@@ -1,16 +1,11 @@
 <?php
 
 /**
- * Description of Manager
+ * Description of Manager.
  *
  * @author Hery
  */
 class CMiddleware_Manager {
-    /**
-     * @var CMiddleware_Manager
-     */
-    private static $instance;
-
     /**
      * The application's global HTTP middleware stack.
      *
@@ -49,12 +44,18 @@ class CMiddleware_Manager {
     ];
 
     /**
+     * @var CMiddleware_Manager
+     */
+    private static $instance;
+
+    /**
      * @return CMiddleware_Manager
      */
     public static function instance() {
         if (static::$instance == null) {
             static::$instance = new static();
         }
+
         return static::$instance;
     }
 
@@ -79,7 +80,7 @@ class CMiddleware_Manager {
     /**
      * Gather the route middleware for the given request.
      *
-     * @param \Illuminate\Http\Request $request
+     * @param \CHTTP_Request $request
      *
      * @return array
      */
@@ -155,9 +156,9 @@ class CMiddleware_Manager {
      * @param string $group
      * @param string $middleware
      *
-     * @return $this
-     *
      * @throws \InvalidArgumentException
+     *
+     * @return $this
      */
     public function prependMiddlewareToGroup($group, $middleware) {
         if (!isset($this->middlewareGroups[$group])) {
@@ -179,9 +180,9 @@ class CMiddleware_Manager {
      * @param string $group
      * @param string $middleware
      *
-     * @return $this
-     *
      * @throws \InvalidArgumentException
+     *
+     * @return $this
      */
     public function appendMiddlewareToGroup($group, $middleware) {
         if (!isset($this->middlewareGroups[$group])) {

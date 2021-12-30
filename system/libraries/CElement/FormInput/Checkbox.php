@@ -11,6 +11,7 @@
 class CElement_FormInput_Checkbox extends CElement_FormInput {
     use CTrait_Compat_Element_FormInput_Checkbox,
         CTrait_Element_Property_Label;
+
     protected $checked = '';
 
     protected $applyjs = '';
@@ -81,7 +82,7 @@ class CElement_FormInput_Checkbox extends CElement_FormInput {
         foreach ($this->attr as $k => $v) {
             $addition_attribute .= ' ' . $k . '="' . $v . '"';
         }
-        $html->append('<input type="checkbox" name="' . $this->name . '" id="' . $this->id . '" class="input-unstyled ' . $classes . '' . $this->validation->validation_class() . '" value="' . $this->value . '"' . $disabled . $custom_css . $checked . $addition_attribute . '>');
+        $html->append('<input type="checkbox" name="' . $this->name . '" id="' . $this->id . '" class="input-unstyled ' . $classes . '' . $this->validation->validationClass() . '" value="' . $this->value . '"' . $disabled . $custom_css . $checked . $addition_attribute . '>');
         //$html->append('<span></span>');
         if (strlen($this->label) > 0) {
             $html->appendln('<label for="' . $this->id . '" class="checkbox-label"><span></span>');

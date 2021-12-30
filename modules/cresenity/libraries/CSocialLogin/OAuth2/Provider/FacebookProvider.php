@@ -23,7 +23,7 @@ class CSocialLogin_OAuth2_Provider_FacebookProvider extends CSocialLogin_OAuth2_
      *
      * @var string
      */
-    protected $version = 'v3.0';
+    protected $version = 'v3.3';
 
     /**
      * The user fields being requested.
@@ -54,53 +54,70 @@ class CSocialLogin_OAuth2_Provider_FacebookProvider extends CSocialLogin_OAuth2_
     protected $reRequest = false;
 
     /**
-     * {@inheritdoc}
+     * The access token that was last used to retrieve a user.
+     *
+     * @var null|string
+     */
+    protected $lastToken;
+
+    /**
+     * @inheritdoc
      */
     protected function getAuthUrl($state) {
         return $this->buildAuthUrlFromBase('https://www.facebook.com/' . $this->version . '/dialog/oauth', $state);
     }
 
     /**
-     * {@inheritdoc}
+     * @inheritdoc
      */
     protected function getTokenUrl() {
         return $this->graphUrl . '/' . $this->version . '/oauth/access_token';
     }
 
     /**
-     * {@inheritdoc}
+     * @inheritdoc
      */
     public function getAccessTokenResponse($code) {
-        $postKey = (version_compare(ClientInterface::VERSION, '6') === 1) ? 'form_params' : 'body';
         $response = $this->getHttpClient()->post($this->getTokenUrl(), [
-            $postKey => $this->getTokenFields($code),
+            'form_params' => $this->getTokenFields($code),
         ]);
+
         $data = json_decode($response->getBody(), true);
+
         return carr::add($data, 'expires_in', carr::pull($data, 'expires'));
     }
 
     /**
-     * {@inheritdoc}
+     * @inheritdoc
      */
     protected function getUserByToken($token) {
-        $meUrl = $this->graphUrl . '/' . $this->version . '/me?access_token=' . $token . '&fields=' . implode(',', $this->fields);
+        $this->lastToken = $token;
+
+        $params = [
+            'access_token' => $token,
+            'fields' => implode(',', $this->fields),
+        ];
+
         if (!empty($this->clientSecret)) {
-            $appSecretProof = hash_hmac('sha256', $token, $this->clientSecret);
-            $meUrl .= '&appsecret_proof=' . $appSecretProof;
+            $params['appsecret_proof'] = hash_hmac('sha256', $token, $this->clientSecret);
         }
-        $response = $this->getHttpClient()->get($meUrl, [
+
+        $response = $this->getHttpClient()->get($this->graphUrl . '/' . $this->version . '/me', [
             'headers' => [
                 'Accept' => 'application/json',
             ],
+            'query' => $params,
         ]);
+
         return json_decode($response->getBody(), true);
     }
 
     /**
-     * {@inheritdoc}
+     * @inheritdoc
      */
     protected function mapUserToObject(array $user) {
         $avatarUrl = $this->graphUrl . '/' . $this->version . '/' . $user['id'] . '/picture';
+
         return (new CSocialLogin_OAuth2_User())->setRaw($user)->map([
             'id' => $user['id'],
             'nickname' => null,
@@ -113,16 +130,19 @@ class CSocialLogin_OAuth2_Provider_FacebookProvider extends CSocialLogin_OAuth2_
     }
 
     /**
-     * {@inheritdoc}
+     * @inheritdoc
      */
     protected function getCodeFields($state = null) {
         $fields = parent::getCodeFields($state);
+
         if ($this->popup) {
             $fields['display'] = 'popup';
         }
+
         if ($this->reRequest) {
             $fields['auth_type'] = 'rerequest';
         }
+
         return $fields;
     }
 
@@ -135,6 +155,7 @@ class CSocialLogin_OAuth2_Provider_FacebookProvider extends CSocialLogin_OAuth2_
      */
     public function fields(array $fields) {
         $this->fields = $fields;
+
         return $this;
     }
 
@@ -145,6 +166,7 @@ class CSocialLogin_OAuth2_Provider_FacebookProvider extends CSocialLogin_OAuth2_
      */
     public function asPopup() {
         $this->popup = true;
+
         return $this;
     }
 
@@ -155,6 +177,29 @@ class CSocialLogin_OAuth2_Provider_FacebookProvider extends CSocialLogin_OAuth2_
      */
     public function reRequest() {
         $this->reRequest = true;
+
+        return $this;
+    }
+
+    /**
+     * Get the last access token used.
+     *
+     * @return null|string
+     */
+    public function lastToken() {
+        return $this->lastToken;
+    }
+
+    /**
+     * Specify which graph version should be used.
+     *
+     * @param string $version
+     *
+     * @return $this
+     */
+    public function usingGraphVersion($version) {
+        $this->version = $version;
+
         return $this;
     }
 }

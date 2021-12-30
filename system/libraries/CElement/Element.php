@@ -15,10 +15,6 @@ abstract class CElement_Element extends CElement {
 
     protected $haveIndent = true;
 
-    protected $is_show = true;
-
-    private $isBuild = false;
-
     public function __construct($id = '', $tag = 'div') {
         parent::__construct($id);
 
@@ -50,15 +46,15 @@ abstract class CElement_Element extends CElement {
     }
 
     protected function htmlAttr() {
-        $custom_css = $this->custom_css;
-        $custom_css = static::renderStyle($custom_css);
-        if (strlen($custom_css) > 0) {
-            $custom_css = ' style="' . $custom_css . '"';
+        $customCss = $this->custom_css;
+        $customCss = static::renderStyle($customCss);
+        if (strlen($customCss) > 0) {
+            $customCss = ' style="' . $customCss . '"';
         }
-        $addition_attribute = '';
+        $additionAttribute = '';
         $haveClass = false;
         foreach ($this->attr as $k => $v) {
-            $addition_attribute .= ' ' . $k . '="' . $v . '"';
+            $additionAttribute .= ' ' . $k . '="' . $v . '"';
             if ($k == 'class') {
                 $haveClass = true;
             }
@@ -69,9 +65,9 @@ abstract class CElement_Element extends CElement {
             $classes = implode(' ', $classes);
             $classAttr = ' class="' . $classes . '"';
         }
-        $html_attr = 'id="' . $this->id . '" ' . $classAttr . $custom_css . $addition_attribute;
+        $htmlAttr = 'id="' . $this->id . '" ' . $classAttr . $customCss . $additionAttribute;
 
-        return $html_attr;
+        return $htmlAttr;
     }
 
     protected function buildOnce() {
@@ -114,28 +110,25 @@ abstract class CElement_Element extends CElement {
         if ($this->isOneTag) {
             $html->$appendMethod($this->onetag());
         } else {
-            if ($this->is_show) {
-                $html->$appendMethod($this->pretag());
-                if ($this->haveIndent) {
-                    $html->br();
-                }
-                if ($this->haveIndent) {
-                    $html->incIndent();
-                }
+            $html->$appendMethod($this->pretag());
+            if ($this->haveIndent) {
+                $html->br();
+            }
+            if ($this->haveIndent) {
+                $html->incIndent();
             }
 
             $html->$appendMethod($this->htmlChild($html->getIndent()));
             if ($this->haveIndent) {
                 $html->br();
             }
-            if ($this->is_show) {
-                if ($this->haveIndent) {
-                    $html->decIndent();
-                }
-                $html->$appendMethod($this->posttag());
-                if ($this->haveIndent) {
-                    $html->br();
-                }
+
+            if ($this->haveIndent) {
+                $html->decIndent();
+            }
+            $html->$appendMethod($this->posttag());
+            if ($this->haveIndent) {
+                $html->br();
             }
         }
         $html->$appendMethod($this->afterHtml($indent));

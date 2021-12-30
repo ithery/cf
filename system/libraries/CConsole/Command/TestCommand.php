@@ -1,15 +1,15 @@
 <?php
 
 /**
- * Description of TestCommand
+ * Description of TestCommand.
  *
  * @author Hery
  */
-use Dotenv\Exception\InvalidPathException;
 use Dotenv\Parser\Parser;
 use Dotenv\Store\StoreBuilder;
-use Symfony\Component\Process\Exception\ProcessSignaledException;
 use Symfony\Component\Process\Process;
+use Dotenv\Exception\InvalidPathException;
+use Symfony\Component\Process\Exception\ProcessSignaledException;
 
 /**
  * @final
@@ -140,18 +140,18 @@ class CConsole_Command_TestCommand extends CConsole_Command {
      */
     protected function clearEnv() {
         if (!$this->option('env')) {
-            $vars = self::getEnvironmentVariables(
-                // @phpstan-ignore-next-line
-                $this->laravel->environmentPath(),
-                // @phpstan-ignore-next-line
-                $this->laravel->environmentFile()
-            );
+            // $vars = self::getEnvironmentVariables(
+            //     // @phpstan-ignore-next-line
+            //     $this->laravel->environmentPath(),
+            //     // @phpstan-ignore-next-line
+            //     $this->laravel->environmentFile()
+            // );
 
-            $repository = CEnv::getRepository();
+            // $repository = CEnv::getRepository();
 
-            foreach ($vars as $name) {
-                $repository->clear($name);
-            }
+            // foreach ($vars as $name) {
+            //     $repository->clear($name);
+            // }
         }
     }
 

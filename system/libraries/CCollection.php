@@ -160,7 +160,7 @@ class CCollection implements ArrayAccess, CInterface_Enumerable, CBase_Contract_
      * @return bool
      */
     public function contains($key, $operator = null, $value = null) {
-        if (func_num_args() === 1) {
+        if (func_num_args() === 1 || (is_callable($key)) || ($operator === null && $value === null)) {
             if ($this->useAsCallable($key)) {
                 $placeholder = new stdClass();
 
@@ -1447,6 +1447,9 @@ class CCollection implements ArrayAccess, CInterface_Enumerable, CBase_Contract_
      * @return static
      */
     public function unique($key = null, $strict = false) {
+        if (is_null($key) && $strict === false) {
+            return new static(array_unique($this->items, SORT_REGULAR));
+        }
         $callback = $this->valueRetriever($key);
 
         $exists = [];

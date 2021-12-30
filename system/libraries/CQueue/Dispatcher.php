@@ -76,6 +76,27 @@ class CQueue_Dispatcher implements CQueue_QueueingDispatcherInterface {
     /**
      * Dispatch a command to its appropriate handler in the current process.
      *
+     * Queueable jobs will be dispatched to the "sync" queue.
+     *
+     * @param mixed $command
+     * @param mixed $handler
+     *
+     * @return mixed
+     */
+    public function dispatchSync($command, $handler = null) {
+        if ($this->queueResolver
+            && $this->commandShouldBeQueued($command)
+            && method_exists($command, 'onConnection')
+        ) {
+            return $this->dispatchToQueue($command->onConnection('sync'));
+        }
+
+        return $this->dispatchNow($command, $handler);
+    }
+
+    /**
+     * Dispatch a command to its appropriate handler in the current process.
+     *
      * @param mixed $command
      * @param mixed $handler
      *
@@ -106,18 +127,17 @@ class CQueue_Dispatcher implements CQueue_QueueingDispatcherInterface {
         }
 
         return $this->pipeline->send($command)->through($this->pipes)->then($callback);
+    }
 
-        if ($handler || $handler = $this->getCommandHandler($command)) {
-            $callback = function ($command) use ($handler) {
-                return $handler->handle($command);
-            };
-        } else {
-            $callback = function ($command) {
-                return $this->container->call([$command, 'execute']);
-            };
-        }
-
-        return $this->pipeline->send($command)->through($this->pipes)->then($callback);
+    /**
+     * Attempt to find the batch with the given ID.
+     *
+     * @param string $batchId
+     *
+     * @return null|\CQueue_Batch
+     */
+    public function findBatch(string $batchId) {
+        return CQueue::batchRepository()->find($batchId);
     }
 
     /**

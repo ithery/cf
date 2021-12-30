@@ -18,31 +18,24 @@ class CDaemon_DebugShell {
     const INDENT_DEPTH = 6;
 
     /**
-     * The object that is being proxied by this shell
+     * The object that is being proxied by this shell.
      *
      * @var stdClass
      */
     public $object;
 
     /**
-     * A simple way to toggle debugging on & off
+     * A simple way to toggle debugging on & off.
      *
      * @var bool
      */
     public $debug = true;
 
     /**
-     * Used to determine which process has access to issue prompts to the debug console.
-     *
-     * @var resource
-     */
-    private $mutex;
-
-    /**
      * Shared Memory resource to store settings for this debug shell that can be shared across all processes
      * using it.
      *
-     * @var resource
+     * @var SysvSharedMemory
      */
     public $shm;
 
@@ -61,7 +54,7 @@ class CDaemon_DebugShell {
     public $service;
 
     /**
-     * List of methods to exclude from debugging -- will be passed directly to the proxied $object
+     * List of methods to exclude from debugging -- will be passed directly to the proxied $object.
      *
      * @var array
      */
@@ -76,20 +69,6 @@ class CDaemon_DebugShell {
      * @var array
      */
     public $prompts = [];
-
-    /**
-     * Array of callables
-     *
-     * @var closure[]
-     */
-    private $parsers = [];
-
-    /**
-     * Array of commands and their descriptions
-     *
-     * @var array
-     */
-    private $commands = [];
 
     /**
      * Associative array of method names and a callable that will be called if that method is interrupted.
@@ -118,6 +97,27 @@ class CDaemon_DebugShell {
      */
     public $promptPrefixCallback;
 
+    /**
+     * Used to determine which process has access to issue prompts to the debug console.
+     *
+     * @var SysvSemaphore
+     */
+    private $mutex;
+
+    /**
+     * Array of callables.
+     *
+     * @var closure[]
+     */
+    private $parsers = [];
+
+    /**
+     * Array of commands and their descriptions.
+     *
+     * @var array
+     */
+    private $commands = [];
+
     public function __construct($object) {
         if (!is_object($object)) {
             throw new Exception('DebugShell Failed: You must supply an object to be proxied.');
@@ -140,7 +140,7 @@ class CDaemon_DebugShell {
      * @param $method
      * @param $args
      *
-     * @return bool|mixed|null|void
+     * @return null|bool|mixed|void
      */
     public function __call($method, $args) {
         $o = $this->object;
@@ -165,11 +165,13 @@ class CDaemon_DebugShell {
                 if ($this->prompt(self::CAPTURE, null)) {
                     return $return;
                 }
+
                 break;
         }
         if (is_callable($interrupt)) {
             return $interrupt();
         }
+
         return null;
     }
 
@@ -177,6 +179,7 @@ class CDaemon_DebugShell {
         if (in_array($k, get_object_vars($this->object))) {
             return $this->object->{$k};
         }
+
         return null;
     }
 
@@ -184,6 +187,7 @@ class CDaemon_DebugShell {
         if (in_array($k, get_object_vars($this->object))) {
             return $this->object->{$k} = $v;
         }
+
         return null;
     }
 
@@ -216,6 +220,7 @@ class CDaemon_DebugShell {
                 } else {
                     echo PHP_EOL;
                 }
+
                 return false;
             }
         ];
@@ -235,7 +240,7 @@ class CDaemon_DebugShell {
             'closure' => function ($matches, $printer) use ($shell) {
                 $time = time() + $matches[1];
                 $shell->debugState('skip__until', $time);
-                $printer("Skipping Breakpoints for $matches[1] seconds. Will resume at " . date('H:i:s', $time));
+                $printer("Skipping Breakpoints for {$matches[1]} seconds. Will resume at " . date('H:i:s', $time));
             }
         ];
         $this->loadParsers($parsers);
@@ -253,6 +258,7 @@ class CDaemon_DebugShell {
         $i = 1 + $this->debugState('indent_incrementor', null, 0);
         if ($key === null) {
             $this->debugState('indent_incrementor', $i);
+
             return $i;
         }
         $map = $this->debugState('indent_map', null, []);
@@ -261,12 +267,13 @@ class CDaemon_DebugShell {
             $this->debugState('indent_map', $map);
             $this->debugState('indent_incrementor', $i);
         }
+
         return $map[$key];
     }
 
     /**
      * Add a parser to the queue. Will be evaluated FIFO.
-     * The parser functions will be passed the method, args
+     * The parser functions will be passed the method, args.
      *
      * @param string $command
      * @param string $description
@@ -279,7 +286,7 @@ class CDaemon_DebugShell {
 
     /**
      * Append the given array of parsers to the end of the parser queue
-     * Array should contain associative array with keys: regex, command, description, closure
+     * Array should contain associative array with keys: regex, command, description, closure.
      *
      * @param array $parsers
      *
@@ -313,11 +320,12 @@ class CDaemon_DebugShell {
         }
         //throw new Exception("Cannot acquire mutex: Unknown Error.");
         $this->mutexAcquired = $pid;
+
         return true;
     }
 
     /**
-     * Release the mutex
+     * Release the mutex.
      *
      * @return void
      */
@@ -328,13 +336,13 @@ class CDaemon_DebugShell {
     }
 
     /**
-     * Get and Set state variables to share settings for this console across processes
+     * Get and Set state variables to share settings for this console across processes.
      *
      * @param $key
      * @param null       $value
      * @param null|mixed $default
      *
-     * @return bool|null
+     * @return null|bool
      */
     public function debugState($key, $value = null, $default = null) {
         static $state = false;
@@ -358,12 +366,12 @@ class CDaemon_DebugShell {
         }
         if ($value === null) {
             if (isset($state[$key])) {
-                $this->service->log("State get $key = " . $state[$key]);
+                $this->service->log("State get ${key} = " . $state[$key]);
             } else {
-                $this->service->log("State get $key = [$default]");
+                $this->service->log("State get ${key} = [${default}]");
             }
         } else {
-            $this->service->log("State SET $key=$value");
+            $this->service->log("State SET ${key}=${value}");
         }
         if ($value === null) {
             if (isset($state[$key])) {
@@ -373,11 +381,12 @@ class CDaemon_DebugShell {
             }
         }
         $state[$key] = $value;
+
         return shm_put_var($this->shm, 1, $state);
     }
 
     /**
-     * Determine if a prompt should be displayed. There are several ways to skip/suppress prompts:
+     * Determine if a prompt should be displayed. There are several ways to skip/suppress prompts:.
      *
      * 1. Disable debugging.
      * 2. Add a given $method to the blacklist at design-time.
@@ -391,8 +400,9 @@ class CDaemon_DebugShell {
     private function isBreakpointActive($method) {
         $a = !in_array($method, $this->blacklist);
         $b = $this->debugState('enabled');
-        $c = !$this->debugState("skip_$method");
+        $c = !$this->debugState("skip_${method}");
         $d = $this->debugState('skip__until') === null || $this->debugState('skip__until') < time();
+
         return $a && $b && $c && $d;
     }
 
@@ -435,11 +445,12 @@ class CDaemon_DebugShell {
         if (is_callable($prefixer)) {
             $prompt = '[' . $prefixer($method, $args) . '] ' . $prompt;
         }
-        return "$prompt > ";
+
+        return "${prompt} > ";
     }
 
     /**
-     * Print a simple banner when the console starts
+     * Print a simple banner when the console starts.
      *
      * @return void
      */
@@ -470,9 +481,9 @@ class CDaemon_DebugShell {
      * @param $method
      * @param $args
      *
-     * @return bool|int|mixed|null
-     *
      * @throws Exception
+     *
+     * @return null|bool|int|mixed
      */
     public function prompt($method, $args) {
         if (!is_resource($this->shm)) {
@@ -483,6 +494,7 @@ class CDaemon_DebugShell {
         $this->mutexAcquire();
         if (!$this->isBreakpointActive($method)) {
             $this->mutexRelease();
+
             return true;
         }
         // Pass a simple print-line closure to parsers to use instead of just "echo" or "print"
@@ -494,8 +506,9 @@ class CDaemon_DebugShell {
                 $message = substr($message, 0, $maxlen - 3) . '...';
             }
             $message = str_replace(PHP_EOL, PHP_EOL . ' ', $message);
-            echo " $message\n\n";
+            echo " ${message}\n\n";
         };
+
         try {
             $this->printBanner();
             $pid = getmypid();
@@ -527,6 +540,7 @@ class CDaemon_DebugShell {
                 foreach ($this->parsers as $parser) {
                     if (preg_match($parser['regex'], $input, $matches) == 1) {
                         $break = $parser['closure']($matches, $printer);
+
                         break;
                     }
                 }
@@ -563,60 +577,73 @@ class CDaemon_DebugShell {
                         $out[] = '';
                         $out[] = '!!                Repeat previous command';
                         $printer(implode(PHP_EOL, $out));
+
                         break;
                     case 'indent y':
                         $this->debugState('indent', true);
                         $printer('Indent enabled');
+
                         break;
                     case 'indent n':
                         $this->debugState('indent', false);
                         $printer('Indent disabled');
+
                         break;
                     case 'show args':
                         $printer(print_r($args, true));
+
                         break;
                     case 'shutdown':
                         //$this->service->shutdown();
                         $printer('Shutdown In Progress... Use `end` command to cease debugging until shutdown is complete.');
                         $break = true;
+
                         break;
                     case 'trace':
                         $e = new exception();
                         $printer($e->getTraceAsString());
+
                         break;
                     case 'end':
                         $this->debugState('enabled', false);
                         $break = true;
                         $printer('Debugging Ended..');
                         $input = true;
+
                         break;
                     case 'skip':
-                        $this->debugState("skip_$method", true);
+                        $this->debugState("skip_${method}", true);
                         $printer('Breakpoint "' . $method . '" Turned Off..');
                         $break = true;
                         $input = true;
+
                         break;
                     case 'kill':
                         @fclose(STDOUT);
                         @fclose(STDERR);
                         @exec('ps -C "php ' . $this->service()->getServiceName() . '" -o pid= | xargs kill -9 ');
+
                         break;
                     case 'capture':
                         $backtrace = debug_backtrace();
                         if ($backtrace[1]['function'] !== '__call' || $method == self::CAPTURE) {
                             $printer('Cannot capture this :(');
+
                             break;
                         }
                         $input = self::CAPTURE;
                         $break = true;
+
                         break;
                     case 'y':
                         $input = self::CONT;
                         $break = true;
+
                         break;
                     case 'n':
                         $input = self::ABORT;
                         $break = true;
+
                         break;
                     default:
                         if ($input) {
@@ -626,9 +653,11 @@ class CDaemon_DebugShell {
             }
         } catch (Exception $e) {
             $this->mutexRelease();
+
             throw $e;
         }
         $this->mutexRelease();
+
         return $input;
     }
 

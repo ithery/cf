@@ -13,9 +13,9 @@ trait CObservable_Trait_EventsTrait {
         /** @var CObservable $this */
         $compiledJs = '';
         if ($event instanceof Closure) {
-            $this->javascript->startDeferred();
-            $event($this->javascript);
-            $compiledJs = $this->javascript->endDeferred();
+            $this->javascript()->startDeferred();
+            $event($this->javascript());
+            $compiledJs = $this->javascript()->endDeferred();
         }
         $this->javascript->jquery()->onClick($compiledJs);
     }
@@ -24,11 +24,11 @@ trait CObservable_Trait_EventsTrait {
         /** @var CObservable $this */
         $compiledJs = '';
         if ($event instanceof Closure) {
-            $this->javascript->startDeferred();
-            $event($this->javascript);
-            $compiledJs = $this->javascript->endDeferred();
+            $this->javascript()->startDeferred();
+            $event($this->javascript());
+            $compiledJs = $this->javascript()->endDeferred();
         }
 
-        $this->javascript->jquery()->onChange($compiledJs);
+        $this->javascript()->jquery()->onChange($compiledJs);
     }
 }

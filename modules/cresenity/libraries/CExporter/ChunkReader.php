@@ -6,7 +6,7 @@ use Maatwebsite\Excel\Jobs\QueueImport;
 class CExporter_ChunkReader {
     /**
      * @param CExporter_Concern_WithChunkReading $import
-     * @param Reader                             $reader
+     * @param CExporter_Reader                   $reader
      * @param CExporter_File_TemporaryFile       $temporaryFile
      *
      * @return null|\CQueue_PendingDispatch

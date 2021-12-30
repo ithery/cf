@@ -85,9 +85,9 @@ run().catch(err => {
     const script = [
         commandScript(cmd, opts),
         `--config="${configPath}"`,
-        ...quoteArgs(args)
+        //...quoteArgs(args)
     ].join(' ');
-    console.log(script);
+
     const scriptEnv = {
         NODE_ENV: env,
         CF_FILE: opts.cfConfig

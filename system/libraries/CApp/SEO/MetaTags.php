@@ -2,13 +2,6 @@
 
 class CApp_SEO_MetaTags implements CApp_SEO_MetaTagsInterface {
     /**
-     * Singleton instance of this class.
-     *
-     * @var CApp_SEO_MetaTags
-     */
-    protected $instance = null;
-
-    /**
      * The meta title.
      *
      * @var string
@@ -117,6 +110,13 @@ class CApp_SEO_MetaTags implements CApp_SEO_MetaTagsInterface {
         'yandex' => 'yandex-verification',
         'norton' => 'norton-safeweb-site-verification',
     ];
+
+    /**
+     * Singleton instance of this class.
+     *
+     * @var CApp_SEO_MetaTags
+     */
+    private static $instance = null;
 
     private function __construct() {
         $this->config = CF::config('seo.meta');

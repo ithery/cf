@@ -8,6 +8,6 @@ defined('SYSPATH') or die('No direct access allowed.');
  *
  * @since Jun 19, 2018, 3:37:54 AM
  */
-class CApp_Model_Roles extends CApp_Model {
+class CApp_Model_Roles extends CApp_Model implements CApp_Auth_Contract_RoleInterface {
     use CApp_Model_Trait_Roles;
 }

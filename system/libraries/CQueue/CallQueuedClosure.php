@@ -1,16 +1,5 @@
 <?php
 
-use Closure;
-use CQueue_ShouldQueueInterface;
-use CQueue_Trait_DispatchableTrait;
-use CQueue_Trait_InteractsWithQueue;
-use CQueue_Trait_SerializesModels;
-use Illuminate\Bus\Batchable;
-use Illuminate\Bus\Queueable;
-use Illuminate\Contracts\Container\Container;
-use Illuminate\Foundation\Bus\Dispatchable;
-use ReflectionFunction;
-
 class CQueue_CallQueuedClosure implements CQueue_ShouldQueueInterface {
     use CQueue_Trait_BatchableTrait;
     use CQueue_Trait_DispatchableTrait;

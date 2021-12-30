@@ -17,7 +17,8 @@ class CCache_Driver_FileDriver extends CCache_DriverAbstract {
         parent::__construct($options);
         $engineName = $this->getOption('engine', 'Temp');
         $engineOptions = $this->getOption('options', []);
-        $engineClass = 'CCache_Driver_FileDriver_Engine_' . $engineName . 'Engine';
+
+        $engineClass = 'CCache_Driver_FileDriver_Engine_' . cstr::ucfirst($engineName) . 'Engine';
         $this->engine = new $engineClass($engineOptions);
     }
 

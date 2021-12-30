@@ -526,9 +526,11 @@ class TestSuite implements IteratorAggregate, Reorderable, SelfDescribing, Test 
     /**
      * Wrapper for addTestFile() that adds multiple test files.
      *
+     * @param iterable $fileNames
+     *
      * @throws Exception
      */
-    public function addTestFiles(iterable $fileNames) {
+    public function addTestFiles($fileNames) {
         foreach ($fileNames as $filename) {
             $this->addTestFile((string) $filename);
         }

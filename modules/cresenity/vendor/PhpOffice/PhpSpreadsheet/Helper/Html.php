@@ -2,16 +2,15 @@
 
 namespace PhpOffice\PhpSpreadsheet\Helper;
 
-use DOMDocument;
-use DOMElement;
 use DOMNode;
 use DOMText;
-use PhpOffice\PhpSpreadsheet\RichText\RichText;
-use PhpOffice\PhpSpreadsheet\Style\Color;
+use DOMElement;
+use DOMDocument;
 use PhpOffice\PhpSpreadsheet\Style\Font;
+use PhpOffice\PhpSpreadsheet\Style\Color;
+use PhpOffice\PhpSpreadsheet\RichText\RichText;
 
-class Html
-{
+class Html {
     protected static $colourMap = [
         'aliceblue' => 'f0f8ff',
         'antiquewhite' => 'faebd7',
@@ -593,8 +592,7 @@ class Html
      */
     protected $richTextObject;
 
-    protected function initialise()
-    {
+    protected function initialise() {
         $this->face = $this->size = $this->color = null;
         $this->bold = $this->italic = $this->underline = $this->superscript = $this->subscript = $this->strikethrough = false;
 
@@ -610,8 +608,7 @@ class Html
      *
      * @return RichText
      */
-    public function toRichTextObject($html)
-    {
+    public function toRichTextObject($html) {
         $this->initialise();
 
         //    Create a new DOM object
@@ -632,8 +629,7 @@ class Html
         return $this->richTextObject;
     }
 
-    protected function cleanWhitespace()
-    {
+    protected function cleanWhitespace() {
         foreach ($this->richTextObject->getRichTextElements() as $key => $element) {
             $text = $element->getText();
             // Trim any leading spaces on the first run
@@ -646,8 +642,7 @@ class Html
         }
     }
 
-    protected function buildTextRun()
-    {
+    protected function buildTextRun() {
         $text = $this->stringData;
         if (trim($text) === '') {
             return;
@@ -684,8 +679,7 @@ class Html
         $this->stringData = '';
     }
 
-    protected function rgbToColour($rgb)
-    {
+    protected function rgbToColour($rgb) {
         preg_match_all('/\d+/', $rgb, $values);
         foreach ($values[0] as &$value) {
             $value = str_pad(dechex($value), 2, '0', STR_PAD_LEFT);
@@ -694,13 +688,11 @@ class Html
         return implode($values[0]);
     }
 
-    protected function colourNameLookup($rgb)
-    {
-        return self::$colourMap[$rgb];
+    public static function colourNameLookup($rgb) {
+        return isset(self::$colourMap[$rgb]) ? self::$colourMap[$rgb] : '';
     }
 
-    protected function startFontTag($tag)
-    {
+    protected function startFontTag($tag) {
         foreach ($tag->attributes as $attribute) {
             $attributeName = strtolower($attribute->name);
             $attributeValue = $attribute->value;
@@ -719,78 +711,63 @@ class Html
         }
     }
 
-    protected function endFontTag()
-    {
+    protected function endFontTag() {
         $this->face = $this->size = $this->color = null;
     }
 
-    protected function startBoldTag()
-    {
+    protected function startBoldTag() {
         $this->bold = true;
     }
 
-    protected function endBoldTag()
-    {
+    protected function endBoldTag() {
         $this->bold = false;
     }
 
-    protected function startItalicTag()
-    {
+    protected function startItalicTag() {
         $this->italic = true;
     }
 
-    protected function endItalicTag()
-    {
+    protected function endItalicTag() {
         $this->italic = false;
     }
 
-    protected function startUnderlineTag()
-    {
+    protected function startUnderlineTag() {
         $this->underline = true;
     }
 
-    protected function endUnderlineTag()
-    {
+    protected function endUnderlineTag() {
         $this->underline = false;
     }
 
-    protected function startSubscriptTag()
-    {
+    protected function startSubscriptTag() {
         $this->subscript = true;
     }
 
-    protected function endSubscriptTag()
-    {
+    protected function endSubscriptTag() {
         $this->subscript = false;
     }
 
-    protected function startSuperscriptTag()
-    {
+    protected function startSuperscriptTag() {
         $this->superscript = true;
     }
 
-    protected function endSuperscriptTag()
-    {
+    protected function endSuperscriptTag() {
         $this->superscript = false;
     }
 
-    protected function startStrikethruTag()
-    {
+    protected function startStrikethruTag() {
         $this->strikethrough = true;
     }
 
-    protected function endStrikethruTag()
-    {
+    protected function endStrikethruTag() {
         $this->strikethrough = false;
     }
 
-    protected function breakTag()
-    {
+    protected function breakTag() {
         $this->stringData .= "\n";
     }
 
-    protected function parseTextNode(DOMText $textNode)
-    {
+    protected function parseTextNode(DOMText $textNode) {
         $domText = preg_replace(
             '/\s+/u',
             ' ',
@@ -802,11 +779,10 @@ class Html
 
     /**
      * @param DOMElement $element
-     * @param string $callbackTag
-     * @param array $callbacks
+     * @param string     $callbackTag
+     * @param array      $callbacks
      */
-    protected function handleCallback(DOMElement $element, $callbackTag, array $callbacks)
-    {
+    protected function handleCallback(DOMElement $element, $callbackTag, array $callbacks) {
         if (isset($callbacks[$callbackTag])) {
             $elementHandler = $callbacks[$callbackTag];
             if (method_exists($this, $elementHandler)) {
@@ -815,8 +791,7 @@ class Html
         }
     }
 
-    protected function parseElementNode(DOMElement $element)
-    {
+    protected function parseElementNode(DOMElement $element) {
         $callbackTag = strtolower($element->nodeName);
         $this->stack[] = $callbackTag;
 
@@ -828,8 +803,7 @@ class Html
         $this->handleCallback($element, $callbackTag, $this->endTagCallbacks);
     }
 
-    protected function parseElements(DOMNode $element)
-    {
+    protected function parseElements(DOMNode $element) {
         foreach ($element->childNodes as $child) {
             if ($child instanceof DOMText) {
                 $this->parseTextNode($child);

@@ -28,12 +28,12 @@ class CElement_FormInput_DateRange extends CElement_FormInput {
 
         $this->type = 'date';
         $this->dateFormat = 'yyyy-mm-dd';
-        $date_format = ccfg::get('date_formatted');
-        if ($date_format != null) {
-            $date_format = str_replace('Y', 'yyyy', $date_format);
-            $date_format = str_replace('m', 'mm', $date_format);
-            $date_format = str_replace('d', 'dd', $date_format);
-            $this->dateFormat = $date_format;
+        $dateFormat = c::formatter()->getDateFormat();
+        if ($dateFormat != null) {
+            $dateFormat = str_replace('Y', 'yyyy', $dateFormat);
+            $dateFormat = str_replace('m', 'mm', $dateFormat);
+            $dateFormat = str_replace('d', 'dd', $dateFormat);
+            $this->dateFormat = $dateFormat;
         }
 
         $this->addClass('form-control');
@@ -82,9 +82,9 @@ class CElement_FormInput_DateRange extends CElement_FormInput {
         }
 
         $html->appendln('<div class="input-daterange input-group" id="' . $this->id . '">')->br();
-        $html->appendln('<input type="text" name="' . $this->name . '[start]"  data-date-format="' . $this->dateFormat . '" id="' . $this->id . '-start" class="datepicker input-unstyled' . $classes . $this->validation->validation_class() . '" value="' . $this->value . '"' . $disabled . $addition_attribute . $custom_css . '>')->br();
+        $html->appendln('<input type="text" name="' . $this->name . '[start]"  data-date-format="' . $this->dateFormat . '" id="' . $this->id . '-start" class="datepicker input-unstyled' . $classes . $this->validation->validationClass() . '" value="' . $this->value . '"' . $disabled . $addition_attribute . $custom_css . '>')->br();
         $html->appendln('<div class="input-group-prepend"><span class="input-group-text">to</span></div>');
-        $html->appendln('<input type="text" name="' . $this->name . '[end]"  data-date-format="' . $this->dateFormat . '" id="' . $this->id . '-end" class="datepicker input-unstyled' . $classes . $this->validation->validation_class() . '" value="' . $this->value . '"' . $disabled . $addition_attribute . $custom_css . '>')->br();
+        $html->appendln('<input type="text" name="' . $this->name . '[end]"  data-date-format="' . $this->dateFormat . '" id="' . $this->id . '-end" class="datepicker input-unstyled' . $classes . $this->validation->validationClass() . '" value="' . $this->value . '"' . $disabled . $addition_attribute . $custom_css . '>')->br();
         $html->appendln('</div>');
 
         return $html->text();
@@ -103,7 +103,7 @@ class CElement_FormInput_DateRange extends CElement_FormInput {
             $option = '{' . $option . '}';
         }
         $js = new CStringBuilder();
-        $js->set_indent($indent);
+        $js->setIndent($indent);
         $js->append(parent::js($indent))->br();
 
         $js->append("$('#" . $this->id . "').datepicker(" . $option . ');')->br();

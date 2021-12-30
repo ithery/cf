@@ -15,17 +15,17 @@ class CSocialLogin_OAuth2_Provider_InstagramProvider extends CSocialLogin_OAuth2
     const IDENTIFIER = 'INSTAGRAM';
 
     /**
-     * {@inheritdoc}
+     * @inheritdoc
      */
     protected $scopeSeparator = ' ';
 
     /**
-     * {@inheritdoc}
+     * @inheritdoc
      */
     protected $scopes = ['basic'];
 
     /**
-     * {@inheritdoc}
+     * @inheritdoc
      */
     protected function getAuthUrl($state) {
         return $this->buildAuthUrlFromBase(
@@ -35,14 +35,14 @@ class CSocialLogin_OAuth2_Provider_InstagramProvider extends CSocialLogin_OAuth2
     }
 
     /**
-     * {@inheritdoc}
+     * @inheritdoc
      */
     protected function getTokenUrl() {
         return 'https://api.instagram.com/oauth/access_token';
     }
 
     /**
-     * {@inheritdoc}
+     * @inheritdoc
      */
     protected function getUserByToken($token) {
         $endpoint = '/users/self';
@@ -60,11 +60,12 @@ class CSocialLogin_OAuth2_Provider_InstagramProvider extends CSocialLogin_OAuth2
                 ],
             ]
         );
+
         return json_decode($response->getBody()->getContents(), true)['data'];
     }
 
     /**
-     * {@inheritdoc}
+     * @inheritdoc
      */
     protected function mapUserToObject(array $user) {
         return (new CSocialLogin_OAuth2_User())->setRaw($user)->map([
@@ -77,18 +78,19 @@ class CSocialLogin_OAuth2_Provider_InstagramProvider extends CSocialLogin_OAuth2
     }
 
     /**
-     * {@inheritdoc}
+     * @inheritdoc
      */
     public function getAccessToken($code) {
         $response = $this->getHttpClient()->post($this->getTokenUrl(), [
             'form_params' => $this->getTokenFields($code),
         ]);
         $this->credentialsResponseBody = json_decode($response->getBody(), true);
+
         return $this->parseAccessToken($response->getBody());
     }
 
     /**
-     * {@inheritdoc}
+     * @inheritdoc
      */
     protected function getTokenFields($code) {
         return array_merge(parent::getTokenFields($code), [
@@ -108,9 +110,10 @@ class CSocialLogin_OAuth2_Provider_InstagramProvider extends CSocialLogin_OAuth2
         $sig = $endpoint;
         ksort($params);
         foreach ($params as $key => $val) {
-            $sig .= "|$key=$val";
+            $sig .= "|${key}=${val}";
         }
         $signing_key = $this->clientSecret;
+
         return hash_hmac('sha256', $sig, $signing_key, false);
     }
 }

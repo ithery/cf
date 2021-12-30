@@ -18,6 +18,7 @@ class CAjax_Engine_DataTable_Processor_ModelQuery extends CAjax_Engine_DataTable
         $queryUnserialized = $this->table()->getQuery();
         $query = CModel_QuerySerializer::unserialize($queryUnserialized);
 
+        /** @var CModel_Query $query */
         $this->getFullQuery($query);
 
         $perPage = null;

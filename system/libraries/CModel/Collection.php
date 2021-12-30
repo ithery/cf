@@ -20,7 +20,7 @@ class CModel_Collection extends CCollection implements CQueue_QueueableCollectio
 
         if (is_array($key)) {
             if ($this->isEmpty()) {
-                return new static;
+                return new static();
             }
 
             return $this->whereIn($this->first()->getKeyName(), $key);
@@ -147,6 +147,17 @@ class CModel_Collection extends CCollection implements CQueue_QueueableCollectio
     }
 
     /**
+     * Load a set of related existences onto the collection.
+     *
+     * @param array|string $relations
+     *
+     * @return $this
+     */
+    public function loadExists($relations) {
+        return $this->loadAggregate($relations, '*', 'exists');
+    }
+
+    /**
      * Load a set of relationships onto the collection if they are not already eager loaded.
      *
      * @param array|string $relations
@@ -209,8 +220,7 @@ class CModel_Collection extends CCollection implements CQueue_QueueableCollectio
         if (empty($path)) {
             return;
         }
-
-        $models = $models->pluck($name);
+        $models = $models->pluck($name)->whereNotNull();
 
         if ($models->first() instanceof CCollection) {
             $models = $models->collapse();
@@ -368,7 +378,7 @@ class CModel_Collection extends CCollection implements CQueue_QueueableCollectio
      */
     public function fresh($with = []) {
         if ($this->isEmpty()) {
-            return new static;
+            return new static();
         }
 
         $model = $this->first();
@@ -378,6 +388,7 @@ class CModel_Collection extends CCollection implements CQueue_QueueableCollectio
             ->whereIn($model->getKeyName(), $this->modelKeys())
             ->get()
             ->getDictionary();
+
         return $this->filter(function ($model) use ($freshModels) {
             return $model->exists && isset($freshModels[$model->getKey()]);
         })->map(function ($model) use ($freshModels) {
@@ -393,7 +404,7 @@ class CModel_Collection extends CCollection implements CQueue_QueueableCollectio
      * @return static
      */
     public function diff($items) {
-        $diff = new static;
+        $diff = new static();
 
         $dictionary = $this->getDictionary($items);
 
@@ -414,7 +425,7 @@ class CModel_Collection extends CCollection implements CQueue_QueueableCollectio
      * @return static
      */
     public function intersect($items) {
-        $intersect = new static;
+        $intersect = new static();
 
         if (empty($items)) {
             return $intersect;
@@ -434,7 +445,7 @@ class CModel_Collection extends CCollection implements CQueue_QueueableCollectio
     /**
      * Return only unique items from the collection.
      *
-     * @param string|callable|null $key
+     * @param null|string|callable $key
      * @param bool                 $strict
      *
      * @return static|CCollection
@@ -504,9 +515,20 @@ class CModel_Collection extends CCollection implements CQueue_QueueableCollectio
     }
 
     /**
+     * Append an attribute across the entire collection.
+     *
+     * @param array|string $attributes
+     *
+     * @return $this
+     */
+    public function append($attributes) {
+        return $this->each->append($attributes);
+    }
+
+    /**
      * Get a dictionary keyed by primary keys.
      *
-     * @param \ArrayAccess|array|null $items
+     * @param null|\ArrayAccess|array $items
      *
      * @return array
      */
@@ -533,7 +555,7 @@ class CModel_Collection extends CCollection implements CQueue_QueueableCollectio
      * Get an array with the values of a given key.
      *
      * @param string      $value
-     * @param string|null $key
+     * @param null|string $key
      *
      * @return CCollection
      */
@@ -596,18 +618,31 @@ class CModel_Collection extends CCollection implements CQueue_QueueableCollectio
      * @param int   $size
      * @param mixed $value
      *
-     * @return \Illuminate\Support\Collection
+     * @return \CCollection
      */
     public function pad($size, $value) {
         return $this->toBase()->pad($size, $value);
     }
 
     /**
+     * Get the comparison function to detect duplicates.
+     *
+     * @param bool $strict
+     *
+     * @return \Closure
+     */
+    protected function duplicateComparator($strict) {
+        return function ($a, $b) {
+            return $a->is($b);
+        };
+    }
+
+    /**
      * Get the type of the entities being queued.
      *
-     * @return string|null
-     *
      * @throws \LogicException
+     *
+     * @return null|string
      */
     public function getQueueableClass() {
         if ($this->isEmpty()) {
@@ -634,6 +669,7 @@ class CModel_Collection extends CCollection implements CQueue_QueueableCollectio
         if ($this->isEmpty()) {
             return [];
         }
+
         return $this->first() instanceof CQueue_QueueableEntityInterface ? $this->map->getQueueableId()->all() : $this->modelKeys();
     }
 
@@ -654,16 +690,16 @@ class CModel_Collection extends CCollection implements CQueue_QueueableCollectio
         } elseif (count($relations) === 1) {
             return reset($relations);
         } else {
-            return array_intersect(...$relations);
+            return array_intersect(...array_values($relations));
         }
     }
 
     /**
      * Get the connection of the entities being queued.
      *
-     * @return string|null
-     *
      * @throws \LogicException
+     *
+     * @return null|string
      */
     public function getQueueableConnection() {
         if ($this->isEmpty()) {
@@ -687,6 +723,33 @@ class CModel_Collection extends CCollection implements CQueue_QueueableCollectio
         foreach ($this->items as $k => $item) {
             $result[$k] = $item->getAttributes();
         }
+
         return $result;
+    }
+
+    /**
+     * Get the Eloquent query builder from the collection.
+     *
+     * @throws \LogicException
+     *
+     * @return \CModel_Query
+     */
+    public function toQuery() {
+        $model = $this->first();
+
+        if (!$model) {
+            throw new LogicException('Unable to create query for empty collection.');
+        }
+
+        $class = get_class($model);
+
+        if ($this->filter(function ($model) use ($class) {
+            return !$model instanceof $class;
+        })->isNotEmpty()
+        ) {
+            throw new LogicException('Unable to create query for collection with mixed types.');
+        }
+
+        return $model->newModelQuery()->whereKey($this->modelKeys());
     }
 }

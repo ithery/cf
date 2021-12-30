@@ -1361,6 +1361,20 @@ class CDatabase {
     public function getTablePrefix() {
         return carr::get($this->config, 'table_prefix');
     }
+
+    /**
+     * Get a Doctrine Schema Column instance.
+     *
+     * @param string $table
+     * @param string $column
+     *
+     * @return \CDatabase_Schema_Column
+     */
+    public function getColumn($table, $column) {
+        $schema = $this->getSchemaManager();
+
+        return $schema->listTableDetails($table)->getColumn($column);
+    }
 }
 
 // End Database Class

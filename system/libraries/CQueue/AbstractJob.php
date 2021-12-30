@@ -75,6 +75,15 @@ abstract class CQueue_AbstractJob implements CQueue_JobInterface {
     abstract public function getRawBody();
 
     /**
+     * Get the UUID of the job.
+     *
+     * @return null|string
+     */
+    public function uuid() {
+        return isset($this->payload()['uuid']) ? $this->payload()['uuid'] : null;
+    }
+
+    /**
      * Fire the job.
      *
      * @return void
@@ -156,7 +165,7 @@ abstract class CQueue_AbstractJob implements CQueue_JobInterface {
     /**
      * Delete the job, call the "failed" method, and raise the failed job event.
      *
-     * @param \Throwable|null $e
+     * @param null|\Throwable $e
      *
      * @return void
      */
@@ -165,6 +174,7 @@ abstract class CQueue_AbstractJob implements CQueue_JobInterface {
         if ($this->isDeleted()) {
             return;
         }
+
         try {
             // If the job has failed, we will delete it, call the "failed" method and then call
             // an event indicating the job has failed so it can be logged if needed. This is
@@ -172,11 +182,10 @@ abstract class CQueue_AbstractJob implements CQueue_JobInterface {
             $this->delete();
             $this->failed($e);
         } finally {
-            $dispatcher = CEvent::dispatcher();
-            $dispatcher->dispatch(new CQueue_Event_JobFailed(
+            CEvent::dispatch(new CQueue_Event_JobFailed(
                 $this->connectionName,
                 $this,
-                $e ?: new CQueue_Exception_ManuallFailedException
+                $e ?: new CQueue_Exception_ManuallyFailedException()
             ));
         }
     }
@@ -184,7 +193,7 @@ abstract class CQueue_AbstractJob implements CQueue_JobInterface {
     /**
      * Process an exception that caused the job to fail.
      *
-     * @param \Throwable|null $e
+     * @param null|\Throwable $e
      *
      * @return void
      */
@@ -193,7 +202,7 @@ abstract class CQueue_AbstractJob implements CQueue_JobInterface {
         list($class, $method) = CQueue_JobName::parse($payload['job']);
 
         if (method_exists($this->instance = $this->resolve($class), 'failed')) {
-            $this->instance->failed($payload['data'], $e);
+            $this->instance->failed($payload['data'], $e, isset($payload['uuid']) ? $payload['uuid'] : '');
         }
     }
 
@@ -229,16 +238,43 @@ abstract class CQueue_AbstractJob implements CQueue_JobInterface {
     /**
      * Get the number of times to attempt a job.
      *
-     * @return int|null
+     * @return null|int
      */
     public function maxTries() {
         return isset($this->payload()['maxTries']) ? $this->payload()['maxTries'] : null;
     }
 
     /**
+     * Get the number of times to attempt a job after an exception.
+     *
+     * @return null|int
+     */
+    public function maxExceptions() {
+        return isset($this->payload()['maxExceptions']) ? $this->payload()['maxExceptions'] : null;
+    }
+
+    /**
+     * Determine if the job should fail when it timeouts.
+     *
+     * @return bool
+     */
+    public function shouldFailOnTimeout() {
+        return isset($this->payload()['failOnTimeout']) ? $this->payload()['failOnTimeout'] : false;
+    }
+
+    /**
+     * The number of seconds to wait before retrying a job that encountered an uncaught exception.
+     *
+     * @return null|int
+     */
+    public function backoff() {
+        return isset($this->payload()['backoff']) ? $this->payload()['backoff'] : (isset($this->payload()['delay']) ? $this->payload()['delay'] : null);
+    }
+
+    /**
      * Get the number of seconds to delay a failed job before retrying it.
      *
-     * @return int|null
+     * @return null|int
      */
     public function delaySeconds() {
         return isset($this->payload()['delay']) ? $this->payload()['delay'] : null;
@@ -247,7 +283,7 @@ abstract class CQueue_AbstractJob implements CQueue_JobInterface {
     /**
      * Get the number of seconds the job can run.
      *
-     * @return int|null
+     * @return null|int
      */
     public function timeout() {
         return isset($this->payload()['timeout']) ? $this->payload()['timeout'] : null;
@@ -256,7 +292,16 @@ abstract class CQueue_AbstractJob implements CQueue_JobInterface {
     /**
      * Get the timestamp indicating when the job should timeout.
      *
-     * @return int|null
+     * @return null|int
+     */
+    public function retryUntil() {
+        return isset($this->payload()['retryUntil']) ? $this->payload()['retryUntil'] : (isset($this->payload()['timeoutAt']) ? $this->payload()['timeoutAt'] : null);
+    }
+
+    /**
+     * Get the timestamp indicating when the job should timeout.
+     *
+     * @return null|int
      */
     public function timeoutAt() {
         return isset($this->payload()['timeoutAt']) ? $this->payload()['timeoutAt'] : null;
@@ -303,7 +348,7 @@ abstract class CQueue_AbstractJob implements CQueue_JobInterface {
     /**
      * Get the service container instance.
      *
-     * @return \Illuminate\Container\Container
+     * @return \CContainer_Container
      */
     public function getContainer() {
         return $this->container;

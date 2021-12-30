@@ -12,14 +12,14 @@ interface CSocialLogin_AbstractProviderInterface {
     /**
      * Redirect the user to the authentication page for the provider.
      *
-     * @return \Symfony\Component\HttpFoundation\RedirectResponse
+     * @return \Symfony\Component\HttpFoundation\RedirectResponse|\CHTTP_RedirectResponse
      */
     public function redirect();
 
     /**
      * Get the User instance for the authenticated user.
      *
-     * @return \Laravel\Socialite\Contracts\User
+     * @return \CSocialLogin_Contract_UserInterface
      */
     public function user();
 }

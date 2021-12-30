@@ -7,33 +7,35 @@
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  */
+
 namespace PHPUnit\Framework\MockObject;
 
-use const DIRECTORY_SEPARATOR;
+use function trim;
 use function implode;
+use function sprintf;
+use ReflectionMethod;
 use function is_string;
 use function preg_match;
-use function preg_replace;
-use function sprintf;
-use function substr_count;
-use function trim;
 use function var_export;
-use ReflectionMethod;
 use ReflectionNamedType;
 use ReflectionParameter;
 use ReflectionUnionType;
-use SebastianBergmann\Template\Exception as TemplateException;
+use function preg_replace;
+use function substr_count;
+use const DIRECTORY_SEPARATOR;
+use SebastianBergmann\Type\Type;
+use SebastianBergmann\Type\VoidType;
+use SebastianBergmann\Type\UnknownType;
 use SebastianBergmann\Template\Template;
 use SebastianBergmann\Type\ReflectionMapper;
-use SebastianBergmann\Type\Type;
-use SebastianBergmann\Type\UnknownType;
-use SebastianBergmann\Type\VoidType;
+use PHPUnit\Framework\MockObject\Exception\RuntimeException;
+use SebastianBergmann\Template\Exception as TemplateException;
+use PHPUnit\Framework\MockObject\Exception\ReflectionException;
 
 /**
  * @internal This class is not covered by the backward compatibility promise for PHPUnit
  */
-final class MockMethod
-{
+final class MockMethod {
     /**
      * @var Template[]
      */
@@ -95,11 +97,13 @@ final class MockMethod
     private $deprecation;
 
     /**
+     * @param mixed $callOriginalMethod
+     * @param mixed $cloneArguments
+     *
      * @throws ReflectionException
      * @throws RuntimeException
      */
-    public static function fromReflection(ReflectionMethod $method, $callOriginalMethod, $cloneArguments)
-    {
+    public static function fromReflection(ReflectionMethod $method, $callOriginalMethod, $cloneArguments) {
         if ($method->isPrivate()) {
             $modifier = 'private';
         } elseif ($method->isProtected()) {
@@ -120,8 +124,8 @@ final class MockMethod
 
         $docComment = $method->getDocComment();
 
-        if (is_string($docComment) &&
-            preg_match('#\*[ \t]*+@deprecated[ \t]*+(.*?)\r?+\n[ \t]*+\*(?:[ \t]*+@|/$)#s', $docComment, $deprecation)) {
+        if (is_string($docComment)
+            && preg_match('#\*[ \t]*+@deprecated[ \t]*+(.*?)\r?+\n[ \t]*+\*(?:[ \t]*+@|/$)#s', $docComment, $deprecation)) {
             $deprecation = trim(preg_replace('#[ \t]*\r?\n[ \t]*+\*[ \t]*+#', ' ', $deprecation[1]));
         } else {
             $deprecation = null;
@@ -134,7 +138,7 @@ final class MockMethod
             $modifier,
             self::getMethodParametersForDeclaration($method),
             self::getMethodParametersForCall($method),
-            (new ReflectionMapper)->fromMethodReturnType($method),
+            (new ReflectionMapper())->fromReturnType($method),
             $reference,
             $callOriginalMethod,
             $method->isStatic(),
@@ -142,8 +146,7 @@ final class MockMethod
         );
     }
 
-    public static function fromName($fullClassName, $methodName, $cloneArguments)
-    {
+    public static function fromName($fullClassName, $methodName, $cloneArguments) {
         return new self(
             $fullClassName,
             $methodName,
@@ -151,7 +154,7 @@ final class MockMethod
             'public',
             '',
             '',
-            new UnknownType,
+            new UnknownType(),
             '',
             false,
             false,
@@ -159,31 +162,28 @@ final class MockMethod
         );
     }
 
-    public function __construct($className, $methodName, $cloneArguments, $modifier, $argumentsForDeclaration, $argumentsForCall, Type $returnType, $reference, $callOriginalMethod, $static, $deprecation)
-    {
-        $this->className               = $className;
-        $this->methodName              = $methodName;
-        $this->cloneArguments          = $cloneArguments;
-        $this->modifier                = $modifier;
+    public function __construct($className, $methodName, $cloneArguments, $modifier, $argumentsForDeclaration, $argumentsForCall, Type $returnType, $reference, $callOriginalMethod, $static, $deprecation) {
+        $this->className = $className;
+        $this->methodName = $methodName;
+        $this->cloneArguments = $cloneArguments;
+        $this->modifier = $modifier;
         $this->argumentsForDeclaration = $argumentsForDeclaration;
-        $this->argumentsForCall        = $argumentsForCall;
-        $this->returnType              = $returnType;
-        $this->reference               = $reference;
-        $this->callOriginalMethod      = $callOriginalMethod;
-        $this->static                  = $static;
-        $this->deprecation             = $deprecation;
+        $this->argumentsForCall = $argumentsForCall;
+        $this->returnType = $returnType;
+        $this->reference = $reference;
+        $this->callOriginalMethod = $callOriginalMethod;
+        $this->static = $static;
+        $this->deprecation = $deprecation;
     }
 
-    public function getName()
-    {
+    public function getName() {
         return $this->methodName;
     }
 
     /**
      * @throws RuntimeException
      */
-    public function generateCode()
-    {
+    public function generateCode() {
         if ($this->static) {
             $templateFile = 'mocked_static_method.tpl';
         } elseif ($this->returnType instanceof VoidType) {
@@ -201,7 +201,7 @@ final class MockMethod
         $deprecation = $this->deprecation;
 
         if (null !== $this->deprecation) {
-            $deprecation         = "The {$this->className}::{$this->methodName} method is deprecated ({$this->deprecation}).";
+            $deprecation = "The {$this->className}::{$this->methodName} method is deprecated ({$this->deprecation}).";
             $deprecationTemplate = $this->getTemplate('deprecation.tpl');
 
             $deprecationTemplate->setVar(
@@ -217,33 +217,33 @@ final class MockMethod
 
         $template->setVar(
             [
-                'arguments_decl'     => $this->argumentsForDeclaration,
-                'arguments_call'     => $this->argumentsForCall,
+                'arguments_decl' => $this->argumentsForDeclaration,
+                'arguments_call' => $this->argumentsForCall,
                 'return_declaration' => !empty($this->returnType->asString()) ? (': ' . $this->returnType->asString()) : '',
-                'return_type'        => $this->returnType->asString(),
-                'arguments_count'    => !empty($this->argumentsForCall) ? substr_count($this->argumentsForCall, ',') + 1 : 0,
-                'class_name'         => $this->className,
-                'method_name'        => $this->methodName,
-                'modifier'           => $this->modifier,
-                'reference'          => $this->reference,
-                'clone_arguments'    => $this->cloneArguments ? 'true' : 'false',
-                'deprecation'        => $deprecation,
+                'return_type' => $this->returnType->asString(),
+                'arguments_count' => !empty($this->argumentsForCall) ? substr_count($this->argumentsForCall, ',') + 1 : 0,
+                'class_name' => $this->className,
+                'method_name' => $this->methodName,
+                'modifier' => $this->modifier,
+                'reference' => $this->reference,
+                'clone_arguments' => $this->cloneArguments ? 'true' : 'false',
+                'deprecation' => $deprecation,
             ]
         );
 
         return $template->render();
     }
 
-    public function getReturnType()
-    {
+    public function getReturnType() {
         return $this->returnType;
     }
 
     /**
+     * @param mixed $template
+     *
      * @throws RuntimeException
      */
-    private function getTemplate($template)
-    {
+    private function getTemplate($template) {
         $filename = __DIR__ . DIRECTORY_SEPARATOR . 'Generator' . DIRECTORY_SEPARATOR . $template;
 
         if (!isset(self::$templates[$filename])) {
@@ -266,8 +266,7 @@ final class MockMethod
      *
      * @throws RuntimeException
      */
-    private static function getMethodParametersForDeclaration(ReflectionMethod $method)
-    {
+    private static function getMethodParametersForDeclaration(ReflectionMethod $method) {
         $parameters = [];
 
         foreach ($method->getParameters() as $i => $parameter) {
@@ -280,12 +279,12 @@ final class MockMethod
                 $name = '$arg' . $i;
             }
 
-            $nullable        = '';
-            $default         = '';
-            $reference       = '';
+            $nullable = '';
+            $default = '';
+            $reference = '';
             $typeDeclaration = '';
-            $type            = null;
-            $typeName        = null;
+            $type = null;
+            $typeName = null;
 
             if ($parameter->hasType()) {
                 $type = $parameter->getType();
@@ -335,8 +334,7 @@ final class MockMethod
      *
      * @throws ReflectionException
      */
-    private static function getMethodParametersForCall(ReflectionMethod $method)
-    {
+    private static function getMethodParametersForCall(ReflectionMethod $method) {
         $parameters = [];
 
         foreach ($method->getParameters() as $i => $parameter) {
@@ -366,8 +364,7 @@ final class MockMethod
     /**
      * @throws ReflectionException
      */
-    private static function exportDefaultValue(ReflectionParameter $parameter)
-    {
+    private static function exportDefaultValue(ReflectionParameter $parameter) {
         try {
             return (string) var_export($parameter->getDefaultValue(), true);
             // @codeCoverageIgnoreStart
@@ -381,8 +378,7 @@ final class MockMethod
         // @codeCoverageIgnoreEnd
     }
 
-    private static function unionTypeAsString(ReflectionUnionType $union, $self)
-    {
+    private static function unionTypeAsString(ReflectionUnionType $union, $self) {
         $types = [];
 
         foreach ($union->getTypes() as $type) {

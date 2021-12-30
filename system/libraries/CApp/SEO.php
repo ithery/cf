@@ -1,7 +1,7 @@
 <?php
 
 class CApp_SEO {
-    protected $instance = null;
+    private static $instance = null;
 
     private function __construct() {
         //do nothing
@@ -11,10 +11,11 @@ class CApp_SEO {
      * @return CApp_SEO
      */
     public static function instance() {
-        if (self::$instance == null) {
-            self::$instance = new static();
+        if (static::$instance == null) {
+            static::$instance = new static();
         }
-        return self::$instance;
+
+        return static::$instance;
     }
 
     /**
@@ -46,7 +47,7 @@ class CApp_SEO {
     }
 
     /**
-     * {@inheritdoc}
+     * @inheritdoc
      */
     public function setTitle($title, $appendDefault = true) {
         $this->metatags()->setTitle($title, $appendDefault);
@@ -58,7 +59,7 @@ class CApp_SEO {
     }
 
     /**
-     * {@inheritdoc}
+     * @inheritdoc
      */
     public function setDescription($description) {
         $this->metatags()->setDescription($description);
@@ -70,7 +71,7 @@ class CApp_SEO {
     }
 
     /**
-     * {@inheritdoc}
+     * @inheritdoc
      */
     public function setCanonical($url) {
         $this->metatags()->setCanonical($url);
@@ -79,7 +80,7 @@ class CApp_SEO {
     }
 
     /**
-     * {@inheritdoc}
+     * @inheritdoc
      */
     public function addImages($urls) {
         if (is_array($urls)) {
@@ -96,7 +97,7 @@ class CApp_SEO {
     }
 
     /**
-     * {@inheritdoc}
+     * @inheritdoc
      */
     public function getTitle($session = false) {
         if ($session) {
@@ -107,7 +108,7 @@ class CApp_SEO {
     }
 
     /**
-     * {@inheritdoc}
+     * @inheritdoc
      */
     public function generate($minify = false) {
         $html = $this->metatags()->generate();

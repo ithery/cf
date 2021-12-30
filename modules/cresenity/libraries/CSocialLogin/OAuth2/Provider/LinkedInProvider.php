@@ -24,14 +24,14 @@ class CSocialLogin_OAuth2_Provider_LinkedInProvider extends CSocialLogin_OAuth2_
     protected $scopeSeparator = ' ';
 
     /**
-     * {@inheritdoc}
+     * @inheritdoc
      */
     protected function getAuthUrl($state) {
         return $this->buildAuthUrlFromBase('https://www.linkedin.com/oauth/v2/authorization', $state);
     }
 
     /**
-     * {@inheritdoc}
+     * @inheritdoc
      */
     protected function getTokenUrl() {
         return 'https://www.linkedin.com/oauth/v2/accessToken';
@@ -49,11 +49,12 @@ class CSocialLogin_OAuth2_Provider_LinkedInProvider extends CSocialLogin_OAuth2_
     }
 
     /**
-     * {@inheritdoc}
+     * @inheritdoc
      */
     protected function getUserByToken($token) {
         $basicProfile = $this->getBasicProfile($token);
         $emailAddress = $this->getEmailAddress($token);
+
         return array_merge($basicProfile, $emailAddress);
     }
 
@@ -72,6 +73,7 @@ class CSocialLogin_OAuth2_Provider_LinkedInProvider extends CSocialLogin_OAuth2_
                 'X-RestLi-Protocol-Version' => '2.0.0',
             ],
         ]);
+
         return (array) json_decode($response->getBody(), true);
     }
 
@@ -90,11 +92,12 @@ class CSocialLogin_OAuth2_Provider_LinkedInProvider extends CSocialLogin_OAuth2_
                 'X-RestLi-Protocol-Version' => '2.0.0',
             ],
         ]);
+
         return (array) carr::get((array) json_decode($response->getBody(), true), 'elements.0.handle~');
     }
 
     /**
-     * {@inheritdoc}
+     * @inheritdoc
      */
     protected function mapUserToObject(array $user) {
         $preferredLocale = carr::get($user, 'firstName.preferredLocale.language') . '_' . carr::get($user, 'firstName.preferredLocale.country');
@@ -107,7 +110,8 @@ class CSocialLogin_OAuth2_Provider_LinkedInProvider extends CSocialLogin_OAuth2_
         $originalAvatar = carr::first(carr::where($images, function ($image) {
             return $image['data']['com.linkedin.digitalmedia.mediaartifact.StillImage']['storageSize']['width'] === 800;
         }));
-        return (new CSocialLogin_OAuth2_User)->setRaw($user)->map([
+
+        return (new CSocialLogin_OAuth2_User())->setRaw($user)->map([
             'id' => $user['id'],
             'nickname' => null,
             'name' => $firstName . ' ' . $lastName,

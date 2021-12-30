@@ -17,21 +17,21 @@ class CSocialLogin_OAuth2_Provider_GithubProvider extends CSocialLogin_OAuth2_Ab
     protected $scopes = ['user:email'];
 
     /**
-     * {@inheritdoc}
+     * @inheritdoc
      */
     protected function getAuthUrl($state) {
         return $this->buildAuthUrlFromBase('https://github.com/login/oauth/authorize', $state);
     }
 
     /**
-     * {@inheritdoc}
+     * @inheritdoc
      */
     protected function getTokenUrl() {
         return 'https://github.com/login/oauth/access_token';
     }
 
     /**
-     * {@inheritdoc}
+     * @inheritdoc
      */
     protected function getUserByToken($token) {
         $userUrl = 'https://api.github.com/user?access_token=' . $token;
@@ -43,6 +43,7 @@ class CSocialLogin_OAuth2_Provider_GithubProvider extends CSocialLogin_OAuth2_Ab
         if (in_array('user:email', $this->scopes)) {
             $user['email'] = $this->getEmailByToken($token);
         }
+
         return $user;
     }
 
@@ -51,10 +52,11 @@ class CSocialLogin_OAuth2_Provider_GithubProvider extends CSocialLogin_OAuth2_Ab
      *
      * @param string $token
      *
-     * @return string|null
+     * @return null|string
      */
     protected function getEmailByToken($token) {
         $emailsUrl = 'https://api.github.com/user/emails?access_token=' . $token;
+
         try {
             $response = $this->getHttpClient()->get(
                 $emailsUrl,
@@ -71,10 +73,10 @@ class CSocialLogin_OAuth2_Provider_GithubProvider extends CSocialLogin_OAuth2_Ab
     }
 
     /**
-     * {@inheritdoc}
+     * @inheritdoc
      */
     protected function mapUserToObject(array $user) {
-        return (new CSocialLogin_OAuth2_User)->setRaw($user)->map([
+        return (new CSocialLogin_OAuth2_User())->setRaw($user)->map([
             'id' => $user['id'],
             'nickname' => $user['login'],
             'name' => carr::get($user, 'name'),

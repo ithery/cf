@@ -7,16 +7,19 @@
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  */
-namespace PHPUnit\Framework\MockObject;
 
-use PHPUnit\Framework\MockObject\Builder\InvocationMocker as InvocationMockerBuilder;
+namespace PHPUnit\Framework\MockObject\Api;
+
+use PHPUnit\Framework\MockObject\InvocationHandler;
+use PHPUnit\Framework\MockObject\ConfigurableMethod;
 use PHPUnit\Framework\MockObject\Rule\InvocationOrder;
+use PHPUnit\Framework\MockObject\Builder\InvocationMocker as InvocationMockerBuilder;
+use PHPUnit\Framework\MockObject\Exception\ConfigurableMethodsAlreadyInitializedException;
 
 /**
  * @internal This trait is not covered by the backward compatibility promise for PHPUnit
  */
-trait Api
-{
+trait Api {
     /**
      * @var ConfigurableMethod[]
      */
@@ -37,9 +40,10 @@ trait Api
      */
     private $__phpunit_invocationMocker;
 
-    /** @noinspection MagicMethodsValidityInspection */
-    public static function __phpunit_initConfigurableMethods(ConfigurableMethod ...$configurableMethods)
-    {
+    /**
+     * @noinspection MagicMethodsValidityInspection
+     */
+    public static function __phpunit_initConfigurableMethods(ConfigurableMethod ...$configurableMethods) {
         if (isset(static::$__phpunit_configurableMethods)) {
             throw new ConfigurableMethodsAlreadyInitializedException(
                 'Configurable methods is already initialized and can not be reinitialized'
@@ -49,21 +53,28 @@ trait Api
         static::$__phpunit_configurableMethods = $configurableMethods;
     }
 
-    /** @noinspection MagicMethodsValidityInspection */
-    public function __phpunit_setOriginalObject($originalObject)
-    {
+    /**
+     * @noinspection MagicMethodsValidityInspection
+     *
+     * @param mixed $originalObject
+     */
+    public function __phpunit_setOriginalObject($originalObject) {
         $this->__phpunit_originalObject = $originalObject;
     }
 
-    /** @noinspection MagicMethodsValidityInspection */
-    public function __phpunit_setReturnValueGeneration($returnValueGeneration)
-    {
+    /**
+     * @noinspection MagicMethodsValidityInspection
+     *
+     * @param mixed $returnValueGeneration
+     */
+    public function __phpunit_setReturnValueGeneration($returnValueGeneration) {
         $this->__phpunit_returnValueGeneration = $returnValueGeneration;
     }
 
-    /** @noinspection MagicMethodsValidityInspection */
-    public function __phpunit_getInvocationHandler()
-    {
+    /**
+     * @noinspection MagicMethodsValidityInspection
+     */
+    public function __phpunit_getInvocationHandler() {
         if ($this->__phpunit_invocationMocker === null) {
             $this->__phpunit_invocationMocker = new InvocationHandler(
                 static::$__phpunit_configurableMethods,
@@ -74,15 +85,19 @@ trait Api
         return $this->__phpunit_invocationMocker;
     }
 
-    /** @noinspection MagicMethodsValidityInspection */
-    public function __phpunit_hasMatchers()
-    {
+    /**
+     * @noinspection MagicMethodsValidityInspection
+     */
+    public function __phpunit_hasMatchers() {
         return $this->__phpunit_getInvocationHandler()->hasMatchers();
     }
 
-    /** @noinspection MagicMethodsValidityInspection */
-    public function __phpunit_verify($unsetInvocationMocker = true)
-    {
+    /**
+     * @noinspection MagicMethodsValidityInspection
+     *
+     * @param mixed $unsetInvocationMocker
+     */
+    public function __phpunit_verify($unsetInvocationMocker = true) {
         $this->__phpunit_getInvocationHandler()->verify();
 
         if ($unsetInvocationMocker) {
@@ -90,8 +105,7 @@ trait Api
         }
     }
 
-    public function expects(InvocationOrder $matcher)
-    {
+    public function expects(InvocationOrder $matcher) {
         return $this->__phpunit_getInvocationHandler()->expects($matcher);
     }
 }

@@ -35,4 +35,15 @@ class CJavascript_StatementFactory {
     public static function createFunction($functionName, $functionParameter = []) {
         return new CJavascript_Statement_Function($functionName, $functionParameter);
     }
+
+    /**
+     * @param mixed $operand1
+     * @param mixed $operator
+     * @param mixed $operand2
+     *
+     * @return CJavascript_Statement_IfStatement
+     */
+    public static function createIf($operand1, $operator, $operand2) {
+        return new CJavascript_Statement_IfStatement($operand1, $operator, $operand2);
+    }
 }

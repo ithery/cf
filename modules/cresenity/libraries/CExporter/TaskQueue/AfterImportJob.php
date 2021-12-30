@@ -3,6 +3,7 @@
 class CExporter_TaskQueue_AfterImportJob implements CQueue_ShouldQueueInterface {
     use CQueue_Trait_QueueableTrait;
     use CExporter_Trait_HasEventBusTrait;
+
     /**
      * @var CExporter_Concern_WithEvents
      */

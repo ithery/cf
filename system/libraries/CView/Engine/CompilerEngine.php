@@ -7,6 +7,7 @@
  */
 class CView_Engine_CompilerEngine extends CView_Engine_PhpEngine {
     use CView_Concern_BladeCollectViewExceptionTrait;
+
     /**
      * The Blade compiler instance.
      *
@@ -30,7 +31,7 @@ class CView_Engine_CompilerEngine extends CView_Engine_PhpEngine {
 
     public function __construct() {
         $this->compiler = CView_Compiler_BladeCompiler::instance();
-        $this->compiler->component('dynamic-component', CView_Component_DynamicComponent::class);
+        $this->compiler->component('dynamic-component', \CView_Component_DynamicComponent::class);
     }
 
     /**
@@ -118,7 +119,7 @@ class CView_Engine_CompilerEngine extends CView_Engine_PhpEngine {
      * @return string
      */
     protected function getMessage($e) {
-        return $e->getMessage() . ' (View: ' . realpath(carr::last($this->lastCompiled)) . ')';
+        return $e->getMessage() . ' (View: ' . realpath(carr::last($this->lastCompiled)) . ', Compiled:' . $e->getFile() . ')';
     }
 
     /**
@@ -132,7 +133,6 @@ class CView_Engine_CompilerEngine extends CView_Engine_PhpEngine {
 
     protected function getBladeLineNumber($compiledPath, $exceptionLineNumber) {
         $viewPath = $this->getCompiledViewName($compiledPath);
-
         if (!$viewPath) {
             return $exceptionLineNumber;
         }

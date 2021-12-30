@@ -482,6 +482,9 @@ return [
     'themify-icons' => [
         'css' => ['icon/themify-icons.css'],
     ],
+    'flag-icons' => [
+        'css' => ['icon/flag-icons.css'],
+    ],
     'material-design-iconic-font' => [
         'css' => ['icon/material-design-iconic-font.min.css'],
     ],
@@ -679,6 +682,11 @@ return [
         ],
         'css' => [
             'plugins/bootstrap-daterangepicker/bootstrap-daterangepicker.css',
+        ],
+    ],
+    'datefns' => [
+        'js' => [
+            'plugins/datefns/datefns.min.js',
         ],
     ],
     'cropper' => [

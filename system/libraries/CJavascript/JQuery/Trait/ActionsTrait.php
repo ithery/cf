@@ -10,7 +10,7 @@ defined('SYSPATH') or die('No direct access allowed.');
  */
 trait CJavascript_JQuery_Trait_ActionsTrait {
     /**
-     * Add class to element
+     * Add class to element.
      *
      * @param string $element
      * @param string $class   to add
@@ -22,7 +22,7 @@ trait CJavascript_JQuery_Trait_ActionsTrait {
     }
 
     /**
-     * Execute a javascript library detach action
+     * Execute a javascript library detach action.
      *
      * @param string $element element
      *
@@ -33,7 +33,7 @@ trait CJavascript_JQuery_Trait_ActionsTrait {
     }
 
     /**
-     * Execute a javascript library remove action
+     * Execute a javascript library remove action.
      *
      * @param string $element element
      *
@@ -44,7 +44,7 @@ trait CJavascript_JQuery_Trait_ActionsTrait {
     }
 
     /**
-     * Insert content, specified by the parameter, after each element in the set of matched elements
+     * Insert content, specified by the parameter, after each element in the set of matched elements.
      *
      * @param string $to
      * @param string $element
@@ -56,7 +56,7 @@ trait CJavascript_JQuery_Trait_ActionsTrait {
     }
 
     /**
-     * Insert content, specified by the parameter, before each element in the set of matched elements
+     * Insert content, specified by the parameter, before each element in the set of matched elements.
      *
      * @param string $to
      * @param string $element
@@ -124,7 +124,7 @@ trait CJavascript_JQuery_Trait_ActionsTrait {
     }
 
     /**
-     * Execute a javascript library hide action
+     * Execute a javascript library hide action.
      *
      * @param string $element  element
      * @param string $speed    One of 'slow', 'normal', 'fast', or time in milliseconds
@@ -137,7 +137,7 @@ trait CJavascript_JQuery_Trait_ActionsTrait {
     }
 
     /**
-     * Execute a javascript library hide action
+     * Execute a javascript library hide action.
      *
      * @param string $element  element
      * @param string $speed    One of 'slow', 'normal', 'fast', or time in milliseconds
@@ -150,7 +150,7 @@ trait CJavascript_JQuery_Trait_ActionsTrait {
     }
 
     /**
-     * Execute a javascript library slideUp action
+     * Execute a javascript library slideUp action.
      *
      * @param string $element  element
      * @param string $speed    One of 'slow', 'normal', 'fast', or time in milliseconds
@@ -163,7 +163,7 @@ trait CJavascript_JQuery_Trait_ActionsTrait {
     }
 
     /**
-     * Execute a javascript library removeClass action
+     * Execute a javascript library removeClass action.
      *
      * @param string $element element
      * @param string $class   Class to add
@@ -175,7 +175,7 @@ trait CJavascript_JQuery_Trait_ActionsTrait {
     }
 
     /**
-     * Execute a javascript library slideDown action
+     * Execute a javascript library slideDown action.
      *
      * @param string $element  element
      * @param string $speed    One of 'slow', 'normal', 'fast', or time in milliseconds
@@ -188,7 +188,7 @@ trait CJavascript_JQuery_Trait_ActionsTrait {
     }
 
     /**
-     * Execute a javascript library slideToggle action
+     * Execute a javascript library slideToggle action.
      *
      * @param string $element  element
      * @param string $speed    One of 'slow', 'normal', 'fast', or time in milliseconds
@@ -201,7 +201,7 @@ trait CJavascript_JQuery_Trait_ActionsTrait {
     }
 
     /**
-     * Execute a javascript library hide action
+     * Execute a javascript library hide action.
      *
      * @param string $element  element
      * @param string $speed    One of 'slow', 'normal', 'fast', or time in milliseconds
@@ -214,7 +214,7 @@ trait CJavascript_JQuery_Trait_ActionsTrait {
     }
 
     /**
-     * Execute a javascript library toggle action
+     * Execute a javascript library toggle action.
      *
      * @param string $element  element
      * @param string $speed    One of 'slow', 'normal', 'fast', or time in milliseconds
@@ -227,7 +227,7 @@ trait CJavascript_JQuery_Trait_ActionsTrait {
     }
 
     /**
-     * Execute a javascript library toggle class action
+     * Execute a javascript library toggle class action.
      *
      * @param string $element element
      * @param string $class
@@ -239,7 +239,7 @@ trait CJavascript_JQuery_Trait_ActionsTrait {
     }
 
     /**
-     * Execute a javascript library show action
+     * Execute a javascript library show action.
      *
      * @param string $element  element
      * @param string $speed    One of 'slow', 'normal', 'fast', or time in milliseconds

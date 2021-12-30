@@ -352,4 +352,12 @@ class CView_View implements ArrayAccess, CInterface_Htmlable, CView_ViewInterfac
     public function set($data) {
         return $this->with($data);
     }
+
+    public function toExportable() {
+        return new CExporter_Exportable_View($this);
+    }
+
+    public function downloadExcel($filename) {
+        CExporter::download($this->toExportable(), $filename);
+    }
 }

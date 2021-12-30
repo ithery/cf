@@ -26,6 +26,7 @@ class CAjax_Engine_DataTableExporterProgress extends CAjax_Engine {
         ];
 
         $response = json_encode($responseArray);
+
         return $response;
     }
 }

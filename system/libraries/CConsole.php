@@ -6,7 +6,9 @@
  */
 class CConsole {
     const SUCCESS_EXIT = 0;
+
     const FAILURE_EXIT = 1;
+
     const EXCEPTION_EXIT = 2;
 
     public static function domain() {
@@ -16,6 +18,7 @@ class CConsole {
     public static function prefix() {
         $appConfig = CConfig::instance('app');
         $appConfig->refresh();
+
         return $appConfig->get('prefix');
     }
 

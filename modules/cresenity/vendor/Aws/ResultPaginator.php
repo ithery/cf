@@ -3,8 +3,6 @@ namespace Aws;
 
 use GuzzleHttp\Promise;
 
-require_once DOCROOT . 'modules/cresenity/vendor/GuzzleHttp/Promise/functions_include.php';
-
 /**
  * Iterator that yields each page of results of a pageable operation.
  */
@@ -43,7 +41,6 @@ class ResultPaginator implements \Iterator
         array $args,
         array $config
     ) {
-         
         $this->client = $client;
         $this->operation = $operation;
         $this->args = $args;
@@ -71,8 +68,7 @@ class ResultPaginator implements \Iterator
      */
     public function each(callable $handleResult)
     {
-       
-        return Promise\coroutine(function () use ($handleResult) {
+        return Promise\Coroutine::of(function () use ($handleResult) {
             $nextToken = null;
             do {
                 $command = $this->createNextCommand($this->args, $nextToken);
@@ -80,7 +76,7 @@ class ResultPaginator implements \Iterator
                 $nextToken = $this->determineNextToken($result);
                 $retVal = $handleResult($result);
                 if ($retVal !== null) {
-                    yield Promise\promise_for($retVal);
+                    yield Promise\Create::promiseFor($retVal);
                 }
             } while ($nextToken);
         });
@@ -107,40 +103,34 @@ class ResultPaginator implements \Iterator
      */
     public function current()
     {
-       
         return $this->valid() ? $this->result : false;
     }
 
     public function key()
     {
-        
         return $this->valid() ? $this->requestCount - 1 : null;
     }
 
     public function next()
     {
-        
         $this->result = null;
     }
 
     public function valid()
     {
-        
         if ($this->result) {
             return true;
         }
-        
+
         if ($this->nextToken || !$this->requestCount) {
-            
             $this->result = $this->client->execute(
                 $this->createNextCommand($this->args, $this->nextToken)
             );
-            
             $this->nextToken = $this->determineNextToken($this->result);
             $this->requestCount++;
             return true;
         }
-        
+
         return false;
     }
 

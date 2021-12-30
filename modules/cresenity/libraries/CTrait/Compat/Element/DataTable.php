@@ -155,6 +155,13 @@ trait CTrait_Compat_Element_DataTable {
         return $this->setCustomColumnHeader($html);
     }
 
+    /**
+     * @param bool $bool
+     *
+     * @return $this
+     *
+     * @deprecated 1.2 use setFooter
+     */
     public function set_footer($bool) {
         return $this->setFooter($bool);
     }

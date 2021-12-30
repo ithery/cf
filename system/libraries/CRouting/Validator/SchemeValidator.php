@@ -1,7 +1,7 @@
 <?php
 
 /**
- * Description of SchemeValidator
+ * Description of SchemeValidator.
  *
  * @author Hery
  */

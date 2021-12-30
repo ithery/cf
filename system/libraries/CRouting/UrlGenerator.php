@@ -234,6 +234,7 @@ class CRouting_UrlGenerator {
 
         $pathOriginal = $path;
 
+        $path = urldecode($path);
         // Once we get the root URL, we will check to see if it contains an index.php
         // file in the paths. If it does, we will remove it since it is not needed
         // for asset paths, but only for routes to endpoints in the application.
@@ -244,7 +245,7 @@ class CRouting_UrlGenerator {
         $root = $this->formatRoot($this->formatScheme($secure));
         $path = CF::findFile('media', $path, false, $extension);
         if (!$path) {
-            throw new Exception('media ' . $pathOriginal . 'not found');
+            throw new Exception('media ' . $pathOriginal . ' not found');
         } else {
             $path = str_replace(DOCROOT, '', $path);
         }

@@ -33,6 +33,6 @@ trait CApp_Model_Trait_Users {
      * @return CModel_Relation_BelongsTo
      */
     public function role() {
-        return $this->belongsTo(CApp_Model_Roles::class);
+        return $this->belongsTo(c::app()->auth()->getRoleModelClass())->withTrashed();
     }
 }

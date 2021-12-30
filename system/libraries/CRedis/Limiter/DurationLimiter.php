@@ -2,6 +2,20 @@
 
 class CRedis_Limiter_DurationLimiter {
     /**
+     * The timestamp of the end of the current duration.
+     *
+     * @var int
+     */
+    public $decaysAt;
+
+    /**
+     * The number of remaining slots.
+     *
+     * @var int
+     */
+    public $remaining;
+
+    /**
      * The Redis factory implementation.
      *
      * @var CRedis_AbstractConnection
@@ -30,20 +44,6 @@ class CRedis_Limiter_DurationLimiter {
     private $decay;
 
     /**
-     * The timestamp of the end of the current duration.
-     *
-     * @var int
-     */
-    public $decaysAt;
-
-    /**
-     * The number of remaining slots.
-     *
-     * @var int
-     */
-    public $remaining;
-
-    /**
      * Create a new duration limiter instance.
      *
      * @param CRedis_AbstractConnection $redis
@@ -64,23 +64,24 @@ class CRedis_Limiter_DurationLimiter {
      * Attempt to acquire the lock for the given number of seconds.
      *
      * @param int           $timeout
-     * @param callable|null $callback
+     * @param null|callable $callback
+     *
+     * @throws \CRedis_Exception_LimiterTimeoutException
      *
      * @return mixed
-     *
-     * @throws \Illuminate\Contracts\Redis\LimiterTimeoutException
      */
     public function block($timeout, $callback = null) {
         $starting = time();
         while (!$this->acquire()) {
             if (time() - $timeout >= $starting) {
-                throw new CRedis_Exception_LimiterTimeoutException;
+                throw new CRedis_Exception_LimiterTimeoutException();
             }
             usleep(750 * 1000);
         }
         if (is_callable($callback)) {
             return $callback();
         }
+
         return true;
     }
 
@@ -101,6 +102,7 @@ class CRedis_Limiter_DurationLimiter {
         );
         $this->decaysAt = $results[1];
         $this->remaining = max(0, $results[2]);
+
         return (bool) $results[0];
     }
 
