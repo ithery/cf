@@ -7,6 +7,7 @@
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  */
+
 namespace PHPUnit\Framework\MockObject;
 
 use function class_exists;
@@ -14,8 +15,7 @@ use function class_exists;
 /**
  * @internal This class is not covered by the backward compatibility promise for PHPUnit
  */
-final class MockTrait implements MockType
-{
+final class MockTrait implements MockType {
     /**
      * @var string
      */
@@ -26,14 +26,12 @@ final class MockTrait implements MockType
      */
     private $mockName;
 
-    public function __construct($classCode, $mockName)
-    {
+    public function __construct($classCode, $mockName) {
         $this->classCode = $classCode;
-        $this->mockName  = $mockName;
+        $this->mockName = $mockName;
     }
 
-    public function generate()
-    {
+    public function generate() {
         if (!class_exists($this->mockName, false)) {
             eval($this->classCode);
         }
@@ -41,8 +39,7 @@ final class MockTrait implements MockType
         return $this->mockName;
     }
 
-    public function getClassCode()
-    {
+    public function getClassCode() {
         return $this->classCode;
     }
 }

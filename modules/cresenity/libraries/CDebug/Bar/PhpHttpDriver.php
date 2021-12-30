@@ -10,7 +10,7 @@ defined('SYSPATH') or die('No direct access allowed.');
  */
 
 /**
- * HTTP driver for native php
+ * HTTP driver for native php.
  */
 class CDebug_Bar_PhpHttpDriver implements CDebug_Bar_Interface_HttpDriverInterface {
     /**

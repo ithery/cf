@@ -7,20 +7,19 @@
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  */
-namespace PHPUnit\Framework\MockObject;
+
+namespace PHPUnit\Framework\MockObject\Exception;
 
 use function sprintf;
 
 /**
  * @internal This class is not covered by the backward compatibility promise for PHPUnit
  */
-final class DuplicateMethodException extends \PHPUnit\Framework\Exception implements Exception
-{
+final class DuplicateMethodException extends \PHPUnit\Framework\Exception\Exception implements Exception {
     /**
      * @psalm-param list<string> $methods
      */
-    public function __construct(array $methods)
-    {
+    public function __construct(array $methods) {
         parent::__construct(
             sprintf(
                 'Cannot stub or mock using a method list that contains duplicates: "%s" (duplicate: "%s")',

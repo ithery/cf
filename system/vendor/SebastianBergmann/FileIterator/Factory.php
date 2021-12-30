@@ -1,4 +1,4 @@
-<?php declare(strict_types=1);
+<?php
 /*
  * This file is part of phpunit/php-file-iterator.
  *
@@ -7,34 +7,35 @@
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  */
+
 namespace SebastianBergmann\FileIterator;
 
-use const GLOB_ONLYDIR;
-use function array_filter;
-use function array_map;
-use function array_merge;
 use function glob;
-use function is_dir;
-use function is_string;
-use function realpath;
 use AppendIterator;
-use RecursiveDirectoryIterator;
+use function is_dir;
+use function realpath;
+use const GLOB_ONLYDIR;
+use function array_map;
+use function is_string;
+use function array_merge;
+use function array_filter;
 use RecursiveIteratorIterator;
+use RecursiveDirectoryIterator;
 
-class Factory
-{
+class Factory {
     /**
      * @param array|string $paths
      * @param array|string $suffixes
      * @param array|string $prefixes
+     *
+     * @return AppendIterator
      */
-    public function getFileIterator($paths, $suffixes = '', $prefixes = '', array $exclude = []): AppendIterator
-    {
+    public function getFileIterator($paths, $suffixes = '', $prefixes = '', array $exclude = []) {
         if (is_string($paths)) {
             $paths = [$paths];
         }
 
-        $paths   = $this->getPathsAfterResolvingWildcards($paths);
+        $paths = $this->getPathsAfterResolvingWildcards($paths);
         $exclude = $this->getPathsAfterResolvingWildcards($exclude);
 
         if (is_string($prefixes)) {
@@ -53,7 +54,7 @@ class Factory
             }
         }
 
-        $iterator = new AppendIterator;
+        $iterator = new AppendIterator();
 
         foreach ($paths as $path) {
             if (is_dir($path)) {
@@ -74,8 +75,12 @@ class Factory
         return $iterator;
     }
 
-    protected function getPathsAfterResolvingWildcards(array $paths): array
-    {
+    /**
+     * @param array $paths
+     *
+     * @return array
+     */
+    protected function getPathsAfterResolvingWildcards(array $paths) {
         $_paths = [];
 
         foreach ($paths as $path) {

@@ -156,7 +156,7 @@ class CQueue_PendingBatch {
     /**
      * Get the connection used by the pending batch.
      *
-     * @return string|null
+     * @return null|string
      */
     public function connection() {
         return $this->options['connection'] ?? null;
@@ -178,7 +178,7 @@ class CQueue_PendingBatch {
     /**
      * Get the queue used by the pending batch.
      *
-     * @return string|null
+     * @return null|string
      */
     public function queue() {
         return $this->options['queue'] ?? null;
@@ -187,12 +187,12 @@ class CQueue_PendingBatch {
     /**
      * Dispatch the batch.
      *
-     * @return \CQueue_Batch
-     *
      * @throws \Throwable
+     *
+     * @return \CQueue_Batch
      */
     public function dispatch() {
-        $repository = CContainer::getInstance()->make(CQueue_BatchRepositoryInterface::class);
+        $repository = CQueue::batchRepository();
 
         try {
             $batch = $repository->store($this);

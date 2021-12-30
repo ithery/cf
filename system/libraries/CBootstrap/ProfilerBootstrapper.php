@@ -1,7 +1,7 @@
 <?php
 
 /**
- * Description of ProfilerBootstrapper
+ * Description of ProfilerBootstrapper.
  *
  * @author Hery
  */

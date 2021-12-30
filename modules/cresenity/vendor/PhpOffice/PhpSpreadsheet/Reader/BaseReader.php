@@ -2,11 +2,10 @@
 
 namespace PhpOffice\PhpSpreadsheet\Reader;
 
-use PhpOffice\PhpSpreadsheet\Reader\Security\XmlScanner;
 use PhpOffice\PhpSpreadsheet\Shared\File;
+use PhpOffice\PhpSpreadsheet\Reader\Security\XmlScanner;
 
-abstract class BaseReader implements IReader
-{
+abstract class BaseReader implements IReader {
     /**
      * Read data only?
      * Identifies whether the Reader should only read data values for cells, and ignore any formatting information;
@@ -62,8 +61,7 @@ abstract class BaseReader implements IReader
      *
      * @return bool
      */
-    public function getReadDataOnly()
-    {
+    public function getReadDataOnly() {
         return $this->readDataOnly;
     }
 
@@ -72,13 +70,12 @@ abstract class BaseReader implements IReader
      *        Set to true, to advise the Reader only to read data values for cells, and to ignore any formatting information.
      *        Set to false (the default) to advise the Reader to read both data and formatting for cells.
      *
-     * @param bool $pValue
+     * @param bool $readCellValuesOnly
      *
      * @return IReader
      */
-    public function setReadDataOnly($pValue)
-    {
-        $this->readDataOnly = (bool) $pValue;
+    public function setReadDataOnly($readCellValuesOnly) {
+        $this->readDataOnly = (bool) $readCellValuesOnly;
 
         return $this;
     }
@@ -90,8 +87,7 @@ abstract class BaseReader implements IReader
      *
      * @return bool
      */
-    public function getReadEmptyCells()
-    {
+    public function getReadEmptyCells() {
         return $this->readEmptyCells;
     }
 
@@ -100,13 +96,12 @@ abstract class BaseReader implements IReader
      *        Set to true (the default) to advise the Reader read data values for all cells, irrespective of value.
      *        Set to false to advise the Reader to ignore cells containing a null value or an empty string.
      *
-     * @param bool $pValue
+     * @param bool $readEmptyCells
      *
      * @return IReader
      */
-    public function setReadEmptyCells($pValue)
-    {
-        $this->readEmptyCells = (bool) $pValue;
+    public function setReadEmptyCells($readEmptyCells) {
+        $this->readEmptyCells = (bool) $readEmptyCells;
 
         return $this;
     }
@@ -119,8 +114,7 @@ abstract class BaseReader implements IReader
      *
      * @return bool
      */
-    public function getIncludeCharts()
-    {
+    public function getIncludeCharts() {
         return $this->includeCharts;
     }
 
@@ -130,13 +124,12 @@ abstract class BaseReader implements IReader
      *      Note that a ReadDataOnly value of false overrides, and charts won't be read regardless of the IncludeCharts value.
      *        Set to false (the default) to discard charts.
      *
-     * @param bool $pValue
+     * @param bool $includeCharts
      *
      * @return IReader
      */
-    public function setIncludeCharts($pValue)
-    {
-        $this->includeCharts = (bool) $pValue;
+    public function setIncludeCharts($includeCharts) {
+        $this->includeCharts = (bool) $includeCharts;
 
         return $this;
     }
@@ -148,8 +141,7 @@ abstract class BaseReader implements IReader
      *
      * @return mixed
      */
-    public function getLoadSheetsOnly()
-    {
+    public function getLoadSheetsOnly() {
         return $this->loadSheetsOnly;
     }
 
@@ -157,13 +149,12 @@ abstract class BaseReader implements IReader
      * Set which sheets to load.
      *
      * @param mixed $value
-     *        This should be either an array of worksheet names to be loaded, or a string containing a single worksheet name.
-     *        If NULL, then it tells the Reader to read all worksheets in the workbook
+     *                     This should be either an array of worksheet names to be loaded, or a string containing a single worksheet name.
+     *                     If NULL, then it tells the Reader to read all worksheets in the workbook
      *
      * @return IReader
      */
-    public function setLoadSheetsOnly($value)
-    {
+    public function setLoadSheetsOnly($value) {
         if ($value === null) {
             return $this->setLoadAllSheets();
         }
@@ -179,8 +170,7 @@ abstract class BaseReader implements IReader
      *
      * @return IReader
      */
-    public function setLoadAllSheets()
-    {
+    public function setLoadAllSheets() {
         $this->loadSheetsOnly = null;
 
         return $this;
@@ -191,8 +181,7 @@ abstract class BaseReader implements IReader
      *
      * @return IReadFilter
      */
-    public function getReadFilter()
-    {
+    public function getReadFilter() {
         return $this->readFilter;
     }
 
@@ -203,20 +192,24 @@ abstract class BaseReader implements IReader
      *
      * @return IReader
      */
-    public function setReadFilter(IReadFilter $pValue)
-    {
+    public function setReadFilter(IReadFilter $pValue) {
         $this->readFilter = $pValue;
 
         return $this;
     }
 
-    public function getSecuritySCanner()
-    {
+    public function getSecuritySCanner() {
         if (property_exists($this, 'securityScanner')) {
             return $this->securityScanner;
         }
 
         return null;
+    }
+
+    protected function processFlags($flags) {
+        if (((bool) ($flags & self::LOAD_WITH_CHARTS)) === true) {
+            $this->setIncludeCharts(true);
+        }
     }
 
     /**
@@ -226,8 +219,7 @@ abstract class BaseReader implements IReader
      *
      * @throws Exception
      */
-    protected function openFile($pFilename)
-    {
+    protected function openFile($pFilename) {
         File::assertFile($pFilename);
 
         // Open file

@@ -12,6 +12,7 @@ class CElement_Component_Action extends CElement_Component {
     use CTrait_Compat_Element_Action,
         CTrait_Element_Property_Label,
         CTrait_Element_Property_Icon;
+
     protected $jsfunc;
 
     protected $disabled;
@@ -286,9 +287,7 @@ class CElement_Component_Action extends CElement_Component {
             }
             if ($this->button) {
                 $html->appendln('<button id="' . $this->id . '" name="' . $this->id . '" class="btn btn-primary' . $add_class . $classes . '" type="' . $input_type . '"' . $disabled . $add_attr . $addition_attribute . $custom_css . '>' . $this->label . '</button>');
-                if (strlen($this->icon) > 0) {
-                    $html->append('<i class="icon icon-' . $this->icon . '"></i> ');
-                }
+                $html->append($this->getIconHtml());
                 $html->appendln($this->label . '</button>');
             } else {
                 $html->appendln('<button type="submit" id="' . $this->id . '" name="' . $this->id . '" class="btn btn-primary' . $add_class . $classes . '" type="' . $input_type . '" ' . $disabled . $add_attr . $addition_attribute . $custom_css . ' value="' . $this->label . '">' . $this->label . '</button>');
@@ -308,11 +307,7 @@ class CElement_Component_Action extends CElement_Component {
             } else {
                 $html->appendln('<a id="' . $this->id . '" href="' . $link . '"' . $linkTarget . ' class="btn ' . $add_class . '' . $classes . '" ' . $disabled . $add_attr . $addition_attribute . $custom_css . '>');
             }
-
-            if (strlen($this->icon) > 0) {
-                $iconPrefix = c::theme('icon.prefix', 'icon icon-');
-                $html->append('<i class="' . $iconPrefix . $this->getIcon() . ' ' . $this->getIcon() . '"></i> ');
-            }
+            $html->append($this->getIconHtml());
             if ($this->style != 'btn-icon-group') {
                 $html->append($this->label);
             }

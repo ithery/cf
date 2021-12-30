@@ -8,19 +8,22 @@ defined('SYSPATH') or die('No direct access allowed.');
  * @see CRenderable
  * @see CElement
  *
- * @method CElement_Component_Action      addAction($id=null)
- * @method CElement_List_ActionList       addActionList($id=null)
- * @method CElement_Component_Alert       addAlert($id=null)
- * @method CElement_Element_Div           addDiv($id=null)
- * @method CElement_Component_FileManager addFileManager($id=null)
- * @method CElement_Component_Form        addForm($id=null)
- * @method CElement_Element_Pre           addPre($id=null)
- * @method CElement_Component_DataTable   addTable($id=null)
- * @method CElement_List_TabList          addTabList($id=null)
- * @method CElement_Template              addTemplate($id=null)
- * @method CElement_View                  addView($view = null, $data = null, $id = null)
- * @method CElement_Component_Widget      addWidget($id=null)
- * @method $this                          addJs($js)
+ * @method CElement_Component_Action       addAction($id=null)
+ * @method CElement_Component_Alert        addAlert($id=null)
+ * @method CElement_Component_FileManager  addFileManager($id=null)
+ * @method CElement_Component_Form         addForm($id=null)
+ * @method CElement_Component_DataTable    addTable($id=null)
+ * @method CElement_Element_Div            addDiv($id=null)
+ * @method CElement_Element_A              addA($id=null)
+ * @method CElement_Element_Pre            addPre($id=null)
+ * @method CElement_List_ActionList        addActionList($id=null)
+ * @method CElement_List_TabList           addTabList($id=null)
+ * @method CElement_FormInput_Select       addSelectControl($id=null)
+ * @method CElement_FormInput_SelectSearch addSelectSearchControl($id=null)
+ * @method CElement_Template               addTemplate($id=null)
+ * @method CElement_View                   addView($view = null, $data = null, $id = null)
+ * @method CElement_Component_Widget       addWidget($id=null)
+ * @method $this                           addJs($js)
  */
 class CApp implements CInterface_Responsable, CInterface_Renderable, CInterface_Jsonable {
     use CTrait_Compat_App,
@@ -37,6 +40,7 @@ class CApp implements CInterface_Responsable, CInterface_Renderable, CInterface_
         CApp_Concern_AuthTrait,
         CApp_Concern_BootstrapTrait,
         CApp_Concern_TitleTrait;
+
     public static $instance = null;
 
     protected $renderer;
@@ -94,12 +98,6 @@ class CApp implements CInterface_Responsable, CInterface_Renderable, CInterface_
 
         if (file_exists($appBootFile)) {
             include $appBootFile;
-        }
-
-        if (ccfg::get('set_timezone')) {
-            $timezone = ccfg::get('default_timezone');
-
-            date_default_timezone_set($timezone);
         }
 
         $this->id = 'capp';
@@ -437,8 +435,9 @@ class CApp implements CInterface_Responsable, CInterface_Renderable, CInterface_
         if (strlen($orgId) == 0) {
             $orgId = CApp_Base::orgId();
         }
+        $roleModel = c::container()->make($this->auth()->getRoleModelClass());
 
-        $nodes = self::model('Roles')->getDescendantsTree($roleId, $orgId, $type);
+        $nodes = $roleModel->getDescendantsTree($roleId, $orgId, $type);
         $childList = [];
 
         $traverse = function ($childs) use (&$traverse, &$childList) {
@@ -545,7 +544,7 @@ class CApp implements CInterface_Responsable, CInterface_Renderable, CInterface_
     }
 
     public static function setTheme($theme) {
-        CManager::theme()->setTheme($theme);
+        return CManager::theme()->setTheme($theme);
     }
 
     public static function setHaveScrollToTop($bool = true) {
@@ -554,7 +553,7 @@ class CApp implements CInterface_Responsable, CInterface_Renderable, CInterface_
 
     public static function haveScrollToTop() {
         if (static::$haveScrollToTop === null) {
-            static::$haveScrollToTop = ccfg::get('have_scroll_to_top') === null ? true : ccfg::get('have_scroll_to_top');
+            static::$haveScrollToTop = CF::config('cresjs', 'scroll_to_top', false);
         }
 
         return static::$haveScrollToTop;
@@ -564,5 +563,14 @@ class CApp implements CInterface_Responsable, CInterface_Renderable, CInterface_
         $this->data[$key] = $value;
 
         return $this;
+    }
+
+    /**
+     * Get CApp Formatter Instance.
+     *
+     * @return CApp_Formatter
+     */
+    public static function formatter() {
+        return CApp_Formatter::instance();
     }
 }

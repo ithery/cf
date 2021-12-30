@@ -1,6 +1,8 @@
 <?php
 
 class CElement_FormInput_Label extends CElement_FormInput {
+    use CTrait_Element_Property_DependsOn;
+
     public function __construct($id) {
         parent::__construct($id);
 
@@ -57,6 +59,7 @@ class CElement_FormInput_Label extends CElement_FormInput {
         $js = new CStringBuilder();
 
         $js->append(parent::js());
+        $js->append($this->getDependsOnContentJavascript());
 
         return $js->text();
     }

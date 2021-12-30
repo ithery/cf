@@ -1,7 +1,7 @@
 <?php
 
 /**
- * Description of UriValidator
+ * Description of UriValidator.
  *
  * @author Hery
  */

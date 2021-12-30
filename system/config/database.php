@@ -2,8 +2,6 @@
 
 defined('SYSPATH') or die('No direct script access.');
 /**
- * @package  Database
- *
  * Database connection settings, defined as arrays, or "groups". If no group
  * name is used when loading the database library, the group named "default"
  * will be used.
@@ -31,14 +29,14 @@ return [
         'persistent' => false,
         'connection' => [
             'type' => 'mysqli',
-            'user' => 'root',
-            'pass' => '',
-            'host' => 'localhost',
+            'user' => c::env('MYSQL_USER'),
+            'pass' => c::env('MYSQL_PASSWORD'),
+            'host' => c::env('MYSQL_HOST'),
             'port' => false,
             'socket' => false,
-            'database' => 'cresenity'
+            'database' => c::env('MYSQL_DATABASE')
         ],
-        'character_set' => 'utf8',
+        'character_set' => 'utf8mb4',
         'table_prefix' => '',
         'object' => true,
         'cache' => false,

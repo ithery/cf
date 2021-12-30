@@ -11,6 +11,7 @@ use PhpOffice\PhpSpreadsheet\Cell\Cell as SpreadsheetCell;
 class CExporter_Sheet {
     use CExporter_Trait_DelegatedMacroableTrait,
         CExporter_Trait_HasEventBusTrait;
+
     /**
      * @var int
      */
@@ -317,7 +318,6 @@ class CExporter_Sheet {
                 }
             }
         }
-
         $this->raise(new CExporter_Event_AfterSheet($this, $this->exportable));
     }
 
@@ -354,8 +354,8 @@ class CExporter_Sheet {
     }
 
     /**
-     * @param CExporter_Concern_FromQuery $sheetExport
-     * @param Worksheet                   $worksheet
+     * @param CExporter_Concern_FromSql $sheetExport
+     * @param Worksheet                 $worksheet
      */
     public function fromSql(CExporter_Concern_FromSql $sheetExport, Worksheet $worksheet) {
         CExporter_Helper_SqlHelper::chunkSqlResult($sheetExport->sql(), $this->getChunkSize($sheetExport), function ($chunk) use ($sheetExport, $worksheet) {
@@ -421,8 +421,12 @@ class CExporter_Sheet {
      * @throws \PhpOffice\PhpSpreadsheet\Exception
      */
     public function formatColumn($column, $format) {
+        $startRow = 1;
+        if ($this->exportable instanceof CExporter_Concern_WithHeadings) {
+            $startRow = 2;
+        }
         $this->worksheet
-            ->getStyle($column . '1:' . $column . $this->worksheet->getHighestRow())
+            ->getStyle($column . $startRow . ':' . $column . $this->worksheet->getHighestRow())
             ->getNumberFormat()
             ->setFormatCode($format);
     }

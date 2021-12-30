@@ -16,7 +16,6 @@ class CHTTP_Request extends SymfonyRequest implements CInterface_Arrayable, Arra
     use CHTTP_Trait_InteractsWithInput,
         CHTTP_Trait_InteractsWithContentTypes,
         CHTTP_Trait_InteractsWithFlashData;
-
     protected $browser;
 
     /**
@@ -552,6 +551,10 @@ class CHTTP_Request extends SymfonyRequest implements CInterface_Arrayable, Arra
      */
     public function getUserResolver() {
         return $this->userResolver ?: function ($guard = null) {
+            if ($guard == null) {
+                $guard = c::app()->auth()->guardName();
+            }
+
             return c::auth($guard)->user();
         };
     }
@@ -708,5 +711,26 @@ class CHTTP_Request extends SymfonyRequest implements CInterface_Arrayable, Arra
 
     public function hasValidRelativeSignature() {
         return $this->hasValidSignature(false);
+    }
+
+    /**
+     * Returns the HTTP referrer, or the default if the referrer is not set.
+     *
+     * @param mixed $default
+     *
+     * @return string
+     */
+    public function referrer($default = false) {
+        if (!empty($this->server('HTTP_REFERER'))) {
+            // Set referrer
+            $ref = $this->server('HTTP_REFERER');
+
+            if (strpos($ref, curl::base(false)) === 0) {
+                // Remove the base URL from the referrer
+                $ref = substr($ref, strlen(curl::base(false)));
+            }
+        }
+
+        return isset($ref) ? $ref : $default;
     }
 }

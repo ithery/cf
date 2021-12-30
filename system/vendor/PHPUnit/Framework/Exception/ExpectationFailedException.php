@@ -7,6 +7,7 @@
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  */
+
 namespace PHPUnit\Framework\Exception;
 
 use Exception;
@@ -21,22 +22,19 @@ use SebastianBergmann\Comparator\ComparisonFailure;
  *
  * @internal This class is not covered by the backward compatibility promise for PHPUnit
  */
-final class ExpectationFailedException extends AssertionFailedError
-{
+final class ExpectationFailedException extends AssertionFailedError {
     /**
      * @var ComparisonFailure
      */
     protected $comparisonFailure;
 
-    public function __construct($message, ComparisonFailure $comparisonFailure = null, Exception $previous = null)
-    {
+    public function __construct($message, ComparisonFailure $comparisonFailure = null, Exception $previous = null) {
         $this->comparisonFailure = $comparisonFailure;
 
         parent::__construct($message, 0, $previous);
     }
 
-    public function getComparisonFailure()
-    {
+    public function getComparisonFailure() {
         return $this->comparisonFailure;
     }
 }

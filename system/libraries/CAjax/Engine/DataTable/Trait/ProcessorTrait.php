@@ -1,11 +1,26 @@
 <?php
 
 trait CAjax_Engine_DataTable_Trait_ProcessorTrait {
+    public function rowGet($row, $field) {
+        if ($row instanceof CModel) {
+            return $row->$field;
+        }
+
+        return carr::get($row, $field);
+    }
+
+    public function rowArray($row) {
+        if ($row instanceof CModel) {
+            return $row->getAttributes();
+        }
+
+        return $row;
+    }
+
     public function populateAAData($data, CElement_Component_DataTable $table, $request, &$js) {
         $aaData = [];
         $rowActionList = $table->getRowActionList();
         $no = carr::get($request, 'iDisplayStart', 0);
-
         foreach ($data as $row) {
             $arr = [];
             $no++;
@@ -16,7 +31,7 @@ trait CAjax_Engine_DataTable_Trait_ProcessorTrait {
                 $html = new CStringBuilder();
 
                 $html->appendln('<td class="low-padding align-center cell-action td-action ">')->incIndent()->br();
-                $jsparam = $row;
+                $jsparam = $this->rowArray($row);
                 if (!isset($jsparam['param1'])) {
                     $jsparam['param1'] = $key;
                 }

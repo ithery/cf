@@ -1,7 +1,7 @@
 <?php
 
 /**
- * Description of DynamicComponent
+ * Description of DynamicComponent.
  *
  * @author Hery
  */
@@ -47,10 +47,10 @@ class CView_Component_DynamicComponent extends CView_ComponentAbstract {
         $template = <<<'EOF'
 <?php extract(collect($attributes->getAttributes())->mapWithKeys(function ($value, $key) { return [Illuminate\Support\Str::camel(str_replace([':', '.'], ' ', $key)) => $value]; })->all(), EXTR_SKIP); ?>
 {{ props }}
-<cf-{{ component }} {{ bindings }} {{ attributes }}>
+<x-{{ component }} {{ bindings }} {{ attributes }}>
 {{ slots }}
 {{ defaultSlot }}
-</cf-{{ component }}>
+</x-{{ component }}>
 EOF;
 
         return function ($data) use ($template) {
@@ -117,7 +117,7 @@ EOF;
      */
     protected function compileSlots(array $slots) {
         return c::collect($slots)->map(function ($slot, $name) {
-            return $name === '__default' ? null : '<cf-slot name="' . $name . '">{{ $' . $name . ' }}</cf-slot>';
+            return $name === '__default' ? null : '<x-slot name="' . $name . '">{{ $' . $name . ' }}</x-slot>';
         })->filter()->implode(PHP_EOL);
     }
 
@@ -155,9 +155,8 @@ EOF;
     protected function compiler() {
         if (!static::$compiler) {
             static::$compiler = new CView_Compiler_ComponentTagCompiler(
-                CContainer::getInstance()->make('blade.compiler')->getClassComponentAliases(),
-                CContainer::getInstance()->make('blade.compiler')->getClassComponentNamespaces(),
-                CContainer::getInstance()->make('blade.compiler')
+                CView::blade()->getClassComponentAliases(),
+                CView::blade()->getClassComponentNamespaces(),
             );
         }
 

@@ -6,19 +6,21 @@
  * @author Hery
  */
 class CView_Compiler_BladeCompiler extends CView_CompilerAbstract implements CView_CompilerInterface {
-    use CView_Compiler_BladeCompiler_CompileCommentTrait,
+    use CView_Compiler_BladeCompiler_CompileAuthorizationTrait,
+        CView_Compiler_BladeCompiler_CompileCommentTrait,
         CView_Compiler_BladeCompiler_CompileComponentTrait,
         CView_Compiler_BladeCompiler_CompileConditionalTrait,
+        CView_Compiler_BladeCompiler_CompileEchoTrait,
         CView_Compiler_BladeCompiler_CompileErrorTrait,
         CView_Compiler_BladeCompiler_CompileHelperTrait,
-        CView_Compiler_BladeCompiler_CompileEchoTrait,
-        CView_Compiler_BladeCompiler_CompileLayoutTrait,
-        CView_Compiler_BladeCompiler_CompileRawPhpTrait,
-        CView_Compiler_BladeCompiler_CompileLoopTrait,
         CView_Compiler_BladeCompiler_CompileIncludeTrait,
         CView_Compiler_BladeCompiler_CompileInjectionTrait,
         CView_Compiler_BladeCompiler_CompileJsonTrait,
-        CView_Compiler_BladeCompiler_CompileStackTrait;
+        CView_Compiler_BladeCompiler_CompileLayoutTrait,
+        CView_Compiler_BladeCompiler_CompileLoopTrait,
+        CView_Compiler_BladeCompiler_CompileRawPhpTrait,
+        CView_Compiler_BladeCompiler_CompileStackTrait,
+        CView_Compiler_BladeCompiler_CompileTranslationTrait;
     /*
       use Concerns\CompilesAuthorizations,
       Concerns\CompilesComments,
@@ -355,8 +357,7 @@ class CView_Compiler_BladeCompiler extends CView_CompilerAbstract implements CVi
 
         return (new CView_Compiler_ComponentTagCompiler(
             $this->classComponentAliases,
-            $this->classComponentNamespaces,
-            $this
+            $this->classComponentNamespaces
         ))->compile($value);
     }
 

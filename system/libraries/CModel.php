@@ -77,6 +77,7 @@ abstract class CModel implements ArrayAccess, CInterface_Arrayable, CInterface_J
         CModel_Trait_HidesAttributes,
         CModel_Trait_Timestamps,
         CTrait_ForwardsCalls;
+
     /**
      * The name of the "created" column.
      *
@@ -269,7 +270,7 @@ abstract class CModel implements ArrayAccess, CInterface_Arrayable, CInterface_J
      * @return void
      */
     public function __construct(array $attributes = []) {
-        $this->primaryKey = $this->table . '_id';
+        $this->primaryKey = $this->table ? $this->table . '_id' : 'id';
         $this->bootIfNotBooted();
 
         $this->syncOriginal();

@@ -129,6 +129,11 @@ HTML;
         return CApp_Message::flashAll();
     }
 
+    public function renderSeo($options = []) {
+        /** @var CApp $this */
+        return $this->seo()->generate();
+    }
+
     public function getViewData() {
         if ($this->viewData == null) {
             $theme_path = '';

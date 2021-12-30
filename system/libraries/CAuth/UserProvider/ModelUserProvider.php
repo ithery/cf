@@ -52,6 +52,10 @@ class CAuth_UserProvider_ModelUserProvider extends CAuth_UserProviderAbstract {
      */
     public function retrieveByObject($object) {
         $identifierName = $this->createModel()->getAuthIdentifierName();
+        if (!property_exists($object, $identifierName)) {
+            //this object is corrupt
+            return null;
+        }
         $id = $object->$identifierName;
 
         return $this->retrieveById($id);

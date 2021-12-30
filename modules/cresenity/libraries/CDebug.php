@@ -25,6 +25,7 @@ class CDebug {
         } else {
             self::$bar->setOptions($options);
         }
+
         return self::$bar;
     }
 
@@ -34,21 +35,5 @@ class CDebug {
             $collector = self::bar()->getCollector('messages');
             $collector->debug($var);
         }
-    }
-
-    public static function tracer() {
-        // Creates a tracer with default transport and default propagators
-        $tracer = new CDebug_Tracer();
-
-        // Sets a global tracer (singleton). Ideally tracer should be
-        // injected as a dependency
-        GlobalTracer::set($tracer);
-
-        //$application->run();
-
-        // Flushes traces to agent.
-        //register_shutdown_function(function() {
-            //GlobalTracer::get()->flush();
-        //});
     }
 }

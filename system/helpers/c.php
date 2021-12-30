@@ -498,9 +498,13 @@ class c {
      * @param mixed         $payload
      * @param bool          $halt
      *
-     * @return null|array
+     * @return null|array|CEvent_Dispatcher
      */
     public static function event(...$args) {
+        if (count($args) == 0) {
+            return CEvent::dispatcher();
+        }
+
         return CEvent::dispatch(...$args);
     }
 
@@ -684,10 +688,17 @@ class c {
     //@codingStandardsIgnoreEnd
 
     /**
-     * @return CSession
+     * @param null|string $key
+     * @param null|mixed  $default
+     *
+     * @return CSession_Store|mixed
      */
-    public static function session() {
-        return CSession::instance();
+    public static function session($key = null, $default = null) {
+        if ($key === null) {
+            return CSession::instance()->store();
+        }
+
+        return CSession::instance()->store()->get($key, $default);
     }
 
     /**
@@ -1093,7 +1104,7 @@ class c {
      * @param null|string $abstract
      * @param array       $parameters
      *
-     * @return mixed|\CContainer_Container
+     * @return CContainer_Container|mixed
      */
     public static function container($abstract = null, array $parameters = []) {
         if (is_null($abstract)) {
@@ -1415,13 +1426,14 @@ class c {
         }
 
         $appRoot = static::docRoot('application/' . $appCode);
+
         if ($path != null) {
-            if (is_string($path)) {
+            if (is_string($path) && strlen($path) > 0) {
                 $appRoot .= DS . trim($path, DS);
             }
         }
 
-        return $appRoot . DS;
+        return c::untrailingslashit($appRoot) . DS;
     }
 
     public static function disk($name = null) {
@@ -1473,6 +1485,78 @@ class c {
         }
 
         return $object;
+    }
+
+    /**
+     * Get Public Path.
+     *
+     * @param string $path
+     *
+     * @return string
+     */
+    public static function publicPath($path = null) {
+        $publicPath = DOCROOT . 'public';
+        if ($path != null && strlen($path) > 0) {
+            $publicPath .= ltrim($path, '/');
+        }
+
+        return $publicPath;
+    }
+
+    /**
+     * Get / set the specified cache value.
+     *
+     * If an array is passed, we'll assume you want to put to the cache.
+     *
+     * @param  dynamic  key|key,default|data,expiration|null
+     *
+     * @throws \Exception
+     *
+     * @return \CCache_Manager|mixed
+     */
+    public static function cache() {
+        $arguments = func_get_args();
+
+        if (empty($arguments)) {
+            return CCache::manager();
+        }
+
+        if (is_string($arguments[0])) {
+            return CCache::manager()->get(...$arguments);
+        }
+
+        if (!is_array($arguments[0])) {
+            throw new Exception(
+                'When setting a value in the cache, you must pass an array of key / value pairs.'
+            );
+        }
+
+        return CCache::manager()->put(key($arguments[0]), reset($arguments[0]), isset($arguments[1]) ? $arguments[1] : null);
+    }
+
+    /**
+     * Get CApp Formatter Instance.
+     *
+     * @return CApp_Formatter
+     */
+    public static function formatter() {
+        return CApp::formatter();
+    }
+
+    /**
+     * Get Schedule Instance.
+     *
+     * @return CCron_Schedule
+     */
+    public static function cron() {
+        return CCron::schedule();
+    }
+
+    /**
+     * @return CHTTP_Cookie
+     */
+    public static function cookie() {
+        return CHTTP::cookie();
     }
 }
 

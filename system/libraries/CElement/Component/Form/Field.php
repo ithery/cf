@@ -111,9 +111,14 @@ class CElement_Component_Form_Field extends CElement_Component {
         $label_class = '';
         $control_class = '';
 
+        $groupIdAttr = '';
+        if (strlen($this->group_id) > 0) {
+            $groupIdAttr = 'id="' . $this->group_id . '" ';
+        }
+
         $label_class .= ' ' . implode(' ', $this->label_class);
         $control_class .= ' ' . implode(' ', $this->control_class);
-        $html->appendln('<div class="' . $classFormField . ' ' . $classes . '" ' . $custom_css . $addition_attribute . '>')->incIndent();
+        $html->appendln('<div ' . $groupIdAttr . ' class="' . $classFormField . ' ' . $classes . '" ' . $custom_css . $addition_attribute . '>')->incIndent();
         if ($this->show_label) {
             $html->appendln('<label id="' . $this->id . '" class="form-label ' . $label_class . ' control-label">' . $labelRequiredHtml . $this->label . '</label>')->br();
         }

@@ -113,13 +113,7 @@ class CRemote_SSH {
 
     public function outputContent() {
         $output = $this->output();
-        preg_match('#^\[.+?\] \(*.+?\) (.*)#ims', $output, $matches);
-        $content = '';
-        if (isset($matches[1])) {
-            $content = $matches[1];
-        } else {
-            $content = $output;
-        }
+        $content = preg_replace('/\[.+?\] \(*.+?\) /', '', $output);
 
         return $content;
     }

@@ -24,7 +24,7 @@ class CAjax_Engine_DataTable_Parameter {
 
     public function page() {
         $pageSize = $this->pageSize();
-        if (strlen($pageSize) > 0 && $pageSize != 0) {
+        if (strlen($pageSize) > 0 && $pageSize > 0) {
             return (carr::get($this->requestGet, 'iDisplayStart') / $pageSize) + 1;
         }
 

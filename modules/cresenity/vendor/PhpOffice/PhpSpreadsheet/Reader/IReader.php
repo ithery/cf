@@ -2,8 +2,9 @@
 
 namespace PhpOffice\PhpSpreadsheet\Reader;
 
-interface IReader
-{
+interface IReader {
+    const LOAD_WITH_CHARTS = 1;
+
     /**
      * IReader constructor.
      */

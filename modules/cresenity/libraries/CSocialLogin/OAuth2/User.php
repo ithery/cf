@@ -1,14 +1,8 @@
 <?php
 
-defined('SYSPATH') OR die('No direct access allowed.');
+defined('SYSPATH') or die('No direct access allowed.');
 
-/**
- * @author Hery Kurniawan
- * @since May 15, 2019, 8:06:23 PM
- * @license Ittron Global Teknologi <ittron.co.id>
- */
 class CSocialLogin_OAuth2_User extends CSocialLogin_AbstractUser {
-
     /**
      * The user's access token.
      *
@@ -33,34 +27,39 @@ class CSocialLogin_OAuth2_User extends CSocialLogin_AbstractUser {
     /**
      * Set the token on the user.
      *
-     * @param  string  $token
+     * @param string $token
+     *
      * @return $this
      */
     public function setToken($token) {
         $this->token = $token;
+
         return $this;
     }
 
     /**
      * Set the refresh token required to obtain a new access token.
      *
-     * @param  string  $refreshToken
+     * @param string $refreshToken
+     *
      * @return $this
      */
     public function setRefreshToken($refreshToken) {
         $this->refreshToken = $refreshToken;
+
         return $this;
     }
 
     /**
      * Set the number of seconds the access token is valid for.
      *
-     * @param  int  $expiresIn
+     * @param int $expiresIn
+     *
      * @return $this
      */
     public function setExpiresIn($expiresIn) {
         $this->expiresIn = $expiresIn;
+
         return $this;
     }
-
 }

@@ -19,8 +19,10 @@ return [
         ],
         'file' => [
             'driver' => 'file',
-            'disk' => 'local-temp',
-            'path' => DOCROOT . 'temp' . DS . 'cache',
+            'engine' => 'temp',
+            'options' => [
+                'directory' => CF::appCode()
+            ],
         ],
         'memcached' => [
             'driver' => 'memcached',
@@ -53,4 +55,6 @@ return [
             'endpoint' => c::env('DYNAMODB_ENDPOINT'),
         ],
     ],
+    'prefix' => c::env('CACHE_PREFIX', cstr::slug(CF::appCode(), '_') . '_cache'),
+
 ];

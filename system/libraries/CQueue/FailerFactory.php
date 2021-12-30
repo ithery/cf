@@ -20,7 +20,7 @@ class CQueue_FailerFactory {
         } elseif (isset($config['table'])) {
             return static::databaseFailedJobProvider($config);
         } else {
-            return new CQueue_FailedJob_NullFailedJob;
+            return new CQueue_FailedJob_NullFailedJob();
         }
     }
 
@@ -29,10 +29,11 @@ class CQueue_FailerFactory {
      *
      * @param array $config
      *
-     * @return \Illuminate\Queue\Failed\DatabaseFailedJobProvider
+     * @return \CQueue_FailedJob_DatabaseFailedJob
      */
     protected static function databaseFailedJobProvider($config) {
         $db = CDatabase::instance(carr::get($config, 'database'));
+
         return new CQueue_FailedJob_DatabaseFailedJob(
             $db,
             carr::get($config, 'table')
@@ -44,7 +45,7 @@ class CQueue_FailerFactory {
      *
      * @param array $config
      *
-     * @return \Illuminate\Queue\Failed\DynamoDbFailedJobProvider
+     * @return \CQueue_FailedJob_DynamoDbFailedJob
      */
     protected static function dynamoFailedJobProvider($config) {
         $dynamoConfig = [
@@ -55,6 +56,7 @@ class CQueue_FailerFactory {
         if (!empty($config['key']) && !empty($config['secret'])) {
             $dynamoConfig['credentials'] = carr::only($config, ['key', 'secret', 'token']);
         }
+
         return new CQueue_FailedJob_DynamoDbFailedJob(
             new DynamoDbClient($dynamoConfig),
             CF::appCode(),

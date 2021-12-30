@@ -80,6 +80,8 @@ class crequest {
     /**
      * Fetch the Remote Address.
      *
+     * @deprecated 1.2
+     *
      * @return string
      */
     public static function remoteAddress() {
@@ -94,7 +96,7 @@ class crequest {
      * @deprecated 1.2
      */
     public static function remote_address() {
-        return static::remoteAddress();
+        return CHTTP::request()->ip();
     }
 
     /**
@@ -120,15 +122,15 @@ class crequest {
      * @return bool
      */
     public static function is_ajax() {
-        return (isset($_SERVER['HTTP_X_REQUESTED_WITH']) and strtolower($_SERVER['HTTP_X_REQUESTED_WITH']) === 'xmlhttprequest');
+        return isset($_SERVER['HTTP_X_REQUESTED_WITH']) and strtolower($_SERVER['HTTP_X_REQUESTED_WITH']) === 'xmlhttprequest';
     }
 
     /**
-     * Checks to see if the page is being server over SSL or not
+     * Checks to see if the page is being server over SSL or not.
      *
      * @return bool
      *
-     * @since   1.0.000
+     * @deprecated 1.2
      * @static
      */
     public static function is_https() {
@@ -136,7 +138,7 @@ class crequest {
     }
 
     /**
-     * Checks to see if the page is being server over SSL or not
+     * Checks to see if the page is being server over SSL or not.
      *
      * @return bool
      *
@@ -153,7 +155,7 @@ class crequest {
      * @return string
      */
     public static function method() {
-        $method = strtolower($_SERVER['REQUEST_METHOD']);
+        $method = strtolower(carr::get($_SERVER, 'REQUEST_METHOD', 'GET'));
 
         return $method;
     }

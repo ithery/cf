@@ -1787,12 +1787,15 @@ let Cresenity = function () {
 
     this.initConfirm = function () {
         elementRendered('a.confirm, button.confirm, input[type=submit].confirm', (el)=>{
-            $(el).click((e)=>{
-                e.preventDefault();
-                e.stopPropagation();
-                confirmFromElement(el, this.confirmHandler);
-                return false;
-            });
+            if(!$(el).data('capp-confirm-inited')) {
+                $(el).click((e)=>{
+                    e.preventDefault();
+                    e.stopPropagation();
+                    confirmFromElement(el, this.confirmHandler);
+                    return false;
+                });
+                $(el).data('capp-confirm-inited', true);
+            }
         });
         jQuery(document).ready(function () {
             jQuery('#toggle-subnavbar').click(function () {
@@ -4351,7 +4354,7 @@ $.extend(true, appValidation, {
 });
 
 
-if (!window.cresenity) {
+if (typeof window.cresenity == 'undefined') {
     window.cresenity = new Cresenity();
 
     window.cresenity.init();

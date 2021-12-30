@@ -6,14 +6,14 @@ class CRouting_ImplicitRouteBinding {
      * @param CContainer_Container $container
      * @param CRouting_Route       $route
      *
-     * @throws CModel_Exception_ModelNotFound
+     * @throws CModel_Exception_ModelNotFoundException
      *
      * @return void
      */
     public static function resolveForRoute($container, $route) {
         $parameters = $route->parameters();
 
-        foreach ($route->signatureParameters(UrlRoutable::class) as $parameter) {
+        foreach ($route->signatureParameters(CRouting_UrlRoutableInterface::class) as $parameter) {
             if (!$parameterName = static::getParameterName($parameter->getName(), $parameters)) {
                 continue;
             }
@@ -35,10 +35,10 @@ class CRouting_ImplicitRouteBinding {
                     $route->bindingFieldFor($parameterName)
                 );
                 if (!$model) {
-                    throw (new CModel_Exception_ModelNotFound())->setModel(get_class($instance), [$parameterValue]);
+                    throw (new CModel_Exception_ModelNotFoundException())->setModel(get_class($instance), [$parameterValue]);
                 }
             } elseif (!$model = $instance->resolveRouteBinding($parameterValue, $route->bindingFieldFor($parameterName))) {
-                throw (new CModel_Exception_ModelNotFound())->setModel(get_class($instance), [$parameterValue]);
+                throw (new CModel_Exception_ModelNotFoundException())->setModel(get_class($instance), [$parameterValue]);
             }
 
             $route->setParameter($parameterName, $model);

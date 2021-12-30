@@ -124,7 +124,7 @@ trait CEmail_Builder_Parser_CmlParserSubscriberTrait {
         if ($this->inEndingTag > 0) {
             return;
         }
-
+        $data = $event->value;
         if ($this->currentNode != null && $this->keepComments) {
             $line = carr::findLastIndex($this->lineIndexes, function ($i) {
                 return $i < $this->parser->getStartIndex();

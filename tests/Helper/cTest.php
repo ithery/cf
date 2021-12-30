@@ -594,6 +594,7 @@ class cTest extends TestCase {
 
     public function testEnv() {
         $_SERVER['foo'] = 'bar';
+
         $this->assertSame('bar', c::env('foo'));
         $this->assertSame('bar', CEnv::get('foo'));
     }

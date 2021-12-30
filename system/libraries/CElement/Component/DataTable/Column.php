@@ -6,7 +6,6 @@ class CElement_Component_DataTable_Column extends CObject {
     use CTrait_Compat_Element_DataTable_Column,
         CTrait_Element_Property_Label,
         CTrait_Element_Responsive;
-
     public $transforms = [];
 
     public $fieldname;
@@ -45,12 +44,14 @@ class CElement_Component_DataTable_Column extends CObject {
 
     protected $exportCallbackRequire;
 
+    protected $dataType = null;
+
     public function __construct($fieldname) {
         parent::__construct();
 
         $this->fieldname = $fieldname;
         $this->align = 'left';
-        $this->label = '';
+        $this->label = $fieldname;
         $this->width = '';
         $this->transforms = [];
         $this->format = '';
@@ -98,6 +99,16 @@ class CElement_Component_DataTable_Column extends CObject {
         $this->noLineBreak = $bool;
 
         return $this;
+    }
+
+    public function setDataType($dataType) {
+        $this->dataType = $dataType;
+
+        return $this;
+    }
+
+    public function getDataType() {
+        return $this->dataType;
     }
 
     public function setVisible($bool) {

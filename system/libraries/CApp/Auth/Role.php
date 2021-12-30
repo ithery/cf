@@ -2,7 +2,7 @@
 
 class CApp_Auth_Role {
     /**
-     * Roles cache
+     * Roles cache.
      *
      * @var array
      */
@@ -18,7 +18,9 @@ class CApp_Auth_Role {
         }
         if (!isset(static::$roles[$id])) {
             static::$roles[$id] = null;
-            $role = CApp::model('Roles')->find($id);
+            $roleClass = c::app()->auth()->getRoleModelClass();
+            $role = $roleClass::find($id);
+            //$role = CApp::model('Roles')->find($id);
 
             if ($role != null) {
                 static::$roles[$id] = $role;

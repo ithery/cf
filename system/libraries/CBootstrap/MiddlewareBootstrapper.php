@@ -1,7 +1,7 @@
 <?php
 
 /**
- * Description of MiddlewareBootstrapper
+ * Description of MiddlewareBootstrapper.
  *
  * @author Hery
  */
