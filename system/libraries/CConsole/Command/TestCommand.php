@@ -129,6 +129,9 @@ class CConsole_Command_TestCommand extends CConsole_Command {
         if (!file_exists($file = c::fixPath(CF::appDir()) . 'phpunit.xml')) {
             $file = c::fixPath(CF::appDir()) . 'phpunit.xml.dist';
         }
+        if (!file_exists($file)) {
+            throw new Exception('File not found:' . $file);
+        }
 
         return array_merge(['-c', $file], $options);
     }

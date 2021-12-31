@@ -917,6 +917,11 @@ final class CF {
      * @return string
      */
     public static function appCode($domain = null) {
+        if (CF::isCFCli()) {
+            if (CF::cliAppCode()) {
+                return CF::cliAppCode();
+            }
+        }
         $data = self::data($domain);
 
         return isset($data['app_code']) ? $data['app_code'] : null;
