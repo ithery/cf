@@ -444,6 +444,9 @@ final class CF {
         if ($domain == null) {
             $domain = CF::domain($domain);
         }
+        if (CF::appCode() != CF::appCode($domain)) {
+            $forceReload = true;
+        }
 
         $cacheKey = 'paths.' . $domain . '.' . ($withShared ? 'withShared' : 'withoutShared');
         $paths = null;
@@ -917,7 +920,7 @@ final class CF {
      * @return string
      */
     public static function appCode($domain = null) {
-        if (CF::isCFCli()) {
+        if (CF::isCFCli() || CF::isTesting()) {
             if (CF::cliAppCode()) {
                 return CF::cliAppCode();
             }
