@@ -262,7 +262,7 @@ HTML;
             return true;
         }
 
-        return CHTTP::request()->hasHeader('X-Livewire');
+        return CHTTP::request()->hasHeader('X-Cresenity');
     }
 
     public function getRootElementTagName($dom) {
@@ -289,6 +289,13 @@ HTML;
         $this->queryParamsForTesting = $queryParams;
 
         return $this;
+    }
+
+    public function setBackButtonCache() {
+        /**
+         * Reverse this boolean so that the middleware is only applied when it is disabled.
+         */
+        $this->shouldDisableBackButtonCache = !CF::config('component.back_button_cache', false);
     }
 
     /**

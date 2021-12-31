@@ -1565,6 +1565,13 @@ class c {
     public static function cli() {
         return CConsole::kernel();
     }
+
+    /**
+     * @return CCrypt_Encrypter
+     */
+    public static function crypt() {
+        return CCrypt::encrypter();
+    }
 }
 
 // End c

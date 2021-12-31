@@ -9,10 +9,8 @@ final class CCrypt {
 
     public static function encrypter() {
         if (static::$encrypter == null) {
-            $config = CConfig::instance('app');
-            $key = $config->get('key');
-            $cipher = $config->get('cipher');
-
+            $key = CF::config('app.key');
+            $cipher = CF::config('app.cipher');
             static::$encrypter = new CCrypt_Encrypter(static::parseKey($key), $cipher);
         }
 
