@@ -1062,7 +1062,7 @@ class c {
      *
      * @param null|string $guard
      *
-     * @return CAuth_Manager|CAuth_GuardInterface|CAuth_StatefulGuardInterface
+     * @return CAuth_Manager|CAuth_Contract_GuardInterface|CAuth_Contract_StatefulGuardInterface
      */
     public static function auth($guard = null) {
         if (is_null($guard)) {

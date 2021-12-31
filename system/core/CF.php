@@ -444,7 +444,11 @@ final class CF {
         if ($domain == null) {
             $domain = CF::domain($domain);
         }
+        $isDiffAppCode = false;
         if (CF::appCode() != CF::appCode($domain)) {
+            $isDiffAppCode = true;
+        }
+        if (CF::isTesting() || $isDiffAppCode) {
             $forceReload = true;
         }
 
@@ -457,7 +461,7 @@ final class CF {
             //we try to search all paths for this domain
             $paths = [];
             $orgCode = CF::orgCode($domain);
-            $appCode = CF::appCode($domain);
+            $appCode = $isDiffAppCode ? CF::appCode() : CF::appCode($domain);
 
             $modules = CF::modules($domain);
             //when this domain is org
