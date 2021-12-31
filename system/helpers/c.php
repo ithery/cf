@@ -1558,6 +1558,13 @@ class c {
     public static function cookie() {
         return CHTTP::cookie();
     }
+
+    /**
+     * @return CConsole_Kernel
+     */
+    public static function cli() {
+        return CConsole::kernel();
+    }
 }
 
 // End c

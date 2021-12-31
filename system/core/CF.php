@@ -11,6 +11,8 @@ final class CF {
 
     const CFCLI_CURRENT_DOMAIN_FILE = DOCROOT . 'data' . DS . 'current-domain';
 
+    const CFCLI_CURRENT_APPCODE_FILE = DOCROOT . 'data' . DS . 'current-app';
+
     // Security check that is added to all generated PHP files
     const FILE_SECURITY = '<?php defined(\'SYSPATH\') OR die(\'No direct script access.\');';
 
@@ -742,6 +744,20 @@ final class CF {
         return $domain;
     }
 
+    /**
+     * To get cliAppCode.
+     *
+     * @return string
+     */
+    public static function cliAppCode() {
+        $domain = null;
+        if (file_exists(static::CFCLI_CURRENT_APPCODE_FILE)) {
+            $domain = trim(file_get_contents(static::CFCLI_CURRENT_APPCODE_FILE));
+        }
+
+        return $domain;
+    }
+
     public static function domain() {
         $domain = '';
         if (static::isCli() || static::isCFCli()) {
@@ -1128,6 +1144,17 @@ final class CF {
         return c::collect($directories)->map(function ($v) {
             return basename($v);
         })->all();
+    }
+
+    /**
+     * Check appCode is exits on directory.
+     *
+     * @param mixed $appCode
+     *
+     * @return bool
+     */
+    public static function appCodeExists($appCode) {
+        return in_array($appCode, static::getAvailableAppCode());
     }
 
     /**

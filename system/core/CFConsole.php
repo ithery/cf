@@ -1,18 +1,19 @@
 <?php
 
 class CFConsole {
-    private static $commands = [];
+    public static $commands = [];
 
-    private static $defaultCommands = [
+    public static $defaultCommands = [
         CConsole_Command_VersionCommand::class,
         CConsole_Command_StatusCommand::class,
         CConsole_Command_ServeCommand::class,
         CConsole_Command_ComposerCommand::class,
         CConsole_Command_EnvironmentCommand::class,
+        CConsole_Command_SetDomainCommand::class,
+        CConsole_Command_SetAppCommand::class,
         CConsole_Command_Domain_DomainListCommand::class,
         CConsole_Command_Domain_DomainCreateCommand::class,
         CConsole_Command_Domain_DomainDeleteCommand::class,
-        CConsole_Command_Domain_DomainSwitchCommand::class,
         CConsole_Command_Daemon_DaemonListCommand::class,
         CConsole_Command_Daemon_DaemonStartCommand::class,
         CConsole_Command_Daemon_DaemonStatusCommand::class,
