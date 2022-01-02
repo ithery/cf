@@ -2,7 +2,7 @@
 <?php
 
 /** @mixin \Illuminate\Testing\TestResponse */
-class TestableLivewire {
+class CComponent_Testing_TestableComponent {
     use CTrait_Macroable {
         __call as macroCall;
     }

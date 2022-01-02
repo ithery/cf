@@ -89,7 +89,7 @@ trait CComponent_Testing_Concern_MakesCallsToComponentTrait {
         $storage = CComponent_FileUploadConfiguration::storage();
 
         try {
-            $fileHashes = (new CComponent_Controller_FileUploadHandler())->validateAndStore($files, CComponent_FileUploadConfiguration::disk());
+            $fileHashes = (new CComponent_Handler_FileUploadHandler())->validateAndStore($files, CComponent_FileUploadConfiguration::disk());
         } catch (CValidation_Exception $e) {
             $this->runAction('uploadErrored', $name, json_encode(['errors' => $e->errors()]), $isMultiple);
 
