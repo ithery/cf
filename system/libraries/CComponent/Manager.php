@@ -107,7 +107,7 @@ class CComponent_Manager {
     }
 
     public function test($name, $params = []) {
-        return new TestableComponent($name, $params, $this->queryParamsForTesting);
+        return new CComponent_Testing_TestableComponent($name, $params, $this->queryParamsForTesting);
     }
 
     public function visit($browser, $class, $queryString = '') {

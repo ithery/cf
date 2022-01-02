@@ -209,7 +209,7 @@ class CComponent_Testing_TestableComponent {
                 try {
                     $value = $this->instance()->{$root};
                 } catch (\Throwable $e) {
-                    if ($e instanceof PropertyNotFoundException) {
+                    if ($e instanceof CComponent_Exception_PropertyNotFoundException) {
                         $value = null;
                     } elseif (c::str($e->getMessage())->contains('must not be accessed before initialization')) {
                         $value = null;
