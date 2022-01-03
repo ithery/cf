@@ -341,11 +341,10 @@ class CVendor_Shipper {
      * @param float $height cm
      * @param float $length cm
      * @param float $width cm
-     * @param boolean $cod
      * @param boolean $forOrder
      * @param integer $limit
      * @param integer $page
-     * @param integer $sortBy 0= delivery_time / 1= final_price
+     * @param boolean $cod
      * @return void
      */
     public function getPricingDomesticByRates(
@@ -357,11 +356,11 @@ class CVendor_Shipper {
         $height,
         $length,
         $width,
-        $cod = false,
         $forOrder = false,
+        $sortBy = [],
         $limit = 30,
         $page = 1,
-        int $sortBy = 2
+        $cod = false
     ) {
         $data = [];
         $data["cod"] = $cod;
@@ -385,24 +384,30 @@ class CVendor_Shipper {
 
     public function createOrder(
         $consignee,
-        $consigner,
         $courier,
         $coverage,
         $destination,
         $origin,
         $package,
         $paymentType,
+        $externalId = '',
+        $consigner = [],
         $serviceType = '',
         $bestPrice = false
     ) {
         $data = [];
         $data["consignee"] = $consignee;
-        $data["consigner"] = $consigner;
+        if (count($consigner) > 0) {
+            $data["consigner"] = $consigner;
+        }
         $data["courier"] = $courier;
         $data["coverage"] = $coverage;
         $data["destination"] = $destination;
         $data["origin"] = $origin;
         $data["package"] = $package;
+        if (strlen($externalId) > 0) {
+            $data['external_id'] = $externalId;
+        }
         $data["payment_type"] = $paymentType;
         if (strlen($serviceType) > 0) {
             $data['service_type'] = $serviceType;
@@ -410,6 +415,50 @@ class CVendor_Shipper {
         $data["best_price"] = $bestPrice;
         $endPoint = $this->url . 'v3/order/';
         $response = $this->requestToShipper($endPoint, "POST", $data);
+        return $response;
+    }
+
+    /**
+     * Retrieves tracking ID of the order with the provided ID
+     *
+     * @param integer $orderId the ID retrieved after creating the order
+     *
+     * @method getOrder
+     *
+     * @return object JSON Results
+     */
+    public function getOrder($orderId) {
+        $data =[];
+        $endPoint = $this->url . 'v3/order/'.$orderId;
+        $response = $this->requestToShipper($endPoint, "GET", $data);
+        return $response;
+    }
+
+    /**
+     * Create pickup order
+     *
+     *  $order = array(
+     *      'order_id'      => ['21CWXMW82GEWV'],          // the id
+     *      'pickup_time'   => '2021-12-30T19:00:00+07:00',     // the class
+     *  );
+     *
+     * @method getOrder
+     *
+     * @return object JSON Results
+     */
+    public function createPickUpOrder($orderActivation) {
+        $data =[];
+        $data["data"]["order_activation"] = $orderActivation;
+        $endPoint = $this->url . 'v3/pickup/';
+        $response = $this->requestToShipper($endPoint, "POST", $data);
+        return $response;
+    }
+
+    public function getTimeslot($timeZone = "Asia/Jakarta") {
+        $data =[];
+        $data["time_zone"] = $timeZone;
+        $endPoint = $this->url . 'v3/pickup/timeslot';
+        $response = $this->requestToShipper($endPoint, "GET", $data);
         return $response;
     }
 
@@ -864,46 +913,6 @@ class CVendor_Shipper {
             CURLOPT_HTTP_VERSION => CURL_HTTP_VERSION_1_1,
             CURLOPT_CUSTOMREQUEST => $method,
             CURLOPT_POSTFIELDS => http_build_query($options),
-            CURLOPT_USERAGENT => $_SERVER['HTTP_USER_AGENT'],
-            CURLOPT_HTTPHEADER => [
-                'Content-Type: application/json',
-            ],
-        ]);
-
-        $response = curl_exec($this->curl);
-        $err = curl_error($this->curl);
-
-        if ($err) {
-            return $this->error($err);
-        } else {
-            return $this->response($response);
-        }
-    }
-
-    /**
-     * Retrieves tracking ID of the order with the provided ID
-     *
-     * @param integer $orderId the ID retrieved after creating the order
-     *
-     * @method getOrder
-     *
-     * @return object JSON Results
-     */
-    public function getOrder($orderId) {
-        $method = 'GET';
-        $options = [
-            'apiKey' => $this->key,
-            'id' => $orderId,
-        ];
-
-        curl_setopt_array($this->curl, [
-            CURLOPT_URL => $this->url . 'public/v1/orders?' . http_build_query($options),
-            CURLOPT_RETURNTRANSFER => true,
-            CURLOPT_ENCODING => '',
-            CURLOPT_MAXREDIRS => 10,
-            CURLOPT_TIMEOUT => 30,
-            CURLOPT_HTTP_VERSION => CURL_HTTP_VERSION_1_1,
-            CURLOPT_CUSTOMREQUEST => $method,
             CURLOPT_USERAGENT => $_SERVER['HTTP_USER_AGENT'],
             CURLOPT_HTTPHEADER => [
                 'Content-Type: application/json',
