@@ -55,9 +55,13 @@ application/cresenity/config/*
 /certificate
 /upload/*
 /payment_log/
+/public/*
 /public/files/
 /public/files/*
 /compiled
+/node_modules
+
+.rnd
 
 #ignore netbeans ide config
 /nbproject/
