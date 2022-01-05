@@ -44,5 +44,11 @@
                 <p class="stats"><?php echo c::__('core.stats_footer'); ?></p>
             <?php endif; ?>
         </div>
+        <?php
+
+        echo '<script>window.capp = ' . json_encode(c::app()->variables()) . ';</script>';
+        $cresJs = curl::base() . 'media/js/cres/dist/cres.js?v=' . md5(CFile::lastModified(DOCROOT . 'media/js/cres/dist/cres.js'));
+        echo "<script defer src=\"${cresJs}\"></script>";
+        ?>
     </body>
 </html>

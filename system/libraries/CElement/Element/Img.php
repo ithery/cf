@@ -17,8 +17,14 @@ class CElement_Element_Img extends CElement_Element {
         $this->tag = 'img';
     }
 
+    /**
+     * Set Attribute src.
+     *
+     * @param string $src
+     */
     public function setSrc($src) {
         $this->setAttr('src', $src);
+
         return $this;
     }
 }

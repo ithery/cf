@@ -20,23 +20,6 @@ class CElement_Element_A extends CElement_Element {
      * @param string $href
      *
      * @return $this
-     *
-     * @deprecated 1.2 use setHref
-     */
-    // @codingStandardsIgnoreStart
-    public function set_href($href) {
-        // @codingStandardsIgnoreEnd
-        $this->href = $href;
-
-        return $this;
-    }
-
-    /**
-     * Set href attribute.
-     *
-     * @param string $href
-     *
-     * @return $this
      */
     public function setHref($href) {
         $this->href = $href;
@@ -50,7 +33,8 @@ class CElement_Element_A extends CElement_Element {
         return $this;
     }
 
-    public function build($indent = 0) {
+    protected function build() {
+        parent::build();
         if (strlen($this->href) > 0) {
             $this->addAttr('href', $this->href);
         }

@@ -3,45 +3,47 @@
 class CObserver {
     private static $instance;
 
-    private $obj_list;
-
-    private $autoid;
+    private $objectList;
 
     private function __construct() {
-        $this->obj_list = [];
+        $this->objectList = [];
         $this->autoid = 0;
     }
 
     public static function instance() {
         if (self::$instance == null) {
-            self::$instance = new CObserver();
+            self::$instance = new static();
         }
+
         return self::$instance;
     }
 
     public function objects() {
-        return $this->obj_list;
+        return $this->objectList;
     }
 
     public function newId() {
         $uniqid = uniqid(time(), true);
         $uniqid = str_replace('.', '', $uniqid);
+
         return $uniqid;
     }
 
     public function remove(CObject $obj) {
-        if (array_key_exists($obj->id(), $this->obj_list)) {
-            unset($this->obj_list[$obj->id()]);
+        if (array_key_exists($obj->id(), $this->objectList)) {
+            unset($this->objectList[$obj->id()]);
+
             return true;
         }
+
         return false;
     }
 
     public function add(CObject $obj) {
-        if (array_key_exists($obj->id(), $this->obj_list)) {
+        if (array_key_exists($obj->id(), $this->objectList)) {
             throw new CException('Object :object_id is exists.', [':object_id' => $obj->id()]);
         }
 
-        $this->obj_list[$obj->id()] = $obj;
+        $this->objectList[$obj->id()] = $obj;
     }
 }

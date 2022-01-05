@@ -19,9 +19,7 @@ class CElement_Component_Icon extends CElement_Component {
 
     public function build() {
         $icon = $this->icon;
-        if (strpos($icon, 'fa-') === false && strpos($icon, 'ion-') === false && strpos($icon, 'icon-') === false) {
-            $icon = 'icon-' . $icon;
-        }
+
         $this->addClass($icon);
     }
 }

@@ -6,7 +6,6 @@
 class CFormInputCurrency extends CFormInput {
     use CTrait_Compat_Element_FormInput_Currency,
         CTrait_Element_Property_Placeholder;
-
     protected $vk;
 
     protected $vk_opt;
@@ -33,11 +32,13 @@ class CFormInputCurrency extends CFormInput {
 
     public function set_vk($bool) {
         $this->vk = $bool;
+
         return $this;
     }
 
     public function set_vk_opt($option) {
         $this->vk_opt = array_merge($this->vk_opt, $option);
+
         return $this;
     }
 
@@ -57,7 +58,7 @@ class CFormInputCurrency extends CFormInput {
             $classes = ' ' . $classes;
         }
         $custom_css = $this->custom_css;
-        $custom_css = crenderer::render_style($custom_css);
+        $custom_css = $this->renderStyle($custom_css);
         if (strlen($custom_css) > 0) {
             $custom_css = ' style="' . $custom_css . '"';
         }
@@ -66,6 +67,7 @@ class CFormInputCurrency extends CFormInput {
             $addition_attribute .= ' ' . $k . '="' . $v . '"';
         }
         $html->appendln('<input type="text" placeholder="' . $this->placeholder . '" name="' . $this->name . '" id="' . $this->id . '" class="input-unstyled' . $classes . $this->validation->validation_class() . '" value="' . $this->value . '"' . $disabled . $addition_attribute . $custom_css . '>')->br();
+
         return $html->text();
     }
 

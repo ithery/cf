@@ -8,5 +8,5 @@ defined('SYSPATH') or die('No direct access allowed.');
  *
  * @since Nov 4, 2019, 3:55:22 PM
  */
-class CQueue_Exception_ManuallFailedException extends Exception {
+class CQueue_Exception_ManuallyFailedException extends Exception {
 }

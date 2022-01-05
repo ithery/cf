@@ -112,6 +112,9 @@ class CHTTP {
         return !static::$middlewareEnabled;
     }
 
+    /**
+     * @return CHTTP_Cookie
+     */
     public static function cookie() {
         if (static::$cookie == null) {
             $config = CF::config('cookie');
@@ -130,6 +133,11 @@ class CHTTP {
     public static function setRequest(CHTTP_Request $request) {
         static::$request = $request;
         CRouting::urlGenerator()->setRequest(static::$request);
+        if (CF::isTesting()) {
+            $_POST = (array) $request->post();
+            $_GET = (array) $request->query();
+            $_REQUEST = array_merge($_GET, $_POST);
+        }
     }
 
     /**

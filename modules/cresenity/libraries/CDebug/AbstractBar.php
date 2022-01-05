@@ -333,6 +333,10 @@ class CDebug_AbstractBar implements ArrayAccess {
      */
     protected function initStackSession() {
         $http = $this->getHttpDriver();
+        //TODO: enable debugbar on middleware and remove this line
+        if (!isset($_SESSION)) {
+            $_SESSION = [];
+        }
         if (!$http->isSessionStarted()) {
             throw new CDebug_Exception('Session must be started before using stack data in the debug bar');
         }

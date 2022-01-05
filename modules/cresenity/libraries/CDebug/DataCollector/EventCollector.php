@@ -18,7 +18,7 @@ class CDebug_DataCollector_EventCollector extends CDebug_DataCollector_TimeDataC
     protected $events;
 
     /**
-     * @var integer
+     * @var int
      */
     protected $previousTime;
 
@@ -68,6 +68,7 @@ class CDebug_DataCollector_EventCollector extends CDebug_DataCollector_TimeDataC
         }
 
         $source = null;
+
         try {
             $source = $this->findSource();
         } catch (Exception $ex) {
@@ -97,12 +98,14 @@ class CDebug_DataCollector_EventCollector extends CDebug_DataCollector_TimeDataC
             }
             $data[$key] = htmlentities($this->getDataFormatter()->formatVar($value), ENT_QUOTES, 'UTF-8', false);
         }
+
         return $data;
     }
 
     public function collect() {
         $data = parent::collect();
         $data['nb_measures'] = count($data['measures']);
+
         return $data;
     }
 
@@ -131,7 +134,7 @@ class CDebug_DataCollector_EventCollector extends CDebug_DataCollector_TimeDataC
      *
      * @return object|bool
      */
-    protected function parseTrace($index, array $trace) {
+    protected function parseTrace($index, $trace) {
         $frame = (object) [
             'index' => $index,
             'namespace' => null,
@@ -140,17 +143,19 @@ class CDebug_DataCollector_EventCollector extends CDebug_DataCollector_TimeDataC
         ];
         if (isset($trace['function']) && $trace['function'] == 'substituteBindings') {
             $frame->name = 'Route binding';
+
             return $frame;
         }
-        if (isset($trace['class'])
-            && isset($trace['file'])
+        if (isset($trace['class'], $trace['file'])
             && !$this->fileIsInExcludedPath($trace['file'])
         ) {
             $file = $trace['file'];
 
             $frame->name = $this->normalizeFilename($file);
+
             return $frame;
         }
+
         return false;
     }
 

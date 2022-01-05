@@ -155,6 +155,13 @@ trait CTrait_Compat_Element_DataTable {
         return $this->setCustomColumnHeader($html);
     }
 
+    /**
+     * @param bool $bool
+     *
+     * @return $this
+     *
+     * @deprecated 1.2 use setFooter
+     */
     public function set_footer($bool) {
         return $this->setFooter($bool);
     }
@@ -182,6 +189,16 @@ trait CTrait_Compat_Element_DataTable {
         return $this->setTbodyId($id);
     }
 
+    /**
+     * @param string $label
+     * @param string $value
+     * @param string $align
+     * @param int    $labelcolspan
+     *
+     * @return $this
+     *
+     * @deprecated 1.2 use addFooterField
+     */
     public function add_footer_field($label, $value, $align = 'left', $labelcolspan = 0) {
         return $this->addFooterField($label, $value, $align, $labelcolspan);
     }

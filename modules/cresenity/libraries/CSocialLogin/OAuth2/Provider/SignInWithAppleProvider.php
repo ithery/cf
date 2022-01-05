@@ -2,6 +2,7 @@
 
 class CSocialLogin_OAuth2_Provider_SignInWithAppleProvider extends CSocialLogin_OAuth2_AbstractProvider implements CSocialLogin_OAuth2_ProviderInterface {
     protected $encodingType = PHP_QUERY_RFC3986;
+
     protected $scopeSeparator = ' ';
 
     protected function getAuthUrl($state) {
@@ -92,7 +93,7 @@ class CSocialLogin_OAuth2_Provider_SignInWithAppleProvider extends CSocialLogin_
             }
         }
 
-        return (new CSocialLogin_OAuth2_User)
+        return (new CSocialLogin_OAuth2_User())
             ->setRaw($user)
             ->map([
                 'id' => $user['sub'],

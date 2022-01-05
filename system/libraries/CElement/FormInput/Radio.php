@@ -11,7 +11,6 @@ defined('SYSPATH') or die('No direct access allowed.');
 class CElement_FormInput_Radio extends CElement_FormInput {
     use CTrait_Compat_Element_FormInput_Radio,
         CTrait_Element_Property_Label;
-
     protected $checked;
 
     // protected $label;
@@ -42,11 +41,13 @@ class CElement_FormInput_Radio extends CElement_FormInput {
 
     public function setChecked($bool = true) {
         $this->checked = $bool;
+
         return $this;
     }
 
     public function setLabelWrap($bool) {
         $this->label_wrap = $bool;
+
         return $this;
     }
 
@@ -56,6 +57,7 @@ class CElement_FormInput_Radio extends CElement_FormInput {
 
     public function setInline($inline) {
         $this->inline = $inline;
+
         return $this;
     }
 
@@ -83,55 +85,28 @@ class CElement_FormInput_Radio extends CElement_FormInput {
             $custom_css = ' style="' . $custom_css . '"';
         }
         $label_class = 'radio-inline';
-        if ($this->bootstrap == '3.3') {
-            if ($this->radio >= '1.0') {
-                $label_class = 'control-label';
-            }
-        }
+
         $addition_attribute = '';
         foreach ($this->attr as $k => $v) {
             $addition_attribute .= ' ' . $k . '="' . $v . '"';
         }
 
-        if ($this->bootstrap >= '3') {
-            if ($this->inline == false) {
-                $html->append('<div class="radio ' . $classes . '" >');
-                $html->append(' <label>');
-            } else {
-                $html->append('<label class="' . $label_class . ' ' . $classes . '" >');
-            }
-            $html->append('     <input type="radio" name="' . $this->name . '" id="' . $this->id . '" class="input-unstyled' . $this->validation->validation_class() . '" ' . $addition_attribute . ' value="' . $this->value . '"' . $disabled . $checked . '>');
-            if (strlen($this->label) > 0) {
-                if ($this->label_wrap) {
-                    $html->appendln('<label for="' . $this->id . '" class="radio-label"><span></span>');
-                }
-                $html->appendln('&nbsp;' . $this->label);
-                if ($this->label_wrap) {
-                    $html->appendln('</label>');
-                }
-            }
-            if ($this->inline == false) {
-                $html->append(' </label>');
-                $html->append('</div>');
-            } else {
-                $html->append(' </label>');
-            }
-        } else {
-            $html->append('<label class="checkbox' . $classes . '" >');
-            if ($this->applyjs == 'switch') {
-                $html->append('<div class="switch">');
-            }
-
-            $html->append('<input type="radio" name="' . $this->name . '" id="' . $this->id . '" class="input-unstyled' . $this->validation->validation_class() . '" ' . $addition_attribute . ' value="' . $this->value . '"' . $disabled . $checked . '>');
-            if (strlen($this->label) > 0) {
-                $html->appendln('&nbsp;' . $this->label);
-            }
-            if ($this->applyjs == 'switch') {
-                $html->append('</div>');
-            }
+        $html->append('<label class="checkbox' . $classes . '" >');
+        if ($this->applyjs == 'switch') {
+            $html->append('<div class="switch">');
         }
+
+        $html->append('<input type="radio" name="' . $this->name . '" id="' . $this->id . '" class="input-unstyled' . $this->validation->validation_class() . '" ' . $addition_attribute . ' value="' . $this->value . '"' . $disabled . $checked . '>');
+        if (strlen($this->label) > 0) {
+            $html->appendln('&nbsp;' . $this->label);
+        }
+        if ($this->applyjs == 'switch') {
+            $html->append('</div>');
+        }
+
         $html->append('</label>');
         $html->br();
+
         return $html->text();
     }
 

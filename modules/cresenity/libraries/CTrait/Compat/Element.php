@@ -93,14 +93,24 @@ trait CTrait_Compat_Element {
         return $this->generateClass();
     }
 
-    public function toarray() {
-        return $this->toArray();
-    }
-
+    /**
+     * @param int $indent
+     *
+     * @return string
+     *
+     * @deprecated 1.2
+     */
     protected function html_child($indent = 0) {
         return $this->htmlChild($indent);
     }
 
+    /**
+     * @param int $indent
+     *
+     * @return string
+     *
+     * @deprecated 1.2
+     */
     protected function js_child($indent = 0) {
         return $this->jsChild($indent);
     }

@@ -17,7 +17,8 @@ class CDaemon_Worker_Listener_SocketListener extends CDaemon_Worker_ListenerAbst
         $this->event = new CDaemon_Worker_Event();
         // Set an empty onMessage callback.
         if (empty($this->onMessage)) {
-            $this->onMessage = function () {};
+            $this->onMessage = function () {
+            };
         }
         $this->listen();
     }

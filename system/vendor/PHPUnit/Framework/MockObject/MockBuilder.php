@@ -7,20 +7,23 @@
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  */
+
 namespace PHPUnit\Framework\MockObject;
 
+use ReflectionClass;
 use function array_diff;
 use function array_merge;
 use PHPUnit\Framework\TestCase;
-use ReflectionClass;
+use PHPUnit\Framework\MockObject\Exception\ReflectionException;
+use PHPUnit\Framework\MockObject\Exception\CannotUseAddMethodsException;
+use PHPUnit\Framework\MockObject\Exception\CannotUseOnlyMethodsException;
 
 /**
  * @psalm-template MockedType
  *
  * @no-named-arguments Parameter names are not covered by the backward compatibility promise for PHPUnit
  */
-final class MockBuilder
-{
+final class MockBuilder {
     /**
      * @var TestCase
      */
@@ -101,11 +104,10 @@ final class MockBuilder
      *
      * @psalm-param class-string<MockedType>|string|string[] $type
      */
-    public function __construct(TestCase $testCase, $type)
-    {
-        $this->testCase  = $testCase;
-        $this->type      = $type;
-        $this->generator = new Generator;
+    public function __construct(TestCase $testCase, $type) {
+        $this->testCase = $testCase;
+        $this->type = $type;
+        $this->generator = new Generator();
     }
 
     /**
@@ -123,8 +125,7 @@ final class MockBuilder
      *
      * @psalm-return MockObject&MockedType
      */
-    public function getMock()
-    {
+    public function getMock() {
         $object = $this->generator->getMock(
             $this->type,
             !$this->emptyMethodsArray ? $this->methods : null,
@@ -154,8 +155,7 @@ final class MockBuilder
      * @throws RuntimeException
      * @throws ReflectionException
      */
-    public function getMockForAbstractClass()
-    {
+    public function getMockForAbstractClass() {
         $object = $this->generator->getMockForAbstractClass(
             $this->type,
             $this->constructorArgs,
@@ -181,8 +181,7 @@ final class MockBuilder
      * @throws ReflectionException
      * @throws RuntimeException
      */
-    public function getMockForTrait()
-    {
+    public function getMockForTrait() {
         $object = $this->generator->getMockForTrait(
             $this->type,
             $this->constructorArgs,
@@ -204,14 +203,15 @@ final class MockBuilder
      *
      * @deprecated https://github.com/sebastianbergmann/phpunit/pull/3687
      *
+     * @param null|mixed $methods
+     *
      * @return $this
      */
-    public function setMethods($methods = null)
-    {
+    public function setMethods($methods = null) {
         if ($methods === null) {
             $this->methods = $methods;
         } else {
-            $this->methods = array_merge((isset($this->methods) && $this->methods!=null) ? $this->methods : [], $methods);
+            $this->methods = array_merge((isset($this->methods) && $this->methods != null) ? $this->methods : [], $methods);
         }
 
         return $this;
@@ -227,8 +227,7 @@ final class MockBuilder
      *
      * @return $this
      */
-    public function onlyMethods(array $methods)
-    {
+    public function onlyMethods(array $methods) {
         if (empty($methods)) {
             $this->emptyMethodsArray = true;
 
@@ -253,7 +252,7 @@ final class MockBuilder
             }
         }
 
-        $this->methods = array_merge((isset($this->methods) && $this->methods!=null) ? $this->methods : [], $methods);
+        $this->methods = array_merge((isset($this->methods) && $this->methods != null) ? $this->methods : [], $methods);
 
         return $this;
     }
@@ -269,8 +268,7 @@ final class MockBuilder
      *
      * @return $this
      */
-    public function addMethods(array $methods)
-    {
+    public function addMethods(array $methods) {
         if (empty($methods)) {
             $this->emptyMethodsArray = true;
 
@@ -295,7 +293,7 @@ final class MockBuilder
             }
         }
 
-        $this->methods = array_merge((isset($this->methods) && $this->methods!=null) ? $this->methods : [], $methods);
+        $this->methods = array_merge((isset($this->methods) && $this->methods != null) ? $this->methods : [], $methods);
 
         return $this;
     }
@@ -305,8 +303,7 @@ final class MockBuilder
      *
      * @throws ReflectionException
      */
-    public function setMethodsExcept(array $methods = [])
-    {
+    public function setMethodsExcept(array $methods = []) {
         return $this->setMethods(
             array_diff(
                 $this->generator->getClassMethods($this->type),
@@ -320,8 +317,7 @@ final class MockBuilder
      *
      * @return $this
      */
-    public function setConstructorArgs(array $args)
-    {
+    public function setConstructorArgs(array $args) {
         $this->constructorArgs = $args;
 
         return $this;
@@ -330,10 +326,11 @@ final class MockBuilder
     /**
      * Specifies the name for the mock class.
      *
+     * @param mixed $name
+     *
      * @return $this
      */
-    public function setMockClassName($name)
-    {
+    public function setMockClassName($name) {
         $this->mockClassName = $name;
 
         return $this;
@@ -344,8 +341,7 @@ final class MockBuilder
      *
      * @return $this
      */
-    public function disableOriginalConstructor()
-    {
+    public function disableOriginalConstructor() {
         $this->originalConstructor = false;
 
         return $this;
@@ -356,8 +352,7 @@ final class MockBuilder
      *
      * @return $this
      */
-    public function enableOriginalConstructor()
-    {
+    public function enableOriginalConstructor() {
         $this->originalConstructor = true;
 
         return $this;
@@ -368,8 +363,7 @@ final class MockBuilder
      *
      * @return $this
      */
-    public function disableOriginalClone()
-    {
+    public function disableOriginalClone() {
         $this->originalClone = false;
 
         return $this;
@@ -380,8 +374,7 @@ final class MockBuilder
      *
      * @return $this
      */
-    public function enableOriginalClone()
-    {
+    public function enableOriginalClone() {
         $this->originalClone = true;
 
         return $this;
@@ -392,8 +385,7 @@ final class MockBuilder
      *
      * @return $this
      */
-    public function disableAutoload()
-    {
+    public function disableAutoload() {
         $this->autoload = false;
 
         return $this;
@@ -404,8 +396,7 @@ final class MockBuilder
      *
      * @return $this
      */
-    public function enableAutoload()
-    {
+    public function enableAutoload() {
         $this->autoload = true;
 
         return $this;
@@ -416,8 +407,7 @@ final class MockBuilder
      *
      * @return $this
      */
-    public function disableArgumentCloning()
-    {
+    public function disableArgumentCloning() {
         $this->cloneArguments = false;
 
         return $this;
@@ -428,8 +418,7 @@ final class MockBuilder
      *
      * @return $this
      */
-    public function enableArgumentCloning()
-    {
+    public function enableArgumentCloning() {
         $this->cloneArguments = true;
 
         return $this;
@@ -440,8 +429,7 @@ final class MockBuilder
      *
      * @return $this
      */
-    public function enableProxyingToOriginalMethods()
-    {
+    public function enableProxyingToOriginalMethods() {
         $this->callOriginalMethods = true;
 
         return $this;
@@ -452,10 +440,9 @@ final class MockBuilder
      *
      * @return $this
      */
-    public function disableProxyingToOriginalMethods()
-    {
+    public function disableProxyingToOriginalMethods() {
         $this->callOriginalMethods = false;
-        $this->proxyTarget         = null;
+        $this->proxyTarget = null;
 
         return $this;
     }
@@ -465,8 +452,7 @@ final class MockBuilder
      *
      * @return $this
      */
-    public function setProxyTarget(object $object)
-    {
+    public function setProxyTarget(object $object) {
         $this->proxyTarget = $object;
 
         return $this;
@@ -475,8 +461,7 @@ final class MockBuilder
     /**
      * @return $this
      */
-    public function allowMockingUnknownTypes()
-    {
+    public function allowMockingUnknownTypes() {
         $this->allowMockingUnknownTypes = true;
 
         return $this;
@@ -485,8 +470,7 @@ final class MockBuilder
     /**
      * @return $this
      */
-    public function disallowMockingUnknownTypes()
-    {
+    public function disallowMockingUnknownTypes() {
         $this->allowMockingUnknownTypes = false;
 
         return $this;
@@ -495,8 +479,7 @@ final class MockBuilder
     /**
      * @return $this
      */
-    public function enableAutoReturnValueGeneration()
-    {
+    public function enableAutoReturnValueGeneration() {
         $this->returnValueGeneration = true;
 
         return $this;
@@ -505,8 +488,7 @@ final class MockBuilder
     /**
      * @return $this
      */
-    public function disableAutoReturnValueGeneration()
-    {
+    public function disableAutoReturnValueGeneration() {
         $this->returnValueGeneration = false;
 
         return $this;

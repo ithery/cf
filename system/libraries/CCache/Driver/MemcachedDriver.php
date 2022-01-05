@@ -1,14 +1,14 @@
 <?php
 
-defined('SYSPATH') OR die('No direct access allowed.');
+defined('SYSPATH') or die('No direct access allowed.');
 
 /**
  * @author Hery Kurniawan
- * @since Jun 23, 2019, 4:58:43 AM
  * @license Ittron Global Teknologi <ittron.co.id>
+ *
+ * @since Jun 23, 2019, 4:58:43 AM
  */
 class CCache_Driver_MemcachedDriver extends CCache_DriverTaggableAbstract implements CCache_LockProviderInterface {
-
     use CTrait_Helper_InteractsWithTime;
 
     /**
@@ -35,21 +35,23 @@ class CCache_Driver_MemcachedDriver extends CCache_DriverTaggableAbstract implem
     /**
      * Create a new Memcached store.
      *
-     * @param  \Memcached  $memcached
-     * @param  string      $prefix
+     * @param \Memcached $memcached
+     * @param string     $prefix
+     *
      * @return void
      */
     public function __construct($memcached, $prefix = '') {
         $this->setPrefix($prefix);
         $this->memcached = $memcached;
         $this->onVersionThree = (new ReflectionMethod('Memcached', 'getMulti'))
-                        ->getNumberOfParameters() == 2;
+            ->getNumberOfParameters() == 2;
     }
 
     /**
      * Retrieve an item from the cache by key.
      *
-     * @param  string  $key
+     * @param string $key
+     *
      * @return mixed
      */
     public function get($key) {
@@ -64,7 +66,8 @@ class CCache_Driver_MemcachedDriver extends CCache_DriverTaggableAbstract implem
      *
      * Items not found in the cache will have a null value.
      *
-     * @param  array  $keys
+     * @param array $keys
+     *
      * @return array
      */
     public function many(array $keys) {
@@ -80,28 +83,33 @@ class CCache_Driver_MemcachedDriver extends CCache_DriverTaggableAbstract implem
         if ($this->memcached->getResultCode() != 0) {
             return array_fill_keys($keys, null);
         }
+
         return array_combine($keys, $values);
     }
 
     /**
      * Store an item in the cache for a given number of seconds.
      *
-     * @param  string  $key
-     * @param  mixed   $value
-     * @param  int  $seconds
+     * @param string $key
+     * @param mixed  $value
+     * @param int    $seconds
+     *
      * @return bool
      */
     public function put($key, $value, $seconds) {
         return $this->memcached->set(
-                        $this->prefix . $key, $value, $this->calculateExpiration($seconds)
+            $this->prefix . $key,
+            $value,
+            $this->calculateExpiration($seconds)
         );
     }
 
     /**
      * Store multiple items in the cache for a given number of seconds.
      *
-     * @param  array  $values
-     * @param  int  $seconds
+     * @param array $values
+     * @param int   $seconds
+     *
      * @return bool
      */
     public function putMany(array $values, $seconds) {
@@ -109,30 +117,36 @@ class CCache_Driver_MemcachedDriver extends CCache_DriverTaggableAbstract implem
         foreach ($values as $key => $value) {
             $prefixedValues[$this->prefix . $key] = $value;
         }
+
         return $this->memcached->setMulti(
-                        $prefixedValues, $this->calculateExpiration($seconds)
+            $prefixedValues,
+            $this->calculateExpiration($seconds)
         );
     }
 
     /**
      * Store an item in the cache if the key doesn't exist.
      *
-     * @param  string  $key
-     * @param  mixed   $value
-     * @param  int  $seconds
+     * @param string $key
+     * @param mixed  $value
+     * @param int    $seconds
+     *
      * @return bool
      */
     public function add($key, $value, $seconds) {
         return $this->memcached->add(
-                        $this->prefix . $key, $value, $this->calculateExpiration($seconds)
+            $this->prefix . $key,
+            $value,
+            $this->calculateExpiration($seconds)
         );
     }
 
     /**
      * Increment the value of an item in the cache.
      *
-     * @param  string  $key
-     * @param  mixed   $value
+     * @param string $key
+     * @param mixed  $value
+     *
      * @return int|bool
      */
     public function increment($key, $value = 1) {
@@ -142,8 +156,9 @@ class CCache_Driver_MemcachedDriver extends CCache_DriverTaggableAbstract implem
     /**
      * Decrement the value of an item in the cache.
      *
-     * @param  string  $key
-     * @param  mixed   $value
+     * @param string $key
+     * @param mixed  $value
+     *
      * @return int|bool
      */
     public function decrement($key, $value = 1) {
@@ -153,8 +168,9 @@ class CCache_Driver_MemcachedDriver extends CCache_DriverTaggableAbstract implem
     /**
      * Store an item in the cache indefinitely.
      *
-     * @param  string  $key
-     * @param  mixed   $value
+     * @param string $key
+     * @param mixed  $value
+     *
      * @return bool
      */
     public function forever($key, $value) {
@@ -164,21 +180,23 @@ class CCache_Driver_MemcachedDriver extends CCache_DriverTaggableAbstract implem
     /**
      * Get a lock instance.
      *
-     * @param  string $name
-     * @param  int $seconds
-     * @param  string|null $owner
-     * @return \Illuminate\Contracts\Cache\Lock
+     * @param string      $name
+     * @param int         $seconds
+     * @param null|string $owner
+     *
+     * @return \CCache_LockInterface
      */
     public function lock($name, $seconds = 0, $owner = null) {
-        return new MemcachedLock($this->memcached, $this->prefix . $name, $seconds, $owner);
+        return new CCache_Lock_MemcachedLock($this->memcached, $this->prefix . $name, $seconds, $owner);
     }
 
     /**
      * Restore a lock instance using the owner identifier.
      *
-     * @param  string  $name
-     * @param  string  $owner
-     * @return \Illuminate\Contracts\Cache\Lock
+     * @param string $name
+     * @param string $owner
+     *
+     * @return \CCache_LockInterface
      */
     public function restoreLock($name, $owner) {
         return $this->lock($name, 0, $owner);
@@ -187,7 +205,8 @@ class CCache_Driver_MemcachedDriver extends CCache_DriverTaggableAbstract implem
     /**
      * Remove an item from the cache.
      *
-     * @param  string  $key
+     * @param string $key
+     *
      * @return bool
      */
     public function forget($key) {
@@ -206,7 +225,8 @@ class CCache_Driver_MemcachedDriver extends CCache_DriverTaggableAbstract implem
     /**
      * Get the expiration time of the key.
      *
-     * @param  int  $seconds
+     * @param int $seconds
+     *
      * @return int
      */
     protected function calculateExpiration($seconds) {
@@ -216,7 +236,8 @@ class CCache_Driver_MemcachedDriver extends CCache_DriverTaggableAbstract implem
     /**
      * Get the UNIX timestamp for the given number of seconds.
      *
-     * @param  int  $seconds
+     * @param int $seconds
+     *
      * @return int
      */
     protected function toTimestamp($seconds) {
@@ -244,11 +265,11 @@ class CCache_Driver_MemcachedDriver extends CCache_DriverTaggableAbstract implem
     /**
      * Set the cache key prefix.
      *
-     * @param  string  $prefix
+     * @param string $prefix
+     *
      * @return void
      */
     public function setPrefix($prefix) {
         $this->prefix = !empty($prefix) ? $prefix . ':' : '';
     }
-
 }

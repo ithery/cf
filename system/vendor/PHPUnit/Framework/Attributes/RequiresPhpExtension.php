@@ -7,13 +7,13 @@
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  */
+
 namespace PHPUnit\Framework\Attributes;
 
 use Attribute;
 
 #[Attribute(Attribute::TARGET_CLASS | Attribute::TARGET_METHOD | Attribute::IS_REPEATABLE)]
-class RequiresPhpExtension
-{
+class RequiresPhpExtension {
     /**
      * @var string
      */
@@ -31,26 +31,26 @@ class RequiresPhpExtension
 
     /**
      * @psalm-param '<'|'lt'|'<='|'le'|'>'|'gt'|'>='|'ge'|'=='|'='|'eq'|'!='|'<>'|'ne' $operator
+     *
+     * @param mixed $extension
+     * @param mixed $version
+     * @param mixed $operator
      */
-    public function __construct($extension, $version, $operator = '>=')
-    {
+    public function __construct($extension, $version, $operator = '>=') {
         $this->extension = $extension;
-        $this->version   = $version;
-        $this->operator  = $operator;
+        $this->version = $version;
+        $this->operator = $operator;
     }
 
-    public function extension()
-    {
+    public function extension() {
         return $this->extension;
     }
 
-    public function version()
-    {
+    public function version() {
         return $this->version;
     }
 
-    public function operator()
-    {
+    public function operator() {
         return $this->operator;
     }
 }

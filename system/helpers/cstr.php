@@ -1,9 +1,10 @@
 <?php
 
-use Ramsey\Uuid\Codec\TimestampFirstCombCodec;
-use Ramsey\Uuid\Generator\CombGenerator;
 use Ramsey\Uuid\Uuid;
 use Ramsey\Uuid\UuidFactory;
+use Ramsey\Uuid\Generator\CombGenerator;
+use Ramsey\Uuid\Codec\TimestampFirstCombCodec;
+use League\CommonMark\GithubFlavoredMarkdownConverter;
 
 // @codingStandardsIgnoreStart
 class cstr {
@@ -79,7 +80,7 @@ class cstr {
     }
 
     /**
-     * Limit the number of characters in a string and give ... in end of string
+     * Limit the number of characters in a string and give ... in end of string.
      *
      * @param string $value
      * @param int    $limit
@@ -152,6 +153,18 @@ class cstr {
     }
 
     /**
+     * Repeat the given string.
+     *
+     * @param string $string
+     * @param int    $times
+     *
+     * @return string
+     */
+    public static function repeat($string, $times) {
+        return str_repeat($string, $times);
+    }
+
+    /**
      * Replace a given value in the string sequentially with an array.
      *
      * @param string $search
@@ -161,11 +174,28 @@ class cstr {
      * @return string
      */
     public static function replaceArray($search, array $replace, $subject) {
-        foreach ($replace as $value) {
-            $subject = static::replaceFirst($search, $value, $subject);
+        $segments = explode($search, $subject);
+
+        $result = array_shift($segments);
+
+        foreach ($segments as $segment) {
+            $result .= (array_shift($replace) ?: $search) . $segment;
         }
 
-        return $subject;
+        return $result;
+    }
+
+    /**
+     * Replace the given value in the given string.
+     *
+     * @param string|string[] $search
+     * @param string|string[] $replace
+     * @param string|string[] $subject
+     *
+     * @return string
+     */
+    public static function replace($search, $replace, $subject) {
+        return str_replace($search, $replace, $subject);
     }
 
     /**
@@ -206,6 +236,23 @@ class cstr {
         if ($position !== false) {
             return substr_replace($subject, $replace, $position, strlen($search));
         }
+
+        return $subject;
+    }
+
+    /**
+     * Remove any occurrence of the given string in the subject.
+     *
+     * @param string|array<string> $search
+     * @param string               $subject
+     * @param bool                 $caseSensitive
+     *
+     * @return string
+     */
+    public static function remove($search, $subject, $caseSensitive = true) {
+        $subject = $caseSensitive
+                    ? str_replace($search, '', $subject)
+                    : str_ireplace($search, '', $subject);
 
         return $subject;
     }
@@ -307,6 +354,27 @@ class cstr {
     }
 
     /**
+     * Convert the given string to title case for each word.
+     *
+     * @param string $value
+     *
+     * @return string
+     */
+    public static function headline($value) {
+        $parts = explode('_', static::replace(' ', '_', $value));
+
+        if (count($parts) > 1) {
+            $parts = array_map([static::class, 'title'], $parts);
+        }
+
+        $studly = static::studly(implode($parts));
+
+        $words = preg_split('/(?=[A-Z])/', $studly, -1, PREG_SPLIT_NO_EMPTY);
+
+        return implode(' ', $words);
+    }
+
+    /**
      * Determine if a given string starts with a given substring.
      *
      * @param string       $haystack
@@ -316,7 +384,7 @@ class cstr {
      */
     public static function startsWith($haystack, $needles) {
         foreach ((array) $needles as $needle) {
-            if ($needle !== '' && substr($haystack, 0, strlen($needle)) === (string) $needle) {
+            if ((string) $needle !== '' && strncmp($haystack, $needle, strlen($needle)) === 0) {
                 return true;
             }
         }
@@ -334,7 +402,9 @@ class cstr {
      */
     public static function endsWith($haystack, $needles) {
         foreach ((array) $needles as $needle) {
-            if (substr($haystack, -strlen($needle)) === (string) $needle) {
+            if ($needle !== '' && $needle !== null
+                && substr($haystack, -strlen($needle)) === (string) $needle
+            ) {
                 return true;
             }
         }
@@ -436,10 +506,10 @@ class cstr {
      * @return string
      */
     public static function slug($title, $separator = '-', $language = 'en') {
-        $title = static::ascii($title, $language);
+        $title = $language ? static::ascii($title, $language) : $title;
 
         // Convert all dashes/underscores into separator
-        $flip = $separator == '-' ? '_' : '-';
+        $flip = $separator === '-' ? '_' : '-';
 
         $title = preg_replace('![' . preg_quote($flip) . ']+!u', $separator, $title);
 
@@ -447,7 +517,7 @@ class cstr {
         $title = str_replace('@', $separator . 'at' . $separator, $title);
 
         // Remove all characters that are not the separator, letters, numbers, or whitespace.
-        $title = preg_replace('![^' . preg_quote($separator) . '\pL\pN\s]+!u', '', mb_strtolower($title));
+        $title = preg_replace('![^' . preg_quote($separator) . '\pL\pN\s]+!u', '', static::lower($title));
 
         // Replace all separator characters and whitespace by a single separator
         $title = preg_replace('![' . preg_quote($separator) . '\s]+!u', $separator, $title);
@@ -470,7 +540,7 @@ class cstr {
      * Parse a Class@method style callback into class and method.
      *
      * @param string      $callback
-     * @param string|null $default
+     * @param null|string $default
      *
      * @return array
      */
@@ -501,13 +571,16 @@ class cstr {
      * @return bool
      */
     public static function is($pattern, $value) {
-        $patterns = is_array($pattern) ? $pattern : (array) $pattern;
+        $patterns = carr::wrap($pattern);
+
+        $value = (string) $value;
 
         if (empty($patterns)) {
             return false;
         }
 
         foreach ($patterns as $pattern) {
+            $pattern = (string) $pattern;
             // If the given value is an exact match we can of course return true right
             // from the beginning. Otherwise, we will translate asterisks and do an
             // actual pattern match against the two strings to see if they match.
@@ -535,7 +608,7 @@ class cstr {
      *
      * @param string   $string
      * @param int      $start
-     * @param int|null $length
+     * @param null|int $length
      *
      * @return string
      */
@@ -549,7 +622,7 @@ class cstr {
      * @param string   $haystack
      * @param string   $needle
      * @param int      $offset
-     * @param int|null $length
+     * @param null|int $length
      *
      * @return int
      */
@@ -654,17 +727,7 @@ class cstr {
      * @return string
      */
     public static function ascii($value, $language = 'en') {
-        $languageSpecific = static::languageSpecificCharsArray($language);
-
-        if (!is_null($languageSpecific)) {
-            $value = str_replace($languageSpecific[0], $languageSpecific[1], $value);
-        }
-
-        foreach (static::charsArray() as $key => $val) {
-            $value = str_replace($val, $key, $value);
-        }
-
-        return preg_replace('/[^\x20-\x7E]/u', '', $value);
+        return CASCII::toAscii((string) $value, $language);
     }
 
     /**
@@ -809,7 +872,7 @@ class cstr {
      *
      * @see https://github.com/danielstjules/Stringy/blob/3.1.0/LICENSE.txt
      *
-     * @return array|null
+     * @return null|array
      */
     protected static function languageSpecificCharsArray($language) {
         static $languageSpecific;
@@ -835,41 +898,40 @@ class cstr {
     }
 
     public static function kebabCase($string) {
-        return \implode('-', \array_map('\strtolower', cstr::words(\preg_replace("/['\x{2019}]/u", '', $string))));
+        return static::kebab($string);
     }
 
     /**
-     * Splits `string` into an array of its words.
+     * Limit the number of words in a string.
      *
-     * @param string $string  the string to inspect
-     * @param string $pattern the pattern to match words
+     * @param string $value
+     * @param int    $words
+     * @param string $end
      *
-     * @return array returns the words of `string`
-     *
-     * @example
-     * <code>
-     * cstr::words('fred, barney, & pebbles')
-     * // => ['fred', 'barney', 'pebbles']
-     *
-     * cstr::words('fred, barney, & pebbles', '/[^, ]+/g')
-     * // => ['fred', 'barney', '&', 'pebbles']
-     * </code>
+     * @return string
      */
-    public static function words($string, $pattern = null) {
-        $asciiWords = '/[^\x00-\x2f\x3a-\x40\x5b-\x60\x7b-\x7f]+/';
-        $hasUnicodeWord = '/[a-z][A-Z]|[A-Z]{2,}[a-z]|[0-9][a-zA-Z]|[a-zA-Z][0-9]|[^a-zA-Z0-9 ]/';
+    public static function words($value, $words = 100, $end = '...') {
+        preg_match('/^\s*+(?:\S++\s*+){1,' . $words . '}/u', $value, $matches);
 
-        if (null === $pattern) {
-            if (\preg_match($hasUnicodeWord, $string)) {
-                return cstr::unicodeWords($string);
-            }
-            \preg_match_all($asciiWords, $string, $matches);
-            return isset($matches[0]) ? $matches[0] : [];
+        if (!isset($matches[0]) || static::length($value) === static::length($matches[0])) {
+            return $value;
         }
-        if (\preg_match_all($pattern, $string, $matches) > 0) {
-            return $matches[0];
-        }
-        return [];
+
+        return rtrim($matches[0]) . $end;
+    }
+
+    /**
+     * Converts GitHub flavored Markdown into HTML.
+     *
+     * @param string $string
+     * @param array  $options
+     *
+     * @return string
+     */
+    public static function markdown($string, array $options = []) {
+        $converter = new GithubFlavoredMarkdownConverter($options);
+
+        return (string) $converter->convertToHtml($string);
     }
 
     /**
@@ -940,6 +1002,7 @@ class cstr {
         if (\preg_match_all($regex, $string, $matches) > 0) {
             return $matches[0];
         }
+
         return [];
     }
 
@@ -959,6 +1022,7 @@ class cstr {
      */
     public static function escapeRegExp($string) {
         $reRegExpChar = '/([\\^$.*+?()[\]{}|])/';
+
         return \preg_replace($reRegExpChar, '\\\$0', $string);
     }
 
@@ -987,8 +1051,18 @@ class cstr {
      * @return string
      */
     public static function ucfirst($string, $delimiter = ' ') {
-        // Put the keys back the Case-Convention expected
-        return implode($delimiter, array_map('CUTF8::ucfirst', explode($delimiter, $string)));
+        return static::upper(static::substr($string, 0, 1)) . static::substr($string, 1);
+    }
+
+    /**
+     * Get the number of words a string contains.
+     *
+     * @param string $string
+     *
+     * @return int
+     */
+    public static function wordCount($string) {
+        return str_word_count($string);
     }
 
     /**
@@ -1029,7 +1103,7 @@ class cstr {
     /**
      * Set the callable that will be used to generate UUIDs.
      *
-     * @param callable|null $factory
+     * @param null|callable $factory
      *
      * @return void
      */
@@ -1044,6 +1118,74 @@ class cstr {
      */
     public static function createUuidsNormally() {
         static::$uuidFactory = null;
+    }
+
+    /**
+     * Masks a portion of a string with a repeated character.
+     *
+     * @param string   $string
+     * @param string   $character
+     * @param int      $index
+     * @param null|int $length
+     * @param string   $encoding
+     *
+     * @return string
+     */
+    public static function mask($string, $character, $index, $length = null, $encoding = 'UTF-8') {
+        if ($character === '') {
+            return $string;
+        }
+
+        if (is_null($length) && PHP_MAJOR_VERSION < 8) {
+            $length = mb_strlen($string, $encoding);
+        }
+
+        $segment = mb_substr($string, $index, $length, $encoding);
+
+        if ($segment === '') {
+            return $string;
+        }
+
+        $start = mb_substr($string, 0, mb_strpos($string, $segment, 0, $encoding), $encoding);
+        $end = mb_substr($string, mb_strpos($string, $segment, 0, $encoding) + mb_strlen($segment, $encoding));
+
+        return $start . str_repeat(mb_substr($character, 0, 1, $encoding), mb_strlen($segment, $encoding)) . $end;
+    }
+
+    /**
+     * Get the string matching the given pattern.
+     *
+     * @param string $pattern
+     * @param string $subject
+     *
+     * @return string
+     */
+    public static function match($pattern, $subject) {
+        preg_match($pattern, $subject, $matches);
+
+        if (!$matches) {
+            return '';
+        }
+
+        return isset($matches[1]) ? $matches[1] : $matches[0];
+    }
+
+    /**
+     * Get the string matching the given pattern.
+     *
+     * @param string $pattern
+     * @param string $subject
+     *
+     * @return \CCollection
+     */
+    public static function matchAll($pattern, $subject) {
+        preg_match_all($pattern, $subject, $matches);
+
+        if (empty($matches[0])) {
+            return c::collect();
+        }
+
+        return c::collect(isset($matches[1]) ? $matches[1] : $matches[0]);
     }
 
     /**
@@ -1085,7 +1227,29 @@ class cstr {
         return str_pad($value, $length, $pad, STR_PAD_RIGHT);
     }
 
+    /**
+     * Determine if a given string is 7 bit ASCII.
+     *
+     * @param mixed $str
+     *
+     * @return bool
+     */
     public static function isAscii($str) {
         return $str == static::ascii($str);
+    }
+
+    /**
+     * Determine if a given string is a valid UUID.
+     *
+     * @param string $value
+     *
+     * @return bool
+     */
+    public static function isUuid($value) {
+        if (!is_string($value)) {
+            return false;
+        }
+
+        return preg_match('/^[\da-f]{8}-[\da-f]{4}-[\da-f]{4}-[\da-f]{4}-[\da-f]{12}$/iD', $value) > 0;
     }
 }

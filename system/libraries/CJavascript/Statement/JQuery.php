@@ -7,6 +7,8 @@ defined('SYSPATH') or die('No direct access allowed.');
  * @license Ittron Global Teknologi <ittron.co.id>
  *
  * @since Sep 1, 2018, 11:48:25 PM
+ *
+ * @method CJavascript_Statement_JQuery toggle()
  */
 class CJavascript_Statement_JQuery extends CJavascript_Statement {
     /**
@@ -30,6 +32,7 @@ class CJavascript_Statement_JQuery extends CJavascript_Statement {
 
     public function setSelector($selector = 'this') {
         $this->selector = $selector;
+
         return $this;
     }
 
@@ -51,6 +54,7 @@ class CJavascript_Statement_JQuery extends CJavascript_Statement {
     public function __call($method, $arguments) {
         $methodObject = new CJavascript_Statement_JQuery_Method($method, $arguments);
         $this->needForCompile[] = $methodObject;
+
         return $this;
     }
 
@@ -69,11 +73,13 @@ class CJavascript_Statement_JQuery extends CJavascript_Statement {
             $jQueryObjectStr = '$';
         }
         $str = $jQueryObjectStr . $str . ';';
+
         return $str;
     }
 
     public function getStatement() {
         $statement = $this->compile();
+
         return $statement;
     }
 }

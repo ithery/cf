@@ -21,6 +21,7 @@ trait CTrait_Element_ActionList_Header {
         if ($this->headerActionList != null) {
             return $this->headerActionList->childCount();
         }
+
         return 0;
     }
 
@@ -41,7 +42,8 @@ trait CTrait_Element_ActionList_Header {
         if (!($id instanceof CElement_Component_Action)) {
             $rowAct = CElement_Factory::createComponent('Action', $id);
         }
-        $this->headerActionList->add($rowAct);
+        $this->getHeaderActionList()->add($rowAct);
+
         return $rowAct;
     }
 
@@ -51,7 +53,8 @@ trait CTrait_Element_ActionList_Header {
      * @return $this
      */
     public function setHeaderActionStyle($style) {
-        $this->headerActionList->setStyle($style);
+        $this->getHeaderActionList()->setStyle($style);
+
         return $this;
     }
 
@@ -59,6 +62,10 @@ trait CTrait_Element_ActionList_Header {
      * @return CElement_List_ActionList
      */
     public function getHeaderActionList() {
+        if ($this->headerActionList == null) {
+            $this->headerActionList = CElement_Factory::createList('ActionList');
+        }
+
         return $this->headerActionList;
     }
 }

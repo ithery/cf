@@ -3,6 +3,7 @@
 use Symfony\Component\Console\Input\ArgvInput;
 use Symfony\Component\Console\Input\ArrayInput;
 use Symfony\Component\Console\Input\InputOption;
+use Symfony\Component\Console\Input\StringInput;
 use Symfony\Component\Process\PhpExecutableFinder;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\ConsoleOutput;
@@ -57,23 +58,21 @@ class CConsole_Application extends SymfonyApplication implements CConsole_Applic
     }
 
     /**
-     * {@inheritdoc}
+     * @inheritdoc
      */
     public function run(InputInterface $input = null, OutputInterface $output = null) {
         $commandName = $this->getCommandName(
-            $input = $input ?: new ArgvInput
+            $input = $input ?: new ArgvInput()
         );
-
         $this->events->fire(
             new CConsole_Event_CommandStarting(
                 $commandName,
                 $input,
-                $output = $output ?: new ConsoleOutput
+                $output = $output ?: new ConsoleOutput()
             )
         );
 
         $exitCode = parent::run($input, $output);
-
         $this->events->fire(
             new CConsole_Event_CommandFinished($commandName, $input, $output, $exitCode)
         );
@@ -87,7 +86,7 @@ class CConsole_Application extends SymfonyApplication implements CConsole_Applic
      * @return string
      */
     public static function phpBinary() {
-        return CBase_ProcessUtils::escapeArgument((new PhpExecutableFinder)->find(false));
+        return CBase_ProcessUtils::escapeArgument((new PhpExecutableFinder())->find(false));
     }
 
     /**
@@ -146,32 +145,49 @@ class CConsole_Application extends SymfonyApplication implements CConsole_Applic
      *
      * @param string                                                 $command
      * @param array                                                  $parameters
-     * @param \Symfony\Component\Console\Output\OutputInterface|null $outputBuffer
-     *
-     * @return int
+     * @param null|\Symfony\Component\Console\Output\OutputInterface $outputBuffer
      *
      * @throws \Symfony\Component\Console\Exception\CommandNotFoundException
+     *
+     * @return int
      */
     public function call($command, array $parameters = [], $outputBuffer = null) {
-        if (is_subclass_of($command, SymfonyCommand::class)) {
-            $command = CContainer::getInstance()->make($command)->getName();
-        }
+        list($command, $input) = $this->parseCommand($command, $parameters);
 
         if (!$this->has($command)) {
             throw new CommandNotFoundException(sprintf('The command "%s" does not exist.', $command));
         }
 
-        array_unshift($parameters, $command);
+        return $this->run(
+            $input,
+            $this->lastOutput = $outputBuffer ?: new BufferedOutput()
+        );
+    }
 
-        $this->lastOutput = $outputBuffer ?: new BufferedOutput;
+    /**
+     * Parse the incoming Artisan command and its input.
+     *
+     * @param string $command
+     * @param array  $parameters
+     *
+     * @return array
+     */
+    protected function parseCommand($command, $parameters) {
+        if (is_subclass_of($command, SymfonyCommand::class)) {
+            $callingClass = true;
 
-        $this->setCatchExceptions(false);
+            $command = $this->laravel->make($command)->getName();
+        }
 
-        $result = $this->run(new ArrayInput($parameters), $this->lastOutput);
+        if (!isset($callingClass) && empty($parameters)) {
+            $command = $this->getCommandName($input = new StringInput($command));
+        } else {
+            array_unshift($parameters, $command);
 
-        $this->setCatchExceptions(true);
+            $input = new ArrayInput($parameters);
+        }
 
-        return $result;
+        return [$command, $input];
     }
 
     /**

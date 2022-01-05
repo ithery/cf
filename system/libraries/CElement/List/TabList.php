@@ -236,18 +236,11 @@ class CElement_List_TabList extends CElement_List {
 
         $html->appendln('				</div>');
         $html->appendln('			</div>');
-        if ($this->bootstrap >= '3') {
-            if ($this->tabPosition == 'top') {
-                $html->appendln('           <div class="row-tab-content">');
-            } else {
-                $html->appendln('			<div class="col-md-10">');
-            }
+
+        if ($this->tabPosition == 'top') {
+            $html->appendln('           <div class="row-tab-content">');
         } else {
-            if ($this->tabPosition == 'top') {
-                $html->appendln('           <div class="row-tab-content">');
-            } else {
-                $html->appendln('           <div class="span10">');
-            }
+            $html->appendln('           <div class="span10">');
         }
 
         $html->appendln('				<div id="' . $this->id . '-tab-widget" class="' . $this->widgetWrapperClass . ' nomargin widget-transaction-tab ' . $widgetClasses . '">');
@@ -276,9 +269,6 @@ class CElement_List_TabList extends CElement_List {
             }
         }
 
-        if ($this->bootstrap >= '3') {
-            $html->appendln('					</div>');
-        }
         $html->appendln('					</div>');
         $html->appendln('				</div>');
         $html->appendln('			</div>');

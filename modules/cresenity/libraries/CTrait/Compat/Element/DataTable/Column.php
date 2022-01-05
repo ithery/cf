@@ -31,6 +31,11 @@ trait CTrait_Compat_Element_DataTable_Column {
         return $this->getLabel();
     }
 
+    /**
+     * @return $string
+     *
+     * @deprecated since version 1.2
+     */
     public function get_fieldname() {
         return $this->getFieldname();
     }

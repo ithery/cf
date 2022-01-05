@@ -11,7 +11,7 @@ defined('SYSPATH') or die('No direct access allowed.');
 class CElement_FormInput_Date extends CElement_FormInput {
     use CTrait_Compat_Element_FormInput_Date;
 
-    protected $date_format;
+    protected $dateFormat;
 
     protected $have_button;
 
@@ -35,13 +35,13 @@ class CElement_FormInput_Date extends CElement_FormInput {
         }
 
         $this->type = 'date';
-        $this->date_format = 'yyyy-mm-dd';
-        $date_format = CF::config('app.date_formatted', 'Y-m-d');
-        if ($date_format != null) {
-            $date_format = str_replace('Y', 'yyyy', $date_format);
-            $date_format = str_replace('m', 'mm', $date_format);
-            $date_format = str_replace('d', 'dd', $date_format);
-            $this->date_format = $date_format;
+        $this->dateFormat = 'yyyy-mm-dd';
+        $dateFormat = c::formatter()->getDateFormat();
+        if ($dateFormat != null) {
+            $dateFormat = str_replace('Y', 'yyyy', $dateFormat);
+            $dateFormat = str_replace('m', 'mm', $dateFormat);
+            $dateFormat = str_replace('d', 'dd', $dateFormat);
+            $this->dateFormat = $dateFormat;
         }
 
         $this->have_button = false;
@@ -76,28 +76,21 @@ class CElement_FormInput_Date extends CElement_FormInput {
             $classes = ' ' . $classes;
         }
         $custom_css = $this->custom_css;
-        if ($this->bootstrap >= '3') {
-            $classes = $classes . ' form-control ';
-        }
+
         $custom_css = $this->renderStyle($custom_css);
         if (strlen($custom_css) > 0) {
             $custom_css = ' style="' . $custom_css . '"';
         }
+
         if ($this->have_button) {
-            $html->appendln('<div class="input-append date" id="dp3" data-date="' . $this->value . '" data-date-format="' . $this->date_format . '">
-                        <input class="input-unstyled ' . $classes . $this->validation->validation_class() . '" size="16" type="text" name="' . $this->name . '"  data-date-format="' . $this->date_format . '" id="' . $this->id . '" value="' . $this->value . '"' . $disabled . $addition_attribute . $custom_css . '>
+            $html->appendln('<div class="input-append date" id="dp3" data-date="' . $this->value . '" data-date-format="' . $this->dateFormat . '">
+                        <input class="input-unstyled ' . $classes . $this->validation->validationClass() . '" size="16" type="text" name="' . $this->name . '"  data-date-format="' . $this->dateFormat . '" id="' . $this->id . '" value="' . $this->value . '"' . $disabled . $addition_attribute . $custom_css . '>
                         <span class="add-on"><i class="icon-th"></i></span>
                     </div>')->br();
         } else {
-            if ($this->bootstrap == '3.3') {
-                $html->appendln('<div class="input-group">')->br();
-            }
-            $html->appendln('<input type="text" name="' . $this->name . '"  data-date-format="' . $this->date_format . '" id="' . $this->id . '" class="datepicker input-unstyled' . $classes . $this->validation->validation_class() . '" value="' . $this->value . '"' . $disabled . $addition_attribute . $custom_css . '>')->br();
-            if ($this->bootstrap == '3.3') {
-                $html->appendln('</div>');
-            }
+            $html->appendln('<input type="text" name="' . $this->name . '"  data-date-format="' . $this->dateFormat . '" id="' . $this->id . '" class="datepicker input-unstyled' . $classes . $this->validation->validationClass() . '" value="' . $this->value . '"' . $disabled . $addition_attribute . $custom_css . '>')->br();
         }
-        //$html->appendln('<input type="text" name="'.$this->name.'"  data-date-format="'.$this->date_format.'" id="'.$this->id.'" class="datepicker input-unstyled'.$classes.$this->validation->validation_class().'" value="'.$this->value.'"'.$disabled.$custom_css.'>')->br();
+        //$html->appendln('<input type="text" name="'.$this->name.'"  data-date-format="'.$this->dateFormat.'" id="'.$this->id.'" class="datepicker input-unstyled'.$classes.$this->validation->validation_class().'" value="'.$this->value.'"'.$disabled.$custom_css.'>')->br();
 
         return $html->text();
     }

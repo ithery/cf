@@ -58,6 +58,7 @@ class CElement_Component_Form_Validation {
         $data = $this->getValidationData($this->rules, $customAttributes);
         $validator = CValidation::createValidator($data, $this->rules, $messages, $customAttributes);
         $validator->addCustomAttributes($customAttributes);
+
         return $validator;
     }
 
@@ -75,8 +76,10 @@ class CElement_Component_Form_Validation {
         $attributes = array_merge(array_keys($customAttributes), $attributes);
         $data = array_reduce($attributes, function ($data, $attribute) {
             carr::set($data, $attribute, true);
+
             return $data;
         }, []);
+
         return $data;
     }
 
@@ -85,10 +88,11 @@ class CElement_Component_Form_Validation {
      *
      * @param null|string $selector
      *
-     * @return \Proengsoft\JsValidation\Javascript\JavascriptValidator
+     * @return \CJavascript_Validation_ValidatorJavascript
      */
     public function validator($selector = null) {
         $validator = $this->getValidatorInstance();
+
         return $this->jsValidator($validator, $selector);
     }
 
@@ -108,6 +112,7 @@ class CElement_Component_Form_Validation {
         $messages = new CJavascript_Validation_MessageParser($delegated);
         $jsValidator = new CJavascript_Validation_ValidatorHandler($rules, $messages);
         $manager = new CJavascript_Validation_ValidatorJavascript($jsValidator, compact('selector', 'remote'));
+
         return $manager;
     }
 
@@ -118,6 +123,7 @@ class CElement_Component_Form_Validation {
      */
     protected function getSessionToken() {
         $token = CSession::instance()->id();
+
         return $token;
     }
 }

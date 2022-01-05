@@ -67,12 +67,14 @@ defined('SYSPATH') or die('No direct access allowed.');
  * @method CModel_Query|static offset($value)
  * @method CModel_Query|static take($value)
  * @method CModel_Query|static limit($value)
+ *
+ * @see CModel
+ * @see CDatabase_Query_Builder
  */
 class CModel_Query {
     use CDatabase_Trait_Builder,
         CModel_Trait_QueriesRelationships,
         CTrait_ForwardsCalls;
-
     /**
      * The base query builder instance.
      *
@@ -184,7 +186,7 @@ class CModel_Query {
     /**
      * Remove a registered global scope.
      *
-     * @param \Illuminate\Database\Eloquent\Scope|string $scope
+     * @param \CModel_Interface_Scope|string $scope
      *
      * @return $this
      */
@@ -722,7 +724,7 @@ class CModel_Query {
      * @param string      $column
      * @param null|string $key
      *
-     * @return \Illuminate\Support\Collection
+     * @return \CCollection
      */
     public function pluck($column, $key = null) {
         $results = $this->toBase()->pluck($column, $key);
@@ -815,7 +817,7 @@ class CModel_Query {
      *
      * @param array $attributes
      *
-     * @return \Illuminate\Database\Eloquent\Model|$this
+     * @return \CModel|$this
      */
     public function forceCreate(array $attributes) {
         return $this->model->unguarded(function () use ($attributes) {
@@ -1023,8 +1025,8 @@ class CModel_Query {
     /**
      * Nest where conditions by slicing them at the given where count.
      *
-     * @param \Illuminate\Database\Query\Builder $query
-     * @param int                                $originalWhereCount
+     * @param \CDatabase_Query_Builder $query
+     * @param int                      $originalWhereCount
      *
      * @return void
      */

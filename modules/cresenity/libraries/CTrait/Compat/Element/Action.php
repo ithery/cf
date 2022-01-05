@@ -111,10 +111,18 @@ trait CTrait_Compat_Element_Action {
         return $this->setDisabled($bool);
     }
 
+    /**
+     * @deprecated since 1.2
+     */
     public function render_as_input() {
         return $this->renderAsInput();
     }
 
+    /**
+     * @deprecated since 1.2
+     *
+     * @param mixed $jsparam
+     */
     public function set_jsparam($jsparam) {
         return $this->setJsParam($jsparam);
     }

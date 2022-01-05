@@ -7,19 +7,21 @@
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  */
+
 namespace PHPUnit\Framework\MockObject;
 
-use function strtolower;
 use Exception;
-use PHPUnit\Framework\MockObject\Builder\InvocationMocker;
-use PHPUnit\Framework\MockObject\Rule\InvocationOrder;
 use Throwable;
+use function strtolower;
+use PHPUnit\Framework\MockObject\Rule\InvocationOrder;
+use PHPUnit\Framework\MockObject\Builder\InvocationMocker;
+use PHPUnit\Framework\MockObject\Exception\MatcherAlreadyRegisteredException;
+use PHPUnit\Framework\MockObject\Exception\ReturnValueNotConfiguredException;
 
 /**
  * @internal This class is not covered by the backward compatibility promise for PHPUnit
  */
-final class InvocationHandler
-{
+final class InvocationHandler {
     /**
      * @var Matcher[]
      */
@@ -45,14 +47,12 @@ final class InvocationHandler
      */
     private $deferredError;
 
-    public function __construct(array $configurableMethods, $returnValueGeneration)
-    {
-        $this->configurableMethods   = $configurableMethods;
+    public function __construct(array $configurableMethods, $returnValueGeneration) {
+        $this->configurableMethods = $configurableMethods;
         $this->returnValueGeneration = $returnValueGeneration;
     }
 
-    public function hasMatchers()
-    {
+    public function hasMatchers() {
         foreach ($this->matchers as $matcher) {
             if ($matcher->hasMatchers()) {
                 return true;
@@ -67,8 +67,7 @@ final class InvocationHandler
      *
      * @param string $id The identification of the match builder
      */
-    public function lookupMatcher($id)
-    {
+    public function lookupMatcher($id) {
         if (isset($this->matcherMap[$id])) {
             return $this->matcherMap[$id];
         }
@@ -85,8 +84,7 @@ final class InvocationHandler
      *
      * @throws MatcherAlreadyRegisteredException
      */
-    public function registerMatcher($id, Matcher $matcher)
-    {
+    public function registerMatcher($id, Matcher $matcher) {
         if (isset($this->matcherMap[$id])) {
             throw new MatcherAlreadyRegisteredException($id);
         }
@@ -94,8 +92,7 @@ final class InvocationHandler
         $this->matcherMap[$id] = $matcher;
     }
 
-    public function expects(InvocationOrder $rule)
-    {
+    public function expects(InvocationOrder $rule) {
         $matcher = new Matcher($rule);
         $this->addMatcher($matcher);
 
@@ -110,11 +107,10 @@ final class InvocationHandler
      * @throws RuntimeException
      * @throws Exception
      */
-    public function invoke(Invocation $invocation)
-    {
-        $exception      = null;
+    public function invoke(Invocation $invocation) {
+        $exception = null;
         $hasReturnValue = false;
-        $returnValue    = null;
+        $returnValue = null;
 
         foreach ($this->matchers as $match) {
             try {
@@ -122,7 +118,7 @@ final class InvocationHandler
                     $value = $match->invoked($invocation);
 
                     if (!$hasReturnValue) {
-                        $returnValue    = $value;
+                        $returnValue = $value;
                         $hasReturnValue = true;
                     }
                 }
@@ -154,8 +150,7 @@ final class InvocationHandler
         return $invocation->generateReturnValue();
     }
 
-    public function matches(Invocation $invocation)
-    {
+    public function matches(Invocation $invocation) {
         foreach ($this->matchers as $matcher) {
             if (!$matcher->matches($invocation)) {
                 return false;
@@ -168,8 +163,7 @@ final class InvocationHandler
     /**
      * @throws Throwable
      */
-    public function verify()
-    {
+    public function verify() {
         foreach ($this->matchers as $matcher) {
             $matcher->verify();
         }
@@ -179,8 +173,7 @@ final class InvocationHandler
         }
     }
 
-    private function addMatcher(Matcher $matcher)
-    {
+    private function addMatcher(Matcher $matcher) {
         $this->matchers[] = $matcher;
     }
 }

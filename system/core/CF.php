@@ -8,7 +8,10 @@ defined('SYSPATH') or die('No direct access allowed.');
  */
 final class CF {
     use CFDeprecatedTrait;
+
     const CFCLI_CURRENT_DOMAIN_FILE = DOCROOT . 'data' . DS . 'current-domain';
+
+    const CFCLI_CURRENT_APPCODE_FILE = DOCROOT . 'data' . DS . 'current-app';
 
     // Security check that is added to all generated PHP files
     const FILE_SECURITY = '<?php defined(\'SYSPATH\') OR die(\'No direct script access.\');';
@@ -77,11 +80,15 @@ final class CF {
      * @return bool
      */
     public static function isProduction() {
+        return static::environment() === CBase::ENVIRONMENT_PRODUCTION;
+    }
+
+    public static function environment() {
         if (defined('IN_PRODUCTION') && IN_PRODUCTION) {
-            return true;
+            return CBase::ENVIRONMENT_PRODUCTION;
         }
 
-        return CF::config('app.environment') === 'production';
+        return CF::config('app.environment', CBase::ENVIRONMENT_DEVELOPMENT);
     }
 
     /**
@@ -437,6 +444,13 @@ final class CF {
         if ($domain == null) {
             $domain = CF::domain($domain);
         }
+        $isDiffAppCode = false;
+        if (CF::appCode() != CF::appCode($domain)) {
+            $isDiffAppCode = true;
+        }
+        if (CF::isTesting() || $isDiffAppCode) {
+            $forceReload = true;
+        }
 
         $cacheKey = 'paths.' . $domain . '.' . ($withShared ? 'withShared' : 'withoutShared');
         $paths = null;
@@ -447,7 +461,7 @@ final class CF {
             //we try to search all paths for this domain
             $paths = [];
             $orgCode = CF::orgCode($domain);
-            $appCode = CF::appCode($domain);
+            $appCode = $isDiffAppCode ? CF::appCode() : CF::appCode($domain);
 
             $modules = CF::modules($domain);
             //when this domain is org
@@ -737,6 +751,20 @@ final class CF {
         return $domain;
     }
 
+    /**
+     * To get cliAppCode.
+     *
+     * @return string
+     */
+    public static function cliAppCode() {
+        $domain = null;
+        if (file_exists(static::CFCLI_CURRENT_APPCODE_FILE)) {
+            $domain = trim(file_get_contents(static::CFCLI_CURRENT_APPCODE_FILE));
+        }
+
+        return $domain;
+    }
+
     public static function domain() {
         $domain = '';
         if (static::isCli() || static::isCFCli()) {
@@ -896,6 +924,11 @@ final class CF {
      * @return string
      */
     public static function appCode($domain = null) {
+        if (CF::isCFCli() || CF::isTesting()) {
+            if (CF::cliAppCode()) {
+                return CF::cliAppCode();
+            }
+        }
         $data = self::data($domain);
 
         return isset($data['app_code']) ? $data['app_code'] : null;
@@ -1123,6 +1156,17 @@ final class CF {
         return c::collect($directories)->map(function ($v) {
             return basename($v);
         })->all();
+    }
+
+    /**
+     * Check appCode is exits on directory.
+     *
+     * @param mixed $appCode
+     *
+     * @return bool
+     */
+    public static function appCodeExists($appCode) {
+        return in_array($appCode, static::getAvailableAppCode());
     }
 
     /**

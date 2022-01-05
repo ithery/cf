@@ -12,7 +12,7 @@ class CQueue_CallQueuedHandler {
     /**
      * The bus dispatcher implementation.
      *
-     * @var \Illuminate\Contracts\Bus\Dispatcher
+     * @var \CQueue_DispatcherInterface
      */
     protected $dispatcher;
 
@@ -38,8 +38,8 @@ class CQueue_CallQueuedHandler {
     /**
      * Handle the queued job.
      *
-     * @param \Illuminate\Contracts\Queue\Job $job
-     * @param array                           $data
+     * @param \CQueue_AbstractJob $job
+     * @param array               $data
      *
      * @return void
      */

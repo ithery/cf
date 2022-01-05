@@ -8,7 +8,7 @@ defined('SYSPATH') or die('No direct access allowed.');
  *
  * @since May 15, 2019, 8:06:59 PM
  */
-abstract class CSocialLogin_AbstractUser implements ArrayAccess, CSocialLogin_UserInterface {
+abstract class CSocialLogin_AbstractUser implements ArrayAccess, CSocialLogin_Contract_UserInterface {
     /**
      * The unique identifier for the user.
      *
@@ -114,6 +114,7 @@ abstract class CSocialLogin_AbstractUser implements ArrayAccess, CSocialLogin_Us
      */
     public function setRaw(array $user) {
         $this->user = $user;
+
         return $this;
     }
 
@@ -128,6 +129,7 @@ abstract class CSocialLogin_AbstractUser implements ArrayAccess, CSocialLogin_Us
         foreach ($attributes as $key => $value) {
             $this->{$key} = $value;
         }
+
         return $this;
     }
 

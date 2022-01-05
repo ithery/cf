@@ -461,7 +461,7 @@ class CView_Factory {
     /**
      * Get the view finder instance.
      *
-     * @return \Illuminate\View\ViewFinderInterface
+     * @return \CView_Finder
      */
     public function getFinder() {
         return $this->finder;
@@ -490,7 +490,7 @@ class CView_Factory {
     /**
      * Get the event dispatcher instance.
      *
-     * @return \Illuminate\Contracts\Events\Dispatcher
+     * @return \CEvent_Dispatcher
      */
     public function getDispatcher() {
         return $this->events;
@@ -519,7 +519,7 @@ class CView_Factory {
     /**
      * Set the IoC container instance.
      *
-     * @param \Illuminate\Contracts\Container\Container $container
+     * @param \CContainer_Container $container
      *
      * @return void
      */

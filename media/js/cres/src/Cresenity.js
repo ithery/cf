@@ -1,5 +1,5 @@
 import Url from './module/Url';
-import CF from './CF';
+import cf from './CF';
 import ScrollToTop from './module/ScrollToTop';
 import UI from './ui';
 import {
@@ -11,21 +11,28 @@ import {
 import {encode as base64encode, decode as base64decode} from './util/base64';
 import php from './php';
 import { elementReady, elementRendered } from './util/dom-observer';
+import { debounce } from './util/debounce';
 import { confirmFromElement, defaultConfirmHandler } from './module/confirm-handler';
-import appValidation from './module/validation';
+import initValidation from './module/validation';
 import ucfirst from 'locutus/php/strings/ucfirst';
 import Alpine from 'alpinejs';
+import cresReact from './react';
 import CSocket from './csocket/CSocket';
+import removePreloader from './module/preloader';
+import initProgressive from './module/progressive';
+import cresToast from './module/toast';
+import CresAlpine from './module/CresAlpine';
 
 export default class Cresenity {
     constructor() {
-        this.cf = new CF();
+        this.cf = cf;
         this.base64 = {
             encode: base64encode,
             decode: base64decode
         };
         this.windowEventList = [
             'cresenity:confirm',
+            'cresenity:jquery:loaded',
             'cresenity:loaded',
             'cresenity:ui:start'
         ];
@@ -39,6 +46,7 @@ export default class Cresenity {
         this.filesAdded = [];
         this.ui = new UI();
         this.php = php;
+        this.react = cresReact;
         this.observer = {
             elementRendered: elementRendered,
             elementReady: elementReady
@@ -46,6 +54,7 @@ export default class Cresenity {
         this.confirmHandler = defaultConfirmHandler;
         this.dispatchWindowEvent = dispatchWindowEvent;
         this.websocket = null;
+        this.debounce = debounce;
     }
     loadJs(filename, callback) {
         let fileref = document.createElement('script');
@@ -585,7 +594,7 @@ export default class Cresenity {
                 newestOnTop: false
             });
         }
-        return console.log(type+':'+message);
+        return cresToast.toast(message);
     }
     message(type, message, alertType, callback) {
         alertType = typeof alertType !== 'undefined' ? alertType : 'notify';
@@ -944,7 +953,7 @@ export default class Cresenity {
     }
     initValidation() {
         if($ && $.validator) {
-            appValidation.init();
+            initValidation();
         }
     }
 
@@ -953,6 +962,22 @@ export default class Cresenity {
         window.Alpine = Alpine;
         this.ui.start();
         window.Alpine.start();
+        this.alpine = new CresAlpine(window.Alpine);
+    }
+
+    initLiveReload() {
+        if(!this.cf.isProduction() && this.cf.config.vscode.liveReload.enable) {
+            try {
+                const rsocket = new WebSocket(this.cf.config.vscode.liveReload.protocol + '://' +this.cf.config.vscode.liveReload.host+ ':'+this.cf.config.vscode.liveReload.port+'/', 'reload-protocol');
+                rsocket.onmessage = function (msg) {
+                    if (msg.data == 'RELOAD') {
+                        location.reload();
+                    }
+                };
+            }catch(e) {
+                //do nothing
+            }
+        }
     }
     init() {
         this.cf.onBeforeInit(() => {
@@ -960,7 +985,7 @@ export default class Cresenity {
         });
         this.cf.onAfterInit(() => {
             if (this.cf.getConfig().haveScrollToTop) {
-                if (!document.getElementById('topcontrol')) {
+                if (!document.getElementById('cres-topcontrol')) {
                     this.scrollToTop.init();
                 }
             }
@@ -968,14 +993,18 @@ export default class Cresenity {
             this.initReload();
             this.initValidation();
             this.initAlpineAndUi();
+            this.initLiveReload();
+            initProgressive();
+            let root = document.getElementsByTagName('html')[0]; // '0' to assign the first (and only `HTML` tag)
+
+            root.classList.add('cresenity-loaded');
+            root.classList.remove('no-js');
+            dispatchWindowEvent('cresenity:loaded');
         });
 
 
         this.cf.init();
-
-        dispatchWindowEvent('cresenity:loaded');
     }
-
     downloadProgress(options) {
         let settings = $.extend({
             // These are the defaults.
@@ -1106,8 +1135,22 @@ export default class Cresenity {
             }
         });
     }
+    reactive(data, cb) {
+        const reactiveData =Alpine.reactive(data);
+        if(typeof cb == 'function') {
+            Alpine.effect(() => {
+                cb(reactiveData);
+            });
+        }
 
-
+        return reactiveData;
+    }
+    getAlpineData(node) {
+        if(typeof node == 'string') {
+            node = document.querySelector(node);
+        }
+        return this.alpine.getAlpineDataInstance(node);
+    }
     handleJsonResponse(response, onSuccess, onError) {
         let errMessage = 'Unexpected error happen, please relogin ro refresh this page';
         if (typeof onError == 'string') {

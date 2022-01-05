@@ -2,7 +2,7 @@
 
 trait CTrait_Controller_Application_Manager_Daemon {
     protected function getTitle() {
-        return 'Service Manager';
+        return 'Daemon Manager';
     }
 
     public function index() {

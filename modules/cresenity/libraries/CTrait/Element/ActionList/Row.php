@@ -21,6 +21,7 @@ trait CTrait_Element_ActionList_Row {
         if ($this->rowActionList != null) {
             return $this->rowActionList->childCount();
         }
+
         return 0;
     }
 
@@ -38,7 +39,8 @@ trait CTrait_Element_ActionList_Row {
      */
     public function addRowAction($id = '') {
         $rowAct = CElement_Factory::createComponent('Action', $id);
-        $this->rowActionList->add($rowAct);
+        $this->getRowActionList()->add($rowAct);
+
         return $rowAct;
     }
 
@@ -48,7 +50,8 @@ trait CTrait_Element_ActionList_Row {
      * @return $this
      */
     public function setRowActionStyle($style) {
-        $this->rowActionList->setStyle($style);
+        $this->getRowActionList()->setStyle($style);
+
         return $this;
     }
 
@@ -56,13 +59,17 @@ trait CTrait_Element_ActionList_Row {
      * @return string
      */
     public function getRowActionStyle() {
-        return $this->rowActionList->getStyle();
+        return $this->getRowActionList()->getStyle();
     }
 
     /**
      * @return CElement_List_ActionList
      */
     public function getRowActionList() {
+        if ($this->rowActionList == null) {
+            $this->rowActionList = CElement_Factory::createList('ActionList');
+        }
+
         return $this->rowActionList;
     }
 }

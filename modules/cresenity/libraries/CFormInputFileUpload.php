@@ -39,11 +39,13 @@ class CFormInputFileUpload extends CFormInput {
 
     public function set_applyjs($applyjs) {
         $this->applyjs = $applyjs;
+
         return $this;
     }
 
     public function set_removeLink($bool) {
         $this->removeLink = $bool;
+
         return $this;
     }
 
@@ -53,6 +55,7 @@ class CFormInputFileUpload extends CFormInput {
         $arr['file_url'] = $file_url;
 
         $this->files[] = $arr;
+
         return $this;
     }
 
@@ -62,16 +65,19 @@ class CFormInputFileUpload extends CFormInput {
         $arr['input_name'] = $input_name;
         $arr['input_label'] = $input_label;
         $this->custom_control[] = $arr;
+
         return $this;
     }
 
     public function add_custom_control_value($input_name, $control_name, $input_value) {
         $this->custom_control_value[$input_name][$control_name] = $input_value;
+
         return $this;
     }
 
     public function set_link($value) {
         $this->link = $value;
+
         return $this;
     }
 
@@ -88,7 +94,7 @@ class CFormInputFileUpload extends CFormInput {
             $classes = ' ' . $classes;
         }
         $custom_css = $this->custom_css;
-        $custom_css = crenderer::render_style($custom_css);
+        $custom_css = $this->renderStyle($custom_css);
         if (strlen($custom_css) > 0) {
             $custom_css = ' style="' . $custom_css . '"';
         }
@@ -229,13 +235,14 @@ class CFormInputFileUpload extends CFormInput {
                 <div id="' . $div_id . '_btn_upload" class="btn btn-success">' . clang::__('Upload Image') . '</div>
             </div>
         ');
+
         return $html->text();
     }
 
     public function js($indent = 0) {
         $ajax_url = CAjaxMethod::factory()->set_type('fileupload')
-                        ->set_data('input_name', $this->name)
-                        ->makeurl();
+            ->set_data('input_name', $this->name)
+            ->makeurl();
 
         $div_id = 'div_fileupload_' . $this->id;
         $js = new CStringBuilder();
@@ -421,6 +428,7 @@ class CFormInputFileUpload extends CFormInput {
                 })
             ');
         }
+
         return $js->text();
     }
 }

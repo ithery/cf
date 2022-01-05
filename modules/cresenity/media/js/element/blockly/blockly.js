@@ -1,8 +1,3 @@
-/* 
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
 
 
 var CBlockly = function (options) {
@@ -20,37 +15,32 @@ var CBlockly = function (options) {
         var saveUrl = this.settings.saveUrl;
 
 
-
         $.ajax({
-            url:saveUrl,
-            type:'post',
+            url: saveUrl,
+            type: 'post',
             data: {
-                code:code,
+                code: code
             },
-            success: function(response) {
+            success: function (response) {
                 alert(response);
             }
-        })
-        
-
-    }
+        });
+    };
 
 
     this.inited = function () {
-        this.workspace !== null
-    }
+        this.workspace !== null;
+    };
     this.createVariable = function (variable) {
         this.workspace.createVariable(variable);
-
     };
 
 
     this.getXml = function () {
-
         var xmlDom = Blockly.Xml.workspaceToDom(this.workspace);
         var xmlText = Blockly.Xml.domToPrettyText(xmlDom);
         return xmlText;
-    }
+    };
 
     this.getPhp = function () {
         var generator = Blockly.PHP;
@@ -61,7 +51,7 @@ var CBlockly = function (options) {
             return code;
         }
         return null;
-    }
+    };
 
     this.checkAllGeneratorFunctionsDefined = function (generator) {
         var blocks = this.workspace.getAllBlocks(false);
@@ -79,7 +69,7 @@ var CBlockly = function (options) {
         if (!valid) {
             var msg = 'The generator code for the following blocks not specified for ' +
                     generator.name_ + ':\n - ' + missingBlockGenerators.join('\n - ');
-            this.alert(msg);  // Assuming synchronous. No callback.
+            this.alert(msg); // Assuming synchronous. No callback.
         }
         return valid;
     };
@@ -97,7 +87,7 @@ var CBlockly = function (options) {
                 snap: true
             },
             media: this.mediaFolder,
-            toolbox: document.getElementById(this.toolboxElementId),
+            toolbox: document.getElementById(this.toolboxElementId)
             //toolboxPosition: 'left',
             //horizontalLayout: true,
             //scrollbars: true,
@@ -105,7 +95,6 @@ var CBlockly = function (options) {
         if (typeof this.settings.saveElementId !== 'undefined') {
             document.getElementById(this.settings.saveElementId).addEventListener('click', (event) => {
                 this.save(event);
-
             }, true);
         }
 
@@ -117,12 +106,9 @@ var CBlockly = function (options) {
             var xml = Blockly.Xml.textToDom(this.settings.defaultXml);
             Blockly.Xml.domToWorkspace(xml, this.workspace);
         }
-
-
     };
-
 
 
     this.init();
     window.bworkspace = this.workspace;
-}
+};

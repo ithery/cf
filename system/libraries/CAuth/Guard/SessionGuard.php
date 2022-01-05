@@ -5,7 +5,6 @@ use Symfony\Component\HttpKernel\Exception\UnauthorizedHttpException;
 
 class CAuth_Guard_SessionGuard implements CAuth_Contract_StatefulGuardInterface, CAuth_SupportBasicAuthInterface {
     use CAuth_Guard_Concern_GuardHelper, CTrait_Macroable;
-
     /**
      * The name of the guard. Typically "web".
      *
@@ -127,7 +126,7 @@ class CAuth_Guard_SessionGuard implements CAuth_Contract_StatefulGuardInterface,
             $this->user = $this->userFromRecaller($recaller);
 
             if ($this->user) {
-                $this->updateSession($this->user);
+                $this->updateSession($this->user->getAuthIdentifier());
 
                 $this->fireLoginEvent($this->user, true);
             }
@@ -397,7 +396,7 @@ class CAuth_Guard_SessionGuard implements CAuth_Contract_StatefulGuardInterface,
      * @return void
      */
     public function login(CAuth_AuthenticatableInterface $user, $remember = false) {
-        $this->updateSession($user);
+        $this->updateSession($user->getAuthIdentifier());
 
         // If the user should be permanently "remembered" by the application we will
         // queue a permanent cookie that contains the encrypted copy of the user
@@ -420,15 +419,12 @@ class CAuth_Guard_SessionGuard implements CAuth_Contract_StatefulGuardInterface,
     /**
      * Update the session with the given ID.
      *
-     * @param CAuth_AuthenticatableInterface|CModel $user
+     * @param int $id
      *
      * @return void
      */
-    protected function updateSession($user) {
-        $this->session->put($this->getName(), $user->getAuthIdentifier());
-        $this->session->put('user', (object) $user->getAttributes());
-
-        //$this->session->migrate(true);
+    protected function updateSession($id) {
+        $this->session->put($this->getName(), $id);
     }
 
     /**
@@ -838,5 +834,34 @@ class CAuth_Guard_SessionGuard implements CAuth_Contract_StatefulGuardInterface,
 
     public function hasher() {
         return $this->provider->hasher();
+    }
+
+    /**
+     * Log a user into the application without firing the Login event.
+     *
+     * @param \CAuth_AuthenticatableInterface $user
+     *
+     * @return void
+     */
+    public function quietLogin(CAuth_AuthenticatableInterface $user) {
+        $this->updateSession($user->getAuthIdentifier());
+
+        $this->setUser($user);
+    }
+
+    /**
+     * Logout the user without updating remember_token
+     * and without firing the Logout event.
+     *
+     * @param   void
+     *
+     * @return void
+     */
+    public function quietLogout() {
+        $this->clearUserDataFromStorage();
+
+        $this->user = null;
+
+        $this->loggedOut = true;
     }
 }

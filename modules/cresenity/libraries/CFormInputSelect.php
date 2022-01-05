@@ -8,7 +8,6 @@ defined('SYSPATH') or die('No direct access allowed.');
 //@codingStandardsIgnoreStart
 class CFormInputSelect extends CElement_FormInput {
     use CTrait_Compat_Element_FormInput_Select;
-
     protected $group_list = [];
 
     protected $multiple;
@@ -48,11 +47,13 @@ class CFormInputSelect extends CElement_FormInput {
 
     public function set_multiple($bool) {
         $this->multiple = $bool;
+
         return $this;
     }
 
     public function setApplyjs($applyjs) {
         $this->applyjs = $applyjs;
+
         return $this;
     }
 
@@ -61,11 +62,13 @@ class CFormInputSelect extends CElement_FormInput {
 
     public function setMaximumSelectionLength($length) {
         $this->maximumSelectionLength = $length;
+
         return $this;
     }
 
     public function add_group_list($group, $list) {
         $this->group_list[$group] = $list;
+
         return $this;
     }
 
@@ -73,22 +76,21 @@ class CFormInputSelect extends CElement_FormInput {
         if (is_array($c)) {
             $this->dropdown_classes = array_merge($c, $this->dropdown_classes);
         } else {
-            if ($this->bootstrap == '3.3') {
-                $c = str_replace('span', 'col-md-', $c);
-                $c = str_replace('row-fluid', 'row', $c);
-            }
             $this->dropdown_classes[] = $c;
         }
+
         return $this;
     }
 
     public function set_readonly($bool) {
         $this->readonly = $bool;
+
         return $this;
     }
 
     public function setPlaceholder($placeholder) {
         $this->placeholder = $placeholder;
+
         return $this;
     }
 
@@ -122,6 +124,7 @@ class CFormInputSelect extends CElement_FormInput {
                 $data['children'][] = $child;
             }
         }
+
         return $data;
     }
 
@@ -149,9 +152,7 @@ class CFormInputSelect extends CElement_FormInput {
         if (strlen($classes) > 0) {
             $classes = ' ' . $classes;
         }
-        if ($this->bootstrap >= '3') {
-            $classes = $classes . ' form-control ';
-        }
+
         $custom_css = $this->custom_css;
         $custom_css = $this->renderStyle($custom_css);
         if (strlen($custom_css) > 0) {
@@ -240,9 +241,7 @@ class CFormInputSelect extends CElement_FormInput {
             if (strlen($classes) > 0) {
                 $classes = ' ' . $classes;
             }
-            if ($this->bootstrap == '3.3') {
-                $classes = $classes . ' form-control ';
-            }
+
             $dropdown_classes = $this->dropdown_classes;
             $dropdown_classes = implode(' ', $dropdown_classes);
             if (strlen($dropdown_classes) > 0) {
@@ -277,6 +276,7 @@ class CFormInputSelect extends CElement_FormInput {
 
     public function setHideSearch($hide_search) {
         $this->hide_search = $hide_search;
+
         return $this;
     }
 }

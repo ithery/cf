@@ -7,6 +7,7 @@
  */
 class CElement_FormInput extends CElement_Element {
     use CTrait_Compat_Element_FormInput;
+
     protected $transforms = [];
 
     protected $name;
@@ -52,7 +53,7 @@ class CElement_FormInput extends CElement_Element {
         $this->value = '';
         $this->disabled = '';
         $this->list = [];
-        $this->validation = CFormValidation::factory();
+        $this->validation = new CElement_Component_Form_FieldValidation();
     }
 
     public function setSubmitOnChange($bool = true) {
@@ -125,7 +126,7 @@ class CElement_FormInput extends CElement_Element {
         if (strlen($value) == 0) {
             $value = $name;
         }
-        $this->validation->add_validation($name, $value);
+        $this->validation->addValidation($name, $value);
 
         return $this;
     }
@@ -211,7 +212,7 @@ class CElement_FormInput extends CElement_Element {
 
 				";
         }
-        $js .= $this->js_child($indent);
+        $js .= $this->jsChild($indent);
 
         return $js;
     }
