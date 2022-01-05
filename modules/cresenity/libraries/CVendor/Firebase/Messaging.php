@@ -7,12 +7,12 @@ class CVendor_Firebase_Messaging {
     private $projectId;
 
     /**
-     * @var ApiClient
+     * @var CVendor_Firebase_Messaging_ApiClient
      */
     private $messagingApi;
 
     /**
-     * @var AppInstanceApiClient
+     * @var CVendor_Firebase_Messaging_AppInstanceApiClient
      */
     private $appInstanceApi;
 
@@ -108,6 +108,7 @@ class CVendor_Firebase_Messaging {
         $message = $this->makeMessage($message);
 
         $request = new CVendor_Firebase_Messaging_Request_ValidateMessageRequest($this->projectId, $message);
+
         try {
             $response = $this->messagingApi->send($request);
         } catch (CVendor_Firebase_Messaging_Exception_NotFoundException $e) {
@@ -161,8 +162,8 @@ class CVendor_Firebase_Messaging {
      *
      * @see https://developers.google.com/instance-id/reference/server#results
      *
-     * @throws InvalidArgument   if the registration token is invalid
-     * @throws FirebaseException
+     * @throws InvalidArgument                     if the registration token is invalid
+     * @throws CVendor_Firebase_ExceptionInterface
      */
     public function getAppInstance($registrationToken) {
         $token = $registrationToken instanceof CVendor_Firebase_Messaging_RegistrationToken ? $registrationToken : CVendor_Firebase_Messaging_RegistrationToken::fromValue($registrationToken);
@@ -201,7 +202,7 @@ class CVendor_Firebase_Messaging {
     /**
      * @param mixed $value
      *
-     * @throws InvalidArgument
+     * @throws CVendor_Firebase_Messaging_Exception_InvalidArgumentException
      */
     private function ensureNonEmptyRegistrationTokens($value) {
         try {
