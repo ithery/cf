@@ -12,13 +12,14 @@ class CElement_Component_Action extends CElement_Component {
     use CTrait_Compat_Element_Action,
         CTrait_Element_Property_Label,
         CTrait_Element_Property_Icon;
+
     protected $jsfunc;
 
     protected $disabled;
 
     protected $type;
 
-    protected $link_target;
+    protected $linkTarget;
 
     protected $link;
 
@@ -46,13 +47,13 @@ class CElement_Component_Action extends CElement_Component {
 
     public function __construct($id) {
         parent::__construct($id);
-
+        $this->tag = 'a';
         $this->jsfunc = '';
         $this->type = 'jsfunc';
         $this->icon = '';
         $this->link = '';
         $this->jsparam = [];
-        $this->link_target = '';
+        $this->linkTarget = '';
         $this->submit = false;
         $this->submitTo = false;
         $this->submitToTarget = false;
@@ -106,7 +107,7 @@ class CElement_Component_Action extends CElement_Component {
     }
 
     public function setLinkTarget($linkTarget) {
-        $this->link_target = $linkTarget;
+        $this->linkTarget = $linkTarget;
 
         return $this;
     }
@@ -133,13 +134,13 @@ class CElement_Component_Action extends CElement_Component {
         return $this;
     }
 
-    public function renderAsInput() {
-        $render_as_input = false;
+    protected function renderAsInput() {
+        $renderAsInput = false;
         if ($this->submit) {
-            $render_as_input = true;
+            $renderAsInput = true;
         }
 
-        return $render_as_input;
+        return $renderAsInput;
     }
 
     public function reassignConfirm() {
@@ -172,14 +173,72 @@ class CElement_Component_Action extends CElement_Component {
         return $data;
     }
 
-    public function html($indent = 0) {
-        $this->reassignConfirm();
-        $html = new CStringBuilder();
-        $html->setIndent($indent);
+    protected function buildLink($link) {
         $jsparam = $this->jsparam;
-        $link = $this->link;
         $param = '';
         $i = 0;
+        foreach ($jsparam as $k => $p) {
+            $i++;
+            if ($k == 'param1') {
+                if (strlen($param) > 0) {
+                    $param .= ',';
+                }
+                $param .= "'" . $p . "'";
+            }
+            if ($this->type == 'link') {
+                preg_match_all("/{([\w]*)}/", $link, $matches, PREG_SET_ORDER);
+                foreach ($matches as $val) {
+                    $str = $val[1]; //matches str without bracket {}
+                    $b_str = $val[0]; //matches str with bracket {}
+                    if ($k == $str) {
+                        $link = str_replace($b_str, $p, $link);
+                    }
+                }
+            }
+        }
+
+        return $link;
+    }
+
+    // protected function build() {
+    //     parent::build();
+    //     $this->reassignConfirm();
+    //     $this->addClass('btn');
+    //     $link = $this->link;
+    //     if ($this->submit) {
+    //         $this->tag = 'input';
+    //         $this->setAttr('type', 'submit');
+    //         $this->setAttr('value', $this->label);
+    //     } else {
+    //         $link = $this->buildLink($link);
+    //         if ($link && strlen($link) > 0) {
+    //             $this->setAttr('href', $link);
+    //         }
+
+    //         if (strlen($this->linkTarget)) {
+    //             $this->setAttr('target', $this->linkTarget);
+    //         }
+    //     }
+    //     if ($this->icon && strlen($this->icon) > 0) {
+    //         $this->addIcon()->setIcon($this->icon);
+    //     }
+    //     if ($this->style != 'btn-icon-group') {
+    //         $this->add($this->label);
+    //     }
+    // }
+
+    /**
+     * @param int $indent
+     *
+     * @return string
+     */
+    public function html($indent = 0) {
+        $html = new CStringBuilder();
+        $html->setIndent($indent);
+
+        $link = $this->link;
+        $param = '';
+
         $classes = $this->classes;
         $classes = implode(' ', $classes);
         if (strlen($classes) > 0) {
@@ -194,29 +253,10 @@ class CElement_Component_Action extends CElement_Component {
         foreach ($this->attr as $k => $v) {
             $addition_attribute .= ' ' . $k . '="' . $v . '"';
         }
-        foreach ($jsparam as $k => $p) {
-            $i++;
-            if ($k == 'param1') {
-                if (strlen($param) > 0) {
-                    $param .= ',';
-                }
-                $param .= "'" . $p . "'";
-            }
-            if ($this->type == 'link') {
-                //$link = str_replace("{param1}",$p,$link);
-                preg_match_all("/{([\w]*)}/", $link, $matches, PREG_SET_ORDER);
-                foreach ($matches as $val) {
-                    $str = $val[1]; //matches str without bracket {}
-                    $b_str = $val[0]; //matches str with bracket {}
-                    if ($k == $str) {
-                        $link = str_replace($b_str, $p, $link);
-                    }
-                }
-            }
-        }
-        $link_target = '';
-        if (strlen($this->link_target)) {
-            $link_target = ' target="' . $this->link_target . '"';
+        $link = $this->buildLink($link);
+        $linkTarget = '';
+        if (strlen($this->linkTarget)) {
+            $linkTarget = ' target="' . $this->linkTarget . '"';
         }
         $disabled = '';
         if ($this->disabled) {
@@ -230,11 +270,7 @@ class CElement_Component_Action extends CElement_Component {
                 $add_class .= ' confirm';
             }
         }
-        if ($this->bootstrap == '3.3') {
-            if (strlen($this->btn_style) == 0) {
-                $add_class .= ' btn-' . $this->btn_style;
-            }
-        }
+
         if ($this->style == 'btn-icon-group' && strlen($this->label) > 0) {
             $add_class .= ' tip-top';
             $add_attr .= ' data-original-title="' . c::e($this->label) . '"';
@@ -243,7 +279,7 @@ class CElement_Component_Action extends CElement_Component {
             $add_attr .= ' data-confirm-message="' . c::e($this->confirmMessage) . '"';
         }
 
-        if ($this->render_as_input()) {
+        if ($this->renderAsInput()) {
             $input_type = 'button';
 
             if ($this->submit) {
@@ -251,11 +287,7 @@ class CElement_Component_Action extends CElement_Component {
             }
             if ($this->button) {
                 $html->appendln('<button id="' . $this->id . '" name="' . $this->id . '" class="btn btn-primary' . $add_class . $classes . '" type="' . $input_type . '"' . $disabled . $add_attr . $addition_attribute . $custom_css . '>' . $this->label . '</button>');
-                if (strlen($this->icon) > 0) {
-                    if ($this->bootstrap == '3.3') {
-                        $html->append('<i class="fa fa-' . $this->icon . '"></i> ');
-                    }
-                }
+                $html->append($this->getIconHtml());
                 $html->appendln($this->label . '</button>');
             } else {
                 $html->appendln('<button type="submit" id="' . $this->id . '" name="' . $this->id . '" class="btn btn-primary' . $add_class . $classes . '" type="' . $input_type . '" ' . $disabled . $add_attr . $addition_attribute . $custom_css . ' value="' . $this->label . '">' . $this->label . '</button>');
@@ -271,14 +303,11 @@ class CElement_Component_Action extends CElement_Component {
                 $html->appendln('<li>');
             }
             if ($this->style == 'btn-dropdown') {
-                $html->appendln('<a id="' . $this->id . '" href="' . $link . '"' . $link_target . ' class=" ' . $add_class . '' . $classes . '" ' . $disabled . $add_attr . $addition_attribute . $custom_css . '>');
+                $html->appendln('<a id="' . $this->id . '" href="' . $link . '"' . $linkTarget . ' class=" ' . $add_class . '' . $classes . '" ' . $disabled . $add_attr . $addition_attribute . $custom_css . '>');
             } else {
-                $html->appendln('<a id="' . $this->id . '" href="' . $link . '"' . $link_target . ' class="btn ' . $add_class . '' . $classes . '" ' . $disabled . $add_attr . $addition_attribute . $custom_css . '>');
+                $html->appendln('<a id="' . $this->id . '" href="' . $link . '"' . $linkTarget . ' class="btn ' . $add_class . '' . $classes . '" ' . $disabled . $add_attr . $addition_attribute . $custom_css . '>');
             }
-
-            if (strlen($this->icon) > 0) {
-                $html->append('<i class="icon icon-' . $this->getIcon() . ' ' . $this->getIcon() . '"></i> ');
-            }
+            $html->append($this->getIconHtml());
             if ($this->style != 'btn-icon-group') {
                 $html->append($this->label);
             }
@@ -291,6 +320,11 @@ class CElement_Component_Action extends CElement_Component {
         return $html->text();
     }
 
+    /**
+     * @param int $indent
+     *
+     * @return string
+     */
     public function js($indent = 0) {
         $js = new CStringBuilder();
         $js->setIndent($indent);
@@ -298,7 +332,7 @@ class CElement_Component_Action extends CElement_Component {
         if ($this->disabled) {
             $js->appendln("jQuery('#" . $this->id . "').click(function(e) { e.preventDefault(); });");
         } else {
-            if ($this->render_as_input()) {
+            if ($this->renderAsInput()) {
                 if (strlen($this->link) > 0) {
                     if ($this->submit) {
                         $js->appendln("jQuery('#" . $this->id . "').click(function() { jQuery(this).closest('form').attr('action','" . $this->link . "'); });");

@@ -23,16 +23,6 @@ class CStorage {
     protected static $instance;
 
     /**
-     * @return CStorage
-     */
-    public static function instance() {
-        if (static::$instance == null) {
-            static::$instance = new static();
-        }
-        return static::$instance;
-    }
-
-    /**
      * The array of resolved filesystem drivers.
      *
      * @var array
@@ -47,6 +37,17 @@ class CStorage {
     protected $customCreators = [];
 
     /**
+     * @return CStorage
+     */
+    public static function instance() {
+        if (static::$instance == null) {
+            static::$instance = new static();
+        }
+
+        return static::$instance;
+    }
+
+    /**
      * Create a new filesystem manager instance.
      *
      * @return void
@@ -57,7 +58,7 @@ class CStorage {
     /**
      * Get a filesystem instance.
      *
-     * @param string|null $name
+     * @param null|string $name
      *
      * @return CStorage_FilesystemInterface
      */
@@ -68,24 +69,26 @@ class CStorage {
     /**
      * Get a filesystem instance.
      *
-     * @param string|null $name
+     * @param null|string $name
      *
      * @return CStorage_Adapter
      */
     public function disk($name = null) {
         $name = $name ?: $this->getDefaultDriver();
+
         return $this->disks[$name] = $this->get($name);
     }
 
     /**
      * Get a filesystem instance.
      *
-     * @param string|null $name
+     * @param null|string $name
      *
      * @return CStorage_FilesystemInterface
      */
     public function temp($name = null) {
         $name = $name ?: $this->getTempDriver();
+
         return $this->disks[$name] = $this->get($name);
     }
 
@@ -96,6 +99,7 @@ class CStorage {
      */
     public function cloud() {
         $name = $this->getDefaultCloudDriver();
+
         return $this->disks[$name] = $this->get($name);
     }
 
@@ -115,9 +119,9 @@ class CStorage {
      *
      * @param string $name
      *
-     * @return CStorage_FilesystemInterface
-     *
      * @throws \InvalidArgumentException
+     *
+     * @return CStorage_FilesystemInterface
      */
     protected function resolve($name) {
         $config = $this->getConfig($name);
@@ -144,6 +148,7 @@ class CStorage {
         if ($driver instanceof FilesystemInterface) {
             return $this->adapt($driver);
         }
+
         return $driver;
     }
 
@@ -155,12 +160,13 @@ class CStorage {
      * @return \CStorage_FilesystemInterface
      */
     public function createGoogleDriver(array $config) {
-        $client = new \Google_Client;
+        $client = new \Google_Client();
         $client->setClientId(carr::get($config, 'clientId'));
         $client->setClientSecret(carr::get($config, 'clientSecret'));
         $client->refreshToken(carr::get($config, 'refreshToken'));
         $folderId = carr::get($config, 'folderId');
         $service = new \Google_Service_Drive($client);
+
         return $this->adapt($this->createFlysystem(
             new CStorage_Adapter_GoogleDriveAdapter($service, $folderId),
             $config
@@ -177,6 +183,7 @@ class CStorage {
     public function createLocalDriver(array $config) {
         $permissions = isset($config['permissions']) ? $config['permissions'] : [];
         $links = (isset($config['links']) ? $config['links'] : null) === 'skip' ? LocalAdapter::SKIP_LINKS : LocalAdapter::DISALLOW_LINKS;
+
         return $this->adapt($this->createFlysystem(new LocalAdapter(
             $config['root'],
             isset($config['lock']) ? $config['lock'] : LOCK_EX,
@@ -224,9 +231,10 @@ class CStorage {
         $s3Config = $this->formatS3Config($config);
         $root = isset($s3Config['root']) ? $s3Config['root'] : null;
         $options = isset($config['options']) ? $config['options'] : [];
+        $streamReads = isset($config['stream_reads']) ? $config['stream_reads'] : false;
 
         return $this->adapt($this->createFlysystem(
-            new S3Adapter(new S3Client($s3Config), $s3Config['bucket'], $root, $options),
+            new S3Adapter(new S3Client($s3Config), $s3Config['bucket'], $root, $options, $streamReads),
             $config
         ));
     }
@@ -261,6 +269,7 @@ class CStorage {
         if ($cache) {
             $adapter = new CachedAdapter($adapter, $this->createCacheStore($cache));
         }
+
         return new Flysystem($adapter, count($config) > 0 ? $config : null);
     }
 
@@ -269,13 +278,13 @@ class CStorage {
      *
      * @param mixed $config
      *
-     * @return \League\Flysystem\Cached\CacheInterface
-     *
      * @throws \InvalidArgumentException
+     *
+     * @return \League\Flysystem\Cached\CacheInterface
      */
     protected function createCacheStore($config) {
         if ($config === true) {
-            return new MemoryStore;
+            return new MemoryStore();
         }
 
         return new Cache(
@@ -306,6 +315,7 @@ class CStorage {
      */
     public function set($name, $disk) {
         $this->disks[$name] = $disk;
+
         return $this;
     }
 
@@ -358,6 +368,7 @@ class CStorage {
         foreach ((array) $disk as $diskName) {
             unset($this->disks[$diskName]);
         }
+
         return $this;
     }
 
@@ -371,6 +382,7 @@ class CStorage {
      */
     public function extend($driver, Closure $callback) {
         $this->customCreators[$driver] = $callback;
+
         return $this;
     }
 

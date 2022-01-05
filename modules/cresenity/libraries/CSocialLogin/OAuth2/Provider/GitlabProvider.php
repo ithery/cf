@@ -25,38 +25,40 @@ class CSocialLogin_OAuth2_Provider_GitlabProvider extends CSocialLogin_OAuth2_Ab
      */
     public function setBaseUrl($baseUrl) {
         $this->baseUrl = $baseUrl;
+
         return $this;
     }
 
     /**
-     * {@inheritdoc}
+     * @inheritdoc
      */
     protected function getAuthUrl($state) {
         return $this->buildAuthUrlFromBase($this->getBaseUrl() . 'oauth/authorize', $state);
     }
 
     /**
-     * {@inheritdoc}
+     * @inheritdoc
      */
     protected function getTokenUrl() {
         return $this->baseUrl . 'oauth/token';
     }
 
     /**
-     * {@inheritdoc}
+     * @inheritdoc
      */
     protected function getUserByToken($token) {
         $userUrl = $this->baseUrl . 'api/v3/user?access_token=' . $token;
         $response = $this->getHttpClient()->get($userUrl);
         $user = json_decode($response->getBody(), true);
+
         return $user;
     }
 
     /**
-     * {@inheritdoc}
+     * @inheritdoc
      */
     protected function mapUserToObject(array $user) {
-        return (new CSocialLogin_OAuth2_User)->setRaw($user)->map([
+        return (new CSocialLogin_OAuth2_User())->setRaw($user)->map([
             'id' => $user['id'],
             'nickname' => $user['username'],
             'name' => $user['name'],
@@ -66,7 +68,7 @@ class CSocialLogin_OAuth2_Provider_GitlabProvider extends CSocialLogin_OAuth2_Ab
     }
 
     /**
-     * {@inheritdoc}
+     * @inheritdoc
      */
     protected function getTokenFields($code) {
         return parent::getTokenFields($code) + ['grant_type' => 'authorization_code'];

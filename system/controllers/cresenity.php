@@ -8,7 +8,7 @@ class Controller_Cresenity extends CController {
     }
 
     public function cron() {
-        CJob::cliRunner();
+        CCron::run();
     }
 
     public function task() {
@@ -50,6 +50,7 @@ class Controller_Cresenity extends CController {
         $json = $disk->get($file);
 
         $ajaxMethod = CAjax::createMethod($json)->setArgs($args);
+
         $response = $ajaxMethod->executeEngine();
 
         return $response;
@@ -232,6 +233,9 @@ class Controller_Cresenity extends CController {
     }
 
     public function noimage($width = 200, $height = 150, $bg_color = 'EFEFEF', $txt_color = 'AAAAAA', $text = 'NO IMAGE') {
+        if (strlen($text) > 0) {
+            $text = urldecode($text);
+        }
         //Create the image resource
         $width = (int) $width;
         $height = (int) $height;
@@ -478,5 +482,18 @@ class Controller_Cresenity extends CController {
     public function clear() {
         CView::blade()->clearCompiled();
         CHTTP_FileServeDriver::clearPublic();
+    }
+
+    public function broadcast($method = null) {
+        $request = CHTTP::request();
+        if ($method == 'auth') {
+            if ($request->hasSession()) {
+                $request->session()->reflash();
+            }
+
+            return CBroadcast::manager()->driver()->auth($request);
+        }
+
+        return c::response('Cresenity Broadcasting Endpoint', 200);
     }
 }

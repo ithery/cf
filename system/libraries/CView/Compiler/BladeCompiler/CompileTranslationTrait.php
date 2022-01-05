@@ -1,15 +1,15 @@
 <?php
 
 /**
- * Description of CompileTranslationTrait
+ * Description of CompileTranslationTrait.
  *
  * @author Hery
  */
-trait CompilesTranslations {
+trait CView_Compiler_BladeCompiler_CompileTranslationTrait {
     /**
      * Compile the lang statements into valid PHP.
      *
-     * @param string|null $expression
+     * @param null|string $expression
      *
      * @return string
      */
@@ -20,7 +20,7 @@ trait CompilesTranslations {
             return "<?php \$__env->startTranslation{$expression}; ?>";
         }
 
-        return "<?php echo CF::lang()->get{$expression}; ?>";
+        return "<?php echo c::trans()->get{$expression}; ?>";
     }
 
     /**
@@ -40,6 +40,6 @@ trait CompilesTranslations {
      * @return string
      */
     protected function compileChoice($expression) {
-        return "<?php echo CF::lang()->choice{$expression}; ?>";
+        return "<?php echo c::trans()->choice{$expression}; ?>";
     }
 }

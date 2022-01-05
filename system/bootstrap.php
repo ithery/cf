@@ -10,12 +10,6 @@ defined('SYSPATH') or die('No direct access allowed.');
  */
 CPagination_Paginator::useBootstrap();
 
-/**
- * @author Hery Kurniawan
- * @license Ittron Global Teknologi <ittron.co.id>
- *
- * @since Apr 4, 2019, 9:20:01 PM
- */
 CBootstrap::instance()->addBootstrapper([
     CApp_Bootstrapper_DependencyChecker::class,
 ]);
@@ -51,11 +45,23 @@ CApp::registerComponent();
 CApp::registerControl();
 CFBenchmark::stop('CApp_Bootstrap');
 
-if (isset($_COOKIE['capp-profiler'])) {
+if (CHTTP::request()->cookie('capp-profiler')) {
     CProfiler::enable();
 }
-if (isset($_COOKIE['capp-debugbar'])) {
+if (CHTTP::request()->cookie('capp-debugbar')) {
     CDebug::bar()->enable();
 }
 
 CApp_Auth_Features::setFeatures(CF::config('app.auth.features'));
+
+if (CF::isTesting()) {
+    CEvent::dispatcher()->listen(CLogger_Event_MessageLogged::class, function (CLogger_Event_MessageLogged $event) {
+        if (isset($event->context['exception'])) {
+            CTesting::loggedExceptionCollection()->push($event->context['exception']);
+        }
+    });
+}
+
+//CView::blade()->component('dynamic-component', CView_Component_DynamicComponent::class);
+CView::blade()->component('icon', \CView_Component_IconComponent::class);
+c::manager()->icon()->registerIconDirectory('orchid', DOCROOT . 'media/img/icons/orchid/');

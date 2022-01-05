@@ -30,12 +30,13 @@ class CHTTP {
         if (self::$request == null) {
             self::$request = CHTTP_Request::capture();
         }
+
         return self::$request;
     }
 
     /**
-     * @param mixed $content
-     * @param mixed $status
+     * @param string $content
+     * @param int    $status
      *
      * @return CHTTP_Response
      */
@@ -103,6 +104,7 @@ class CHTTP {
         if (self::$kernel == null) {
             self::$kernel = new CHTTP_Kernel();
         }
+
         return self::$kernel;
     }
 
@@ -110,6 +112,9 @@ class CHTTP {
         return !static::$middlewareEnabled;
     }
 
+    /**
+     * @return CHTTP_Cookie
+     */
     public static function cookie() {
         if (static::$cookie == null) {
             $config = CF::config('cookie');
@@ -121,12 +126,18 @@ class CHTTP {
                 $config['same_site']
             );
         }
+
         return static::$cookie;
     }
 
     public static function setRequest(CHTTP_Request $request) {
         static::$request = $request;
         CRouting::urlGenerator()->setRequest(static::$request);
+        if (CF::isTesting()) {
+            $_POST = (array) $request->post();
+            $_GET = (array) $request->query();
+            $_REQUEST = array_merge($_GET, $_POST);
+        }
     }
 
     /**

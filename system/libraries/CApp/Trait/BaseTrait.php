@@ -178,13 +178,10 @@ trait CApp_Trait_BaseTrait {
     /**
      * User dari session CApp.
      *
-     * @return stdClass
+     * @return null|stdClass
      */
     public static function user() {
-        $session = self::session();
-        $user = $session->get('user');
-
-        return $user;
+        return c::app()->user();
     }
 
     /**
@@ -193,7 +190,7 @@ trait CApp_Trait_BaseTrait {
      * @return int
      */
     public static function userId() {
-        return c::get(self::user(), 'user_id');
+        return c::optional(self::user())->user_id;
     }
 
     /**

@@ -32,6 +32,7 @@ class CQueue_JobName {
         if (!empty($payload['displayName'])) {
             return $payload['displayName'];
         }
+
         return $name;
     }
 }

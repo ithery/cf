@@ -270,8 +270,7 @@ class CEvent_Dispatcher implements CEvent_DispatcherInterface {
      */
     public function getListeners($eventName) {
         if (is_array($eventName) || strlen($eventName) == 0) {
-            cdbg::varDump(cdbg::trace());
-            die;
+            throw new Exception('Invalid Event Name, ' . (is_array($eventName) ? json_encode($eventName) : ', Empty Session Name'));
         }
         $listeners = isset($this->listeners[$eventName]) ? $this->listeners[$eventName] : [];
         $listeners = array_merge(

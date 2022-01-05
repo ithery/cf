@@ -8,6 +8,8 @@ defined('SYSPATH') or die('No direct access allowed.');
  *
  * @since Feb 16, 2018, 10:58:20 PM
  */
+use Opis\Closure\SerializableClosure;
+
 abstract class CAjax_Engine implements CAjax_EngineInterface {
     /**
      * @var CAjax_Method
@@ -43,7 +45,7 @@ abstract class CAjax_Engine implements CAjax_EngineInterface {
     }
 
     /**
-     * Get Input
+     * Get Input.
      *
      * @return array
      */
@@ -59,7 +61,7 @@ abstract class CAjax_Engine implements CAjax_EngineInterface {
     }
 
     /**
-     * Get Data
+     * Get Data.
      *
      * @return array
      */
@@ -68,7 +70,7 @@ abstract class CAjax_Engine implements CAjax_EngineInterface {
     }
 
     /**
-     * Get Type
+     * Get Type.
      *
      * @return string
      */
@@ -77,11 +79,27 @@ abstract class CAjax_Engine implements CAjax_EngineInterface {
     }
 
     /**
-     * Get args
+     * Get args.
      *
      * @return array
      */
     public function getArgs() {
         return $this->ajaxMethod->getArgs();
+    }
+
+    public function toJsonResponse($errCode, $errMessage, $data = []) {
+        return c::response()->json([
+            'errCode' => $errCode,
+            'errMessage' => $errMessage,
+            'data' => $data,
+        ]);
+    }
+
+    public function invokeCallback($callback, array $args = []) {
+        if ($callback instanceof SerializableClosure) {
+            return $callback->__invoke(...$args);
+        }
+
+        return call_user_func_array($callback, $args);
     }
 }

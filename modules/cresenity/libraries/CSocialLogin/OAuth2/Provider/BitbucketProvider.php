@@ -26,29 +26,33 @@ class CSocialLogin_OAuth2_Provider_BitbucketProvider extends CSocialLogin_OAuth2
     protected $scopeSeparator = ' ';
 
     /**
-     * {@inheritdoc}
+     * @inheritdoc
      */
     protected function getAuthUrl($state) {
         return $this->buildAuthUrlFromBase('https://bitbucket.org/site/oauth2/authorize', $state);
     }
 
     /**
-     * {@inheritdoc}
+     * @inheritdoc
      */
     protected function getTokenUrl() {
         return 'https://bitbucket.org/site/oauth2/access_token';
     }
 
     /**
-     * {@inheritdoc}
+     * @inheritdoc
      */
     protected function getUserByToken($token) {
-        $userUrl = 'https://api.bitbucket.org/2.0/user?access_token=' . $token;
-        $response = $this->getHttpClient()->get($userUrl);
+        $response = $this->getHttpClient()->get('https://api.bitbucket.org/2.0/user', [
+            'query' => ['access_token' => $token],
+        ]);
+
         $user = json_decode($response->getBody(), true);
+
         if (in_array('email', $this->scopes)) {
             $user['email'] = $this->getEmailByToken($token);
         }
+
         return $user;
     }
 
@@ -57,16 +61,19 @@ class CSocialLogin_OAuth2_Provider_BitbucketProvider extends CSocialLogin_OAuth2
      *
      * @param string $token
      *
-     * @return string|null
+     * @return null|string
      */
     protected function getEmailByToken($token) {
         $emailsUrl = 'https://api.bitbucket.org/2.0/user/emails?access_token=' . $token;
+
         try {
             $response = $this->getHttpClient()->get($emailsUrl);
         } catch (Exception $e) {
             return;
         }
+
         $emails = json_decode($response->getBody(), true);
+
         foreach ($emails['values'] as $email) {
             if ($email['type'] == 'email' && $email['is_primary'] && $email['is_confirmed']) {
                 return $email['email'];
@@ -75,10 +82,10 @@ class CSocialLogin_OAuth2_Provider_BitbucketProvider extends CSocialLogin_OAuth2
     }
 
     /**
-     * {@inheritdoc}
+     * @inheritdoc
      */
     protected function mapUserToObject(array $user) {
-        return (new CSocialLogin_OAuth2_User)->setRaw($user)->map([
+        return (new CSocialLogin_OAuth2_User())->setRaw($user)->map([
             'id' => $user['uuid'],
             'nickname' => $user['username'],
             'name' => carr::get($user, 'display_name'),
@@ -95,23 +102,12 @@ class CSocialLogin_OAuth2_Provider_BitbucketProvider extends CSocialLogin_OAuth2
      * @return string
      */
     public function getAccessToken($code) {
-        $postKey = (version_compare(ClientInterface::VERSION, '6') === 1) ? 'form_params' : 'body';
         $response = $this->getHttpClient()->post($this->getTokenUrl(), [
             'auth' => [$this->clientId, $this->clientSecret],
             'headers' => ['Accept' => 'application/json'],
-            $postKey => $this->getTokenFields($code),
+            'form_params' => $this->getTokenFields($code),
         ]);
-        return json_decode($response->getBody(), true)['access_token'];
-    }
 
-    /**
-     * Get the POST fields for the token request.
-     *
-     * @param string $code
-     *
-     * @return array
-     */
-    protected function getTokenFields($code) {
-        return parent::getTokenFields($code) + ['grant_type' => 'authorization_code'];
+        return json_decode($response->getBody(), true)['access_token'];
     }
 }

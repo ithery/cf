@@ -2,7 +2,7 @@
 
 class CExporter_Event_AfterSheet extends CExporter_Event {
     /**
-     * @var Sheet
+     * @var CExporter_Sheet
      */
     public $sheet;
 

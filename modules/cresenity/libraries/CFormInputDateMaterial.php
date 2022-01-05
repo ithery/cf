@@ -38,11 +38,13 @@ class CFormInputDateMaterial extends CFormInput {
 
     public function set_have_button($boolean) {
         $this->have_button = $boolean;
+
         return $this;
     }
 
     public function set_start_date($str) {
         $this->start_date = $str;
+
         return $this;
     }
 
@@ -55,6 +57,7 @@ class CFormInputDateMaterial extends CFormInput {
         } else {
             $this->disable_day[] = $day;
         }
+
         return $this;
     }
 
@@ -71,10 +74,8 @@ class CFormInputDateMaterial extends CFormInput {
             $classes = ' ' . $classes;
         }
         $custom_css = $this->custom_css;
-        if ($this->bootstrap == '3') {
-            $classes = $classes . ' form-control ';
-        }
-        $custom_css = crenderer::render_style($custom_css);
+
+        $custom_css = $this->renderStyle($custom_css);
         if (strlen($custom_css) > 0) {
             $custom_css = ' style="' . $custom_css . '"';
         }
@@ -142,6 +143,7 @@ class CFormInputDateMaterial extends CFormInput {
         } else {
             $js->append("$('#" . $this->id . "').bootstrapMaterialDatePicker({ date: false });")->br();
         }
+
         return $js->text();
     }
 }

@@ -14,7 +14,7 @@ trait CQueue_Trait_InteractsWithQueue {
      *
      * @var CQueue_AbstractJob
      */
-    protected $job;
+    public $job;
 
     /**
      * Get the number of times the job has been attempted.
@@ -39,7 +39,7 @@ trait CQueue_Trait_InteractsWithQueue {
     /**
      * Fail the job from the queue.
      *
-     * @param \Throwable|null $exception
+     * @param null|\Throwable $exception
      *
      * @return void
      */
@@ -71,6 +71,7 @@ trait CQueue_Trait_InteractsWithQueue {
      */
     public function setJob(CQueue_AbstractJob $job) {
         $this->job = $job;
+
         return $this;
     }
 }

@@ -12,21 +12,16 @@ defined('SYSPATH') or die('No direct access allowed.');
 use Symfony\Component\HttpFoundation\ParameterBag;
 use Symfony\Component\HttpFoundation\Request as SymfonyRequest;
 
-/**
- * @method array validate(array $rules, ...$params)
- * @method array validateWithBag(string $errorBag, array $rules, ...$params)
- */
 class CHTTP_Request extends SymfonyRequest implements CInterface_Arrayable, ArrayAccess {
     use CHTTP_Trait_InteractsWithInput,
         CHTTP_Trait_InteractsWithContentTypes,
         CHTTP_Trait_InteractsWithFlashData;
-
     protected $browser;
 
     /**
      * The decoded JSON content for the request.
      *
-     * @var \Symfony\Component\HttpFoundation\ParameterBag|null
+     * @var null|\Symfony\Component\HttpFoundation\ParameterBag
      */
     protected $json;
 
@@ -52,7 +47,7 @@ class CHTTP_Request extends SymfonyRequest implements CInterface_Arrayable, Arra
     protected $routeResolver;
 
     /**
-     * Create a new Illuminate HTTP request from server variables.
+     * Create a new HTTP request from server variables.
      *
      * @return static
      */
@@ -148,9 +143,9 @@ class CHTTP_Request extends SymfonyRequest implements CInterface_Arrayable, Arra
      * Get a segment from the URI (1 based index).
      *
      * @param int         $index
-     * @param string|null $default
+     * @param null|string $default
      *
-     * @return string|null
+     * @return null|string
      */
     public function segment($index, $default = null) {
         return carr::get($this->segments(), $index - 1, $default);
@@ -258,7 +253,7 @@ class CHTTP_Request extends SymfonyRequest implements CInterface_Arrayable, Arra
     /**
      * Get the client IP address.
      *
-     * @return string|null
+     * @return null|string
      */
     public function ip() {
         return $this->getClientIp();
@@ -276,7 +271,7 @@ class CHTTP_Request extends SymfonyRequest implements CInterface_Arrayable, Arra
     /**
      * Get the client user agent.
      *
-     * @return string|null
+     * @return null|string
      */
     public function userAgent() {
         return $this->headers->get('User-Agent');
@@ -326,7 +321,7 @@ class CHTTP_Request extends SymfonyRequest implements CInterface_Arrayable, Arra
     /**
      * Get the JSON payload for the request.
      *
-     * @param string|null $key
+     * @param null|string $key
      * @param mixed       $default
      *
      * @return \Symfony\Component\HttpFoundation\ParameterBag|mixed
@@ -360,12 +355,12 @@ class CHTTP_Request extends SymfonyRequest implements CInterface_Arrayable, Arra
      * Create a new request instance from the given Laravel request.
      *
      * @param \CHTTP_Request      $from
-     * @param \CHTTP_Request|null $to
+     * @param null|\CHTTP_Request $to
      *
      * @return static
      */
     public static function createFrom(self $from, $to = null) {
-        $request = $to ?: new static;
+        $request = $to ?: new static();
 
         $files = $from->files->all();
 
@@ -397,14 +392,14 @@ class CHTTP_Request extends SymfonyRequest implements CInterface_Arrayable, Arra
     }
 
     /**
-     * Create an Illuminate request from a Symfony instance.
+     * Create an request from a Symfony instance.
      *
      * @param \Symfony\Component\HttpFoundation\Request $request
      *
      * @return static
      */
     public static function createFromBase(SymfonyRequest $request) {
-        $newRequest = (new static)->duplicate(
+        $newRequest = (new static())->duplicate(
             $request->query->all(),
             $request->request->all(),
             $request->attributes->all(),
@@ -423,7 +418,7 @@ class CHTTP_Request extends SymfonyRequest implements CInterface_Arrayable, Arra
     }
 
     /**
-     * {@inheritdoc}
+     * @inheritdoc
      */
     public function duplicate(array $query = null, array $request = null, array $attributes = null, array $cookies = null, array $files = null, array $server = null) {
         return parent::duplicate($query, $request, $attributes, $cookies, $this->filterFiles($files), $server);
@@ -457,9 +452,9 @@ class CHTTP_Request extends SymfonyRequest implements CInterface_Arrayable, Arra
     /**
      * Get the session associated with the request.
      *
-     * @return \Illuminate\Session\Store
-     *
      * @throws \RuntimeException
+     *
+     * @return \Illuminate\Session\Store
      */
     public function session() {
         if (!$this->hasSession()) {
@@ -472,7 +467,7 @@ class CHTTP_Request extends SymfonyRequest implements CInterface_Arrayable, Arra
     /**
      * Get the session associated with the request.
      *
-     * @return \CSession_Store|null
+     * @return null|\CSession_Store
      */
     public function getSession() {
         return $this->session;
@@ -492,7 +487,7 @@ class CHTTP_Request extends SymfonyRequest implements CInterface_Arrayable, Arra
     /**
      * Get the user making the request.
      *
-     * @param string|null $guard
+     * @param null|string $guard
      *
      * @return mixed
      */
@@ -503,10 +498,10 @@ class CHTTP_Request extends SymfonyRequest implements CInterface_Arrayable, Arra
     /**
      * Get the route handling the request.
      *
-     * @param string|null $param
+     * @param null|string $param
      * @param mixed       $default
      *
-     * @return \Illuminate\Routing\Route|object|string|null
+     * @return null|\CRouting_Route|object|string
      */
     public function route($param = null, $default = null) {
         $route = call_user_func($this->getRouteResolver());
@@ -521,9 +516,9 @@ class CHTTP_Request extends SymfonyRequest implements CInterface_Arrayable, Arra
     /**
      * Get a unique fingerprint for the request / route / IP address.
      *
-     * @return string
-     *
      * @throws \RuntimeException
+     *
+     * @return string
      */
     public function fingerprint() {
         if (!$route = $this->route()) {
@@ -555,8 +550,12 @@ class CHTTP_Request extends SymfonyRequest implements CInterface_Arrayable, Arra
      * @return \Closure
      */
     public function getUserResolver() {
-        return $this->userResolver ?: function () {
-            //
+        return $this->userResolver ?: function ($guard = null) {
+            if ($guard == null) {
+                $guard = c::app()->auth()->guardName();
+            }
+
+            return c::auth($guard)->user();
         };
     }
 
@@ -580,7 +579,6 @@ class CHTTP_Request extends SymfonyRequest implements CInterface_Arrayable, Arra
      */
     public function getRouteResolver() {
         return $this->routeResolver ?: function () {
-            //
         };
     }
 
@@ -615,6 +613,7 @@ class CHTTP_Request extends SymfonyRequest implements CInterface_Arrayable, Arra
      */
     public function offsetExists($offset) {
         $routeParameters = $this->route() ? $this->route()->parameters() : [];
+
         return carr::has(
             $this->all() + $routeParameters,
             $offset
@@ -680,7 +679,7 @@ class CHTTP_Request extends SymfonyRequest implements CInterface_Arrayable, Arra
     }
 
     /**
-     * Get Browser
+     * Get Browser.
      *
      * @return CBrowser
      */
@@ -688,6 +687,50 @@ class CHTTP_Request extends SymfonyRequest implements CInterface_Arrayable, Arra
         if ($this->browser == null) {
             $this->browser = new CBrowser($this->userAgent());
         }
+
         return $this->browser;
+    }
+
+    public function validate(array $rules, ...$params) {
+        return c::validator()->validate($this->all(), $rules, ...$params);
+    }
+
+    public function validateWithBag($errorBag, array $rules, ...$params) {
+        try {
+            return $this->validate($rules, ...$params);
+        } catch (CValidation_Exception $e) {
+            $e->errorBag = $errorBag;
+
+            throw $e;
+        }
+    }
+
+    public function hasValidSignature($absolute = true) {
+        return c::url()->hasValidSignature($this, $absolute);
+    }
+
+    public function hasValidRelativeSignature() {
+        return $this->hasValidSignature(false);
+    }
+
+    /**
+     * Returns the HTTP referrer, or the default if the referrer is not set.
+     *
+     * @param mixed $default
+     *
+     * @return string
+     */
+    public function referrer($default = false) {
+        if (!empty($this->server('HTTP_REFERER'))) {
+            // Set referrer
+            $ref = $this->server('HTTP_REFERER');
+
+            if (strpos($ref, curl::base(false)) === 0) {
+                // Remove the base URL from the referrer
+                $ref = substr($ref, strlen(curl::base(false)));
+            }
+        }
+
+        return isset($ref) ? $ref : $default;
     }
 }

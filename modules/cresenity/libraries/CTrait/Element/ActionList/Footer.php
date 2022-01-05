@@ -21,6 +21,7 @@ trait CTrait_Element_ActionList_Footer {
         if ($this->footerActionList != null) {
             return $this->footerActionList->childCount();
         }
+
         return 0;
     }
 
@@ -42,7 +43,8 @@ trait CTrait_Element_ActionList_Footer {
             $rowAct = CElement_Factory::createComponent('Action', $id);
         }
 
-        $this->footerActionList->add($rowAct);
+        $this->getFooterActionList()->add($rowAct);
+
         return $rowAct;
     }
 
@@ -52,7 +54,8 @@ trait CTrait_Element_ActionList_Footer {
      * @return $this
      */
     public function setFooterActionStyle($style) {
-        $this->footerActionList->setStyle($style);
+        $this->getFooterActionList()->setStyle($style);
+
         return $this;
     }
 
@@ -60,6 +63,10 @@ trait CTrait_Element_ActionList_Footer {
      * @return CElement_List_ActionList
      */
     public function getFooterActionList() {
+        if ($this->footerActionList == null) {
+            $this->footerActionList = CElement_Factory::createList('ActionList');
+        }
+
         return $this->footerActionList;
     }
 }

@@ -6,7 +6,6 @@
 //@codingStandardsIgnoreStart
 class CFormInputDate extends CFormInput {
     use CTrait_Compat_Element_FormInput_Date;
-
     protected $date_format;
 
     protected $have_button;
@@ -21,11 +20,8 @@ class CFormInputDate extends CFormInput {
 
     public function __construct($id) {
         parent::__construct($id);
-        if ($this->bootstrap == '3.3') {
-            CManager::instance()->register_module('bootstrap3-datepicker');
-        } else {
-            CManager::instance()->register_module('datepicker');
-        }
+
+        CManager::instance()->register_module('datepicker');
 
         $this->type = 'date';
         $this->date_format = 'yyyy-mm-dd';
@@ -50,16 +46,19 @@ class CFormInputDate extends CFormInput {
 
     public function set_have_button($boolean) {
         $this->have_button = $boolean;
+
         return $this;
     }
 
     public function setStartDate($str) {
         $this->startDate = $str;
+
         return $this;
     }
 
     public function set_end_date($str) {
         $this->end_date = $str;
+
         return $this;
     }
 
@@ -72,6 +71,7 @@ class CFormInputDate extends CFormInput {
         } else {
             $this->disable_day[] = $day;
         }
+
         return $this;
     }
 
@@ -93,10 +93,8 @@ class CFormInputDate extends CFormInput {
             $classes = ' ' . $classes;
         }
         $custom_css = $this->custom_css;
-        if ($this->bootstrap >= '3') {
-            $classes = $classes . ' form-control ';
-        }
-        $custom_css = crenderer::render_style($custom_css);
+
+        $custom_css = $this->renderStyle($custom_css);
         if (strlen($custom_css) > 0) {
             $custom_css = ' style="' . $custom_css . '"';
         }
@@ -106,13 +104,7 @@ class CFormInputDate extends CFormInput {
                         <span class="add-on"><i class="icon-th"></i></span>
                     </div>')->br();
         } else {
-            if ($this->bootstrap == '3.3') {
-                $html->appendln('<div class="input-group">')->br();
-            }
             $html->appendln('<input type="text" name="' . $this->name . '"  data-date-format="' . $this->date_format . '" id="' . $this->id . '" class="datepicker input-unstyled' . $classes . $this->validation->validation_class() . '" value="' . $this->value . '"' . $disabled . $addition_attribute . $custom_css . '>')->br();
-            if ($this->bootstrap == '3.3') {
-                $html->appendln('</div>');
-            }
         }
         //		$html->appendln('<input type="text" name="'.$this->name.'"  data-date-format="'.$this->date_format.'" id="'.$this->id.'" class="datepicker input-unstyled'.$classes.$this->validation->validation_class().'" value="'.$this->value.'"'.$disabled.$custom_css.'>')->br();
 
@@ -176,6 +168,7 @@ class CFormInputDate extends CFormInput {
         } else {
             $js->append("$('#" . $this->id . "').datepicker(" . $option . ');')->br();
         }
+
         return $js->text();
     }
 }

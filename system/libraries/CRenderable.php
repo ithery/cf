@@ -6,13 +6,13 @@ class CRenderable extends CObject implements CApp_Interface_Renderable {
     use CTrait_Compat_Renderable;
 
     /**
-     * Renderable Child Array
+     * Renderable Child Array.
      *
      * @var CRenderable[]
      */
     protected $renderable;
 
-    protected $additional_js;
+    protected $additionalJs;
 
     protected $visibility;
 
@@ -25,7 +25,7 @@ class CRenderable extends CObject implements CApp_Interface_Renderable {
 
         $this->renderable = new CCollection();
         $this->wrapper = $this;
-        $this->additional_js = '';
+        $this->additionalJs = '';
         $this->visibility = true;
         $this->parent = null;
     }
@@ -40,6 +40,7 @@ class CRenderable extends CObject implements CApp_Interface_Renderable {
 
     public function setParent($parent) {
         $this->parent = &$parent;
+
         return $this;
     }
 
@@ -48,7 +49,7 @@ class CRenderable extends CObject implements CApp_Interface_Renderable {
     }
 
     /**
-     * Apply call method or set property of all childs of this object
+     * Apply call method or set property of all childs of this object.
      *
      * @param string $key
      * @param mixed  $value
@@ -66,6 +67,7 @@ class CRenderable extends CObject implements CApp_Interface_Renderable {
                 }
             }
         }
+
         return $this;
     }
 
@@ -82,7 +84,8 @@ class CRenderable extends CObject implements CApp_Interface_Renderable {
     }
 
     public function addJs($js) {
-        $this->additional_js .= $js;
+        $this->additionalJs .= $js;
+
         return $this;
     }
 
@@ -91,13 +94,12 @@ class CRenderable extends CObject implements CApp_Interface_Renderable {
             if ($r instanceof CRenderable) {
                 $r->clear();
             }
-        }
-        foreach ($this->renderable as $r) {
             if ($r instanceof CObject) {
                 CObserver::instance()->remove($r);
             }
         }
         $this->renderable = [];
+
         return $this;
     }
 
@@ -131,7 +133,7 @@ class CRenderable extends CObject implements CApp_Interface_Renderable {
             }
 
             /**
-             * \Stringable available on PHP 8
+             * \Stringable available on PHP 8.
              */
             if ($r instanceof \Stringable) {
                 $r = $r->__toString();
@@ -145,6 +147,7 @@ class CRenderable extends CObject implements CApp_Interface_Renderable {
             $html->append($r);
         }
         $html->decIndent();
+
         return $html->text();
     }
 
@@ -159,7 +162,8 @@ class CRenderable extends CObject implements CApp_Interface_Renderable {
                 $js->append($r->js($js->getIndent()));
             }
         }
-        $js->append($this->additional_js);
+        $js->append($this->additionalJs);
+
         return $js->text();
     }
 
@@ -167,10 +171,10 @@ class CRenderable extends CObject implements CApp_Interface_Renderable {
         $data = [];
         $data['html'] = cmsg::flash_all() . $this->html();
         $data['js'] = base64_encode($this->js());
-        $data['js_require'] = CClientScript::instance()->urlJsFile();
-        $data['css_require'] = CClientScript::instance()->urlCssFile();
+        $data['js_require'] = CManager::asset()->getAllJsFileUrl();
+        $data['css_require'] = CManager::asset()->getAllCssFileUrl();
 
-        return CHelper::json()->encode($data);
+        return json_encode($data);
     }
 
     public function regenerateId($recursive = false) {
@@ -185,7 +189,8 @@ class CRenderable extends CObject implements CApp_Interface_Renderable {
     }
 
     public function toArray() {
-        $arrays = [];
+        $data = parent::toArray();
+        $data['visibility'] = $this->visibility;
         foreach ($this->renderable as $r) {
             if ($r instanceof CRenderable) {
                 $arrays[] = $r->toArray();
@@ -193,10 +198,11 @@ class CRenderable extends CObject implements CApp_Interface_Renderable {
                 $arrays[] = $r;
             }
         }
-        $data = [];
+
         if (!empty($arrays)) {
             $data['children'] = $arrays;
         }
+
         return $data;
     }
 
@@ -222,6 +228,8 @@ class CRenderable extends CObject implements CApp_Interface_Renderable {
      * Register a renderable created listener with the CApp.
      *
      * @param \Closure $callback
+     *
+     * @deprecated 1.2
      *
      * @return void
      */
@@ -251,6 +259,13 @@ class CRenderable extends CObject implements CApp_Interface_Renderable {
         foreach ($styles as $k => $v) {
             $ret .= $k . ':' . $v . ';';
         }
+
         return $ret;
+    }
+
+    public function detach() {
+        $this->parent = null;
+
+        return $this;
     }
 }

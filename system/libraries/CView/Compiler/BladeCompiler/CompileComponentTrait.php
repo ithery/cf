@@ -24,7 +24,9 @@ trait CView_Compiler_BladeCompiler_CompileComponentTrait {
      * @return string
      */
     protected function compileComponent($expression) {
-        list($component, $alias, $data) = strpos($expression, ',') !== false ? array_map('trim', explode(',', trim($expression, '()'), 3)) + ['', '', ''] : [trim($expression, '()'), '', ''];
+        list($component, $alias, $data) = strpos($expression, ',') !== false
+                    ? array_map('trim', explode(',', trim($expression, '()'), 3)) + ['', '', '']
+                    : [trim($expression, '()'), '', ''];
 
         $component = trim($component, '\'"');
 
@@ -76,15 +78,7 @@ trait CView_Compiler_BladeCompiler_CompileComponentTrait {
      * @return string
      */
     protected function compileEndComponent() {
-        $hash = array_pop(static::$componentHashStack);
-
-        return implode("\n", [
-            '<?php if (isset($__componentOriginal' . $hash . ')): ?>',
-            '<?php $component = $__componentOriginal' . $hash . '; ?>',
-            '<?php unset($__componentOriginal' . $hash . '); ?>',
-            '<?php endif; ?>',
-            '<?php echo $__env->renderComponent(); ?>',
-        ]);
+        return '<?php echo $__env->renderComponent(); ?>';
     }
 
     /**
@@ -93,7 +87,13 @@ trait CView_Compiler_BladeCompiler_CompileComponentTrait {
      * @return string
      */
     public function compileEndComponentClass() {
+        $hash = array_pop(static::$componentHashStack);
+
         return $this->compileEndComponent() . "\n" . implode("\n", [
+            '<?php endif; ?>',
+            '<?php if (isset($__componentOriginal' . $hash . ')): ?>',
+            '<?php $component = $__componentOriginal' . $hash . '; ?>',
+            '<?php unset($__componentOriginal' . $hash . '); ?>',
             '<?php endif; ?>',
         ]);
     }
@@ -158,6 +158,20 @@ trait CView_Compiler_BladeCompiler_CompileComponentTrait {
     }
 
     /**
+     * Compile the aware statement into valid PHP.
+     *
+     * @param string $expression
+     *
+     * @return string
+     */
+    protected function compileAware($expression) {
+        return "<?php foreach ({$expression} as \$__key => \$__value) {
+    \$__consumeVariable = is_string(\$__key) ? \$__key : \$__value;
+    \$\$__consumeVariable = is_string(\$__key) ? \$__env->getConsumableComponentData(\$__key, \$__value) : \$__env->getConsumableComponentData(\$__value);
+} ?>";
+    }
+
+    /**
      * Sanitize the given component attribute value.
      *
      * @param mixed $value
@@ -165,7 +179,13 @@ trait CView_Compiler_BladeCompiler_CompileComponentTrait {
      * @return mixed
      */
     public static function sanitizeComponentAttribute($value) {
+        if (is_object($value) && $value instanceof CBase_Contract_CanBeEscapedWhenCastToStringInterface) {
+            return $value->escapeWhenCastingToString();
+        }
+
         return is_string($value)
-            || (is_object($value) && !$value instanceof CView_ComponentAttributeBag && method_exists($value, '__toString')) ? c::e($value) : $value;
+               || (is_object($value) && !$value instanceof CView_ComponentAttributeBag && method_exists($value, '__toString'))
+                        ? c::e($value)
+                        : $value;
     }
 }

@@ -7,13 +7,13 @@
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  */
+
 namespace PHPUnit\Framework\Attributes;
 
 use Attribute;
 
 #[Attribute(Attribute::TARGET_CLASS | Attribute::TARGET_METHOD)]
-class RequiresPhp
-{
+class RequiresPhp {
     /**
      * @var string
      */
@@ -26,20 +26,20 @@ class RequiresPhp
 
     /**
      * @psalm-param '<'|'lt'|'<='|'le'|'>'|'gt'|'>='|'ge'|'=='|'='|'eq'|'!='|'<>'|'ne' $operator
+     *
+     * @param mixed $version
+     * @param mixed $operator
      */
-    public function __construct($version, $operator = '>=')
-    {
-        $this->version  = $version;
+    public function __construct($version, $operator = '>=') {
+        $this->version = $version;
         $this->operator = $operator;
     }
 
-    public function version()
-    {
+    public function version() {
         return $this->version;
     }
 
-    public function operator()
-    {
+    public function operator() {
         return $this->operator;
     }
 }

@@ -27,6 +27,7 @@ trait CObservable_Javascript_JQuery_Trait_EventsTrait {
         }
         $statement = $this->jQueryStatement()->event('click', $statements, $options);
         $this->resetJQueryStatement();
+
         return $this;
     }
 
@@ -38,6 +39,7 @@ trait CObservable_Javascript_JQuery_Trait_EventsTrait {
         $statement = $this->jQueryStatement()->event('change', $statements, $options);
 
         $this->resetJQueryStatement();
+
         return $this;
     }
 }

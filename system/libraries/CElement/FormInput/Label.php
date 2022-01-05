@@ -1,6 +1,8 @@
 <?php
 
 class CElement_FormInput_Label extends CElement_FormInput {
+    use CTrait_Element_Property_DependsOn;
+
     public function __construct($id) {
         parent::__construct($id);
 
@@ -31,10 +33,7 @@ class CElement_FormInput_Label extends CElement_FormInput {
             $custom_css = ' style="' . $custom_css . '"';
         }
         $bootstrap_class = '';
-        if ($this->bootstrap >= '3') {
-            $bootstrap_class = ' label-default ';
-            $html->appendln('<h4>');
-        }
+
         if (is_array($this->value)) {
             $i = 0;
             foreach ($this->value as $val) {
@@ -52,9 +51,7 @@ class CElement_FormInput_Label extends CElement_FormInput {
             }
             $html->appendln('<span class="label ' . $bootstrap_class . $classes . '" name="' . $this->name . '" id="' . $this->id . '" ' . $custom_css . '>' . $new_val . '</span>')->br();
         }
-        if ($this->bootstrap >= '3') {
-            $html->appendln('</h4>');
-        }
+
         return $html->text();
     }
 
@@ -62,6 +59,7 @@ class CElement_FormInput_Label extends CElement_FormInput {
         $js = new CStringBuilder();
 
         $js->append(parent::js());
+        $js->append($this->getDependsOnContentJavascript());
 
         return $js->text();
     }

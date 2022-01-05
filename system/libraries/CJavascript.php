@@ -146,4 +146,15 @@ class CJavascript {
     public static function functionStatement($functionName, $functionParameter = []) {
         return CJavascript_StatementFactory::createFunction($functionName, $functionParameter);
     }
+
+    /**
+     * @param mixed $operand1
+     * @param mixed $operator
+     * @param mixed $operand2
+     *
+     * @return CJavascript_Statement_IfStatement
+     */
+    public static function ifStatement($operand1, $operator, $operand2) {
+        return CJavascript_StatementFactory::createIf($operand1, $operator, $operand2);
+    }
 }

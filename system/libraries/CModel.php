@@ -270,7 +270,7 @@ abstract class CModel implements ArrayAccess, CInterface_Arrayable, CInterface_J
      * @return void
      */
     public function __construct(array $attributes = []) {
-        $this->primaryKey = $this->table . '_id';
+        $this->primaryKey = $this->table ? $this->table . '_id' : 'id';
         $this->bootIfNotBooted();
 
         $this->syncOriginal();
@@ -1193,7 +1193,7 @@ abstract class CModel implements ArrayAccess, CInterface_Arrayable, CInterface_J
      *
      * @param null|array $except
      *
-     * @return \CModel
+     * @return \static
      */
     public function replicate(array $except = null) {
         $defaults = [

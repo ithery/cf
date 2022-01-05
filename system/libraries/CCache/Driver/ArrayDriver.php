@@ -8,8 +8,15 @@ defined('SYSPATH') or die('No direct access allowed.');
  *
  * @since Aug 19, 2019, 12:38:07 PM
  */
-class CCache_Driver_ArrayDriver extends CCache_DriverAbstract implements CCache_LockProviderInterface {
+class CCache_Driver_ArrayDriver extends CCache_DriverTaggableAbstract implements CCache_LockProviderInterface {
     use CTrait_Helper_InteractsWithTime, CCache_Trait_RetrievesMultipleKeys;
+
+    /**
+     * The array of locks.
+     *
+     * @var array
+     */
+    public $locks = [];
 
     /**
      * The array of stored values.
@@ -17,6 +24,25 @@ class CCache_Driver_ArrayDriver extends CCache_DriverAbstract implements CCache_
      * @var array
      */
     protected $storage = [];
+
+    /**
+     * Indicates if values are serialized within the store.
+     *
+     * @var bool
+     */
+    protected $serializesValues;
+
+    /**
+     * Create a new Array store.
+     *
+     * @param array $options
+     *
+     * @return void
+     */
+    public function __construct($options = []) {
+        parent::__construct($options);
+        $this->serializesValues = carr::get($options, 'serializes_values', false);
+    }
 
     /**
      * Retrieve an item from the cache by key.
@@ -33,9 +59,11 @@ class CCache_Driver_ArrayDriver extends CCache_DriverAbstract implements CCache_
         $expiresAt = isset($item['expiresAt']) ? $item['expiresAt'] : 0;
         if ($expiresAt !== 0 && $this->currentTime() > $expiresAt) {
             $this->forget($key);
+
             return;
         }
-        return $item['value'];
+
+        return $this->serializesValues ? unserialize($item['value']) : $item['value'];
     }
 
     /**
@@ -49,9 +77,10 @@ class CCache_Driver_ArrayDriver extends CCache_DriverAbstract implements CCache_
      */
     public function put($key, $value, $seconds) {
         $this->storage[$key] = [
-            'value' => $value,
+            'value' => $this->serializesValues ? serialize($value) : $value,
             'expiresAt' => $this->calculateExpiration($seconds),
         ];
+
         return true;
     }
 
@@ -64,12 +93,17 @@ class CCache_Driver_ArrayDriver extends CCache_DriverAbstract implements CCache_
      * @return int
      */
     public function increment($key, $value = 1) {
-        if (!isset($this->storage[$key])) {
-            $this->forever($key, $value);
-            return $this->storage[$key]['value'];
+        if (!is_null($existing = $this->get($key))) {
+            return c::tap(((int) $existing) + $value, function ($incremented) use ($key) {
+                $value = $this->serializesValues ? serialize($incremented) : $incremented;
+
+                $this->storage[$key]['value'] = $value;
+            });
         }
-        $this->storage[$key]['value'] = ((int) $this->storage[$key]['value']) + $value;
-        return $this->storage[$key]['value'];
+
+        $this->forever($key, $value);
+
+        return $value;
     }
 
     /**
@@ -106,8 +140,10 @@ class CCache_Driver_ArrayDriver extends CCache_DriverAbstract implements CCache_
     public function forget($key) {
         if (array_key_exists($key, $this->storage)) {
             unset($this->storage[$key]);
+
             return true;
         }
+
         return false;
     }
 
@@ -118,6 +154,7 @@ class CCache_Driver_ArrayDriver extends CCache_DriverAbstract implements CCache_
      */
     public function flush() {
         $this->storage = [];
+
         return true;
     }
 
@@ -157,9 +194,9 @@ class CCache_Driver_ArrayDriver extends CCache_DriverAbstract implements CCache_
      *
      * @param string      $name
      * @param int         $seconds
-     * @param string|null $owner
+     * @param null|string $owner
      *
-     * @return CCache_LockInterface
+     * @return CCache_LockAbstract
      */
     public function lock($name, $seconds = 0, $owner = null) {
         return new CCache_Lock_ArrayLock($this, $name, $seconds, $owner);
@@ -171,7 +208,7 @@ class CCache_Driver_ArrayDriver extends CCache_DriverAbstract implements CCache_
      * @param string $name
      * @param string $owner
      *
-     * @return CCache_LockInterface
+     * @return CCache_LockAbstract
      */
     public function restoreLock($name, $owner) {
         return $this->lock($name, 0, $owner);

@@ -21,23 +21,30 @@ trait CApp_Concern_VariablesTrait {
     public static function variables() {
         /** @var CApp $this */
         $variables = [];
-        $variables['decimal_separator'] = ccfg::get('decimal_separator') === null ? '.' : ccfg::get('decimal_separator');
-        $variables['decimalSeparator'] = ccfg::get('decimal_separator') === null ? '.' : ccfg::get('decimal_separator');
-        $variables['thousand_separator'] = ccfg::get('thousand_separator') === null ? ',' : ccfg::get('thousand_separator');
-        $variables['thousandSeparator'] = ccfg::get('thousand_separator') === null ? ',' : ccfg::get('thousand_separator');
-        $variables['decimal_digit'] = ccfg::get('decimal_digit') === null ? '0' : ccfg::get('decimal_digit');
-        $variables['decimalDigit'] = ccfg::get('decimal_digit') === null ? '0' : ccfg::get('decimal_digit');
+        $variables['decimal_separator'] = $variables['decimalSeparator'] = static::formatter()->getDecimalSeparator();
+        $variables['thousand_separator'] = $variables['thousandSeparator'] = static::formatter()->getThousandSeparator();
+        $variables['decimal_digit'] = $variables['decimalDigit'] = static::formatter()->getDecimalDigit();
+
+        $variables['format'] = [];
+        $variables['format']['decimalSeparator'] = static::formatter()->getDecimalSeparator();
+        $variables['format']['thousandSeparator'] = static::formatter()->getThousandSeparator();
+        $variables['format']['decimalDigit'] = static::formatter()->getDecimalDigit();
+        $variables['format']['date'] = static::formatter()->getDatetimeFormat();
+        $variables['format']['datetime'] = static::formatter()->getDateFormat();
         $variables['have_clock'] = ccfg::get('have_clock') === null ? false : ccfg::get('have_clock');
         $variables['haveClock'] = ccfg::get('have_clock') === null ? false : ccfg::get('have_clock');
-        $variables['have_scroll_to_top'] = static::haveScrollToTop();
-        $variables['haveScrollToTop'] = static::haveScrollToTop();
+        $variables['have_scroll_to_top'] = $variables['haveScrollToTop'] = CF::config('cresjs', 'scroll_to_top');
         $variables['CFVersion'] = CF::version();
         $variables['domain'] = CF::domain();
         $variables['appCode'] = CF::appCode();
         $variables['appId'] = CF::appId();
         $variables['debug'] = CF::isDevSuite();
-        $variables['environment'] = CF::config('app.environment');
+        $variables['environment'] = CF::environment();
 
+        $variables['vscode'] = [];
+        $variables['vscode']['liveReload'] = CF::config('cresjs.vscode.live_reload');
+        $variables['react'] = [];
+        $variables['react']['enable'] = CF::config('cresjs.react.enable');
         $bootstrap = ccfg::get('bootstrap');
         $themeData = CManager::instance()->getThemeData();
         if (isset($themeData) && strlen(carr::get($themeData, 'bootstrap')) > 0) {

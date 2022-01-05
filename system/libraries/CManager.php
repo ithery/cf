@@ -4,6 +4,7 @@ defined('SYSPATH') or die('No direct access allowed.');
 
 final class CManager {
     use CTrait_Compat_Manager;
+
     protected $controls = [];
 
     protected $controlsCode = [];
@@ -11,12 +12,6 @@ final class CManager {
     protected $elements = [];
 
     protected $elements_code = [];
-
-    protected $is_mobile = false;
-
-    protected $mobile_path = '';
-
-    protected $theme_data = null;
 
     protected static $langObjectCallback = null;
 
@@ -55,17 +50,7 @@ final class CManager {
         return self::$instance;
     }
 
-    public function __construct() {
-        $this->is_mobile = false;
-        $this->mobile_path = '';
-
-        //$theme = ccfg::get('theme');
-        //if ($theme == null) $theme = 'cresenity';
-        // $theme = static::theme()->getCurrentTheme();
-        // $theme_file = CF::getFile('themes', $theme);
-        // if (file_exists($theme_file)) {
-        //     $this->theme_data = include $theme_file;
-        // }
+    private function __construct() {
     }
 
     /**
@@ -286,37 +271,6 @@ final class CManager {
         return call_user_func([$class, 'factory'], ($id));
     }
 
-    /**
-     * @param string $path
-     *
-     * @return $this
-     *
-     * @deprecated since 1.2, dont use this anymore
-     */
-    public function setMobilePath($path) {
-        $this->mobile_path = $path;
-
-        return $this;
-    }
-
-    /**
-     * @return string
-     *
-     * @deprecated  since 1.2 dont use this anymore
-     */
-    public function getMobilePath() {
-        return $this->mobile_path;
-    }
-
-    /**
-     * @return bool
-     *
-     * @deprecated since 1.2 dont use this anymore
-     */
-    public function isMobile() {
-        return $this->is_mobile;
-    }
-
     public static function lang() {
         if (self::$langObjectCallback != null) {
             return call_user_func(self::$langObjectCallback);
@@ -412,5 +366,16 @@ final class CManager {
      */
     public static function view() {
         return CView_Factory::instance();
+    }
+
+    /**
+     * @return CManager_Icon
+     */
+    public static function icon() {
+        return CManager_Icon::instance();
+    }
+
+    public static function createModelDataProvider($model, $queryCallback = null) {
+        return new CManager_DataProvider_ModelDataProvider($model, $queryCallback);
     }
 }

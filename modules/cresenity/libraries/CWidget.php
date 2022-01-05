@@ -8,15 +8,6 @@ defined('SYSPATH') or die('No direct access allowed.');
  */
 // @codingStandardsIgnoreStart
 class CWidget extends CElement_Element {
-    protected $header_action_list;
-
-    /**
-     * Undocumented variable
-     *
-     * @var CFormInput
-     */
-    protected $switcher;
-
     public $title;
 
     public $content;
@@ -42,6 +33,15 @@ class CWidget extends CElement_Element {
     public $height;
 
     public $attr;
+
+    protected $header_action_list;
+
+    /**
+     * Undocumented variable.
+     *
+     * @var CFormInput
+     */
+    protected $switcher;
 
     private $collapse;
 
@@ -84,10 +84,9 @@ class CWidget extends CElement_Element {
 
     public function add_header_action($id = '') {
         $row_act = CAction::factory($id);
-        if ($this->bootstrap == '3.3') {
-            $row_act->add_class('btn-xs');
-        }
+
         $this->header_action_list->add($row_act);
+
         return $row_act;
     }
 
@@ -95,6 +94,7 @@ class CWidget extends CElement_Element {
         $row_acts = CActionList::factory($id);
         $row_acts->set_style('btn-dropdown');
         $this->header_action_list->add($row_acts);
+
         return $row_acts;
     }
 
@@ -120,51 +120,61 @@ class CWidget extends CElement_Element {
             $title = clang::__($title);
         }
         $this->title = $title;
+
         return $this;
     }
 
     public function set_height($height) {
         $this->height = $height;
+
         return $this;
     }
 
     public function set_icon($icon) {
         $this->icon = $icon;
+
         return $this;
     }
 
     public function set_scroll($bool) {
         $this->scroll = $bool;
+
         return $this;
     }
 
     public function set_nopadding($bool) {
         $this->nopadding = $bool;
+
         return $this;
     }
 
     public function set_wrapped($bool) {
         $this->wrapped = $bool;
+
         return $this;
     }
 
     public function set_info($info) {
         $this->info = $info;
+
         return $this;
     }
 
     public function add_html($custom_html) {
         $this->custom_html = $custom_html;
+
         return $this;
     }
 
     public function set_info_tip($info_tip) {
         $this->info_tip = $info_tip;
+
         return $this;
     }
 
     public function add_content_attr($k, $v) {
         $this->attr[$k] = $v;
+
         return $this;
     }
 
@@ -179,11 +189,13 @@ class CWidget extends CElement_Element {
     public function set_collapse($collapse, $js_collapse = false) {
         $this->collapse = $collapse;
         $this->js_collapse = $js_collapse;
+
         return $this;
     }
 
     public function set_close($close) {
         $this->close = $close;
+
         return $this;
     }
 
@@ -197,25 +209,12 @@ class CWidget extends CElement_Element {
         $main_class_content = ' widget-content ';
         $class_title = '';
 
-        // keep in mind with project biota, use this and bootstrap = 3
-        if ($this->bootstrap >= '3') {
-            $main_class = ' box box-info ';
-            $main_class_title = ' box-header with-border ';
-            $main_class_content = ' box-body ';
-            $class_title = ' box-title ';
-        }
-
         if ($this->header_action_style == 'btn-dropdown') {
             $this->header_action_list->add_class('pull-right');
         }
         if ($this->wrapped) {
-            if ($this->bootstrap > '3') {
-                $html->appendln('<div class="row">
-				<div class="col-md-' . $this->span . '">');
-            } else {
-                $html->appendln('<div class="row-fluid">
+            $html->appendln('<div class="row-fluid">
 				<div class="span' . $this->span . '">');
-            }
         }
         $nopadding = '';
         if ($this->nopadding) {
@@ -235,54 +234,22 @@ class CWidget extends CElement_Element {
             $classes = ' ' . $classes;
         }
         $custom_css = $this->custom_css;
-        $custom_css = crenderer::render_style($custom_css);
+        $custom_css = $this->renderStyle($custom_css);
         $html->appendln('<div id="' . $this->id . '" class="' . $main_class . $classes . '" style="' . $custom_css . '">');
         $html->appendln('	<div class="' . $main_class_title . '">');
-        if ($this->bootstrap >= '3') {
-            $html->appendln('       <span class="icon pull-left">');
-        } else {
-            $html->appendln('       <span class="icon">');
-        }
-        if ($this->bootstrap >= '3') {
-            $html->appendln('		<i class="glyphicon glyphicon-' . $this->icon . '"></i>');
-        } else {
-            $html->appendln('		<i class="icon-' . $this->icon . '"></i>');
-        }
-        $html->appendln('		</span>');
-        if ($this->bootstrap >= '3') {
-            $box_tools = false;
-            if ($this->collapse || $this->close) {
-                $box_tools = true;
-            }
 
-            if ($box_tools == true) {
-                $html->appendln('<div class="box-tools pull-right">');
-                if ($this->collapse) {
-                    $html->appendln('<button class="btn btn-info btn-sm" data-widget="collapse" data-toggle="tooltip" title="Collapse">');
-                    $html->appendln('<i class="fa fa-minus"></i>');
-                    $html->appendln('</button>');
-                }
-                if ($this->close) {
-                    $html->appendln('<button class="btn btn-info btn-sm" data-widget="remove" data-toggle="tooltip" title="Remove">');
-                    $html->appendln('<i class="fa fa-times"></i>');
-                    $html->appendln('</button>');
-                }
-                $html->appendln('</div>');
-            }
-            $html->appendln('		<h3 class="box-title">' . $this->title . '</h3>');
-        } else {
-            $html->appendln('       <h5>' . $this->title . '</h5>');
-        }
+        $html->appendln('       <span class="icon">');
+
+        $html->appendln('		<i class="icon-' . $this->icon . '"></i>');
+
+        $html->appendln('		</span>');
+
+        $html->appendln('       <h5>' . $this->title . '</h5>');
+
         $html->appendln('		' . $custom_html . '');
         $html->appendln('		' . $info . '');
         if ($this->have_header_action()) {
-            if ($this->bootstrap >= '3') {
-                $html->appendln('<div class="box-tools pull-right">');
-                $html->appendln($this->header_action_list->html($html->get_indent()));
-                $html->appendln('</div>');
-            } else {
-                $html->appendln($this->header_action_list->html($html->get_indent()));
-            }
+            $html->appendln($this->header_action_list->html($html->get_indent()));
         }
 
         if ($this->have_switcher()) {
@@ -319,6 +286,7 @@ class CWidget extends CElement_Element {
             $html->appendln('</div>
 			</div>');
         }
+
         return $html->text();
     }
 
@@ -331,14 +299,14 @@ class CWidget extends CElement_Element {
 
         if ($this->have_switcher()) {
             $js->appendln('
-                if (jQuery("#' . $this->switcher->get_field_id() . '").prop("checked")) {
+                if (jQuery("#' . $this->switcher->getFieldId() . '").prop("checked")) {
                     jQuery("#' . $this->id . '").find(".widget-content").show();
                 } else {
                     jQuery("#' . $this->id . '").find(".widget-content").hide();
                 }
 
-                jQuery("#' . $this->switcher->get_field_id() . '").click(function() {
-                    if (jQuery("#' . $this->switcher->get_field_id() . '").prop("checked")) {
+                jQuery("#' . $this->switcher->getFieldId() . '").click(function() {
+                    if (jQuery("#' . $this->switcher->getFieldId() . '").prop("checked")) {
                         jQuery("#' . $this->id . '").find(".widget-content").show();
                     } else {
                         jQuery("#' . $this->id . '").find(".widget-content").hide();
@@ -347,28 +315,8 @@ class CWidget extends CElement_Element {
             ');
         }
 
-        if ($this->bootstrap >= '3') {
-            if ($this->js_collapse == true) {
-                if ($this->collapse) {
-                    $js->appendln('jQuery("#' . $this->id . ' button[data-widget=\"collapse\"]").on("click", function(){
-                                var box = jQuery(this).parents(".box").first();
-                                if (box.hasClass("collapsed-box")){
-                                    box.find("> .box-body, > .box-footer").slideDown();
-                                    box.removeClass("collapsed-box");
-                                    jQuery(this).children(".fa").removeClass("fa-plus");
-                                    jQuery(this).children(".fa").addClass("fa-minus");
-                                }
-                                else {
-                                    box.find("> .box-body, > .box-footer").slideUp();
-                                    box.addClass("collapsed-box");
-                                    jQuery(this).children(".fa").addClass("fa-plus");
-                                    jQuery(this).children(".fa").removeClass("fa-minus");
-                                }
-                            });');
-                }
-            }
-        }
-        $js->append($this->js_child($js->get_indent()));
+        $js->append($this->jsChild($js->getIndent()));
+
         return $js->text();
     }
 }

@@ -9,5 +9,4 @@ namespace Psr\SimpleCache;
  * this interface
  */
 interface InvalidArgumentException extends CacheException {
-    
 }

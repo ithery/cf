@@ -1,7 +1,7 @@
 <?php
 
 /**
- * Description of MethodValidator
+ * Description of MethodValidator.
  *
  * @author Hery
  */

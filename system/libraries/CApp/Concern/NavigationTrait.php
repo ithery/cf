@@ -56,10 +56,10 @@ trait CApp_Concern_NavigationTrait {
             $layout = carr::get($renderer, 'layout', 'horizontal');
 
             $engineClassName = 'CApp_Navigation_Engine_' . $engine;
-            $renderer = CContainer::getInstance()->make($engineClassName);
+            $renderer = c::container($engineClassName);
         }
         if (is_string($renderer) && class_exists($renderer)) {
-            $renderer = CContainer::getInstance()->make($renderer);
+            $renderer = c::container($renderer);
         }
 
         if ($renderer instanceof Closure || is_callable($renderer)) {

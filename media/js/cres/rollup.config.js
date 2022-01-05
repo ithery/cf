@@ -9,9 +9,10 @@ import resolve from 'rollup-plugin-node-resolve';
 import outputManifest from 'rollup-plugin-output-manifest';
 import postcss from 'rollup-plugin-postcss';
 import nodePolyfills from 'rollup-plugin-polyfill-node';
+import serve from 'rollup-plugin-serve';
+import livereload from 'rollup-plugin-livereload';
 // eslint-disable-next-line no-process-env
 const isProduction = process.env.NODE_ENV === 'production';
-
 
 export default {
     input: 'src/index.js',
@@ -19,7 +20,15 @@ export default {
         format: 'umd',
         sourcemap: true,
         name: 'Cresenity',
-        file: 'dist/cres.js'
+        file: isProduction ? 'dist/cres.js' : 'public/cres.js'
+    },
+
+    onwarn(warning, warn) {
+        // suppress eval warnings
+        if (warning.code === 'EVAL') {return;}
+        // suppress circular dependency warnings
+        if (warning.code === 'CIRCULAR_DEPENDENCY') {return;}
+        warn(warning);
     },
     plugins: [
 
@@ -38,7 +47,7 @@ export default {
             // modules: true,
         }),
         filesize(),
-        terser({
+        isProduction && terser({
             mangle: false,
             compress: {
                 // eslint-disable-next-line camelcase
@@ -64,7 +73,13 @@ export default {
                 });
             }
         }),
-        nodePolyfills()
+        nodePolyfills(),
+        !isProduction && serve({
+            contentBase: 'public'
+        }),
+        !isProduction && livereload({
+            watch: 'public',
+            port: 12345
+        })
     ]
-}
-;
+};

@@ -14,6 +14,7 @@ use Countable;
 use function sprintf;
 use PHPUnit\Framework\SelfDescribing;
 use SebastianBergmann\Exporter\Exporter;
+use PHPUnit\Framework\Constraint\Operator\Operator;
 use SebastianBergmann\Comparator\ComparisonFailure;
 use PHPUnit\Framework\Exception\ExpectationFailedException;
 

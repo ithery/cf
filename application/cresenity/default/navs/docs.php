@@ -133,6 +133,11 @@ return [
                 'label' => c::__('Daemon'),
                 'uri' => 'docs/module/daemon',
             ],
+            [
+                'name' => 'module.cron',
+                'label' => c::__('Cron'),
+                'uri' => 'docs/module/cron',
+            ],
         ]
     ],
     [

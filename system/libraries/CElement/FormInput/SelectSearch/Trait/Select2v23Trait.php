@@ -1,11 +1,17 @@
 <?php
 
+/**
+ * @see CElement_FormInput_SelectSearch
+ */
 trait CElement_FormInput_SelectSearch_Trait_Select2v23Trait {
     public function htmlSelect2v23($indent = 0) {
         return '<input type="text" name="' . $this->name . '" id="' . $this->id . '" class="input-unstyled validate[]" value="' . $this->value . '">';
     }
 
     public function jsSelect2v23($indent = 0) {
+        if ($this->value > 0) {
+            $this->autoSelect = true;
+        }
         $ajaxUrl = $this->createAjaxUrl();
 
         $strSelection = $this->formatSelection;
@@ -79,7 +85,15 @@ trait CElement_FormInput_SelectSearch_Trait_Select2v23Trait {
         if (strlen($dropdownClasses) > 0) {
             $dropdownClasses = ' ' . $dropdownClasses;
         }
+        $additionalRequestDataJs = '';
+        foreach ($this->dependsOn as $index => $dependOn) {
+            $dependsOnSelector = $dependOn->getSelector();
+            $variableUniqueKey = 'dependsOn_' . $index;
 
+            $additionalRequestDataJs .= "
+                result['" . $variableUniqueKey . "']= $('" . $dependsOnSelector . "').val();
+            ";
+        }
         $str = "
 
             $('#" . $this->id . "').select2({
@@ -93,11 +107,13 @@ trait CElement_FormInput_SelectSearch_Trait_Select2v23Trait {
                         delay: ' . $this->delay . ',
                         ' . $strMultiple . '
                         data: function (term,page) {
-                            return {
+                            let result =  {
                                 q: term, // search term
                                 page: page,
                                 limit: 10
                             };
+                            ' . $additionalRequestDataJs . '
+                            return result;
                         },
                         results: function (data, page) {
                             // parse the results into the format expected by Select2
@@ -159,6 +175,20 @@ trait CElement_FormInput_SelectSearch_Trait_Select2v23Trait {
         $js->setIndent($indent);
         //echo $str;
         $js->append($str)->br();
+        foreach ($this->dependsOn as $index => $dependOn) {
+            $dependsOnSelector = $dependOn->getSelector();
+            $targetSelector = '#' . $this->id();
+            $throttle = $dependOn->getThrottle();
+            $dependsOnFunctionName = 'dependsOnFunction' . uniqid();
+            $js->appendln('
+                 let ' . $dependsOnFunctionName . " = () => {
+                    $('" . $targetSelector . "').val('');
+                    $('" . $targetSelector . "').select2('val', null);
+                    $('" . $targetSelector . "').trigger('change');
+                 };
+                 $('" . $dependsOnSelector . "').change(cresenity.debounce(" . $dependsOnFunctionName . ' ,' . $throttle . '));
+            ');
+        }
 
         return $js->text();
     }

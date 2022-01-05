@@ -9,9 +9,15 @@ defined('SYSPATH') or die('No direct access allowed.');
  * @since May 15, 2019, 8:01:24 PM
  */
 use GuzzleHttp\Client;
-use GuzzleHttp\ClientInterface;
 
-abstract class CSocialLogin_OAuth2_AbstractProvider extends CSocialLogin_AbstractProvider {
+abstract class CSocialLogin_OAuth2_AbstractProvider implements CSocialLogin_AbstractProviderInterface {
+    /**
+     * The HTTP request instance.
+     *
+     * @var \CHTTP_Request
+     */
+    protected $request;
+
     /**
      * The HTTP Client instance.
      *
@@ -64,7 +70,7 @@ abstract class CSocialLogin_OAuth2_AbstractProvider extends CSocialLogin_Abstrac
     /**
      * The type of the encoding in the query.
      *
-     * @var int Can be either PHP_QUERY_RFC3986 or PHP_QUERY_RFC1738.
+     * @var int can be either PHP_QUERY_RFC3986 or PHP_QUERY_RFC1738
      */
     protected $encodingType = PHP_QUERY_RFC1738;
 
@@ -76,6 +82,13 @@ abstract class CSocialLogin_OAuth2_AbstractProvider extends CSocialLogin_Abstrac
     protected $stateless = false;
 
     /**
+     * Indicates if PKCE should be used.
+     *
+     * @var bool
+     */
+    protected $usesPKCE = false;
+
+    /**
      * The custom Guzzle configuration options.
      *
      * @var array
@@ -83,18 +96,26 @@ abstract class CSocialLogin_OAuth2_AbstractProvider extends CSocialLogin_Abstrac
     protected $guzzle = [];
 
     /**
+     * The cached user instance.
+     *
+     * @var null|\Laravel\Socialite\Two\User
+     */
+    protected $user;
+
+    /**
      * Create a new provider instance.
      *
-     * @param string $clientId
-     * @param string $clientSecret
-     * @param string $redirectUrl
-     * @param array  $guzzle
+     * @param \CHTTP_Request $request
+     * @param string         $clientId
+     * @param string         $clientSecret
+     * @param string         $redirectUrl
+     * @param array          $guzzle
      *
      * @return void
      */
-    public function __construct($clientId, $clientSecret, $redirectUrl, $guzzle = []) {
+    public function __construct(CHTTP_Request $request, $clientId, $clientSecret, $redirectUrl, $guzzle = []) {
         $this->guzzle = $guzzle;
-
+        $this->request = $request;
         $this->clientId = $clientId;
         $this->redirectUrl = $redirectUrl;
         $this->clientSecret = $clientSecret;
@@ -130,25 +151,32 @@ abstract class CSocialLogin_OAuth2_AbstractProvider extends CSocialLogin_Abstrac
      *
      * @param array $user
      *
-     * @return CSocialLogin_OAuth2_User
+     * @return \Laravel\Socialite\Two\User
      */
     abstract protected function mapUserToObject(array $user);
 
     /**
      * Redirect the user of the application to the provider's authentication screen.
      *
-     * @return void
+     * @return \CHTTP_RedirectResponse
      */
     public function redirect() {
         $state = null;
+
         if ($this->usesState()) {
-            $this->session()->set('state', $state = $this->getState());
+            $this->request->session()->put('state', $state = $this->getState());
+        }
+
+        if ($this->usesPKCE()) {
+            $this->request->session()->put('code_verifier', $this->getCodeVerifier());
         }
         curl::redirect($this->getAuthUrl($state));
+
+        return new CHTTP_RedirectResponse($this->getAuthUrl($state));
     }
 
     /**
-     * Get the authentication URL for the provider.
+     * Build the authentication URL for the provider from the given base URL.
      *
      * @param string $url
      * @param string $state
@@ -162,7 +190,7 @@ abstract class CSocialLogin_OAuth2_AbstractProvider extends CSocialLogin_Abstrac
     /**
      * Get the GET parameters for the code request.
      *
-     * @param string|null $state
+     * @param null|string $state
      *
      * @return array
      */
@@ -173,9 +201,16 @@ abstract class CSocialLogin_OAuth2_AbstractProvider extends CSocialLogin_Abstrac
             'scope' => $this->formatScopes($this->getScopes(), $this->scopeSeparator),
             'response_type' => 'code',
         ];
+
         if ($this->usesState()) {
             $fields['state'] = $state;
         }
+
+        if ($this->usesPKCE()) {
+            $fields['code_challenge'] = $this->getCodeChallenge();
+            $fields['code_challenge_method'] = $this->getCodeChallengeMethod();
+        }
+
         return array_merge($fields, $this->parameters);
     }
 
@@ -192,17 +227,24 @@ abstract class CSocialLogin_OAuth2_AbstractProvider extends CSocialLogin_Abstrac
     }
 
     /**
-     * {@inheritdoc}
+     * @inheritdoc
      */
     public function user() {
-        if ($this->hasInvalidState()) {
-            throw new CSocialLogin_OAuth2_Exception_InvalidStateException;
+        if ($this->user) {
+            return $this->user;
         }
+
+        if ($this->hasInvalidState()) {
+            throw new CSocialLogin_Exception_InvalidStateException();
+        }
+
         $response = $this->getAccessTokenResponse($this->getCode());
-        $user = $this->mapUserToObject($this->getUserByToken(
+
+        $this->user = $this->mapUserToObject($this->getUserByToken(
             $token = carr::get($response, 'access_token')
         ));
-        return $user->setToken($token)
+
+        return $this->user->setToken($token)
             ->setRefreshToken(carr::get($response, 'refresh_token'))
             ->setExpiresIn(carr::get($response, 'expires_in'));
     }
@@ -212,10 +254,11 @@ abstract class CSocialLogin_OAuth2_AbstractProvider extends CSocialLogin_Abstrac
      *
      * @param string $token
      *
-     * @return CSocialLogin_OAuth2_User
+     * @return \CSocialLogin_OAuth2_User
      */
     public function userFromToken($token) {
         $user = $this->mapUserToObject($this->getUserByToken($token));
+
         return $user->setToken($token);
     }
 
@@ -229,8 +272,9 @@ abstract class CSocialLogin_OAuth2_AbstractProvider extends CSocialLogin_Abstrac
             return false;
         }
 
-        $state = $this->session()->get('state');
-        return !(strlen($state) > 0 && $this->input('state') === $state);
+        $state = $this->request->session()->pull('state');
+
+        return empty($state) || $this->request->input('state') !== $state;
     }
 
     /**
@@ -241,11 +285,11 @@ abstract class CSocialLogin_OAuth2_AbstractProvider extends CSocialLogin_Abstrac
      * @return array
      */
     public function getAccessTokenResponse($code) {
-        $postKey = (version_compare(ClientInterface::VERSION, '6') === 1) ? 'form_params' : 'body';
         $response = $this->getHttpClient()->post($this->getTokenUrl(), [
             'headers' => ['Accept' => 'application/json'],
-            $postKey => $this->getTokenFields($code),
+            'form_params' => $this->getTokenFields($code),
         ]);
+
         return json_decode($response->getBody(), true);
     }
 
@@ -257,12 +301,19 @@ abstract class CSocialLogin_OAuth2_AbstractProvider extends CSocialLogin_Abstrac
      * @return array
      */
     protected function getTokenFields($code) {
-        return [
+        $fields = [
+            'grant_type' => 'authorization_code',
             'client_id' => $this->clientId,
             'client_secret' => $this->clientSecret,
             'code' => $code,
             'redirect_uri' => $this->redirectUrl,
         ];
+
+        if ($this->usesPKCE()) {
+            $fields['code_verifier'] = $this->request->session()->pull('code_verifier');
+        }
+
+        return $fields;
     }
 
     /**
@@ -271,7 +322,7 @@ abstract class CSocialLogin_OAuth2_AbstractProvider extends CSocialLogin_Abstrac
      * @return string
      */
     protected function getCode() {
-        return $this->input('code');
+        return $this->request->input('code');
     }
 
     /**
@@ -283,6 +334,7 @@ abstract class CSocialLogin_OAuth2_AbstractProvider extends CSocialLogin_Abstrac
      */
     public function scopes($scopes) {
         $this->scopes = array_unique(array_merge($this->scopes, (array) $scopes));
+
         return $this;
     }
 
@@ -295,6 +347,7 @@ abstract class CSocialLogin_OAuth2_AbstractProvider extends CSocialLogin_Abstrac
      */
     public function setScopes($scopes) {
         $this->scopes = array_unique((array) $scopes);
+
         return $this;
     }
 
@@ -316,6 +369,7 @@ abstract class CSocialLogin_OAuth2_AbstractProvider extends CSocialLogin_Abstrac
      */
     public function redirectUrl($url) {
         $this->redirectUrl = $url;
+
         return $this;
     }
 
@@ -328,6 +382,7 @@ abstract class CSocialLogin_OAuth2_AbstractProvider extends CSocialLogin_Abstrac
         if (is_null($this->httpClient)) {
             $this->httpClient = new Client($this->guzzle);
         }
+
         return $this->httpClient;
     }
 
@@ -340,18 +395,20 @@ abstract class CSocialLogin_OAuth2_AbstractProvider extends CSocialLogin_Abstrac
      */
     public function setHttpClient(Client $client) {
         $this->httpClient = $client;
+
         return $this;
     }
 
     /**
      * Set the request instance.
      *
-     * @param CHTTP_Request $request
+     * @param \CHTTP_Request $request
      *
      * @return $this
      */
     public function setRequest(CHTTP_Request $request) {
         $this->request = $request;
+
         return $this;
     }
 
@@ -380,6 +437,7 @@ abstract class CSocialLogin_OAuth2_AbstractProvider extends CSocialLogin_Abstrac
      */
     public function stateless() {
         $this->stateless = true;
+
         return $this;
     }
 
@@ -393,6 +451,55 @@ abstract class CSocialLogin_OAuth2_AbstractProvider extends CSocialLogin_Abstrac
     }
 
     /**
+     * Determine if the provider uses PKCE.
+     *
+     * @return bool
+     */
+    protected function usesPKCE() {
+        return $this->usesPKCE;
+    }
+
+    /**
+     * Enables PKCE for the provider.
+     *
+     * @return $this
+     */
+    public function enablePKCE() {
+        $this->usesPKCE = true;
+
+        return $this;
+    }
+
+    /**
+     * Generates a random string of the right length for the PKCE code verifier.
+     *
+     * @return string
+     */
+    protected function getCodeVerifier() {
+        return cstr::random(96);
+    }
+
+    /**
+     * Generates the PKCE code challenge based on the PKCE code verifier in the session.
+     *
+     * @return string
+     */
+    protected function getCodeChallenge() {
+        $hashed = hash('sha256', $this->request->session()->get('code_verifier'), true);
+
+        return rtrim(strtr(base64_encode($hashed), '+/', '-_'), '=');
+    }
+
+    /**
+     * Returns the hash method used to calculate the PKCE code challenge.
+     *
+     * @return string
+     */
+    protected function getCodeChallengeMethod() {
+        return 'S256';
+    }
+
+    /**
      * Set the custom parameters of the request.
      *
      * @param array $parameters
@@ -401,39 +508,7 @@ abstract class CSocialLogin_OAuth2_AbstractProvider extends CSocialLogin_Abstrac
      */
     public function with(array $parameters) {
         $this->parameters = $parameters;
+
         return $this;
-    }
-
-    public function jwtEncode($data) {
-        $encoded = strtr(base64_encode($data), '+/', '-_');
-        return rtrim($encoded, '=');
-    }
-
-    public function jwtGenerateSecretKey($keyId, $teamId, $clientId, $key) {
-        $header = [
-            'alg' => 'ES256',
-            'kid' => $keyId
-        ];
-        $body = [
-            'iss' => $teamId,
-            'iat' => time(),
-            'exp' => time() + 3600,
-            'aud' => 'https://appleid.apple.com',
-            'sub' => $clientId
-        ];
-
-        $privKey = openssl_pkey_get_private($key);
-        if (!$privKey) {
-            return false;
-        }
-
-        $payload = encode(json_encode($header)) . '.' . encode(json_encode($body));
-        $signature = '';
-        $success = openssl_sign($payloads, $signature, $privKey, OPENSSL_ALGO_SHA256);
-        if (!$success) {
-            return false;
-        }
-
-        return $payload . '.' . encode($signature);
     }
 }

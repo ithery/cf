@@ -24,6 +24,13 @@ trait CView_Trait_ManageComponentTrait {
     protected $componentData = [];
 
     /**
+     * The component data for the component that is currently being rendered.
+     *
+     * @var array
+     */
+    protected $currentComponentData = [];
+
+    /**
      * The slot contents for the component.
      *
      * @var array
@@ -40,8 +47,8 @@ trait CView_Trait_ManageComponentTrait {
     /**
      * Start a component rendering process.
      *
-     * @param \CView_View|\Illuminate\Contracts\Support\Htmlable|\Closure|string $view
-     * @param array                                                              $data
+     * @param \CView_View|\CInterface_Htmlable|\Closure|string $view
+     * @param array                                            $data
      *
      * @return void
      */
@@ -118,7 +125,7 @@ trait CView_Trait_ManageComponentTrait {
      * Start the slot rendering process.
      *
      * @param string      $name
-     * @param string|null $content
+     * @param null|string $content
      *
      * @return void
      */

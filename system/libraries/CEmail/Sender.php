@@ -2,7 +2,7 @@
 
 class CEmail_Sender {
     /**
-     * Email Driver
+     * Email Driver.
      *
      * @var CEmail_DriverAbstract
      */
@@ -17,7 +17,7 @@ class CEmail_Sender {
     }
 
     /**
-     * Undocumented function
+     * Undocumented function.
      *
      * @param array|string $to
      * @param string       $subject
@@ -38,6 +38,9 @@ class CEmail_Sender {
     protected function rebuildOptions($options) {
         if (!isset($options['from'])) {
             $options['from'] = carr::get($options, 'smtp_from', CF::config('app.smtp_from'));
+        }
+        if (!isset($options['domain'])) {
+            $options['domain'] = carr::get($options, 'smtp_domain', CF::config('app.smtp_domain'));
         }
 
         if (!isset($options['from'])) {

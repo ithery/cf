@@ -21,19 +21,22 @@ use Symfony\Component\HttpFoundation\Response;
  *
  * @author Kévin Dunglas <dunglas@gmail.com>
  */
-interface HttpFoundationFactoryInterface
-{
+interface HttpFoundationFactoryInterface {
     /**
      * Creates a Symfony Request instance from a PSR-7 one.
      *
+     * @param bool $streamed
+     *
      * @return Request
      */
-    public function createRequest(ServerRequestInterface $psrRequest, bool $streamed = false);
+    public function createRequest(ServerRequestInterface $psrRequest, $streamed = false);
 
     /**
      * Creates a Symfony Response instance from a PSR-7 one.
      *
+     * @param bool $streamed
+     *
      * @return Response
      */
-    public function createResponse(ResponseInterface $psrResponse, bool $streamed = false);
+    public function createResponse(ResponseInterface $psrResponse, $streamed = false);
 }

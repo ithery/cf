@@ -2,24 +2,24 @@
 
 namespace PhpOffice\PhpSpreadsheet\Reader;
 
-use DOMDocument;
-use DOMElement;
 use DOMNode;
 use DOMText;
-use PhpOffice\PhpSpreadsheet\Cell\Coordinate;
-use PhpOffice\PhpSpreadsheet\Reader\Security\XmlScanner;
-use PhpOffice\PhpSpreadsheet\Spreadsheet;
-use PhpOffice\PhpSpreadsheet\Style\Border;
-use PhpOffice\PhpSpreadsheet\Style\Color;
+use DOMElement;
+use DOMDocument;
 use PhpOffice\PhpSpreadsheet\Style\Fill;
 use PhpOffice\PhpSpreadsheet\Style\Font;
+use PhpOffice\PhpSpreadsheet\Spreadsheet;
+use PhpOffice\PhpSpreadsheet\Style\Color;
 use PhpOffice\PhpSpreadsheet\Style\Style;
+use PhpOffice\PhpSpreadsheet\Style\Border;
+use PhpOffice\PhpSpreadsheet\Cell\Coordinate;
 use PhpOffice\PhpSpreadsheet\Worksheet\Drawing;
 use PhpOffice\PhpSpreadsheet\Worksheet\Worksheet;
+use PhpOffice\PhpSpreadsheet\Reader\Security\XmlScanner;
+use PhpOffice\PhpSpreadsheet\Helper\Dimension as CssDimension;
 
 /** PhpSpreadsheet root directory */
-class Html extends BaseReader
-{
+class Html extends BaseReader {
     /**
      * Sample size to read to determine if it's HTML or not.
      */
@@ -123,11 +123,17 @@ class Html extends BaseReader
 
     protected $rowspan = [];
 
+    //    Data Array used for testing only, should write to Spreadsheet object on completion of tests
+    protected $dataArray = [];
+
+    protected $tableLevel = 0;
+
+    protected $nestedColumn = ['A'];
+
     /**
      * Create a new HTML Reader instance.
      */
-    public function __construct()
-    {
+    public function __construct() {
         $this->readFilter = new DefaultReadFilter();
         $this->securityScanner = XmlScanner::getInstance($this);
     }
@@ -139,8 +145,7 @@ class Html extends BaseReader
      *
      * @return bool
      */
-    public function canRead($pFilename)
-    {
+    public function canRead($pFilename) {
         // Check if file exists
         try {
             $this->openFile($pFilename);
@@ -158,15 +163,13 @@ class Html extends BaseReader
         return $startWithTag && $containsTags && $endsWithTag;
     }
 
-    private function readBeginning()
-    {
+    private function readBeginning() {
         fseek($this->fileHandle, 0);
 
         return fread($this->fileHandle, self::TEST_SAMPLE_SIZE);
     }
 
-    private function readEnding()
-    {
+    private function readEnding() {
         $meta = stream_get_meta_data($this->fileHandle);
         $filename = $meta['uri'];
 
@@ -182,21 +185,18 @@ class Html extends BaseReader
 
         fseek($this->fileHandle, $size - $blockSize);
 
-        return fread($this->fileHandle, $blockSize);
+        return (string) fread($this->fileHandle, $blockSize);
     }
 
-    private static function startsWithTag($data)
-    {
+    private static function startsWithTag($data) {
         return '<' === substr(trim($data), 0, 1);
     }
 
-    private static function endsWithTag($data)
-    {
+    private static function endsWithTag($data) {
         return '>' === substr(trim($data), -1, 1);
     }
 
-    private static function containsTags($data)
-    {
+    private static function containsTags($data) {
         return strlen($data) !== strlen(strip_tags($data));
     }
 
@@ -204,13 +204,13 @@ class Html extends BaseReader
      * Loads Spreadsheet from file.
      *
      * @param string $pFilename
+     * @param mixed  $flags
      *
      * @throws Exception
      *
      * @return Spreadsheet
      */
-    public function load($pFilename)
-    {
+    public function load($pFilename) {
         // Create new Spreadsheet
         $spreadsheet = new Spreadsheet();
 
@@ -221,13 +221,12 @@ class Html extends BaseReader
     /**
      * Set input encoding.
      *
-     * @param string $pValue Input encoding, eg: 'ANSI'
+     * @param string $inputEncoding Input encoding, eg: 'ANSI'
      *
      * @return Html
      */
-    public function setInputEncoding($pValue)
-    {
-        $this->inputEncoding = $pValue;
+    public function setInputEncoding($inputEncoding) {
+        $this->inputEncoding = $inputEncoding;
 
         return $this;
     }
@@ -237,20 +236,16 @@ class Html extends BaseReader
      *
      * @return string
      */
-    public function getInputEncoding()
-    {
+    public function getInputEncoding() {
         return $this->inputEncoding;
     }
 
-    //    Data Array used for testing only, should write to Spreadsheet object on completion of tests
-    protected $dataArray = [];
-
-    protected $tableLevel = 0;
-
-    protected $nestedColumn = ['A'];
-
-    protected function setTableStartColumn($column)
-    {
+    /**
+     * @param string $column
+     *
+     * @return string
+     */
+    protected function setTableStartColumn($column) {
         if ($this->tableLevel == 0) {
             $column = 'A';
         }
@@ -260,20 +255,23 @@ class Html extends BaseReader
         return $this->nestedColumn[$this->tableLevel];
     }
 
-    protected function getTableStartColumn()
-    {
+    /**
+     * @return string
+     */
+    protected function getTableStartColumn() {
         return $this->nestedColumn[$this->tableLevel];
     }
 
-    protected function releaseTableStartColumn()
-    {
+    /**
+     * @return string
+     */
+    protected function releaseTableStartColumn() {
         --$this->tableLevel;
 
         return array_pop($this->nestedColumn);
     }
 
-    protected function flushCell(Worksheet $sheet, $column, $row, &$cellContent)
-    {
+    protected function flushCell(Worksheet $sheet, $column, $row, &$cellContent) {
         if (is_string($cellContent)) {
             //    Simple String content
             if (trim($cellContent) > '') {
@@ -292,14 +290,13 @@ class Html extends BaseReader
     }
 
     /**
-     * @param DOMNode $element
+     * @param DOMNode   $element
      * @param Worksheet $sheet
-     * @param int $row
-     * @param string $column
-     * @param string $cellContent
+     * @param int       $row
+     * @param string    $column
+     * @param string    $cellContent
      */
-    protected function processDomElement(DOMNode $element, Worksheet $sheet, &$row, &$column, &$cellContent)
-    {
+    protected function processDomElement(DOMNode $element, Worksheet $sheet, &$row, &$column, &$cellContent) {
         foreach ($element->childNodes as $child) {
             if ($child instanceof DOMText) {
                 $domText = preg_replace('/\s+/u', ' ', trim($child->nodeValue));
@@ -577,15 +574,14 @@ class Html extends BaseReader
     /**
      * Loads PhpSpreadsheet from file into PhpSpreadsheet instance.
      *
-     * @param string $pFilename
+     * @param string      $pFilename
      * @param Spreadsheet $spreadsheet
      *
      * @throws Exception
      *
      * @return Spreadsheet
      */
-    public function loadIntoExisting($pFilename, Spreadsheet $spreadsheet)
-    {
+    public function loadIntoExisting($pFilename, Spreadsheet $spreadsheet) {
         // Validate
         if (!$this->canRead($pFilename)) {
             throw new Exception($pFilename . ' is an Invalid HTML file.');
@@ -623,8 +619,7 @@ class Html extends BaseReader
      *
      * @return int
      */
-    public function getSheetIndex()
-    {
+    public function getSheetIndex() {
         return $this->sheetIndex;
     }
 
@@ -635,8 +630,7 @@ class Html extends BaseReader
      *
      * @return HTML
      */
-    public function setSheetIndex($pValue)
-    {
+    public function setSheetIndex($pValue) {
         $this->sheetIndex = $pValue;
 
         return $this;
@@ -653,12 +647,11 @@ class Html extends BaseReader
      * - Implement to other propertie, such as border
      *
      * @param Worksheet $sheet
-     * @param int $row
-     * @param string $column
-     * @param array $attributeArray
+     * @param int       $row
+     * @param string    $column
+     * @param array     $attributeArray
      */
-    private function applyInlineStyle(&$sheet, $row, $column, $attributeArray)
-    {
+    private function applyInlineStyle(&$sheet, $row, $column, $attributeArray) {
         if (!isset($attributeArray['style'])) {
             return;
         }
@@ -776,14 +769,16 @@ class Html extends BaseReader
 
                 case 'width':
                     $sheet->getColumnDimension($column)->setWidth(
-                        str_replace('px', '', $styleValue)
+                        (new CssDimension($styleValue ?: ''))->width()
+                        //str_replace('px', '', $styleValue)
                     );
 
                     break;
 
                 case 'height':
                     $sheet->getRowDimension($row)->setRowHeight(
-                        str_replace('px', '', $styleValue)
+                        (new CssDimension($styleValue ?: ''))->height()
+                        //str_replace('px', '', $styleValue)
                     );
 
                     break;
@@ -812,13 +807,12 @@ class Html extends BaseReader
      *
      * @return null|string
      */
-    public function getStyleColor($value)
-    {
+    public function getStyleColor($value) {
         if (strpos($value, '#') === 0) {
             return substr($value, 1);
         }
 
-        return null;
+        return \PhpOffice\PhpSpreadsheet\Helper\Html::colourNameLookup($value);
     }
 
     /**
@@ -829,8 +823,7 @@ class Html extends BaseReader
      *
      * @throws \PhpOffice\PhpSpreadsheet\Exception
      */
-    private function insertImage(Worksheet $sheet, $column, $row, array $attributes)
-    {
+    private function insertImage(Worksheet $sheet, $column, $row, array $attributes) {
         if (!isset($attributes['src'])) {
             return;
         }
@@ -872,12 +865,11 @@ class Html extends BaseReader
     /**
      * Map html border style to PhpSpreadsheet border style.
      *
-     * @param  string $style
+     * @param string $style
      *
      * @return null|string
      */
-    public function getBorderStyle($style)
-    {
+    public function getBorderStyle($style) {
         switch ($style) {
             case 'solid':
                 return Border::BORDER_THIN;
@@ -917,8 +909,7 @@ class Html extends BaseReader
      * @param string $styleValue
      * @param string $type
      */
-    private function setBorderStyle(Style $cellStyle, $styleValue, $type)
-    {
+    private function setBorderStyle(Style $cellStyle, $styleValue, $type) {
         list(, $borderStyle, $color) = explode(' ', $styleValue);
 
         $cellStyle->applyFromArray([

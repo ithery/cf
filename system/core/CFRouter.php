@@ -48,7 +48,10 @@ class CFRouter {
         if (self::$controller === null) {
             // No controller was found, so no page can be rendered
             if (defined('CFPUBLIC')) {
-                if (carr::get(static::$segments, 0) == 'media' || carr::get(static::$segments, 3) == 'media') {
+                if (carr::get(static::$segments, 0) == 'media'
+                    || carr::get(static::$segments, 3) == 'media'
+                    || (carr::get(static::$segments, 1) == 'cresenity' && carr::get(static::$segments, 2) == 'media')
+                ) {
                     $response = CHTTP_FileServeDriver::responseStaticFile(static::$current_uri);
 
                     if ($response) {
@@ -282,7 +285,6 @@ class CFRouter {
                 // Command line requires a bit of hacking
                 if (isset($_SERVER['argv'][1])) {
                     $currentUri = $_SERVER['argv'][1];
-
                     // Remove GET string from segments
                     if (($query = strpos($currentUri, '?')) !== false) {
                         list($currentUri, $query) = explode('?', $currentUri, 2);

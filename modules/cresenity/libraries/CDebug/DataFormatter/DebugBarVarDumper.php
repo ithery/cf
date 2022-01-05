@@ -19,6 +19,7 @@ use Symfony\Component\VarDumper\Cloner\VarCloner;
  */
 class CDebug_DataFormatter_DebugBarVarDumper implements CDebug_DataCollector_AssetProviderInterface {
     protected static $defaultClonerOptions = [];
+
     protected static $defaultDumperOptions = [
         'expanded_depth' => 0,
         'styles' => [
@@ -38,7 +39,9 @@ class CDebug_DataFormatter_DebugBarVarDumper implements CDebug_DataCollector_Ass
             'ellipsis' => 'color:#A0A000',
         ],
     ];
+
     protected $clonerOptions;
+
     protected $dumperOptions;
 
     /**
@@ -46,7 +49,9 @@ class CDebug_DataFormatter_DebugBarVarDumper implements CDebug_DataCollector_Ass
      */
     protected $cloner;
 
-    /** @var DebugBarHtmlDumper */
+    /**
+     * @var DebugBarHtmlDumper
+     */
     protected $dumper;
 
     /**
@@ -76,6 +81,7 @@ class CDebug_DataFormatter_DebugBarVarDumper implements CDebug_DataCollector_Ass
                 $this->cloner->setMinDepth($clonerOptions['min_depth']);
             }
         }
+
         return $this->cloner;
     }
 
@@ -92,6 +98,7 @@ class CDebug_DataFormatter_DebugBarVarDumper implements CDebug_DataCollector_Ass
                 $this->dumper->setStyles($dumperOptions['styles']);
             }
         }
+
         return $this->dumper;
     }
 
@@ -104,6 +111,7 @@ class CDebug_DataFormatter_DebugBarVarDumper implements CDebug_DataCollector_Ass
         if ($this->clonerOptions === null) {
             $this->clonerOptions = self::$defaultClonerOptions;
         }
+
         return $this->clonerOptions;
     }
 
@@ -156,6 +164,7 @@ class CDebug_DataFormatter_DebugBarVarDumper implements CDebug_DataCollector_Ass
         if ($this->dumperOptions === null) {
             $this->dumperOptions = self::$defaultDumperOptions;
         }
+
         return $this->dumperOptions;
     }
 
@@ -204,9 +213,9 @@ class CDebug_DataFormatter_DebugBarVarDumper implements CDebug_DataCollector_Ass
     /**
      * Captures the data from a variable and serializes it for later rendering.
      *
-     * @param mixed $data The variable to capture.
+     * @param mixed $data the variable to capture
      *
-     * @return string Serialized variable data.
+     * @return string serialized variable data
      */
     public function captureVar($data) {
         return serialize($this->getCloner()->cloneVar($data));
@@ -232,37 +241,39 @@ class CDebug_DataFormatter_DebugBarVarDumper implements CDebug_DataCollector_Ass
         if (isset($dumperOptions['file_link_format'])) {
             $displayOptions['fileLinkFormat'] = $dumperOptions['file_link_format'];
         }
+
         return $displayOptions;
     }
 
     /**
      * Renders previously-captured data from captureVar to HTML and returns it as a string.
      *
-     * @param string $capturedData Captured data from captureVar.
-     * @param array  $seekPath     Pass an array of keys to traverse if you only want to render a subset
-     *                             of the data.
+     * @param string $capturedData captured data from captureVar
+     * @param array  $seekPath     pass an array of keys to traverse if you only want to render a subset
+     *                             of the data
      *
-     * @return string HTML rendering of the variable.
+     * @return string HTML rendering of the variable
      */
     public function renderCapturedVar($capturedData, $seekPath = []) {
         $data = unserialize($capturedData);
         // The seek method was added in Symfony 3.2; emulate the behavior via SeekingData for older
         // Symfony versions.
         if (!method_exists($data, 'seek')) {
-            $data = new SeekingData($data->getRawData());
+            $data = new CDebug_DataFormatter_DebugBarVarDumper_SeekingData($data->getRawData());
         }
         foreach ($seekPath as $key) {
             $data = $data->seek($key);
         }
+
         return $this->dump($data);
     }
 
     /**
      * Captures and renders the data from a variable to HTML and returns it as a string.
      *
-     * @param mixed $data The variable to capture and render.
+     * @param mixed $data the variable to capture and render
      *
-     * @return string HTML rendering of the variable.
+     * @return string HTML rendering of the variable
      */
     public function renderVar($data) {
         return $this->dump($this->getCloner()->cloneVar($data));
@@ -276,6 +287,7 @@ class CDebug_DataFormatter_DebugBarVarDumper implements CDebug_DataCollector_Ass
     public function getAssets() {
         $dumper = $this->getDumper();
         $dumper->setDumpHeader(null); // this will cause the default dump header to regenerate
+
         return [
             'inline_head' => [
                 'html_var_dumper' => $dumper->getDumpHeaderByDebugBar(),
@@ -300,6 +312,7 @@ class CDebug_DataFormatter_DebugBarVarDumper implements CDebug_DataCollector_Ass
         $dumper->dump($data, null, $this->getDisplayOptions());
         $result = stream_get_contents($output, -1, 0);
         fclose($output);
+
         return $result;
     }
 }

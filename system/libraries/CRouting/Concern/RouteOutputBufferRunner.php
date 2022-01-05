@@ -24,6 +24,7 @@ trait CRouting_Concern_RouteOutputBufferRunner {
         });
         $output = '';
         $response = null;
+
         try {
             $response = $this->run();
 
@@ -47,6 +48,7 @@ trait CRouting_Concern_RouteOutputBufferRunner {
                 }
             }
         }
+
         return $response;
     }
 }

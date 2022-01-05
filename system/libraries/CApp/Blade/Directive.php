@@ -34,6 +34,10 @@ class CApp_Blade_Directive {
         return '{!! CApp::instance()->renderNavigation(' . $expression . ') !!}';
     }
 
+    public static function seo($expression) {
+        return '{!! CApp::instance()->renderSeo() !!}';
+    }
+
     public static function content($expression) {
         return '{!! CApp::instance()->renderContent() !!}';
     }

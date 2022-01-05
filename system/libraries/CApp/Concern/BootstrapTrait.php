@@ -105,6 +105,7 @@ trait CApp_Concern_BootstrapTrait {
             CView::blade()->directive('CAppPageTitle', [CApp_Blade_Directive::class, 'pageTitle']);
             CView::blade()->directive('CAppTitle', [CApp_Blade_Directive::class, 'title']);
             CView::blade()->directive('CAppNav', [CApp_Blade_Directive::class, 'nav']);
+            CView::blade()->directive('CAppSeo', [CApp_Blade_Directive::class, 'seo']);
             CView::blade()->directive('CAppContent', [CApp_Blade_Directive::class, 'content']);
             CView::blade()->directive('CAppPushScript', [CApp_Blade_Directive::class, 'pushScript']);
             CView::blade()->directive('CAppEndPushScript', [CApp_Blade_Directive::class, 'endPushScript']);
@@ -113,7 +114,6 @@ trait CApp_Concern_BootstrapTrait {
             CView::blade()->directive('CAppElement', [CApp_Blade_Directive::class, 'element']);
             CView::blade()->directive('CAppMessage', [CApp_Blade_Directive::class, 'message']);
 
-            CView::blade()->component('capp.view-component.modal', 'modal');
             static::$registerBladeBooted = true;
         }
     }
@@ -149,7 +149,7 @@ trait CApp_Concern_BootstrapTrait {
                 'map-picker' => CElement_FormInput_MapPicker::class,
                 'hidden' => CElement_FormInput_Hidden::class,
                 'select-tag' => CElement_FormInput_SelectTag::class,
-                'selectsearch' => CFormInputSelectSearch::class,
+                'selectsearch' => CElement_FormInput_SelectSearch::class,
                 'checkbox' => CElement_FormInput_Checkbox::class,
                 'checkbox-list' => CFormInputCheckboxList::class,
                 'switcher' => CElement_FormInput_Checkbox_Switcher::class,
@@ -157,7 +157,7 @@ trait CApp_Concern_BootstrapTrait {
                 'radio' => CElement_FormInput_Radio::class,
                 'label' => CElement_FormInput_Label::class,
                 'quill' => CElement_FormInput_Textarea_Quill::class,
-                'file' => CFormInputFile::class,
+                'file' => CElement_FormInput_File::class,
                 'ckeditor' => CFormInputCKEditor::class,
                 'filedrop' => CFormInputFileDrop::class,
                 'slider' => CFormInputSlider::class,

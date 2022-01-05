@@ -11,12 +11,21 @@ defined('SYSPATH') or die('No direct access allowed.');
 class CElement_FormInput_AutoNumeric extends CElement_FormInput {
     use CTrait_Element_Property_Placeholder;
 
+    protected $decimalDigit = 0;
+
+    protected $thousandSeparator = ',';
+
+    protected $decimalSeparator = '.';
+
     public function __construct($id) {
         parent::__construct($id);
 
         $this->type = 'text';
         $this->placeholder = '';
         $this->value = '0';
+        $this->decimalDigit = CApp::formatter()->getDecimalDigit();
+        $this->thousandSeparator = CApp::formatter()->getThousandSeparator();
+        $this->decimalSeparator = CApp::formatter()->getDecimalSeparator();
         $this->addClass('form-control');
 
         if (!CManager::asset()->module()->isRegisteredModule('auto-numeric')) {
@@ -27,12 +36,33 @@ class CElement_FormInput_AutoNumeric extends CElement_FormInput {
     protected function build() {
         $this->setAttr('type', $this->type);
         $this->setAttr('value', $this->value);
+        $this->setAttr('data-m-dec', $this->decimalDigit);
+        $this->setAttr('data-a-sep', $this->thousandSeparator);
+        $this->setAttr('data-a-dec', $this->decimalSeparator);
         if ($this->readonly) {
             $this->setAttr('readonly', 'readonly');
         }
         if ($this->disabled) {
             $this->setAttr('disabled', 'disabled');
         }
+    }
+
+    public function setDecimalDigit($digit) {
+        $this->decimalDigit = $digit;
+
+        return $this;
+    }
+
+    public function setThousandSeparator($separator) {
+        $this->thousandSeparator = $separator;
+
+        return $this;
+    }
+
+    public function setDecimalSeparator($separator) {
+        $this->decimalSeparator = $separator;
+
+        return $this;
     }
 
     public function js($indent = 0) {

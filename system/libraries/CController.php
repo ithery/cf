@@ -18,9 +18,11 @@ abstract class CController {
     protected $input;
 
     /**
-     * @var URI
+     * The middleware registered on the controller.
+     *
+     * @var array
      */
-    protected $uri;
+    protected $middleware = [];
 
     /**
      * Loads URI, and Input into this controller.
@@ -33,9 +35,6 @@ abstract class CController {
             CF::$instance = $this;
         }
 
-        // URI should always be available
-        $this->uri = URI::instance();
-
         // Input should always be available
         $this->input = CController_Input::instance();
 
@@ -43,16 +42,58 @@ abstract class CController {
     }
 
     /**
-     * Handles methods that do not exist.
+     * Register middleware on the controller.
      *
-     * @param string $method method name
-     * @param array  $args   arguments
+     * @param \Closure|array|string $middleware
+     * @param array                 $options
      *
-     * @return void
+     * @return \CController_MiddlewareOptions
      */
-    public function __call($method, $args) {
-        // Default to showing a 404 page
-        CF::show404();
+    public function middleware($middleware, array $options = []) {
+        foreach ((array) $middleware as $m) {
+            $this->middleware[] = [
+                'middleware' => $m,
+                'options' => &$options,
+            ];
+        }
+
+        return new CController_MiddlewareOptions($options);
+    }
+
+    /**
+     * Get the middleware assigned to the controller.
+     *
+     * @return array
+     */
+    public function getMiddleware() {
+        return $this->middleware;
+    }
+
+    /**
+     * Execute an action on the controller.
+     *
+     * @param string $method
+     * @param array  $parameters
+     *
+     * @return \Symfony\Component\HttpFoundation\Response
+     */
+    public function callAction($method, $parameters) {
+        if (!method_exists($this, $method) && !method_exists($this, '__call')) {
+            throw new CHTTP_Exception_NotFoundHttpException();
+        }
+        if (method_exists($this, $method)) {
+            $reflectionClass = new ReflectionClass($this);
+
+            $reflectionMethod = $reflectionClass->getMethod($method);
+            /** @var ReflectionMethod $reflectionMethod */
+            $requiredParameter = $reflectionMethod->getNumberOfRequiredParameters();
+
+            if (count($parameters) < $requiredParameter) {
+                throw new CHTTP_Exception_NotFoundHttpException();
+            }
+        }
+
+        return $this->{$method}(...array_values($parameters));
     }
 
     public static function controllerUrl() {
