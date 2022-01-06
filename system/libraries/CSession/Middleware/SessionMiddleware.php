@@ -34,6 +34,9 @@ class CSession_Middleware_SessionMiddleware {
      * @return mixed
      */
     public function handle($request, Closure $next) {
+        if (CSession::instance()->store() instanceof CSession) {
+            return $next($request);
+        }
         if (!$this->sessionConfigured()) {
             return $next($request);
         }
@@ -65,7 +68,7 @@ class CSession_Middleware_SessionMiddleware {
 
         $lockFor = $request->route() && $request->route()->locksFor() ? $request->route()->locksFor() : 10;
 
-        $lock = $this->cache($this->manager->blockDriver())
+        $lock = $this->cache(CSession::manager()->blockDriver())
             ->lock('session:' . $session->getId(), $lockFor)
             ->betweenBlockedAttemptsSleepFor(50);
 
