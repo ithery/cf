@@ -34,9 +34,6 @@ class CSession_Middleware_SessionMiddleware {
      * @return mixed
      */
     public function handle($request, Closure $next) {
-        if (CSession::instance()->store() instanceof CSession) {
-            return $next($request);
-        }
         if (!$this->sessionConfigured()) {
             return $next($request);
         }
