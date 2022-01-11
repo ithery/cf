@@ -73,7 +73,7 @@ class CSession_Manager {
      * @return \CSession_Store
      */
     protected function buildSession($handler) {
-        return $this->config->get('encrypt') ? $this->buildEncryptedSession($handler) : new CSession_Store($this->config->get('name'), $handler);
+        return $this->config->get('encryption') ? $this->buildEncryptedSession($handler) : new CSession_Store($this->config->get('name'), $handler);
     }
 
     /**

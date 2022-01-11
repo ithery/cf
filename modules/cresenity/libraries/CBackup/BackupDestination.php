@@ -4,6 +4,11 @@ use Carbon\Carbon;
 
 class CBackup_BackupDestination {
     /**
+     * @var Exception
+     */
+    public $connectionError;
+
+    /**
      * @var CStorage_Adapter
      */
     protected $disk;
@@ -17,11 +22,6 @@ class CBackup_BackupDestination {
      * @var string
      */
     protected $backupName;
-
-    /**
-     * @var Exception
-     */
-    public $connectionError;
 
     /**
      * @var null|\CBackup_RecordCollection
@@ -48,16 +48,19 @@ class CBackup_BackupDestination {
         }
         $adapterClass = get_class($this->disk->getDriver()->getAdapter());
         $filesystemType = carr::last(explode('\\', $adapterClass));
+
         return strtolower($filesystemType);
     }
 
     public static function create($diskName, $backupName) {
         try {
             $disk = CStorage::instance()->disk($diskName);
+
             return new static($disk, $backupName, $diskName);
         } catch (Exception $exception) {
             $backupDestination = new static(null, $backupName, $diskName);
             $backupDestination->connectionError = $exception;
+
             return $backupDestination;
         }
     }
@@ -76,6 +79,7 @@ class CBackup_BackupDestination {
         if (is_resource($handle)) {
             fclose($handle);
         }
+
         return $destination;
     }
 
@@ -88,6 +92,7 @@ class CBackup_BackupDestination {
             return $this->backupCollectionCache;
         }
         $files = is_null($this->disk) ? [] : $this->disk->allFiles($this->backupName);
+
         return $this->backupCollectionCache = CBackup_RecordCollection::createFromFiles(
             $this->disk,
             $files
@@ -106,11 +111,14 @@ class CBackup_BackupDestination {
         if (is_null($this->disk)) {
             return false;
         }
+
         try {
             $this->disk->allFiles($this->backupName);
+
             return true;
         } catch (Exception $exception) {
             $this->connectionError = $exception;
+
             return false;
         }
     }
@@ -132,11 +140,13 @@ class CBackup_BackupDestination {
         if (is_null($newestBackup)) {
             return true;
         }
+
         return $newestBackup->date()->gt($date);
     }
 
     public function fresh() {
         $this->backupCollectionCache = null;
+
         return $this;
     }
 }

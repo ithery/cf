@@ -157,15 +157,13 @@ class CRouting_RouteFinder {
 
         // Paths to search
         $paths = CF::paths();
-
         foreach ($data['rsegments'] as $key => $segment) {
             // Add the segment to the search path
             $c_dir = $controller_path;
-            $c_dir_ucfirst = ucfirst(strtolower($controller_path_ucfirst));
+            $c_dir_ucfirst = ucfirst(($controller_path_ucfirst));
             $controller_path .= $segment;
             $controller_path_ucfirst .= ucfirst($segment);
             $found = false;
-
             foreach ($paths as $dir) {
                 // Search within controllers only
                 $dir .= 'controllers' . DS;
@@ -173,7 +171,6 @@ class CRouting_RouteFinder {
                 if (is_dir($dir . $controller_path) or is_file($dir . $controller_path . EXT)) {
                     // Valid path
                     $found = true;
-
                     // The controller must be a file that exists with the search path
                     if ($c = str_replace('\\', '/', realpath($dir . $controller_path . EXT))
                         and is_file($c)
@@ -202,6 +199,7 @@ class CRouting_RouteFinder {
 
             if ($found === false) {
                 // Maximum depth has been reached, stop searching
+
                 break;
             }
 
