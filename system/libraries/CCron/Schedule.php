@@ -2,7 +2,6 @@
 
 class CCron_Schedule {
     use CTrait_Macroable;
-
     const SUNDAY = 0;
 
     const MONDAY = 1;
@@ -121,7 +120,7 @@ class CCron_Schedule {
             $job = is_string($job) ? c::container()->make($job) : $job;
 
             if ($job instanceof CQueue_ShouldQueueInterface) {
-                $this->dispatchToQueue($job, $queue ?? $job->queue, $connection ?? $job->connection);
+                $this->dispatchToQueue($job, $queue ?: $job->queue, $connection ?: $job->connection);
             } else {
                 $this->dispatchNow($job);
             }

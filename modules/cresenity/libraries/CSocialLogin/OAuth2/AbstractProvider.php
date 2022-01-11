@@ -170,7 +170,6 @@ abstract class CSocialLogin_OAuth2_AbstractProvider implements CSocialLogin_Abst
         if ($this->usesPKCE()) {
             $this->request->session()->put('code_verifier', $this->getCodeVerifier());
         }
-        curl::redirect($this->getAuthUrl($state));
 
         return new CHTTP_RedirectResponse($this->getAuthUrl($state));
     }

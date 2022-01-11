@@ -471,7 +471,7 @@ class CApp implements CInterface_Responsable, CInterface_Renderable, CInterface_
         $js .= $cappScript;
         $js = $asset->renderJsRequire($js, 'cresenity.cf.require');
         $data['js'] = base64_encode($js);
-        $data['jsRaw'] = $js;
+        //$data['jsRaw'] = $js;
         $data['css_require'] = $asset->getAllCssFileUrl();
         $data['message'] = $messageOrig;
         $data['ajaxData'] = $this->ajaxData;

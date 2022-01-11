@@ -26,11 +26,6 @@ class CSession {
     protected $store;
 
     /**
-     * @var CSession_Driver
-     */
-    protected $driver;
-
-    /**
      * Singleton instance of Session.
      *
      * @return CSession
@@ -56,11 +51,7 @@ class CSession {
      * @return CSession_Store
      */
     public function store() {
-        if ($this->store == null) {
-            $this->store = CSession_Manager::instance()->createStore();
-        }
-
-        return $this->store;
+        return CF::session();
     }
 
     /**
@@ -82,15 +73,9 @@ class CSession {
 
     protected function initializeSession() {
         if (!$this->initialized && static::sessionConfigured()) {
-            $request = CHTTP::request();
-            static::manager()->applyNativeSession();
-
-            return c::tap($this->store(), function ($session) use ($request) {
-                $session->setId($request->cookies->get($session->getName()));
-                $session->setRequestOnHandler($request);
-                $session->start();
-            });
             $this->initialized = true;
+
+            return CF::session();
         }
     }
 
