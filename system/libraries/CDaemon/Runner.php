@@ -81,15 +81,15 @@ class CDaemon_Runner {
         $output = $this->debug ? $this->debugOutput() : '/dev/null';
         //$output = $this->debugOutput();
 
-        $commandToExecute = "${binary} ${command} 1> \"${output}\" 2>&1 &";
-        if (CF::isCli()) {
-            if ($this->serviceClass == TBDaemon_Service_PostPublishService::class) {
-                cdbg::d('From Runner', $this->serviceClass, $commandToExecute);
-            }
+        $commandToExecute = "NSS_STRICT_NOFORK=DISABLED ${binary} ${command} 1> \"${output}\" 2>&1 &";
+
+        if (defined('CFCLI')) {
+            $process = new Process($command);
+            $process->run();
+            $result = $process->getOutput();
+        } else {
+            $result = shell_exec($command);
         }
-        $process = new Process($commandToExecute);
-        $process->run();
-        $result = $process->getOutput();
 
         return $result;
     }
