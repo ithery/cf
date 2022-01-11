@@ -117,7 +117,7 @@ class CSession_Middleware_SessionMiddleware {
      * @return CSession_Store
      */
     public function getSession(CHTTP_Request $request) {
-        return CF::session();
+        return CBase::session();
     }
 
     /**

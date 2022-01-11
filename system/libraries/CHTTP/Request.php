@@ -381,10 +381,6 @@ class CHTTP_Request extends SymfonyRequest implements CInterface_Arrayable, Arra
 
         $request->setJson($from->json());
 
-        if ($session = $from->getSession()) {
-            $request->setCFSession($session);
-        }
-
         $request->setUserResolver($from->getUserResolver());
 
         $request->setRouteResolver($from->getRouteResolver());
@@ -458,27 +454,7 @@ class CHTTP_Request extends SymfonyRequest implements CInterface_Arrayable, Arra
      * @return \CSession_Store
      */
     public function session() {
-        return CF::session();
-    }
-
-    /**
-     * Get the session associated with the request.
-     *
-     * @return null|\CSession_Store
-     */
-    public function getSession() {
-        return $this->session;
-    }
-
-    /**
-     * Set the session instance on the request.
-     *
-     * @param CSession_Store $session
-     *
-     * @return void
-     */
-    public function setCFSession($session) {
-        $this->session = $session;
+        return CBase::session();
     }
 
     /**
