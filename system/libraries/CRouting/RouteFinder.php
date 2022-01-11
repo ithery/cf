@@ -220,4 +220,14 @@ class CRouting_RouteFinder {
 
         return $data;
     }
+
+    public static function controllerUrl($controller) {
+        $classExplode = explode('_', $controller);
+        $classExplode = array_map(function ($item) {
+            return cstr::camel($item);
+        }, $classExplode);
+        $url = curl::base() . implode('/', array_slice($classExplode, 1)) . '/';
+
+        return $url;
+    }
 }
