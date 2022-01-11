@@ -81,17 +81,13 @@ class CDaemon_Runner {
         $output = $this->debug ? $this->debugOutput() : '/dev/null';
         //$output = $this->debugOutput();
 
-        $commandToExecute = "NSS_STRICT_NOFORK=DISABLED ${binary} ${command} 1> \"${output}\" 2>&1 &";
+        $commandToExecute = "${binary} ${command} 1> \"${output}\" 2>&1 &";
 
-        if (defined('CFCLI')) {
-            $process = new Process($commandToExecute);
-            $process->run();
-            $result = $process->getOutput();
+        $process = new Process($commandToExecute);
+        $process->run();
+        $result = $process->getOutput();
 
-            return $result;
-        } else {
-            return exec($commandToExecute);
-        }
+        return $result;
     }
 
     // @codeCoverageIgnoreStart
