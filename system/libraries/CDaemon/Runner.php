@@ -161,7 +161,7 @@ class CDaemon_Runner {
 
     public function stop($exit = true) {
         $pid = $this->getPid();
-        $command = 'kill -2 ' . $pid;
+        $command = 'kill -9 ' . $pid;
         if (defined('CFCLI')) {
             $process = new Process($command);
             $process->run();
