@@ -13,14 +13,6 @@ class CBase {
         return new CBase_RecursionContext();
     }
 
-    public static function createMemoizeResolver(callable $func, callable $resolver = null) {
-        return new CBase_MemoizeResolver($func, $resolver);
-    }
-
-    public static function createMapCache() {
-        return new CBase_MapCache();
-    }
-
     public static function createStringParamable($string, array $params = []) {
         return new CBase_StringParamable($string, $params);
     }
