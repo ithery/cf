@@ -82,7 +82,11 @@ class CDaemon_Runner {
         //$output = $this->debugOutput();
 
         $commandToExecute = "${binary} ${command} 1> \"${output}\" 2>&1 &";
-
+        if (CF::isCli()) {
+            if ($this->serviceClass == TBDaemon_Service_PostPublishService::class) {
+                cdbg::d('From Runner', $this->serviceClass, $commandToExecute);
+            }
+        }
         $process = new Process($commandToExecute);
         $process->run();
         $result = $process->getOutput();
