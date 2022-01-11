@@ -36,7 +36,6 @@ class CDaemon_Runner {
         if ($isRunning = $this->isRunning()) {
             throw new CDaemon_Exception_AlreadyRunningException('daemon is running');
         }
-
         if ($isUnix) {
             return $this->runUnix();
         } else {
@@ -84,11 +83,11 @@ class CDaemon_Runner {
         $commandToExecute = "NSS_STRICT_NOFORK=DISABLED ${binary} ${command} 1> \"${output}\" 2>&1 &";
 
         if (defined('CFCLI')) {
-            $process = new Process($command);
+            $process = new Process($commandToExecute);
             $process->run();
             $result = $process->getOutput();
         } else {
-            $result = shell_exec($command);
+            $result = shell_exec($commandToExecute);
         }
 
         return $result;
