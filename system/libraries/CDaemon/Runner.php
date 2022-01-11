@@ -133,7 +133,7 @@ class CDaemon_Runner {
     }
 
     protected function debugOutput() {
-        $serviceClass = $this->config['serviceClass'];
+        $serviceClass = $this->serviceClass;
         $output = DOCROOT . 'temp' . DS . 'daemon' . DS . CF::appCode() . '/' . $serviceClass . '.log';
         $dir = dirname($output);
         if (!CFile::isDirectory($dir)) {
