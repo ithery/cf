@@ -74,7 +74,7 @@ class CConsole_Command_Queue_ListFailedCommand extends CConsole_Command {
         $payload = json_decode($payload, true);
 
         if ($payload && (!isset($payload['data']['command']))) {
-            return $payload['job'] ?? null;
+            return isset($payload['job']) ? $payload['job'] : null;
         } elseif ($payload && isset($payload['data']['command'])) {
             return $this->matchJobName($payload);
         }
@@ -90,7 +90,7 @@ class CConsole_Command_Queue_ListFailedCommand extends CConsole_Command {
     protected function matchJobName($payload) {
         preg_match('/"([^"]+)"/', $payload['data']['command'], $matches);
 
-        return $matches[1] ?? $payload['job'] ?? null;
+        return isset($matches[1]) ? $matches[1] : (isset($payload['job']) ? $payload['job'] : null);
     }
 
     /**
