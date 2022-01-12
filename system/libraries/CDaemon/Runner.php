@@ -33,7 +33,7 @@ class CDaemon_Runner {
             throw new Exception('posix extension is required');
         }
 
-        if ($isRunning = $this->isRunning()) {
+        if ($this->isRunning()) {
             throw new CDaemon_Exception_AlreadyRunningException('daemon is running');
         }
         if ($isUnix) {
@@ -82,15 +82,12 @@ class CDaemon_Runner {
 
         $commandToExecute = "NSS_STRICT_NOFORK=DISABLED ${binary} ${command} 1> \"${output}\" 2>&1 &";
 
-        if (defined('CFCLI')) {
-            $process = new Process($commandToExecute);
-            $process->run();
-            $result = $process->getOutput();
-        } else {
-            $result = shell_exec($commandToExecute);
-        }
+        $process = new Process($commandToExecute);
+        $process->setWorkingDirectory(DOCROOT);
+        $process->run();
+        $result = $process->getExitCode();
 
-        return $result;
+        return $result == 0;
     }
 
     // @codeCoverageIgnoreStart
