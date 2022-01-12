@@ -60,6 +60,7 @@ class CManager_DataProvider_ModelDataProvider extends CManager_DataProviderAbstr
 
         //process ordering
         if (count($this->sort) > 0) {
+            $query->getQuery()->orders = null;
             foreach ($this->sort as $fieldName => $sortDirection) {
                 if (strpos($fieldName, '.') !== false) {
                     $fields = explode('.', $fieldName);
