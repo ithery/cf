@@ -26,7 +26,7 @@ class CConsole_Command_Cron_ScheduleTestCommand extends CConsole_Command {
         $commandNames = [];
 
         foreach ($commands as $command) {
-            $commandNames[] = $command->command ?? $command->getSummaryForDisplay();
+            $commandNames[] = $command->command ?: $command->getSummaryForDisplay();
         }
 
         $index = array_search($this->choice('Which command would you like to run?', $commandNames), $commandNames);
