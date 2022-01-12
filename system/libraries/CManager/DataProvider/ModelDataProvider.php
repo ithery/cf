@@ -42,20 +42,23 @@ class CManager_DataProvider_ModelDataProvider extends CManager_DataProviderAbstr
 
         //process search
         if (count($this->search) > 0) {
-            foreach ($this->search as $fieldName => $value) {
-                if (strpos($fieldName, '.') !== false) {
-                    $fields = explode('.', $fieldName);
+            $dataSearch = $this->search;
+            $query->where(function (CModel_Query $q) use ($dataSearch) {
+                foreach ($dataSearch as $fieldName => $value) {
+                    if (strpos($fieldName, '.') !== false) {
+                        $fields = explode('.', $fieldName);
 
-                    $field = array_pop($fields);
-                    $relation = implode('.', $fields);
+                        $field = array_pop($fields);
+                        $relation = implode('.', $fields);
 
-                    $query->whereHas($relation, function ($q2) use ($value, $field) {
-                        $q2->where($field, 'like', '%' . $value . '%');
-                    });
-                } else {
-                    $query->where($fieldName, 'like', '%' . $value . '%');
+                        $q->orWhereHas($relation, function ($q2) use ($value, $field) {
+                            $q2->where($field, 'like', '%' . $value . '%');
+                        });
+                    } else {
+                        $q->orWhere($fieldName, 'like', '%' . $value . '%');
+                    }
                 }
-            }
+            });
         }
 
         //process ordering
