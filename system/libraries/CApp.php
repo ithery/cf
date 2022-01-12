@@ -15,6 +15,7 @@ defined('SYSPATH') or die('No direct access allowed.');
  * @method CElement_Component_DataTable    addTable($id=null)
  * @method CElement_Element_Div            addDiv($id=null)
  * @method CElement_Element_A              addA($id=null)
+ * @method CElement_Element_Span           addSpan($id=null)
  * @method CElement_Element_Pre            addPre($id=null)
  * @method CElement_List_ActionList        addActionList($id=null)
  * @method CElement_List_TabList           addTabList($id=null)
@@ -40,7 +41,6 @@ class CApp implements CInterface_Responsable, CInterface_Renderable, CInterface_
         CApp_Concern_AuthTrait,
         CApp_Concern_BootstrapTrait,
         CApp_Concern_TitleTrait;
-
     public static $instance = null;
 
     protected $renderer;

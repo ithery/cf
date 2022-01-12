@@ -47,7 +47,7 @@ trait CTrait_Compat_Factory {
     /**
      * @param string $calendarId
      *
-     * @deprecated since version 1.2, please use createTable
+     * @deprecated since version 1.2, dont use this anymore
      *
      * @return CCalendar
      */
@@ -60,11 +60,22 @@ trait CTrait_Compat_Factory {
     /**
      * @param string $id
      *
-     * @deprecated since version 1.2, please use createTable
+     * @deprecated since version 1.2, please use createNestable
      *
      * @return CElement_Component_Nestable
      */
     public static function create_nestable($id = '') {
         return static::createNestable($id);
+    }
+
+    /**
+     * @param string $id
+     *
+     * @deprecated since version 1.2, please use createTableRow
+     *
+     * @return CElement_Component_TableRow
+     */
+    public static function create_row($id = '') {
+        return static::createTableRow($id);
     }
 }
