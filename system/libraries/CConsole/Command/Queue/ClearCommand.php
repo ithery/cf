@@ -4,7 +4,6 @@ use Symfony\Component\Console\Input\InputArgument;
 
 class CConsole_Command_Queue_ClearCommand extends CConsole_Command {
     use CConsole_Trait_ConfirmableTrait;
-
     /**
      * The console command name.
      *
@@ -37,7 +36,7 @@ class CConsole_Command_Queue_ClearCommand extends CConsole_Command {
         // connection being run for the queue operation currently being executed.
         $queueName = $this->getQueue($connection);
 
-        $queue = ($this->laravel['queue'])->connection($connection);
+        $queue = CQueue::queuer()->connection($connection);
 
         if ($queue instanceof CQueue_Contract_ClearableQueueInterface) {
             $count = $queue->clear($queueName);

@@ -150,7 +150,7 @@ class CSession_Factory {
         // if it does not we will check for a creator method for the driver. Custom creator
         // callbacks allow developers to build their own "drivers" easily using Closures.
         if (isset($this->customCreators[$driver])) {
-            return $this->callCustomCreator($driver);
+            // return $this->callCustomCreator($driver);
         } else {
             $method = 'create' . cstr::studly($driver) . 'Driver';
             if (method_exists($this, $method)) {

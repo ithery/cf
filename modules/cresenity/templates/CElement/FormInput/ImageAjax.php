@@ -145,7 +145,7 @@ $maxHeight .= $suffixHeight;
                                     }
 
 
-                                    imageData = cropperImg.cropper('getCroppedCanvas', {width: cropperWidth, height: cropperHeight}).toDataURL(mime);
+                                    let imageData = cropperImg.cropper('getCroppedCanvas', {width: cropperWidth, height: cropperHeight}).toDataURL(mime);
 
                                     var img = "<img src=" + imageData + " /> ";
                                     $('#container-<?php echo $id; ?> .fileupload-preview').html(img);

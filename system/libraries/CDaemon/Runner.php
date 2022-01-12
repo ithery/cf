@@ -33,10 +33,9 @@ class CDaemon_Runner {
             throw new Exception('posix extension is required');
         }
 
-        if ($isRunning = $this->isRunning()) {
+        if ($this->isRunning()) {
             throw new CDaemon_Exception_AlreadyRunningException('daemon is running');
         }
-
         if ($isUnix) {
             return $this->runUnix();
         } else {
@@ -83,15 +82,12 @@ class CDaemon_Runner {
 
         $commandToExecute = "NSS_STRICT_NOFORK=DISABLED ${binary} ${command} 1> \"${output}\" 2>&1 &";
 
-        if (defined('CFCLI')) {
-            $process = new Process($commandToExecute);
-            $process->run();
-            $result = $process->getOutput();
+        $process = new Process($commandToExecute);
+        $process->setWorkingDirectory(DOCROOT);
+        $process->run();
+        $result = $process->getExitCode();
 
-            return $result;
-        } else {
-            return exec($commandToExecute);
-        }
+        return $result == 0;
     }
 
     // @codeCoverageIgnoreStart
@@ -133,7 +129,7 @@ class CDaemon_Runner {
     }
 
     protected function debugOutput() {
-        $serviceClass = $this->config['serviceClass'];
+        $serviceClass = $this->serviceClass;
         $output = DOCROOT . 'temp' . DS . 'daemon' . DS . CF::appCode() . '/' . $serviceClass . '.log';
         $dir = dirname($output);
         if (!CFile::isDirectory($dir)) {
@@ -161,7 +157,7 @@ class CDaemon_Runner {
 
     public function stop($exit = true) {
         $pid = $this->getPid();
-        $command = 'kill -2 ' . $pid;
+        $command = 'kill -9 ' . $pid;
         if (defined('CFCLI')) {
             $process = new Process($command);
             $process->run();

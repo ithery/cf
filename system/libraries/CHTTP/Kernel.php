@@ -181,7 +181,6 @@ class CHTTP_Kernel {
 
         try {
             $response = $this->sendRequestThroughRouter($request);
-
             //$response = $this->invokeController($request);
         } catch (Exception $e) {
             throw $e;
