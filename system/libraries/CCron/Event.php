@@ -929,7 +929,7 @@ class CCron_Event {
      *
      * @return void
      */
-    public function log(string $message) {
+    public function log(string $message = '') {
         static $logFile = '';
         static $logFileError = false;
         static $eventName = '';
@@ -937,8 +937,6 @@ class CCron_Event {
         if ($eventName != $this->description) {
             $eventName = $this->description;
             $eventName = str_replace(' ', '', $eventName);
-            $date = date('Y-m-d H:i:s');
-            $prefix = "[${date}]" . str_repeat("\t", $indent = 0);
             $logDir = DOCROOT . 'data' . DS . 'cron' . DS . CF::appCode() . DS . 'log' . DS . $eventName;
             $logFile = $logDir . DS . $eventName . '.log';
             if (!file_exists($logDir)) {
@@ -948,6 +946,10 @@ class CCron_Event {
                 self::$logHandle = false;
             }
         }
+
+        $date = date('Y-m-d H:i:s');
+        $prefix = "[${date}]" . str_repeat("\t", $indent = 0);
+
         if (self::$logHandle === false) {
             $fileSize = 0;
             if (file_exists($logFile)) {
