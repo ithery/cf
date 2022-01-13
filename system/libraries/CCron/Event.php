@@ -145,11 +145,20 @@ class CCron_Event {
     protected $afterCallbacks = [];
 
     /**
+     * Handle for log() method,.
+     *
+     * @see CCron_Event::log()
+     *
+     * @var stream
+     */
+    private static $logHandle = false;
+
+    /**
      * Create a new event instance.
      *
      * @param \CCron_Contract_EventMutexInterface $mutex
-     * @param string                                          $command
-     * @param null|\DateTimeZone|string                       $timezone
+     * @param string                              $command
+     * @param null|\DateTimeZone|string           $timezone
      *
      * @return void
      */
@@ -910,6 +919,79 @@ class CCron_Event {
     protected function removeMutex() {
         if ($this->withoutOverlapping) {
             $this->mutex->forget($this);
+        }
+    }
+
+    /**
+     * Write event log into file.
+     *
+     * @param string $message
+     *
+     * @return void
+     */
+    public function log(string $message) {
+        static $logFile = '';
+        static $logFileError = false;
+        static $eventName = '';
+
+        if ($eventName != $this->description) {
+            $eventName = $this->description;
+            $eventName = str_replace(' ', '', $eventName);
+            $date = date('Y-m-d H:i:s');
+            $prefix = "[${date}]" . str_repeat("\t", $indent = 0);
+            $logDir = DOCROOT . 'data' . DS . 'cron' . DS . CF::appCode() . DS . 'log' . DS . $eventName;
+            $logFile = $logDir . DS . $eventName . '.log';
+            if (!file_exists($logDir)) {
+                mkdir($logDir, 0777, true);
+            }
+            if (self::$logHandle) {
+                self::$logHandle = false;
+            }
+        }
+
+        if (self::$logHandle === false) {
+            $fileSize = filesize($logFile); // in bytes
+            // max file size 10MB
+            if ($fileSize >= 10485760) {
+                $this->rotateLog($logFile, 10);
+            }
+
+            if (strlen($logFile) > 0 && self::$logHandle = fopen($logFile, 'a+')) {
+            } elseif (!$logFileError) {
+                $logFileError = true;
+                trigger_error(__CLASS__ . 'Error: Could not write to logfile ' . $logFile, E_USER_WARNING);
+            }
+        }
+
+        $message = $prefix . ' ' . str_replace("\n", "\n${prefix} ", trim($message)) . "\n";
+        if (self::$logHandle) {
+            fwrite(self::$logHandle, $message);
+        }
+    }
+
+    /**
+     * Rotate to prevent huge size of log file.
+     *
+     * @param string $fileName
+     * @param int    $maxRotation
+     *
+     * @return void
+     */
+    private function rotateLog(string $fileName, int $maxRotation = 10) {
+        cdbg::d("rotate ${fileName}");
+        for ($i = $maxRotation; $i >= 0; $i--) {
+            $file = $fileName;
+            $fileToReplace = $fileName . '.' . ($i + 1);
+            if ($i > 0) {
+                $file .= ".${i}";
+            }
+            if (file_exists($file)) {
+                if ($i == $maxRotation) {
+                    unlink($file);
+                } else {
+                    rename($file, $fileToReplace);
+                }
+            }
         }
     }
 }
