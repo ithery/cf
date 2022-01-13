@@ -59,6 +59,7 @@ class CCron_Runner {
      * @return void
      */
     protected function runEvent($event, OutputInterface $output = null) {
+        CCron::setEvent($event);
         if ($output) {
             $output->writeln('<info>[' . date('c') . '] Running scheduled command:</info> ' . $event->getSummaryForDisplay());
         }
@@ -94,5 +95,6 @@ class CCron_Runner {
             $event->log(str_repeat('#', 64));
             $event->log();
         }
+        CCron::unsetEvent();
     }
 }
