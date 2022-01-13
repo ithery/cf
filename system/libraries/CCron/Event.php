@@ -948,12 +948,14 @@ class CCron_Event {
                 self::$logHandle = false;
             }
         }
-
         if (self::$logHandle === false) {
-            $fileSize = filesize($logFile); // in bytes
-            // max file size 10MB
-            if ($fileSize >= 10485760) {
-                $this->rotateLog($logFile, 10);
+            $fileSize = 0;
+            if (file_exists($logFile)) {
+                $fileSize = filesize($logFile); // in bytes
+                // max file size 10MB
+                if ($fileSize >= 10485760) {
+                    $this->rotateLog($logFile, 10);
+                }
             }
 
             if (strlen($logFile) > 0 && self::$logHandle = fopen($logFile, 'a+')) {
@@ -978,7 +980,6 @@ class CCron_Event {
      * @return void
      */
     private function rotateLog(string $fileName, int $maxRotation = 10) {
-        cdbg::d("rotate ${fileName}");
         for ($i = $maxRotation; $i >= 0; $i--) {
             $file = $fileName;
             $fileToReplace = $fileName . '.' . ($i + 1);
