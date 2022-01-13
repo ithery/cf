@@ -922,6 +922,23 @@ class CCron_Event {
         }
     }
 
+    public function getName() {
+        $eventName = $this->description;
+        $eventName = str_replace(' ', '', $eventName);
+
+        return $eventName;
+    }
+
+    public function getLogDirectory() {
+        $logDir = DOCROOT . 'data' . DS . 'cron' . DS . CF::appCode() . DS . 'log' . DS . $this->getName();
+
+        return $logDir;
+    }
+
+    public function getLogFile() {
+        return $this->getLogDirectory() . DS . $this->getName() . '.log';
+    }
+
     /**
      * Write event log into file.
      *
@@ -932,21 +949,20 @@ class CCron_Event {
     public function log(string $message = '') {
         static $logFile = '';
         static $logFileError = false;
-        static $eventName = '';
+        static $description = '';
 
-        if ($eventName != $this->description) {
-            $eventName = $this->description;
-            $eventName = str_replace(' ', '', $eventName);
-            $logDir = DOCROOT . 'data' . DS . 'cron' . DS . CF::appCode() . DS . 'log' . DS . $eventName;
-            $logFile = $logDir . DS . $eventName . '.log';
-            if (!file_exists($logDir)) {
-                mkdir($logDir, 0777, true);
+        if ($description != $this->description) {
+            $description = $this->description;
+            $logFile = $this->getLogFile();
+            if (!file_exists($this->getLogDirectory())) {
+                mkdir($this->getLogDirectory(), 0777, true);
             }
             if (self::$logHandle) {
                 self::$logHandle = false;
             }
         }
 
+        $header = "\nDate                  Message\n";
         $date = date('Y-m-d H:i:s');
         $prefix = "[${date}]" . str_repeat("\t", $indent = 0);
 
@@ -959,8 +975,11 @@ class CCron_Event {
                     $this->rotateLog($logFile, 10);
                 }
             }
-
             if (strlen($logFile) > 0 && self::$logHandle = fopen($logFile, 'a+')) {
+                $content = file_get_contents($logFile);
+                if ($content == '') {
+                    fwrite(self::$logHandle, $header);
+                }
             } elseif (!$logFileError) {
                 $logFileError = true;
                 trigger_error(__CLASS__ . 'Error: Could not write to logfile ' . $logFile, E_USER_WARNING);
@@ -996,5 +1015,18 @@ class CCron_Event {
                 }
             }
         }
+    }
+
+    /**
+     * Rotate log file
+     *
+     * @param integer $maxRotation
+     * @return void
+     */
+    public function rotate(int $maxRotation = 10) {
+        $this->rotateLog($this->getLogFile(), $maxRotation);
+        $handle = fopen($this->getLogFile(), 'a+');
+        fwrite($handle, "\nDate                  Message\n");
+        fclose($handle);
     }
 }
