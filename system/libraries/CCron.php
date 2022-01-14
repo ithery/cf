@@ -4,6 +4,11 @@ use Symfony\Component\Console\Output\OutputInterface;
 
 class CCron {
     /**
+     * @var CCron_Event
+     */
+    private static $runningEvent;
+
+    /**
      * @var CCron_Schedule
      */
     private static $schedule;
@@ -48,5 +53,38 @@ class CCron {
      */
     public static function run(OutputInterface $output = null) {
         return (new CCron_Runner())->run($output);
+    }
+
+    /**
+     * Set current running event to enable log using CCron::log().
+     *
+     * @param CCron_Event $event
+     *
+     * @return void
+     */
+    public static function setEvent(CCron_Event $event) {
+        static::$runningEvent = $event;
+    }
+
+    /**
+     * Remove current running event to prevent missplaced log file.
+     *
+     * @return void
+     */
+    public static function unsetEvent() {
+        static::$runningEvent = null;
+    }
+
+    /**
+     * Log cron event.
+     *
+     * @param string $message
+     *
+     * @return void
+     */
+    public static function log(string $message) {
+        if (static::$runningEvent) {
+            static::$runningEvent->log($message);
+        }
     }
 }

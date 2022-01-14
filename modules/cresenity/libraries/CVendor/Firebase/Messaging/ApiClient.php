@@ -72,7 +72,7 @@ class CVendor_Firebase_Messaging_ApiClient implements ClientInterface {
 
     /**
      * @throws MessagingException
-     * @throws FirebaseException
+     * @throws CVendor_Firebase_Exception
      */
     public function send(RequestInterface $request, array $options = []) {
         try {
