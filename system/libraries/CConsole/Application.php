@@ -176,7 +176,7 @@ class CConsole_Application extends SymfonyApplication implements CConsole_Applic
         if (is_subclass_of($command, SymfonyCommand::class)) {
             $callingClass = true;
 
-            $command = $this->laravel->make($command)->getName();
+            $command = c::container($command)->getName();
         }
 
         if (!isset($callingClass) && empty($parameters)) {

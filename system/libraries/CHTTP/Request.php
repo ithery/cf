@@ -16,6 +16,7 @@ class CHTTP_Request extends SymfonyRequest implements CInterface_Arrayable, Arra
     use CHTTP_Trait_InteractsWithInput,
         CHTTP_Trait_InteractsWithContentTypes,
         CHTTP_Trait_InteractsWithFlashData;
+
     protected $browser;
 
     /**
@@ -454,14 +455,10 @@ class CHTTP_Request extends SymfonyRequest implements CInterface_Arrayable, Arra
      *
      * @throws \RuntimeException
      *
-     * @return \Illuminate\Session\Store
+     * @return \CSession_Store
      */
     public function session() {
-        if (!$this->hasSession()) {
-            throw new RuntimeException('Session store not set on request.');
-        }
-
-        return $this->session;
+        return CF::session();
     }
 
     /**

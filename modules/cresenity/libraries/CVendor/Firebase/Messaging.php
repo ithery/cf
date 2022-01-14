@@ -43,7 +43,7 @@ class CVendor_Firebase_Messaging {
      *
      * @throws InvalidArgumentException
      * @throws MessagingException
-     * @throws FirebaseException
+     * @throws CVendor_Firebase_Exception
      */
     public function send($message) {
         $message = $this->makeMessage($message);
@@ -58,9 +58,9 @@ class CVendor_Firebase_Messaging {
      * @param array|Message|mixed                             $message
      * @param RegistrationToken[]|string[]|RegistrationTokens $registrationTokens
      *
-     * @throws InvalidArgumentException if the message is invalid
-     * @throws MessagingException       if the API request failed
-     * @throws FirebaseException        if something very unexpected happened (never :))
+     * @throws InvalidArgumentException   if the message is invalid
+     * @throws MessagingException         if the API request failed
+     * @throws CVendor_Firebase_Exception if something very unexpected happened (never :))
      *
      * @return CVendor_Firebase_Messaging_MulticastSendReport
      */
@@ -78,9 +78,9 @@ class CVendor_Firebase_Messaging {
     /**
      * @param array[]|Message[]|Messages $messages
      *
-     * @throws InvalidArgumentException if the message is invalid
-     * @throws MessagingException       if the API request failed
-     * @throws FirebaseException        if something very unexpected happened (never :))
+     * @throws InvalidArgumentException   if the message is invalid
+     * @throws MessagingException         if the API request failed
+     * @throws CVendor_Firebase_Exception if something very unexpected happened (never :))
      */
     public function sendAll($messages) {
         $ensuredMessages = [];

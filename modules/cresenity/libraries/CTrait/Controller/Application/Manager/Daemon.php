@@ -243,7 +243,8 @@ trait CTrait_Controller_Application_Manager_Daemon {
 
     public function logRestart($serviceClass = null) {
         if (strlen($serviceClass) == 0) {
-            curl::redirect($this->controllerUrl() . 'log/index' . static::groupQueryString());
+            // curl::redirect($this->controllerUrl() . 'log/index' . static::groupQueryString());
+            return c::redirect($this->controllerUrl() . 'log/index' . static::groupQueryString());
         }
         $group = carr::get($_GET, 'group');
         $app = CApp::instance();
@@ -272,7 +273,8 @@ trait CTrait_Controller_Application_Manager_Daemon {
         } else {
             cmsg::add('error', $errMessage);
         }
-        curl::redirect($this->controllerUrl() . 'log/index/' . $serviceClass . static::groupQueryString());
+        // curl::redirect($this->controllerUrl() . 'log/index/' . $serviceClass . static::groupQueryString());
+        return c::redirect($this->controllerUrl() . 'log/index/' . $serviceClass . static::groupQueryString());
     }
 
     public function logDump($serviceClass = null) {

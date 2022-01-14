@@ -75,6 +75,13 @@ final class CF {
     private static $sharedAppCode = [];
 
     /**
+     * CF Session.
+     *
+     * @var CSession_Store
+     */
+    private static $session;
+
+    /**
      * Check CF is running on production.
      *
      * @return bool
@@ -1243,5 +1250,20 @@ final class CF {
                 static::$data[$domain]['app_code'] = $originalAppCode;
             }
         }
+    }
+
+    public static function session() {
+        if (static::$session == null && CSession::sessionConfigured()) {
+            $request = CHTTP::request();
+            CSession::manager()->applyNativeSession();
+
+            static::$session = c::tap(CSession::manager()->createStore(), function ($session) use ($request) {
+                $session->setId($request->cookies->get($session->getName()));
+                $session->setRequestOnHandler($request);
+                $session->start();
+            });
+        }
+
+        return static::$session;
     }
 }

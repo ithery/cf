@@ -13,6 +13,7 @@ class CElement_FormInput_SelectSearch extends CElement_FormInput {
     use CElement_FormInput_SelectSearch_Trait_Select2v23Trait;
     use CTrait_Element_Property_ApplyJs;
     use CTrait_Element_Property_DependsOn;
+
     protected $query;
 
     protected $formatSelection;
@@ -408,7 +409,7 @@ class CElement_FormInput_SelectSearch extends CElement_FormInput {
                     delay: ' . $this->delay . ',
                     ' . $strMultiple . '
                     data: function (params) {
-                        result =  {
+                        let result = {
                             q: params.term, // search term
                             page: params.page,
                             limit: 10

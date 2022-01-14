@@ -89,6 +89,24 @@ class CCron_Schedule {
     }
 
     /**
+     * Add a new callback event to the schedule by class.
+     *
+     * @param CCron_Job $job
+     * @param array     $parameters
+     *
+     * @return \CCron_CallbackEvent
+     */
+    public function run(CCron_Job $job, array $parameters = []) {
+        $event = $this->call(function () use ($job) {
+            return $job->execute();
+        }, $parameters);
+        $event->expression = $job->getSchedule();
+        $event->name($job->getName());
+
+        return $event;
+    }
+
+    /**
      * Add a new Artisan command event to the schedule.
      *
      * @param string $command
@@ -121,7 +139,7 @@ class CCron_Schedule {
             $job = is_string($job) ? c::container()->make($job) : $job;
 
             if ($job instanceof CQueue_ShouldQueueInterface) {
-                $this->dispatchToQueue($job, $queue ?? $job->queue, $connection ?? $job->connection);
+                $this->dispatchToQueue($job, $queue ?: $job->queue, $connection ?: $job->connection);
             } else {
                 $this->dispatchNow($job);
             }
