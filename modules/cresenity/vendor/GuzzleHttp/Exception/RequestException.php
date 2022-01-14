@@ -1,20 +1,31 @@
 <?php
+
 namespace GuzzleHttp\Exception;
+
+use Psr\Http\Message\UriInterface;
 use Psr\Http\Message\RequestInterface;
 use Psr\Http\Message\ResponseInterface;
 use GuzzleHttp\Promise\PromiseInterface;
-use Psr\Http\Message\UriInterface;
+
 /**
- * HTTP Request exception
+ * HTTP Request exception.
  */
-class RequestException extends TransferException
-{
-    /** @var RequestInterface */
+class RequestException extends TransferException {
+    /**
+     * @var RequestInterface
+     */
     private $request;
-    /** @var ResponseInterface */
+
+    /**
+     * @var ResponseInterface
+     */
     private $response;
-    /** @var array */
+
+    /**
+     * @var array
+     */
     private $handlerContext;
+
     public function __construct(
         $message,
         RequestInterface $request,
@@ -31,27 +42,28 @@ class RequestException extends TransferException
         $this->response = $response;
         $this->handlerContext = $handlerContext;
     }
+
     /**
-     * Wrap non-RequestExceptions with a RequestException
+     * Wrap non-RequestExceptions with a RequestException.
      *
      * @param RequestInterface $request
      * @param \Exception       $e
      *
      * @return RequestException
      */
-    public static function wrapException(RequestInterface $request, \Exception $e)
-    {
+    public static function wrapException(RequestInterface $request, \Exception $e) {
         return $e instanceof RequestException
             ? $e
             : new RequestException($e->getMessage(), $request, null, $e);
     }
+
     /**
-     * Factory method to create a new exception with a normalized error message
+     * Factory method to create a new exception with a normalized error message.
      *
      * @param RequestInterface  $request  Request
      * @param ResponseInterface $response Response received
      * @param \Exception        $previous Previous exception
-     * @param array             $ctx      Optional handler context.
+     * @param array             $ctx      optional handler context
      *
      * @return self
      */
@@ -97,19 +109,20 @@ class RequestException extends TransferException
         if ($summary !== null) {
             $message .= ":\n{$summary}\n";
         }
+
         return new $className($message, $request, $response, $previous, $ctx);
     }
+
     /**
-     * Get a short summary of the response
+     * Get a short summary of the response.
      *
      * Will return `null` if the response is not printable.
      *
      * @param ResponseInterface $response
      *
-     * @return string|null
+     * @return null|string
      */
-    public static function getResponseBodySummary(ResponseInterface $response)
-    {
+    public static function getResponseBodySummary(ResponseInterface $response) {
         $body = $response->getBody();
         if (!$body->isSeekable() || !$body->isReadable()) {
             return null;
@@ -128,50 +141,53 @@ class RequestException extends TransferException
         if (preg_match('/[^\pL\pM\pN\pP\pS\pZ\n\r\t]/', $summary)) {
             return null;
         }
+
         return $summary;
     }
+
     /**
-     * Obfuscates URI if there is an username and a password present
+     * Obfuscates URI if there is an username and a password present.
      *
      * @param UriInterface $uri
      *
      * @return UriInterface
      */
-    private static function obfuscateUri($uri)
-    {
+    private static function obfuscateUri($uri) {
         $userInfo = $uri->getUserInfo();
         if (false !== ($pos = strpos($userInfo, ':'))) {
             return $uri->withUserInfo(substr($userInfo, 0, $pos), '***');
         }
+
         return $uri;
     }
+
     /**
-     * Get the request that caused the exception
+     * Get the request that caused the exception.
      *
      * @return RequestInterface
      */
-    public function getRequest()
-    {
+    public function getRequest() {
         return $this->request;
     }
+
     /**
-     * Get the associated response
+     * Get the associated response.
      *
-     * @return ResponseInterface|null
+     * @return null|ResponseInterface
      */
-    public function getResponse()
-    {
+    public function getResponse() {
         return $this->response;
     }
+
     /**
-     * Check if a response was received
+     * Check if a response was received.
      *
      * @return bool
      */
-    public function hasResponse()
-    {
+    public function hasResponse() {
         return $this->response !== null;
     }
+
     /**
      * Get contextual information about the error from the underlying handler.
      *
@@ -182,8 +198,7 @@ class RequestException extends TransferException
      *
      * @return array
      */
-    public function getHandlerContext()
-    {
+    public function getHandlerContext() {
         return $this->handlerContext;
     }
 }
