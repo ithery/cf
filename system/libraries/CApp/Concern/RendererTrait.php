@@ -242,8 +242,10 @@ HTML;
      */
     public function render() {
         /** @var CApp $this */
-        if ($this->rendered) {
-            throw new CApp_Exception('CApp already Rendered');
+        if (!CF::isTesting()) {
+            if ($this->rendered) {
+                throw new CApp_Exception('CApp already Rendered');
+            }
         }
         $this->rendered = true;
 

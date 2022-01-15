@@ -1062,7 +1062,7 @@ class c {
      *
      * @param null|string $guard
      *
-     * @return CAuth_Manager|CAuth_GuardInterface|CAuth_StatefulGuardInterface
+     * @return CAuth_Manager|CAuth_Contract_GuardInterface|CAuth_Contract_StatefulGuardInterface
      */
     public static function auth($guard = null) {
         if (is_null($guard)) {
@@ -1557,6 +1557,20 @@ class c {
      */
     public static function cookie() {
         return CHTTP::cookie();
+    }
+
+    /**
+     * @return CConsole_Kernel
+     */
+    public static function cli() {
+        return CConsole::kernel();
+    }
+
+    /**
+     * @return CCrypt_Encrypter
+     */
+    public static function crypt() {
+        return CCrypt::encrypter();
     }
 }
 

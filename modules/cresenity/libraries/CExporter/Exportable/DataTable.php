@@ -5,7 +5,7 @@ use PhpOffice\PhpSpreadsheet\Cell\DataType;
 use PhpOffice\PhpSpreadsheet\Cell\Coordinate;
 use PhpOffice\PhpSpreadsheet\Style\NumberFormat;
 
-class CExporter_Exportable_DataTable extends CExporter_Exportable implements CExporter_Concern_ShouldAutoSize, CExporter_Concern_FromCollection, CExporter_Concern_WithHeadings, CExporter_Concern_WithMapping, CExporter_Concern_WithColumnFormatting {
+class CExporter_Exportable_DataTable extends CExporter_Exportable implements CExporter_Concern_ShouldAutoSize, CExporter_Concern_FromCollection, CExporter_Concern_WithHeadings, CExporter_Concern_WithMapping, CExporter_Concern_WithColumnFormatting, CExporter_Concern_WithEvents {
     protected $table;
 
     protected $columnFormats;
@@ -13,6 +13,15 @@ class CExporter_Exportable_DataTable extends CExporter_Exportable implements CEx
     public function __construct(CElement_Component_DataTable $table) {
         $this->table = $table;
         $this->columnFormats = [];
+    }
+
+    /**
+     * @return array
+     */
+    public function registerEvents() {
+        return [
+            CExporter_Event_AfterSheet::class => [$this, 'handleAfterSheet'],
+        ];
     }
 
     public function collection() {
@@ -180,5 +189,27 @@ class CExporter_Exportable_DataTable extends CExporter_Exportable implements CEx
         }
 
         return $heading;
+    }
+
+    public function handleAfterSheet(CExporter_Event_AfterSheet $event) {
+        $worksheet = $event->sheet->getDelegate();
+        $columnString = $worksheet->getHighestColumn();
+        $lastColumn = Coordinate::columnIndexFromString($columnString);
+        $lastRow = $worksheet->getHighestRow();
+        $event->sheet->autoSize();
+        $footerFields = $this->table->getFooterFields();
+        $currentRow = $lastRow;
+        foreach ($footerFields as $footerField) {
+            $currentRow = $currentRow + 1;
+            $label = $footerField->getLabel();
+            $value = $footerField->getValue();
+            $dataType = static::detectDataTypeFromValue($value);
+            $worksheet->setCellValue('A' . $currentRow, $label);
+            if ($dataType) {
+                $worksheet->setCellValueExplicit(Coordinate::stringFromColumnIndex($lastColumn) . $currentRow, $value, $dataType);
+            } else {
+                $worksheet->setCellValue(Coordinate::stringFromColumnIndex($lastColumn) . $currentRow, $value, $dataType);
+            }
+        }
     }
 }

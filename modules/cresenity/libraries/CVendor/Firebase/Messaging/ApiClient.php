@@ -1,18 +1,17 @@
 <?php
 
 use GuzzleHttp\ClientInterface;
-use GuzzleHttp\Promise\PromiseInterface;
 use Psr\Http\Message\RequestInterface;
 use Psr\Http\Message\ResponseInterface;
+use GuzzleHttp\Promise\PromiseInterface;
 
 /**
  * @internal
  */
 class CVendor_Firebase_Messaging_ApiClient implements ClientInterface {
     use CVendor_Firebase_Trait_WrappedGuzzleClientTrait;
-
     /**
-     * @var MessagingApiExceptionConverter
+     * @var CVendor_Firebase_Messaging_ApiExceptionConverter
      */
     private $errorHandler;
 
@@ -73,12 +72,14 @@ class CVendor_Firebase_Messaging_ApiClient implements ClientInterface {
 
     /**
      * @throws MessagingException
-     * @throws FirebaseException
+     * @throws CVendor_Firebase_Exception
      */
     public function send(RequestInterface $request, array $options = []) {
         try {
             return $this->client->send($request);
         } catch (Throwable $e) {
+            throw $this->errorHandler->convertException($e);
+        } catch (Exception $e) {
             throw $this->errorHandler->convertException($e);
         }
     }

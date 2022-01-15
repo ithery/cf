@@ -1,24 +1,24 @@
 <?php
 
-use GuzzleHttp\Exception\RequestException;
 use Psr\Http\Message\RequestInterface;
 use Psr\Http\Message\ResponseInterface;
+use GuzzleHttp\Exception\RequestException;
 
 trait CVendor_Firebase_Trait_ExceptionHasRequestAndResponseTrait {
     /**
-     * @var RequestInterface|null
+     * @var null|RequestInterface
      */
     protected $request;
 
     /**
-     * @var ResponseInterface|null
+     * @var null|ResponseInterface
      */
     protected $response;
 
     /**
      * @deprecated 4.28.0
      *
-     * @return RequestInterface|null
+     * @return null|RequestInterface
      */
     public function getRequest() {
         if ($this->request) {
@@ -35,7 +35,7 @@ trait CVendor_Firebase_Trait_ExceptionHasRequestAndResponseTrait {
     /**
      * @deprecated 4.28.0
      *
-     * @return RequestInterface|null
+     * @return null|RequestInterface
      */
     public function request() {
         return $this->getRequest();
@@ -44,7 +44,7 @@ trait CVendor_Firebase_Trait_ExceptionHasRequestAndResponseTrait {
     /**
      * @deprecated 4.28.0
      *
-     * @return ResponseInterface|null
+     * @return null|ResponseInterface
      */
     public function getResponse() {
         if ($this->response) {
@@ -61,14 +61,14 @@ trait CVendor_Firebase_Trait_ExceptionHasRequestAndResponseTrait {
     /**
      * @deprecated 4.28.0
      *
-     * @return ResponseInterface|null
+     * @return null|ResponseInterface
      */
     public function response() {
         return $this->getResponse();
     }
 
     /**
-     * @return RequestException|null
+     * @return null|RequestException
      */
     private function getPreviousIfItIsARequestException() {
         if (!($this instanceof Throwable)) {

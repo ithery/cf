@@ -76,7 +76,7 @@ trait CTesting_Concern_MakesHttpRequests {
      *
      * @return $this
      */
-    public function withHeader(string $name, string $value) {
+    public function withHeader($name, $value) {
         $this->defaultHeaders[$name] = $value;
 
         return $this;
