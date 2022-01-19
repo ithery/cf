@@ -31,6 +31,7 @@ class CExporter_QueuedWriter {
         if (static::$instance == null) {
             static::$instance = new CExporter_QueuedWriter();
         }
+
         return static::$instance;
     }
 
@@ -38,7 +39,7 @@ class CExporter_QueuedWriter {
      * @param object       $export
      * @param string       $filePath
      * @param string       $disk
-     * @param string|null  $writerType
+     * @param null|string  $writerType
      * @param array|string $diskOptions
      *
      * @return CQueue_PendingDispatch
@@ -55,7 +56,10 @@ class CExporter_QueuedWriter {
             $diskOptions
         ));
 
-        return CExporter_TaskQueue_QueueExport::withChain($jobs->toArray())->dispatch($export, $temporaryFile, $writerType);
+        return new CQueue_PendingDispatch(
+            (new CExporter_TaskQueue_QueueExport($export, $temporaryFile, $writerType))->chain($jobs->toArray())
+        );
+        //return CExporter_TaskQueue_QueueExport::withChain($jobs->toArray())->dispatch($export, $temporaryFile, $writerType);
     }
 
     /**
@@ -71,7 +75,7 @@ class CExporter_QueuedWriter {
             $sheetExports = $export->sheets();
         }
 
-        $jobs = new CCollection;
+        $jobs = new CCollection();
         foreach ($sheetExports as $sheetIndex => $sheetExport) {
             if ($sheetExport instanceof CExporter_Concern_FromCollection) {
                 $jobs = $jobs->merge($this->exportCollection($sheetExport, $temporaryFile, $writerType, $sheetIndex));

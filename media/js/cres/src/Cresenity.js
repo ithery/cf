@@ -22,6 +22,7 @@ import removePreloader from './module/preloader';
 import initProgressive from './module/progressive';
 import cresToast from './module/toast';
 import CresAlpine from './module/CresAlpine';
+import SSE from './module/SSE';
 
 export default class Cresenity {
     constructor() {
@@ -55,6 +56,7 @@ export default class Cresenity {
         this.dispatchWindowEvent = dispatchWindowEvent;
         this.websocket = null;
         this.debounce = debounce;
+        this.sse = new SSE();
     }
     loadJs(filename, callback) {
         let fileref = document.createElement('script');
@@ -1056,7 +1058,7 @@ export default class Cresenity {
                             dataType: 'json',
                             success: (responseProgress) => {
                                 this.handleJsonResponse(responseProgress, (dataProgress) => {
-                                    if (data.state === 'DONE') {
+                                    if (dataProgress.state === 'DONE') {
                                         progressContainer.find('.progress-container-status').empty();
                                         let innerStatus = $('<div>');
 

@@ -40,7 +40,7 @@ trait CElement_Component_DataTable_Trait_ActionCreationTrait {
         $options['action'] = CExporter::ACTION_DOWNLOAD;
         $options['queued'] = true;
         $act = CElement_Factory::createComponent('Action', $id)->setLabel('Export');
-
+        /** @var CElement_Component_Action $act */
         $disk = carr::get($options, 'disk');
         $filename = carr::get($options, 'filename');
 
@@ -57,7 +57,7 @@ trait CElement_Component_DataTable_Trait_ActionCreationTrait {
         $ajaxMethod->setData('fileUrl', $fileUrl);
         $downloadUrl = $ajaxMethod->makeUrl();
 
-        $act->addListener('click')->addHandler('downloadProgress')->setUrl($downloadUrl);
+        $act->addListener('click')->addDownloadProgressHandler()->setUrl($downloadUrl);
 
         return $act;
     }
