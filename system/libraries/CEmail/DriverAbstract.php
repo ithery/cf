@@ -27,7 +27,7 @@ abstract class CEmail_DriverAbstract implements CEmail_DriverInterface {
     protected function formatAddresses(array $items) {
         $addresses = $this->arrayAddresses($items);
 
-        return implode(', ' . $addresses);
+        return implode(', ', $addresses);
     }
 
     protected function arrayAddresses(array $items) {
