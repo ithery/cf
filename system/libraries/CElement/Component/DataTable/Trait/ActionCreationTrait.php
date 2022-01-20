@@ -49,13 +49,14 @@ trait CElement_Component_DataTable_Trait_ActionCreationTrait {
         $fileUrl = CStorage::instance()->disk($disk)->url($filename);
 
         $ajaxMethod = CAjax::createMethod();
-        $ajaxMethod->setType('DataTableExporter');
+        $ajaxMethod->setType(CAjax_Engine_DataTableExporter::class);
         $ajaxMethod->setData('table', serialize($this));
         $ajaxMethod->setData('exporter', $options);
         $ajaxMethod->setData('progress', true);
         $ajaxMethod->setData('state', 'PENDING');
         $ajaxMethod->setData('progressValue', '0');
         $ajaxMethod->setData('progressMax', '100');
+        $ajaxMethod->setData('writerType', carr::get($options, 'writerType', CExporter::XLS));
         $ajaxMethod->setData('fileUrl', $fileUrl);
         $downloadUrl = $ajaxMethod->makeUrl();
 

@@ -383,7 +383,7 @@ final class CManager {
         return new CManager_DataProvider_SqlDataProvider($sql, $bindings);
     }
 
-    public static function createClosureDataProvider($sql, array $bindings = []) {
-        return new CManager_DataProvider_ClosureDataProvider($sql, $bindings);
+    public static function createClosureDataProvider($sql, $requires) {
+        return new CManager_DataProvider_ClosureDataProvider($sql, carr::wrap($requires));
     }
 }

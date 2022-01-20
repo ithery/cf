@@ -10,11 +10,11 @@ class CManager_DataProvider_ClosureDataProvider extends CManager_DataProviderAbs
      */
     protected $closure;
 
-    protected $bindings;
+    protected $requires;
 
-    public function __construct($closure, array $options = []) {
+    public function __construct($closure, array $requires = []) {
         $this->closure = new SerializableClosure($closure);
-        $this->options = $options;
+        $this->requires = $requires;
     }
 
     public function setConnection($connection) {
@@ -34,8 +34,12 @@ class CManager_DataProvider_ClosureDataProvider extends CManager_DataProviderAbs
 
         $parameter = $this->createParameter();
         $parameter->setForPagination($page, $perPage);
+        foreach ($this->requires as $require) {
+            require_once $require;
+        }
 
         $results = $this->closure->__invoke($parameter);
+
         if ($results instanceof CPagination_LengthAwarePaginator) {
             return $results;
         }

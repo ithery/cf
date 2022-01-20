@@ -591,12 +591,13 @@ class CElement_Component_DataTable extends CElement_Component {
     }
 
     /**
-     * @param Closure $closure
+     * @param Closure    $closure
+     * @param null|mixed $requires
      *
      * @return $this
      */
-    public function setDataFromClosure($closure) {
-        $this->query = CManager::createClosureDataProvider($closure);
+    public function setDataFromClosure($closure, $requires = null) {
+        $this->query = CManager::createClosureDataProvider($closure, carr::wrap($requires));
 
         return $this;
     }
@@ -853,5 +854,9 @@ class CElement_Component_DataTable extends CElement_Component {
                 $this->data = $r->result(false);
             }
         }
+    }
+
+    public function isUsingDataProvider() {
+        return $this->query instanceof CManager_Contract_DataProviderInterface;
     }
 }

@@ -29,7 +29,7 @@ class CAjax_Engine_DataTable_ExporterProcessor_Query extends CAjax_Engine_DataTa
             $exportOptions['diskOptions'] = [
                 'ContentType' => 'application/octet-stream'
             ];
-
+            $exportable->setDownloadId($fileId);
             $storeResult = CExporter::store($exportable, $filename, $exportOptions);
 
             if ($queued) {

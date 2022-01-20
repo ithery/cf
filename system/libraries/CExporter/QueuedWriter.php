@@ -82,6 +82,8 @@ class CExporter_QueuedWriter {
                 $jobs = $jobs->merge($this->exportQuery($sheetExport, $temporaryFile, $writerType, $sheetIndex));
             } elseif ($sheetExport instanceof CExporter_Concern_FromView) {
                 $jobs = $jobs->merge($this->exportView($sheetExport, $temporaryFile, $writerType, $sheetIndex));
+            } elseif ($sheetExport instanceof CExporter_Concern_FromDataTable) {
+                $jobs = $jobs->merge($this->exportDataTable($sheetExport, $temporaryFile, $writerType, $sheetIndex));
             }
 
             $jobs->push(new CExporter_TaskQueue_CloseSheet($sheetExport, $temporaryFile, $writerType, $sheetIndex));
@@ -102,6 +104,56 @@ class CExporter_QueuedWriter {
         return $export
             ->collection()
             ->chunk($this->getChunkSize($export))
+            ->map(function ($rows) use ($writerType, $temporaryFile, $sheetIndex, $export) {
+                if ($rows instanceof Traversable) {
+                    $rows = iterator_to_array($rows);
+                }
+
+                return new CExporter_TaskQueue_AppendDataToSheet(
+                    $export,
+                    $temporaryFile,
+                    $writerType,
+                    $sheetIndex,
+                    $rows
+                );
+            });
+    }
+
+    /**
+     * @param CExporter_Concern_FromDataTable $export
+     * @param CExporter_File_TemporaryFile    $temporaryFile
+     * @param string                          $writerType
+     * @param int                             $sheetIndex
+     *
+     * @return CCollection
+     */
+    private function exportDataTable(CExporter_Concern_FromDataTable $export, CExporter_File_TemporaryFile $temporaryFile, $writerType, $sheetIndex) {
+        $dataTable = $export->dataTable();
+
+        if ($dataTable->isUsingDataProvider()) {
+            $perPage = $this->getChunkSize($export);
+
+            /** @var CManager_Contract_DataProviderInterface $query */
+            $query = $dataTable->getQuery();
+
+            if ($perPage > 200) {
+                $perPage = 200;
+            }
+
+            $task = [];
+            $task[] = new CExporter_TaskQueue_AppendDataProviderToSheet(
+                $export,
+                $temporaryFile,
+                $writerType,
+                $sheetIndex,
+                $query,
+                $perPage
+            );
+
+            return c::collect($task);
+        }
+
+        return $dataTable->setAjax(false)->getCollection()->chunk($this->getChunkSize($export))
             ->map(function ($rows) use ($writerType, $temporaryFile, $sheetIndex, $export) {
                 if ($rows instanceof Traversable) {
                     $rows = iterator_to_array($rows);

@@ -197,7 +197,6 @@ final class CF {
         static::loadBootstrapFiles();
         // Setup is complete, prevent it from being run again
         $run = true;
-
         // Stop the environment setup routine
     }
 
@@ -230,6 +229,7 @@ final class CF {
         //try to locate bootstrap files for application
         CFBenchmark::start(SYSTEM_BENCHMARK . '_environment_application_bootstrap');
         $bootstrapPath = DOCROOT . 'application' . DS . CF::appCode() . DS;
+
         if (file_exists($bootstrapPath . 'bootstrap' . EXT)) {
             include $bootstrapPath . 'bootstrap' . EXT;
         }
@@ -578,6 +578,7 @@ final class CF {
             $file = implode(DS, array_map(function ($item) {
                 return lcfirst($item);
             }, explode('_', $file)));
+            CDaemon::log('Autoload Controller:' . $file);
         } else {
             // This could be either a library or a helper, but libraries must
             // always be capitalized, so we check if the first character is
@@ -832,6 +833,9 @@ final class CF {
         if (!$reload) {
             $found = static::getInternalCache($cacheKey);
         }
+        if ($directory == 'controllers') {
+            CDaemon::log('Find Controller From Cache:' . $found);
+        }
 
         if ($found === null) {
             // Load include paths
@@ -840,7 +844,6 @@ final class CF {
             if ($directory === 'config' or $directory === 'i18n') {
                 // Search in reverse, for merging
                 $paths = array_reverse($paths);
-
                 foreach ($paths as $path) {
                     if (static::isFile($path . $search)) {
                         // A matching file has been found
@@ -849,9 +852,15 @@ final class CF {
                 }
             } else {
                 foreach ($paths as $path) {
+                    if ($directory == 'controllers') {
+                        CDaemon::log('Try Find Controller on path:' . $path . $search);
+                    }
                     if (static::isFile($path . $search)) {
                         // A matching file has been found
                         $found = $path . $search;
+                        if ($directory == 'controllers') {
+                            CDaemon::log('Found Controller on path:' . $path . $search);
+                        }
 
                         // Stop searching
                         break;
