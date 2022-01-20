@@ -401,7 +401,7 @@ export default class Cresenity {
 
                             setTimeout(() => {
                                 $(lastModal).remove();
-                                this.modalElements.pop();
+                                window.cresenity.modalElements.pop();
 
 
                                 let modalExists = $('.modal:visible').length > 0;
