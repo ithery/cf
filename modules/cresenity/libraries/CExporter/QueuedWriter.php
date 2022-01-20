@@ -55,10 +55,9 @@ class CExporter_QueuedWriter {
             $disk,
             $diskOptions
         ));
+        $taskQueue = (new CExporter_TaskQueue_QueueExport($export, $temporaryFile, $writerType))->chain($jobs->toArray());
 
-        return new CQueue_PendingDispatch(
-            (new CExporter_TaskQueue_QueueExport($export, $temporaryFile, $writerType))->chain($jobs->toArray())
-        );
+        return new CQueue_PendingDispatch($taskQueue);
         //return CExporter_TaskQueue_QueueExport::withChain($jobs->toArray())->dispatch($export, $temporaryFile, $writerType);
     }
 

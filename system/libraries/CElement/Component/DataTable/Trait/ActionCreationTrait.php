@@ -1,5 +1,7 @@
 <?php
-
+/**
+ * @see CElement_Component_DataTable
+ */
 trait CElement_Component_DataTable_Trait_ActionCreationTrait {
     public function createExportAction($options) {
         $id = carr::get($options, 'id');

@@ -77,6 +77,7 @@ class CModel_Query {
     use CDatabase_Trait_Builder,
         CModel_Trait_QueriesRelationships,
         CTrait_ForwardsCalls;
+
     /**
      * The base query builder instance.
      *
