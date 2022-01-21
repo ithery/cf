@@ -37,12 +37,14 @@ class CQueue_Runner {
      *
      * @param CQueue_Worker     $worker
      * @param CCache_Repository $cache
+     * @param array             $options
      *
      * @return void
      */
-    public function __construct(CQueue_Worker $worker, CCache_Repository $cache = null) {
+    public function __construct(CQueue_Worker $worker, CCache_Repository $cache = null, array $options = []) {
         $this->cache = $cache;
         $this->worker = $worker;
+        $this->options = $options;
     }
 
     public function run($connection = null, $queue = null) {

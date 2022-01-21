@@ -1572,6 +1572,27 @@ class c {
     public static function crypt() {
         return CCrypt::encrypter();
     }
+
+    /**
+     * Create a new length-aware paginator instance.
+     *
+     * @param CCollection $items
+     * @param int         $total
+     * @param int         $perPage
+     * @param int         $currentPage
+     * @param array       $options
+     *
+     * @return CPagination_LengthAwarePaginator
+     */
+    public static function paginator($items, $total, $perPage, $currentPage, $options) {
+        return CContainer::getInstance()->makeWith(CPagination_LengthAwarePaginator::class, compact(
+            'items',
+            'total',
+            'perPage',
+            'currentPage',
+            'options'
+        ));
+    }
 }
 
 // End c

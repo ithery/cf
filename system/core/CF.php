@@ -197,7 +197,6 @@ final class CF {
         static::loadBootstrapFiles();
         // Setup is complete, prevent it from being run again
         $run = true;
-
         // Stop the environment setup routine
     }
 
@@ -230,6 +229,7 @@ final class CF {
         //try to locate bootstrap files for application
         CFBenchmark::start(SYSTEM_BENCHMARK . '_environment_application_bootstrap');
         $bootstrapPath = DOCROOT . 'application' . DS . CF::appCode() . DS;
+
         if (file_exists($bootstrapPath . 'bootstrap' . EXT)) {
             include $bootstrapPath . 'bootstrap' . EXT;
         }
@@ -840,7 +840,6 @@ final class CF {
             if ($directory === 'config' or $directory === 'i18n') {
                 // Search in reverse, for merging
                 $paths = array_reverse($paths);
-
                 foreach ($paths as $path) {
                     if (static::isFile($path . $search)) {
                         // A matching file has been found
@@ -852,7 +851,6 @@ final class CF {
                     if (static::isFile($path . $search)) {
                         // A matching file has been found
                         $found = $path . $search;
-
                         // Stop searching
                         break;
                     }

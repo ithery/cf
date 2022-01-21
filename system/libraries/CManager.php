@@ -378,4 +378,12 @@ final class CManager {
     public static function createModelDataProvider($model, $queryCallback = null) {
         return new CManager_DataProvider_ModelDataProvider($model, $queryCallback);
     }
+
+    public static function createSqlDataProvider($sql, array $bindings = []) {
+        return new CManager_DataProvider_SqlDataProvider($sql, $bindings);
+    }
+
+    public static function createClosureDataProvider($sql, $requires) {
+        return new CManager_DataProvider_ClosureDataProvider($sql, carr::wrap($requires));
+    }
 }
