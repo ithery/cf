@@ -9,10 +9,11 @@ use Doctrine\DBAL\Connection as DoctrineConnection;
  *
  * @since Aug 18, 2018, 8:39:09 AM
  */
-abstract class CDatabase_Connection implements CDatabase_ConnectionInterface {
-    use CDatabase_Trait_DetectConcurrencyErrors,
-        CDatabase_Trait_DetectLostConnection,
-        CDatabase_Trait_ManageTransaction;
+class CDatabase_Connection implements CDatabase_ConnectionInterface {
+    use CTrait_Compat_Database;
+    use CDatabase_Trait_DetectDeadlock;
+    use CDatabase_Trait_DetectLostConnection;
+    use CDatabase_Trait_ManageTransaction;
 
     /**
      * The active PDO connection.
