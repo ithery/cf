@@ -17,9 +17,9 @@ trait CDatabase_Trait_ManageTransaction {
      * @param \Closure $callback
      * @param int      $attempts
      *
-     * @return mixed
-     *
      * @throws \Exception|\Throwable
+     *
+     * @return mixed
      */
     public function transaction(Closure $callback, $attempts = 1) {
         for ($currentAttempt = 1; $currentAttempt <= $attempts; $currentAttempt++) {
@@ -42,6 +42,7 @@ trait CDatabase_Trait_ManageTransaction {
                 );
             } catch (Throwable $e) {
                 $this->rollBack();
+
                 throw $e;
             }
         }
@@ -54,9 +55,9 @@ trait CDatabase_Trait_ManageTransaction {
      * @param int        $currentAttempt
      * @param int        $maxAttempts
      *
-     * @return void
-     *
      * @throws \Exception
+     *
+     * @return void
      */
     protected function handleTransactionException($e, $currentAttempt, $maxAttempts) {
         // On a deadlock, MySQL rolls back the entire transaction so we can't just
@@ -66,6 +67,7 @@ trait CDatabase_Trait_ManageTransaction {
             && $this->transactions > 1
         ) {
             $this->transactions--;
+
             throw $e;
         }
         // If there was an exception we will rollback this transaction and then we
@@ -75,6 +77,7 @@ trait CDatabase_Trait_ManageTransaction {
         if ($this->causedByDeadlock($e) && $currentAttempt < $maxAttempts) {
             return;
         }
+
         throw $e;
     }
 
@@ -83,9 +86,9 @@ trait CDatabase_Trait_ManageTransaction {
      *
      * @param bool $isSavePoint
      *
-     * @return void
-     *
      * @throws \Exception
+     *
+     * @return void
      */
     public function beginTransaction($isSavePoint = true) {
         if ($this->transactions == 0) {
@@ -97,11 +100,11 @@ trait CDatabase_Trait_ManageTransaction {
     }
 
     /**
-     * Alias of beginTransaction but will not create save point
-     *
-     * @return void
+     * Alias of beginTransaction but will not create save point.
      *
      * @throws \Exception
+     *
+     * @return void
      */
     public function begin() {
         return $this->beginTransaction(false);
@@ -145,9 +148,9 @@ trait CDatabase_Trait_ManageTransaction {
      *
      * @param \Throwable $e
      *
-     * @return void
-     *
      * @throws \Exception
+     *
+     * @return void
      */
     protected function handleBeginTransactionException($e) {
         if ($this->causedByLostConnection($e)) {
@@ -174,11 +177,11 @@ trait CDatabase_Trait_ManageTransaction {
     /**
      * Rollback the active database transaction.
      *
-     * @param int|null $toLevel
-     *
-     * @return void
+     * @param null|int $toLevel
      *
      * @throws \Exception
+     *
+     * @return void
      */
     public function rollback($toLevel = null) {
         // We allow developers to rollback to a certain transaction level. We will verify
@@ -228,6 +231,7 @@ trait CDatabase_Trait_ManageTransaction {
         if ($this->causedByLostConnection($e)) {
             $this->transactions = 0;
         }
+
         throw $e;
     }
 

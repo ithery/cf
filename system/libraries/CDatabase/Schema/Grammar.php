@@ -325,4 +325,40 @@ abstract class CDatabase_Schema_Grammar extends CDatabase_Grammar {
     public function supportsSchemaTransactions() {
         return $this->transactions;
     }
+
+    /**
+     * Compile the query to determine the list of tables.
+     *
+     * @return string
+     */
+    public function compileTableExists() {
+        throw new LogicException('This database driver does not support check table exists.');
+    }
+
+    /**
+     * Compile the query to determine the list of columns.
+     *
+     * @return string
+     */
+    public function compileColumnListing() {
+        throw new LogicException('This database driver does not support column listing.');
+    }
+
+    /**
+     * Compile the command to enable foreign key constraints.
+     *
+     * @return string
+     */
+    public function compileEnableForeignKeyConstraints() {
+        throw new LogicException('This database driver does not support enable foreign key constraints.');
+    }
+
+    /**
+     * Compile the command to disable foreign key constraints.
+     *
+     * @return string
+     */
+    public function compileDisableForeignKeyConstraints() {
+        throw new LogicException('This database driver does not support disable foreign key constraints.');
+    }
 }
