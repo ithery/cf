@@ -1,4 +1,5 @@
 <?php
+use Opis\Closure\SerializableClosure;
 
 class CElement_Component_DataTable extends CElement_Component {
     use CTrait_Compat_Element_DataTable,
@@ -455,12 +456,15 @@ class CElement_Component_DataTable extends CElement_Component {
     /**
      * Set callback for table cell render.
      *
-     * @param callable $func    parameter: $table,$col,$row,$value
-     * @param string   $require File location of callable function to require
+     * @param callable|Closure $func    parameter: $table,$col,$row,$value
+     * @param string           $require File location of callable function to require
      *
      * @return $this
      */
     public function cellCallbackFunc($func, $require = '') {
+        if ($func instanceof Closure) {
+            $func = new SerializableClosure($func);
+        }
         $this->cellCallbackFunc = $func;
         if (strlen($require) > 0) {
             $this->requires[] = $require;
@@ -581,7 +585,19 @@ class CElement_Component_DataTable extends CElement_Component {
      * @return $this
      */
     public function setDataFromQuery($q) {
-        $this->query = $q;
+        $this->query = CManager::createSqlDataProvider($q);
+
+        return $this;
+    }
+
+    /**
+     * @param Closure    $closure
+     * @param null|mixed $requires
+     *
+     * @return $this
+     */
+    public function setDataFromClosure($closure, $requires = null) {
+        $this->query = CManager::createClosureDataProvider($closure, carr::wrap($requires));
 
         return $this;
     }
@@ -838,5 +854,9 @@ class CElement_Component_DataTable extends CElement_Component {
                 $this->data = $r->result(false);
             }
         }
+    }
+
+    public function isUsingDataProvider() {
+        return $this->query instanceof CManager_Contract_DataProviderInterface;
     }
 }

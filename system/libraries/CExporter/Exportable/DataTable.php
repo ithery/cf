@@ -5,7 +5,7 @@ use PhpOffice\PhpSpreadsheet\Cell\DataType;
 use PhpOffice\PhpSpreadsheet\Cell\Coordinate;
 use PhpOffice\PhpSpreadsheet\Style\NumberFormat;
 
-class CExporter_Exportable_DataTable extends CExporter_Exportable implements CExporter_Concern_ShouldAutoSize, CExporter_Concern_FromCollection, CExporter_Concern_WithHeadings, CExporter_Concern_WithMapping, CExporter_Concern_WithColumnFormatting, CExporter_Concern_WithEvents {
+class CExporter_Exportable_DataTable extends CExporter_Exportable implements CExporter_Concern_ShouldAutoSize, CExporter_Concern_FromDataTable, CExporter_Concern_WithHeadings, CExporter_Concern_WithMapping, CExporter_Concern_WithColumnFormatting, CExporter_Concern_WithEvents {
     protected $table;
 
     protected $columnFormats;
@@ -24,10 +24,10 @@ class CExporter_Exportable_DataTable extends CExporter_Exportable implements CEx
         ];
     }
 
-    public function collection() {
+    public function dataTable() {
         $this->table->setAjax(false);
 
-        return $this->table->getCollection();
+        return $this->table;
     }
 
     public function map($data) {

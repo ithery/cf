@@ -2,6 +2,7 @@
 
 class CExporter_TaskQueue_AppendDataToSheet extends CQueue_AbstractTask {
     use CExporter_Trait_ProxyFailures;
+
     /**
      * @var array
      */
