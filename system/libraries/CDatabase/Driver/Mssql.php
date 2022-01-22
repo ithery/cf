@@ -3,24 +3,23 @@
 defined('SYSPATH') or die('No direct access allowed.');
 
 /**
- * MSSQL Database Driver
+ * MSSQL Database Driver.
  */
 class Database_Driver_Mssql extends CDatabase_Driver {
     /**
-     * Database connection link
+     * Database connection link.
      */
     protected $link;
 
     /**
-     * Database configuration
+     * Database configuration.
      */
     protected $db_config;
 
     /**
      * Sets the config for the class.
      *
-     * @param  array  database configuration
-     * @param mixed $config
+     * @param array $config database configuration
      */
     public function __construct($config) {
         $this->db_config = $config;
@@ -36,7 +35,7 @@ class Database_Driver_Mssql extends CDatabase_Driver {
     }
 
     /**
-     * Make the connection
+     * Make the connection.
      *
      * @return return connection
      */
@@ -108,6 +107,7 @@ class Database_Driver_Mssql extends CDatabase_Driver {
             // Re-create the AS statement
             return implode(' AS ', $table);
         }
+
         return '[' . str_replace('.', '[.]', $table) . ']';
     }
 
@@ -156,6 +156,7 @@ class Database_Driver_Mssql extends CDatabase_Driver {
                 $column .= $parts[$i] . ' ';
             }
         }
+
         return $column;
     }
 
@@ -233,6 +234,7 @@ class Database_Driver_Mssql extends CDatabase_Driver {
 
         $characters = ['/\x00/', '/\x1a/', '/\n/', '/\r/', '/\\\/', '/\'/'];
         $replace = ['\\\x00', '\\x1a', '\\n', '\\r', '\\\\', "''"];
+
         return preg_replace($characters, $replace, $str);
     }
 
@@ -271,7 +273,7 @@ class Database_Driver_Mssql extends CDatabase_Driver {
 }
 
 /**
- * MSSQL Result
+ * MSSQL Result.
  */
 class Mssql_Result extends Database_Result {
     // Fetch function and return type
