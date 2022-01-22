@@ -12,7 +12,7 @@ use Doctrine\DBAL\Connection as DoctrineConnection;
 abstract class CDatabase_Connection implements CDatabase_ConnectionInterface {
     use CDatabase_Trait_DetectConcurrencyErrors,
         CDatabase_Trait_DetectLostConnection,
-        CDatabase_Concern_ManagesTransactions;
+        CDatabase_Trait_ManageTransaction;
 
     /**
      * The active PDO connection.
@@ -148,7 +148,7 @@ abstract class CDatabase_Connection implements CDatabase_ConnectionInterface {
     protected static $resolvers = [];
 
     /**
-     * The driver
+     * The driver.
      *
      * @var CDatabase_Driver
      */
@@ -199,7 +199,7 @@ abstract class CDatabase_Connection implements CDatabase_ConnectionInterface {
      * @return CDatabase_Query_Grammar
      */
     protected function getDefaultQueryGrammar() {
-        return new CDatabase_Query_Grammar;
+        return new CDatabase_Query_Grammar();
     }
 
     /**
@@ -217,7 +217,7 @@ abstract class CDatabase_Connection implements CDatabase_ConnectionInterface {
      * @return CDatabase_Schema_Grammar
      */
     protected function getDefaultSchemaGrammar() {
-        //
+        // implement later
     }
 
     /**
@@ -235,7 +235,7 @@ abstract class CDatabase_Connection implements CDatabase_ConnectionInterface {
      * @return CDatabase_Query_Processor
      */
     protected function getDefaultPostProcessor() {
-        return new CDatabase_Query_Processor;
+        return new CDatabase_Query_Processor();
     }
 
     /**
@@ -255,7 +255,7 @@ abstract class CDatabase_Connection implements CDatabase_ConnectionInterface {
      * Begin a fluent query against a database table.
      *
      * @param \Closure|CDatabase_Query_Builder|string $table
-     * @param string|null                             $as
+     * @param null|string                             $as
      *
      * @return CDatabase_Query_Builder
      */
@@ -304,7 +304,7 @@ abstract class CDatabase_Connection implements CDatabase_ConnectionInterface {
     }
 
     /**
-     * Get result from query
+     * Get result from query.
      *
      * @param string $query
      * @param array  $bindings
@@ -345,6 +345,7 @@ abstract class CDatabase_Connection implements CDatabase_ConnectionInterface {
      */
     public function select($query, $bindings = [], $useReadPdo = true) {
         return $this->result($query, $bindings, $useReadPdo)->fetchAll();
+
         return $this->run($query, $bindings, function ($query, $bindings) use ($useReadPdo) {
             if ($this->pretending()) {
                 return [];
@@ -643,9 +644,9 @@ abstract class CDatabase_Connection implements CDatabase_ConnectionInterface {
      * @param array    $bindings
      * @param \Closure $callback
      *
-     * @return mixed
-     *
      * @throws \CDatabase_Exception_QueryException
+     *
+     * @return mixed
      */
     protected function run($query, $bindings, Closure $callback) {
         $this->reconnectIfMissingConnection();
@@ -685,9 +686,9 @@ abstract class CDatabase_Connection implements CDatabase_ConnectionInterface {
      * @param array    $bindings
      * @param \Closure $callback
      *
-     * @return mixed
-     *
      * @throws \CDatabase_Exception_QueryException
+     *
+     * @return mixed
      */
     protected function runQueryCallback($query, $bindings, Closure $callback) {
         // To execute the statement, we'll simply call the callback, which will actually
@@ -714,7 +715,7 @@ abstract class CDatabase_Connection implements CDatabase_ConnectionInterface {
      *
      * @param string     $query
      * @param array      $bindings
-     * @param float|null $time
+     * @param null|float $time
      *
      * @return void
      */
@@ -745,9 +746,9 @@ abstract class CDatabase_Connection implements CDatabase_ConnectionInterface {
      * @param array                               $bindings
      * @param \Closure                            $callback
      *
-     * @return mixed
-     *
      * @throws CDatabase_Exception_QueryException
+     *
+     * @return mixed
      */
     protected function handleQueryException(CDatabase_Exception_QueryException $e, $query, $bindings, Closure $callback) {
         if ($this->transactions >= 1) {
@@ -770,9 +771,9 @@ abstract class CDatabase_Connection implements CDatabase_ConnectionInterface {
      * @param array                               $bindings
      * @param \Closure                            $callback
      *
-     * @return mixed
-     *
      * @throws \CDatabase_Exception_QueryException
+     *
+     * @return mixed
      */
     protected function tryAgainIfCausedByLostConnection(CDatabase_Exception_QueryException $e, $query, $bindings, Closure $callback) {
         if ($this->causedByLostConnection($e->getPrevious())) {
@@ -787,9 +788,9 @@ abstract class CDatabase_Connection implements CDatabase_ConnectionInterface {
     /**
      * Reconnect to the database.
      *
-     * @return void
-     *
      * @throws \LogicException
+     *
+     * @return void
      */
     public function reconnect() {
         if (is_callable($this->reconnector)) {
@@ -839,7 +840,7 @@ abstract class CDatabase_Connection implements CDatabase_ConnectionInterface {
      *
      * @param string $event
      *
-     * @return array|null
+     * @return null|array
      */
     protected function fireConnectionEvent($event) {
         if (!isset($this->events)) {
@@ -967,7 +968,7 @@ abstract class CDatabase_Connection implements CDatabase_ConnectionInterface {
     /**
      * Get the current PDO connection parameter without executing any reconnect logic.
      *
-     * @return \PDO|\Closure|null
+     * @return null|\PDO|\Closure
      */
     public function getRawPdo() {
         return $this->pdo;
@@ -997,7 +998,7 @@ abstract class CDatabase_Connection implements CDatabase_ConnectionInterface {
     /**
      * Get the current read PDO connection parameter without executing any reconnect logic.
      *
-     * @return \PDO|\Closure|null
+     * @return null|\PDO|\Closure
      */
     public function getRawReadPdo() {
         return $this->readPdo;
@@ -1006,7 +1007,7 @@ abstract class CDatabase_Connection implements CDatabase_ConnectionInterface {
     /**
      * Set the PDO connection.
      *
-     * @param \PDO|\Closure|null $pdo
+     * @param null|\PDO|\Closure $pdo
      *
      * @return $this
      */
@@ -1021,7 +1022,7 @@ abstract class CDatabase_Connection implements CDatabase_ConnectionInterface {
     /**
      * Set the PDO connection used for reading.
      *
-     * @param \PDO|\Closure|null $pdo
+     * @param null|\PDO|\Closure $pdo
      *
      * @return $this
      */
@@ -1047,7 +1048,7 @@ abstract class CDatabase_Connection implements CDatabase_ConnectionInterface {
     /**
      * Get the database connection name.
      *
-     * @return string|null
+     * @return null|string
      */
     public function getName() {
         return $this->getConfig('name');
@@ -1056,7 +1057,7 @@ abstract class CDatabase_Connection implements CDatabase_ConnectionInterface {
     /**
      * Get an option from the configuration options.
      *
-     * @param string|null $option
+     * @param null|string $option
      *
      * @return mixed
      */
@@ -1344,6 +1345,7 @@ abstract class CDatabase_Connection implements CDatabase_ConnectionInterface {
         if ($this->driver == null) {
             $this->driver = $this->createDriver($this->pdo);
         }
+
         return $this->driver;
     }
 }
