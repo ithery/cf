@@ -16,11 +16,9 @@ class CManager_DataProvider_ModelDataProvider extends CManager_DataProviderAbstr
     }
 
     /**
-     * @param null|callable $callback
-     *
      * @return CModel_Query
      */
-    protected function getModelQuery($callback = null) {
+    protected function getModelQuery() {
         $modelClass = $this->modelClass;
         $query = $modelClass::query();
         /** @var CModel_Query $query */
@@ -32,17 +30,9 @@ class CManager_DataProvider_ModelDataProvider extends CManager_DataProviderAbstr
             }
         }
 
-        if ($callback) {
-            if ($callback instanceof SerializableClosure) {
-                $callback->__invoke($query);
-            } else {
-                call_user_func_array($callback, [$query]);
-            }
-        }
-
         //process search
-        if (count($this->search) > 0) {
-            $dataSearch = $this->search;
+        if (count($this->searchOr) > 0) {
+            $dataSearch = $this->searchOr;
             $query->where(function (CModel_Query $q) use ($dataSearch) {
                 foreach ($dataSearch as $fieldName => $value) {
                     if (strpos($fieldName, '.') !== false) {
@@ -56,6 +46,26 @@ class CManager_DataProvider_ModelDataProvider extends CManager_DataProviderAbstr
                         });
                     } else {
                         $q->orWhere($fieldName, 'like', '%' . $value . '%');
+                    }
+                }
+            });
+        }
+
+        if (count($this->searchAnd) > 0) {
+            $dataSearch = $this->searchAnd;
+            $query->where(function (CModel_Query $q) use ($dataSearch) {
+                foreach ($dataSearch as $fieldName => $value) {
+                    if (strpos($fieldName, '.') !== false) {
+                        $fields = explode('.', $fieldName);
+
+                        $field = array_pop($fields);
+                        $relation = implode('.', $fields);
+
+                        $q->WhereHas($relation, function ($q2) use ($value, $field) {
+                            $q2->where($field, 'like', '%' . $value . '%');
+                        });
+                    } else {
+                        $q->Where($fieldName, 'like', '%' . $value . '%');
                     }
                 }
             });
@@ -84,7 +94,7 @@ class CManager_DataProvider_ModelDataProvider extends CManager_DataProviderAbstr
     }
 
     public function paginate($perPage = null, $columns = ['*'], $pageName = 'page', $page = null, $callback = null) {
-        $query = $this->getModelQuery($callback);
+        $query = $this->getModelQuery();
 
         return $query->paginate($perPage, $columns, $pageName, $page);
     }

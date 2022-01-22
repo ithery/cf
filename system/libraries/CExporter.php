@@ -2,6 +2,7 @@
 
 class CExporter {
     use CExporter_Trait_RegistersCustomConcernsTrait;
+
     const ACTION_STORE = 'store';
 
     const ACTION_DOWNLOAD = 'download';

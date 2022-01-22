@@ -22,6 +22,7 @@ import removePreloader from './module/preloader';
 import initProgressive from './module/progressive';
 import cresToast from './module/toast';
 import CresAlpine from './module/CresAlpine';
+import SSE from './module/SSE';
 
 export default class Cresenity {
     constructor() {
@@ -55,6 +56,7 @@ export default class Cresenity {
         this.dispatchWindowEvent = dispatchWindowEvent;
         this.websocket = null;
         this.debounce = debounce;
+        this.sse = new SSE();
     }
     loadJs(filename, callback) {
         let fileref = document.createElement('script');
@@ -399,7 +401,7 @@ export default class Cresenity {
 
                             setTimeout(() => {
                                 $(lastModal).remove();
-                                this.modalElements.pop();
+                                window.cresenity.modalElements.pop();
 
 
                                 let modalExists = $('.modal:visible').length > 0;
@@ -1047,7 +1049,7 @@ export default class Cresenity {
             success: (response) => {
                 this.handleJsonResponse(response, (data) => {
                     let progressUrl = data.progressUrl;
-                    let progressContainer = $('<div>').addClass('progress-container');
+                    let progressContainer = $('<div>').addClass('cres-download-progress');
 
                     const interval = setInterval(() => {
                         $.ajax({
@@ -1056,8 +1058,9 @@ export default class Cresenity {
                             dataType: 'json',
                             success: (responseProgress) => {
                                 this.handleJsonResponse(responseProgress, (dataProgress) => {
-                                    if (data.state === 'DONE') {
-                                        progressContainer.find('.progress-container-status').empty();
+                                    let progressContainerStatus = progressContainer.find('.cres-download-progress-status');
+                                    if (dataProgress.state === 'DONE') {
+                                        progressContainerStatus.empty();
                                         let innerStatus = $('<div>');
 
                                         let innerStatusLabel = $('<label>', {
@@ -1077,11 +1080,40 @@ export default class Cresenity {
                                         innerStatus.append(linkDownload);
                                         innerStatus.append(linkClose);
 
-                                        progressContainer.find('.progress-container-status').append(innerStatus);
+                                        progressContainerStatus.append(innerStatus);
                                         linkClose.click(() => {
                                             this.closeLastModal();
                                         });
                                         clearInterval(interval);
+                                    } else {
+                                        if(dataProgress.state === 'PENDING') {
+                                            let progressValue = parseFloat(dataProgress.progressValue);
+                                            if(progressValue>0) {
+                                                let progressStatusBar = progressContainer.find('.cres-download-progress-status-bar');
+                                                if(progressStatusBar.length==0) {
+                                                    //create the status bar
+                                                    let progressAnimation = progressContainer.find('.cres-download-progress-animation');
+                                                    progressAnimation.empty();
+                                                    let progressStatusBar = $('<div class="cres-download-progress-status-bar my-4">');
+                                                    let progress = $('<div class="progress">');
+                                                    let progressBar = $('<div class="progress-bar progress-bar-striped progress-bar-animated">');
+                                                    progressAnimation.append(
+                                                        progressStatusBar.append(progress.append(progressBar))
+                                                    );
+                                                }
+
+                                                let progressMax = parseFloat(dataProgress.progressMax);
+                                                if(isNaN(progressMax) || progressMax==0) {
+                                                    progressMax = 100;
+                                                }
+
+                                                let progressBar = progressStatusBar.find('.progress-bar');
+                                                let progressPercent = Math.round(progressMax>0 ? progressValue * 100 / progressMax : 0);
+
+                                                progressBar.css('width', progressPercent + '%');
+                                                progressBar.html(progressPercent + '%');
+                                            }
+                                        }
                                     }
                                 });
                             }
@@ -1092,7 +1124,7 @@ export default class Cresenity {
                     let innerStatusLabel = $('<label>', {
                         class: 'mb-4'
                     }).append('Please Wait...');
-                    let innerStatusAnimation = $('<div>').append('<div class="sk-fading-circle sk-primary"><div class="sk-circle1 sk-circle"></div><div class="sk-circle2 sk-circle"></div><div class="sk-circle3 sk-circle"></div><div class="sk-circle4 sk-circle"></div><div class="sk-circle5 sk-circle"></div><div class="sk-circle6 sk-circle"></div><div class="sk-circle7 sk-circle"></div><div class="sk-circle8 sk-circle"></div><div class="sk-circle9 sk-circle"></div><div class="sk-circle10 sk-circle"></div><div class="sk-circle11 sk-circle"></div><div class="sk-circle12 sk-circle"></div></div>');
+                    let innerStatusAnimation = $('<div class="cres-download-progress-animation">').append('<div class="sk-fading-circle sk-primary"><div class="sk-circle1 sk-circle"></div><div class="sk-circle2 sk-circle"></div><div class="sk-circle3 sk-circle"></div><div class="sk-circle4 sk-circle"></div><div class="sk-circle5 sk-circle"></div><div class="sk-circle6 sk-circle"></div><div class="sk-circle7 sk-circle"></div><div class="sk-circle8 sk-circle"></div><div class="sk-circle9 sk-circle"></div><div class="sk-circle10 sk-circle"></div><div class="sk-circle11 sk-circle"></div><div class="sk-circle12 sk-circle"></div></div>');
                     let innerStatusAction = $('<div>', {
                         class: 'text-center my-3'
                     });
@@ -1103,7 +1135,8 @@ export default class Cresenity {
                     innerStatus.append(innerStatusLabel);
                     innerStatus.append(innerStatusAnimation);
                     innerStatus.append(innerStatusAction);
-                    progressContainer.append($('<div>').addClass('progress-container-status').append(innerStatus));
+                    progressContainer.append($('<div class="text-center">').addClass('cres-download-progress-status')
+                        .append(innerStatus));
 
                     innerStatusCancelButton.click(() => {
                         clearInterval(interval);
@@ -1113,7 +1146,7 @@ export default class Cresenity {
 
                     this.modal({
                         message: progressContainer,
-                        modalClass: 'modal-download-progress'
+                        modalClass: 'cres-modal-download-progress'
                     });
                 });
             },

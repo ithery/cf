@@ -1,7 +1,9 @@
 <?php
 
-class CExporter_Exportable_DataTableTemp extends CExporter_Exportable implements CExporter_Concern_FromCollection, CExporter_Concern_WithHeadings, CExporter_Concern_WithMapping {
+class CExporter_Exportable_DataTableTemp extends CExporter_Exportable implements CExporter_Concern_FromDataTable, CExporter_Concern_WithHeadings, CExporter_Concern_WithMapping {
     protected $file;
+
+    protected $downloadId;
 
     public function __construct($file) {
         $this->file = $file;
@@ -15,8 +17,8 @@ class CExporter_Exportable_DataTableTemp extends CExporter_Exportable implements
         return new CExporter_Exportable_DataTable($table);
     }
 
-    public function collection() {
-        return $this->table()->collection();
+    public function dataTable() {
+        return $this->table()->dataTable();
     }
 
     public function map($data) {
@@ -25,5 +27,15 @@ class CExporter_Exportable_DataTableTemp extends CExporter_Exportable implements
 
     public function headings() {
         return $this->table()->headings();
+    }
+
+    public function setDownloadId($downloadId) {
+        $this->downloadId = $downloadId;
+
+        return $this;
+    }
+
+    public function getDownloadId() {
+        return $this->downloadId;
     }
 }

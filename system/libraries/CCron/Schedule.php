@@ -2,6 +2,7 @@
 
 class CCron_Schedule {
     use CTrait_Macroable;
+
     const SUNDAY = 0;
 
     const MONDAY = 1;
@@ -83,6 +84,24 @@ class CCron_Schedule {
             $parameters,
             $this->timezone
         );
+
+        return $event;
+    }
+
+    /**
+     * Add a new callback event to the schedule by class.
+     *
+     * @param CCron_Job $job
+     * @param array     $parameters
+     *
+     * @return \CCron_CallbackEvent
+     */
+    public function run(CCron_Job $job, array $parameters = []) {
+        $event = $this->call(function () use ($job) {
+            return $job->execute();
+        }, $parameters);
+        $event->expression = $job->getSchedule();
+        $event->name($job->getName());
 
         return $event;
     }

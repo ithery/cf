@@ -1374,6 +1374,14 @@ class CDatabase {
 
         return $schema->listTableDetails($table)->getColumn($column);
     }
+
+    public static function resetBenchmarks() {
+        static::$benchmarks = [];
+    }
+
+    public static function getBenchmarks() {
+        return static::$benchmarks;
+    }
 }
 
 // End Database Class

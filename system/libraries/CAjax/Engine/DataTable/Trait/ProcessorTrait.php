@@ -33,6 +33,7 @@ trait CAjax_Engine_DataTable_Trait_ProcessorTrait {
 
                 $html->appendln('<td class="low-padding align-center cell-action td-action ">')->incIndent()->br();
                 $jsparam = $this->rowArray($row);
+
                 if (!isset($jsparam['param1'])) {
                     $jsparam['param1'] = $key;
                 }

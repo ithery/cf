@@ -15,7 +15,7 @@ trait CDatabase_Trait_DetectConcurrencyErrors {
 
         $message = $e->getMessage();
 
-        return Str::contains($message, [
+        return cstr::contains($message, [
             'Deadlock found when trying to get lock',
             'deadlock detected',
             'The database file is locked',

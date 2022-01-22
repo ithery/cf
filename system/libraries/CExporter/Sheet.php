@@ -485,9 +485,15 @@ class CExporter_Sheet {
      * @param object   $sheetExport
      */
     public function appendRows($rows, $sheetExport) {
+        if (method_exists($sheetExport, 'prepareRows')) {
+            $rows = $sheetExport->prepareRows($rows);
+        }
         $rows = (new CCollection($rows))->flatMap(function ($row) use ($sheetExport) {
             if ($sheetExport instanceof CExporter_Concern_WithMapping) {
                 $row = $sheetExport->map($row);
+            }
+            if ($sheetExport instanceof CExporter_Concern_WithCustomValueBinder) {
+                SpreadsheetCell::setValueBinder($sheetExport);
             }
 
             return CExporter_Helper_ArrayHelper::ensureMultipleRows(

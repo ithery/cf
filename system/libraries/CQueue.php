@@ -177,8 +177,8 @@ final class CQueue {
         return new CQueue_Worker(static::queuer(), CEvent::dispatcher(), CException::exceptionHandler(), $isDownForMaintenance);
     }
 
-    public static function run($connection = null) {
-        $runner = new CQueue_Runner(CQueue::worker(), null);
+    public static function run($connection = null, array $options = []) {
+        $runner = new CQueue_Runner(CQueue::worker(), null, $options);
         $runner->run($connection);
     }
 
