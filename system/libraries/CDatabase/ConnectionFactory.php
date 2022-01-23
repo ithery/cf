@@ -1,18 +1,19 @@
 <?php
 class CDatabase_ConnectionFactory {
+    protected $connectors = [];
+
     /**
-     * Singleton Instance
+     * Singleton Instance.
      *
      * @var CDatabase_ConnectionFactory
      */
     private static $instance;
 
-    protected $connectors = [];
-
     public static function instance() {
         if (static::$instance == null) {
             static::$instance = new static();
         }
+
         return static::$instance;
     }
 
@@ -28,7 +29,7 @@ class CDatabase_ConnectionFactory {
      * Establish a PDO connection based on the configuration.
      *
      * @param array       $config
-     * @param string|null $name
+     * @param null|string $name
      *
      * @return CDatabase_Connection
      */
@@ -62,11 +63,11 @@ class CDatabase_ConnectionFactory {
      * @return CDatabase_Connection
      */
     protected function createSingleConnection(array $config) {
-        $pdo = $this->createPdoResolver($config);
+        $driver = $this->createDriverResolver($config);
 
         return $this->createConnection(
             $config['driver'],
-            $pdo,
+            $driver,
             $config['database'],
             $config['prefix'],
             $config
@@ -93,8 +94,8 @@ class CDatabase_ConnectionFactory {
      *
      * @return \Closure
      */
-    protected function createReadPdo(array $config) {
-        return $this->createPdoResolver($this->getReadConfig($config));
+    protected function createReadDriver(array $config) {
+        return $this->createDriverResolver($this->getReadConfig($config));
     }
 
     /**
@@ -158,10 +159,10 @@ class CDatabase_ConnectionFactory {
      *
      * @return \Closure
      */
-    protected function createPdoResolver(array $config) {
+    protected function createDriverResolver(array $config) {
         return array_key_exists('host', $config)
-            ? $this->createPdoResolverWithHosts($config)
-            : $this->createPdoResolverWithoutHosts($config);
+            ? $this->createDriverResolverWithHosts($config)
+            : $this->createDriverResolverWithoutHosts($config);
     }
 
     /**
@@ -169,11 +170,11 @@ class CDatabase_ConnectionFactory {
      *
      * @param array $config
      *
-     * @return \Closure
-     *
      * @throws \PDOException
+     *
+     * @return \Closure
      */
-    protected function createPdoResolverWithHosts(array $config) {
+    protected function createDriverResolverWithHosts(array $config) {
         return function () use ($config) {
             foreach (carr::shuffle($hosts = $this->parseHosts($config)) as $key => $host) {
                 $config['host'] = $host;
@@ -194,9 +195,9 @@ class CDatabase_ConnectionFactory {
      *
      * @param array $config
      *
-     * @return array
-     *
      * @throws \InvalidArgumentException
+     *
+     * @return array
      */
     protected function parseHosts(array $config) {
         $hosts = carr::wrap($config['host']);
@@ -215,7 +216,7 @@ class CDatabase_ConnectionFactory {
      *
      * @return \Closure
      */
-    protected function createPdoResolverWithoutHosts(array $config) {
+    protected function createDriverResolverWithoutHosts(array $config) {
         return function () use ($config) {
             return $this->createConnector($config)->connect($config);
         };
@@ -226,9 +227,9 @@ class CDatabase_ConnectionFactory {
      *
      * @param array $config
      *
-     * @return \CDatabase_Connector
-     *
      * @throws \InvalidArgumentException
+     *
+     * @return \CDatabase_Connector
      */
     public function createConnector(array $config) {
         if (!isset($config['driver'])) {
@@ -241,11 +242,11 @@ class CDatabase_ConnectionFactory {
 
         switch ($config['driver']) {
             case 'mysqli':
-                return new CDatabase_Connector_MySqliConnector;
+                return new CDatabase_Connector_MySqliConnector();
             case 'mongodb':
-                return new CDatabase_Connector_MongoDBConnector;
+                return new CDatabase_Connector_MongoDBConnector();
             case 'pdo.mysql':
-                return new CDatabase_Connector_PDOConnector_MySqlConnector;
+                return new CDatabase_Connector_PDOConnector_MySqlConnector();
         }
 
         throw new InvalidArgumentException("Unsupported driver [{$config['driver']}].");
@@ -260,9 +261,9 @@ class CDatabase_ConnectionFactory {
      * @param string        $prefix
      * @param array         $config
      *
-     * @return \CDatabase_Connection
-     *
      * @throws \InvalidArgumentException
+     *
+     * @return \CDatabase_Connection
      */
     protected function createConnection($driver, $connection, $database, $prefix = '', array $config = []) {
         if ($resolver = CDatabase_Connection::getResolver($driver)) {

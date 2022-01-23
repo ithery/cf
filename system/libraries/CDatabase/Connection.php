@@ -16,6 +16,8 @@ class CDatabase_Connection implements CDatabase_ConnectionInterface {
     use CDatabase_Trait_DetectLostConnection;
     use CDatabase_Trait_ManageTransaction;
 
+    protected $name;
+
     /**
      * The active PDO connection.
      *
