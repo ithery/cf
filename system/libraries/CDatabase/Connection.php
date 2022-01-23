@@ -7,6 +7,7 @@ use Doctrine\DBAL\Connection as DoctrineConnection;
  * @author Hery Kurniawan
  * @license Ittron Global Teknologi <ittron.co.id>
  *
+ * @see CDatabase
  * @since Aug 18, 2018, 8:39:09 AM
  */
 class CDatabase_Connection implements CDatabase_ConnectionInterface {

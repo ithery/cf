@@ -1382,6 +1382,10 @@ class CDatabase {
     public static function getBenchmarks() {
         return static::$benchmarks;
     }
+
+    public static function manager() {
+        return CDatabase_Manager::instance();
+    }
 }
 
 // End Database Class
