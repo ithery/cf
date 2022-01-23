@@ -33,21 +33,7 @@ class CDatabase_Manager {
      * @return \CDatabase_Connection
      */
     public function connection($name = null) {
-        list($database, $type) = $this->parseConnectionName($name);
-
-        $name = $name ?: $database;
-
-        // If we haven't created this connection, we'll create it based on the config
-        // provided in the application. Once we've created the connections we will
-        // set the "fetch mode" for PDO which determines the query return types.
-        if (!isset($this->connections[$name])) {
-            $this->connections[$name] = $this->configure(
-                $this->makeConnection($database),
-                $type
-            );
-        }
-
-        return $this->connections[$name];
+        return new CDatabase_Connection($name);
     }
 
     /**
@@ -117,17 +103,6 @@ class CDatabase_Manager {
      */
     protected function configure(CDatabase_Connection $connection, $type) {
         $connection = $this->setPdoForType($connection, $type)->setReadWriteType($type);
-
-        // First we'll set the fetch mode and a few other dependencies of the database
-        // connection. This method basically just configures and prepares it to get
-        // used by the application. Once we're finished we'll return it back out.
-        if ($this->app->bound('events')) {
-            $connection->setEventDispatcher($this->app['events']);
-        }
-
-        if ($this->app->bound('db.transactions')) {
-            $connection->setTransactionManager($this->app['db.transactions']);
-        }
 
         // Here we'll set a reconnector callback. This reconnector can be any callable
         // so we will set a Closure to reconnect from this manager with the name of

@@ -1,7 +1,6 @@
 <?php
 
 defined('SYSPATH') or die('No direct access allowed.');
-use Doctrine\DBAL\Connection as DoctrineConnection;
 
 /**
  * @author Hery Kurniawan
@@ -10,90 +9,72 @@ use Doctrine\DBAL\Connection as DoctrineConnection;
  * @see CDatabase
  * @since Aug 18, 2018, 8:39:09 AM
  */
-class CDatabase_Connection implements CDatabase_ConnectionInterface {
+
+use Carbon\Carbon;
+
+class CDatabase_Connection {
     use CTrait_Compat_Database;
     use CDatabase_Trait_DetectDeadlock;
     use CDatabase_Trait_DetectLostConnection;
     use CDatabase_Trait_ManageTransaction;
 
-    protected $name;
+    public $domain;
+
+    public $name;
 
     /**
-     * The active PDO connection.
-     *
-     * @var \PDO|\Closure
-     */
-    protected $pdo;
-
-    /**
-     * The active PDO connection used for reads.
-     *
-     * @var \PDO|\Closure
-     */
-    protected $readPdo;
-
-    /**
-     * The name of the connected database.
+     * Default Database.
      *
      * @var string
      */
-    protected $database;
+    protected static $defaultConnection = 'default';
 
     /**
-     * The table prefix for the connection.
-     *
+     * @var CDatabase_Schema_Manager
+     */
+    protected $schemaManager;
+
+    /**
+     * @var CDatabase_Platform
+     */
+    protected $platform;
+
+    /**
      * @var string
      */
-    protected $tablePrefix = '';
+    protected $driverName;
 
     /**
-     * The database connection configuration options.
-     *
+     * @var CDatabase_Configuration
+     */
+    protected $configuration;
+
+    /**
      * @var array
      */
-    protected $config = [];
+    protected $config = [
+        'benchmark' => true,
+        'persistent' => false,
+        'connection' => '',
+        'character_set' => 'utf8',
+        'table_prefix' => '',
+        'object' => true,
+        'cache' => false,
+        'escape' => true,
+    ];
 
     /**
-     * The reconnector instance for the connection.
-     *
-     * @var callable
+     * @var CDatabase_Driver_Mysqli
      */
-    protected $reconnector;
+    protected $driver;
 
-    /**
-     * The query grammar implementation.
-     *
-     * @var CDatabase_Query_Grammar
-     */
-    protected $queryGrammar;
+    protected $driver_name;
 
-    /**
-     * The schema grammar implementation.
-     *
-     * @var CDatabase_Schema_Grammar
-     */
-    protected $schemaGrammar;
+    protected $link;
 
-    /**
-     * The query post processor implementation.
-     *
-     * @var CDatabase_Query_Processor
-     */
-    protected $postProcessor;
+    protected $last_query = '';
 
-    /**
-     * The event dispatcher instance.
-     *
-     * @var CEvent_Dispatcher
-     */
-    protected $events;
-
-    /**
-     * The default fetch mode of the connection.
-     *
-     * @var int
-     */
-    protected $fetchMode = PDO::FETCH_OBJ;
+    protected $queryLog = [];
 
     /**
      * The number of active transactions.
@@ -103,518 +84,277 @@ class CDatabase_Connection implements CDatabase_ConnectionInterface {
     protected $transactions = 0;
 
     /**
-     * The transaction manager instance.
+     * The event dispatcher instance.
      *
-     * @var CDatabase_Transaction_TransactionManager
+     * @var CEvent_Dispatcher
      */
-    protected $transactionsManager;
+    protected $events;
 
     /**
-     * Indicates if changes have been made to the database.
+     * The query grammar implementation.
      *
-     * @var int
+     * @var CDatabase_Query_Grammar
      */
-    protected $recordsModified = false;
+    protected $queryGrammar;
 
     /**
-     * All of the queries run against the connection.
+     * The query post processor implementation.
      *
-     * @var array
+     * @var CDatabase_Query_Grammar_Processor
      */
-    protected $queryLog = [];
+    protected $postProcessor;
 
     /**
-     * Indicates whether queries are being logged.
+     * Sets up the database configuration, loads the CDatabase_Driver.
      *
-     * @var bool
+     * @param mixed      $config
+     * @param null|mixed $domain
+     *
+     * @throws CDatabase_Exception
      */
-    protected $loggingQueries = false;
+    public function __construct($config = [], $domain = null) {
+        if ($domain == null) {
+            $domain = CF::domain();
+        }
+        $loadConfig = true;
 
-    /**
-     * Indicates if the connection is in a "dry run".
-     *
-     * @var bool
-     */
-    protected $pretending = false;
+        if (!empty($config)) {
+            if (is_array($config) && count($config) > 0) {
+                if (!array_key_exists('connection', $config)) {
+                    $config = ['connection' => $config];
+                    $loadConfig = false;
+                } else {
+                    $loadConfig = false;
+                }
+            }
+            if (is_string($config)) {
+                if (strpos($config, '://') !== false) {
+                    $config = ['connection' => $config];
+                    $loadConfig = false;
+                }
+            }
+        }
+        $configName = '';
+        if ($loadConfig) {
+            $found = false;
 
-    /**
-     * The instance of Doctrine connection.
-     *
-     * @var \Doctrine\DBAL\Connection
-     */
-    protected $doctrineConnection;
+            $configName = static::$defaultConnection;
+            if (is_string($config)) {
+                $configName = $config;
+            }
+            $config = $this->resolveConfig($config);
 
-    /**
-     * The connection resolvers.
-     *
-     * @var array
-     */
-    protected static $resolvers = [];
+            if (is_array($config)) {
+                $found = true;
+            }
 
-    /**
-     * The driver.
-     *
-     * @var CDatabase_Driver
-     */
-    protected $driver;
-
-    /**
-     * Create a new database connection instance.
-     *
-     * @param \PDO|\Closure $pdo
-     * @param string        $database
-     * @param string        $tablePrefix
-     * @param array         $config
-     *
-     * @return void
-     */
-    public function __construct($pdo, $database = '', $tablePrefix = '', array $config = []) {
-        $this->pdo = $pdo;
-
-        // First we will setup the default properties. We keep track of the DB
-        // name we are connected to since it is needed when some reflective
-        // type commands are run such as checking whether a table exists.
-        $this->database = $database;
-
-        $this->tablePrefix = $tablePrefix;
-
-        $this->config = $config;
-
-        // We need to initialize a query grammar and the query post processors
-        // which are both very important parts of the database abstractions
-        // so we initialize these to their default values while starting.
-        $this->useDefaultQueryGrammar();
-
-        $this->useDefaultPostProcessor();
-    }
-
-    /**
-     * Set the query grammar to the default implementation.
-     *
-     * @return void
-     */
-    public function useDefaultQueryGrammar() {
-        $this->queryGrammar = $this->getDefaultQueryGrammar();
-    }
-
-    /**
-     * Get the default query grammar instance.
-     *
-     * @return CDatabase_Query_Grammar
-     */
-    protected function getDefaultQueryGrammar() {
-        return new CDatabase_Query_Grammar();
-    }
-
-    /**
-     * Set the schema grammar to the default implementation.
-     *
-     * @return void
-     */
-    public function useDefaultSchemaGrammar() {
-        $this->schemaGrammar = $this->getDefaultSchemaGrammar();
-    }
-
-    /**
-     * Get the default schema grammar instance.
-     *
-     * @return CDatabase_Schema_Grammar
-     */
-    protected function getDefaultSchemaGrammar() {
-        // implement later
-    }
-
-    /**
-     * Set the query post processor to the default implementation.
-     *
-     * @return void
-     */
-    public function useDefaultPostProcessor() {
-        $this->postProcessor = $this->getDefaultPostProcessor();
-    }
-
-    /**
-     * Get the default post processor instance.
-     *
-     * @return CDatabase_Query_Processor
-     */
-    protected function getDefaultPostProcessor() {
-        return new CDatabase_Query_Processor();
-    }
-
-    /**
-     * Get a schema builder instance for the connection.
-     *
-     * @return CDatabase_Schema_Builder
-     */
-    public function getSchemaBuilder() {
-        if (is_null($this->schemaGrammar)) {
-            $this->useDefaultSchemaGrammar();
+            if ($found == false) {
+                throw new Exception('Config ' . $configName . ' Not Found');
+            }
         }
 
-        return new CDatabase_Schema_Builder($this);
+        $this->name = $configName;
+        // Merge the default config with the passed config
+        $this->config = array_merge($this->config, $config);
+
+        if (is_string($this->config['connection'])) {
+            // Make sure the connection is valid
+            if (strpos($this->config['connection'], '://') === false) {
+                throw new CDatabase_Exception('The DSN you supplied is not valid: :dsn', [':dsn' => $this->config['connection']]);
+            }
+            // Parse the DSN, creating an array to hold the connection parameters
+            $db = [
+                'type' => false,
+                'user' => false,
+                'pass' => false,
+                'host' => false,
+                'port' => false,
+                'socket' => false,
+                'database' => false
+            ];
+
+            // Get the protocol and arguments
+            list($db['type'], $connection) = explode('://', $this->config['connection'], 2);
+
+            if (strpos($connection, '@') !== false) {
+                // Get the username and password
+                list($db['pass'], $connection) = explode('@', $connection, 2);
+                // Check if a password is supplied
+                $logindata = explode(':', $db['pass'], 2);
+                $db['pass'] = (count($logindata) > 1) ? $logindata[1] : '';
+                $db['user'] = $logindata[0];
+
+                // Prepare for finding the database
+                $connection = explode('/', $connection);
+
+                // Find the database name
+                $db['database'] = array_pop($connection);
+
+                // Reset connection string
+                $connection = implode('/', $connection);
+
+                // Find the socket
+                if (preg_match('/^unix\([^)]++\)/', $connection)) {
+                    // This one is a little hairy: we explode based on the end of
+                    // the socket, removing the 'unix(' from the connection string
+                    list($db['socket'], $connection) = explode(')', substr($connection, 5), 2);
+                } elseif (strpos($connection, ':') !== false) {
+                    // Fetch the host and port name
+                    list($db['host'], $db['port']) = explode(':', $connection, 2);
+                } else {
+                    $db['host'] = $connection;
+                }
+            } else {
+                // File connection
+                $connection = explode('/', $connection);
+
+                // Find database file name
+                $db['database'] = array_pop($connection);
+
+                // Find database directory name
+                $db['socket'] = implode('/', $connection) . '/';
+            }
+
+            // Reset the connection array to the database config
+            $this->config['connection'] = $db;
+        }
+        // Set driver name
+
+        $connectionType = $this->config['connection']['type'];
+        switch ($this->config['connection']['type']) {
+            case 'mongodb':
+                $this->driverName = 'MongoDB';
+
+                break;
+            default:
+                $this->driverName = ucfirst($this->config['connection']['type']);
+
+                break;
+        }
+
+        $driver = 'CDatabase_Driver_' . $this->driverName;
+
+        try {
+            // Validation of the driver
+            $class = new ReflectionClass($driver);
+            // Initialize the driver
+            $this->driver = $class->newInstance($this, $this->config);
+        } catch (ReflectionException $ex) {
+            throw new CDatabase_Exception('The :driver driver for the :class library could not be found', [':driver' => $driver, ':class' => get_class($this)]);
+        }
+
+        $this->events = CEvent::dispatcher();
+        CModel::setEventDispatcher($this->events);
+
+        // Validate the driver
+        if (!($this->driver instanceof CDatabase_Driver)) {
+            throw new CDatabase_Exception('The :driver driver for the :class library must implement the :interface interface', [':driver' => $driver, ':class' => get_class($this), ':interface' => 'CDatabase_Driver']);
+        }
+
+        CF::log(CLogger::DEBUG, 'Database Library initialized');
+    }
+
+    public function __destruct() {
+        $this->rollback();
+
+        try {
+            if ($this->driver != null) {
+                $this->driver->close();
+            }
+        } catch (Exception $ex) {
+        }
+    }
+
+    public function config() {
+        return $this->config;
     }
 
     /**
-     * Begin a fluent query against a database table.
-     *
-     * @param \Closure|CDatabase_Query_Builder|string $table
-     * @param null|string                             $as
-     *
-     * @return CDatabase_Query_Builder
+     * @param array $config
      */
-    public function table($table, $as = null) {
-        return $this->query()->from($table, $as);
+    public function resolveConfig($config) {
+        if ($config == null) {
+            $config = 'default';
+        }
+
+        return CDatabase_Config::resolve($config);
     }
 
     /**
-     * Get a new query builder instance.
+     * Simple connect method to get the database queries up and running.
      *
-     * @return CDatabase_Query_Builder
+     * @return void
      */
-    public function query() {
-        return new CDatabase_Query_Builder(
-            $this,
-            $this->getQueryGrammar(),
-            $this->getPostProcessor()
-        );
+    public function connect() {
+        // A link can be a resource or an object
+        if (!is_resource($this->link) and !is_object($this->link)) {
+            $this->link = $this->driver->connect();
+            if (!is_resource($this->link) and !is_object($this->link)) {
+                throw new CDatabase_Exception('There was an error connecting to the database: :error', [':error' => $this->driver->showError()]);
+            }
+            // Clear password after successful connect
+            $this->config['connection']['pass'] = null;
+        }
+    }
+
+    public function close() {
+        $this->driver->close();
+        $this->link = null;
     }
 
     /**
-     * Run a select statement and return a single result.
+     * Runs a query into the driver and returns the result.
      *
-     * @param string $query
-     * @param array  $bindings
-     * @param bool   $useReadPdo
-     *
-     * @return mixed
-     */
-    public function selectOne($query, $bindings = [], $useReadPdo = true) {
-        $records = $this->select($query, $bindings, $useReadPdo);
-
-        return array_shift($records);
-    }
-
-    /**
-     * Run a select statement against the database.
-     *
-     * @param string $query
-     * @param array  $bindings
-     *
-     * @return array
-     */
-    public function selectFromWriteConnection($query, $bindings = []) {
-        return $this->select($query, $bindings, false);
-    }
-
-    /**
-     * Get result from query.
-     *
-     * @param string $query
+     * @param string $sql        SQL query to execute
      * @param array  $bindings
      * @param bool   $useReadPdo
      *
      * @return CDatabase_Result
      */
-    public function result($query, $bindings = [], $useReadPdo = true) {
-        return $this->run($query, $bindings, function ($query, $bindings) use ($useReadPdo) {
-            if ($this->pretending()) {
-                return [];
-            }
-
-            // For select statements, we'll simply execute the query and return an array
-            // of the database result set. Each element in the array will be a single
-            // row from the database table, and will either be an array or objects.
-            $pdo = $this->getPdoForSelect($useReadPdo);
-            $statement = $this->prepared(
-                $pdo->prepare($query)
-            );
-
-            $this->bindValues($statement, $this->prepareBindings($bindings));
-
-            $statement->execute();
-
-            return $this->createResult($pdo, $statement);
-        });
-    }
-
-    /**
-     * Run a select statement against the database.
-     *
-     * @param string $query
-     * @param array  $bindings
-     * @param bool   $useReadPdo
-     *
-     * @return array
-     */
-    public function select($query, $bindings = [], $useReadPdo = true) {
-        return $this->result($query, $bindings, $useReadPdo)->fetchAll();
-
-        return $this->run($query, $bindings, function ($query, $bindings) use ($useReadPdo) {
-            if ($this->pretending()) {
-                return [];
-            }
-
-            // For select statements, we'll simply execute the query and return an array
-            // of the database result set. Each element in the array will be a single
-            // row from the database table, and will either be an array or objects.
-            $statement = $this->prepared(
-                $this->getPdoForSelect($useReadPdo)->prepare($query)
-            );
-
-            $this->bindValues($statement, $this->prepareBindings($bindings));
-
-            $statement->execute();
-
-            return $statement->fetchAll();
-        });
-    }
-
-    /**
-     * Run a select statement against the database and returns a generator.
-     *
-     * @param string $query
-     * @param array  $bindings
-     * @param bool   $useReadPdo
-     *
-     * @return \Generator
-     */
-    public function cursor($query, $bindings = [], $useReadPdo = true) {
-        $statement = $this->run($query, $bindings, function ($query, $bindings) use ($useReadPdo) {
-            if ($this->pretending()) {
-                return [];
-            }
-
-            // First we will create a statement for the query. Then, we will set the fetch
-            // mode and prepare the bindings for the query. Once that's done we will be
-            // ready to execute the query against the database and return the cursor.
-            $statement = $this->prepared($this->getPdoForSelect($useReadPdo)
-                ->prepare($query));
-
-            $this->bindValues(
-                $statement,
-                $this->prepareBindings($bindings)
-            );
-
-            // Next, we'll execute the query against the database and return the statement
-            // so we can return the cursor. The cursor will use a PHP generator to give
-            // back one row at a time without using a bunch of memory to render them.
-            $statement->execute();
-
-            return $statement;
-        });
-
-        while ($record = $statement->fetch()) {
-            yield $record;
+    public function query($sql = '', $bindings = [], $useReadPdo = true) {
+        if ($sql == '') {
+            return false;
         }
-    }
 
-    /**
-     * Configure the PDO prepared statement.
-     *
-     * @param \PDOStatement $statement
-     *
-     * @return \PDOStatement
-     */
-    protected function prepared(PDOStatement $statement) {
-        $statement->setFetchMode($this->fetchMode);
+        // No link? Connect!
+        $this->link or $this->connect();
 
-        $this->event(new CDatabase_Event_StatementPrepared(
-            $this,
-            $statement
-        ));
+        // Start the benchmark
+        $start = microtime(true);
 
-        return $statement;
-    }
+        // Compile binds if needed
 
-    /**
-     * Get the PDO connection to use for a select query.
-     *
-     * @param bool $useReadPdo
-     *
-     * @return \PDO
-     */
-    protected function getPdoForSelect($useReadPdo = true) {
-        return $useReadPdo ? $this->getReadPdo() : $this->getPdo();
-    }
+        $sql = $this->compileBinds($sql, $bindings);
 
-    /**
-     * Run an insert statement against the database.
-     *
-     * @param string $query
-     * @param array  $bindings
-     *
-     * @return bool
-     */
-    public function insert($query, $bindings = []) {
-        return $this->statement($query, $bindings);
-    }
+        // Fetch the result
+        $result = $this->driver->query($this->last_query = $sql);
 
-    /**
-     * Run an update statement against the database.
-     *
-     * @param string $query
-     * @param array  $bindings
-     *
-     * @return int
-     */
-    public function update($query, $bindings = []) {
-        return $this->affectingStatement($query, $bindings);
-    }
+        // Stop the benchmark
+        $elapsedTime = $this->getElapsedTime($start);
 
-    /**
-     * Run a delete statement against the database.
-     *
-     * @param string $query
-     * @param array  $bindings
-     *
-     * @return int
-     */
-    public function delete($query, $bindings = []) {
-        return $this->affectingStatement($query, $bindings);
-    }
+        if ($this->isBenchmarkQuery()) {
+            $this->benchmarkQuery($sql, $elapsedTime, count($result));
+            // Benchmark the query
+            //CDatabase::$benchmarks[] = array('query' => $sql, 'time' => $elapsedTime, 'rows' => count($result), 'caller' => cdbg::callerInfo());
+        }
 
-    /**
-     * Execute an SQL statement and return the boolean result.
-     *
-     * @param string $query
-     * @param array  $bindings
-     *
-     * @return bool
-     */
-    public function statement($query, $bindings = []) {
-        return $this->run($query, $bindings, function ($query, $bindings) {
-            if ($this->pretending()) {
-                return true;
-            }
-
-            $statement = $this->getPdo()->prepare($query);
-
-            $this->bindValues($statement, $this->prepareBindings($bindings));
-
-            $this->recordsHaveBeenModified();
-
-            return $statement->execute();
-        });
-    }
-
-    /**
-     * Run an SQL statement and get the number of rows affected.
-     *
-     * @param string $query
-     * @param array  $bindings
-     *
-     * @return int
-     */
-    public function affectingStatement($query, $bindings = []) {
-        return $this->run($query, $bindings, function ($query, $bindings) {
-            if ($this->pretending()) {
-                return 0;
-            }
-
-            // For update or delete statements, we want to get the number of rows affected
-            // by the statement and return that back to the developer. We'll first need
-            // to execute the statement and then we'll use PDO to fetch the affected.
-            $statement = $this->getPdo()->prepare($query);
-
-            $this->bindValues($statement, $this->prepareBindings($bindings));
-
-            $statement->execute();
-
-            $this->recordsHaveBeenModified(
-                ($count = $statement->rowCount()) > 0
-            );
-
-            return $count;
-        });
-    }
-
-    /**
-     * Run a raw, unprepared query against the PDO connection.
-     *
-     * @param string $query
-     *
-     * @return bool
-     */
-    public function unprepared($query) {
-        return $this->run($query, [], function ($query) {
-            if ($this->pretending()) {
-                return true;
-            }
-
-            $this->recordsHaveBeenModified(
-                $change = $this->getPdo()->exec($query) !== false
-            );
-
-            return $change;
-        });
-    }
-
-    /**
-     * Execute the given callback in "dry run" mode.
-     *
-     * @param \Closure $callback
-     *
-     * @return array
-     */
-    public function pretend(Closure $callback) {
-        return $this->withFreshQueryLog(function () use ($callback) {
-            $this->pretending = true;
-
-            // Basically to make the database connection "pretend", we will just return
-            // the default values for all the query methods, then we will return an
-            // array of queries that were "executed" within the Closure callback.
-            $callback($this);
-
-            $this->pretending = false;
-
-            return $this->queryLog;
-        });
-    }
-
-    /**
-     * Execute the given callback in "dry run" mode.
-     *
-     * @param \Closure $callback
-     *
-     * @return array
-     */
-    protected function withFreshQueryLog($callback) {
-        $loggingQueries = $this->loggingQueries;
-
-        // First we will back up the value of the logging queries property and then
-        // we'll be ready to run callbacks. This query log will also get cleared
-        // so we will have a new log of all the queries that are executed now.
-        $this->enableQueryLog();
-
-        $this->queryLog = [];
-
-        // Now we'll execute this callback and capture the result. Once it has been
-        // executed we will restore the value of query logging and give back the
-        // value of the callback so the original callers can have the results.
-        $result = $callback();
-
-        $this->loggingQueries = $loggingQueries;
+        // Once we have run the query we will calculate the time that it took to run and
+        // then log the query, bindings, and execution time so we will report them on
+        // the event that the developer needs them. We'll log time in milliseconds.
+        $this->logQuery($sql, $bindings, $elapsedTime, $result->count());
 
         return $result;
     }
 
     /**
-     * Bind values to their parameters in the given statement.
+     * Get the elapsed time since a given starting point.
      *
-     * @param \PDOStatement $statement
-     * @param array         $bindings
+     * @param int $start
      *
-     * @return void
+     * @return float
      */
-    public function bindValues($statement, $bindings) {
-        foreach ($bindings as $key => $value) {
-            $statement->bindValue(
-                is_string($key) ? $key : $key + 1,
-                $value,
-                is_int($value) ? PDO::PARAM_INT : PDO::PARAM_STR
-            );
-        }
+    protected function getElapsedTime($start) {
+        return round((microtime(true) - $start) * 1000, 2);
     }
 
     /**
@@ -642,151 +382,307 @@ class CDatabase_Connection implements CDatabase_ConnectionInterface {
     }
 
     /**
-     * Run a SQL statement and log its execution context.
+     * Run a select statement against the database.
      *
-     * @param string   $query
-     * @param array    $bindings
-     * @param \Closure $callback
+     * @param string $query
+     * @param array  $bindings
+     * @param bool   $useReadDriver
      *
-     * @throws \CDatabase_Exception_QueryException
-     *
-     * @return mixed
+     * @return array
      */
-    protected function run($query, $bindings, Closure $callback) {
-        $this->reconnectIfMissingConnection();
+    public function select($query, $bindings = [], $useReadDriver = true) {
+        return $this->query($query, $bindings, $useReadDriver);
+    }
 
-        $start = microtime(true);
+    /**
+     * Selects the like(s) for a database query.
+     *
+     * @param string|array $field field name or array of field => match pairs
+     * @param string       $match like value to match with field
+     *
+     * @return CDatabase this Database object
+     */
+    public function regex($field, $match = '') {
+        $fields = is_array($field) ? $field : [$field => $match];
 
-        // Here we will run this query. If an exception occurs we'll determine if it was
-        // caused by a connection that has been lost. If that is the cause, we'll try
-        // to re-establish connection and re-run the query with a fresh connection.
-        try {
-            $result = $this->runQueryCallback($query, $bindings, $callback);
-        } catch (CDatabase_Exception_QueryException $e) {
-            $result = $this->handleQueryException(
-                $e,
-                $query,
-                $bindings,
-                $callback
+        foreach ($fields as $field => $match) {
+            $field = (strpos($field, '.') !== false) ? $this->config['table_prefix'] . $field : $field;
+            $this->where[] = $this->driver->regex($field, $match, 'AND ', count($this->where));
+        }
+
+        return $this;
+    }
+
+    /**
+     * Compiles an insert string and runs the query.
+     *
+     * @param string $table table name
+     * @param array  $set   array of key/value pairs to insert
+     *
+     * @return CDatabase_Result Query result
+     */
+    public function insert($table, $set) {
+        return $this->table($table)->insert($set);
+    }
+
+    /**
+     * Compiles an update string and runs the query.
+     *
+     * @param string $table table name
+     * @param array  $set   associative array of update values
+     * @param array  $where where clause
+     *
+     * @return CDatabase_Result Query result
+     */
+    public function update($table = '', $set = null, $where = null) {
+        return $this->table($table)->where($where)->update($set);
+    }
+
+    /**
+     * Compiles a delete string and runs the query.
+     *
+     * @param string $table table name
+     * @param array  $where where clause
+     *
+     * @return CDatabase_Result Query result
+     */
+    public function delete($table = '', $where = []) {
+        if ($where == null || count($where) < 1) {
+            throw new CDatabase_Exception('You must set a WHERE clause for your query');
+        }
+        $builder = $this->table($table);
+
+        return $builder->where($where)->delete();
+    }
+
+    /**
+     * Returns the last query run.
+     *
+     * @return string SQL
+     */
+    public function lastQuery() {
+        return $this->last_query;
+    }
+
+    /**
+     * Set the last query run.
+     *
+     * @param mixed $sql
+     *
+     * @return string SQL
+     */
+    public function setLastQuery($sql) {
+        return $this->last_query = $sql;
+    }
+
+    /**
+     * Lists all the tables in the current database.
+     *
+     * @return array
+     */
+    public function listTables() {
+        $this->link or $this->connect();
+
+        return $this->driver->listTables();
+    }
+
+    /**
+     * See if a table exists in the database.
+     *
+     * @param string $table_name table name
+     * @param bool   $prefix     True to attach table prefix
+     *
+     * @return bool
+     */
+    public function tableExists($table_name, $prefix = true) {
+        if ($prefix) {
+            return in_array($this->config['table_prefix'] . $table_name, $this->listTables());
+        }
+
+        return in_array($table_name, $this->listTables());
+    }
+
+    /**
+     * Combine a SQL statement with the bind values. Used for safe queries.
+     *
+     * @param string $sql   query to bind to the values
+     * @param array  $binds array of values to bind to the query
+     *
+     * @return string
+     */
+    public function compileBinds($sql, $binds) {
+        foreach ((array) $binds as $val) {
+            // If the SQL contains no more bind marks ("?"), we're done.
+            if (($next_bind_pos = strpos($sql, '?')) === false) {
+                break;
+            }
+            if ($val instanceof Carbon) {
+                $val = (string) $val;
+            }
+            // Properly escape the bind value.
+            $val = $this->driver->escape($val);
+
+            // Temporarily replace possible bind marks ("?"), in the bind value itself, with a placeholder.
+            $val = str_replace('?', '{%B%}', $val);
+
+            // Replace the first bind mark ("?") with its corresponding value.
+            $sql = substr($sql, 0, $next_bind_pos) . $val . substr($sql, $next_bind_pos + 1);
+        }
+
+        // Restore placeholders.
+        return str_replace('{%B%}', '?', $sql);
+    }
+
+    /**
+     * Get the field data for a database table, along with the field's attributes.
+     *
+     * @param string $table table name
+     *
+     * @return array
+     */
+    public function fieldData($table = '') {
+        $this->link or $this->connect();
+
+        return $this->driver->fieldData($this->config['table_prefix'] . $table);
+    }
+
+    /**
+     * Get the field data for a database table, along with the field's attributes.
+     *
+     * @param string $table table name
+     *
+     * @return array
+     */
+    public function listFields($table = '') {
+        $this->link or $this->connect();
+
+        return $this->driver->listFields($this->config['table_prefix'] . $table);
+    }
+
+    /**
+     * Escapes a value for a query.
+     *
+     * @param mixed $value value to escape
+     *
+     * @return string
+     */
+    public function escape($value) {
+        return $this->driver->escape($value);
+    }
+
+    /**
+     * Escapes a string for a query.
+     *
+     * @param string $str string to escape
+     *
+     * @return string
+     */
+    public function escapeStr($str) {
+        return $this->driver->escapeStr($str);
+    }
+
+    /**
+     * Escapes a table name for a query.
+     *
+     * @param string $table string to escape
+     *
+     * @return string
+     */
+    public function escapeTable($table) {
+        return $this->driver->escapeTable($table);
+    }
+
+    /**
+     * Escapes a column name for a query.
+     *
+     * @param string $table string to escape
+     *
+     * @return string
+     */
+    public function escapeColumn($table) {
+        return $this->driver->escapeColumn($table);
+    }
+
+    /**
+     * Count the number of records in the last query, without LIMIT or OFFSET applied.
+     *
+     * @return int
+     */
+    public function countLastQuery() {
+        if ($sql = $this->lastQuery()) {
+            if (stripos($sql, 'LIMIT') !== false) {
+                // Remove LIMIT from the SQL
+                $sql = preg_replace('/\sLIMIT\s+[^a-z]+/i', ' ', $sql);
+            }
+
+            if (stripos($sql, 'OFFSET') !== false) {
+                // Remove OFFSET from the SQL
+                $sql = preg_replace('/\sOFFSET\s+\d+/i', '', $sql);
+            }
+
+            // Get the total rows from the last query executed
+            $result = $this->query(
+                'SELECT COUNT(*) AS ' . $this->escapeColumn('total_rows') . ' '
+                    . 'FROM (' . trim($sql) . ') AS ' . $this->escapeTable('counted_results')
             );
+
+            // Return the total number of rows from the query
+            return (int) $result->current()->total_rows;
         }
 
-        // Once we have run the query we will calculate the time that it took to run and
-        // then log the query, bindings, and execution time so we will report them on
-        // the event that the developer needs them. We'll log time in milliseconds.
-        $this->logQuery(
-            $query,
-            $bindings,
-            $this->getElapsedTime($start)
-        );
+        return false;
+    }
 
-        return $result;
+    public function escapeLike($str) {
+        $str = $this->escapeStr($str);
+
+        return $str;
+    }
+
+    public function driverName() {
+        return $this->driverName;
     }
 
     /**
-     * Run a SQL statement.
+     * Get Query Builder from table.
      *
-     * @param string   $query
-     * @param array    $bindings
-     * @param \Closure $callback
+     * @param string     $table
+     * @param null|mixed $as
      *
-     * @throws \CDatabase_Exception_QueryException
+     * @return CDatabase_Query_Builder
+     */
+    public function table($table, $as = null) {
+        $builderClass = $this->driverName == 'MongoDB' ? CDatabase_Query_Builder_MongoDBBuilder::class : CDatabase_Query_Builder::class;
+        $builder = $this->driverName == 'MongoDB' ? new $builderClass($this, new CDatabase_Query_Processor_MongoDB()) : new $builderClass($this);
+        /** @var CDatabase_Query_Builder $builder */
+        return $builder->from($table, $as);
+    }
+
+    /**
+     * Run a select statement and return a single result.
+     *
+     * @param string $query
+     * @param array  $bindings
+     * @param bool   $useReadDriver
      *
      * @return mixed
      */
-    protected function runQueryCallback($query, $bindings, Closure $callback) {
-        // To execute the statement, we'll simply call the callback, which will actually
-        // run the SQL against the PDO connection. Then we can calculate the time it
-        // took to execute and log the query SQL, bindings and time in our memory.
-        try {
-            $result = $callback($query, $bindings);
-        } catch (Exception $e) {
-            // If an exception occurs when attempting to run a query, we'll format the error
-            // message to include the bindings with SQL, which will make this exception a
-            // lot more helpful to the developer instead of just the database's errors.
-            throw new CDatabase_Exception_QueryException(
-                $query,
-                $this->prepareBindings($bindings),
-                $e
-            );
-        }
+    public function selectOne($query, $bindings = [], $useReadDriver = true) {
+        $records = $this->select($query, $bindings, $useReadDriver);
 
-        return $result;
+        return array_shift($records);
     }
 
     /**
-     * Log a query in the connection's query log.
+     * Run a select statement against the database.
      *
-     * @param string     $query
-     * @param array      $bindings
-     * @param null|float $time
+     * @param string $query
+     * @param array  $bindings
      *
-     * @return void
+     * @return array
      */
-    public function logQuery($query, $bindings, $time = null) {
-        $this->event(new CDatabase_Event_QueryExecuted($query, $bindings, $time, $this));
-
-        if ($this->loggingQueries) {
-            $this->queryLog[] = compact('query', 'bindings', 'time');
-        }
-    }
-
-    /**
-     * Get the elapsed time since a given starting point.
-     *
-     * @param int $start
-     *
-     * @return float
-     */
-    protected function getElapsedTime($start) {
-        return round((microtime(true) - $start) * 1000, 2);
-    }
-
-    /**
-     * Handle a query exception.
-     *
-     * @param \Illuminate\Database\QueryException $e
-     * @param string                              $query
-     * @param array                               $bindings
-     * @param \Closure                            $callback
-     *
-     * @throws CDatabase_Exception_QueryException
-     *
-     * @return mixed
-     */
-    protected function handleQueryException(CDatabase_Exception_QueryException $e, $query, $bindings, Closure $callback) {
-        if ($this->transactions >= 1) {
-            throw $e;
-        }
-
-        return $this->tryAgainIfCausedByLostConnection(
-            $e,
-            $query,
-            $bindings,
-            $callback
-        );
-    }
-
-    /**
-     * Handle a query exception that occurred during query execution.
-     *
-     * @param \Illuminate\Database\QueryException $e
-     * @param string                              $query
-     * @param array                               $bindings
-     * @param \Closure                            $callback
-     *
-     * @throws \CDatabase_Exception_QueryException
-     *
-     * @return mixed
-     */
-    protected function tryAgainIfCausedByLostConnection(CDatabase_Exception_QueryException $e, $query, $bindings, Closure $callback) {
-        if ($this->causedByLostConnection($e->getPrevious())) {
-            $this->reconnect();
-
-            return $this->runQueryCallback($query, $bindings, $callback);
-        }
-
-        throw $e;
+    public function selectFromWriteConnection($query, $bindings = []) {
+        return $this->select($query, $bindings, false);
     }
 
     /**
@@ -797,33 +693,8 @@ class CDatabase_Connection implements CDatabase_ConnectionInterface {
      * @return void
      */
     public function reconnect() {
-        if (is_callable($this->reconnector)) {
-            $this->doctrineConnection = null;
-
-            return call_user_func($this->reconnector, $this);
-        }
-
-        throw new LogicException('Lost connection and no reconnector available.');
-    }
-
-    /**
-     * Reconnect to the database if a PDO connection is missing.
-     *
-     * @return void
-     */
-    protected function reconnectIfMissingConnection() {
-        if (is_null($this->pdo)) {
-            $this->reconnect();
-        }
-    }
-
-    /**
-     * Disconnect from the underlying PDO connection.
-     *
-     * @return void
-     */
-    public function disconnect() {
-        $this->setPdo(null)->setReadPdo(null);
+        $this->driver->close();
+        $this->driver->connect();
     }
 
     /**
@@ -833,10 +704,331 @@ class CDatabase_Connection implements CDatabase_ConnectionInterface {
      *
      * @return void
      */
-    public function listen(Closure $callback) {
+    public function listenOnQueryExecuted(Closure $callback) {
         if (isset($this->events)) {
-            $this->events->listen(CDatabase_Event_QueryExecuted::class, $callback);
+            $this->events->listen(CDatabase_Event_OnQueryExecuted::class, $callback);
         }
+    }
+
+    public function listen($event, Closure $callback) {
+        if (isset($this->events)) {
+            $this->events->listen($event, $callback);
+        }
+    }
+
+    /**
+     * Fire the given event if possible.
+     *
+     * @param mixed $event
+     *
+     * @return void
+     */
+    protected function dispatchEvent($event) {
+        if (isset($this->events)) {
+            $this->events->dispatch($event);
+        }
+    }
+
+    /**
+     * Get the event dispatcher used by the connection.
+     *
+     * @return CEvent
+     */
+    public function getEventDispatcher() {
+        return $this->events;
+    }
+
+    /**
+     * Set the event dispatcher instance on the connection.
+     *
+     * @param CEvent $events
+     *
+     * @return void
+     */
+    public function setEventDispatcher(CEvent $events) {
+        $this->events = $events;
+    }
+
+    /**
+     * Get the query grammar used by the connection.
+     *
+     * @return CDatabase_Query_Grammar
+     */
+    public function getQueryGrammar() {
+        if ($this->queryGrammar == null) {
+            $driver_name = $this->driverName();
+            $grammar_class = 'CDatabase_Query_Grammar_' . $driver_name;
+            $this->queryGrammar = new $grammar_class();
+        }
+
+        return $this->queryGrammar;
+    }
+
+    public function getName() {
+        return $this->name;
+    }
+
+    /**
+     * Gets the SchemaManager that can be used to inspect or change the
+     * database schema through the connection.
+     *
+     * @return CDatabase_Schema_Manager
+     */
+    public function getSchemaManager() {
+        if (!$this->schemaManager) {
+            $this->schemaManager = $this->driver->getSchemaManager($this);
+        }
+
+        return $this->schemaManager;
+    }
+
+    /**
+     * Gets the DatabasePlatform for the connection.
+     *
+     * @throws CDatabase_Exception
+     *
+     * @return CDatabase_Platform
+     */
+    public function getDatabasePlatform() {
+        if (null === $this->platform) {
+            $this->detectDatabasePlatform();
+        }
+
+        return $this->platform;
+    }
+
+    /**
+     * Detects and sets the database platform.
+     *
+     * Evaluates custom platform class and version in order to set the correct platform.
+     *
+     * @throws CDatabase_Exception if an invalid platform was specified for this connection
+     */
+    private function detectDatabasePlatform() {
+        $version = $this->getDatabasePlatformVersion();
+
+        if ($version !== null) {
+            assert($this->driver instanceof CDatabase_Driver_VersionAwarePlatformInterface);
+
+            $this->platform = $this->driver->createDatabasePlatformForVersion($version);
+        } else {
+            $this->platform = $this->driver->getDatabasePlatform();
+        }
+
+        $this->platform->setEventManager($this->events);
+    }
+
+    /**
+     * Returns the version of the related platform if applicable.
+     *
+     * Returns null if either the driver is not capable to create version
+     * specific platform instances, no explicit server version was specified
+     * or the underlying driver connection cannot determine the platform
+     * version without having to query it (performance reasons).
+     *
+     * @throws Exception
+     *
+     * @return null|string
+     */
+    private function getDatabasePlatformVersion() {
+        // Driver does not support version specific platforms.
+
+        if (!($this->driver instanceof CDatabase_Driver_VersionAwarePlatformInterface)) {
+            return null;
+        }
+
+        // Explicit platform version requested (supersedes auto-detection).
+        if (isset($this->config['serverVersion'])) {
+            return $this->config['serverVersion'];
+        }
+
+        return $this->getServerVersion();
+    }
+
+    /**
+     * Returns the database server version if the underlying driver supports it.
+     *
+     * @return null|string
+     */
+    private function getServerVersion() {
+        // Automatic platform version detection.
+
+        if ($this->driver instanceof CDatabase_Driver_ServerInfoAwareInterface && !$this->driver->requiresQueryForServerVersion()) {
+            return $this->driver->getServerVersion();
+        }
+
+        // Unable to detect platform version.
+        return null;
+    }
+
+    /**
+     * Gets the Configuration used by the Connection.
+     *
+     * @return CDatabase_Configuration
+     */
+    public function getConfiguration() {
+        return $this->configuration;
+    }
+
+    /**
+     * Gets the name of the database this Connection is connected to.
+     *
+     * @return string
+     */
+    public function getDatabase() {
+        return $this->driver->getDatabase($this);
+    }
+
+    public function isLogQuery() {
+        return carr::get($this->config, 'log', false);
+    }
+
+    public function isBenchmarkQuery() {
+        return carr::get($this->config, 'benchmark', false);
+    }
+
+    public function benchmarkQuery($query, $time = null, $rowsCount = null) {
+        if ($this->isBenchmarkQuery()) {
+            // Benchmark the query
+            //static::$benchmarks[] = array('query' => $query, 'time' => $time, 'rows' => $rowsCount, 'caller' => cdbg::getTraceString());
+            CDatabase::$benchmarks[] = ['query' => $query, 'time' => $time, 'rows' => $rowsCount, 'caller' => cdbg::callerInfo()];
+        }
+    }
+
+    /**
+     * Log a query in the connection's query log.
+     *
+     * @param string     $query
+     * @param array      $bindings
+     * @param null|float $time
+     * @param null|mixed $rowsCount
+     *
+     * @return void
+     */
+    public function logQuery($query, $bindings, $time = null, $rowsCount = null) {
+        if ($this->driverName() == 'MongoDB') {
+            if (is_array($query)) {
+                $query = CDatabase_Helper_MongoDB::commandToString($query);
+            }
+        }
+        $this->dispatchEvent(CDatabase_Event::createOnQueryExecutedEvent($query, $bindings, $time, $rowsCount, $this));
+
+        if ($this->isLogQuery()) {
+            $this->queryLog[] = compact('query', 'bindings', 'time');
+        }
+    }
+
+    public function enableQueryLog() {
+        $this->config['log'] = true;
+    }
+
+    public function getQueryLog() {
+        return $this->queryLog;
+    }
+
+    /**
+     * Get a new raw query expression.
+     *
+     * @param mixed $value
+     *
+     * @return CDatabase_Query_Expression
+     */
+    public static function raw($value) {
+        return new CDatabase_Query_Expression($value);
+    }
+
+    /**
+     * Get the name of the connected database.
+     *
+     * @return string
+     */
+    public function getDatabaseName() {
+        return carr::get($this->config, 'connection.database');
+    }
+
+    public function getRow($query) {
+        $r = $this->query($query);
+        $result = null;
+        if ($r->count() > 0) {
+            $result = $r[0];
+        }
+
+        return $result;
+    }
+
+    public function getValue($query) {
+        $r = $this->query($query);
+        $result = $r->result(false);
+        $res = [];
+        $value = null;
+        foreach ($result as $row) {
+            foreach ($row as $k => $v) {
+                $value = $v;
+
+                break;
+            }
+
+            break;
+        }
+
+        return $value;
+    }
+
+    public function getArray($query) {
+        $r = $this->query($query);
+        $result = $r->result(false);
+        $res = [];
+        foreach ($result as $row) {
+            $cnt = 0;
+            $arr_val = '';
+            foreach ($row as $k => $v) {
+                if ($cnt == 0) {
+                    $arr_val = $v;
+                }
+                $cnt++;
+                if ($cnt > 0) {
+                    break;
+                }
+            }
+            $res[] = $arr_val;
+        }
+
+        return $res;
+    }
+
+    public function getList($query) {
+        $r = $this->query($query);
+        $result = $r->result(false);
+        $res = [];
+        foreach ($result as $row) {
+            $cnt = 0;
+            $arr_key = '';
+            $arr_val = '';
+            foreach ($row as $k => $v) {
+                if ($cnt == 0) {
+                    $arr_key = $v;
+                }
+                if ($cnt == 1) {
+                    $arr_val = $v;
+                }
+                $cnt++;
+                if ($cnt > 1) {
+                    break;
+                }
+            }
+            $res[$arr_key] = $arr_val;
+        }
+
+        return $res;
+    }
+
+    /**
+     * Get a new query builder instance.
+     *
+     * @return CDatabase_Query_Builder
+     */
+    public function createQueryBuilder() {
+        return $this->newQuery();
     }
 
     /**
@@ -850,276 +1042,23 @@ class CDatabase_Connection implements CDatabase_ConnectionInterface {
         if (!isset($this->events)) {
             return;
         }
-
         switch ($event) {
             case 'beganTransaction':
-                return $this->events->dispatch(new CDatabase_Event_TransactionBeginning($this));
+                return $this->events->dispatch(new CDatabase_Event_Transaction_Beginning($this));
             case 'committed':
-                return $this->events->dispatch(new CDatabase_Event_TransactionCommitted($this));
+                return $this->events->dispatch(new CDatabase_Event_Transaction_Committed($this));
             case 'rollingBack':
-                return $this->events->dispatch(new CDatabase_Event_TransactionRolledBack($this));
+                return $this->events->dispatch(new CDatabase_Event_Transaction_RolledBack($this));
         }
     }
 
     /**
-     * Fire the given event if possible.
+     * Get a new query builder instance.
      *
-     * @param mixed $event
-     *
-     * @return void
+     * @return CDatabase_Query_Builder
      */
-    protected function event($event) {
-        if (isset($this->events)) {
-            $this->events->dispatch($event);
-        }
-    }
-
-    /**
-     * Get a new raw query expression.
-     *
-     * @param mixed $value
-     *
-     * @return \CDatabase_Query_Expression
-     */
-    public function raw($value) {
-        return new CDatabase_Query_Expression($value);
-    }
-
-    /**
-     * Indicate if any records have been modified.
-     *
-     * @param bool $value
-     *
-     * @return void
-     */
-    public function recordsHaveBeenModified($value = true) {
-        if (!$this->recordsModified) {
-            $this->recordsModified = $value;
-        }
-    }
-
-    /**
-     * Is Doctrine available?
-     *
-     * @return bool
-     */
-    public function isDoctrineAvailable() {
-        return class_exists('Doctrine\DBAL\Connection');
-    }
-
-    /**
-     * Get a Doctrine Schema Column instance.
-     *
-     * @param string $table
-     * @param string $column
-     *
-     * @return \Doctrine\DBAL\Schema\Column
-     */
-    public function getDoctrineColumn($table, $column) {
-        $schema = $this->getDoctrineSchemaManager();
-
-        return $schema->listTableDetails($table)->getColumn($column);
-    }
-
-    /**
-     * Get the Doctrine DBAL schema manager for the connection.
-     *
-     * @return \Doctrine\DBAL\Schema\AbstractSchemaManager
-     */
-    public function getDoctrineSchemaManager() {
-        $connection = $this->getDoctrineConnection();
-
-        // Doctrine v2 expects one parameter while v3 expects two. 2nd will be ignored on v2...
-        return $this->getDoctrineDriver()->getSchemaManager(
-            $connection,
-            $connection->getDatabasePlatform()
-        );
-    }
-
-    /**
-     * Get the Doctrine DBAL database connection instance.
-     *
-     * @return \Doctrine\DBAL\Connection
-     */
-    public function getDoctrineConnection() {
-        if (is_null($this->doctrineConnection)) {
-            $driver = $this->getDoctrineDriver();
-
-            $this->doctrineConnection = new DoctrineConnection(array_filter([
-                'pdo' => $this->getPdo(),
-                'dbname' => $this->getDatabaseName(),
-                'driver' => method_exists($driver, 'getName') ? $driver->getName() : null,
-                'serverVersion' => $this->getConfig('server_version'),
-            ]), $driver);
-        }
-
-        return $this->doctrineConnection;
-    }
-
-    /**
-     * Get the current PDO connection.
-     *
-     * @return \PDO
-     */
-    public function getPdo() {
-        if ($this->pdo instanceof Closure) {
-            return $this->pdo = call_user_func($this->pdo);
-        }
-
-        return $this->pdo;
-    }
-
-    /**
-     * Get the current PDO connection parameter without executing any reconnect logic.
-     *
-     * @return null|\PDO|\Closure
-     */
-    public function getRawPdo() {
-        return $this->pdo;
-    }
-
-    /**
-     * Get the current PDO connection used for reading.
-     *
-     * @return \PDO
-     */
-    public function getReadPdo() {
-        if ($this->transactions > 0) {
-            return $this->getPdo();
-        }
-
-        if ($this->recordsModified && $this->getConfig('sticky')) {
-            return $this->getPdo();
-        }
-
-        if ($this->readPdo instanceof Closure) {
-            return $this->readPdo = call_user_func($this->readPdo);
-        }
-
-        return $this->readPdo ?: $this->getPdo();
-    }
-
-    /**
-     * Get the current read PDO connection parameter without executing any reconnect logic.
-     *
-     * @return null|\PDO|\Closure
-     */
-    public function getRawReadPdo() {
-        return $this->readPdo;
-    }
-
-    /**
-     * Set the PDO connection.
-     *
-     * @param null|\PDO|\Closure $pdo
-     *
-     * @return $this
-     */
-    public function setPdo($pdo) {
-        $this->transactions = 0;
-
-        $this->pdo = $pdo;
-
-        return $this;
-    }
-
-    /**
-     * Set the PDO connection used for reading.
-     *
-     * @param null|\PDO|\Closure $pdo
-     *
-     * @return $this
-     */
-    public function setReadPdo($pdo) {
-        $this->readPdo = $pdo;
-
-        return $this;
-    }
-
-    /**
-     * Set the reconnect instance on the connection.
-     *
-     * @param callable $reconnector
-     *
-     * @return $this
-     */
-    public function setReconnector(callable $reconnector) {
-        $this->reconnector = $reconnector;
-
-        return $this;
-    }
-
-    /**
-     * Get the database connection name.
-     *
-     * @return null|string
-     */
-    public function getName() {
-        return $this->getConfig('name');
-    }
-
-    /**
-     * Get an option from the configuration options.
-     *
-     * @param null|string $option
-     *
-     * @return mixed
-     */
-    public function getConfig($option = null) {
-        return carr::get($this->config, $option);
-    }
-
-    /**
-     * Get the PDO driver name.
-     *
-     * @return string
-     */
-    public function getDriverName() {
-        return $this->getConfig('driver');
-    }
-
-    /**
-     * Get the query grammar used by the connection.
-     *
-     * @return CDatabase_Query_Grammar
-     */
-    public function getQueryGrammar() {
-        return $this->queryGrammar;
-    }
-
-    /**
-     * Set the query grammar used by the connection.
-     *
-     * @param CDatabase_Query_Grammar $grammar
-     *
-     * @return $this
-     */
-    public function setQueryGrammar(CDatabase_Query_Grammar $grammar) {
-        $this->queryGrammar = $grammar;
-
-        return $this;
-    }
-
-    /**
-     * Get the schema grammar used by the connection.
-     *
-     * @return CDatabase_Schema_Grammar
-     */
-    public function getSchemaGrammar() {
-        return $this->schemaGrammar;
-    }
-
-    /**
-     * Set the schema grammar used by the connection.
-     *
-     * @param CDatabase_Schema_Grammar $grammar
-     *
-     * @return $this
-     */
-    public function setSchemaGrammar(CDatabase_Query_Grammar $grammar) {
-        $this->schemaGrammar = $grammar;
-
-        return $this;
+    public function newQuery() {
+        return new CDatabase_Query_Builder($this);
     }
 
     /**
@@ -1128,228 +1067,50 @@ class CDatabase_Connection implements CDatabase_ConnectionInterface {
      * @return CDatabase_Query_Processor
      */
     public function getPostProcessor() {
+        if ($this->postProcessor == null) {
+            $driverName = $this->driverName();
+            $processorClass = 'CDatabase_Query_Processor_' . $driverName;
+            $this->postProcessor = new $processorClass();
+        }
+
         return $this->postProcessor;
     }
 
-    /**
-     * Set the query post processor used by the connection.
-     *
-     * @param CDatabase_Query_Processor $processor
-     *
-     * @return $this
-     */
-    public function setPostProcessor(CDatabase_Query_Processor $processor) {
-        $this->postProcessor = $processor;
+    public function driver() {
+        return $this->driver;
+    }
 
-        return $this;
+    public function ping() {
+        return $this->driver->ping();
     }
 
     /**
-     * Get the event dispatcher used by the connection.
+     * Prepares and executes an SQL query and returns the result as an associative array.
      *
-     * @return CEvent_Dispatcher
-     */
-    public function getEventDispatcher() {
-        return $this->events;
-    }
-
-    /**
-     * Set the event dispatcher instance on the connection.
-     *
-     * @param CEvent_Dispatcher $events
-     *
-     * @return $this
-     */
-    public function setEventDispatcher(CEvent_Dispatcher $events) {
-        $this->events = $events;
-
-        return $this;
-    }
-
-    /**
-     * Unset the event dispatcher for this connection.
-     *
-     * @return void
-     */
-    public function unsetEventDispatcher() {
-        $this->events = null;
-    }
-
-    /**
-     * Set the transaction manager instance on the connection.
-     *
-     * @param CDatabase_Transaction_TransactionManager $manager
-     *
-     * @return $this
-     */
-    public function setTransactionManager($manager) {
-        $this->transactionsManager = $manager;
-
-        return $this;
-    }
-
-    /**
-     * Unset the transaction manager for this connection.
-     *
-     * @return void
-     */
-    public function unsetTransactionManager() {
-        $this->transactionsManager = null;
-    }
-
-    /**
-     * Determine if the connection is in a "dry run".
-     *
-     * @return bool
-     */
-    public function pretending() {
-        return $this->pretending === true;
-    }
-
-    /**
-     * Get the connection query log.
+     * @param string $sql    the SQL query
+     * @param array  $params the query parameters
      *
      * @return array
      */
-    public function getQueryLog() {
-        return $this->queryLog;
+    public function fetchAll($sql, array $params = []) {
+        return $this->query($sql, $params)->fetchAll();
     }
 
-    /**
-     * Clear the query log.
-     *
-     * @return void
-     */
-    public function flushQueryLog() {
-        $this->queryLog = [];
-    }
-
-    /**
-     * Enable the query log on the connection.
-     *
-     * @return void
-     */
-    public function enableQueryLog() {
-        $this->loggingQueries = true;
-    }
-
-    /**
-     * Disable the query log on the connection.
-     *
-     * @return void
-     */
-    public function disableQueryLog() {
-        $this->loggingQueries = false;
-    }
-
-    /**
-     * Determine whether we're logging queries.
-     *
-     * @return bool
-     */
-    public function logging() {
-        return $this->loggingQueries;
-    }
-
-    /**
-     * Get the name of the connected database.
-     *
-     * @return string
-     */
-    public function getDatabaseName() {
-        return $this->database;
-    }
-
-    /**
-     * Set the name of the connected database.
-     *
-     * @param string $database
-     *
-     * @return $this
-     */
-    public function setDatabaseName($database) {
-        $this->database = $database;
-
-        return $this;
-    }
-
-    /**
-     * Get the table prefix for the connection.
-     *
-     * @return string
-     */
     public function getTablePrefix() {
-        return $this->tablePrefix;
+        return carr::get($this->config, 'table_prefix');
     }
 
     /**
-     * Set the table prefix in use by the connection.
+     * Get a Doctrine Schema Column instance.
      *
-     * @param string $prefix
+     * @param string $table
+     * @param string $column
      *
-     * @return $this
+     * @return \CDatabase_Schema_Column
      */
-    public function setTablePrefix($prefix) {
-        $this->tablePrefix = $prefix;
+    public function getColumn($table, $column) {
+        $schema = $this->getSchemaManager();
 
-        $this->getQueryGrammar()->setTablePrefix($prefix);
-
-        return $this;
-    }
-
-    /**
-     * Set the table prefix and return the grammar.
-     *
-     * @param \CDatabase_Grammar $grammar
-     *
-     * @return \CDatabase_Grammar
-     */
-    public function withTablePrefix(CDatabase_Grammar $grammar) {
-        $grammar->setTablePrefix($this->tablePrefix);
-
-        return $grammar;
-    }
-
-    /**
-     * Register a connection resolver.
-     *
-     * @param string   $driver
-     * @param \Closure $callback
-     *
-     * @return void
-     */
-    public static function resolverFor($driver, Closure $callback) {
-        static::$resolvers[$driver] = $callback;
-    }
-
-    /**
-     * Get the connection resolver for the given driver.
-     *
-     * @param string $driver
-     *
-     * @return mixed
-     */
-    public static function getResolver($driver) {
-        return carr::get(static::$resolvers, $driver, null);
-    }
-
-    protected function getDoctrineDriver() {
-        throw new CDatabase_Exception('Not implemented yet ' . __FUNCTION__ . ' on ' . get_class($this));
-    }
-
-    protected function createResult($link, $result) {
-        throw new CDatabase_Exception('Not implemented yet ' . __FUNCTION__ . ' on ' . get_class($this));
-    }
-
-    protected function createDriver() {
-        throw new CDatabase_Exception('Not implemented yet ' . __FUNCTION__ . ' on ' . get_class($this));
-    }
-
-    public function getDriver() {
-        if ($this->driver == null) {
-            $this->driver = $this->createDriver($this->pdo);
-        }
-
-        return $this->driver;
+        return $schema->listTableDetails($table)->getColumn($column);
     }
 }

@@ -84,7 +84,7 @@ class CDatabase_ConnectionFactory {
     protected function createReadWriteConnection(array $config) {
         $connection = $this->createSingleConnection($this->getWriteConfig($config));
 
-        return $connection->setReadPdo($this->createReadPdo($config));
+        return $connection->setReadPdo($this->createReadDriver($config));
     }
 
     /**
@@ -201,7 +201,6 @@ class CDatabase_ConnectionFactory {
      */
     protected function parseHosts(array $config) {
         $hosts = carr::wrap($config['host']);
-
         if (empty($hosts)) {
             throw new InvalidArgumentException('Database hosts array is empty.');
         }
