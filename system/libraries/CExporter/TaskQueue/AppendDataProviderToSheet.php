@@ -79,7 +79,7 @@ class CExporter_TaskQueue_AppendDataProviderToSheet extends CQueue_AbstractTask 
         //CDaemon::log(json_encode($this->data));
         $paginationResult = $this->dataProvider->paginate($perPage, ['*'], 'page', $page);
         CDaemon::log('append row from data provider page:' . $page . ', perPage:' . $perPage . ' with total data:' . $paginationResult->total());
-        CDaemon::log('row:' . json_encode($paginationResult->items()));
+        //CDaemon::log('row:' . json_encode($paginationResult->items()));
         $sheet->appendRows($paginationResult->items(), $this->sheetExport);
         CDaemon::log('Memory Usage:' . memory_get_usage());
         $total = $paginationResult->total();
