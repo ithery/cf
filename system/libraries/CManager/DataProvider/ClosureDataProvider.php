@@ -26,7 +26,7 @@ class CManager_DataProvider_ClosureDataProvider extends CManager_DataProviderAbs
     }
 
     public function toEnumerable() {
-        return $this->closure->__invoke($this->createParameter());
+        return c::collect($this->closure->__invoke($this->createParameter()));
     }
 
     public function paginate($perPage = null, $columns = ['*'], $pageName = 'page', $page = null, $callback = null) {

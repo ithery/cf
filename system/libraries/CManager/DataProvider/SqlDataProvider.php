@@ -33,7 +33,7 @@ class CManager_DataProvider_SqlDataProvider extends CManager_DataProviderAbstrac
     }
 
     public function toEnumerable() {
-        return c::db($this->connection)->query($this->sql, $this->bindings)->resultArray(false);
+        return c::collect(c::db($this->connection)->query($this->sql, $this->bindings)->resultArray(false));
     }
 
     private function executeQuery($sql, $bindings = []) {
