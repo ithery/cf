@@ -75,6 +75,7 @@ class CExporter_QueuedWriter {
         }
 
         $jobs = new CCollection();
+
         foreach ($sheetExports as $sheetIndex => $sheetExport) {
             if ($sheetExport instanceof CExporter_Concern_FromCollection) {
                 $jobs = $jobs->merge($this->exportCollection($sheetExport, $temporaryFile, $writerType, $sheetIndex));
