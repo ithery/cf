@@ -31,7 +31,12 @@ class CEmail_Builder_RuntimeBuilder {
         throw new Exception('not defined method ' . $method);
     }
 
-    public function render($options = []) {
+    /**
+     * @param array $options
+     *
+     * @return string
+     */
+    public function render(array $options = []) {
         $parser = new CEmail_Builder_Parser($this->node, $options);
 
         return $parser->parse();
