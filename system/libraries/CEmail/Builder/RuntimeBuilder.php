@@ -2,6 +2,16 @@
 
 /**
  * @mixed CEmail_Builder_Node
+ *
+ * @method CEmail_Builder_Node addBody()
+ * @method CEmail_Builder_Node addHead()
+ * @method CEmail_Builder_Node addHeadAttributes()
+ * @method CEmail_Builder_Node addSection()
+ * @method CEmail_Builder_Node addColumn()
+ * @method CEmail_Builder_Node addGroup()
+ * @method CEmail_Builder_Node addImage()
+ * @method CEmail_Builder_Node addText()
+ * @method CEmail_Builder_Node addDivider()
  */
 class CEmail_Builder_RuntimeBuilder {
     /**
@@ -17,12 +27,13 @@ class CEmail_Builder_RuntimeBuilder {
         if (method_exists($this->node, $method)) {
             return call_user_func_array([$this->node, $method], $args);
         }
+
         throw new Exception('not defined method ' . $method);
     }
 
     public function render($options = []) {
-        $options;
         $parser = new CEmail_Builder_Parser($this->node, $options);
+
         return $parser->parse();
     }
 }
