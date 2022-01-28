@@ -69,6 +69,9 @@ abstract class CNotification_ChannelAbstract implements CNotification_ChannelInt
                         ];
                     }
 
+                    if ($vendorResponse instanceof CVendor_Firebase_Messaging_MulticastSendReport) {
+                    }
+
                     $vendorResponse = json_encode($vendorResponse);
                     $logNotificationModel->vendor_response = $vendorResponse;
 
