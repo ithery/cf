@@ -4,31 +4,38 @@ declare(strict_types=1);
 namespace Lcobucci\JWT;
 
 use Closure;
-use Lcobucci\JWT\Encoding\ChainedFormatter;
-use Lcobucci\JWT\Encoding\JoseEncoder;
 use Lcobucci\JWT\Signer\Key;
-use Lcobucci\JWT\Signer\Key\InMemory;
 use Lcobucci\JWT\Signer\None;
+use Lcobucci\JWT\Signer\Key\InMemory;
+use Lcobucci\JWT\Encoding\JoseEncoder;
 use Lcobucci\JWT\Validation\Constraint;
+use Lcobucci\JWT\Encoding\ChainedFormatter;
 
 /**
- * Configuration container for the JWT Builder and Parser
+ * Configuration container for the JWT Builder and Parser.
  *
  * Serves like a small DI container to simplify the creation and usage
  * of the objects.
  */
-final class Configuration
-{
+final class Configuration {
     private Parser $parser;
+
     private Signer $signer;
+
     private Key $signingKey;
+
     private Key $verificationKey;
+
     private Validator $validator;
 
-    /** @var Closure(ClaimsFormatter $claimFormatter): Builder */
+    /**
+     * @var Closure(ClaimsFormatter): Builder
+     */
     private Closure $builderFactory;
 
-    /** @var Constraint[] */
+    /**
+     * @var Constraint[]
+     */
     private array $validationConstraints = [];
 
     private function __construct(
@@ -38,11 +45,11 @@ final class Configuration
         ?Encoder $encoder = null,
         ?Decoder $decoder = null
     ) {
-        $this->signer          = $signer;
-        $this->signingKey      = $signingKey;
+        $this->signer = $signer;
+        $this->signingKey = $signingKey;
         $this->verificationKey = $verificationKey;
-        $this->parser          = new Token\Parser($decoder ?? new JoseEncoder());
-        $this->validator       = new Validation\Validator();
+        $this->parser = new Token\Parser($decoder ?? new JoseEncoder());
+        $this->validator = new Validation\Validator();
 
         $this->builderFactory = static function (ClaimsFormatter $claimFormatter) use ($encoder): Builder {
             return new Token\Builder($encoder ?? new JoseEncoder(), $claimFormatter);
@@ -95,60 +102,53 @@ final class Configuration
         );
     }
 
-    /** @param callable(ClaimsFormatter): Builder $builderFactory */
-    public function setBuilderFactory(callable $builderFactory): void
-    {
+    /**
+     * @param callable(ClaimsFormatter): Builder $builderFactory
+     */
+    public function setBuilderFactory(callable $builderFactory): void {
         $this->builderFactory = Closure::fromCallable($builderFactory);
     }
 
-    public function builder(?ClaimsFormatter $claimFormatter = null): Builder
-    {
+    public function builder(?ClaimsFormatter $claimFormatter = null): Builder {
         return ($this->builderFactory)($claimFormatter ?? ChainedFormatter::default());
     }
 
-    public function parser(): Parser
-    {
+    public function parser(): Parser {
         return $this->parser;
     }
 
-    public function setParser(Parser $parser): void
-    {
+    public function setParser(Parser $parser): void {
         $this->parser = $parser;
     }
 
-    public function signer(): Signer
-    {
+    public function signer(): Signer {
         return $this->signer;
     }
 
-    public function signingKey(): Key
-    {
+    public function signingKey(): Key {
         return $this->signingKey;
     }
 
-    public function verificationKey(): Key
-    {
+    public function verificationKey(): Key {
         return $this->verificationKey;
     }
 
-    public function validator(): Validator
-    {
+    public function validator(): Validator {
         return $this->validator;
     }
 
-    public function setValidator(Validator $validator): void
-    {
+    public function setValidator(Validator $validator): void {
         $this->validator = $validator;
     }
 
-    /** @return Constraint[] */
-    public function validationConstraints(): array
-    {
+    /**
+     * @return Constraint[]
+     */
+    public function validationConstraints(): array {
         return $this->validationConstraints;
     }
 
-    public function setValidationConstraints(Constraint ...$validationConstraints): void
-    {
+    public function setValidationConstraints(Constraint ...$validationConstraints): void {
         $this->validationConstraints = $validationConstraints;
     }
 }
