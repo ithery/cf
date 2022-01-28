@@ -4,6 +4,8 @@ All notable changes to `CF` will be documented in this file
 
 ## 1.3 - 2022-01-24
 
+### Important
+- php 5.6 not supported anymore
 ### Added
 
 - add CTranslation_Manager
