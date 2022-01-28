@@ -65,29 +65,6 @@ class Controller_Cresenity extends CController {
         return c::response()->json($data);
     }
 
-    //@codingStandardsIgnoreStart
-
-    /**
-     * change lang.
-     *
-     * @param string $lang
-     *
-     * @return void
-     *
-     * @deprecated version
-     */
-    public function change_lang($lang) {
-        clang::setlang($lang);
-
-        return c::redirect(crequest::referrer());
-    }
-
-    public function change_theme($theme) {
-        CManager::theme()->setTheme($theme);
-
-        return c::redirect(crequest::referrer());
-    }
-
     //@codingStandardsIgnoreEnd
 
     /**
