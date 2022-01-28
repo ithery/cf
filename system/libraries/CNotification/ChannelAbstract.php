@@ -68,9 +68,7 @@ abstract class CNotification_ChannelAbstract implements CNotification_ChannelInt
                             'headers' => $vendorResponse->headers()
                         ];
                     }
-                    if (is_object($vendorResponse)) {
-                        $vendorResponse->headerResponse = $result->headers(true);
-                    }
+
                     $vendorResponse = json_encode($vendorResponse);
                     $logNotificationModel->vendor_response = $vendorResponse;
 
