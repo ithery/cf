@@ -169,7 +169,7 @@ class CManager_DataProvider_SqlDataProvider extends CManager_DataProviderAbstrac
         }
 
         if (count($this->searchAnd) > 0) {
-            $dataSearchAnd = $this->search;
+            $dataSearchAnd = $this->searchAnd;
 
             foreach ($dataSearchAnd as $fieldName => $value) {
                 $sWhereAnd .= 'AND ' . c::db()->escapeColumn($fieldName) . " LIKE '%" . c::db($this->connection)->escapeLike($value) . "%' ";
