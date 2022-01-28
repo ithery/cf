@@ -72,7 +72,7 @@ class CDaemon {
      * Shortcut function to log the current running service.
      *
      * @param string $msg
-     * @param mixed  $label
+     * @param string $label
      */
     public static function log($msg, $label = '') {
         $runningService = self::getRunningService();
