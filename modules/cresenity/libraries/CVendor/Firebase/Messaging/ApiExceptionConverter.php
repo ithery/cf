@@ -9,7 +9,7 @@ use GuzzleHttp\Exception\RequestException;
  */
 class CVendor_Firebase_Messaging_ApiExceptionConverter {
     /**
-     * @var ErrorResponseParser
+     * @var CVendor_Firebase_Http_ErrorResponseParser
      */
     private $responseParser;
 
