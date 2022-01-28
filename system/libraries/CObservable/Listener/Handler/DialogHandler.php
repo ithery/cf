@@ -49,6 +49,7 @@ class CObservable_Listener_Handler_DialogHandler extends CObservable_Listener_Ha
 
     public function setSidebar($bool = true) {
         $this->isSidebar = $bool;
+
         return $this;
     }
 
@@ -60,11 +61,13 @@ class CObservable_Listener_Handler_DialogHandler extends CObservable_Listener_Ha
 
     public function setModalClass($class) {
         $this->modalClass = $class;
+
         return $this;
     }
 
     public function setBackdrop($backdrop) {
         $this->backdrop = $backdrop;
+
         return $this;
     }
 
@@ -75,6 +78,7 @@ class CObservable_Listener_Handler_DialogHandler extends CObservable_Listener_Ha
         foreach ($inputs as $inp) {
             $this->param_inputs[] = $inp;
         }
+
         return $this;
     }
 
@@ -85,11 +89,13 @@ class CObservable_Listener_Handler_DialogHandler extends CObservable_Listener_Ha
         foreach ($param_request as $req_k => $req_v) {
             $this->param_request[$req_k] = $req_v;
         }
+
         return $this;
     }
 
     public function setMethod($method) {
         $this->method = $method;
+
         return $this;
     }
 
@@ -169,14 +175,9 @@ class CObservable_Listener_Handler_DialogHandler extends CObservable_Listener_Ha
                 $.' . $this->js_class . ".show_dialog('" . $this->target . "','" . $this->title . "','" . $content . "');
             ";
         } else {
-            $js .= '
-            if(cresenity) {
-                cresenity.modal(' . $jsOptions . ");
-            } else {
-                 $.cresenity.show_dialog('" . $this->target . "','" . $generatedUrl . "','" . $this->method . "'," . $jsOptions . ',' . $dataAddition . ');
-            }
-         ';
+            $js .= 'cresenity.modal(' . $jsOptions . ');';
         }
+
         return $js;
     }
 }
