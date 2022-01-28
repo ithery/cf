@@ -2,10 +2,29 @@
 
 All notable changes to `CF` will be documented in this file
 
+## 1.3 - 2022-01-24
+
+### Added
+
+- add CTranslation_Manager
+### Fixes
+
+- Fixes for cres.js:
+  - object cresenity.sse
+
+### Improved
+
+- helpers c
+  - c::arrayDiffAssocRecursive()
+
+- Remove deprecated $.cresenity
+
 ## 1.2 - 2020-10-05
 
 ### Added
 
+- add CMiddleware
+- add CAuth
 - CModel_Relation_BelongsToOne
 - CView with blade
 - CTemplate with blade
@@ -16,7 +35,7 @@ All notable changes to `CF` will be documented in this file
 - Form client validation with $form->setValidation
 - add support for public folder. Document Root for CF now can be served from folder public
 - add Experimental WebSocket
-
+- add Experimental CCron
 ### Fixes
 
 - Fixes for cres.js function ajaxSubmit and handleResponse
