@@ -163,7 +163,7 @@ abstract class CDaemon_ServiceAbstract implements CDaemon_ServiceInterface {
      *
      * @var stream
      */
-    private static $log_handle = false;
+    private static $logHandle = false;
 
     /**
      * Implement this method to define plugins.
@@ -586,18 +586,18 @@ abstract class CDaemon_ServiceAbstract implements CDaemon_ServiceInterface {
         if (time() >= $logFileCheckAt && $this->logFile() != $logFile) {
             $logFile = $this->logFile();
             $logFileCheckAt = mktime(date('H'), (date('i') - (date('i') % 5)) + 5, null);
-            @fclose(self::$log_handle);
-            self::$log_handle = $logFileError = false;
+            @fclose(self::$logHandle);
+            self::$logHandle = $logFileError = false;
         }
-        if (self::$log_handle === false) {
+        if (self::$logHandle === false) {
             if (strlen($logFile) > 0 && file_exists($logFile)) {
                 $rotator = CLogger_Rotator::createRotate($logFile);
 
                 $rotator->size($this->sizeToRotate)->run();
             }
-            if (strlen($logFile) > 0 && self::$log_handle = @fopen($logFile, 'a+')) {
+            if (strlen($logFile) > 0 && self::$logHandle = @fopen($logFile, 'a+')) {
                 if ($this->parent) {
-                    fwrite(self::$log_handle, $header);
+                    fwrite(self::$logHandle, $header);
                     if ($this->stdout) {
                         echo $header;
                     }
@@ -608,8 +608,8 @@ abstract class CDaemon_ServiceAbstract implements CDaemon_ServiceInterface {
             }
         }
         $message = $prefix . ' ' . str_replace("\n", "\n${prefix} ", trim($message)) . "\n";
-        if (self::$log_handle) {
-            fwrite(self::$log_handle, $message);
+        if (self::$logHandle) {
+            fwrite(self::$logHandle, $message);
         }
         if ($this->stdout) {
             echo $message;
@@ -700,8 +700,8 @@ abstract class CDaemon_ServiceAbstract implements CDaemon_ServiceInterface {
                     fclose(STDIN);
                 }
                 // Close the static log handle to prevent it being inherrited by the new process.
-                if (is_resource(self::$log_handle)) {
-                    fclose(self::$log_handle);
+                if (is_resource(self::$logHandle)) {
+                    fclose(self::$logHandle);
                 }
 
                 break;
@@ -931,8 +931,8 @@ abstract class CDaemon_ServiceAbstract implements CDaemon_ServiceInterface {
             fclose(STDIN);
         }
         // Close the static log handle to prevent it being inherrited by the new process.
-        if (is_resource(self::$log_handle)) {
-            fclose(self::$log_handle);
+        if (is_resource(self::$logHandle)) {
+            fclose(self::$logHandle);
         }
 
         $class = get_class($this);

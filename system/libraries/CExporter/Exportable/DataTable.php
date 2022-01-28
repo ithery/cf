@@ -24,8 +24,12 @@ class CExporter_Exportable_DataTable extends CExporter_Exportable implements CEx
         ];
     }
 
+    /**
+     * @return CElement_Component_DataTable
+     */
     public function dataTable() {
         $this->table->setAjax(false);
+        //d
 
         return $this->table;
     }

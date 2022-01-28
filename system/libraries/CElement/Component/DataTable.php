@@ -811,6 +811,12 @@ class CElement_Component_DataTable extends CElement_Component {
      */
     public function getCollection() {
         $data = [];
+        if ($this->isUsingDataProvider()) {
+            /** @var CManager_Contract_DataProviderInterface $dataProvider */
+            $dataProvider = $this->query;
+
+            return $dataProvider->toEnumerable();
+        }
         if ($this->isCallback) {
             $callbackData = CFunction::factory($this->query)
                 ->addArg($this->callbackOptions)

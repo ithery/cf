@@ -8,11 +8,12 @@ defined('SYSPATH') or die('No direct access allowed.');
  *
  * @since Jun 23, 2018, 1:29:45 AM
  *
- * @property string  $createdby
- * @property string  $updatedby
- * @property CCarbon $created
- * @property CCarbon $updated
- * @property int     $status
+ * @property      string  $createdby
+ * @property      string  $updatedby
+ * @property      CCarbon $created
+ * @property      CCarbon $updated
+ * @property      int     $status
+ * @property-read int     $org_id
  */
 trait CApp_Model_Trait_Org {
     public function __construct(array $attributes = []) {

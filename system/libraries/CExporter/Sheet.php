@@ -161,6 +161,9 @@ class CExporter_Sheet {
             if ($sheetExport instanceof CExporter_Concern_FromCollection) {
                 $this->fromCollection($sheetExport);
             }
+            if ($sheetExport instanceof CExporter_Concern_FromDataTable) {
+                $this->fromDataTable($sheetExport);
+            }
 
             if ($sheetExport instanceof CExporter_Concern_FromArray) {
                 $this->fromArray($sheetExport);
@@ -364,10 +367,18 @@ class CExporter_Sheet {
     }
 
     /**
-     * @param FromCollection $sheetExport
+     * @param CExporter_Concern_FromCollection $sheetExport
      */
     public function fromCollection(CExporter_Concern_FromCollection $sheetExport) {
         $this->appendRows($sheetExport->collection()->all(), $sheetExport);
+    }
+
+    /**
+     * @param CExporter_Concern_FromDataTable $sheetExport
+     */
+    public function fromDataTable(CExporter_Concern_FromDataTable $sheetExport) {
+        $dataTable = $sheetExport->dataTable();
+        $this->appendRows($dataTable->getCollection()->all(), $sheetExport);
     }
 
     /**
@@ -378,14 +389,14 @@ class CExporter_Sheet {
     }
 
     /**
-     * @param FromIterator $sheetExport
+     * @param CExporter_Concern_FromIterator $sheetExport
      */
     public function fromIterator(CExporter_Concern_FromIterator $sheetExport) {
         $this->appendRows($sheetExport->iterator(), $sheetExport);
     }
 
     /**
-     * @param FromGenerator $sheetExport
+     * @param CExporter_Concern_FromGenerator $sheetExport
      */
     public function fromGenerator(CExporter_Concern_FromGenerator $sheetExport) {
         $this->appendRows($sheetExport->generator(), $sheetExport);
