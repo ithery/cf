@@ -18,7 +18,9 @@ if(!isset($canDelete))    {
                 <th class="thead sortable" width="20%">{{ c::__('translation.key') }}</th>
                 <th class="thead sortable">{{ CF::config('app.locale') }}</th>
                 <th class="thead sortable">{{ $language }}</th>
+                @if($canEdit||$canDelete)
                 <th class="thead sortable" width="100px">{{ c::__('translation.action') }}</th>
+                @endif
             </tr>
 
         </thead>
@@ -52,13 +54,17 @@ if(!isset($canDelete))    {
                                     <span x-show="!isEditing" x-text="item.value">{{ carr::get($item, 'item.value') }}</span>
                                     <input type="text" x-ref="inputTranslation" x-model="item.value" x-show="isEditing" @keydown.enter="disableEditing" @keydown.window.escape="disableEditing" class="form-control" x-ref="input">
                                 </td>
+                                @if($canEdit||$canDelete)
                                 <td class="capp-not-printable">
+                                    @if($canEdit)
                                     <button x-show="!isEditing" class="btn btn-light" @click="toggleEditingState"><i class="ti ti-pencil" ></i></button>
                                     <button x-show="isEditing" class="btn btn-light" @click="saveEditing"><i class="ti ti-check" ></i></button>
+                                    @endif
                                     @if($canDelete)
                                     <button class="btn btn-light translation-delete" x-ref="btnDelete" @click="remove(itemIndex)"><i class="ti ti-trash" ></i></button>
                                     @endif
                                 </td>
+                                @endif
 
                             </tr>
                         @endif

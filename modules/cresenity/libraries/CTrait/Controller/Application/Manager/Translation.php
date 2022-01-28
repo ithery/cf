@@ -4,17 +4,35 @@ trait CTrait_Controller_Application_Manager_Translation {
         return 'Translation Manager';
     }
 
+    protected function canEdit($language, $group = '') {
+        return $language != CF::config('app.locale');
+    }
+
+    protected function filterLanguage($language) {
+        return true;
+    }
+
+    private function getLanguages() {
+        $translation = CTranslation::manager()->resolve();
+        $languages = $translation->allLanguages();
+        $languages = c::collect($languages)->filter(function ($language) {
+            return $this->filterLanguage($language);
+        })->all();
+
+        return $languages;
+    }
+
     public function index() {
         $app = c::app();
 
-        $translation = CTranslation::manager()->resolve();
         $app->title($this->getTitle());
-        $languages = $translation->allLanguages();
-
+        $languages = $this->getLanguages();
         $tabList = $app->addTabList()->setTabPosition('left');
 
         foreach ($languages as $language) {
-            $tabList->addTab()->setLabel($language)->setAjaxUrl($this->controllerUrl() . 'language/' . $language);
+            $tabList->addTab()->setLabel($language)
+                ->setAjaxUrl($this->controllerUrl() . 'language/' . $language)
+                ->setNoPadding();
         }
         $app->addView('cresenity.manager.translation.index');
 
@@ -26,8 +44,8 @@ trait CTrait_Controller_Application_Manager_Translation {
         $translation = CTranslation::manager()->resolve();
         $groups = $translation->getGroupsFor(CF::config('app.locale'));
 
-        $widget = $app->addWidget()->setTitle($language)->setIcon('ti ti-flag');
-        $tabList = $app->addTabList()->setTabPosition('top');
+        $widget = $app->addWidget()->setTitle($language)->setIcon('ti ti-flag')->setNoPadding();
+        $tabList = $widget->addTabList()->setTabPosition('top');
 
         foreach ($groups as $group) {
             $tabList->addTab()
@@ -42,7 +60,8 @@ trait CTrait_Controller_Application_Manager_Translation {
         $app = c::app();
         $translation = CTranslation::manager()->resolve();
         $request = c::request();
-        $languages = $translation->allLanguages();
+        $languages = $this->getLanguages();
+
         $groups = $translation->getGroupsFor(CF::config('app.locale'));
         $translations = $translation->filterTranslationsFor($language, $request->get('filter'));
         if ($group === 'single') {
@@ -57,6 +76,7 @@ trait CTrait_Controller_Application_Manager_Translation {
         }
         $app->addView('cresenity.manager.translation.translation-table', [
             'language' => $language,
+            'canEdit' => $this->canEdit($language, $group),
             'languages' => $languages,
             'groups' => $groups,
             'translations' => $translations,
