@@ -1242,8 +1242,7 @@ class c {
             $appCode = CF::appCode();
         }
 
-        $appRoot = static::docRoot('application/' . $appCode);
-
+        $appRoot = c::untrailingslashit(static::docRoot('application/' . $appCode));
         if ($path != null) {
             if (is_string($path) && strlen($path) > 0) {
                 $appRoot .= DS . trim($path, DS);
@@ -1409,6 +1408,36 @@ class c {
             'currentPage',
             'options'
         ));
+    }
+
+    /**
+     * Recursively diff two arrays.
+     *
+     * @param array $arrayOne
+     * @param array $arrayTwo
+     *
+     * @return array
+     */
+    public static function arrayDiffAssocRecursive($arrayOne, $arrayTwo) {
+        $difference = [];
+        foreach ($arrayOne as $key => $value) {
+            if (is_array($value) || $value instanceof CCollection) {
+                if (!isset($arrayTwo[$key])) {
+                    $difference[$key] = $value;
+                } elseif (!(is_array($arrayTwo[$key]) || $arrayTwo[$key] instanceof CCollection)) {
+                    $difference[$key] = $value;
+                } else {
+                    $new_diff = c::arrayDiffAssocRecursive($value, $arrayTwo[$key]);
+                    if ($new_diff != false) {
+                        $difference[$key] = $new_diff;
+                    }
+                }
+            } elseif (!isset($arrayTwo[$key])) {
+                $difference[$key] = $value;
+            }
+        }
+
+        return $difference;
     }
 }
 
