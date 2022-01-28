@@ -9,12 +9,10 @@
 use Psr\Http\Message\RequestInterface;
 
 final class CVendor_Firebase_Messaging_Request_SendMessageToTokensRequest implements CVendor_Firebase_Http_HasSubRequestsInterface, RequestInterface {
-
+    use CVendor_Firebase_Trait_WrappedPsr7RequestTrait;
     const MAX_AMOUNT_OF_TOKENS = 500;
 
-    use CVendor_Firebase_Trait_WrappedPsr7RequestTrait;
-
-    public function __construct($projectId, CVendor_Firebase_Messaging_MessageInterface $message, CVendor_Firebase_Messaging_RegistrationTokens $registrationTokens) {
+    public function __construct($projectId, CVendor_Firebase_Messaging_MessageInterface $message, CVendor_Firebase_Messaging_RegistrationTokens $registrationTokens, $validateOnly = false) {
         if ($registrationTokens->count() > self::MAX_AMOUNT_OF_TOKENS) {
             throw new CVendor_Firebase_Exception_InvalidArgumentException('A multicast message can be sent to a maximum amount of ' . self::MAX_AMOUNT_OF_TOKENS . ' tokens.');
         }
@@ -30,7 +28,6 @@ final class CVendor_Firebase_Messaging_Request_SendMessageToTokensRequest implem
             $messages[] = new CVendor_Firebase_Messaging_RawMessageFromArray($messageData);
         }
 
-        $this->wrappedRequest = new CVendor_Firebase_Messaging_Request_SendMessagesRequest($projectId, new CVendor_Firebase_Messaging_Messages(...$messages));
+        $this->wrappedRequest = new CVendor_Firebase_Messaging_Request_SendMessagesRequest($projectId, new CVendor_Firebase_Messaging_Messages(...$messages), $validateOnly);
     }
-
 }

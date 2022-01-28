@@ -122,6 +122,63 @@ final class CVendor_Firebase_Messaging_MulticastSendReport implements Countable 
         return $this->failures()->count() > 0;
     }
 
+    /**
+     * @param callable $callback
+     *
+     * @return self
+     */
+    public function filter(callable $callback) {
+        $items = $this->items;
+
+        return self::withItems(\array_values(\array_filter($items, $callback)));
+    }
+
+    /**
+     * @return array<int, mixed>
+     */
+    public function map(callable $callback) {
+        return \array_map($callback, $this->items);
+    }
+
+    /**
+     * @return string[]
+     */
+    public function validTokens(): array {
+        return $this->successes()->filter(static function (CVendor_Firebase_Messaging_SendReport $report) {
+            return $report->target()->type() === MessageTarget::TOKEN;
+        })->map(static function (CVendor_Firebase_Messaging_SendReport $report) {
+            return $report->target()->value();
+        });
+    }
+
+    /**
+     * Returns all provided registration tokens that were not reachable.
+     *
+     * @return string[]
+     */
+    public function unknownTokens() {
+        return $this
+            ->filter(static function (CVendor_Firebase_Messaging_SendReport $report) {
+                return $report->messageWasSentToUnknownToken();
+            })->map(static function (CVendor_Firebase_Messaging_SendReport $report) {
+                return $report->target()->value();
+            });
+    }
+
+    /**
+     * Returns all provided registration tokens that were invalid.
+     *
+     * @return string[]
+     */
+    public function invalidTokens() {
+        return $this
+            ->filter(static function (CVendor_Firebase_Messaging_SendReport $report) {
+                return $report->messageTargetWasInvalid();
+            })->map(static function (CVendor_Firebase_Messaging_SendReport $report) {
+                return $report->target()->value();
+            });
+    }
+
     public function count() {
         return \count($this->items);
     }

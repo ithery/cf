@@ -1,19 +1,25 @@
 <?php
 
-use Psr\Http\Message\ResponseInterface;
-
-final class CVendor_Firebase_Messaging_Exception_ServerUnavailableException extends RuntimeException implements CVendor_Firebase_Messaging_ExceptionInterface {
+final class CVendor_Firebase_Messaging_Exception_QuotaExceededException extends RuntimeException implements CVendor_Firebase_Messaging_ExceptionInterface {
     use CVendor_Firebase_Trait_ExceptionHasErrorsTrait;
+    /**
+     * Undocumented variable.
+     *
+     * @var null|DateTimeImmutable
+     */
+    private $retryAfter = null;
 
     /**
      * @param string[] $errors
      *
-     * @return static
+     * @internal
+     *
+     * @return self
      */
     public function withErrors(array $errors) {
         $new = new self($this->getMessage(), $this->getCode(), $this->getPrevious());
         $new->errors = $errors;
-        $new->response = $this->response;
+        $new->retryAfter = $this->retryAfter;
 
         return $new;
     }
