@@ -55,7 +55,7 @@ final class CVendor_Firebase_Messaging_AppInstance implements JsonSerializable {
     }
 
     /**
-     * @param Topic|string $topic
+     * @param CVendor_Firebase_Messaging_Topic|string $topic
      */
     public function isSubscribedToTopic($topic) {
         $topic = $topic instanceof CVendor_Firebase_Messaging_Topic ? $topic : CVendor_Firebase_Messaging_Topic::fromValue($topic);

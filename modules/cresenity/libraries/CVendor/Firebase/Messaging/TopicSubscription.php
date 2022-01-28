@@ -22,15 +22,24 @@ final class CVendor_Firebase_Messaging_TopicSubscription implements JsonSerializ
         $this->subscribedAt = $subscribedAt;
     }
 
+    /**
+     * @return CVendor_Firebase_Messaging_Topic
+     */
     public function topic() {
         return $this->topic;
     }
 
+    /**
+     * @return CVendor_Firebase_Messaging_RegistrationToken
+     */
     public function registrationToken() {
         return $this->registrationToken;
     }
 
-    public function subscribedAt(): DateTimeImmutable {
+    /**
+     * @return DateTimeImmutable
+     */
+    public function subscribedAt() {
         return $this->subscribedAt;
     }
 
