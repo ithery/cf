@@ -1,12 +1,12 @@
 <?php
 
-use Google\Auth\Credentials\GCECredentials;
-use Google\Auth\Credentials\ServiceAccountCredentials;
-use Google\Auth\Middleware\AuthTokenMiddleware;
-use Google\Cloud\Firestore\FirestoreClient;
-use Google\Cloud\Storage\StorageClient;
 use GuzzleHttp\Client;
 use GuzzleHttp\HandlerStack;
+use Google\Cloud\Storage\StorageClient;
+use Google\Auth\Credentials\GCECredentials;
+use Google\Cloud\Firestore\FirestoreClient;
+use Google\Auth\Middleware\AuthTokenMiddleware;
+use Google\Auth\Credentials\ServiceAccountCredentials;
 
 class CVendor_Firebase {
     const API_CLIENT_SCOPES = [
@@ -18,8 +18,9 @@ class CVendor_Firebase {
         'https://www.googleapis.com/auth/firebase.remoteconfig',
         'https://www.googleapis.com/auth/userinfo.email',
     ];
+
     /**
-     * @var ServiceAccount|null
+     * @var null|ServiceAccount
      */
     protected $serviceAccount;
 
@@ -32,6 +33,7 @@ class CVendor_Firebase {
      * @var array
      */
     protected $httpClientConfig = [];
+
     /**
      * @var array
      */
@@ -130,5 +132,25 @@ class CVendor_Firebase {
         // @codeCoverageIgnoreEnd
 
         return new AuthTokenMiddleware($credentials);
+    }
+
+    /**
+     * @return CVendor_Firebase_AuthInterface
+     */
+    public function createAuth() {
+        $projectId = $this->getProjectId();
+        $tenantId = $this->tenantId;
+
+        $httpClient = $this->createApiClient([
+            'base_uri' => 'https://www.googleapis.com/identitytoolkit/v3/relyingparty/',
+        ]);
+
+        $authApiClient = new Auth\ApiClient($httpClient, $tenantId);
+        $customTokenGenerator = $this->createCustomTokenGenerator();
+        $idTokenVerifier = $this->createIdTokenVerifier();
+        $sessionCookieVerifier = $this->createSessionCookieVerifier();
+        $signInHandler = new Firebase\Auth\SignIn\GuzzleHandler($httpClient);
+
+        return new CVendor_Firebase_AuthAuth($authApiClient, $httpClient, $customTokenGenerator, $idTokenVerifier, $sessionCookieVerifier, $signInHandler, $projectId, $tenantId, $this->clock);
     }
 }
