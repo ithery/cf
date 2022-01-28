@@ -22,7 +22,7 @@ use Google\Auth\GetQuotaProjectInterface;
 use Psr\Http\Message\RequestInterface;
 
 /**
- * AuthTokenMiddleware is a Guzzle Middleware that adds an Authorization header
+ * ProxyAuthTokenMiddleware is a Guzzle Middleware that adds an Authorization header
  * provided by an object implementing FetchAuthTokenInterface.
  *
  * The FetchAuthTokenInterface#fetchAuthToken is used to obtain a hash; one of
@@ -30,9 +30,9 @@ use Psr\Http\Message\RequestInterface;
  *
  * Requests will be accessed with the authorization header:
  *
- * 'authorization' 'Bearer <value of auth_token>'
+ * 'proxy-authorization' 'Bearer <value of auth_token>'
  */
-class AuthTokenMiddleware
+class ProxyAuthTokenMiddleware
 {
     /**
      * @var callback
@@ -50,7 +50,7 @@ class AuthTokenMiddleware
     private $tokenCallback;
 
     /**
-     * Creates a new AuthTokenMiddleware.
+     * Creates a new ProxyAuthTokenMiddleware.
      *
      * @param FetchAuthTokenInterface $fetcher is used to fetch the auth token
      * @param callable $httpHandler (optional) callback which delivers psr7 request
@@ -69,21 +69,21 @@ class AuthTokenMiddleware
     /**
      * Updates the request with an Authorization header when auth is 'google_auth'.
      *
-     *   use Google\Auth\Middleware\AuthTokenMiddleware;
+     *   use Google\Auth\Middleware\ProxyAuthTokenMiddleware;
      *   use Google\Auth\OAuth2;
      *   use GuzzleHttp\Client;
      *   use GuzzleHttp\HandlerStack;
      *
      *   $config = [..<oauth config param>.];
      *   $oauth2 = new OAuth2($config)
-     *   $middleware = new AuthTokenMiddleware($oauth2);
+     *   $middleware = new ProxyAuthTokenMiddleware($oauth2);
      *   $stack = HandlerStack::create();
      *   $stack->push($middleware);
      *
      *   $client = new Client([
      *       'handler' => $stack,
      *       'base_uri' => 'https://www.googleapis.com/taskqueue/v1beta2/projects/',
-     *       'auth' => 'google_auth' // authorize all requests
+     *       'proxy_auth' => 'google_auth' // authorize all requests
      *   ]);
      *
      *   $res = $client->get('myproject/taskqueues/myqueue');
@@ -94,12 +94,12 @@ class AuthTokenMiddleware
     public function __invoke(callable $handler)
     {
         return function (RequestInterface $request, array $options) use ($handler) {
-            // Requests using "auth"="google_auth" will be authorized.
-            if (!isset($options['auth']) || $options['auth'] !== 'google_auth') {
+            // Requests using "proxy_auth"="google_auth" will be authorized.
+            if (!isset($options['proxy_auth']) || $options['proxy_auth'] !== 'google_auth') {
                 return $handler($request, $options);
             }
 
-            $request = $request->withHeader('authorization', 'Bearer ' . $this->fetchToken());
+            $request = $request->withHeader('proxy-authorization', 'Bearer ' . $this->fetchToken());
 
             if ($quotaProject = $this->getQuotaProject()) {
                 $request = $request->withHeader(

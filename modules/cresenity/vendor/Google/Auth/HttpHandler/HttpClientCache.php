@@ -22,9 +22,10 @@ use GuzzleHttp\ClientInterface;
 /**
  * Stores an HTTP Client in order to prevent multiple instantiations.
  */
-class HttpClientCache {
+class HttpClientCache
+{
     /**
-     * @var null|ClientInterface
+     * @var ClientInterface|null
      */
     private static $httpClient;
 
@@ -33,20 +34,21 @@ class HttpClientCache {
      *
      * Passing null will unset the cached client.
      *
-     * @param null|ClientInterface $client
-     *
+     * @param ClientInterface|null $client
      * @return void
      */
-    public static function setHttpClient(ClientInterface $client = null) {
+    public static function setHttpClient(ClientInterface $client = null)
+    {
         self::$httpClient = $client;
     }
 
     /**
      * Get the stored HTTP Client, or null.
      *
-     * @return null|ClientInterface
+     * @return ClientInterface|null
      */
-    public static function getHttpClient() {
+    public static function getHttpClient()
+    {
         return self::$httpClient;
     }
 }

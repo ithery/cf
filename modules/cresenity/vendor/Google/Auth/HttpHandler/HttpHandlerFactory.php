@@ -14,23 +14,22 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 namespace Google\Auth\HttpHandler;
 
 use GuzzleHttp\Client;
 use GuzzleHttp\ClientInterface;
 
-class HttpHandlerFactory {
+class HttpHandlerFactory
+{
     /**
      * Builds out a default http handler for the installed version of guzzle.
      *
      * @param ClientInterface $client
-     *
-     * @throws \Exception
-     *
      * @return Guzzle5HttpHandler|Guzzle6HttpHandler|Guzzle7HttpHandler
+     * @throws \Exception
      */
-    public static function build(ClientInterface $client = null) {
+    public static function build(ClientInterface $client = null)
+    {
         $client = $client ?: new Client();
 
         $version = null;
