@@ -20,14 +20,14 @@ class CManager_Asset_Compiler {
     protected $maxImportSize;
 
     /**
-     * The last modified time of the newest Asset in the Assets array
+     * The last modified time of the newest Asset in the Assets array.
      *
      * @var int
      */
     protected $lastModTimeNewestAsset = 0;
 
     /**
-     * The last modified time of the compiled Asset
+     * The last modified time of the compiled Asset.
      *
      * @var int
      */
@@ -95,10 +95,12 @@ class CManager_Asset_Compiler {
         if ($this->needToRecompile()) {
             $dirname = dirname($this->outFile);
             if (!is_dir($dirname)) {
-                cfs::mkdir($dirname);
+                CFile::makeDirectory($dirname, 0755, true);
             }
 
-            file_put_contents($this->outFile, '');
+            if (file_exists($this->outFile)) {
+                CFile::put($this->outFile, '');
+            }
             foreach ($this->files as $file) {
                 $compiledOutput = file_get_contents($file);
                 // strip BOM, if any
