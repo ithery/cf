@@ -1,5 +1,7 @@
 <?php
-
+/**
+ * @see https://github.com/fideloper/TrustedProxy
+ */
 class CHTTP_Middleware_TrustProxies {
     /**
      * @var array
