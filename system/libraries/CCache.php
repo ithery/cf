@@ -15,6 +15,11 @@ class CCache {
     protected $repository;
 
     /**
+     * @var CCache_RateLimiter
+     */
+    protected static $rateLimiter;
+
+    /**
      * @param null|mixed $name
      *
      * @return CCache_Repository
@@ -64,5 +69,13 @@ class CCache {
      */
     public static function manager() {
         return CCache_Manager::instance();
+    }
+
+    public static function rateLimiter() {
+        if (static::$rateLimiter == null) {
+            static::$rateLimiter = new CCache_RateLimiter(CCache::manager()->driver(CF::config('cache.limiter')));
+        }
+
+        return static::$rateLimiter;
     }
 }

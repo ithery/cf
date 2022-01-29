@@ -1,17 +1,17 @@
 <?php
 class CMiddleware_LiteSpeed_Cache {
-    protected $stale_key;
+    protected $staleKey;
 
     public function __construct() {
-        $this->stale_key = '';
+        $this->staleKey = '';
     }
 
     public function purge($items, $stale = true) {
         if ($stale === true) {
-            $this->stale_key = 'stale,';
+            $this->staleKey = 'stale,';
         }
 
-        return header('X-LiteSpeed-Purge: ' . $this->stale_key . $items);
+        return header('X-LiteSpeed-Purge: ' . $this->staleKey . $items);
     }
 
     public function purgeAll($stale = true) {

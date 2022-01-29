@@ -6,29 +6,29 @@ class CMiddleware_Litespeed_TagMiddleware {
      *
      * @param \CHTTP_Request $request
      * @param \Closure       $next
-     * @param string         $lscache_tags
+     * @param string         $lscacheTags
      *
      * @return mixed
      */
-    public function handle($request, $next, $lscache_tags = null) {
+    public function handle($request, $next, $lscacheTags = null) {
         $response = $next($request);
 
-        $lscache_string = null;
+        $lscacheString = null;
 
         if (!in_array($request->getMethod(), ['GET', 'HEAD']) || !$response->getContent()) {
             return $response;
         }
 
-        if (isset($lscache_tags)) {
-            $lscache_string = str_replace(';', ',', $lscache_tags);
+        if (isset($lscacheTags)) {
+            $lscacheString = str_replace(';', ',', $lscacheTags);
         }
 
-        if (empty($lscache_string)) {
+        if (empty($lscacheString)) {
             return $response;
         }
 
         if ($response->headers->has('X-LiteSpeed-Tag') == false) {
-            $response->headers->set('X-LiteSpeed-Tag', $lscache_string);
+            $response->headers->set('X-LiteSpeed-Tag', $lscacheString);
         }
 
         return $response;
