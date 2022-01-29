@@ -1369,10 +1369,33 @@ class c {
     }
 
     /**
-     * @return CHTTP_Cookie
+     * Create a new cookie instance.
+     *
+     * @param null|string $name
+     * @param null|string $value
+     * @param int         $minutes
+     * @param null|string $path
+     * @param null|string $domain
+     * @param null|bool   $secure
+     * @param bool        $httpOnly
+     * @param bool        $raw
+     * @param null|string $sameSite
+     *
+     * @return \CHTTP_Cookie|\Symfony\Component\HttpFoundation\Cookie
      */
-    public static function cookie() {
-        return CHTTP::cookie();
+    public static function cookie($name = null, $value = null, $minutes = 0, $path = null, $domain = null, $secure = null, $httpOnly = true, $raw = false, $sameSite = null) {
+        $cookie = CHTTP::cookie();
+        if (is_null($name)) {
+            return $cookie;
+        }
+
+        return $cookie->make($name, $value, $minutes, $path, $domain, $secure, $httpOnly, $raw, $sameSite);
+    }
+
+    public static function setCookie($name, $value, $minutes = 0, $path = null, $domain = null, $secure = null, $httpOnly = true, $raw = false, $sameSite = null) {
+        $cookie = CHTTP::cookie()->make($name, $value, $minutes, $path, $domain, $secure, $httpOnly, $raw, $sameSite);
+
+        return CHTTP::cookie()->queue($cookie);
     }
 
     /**
