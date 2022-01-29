@@ -1,7 +1,7 @@
 <?php
 
 /**
- * Description of CApi
+ * Description of CApi.
  *
  * @author Hery
  */
@@ -13,7 +13,7 @@ class CApi {
     const SESSION_DRIVER_NULL = 'Null';
 
     /**
-     * Get CApi_Runner instance
+     * Get CApi_Runner instance.
      *
      * @return CApi_Runner
      */
