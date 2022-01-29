@@ -52,7 +52,7 @@ class CHTTP_Middleware_TrustProxies {
      * @param \CHttp_Request $request
      */
     protected function setTrustedProxyIpAddresses(CHTTP_Request $request) {
-        $trustedIps = $this->proxies ?: carr::get($this->config, 'proxies', []);
+        $trustedIps = $this->proxies();
 
         // Trust any IP address that calls us
         // `**` for backwards compatibility, but is deprecated
@@ -131,5 +131,14 @@ class CHTTP_Middleware_TrustProxies {
         }
 
         return $headers;
+    }
+
+    /**
+     * Get the trusted proxies.
+     *
+     * @return null|array|string
+     */
+    protected function proxies() {
+        return $this->proxies ?: carr::get($this->config, 'proxies', []);
     }
 }
