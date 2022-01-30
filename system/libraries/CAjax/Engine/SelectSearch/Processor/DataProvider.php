@@ -17,7 +17,7 @@ class CAjax_Engine_SelectSearch_Processor_DataProvider extends CAjax_Engine_Sele
         $dependsOn = $this->dependsOn();
 
         /** @var CManager_Contract_DataProviderInterface $query */
-        $dataProvider->search($this->getSearchData());
+        $dataProvider->searchOr($this->getSearchDataOr());
         $dataProvider->sort($this->getSortData());
 
         $paginationResult = $dataProvider->paginate($this->parameter->pageSize(), ['*'], 'page', $this->parameter->page(), function ($q) use ($dependsOn) {
@@ -40,7 +40,7 @@ class CAjax_Engine_SelectSearch_Processor_DataProvider extends CAjax_Engine_Sele
         ]);
     }
 
-    protected function getSearchData() {
+    protected function getSearchDataOr() {
         $searchData = [];
         foreach ($this->searchField() as $field) {
             if (strlen($field) > 0) {
