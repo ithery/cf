@@ -71,7 +71,7 @@ class CImage_Avatar_Input_Initials {
     }
 
     private function getInitials() {
-        return ( new CString_Initials)->length($this->length)->keepCase(!$this->uppercase)->generate($this->name);
+        return ( new CString_Initials())->length($this->length)->keepCase(!$this->uppercase)->generate($this->name);
     }
 
     private function generateCacheKey() {
@@ -100,9 +100,11 @@ class CImage_Avatar_Input_Initials {
         foreach ($_GET as $item => $value) {
             if (\in_array($item, self::$indexes, true)) {
                 $this->hasQueryParameters = true;
+
                 return true;
             }
         }
+
         return false;
     }
 
@@ -119,6 +121,7 @@ class CImage_Avatar_Input_Initials {
             }
             $_GET[self::$indexes[$index]] = urldecode($value);
         }
+
         return true;
     }
 

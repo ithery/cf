@@ -276,9 +276,7 @@ class Controller_Cresenity extends CController {
                 break;
         }
 
-        ob_start('ob_gzhandler');
         $avatarApi = CImage::avatar()->api($engineName);
-
         /*
         if (!isset($_GET['noheader'])) {
             header('Content-type: image/png');
@@ -288,7 +286,7 @@ class Controller_Cresenity extends CController {
         }
         $avatarApi->render();
         */
-
+        ob_start('ob_gzhandler');
         $headers = [
             'Content-Type' => 'image/png',
             'Pragma' => 'public',
