@@ -12,12 +12,11 @@
 namespace CarbonV3;
 
 use Closure;
-use ReflectionException;
 use ReflectionFunction;
+use ReflectionException;
 use Symfony\Component\Translation;
 
-class Translator extends Translation\Translator
-{
+class Translator extends Translation\Translator {
     /**
      * Translator singletons for each language.
      *
@@ -59,12 +58,11 @@ class Translator extends Translation\Translator
     /**
      * Return a singleton instance of Translator.
      *
-     * @param string|null $locale optional initial locale ("en" - english by default)
+     * @param null|string $locale optional initial locale ("en" - english by default)
      *
      * @return static
      */
-    public static function get($locale = null)
-    {
+    public static function get($locale = null) {
         $locale = $locale ?: 'en';
 
         if (!isset(static::$singletons[$locale])) {
@@ -74,10 +72,9 @@ class Translator extends Translation\Translator
         return static::$singletons[$locale];
     }
 
-    public function __construct($locale, Translation\Formatter\MessageFormatterInterface $formatter = null, $cacheDir = null, $debug = false)
-    {
+    public function __construct($locale, Translation\Formatter\MessageFormatterInterface $formatter = null, $cacheDir = null, $debug = false) {
         $this->initializing = true;
-        $this->directories = [__DIR__.'/Lang'];
+        $this->directories = [__DIR__ . '/Lang'];
         $this->addLoader('array', new Translation\Loader\ArrayLoader());
         parent::__construct($locale, $formatter, $cacheDir, $debug);
         $this->initializing = false;
@@ -88,8 +85,7 @@ class Translator extends Translation\Translator
      *
      * @return array
      */
-    public function getDirectories(): array
-    {
+    public function getDirectories(): array {
         return $this->directories;
     }
 
@@ -100,8 +96,7 @@ class Translator extends Translation\Translator
      *
      * @return $this
      */
-    public function setDirectories(array $directories)
-    {
+    public function setDirectories(array $directories) {
         $this->directories = $directories;
 
         return $this;
@@ -114,8 +109,7 @@ class Translator extends Translation\Translator
      *
      * @return $this
      */
-    public function addDirectory(string $directory)
-    {
+    public function addDirectory(string $directory) {
         $this->directories[] = $directory;
 
         return $this;
@@ -128,8 +122,7 @@ class Translator extends Translation\Translator
      *
      * @return $this
      */
-    public function removeDirectory(string $directory)
-    {
+    public function removeDirectory(string $directory) {
         $search = rtrim(strtr($directory, '\\', '/'), '/');
 
         return $this->setDirectories(array_filter($this->getDirectories(), function ($item) use ($search) {
@@ -147,8 +140,7 @@ class Translator extends Translation\Translator
      *
      * @return string
      */
-    public function trans($id, array $parameters = [], $domain = null, $locale = null)
-    {
+    public function trans($id, array $parameters = [], $domain = null, $locale = null) {
         if ($domain === null) {
             $domain = 'messages';
         }
@@ -178,12 +170,11 @@ class Translator extends Translation\Translator
      * Remove custom messages and reload initial messages from matching
      * file in Lang directory.
      *
-     * @param string|null $locale
+     * @param null|string $locale
      *
      * @return bool
      */
-    public function resetMessages($locale = null)
-    {
+    public function resetMessages($locale = null) {
         if ($locale === null) {
             $this->messages = [];
 
@@ -211,14 +202,13 @@ class Translator extends Translation\Translator
      *
      * @return array
      */
-    public function getLocalesFiles($prefix = '')
-    {
+    public function getLocalesFiles($prefix = '') {
         $files = [];
 
         foreach ($this->getDirectories() as $directory) {
             $directory = rtrim($directory, '\\/');
 
-            foreach (glob("$directory/$prefix*.php") as $file) {
+            foreach (glob("${directory}/${prefix}*.php") as $file) {
                 $files[] = $file;
             }
         }
@@ -228,14 +218,13 @@ class Translator extends Translation\Translator
 
     /**
      * Returns the list of internally available locales and already loaded custom locales.
-     * (It will ignore custom translator dynamic loading.)
+     * (It will ignore custom translator dynamic loading.).
      *
      * @param string $prefix prefix required to filter result
      *
      * @return array
      */
-    public function getAvailableLocales($prefix = '')
-    {
+    public function getAvailableLocales($prefix = '') {
         $locales = [];
         foreach ($this->getLocalesFiles($prefix) as $file) {
             $locales[] = substr($file, strrpos($file, '/') + 1, -4);
@@ -251,8 +240,7 @@ class Translator extends Translation\Translator
      *
      * @return bool
      */
-    protected function loadMessagesFromFile($locale)
-    {
+    protected function loadMessagesFromFile($locale) {
         if (isset($this->messages[$locale])) {
             return true;
         }
@@ -268,8 +256,7 @@ class Translator extends Translation\Translator
      *
      * @return $this
      */
-    public function setMessages($locale, $messages)
-    {
+    public function setMessages($locale, $messages) {
         $this->loadMessagesFromFile($locale);
         $this->addResource('array', $messages, $locale);
         $this->messages[$locale] = array_merge(
@@ -287,8 +274,7 @@ class Translator extends Translation\Translator
      *
      * @return $this
      */
-    public function setTranslations($messages)
-    {
+    public function setTranslations($messages) {
         return $this->setMessages($this->getLocale(), $messages);
     }
 
@@ -296,33 +282,31 @@ class Translator extends Translation\Translator
      * Get messages of a locale, if none given, return all the
      * languages.
      *
-     * @param string|null $locale
+     * @param null|string $locale
      *
      * @return array
      */
-    public function getMessages($locale = null)
-    {
+    public function getMessages($locale = null) {
         return $locale === null ? $this->messages : $this->messages[$locale];
     }
 
     /**
-     * Set the current translator locale and indicate if the source locale file exists
+     * Set the current translator locale and indicate if the source locale file exists.
      *
      * @param string $locale locale ex. en
      *
      * @return bool
      */
-    public function setLocale($locale)
-    {
+    public function setLocale($locale) {
         $locale = preg_replace_callback('/[-_]([a-z]{2,}|[0-9]{2,})/', function ($matches) {
             // _2-letters or YUE is a region, _3+-letters is a variant
             $upper = strtoupper($matches[1]);
 
             if ($upper === 'YUE' || $upper === 'ISO' || \strlen($upper) < 3) {
-                return "_$upper";
+                return "_${upper}";
             }
 
-            return '_'.ucfirst($matches[1]);
+            return '_' . ucfirst($matches[1]);
         }, strtolower($locale));
 
         $previousLocale = $this->getLocale();
@@ -356,8 +340,8 @@ class Translator extends Translation\Translator
         }
 
         // If subtag (ex: en_CA) first load the macro (ex: en) to have a fallback
-        if (str_contains($locale, '_') &&
-            $this->loadMessagesFromFile($macroLocale = preg_replace('/^([^_]+).*$/', '$1', $locale))
+        if (static::strContains($locale, '_')
+            && $this->loadMessagesFromFile($macroLocale = preg_replace('/^([^_]+).*$/', '$1', $locale))
         ) {
             parent::setLocale($macroLocale);
         }
@@ -376,15 +360,13 @@ class Translator extends Translation\Translator
      *
      * @return array
      */
-    public function __debugInfo()
-    {
+    public function __debugInfo() {
         return [
             'locale' => $this->getLocale(),
         ];
     }
 
-    private static function compareChunkLists($referenceChunks, $chunks)
-    {
+    private static function compareChunkLists($referenceChunks, $chunks) {
         $score = 0;
 
         foreach ($referenceChunks as $index => $chunk) {
@@ -400,5 +382,13 @@ class Translator extends Translation\Translator
         }
 
         return $score;
+    }
+
+    public static function strContains($haystack, $needle) {
+        if (!function_exists('str_contains')) {
+            return $needle !== '' && mb_strpos($haystack, $needle) !== false;
+        }
+
+        return \str_contains($haystack, $needle);
     }
 }
