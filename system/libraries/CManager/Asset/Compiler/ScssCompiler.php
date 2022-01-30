@@ -38,8 +38,9 @@ class CManager_Asset_Compiler_ScssCompiler {
      * @return string
      */
     protected function determineOutFile() {
+        $ymd = date('Ymd', filemtime($this->file));
         $basePath = defined('CFPUBLIC') ? DOCROOT . 'public' . DS : DOCROOT;
-        $this->outFile = $basePath . 'compiled/asset/scss/' . md5($this->file) . '.css';
+        $this->outFile = $basePath . 'compiled/asset/scss/' . $ymd . '/' . md5($this->file) . '.css';
     }
 
     protected function needToRecompile() {

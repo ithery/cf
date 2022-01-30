@@ -62,8 +62,10 @@ class CManager_Asset_Compiler {
     }
 
     protected function determineOutFile() {
+        $firstFile = carr::first($this->files);
+        $ymd = date('Ymd', filemtime($firstFile));
         $basePath = defined('CFPUBLIC') ? DOCROOT . 'public' . DS : DOCROOT;
-        $this->outFile = $basePath . 'compiled/asset/' . $this->type . '/' . md5(implode(':', $this->files)) . '.' . $this->type;
+        $this->outFile = $basePath . 'compiled/asset/' . $this->type . '/' . $ymd . '/' . md5(implode(':', $this->files)) . '.' . $this->type;
     }
 
     protected function determineLastModified() {
