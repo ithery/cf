@@ -41,6 +41,7 @@ class CApp implements CInterface_Responsable, CInterface_Renderable, CInterface_
         CApp_Concern_AuthTrait,
         CApp_Concern_BootstrapTrait,
         CApp_Concern_TitleTrait;
+
     public static $instance = null;
 
     protected $renderer;
@@ -436,7 +437,7 @@ class CApp implements CInterface_Responsable, CInterface_Renderable, CInterface_
             $orgId = CApp_Base::orgId();
         }
         $roleModel = c::container()->make($this->auth()->getRoleModelClass());
-
+        /** @var CApp_Model_Roles $roleModel */
         $nodes = $roleModel->getDescendantsTree($roleId, $orgId, $type);
         $childList = [];
 
