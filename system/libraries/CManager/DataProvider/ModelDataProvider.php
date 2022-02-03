@@ -23,13 +23,15 @@ class CManager_DataProvider_ModelDataProvider extends CManager_DataProviderAbstr
     protected function getAggregateFieldFromQuery(CModel_Query $query) {
         $columns = $query->toBase()->columns;
         $fields = [];
-        foreach ($columns as $col) {
-            if ($col instanceof CDatabase_Query_Expression) {
-                $statement = $col->getValue();
-                $regex = '/([\w]++)`?+(?:\s++as\s++[^,\s]++)?+\s*+(?:FROM\s*+|$)/i';
+        if ($columns !== null) {
+            foreach ($columns as $col) {
+                if ($col instanceof CDatabase_Query_Expression) {
+                    $statement = $col->getValue();
+                    $regex = '/([\w]++)`?+(?:\s++as\s++[^,\s]++)?+\s*+(?:FROM\s*+|$)/i';
 
-                if (preg_match($regex, $statement, $match)) {
-                    $fields[] = $match[1]; // field stored in $match[1]
+                    if (preg_match($regex, $statement, $match)) {
+                        $fields[] = $match[1]; // field stored in $match[1]
+                    }
                 }
             }
         }
