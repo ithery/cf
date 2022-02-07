@@ -27,7 +27,8 @@ class CManager_DataProvider_ModelDataProvider extends CManager_DataProviderAbstr
             foreach ($columns as $col) {
                 if ($col instanceof CDatabase_Query_Expression) {
                     $statement = $col->getValue();
-                    $regex = '/([\w]++)`?+(?:\s++as\s++[^,\s]++)?+\s*+(?:FROM\s*+|$)/i';
+                    //$regex = '/([\w]++)`?+(?:\s++as\s++[^,\s]++)?+\s*+(?:FROM\s*+|$)/i';
+                    $regex = '/([\w]++)`?+\s*+(?:FROM\s*+|$)/i';
 
                     if (preg_match($regex, $statement, $match)) {
                         $fields[] = $match[1]; // field stored in $match[1]
