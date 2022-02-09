@@ -1,7 +1,7 @@
 <?php
 use Aws\DynamoDb\DynamoDbClient;
 
-class CCache_Manager implements CCache_Contract_Factory {
+class CCache_Manager implements CCache_Contract_FactoryInterface {
     /**
      * The array of resolved cache stores.
      *
