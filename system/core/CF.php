@@ -1124,7 +1124,7 @@ final class CF {
      * @return bool
      */
     public static function isDevSuite() {
-        return cstr::endsWith(CF::domain(), '.test');
+        return substr(CF::domain(), -strlen('.test')) === '.test';
     }
 
     /**

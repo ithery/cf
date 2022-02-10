@@ -3,13 +3,13 @@
 defined('SYSPATH') or die('No direct access allowed.');
 
 /**
- * MySQLi Database Driver
+ * MySQLi Database Driver.
  */
 class CDatabase_Driver_Mysqli extends CDatabase_Driver_AbstractMysql {
     use CTrait_Compat_Database_Driver_Mysqli;
 
     /**
-     * Database connection link
+     * Database connection link.
      *
      * @var mysqli
      */
@@ -62,6 +62,7 @@ class CDatabase_Driver_Mysqli extends CDatabase_Driver_AbstractMysql {
 
         // Build the connection info
         $host = isset($host) ? $host : $socket;
+
         try {
             // Make the connection and select the database
             if ($this->link = new mysqli($host, $user, $pass, $database, $port)) {
@@ -133,6 +134,7 @@ class CDatabase_Driver_Mysqli extends CDatabase_Driver_AbstractMysql {
             // Re-create the AS statement
             return implode(' AS ', $table);
         }
+
         return '`' . str_replace('.', '`.`', $table) . '`';
     }
 
@@ -181,6 +183,7 @@ class CDatabase_Driver_Mysqli extends CDatabase_Driver_AbstractMysql {
                 $column .= $parts[$i] . ' ';
             }
         }
+
         return $column;
     }
 
@@ -201,6 +204,7 @@ class CDatabase_Driver_Mysqli extends CDatabase_Driver_AbstractMysql {
         foreach ($keys as $key => $value) {
             $keys[$key] = $this->escapeColumn($value);
         }
+
         return 'REPLACE INTO ' . $this->escapeTable($table) . ' (' . implode(', ', $keys) . ') VALUES (' . implode(', ', $values) . ')';
     }
 
@@ -266,7 +270,7 @@ class CDatabase_Driver_Mysqli extends CDatabase_Driver_AbstractMysql {
     }
 
     /**
-     * {@inheritdoc}
+     * @inheritdoc
      *
      * @return CDatabase_Driver_Mysqli_MySqlSchemaManager
      */
@@ -298,6 +302,7 @@ class CDatabase_Driver_Mysqli extends CDatabase_Driver_AbstractMysql {
         if (!$this->link) {
             $this->connect();
         }
+
         return mysqli_ping($this->link);
     }
 }
