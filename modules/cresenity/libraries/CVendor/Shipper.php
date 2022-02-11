@@ -1520,9 +1520,6 @@ class CVendor_Shipper {
         if ($method == 'POST') {
             if ($data != null) {
                 $payload = json_encode($data);
-                echo $endPoint;
-                echo $payload;
-                die;
                 curl_setopt($curl, CURLOPT_POST, true);
                 curl_setopt($curl, CURLOPT_POSTFIELDS, $payload);
             }
