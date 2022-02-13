@@ -25,6 +25,13 @@ class CSocialLogin_OAuth2_User extends CSocialLogin_AbstractUser {
     public $expiresIn;
 
     /**
+     * The scopes the user authorized. The approved scopes may be a subset of the requested scopes.
+     *
+     * @var array
+     */
+    public $approvedScopes;
+
+    /**
      * Set the token on the user.
      *
      * @param string $token
@@ -59,6 +66,19 @@ class CSocialLogin_OAuth2_User extends CSocialLogin_AbstractUser {
      */
     public function setExpiresIn($expiresIn) {
         $this->expiresIn = $expiresIn;
+
+        return $this;
+    }
+
+    /**
+     * Set the scopes that were approved by the user during authentication.
+     *
+     * @param array $approvedScopes
+     *
+     * @return $this
+     */
+    public function setApprovedScopes($approvedScopes) {
+        $this->approvedScopes = $approvedScopes;
 
         return $this;
     }

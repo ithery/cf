@@ -26,6 +26,11 @@ class CSocialLogin_DriverManager {
         return $this->driver($driver);
     }
 
+    /**
+     * @param array $config
+     *
+     * @return $this
+     */
     public function setConfig($config) {
         $this->config = $config;
 
@@ -102,6 +107,15 @@ class CSocialLogin_DriverManager {
      */
     protected function createSignInWithAppleDriver() {
         return $this->buildProvider(CSocialLogin_OAuth2_Provider_SignInWithAppleProvider::class, $this->config);
+    }
+
+    /**
+     * Create an instance of the specified driver.
+     *
+     * @return CSocialLogin_OAuth2_AbstractProvider
+     */
+    protected function createDiscordDriver() {
+        return $this->buildProvider(CSocialLogin_OAuth2_Provider_DiscordProvider::class, $this->config);
     }
 
     /**
