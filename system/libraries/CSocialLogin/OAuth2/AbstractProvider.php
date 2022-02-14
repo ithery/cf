@@ -236,7 +236,7 @@ abstract class CSocialLogin_OAuth2_AbstractProvider implements CSocialLogin_Abst
         }
 
         if ($this->hasInvalidState()) {
-            throw new CSocialLogin_Exception_InvalidStateException();
+            throw new CSocialLogin_Exception_InvalidStateException('Invalid State');
         }
 
         $response = $this->getAccessTokenResponse($this->getCode());
