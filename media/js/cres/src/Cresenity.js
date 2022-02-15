@@ -14,7 +14,6 @@ import { elementReady, elementRendered } from './util/dom-observer';
 import { debounce } from './util/debounce';
 import { confirmFromElement, defaultConfirmHandler } from './module/confirm-handler';
 import initValidation from './module/validation';
-import InfiniteScroll from './module/InfiniteScroll';
 
 import ucfirst from 'locutus/php/strings/ucfirst';
 import Alpine from 'alpinejs';
@@ -1210,10 +1209,5 @@ export default class Cresenity {
 
     showError(errMessage) {
         this.toast('error', errMessage);
-    }
-
-    infiniteScroll(options) {
-        const infiniteScroll = new InfiniteScroll(options);
-        return infiniteScroll;
     }
 }
