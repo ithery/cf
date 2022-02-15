@@ -13,6 +13,7 @@ class CColor_String {
         CColor_Trait_ColorInfoTrait;
 
     protected $string;
+
     protected $int32;
 
     public function __construct($string, $options = []) {
@@ -38,12 +39,15 @@ class CColor_String {
             switch ($this->getOption('luminosity')) {
                 case 'bright':
                     $range[0] = 55;
+
                     break;
                 case 'dark':
                     $range[0] = $range[1] - 10;
+
                     break;
                 case 'light':
                     $range[1] = 55;
+
                     break;
             }
         }
@@ -60,13 +64,16 @@ class CColor_String {
                 switch ($this->getOption('luminosity')) {
                     case 'dark':
                         $range[1] = $range[0] + 20;
+
                         break;
                     case 'light':
                         $range[0] = ($range[1] + $range[0]) / 2;
+
                         break;
                 }
             }
         }
+
         return $this->getModulo($range);
     }
 
@@ -75,7 +82,26 @@ class CColor_String {
      */
     public function toHex() {
         $hsv = $this->toHsv();
+
         return $hsv->toHex();
+    }
+
+    /**
+     * @return CColor_Format_Type_Rgb
+     */
+    public function toRgb() {
+        $hsv = $this->toHsv();
+
+        return $hsv->toRgb();
+    }
+
+    /**
+     * @return CColor_Format_Type_Hsl
+     */
+    public function toHsl() {
+        $hsv = $this->toHsv();
+
+        return $hsv->toHsl();
     }
 
     /**
@@ -93,6 +119,7 @@ class CColor_String {
         if (floor(($range[1] - $range[0])) == 0) {
             return 0;
         }
+
         return $range[0] + ($this->int32 % ($range[1] - $range[0]));
     }
 }
