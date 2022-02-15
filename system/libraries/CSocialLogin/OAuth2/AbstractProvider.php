@@ -11,6 +11,8 @@ defined('SYSPATH') or die('No direct access allowed.');
 use GuzzleHttp\Client;
 
 abstract class CSocialLogin_OAuth2_AbstractProvider implements CSocialLogin_AbstractProviderInterface {
+    use CSocialLogin_Trait_ConfigTrait;
+
     /**
      * The HTTP request instance.
      *
@@ -234,7 +236,7 @@ abstract class CSocialLogin_OAuth2_AbstractProvider implements CSocialLogin_Abst
         }
 
         if ($this->hasInvalidState()) {
-            throw new CSocialLogin_Exception_InvalidStateException();
+            throw new CSocialLogin_Exception_InvalidStateException('Invalid State');
         }
 
         $response = $this->getAccessTokenResponse($this->getCode());

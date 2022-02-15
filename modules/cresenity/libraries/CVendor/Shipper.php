@@ -1,9 +1,14 @@
 <?php
 
 class CVendor_Shipper {
+    const VERSION = '3.0';
+
     private $key = 'c46eacd847a2ab8d4459d3e54c8694dc';
+
     private $url;
+
     private $curl;
+
     private $environment;
 
     public function __construct($env = 'production') {
@@ -12,22 +17,18 @@ class CVendor_Shipper {
             $env = carr::get($env, 'environment', 'production');
         }
         $this->environment = $env;
-        $this->url = 'https://api.shipper.id/prod/';
+        $this->url = 'https://merchant-api.shipper.id/';
         if ($this->environment == 'dev' || $this->environment == 'development') {
-            $this->url = 'https://api.shipper.id/sandbox/';
+            $this->url = 'https://merchant-api-sandbox.shipper.id/';
         }
-        $this->curl = curl_init();
     }
 
     public function asPlugin($params = []) {
         $options = [];
         $options['apiKey'] = carr::get($params, 'apiKey', $this->key);
         $options['apiType'] = carr::get($params, 'apiType', 'starter');
-        return new CVendor_Shipper_Plugin($options);
-    }
 
-    public function __destruct() {
-        curl_close($this->curl);
+        return new CVendor_Shipper_Plugin($options);
     }
 
     public function setKey($key) {
@@ -217,132 +218,300 @@ class CVendor_Shipper {
         }
     }
 
+    public function getCountriesById($countryId) {
+        $endPoint = $this->url . 'v3/location/country/' . $countryId;
+        $response = $this->requestToShipper($endPoint, 'GET');
+
+        return $response;
+    }
+
     public function getCountries() {
-        $method = 'GET';
-        $options = [
-            'apiKey' => $this->key,
-        ];
+        $endPoint = $this->url . 'v3/location/countries?';
+        $response = $this->requestToShipper($endPoint, 'GET');
 
-        curl_setopt_array($this->curl, [
-            CURLOPT_URL => $this->url . 'public/v1/countries?' . http_build_query($options),
-            CURLOPT_RETURNTRANSFER => true,
-            CURLOPT_ENCODING => '',
-            CURLOPT_MAXREDIRS => 10,
-            CURLOPT_TIMEOUT => 30,
-            CURLOPT_HTTP_VERSION => CURL_HTTP_VERSION_1_1,
-            CURLOPT_CUSTOMREQUEST => $method,
-            CURLOPT_USERAGENT => $_SERVER['HTTP_USER_AGENT'],
-            CURLOPT_HTTPHEADER => [
-                'Content-Type: application/json',
-            ],
-        ]);
-
-        $response = curl_exec($this->curl);
-        $err = curl_error($this->curl);
-        cdbg::varDump($response);
-        die;
-        if ($err) {
-            return $this->error($err);
-        } else {
-            return $this->response($response);
-        }
+        return $response;
     }
 
     public function getProvinces() {
-        $method = 'GET';
-        $options = [
-            'apiKey' => $this->key,
-        ];
+        $endPoint = $this->url . 'v3/location/provinces?';
+        $response = $this->requestToShipper($endPoint, 'GET');
 
-        curl_setopt_array($this->curl, [
-            CURLOPT_URL => $this->url . 'public/v1/provinces?' . http_build_query($options),
-            CURLOPT_RETURNTRANSFER => true,
-            CURLOPT_ENCODING => '',
-            CURLOPT_MAXREDIRS => 10,
-            CURLOPT_TIMEOUT => 30,
-            CURLOPT_HTTP_VERSION => CURL_HTTP_VERSION_1_1,
-            CURLOPT_CUSTOMREQUEST => $method,
-            CURLOPT_USERAGENT => $_SERVER['HTTP_USER_AGENT'],
-            CURLOPT_HTTPHEADER => [
-                'Content-Type: application/json',
-            ],
-        ]);
-
-        $response = curl_exec($this->curl);
-        $err = curl_error($this->curl);
-
-        if ($err) {
-            return $this->error($err);
-        } else {
-            return $this->response($response);
-        }
+        return $response;
     }
 
-    public function getCities($provinceId = 'all') {
-        $method = 'GET';
-        $options = [
-            'apiKey' => $this->key,
-        ];
+    public function getProvinceById($provinceId) {
+        $endPoint = $this->url . 'v3/location/province/' . $provinceId;
+        $response = $this->requestToShipper($endPoint, 'GET');
 
-        if ($provinceId == 'all') {
-            $options['origin'] = $provinceId;
-        } elseif ($provinceId) {
-            $options['province'] = $provinceId;
-        }
-
-        curl_setopt_array($this->curl, [
-            CURLOPT_URL => $this->url . 'public/v1/cities?' . http_build_query($options),
-            CURLOPT_RETURNTRANSFER => true,
-            CURLOPT_ENCODING => '',
-            CURLOPT_MAXREDIRS => 10,
-            CURLOPT_TIMEOUT => 30,
-            CURLOPT_HTTP_VERSION => CURL_HTTP_VERSION_1_1,
-            CURLOPT_CUSTOMREQUEST => $method,
-            CURLOPT_USERAGENT => $_SERVER['HTTP_USER_AGENT'],
-            CURLOPT_HTTPHEADER => [
-                'Content-Type: application/json',
-            ],
-        ]);
-
-        $response = curl_exec($this->curl);
-        $err = curl_error($this->curl);
-
-        if ($err) {
-            return $this->error($err);
-        } else {
-            return $this->response($response);
-        }
+        return $response;
     }
 
-    public function getSuburbs($cityId) {
-        $method = 'GET';
-        $options = [
-            'apiKey' => $this->key,
-            'city' => $cityId,
-        ];
+    public function getProvincesByCountryId($countryId) {
+        $endPoint = $this->url . 'v3/location/country/' . $countryId . '/provinces/';
+        $response = $this->requestToShipper($endPoint, 'GET');
 
-        curl_setopt_array($this->curl, [
-            CURLOPT_URL => $this->url . 'public/v1/suburbs?' . http_build_query($options),
-            CURLOPT_RETURNTRANSFER => true,
-            CURLOPT_ENCODING => '',
-            CURLOPT_MAXREDIRS => 10,
-            CURLOPT_TIMEOUT => 30,
-            CURLOPT_HTTP_VERSION => CURL_HTTP_VERSION_1_1,
-            CURLOPT_CUSTOMREQUEST => $method,
-            CURLOPT_USERAGENT => $_SERVER['HTTP_USER_AGENT'],
-            CURLOPT_HTTPHEADER => [
-                'Content-Type: application/json',
-            ],
-        ]);
+        return $response;
+    }
 
-        $response = curl_exec($this->curl);
-        $err = curl_error($this->curl);
+    public function getCities() {
+        $endPoint = $this->url . 'v3/location/cities?';
+        $response = $this->requestToShipper($endPoint, 'GET');
 
-        if ($err) {
-            return $this->error($err);
-        } else {
-            return $this->response($response);
+        return $response;
+    }
+
+    public function getCitiesByProvinceId($provinceId) {
+        $endPoint = $this->url . 'v3/location/province/' . $provinceId . '/cities/';
+        $response = $this->requestToShipper($endPoint, 'GET');
+
+        return $response;
+    }
+
+    public function getCityById($cityId) {
+        $endPoint = $this->url . 'v3/location/city/' . $cityId;
+        $response = $this->requestToShipper($endPoint, 'GET');
+
+        return $response;
+    }
+
+    public function getSuburbs() {
+        $endPoint = $this->url . 'v3/location/suburbs?';
+        $response = $this->requestToShipper($endPoint, 'GET');
+
+        return $response;
+    }
+
+    public function getSuburbsByCityId($cityId) {
+        $endPoint = $this->url . 'v3/location/city/' . $cityId . '/suburbs/';
+        $response = $this->requestToShipper($endPoint, 'GET');
+
+        return $response;
+    }
+
+    public function getSuburbById($suburbId) {
+        $endPoint = $this->url . 'v3/location/suburb/' . $suburbId;
+        $response = $this->requestToShipper($endPoint, 'GET');
+
+        return $response;
+    }
+
+    /**
+     * Get Pricings Domestic.
+     *
+     * @param array $destination
+     * @param array $origin      s
+     * @param int   $weight      kg
+     * @param float $itemValue   rp
+     * @param float $height      cm
+     * @param float $length      cm
+     * @param float $width       cm
+     * @param bool  $forOrder
+     * @param int   $limit
+     * @param int   $page
+     * @param bool  $cod
+     * @param mixed $sortBy
+     *
+     * @return void
+     */
+    public function getPricingDomestic(
+        $destination,
+        $origin,
+        $weight,
+        $itemValue,
+        $height,
+        $length,
+        $width,
+        $forOrder = false,
+        $sortBy = [],
+        $limit = 30,
+        $page = 1,
+        $cod = false
+    ) {
+        $data = [];
+        $data['cod'] = $cod;
+        $data['destination'] = $destination;
+        $data['origin'] = $origin;
+        $data['weight'] = $weight;
+        $data['item_value'] = $itemValue;
+        $data['height'] = $height;
+        $data['length'] = $length;
+        $data['width'] = $width;
+        $data['for_order'] = $forOrder;
+        $data['limit'] = $limit;
+        $data['page'] = $page;
+        if (count($sortBy) > 0) {
+            $data['sort_by'] = $sortBy;
         }
+        $endPoint = $this->url . 'v3/pricing/domestic';
+        $response = $this->requestToShipper($endPoint, 'POST', $data);
+
+        return $response;
+    }
+
+    /**
+     * Get Pricings Domestic.
+     *
+     * @param string $rateTypes   ['intant', 'regular', 'express', 'trucking', 'same-day']
+     * @param array  $destination
+     * @param array  $origin      s
+     * @param int    $weight      kg
+     * @param float  $itemValue   rp
+     * @param float  $height      cm
+     * @param float  $length      cm
+     * @param float  $width       cm
+     * @param bool   $forOrder
+     * @param int    $limit
+     * @param int    $page
+     * @param bool   $cod
+     * @param mixed  $sortBy
+     *
+     * @return void
+     */
+    public function getPricingDomesticByRates(
+        $rateTypes,
+        $destination,
+        $origin,
+        $weight,
+        $itemValue,
+        $height,
+        $length,
+        $width,
+        $forOrder = false,
+        $sortBy = [],
+        $limit = 30,
+        $page = 1,
+        $cod = false
+    ) {
+        $data = [];
+        $data['cod'] = $cod;
+        $data['destination'] = $destination;
+        $data['origin'] = $origin;
+        $data['weight'] = $weight;
+        $data['item_value'] = $itemValue;
+        $data['height'] = $height;
+        $data['length'] = $length;
+        $data['width'] = $width;
+        $data['for_order'] = $forOrder;
+        $data['limit'] = $limit;
+        $data['page'] = $page;
+        if ($sortBy != 2) {
+            $data['sort_by'] = $sortBy;
+        }
+        $endPoint = $this->url . 'v3/pricing/domestic/' . $rateTypes;
+        $response = $this->requestToShipper($endPoint, 'POST', $data);
+
+        return $response;
+    }
+
+    public function createOrder(
+        $consignee,
+        $courier,
+        $coverage,
+        $destination,
+        $origin,
+        $package,
+        $paymentType,
+        $externalId = '',
+        $consigner = [],
+        $serviceType = '',
+        $bestPrice = false
+    ) {
+        $data = [];
+        $data['consignee'] = $consignee;
+        if (count($consigner) > 0) {
+            $data['consigner'] = $consigner;
+        }
+        $data['courier'] = $courier;
+        $data['coverage'] = $coverage;
+        $data['destination'] = $destination;
+        $data['origin'] = $origin;
+        $data['package'] = $package;
+        if (strlen($externalId) > 0) {
+            $data['external_id'] = $externalId;
+        }
+        $data['payment_type'] = $paymentType;
+        if (strlen($serviceType) > 0) {
+            $data['service_type'] = $serviceType;
+        }
+        $data['best_price'] = $bestPrice;
+        $endPoint = $this->url . 'v3/order/';
+        $response = $this->requestToShipper($endPoint, 'POST', $data);
+        $response["request"] = $data;
+        return $response;
+    }
+
+    /**
+     * Retrieves tracking ID of the order with the provided ID.
+     *
+     * @param int $orderId the ID retrieved after creating the order
+     *
+     * @method getOrder
+     *
+     * @return object JSON Results
+     */
+    public function getOrder($orderId) {
+        $data = [];
+        $endPoint = $this->url . 'v3/order/' . $orderId;
+        $response = $this->requestToShipper($endPoint, 'GET', $data);
+
+        return $response;
+    }
+
+    /**
+     * Create pickup order.
+     *
+     *  $order = array(
+     *      'order_id'      => ['21CWXMW82GEWV'],          // the id
+     *      'pickup_time'   => '2021-12-30T19:00:00+07:00',     // the class
+     *  );
+     *
+     * @method getOrder
+     *
+     * @param mixed $orderActivation
+     *
+     * @return object JSON Results
+     */
+    public function createPickUpOrder($orderActivation) {
+        $data = [];
+        $data['data']['order_activation'] = $orderActivation;
+        $endPoint = $this->url . 'v3/pickup/';
+        $response = $this->requestToShipper($endPoint, 'POST', $data);
+
+        return $response;
+    }
+
+    /**
+     * Create pickup order with timeslot.
+     *
+     *  $order = array(
+     *      'order_id'      => ['21CWXMW82GEWV'],          // the id
+     *      'start_time'   => '2021-12-30T19:00:00+07:00',     // the class
+     *      'end_time'   => '2021-12-30T19:00:00+07:00',     // the class
+     *      'timezone'   => 'Asia/Jakarta',     // the class
+     *  );
+     *
+     * @method getOrder
+     *
+     * @param mixed $orderActivation
+     *
+     * @return object JSON Results
+     */
+    public function createPickUpOrderWithTimeslot($orderActivation) {
+        $data = [];
+        $data['data']['order_activation'] = $orderActivation;
+        $endPoint = $this->url . 'v3/pickup/timeslot';
+        $response = $this->requestToShipper($endPoint, 'POST', $data);
+
+        return $response;
+    }
+
+    public function getTimeslot($timeZone = 'Asia/Jakarta') {
+        $data = [];
+        $data['time_zone'] = $timeZone;
+        $endPoint = $this->url . 'v3/pickup/timeslot';
+        $response = $this->requestToShipper($endPoint, 'GET', $data);
+
+        return $response;
     }
 
     public function getAreas($suburbId) {
@@ -407,18 +576,18 @@ class CVendor_Shipper {
     }
 
     /**
-     * Retrieve every rates based on the submitted query string parameters. This endpoint requires area ID for its o and d parameter
+     * Retrieve every rates based on the submitted query string parameters. This endpoint requires area ID for its o and d parameter.
      *
-     * @param integer $origin      origin area ID. Obtained from getAreas.
-     * @param integer $destination destination area ID. Obtained from getAreas.
-     * @param integer $weight      package's weight (float in kilograms e.g. 1.5). The allowance for each logistic will be calculated automatically.
-     * @param integer $length      package's length (integer in centimeter e.g 10)
-     * @param integer $width       package's width (integer in centimeter e.g 10)
-     * @param integer $height      package's height (integer in centimeter e.g 10)
-     * @param integer $value       package's value/price (integer in IDR e.g 100000)
-     * @param integer $type        package type ID (1 for documents; 2 for small packages[DEFAULT]; and 3 for medium-sized packages)
-     * @param integer $cod         is this a Cash on Delivery shipment? (1 for yes; 0 for no[DEFAULT])
-     * @param integer $order       is this a Rate Checking only or is this for a valid Transaction Order? (1 for yes; 0 for no[DEFAULT])
+     * @param int $origin      origin area ID. Obtained from getAreas.
+     * @param int $destination destination area ID. Obtained from getAreas.
+     * @param int $weight      package's weight (float in kilograms e.g. 1.5). The allowance for each logistic will be calculated automatically.
+     * @param int $length      package's length (integer in centimeter e.g 10)
+     * @param int $width       package's width (integer in centimeter e.g 10)
+     * @param int $height      package's height (integer in centimeter e.g 10)
+     * @param int $value       package's value/price (integer in IDR e.g 100000)
+     * @param int $type        package type ID (1 for documents; 2 for small packages[DEFAULT]; and 3 for medium-sized packages)
+     * @param int $cod         is this a Cash on Delivery shipment? (1 for yes; 0 for no[DEFAULT])
+     * @param int $order       is this a Rate Checking only or is this for a valid Transaction Order? (1 for yes; 0 for no[DEFAULT])
      *
      * @method getDomesticRates
      *
@@ -476,16 +645,16 @@ class CVendor_Shipper {
     }
 
     /**
-     * Retrieve rate for International shipment
+     * Retrieve rate for International shipment.
      *
-     * @param integer $destination destination country ID. Obtained from getCountries.
-     * @param integer $weight      package's weight (double in kilograms e.g. 1.40).
-     * @param integer $length      package's length (integer in centimeter e.g 10)
-     * @param integer $width       package's width (integer in centimeter e.g 10)
-     * @param integer $height      package's height (integer in centimeter e.g 10)
-     * @param integer $value       package's value/price (integer in IDR e.g 100000)
-     * @param integer $type        package type ID (1 for documents; 2 for small parcels[DEFAULT]; and 3 for medium-sized parcels)
-     * @param integer $order       is this a Rate Checking only or is this for a valid Transaction Order? (1 for yes; 0 for no[DEFAULT])
+     * @param int $destination destination country ID. Obtained from getCountries.
+     * @param int $weight      package's weight (double in kilograms e.g. 1.40).
+     * @param int $length      package's length (integer in centimeter e.g 10)
+     * @param int $width       package's width (integer in centimeter e.g 10)
+     * @param int $height      package's height (integer in centimeter e.g 10)
+     * @param int $value       package's value/price (integer in IDR e.g 100000)
+     * @param int $type        package type ID (1 for documents; 2 for small parcels[DEFAULT]; and 3 for medium-sized parcels)
+     * @param int $order       is this a Rate Checking only or is this for a valid Transaction Order? (1 for yes; 0 for no[DEFAULT])
      *
      * @method getDomesticRates
      *
@@ -544,29 +713,29 @@ class CVendor_Shipper {
      * The id returned is not our tracking ID.
      * You need to retrieve the tracking ID from getOrder and use that as actual order ID.
      *
-     * @param integer       $origin               origin area ID
-     * @param integer       $destination          destination area ID
+     * @param int $origin      origin area ID
+     * @param int $destination destination area ID
      * @param float/integer $weight               package's weight
      * @param float/integer $length               package's length
      * @param float/integer $width                package's width
      * @param float/integer $height               package's height
-     * @param integer       $value                item's price (IDR e.g. 100000)
-     * @param integer       $rateId               rate ID as you choose from rate search result
-     * @param string        $consignerName        consigner's name
-     * @param string        $consignerPhoneNumber consigner's phone number (with country code)
-     * @param string        $originAddress        origin address
-     * @param string        $originDirection      hints of the location e.g. in front of drug store K-12, etc (can be empty)
-     * @param string        $consigneeName        consignee's name
-     * @param string        $consigneePhoneNumber consignee's phone number (with country code)
-     * @param string        $destinationAddress   destination address
-     * @param string        $destinationDirection hints of the location e.g. in front of drug store K-1, etc (can be empty)
-     * @param string        $itemName             item name - ie: Shoes
-     * @param string        $contents             item description - ie: One pair of red shoes
-     * @param integer       $useInsurance         is Insurance needed? (1 for yes; 0 for no). If compulsory insurance is flagged by system, then this does not make any difference
-     * @param integer       $packageType          package type ID (1 for documents; 2 for small packages; 3 for medium-sized packages)
-     * @param string        $externalId           the merchant's self-tailored order ID (optional - Unique)
-     * @param string        $paymentType          payment type for the user's orders. Valid values are currently cash and the default value : postpay (optional)
-     * @param integer       $cod                  is this a COD order? Please note there is a fee for COD Order. Accepted paymentType for COD is postpay. (1 for yes; 0 for no [default])
+     * @param int    $value                item's price (IDR e.g. 100000)
+     * @param int    $rateId               rate ID as you choose from rate search result
+     * @param string $consignerName        consigner's name
+     * @param string $consignerPhoneNumber consigner's phone number (with country code)
+     * @param string $originAddress        origin address
+     * @param string $originDirection      hints of the location e.g. in front of drug store K-12, etc (can be empty)
+     * @param string $consigneeName        consignee's name
+     * @param string $consigneePhoneNumber consignee's phone number (with country code)
+     * @param string $destinationAddress   destination address
+     * @param string $destinationDirection hints of the location e.g. in front of drug store K-1, etc (can be empty)
+     * @param string $itemName             item name - ie: Shoes
+     * @param string $contents             item description - ie: One pair of red shoes
+     * @param int    $useInsurance         is Insurance needed? (1 for yes; 0 for no). If compulsory insurance is flagged by system, then this does not make any difference
+     * @param int    $packageType          package type ID (1 for documents; 2 for small packages; 3 for medium-sized packages)
+     * @param string $externalId           the merchant's self-tailored order ID (optional - Unique)
+     * @param string $paymentType          payment type for the user's orders. Valid values are currently cash and the default value : postpay (optional)
+     * @param int    $cod                  is this a COD order? Please note there is a fee for COD Order. Accepted paymentType for COD is postpay. (1 for yes; 0 for no [default])
      *
      * @method domesticOrder
      *
@@ -675,33 +844,33 @@ class CVendor_Shipper {
      * The id returned is not our tracking ID.
      * You need to retrieve the tracking ID from getOrder and use that as actual order ID.
      *
-     * @param integer       $origin               origin area ID
-     * @param integer       $destination          destination country ID
+     * @param int $origin      origin area ID
+     * @param int $destination destination country ID
      * @param float/integer $weight               package's weight
      * @param float/integer $length               package's length
      * @param float/integer $width                package's width
      * @param float/integer $height               package's height
-     * @param integer       $value                item's price (IDR e.g. 100000)
-     * @param integer       $rateId               rate ID as you choose from rate search result
-     * @param string        $consignerName        consigner's name
-     * @param string        $consignerPhoneNumber consigner's phone number (with country code)
-     * @param string        $originAddress        origin address
-     * @param string        $originDirection      hints of the location e.g. in front of drug store K-12, etc (can be empty)
-     * @param string        $consigneeName        consignee's name
-     * @param string        $consigneePhoneNumber consignee's phone number (with country code)
-     * @param string        $destinationAddress   destination address
-     * @param string        $destinationDirection hints of the location e.g. in front of drug store K-1, etc (can be empty)
-     * @param string        $destinationArea      destination area (can be empty)
-     * @param string        $destinationSuburb    destination suburb (can be empty)
-     * @param string        $destinationCity      destination city (can be empty)
-     * @param string        $destinationProvince  destination province (can be empty)
-     * @param string        $destinationPostcode  destination postcode (can be empty)
-     * @param string        $itemName             item name - ie: Shoes
-     * @param string        $contents             item description - ie: One pair of red shoes
-     * @param integer       $useInsurance         is Insurance needed? (1 for yes; 0 for no). If compulsory insurance is flagged by system, then this does not make any difference
-     * @param integer       $packageType          package type ID (1 for documents; 2 for small packages; 3 for medium-sized packages)
-     * @param string        $externalId           the merchant's self-tailored order ID (optional - Unique)
-     * @param string        $paymentType          payment type for the user's orders. Valid values are currently cash and the default value : postpay (optional)
+     * @param int    $value                item's price (IDR e.g. 100000)
+     * @param int    $rateId               rate ID as you choose from rate search result
+     * @param string $consignerName        consigner's name
+     * @param string $consignerPhoneNumber consigner's phone number (with country code)
+     * @param string $originAddress        origin address
+     * @param string $originDirection      hints of the location e.g. in front of drug store K-12, etc (can be empty)
+     * @param string $consigneeName        consignee's name
+     * @param string $consigneePhoneNumber consignee's phone number (with country code)
+     * @param string $destinationAddress   destination address
+     * @param string $destinationDirection hints of the location e.g. in front of drug store K-1, etc (can be empty)
+     * @param string $destinationArea      destination area (can be empty)
+     * @param string $destinationSuburb    destination suburb (can be empty)
+     * @param string $destinationCity      destination city (can be empty)
+     * @param string $destinationProvince  destination province (can be empty)
+     * @param string $destinationPostcode  destination postcode (can be empty)
+     * @param string $itemName             item name - ie: Shoes
+     * @param string $contents             item description - ie: One pair of red shoes
+     * @param int    $useInsurance         is Insurance needed? (1 for yes; 0 for no). If compulsory insurance is flagged by system, then this does not make any difference
+     * @param int    $packageType          package type ID (1 for documents; 2 for small packages; 3 for medium-sized packages)
+     * @param string $externalId           the merchant's self-tailored order ID (optional - Unique)
+     * @param string $paymentType          payment type for the user's orders. Valid values are currently cash and the default value : postpay (optional)
      *
      * @method internationalOrder
      *
@@ -813,50 +982,10 @@ class CVendor_Shipper {
     }
 
     /**
-     * Retrieves tracking ID of the order with the provided ID
-     *
-     * @param integer $orderId the ID retrieved after creating the order
-     *
-     * @method getOrder
-     *
-     * @return object JSON Results
-     */
-    public function getOrder($orderId) {
-        $method = 'GET';
-        $options = [
-            'apiKey' => $this->key,
-            'id' => $orderId,
-        ];
-
-        curl_setopt_array($this->curl, [
-            CURLOPT_URL => $this->url . 'public/v1/orders?' . http_build_query($options),
-            CURLOPT_RETURNTRANSFER => true,
-            CURLOPT_ENCODING => '',
-            CURLOPT_MAXREDIRS => 10,
-            CURLOPT_TIMEOUT => 30,
-            CURLOPT_HTTP_VERSION => CURL_HTTP_VERSION_1_1,
-            CURLOPT_CUSTOMREQUEST => $method,
-            CURLOPT_USERAGENT => $_SERVER['HTTP_USER_AGENT'],
-            CURLOPT_HTTPHEADER => [
-                'Content-Type: application/json',
-            ],
-        ]);
-
-        $response = curl_exec($this->curl);
-        $err = curl_error($this->curl);
-
-        if ($err) {
-            return $this->error($err);
-        } else {
-            return $this->response($response);
-        }
-    }
-
-    /**
      * Activate/deactivate an order. Such activation will initiate Shipper’s pickup process.
      *
-     * @param string  $orderId order ID obtained from Order Creation or order tracking ID
-     * @param integer $active  integer (0 for order deactivation and 1 for its activation)
+     * @param string $orderId order ID obtained from Order Creation or order tracking ID
+     * @param int    $active  integer (0 for order deactivation and 1 for its activation)
      *
      * @method orderActivation
      *
@@ -894,7 +1023,7 @@ class CVendor_Shipper {
     }
 
     /**
-     * Retrieves an order’s detail
+     * Retrieves an order’s detail.
      *
      * @param string $orderId order ID obtained from Order Creation or order tracking ID
      *
@@ -933,7 +1062,7 @@ class CVendor_Shipper {
     }
 
     /**
-     * Retrieve Label Checksum from getOrderDetail
+     * Retrieve Label Checksum from getOrderDetail.
      *
      * @param string $orderId       order ID obatined from Order Creation or order tracking ID
      * @param string $labelChecksum labelChecksum obtained from getOrderDetail
@@ -946,11 +1075,12 @@ class CVendor_Shipper {
         if ($this->environment == 'dev' || $this->environment == 'development') {
             return 'https://shipper.id/label-dev/sticker.php?oid=' . $orderId . '&uid=' . $labelChecksum;
         }
+
         return 'https://shipper.id/label/sticker.php?oid=' . $orderId . '&uid=' . $labelChecksum;
     }
 
     /**
-     * Generate Airway Bill number of the order with the provided external ID or the order ID (you must provide either one of those)
+     * Generate Airway Bill number of the order with the provided external ID or the order ID (you must provide either one of those).
      *
      * @param array $options eid (external ID) or oid (order ID)
      *
@@ -1002,7 +1132,7 @@ class CVendor_Shipper {
     }
 
     /**
-     * Retrieves Airway Bill number of the order with the provided external ID or the order ID (you must provide either one of those)
+     * Retrieves Airway Bill number of the order with the provided external ID or the order ID (you must provide either one of those).
      *
      * @param array $options eid (external ID) or oid (order ID)
      *
@@ -1054,7 +1184,7 @@ class CVendor_Shipper {
     }
 
     /**
-     * Updates an order’s AWB number
+     * Updates an order’s AWB number.
      *
      * @param string $orderId   order ID obtained from Order Creation or order tracking ID
      * @param string $awbNumber airway bill number
@@ -1097,11 +1227,11 @@ class CVendor_Shipper {
     /**
      * Update an order’s package’s weight and dimension.
      *
-     * @param string  $orderId order ID obtained from Order Creation or order tracking ID
-     * @param integer $weight  [description]
-     * @param integer $length  [description]
-     * @param integer $height  [description]
-     * @param integer $width   [description]
+     * @param string $orderId order ID obtained from Order Creation or order tracking ID
+     * @param int    $weight  [description]
+     * @param int    $length  [description]
+     * @param int    $height  [description]
+     * @param int    $width   [description]
      *
      * @method updateOrder
      *
@@ -1245,8 +1375,8 @@ class CVendor_Shipper {
      * @param string $merchantId merchant’s ID
      * @param string $phone      consigner’s phone number with country code e.g. +6281112343231
      * @param string $limit      how many orders will be displayed in single response. Default value : 20.
-     * @param string $startDate  retrieve orders created at and after the date in UTC time (YYYY-MM-DDThh:mm:ss+00:00).
-     * @param string $endDate    retrieve orders created at and before the date in UTC time (YYYY-MM-DDThh:mm:ss+00:00).
+     * @param string $startDate  retrieve orders created at and after the date in UTC time (YYYY-MM-DDThh:mm:ss+00:00)
+     * @param string $endDate    retrieve orders created at and before the date in UTC time (YYYY-MM-DDThh:mm:ss+00:00)
      * @param string $page       page number to be shown from total number of possible pages in this request (totalRecord / limit)
      *
      * @method getOrderHistory
@@ -1305,7 +1435,7 @@ class CVendor_Shipper {
     /**
      * Retrieve every available logistic in a city.
      *
-     * @param integer $cityId City ID
+     * @param int $cityId City ID
      *
      * @method getLogistics
      *
@@ -1376,6 +1506,36 @@ class CVendor_Shipper {
         } else {
             return $this->response($response);
         }
+    }
+
+    protected function requestToShipper($endPoint, $method, $data = null) {
+        $curl = curl_init();
+        $headers = [];
+        $headers[] = 'Accept: application/json';
+        $headers[] = 'Content-Type: application/json';
+        $headers[] = 'X-API-Key: ' . $this->key;
+
+        curl_setopt($curl, CURLOPT_HTTPHEADER, $headers);
+        curl_setopt($curl, CURLOPT_URL, $endPoint);
+        if ($method == 'POST') {
+            if ($data != null) {
+                $payload = json_encode($data);
+                curl_setopt($curl, CURLOPT_POST, true);
+                curl_setopt($curl, CURLOPT_POSTFIELDS, $payload);
+            }
+        } else {
+            if ($data != null) {
+                $payload = curl::asPostString($data);
+                curl_setopt($curl, CURLOPT_URL, $endPoint . '?' . $payload);
+            }
+        }
+        curl_setopt($curl, CURLOPT_RETURNTRANSFER, true);
+        $response = curl_exec($curl);
+
+        curl_close($curl);
+        $responseObject = json_decode($response, true);
+
+        return $responseObject;
     }
 
     private function response($res) {
