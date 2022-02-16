@@ -35,6 +35,7 @@ class CElement_FormInput_QueryBuilder extends CElement_FormInput {
         $this->input = CElement_FormInput_Hidden::factory($this->inputId);
         $this->add($this->container);
         $this->add($this->input);
+        $this->addClass('capp-query-builder capp-input');
     }
 
     public static function parseToModelQuery($rules, $modelClass) {
