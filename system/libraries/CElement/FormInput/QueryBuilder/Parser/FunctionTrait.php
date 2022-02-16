@@ -204,13 +204,16 @@ trait CElement_FormInput_QueryBuilder_Parser_FunctionTrait {
     /**
      * Decode the given JSON.
      *
-     * @param string $json
+     * @param string|array $json
      *
      * @throws CElement_FormInput_QueryBuilder_Exception_ParseException
      *
      * @return stdClass
      */
     private function decodeJSON($json) {
+        if (is_array($json)) {
+            $json = json_encode($json);
+        }
         $query = json_decode($json);
 
         if (json_last_error()) {

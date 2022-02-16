@@ -50,6 +50,9 @@ class CElement_FormInput_QueryBuilder extends CElement_FormInput {
         return $this;
     }
 
+    /**
+     * @return CElement_FormInput_QueryBuilder_FilterBuilder
+     */
     public function filterBuilder() {
         if ($this->filters == null) {
             $this->filters = new CElement_FormInput_QueryBuilder_FilterBuilder();
@@ -89,7 +92,6 @@ class CElement_FormInput_QueryBuilder extends CElement_FormInput {
         });
         let error_' . $this->inputId . "= null;
         $('#" . $this->containerId . "').on('validationError.queryBuilder', function(e, rule, error, value) {
-            console.log(e,rule,error,value);
             error_" . $this->inputId . "= error;
 
         });
