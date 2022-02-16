@@ -21,14 +21,14 @@ trait CApp_Trait_Template {
 
     protected $sections = [];
 
-    private $sectionJs = '';
-
     protected $skeleton = '';
 
     /**
      * @var array
      */
     protected $helpers = [];
+
+    private $sectionJs = '';
 
     /**
      * @param string $name
@@ -37,6 +37,7 @@ trait CApp_Trait_Template {
      */
     public function setTemplate($name) {
         $this->templateName = $name;
+
         return $this;
     }
 
@@ -47,6 +48,7 @@ trait CApp_Trait_Template {
      */
     public function setSkeleton($name) {
         $this->skeleton = $name;
+
         return $this;
     }
 
@@ -55,7 +57,7 @@ trait CApp_Trait_Template {
     }
 
     /**
-     * Retrieve section which declared on this template as CApp Element
+     * Retrieve section which declared on this template as CApp Element.
      *
      * @param string $sectionName
      *
@@ -65,6 +67,7 @@ trait CApp_Trait_Template {
         if (!isset($this->sections[$sectionName])) {
             $this->sections[$sectionName] = new CElement_PseudoElement();
         }
+
         return $this->sections[$sectionName];
     }
 
@@ -84,11 +87,13 @@ trait CApp_Trait_Template {
 
     public function setVar($key, $val) {
         $this->templateData[$key] = $val;
+
         return $this;
     }
 
     public function getTemplatePath($templateName) {
         $viewPath = $templateName;
+
         return $viewPath;
     }
 
@@ -110,7 +115,9 @@ trait CApp_Trait_Template {
         $outputJs = '';
         $templateJs = '';
         $viewPath = $this->getTemplatePath($templateName);
+
         $view = new CTemplate($viewPath);
+
         $view->setBlockRoutingCallback([$this, 'getTemplatePath']);
         $helpers = $view->getHelpers();
         if ($isSkeleton) {
@@ -130,12 +137,14 @@ trait CApp_Trait_Template {
             if ($this instanceof CElement) {
                 return $this->htmlChild();
             }
+
             return $this->html();
         });
         $helpers->set('jsContent', function () {
             if ($this instanceof CElement) {
                 return $this->jsChild();
             }
+
             return $this->js();
         });
 
@@ -151,9 +160,11 @@ trait CApp_Trait_Template {
                 //populate html first, because js sometime populated in html
                 $html = $section->htmlChild();
                 $this->sectionJs .= $section->jsChild();
+
                 return $html;
             }
             $this->sectionJs .= $section->js();
+
             return $section->html();
         });
 
@@ -180,18 +191,21 @@ trait CApp_Trait_Template {
         if ($this->htmlOutput == null) {
             $this->collectHtmlJs();
         }
+
         return true;
     }
 
     protected function collectHtmlJs() {
         $obLevel = ob_get_level();
         $resultContent = '';
+
         try {
             $resultContent = $this->parseTemplate();
         } catch (Exception $ex) {
             while (ob_get_level() > $obLevel) {
                 ob_end_clean();
             }
+
             throw $ex;
         }
 
@@ -205,21 +219,25 @@ trait CApp_Trait_Template {
         } elseif ($this instanceof CRenderable) {
             $this->jsOutput .= parent::js();
         }
+
         return true;
     }
 
     public function onBeforeParse(callable $callable) {
         $this->onBeforeParse = $callable;
+
         return $this;
     }
 
     public function getTemplateHtml($indent = 0) {
         $this->collectHtmlJsOnce();
+
         return $this->htmlOutput;
     }
 
     public function getTemplateJs($indent = 0) {
         $this->collectHtmlJsOnce();
+
         return $this->jsOutput;
     }
 }

@@ -1,7 +1,7 @@
 <?php
 
 /**
- * Description of Finder
+ * Description of Finder.
  *
  * @author Hery
  */
@@ -35,17 +35,18 @@ class CTemplate_Finder {
     protected $extensions = ['blade.php', 'php', 'css', 'html'];
 
     /**
-     * @var CView_Finder
+     * @var CTemplate_Finder
      */
     private static $instance;
 
     /**
-     * @return CView_Finder
+     * @return CTemplate_Finder
      */
     public static function instance() {
         if (static::$instance == null) {
             static::$instance = new static();
         }
+
         return static::$instance;
     }
 
@@ -95,9 +96,9 @@ class CTemplate_Finder {
      *
      * @param string $name
      *
-     * @return array
-     *
      * @throws \InvalidArgumentException
+     *
+     * @return array
      */
     protected function parseNamespaceSegments($name) {
         $segments = explode(CView::HINT_PATH_DELIMITER, $name);
@@ -119,9 +120,9 @@ class CTemplate_Finder {
      * @param string $name
      * @param array  $paths
      *
-     * @return string
-     *
      * @throws \InvalidArgumentException
+     *
+     * @return string
      */
     protected function findInPaths($name, $paths) {
         $cfPath = CF::getDirs(CTemplate::TEMPLATE_FOLDER);

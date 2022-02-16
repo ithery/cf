@@ -1593,6 +1593,14 @@ class c {
             'options'
         ));
     }
+
+    public static function json($data, $options = null, $depth = 512) {
+        if ($options == null) {
+            $options = JSON_HEX_TAG | JSON_HEX_APOS | JSON_HEX_AMP | JSON_HEX_QUOT;
+        }
+
+        return json_encode($data, $options, $depth);
+    }
 }
 
 // End c

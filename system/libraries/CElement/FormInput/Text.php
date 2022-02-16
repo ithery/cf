@@ -11,6 +11,7 @@ defined('SYSPATH') or die('No direct access allowed.');
 class CElement_FormInput_Text extends CElement_FormInput {
     use CTrait_Compat_Element_FormInput_Text,
         CTrait_Element_Property_Placeholder;
+
     protected $input_style;
 
     protected $button_position;
@@ -67,7 +68,7 @@ class CElement_FormInput_Text extends CElement_FormInput {
         foreach ($this->attr as $k => $v) {
             $addition_attribute .= ' ' . $k . '="' . $v . '"';
         }
-        $html->appendln('<input type="text" placeholder="' . $this->placeholder . '" name="' . $this->name . '" id="' . $this->id . '" class="form-control input-unstyled' . $classes . $this->validation->validation_class() . '" value="' . $this->value . '"' . $disabled . $custom_css . $addition_attribute . '/>')->br();
+        $html->appendln('<input type="text" placeholder="' . $this->placeholder . '" name="' . $this->name . '" id="' . $this->id . '" class="form-control input-unstyled' . $classes . $this->validation->validationClass() . '" value="' . $this->value . '"' . $disabled . $custom_css . $addition_attribute . '/>')->br();
 
         return $html->text();
     }

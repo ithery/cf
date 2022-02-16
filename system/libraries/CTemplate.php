@@ -12,21 +12,7 @@ class CTemplate {
     const TEMPLATE_FOLDER = 'templates';
 
     /**
-     * The stack of section names currently being captured.
-     *
-     * @var array
-     */
-    private $capture;
-
-    /**
-     * A collection point for section content.
-     *
-     * @var array
-     */
-    private $section;
-
-    /**
-     * Default folder for templates view
+     * Default folder for templates view.
      *
      * @var string
      */
@@ -45,14 +31,28 @@ class CTemplate {
 
     protected $blockRoutingCallback = null;
 
+    protected static $bladeCompiler;
+
+    /**
+     * The stack of section names currently being captured.
+     *
+     * @var array
+     */
+    private $capture;
+
+    /**
+     * A collection point for section content.
+     *
+     * @var array
+     */
+    private $section;
+
     /**
      * An aribtrary object for helpers.
      *
      * @var object
      */
     private $helpers;
-
-    protected static $bladeCompiler;
 
     public function __construct($name, $data = []) {
         $this->registry = new CTemplate_Registry();
@@ -90,6 +90,7 @@ class CTemplate {
         $data = array_merge($this->data, $data);
         ob_start();
         $this->getRegistry($name)->__invoke($data);
+
         return ob_get_clean();
     }
 
@@ -155,6 +156,7 @@ class CTemplate {
 
     protected function getRegistry($name) {
         $tmpl = $this->registry->get($name);
+
         return $tmpl->bindTo($this, get_class($this));
     }
 
@@ -177,12 +179,15 @@ class CTemplate {
      */
     public function render($print = false, $renderer = false) {
         ob_start();
+
         try {
             $this->getRegistry($this->name)->__invoke($this->data);
         } catch (Exception $ex) {
             ob_end_clean();
+
             throw $ex;
         }
+
         return ob_get_clean();
     }
 

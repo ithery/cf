@@ -200,38 +200,48 @@ class CElement_FormInput_SelectSearch extends CElement_FormInput {
 
     protected function getSelectedRow() {
         if ($this->autoSelect || $this->value != null) {
-            $db = c::db();
             $value = null;
             if ($this->value !== null) {
                 $value = $this->value;
             }
-            if ($this->dataProvider instanceof CManager_DataProvider_ModelDataProvider) {
-                $query = clone $this->dataProvider;
+            $values = carr::wrap($value);
+            $result = c::collect($values)->map(function ($value) {
+                $db = c::db();
+                if ($this->dataProvider instanceof CManager_DataProvider_ModelDataProvider) {
+                    $query = clone $this->dataProvider;
 
-                if ($value !== null) {
-                    $query->queryCallback(function ($q) use ($value) {
-                        $q->where($this->keyField, '=', $value);
-                    });
+                    if ($value !== null) {
+                        $query->queryCallback(function ($q) use ($value) {
+                            $q->where($this->keyField, '=', $value);
+                        });
+                    }
+                    $result = $query->paginate(1);
+                    $items = $result->items();
+
+                    $item = carr::first($items);
+                    if ($item) {
+                        $itemArray = $item->toArray();
+                        $itemArray['id'] = $item->getKey();
+
+                        return $itemArray;
+                    }
+
+                    return null;
                 }
-                $result = $query->paginate(1);
+                $q = 'select * from (' . $this->query . ') as a limit 1';
+                if ($value !== null) {
+                    $q = 'select * from (' . $this->query . ') as a where `' . $this->keyField . '`=' . $db->escape($this->value);
+                }
 
-                $items = $result->items();
-                $item = carr::first($items);
-                if ($item) {
-                    return $item->toArray();
+                $result = $db->query($q)->resultArray(false);
+                if (count($result) > 0) {
+                    return carr::first($result);
                 }
 
                 return null;
-            }
-            $q = 'select * from (' . $this->query . ') as a limit 1';
-            if ($value !== null) {
-                $q = 'select * from (' . $this->query . ') as a where `' . $this->keyField . '`=' . $db->escape($this->value);
-            }
+            })->toArray();
 
-            $result = $db->query($q)->resultArray(false);
-            if (count($result) > 0) {
-                return carr::first($result);
-            }
+            return $result;
         }
 
         return null;
@@ -277,27 +287,37 @@ class CElement_FormInput_SelectSearch extends CElement_FormInput {
         }
         $html->appendln('<select class="' . $classes . '" name="' . $this->name . '" id="' . $this->id . '" ' . $disabled . $custom_css . $multiple . $additionAttribute . '">');
 
-        $selectedRow = $this->getSelectedRow();
-        if ($selectedRow != null) {
-            $row = $selectedRow;
-            if (isset($this->valueCallback) && is_callable($this->valueCallback)) {
-                foreach ($row as $k => $v) {
-                    $row[$k] = $this->valueCallback($row, $k, $v);
+        $selectedRows = $this->getSelectedRow();
+        if ($selectedRows) {
+            foreach ($selectedRows as $index => $selectedRow) {
+                if ($selectedRow != null) {
+                    $row = $selectedRow;
+                    if (isset($this->valueCallback) && is_callable($this->valueCallback)) {
+                        foreach ($row as $k => $v) {
+                            $row[$k] = $this->valueCallback($row, $k, $v);
+                        }
+                    }
+
+                    $strSelection = $this->formatSelection;
+                    if (strlen($strSelection) == 0) {
+                        $strSelection = '{' . $this->searchField . '}';
+                    }
+
+                    $strSelection = str_replace("'", "\'", $strSelection);
+                    preg_match_all("/{([\w]*)}/", $strSelection, $matches, PREG_SET_ORDER);
+
+                    foreach ($matches as $val) {
+                        $str = $val[1]; //matches str without bracket {}
+                        $b_str = $val[0]; //matches str with bracket {}
+
+                        $strSelection = str_replace($b_str, carr::get($row, $str), $strSelection);
+                    }
+
+                    $valueTemp = is_array($this->value) ? $this->value[$index] : $this->value;
+
+                    $html->appendln('<option value="' . $valueTemp . '" data-content="' . c::e($strSelection) . '" selected="selected" >' . $strSelection . '</option>');
                 }
             }
-
-            $strSelection = $this->formatSelection;
-            $strSelection = str_replace("'", "\'", $strSelection);
-            preg_match_all("/{([\w]*)}/", $strSelection, $matches, PREG_SET_ORDER);
-
-            foreach ($matches as $val) {
-                $str = $val[1]; //matches str without bracket {}
-                $b_str = $val[0]; //matches str with bracket {}
-
-                $strSelection = str_replace($b_str, carr::get($row, $str), $strSelection);
-            }
-
-            $html->appendln('<option value="' . $this->value . '" data-content="' . c::e($strSelection) . '" >' . $strSelection . '</option>');
         }
 
         $html->appendln('</select>');
@@ -346,28 +366,38 @@ class CElement_FormInput_SelectSearch extends CElement_FormInput {
         if ($this->value !== null) {
             $value = $this->value;
         }
-        $selectedRow = $this->getSelectedRow();
-        if ($selectedRow != null) {
-            $row = $selectedRow;
-            if (is_object($row)) {
-                $row = (array) $row;
-            }
-            if (isset($this->valueCallback) && is_callable($this->valueCallback)) {
-                foreach ($row as $k => $v) {
-                    $row[$k] = $this->valueCallback($row, $k, $v);
+        $selectedRows = $this->getSelectedRow();
+        $selectedData = [];
+        if ($selectedRows) {
+            foreach ($selectedRows as $index => $selectedRow) {
+                if ($selectedRow != null) {
+                    $row = $selectedRow;
+                    if (is_object($row)) {
+                        $row = (array) $row;
+                    }
+                    if (isset($this->valueCallback) && is_callable($this->valueCallback)) {
+                        foreach ($row as $k => $v) {
+                            $row[$k] = $this->valueCallback($row, $k, $v);
+                        }
+                    }
+                    $selectedData[] = $row;
                 }
             }
-
-            $rjson = json_encode($row);
-
-            $strJsInit = '
-                    initSelection : function (element, callback) {
-                        var data = ' . $rjson . ';
-                        callback(data);
-                    },
-                ';
         }
 
+        if ($selectedData && is_array($selectedData) && count($selectedData) > 0) {
+            if (!$this->multiple) {
+                $selectedData = carr::first($selectedData);
+            }
+            $rjson = json_encode($selectedData);
+
+            $strJsInit = '
+                initSelection : function (element, callback) {
+                    var data = ' . $rjson . ';
+                    callback(data);
+                },
+            ';
+        }
         $strMultiple = '';
         if ($this->multiple) {
             $strMultiple = " multiple:'true',";
@@ -467,7 +497,15 @@ class CElement_FormInput_SelectSearch extends CElement_FormInput {
                 }
             });
         ";
-        if ($this->valueCallback != null && is_callable($this->valueCallback)) {
+        if ($this->multiple) {
+            // if ($selectedData && is_array($selectedData) && count($selectedData) > 0) {
+            //     $value = c::json($selectedData);
+            //     $str .= "
+            //         $('#" . $this->id . "').select2('val'," . $value . ');
+            //     ';
+            // }
+        }
+        if (($this->valueCallback != null && is_callable($this->valueCallback))) {
             $str .= "
                 $('#" . $this->id . "').trigger('change');
             ";
