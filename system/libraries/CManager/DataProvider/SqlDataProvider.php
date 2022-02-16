@@ -40,7 +40,7 @@ class CManager_DataProvider_SqlDataProvider extends CManager_DataProviderAbstrac
         return c::db($this->connection)->query($sql, $bindings);
     }
 
-    public function paginate($perPage = null, $columns = ['*'], $pageName = 'page', $page = null) {
+    public function paginate($perPage = null, $columns = ['*'], $pageName = 'page', $page = null, $callback = null) {
         $page = $page ?: CPagination_Paginator::resolveCurrentPage($pageName);
 
         $total = $this->getCountForPagination();
