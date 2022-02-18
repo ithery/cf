@@ -12,6 +12,9 @@ class OEmbed extends Base {
 
     const ENDPOINT_VIDEO = 'https://graph.facebook.com/v11.0/oembed_video';
 
+    /**
+     * @return null|UriInterface
+     */
     protected function detectEndpoint() {
         $token = $this->extractor->getSetting('facebook:token');
 
