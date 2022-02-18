@@ -24,8 +24,9 @@ class CAnalytics_Google_ClientFactory {
         static::validateG4Config($analyticsConfig);
         $config = c::collect($analyticsConfig);
         $clientConfig = [];
-        $clientConfig['credentials'] = [];
-        $clientConfig['credentials']['keyFile'] = $config['service_account_credentials_json'];
+        $clientConfig['credentials'] = $config['service_account_credentials_json'];
+        //$clientConfig['credentials']['type'] = 'service_account';
+
         $client = new BetaAnalyticsDataClient($clientConfig);
 
         $clientGA4 = new CAnalytics_Google_ClientGA4($client, CCache::store($config->get('store')));

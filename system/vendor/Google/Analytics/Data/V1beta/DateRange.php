@@ -5,8 +5,8 @@
 namespace Google\Analytics\Data\V1beta;
 
 use Google\Protobuf\Internal\GPBType;
-use Google\Protobuf\Internal\RepeatedField;
 use Google\Protobuf\Internal\GPBUtil;
+use Google\Protobuf\Internal\RepeatedField;
 
 /**
  * A contiguous set of days: startDate, startDate + 1, ..., endDate. Requests
@@ -14,8 +14,7 @@ use Google\Protobuf\Internal\GPBUtil;
  *
  * Generated from protobuf message <code>google.analytics.data.v1beta.DateRange</code>
  */
-class DateRange extends \Google\Protobuf\Internal\Message
-{
+class DateRange extends \Google\Protobuf\Internal\Message {
     /**
      * The inclusive start date for the query in the format `YYYY-MM-DD`. Cannot
      * be after `end_date`. The format `NdaysAgo`, `yesterday`, or `today` is also
@@ -25,6 +24,7 @@ class DateRange extends \Google\Protobuf\Internal\Message
      * Generated from protobuf field <code>string start_date = 1;</code>
      */
     private $start_date = '';
+
     /**
      * The inclusive end date for the query in the format `YYYY-MM-DD`. Cannot
      * be before `start_date`. The format `NdaysAgo`, `yesterday`, or `today` is
@@ -34,6 +34,7 @@ class DateRange extends \Google\Protobuf\Internal\Message
      * Generated from protobuf field <code>string end_date = 2;</code>
      */
     private $end_date = '';
+
     /**
      * Assigns a name to this date range. The dimension `dateRange` is valued to
      * this name in a report response. If set, cannot begin with `date_range_` or
@@ -48,7 +49,7 @@ class DateRange extends \Google\Protobuf\Internal\Message
      * Constructor.
      *
      * @param array $data {
-     *     Optional. Data for populating the Message object.
+     *                    Optional. Data for populating the Message object.
      *
      *     @type string $start_date
      *           The inclusive start date for the query in the format `YYYY-MM-DD`. Cannot
@@ -67,7 +68,7 @@ class DateRange extends \Google\Protobuf\Internal\Message
      *           the request: `date_range_0`, `date_range_1`, etc.
      * }
      */
-    public function __construct($data = NULL) {
+    public function __construct($data = null) {
         \GPBMetadata\Google\Analytics\Data\V1Beta\Data::initOnce();
         parent::__construct($data);
     }
@@ -79,10 +80,10 @@ class DateRange extends \Google\Protobuf\Internal\Message
      * reporting time zone.
      *
      * Generated from protobuf field <code>string start_date = 1;</code>
+     *
      * @return string
      */
-    public function getStartDate()
-    {
+    public function getStartDate() {
         return $this->start_date;
     }
 
@@ -93,12 +94,13 @@ class DateRange extends \Google\Protobuf\Internal\Message
      * reporting time zone.
      *
      * Generated from protobuf field <code>string start_date = 1;</code>
+     *
      * @param string $var
+     *
      * @return $this
      */
-    public function setStartDate($var)
-    {
-        GPBUtil::checkString($var, True);
+    public function setStartDate($var) {
+        GPBUtil::checkString($var, true);
         $this->start_date = $var;
 
         return $this;
@@ -111,10 +113,10 @@ class DateRange extends \Google\Protobuf\Internal\Message
      * property's reporting time zone.
      *
      * Generated from protobuf field <code>string end_date = 2;</code>
+     *
      * @return string
      */
-    public function getEndDate()
-    {
+    public function getEndDate() {
         return $this->end_date;
     }
 
@@ -125,12 +127,13 @@ class DateRange extends \Google\Protobuf\Internal\Message
      * property's reporting time zone.
      *
      * Generated from protobuf field <code>string end_date = 2;</code>
+     *
      * @param string $var
+     *
      * @return $this
      */
-    public function setEndDate($var)
-    {
-        GPBUtil::checkString($var, True);
+    public function setEndDate($var) {
+        GPBUtil::checkString($var, true);
         $this->end_date = $var;
 
         return $this;
@@ -143,10 +146,10 @@ class DateRange extends \Google\Protobuf\Internal\Message
      * the request: `date_range_0`, `date_range_1`, etc.
      *
      * Generated from protobuf field <code>string name = 3;</code>
+     *
      * @return string
      */
-    public function getName()
-    {
+    public function getName() {
         return $this->name;
     }
 
@@ -157,16 +160,15 @@ class DateRange extends \Google\Protobuf\Internal\Message
      * the request: `date_range_0`, `date_range_1`, etc.
      *
      * Generated from protobuf field <code>string name = 3;</code>
+     *
      * @param string $var
+     *
      * @return $this
      */
-    public function setName($var)
-    {
-        GPBUtil::checkString($var, True);
+    public function setName($var) {
+        GPBUtil::checkString($var, true);
         $this->name = $var;
 
         return $this;
     }
-
 }
-
