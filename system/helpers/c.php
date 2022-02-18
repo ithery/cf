@@ -697,6 +697,9 @@ class c {
         if ($key === null) {
             return CSession::instance()->store();
         }
+        if (is_array($key)) {
+            return CSession::instance()->store()->put($key);
+        }
 
         return CSession::instance()->store()->get($key, $default);
     }
