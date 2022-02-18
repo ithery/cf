@@ -5,9 +5,9 @@
 namespace Embed;
 
 use Embed\Http\Crawler;
+use Psr\Http\Message\UriInterface;
 use Psr\Http\Message\RequestInterface;
 use Psr\Http\Message\ResponseInterface;
-use Psr\Http\Message\UriInterface;
 
 class ExtractorFactory {
     private $default = Extractor::class;
@@ -58,6 +58,7 @@ class ExtractorFactory {
         foreach ($this->adapters as $adapterHost => $adapter) {
             if (substr($host, -strlen($adapterHost)) === $adapterHost) {
                 $class = $adapter;
+
                 break;
             }
         }
@@ -68,6 +69,9 @@ class ExtractorFactory {
 
         foreach ($this->customDetectors as $name => $detector) {
             $extractor->addDetector($name, new $detector($extractor));
+        }
+        foreach ($extractor->createCustomDetectors() as $name => $detector) {
+            $extractor->addDetector($name, $detector);
         }
 
         return $extractor;

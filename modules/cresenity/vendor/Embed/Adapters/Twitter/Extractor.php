@@ -1,6 +1,6 @@
 <?php
 
-namespace Embed\Adapters\Archive;
+namespace Embed\Adapters\Twitter;
 
 use Embed\Extractor as Base;
 
@@ -15,12 +15,13 @@ class Extractor extends Base {
         $this->api = new Api($this);
 
         return [
-            'title' => new Detectors\Title($this),
-            'description' => new Detectors\Description($this),
-            'code' => new Detectors\Code($this),
             'authorName' => new Detectors\AuthorName($this),
+            'authorUrl' => new Detectors\AuthorUrl($this),
+            'description' => new Detectors\Description($this),
+            'image' => new Detectors\Image($this),
             'providerName' => new Detectors\ProviderName($this),
             'publishedTime' => new Detectors\PublishedTime($this),
+            'title' => new Detectors\Title($this),
         ];
     }
 }
