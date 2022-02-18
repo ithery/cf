@@ -25,11 +25,12 @@ class CAnalytics_Google_ClientFactory {
         $config = c::collect($analyticsConfig);
         $clientConfig = [];
         $clientConfig['credentials'] = $config['service_account_credentials_json'];
-        //$clientConfig['credentials']['type'] = 'service_account';
 
         $client = new BetaAnalyticsDataClient($clientConfig);
 
         $clientGA4 = new CAnalytics_Google_ClientGA4($client, CCache::store($config->get('store')));
+
+        $clientGA4->setCacheLifeTimeInMinutes($config['cache_lifetime_in_minutes']);
 
         return $clientGA4;
     }
