@@ -45,7 +45,7 @@ class CAnalytics_Google_ClientGA4 {
      * @param mixed $metrics
      * @param mixed $dimensions
      *
-     * @return null|array
+     * @return null|array|\Google\Analytics\Data\V1beta\RunReportResponse
      */
     public function runReport($propertyId, $dateRanges, $metrics, $dimensions) {
         $cacheName = $this->determineCacheName(func_get_args());

@@ -51,6 +51,10 @@ class CAnalytics_Google_AnalyticGA4 {
         return $this->propertyId;
     }
 
+    public function setPeriod(CPeriod $period) {
+        return $this->setDateRanges($period->startDate, $period->endDate);
+    }
+
     public function setDateRanges(DateTimeInterface $startDate, DateTimeInterface $endDate) {
         $this->dateRanges = new DateRange(
             [
@@ -104,6 +108,9 @@ class CAnalytics_Google_AnalyticGA4 {
         return $this;
     }
 
+    /**
+     * @return \Google\Analytics\Data\V1beta\RunReportResponse
+     */
     public function raw() {
         return $this->report;
     }
