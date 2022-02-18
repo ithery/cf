@@ -12,7 +12,12 @@ class CCache {
     /**
      * @var CCache_Repository[]
      */
-    protected $repository;
+    protected static $repository;
+
+    /**
+     * @var CCache_RateLimiter
+     */
+    protected static $rateLimiter;
 
     /**
      * @param null|mixed $name
@@ -24,6 +29,9 @@ class CCache {
         $instanceKey = $name;
         if (!is_string($name)) {
             $instanceKey = carr::hash($options);
+        }
+        if (!is_array(self::$repository)) {
+            self::$repository = [];
         }
         if (!isset(self::$repository[$instanceKey])) {
             self::$repository[$instanceKey] = new CCache_Repository($options);
@@ -64,5 +72,13 @@ class CCache {
      */
     public static function manager() {
         return CCache_Manager::instance();
+    }
+
+    public static function rateLimiter() {
+        if (static::$rateLimiter == null) {
+            static::$rateLimiter = new CCache_RateLimiter(CCache::manager()->driver(CF::config('cache.limiter')));
+        }
+
+        return static::$rateLimiter;
     }
 }
