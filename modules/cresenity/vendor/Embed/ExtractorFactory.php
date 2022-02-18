@@ -30,6 +30,7 @@ class ExtractorFactory {
         'youtube.com' => Adapters\Youtube\Extractor::class,
         'twitch.tv' => Adapters\Twitch\Extractor::class,
         'bandcamp.com' => Adapters\Bandcamp\Extractor::class,
+        'twitter.com' => Adapters\Twitter\Extractor::class,
     ];
 
     private $customDetectors = [];
