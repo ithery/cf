@@ -41,9 +41,11 @@ class CManager_DataProvider_ModelDataProvider extends CManager_DataProviderAbstr
     }
 
     /**
+     * @param mixed $callback
+     *
      * @return CModel_Query
      */
-    protected function getModelQuery() {
+    protected function getModelQuery($callback = null) {
         $modelClass = $this->modelClass;
         $query = $modelClass::query();
         /** @var CModel_Query $query */
@@ -52,6 +54,14 @@ class CManager_DataProvider_ModelDataProvider extends CManager_DataProviderAbstr
                 $this->queryCallback->__invoke($query);
             } else {
                 call_user_func_array($this->queryCallback, [$query]);
+            }
+        }
+
+        if ($callback) {
+            if ($callback instanceof SerializableClosure) {
+                $callback->__invoke($query);
+            } else {
+                call_user_func_array($callback, [$query]);
             }
         }
 
@@ -130,7 +140,8 @@ class CManager_DataProvider_ModelDataProvider extends CManager_DataProviderAbstr
     }
 
     public function paginate($perPage = null, $columns = ['*'], $pageName = 'page', $page = null, $callback = null) {
-        $query = $this->getModelQuery();
+        //do nothing
+        $query = $this->getModelQuery($callback);
 
         return $query->paginate($perPage, $columns, $pageName, $page);
     }

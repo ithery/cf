@@ -16,6 +16,10 @@ class CElement_Element_Div extends CElement_Element {
         $this->tag = 'div';
     }
 
+    public static function factory($id = null) {
+        return new static($id);
+    }
+
     protected function build() {
         parent::build();
         $this->bootBuildReloadHandler();

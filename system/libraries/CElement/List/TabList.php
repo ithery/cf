@@ -10,6 +10,7 @@ defined('SYSPATH') or die('No direct access allowed.');
  */
 class CElement_List_TabList extends CElement_List {
     use CTrait_Compat_Element_TabList;
+
     /**
      * Tabs.
      *

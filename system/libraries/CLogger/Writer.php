@@ -16,6 +16,11 @@ abstract class CLogger_Writer {
     public static $timezone;
 
     /**
+     * @var int Level to use for stack traces
+     */
+    public static $straceLevel = LOG_DEBUG;
+
+    /**
      * Numeric log level to string lookup table.
      *
      * @var array
@@ -31,17 +36,14 @@ abstract class CLogger_Writer {
         LOG_DEBUG => 'DEBUG',
     ];
 
-    /**
-     * @var int Level to use for stack traces
-     */
-    public static $straceLevel = LOG_DEBUG;
-
     public static function factory($type = 'file', $options = []) {
         switch ($type) {
             case 'file':
                 return new CLogger_Writer_File($options);
+
                 break;
         }
+
         return new CLogger_Writer_File($options);
     }
 
@@ -85,7 +87,11 @@ abstract class CLogger_Writer {
             // Re-use as much as possible, just resetting the body to the trace
 
             if (carr::get($message, 'level') >= static::$straceLevel) {
-                $message['body'] .= $message['trace'];
+                if (is_array($message['trace'])) {
+                    $message['body'] .= json_encode($message['trace']);
+                } else {
+                    $message['body'] .= $message['trace'];
+                }
             }
             if (isset($this->logLevels[$message['level']])) {
                 $message['level'] = $this->logLevels[$message['level']];

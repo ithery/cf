@@ -12,7 +12,12 @@ class CCache {
     /**
      * @var CCache_Repository[]
      */
-    protected $repository;
+    protected static $repository;
+
+    /**
+     * @var CCache_RateLimiter
+     */
+    protected static $rateLimiter;
 
     /**
      * @var CCache_RateLimiter
@@ -29,6 +34,9 @@ class CCache {
         $instanceKey = $name;
         if (!is_string($name)) {
             $instanceKey = carr::hash($options);
+        }
+        if (!is_array(self::$repository)) {
+            self::$repository = [];
         }
         if (!isset(self::$repository[$instanceKey])) {
             self::$repository[$instanceKey] = new CCache_Repository($options);
