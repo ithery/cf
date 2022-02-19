@@ -12,11 +12,11 @@ trait CObservable_Trait_ElementTrait {
     /**
      * Add Div &lt;div&gt.
      *
-     * @param string $id optional
+     * @param null|string $id optional
      *
      * @return CElement_Element_Div Div Element
      */
-    public function addDiv($id = '') {
+    public function addDiv($id = null) {
         $element = new CElement_Element_Div($id);
         $this->wrapper->add($element);
 
@@ -30,7 +30,7 @@ trait CObservable_Trait_ElementTrait {
      *
      * @return CElement_Element_Label Label Element
      */
-    public function addLabel($id = '') {
+    public function addLabel($id = null) {
         $element = new CElement_Element_Label($id);
         $this->wrapper->add($element);
 
@@ -44,7 +44,7 @@ trait CObservable_Trait_ElementTrait {
      *
      * @return CElement_Element_A Anchor Element
      */
-    public function addA($id = '') {
+    public function addA($id = null) {
         $element = new CElement_Element_A($id);
         $this->wrapper->add($element);
 
@@ -58,7 +58,7 @@ trait CObservable_Trait_ElementTrait {
      *
      * @return CElement_Element_H1 Heading 1 Element
      */
-    public function addH1($id = '') {
+    public function addH1($id = null) {
         $element = new CElement_Element_H1($id);
         $this->wrapper->add($element);
 
@@ -72,7 +72,7 @@ trait CObservable_Trait_ElementTrait {
      *
      * @return CElement_Element_H2 Heading 2 Element
      */
-    public function addH2($id = '') {
+    public function addH2($id = null) {
         $element = new CElement_Element_H2($id);
         $this->wrapper->add($element);
 
@@ -86,7 +86,7 @@ trait CObservable_Trait_ElementTrait {
      *
      * @return CElement_Element_H3 Heading 3 Element
      */
-    public function addH3($id = '') {
+    public function addH3($id = null) {
         $element = new CElement_Element_H3($id);
         $this->wrapper->add($element);
 
@@ -100,7 +100,7 @@ trait CObservable_Trait_ElementTrait {
      *
      * @return CElement_Element_H4 Heading 4 Element
      */
-    public function addH4($id = '') {
+    public function addH4($id = null) {
         $element = new CElement_Element_H4($id);
         $this->wrapper->add($element);
 
@@ -114,7 +114,7 @@ trait CObservable_Trait_ElementTrait {
      *
      * @return CElement_Element_H5 Heading 5 Element
      */
-    public function addH5($id = '') {
+    public function addH5($id = null) {
         $element = new CElement_Element_H5($id);
         $this->wrapper->add($element);
 
@@ -128,7 +128,7 @@ trait CObservable_Trait_ElementTrait {
      *
      * @return CElement_Element_H6 Heading 6 Element
      */
-    public function addH6($id = '') {
+    public function addH6($id = null) {
         $element = new CElement_Element_H6($id);
         $this->wrapper->add($element);
 
@@ -142,7 +142,7 @@ trait CObservable_Trait_ElementTrait {
      *
      * @return CElement_Element_Button Button Element
      */
-    public function addButton($id = '') {
+    public function addButton($id = null) {
         $element = new CElement_Element_Button($id);
         $this->wrapper->add($element);
 
@@ -156,7 +156,7 @@ trait CObservable_Trait_ElementTrait {
      *
      * @return CElement_Element_P Paragraph Element
      */
-    public function addP($id = '') {
+    public function addP($id = null) {
         $element = new CElement_Element_P($id);
         $this->wrapper->add($element);
 
@@ -170,7 +170,7 @@ trait CObservable_Trait_ElementTrait {
      *
      * @return CElement_Element_Ol Ordered List Element
      */
-    public function addOl($id = '') {
+    public function addOl($id = null) {
         $element = new CElement_Element_Ol($id);
         $this->wrapper->add($element);
 
@@ -184,7 +184,7 @@ trait CObservable_Trait_ElementTrait {
      *
      * @return CElement_Element_Ul Unordered List Element
      */
-    public function addUl($id = '') {
+    public function addUl($id = null) {
         $element = new CElement_Element_Ul($id);
         //$element = CUlElement::factory($id);
         $this->wrapper->add($element);
@@ -199,7 +199,7 @@ trait CObservable_Trait_ElementTrait {
      *
      * @return CElement_Element_Tr Table Row Element
      */
-    public function addTr($id = '') {
+    public function addTr($id = null) {
         $element = new CElement_Element_Tr($id);
         $this->wrapper->add($element);
 
@@ -213,7 +213,7 @@ trait CObservable_Trait_ElementTrait {
      *
      * @return CElement_Element_Td Table Cell Element
      */
-    public function addTd($id = '') {
+    public function addTd($id = null) {
         $element = new CElement_Element_Td($id);
         $this->wrapper->add($element);
 
@@ -227,7 +227,7 @@ trait CObservable_Trait_ElementTrait {
      *
      * @return CElement_Element_Code Code Element
      */
-    public function addCode($id = '') {
+    public function addCode($id = null) {
         $element = new CElement_Element_Code($id);
         $this->wrapper->add($element);
 
@@ -241,7 +241,7 @@ trait CObservable_Trait_ElementTrait {
      *
      * @return CElement_Element_Li List Item Element
      */
-    public function addLi($id = '') {
+    public function addLi($id = null) {
         $element = new CElement_Element_Li($id);
         $this->wrapper->add($element);
 
@@ -255,7 +255,7 @@ trait CObservable_Trait_ElementTrait {
      *
      * @return CElement_Element_Iframe Iframe Element
      */
-    public function addIframe($id = '') {
+    public function addIframe($id = null) {
         $element = new CElement_Element_Iframe($id);
         $this->wrapper->add($element);
 
@@ -269,7 +269,7 @@ trait CObservable_Trait_ElementTrait {
      *
      * @return CElement_Element_Canvas Canvas Element
      */
-    public function addCanvas($id = '') {
+    public function addCanvas($id = null) {
         $element = new CElement_Element_Canvas($id);
         $this->wrapper->add($element);
 
@@ -283,7 +283,7 @@ trait CObservable_Trait_ElementTrait {
      *
      * @return CElement_Element_Img Img Element
      */
-    public function addImg($id = '') {
+    public function addImg($id = null) {
         $element = new CElement_Element_Img($id);
         $this->wrapper->add($element);
 
@@ -297,7 +297,7 @@ trait CObservable_Trait_ElementTrait {
      *
      * @return CElement_Element_Pre Pre Element
      */
-    public function addPre($id = '') {
+    public function addPre($id = null) {
         $element = new CElement_Element_Pre($id);
         $this->wrapper->add($element);
 
@@ -311,7 +311,7 @@ trait CObservable_Trait_ElementTrait {
      *
      * @return CElement_Element_Span Span Element
      */
-    public function addSpan($id = '') {
+    public function addSpan($id = null) {
         $element = new CElement_Element_Span($id);
         $this->wrapper->add($element);
 
