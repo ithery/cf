@@ -13,10 +13,16 @@ trait CTrait_Element_Property_Title {
 
     protected $rawTitle;
 
+    /**
+     * @param string     $title
+     * @param bool|array $lang
+     *
+     * @return $this
+     */
     public function setTitle($title, $lang = true) {
         $this->rawTitle = $title;
         if ($lang) {
-            $title = c::__($title);
+            $title = c::__($title, is_array($lang) ? $lang : []);
         }
         $this->title = $title;
 
