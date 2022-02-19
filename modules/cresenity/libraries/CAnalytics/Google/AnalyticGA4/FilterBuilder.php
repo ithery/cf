@@ -23,29 +23,47 @@ class CAnalytics_Google_AnalyticGA4_FilterBuilder {
      */
     protected $notExpression = null;
 
-    protected $fieldName = null;
+    /**
+     * @var CAnalytics_Google_AnalyticGA4_Filter
+     */
+    protected $filter = null;
 
     public function __construct() {
     }
 
-    public function toGa4Filter() {
+    public function where($field, $callback = null) {
+        if ($field instanceof Closure) {
+        }
+
+        $this->filter = new CAnalytics_Google_AnalyticGA4_Filter($field);
+        if ($callback != null && $callback instanceof Closure) {
+            $callback($this->filter);
+        }
+
+        return $this;
+    }
+
+    /**
+     * @return FilterExpression
+     */
+    public function toGA4Object() {
         $data = [];
         if (count($this->andGroup) > 0) {
             $data['and_group'] = new FilterExpressionList(c::collect($this->andGroup)->map(function (CAnalytics_Google_AnalyticGA4_FilterBuilder $filter) {
-                return $filter->toGa4Filter();
+                return $filter->toGA4Object();
             }));
         }
         if (count($this->orGroup) > 0) {
             $data['or_group'] = new FilterExpressionList(c::collect($this->andGroup)->map(function (CAnalytics_Google_AnalyticGA4_FilterBuilder $filter) {
-                return $filter->toGa4Filter();
+                return $filter->toGA4Object();
             }));
         }
 
         if ($this->notExpression) {
-            $data['or_group'] = $this->notExpression->toGa4Filter();
+            $data['or_group'] = $this->notExpression->toGA4Object();
         }
 
-        $data['filter'] = new Filter();
+        $data['filter'] = $this->filter->toGA4Object();
 
         return new FilterExpression($data);
     }

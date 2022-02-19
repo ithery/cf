@@ -1,20 +1,84 @@
 <?php
+use Google\Analytics\Data\V1beta\Row;
 use Google\Analytics\Data\V1beta\Metric;
 use Google\Analytics\Data\V1beta\DateRange;
 use Google\Analytics\Data\V1beta\Dimension;
+use Google\Analytics\Data\V1beta\MetricValue;
+use Google\Analytics\Data\V1beta\MetricHeader;
+use Google\Analytics\Data\V1beta\DimensionValue;
+use Google\Analytics\Data\V1beta\DimensionHeader;
+use Google\Analytics\Data\V1beta\FilterExpression;
+use Google\Analytics\Data\V1beta\RunReportResponse;
+use Google\Analytics\Data\V1beta\DimensionExpression;
 
 class CAnalytics_Google_AnalyticGA4_ReportRunner {
-    private $dateRanges = [];
+    /**
+     * @var \Google\Analytics\Data\V1beta\DateRange
+     */
+    private $dateRanges;
 
     private $metrics = [];
 
     private $dimensions = [];
 
+    private $offset = 0;
+
+    private $limit = null;
+
+    /**
+     * @var \Google\Analytics\Data\V1beta\RunReportResponse
+     */
     private $report;
 
-    public function __construct() {
+    /**
+     * @var CAnalytics_Google_AnalyticGA4_FilterBuilder
+     */
+    private $dimensionFilter;
+
+    private $metricFilter;
+
+    /**
+     * @var CAnalytics_Google_ClientGA4
+     */
+    private $client;
+
+    /**
+     * @var string
+     */
+    private $propertyId;
+
+    public function __construct(CAnalytics_Google_ClientGA4 $client, $propertyId) {
+        $this->client = $client;
+        $this->propertyId = $propertyId;
     }
 
+    public function dimensionFilter() {
+        if ($this->dimensionFilter == null) {
+            $this->dimensionFilter = new CAnalytics_Google_AnalyticGA4_FilterBuilder();
+        }
+
+        return $this->dimensionFilter;
+    }
+
+    public function withFilterDimension($callback) {
+        return c::tap($this->dimensionFilter(), $callback);
+    }
+
+    /**
+     * @param CPeriod $period
+     *
+     * @return $this
+     */
+    public function setPeriod(CPeriod $period) {
+        return $this->setDateRanges($period->startDate, $period->endDate);
+    }
+
+    /**
+     * @param DateTimeInterface $startDate
+     * @param DateTimeInterface $endDate
+     *
+     * @return $this
+     */
     public function setDateRanges(DateTimeInterface $startDate, DateTimeInterface $endDate) {
         $this->dateRanges = new DateRange(
             [
@@ -26,6 +90,11 @@ class CAnalytics_Google_AnalyticGA4_ReportRunner {
         return $this;
     }
 
+    /**
+     * @param array $metrics
+     *
+     * @return $this
+     */
     public function setMetrics(array $metrics = []) {
         $this->metrics = [];
 
@@ -40,6 +109,11 @@ class CAnalytics_Google_AnalyticGA4_ReportRunner {
         return $this;
     }
 
+    /**
+     * @param array $dimensions
+     *
+     * @return $this
+     */
     public function setDimensions(array $dimensions = []) {
         $this->dimensions = [];
 
@@ -55,15 +129,56 @@ class CAnalytics_Google_AnalyticGA4_ReportRunner {
     }
 
     /**
-     * Call the query method on the authenticated client.
+     * @param int $offset
+     *
+     * @return $this
      */
-    public function runReport() {
-        $this->report = $this->client->runReport(
-            $this->propertyId,
-            $this->dateRanges,
-            $this->metrics,
-            $this->dimensions,
-        );
+    public function setOffset($offset) {
+        $this->offset = $offset;
+
+        return $this;
+    }
+
+    /**
+     * @param int $limit
+     *
+     * @return $this
+     */
+    public function setLimit($limit) {
+        $this->limit = $limit;
+
+        return $this;
+    }
+
+    /**
+     * Call the query method on the authenticated client.
+     *
+     * @param mixed $realtime
+     *
+     * @return $this
+     */
+    public function runReport($realtime = false) {
+        $data = [];
+        $data['property'] = 'properties/' . $this->propertyId;
+        $data['offset'] = $this->offset;
+        if ($this->limit) {
+            $data['limit'] = $this->limit;
+        }
+        if ($this->dateRanges) {
+            $data['dateRanges'] = [$this->dateRanges];
+        }
+        if ($this->dimensions) {
+            $data['dimensions'] = $this->dimensions;
+        }
+        if ($this->dimensions) {
+            $data['metrics'] = $this->metrics;
+        }
+
+        if ($this->dimensionFilter) {
+            $data['dimensionFilter'] = $this->dimensionFilter->toGA4Object();
+        }
+
+        $this->report = $this->client->runReport($data, $realtime);
 
         return $this;
     }
@@ -76,6 +191,39 @@ class CAnalytics_Google_AnalyticGA4_ReportRunner {
     }
 
     public function toArray() {
+        $dimensionHeaders = $this->report->getDimensionHeaders();
+        $metricHeaders = $this->report->getMetricHeaders();
+        $data = c::collect($this->report->getRows() ?: [])->map(function (Row $row) use ($dimensionHeaders, $metricHeaders) {
+            return [
+                'dimensions' => c::collect($row->getDimensionValues() ?: [])->mapWithKeys(function (DimensionValue $dimensionValue, $index) use ($dimensionHeaders) {
+                    /** @var DimensionHeader $dimensionHeader */
+                    $dimensionHeader = $dimensionHeaders[$index];
+
+                    return [$dimensionHeader->getName() => [
+                        'name' => $dimensionHeader->getName(),
+                        'value' => $dimensionValue->getValue(),
+                    ]];
+                })->toArray(),
+                'metrics' => c::collect($row->getMetricValues() ?: [])->mapWithKeys(function (MetricValue $metricValue, $index) use ($metricHeaders) {
+                    /** @var MetricHeader $metricHeader */
+                    $metricHeader = $metricHeaders[$index];
+                    $typeEnum = $metricHeader->getType();
+                    $type = \Google\Analytics\Data\V1beta\MetricType::name($typeEnum);
+
+                    return [$metricHeader->getName() => [
+                        'name' => $metricHeader->getName(),
+                        'type' => $type,
+                        'typeEnum' => $typeEnum,
+                        'value' => $metricValue->getValue(),
+                    ]];
+                })->toArray()
+            ];
+        })->toArray();
+
+        return $data;
+    }
+
+    public function toArray2() {
         $data = [];
 
         foreach ($this->report->getRows() as $row) {
@@ -102,5 +250,9 @@ class CAnalytics_Google_AnalyticGA4_ReportRunner {
         }
 
         return $data;
+    }
+
+    public function toCollection() {
+        return c::collect($this->toArray());
     }
 }

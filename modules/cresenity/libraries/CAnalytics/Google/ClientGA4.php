@@ -40,14 +40,12 @@ class CAnalytics_Google_ClientGA4 {
     /**
      * Query the Google Analytics Service with given parameters.
      *
-     * @param mixed $propertyId
-     * @param mixed $dateRanges
-     * @param mixed $metrics
-     * @param mixed $dimensions
+     * @param array $reportData
+     * @param mixed $realtime
      *
      * @return null|array|\Google\Analytics\Data\V1beta\RunReportResponse
      */
-    public function runReport($propertyId, $dateRanges, $metrics, $dimensions) {
+    public function runReport($reportData, $realtime = false) {
         $cacheName = $this->determineCacheName(func_get_args());
 
         if ($this->cacheLifeTimeInMinutes === 0) {
@@ -57,15 +55,8 @@ class CAnalytics_Google_ClientGA4 {
         return $this->cache->remember(
             $cacheName,
             $this->cacheLifeTimeInMinutes,
-            function () use ($propertyId, $dateRanges, $metrics, $dimensions) {
-                return $this->service->runReport(
-                    [
-                        'property' => 'properties/' . $propertyId,
-                        'dateRanges' => [$dateRanges],
-                        'dimensions' => $dimensions,
-                        'metrics' => $metrics,
-                    ]
-                );
+            function () use ($reportData, $realtime) {
+                return $realtime ? $this->service->runRealtimeReport($reportData) : $this->service->runReport($reportData);
             }
         );
     }
