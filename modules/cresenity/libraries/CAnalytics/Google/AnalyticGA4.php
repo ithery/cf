@@ -148,6 +148,41 @@ class CAnalytics_Google_AnalyticGA4 {
         return c::collect($this->toArray());
     }
 
+    public function getMetadata() {
+        $googleMetadata = $this->client->getAnalyticsService()->getMetadata(
+            'properties/' . ENGoogle::propertyId() . '/metadata',
+        );
+        $result = [];
+        $result['dimensions'] = c::collect($googleMetadata->getDimensions())->mapWithKeys(function ($dimension) {
+            /** @var \Google\Analytics\Data\V1beta\DimensionMetadata $dimension */
+
+            return [$dimension->getApiName() => [
+                'apiName' => $dimension->getApiName(),
+                'uiName' => $dimension->getUiName(),
+                'category' => $dimension->getCategory(),
+                'description' => $dimension->getDescription(),
+                'isCustomDefinition' => $dimension->getCustomDefinition(),
+            ]];
+        })->toArray();
+        $result['metrics'] = c::collect($googleMetadata->getMetrics())->mapWithKeys(function ($metric) {
+            /** @var \Google\Analytics\Data\V1beta\MetricMetadata $metric */
+            $type = $metric->getType();
+            $typeName = \Google\Analytics\Data\V1beta\MetricType::name($type);
+
+            return [$metric->getApiName() => [
+                'apiName' => $metric->getApiName(),
+                'uiName' => $metric->getUiName(),
+                'category' => $metric->getCategory(),
+                'description' => $metric->getDescription(),
+                'isCustomDefinition' => $metric->getCustomDefinition(),
+                'type' => $type,
+                'typeName' => $typeName,
+            ]];
+        })->toArray();
+
+        return $result;
+    }
+
     /**
      * Undocumented function.
      *
