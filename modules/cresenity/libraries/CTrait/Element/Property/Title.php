@@ -21,7 +21,7 @@ trait CTrait_Element_Property_Title {
      */
     public function setTitle($title, $lang = true) {
         $this->rawTitle = $title;
-        if ($lang) {
+        if ($lang !== false) {
             $title = c::__($title, is_array($lang) ? $lang : []);
         }
         $this->title = $title;
@@ -45,13 +45,13 @@ trait CTrait_Element_Property_Title {
      * Call getTitle if parameter title is not passed
      * Call setTitle if parameter title is passed.
      *
-     * @param string $title
-     * @param bool   $lang
+     * @param string     $title
+     * @param bool|array $lang
      *
      * @return mixed
      */
     public function title($title = null, $lang = true) {
-        if ($title != null) {
+        if ($title !== null) {
             return $this->setTitle($title, $lang);
         }
 
