@@ -16,4 +16,8 @@ class CAnalytics_Google_Exception_InvalidConfigurationException extends Exceptio
     public static function credentialsJsonDoesNotExist($path) {
         return new static("Could not find a credentials file at `{$path}`.");
     }
+
+    public static function propertyIdNotSpecified() {
+        return new static('There was no property ID specified. You must provide a valid property ID to execute queries on Google Analytics.');
+    }
 }
