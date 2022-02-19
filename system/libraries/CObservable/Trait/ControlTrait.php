@@ -9,7 +9,7 @@ trait CObservable_Trait_ControlTrait {
     /**
      * Create SelectSearch Control.
      *
-     * @param string $id
+     * @param null|string $id
      *
      * @return CElement_FormInput_SelectSearch
      */
@@ -23,7 +23,7 @@ trait CObservable_Trait_ControlTrait {
     /**
      * Create Text Control.
      *
-     * @param string $id
+     * @param null|string $id
      *
      * @return CElement_FormInput_Text
      */
@@ -35,9 +35,23 @@ trait CObservable_Trait_ControlTrait {
     }
 
     /**
+     * Create Hidden Control.
+     *
+     * @param null|string $id
+     *
+     * @return CElement_FormInput_Hidden
+     */
+    public function addHiddenControl($id = null) {
+        $control = new CElement_FormInput_Hidden($id);
+        $this->wrapper->add($control);
+
+        return $control;
+    }
+
+    /**
      * Create Text Control.
      *
-     * @param string $id
+     * @param null|string $id
      *
      * @return CElement_FormInput_Password
      */
@@ -51,7 +65,7 @@ trait CObservable_Trait_ControlTrait {
     /**
      * Create Select Control.
      *
-     * @param string $id
+     * @param null|string $id
      *
      * @return CElement_FormInput_Select
      */
@@ -65,7 +79,7 @@ trait CObservable_Trait_ControlTrait {
     /**
      * Create Select Control.
      *
-     * @param string $id
+     * @param null|string $id
      *
      * @return CElement_FormInput_AutoNumeric
      */
@@ -79,7 +93,7 @@ trait CObservable_Trait_ControlTrait {
     /**
      * Create Date Range Drop Down Control.
      *
-     * @param string $id
+     * @param null|string $id
      *
      * @return CElement_FormInput_DateRange_DropdownButton
      */
@@ -93,7 +107,7 @@ trait CObservable_Trait_ControlTrait {
     /**
      * Create Date Range Drop Down Control.
      *
-     * @param string $id
+     * @param null|string $id
      *
      * @return CElement_FormInput_Label
      */
