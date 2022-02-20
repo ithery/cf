@@ -358,18 +358,18 @@ trait CElement_Component_DataTable_Trait_HtmlTrait {
                 $addition_column++;
             }
 
-            foreach ($this->footerField as $f) {
+            foreach ($this->getFooterFields() as $footerField) {
                 $html->incIndent()->appendln('<tr>')->br();
 
-                $colspan = $f['labelcolspan'];
+                $colspan = $footerField->getLabelColSpan();
                 if ($colspan == 0) {
                     $colspan = $total_column + $addition_column - 1;
                 }
                 $html->incIndent()->appendln('<td colspan="' . ($colspan) . '">')->br();
-                $html->appendln($f['label'])->br();
+                $html->appendln($footerField->getLabel())->br();
                 $html->decIndent()->appendln('</td>')->br();
                 $class = '';
-                switch ($f['align']) {
+                switch ($footerField->getAlign()) {
                     case 'left':
                         $class .= ' align-left';
 
@@ -384,7 +384,7 @@ trait CElement_Component_DataTable_Trait_HtmlTrait {
                         break;
                 }
 
-                $fval = $f['value'];
+                $fval = $footerField->getValue();
                 if ($fval instanceof CRenderable) {
                     $html->incIndent()->appendln('<td class="' . $class . '">')->br();
                     list($html, $js) = $this->getHtmlJsCell($fval);

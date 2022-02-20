@@ -9,6 +9,18 @@ defined('SYSPATH') or die('No direct access allowed.');
  * @since Dec 25, 2017, 10:08:50 PM
  */
 trait CModel_Trait_Relationships {
+    use CModel_Trait_Relationships_ConcatenatesRelationships;
+
+    /**
+     * The many to many relationship methods.
+     *
+     * @var array
+     */
+    public static $manyMethods = [
+        'belongsToMany', 'morphToMany', 'morphedByMany',
+        'guessBelongsToManyRelation', 'findFirstMethodThatIsntRelation',
+    ];
+
     /**
      * The loaded relationships for the model.
      *
@@ -22,16 +34,6 @@ trait CModel_Trait_Relationships {
      * @var array
      */
     protected $touches = [];
-
-    /**
-     * The many to many relationship methods.
-     *
-     * @var array
-     */
-    public static $manyMethods = [
-        'belongsToMany', 'morphToMany', 'morphedByMany',
-        'guessBelongsToManyRelation', 'findFirstMethodThatIsntRelation',
-    ];
 
     /**
      * Define a one-to-one relationship.
@@ -239,15 +241,15 @@ trait CModel_Trait_Relationships {
      *
      * @param string      $related
      * @param string      $through
-     * @param string|null $firstKey
-     * @param string|null $secondKey
-     * @param string|null $localKey
-     * @param string|null $secondLocalKey
+     * @param null|string $firstKey
+     * @param null|string $secondKey
+     * @param null|string $localKey
+     * @param null|string $secondLocalKey
      *
      * @return CModel_Relation_HasManyThrough
      */
     public function hasManyThrough($related, $through, $firstKey = null, $secondKey = null, $localKey = null, $secondLocalKey = null) {
-        $through = new $through;
+        $through = new $through();
 
         $firstKey = $firstKey ?: $this->getForeignKey();
 
@@ -520,7 +522,7 @@ trait CModel_Trait_Relationships {
      * @return mixed
      */
     protected function newRelatedInstance($class) {
-        return c::tap(new $class, function ($instance) {
+        return c::tap(new $class(), function ($instance) {
             //do nothing
         });
     }
@@ -610,7 +612,7 @@ trait CModel_Trait_Relationships {
      *
      * @param string       $related
      * @param array|string $through
-     * @param string|null  $localKey
+     * @param null|string  $localKey
      * @param string       $prefix
      * @param array        $foreignKeyLookup
      *
@@ -640,7 +642,7 @@ trait CModel_Trait_Relationships {
         }
 
         foreach ($foreignKeyLookup as $model => $foreignKey) {
-            $instance = new $model;
+            $instance = new $model();
 
             if ($foreignKey) {
                 $foreignKeys[$instance->getTable()] = $foreignKey;
@@ -661,7 +663,7 @@ trait CModel_Trait_Relationships {
         $segments = preg_split('/\s+as\s+/i', $model);
 
         /** @var \CModel $instance */
-        $instance = new $segments[0];
+        $instance = new $segments[0]();
 
         if (isset($segments[1])) {
             $instance->setTable($instance->getTable() . ' as ' . $segments[1]);
@@ -916,5 +918,185 @@ trait CModel_Trait_Relationships {
             $relatedKey,
             true
         );
+    }
+
+    /**
+     * Define a has-many-deep relationship.
+     *
+     * @param string $related
+     * @param array  $through
+     * @param array  $foreignKeys
+     * @param array  $localKeys
+     *
+     * @return \CModel_Relation_HasManyDeep
+     */
+    public function hasManyDeep($related, array $through, array $foreignKeys = [], array $localKeys = []) {
+        return $this->newHasManyDeep(...$this->hasOneOrManyDeep($related, $through, $foreignKeys, $localKeys));
+    }
+
+    /**
+     * Define a has-many-deep relationship from existing relationships.
+     *
+     * @param \CModel_Relation ...$relations
+     *
+     * @return \CModel_Relation_HasManyDeep
+     */
+    public function hasManyDeepFromRelations(...$relations) {
+        return $this->hasManyDeep(...$this->hasOneOrManyDeepFromRelations($relations));
+    }
+
+    /**
+     * Define a has-one-deep relationship.
+     *
+     * @param string $related
+     * @param array  $through
+     * @param array  $foreignKeys
+     * @param array  $localKeys
+     *
+     * @return \CModel_Relation_HasOneDeep
+     */
+    public function hasOneDeep($related, array $through, array $foreignKeys = [], array $localKeys = []) {
+        return $this->newHasOneDeep(...$this->hasOneOrManyDeep($related, $through, $foreignKeys, $localKeys));
+    }
+
+    /**
+     * Define a has-one-deep relationship from existing relationships.
+     *
+     * @param \CModel_Relation ...$relations
+     *
+     * @return \CModel_Relation_HasOneDeep
+     */
+    public function hasOneDeepFromRelations(...$relations) {
+        return $this->hasOneDeep(...$this->hasOneOrManyDeepFromRelations($relations));
+    }
+
+    /**
+     * Prepare a has-one-deep or has-many-deep relationship.
+     *
+     * @param string $related
+     * @param array  $through
+     * @param array  $foreignKeys
+     * @param array  $localKeys
+     *
+     * @return array
+     */
+    protected function hasOneOrManyDeep($related, array $through, array $foreignKeys, array $localKeys) {
+        $relatedSegments = preg_split('/\s+from\s+/i', $related);
+
+        /** @var \CModel $relatedInstance */
+        $relatedInstance = $this->newRelatedInstance($relatedSegments[0]);
+
+        if (isset($relatedSegments[1])) {
+            $relatedInstance->setTable($relatedSegments[1]);
+        }
+
+        $throughParents = $this->hasOneOrManyDeepThroughParents($through);
+
+        $foreignKeys = $this->hasOneOrManyDeepForeignKeys($relatedInstance, $throughParents, $foreignKeys);
+
+        $localKeys = $this->hasOneOrManyDeepLocalKeys($relatedInstance, $throughParents, $localKeys);
+
+        return [$relatedInstance->newQuery(), $this, $throughParents, $foreignKeys, $localKeys];
+    }
+
+    /**
+     * Prepare the through parents for a has-one-deep or has-many-deep relationship.
+     *
+     * @param array $through
+     *
+     * @return array
+     */
+    protected function hasOneOrManyDeepThroughParents(array $through) {
+        return array_map(function ($class) {
+            $segments = preg_split('/\s+as\s+/i', $class);
+
+            $instance = cstr::contains($segments[0], '\\')
+                ? new $segments[0]()
+                : (new CModel_Relation_Pivot())->setTable($segments[0]);
+
+            if (isset($segments[1])) {
+                $instance->setTable($instance->getTable() . ' as ' . $segments[1]);
+            }
+
+            return $instance;
+        }, $through);
+    }
+
+    /**
+     * Prepare the foreign keys for a has-one-deep or has-many-deep relationship.
+     *
+     * @param \CModel   $related
+     * @param \CModel[] $throughParents
+     * @param array     $foreignKeys
+     *
+     * @return array
+     */
+    protected function hasOneOrManyDeepForeignKeys(CModel $related, array $throughParents, array $foreignKeys) {
+        foreach (array_merge([$this], $throughParents) as $i => $instance) {
+            /** @var \CModel $instance */
+            if (!isset($foreignKeys[$i])) {
+                if ($instance instanceof CModel_Relation_Pivot) {
+                    $foreignKeys[$i] = ($throughParents[$i] ?? $related)->getKeyName();
+                } else {
+                    $foreignKeys[$i] = $instance->getForeignKey();
+                }
+            }
+        }
+
+        return $foreignKeys;
+    }
+
+    /**
+     * Prepare the local keys for a has-one-deep or has-many-deep relationship.
+     *
+     * @param \CModel   $related
+     * @param \CModel[] $throughParents
+     * @param array     $localKeys
+     *
+     * @return array
+     */
+    protected function hasOneOrManyDeepLocalKeys(CModel $related, array $throughParents, array $localKeys) {
+        foreach (array_merge([$this], $throughParents) as $i => $instance) {
+            /** @var \CModel $instance */
+            if (!isset($localKeys[$i])) {
+                if ($instance instanceof CModel_Relation_Pivot) {
+                    $localKeys[$i] = ($throughParents[$i] ?? $related)->getForeignKey();
+                } else {
+                    $localKeys[$i] = $instance->getKeyName();
+                }
+            }
+        }
+
+        return $localKeys;
+    }
+
+    /**
+     * Instantiate a new HasManyDeep relationship.
+     *
+     * @param \CModel_Query $query
+     * @param \CModel       $farParent
+     * @param \CModel[]     $throughParents
+     * @param array         $foreignKeys
+     * @param array         $localKeys
+     *
+     * @return \CModel_Relation_HasManyDeep
+     */
+    protected function newHasManyDeep(CModel_Query $query, CModel $farParent, array $throughParents, array $foreignKeys, array $localKeys) {
+        return new CModel_Relation_HasManyDeep($query, $farParent, $throughParents, $foreignKeys, $localKeys);
+    }
+
+    /**
+     * Instantiate a new HasOneDeep relationship.
+     *
+     * @param \CModel_Query $query
+     * @param \CModel       $farParent
+     * @param \CModel[]     $throughParents
+     * @param array         $foreignKeys
+     * @param array         $localKeys
+     *
+     * @return \CModel_Relation_HasOneDeep
+     */
+    protected function newHasOneDeep(CModel_Query $query, CModel $farParent, array $throughParents, array $foreignKeys, array $localKeys) {
+        return new CModel_Relation_HasOneDeep($query, $farParent, $throughParents, $foreignKeys, $localKeys);
     }
 }

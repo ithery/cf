@@ -1,11 +1,13 @@
 <?php
-
+/**
+ * @see CElement_Component_DataTable
+ */
 trait CElement_Component_DataTable_Trait_FooterTrait {
     public $footerTitle;
 
     public $footer;
 
-    public $footerField;
+    public $footerFields;
 
     /**
      * @param string $title
@@ -29,15 +31,20 @@ trait CElement_Component_DataTable_Trait_FooterTrait {
         return $this;
     }
 
-    public function addFooterField($label, $value, $align = 'left', $labelcolspan = 0) {
-        $f = [
-            'label' => $label,
-            'value' => $value,
-            'align' => $align,
-            'labelcolspan' => $labelcolspan,
-        ];
-        $this->footerField[] = $f;
+    public function addFooterField($label = null, $value = null, $align = 'left', $labelColSpan = 0) {
+        $footerField = new CElement_Component_DataTable_FooterField();
+
+        $footerField->setLabel($label)->setValue($value)->setAlign($align)->setLabelColSpan($labelColSpan);
+
+        $this->footerFields[] = $footerField;
 
         return $this;
+    }
+
+    /**
+     * @return CElement_Component_DataTable_FooterField[]
+     */
+    public function getFooterFields() {
+        return  $this->footerFields;
     }
 }

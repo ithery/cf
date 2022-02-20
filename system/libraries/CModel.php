@@ -26,6 +26,7 @@ defined('SYSPATH') or die('No direct access allowed.');
  * @method array                                      eagerLoadRelations(array $models)                                                                            Eager load the relationships for the models.
  * @method array                                      loadRelation(array $models, $name, Closure $constraints)                                                     Eagerly load the relationship on a set of models.
  * @method static                                     CModel_Query|static where($column, $operator = null, $value = null, $boolean = 'and')                        Add a basic where clause to the query.
+ * @method static                                     CModel_Query|static whereHas($relation, Closure $callback = null, $operator = '>=', $count = 1)              Add a relationship count / exists condition to the query with where clauses.
  * @method static                                     CModel_Query|static orWhere($column, $operator = null, $value = null)                                        Add an "or where" clause to the query.
  * @method static                                     CModel_Query|static has($relation, $operator = '>=', $count = 1, $boolean = 'and', Closure $callback = null) Add a relationship count condition to the query.
  * @method static                                     CModel_Query|static whereRaw($sql, array $bindings = [])
@@ -67,6 +68,9 @@ defined('SYSPATH') or die('No direct access allowed.');
  * @method static                                     CModel_Query|static offset($value)
  * @method static                                     CModel_Query|static take($value)
  * @method static                                     CModel_Query|static limit($value)
+ * @method static                                     CModel_Query|static lockForUpdate()                                                                          Lock the selected rows in the table for updating.
+ *
+ * @see CModel_Query
  */
 abstract class CModel implements ArrayAccess, CInterface_Arrayable, CInterface_Jsonable, CQueue_QueueableEntityInterface {
     use CModel_Trait_GuardsAttributes,
@@ -77,7 +81,6 @@ abstract class CModel implements ArrayAccess, CInterface_Arrayable, CInterface_J
         CModel_Trait_HidesAttributes,
         CModel_Trait_Timestamps,
         CTrait_ForwardsCalls;
-
     /**
      * The name of the "created" column.
      *

@@ -11,8 +11,19 @@ class CConsole {
 
     const EXCEPTION_EXIT = 2;
 
+    /**
+     * CConsole Kernel.
+     *
+     * @var CConsole_Kernel
+     */
+    protected static $kernel;
+
     public static function domain() {
         return CF::cliDomain();
+    }
+
+    public static function appCode() {
+        return CF::cliAppCode();
     }
 
     public static function prefix() {
@@ -60,5 +71,18 @@ class CConsole {
             $console->error('Please set your prefix in config app.php');
             exit(static::FAILURE_EXIT);
         }
+    }
+
+    /**
+     * @return CConsole_Kernel
+     */
+    public static function kernel() {
+        if (static::$kernel == null) {
+            static::$kernel = new CConsole_Kernel();
+            $commands = array_merge(CFConsole::$defaultCommands, CFConsole::$commands);
+            static::$kernel->cfCli()->resolveCommands($commands);
+        }
+
+        return static::$kernel;
     }
 }

@@ -11,6 +11,8 @@ final class CF {
 
     const CFCLI_CURRENT_DOMAIN_FILE = DOCROOT . 'data' . DS . 'current-domain';
 
+    const CFCLI_CURRENT_APPCODE_FILE = DOCROOT . 'data' . DS . 'current-app';
+
     // Security check that is added to all generated PHP files
     const FILE_SECURITY = '<?php defined(\'SYSPATH\') OR die(\'No direct script access.\');';
 
@@ -71,6 +73,13 @@ final class CF {
      * @var array
      */
     private static $sharedAppCode = [];
+
+    /**
+     * CF Session.
+     *
+     * @var CSession_Store
+     */
+    private static $session;
 
     /**
      * Check CF is running on production.
@@ -188,7 +197,6 @@ final class CF {
         static::loadBootstrapFiles();
         // Setup is complete, prevent it from being run again
         $run = true;
-
         // Stop the environment setup routine
     }
 
@@ -221,6 +229,7 @@ final class CF {
         //try to locate bootstrap files for application
         CFBenchmark::start(SYSTEM_BENCHMARK . '_environment_application_bootstrap');
         $bootstrapPath = DOCROOT . 'application' . DS . CF::appCode() . DS;
+
         if (file_exists($bootstrapPath . 'bootstrap' . EXT)) {
             include $bootstrapPath . 'bootstrap' . EXT;
         }
@@ -442,6 +451,13 @@ final class CF {
         if ($domain == null) {
             $domain = CF::domain($domain);
         }
+        $isDiffAppCode = false;
+        if (CF::appCode() != CF::appCode($domain)) {
+            $isDiffAppCode = true;
+        }
+        if (CF::isTesting() || $isDiffAppCode) {
+            $forceReload = true;
+        }
 
         $cacheKey = 'paths.' . $domain . '.' . ($withShared ? 'withShared' : 'withoutShared');
         $paths = null;
@@ -452,7 +468,7 @@ final class CF {
             //we try to search all paths for this domain
             $paths = [];
             $orgCode = CF::orgCode($domain);
-            $appCode = CF::appCode($domain);
+            $appCode = $isDiffAppCode ? CF::appCode() : CF::appCode($domain);
 
             $modules = CF::modules($domain);
             //when this domain is org
@@ -742,6 +758,20 @@ final class CF {
         return $domain;
     }
 
+    /**
+     * To get cliAppCode.
+     *
+     * @return string
+     */
+    public static function cliAppCode() {
+        $domain = null;
+        if (file_exists(static::CFCLI_CURRENT_APPCODE_FILE)) {
+            $domain = trim(file_get_contents(static::CFCLI_CURRENT_APPCODE_FILE));
+        }
+
+        return $domain;
+    }
+
     public static function domain() {
         $domain = '';
         if (static::isCli() || static::isCFCli()) {
@@ -810,7 +840,6 @@ final class CF {
             if ($directory === 'config' or $directory === 'i18n') {
                 // Search in reverse, for merging
                 $paths = array_reverse($paths);
-
                 foreach ($paths as $path) {
                     if (static::isFile($path . $search)) {
                         // A matching file has been found
@@ -822,7 +851,6 @@ final class CF {
                     if (static::isFile($path . $search)) {
                         // A matching file has been found
                         $found = $path . $search;
-
                         // Stop searching
                         break;
                     }
@@ -901,6 +929,11 @@ final class CF {
      * @return string
      */
     public static function appCode($domain = null) {
+        if (CF::isCFCli() || CF::isTesting()) {
+            if (CF::cliAppCode()) {
+                return CF::cliAppCode();
+            }
+        }
         $data = self::data($domain);
 
         return isset($data['app_code']) ? $data['app_code'] : null;
@@ -1131,6 +1164,17 @@ final class CF {
     }
 
     /**
+     * Check appCode is exits on directory.
+     *
+     * @param mixed $appCode
+     *
+     * @return bool
+     */
+    public static function appCodeExists($appCode) {
+        return in_array($appCode, static::getAvailableAppCode());
+    }
+
+    /**
      * Get CF internal cache.
      *
      * @param string     $key
@@ -1204,5 +1248,20 @@ final class CF {
                 static::$data[$domain]['app_code'] = $originalAppCode;
             }
         }
+    }
+
+    public static function session() {
+        if (static::$session == null && CSession::sessionConfigured()) {
+            $request = CHTTP::request();
+            CSession::manager()->applyNativeSession();
+
+            static::$session = c::tap(CSession::manager()->createStore(), function ($session) use ($request) {
+                $session->setId($request->cookies->get($session->getName()));
+                $session->setRequestOnHandler($request);
+                $session->start();
+            });
+        }
+
+        return static::$session;
     }
 }

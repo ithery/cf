@@ -1,9 +1,12 @@
 <?php
 class CAjax_Engine_DataTableExporter extends CAjax_Engine {
-    public function createProcessor($type) {
-        $class = 'CAjax_Engine_DataTable_ExporterProcessor_' . $type;
-
-        return new $class($this);
+    /**
+     * @param string $processorClass
+     *
+     * @return CAjax_Engine_DataTable_Processor
+     */
+    public function createProcessor($processorClass) {
+        return new $processorClass($this);
     }
 
     public function execute() {
@@ -12,14 +15,9 @@ class CAjax_Engine_DataTableExporter extends CAjax_Engine {
         $isElastic = carr::get($data, 'isElastic');
         $isCallback = carr::get($data, 'isCallback');
 
-        $processorType = 'Query';
-        if ($isElastic) {
-            $processorType = 'Elastic';
-        }
-        if ($isCallback) {
-            $processorType = 'Callback';
-        }
-        $processor = $this->createProcessor($processorType, $data);
+        $processorClass = CAjax_Engine_DataTable_ExporterProcessor_Query::class;
+
+        $processor = $this->createProcessor($processorClass);
         $response = $processor->process();
 
         return $response;

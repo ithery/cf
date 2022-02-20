@@ -1,22 +1,27 @@
 <?php
-declare(strict_types = 1);
+declare(strict_types=1);
 
 namespace Embed\Adapters\Ideone\Detectors;
 
-use Embed\Detectors\Code as Detector;
 use Embed\EmbedCode;
 use function Embed\html;
+use Embed\Detectors\Code as Detector;
 
-class Code extends Detector
-{
-    public function detect(): ?EmbedCode
-    {
+class Code extends Detector {
+    /**
+     * Undocumented function.
+     *
+     * @return null|EmbedCode
+     */
+    public function detect() {
         return parent::detect()
             ?: $this->fallback();
     }
 
-    private function fallback(): ?EmbedCode
-    {
+    /**
+     * @return null|EmbedCode
+     */
+    private function fallback() {
         $uri = $this->extractor->getUri();
         $id = explode('/', $uri->getPath())[1];
 

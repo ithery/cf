@@ -2,6 +2,7 @@
 
 class CAuth_Manager {
     use CAuth_Concern_CreateUserProvider;
+
     /**
      * The registered custom driver creators.
      *
@@ -24,6 +25,8 @@ class CAuth_Manager {
      * @var \Closure
      */
     protected $userResolver;
+
+    protected $defaultGuard;
 
     private static $instance;
 
@@ -49,6 +52,7 @@ class CAuth_Manager {
         $this->userResolver = function ($guard = null) {
             return $this->guard($guard)->user();
         };
+        $this->defaultGuard = CF::config('auth.defaults.guard');
     }
 
     /**
@@ -229,7 +233,7 @@ class CAuth_Manager {
      * @return void
      */
     public function setDefaultDriver($name) {
-        $this->app['config']['auth.defaults.guard'] = $name;
+        $this->defaultGuard = $name;
     }
 
     /**

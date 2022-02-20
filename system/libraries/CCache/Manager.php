@@ -1,7 +1,7 @@
 <?php
 use Aws\DynamoDb\DynamoDbClient;
 
-class CCache_Manager implements CCache_Contract_Factory {
+class CCache_Manager implements CCache_Contract_FactoryInterface {
     /**
      * The array of resolved cache stores.
      *
@@ -155,9 +155,9 @@ class CCache_Manager implements CCache_Contract_Factory {
 
         $memcached = $this->app['memcached.connector']->connect(
             $config['servers'],
-            $config['persistent_id'] ?? null,
-            $config['options'] ?? [],
-            array_filter($config['sasl'] ?? [])
+            isset($config['persistent_id']) ? $config['persistent_id'] : null,
+            isset($config['options']) ? $config['options'] : [],
+            array_filter(isset($config['sasl']) ? $config['sasl'] : [])
         );
 
         return $this->repository(new CCache_Driver_MemcachedDriver($memcached, $prefix));
@@ -180,9 +180,9 @@ class CCache_Manager implements CCache_Contract_Factory {
      * @return \CCache_Repository
      */
     protected function createRedisDriver(array $config) {
-        $redis = $this->app['redis'];
+        $redis = CRedis::instance();
 
-        $connection = $config['connection'] ?? 'default';
+        $connection = isset($config['connection']) ? $config['connection'] : 'default';
 
         $store = new CCache_Driver_RedisDriver($redis, $this->getPrefix($config), $connection);
 
@@ -199,18 +199,18 @@ class CCache_Manager implements CCache_Contract_Factory {
      * @return \CCache_Repository
      */
     protected function createDatabaseDriver(array $config) {
-        $connection = $this->app['db']->connection($config['connection'] ?? null);
+        $connection = c::db(isset($config['connection']) ? $config['connection'] : null);
 
         $store = new CCache_Driver_DatabaseDriver(
             $connection,
             $config['table'],
             $this->getPrefix($config),
-            $config['lock_table'] ?? 'cache_locks',
-            $config['lock_lottery'] ?? [2, 100]
+            isset($config['lock_table']) ? $config['lock_table'] : 'cache_locks',
+            isset($config['lock_lottery']) ? $config['lock_lottery'] : [2, 100]
         );
 
         return $this->repository($store->setLockConnection(
-            $this->app['db']->connection($config['lock_connection'] ?? $config['connection'] ?? null)
+            c::db(isset($config['lock_connection']) ? $config['lock_connection'] : (isset($config['connection']) ? $config['connection'] : null))
         ));
     }
 
@@ -228,9 +228,9 @@ class CCache_Manager implements CCache_Contract_Factory {
             new CCache_Driver_DynamoDbDriver(
                 $client,
                 $config['table'],
-                $config['attributes']['key'] ?? 'key',
-                $config['attributes']['value'] ?? 'value',
-                $config['attributes']['expiration'] ?? 'expires_at',
+                isset($config['attributes']['key']) ? $config['attributes']['key'] : 'key',
+                isset($config['attributes']['value']) ? $config['attributes']['value'] : 'value',
+                isset($config['attributes']['expiration']) ? $config['attributes']['expiration'] : 'expires_at',
                 $this->getPrefix($config)
             )
         );
@@ -245,7 +245,7 @@ class CCache_Manager implements CCache_Contract_Factory {
         $dynamoConfig = [
             'region' => $config['region'],
             'version' => 'latest',
-            'endpoint' => $config['endpoint'] ?? null,
+            'endpoint' => isset($config['endpoint']) ? $config['endpoint'] : null,
         ];
 
         if (isset($config['key'], $config['secret'])) {

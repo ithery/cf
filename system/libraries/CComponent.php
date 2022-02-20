@@ -31,10 +31,14 @@ abstract class CComponent {
 
     protected $preRenderedView;
 
+    protected $forStack = [];
+
     public function __construct($id = null) {
         $this->id = $id ? $id : cstr::random(20);
 
         $this->ensureIdPropertyIsntOverridden();
+
+        CComponent_Manager::instance()->setBackButtonCache();
     }
 
     public function __invoke(CContainer_Container $container, CRouting_Route $route) {

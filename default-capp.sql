@@ -373,6 +373,29 @@ CREATE TABLE `log_activity` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 
+DROP TABLE IF EXISTS `log_sse`;
+CREATE TABLE `log_sse` (
+  `log_sse_id` bigint(20) unsigned NOT NULL AUTO_INCREMENT,
+  `org_id` bigint(20) unsigned DEFAULT NULL,
+  `ref_id` bigint(20) unsigned DEFAULT NULL,
+  `ref_type` varchar(255) DEFAULT NULL,
+  `message` longtext DEFAULT NULL,
+  `event` varchar(50) DEFAULT NULL,
+  `type` varchar(255) DEFAULT NULL,
+  `delivered` tinyint DEFAULT 0,
+  `client` varchar(255) DEFAULT NULL,
+  `created` datetime DEFAULT NULL,
+  `createdby` varchar(255) DEFAULT NULL,
+  `updated` datetime DEFAULT NULL,
+  `updatedby` varchar(255) DEFAULT NULL,
+  `deleted` datetime DEFAULT NULL,
+  `deletedby` varchar(255) DEFAULT NULL,
+  `status` int(11) NOT NULL DEFAULT '1',
+  PRIMARY KEY (`log_sse_id`),
+  UNIQUE KEY `log_sse_id` (`log_sse_id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+
 DROP TABLE IF EXISTS `log_login`;
 CREATE TABLE IF NOT EXISTS `log_login` (
   `log_login_id` bigint(20) unsigned NOT NULL AUTO_INCREMENT,

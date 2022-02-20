@@ -5,14 +5,14 @@
  *
  * @property CCollection|CModel_Metable_Meta[] $meta
  *
- * @method static CModel_Query whereHasMeta($key): void
- * @method static CModel_Query whereDoesntHaveMeta($key)
- * @method static CModel_Query whereHasMetaKeys(array $keys)
- * @method static CModel_Query whereMeta(string $key, $operator, $value = null)
- * @method static CModel_Query whereMetaNumeric(string $key, string $operator, $value)
- * @method static CModel_Query whereMetaIn(string $key, array $values)
- * @method static CModel_Query orderByMeta(string $key, string $direction = 'asc', $strict = false)
- * @method static CModel_Query orderByMetaNumeric(string $key, string $direction = 'asc', $strict = false)
+ * @method static CModel_Query|static whereHasMeta($key): void
+ * @method static CModel_Query|static whereDoesntHaveMeta($key)
+ * @method static CModel_Query|static whereHasMetaKeys(array $keys)
+ * @method static CModel_Query|static whereMeta(string $key, $operator, $value = null)
+ * @method static CModel_Query|static whereMetaNumeric(string $key, string $operator, $value)
+ * @method static CModel_Query|static whereMetaIn(string $key, array $values)
+ * @method static CModel_Query|static orderByMeta(string $key, string $direction = 'asc', $strict = false)
+ * @method static CModel_Query|static orderByMetaNumeric(string $key, string $direction = 'asc', $strict = false)
  */
 trait CModel_Metable_MetableTrait {
     /**
@@ -149,7 +149,7 @@ trait CModel_Metable_MetableTrait {
     }
 
     /**
-     * Check if the default meta array exists and the key is set
+     * Check if the default meta array exists and the key is set.
      *
      * @param string $key
      *
@@ -161,7 +161,7 @@ trait CModel_Metable_MetableTrait {
     }
 
     /**
-     * Get the default meta value by key
+     * Get the default meta value by key.
      *
      * @param string $key
      *
@@ -241,7 +241,7 @@ trait CModel_Metable_MetableTrait {
      *
      * @param string $key
      *
-     * @return CModel_Metable_Meta|null
+     * @return null|CModel_Metable_Meta
      */
     public function getMetaRecord($key) {
         return $this->getMetaCollection()->get($key);
@@ -259,7 +259,7 @@ trait CModel_Metable_MetableTrait {
      */
     public function scopeWhereHasMeta(CModel_Query $q, $key) {
         $q->whereHas('meta', function (CModel_Query $q) use ($key) {
-            $q->whereIn('key', (array)$key);
+            $q->whereIn('key', (array) $key);
         });
     }
 
@@ -275,7 +275,7 @@ trait CModel_Metable_MetableTrait {
      */
     public function scopeWhereDoesntHaveMeta(CModel_Query $q, $key) {
         $q->whereDoesntHave('meta', function (CModel_Query $q) use ($key) {
-            $q->whereIn('key', (array)$key);
+            $q->whereIn('key', (array) $key);
         });
     }
 
@@ -353,7 +353,7 @@ trait CModel_Metable_MetableTrait {
 
         $q->whereHas('meta', function (CModel_Query $q) use ($key, $operator, $value, $field) {
             $q->where('key', $key);
-            $q->whereRaw("cast({$field} as decimal) {$operator} ?", [(float)$value]);
+            $q->whereRaw("cast({$field} as decimal) {$operator} ?", [(float) $value]);
         });
     }
 
@@ -417,7 +417,7 @@ trait CModel_Metable_MetableTrait {
         $direction = strtolower($direction) == 'asc' ? 'asc' : 'desc';
         $field = $q->getQuery()->getGrammar()->wrap("{$table}.value");
 
-        $q->orderByRaw("cast({$field} as decimal) $direction");
+        $q->orderByRaw("cast({$field} as decimal) ${direction}");
     }
 
     /**
@@ -474,7 +474,7 @@ trait CModel_Metable_MetableTrait {
     }
 
     /**
-     * {@inheritdoc}
+     * @inheritdoc
      */
     public function setRelation($relation, $value) {
         if ($relation == 'meta') {

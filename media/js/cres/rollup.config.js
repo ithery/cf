@@ -35,7 +35,7 @@ export default {
         resolve(),
         commonjs({
             // These npm packages still use common-js modules. Ugh.
-            include: /node_modules\/(get-value|isobject|core-js|locutus|pusher-js)/
+            include: /node_modules\/(get-value|isobject|core-js|locutus|pusher-js|event-source-polyfill)/
         }),
         postcss({
             config: {

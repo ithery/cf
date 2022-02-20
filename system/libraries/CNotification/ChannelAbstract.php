@@ -12,13 +12,13 @@ abstract class CNotification_ChannelAbstract implements CNotification_ChannelInt
     public function send($className, array $options = []) {
         $notificationSenderJobClass = CF::config('notification.task_queue.notification_sender', CNotification_TaskQueue_NotificationSender::class);
 
+        $isQueued = carr::get($options, 'queued', CF::config('notification.queue.queued'));
         $options = [
             'channel' => static::$channelName,
             'className' => $className,
             'options' => $options,
         ];
 
-        $isQueued = CF::config('notification.queue.queued');
         if ($isQueued) {
             $taskQueue = call_user_func([$notificationSenderJobClass, 'dispatch'], $options);
             if ($customConnection = CF::config('notification.queue.connection')) {
@@ -30,6 +30,7 @@ abstract class CNotification_ChannelAbstract implements CNotification_ChannelInt
         } else {
             $taskQueue = call_user_func([$notificationSenderJobClass, 'dispatchNow'], $options);
         }
+
         return $taskQueue;
     }
 
@@ -39,6 +40,7 @@ abstract class CNotification_ChannelAbstract implements CNotification_ChannelInt
         $result = $message->execute();
 
         $messageResult = $this->handleResult($message, $result);
+
         return $messageResult;
     }
 
@@ -66,9 +68,29 @@ abstract class CNotification_ChannelAbstract implements CNotification_ChannelInt
                             'headers' => $vendorResponse->headers()
                         ];
                     }
-                    if (is_object($vendorResponse)) {
-                        $vendorResponse->headerResponse = $result->headers(true);
+
+                    if ($vendorResponse instanceof CVendor_Firebase_Messaging_MulticastSendReport) {
+                        $resultResponse = [];
+                        $resultResponse['success'] = [];
+                        $resultResponse['fail'] = [];
+                        foreach ($vendorResponse->successes()->getItems() as $report) {
+                            $resultResponse['success'][] = [
+                                'type' => $report->target()->type(),
+                                'value' => $report->target()->value(),
+                                'result' => $report->result(),
+                            ];
+                        }
+                        foreach ($vendorResponse->failures()->getItems() as $report) {
+                            $resultResponse['fail'][] = [
+                                'type' => $report->target()->type(),
+                                'value' => $report->target()->value(),
+                                'result' => $report->result(),
+                                'error' => $report->error() instanceof Exception ? $report->error()->getMessage() : $report->error(),
+                            ];
+                        }
+                        $vendorResponse = $resultResponse;
                     }
+
                     $vendorResponse = json_encode($vendorResponse);
                     $logNotificationModel->vendor_response = $vendorResponse;
 
@@ -125,6 +147,7 @@ abstract class CNotification_ChannelAbstract implements CNotification_ChannelInt
         $model->updated = CApp_Base::now();
         $model->status = 1;
         $model->save();
+
         return $model;
     }
 
@@ -133,6 +156,7 @@ abstract class CNotification_ChannelAbstract implements CNotification_ChannelInt
         if (strlen($vendor) == 0) {
             $vendor = CF::config('notification.' . strtolower(cstr::snake(static::$channelName)) . '.vendor');
         }
+
         return $vendor;
     }
 
@@ -150,6 +174,7 @@ abstract class CNotification_ChannelAbstract implements CNotification_ChannelInt
         if (!is_array($vendorConfig)) {
             $vendorConfig = [];
         }
+
         return CNotification::manager()->createMessage($this->getVendorName(), $vendorConfig, $data);
     }
 

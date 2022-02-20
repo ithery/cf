@@ -3,7 +3,9 @@
 use Psr\Http\Message\ResponseInterface;
 
 final class CVendor_Firebase_Http_Responses implements IteratorAggregate {
-    /** @var ResponseInterface[] */
+    /**
+     * @var ResponseInterface[]
+     */
     private $responses;
 
     public function __construct(ResponseInterface ...$responses) {

@@ -697,6 +697,9 @@ class c {
         if ($key === null) {
             return CSession::instance()->store();
         }
+        if (is_array($key)) {
+            return CSession::instance()->store()->put($key);
+        }
 
         return CSession::instance()->store()->get($key, $default);
     }
@@ -1062,7 +1065,7 @@ class c {
      *
      * @param null|string $guard
      *
-     * @return CAuth_Manager|CAuth_GuardInterface|CAuth_StatefulGuardInterface
+     * @return CAuth_Manager|CAuth_Contract_GuardInterface|CAuth_Contract_StatefulGuardInterface
      */
     public static function auth($guard = null) {
         if (is_null($guard)) {
@@ -1557,6 +1560,49 @@ class c {
      */
     public static function cookie() {
         return CHTTP::cookie();
+    }
+
+    /**
+     * @return CConsole_Kernel
+     */
+    public static function cli() {
+        return CConsole::kernel();
+    }
+
+    /**
+     * @return CCrypt_Encrypter
+     */
+    public static function crypt() {
+        return CCrypt::encrypter();
+    }
+
+    /**
+     * Create a new length-aware paginator instance.
+     *
+     * @param CCollection $items
+     * @param int         $total
+     * @param int         $perPage
+     * @param int         $currentPage
+     * @param array       $options
+     *
+     * @return CPagination_LengthAwarePaginator
+     */
+    public static function paginator($items, $total, $perPage, $currentPage, $options) {
+        return CContainer::getInstance()->makeWith(CPagination_LengthAwarePaginator::class, compact(
+            'items',
+            'total',
+            'perPage',
+            'currentPage',
+            'options'
+        ));
+    }
+
+    public static function json($data, $options = null, $depth = 512) {
+        if ($options == null) {
+            $options = JSON_HEX_TAG | JSON_HEX_APOS | JSON_HEX_AMP | JSON_HEX_QUOT;
+        }
+
+        return json_encode($data, $options, $depth);
     }
 }
 

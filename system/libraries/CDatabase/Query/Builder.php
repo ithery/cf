@@ -1118,6 +1118,15 @@ class CDatabase_Query_Builder {
     }
 
     /**
+     * Get the SQL representation of the query with bindings.
+     *
+     * @return string
+     */
+    public function toCompiledSql() {
+        return $this->db->compileBinds($this->toSql(), $this->getBindings());
+    }
+
+    /**
      * Execute a query for a single record by ID.
      *
      * @param int   $id

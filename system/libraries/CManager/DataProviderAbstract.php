@@ -1,7 +1,9 @@
 <?php
 
 abstract class CManager_DataProviderAbstract implements CManager_Contract_DataProviderInterface {
-    protected $search = [];
+    protected $searchAnd = [];
+
+    protected $searchOr = [];
 
     protected $sort = [];
 
@@ -10,11 +12,19 @@ abstract class CManager_DataProviderAbstract implements CManager_Contract_DataPr
      */
     protected $callbacks = [];
 
-    public function search(array $search) {
-        $this->search = $search;
+    public function searchAnd(array $search) {
+        $this->searchAnd = $search;
+    }
+
+    public function searchOr(array $search) {
+        $this->searchOr = $search;
     }
 
     public function sort(array $sort) {
         $this->sort = $sort;
+    }
+
+    public function createParameter() {
+        return new CManager_DataProviderParameter($this->searchAnd, $this->searchOr, $this->sort);
     }
 }

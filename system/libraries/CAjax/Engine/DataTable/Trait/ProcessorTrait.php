@@ -1,4 +1,5 @@
 <?php
+use Carbon\Carbon;
 
 trait CAjax_Engine_DataTable_Trait_ProcessorTrait {
     public function rowGet($row, $field) {
@@ -32,6 +33,7 @@ trait CAjax_Engine_DataTable_Trait_ProcessorTrait {
 
                 $html->appendln('<td class="low-padding align-center cell-action td-action ">')->incIndent()->br();
                 $jsparam = $this->rowArray($row);
+
                 if (!isset($jsparam['param1'])) {
                     $jsparam['param1'] = $key;
                 }
@@ -45,7 +47,6 @@ trait CAjax_Engine_DataTable_Trait_ProcessorTrait {
                 }
                 $rowActionList->regenerateId(true);
                 $rowActionList->apply('setJsParam', $jsparam);
-
                 $rowActionList->apply('setHandlerParam', $jsparam);
 
                 if (($table->filterActionCallbackFunc) != null) {
@@ -90,82 +91,10 @@ trait CAjax_Engine_DataTable_Trait_ProcessorTrait {
                 }
             }
             foreach ($table->columns as $col) {
-                $col_found = false;
-                $newValue = '';
-                if ($row instanceof CModel) {
-                    $fieldName = $col->getFieldname();
-                    if (strpos($fieldName, '.') !== false) {
-                        $fields = explode('.', $fieldName);
-                        $colValue = $row;
+                $cell = new CElement_Component_DataTable_Cell($table, $col, $row);
 
-                        foreach ($fields as $field) {
-                            $colValue = c::optional($colValue)->$field;
-                        }
-                    } else {
-                        $colValue = $row->{$col->getFieldname()};
-                    }
-                } else {
-                    $colValue = carr::get($row, $col->getFieldname());
-                }
-
-                $ori_v = $colValue;
-                //do transform
-                foreach ($col->transforms as $trans) {
-                    $colValue = $trans->execute($colValue);
-                }
-
-                //if formatted
-                if (strlen($col->getFormat()) > 0) {
-                    $tempValue = $col->getFormat();
-                    foreach ($row as $k2 => $v2) {
-                        if (strpos($tempValue, '{' . $k2 . '}') !== false) {
-                            $tempValue = str_replace('{' . $k2 . '}', $v2, $tempValue);
-                        }
-                        $colValue = $tempValue;
-                    }
-                }
-                //if have callback
-                if ($col->callback != null) {
-                    $colValue = CFunction::factory($col->callback)
-                        ->addArg($row)
-                        ->addArg($colValue)
-                        ->setRequire($col->callbackRequire)
-                        ->execute();
-                    list($colValue, $jsCell) = $this->getHtmlJsCell($colValue);
-                    $js .= $jsCell;
-                }
-                $newValue = $colValue;
-
-                if (($table->cellCallbackFunc) != null) {
-                    $newValue = CFunction::factory($table->cellCallbackFunc)
-                        ->addArg($table)
-                        ->addArg($col->getFieldname())
-                        ->addArg($row)
-                        ->addArg($newValue)
-                        ->setRequire($table->requires)
-                        ->execute();
-
-                    if (is_array($newValue) && isset($newValue['html'], $newValue['js'])) {
-                        $js .= $newValue['js'];
-                        $newValue = $newValue['html'];
-                    }
-                }
-                $class = $col->getClassAttribute();
-                switch ($col->getAlign()) {
-                    case CConstant::ALIGN_LEFT:
-                        $class .= ' align-left';
-
-                        break;
-                    case CConstant::ALIGN_RIGHT:
-                        $class .= ' align-right';
-
-                        break;
-                    case CConstant::ALIGN_CENTER:
-                        $class .= ' align-center';
-
-                        break;
-                }
-                $arr[] = $newValue;
+                $arr[] = $cell->html();
+                $js .= $cell->js();
             }
             if ($table->getActionLocation() == 'last') {
                 if ($rowActionList != null && $rowActionList->childCount() > 0) {
@@ -178,25 +107,5 @@ trait CAjax_Engine_DataTable_Trait_ProcessorTrait {
         }
 
         return $aaData;
-    }
-
-    protected function getHtmlJsCell($cell) {
-        $html = '';
-        $js = '';
-
-        if (is_string($cell)) {
-            $html = $cell;
-        }
-
-        if ($cell instanceof CRenderable) {
-            $html = $cell->html();
-            $js = $cell->js();
-        }
-        if (carr::accessible($cell)) {
-            $html = carr::get($cell, 'html');
-            $js = carr::get($cell, 'js');
-        }
-
-        return [$html, $js];
     }
 }

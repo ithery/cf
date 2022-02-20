@@ -1,4 +1,5 @@
 <?php
+
 namespace GuzzleHttp\Promise;
 
 /**
@@ -14,88 +15,47 @@ namespace GuzzleHttp\Promise;
  * }
  * </code>
  *
- * @param TaskQueueInterface $assign Optionally specify a new queue instance.
+ * @param TaskQueueInterface $assign optionally specify a new queue instance
  *
  * @return TaskQueueInterface
  */
-function queue(TaskQueueInterface $assign = null)
-{
-    static $queue;
-
-    if ($assign) {
-        $queue = $assign;
-    } elseif (!$queue) {
-        $queue = new TaskQueue();
-    }
-
-    return $queue;
+function queue(TaskQueueInterface $assign = null) {
+    return Utils::queue($assign);
 }
 
 /**
  * Adds a function to run in the task queue when it is next `run()` and returns
  * a promise that is fulfilled or rejected with the result.
  *
- * @param callable $task Task function to run.
+ * @param callable $task task function to run
  *
  * @return PromiseInterface
  */
-function task(callable $task)
-{
-    $queue = queue();
-    $promise = new Promise([$queue, 'run']);
-    $queue->add(function () use ($task, $promise) {
-        try {
-            $promise->resolve($task());
-        } catch (\Throwable $e) {
-            $promise->reject($e);
-        } catch (\Exception $e) {
-            $promise->reject($e);
-        }
-    });
-
-    return $promise;
+function task(callable $task) {
+    return Utils::task($task);
 }
 
 /**
  * Creates a promise for a value if the value is not a promise.
  *
- * @param mixed $value Promise or value.
+ * @param mixed $value promise or value
  *
  * @return PromiseInterface
  */
-function promise_for($value)
-{
-    if ($value instanceof PromiseInterface) {
-        return $value;
-    }
-
-    // Return a Guzzle promise that shadows the given promise.
-    if (method_exists($value, 'then')) {
-        $wfn = method_exists($value, 'wait') ? [$value, 'wait'] : null;
-        $cfn = method_exists($value, 'cancel') ? [$value, 'cancel'] : null;
-        $promise = new Promise($wfn, $cfn);
-        $value->then([$promise, 'resolve'], [$promise, 'reject']);
-        return $promise;
-    }
-
-    return new FulfilledPromise($value);
+function promise_for($value) {
+    return Create::promiseFor($value);
 }
 
 /**
  * Creates a rejected promise for a reason if the reason is not a promise. If
  * the provided reason is a promise, then it is returned as-is.
  *
- * @param mixed $reason Promise or reason.
+ * @param mixed $reason promise or reason
  *
  * @return PromiseInterface
  */
-function rejection_for($reason)
-{
-    if ($reason instanceof PromiseInterface) {
-        return $reason;
-    }
-
-    return new RejectedPromise($reason);
+function rejection_for($reason) {
+    return Create::rejectionFor($reason);
 }
 
 /**
@@ -105,11 +65,8 @@ function rejection_for($reason)
  *
  * @return \Exception|\Throwable
  */
-function exception_for($reason)
-{
-    return $reason instanceof \Exception || $reason instanceof \Throwable
-        ? $reason
-        : new RejectionException($reason);
+function exception_for($reason) {
+    return Create::exceptionFor($reason);
 }
 
 /**
@@ -119,15 +76,8 @@ function exception_for($reason)
  *
  * @return \Iterator
  */
-function iter_for($value)
-{
-    if ($value instanceof \Iterator) {
-        return $value;
-    } elseif (is_array($value)) {
-        return new \ArrayIterator($value);
-    } else {
-        return new \ArrayIterator([$value]);
-    }
+function iter_for($value) {
+    return Create::iterFor($value);
 }
 
 /**
@@ -140,24 +90,12 @@ function iter_for($value)
  * the promise is rejected, the array will contain a "reason" key mapping to
  * the rejection reason of the promise.
  *
- * @param PromiseInterface $promise Promise or value.
+ * @param PromiseInterface $promise promise or value
  *
  * @return array
  */
-function inspect(PromiseInterface $promise)
-{
-    try {
-        return [
-            'state' => PromiseInterface::FULFILLED,
-            'value' => $promise->wait()
-        ];
-    } catch (RejectionException $e) {
-        return ['state' => PromiseInterface::REJECTED, 'reason' => $e->getReason()];
-    } catch (\Throwable $e) {
-        return ['state' => PromiseInterface::REJECTED, 'reason' => $e];
-    } catch (\Exception $e) {
-        return ['state' => PromiseInterface::REJECTED, 'reason' => $e];
-    }
+function inspect(PromiseInterface $promise) {
+    return Utils::inspect($promise);
 }
 
 /**
@@ -166,19 +104,14 @@ function inspect(PromiseInterface $promise)
  *
  * Returns an array of inspection state arrays.
  *
- * @param PromiseInterface[] $promises Traversable of promises to wait upon.
+ * @param PromiseInterface[] $promises traversable of promises to wait upon
  *
  * @return array
+ *
  * @see GuzzleHttp\Promise\inspect for the inspection state array format.
  */
-function inspect_all($promises)
-{
-    $results = [];
-    foreach ($promises as $key => $promise) {
-        $results[$key] = inspect($promise);
-    }
-
-    return $results;
+function inspect_all($promises) {
+    return Utils::inspectAll($promises);
 }
 
 /**
@@ -188,20 +121,15 @@ function inspect_all($promises)
  * the promises were provided). An exception is thrown if any of the promises
  * are rejected.
  *
- * @param mixed $promises Iterable of PromiseInterface objects to wait on.
+ * @param mixed $promises iterable of PromiseInterface objects to wait on
  *
- * @return array
  * @throws \Exception on error
  * @throws \Throwable on error in PHP >=7
+ *
+ * @return array
  */
-function unwrap($promises)
-{
-    $results = [];
-    foreach ($promises as $key => $promise) {
-        $results[$key] = $promise->wait();
-    }
-
-    return $results;
+function unwrap($promises) {
+    return Utils::unwrap($promises);
 }
 
 /**
@@ -212,39 +140,13 @@ function unwrap($promises)
  * respective positions to the original array. If any promise in the array
  * rejects, the returned promise is rejected with the rejection reason.
  *
- * @param mixed $promises Promises or values.
- * @param bool $recursive - If true, resolves new promises that might have been added to the stack during its own resolution.
+ * @param mixed $promises  promises or values
+ * @param bool  $recursive - If true, resolves new promises that might have been added to the stack during its own resolution
  *
  * @return PromiseInterface
  */
-function all($promises, $recursive = false)
-{
-    $results = [];
-    $promise = each(
-        $promises,
-        function ($value, $idx) use (&$results) {
-            $results[$idx] = $value;
-        },
-        function ($reason, $idx, Promise $aggregate) {
-            $aggregate->reject($reason);
-        }
-    )->then(function () use (&$results) {
-        ksort($results);
-        return $results;
-    });
-
-    if (true === $recursive) {
-        $promise = $promise->then(function ($results) use ($recursive, &$promises) {
-            foreach ($promises AS $promise) {
-                if (\GuzzleHttp\Promise\PromiseInterface::PENDING === $promise->getState()) {
-                    return all($promises, $recursive);
-                }
-            }
-            return $results;
-        });
-    }
-
-    return $promise;
+function all($promises, $recursive = false) {
+    return Utils::all($promises, $recursive);
 }
 
 /**
@@ -258,55 +160,25 @@ function all($promises, $recursive = false)
  * This prommise is rejected with a {@see GuzzleHttp\Promise\AggregateException}
  * if the number of fulfilled promises is less than the desired $count.
  *
- * @param int   $count    Total number of promises.
- * @param mixed $promises Promises or values.
+ * @param int   $count    total number of promises
+ * @param mixed $promises promises or values
  *
  * @return PromiseInterface
  */
-function some($count, $promises)
-{
-    $results = [];
-    $rejections = [];
-
-    return each(
-        $promises,
-        function ($value, $idx, PromiseInterface $p) use (&$results, $count) {
-            if ($p->getState() !== PromiseInterface::PENDING) {
-                return;
-            }
-            $results[$idx] = $value;
-            if (count($results) >= $count) {
-                $p->resolve(null);
-            }
-        },
-        function ($reason) use (&$rejections) {
-            $rejections[] = $reason;
-        }
-    )->then(
-        function () use (&$results, &$rejections, $count) {
-            if (count($results) !== $count) {
-                throw new AggregateException(
-                    'Not enough promises to fulfill count',
-                    $rejections
-                );
-            }
-            ksort($results);
-            return array_values($results);
-        }
-    );
+function some($count, $promises) {
+    return Utils::some($count, $promises);
 }
 
 /**
  * Like some(), with 1 as count. However, if the promise fulfills, the
  * fulfillment value is not an array of 1 but the value directly.
  *
- * @param mixed $promises Promises or values.
+ * @param mixed $promises promises or values
  *
  * @return PromiseInterface
  */
-function any($promises)
-{
-    return some(1, $promises)->then(function ($values) { return $values[0]; });
+function any($promises) {
+    return Utils::any($promises);
 }
 
 /**
@@ -315,27 +187,14 @@ function any($promises)
  *
  * The returned promise is fulfilled with an array of inspection state arrays.
  *
- * @param mixed $promises Promises or values.
+ * @param mixed $promises promises or values
  *
  * @return PromiseInterface
+ *
  * @see GuzzleHttp\Promise\inspect for the inspection state array format.
  */
-function settle($promises)
-{
-    $results = [];
-
-    return each(
-        $promises,
-        function ($value, $idx) use (&$results) {
-            $results[$idx] = ['state' => PromiseInterface::FULFILLED, 'value' => $value];
-        },
-        function ($reason, $idx) use (&$results) {
-            $results[$idx] = ['state' => PromiseInterface::REJECTED, 'reason' => $reason];
-        }
-    )->then(function () use (&$results) {
-        ksort($results);
-        return $results;
-    });
+function settle($promises) {
+    return Utils::settle($promises);
 }
 
 /**
@@ -351,7 +210,7 @@ function settle($promises)
  * index, and the aggregate promise. The callback can invoke any necessary side
  * effects and choose to resolve or reject the aggregate promise if needed.
  *
- * @param mixed    $iterable    Iterator or array to iterate over.
+ * @param mixed    $iterable    iterator or array to iterate over
  * @param callable $onFulfilled
  * @param callable $onRejected
  *
@@ -362,10 +221,7 @@ function each(
     callable $onFulfilled = null,
     callable $onRejected = null
 ) {
-    return (new EachPromise($iterable, [
-        'fulfilled' => $onFulfilled,
-        'rejected'  => $onRejected
-    ]))->promise();
+    return Each::of($iterable, $onFulfilled, $onRejected);
 }
 
 /**
@@ -389,11 +245,7 @@ function each_limit(
     callable $onFulfilled = null,
     callable $onRejected = null
 ) {
-    return (new EachPromise($iterable, [
-        'fulfilled'   => $onFulfilled,
-        'rejected'    => $onRejected,
-        'concurrency' => $concurrency
-    ]))->promise();
+    return Each::ofLimit($iterable, $concurrency, $onFulfilled, $onRejected);
 }
 
 /**
@@ -412,14 +264,7 @@ function each_limit_all(
     $concurrency,
     callable $onFulfilled = null
 ) {
-    return each_limit(
-        $iterable,
-        $concurrency,
-        $onFulfilled,
-        function ($reason, $idx, PromiseInterface $aggregate) {
-            $aggregate->reject($reason);
-        }
-    );
+    return Each::ofLimitAll($iterable, $concurrency, $onFulfilled);
 }
 
 /**
@@ -429,9 +274,8 @@ function each_limit_all(
  *
  * @return bool
  */
-function is_fulfilled(PromiseInterface $promise)
-{
-    return $promise->getState() === PromiseInterface::FULFILLED;
+function is_fulfilled(PromiseInterface $promise) {
+    return Is::fulfilled($promise);
 }
 
 /**
@@ -441,9 +285,8 @@ function is_fulfilled(PromiseInterface $promise)
  *
  * @return bool
  */
-function is_rejected(PromiseInterface $promise)
-{
-    return $promise->getState() === PromiseInterface::REJECTED;
+function is_rejected(PromiseInterface $promise) {
+    return Is::rejected($promise);
 }
 
 /**
@@ -453,9 +296,8 @@ function is_rejected(PromiseInterface $promise)
  *
  * @return bool
  */
-function is_settled(PromiseInterface $promise)
-{
-    return $promise->getState() !== PromiseInterface::PENDING;
+function is_settled(PromiseInterface $promise) {
+    return Is::settled($promise);
 }
 
 /**
@@ -465,7 +307,6 @@ function is_settled(PromiseInterface $promise)
  *
  * @return PromiseInterface
  */
-function coroutine(callable $generatorFn)
-{
-    return new Coroutine($generatorFn);
+function coroutine(callable $generatorFn) {
+    return Coroutine::of($generatorFn);
 }

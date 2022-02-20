@@ -1,15 +1,15 @@
 <?php
 
+use Psr\Http\Message\ResponseInterface;
 use GuzzleHttp\Exception\ConnectException;
 use GuzzleHttp\Exception\RequestException;
-use Psr\Http\Message\ResponseInterface;
 
 /**
  * @internal
  */
 class CVendor_Firebase_Messaging_ApiExceptionConverter {
     /**
-     * @var ErrorResponseParser
+     * @var CVendor_Firebase_Http_ErrorResponseParser
      */
     private $responseParser;
 
@@ -46,22 +46,28 @@ class CVendor_Firebase_Messaging_ApiExceptionConverter {
         switch ($code) {
             case 400:
                 $convertedError = new CVendor_Firebase_Messaging_Exception_InvalidMessageException($message, $code, $previous);
+
                 break;
             case 401:
             case 403:
                 $convertedError = new CVendor_Firebase_Messaging_Exception_AuthenticationErrorException($message, $code, $previous);
+
                 break;
             case 404:
                 $convertedError = new CVendor_Firebase_Messaging_Exception_NotFoundException($message, $code, $previous);
+
                 break;
             case 500:
                 $convertedError = new CVendor_Firebase_Messaging_Exception_ServerErrorException($message, $code, $previous);
+
                 break;
             case 503:
                 $convertedError = new CVendor_Firebase_Messaging_Exception_ServerUnavailableException($message, $code, $previous);
+
                 break;
             default:
                 $convertedError = new CVendor_Firebase_Messaging_Exception_MessagingErrorException($message, $code, $previous);
+
                 break;
         }
 

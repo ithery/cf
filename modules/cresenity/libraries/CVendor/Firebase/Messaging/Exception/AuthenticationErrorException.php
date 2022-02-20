@@ -1,9 +1,9 @@
 <?php
 
-use Kreait\Firebase\Exception\HasErrors;
-use Kreait\Firebase\Exception\HasRequestAndResponse;
-use Kreait\Firebase\Exception\MessagingException;
 use Psr\Http\Message\ResponseInterface;
+use Kreait\Firebase\Exception\HasErrors;
+use Kreait\Firebase\Exception\MessagingException;
+use Kreait\Firebase\Exception\HasRequestAndResponse;
 
 final class CVendor_Firebase_Messaging_Exception_AuthenticationErrorException extends RuntimeException implements CVendor_Firebase_Messaging_ExceptionInterface {
     use CVendor_Firebase_Trait_ExceptionHasRequestAndResponseTrait;

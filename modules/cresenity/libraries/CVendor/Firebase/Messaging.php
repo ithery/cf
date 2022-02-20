@@ -7,12 +7,12 @@ class CVendor_Firebase_Messaging {
     private $projectId;
 
     /**
-     * @var ApiClient
+     * @var CVendor_Firebase_Messaging_ApiClient
      */
     private $messagingApi;
 
     /**
-     * @var AppInstanceApiClient
+     * @var CVendor_Firebase_Messaging_AppInstanceApiClient
      */
     private $appInstanceApi;
 
@@ -43,7 +43,7 @@ class CVendor_Firebase_Messaging {
      *
      * @throws InvalidArgumentException
      * @throws MessagingException
-     * @throws FirebaseException
+     * @throws CVendor_Firebase_Exception
      */
     public function send($message) {
         $message = $this->makeMessage($message);
@@ -58,9 +58,9 @@ class CVendor_Firebase_Messaging {
      * @param array|Message|mixed                             $message
      * @param RegistrationToken[]|string[]|RegistrationTokens $registrationTokens
      *
-     * @throws InvalidArgumentException if the message is invalid
-     * @throws MessagingException       if the API request failed
-     * @throws FirebaseException        if something very unexpected happened (never :))
+     * @throws InvalidArgumentException   if the message is invalid
+     * @throws MessagingException         if the API request failed
+     * @throws CVendor_Firebase_Exception if something very unexpected happened (never :))
      *
      * @return CVendor_Firebase_Messaging_MulticastSendReport
      */
@@ -69,7 +69,7 @@ class CVendor_Firebase_Messaging {
         $registrationTokens = $this->ensureNonEmptyRegistrationTokens($registrationTokens);
 
         $request = new CVendor_Firebase_Messaging_Request_SendMessageToTokensRequest($this->projectId, $message, $registrationTokens);
-        /** @var ResponseWithSubResponses $response */
+        /** @var CVendor_Firebase_Http_ResponseWithSubResponses $response */
         $response = $this->messagingApi->send($request);
 
         return CVendor_Firebase_Messaging_MulticastSendReport::fromRequestsAndResponses($request->subRequests(), $response->subResponses());
@@ -78,9 +78,9 @@ class CVendor_Firebase_Messaging {
     /**
      * @param array[]|Message[]|Messages $messages
      *
-     * @throws InvalidArgumentException if the message is invalid
-     * @throws MessagingException       if the API request failed
-     * @throws FirebaseException        if something very unexpected happened (never :))
+     * @throws InvalidArgumentException   if the message is invalid
+     * @throws MessagingException         if the API request failed
+     * @throws CVendor_Firebase_Exception if something very unexpected happened (never :))
      */
     public function sendAll($messages) {
         $ensuredMessages = [];
@@ -108,6 +108,7 @@ class CVendor_Firebase_Messaging {
         $message = $this->makeMessage($message);
 
         $request = new CVendor_Firebase_Messaging_Request_ValidateMessageRequest($this->projectId, $message);
+
         try {
             $response = $this->messagingApi->send($request);
         } catch (CVendor_Firebase_Messaging_Exception_NotFoundException $e) {
@@ -161,8 +162,8 @@ class CVendor_Firebase_Messaging {
      *
      * @see https://developers.google.com/instance-id/reference/server#results
      *
-     * @throws InvalidArgument   if the registration token is invalid
-     * @throws FirebaseException
+     * @throws InvalidArgument                     if the registration token is invalid
+     * @throws CVendor_Firebase_ExceptionInterface
      */
     public function getAppInstance($registrationToken) {
         $token = $registrationToken instanceof CVendor_Firebase_Messaging_RegistrationToken ? $registrationToken : CVendor_Firebase_Messaging_RegistrationToken::fromValue($registrationToken);
@@ -201,7 +202,7 @@ class CVendor_Firebase_Messaging {
     /**
      * @param mixed $value
      *
-     * @throws InvalidArgument
+     * @throws CVendor_Firebase_Messaging_Exception_InvalidArgumentException
      */
     private function ensureNonEmptyRegistrationTokens($value) {
         try {

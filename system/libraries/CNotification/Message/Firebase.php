@@ -27,11 +27,14 @@ class CNotification_Message_Firebase extends CNotification_MessageAbstract {
         }
 
         $multicastReport = $messaging->sendMulticast($message, $tokens);
+
         foreach ($multicastReport->successes()->getItems() as $report) {
             CDaemon::log('Success send to ' . $report->target()->type() . ':' . $report->target()->value());
         }
         foreach ($multicastReport->failures()->getItems() as $report) {
             CDaemon::log('Fail send to ' . $report->target()->type() . ':' . $report->target()->value() . ', reason:' . $report->error()->getMessage());
         }
+
+        return $multicastReport;
     }
 }

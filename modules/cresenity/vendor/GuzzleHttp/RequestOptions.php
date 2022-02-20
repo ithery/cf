@@ -1,4 +1,5 @@
 <?php
+
 namespace GuzzleHttp;
 
 /**
@@ -8,15 +9,14 @@ namespace GuzzleHttp;
  *
  * @link http://docs.guzzlephp.org/en/v6/request-options.html
  */
-final class RequestOptions
-{
+final class RequestOptions {
     /**
      * allow_redirects: (bool|array) Controls redirect behavior. Pass false
      * to disable redirects, pass true to enable redirects, pass an
      * associative to provide custom redirect settings. Defaults to "false".
      * This option only works if your handler has the RedirectMiddleware. When
      * passing an associative array, you can provide the following key value
-     * pairs:
+     * pairs:.
      *
      * - max: (int, default=5) maximum number of allowed redirects.
      * - strict: (bool, default=false) Set to true to use strict redirects
@@ -188,7 +188,7 @@ final class RequestOptions
      * query: (array|string) Associative array of query string values to add
      * to the request. This option uses PHP's http_build_query() to create
      * the string representation. Pass a string value if you need more
-     * control than what this method provides
+     * control than what this method provides.
      */
     const QUERY = 'query';
 
@@ -249,7 +249,7 @@ final class RequestOptions
     const VERSION = 'version';
 
     /**
-     * force_ip_resolve: (bool) Force client to use only ipv4 or ipv6 protocol
+     * force_ip_resolve: (bool) Force client to use only ipv4 or ipv6 protocol.
      */
     const FORCE_IP_RESOLVE = 'force_ip_resolve';
 }

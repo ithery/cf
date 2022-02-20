@@ -27,6 +27,7 @@ defined('SYSPATH') or die('No direct access allowed.');
  * @method array               eagerLoadRelations(array $models)                                                                            Eager load the relationships for the models.
  * @method array               loadRelation(array $models, $name, Closure $constraints)                                                     Eagerly load the relationship on a set of models.
  * @method static              CModel_Query|static where($column, $operator = null, $value = null, $boolean = 'and')                        Add a basic where clause to the query.
+ * @method static              CModel_Query|static whereHas($relation, Closure $callback = null, $operator = '>=', $count = 1)              Add a relationship count / exists condition to the query with where clauses.
  * @method static              CModel_Query|static orWhere($column, $operator = null, $value = null)                                        Add an "or where" clause to the query.
  * @method static              CModel_Query|static has($relation, $operator = '>=', $count = 1, $boolean = 'and', Closure $callback = null) Add a relationship count condition to the query.
  * @method static              CDatabase_Query_Builder|static whereRaw($sql, array $bindings = [])
@@ -67,6 +68,7 @@ defined('SYSPATH') or die('No direct access allowed.');
  * @method CModel_Query|static offset($value)
  * @method CModel_Query|static take($value)
  * @method CModel_Query|static limit($value)
+ * @method CModel_Query|static lockForUpdate()                                                                                              Lock the selected rows in the table for updating.
  *
  * @see CModel
  * @see CDatabase_Query_Builder
@@ -75,6 +77,7 @@ class CModel_Query {
     use CDatabase_Trait_Builder,
         CModel_Trait_QueriesRelationships,
         CTrait_ForwardsCalls;
+
     /**
      * The base query builder instance.
      *
@@ -123,7 +126,7 @@ class CModel_Query {
      * @var array
      */
     protected $passthru = [
-        'insert', 'insertGetId', 'getBindings', 'toSql', 'dump', 'dd',
+        'insert', 'insertGetId', 'getBindings', 'toSql', 'toCompiledSql', 'dump', 'dd',
         'exists', 'count', 'min', 'max', 'avg', 'sum', 'getConnection', 'raw',
     ];
 

@@ -1,65 +1,69 @@
 <?php
 
-defined('SYSPATH') OR die('No direct access allowed.');
+defined('SYSPATH') or die('No direct access allowed.');
 
 /**
- * CSession driver interface
+ * CSession driver interface.
  */
 interface CSession_Driver extends SessionHandlerInterface {
-
     /**
      * Opens a session.
      *
-     * @param   string   save path
-     * @param   string   session name
-     * @return  boolean
+     * @param string $path save path
+     * @param string $name session name
+     *
+     * @return bool
      */
     public function open($path, $name);
 
     /**
      * Closes a session.
      *
-     * @return  boolean
+     * @return bool
      */
     public function close();
 
     /**
      * Reads a session.
      *
-     * @param   string  session id
-     * @return  string
+     * @param string $id session id
+     *
+     * @return string
      */
     public function read($id);
 
     /**
      * Writes a session.
      *
-     * @param   string   session id
-     * @param   string   session data
-     * @return  boolean
+     * @param string $id   session id
+     * @param string $data session data
+     *
+     * @return bool
      */
     public function write($id, $data);
 
     /**
      * Destroys a session.
      *
-     * @param   string   session id
-     * @return  boolean
+     * @param string $id session id
+     *
+     * @return bool
      */
     public function destroy($id);
 
     /**
      * Regenerates the session id.
      *
-     * @return  string
+     * @return string
      */
     public function regenerate();
 
     /**
      * Garbage collection.
      *
-     * @param   integer  session expiration period
-     * @return  boolean
+     * @param int $maxlifetime session expiration period
+     *
+     * @return bool
      */
     public function gc($maxlifetime);
 }

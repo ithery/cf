@@ -697,4 +697,12 @@ return [
             'plugins/cropper/cropper.js',
         ],
     ],
+    'jquery-query-builder' => [
+        'css' => [
+            'plugins/jquery-query-builder/query-builder.default.css',
+        ],
+        'js' => [
+            'plugins/jquery-query-builder/query-builder.standalone.js',
+        ],
+    ],
 ];

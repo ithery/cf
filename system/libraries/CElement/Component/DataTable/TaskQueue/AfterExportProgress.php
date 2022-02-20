@@ -24,7 +24,10 @@ class CElement_Component_DataTable_TaskQueue_AfterExportProgress extends CQueue_
         if ($isReady) {
             $data['data']['progressValue'] = carr::get($data, 'data.progressMax');
             $data['data']['state'] = 'DONE';
+
             CAjax::setData($downloadId, $data);
+        } else {
+            $this->logDaemon('AfterExportProgress | warning not ready on disk:' . carr::get($data, 'data.exporter.disk') . ' with filename:' . $filename);
         }
 
         $this->logDaemon('AfterExportProgress | downloadId:' . $downloadId);
