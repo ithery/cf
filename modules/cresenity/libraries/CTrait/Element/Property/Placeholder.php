@@ -20,17 +20,18 @@ trait CTrait_Element_Property_Placeholder {
     public $rawPlaceholder;
 
     /**
-     * @param string $placeholder
-     * @param mixed  $lang
+     * @param string     $placeholder
+     * @param bool|array $lang
      *
      * @return $this
      */
     public function setPlaceholder($placeholder, $lang = true) {
         $this->rawPlaceholder = $placeholder;
-        if ($lang) {
-            $placeholder = clang::__($placeholder);
+        if ($lang !== false) {
+            $placeholder = c::__($placeholder, is_array($lang) ? $lang : []);
         }
         $this->placeholder = $placeholder;
+
         return $this;
     }
 

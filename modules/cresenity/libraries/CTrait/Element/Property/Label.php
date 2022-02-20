@@ -24,15 +24,15 @@ trait CTrait_Element_Property_Label {
     protected $rawLabel;
 
     /**
-     * @param string $label
-     * @param string $lang
+     * @param string     $label
+     * @param bool|array $lang
      *
      * @return $this
      */
     public function setLabel($label, $lang = true) {
         $this->rawLabel = $label;
-        if ($lang) {
-            $label = c::__($label);
+        if ($lang !== false) {
+            $label = c::__($label, is_array($lang) ? $lang : []);
         }
         $this->label = $label;
 

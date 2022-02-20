@@ -1036,7 +1036,8 @@ trait CModel_Trait_Relationships {
             /** @var \CModel $instance */
             if (!isset($foreignKeys[$i])) {
                 if ($instance instanceof CModel_Relation_Pivot) {
-                    $foreignKeys[$i] = ($throughParents[$i] ?? $related)->getKeyName();
+                    $parent = (isset($throughParents[$i]) ? $throughParents[$i] : $related);
+                    $foreignKeys[$i] = $parent->getKeyName();
                 } else {
                     $foreignKeys[$i] = $instance->getForeignKey();
                 }
@@ -1060,7 +1061,8 @@ trait CModel_Trait_Relationships {
             /** @var \CModel $instance */
             if (!isset($localKeys[$i])) {
                 if ($instance instanceof CModel_Relation_Pivot) {
-                    $localKeys[$i] = ($throughParents[$i] ?? $related)->getForeignKey();
+                    $parent = $parent = (isset($throughParents[$i]) ? $throughParents[$i] : $related);
+                    $localKeys[$i] = $parent->getForeignKey();
                 } else {
                     $localKeys[$i] = $instance->getKeyName();
                 }
