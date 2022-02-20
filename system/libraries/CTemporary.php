@@ -89,9 +89,7 @@ class CTemporary {
      */
     public static function makeFolder($path, $folder) {
         $path = $path . $folder . DIRECTORY_SEPARATOR;
-        if (!is_dir($path)) {
-            mkdir($path);
-        }
+        self::makeDir($path);
 
         return $path;
     }

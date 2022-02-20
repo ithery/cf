@@ -1,5 +1,5 @@
 <?php
 
 interface CTemporary_PathGeneratorInterface {
-    public function getPath($extension = null);
+    public function generatePath($extension = null);
 }
