@@ -131,10 +131,10 @@ class CServer_Chrome_PageCapture {
             return $this->savePdf($targetPath);
         }
 
-        $temporaryPath = CTemporary::local()->getDirectory('page-capture');
+        $temporaryDirectory = CTemporary::customDirectory()->create();
 
         try {
-            $command = $this->createScreenshotCommand($temporaryPath);
+            $command = $this->createScreenshotCommand($temporaryDirectory->path());
 
             $process = (new Process($command))->setTimeout($this->timeout);
 
@@ -146,7 +146,7 @@ class CServer_Chrome_PageCapture {
                 throw new ProcessFailedException($process);
             }
 
-            $screenShotPath = $temporaryPath;
+            $screenShotPath = $temporaryDirectory->path('screenshot.png');
 
             if (!file_exists($screenShotPath)) {
                 throw CServer_Chrome_Exception_CouldNotTakePageCapture::chromeOutputEmpty($screenShotPath, $process);
@@ -154,7 +154,7 @@ class CServer_Chrome_PageCapture {
 
             rename($screenShotPath, $targetPath);
         } finally {
-            CFile::delete($temporaryPath);
+            $temporaryDirectory->delete();
         }
 
         if (!$this->imageManipulations->isEmpty()) {
@@ -250,11 +250,10 @@ class CServer_Chrome_PageCapture {
         return $command;
     }
 
-    protected function createPdfCommand($targetPath): string {
+    protected function createPdfCommand($targetPath) {
         $url = $this->html ? $this->createTemporaryHtmlFile() : $this->url;
 
-        $command
-              = escapeshellarg($this->findChrome())
+        $command = escapeshellarg($this->findChrome())
             . " --headless --print-to-pdf={$targetPath}";
 
         if ($this->disableGpu) {
@@ -275,7 +274,7 @@ class CServer_Chrome_PageCapture {
     }
 
     protected function createTemporaryHtmlFile() {
-        $this->temporaryHtmlDirectory = (new TemporaryDirectory())->create();
+        $this->temporaryHtmlDirectory = CTemporary::customDirectory()->create();
 
         file_put_contents($temporaryHtmlFile = $this->temporaryHtmlDirectory->path('index.html'), $this->html);
 

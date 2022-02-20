@@ -261,4 +261,13 @@ class CTemporary {
     public static function __callStatic($name, $arguments) {
         return CTemporary::instance()->$name(...$arguments);
     }
+
+    /**
+     * @param string $location
+     *
+     * @return CTemporary_CustomDirectory
+     */
+    public static function customDirectory($location = '') {
+        return new CTemporary_CustomDirectory($location);
+    }
 }

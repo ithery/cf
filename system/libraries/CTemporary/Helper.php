@@ -15,13 +15,13 @@ class CTemporary_Helper {
     /**
      * @param string $name
      *
-     * @throws CTemporary_Exception_InvalidDirectoryName
+     * @throws CTemporary_Exception_InvalidDirectoryNameException
      *
      * @return string
      */
     protected function sanitizeName($name) {
         if (!$this->isValidDirectoryName($name)) {
-            throw CTemporary_Exception_InvalidDirectoryName::create($name);
+            throw CTemporary_Exception_InvalidDirectoryNameException::create($name);
         }
 
         return trim($name);

@@ -1,6 +1,6 @@
 <?php
 
-class CTemporary_Exception_PathAlreadyExists extends \Exception {
+class CTemporary_Exception_PathAlreadyExistsException extends \Exception {
     /**
      * @param string $path
      *

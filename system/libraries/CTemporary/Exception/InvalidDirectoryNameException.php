@@ -1,6 +1,6 @@
 <?php
 
-class CTemporary_Exception_InvalidDirectoryName extends \Exception {
+class CTemporary_Exception_InvalidDirectoryNameException extends \Exception {
     /**
      * @param string $directoryName
      *
