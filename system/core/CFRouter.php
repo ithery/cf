@@ -5,36 +5,108 @@ defined('SYSPATH') or die('No direct access allowed.');
 use Symfony\Component\Routing\Route as SymfonyRoute;
 
 class CFRouter {
+    /**
+     * @var string
+     *
+     * @deprecated 1.3
+     */
     public static $current_uri = '';
 
+    /**
+     * @var string
+     *
+     * @deprecated 1.3
+     */
     public static $query_string = '';
 
+    /**
+     * @var string
+     *
+     * @deprecated 1.3
+     */
     public static $complete_uri = '';
 
+    /**
+     * @var string
+     *
+     * @deprecated 1.3
+     */
     public static $routed_uri = '';
 
+    /**
+     * @var string
+     *
+     * @deprecated 1.3
+     */
     public static $url_suffix = '';
 
+    /**
+     * @var array
+     *
+     * @deprecated 1.3
+     */
     public static $segments;
 
+    /**
+     * @var array
+     *
+     * @deprecated 1.3
+     */
     public static $rsegments;
 
+    /**
+     * @var string
+     *
+     * @deprecated 1.3
+     */
     public static $controller;
 
+    /**
+     * @var string
+     *
+     * @deprecated 1.3
+     */
     public static $controller_dir;
 
+    /**
+     * @var string
+     *
+     * @deprecated 1.3
+     */
     public static $controller_dir_ucfirst;
 
+    /**
+     * @var string
+     *
+     * @deprecated 1.3
+     */
     public static $controller_path;
 
+    /**
+     * @var string
+     *
+     * @deprecated 1.3
+     */
     public static $method = 'index';
 
+    /**
+     * @var array
+     *
+     * @deprecated 1.3
+     */
     public static $arguments = [];
 
+    /**
+     * @var array
+     *
+     * @deprecated 1.3
+     */
     public static $routeData = [];
 
     /**
      * CFRouter setup routine. Automatically called during CF setup process.
+     *
+     * @deprecated 1.3
      *
      * @return void
      */
@@ -62,6 +134,8 @@ class CFRouter {
      * CFRouter get route data.
      *
      * @param string $uri
+     *
+     * @deprecated 1.3
      *
      * @return CRouting_RouteData
      */
@@ -97,6 +171,8 @@ class CFRouter {
     /**
      * @param string $uri if null, using the current uri
      *
+     * @deprecated 1.3
+     *
      * @return void
      */
     public static function resetup($uri = null) {
@@ -122,6 +198,8 @@ class CFRouter {
      * Attempts to determine the current URI using CLI, GET, PATH_INFO, ORIG_PATH_INFO, REQUEST_URI or PHP_SELF.
      *
      * @return string uri
+     *
+     * @deprecated 1.3
      */
     public static function getUri() {
         return self::$current_uri;
@@ -130,16 +208,22 @@ class CFRouter {
     /**
      * Attempts to determine the current URI using CLI, GET, PATH_INFO, ORIG_PATH_INFO, or PHP_SELF.
      *
+     * @deprecated 1.3
+     *
      * @return string
      */
     public static function findUri() {
         return c::request()->path();
     }
 
-    public static function getRoutes() {
-        return CRouting_Manager::instance()->getUriRouting();
-    }
-
+    /**
+     * @param string $uri
+     * @param array  $routes
+     *
+     * @deprecated 1.3
+     *
+     * @return string
+     */
     //@codingStandardsIgnoreStart
     public static function routed_uri($uri, &$routes = null) {
         return static::routedUri($uri, $routes);
@@ -153,40 +237,85 @@ class CFRouter {
      * @param mixed  $uri
      * @param string $routes URI to convert
      *
+     * @deprecated 1.3
+     *
      * @return string Routed uri
      */
     public static function routedUri($uri, &$routes = null) {
         return self::$routed_uri;
     }
 
+    /**
+     * @deprecated 1.3
+     *
+     * @return string
+     */
     public static function currentUri() {
         return static::$current_uri;
     }
 
+    /**
+     * @deprecated 1.3
+     *
+     * @return string
+     */
     public static function controllerDir() {
         return static::$controller_dir;
     }
 
+    /**
+     * @deprecated 1.3
+     *
+     * @return string
+     */
     public static function controllerName() {
         return static::$controller;
     }
 
+    /**
+     * @deprecated 1.3
+     *
+     * @return string
+     */
     public static function controllerUri() {
         return curl::base() . static::controllerDir() . static::controllerName();
     }
 
+    /**
+     * @param string         $route
+     * @param string|Closure $routedUri
+     *
+     * @deprecated 1.3
+     *
+     * @return void
+     */
     public static function addRoute($route, $routedUri) {
-        CRouting_Manager::instance()->addUriRouting($route, $routedUri);
+        return CRouting_Manager::instance()->addUriRouting($route, $routedUri);
     }
 
+    /**
+     * @deprecated 1.3
+     *
+     * @return string
+     */
     public static function getController() {
         return static::$controller;
     }
 
+    /**
+     * @deprecated 1.3
+     *
+     * @return string
+     */
     public static function getControllerMethod() {
         return static::$method;
     }
 
+    /**
+     * @deprecated 1.3
+     *
+     * @return string
+     */
     public static function getCompleteUri() {
         return static::$complete_uri;
     }
