@@ -100,16 +100,6 @@ class CFRouter {
      * @return void
      */
     public static function resetup($uri = null) {
-        throw new Exception('should not called');
-        // if ($uri !== null) {
-        //     self::$current_uri = $uri;
-        // }
-        // if (strlen(self::$current_uri) == 0) {
-        //     self::findUri();
-        // }
-        // $data = self::getRouteData(self::$current_uri);
-
-        // static::applyRouteData($data);
     }
 
     public static function applyRouteData(CRouting_RouteData $routeData) {
@@ -143,7 +133,7 @@ class CFRouter {
      * @return string
      */
     public static function findUri() {
-        return self::$current_uri;
+        return c::request()->path();
     }
 
     public static function getRoutes() {

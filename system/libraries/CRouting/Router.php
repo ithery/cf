@@ -577,7 +577,7 @@ class CRouting_Router {
     protected function findRoute($request) {
         $this->current = $route = $this->routes->match($request);
 
-        $this->container->instance(CHTTP_Route::class, $route);
+        //$this->container->instance(CHTTP_Route::class, $route);
 
         return $route;
     }
