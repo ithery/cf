@@ -55,7 +55,7 @@ class crouter {
         return CFRouter::$current_uri;
     }
 
-    public static function url_suffix() {
+    public static function urlSuffix() {
         return CFRouter::$url_suffix;
     }
 

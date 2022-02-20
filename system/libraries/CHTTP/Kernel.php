@@ -52,8 +52,8 @@ class CHTTP_Kernel {
     }
 
     public function setupRouter() {
-        CFRouter::findUri();
-        CFRouter::setup();
+        //CFRouter::findUri();
+        //CFRouter::setup();
     }
 
     /**
