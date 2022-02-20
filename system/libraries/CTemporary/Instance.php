@@ -14,6 +14,7 @@ class CTemporary_Instance {
         if (!isset(static::$instance[$disk])) {
             static::$instance[$disk] = new CTemporary_Instance($disk);
         }
+
         return static::$instance[$disk];
     }
 
@@ -46,6 +47,7 @@ class CTemporary_Instance {
 
         $file = CTemporary::getPath($folder, $filename);
         $this->disk()->put($file, $content);
+
         return $file;
     }
 
@@ -59,6 +61,7 @@ class CTemporary_Instance {
         if (!is_dir($path)) {
             @mkdir($path, 0777, true);
         }
+
         return $path;
     }
 }
