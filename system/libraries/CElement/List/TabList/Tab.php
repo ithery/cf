@@ -12,6 +12,7 @@ class CElement_List_TabList_Tab extends CElement_Element {
     use CTrait_Compat_Element_Tab,
         CTrait_Element_Property_Label,
         CTrait_Element_Property_Icon;
+
     protected $active;
 
     protected $target;
@@ -53,6 +54,13 @@ class CElement_List_TabList_Tab extends CElement_Element {
         $this->active = $bool;
 
         return $this;
+    }
+
+    /**
+     * @return bool
+     */
+    public function isActive() {
+        return (bool) $this->active;
     }
 
     public function setNoPadding($bool = true) {

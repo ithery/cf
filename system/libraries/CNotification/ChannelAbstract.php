@@ -68,9 +68,29 @@ abstract class CNotification_ChannelAbstract implements CNotification_ChannelInt
                             'headers' => $vendorResponse->headers()
                         ];
                     }
-                    if (is_object($vendorResponse)) {
-                        $vendorResponse->headerResponse = $result->headers(true);
+
+                    if ($vendorResponse instanceof CVendor_Firebase_Messaging_MulticastSendReport) {
+                        $resultResponse = [];
+                        $resultResponse['success'] = [];
+                        $resultResponse['fail'] = [];
+                        foreach ($vendorResponse->successes()->getItems() as $report) {
+                            $resultResponse['success'][] = [
+                                'type' => $report->target()->type(),
+                                'value' => $report->target()->value(),
+                                'result' => $report->result(),
+                            ];
+                        }
+                        foreach ($vendorResponse->failures()->getItems() as $report) {
+                            $resultResponse['fail'][] = [
+                                'type' => $report->target()->type(),
+                                'value' => $report->target()->value(),
+                                'result' => $report->result(),
+                                'error' => $report->error() instanceof Exception ? $report->error()->getMessage() : $report->error(),
+                            ];
+                        }
+                        $vendorResponse = $resultResponse;
                     }
+
                     $vendorResponse = json_encode($vendorResponse);
                     $logNotificationModel->vendor_response = $vendorResponse;
 

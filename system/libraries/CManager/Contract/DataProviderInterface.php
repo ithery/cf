@@ -1,7 +1,9 @@
 <?php
 
 interface CManager_Contract_DataProviderInterface {
-    public function search(array $searchData);
+    public function searchOr(array $searchData);
+
+    public function searchAnd(array $searchData);
 
     public function sort(array $sortData);
 

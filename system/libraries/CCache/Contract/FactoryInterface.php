@@ -1,6 +1,6 @@
 <?php
 
-interface CCache_Contract_Factory {
+interface CCache_Contract_FactoryInterface {
     /**
      * Get a cache store instance by name.
      *

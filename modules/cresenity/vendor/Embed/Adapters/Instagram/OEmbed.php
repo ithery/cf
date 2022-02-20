@@ -8,6 +8,9 @@ use Psr\Http\Message\UriInterface;
 class OEmbed extends Base {
     const ENDPOINT = 'https://graph.facebook.com/v8.0/instagram_oembed';
 
+    /**
+     * @return null|UriInterface
+     */
     protected function detectEndpoint() {
         $token = $this->extractor->getSetting('instagram:token');
 

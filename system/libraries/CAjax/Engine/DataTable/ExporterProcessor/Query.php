@@ -5,8 +5,6 @@ class CAjax_Engine_DataTable_ExporterProcessor_Query extends CAjax_Engine_DataTa
     use CAjax_Engine_DataTable_Trait_ProcessorQueryTrait;
 
     public function process() {
-        $db = $this->db();
-
         $response = '';
         $request = $this->input;
 
@@ -23,6 +21,7 @@ class CAjax_Engine_DataTable_ExporterProcessor_Query extends CAjax_Engine_DataTa
             $args = $this->engine->getArgs();
             $fileId = carr::first($args);
             $exportable = new CExporter_Exportable_DataTableTemp($fileId);
+
             $exportOptions = [];
             $exportOptions['writerType'] = $writerType;
             $exportOptions['queued'] = $queued;
@@ -30,7 +29,7 @@ class CAjax_Engine_DataTable_ExporterProcessor_Query extends CAjax_Engine_DataTa
             $exportOptions['diskOptions'] = [
                 'ContentType' => 'application/octet-stream'
             ];
-
+            $exportable->setDownloadId($fileId);
             $storeResult = CExporter::store($exportable, $filename, $exportOptions);
 
             if ($queued) {

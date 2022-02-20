@@ -7,13 +7,26 @@ trait CObservable_Listener_Handler_Trait_ParamHandlerTrait {
 
     protected $paramRequest;
 
-    public function addParamInput($inputs) {
+    protected function normalizeParamInput($inputs) {
         if (!is_array($inputs)) {
             $inputs = [$inputs];
         }
+
+        return c::collect($inputs)->map(function ($input) {
+            if ($input instanceof CRenderable) {
+                return $input->id();
+            }
+
+            return $input;
+        })->toArray();
+    }
+
+    public function addParamInput($inputs) {
+        $inputs = $this->normalizeParamInput($inputs);
         foreach ($inputs as $inp) {
             $this->paramInputs[] = $inp;
         }
+
         return $this;
     }
 
@@ -24,6 +37,7 @@ trait CObservable_Listener_Handler_Trait_ParamHandlerTrait {
         foreach ($paramRequest as $reqK => $reqV) {
             $this->paramRequest[$reqK] = $reqV;
         }
+
         return $this;
     }
 
@@ -34,6 +48,7 @@ trait CObservable_Listener_Handler_Trait_ParamHandlerTrait {
         foreach ($inputs as $k => $inp) {
             $this->paramInputsByName[$k] = $inp;
         }
+
         return $this;
     }
 
@@ -64,6 +79,7 @@ trait CObservable_Listener_Handler_Trait_ParamHandlerTrait {
             }
         }
         $dataAddition = '{' . $dataAddition . '}';
+
         return $dataAddition;
     }
 }

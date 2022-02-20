@@ -6,27 +6,29 @@ defined('SYSPATH') or die('No direct access allowed.');
  * @author Hery Kurniawan
  * @license Ittron Global Teknologi <ittron.co.id>
  *
+ * @see CAnalytics
  * @since Jun 23, 2019, 12:42:50 PM
  */
 class CAnalytics_Google {
     use CTrait_Macroable;
 
-    /** @var CAnalytics_Google_Client */
+    /**
+     * @var CAnalytics_Google_Client
+     */
     protected $client;
 
-    /** @var string */
+    /**
+     * @var string
+     */
     protected $viewId;
 
     /**
-     * @param mixed $options
+     * @param CAnalytics_Google_Client $client
+     * @param string                   $viewId
      */
-    public function __construct($options) {
-        $googleServiceAnalytics = new Google_Service_Analytics(CAnalytics_Google_ClientFactory::createAuthenticatedGoogleClient($options));
-        $cache = new CAnalytics_Google_Cache(carr::get($options, 'cache'));
-        $client = new CAnalytics_Google_Client($googleServiceAnalytics, $cache);
-        $client->setCacheLifeTimeInMinutes(carr::get($options, 'cacheLifetime', 60));
+    public function __construct(CAnalytics_Google_Client $client, $viewId) {
         $this->client = $client;
-        $this->viewId = carr::get($options, 'viewId');
+        $this->viewId = $viewId;
     }
 
     /**
@@ -36,7 +38,12 @@ class CAnalytics_Google {
      */
     public function setViewId($viewId) {
         $this->viewId = $viewId;
+
         return $this;
+    }
+
+    public function getViewId() {
+        return $this->viewId;
     }
 
     public function fetchVisitorsAndPageViews(CPeriod $period) {
@@ -45,6 +52,7 @@ class CAnalytics_Google {
             'ga:users,ga:pageviews',
             ['dimensions' => 'ga:date,ga:pageTitle']
         );
+
         return c::collect(isset($response['rows']) ? $response['rows'] : [])->map(function (array $dateRow) {
             return [
                 'date' => CCarbon::createFromFormat('Ymd', $dateRow[0]),
@@ -61,6 +69,7 @@ class CAnalytics_Google {
             'ga:users,ga:pageviews',
             ['dimensions' => 'ga:date']
         );
+
         return c::collect(isset($response['rows']) ? $response['rows'] : [])->map(function (array $dateRow) {
             return [
                 'date' => CCarbon::createFromFormat('Ymd', $dateRow[0]),
@@ -80,6 +89,7 @@ class CAnalytics_Google {
                 'max-results' => $maxResults,
             ]
         );
+
         return c::collect(isset($response['rows']) ? $response['rows'] : [])
             ->map(function (array $pageRow) {
                 return [
@@ -100,6 +110,7 @@ class CAnalytics_Google {
                 'max-results' => $maxResults,
             ]
         );
+
         return c::collect(isset($response['rows']) ? $response['rows'] : [])->map(function (array $pageRow) {
             return [
                 'url' => $pageRow[0],
@@ -116,7 +127,8 @@ class CAnalytics_Google {
                 'dimensions' => 'ga:userType',
             ]
         );
-        return c::collect(cobj::get($response, 'rows') ? $response->rows : [])->map(function (array $userRow) {
+
+        return c::collect(isset($response['rows']) ? $response['rows'] : [])->map(function (array $userRow) {
             return [
                 'type' => $userRow[0],
                 'sessions' => (int) $userRow[1],
@@ -143,6 +155,7 @@ class CAnalytics_Google {
         if ($topBrowsers->count() <= $maxResults) {
             return $topBrowsers;
         }
+
         return $this->summarizeTopBrowsers($topBrowsers, $maxResults);
     }
 
@@ -155,72 +168,6 @@ class CAnalytics_Google {
             ]);
     }
 
-    public function fetchActiveUsers() {
-        $response = $this->performRealtime(
-            'rt:activeVisitors',
-            [
-                'dimensions' => 'rt:userType',
-                'sort' => '-rt:userType',
-            ]
-        );
-
-        return $response->totalsForAllResults['rt:activeVisitors'];
-    }
-
-    public function fetchActiveUsersByBrowser($maxResults = 20) {
-        $response = $this->performRealtime(
-            'rt:activeVisitors',
-            [
-                'dimensions' => 'rt:browser',
-                'sort' => 'rt:browser',
-                'max-results' => $maxResults,
-            ]
-        );
-
-        $topBrowsers = c::collect(isset($response['rows']) ? $response['rows'] : [])->map(function (array $browserRow) {
-            return [
-                'browser' => $browserRow[0],
-                'sessions' => (int) $browserRow[1],
-            ];
-        });
-        if ($topBrowsers->count() <= $maxResults) {
-            return $topBrowsers;
-        }
-        return $this->summarizeTopBrowsers($topBrowsers, $maxResults);
-    }
-
-    /**
-     * Get the top keywords.
-     *
-     * @param CPeriod $period
-     * @param int     $maxResults
-     *
-     * @return CCollection
-     */
-    public function fetchTopKeywords(CPeriod $period, $maxResults = 30) {
-        $answer = $this->performQuery(
-            $period,
-            'ga:sessions',
-            [
-                'dimensions' => 'ga:keyword',
-                'sort' => '-ga:sessions',
-                'max-results' => $maxResults,
-                'filters' => 'ga:keyword!=(not set);ga:keyword!=(not provided)'
-            ]
-        );
-        if (is_null($answer->rows)) {
-            return [];
-        }
-        $keywordData = [];
-        foreach ($answer->rows as $pageRow) {
-            $keywordData[] = [
-                'keyword' => $pageRow[0],
-                'sessions' => $pageRow[1]
-            ];
-        }
-        return $keywordData;
-    }
-
     /**
      * Call the query method on the authenticated client.
      *
@@ -228,29 +175,13 @@ class CAnalytics_Google {
      * @param string $metrics
      * @param array  $others
      *
-     * @return array|null
+     * @return null|array
      */
     public function performQuery(CPeriod $period, $metrics, array $others = []) {
         return $this->client->performQuery(
             $this->viewId,
             $period->startDate,
             $period->endDate,
-            $metrics,
-            $others
-        );
-    }
-
-    /**
-     * Call the query method on the authenticated client.
-     *
-     * @param string $metrics
-     * @param array  $others
-     *
-     * @return array|null
-     */
-    public function performRealtime($metrics, array $others = []) {
-        return $this->client->performRealtime(
-            $this->viewId,
             $metrics,
             $others
         );

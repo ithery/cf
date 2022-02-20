@@ -75,12 +75,12 @@ class CDatabase_Schema_Blueprint {
     /**
      * Execute the blueprint against the database.
      *
-     * @param \CDatabase                                   $connection
-     * @param \Illuminate\Database\Schema\Grammars\Grammar $grammar
+     * @param \CDatabase                $connection
+     * @param \CDatabase_Schema_Grammar $grammar
      *
      * @return void
      */
-    public function build(CDatabase $connection, Grammar $grammar) {
+    public function build(CDatabase $connection, CDatabase_Schema_Grammar $grammar) {
         foreach ($this->toSql($connection, $grammar) as $statement) {
             $connection->statement($statement);
         }
@@ -89,12 +89,12 @@ class CDatabase_Schema_Blueprint {
     /**
      * Get the raw SQL statements for the blueprint.
      *
-     * @param \CDatabase                                   $connection
-     * @param \Illuminate\Database\Schema\Grammars\Grammar $grammar
+     * @param \CDatabase                $connection
+     * @param \CDatabase_Schema_Grammar $grammar
      *
      * @return array
      */
-    public function toSql(CDatabase $connection, Grammar $grammar) {
+    public function toSql(CDatabase $connection, CDatabase_Schema_Grammar $grammar) {
         $this->addImpliedCommands();
 
         $statements = [];
@@ -469,7 +469,7 @@ class CDatabase_Schema_Blueprint {
      * @return CBase_Fluent
      */
     public function char($column, $length = null) {
-        $length = $length ?: Builder::$defaultStringLength;
+        $length = $length ?: CDatabase_Schema_Builder::$defaultStringLength;
 
         return $this->addColumn('char', $column, compact('length'));
     }
@@ -483,7 +483,7 @@ class CDatabase_Schema_Blueprint {
      * @return CBase_Fluent
      */
     public function string($column, $length = null) {
-        $length = $length ?: Builder::$defaultStringLength;
+        $length = $length ?: CDatabase_Schema_Builder::$defaultStringLength;
 
         return $this->addColumn('string', $column, compact('length'));
     }

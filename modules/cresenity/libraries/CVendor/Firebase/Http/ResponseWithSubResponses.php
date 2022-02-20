@@ -2,13 +2,14 @@
 
 use GuzzleHttp\Psr7\Response;
 use Psr\Http\Message\ResponseInterface;
-use Riverline\MultiPartParser\Converters\PSR7;
 use Riverline\MultiPartParser\StreamedPart;
+use Riverline\MultiPartParser\Converters\PSR7;
 
 final class CVendor_Firebase_Http_ResponseWithSubResponses implements CVendor_Firebase_Http_HasSubResponsesInterface, ResponseInterface {
     use CVendor_Firebase_Trait_WrappedPsr7ResponseTrait;
-
-    /** @var Responses */
+    /**
+     * @var CVendor_Firebase_Http_Responses
+     */
     private $subResponses;
 
     public function __construct(ResponseInterface $response) {

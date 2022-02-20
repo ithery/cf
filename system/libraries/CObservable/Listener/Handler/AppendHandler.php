@@ -11,15 +11,16 @@ defined('SYSPATH') or die('No direct access allowed.');
 class CObservable_Listener_Handler_AppendHandler extends CObservable_Listener_Handler {
     use CTrait_Compat_Handler_Driver_Append,
         CObservable_Listener_Handler_Trait_TargetHandlerTrait,
-        CObservable_Listener_Handler_Trait_AjaxHandlerTrait;
+        CObservable_Listener_Handler_Trait_SelectorHandlerTrait,
+        CObservable_Listener_Handler_Trait_AjaxHandlerTrait,
+        CObservable_Listener_Handler_Trait_BlockerHandlerTrait,
+        CObservable_Listener_Handler_Trait_ParamHandlerTrait;
 
     protected $content;
 
     protected $param;
 
-    protected $param_inputs;
-
-    protected $check_duplicate_selector;
+    protected $checkDuplicateSelector;
 
     public function __construct($listener) {
         parent::__construct($listener);
@@ -27,82 +28,70 @@ class CObservable_Listener_Handler_AppendHandler extends CObservable_Listener_Ha
         $this->method = 'get';
         $this->target = '';
         $this->content = CHandlerElement::factory();
-        $this->param_inputs = [];
+        $this->paramInputs = [];
+        $this->paramInputsByName = [];
+        $this->paramRequest = [];
+        $this->url = '';
+        $this->urlParam = [];
     }
 
-    /**
-     * Add param input
-     *
-     * @param string|array $inputs
-     *
-     * @return $this
-     */
-    public function addParamInput($inputs) {
-        if (!is_array($inputs)) {
-            $inputs = [$inputs];
-        }
-        foreach ($inputs as $inp) {
-            $this->param_inputs[] = $inp;
-        }
-        return $this;
-    }
-
-    /**
-     * Set method of ajax
-     *
-     * @param string $method
-     *
-     * @return $this
-     */
-    public function setMethod($method) {
-        $this->method = $method;
-        return $this;
-    }
-
-    /**
-     * Get content
-     *
-     * @return string
-     */
     public function content() {
         return $this->content;
     }
 
+    public function toAttributeArray() {
+        return [
+            'selector' => $this->getSelector(),
+            'url' => $this->generatedUrl(),
+            'method' => $this->method,
+            'blockType' => $this->blockerType,
+        ];
+    }
+
     /**
-     * Set duplicate css selector checker
+     * Set duplicate css selector checker.
      *
      * @param string $selector
      *
      * @return $this
      */
     public function setCheckDuplicateSelector($selector) {
-        $this->check_duplicate_selector = $selector;
+        $this->checkDuplicateSelector = $selector;
+
         return $this;
     }
 
     public function js() {
         $js = '';
-        $data_addition = '';
+        $dataAddition = $this->populateParamJson();
 
-        foreach ($this->param_inputs as $inp) {
-            if (strlen($data_addition) > 0) {
-                $data_addition .= ',';
-            }
-            $data_addition .= "'" . $inp . "':$('#" . $inp . "').val()";
-        }
-        $data_addition = '{' . $data_addition . '}';
+        $generatedUrl = $this->generatedUrl();
+        $jsOptions = '{';
+        $jsOptions .= "selector:'" . $this->getSelector() . "',";
+        $jsOptions .= "url:'" . $generatedUrl . "',";
+        $jsOptions .= "method:'" . $this->method . "',";
+        $jsOptions .= 'dataAddition:' . $dataAddition . ',';
+        $jsOptions .= "blockType:'" . $this->getBlockerType() . "',";
+
+        $jsOptions .= '}';
+
         $js .= '
-            var is_duplicate = 0;
-            var check_duplicate = ' . (strlen($this->check_duplicate_selector) > 0 ? '1' : '0') . ";
-            if(check_duplicate==1){
-                if (jQuery('#" . $this->target . "').find('" . $this->check_duplicate_selector . "').length > 0) {
-                    is_duplicate = 1;
+            var isDuplicate = 0;
+            var checkDuplicate = ' . (strlen($this->checkDuplicateSelector) > 0 ? '1' : '0') . ';
+            if (checkDuplicate == 1) {
+                if (jQuery("#' . $this->target . '").find("' . $this->checkDuplicateSelector . '").length > 0) {
+                    isDuplicate = 1;
                 }
             }
-            if (is_duplicate==0) {
-			    $.cresenity.append('" . $this->target . "','" . $this->generatedUrl() . "','" . $this->method . "'," . $data_addition . ');
+
+            if (isDuplicate == 0) {
+                if (cresenity) {
+                    cresenity.append(' . $jsOptions . ');
+                } else {
+                    $.cresenity.append("' . $this->target . '", "' . $generatedUrl . '", "' . $this->method . '", ' . $dataAddition . ');
+                }
             }
-		';
+         ';
 
         return $js;
     }

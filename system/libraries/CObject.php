@@ -14,6 +14,7 @@ class CObject {
         if ($id == '') {
             $id = spl_object_hash($this);
         }
+
         $this->id = $id;
         $this->domain = CF::domain();
         $observer->add($this);

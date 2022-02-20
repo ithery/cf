@@ -69,7 +69,7 @@ class CVendor_Firebase_Messaging {
         $registrationTokens = $this->ensureNonEmptyRegistrationTokens($registrationTokens);
 
         $request = new CVendor_Firebase_Messaging_Request_SendMessageToTokensRequest($this->projectId, $message, $registrationTokens);
-        /** @var ResponseWithSubResponses $response */
+        /** @var CVendor_Firebase_Http_ResponseWithSubResponses $response */
         $response = $this->messagingApi->send($request);
 
         return CVendor_Firebase_Messaging_MulticastSendReport::fromRequestsAndResponses($request->subRequests(), $response->subResponses());

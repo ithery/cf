@@ -34,5 +34,7 @@ class CNotification_Message_Firebase extends CNotification_MessageAbstract {
         foreach ($multicastReport->failures()->getItems() as $report) {
             CDaemon::log('Fail send to ' . $report->target()->type() . ':' . $report->target()->value() . ', reason:' . $report->error()->getMessage());
         }
+
+        return $multicastReport;
     }
 }

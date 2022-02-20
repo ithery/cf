@@ -44,21 +44,29 @@ trait CElement_FormInput_SelectSearch_Trait_Select2v23Trait {
         }
 
         $strJsInit = '';
-        if ($this->autoSelect) {
-            $db = CDatabase::instance();
-            $rjson = 'false';
-
-            $q = 'select * from (' . $this->query . ') as a limit 1';
-            $r = $db->query($q)->resultArray(false);
-            if (count($r) > 0) {
-                $r = $r[0];
-                if ($this->valueCallback != null && is_callable($this->valueCallback)) {
-                    foreach ($r as $k => $val) {
-                        $r[$k] = $this->valueCallback($r, $k, $val);
+        $selectedRows = $this->getSelectedRow();
+        if ($selectedRows) {
+            foreach ($selectedRows as $index => $selectedRow) {
+                if ($selectedRow != null) {
+                    $row = $selectedRow;
+                    if (is_object($row)) {
+                        $row = (array) $row;
                     }
+                    if (isset($this->valueCallback) && is_callable($this->valueCallback)) {
+                        foreach ($row as $k => $v) {
+                            $row[$k] = $this->valueCallback($row, $k, $v);
+                        }
+                    }
+                    $selectedData[] = $row;
                 }
             }
-            $rjson = json_encode($r);
+        }
+
+        if ($selectedData && is_array($selectedData) && count($selectedData) > 0) {
+            if (!$this->multiple) {
+                $selectedData = carr::first($selectedData);
+            }
+            $rjson = json_encode($selectedData);
 
             $strJsInit = '
                 initSelection : function (element, callback) {
