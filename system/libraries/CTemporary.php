@@ -89,9 +89,7 @@ class CTemporary {
      */
     public static function makeFolder($path, $folder) {
         $path = $path . $folder . DIRECTORY_SEPARATOR;
-        if (!is_dir($path)) {
-            mkdir($path);
-        }
+        self::makeDir($path);
 
         return $path;
     }
@@ -262,5 +260,14 @@ class CTemporary {
 
     public static function __callStatic($name, $arguments) {
         return CTemporary::instance()->$name(...$arguments);
+    }
+
+    /**
+     * @param string $location
+     *
+     * @return CTemporary_CustomDirectory
+     */
+    public static function customDirectory($location = '') {
+        return new CTemporary_CustomDirectory($location);
     }
 }

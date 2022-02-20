@@ -1,13 +1,13 @@
 <?php
 
 /**
- * Description of Reloadable
+ * Description of Reloadable.
  *
  * @author Hery
  */
 trait CTrait_Element_Handler_ReloadHandler {
     /**
-     * Reload Handler
+     * Reload Handler.
      *
      * @var CObservable_Listener_Handler_ReloadHandler
      */
@@ -27,10 +27,11 @@ trait CTrait_Element_Handler_ReloadHandler {
             $listener->addHandler($this->reloadHandler);
             $this->reloadHandlers[] = $this->reloadHandler;
         }
+
         return $this->reloadHandler;
     }
 
-    public function bootBuildReloadHandler() {
+    protected function bootBuildReloadHandler() {
         if ($this->reloadHandler) {
             $attributes = $this->reloadHandler->toAttributeArray();
             foreach ($attributes as $key => $value) {
