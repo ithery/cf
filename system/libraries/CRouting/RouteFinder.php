@@ -52,6 +52,7 @@ class CRouting_RouteFinder {
             //cdbg::dd($routedUri);
             //$routedUri = 't/ittron/feeds/hashtag/posts/{any0}';
             $route = new CRouting_Route(CRouting_Router::$verbs, $routedUri, $className . '@' . $method, $parameters);
+            $route->setRouteData($routeData);
         }
 
         return $route;

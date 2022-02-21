@@ -1171,4 +1171,14 @@ class CRouting_Route {
     public function routedUri() {
         return c::optional($this->routeData)->getRoutedUri();
     }
+
+    public function setRouteData(CRouting_RouteData $routeData) {
+        $this->routeData = $routeData;
+
+        return $this;
+    }
+
+    public function getRouteData() {
+        return $this->routeData;
+    }
 }
