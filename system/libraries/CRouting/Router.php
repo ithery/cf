@@ -1174,10 +1174,11 @@ class CRouting_Router {
             return $this->macroCall($method, $parameters);
         }
 
+        $routeRegistrar = new CRouting_RouteRegistrar($this);
         if ($method === 'middleware') {
-            return (new RouteRegistrar($this))->attribute($method, is_array($parameters[0]) ? $parameters[0] : $parameters);
+            return $routeRegistrar->attribute($method, is_array($parameters[0]) ? $parameters[0] : $parameters);
         }
 
-        return (new RouteRegistrar($this))->attribute($method, $parameters[0]);
+        return $routeRegistrar->attribute($method, $parameters[0]);
     }
 }
