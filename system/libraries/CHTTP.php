@@ -151,4 +151,8 @@ class CHTTP {
     public static function client() {
         return CHTTP_Client::instance();
     }
+
+    public static function robotsTxt() {
+        return CHTTP_RobotsTxt::instance();
+    }
 }
