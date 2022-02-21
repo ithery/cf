@@ -160,4 +160,8 @@ class CHTTP_RobotsTxt {
     public function metaTag() {
         return '<meta name="robots" content="' . ($this->shouldIndex() ? 'index, follow' : 'noindex, nofollow') . '">';
     }
+
+    public function toResponse() {
+        return c::response($this->generate(), 200, ['Content-Type' => 'text/plain']);
+    }
 }
