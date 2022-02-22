@@ -66,7 +66,15 @@ class Embed {
      * @return Extractor
      */
     private function extract(RequestInterface $request, ResponseInterface $response, $redirect = true) {
-        $uri = $this->crawler->getResponseUri($response) ?: $request->getUri();
+        $shouldCrawler = false;
+        $uri = $request->getUri();
+        if (preg_match('#https:\/\/www.instagram.com\/#U', $uri)) {
+            $shouldCrawler = false;
+        }
+        if ($shouldCrawler) {
+            $uri = $this->crawler->getResponseUri($response) ?: $request->getUri();
+        }
+
         $extractor = $this->extractorFactory->createExtractor($uri, $request, $response, $this->crawler);
         if (!$redirect || !$this->mustRedirect($extractor)) {
             return $extractor;
