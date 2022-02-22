@@ -18,6 +18,9 @@ class CCache_Manager implements CCache_Contract_FactoryInterface {
 
     private static $instance;
 
+    /**
+     * @return CCache_Manager
+     */
     public static function instance() {
         if (self::$instance == null) {
             self::$instance = new static();

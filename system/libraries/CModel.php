@@ -24,7 +24,6 @@ defined('SYSPATH') or die('No direct access allowed.');
  * @method void                                       onDelete(Closure $callback)                                                                                  Register a replacement for the default delete function.
  * @method CModel[]                                   getModels($columns = ['*'])                                                                                  Get the hydrated models without eager loading.
  * @method array                                      eagerLoadRelations(array $models)                                                                            Eager load the relationships for the models.
- * @method array                                      loadRelation(array $models, $name, Closure $constraints)                                                     Eagerly load the relationship on a set of models.
  * @method static                                     CModel_Query|static where($column, $operator = null, $value = null, $boolean = 'and')                        Add a basic where clause to the query.
  * @method static                                     CModel_Query|static whereHas($relation, Closure $callback = null, $operator = '>=', $count = 1)              Add a relationship count / exists condition to the query with where clauses.
  * @method static                                     CModel_Query|static orWhere($column, $operator = null, $value = null)                                        Add an "or where" clause to the query.
@@ -81,6 +80,7 @@ abstract class CModel implements ArrayAccess, CInterface_Arrayable, CInterface_J
         CModel_Trait_HidesAttributes,
         CModel_Trait_Timestamps,
         CTrait_ForwardsCalls;
+
     /**
      * The name of the "created" column.
      *

@@ -182,6 +182,7 @@ class CManager_Asset {
         $jsBefore = '';
         $i = 0;
         $manager = CManager::instance();
+
         if ($manager->getUseRequireJs()) {
             foreach ($jsFiles as $f) {
                 $urlJsFile = CManager_Asset_Helper::urlJsFile($f);
@@ -192,7 +193,7 @@ class CManager_Asset {
                 $i++;
             }
         }
-        $jsBefore = $this->varJs();
+        $jsBefore = CApp::isAjax() ? '' : $this->varJs();
 
         return $jsBefore . $this->wrapJs($jsOpen . $js . $jsClose);
     }
