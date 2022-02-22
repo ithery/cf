@@ -16,6 +16,12 @@ class CAjax_Engine_DependsOn extends CAjax_Engine {
             $data = $data->toArray();
         }
 
+        if ($data instanceof CRenderable) {
+            $app = c::app();
+            $app->add($data);
+            $data = $app->toArray();
+        }
+
         return $this->toJsonResponse($errCode, $errMessage, $data);
     }
 }
