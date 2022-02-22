@@ -1,6 +1,7 @@
 <?php
 
 defined('SYSPATH') or die('No direct access allowed.');
+use Opis\Closure\SerializableClosure;
 
 /**
  * @author Hery Kurniawan
@@ -87,6 +88,11 @@ class CFunction {
 
         $error = 0;
         if ($error == 0) {
+            if ($this->func instanceof SerializableClosure) {
+                return $this->func->__invoke(...$args);
+            }
+        }
+        if ($error == 0) {
             if (is_array($this->func)) {
                 if (is_callable($this->func)) {
                     return call_user_func_array($this->func, $args);
@@ -95,6 +101,7 @@ class CFunction {
                 }
             }
         }
+
         if ($error == 0) {
             if ($this->func instanceof Closure) {
                 return call_user_func_array($this->func, $args);
