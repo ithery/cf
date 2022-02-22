@@ -68,7 +68,10 @@ class Embed {
     private function extract(RequestInterface $request, ResponseInterface $response, $redirect = true) {
         $shouldCrawler = false;
         $uri = $request->getUri();
-        if (preg_match('#https:\/\/www.instagram.com\/#U', $uri)) {
+        $host = $uri->getHost();
+        $notShouldCrawlerHost = ['www.instagram.com', 'instagram.com', 'www.facebook.com', 'facebook.com'];
+
+        if (in_array($host, $notShouldCrawlerHost)) {
             $shouldCrawler = false;
         }
         if ($shouldCrawler) {
