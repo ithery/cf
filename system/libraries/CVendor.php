@@ -2,8 +2,8 @@
 
 use GuzzleHttp\Client as GuzzleClient;
 use Http\Adapter\Guzzle6\Client as GuzzleAdapter;
-use Http\Client\Common\HttpMethodsClient as HttpClient;
 use Http\Message\MessageFactory\GuzzleMessageFactory;
+use Http\Client\Common\HttpMethodsClient as HttpClient;
 
 class CVendor {
     /**
@@ -45,6 +45,7 @@ class CVendor {
 
         $client = new HttpClient(new GuzzleAdapter($guzzle), new GuzzleMessageFactory());
         $api = new CVendor_OneSignal($config, $client);
+
         return $api;
     }
 
@@ -52,12 +53,15 @@ class CVendor {
         switch (strtolower($type)) {
             case 'starter':
                 return new CVendor_RajaOngkir_Starter();
+
                 break;
             case 'basic':
                 return new CVendor_RajaOngkir_Basic();
+
                 break;
             default:
                 return new CVendor_RajaOngkir_Pro();
+
                 break;
         }
     }
@@ -120,7 +124,7 @@ class CVendor {
     }
 
     /**
-     * [zenziva description]
+     * [zenziva description].
      *
      * @param string $username [description]
      * @param string $password [description]
@@ -134,7 +138,7 @@ class CVendor {
     }
 
     /**
-     * [kredivo description]
+     * [kredivo description].
      *
      * @param string $serverKey   [<description>]
      * @param string $environment [<description>]
@@ -184,6 +188,7 @@ class CVendor {
         if (!isset($options['from'])) {
             $options['from'] = CF::config('vendor.nexmo.from');
         }
+
         return new CVendor_Nexmo($apiKey, $apiSecret, $options);
     }
 
