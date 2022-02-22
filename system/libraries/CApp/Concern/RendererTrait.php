@@ -238,7 +238,7 @@ HTML;
      * @throws CException
      * @throws CApp_Exception
      *
-     * @return void
+     * @return string
      */
     public function render() {
         /** @var CApp $this */
@@ -248,7 +248,6 @@ HTML;
             }
         }
         $this->rendered = true;
-
         $this->registerCoreModules();
 
         CFEvent::run('CApp.beforeRender');

@@ -12,6 +12,10 @@ class CAjax_Engine_DependsOn extends CAjax_Engine {
         $resolver = $dependsOn->getResolver();
         $data = $this->invokeCallback($resolver, [$value]);
 
+        if ($data instanceof CApp) {
+            $data = $data->toArray();
+        }
+
         return $this->toJsonResponse($errCode, $errMessage, $data);
     }
 }
