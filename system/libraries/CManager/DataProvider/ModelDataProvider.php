@@ -128,15 +128,33 @@ class CManager_DataProvider_ModelDataProvider extends CManager_DataProviderAbstr
                     $relation = implode('.', $fields);
 
                     $query->with([$relation => function ($q2) use ($sortDirection, $field) {
-                        $q2->orderBy($field, $sortDirection);
+                        if (!$this->isRelationField($q2, $field)) {
+                            $q2->orderBy($field, $sortDirection);
+                        }
                     }]);
                 } else {
-                    $query->orderBy($fieldName, $sortDirection);
+                    if (!$this->isRelationField($query, $fieldName)) {
+                        $query->orderBy($fieldName, $sortDirection);
+                    }
                 }
             }
         }
 
         return $query;
+    }
+
+    protected function isRelationField(CModel_Query $query, $fieldName) {
+        if (method_exists($query->getModel(), $fieldName)) {
+            try {
+                $query->getModel()->load($fieldName);
+            } catch (CModel_Exception_RelationNotFoundException $ex) {
+                return false;
+            }
+
+            return true;
+        }
+
+        return false;
     }
 
     public function paginate($perPage = null, $columns = ['*'], $pageName = 'page', $page = null, $callback = null) {
