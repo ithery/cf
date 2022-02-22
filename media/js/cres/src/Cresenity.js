@@ -14,6 +14,7 @@ import { elementReady, elementRendered } from './util/dom-observer';
 import { debounce } from './util/debounce';
 import { confirmFromElement, defaultConfirmHandler } from './module/confirm-handler';
 import initValidation from './module/validation';
+
 import ucfirst from 'locutus/php/strings/ucfirst';
 import Alpine from 'alpinejs';
 import cresReact from './react';
@@ -1208,5 +1209,20 @@ export default class Cresenity {
 
     showError(errMessage) {
         this.toast('error', errMessage);
+    }
+
+    inViewPort(el) {
+        // Special bonus for those using jQuery
+        if (typeof jQuery === 'function' && el instanceof jQuery) {
+            el = el[0];
+        }
+
+        const rect = el.getBoundingClientRect();
+        return (
+            rect.top >= 0 &&
+            rect.left >= 0 &&
+            rect.bottom <= (window.innerHeight || document.documentElement.clientHeight) && /* or $(window).height() */
+            rect.right <= (window.innerWidth || document.documentElement.clientWidth) /* or $(window).width() */
+        );
     }
 }

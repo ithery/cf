@@ -5,7 +5,7 @@ trait CDatabase_Query_Concern_BuilderWhereTrait {
      * Add a basic where clause to the query.
      *
      * @param string|array|\Closure $column
-     * @param string|null           $operator
+     * @param null|string           $operator
      * @param mixed                 $value
      * @param string                $boolean
      *
@@ -125,9 +125,9 @@ trait CDatabase_Query_Concern_BuilderWhereTrait {
      * @param string $operator
      * @param bool   $useDefault
      *
-     * @return array
-     *
      * @throws \InvalidArgumentException
+     *
+     * @return array
      */
     protected function prepareValueAndOperator($value, $operator, $useDefault = false) {
         if ($useDefault) {
@@ -170,7 +170,7 @@ trait CDatabase_Query_Concern_BuilderWhereTrait {
      * Add an "or where" clause to the query.
      *
      * @param string|array|\Closure $column
-     * @param string|null           $operator
+     * @param null|string           $operator
      * @param mixed                 $value
      *
      * @return \CDatabase_Query_Builder|static
@@ -189,9 +189,9 @@ trait CDatabase_Query_Concern_BuilderWhereTrait {
      * Add a "where" clause comparing two columns to the query.
      *
      * @param string|array $first
-     * @param string|null  $operator
-     * @param string|null  $second
-     * @param string|null  $boolean
+     * @param null|string  $operator
+     * @param null|string  $second
+     * @param null|string  $boolean
      *
      * @return \CDatabase_Query_Builder|static
      */
@@ -230,8 +230,8 @@ trait CDatabase_Query_Concern_BuilderWhereTrait {
      * Add an "or where" clause comparing two columns to the query.
      *
      * @param string|array $first
-     * @param string|null  $operator
-     * @param string|null  $second
+     * @param null|string  $operator
+     * @param null|string  $second
      *
      * @return \CDatabase_Query_Builder|static
      */
@@ -672,6 +672,7 @@ trait CDatabase_Query_Concern_BuilderWhereTrait {
             $operator,
             func_num_args() == 2
         );
+
         return $this->whereTime($column, $operator, $value, 'or');
     }
 
@@ -710,7 +711,7 @@ trait CDatabase_Query_Concern_BuilderWhereTrait {
      *
      * @param string                         $column
      * @param string                         $operator
-     * @param \DateTimeInterface|string|null $value
+     * @param null|\DateTimeInterface|string $value
      *
      * @return $this
      */
@@ -759,7 +760,7 @@ trait CDatabase_Query_Concern_BuilderWhereTrait {
      *
      * @param string                         $column
      * @param string                         $operator
-     * @param \DateTimeInterface|string|null $value
+     * @param null|\DateTimeInterface|string $value
      *
      * @return $this
      */
@@ -804,7 +805,7 @@ trait CDatabase_Query_Concern_BuilderWhereTrait {
      *
      * @param string                             $column
      * @param string                             $operator
-     * @param \DateTimeInterface|string|int|null $value
+     * @param null|\DateTimeInterface|string|int $value
      *
      * @return $this
      */
@@ -995,9 +996,9 @@ trait CDatabase_Query_Concern_BuilderWhereTrait {
      * @param array  $values
      * @param string $boolean
      *
-     * @return $this
-     *
      * @throws \InvalidArgumentException
+     *
+     * @return $this
      */
     public function whereRowValues($columns, $operator, $values, $boolean = 'and') {
         if (count($columns) !== count($values)) {

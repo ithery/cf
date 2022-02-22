@@ -11,6 +11,9 @@ class CEmail_Builder_Renderer {
         return CEmail::Builder()->globalData()->get($key, $defaultValue);
     }
 
+    /**
+     * @return string
+     */
     public function render() {
         $lang = $this->get('lang');
         $langAttribute = '';

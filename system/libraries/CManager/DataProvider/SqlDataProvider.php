@@ -40,7 +40,7 @@ class CManager_DataProvider_SqlDataProvider extends CManager_DataProviderAbstrac
         return c::db($this->connection)->query($sql, $bindings);
     }
 
-    public function paginate($perPage = null, $columns = ['*'], $pageName = 'page', $page = null) {
+    public function paginate($perPage = null, $columns = ['*'], $pageName = 'page', $page = null, $callback = null) {
         $page = $page ?: CPagination_Paginator::resolveCurrentPage($pageName);
 
         $total = $this->getCountForPagination();
@@ -169,7 +169,7 @@ class CManager_DataProvider_SqlDataProvider extends CManager_DataProviderAbstrac
         }
 
         if (count($this->searchAnd) > 0) {
-            $dataSearchAnd = $this->search;
+            $dataSearchAnd = $this->searchAnd;
 
             foreach ($dataSearchAnd as $fieldName => $value) {
                 $sWhereAnd .= 'AND ' . c::db()->escapeColumn($fieldName) . " LIKE '%" . c::db($this->connection)->escapeLike($value) . "%' ";

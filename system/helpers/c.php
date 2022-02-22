@@ -697,6 +697,9 @@ class c {
         if ($key === null) {
             return CSession::instance()->store();
         }
+        if (is_array($key)) {
+            return CSession::instance()->store()->put($key);
+        }
 
         return CSession::instance()->store()->get($key, $default);
     }
@@ -1592,6 +1595,14 @@ class c {
             'currentPage',
             'options'
         ));
+    }
+
+    public static function json($data, $options = null, $depth = 512) {
+        if ($options == null) {
+            $options = JSON_HEX_TAG | JSON_HEX_APOS | JSON_HEX_AMP | JSON_HEX_QUOT;
+        }
+
+        return json_encode($data, $options, $depth);
     }
 }
 
