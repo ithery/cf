@@ -206,7 +206,7 @@ trait CModel_Trait_QueriesRelationships {
         }
 
         foreach ($types as &$type) {
-            $type = CModel_Relation::getMorphedModel($type) ?? $type;
+            $type = CModel_Relation::getMorphedModel($type) ?: $type;
         }
 
         return $this->where(function ($query) use ($relation, $callback, $operator, $count, $types) {
