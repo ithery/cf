@@ -564,12 +564,11 @@ trait CModel_Trait_QueriesRelationships {
         if (!$relationship instanceof CModel_Relation_BelongsTo) {
             throw CModel_Exception_RelationNotFoundException::make($this->model, $relationshipName, CModel_Relation_BelongsTo::class);
         }
-
         $this->where(
             $relationship->getQualifiedForeignKeyName(),
             '=',
             $related->getAttributeValue($relationship->getOwnerKeyName()),
-            $boolean,
+            $boolean
         );
 
         return $this;
