@@ -27,21 +27,39 @@ class CApi_HTTP_Response extends CHTTP_Response {
      *
      * @var array
      */
-    protected static $formatters = [];
+    protected $formatters = [
+        'json' => CApi_HTTP_Response_Format_JsonFormat::class,
+        'jsonp' => CApi_HTTP_Response_Format_JsonFormat::class,
+        'default' => CApi_HTTP_Response_Format_DefaultFormat::class,
+
+    ];
 
     /**
      * Array of formats' options.
      *
      * @var array
      */
-    protected static $formatsOptions = [];
+    protected $formatsOptions = [
+
+        'json' => [
+            'pretty_print' => false,
+            'indent_style' => 'space',
+            'indent_size' => 2,
+        ],
+        'default' => [
+            'pretty_print' => false,
+            'indent_style' => 'space',
+            'indent_size' => 2,
+        ],
+
+    ];
 
     /**
      * Transformer factory instance.
      *
-     * @var \Dingo\Api\Transformer\TransformerFactory
+     * @var \CApi_Transformer_Factory
      */
-    protected static $transformer;
+    protected $transformer;
 
     /**
      * Create a new response instance.
@@ -110,13 +128,13 @@ class CApi_HTTP_Response extends CHTTP_Response {
 
         $this->fireMorphingEvent();
 
-        if (isset(static::$transformer) && static::$transformer->transformableResponse($this->content)) {
-            $this->content = static::$transformer->transform($this->content);
+        if (isset($this->transformer) && $this->transformer->transformableResponse($this->content)) {
+            $this->content = $this->transformer->transform($this->content);
         }
 
-        $formatter = static::getFormatter($format);
+        $formatter = $this->getFormatter($format);
 
-        $formatter->setOptions(static::getFormatsOptions($format));
+        $formatter->setOptions($this->getFormatsOptions($format));
 
         $defaultContentType = $this->headers->get('Content-Type');
 
@@ -208,12 +226,12 @@ class CApi_HTTP_Response extends CHTTP_Response {
      *
      * @return \CApi_HTTP_Response_FormatAbstract
      */
-    public static function getFormatter($format) {
-        if (!static::hasFormatter($format)) {
+    public function getFormatter($format) {
+        if (!$this->hasFormatter($format)) {
             throw new NotAcceptableHttpException('Unable to format response according to Accept header.');
         }
 
-        return static::$formatters[$format];
+        return $this->formatters[$format];
     }
 
     /**
@@ -223,8 +241,8 @@ class CApi_HTTP_Response extends CHTTP_Response {
      *
      * @return bool
      */
-    public static function hasFormatter($format) {
-        return isset(static::$formatters[$format]);
+    public function hasFormatter($format) {
+        return isset($this->formatters[$format]);
     }
 
     /**
@@ -234,8 +252,8 @@ class CApi_HTTP_Response extends CHTTP_Response {
      *
      * @return void
      */
-    public static function setFormatters(array $formatters) {
-        static::$formatters = $formatters;
+    public function addFormatters(array $formatters) {
+        $this->formatters = array_merge($this->formatters, $formatters);
     }
 
     /**
@@ -245,8 +263,8 @@ class CApi_HTTP_Response extends CHTTP_Response {
      *
      * @return void
      */
-    public static function setFormatsOptions(array $formatsOptions) {
-        static::$formatsOptions = $formatsOptions;
+    public function addFormatsOptions(array $formatsOptions) {
+        $this->formatsOptions = array_merge($this->formatsOptions, $formatsOptions);
     }
 
     /**
@@ -256,12 +274,12 @@ class CApi_HTTP_Response extends CHTTP_Response {
      *
      * @return array
      */
-    public static function getFormatsOptions($format) {
-        if (!static::hasOptionsForFormat($format)) {
+    public function getFormatsOptions($format) {
+        if (!$this->hasOptionsForFormat($format)) {
             return [];
         }
 
-        return static::$formatsOptions[$format];
+        return $this->formatsOptions[$format];
     }
 
     /**
@@ -271,20 +289,20 @@ class CApi_HTTP_Response extends CHTTP_Response {
      *
      * @return bool
      */
-    public static function hasOptionsForFormat($format) {
-        return isset(static::$formatsOptions[$format]);
+    public function hasOptionsForFormat($format) {
+        return isset($this->formatsOptions[$format]);
     }
 
     /**
      * Add a response formatter.
      *
-     * @param string                                 $key
-     * @param \Dingo\Api\Http\Response\Format\Format $formatter
+     * @param string                             $key
+     * @param \CApi_HTTP_Response_FormatAbstract $formatter
      *
      * @return void
      */
-    public static function addFormatter($key, $formatter) {
-        static::$formatters[$key] = $formatter;
+    public function addFormatter($key, $formatter) {
+        $this->formatters[$key] = $formatter;
     }
 
     /**
@@ -294,8 +312,8 @@ class CApi_HTTP_Response extends CHTTP_Response {
      *
      * @return void
      */
-    public static function setTransformer(CApi_Transformer_Factory $transformer) {
-        static::$transformer = $transformer;
+    public function setTransformer(CApi_Transformer_Factory $transformer) {
+        $this->transformer = $transformer;
     }
 
     /**
@@ -303,8 +321,8 @@ class CApi_HTTP_Response extends CHTTP_Response {
      *
      * @return \CApi_Transformer_Factory
      */
-    public static function getTransformer() {
-        return static::$transformer;
+    public function getTransformer() {
+        return $this->transformer;
     }
 
     /**
@@ -313,7 +331,7 @@ class CApi_HTTP_Response extends CHTTP_Response {
      * @param string $key
      * @param mixed  $value
      *
-     * @return \Dingo\Api\Http\Response
+     * @return \CApi_HTTP_Response
      */
     public function addMeta($key, $value) {
         $this->binding->addMeta($key, $value);
@@ -327,7 +345,7 @@ class CApi_HTTP_Response extends CHTTP_Response {
      * @param string $key
      * @param mixed  $value
      *
-     * @return \Dingo\Api\Http\Response
+     * @return \CApi_HTTP_Response
      */
     public function meta($key, $value) {
         return $this->addMeta($key, $value);
@@ -338,7 +356,7 @@ class CApi_HTTP_Response extends CHTTP_Response {
      *
      * @param array $meta
      *
-     * @return \Dingo\Api\Http\Response
+     * @return \CApi_HTTP_Response
      */
     public function setMeta(array $meta) {
         $this->binding->setMeta($meta);
@@ -360,7 +378,7 @@ class CApi_HTTP_Response extends CHTTP_Response {
      *
      * @param \Symfony\Component\HttpFoundation\Cookie|mixed $cookie
      *
-     * @return \Dingo\Api\Http\Response
+     * @return \CApi_HTTP_Response
      */
     public function cookie($cookie) {
         return $this->withCookie($cookie);
@@ -373,7 +391,7 @@ class CApi_HTTP_Response extends CHTTP_Response {
      * @param string $value
      * @param bool   $replace
      *
-     * @return \Dingo\Api\Http\Response
+     * @return \CApi_HTTP_Response
      */
     public function withHeader($key, $value, $replace = true) {
         return $this->header($key, $value, $replace);
@@ -384,7 +402,7 @@ class CApi_HTTP_Response extends CHTTP_Response {
      *
      * @param int $statusCode
      *
-     * @return \Dingo\Api\Http\Response
+     * @return \CApi_HTTP_Response
      */
     public function statusCode($statusCode) {
         return $this->setStatusCode($statusCode);

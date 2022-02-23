@@ -1,4 +1,5 @@
 <?php
+use League\Fractal\Manager as FractalManager;
 
 class CApi_Manager {
     protected static $instance = [];
@@ -31,6 +32,8 @@ class CApi_Manager {
 
     private $httpParseAccept;
 
+    private $transformer;
+
     /**
      * @param string $group
      *
@@ -49,11 +52,29 @@ class CApi_Manager {
 
     public function __construct($group) {
         $this->group = $group;
-        $this->config = CF::config('api.' . $group, []);
+        $this->config = CF::config('api.groups.' . $group, []);
     }
 
     public function getConfig($key, $default = null) {
         return carr::get($this->config, $key, $default);
+    }
+
+    public function formatters() {
+        $formats = $this->getConfig('formats', []);
+
+        return c::collect($formats)->map(function ($format) {
+            return new $format();
+        })->toArray();
+    }
+
+    public function transformer() {
+        if ($this->transformer == null) {
+            $transformerAdapterClass = $this->getConfig('transformer', CApi_Transformer_Adapter_FractalAdapter::class);
+            $transformerAdapter = new $transformerAdapterClass(new FractalManager());
+            $this->transformer = new CApi_Transformer_Factory($transformerAdapter);
+        }
+
+        return $this->transformer;
     }
 
     /**
@@ -63,11 +84,15 @@ class CApi_Manager {
         if ($this->exceptionHandler == null) {
             $this->exceptionHandler = new CApi_ExceptionHandler(
                 $this->getConfig('error_format', [
-                    'message' => ':message',
-                    'errors' => ':errors',
-                    'code' => ':code',
-                    'status_code' => ':status_code',
-                    'debug' => ':debug',
+                    'errCode' => ':code',
+                    'errMessage' => ':message',
+                    'data' => [
+                        'message' => ':message',
+                        'errors' => ':errors',
+                        'code' => ':code',
+                        'status_code' => ':status_code',
+                        'debug' => ':debug',
+                    ]
                 ]),
                 $this->getConfig('debug', !CF::isProduction())
             );
@@ -124,7 +149,7 @@ class CApi_Manager {
             $dispatcher->setPrefix($this->getConfig('prefix', null));
             $dispatcher->setDefaultVersion($this->getConfig('version', 'v1'));
             $dispatcher->setDefaultDomain($this->getConfig('domain', CF::domain()));
-            $dispatcher->setDefaultFormat($this->getConfig('default_format', 'json'));
+            $dispatcher->setDefaultFormat($this->getConfig('default_format', 'default'));
 
             $this->dispatcher = $dispatcher;
         }
@@ -138,7 +163,7 @@ class CApi_Manager {
                 $this->getConfig('standards_tree', 'x'),
                 $this->getConfig('subtype', ''),
                 $this->getConfig('version', 'v1'),
-                $this->getConfig('default_format', 'json')
+                $this->getConfig('default_format', 'default')
             );
         }
 
@@ -177,6 +202,7 @@ class CApi_Manager {
      */
     protected function sendRequestThroughRouter(CApi_HTTP_Request $request) {
         return (new CApi_HTTP_Pipeline())
+            ->setGroup($this->group)
             ->send($request)
             ->through($this->shouldSkipMiddleware() ? [] : $this->getMiddleware())
             ->then($this->dispatchToRouter());

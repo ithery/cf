@@ -239,6 +239,8 @@ class CApi_ExceptionHandler implements CApi_Contract_ExceptionHandlerInterface, 
 
         if ($code = $exception->getCode()) {
             $replacements[':code'] = $code;
+        } else {
+            $replacements[':code'] = $replacements[':status_code'];
         }
 
         if ($this->runningInDebugMode()) {

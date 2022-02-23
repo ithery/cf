@@ -480,118 +480,11 @@ class CApi_Routing_Router {
          * @var CApi_MethodAbstract $method
          */
         $method->setApiRequest($request);
-        CApi::runner()->runMethod($method);
 
-        return $this->prepareResponse($method, $request, $request->format());
+        $response = CApi::runner()->runMethod($method);
+        $response = c::response()->json($response);
 
-        return $this->dispatchToRoute($request);
-    }
-
-    /**
-     * Dispatch the request to a route and return the response.
-     *
-     * @param CApi_HTTP_Request $request
-     *
-     * @return \CApi_HTTP_Response
-     */
-    public function dispatchToRoute(CApi_HTTP_Request $request) {
-        return $this->runRoute($request, $this->findRoute($request));
-    }
-
-    /**
-     * Find the route matching a given request.
-     *
-     * @param CApi_HTTP_Request $request
-     *
-     * @return CApi_Routing_Route
-     */
-    protected function findRoute($request) {
-        $routeResolver = $this->manager()->getMethodResolver();
-
-        $this->current = $route = $this->routes->match($request);
-
-        return $route;
-    }
-
-    /**
-     * Return the response for the given route.
-     *
-     * @param CApi_HTTP_Request  $request
-     * @param CApi_Routing_Route $route
-     *
-     * @return \Symfony\Component\HttpFoundation\Response
-     */
-    protected function runRoute(CApi_HTTP_Request $request, CApi_Routing_Route $route) {
-        $request->setRouteResolver(function () use ($route) {
-            return $route;
-        });
-    }
-
-    /**
-     * Gather the middleware for the given route with resolved class names.
-     *
-     * @param CApi_Routing_Route $route
-     *
-     * @return array
-     */
-    public function gatherRouteMiddleware(CApi_Routing_Route $route) {
-        $excluded = c::collect($route->excludedMiddleware())->map(function ($name) {
-            return (array) CMiddleware_MiddlewareNameResolver::resolve($name, $this->middleware, $this->middlewareGroups);
-        })->flatten()->values()->all();
-
-        $middleware = c::collect($route->gatherMiddleware())->map(function ($name) {
-            return (array) CMiddleware_MiddlewareNameResolver::resolve($name, $this->middleware, $this->middlewareGroups);
-        })->flatten()->reject(function ($name) use ($excluded) {
-            if (empty($excluded)) {
-                return false;
-            } elseif (in_array($name, $excluded, true)) {
-                return true;
-            }
-
-            if (!class_exists($name)) {
-                return false;
-            }
-
-            $reflection = new ReflectionClass($name);
-
-            return c::collect($excluded)->contains(function ($exclude) use ($reflection) {
-                return class_exists($exclude) && $reflection->isSubclassOf($exclude);
-            });
-        })->values();
-
-        return $this->sortMiddleware($middleware);
-    }
-
-    /**
-     * Run the given route within a Stack "onion" instance.
-     *
-     * @param CApi_Routing_Route $route
-     * @param CApi_HTTP_Request  $request
-     *
-     * @return mixed
-     */
-    protected function runRouteWithinStack(CApi_Routing_Route $route, CApi_HTTP_Request $request) {
-        $shouldSkipMiddleware = CHTTP::shouldSkipMiddleware();
-
-        $middleware = $shouldSkipMiddleware ? [] : $this->gatherRouteMiddleware($route);
-
-        return (new CApi_HTTP_Pipeline())
-            ->send($request)
-            ->through($middleware)
-            ->then(function ($request) use ($route) {
-                cdbg::dd($route);
-            });
-    }
-
-    /**
-     * Sort the given middleware by priority.
-     *
-     * @param CCollection $middlewares
-     *
-     * @return array
-     */
-    protected function sortMiddleware(CCollection $middlewares) {
-        return (new CMiddleware_SortedMiddleware($this->middlewarePriority, $middlewares))->all();
+        return $this->prepareResponse($response, $request, $request->format());
     }
 
     /**
@@ -618,7 +511,14 @@ class CApi_Routing_Router {
         }
 
         if ($response instanceof CApi_HTTP_Response) {
-            // If we try and get a formatter that does not exist we'll let the exception
+            $response->addFormatters($this->manager()->formatters());
+            $response->addFormatsOptions($this->manager()->getConfig('format_options', []));
+            $response->setTransformer($this->manager()->transformer());
+            // Response::setFormatters($this->config('formats'));
+            // Response::setFormatsOptions($this->config('formatsOptions'));
+            // Response::setTransformer($this->app['api.transformer']);
+            // Response::setEventDispatcher($this->app['events']);
+            // // If we try and get a formatter that does not exist we'll let the exception
             // handler deal with it. At worst we'll get a generic JSON response that
             // a consumer can hopefully deal with. Ideally they won't be using
             // an unsupported format.
@@ -627,17 +527,16 @@ class CApi_Routing_Router {
             } catch (NotAcceptableHttpException $exception) {
                 return $this->exception->handle($exception);
             }
-
             $response = $response->morph($format);
         }
 
-        if ($response->isSuccessful() && $this->requestIsConditional()) {
-            if (!$response->headers->has('ETag')) {
-                $response->setEtag(sha1($response->getContent() ?: ''));
-            }
+        // if ($response->isSuccessful() && $this->requestIsConditional()) {
+        //     if (!$response->headers->has('ETag')) {
+        //         $response->setEtag(sha1($response->getContent() ?: ''));
+        //     }
 
-            $response->isNotModified($request);
-        }
+        //     $response->isNotModified($request);
+        // }
 
         return $response;
     }
@@ -714,7 +613,7 @@ class CApi_Routing_Router {
      * @return \CApi_Routing_Route
      */
     public function createRoute($route) {
-        return new CApi_Routing_Route($this->adapter, $this->container, $this->container['request'], $route);
+        return new CApi_Routing_Route($this->currentRequest, $route);
     }
 
     /**

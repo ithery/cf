@@ -1,14 +1,5 @@
 <?php
 
-use Closure;
-use RuntimeException;
-use Dingo\Api\Http\Request;
-use Illuminate\Support\Collection;
-use Illuminate\Container\Container;
-use Dingo\Api\Contract\Transformer\Adapter;
-use Illuminate\Contracts\Pagination\Paginator;
-use Illuminate\Http\Request as IlluminateRequest;
-
 class CApi_Transformer_Factory {
     /**
      * Array of registered transformer bindings.
@@ -32,8 +23,14 @@ class CApi_Transformer_Factory {
      * @return void
      */
     public function __construct(CApi_Contract_Transformer_AdapterInterface $adapter) {
-        $this->container = $container;
         $this->adapter = $adapter;
+    }
+
+    /**
+     * @return CContainer_Container
+     */
+    public function contaniner() {
+        return c::container();
     }
 
     /**
@@ -115,16 +112,16 @@ class CApi_Transformer_Factory {
      * @param array                  $parameters
      * @param \Closure               $callback
      *
-     * @return \Dingo\Api\Transformer\Binding
+     * @return \CApi_Transformer_Binding
      */
     protected function createBinding($resolver, array $parameters = [], Closure $callback = null) {
-        return new Binding($this->container, $resolver, $parameters, $callback);
+        return new CApi_Transformer_Binding($resolver, $parameters, $callback);
     }
 
     /**
      * Get a registered transformer binding from a collection of items.
      *
-     * @param \Illuminate\Support\Collection $collection
+     * @param \CCollection $collection
      *
      * @return null|string|callable
      */
@@ -157,7 +154,7 @@ class CApi_Transformer_Factory {
      * @return bool
      */
     protected function isCollection($instance) {
-        return $instance instanceof Collection || $instance instanceof Paginator;
+        return $instance instanceof CCollection || $instance instanceof CPagination_PaginatorInterface;
     }
 
     /**
@@ -196,13 +193,13 @@ class CApi_Transformer_Factory {
     /**
      * Get the request from the container.
      *
-     * @return \Dingo\Api\Http\Request
+     * @return \CApi_HTTP_Request_Request
      */
     public function getRequest() {
         $request = $this->container['request'];
 
-        if ($request instanceof IlluminateRequest && !$request instanceof Request) {
-            $request = (new Request())->createFromIlluminate($request);
+        if ($request instanceof CHTTP_Request && !$request instanceof CApi_HTTP_Request) {
+            $request = (new CApi_HTTP_Request())->createFromBaseHttp($request);
         }
 
         return $request;

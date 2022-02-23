@@ -1,6 +1,6 @@
 <?php
 
-class JsCApi_HTTP_Response_Format_NativeFormat extends CApi_HTTP_Response_Format_JsonFormat {
+class CApi_HTTP_Response_Format_DefaultFormat extends CApi_HTTP_Response_Format_JsonFormat {
     /**
      * Error code parameter.
      *
@@ -13,7 +13,7 @@ class JsCApi_HTTP_Response_Format_NativeFormat extends CApi_HTTP_Response_Format
      *
      * @var string
      */
-    protected $errMessage = 0;
+    protected $errMessage = '';
 
     /**
      * Create a new JSONP response formatter instance.
