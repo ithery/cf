@@ -8,5 +8,5 @@ interface CApi_Contract_HTTP_RequestInterface {
      *
      * @return \CApi_HTTP_Request
      */
-    public function createFromBaseHttp(CHTTP_Request $old);
+    public static function createFromBaseHttp(CHTTP_Request $old);
 }

@@ -1,17 +1,11 @@
 <?php
 
 class CApi_HTTP_Pipeline extends CHTTP_Pipeline {
-    protected $group;
+    use CApi_Trait_HasGroupPropertyTrait;
 
-    /**
-     * @param string $group
-     *
-     * @return $this
-     */
-    public function setGroup($group) {
+    public function __construct($group) {
+        parent::__construct();
         $this->group = $group;
-
-        return $this;
     }
 
     /**
@@ -29,7 +23,7 @@ class CApi_HTTP_Pipeline extends CHTTP_Pipeline {
             throw $e;
         }
 
-        $handler = CApi_Manager::instance($this->group)->exceptionHandler();
+        $handler = $this->manager()->exceptionHandler();
 
         $handler->report($e);
 

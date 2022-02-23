@@ -1,4 +1,100 @@
 <?php
 
 class CApi_Kernel {
+    use CApi_Trait_HasGroupPropertyTrait;
+
+    public function __construct($group) {
+        $this->group = $group;
+    }
+
+    public function handle(CHTTP_Request $request, Closure $methodResolver) {
+        try {
+            $request = CApi_HTTP_Request::createFromBase($request);
+
+            $response = $this->sendRequestThroughPipeline($request, $methodResolver);
+        } catch (Exception $e) {
+            $this->reportException($e);
+            $response = $this->renderException($request, $e);
+        } catch (Throwable $e) {
+            $this->reportException($e);
+            $response = $this->renderException($request, $e);
+        }
+
+        CEvent::dispatch(new CApi_Event_RequestHandled($request, $response));
+
+        $this->isHandled = true;
+
+        return $response;
+    }
+
+    /**
+     * Send the given request through the middleware / router.
+     *
+     * @param \CApi_HTTP_Request $request
+     * @param mixed              $method
+     * @param mixed              $methodResolver
+     *
+     * @return \CApi_HTTP_Response
+     */
+    protected function sendRequestThroughPipeline(CApi_HTTP_Request $request, $methodResolver) {
+        return (new CApi_HTTP_Pipeline($this->group))
+            ->send($request)
+            ->through(c::api($this->group)->shouldSkipMiddleware() ? [] : $this->gatherMiddleware($method))
+            ->then($this->dispatchMethod($methodResolver));
+    }
+
+    /**
+     * Get the route dispatcher callback.
+     *
+     * @param mixed $methodResolver
+     *
+     * @return \Closure
+     */
+    protected function dispatchMethod($methodResolver) {
+        return function ($request) use ($methodResolver) {
+            $method = $methodResolver($request);
+
+            $method->execute();
+
+            return c::response()->json($method->result());
+        };
+    }
+
+    protected function gatherMiddleware(CApi_MethodAbstract $method) {
+        if (!method_exists($method, 'getMiddleware')) {
+            return [];
+        }
+
+        return c::collect($method->getMiddleware())->pluck('middleware')->all();
+    }
+
+    /**
+     * Prepare a response by transforming and formatting it correctly.
+     *
+     * @param mixed              $response
+     * @param \CApi_HTTP_Request $request
+     * @param string             $format
+     *
+     * @return \CApi_HTTP_Response
+     */
+    protected function prepareResponse($response, CApi_HTTP_Request $request) {
+        if ($response instanceof CApi_MethodResponse) {
+            $response = $response->toResponse();
+        }
+        if ($response instanceof CHTTP_Response) {
+            $response = CApi_HTTP_Response::makeFromExisting($response);
+        } elseif ($response instanceof CHTTP_JsonResponse) {
+            $response = CApi_HTTP_Response::makeFromJson($response);
+        }
+
+        // if ($response->isSuccessful() && $this->requestIsConditional()) {
+        //     if (!$response->headers->has('ETag')) {
+        //         $response->setEtag(sha1($response->getContent() ?: ''));
+        //     }
+
+        //     $response->isNotModified($request);
+        // }
+
+        return $response;
+    }
 }

@@ -41,4 +41,8 @@ class CApi {
     public static function request() {
         return static::$request;
     }
+
+    public static function manager($group = null) {
+        return CApi_Manager::instance($group);
+    }
 }

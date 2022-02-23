@@ -22,6 +22,13 @@ abstract class CApi_MethodAbstract implements CInterface_Arrayable {
 
     protected $apiRequest;
 
+    /**
+     * The middleware registered on the controller.
+     *
+     * @var array
+     */
+    protected $middleware = [];
+
     protected $sessionOptions = [
         'driver' => 'File',
         'expiration' => null,
@@ -45,6 +52,34 @@ abstract class CApi_MethodAbstract implements CInterface_Arrayable {
 
     public function setApiRequest(CApi_HTTP_Request $apiRequest) {
         $this->apiRequest = $apiRequest;
+    }
+
+    /**
+     * Register middleware on the controller.
+     *
+     * @param \Closure|array|string $middleware
+     * @param array                 $options
+     *
+     * @return $this
+     */
+    public function middleware($middleware, array $options = []) {
+        foreach ((array) $middleware as $m) {
+            $this->middleware[] = [
+                'middleware' => $m,
+                'options' => &$options,
+            ];
+        }
+
+        return $this;
+    }
+
+    /**
+     * Get the middleware assigned to the controller.
+     *
+     * @return array
+     */
+    public function getMiddleware() {
+        return $this->middleware;
     }
 
     public function toArray() {

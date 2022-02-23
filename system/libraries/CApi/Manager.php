@@ -34,12 +34,17 @@ class CApi_Manager {
 
     private $transformer;
 
+    private $resultFormatter;
+
     /**
      * @param string $group
      *
      * @return CApi_Manager
      */
-    public static function instance($group = 'default') {
+    public static function instance($group = null) {
+        if ($group == null) {
+            $group = CF::config('api.default');
+        }
         if (!is_array(static::$instance)) {
             static::$instance = [];
         }
@@ -59,18 +64,17 @@ class CApi_Manager {
         return carr::get($this->config, $key, $default);
     }
 
-    public function formatters() {
-        $formats = $this->getConfig('formats', []);
+    public function resultFormatter() {
+        if ($this->resultFormatter == null) {
+            $this->resultFormatter = new CApi_HTTP_Response_Format_JsonFormat();
+        }
 
-        return c::collect($formats)->map(function ($format) {
-            return new $format();
-        })->toArray();
+        return $this->resultFormatter;
     }
 
     public function transformer() {
         if ($this->transformer == null) {
-            $transformerAdapterClass = $this->getConfig('transformer', CApi_Transformer_Adapter_FractalAdapter::class);
-            $transformerAdapter = new $transformerAdapterClass(new FractalManager());
+            $transformerAdapter = new CApi_Transformer_Adapter_FractalAdapter(new FractalManager());
             $this->transformer = new CApi_Transformer_Factory($transformerAdapter);
         }
 
@@ -137,26 +141,6 @@ class CApi_Manager {
         return $this->auth;
     }
 
-    /**
-     * @return CApi_Dispatcher
-     */
-    public function dispatcher() {
-        if ($this->dispatcher == null) {
-            $dispatcher = new CApi_Dispatcher($this->group, $this->router(), $this->auth());
-
-            $dispatcher->setSubtype($this->getConfig('subtype', ''));
-            $dispatcher->setStandardsTree($this->getConfig('standards_tree', 'x'));
-            $dispatcher->setPrefix($this->getConfig('prefix', null));
-            $dispatcher->setDefaultVersion($this->getConfig('version', 'v1'));
-            $dispatcher->setDefaultDomain($this->getConfig('domain', CF::domain()));
-            $dispatcher->setDefaultFormat($this->getConfig('default_format', 'default'));
-
-            $this->dispatcher = $dispatcher;
-        }
-
-        return $this->dispatcher;
-    }
-
     public function httpParseAccept() {
         if ($this->httpParseAccept == null) {
             $this->httpParseAccept = new CApi_HTTP_Parser_Accept(
@@ -168,78 +152,6 @@ class CApi_Manager {
         }
 
         return $this->httpParseAccept;
-    }
-
-    public function handle(CHTTP_Request $request) {
-        try {
-            $request = CApi_HTTP_Request::createFromBase($request);
-
-            $response = $this->sendRequestThroughRouter($request);
-        } catch (Exception $e) {
-            $this->reportException($e);
-            $response = $this->renderException($request, $e);
-        } catch (Throwable $e) {
-            $this->reportException($e);
-            $response = $this->renderException($request, $e);
-        }
-
-        CEvent::dispatch(new CApi_Event_RequestHandled($request, $response));
-        //        if($response->getStatusCode()!=200) {
-        //            $this->endOutputBuffering();
-        //        }
-
-        $this->isHandled = true;
-
-        return $response;
-    }
-
-    /**
-     * Send the given request through the middleware / router.
-     *
-     * @param \CApi_HTTP_Request $request
-     *
-     * @return \CApi_HTTP_Response
-     */
-    protected function sendRequestThroughRouter(CApi_HTTP_Request $request) {
-        return (new CApi_HTTP_Pipeline())
-            ->setGroup($this->group)
-            ->send($request)
-            ->through($this->shouldSkipMiddleware() ? [] : $this->getMiddleware())
-            ->then($this->dispatchToRouter());
-    }
-
-    /**
-     * Get the route dispatcher callback.
-     *
-     * @return \Closure
-     */
-    protected function dispatchToRouter() {
-        return function ($request) {
-            return $this->router()->dispatch($request);
-        };
-    }
-
-    /**
-     * Report the exception to the exception handler.
-     *
-     * @param \Exception $e
-     *
-     * @return void
-     */
-    protected function reportException($e) {
-        $this->exceptionHandler()->report($e);
-    }
-
-    /**
-     * Render the exception to a response.
-     *
-     * @param \CApi_HTTP_Request $request
-     * @param \Exception         $e
-     *
-     * @return \Symfony\Component\HttpFoundation\Response
-     */
-    protected function renderException($request, $e) {
-        return $this->exceptionHandler()->render($request, $e);
     }
 
     public function getMiddleware() {
@@ -258,5 +170,13 @@ class CApi_Manager {
 
     public function shouldSkipMiddleware() {
         return $this->middlewareEnabled;
+    }
+
+    protected function kernel() {
+        return new CApi_Kernel($this->group);
+    }
+
+    public function createDispatcher() {
+        return new CApi_Dispatcher($this->group);
     }
 }

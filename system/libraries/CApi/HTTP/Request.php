@@ -1,14 +1,7 @@
 <?php
 
-use Dingo\Api\Http\Parser\Accept;
-
 class CApi_HTTP_Request extends CHTTP_Request implements CApi_Contract_HTTP_RequestInterface {
-    /**
-     * Api Group.
-     *
-     * @var string
-     */
-    protected $apiGroup;
+    use CApi_Trait_HasGroupPropertyTrait;
 
     /**
      * Parsed accept header for the request.
@@ -24,7 +17,7 @@ class CApi_HTTP_Request extends CHTTP_Request implements CApi_Contract_HTTP_Requ
      *
      * @return \CApi_HTTP_Request
      */
-    public function createFromBaseHttp(CHTTP_Request $old) {
+    public static function createFromBaseHttp(CHTTP_Request $old) {
         $new = new static(
             $old->query->all(),
             $old->request->all(),
@@ -36,7 +29,7 @@ class CApi_HTTP_Request extends CHTTP_Request implements CApi_Contract_HTTP_Requ
         );
 
         if ($session = $old->getSession()) {
-            $new->setSession($old->getSession());
+            $new->setSession($session);
         }
 
         $new->setRouteResolver($old->getRouteResolver());
@@ -46,25 +39,21 @@ class CApi_HTTP_Request extends CHTTP_Request implements CApi_Contract_HTTP_Requ
     }
 
     /**
-     * @return CApi_Manager
-     */
-    protected function manager() {
-        return CApi_Manager::instance($this->apiGroup);
-    }
-
-    /**
      * Get the defined version.
      *
      * @return string
      */
     public function version() {
-        $this->parseAcceptHeader();
-
         return $this->accept['version'];
     }
 
-    public function setApiGroup($apiGroup) {
-        $this->apiGroup = $apiGroup;
+    public function setGroup($group) {
+        $this->group = $group;
+        $this->parseAcceptHeader();
+    }
+
+    public function group() {
+        return $this->group;
     }
 
     /**

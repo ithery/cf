@@ -1473,6 +1473,15 @@ class c {
 
         return json_encode($data, $options, $depth);
     }
+
+    /**
+     * @param null|string $group
+     *
+     * @return CApi_Manager
+     */
+    public static function api($group = null) {
+        return CApi::manager($group);
+    }
 }
 
 // End c
