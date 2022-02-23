@@ -14,7 +14,7 @@ class curl {
      * @return string
      */
     public static function current($qs = false) {
-        return ($qs === true) ? ltrim(c::request()->getRequestUri(), '/') : ltrim(c::request()->path(), '/');
+        return ltrim(($qs === true) ? c::request()->getRequestUri() : c::request()->path(), '/');
     }
 
     /**
