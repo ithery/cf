@@ -5,7 +5,7 @@
  *
  * @author Hery
  */
-abstract class CApi_MethodAbstract implements CInterface_Arrayable {
+abstract class CApi_ControllerAbstract implements CInterface_Arrayable {
     protected $errCode = 0;
 
     protected $errMessage = '';
@@ -19,8 +19,6 @@ abstract class CApi_MethodAbstract implements CInterface_Arrayable {
     protected $sessionId = null;
 
     protected $session;
-
-    protected $apiRequest;
 
     protected $sessionOptions = [
         'driver' => 'File',
@@ -42,10 +40,6 @@ abstract class CApi_MethodAbstract implements CInterface_Arrayable {
     }
 
     abstract public function execute();
-
-    public function setApiRequest(CApi_HTTP_Request $apiRequest) {
-        $this->apiRequest = $apiRequest;
-    }
 
     public function toArray() {
         return $this->result();

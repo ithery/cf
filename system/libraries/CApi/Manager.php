@@ -3,6 +3,10 @@
 class CApi_Manager {
     protected static $instance = [];
 
+    protected $middlewareEnabled = true;
+
+    protected $middleware = [];
+
     /**
      * Api Group Parameter.
      *
@@ -53,7 +57,7 @@ class CApi_Manager {
     }
 
     /**
-     * @return CApi_Contract_ExceptionHandlerInterface
+     * @return CApi_ExceptionHandler
      */
     public function exceptionHandler() {
         if ($this->exceptionHandler == null) {
@@ -108,6 +112,9 @@ class CApi_Manager {
         return $this->auth;
     }
 
+    /**
+     * @return CApi_Dispatcher
+     */
     public function dispatcher() {
         if ($this->dispatcher == null) {
             $dispatcher = new CApi_Dispatcher($this->group, $this->router(), $this->auth());
@@ -136,5 +143,94 @@ class CApi_Manager {
         }
 
         return $this->httpParseAccept;
+    }
+
+    public function handle(CHTTP_Request $request) {
+        try {
+            $request = CApi_HTTP_Request::createFromBase($request);
+
+            $response = $this->sendRequestThroughRouter($request);
+        } catch (Exception $e) {
+            $this->reportException($e);
+            $response = $this->renderException($request, $e);
+        } catch (Throwable $e) {
+            $this->reportException($e);
+            $response = $this->renderException($request, $e);
+        }
+
+        CEvent::dispatch(new CApi_Event_RequestHandled($request, $response));
+        //        if($response->getStatusCode()!=200) {
+        //            $this->endOutputBuffering();
+        //        }
+
+        $this->isHandled = true;
+
+        return $response;
+    }
+
+    /**
+     * Send the given request through the middleware / router.
+     *
+     * @param \CApi_HTTP_Request $request
+     *
+     * @return \CApi_HTTP_Response
+     */
+    protected function sendRequestThroughRouter(CApi_HTTP_Request $request) {
+        return (new CApi_HTTP_Pipeline())
+            ->send($request)
+            ->through($this->shouldSkipMiddleware() ? [] : $this->getMiddleware())
+            ->then($this->dispatchToRouter());
+    }
+
+    /**
+     * Get the route dispatcher callback.
+     *
+     * @return \Closure
+     */
+    protected function dispatchToRouter() {
+        return function ($request) {
+            return $this->router()->dispatch($request);
+        };
+    }
+
+    /**
+     * Report the exception to the exception handler.
+     *
+     * @param \Exception $e
+     *
+     * @return void
+     */
+    protected function reportException($e) {
+        $this->exceptionHandler()->report($e);
+    }
+
+    /**
+     * Render the exception to a response.
+     *
+     * @param \CApi_HTTP_Request $request
+     * @param \Exception         $e
+     *
+     * @return \Symfony\Component\HttpFoundation\Response
+     */
+    protected function renderException($request, $e) {
+        return $this->exceptionHandler()->render($request, $e);
+    }
+
+    public function getMiddleware() {
+        return $this->middleware;
+    }
+
+    public function getMethodResolver() {
+        return $this->methodResolver;
+    }
+
+    public function setMethodResolver($callback) {
+        $this->methodResolver = $callback;
+
+        return $this;
+    }
+
+    public function shouldSkipMiddleware() {
+        return $this->middlewareEnabled;
     }
 }

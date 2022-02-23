@@ -1,16 +1,6 @@
 <?php
 
-use Illuminate\Support\Arr;
-use Illuminate\Support\Str;
-
-class CApi_Routing_Route extends \CRouting_Route {
-    /**
-     * Routing adapter instance.
-     *
-     * @var \CApi_Contract_Routing_AdapterInterface
-     */
-    protected $adapter;
-
+class CApi_Routing_Route {
     /**
      * Array of versions this route will respond to.
      *
@@ -58,7 +48,7 @@ class CApi_Routing_Route extends \CRouting_Route {
      *
      * @var string
      */
-    protected $controllerClass;
+    protected $methodClass;
 
     /**
      * Indicates if the request is conditional.
@@ -74,8 +64,6 @@ class CApi_Routing_Route extends \CRouting_Route {
      */
     protected $middleware;
 
-    private $route;
-
     /**
      * Create a new route instance.
      *
@@ -83,13 +71,8 @@ class CApi_Routing_Route extends \CRouting_Route {
      * @param \CHTTP_Request                          $request
      * @param array|\CRouting_Route                   $route
      */
-    public function __construct(CApi_Contract_Routing_AdapterInterface $adapter, CHTTP_Request $request, $route) {
-        $this->adapter = $adapter;
-        $this->route = $route;
-
+    public function __construct(CHTTP_Request $request, $route) {
         $this->setupRouteProperties($request, $route);
-
-        parent::__construct($this->methods, $this->uri, $this->action);
     }
 
     /**
@@ -127,10 +110,10 @@ class CApi_Routing_Route extends \CRouting_Route {
      * Merge the controller properties onto the route properties.
      */
     protected function mergeControllerProperties() {
-        if (isset($this->action['uses']) && is_string($this->action['uses']) && Str::contains(
-            $this->action['uses'],
-            '@'
-        )) {
+        if (isset($this->action['uses'])
+            && is_string($this->action['uses'])
+            && cstr::contains($this->action['uses'], '@')
+        ) {
             $this->action['controller'] = $this->action['uses'];
 
             $this->makeControllerInstance();
@@ -344,7 +327,7 @@ class CApi_Routing_Route extends \CRouting_Route {
      * @return bool
      */
     public function scopeStrict() {
-        return Arr::get($this->action, 'scopeStrict', false);
+        return carr::get($this->action, 'scopeStrict', false);
     }
 
     /**
@@ -407,7 +390,7 @@ class CApi_Routing_Route extends \CRouting_Route {
      * @return string
      */
     public function getName() {
-        return Arr::get($this->action, 'as', null);
+        return carr::get($this->action, 'as', null);
     }
 
     /**

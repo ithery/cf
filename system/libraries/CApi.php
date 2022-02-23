@@ -12,6 +12,8 @@ class CApi {
 
     const SESSION_DRIVER_NULL = 'Null';
 
+    protected static $request;
+
     /**
      * Get CApi_Runner instance.
      *
@@ -27,5 +29,16 @@ class CApi {
 
     public static function session($sessionId, $options = []) {
         return CApi_SessionFactory::getSession($sessionId, $options);
+    }
+
+    public static function setRequest(CApi_HTTP_Request $request) {
+        static::$request = $request;
+    }
+
+    /**
+     * @return CApi_HTTP_Request
+     */
+    public static function request() {
+        return static::$request;
     }
 }

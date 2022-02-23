@@ -463,34 +463,135 @@ class CApi_Routing_Router {
     }
 
     /**
-     * Dispatch a request via the adapter.
+     * Dispatch the request to the application.
      *
-     * @param \CApi_HTTP_Request $request
-     *
-     * @throws \Exception
+     * @param CApi_HTTP_Request $request
      *
      * @return \CApi_HTTP_Response
      */
     public function dispatch(CApi_HTTP_Request $request) {
-        $this->currentRoute = null;
+        $this->currentRequest = $request;
 
-        $this->container()->instance(CApi_HTTP_Request::class, $request);
+        $methodResolver = $this->manager()->getMethodResolver();
 
-        $this->routesDispatched++;
+        $methodClass = call_user_func($methodResolver, [$request]);
+        $method = CApi_Factory::createMethod($methodClass, $request);
+        /**
+         * @var CApi_MethodAbstract $method
+         */
+        $method->setApiRequest($request);
+        CApi::runner()->runMethod($method);
 
-        try {
-            $response = $this->adapter->dispatch($request, $request->version());
-        } catch (Exception $exception) {
-            if ($request instanceof CApi_HTTP_InternalRequest) {
-                throw $exception;
+        return $this->prepareResponse($method, $request, $request->format());
+
+        return $this->dispatchToRoute($request);
+    }
+
+    /**
+     * Dispatch the request to a route and return the response.
+     *
+     * @param CApi_HTTP_Request $request
+     *
+     * @return \CApi_HTTP_Response
+     */
+    public function dispatchToRoute(CApi_HTTP_Request $request) {
+        return $this->runRoute($request, $this->findRoute($request));
+    }
+
+    /**
+     * Find the route matching a given request.
+     *
+     * @param CApi_HTTP_Request $request
+     *
+     * @return CApi_Routing_Route
+     */
+    protected function findRoute($request) {
+        $routeResolver = $this->manager()->getMethodResolver();
+
+        $this->current = $route = $this->routes->match($request);
+
+        return $route;
+    }
+
+    /**
+     * Return the response for the given route.
+     *
+     * @param CApi_HTTP_Request  $request
+     * @param CApi_Routing_Route $route
+     *
+     * @return \Symfony\Component\HttpFoundation\Response
+     */
+    protected function runRoute(CApi_HTTP_Request $request, CApi_Routing_Route $route) {
+        $request->setRouteResolver(function () use ($route) {
+            return $route;
+        });
+    }
+
+    /**
+     * Gather the middleware for the given route with resolved class names.
+     *
+     * @param CApi_Routing_Route $route
+     *
+     * @return array
+     */
+    public function gatherRouteMiddleware(CApi_Routing_Route $route) {
+        $excluded = c::collect($route->excludedMiddleware())->map(function ($name) {
+            return (array) CMiddleware_MiddlewareNameResolver::resolve($name, $this->middleware, $this->middlewareGroups);
+        })->flatten()->values()->all();
+
+        $middleware = c::collect($route->gatherMiddleware())->map(function ($name) {
+            return (array) CMiddleware_MiddlewareNameResolver::resolve($name, $this->middleware, $this->middlewareGroups);
+        })->flatten()->reject(function ($name) use ($excluded) {
+            if (empty($excluded)) {
+                return false;
+            } elseif (in_array($name, $excluded, true)) {
+                return true;
             }
 
-            $this->exception->report($exception);
+            if (!class_exists($name)) {
+                return false;
+            }
 
-            $response = $this->exception->handle($exception);
-        }
+            $reflection = new ReflectionClass($name);
 
-        return $this->prepareResponse($response, $request, $request->format());
+            return c::collect($excluded)->contains(function ($exclude) use ($reflection) {
+                return class_exists($exclude) && $reflection->isSubclassOf($exclude);
+            });
+        })->values();
+
+        return $this->sortMiddleware($middleware);
+    }
+
+    /**
+     * Run the given route within a Stack "onion" instance.
+     *
+     * @param CApi_Routing_Route $route
+     * @param CApi_HTTP_Request  $request
+     *
+     * @return mixed
+     */
+    protected function runRouteWithinStack(CApi_Routing_Route $route, CApi_HTTP_Request $request) {
+        $shouldSkipMiddleware = CHTTP::shouldSkipMiddleware();
+
+        $middleware = $shouldSkipMiddleware ? [] : $this->gatherRouteMiddleware($route);
+
+        return (new CApi_HTTP_Pipeline())
+            ->send($request)
+            ->through($middleware)
+            ->then(function ($request) use ($route) {
+                cdbg::dd($route);
+            });
+    }
+
+    /**
+     * Sort the given middleware by priority.
+     *
+     * @param CCollection $middlewares
+     *
+     * @return array
+     */
+    protected function sortMiddleware(CCollection $middlewares) {
+        return (new CMiddleware_SortedMiddleware($this->middlewarePriority, $middlewares))->all();
     }
 
     /**
@@ -668,7 +769,7 @@ class CApi_Routing_Router {
         $collections = [];
 
         foreach ($routes as $key => $value) {
-            $collections[$key] = new CApi_Routing_RouteCollection($this->container['request']);
+            $collections[$key] = new CApi_Routing_RouteCollection(CApi::request());
 
             foreach ($value as $route) {
                 $route = $this->createRoute($route);

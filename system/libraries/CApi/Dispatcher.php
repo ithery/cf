@@ -27,13 +27,6 @@ class CApi_Dispatcher {
     protected $auth;
 
     /**
-     * Internal request stack.
-     *
-     * @var array
-     */
-    protected $requestStack = [];
-
-    /**
      * Internal route stack.
      *
      * @var array
@@ -146,6 +139,13 @@ class CApi_Dispatcher {
     protected $defaultFormat;
 
     /**
+     * Method Resolver.
+     *
+     * @var callable
+     */
+    protected $methodResolver;
+
+    /**
      * Create a new dispatcher instance.
      *
      * @param string               $apiGroup
@@ -158,8 +158,7 @@ class CApi_Dispatcher {
         $this->apiGroup = $apiGroup;
         $this->router = $router;
         $this->auth = $auth;
-
-        $this->setupRequestStack();
+        $this->defaultVersion = 'v1';
     }
 
     /**
@@ -170,20 +169,11 @@ class CApi_Dispatcher {
     }
 
     /**
-     * Setup the request stack by grabbing the initial request.
-     *
-     * @return void
-     */
-    protected function setupRequestStack() {
-        $this->requestStack[] = CHTTP::request();
-    }
-
-    /**
      * Attach files to be uploaded.
      *
      * @param array $files
      *
-     * @return \Dingo\Api\Dispatcher
+     * @return \CApi_Dispatcher
      */
     public function attach(array $files) {
         foreach ($files as $key => $file) {
@@ -208,7 +198,7 @@ class CApi_Dispatcher {
      *
      * @param mixed $user
      *
-     * @return \Dingo\Api\Dispatcher
+     * @return \CApi_Dispatcher
      */
     public function be($user) {
         $this->auth->setUser($user);
@@ -221,7 +211,7 @@ class CApi_Dispatcher {
      *
      * @param string|array $content
      *
-     * @return \Dingo\Api\Dispatcher
+     * @return \CApi_Dispatcher
      */
     public function json($content) {
         if (is_array($content)) {
@@ -238,7 +228,7 @@ class CApi_Dispatcher {
      *
      * @param string $domain
      *
-     * @return \Dingo\Api\Dispatcher
+     * @return \CApi_Dispatcher
      */
     public function on($domain) {
         $this->domain = $domain;
@@ -249,7 +239,7 @@ class CApi_Dispatcher {
     /**
      * Return the raw response object once request is dispatched.
      *
-     * @return \Dingo\Api\Dispatcher
+     * @return \CApi_Dispatcher
      */
     public function raw() {
         $this->raw = true;
@@ -260,7 +250,7 @@ class CApi_Dispatcher {
     /**
      * Only authenticate with the given user for a single request.
      *
-     * @return \Dingo\Api\Dispatcher
+     * @return \CApi_Dispatcher
      */
     public function once() {
         $this->persistAuthentication = false;
@@ -273,7 +263,7 @@ class CApi_Dispatcher {
      *
      * @param string $version
      *
-     * @return \Dingo\Api\Dispatcher
+     * @return \CApi_Dispatcher
      */
     public function version($version) {
         $this->version = $version;
@@ -286,7 +276,7 @@ class CApi_Dispatcher {
      *
      * @param string|array $parameters
      *
-     * @return \Dingo\Api\Dispatcher
+     * @return \CApi_Dispatcher
      */
     public function with($parameters) {
         $this->parameters = array_merge($this->parameters, is_array($parameters) ? $parameters : func_get_args());
@@ -300,7 +290,7 @@ class CApi_Dispatcher {
      * @param string $key
      * @param string $value
      *
-     * @return \Dingo\Api\Dispatcher
+     * @return \CApi_Dispatcher
      */
     public function header($key, $value) {
         $this->headers[$key] = $value;
@@ -313,7 +303,7 @@ class CApi_Dispatcher {
      *
      * @param \Symfony\Component\HttpFoundation\Cookie $cookie
      *
-     * @return \Dingo\Api\Dispatcher
+     * @return \CApi_Dispatcher
      */
     public function cookie(Cookie $cookie) {
         $this->cookies[] = $cookie;
@@ -400,17 +390,7 @@ class CApi_Dispatcher {
             $this->content = $content;
         }
 
-        // Sometimes after setting the initial request another request might be made prior to
-        // internally dispatching an API request. We need to capture this request as well
-        // and add it to the request stack as it has become the new parent request to
-        // this internal request. This will generally occur during tests when
-        // using the crawler to navigate pages that also make internal
-        // requests.
-        if (end($this->requestStack) != CHTTP::request()) {
-            $this->requestStack[] = CHTTP::request();
-        }
-
-        $this->requestStack[] = $request = $this->createRequest($verb, $uri, $parameters);
+        $request = $this->createRequest($verb, $uri, $parameters);
 
         return $this->dispatch($request);
     }
@@ -631,10 +611,12 @@ class CApi_Dispatcher {
      *
      * @param string $subtype
      *
-     * @return void
+     * @return $this
      */
     public function setSubtype($subtype) {
         $this->subtype = $subtype;
+
+        return $this;
     }
 
     /**
@@ -651,10 +633,12 @@ class CApi_Dispatcher {
      *
      * @param string $standardsTree
      *
-     * @return void
+     * @return $this
      */
     public function setStandardsTree($standardsTree) {
         $this->standardsTree = $standardsTree;
+
+        return $this;
     }
 
     /**
@@ -662,10 +646,12 @@ class CApi_Dispatcher {
      *
      * @param string $prefix
      *
-     * @return void
+     * @return $this
      */
     public function setPrefix($prefix) {
         $this->prefix = $prefix;
+
+        return $this;
     }
 
     /**
@@ -673,10 +659,12 @@ class CApi_Dispatcher {
      *
      * @param string $version
      *
-     * @return void
+     * @return $this
      */
     public function setDefaultVersion($version) {
         $this->defaultVersion = $version;
+
+        return $this;
     }
 
     /**
@@ -684,10 +672,12 @@ class CApi_Dispatcher {
      *
      * @param string $domain
      *
-     * @return void
+     * @return $this
      */
     public function setDefaultDomain($domain) {
         $this->defaultDomain = $domain;
+
+        return $this;
     }
 
     /**
@@ -699,5 +689,16 @@ class CApi_Dispatcher {
      */
     public function setDefaultFormat($format) {
         $this->defaultFormat = $format;
+    }
+
+    /**
+     * @param callable $callback
+     *
+     * @return $this
+     */
+    public function withMethodResolver($callback) {
+        $this->methodResolver = $callback;
+
+        return $this;
     }
 }
