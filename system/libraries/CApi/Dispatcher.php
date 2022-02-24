@@ -44,7 +44,7 @@ class CApi_Dispatcher {
 
             $class = $this->methodNamespace . ($nameSpaced ? '\\' : '_') . $classPath;
             if (!class_exists($class)) {
-                throw new CApi_Exception_ApiMethodNotFoundException($originalPath . ' is invalid');
+                throw new CApi_Exception_ApiMethodNotFoundException($originalPath . ' is not found');
             }
 
             return CApi_Factory::createMethod($class, $request);
