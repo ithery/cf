@@ -1609,6 +1609,13 @@ class c {
 
         return json_encode($data, $options, $depth);
     }
+
+    /**
+     * @return CApp_Contract_BaseInterface
+     */
+    public static function base() {
+        return c::app()->base();
+    }
 }
 
 // End c
