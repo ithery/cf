@@ -73,6 +73,11 @@ class CApi_Docs_GeneratorFactory {
      */
     protected $yamlCopyRequired;
 
+    /**
+     * @var array
+     */
+    protected $constants;
+
     public function __construct($group) {
         $this->group = $group;
 
@@ -83,6 +88,7 @@ class CApi_Docs_GeneratorFactory {
         $this->outputJson = carr::get($config, 'path.output.json', 'api-docs.json');
         $this->outputYaml = carr::get($config, 'path.output.yaml', 'api-docs.yaml');
         $this->basePath = carr::get($config, 'path.base', null);
+        $this->constants = carr::get($config, 'constants', []);
 
         $this->scanAnalyser = carr::get($config, 'scan_options.analyser', null); // default \OpenApi\Analysers\TokenAnalyser::class
         $this->scanAnalysis = carr::get($config, 'scan_options.analysis', null); // default \OpenApi\Analysis::class
@@ -134,6 +140,12 @@ class CApi_Docs_GeneratorFactory {
         $this->yamlCopyRequired = $bool;
     }
 
+    public function setConstants(array $constants) {
+        $this->constants = $constants;
+
+        return $this;
+    }
+
     public function createGenerator() {
         $pathsConfig = [];
         $pathsConfig['annotations'] = $this->annotationDirs;
@@ -158,6 +170,7 @@ class CApi_Docs_GeneratorFactory {
 
         return new CApi_Docs_Generator(
             $pathsConfig,
+            $this->constants,
             $security,
             $scanOptions,
             $this->yamlCopyRequired

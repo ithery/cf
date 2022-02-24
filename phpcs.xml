@@ -59,6 +59,7 @@
         <exclude name="PEAR.Functions.FunctionCallSignature.CloseBracketLine"/>
         <exclude name="PEAR.WhiteSpace.ScopeIndent.IncorrectExact"/>
         <exclude name="Generic.Commenting.DocComment.LongNotCapital"/>
+        <exclude name="Generic.Commenting.DocComment.TagsNotGrouped"/>
         <exclude name="Squiz.Commenting.DocCommentAlignment.SpaceAfterStar"/>
         <exclude name="Squiz.Classes.ValidClassName.NotCamelCaps"/>
         <exclude name="PEAR.Functions.FunctionCallSignature.Indent"/>

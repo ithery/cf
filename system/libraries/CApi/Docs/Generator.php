@@ -64,18 +64,19 @@ class CApi_Docs_Generator {
 
     /**
      * @param array                        $pathsConfig
+     * @param array                        $contants
      * @param CApi_Docs_SecurityDefinition $security
      * @param array                        $scanOptions
      * @param bool                         $yamlCopyRequired
      */
-    public function __construct($pathsConfig, CApi_Docs_SecurityDefinition $security, $scanOptions, $yamlCopyRequired = false) {
+    public function __construct($pathsConfig, $contants, CApi_Docs_SecurityDefinition $security, $scanOptions, $yamlCopyRequired = false) {
         $this->annotationsDir = carr::get($pathsConfig, 'annotations', []);
         $this->excludedDirs = carr::get($pathsConfig, 'excludes', []);
         $this->outputDir = carr::get($pathsConfig, 'output.directory');
         $this->basePath = carr::get($pathsConfig, 'base', null);
         $this->jsonDocsFile = rtrim($this->outputDir, DS) . DS . carr::get($pathsConfig, 'output.json', 'api-docs.json');
         $this->yamlDocsFile = rtrim($this->outputDir, DS) . DS . carr::get($pathsConfig, 'output.yaml', 'api-docs.yaml');
-        $this->constants = [];
+        $this->constants = $contants;
         $this->scanOptions = $scanOptions;
         $this->security = $security;
         $this->yamlCopyRequired = $yamlCopyRequired;
