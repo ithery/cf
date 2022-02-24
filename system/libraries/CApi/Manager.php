@@ -169,7 +169,7 @@ class CApi_Manager {
     }
 
     public function shouldSkipMiddleware() {
-        return $this->middlewareEnabled;
+        return !$this->middlewareEnabled;
     }
 
     protected function kernel() {
