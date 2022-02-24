@@ -3,7 +3,7 @@ trait CModel_AccessToken_HasAccessTokenTrait {
     /**
      * The access token the user is using for the current request.
      *
-     * @var \Laravel\Sanctum\Contracts\HasAbilities
+     * @var \CModel_AccessToken_Contract_HasAbilitiesInterface
      */
     protected $accessToken;
 

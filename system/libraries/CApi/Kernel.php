@@ -54,8 +54,9 @@ class CApi_Kernel {
     protected function dispatchMethod(CApi_MethodAbstract $method) {
         return function ($request) use ($method) {
             $method->execute();
+            $methodResponse = new CApi_MethodResponse($request, $method);
 
-            return c::response()->json($method->result());
+            return $methodResponse->toResponse();
         };
     }
 

@@ -16,6 +16,11 @@ class CApi_HTTP_Response extends CHTTP_Response {
     public $exception;
 
     /**
+     * @var string
+     */
+    protected $group;
+
+    /**
      * Transformer binding instance.
      *
      * @var \CApi_Transformer_Binding
@@ -78,6 +83,17 @@ class CApi_HTTP_Response extends CHTTP_Response {
     }
 
     /**
+     * @param string $group
+     *
+     * @return $this
+     */
+    public function setGroup($group) {
+        $this->group = $group;
+
+        return $this;
+    }
+
+    /**
      * Make an API response from an existing Illuminate response.
      *
      * @param \CHTTP_Response $old
@@ -124,15 +140,15 @@ class CApi_HTTP_Response extends CHTTP_Response {
      * @return \CApi_HTTP_Response
      */
     public function morph($format = 'json') {
+        $formatter = c::api($this->group)->resultFormatter();
+        $transformer = c::api($this->group)->transformer();
         $this->content = $this->getOriginalContent();
 
         $this->fireMorphingEvent();
 
-        if (isset($this->transformer) && $this->transformer->transformableResponse($this->content)) {
-            $this->content = $this->transformer->transform($this->content);
+        if (isset($transformer) && $transformer->transformableResponse($this->content)) {
+            $this->content = $transformer->transform($this->content);
         }
-
-        $formatter = $this->getFormatter($format);
 
         $formatter->setOptions($this->getFormatsOptions($format));
 

@@ -14,9 +14,9 @@ class CApi_MethodResponse {
     }
 
     public function toResponse($format = 'json') {
-        $result = new CApi_Result($this->request, $this->method->result());
-        $formatted = $result->morph($format);
+        $response = new CApi_HTTP_Response($this->method->result());
+        $response->morph($format);
 
-        return c::response()->json($formatted);
+        return $response;
     }
 }
