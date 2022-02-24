@@ -555,7 +555,7 @@ class CApp implements CInterface_Responsable, CInterface_Renderable, CInterface_
     }
 
     public static function isAdministrator() {
-        return carr::first(explode('/', trim(CFRouter::getUri(), '/'))) == 'administrator';
+        return carr::first(explode('/', trim(curl::current(), '/'))) == 'administrator';
     }
 
     public static function setTheme($theme) {
