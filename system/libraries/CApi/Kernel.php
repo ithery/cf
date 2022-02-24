@@ -31,29 +31,28 @@ class CApi_Kernel {
      * Send the given request through the middleware / router.
      *
      * @param \CApi_HTTP_Request $request
-     * @param mixed              $method
      * @param mixed              $methodResolver
      *
      * @return \CApi_HTTP_Response
      */
     protected function sendRequestThroughPipeline(CApi_HTTP_Request $request, $methodResolver) {
+        $method = $methodResolver($request);
+
         return (new CApi_HTTP_Pipeline($this->group))
             ->send($request)
             ->through(c::api($this->group)->shouldSkipMiddleware() ? [] : $this->gatherMiddleware($method))
-            ->then($this->dispatchMethod($methodResolver));
+            ->then($this->dispatchMethod($method));
     }
 
     /**
      * Get the route dispatcher callback.
      *
-     * @param mixed $methodResolver
+     * @param CApi_MethodAbstract $method
      *
      * @return \Closure
      */
-    protected function dispatchMethod($methodResolver) {
-        return function ($request) use ($methodResolver) {
-            $method = $methodResolver($request);
-
+    protected function dispatchMethod(CApi_MethodAbstract $method) {
+        return function ($request) use ($method) {
             $method->execute();
 
             return c::response()->json($method->result());
@@ -73,7 +72,6 @@ class CApi_Kernel {
      *
      * @param mixed              $response
      * @param \CApi_HTTP_Request $request
-     * @param string             $format
      *
      * @return \CApi_HTTP_Response
      */

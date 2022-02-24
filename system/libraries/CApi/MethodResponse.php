@@ -13,7 +13,7 @@ class CApi_MethodResponse {
         $this->request = $request;
     }
 
-    public function toResponse($format) {
+    public function toResponse($format = 'json') {
         $result = new CApi_Result($this->request, $this->method->result());
         $formatted = $result->morph($format);
 
