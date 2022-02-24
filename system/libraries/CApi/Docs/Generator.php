@@ -73,8 +73,8 @@ class CApi_Docs_Generator {
         $this->excludedDirs = carr::get($pathsConfig, 'excludes', []);
         $this->outputDir = carr::get($pathsConfig, 'output.directory');
         $this->basePath = carr::get($pathsConfig, 'base', null);
-        $this->jsonDocsFile = $this->outputDir . DS . carr::get($pathsConfig, 'output.json', 'api-docs.json');
-        $this->yamlDocsFile = $this->outputDir . DS . carr::get($pathsConfig, 'output.yaml', 'api-docs.json');
+        $this->jsonDocsFile = rtrim($this->outputDir, DS) . DS . carr::get($pathsConfig, 'output.json', 'api-docs.json');
+        $this->yamlDocsFile = rtrim($this->outputDir, DS) . DS . carr::get($pathsConfig, 'output.yaml', 'api-docs.yaml');
         $this->constants = [];
         $this->scanOptions = $scanOptions;
         $this->security = $security;

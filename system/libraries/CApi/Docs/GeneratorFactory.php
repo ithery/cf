@@ -80,8 +80,8 @@ class CApi_Docs_GeneratorFactory {
         $this->annotationDirs = carr::get($config, 'path.annotations', []);
         $this->excludeDirs = carr::get($config, 'path.excludes', []);
         $this->outputDir = carr::get($config, 'path.output.directory', '');
-        $this->outputJson = carr::get($config, 'path.output.json', '');
-        $this->outputYaml = carr::get($config, 'path.output.yaml', '');
+        $this->outputJson = carr::get($config, 'path.output.json', 'api-docs.json');
+        $this->outputYaml = carr::get($config, 'path.output.yaml', 'api-docs.yaml');
         $this->basePath = carr::get($config, 'path.base', null);
 
         $this->scanAnalyser = carr::get($config, 'scan_options.analyser', null); // default \OpenApi\Analysers\TokenAnalyser::class
@@ -113,6 +113,19 @@ class CApi_Docs_GeneratorFactory {
      */
     public function setOutputDir($dir) {
         $this->outputDir = $dir;
+
+        return $this;
+    }
+
+    /**
+     * Filename of json file (dont include path here, path is from outputDir).
+     *
+     * @param string $filename
+     *
+     * @return $this
+     */
+    public function setOutputJsonFile($filename) {
+        $this->outputJson = $filename;
 
         return $this;
     }

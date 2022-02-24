@@ -1249,7 +1249,7 @@ class c {
      * @param null|string|array $path
      * @param null|string       $appCode
      *
-     * @return void
+     * @return string
      */
     public static function appRoot($path = null, $appCode = null) {
         if ($appCode == null) {
