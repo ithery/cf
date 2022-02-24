@@ -37,6 +37,7 @@ class CApp_Log_Activity {
         $appId = Base::appId();
         $orgId = Base::orgId();
         $userId = Base::userId();
+        $username = Base::username();
         $model->fill([
             'org_id' => $orgId,
             'app_id' => $appId,
@@ -57,6 +58,7 @@ class CApp_Log_Activity {
             'nav_label' => $navLabel,
             'action' => $actionName,
             'action_label' => $actionLabel,
+            'createdby' => $username,
         ]);
 
         $model->data = json_encode($data);
