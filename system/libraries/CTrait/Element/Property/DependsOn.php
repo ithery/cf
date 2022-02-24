@@ -46,9 +46,23 @@ trait CTrait_Element_Property_DependsOn {
 
             $optionsJson .= "dataAddition: { value: $('" . $dependsOnSelector . "').val() },";
             $optionsJson .= "onSuccess: (data) => {
-                 let jQueryTarget = $('" . $targetSelector . "');
-                 jQueryTarget.empty();
-                 jQueryTarget.html(data);
+                let jQueryTarget = $('" . $targetSelector . "');
+                jQueryTarget.empty();
+                if(typeof data == 'object') {
+                    if(typeof data.html === 'undefined') {
+                        cresenity.htmlModal(data);
+                    } else {
+                        jQueryTarget.html(data.html);
+                        if (data.js && data.js.length > 0) {
+                            let script = cresenity.base64.decode(data.js);
+                            eval(script);
+                        }
+                    }
+                } else {
+                    jQueryTarget.html(data);
+                }
+
+
             },";
             $optionsJson .= 'handleJsonResponse: true';
             $optionsJson .= '}';

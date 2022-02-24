@@ -42,7 +42,7 @@ class CRouting_RouteGroup {
                     : trim($new['namespace'], '\\');
         }
 
-        return $old['namespace'] ?? null;
+        return isset($old['namespace']) ? $old['namespace'] : null;
     }
 
     /**
@@ -55,7 +55,7 @@ class CRouting_RouteGroup {
      * @return null|string
      */
     protected static function formatPrefix($new, $old, $prependExistingPrefix = true) {
-        $old = $old['prefix'] ?? '';
+        $old = isset($old['prefix']) ? $old['prefix'] : '';
 
         if ($prependExistingPrefix) {
             return isset($new['prefix']) ? trim($old, '/') . '/' . trim($new['prefix'], '/') : $old;
@@ -74,8 +74,8 @@ class CRouting_RouteGroup {
      */
     protected static function formatWhere($new, $old) {
         return array_merge(
-            $old['where'] ?? [],
-            $new['where'] ?? []
+            isset($old['where']) ? $old['where'] : [],
+            isset($new['where']) ? $new['where'] : []
         );
     }
 
@@ -89,7 +89,7 @@ class CRouting_RouteGroup {
      */
     protected static function formatAs($new, $old) {
         if (isset($old['as'])) {
-            $new['as'] = $old['as'] . ($new['as'] ?? '');
+            $new['as'] = $old['as'] . (isset($new['as']) ? $new['as'] : '');
         }
 
         return $new;

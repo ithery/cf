@@ -36,6 +36,28 @@ trait CModel_Trait_Relationships {
     protected $touches = [];
 
     /**
+     * The relation resolver callbacks.
+     *
+     * @var array
+     */
+    protected static $relationResolvers = [];
+
+    /**
+     * Define a dynamic relation resolver.
+     *
+     * @param string   $name
+     * @param \Closure $callback
+     *
+     * @return void
+     */
+    public static function resolveRelationUsing($name, Closure $callback) {
+        static::$relationResolvers = array_replace_recursive(
+            static::$relationResolvers,
+            [static::class => [$name => $callback]]
+        );
+    }
+
+    /**
      * Define a one-to-one relationship.
      *
      * @param string $related
@@ -51,7 +73,68 @@ trait CModel_Trait_Relationships {
 
         $localKey = $localKey ?: $this->getKeyName();
 
-        return new CModel_Relation_HasOne($instance->newQuery(), $this, $instance->getTable() . '.' . $foreignKey, $localKey);
+        return $this->newHasOne($instance->newQuery(), $this, $instance->getTable() . '.' . $foreignKey, $localKey);
+    }
+
+    /**
+     * Instantiate a new HasOne relationship.
+     *
+     * @param \CModel_Query $query
+     * @param \CModel       $parent
+     * @param string        $foreignKey
+     * @param string        $localKey
+     *
+     * @return \CModel_Relation_HasOne
+     */
+    protected function newHasOne(CModel_Query $query, CModel $parent, $foreignKey, $localKey) {
+        return new CModel_Relation_HasOne($query, $parent, $foreignKey, $localKey);
+    }
+
+    /**
+     * Define a has-one-through relationship.
+     *
+     * @param string      $related
+     * @param string      $through
+     * @param null|string $firstKey
+     * @param null|string $secondKey
+     * @param null|string $localKey
+     * @param null|string $secondLocalKey
+     *
+     * @return \CModel_Relation_HasOneThrough
+     */
+    public function hasOneThrough($related, $through, $firstKey = null, $secondKey = null, $localKey = null, $secondLocalKey = null) {
+        $through = new $through();
+
+        $firstKey = $firstKey ?: $this->getForeignKey();
+
+        $secondKey = $secondKey ?: $through->getForeignKey();
+
+        return $this->newHasOneThrough(
+            $this->newRelatedInstance($related)->newQuery(),
+            $this,
+            $through,
+            $firstKey,
+            $secondKey,
+            $localKey ?: $this->getKeyName(),
+            $secondLocalKey ?: $through->getKeyName()
+        );
+    }
+
+    /**
+     * Instantiate a new HasOneThrough relationship.
+     *
+     * @param \CModel_Query $query
+     * @param \CModel       $farParent
+     * @param \CModel       $throughParent
+     * @param string        $firstKey
+     * @param string        $secondKey
+     * @param string        $localKey
+     * @param string        $secondLocalKey
+     *
+     * @return \CModel_Relation_HasOneThrough
+     */
+    protected function newHasOneThrough(CModel_Query $query, CModel $farParent, CModel $throughParent, $firstKey, $secondKey, $localKey, $secondLocalKey) {
+        return new CModel_Relation_HasOneThrough($query, $farParent, $throughParent, $firstKey, $secondKey, $localKey, $secondLocalKey);
     }
 
     /**
@@ -586,6 +669,28 @@ trait CModel_Trait_Relationships {
     }
 
     /**
+     * Duplicate the instance and unset all the loaded relations.
+     *
+     * @return $this
+     */
+    public function withoutRelations() {
+        $model = clone $this;
+
+        return $model->unsetRelations();
+    }
+
+    /**
+     * Unset all the loaded relations for the instance.
+     *
+     * @return $this
+     */
+    public function unsetRelations() {
+        $this->relations = [];
+
+        return $this;
+    }
+
+    /**
      * Get the relationships that are touched on save.
      *
      * @return array
@@ -1036,7 +1141,8 @@ trait CModel_Trait_Relationships {
             /** @var \CModel $instance */
             if (!isset($foreignKeys[$i])) {
                 if ($instance instanceof CModel_Relation_Pivot) {
-                    $foreignKeys[$i] = ($throughParents[$i] ?? $related)->getKeyName();
+                    $parent = (isset($throughParents[$i]) ? $throughParents[$i] : $related);
+                    $foreignKeys[$i] = $parent->getKeyName();
                 } else {
                     $foreignKeys[$i] = $instance->getForeignKey();
                 }
@@ -1060,7 +1166,8 @@ trait CModel_Trait_Relationships {
             /** @var \CModel $instance */
             if (!isset($localKeys[$i])) {
                 if ($instance instanceof CModel_Relation_Pivot) {
-                    $localKeys[$i] = ($throughParents[$i] ?? $related)->getForeignKey();
+                    $parent = $parent = (isset($throughParents[$i]) ? $throughParents[$i] : $related);
+                    $localKeys[$i] = $parent->getForeignKey();
                 } else {
                     $localKeys[$i] = $instance->getKeyName();
                 }
