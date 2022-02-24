@@ -1245,11 +1245,22 @@ class c {
         return $docRoot . DS;
     }
 
+    /**
+     * @param null|string|array $path
+     * @param null|string       $appCode
+     *
+     * @return void
+     */
     public static function appRoot($path = null, $appCode = null) {
         if ($appCode == null) {
             $appCode = CF::appCode();
         }
-
+        if (!in_array($appCode, CF::getAvailableAppCode())) {
+            throw new Exception('appCode ' . $appCode . ' doesn\'t exists');
+        }
+        if (is_array($path)) {
+            $path = implode(DS, $path);
+        }
         $appRoot = c::untrailingslashit(static::docRoot('application/' . $appCode));
         if ($path != null) {
             if (is_string($path) && strlen($path) > 0) {
@@ -1478,7 +1489,7 @@ class c {
 
         return json_encode($data, $options, $depth);
     }
-    
+
     /**
      * @return CApp_Contract_BaseInterface
      */

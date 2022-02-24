@@ -179,4 +179,8 @@ class CApi_Manager {
     public function createDispatcher() {
         return new CApi_Dispatcher($this->group);
     }
+
+    public function createDocsGenerator() {
+        return new CApi_Docs_GeneratorFactory($this->group);
+    }
 }
