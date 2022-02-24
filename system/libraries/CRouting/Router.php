@@ -296,55 +296,6 @@ class CRouting_Router {
     }
 
     /**
-     * Register an array of resource controllers.
-     *
-     * @param array $resources
-     * @param array $options
-     *
-     * @return void
-     */
-    public function resources(array $resources, array $options = []) {
-        foreach ($resources as $name => $controller) {
-            $this->resource($name, $controller, $options);
-        }
-    }
-
-    /**
-     * Register an array of API resource controllers.
-     *
-     * @param array $resources
-     * @param array $options
-     *
-     * @return void
-     */
-    public function apiResources(array $resources, array $options = []) {
-        foreach ($resources as $name => $controller) {
-            $this->apiResource($name, $controller, $options);
-        }
-    }
-
-    /**
-     * Route an API resource to a controller.
-     *
-     * @param string $name
-     * @param string $controller
-     * @param array  $options
-     *
-     * @return \Illuminate\Routing\PendingResourceRegistration
-     */
-    public function apiResource($name, $controller, array $options = []) {
-        $only = ['index', 'show', 'store', 'update', 'destroy'];
-
-        if (isset($options['except'])) {
-            $only = array_diff($only, (array) $options['except']);
-        }
-
-        return $this->resource($name, $controller, array_merge([
-            'only' => $only,
-        ], $options));
-    }
-
-    /**
      * Create a route group with shared attributes.
      *
      * @param array           $attributes
@@ -626,7 +577,7 @@ class CRouting_Router {
     protected function findRoute($request) {
         $this->current = $route = $this->routes->match($request);
 
-        $this->container->instance(CHTTP_Route::class, $route);
+        //$this->container->instance(CHTTP_Route::class, $route);
 
         return $route;
     }
@@ -1223,10 +1174,11 @@ class CRouting_Router {
             return $this->macroCall($method, $parameters);
         }
 
+        $routeRegistrar = new CRouting_RouteRegistrar($this);
         if ($method === 'middleware') {
-            return (new RouteRegistrar($this))->attribute($method, is_array($parameters[0]) ? $parameters[0] : $parameters);
+            return $routeRegistrar->attribute($method, is_array($parameters[0]) ? $parameters[0] : $parameters);
         }
 
-        return (new RouteRegistrar($this))->attribute($method, $parameters[0]);
+        return $routeRegistrar->attribute($method, $parameters[0]);
     }
 }

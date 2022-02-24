@@ -113,9 +113,35 @@ trait CObservable_Trait_ComponentTrait {
      */
     public function addForm($id = null) {
         $form = new CElement_Component_Form($id);
-        $this->add($form);
+        $this->wrapper->add($form);
 
         return $form;
+    }
+
+    /**
+     * Add Action Element.
+     *
+     * @param string $id optional
+     *
+     * @return CElement_Component_Action
+     */
+    public function addAction($id = null) {
+        $act = new CElement_Component_Action($id);
+        $this->wrapper->add($act);
+
+        return $act;
+    }
+
+    /**
+     * @param string $id
+     *
+     * @return CElement_Component_Alert
+     */
+    public function addAlert($id = null) {
+        $element = new CElement_Component_Alert($id);
+        $this->wrapper->add($element);
+
+        return $element;
     }
 
     /**

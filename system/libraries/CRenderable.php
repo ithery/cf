@@ -51,15 +51,18 @@ class CRenderable extends CObject implements CApp_Interface_Renderable {
     /**
      * Apply call method or set property of all childs of this object.
      *
-     * @param string $key
-     * @param mixed  $value
-     * @param string $className
+     * @param string            $key
+     * @param mixed             $value
+     * @param null|string|array $className
      *
      * @return $this
      */
-    public function apply($key, $value, $className = '') {
+    public function apply($key, $value, $className = null) {
+        if ($className !== null) {
+            $className = carr::wrap($className);
+        }
         foreach ($this->renderable as $r) {
-            if ($className == '' || $r->className() == $className) {
+            if ($className === null || in_array($r->className(), $className)) {
                 if (method_exists($r, $key)) {
                     $r->$key($value);
                 } else {

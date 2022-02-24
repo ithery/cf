@@ -155,7 +155,7 @@ trait CDatabase_Trait_Builder {
      * @throws \CDatabase_Exception_RecordsNotFoundException
      * @throws \CDatabase_Exception_MultipleRecordsFoundException
      *
-     * @return null|\Illuminate\Database\Eloquent\Model|object|static
+     * @return null|\CModel|object|static
      */
     public function sole($columns = ['*']) {
         $result = $this->take(2)->get($columns);
