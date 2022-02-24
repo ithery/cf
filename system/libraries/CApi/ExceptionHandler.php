@@ -128,6 +128,9 @@ class CApi_ExceptionHandler implements CApi_Contract_ExceptionHandlerInterface, 
         if ($exception instanceof CModel_Exception_ModelNotFoundException) {
             $exception = new NotFoundHttpException($exception->getMessage(), $exception);
         }
+        if ($exception instanceof CApi_Exception_ApiMethodNotFoundException) {
+            $exception = new NotFoundHttpException($exception->getMessage(), $exception);
+        }
 
         foreach ($this->handlers as $hint => $handler) {
             if (!$exception instanceof $hint) {
