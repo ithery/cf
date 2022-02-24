@@ -5,6 +5,7 @@ defined('SYSPATH') or die('No direct access allowed.');
 /**
  * Common helper class.
  */
+use Opis\Closure\SerializableClosure;
 use Symfony\Component\VarDumper\VarDumper;
 use Symfony\Component\PropertyAccess\PropertyAccess;
 use Symfony\Component\Debug\Exception\FatalThrowableError;
@@ -303,6 +304,10 @@ class c {
      * @return mixed
      */
     public static function value($value, ...$args) {
+        if ($value instanceof SerializableClosure) {
+            return $value->__invoke(...$args);
+        }
+
         return $value instanceof Closure ? $value(...$args) : $value;
     }
 
@@ -1472,6 +1477,13 @@ class c {
         }
 
         return json_encode($data, $options, $depth);
+    }
+    
+    /**
+     * @return CApp_Contract_BaseInterface
+     */
+    public static function base() {
+        return c::app()->base();
     }
 
     /**
