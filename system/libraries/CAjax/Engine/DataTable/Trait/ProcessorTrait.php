@@ -39,20 +39,17 @@ trait CAjax_Engine_DataTable_Trait_ProcessorTrait {
                 }
 
                 if ($table->getRowActionList()->getStyle() == 'btn-dropdown') {
-                    if ($table->getActionLocation() == 'first') {
-                        $table->getRowActionList()->addClass('dropdown-menu-left');
-                    } else {
-                        $table->getRowActionList()->addClass('dropdown-menu-right');
-                    }
+                    $table->getRowActionList()
+                        ->addClass($table->getActionLocation() == 'first' ? 'dropdown-menu-left' : 'dropdown-menu-right');
                 }
                 $rowActionList->regenerateId(true);
                 $rowActionList->apply('setJsParam', $jsparam);
                 $rowActionList->apply('setHandlerParam', $jsparam);
 
-                if (($table->filterActionCallbackFunc) != null) {
-                    $actions = $rowActionList->childs();
+                $actions = $rowActionList->childs();
 
-                    foreach ($actions as &$action) {
+                foreach ($actions as &$action) {
+                    if (($table->filterActionCallbackFunc) != null) {
                         $action->removeClass('d-none');
 
                         $visibility = CFunction::factory($table->filterActionCallbackFunc)
@@ -68,8 +65,9 @@ trait CAjax_Engine_DataTable_Trait_ProcessorTrait {
                         }
                         $action->setVisibility($visibility);
                     }
-
-                    //call_user_func($this->cellCallbackFunc,$this,$col->get_fieldname(),$row,$v);
+                    if ($action instanceof CElement_Component_ActionRow) {
+                        $action->applyRowCallback($row);
+                    }
                 }
 
                 $html->appendln($table->getRowActionList()->html($html->getIndent()));
