@@ -256,7 +256,7 @@ class SerializableClosure implements Serializable {
             $this->code['this'] = null;
         }
         $classThis = $this->code['this'];
-        if (\class_exists($classThis)) {
+        if (\is_object($classThis) || \class_exists($classThis)) {
             $this->closure = $this->closure->bindTo($this->code['this'], $this->code['scope']);
         }
 
@@ -377,7 +377,6 @@ class SerializableClosure implements Serializable {
                 static::wrapClosures($value, $storage);
             }
             unset($value, $data[self::ARRAY_RECURSIVE_KEY]);
-
         } elseif ($data instanceof \stdClass) {
             if (isset($storage[$data])) {
                 $data = $storage[$data];
@@ -534,7 +533,6 @@ class SerializableClosure implements Serializable {
                 }
             }
             unset($value, $data[self::ARRAY_RECURSIVE_KEY]);
-
         } elseif ($data instanceof \stdClass) {
             if (isset($scope[$data])) {
                 return;
@@ -624,7 +622,6 @@ class SerializableClosure implements Serializable {
                 $this->mapByReference($value);
             }
             unset($value, $data[self::ARRAY_RECURSIVE_KEY]);
-
         } elseif ($data instanceof \stdClass) {
             if (isset($this->scope[$data])) {
                 $data = $this->scope[$data];
