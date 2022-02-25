@@ -173,7 +173,7 @@ class CHTTP_Middleware_VerifyCsrfToken {
                 $config['secure'],
                 false,
                 false,
-                $config['same_site'] ?? null
+                isset($config['same_site']) ? $config['same_site'] : null
             )
         );
 

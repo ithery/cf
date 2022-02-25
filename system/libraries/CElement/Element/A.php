@@ -14,6 +14,10 @@ class CElement_Element_A extends CElement_Element {
         $this->target = '';
     }
 
+    public static function factory($id = '') {
+        return CElement_Factory::create(static::class, $id = '');
+    }
+
     /**
      * Set href attribute.
      *

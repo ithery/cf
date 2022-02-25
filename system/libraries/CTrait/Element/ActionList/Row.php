@@ -35,10 +35,10 @@ trait CTrait_Element_ActionList_Row {
     /**
      * @param string $id
      *
-     * @return CElement_Component_Action
+     * @return CElement_Component_ActionRow
      */
     public function addRowAction($id = '') {
-        $rowAct = CElement_Factory::createComponent('Action', $id);
+        $rowAct = CElement_Component_ActionRow::factory($id);
         $this->getRowActionList()->add($rowAct);
 
         return $rowAct;
@@ -63,11 +63,11 @@ trait CTrait_Element_ActionList_Row {
     }
 
     /**
-     * @return CElement_List_ActionList
+     * @return CElement_List_ActionRowList
      */
     public function getRowActionList() {
         if ($this->rowActionList == null) {
-            $this->rowActionList = CElement_Factory::createList('ActionList');
+            $this->rowActionList = CElement_List_ActionRowList::factory();
         }
 
         return $this->rowActionList;

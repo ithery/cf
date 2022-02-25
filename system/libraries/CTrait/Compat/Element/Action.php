@@ -9,7 +9,6 @@ defined('SYSPATH') or die('No direct access allowed.');
  * @since Feb 16, 2018, 5:01:46 AM
  */
 //@codingStandardsIgnoreStart
-
 trait CTrait_Compat_Element_Action {
     /**
      * @deprecated since version 1.2

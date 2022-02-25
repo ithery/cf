@@ -66,4 +66,27 @@ class CManager_Asset_Helper {
 
         return $version;
     }
+
+    public static function fullpathCssFile($file, $mediaPaths = []) {
+        foreach ($mediaPaths as $dir) {
+            $path = $dir . 'css' . DS . $file;
+
+            if (file_exists($path)) {
+                return $path;
+            }
+        }
+        $dirs = CF::getDirs('media');
+        $dirs = array_merge($mediaPaths, $dirs);
+
+        foreach ($dirs as $dir) {
+            $path = $dir . 'css' . DS . $file;
+
+            if (file_exists($path)) {
+                return $path;
+            }
+        }
+        $path = DOCROOT . 'media' . DS . 'css' . DS;
+
+        return $path . $file;
+    }
 }

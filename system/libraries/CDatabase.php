@@ -253,7 +253,6 @@ class CDatabase {
 
         $this->events = CEvent::dispatcher();
         CModel::setEventDispatcher($this->events);
-        $this->configuration = new CDatabase_Configuration();
 
         // Validate the driver
         if (!($this->driver instanceof CDatabase_Driver)) {
@@ -1382,6 +1381,10 @@ class CDatabase {
 
     public static function getBenchmarks() {
         return static::$benchmarks;
+    }
+
+    public static function manager() {
+        return CDatabase_Manager::instance();
     }
 }
 

@@ -117,7 +117,8 @@ class CHTTP {
      */
     public static function cookie() {
         if (static::$cookie == null) {
-            $config = CF::config('cookie');
+            $config = CF::config('session');
+
             static::$cookie = new CHTTP_Cookie();
             static::$cookie->setDefaultPathAndDomain(
                 $config['path'],
@@ -149,5 +150,9 @@ class CHTTP {
 
     public static function client() {
         return CHTTP_Client::instance();
+    }
+
+    public static function robotsTxt() {
+        return CHTTP_RobotsTxt::instance();
     }
 }

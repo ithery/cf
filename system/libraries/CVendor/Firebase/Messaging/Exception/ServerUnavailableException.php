@@ -3,7 +3,6 @@
 use Psr\Http\Message\ResponseInterface;
 
 final class CVendor_Firebase_Messaging_Exception_ServerUnavailableException extends RuntimeException implements CVendor_Firebase_Messaging_ExceptionInterface {
-    use CVendor_Firebase_Trait_ExceptionHasRequestAndResponseTrait;
     use CVendor_Firebase_Trait_ExceptionHasErrorsTrait;
 
     /**
@@ -20,17 +19,22 @@ final class CVendor_Firebase_Messaging_Exception_ServerUnavailableException exte
     }
 
     /**
-     * @internal
+     * @param DateTimeImmutable $retryAfter
      *
-     * @deprecated 4.28.0
-     *
-     * @return static
+     * @return self
      */
-    public function withResponse(ResponseInterface $response) {
+    public function withRetryAfter(DateTimeImmutable $retryAfter) {
         $new = new self($this->getMessage(), $this->getCode(), $this->getPrevious());
         $new->errors = $this->errors;
-        $new->response = $response;
+        $new->retryAfter = $retryAfter;
 
         return $new;
+    }
+
+    /**
+     * @return null|DateTimeImmutable
+     */
+    public function retryAfter() {
+        return $this->retryAfter;
     }
 }

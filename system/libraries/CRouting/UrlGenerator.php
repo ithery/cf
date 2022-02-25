@@ -560,9 +560,9 @@ class CRouting_UrlGenerator {
     /**
      * Format the given URL segments into a single URL.
      *
-     * @param string                         $root
-     * @param string                         $path
-     * @param null|\Illuminate\Routing\Route $route
+     * @param string               $root
+     * @param string               $path
+     * @param null|\CRouting_Route $route
      *
      * @return string
      */

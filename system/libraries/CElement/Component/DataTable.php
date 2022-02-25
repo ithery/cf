@@ -149,7 +149,7 @@ class CElement_Component_DataTable extends CElement_Component {
         $this->data = [];
         $this->keyField = '';
         $this->columns = [];
-        $this->rowActionList = CElement_Factory::createList('ActionList');
+        $this->rowActionList = CElement_List_ActionRowList::factory();
         $this->rowActionList->setStyle('btn-icon-group')->addClass('btn-table-action');
         $this->headerActionList = null;
         $this->footerActionList = null;
@@ -215,6 +215,10 @@ class CElement_Component_DataTable extends CElement_Component {
         $this->checkboxRenderer = CManager::theme()->getData('datatable.renderer.checkbox', [CElement_Component_DataTable_Renderer::class, 'checkboxCell']);
         $this->labels['noData'] = CManager::theme()->getData('datatable.label.noData', 'No data available in table');
         $this->labels['first'] = CManager::theme()->getData('datatable.label.first', 'First');
+        $this->labels['last'] = CManager::theme()->getData('datatable.label.last', 'Last');
+        $this->labels['previous'] = CManager::theme()->getData('datatable.label.previous', 'Previous');
+        $this->labels['next'] = CManager::theme()->getData('datatable.label.next', 'Next');
+        $this->labels['processing'] = CManager::theme()->getData('datatable.label.processing', 'Processing');
     }
 
     public static function factory($id = '') {

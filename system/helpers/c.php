@@ -5,6 +5,7 @@ defined('SYSPATH') or die('No direct access allowed.');
 /**
  * Common helper class.
  */
+use Opis\Closure\SerializableClosure;
 use Symfony\Component\VarDumper\VarDumper;
 use Symfony\Component\PropertyAccess\PropertyAccess;
 use Symfony\Component\Debug\Exception\FatalThrowableError;
@@ -145,189 +146,6 @@ class c {
                 return null;
             }
         };
-    }
-
-    public static function baseGet($object, $path, $defaultValue = null) {
-        $path = static::castPath($path, $object);
-        $index = 0;
-        $length = \count($path);
-        while ($object !== null && !is_scalar($object) && $index < $length) {
-            $property = static::property(static::toKey($path[$index++]));
-            $object = $property($object);
-        }
-
-        return ($index > 0 && $index === $length) ? $object : $defaultValue;
-    }
-
-    /**
-     * Converts `value` to a string key if it's not a string.
-     *
-     * @param mixed $value the value to inspect
-     *
-     * @return string returns the key
-     */
-    public static function toKey($value) {
-        if (\is_string($value)) {
-            return $value;
-        }
-        $result = (string) $value;
-
-        return ('0' === $result && (1 / $value) === -INF) ? '-0' : $result;
-    }
-
-    public static function castPath($value, $object) {
-        if (\is_array($value)) {
-            return $value;
-        }
-
-        return static::isKey($value, $object) ? [$value] : static::stringToPath((string) $value);
-    }
-
-    /**
-     * Checks if `value` is a property name and not a property path.
-     *
-     * @param mixed        $value  the value to check
-     * @param object|array $object the object to query keys on
-     *
-     * @return bool returns `true` if `value` is a property name, else `false`
-     */
-    public static function isKey($value, $object = []) {
-        /* Used to match property names within property paths. */
-        $reIsDeepProp = '#\.|\[(?:[^[\]]*|(["\'])(?:(?!\1)[^\\\\]|\\.)*?\1)\]#';
-        $reIsPlainProp = '/^\w*$/';
-        if (\is_array($value)) {
-            return false;
-        }
-        if (\is_numeric($value)) {
-            return true;
-        }
-        $forceObject = ((object) $object);
-
-        return \preg_match($reIsPlainProp, $value) || !\preg_match($reIsDeepProp, $value) || (null !== $object && isset($forceObject->$value));
-    }
-
-    public static function stringToPath(...$args) {
-        $memoizeCapped = static::memoizeCapped(function ($string) {
-            $reLeadingDot = '/^\./';
-            $rePropName = '#[^.[\]]+|\[(?:(-?\d+(?:\.\d+)?)|(["\'])((?:(?!\2)[^\\\\]|\\.)*?)\2)\]|(?=(?:\.|\[\])(?:\.|\[\]|$))#';
-            /* Used to match backslashes in property paths. */
-            $reEscapeChar = '/\\(\\)?/g';
-            $result = [];
-            if (\preg_match($reLeadingDot, $string)) {
-                $result[] = '';
-            }
-            \preg_match_all($rePropName, $string, $matches, PREG_SPLIT_DELIM_CAPTURE);
-            foreach ($matches as $match) {
-                $result[] = isset($match[1]) ? $match[1] : $match[0];
-            }
-
-            return $result;
-        });
-
-        return $memoizeCapped(...$args);
-    }
-
-    public static function memoizeCapped(callable $func) {
-        $MaxMemoizeSize = 500;
-        $result = static::memoize($func, function ($key) use ($MaxMemoizeSize) {
-            if ($this->cache->getSize() === $MaxMemoizeSize) {
-                $this->cache->clear();
-            }
-
-            return $key;
-        });
-
-        return $result;
-    }
-
-    /**
-     * Creates a function that memoizes the result of `func`. If `resolver` is
-     * provided, it determines the cache key for storing the result based on the
-     * arguments provided to the memoized function. By default, the first argument
-     * provided to the memoized function is used as the map cache key.
-     *
-     * **Note:** The cache is exposed as the `cache` property on the memoized
-     * function. Its creation may be customized by replacing the `_.memoize.Cache`
-     * constructor with one whose instances implement the
-     * [`Map`](http://ecma-international.org/ecma-262/7.0/#sec-properties-of-the-map-prototype-object)
-     * method interface of `clear`, `delete`, `get`, `has`, and `set`.
-     *
-     * @param callable      $func     the function to have its output memoized
-     * @param null|callable $resolver the function to resolve the cache key
-     *
-     * @return callable returns the new memoized function
-     *
-     * @example
-     * <code>
-     * $object = ['a' => 1, 'b' => 2];
-     * $other = ['c' => 3, 'd' => 4];
-     *
-     * $values = c::memoize('c::values');
-     * $values($object);
-     * // => [1, 2]
-     *
-     * $values($other);
-     * // => [3, 4]
-     *
-     * $object['a'] = 2;
-     * $values($object);
-     * // => [1, 2]
-     *
-     * // Modify the result cache.
-     * $values->cache->set($object, ['a', 'b']);
-     * $values($object);
-     * // => ['a', 'b']
-     * </code>
-     */
-    public static function memoize(callable $func, callable $resolver = null) {
-        $memoized = CBase::createMemoizeResolver($func, $resolver);
-        $memoized->cache = CBase::createMapCache();
-
-        return $memoized;
-    }
-
-    public static function assocIndexOf(array $array, $key) {
-        $length = \count($array);
-        while ($length--) {
-            if (static::eq($array[$length][0], $key)) {
-                return $length;
-            }
-        }
-
-        return -1;
-    }
-
-    /**
-     * Performs a comparison between two values to determine if they are equivalent.
-     *
-     * @param mixed $value the value to compare
-     * @param mixed $other the other value to compare
-     *
-     * @return bool returns `true` if the values are equivalent, else `false`
-     *
-     * @example
-     * <code>
-     * $object = (object) ['a' => 1];
-     * $other = (object) ['a' => 1];
-     *
-     * eq($object, $object);
-     * // => true
-     *
-     * eq($object, $other);
-     * // => false
-     *
-     * eq('a', 'a');
-     * // => true
-     *
-     * eq(['a'], (object) ['a']);
-     * // => false
-     *
-     * eq(INF, INF);
-     * // => true
-     * </code>
-     */
-    public static function eq($value, $other) {
-        return $value === $other;
     }
 
     /**
@@ -486,6 +304,10 @@ class c {
      * @return mixed
      */
     public static function value($value, ...$args) {
+        if ($value instanceof SerializableClosure) {
+            return $value->__invoke(...$args);
+        }
+
         return $value instanceof Closure ? $value(...$args) : $value;
     }
 
@@ -1423,13 +1245,23 @@ class c {
         return $docRoot . DS;
     }
 
+    /**
+     * @param null|string|array $path
+     * @param null|string       $appCode
+     *
+     * @return string
+     */
     public static function appRoot($path = null, $appCode = null) {
         if ($appCode == null) {
             $appCode = CF::appCode();
         }
-
-        $appRoot = static::docRoot('application/' . $appCode);
-
+        if (!in_array($appCode, CF::getAvailableAppCode())) {
+            throw new Exception('appCode ' . $appCode . ' doesn\'t exists');
+        }
+        if (is_array($path)) {
+            $path = implode(DS, $path);
+        }
+        $appRoot = c::untrailingslashit(static::docRoot('application/' . $appCode));
         if ($path != null) {
             if (is_string($path) && strlen($path) > 0) {
                 $appRoot .= DS . trim($path, DS);
@@ -1556,10 +1388,33 @@ class c {
     }
 
     /**
-     * @return CHTTP_Cookie
+     * Create a new cookie instance.
+     *
+     * @param null|string $name
+     * @param null|string $value
+     * @param int         $minutes
+     * @param null|string $path
+     * @param null|string $domain
+     * @param null|bool   $secure
+     * @param bool        $httpOnly
+     * @param bool        $raw
+     * @param null|string $sameSite
+     *
+     * @return \CHTTP_Cookie|\Symfony\Component\HttpFoundation\Cookie
      */
-    public static function cookie() {
-        return CHTTP::cookie();
+    public static function cookie($name = null, $value = null, $minutes = 0, $path = null, $domain = null, $secure = null, $httpOnly = true, $raw = false, $sameSite = null) {
+        $cookie = CHTTP::cookie();
+        if (is_null($name)) {
+            return $cookie;
+        }
+
+        return $cookie->make($name, $value, $minutes, $path, $domain, $secure, $httpOnly, $raw, $sameSite);
+    }
+
+    public static function setCookie($name, $value, $minutes = 0, $path = null, $domain = null, $secure = null, $httpOnly = true, $raw = false, $sameSite = null) {
+        $cookie = CHTTP::cookie()->make($name, $value, $minutes, $path, $domain, $secure, $httpOnly, $raw, $sameSite);
+
+        return CHTTP::cookie()->queue($cookie);
     }
 
     /**
@@ -1597,12 +1452,58 @@ class c {
         ));
     }
 
+    /**
+     * Recursively diff two arrays.
+     *
+     * @param array $arrayOne
+     * @param array $arrayTwo
+     *
+     * @return array
+     */
+    public static function arrayDiffAssocRecursive($arrayOne, $arrayTwo) {
+        $difference = [];
+        foreach ($arrayOne as $key => $value) {
+            if (is_array($value) || $value instanceof CCollection) {
+                if (!isset($arrayTwo[$key])) {
+                    $difference[$key] = $value;
+                } elseif (!(is_array($arrayTwo[$key]) || $arrayTwo[$key] instanceof CCollection)) {
+                    $difference[$key] = $value;
+                } else {
+                    $new_diff = c::arrayDiffAssocRecursive($value, $arrayTwo[$key]);
+                    if ($new_diff != false) {
+                        $difference[$key] = $new_diff;
+                    }
+                }
+            } elseif (!isset($arrayTwo[$key])) {
+                $difference[$key] = $value;
+            }
+        }
+
+        return $difference;
+    }
+
     public static function json($data, $options = null, $depth = 512) {
         if ($options == null) {
             $options = JSON_HEX_TAG | JSON_HEX_APOS | JSON_HEX_AMP | JSON_HEX_QUOT;
         }
 
         return json_encode($data, $options, $depth);
+    }
+
+    /**
+     * @return CApp_Contract_BaseInterface
+     */
+    public static function base() {
+        return c::app()->base();
+    }
+
+    /**
+     * @param null|string $group
+     *
+     * @return CApi_Manager
+     */
+    public static function api($group = null) {
+        return CApi::manager($group);
     }
 }
 

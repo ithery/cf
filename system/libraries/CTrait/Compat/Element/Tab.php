@@ -23,7 +23,7 @@ trait CTrait_Compat_Element_Tab {
     }
 
     /**
-     * Undocumented function
+     * Undocumented function.
      *
      * @param string $url
      *
@@ -36,7 +36,7 @@ trait CTrait_Compat_Element_Tab {
     }
 
     /**
-     * Undocumented function
+     * Undocumented function.
      *
      * @param string $target
      *
@@ -49,7 +49,7 @@ trait CTrait_Compat_Element_Tab {
     }
 
     /**
-     * Undocumented function
+     * Undocumented function.
      *
      * @param string $bool
      *
@@ -62,7 +62,7 @@ trait CTrait_Compat_Element_Tab {
     }
 
     /**
-     * Undocumented function
+     * Undocumented function.
      *
      * @param string $bool
      *
@@ -75,7 +75,7 @@ trait CTrait_Compat_Element_Tab {
     }
 
     /**
-     * Undocumented function
+     * Undocumented function.
      *
      * @param string $bool
      *
@@ -88,7 +88,7 @@ trait CTrait_Compat_Element_Tab {
     }
 
     /**
-     * Undocumented function
+     * Undocumented function.
      *
      * @param string $icon
      *
@@ -101,7 +101,7 @@ trait CTrait_Compat_Element_Tab {
     }
 
     /**
-     * Undocumented function
+     * Undocumented function.
      *
      * @param int $indent
      *

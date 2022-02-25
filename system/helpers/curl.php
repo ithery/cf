@@ -14,7 +14,7 @@ class curl {
      * @return string
      */
     public static function current($qs = false) {
-        return ($qs === true) ? CFRouter::$complete_uri : CFRouter::$current_uri;
+        return ltrim(($qs === true) ? c::request()->getRequestUri() : c::request()->path(), '/');
     }
 
     /**
@@ -86,12 +86,7 @@ class curl {
      * @return string
      */
     public static function fullUrl($qs = true) {
-        $requestUri = carr::get($_SERVER, 'REQUEST_URI');
-        if ($qs && strlen($requestUri) > 0) {
-            return trim(curl::httpbase(), '/') . $requestUri;
-        }
-
-        return curl::httpbase() . curl::current() . ($qs ? CFRouter::$query_string : '');
+        return $qs ? c::url()->full() : c::url()->current();
     }
 
     /**

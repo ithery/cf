@@ -1,5 +1,5 @@
 <?php
-
+// @codingStandardsIgnoreStart
 class CApp {
     /**
      * @param null|string $id
@@ -30,8 +30,8 @@ class CApp {
 
     /**
      * @param CElement_View}string $view
-     * @param string               $id
-     * @param null|mixed           $data
+     * @param string     $id
+     * @param null|mixed $data
      *
      * @return CElement_View
      */

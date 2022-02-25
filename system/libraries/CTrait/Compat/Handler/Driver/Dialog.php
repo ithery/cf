@@ -15,7 +15,7 @@ trait CTrait_Compat_Handler_Driver_Dialog {
     protected $js_class_manual;
 
     /**
-     * @param type $js_class
+     * @param string $js_class
      *
      * @return $this
      *
@@ -24,6 +24,7 @@ trait CTrait_Compat_Handler_Driver_Dialog {
     public function set_js_class($js_class) {
         //set js class manual
         $this->js_class_manual = $js_class;
+
         return $this;
     }
 

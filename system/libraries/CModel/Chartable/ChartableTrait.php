@@ -114,7 +114,7 @@ trait CModel_Chartable_ChartableTrait {
      * @param null|string|DateTimeInterface $stopDate
      * @param string                        $dateColumn
      *
-     * @return TimeCollection
+     * @return CModel_Chartable_TimeCollection
      */
     public function scopeSumByDays(CModel_Query $builder, $value, $startDate = null, $stopDate = null, $dateColumn = 'created') {
         return $this->groupByDays($builder, "SUM(${value})", $startDate, $stopDate, $dateColumn);

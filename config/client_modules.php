@@ -705,4 +705,10 @@ return [
             'plugins/jquery-query-builder/query-builder.standalone.js',
         ],
     ],
+
+    'redoc' => [
+        'js' => [
+            'plugins/redoc/redoc.standalone.min.js',
+        ],
+    ],
 ];

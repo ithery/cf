@@ -12,7 +12,7 @@ defined('SYSPATH') or die('No direct access allowed.');
  //@codingStandardsIgnoreStart
 trait CTrait_Compat_Element_Form {
     /**
-     * Set method attribute value of form element
+     * Set method attribute value of form element.
      *
      * @deprecated since version 1.2, please use setMethod
      *
@@ -25,7 +25,7 @@ trait CTrait_Compat_Element_Form {
     }
 
     /**
-     * Set action attribute value of form element
+     * Set action attribute value of form element.
      *
      * @deprecated since version 1.2, please use setAction
      *
@@ -38,7 +38,7 @@ trait CTrait_Compat_Element_Form {
     }
 
     /**
-     * Set target attribute value of form element
+     * Set target attribute value of form element.
      *
      * @deprecated since version 1.2, please use setTarget
      *
@@ -151,36 +151,43 @@ trait CTrait_Compat_Element_Form {
 
     public function set_disable_js($bool) {
         $this->disable_js = $bool;
+
         return $this;
     }
 
     public function set_ajax_submit_target_class($target) {
         $this->ajax_submit_target_class = $target;
+
         return $this;
     }
 
     public function set_ajax_success_script_callback($jsfunc) {
         $this->ajax_success_script_callback = $jsfunc;
+
         return $this;
     }
 
     public function setAjaxRedirect($bool) {
         $this->ajax_redirect = $bool;
+
         return $this;
     }
 
     public function set_ajax_redirect_url($url) {
         $this->ajax_redirect_url = $url;
+
         return $this;
     }
 
     public function set_action_before_submit($action_before_submit) {
         $this->action_before_submit = $action_before_submit;
+
         return $this;
     }
 
     public function set_auto_set_focus($bol) {
         $this->auto_set_focus = $bol;
+
         return $this;
     }
 
@@ -192,6 +199,7 @@ trait CTrait_Compat_Element_Form {
     public function add_ajax_submit_handler($handler_name) {
         $handler = CHandler::factory($this->id, 'submit', $handler_name);
         $this->ajax_submit_handlers[] = $handler;
+
         return $handler;
     }
 }

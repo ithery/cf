@@ -75,13 +75,6 @@ final class CF {
     private static $sharedAppCode = [];
 
     /**
-     * CF Session.
-     *
-     * @var CSession_Store
-     */
-    private static $session;
-
-    /**
      * Check CF is running on production.
      *
      * @return bool
@@ -253,92 +246,9 @@ final class CF {
      * @return void
      */
     public static function invoke($uri) {
-        $routerData = CFRouter::getRouteData($uri);
-        $routes = carr::get($routerData, 'routes');
-        $current_uri = carr::get($routerData, 'current_uri');
-        $query_string = carr::get($routerData, 'query_string');
-        $complete_uri = carr::get($routerData, 'complete_uri');
-        $routed_uri = carr::get($routerData, 'routed_uri');
-        $url_suffix = carr::get($routerData, 'url_suffix');
-        $segments = carr::get($routerData, 'segments');
-        $rsegments = carr::get($routerData, 'rsegments');
-        $controller = carr::get($routerData, 'controller');
-        $controller_dir = carr::get($routerData, 'controller_dir');
-        $controller_dir_ucfirst = carr::get($routerData, 'controller_dir_ucfirst');
-        $controller_path = carr::get($routerData, 'controller_path');
-        $method = carr::get($routerData, 'method');
-        $arguments = carr::get($routerData, 'arguments');
+        $request = CHTTP_Request::create($uri, c::request()->method());
 
-        if ($controller instanceof \Symfony\Component\HttpFoundation\Response) {
-            return $controller;
-        }
-        // Include the Controller file
-        if (strlen($controller_path) > 0) {
-            require_once $controller_path;
-        }
-        $class_name = '';
-
-        try {
-            // Start validation of the controller
-            $class_name = str_replace('/', '_', $controller_dir_ucfirst);
-            $class_name = 'Controller_' . $class_name . ucfirst($controller);
-            $class = new ReflectionClass($class_name);
-        } catch (ReflectionException $e) {
-            try {
-                $class_name = ucfirst($controller) . '_Controller';
-                $class = new ReflectionClass($class_name);
-                // Start validation of the controller
-            } catch (ReflectionException $e) {
-                // Controller does not exist
-                CF::show404();
-            }
-        }
-
-        if (isset($class)
-            && ($class->isAbstract()
-            || (IN_PRODUCTION && $class->getConstant('ALLOW_PRODUCTION') == false))
-        ) {
-            // Controller is not allowed to run in production
-            throw new Exception(c::__(
-                'class is abstract or not allowed in production in :class_name',
-                [':class_name' => $class_name]
-            ));
-        }
-        // Create a new controller instance
-        if (isset($class)) {
-            $controller = $class->newInstance();
-        }
-
-        try {
-            // Load the controller method
-            $method = $class->getMethod($method);
-
-            // Method exists
-            if (CFRouter::$method[0] === '_') {
-                // Do not allow access to hidden methods
-                throw new Exception(c::__(
-                    'method :method is hidden methods in :class_name',
-                    [':method' => $method, ':class_name' => $class_name]
-                ));
-            }
-
-            if ($method->isProtected() or $method->isPrivate()) {
-                // Do not attempt to invoke protected methods
-                throw new ReflectionException('protected controller method');
-            }
-
-            // Default arguments
-            $arguments = $arguments;
-        } catch (ReflectionException $e) {
-            // Use __call instead
-            $method = $class->getMethod('__call');
-
-            // Use arguments in __call format
-            $arguments = [$method, $arguments];
-        }
-
-        // Execute the controller method
-        return $method->invokeArgs($controller, $arguments);
+        return  c::router()->dispatchToRoute($request);
     }
 
     /**
@@ -1131,7 +1041,7 @@ final class CF {
      * @return bool
      */
     public static function isDevSuite() {
-        return cstr::endsWith(CF::domain(), '.test');
+        return substr(CF::domain(), -strlen('.test')) === '.test';
     }
 
     /**
@@ -1248,20 +1158,5 @@ final class CF {
                 static::$data[$domain]['app_code'] = $originalAppCode;
             }
         }
-    }
-
-    public static function session() {
-        if (static::$session == null && CSession::sessionConfigured()) {
-            $request = CHTTP::request();
-            CSession::manager()->applyNativeSession();
-
-            static::$session = c::tap(CSession::manager()->createStore(), function ($session) use ($request) {
-                $session->setId($request->cookies->get($session->getName()));
-                $session->setRequestOnHandler($request);
-                $session->start();
-            });
-        }
-
-        return static::$session;
     }
 }

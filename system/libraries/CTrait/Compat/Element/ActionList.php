@@ -9,9 +9,9 @@ defined('SYSPATH') or die('No direct access allowed.');
  * @since Feb 16, 2018, 6:19:05 AM
  */
 //@codingStandardsIgnoreStart
-
 trait CTrait_Compat_Element_ActionList {
     protected $label_size;
+
     protected $btn_dropdown_classes;
 
     /**
@@ -40,6 +40,7 @@ trait CTrait_Compat_Element_ActionList {
      */
     public function set_label_size($label_size) {
         $this->label_size = $label_size;
+
         return $this;
     }
 
@@ -50,6 +51,7 @@ trait CTrait_Compat_Element_ActionList {
      */
     public function add_btn_dropdown_class($class) {
         $this->btn_dropdown_classes[] = $class;
+
         return $this;
     }
 }

@@ -40,23 +40,35 @@ class CVendor_Firebase_Messaging {
 
     /**
      * @param array|Message|mixed $message
+     * @param bool                $validateOnly
      *
      * @throws InvalidArgumentException
      * @throws MessagingException
      * @throws CVendor_Firebase_Exception
      */
-    public function send($message) {
+    public function send($message, $validateOnly = false) {
         $message = $this->makeMessage($message);
 
-        $request = new CVendor_Firebase_Messaging_Request_SendMessageRequest($this->projectId, $message);
-        $response = $this->messagingApi->send($request);
+        $request = new CVendor_Firebase_Messaging_Request_SendMessageRequest($this->projectId, $message, $validateOnly);
 
-        return CHelper::json()->decode((string) $response->getBody(), true);
+        try {
+            $response = $this->messagingApi->send($request);
+        } catch (CVendor_Firebase_Messaging_Exception_NotFoundException $e) {
+            $token = carr::get($message->jsonSerialize(), 'token');
+            if ($token) {
+                throw CVendor_Firebase_Messaging_Exception_NotFoundException::becauseTokenNotFound($token);
+            }
+
+            throw $e;
+        }
+
+        return CVendor_Firebase_Util_JSON::decode((string) $response->getBody(), true);
     }
 
     /**
      * @param array|Message|mixed                             $message
      * @param RegistrationToken[]|string[]|RegistrationTokens $registrationTokens
+     * @param bool                                            $validateOnly
      *
      * @throws InvalidArgumentException   if the message is invalid
      * @throws MessagingException         if the API request failed
@@ -64,11 +76,11 @@ class CVendor_Firebase_Messaging {
      *
      * @return CVendor_Firebase_Messaging_MulticastSendReport
      */
-    public function sendMulticast($message, $registrationTokens) {
+    public function sendMulticast($message, $registrationTokens, $validateOnly = false) {
         $message = $this->makeMessage($message);
         $registrationTokens = $this->ensureNonEmptyRegistrationTokens($registrationTokens);
 
-        $request = new CVendor_Firebase_Messaging_Request_SendMessageToTokensRequest($this->projectId, $message, $registrationTokens);
+        $request = new CVendor_Firebase_Messaging_Request_SendMessageToTokensRequest($this->projectId, $message, $registrationTokens, $validateOnly);
         /** @var CVendor_Firebase_Http_ResponseWithSubResponses $response */
         $response = $this->messagingApi->send($request);
 
@@ -103,26 +115,28 @@ class CVendor_Firebase_Messaging {
      * @throws InvalidMessage
      * @throws MessagingException
      * @throws FirebaseException
+     *
+     * @return array
      */
     public function validate($message) {
-        $message = $this->makeMessage($message);
+        return $this->send($message, true);
+    }
 
-        $request = new CVendor_Firebase_Messaging_Request_ValidateMessageRequest($this->projectId, $message);
+    /**
+     * @param mixed $registrationTokenOrTokens
+     *
+     * @return array
+     */
+    public function validateRegistrationTokens($registrationTokenOrTokens) {
+        $registrationTokenOrTokens = $this->ensureNonEmptyRegistrationTokens($registrationTokenOrTokens);
 
-        try {
-            $response = $this->messagingApi->send($request);
-        } catch (CVendor_Firebase_Messaging_Exception_NotFoundException $e) {
-            $error = new CVendor_Firebase_Messaging_Exception_InvalidMessageException($e->getMessage(), $e->getCode(), $e->getPrevious());
-            $error = $error->withErrors($e->errors());
+        $report = $this->sendMulticast(CVendor_Firebase_Messaging_CloudMessage::new(), $registrationTokenOrTokens, true);
 
-            if ($response = $e->response()) {
-                $error = $error->withResponse($response);
-            }
-
-            throw $error;
-        }
-
-        return CHelper::json()->decode((string) $response->getBody(), true);
+        return [
+            'valid' => $report->validTokens(),
+            'unknown' => $report->unknownTokens(),
+            'invalid' => $report->invalidTokens(),
+        ];
     }
 
     /**
@@ -164,15 +178,21 @@ class CVendor_Firebase_Messaging {
      *
      * @throws InvalidArgument                     if the registration token is invalid
      * @throws CVendor_Firebase_ExceptionInterface
+     *
+     * @return CVendor_Firebase_Messaging_AppInstance
      */
     public function getAppInstance($registrationToken) {
-        $token = $registrationToken instanceof CVendor_Firebase_Messaging_RegistrationToken ? $registrationToken : CVendor_Firebase_Messaging_RegistrationToken::fromValue($registrationToken);
+        $token = $registrationToken instanceof CVendor_Firebase_Messaging_RegistrationToken
+            ? $registrationToken
+            : CVendor_Firebase_Messaging_RegistrationToken::fromValue($registrationToken);
 
         try {
             $response = $this->appInstanceApi->getAppInstance((string) $token);
+        } catch (CVendor_Firebase_Messaging_Exception_NotFoundException $e) {
+            throw CVendor_Firebase_Messaging_Exception_NotFoundException::becauseTokenNotFound($token->value());
         } catch (CVendor_Firebase_Messaging_ExceptionInterface $e) {
             // The token is invalid
-            throw new CVendor_Firebase_Messaging_Exception_InvalidArgumentException("The registration token '{$token}' is invalid");
+            throw new CVendor_Firebase_Messaging_Exception_InvalidArgumentException("The registration token '{$token}' is invalid or not available", $e->getCode(), $e);
         }
 
         $data = CHelper::json()->decode((string) $response->getBody(), true);

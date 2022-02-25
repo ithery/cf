@@ -53,6 +53,8 @@ class CApp implements CInterface_Responsable, CInterface_Renderable, CInterface_
      */
     protected $element;
 
+    protected $baseResolver = null;
+
     private $content = '';
 
     private $js = '';
@@ -119,6 +121,10 @@ class CApp implements CInterface_Responsable, CInterface_Renderable, CInterface_
         if ($haveUserLogin === false) {
             $this->authEnabled = false;
         }
+
+        $this->baseResolver = function () {
+            return CF::config('app.classes.base', CApp_Base::class);
+        };
     }
 
     /**
@@ -128,6 +134,13 @@ class CApp implements CInterface_Responsable, CInterface_Renderable, CInterface_
         if (function_exists('gc_collect_cycles')) {
             gc_collect_cycles();
         }
+    }
+
+    /**
+     * @return CApp_Contract_BaseInterface
+     */
+    public function base() {
+        return new CBase_ForwarderStaticClass(c::value($this->baseResolver));
     }
 
     public function __call($method, $parameters) {
@@ -437,7 +450,7 @@ class CApp implements CInterface_Responsable, CInterface_Renderable, CInterface_
             $orgId = CApp_Base::orgId();
         }
         $roleModel = c::container()->make($this->auth()->getRoleModelClass());
-
+        /** @var CApp_Model_Roles $roleModel */
         $nodes = $roleModel->getDescendantsTree($roleId, $orgId, $type);
         $childList = [];
 
@@ -542,7 +555,7 @@ class CApp implements CInterface_Responsable, CInterface_Renderable, CInterface_
     }
 
     public static function isAdministrator() {
-        return carr::first(explode('/', trim(CFRouter::getUri(), '/'))) == 'administrator';
+        return carr::first(explode('/', trim(curl::current(), '/'))) == 'administrator';
     }
 
     public static function setTheme($theme) {
