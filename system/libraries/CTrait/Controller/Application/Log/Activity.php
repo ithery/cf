@@ -36,7 +36,8 @@ trait CTrait_Controller_Application_Log_Activity {
 
                 return $action;
             });
-        $table->addColumn('remote_addr')->setLabel('Remote Address');
+        $table->addColumn('description')->setLabel('Description');
+        $table->addColumn('createdby')->setLabel('By');
         $table->addColumn('platform')->setLabel('Platform');
         $table->addColumn('browser')->setLabel('Browser')->setCallback(function ($row, $val) {
             $version = carr::get($row, 'browser_version');

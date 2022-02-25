@@ -41,6 +41,7 @@ class CApp implements CInterface_Responsable, CInterface_Renderable, CInterface_
         CApp_Concern_AuthTrait,
         CApp_Concern_BootstrapTrait,
         CApp_Concern_TitleTrait;
+
     public static $instance = null;
 
     protected $renderer;
@@ -51,6 +52,8 @@ class CApp implements CInterface_Responsable, CInterface_Renderable, CInterface_
      * @var CApp_Element
      */
     protected $element;
+
+    protected $baseResolver = null;
 
     private $content = '';
 
@@ -118,6 +121,10 @@ class CApp implements CInterface_Responsable, CInterface_Renderable, CInterface_
         if ($haveUserLogin === false) {
             $this->authEnabled = false;
         }
+
+        $this->baseResolver = function () {
+            return CF::config('app.classes.base', CApp_Base::class);
+        };
     }
 
     /**
@@ -127,6 +134,13 @@ class CApp implements CInterface_Responsable, CInterface_Renderable, CInterface_
         if (function_exists('gc_collect_cycles')) {
             gc_collect_cycles();
         }
+    }
+
+    /**
+     * @return CApp_Contract_BaseInterface
+     */
+    public function base() {
+        return new CBase_ForwarderStaticClass(c::value($this->baseResolver));
     }
 
     public function __call($method, $parameters) {
@@ -470,6 +484,7 @@ class CApp implements CInterface_Responsable, CInterface_Renderable, CInterface_
         $cappScript = $this->yieldPushContent('capp-script');
         $js .= $cappScript;
         $js = $asset->renderJsRequire($js, 'cresenity.cf.require');
+
         $data['js'] = base64_encode($js);
         //$data['jsRaw'] = $js;
         $data['css_require'] = $asset->getAllCssFileUrl();

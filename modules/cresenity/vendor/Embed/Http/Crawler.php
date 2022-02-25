@@ -4,18 +4,20 @@
 
 namespace Embed\Http;
 
+use Psr\Http\Message\UriInterface;
 use Psr\Http\Client\ClientInterface;
-use Psr\Http\Message\RequestFactoryInterface;
 use Psr\Http\Message\RequestInterface;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\UriFactoryInterface;
-use Psr\Http\Message\UriInterface;
+use Psr\Http\Message\RequestFactoryInterface;
 
 class Crawler implements ClientInterface, RequestFactoryInterface, UriFactoryInterface {
-
     private $requestFactory;
+
     private $uriFactory;
+
     private $client;
+
     private $defaultHeaders = [
         'User-Agent' => 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:73.0) Gecko/20100101 Firefox/73.0',
         'Cache-Control' => 'max-age=0',
@@ -32,7 +34,8 @@ class Crawler implements ClientInterface, RequestFactoryInterface, UriFactoryInt
     }
 
     /**
-     * @param UriInterface|string $uri The URI associated with the request.
+     * @param UriInterface|string $uri    the URI associated with the request
+     * @param mixed               $method
      */
     public function createRequest($method, $uri) {
         $request = $this->requestFactory->createRequest($method, $uri);
@@ -57,7 +60,7 @@ class Crawler implements ClientInterface, RequestFactoryInterface, UriFactoryInt
             return $this->client->sendRequests(...$requests);
         }
 
-        return array_map(function($request) {
+        return array_map(function ($request) {
             return $this->client->sendRequest($request);
         }, $requests);
     }
@@ -67,5 +70,4 @@ class Crawler implements ClientInterface, RequestFactoryInterface, UriFactoryInt
 
         return $location ? $this->uriFactory->createUri($location) : null;
     }
-
 }
