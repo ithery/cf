@@ -65,29 +65,6 @@ class Controller_Cresenity extends CController {
         return c::response()->json($data);
     }
 
-    //@codingStandardsIgnoreStart
-
-    /**
-     * change lang.
-     *
-     * @param string $lang
-     *
-     * @return void
-     *
-     * @deprecated version
-     */
-    public function change_lang($lang) {
-        clang::setlang($lang);
-
-        return c::redirect(crequest::referrer());
-    }
-
-    public function change_theme($theme) {
-        CManager::theme()->setTheme($theme);
-
-        return c::redirect(crequest::referrer());
-    }
-
     //@codingStandardsIgnoreEnd
 
     /**
@@ -299,9 +276,7 @@ class Controller_Cresenity extends CController {
                 break;
         }
 
-        ob_start('ob_gzhandler');
         $avatarApi = CImage::avatar()->api($engineName);
-
         /*
         if (!isset($_GET['noheader'])) {
             header('Content-type: image/png');
@@ -311,7 +286,7 @@ class Controller_Cresenity extends CController {
         }
         $avatarApi->render();
         */
-
+        ob_start('ob_gzhandler');
         $headers = [
             'Content-Type' => 'image/png',
             'Pragma' => 'public',

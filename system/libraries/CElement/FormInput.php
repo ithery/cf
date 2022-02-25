@@ -91,12 +91,12 @@ class CElement_FormInput extends CElement_Element {
     }
 
     public function addTransform($name, $args = []) {
-        $func = CDynFunction::factory($name);
+        $func = CFunction::factory($name);
         if (!is_array($args)) {
             $args = [$args];
         }
         foreach ($args as $arg) {
-            $func->add_param($arg);
+            $func->addArg($arg);
         }
 
         $this->transforms[] = $func;

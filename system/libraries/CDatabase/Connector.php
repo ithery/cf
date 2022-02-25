@@ -24,13 +24,14 @@ abstract class CDatabase_Connector implements CDatabase_ConnectorInterface {
      * @param array  $config
      * @param array  $options
      *
-     * @return \PDO
-     *
      * @throws \Exception
+     *
+     * @return \PDO
      */
     public function createConnection($dsn, array $config, array $options) {
         $username = carr::get($config, 'username');
         $password = carr::get($config, 'password');
+
         try {
             return $this->createPdoConnection(
                 $dsn,
@@ -84,9 +85,9 @@ abstract class CDatabase_Connector implements CDatabase_ConnectorInterface {
      * @param string     $password
      * @param array      $options
      *
-     * @return \PDO
-     *
      * @throws \Exception
+     *
+     * @return \PDO
      */
     protected function tryAgainIfCausedByLostConnection($e, $dsn, $username, $password, $options) {
         if ($this->causedByLostConnection($e)) {

@@ -38,6 +38,7 @@ trait CTrait_Compat_Element_FormInput_Date {
      */
     public function set_have_button($boolean) {
         $this->have_button = $boolean;
+
         return $this;
     }
 
@@ -48,6 +49,7 @@ trait CTrait_Compat_Element_FormInput_Date {
      */
     public function set_end_date($str) {
         $this->end_date = $str;
+
         return $this;
     }
 
@@ -65,6 +67,7 @@ trait CTrait_Compat_Element_FormInput_Date {
         } else {
             $this->disable_day[] = $day;
         }
+
         return $this;
     }
 }

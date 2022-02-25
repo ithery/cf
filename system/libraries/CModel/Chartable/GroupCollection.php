@@ -7,7 +7,7 @@ class CModel_Chartable_GroupCollection extends CCollection {
      * @return array
      */
     public function toChart($closure = null) {
-        $closure = $closure ?? static function ($label) {
+        $closure = $closure ?: static function ($label) {
             return $label;
         };
 

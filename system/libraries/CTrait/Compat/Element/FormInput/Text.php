@@ -36,16 +36,19 @@ trait CTrait_Compat_Element_FormInput_Text {
 
     public function set_input_style($input_style) {
         $this->input_style = $input_style;
+
         return $this;
     }
 
     public function set_button_position($button_position) {
         $this->button_position = $button_position;
+
         return $this;
     }
 
     public function add_action($id = '') {
         $this->action = CElement_Factory::createComponent('Action', $id);
+
         return $this->action;
     }
 }

@@ -56,5 +56,8 @@ return [
         ],
     ],
     'prefix' => c::env('CACHE_PREFIX', cstr::slug(CF::appCode(), '_') . '_cache'),
-
+    /**
+     * Cache store should be used on rate limiter, leave null to use default store.
+     */
+    'limiter' => null,
 ];
