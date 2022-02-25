@@ -659,9 +659,9 @@ class CElement_Component_DataTable extends CElement_Component {
     }
 
     /**
-     * @param callable $callback
-     * @param array    $callbackOptions
-     * @param string   $require
+     * @param callable|Closure $callback
+     * @param array            $callbackOptions
+     * @param string           $require
      *
      * @return $this
      */
