@@ -18,11 +18,11 @@ class CAnalytics_Google_AnalyticGA4_PredefinedReport {
         $this->analytic = $analytic;
     }
 
-    public function getUserActiveCountRealtime() {
+    public function getUserActiveCountRealtime($minutes = 29) {
         $analytic = $this->analytic;
 
         $data = $analytic->createReport()
-            ->setMinuteRange(5, 0)
+            ->setMinuteRange($minutes, 0)
             ->setMetrics([$analytic->metadata()->realtimeSchema()->metric()->activeUsers()])
             ->runReport(true)
             ->toArray();
@@ -31,7 +31,7 @@ class CAnalytics_Google_AnalyticGA4_PredefinedReport {
         return $activeUserCount;
     }
 
-    public function getUserActivePerMinute($minutes = 29) {
+    public function getUserActivePerMinuteChartData($minutes = 29) {
         $analytic = $this->analytic;
         $data = $analytic->createReport()
             ->setMinuteRange($minutes, 0)
@@ -39,7 +39,24 @@ class CAnalytics_Google_AnalyticGA4_PredefinedReport {
             ->setMetrics([$analytic->metadata()->realtimeSchema()->metric()->activeUsers()])
             ->runReport(true)
             ->toArray();
+        $labels = [];
+        $values = [];
+        foreach (range(0, 29) as $index) {
+            $labels[$index] = str_pad($index, 2, '0', STR_PAD_LEFT);
+            $values[$index] = 0;
+        }
+        foreach ($data as $row) {
+            $indexValue = carr::get($row, 'dimensions.minutesAgo.value');
+            $index = array_search($indexValue, $labels);
+            if ($index !== false) {
+                $values[$index] = (int) carr::get($row, 'metrics.activeUsers.value');
+            }
+        }
 
-        return $data;
+        return [
+            'labels' => $labels,
+            'values' => $values,
+
+        ];
     }
 }
