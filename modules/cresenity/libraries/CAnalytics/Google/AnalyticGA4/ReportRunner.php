@@ -171,11 +171,12 @@ class CAnalytics_Google_AnalyticGA4_ReportRunner {
     /**
      * Call the query method on the authenticated client.
      *
-     * @param mixed $realtime
+     * @param mixed      $realtime
+     * @param null|mixed $cacheInMinutes
      *
      * @return $this
      */
-    public function runReport($realtime = false) {
+    public function runReport($cacheInMinutes = null, $realtime = false) {
         $data = [];
         $data['property'] = 'properties/' . $this->propertyId;
         $data['offset'] = $this->offset;
@@ -199,9 +200,13 @@ class CAnalytics_Google_AnalyticGA4_ReportRunner {
             $data['dimensionFilter'] = $this->dimensionFilter->toGA4Object();
         }
 
-        $this->report = $this->client->runReport($data, $realtime);
+        $this->report = $this->client->runReport($data, $realtime, $cacheInMinutes);
 
         return $this;
+    }
+
+    public function runReportRealtime($cacheInMinutes = null) {
+        return $this->runReport($cacheInMinutes, true);
     }
 
     /**

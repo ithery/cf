@@ -24,20 +24,20 @@ class CAnalytics_Google_AnalyticGA4_PredefinedReport {
         $data = $analytic->createReport()
             ->setMinuteRange($minutes, 0)
             ->setMetrics([$analytic->metadata()->realtimeSchema()->metric()->activeUsers()])
-            ->runReport(true)
+            ->runReportRealtime()
             ->toArray();
         $activeUserCount = carr::get($data, '0.metrics.activeUsers.value', 0);
 
         return $activeUserCount;
     }
 
-    public function getUserActivePerMinuteChartData($minutes = 29) {
+    public function getUserActivePerMinuteRealtimeChartData($minutes = 29) {
         $analytic = $this->analytic;
         $data = $analytic->createReport()
             ->setMinuteRange($minutes, 0)
             ->setDimensions([$analytic->metadata()->realtimeSchema()->dimension()->minutesAgo()])
             ->setMetrics([$analytic->metadata()->realtimeSchema()->metric()->activeUsers()])
-            ->runReport(true)
+            ->runReportRealtime()
             ->toArray();
         $labels = [];
         $values = [];
@@ -58,5 +58,26 @@ class CAnalytics_Google_AnalyticGA4_PredefinedReport {
             'values' => $values,
 
         ];
+    }
+
+    public function getUserIdActiveRealtimeList($customUserPropertyId = 'app_user_id', $minutes = 5) {
+        $analytic = $this->analytic;
+        $data = $analytic->createReport()
+            ->setMinuteRange($minutes, 0)
+            ->setDimensions(['customUser:' . $customUserPropertyId])
+            ->setMetrics([$analytic->metadata()->realtimeSchema()->metric()->activeUsers()])
+            ->runReportRealtime()
+            ->toArray();
+
+        $result = [];
+        foreach ($data as $row) {
+            $userId = carr::get($row, 'dimensions.customUser:' . $customUserPropertyId . '.value');
+            $value = carr::get($row, 'metrics.activeUsers.value');
+            if ($value > 0) {
+                $result[$userId] = $value;
+            }
+        }
+
+        return $result;
     }
 }

@@ -40,21 +40,25 @@ class CAnalytics_Google_ClientGA4 {
     /**
      * Query the Google Analytics Service with given parameters.
      *
-     * @param array $reportData
-     * @param mixed $realtime
+     * @param array    $reportData
+     * @param mixed    $realtime
+     * @param null|int $cacheInMinutes
      *
      * @return null|array|\Google\Analytics\Data\V1beta\RunReportResponse
      */
-    public function runReport($reportData, $realtime = false) {
+    public function runReport($reportData, $realtime = false, $cacheInMinutes = null) {
         $cacheName = $this->determineCacheName(func_get_args());
 
-        if ($this->cacheLifeTimeInMinutes === 0) {
+        if ($cacheInMinutes === null) {
+            $cacheInMinutes = $this->cacheLifeTimeInMinutes;
+        }
+        if ($cacheInMinutes === 0) {
             $this->cache->forget($cacheName);
         }
 
         return $this->cache->remember(
             $cacheName,
-            $this->cacheLifeTimeInMinutes,
+            $cacheInMinutes,
             function () use ($reportData, $realtime) {
                 return $realtime ? $this->service->runRealtimeReport($reportData) : $this->service->runReport($reportData);
             }
