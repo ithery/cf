@@ -38,45 +38,55 @@ class CHTTP_RobotsTxt {
      * Add a Sitemap to the robots.txt.
      *
      * @param string $sitemap
+     *
+     * @return $this
      */
     public function addSitemap($sitemap) {
-        $this->addLine("Sitemap: ${sitemap}");
+        return $this->addLine("Sitemap: ${sitemap}");
     }
 
     /**
      * Add a User-agent to the robots.txt.
      *
      * @param string $userAgent
+     *
+     * @return $this
      */
     public function addUserAgent($userAgent) {
-        $this->addLine("User-agent: ${userAgent}");
+        return $this->addLine("User-agent: ${userAgent}");
     }
 
     /**
      * Add a Host to the robots.txt.
      *
      * @param string $host
+     *
+     * @return $this
      */
     public function addHost($host) {
-        $this->addLine("Host: ${host}");
+        return $this->addLine("Host: ${host}");
     }
 
     /**
      * Add a disallow rule to the robots.txt.
      *
      * @param string|array $directories
+     *
+     * @return $this
      */
     public function addDisallow($directories) {
-        $this->addRuleLine($directories, 'Disallow');
+        return $this->addRuleLine($directories, 'Disallow');
     }
 
     /**
      * Add a allow rule to the robots.txt.
      *
      * @param string|array $directories
+     *
+     * @return $this
      */
     public function addAllow($directories) {
-        $this->addRuleLine($directories, 'Allow');
+        return $this->addRuleLine($directories, 'Allow');
     }
 
     /**
@@ -84,56 +94,74 @@ class CHTTP_RobotsTxt {
      *
      * @param string|array $directories
      * @param string       $rule
+     *
+     * @return $this
      */
     public function addRuleLine($directories, $rule) {
         foreach ((array) $directories as $directory) {
             $this->addLine("${rule}: ${directory}");
         }
+
+        return $this;
     }
 
     /**
      * Add a comment to the robots.txt.
      *
      * @param string $comment
+     *
+     * @return $this
      */
     public function addComment($comment) {
-        $this->addLine("# ${comment}");
+        return $this->addLine("# ${comment}");
     }
 
     /**
      * Add a spacer to the robots.txt.
+     *
+     * @return $this
      */
     public function addSpacer() {
-        $this->addLine('');
+        return $this->addLine('');
     }
 
     /**
      * Add a line to the robots.txt.
      *
      * @param string $line
+     *
+     * @return $this
      */
     public function addLine($line) {
         $this->lines[] = $line;
+
+        return $this;
     }
 
     /**
      * Add multiple lines to the robots.txt.
      *
      * @param string|array $lines
+     *
+     * @return $this
      */
     protected function addLines($lines) {
         foreach ((array) $lines as $line) {
             $this->addLine($line);
         }
+
+        return $this;
     }
 
     /**
      * Reset the lines.
      *
-     * @return void
+     * @return $this
      */
     public function reset() {
         $this->lines = [];
+
+        return $this;
     }
 
     /**
