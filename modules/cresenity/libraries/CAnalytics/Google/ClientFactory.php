@@ -24,6 +24,7 @@ class CAnalytics_Google_ClientFactory {
         static::validateG4Config($analyticsConfig);
         $config = c::collect($analyticsConfig);
         $clientConfig = [];
+
         $clientConfig['credentials'] = $config['service_account_credentials_json'];
 
         $client = new BetaAnalyticsDataClient($clientConfig);

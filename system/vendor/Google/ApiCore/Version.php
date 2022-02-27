@@ -29,21 +29,21 @@
  * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
  * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
+
 namespace Google\ApiCore;
 
-class Version
-{
+class Version {
     private static $version = null;
 
     /**
-     * @return string The version of the ApiCore library.
+     * @return string the version of the ApiCore library
      */
-    public static function getApiCoreVersion()
-    {
+    public static function getApiCoreVersion() {
         if (is_null(self::$version)) {
             $versionFile = implode(DIRECTORY_SEPARATOR, [__DIR__, '..', 'VERSION']);
             self::$version = self::readVersionFile($versionFile);
         }
+
         return self::$version;
     }
 
@@ -52,20 +52,20 @@ class Version
      * exist, returns "".
      *
      * @param string $file
+     *
      * @return string
      */
-    public static function readVersionFile($file)
-    {
-        $versionString = file_exists($file)
+    public static function readVersionFile($file) {
+        $versionString = @file_exists($file)
             ? file_get_contents($file)
-            : "";
+            : '';
+
         return trim($versionString);
     }
 
     /**
      * Private constructor.
      */
-    private function __construct()
-    {
+    private function __construct() {
     }
 }
