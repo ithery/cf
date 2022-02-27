@@ -10,7 +10,7 @@ defined('SYSPATH') or die('No direct access allowed.');
  */
 class CColor {
     /**
-     * Create CColor_Random object
+     * Create CColor_Random object.
      *
      * @param array $options
      *
@@ -21,7 +21,7 @@ class CColor {
     }
 
     /**
-     * Create CColor_String object
+     * Create CColor_String object.
      *
      * @param string $string
      * @param array  $options

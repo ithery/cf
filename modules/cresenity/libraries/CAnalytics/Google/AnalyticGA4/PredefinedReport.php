@@ -18,26 +18,26 @@ class CAnalytics_Google_AnalyticGA4_PredefinedReport {
         $this->analytic = $analytic;
     }
 
-    public function getUserActiveCountRealtime($minutes = 29) {
+    public function getUserActiveCountRealtime($minutes = 29, $cacheInMinutes = null) {
         $analytic = $this->analytic;
 
         $data = $analytic->createReport()
             ->setMinuteRange($minutes, 0)
             ->setMetrics([$analytic->metadata()->realtimeSchema()->metric()->activeUsers()])
-            ->runReportRealtime()
+            ->runReportRealtime($cacheInMinutes)
             ->toArray();
         $activeUserCount = carr::get($data, '0.metrics.activeUsers.value', 0);
 
         return $activeUserCount;
     }
 
-    public function getUserActivePerMinuteRealtimeChartData($minutes = 29) {
+    public function getUserActivePerMinuteRealtimeChartData($minutes = 29, $cacheInMinutes = null) {
         $analytic = $this->analytic;
         $data = $analytic->createReport()
             ->setMinuteRange($minutes, 0)
             ->setDimensions([$analytic->metadata()->realtimeSchema()->dimension()->minutesAgo()])
             ->setMetrics([$analytic->metadata()->realtimeSchema()->metric()->activeUsers()])
-            ->runReportRealtime()
+            ->runReportRealtime($cacheInMinutes)
             ->toArray();
         $labels = [];
         $values = [];
@@ -60,13 +60,36 @@ class CAnalytics_Google_AnalyticGA4_PredefinedReport {
         ];
     }
 
-    public function getUserIdActiveRealtimeList($customUserPropertyId = 'app_user_id', $minutes = 5) {
+    public function getUserActiveByDeviceCategoryRealtimeChartData($minutes = 29, $cacheInMinutes = null) {
+        $analytic = $this->analytic;
+        $data = $analytic->createReport()
+            ->setMinuteRange($minutes, 0)
+            ->setDimensions([$analytic->metadata()->realtimeSchema()->dimension()->deviceCategory()])
+            ->setMetrics([$analytic->metadata()->realtimeSchema()->metric()->activeUsers()])
+            ->runReportRealtime($cacheInMinutes)
+            ->toArray();
+        $labels = [];
+        $values = [];
+
+        foreach ($data as $row) {
+            $labels[] = carr::get($row, 'dimensions.deviceCategory.value');
+            $values[] = (int) carr::get($row, 'metrics.activeUsers.value');
+        }
+
+        return [
+            'labels' => $labels,
+            'values' => $values,
+
+        ];
+    }
+
+    public function getUserIdActiveRealtimeList($customUserPropertyId = 'app_user_id', $minutes = 5, $cacheInMinutes = null) {
         $analytic = $this->analytic;
         $data = $analytic->createReport()
             ->setMinuteRange($minutes, 0)
             ->setDimensions(['customUser:' . $customUserPropertyId])
             ->setMetrics([$analytic->metadata()->realtimeSchema()->metric()->activeUsers()])
-            ->runReportRealtime()
+            ->runReportRealtime($cacheInMinutes)
             ->toArray();
 
         $result = [];
