@@ -20,11 +20,6 @@ class CCache {
     protected static $rateLimiter;
 
     /**
-     * @var CCache_RateLimiter
-     */
-    protected static $rateLimiter;
-
-    /**
      * @param null|mixed $name
      *
      * @return CCache_Repository
