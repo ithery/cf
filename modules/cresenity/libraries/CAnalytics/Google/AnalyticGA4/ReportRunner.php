@@ -4,6 +4,7 @@ use Google\Analytics\Data\V1beta\Metric;
 use Google\Analytics\Data\V1beta\DateRange;
 use Google\Analytics\Data\V1beta\Dimension;
 use Google\Analytics\Data\V1beta\MetricValue;
+use Google\Analytics\Data\V1beta\MinuteRange;
 use Google\Analytics\Data\V1beta\MetricHeader;
 use Google\Analytics\Data\V1beta\DimensionValue;
 use Google\Analytics\Data\V1beta\DimensionHeader;
@@ -13,9 +14,9 @@ use Google\Analytics\Data\V1beta\DimensionExpression;
 
 class CAnalytics_Google_AnalyticGA4_ReportRunner {
     /**
-     * @var \Google\Analytics\Data\V1beta\DateRange
+     * @var array[\Google\Analytics\Data\V1beta\DateRange]
      */
-    private $dateRanges;
+    private $dateRanges = [];
 
     private $metrics = [];
 
@@ -24,6 +25,11 @@ class CAnalytics_Google_AnalyticGA4_ReportRunner {
     private $offset = 0;
 
     private $limit = null;
+
+    /**
+     * @var array[\Google\Analytics\Data\V1beta\MinuteRange]
+     */
+    private $minuteRange = [];
 
     /**
      * @var \Google\Analytics\Data\V1beta\RunReportResponse
@@ -74,18 +80,34 @@ class CAnalytics_Google_AnalyticGA4_ReportRunner {
     }
 
     /**
+     * @param int $startMinutesAgo
+     * @param int $endMinutesAgo
+     *
+     * @return $this
+     */
+    public function setMinuteRange($startMinutesAgo, $endMinutesAgo = 0) {
+        $this->minuteRange = [new MinuteRange([
+            'start_minutes_ago' => $startMinutesAgo,
+            'end_minutes_ago' => $endMinutesAgo,
+
+        ])];
+
+        return $this;
+    }
+
+    /**
      * @param DateTimeInterface $startDate
      * @param DateTimeInterface $endDate
      *
      * @return $this
      */
     public function setDateRanges(DateTimeInterface $startDate, DateTimeInterface $endDate) {
-        $this->dateRanges = new DateRange(
+        $this->dateRanges = [new DateRange(
             [
                 'start_date' => $startDate->format('Y-m-d'),
                 'end_date' => $endDate->format('Y-m-d'),
             ]
-        );
+        )];
 
         return $this;
     }
@@ -118,11 +140,7 @@ class CAnalytics_Google_AnalyticGA4_ReportRunner {
         $this->dimensions = [];
 
         foreach ($dimensions as $dimension) {
-            $this->dimensions[] = new Dimension(
-                [
-                    'name' => $dimension,
-                ]
-            );
+            $this->dimensions[] = new Dimension(['name' => $dimension]);
         }
 
         return $this;
@@ -164,14 +182,17 @@ class CAnalytics_Google_AnalyticGA4_ReportRunner {
         if ($this->limit) {
             $data['limit'] = $this->limit;
         }
-        if ($this->dateRanges) {
-            $data['dateRanges'] = [$this->dateRanges];
+        if ($this->dateRanges && count($this->dateRanges) > 0) {
+            $data['dateRanges'] = $this->dateRanges;
         }
         if ($this->dimensions) {
             $data['dimensions'] = $this->dimensions;
         }
-        if ($this->dimensions) {
+        if ($this->metrics) {
             $data['metrics'] = $this->metrics;
+        }
+        if ($this->minuteRange) {
+            $data['minuteRanges'] = $this->minuteRange;
         }
 
         if ($this->dimensionFilter) {

@@ -38,4 +38,13 @@ class CBase {
 
         return static::$session;
     }
+
+    /**
+     * @param string $class
+     *
+     * @return CBase_ForwarderStaticClass
+     */
+    public static function forwarderStaticClass($class) {
+        return new CBase_ForwarderStaticClass($class);
+    }
 }
