@@ -55,6 +55,8 @@ final class CHelper {
 
     /**
      * @return \CHelper_Closure
+     *
+     * @deprecated since 1.3
      */
     public static function closure() {
         return new CHelper_Closure();

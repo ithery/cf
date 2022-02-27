@@ -2,8 +2,6 @@
 
 defined('SYSPATH') or die('No direct access allowed.');
 
-use Symfony\Component\Routing\Route as SymfonyRoute;
-
 class CFRouter {
     /**
      * @var string

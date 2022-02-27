@@ -1,7 +1,7 @@
 <?php
 
 defined('SYSPATH') or die('No direct access allowed.');
-use Opis\Closure\SerializableClosure;
+use Opis\Closure\SerializableClosure as OpisSerializableClosure;
 
 /**
  * @author Hery Kurniawan
@@ -27,7 +27,10 @@ class CFunction {
     public $type = 'defined'; //defined,class,
 
     private function __construct($func) {
-        $this->func = CHelper::closure()->deserializeClosure($func);
+        if (!$func instanceof OpisSerializableClosure) {
+            $func = CHelper::closure()->deserializeClosure($func);
+        }
+        $this->func = $func;
     }
 
     public static function factory($func) {
@@ -88,7 +91,7 @@ class CFunction {
 
         $error = 0;
         if ($error == 0) {
-            if ($this->func instanceof SerializableClosure) {
+            if ($this->func instanceof OpisSerializableClosure) {
                 return $this->func->__invoke(...$args);
             }
         }

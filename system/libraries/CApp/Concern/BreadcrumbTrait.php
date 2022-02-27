@@ -1,5 +1,7 @@
 <?php
 
+use Opis\Closure\SerializableClosure;
+
 defined('SYSPATH') or die('No direct access allowed.');
 
 /**
@@ -47,7 +49,7 @@ trait CApp_Concern_BreadcrumbTrait {
     }
 
     public function setBreadcrumbCallback($callback) {
-        $this->breadcrumbCallback = CHelper::closure()->serializeClosure($callback);
+        $this->breadcrumbCallback = c::toSerializableClosure($callback);
 
         return $this;
     }

@@ -1505,6 +1505,15 @@ class c {
     public static function api($group = null) {
         return CApi::manager($group);
     }
+
+    /**
+     * @param callable|Closure $callback
+     *
+     * @return callable|SerializableClosure
+     */
+    public static function toSerializableClosure($callback) {
+        return $callback instanceof Closure ? new SerializableClosure($callback) : $callback;
+    }
 }
 
 // End c
