@@ -303,8 +303,8 @@ class CModel_MongoDB_Relation_EmbedsMany extends CModel_MongoDB_Relation_EmbedsO
     /**
      * Get the name of the "where in" method for eager loading.
      *
-     * @param \Illuminate\Database\Eloquent\Model $model
-     * @param string                              $key
+     * @param \CModel $model
+     * @param string  $key
      *
      * @return string
      */

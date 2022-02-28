@@ -272,7 +272,7 @@ class CModel_Scout_Engine_TNTSearchEngine extends CModel_Scout_EngineAbstract {
      *
      * @param mixed $results
      *
-     * @return \Illuminate\Support\Collection
+     * @return \CCollection
      */
     public function mapIds($results) {
         if (empty($results['ids'])) {
@@ -345,7 +345,7 @@ class CModel_Scout_Engine_TNTSearchEngine extends CModel_Scout_EngineAbstract {
     /**
      * Determine if the given model uses soft deletes.
      *
-     * @param \Illuminate\Database\Eloquent\Model $model
+     * @param \CModel $model
      *
      * @return bool
      */
@@ -357,8 +357,8 @@ class CModel_Scout_Engine_TNTSearchEngine extends CModel_Scout_EngineAbstract {
      * Determine if soft delete is active and depending on state return the
      * appropriate builder.
      *
-     * @param Builder                             $builder
-     * @param \Illuminate\Database\Eloquent\Model $model
+     * @param Builder $builder
+     * @param \CModel $model
      *
      * @return Builder
      */
@@ -439,7 +439,7 @@ class CModel_Scout_Engine_TNTSearchEngine extends CModel_Scout_EngineAbstract {
     /**
      * Flush all of the model's records from the engine.
      *
-     * @param \Illuminate\Database\Eloquent\Model $model
+     * @param \CModel $model
      *
      * @return void
      */
