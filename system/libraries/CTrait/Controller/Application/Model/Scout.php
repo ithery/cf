@@ -58,7 +58,7 @@ trait CTrait_Controller_Application_Model_Scout {
         $table->setApplyDataTable(false);
         $table->addColumn('searchable')->setLabel('Searchable');
         $table->addColumn('index')->setLabel('Index');
-        $table->addColumn('columns')->setLabel('Indexed Columns');
+        $table->addColumn('columns')->setLabel('Indexed Columns')->customCss('word-break', 'break-all');
         $table->addColumn('rows_indexed')->setLabel('Indexed Records');
         $table->addColumn('rows_total')->setLabel('DB Records');
         $table->addColumn('difference')->setLabel('Records Difference');

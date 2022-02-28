@@ -666,7 +666,7 @@ class CElement_Component_DataTable extends CElement_Component {
      * @return $this
      */
     public function setDataFromCallback($callback, $callbackOptions = [], $require = null) {
-        $this->query = CHelper::closure()->serializeClosure($callback);
+        $this->query = new SerializableClosure($callback);
         $this->isCallback = true;
         $this->callbackOptions = $callbackOptions;
         $this->callbackRequire = $require;
