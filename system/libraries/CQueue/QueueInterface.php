@@ -12,7 +12,7 @@ interface CQueue_QueueInterface {
     /**
      * Get the size of the queue.
      *
-     * @param string|null $queue
+     * @param null|string $queue
      *
      * @return int
      */
@@ -23,7 +23,7 @@ interface CQueue_QueueInterface {
      *
      * @param string|object $job
      * @param mixed         $data
-     * @param string|null   $queue
+     * @param null|string   $queue
      *
      * @return mixed
      */
@@ -44,7 +44,7 @@ interface CQueue_QueueInterface {
      * Push a raw payload onto the queue.
      *
      * @param string      $payload
-     * @param string|null $queue
+     * @param null|string $queue
      * @param array       $options
      *
      * @return mixed
@@ -57,7 +57,7 @@ interface CQueue_QueueInterface {
      * @param \DateTimeInterface|\DateInterval|int $delay
      * @param string|object                        $job
      * @param mixed                                $data
-     * @param string|null                          $queue
+     * @param null|string                          $queue
      *
      * @return mixed
      */
@@ -80,7 +80,7 @@ interface CQueue_QueueInterface {
      *
      * @param array       $jobs
      * @param mixed       $data
-     * @param string|null $queue
+     * @param null|string $queue
      *
      * @return mixed
      */
@@ -91,7 +91,7 @@ interface CQueue_QueueInterface {
      *
      * @param string $queue
      *
-     * @return \Illuminate\Contracts\Queue\Job|null
+     * @return null|\CQueue_JobInterface
      */
     public function pop($queue = null);
 
