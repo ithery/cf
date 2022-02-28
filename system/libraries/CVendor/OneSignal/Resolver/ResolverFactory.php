@@ -1,7 +1,6 @@
 <?php
 
 class CVendor_OneSignal_Resolver_ResolverFactory {
-
     private $config;
 
     public function __construct(CVendor_OneSignal_Config $config) {
@@ -35,5 +34,4 @@ class CVendor_OneSignal_Resolver_ResolverFactory {
     public function createNotificationResolver() {
         return new CVendor_OneSignal_Resolver_NotificationResolver($this->config);
     }
-
 }
