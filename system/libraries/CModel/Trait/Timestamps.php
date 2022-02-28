@@ -37,6 +37,7 @@ trait CModel_Trait_Timestamps {
      * @return void
      */
     protected function updateTimestamps() {
+        /** @var CModel $this */
         $time = $this->freshTimestamp();
         if (!is_null(static::UPDATED) && !$this->isDirty(static::UPDATED)) {
             $this->setUpdatedAt($time);
@@ -55,6 +56,7 @@ trait CModel_Trait_Timestamps {
      * @return $this
      */
     public function setCreatedAt($value) {
+        /** @var CModel $this */
         $this->{static::CREATED} = $value;
 
         return $this;
@@ -68,6 +70,7 @@ trait CModel_Trait_Timestamps {
      * @return $this
      */
     public function setUpdatedAt($value) {
+        /** @var CModel $this */
         $this->{static::UPDATED} = $value;
 
         return $this;
@@ -76,10 +79,10 @@ trait CModel_Trait_Timestamps {
     /**
      * Get a fresh timestamp for the model.
      *
-     * @return \Illuminate\Support\Carbon
+     * @return \CCarbon
      */
     public function freshTimestamp() {
-        return new CCarbon;
+        return new CCarbon();
     }
 
     /**
@@ -106,6 +109,7 @@ trait CModel_Trait_Timestamps {
      * @return string
      */
     public function getCreatedAtColumn() {
+        /** @var CModel $this */
         return static::CREATED;
     }
 
@@ -115,6 +119,7 @@ trait CModel_Trait_Timestamps {
      * @return string
      */
     public function getUpdatedAtColumn() {
+        /** @var CModel $this */
         return static::UPDATED;
     }
 }

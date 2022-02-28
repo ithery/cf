@@ -2,7 +2,7 @@
 
 /**
  * @template TRelatedModel of \CModel
- * @extends \Illuminate\Database\Eloquent\Relations\Relation<TRelatedModel>
+ * @extends \CModel_Relation<TRelatedModel>
  */
 class CModel_Relation_HasManyDeep extends CModel_Relation_HasManyThrough {
     use CModel_Relation_Trait_HasEagerLimit;
@@ -167,7 +167,7 @@ class CModel_Relation_HasManyDeep extends CModel_Relation_HasManyThrough {
      *
      * @param array $columns
      *
-     * @return \Illuminate\Database\Eloquent\Collection
+     * @return \CModel_Collection
      */
     public function get($columns = ['*']) {
         $models = parent::get($columns);
@@ -185,7 +185,7 @@ class CModel_Relation_HasManyDeep extends CModel_Relation_HasManyThrough {
      * @param string $pageName
      * @param int    $page
      *
-     * @return \Illuminate\Contracts\Pagination\LengthAwarePaginator
+     * @return \CPagination_LengthAwarePaginatorInterface
      */
     public function paginate($perPage = null, $columns = ['*'], $pageName = 'page', $page = null) {
         $columns = $this->shouldSelect($columns);

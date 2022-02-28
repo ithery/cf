@@ -250,7 +250,7 @@ class CModel_Scout_Engine_TNTSearchEngine extends CModel_Scout_EngineAbstract {
      * Return query builder either from given constraints, or as
      * new query. Add where statements to builder when given.
      *
-     * @param \Illuminate\Database\Eloquent\Model $model
+     * @param \CModel $model
      *
      * @return Builder
      */

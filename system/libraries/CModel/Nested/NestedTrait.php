@@ -1148,7 +1148,7 @@ trait CModel_Nested_NestedTrait {
     /**
      * @param null|array $except
      *
-     * @return \Illuminate\Database\Eloquent\Model
+     * @return \CModel
      */
     public function replicate(array $except = null) {
         $defaults = [

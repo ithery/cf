@@ -58,7 +58,7 @@ trait CModel_Sortable_SortableTrait {
         if (!is_array($ids) && !$ids instanceof ArrayAccess) {
             throw new InvalidArgumentException('You must pass an array or ArrayAccess object to setNewOrder');
         }
-        $model = new static;
+        $model = new static();
         $orderColumnName = $model->determineOrderColumnName();
         $primaryKeyColumn = $model->getKeyName();
         foreach ($ids as $id) {
@@ -77,6 +77,7 @@ trait CModel_Sortable_SortableTrait {
         ) {
             return $this->sortable['order_column_name'];
         }
+
         return 'order_column';
     }
 
@@ -101,6 +102,7 @@ trait CModel_Sortable_SortableTrait {
         if (!$swapWithModel) {
             return $this;
         }
+
         return $this->swapOrderWithModel($swapWithModel);
     }
 
@@ -118,6 +120,7 @@ trait CModel_Sortable_SortableTrait {
         if (!$swapWithModel) {
             return $this;
         }
+
         return $this->swapOrderWithModel($swapWithModel);
     }
 
@@ -136,6 +139,7 @@ trait CModel_Sortable_SortableTrait {
         $otherModel->save();
         $this->$orderColumnName = $oldOrderOfOtherModel;
         $this->save();
+
         return $this;
     }
 
@@ -166,6 +170,7 @@ trait CModel_Sortable_SortableTrait {
         $this->$orderColumnName = $firstModel->$orderColumnName;
         $this->save();
         $this->buildSortQuery()->where($this->getKeyName(), '!=', $this->id)->increment($orderColumnName);
+
         return $this;
     }
 
@@ -186,13 +191,14 @@ trait CModel_Sortable_SortableTrait {
         $this->buildSortQuery()->where($this->getKeyName(), '!=', $this->id)
             ->where($orderColumnName, '>', $oldOrder)
             ->decrement($orderColumnName);
+
         return $this;
     }
 
     /**
      * Build eloquent builder of sortable.
      *
-     * @return \Illuminate\Database\Eloquent\Builder
+     * @return \CModel_Query
      */
     public function buildSortQuery() {
         return static::query();
