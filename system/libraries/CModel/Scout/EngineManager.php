@@ -13,12 +13,7 @@ class CModel_Scout_EngineManager extends CBase_ManagerAbstract {
         return $this->driver($name);
     }
 
-    /**
-     * Create a collection engine instance.
-     *
-     * @return \CModel_Scout_Engine_TNTSearchEngine
-     */
-    public function createTntsearchDriver() {
+    public function createTntsearchEngine() {
         $tnt = new TNTSearch();
 
         $config = CF::config('model.scout.tntsearch');
@@ -50,6 +45,17 @@ class CModel_Scout_EngineManager extends CBase_ManagerAbstract {
         $tnt->fuzzy_max_expansions = CF::config('model.scout.tntsearch.fuzzy.max_expansions', $tnt->fuzzy_max_expansions);
 
         $tnt->asYouType = CF::config('model.scout.tntsearch.asYouType', $tnt->asYouType);
+
+        return $tnt;
+    }
+
+    /**
+     * Create a collection engine instance.
+     *
+     * @return \CModel_Scout_Engine_TNTSearchEngine
+     */
+    public function createTntsearchDriver() {
+        $tnt = $this->createTntsearchEngine();
 
         return new CModel_Scout_Engine_TNTSearchEngine($tnt);
     }
