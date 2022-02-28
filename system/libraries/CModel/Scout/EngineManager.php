@@ -5,7 +5,7 @@ class CModel_Scout_EngineManager extends CBase_ManagerAbstract {
     /**
      * Get a driver instance.
      *
-     * @param string|null $name
+     * @param null|string $name
      *
      * @return \CModel_Scout_EngineAbstract
      */
@@ -28,8 +28,12 @@ class CModel_Scout_EngineManager extends CBase_ManagerAbstract {
         }
         $databaseConfigName = CF::config('model.scout.tntsearch.database', 'default');
         $databaseConfig = CF::config('database.' . $databaseConfigName);
+        $driver = carr::get($databaseConfig, 'connection.type');
+        if ($driver == 'mysqli') {
+            $driver = 'mysql';
+        }
         $tntDbConfig = [
-            'driver' => carr::get($databaseConfig, 'connection.type'),
+            'driver' => $driver,
             'host' => carr::get($databaseConfig, 'connection.host'),
             'database' => carr::get($databaseConfig, 'connection.database'),
             'username' => carr::get($databaseConfig, 'connection.user'),
@@ -56,7 +60,7 @@ class CModel_Scout_EngineManager extends CBase_ManagerAbstract {
      * @return \CModel_Scout_Engine_CollectionEngine
      */
     public function createCollectionDriver() {
-        return new CModel_Scout_Engine_CollectionEngine;
+        return new CModel_Scout_Engine_CollectionEngine();
     }
 
     /**
@@ -65,7 +69,7 @@ class CModel_Scout_EngineManager extends CBase_ManagerAbstract {
      * @return \CModel_Scout_Engine_NullEngine
      */
     public function createNullDriver() {
-        return new CModel_Scout_Engine_NullEngine;
+        return new CModel_Scout_Engine_NullEngine();
     }
 
     /**
