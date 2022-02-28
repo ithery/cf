@@ -1,17 +1,20 @@
 <?php
 
-defined('SYSPATH') OR die('No direct access allowed.');
+defined('SYSPATH') or die('No direct access allowed.');
 
 /**
+ * PSR-6 cache implementation that connects to Laravel's cache Repository.
+ * adapted from https://github.com/madewithlove/illuminate-psr-cache-bridge.
+ *
  * @author Hery Kurniawan
- * @since Jun 23, 2019, 1:01:05 PM
  * @license Ittron Global Teknologi <ittron.co.id>
+ *
+ * @since Jun 23, 2019, 1:01:05 PM
  */
 use Psr\Cache\CacheItemInterface;
 use Psr\Cache\CacheItemPoolInterface;
 
 class CCache_PsrBridge_CacheItemPool implements CacheItemPoolInterface {
-
     /**
      * @var CCache_Repository
      */
@@ -37,30 +40,30 @@ class CCache_PsrBridge_CacheItemPool implements CacheItemPoolInterface {
     }
 
     /**
-     * {@inheritdoc}
+     * @inheritdoc
      */
     public function getItem($key) {
         $this->validateKey($key);
         if (isset($this->deferred[$key])) {
-            return clone($this->deferred[$key]);
+            return clone $this->deferred[$key];
         } elseif ($this->repository->has($key)) {
-            return new CacheItem($key, unserialize($this->repository->get($key)), true);
+            return new CCache_PsrBridge_CacheItem($key, unserialize($this->repository->get($key)), true);
         } else {
-            return new CacheItem($key);
+            return new CCache_PsrBridge_CacheItem($key);
         }
     }
 
     /**
-     * {@inheritdoc}
+     * @inheritdoc
      */
-    public function getItems(array $keys = array()) {
-        return array_combine($keys, array_map(function($key) {
-                    return $this->getItem($key);
-                }, $keys));
+    public function getItems(array $keys = []) {
+        return array_combine($keys, array_map(function ($key) {
+            return $this->getItem($key);
+        }, $keys));
     }
 
     /**
-     * {@inheritdoc}
+     * @inheritdoc
      */
     public function hasItem($key) {
         $this->validateKey($key);
@@ -70,28 +73,31 @@ class CCache_PsrBridge_CacheItemPool implements CacheItemPoolInterface {
             if (!$expiresAt) {
                 return true;
             }
+
             return $expiresAt > new DateTimeImmutable();
         }
+
         return $this->repository->has($key);
     }
 
     /**
-     * {@inheritdoc}
+     * @inheritdoc
      */
     public function clear() {
         try {
             $this->deferred = [];
             $store = $this->repository;
-            /* @var CCache_DriverAbstract $store */
+            /** @var CCache_DriverAbstract $store */
             $store->flush();
         } catch (Exception $exception) {
             return false;
         }
+
         return true;
     }
 
     /**
-     * {@inheritdoc}
+     * @inheritdoc
      */
     public function deleteItem($key) {
         $this->validateKey($key);
@@ -99,11 +105,12 @@ class CCache_PsrBridge_CacheItemPool implements CacheItemPoolInterface {
         if (!$this->hasItem($key)) {
             return true;
         }
+
         return $this->repository->forget($key);
     }
 
     /**
-     * {@inheritdoc}
+     * @inheritdoc
      */
     public function deleteItems(array $keys) {
         // Validating all keys first.
@@ -114,11 +121,12 @@ class CCache_PsrBridge_CacheItemPool implements CacheItemPoolInterface {
         foreach ($keys as $key) {
             $success = $success && $this->deleteItem($key);
         }
+
         return $success;
     }
 
     /**
-     * {@inheritdoc}
+     * @inheritdoc
      */
     public function save(CacheItemInterface $item) {
         $expiresAt = $this->getExpiresAt($item);
@@ -128,6 +136,7 @@ class CCache_PsrBridge_CacheItemPool implements CacheItemPoolInterface {
             } catch (Exception $exception) {
                 return false;
             }
+
             return true;
         }
         $now = new DateTimeImmutable('now', $expiresAt->getTimezone());
@@ -135,31 +144,35 @@ class CCache_PsrBridge_CacheItemPool implements CacheItemPoolInterface {
         $minutes = (int) floor($seconds / 60.0);
         if ($minutes <= 0) {
             $this->repository->forget($item->getKey());
+
             return false;
         }
+
         try {
             $this->repository->put($item->getKey(), serialize($item->get()), $minutes);
         } catch (Exception $exception) {
             return false;
         }
+
         return true;
     }
 
     /**
-     * {@inheritdoc}
+     * @inheritdoc
      */
     public function saveDeferred(CacheItemInterface $item) {
         $expiresAt = $this->getExpiresAt($item);
         if ($expiresAt && ($expiresAt < new DateTimeImmutable())) {
             return false;
         }
-        $item = (new CacheItem($item->getKey(), $item->get(), true))->expiresAt($expiresAt);
+        $item = (new CCache_PsrBridge_CacheItem($item->getKey(), $item->get(), true))->expiresAt($expiresAt);
         $this->deferred[$item->getKey()] = $item;
+
         return true;
     }
 
     /**
-     * {@inheritdoc}
+     * @inheritdoc
      */
     public function commit() {
         $success = true;
@@ -167,6 +180,7 @@ class CCache_PsrBridge_CacheItemPool implements CacheItemPoolInterface {
             $success = $success && $this->save($item);
         }
         $this->deferred = [];
+
         return $success;
     }
 
@@ -182,12 +196,11 @@ class CCache_PsrBridge_CacheItemPool implements CacheItemPoolInterface {
     }
 
     /**
-     * @param \Madewithlove\IlluminatePsrCacheBridge\Laravel\CacheItem $item
+     * @param \CCache_PsrBridge_CacheItem $item
      *
      * @return \DateTimeInterface
      */
-    private function getExpiresAt(CacheItem $item) {
+    private function getExpiresAt(CCache_PsrBridge_CacheItem $item) {
         return $item->getExpiresAt();
     }
-
 }
