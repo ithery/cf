@@ -1178,6 +1178,9 @@ class CRouting_Route {
         return $this;
     }
 
+    /**
+     * @return CRouting_RouteData
+     */
     public function getRouteData() {
         return $this->routeData;
     }
