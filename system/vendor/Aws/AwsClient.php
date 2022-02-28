@@ -21,6 +21,7 @@ require_once dirname(__FILE__) . '/../GuzzleHttp/Promise/functions_include.php';
  */
 class AwsClient implements AwsClientInterface {
     use AwsClientTrait;
+
     /**
      * @var array
      */
