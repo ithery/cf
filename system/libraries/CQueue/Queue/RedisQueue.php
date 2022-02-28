@@ -295,8 +295,8 @@ class CQueue_Queue_RedisQueue extends CQueue_AbstractQueue implements CQueue_Con
     /**
      * Delete a reserved job from the queue.
      *
-     * @param string                          $queue
-     * @param \Illuminate\Queue\Jobs\RedisJob $job
+     * @param string               $queue
+     * @param \CQueue_Job_RedisJob $job
      *
      * @return void
      */

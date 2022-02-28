@@ -1,18 +1,18 @@
 <?php
 
-defined('SYSPATH') OR die('No direct access allowed.');
+defined('SYSPATH') or die('No direct access allowed.');
 
 /**
  * @author Hery Kurniawan <hery@itton.co.id>
- * @since Jul 28, 2020 
  * @license Ittron Global Teknologi
+ *
+ * @since Jul 28, 2020
  */
 class CCache_TagSet {
-
     /**
      * The cache store implementation.
      *
-     * @var \Illuminate\Contracts\Cache\Store
+     * @var \CCache_DriverInterface
      */
     protected $store;
 
@@ -26,8 +26,9 @@ class CCache_TagSet {
     /**
      * Create a new TagSet instance.
      *
-     * @param  CCache_DriverAbstract  $store
-     * @param  array  $names
+     * @param CCache_DriverAbstract $store
+     * @param array                 $names
+     *
      * @return void
      */
     public function __construct(CCache_DriverAbstract $store, array $names = []) {
@@ -47,7 +48,8 @@ class CCache_TagSet {
     /**
      * Reset the tag and return the new tag identifier.
      *
-     * @param  string  $name
+     * @param string $name
+     *
      * @return string
      */
     public function resetTag($name) {
@@ -77,7 +79,8 @@ class CCache_TagSet {
     /**
      * Get the unique tag identifier for a given tag.
      *
-     * @param  string  $name
+     * @param string $name
+     *
      * @return string
      */
     public function tagId($name) {
@@ -87,7 +90,8 @@ class CCache_TagSet {
     /**
      * Get the tag identifier key for a given tag.
      *
-     * @param  string  $name
+     * @param string $name
+     *
      * @return string
      */
     public function tagKey($name) {
@@ -102,5 +106,4 @@ class CCache_TagSet {
     public function getNames() {
         return $this->names;
     }
-
 }
