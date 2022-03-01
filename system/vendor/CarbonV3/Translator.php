@@ -290,10 +290,6 @@ class Translator extends Translation\Translator {
         return $locale === null ? $this->messages : $this->messages[$locale];
     }
 
-    public function strContains($haystack, $needle) {
-        return $needle !== '' && mb_strpos($haystack, $needle) !== false;
-    }
-
     /**
      * Set the current translator locale and indicate if the source locale file exists.
      *
@@ -344,7 +340,7 @@ class Translator extends Translation\Translator {
         }
 
         // If subtag (ex: en_CA) first load the macro (ex: en) to have a fallback
-        if ($this->strContains($locale, '_')
+        if (static::strContains($locale, '_')
             && $this->loadMessagesFromFile($macroLocale = preg_replace('/^([^_]+).*$/', '$1', $locale))
         ) {
             parent::setLocale($macroLocale);
@@ -386,5 +382,13 @@ class Translator extends Translation\Translator {
         }
 
         return $score;
+    }
+
+    public static function strContains($haystack, $needle) {
+        if (!function_exists('str_contains')) {
+            return $needle !== '' && mb_strpos($haystack, $needle) !== false;
+        }
+
+        return \str_contains($haystack, $needle);
     }
 }
