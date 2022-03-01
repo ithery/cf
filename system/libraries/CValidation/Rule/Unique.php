@@ -29,7 +29,7 @@ class CValidation_Rule_Unique {
      * Ignore the given ID during the unique check.
      *
      * @param mixed       $id
-     * @param string|null $idColumn
+     * @param null|string $idColumn
      *
      * @return $this
      */
@@ -48,7 +48,7 @@ class CValidation_Rule_Unique {
      * Ignore the given model during the unique check.
      *
      * @param \CModel     $model
-     * @param string|null $idColumn
+     * @param null|string $idColumn
      *
      * @return $this
      */
@@ -77,7 +77,7 @@ class CValidation_Rule_Unique {
 
     public function __sleep() {
         $this->using = c::collect($this->using)->map(function ($item) {
-            return CHelper::closure()->serialize($item);
+            return c::toSerializableClosure($item);
         })->all();
 
         return array_keys(get_object_vars($this));
@@ -85,7 +85,11 @@ class CValidation_Rule_Unique {
 
     public function __wakeup() {
         $this->using = c::collect($this->using)->map(function ($item) {
-            return CHelper::closure()->unserialize($item);
+            if ($item instanceof \Opis\Closure\SerializableClosure) {
+                return $item->getClosure();
+            }
+
+            return $item;
         })->all();
     }
 }
