@@ -1,5 +1,4 @@
 <?php
-use Opis\Closure\SerializableClosure;
 
 class CElement_Component_DataTable extends CElement_Component {
     use CTrait_Compat_Element_DataTable,
@@ -466,10 +465,7 @@ class CElement_Component_DataTable extends CElement_Component {
      * @return $this
      */
     public function cellCallbackFunc($func, $require = '') {
-        if ($func instanceof Closure) {
-            $func = new SerializableClosure($func);
-        }
-        $this->cellCallbackFunc = $func;
+        $this->cellCallbackFunc = c::toSerializableClosure($func);
         if (strlen($require) > 0) {
             $this->requires[] = $require;
         }
@@ -669,7 +665,7 @@ class CElement_Component_DataTable extends CElement_Component {
      * @return $this
      */
     public function setDataFromCallback($callback, $callbackOptions = [], $require = null) {
-        $this->query = new SerializableClosure($callback);
+        $this->query = c::toSerializableClosure($callback);
         $this->isCallback = true;
         $this->callbackOptions = $callbackOptions;
         $this->callbackRequire = $require;
