@@ -30,11 +30,7 @@ class CValidation_Rule_Exists {
 
     public function __wakeup() {
         $this->using = c::collect($this->using)->map(function ($item) {
-            if ($item instanceof \Opis\Closure\SerializableClosure) {
-                return $item->getClosure();
-            }
-
-            return $item;
+            return c::toCallable($item);
         })->all();
     }
 }

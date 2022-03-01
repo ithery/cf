@@ -1514,6 +1514,19 @@ class c {
     public static function toSerializableClosure($callback) {
         return $callback instanceof Closure ? new SerializableClosure($callback) : $callback;
     }
+
+    /**
+     * @param callable|Closure|SerializableClosure $callback
+     *
+     * @return callable|Closure
+     */
+    public static function toCallable($callback) {
+        if ($callback instanceof SerializableClosure) {
+            return $callback->getClosure();
+        }
+
+        return $callback;
+    }
 }
 
 // End c
