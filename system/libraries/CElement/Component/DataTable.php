@@ -590,6 +590,9 @@ class CElement_Component_DataTable extends CElement_Component {
      */
     public function setDataFromQuery($q) {
         $this->query = CManager::createSqlDataProvider($q);
+        $this->query->setConnection(function () {
+            return $this->db();
+        });
 
         return $this;
     }

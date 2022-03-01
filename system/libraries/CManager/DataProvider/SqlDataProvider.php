@@ -1,15 +1,13 @@
 <?php
 
+use Opis\Closure\SerializableClosure;
+
 class CManager_DataProvider_SqlDataProvider extends CManager_DataProviderAbstract {
     protected $connection = '';
 
     protected $sql;
 
     protected $bindings;
-
-    private $queryWhere;
-
-    private $queryOrderBy;
 
     private $baseQuery;
 
@@ -25,19 +23,25 @@ class CManager_DataProvider_SqlDataProvider extends CManager_DataProviderAbstrac
     }
 
     public function setConnection($connection) {
-        $this->connection = $connection;
+        $this->connection = $connection instanceof Closure ? new SerializableClosure($connection) : $connection;
     }
 
     public function getConnection() {
-        return $this->connection ?: 'default';
+        return c::value($this->connection) ?: 'default';
+    }
+
+    public function getDb() {
+        $connection = $this->getConnection();
+
+        return $connection instanceof CDatabase ? $connection : c::db($connection);
     }
 
     public function toEnumerable() {
-        return c::collect(c::db($this->connection)->query($this->sql, $this->bindings)->resultArray(false));
+        return c::collect($this->getDb()->query($this->sql, $this->bindings)->resultArray(false));
     }
 
     private function executeQuery($sql, $bindings = []) {
-        return c::db($this->connection)->query($sql, $bindings);
+        return $this->getDb()->query($sql, $bindings);
     }
 
     public function paginate($perPage = null, $columns = ['*'], $pageName = 'page', $page = null, $callback = null) {
