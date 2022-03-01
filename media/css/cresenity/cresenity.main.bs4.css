@@ -147,7 +147,7 @@ input[disabled=disabled],select[disabled=disabled],textarea[disabled=disabled],i
 }
 
 .form-horizontal input[type="text"].datepicker {
-    width: 100px;
+    width: 120px;
     display: inline-block;
 }
 

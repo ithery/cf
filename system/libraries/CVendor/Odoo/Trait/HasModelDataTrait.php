@@ -1,14 +1,14 @@
 <?php
 
-defined('SYSPATH') OR die('No direct access allowed.');
+defined('SYSPATH') or die('No direct access allowed.');
 
 /**
  * @author Hery Kurniawan
- * @since Jun 25, 2019, 10:10:42 PM
  * @license Ittron Global Teknologi <ittron.co.id>
+ *
+ * @since Jun 25, 2019, 10:10:42 PM
  */
 trait CVendor_Odoo_Trait_HasModelDataTrait {
-
     /**
      * Data structure as returned by the API and converted to
      * a native PHP array.
@@ -34,7 +34,8 @@ trait CVendor_Odoo_Trait_HasModelDataTrait {
     /**
      * Get a data field using a "dot notation" path.
      *
-     * @inherit
+     * @param mixed      $key
+     * @param null|mixed $default
      */
     public function get($key, $default = null) {
         // Since we are running under laravel, use laravel's helper.
@@ -50,31 +51,39 @@ trait CVendor_Odoo_Trait_HasModelDataTrait {
     }
 
     /**
-     * Supports ArrayAccess
+     * Supports ArrayAccess.
+     *
+     * @param mixed $offset
      */
     public function offsetExists($offset) {
         return $this->get($offset) !== null;
     }
 
     /**
-     * Supports ArrayAccess
+     * Supports ArrayAccess.
+     *
+     * @param mixed $offset
      */
     public function offsetGet($offset) {
         return $this->get($offset);
     }
 
     /**
-     * Supports ArrayAccess
+     * Supports ArrayAccess.
+     *
+     * @param mixed $offset
+     * @param mixed $value
      */
     public function offsetSet($offset, $value) {
         carr::set($this->data, $offset, $value);
     }
 
     /**
-     * Supports ArrayAccess
+     * Supports ArrayAccess.
+     *
+     * @param mixed $offset
      */
     public function offsetUnset($offset) {
         $this->offsetSet($offset, null);
     }
-
 }

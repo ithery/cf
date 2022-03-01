@@ -27,9 +27,6 @@ class CFunction {
     public $type = 'defined'; //defined,class,
 
     private function __construct($func) {
-        if (!$func instanceof OpisSerializableClosure) {
-            $func = CHelper::closure()->deserializeClosure($func);
-        }
         $this->func = $func;
     }
 

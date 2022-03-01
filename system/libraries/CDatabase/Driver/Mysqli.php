@@ -15,6 +15,11 @@ class CDatabase_Driver_Mysqli extends CDatabase_Driver_AbstractMysql {
      */
     protected $link;
 
+    /**
+     * @var PDO
+     */
+    protected $pdo;
+
     protected $dbConfig;
 
     protected $statements = [];
@@ -50,6 +55,14 @@ class CDatabase_Driver_Mysqli extends CDatabase_Driver_AbstractMysql {
         // }
     }
 
+    public function getPdo() {
+        if ($this->pdo instanceof Closure || $this->pdo instanceof \Opis\Closure\SerializableClosure) {
+            $this->pdo = c::value($this->pdo);
+        }
+
+        return $this->pdo;
+    }
+
     public function connect() {
         // Check if link already exists
 
@@ -66,6 +79,10 @@ class CDatabase_Driver_Mysqli extends CDatabase_Driver_AbstractMysql {
         try {
             // Make the connection and select the database
             if ($this->link = new mysqli($host, $user, $pass, $database, $port)) {
+                $this->pdo = function () use ($host, $user, $pass, $database, $port) {
+                    return new PDO("mysql:host=${host};dbname=${database}", $user, $pass);
+                };
+
                 if ($charset = $this->dbConfig['character_set']) {
                     $this->setCharset($charset);
                 }

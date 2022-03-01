@@ -1,5 +1,6 @@
 <?php
 
+use Twilio\Serialize;
 use SuperClosure\SerializableClosure;
 
 class CElement_Component_DataTable_Column extends CObject {
@@ -47,6 +48,8 @@ class CElement_Component_DataTable_Column extends CObject {
 
     protected $dataType = null;
 
+    protected $customCss = [];
+
     public function __construct($fieldname) {
         parent::__construct();
 
@@ -68,6 +71,25 @@ class CElement_Component_DataTable_Column extends CObject {
         $this->callback = null;
         $this->callbackRequire = null;
         $this->class = [];
+        $this->customCss = [];
+    }
+
+    /**
+     * Set custom css style.
+     *
+     * @param string $key
+     * @param string $val
+     *
+     * @return $this
+     */
+    public function customCss($key, $val) {
+        $this->customCss[$key] = $val;
+
+        return $this;
+    }
+
+    public function getCssStyle() {
+        return CRenderable::renderStyle($this->customCss);
     }
 
     public static function factory($fieldname) {
@@ -182,14 +204,14 @@ class CElement_Component_DataTable_Column extends CObject {
     }
 
     public function setCallback($callback, $require = '') {
-        $this->callback = CHelper::closure()->serializeClosure($callback);
+        $this->callback = c::toSerializableClosure($callback);
         $this->callbackRequire = $require;
 
         return $this;
     }
 
     public function setExportCallback($callback, $require = '') {
-        $this->exportCallback = CHelper::closure()->serializeClosure($callback);
+        $this->exportCallback = c::toSerializableClosure($callback);
         $this->exportCallbackRequire = $require;
 
         return $this;

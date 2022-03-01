@@ -107,6 +107,7 @@ class CModel_Relation_MorphTo extends CModel_Relation_BelongsTo {
         foreach (array_keys($this->dictionary) as $type) {
             $this->matchToMorphParents($type, $this->getResultsByType($type));
         }
+
         return $this->models;
     }
 
@@ -167,7 +168,8 @@ class CModel_Relation_MorphTo extends CModel_Relation_BelongsTo {
      */
     public function createModelByType($type) {
         $class = CModel::getActualClassNameForMorph($type);
-        return c::tap(new $class, function ($instance) {
+
+        return c::tap(new $class(), function ($instance) {
             if (!$instance->getConnectionName()) {
                 $instance->setConnection($this->getConnection()->getName());
             }
@@ -222,6 +224,7 @@ class CModel_Relation_MorphTo extends CModel_Relation_BelongsTo {
             $this->morphType,
             $model instanceof CModel ? $model->getMorphClass() : null
         );
+
         return $this->parent->setRelation($this->relationName, $model);
     }
 
@@ -233,6 +236,7 @@ class CModel_Relation_MorphTo extends CModel_Relation_BelongsTo {
     public function dissociate() {
         $this->parent->setAttribute($this->foreignKey, null);
         $this->parent->setAttribute($this->morphType, null);
+
         return $this->parent->setRelation($this->relationName, null);
     }
 
@@ -281,7 +285,7 @@ class CModel_Relation_MorphTo extends CModel_Relation_BelongsTo {
      *
      * @param array $with
      *
-     * @return \Illuminate\Database\Eloquent\Relations\MorphTo
+     * @return \CModel_Relation_MorphTo
      */
     public function morphWith(array $with) {
         $this->morphableEagerLoads = array_merge(
@@ -335,6 +339,7 @@ class CModel_Relation_MorphTo extends CModel_Relation_BelongsTo {
         foreach ($this->macroBuffer as $macro) {
             $query->{$macro['method']}(...$macro['parameters']);
         }
+
         return $query;
     }
 
@@ -352,12 +357,14 @@ class CModel_Relation_MorphTo extends CModel_Relation_BelongsTo {
             if (in_array($method, ['select', 'selectRaw', 'selectSub', 'addSelect', 'withoutGlobalScopes'])) {
                 $this->macroBuffer[] = compact('method', 'parameters');
             }
+
             return $result;
         } catch (BadMethodCallException $e) {
             // If we tried to call a method that does not exist on the parent Builder instance,
             // we'll assume that we want to call a query macro (e.g. withTrashed) that only
             // exists on related models. We will just store the call and replay it later.
             $this->macroBuffer[] = compact('method', 'parameters');
+
             return $this;
         }
     }

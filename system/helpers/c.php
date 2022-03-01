@@ -1357,7 +1357,7 @@ class c {
         }
 
         if (is_string($arguments[0])) {
-            return CCache::manager()->get(...$arguments);
+            return CCache::manager()->store()->get(...$arguments);
         }
 
         if (!is_array($arguments[0])) {
@@ -1366,7 +1366,7 @@ class c {
             );
         }
 
-        return CCache::manager()->put(key($arguments[0]), reset($arguments[0]), isset($arguments[1]) ? $arguments[1] : null);
+        return CCache::manager()->store()->put(key($arguments[0]), reset($arguments[0]), isset($arguments[1]) ? $arguments[1] : null);
     }
 
     /**
@@ -1513,6 +1513,19 @@ class c {
      */
     public static function toSerializableClosure($callback) {
         return $callback instanceof Closure ? new SerializableClosure($callback) : $callback;
+    }
+
+    /**
+     * @param callable|Closure|SerializableClosure $callback
+     *
+     * @return callable|Closure
+     */
+    public static function toCallable($callback) {
+        if ($callback instanceof SerializableClosure) {
+            return $callback->getClosure();
+        }
+
+        return $callback;
     }
 }
 

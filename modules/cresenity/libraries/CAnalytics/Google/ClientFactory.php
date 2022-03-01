@@ -76,7 +76,7 @@ class CAnalytics_Google_ClientFactory {
     }
 
     protected static function createAnalyticsClient(array $analyticsConfig, Google_Service_Analytics $googleService) {
-        $client = new CAnalytics_Google_Client($googleService, CCache::repository());
+        $client = new CAnalytics_Google_Client($googleService, c::cache()->store());
         $client->setCacheLifeTimeInMinutes($analyticsConfig['cache_lifetime_in_minutes']);
 
         return $client;

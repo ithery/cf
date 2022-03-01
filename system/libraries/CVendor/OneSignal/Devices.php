@@ -2,21 +2,35 @@
 
 class CVendor_OneSignal_Devices {
     const DEVICES_LIMIT = 300;
+
     const IOS = 0;
+
     const ANDROID = 1;
+
     const AMAZON = 2;
+
     const WINDOWS_PHONE = 3;
+
     const WINDOWS_PHONE_MPNS = 3;
+
     const CHROME_APP = 4;
+
     const CHROME_WEB = 5;
+
     const WINDOWS_PHONE_WNS = 6;
+
     const SAFARI = 7;
+
     const FIREFOX = 8;
+
     const MACOS = 9;
+
     const ALEXA = 10;
+
     const EMAIL = 11;
 
     protected $api;
+
     private $resolverFactory;
 
     public function __construct(CVendor_OneSignal $api, CVendor_OneSignal_Resolver_ResolverFactory $resolverFactory) {
@@ -35,6 +49,7 @@ class CVendor_OneSignal_Devices {
         $query = [
             'app_id' => $this->api->getConfig()->getApplicationId(),
         ];
+
         return $this->api->request('GET', '/players/' . $id . '?' . http_build_query($query));
     }
 
@@ -54,6 +69,7 @@ class CVendor_OneSignal_Devices {
             'offset' => max(0, filter_var($offset, FILTER_VALIDATE_INT)),
             'app_id' => $this->api->getConfig()->getApplicationId(),
         ];
+
         return $this->api->request('GET', '/players?' . http_build_query($query), [
             'Authorization' => 'Basic ' . $this->api->getConfig()->getApplicationAuthKey(),
         ]);
@@ -68,6 +84,7 @@ class CVendor_OneSignal_Devices {
      */
     public function add(array $data) {
         $data = $this->resolverFactory->createNewDeviceResolver()->resolve($data);
+
         return $this->api->request('POST', '/players', [], json_encode($data));
     }
 
@@ -81,6 +98,7 @@ class CVendor_OneSignal_Devices {
      */
     public function update($id, array $data) {
         $data = $this->resolverFactory->createExistingDeviceResolver()->resolve($data);
+
         return $this->api->request('PUT', '/players/' . $id, [], json_encode($data));
     }
 
@@ -94,6 +112,7 @@ class CVendor_OneSignal_Devices {
      */
     public function onSession($id, array $data) {
         $data = $this->resolverFactory->createDeviceSessionResolver()->resolve($data);
+
         return $this->api->request('POST', '/players/' . $id . '/on_session', [], json_encode($data));
     }
 
@@ -107,6 +126,7 @@ class CVendor_OneSignal_Devices {
      */
     public function onPurchase($id, array $data) {
         $data = $this->resolverFactory->createDevicePurchaseResolver()->resolve($data);
+
         return $this->api->request('POST', '/players/' . $id . '/on_purchase', [], json_encode($data));
     }
 
@@ -120,6 +140,7 @@ class CVendor_OneSignal_Devices {
      */
     public function onFocus($id, array $data) {
         $data = $this->resolverFactory->createDeviceFocusResolver()->resolve($data);
+
         return $this->api->request('POST', '/players/' . $id . '/on_focus', [], json_encode($data));
     }
 
@@ -141,6 +162,7 @@ class CVendor_OneSignal_Devices {
         $body = [
             'extra_fields' => $extraFields,
         ];
+
         return $this->api->request('POST', $url, $headers, json_encode($body));
     }
 }

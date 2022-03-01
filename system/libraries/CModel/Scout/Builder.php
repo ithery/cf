@@ -20,14 +20,14 @@ class CModel_Scout_Builder {
     /**
      * Optional callback before search execution.
      *
-     * @var \Closure|null
+     * @var null|\Closure
      */
     public $callback;
 
     /**
      * Optional callback before model query execution.
      *
-     * @var \Closure|null
+     * @var null|\Closure
      */
     public $queryCallback;
 
@@ -71,7 +71,7 @@ class CModel_Scout_Builder {
      *
      * @param \CModel       $model
      * @param string        $query
-     * @param \Closure|null $callback
+     * @param null|\Closure $callback
      * @param bool          $softDelete
      *
      * @return void
@@ -234,7 +234,7 @@ class CModel_Scout_Builder {
     /**
      * Get the keys of search results.
      *
-     * @return \Illuminate\Support\Collection
+     * @return \CCollection
      */
     public function keys() {
         return $this->engine()->keys($this);
@@ -243,7 +243,7 @@ class CModel_Scout_Builder {
     /**
      * Get the first result from the search.
      *
-     * @return \Illuminate\Database\Eloquent\Model
+     * @return \CModel
      */
     public function first() {
         return $this->get()->first();
@@ -252,7 +252,7 @@ class CModel_Scout_Builder {
     /**
      * Get the results of the search.
      *
-     * @return \Illuminate\Database\Eloquent\Collection
+     * @return \CModel_Collection
      */
     public function get() {
         return $this->engine()->get($this);
@@ -261,7 +261,7 @@ class CModel_Scout_Builder {
     /**
      * Get the results of the search as a "lazy collection" instance.
      *
-     * @return \Illuminate\Support\LazyCollection
+     * @return \CCollection_LazyCollection
      */
     public function cursor() {
         return $this->engine()->cursor($this);
@@ -272,7 +272,7 @@ class CModel_Scout_Builder {
      *
      * @param int      $perPage
      * @param string   $pageName
-     * @param int|null $page
+     * @param null|int $page
      *
      * @return \CPagination_PaginatorInterface
      */
@@ -309,7 +309,7 @@ class CModel_Scout_Builder {
      *
      * @param int      $perPage
      * @param string   $pageName
-     * @param int|null $page
+     * @param null|int $page
      *
      * @return \CPagination_LengthAwarePaginator
      */
@@ -345,7 +345,7 @@ class CModel_Scout_Builder {
      *
      * @param int      $perPage
      * @param string   $pageName
-     * @param int|null $page
+     * @param null|int $page
      *
      * @return \CPagination_LengthAwarePaginator
      */

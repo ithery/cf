@@ -16,11 +16,10 @@ class CAjax_Engine_AjaxHandler extends CAjax_Engine {
         $json = carr::get($data, 'json');
 
         if ($callback != null) {
-            $callback = CHelper::closure()->deserializeClosure($callback);
             $app = CApp::instance();
             $parameters = [$app];
 
-            return call_user_func_array($callback, $parameters);
+            return c::value($callback, ...$parameters);
         } else {
             return $json;
         }
