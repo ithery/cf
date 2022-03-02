@@ -4,6 +4,7 @@ class CObject {
     use CTrait_Compat_Object;
     use CTrait_Macroable;
     use CTrait_Tappable;
+    use CTrait_Conditionable;
 
     protected $id;
 
