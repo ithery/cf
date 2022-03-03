@@ -20,6 +20,7 @@ class CElement_FormInput_Label extends CElement_FormInput {
         if ($value instanceof CRenderable) {
             $this->value = $value->html();
             $this->addJs($value->js());
+            $value = $this->value;
         }
         $this->value = (string) $value;
         $this->addJs($this->getDependsOnContentJavascript());
