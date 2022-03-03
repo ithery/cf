@@ -53,7 +53,7 @@ class CAnalytics_Google_AnalyticGA4 {
 
     public function getMetadata() {
         $googleMetadata = $this->client->getAnalyticsService()->getMetadata(
-            'properties/' . ENGoogle::propertyId() . '/metadata',
+            'properties/' . $this->propertyId . '/metadata',
         );
         $result = [];
         $result['dimensions'] = c::collect($googleMetadata->getDimensions())->mapWithKeys(function ($dimension) {
@@ -99,5 +99,19 @@ class CAnalytics_Google_AnalyticGA4 {
      */
     public function createReport() {
         return new CAnalytics_Google_AnalyticGA4_ReportRunner($this->client, $this->propertyId);
+    }
+
+    /**
+     * @return CAnalytics_Google_MetaData
+     */
+    public static function metadata() {
+        return new CBase_ForwarderStaticClass(CAnalytics_Google_MetaData::class);
+    }
+
+    /**
+     * @return CAnalytics_Google_AnalyticGA4_PredefinedReport
+     */
+    public function predefinedReport() {
+        return new CAnalytics_Google_AnalyticGA4_PredefinedReport($this);
     }
 }

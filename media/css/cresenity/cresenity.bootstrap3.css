@@ -3,7 +3,7 @@ To change this license header, choose License Headers in Project Properties.
 To change this template file, choose Tools | Templates
 and open the template in the editor.
 */
-/* 
+/*
     Created on : Nov 12, 2017, 2:38:05 AM
     Author     : Hery Kurniawan
 */
@@ -59,7 +59,7 @@ a:focus, a:hover {
 }
 .row-fluid > .span8 {
     width: 66.66666667%;
-}    
+}
 .row-fluid > .span9 {
     width:75%;
 }

@@ -152,6 +152,9 @@ class CHTTP {
         return CHTTP_Client::instance();
     }
 
+    /**
+     * @return CHTTP_RobotsTxt
+     */
     public static function robotsTxt() {
         return CHTTP_RobotsTxt::instance();
     }

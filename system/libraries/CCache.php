@@ -20,12 +20,9 @@ class CCache {
     protected static $rateLimiter;
 
     /**
-     * @var CCache_RateLimiter
-     */
-    protected static $rateLimiter;
-
-    /**
      * @param null|mixed $name
+     *
+     * @deprecated since 1.2
      *
      * @return CCache_Repository
      */
@@ -66,7 +63,7 @@ class CCache {
         return $options ? $options : $defaultOptions;
     }
 
-    public static function store($name) {
+    public static function store($name = null) {
         return CCache_Manager::instance()->store($name);
     }
 

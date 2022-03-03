@@ -1,5 +1,4 @@
 <?php
-use Opis\Closure\SerializableClosure;
 
 class CElement_Component_DataTable extends CElement_Component {
     use CTrait_Compat_Element_DataTable,
@@ -466,10 +465,7 @@ class CElement_Component_DataTable extends CElement_Component {
      * @return $this
      */
     public function cellCallbackFunc($func, $require = '') {
-        if ($func instanceof Closure) {
-            $func = new SerializableClosure($func);
-        }
-        $this->cellCallbackFunc = $func;
+        $this->cellCallbackFunc = c::toSerializableClosure($func);
         if (strlen($require) > 0) {
             $this->requires[] = $require;
         }
@@ -591,6 +587,22 @@ class CElement_Component_DataTable extends CElement_Component {
     public function setDataFromQuery($q) {
         $this->query = CManager::createSqlDataProvider($q);
 
+        $dbResolver = $this->dbResolver;
+        $dbName = $this->dbName;
+        $dbConfig = $this->dbConfig;
+
+        $this->query->setConnection(function () use ($dbResolver, $dbName, $dbConfig) {
+            if ($dbResolver != null) {
+                return $dbResolver->connection($dbName);
+            }
+
+            if (strlen($dbName) > 0) {
+                return CDatabase::instance($dbName);
+            }
+
+            return CDatabase::instance($dbName, $dbConfig);
+        });
+
         return $this;
     }
 
@@ -659,14 +671,14 @@ class CElement_Component_DataTable extends CElement_Component {
     }
 
     /**
-     * @param callable $callback
-     * @param array    $callbackOptions
-     * @param string   $require
+     * @param callable|Closure $callback
+     * @param array            $callbackOptions
+     * @param string           $require
      *
      * @return $this
      */
     public function setDataFromCallback($callback, $callbackOptions = [], $require = null) {
-        $this->query = CHelper::closure()->serializeClosure($callback);
+        $this->query = c::toSerializableClosure($callback);
         $this->isCallback = true;
         $this->callbackOptions = $callbackOptions;
         $this->callbackRequire = $require;

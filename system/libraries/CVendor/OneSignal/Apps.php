@@ -2,6 +2,7 @@
 
 class CVendor_OneSignal_Apps {
     protected $api;
+
     private $resolverFactory;
 
     public function __construct(CVendor_OneSignal $api, CVendor_OneSignal_Resolver_ResolverFactory $resolverFactory) {

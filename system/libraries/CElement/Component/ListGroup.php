@@ -11,6 +11,7 @@ defined('SYSPATH') or die('No direct access allowed.');
 class CElement_Component_ListGroup extends CElement_Component {
     use CTrait_Element_Property_Database,
         CTrait_Element_Property_TableData;
+
     protected $itemCallback = null;
 
     protected $itemCallbackRequire = '';
@@ -32,7 +33,7 @@ class CElement_Component_ListGroup extends CElement_Component {
     }
 
     public function setItemCallback($callback, $require = '') {
-        $this->itemCallback = CHelper::closure()->serializeClosure($callback);
+        $this->itemCallback = c::toSerializableClosure($callback);
         $this->itemCallbackRequire = $require;
 
         return $this;

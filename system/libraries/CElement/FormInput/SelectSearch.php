@@ -1,5 +1,7 @@
 <?php
 
+use Opis\Closure\SerializableClosure;
+
 defined('SYSPATH') or die('No direct access allowed.');
 
 /**
@@ -44,6 +46,8 @@ class CElement_FormInput_SelectSearch extends CElement_FormInput {
 
     protected $allowClear;
 
+    protected $queryResolver;
+
     public function __construct($id) {
         parent::__construct($id);
         $this->dropdownClasses = [];
@@ -68,6 +72,18 @@ class CElement_FormInput_SelectSearch extends CElement_FormInput {
 
     public static function factory($id = null) {
         return new CElement_FormInput_SelectSearch($id);
+    }
+
+    public function setQueryResolver(Closure $resolver) {
+        $this->queryResolver = new SerializableClosure($resolver);
+    }
+
+    public function query() {
+        if ($this->queryResolver != null) {
+            return $this->queryResolver->__invoke($this->query);
+        }
+
+        return $this->query;
     }
 
     public function setValueCallback(callable $callback, $require = '') {
@@ -204,6 +220,7 @@ class CElement_FormInput_SelectSearch extends CElement_FormInput {
             if ($this->value !== null) {
                 $value = $this->value;
             }
+
             $values = carr::wrap($value);
             $result = c::collect($values)->map(function ($value) {
                 $db = c::db();
@@ -228,9 +245,10 @@ class CElement_FormInput_SelectSearch extends CElement_FormInput {
 
                     return null;
                 }
-                $q = 'select * from (' . $this->query . ') as a limit 1';
+                $q = 'select * from (' . $this->query() . ') as a limit 1';
+
                 if ($value !== null) {
-                    $q = 'select * from (' . $this->query . ') as a where `' . $this->keyField . '`=' . $db->escape($this->value);
+                    $q = 'select * from (' . $this->query() . ') as a where `' . $this->keyField . '`=' . $db->escape($value);
                 }
 
                 $result = $db->query($q)->resultArray(false);
@@ -276,18 +294,15 @@ class CElement_FormInput_SelectSearch extends CElement_FormInput {
         $classes = $classes . ' form-control ';
 
         $html->setIndent($indent);
-        $value = null;
-        if ($this->value !== null) {
-            $value = $this->value;
-        }
 
         $additionAttribute = '';
         foreach ($this->attr as $k => $v) {
             $additionAttribute .= ' ' . $k . '="' . $v . '"';
         }
+        $selectedRows = $this->getSelectedRow();
+
         $html->appendln('<select class="' . $classes . '" name="' . $this->name . '" id="' . $this->id . '" ' . $disabled . $custom_css . $multiple . $additionAttribute . '">');
 
-        $selectedRows = $this->getSelectedRow();
         if ($selectedRows) {
             foreach ($selectedRows as $index => $selectedRow) {
                 if ($selectedRow != null) {

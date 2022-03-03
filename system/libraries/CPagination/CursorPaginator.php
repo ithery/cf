@@ -1,7 +1,5 @@
 <?php
 
-use Illuminate\Support\Collection;
-
 class CPagination_CursorPaginator extends CPagination_CursorPaginatorAbstract implements Cinterface_Arrayable, ArrayAccess, Countable, IteratorAggregate, CInterface_Jsonable, JsonSerializable, CPagination_CursorPaginatorInterface {
     /**
      * Indicates whether there are more items in the data source.
@@ -42,7 +40,7 @@ class CPagination_CursorPaginator extends CPagination_CursorPaginatorAbstract im
      * @return void
      */
     protected function setItems($items) {
-        $this->items = $items instanceof Collection ? $items : Collection::make($items);
+        $this->items = $items instanceof CCollection ? $items : CCollection::make($items);
 
         $this->hasMore = $this->items->count() > $this->perPage;
 
