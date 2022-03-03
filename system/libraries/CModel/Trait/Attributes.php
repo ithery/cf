@@ -7,6 +7,13 @@ defined('SYSPATH') or die('No direct access allowed.');
  */
 trait CModel_Trait_Attributes {
     /**
+     * Indicates whether attributes are snake cased on arrays.
+     *
+     * @var bool
+     */
+    public static $snakeAttributes = true;
+
+    /**
      * The model's attributes.
      *
      * @var array
@@ -54,13 +61,6 @@ trait CModel_Trait_Attributes {
      * @var array
      */
     protected $appends = [];
-
-    /**
-     * Indicates whether attributes are snake cased on arrays.
-     *
-     * @var bool
-     */
-    public static $snakeAttributes = true;
 
     /**
      * The cache of the mutated attributes for each class.
@@ -390,9 +390,9 @@ trait CModel_Trait_Attributes {
      *
      * @param string $method
      *
-     * @return mixed
-     *
      * @throws \LogicException
+     *
+     * @return mixed
      */
     protected function getRelationshipFromMethod($method) {
         $relation = $this->$method();
@@ -827,7 +827,7 @@ trait CModel_Trait_Attributes {
      * Determine whether an attribute should be cast to a native type.
      *
      * @param string            $key
-     * @param array|string|null $types
+     * @param null|array|string $types
      *
      * @return bool
      */
@@ -904,7 +904,7 @@ trait CModel_Trait_Attributes {
     /**
      * Get the model's original attribute values.
      *
-     * @param string|null $key
+     * @param null|string $key
      * @param mixed       $default
      *
      * @return mixed|array
@@ -985,7 +985,7 @@ trait CModel_Trait_Attributes {
     /**
      * Determine if the model or given attribute(s) have been modified.
      *
-     * @param array|string|null $attributes
+     * @param null|array|string $attributes
      *
      * @return bool
      */
@@ -999,7 +999,7 @@ trait CModel_Trait_Attributes {
     /**
      * Determine if the model or given attribute(s) have remained the same.
      *
-     * @param array|string|null $attributes
+     * @param null|array|string $attributes
      *
      * @return bool
      */
@@ -1010,7 +1010,7 @@ trait CModel_Trait_Attributes {
     /**
      * Determine if the model or given attribute(s) have been modified.
      *
-     * @param array|string|null $attributes
+     * @param null|array|string $attributes
      *
      * @return bool
      */
@@ -1025,7 +1025,7 @@ trait CModel_Trait_Attributes {
      * Determine if the given attributes were changed.
      *
      * @param array             $changes
-     * @param array|string|null $attributes
+     * @param null|array|string $attributes
      *
      * @return bool
      */
