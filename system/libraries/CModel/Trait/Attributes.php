@@ -14,6 +14,13 @@ trait CModel_Trait_Attributes {
     public static $snakeAttributes = true;
 
     /**
+     * The encrypter instance that is used to encrypt attributes.
+     *
+     * @var \CCrypt_EncrypterInterface
+     */
+    public static $encrypter;
+
+    /**
      * The model's attributes.
      *
      * @var array
@@ -42,6 +49,53 @@ trait CModel_Trait_Attributes {
     protected $casts = [];
 
     /**
+     * The attributes that have been cast using custom classes.
+     *
+     * @var array
+     */
+    protected $classCastCache = [];
+
+    /**
+     * The attributes that have been cast using "Attribute" return type mutators.
+     *
+     * @var array
+     */
+    protected $attributeCastCache = [];
+
+    /**
+     * The built-in, primitive cast types supported by Eloquent.
+     *
+     * @var string[]
+     */
+    protected static $primitiveCastTypes = [
+        'array',
+        'bool',
+        'boolean',
+        'collection',
+        'custom_datetime',
+        'date',
+        'datetime',
+        'decimal',
+        'double',
+        'encrypted',
+        'encrypted:array',
+        'encrypted:collection',
+        'encrypted:json',
+        'encrypted:object',
+        'float',
+        'immutable_date',
+        'immutable_datetime',
+        'immutable_custom_datetime',
+        'int',
+        'integer',
+        'json',
+        'object',
+        'real',
+        'string',
+        'timestamp',
+    ];
+
+    /**
      * The attributes that should be mutated to dates.
      *
      * @var array
@@ -68,6 +122,27 @@ trait CModel_Trait_Attributes {
      * @var array
      */
     protected static $mutatorCache = [];
+
+    /**
+     * The cache of the "Attribute" return type marked mutated attributes for each class.
+     *
+     * @var array
+     */
+    protected static $attributeMutatorCache = [];
+
+    /**
+     * The cache of the "Attribute" return type marked mutated, gettable attributes for each class.
+     *
+     * @var array
+     */
+    protected static $getAttributeMutatorCache = [];
+
+    /**
+     * The cache of the "Attribute" return type marked mutated, settable attributes for each class.
+     *
+     * @var array
+     */
+    protected static $setAttributeMutatorCache = [];
 
     /**
      * Convert the model's attributes to an array.
