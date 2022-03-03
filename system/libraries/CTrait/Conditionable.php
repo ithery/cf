@@ -11,10 +11,16 @@ trait CTrait_Conditionable {
      * @return $this|mixed
      */
     public function when($value, $callback, $default = null) {
+        $value = $value instanceof Closure ? $value($this) : $value;
+
+        if (!$callback) {
+            return new CBase_HigherOrderWhenProxy($this, $value);
+        }
+
         if ($value) {
-            return $callback($this, $value) ?: $this;
+            return $callback($this, $value) ?? $this;
         } elseif ($default) {
-            return $default($this, $value) ?: $this;
+            return $default($this, $value) ?? $this;
         }
 
         return $this;
@@ -30,10 +36,16 @@ trait CTrait_Conditionable {
      * @return $this|mixed
      */
     public function unless($value, $callback, $default = null) {
+        $value = $value instanceof Closure ? $value($this) : $value;
+
+        if (!$callback) {
+            return new CBase_HigherOrderWhenProxy($this, !$value);
+        }
+
         if (!$value) {
-            return $callback($this, $value) ?: $this;
+            return $callback($this, $value) ?? $this;
         } elseif ($default) {
-            return $default($this, $value) ?: $this;
+            return $default($this, $value) ?? $this;
         }
 
         return $this;
