@@ -22,6 +22,7 @@ trait CElement_Component_DataTable_Trait_JavascriptTrait {
             $ajaxMethod->setData('query', $this->query);
             $ajaxMethod->setData('isModelQuery', $isModelQuery);
             $ajaxMethod->setData('isDataProvider', $this->query instanceof CManager_Contract_DataProviderInterface);
+
             $ajaxMethod->setData('table', serialize($this));
 
             $ajaxMethod->setData('dbConfig', $this->dbConfig);

@@ -586,8 +586,21 @@ class CElement_Component_DataTable extends CElement_Component {
      */
     public function setDataFromQuery($q) {
         $this->query = CManager::createSqlDataProvider($q);
-        $this->query->setConnection(function () {
-            return $this->db();
+
+        $dbResolver = $this->dbResolver;
+        $dbName = $this->dbName;
+        $dbConfig = $this->dbConfig;
+
+        $this->query->setConnection(function () use ($dbResolver, $dbName, $dbConfig) {
+            if ($dbResolver != null) {
+                return $dbResolver->connection($dbName);
+            }
+
+            if (strlen($dbName) > 0) {
+                return CDatabase::instance($dbName);
+            }
+
+            return CDatabase::instance($dbName, $dbConfig);
         });
 
         return $this;

@@ -204,6 +204,7 @@ class CElement_Component_DataTable_Column extends CObject {
     }
 
     public function setCallback($callback, $require = '') {
+        //$this->callback = c::toSerializableClosure($callback);
         $this->callback = c::toSerializableClosure($callback);
         $this->callbackRequire = $require;
 
