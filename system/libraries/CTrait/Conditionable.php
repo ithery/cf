@@ -1,5 +1,4 @@
 <?php
-
 trait CTrait_Conditionable {
     /**
      * Apply the callback if the given "value" is truthy.
@@ -18,9 +17,9 @@ trait CTrait_Conditionable {
         }
 
         if ($value) {
-            return $callback($this, $value) ?? $this;
+            return $callback($this, $value) ?: $this;
         } elseif ($default) {
-            return $default($this, $value) ?? $this;
+            return $default($this, $value) ?: $this;
         }
 
         return $this;
@@ -43,9 +42,9 @@ trait CTrait_Conditionable {
         }
 
         if (!$value) {
-            return $callback($this, $value) ?? $this;
+            return $callback($this, $value) ?: $this;
         } elseif ($default) {
-            return $default($this, $value) ?? $this;
+            return $default($this, $value) ?: $this;
         }
 
         return $this;
