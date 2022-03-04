@@ -143,7 +143,7 @@ class CManager_DataProvider_ModelDataProvider extends CManager_DataProviderAbstr
         return $query;
     }
 
-    protected function isRelationField(CModel_Query $query, $fieldName) {
+    protected function isRelationField($query, $fieldName) {
         if (method_exists($query->getModel(), $fieldName)) {
             try {
                 $query->getModel()->load($fieldName);
