@@ -1182,7 +1182,7 @@ class c {
      */
     public static function pregReplaceArray($pattern, array $replacements, $subject) {
         return preg_replace_callback($pattern, function () use (&$replacements) {
-            foreach ($replacements as $key => $value) {
+            foreach ($replacements as $value) {
                 return array_shift($replacements);
             }
         }, $subject);

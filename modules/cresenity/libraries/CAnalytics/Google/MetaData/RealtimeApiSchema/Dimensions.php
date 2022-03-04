@@ -16,7 +16,7 @@
  * @method string unifiedScreenName()
  */
 class CAnalytics_Google_MetaData_RealtimeApiSchema_Dimensions {
-    public function __callStatic($name, $arguments) {
+    public static function __callStatic($name, $arguments) {
         return $name;
     }
 }
