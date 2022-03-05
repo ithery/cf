@@ -45,6 +45,7 @@ trait CElement_FormInput_SelectSearch_Trait_Select2v23Trait {
 
         $strJsInit = '';
         $selectedRows = $this->getSelectedRow();
+        $selectedData = [];
         if ($selectedRows) {
             foreach ($selectedRows as $index => $selectedRow) {
                 if ($selectedRow != null) {
