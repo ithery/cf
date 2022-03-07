@@ -28,24 +28,30 @@ trait CApp_Concern_ViewElementTrait {
      * @return string
      */
     public function yieldViewElement($key, $default = '') {
-        $renderingElement = self::renderingElement();
-        if ($renderingElement == null) {
-            return $default;
-        }
+        $element = null;
         $output = '';
-        if ($renderingElement instanceof CElement_View) {
-            $element = $renderingElement->viewElement($key);
+        if ($key instanceof Closure) {
+            $element = c::value($key);
+        } else {
+            $renderingElement = self::renderingElement();
+            if ($renderingElement == null) {
+                return $default;
+            }
 
-            if ($element instanceof CRenderable) {
-                $output .= $element->html();
-                $js = $element->js();
-                if (strlen($js) > 0) {
-                    if (!c::app()->isAjax()) {
-                        $js = '<script>' . $js . '</script>';
-                    }
+            if ($renderingElement instanceof CElement_View) {
+                $element = $renderingElement->viewElement($key);
+            }
+        }
 
-                    $this->extendPush('capp-script', $js);
+        if ($element != null && $element instanceof CRenderable) {
+            $output .= $element->html();
+            $js = $element->js();
+            if (strlen($js) > 0) {
+                if (!c::app()->isAjax()) {
+                    $js = '<script>' . $js . '</script>';
                 }
+
+                $this->extendPush('capp-script', $js);
             }
         }
 
