@@ -510,8 +510,8 @@ class c {
     //@codingStandardsIgnoreEnd
 
     /**
-     * @param null|string $key
-     * @param null|mixed  $default
+     * @param null|array|string $key
+     * @param null|mixed        $default
      *
      * @return CSession_Store|mixed
      */
