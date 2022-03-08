@@ -1,15 +1,6 @@
 <?php
 
-defined('SYSPATH') or die('No direct access allowed.');
-
-/**
- * @author Hery Kurniawan
- * @license Ittron Global Teknologi <ittron.co.id>
- *
- * @since Apr 14, 2019, 3:38:20 PM
- * @deprecated 1.3 dont use anymore
- */
-class CJavascript_Validation_Remote {
+class CJavascript_Validation_Remote_Validator {
     use CJavascript_Validation_Trait_AccessProtectedTrait,
         CJavascript_Validation_Trait_RuleListTrait;
 
@@ -19,71 +10,64 @@ class CJavascript_Validation_Remote {
     const EXTENSION_NAME = 'jsvalidation';
 
     /**
-     * @var CValidation_Validator
+     * @var \CValidation_Validator
      */
     protected $validator;
 
     /**
-     * @var string
+     * Whether to escape validation messages.
+     *
+     * @var bool
      */
-    protected $field;
-
-    /**
-     * @var array
-     */
-    protected $data;
+    protected $escape;
 
     /**
      * RemoteValidator constructor.
      *
-     * @param array $validationData
+     * @param \CValidation_Validator $validator
+     * @param bool                   $escape
      */
-    public function __construct(array $data, array $rules, array $messages = [], array $customAttributes = []) {
-        $this->field = '_jsvalidation';
-        $this->data = $data;
-        $validateAll = carr::get($data, $this->field . '_validate_all', false);
-        $validationRule = 'bail|' . static::EXTENSION_NAME . ':' . $validateAll;
-        $rules = [$this->field => $validationRule] + $rules;
-
-        $this->validator = new CValidation_Validator($data, $rules, $messages, $customAttributes);
+    public function __construct(CValidation_Validator $validator, $escape = false) {
+        $this->validator = $validator;
+        $this->escape = $escape;
     }
 
     /**
      * Validate request.
      *
+     * @param $field
      * @param $parameters
      *
-     * @throws CValidation_Exception
+     * @throws \CValidation_Exception
      *
      * @return void
      */
-    public function validate($parameters = []) {
-        $field = carr::get($this->data, $this->field);
+    public function validate($field, $parameters = []) {
         $attribute = $this->parseAttributeName($field);
-
         $validationParams = $this->parseParameters($parameters);
-
         $validationResult = $this->validateJsRemoteRequest($attribute, $validationParams);
 
-        return $validationResult;
+        $this->throwValidationException($validationResult, $this->validator);
     }
 
     /**
      * Throw the failed validation exception.
      *
      * @param mixed                 $result
-     * @param CValidation_Validator $validator
+     * @param \Calidation_Validator $validator
      *
-     * @throws \Illuminate\Validation\ValidationException|\Illuminate\Http\Exceptions\HttpResponseException
+     * @throws \CValidation_Exception|\CHTTP_Exception_ResponseException
      *
      * @return void
      */
     protected function throwValidationException($result, $validator) {
-        if ($result === true) {
-            echo json_encode($result);
-        } else {
-            echo $validator->errors()->first();
+        $response = new CHTTP_JsonResponse($result, 200);
+
+        if ($result !== true && class_exists(CValidation_Exception::class)) {
+            throw new CValidation_Exception($validator, $response);
         }
+
+        throw new CHTTP_Exception_ResponseException($response);
     }
 
     /**
@@ -133,7 +117,15 @@ class CJavascript_Validation_Remote {
             return true;
         }
 
-        return $validator->messages()->get($attribute);
+        $messages = $validator->messages()->get($attribute);
+
+        if ($this->escape) {
+            foreach ($messages as $key => $value) {
+                $messages[$key] = c::e($value);
+            }
+        }
+
+        return $messages;
     }
 
     /**
@@ -163,7 +155,7 @@ class CJavascript_Validation_Remote {
      * Remove rules that should not be validated remotely.
      *
      * @param $rules
-     * @param BaseValidator $validator
+     * @param CValidation_Validator $validator
      *
      * @return mixed
      */
@@ -171,7 +163,7 @@ class CJavascript_Validation_Remote {
         $protectedValidator = $this->createProtectedCaller($validator);
 
         foreach ($rules as $i => $rule) {
-            $parsedRule = CValidation_RuleParser::parse([$rule]);
+            $parsedRule = CValidation_RuleParser::parse($rule);
             if (!$this->isRemoteRule($parsedRule[0])) {
                 unset($rules[$i]);
             }

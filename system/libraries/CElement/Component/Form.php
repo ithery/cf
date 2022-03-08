@@ -2,6 +2,7 @@
 
 class CElement_Component_Form extends CElement_Component {
     use CTrait_Compat_Element_Form;
+
     protected $name;
 
     protected $method;
@@ -189,7 +190,21 @@ class CElement_Component_Form extends CElement_Component {
         if (is_array($validationData)) {
             $this->validation = false;
             CManager::asset()->module()->registerRunTimeModules('validate');
+
+            /**
+             * @see CAjax_Engine_Validation
+             */
             $this->validation = new CElement_Component_Form_Validation($validationData);
+            //prepare ValidationData
+            foreach ($validationData as $key => $rules) {
+                if (is_array($rules)) {
+                    foreach ($rules as $ruleIndex => $ruleValue) {
+                        if ($ruleValue instanceof Closure) {
+                            $validationData[$key][$ruleIndex] = new \Opis\Closure\SerializableClosure($ruleValue);
+                        }
+                    }
+                }
+            }
 
             $ajaxMethod = CAjax::createMethod();
             $ajaxMethod->setType('Validation');
@@ -299,21 +314,21 @@ class CElement_Component_Form extends CElement_Component {
             }
         }
         if ($this->ajax_submit) {
-            $ajax_url = '';
+            $ajaxUrl = '';
 
-            $redirect_url = $this->ajax_redirect_url;
-            $ajax_url = $this->action;
-            if (strlen($redirect_url) == 0) {
+            $redirectUrl = $this->ajax_redirect_url;
+            $ajaxUrl = $this->action;
+            if (strlen($redirectUrl) == 0) {
                 //ajax to this page
-                $ajax_url = curl::base() . CFRouter::getCompleteUri();
+                $ajaxUrl = c::request()->fullUrl();
             }
-            if (strlen($redirect_url) == 0) {
+            if (strlen($redirectUrl) == 0) {
                 //redirect to this page
-                $redirect_url = curl::base() . CFRouter::getCompleteUri();
+                $redirectUrl = c::request()->fullUrl();
             }
             $script_redirect_url = '';
             if ($this->ajax_redirect) {
-                $script_redirect_url = "document.location.href = '" . $redirect_url . "';";
+                $script_redirect_url = "document.location.href = '" . $redirectUrl . "';";
             }
             $script_callback = '';
             if ($this->ajax_redirect) {
@@ -456,7 +471,7 @@ class CElement_Component_Form extends CElement_Component {
 
 
 						var form_ajax_url = $('#" . $this->id . "').attr('action');
-						if(!form_ajax_url) form_ajax_url = '" . $ajax_url . "';
+						if(!form_ajax_url) form_ajax_url = '" . $ajaxUrl . "';
 						var options = {
 							url: form_ajax_url,
 							dataType: '" . $this->ajax_datatype . "',
