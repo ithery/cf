@@ -21,15 +21,15 @@ class CAjax_Engine_SelectSearch_Processor_Query extends CAjax_Engine_SelectSearc
         $page = $this->page();
 
         $base_q = $q;
-        $pos_order_by = strpos(strtolower($base_q), 'order by', strpos(strtolower($base_q), 'from'));
+        $posOrderBy = strpos(strtolower($base_q), 'order by', strpos(strtolower($base_q), 'from'));
 
-        $pos_last_kurung = strrpos(strtolower($base_q), ')');
+        $posLastBracket = strrpos(strtolower($base_q), ')');
 
-        $temp_order_by = '';
-        if ($pos_order_by > $pos_last_kurung) {
-            if ($pos_order_by !== false) {
-                $temp_order_by = substr($base_q, $pos_order_by, strlen($base_q) - $pos_order_by);
-                $base_q = substr($base_q, 0, $pos_order_by);
+        $tempOrderBy = '';
+        if ($posOrderBy > $posLastBracket) {
+            if ($posOrderBy !== false) {
+                $tempOrderBy = substr($base_q, $posOrderBy, strlen($base_q) - $posOrderBy);
+                $base_q = substr($base_q, 0, $posOrderBy);
             }
         }
 
@@ -91,28 +91,28 @@ class CAjax_Engine_SelectSearch_Processor_Query extends CAjax_Engine_SelectSearc
 
         if (strlen($sOrder) > 0) {
             $sOrder = ' ORDER BY ' . $sOrder;
-            $temp_order_by = '';
+            $tempOrderBy = '';
         }
 
-        if (strlen($temp_order_by) > 0) {
-            $sub = explode(',', substr($temp_order_by, 9));
-            $temp_order_by = '';
+        if (strlen($tempOrderBy) > 0) {
+            $sub = explode(',', substr($tempOrderBy, 9));
+            $tempOrderBy = '';
             foreach ($sub as $val) {
                 $kata = explode('.', $val);
                 if (isset($kata[1])) {
-                    $temp_order_by .= ', ' . $kata[1];
+                    $tempOrderBy .= ', ' . $kata[1];
                 } else {
-                    $temp_order_by .= ', ' . $kata[0];
+                    $tempOrderBy .= ', ' . $kata[0];
                 }
             }
-            $temp_order_by = substr($temp_order_by, 2);
-            $temp_order_by = 'ORDER BY ' . $temp_order_by;
+            $tempOrderBy = substr($tempOrderBy, 2);
+            $tempOrderBy = 'ORDER BY ' . $tempOrderBy;
         }
 
         $qfilter = 'select * from (' . $base_q . ') as a ' . $sWhere . ' ' . $sOrder;
         $total = cdbutils::get_row_count_from_base_query($qfilter);
 
-        $qfilter .= ' ' . $temp_order_by . ' ' . $sLimit;
+        $qfilter .= ' ' . $tempOrderBy . ' ' . $sLimit;
 
         $r = $db->query($qfilter);
 
