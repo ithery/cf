@@ -61,4 +61,8 @@ trait CBase_Trait_UtilsTrait {
     public static function formatDate($date) {
         return c::formatter()->formatDate($date);
     }
+
+    public static function formatDatetime($date) {
+        return c::formatter()->formatDatetime($date);
+    }
 }
