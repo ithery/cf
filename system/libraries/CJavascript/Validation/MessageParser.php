@@ -14,12 +14,21 @@ class CJavascript_Validation_MessageParser {
     use CJavascript_Validation_Trait_UseDelegatedValidatorTrait;
 
     /**
+     * Whether to escape messages using htmlentities.
+     *
+     * @var bool
+     */
+    protected $escape;
+
+    /**
      * Create a new JsValidation instance.
      *
-     * @param \Proengsoft\JsValidation\Support\DelegatedValidator $validator
+     * @param \CJavascript_Validation_ValidatorDelegated $validator
+     * @param bool                                       $escape
      */
-    public function __construct(CJavascript_Validation_ValidatorDelegated $validator) {
+    public function __construct(CJavascript_Validation_ValidatorDelegated $validator, $escape = false) {
         $this->validator = $validator;
+        $this->escape = $escape;
     }
 
     /**
@@ -32,11 +41,13 @@ class CJavascript_Validation_MessageParser {
      * @return mixed
      */
     public function getMessage($attribute, $rule, $parameters) {
+        $attribute = str_replace(CJavascript_Validation::ASTERISK, '*', $attribute);
         $data = $this->fakeValidationData($attribute, $rule, $parameters);
         $message = $this->validator->getMessage($attribute, $rule);
         $message = $this->validator->makeReplacements($message, $attribute, $rule, $parameters);
         $this->validator->setData($data);
-        return $message;
+
+        return $this->escape ? c::e($message) : $message;
     }
 
     /**
@@ -53,6 +64,7 @@ class CJavascript_Validation_MessageParser {
         $data = $this->validator->getData();
         $this->fakeFileData($data, $attribute);
         $this->fakeRequiredIfData($data, $rule, $parameters);
+
         return $data;
     }
 
