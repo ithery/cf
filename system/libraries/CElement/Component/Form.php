@@ -302,7 +302,7 @@ class CElement_Component_Form extends CElement_Component {
         $js = new CStringBuilder();
         $js->setIndent($indent);
         if ($this->validation instanceof CElement_Component_Form_Validation) {
-            $js->append($this->validation->validator()->selector('#' . $this->id()));
+            $js->append($this->validation->validator()->selector('#' . $this->id())->render());
         }
 
         $jsSubmitHandlers = '';
