@@ -22,6 +22,11 @@ class CElement_Component_Form extends CElement_Component {
      */
     protected $validation;
 
+    /**
+     * @var bool
+     */
+    protected $autoFocus;
+
     protected $remoteValidationUrl;
 
     protected $ajax_submit;
@@ -39,8 +44,6 @@ class CElement_Component_Form extends CElement_Component {
     protected $ajax_submit_target;
 
     protected $ajax_submit_target_class;
-
-    protected $auto_set_focus;
 
     protected $action_before_submit;
 
@@ -70,7 +73,7 @@ class CElement_Component_Form extends CElement_Component {
         $this->ajax_submit_handlers = [];
         $this->ajax_submit_target = false;
         $this->ajax_submit_target_class = false;
-        $this->auto_set_focus = true;
+        $this->autoFocus = c::theme('form.autoFocus', true);
         $this->action_before_submit = '';
         $this->disable_js = false;
         $this->validationPromptPosition = 'topRight';
@@ -557,7 +560,7 @@ class CElement_Component_Form extends CElement_Component {
                 ')->br();
         }
 
-        if ($this->auto_set_focus) {
+        if ($this->autoFocus) {
             $js->appendln("
 				$('#" . $this->id . "').find(':input:enabled:visible:first:not(.datepicker)').focus();
 			");
