@@ -5,6 +5,12 @@ class CElement_Component_Form extends CElement_Component {
 
     protected $name;
 
+    /**
+     * HTTP Method when this form is submitted
+     * can override by theme data form.method.
+     *
+     * @var string
+     */
     protected $method;
 
     protected $autocomplete;
@@ -61,7 +67,7 @@ class CElement_Component_Form extends CElement_Component {
         $this->tag = 'form';
 
         $this->name = $this->id;
-        $this->method = 'POST';
+        $this->method = cstr::upper(c::theme('form.method', 'POST'));
         $this->target = '_self';
         $this->layout = 'horizontal';
         $this->action = '';
