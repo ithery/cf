@@ -23,6 +23,9 @@ class CElement_Component_Form extends CElement_Component {
     protected $validation;
 
     /**
+     * Auto Focus on first field when this value is true
+     * can override by theme data form.autoFocus.
+     *
      * @var bool
      */
     protected $autoFocus;
