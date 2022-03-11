@@ -10,9 +10,10 @@ defined('SYSPATH') or die('No direct access allowed.');
  */
 class CAnalytics {
     public static function google($options) {
-        CAnalytics_Google_ClientFactory::validateConfig($options);
-        $client = CAnalytics_Google_ClientFactory::createForConfig($options);
+        return CAnalytics_Google::universalAnalytic($options);
+    }
 
-        return new CAnalytics_Google($client, carr::get($options, 'view_id'));
+    public static function googleGA4($options) {
+        return  CAnalytics_Google::ga4Analytic($options);
     }
 }

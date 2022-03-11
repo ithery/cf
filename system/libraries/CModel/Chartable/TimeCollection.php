@@ -7,7 +7,7 @@ class CModel_Chartable_TimeCollection extends CCollection {
      *
      * @return array
      */
-    public function toChart($name, Closure $closure = null) {
+    public function toChart($name = 'Chart', Closure $closure = null) {
         $closure = $closure ?: static function ($label) {
             return $label;
         };
