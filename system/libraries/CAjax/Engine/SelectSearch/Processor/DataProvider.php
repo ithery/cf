@@ -28,9 +28,25 @@ class CAjax_Engine_SelectSearch_Processor_DataProvider extends CAjax_Engine_Sele
             }
         });
         $data = c::collect($paginationResult->items())->map(function ($model) {
-            return $model->toArray() + [
-                'id' => $model->{$this->keyField()}
-            ];
+            $data = $model->toArray();
+            if ($this->keyField() && !isset($data['id'])) {
+                $data['id'] = $model->{$this->keyField()};
+            }
+
+            $formatResult = $this->formatResult();
+            if ($formatResult instanceof \Opis\Closure\SerializableClosure) {
+                $formatResult = $formatResult->__invoke($model);
+                $data['cappFormatResult'] = $formatResult;
+                $data['cappFormatResultIsHtml'] = c::isHtml($formatResult);
+            }
+            $formatSelection = $this->formatSelection();
+            if ($formatSelection instanceof \Opis\Closure\SerializableClosure) {
+                $formatSelection = $formatSelection->__invoke($model);
+                $data['cappFormatSelection'] = $formatSelection;
+                $data['cappFormatSelectionIsHtml'] = c::isHtml($formatSelection);
+            }
+
+            return $data;
         });
         $total = $paginationResult->total();
 

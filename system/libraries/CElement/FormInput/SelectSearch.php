@@ -24,7 +24,10 @@ class CElement_FormInput_SelectSearch extends CElement_FormInput {
 
     protected $keyField;
 
-    protected $searchField;
+    /**
+     * @var array
+     */
+    protected $searchField = [];
 
     protected $multiple;
 
@@ -53,10 +56,10 @@ class CElement_FormInput_SelectSearch extends CElement_FormInput {
         $this->dropdownClasses = [];
         $this->type = 'selectsearch';
         $this->query = '';
-        $this->formatSelection = '';
-        $this->formatResult = '';
+        $this->formatSelection = null;
+        $this->formatResult = null;
         $this->keyField = '';
-        $this->searchField = '';
+        $this->searchField = [];
         $this->placeholder = 'Search for a item';
         $this->multiple = false;
         $this->autoSelect = false;
@@ -86,6 +89,12 @@ class CElement_FormInput_SelectSearch extends CElement_FormInput {
         return $this->query;
     }
 
+    /**
+     * @param callable $callback
+     * @param string   $require
+     *
+     * @return $this
+     */
     public function setValueCallback(callable $callback, $require = '') {
         $this->valueCallback = $callback;
         if (strlen($require) > 0) {
@@ -95,55 +104,123 @@ class CElement_FormInput_SelectSearch extends CElement_FormInput {
         return $this;
     }
 
+    /**
+     * @param bool $bool
+     *
+     * @return $this
+     */
     public function setMultiple($bool = true) {
         $this->multiple = $bool;
 
         return $this;
     }
 
+    /**
+     * Set delay in miliseconds, default is 100.
+     *
+     * @param int $val
+     *
+     * @return $this
+     */
     public function setDelay($val) {
         $this->delay = $val;
 
         return $this;
     }
 
+    /**
+     * @param bool $bool
+     *
+     * @return $this
+     */
     public function setAutoSelect($bool = true) {
         $this->autoSelect = $bool;
 
         return $this;
     }
 
+    /**
+     * @param int $minInputLength
+     *
+     * @return $this
+     */
     public function setMinInputLength($minInputLength) {
         $this->minInputLength = $minInputLength;
 
         return $this;
     }
 
+    /**
+     * @param string $keyField
+     *
+     * @return $this
+     */
     public function setKeyField($keyField) {
         $this->keyField = $keyField;
 
         return $this;
     }
 
+    /**
+     * @param string|array $searchField
+     *
+     * @return $this
+     */
     public function setSearchField($searchField) {
+        $searchField = carr::wrap($searchField);
         $this->searchField = $searchField;
+
+        if ($this->formatSelection == null) {
+            $this->formatSelection = carr::first($searchField);
+        }
+        if ($this->formatResult == null) {
+            $this->formatResult = carr::first($searchField);
+        }
 
         return $this;
     }
 
+    /**
+     * @param string $query
+     *
+     * @return $this
+     */
     public function setQuery($query) {
         $this->query = $query;
 
         return $this;
     }
 
+    public function setFormat($fmt) {
+        $this->setFormatResult($fmt);
+        $this->setFormatSelection($fmt);
+
+        return $this;
+    }
+
+    /**
+     * @param string|Closure $fmt
+     *
+     * @return $this
+     */
     public function setFormatResult($fmt) {
+        if ($fmt instanceof Closure) {
+            $fmt = new \Opis\Closure\SerializableClosure($fmt);
+        }
         $this->formatResult = $fmt;
 
         return $this;
     }
 
+    /**
+     * @param string|Closure $fmt
+     *
+     * @return $this
+     */
     public function setFormatSelection($fmt) {
+        if ($fmt instanceof Closure) {
+            $fmt = new \Opis\Closure\SerializableClosure($fmt);
+        }
         $this->formatSelection = $fmt;
 
         return $this;
@@ -191,6 +268,8 @@ class CElement_FormInput_SelectSearch extends CElement_FormInput {
         $ajaxMethod->setData('keyField', $this->keyField);
         $ajaxMethod->setData('searchField', $this->searchField);
         $ajaxMethod->setData('valueCallback', $this->valueCallback);
+        $ajaxMethod->setData('formatSelection', serialize($this->formatSelection));
+        $ajaxMethod->setData('formatResult', serialize($this->formatResult));
         $ajaxMethod->setData('dependsOn', serialize($this->dependsOn));
 
         $ajaxUrl = $ajaxMethod->makeUrl();
@@ -199,6 +278,7 @@ class CElement_FormInput_SelectSearch extends CElement_FormInput {
     }
 
     private function generateSelect2Template($template) {
+
         //escape the character
         $template = str_replace("'", "\'", $template);
         preg_match_all("/{([\w]*)}/", $template, $matches, PREG_SET_ORDER);
@@ -314,10 +394,13 @@ class CElement_FormInput_SelectSearch extends CElement_FormInput {
                     }
 
                     $strSelection = $this->formatSelection;
-                    if (strlen($strSelection) == 0) {
-                        $strSelection = '{' . $this->searchField . '}';
+                    if ($strSelection == null) {
+                        $strSelection = '{' . carr::first($this->searchField) . '}';
                     }
-
+                    if ($strSelection instanceof \Opis\Closure\SerializableClosure) {
+                        $strSelection = $strSelection->__invoke($row);
+                    }
+                    $strSelection = c::value($strSelection);
                     $strSelection = str_replace("'", "\'", $strSelection);
                     preg_match_all("/{([\w]*)}/", $strSelection, $matches, PREG_SET_ORDER);
 
@@ -350,23 +433,35 @@ class CElement_FormInput_SelectSearch extends CElement_FormInput {
         $strSelection = $this->formatSelection;
         $strResult = $this->formatResult;
 
-        $strSelection = $this->generateSelect2Template($strSelection);
-        $strResult = $this->generateSelect2Template($strResult);
-
-        if (strlen($strResult) == 0) {
-            $searchFieldText = c::value($this->searchField);
-            if (strlen($searchFieldText) > 0) {
-                $strResult = "'+item." . $searchFieldText . "+'";
-            }
+        if ($strSelection instanceof \Opis\Closure\SerializableClosure) {
+            $strSelection = '';
         }
+
+        if ($strResult instanceof \Opis\Closure\SerializableClosure) {
+            $strResult = '';
+        }
+
+        //dont generate here when closure
+        $strSelection = $this->generateSelect2Template($strSelection);
         if (strlen($strSelection) == 0) {
-            $searchFieldText = c::value($this->searchField);
+            $searchFieldText = c::value(carr::first($this->searchField));
             if (strlen($searchFieldText) > 0) {
                 $strSelection = "'+item." . $searchFieldText . "+'";
             }
         }
 
-        $strResult = preg_replace("/[\r\n]+/", '', $strResult);
+        if (is_string($strResult)) {
+            $strResult = $this->generateSelect2Template($strResult);
+
+            if (strlen($strResult) == 0) {
+                $searchFieldText = c::value(carr::first($this->searchField));
+                if (strlen($searchFieldText) > 0) {
+                    $strResult = "'+item." . $searchFieldText . "+'";
+                }
+            }
+            $strResult = preg_replace("/[\r\n]+/", '', $strResult);
+        }
+
         $placeholder = 'Search for a item';
         if (strlen($this->placeholder) > 0) {
             $placeholder = $this->placeholder;
@@ -409,6 +504,7 @@ class CElement_FormInput_SelectSearch extends CElement_FormInput {
             $strJsInit = '
                 initSelection : function (element, callback) {
                     var data = ' . $rjson . ';
+
                     callback(data);
                 },
             ';
@@ -484,16 +580,37 @@ class CElement_FormInput_SelectSearch extends CElement_FormInput {
                     if (typeof item.loading !== 'undefined') {
                         return item.text;
                     }
+                    if(item.cappFormatResult) {
+                        if(item.cappFormatResultIsHtml) {
+                            return $('<div>' + item.cappFormatResult +'</div>');
+                        } else {
+                            return item.cappFormatResult;
+                        }
+                    }
                     return $('<div>" . $strResult . "</div>');
-                }, // omitted for brevity, see the source of this page
+                },
                 templateSelection: function(item) {
-                    if (item.id === '' || item.selected) {
+                    if(item.selected && item.element) {
+                        let dataContent = $(item.element).attr('data-content');
+                        if(dataContent) {
+                            return $(dataContent);
+                        }
+                    }
+                    if(item.cappFormatSelection) {
+                        if(item.cappFormatSelectionIsHtml) {
+                            return $('<div>' + item.cappFormatSelection +'</div>');
+                        } else {
+                            return item.cappFormatSelection;
+                        }
+                    }
+                    if (item.id === '') {
                         return item.text;
                     }
+
                     else {
                         return $('<div>" . $strSelection . "</div>');
                     }
-                },  // omitted for brevity, see the source of this page
+                },
                 dropdownCssClass: '" . $dropdownClasses . "', // apply css that makes the dropdown taller
                 containerCssClass : 'tpx-select2-container " . $classes . "'
             }).change(function() {
