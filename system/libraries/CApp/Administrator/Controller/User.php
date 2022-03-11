@@ -17,7 +17,10 @@ class CApp_Administrator_Controller_User extends CApp_Administrator_Controller {
         if (!isset($_COOKIE['capp-administrator'])) {
             $app->setViewName('administrator/login');
         }
-
+        CManager::registerModule('jquery.datatable', [
+            'css' => ['administrator/datatables/datatables.css'],
+            'js' => ['administrator/datatables/datatables.js'],
+        ]);
         CManager::instance()->theme()->setThemeCallback(function ($theme) {
             return 'administrator';
         });
