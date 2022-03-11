@@ -30,7 +30,7 @@ if (CF::config('app.mail_error')) {
     });
 }
 
-if (carr::first(explode('/', trim(CFRouter::getUri(), '/'))) == 'administrator') {
+if (carr::first(explode('/', trim(curl::current(), '/'))) == 'administrator') {
     //we adjust the the client modules
     CManager::registerModule('jquery.datatable', [
         'css' => ['administrator/datatables/datatables.css'],
