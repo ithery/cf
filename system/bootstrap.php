@@ -44,12 +44,13 @@ CApp::registerComponent();
 
 CApp::registerControl();
 CFBenchmark::stop('CApp_Bootstrap');
-
-if (CHTTP::request()->cookie('capp-profiler')) {
-    CProfiler::enable();
-}
-if (CHTTP::request()->cookie('capp-debugbar')) {
-    CDebug::bar()->enable();
+if (!CF::isCli()) {
+    if (CHTTP::request()->cookie('capp-profiler')) {
+        CProfiler::enable();
+    }
+    if (CHTTP::request()->cookie('capp-debugbar')) {
+        CDebug::bar()->enable();
+    }
 }
 
 CApp_Auth_Features::setFeatures(CF::config('app.auth.features'));

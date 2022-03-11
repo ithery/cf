@@ -14,6 +14,11 @@ class CSession_Manager {
     protected $drivers = [];
 
     /**
+     * @var CConfig
+     */
+    protected $config;
+
+    /**
      * @var CSession_Manager
      */
     private static $instance;

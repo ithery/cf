@@ -18,18 +18,24 @@ namespace Symfony\Component\Routing;
  * @author Tobias Schultze <http://tobion.de>
  */
 class Route implements \Serializable {
-
     private $path = '/';
+
     private $host = '';
+
     private $schemes = [];
+
     private $methods = [];
+
     private $defaults = [];
+
     private $requirements = [];
+
     private $options = [];
+
     private $condition = '';
 
     /**
-     * @var CompiledRoute|null
+     * @var null|CompiledRoute
      */
     private $compiled;
 
@@ -101,6 +107,8 @@ class Route implements \Serializable {
 
     /**
      * @internal
+     *
+     * @param mixed $serialized
      */
     final public function unserialize($serialized) {
         $this->__unserialize(unserialize($serialized));
@@ -445,7 +453,7 @@ class Route implements \Serializable {
      *
      * @param string $key The key
      *
-     * @return string|null The regex or null when not given
+     * @return null|string The regex or null when not given
      */
     public function getRequirement($key) {
         return isset($this->requirements[$key]) ? $this->requirements[$key] : null;
@@ -505,10 +513,10 @@ class Route implements \Serializable {
     /**
      * Compiles the route.
      *
-     * @return CompiledRoute A CompiledRoute instance
-     *
      * @throws \LogicException If the Route cannot be compiled because the
      *                         path or host pattern is invalid
+     *
+     * @return CompiledRoute A CompiledRoute instance
      *
      * @see RouteCompiler which is responsible for the compilation process
      */
@@ -541,5 +549,4 @@ class Route implements \Serializable {
 
         return $regex;
     }
-
 }

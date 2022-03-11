@@ -62,6 +62,7 @@ trait CTrait_Compat_Element_FormInput_Select {
      */
     public function add_group_list($group, $list) {
         $this->group_list[$group] = $list;
+
         return $this;
     }
 
@@ -80,6 +81,7 @@ trait CTrait_Compat_Element_FormInput_Select {
             }
             $this->dropdown_classes[] = $c;
         }
+
         return $this;
     }
 }

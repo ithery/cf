@@ -109,7 +109,7 @@ class CQueue_Job_RedisJob extends CQueue_AbstractJob {
     /**
      * Get the underlying Redis factory implementation.
      *
-     * @return \Illuminate\Queue\RedisQueue
+     * @return \CQueue_Queue_RedisQueue
      */
     public function getRedisQueue() {
         return $this->redis;

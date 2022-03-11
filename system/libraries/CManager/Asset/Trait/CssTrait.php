@@ -10,26 +10,7 @@ defined('SYSPATH') or die('No direct access allowed.');
  */
 trait CManager_Asset_Trait_CssTrait {
     public function fullpathCssFile($file) {
-        foreach ($this->mediaPaths as $dir) {
-            $path = $dir . 'css' . DS . $file;
-
-            if (file_exists($path)) {
-                return $path;
-            }
-        }
-        $dirs = CF::getDirs('media');
-        $dirs = array_merge($this->mediaPaths, $dirs);
-
-        foreach ($dirs as $dir) {
-            $path = $dir . 'css' . DS . $file;
-
-            if (file_exists($path)) {
-                return $path;
-            }
-        }
-        $path = DOCROOT . 'media' . DS . 'css' . DS;
-
-        return $path . $file;
+        return CManager_Asset_Helper::fullpathCssFile($file, $this->mediaPaths);
     }
 
     public function getAllCssFileUrl() {
@@ -55,15 +36,24 @@ trait CManager_Asset_Trait_CssTrait {
     }
 
     public function registerCssFile($file, $pos = 'head') {
+        $originalFile = $file;
         $fileOptions = $file;
         if (!is_array($fileOptions)) {
             $fileOptions = [
                 'script' => $file,
             ];
         }
-        $fileOptions['type'] = 'js';
+        $fileOptions['type'] = 'css';
         $fileOptions['pos'] = $pos;
         $fileOptions['mediaPaths'] = $this->mediaPaths;
+        $ext = CFile::extension(carr::get($fileOptions, 'script'));
+        if ($ext == 'scss') {
+            $scssCompiler = new CManager_Asset_Compiler_ScssCompiler($this->fullpathCssFile($file));
+            $newPath = $scssCompiler->compile();
+            $fileOptions['script'] = $newPath;
+            $fileOptions['compiled'] = true;
+            $fileOptions['compiledFrom'] = 'scss';
+        }
 
         $this->scripts[$pos]['css_file'][] = new CManager_Asset_File_CssFile($fileOptions);
 

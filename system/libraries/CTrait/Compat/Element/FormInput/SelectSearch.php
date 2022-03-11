@@ -30,16 +30,19 @@ trait CTrait_Compat_Element_FormInput_SelectSearch {
 
     public function set_min_input_length($min_input_length) {
         $this->min_input_length = $min_input_length;
+
         return $this->setMinInputLength($min_input_length);
     }
 
     public function set_key_field($key_field) {
         $this->key_field = $key_field;
+
         return $this->setKeyField($key_field);
     }
 
     public function set_search_field($search_field) {
         $this->search_field = $search_field;
+
         return $this->setSearchField($search_field);
     }
 
@@ -49,11 +52,13 @@ trait CTrait_Compat_Element_FormInput_SelectSearch {
 
     public function set_format_result($fmt) {
         $this->format_result = $fmt;
+
         return $this->setFormatResult($fmt);
     }
 
     public function set_format_selection($fmt) {
         $this->format_selection = $fmt;
+
         return $this->setFormatSelection($fmt);
     }
 
@@ -71,6 +76,7 @@ trait CTrait_Compat_Element_FormInput_SelectSearch {
             }
             $this->dropdown_classes[] = $c;
         }
+
         return $this->addDropdownClass($c);
     }
 

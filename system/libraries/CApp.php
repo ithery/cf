@@ -450,7 +450,7 @@ class CApp implements CInterface_Responsable, CInterface_Renderable, CInterface_
             $orgId = CApp_Base::orgId();
         }
         $roleModel = c::container()->make($this->auth()->getRoleModelClass());
-
+        /** @var CApp_Model_Roles $roleModel */
         $nodes = $roleModel->getDescendantsTree($roleId, $orgId, $type);
         $childList = [];
 
@@ -555,7 +555,7 @@ class CApp implements CInterface_Responsable, CInterface_Renderable, CInterface_
     }
 
     public static function isAdministrator() {
-        return carr::first(explode('/', trim(CFRouter::getUri(), '/'))) == 'administrator';
+        return carr::first(explode('/', trim(curl::current(), '/'))) == 'administrator';
     }
 
     public static function setTheme($theme) {

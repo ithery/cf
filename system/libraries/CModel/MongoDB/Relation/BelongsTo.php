@@ -60,8 +60,8 @@ class CModel_MongoDB_Relation_BelongsTo extends CModel_Relation_BelongsTo {
     /**
      * Get the name of the "where in" method for eager loading.
      *
-     * @param \Illuminate\Database\Eloquent\Model $model
-     * @param string                              $key
+     * @param \CModel $model
+     * @param string  $key
      *
      * @return string
      */

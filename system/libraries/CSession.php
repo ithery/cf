@@ -11,6 +11,7 @@ defined('SYSPATH') or die('No direct access allowed.');
  */
 class CSession {
     use CTrait_Compat_Session;
+
     protected $initialized = false;
 
     /**
@@ -51,7 +52,7 @@ class CSession {
      * @return CSession_Store
      */
     public function store() {
-        return CF::session();
+        return CBase::session();
     }
 
     /**
@@ -75,7 +76,7 @@ class CSession {
         if (!$this->initialized && static::sessionConfigured()) {
             $this->initialized = true;
 
-            return CF::session();
+            return CBase::session();
         }
     }
 

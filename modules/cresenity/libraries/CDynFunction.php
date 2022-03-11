@@ -1,5 +1,9 @@
 <?php
 
+/**
+ * @deprecated 1.3, use CFunction
+ * @see CFunction
+ */
 class CDynFunction {
     use CTrait_Compat_DynFunction;
 
@@ -22,6 +26,7 @@ class CDynFunction {
 
     public function setFunction($cfunc) {
         $this->func = $cfunc;
+
         return $this;
     }
 
@@ -31,16 +36,19 @@ class CDynFunction {
 
     public function addParam($p) {
         $this->params[] = $p;
+
         return $this;
     }
 
     public function addRequire($p) {
         $this->requires[] = $p;
+
         return $this;
     }
 
     public function setRequire($p) {
         $this->requires = $p;
+
         return $this;
     }
 
@@ -110,6 +118,7 @@ class CDynFunction {
             if (!is_string($functionName)) {
                 $functionName = 'Unknown';
             }
+
             throw new CException('function :function is not callable', [':function' => $functionName]);
         }
         //last return this name of function

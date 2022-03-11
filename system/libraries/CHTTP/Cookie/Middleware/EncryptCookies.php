@@ -7,7 +7,7 @@ class CHTTP_Cookie_Middleware_EncryptCookies {
     /**
      * The encrypter instance.
      *
-     * @var \CCrypt_EncrypterInterface
+     * @var \CCrypt_Encrypter
      */
     protected $encrypter;
 
@@ -28,12 +28,10 @@ class CHTTP_Cookie_Middleware_EncryptCookies {
     /**
      * Create a new CookieGuard instance.
      *
-     * @param \CCrypt_EncrypterInterface $encrypter
-     *
      * @return void
      */
-    public function __construct(CCrypt_EncrypterInterface $encrypter) {
-        $this->encrypter = $encrypter;
+    public function __construct() {
+        $this->encrypter = CCrypt::encrypter();
     }
 
     /**
@@ -99,8 +97,8 @@ class CHTTP_Cookie_Middleware_EncryptCookies {
      */
     protected function decryptCookie($name, $cookie) {
         return is_array($cookie)
-            ? $this->decryptArray($cookie)
-            : $this->encrypter->decrypt($cookie, static::serialized($name));
+                        ? $this->decryptArray($cookie)
+                        : $this->encrypter->decrypt($cookie, static::serialized($name));
     }
 
     /**

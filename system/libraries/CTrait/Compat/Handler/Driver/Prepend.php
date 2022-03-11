@@ -11,9 +11,9 @@ defined('SYSPATH') or die('No direct access allowed.');
 // @codingStandardsIgnoreStart
 trait CTrait_Compat_Handler_Driver_Prepend {
     /**
-     * @deprecated, please use setMethod
-     *
      * @param string $method
+     *
+     * @deprecated, please use setMethod
      *
      * @return $this
      */
@@ -22,22 +22,22 @@ trait CTrait_Compat_Handler_Driver_Prepend {
     }
 
     /**
-     * @deprecated, please use addParamInput
-     *
      * @param type $inputs
      *
-     * @return type
+     * @deprecated, please use addParamInput
+     *
+     * @return $this
      */
     public function add_param_input($inputs) {
         return $this->addParamInput($inputs);
     }
 
     /**
-     * @deprecated, please use addParamInputByName
-     *
      * @param type $inputs
      *
-     * @return type
+     * @deprecated, please use addParamInputByName
+     *
+     * @return $this
      */
     public function add_param_input_by_name($inputs) {
         return $this->addParamInputByName($inputs);

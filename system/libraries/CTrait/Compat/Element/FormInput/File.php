@@ -40,6 +40,7 @@ trait CTrait_Compat_Element_FormInput_File {
 
     public function set_resize($resize) {
         $this->resize = $resize;
+
         return $this;
     }
 
@@ -65,21 +66,25 @@ trait CTrait_Compat_Element_FormInput_File {
 
     public function set_paste_zone($paste_zone) {
         $this->paste_zone = $paste_zone;
+
         return $this;
     }
 
     public function set_url($url) {
         $this->url = $url;
+
         return $this;
     }
 
     public function set_max_file_size($max_file_size) {
         $this->max_file_size = $max_file_size;
+
         return $this;
     }
 
     public function set_accept_file_type($accept_file_type) {
         $this->accept_file_type = $accept_file_type;
+
         return $this;
     }
 
@@ -89,6 +94,7 @@ trait CTrait_Compat_Element_FormInput_File {
 
     public function set_callback_drop($callback_drop) {
         $this->callback_drop = $callback_drop;
+
         return $this;
     }
 
@@ -102,11 +108,13 @@ trait CTrait_Compat_Element_FormInput_File {
 
     public function set_before_submit($before_submit) {
         $this->before_submit = $before_submit;
+
         return $this;
     }
 
     public function set_callback_success($callback_success) {
         $this->callback_success = $callback_success;
+
         return $this;
     }
 
@@ -116,6 +124,7 @@ trait CTrait_Compat_Element_FormInput_File {
 
     public function set_callback_progress($callback_progress) {
         $this->callback_progress = $callback_progress;
+
         return $this;
     }
 
@@ -129,11 +138,13 @@ trait CTrait_Compat_Element_FormInput_File {
 
     public function set_drop_zone($drop_zone) {
         $this->drop_zone = $drop_zone;
+
         return $this;
     }
 
     public function set_auto_upload($auto_upload) {
         $this->auto_upload = $auto_upload;
+
         return $this;
     }
 
@@ -143,11 +154,13 @@ trait CTrait_Compat_Element_FormInput_File {
 
     public function set_max_number_of_files($max_number_of_files) {
         $this->max_number_of_files = $max_number_of_files;
+
         return $this;
     }
 
     public function set_input_help($param) {
         $this->input_help = $param;
+
         return $this;
     }
 }

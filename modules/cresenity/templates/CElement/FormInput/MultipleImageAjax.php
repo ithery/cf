@@ -106,12 +106,12 @@ defined('SYSPATH') or die('No direct access allowed.');
     }
 </style>
 
-<div id="container-<?php echo $id ?>" class="container-multi-image-ajax" data-maximum="<?php echo $maximum; ?>" >
-    <input id="<?php echo $id ?>_input_temp" type="file" accept="<?php echo $accept;?>" name="<?php echo $id ?>_input_temp[]" class="multi-image-ajax-input-temp"  style="display:none;">
-    <div id="<?php echo $id ?>_message" class="row alert alert-danger fade in multi-image-ajax-message">
+<div id="container-<?php echo $id; ?>" class="container-multi-image-ajax" data-maximum="<?php echo $maximum; ?>" >
+    <input id="<?php echo $id; ?>_input_temp" type="file" accept="<?php echo $accept;?>" name="<?php echo $id; ?>_input_temp[]" class="multi-image-ajax-input-temp"  style="display:none;">
+    <div id="<?php echo $id; ?>_message" class="row alert alert-danger fade in multi-image-ajax-message">
     </div>
-    <div id="<?php echo $id ?>_description" class="multi-image-ajax-description"><?php echo clang::__('Click or Drop Files On Box Below')?></div>
-    <div id="<?php echo $id ?>" class="row control-fileupload multi-image-ajax">
+    <div id="<?php echo $id; ?>_description" class="multi-image-ajax-description"><?php echo clang::__('Click or Drop Files On Box Below');?></div>
+    <div id="<?php echo $id; ?>" class="row control-fileupload multi-image-ajax">
         <?php foreach ($files as $f):  ?>
             <?php
             $input_name = carr::get($f, 'input_name');
@@ -154,8 +154,8 @@ defined('SYSPATH') or die('No direct access allowed.');
 
     (function ($) {
         $(function () {
-            var haveCropper = <?php echo ($cropper != null) ? 'true' : 'false' ?>;
-            var maxUploadSize = <?= $maxUploadSize ?> * 1024 * 1024;
+            var haveCropper = <?php echo ($cropper != null) ? 'true' : 'false'; ?>;
+            var maxUploadSize = <?php echo $maxUploadSize; ?> * 1024 * 1024;
 
 <?php if ($cropper != null) : ?>
             var cropperWidth = parseFloat('<?php echo $cropper->getCropperWidth(); ?>');
@@ -163,9 +163,9 @@ defined('SYSPATH') or die('No direct access allowed.');
             var cropBoxResizable = <?php echo json_encode($cropper->getCropperResizable()); ?>;
 <?php endif; ?>
             var index = 0;
-            var descriptionElement = $("#container-<?php echo $id ?> .multi-image-ajax-description");
-            $('#container-<?php echo $id ?> .multi-image-ajax-btn-upload').click(function () {
-                $('#container-<?php echo $id ?> .multi-image-ajax-input-temp').trigger("click");
+            var descriptionElement = $("#container-<?php echo $id; ?> .multi-image-ajax-description");
+            $('#container-<?php echo $id; ?> .multi-image-ajax-btn-upload').click(function () {
+                $('#container-<?php echo $id; ?> .multi-image-ajax-input-temp').trigger("click");
             });
             $(this).on({
                 "dragover dragenter": function (e) {
@@ -182,7 +182,7 @@ defined('SYSPATH') or die('No direct access allowed.');
                 e.stopPropagation();
             });
             function fileChanged() {
-                var container = $('#container-<?php echo $id ?>');
+                var container = $('#container-<?php echo $id; ?>');
                 var maximum = parseInt(container.attr('data-maximum'));
                 var fileCount = container.find('.multi-image-ajax-file').length;
                 if (maximum > 0 && fileCount >= maximum) {
@@ -190,13 +190,13 @@ defined('SYSPATH') or die('No direct access allowed.');
                 } else {
                     container.removeClass('disabled');
                 }
-                $("#<?= $id ?>").trigger('change');
+                $("#<?php echo $id; ?>").trigger('change');
             }
             fileChanged();
             // Remove File
             function fileUploadRemove(e) {
 
-                $('#container-<?php echo $id ?> .multi-image-ajax-remove').click(function (e) {
+                $('#container-<?php echo $id; ?> .multi-image-ajax-remove').click(function (e) {
                     e.preventDefault();
                     e.stopPropagation();
 
@@ -206,7 +206,7 @@ defined('SYSPATH') or die('No direct access allowed.');
             }
 
             function insertFile(reader, file, fileList, event) {
-                var haveCropper = <?php echo ($cropper != null) ? 'true' : 'false' ?>;
+                var haveCropper = <?php echo ($cropper != null) ? 'true' : 'false'; ?>;
                 if (haveCropper) {
 
                     reader.onloadend = (function (event) {
@@ -345,8 +345,8 @@ defined('SYSPATH') or die('No direct access allowed.');
 
             fileUploadRemove();
 
-            $("#<?php echo $id ?>").sortable();
-            $("#<?php echo $id ?>").on({
+            $("#<?php echo $id; ?>").sortable();
+            $("#<?php echo $id; ?>").on({
                 "dragover dragenter": function (e) {
                     $(this).addClass("ondrag");
                 },
@@ -355,9 +355,9 @@ defined('SYSPATH') or die('No direct access allowed.');
                 },
                 "drop": function (e) {
                     $(this).removeClass("ondrag");
-                    var container = $('#container-<?php echo $id ?>');
+                    var container = $('#container-<?php echo $id; ?>');
                     if (!container.hasClass('disabled')) {
-                        $("#<?php echo $id ?>").sortable();
+                        $("#<?php echo $id; ?>").sortable();
                         var dataTransfer = e.originalEvent.dataTransfer;
                         if (dataTransfer && dataTransfer.files.length) {
                             dataTransferFiles = dataTransfer.files;
@@ -368,20 +368,20 @@ defined('SYSPATH') or die('No direct access allowed.');
                             }
                             e.preventDefault();
                             e.stopPropagation();
-                            $("#container-<?php echo $id ?> .multi-image-ajax-description").remove();
+                            $("#container-<?php echo $id; ?> .multi-image-ajax-description").remove();
                             $.each(dataTransferFiles, function (i, file) {
                                 var reader = new FileReader();
                                 reader.fileName = file.name;
 
                                 reader.onload = $.proxy(function (file, fileList, event) {
                                     var filesize = event.total;
-                                    var maxUploadSize = <?= $maxUploadSize ?> * 1024 * 1024;
-                                    var limitFile = <?= $limitFile ?>;
-                                    if (limitFile && $("#<?= $id ?>").children().length >= limitFile) {
+                                    var maxUploadSize = <?php echo $maxUploadSize; ?> * 1024 * 1024;
+                                    var limitFile = <?php echo $limitFile; ?>;
+                                    if (limitFile && $("#<?php echo $id; ?>").children().length >= limitFile) {
                                         $.cresenity.message('', '<div class="alert alert-danger text-center"><b>Error:</b> Only ' + limitFile + ' image can be uploaded</div>', 'bootbox');
                                     } else {
                                         if (maxUploadSize && filesize > maxUploadSize) {
-                                            $.cresenity.message('', '<div class="alert alert-danger text-center"><b>Error:</b> Image Size is more than ' + <?= $maxUploadSize ?> + ' MB</div>', 'bootbox');
+                                            $.cresenity.message('', '<div class="alert alert-danger text-center"><b>Error:</b> Image Size is more than ' + <?php echo $maxUploadSize; ?> + ' MB</div>', 'bootbox');
                                         } else {
                                             insertFile(reader, file, fileList, event);
                                         }
@@ -399,7 +399,7 @@ defined('SYSPATH') or die('No direct access allowed.');
 
             // Add Image by Click
             $("#<?php echo $id; ?>").click(function () {
-                var container = $('#container-<?php echo $id ?>');
+                var container = $('#container-<?php echo $id; ?>');
                 if (!container.hasClass('disabled')) {
                     $("#<?php echo $id; ?>_input_temp").trigger("click");
                 }
@@ -413,13 +413,13 @@ defined('SYSPATH') or die('No direct access allowed.');
                     reader.fileName = file.name;
                     reader.onload = $.proxy(function (file, fileList, event) {
                         var filesize = event.total;
-                        var maxUploadSize = <?= $maxUploadSize ?> * 1024 * 1024;
-                        var limitFile = <?= $limitFile ?>;
-                        if (limitFile && $("#<?= $id ?>").children().length >= limitFile) {
+                        var maxUploadSize = <?php echo $maxUploadSize; ?> * 1024 * 1024;
+                        var limitFile = <?php echo $limitFile; ?>;
+                        if (limitFile && $("#<?php echo $id; ?>").children().length >= limitFile) {
                             $.cresenity.message('', '<div class="alert alert-danger text-center"><b>Error:</b> Only ' + limitFile + ' image can be uploaded</div>', 'bootbox');
                         } else {
                             if (maxUploadSize && filesize > maxUploadSize) {
-                                $.cresenity.message('', '<div class="alert alert-danger text-center"><b>Error:</b> Image Size is more than ' + <?= $maxUploadSize ?> + ' MB</div>', 'bootbox');
+                                $.cresenity.message('', '<div class="alert alert-danger text-center"><b>Error:</b> Image Size is more than ' + <?php echo $maxUploadSize; ?> + ' MB</div>', 'bootbox');
                             } else {
                                 insertFile(reader, file, fileList, event);
                             }

@@ -1,7 +1,7 @@
 <?php
 
 /**
- * @mixin \Illuminate\Database\Eloquent\Builder
+ * @mixin \CModel_Query
  */
 class CModel_Relation_BelongsTo extends CModel_Relation {
     use CModel_Relation_Trait_ComparesRelatedModels;

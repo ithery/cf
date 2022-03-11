@@ -1,7 +1,7 @@
 <?php
 
 /**
- * Description of UtilsTrait
+ * Description of UtilsTrait.
  *
  * @author Hery
  */
@@ -16,15 +16,20 @@ trait CBase_Trait_UtilsTrait {
         if (carr::first($names) == $prefix . $folder) {
             return $name;
         }
+
         return $prefix . $folder . '_' . $name;
     }
 
     public static function formatCurrency($value) {
-        return number_format($value, 2);
+        return c::formatter()->formatCurrency($value);
     }
 
     public static function formatNumber($value) {
-        return number_format($value, 0);
+        return c::formatter()->formatNumber($value);
+    }
+
+    public static function formatDecimal($value) {
+        return c::formatter()->formatDecimal($value);
     }
 
     public static function unformatCurrency($number, $force_number = true, $dec_point = '.', $thousands_sep = ',') {
@@ -36,6 +41,7 @@ trait CBase_Trait_UtilsTrait {
         $type = (strpos($number, $dec_point) === false) ? 'int' : 'float';
         $number = str_replace([$dec_point, $thousands_sep], ['.', ''], $number);
         settype($number, $type);
+
         return $number;
     }
 
@@ -48,10 +54,15 @@ trait CBase_Trait_UtilsTrait {
         $type = (strpos($number, $dec_point) === false) ? 'int' : 'float';
         $number = str_replace([$dec_point, $thousands_sep], ['.', ''], $number);
         settype($number, $type);
+
         return $number;
     }
 
     public static function formatDate($date) {
-        return ctransform::format_date($date);
+        return c::formatter()->formatDate($date);
+    }
+
+    public static function formatDatetime($date) {
+        return c::formatter()->formatDatetime($date);
     }
 }

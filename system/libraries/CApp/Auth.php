@@ -214,7 +214,7 @@ class CApp_Auth {
     }
 
     public static function loginRateLimiter() {
-        return new CApp_Auth_LoginRateLimiter(new CCache_RateLimiter(CCache::repository()));
+        return new CApp_Auth_LoginRateLimiter(new CCache_RateLimiter(c::cache()->store()));
     }
 
     public function attempt(array $credentials = [], $remember = false) {

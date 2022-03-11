@@ -140,31 +140,10 @@ class curl {
     }
 
     /**
-     * Merges an array of arguments with the current URI and query string to
-     * overload, instead of replace, the current query string.
-     *
-     * @param   array   associative array of arguments
-     *
-     * @return string
-     */
-    public static function merge(array $arguments) {
-        if ($_GET === $arguments) {
-            $query = CFRouter::$query_string;
-        } elseif ($query = http_build_query(array_merge($_GET, $arguments))) {
-            $query = '?' . $query;
-        }
-
-        // Return the current URI with the arguments merged into the query string
-        return CFRouter::$current_uri . $query;
-    }
-
-    /**
      * Convert a phrase to a URL-safe title.
      *
-     * @param   string  phrase to convert
-     * @param   string  word separator (- or _)
-     * @param mixed $title
-     * @param mixed $separator
+     * @param string $title     phrase to convert
+     * @param string $separator word separator (- or _)
      *
      * @return string
      */

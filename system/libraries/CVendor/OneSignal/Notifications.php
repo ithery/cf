@@ -1,10 +1,10 @@
 <?php
 
 class CVendor_OneSignal_Resolver_Notifications {
-
     const NOTIFICATIONS_LIMIT = 50;
 
     protected $api;
+
     private $resolverFactory;
 
     public function __construct(CVendor_OneSignal $api, CVendor_OneSignal_Resolver_ResolverFactory $resolverFactory) {
@@ -25,7 +25,7 @@ class CVendor_OneSignal_Resolver_Notifications {
         $url = '/notifications/' . $id . '?app_id=' . $this->api->getConfig()->getApplicationId();
 
         return $this->api->request('GET', $url, [
-                    'Authorization' => 'Basic ' . $this->api->getConfig()->getApplicationAuthKey(),
+            'Authorization' => 'Basic ' . $this->api->getConfig()->getApplicationAuthKey(),
         ]);
     }
 
@@ -47,7 +47,7 @@ class CVendor_OneSignal_Resolver_Notifications {
         ];
 
         return $this->api->request('GET', '/notifications?' . http_build_query($query), [
-                    'Authorization' => 'Basic ' . $this->api->getConfig()->getApplicationAuthKey(),
+            'Authorization' => 'Basic ' . $this->api->getConfig()->getApplicationAuthKey(),
         ]);
     }
 
@@ -64,8 +64,8 @@ class CVendor_OneSignal_Resolver_Notifications {
         $data = $this->resolverFactory->createNotificationResolver()->resolve($data);
 
         return $this->api->request('POST', '/notifications', [
-                    'Authorization' => 'Basic ' . $this->api->getConfig()->getApplicationAuthKey(),
-                        ], json_encode($data));
+            'Authorization' => 'Basic ' . $this->api->getConfig()->getApplicationAuthKey(),
+        ], json_encode($data));
     }
 
     /**
@@ -79,10 +79,10 @@ class CVendor_OneSignal_Resolver_Notifications {
      */
     public function open($id) {
         return $this->api->request('PUT', '/notifications/' . $id, [
-                    'Authorization' => 'Basic ' . $this->api->getConfig()->getApplicationAuthKey(),
-                        ], json_encode([
-                    'app_id' => $this->api->getConfig()->getApplicationId(),
-                    'opened' => true,
+            'Authorization' => 'Basic ' . $this->api->getConfig()->getApplicationAuthKey(),
+        ], json_encode([
+            'app_id' => $this->api->getConfig()->getApplicationId(),
+            'opened' => true,
         ]));
     }
 
@@ -99,8 +99,7 @@ class CVendor_OneSignal_Resolver_Notifications {
         $url = '/notifications/' . $id . '?app_id=' . $this->api->getConfig()->getApplicationId();
 
         return $this->api->request('DELETE', $url, [
-                    'Authorization' => 'Basic ' . $this->api->getConfig()->getApplicationAuthKey(),
+            'Authorization' => 'Basic ' . $this->api->getConfig()->getApplicationAuthKey(),
         ]);
     }
-
 }

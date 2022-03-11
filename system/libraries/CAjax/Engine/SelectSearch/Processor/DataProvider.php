@@ -42,9 +42,12 @@ class CAjax_Engine_SelectSearch_Processor_DataProvider extends CAjax_Engine_Sele
 
     protected function getSearchDataOr() {
         $searchData = [];
-        foreach ($this->searchField() as $field) {
-            if (strlen($field) > 0) {
-                $searchData[$field] = $this->searchTerm();
+        $searchTerm = $this->searchTerm();
+        if (strlen($searchTerm) > 0) {
+            foreach ($this->searchField() as $field) {
+                if (strlen($field) > 0) {
+                    $searchData[$field] = $this->searchTerm();
+                }
             }
         }
 

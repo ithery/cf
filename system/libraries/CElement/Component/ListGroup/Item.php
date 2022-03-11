@@ -10,28 +10,28 @@ defined('SYSPATH') or die('No direct access allowed.');
  */
 class CElement_Component_ListGroup_Item extends CElement_Element {
     /**
-     *  Callback for this item, when not defined will use default renderer
+     *  Callback for this item, when not defined will use default renderer.
      *
      * @var callable
      */
     protected $callback;
 
     /**
-     * Data for this item
+     * Data for this item.
      *
      * @var array
      */
     protected $data;
 
     /**
-     * Index for this item
+     * Index for this item.
      *
      * @var int
      */
     protected $index;
 
     /**
-     *  Path of file to need to be require manually
+     *  Path of file to need to be require manually.
      *
      * @var string
      */
@@ -42,20 +42,23 @@ class CElement_Component_ListGroup_Item extends CElement_Element {
     }
 
     public function setCallback($callback, $require = '') {
-        $this->callback = CHelper::closure()->serializeClosure($callback);
+        $this->callback = c::toSerializableClosure($callback);
         if (strlen($require) > 0) {
             $this->callbackRequire = $require;
         }
+
         return $this;
     }
 
     public function setIndex($index) {
         $this->index = $index;
+
         return $this;
     }
 
     public function setData($data) {
         $this->data = $data;
+
         return $this;
     }
 
@@ -64,11 +67,11 @@ class CElement_Component_ListGroup_Item extends CElement_Element {
         $js = '';
         if ($this->callback != null) {
             $htmlValue = CFunction::factory($this->callback)
-                    ->addArg($this)
-                    ->addArg($this->data)
-                    ->setRequire($this->callbackRequire)
-                    ->execute();
-            if (is_array($htmlValue) && isset($htmlValue['html']) && isset($htmlValue['js'])) {
+                ->addArg($this)
+                ->addArg($this->data)
+                ->setRequire($this->callbackRequire)
+                ->execute();
+            if (is_array($htmlValue) && isset($htmlValue['html'], $htmlValue['js'])) {
                 $js .= $htmlValue['js'];
                 $htmlValue = $htmlValue['html'];
             }

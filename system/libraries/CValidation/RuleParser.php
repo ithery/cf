@@ -193,7 +193,7 @@ class CValidation_RuleParser {
      * @return array
      */
     public static function parse($rules) {
-        if ($rules instanceof CValidation_RuleInterface) {
+        if ($rules instanceof CValidation_RuleInterface || $rules instanceof CValidation_NestedRules) {
             return [$rules, []];
         }
 

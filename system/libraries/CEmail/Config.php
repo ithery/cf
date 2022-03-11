@@ -53,6 +53,7 @@ class CEmail_Config {
 
     public function __construct($options = []) {
         $options = $this->reformatOptions($options);
+
         $this->options = $options;
         $this->driver = carr::get($options, 'driver');
         $this->username = carr::get($options, 'username');
@@ -66,6 +67,7 @@ class CEmail_Config {
         $config = $this->mergeWithDefaultConfig($config);
 
         $isLegacyOptions = !carr::get($config, 'driver');
+
         $newConfig = $config;
         if ($isLegacyOptions) {
             $smtpHost = carr::get($config, 'host', carr::get($config, 'smtp_host'));
@@ -80,10 +82,10 @@ class CEmail_Config {
             $newConfig['password'] = carr::get($config, 'password', carr::get($config, 'smtp_password'));
             $newConfig['from'] = carr::get($config, 'from', carr::get($config, 'smtp_from'));
             $newConfig['from_name'] = carr::get($config, 'from_name', carr::get($config, 'smtp_from_name'));
+            $newConfig['secure'] = carr::get($config, 'secure', carr::get($config, 'smtp_secure'));
             if ($driver == 'smtp') {
                 $newConfig['host'] = carr::get($config, 'host', carr::get($config, 'smtp_host'));
                 $newConfig['port'] = carr::get($config, 'port', carr::get($config, 'smtp_port'));
-                $newConfig['secure'] = carr::get($config, 'secure', carr::get($config, 'smtp_secure'));
             }
         }
 
@@ -109,7 +111,7 @@ class CEmail_Config {
         }
 
         if (!isset($config['secure']) || c::blank($config['secure'])) {
-            $config['secure'] = carr::get($config, 'smtp_secure', CF::config('app.email.secure', CF::config('app.smtp_secure')));
+            $config['secure'] = carr::get($config, 'smtp_secure', CF::config('app.email.secure', CF::config('app.smtp_secure')), 'tls');
         }
 
         return $config;
