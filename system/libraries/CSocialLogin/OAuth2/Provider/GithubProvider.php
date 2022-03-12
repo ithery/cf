@@ -34,12 +34,15 @@ class CSocialLogin_OAuth2_Provider_GithubProvider extends CSocialLogin_OAuth2_Ab
      * @inheritdoc
      */
     protected function getUserByToken($token) {
-        $userUrl = 'https://api.github.com/user?access_token=' . $token;
+        $userUrl = 'https://api.github.com/user';
+
         $response = $this->getHttpClient()->get(
             $userUrl,
-            $this->getRequestOptions()
+            $this->getRequestOptions($token)
         );
+
         $user = json_decode($response->getBody(), true);
+
         if (in_array('user:email', $this->scopes)) {
             $user['email'] = $this->getEmailByToken($token);
         }
@@ -55,16 +58,17 @@ class CSocialLogin_OAuth2_Provider_GithubProvider extends CSocialLogin_OAuth2_Ab
      * @return null|string
      */
     protected function getEmailByToken($token) {
-        $emailsUrl = 'https://api.github.com/user/emails?access_token=' . $token;
+        $emailsUrl = 'https://api.github.com/user/emails';
 
         try {
             $response = $this->getHttpClient()->get(
                 $emailsUrl,
-                $this->getRequestOptions()
+                $this->getRequestOptions($token)
             );
         } catch (Exception $e) {
             return;
         }
+
         foreach (json_decode($response->getBody(), true) as $email) {
             if ($email['primary'] && $email['verified']) {
                 return $email['email'];
@@ -88,12 +92,15 @@ class CSocialLogin_OAuth2_Provider_GithubProvider extends CSocialLogin_OAuth2_Ab
     /**
      * Get the default options for an HTTP request.
      *
+     * @param string $token
+     *
      * @return array
      */
-    protected function getRequestOptions() {
+    protected function getRequestOptions($token) {
         return [
             'headers' => [
                 'Accept' => 'application/vnd.github.v3+json',
+                'Authorization' => 'token ' . $token,
             ],
         ];
     }
