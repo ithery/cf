@@ -171,10 +171,10 @@ class CElement_FormInput_SelectSearch extends CElement_FormInput {
         $this->searchField = $searchField;
 
         if ($this->formatSelection == null) {
-            $this->formatSelection = carr::first($searchField);
+            $this->formatSelection = '{' . carr::first($searchField) . '}';
         }
         if ($this->formatResult == null) {
-            $this->formatResult = carr::first($searchField);
+            $this->formatResult = '{' . carr::first($searchField) . '}';
         }
 
         return $this;
@@ -476,6 +476,7 @@ class CElement_FormInput_SelectSearch extends CElement_FormInput {
         if ($this->value !== null) {
             $value = $this->value;
         }
+
         $selectedRows = $this->getSelectedRow();
         $selectedData = [];
         if ($selectedRows) {

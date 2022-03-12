@@ -23,7 +23,9 @@ class CAjax_Engine_SelectSearch_Processor_DataProvider extends CAjax_Engine_Sele
         $paginationResult = $dataProvider->paginate($this->parameter->pageSize(), ['*'], 'page', $this->parameter->page(), function ($q) use ($dependsOn) {
             foreach ($dependsOn as $key => $dependOn) {
                 $resolver = $dependOn->getResolver();
+
                 $value = carr::get($this->input, 'dependsOn_' . $key);
+
                 $this->engine->invokeCallback($resolver, [$q, $value]);
             }
         });
