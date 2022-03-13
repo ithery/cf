@@ -123,8 +123,12 @@ class CApp_Formatter {
         return date('Y-m-d H:i:s', strtotime($x));
     }
 
-    public function formatCurrency($x) {
-        $x = number_format($x, $this->currencyDecimalDigit, $this->decimalSeparator, $this->thousandSeparator);
+    public function formatCurrency($x, $decimalDigit = null) {
+        if ($decimalDigit == null) {
+            $decimalDigit = $this->decimalDigit;
+        }
+
+        $x = number_format($x, $decimalDigit, $this->decimalSeparator, $this->thousandSeparator);
 
         return $this->currencyPrefix . $x . $this->currencySuffix;
     }
@@ -133,8 +137,12 @@ class CApp_Formatter {
         return number_format($x, 0, $this->decimalSeparator, $this->thousandSeparator);
     }
 
-    public function formatDecimal($x) {
-        return number_format($x, $this->decimalDigit, $this->decimalSeparator, $this->thousandSeparator);
+    public function formatDecimal($x, $decimalDigit = null) {
+        if ($decimalDigit == null) {
+            $decimalDigit = $this->decimalDigit;
+        }
+
+        return number_format($x, $decimalDigit, $this->decimalSeparator, $this->thousandSeparator);
     }
 
     public function unformatCurrency($number) {

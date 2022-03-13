@@ -1527,6 +1527,10 @@ class c {
 
         return $callback;
     }
+
+    public static function isHtml($string) {
+        return preg_match('/<[^<]+>/', $string, $m) != 0;
+    }
 }
 
 // End c

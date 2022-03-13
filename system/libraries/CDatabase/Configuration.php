@@ -9,7 +9,7 @@ defined('SYSPATH') or die('No direct access allowed.');
   * @since Aug 18, 2018, 10:43:47 AM
   */
 
- use \Doctrine\Common\Cache\Cache;
+ use Doctrine\Common\Cache\Cache;
 
 /**
  * Configuration container for the CDatabase.
@@ -26,7 +26,7 @@ class CDatabase_Configuration {
     /**
      * Sets the SQL logger to use. Defaults to NULL which means SQL logging is disabled.
      *
-     * @param CDatabase_Logger|null $logger
+     * @param null|CDatabase_Logger $logger
      *
      * @return void
      */
@@ -37,7 +37,7 @@ class CDatabase_Configuration {
     /**
      * Gets the SQL logger that is used.
      *
-     * @return \Doctrine\DBAL\Logging\SQLLogger|null
+     * @return null|\Doctrine\DBAL\Logging\SQLLogger
      */
     public function getSQLLogger() {
         return isset($this->_attributes['sqlLogger']) ? $this->_attributes['sqlLogger'] : null;
@@ -46,7 +46,7 @@ class CDatabase_Configuration {
     /**
      * Gets the cache driver implementation that is used for query result caching.
      *
-     * @return \Doctrine\Common\Cache\Cache|null
+     * @return null|\Doctrine\Common\Cache\Cache
      */
     public function getResultCacheImpl() {
         return isset($this->_attributes['resultCacheImpl']) ? $this->_attributes['resultCacheImpl'] : null;
@@ -81,7 +81,7 @@ class CDatabase_Configuration {
     /**
      * Returns filter schema assets expression.
      *
-     * @return string|null
+     * @return null|string
      */
     public function getFilterSchemaAssetsExpression() {
         return isset($this->_attributes['filterSchemaAssetsExpression']) ? $this->_attributes['filterSchemaAssetsExpression'] : null;

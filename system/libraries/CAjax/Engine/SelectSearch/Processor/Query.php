@@ -5,9 +5,9 @@ class CAjax_Engine_SelectSearch_Processor_Query extends CAjax_Engine_SelectSearc
         $q = $this->query();
 
         $valueCallbackFunction = carr::get($this->data, 'valueCallback', null);
-        $key_field = $this->keyField();
+        $keyField = $this->keyField();
 
-        $search_field = $this->searchField();
+        $searchField = $this->searchField();
 
         $db = CDatabase::instance();
 
@@ -65,22 +65,22 @@ class CAjax_Engine_SelectSearch_Processor_Query extends CAjax_Engine_SelectSearc
          */
 
         $sWhere = '';
-        if (strlen($term) > 0 && (!empty($search_field))) {
+        if (strlen($term) > 0 && (!empty($searchField))) {
             $sWhere = 'WHERE (';
-            if (is_array($search_field)) {
-                foreach ($search_field as $f) {
+            if (is_array($searchField)) {
+                foreach ($searchField as $f) {
                     $sWhere .= '`' . $f . "` LIKE '%" . $db->escapeLike($term) . "%' OR ";
                 }
             } else {
-                $sWhere .= '`' . $search_field . "` LIKE '%" . $db->escapeLike($term) . "%' OR ";
+                $sWhere .= '`' . $searchField . "` LIKE '%" . $db->escapeLike($term) . "%' OR ";
             }
 
             $sWhere = substr_replace($sWhere, '', -3);
             $sWhere .= ')';
 
             //order
-            if (is_array($search_field)) {
-                foreach ($search_field as $f) {
+            if (is_array($searchField)) {
+                foreach ($searchField as $f) {
                     if (strlen($sOrder) > 0) {
                         $sOrder .= ',';
                     }
@@ -126,8 +126,21 @@ class CAjax_Engine_SelectSearch_Processor_Query extends CAjax_Engine_SelectSearc
                 }
                 $p[$k] = ($v == null) ? '' : $v;
             }
-            if (strlen($key_field) > 0) {
-                $p['id'] = carr::get($row, $key_field);
+            if (strlen($keyField) > 0 && !isset($p['id'])) {
+                $p['id'] = carr::get($row, $keyField);
+            }
+
+            $formatResult = $this->formatResult();
+            if ($formatResult instanceof \Opis\Closure\SerializableClosure) {
+                $formatResult = $formatResult->__invoke($row);
+                $p['cappFormatResult'] = $formatResult;
+                $p['cappFormatResultIsHtml'] = c::isHtml($formatResult);
+            }
+            $formatSelection = $this->formatSelection();
+            if ($formatSelection instanceof \Opis\Closure\SerializableClosure) {
+                $formatSelection = $formatSelection->__invoke($row);
+                $p['cappFormatSelection'] = $formatSelection;
+                $p['cappFormatSelectionIsHtml'] = c::isHtml($formatSelection);
             }
             //$p["id"]=$row["item_id"];
             $data[] = $p;
