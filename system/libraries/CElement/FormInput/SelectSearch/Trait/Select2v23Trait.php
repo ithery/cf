@@ -110,36 +110,36 @@ trait CElement_FormInput_SelectSearch_Trait_Select2v23Trait {
                 placeholder: '" . $placeholder . "',
                 minimumInputLength: '" . $this->minInputLength . "',
                 ajax: { // instead of writing the function to execute the request we use Select2's convenient helper
-                        url: '" . $ajaxUrl . "',
-                        dataType: 'jsonp',
-                        quietMillis: " . $this->delay . ',
-                        delay: ' . $this->delay . ',
-                        ' . $strMultiple . '
-                        data: function (term,page) {
-                            let result =  {
-                                q: term, // search term
-                                page: page,
-                                limit: 10
-                            };
-                            ' . $additionalRequestDataJs . '
-                            return result;
-                        },
-                        results: function (data, page) {
-                            // parse the results into the format expected by Select2
-                            // since we are using custom formatting functions we do not need to
-                            // alter the remote JSON data, except to indicate that infinite
-                            // scrolling can be used
-                            page = page || 1;
-                            var more = (page * 10) < data.total;
-                            return {results: data.data, more: more};
-                        },
-                        cache:true,
-                        error: function (jqXHR, status, error) {
-                            if(cresenity && cresenity.handleAjaxError) {
-                                cresenity.handleAjaxError(jqXHR, status, error);
-                            }
-                        }
+                    url: '" . $ajaxUrl . "',
+                    dataType: 'jsonp',
+                    quietMillis: " . $this->delay . ',
+                    delay: ' . $this->delay . ',
+                    ' . $strMultiple . '
+                    data: function (term,page) {
+                        let result =  {
+                            q: term, // search term
+                            page: page,
+                            limit: 10
+                        };
+                        ' . $additionalRequestDataJs . '
+                        return result;
                     },
+                    results: function (data, page) {
+                        // parse the results into the format expected by Select2
+                        // since we are using custom formatting functions we do not need to
+                        // alter the remote JSON data, except to indicate that infinite
+                        // scrolling can be used
+                        page = page || 1;
+                        var more = (page * 10) < data.total;
+                        return {results: data.data, more: more};
+                    },
+                    cache:true,
+                    error: function (jqXHR, status, error) {
+                        if(cresenity && cresenity.handleAjaxError) {
+                            cresenity.handleAjaxError(jqXHR, status, error);
+                        }
+                    }
+                },
                 ' . $strJsInit . "
                 formatResult: function(item) {
                     if (typeof item.loading !== 'undefined') {
@@ -180,10 +180,11 @@ trait CElement_FormInput_SelectSearch_Trait_Select2v23Trait {
         }
 
         $js = new CStringBuilder();
-        $js->append(parent::jsChild($indent))->br();
+
         $js->setIndent($indent);
         //echo $str;
         $js->append($str)->br();
+        $js->append(parent::jsChild($indent))->br();
         foreach ($this->dependsOn as $index => $dependOn) {
             $dependsOnSelector = $dependOn->getSelector();
             $targetSelector = '#' . $this->id();
