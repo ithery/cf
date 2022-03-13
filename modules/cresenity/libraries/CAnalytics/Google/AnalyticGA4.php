@@ -18,11 +18,12 @@ class CAnalytics_Google_AnalyticGA4 {
      */
     protected $propertyId;
 
-    private $dateRanges = [];
-
-    private $metrics = [];
-
-    private $dimensions = [];
+    /**
+     * Variable cache for predefinedReport.
+     *
+     * @var CAnalytics_Google_AnalyticGA4_PredefinedReport
+     */
+    protected $predefinedReport;
 
     private $report;
 
@@ -112,6 +113,20 @@ class CAnalytics_Google_AnalyticGA4 {
      * @return CAnalytics_Google_AnalyticGA4_PredefinedReport
      */
     public function predefinedReport() {
-        return new CAnalytics_Google_AnalyticGA4_PredefinedReport($this);
+        if ($this->predefinedReport == null) {
+            $this->predefinedReport = new CAnalytics_Google_AnalyticGA4_PredefinedReport($this);
+        }
+
+        return $this->predefinedReport;
+    }
+
+    /**
+     * @param string $measurementId
+     * @param string $apiSecret
+     *
+     * @return CAnalytics_Google_AnalyticGA4_ServerClient
+     */
+    public function createServerClient($measurementId, $apiSecret) {
+        return new CAnalytics_Google_AnalyticGA4_ServerClient($measurementId, $apiSecret);
     }
 }
