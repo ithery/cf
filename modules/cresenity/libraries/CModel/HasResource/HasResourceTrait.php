@@ -226,6 +226,8 @@ trait CModel_HasResource_HasResourceTrait {
      *
      * @param mixed $collectionName
      * @param mixed $conversionName
+     *
+     * @return string
      */
     public function getFirstResourceUrl($collectionName = 'default', $conversionName = '') {
         $resource = $this->getFirstResource($collectionName);
@@ -243,6 +245,8 @@ trait CModel_HasResource_HasResourceTrait {
      *
      * @param mixed $collectionName
      * @param mixed $conversionName
+     *
+     * @return string
      */
     public function getFirstResourceFullUrl($collectionName = 'default', $conversionName = '') {
         $resource = $this->getFirstResource($collectionName);

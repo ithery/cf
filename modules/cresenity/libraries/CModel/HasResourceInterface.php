@@ -63,8 +63,8 @@ interface CModel_HasResourceInterface {
     /**
      * Remove all resource in the given collection except some.
      *
-     * @param string                                          $collectionName
-     * @param \Spatie\ResourceLibrary\Resource[]|\CCollection $excludedResource
+     * @param string                                                 $collectionName
+     * @param \CApp_Model_Interface_ResourceInterface[]|\CCollection $excludedResource
      *
      * @return string $collectionName
      */
@@ -86,14 +86,12 @@ interface CModel_HasResourceInterface {
      */
     public function loadResource($collectionName);
 
-    /*
-     * Add a conversion.
-     */
-
     /**
-     * @param type $name
+     * Add a conversion.
      *
-     * @return Conversion
+     * @param string $name
+     *
+     * @return CResources_Conversion
      */
     public function addResourceConversion($name);
 
