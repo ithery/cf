@@ -2,8 +2,15 @@
 
 class CElement_Component_Form extends CElement_Component {
     use CTrait_Compat_Element_Form;
+
     protected $name;
 
+    /**
+     * HTTP Method when this form is submitted
+     * can override by theme data form.method.
+     *
+     * @var string
+     */
     protected $method;
 
     protected $autocomplete;
@@ -20,6 +27,14 @@ class CElement_Component_Form extends CElement_Component {
      * @var CElement_Component_Form_Validation
      */
     protected $validation;
+
+    /**
+     * Auto Focus on first field when this value is true
+     * can override by theme data form.autoFocus.
+     *
+     * @var bool
+     */
+    protected $autoFocus;
 
     protected $remoteValidationUrl;
 
@@ -39,8 +54,6 @@ class CElement_Component_Form extends CElement_Component {
 
     protected $ajax_submit_target_class;
 
-    protected $auto_set_focus;
-
     protected $action_before_submit;
 
     protected $disable_js;
@@ -54,7 +67,7 @@ class CElement_Component_Form extends CElement_Component {
         $this->tag = 'form';
 
         $this->name = $this->id;
-        $this->method = 'POST';
+        $this->method = cstr::upper(c::theme('form.method', 'POST'));
         $this->target = '_self';
         $this->layout = 'horizontal';
         $this->action = '';
@@ -69,7 +82,7 @@ class CElement_Component_Form extends CElement_Component {
         $this->ajax_submit_handlers = [];
         $this->ajax_submit_target = false;
         $this->ajax_submit_target_class = false;
-        $this->auto_set_focus = true;
+        $this->autoFocus = c::theme('form.autoFocus', true);
         $this->action_before_submit = '';
         $this->disable_js = false;
         $this->validationPromptPosition = 'topRight';
@@ -189,7 +202,21 @@ class CElement_Component_Form extends CElement_Component {
         if (is_array($validationData)) {
             $this->validation = false;
             CManager::asset()->module()->registerRunTimeModules('validate');
+
+            /**
+             * @see CAjax_Engine_Validation
+             */
             $this->validation = new CElement_Component_Form_Validation($validationData);
+            //prepare ValidationData
+            foreach ($validationData as $key => $rules) {
+                if (is_array($rules)) {
+                    foreach ($rules as $ruleIndex => $ruleValue) {
+                        if ($ruleValue instanceof Closure) {
+                            $validationData[$key][$ruleIndex] = new \Opis\Closure\SerializableClosure($ruleValue);
+                        }
+                    }
+                }
+            }
 
             $ajaxMethod = CAjax::createMethod();
             $ajaxMethod->setType('Validation');
@@ -287,7 +314,7 @@ class CElement_Component_Form extends CElement_Component {
         $js = new CStringBuilder();
         $js->setIndent($indent);
         if ($this->validation instanceof CElement_Component_Form_Validation) {
-            $js->append($this->validation->validator()->selector('#' . $this->id()));
+            $js->append($this->validation->validator()->selector('#' . $this->id())->render());
         }
 
         $jsSubmitHandlers = '';
@@ -299,21 +326,21 @@ class CElement_Component_Form extends CElement_Component {
             }
         }
         if ($this->ajax_submit) {
-            $ajax_url = '';
+            $ajaxUrl = '';
 
-            $redirect_url = $this->ajax_redirect_url;
-            $ajax_url = $this->action;
-            if (strlen($redirect_url) == 0) {
+            $redirectUrl = $this->ajax_redirect_url;
+            $ajaxUrl = $this->action;
+            if (strlen($redirectUrl) == 0) {
                 //ajax to this page
-                $ajax_url = curl::base() . CFRouter::getCompleteUri();
+                $ajaxUrl = c::request()->fullUrl();
             }
-            if (strlen($redirect_url) == 0) {
+            if (strlen($redirectUrl) == 0) {
                 //redirect to this page
-                $redirect_url = curl::base() . CFRouter::getCompleteUri();
+                $redirectUrl = c::request()->fullUrl();
             }
             $script_redirect_url = '';
             if ($this->ajax_redirect) {
-                $script_redirect_url = "document.location.href = '" . $redirect_url . "';";
+                $script_redirect_url = "document.location.href = '" . $redirectUrl . "';";
             }
             $script_callback = '';
             if ($this->ajax_redirect) {
@@ -456,7 +483,7 @@ class CElement_Component_Form extends CElement_Component {
 
 
 						var form_ajax_url = $('#" . $this->id . "').attr('action');
-						if(!form_ajax_url) form_ajax_url = '" . $ajax_url . "';
+						if(!form_ajax_url) form_ajax_url = '" . $ajaxUrl . "';
 						var options = {
 							url: form_ajax_url,
 							dataType: '" . $this->ajax_datatype . "',
@@ -542,7 +569,7 @@ class CElement_Component_Form extends CElement_Component {
                 ')->br();
         }
 
-        if ($this->auto_set_focus) {
+        if ($this->autoFocus) {
             $js->appendln("
 				$('#" . $this->id . "').find(':input:enabled:visible:first:not(.datepicker)').focus();
 			");

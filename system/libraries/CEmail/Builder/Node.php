@@ -7,6 +7,11 @@
  * @method CEmail_Builder_Node setPadding($param)
  * @method CEmail_Builder_Node setMargin($param)
  * @method CEmail_Builder_Node setLineHeight($param)
+ * @method CEmail_Builder_Node setWidth($param)
+ * @method CEmail_Builder_Node setTextAlign($param)
+ * @method CEmail_Builder_Node setVerticalAlign($param)
+ * @method CEmail_Builder_Node setBorderColor($param)
+ * @method CEmail_Builder_Node setFontWeight($param)
  */
 class CEmail_Builder_Node {
     use CEmail_Builder_Trait_NodeTrait;

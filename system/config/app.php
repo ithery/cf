@@ -126,6 +126,9 @@ return [
         'thousand_separator' => c::env('FORMAT_THOUSAND_SEPARATOR', ','),
         'decimal_separator' => c::env('FORMAT_DECIMAL_SEPARATOR', '.'),
         'decimal_digit' => c::env('FORMAT_DECIMAL_DIGIT', 0),
+        'currency_decimal_digit' => c::env('FORMAT_CURRENCY_DECIMAL_DIGIT', 0),
+        'currency_prefix' => c::env('FORMAT_CURRENCY_PREFIX', ''),
+        'currency_suffix' => c::env('FORMAT_CURRENCY_SUFFIX', ''),
     ],
 
     'smtp_host' => '', //deprecated

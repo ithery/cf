@@ -22,6 +22,8 @@ class CCache {
     /**
      * @param null|mixed $name
      *
+     * @deprecated since 1.2
+     *
      * @return CCache_Repository
      */
     public static function repository($name = null) {
@@ -61,7 +63,7 @@ class CCache {
         return $options ? $options : $defaultOptions;
     }
 
-    public static function store($name) {
+    public static function store($name = null) {
         return CCache_Manager::instance()->store($name);
     }
 

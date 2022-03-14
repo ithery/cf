@@ -4,7 +4,7 @@ trait CModel_Relation_Trait_ComparesRelatedModels {
     /**
      * Determine if the model is the related instance of the relationship.
      *
-     * @param \CModel|null $model
+     * @param null|\CModel $model
      *
      * @return bool
      */
@@ -18,7 +18,7 @@ trait CModel_Relation_Trait_ComparesRelatedModels {
     /**
      * Determine if the model is not the related instance of the relationship.
      *
-     * @param \Illuminate\Database\Eloquent\Model|null $model
+     * @param null|\CModel $model
      *
      * @return bool
      */

@@ -19,7 +19,7 @@ class CQueue_Event_JobExceptionOccurred {
     /**
      * The job instance.
      *
-     * @var \Illuminate\Contracts\Queue\Job
+     * @var \CQueue_JobInterface
      */
     public $job;
 
@@ -33,9 +33,9 @@ class CQueue_Event_JobExceptionOccurred {
     /**
      * Create a new event instance.
      *
-     * @param string                          $connectionName
-     * @param \Illuminate\Contracts\Queue\Job $job
-     * @param \Exception                      $exception
+     * @param string               $connectionName
+     * @param \CQueue_JobInterface $job
+     * @param \Exception           $exception
      *
      * @return void
      */

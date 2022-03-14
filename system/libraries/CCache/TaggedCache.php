@@ -38,7 +38,7 @@ class CCache_TaggedCache extends CCache_Repository {
      * Store multiple items in the cache for a given number of seconds.
      *
      * @param array    $values
-     * @param int|null $ttl
+     * @param null|int $ttl
      *
      * @return bool
      */
@@ -86,7 +86,7 @@ class CCache_TaggedCache extends CCache_Repository {
     }
 
     /**
-     * {@inheritdoc}
+     * @inheritdoc
      */
     protected function itemKey($key) {
         return $this->taggedItemKey($key);
@@ -117,7 +117,7 @@ class CCache_TaggedCache extends CCache_Repository {
     /**
      * Get the tag set instance.
      *
-     * @return \Illuminate\Cache\TagSet
+     * @return \CCache_TagSet
      */
     public function getTags() {
         return $this->tags;

@@ -30,26 +30,19 @@ if (CF::config('app.mail_error')) {
     });
 }
 
-if (carr::first(explode('/', trim(CFRouter::getUri(), '/'))) == 'administrator') {
-    //we adjust the the client modules
-    CManager::registerModule('jquery.datatable', [
-        'css' => ['administrator/datatables/datatables.css'],
-        'js' => ['administrator/datatables/datatables.js'],
-    ]);
-}
-
-CFBenchmark::start('CApp_Bootstrap');
+CFBenchmark::start('capp:bootstrap');
 CApp::registerBlade();
 CApp::registerComponent();
 
 CApp::registerControl();
-CFBenchmark::stop('CApp_Bootstrap');
-
-if (CHTTP::request()->cookie('capp-profiler')) {
-    CProfiler::enable();
-}
-if (CHTTP::request()->cookie('capp-debugbar')) {
-    CDebug::bar()->enable();
+CFBenchmark::stop('capp:bootstrap');
+if (!CF::isCli()) {
+    if (CHTTP::request()->cookie('capp-profiler')) {
+        CProfiler::enable();
+    }
+    if (CHTTP::request()->cookie('capp-debugbar')) {
+        CDebug::bar()->enable();
+    }
 }
 
 CApp_Auth_Features::setFeatures(CF::config('app.auth.features'));

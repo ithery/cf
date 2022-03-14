@@ -37,16 +37,19 @@ trait CTrait_Compat_Element_FormInput_Checkbox {
 
     public function set_applyjs($applyjs) {
         $this->applyjs = $applyjs;
+
         return $this;
     }
 
     public function set_label_wrap($bool) {
         $this->label_wrap = $bool;
+
         return $this;
     }
 
     public function set_display_inline($bool) {
         $this->display_inline = $bool;
+
         return $this;
     }
 }

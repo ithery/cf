@@ -24,19 +24,40 @@ abstract class CEmail_DriverAbstract implements CEmail_DriverInterface {
         return $this->config;
     }
 
-    protected function formatAddresses(array $items) {
-        $addresses = $this->arrayAddresses($items);
+    public static function formatAddresses(array $items) {
+        $addresses = static::arrayAddresses($items);
+        $return = [];
+        foreach ($addresses as $recipient) {
+            $email = $recipient;
+            $name = '';
+            if (is_array($email)) {
+                $name = carr::get($recipient, 'name');
+                if (strlen($name) > 0) {
+                    $email = $name . '" <' . carr::get($recipient, 'email') . '>';
+                }
+            }
+            $return[] = $email;
+        }
 
-        return implode(', ' . $addresses);
+        return implode(', ', $return);
     }
 
-    protected function arrayAddresses(array $items) {
+    protected static function arrayAddresses(array $items, $emailOnly = false) {
         $addresses = [];
         foreach ($items as $item) {
             $toName = '';
             $email = $item;
             if (is_array($item)) {
-                $email = carr::get($item, 'email', carr::get($item, 'toEmail'));
+                if ($emailOnly) {
+                    $email = carr::get($item, 'email', carr::get($item, 'toEmail'));
+                } else {
+                    $email = [
+                        'email' => carr::get($item, 'email', carr::get($item, 'toEmail')),
+                        'name' => carr::get($item, 'name', carr::get($item, 'toName')),
+
+                    ];
+                    $addresses[] = $email;
+                }
             }
             if (is_string($email) && strlen($email) > 0) {
                 $addresses[] = $email;

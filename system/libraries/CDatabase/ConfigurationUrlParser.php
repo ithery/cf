@@ -31,6 +31,7 @@ class CDatabase_ConfigurationUrlParser {
             return $config;
         }
         $parsedUrl = $this->parseUrl($url);
+
         return array_merge(
             $config,
             $this->getPrimaryOptions($parsedUrl),
@@ -54,8 +55,8 @@ class CDatabase_ConfigurationUrlParser {
             'username' => isset($url['user']) ? $url['user'] : null,
             'password' => isset($url['pass']) ? $url['pass'] : null,
         ], function ($value) {
-                    return !is_null($value);
-                });
+            return !is_null($value);
+        });
     }
 
     /**
@@ -63,13 +64,14 @@ class CDatabase_ConfigurationUrlParser {
      *
      * @param array $url
      *
-     * @return string|null
+     * @return null|string
      */
     protected function getDriver($url) {
         $alias = isset($url['scheme']) ? $url['scheme'] : null;
         if (!$alias) {
             return;
         }
+
         return isset(static::$driverAliases[$alias]) ? static::$driverAliases[$alias] : $alias;
     }
 
@@ -78,10 +80,11 @@ class CDatabase_ConfigurationUrlParser {
      *
      * @param array $url
      *
-     * @return string|null
+     * @return null|string
      */
     protected function getDatabase($url) {
         $path = isset($url['path']) ? $url['path'] : null;
+
         return $path ? substr($path, 1) : null;
     }
 
@@ -99,6 +102,7 @@ class CDatabase_ConfigurationUrlParser {
         }
         $query = [];
         parse_str($queryString, $query);
+
         return $this->parseStringsToNativeTypes($query);
     }
 
@@ -115,6 +119,7 @@ class CDatabase_ConfigurationUrlParser {
         if ($parsedUrl === false) {
             throw new InvalidArgumentException('The database configuration URL is malformed.');
         }
+
         return $this->parseStringsToNativeTypes(
             array_map('rawurldecode', $parsedUrl)
         );
@@ -138,6 +143,7 @@ class CDatabase_ConfigurationUrlParser {
         if (json_last_error() === JSON_ERROR_NONE) {
             return $parsedValue;
         }
+
         return $value;
     }
 

@@ -3,7 +3,7 @@ trait CModel_AccessToken_HasAccessTokenTrait {
     /**
      * The access token the user is using for the current request.
      *
-     * @var \Laravel\Sanctum\Contracts\HasAbilities
+     * @var \CModel_AccessToken_Contract_HasAbilitiesInterface
      */
     protected $accessToken;
 
@@ -23,7 +23,7 @@ trait CModel_AccessToken_HasAccessTokenTrait {
      *
      * @return bool
      */
-    public function tokenCan($ability) {
+    public function accessTokenCan($ability) {
         return $this->accessToken && $this->accessToken->can($ability);
     }
 
@@ -35,7 +35,7 @@ trait CModel_AccessToken_HasAccessTokenTrait {
      *
      * @return \CModel_AccessToken_NewAccessToken
      */
-    public function createToken(string $name, array $abilities = ['*']) {
+    public function createAccessToken(string $name, array $abilities = ['*']) {
         $token = $this->accessToken()->create([
             'name' => $name,
             'token' => hash('sha256', $plainTextToken = cstr::random(40)),

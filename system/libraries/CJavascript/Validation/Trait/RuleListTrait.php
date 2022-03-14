@@ -14,20 +14,22 @@ trait CJavascript_Validation_Trait_RuleListTrait {
      *
      * @var array
      */
-    protected $clientRules = ['Accepted', 'After', 'Alpha', 'AlphaDash',
-        'AlphaNum', 'Array', 'Bail', 'Before', 'Between', 'Boolean', 'Confirmed', 'Date', 'Dimensions',
+    protected $clientRules = [
+        'Accepted', 'After', 'AfterOrEqual', 'Alpha', 'AlphaDash',
+        'AlphaNum', 'Array', 'Bail', 'Before', 'BeforeOrEqual', 'Between', 'Boolean', 'Confirmed', 'Date', 'Dimensions',
         'DateFormat', 'Different', 'Digits', 'DigitsBetween', 'Distinct', 'Email', 'File', 'Filled', 'Image',
         'In', 'InArray', 'Integer', 'Ip', 'Json', 'Max', 'Mimes', 'Mimetypes', 'Min', 'NotIn', 'Nullable',
         'Numeric', 'Regex', 'Required', 'RequiredIf', 'RequiredUnless', 'RequiredWith', 'RequiredWithAll',
         'RequiredWithout', 'RequiredWithoutAll', 'Same', 'Size', 'Sometimes',
-        'String', 'Timezone', 'Url', ];
+        'String', 'Timezone', 'CAppNoop',
+    ];
 
     /**
      * Rules validated in Server-Side.
      *
      * @var array
      */
-    protected $serverRules = ['ActiveUrl', 'Exists', 'Unique'];
+    protected $serverRules = ['ActiveUrl', 'Exists', 'Unique', 'Url'];
 
     /**
      * Rules applyed to files.
@@ -67,6 +69,17 @@ trait CJavascript_Validation_Trait_RuleListTrait {
     }
 
     /**
+     * Form request rule.
+     *
+     * @param string $rule
+     *
+     * @return bool
+     */
+    protected function isFormRequestRule($rule) {
+        return $rule === CJavascript_Validation_RuleParser::FORM_REQUEST_RULE_NAME;
+    }
+
+    /**
      * Check if rule disables rule processing.
      *
      * @param $rule
@@ -86,6 +99,7 @@ trait CJavascript_Validation_Trait_RuleListTrait {
      */
     protected function validationDisabled($rules) {
         $rules = (array) $rules;
+
         return in_array($this->disableJsValidationRule, $rules);
     }
 

@@ -1,7 +1,7 @@
 <?php
 
 /**
- * Description of Runner
+ * Description of Runner.
  *
  * @author Hery
  */
@@ -12,6 +12,7 @@ class CApi_Runner {
         if (static::$instance == null) {
             static::$instance = new CApi_Runner();
         }
+
         return static::$instance;
     }
 

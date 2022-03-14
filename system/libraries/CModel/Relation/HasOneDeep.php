@@ -1,9 +1,5 @@
 <?php
 
-use Illuminate\Database\Eloquent\Model;
-use Illuminate\Database\Eloquent\Collection;
-use Illuminate\Database\Eloquent\Relations\Concerns\SupportsDefaultModels;
-
 class CModel_Relation_HasOneDeep extends CModel_Relation_HasManyDeep {
     use CModel_Relation_Trait_SupportsDefaultModels;
 

@@ -250,7 +250,7 @@ class CModel_Scout_Engine_TNTSearchEngine extends CModel_Scout_EngineAbstract {
      * Return query builder either from given constraints, or as
      * new query. Add where statements to builder when given.
      *
-     * @param \Illuminate\Database\Eloquent\Model $model
+     * @param \CModel $model
      *
      * @return Builder
      */
@@ -272,7 +272,7 @@ class CModel_Scout_Engine_TNTSearchEngine extends CModel_Scout_EngineAbstract {
      *
      * @param mixed $results
      *
-     * @return \Illuminate\Support\Collection
+     * @return \CCollection
      */
     public function mapIds($results) {
         if (empty($results['ids'])) {
@@ -296,9 +296,15 @@ class CModel_Scout_Engine_TNTSearchEngine extends CModel_Scout_EngineAbstract {
     public function initIndex($model) {
         $indexName = $model->searchableAs();
 
+        if (file_exists($this->tnt->config['storage'] . "/{$indexName}.index")) {
+            unlink($this->tnt->config['storage'] . "/{$indexName}.index");
+        }
+
         if (!file_exists($this->tnt->config['storage'] . "/{$indexName}.index")) {
             $indexer = $this->tnt->createIndex("${indexName}.index");
-            $indexer->setDatabaseHandle($model->getConnection()->getPdo());
+            //try to get PDO
+            $pdo = $model->getConnection()->driver()->getPdo();
+            $indexer->setDatabaseHandle($pdo);
             $indexer->setPrimaryKey($model->getKeyName());
         }
     }
@@ -345,7 +351,7 @@ class CModel_Scout_Engine_TNTSearchEngine extends CModel_Scout_EngineAbstract {
     /**
      * Determine if the given model uses soft deletes.
      *
-     * @param \Illuminate\Database\Eloquent\Model $model
+     * @param \CModel $model
      *
      * @return bool
      */
@@ -357,8 +363,8 @@ class CModel_Scout_Engine_TNTSearchEngine extends CModel_Scout_EngineAbstract {
      * Determine if soft delete is active and depending on state return the
      * appropriate builder.
      *
-     * @param Builder                             $builder
-     * @param \Illuminate\Database\Eloquent\Model $model
+     * @param Builder $builder
+     * @param \CModel $model
      *
      * @return Builder
      */
@@ -439,7 +445,7 @@ class CModel_Scout_Engine_TNTSearchEngine extends CModel_Scout_EngineAbstract {
     /**
      * Flush all of the model's records from the engine.
      *
-     * @param \Illuminate\Database\Eloquent\Model $model
+     * @param \CModel $model
      *
      * @return void
      */

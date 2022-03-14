@@ -18,6 +18,15 @@ class CElement_Element_Img extends CElement_Element {
     }
 
     /**
+     * @param string $id
+     *
+     * @return CElement_Element_Img
+     */
+    public static function factory($id = '') {
+        return CElement_Factory::create(static::class, $id);
+    }
+
+    /**
      * Set Attribute src.
      *
      * @param string $src

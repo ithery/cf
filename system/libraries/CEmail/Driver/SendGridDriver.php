@@ -8,6 +8,8 @@ class CEmail_Driver_SendGridDriver extends CEmail_DriverAbstract {
         $fromName = carr::get($options, 'from_name', $this->config->getFromName());
         $attachments = carr::get($options, 'attachments', []);
         $replyTo = carr::get($options, 'replyTo', '');
+        $cc = carr::get($options, 'cc', []);
+        $bcc = carr::get($options, 'bcc', []);
 
         $mail = new CVendor_SendGrid_Mail_Mail();
         $mail->setFrom($from, $fromName);
@@ -30,7 +32,14 @@ class CEmail_Driver_SendGridDriver extends CEmail_DriverAbstract {
         }
         $mail->setSubject($subject);
         $mail->addContent('text/html', $body);
-
+        $cc = carr::wrap($cc);
+        $bcc = carr::wrap($bcc);
+        foreach ($cc as $email) {
+            $mail->addCc($email);
+        }
+        foreach ($bcc as $email) {
+            $mail->addBcc($email);
+        }
         $subjectPreview = carr::get($options, 'subject_preview');
         foreach ($attachments as $att) {
             $disk = '';

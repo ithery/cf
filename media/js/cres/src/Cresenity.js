@@ -970,16 +970,22 @@ export default class Cresenity {
 
     initLiveReload() {
         if(!this.cf.isProduction() && this.cf.config.vscode.liveReload.enable) {
-            try {
+            new Promise((resolve, reject) => {
                 const rsocket = new WebSocket(this.cf.config.vscode.liveReload.protocol + '://' +this.cf.config.vscode.liveReload.host+ ':'+this.cf.config.vscode.liveReload.port+'/', 'reload-protocol');
                 rsocket.onmessage = function (msg) {
                     if (msg.data == 'RELOAD') {
                         location.reload();
                     }
                 };
-            }catch(e) {
+
+                rsocket.onerror = function() {
+                   reject("couldn't connect")
+                }
+            }).catch(function(err) {
                 //do nothing
-            }
+                //console.log("Catch Live Reload handler sees: ", err)
+            });
+
         }
     }
     init() {
@@ -1224,5 +1230,43 @@ export default class Cresenity {
             rect.bottom <= (window.innerHeight || document.documentElement.clientHeight) && /* or $(window).height() */
             rect.right <= (window.innerWidth || document.documentElement.clientWidth) /* or $(window).width() */
         );
+    }
+    tzDate(date = null) {
+
+        // Get local time as ISO string with offset at the end
+        let now = new Date();
+        if(date!==null) {
+            now = date;
+        }
+        const tzo = -now.getTimezoneOffset();
+        const dif = tzo >= 0 ? '+' : '-';
+        const pad = function(num, ms) {
+            var norm = Math.floor(Math.abs(num));
+            if (ms) return (norm < 10 ? '00' : norm < 100 ? '0' : '') + norm;
+            return (norm < 10 ? '0' : '') + norm;
+        };
+        return now.getFullYear()
+            + '-' + pad(now.getMonth()+1)
+            + '-' + pad(now.getDate())
+            + 'T' + pad(now.getHours())
+            + ':' + pad(now.getMinutes())
+            + ':' + pad(now.getSeconds())
+            + '.' + pad(now.getMilliseconds(), true)
+            + dif + pad(tzo / 60)
+            + ':' + pad(tzo % 60);
+
+    }
+    randomGUID() {
+
+        var d = new Date().getTime();
+        if (typeof performance !== 'undefined' && typeof performance.now === 'function'){
+            d += performance.now(); //use high-precision timer if available
+        }
+        return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function (c) {
+            var r = (d + Math.random() * 16) % 16 | 0;
+            d = Math.floor(d / 16);
+            return (c === 'x' ? r : (r & 0x3 | 0x8)).toString(16);
+        });
+
     }
 }

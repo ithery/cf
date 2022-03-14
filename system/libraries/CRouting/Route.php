@@ -141,6 +141,11 @@ class CRouting_Route {
     protected $bindingFields = [];
 
     /**
+     * @var CRouting_RouteData
+     */
+    protected $routeData;
+
+    /**
      * Create a new Route instance.
      *
      * @param array|string   $methods
@@ -316,6 +321,9 @@ class CRouting_Route {
     protected function compileRoute() {
         if (!$this->compiled) {
             $this->compiled = $this->toSymfonyRoute()->compile();
+        }
+        if (!$this->routeData) {
+            $this->routeData = new CRouting_RouteData($this->compiled->getStaticPrefix());
         }
 
         return $this->compiled;
@@ -1158,5 +1166,22 @@ class CRouting_Route {
      */
     public function __get($key) {
         return $this->parameter($key);
+    }
+
+    public function routedUri() {
+        return c::optional($this->routeData)->getRoutedUri();
+    }
+
+    public function setRouteData(CRouting_RouteData $routeData) {
+        $this->routeData = $routeData;
+
+        return $this;
+    }
+
+    /**
+     * @return CRouting_RouteData
+     */
+    public function getRouteData() {
+        return $this->routeData;
     }
 }

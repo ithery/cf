@@ -1,46 +1,46 @@
 <?php
 
-use CVendor_Firebase_Messaging_MessageTarget as MessageTarget;
-use CVendor_Firebase_Messaging_Notification as Notification;
-use CVendor_Firebase_Messaging_MessageData as MessageData;
-use CVendor_Firebase_Messaging_AndroidConfig as AndroidConfig;
 use CVendor_Firebase_Messaging_ApnsConfig as ApnsConfig;
-use CVendor_Firebase_Messaging_WebPushConfig as WebPushConfig;
 use CVendor_Firebase_Messaging_FcmOptions as FcmOptions;
+use CVendor_Firebase_Messaging_MessageData as MessageData;
+use CVendor_Firebase_Messaging_Notification as Notification;
+use CVendor_Firebase_Messaging_AndroidConfig as AndroidConfig;
+use CVendor_Firebase_Messaging_MessageTarget as MessageTarget;
+use CVendor_Firebase_Messaging_WebPushConfig as WebPushConfig;
 
 class CVendor_Firebase_Messaging_CloudMessage implements CVendor_Firebase_Messaging_MessageInterface {
     /**
-     * @var MessageTarget|null
+     * @var null|MessageTarget
      */
     private $target;
 
     /**
-     * @var MessageData|null
+     * @var null|MessageData
      */
     private $data;
 
     /**
-     * @var Notification|null
+     * @var null|Notification
      */
     private $notification;
 
     /**
-     * @var AndroidConfig|null
+     * @var null|AndroidConfig
      */
     private $androidConfig;
 
     /**
-     * @var ApnsConfig|null
+     * @var null|ApnsConfig
      */
     private $apnsConfig;
 
     /**
-     * @var WebPushConfig|null
+     * @var null|WebPushConfig
      */
     private $webPushConfig;
 
     /**
-     * @var FcmOptions|null
+     * @var null|FcmOptions
      */
     private $fcmOptions;
 
@@ -60,6 +60,13 @@ class CVendor_Firebase_Messaging_CloudMessage implements CVendor_Firebase_Messag
     }
 
     /**
+     * @return self
+     */
+    public static function new() {
+        return new self();
+    }
+
+    /**
      * @return static
      */
     public static function create() {
@@ -67,6 +74,48 @@ class CVendor_Firebase_Messaging_CloudMessage implements CVendor_Firebase_Messag
     }
 
     /**
+     * @param array{
+     *     token?: string,
+     *     topic?: string,
+     *     condition?: string,
+     *     data?: MessageData|array<string, string>,
+     *     notification?: Notification|array{
+     *         title?: string,
+     *         body?: string,
+     *         image?: string
+     *     },
+     *     android?: array{
+     *         collapse_key?: string,
+     *         priority?: 'normal'|'high',
+     *         ttl?: string,
+     *         restricted_package_name?: string,
+     *         data?: array<string, string>,
+     *         notification?: array<string, string>,
+     *         fcm_options?: array<string, mixed>,
+     *         direct_boot_ok?: bool
+     *     },
+     *     apns?: ApnsConfig|array{
+     *          headers?: array<string, string>,
+     *          payload?: array<string, mixed>,
+     *          fcm_options?: array{
+     *              analytics_label?: string,
+     *              image?: string
+     *          }
+     *     },
+     *     webpush?: WebPushConfig|array{
+     *         headers?: array<string, string>,
+     *         data?: array<string, string>,
+     *         notification?: array<string, mixed>,
+     *         fcm_options?: array{
+     *             link?: string,
+     *             analytics_label?: string
+     *         }
+     *     },
+     *     fcm_options?: FcmOptions|array{
+     *         analytics_label?: string
+     *     }
+     * } $data
+     *
      * @return static
      */
     public static function fromArray(array $data) {

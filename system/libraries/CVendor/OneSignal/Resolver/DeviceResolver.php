@@ -2,8 +2,7 @@
 
 use Symfony\Component\OptionsResolver\OptionsResolver;
 
-class CVendor_OneSignal_Resolver_DeviceResolver implements CVendor_OneSignal_Resolver_ResolverInterface
-{
+class CVendor_OneSignal_Resolver_DeviceResolver implements CVendor_OneSignal_Resolver_ResolverInterface {
     private $config;
 
     /**
@@ -17,17 +16,15 @@ class CVendor_OneSignal_Resolver_DeviceResolver implements CVendor_OneSignal_Res
      * @param Config $config
      * @param bool   $isNewDevice
      */
-    public function __construct(CVendor_OneSignal_Config $config, $isNewDevice = false)
-    {
+    public function __construct(CVendor_OneSignal_Config $config, $isNewDevice = false) {
         $this->config = $config;
         $this->isNewDevice = $isNewDevice;
     }
 
     /**
-     * {@inheritdoc}
+     * @inheritdoc
      */
-    public function resolve(array $data)
-    {
+    public function resolve(array $data) {
         $resolver = (new OptionsResolver())
             ->setDefined('identifier')
             ->setAllowedTypes('identifier', 'string')
@@ -79,19 +76,19 @@ class CVendor_OneSignal_Resolver_DeviceResolver implements CVendor_OneSignal_Res
                 ->setRequired('device_type')
                 ->setAllowedTypes('device_type', 'int')
                 ->setAllowedValues('device_type', [
-                    Devices::IOS,
-                    Devices::ANDROID,
-                    Devices::AMAZON,
-                    Devices::WINDOWS_PHONE,
-                    Devices::WINDOWS_PHONE_MPNS,
-                    Devices::CHROME_APP,
-                    Devices::CHROME_WEB,
-                    Devices::WINDOWS_PHONE_WNS,
-                    Devices::SAFARI,
-                    Devices::FIREFOX,
-                    Devices::MACOS,
-                    Devices::ALEXA,
-                    Devices::EMAIL,
+                    CVendor_OneSignal_Devices::IOS,
+                    CVendor_OneSignal_Devices::ANDROID,
+                    CVendor_OneSignal_Devices::AMAZON,
+                    CVendor_OneSignal_Devices::WINDOWS_PHONE,
+                    CVendor_OneSignal_Devices::WINDOWS_PHONE_MPNS,
+                    CVendor_OneSignal_Devices::CHROME_APP,
+                    CVendor_OneSignal_Devices::CHROME_WEB,
+                    CVendor_OneSignal_Devices::WINDOWS_PHONE_WNS,
+                    CVendor_OneSignal_Devices::SAFARI,
+                    CVendor_OneSignal_Devices::FIREFOX,
+                    CVendor_OneSignal_Devices::MACOS,
+                    CVendor_OneSignal_Devices::ALEXA,
+                    CVendor_OneSignal_Devices::EMAIL,
                 ]);
         }
 
@@ -101,16 +98,14 @@ class CVendor_OneSignal_Resolver_DeviceResolver implements CVendor_OneSignal_Res
     /**
      * @return bool
      */
-    public function getIsNewDevice()
-    {
+    public function getIsNewDevice() {
         return $this->isNewDevice;
     }
 
     /**
      * @param bool $isNewDevice
      */
-    public function setIsNewDevice($isNewDevice)
-    {
+    public function setIsNewDevice($isNewDevice) {
         $this->isNewDevice = $isNewDevice;
     }
 }

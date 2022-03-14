@@ -1,0 +1,4 @@
+<?php
+
+final class CVendor_Firebase_Auth_Exception_EmailExistsException extends RuntimeException implements CVendor_Firebase_Auth_ExceptionInterface {
+}

@@ -25,6 +25,7 @@ class CBackup_Database_Dumper_MongoDbDumper extends CBackup_Database_AbstractDum
      */
     public function dumpToFile($dumpFile) {
         $this->guardAgainstIncompleteCredentials();
+
         $command = $this->getDumpCommand($dumpFile);
         $process = Process::fromShellCommandline($command, null, null, null, $this->timeout);
         $process->run();
@@ -53,6 +54,7 @@ class CBackup_Database_Dumper_MongoDbDumper extends CBackup_Database_AbstractDum
      */
     public function setCollection($collection) {
         $this->collection = $collection;
+
         return $this;
     }
 
@@ -63,6 +65,7 @@ class CBackup_Database_Dumper_MongoDbDumper extends CBackup_Database_AbstractDum
      */
     public function setAuthenticationDatabase($authenticationDatabase) {
         $this->authenticationDatabase = $authenticationDatabase;
+
         return $this;
     }
 
@@ -98,6 +101,7 @@ class CBackup_Database_Dumper_MongoDbDumper extends CBackup_Database_AbstractDum
         if ($this->authenticationDatabase) {
             $command[] = "--authenticationDatabase {$this->authenticationDatabase}";
         }
+
         return $this->echoToFile(implode(' ', $command), $filename);
     }
 }

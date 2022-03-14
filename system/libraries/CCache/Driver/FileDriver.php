@@ -11,6 +11,7 @@ defined('SYSPATH') or die('No direct access allowed.');
 class CCache_Driver_FileDriver extends CCache_DriverAbstract {
     use CTrait_Helper_InteractsWithTime,
         CCache_Trait_RetrievesMultipleKeys;
+
     protected $engine;
 
     public function __construct($options) {

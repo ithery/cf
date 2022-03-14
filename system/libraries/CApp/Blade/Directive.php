@@ -59,10 +59,12 @@ class CApp_Blade_Directive {
     }
 
     public static function element($expression) {
+        if (cstr::startsWith(trim($expression), 'function')) {
+            return "<?php echo \CApp::instance()->yieldViewElement(" . $expression . '); ?>';
+        }
         $expression = str_replace(['(', ')'], '', $expression);
         $expression = str_replace(['"', '\''], '', $expression);
         $expression = str_replace(',', ' ', $expression);
-
         $renderingElement = CApp::instance()->renderingElement();
 
         if ($renderingElement != null) {

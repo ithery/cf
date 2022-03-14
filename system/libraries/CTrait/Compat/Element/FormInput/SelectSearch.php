@@ -16,64 +16,138 @@ trait CTrait_Compat_Element_FormInput_SelectSearch {
 
     protected $dropdown_classes;
 
-    public function set_multiple($bool) {
+    /**
+     * @param bool $bool
+     *
+     * @deprecated 1.3
+     *
+     * @return $this
+     */
+    public function set_multiple($bool = true) {
         return $this->setMultiple($bool);
     }
 
+    /**
+     * @param int $val
+     *
+     * @deprecated 1.3
+     *
+     * @return $this
+     */
     public function set_delay($val) {
         return $this->setDelay($val);
     }
 
-    public function set_auto_select($bool) {
+    /**
+     * @param bool $bool
+     *
+     * @deprecated 1.3
+     *
+     * @return $this
+     */
+    public function set_auto_select($bool = true) {
         return $this->setAutoSelect($bool);
     }
 
-    public function set_min_input_length($min_input_length) {
-        $this->min_input_length = $min_input_length;
-        return $this->setMinInputLength($min_input_length);
+    /**
+     * @param int $minInputLength
+     *
+     * @deprecated 1.3
+     *
+     * @return $this
+     */
+    public function set_min_input_length($minInputLength) {
+        return $this->setMinInputLength($minInputLength);
     }
 
-    public function set_key_field($key_field) {
-        $this->key_field = $key_field;
-        return $this->setKeyField($key_field);
+    /**
+     * @param string $keyField
+     *
+     * @deprecated 1.3
+     *
+     * @return $this
+     */
+    public function set_key_field($keyField) {
+        return $this->setKeyField($keyField);
     }
 
-    public function set_search_field($search_field) {
-        $this->search_field = $search_field;
-        return $this->setSearchField($search_field);
+    /**
+     * @param array|string $searchField
+     *
+     * @deprecated 1.3
+     *
+     * @return $this
+     */
+    public function set_search_field($searchField) {
+        return $this->setSearchField($searchField);
     }
 
+    /**
+     * @param string $query
+     *
+     * @deprecated 1.3
+     *
+     * @return $this
+     */
     public function set_query($query) {
         return $this->setQuery($query);
     }
 
+    /**
+     * @param string|Closure $fmt
+     *
+     * @deprecated 1.3
+     *
+     * @return $this
+     */
     public function set_format_result($fmt) {
-        $this->format_result = $fmt;
         return $this->setFormatResult($fmt);
     }
 
+    /**
+     * @param string|Closure $fmt
+     *
+     * @deprecated 1.3
+     *
+     * @return $this
+     */
     public function set_format_selection($fmt) {
-        $this->format_selection = $fmt;
         return $this->setFormatSelection($fmt);
     }
 
+    /**
+     * @param string $placeholder
+     *
+     * @deprecated 1.3
+     *
+     * @return $this
+     */
     public function set_placeholder($placeholder) {
         return $this->setPlaceholder($placeholder);
     }
 
+    /**
+     * @param string|array $c
+     *
+     * @deprecated 1.3
+     *
+     * @return $this
+     */
     public function add_dropdown_class($c) {
         if (is_array($c)) {
             $this->dropdown_classes = array_merge($c, $this->dropdown_classes);
         } else {
-            if ($this->bootstrap == '3.3') {
-                $c = str_replace('span', 'col-md-', $c);
-                $c = str_replace('row-fluid', 'row', $c);
-            }
             $this->dropdown_classes[] = $c;
         }
+
         return $this->addDropdownClass($c);
     }
 
+    /**
+     * @deprecated 1.3
+     *
+     * @return string
+     */
     public function create_ajax_url() {
         return $this->createAjaxUrl();
     }

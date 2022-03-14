@@ -125,7 +125,7 @@ class CQueue_Queue_BeanstalkdQueue extends CQueue_AbstractQueue {
      *
      * @param null|string $queue
      *
-     * @return null|\Illuminate\Contracts\Queue\Job
+     * @return null|\CQueue_JobInterface
      */
     public function pop($queue = null) {
         $queue = $this->getQueue($queue);

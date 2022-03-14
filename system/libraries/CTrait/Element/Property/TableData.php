@@ -92,7 +92,7 @@ trait CTrait_Element_Property_TableData {
      * @return $this
      */
     public function setDataFromCallback($callback, $callbackOptions = [], $require = null) {
-        $this->tableDataQuery = CHelper::closure()->serializeClosure($callback);
+        $this->tableDataQuery = c::toSerializableClosure($callback);
         $this->tableDataCallbackOptions = $callbackOptions;
         $this->tableDataCallbackRequire = $require;
         $this->tableDataIsAjax = true;

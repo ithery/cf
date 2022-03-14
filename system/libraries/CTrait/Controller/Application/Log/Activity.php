@@ -2,26 +2,15 @@
 
 trait CTrait_Controller_Application_Log_Activity {
     public function activity() {
+        if (!isset($this->logActivityModel)) {
+            $this->logActivityModel = CApp_Model_LogActivity::class;
+        }
         $app = c::app();
-        $logActivityClass = '';
 
-        try {
-            $logActivityClass = $this->logActivityModel;
-        } catch (Exception $ex) {
-            cmsg::add('error', $ex->getMessage());
-
-            return $app;
-        }
-        $logActivityModel = new $logActivityClass();
-        if (!$logActivityModel instanceof CModel) {
-            cmsg::add('error', '"logActivityModel" must be instance of CModel');
-
-            return $app;
-        }
-
-        $logActivityModel = $logActivityModel->orderBy('activity_date', 'desc');
         $table = $app->addTable();
-        $table->setDataFromModel($logActivityModel);
+        $table->setDataFromModel($this->logActivityModel, function ($query) {
+            $query->orderBy('log_activity_id', 'desc');
+        });
         $table->setAjax();
         $table->addColumn('log_activity_id')
             ->setLabel('ID')
@@ -32,7 +21,7 @@ trait CTrait_Controller_Application_Log_Activity {
                     ->onClickListener()
                     ->addDialogHandler()
                     ->setTitle('Activity Detail')
-                    ->setUrl($this->controllerUrl() . "activityDetail/${val}");
+                    ->setUrl($this->controllerUrl() . 'activityDetail/' . $val);
 
                 return $action;
             });
@@ -42,7 +31,7 @@ trait CTrait_Controller_Application_Log_Activity {
         $table->addColumn('browser')->setLabel('Browser')->setCallback(function ($row, $val) {
             $version = carr::get($row, 'browser_version');
 
-            return "${val} (${version})";
+            return $val . ' (' . $version . ')';
         });
         $table->addColumn('uri')->setLabel('URI');
         $table->addColumn('activity_date')->setLabel('Time');
@@ -52,22 +41,10 @@ trait CTrait_Controller_Application_Log_Activity {
 
     public function activityDetail($logActivityId) {
         $app = c::app();
-
-        try {
-            $logActivityClass = $this->logActivityModel;
-        } catch (Exception $ex) {
-            cmsg::add('error', $ex->getMessage());
-
-            return $app;
+        if (!isset($this->logActivityModel)) {
+            $this->logActivityModel = CApp_Model_LogActivity::class;
         }
-
-        $logActivityModel = new $logActivityClass();
-        if (!$logActivityModel instanceof CModel) {
-            cmsg::add('error', '"logActivityModel" must be instance of CModel');
-
-            return $app;
-        }
-
+        $logActivityModel = $this->logActivityModel;
         $logActivityModel = $logActivityModel::find($logActivityId);
         if (!$logActivityModel) {
             cmsg::add('error', 'Log Activity not found');

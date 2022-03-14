@@ -454,12 +454,12 @@ trait CElement_Component_DataTable_Trait_ExportTrait {
                 $new_v = $col_v;
 
                 if (($this->cellCallbackFunc) != null) {
-                    $new_v = CDynFunction::factory($this->cellCallbackFunc)
-                        ->add_param($this)
-                        ->add_param($col->get_fieldname())
-                        ->add_param($row)
-                        ->add_param($new_v)
-                        ->set_require($this->requires)
+                    $new_v = CFunction::factory($this->cellCallbackFunc)
+                        ->addArg($this)
+                        ->addArg($col->get_fieldname())
+                        ->addArg($row)
+                        ->addArg($new_v)
+                        ->setRequire($this->requires)
                         ->execute();
 
                     //call_user_func($this->cellCallbackFunc,$this,$col->get_fieldname(),$row,$v);
@@ -796,7 +796,7 @@ trait CElement_Component_DataTable_Trait_ExportTrait {
 
     public function exportExcel($filename, $sheet_name = 'data') {
         $this->export_excel = true;
-        $excel = CExcel::factory()->set_creator('cresenity_system')->set_subject('Cresenity Report');
+        $excel = CExcel::factory()->setCreator('cresenity_system')->setSubject('Cresenity Report');
         $excel->setActiveSheetName($sheet_name);
         $header_count = count($this->report_header);
         $colStart = 1;
