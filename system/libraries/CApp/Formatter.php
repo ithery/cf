@@ -14,6 +14,12 @@ class CApp_Formatter {
 
     protected $decimalDigit;
 
+    protected $currencyDecimalDigit;
+
+    protected $currencyPrefix;
+
+    protected $currencySuffix;
+
     private static $instance;
 
     public static function instance() {
@@ -30,6 +36,9 @@ class CApp_Formatter {
         $this->thousandSeparator = CF::config('app.format.thousand_separator', '.');
         $this->decimalSeparator = CF::config('app.format.decimal_separator', ',');
         $this->decimalDigit = CF::config('app.format.decimal_digit', 0);
+        $this->currencyDecimalDigit = CF::config('app.format.currency_decimal_digit', $this->decimalDigit);
+        $this->currencyPrefix = CF::config('app.format.currency_prefix', '');
+        $this->currencySuffix = CF::config('app.format.currency_suffix', '');
     }
 
     public function getDateFormat() {
@@ -112,5 +121,37 @@ class CApp_Formatter {
 
     public function unformatDatetime($x) {
         return date('Y-m-d H:i:s', strtotime($x));
+    }
+
+    public function formatCurrency($x, $decimalDigit = null) {
+        if ($decimalDigit == null) {
+            $decimalDigit = $this->decimalDigit;
+        }
+
+        $x = number_format($x, $decimalDigit, $this->decimalSeparator, $this->thousandSeparator);
+
+        return $this->currencyPrefix . $x . $this->currencySuffix;
+    }
+
+    public function formatNumber($x) {
+        return number_format($x, 0, $this->decimalSeparator, $this->thousandSeparator);
+    }
+
+    public function formatDecimal($x, $decimalDigit = null) {
+        if ($decimalDigit == null) {
+            $decimalDigit = $this->decimalDigit;
+        }
+
+        return number_format($x, $decimalDigit, $this->decimalSeparator, $this->thousandSeparator);
+    }
+
+    public function unformatCurrency($number) {
+        $number = preg_replace('/^[^\d]+/', '', $number);
+
+        $type = (strpos($number, $this->decimalSeparator) === false) ? 'int' : 'float';
+        $number = str_replace([$this->decimalSeparator, $this->thousandSeparator], ['.', ''], $number);
+        settype($number, $type);
+
+        return $number;
     }
 }

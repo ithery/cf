@@ -10,11 +10,12 @@ defined('SYSPATH') or die('No direct access allowed.');
  */
 class CObservable_Listener extends CObservable_ListenerAbstract {
     use CTrait_Compat_Listener;
+
     protected $confirm;
 
     protected $confirm_message;
 
-    protected $no_double;
+    protected $noDouble;
 
     public function __construct($owner, $event = 'click') {
         parent::__construct($owner);
@@ -72,7 +73,7 @@ class CObservable_Listener extends CObservable_ListenerAbstract {
         if ($this->confirm) {
             $confirm_message = $this->confirm_message;
             if (strlen($confirm_message) == 0) {
-                $confirm_message = clang::__('Are you sure ?');
+                $confirm_message = c::__('Are you sure ?');
             }
             $confirmStartScript = "
                 window.cresenity.confirm({owner:thiselm, message:'" . c::e($confirm_message) . "',confirmCallback: function(confirmed) {
@@ -108,23 +109,23 @@ class CObservable_Listener extends CObservable_ListenerAbstract {
         $eventParameterImploded = implode(',', $this->eventParameters);
         if ($this->event == 'lazyload') {
             $js->append("
-                    jQuery(window).ready(function() {
-                        if (jQuery('#" . $this->owner . "')[0].getBoundingClientRect().top < (jQuery(window).scrollTop() + jQuery(window).height())) {
-                                " . $compiledJs . "
-                            }
-                    });
-                    jQuery(window).scroll(function() {
-                        if (jQuery('#" . $this->owner . "')[0].getBoundingClientRect().top < (jQuery(window).scrollTop() + jQuery(window).height())) {
-                                " . $compiledJs . '
-                            }
-                    });
-                ');
+                jQuery(window).ready(function() {
+                    if (jQuery('#" . $this->owner . "')[0].getBoundingClientRect().top < (jQuery(window).scrollTop() + jQuery(window).height())) {
+                        " . $compiledJs . "
+                    }
+                });
+                jQuery(window).scroll(function() {
+                    if (jQuery('#" . $this->owner . "')[0].getBoundingClientRect().top < (jQuery(window).scrollTop() + jQuery(window).height())) {
+                        " . $compiledJs . '
+                    }
+                });
+            ');
         } else {
             $js->append("
-                    jQuery('#" . $this->owner . "')." . $this->event . '(function(' . $eventParameterImploded . ') {
-                        ' . $compiledJs . '
-                    });
-                ');
+                jQuery('#" . $this->owner . "')." . $this->event . '(function(' . $eventParameterImploded . ') {
+                    ' . $compiledJs . '
+                });
+            ');
         }
 
         return $js->text();

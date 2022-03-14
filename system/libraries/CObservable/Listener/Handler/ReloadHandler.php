@@ -61,12 +61,8 @@ class CObservable_Listener_Handler_ReloadHandler extends CObservable_Listener_Ha
         $jsOptions .= '}';
 
         $js .= '
-            if(cresenity) {
-                cresenity.reload(' . $jsOptions . ");
-            } else {
-                $.cresenity.reload('" . $this->target . "','" . $generatedUrl . "','" . $this->method . "'," . $dataAddition . ');
-            }
-         ';
+            cresenity.reload(' . $jsOptions . ');
+        ';
 
         return $js;
     }

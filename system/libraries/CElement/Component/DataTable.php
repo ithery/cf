@@ -197,7 +197,7 @@ class CElement_Component_DataTable extends CElement_Component {
         $this->haveDataTableViewAction = false;
         $this->dataTableView = CConstant::TABLE_VIEW_ROW;
         $this->dataTableViewColCount = 5;
-        $this->fixedColumn = false;
+        $this->fixedColumn = null;
         $this->scrollX = false;
         $this->scrollY = false;
 
@@ -324,12 +324,15 @@ class CElement_Component_DataTable extends CElement_Component {
     }
 
     /**
-     * @param bool $bool
+     * @param int $column
      *
      * @return \CElement_Component_DataTable
      */
-    public function setFixedColumn($bool = true) {
-        $this->fixedColumn = $bool;
+    public function setFixedColumn($column = 1) {
+        if (is_bool($column)) {
+            $column = $column ? 1 : null;
+        }
+        $this->fixedColumn = $column;
 
         return $this;
     }

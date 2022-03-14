@@ -36,6 +36,8 @@ class CDatabase {
     protected static $defaultConnection = 'default';
 
     /**
+     * Instance of schema manager.
+     *
      * @var CDatabase_Schema_Manager
      */
     protected $schemaManager;
@@ -253,7 +255,7 @@ class CDatabase {
 
         $this->events = CEvent::dispatcher();
         CModel::setEventDispatcher($this->events);
-
+        $this->configuration = new CDatabase_Configuration();
         // Validate the driver
         if (!($this->driver instanceof CDatabase_Driver)) {
             throw new CDatabase_Exception('The :driver driver for the :class library must implement the :interface interface', [':driver' => $driver, ':class' => get_class($this), ':interface' => 'CDatabase_Driver']);

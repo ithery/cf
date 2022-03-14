@@ -43,6 +43,20 @@ abstract class CAjax_Engine_SelectSearch_Processor implements CAjax_Engine_Selec
     }
 
     /**
+     * @return null|string
+     */
+    public function formatResult() {
+        return unserialize(carr::get($this->data, 'formatResult'));
+    }
+
+    /**
+     * @return null|string
+     */
+    public function formatSelection() {
+        return unserialize(carr::get($this->data, 'formatSelection'));
+    }
+
+    /**
      * @return string
      */
     public function keyField() {

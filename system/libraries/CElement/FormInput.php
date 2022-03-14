@@ -199,18 +199,18 @@ class CElement_FormInput extends CElement_Element {
         if ($this->submit_onchange) {
             if ($this->type == 'date') {
                 $js .= "
-						$('#" . $this->id . "').on('changeDate',function() {
-							$(this).closest('form').submit();
-						});
+                    $('#" . $this->id . "').on('changeDate',function() {
+                        $(this).closest('form').submit();
+                    });
 
-					";
+                ";
             }
             $js .= "
-					$('#" . $this->id . "').on('change',function() {
-						$(this).closest('form').submit();
-					});
+                $('#" . $this->id . "').on('change',function() {
+                    $(this).closest('form').submit();
+                });
 
-				";
+            ";
         }
         $js .= $this->jsChild($indent);
 

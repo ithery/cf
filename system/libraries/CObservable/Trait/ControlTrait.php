@@ -131,4 +131,46 @@ trait CObservable_Trait_ControlTrait {
 
         return $control;
     }
+
+    /**
+     * Create Date Range Drop Down Control.
+     *
+     * @param null|string $id
+     *
+     * @return CElement_FormInput_Number
+     */
+    public function addNumberControl($id = null) {
+        $control = new CElement_FormInput_Number($id);
+        $this->wrapper->add($control);
+
+        return $control;
+    }
+
+    /**
+     * Create Date Range Drop Down Control.
+     *
+     * @param null|string $id
+     *
+     * @return CElement_FormInput_Email
+     */
+    public function addEmailControl($id = null) {
+        $control = new CElement_FormInput_Email($id);
+        $this->wrapper->add($control);
+
+        return $control;
+    }
+
+    /**
+     * Create Multiple Image Ajax Control.
+     *
+     * @param null|string $id
+     *
+     * @return CElement_FormInput_MultipleImageAjax
+     */
+    public function addMultipleImageAjaxControl($id = null) {
+        $control = new CElement_FormInput_MultipleImageAjax($id);
+        $this->wrapper->add($control);
+
+        return $control;
+    }
 }

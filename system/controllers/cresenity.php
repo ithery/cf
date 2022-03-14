@@ -294,6 +294,10 @@ class Controller_Cresenity extends CController {
             'Expires' => gmdate('D, d M Y H:i:s \G\M\T', time() + 172800),
         ];
 
+        if (isset($_GET['debug_avatar'])) {
+            return $avatarApi->render();
+        }
+
         return c::response()->stream(function () use ($avatarApi) {
             $avatarApi->render();
         }, 200, $headers);

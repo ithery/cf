@@ -14,6 +14,16 @@ class CJavascript_Validation_RuleParser {
     use CJavascript_Validation_Trait_UseDelegatedValidatorTrait;
 
     /**
+     * Dummy CApp validation rule for form requests.
+     */
+    const FORM_REQUEST_RULE_NAME = 'appFormRequest';
+
+    /**
+     * Js validation rule used to validate form requests.
+     */
+    const FORM_REQUEST_RULE = 'appValidationFormRequest';
+
+    /**
      * Rule used to validate remote requests.
      */
     const REMOTE_RULE = 'appValidationRemote';
@@ -40,8 +50,8 @@ class CJavascript_Validation_RuleParser {
     /**
      * Create a new JsValidation instance.
      *
-     * @param \Proengsoft\JsValidation\Support\DelegatedValidator $validator
-     * @param null|string                                         $remoteToken
+     * @param \CJavascript_Validation_ValidatorDelegated $validator
+     * @param null|string                                $remoteToken
      */
     public function __construct(CJavascript_Validation_ValidatorDelegated $validator, $remoteToken = null) {
         $this->validator = $validator;
@@ -61,13 +71,16 @@ class CJavascript_Validation_RuleParser {
     public function getRule($attribute, $rule, $parameters, $rawRule) {
         $isConditional = $this->isConditionalRule($attribute, $rawRule);
         $isRemote = $this->isRemoteRule($rule);
-        if ($isConditional || $isRemote) {
+        $isFormRequest = $this->isFormRequestRule($rule);
+        if ($isFormRequest || $isConditional || $isRemote) {
             list($attribute, $parameters) = $this->remoteRule($attribute, $isConditional);
-            $jsRule = self::REMOTE_RULE;
+            $jsRule = $isFormRequest ? static::FORM_REQUEST_RULE : static::REMOTE_RULE;
         } else {
             list($jsRule, $attribute, $parameters) = $this->clientRule($attribute, $rule, $parameters);
         }
+
         $attribute = $this->getAttributeName($attribute);
+
         return [$attribute, $jsRule, $parameters];
     }
 
@@ -124,6 +137,7 @@ class CJavascript_Validation_RuleParser {
         if (method_exists($this, $method)) {
             list($attribute, $parameters) = $this->$method($attribute, $parameters);
         }
+
         return [$jsRule, $attribute, $parameters];
     }
 
@@ -142,6 +156,7 @@ class CJavascript_Validation_RuleParser {
             $this->remoteToken,
             $forceRemote,
         ];
+
         return [$attribute, $params];
     }
 
@@ -153,10 +168,13 @@ class CJavascript_Validation_RuleParser {
      * @return string
      */
     protected function getAttributeName($attribute) {
+        $attribute = str_replace(CJavascript_Validation::ASTERISK, '*', $attribute);
+
         $attributeArray = explode('.', $attribute);
         if (count($attributeArray) > 1) {
             return $attributeArray[0] . '[' . implode('][', array_slice($attributeArray, 1)) . ']';
         }
+
         return $attribute;
     }
 
@@ -171,6 +189,7 @@ class CJavascript_Validation_RuleParser {
         return array_reduce($parameters, function ($result, $item) {
             list($key, $value) = array_pad(explode('=', $item, 2), 2, null);
             $result[$key] = $value;
+
             return $result;
         });
     }
