@@ -24,13 +24,24 @@ class CAjax_Engine_DataTable_Processor_DataProvider extends CAjax_Engine_DataTab
         $query->searchAnd($this->getSearchDataAnd());
         $query->sort($this->getSortData());
 
-        $paginationResult = $query->paginate($this->parameter->pageSize(), ['*'], 'page', $this->parameter->page());
+        $pageSize = $this->parameter->pageSize();
+        $collections = null;
+        $totalItem = 0;
+
+        if ($pageSize && $pageSize != '-1') {
+            $paginationResult = $query->paginate($this->parameter->pageSize(), ['*'], 'page', $this->parameter->page());
+            $collections = $paginationResult->items();
+            $totalItem = $paginationResult->total();
+        } else {
+            $collections = $query->toEnumerable();
+            $totalItem = $collections->count();
+        }
 
         $output = [
             'sEcho' => intval(carr::get($request, 'sEcho')),
-            'iTotalRecords' => $paginationResult->total(),
-            'iTotalDisplayRecords' => $paginationResult->total(),
-            'aaData' => $this->populateAAData($paginationResult->items(), $this->table(), $request, $js),
+            'iTotalRecords' => $totalItem,
+            'iTotalDisplayRecords' => $totalItem,
+            'aaData' => $this->populateAAData($collections, $this->table(), $request, $js),
         ];
 
         $data = [
