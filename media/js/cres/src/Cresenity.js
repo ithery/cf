@@ -970,7 +970,7 @@ export default class Cresenity {
 
     initLiveReload() {
         if(!this.cf.isProduction() && this.cf.config.vscode.liveReload.enable) {
-            new Promise(function(resolve, reject) {
+            new Promise((resolve, reject) => {
                 const rsocket = new WebSocket(this.cf.config.vscode.liveReload.protocol + '://' +this.cf.config.vscode.liveReload.host+ ':'+this.cf.config.vscode.liveReload.port+'/', 'reload-protocol');
                 rsocket.onmessage = function (msg) {
                     if (msg.data == 'RELOAD') {
@@ -983,7 +983,7 @@ export default class Cresenity {
                 }
             }).catch(function(err) {
                 //do nothing
-                //console.log("Catch handler sees: ", err)
+                //console.log("Catch Live Reload handler sees: ", err)
             });
 
         }

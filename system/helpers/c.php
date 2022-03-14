@@ -510,8 +510,8 @@ class c {
     //@codingStandardsIgnoreEnd
 
     /**
-     * @param null|string $key
-     * @param null|mixed  $default
+     * @param null|array|string $key
+     * @param null|mixed        $default
      *
      * @return CSession_Store|mixed
      */
@@ -1526,6 +1526,10 @@ class c {
         }
 
         return $callback;
+    }
+
+    public static function isHtml($string) {
+        return preg_match('/<[^<]+>/', $string, $m) != 0;
     }
 }
 

@@ -18,6 +18,11 @@ class CAnalytics_Google_ClientGA4 {
      */
     protected $cacheLifeTimeInMinutes = 0;
 
+    /**
+     * @var int
+     */
+    protected $cacheRealtimeLifeTimeInMinutes = 0;
+
     public function __construct(BetaAnalyticsDataClient $service, CCache_RepositoryInterface $cache) {
         $this->service = $service;
 
@@ -38,6 +43,19 @@ class CAnalytics_Google_ClientGA4 {
     }
 
     /**
+     * Set the cache time.
+     *
+     * @param int $cacheLifeTimeInMinutes
+     *
+     * @return self
+     */
+    public function setCacheRealtimeLifeTimeInMinutes($cacheLifeTimeInMinutes) {
+        $this->cacheRealtimeLifeTimeInMinutes = $cacheLifeTimeInMinutes * 60;
+
+        return $this;
+    }
+
+    /**
      * Query the Google Analytics Service with given parameters.
      *
      * @param array    $reportData
@@ -50,7 +68,7 @@ class CAnalytics_Google_ClientGA4 {
         $cacheName = $this->determineCacheName(func_get_args());
 
         if ($cacheInMinutes === null) {
-            $cacheInMinutes = $this->cacheLifeTimeInMinutes;
+            $cacheInMinutes = $realtime ? $this->cacheRealtimeLifeTimeInMinutes : $this->cacheLifeTimeInMinutes;
         }
         if ($cacheInMinutes === 0) {
             $this->cache->forget($cacheName);

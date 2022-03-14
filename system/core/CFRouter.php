@@ -169,7 +169,7 @@ class CFRouter {
     /**
      * @param string $uri if null, using the current uri
      *
-     * @deprecated 1.3
+     * @deprecated 1.3 dont use anymore
      *
      * @return void
      */

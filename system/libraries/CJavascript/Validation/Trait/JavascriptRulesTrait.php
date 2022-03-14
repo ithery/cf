@@ -38,6 +38,7 @@ trait CJavascript_Validation_Trait_JavascriptRulesTrait {
     protected function ruleConfirmed($attribute, array $parameters) {
         $parameters[0] = $this->getAttributeName($attribute);
         $attribute = "{$attribute}_confirmation";
+
         return [$attribute, $parameters];
     }
 
@@ -53,6 +54,7 @@ trait CJavascript_Validation_Trait_JavascriptRulesTrait {
         if (!($date = strtotime($parameters[0]))) {
             $date = $this->getAttributeName($parameters[0]);
         }
+
         return [$attribute, [$date]];
     }
 
@@ -78,6 +80,7 @@ trait CJavascript_Validation_Trait_JavascriptRulesTrait {
      */
     protected function ruleSame($attribute, array $parameters) {
         $other = $this->getAttributeName($parameters[0]);
+
         return [$attribute, [$other]];
     }
 
@@ -103,6 +106,7 @@ trait CJavascript_Validation_Trait_JavascriptRulesTrait {
      */
     protected function ruleRequiredWith($attribute, array $parameters) {
         $parameters = array_map([$this, 'getAttributeName'], $parameters);
+
         return [$attribute, $parameters];
     }
 
@@ -152,6 +156,7 @@ trait CJavascript_Validation_Trait_JavascriptRulesTrait {
      */
     protected function ruleRequiredIf($attribute, array $parameters) {
         $parameters[0] = $this->getAttributeName($parameters[0]);
+
         return [$attribute, $parameters];
     }
 
@@ -189,6 +194,7 @@ trait CJavascript_Validation_Trait_JavascriptRulesTrait {
      */
     protected function ruleDimensions($attribute, $parameters) {
         $parameters = $this->parseNamedParameters($parameters);
+
         return [$attribute, $parameters];
     }
 
@@ -202,6 +208,7 @@ trait CJavascript_Validation_Trait_JavascriptRulesTrait {
      */
     protected function ruleDistinct($attribute, array $parameters) {
         $parameters[0] = $attribute;
+
         return $this->ruleRequiredIf($attribute, $parameters);
     }
 }

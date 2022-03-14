@@ -1,6 +1,20 @@
 <?php
 
 class CAnalytics_Google_MetaData_ApiSchema {
+    /**
+     * @return CAnalytics_Google_MetaData_ApiSchema_Dimensions
+     */
+    public static function dimension() {
+        return CBase::forwarderStaticClass(CAnalytics_Google_MetaData_ApiSchema_Dimensions::class);
+    }
+
+    /**
+     * @return CAnalytics_Google_MetaData_ApiSchema_Metrics
+     */
+    public static function metric() {
+        return CBase::forwarderStaticClass(CAnalytics_Google_MetaData_ApiSchema_Metrics::class);
+    }
+
     public static function dimensionList() {
         return [
             'achievementId',

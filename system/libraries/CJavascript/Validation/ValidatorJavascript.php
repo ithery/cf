@@ -94,8 +94,12 @@ class CJavascript_Validation_ValidatorJavascript implements CInterface_Arrayable
     public function render($template = null, $selector = null) {
         $this->template($template);
         $this->selector($selector);
-        $template = new CTemplate($this->template, ['validator' => $this->getTemplateData()]);
-        $output = $template->render();
+
+        $view = CView::factory('cresenity.javascript.validation.validate', [
+            'validator' => $this->getTemplateData()
+        ]);
+        //$template = new CTemplate($this->template, ['validator' => $this->getTemplateData()]);
+        $output = $view->render();
         preg_match_all('#<script>(.*?)</script>#ims', $output, $matches);
         $outputJs = '';
         foreach ($matches[1] as $value) {
@@ -154,9 +158,7 @@ class CJavascript_Validation_ValidatorJavascript implements CInterface_Arrayable
         $this->validator->setRemote($this->remote);
         $data = $this->validator->validationData();
         $data['selector'] = $this->selector;
-        if (!is_null($this->ignore)) {
-            $data['ignore'] = $this->ignore;
-        }
+        $data['ignore'] = $this->ignore;
         $data['focus_on_error'] = $this->focusOnError;
         $data['animate_duration'] = $this->animateDuration;
 

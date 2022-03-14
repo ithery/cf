@@ -23,14 +23,32 @@ class CAjax_Engine_SelectSearch_Processor_DataProvider extends CAjax_Engine_Sele
         $paginationResult = $dataProvider->paginate($this->parameter->pageSize(), ['*'], 'page', $this->parameter->page(), function ($q) use ($dependsOn) {
             foreach ($dependsOn as $key => $dependOn) {
                 $resolver = $dependOn->getResolver();
+
                 $value = carr::get($this->input, 'dependsOn_' . $key);
+
                 $this->engine->invokeCallback($resolver, [$q, $value]);
             }
         });
         $data = c::collect($paginationResult->items())->map(function ($model) {
-            return $model->toArray() + [
-                'id' => $model->{$this->keyField()}
-            ];
+            $data = $model->toArray();
+            if ($this->keyField() && !isset($data['id'])) {
+                $data['id'] = $model->{$this->keyField()};
+            }
+
+            $formatResult = $this->formatResult();
+            if ($formatResult instanceof \Opis\Closure\SerializableClosure) {
+                $formatResult = $formatResult->__invoke($model);
+                $data['cappFormatResult'] = $formatResult;
+                $data['cappFormatResultIsHtml'] = c::isHtml($formatResult);
+            }
+            $formatSelection = $this->formatSelection();
+            if ($formatSelection instanceof \Opis\Closure\SerializableClosure) {
+                $formatSelection = $formatSelection->__invoke($model);
+                $data['cappFormatSelection'] = $formatSelection;
+                $data['cappFormatSelectionIsHtml'] = c::isHtml($formatSelection);
+            }
+
+            return $data;
         });
         $total = $paginationResult->total();
 
@@ -42,9 +60,12 @@ class CAjax_Engine_SelectSearch_Processor_DataProvider extends CAjax_Engine_Sele
 
     protected function getSearchDataOr() {
         $searchData = [];
-        foreach ($this->searchField() as $field) {
-            if (strlen($field) > 0) {
-                $searchData[$field] = $this->searchTerm();
+        $searchTerm = $this->searchTerm();
+        if (strlen($searchTerm) > 0) {
+            foreach ($this->searchField() as $field) {
+                if (strlen($field) > 0) {
+                    $searchData[$field] = $this->searchTerm();
+                }
             }
         }
 

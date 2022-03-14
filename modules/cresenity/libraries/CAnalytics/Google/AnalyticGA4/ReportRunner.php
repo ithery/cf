@@ -1,6 +1,7 @@
 <?php
 use Google\Analytics\Data\V1beta\Row;
 use Google\Analytics\Data\V1beta\Metric;
+use Google\Analytics\Data\V1beta\OrderBy;
 use Google\Analytics\Data\V1beta\DateRange;
 use Google\Analytics\Data\V1beta\Dimension;
 use Google\Analytics\Data\V1beta\MetricValue;
@@ -11,6 +12,9 @@ use Google\Analytics\Data\V1beta\DimensionHeader;
 use Google\Analytics\Data\V1beta\FilterExpression;
 use Google\Analytics\Data\V1beta\RunReportResponse;
 use Google\Analytics\Data\V1beta\DimensionExpression;
+use Google\Analytics\Data\V1beta\OrderBy\PivotOrderBy;
+use Google\Analytics\Data\V1beta\OrderBy\MetricOrderBy;
+use Google\Analytics\Data\V1beta\OrderBy\DimensionOrderBy;
 
 class CAnalytics_Google_AnalyticGA4_ReportRunner {
     /**
@@ -18,12 +22,24 @@ class CAnalytics_Google_AnalyticGA4_ReportRunner {
      */
     private $dateRanges = [];
 
+    /**
+     * @var array[string]
+     */
     private $metrics = [];
 
+    /**
+     * @var array[string]
+     */
     private $dimensions = [];
 
+    /**
+     * @var int
+     */
     private $offset = 0;
 
+    /**
+     * @var null|int
+     */
     private $limit = null;
 
     /**
@@ -41,7 +57,15 @@ class CAnalytics_Google_AnalyticGA4_ReportRunner {
      */
     private $dimensionFilter;
 
+    /**
+     * @var CAnalytics_Google_AnalyticGA4_FilterBuilder
+     */
     private $metricFilter;
+
+    /**
+     * @var array[\Google\Analytics\Data\V1beta\OrderBy]
+     */
+    private $orderBys;
 
     /**
      * @var CAnalytics_Google_ClientGA4
@@ -66,8 +90,44 @@ class CAnalytics_Google_AnalyticGA4_ReportRunner {
         return $this->dimensionFilter;
     }
 
+    public function metricFilter() {
+        if ($this->metricFilter == null) {
+            $this->metricFilter = new CAnalytics_Google_AnalyticGA4_FilterBuilder();
+        }
+
+        return $this->metricFilter;
+    }
+
     public function withFilterDimension($callback) {
         return c::tap($this->dimensionFilter(), $callback);
+    }
+
+    public function withFilterMetric($callback) {
+        return c::tap($this->metricFilter(), $callback);
+    }
+
+    public function orderByDimensions(array $dimensions) {
+        foreach ($dimensions as $dimension) {
+            $this->orderBys[] = new OrderBy([
+                'dimension' => new DimensionOrderBy([
+                    'dimension_name' => $dimension
+                ])
+            ]);
+        }
+
+        return $this;
+    }
+
+    public function orderByMetrics(array $metrics) {
+        foreach ($metrics as $metric) {
+            $this->orderBys[] = new OrderBy([
+                'metric' => new MetricOrderBy([
+                    'metric_name' => $metric
+                ])
+            ]);
+        }
+
+        return $this;
     }
 
     /**
@@ -198,6 +258,13 @@ class CAnalytics_Google_AnalyticGA4_ReportRunner {
 
         if ($this->dimensionFilter) {
             $data['dimensionFilter'] = $this->dimensionFilter->toGA4Object();
+        }
+        if ($this->metricFilter) {
+            $data['metricFilter'] = $this->metricFilter->toGA4Object();
+        }
+
+        if ($this->orderBys) {
+            $data['orderBys'] = $this->orderBys;
         }
 
         $this->report = $this->client->runReport($data, $realtime, $cacheInMinutes);
