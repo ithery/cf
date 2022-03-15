@@ -129,10 +129,12 @@ class CException_Context_RequestContext extends CException_ContextAbstract imple
             $routeData = $route->getRouteData()->toArray();
         }
 
+        $controller = c::optional($route)->controller;
+        $controllerClass = $controller ? get_class($controller) : null;
         $defaultData = [
             'route' => c::optional($route)->getName(),
             'routeParameters' => $this->getRouteParameters(),
-            'controllerClass' => get_class(c::optional($route)->controller),
+            'controllerClass' => $controllerClass,
             'controllerAction' => c::optional($route)->getActionName(),
             'middleware' => array_values(c::optional($route)->gatherMiddleware() ?? []),
         ];

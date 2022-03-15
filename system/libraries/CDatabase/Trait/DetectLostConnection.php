@@ -16,8 +16,9 @@ trait CDatabase_Trait_DetectLostConnection {
      *
      * @return bool
      */
-    protected function causedByLostConnection(Exception $e) {
+    protected function causedByLostConnection($e) {
         $message = $e->getMessage();
+
         return cstr::contains($message, [
             'server has gone away',
             'no connection to the server',
