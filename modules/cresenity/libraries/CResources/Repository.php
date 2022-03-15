@@ -9,13 +9,18 @@ defined('SYSPATH') or die('No direct access allowed.');
  * @since May 6, 2019, 7:25:37 AM
  */
 class CResources_Repository {
-    /** @var CApp_Model_Interface_ResourceInterface|CModel */
+    /**
+     * @var CApp_Model_Interface_ResourceInterface|CModel
+     */
     protected $model;
 
-    /** @param CApp_Model_Interface_ResourceInterface $model */
+    /**
+     * @param CApp_Model_Interface_ResourceInterface $model
+     */
     public function __construct(CApp_Model_Interface_ResourceInterface $model = null) {
         if ($model == null) {
-            $model = new CApp_Model_Resource();
+            $resourceModel = CF::config('resource.resource_model', CApp_Model_Resource::class);
+            $model = new $resourceModel();
         }
         $this->model = $model;
     }
@@ -45,6 +50,7 @@ class CResources_Repository {
         if (is_array($filter)) {
             $filter = $this->getDefaultFilterFunction($filter);
         }
+
         return $resource->filter($filter);
     }
 
@@ -90,6 +96,7 @@ class CResources_Repository {
                     return false;
                 }
             }
+
             return true;
         };
     }

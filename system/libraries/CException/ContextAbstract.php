@@ -66,4 +66,26 @@ abstract class CException_ContextAbstract {
 
         return trim($process->getOutput());
     }
+
+    protected function getAppData() {
+        $docRoot = DOCROOT;
+        $appRoot = $docRoot;
+        $appCode = CF::appCode();
+        if ($appCode) {
+            $appRoot = c::untrailingslashit(c::docRoot('application/' . $appCode)) . DS;
+        }
+
+        return [
+            'theme' => c::theme()->getCurrentTheme(),
+            'nav' => c::app()->getNavName(),
+            'domain' => CF::domain(),
+            'appCode' => CF::appCode(),
+            'orgCode' => CF::orgCode(),
+            'appRoot' => $appRoot,
+        ];
+    }
+
+    protected function getDebugData() {
+        return [];
+    }
 }

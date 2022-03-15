@@ -247,4 +247,22 @@ class CRouting_RouteData {
     public function getArguments() {
         return $this->arguments ?: [];
     }
+
+    public function toArray() {
+        $data = [];
+        $data['uri'] = $this->getUri();
+        $data['queryString'] = $this->getQueryString();
+        $data['completeUri'] = $this->getCompleteUri();
+        $data['routedUri'] = $this->getRoutedUri();
+        $data['urlSuffix'] = $this->getUrlSuffix();
+        $data['segments'] = $this->getSegments();
+        $data['routedSegments'] = $this->getRoutedSegments();
+        $data['controller'] = $this->getController();
+        $data['controllerDir'] = $this->getControllerDir();
+        $data['controllerPath'] = $this->getControllerPath();
+        $data['method'] = $this->getMethod();
+        $data['arguments'] = $this->getArguments();
+
+        return $data;
+    }
 }

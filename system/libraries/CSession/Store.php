@@ -7,7 +7,7 @@
  *
  * @see CSession
  */
-class CSession_Store {
+class CSession_Store implements CSession_Contract_SessionInterface {
     /**
      * The session ID.
      *

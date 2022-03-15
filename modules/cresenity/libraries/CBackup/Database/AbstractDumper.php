@@ -84,6 +84,7 @@ abstract class CBackup_Database_AbstractDumper {
      */
     public function setDbName($dbName) {
         $this->dbName = $dbName;
+
         return $this;
     }
 
@@ -94,6 +95,7 @@ abstract class CBackup_Database_AbstractDumper {
      */
     public function setUserName($userName) {
         $this->userName = $userName;
+
         return $this;
     }
 
@@ -104,6 +106,7 @@ abstract class CBackup_Database_AbstractDumper {
      */
     public function setPassword($password) {
         $this->password = $password;
+
         return $this;
     }
 
@@ -114,6 +117,7 @@ abstract class CBackup_Database_AbstractDumper {
      */
     public function setHost($host) {
         $this->host = $host;
+
         return $this;
     }
 
@@ -128,6 +132,7 @@ abstract class CBackup_Database_AbstractDumper {
      */
     public function setPort($port) {
         $this->port = $port;
+
         return $this;
     }
 
@@ -138,6 +143,7 @@ abstract class CBackup_Database_AbstractDumper {
      */
     public function setSocket($socket) {
         $this->socket = $socket;
+
         return $this;
     }
 
@@ -148,6 +154,7 @@ abstract class CBackup_Database_AbstractDumper {
      */
     public function setTimeout($timeout) {
         $this->timeout = $timeout;
+
         return $this;
     }
 
@@ -156,6 +163,7 @@ abstract class CBackup_Database_AbstractDumper {
             $dumpBinaryPath .= '/';
         }
         $this->dumpBinaryPath = $dumpBinaryPath;
+
         return $this;
     }
 
@@ -166,6 +174,7 @@ abstract class CBackup_Database_AbstractDumper {
      */
     public function enableCompression() {
         $this->compressor = new CBackup_Compressor_GzipCompressor();
+
         return $this;
     }
 
@@ -175,15 +184,16 @@ abstract class CBackup_Database_AbstractDumper {
 
     public function useCompressor(CBackup_AbstractCompressor $compressor) {
         $this->compressor = $compressor;
+
         return $this;
     }
 
     /**
      * @param string|array $includeTables
      *
-     * @return $this
-     *
      * @throws CBackup_Database_Exception_CannotSetParameterException
+     *
+     * @return $this
      */
     public function includeTables($includeTables) {
         if (!empty($this->excludeTables)) {
@@ -193,15 +203,16 @@ abstract class CBackup_Database_AbstractDumper {
             $includeTables = explode(', ', $includeTables);
         }
         $this->includeTables = $includeTables;
+
         return $this;
     }
 
     /**
      * @param string|array $excludeTables
      *
-     * @return $this
-     *
      * @throws CBackup_Database_Exception_CannotSetParameterException
+     *
+     * @return $this
      */
     public function excludeTables($excludeTables) {
         if (!empty($this->includeTables)) {
@@ -211,6 +222,7 @@ abstract class CBackup_Database_AbstractDumper {
             $excludeTables = explode(', ', $excludeTables);
         }
         $this->excludeTables = $excludeTables;
+
         return $this;
     }
 
@@ -223,6 +235,7 @@ abstract class CBackup_Database_AbstractDumper {
         if (!empty($extraOption)) {
             $this->extraOptions[] = $extraOption;
         }
+
         return $this;
     }
 
@@ -248,6 +261,7 @@ abstract class CBackup_Database_AbstractDumper {
         }
         if ($this->compressor) {
             $compressCommand = $this->compressor->useCommand();
+
             return "(((({$command}; echo \$? >&3) | {$compressCommand} > {$dumpFile}) 3>&1) | (read x; exit \$x))";
         }
 

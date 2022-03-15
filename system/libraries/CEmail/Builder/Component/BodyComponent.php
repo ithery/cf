@@ -1,11 +1,5 @@
 <?php
 
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
-
 use CEmail_Builder_Helper as Helper;
 
 class CEmail_Builder_Component_BodyComponent extends CEmail_Builder_Component {
@@ -48,6 +42,7 @@ class CEmail_Builder_Component_BodyComponent extends CEmail_Builder_Component {
             if ($value != null && strlen($value) > 0) {
                 return $output . ' ' . $name . '="' . $value . '"';
             }
+
             return $output;
         }, '');
     }
@@ -80,10 +75,12 @@ class CEmail_Builder_Component_BodyComponent extends CEmail_Builder_Component {
                 $stylesArray = $styles;
             }
         }
+
         return carr::reduce($stylesArray, function ($output, $value, $name) {
             if ($value != null) {
                 return $output . $name . ':' . $value;
             }
+
             return $output;
         }, '');
     }
@@ -97,6 +94,7 @@ class CEmail_Builder_Component_BodyComponent extends CEmail_Builder_Component {
         $renderer = function ($component) {
             if (!method_exists($component, 'render')) {
             }
+
             return $component->render();
         };
         $rawXML = carr::get($options, 'rawXML', false);
@@ -148,7 +146,7 @@ class CEmail_Builder_Component_BodyComponent extends CEmail_Builder_Component {
                 $output .= $renderer($component);
             }
             $index++;
-        };
+        }
 
         return $output;
     }

@@ -354,10 +354,10 @@ class CException_ExceptionHandler implements CException_ExceptionHandlerInterfac
      */
     protected function renderExceptionContent($e) {
         try {
-            return CException_LegacyExceptionHandler::getContent($e);
-            if (CF::isProduction()) {
-                return CException_LegacyExceptionHandler::getContent($e);
-            }
+            //return CException_LegacyExceptionHandler::getContent($e);
+            // if (CF::isProduction()) {
+            //     return CException_LegacyExceptionHandler::getContent($e);
+            // }
 
             $exceptionRenderer = new CException_Renderer_ExceptionRenderer();
 

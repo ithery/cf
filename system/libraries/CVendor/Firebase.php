@@ -139,7 +139,7 @@ class CVendor_Firebase {
         $this->config = $config;
         $this->verifierCache = new MemoryCacheItemPool();
         $this->authTokenCache = new MemoryCacheItemPool();
-        $this->httpClientOptions = CVendor_Firebase_Http_HttpClientOptions::default();
+        $this->httpClientOptions = CVendor_Firebase_Http_HttpClientOptions::defaultOptions();
     }
 
     /**

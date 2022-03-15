@@ -20,6 +20,9 @@ class CException_Manager {
 
     private static $instance;
 
+    /**
+     * @return CException_Manager
+     */
     public static function instance() {
         if (static::$instance == null) {
             static::$instance = new static();

@@ -32,6 +32,7 @@ class CAnalytics_Google_ClientFactory {
         $clientGA4 = new CAnalytics_Google_ClientGA4($client, CCache::store($config->get('store')));
 
         $clientGA4->setCacheLifeTimeInMinutes($config['cache_lifetime_in_minutes']);
+        $clientGA4->setCacheRealtimeLifeTimeInMinutes(carr::get($config, 'cache_realtime_lifetime_in_minutes', $config['cache_lifetime_in_minutes']));
 
         return $clientGA4;
     }
