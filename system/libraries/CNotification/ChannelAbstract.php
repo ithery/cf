@@ -1,12 +1,13 @@
 <?php
 
 abstract class CNotification_ChannelAbstract implements CNotification_ChannelInterface {
-    protected static $channelName;
+    protected $channelName;
 
     protected $config;
 
     public function __construct($config = []) {
         $this->config = $config;
+        $this->channelName = 'Custom';
     }
 
     public function send($className, array $options = []) {
@@ -14,7 +15,7 @@ abstract class CNotification_ChannelAbstract implements CNotification_ChannelInt
 
         $isQueued = carr::get($options, 'queued', CF::config('notification.queue.queued'));
         $options = [
-            'channel' => static::$channelName,
+            'channel' => $this->channelName,
             'className' => $className,
             'options' => $options,
         ];
@@ -132,7 +133,7 @@ abstract class CNotification_ChannelAbstract implements CNotification_ChannelInt
         $model->message_class = get_class($message);
         $model->vendor = $vendor;
         $model->org_id = $orgId;
-        $model->channel = static::$channelName;
+        $model->channel = $this->channelName;
         $model->notification_status = 'PENDING';
         $model->is_read = 0;
         $model->recipient = $recipient;
@@ -154,7 +155,7 @@ abstract class CNotification_ChannelAbstract implements CNotification_ChannelInt
     public function getVendorName() {
         $vendor = carr::get($this->config, 'vendor');
         if (strlen($vendor) == 0) {
-            $vendor = CF::config('notification.' . strtolower(cstr::snake(static::$channelName)) . '.vendor');
+            $vendor = CF::config('notification.' . strtolower(cstr::snake($this->channelName)) . '.vendor');
         }
 
         return $vendor;
