@@ -358,7 +358,9 @@ class CVendor_Firebase {
      * @return Client
      */
     public function createApiClient(array $config = null, array $middlewares = null) {
-        $config ??= [];
+        if ($config == null) {
+            $config = [];
+        }
 
         if ($proxy = $this->httpClientOptions->proxy()) {
             $config[RequestOptions::PROXY] = $proxy;
