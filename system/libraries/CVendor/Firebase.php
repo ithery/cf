@@ -220,7 +220,7 @@ class CVendor_Firebase {
         throw new RuntimeException('Unable to determine the Firebase Project ID');
     }
 
-    private function getClientEmail(): ?string {
+    private function getClientEmail() {
         if ($this->clientEmail !== null) {
             return $this->clientEmail;
         }
@@ -249,7 +249,7 @@ class CVendor_Firebase {
         return null;
     }
 
-    private function getDatabaseUri(): UriInterface {
+    private function getDatabaseUri() {
         if ($this->databaseUri === null) {
             $this->databaseUri = \sprintf(self::$databaseUriPattern, $this->getProjectId());
         }
@@ -257,7 +257,7 @@ class CVendor_Firebase {
         return GuzzleUtils::uriFor($this->databaseUri);
     }
 
-    private function getStorageBucketName(): string {
+    private function getStorageBucketName() {
         if ($this->defaultStorageBucket === null) {
             $this->defaultStorageBucket = \sprintf(self::$storageBucketNamePattern, $this->getProjectId());
         }
