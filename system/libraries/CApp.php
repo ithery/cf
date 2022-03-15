@@ -157,15 +157,6 @@ class CApp implements CInterface_Responsable, CInterface_Renderable, CInterface_
     /**
      * @param string $domain
      *
-     * @return CApp_Navigation
-     */
-    public static function navigation($domain = null) {
-        return CApp_Navigation::instance($domain);
-    }
-
-    /**
-     * @param string $domain
-     *
      * @return CApp_Api
      */
     public static function api($domain = null) {
@@ -192,6 +183,8 @@ class CApp implements CInterface_Responsable, CInterface_Renderable, CInterface_
     /**
      * @param string $modelName
      *
+     * @deprecated 1.3
+     *
      * @return CApp_Model
      */
     public static function model($modelName) {
@@ -206,6 +199,15 @@ class CApp implements CInterface_Responsable, CInterface_Renderable, CInterface_
      * @return CApp_Navigation
      */
     public static function nav($domain = null) {
+        return CApp_Navigation::instance($domain);
+    }
+
+    /**
+     * @param string $domain
+     *
+     * @return CApp_Navigation
+     */
+    public static function navigation($domain = null) {
         return CApp_Navigation::instance($domain);
     }
 
