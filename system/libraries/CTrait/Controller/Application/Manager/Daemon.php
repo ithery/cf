@@ -273,6 +273,7 @@ trait CTrait_Controller_Application_Manager_Daemon {
         } else {
             cmsg::add('error', $errMessage);
         }
+        sleep(1);
         // curl::redirect($this->controllerUrl() . 'log/index/' . $serviceClass . static::groupQueryString());
         return c::redirect($this->controllerUrl() . 'log/index/' . $serviceClass . static::groupQueryString());
     }
