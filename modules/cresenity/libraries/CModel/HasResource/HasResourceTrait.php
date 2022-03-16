@@ -1,5 +1,7 @@
 <?php
-
+/**
+ * @property-read CModel_Collection|CApp_Model_Interface_ResourceInterface[] $resource
+ */
 trait CModel_HasResource_HasResourceTrait {
     /**
      * @var array
