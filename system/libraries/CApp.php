@@ -483,12 +483,24 @@ class CApp implements CInterface_Responsable, CInterface_Renderable, CInterface_
         $data['html'] = $message . $this->html();
         $asset = CManager::asset();
         $js = $this->element->js();
-        $cappScript = $this->yieldPushContent('capp-script');
-        $js .= $cappScript;
         $js = $asset->renderJsRequire($js, 'cresenity.cf.require');
 
+        $cappScript = $this->yieldPushContent('capp-script');
+        //strip cappScript from <script>
+        //parse the output of view
+        preg_match_all('#<script>(.*?)</script>#ims', $cappScript, $matches);
+
+        foreach ($matches[1] as $value) {
+            $js .= $value;
+        }
+
+        //$js .= $cappScript;
+
         $data['js'] = base64_encode($js);
-        //$data['jsRaw'] = $js;
+        if (CF::config('app.debug')) {
+            $data['jsRaw'] = $js;
+        }
+
         $data['css_require'] = $asset->getAllCssFileUrl();
         $data['message'] = $messageOrig;
         $data['ajaxData'] = $this->ajaxData;
