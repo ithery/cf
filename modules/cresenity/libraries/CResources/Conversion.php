@@ -13,7 +13,8 @@ defined('SYSPATH') or die('No direct access allowed.');
 /**
  * @mixin CImage_Manipulations
  *
- * @method static|CImage_Manipulations width($width);
+ * @method static width($width);
+ * @method static height($height)
  */
 class CResources_Conversion {
     /**
@@ -141,7 +142,7 @@ class CResources_Conversion {
     /**
      * Add the given manipulations as the first ones.
      *
-     * @param \Spatie\Image\Manipulations $manipulations
+     * @param \CImage_Manipulations $manipulations
      *
      * @return $this
      */

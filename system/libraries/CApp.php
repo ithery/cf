@@ -157,15 +157,6 @@ class CApp implements CInterface_Responsable, CInterface_Renderable, CInterface_
     /**
      * @param string $domain
      *
-     * @return CApp_Navigation
-     */
-    public static function navigation($domain = null) {
-        return CApp_Navigation::instance($domain);
-    }
-
-    /**
-     * @param string $domain
-     *
      * @return CApp_Api
      */
     public static function api($domain = null) {
@@ -192,6 +183,8 @@ class CApp implements CInterface_Responsable, CInterface_Renderable, CInterface_
     /**
      * @param string $modelName
      *
+     * @deprecated 1.3
+     *
      * @return CApp_Model
      */
     public static function model($modelName) {
@@ -206,6 +199,15 @@ class CApp implements CInterface_Responsable, CInterface_Renderable, CInterface_
      * @return CApp_Navigation
      */
     public static function nav($domain = null) {
+        return CApp_Navigation::instance($domain);
+    }
+
+    /**
+     * @param string $domain
+     *
+     * @return CApp_Navigation
+     */
+    public static function navigation($domain = null) {
         return CApp_Navigation::instance($domain);
     }
 
@@ -481,12 +483,24 @@ class CApp implements CInterface_Responsable, CInterface_Renderable, CInterface_
         $data['html'] = $message . $this->html();
         $asset = CManager::asset();
         $js = $this->element->js();
-        $cappScript = $this->yieldPushContent('capp-script');
-        $js .= $cappScript;
         $js = $asset->renderJsRequire($js, 'cresenity.cf.require');
 
+        $cappScript = $this->yieldPushContent('capp-script');
+        //strip cappScript from <script>
+        //parse the output of view
+        preg_match_all('#<script>(.*?)</script>#ims', $cappScript, $matches);
+
+        foreach ($matches[1] as $value) {
+            $js .= $value;
+        }
+
+        //$js .= $cappScript;
+
         $data['js'] = base64_encode($js);
-        //$data['jsRaw'] = $js;
+        if (CF::config('app.debug')) {
+            $data['jsRaw'] = $js;
+        }
+
         $data['css_require'] = $asset->getAllCssFileUrl();
         $data['message'] = $messageOrig;
         $data['ajaxData'] = $this->ajaxData;
