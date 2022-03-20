@@ -39,7 +39,6 @@ final class CVendor_Firebase_Messaging_Exception_NotFoundException extends Runti
     public function withErrors(array $errors) {
         $new = new self($this->getMessage(), $this->getCode(), $this->getPrevious());
         $new->errors = $errors;
-        $new->response = $this->response;
 
         return $new;
     }

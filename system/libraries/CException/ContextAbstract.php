@@ -66,4 +66,22 @@ abstract class CException_ContextAbstract {
 
         return trim($process->getOutput());
     }
+
+    protected function getAppData() {
+        return [
+            'isCli' => CF::isCli(),
+            'isCFCli' => CF::isCFCli(),
+            'sharedAppCode' => CF::getSharedApp(),
+            'locale' => CF::getLocale(),
+            'domain' => CF::domain(),
+            'appCode' => CF::appCode(),
+            'orgCode' => CF::orgCode(),
+            'theme' => c::theme()->getCurrentTheme(),
+            'nav' => c::app()->getNavName(),
+        ];
+    }
+
+    protected function getDebugData() {
+        return [];
+    }
 }

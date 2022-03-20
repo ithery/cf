@@ -21,7 +21,7 @@ class CObservable_Listener extends CObservable_ListenerAbstract {
         parent::__construct($owner);
         $this->confirm = false;
         $this->confirm_message = '';
-        $this->no_double = false;
+        $this->noDouble = false;
         $this->event = $event;
     }
 
@@ -36,7 +36,7 @@ class CObservable_Listener extends CObservable_ListenerAbstract {
     }
 
     public function setNoDouble($bool) {
-        $this->no_double = $bool;
+        $this->noDouble = $bool;
 
         return $this;
     }
@@ -56,7 +56,7 @@ class CObservable_Listener extends CObservable_ListenerAbstract {
             var thiselm=jQuery(this);
             var clicked = thiselm.attr('data-clicked');
         ";
-        if ($this->no_double) {
+        if ($this->noDouble) {
             $startScript .= '
                 if(clicked) return false;
             ';

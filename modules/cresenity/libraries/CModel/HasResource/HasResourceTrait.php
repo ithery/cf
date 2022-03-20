@@ -1,5 +1,7 @@
 <?php
-
+/**
+ * @property-read CModel_Collection|CApp_Model_Interface_ResourceInterface[] $resource
+ */
 trait CModel_HasResource_HasResourceTrait {
     /**
      * @var array
@@ -226,6 +228,8 @@ trait CModel_HasResource_HasResourceTrait {
      *
      * @param mixed $collectionName
      * @param mixed $conversionName
+     *
+     * @return string
      */
     public function getFirstResourceUrl($collectionName = 'default', $conversionName = '') {
         $resource = $this->getFirstResource($collectionName);
@@ -243,6 +247,8 @@ trait CModel_HasResource_HasResourceTrait {
      *
      * @param mixed $collectionName
      * @param mixed $conversionName
+     *
+     * @return string
      */
     public function getFirstResourceFullUrl($collectionName = 'default', $conversionName = '') {
         $resource = $this->getFirstResource($collectionName);

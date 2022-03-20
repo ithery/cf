@@ -139,7 +139,7 @@ class CVendor_Firebase {
         $this->config = $config;
         $this->verifierCache = new MemoryCacheItemPool();
         $this->authTokenCache = new MemoryCacheItemPool();
-        $this->httpClientOptions = CVendor_Firebase_Http_HttpClientOptions::default();
+        $this->httpClientOptions = CVendor_Firebase_Http_HttpClientOptions::defaultOptions();
     }
 
     /**
@@ -220,7 +220,7 @@ class CVendor_Firebase {
         throw new RuntimeException('Unable to determine the Firebase Project ID');
     }
 
-    private function getClientEmail(): ?string {
+    private function getClientEmail() {
         if ($this->clientEmail !== null) {
             return $this->clientEmail;
         }
@@ -249,7 +249,7 @@ class CVendor_Firebase {
         return null;
     }
 
-    private function getDatabaseUri(): UriInterface {
+    private function getDatabaseUri() {
         if ($this->databaseUri === null) {
             $this->databaseUri = \sprintf(self::$databaseUriPattern, $this->getProjectId());
         }
@@ -257,7 +257,7 @@ class CVendor_Firebase {
         return GuzzleUtils::uriFor($this->databaseUri);
     }
 
-    private function getStorageBucketName(): string {
+    private function getStorageBucketName() {
         if ($this->defaultStorageBucket === null) {
             $this->defaultStorageBucket = \sprintf(self::$storageBucketNamePattern, $this->getProjectId());
         }
@@ -358,7 +358,9 @@ class CVendor_Firebase {
      * @return Client
      */
     public function createApiClient(array $config = null, array $middlewares = null) {
-        $config ??= [];
+        if ($config == null) {
+            $config = [];
+        }
 
         if ($proxy = $this->httpClientOptions->proxy()) {
             $config[RequestOptions::PROXY] = $proxy;

@@ -8,6 +8,8 @@
 trait CApp_Concern_NavigationTrait {
     protected $nav = 'nav';
 
+    protected $resolvedNavName = null;
+
     protected $navRenderer = CApp_Navigation_Engine_SideNav::class;
 
     public function setNav($nav) {
@@ -17,10 +19,15 @@ trait CApp_Concern_NavigationTrait {
     }
 
     public function resolveNav($nav) {
+        $this->resolvedNavName = null;
         if (is_callable($nav)) {
+            $this->resolvedNavName = '{Closure}';
             $nav = $nav();
         }
         if (is_string($nav)) {
+            if ($this->resolvedNavName == null) {
+                $this->navName = $nav;
+            }
             $fileNav = CF::getFile('navs', $nav);
             if ($fileNav == null) {
                 if ($nav == 'nav') {
@@ -36,8 +43,19 @@ trait CApp_Concern_NavigationTrait {
                 throw new Exception('nav ' . $nav . ' is not found');
             }
         }
+        if ($this->resolvedNavName == null) {
+            $this->resolvedNavName = '{array}';
+        }
 
         return $nav;
+    }
+
+    public function getNavName() {
+        if ($this->resolvedNavName != null) {
+            return $this->resolvedNavName;
+        }
+
+        return null;
     }
 
     /**

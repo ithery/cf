@@ -41,7 +41,7 @@ final class CVendor_Firebase_Http_HttpClientOptions {
     /**
      * @return self
      */
-    public static function default() {
+    public static function defaultOptions() {
         return new self();
     }
 
@@ -140,7 +140,7 @@ final class CVendor_Firebase_Http_HttpClientOptions {
      *
      * @return self
      */
-    public function withProxy($value): self {
+    public function withProxy($value) {
         $options = clone $this;
         $options->proxy = $value;
 
