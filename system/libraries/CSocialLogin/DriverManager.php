@@ -119,6 +119,15 @@ class CSocialLogin_DriverManager {
     }
 
     /**
+     * Create an instance of the specified driver.
+     *
+     * @return CSocialLogin_OAuth2_AbstractProvider
+     */
+    protected function createAtlassianDriver() {
+        return $this->buildProvider(CSocialLogin_OAuth2_Provider_AtlassianProvider::class, $this->config);
+    }
+
+    /**
      * Build an OAuth 2 provider instance.
      *
      * @param string $provider
