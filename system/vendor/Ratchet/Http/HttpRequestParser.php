@@ -2,11 +2,10 @@
 
 namespace Ratchet\Http;
 
-use GuzzleHttp\Psr7 as gPsr;
 use Ratchet\MessageInterface;
 use Ratchet\ConnectionInterface;
+use GuzzleHttp\Psr7\Message as GuzzleMessage;
 
-require_once \realpath(dirname(__FILE__) . '/../../../../modules/cresenity/vendor/GuzzleHttp/Psr7') . '/functions_include.php';
 /**
  * This class receives streaming data from a client request
  * and parses HTTP headers, returning a PSR-7 Request object
@@ -68,6 +67,6 @@ class HttpRequestParser implements MessageInterface {
      * @return \Psr\Http\Message\RequestInterface
      */
     public function parse($headers) {
-        return gPsr\parse_request($headers);
+        return GuzzleMessage::parseRequest($headers);
     }
 }

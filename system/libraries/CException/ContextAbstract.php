@@ -68,20 +68,16 @@ abstract class CException_ContextAbstract {
     }
 
     protected function getAppData() {
-        $docRoot = DOCROOT;
-        $appRoot = $docRoot;
-        $appCode = CF::appCode();
-        if ($appCode) {
-            $appRoot = c::untrailingslashit(c::docRoot('application/' . $appCode)) . DS;
-        }
-
         return [
-            'theme' => c::theme()->getCurrentTheme(),
-            'nav' => c::app()->getNavName(),
+            'isCli' => CF::isCli(),
+            'isCFCli' => CF::isCFCli(),
+            'sharedAppCode' => CF::getSharedApp(),
+            'locale' => CF::getLocale(),
             'domain' => CF::domain(),
             'appCode' => CF::appCode(),
             'orgCode' => CF::orgCode(),
-            'appRoot' => $appRoot,
+            'theme' => c::theme()->getCurrentTheme(),
+            'nav' => c::app()->getNavName(),
         ];
     }
 

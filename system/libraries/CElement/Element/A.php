@@ -14,6 +14,11 @@ class CElement_Element_A extends CElement_Element {
         $this->target = '';
     }
 
+    /**
+     * @param string $id
+     *
+     * @return static
+     */
     public static function factory($id = '') {
         return CElement_Factory::create(static::class, $id = '');
     }

@@ -105,7 +105,7 @@ class CCron_Event {
     /**
      * The event mutex implementation.
      *
-     * @var \Illuminate\Console\Scheduling\EventMutex
+     * @var \CCron_Contract_EventMutexInterface
      */
     public $mutex;
 
@@ -190,7 +190,6 @@ class CCron_Event {
         ) {
             return;
         }
-
         $this->runInBackground
             ? $this->runCommandInBackground()
             : $this->runCommandInForeground();

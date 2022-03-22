@@ -36,4 +36,15 @@ class CElement_Element_Img extends CElement_Element {
 
         return $this;
     }
+
+    /**
+     * Set Attribute alt.
+     *
+     * @param string $alt
+     */
+    public function setAlt($alt) {
+        $this->setAttr('alt', $alt);
+
+        return $this;
+    }
 }

@@ -45,7 +45,8 @@ class Controller_Cresenity extends CController {
 
         $disk = CTemporary::disk();
         if (!$disk->exists($file)) {
-            throw new Exception(c::__('failed to get temporary file :filename', ['filename' => $file]));
+            c::abort(404, c::__('failed to get temporary file :filename', ['filename' => $file]));
+            //throw new Exception(c::__('failed to get temporary file :filename', ['filename' => $file]));
         }
         $json = $disk->get($file);
 

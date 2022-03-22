@@ -8,14 +8,14 @@ defined('SYSPATH') or die('No direct access allowed.');
  *
  * @since Sep 8, 2019, 6:06:41 AM
  */
-abstract class CQueue_AbstractTask implements CQueue_ShouldQueueInterface {
+abstract class CQueue_AbstractTask {
     use CQueue_Trait_DispatchableTrait;
     use CQueue_Trait_QueueableTrait;
     use CQueue_Trait_InteractsWithQueue;
     use CQueue_Trait_SerializesModels;
 
     /**
-     * Shortcut function to log the current running service
+     * Shortcut function to log the current running service.
      *
      * @param string $msg
      */

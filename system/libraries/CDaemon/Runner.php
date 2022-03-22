@@ -74,13 +74,45 @@ class CDaemon_Runner {
         return false;
     }
 
-    protected function runUnix() {
+    protected function getCommandToExecuteOnUnix($background = true) {
         $command = $this->getExecutableCommand();
         $binary = $this->getPhpBinary();
         $output = $this->debug ? $this->debugOutput() : '/dev/null';
         //$output = $this->debugOutput();
 
-        $commandToExecute = "NSS_STRICT_NOFORK=DISABLED ${binary} ${command} 1> \"${output}\" 2>&1 &";
+        $commandToExecute = "NSS_STRICT_NOFORK=DISABLED ${binary} ${command}";
+        if ($background) {
+            $commandToExecute .= " 1> \"${output}\" 2>&1 &";
+        }
+
+        return $commandToExecute;
+    }
+
+    protected function getCommandToExecuteOnWindows($background = true) {
+        $command = $this->getExecutableCommand();
+        $binary = $this->getPhpBinary();
+        //$output = $this->debug ? $this->debugOutput() : '/dev/null';
+        //$output = $this->debugOutput();
+
+        $commandToExecute = "\"${binary}\" ${command}";
+        if ($background) {
+            $commandToExecute = 'start "blah" /B ' . $commandToExecute;
+        }
+
+        return $commandToExecute;
+    }
+
+    public function getCommandToExecute($background = true) {
+        $isUnix = CDaemon_Helper::getPlatform() === CDaemon_Helper::UNIX;
+        if ($isUnix) {
+            return $this->getCommandToExecuteOnUnix($background);
+        }
+
+        return $this->getCommandToExecuteOnWindows($background);
+    }
+
+    protected function runUnix() {
+        $commandToExecute = $this->getCommandToExecuteOnUnix();
 
         $process = new Process($commandToExecute);
         $process->setWorkingDirectory(DOCROOT);

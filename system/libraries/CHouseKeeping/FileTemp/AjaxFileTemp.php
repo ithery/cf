@@ -3,7 +3,7 @@ class CHouseKeeping_FileTemp_AjaxFileTemp {
     public static function execute($keepDays = 90) {
         $executed = false;
 
-        $disk = CStorage::instance()->disk('s3-temp');
+        $disk = CTemporary::disk();
 
         $basePath = 'ajax';
 
