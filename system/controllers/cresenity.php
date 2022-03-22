@@ -20,7 +20,11 @@ class Controller_Cresenity extends CController {
     }
 
     public function daemon() {
-        CDaemon::cliRunner();
+        try {
+            CDaemon::cliRunner();
+        } catch (CDaemon_Exception_AlreadyRunningException $ex) {
+            //do nothing when exception is already running
+        }
     }
 
     public function component() {
