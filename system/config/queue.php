@@ -59,11 +59,11 @@ return [
 
         'sqs' => [
             'driver' => 'sqs',
-            'key' => 'AKIAJX24UYWYMZS4BT4Q',
-            'secret' => 'TX0c2zNIHZQ1zNTXD0FRTYKGWn5c7ZO3ONKPKzeg',
-            'prefix' => 'https://sqs.ap-southeast-1.amazonaws.com/847969917871', //'https://sqs.us-east-1.amazonaws.com/your-account-id'),
-            'queue' => 'tribelio-common-queue', // 'your-queue-name'),
-            'region' => 'ap-southeast-1', //, 'us-east-1'),
+            'key' => '',
+            'secret' => '',
+            'prefix' => '', //'https://sqs.us-east-1.amazonaws.com/your-account-id'),
+            'queue' => '', // 'your-queue-name'),
+            'region' => '', //, 'us-east-1'),
         ],
 
         'redis' => [
