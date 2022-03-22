@@ -62,6 +62,10 @@ trait CTrait_Controller_Application_Manager_Daemon {
 
         $request = array_merge(CApp_Base::getRequest(), $options);
         $group = carr::get($request, 'group');
+        $groupQueryString = '';
+        if (strlen($group) > 0) {
+            $groupQueryString = '?group=' . $group;
+        }
         $listService = $daemonManager->daemons($group);
         $dataService = [];
         foreach ($listService as $kService => $vService) {
@@ -72,7 +76,9 @@ trait CTrait_Controller_Application_Manager_Daemon {
         }
         $table = $app->addTable();
         $table->setDataFromArray($dataService);
-        $table->addColumn('service_name')->setLabel('Name');
+        $table->addColumn('service_name')->setLabel('Name')->setCallback(function ($row, $value) use ($groupQueryString) {
+            return CElement_Element_A::factory()->setHref(static::controllerUrl() . 'log/index/' . carr::get($row, 'service_class') . $groupQueryString)->add($value);
+        });
         $table->addColumn('service_status')->setLabel('Service Status')->setCallback(function ($row, $value) {
             $isRunning = CManager::daemon()->isRunning(carr::get($row, 'service_class'));
             $badgeClass = $isRunning ? 'badge badge-success bg-success' : 'badge badge-danger bg-danger';
@@ -85,14 +91,6 @@ trait CTrait_Controller_Application_Manager_Daemon {
 
         $table->setRowActionStyle('btn-dropdown');
 
-        $groupQueryString = '';
-        if (strlen($group) > 0) {
-            $groupQueryString = '?group=' . $group;
-        }
-
-        $actMonitor = $table->addRowAction();
-        $actMonitor->setIcon('fas fa-life-ring')->setLabel('Debug');
-        $actMonitor->setLink(static::controllerUrl() . 'debug/{service_class}' . $groupQueryString);
         $actMonitor = $table->addRowAction();
         $actMonitor->setIcon('fas fa-file')->setLabel('Log');
         $actMonitor->setLink(static::controllerUrl() . 'log/index/{service_class}' . $groupQueryString);
@@ -102,6 +100,9 @@ trait CTrait_Controller_Application_Manager_Daemon {
         $actStop = $table->addRowAction();
         $actStop->setIcon('fas fa-stop')->setLabel('Stop');
         $actStop->setLink(static::controllerUrl() . 'stop/{service_class}' . $groupQueryString)->setConfirm();
+        $actDebug = $table->addRowAction();
+        $actDebug->setIcon('fas fa-life-ring')->setLabel('Debug');
+        $actDebug->setLink(static::controllerUrl() . 'debug/{service_class}' . $groupQueryString);
 
         if ($container == null) {
             echo $app->render();
