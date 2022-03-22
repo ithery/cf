@@ -13,14 +13,14 @@ class CObservable_Listener extends CObservable_ListenerAbstract {
 
     protected $confirm;
 
-    protected $confirm_message;
+    protected $confirmMessage;
 
     protected $noDouble;
 
     public function __construct($owner, $event = 'click') {
         parent::__construct($owner);
         $this->confirm = false;
-        $this->confirm_message = '';
+        $this->confirmMessage = '';
         $this->noDouble = false;
         $this->event = $event;
     }
@@ -46,7 +46,7 @@ class CObservable_Listener extends CObservable_ListenerAbstract {
     }
 
     public function setConfirmMessage($message) {
-        $this->confirm_message = $message;
+        $this->confirmMessage = $message;
 
         return $this;
     }
@@ -71,12 +71,12 @@ class CObservable_Listener extends CObservable_ListenerAbstract {
         $confirmStartScript = '';
         $confirmEndScript = '';
         if ($this->confirm) {
-            $confirm_message = $this->confirm_message;
-            if (strlen($confirm_message) == 0) {
-                $confirm_message = c::__('Are you sure ?');
+            $confirmMessage = $this->confirmMessage;
+            if (strlen($confirmMessage) == 0) {
+                $confirmMessage = c::__('Are you sure ?');
             }
             $confirmStartScript = "
-                window.cresenity.confirm({owner:thiselm, message:'" . c::e($confirm_message) . "',confirmCallback: function(confirmed) {
+                window.cresenity.confirm({owner:thiselm, message:'" . c::e($confirmMessage) . "',confirmCallback: function(confirmed) {
                     if(confirmed) {
             ";
 

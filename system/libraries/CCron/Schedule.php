@@ -159,11 +159,11 @@ class CCron_Schedule {
      */
     protected function dispatchToQueue($job, $queue, $connection) {
         if ($job instanceof Closure) {
-            if (!class_exists(CallQueuedClosure::class)) {
-                throw new RuntimeException(
-                    'To enable support for closure jobs, please install the illuminate/queue package.'
-                );
-            }
+            // if (!class_exists(CQueue_CallQueuedClosure::class)) {
+            //     throw new RuntimeException(
+            //         'To enable support for closure jobs, please install the illuminate/queue package.'
+            //     );
+            // }
 
             $job = CQueue_CallQueuedClosure::create($job);
         }

@@ -126,7 +126,7 @@ class CAjax_Engine_DataTable_Processor_DataProvider extends CAjax_Engine_DataTab
                 if ($table->checkbox) {
                     $i2++;
                 }
-                if ($this->actionLocation() == 'first') {
+                if ($this->actionLocation() == 'first' && $this->haveRowAction()) {
                     $i2++;
                 }
                 if ($request['bSortable_' . intval($request['iSortCol_' . $i])] == 'true') {
