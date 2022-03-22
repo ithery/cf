@@ -19,9 +19,9 @@ class CCron_CallbackEvent extends CCron_Event {
      * Create a new event instance.
      *
      * @param \CCron_Contract_EventMutexInterface $mutex
-     * @param string                                          $callback
-     * @param array                                           $parameters
-     * @param null|\DateTimeZone|string                       $timezone
+     * @param string                              $callback
+     * @param array                               $parameters
+     * @param null|\DateTimeZone|string           $timezone
      *
      * @throws \InvalidArgumentException
      *
@@ -66,8 +66,8 @@ class CCron_CallbackEvent extends CCron_Event {
 
         try {
             $response = is_object($this->callback)
-                        ? c::container()->call([$this->callback, '__invoke'], $this->parameters)
-                        : c::container()->call($this->callback, $this->parameters);
+                ? c::container()->call([$this->callback, '__invoke'], $this->parameters)
+                : c::container()->call($this->callback, $this->parameters);
 
             $this->exitCode = $response === false ? 1 : 0;
         } catch (Throwable $e) {
