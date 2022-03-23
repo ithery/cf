@@ -236,7 +236,15 @@ class CApi_ExceptionHandler implements CApi_Contract_ExceptionHandlerInterface, 
         }
 
         if ($exception instanceof CValidation_Exception) {
-            $replacements[':errors'] = $exception->errors();
+            $validationErrors = $exception->errors();
+            $errors = [];
+            foreach ($validationErrors as $key => $error) {
+                $errors[] = [
+                    'key' => $key,
+                    'messages' => $error
+                ];
+            }
+            $replacements[':errors'] = $errors;
             $replacements[':status_code'] = $exception->status;
         }
 
