@@ -158,7 +158,7 @@ class CHTTP_Middleware_ThrottleRequest {
             return sha1($user->getAuthIdentifier());
         } elseif ($route = $request->route()) {
             return sha1($route->getDomain() . '|' . $request->ip());
-        } elseif (CFRouter::$controller) {
+        } else {
             return sha1(CF::domain() . '|' . $request->ip());
         }
 
