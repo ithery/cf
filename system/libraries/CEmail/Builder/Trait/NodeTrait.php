@@ -70,7 +70,7 @@ trait CEmail_Builder_Trait_NodeTrait {
     }
 
     /**
-     * @return CEmail_Builder_Button
+     * @return CEmail_Builder_Node
      */
     public function addButton() {
         return $this->addNode('c-button');
