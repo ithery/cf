@@ -18,6 +18,8 @@ class CEmail_Builder_Component_BodyComponent_Group extends CEmail_Builder_Compon
 
     public function getChildContext() {
         $parentWidth = $this->context->getContainerWidth();
+        $parentWidthParserResult = Helper::widthParser($parentWidth, ['parseFloatToInt' => false]);
+        $parentParsedWidth = carr::get($parentWidthParserResult, 'parsedWidth');
         $nonRawSiblings = $this->getProp('nonRawSiblings', 0);
         $children = $this->getChildren();
 
@@ -25,7 +27,7 @@ class CEmail_Builder_Component_BodyComponent_Group extends CEmail_Builder_Compon
         $containerWidth = $this->getAttribute('width');
         if (strlen($containerWidth) == 0) {
             if ($nonRawSiblings > 0) {
-                $containerWidth = $parentWidth / $nonRawSiblings . 'px';
+                $containerWidth = $parentParsedWidth / $nonRawSiblings . 'px';
             }
         }
         $widthParserResult = Helper::widthParser($containerWidth, ['parserFloatToInt' => false]);
@@ -33,9 +35,9 @@ class CEmail_Builder_Component_BodyComponent_Group extends CEmail_Builder_Compon
         $parsedWidth = carr::get($widthParserResult, 'parsedWidth');
 
         if ($unit === '%') {
-            $containerWidth = ($parentWidth * $parsedWidth / 100 - $paddingSize) . 'px';
+            $containerWidth = ($parentParsedWidth * $parsedWidth / 100 - $paddingSize) . 'px';
         } else {
-            $containerWidth = ($parentWidth - $paddingSize) . 'px';
+            $containerWidth = ($parentParsedWidth - $paddingSize) . 'px';
         }
 
         $context = clone $this->context;
@@ -90,12 +92,14 @@ class CEmail_Builder_Component_BodyComponent_Group extends CEmail_Builder_Compon
 
     public function getWidthAsPixel() {
         $containerWidth = $this->context->getContainerWidth();
+        $containerWidthParserResult = Helper::widthParser($containerWidth, ['parseFloatToInt' => false]);
+        $containerParsedWidth = carr::get($containerWidthParserResult, 'parsedWidth');
         $widthParserResult = Helper::widthParser($this->getParsedWidth(true), ['parseFloatToInt' => false]);
         $unit = carr::get($widthParserResult, 'unit');
         $parsedWidth = carr::get($widthParserResult, 'parsedWidth');
 
         if ($unit === '%') {
-            return intval(str_replace('px', '', $containerWidth)) * $parsedWidth / 100 . 'px';
+            return $containerParsedWidth * $parsedWidth / 100 . 'px';
         }
 
         return $parsedWidth . 'px';
