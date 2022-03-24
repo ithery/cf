@@ -4,12 +4,14 @@ use CEmail_Builder_Helper as Helper;
 
 class CEmail_Builder_Component_BodyComponent_Group extends CEmail_Builder_Component_BodyComponent {
     protected static $tagName = 'c-group';
+
     protected $allowedAttributes = [
         'background-color' => 'color',
         'direction' => 'enum(ltr,rtl)',
         'vertical-align' => 'enum(top,bottom,middle)',
         'width' => 'unit(px,%)',
     ];
+
     protected $defaultAttributes = [
         'direction' => 'ltr',
     ];
@@ -40,6 +42,7 @@ class CEmail_Builder_Component_BodyComponent_Group extends CEmail_Builder_Compon
 
         $context->set('containerWidth', $containerWidth);
         $context->set('nonRawSiblings', count($children));
+
         return $context;
     }
 
@@ -91,9 +94,12 @@ class CEmail_Builder_Component_BodyComponent_Group extends CEmail_Builder_Compon
         $unit = carr::get($widthParserResult, 'unit');
         $parsedWidth = carr::get($widthParserResult, 'parsedWidth');
 
+        cdbg::dd($unit, $containerWidth, $parsedWidth);
+
         if ($unit === '%') {
             return $containerWidth * $parsedWidth / 100 . 'px';
         }
+
         return $parsedWidth . 'px';
     }
 
@@ -106,11 +112,13 @@ class CEmail_Builder_Component_BodyComponent_Group extends CEmail_Builder_Compon
         switch ($unit) {
             case '%':
                 $className = 'c-column-per-' . $parsedWidth;
+
                 break;
 
             case 'px':
             default:
                 $className = 'c-column-px-' . $parsedWidth;
+
                 break;
         }
         // Add className to media queries
@@ -144,8 +152,10 @@ class CEmail_Builder_Component_BodyComponent_Group extends CEmail_Builder_Compon
                 if ($groupWidth == 0) {
                     return '0px';
                 }
+
                 return (100 * $parsedWidth / $groupWidth) . 'px';
             }
+
             return $parsedWidth . $unit;
         };
         $classesName = $this->getColumnClass() . ' mj-outlook-group-fix';
@@ -166,6 +176,7 @@ class CEmail_Builder_Component_BodyComponent_Group extends CEmail_Builder_Compon
                 $tdAttr = [];
 
                 $tdAttr['style'] = $style;
+
                 return '
               <!--[if mso | IE]>
               <td' . $component->htmlAttributes($tdAttr) . '>
@@ -177,6 +188,7 @@ class CEmail_Builder_Component_BodyComponent_Group extends CEmail_Builder_Compon
           ';
             }
         };
+
         return '
       <div' . $this->htmlAttributes(['class' => $classesName, 'style' => 'div']) . '>
         <!--[if mso | IE]>
