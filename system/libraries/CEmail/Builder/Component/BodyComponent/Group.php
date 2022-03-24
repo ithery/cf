@@ -139,6 +139,9 @@ class CEmail_Builder_Component_BodyComponent_Group extends CEmail_Builder_Compon
         $containerWidth = $this->context->getContainerWidth();
 
         $getElementWidth = function ($width) use ($containerWidth, $nonRawSiblings, $groupWidth) {
+            $groupWidthParserResult = Helper::widthParser($groupWidth, ['parseFloatToInt' => false]);
+            $groupParsedWidth = carr::get($groupWidthParserResult, 'parsedWidth');
+
             if (!$width) {
                 if ($nonRawSiblings == 0) {
                     return '0px';
@@ -151,11 +154,11 @@ class CEmail_Builder_Component_BodyComponent_Group extends CEmail_Builder_Compon
             $unit = carr::get($widthParserResult, 'unit');
             $parsedWidth = carr::get($widthParserResult, 'parsedWidth');
             if ($unit === '%') {
-                if ($groupWidth == 0) {
+                if ($groupParsedWidth == 0) {
                     return '0px';
                 }
 
-                return (100 * $parsedWidth / $groupWidth) . 'px';
+                return (100 * $parsedWidth / $groupParsedWidth) . 'px';
             }
 
             return $parsedWidth . $unit;
