@@ -97,10 +97,10 @@ class CException_ExceptionHandler implements CException_ExceptionHandlerInterfac
         if ($this->shouldntReport($e)) {
             return;
         }
+
         if (is_callable($reportCallable = [$e, 'report'])) {
             return $this->container->call($reportCallable);
         }
-
         foreach ($this->reportCallbacks as $reportCallback) {
             if ($reportCallback->handles($e)) {
                 if ($reportCallback($e) === false) {
@@ -108,7 +108,6 @@ class CException_ExceptionHandler implements CException_ExceptionHandlerInterfac
                 }
             }
         }
-
         CLogger::instance()->add(CLogger::ERROR, $e->getMessage(), null, $this->context(), $e);
         //        try {
         //            CLogger::instance()->add($reportCallable, $message)
@@ -354,10 +353,10 @@ class CException_ExceptionHandler implements CException_ExceptionHandlerInterfac
      */
     protected function renderExceptionContent($e) {
         try {
-            //return CException_LegacyExceptionHandler::getContent($e);
-            // if (CF::isProduction()) {
-            //     return CException_LegacyExceptionHandler::getContent($e);
-            // }
+            return CException_LegacyExceptionHandler::getContent($e);
+            if (CF::isProduction()) {
+                return CException_LegacyExceptionHandler::getContent($e);
+            }
 
             $exceptionRenderer = new CException_Renderer_ExceptionRenderer();
 
