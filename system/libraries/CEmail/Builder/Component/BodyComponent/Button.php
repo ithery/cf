@@ -4,7 +4,9 @@ use CEmail_Builder_Helper as Helper;
 
 class CEmail_Builder_Component_BodyComponent_Button extends CEmail_Builder_Component_BodyComponent {
     protected static $endingTag = true;
+
     protected static $tagName = 'c-button';
+
     protected $allowedAttributes = [
         'align' => 'enum(left,center,right)',
         'background-color' => 'color',
@@ -39,6 +41,7 @@ class CEmail_Builder_Component_BodyComponent_Button extends CEmail_Builder_Compo
         'text-align' => 'enum(left,right,center)',
         'width' => 'unit(px,%)',
     ];
+
     protected $defaultAttributes = [
         'align' => 'center',
         'background-color' => '#414141',

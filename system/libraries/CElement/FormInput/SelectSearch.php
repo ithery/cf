@@ -578,6 +578,7 @@ class CElement_FormInput_SelectSearch extends CElement_FormInput {
                 },
                 ' . $strJsInit . "
                 templateResult: function(item) {
+
                     if (typeof item.loading !== 'undefined') {
                         return item.text;
                     }
@@ -588,6 +589,7 @@ class CElement_FormInput_SelectSearch extends CElement_FormInput {
                             return item.cappFormatResult;
                         }
                     }
+
                     return $('<div>" . $strResult . "</div>');
                 },
                 templateSelection: function(item) {
@@ -608,9 +610,8 @@ class CElement_FormInput_SelectSearch extends CElement_FormInput {
                         return item.text;
                     }
 
-                    else {
-                        return $('<div>" . $strSelection . "</div>');
-                    }
+                    return $('<div>" . $strSelection . "</div>');
+
                 },
                 dropdownCssClass: '" . $dropdownClasses . "', // apply css that makes the dropdown taller
                 containerCssClass : 'tpx-select2-container " . $classes . "'
@@ -663,6 +664,14 @@ class CElement_FormInput_SelectSearch extends CElement_FormInput {
                  };
                  $('" . $dependsOnSelector . "').change(cresenity.debounce(" . $dependsOnFunctionName . ' ,' . $throttle . '));
             ');
+        }
+
+        if ($this->readonly) {
+            $js->appendln("
+                $('#" . $this->id . "').select2({
+                    disabled: true
+                });
+            ");
         }
 
         return $js->text();

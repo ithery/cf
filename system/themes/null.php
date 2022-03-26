@@ -30,6 +30,10 @@ return [
         'radio' => [
             'js' => null, // js module for radio
         ],
+        'tooltip' => [
+            'icon' => 'fas fa-info-circle',
+            'class' => '',
+        ],
         'widget' => [
             'class' => [
                 'wrapper' => null,

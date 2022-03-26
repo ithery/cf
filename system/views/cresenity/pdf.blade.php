@@ -1,15 +1,3 @@
-<?php
-defined('SYSPATH') or die('No direct access allowed.');
-
-/**
- * @author Hery Kurniawan
- *
- * @since Jun 29, 2019, 6:34:42 PM
- *
- * @license Ittron Global Teknologi <ittron.co.id>
- */
-?>
-
 <!DOCTYPE html>
 <!--
 Copyright 2012 Mozilla Foundation
@@ -38,7 +26,7 @@ See https://github.com/adobe-type-tools/cmap-resources
         <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
         <meta name="google" content="notranslate">
         <meta http-equiv="X-UA-Compatible" content="IE=edge">
-        <title><?php echo $title; ?></title>
+        <title>{{ $title }}</title>
 
         <link rel="stylesheet" href="/media/css/plugins/pdfjs/viewer.css">
 

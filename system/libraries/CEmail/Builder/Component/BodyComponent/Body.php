@@ -6,7 +6,13 @@ class CEmail_Builder_Component_BodyComponent_Body extends CEmail_Builder_Compone
     protected $allowedAttributes = [
         'width' => 'unit(px,%)',
         'background-color' => 'color',
+        'padding-bottom' => 'unit(px,%)',
+        'padding-left' => 'unit(px,%)',
+        'padding-right' => 'unit(px,%)',
+        'padding-top' => 'unit(px,%)',
+        'padding' => 'unit(px,%){1,4}',
     ];
+
     protected $defaultAttributes = [
         'width' => '600px',
     ];
@@ -15,6 +21,11 @@ class CEmail_Builder_Component_BodyComponent_Body extends CEmail_Builder_Compone
         return [
             'div' => [
                 'background-color' => $this->getAttribute('background-color'),
+                'padding' => $this->getAttribute('padding'),
+                'padding-top' => $this->getAttribute('padding-top'),
+                'padding-right' => $this->getAttribute('padding-right'),
+                'padding-bottom' => $this->getAttribute('padding-bottom'),
+                'padding-left' => $this->getAttribute('padding-left'),
             ],
         ];
     }
@@ -24,6 +35,7 @@ class CEmail_Builder_Component_BodyComponent_Body extends CEmail_Builder_Compone
         $width = $this->getAttribute('width');
 
         $context->set('containerWidth', $width);
+
         return $context;
     }
 
