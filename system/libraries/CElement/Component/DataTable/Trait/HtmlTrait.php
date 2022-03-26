@@ -192,10 +192,7 @@ trait CElement_Component_DataTable_Trait_HtmlTrait {
 
                         if (($this->cellCallbackFunc) != null) {
                             $newValue = CFunction::factory($this->cellCallbackFunc)
-                                ->addArg($this)
-                                ->addArg($col->getFieldname())
-                                ->addArg($row)
-                                ->addArg($newValue)
+                                ->setArgs([$this, $col->getFieldname(), $row, $newValue])
                                 ->setRequire($this->requires)
                                 ->execute();
                             list($newValue, $jsCell) = $this->getHtmlJsCell($newValue);
@@ -248,8 +245,8 @@ trait CElement_Component_DataTable_Trait_HtmlTrait {
                                     break;
                             }
                         }
-
-                        $html->appendln('<td' . $pdfTBodyTdCurrentAttr . ' class="' . $class . '" data-column="' . $col->getFieldname() . '">' . $newValue . '</td>')->br();
+                        $styleAttribute = 'style="' . $col->getCssStyle() . '"';
+                        $html->appendln('<td' . $pdfTBodyTdCurrentAttr . ' class="' . $class . '" data-column="' . $col->getFieldname() . '" ' . $styleAttribute . '>' . $newValue . '</td>')->br();
                     }
                     if ($this->actionLocation == 'last') {
                         $js .= $this->drawActionAndGetJs($html, $dataRow, $key);

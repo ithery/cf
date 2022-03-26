@@ -1,7 +1,7 @@
 <?php
 
-class CTemporary_PathGenerator_NullPathGenerator {
-    public function getPath($extension = null) {
+class CTemporary_PathGenerator_NullPathGenerator implements CTemporary_PathGeneratorInterface {
+    public function generatePath($extension = null) {
         return '';
     }
 }

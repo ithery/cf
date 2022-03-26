@@ -95,8 +95,22 @@ class CCron_Schedule {
      * @param array     $parameters
      *
      * @return \CCron_CallbackEvent
+     *
+     * @deprecated use cronJob
      */
     public function run(CCron_Job $job, array $parameters = []) {
+        return $this->cronJob($job, $parameters);
+    }
+
+    /**
+     * Add a new callback event to the schedule by class.
+     *
+     * @param CCron_Job $job
+     * @param array     $parameters
+     *
+     * @return \CCron_CallbackEvent
+     */
+    public function cronJob(CCron_Job $job, array $parameters = []) {
         $event = $this->call(function () use ($job) {
             return $job->execute();
         }, $parameters);
@@ -159,11 +173,11 @@ class CCron_Schedule {
      */
     protected function dispatchToQueue($job, $queue, $connection) {
         if ($job instanceof Closure) {
-            if (!class_exists(CallQueuedClosure::class)) {
-                throw new RuntimeException(
-                    'To enable support for closure jobs, please install the illuminate/queue package.'
-                );
-            }
+            // if (!class_exists(CQueue_CallQueuedClosure::class)) {
+            //     throw new RuntimeException(
+            //         'To enable support for closure jobs, please install the illuminate/queue package.'
+            //     );
+            // }
 
             $job = CQueue_CallQueuedClosure::create($job);
         }

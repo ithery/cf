@@ -11,6 +11,8 @@ defined('SYSPATH') or die('No direct access allowed.');
 class CElement_Component_Form_Field extends CElement_Component {
     use CTrait_Compat_Element_Form_Field;
     use CTrait_Element_Property_Label;
+    use CTrait_Element_Property_Tooltip;
+
     protected $groupClasses = [];
 
     protected $group_id = '';
@@ -52,7 +54,7 @@ class CElement_Component_Form_Field extends CElement_Component {
     }
 
     public static function factory($id = '') {
-        return new CElement_Component_Form_Field($id);
+        return new static($id);
     }
 
     public function setLabelRequired($bool = true) {
@@ -120,7 +122,11 @@ class CElement_Component_Form_Field extends CElement_Component {
         $control_class .= ' ' . implode(' ', $this->control_class);
         $html->appendln('<div ' . $groupIdAttr . ' class="' . $classFormField . ' ' . $classes . '" ' . $custom_css . $addition_attribute . '>')->incIndent();
         if ($this->show_label) {
-            $html->appendln('<label id="' . $this->id . '" class="form-label ' . $label_class . ' control-label">' . $labelRequiredHtml . $this->label . '</label>')->br();
+            if ($this->tooltip) {
+                $this->tooltip->addClass('ml-1');
+            }
+            $tooltipHtml = $this->tooltip ? $this->tooltip->html() : '';
+            $html->appendln('<label id="' . $this->id . '" class="form-label ' . $label_class . ' control-label">' . $labelRequiredHtml . $this->label . $tooltipHtml . '</label>')->br();
         }
 
         $html->appendln('<div class="controls">')->incIndent()->br();

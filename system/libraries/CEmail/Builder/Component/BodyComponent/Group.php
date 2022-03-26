@@ -4,18 +4,22 @@ use CEmail_Builder_Helper as Helper;
 
 class CEmail_Builder_Component_BodyComponent_Group extends CEmail_Builder_Component_BodyComponent {
     protected static $tagName = 'c-group';
+
     protected $allowedAttributes = [
         'background-color' => 'color',
         'direction' => 'enum(ltr,rtl)',
         'vertical-align' => 'enum(top,bottom,middle)',
         'width' => 'unit(px,%)',
     ];
+
     protected $defaultAttributes = [
         'direction' => 'ltr',
     ];
 
     public function getChildContext() {
         $parentWidth = $this->context->getContainerWidth();
+        $parentWidthParserResult = Helper::widthParser($parentWidth, ['parseFloatToInt' => false]);
+        $parentParsedWidth = carr::get($parentWidthParserResult, 'parsedWidth');
         $nonRawSiblings = $this->getProp('nonRawSiblings', 0);
         $children = $this->getChildren();
 
@@ -23,7 +27,7 @@ class CEmail_Builder_Component_BodyComponent_Group extends CEmail_Builder_Compon
         $containerWidth = $this->getAttribute('width');
         if (strlen($containerWidth) == 0) {
             if ($nonRawSiblings > 0) {
-                $containerWidth = $parentWidth / $nonRawSiblings . 'px';
+                $containerWidth = $parentParsedWidth / $nonRawSiblings . 'px';
             }
         }
         $widthParserResult = Helper::widthParser($containerWidth, ['parserFloatToInt' => false]);
@@ -31,15 +35,16 @@ class CEmail_Builder_Component_BodyComponent_Group extends CEmail_Builder_Compon
         $parsedWidth = carr::get($widthParserResult, 'parsedWidth');
 
         if ($unit === '%') {
-            $containerWidth = ($parentWidth * $parsedWidth / 100 - $paddingSize) . 'px';
+            $containerWidth = ($parentParsedWidth * $parsedWidth / 100 - $paddingSize) . 'px';
         } else {
-            $containerWidth = ($parentWidth - $paddingSize) . 'px';
+            $containerWidth = ($parentParsedWidth - $paddingSize) . 'px';
         }
 
         $context = clone $this->context;
 
         $context->set('containerWidth', $containerWidth);
         $context->set('nonRawSiblings', count($children));
+
         return $context;
     }
 
@@ -87,13 +92,16 @@ class CEmail_Builder_Component_BodyComponent_Group extends CEmail_Builder_Compon
 
     public function getWidthAsPixel() {
         $containerWidth = $this->context->getContainerWidth();
+        $containerWidthParserResult = Helper::widthParser($containerWidth, ['parseFloatToInt' => false]);
+        $containerParsedWidth = carr::get($containerWidthParserResult, 'parsedWidth');
         $widthParserResult = Helper::widthParser($this->getParsedWidth(true), ['parseFloatToInt' => false]);
         $unit = carr::get($widthParserResult, 'unit');
         $parsedWidth = carr::get($widthParserResult, 'parsedWidth');
 
         if ($unit === '%') {
-            return $containerWidth * $parsedWidth / 100 . 'px';
+            return $containerParsedWidth * $parsedWidth / 100 . 'px';
         }
+
         return $parsedWidth . 'px';
     }
 
@@ -106,11 +114,13 @@ class CEmail_Builder_Component_BodyComponent_Group extends CEmail_Builder_Compon
         switch ($unit) {
             case '%':
                 $className = 'c-column-per-' . $parsedWidth;
+
                 break;
 
             case 'px':
             default:
                 $className = 'c-column-px-' . $parsedWidth;
+
                 break;
         }
         // Add className to media queries
@@ -129,6 +139,9 @@ class CEmail_Builder_Component_BodyComponent_Group extends CEmail_Builder_Compon
         $containerWidth = $this->context->getContainerWidth();
 
         $getElementWidth = function ($width) use ($containerWidth, $nonRawSiblings, $groupWidth) {
+            $groupWidthParserResult = Helper::widthParser($groupWidth, ['parseFloatToInt' => false]);
+            $groupParsedWidth = carr::get($groupWidthParserResult, 'parsedWidth');
+
             if (!$width) {
                 if ($nonRawSiblings == 0) {
                     return '0px';
@@ -141,11 +154,13 @@ class CEmail_Builder_Component_BodyComponent_Group extends CEmail_Builder_Compon
             $unit = carr::get($widthParserResult, 'unit');
             $parsedWidth = carr::get($widthParserResult, 'parsedWidth');
             if ($unit === '%') {
-                if ($groupWidth == 0) {
+                if ($groupParsedWidth == 0) {
                     return '0px';
                 }
-                return (100 * $parsedWidth / $groupWidth) . 'px';
+
+                return (100 * $parsedWidth / $groupParsedWidth) . 'px';
             }
+
             return $parsedWidth . $unit;
         };
         $classesName = $this->getColumnClass() . ' mj-outlook-group-fix';
@@ -166,6 +181,7 @@ class CEmail_Builder_Component_BodyComponent_Group extends CEmail_Builder_Compon
                 $tdAttr = [];
 
                 $tdAttr['style'] = $style;
+
                 return '
               <!--[if mso | IE]>
               <td' . $component->htmlAttributes($tdAttr) . '>
@@ -177,6 +193,7 @@ class CEmail_Builder_Component_BodyComponent_Group extends CEmail_Builder_Compon
           ';
             }
         };
+
         return '
       <div' . $this->htmlAttributes(['class' => $classesName, 'style' => 'div']) . '>
         <!--[if mso | IE]>

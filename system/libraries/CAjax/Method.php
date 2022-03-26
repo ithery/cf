@@ -58,6 +58,10 @@ class CAjax_Method implements CInterface_Jsonable {
      * @return $this
      */
     public function setType($type) {
+        if (class_exists($type)) {
+            $type = c::classBasename($type);
+        }
+
         $this->type = $type;
 
         return $this;

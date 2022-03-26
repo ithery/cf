@@ -10,6 +10,7 @@ class CElement_List_ActionList extends CElement_List {
     use CTrait_Compat_Element_ActionList,
         CTrait_Element_Property_Label,
         CTrait_Element_Property_Icon;
+
     public $actions = [];
 
     protected $style;
@@ -20,15 +21,15 @@ class CElement_List_ActionList extends CElement_List {
         parent::__construct($listId);
 
         $this->style = 'btn-list';
-        $this->label = clang::__('Action');
+        $this->label = c::__('Action');
         $this->btn_dropdown_classes = [];
         $this->label_size = 2;
         $this->icon = '';
         $this->withCaret = true;
     }
 
-    public static function factory($list_id = '') {
-        return new CElement_List_ActionList($list_id);
+    public static function factory($id = null) {
+        return new static($id);
     }
 
     /**
@@ -43,9 +44,6 @@ class CElement_List_ActionList extends CElement_List {
             $this->style = $style;
         } else {
             trigger_error('style is not defined');
-        }
-        if ($this->id == 'test-123') {
-            //echo($this->style);
         }
 
         return $this;
@@ -65,12 +63,12 @@ class CElement_List_ActionList extends CElement_List {
         return $this->withCaret ? '<span class="caret"></span>' : '';
     }
 
-    public function html($indent = 0) {
-        if ($this->id == 'test-123') {
-            //die($this->style);
-        }
+    protected function applyStyleToChild() {
+        $this->apply('style', $this->style, [CElement_Component_Action::class]);
+    }
 
-        $this->apply('style', $this->style, 'CElement_Component_Action');
+    public function html($indent = 0) {
+        $this->applyStyleToChild();
         $html = new CStringBuilder();
         $html->setIndent($indent);
         $classes = $this->getClasses();

@@ -54,6 +54,7 @@ class CModel_Validating_ValidatingObserver {
                 if ($model->getThrowValidationExceptions()) {
                     $model->throwValidationException();
                 }
+
                 return false;
             }
             // Fire the validating.passed event.
@@ -66,8 +67,8 @@ class CModel_Validating_ValidatingObserver {
     /**
      * Fire the namespaced validating event.
      *
-     * @param \Illuminate\Database\Eloquent\Model $model
-     * @param string                              $event
+     * @param \CModel $model
+     * @param string  $event
      *
      * @return mixed
      */
@@ -76,6 +77,7 @@ class CModel_Validating_ValidatingObserver {
         if ($dispatcher == null) {
             return true;
         }
+
         return $dispatcher->until('model.validating: ' . get_class($model), [$model, $event]);
     }
 

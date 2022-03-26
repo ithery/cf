@@ -6,12 +6,15 @@ use Embed\OEmbed as Base;
 use Psr\Http\Message\UriInterface;
 
 class OEmbed extends Base {
-    const ENDPOINT_PAGE = 'https://graph.facebook.com/v8.0/oembed_page';
+    const ENDPOINT_PAGE = 'https://graph.facebook.com/v11.0/oembed_page';
 
-    const ENDPOINT_POST = 'https://graph.facebook.com/v8.0/oembed_post';
+    const ENDPOINT_POST = 'https://graph.facebook.com/v11.0/oembed_post';
 
-    const ENDPOINT_VIDEO = 'https://graph.facebook.com/v8.0/oembed_video';
+    const ENDPOINT_VIDEO = 'https://graph.facebook.com/v11.0/oembed_video';
 
+    /**
+     * @return null|UriInterface
+     */
     protected function detectEndpoint() {
         $token = $this->extractor->getSetting('facebook:token');
 

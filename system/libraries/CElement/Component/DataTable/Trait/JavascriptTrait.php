@@ -22,6 +22,7 @@ trait CElement_Component_DataTable_Trait_JavascriptTrait {
             $ajaxMethod->setData('query', $this->query);
             $ajaxMethod->setData('isModelQuery', $isModelQuery);
             $ajaxMethod->setData('isDataProvider', $this->query instanceof CManager_Contract_DataProviderInterface);
+
             $ajaxMethod->setData('table', serialize($this));
 
             $ajaxMethod->setData('dbConfig', $this->dbConfig);
@@ -210,16 +211,22 @@ trait CElement_Component_DataTable_Trait_JavascriptTrait {
                 $js->appendln('scrollY:        ' . $scrollY . ',')->br();
             }
             if ($this->fixedColumn) {
-                $js->appendln('scrollY:        300,')->br()
-                    ->appendln('scrollX:        true,')->br()
-                    ->appendln('scrollCollapse: true,')->br();
-                if ($this->checkbox) {
-                    $js->appendln("'fixedColumns': {
-                        leftColumns: 2
-                    },")->br();
-                } else {
-                    $js->appendln("'fixedColumns': " . ($this->fixedColumn ? 'true' : 'false') . ',')->br();
+                $scrollY = $this->scrollY;
+                if (is_bool($scrollY) || !is_numeric($scrollY)) {
+                    $scrollY = '300';
                 }
+
+                $js->appendln('scrollY : ' . $scrollY . ',')->br()
+                    ->appendln('scrollX : true,')->br()
+                    ->appendln('scrollCollapse : true,')->br();
+                $leftColumns = $this->fixedColumn;
+                if ($this->checkbox) {
+                    $leftColumns += 1;
+                }
+                $js->appendln('fixedColumns: {
+                    leftColumns: ' . $leftColumns . ',
+                    left: ' . $leftColumns . ',
+                },')->br();
             }
 
             /*

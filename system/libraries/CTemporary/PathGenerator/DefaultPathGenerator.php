@@ -1,13 +1,11 @@
 <?php
 
-class CTemporary_PathGenerator_DefaultPathGenerator {
-    public function getPath($extension = null) {
-        if (!$extension) {
-            $extension = 'temp';
-        }
-
-        if (cstr::startsWith($extension, '.')) {
-            $extension = '.' . $extension;
+class CTemporary_PathGenerator_DefaultPathGenerator implements CTemporary_PathGeneratorInterface {
+    public function generatePath($extension = null) {
+        if ($extension) {
+            if (cstr::startsWith($extension, '.')) {
+                $extension = '.' . $extension;
+            }
         }
 
         $filename = date('Ymd') . cutils::randmd5() . (strlen($extension) > 0 ? $extension : '');

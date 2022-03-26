@@ -11,6 +11,7 @@ class CFConsole {
         CConsole_Command_EnvironmentCommand::class,
         CConsole_Command_SetDomainCommand::class,
         CConsole_Command_SetAppCommand::class,
+        CConsole_Command_Api_JWTSecretCommand::class,
         CConsole_Command_Domain_DomainListCommand::class,
         CConsole_Command_Domain_DomainCreateCommand::class,
         CConsole_Command_Domain_DomainDeleteCommand::class,

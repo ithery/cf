@@ -167,32 +167,6 @@ abstract class CObservable extends CRenderable {
     }
 
     /**
-     * Add Action Element.
-     *
-     * @param string $id optional
-     *
-     * @return CElement_Component_Action
-     */
-    public function addAction($id = '') {
-        $act = CElement_Factory::createComponent('Action', $id);
-        $this->add($act);
-
-        return $act;
-    }
-
-    /**
-     * @param string $id
-     *
-     * @return CElement_Component_Alert
-     */
-    public function addAlert($id = '') {
-        $element = CElement_Factory::createComponent('Alert', $id);
-        $this->add($element);
-
-        return $element;
-    }
-
-    /**
      * @param string $id
      *
      * @return CElement_Component_Accordion

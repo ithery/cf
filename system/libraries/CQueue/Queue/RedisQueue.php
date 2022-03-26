@@ -295,8 +295,8 @@ class CQueue_Queue_RedisQueue extends CQueue_AbstractQueue implements CQueue_Con
     /**
      * Delete a reserved job from the queue.
      *
-     * @param string                          $queue
-     * @param \Illuminate\Queue\Jobs\RedisJob $job
+     * @param string               $queue
+     * @param \CQueue_Job_RedisJob $job
      *
      * @return void
      */
@@ -307,9 +307,9 @@ class CQueue_Queue_RedisQueue extends CQueue_AbstractQueue implements CQueue_Con
     /**
      * Delete a reserved job from the reserved queue and release it.
      *
-     * @param string                          $queue
-     * @param \Illuminate\Queue\Jobs\RedisJob $job
-     * @param int                             $delay
+     * @param string               $queue
+     * @param \CQueue_Job_RedisJob $job
+     * @param int                  $delay
      *
      * @return void
      */
@@ -378,7 +378,7 @@ class CQueue_Queue_RedisQueue extends CQueue_AbstractQueue implements CQueue_Con
     /**
      * Get the underlying Redis instance.
      *
-     * @return \Illuminate\Contracts\Redis\Factory
+     * @return \CRedis_FactoryInterface
      */
     public function getRedis() {
         return $this->redis;

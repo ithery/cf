@@ -9,8 +9,6 @@ defined('SYSPATH') or die('No direct access allowed.');
  *
  * @license Ittron Global Teknologi <ittron.co.id>
  */
-use Illuminate\Pagination\LengthAwarePaginator;
-use Illuminate\Pagination\Paginator;
 use MongoDB\BSON\ObjectID;
 
 class CModel_MongoDB_Relation_EmbedsMany extends CModel_MongoDB_Relation_EmbedsOneOrMany {
@@ -21,6 +19,7 @@ class CModel_MongoDB_Relation_EmbedsMany extends CModel_MongoDB_Relation_EmbedsO
         foreach ($models as $model) {
             $model->setRelation($relation, $this->related->newCollection());
         }
+
         return $models;
     }
 
@@ -34,18 +33,19 @@ class CModel_MongoDB_Relation_EmbedsMany extends CModel_MongoDB_Relation_EmbedsO
     /**
      * Save a new model and attach it to the parent model.
      *
-     * @param Model $model
+     * @param CModel $model
      *
-     * @return Model|bool
+     * @return CModel|bool
      */
     public function performInsert(CModel_MongoDB_Model $model) {
         // Generate a new key if needed.
         if ($model->getKeyName() == '_id' && !$model->getKey()) {
-            $model->setAttribute('_id', new ObjectID);
+            $model->setAttribute('_id', new ObjectID());
         }
         // For deeply nested documents, let the parent handle the changes.
         if ($this->isNested()) {
             $this->associate($model);
+
             return $this->parent->save() ? $model : false;
         }
         // Push the new model to the database.
@@ -54,6 +54,7 @@ class CModel_MongoDB_Relation_EmbedsMany extends CModel_MongoDB_Relation_EmbedsO
         if ($result) {
             $this->associate($model);
         }
+
         return $result ? $model : false;
     }
 
@@ -68,6 +69,7 @@ class CModel_MongoDB_Relation_EmbedsMany extends CModel_MongoDB_Relation_EmbedsO
         // For deeply nested documents, let the parent handle the changes.
         if ($this->isNested()) {
             $this->associate($model);
+
             return $this->parent->save();
         }
         // Get the correct foreign key value.
@@ -80,6 +82,7 @@ class CModel_MongoDB_Relation_EmbedsMany extends CModel_MongoDB_Relation_EmbedsO
         if ($result) {
             $this->associate($model);
         }
+
         return $result ? $model : false;
     }
 
@@ -94,6 +97,7 @@ class CModel_MongoDB_Relation_EmbedsMany extends CModel_MongoDB_Relation_EmbedsO
         // For deeply nested documents, let the parent handle the changes.
         if ($this->isNested()) {
             $this->dissociate($model);
+
             return $this->parent->save();
         }
         // Get the correct foreign key value.
@@ -102,6 +106,7 @@ class CModel_MongoDB_Relation_EmbedsMany extends CModel_MongoDB_Relation_EmbedsO
         if ($result) {
             $this->dissociate($model);
         }
+
         return $result;
     }
 
@@ -116,6 +121,7 @@ class CModel_MongoDB_Relation_EmbedsMany extends CModel_MongoDB_Relation_EmbedsO
         if (!$this->contains($model)) {
             return $this->associateNew($model);
         }
+
         return $this->associateExisting($model);
     }
 
@@ -161,6 +167,7 @@ class CModel_MongoDB_Relation_EmbedsMany extends CModel_MongoDB_Relation_EmbedsO
                 $count++;
             }
         }
+
         return $count;
     }
 
@@ -175,6 +182,7 @@ class CModel_MongoDB_Relation_EmbedsMany extends CModel_MongoDB_Relation_EmbedsO
         if ($result) {
             $this->setEmbedded([]);
         }
+
         return $result;
     }
 
@@ -210,11 +218,12 @@ class CModel_MongoDB_Relation_EmbedsMany extends CModel_MongoDB_Relation_EmbedsO
     protected function associateNew($model) {
         // Create a new key if needed.
         if ($model->getKeyName() === '_id' && !$model->getAttribute('_id')) {
-            $model->setAttribute('_id', new ObjectID);
+            $model->setAttribute('_id', new ObjectID());
         }
         $records = $this->getEmbedded();
         // Add the new model to the embedded documents.
         $records[] = $model->getAttributes();
+
         return $this->setEmbedded($records);
     }
 
@@ -234,9 +243,11 @@ class CModel_MongoDB_Relation_EmbedsMany extends CModel_MongoDB_Relation_EmbedsO
         foreach ($records as &$record) {
             if ($record[$primaryKey] == $key) {
                 $record = $model->getAttributes();
+
                 break;
             }
         }
+
         return $this->setEmbedded($records);
     }
 
@@ -245,17 +256,18 @@ class CModel_MongoDB_Relation_EmbedsMany extends CModel_MongoDB_Relation_EmbedsO
      *
      * @param int $perPage
      *
-     * @return \Illuminate\Pagination\AbstractPaginator
+     * @return \CPagination_AbstractPaginator
      */
     public function paginate($perPage = null) {
-        $page = Paginator::resolveCurrentPage();
+        $page = CPagination_Paginator::resolveCurrentPage();
         $perPage = $perPage ?: $this->related->getPerPage();
         $results = $this->getEmbedded();
         $total = count($results);
         $start = ($page - 1) * $perPage;
         $sliced = array_slice($results, $start, $perPage);
-        return new LengthAwarePaginator($sliced, $total, $perPage, $page, [
-            'path' => Paginator::resolveCurrentPath(),
+
+        return new CPagination_LengthAwarePaginator($sliced, $total, $perPage, $page, [
+            'path' => CPagination_Paginator::resolveCurrentPath(),
         ]);
     }
 
@@ -273,6 +285,7 @@ class CModel_MongoDB_Relation_EmbedsMany extends CModel_MongoDB_Relation_EmbedsO
         if (!is_array($models)) {
             $models = [$models];
         }
+
         return parent::setEmbedded(array_values($models));
     }
 
@@ -283,14 +296,15 @@ class CModel_MongoDB_Relation_EmbedsMany extends CModel_MongoDB_Relation_EmbedsO
         if (method_exists(CModel_Collection::class, $method)) {
             return call_user_func_array([$this->getResults(), $method], $parameters);
         }
+
         return parent::__call($method, $parameters);
     }
 
     /**
      * Get the name of the "where in" method for eager loading.
      *
-     * @param \Illuminate\Database\Eloquent\Model $model
-     * @param string                              $key
+     * @param \CModel $model
+     * @param string  $key
      *
      * @return string
      */

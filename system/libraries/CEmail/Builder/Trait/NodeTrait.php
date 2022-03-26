@@ -9,6 +9,7 @@ trait CEmail_Builder_Trait_NodeTrait {
     protected function addNode($tagName) {
         $node = new CEmail_Builder_Node(['tagName' => $tagName]);
         $this->children[] = $node;
+
         return $node;
     }
 
@@ -66,6 +67,13 @@ trait CEmail_Builder_Trait_NodeTrait {
      */
     public function addText() {
         return $this->addNode('c-text');
+    }
+
+    /**
+     * @return CEmail_Builder_Node
+     */
+    public function addButton() {
+        return $this->addNode('c-button');
     }
 
     /**

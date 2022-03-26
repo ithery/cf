@@ -30,4 +30,11 @@ class CTranslation {
 
         return static::$translator[$locale];
     }
+
+    /**
+     * @return CTranslation_Manager
+     */
+    public static function manager() {
+        return CTranslation_Manager::instance();
+    }
 }

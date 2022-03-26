@@ -1,5 +1,7 @@
 <?php
 
+use Opis\Closure\SerializableClosure;
+
 class CManager_DataProvider_SqlDataProvider extends CManager_DataProviderAbstract {
     protected $connection = '';
 
@@ -7,20 +9,242 @@ class CManager_DataProvider_SqlDataProvider extends CManager_DataProviderAbstrac
 
     protected $bindings;
 
+    private $baseQuery;
+
+    private $baseOrder;
+
     public function __construct($sql, $bindings = []) {
         $this->sql = $sql;
         $this->bindings = $bindings;
     }
 
+    protected function getQuery() {
+        return c::db($this->connection)->compileBinds($this->sql, $this->bindings);
+    }
+
     public function setConnection($connection) {
-        $this->connection = $connection;
+        $this->connection = $connection instanceof Closure ? new SerializableClosure($connection) : $connection;
     }
 
     public function getConnection() {
-        return $this->connection ?: 'default';
+        return c::value($this->connection) ?: 'default';
+    }
+
+    public function getDb() {
+        $connection = $this->getConnection();
+
+        return $connection instanceof CDatabase ? $connection : c::db($connection);
     }
 
     public function toEnumerable() {
-        return c::db($this->connection)->query($this->sql, $this->bindings);
+        return c::collect($this->getDb()->query($this->sql, $this->bindings)->resultArray(false));
+    }
+
+    private function executeQuery($sql, $bindings = []) {
+        return $this->getDb()->query($sql, $bindings);
+    }
+
+    public function paginate($perPage = null, $columns = ['*'], $pageName = 'page', $page = null, $callback = null) {
+        $page = $page ?: CPagination_Paginator::resolveCurrentPage($pageName);
+
+        $total = $this->getCountForPagination();
+        $results = c::collect();
+        if ($total > 0) {
+            $query = $this->getQueryForPage($page, $perPage);
+            $resultQ = $this->executeQuery($query);
+            $results = c::collect($resultQ->result(false));
+        }
+
+        return c::paginator($results, $total, $perPage, $page, [
+            'path' => CPagination_Paginator::resolveCurrentPath(),
+            'pageName' => $pageName,
+        ]);
+    }
+
+    public function getCountForPagination() {
+        return $this->getTotalRecord();
+    }
+
+    protected function getBaseQuery() {
+        if ($this->baseQuery === null) {
+            $qBase = $this->getQuery();
+
+            $maxWhere = strrpos(strtolower($qBase), 'where');
+            $maxFrom = strrpos(strtolower($qBase), 'from');
+
+            $maxOffset = 0;
+            if ($maxWhere !== false && $maxWhere > $maxOffset) {
+                $maxOffset = $maxWhere;
+            }
+            if ($maxFrom !== false && $maxFrom > $maxOffset) {
+                $maxOffset = $maxFrom;
+            }
+
+            $posOrderBy = strrpos(strtolower($qBase), 'order by', $maxOffset);
+
+            $postLastBracket = strrpos(strtolower($qBase), ')');
+
+            $stringOrderBy = '';
+            if ($posOrderBy !== false && $posOrderBy > $postLastBracket) {
+                $stringOrderBy = substr($qBase, $posOrderBy, strlen($qBase) - $posOrderBy);
+                $qBase = substr($qBase, 0, $posOrderBy);
+            }
+            $this->baseQuery = $qBase;
+            $this->baseOrder = $stringOrderBy;
+        }
+
+        return $this->baseQuery;
+    }
+
+    protected function getQueryLimit($page, $perPage) {
+        if ($page <= 0) {
+            return '';
+        }
+        $offset = ($page - 1) * $perPage;
+        $limit = $perPage;
+        $sLimit = 'LIMIT ' . intval($offset) . ', ' . intval($limit);
+
+        return $sLimit;
+    }
+
+    protected function getQueryOrderBy() {
+        $sortData = $this->sort;
+
+        $sOrder = '';
+        //process ordering
+        if (count($this->sort) > 0) {
+            foreach ($this->sort as $fieldName => $sortDirection) {
+                $sOrder .= ', ' . c::db($this->connection)->escapeColumn($fieldName) . ' ' . c::db($this->connection)->escapeStr($sortDirection);
+            }
+        }
+
+        if (strlen($sOrder) > 0) {
+            $sOrder = substr($sOrder, 2);
+        }
+
+        if (strlen($sOrder) == 0) {
+            $stringOrderBy = $this->baseOrder();
+
+            if (strlen($stringOrderBy) > 0) {
+                //remove prefixed column from order by
+                $sub = explode(',', substr($stringOrderBy, 9));
+                $sOrder = '';
+                $newStringOrderBy = '';
+                foreach ($sub as $val) {
+                    $columnNames = explode('.', $val);
+                    $columnName = $columnNames[0];
+                    if (isset($columnNames[1])) {
+                        $columnName = $columnNames[1];
+                    }
+                    $newStringOrderBy .= ', ' . $columnName;
+                }
+                $sOrder = substr($newStringOrderBy, 2);
+            }
+        }
+        if (strlen($sOrder) > 0) {
+            $sOrder = 'ORDER BY ' . $sOrder;
+        }
+
+        return $sOrder;
+    }
+
+    protected function baseOrder() {
+        if ($this->baseOrder === null) {
+            $this->getBaseQuery();
+        }
+
+        return $this->baseOrder;
+    }
+
+    protected function getQueryWhere() {
+        $sWhereOr = '';
+        $sWhereAnd = '';
+        $sWhere = '';
+        //process search
+        if (count($this->searchOr) > 0) {
+            $dataSearchOr = $this->searchOr;
+
+            foreach ($dataSearchOr as $fieldName => $value) {
+                $sWhereOr .= 'OR ' . c::db()->escapeColumn($fieldName) . " LIKE '%" . c::db($this->connection)->escapeLike($value) . "%' ";
+            }
+            if (strlen($sWhereOr) > 0) {
+                $sWhereOr = '(' . substr($sWhereOr, 3) . ')';
+            }
+        }
+
+        if (count($this->searchAnd) > 0) {
+            $dataSearchAnd = $this->searchAnd;
+
+            foreach ($dataSearchAnd as $fieldName => $value) {
+                $sWhereAnd .= 'AND ' . c::db()->escapeColumn($fieldName) . " LIKE '%" . c::db($this->connection)->escapeLike($value) . "%' ";
+            }
+            if (strlen($sWhereAnd) > 0) {
+                $sWhereAnd = '(' . substr($sWhereAnd, 4) . ')';
+            }
+        }
+
+        $sWhere = $sWhereOr;
+        if (strlen($sWhereAnd) > 0) {
+            if (strlen($sWhere) > 0) {
+                $sWhere .= ' AND ';
+            }
+            $sWhere .= $sWhereAnd;
+        }
+        if (strlen($sWhere) > 0) {
+            $sWhere = ' WHERE ( ' . $sWhere . ' )';
+        }
+
+        return $sWhere;
+    }
+
+    protected function getTotalRecord() {
+        $q = $this->getBaseQuery();
+        // get total record
+        $qTotal = 'select count(*) as cnt from (' . $q . ') as a';
+        $rTotal = c::db($this->connection)->query($qTotal);
+        $totalRecord = 0;
+        if ($rTotal->count() > 0) {
+            $totalRecord = $rTotal[0]->cnt;
+        }
+
+        return $totalRecord;
+    }
+
+    protected function getTotalFilteredRecord() {
+        $qBase = $this->getBaseQuery();
+        $sWhere = $this->getQueryWhere();
+        $qFiltered = 'select * from (' . $qBase . ') as a ' . $sWhere;
+
+        $qTotalFiltered = 'select count(*) as cnt from (' . $qFiltered . ') as a';
+        $rTotalFiltered = c::db($this->connection)->query($qTotalFiltered);
+        $totalFilteredRecord = 0;
+        if ($rTotalFiltered->count() > 0) {
+            $totalFilteredRecord = $rTotalFiltered[0]->cnt;
+        }
+
+        return $totalFilteredRecord;
+    }
+
+    protected function getQueryForPage($page, $perPage) {
+        $q = $this->getFullQuery();
+        $sLimit = $this->getQueryLimit($page, $perPage);
+        $q .= ' ' . $sLimit;
+
+        return $q;
+    }
+
+    protected function getFullQuery() {
+        $qBase = $this->getBaseQuery();
+
+        /* Ordering */
+        $sOrder = $this->getQueryOrderBy();
+        /**
+         * Build condition query.
+         */
+        $sWhere = $this->getQueryWhere();
+
+        $qProcess = 'select * from (' . $qBase . ') as a ' . $sWhere . ' ' . $sOrder;
+
+        return $qProcess;
     }
 }

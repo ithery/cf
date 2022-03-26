@@ -1,7 +1,7 @@
 <?php
 
 /**
- * Description of MethodAbstract
+ * Description of MethodAbstract.
  *
  * @author Hery
  */
@@ -19,6 +19,15 @@ abstract class CApi_MethodAbstract implements CInterface_Arrayable {
     protected $sessionId = null;
 
     protected $session;
+
+    protected $apiRequest;
+
+    /**
+     * The middleware registered on the controller.
+     *
+     * @var array
+     */
+    protected $middleware = [];
 
     protected $sessionOptions = [
         'driver' => 'File',
@@ -41,6 +50,38 @@ abstract class CApi_MethodAbstract implements CInterface_Arrayable {
 
     abstract public function execute();
 
+    public function setApiRequest(CApi_HTTP_Request $apiRequest) {
+        $this->apiRequest = $apiRequest;
+    }
+
+    /**
+     * Register middleware on the controller.
+     *
+     * @param \Closure|array|string $middleware
+     * @param array                 $options
+     *
+     * @return $this
+     */
+    public function middleware($middleware, array $options = []) {
+        foreach ((array) $middleware as $m) {
+            $this->middleware[] = [
+                'middleware' => $m,
+                'options' => &$options,
+            ];
+        }
+
+        return $this;
+    }
+
+    /**
+     * Get the middleware assigned to the controller.
+     *
+     * @return array
+     */
+    public function getMiddleware() {
+        return $this->middleware;
+    }
+
     public function toArray() {
         return $this->result();
     }
@@ -49,6 +90,7 @@ abstract class CApi_MethodAbstract implements CInterface_Arrayable {
         if ($this->request == null) {
             return array_merge($_GET, $_POST);
         }
+
         return $this->request;
     }
 
@@ -56,6 +98,7 @@ abstract class CApi_MethodAbstract implements CInterface_Arrayable {
         if ($this->sessionId == null) {
             $this->sessionId = carr::get($this->request(), $this->sessionIdParameter);
         }
+
         return $this->sessionId;
     }
 
@@ -65,6 +108,7 @@ abstract class CApi_MethodAbstract implements CInterface_Arrayable {
             'errMessage' => $this->errMessage,
             'data' => $this->data,
         ];
+
         return $return;
     }
 
@@ -91,10 +135,19 @@ abstract class CApi_MethodAbstract implements CInterface_Arrayable {
         if ($this->session == null) {
             $this->session = $this->getSession();
         }
+
         return $this->session;
     }
 
     protected function getSession() {
         return CApi::session($this->sessionId(), $this->sessionOptions);
+    }
+
+    protected function validate($data, $rules, $messages = []) {
+        if ($data == null) {
+            $data = $this->request();
+        }
+        $validator = CValidation::createValidator($data, $rules, $messages);
+        $validator->validate();
     }
 }

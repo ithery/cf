@@ -15,7 +15,7 @@ abstract class CQueue_AbstractTask implements CQueue_ShouldQueueInterface {
     use CQueue_Trait_SerializesModels;
 
     /**
-     * Shortcut function to log the current running service
+     * Shortcut function to log the current running service.
      *
      * @param string $msg
      */

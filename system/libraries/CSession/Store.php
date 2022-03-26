@@ -7,7 +7,7 @@
  *
  * @see CSession
  */
-class CSession_Store {
+class CSession_Store implements CSession_Contract_SessionInterface {
     /**
      * The session ID.
      *
@@ -599,7 +599,7 @@ class CSession_Store {
      * @return void
      */
     public function setExists($value) {
-        if ($this->handler instanceof ExistenceAwareInterface) {
+        if ($this->handler instanceof CSession_ExistenceAwareInterface) {
             $this->handler->setExists($value);
         }
     }

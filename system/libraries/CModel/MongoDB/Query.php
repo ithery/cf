@@ -5,6 +5,7 @@ use MongoDB\Model\BSONDocument;
 
 class CModel_MongoDB_Query extends CModel_Query {
     use CModel_MongoDB_Trait_QueriesRelationshipTrait;
+
     /**
      * The methods that should be returned from query builder.
      *
@@ -33,8 +34,10 @@ class CModel_MongoDB_Query extends CModel_Query {
         // to the parent relation instance.
         if ($relation = $this->model->getParentRelation()) {
             $relation->performUpdate($this->model, $values);
+
             return 1;
         }
+
         return $this->toBase()->update($this->addUpdatedAtColumn($values), $options);
     }
 
@@ -46,8 +49,10 @@ class CModel_MongoDB_Query extends CModel_Query {
         // to the parent relation instance.
         if ($relation = $this->model->getParentRelation()) {
             $relation->performInsert($this->model, $values);
+
             return true;
         }
+
         return parent::insert($values);
     }
 
@@ -59,8 +64,10 @@ class CModel_MongoDB_Query extends CModel_Query {
         // to the parent relation instance.
         if ($relation = $this->model->getParentRelation()) {
             $relation->performInsert($this->model, $values);
+
             return $this->model->getKey();
         }
+
         return parent::insertGetId($values, $sequence);
     }
 
@@ -72,8 +79,10 @@ class CModel_MongoDB_Query extends CModel_Query {
         // to the parent relation instance.
         if ($relation = $this->model->getParentRelation()) {
             $relation->performDelete($this->model);
+
             return $this->model->getKey();
         }
+
         return parent::delete();
     }
 
@@ -91,8 +100,10 @@ class CModel_MongoDB_Query extends CModel_Query {
             $this->model->{$column} = null;
             $this->model->syncOriginalAttribute($column);
             $result = $this->model->update([$column => $value]);
+
             return $result;
         }
+
         return parent::increment($column, $amount, $extra);
     }
 
@@ -109,8 +120,10 @@ class CModel_MongoDB_Query extends CModel_Query {
             // temporary in order to trigger an update query.
             $this->model->{$column} = null;
             $this->model->syncOriginalAttribute($column);
+
             return $this->model->update([$column => $value]);
         }
+
         return parent::decrement($column, $amount, $extra);
     }
 
@@ -130,15 +143,18 @@ class CModel_MongoDB_Query extends CModel_Query {
         // Convert MongoCursor results to a collection of models.
         if ($results instanceof Cursor) {
             $results = iterator_to_array($results, false);
+
             return $this->model->hydrate($results);
         } elseif ($results instanceof BSONDocument) {
             // Convert Mongo BSONDocument to a single object.
             $results = $results->getArrayCopy();
+
             return $this->model->newFromBuilder((array) $results);
         } elseif (is_array($results) && array_key_exists('_id', $results)) {
             // The result is a single object.
             return $this->model->newFromBuilder((array) $results);
         }
+
         return $results;
     }
 
@@ -146,7 +162,7 @@ class CModel_MongoDB_Query extends CModel_Query {
      * Add the "updated at" column to an array of values.
      * TODO Remove if https://github.com/laravel/framework/commit/6484744326531829341e1ff886cc9b628b20d73e
      * wiil be reverted
-     * Issue in laravel frawework https://github.com/laravel/framework/issues/27791
+     * Issue in laravel frawework https://github.com/laravel/framework/issues/27791.
      *
      * @param array $values
      *
@@ -161,11 +177,12 @@ class CModel_MongoDB_Query extends CModel_Query {
             [$column => $this->model->freshTimestampString()],
             $values
         );
+
         return $values;
     }
 
     /**
-     * @return \Illuminate\Database\ConnectionInterface
+     * @return \CDatabase
      */
     public function getConnection() {
         return $this->query->getConnection();

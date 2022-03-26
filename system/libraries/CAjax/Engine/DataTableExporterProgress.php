@@ -22,6 +22,7 @@ class CAjax_Engine_DataTableExporterProgress extends CAjax_Engine {
                 'state' => $state,
                 'exporter' => $exporter,
                 'fileUrl' => $fileUrl,
+                'downloadId' => $downloadId,
             ]
         ];
 

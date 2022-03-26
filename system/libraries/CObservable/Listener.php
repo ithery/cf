@@ -10,17 +10,18 @@ defined('SYSPATH') or die('No direct access allowed.');
  */
 class CObservable_Listener extends CObservable_ListenerAbstract {
     use CTrait_Compat_Listener;
+
     protected $confirm;
 
-    protected $confirm_message;
+    protected $confirmMessage;
 
-    protected $no_double;
+    protected $noDouble;
 
     public function __construct($owner, $event = 'click') {
         parent::__construct($owner);
         $this->confirm = false;
-        $this->confirm_message = '';
-        $this->no_double = false;
+        $this->confirmMessage = '';
+        $this->noDouble = false;
         $this->event = $event;
     }
 
@@ -35,7 +36,7 @@ class CObservable_Listener extends CObservable_ListenerAbstract {
     }
 
     public function setNoDouble($bool) {
-        $this->no_double = $bool;
+        $this->noDouble = $bool;
 
         return $this;
     }
@@ -45,7 +46,7 @@ class CObservable_Listener extends CObservable_ListenerAbstract {
     }
 
     public function setConfirmMessage($message) {
-        $this->confirm_message = $message;
+        $this->confirmMessage = $message;
 
         return $this;
     }
@@ -55,7 +56,7 @@ class CObservable_Listener extends CObservable_ListenerAbstract {
             var thiselm=jQuery(this);
             var clicked = thiselm.attr('data-clicked');
         ";
-        if ($this->no_double) {
+        if ($this->noDouble) {
             $startScript .= '
                 if(clicked) return false;
             ';
@@ -70,12 +71,12 @@ class CObservable_Listener extends CObservable_ListenerAbstract {
         $confirmStartScript = '';
         $confirmEndScript = '';
         if ($this->confirm) {
-            $confirm_message = $this->confirm_message;
-            if (strlen($confirm_message) == 0) {
-                $confirm_message = clang::__('Are you sure ?');
+            $confirmMessage = $this->confirmMessage;
+            if (strlen($confirmMessage) == 0) {
+                $confirmMessage = c::__('Are you sure ?');
             }
             $confirmStartScript = "
-                window.cresenity.confirm({owner:thiselm, message:'" . c::e($confirm_message) . "',confirmCallback: function(confirmed) {
+                window.cresenity.confirm({owner:thiselm, message:'" . c::e($confirmMessage) . "',confirmCallback: function(confirmed) {
                     if(confirmed) {
             ";
 
@@ -108,23 +109,23 @@ class CObservable_Listener extends CObservable_ListenerAbstract {
         $eventParameterImploded = implode(',', $this->eventParameters);
         if ($this->event == 'lazyload') {
             $js->append("
-                    jQuery(window).ready(function() {
-                        if (jQuery('#" . $this->owner . "')[0].getBoundingClientRect().top < (jQuery(window).scrollTop() + jQuery(window).height())) {
-                                " . $compiledJs . "
-                            }
-                    });
-                    jQuery(window).scroll(function() {
-                        if (jQuery('#" . $this->owner . "')[0].getBoundingClientRect().top < (jQuery(window).scrollTop() + jQuery(window).height())) {
-                                " . $compiledJs . '
-                            }
-                    });
-                ');
+                jQuery(window).ready(function() {
+                    if (jQuery('#" . $this->owner . "')[0].getBoundingClientRect().top < (jQuery(window).scrollTop() + jQuery(window).height())) {
+                        " . $compiledJs . "
+                    }
+                });
+                jQuery(window).scroll(function() {
+                    if (jQuery('#" . $this->owner . "')[0].getBoundingClientRect().top < (jQuery(window).scrollTop() + jQuery(window).height())) {
+                        " . $compiledJs . '
+                    }
+                });
+            ');
         } else {
             $js->append("
-                    jQuery('#" . $this->owner . "')." . $this->event . '(function(' . $eventParameterImploded . ') {
-                        ' . $compiledJs . '
-                    });
-                ');
+                jQuery('#" . $this->owner . "')." . $this->event . '(function(' . $eventParameterImploded . ') {
+                    ' . $compiledJs . '
+                });
+            ');
         }
 
         return $js->text();

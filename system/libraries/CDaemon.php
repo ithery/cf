@@ -4,14 +4,11 @@ defined('SYSPATH') or die('No direct access allowed.');
 
 /**
  * @author Hery Kurniawan
- *
- * @since Mar 12, 2019, 3:17:44 PM
- *
  * @license Ittron Global Teknologi <ittron.co.id>
+ *
+ * @see CDaemon_Runner
+ * @since Mar 12, 2019, 3:17:44 PM
  */
-use Symfony\Component\Process\Process;
-use Symfony\Component\Process\PhpExecutableFinder;
-
 class CDaemon {
     const COMMAND_START = 'start';
 
@@ -72,7 +69,7 @@ class CDaemon {
      * Shortcut function to log the current running service.
      *
      * @param string $msg
-     * @param mixed  $label
+     * @param string $label
      */
     public static function log($msg, $label = '') {
         $runningService = self::getRunningService();

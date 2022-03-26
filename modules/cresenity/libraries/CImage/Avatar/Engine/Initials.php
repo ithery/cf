@@ -8,27 +8,43 @@ defined('SYSPATH') or die('No direct access allowed.');
  *
  * @since Feb 16, 2019, 1:43:07 AM
  */
-use Intervention\Image\AbstractFont;
 use Intervention\Image\Image;
+use Intervention\Image\AbstractFont;
 use Intervention\Image\ImageManager;
 
 class CImage_Avatar_Engine_Initials extends CImage_Avatar_EngineAbstract {
-    /** @var ImageManager */
+    /**
+     * @var ImageManager
+     */
     protected $image;
 
-    /** @var Initials */
+    /**
+     * @var CString_Initials
+     */
     protected $initials_generator;
+
     protected $driver = 'gd'; // imagick or gd
+
     protected $fontSize = 0.5;
+
     protected $name = 'John Doe';
+
     protected $size = 48;
+
     protected $bgColor = '#000';
+
     protected $fontColor = '#fff';
+
     protected $rounded = false;
+
     protected $smooth = false;
+
     protected $autofont = false;
+
     protected $keepCase = false;
+
     protected $fontFile = CConstant::CRESENITY_FONT_PATH . '/opensans/OpenSans-Regular.ttf';
+
     protected $generated_initials = 'JD';
 
     public function __construct() {
@@ -37,7 +53,7 @@ class CImage_Avatar_Engine_Initials extends CImage_Avatar_EngineAbstract {
     }
 
     /**
-     * Create a ImageManager instance
+     * Create a ImageManager instance.
      */
     protected function setupImageManager() {
         $this->image = new ImageManager(['driver' => $this->getDriver()]);
@@ -53,11 +69,12 @@ class CImage_Avatar_Engine_Initials extends CImage_Avatar_EngineAbstract {
     public function name($nameOrInitials) {
         $this->name = $nameOrInitials;
         $this->initials_generator->name($nameOrInitials);
+
         return $this;
     }
 
     /**
-     * Transforms a unicode string to the proper format
+     * Transforms a unicode string to the proper format.
      *
      * @param string $char the code to be converted (e.g., f007 would mean the "user" symbol)
      *
@@ -66,6 +83,7 @@ class CImage_Avatar_Engine_Initials extends CImage_Avatar_EngineAbstract {
     public function glyph($char) {
         $uChar = json_decode(sprintf('"\u%s"', $char));
         $this->name($uChar);
+
         return $this;
     }
 
@@ -78,6 +96,7 @@ class CImage_Avatar_Engine_Initials extends CImage_Avatar_EngineAbstract {
      */
     public function length($length = 2) {
         $this->initials_generator->length($length);
+
         return $this;
     }
 
@@ -90,6 +109,7 @@ class CImage_Avatar_Engine_Initials extends CImage_Avatar_EngineAbstract {
      */
     public function size($size) {
         $this->size = (int) $size;
+
         return $this;
     }
 
@@ -102,6 +122,7 @@ class CImage_Avatar_Engine_Initials extends CImage_Avatar_EngineAbstract {
      */
     public function background($background) {
         $this->bgColor = (string) $background;
+
         return $this;
     }
 
@@ -114,6 +135,7 @@ class CImage_Avatar_Engine_Initials extends CImage_Avatar_EngineAbstract {
      */
     public function color($color) {
         $this->fontColor = (string) $color;
+
         return $this;
     }
 
@@ -126,6 +148,7 @@ class CImage_Avatar_Engine_Initials extends CImage_Avatar_EngineAbstract {
      */
     public function font($font) {
         $this->fontFile = $font;
+
         return $this;
     }
 
@@ -137,6 +160,7 @@ class CImage_Avatar_Engine_Initials extends CImage_Avatar_EngineAbstract {
     public function imagick() {
         $this->driver = 'imagick';
         $this->setupImageManager();
+
         return $this;
     }
 
@@ -148,6 +172,7 @@ class CImage_Avatar_Engine_Initials extends CImage_Avatar_EngineAbstract {
     public function gd() {
         $this->driver = 'gd';
         $this->setupImageManager();
+
         return $this;
     }
 
@@ -160,6 +185,7 @@ class CImage_Avatar_Engine_Initials extends CImage_Avatar_EngineAbstract {
      */
     public function rounded($rounded = true) {
         $this->rounded = (bool) $rounded;
+
         return $this;
     }
 
@@ -173,6 +199,7 @@ class CImage_Avatar_Engine_Initials extends CImage_Avatar_EngineAbstract {
      */
     public function autoFont($autofont = true) {
         $this->autofont = (bool) $autofont;
+
         return $this;
     }
 
@@ -185,6 +212,7 @@ class CImage_Avatar_Engine_Initials extends CImage_Avatar_EngineAbstract {
      */
     public function smooth($smooth = true) {
         $this->smooth = (bool) $smooth;
+
         return $this;
     }
 
@@ -197,6 +225,7 @@ class CImage_Avatar_Engine_Initials extends CImage_Avatar_EngineAbstract {
      */
     public function keepCase($keepCase = true) {
         $this->keepCase = (bool) $keepCase;
+
         return $this;
     }
 
@@ -210,6 +239,7 @@ class CImage_Avatar_Engine_Initials extends CImage_Avatar_EngineAbstract {
      */
     public function fontSize($size = 0.5) {
         $this->fontSize = number_format($size, 2);
+
         return $this;
     }
 
@@ -225,6 +255,7 @@ class CImage_Avatar_Engine_Initials extends CImage_Avatar_EngineAbstract {
             $this->name = $name;
             $this->generated_initials = $this->initials_generator->keepCase($this->getKeepCase())->generate($name);
         }
+
         return $this->makeAvatar($this->image);
     }
 
@@ -312,7 +343,7 @@ class CImage_Avatar_Engine_Initials extends CImage_Avatar_EngineAbstract {
     /**
      * Will return the keepCase parameter.
      *
-     * @return boolean
+     * @return bool
      */
     public function getKeepCase() {
         return $this->keepCase;
@@ -352,6 +383,7 @@ class CImage_Avatar_Engine_Initials extends CImage_Avatar_EngineAbstract {
             $size /= 5;
             $avatar->resize($size, $size);
         }
+
         return $avatar->text($name, $size / 2, $size / 2, function (AbstractFont $font) use ($size, $color, $fontFile, $fontSize) {
             $font->file($fontFile);
             $font->size($size * $fontSize);
@@ -378,6 +410,7 @@ class CImage_Avatar_Engine_Initials extends CImage_Avatar_EngineAbstract {
         if (file_exists(__DIR__ . '/' . $fontFile)) {
             return __DIR__ . '/' . $fontFile;
         }
+
         return 1;
     }
 
@@ -412,6 +445,7 @@ class CImage_Avatar_Engine_Initials extends CImage_Avatar_EngineAbstract {
         if (CString_Language::isJapanese($this->getInitials())) {
             return CConstant::CRESENITY_FONT_PATH . '/notosans/script/Noto-CJKJP-Regular.otf';
         }
+
         return $this->getFontFile();
     }
 }

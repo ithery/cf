@@ -105,7 +105,7 @@ class CCron_Event {
     /**
      * The event mutex implementation.
      *
-     * @var \Illuminate\Console\Scheduling\EventMutex
+     * @var \CCron_Contract_EventMutexInterface
      */
     public $mutex;
 
@@ -190,7 +190,6 @@ class CCron_Event {
         ) {
             return;
         }
-
         $this->runInBackground
             ? $this->runCommandInBackground()
             : $this->runCommandInForeground();
@@ -946,7 +945,7 @@ class CCron_Event {
      *
      * @return void
      */
-    public function log(string $message = '') {
+    public function log($message = '') {
         static $logFile = '';
         static $logFileError = false;
         static $description = '';
@@ -1000,7 +999,7 @@ class CCron_Event {
      *
      * @return void
      */
-    private function rotateLog(string $fileName, int $maxRotation = 10) {
+    private function rotateLog($fileName, $maxRotation = 10) {
         for ($i = $maxRotation; $i >= 0; $i--) {
             $file = $fileName;
             $fileToReplace = $fileName . '.' . ($i + 1);
@@ -1018,12 +1017,13 @@ class CCron_Event {
     }
 
     /**
-     * Rotate log file
+     * Rotate log file.
      *
-     * @param integer $maxRotation
+     * @param int $maxRotation
+     *
      * @return void
      */
-    public function rotate(int $maxRotation = 10) {
+    public function rotate($maxRotation = 10) {
         $this->rotateLog($this->getLogFile(), $maxRotation);
         $handle = fopen($this->getLogFile(), 'a+');
         fwrite($handle, "\nDate                  Message\n");

@@ -380,11 +380,21 @@ class CRemote_SSH_Gateway implements CRemote_SSH_GatewayInterface {
     }
 
     /**
-     * Get log ssh with defined NET_SSH2_LOGGING
+     * Get log ssh with defined NET_SSH2_LOGGING.
      *
      * @return string
      */
     public function getLog() {
         return $this->getConnection()->getLog();
+    }
+
+    public function disconnect() {
+        if ($this->connection) {
+            $this->connection->disconnect();
+        }
+    }
+
+    public function __destruct() {
+        //$this->disconnect();
     }
 }

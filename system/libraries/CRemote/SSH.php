@@ -53,6 +53,7 @@ class CRemote_SSH {
         if (strlen($host) == 0) {
             $host = carr::get($config, 'host');
         }
+
         $this->setOutput($connection = new CRemote_SSH_Connection(
             $name,
             $host,
@@ -133,12 +134,33 @@ class CRemote_SSH {
     }
 
     /**
+     * Run a set of commands against the connection (blocking).
+     *
+     * @param string|array $commands
+     * @param mixed        $timeout
+     *
+     * @return string
+     */
+    public function runBlocking($commands, $timeout = 2) {
+        return $this->connection->runBlocking($commands, $timeout);
+    }
+
+    /**
      * Get log ssh with defined NET_SSH2_LOGGING.
      *
      * @return string
      */
     public function getLog() {
         return $this->connection->getGateway()->getLog();
+    }
+
+    public function disconnect() {
+        return $this->connection->disconnect();
+    }
+
+    public function reconnect() {
+        $this->disconnect();
+        $this->connection = $this->makeConnection($this->name, $this->config);
     }
 
     /**

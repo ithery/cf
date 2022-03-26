@@ -244,10 +244,9 @@ class CRouting_UrlGenerator {
         $path = $dirname . DS . $filename;
         $root = $this->formatRoot($this->formatScheme($secure));
         $path = CF::findFile('media', $path, false, $extension);
-        if (!$path) {
-            throw new Exception('media ' . $pathOriginal . ' not found');
-        } else {
-            $path = str_replace(DOCROOT, '', $path);
+        $count = 1;
+        if (cstr::startsWith($path, DOCROOT)) {
+            $path = str_replace(DOCROOT, '', $path, $count);
         }
 
         return $this->removeIndex($root) . '/' . trim($path, '/');
@@ -561,9 +560,9 @@ class CRouting_UrlGenerator {
     /**
      * Format the given URL segments into a single URL.
      *
-     * @param string                         $root
-     * @param string                         $path
-     * @param null|\Illuminate\Routing\Route $route
+     * @param string               $root
+     * @param string               $path
+     * @param null|\CRouting_Route $route
      *
      * @return string
      */

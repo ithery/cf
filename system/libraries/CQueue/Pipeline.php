@@ -41,7 +41,7 @@ class CQueue_Pipeline implements CQueue_PipelineInterface {
     /**
      * Create a new class instance.
      *
-     * @param CContainer_ContainerInterface|null $container
+     * @param null|CContainer_ContainerInterface $container
      *
      * @return void
      */
@@ -58,6 +58,7 @@ class CQueue_Pipeline implements CQueue_PipelineInterface {
      */
     public function send($passable) {
         $this->passable = $passable;
+
         return $this;
     }
 
@@ -70,6 +71,7 @@ class CQueue_Pipeline implements CQueue_PipelineInterface {
      */
     public function through($pipes) {
         $this->pipes = is_array($pipes) ? $pipes : func_get_args();
+
         return $this;
     }
 
@@ -82,6 +84,7 @@ class CQueue_Pipeline implements CQueue_PipelineInterface {
      */
     public function via($method) {
         $this->method = $method;
+
         return $this;
     }
 
@@ -98,6 +101,7 @@ class CQueue_Pipeline implements CQueue_PipelineInterface {
             $this->carry(),
             $this->prepareDestination($destination)
         );
+
         return $pipeline($this->passable);
     }
 
@@ -159,6 +163,7 @@ class CQueue_Pipeline implements CQueue_PipelineInterface {
                         $parameters = [$passable, $stack];
                     }
                     $carry = method_exists($pipe, $this->method) ? $pipe->{$this->method}(...$parameters) : $pipe(...$parameters);
+
                     return $this->handleCarry($carry);
                 } catch (Exception $e) {
                     return $this->handleException($passable, $e);
@@ -181,20 +186,22 @@ class CQueue_Pipeline implements CQueue_PipelineInterface {
         if (is_string($parameters)) {
             $parameters = explode(',', $parameters);
         }
+
         return [$name, $parameters];
     }
 
     /**
      * Get the container instance.
      *
-     * @return \Illuminate\Contracts\Container\Container
-     *
      * @throws \RuntimeException
+     *
+     * @return \CContainer_ContainerInterface
      */
     protected function getContainer() {
         if (!$this->container) {
             throw new RuntimeException('A container instance has not been passed to the Pipeline.');
         }
+
         return $this->container;
     }
 
@@ -215,9 +222,9 @@ class CQueue_Pipeline implements CQueue_PipelineInterface {
      * @param mixed      $passable
      * @param \Exception $e
      *
-     * @return mixed
-     *
      * @throws \Exception
+     *
+     * @return mixed
      */
     protected function handleException($passable, Exception $e) {
         throw $e;

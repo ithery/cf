@@ -7,6 +7,7 @@ defined('SYSPATH') or die('No direct access allowed.');
  * @license Ittron Global Teknologi <ittron.co.id>
  *
  * @since Apr 14, 2019, 3:38:20 PM
+ * @deprecated 1.3 dont use anymore
  */
 class CJavascript_Validation_Remote {
     use CJavascript_Validation_Trait_AccessProtectedTrait,
@@ -52,9 +53,9 @@ class CJavascript_Validation_Remote {
      *
      * @param $parameters
      *
-     * @return void
-     *
      * @throws CValidation_Exception
+     *
+     * @return void
      */
     public function validate($parameters = []) {
         $field = carr::get($this->data, $this->field);
@@ -73,9 +74,9 @@ class CJavascript_Validation_Remote {
      * @param mixed                 $result
      * @param CValidation_Validator $validator
      *
-     * @return void
-     *
      * @throws \Illuminate\Validation\ValidationException|\Illuminate\Http\Exceptions\HttpResponseException
+     *
+     * @return void
      */
     protected function throwValidationException($result, $validator) {
         if ($result === true) {
@@ -96,6 +97,7 @@ class CJavascript_Validation_Remote {
         parse_str($data, $attrParts);
         $attrParts = is_null($attrParts) ? [] : $attrParts;
         $newAttr = array_keys(carr::dot($attrParts));
+
         return array_pop($newAttr);
     }
 
@@ -111,6 +113,7 @@ class CJavascript_Validation_Remote {
         if (isset($parameters[0])) {
             $newParams['validate_all'] = ($parameters[0] === 'true') ? true : false;
         }
+
         return $newParams;
     }
 
@@ -129,6 +132,7 @@ class CJavascript_Validation_Remote {
         if ($validator->passes()) {
             return true;
         }
+
         return $validator->messages()->get($attribute);
     }
 
@@ -146,6 +150,7 @@ class CJavascript_Validation_Remote {
         $rules = isset($rules[$attribute]) ? $rules[$attribute] : [];
         if (in_array('no_js_validation', $rules)) {
             $validator->setRules([$attribute => []]);
+
             return;
         }
         if (!$validateAll) {
@@ -171,6 +176,7 @@ class CJavascript_Validation_Remote {
                 unset($rules[$i]);
             }
         }
+
         return $rules;
     }
 }

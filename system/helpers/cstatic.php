@@ -56,6 +56,7 @@ class cstatic {
             507 => 'Insufficient Storage',
             510 => 'Not Extended'
         ];
+
         return $status_header;
     }
 
@@ -80,9 +81,10 @@ class cstatic {
         ];
         if ($clang) {
             foreach ($ret as $k => $v) {
-                $ret[$k] = clang::__($v);
+                $ret[$k] = c::__($v);
             }
         }
+
         return $ret;
     }
 

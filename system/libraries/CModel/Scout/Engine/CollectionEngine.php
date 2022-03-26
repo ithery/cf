@@ -127,10 +127,10 @@ class CModel_Scout_Engine_CollectionEngine extends CModel_Scout_EngineAbstract {
     /**
      * Ensure that soft delete handling is properly applied to the query.
      *
-     * @param \Laravel\Scout\Builder             $builder
-     * @param \Illuminate\Database\Query\Builder $query
+     * @param \CModel_Scout_Builder    $builder
+     * @param \CDatabase_Query_Builder $query
      *
-     * @return \Illuminate\Database\Query\Builder
+     * @return \CDatabase_Query_Builder
      */
     protected function ensureSoftDeletesAreHandled($builder, $query) {
         if (carr::get($builder->wheres, '__soft_deleted') === 0) {
@@ -240,7 +240,7 @@ class CModel_Scout_Engine_CollectionEngine extends CModel_Scout_EngineAbstract {
     /**
      * Flush all of the model's records from the engine.
      *
-     * @param \Illuminate\Database\Eloquent\Model $model
+     * @param \CModel $model
      *
      * @return void
      */

@@ -6,6 +6,9 @@ defined('SYSPATH') or die('No direct access allowed.');
  * @author Hery Kurniawan
  * @license Ittron Global Teknologi <ittron.co.id>
  *
+ * @see CManager_DataProvider_SqlDataProvider
+ * @see CManager_DataProvider_ModelDataProvider
+ * @see CManager_DataProvider_ClosureDataProvider
  * @since Jul 8, 2018, 2:58:18 AM
  */
 class CAjax_Engine_DataTable_Processor_DataProvider extends CAjax_Engine_DataTable_Processor {
@@ -15,17 +18,30 @@ class CAjax_Engine_DataTable_Processor_DataProvider extends CAjax_Engine_DataTab
         $request = $this->input;
         $table = $this->table();
         $query = $table->getQuery();
+
         /** @var CManager_Contract_DataProviderInterface $query */
-        $query->search($this->getSearchData());
+        $query->searchOr($this->getSearchDataOr());
+        $query->searchAnd($this->getSearchDataAnd());
         $query->sort($this->getSortData());
 
-        $paginationResult = $query->paginate($this->parameter->pageSize(), ['*'], 'page', $this->parameter->page());
+        $pageSize = $this->parameter->pageSize();
+        $collections = null;
+        $totalItem = 0;
+
+        if ($pageSize && $pageSize != '-1') {
+            $paginationResult = $query->paginate($this->parameter->pageSize(), ['*'], 'page', $this->parameter->page());
+            $collections = $paginationResult->items();
+            $totalItem = $paginationResult->total();
+        } else {
+            $collections = $query->toEnumerable();
+            $totalItem = $collections->count();
+        }
 
         $output = [
             'sEcho' => intval(carr::get($request, 'sEcho')),
-            'iTotalRecords' => $paginationResult->total(),
-            'iTotalDisplayRecords' => $paginationResult->total(),
-            'aaData' => $this->populateAAData($paginationResult->items(), $this->table(), $request, $js),
+            'iTotalRecords' => $totalItem,
+            'iTotalDisplayRecords' => $totalItem,
+            'aaData' => $this->populateAAData($collections, $this->table(), $request, $js),
         ];
 
         $data = [
@@ -36,7 +52,7 @@ class CAjax_Engine_DataTable_Processor_DataProvider extends CAjax_Engine_DataTab
         return $data;
     }
 
-    protected function getSearchData() {
+    protected function getSearchDataOr() {
         $request = $this->engine->getInput();
         $table = $this->table;
 
@@ -63,6 +79,17 @@ class CAjax_Engine_DataTable_Processor_DataProvider extends CAjax_Engine_DataTab
                 }
             }
         }
+
+        return $searchData;
+    }
+
+    protected function getSearchDataAnd() {
+        $request = $this->engine->getInput();
+        $table = $this->table;
+
+        $searchData = [];
+        $columns = $this->columns();
+
         // Quick Search
         $qsCondition = [];
         if (isset($request['dttable_quick_search'])) {
@@ -99,7 +126,7 @@ class CAjax_Engine_DataTable_Processor_DataProvider extends CAjax_Engine_DataTab
                 if ($table->checkbox) {
                     $i2++;
                 }
-                if ($this->actionLocation() == 'first') {
+                if ($this->actionLocation() == 'first' && $this->haveRowAction()) {
                     $i2++;
                 }
                 if ($request['bSortable_' . intval($request['iSortCol_' . $i])] == 'true') {
@@ -121,9 +148,11 @@ class CAjax_Engine_DataTable_Processor_DataProvider extends CAjax_Engine_DataTab
         $table = $this->table;
 
         $columns = $this->columns();
-        $searchData = $this->getSearchData();
+        $searchDataAnd = $this->getSearchDataAnd();
+        $searchDataOr = $this->getSearchDataOr();
         $sortData = $this->getSortData();
-        $dataProvider->search($searchData);
+        $dataProvider->searchAnd($searchDataAnd);
+        $dataProvider->searchOr($searchDataOr);
         $dataProvider->sort($sortData);
     }
 }

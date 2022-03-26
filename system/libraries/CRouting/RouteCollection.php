@@ -1,7 +1,7 @@
 <?php
 
 /**
- * Description of RouteCollection
+ * Description of RouteCollection.
  *
  * @author Hery
  */
@@ -142,10 +142,10 @@ class CRouting_RouteCollection extends CRouting_RouteCollectionAbstract {
      *
      * @param CHTTP_Request $request
      *
-     * @return CRouting_Route
-     *
      * @throws \Symfony\Component\HttpKernel\Exception\MethodNotAllowedHttpException
      * @throws \Symfony\Component\HttpKernel\Exception\NotFoundHttpException
+     *
+     * @return CRouting_Route
      */
     public function match(CHTTP_Request $request) {
         $routes = $this->get($request->getMethod());
@@ -157,9 +157,11 @@ class CRouting_RouteCollection extends CRouting_RouteCollectionAbstract {
 
         //if route still null we will search new route that match with controller
         if ($route == null) {
-            $routeFinder = new CRouting_RouteFinder($request);
-
-            $route = $routeFinder->find();
+            $uri = ltrim($request->path(), '/');
+            if (PHP_SAPI == 'cli') {
+                $uri = CRouting_UrlFinder::getUri();
+            }
+            $route = CRouting_RouteFinder::find($uri);
         }
 
         return $this->handleMatchedRoute($request, $route);
@@ -168,7 +170,7 @@ class CRouting_RouteCollection extends CRouting_RouteCollectionAbstract {
     /**
      * Get routes from the collection by method.
      *
-     * @param string|null $method
+     * @param null|string $method
      *
      * @return CRouting_Route[]
      */
@@ -192,7 +194,7 @@ class CRouting_RouteCollection extends CRouting_RouteCollectionAbstract {
      *
      * @param string $name
      *
-     * @return CRouting_Route|null
+     * @return null|CRouting_Route
      */
     public function getByName($name) {
         return carr::get($this->nameList, $name);
@@ -203,7 +205,7 @@ class CRouting_RouteCollection extends CRouting_RouteCollectionAbstract {
      *
      * @param string $action
      *
-     * @return CRouting_Route|null
+     * @return null|CRouting_Route
      */
     public function getByAction($action) {
         return carr::get($this->actionList, $action);
@@ -261,6 +263,7 @@ class CRouting_RouteCollection extends CRouting_RouteCollectionAbstract {
         $result = $this->compile();
         $compiled = carr::get($result, 'compiled');
         $attributes = carr::get($result, 'attributes');
+
         return (new CRouting_CompiledRouteCollection($compiled, $attributes))
             ->setRouter($router)
             ->setContainer($container);

@@ -1,7 +1,7 @@
 <?php
 
 /**
- * Description of NotFoundHttpException
+ * 404 HTTP Exception.
  *
  * @author Hery
  */

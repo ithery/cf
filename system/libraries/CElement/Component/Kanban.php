@@ -29,7 +29,7 @@ class CElement_Component_Kanban extends CElement_Component {
     }
 
     public function setSaveCallback($callback, $require = '') {
-        $this->saveCallback = CHelper::closure()->serializeClosure($callback);
+        $this->saveCallback = c::toSerializableClosure($callback);
         $this->saveCallbackRequire = $require;
 
         return $this;
@@ -64,7 +64,7 @@ class CElement_Component_Kanban extends CElement_Component {
             };
             $ajaxMethod = CAjax::createMethod();
             $ajaxMethod->setType('Callback');
-            $ajaxMethod->setData('callable', serialize(CHelper::closure()->serializeClosure($wrapperCallback)));
+            $ajaxMethod->setData('callable', serialize(c::toSerializableClosure($wrapperCallback)));
             $ajaxMethod->setData('requires', $this->saveCallbackRequire);
             $ajaxMethod->setData('saveCallback', serialize($this->saveCallback));
             $ajaxMethod->setData('method', 'post');

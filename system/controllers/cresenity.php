@@ -20,7 +20,11 @@ class Controller_Cresenity extends CController {
     }
 
     public function daemon() {
-        CDaemon::cliRunner();
+        try {
+            CDaemon::cliRunner();
+        } catch (CDaemon_Exception_AlreadyRunningException $ex) {
+            //do nothing when exception is already running
+        }
     }
 
     public function component() {
@@ -45,7 +49,8 @@ class Controller_Cresenity extends CController {
 
         $disk = CTemporary::disk();
         if (!$disk->exists($file)) {
-            throw new Exception(c::__('failed to get temporary file :filename', ['filename' => $file]));
+            c::abort(404, c::__('failed to get temporary file :filename', ['filename' => $file]));
+            //throw new Exception(c::__('failed to get temporary file :filename', ['filename' => $file]));
         }
         $json = $disk->get($file);
 
@@ -63,29 +68,6 @@ class Controller_Cresenity extends CController {
         $data = CApp::api()->exec(...$methods);
 
         return c::response()->json($data);
-    }
-
-    //@codingStandardsIgnoreStart
-
-    /**
-     * change lang.
-     *
-     * @param string $lang
-     *
-     * @return void
-     *
-     * @deprecated version
-     */
-    public function change_lang($lang) {
-        clang::setlang($lang);
-
-        return c::redirect(crequest::referrer());
-    }
-
-    public function change_theme($theme) {
-        CManager::theme()->setTheme($theme);
-
-        return c::redirect(crequest::referrer());
     }
 
     //@codingStandardsIgnoreEnd
@@ -299,9 +281,7 @@ class Controller_Cresenity extends CController {
                 break;
         }
 
-        ob_start('ob_gzhandler');
         $avatarApi = CImage::avatar()->api($engineName);
-
         /*
         if (!isset($_GET['noheader'])) {
             header('Content-type: image/png');
@@ -311,13 +291,17 @@ class Controller_Cresenity extends CController {
         }
         $avatarApi->render();
         */
-
+        ob_start('ob_gzhandler');
         $headers = [
             'Content-Type' => 'image/png',
             'Pragma' => 'public',
             'Cache-Control' => 'max-age=172800',
             'Expires' => gmdate('D, d M Y H:i:s \G\M\T', time() + 172800),
         ];
+
+        if (isset($_GET['debug_avatar'])) {
+            return $avatarApi->render();
+        }
 
         return c::response()->stream(function () use ($avatarApi) {
             $avatarApi->render();
@@ -356,8 +340,9 @@ class Controller_Cresenity extends CController {
 
         CManager::registerModule('pdfjs');
 
-        $app->setViewName('cresenity/pdf');
-        echo $app->render();
+        $app->setView('cresenity.pdf');
+
+        return $app;
     }
 
     public function upload($method = 'temp') {
@@ -450,12 +435,6 @@ class Controller_Cresenity extends CController {
         $qrcode->outputImage();
     }
 
-    public function auth() {
-        $args = func_get_args();
-        $method = carr::get($args, 0);
-        $parameters = array_slice($args, 1);
-    }
-
     public function symlink($appCode) {
         $appDir = DOCROOT . 'application' . DS . $appCode;
         if (is_dir($appDir)) {
@@ -476,7 +455,7 @@ class Controller_Cresenity extends CController {
     }
 
     public function health() {
-        echo 'OK';
+        return c::response('OK');
     }
 
     public function clear() {
@@ -495,5 +474,9 @@ class Controller_Cresenity extends CController {
         }
 
         return c::response('Cresenity Broadcasting Endpoint', 200);
+    }
+
+    public function version() {
+        return c::response(CF::version());
     }
 }

@@ -15,7 +15,7 @@ defined('SYSPATH') or die('No direct access allowed.');
  * @method static              CModel|CModel_Collection|static|null find($id, $columns = ['*'])                                             Find a model by its primary key.
  * @method static              CModel_Collection findMany($ids, $columns = ['*'])                                                           Find a model by its primary key.
  * @method static              CModel|CModel_Collection|static findOrFail($id, $columns = ['*'])                                            Find a model by its primary key or throw an exception.
- * @method static              CModel|CModel_Query|static|null first($columns = ['*'])                                                      Execute the query and get the first result.
+ * @method static              static|CModel|CModel_Query|null first($columns = ['*'])                                                      Execute the query and get the first result.
  * @method static              CModel|CModel_Query|static firstOrFail($columns = ['*'])                                                     Execute the query and get the first result or throw an exception.
  * @method static              CModel_Collection|CModel_Query[]|static[] get($columns = ['*'])                                              Execute the query as a "select" statement.
  * @method mixed               value($column)                                                                                               Get a single column's value from the first result of a query.
@@ -77,6 +77,7 @@ class CModel_Query {
     use CDatabase_Trait_Builder,
         CModel_Trait_QueriesRelationships,
         CTrait_ForwardsCalls;
+
     /**
      * The base query builder instance.
      *
@@ -125,7 +126,7 @@ class CModel_Query {
      * @var array
      */
     protected $passthru = [
-        'insert', 'insertGetId', 'getBindings', 'toSql', 'dump', 'dd',
+        'insert', 'insertGetId', 'getBindings', 'toSql', 'toCompiledSql', 'dump', 'dd',
         'exists', 'count', 'min', 'max', 'avg', 'sum', 'getConnection', 'raw',
     ];
 

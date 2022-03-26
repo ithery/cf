@@ -10,6 +10,7 @@ defined('SYSPATH') or die('No direct access allowed.');
  */
 class CElement_List_TabList extends CElement_List {
     use CTrait_Compat_Element_TabList;
+
     /**
      * Tabs.
      *
@@ -189,9 +190,9 @@ class CElement_List_TabList extends CElement_List {
 
         $html->appendln('		<div class="row-fluid">');
         if ($this->tabPosition == 'top') {
-            $html->appendln('           <div class="row-tab-menu">');
+            $html->appendln('           <div class="row-tab-menu row-tab-menu-top">');
         } else {
-            $html->appendln('			<div class="span2">');
+            $html->appendln('			<div class="span2 row-tab-menu row-tab-menu-left">');
         }
 
         if ($this->tabPosition == 'top') {
@@ -238,9 +239,9 @@ class CElement_List_TabList extends CElement_List {
         $html->appendln('			</div>');
 
         if ($this->tabPosition == 'top') {
-            $html->appendln('           <div class="row-tab-content">');
+            $html->appendln('           <div class="row-tab-content row-tab-content-top">');
         } else {
-            $html->appendln('           <div class="span10">');
+            $html->appendln('           <div class="span10 row-tab-content row-tab-content-left">');
         }
 
         $html->appendln('				<div id="' . $this->id . '-tab-widget" class="' . $this->widgetWrapperClass . ' nomargin widget-transaction-tab ' . $widgetClasses . '">');

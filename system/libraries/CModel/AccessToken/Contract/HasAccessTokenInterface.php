@@ -14,7 +14,7 @@ interface CModel_AccessToken_Contract_HasAccessTokenInterface {
      *
      * @return bool
      */
-    public function tokenCan($ability);
+    public function accessTokenCan($ability);
 
     /**
      * Create a new personal access token for the user.
@@ -24,7 +24,7 @@ interface CModel_AccessToken_Contract_HasAccessTokenInterface {
      *
      * @return \CModel_AccessToken_NewAccessToken
      */
-    public function createToken(string $name, array $abilities = ['*']);
+    public function createAccessToken(string $name, array $abilities = ['*']);
 
     /**
      * Get the access token currently associated with the user.

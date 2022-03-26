@@ -12,7 +12,7 @@ class CBootstrap_MiddlewareBootstrapper extends CBootstrap_BootstrapperAbstract 
      * @return void
      */
     public function bootstrap() {
-        $sessionMiddleware = new CSession_Middleware_SessionMiddleware();
-        CMiddleware::manager()->pushMiddleware($sessionMiddleware);
+        CMiddleware::manager()->pushMiddleware(CSession_Middleware_SessionMiddleware::class);
+        CMiddleware::manager()->pushMiddleware(CHTTP_Cookie_Middleware_AddQueuedCookiesToResponse::class);
     }
 }

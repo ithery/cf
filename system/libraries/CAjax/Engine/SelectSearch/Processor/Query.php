@@ -5,9 +5,9 @@ class CAjax_Engine_SelectSearch_Processor_Query extends CAjax_Engine_SelectSearc
         $q = $this->query();
 
         $valueCallbackFunction = carr::get($this->data, 'valueCallback', null);
-        $key_field = $this->keyField();
+        $keyField = $this->keyField();
 
-        $search_field = $this->searchField();
+        $searchField = $this->searchField();
 
         $db = CDatabase::instance();
 
@@ -21,15 +21,15 @@ class CAjax_Engine_SelectSearch_Processor_Query extends CAjax_Engine_SelectSearc
         $page = $this->page();
 
         $base_q = $q;
-        $pos_order_by = strpos(strtolower($base_q), 'order by', strpos(strtolower($base_q), 'from'));
+        $posOrderBy = strpos(strtolower($base_q), 'order by', strpos(strtolower($base_q), 'from'));
 
-        $pos_last_kurung = strrpos(strtolower($base_q), ')');
+        $posLastBracket = strrpos(strtolower($base_q), ')');
 
-        $temp_order_by = '';
-        if ($pos_order_by > $pos_last_kurung) {
-            if ($pos_order_by !== false) {
-                $temp_order_by = substr($base_q, $pos_order_by, strlen($base_q) - $pos_order_by);
-                $base_q = substr($base_q, 0, $pos_order_by);
+        $tempOrderBy = '';
+        if ($posOrderBy > $posLastBracket) {
+            if ($posOrderBy !== false) {
+                $tempOrderBy = substr($base_q, $posOrderBy, strlen($base_q) - $posOrderBy);
+                $base_q = substr($base_q, 0, $posOrderBy);
             }
         }
 
@@ -65,22 +65,22 @@ class CAjax_Engine_SelectSearch_Processor_Query extends CAjax_Engine_SelectSearc
          */
 
         $sWhere = '';
-        if (strlen($term) > 0 && (!empty($search_field))) {
+        if (strlen($term) > 0 && (!empty($searchField))) {
             $sWhere = 'WHERE (';
-            if (is_array($search_field)) {
-                foreach ($search_field as $f) {
+            if (is_array($searchField)) {
+                foreach ($searchField as $f) {
                     $sWhere .= '`' . $f . "` LIKE '%" . $db->escapeLike($term) . "%' OR ";
                 }
             } else {
-                $sWhere .= '`' . $search_field . "` LIKE '%" . $db->escapeLike($term) . "%' OR ";
+                $sWhere .= '`' . $searchField . "` LIKE '%" . $db->escapeLike($term) . "%' OR ";
             }
 
             $sWhere = substr_replace($sWhere, '', -3);
             $sWhere .= ')';
 
             //order
-            if (is_array($search_field)) {
-                foreach ($search_field as $f) {
+            if (is_array($searchField)) {
+                foreach ($searchField as $f) {
                     if (strlen($sOrder) > 0) {
                         $sOrder .= ',';
                     }
@@ -91,28 +91,28 @@ class CAjax_Engine_SelectSearch_Processor_Query extends CAjax_Engine_SelectSearc
 
         if (strlen($sOrder) > 0) {
             $sOrder = ' ORDER BY ' . $sOrder;
-            $temp_order_by = '';
+            $tempOrderBy = '';
         }
 
-        if (strlen($temp_order_by) > 0) {
-            $sub = explode(',', substr($temp_order_by, 9));
-            $temp_order_by = '';
+        if (strlen($tempOrderBy) > 0) {
+            $sub = explode(',', substr($tempOrderBy, 9));
+            $tempOrderBy = '';
             foreach ($sub as $val) {
                 $kata = explode('.', $val);
                 if (isset($kata[1])) {
-                    $temp_order_by .= ', ' . $kata[1];
+                    $tempOrderBy .= ', ' . $kata[1];
                 } else {
-                    $temp_order_by .= ', ' . $kata[0];
+                    $tempOrderBy .= ', ' . $kata[0];
                 }
             }
-            $temp_order_by = substr($temp_order_by, 2);
-            $temp_order_by = 'ORDER BY ' . $temp_order_by;
+            $tempOrderBy = substr($tempOrderBy, 2);
+            $tempOrderBy = 'ORDER BY ' . $tempOrderBy;
         }
 
         $qfilter = 'select * from (' . $base_q . ') as a ' . $sWhere . ' ' . $sOrder;
         $total = cdbutils::get_row_count_from_base_query($qfilter);
 
-        $qfilter .= ' ' . $temp_order_by . ' ' . $sLimit;
+        $qfilter .= ' ' . $tempOrderBy . ' ' . $sLimit;
 
         $r = $db->query($qfilter);
 
@@ -126,8 +126,21 @@ class CAjax_Engine_SelectSearch_Processor_Query extends CAjax_Engine_SelectSearc
                 }
                 $p[$k] = ($v == null) ? '' : $v;
             }
-            if (strlen($key_field) > 0) {
-                $p['id'] = carr::get($row, $key_field);
+            if (strlen($keyField) > 0 && !isset($p['id'])) {
+                $p['id'] = carr::get($row, $keyField);
+            }
+
+            $formatResult = $this->formatResult();
+            if ($formatResult instanceof \Opis\Closure\SerializableClosure) {
+                $formatResult = $formatResult->__invoke($row);
+                $p['cappFormatResult'] = $formatResult;
+                $p['cappFormatResultIsHtml'] = c::isHtml($formatResult);
+            }
+            $formatSelection = $this->formatSelection();
+            if ($formatSelection instanceof \Opis\Closure\SerializableClosure) {
+                $formatSelection = $formatSelection->__invoke($row);
+                $p['cappFormatSelection'] = $formatSelection;
+                $p['cappFormatSelectionIsHtml'] = c::isHtml($formatSelection);
             }
             //$p["id"]=$row["item_id"];
             $data[] = $p;

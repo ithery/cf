@@ -218,7 +218,7 @@ abstract class CDatabase_Schema_Manager {
     /**
      * Lists the tables for this connection.
      *
-     * @return \Doctrine\DBAL\Schema\Table[]
+     * @return \CDatabase_Schema_Table[]
      */
     public function listTables() {
         $tableNames = $this->listTableNames();
@@ -335,8 +335,8 @@ abstract class CDatabase_Schema_Manager {
     /**
      * Drops a foreign key from a table.
      *
-     * @param \Doctrine\DBAL\Schema\ForeignKeyConstraint|string $foreignKey the name of the foreign key
-     * @param \Doctrine\DBAL\Schema\Table|string                $table      the name of the table with the foreign key
+     * @param \CDatabase_Schema_ForeignKeyConstraint|string $foreignKey the name of the foreign key
+     * @param \CDatabase_Schema_Table|string                $table      the name of the table with the foreign key
      *
      * @return void
      */
