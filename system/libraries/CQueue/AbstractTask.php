@@ -8,7 +8,7 @@ defined('SYSPATH') or die('No direct access allowed.');
  *
  * @since Sep 8, 2019, 6:06:41 AM
  */
-abstract class CQueue_AbstractTask {
+abstract class CQueue_AbstractTask implements CQueue_ShouldQueueInterface {
     use CQueue_Trait_DispatchableTrait;
     use CQueue_Trait_QueueableTrait;
     use CQueue_Trait_InteractsWithQueue;
