@@ -480,4 +480,8 @@ class Controller_Cresenity extends CController {
 
         return c::response('Cresenity Broadcasting Endpoint', 200);
     }
+
+    public function version() {
+        return c::response(CF::version());
+    }
 }
