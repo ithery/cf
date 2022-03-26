@@ -340,8 +340,9 @@ class Controller_Cresenity extends CController {
 
         CManager::registerModule('pdfjs');
 
-        $app->setViewName('cresenity/pdf');
-        echo $app->render();
+        $app->setView('cresenity.pdf');
+
+        return $app;
     }
 
     public function upload($method = 'temp') {
@@ -432,12 +433,6 @@ class Controller_Cresenity extends CController {
         $options['s'] = carr::get($request, 's', 'qr');
         $qrcode = new CImage_QRCode($data, $options);
         $qrcode->outputImage();
-    }
-
-    public function auth() {
-        $args = func_get_args();
-        $method = carr::get($args, 0);
-        $parameters = array_slice($args, 1);
     }
 
     public function symlink($appCode) {
