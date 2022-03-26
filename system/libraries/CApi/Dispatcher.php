@@ -9,7 +9,7 @@ class CApi_Dispatcher {
 
     public function __construct($group) {
         $this->group = $group;
-        $this->prefix = '';
+        $this->prefix = CF::config('api.groups.' . $group . '.prefix', '');
         $this->methodNamespace = '';
     }
 

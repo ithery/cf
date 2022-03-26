@@ -12,6 +12,7 @@
  * @method CEmail_Builder_Node setVerticalAlign($param)
  * @method CEmail_Builder_Node setBorderColor($param)
  * @method CEmail_Builder_Node setFontWeight($param)
+ * @method CEmail_Builder_Node setHref($param)
  * @method CEmail_Builder_Node setAlign($param)
  */
 class CEmail_Builder_Node {

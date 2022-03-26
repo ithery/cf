@@ -20,7 +20,11 @@ class Controller_Cresenity extends CController {
     }
 
     public function daemon() {
-        CDaemon::cliRunner();
+        try {
+            CDaemon::cliRunner();
+        } catch (CDaemon_Exception_AlreadyRunningException $ex) {
+            //do nothing when exception is already running
+        }
     }
 
     public function component() {
@@ -336,8 +340,9 @@ class Controller_Cresenity extends CController {
 
         CManager::registerModule('pdfjs');
 
-        $app->setViewName('cresenity/pdf');
-        echo $app->render();
+        $app->setView('cresenity.pdf');
+
+        return $app;
     }
 
     public function upload($method = 'temp') {
@@ -430,12 +435,6 @@ class Controller_Cresenity extends CController {
         $qrcode->outputImage();
     }
 
-    public function auth() {
-        $args = func_get_args();
-        $method = carr::get($args, 0);
-        $parameters = array_slice($args, 1);
-    }
-
     public function symlink($appCode) {
         $appDir = DOCROOT . 'application' . DS . $appCode;
         if (is_dir($appDir)) {
@@ -456,7 +455,7 @@ class Controller_Cresenity extends CController {
     }
 
     public function health() {
-        echo 'OK';
+        return c::response('OK');
     }
 
     public function clear() {
@@ -475,5 +474,9 @@ class Controller_Cresenity extends CController {
         }
 
         return c::response('Cresenity Broadcasting Endpoint', 200);
+    }
+
+    public function version() {
+        return c::response(CF::version());
     }
 }

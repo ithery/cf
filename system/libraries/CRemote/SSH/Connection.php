@@ -137,7 +137,7 @@ class CRemote_SSH_Connection implements CRemote_SSH_ConnectionInterface {
      * @param string|array $commands
      * @param mixed        $timeout
      *
-     * @return $this
+     * @return string
      */
     public function runBlocking($commands, $timeout = 2) {
         // First, we will initialize the SSH gateway, and then format the commands so
@@ -338,5 +338,9 @@ class CRemote_SSH_Connection implements CRemote_SSH_ConnectionInterface {
      */
     public function getTimeout() {
         return $this->gateway->getTimeout();
+    }
+
+    public function disconnect() {
+        return $this->gateway->disconnect();
     }
 }
