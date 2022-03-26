@@ -25,6 +25,6 @@ class CEmail_Factory {
             return new $class($config);
         }
 
-        return null;
+        throw new Exception('Mail driver:' . $driver . ' not found');
     }
 }
