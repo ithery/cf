@@ -142,4 +142,12 @@ abstract class CApi_MethodAbstract implements CInterface_Arrayable {
     protected function getSession() {
         return CApi::session($this->sessionId(), $this->sessionOptions);
     }
+
+    protected function validate($data, $rules, $messages = []) {
+        if ($data == null) {
+            $data = $this->request();
+        }
+        $validator = CValidation::createValidator($data, $rules, $messages);
+        $validator->validate();
+    }
 }

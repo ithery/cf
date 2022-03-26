@@ -58,6 +58,12 @@ class CElement_FormInput_Date extends CElement_FormInput {
         return $this;
     }
 
+    public function setDateFormat($str) {
+        $this->dateFormat = $str;
+
+        return $this;
+    }
+
     public function html($indent = 0) {
         $html = new CStringBuilder();
         $html->setIndent($indent);
