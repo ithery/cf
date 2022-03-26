@@ -53,6 +53,7 @@ class CRemote_SSH {
         if (strlen($host) == 0) {
             $host = carr::get($config, 'host');
         }
+
         $this->setOutput($connection = new CRemote_SSH_Connection(
             $name,
             $host,
