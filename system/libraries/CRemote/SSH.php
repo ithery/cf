@@ -133,6 +133,10 @@ class CRemote_SSH {
         return $this;
     }
 
+    public function exec($commands) {
+        return $this->connection->exec($commands);
+    }
+
     /**
      * Run a set of commands against the connection (blocking).
      *
@@ -173,5 +177,12 @@ class CRemote_SSH {
      */
     public function __call($method, $parameters) {
         return call_user_func_array([$this->connection, $method], $parameters);
+    }
+
+    /**
+     * @return \phpseclib3\Net\SFTP
+     */
+    public function getClient() {
+        return $this->connection->getGateway()->getConnection();
     }
 }
