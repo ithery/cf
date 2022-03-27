@@ -2,9 +2,6 @@
 
 use Predis\Client;
 
-/**
- * @deprecated Predis is no longer maintained by its original author
- */
 class CRedis_Connector_PredisConnector extends CRedis_AbstractConnector {
     /**
      * Create a new clustered Predis connection.

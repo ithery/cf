@@ -5,6 +5,7 @@ trait CTrait_Controller_Application_Log_System {
         $app = c::app();
         $path = DOCROOT . 'logs/' . cf::appCode();
         $years = array_reverse($this->getSubdirectory($path));
+
         $reportTimes = [];
 
         foreach ($years as $year) {
@@ -70,11 +71,14 @@ trait CTrait_Controller_Application_Log_System {
         foreach ($phpFiles as $file) {
             $files[] = carr::get($file, '0');
         }
+        $files = c::collect($files)->sort()->toArray();
         foreach ($files as $file) {
             $fileContent = file_get_contents($file);
             $lines = explode("\n", $fileContent);
+
             foreach ($lines as $line) {
-                preg_match('/^(.*?) --- (.*?):(.*?): (.*?)$/', $line, $matches);
+                preg_match('#^(.*?) --- (.*?):(.*?): (.*?)$#ims', $line, $matches);
+
                 if ($matches) {
                     $time = carr::get($matches, 1);
                     $domain = carr::get($matches, 2);
@@ -90,6 +94,7 @@ trait CTrait_Controller_Application_Log_System {
                 }
             }
         }
+
         $report = array_reverse($report);
         $table = $app->addTable()->setDataFromArray($report);
         $table->addColumn('time')->setLabel('Time');
