@@ -17,7 +17,7 @@ class CDebug_Bar extends CDebug_AbstractBar {
     protected $booted;
 
     /**
-     * True when enabled, false disabled an null for still unknown
+     * True when enabled, false disabled an null for still unknown.
      *
      * @var bool
      */
@@ -46,8 +46,12 @@ class CDebug_Bar extends CDebug_AbstractBar {
         }
     }
 
+    public function shouldCollect($name, $default = false) {
+        return CF::config('debug.debugbar.collectors.' . $name, $default);
+    }
+
     /**
-     * Boot the debugbar (add collectors, renderer and listener)
+     * Boot the debugbar (add collectors, renderer and listener).
      */
     public function boot() {
         if ($this->booted) {
@@ -74,6 +78,12 @@ class CDebug_Bar extends CDebug_AbstractBar {
         $this->addCollector(new CDebug_DataCollector_ExceptionsCollector());
         $this->addCollector(new CDebug_DataCollector_ModelCollector());
 
+        if ($this->shouldCollect('cache')) {
+            $cacheCollector = new CDebug_DataCollector_CacheCollector();
+            CEvent::dispatcher()->subscribe($cacheCollector);
+            $this->addCollector($cacheCollector);
+        }
+
         CFBenchmark::onStopCallback(function ($name, $data) use ($timeDataCollector) {
             $timeDataCollector->addMeasure($name, carr::get($data, 'start'), carr::get($data, 'stop'));
         });
@@ -97,21 +107,21 @@ class CDebug_Bar extends CDebug_AbstractBar {
     }
 
     /**
-     * Starts a measure
+     * Starts a measure.
      *
      * @param string $name  Internal name, used to stop the measure
      * @param string $label Public name
      */
     public function startMeasure($name, $label = null) {
         if ($this->hasCollector('time')) {
-            /** @var CDebug_DataCollector_TimeDataCollector $collector  */
+            /** @var CDebug_DataCollector_TimeDataCollector $collector */
             $collector = $this->getCollector('time');
             $collector->startMeasure($name, $label);
         }
     }
 
     /**
-     * Adds an exception to be profiled in the debug bar
+     * Adds an exception to be profiled in the debug bar.
      *
      * @param Exception $e
      *
@@ -122,7 +132,7 @@ class CDebug_Bar extends CDebug_AbstractBar {
     }
 
     /**
-     * Adds an exception to be profiled in the debug bar
+     * Adds an exception to be profiled in the debug bar.
      *
      * @param Exception $e
      */
