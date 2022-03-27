@@ -10,18 +10,27 @@ defined('SYSPATH') or die('No direct access allowed.');
  */
 
 /**
- * Collects data about SQL statements executed with PDO
+ * Collects data about SQL statements executed with PDO.
  */
 class CDebug_DataCollector_QueryCollector extends CDebug_DataCollector implements CDebug_Bar_Interface_RenderableInterface, CDebug_DataCollector_AssetProviderInterface {
     protected $timeCollector;
+
     protected $queries = [];
+
     protected $renderSqlWithParams = false;
+
     protected $findSource = false;
+
     protected $middleware = [];
+
     protected $explainQuery = false;
+
     protected $explainTypes = ['SELECT']; // ['SELECT', 'INSERT', 'UPDATE', 'DELETE']; for MySQL 5.6.3+
+
     protected $showHints = true;
+
     protected $reflection = [];
+
     protected $showCopyButton = true;
 
     /**
@@ -31,6 +40,7 @@ class CDebug_DataCollector_QueryCollector extends CDebug_DataCollector implement
         $this->timeCollector = $timeCollector;
         $this->setDataFormatter(new CDebug_DataFormatter_QueryFormatter());
         $db = CDatabase::instance();
+
         try {
             $db->listenOnQueryExecuted(
                 function ($query) use ($db) {
@@ -53,26 +63,26 @@ class CDebug_DataCollector_QueryCollector extends CDebug_DataCollector implement
     }
 
     /**
-     * Renders the SQL of traced statements with params embedded
+     * Renders the SQL of traced statements with params embedded.
      *
-     * @param boolean $enabled
-     * @param string  $quotationChar NOT USED
+     * @param bool   $enabled
+     * @param string $quotationChar NOT USED
      */
     public function setRenderSqlWithParams($enabled = true, $quotationChar = "'") {
         $this->renderSqlWithParams = $enabled;
     }
 
     /**
-     * Show or hide the hints in the parameters
+     * Show or hide the hints in the parameters.
      *
-     * @param boolean $enabled
+     * @param bool $enabled
      */
     public function setShowHints($enabled = true) {
         $this->showHints = $enabled;
     }
 
     /**
-     * Enable/disable finding the source
+     * Enable/disable finding the source.
      *
      * @param bool  $value
      * @param array $middleware
@@ -83,10 +93,10 @@ class CDebug_DataCollector_QueryCollector extends CDebug_DataCollector implement
     }
 
     /**
-     * Enable/disable the EXPLAIN queries
+     * Enable/disable the EXPLAIN queries.
      *
      * @param bool       $enabled
-     * @param array|null $types   Array of types to explain queries (select/insert/update/delete)
+     * @param null|array $types   Array of types to explain queries (select/insert/update/delete)
      */
     public function setExplainSource($enabled, $types) {
         $this->explainQuery = $enabled;
@@ -113,7 +123,7 @@ class CDebug_DataCollector_QueryCollector extends CDebug_DataCollector implement
             $result = $db->query('EXPLAIN ' . $query, $bindings);
 
             //$statement->execute($bindings);
-            $explainResults = $result->result_array();
+            $explainResults = $result->resultArray();
         }
         $bindings = $this->getDataFormatter()->checkBindings($bindings);
         if (!empty($bindings) && $this->renderSqlWithParams) {
@@ -126,6 +136,7 @@ class CDebug_DataCollector_QueryCollector extends CDebug_DataCollector implement
             }
         }
         $source = [];
+
         try {
             $source = $this->findSource();
         } catch (\Exception $e) {
@@ -150,19 +161,16 @@ class CDebug_DataCollector_QueryCollector extends CDebug_DataCollector implement
     }
 
     /**
-     * Explainer::performQueryAnalysis()
+     * Explainer::performQueryAnalysis().
      *
      * Perform simple regex analysis on the code
      *
      * @param string $query
      *
-     * @package xplain (https://github.com/rap2hpoutre/mysql-xplain-xplain)
-     *
      * @author e-doceo
      * @copyright 2014
      *
      * @version $Id$
-     * @access public
      *
      * @return string
      */
@@ -190,6 +198,7 @@ class CDebug_DataCollector_QueryCollector extends CDebug_DataCollector implement
             $hints[] = 'An argument has a leading wildcard character: <code>' . $matches[1] . '</code>.
                 The predicate with this argument is not sargable and cannot use an index if one exists.';
         }
+
         return $hints;
 
         // @codingStandardsIgnoreEnd
@@ -229,17 +238,19 @@ class CDebug_DataCollector_QueryCollector extends CDebug_DataCollector implement
         ];
         if (isset($trace['function']) && $trace['function'] == 'substituteBindings') {
             $frame->name = 'Route binding';
+
             return $frame;
         }
-        if (isset($trace['class'])
-            && isset($trace['file'])
+        if (isset($trace['class'], $trace['file'])
             && !$this->fileIsInExcludedPath($trace['file'])
         ) {
             $file = $trace['file'];
 
             $frame->name = $this->normalizeFilename($file);
+
             return $frame;
         }
+
         return false;
     }
 
@@ -282,7 +293,7 @@ class CDebug_DataCollector_QueryCollector extends CDebug_DataCollector implement
     }
 
     /**
-     * {@inheritDoc}
+     * @inheritDoc
      */
     public function collect() {
         $totalTime = 0;
@@ -324,18 +335,19 @@ class CDebug_DataCollector_QueryCollector extends CDebug_DataCollector implement
             'accumulated_duration_str' => $this->formatDuration($totalTime),
             'statements' => $statements
         ];
+
         return $data;
     }
 
     /**
-     * {@inheritDoc}
+     * @inheritDoc
      */
     public function getName() {
         return 'queries';
     }
 
     /**
-     * {@inheritDoc}
+     * @inheritDoc
      */
     public function getWidgets() {
         return [
