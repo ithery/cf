@@ -306,6 +306,11 @@ trait CTrait_Controller_Application_Server_Redis {
         if (isset($data[$ucfirstSection]) && is_array($data[$ucfirstSection])) {
             $data = $data[$ucfirstSection];
         }
+        if ($section == 'memory') {
+            $data['used_memory'] = CRedis_Formatter_Information::formatBytes($data['used_memory']);
+            $data['used_memory_rss'] = CRedis_Formatter_Information::formatBytes($data['used_memory_rss']);
+            $data['used_memory_peak'] = CRedis_Formatter_Information::formatBytes($data['used_memory_peak']);
+        }
         $responseData = [
             'errCode' => 0,
             'errMessage' => '',

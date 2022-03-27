@@ -9,9 +9,15 @@ class CRedis_Formatter_Information {
      * @return array
      */
     public static function memory($info) {
-        $info['user_memory'] = static::formatBytes($info['used_memory']);
-        $info['used_memory_rss'] = static::formatBytes($info['used_memory_rss']);
-        $info['used_memory_peak'] = static::formatBytes($info['used_memory_peak']);
+        if (isset($info['Memory'])) {
+            $info['Memory']['used_memory'] = static::formatBytes($info['Memory']['used_memory']);
+            $info['Memory']['used_memory_rss'] = static::formatBytes($info['Memory']['used_memory_rss']);
+            $info['Memory']['used_memory_peak'] = static::formatBytes($info['Memory']['used_memory_peak']);
+        } else {
+            $info['used_memory'] = static::formatBytes($info['used_memory']);
+            $info['used_memory_rss'] = static::formatBytes($info['used_memory_rss']);
+            $info['used_memory_peak'] = static::formatBytes($info['used_memory_peak']);
+        }
 
         return $info;
     }
