@@ -138,7 +138,7 @@ class CRemote_SSH_Connection implements CRemote_SSH_ConnectionInterface {
      *
      * @param string|array $commands
      *
-     * @return $this
+     * @return string
      */
     public function exec($commands) {
         // First, we will initialize the SSH gateway, and then format the commands so

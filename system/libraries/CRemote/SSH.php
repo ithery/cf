@@ -133,6 +133,11 @@ class CRemote_SSH {
         return $this;
     }
 
+    /**
+     * @param string $commands
+     *
+     * @return string
+     */
     public function exec($commands) {
         return $this->connection->exec($commands);
     }
