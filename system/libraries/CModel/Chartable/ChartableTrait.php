@@ -4,7 +4,8 @@
  * @method static CModel_Chartable_TimeCollection  countByDays()
  * @method static CModel_Chartable_TimeCollection  countByMonths()
  * @method static CModel_Chartable_TimeCollection  valuesByDays()
- * @method static CModel_Chartable_TimeCollection  sumByDays()
+ * @method static CModel_Chartable_TimeCollection  sumByDays($value)
+ * @method static CModel_Chartable_TimeCollection  sumByMonths($value)
  */
 trait CModel_Chartable_ChartableTrait {
     /**
@@ -180,5 +181,20 @@ trait CModel_Chartable_ChartableTrait {
      */
     public function scopeSumByDays(CModel_Query $builder, $value, $startDate = null, $stopDate = null, $dateColumn = 'created') {
         return $this->groupByDays($builder, "SUM(${value})", $startDate, $stopDate, $dateColumn);
+    }
+
+    /**
+     * Get sum values models grouped by `created_at` day.
+     *
+     * @param CModel_Query                  $builder
+     * @param string                        $value
+     * @param null|string|DateTimeInterface $startDate
+     * @param null|string|DateTimeInterface $stopDate
+     * @param string                        $dateColumn
+     *
+     * @return CModel_Chartable_TimeCollection
+     */
+    public function scopeSumByMonths(CModel_Query $builder, $value, $startDate = null, $stopDate = null, $dateColumn = 'created') {
+        return $this->groupByMonths($builder, "SUM(${value})", $startDate, $stopDate, $dateColumn);
     }
 }
