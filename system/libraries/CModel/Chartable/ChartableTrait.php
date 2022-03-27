@@ -2,6 +2,7 @@
 /**
  * @method static CModel_Chartable_GroupCollection countForGroup()
  * @method static CModel_Chartable_TimeCollection  countByDays()
+ * @method static CModel_Chartable_TimeCollection  countByMonths()
  * @method static CModel_Chartable_TimeCollection  valuesByDays()
  * @method static CModel_Chartable_TimeCollection  sumByDays()
  */
@@ -27,6 +28,53 @@ trait CModel_Chartable_ChartableTrait {
             });
 
         return new CModel_Chartable_GroupCollection($group);
+    }
+
+    /**
+     * @param CModel_Query $builder
+     * @param string       $value
+     * @param null|mixed   $startDate
+     * @param null|mixed   $stopDate
+     * @param string       $dateColumn
+     *
+     * @return CModel_Chartable_TimeCollection
+     */
+    private function groupByMonths(CModel_Query $builder, $value, $startDate = null, $stopDate = null, $dateColumn = 'created') {
+        $startDate = empty($startDate)
+            ? CCarbon::now()->subYear()->addMonthsNoOverflow()->startOfMonth()
+            : CCarbon::parse($startDate);
+
+        $stopDate = empty($stopDate)
+            ? CCarbon::now()->endOfMonth()
+            : CCarbon::parse($stopDate);
+
+        $query = $builder->select(
+            CDatabase::raw("${value} as value"),
+            CDatabase::raw("CONCAT(YEAR(${dateColumn}),LPAD(MONTH(${dateColumn}),2,'0')) as label")
+        )
+            ->where($dateColumn, '>=', $startDate)
+            ->where($dateColumn, '<=', $stopDate)
+            ->orderBy('label')
+            ->groupBy('label')
+            ->get();
+
+        $months = $startDate->diffInMonths($stopDate) + 1;
+
+        return CModel_Chartable_TimeCollection::times($months, function () use ($startDate, $query) {
+            $found = $query->firstWhere(
+                'label',
+                $startDate->format('Ym'),
+            );
+
+            $result = [
+                'value' => ($found ? $found->value : 0),
+                'label' => $startDate->format('Ym'),
+            ];
+
+            $startDate->addMonthsNoOverflow();
+
+            return $result;
+        });
     }
 
     /**
@@ -88,6 +136,20 @@ trait CModel_Chartable_ChartableTrait {
      */
     public function scopeCountByDays(CModel_Query $builder, $startDate = null, $stopDate = null, $dateColumn = 'created') {
         return $this->groupByDays($builder, 'count(*)', $startDate, $stopDate, $dateColumn);
+    }
+
+    /**
+     * Get total models grouped by `created_at` day.
+     *
+     * @param CModel_Query                  $builder
+     * @param null|string|DateTimeInterface $startDate
+     * @param null|string|DateTimeInterface $stopDate
+     * @param string                        $dateColumn
+     *
+     * @return CModel_Chartable_TimeCollection
+     */
+    public function scopeCountByMonths(CModel_Query $builder, $startDate = null, $stopDate = null, $dateColumn = 'created') {
+        return $this->groupByMonths($builder, 'count(*)', $startDate, $stopDate, $dateColumn);
     }
 
     /**
