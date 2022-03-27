@@ -491,7 +491,7 @@ class CApp implements CInterface_Responsable, CInterface_Renderable, CInterface_
         preg_match_all('#<script>(.*?)</script>#ims', $cappScript, $matches);
 
         foreach ($matches[1] as $value) {
-            $js .= $value;
+            $js = $value . $js;
         }
 
         //$js .= $cappScript;

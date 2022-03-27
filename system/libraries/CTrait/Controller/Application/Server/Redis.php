@@ -24,6 +24,9 @@ trait CTrait_Controller_Application_Server_Redis {
 
     public function connection($connection) {
         $app = c::app();
+        CManager::registerModule('chartjs');
+        CManager::registerModule('toastr');
+        CManager::registerModule('themify-icons');
 
         $app->addBreadcrumb('Redis', $this->controllerUrl());
         $app->title($connection);
@@ -83,12 +86,15 @@ trait CTrait_Controller_Application_Server_Redis {
             if ($submethod == 'index') {
                 $app = c::app();
                 $tabList = $app->addTabList()->setTabPosition('left');
-                $tabList->addTab()->setLabel('Memory')->setAjaxUrl($this->controllerUrl() . 'tab/metrics/cpu/' . $connection)->setNoPadding();
-                $tabList->addTab()->setLabel('CPU')->setAjaxUrl($this->controllerUrl() . 'tab/metrics/server/' . $connection)->setNoPadding();
+                $tabList->addTab()->setLabel('Memory')->setAjaxUrl($this->controllerUrl() . 'tab/metrics/memory/' . $connection)->setNoPadding();
+                $tabList->addTab()->setLabel('CPU')->setAjaxUrl($this->controllerUrl() . 'tab/metrics/cpu/' . $connection)->setNoPadding();
                 $tabList->addTab()->setLabel('Clients')->setAjaxUrl($this->controllerUrl() . 'tab/metrics/clients/' . $connection)->setNoPadding();
                 $tabList->addTab()->setLabel('Throughput')->setAjaxUrl($this->controllerUrl() . 'tab/metrics/throughput/' . $connection)->setNoPadding();
 
                 return $app;
+            }
+            if ($submethod == 'throughput') {
+                return $this->tabThroughput($connection);
             }
 
             return $this->tabMetrics($submethod, $connection);
@@ -153,11 +159,13 @@ trait CTrait_Controller_Application_Server_Redis {
         if ($method == 'metrics') {
             return $this->ajaxMetrics($connection, $section);
         }
+        if ($method == 'throughput') {
+            return $this->ajaxThroughput($connection, $section);
+        }
     }
 
     public function ajaxScan($connection) {
         $manager = CRedis_Manager::instance($connection);
-        CManager::registerModule('themify-icons');
 
         $pattern = c::request()->pattern;
         $result = $manager->scan($pattern);
@@ -231,9 +239,6 @@ trait CTrait_Controller_Application_Server_Redis {
     }
 
     protected function tabMetrics($section, $connection) {
-        CManager::registerModule('chartjs');
-        CManager::registerModule('toastr');
-
         $datasetMap = [
             'memory' => [
                 'used_memory' => [
@@ -248,7 +253,27 @@ trait CTrait_Controller_Application_Server_Redis {
                     'key' => 'used_memory_peak',
                     'color' => CColor::fromString('used_memory_peak', ['luminosity' => 'dark'])->toRgb()->toCssStyle(),
                 ],
-            ]
+            ],
+            'cpu' => [
+                'used_cpu_user' => [
+                    'key' => 'used_cpu_user',
+                    'color' => CColor::fromString('used_cpu_user', ['luminosity' => 'dark'])->toRgb()->toCssStyle(),
+                ],
+                'used_cpu_sys' => [
+                    'key' => 'used_cpu_sys',
+                    'color' => CColor::fromString('used_cpu_sys', ['luminosity' => 'dark'])->toRgb()->toCssStyle(),
+                ],
+            ],
+            'clients' => [
+                'connected_clients' => [
+                    'key' => 'connected_clients',
+                    'color' => CColor::fromString('connected_clients', ['luminosity' => 'dark'])->toRgb()->toCssStyle(),
+                ],
+                'blocked_clients' => [
+                    'key' => 'blocked_clients',
+                    'color' => CColor::fromString('blocked_clients', ['luminosity' => 'dark'])->toRgb()->toCssStyle(),
+                ],
+            ],
         ];
         $app = c::app();
         $app->addView('cresenity.manager.services.redis.metrics', [
@@ -261,6 +286,16 @@ trait CTrait_Controller_Application_Server_Redis {
         return $app;
     }
 
+    protected function tabThroughput($connection) {
+        $app = c::app();
+        $app->addView('cresenity.manager.services.redis.throughput', [
+            'connection' => $connection,
+            'pollingUrl' => $this->controllerUrl() . 'ajax/throughput/' . $connection . '',
+        ]);
+
+        return $app;
+    }
+
     public function ajaxMetrics($connection, $section) {
         $manager = CRedis_Manager::instance($connection);
         $data = $manager->getInformation($section);
@@ -268,6 +303,23 @@ trait CTrait_Controller_Application_Server_Redis {
         if ($section == 'cpu') {
             $ucfirstSection = 'CPU';
         }
+        if (isset($data[$ucfirstSection]) && is_array($data[$ucfirstSection])) {
+            $data = $data[$ucfirstSection];
+        }
+        $responseData = [
+            'errCode' => 0,
+            'errMessage' => '',
+            'data' => $data,
+        ];
+
+        return c::response()->json($responseData);
+    }
+
+    public function ajaxThroughput($connection) {
+        $manager = CRedis_Manager::instance($connection);
+        $data = $manager->getInformation('commandstats');
+
+        $ucfirstSection = ucfirst('commandstats');
         if (isset($data[$ucfirstSection]) && is_array($data[$ucfirstSection])) {
             $data = $data[$ucfirstSection];
         }

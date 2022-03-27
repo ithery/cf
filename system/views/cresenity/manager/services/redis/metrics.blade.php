@@ -10,7 +10,7 @@ if (!isset($data)) {
 }
 $id = uniqid();
 @endphp
-<div x-data="redisMetric">
+<div x-data="redisMetric()">
     <canvas id="{{ $id }}" style="width:100%; height:100%; min-height:400px"></canvas>
 </div>
 
@@ -18,19 +18,29 @@ $id = uniqid();
 <script>
 
     window.redisMetric = function() {
+
         return {
             collection : null,
             interval: null,
+            maxData:20,
             datasets: @json($datasets),
             chart:null,
             pollingUrl: '{{ $pollingUrl }}',
             init() {
-                window.addEventListener('cresenity:loaded',()=>{
+                if(window.cresenity) {
                     this.fillData();
                     this.refreshPeriodically();
                     this.initChart();
+                    cresenity.on('reload:success',()=> this.destroy());
+                } else {
+                    window.addEventListener('cresenity:loaded',()=>{
+                        this.fillData();
+                        this.refreshPeriodically();
+                        this.initChart();
+                        cresenity.on('reload:success',()=> this.destroy());
+                    });
+                }
 
-                })
             },
             initChart() {
                 this.chart = new Chart(document.getElementById('{{ $id }}').getContext("2d"), {
@@ -84,6 +94,9 @@ $id = uniqid();
 
                 }
                 this.collection.labels.push(this.time());
+                if(this.collection.labels.length>this.maxData) {
+                    this.collection.labels = this.collection.labels.slice(-1 * this.maxData);
+                }
                 let index=0;
                 for(let i in this.datasets) {
 
@@ -97,6 +110,9 @@ $id = uniqid();
                         }
                     }
                     this.collection.datasets[index].data.push(response[this.datasets[i].key]);
+                    if(this.collection.datasets[index].data.length>this.maxData) {
+                        this.collection.datasets[index].data = this.collection.datasets[index].data.slice(-1 * this.maxData);
+                    }
                     index++;
                 }
                 console.log(this.collection);
@@ -115,7 +131,6 @@ $id = uniqid();
                         processData: false,
                         contentType: false,
                         success: function (responseData) {
-                            console.log('responseData',responseData);
                             if(typeof responseData.errCode === 'undefined') {
                                 feWeb.showError('Unknown error');
                                 return resolve(false);

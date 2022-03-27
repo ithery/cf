@@ -139,8 +139,10 @@ class CRedis_Manager {
     public function getInformation($section = null) {
         if ($section) {
             $info = $this->getConnection()->info($section);
+            if ($section == 'commandstats') {
+                return CRedis_Formatter_Information::commandstats($info);
+            }
 
-            //return CRedis_Formatter_Information::$section($info);
             return $info;
         }
 
