@@ -711,4 +711,15 @@ return [
             'plugins/redoc/redoc.standalone.min.js',
         ],
     ],
+    'hljs' => [
+        'js' => [
+            'plugins/hljs/highlight.min.js',
+        ],
+        'css' => [
+            // 'hljs/highlight.min.css',
+            'plugins/hljs/hljs-dark.css',
+            'plugins/hljs/hljs-light.css',
+            'plugins/hljs/hljs.css',
+        ],
+    ],
 ];

@@ -37,7 +37,9 @@ trait CTrait_Controller_Application_Server_Redis {
         $widget = $app->addWidget()->setTitle('Redis ' . $connection)->addClass('mb-3');
         $form = $widget->addForm();
         $row = $form->addDiv()->addClass('row');
-
+        if (isset($info['Server'])) {
+            $info = carr::get($info, 'Server');
+        }
         $row->addDiv()->addClass('col-md-3 col-sm-6')->addField()->setLabel('Connection Name')->addLabelControl()->setValue('<code>' . $connection . '</code>');
         $row->addDiv()->addClass('col-md-3 col-sm-6')->addField()->setLabel('Redis Version')->addLabelControl()->setValue('<code>' . carr::get($info, 'redis_version') . '</code>');
         $tab = c::request()->tab;
