@@ -479,4 +479,24 @@ class Controller_Cresenity extends CController {
     public function version() {
         return c::response(CF::version());
     }
+
+    public function cache($method) {
+        if ($method == 'delete') {
+            $key = c::request()->key;
+            $tags = c::request()->tags;
+
+            $cache = CCache::manager();
+
+            if (!empty($tags)) {
+                $tags = json_decode($tags, true);
+                $cache = $cache->tags($tags);
+            } else {
+                unset($tags);
+            }
+
+            $success = $cache->forget($key);
+
+            return c::response()->json(compact('success'));
+        }
+    }
 }

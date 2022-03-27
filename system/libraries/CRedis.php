@@ -1,8 +1,6 @@
 <?php
 
 class CRedis implements CRedis_FactoryInterface {
-    private static $instance;
-
     /**
      * The Redis server configurations.
      *
@@ -40,6 +38,13 @@ class CRedis implements CRedis_FactoryInterface {
      */
     protected $events = false;
 
+    private static $instance;
+
+    /**
+     * @param string $configName
+     *
+     * @return CRedis
+     */
     public static function instance($configName = 'redis') {
         if (self::$instance == null) {
             self::$instance = [];
@@ -47,6 +52,7 @@ class CRedis implements CRedis_FactoryInterface {
         if (!isset(self::$instance[$configName])) {
             self::$instance[$configName] = new static($configName);
         }
+
         return self::$instance[$configName];
     }
 
@@ -65,7 +71,7 @@ class CRedis implements CRedis_FactoryInterface {
     /**
      * Get a Redis connection by name.
      *
-     * @param string|null $name
+     * @param null|string $name
      *
      * @return CRedis_AbstractConnection
      */
@@ -84,11 +90,11 @@ class CRedis implements CRedis_FactoryInterface {
     /**
      * Resolve the given connection by name.
      *
-     * @param string|null $name
-     *
-     * @return CRedis_AbstractConnection
+     * @param null|string $name
      *
      * @throws \InvalidArgumentException
+     *
+     * @return CRedis_AbstractConnection
      */
     public function resolve($name = null) {
         $name = $name ?: 'default';
@@ -103,6 +109,7 @@ class CRedis implements CRedis_FactoryInterface {
         if (isset($this->config['clusters'][$name])) {
             return $this->resolveCluster($name);
         }
+
         throw new InvalidArgumentException("Redis connection [{$name}] not configured.");
     }
 
@@ -151,9 +158,9 @@ class CRedis implements CRedis_FactoryInterface {
         }
         switch ($this->driver) {
             case 'predis':
-                return new CRedis_Connector_PredisConnector;
+                return new CRedis_Connector_PredisConnector();
             case 'phpredis':
-                return new CRedis_Connector_PhpRedisConnector;
+                return new CRedis_Connector_PhpRedisConnector();
         }
     }
 
@@ -165,7 +172,8 @@ class CRedis implements CRedis_FactoryInterface {
      * @return array
      */
     protected function parseConnectionConfiguration($config) {
-        $parsed = (new CDatabase_ConfigurationUrlParser)->parseConfiguration($config);
+        $parsed = (new CDatabase_ConfigurationUrlParser())->parseConfiguration($config);
+
         return array_filter($parsed, function ($key) {
             return !in_array($key, ['driver', 'username'], true);
         }, ARRAY_FILTER_USE_KEY);
@@ -210,6 +218,13 @@ class CRedis implements CRedis_FactoryInterface {
     }
 
     /**
+     * @return string
+     */
+    public function getDriver() {
+        return $this->driver;
+    }
+
+    /**
      * Register a custom driver creator Closure.
      *
      * @param string   $driver
@@ -219,6 +234,7 @@ class CRedis implements CRedis_FactoryInterface {
      */
     public function extend($driver, Closure $callback) {
         $this->customCreators[$driver] = $callback->bindTo($this, $this);
+
         return $this;
     }
 
