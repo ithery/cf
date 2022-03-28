@@ -148,6 +148,11 @@ class CElement_Component_Form_Field extends CElement_Component {
         $js = CStringBuilder::factory()->setIndent($indent);
 
         $js->setIndent($indent);
+        $tooltipJs = $this->tooltip ? $this->tooltip->js() : '';
+
+        if ($tooltipJs) {
+            $js->appendln($tooltipJs);
+        }
 
         $js->appendln(parent::js($js->getIndent()))->br();
 

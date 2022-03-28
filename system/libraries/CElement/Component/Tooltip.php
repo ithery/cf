@@ -27,6 +27,10 @@ class CElement_Component_Tooltip extends CElement_Component {
     }
 
     public static function factory($id = null) {
-        return new static($id = null);
+        return new static($id);
+    }
+
+    public function js($indent = 0) {
+        return " tippy && tippy(document.getElementById('" . $this->id . "'))";
     }
 }
