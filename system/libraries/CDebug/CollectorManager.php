@@ -30,4 +30,8 @@ class CDebug_CollectorManager {
     public static function allCollectorType() {
         return [CDebug::COLLECTOR_TYPE_DEPRECATED, CDebug::COLLECTOR_TYPE_EXCEPTION, CDebug::COLLECTOR_TYPE_PROFILER];
     }
+
+    public function collectException($ex) {
+        return $this->exception()->collect($ex);
+    }
 }
