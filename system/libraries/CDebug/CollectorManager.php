@@ -27,11 +27,26 @@ class CDebug_CollectorManager {
         return $this->exception;
     }
 
+    /**
+     * @return CDebug_Collector_Deprecated
+     */
+    public function deprecated() {
+        if ($this->deprecated == null) {
+            $this->deprecated = new CDebug_Collector_Deprecated();
+        }
+
+        return $this->deprecated;
+    }
+
     public static function allCollectorType() {
         return [CDebug::COLLECTOR_TYPE_DEPRECATED, CDebug::COLLECTOR_TYPE_EXCEPTION, CDebug::COLLECTOR_TYPE_PROFILER];
     }
 
     public function collectException($ex) {
         return $this->exception()->collect($ex);
+    }
+
+    public function collectDeprecated($message = '') {
+        return $this->deprecated()->collect($message);
     }
 }
