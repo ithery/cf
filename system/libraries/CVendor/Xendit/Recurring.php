@@ -6,7 +6,7 @@ class CVendor_Xendit_Recurring extends CVendor_Xendit_Base {
     use CVendor_Xendit_ApiOperation_Update;
 
     /**
-     * Instantiate base URL
+     * Instantiate base URL.
      *
      * @return string
      */
@@ -15,7 +15,7 @@ class CVendor_Xendit_Recurring extends CVendor_Xendit_Base {
     }
 
     /**
-     * Instantiate required params for Create
+     * Instantiate required params for Create.
      *
      * @return array
      */
@@ -31,7 +31,7 @@ class CVendor_Xendit_Recurring extends CVendor_Xendit_Base {
     }
 
     /**
-     * Instantiate required params for Update
+     * Instantiate required params for Update.
      *
      * @return array
      */
@@ -40,9 +40,11 @@ class CVendor_Xendit_Recurring extends CVendor_Xendit_Base {
     }
 
     /**
-     * Stop a recurring payment
+     * Stop a recurring payment.
      *
      * @param string $id recurring payment ID
+     *
+     * @throws CVendor_Xendit_Exception_ApiException
      *
      * @return array[
      *                'id'=> string,
@@ -62,8 +64,6 @@ class CVendor_Xendit_Recurring extends CVendor_Xendit_Base {
      *                'updated'=> string,
      *                'start_date'=> string
      *                ]
-     *
-     * @throws CVendor_Xendit_Exception_ApiException
      */
     public function stop($id) {
         $url = '/recurring_payments/' . $id . '/stop!';
@@ -72,9 +72,11 @@ class CVendor_Xendit_Recurring extends CVendor_Xendit_Base {
     }
 
     /**
-     * Pause a recurring payment
+     * Pause a recurring payment.
      *
      * @param string $id recurring payment ID
+     *
+     * @throws CVendor_Xendit_Exception_ApiException
      *
      * @return array[
      *                'id'=> string,
@@ -94,8 +96,6 @@ class CVendor_Xendit_Recurring extends CVendor_Xendit_Base {
      *                'updated'=> string,
      *                'start_date'=> string
      *                ]
-     *
-     * @throws CVendor_Xendit_Exception_ApiException
      */
     public function pause($id) {
         $url = '/recurring_payments/' . $id . '/pause!';
@@ -104,9 +104,11 @@ class CVendor_Xendit_Recurring extends CVendor_Xendit_Base {
     }
 
     /**
-     * Resume a recurring payment
+     * Resume a recurring payment.
      *
      * @param string $id recurring payment ID
+     *
+     * @throws CVendor_Xendit_Exception_ApiException
      *
      * @return array[
      *                'id'=> string,
@@ -126,8 +128,6 @@ class CVendor_Xendit_Recurring extends CVendor_Xendit_Base {
      *                'updated'=> string,
      *                'start_date'=> string
      *                ]
-     *
-     * @throws CVendor_Xendit_Exception_ApiException
      */
     public function resume($id) {
         $url = '/recurring_payments/' . $id . '/resume!';
