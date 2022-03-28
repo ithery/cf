@@ -100,6 +100,14 @@ abstract class CException_ContextAbstract {
     }
 
     protected function getDebugData() {
-        return [];
+        $variables = CDebug::getVariables();
+        //serialize all variables
+        return c::collect($variables)->map(function ($item) {
+            if ($item instanceof Closure) {
+                $item = new \Opis\Closure\SerializableClosure($item);
+            }
+
+            return serialize($item);
+        })->toArray();
     }
 }
