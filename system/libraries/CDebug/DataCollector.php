@@ -18,7 +18,7 @@ defined('SYSPATH') or die('No direct access allowed.');
 /**
  * Abstract class for data collectors.
  */
-abstract class CDebug_DataCollector implements CDebug_Interface_DataCollectorInterface {
+abstract class CDebug_DataCollector implements CDebug_Contract_DataCollectorInterface {
     protected $dataFormater;
 
     protected $varDumper;
@@ -36,16 +36,16 @@ abstract class CDebug_DataCollector implements CDebug_Interface_DataCollectorInt
     /**
      * Sets the default data formater instance used by all collectors subclassing this class.
      *
-     * @param DataFormatterInterface $formater
+     * @param CDebug_Contract_DataFormatterInterface $formater
      */
-    public static function setDefaultDataFormatter(CDebug_Interface_DataFormatterInterface $formater) {
+    public static function setDefaultDataFormatter(CDebug_Contract_DataFormatterInterface $formater) {
         self::$defaultDataFormatter = $formater;
     }
 
     /**
      * Returns the default data formater.
      *
-     * @return DataFormatterInterface
+     * @return CDebug_Contract_DataFormatterInterface
      */
     public static function getDefaultDataFormatter() {
         if (self::$defaultDataFormatter === null) {
@@ -58,18 +58,18 @@ abstract class CDebug_DataCollector implements CDebug_Interface_DataCollectorInt
     /**
      * Sets the data formater instance used by this collector.
      *
-     * @param CDebug_Interface_DataFormatterInterface $formater
+     * @param CDebug_Contract_DataFormatterInterface $formater
      *
      * @return $this
      */
-    public function setDataFormatter(CDebug_Interface_DataFormatterInterface $formater) {
+    public function setDataFormatter(CDebug_Contract_DataFormatterInterface $formater) {
         $this->dataFormater = $formater;
 
         return $this;
     }
 
     /**
-     * @return CDebug_Interface_DataFormatterInterface
+     * @return CDebug_Contract_DataFormatterInterface
      */
     public function getDataFormatter() {
         if ($this->dataFormater === null) {

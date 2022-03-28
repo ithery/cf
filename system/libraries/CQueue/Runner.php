@@ -55,6 +55,7 @@ class CQueue_Runner {
         if ($this->downForMaintenance() && $this->getOption('once')) {
             return $this->worker->sleep($this->getOption('sleep'));
         }
+
         // We'll listen to the processed and failed events so we can write information
         // to the console as jobs are processed, which will let the developer watch
         // which jobs are coming through a queue and be informed on its progress.
@@ -247,5 +248,9 @@ class CQueue_Runner {
         $options = array_merge($defaultOptions, $this->options);
 
         return carr::get($options, $name);
+    }
+
+    public function getCurrentJobName() {
+        return $this->worker->getCurrentJobName();
     }
 }

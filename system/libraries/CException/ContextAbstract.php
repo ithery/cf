@@ -68,6 +68,20 @@ abstract class CException_ContextAbstract {
     }
 
     protected function getAppData() {
+        $daemonClass = null;
+        $isDaemon = CDaemon::isDaemon();
+        $daemonService = CDaemon::getRunningService();
+        if ($daemonService != null && is_object($daemonService)) {
+            $daemonClass = get_class($daemonService);
+        }
+        $queueRunner = CQueue::runner();
+        $isQueue = false;
+        $queueJobName = null;
+        if ($queueRunner != null) {
+            $isQueue = true;
+            $queueJobName = $queueRunner->getCurrentJobName();
+        }
+
         return [
             'isCli' => CF::isCli(),
             'isCFCli' => CF::isCFCli(),
@@ -78,6 +92,10 @@ abstract class CException_ContextAbstract {
             'orgCode' => CF::orgCode(),
             'theme' => c::theme()->getCurrentTheme(),
             'nav' => c::app()->getNavName(),
+            'isDaemon' => $isDaemon,
+            'daemonClass' => $daemonClass,
+            'isQueue' => $isQueue,
+            'queueJobName' => $queueJobName,
         ];
     }
 

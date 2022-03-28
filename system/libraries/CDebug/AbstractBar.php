@@ -14,7 +14,7 @@ class CDebug_AbstractBar implements ArrayAccess {
     protected $data;
 
     /**
-     * @var CDebug_Interface_DataCollectorInterface[]
+     * @var CDebug_Contract_DataCollectorInterface[]
      */
     protected $collectors = [];
 
@@ -26,7 +26,7 @@ class CDebug_AbstractBar implements ArrayAccess {
     protected $config;
 
     /**
-     * @var CDebug_Bar_Interface_RequestIdGeneratorInterface
+     * @var CDebug_Contract_RequestIdGeneratorInterface
      */
     protected $requestIdGenerator;
 
@@ -67,13 +67,13 @@ class CDebug_AbstractBar implements ArrayAccess {
     /**
      * Adds a data collector.
      *
-     * @param DataCollectorInterface $collector
+     * @param CDebug_Contract_DataCollectorInterface $collector
      *
-     * @throws DebugBarException
+     * @throws CDebug_Bar_Exception
      *
      * @return $this
      */
-    public function addCollector(CDebug_Interface_DataCollectorInterface $collector) {
+    public function addCollector(CDebug_Contract_DataCollectorInterface $collector) {
         if ($collector->getName() === '__meta') {
             throw new CDebug_Bar_Exception("'__meta' is a reserved name and cannot be used as a collector name");
         }
@@ -92,7 +92,7 @@ class CDebug_AbstractBar implements ArrayAccess {
      *
      * @throws CDebug_Bar_Exception
      *
-     * @return CDebug_Interface_DataCollectorInterface
+     * @return CDebug_Contract_DataCollectorInterface
      */
     public function getCollector($name) {
         if (!isset($this->collectors[$name])) {
@@ -105,7 +105,7 @@ class CDebug_AbstractBar implements ArrayAccess {
     /**
      * Returns an array of all data collectors.
      *
-     * @return CDebug_Interface_DataCollectorInterface[]
+     * @return CDebug_Contract_DataCollectorInterface[]
      */
     public function getCollectors() {
         return $this->collectors;
@@ -125,18 +125,18 @@ class CDebug_AbstractBar implements ArrayAccess {
     /**
      * Sets the request id generator.
      *
-     * @param RequestIdGeneratorInterface $generator
+     * @param CDebug_Contract_RequestIdGeneratorInterface $generator
      *
      * @return $this
      */
-    public function setRequestIdGenerator(RequestIdGeneratorInterface $generator) {
+    public function setRequestIdGenerator(CDebug_Contract_RequestIdGeneratorInterface $generator) {
         $this->requestIdGenerator = $generator;
 
         return $this;
     }
 
     /**
-     * @return RequestIdGeneratorInterface
+     * @return CDebug_Contract_RequestIdGeneratorInterface
      */
     public function getRequestIdGenerator() {
         if ($this->requestIdGenerator === null) {
@@ -157,6 +157,35 @@ class CDebug_AbstractBar implements ArrayAccess {
         }
 
         return $this->requestId;
+    }
+
+    /**
+     * Sets the storage backend to use to store the collected data.
+     *
+     * @param CDebug_Contract_StorageInterface $storage
+     *
+     * @return $this
+     */
+    public function setStorage(CDebug_Contract_StorageInterface $storage = null) {
+        $this->storage = $storage;
+
+        return $this;
+    }
+
+    /**
+     * @return CDebug_Contract_StorageInterface
+     */
+    public function getStorage() {
+        return $this->storage;
+    }
+
+    /**
+     * Checks if the data will be persisted.
+     *
+     * @return bool
+     */
+    public function isDataPersisted() {
+        return $this->storage !== null;
     }
 
     /**
