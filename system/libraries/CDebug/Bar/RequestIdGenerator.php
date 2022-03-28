@@ -10,9 +10,9 @@ defined('SYSPATH') or die('No direct access allowed.');
  */
 
 /**
- * Basic request ID generator
+ * Basic request ID generator.
  */
-class CDebug_Bar_RequestIdGenerator implements CDebug_Bar_Interface_RequestIdGeneratorInterface {
+class CDebug_Bar_RequestIdGenerator implements CDebug_Contract_RequestIdGeneratorInterface {
     protected $index = 0;
 
     /**
@@ -34,6 +34,7 @@ class CDebug_Bar_RequestIdGenerator implements CDebug_Bar_Interface_RequestIdGen
             //  * $this->index guarantees the uniqueness of IDs from the current object.
             $this->index++;
             $entropy = serialize($_SERVER) . uniqid('', true) . spl_object_hash($this) . $this->index;
+
             return 'X' . md5($entropy);
         }
     }

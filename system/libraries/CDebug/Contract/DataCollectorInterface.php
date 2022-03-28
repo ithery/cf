@@ -10,18 +10,18 @@ defined('SYSPATH') or die('No direct access allowed.');
  */
 
 /**
- * DataCollector Interface
+ * DataCollector Interface.
  */
-interface CDebug_Interface_DataCollectorInterface {
+interface CDebug_Contract_DataCollectorInterface {
     /**
-     * Called by the DebugBar when data needs to be collected
+     * Called by the DebugBar when data needs to be collected.
      *
      * @return array Collected data
      */
     public function collect();
 
     /**
-     * Returns the unique name of the collector
+     * Returns the unique name of the collector.
      *
      * @return string
      */
