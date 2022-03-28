@@ -43,7 +43,7 @@ final class CVendor_Firebase_ServiceAccount {
     /**
      * @return string
      */
-    public function getPrivateKey(): string {
+    public function getPrivateKey() {
         return isset($this->data['private_key']) ? $this->data['private_key'] : '';
     }
 
