@@ -12,6 +12,12 @@ defined('SYSPATH') or die('No direct access allowed.');
 use OpenTracing\GlobalTracer;
 
 class CDebug {
+    const COLLECTOR_TYPE_DEPRECATED = 'deprecated';
+
+    const COLLECTOR_TYPE_EXCEPTION = 'exception';
+
+    const COLLECTOR_TYPE_PROFILER = 'profiler';
+
     protected static $bar;
 
     /**
@@ -35,5 +41,12 @@ class CDebug {
             $collector = self::bar()->getCollector('messages');
             $collector->debug($var);
         }
+    }
+
+    /**
+     * @return CDebug_CollectorManager
+     */
+    public static function collector() {
+        return CDebug_CollectorManager::instance();
     }
 }
