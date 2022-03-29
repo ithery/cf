@@ -26,10 +26,10 @@ abstract class CDatabase_Driver_AbstractMysql extends CDatabase_Driver implement
     /**
      * @inheritdoc
      *
-     * @return CDatabase_Platform_Mysql
+     * @return CDatabase_Platform_MySql
      */
     public function getDatabasePlatform() {
-        return new CDatabase_Platform_Mysql();
+        return new CDatabase_Platform_MySql();
     }
 
     /**
@@ -46,10 +46,10 @@ abstract class CDatabase_Driver_AbstractMysql extends CDatabase_Driver implement
         if (!$mariadb) {
             $oracleMysqlVersion = $this->getOracleMysqlVersionNumber($version);
             if (version_compare($oracleMysqlVersion, '8', '>=')) {
-                return new CDatabase_Platform_MySQL80();
+                return new CDatabase_Platform_MySql80();
             }
             if (version_compare($oracleMysqlVersion, '5.7.9', '>=')) {
-                return new CDatabase_Platform_MySQL57();
+                return new CDatabase_Platform_MySql57();
             }
         }
 
