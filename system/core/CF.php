@@ -88,7 +88,7 @@ final class CF {
             return CBase::ENVIRONMENT_PRODUCTION;
         }
 
-        return CF::config('app.environment', CBase::ENVIRONMENT_DEVELOPMENT);
+        return c::env('ENVIRONMENT', CBase::ENVIRONMENT_DEVELOPMENT);
     }
 
     /**
