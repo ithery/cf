@@ -397,7 +397,7 @@ trait CApp_Trait_BaseTrait {
      * @return bool
      */
     public static function isDevelopment() {
-        if (static::isProduction()) {
+        if (CF::isProduction()) {
             return false;
         }
         $domain = CF::domain();
