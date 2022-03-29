@@ -36,7 +36,6 @@ class CAjax_Engine_DataTable_Processor_DataProvider extends CAjax_Engine_DataTab
             $collections = $query->toEnumerable();
             $totalItem = $collections->count();
         }
-
         $output = [
             'sEcho' => intval(carr::get($request, 'sEcho')),
             'iTotalRecords' => $totalItem,

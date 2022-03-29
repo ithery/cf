@@ -140,7 +140,6 @@ class SerializableClosure implements Serializable {
 
         $use = $this->transformUseVariables($reflector->getUseVariables());
         $code = $reflector->getCode();
-
         $this->mapByReference($use);
 
         $ret = \serialize([

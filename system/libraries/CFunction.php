@@ -89,7 +89,9 @@ class CFunction {
         $error = 0;
         if ($error == 0) {
             if ($this->func instanceof OpisSerializableClosure) {
-                return $this->func->__invoke(...$args);
+                $var = $this->func->__invoke(...$args);
+
+                return $var;
             }
         }
         if ($error == 0) {
