@@ -371,7 +371,7 @@ class CQueue_Worker {
      */
     protected function runJob($job, $connectionName, CQueue_WorkerOptions $options) {
         try {
-            $this->currentJobName = $job->getName();
+            $this->currentJobName = $job->resolveName();
 
             return $this->process($connectionName, $job, $options);
         } catch (Throwable $e) {
