@@ -1028,7 +1028,7 @@ SQL
      * @inheritDoc
      */
     protected function getReservedKeywordsClass() {
-        return CDatabase_Platform_Keywords_Mysql::class;
+        return CDatabase_Platform_Keywords_MySql::class;
     }
 
     /**
