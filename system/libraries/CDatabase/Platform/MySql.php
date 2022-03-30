@@ -921,13 +921,13 @@ SQL
         } elseif (is_string($index)) {
             $indexName = $index;
         } else {
-            throw new \InvalidArgumentException('CDatabase_Platform_Mysql::getDropIndexSQL() expects $index parameter to be string or \Doctrine\DBAL\Schema\Index.');
+            throw new \InvalidArgumentException('CDatabase_Platform_MySql::getDropIndexSQL() expects $index parameter to be string or \Doctrine\DBAL\Schema\Index.');
         }
 
         if ($table instanceof CDatabase_Schema_Table) {
             $table = $table->getQuotedName($this);
         } elseif (!is_string($table)) {
-            throw new \InvalidArgumentException('CDatabase_Platform_Mysql::getDropIndexSQL() expects $table parameter to be string or \Doctrine\DBAL\Schema\Table.');
+            throw new \InvalidArgumentException('CDatabase_Platform_MySql::getDropIndexSQL() expects $table parameter to be string or \Doctrine\DBAL\Schema\Table.');
         }
 
         if ($index instanceof CDatabase_Schema_Index && $index->isPrimary()) {
