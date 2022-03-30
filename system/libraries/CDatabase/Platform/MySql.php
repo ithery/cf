@@ -983,6 +983,7 @@ SQL
             'datetime' => 'datetime',
             'decimal' => 'decimal',
             'double' => 'float',
+            'enum' => 'enum',
             'float' => 'float',
             'int' => 'integer',
             'integer' => 'integer',
