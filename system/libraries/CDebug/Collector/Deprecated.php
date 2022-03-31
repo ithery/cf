@@ -2,6 +2,9 @@
 
 class CDebug_Collector_Deprecated extends CDebug_Collector_Exception {
     public function collect($message = '') {
+        if (!CF::config('collector.deprecated')) {
+            return null;
+        }
         static $totalDeprecated = 0;
         $totalDeprecated++;
 

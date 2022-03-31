@@ -2,6 +2,10 @@
 
 class CDebug_Collector_Exception extends CDebug_CollectorAbstract {
     public function collect($exception) {
+        if (!CF::config('collector.exception')) {
+            return null;
+        }
+
         if ($exception instanceof Exception) {
             $data = $this->getDataFromException($exception);
             $this->put($data);
