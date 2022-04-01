@@ -236,9 +236,7 @@ export default class Cresenity {
                     if(!isError) {
 
                         this.doCallback('onReloadSuccess', data);
-                        this.dispatch('reload:success',{
-                            data
-                        });
+                        this.dispatch('reload:success',data);
                         this.handleResponse(data, () => {
                             switch (settings.reloadType) {
                                 case 'after':
@@ -277,7 +275,7 @@ export default class Cresenity {
                 },
                 error: (errorXhr, ajaxOptions, thrownError) => {
                     this.dispatch('reload:error',{
-                        errorXhr, ajaxOptions, thrownError
+                        xhr:errorXhr, ajaxOptions, error:thrownError
                     });
                     this.handleAjaxError(errorXhr, ajaxOptions, thrownError);
                 },
