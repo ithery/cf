@@ -460,7 +460,7 @@ trait CElement_Component_DataTable_Trait_HtmlTrait {
                 $html->appendln('
                     <th class="align-center" data-align="align-center" class="' . $thClass . '" scope="col" ' . $attrWidth . '>
                         <div class="capp-table-checkbox-wrapper">
-                            <input type="checkbox" name="' . $this->id . '-check-all" id="' . $this->id . '-check-all" value="1">
+                            <input type="checkbox" name="' . $this->id . '-check-all" id="' . $this->id . '-check-all" class="' . $this->id . '-check-all" value="1">
                             <label for="' . $this->id . '-check-all"></label>
                         </div>
                     </th>')->br();
