@@ -22,6 +22,7 @@ class CResources {
         }
 
         $config = CF::config("storage.disks.{$diskName}");
+
         return carr::get($config, 'driver') == 's3';
     }
 
@@ -67,6 +68,7 @@ class CResources {
         if ($orgCode == 'default') {
             $orgCode = null;
         }
+
         return [
             'org_code' => $orgCode,
             'resource_type' => $resource_type,
@@ -78,6 +80,7 @@ class CResources {
 
     public static function exists($filename, $size = null) {
         $path = static::getPath($filename, $size);
+
         return file_exists($path);
     }
 
@@ -107,6 +110,7 @@ class CResources {
         $dir = 'resources';
 
         $temp_path = str_replace(DS, '/', $dir) . '' . $temp;
+
         return $temp_path;
     }
 
@@ -136,11 +140,12 @@ class CResources {
         $dir = CF::getDir('resources');
 
         $temp_path = str_replace(DS, '/', $dir) . '' . $temp;
+
         return $temp_path;
     }
 
     /**
-     * Currently just support image
+     * Currently just support image.
      *
      * @param string $resource_type Possible value: image, pdf, dll or filename if
      * @param string $type
@@ -156,7 +161,7 @@ class CResources {
             $orgCode = carr::get($options, 'org_code');
             $appCode = carr::get($options, 'app_code');
         } else {
-            CCollector::deprecated('Resources options must passed as array');
+            CDebug::collector()->collectDeprecated('Resources options must passed as array');
         }
         if (!is_array($orgCode)) {
             if (strlen($orgCode) == 0) {
@@ -203,6 +208,7 @@ class CResources {
         $class = 'CResources_Engine_' . $resource_type;
         $object = new $class($type, $options);
         $object->set_root_directory($root_directory);
+
         return $object;
     }
 
@@ -280,6 +286,7 @@ class CResources {
                 CResources::scanDirectory($path, $filter, $results);
             }
         }
+
         return $results;
     }
 
@@ -295,20 +302,24 @@ class CResources {
         $resource = CResources::factory($type, $resourceName, $resourceOptions);
         $filename = basename($tempPath);
         $imageName = $resource->saveFromTemp($filename, $tempPath);
+
         return $imageName;
     }
 
     public static function getUrl($fileId) {
         $path = static::getPath($fileId);
         $url = str_replace(DOCROOT, curl::httpbase(), $path);
+
         return $url;
     }
 
     public static function delete($filename, $size = null) {
         if (static::exists($filename, $size)) {
             $path = static::getPath($filename);
+
             return unlink($path);
         }
+
         return true;
     }
 }

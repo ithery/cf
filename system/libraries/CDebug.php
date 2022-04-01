@@ -20,6 +20,8 @@ class CDebug {
 
     protected static $bar;
 
+    private static $variables;
+
     /**
      * @param array $options
      *
@@ -48,5 +50,13 @@ class CDebug {
      */
     public static function collector() {
         return CDebug_CollectorManager::instance();
+    }
+
+    public static function variable($key, $value) {
+        static::$variables[$key] = $value;
+    }
+
+    public static function getVariables() {
+        return static::$variables;
     }
 }

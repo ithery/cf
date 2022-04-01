@@ -5,11 +5,19 @@ final class CVendor_Firebase_Messaging_Condition implements \JsonSerializable {
      */
     private $value;
 
-    private function __construct(string $value) {
+    /**
+     * @param string $value
+     */
+    private function __construct($value) {
         $this->value = $value;
     }
 
-    public static function fromValue(string $value): self {
+    /**
+     * @param string $value
+     *
+     * @return self
+     */
+    public static function fromValue($value) {
         $value = \str_replace('"', "'", $value);
 
         if ((\mb_substr_count($value, "'") % 2) !== 0) {
@@ -23,7 +31,10 @@ final class CVendor_Firebase_Messaging_Condition implements \JsonSerializable {
         return new self($value);
     }
 
-    public function value(): string {
+    /**
+     * @return string
+     */
+    public function value() {
         return $this->value;
     }
 
@@ -31,7 +42,10 @@ final class CVendor_Firebase_Messaging_Condition implements \JsonSerializable {
         return $this->value;
     }
 
-    public function jsonSerialize(): string {
+    /**
+     * @return string
+     */
+    public function jsonSerialize() {
         return $this->value;
     }
 }

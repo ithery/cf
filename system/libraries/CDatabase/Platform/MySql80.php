@@ -5,7 +5,7 @@
  */
 class CDatabase_Platform_MySql80 extends CDatabase_Platform_MySql57 {
     /**
-     * {@inheritdoc}
+     * @inheritdoc
      */
     protected function getReservedKeywordsClass() {
         return CDatabase_Platform_Keywords_MySql80::class;

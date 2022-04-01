@@ -153,8 +153,8 @@ trait CElement_Component_DataTable_Trait_JavascriptTrait {
                         eval(script);
                     }
                 }
-                jQuery('#" . $this->id . "-check-all').removeAttr('checked');
-                jQuery('#" . $this->id . "-check-all').prop('checked',false);
+                jQuery('." . $this->id . "-check-all').removeAttr('checked');
+                jQuery('." . $this->id . "-check-all').prop('checked',false);
             },
             'error': function(a,b,c) {
                 if(window.cresenity) {
@@ -394,7 +394,7 @@ jQuery('.data_table-quick_search').on('keyup change', function() {
         }
         if ($this->checkbox) {
             $js->appendln("
-                jQuery('#" . $this->id . "-check-all').click(function() {
+                jQuery('." . $this->id . "-check-all').click(function() {
                     if(jQuery(this).is(':checked')) {
                         jQuery('.checkbox-" . $this->id . "').attr('checked','checked');
                         jQuery('.checkbox-" . $this->id . "').prop('checked',true);

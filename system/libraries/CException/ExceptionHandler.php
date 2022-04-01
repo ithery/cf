@@ -534,7 +534,7 @@ class CException_ExceptionHandler implements CException_ExceptionHandlerInterfac
     }
 
     protected function isDebug() {
-        $isDebug = CF::config('core.debug');
+        $isDebug = CF::config('app.debug');
         if ($isDebug === null) {
             $isDebug = !CF::isProduction();
         }

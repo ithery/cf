@@ -11,7 +11,7 @@ defined('SYSPATH') or die('No direct access allowed.');
 use Symfony\Component\VarDumper\Cloner\VarCloner;
 use Symfony\Component\VarDumper\Dumper\CliDumper;
 
-class CDebug_DataFormatter implements CDebug_Interface_DataFormatterInterface {
+class CDebug_DataFormatter implements CDebug_Contract_DataFormatterInterface {
     /**
      * DataFormatter constructor.
      */
@@ -37,6 +37,7 @@ class CDebug_DataFormatter implements CDebug_Interface_DataFormatterInterface {
                 }
             }
         );
+
         return trim($output);
     }
 
@@ -51,6 +52,7 @@ class CDebug_DataFormatter implements CDebug_Interface_DataFormatterInterface {
         } elseif ($seconds < 1) {
             return round($seconds * 1000, 2) . 'ms';
         }
+
         return round($seconds, 2) . 's';
     }
 
@@ -68,6 +70,7 @@ class CDebug_DataFormatter implements CDebug_Interface_DataFormatterInterface {
         $size = abs($size);
         $base = log($size) / log(1024);
         $suffixes = ['B', 'KB', 'MB', 'GB', 'TB'];
+
         return $sign . round(pow(1024, $base - floor($base)), $precision) . $suffixes[floor($base)];
     }
 }

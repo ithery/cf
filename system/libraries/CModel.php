@@ -376,8 +376,10 @@ abstract class CModel implements ArrayAccess, CInterface_Arrayable, CInterface_J
      * @return void
      */
     protected function initializeTraits() {
-        foreach (static::$traitInitializers[static::class] as $method) {
-            $this->{$method}();
+        if (isset(static::$traitInitializers[static::class])) {
+            foreach (static::$traitInitializers[static::class] as $method) {
+                $this->{$method}();
+            }
         }
     }
 

@@ -406,9 +406,9 @@ class CElement_FormInput_SelectSearch extends CElement_FormInput {
 
                     foreach ($matches as $val) {
                         $str = $val[1]; //matches str without bracket {}
-                        $b_str = $val[0]; //matches str with bracket {}
+                        $bStr = $val[0]; //matches str with bracket {}
 
-                        $strSelection = str_replace($b_str, carr::get($row, $str), $strSelection);
+                        $strSelection = str_replace($bStr, carr::get($row, $str), $strSelection);
                     }
 
                     $valueTemp = is_array($this->value) ? $this->value[$index] : $this->value;
@@ -505,7 +505,7 @@ class CElement_FormInput_SelectSearch extends CElement_FormInput {
             $strJsInit = '
                 initSelection : function (element, callback) {
                     var data = ' . $rjson . ';
-
+                    console.log(data);
                     callback(data);
                 },
             ';
@@ -596,6 +596,7 @@ class CElement_FormInput_SelectSearch extends CElement_FormInput {
                     if(item.selected && item.element) {
                         let dataContent = $(item.element).attr('data-content');
                         if(dataContent) {
+
                             return $(dataContent);
                         }
                     }

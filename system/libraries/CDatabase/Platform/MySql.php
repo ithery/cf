@@ -14,7 +14,7 @@ defined('SYSPATH') or die('No direct access allowed.');
  * MySQL database platform. This platform represents a MySQL 5.0 or greater platform that
  * uses the InnoDB storage engine.
  */
-class CDatabase_Platform_Mysql extends CDatabase_Platform {
+class CDatabase_Platform_MySql extends CDatabase_Platform {
     const LENGTH_LIMIT_TINYTEXT = 255;
 
     const LENGTH_LIMIT_TEXT = 65535;
@@ -28,39 +28,39 @@ class CDatabase_Platform_Mysql extends CDatabase_Platform {
     const LENGTH_LIMIT_MEDIUMBLOB = 16777215;
 
     /**
-     * {@inheritDoc}
+     * @inheritDoc
      */
     protected function doModifyLimitQuery($query, $limit, $offset) {
         if ($limit !== null) {
-            $query .= ' LIMIT ' . $limit;
+            $query .= sprintf(' LIMIT %d', $limit);
 
             if ($offset > 0) {
-                $query .= ' OFFSET ' . $offset;
+                $query .= sprintf(' OFFSET %d', $offset);
             }
         } elseif ($offset > 0) {
             // 2^64-1 is the maximum of unsigned BIGINT, the biggest limit possible
-            $query .= ' LIMIT 18446744073709551615 OFFSET ' . $offset;
+            $query .= sprintf(' LIMIT 18446744073709551615 OFFSET %d', $offset);
         }
 
         return $query;
     }
 
     /**
-     * {@inheritDoc}
+     * @inheritDoc
      */
     public function getIdentifierQuoteCharacter() {
         return '`';
     }
 
     /**
-     * {@inheritDoc}
+     * @inheritDoc
      */
     public function getRegexpExpression() {
         return 'RLIKE';
     }
 
     /**
-     * {@inheritDoc}
+     * @inheritDoc
      *
      * @deprecated Use application-generated UUIDs instead
      */
@@ -69,7 +69,7 @@ class CDatabase_Platform_Mysql extends CDatabase_Platform {
     }
 
     /**
-     * {@inheritDoc}
+     * @inheritDoc
      */
     public function getLocateExpression($str, $substr, $startPos = false) {
         if ($startPos == false) {
@@ -80,37 +80,48 @@ class CDatabase_Platform_Mysql extends CDatabase_Platform {
     }
 
     /**
-     * {@inheritDoc}
+     * @inheritDoc
      */
     public function getConcatExpression() {
         return sprintf('CONCAT(%s)', implode(', ', func_get_args()));
     }
 
     /**
-     * {@inheritdoc}
+     * @inheritdoc
      */
     protected function getDateArithmeticIntervalExpression($date, $operator, $interval, $unit) {
-        $function = '+' === $operator ? 'DATE_ADD' : 'DATE_SUB';
+        $function = $operator === '+' ? 'DATE_ADD' : 'DATE_SUB';
 
         return $function . '(' . $date . ', INTERVAL ' . $interval . ' ' . $unit . ')';
     }
 
     /**
-     * {@inheritDoc}
+     * @inheritDoc
      */
     public function getDateDiffExpression($date1, $date2) {
         return 'DATEDIFF(' . $date1 . ', ' . $date2 . ')';
     }
 
+    public function getCurrentDatabaseExpression() {
+        return 'DATABASE()';
+    }
+
     /**
-     * {@inheritDoc}
+     * @inheritDoc
+     */
+    public function getLengthExpression($column) {
+        return 'CHAR_LENGTH(' . $column . ')';
+    }
+
+    /**
+     * @inheritDoc
      */
     public function getListDatabasesSQL() {
         return 'SHOW DATABASES';
     }
 
     /**
-     * {@inheritDoc}
+     * @inheritDoc
      */
     public function getListTableConstraintsSQL($table) {
         return 'SHOW INDEX FROM ' . $table;
@@ -122,76 +133,53 @@ class CDatabase_Platform_Mysql extends CDatabase_Platform {
      * Two approaches to listing the table indexes. The information_schema is
      * preferred, because it doesn't cause problems with SQL keywords such as "order" or "table".
      */
-    public function getListTableIndexesSQL($table, $currentDatabase = null) {
-        if ($currentDatabase) {
-            $currentDatabase = $this->quoteStringLiteral($currentDatabase);
-            $table = $this->quoteStringLiteral($table);
+    public function getListTableIndexesSQL($table, $database = null) {
+        if ($database !== null) {
             return 'SELECT NON_UNIQUE AS Non_Unique, INDEX_NAME AS Key_name, COLUMN_NAME AS Column_Name,'
-                    . ' SUB_PART AS Sub_Part, INDEX_TYPE AS Index_Type'
-                    . ' FROM information_schema.STATISTICS WHERE TABLE_NAME = ' . $table
-                    . ' AND TABLE_SCHEMA = ' . $currentDatabase
-                    . ' ORDER BY SEQ_IN_INDEX ASC';
+                   . ' SUB_PART AS Sub_Part, INDEX_TYPE AS Index_Type'
+                   . ' FROM information_schema.STATISTICS WHERE TABLE_NAME = ' . $this->quoteStringLiteral($table)
+                   . ' AND TABLE_SCHEMA = ' . $this->quoteStringLiteral($database)
+                   . ' ORDER BY SEQ_IN_INDEX ASC';
         }
+
         return 'SHOW INDEX FROM ' . $table;
     }
 
     /**
-     * {@inheritDoc}
+     * @inheritDoc
      */
     public function getListViewsSQL($database) {
-        $database = $this->quoteStringLiteral($database);
-
-        return 'SELECT * FROM information_schema.VIEWS WHERE TABLE_SCHEMA = ' . $database;
+        return 'SELECT * FROM information_schema.VIEWS WHERE TABLE_SCHEMA = ' . $this->quoteStringLiteral($database);
     }
 
     /**
-     * {@inheritDoc}
+     * @inheritDoc
      */
     public function getListTableForeignKeysSQL($table, $database = null) {
-        $table = $this->quoteStringLiteral($table);
-
-        if (null !== $database) {
-            $database = $this->quoteStringLiteral($database);
-        }
-
-        $sql = 'SELECT DISTINCT k.`CONSTRAINT_NAME`, k.`COLUMN_NAME`, k.`REFERENCED_TABLE_NAME`, '
-                . 'k.`REFERENCED_COLUMN_NAME` /*!50116 , c.update_rule, c.delete_rule */ '
-                . 'FROM information_schema.key_column_usage k /*!50116 '
-                . 'INNER JOIN information_schema.referential_constraints c ON '
-                . '  c.constraint_name = k.constraint_name AND '
-                . "  c.table_name = $table */ WHERE k.table_name = $table";
-
-        $databaseNameSql = isset($database) && $database != null ? $database : 'DATABASE()';
-
-        $sql .= " AND k.table_schema = $databaseNameSql /*!50116 AND c.constraint_schema = $databaseNameSql */";
-        $sql .= ' AND k.`REFERENCED_COLUMN_NAME` is not NULL';
-
-        return $sql;
+        // The schema name is passed multiple times as a literal in the WHERE clause instead of using a JOIN condition
+        // in order to avoid performance issues on MySQL older than 8.0 and the corresponding MariaDB versions
+        // caused by https://bugs.mysql.com/bug.php?id=81347
+        return 'SELECT k.CONSTRAINT_NAME, k.COLUMN_NAME, k.REFERENCED_TABLE_NAME, '
+               . 'k.REFERENCED_COLUMN_NAME /*!50116 , c.UPDATE_RULE, c.DELETE_RULE */ '
+               . 'FROM INFORMATION_SCHEMA.KEY_COLUMN_USAGE k /*!50116 '
+               . 'INNER JOIN INFORMATION_SCHEMA.REFERENTIAL_CONSTRAINTS c ON '
+               . 'c.CONSTRAINT_NAME = k.CONSTRAINT_NAME AND '
+               . 'c.TABLE_NAME = k.TABLE_NAME */ '
+               . 'WHERE k.TABLE_NAME = ' . $this->quoteStringLiteral($table) . ' '
+               . 'AND k.TABLE_SCHEMA = ' . $this->getDatabaseNameSQL($database) . ' /*!50116 '
+               . 'AND c.CONSTRAINT_SCHEMA = ' . $this->getDatabaseNameSQL($database) . ' */'
+               . 'ORDER BY k.ORDINAL_POSITION';
     }
 
     /**
-     * {@inheritDoc}
-     */
-    public function getCreateViewSQL($name, $sql) {
-        return 'CREATE VIEW ' . $name . ' AS ' . $sql;
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    public function getDropViewSQL($name) {
-        return 'DROP VIEW ' . $name;
-    }
-
-    /**
-     * {@inheritDoc}
+     * @inheritDoc
      */
     protected function getVarcharTypeDeclarationSQLSnippet($length, $fixed) {
         return $fixed ? ($length ? 'CHAR(' . $length . ')' : 'CHAR(255)') : ($length ? 'VARCHAR(' . $length . ')' : 'VARCHAR(255)');
     }
 
     /**
-     * {@inheritdoc}
+     * @inheritdoc
      */
     protected function getBinaryTypeDeclarationSQLSnippet($length, $fixed) {
         return $fixed ? 'BINARY(' . ($length ?: 255) . ')' : 'VARBINARY(' . ($length ?: 255) . ')';
@@ -202,7 +190,7 @@ class CDatabase_Platform_Mysql extends CDatabase_Platform {
      *     TINYTEXT   : 2 ^  8 - 1 = 255
      *     TEXT       : 2 ^ 16 - 1 = 65535
      *     MEDIUMTEXT : 2 ^ 24 - 1 = 16777215
-     *     LONGTEXT   : 2 ^ 32 - 1 = 4294967295
+     *     LONGTEXT   : 2 ^ 32 - 1 = 4294967295.
      *
      * @param array $field
      *
@@ -229,7 +217,7 @@ class CDatabase_Platform_Mysql extends CDatabase_Platform {
     }
 
     /**
-     * {@inheritDoc}
+     * @inheritDoc
      */
     public function getDateTimeTypeDeclarationSQL(array $fieldDeclaration) {
         if (isset($fieldDeclaration['version']) && $fieldDeclaration['version'] == true) {
@@ -240,25 +228,40 @@ class CDatabase_Platform_Mysql extends CDatabase_Platform {
     }
 
     /**
-     * {@inheritDoc}
+     * @inheritDoc
      */
     public function getDateTypeDeclarationSQL(array $fieldDeclaration) {
         return 'DATE';
     }
 
     /**
-     * {@inheritDoc}
+     * @inheritDoc
      */
     public function getTimeTypeDeclarationSQL(array $fieldDeclaration) {
         return 'TIME';
     }
 
     /**
-     * {@inheritDoc}
+     * @inheritDoc
+     */
+    public function getCreateViewSQL($name, $sql) {
+        return 'CREATE VIEW ' . $name . ' AS ' . $sql;
+    }
+
+    /**
+     * @inheritDoc
+     */
+    public function getDropViewSQL($name) {
+        return 'DROP VIEW ' . $name;
+    }
+
+    /**
+     * @inheritDoc
      */
     public function getBooleanTypeDeclarationSQL(array $field) {
         $unsigned = carr::get($field, 'unsigned', false);
         $unsignedStr = $unsigned ? ' UNSIGNED' : '';
+
         return 'TINYINT(1)' . $unsignedStr;
     }
 
@@ -297,28 +300,28 @@ class CDatabase_Platform_Mysql extends CDatabase_Platform {
     }
 
     /**
-     * {@inheritDoc}
+     * @inheritDoc
      */
     public function supportsInlineColumnComments() {
         return true;
     }
 
     /**
-     * {@inheritDoc}
+     * @inheritDoc
      */
     public function supportsColumnCollation() {
         return true;
     }
 
     /**
-     * {@inheritDoc}
+     * @inheritDoc
      */
     public function getListTablesSQL() {
         return "SHOW FULL TABLES WHERE Table_type = 'BASE TABLE'";
     }
 
     /**
-     * {@inheritDoc}
+     * @inheritDoc
      */
     public function getListTableColumnsSQL($table, $database = null) {
         $table = $this->quoteStringLiteral($table);
@@ -350,21 +353,21 @@ SQL
     }
 
     /**
-     * {@inheritDoc}
+     * @inheritDoc
      */
     public function getCreateDatabaseSQL($name) {
         return 'CREATE DATABASE ' . $name;
     }
 
     /**
-     * {@inheritDoc}
+     * @inheritDoc
      */
     public function getDropDatabaseSQL($name) {
         return 'DROP DATABASE ' . $name;
     }
 
     /**
-     * {@inheritDoc}
+     * @inheritDoc
      */
     protected function protectedGetCreateTableSQL($tableName, array $columns, array $options = []) {
         $queryFields = $this->getColumnDeclarationListSQL($columns);
@@ -416,7 +419,7 @@ SQL
     }
 
     /**
-     * {@inheritdoc}
+     * @inheritdoc
      */
     public function getDefaultValueDeclarationSQL($field) {
         // Unset the default value if the given field definition does not allow default values.
@@ -428,7 +431,7 @@ SQL
     }
 
     /**
-     * Build SQL for table options
+     * Build SQL for table options.
      *
      * @param array $options
      *
@@ -494,7 +497,7 @@ SQL
     }
 
     /**
-     * {@inheritDoc}
+     * @inheritDoc
      */
     public function getAlterTableSQL(CDatabase_Schema_Table_Diff $diff) {
         $columnSql = [];
@@ -565,6 +568,7 @@ SQL
                     $queryParts[] = 'DROP PRIMARY KEY';
                     $queryParts[] = 'ADD PRIMARY KEY (' . implode(', ', $keyColumns) . ')';
                     unset($diff->changedIndexes['primary']);
+
                     break;
                 }
             }
@@ -588,7 +592,7 @@ SQL
     }
 
     /**
-     * {@inheritDoc}
+     * @inheritDoc
      */
     protected function getPreAlterTableIndexForeignKeySQL(CDatabase_Schema_Table_Diff $diff) {
         $sql = [];
@@ -780,7 +784,7 @@ SQL
     }
 
     /**
-     * {@inheritdoc}
+     * @inheritdoc
      */
     protected function getPostAlterTableIndexForeignKeySQL(CDatabase_Schema_Table_Diff $diff) {
         return array_merge(
@@ -815,7 +819,7 @@ SQL
     }
 
     /**
-     * {@inheritDoc}
+     * @inheritDoc
      */
     protected function getCreateIndexSQLFlags(CDatabase_Schema_Index $index) {
         $type = '';
@@ -831,35 +835,35 @@ SQL
     }
 
     /**
-     * {@inheritDoc}
+     * @inheritDoc
      */
     public function getIntegerTypeDeclarationSQL(array $field) {
         return 'INT' . $this->getCommonIntegerTypeDeclarationSQL($field);
     }
 
     /**
-     * {@inheritDoc}
+     * @inheritDoc
      */
     public function getBigIntTypeDeclarationSQL(array $field) {
         return 'BIGINT' . $this->getCommonIntegerTypeDeclarationSQL($field);
     }
 
     /**
-     * {@inheritDoc}
+     * @inheritDoc
      */
     public function getSmallIntTypeDeclarationSQL(array $field) {
         return 'SMALLINT' . $this->getCommonIntegerTypeDeclarationSQL($field);
     }
 
     /**
-     * {@inheritdoc}
+     * @inheritdoc
      */
     public function getFloatDeclarationSQL(array $field) {
         return 'DOUBLE PRECISION' . $this->getUnsignedDeclaration($field);
     }
 
     /**
-     * {@inheritdoc}
+     * @inheritdoc
      */
     public function getDecimalTypeDeclarationSQL(array $columnDef) {
         return parent::getDecimalTypeDeclarationSQL($columnDef) . $this->getUnsignedDeclaration($columnDef);
@@ -877,7 +881,7 @@ SQL
     }
 
     /**
-     * {@inheritDoc}
+     * @inheritDoc
      */
     protected function getCommonIntegerTypeDeclarationSQL(array $columnDef) {
         $autoinc = '';
@@ -889,14 +893,14 @@ SQL
     }
 
     /**
-     * {@inheritDoc}
+     * @inheritDoc
      */
     public function getColumnCharsetDeclarationSQL($charset) {
         return 'CHARACTER SET ' . $charset;
     }
 
     /**
-     * {@inheritDoc}
+     * @inheritDoc
      */
     public function getAdvancedForeignKeyOptionsSQL(CDatabase_Schema_ForeignKeyConstraint $foreignKey) {
         $query = '';
@@ -909,7 +913,7 @@ SQL
     }
 
     /**
-     * {@inheritDoc}
+     * @inheritDoc
      */
     public function getDropIndexSQL($index, $table = null) {
         if ($index instanceof CDatabase_Schema_Index) {
@@ -917,13 +921,13 @@ SQL
         } elseif (is_string($index)) {
             $indexName = $index;
         } else {
-            throw new \InvalidArgumentException('CDatabase_Platform_Mysql::getDropIndexSQL() expects $index parameter to be string or \Doctrine\DBAL\Schema\Index.');
+            throw new \InvalidArgumentException('CDatabase_Platform_MySql::getDropIndexSQL() expects $index parameter to be string or \Doctrine\DBAL\Schema\Index.');
         }
 
         if ($table instanceof CDatabase_Schema_Table) {
             $table = $table->getQuotedName($this);
         } elseif (!is_string($table)) {
-            throw new \InvalidArgumentException('CDatabase_Platform_Mysql::getDropIndexSQL() expects $table parameter to be string or \Doctrine\DBAL\Schema\Table.');
+            throw new \InvalidArgumentException('CDatabase_Platform_MySql::getDropIndexSQL() expects $table parameter to be string or \Doctrine\DBAL\Schema\Table.');
         }
 
         if ($index instanceof CDatabase_Schema_Index && $index->isPrimary()) {
@@ -945,84 +949,86 @@ SQL
     }
 
     /**
-     * {@inheritDoc}
+     * @inheritDoc
      */
     public function getSetTransactionIsolationSQL($level) {
         return 'SET SESSION TRANSACTION ISOLATION LEVEL ' . $this->getTransactionIsolationLevelSQL($level);
     }
 
     /**
-     * {@inheritDoc}
+     * @inheritDoc
      */
     public function getName() {
         return 'mysql';
     }
 
     /**
-     * {@inheritDoc}
+     * @inheritDoc
      */
     public function getReadLockSQL() {
         return 'LOCK IN SHARE MODE';
     }
 
     /**
-     * {@inheritDoc}
+     * @inheritDoc
      */
     protected function initializeDoctrineTypeMappings() {
         $this->doctrineTypeMapping = [
-            'tinyint' => 'boolean',
-            'smallint' => 'smallint',
-            'mediumint' => 'integer',
-            'int' => 'integer',
-            'integer' => 'integer',
             'bigint' => 'bigint',
-            'tinytext' => 'text',
-            'mediumtext' => 'text',
-            'longtext' => 'text',
-            'text' => 'text',
-            'varchar' => 'string',
-            'string' => 'string',
+            'binary' => 'binary',
+            'bit' => 'boolean',
+            'blob' => 'blob',
             'char' => 'string',
             'date' => 'date',
             'datetime' => 'datetime',
-            'timestamp' => 'datetime',
-            'time' => 'time',
-            'float' => 'float',
-            'double' => 'float',
-            'real' => 'float',
             'decimal' => 'decimal',
-            'numeric' => 'decimal',
-            'year' => 'date',
-            'longblob' => 'blob',
-            'blob' => 'blob',
-            'mediumblob' => 'blob',
-            'tinyblob' => 'blob',
-            'binary' => 'binary',
-            'varbinary' => 'binary',
-            'set' => 'simple_array',
+            'double' => 'float',
             'enum' => 'enum',
+            'float' => 'float',
+            'int' => 'integer',
+            'integer' => 'integer',
+            'longblob' => 'blob',
+            'longtext' => 'text',
+            'mediumblob' => 'blob',
+            'mediumint' => 'integer',
+            'mediumtext' => 'text',
+            'numeric' => 'decimal',
+            'real' => 'float',
+            'set' => 'simple_array',
+            'smallint' => 'smallint',
+            'string' => 'string',
+            'text' => 'text',
+            'time' => 'time',
+            'timestamp' => 'datetime',
+            'tinyblob' => 'blob',
+            'tinyint' => 'boolean',
+            'tinytext' => 'text',
+            'varbinary' => 'binary',
+            'varchar' => 'string',
+            'year' => 'date',
+
         ];
     }
 
     /**
-     * {@inheritDoc}
+     * @inheritDoc
      */
     public function getVarcharMaxLength() {
         return 65535;
     }
 
     /**
-     * {@inheritdoc}
+     * @inheritdoc
      */
     public function getBinaryMaxLength() {
         return 65535;
     }
 
     /**
-     * {@inheritDoc}
+     * @inheritDoc
      */
     protected function getReservedKeywordsClass() {
-        return CDatabase_Platform_Keywords_Mysql::class;
+        return CDatabase_Platform_Keywords_MySql::class;
     }
 
     /**
@@ -1046,7 +1052,7 @@ SQL
      *     TINYBLOB   : 2 ^  8 - 1 = 255
      *     BLOB       : 2 ^ 16 - 1 = 65535
      *     MEDIUMBLOB : 2 ^ 24 - 1 = 16777215
-     *     LONGBLOB   : 2 ^ 32 - 1 = 4294967295
+     *     LONGBLOB   : 2 ^ 32 - 1 = 4294967295.
      *
      * @param array $field
      *
@@ -1073,7 +1079,14 @@ SQL
     }
 
     /**
-     * {@inheritdoc}
+     * @return bool
+     */
+    public function supportsColumnLengthIndexes() {
+        return true;
+    }
+
+    /**
+     * @inheritdoc
      */
     public function quoteStringLiteral($str) {
         $str = str_replace('\\', '\\\\', $str); // MySQL requires backslashes to be escaped aswell.
@@ -1082,9 +1095,22 @@ SQL
     }
 
     /**
-     * {@inheritdoc}
+     * @inheritdoc
      */
     public function getDefaultTransactionIsolationLevel() {
         return CDatabase_TransactionIsolationLevel::REPEATABLE_READ;
+    }
+
+    /**
+     * @param null|string $databaseName
+     *
+     * @return string
+     */
+    private function getDatabaseNameSQL($databaseName = null) {
+        if ($databaseName !== null) {
+            return $this->quoteStringLiteral($databaseName);
+        }
+
+        return $this->getCurrentDatabaseExpression();
     }
 }

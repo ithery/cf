@@ -1,28 +1,27 @@
 <?php
 
-defined('SYSPATH') OR die('No direct access allowed.');
+defined('SYSPATH') or die('No direct access allowed.');
 
 /**
  * @author Hery Kurniawan
- * @since Aug 18, 2018, 11:46:23 AM
  * @license Ittron Global Teknologi <ittron.co.id>
+ *
+ * @since Aug 18, 2018, 11:46:23 AM
  */
 
 /**
  * MySQL Keywordlist.
- *
  */
-class CDatabase_Platform_Keywords_Mysql extends CDatabase_Platform_Keywords {
-
+class CDatabase_Platform_Keywords_MySql extends CDatabase_Platform_Keywords {
     /**
-     * {@inheritdoc}
+     * @inheritdoc
      */
     public function getName() {
         return 'MySQL';
     }
 
     /**
-     * {@inheritdoc}
+     * @inheritdoc
      */
     protected function getKeywords() {
         return [
@@ -267,5 +266,4 @@ class CDatabase_Platform_Keywords_Mysql extends CDatabase_Platform_Keywords {
             'ZEROFILL',
         ];
     }
-
 }

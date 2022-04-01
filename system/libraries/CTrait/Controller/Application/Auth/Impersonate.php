@@ -1,8 +1,13 @@
 <?php
 
 trait CTrait_Controller_Application_Auth_Impersonate {
+    protected function getTitle() {
+        return 'Impersonate';
+    }
+
     public function listImpersonate($guard = null, $redirect = null) {
         $app = c::app();
+        $app->setTitle($this->getTitle());
         if ($guard == null) {
             $guard = c::app()->auth()->guardName();
         }

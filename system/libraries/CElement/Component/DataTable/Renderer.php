@@ -10,9 +10,16 @@ class CElement_Component_DataTable_Renderer {
     public static function checkboxCell($table, $row) {
         $checkboxValue = $table->getCheckboxValue();
         $rowKey = '';
-        if (array_key_exists($table->getKeyField(), $row)) {
-            $rowKey = $row[$table->getKeyField()];
+        if (is_array($row)) {
+            if (array_key_exists($table->getKeyField(), $row)) {
+                $rowKey = $row[$table->getKeyField()];
+            }
         }
+
+        if ($row instanceof CModel) {
+            $rowKey = $row->{$table->getKeyField()};
+        }
+
         $checkboxChecked = in_array($rowKey, $checkboxValue) ? ' checked="checked"' : '';
         $checkboxId = $table->id() . '-' . $rowKey;
 

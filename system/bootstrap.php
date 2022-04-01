@@ -20,7 +20,7 @@ CException::init();
 
 if (CF::config('collector.exception')) {
     CException::exceptionHandler()->reportable(function (Exception $e) {
-        CCollector::exception($e);
+        CDebug::collector()->collectException($e);
     });
 }
 

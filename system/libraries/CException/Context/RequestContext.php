@@ -134,7 +134,7 @@ class CException_Context_RequestContext extends CException_ContextAbstract imple
             'routeParameters' => $this->getRouteParameters(),
             'controllerClass' => $controller ? get_class($controller) : null,
             'controllerAction' => c::optional($route)->getActionName(),
-            'middleware' => array_values(c::optional($route)->gatherMiddleware() ?? []),
+            'middleware' => array_values(c::optional($route)->gatherMiddleware() ?: []),
         ];
 
         return array_merge($defaultData, $routeData);

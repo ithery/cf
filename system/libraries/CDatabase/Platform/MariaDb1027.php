@@ -8,16 +8,16 @@ defined('SYSPATH') or die('No direct access allowed.');
  *
  * @since Aug 18, 2018, 8:46:25 AM
  */
-final class CDatabase_Platform_MariaDb1027 extends CDatabase_Platform_Mysql {
+final class CDatabase_Platform_MariaDb1027 extends CDatabase_Platform_MySql {
     /**
-     * {@inheritdoc}
+     * @inheritdoc
      */
     public function hasNativeJsonType() {
         return false;
     }
 
     /**
-     * {@inheritdoc}
+     * @inheritdoc
      *
      * @link https://mariadb.com/kb/en/library/json-data-type/
      */
@@ -26,14 +26,14 @@ final class CDatabase_Platform_MariaDb1027 extends CDatabase_Platform_Mysql {
     }
 
     /**
-     * {@inheritdoc}
+     * @inheritdoc
      */
     protected function getReservedKeywordsClass() {
         return CDatabase_Platform_Keywords_MariaDb102::class;
     }
 
     /**
-     * {@inheritdoc}
+     * @inheritdoc
      */
     protected function initializeDoctrineTypeMappings() {
         parent::initializeDoctrineTypeMappings();
