@@ -1,9 +1,9 @@
 <?php
 /**
- * @method static CModel_Chartable_GroupCollection countForGroup()
- * @method static CModel_Chartable_TimeCollection  countByDays()
- * @method static CModel_Chartable_TimeCollection  countByMonths()
- * @method static CModel_Chartable_TimeCollection  valuesByDays()
+ * @method static CModel_Chartable_GroupCollection countForGroup($groupColumn)
+ * @method static CModel_Chartable_TimeCollection  countByDays($startDate = null, $stopDate = null, $dateColumn = 'created')
+ * @method static CModel_Chartable_TimeCollection  countByMonths($startDate = null, $stopDate = null, $dateColumn = 'created')
+ * @method static CModel_Chartable_TimeCollection  valuesByDays($value, $startDate = null, $stopDate = null, $dateColumn = 'created')
  * @method static CModel_Chartable_TimeCollection  sumByDays($value)
  * @method static CModel_Chartable_TimeCollection  sumByMonths($value)
  */
