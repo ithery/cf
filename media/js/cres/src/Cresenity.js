@@ -24,7 +24,8 @@ import initProgressive from './module/progressive';
 import cresToast from './module/toast';
 import CresAlpine from './module/CresAlpine';
 import SSE from './module/SSE';
-
+import AlpineCleave from './alpine/cleave';
+import AlpineAutoNumeric from './alpine/autonumeric';
 export default class Cresenity {
     constructor() {
         this.cf = cf;
@@ -969,6 +970,8 @@ export default class Cresenity {
 
 
     initAlpineAndUi() {
+        Alpine.plugin(AlpineCleave);
+        Alpine.plugin(AlpineAutoNumeric);
         window.Alpine = Alpine;
         this.ui.start();
         window.Alpine.start();
