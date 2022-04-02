@@ -58,17 +58,28 @@ export default function (Alpine) {
             el.__autonumeric = $(el).data('autoNumeric');
             $(el).bind('blur focusout', valueChangeCallback(el));
 
+
+            if (el._x_model) {
+                effect(() => {
+                    Alpine.mutateDom(() => $(el).autoNumeric('set',el._x_model.get()))
+                })
+            }
+
+            if(el._x_bindings && el._x_bindings['value']) {
+                effect(() =>  {
+                    Alpine.mutateDom(() => $(el).autoNumeric('set',el._x_bindings['value']));
+                });
+
+            }
             cleanup(()=>{
                 $(el).unbind('blur focusout', valueChangeCallback(el));
+                $(el).autoNumeric('destroy');
             });
 
+
+
         }
 
-        if (el._x_model) {
-            effect(() => {
-                Alpine.mutateDom(() => $(el).autoNumeric('set',el._x_model.get()))
-            })
-        }
 
     })
 }
