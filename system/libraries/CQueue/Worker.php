@@ -12,6 +12,7 @@ use Symfony\Component\Debug\Exception\FatalThrowableError;
 
 class CQueue_Worker {
     use CDatabase_Trait_DetectLostConnection;
+
     const EXIT_SUCCESS = 0;
 
     const EXIT_ERROR = 1;
@@ -87,6 +88,11 @@ class CQueue_Worker {
      * @var callable[]
      */
     protected static $popCallbacks = [];
+
+    /**
+     * @var string
+     */
+    protected $currentJobName;
 
     /**
      * Create a new queue worker.
@@ -365,8 +371,11 @@ class CQueue_Worker {
      */
     protected function runJob($job, $connectionName, CQueue_WorkerOptions $options) {
         try {
+            $this->currentJobName = $job->resolveName();
+
             return $this->process($connectionName, $job, $options);
         } catch (Throwable $e) {
+            $this->currentJobName = null;
             if (CDaemon::getRunningService() != null) {
                 CDaemon::log('Run Job Exception');
             } else {
@@ -374,6 +383,7 @@ class CQueue_Worker {
             }
             $this->stopWorkerIfLostConnection($e);
         } catch (Exception $e) {
+            $this->currentJobName = null;
             if (CDaemon::getRunningService() != null) {
                 CDaemon::log('Run Job Exception');
             } else {
@@ -381,6 +391,7 @@ class CQueue_Worker {
             }
             $this->stopWorkerIfLostConnection($e);
         }
+        $this->currentJobName = null;
     }
 
     /**
@@ -835,5 +846,9 @@ class CQueue_Worker {
      */
     public function setManager(CQueue_Manager $manager) {
         $this->manager = $manager;
+    }
+
+    public function getCurrentJobName() {
+        return $this->currentJobName;
     }
 }

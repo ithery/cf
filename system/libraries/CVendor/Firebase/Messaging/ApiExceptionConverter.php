@@ -118,7 +118,7 @@ class CVendor_Firebase_Messaging_ApiExceptionConverter {
      * @return null|DateTimeImmutable
      */
     private function getRetryAfter(ResponseInterface $response) {
-        $retryAfter = $response->getHeader('Retry-After')[0] ?? null;
+        $retryAfter = isset($response->getHeader('Retry-After')[0]) ? $response->getHeader('Retry-After')[0] : null;
 
         if (!$retryAfter) {
             return null;

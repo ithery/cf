@@ -69,6 +69,7 @@ class CElement_Component_DataTable_Cell {
                 ->setRequire($this->column->callbackRequire)
                 ->execute();
             list($html, $jsCell) = $this->getHtmlJsCell($html);
+
             $js .= $jsCell;
         }
 

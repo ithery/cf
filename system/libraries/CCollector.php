@@ -1,7 +1,9 @@
 <?php
 
 defined('SYSPATH') or die('No direct access allowed.');
-
+/**
+ * @deprecated use CDebug::collector()
+ */
 class CCollector {
     const EXT = '.txt';
 

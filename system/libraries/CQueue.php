@@ -36,6 +36,8 @@ final class CQueue {
      */
     protected static $failer;
 
+    protected static $runner;
+
     /**
      * @return CQueue_Dispatcher
      */
@@ -178,8 +180,16 @@ final class CQueue {
     }
 
     public static function run($connection = null, array $options = []) {
-        $runner = new CQueue_Runner(CQueue::worker(), null, $options);
-        $runner->run($connection);
+        static::$runner = new CQueue_Runner(CQueue::worker(), null, $options);
+        static::$runner->run($connection);
+        static::$runner = null;
+    }
+
+    /**
+     * @return null|CQueue_Runner
+     */
+    public static function runner() {
+        return static::$runner;
     }
 
     public static function config($config, $default = null) {

@@ -16,62 +16,71 @@ defined('SYSPATH') or die('No direct access allowed.');
  */
 
 /**
- * Abstract class for data collectors
+ * Abstract class for data collectors.
  */
-abstract class CDebug_DataCollector implements CDebug_Interface_DataCollectorInterface {
-    private static $defaultDataFormatter;
-    private static $defaultVarDumper;
+abstract class CDebug_DataCollector implements CDebug_Contract_DataCollectorInterface {
     protected $dataFormater;
+
     protected $varDumper;
+
     protected $xdebugLinkTemplate = '';
+
     protected $xdebugShouldUseAjax = false;
+
     protected $xdebugReplacements = [];
 
+    private static $defaultDataFormatter;
+
+    private static $defaultVarDumper;
+
     /**
-     * Sets the default data formater instance used by all collectors subclassing this class
+     * Sets the default data formater instance used by all collectors subclassing this class.
      *
-     * @param DataFormatterInterface $formater
+     * @param CDebug_Contract_DataFormatterInterface $formater
      */
-    public static function setDefaultDataFormatter(CDebug_Interface_DataFormatterInterface $formater) {
+    public static function setDefaultDataFormatter(CDebug_Contract_DataFormatterInterface $formater) {
         self::$defaultDataFormatter = $formater;
     }
 
     /**
-     * Returns the default data formater
+     * Returns the default data formater.
      *
-     * @return DataFormatterInterface
+     * @return CDebug_Contract_DataFormatterInterface
      */
     public static function getDefaultDataFormatter() {
         if (self::$defaultDataFormatter === null) {
             self::$defaultDataFormatter = new CDebug_DataFormatter();
         }
+
         return self::$defaultDataFormatter;
     }
 
     /**
-     * Sets the data formater instance used by this collector
+     * Sets the data formater instance used by this collector.
      *
-     * @param CDebug_Interface_DataFormatterInterface $formater
+     * @param CDebug_Contract_DataFormatterInterface $formater
      *
      * @return $this
      */
-    public function setDataFormatter(CDebug_Interface_DataFormatterInterface $formater) {
+    public function setDataFormatter(CDebug_Contract_DataFormatterInterface $formater) {
         $this->dataFormater = $formater;
+
         return $this;
     }
 
     /**
-     * @return CDebug_Interface_DataFormatterInterface
+     * @return CDebug_Contract_DataFormatterInterface
      */
     public function getDataFormatter() {
         if ($this->dataFormater === null) {
             $this->dataFormater = self::getDefaultDataFormatter();
         }
+
         return $this->dataFormater;
     }
 
     /**
-     * Get an Xdebug Link to a file
+     * Get an Xdebug Link to a file.
      *
      * @param string $file
      * @param int    $line
@@ -93,16 +102,16 @@ abstract class CDebug_DataCollector implements CDebug_Interface_DataCollectorInt
     }
 
     /**
-     * Sets the default variable dumper used by all collectors subclassing this class
+     * Sets the default variable dumper used by all collectors subclassing this class.
      *
-     * @param DebugBarVarDumper $varDumper
+     * @param CDebug_DataFormatter_DebugBarVarDumper $varDumper
      */
     public static function setDefaultVarDumper(CDebug_DataFormatter_DebugBarVarDumper $varDumper) {
         self::$defaultVarDumper = $varDumper;
     }
 
     /**
-     * Returns the default variable dumper
+     * Returns the default variable dumper.
      *
      * @return DebugBarVarDumper
      */
@@ -110,11 +119,12 @@ abstract class CDebug_DataCollector implements CDebug_Interface_DataCollectorInt
         if (self::$defaultVarDumper === null) {
             self::$defaultVarDumper = new CDebug_DataFormatter_DebugBarVarDumper();
         }
+
         return self::$defaultVarDumper;
     }
 
     /**
-     * Sets the variable dumper instance used by this collector
+     * Sets the variable dumper instance used by this collector.
      *
      * @param CDebug_DataFormatter_DebugBarVarDumper $varDumper
      *
@@ -122,6 +132,7 @@ abstract class CDebug_DataCollector implements CDebug_Interface_DataCollectorInt
      */
     public function setVarDumper(CDebug_DataFormatter_DebugBarVarDumper $varDumper) {
         $this->varDumper = $varDumper;
+
         return $this;
     }
 
@@ -135,6 +146,7 @@ abstract class CDebug_DataCollector implements CDebug_Interface_DataCollectorInt
         if ($this->varDumper === null) {
             $this->varDumper = self::getDefaultVarDumper();
         }
+
         return $this->varDumper;
     }
 
@@ -173,6 +185,7 @@ abstract class CDebug_DataCollector implements CDebug_Interface_DataCollectorInt
         if (empty($this->xdebugLinkTemplate) && !empty(ini_get('xdebug.file_link_format'))) {
             $this->xdebugLinkTemplate = ini_get('xdebug.file_link_format');
         }
+
         return $this->xdebugLinkTemplate;
     }
 
@@ -198,7 +211,7 @@ abstract class CDebug_DataCollector implements CDebug_Interface_DataCollectorInt
     }
 
     /**
-     * Returns an array of filename-replacements
+     * Returns an array of filename-replacements.
      *
      * this is useful f.e. when using vagrant or remote servers,
      * where the path of the file is different between server and
@@ -222,7 +235,7 @@ abstract class CDebug_DataCollector implements CDebug_Interface_DataCollectorInt
     }
 
     /**
-     * Shorten the path by removing the relative links and base dir
+     * Shorten the path by removing the relative links and base dir.
      *
      * @param string $path
      *
@@ -232,11 +245,12 @@ abstract class CDebug_DataCollector implements CDebug_Interface_DataCollectorInt
         if (file_exists($path)) {
             $path = realpath($path);
         }
+
         return str_replace(DOCROOT, '', $path);
     }
 
     /**
-     * Check if the given file is to be excluded from analysis
+     * Check if the given file is to be excluded from analysis.
      *
      * @param string $file
      *
@@ -254,6 +268,7 @@ abstract class CDebug_DataCollector implements CDebug_Interface_DataCollectorInt
                 return true;
             }
         }
+
         return false;
     }
 }

@@ -7,6 +7,7 @@
  */
 class CView_Compiler_BladeCompiler extends CView_CompilerAbstract implements CView_CompilerInterface {
     use CView_Compiler_BladeCompiler_CompileAuthorizationTrait,
+        CView_Compiler_BladeCompiler_CompileClassesTrait,
         CView_Compiler_BladeCompiler_CompileCommentTrait,
         CView_Compiler_BladeCompiler_CompileComponentTrait,
         CView_Compiler_BladeCompiler_CompileConditionalTrait,
