@@ -24,7 +24,8 @@ import initProgressive from './module/progressive';
 import cresToast from './module/toast';
 import CresAlpine from './module/CresAlpine';
 import SSE from './module/SSE';
-
+import AlpineCleave from './alpine/cleave';
+import AlpineAutoNumeric from './alpine/autonumeric';
 export default class Cresenity {
     constructor() {
         this.cf = cf;
@@ -36,6 +37,7 @@ export default class Cresenity {
             'cresenity:confirm',
             'cresenity:jquery:loaded',
             'cresenity:loaded',
+            'cresenity:js:loaded',
             'cresenity:ui:start'
         ];
         this.modalElements = [];
@@ -112,11 +114,12 @@ export default class Cresenity {
         }
         return false;
     }
-
-    on(eventName, cb) {
-
+    dispatch(eventName, params = {}) {
+        dispatchWindowEvent('cresenity:' + eventName, params);
     }
-
+    on(eventName, cb) {
+        window.addEventListener('cresenity:' + eventName, cb);
+    }
 
     handleResponse(data, callback) {
         if (data.cssRequire && data.cssRequire.length > 0) {
@@ -218,7 +221,7 @@ export default class Cresenity {
             } else {
                 this.blockElement($(element));
             }
-
+            this.dispatch('reload:before');
             $(element).data('xhr', $.ajax({
                 type: method,
                 url: url,
@@ -232,8 +235,9 @@ export default class Cresenity {
                         isError = true;
                     }
                     if(!isError) {
-                        this.doCallback('onReloadSuccess', data);
 
+                        this.doCallback('onReloadSuccess', data);
+                        this.dispatch('reload:success',data);
                         this.handleResponse(data, () => {
                             switch (settings.reloadType) {
                                 case 'after':
@@ -271,9 +275,13 @@ export default class Cresenity {
                     }
                 },
                 error: (errorXhr, ajaxOptions, thrownError) => {
+                    this.dispatch('reload:error',{
+                        xhr:errorXhr, ajaxOptions, error:thrownError
+                    });
                     this.handleAjaxError(errorXhr, ajaxOptions, thrownError);
                 },
                 complete: () => {
+                    this.dispatch('reload:complete');
                     $(element).data('xhr', false);
                     if (typeof settings.onBlock === 'function') {
                         settings.onUnblock($(element));
@@ -962,6 +970,8 @@ export default class Cresenity {
 
 
     initAlpineAndUi() {
+        Alpine.plugin(AlpineCleave);
+        Alpine.plugin(AlpineAutoNumeric);
         window.Alpine = Alpine;
         this.ui.start();
         window.Alpine.start();

@@ -206,6 +206,34 @@ class CGit_Repository {
             return $cache[$this->path];
         }
         $branches = $this->getClient()->run($this, 'branch');
+
+        $branches = explode("\n", $branches);
+        $branches = array_filter(preg_replace('/[\*\s]/', '', $branches));
+        if (empty($branches)) {
+            return $cache[$this->path] = $branches;
+        }
+        // Since we've stripped whitespace, the result "* (detached from "
+        // and "* (no branch)" that is displayed in detached HEAD state
+        // becomes "(detachedfrom" and "(nobranch)" respectively.
+        if ((0 === strpos($branches[0], '(detachedfrom')) || ('(nobranch)' === $branches[0])) {
+            $branches = array_slice($branches, 1);
+        }
+
+        return $cache[$this->path] = $branches;
+    }
+
+    /**
+     * Show a list of the repository branches.
+     *
+     * @return array List of branches
+     */
+    public function getRemoteBranches() {
+        static $cache = [];
+        if (array_key_exists($this->path, $cache)) {
+            return $cache[$this->path];
+        }
+        $branches = $this->getClient()->run($this, 'branch -r');
+
         $branches = explode("\n", $branches);
         $branches = array_filter(preg_replace('/[\*\s]/', '', $branches));
         if (empty($branches)) {
@@ -385,9 +413,10 @@ class CGit_Repository {
         $diffs = [];
         $lineNumOld = 0;
         $lineNumNew = 0;
+        $diff = null;
         foreach ($logs as $log) {
             if ('diff' === substr($log, 0, 4)) {
-                if (isset($diff)) {
+                if ($diff != null) {
                     $diffs[] = $diff;
                 }
                 $diff = new CGit_Model_Commit_Diff();
@@ -398,17 +427,23 @@ class CGit_Repository {
                 continue;
             }
             if ('index' === substr($log, 0, 5)) {
-                $diff->setIndex($log);
+                if ($diff != null) {
+                    $diff->setIndex($log);
+                }
 
                 continue;
             }
             if ('---' === substr($log, 0, 3)) {
-                $diff->setOld($log);
+                if ($diff != null) {
+                    $diff->setOld($log);
+                }
 
                 continue;
             }
             if ('+++' === substr($log, 0, 3)) {
-                $diff->setNew($log);
+                if ($diff != null) {
+                    $diff->setNew($log);
+                }
 
                 continue;
             }
@@ -416,8 +451,10 @@ class CGit_Repository {
             if ('Binary' === substr($log, 0, 6)) {
                 $m = [];
                 if (preg_match('/Binary files (.+) and (.+) differ/', $log, $m)) {
-                    $diff->setOld($m[1]);
-                    $diff->setNew("    {$m[2]}");
+                    if ($diff != null) {
+                        $diff->setOld($m[1]);
+                        $diff->setNew("    {$m[2]}");
+                    }
                 }
             }
             if (!empty($log)) {
@@ -449,7 +486,7 @@ class CGit_Repository {
                 $diff->addLine($log, $lineNumOld, $lineNumNew);
             }
         }
-        if (isset($diff)) {
+        if ($diff != null) {
             $diffs[] = $diff;
         }
 

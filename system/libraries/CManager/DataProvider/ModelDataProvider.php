@@ -86,7 +86,9 @@ class CManager_DataProvider_ModelDataProvider extends CManager_DataProviderAbstr
                         if (in_array($fieldName, $aggregateFields)) {
                             //TODO apply search on aggregateFields
                         } else {
-                            $q->orWhere($fieldName, 'like', '%' . $value . '%');
+                            if (!$this->isRelationField($q, $fieldName)) {
+                                $q->orWhere($fieldName, 'like', '%' . $value . '%');
+                            }
                         }
                     }
                 }
@@ -110,7 +112,9 @@ class CManager_DataProvider_ModelDataProvider extends CManager_DataProviderAbstr
                         if (in_array($fieldName, $aggregateFields)) {
                             //TODO apply search on aggregateFields
                         } else {
-                            $q->where($fieldName, 'like', '%' . $value . '%');
+                            if (!$this->isRelationField($q, $fieldName)) {
+                                $q->where($fieldName, 'like', '%' . $value . '%');
+                            }
                         }
                     }
                 }
@@ -149,6 +153,10 @@ class CManager_DataProvider_ModelDataProvider extends CManager_DataProviderAbstr
             try {
                 $query->getModel()->load($fieldName);
             } catch (CModel_Exception_RelationNotFoundException $ex) {
+                return false;
+            } catch (Exception $ex) {
+                return false;
+            } catch (Throwable $ex) {
                 return false;
             }
 

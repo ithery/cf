@@ -1,8 +1,8 @@
 <?php
 
 /**
- * @deprecated 1.3, use CFunction
  * @see CFunction
+ * @deprecated 1.3, use CFunction
  */
 class CDynFunction {
     use CTrait_Compat_DynFunction;
@@ -16,7 +16,7 @@ class CDynFunction {
     public $type = 'defined'; //defined,class,
 
     private function __construct($func) {
-        CCollector::deprecated();
+        CDebug::collector()->collectDeprecated('dont use CDynFunction, use CFunction');
         $this->func = $func;
     }
 

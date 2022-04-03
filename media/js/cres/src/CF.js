@@ -127,6 +127,9 @@ class CF {
                     el.onload = callback;
                     el.onreadystatechange = () => {
                         if (this.readyState == 'complete') {
+                            dispatchWindowEvent('cresenity:js:loaded', {
+                                url:url,
+                            });
                             callback();
                         }
                     };

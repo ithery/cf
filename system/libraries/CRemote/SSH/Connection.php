@@ -129,6 +129,26 @@ class CRemote_SSH_Connection implements CRemote_SSH_ConnectionInterface {
         $callback = $this->getCallback($callback);
 
         $response = $gateway->run($this->formatCommands($commands), $callback);
+
+        return $response;
+    }
+
+    /**
+     * Run a set of commands against the connection.
+     *
+     * @param string|array $commands
+     *
+     * @return string
+     */
+    public function exec($commands) {
+        // First, we will initialize the SSH gateway, and then format the commands so
+        // they can be run. Once we have the commands formatted and the server is
+        // ready to go we will just fire off these commands against the server.
+        $gateway = $this->getGateway();
+
+        $response = $gateway->run($this->formatCommands($commands));
+
+        return $response;
     }
 
     /**

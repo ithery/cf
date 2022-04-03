@@ -35,6 +35,20 @@ trait CObservable_Trait_ControlTrait {
     }
 
     /**
+     * Create Text Control.
+     *
+     * @param null|string $id
+     *
+     * @return CElement_FormInput_Textarea
+     */
+    public function addTextareaControl($id = null) {
+        $control = new CElement_FormInput_Textarea($id);
+        $this->wrapper->add($control);
+
+        return $control;
+    }
+
+    /**
      * Create Hidden Control.
      *
      * @param null|string $id

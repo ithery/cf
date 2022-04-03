@@ -26,7 +26,10 @@ final class CVendor_Firebase_Messaging_TopicSubscriptions implements Countable, 
         yield from $this->subscriptions;
     }
 
-    public function count(): int {
+    /**
+     * @return int
+     */
+    public function count() {
         return \count($this->subscriptions);
     }
 }
