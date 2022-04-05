@@ -6,6 +6,7 @@ defined('SYSPATH') or die('No direct access allowed.');
  * @author Hery Kurniawan
  * @license Ittron Global Teknologi <ittron.co.id>
  *
+ * @see CObservable
  * @since Sep 14, 2018, 8:18:54 PM
  */
 trait CObservable_Trait_ComponentTrait {
