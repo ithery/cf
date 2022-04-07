@@ -1256,7 +1256,7 @@ class c {
             $appCode = CF::appCode();
         }
         if (!in_array($appCode, CF::getAvailableAppCode())) {
-            throw new Exception('appCode ' . $appCode . ' doesn\'t exists');
+            throw new CBase_Exception_AppCodeNotFoundException('appCode ' . $appCode . ' doesn\'t exists');
         }
         if (is_array($path)) {
             $path = implode(DS, $path);
