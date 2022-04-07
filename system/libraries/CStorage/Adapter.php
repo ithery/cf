@@ -8,65 +8,116 @@ defined('SYSPATH') or die('No direct access allowed.');
  *
  * @since Aug 11, 2019, 3:47:40 AM
  */
-use League\Flysystem\Adapter\Ftp;
-use League\Flysystem\Adapter\Local as LocalAdapter;
-use League\Flysystem\AdapterInterface;
-use League\Flysystem\AwsS3v3\AwsS3Adapter;
-use League\Flysystem\Cached\CachedAdapter;
-use League\Flysystem\FileExistsException;
-use League\Flysystem\FileNotFoundException;
-use League\Flysystem\FilesystemInterface;
-use PHPUnit\Framework\Assert as PHPUnit;
+use League\Flysystem\Visibility;
+use League\Flysystem\PathPrefixer;
+use League\Flysystem\Ftp\FtpAdapter;
 use Psr\Http\Message\StreamInterface;
+use League\Flysystem\UnableToCopyFile;
+use League\Flysystem\UnableToMoveFile;
+use League\Flysystem\UnableToReadFile;
+use League\Flysystem\StorageAttributes;
+use League\Flysystem\UnableToWriteFile;
+use League\Flysystem\FilesystemOperator;
+use League\Flysystem\UnableToDeleteFile;
+use PHPUnit\Framework\Assert as PHPUnit;
+use League\Flysystem\UnableToSetVisibility;
+use League\Flysystem\PhpseclibV3\SftpAdapter;
+use League\Flysystem\UnableToCreateDirectory;
+use League\Flysystem\UnableToDeleteDirectory;
 use Symfony\Component\HttpFoundation\StreamedResponse;
+use League\Flysystem\FilesystemAdapter as FlysystemAdapter;
+use League\Flysystem\Local\LocalFilesystemAdapter as LocalAdapter;
 
 /**
  * @mixin \League\Flysystem\FilesystemInterface
  */
 class CStorage_Adapter implements CStorage_CloudInterface {
+    use CTrait_Macroable {
+        __call as macroCall;
+    }
+
     /**
      * The Flysystem filesystem implementation.
      *
-     * @var \League\Flysystem\FilesystemInterface
+     * @var \League\Flysystem\FilesystemOperator
      */
     protected $driver;
 
     /**
+     * The Flysystem adapter implementation.
+     *
+     * @var \League\Flysystem\FilesystemAdapter
+     */
+    protected $adapter;
+
+    /**
+     * The filesystem configuration.
+     *
+     * @var array
+     */
+    protected $config;
+
+    /**
+     * The Flysystem PathPrefixer instance.
+     *
+     * @var \League\Flysystem\PathPrefixer
+     */
+    protected $prefixer;
+
+    /**
+     * The temporary URL builder callback.
+     *
+     * @var null|\Closure
+     */
+    protected $temporaryUrlCallback;
+
+    /**
      * Create a new filesystem adapter instance.
      *
-     * @param \League\Flysystem\FilesystemInterface $driver
+     * @param \League\Flysystem\FilesystemOperator $driver
+     * @param \League\Flysystem\FilesystemAdapter  $adapter
+     * @param array                                $config
      *
      * @return void
      */
-    public function __construct(FilesystemInterface $driver) {
+    public function __construct(FilesystemOperator $driver, FlysystemAdapter $adapter, array $config = []) {
         $this->driver = $driver;
+        $this->adapter = $adapter;
+        $this->config = $config;
+
+        $this->prefixer = new PathPrefixer(
+            isset($config['root']) ? $config['root'] : '',
+            isset($config['directory_separator']) ? $config['directory_separator'] : DIRECTORY_SEPARATOR
+        );
     }
 
     /**
      * Assert that the given file exists.
      *
      * @param string|array $path
-     * @param string|null  $content
+     * @param null|string  $content
      *
      * @return $this
      */
     public function assertExists($path, $content = null) {
+        clearstatcache();
         $paths = carr::wrap($path);
         foreach ($paths as $path) {
             PHPUnit::assertTrue(
                 $this->exists($path),
                 "Unable to find a file at path [{$path}]."
             );
-        }
-        if (!is_null($content)) {
-            $actual = $this->get($path);
+            if (!is_null($content)) {
+                $actual = $this->get($path);
 
-            PHPUnit::assertSame(
-                $content,
-                $actual,
-                "File [{$path}] was found, but content [{$actual}] does not match [{$content}]."
-            );
+                PHPUnit::assertSame(
+                    $content,
+                    $actual,
+                    "File or directory [{$path}] was found, but content [{$actual}] does not match [{$content}]."
+                );
+            }
         }
+
         return $this;
     }
 
@@ -78,13 +129,33 @@ class CStorage_Adapter implements CStorage_CloudInterface {
      * @return $this
      */
     public function assertMissing($path) {
+        clearstatcache();
+
         $paths = carr::wrap($path);
+
         foreach ($paths as $path) {
             PHPUnit::assertFalse(
                 $this->exists($path),
-                "Found unexpected file at path [{$path}]."
+                "Found unexpected file or directory at path [{$path}]."
             );
         }
+
+        return $this;
+    }
+
+    /**
+     * Assert that the given directory is empty.
+     *
+     * @param string $path
+     *
+     * @return $this
+     */
+    public function assertDirectoryEmpty($path) {
+        PHPUnit::assertEmpty(
+            $this->allFiles($path),
+            "Directory [{$path}] is not empty."
+        );
+
         return $this;
     }
 
@@ -111,6 +182,50 @@ class CStorage_Adapter implements CStorage_CloudInterface {
     }
 
     /**
+     * Determine if a file exists.
+     *
+     * @param string $path
+     *
+     * @return bool
+     */
+    public function fileExists($path) {
+        return $this->driver->fileExists($path);
+    }
+
+    /**
+     * Determine if a file is missing.
+     *
+     * @param string $path
+     *
+     * @return bool
+     */
+    public function fileMissing($path) {
+        return !$this->fileExists($path);
+    }
+
+    /**
+     * Determine if a directory exists.
+     *
+     * @param string $path
+     *
+     * @return bool
+     */
+    public function directoryExists($path) {
+        return $this->driver->directoryExists($path);
+    }
+
+    /**
+     * Determine if a directory is missing.
+     *
+     * @param string $path
+     *
+     * @return bool
+     */
+    public function directoryMissing($path) {
+        return !$this->directoryExists($path);
+    }
+
+    /**
      * Get the full path for the file at the given "short" path.
      *
      * @param string $path
@@ -118,13 +233,7 @@ class CStorage_Adapter implements CStorage_CloudInterface {
      * @return string
      */
     public function path($path) {
-        $adapter = $this->driver->getAdapter();
-
-        if ($adapter instanceof CachedAdapter) {
-            $adapter = $adapter->getAdapter();
-        }
-
-        return $adapter->getPathPrefix() . $path;
+        return $this->prefixer->prefixPath($path);
     }
 
     /**
@@ -132,15 +241,15 @@ class CStorage_Adapter implements CStorage_CloudInterface {
      *
      * @param string $path
      *
-     * @return string
-     *
      * @throws CStorage_Exception_FileNotFoundException
+     *
+     * @return string
      */
     public function get($path) {
         try {
             return $this->driver->read($path);
-        } catch (FileNotFoundException $e) {
-            throw new CStorage_Exception_FileNotFoundException($path, $e->getCode(), $e);
+        } catch (UnableToReadFile $e) {
+            c::throwIf($this->throwsExceptions(), $e);
         }
     }
 
@@ -148,30 +257,35 @@ class CStorage_Adapter implements CStorage_CloudInterface {
      * Create a streamed response for a given file.
      *
      * @param string      $path
-     * @param string|null $name
-     * @param array|null  $headers
-     * @param string|null $disposition
+     * @param null|string $name
+     * @param array       $headers
+     * @param null|string $disposition
      *
      * @return \Symfony\Component\HttpFoundation\StreamedResponse
      */
     public function response($path, $name = null, array $headers = [], $disposition = 'inline') {
-        $response = new StreamedResponse;
-        $filename = $name ? $name : basename($path);
+        $response = new StreamedResponse();
+
+        $filename = $name ?? basename($path);
+
         $disposition = $response->headers->makeDisposition(
             $disposition,
             $filename,
             $this->fallbackName($filename)
         );
+
         $response->headers->replace($headers + [
             'Content-Type' => $this->mimeType($path),
             'Content-Length' => $this->size($path),
             'Content-Disposition' => $disposition,
         ]);
+
         $response->setCallback(function () use ($path) {
             $stream = $this->readStream($path);
             fpassthru($stream);
             fclose($stream);
         });
+
         return $response;
     }
 
@@ -179,8 +293,8 @@ class CStorage_Adapter implements CStorage_CloudInterface {
      * Create a streamed download response for a given file.
      *
      * @param string      $path
-     * @param string|null $name
-     * @param array|null  $headers
+     * @param null|string $name
+     * @param null|array  $headers
      *
      * @return \Symfony\Component\HttpFoundation\StreamedResponse
      */
@@ -221,13 +335,27 @@ class CStorage_Adapter implements CStorage_CloudInterface {
         ) {
             return $this->putFile($path, $contents, $options);
         }
-        if ($contents instanceof StreamInterface) {
-            return $this->driver->putStream($path, $contents->detach(), $options);
+
+        try {
+            if ($contents instanceof StreamInterface) {
+                $this->driver->writeStream($path, $contents->detach(), $options);
+
+                return true;
+            }
+            is_resource($contents)
+                ? $this->driver->writeStream($path, $contents, $options)
+                : $this->driver->write($path, $contents, $options);
+        } catch (UnableToWriteFile $e) {
+            c::throwIf($this->throwsExceptions(), $e);
+
+            return false;
+        } catch (UnableToSetVisibility $e) {
+            c::throwIf($this->throwsExceptions(), $e);
+
+            return false;
         }
 
-        return is_resource($contents)
-            ? $this->driver->putStream($path, $contents, $options)
-            : $this->driver->put($path, $contents, $options);
+        return true;
     }
 
     /**
@@ -241,6 +369,7 @@ class CStorage_Adapter implements CStorage_CloudInterface {
      */
     public function putFile($path, $file, $options = []) {
         $file = is_string($file) ? new CHTTP_File($file) : $file;
+
         return $this->putFileAs($path, $file, $file->hashName(), $options);
     }
 
@@ -269,6 +398,7 @@ class CStorage_Adapter implements CStorage_CloudInterface {
         if (is_resource($stream)) {
             fclose($stream);
         }
+
         return $result ? $path : false;
     }
 
@@ -280,9 +410,10 @@ class CStorage_Adapter implements CStorage_CloudInterface {
      * @return string
      */
     public function getVisibility($path) {
-        if ($this->driver->getVisibility($path) == AdapterInterface::VISIBILITY_PUBLIC) {
+        if ($this->driver->visibility($path) == Visibility::PUBLIC) {
             return CStorage_FilesystemInterface::VISIBILITY_PUBLIC;
         }
+
         return CStorage_FilesystemInterface::VISIBILITY_PRIVATE;
     }
 
@@ -295,7 +426,15 @@ class CStorage_Adapter implements CStorage_CloudInterface {
      * @return bool
      */
     public function setVisibility($path, $visibility) {
-        return $this->driver->setVisibility($path, $this->parseVisibility($visibility));
+        try {
+            $this->driver->setVisibility($path, $this->parseVisibility($visibility));
+        } catch (UnableToSetVisibility $e) {
+            c::throwIf($this->throwsExceptions(), $e);
+
+            return false;
+        }
+
+        return true;
     }
 
     /**
@@ -308,9 +447,10 @@ class CStorage_Adapter implements CStorage_CloudInterface {
      * @return bool
      */
     public function prepend($path, $data, $separator = PHP_EOL) {
-        if ($this->exists($path)) {
+        if ($this->fileExists($path)) {
             return $this->put($path, $data . $separator . $this->get($path));
         }
+
         return $this->put($path, $data);
     }
 
@@ -324,9 +464,10 @@ class CStorage_Adapter implements CStorage_CloudInterface {
      * @return bool
      */
     public function append($path, $data, $separator = PHP_EOL) {
-        if ($this->exists($path)) {
+        if ($this->fileExists($path)) {
             return $this->put($path, $this->get($path) . $separator . $data);
         }
+
         return $this->put($path, $data);
     }
 
@@ -342,13 +483,14 @@ class CStorage_Adapter implements CStorage_CloudInterface {
         $success = true;
         foreach ($paths as $path) {
             try {
-                if (!$this->driver->delete($path)) {
-                    $success = false;
-                }
-            } catch (FileNotFoundException $e) {
+                $this->driver->delete($path);
+            } catch (UnableToDeleteFile $e) {
+                c::throwIf($this->throwsExceptions(), $e);
+
                 $success = false;
             }
         }
+
         return $success;
     }
 
@@ -361,7 +503,15 @@ class CStorage_Adapter implements CStorage_CloudInterface {
      * @return bool
      */
     public function copy($from, $to) {
-        return $this->driver->copy($from, $to);
+        try {
+            $this->driver->copy($from, $to);
+        } catch (UnableToCopyFile $e) {
+            c::throwIf($this->throwsExceptions(), $e);
+
+            return false;
+        }
+
+        return true;
     }
 
     /**
@@ -373,7 +523,15 @@ class CStorage_Adapter implements CStorage_CloudInterface {
      * @return bool
      */
     public function move($from, $to) {
-        return $this->driver->rename($from, $to);
+        try {
+            $this->driver->move($from, $to);
+        } catch (UnableToMoveFile $e) {
+            c::throwIf($this->throwsExceptions(), $e);
+
+            return false;
+        }
+
+        return true;
     }
 
     /**
@@ -384,7 +542,7 @@ class CStorage_Adapter implements CStorage_CloudInterface {
      * @return int
      */
     public function size($path) {
-        return $this->driver->getSize($path);
+        return $this->driver->fileSize($path);
     }
 
     /**
@@ -395,7 +553,7 @@ class CStorage_Adapter implements CStorage_CloudInterface {
      * @return string|false
      */
     public function mimeType($path) {
-        return $this->driver->getMimetype($path);
+        return $this->driver->mimeType($path);
     }
 
     /**
@@ -406,7 +564,37 @@ class CStorage_Adapter implements CStorage_CloudInterface {
      * @return int
      */
     public function lastModified($path) {
-        return $this->driver->getTimestamp($path);
+        return $this->driver->lastModified($path);
+    }
+
+    /**
+     * @inheritdoc
+     */
+    public function readStream($path) {
+        try {
+            return $this->driver->readStream($path);
+        } catch (UnableToReadFile $e) {
+            c::throwIf($this->throwsExceptions(), $e);
+        }
+    }
+
+    /**
+     * @inheritdoc
+     */
+    public function writeStream($path, $resource, array $options = []) {
+        try {
+            $this->driver->writeStream($path, $resource, $options);
+        } catch (UnableToSetVisibility $e) {
+            c::throwIf($this->throwsExceptions(), $e);
+
+            return false;
+        } catch (UnableToWriteFile $e) {
+            c::throwIf($this->throwsExceptions(), $e);
+
+            return false;
+        }
+
+        return true;
     }
 
     /**
@@ -414,21 +602,19 @@ class CStorage_Adapter implements CStorage_CloudInterface {
      *
      * @param string $path
      *
-     * @return string
-     *
      * @throws \RuntimeException
+     *
+     * @return string
      */
     public function url($path) {
-        $adapter = $this->driver->getAdapter();
-        if ($adapter instanceof CachedAdapter) {
-            $adapter = $adapter->getAdapter();
-        }
+        $adapter = $this->adapter;
+
         if (method_exists($adapter, 'getUrl')) {
             return $adapter->getUrl($path);
         } elseif (method_exists($this->driver, 'getUrl')) {
             return $this->driver->getUrl($path);
-        } elseif ($adapter instanceof AwsS3Adapter) {
-            return $this->getAwsUrl($adapter, $path);
+        } elseif ($adapter instanceof FtpAdapter || $adapter instanceof SftpAdapter) {
+            return $this->getFtpUrl($path);
         } elseif ($adapter instanceof LocalAdapter) {
             return $this->getLocalUrl($path);
         } else {
@@ -437,46 +623,16 @@ class CStorage_Adapter implements CStorage_CloudInterface {
     }
 
     /**
-     * {@inheritdoc}
-     */
-    public function readStream($path) {
-        try {
-            return $this->driver->readStream($path) ?: null;
-        } catch (FileNotFoundException $e) {
-            throw new CStorage_Exception_FileNotFoundException($e->getMessage(), $e->getCode(), $e);
-        }
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function writeStream($path, $resource, array $options = []) {
-        try {
-            return $this->driver->writeStream($path, $resource, $options);
-        } catch (FileExistsException $e) {
-            throw new CStorage_Exception_FileExistsException($e->getMessage(), $e->getCode(), $e);
-        }
-    }
-
-    /**
      * Get the URL for the file at the given path.
      *
-     * @param \League\Flysystem\AwsS3v3\AwsS3Adapter $adapter
-     * @param string                                 $path
+     * @param string $path
      *
      * @return string
      */
-    protected function getAwsUrl($adapter, $path) {
-        // If an explicit base URL has been set on the disk configuration then we will use
-        // it as the base URL instead of the default path. This allows the developer to
-        // have full control over the base path for this filesystem's generated URLs.
-        if (!is_null($url = $this->driver->getConfig()->get('url'))) {
-            return $this->concatPathToUrl($url, $adapter->getPathPrefix() . $path);
-        }
-        return $adapter->getClient()->getObjectUrl(
-            $adapter->getBucket(),
-            $adapter->getPathPrefix() . $path
-        );
+    protected function getFtpUrl($path) {
+        return isset($this->config['url'])
+                ? $this->concatPathToUrl($this->config['url'], $path)
+                : $path;
     }
 
     /**
@@ -487,13 +643,13 @@ class CStorage_Adapter implements CStorage_CloudInterface {
      * @return string
      */
     protected function getLocalUrl($path) {
-        $config = $this->driver->getConfig();
         // If an explicit base URL has been set on the disk configuration then we will use
         // it as the base URL instead of the default path. This allows the developer to
         // have full control over the base path for this filesystem's generated URLs.
-        if ($config->has('url')) {
-            return $this->concatPathToUrl($config->get('url'), $path);
+        if (isset($this->config['url'])) {
+            return $this->concatPathToUrl($this->config['url'], $path);
         }
+
         if (cstr::startsWith($path, DOCROOT)) {
             $path = substr($path, strlen(DOCROOT));
         }
@@ -507,6 +663,7 @@ class CStorage_Adapter implements CStorage_CloudInterface {
         if (cstr::contains($path, '/storage/public/')) {
             return cstr::replaceFirst('/public/', '/', $path);
         }
+
         return $path;
     }
 
@@ -517,44 +674,24 @@ class CStorage_Adapter implements CStorage_CloudInterface {
      * @param \DateTimeInterface $expiration
      * @param array              $options
      *
-     * @return string
-     *
      * @throws \RuntimeException
+     *
+     * @return string
      */
     public function temporaryUrl($path, $expiration, array $options = []) {
-        $adapter = $this->driver->getAdapter();
-        if ($adapter instanceof CachedAdapter) {
-            $adapter = $adapter->getAdapter();
+        if (method_exists($this->adapter, 'getTemporaryUrl')) {
+            return $this->adapter->getTemporaryUrl($path, $expiration, $options);
         }
-        if (method_exists($adapter, 'getTemporaryUrl')) {
-            return $adapter->getTemporaryUrl($path, $expiration, $options);
-        } elseif ($adapter instanceof AwsS3Adapter) {
-            return $this->getAwsTemporaryUrl($adapter, $path, $expiration, $options);
-        } else {
-            throw new RuntimeException('This driver does not support creating temporary URLs.');
-        }
-    }
 
-    /**
-     * Get a temporary URL for the file at the given path.
-     *
-     * @param \League\Flysystem\AwsS3v3\AwsS3Adapter $adapter
-     * @param string                                 $path
-     * @param \DateTimeInterface                     $expiration
-     * @param array                                  $options
-     *
-     * @return string
-     */
-    public function getAwsTemporaryUrl($adapter, $path, $expiration, $options) {
-        $client = $adapter->getClient();
-        $command = $client->getCommand('GetObject', array_merge([
-            'Bucket' => $adapter->getBucket(),
-            'Key' => $adapter->getPathPrefix() . $path,
-        ], $options));
-        return (string) $client->createPresignedRequest(
-            $command,
-            $expiration
-        )->getUri();
+        if ($this->temporaryUrlCallback) {
+            return $this->temporaryUrlCallback->bindTo($this, static::class)(
+                $path,
+                $expiration,
+                $options
+            );
+        }
+
+        throw new RuntimeException('This driver does not support creating temporary URLs.');
     }
 
     /**
@@ -570,23 +707,45 @@ class CStorage_Adapter implements CStorage_CloudInterface {
     }
 
     /**
+     * Replace the scheme, host and port of the given UriInterface with values from the given URL.
+     *
+     * @param \Psr\Http\Message\UriInterface $uri
+     * @param string                         $url
+     *
+     * @return \Psr\Http\Message\UriInterface
+     */
+    protected function replaceBaseUrl($uri, $url) {
+        $parsed = parse_url($url);
+
+        return $uri
+            ->withScheme($parsed['scheme'])
+            ->withHost($parsed['host'])
+            ->withPort(isset($parsed['port']) ? $parsed['port'] : null);
+    }
+
+    /**
      * Get an array of all files in a directory.
      *
-     * @param string|null $directory
+     * @param null|string $directory
      * @param bool        $recursive
      *
      * @return array
      */
     public function files($directory = null, $recursive = false) {
-        $contents = $this->driver->listContents($directory, $recursive);
-
-        return $this->filterContentsByType($contents, 'file');
+        return $this->driver->listContents($directory ?? '', $recursive)
+            ->filter(function (StorageAttributes $attributes) {
+                return $attributes->isFile();
+            })
+            ->map(function (StorageAttributes $attributes) {
+                return $attributes->path();
+            })
+            ->toArray();
     }
 
     /**
      * Get all of the files from the given directory (recursive).
      *
-     * @param string|null $directory
+     * @param null|string $directory
      *
      * @return array
      */
@@ -597,23 +756,26 @@ class CStorage_Adapter implements CStorage_CloudInterface {
     /**
      * Get all of the directories within a given directory.
      *
-     * @param string|null $directory
+     * @param null|string $directory
      * @param bool        $recursive
      *
      * @return array
      */
     public function directories($directory = null, $recursive = false) {
-        $contents = $this->driver->listContents($directory, $recursive);
-
-        $result = $this->filterContentsByType($contents, 'dir');
-
-        return $result;
+        return $this->driver->listContents($directory ?? '', $recursive)
+            ->filter(function (StorageAttributes $attributes) {
+                return $attributes->isDir();
+            })
+            ->map(function (StorageAttributes $attributes) {
+                return $attributes->path();
+            })
+            ->toArray();
     }
 
     /**
      * Get all (recursive) of the directories within a given directory.
      *
-     * @param string|null $directory
+     * @param null|string $directory
      *
      * @return array
      */
@@ -629,7 +791,19 @@ class CStorage_Adapter implements CStorage_CloudInterface {
      * @return bool
      */
     public function makeDirectory($path) {
-        return $this->driver->createDir($path);
+        try {
+            $this->driver->createDirectory($path);
+        } catch (UnableToCreateDirectory $e) {
+            c::throwIf($this->throwsExceptions(), $e);
+
+            return false;
+        } catch (UnableToSetVisibility $e) {
+            c::throwIf($this->throwsExceptions(), $e);
+
+            return false;
+        }
+
+        return true;
     }
 
     /**
@@ -640,19 +814,15 @@ class CStorage_Adapter implements CStorage_CloudInterface {
      * @return bool
      */
     public function deleteDirectory($directory) {
-        return $this->driver->deleteDir($directory);
-    }
+        try {
+            $this->driver->deleteDirectory($directory);
+        } catch (UnableToDeleteDirectory $e) {
+            c::throwIf($this->throwsExceptions(), $e);
 
-    /**
-     * Flush the Flysystem cache.
-     *
-     * @return void
-     */
-    public function flushCache() {
-        $adapter = $this->driver->getAdapter();
-        if ($adapter instanceof CachedAdapter) {
-            $adapter->getCache()->flush();
+            return false;
         }
+
+        return true;
     }
 
     /**
@@ -665,29 +835,31 @@ class CStorage_Adapter implements CStorage_CloudInterface {
     }
 
     /**
-     * Filter directory contents by type.
+     * Get the Flysystem adapter.
      *
-     * @param array  $contents
-     * @param string $type
+     * @return \League\Flysystem\FilesystemAdapter
+     */
+    public function getAdapter() {
+        return $this->adapter;
+    }
+
+    /**
+     * Get the configuration values.
      *
      * @return array
      */
-    protected function filterContentsByType($contents, $type) {
-        return CCollection::make($contents)
-            ->where('type', $type)
-            ->pluck('path')
-            ->values()
-            ->all();
+    public function getConfig() {
+        return $this->config;
     }
 
     /**
      * Parse the given visibility value.
      *
-     * @param string|null $visibility
-     *
-     * @return string|null
+     * @param null|string $visibility
      *
      * @throws \InvalidArgumentException
+     *
+     * @return null|string
      */
     protected function parseVisibility($visibility) {
         if (is_null($visibility)) {
@@ -695,11 +867,32 @@ class CStorage_Adapter implements CStorage_CloudInterface {
         }
         switch ($visibility) {
             case CStorage_FilesystemInterface::VISIBILITY_PUBLIC:
-                return AdapterInterface::VISIBILITY_PUBLIC;
+                return Visibility::PUBLIC;
             case CStorage_FilesystemInterface::VISIBILITY_PRIVATE:
-                return AdapterInterface::VISIBILITY_PRIVATE;
+                return Visibility::PRIVATE;
         }
+
         throw new InvalidArgumentException("Unknown visibility: {$visibility}");
+    }
+
+    /**
+     * Define a custom temporary URL builder callback.
+     *
+     * @param \Closure $callback
+     *
+     * @return void
+     */
+    public function buildTemporaryUrlsUsing(Closure $callback) {
+        $this->temporaryUrlCallback = $callback;
+    }
+
+    /**
+     * Determine if Flysystem exceptions should be thrown.
+     *
+     * @return bool
+     */
+    protected function throwsExceptions() {
+        return (bool) (isset($this->config['throw']) ? $this->config['throw'] : false);
     }
 
     /**
@@ -708,11 +901,15 @@ class CStorage_Adapter implements CStorage_CloudInterface {
      * @param string $method
      * @param array  $parameters
      *
-     * @return mixed
-     *
      * @throws \BadMethodCallException
+     *
+     * @return mixed
      */
     public function __call($method, array $parameters) {
+        if (static::hasMacro($method)) {
+            return $this->macroCall($method, $parameters);
+        }
+
         return call_user_func_array([$this->driver, $method], $parameters);
     }
 }
