@@ -30,6 +30,8 @@ use League\Flysystem\Local\LocalFilesystemAdapter as LocalAdapter;
 
 /**
  * @mixin \League\Flysystem\FilesystemInterface
+ *
+ * @see CStorage
  */
 class CStorage_Adapter implements CStorage_CloudInterface {
     use CTrait_Macroable {
