@@ -268,7 +268,7 @@ class CStorage_Adapter implements CStorage_CloudInterface {
     public function response($path, $name = null, array $headers = [], $disposition = 'inline') {
         $response = new StreamedResponse();
 
-        $filename = $name ?? basename($path);
+        $filename = $name ? $name : basename($path);
 
         $disposition = $response->headers->makeDisposition(
             $disposition,

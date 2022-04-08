@@ -183,7 +183,7 @@ class CStorage {
     public function createLocalDriver(array $config) {
         $visibility = PortableVisibilityConverter::fromArray(
             carr::get($config, 'permissions', []),
-            carr::get($config, 'directory_visibility', carr::get($config, 'visibility', Visibility::PRIVATE)),
+            carr::get($config, 'directory_visibility', carr::get($config, 'visibility', Visibility::PUBLIC)),
         );
 
         $links = (isset($config['links']) ? $config['links'] : null) === 'skip' ? LocalAdapter::SKIP_LINKS : LocalAdapter::DISALLOW_LINKS;
