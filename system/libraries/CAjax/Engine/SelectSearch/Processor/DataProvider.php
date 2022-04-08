@@ -38,14 +38,24 @@ class CAjax_Engine_SelectSearch_Processor_DataProvider extends CAjax_Engine_Sele
             $formatResult = $this->formatResult();
             if ($formatResult instanceof \Opis\Closure\SerializableClosure) {
                 $formatResult = $formatResult->__invoke($model);
-                $data['cappFormatResult'] = $formatResult;
-                $data['cappFormatResultIsHtml'] = c::isHtml($formatResult);
+                if ($formatResult instanceof CRenderable) {
+                    $p['cappFormatResult'] = $formatResult->html();
+                    $p['cappFormatResultIsHtml'] = true;
+                } else {
+                    $p['cappFormatResult'] = $formatResult;
+                    $p['cappFormatResultIsHtml'] = c::isHtml($formatResult);
+                }
             }
             $formatSelection = $this->formatSelection();
             if ($formatSelection instanceof \Opis\Closure\SerializableClosure) {
                 $formatSelection = $formatSelection->__invoke($model);
-                $data['cappFormatSelection'] = $formatSelection;
-                $data['cappFormatSelectionIsHtml'] = c::isHtml($formatSelection);
+                if ($formatSelection instanceof CRenderable) {
+                    $p['cappFormatSelection'] = $formatSelection->html();
+                    $p['cappFormatSelectionIsHtml'] = true;
+                } else {
+                    $p['cappFormatSelection'] = $formatSelection;
+                    $p['cappFormatSelectionIsHtml'] = c::isHtml($formatSelection);
+                }
             }
 
             return $data;
