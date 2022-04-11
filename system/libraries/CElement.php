@@ -129,6 +129,17 @@ abstract class CElement extends CObservable {
         if ($k == 'class') {
             return $this->addClass($v);
         }
+
+        // if ($k == 'style') {
+        //     foreach (explode(';', $v) as $attr) {
+        //         if (strlen(trim($attr)) > 0) { // for missing semicolon on last element, which is legal
+        //             list($name, $value) = explode(':', $attr);
+        //             $this->customCss($name, $value);
+        //         }
+        //     }
+
+        //     return $this;
+        // }
         $this->attr[$k] = $v;
 
         return $this;
