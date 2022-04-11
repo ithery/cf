@@ -2,18 +2,31 @@
 
 class CElement_FormInput_MapPicker extends CElement_FormInput {
     protected $lat;
+
     protected $lng;
+
     protected $mapContainer;
+
     protected $wrapperContainer;
+
     protected $searchContainer;
+
     protected $searchControl;
+
     protected $haveSearch;
+
     protected $searchPlaceholder;
+
     protected $radius;
+
     protected $draggable;
+
     protected $scrollwheel;
+
     protected $markerDraggable;
+
     protected $markerInCenter;
+
     protected $geoCodingApiKey;
 
     public function __construct($id) {
@@ -45,30 +58,41 @@ class CElement_FormInput_MapPicker extends CElement_FormInput {
         $latlngArray = explode(',', $val);
         $this->lat = carr::get($latlngArray, 0, 0);
         $this->lng = carr::get($latlngArray, 1, 0);
+
+        return $this;
     }
 
     public function radius($val) {
+        return $this->setRadius($val);
+    }
+
+    public function setRadius($val) {
         $this->radius = $val;
+
         return $this;
     }
 
     public function setDraggable($bool = true) {
         $this->draggable = $bool;
+
         return $this;
     }
 
     public function setScrollwheel($bool = true) {
         $this->scrollwheel = $bool;
+
         return $this;
     }
 
     public function markerDraggable($bool = true) {
         $this->markerDraggable = $bool;
+
         return $this;
     }
 
     public function markerInCenter($bool = true) {
         $this->markerInCenter = $bool;
+
         return $this;
     }
 
@@ -112,7 +136,6 @@ class CElement_FormInput_MapPicker extends CElement_FormInput {
                     radiusInput: null,
                     locationNameInput: $('#" . $this->id . "-search')
                 },
-
                 enableAutocomplete: true,
                 enableAutocompleteBlur: true,
                 addressFormat: 'street_address',

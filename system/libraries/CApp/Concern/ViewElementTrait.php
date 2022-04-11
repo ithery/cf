@@ -42,7 +42,6 @@ trait CApp_Concern_ViewElementTrait {
                 $element = $renderingElement->viewElement($key);
             }
         }
-
         if ($element != null && $element instanceof CRenderable) {
             $output .= $element->html();
             $js = $element->js();

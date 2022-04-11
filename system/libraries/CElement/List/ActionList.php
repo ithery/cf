@@ -69,6 +69,7 @@ class CElement_List_ActionList extends CElement_List {
 
     public function html($indent = 0) {
         $this->applyStyleToChild();
+
         $html = new CStringBuilder();
         $html->setIndent($indent);
         $classes = $this->getClasses();

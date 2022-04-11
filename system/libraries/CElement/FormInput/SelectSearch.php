@@ -505,7 +505,6 @@ class CElement_FormInput_SelectSearch extends CElement_FormInput {
             $strJsInit = '
                 initSelection : function (element, callback) {
                     var data = ' . $rjson . ';
-                    console.log(data);
                     callback(data);
                 },
             ';

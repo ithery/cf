@@ -169,6 +169,11 @@ return [
                 'label' => c::__('UI'),
                 'uri' => 'docs/cresjs/ui',
             ],
+            [
+                'name' => 'cresjs.helper',
+                'label' => c::__('Helper'),
+                'uri' => 'docs/cresjs/helper',
+            ],
         ]
     ],
     [
