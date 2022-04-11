@@ -9,15 +9,16 @@ class CAjax_Engine_ImgUpload extends CAjax_Engine {
         $fileId = '';
         if (isset($_FILES[$inputName], $_FILES[$inputName]['name'])) {
             for ($i = 0; $i < count($_FILES[$inputName]['name']); $i++) {
-                $extension = pathinfo($_FILES[$inputName]['name'][$i], PATHINFO_EXTENSION);
-                if (in_array($extension, ['php', 'sh', 'htm', 'pht'])) {
-                    die('Not Allowed X_X');
+                $ext = pathinfo($_FILES[$inputName]['name'][$i], PATHINFO_EXTENSION);
+
+                if (strlen($ext) > 3) {
+                    $ext = substr($ext, 0, 3);
                 }
-                if (cstr::startsWith($extension, 'php')) {
+                if (in_array($ext, ['php', 'sh', 'htm', 'pht'])) {
                     die('Not Allowed X_X');
                 }
 
-                $extension = '.' . $extension;
+                $extension = '.' . $ext;
                 $fileId = date('Ymd') . cutils::randmd5() . $extension;
                 $disk = CTemporary::disk();
                 $fullfilename = CTemporary::getPath('imgupload', $fileId);
@@ -41,15 +42,16 @@ class CAjax_Engine_ImgUpload extends CAjax_Engine {
             }
             foreach ($imageDataArray as $k => $imageData) {
                 $filename = carr::get($filenameArray, $k);
-                $extension = pathinfo($filename, PATHINFO_EXTENSION);
-                if (in_array($extension, ['php', 'sh', 'htm', 'pht'])) {
-                    die('Not Allowed X_X');
+                $ext = pathinfo($filename, PATHINFO_EXTENSION);
+
+                if (strlen($ext) > 3) {
+                    $ext = substr($ext, 0, 3);
                 }
-                if (cstr::startsWith($extension, 'php')) {
+                if (in_array($ext, ['php', 'sh', 'htm', 'pht'])) {
                     die('Not Allowed X_X');
                 }
 
-                $extension = '.' . $extension;
+                $extension = '.' . $ext;
                 $filteredData = substr($imageData, strpos($imageData, ',') + 1);
                 $unencodedData = base64_decode($filteredData);
                 $fileId = date('Ymd') . cutils::randmd5() . $extension;

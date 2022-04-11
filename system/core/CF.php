@@ -142,7 +142,7 @@ final class CF {
         if ($run === true) {
             return;
         }
-
+        self::validateFileUpload();
         // Start the environment setup benchmark
         CFBenchmark::start(SYSTEM_BENCHMARK . '_environment_setup');
 
@@ -1156,6 +1156,37 @@ final class CF {
                 static::$data[$domain]['app_code'] = $appCode;
                 $callback();
                 static::$data[$domain]['app_code'] = $originalAppCode;
+            }
+        }
+    }
+
+    protected static function validateFileNamesArray(array $names) {
+        foreach ($names as $name) {
+            if (!is_array($name)) {
+                $ext = pathinfo($name, PATHINFO_EXTENSION);
+                if (strlen($ext) > 3) {
+                    $ext = substr($ext, 0, 3);
+                }
+                if (in_array($ext, ['php', 'sh', 'htm', 'pht'])) {
+                    die('Not Allowed X_X');
+                }
+            } else {
+                static::validateFileNamesArray($name);
+            }
+        }
+    }
+
+    public static function validateFileUpload() {
+        if (isset($_FILES) && is_array($_FILES)) {
+            foreach ($_FILES as $v) {
+                if (isset($v['name'])) {
+                    $t = $v['name'];
+
+                    if (!is_array($t)) {
+                        $t = [$t];
+                    }
+                    static::validateFileNamesArray($t);
+                }
             }
         }
     }
