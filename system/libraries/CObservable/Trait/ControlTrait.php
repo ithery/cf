@@ -21,6 +21,20 @@ trait CObservable_Trait_ControlTrait {
     }
 
     /**
+     * Create Map Picker Control.
+     *
+     * @param null|string $id
+     *
+     * @return CElement_FormInput_MapPicker
+     */
+    public function addMapPickerControl($id = null) {
+        $control = new CElement_FormInput_MapPicker($id);
+        $this->wrapper->add($control);
+
+        return $control;
+    }
+
+    /**
      * Create Text Control.
      *
      * @param null|string $id

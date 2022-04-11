@@ -15,6 +15,9 @@ class Controller_Cresenity extends CController {
         CJob::cliRunner();
     }
 
+    /**
+     * @return void
+     */
     public function dispatch() {
         CQueue::run();
     }

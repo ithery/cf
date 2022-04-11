@@ -11,17 +11,16 @@ defined('SYSPATH') or die('No direct access allowed.');
 class CElement_Component_Nestable extends CElement_Component {
     use CTrait_Compat_Element_Nestable,
         CTrait_Element_ActionList_Row;
+
     protected $data;
 
-    protected $id_key;
+    protected $idKey;
 
-    protected $value_key;
+    protected $valueKey;
 
     protected $applyjs;
 
     protected $input;
-
-    protected $action_style;
 
     protected $displayCallbackFunc;
 
@@ -41,8 +40,7 @@ class CElement_Component_Nestable extends CElement_Component {
         $this->data = [];
         $this->applyjs = true;
         $this->input = '';
-        $this->rowActionList = CElement_Factory::createList('ActionList');
-        $this->action_style = 'btn-icon-group';
+        $this->rowActionList = CElement_List_ActionRowList::factory();
         $this->rowActionList->setStyle('btn-icon-group');
         $this->displayCallbackFunc = false;
         $this->filterActionCallbackFunc = '';
@@ -119,7 +117,7 @@ class CElement_Component_Nestable extends CElement_Component {
     }
 
     public function setIdKey($idKey) {
-        $this->id_key = $idKey;
+        $this->idKey = $idKey;
 
         return $this;
     }
@@ -143,7 +141,7 @@ class CElement_Component_Nestable extends CElement_Component {
     }
 
     public function setValueKey($valueKey) {
-        $this->value_key = $valueKey;
+        $this->valueKey = $valueKey;
 
         return $this;
     }
@@ -157,34 +155,33 @@ class CElement_Component_Nestable extends CElement_Component {
     public function html($indent = 0) {
         $html = new CStringBuilder();
         $html->setIndent($indent);
-
         $html->appendln('<div id="' . $this->id . '" class="dd nestable">')->incIndent();
         if (count($this->data) > 0) {
-            $depth_before = -1;
+            $depthBefore = -1;
             $in = 0;
             foreach ($this->data as $d) {
                 $depth = $d['depth'];
-                if ($depth_before >= $depth) {
+                if ($depthBefore >= $depth) {
                     $html->decIndent()->appendln('</li>');
                 }
-                if ($depth_before > $depth) {
-                    $range_depth = $depth_before - $depth;
-                    for ($i = 0; $i < $range_depth; $i++) {
+                if ($depthBefore > $depth) {
+                    $rangeDepth = $depthBefore - $depth;
+                    for ($i = 0; $i < $rangeDepth; $i++) {
                         $in--;
                         $html->decIndent()->appendln('</ol>');
                     }
                 }
-                if ($depth_before < $depth) {
+                if ($depthBefore < $depth) {
                     $in++;
                     $html->appendln('<ol class="dd-list">')->incIndent();
                 }
-                $html->appendln('<li class="dd-item" data-id="' . $d[$this->id_key] . '">')->incIndent();
+                $html->appendln('<li class="dd-item" data-id="' . $d[$this->idKey] . '">')->incIndent();
 
                 $html->appendln('<div class="dd-handle">')->incIndent();
                 if ($this->checkbox) {
-                    $html->appendln('<input id="cb_' . $d[$this->id_key] . '" name="cb[' . $d[$this->id_key] . ']" data-parent-id="' . $d['parent_id'] . '" type="checkbox" value="' . $d[$this->id_key] . '"/>')->incIndent();
+                    $html->appendln('<input id="cb_' . $d[$this->idKey] . '" name="cb[' . $d[$this->idKey] . ']" data-parent-id="' . $d['parent_id'] . '" type="checkbox" value="' . $d[$this->idKey] . '"/>')->incIndent();
                 }
-                $val = carr::get($d, $this->value_key);
+                $val = carr::get($d, $this->valueKey);
                 $newV = $val;
                 if ($this->displayCallbackFunc !== false && is_callable($this->displayCallbackFunc)) {
                     $newV = CFunction::factory($this->displayCallbackFunc)
@@ -200,17 +197,14 @@ class CElement_Component_Nestable extends CElement_Component {
                     foreach ($d as $k => $v) {
                         $jsparam[$k] = $v;
                     }
-                    $jsparam['param1'] = carr::get($d, $this->id_key);
-                    $this->rowActionList->addClass('pull-right');
-                    if ($this->action_style == 'btn-dropdown') {
-                        $this->rowActionList->addClass('pull-right');
-                    }
-                    $this->rowActionList->regenerateId(true);
-                    $this->rowActionList->apply('jsparam', $jsparam);
-                    $this->rowActionList->apply('setHandlerParam', $jsparam);
+                    $jsparam['param1'] = carr::get($d, $this->idKey);
+
+                    $this->getRowActionList()->regenerateId(true);
+                    $this->getRowActionList()->apply('jsparam', $jsparam);
+                    $this->getRowActionList()->apply('setHandlerParam', $jsparam);
 
                     if (($this->filterActionCallbackFunc) != null) {
-                        $actions = $this->rowActionList->childs();
+                        $actions = $this->getRowActionList()->childs();
 
                         foreach ($actions as $action) {
                             $visibility = CFunction::factory($this->filterActionCallbackFunc)
@@ -219,16 +213,19 @@ class CElement_Component_Nestable extends CElement_Component {
                                 ->addArg($action)
                                 ->setRequire($this->requires)
                                 ->execute();
-
+                            if ($visibility == false) {
+                                $action->addClass('d-none');
+                            }
                             $action->setVisibility($visibility);
                         }
                     }
 
-                    $this->js_cell .= $this->rowActionList->js();
-                    $html->appendln($this->rowActionList->html($html->getIndent()));
+                    $this->js_cell .= $this->getRowActionList()->js();
+
+                    $html->appendln($this->getRowActionList()->html($html->getIndent()));
                 }
 
-                $depth_before = $depth;
+                $depthBefore = $depth;
             }
             for ($i = 0; $i < $in; $i++) {
                 $html->decIndent()->appendln('</li>');
