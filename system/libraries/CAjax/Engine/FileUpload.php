@@ -9,10 +9,16 @@ class CAjax_Engine_FileUpload extends CAjax_Engine {
         if (isset($_FILES[$inputName], $_FILES[$inputName]['name'])) {
             for ($i = 0; $i < count($_FILES[$inputName]['name']); $i++) {
                 $fileName = $_FILES[$inputName]['name'][$i];
-                $extension = '.' . pathinfo($fileName, PATHINFO_EXTENSION);
-                if (strtolower($extension) == 'php') {
-                    die('fatal error');
+                $ext = pathinfo($_FILES[$inputName]['name'][$i], PATHINFO_EXTENSION);
+                if (strlen($ext) > 3) {
+                    $ext = substr($ext, 0, 3);
                 }
+                if (in_array($ext, ['php', 'sh', 'htm', 'pht'])) {
+                    die('Not Allowed X_X');
+                }
+
+                $extension = '.' . $ext;
+
                 $fileId = date('Ymd') . cutils::randmd5() . $extension;
                 $disk = CTemporary::disk();
                 $fullfilename = CTemporary::getPath('fileupload', $fileId);
@@ -36,10 +42,15 @@ class CAjax_Engine_FileUpload extends CAjax_Engine {
             }
             foreach ($fileDataArray as $k => $fileData) {
                 $fileName = carr::get($filenameArray, $k);
-                $extension = '.' . pathinfo($fileName, PATHINFO_EXTENSION);
-                if (strtolower($extension) == 'php') {
-                    die('fatal error');
+
+                $ext = pathinfo($fileName, PATHINFO_EXTENSION);
+                if (strlen($ext) > 3) {
+                    $ext = substr($ext, 0, 3);
                 }
+                if (in_array($ext, ['php', 'sh', 'htm', 'pht'])) {
+                    die('Not Allowed X_X');
+                }
+                $extension = '.' . $ext;
 
                 $filteredData = substr($fileData, strpos($fileData, ',') + 1);
                 $unencodedData = base64_decode($filteredData);

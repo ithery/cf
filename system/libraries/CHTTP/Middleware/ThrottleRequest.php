@@ -154,7 +154,8 @@ class CHTTP_Middleware_ThrottleRequest {
      * @return string
      */
     protected function resolveRequestSignature($request) {
-        if ($user = $request->user()) {
+        $user = $request->user();
+        if ($user && method_exists($request->user(), 'getAuthIdentifier')) {
             return sha1($user->getAuthIdentifier());
         } elseif ($route = $request->route()) {
             return sha1($route->getDomain() . '|' . $request->ip());

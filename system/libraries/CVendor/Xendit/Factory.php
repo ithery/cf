@@ -78,7 +78,7 @@ class CVendor_Xendit_Factory {
     }
 
     /**
-     * @return CVendor_Xendit_Disbursement
+     * @return CVendor_Xendit_Invoice
      */
     public function invoice() {
         return new CVendor_Xendit_Invoice($this->apiRequestor);
