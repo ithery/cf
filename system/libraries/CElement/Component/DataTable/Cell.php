@@ -35,14 +35,29 @@ class CElement_Component_DataTable_Cell {
                 $fields = explode('.', $fieldName);
                 $html = $this->row;
 
-                foreach ($fields as $field) {
-                    $html = c::optional($html)->$field;
+                foreach ($fields as $fieldIndex => $field) {
+                    if ($html instanceof  CModel_Collection) {
+                        $remainFields = array_slice($fields, $fieldIndex);
+
+                        $remainFieldsPath = implode('.', $remainFields);
+                        $html = $html->implode($remainFieldsPath, ',');
+
+                        break;
+                    } else {
+                        $html = c::optional($html)->$field;
+                    }
                 }
             } else {
                 $html = $this->row->{$this->column->getFieldname()};
             }
         } else {
             $html = carr::get($this->row, $this->column->getFieldname());
+        }
+        if ($html instanceof CCollection) {
+            $html = $html->toArray();
+        }
+        if (is_array($html)) {
+            $html = implode(',', $html);
         }
 
         //do transform

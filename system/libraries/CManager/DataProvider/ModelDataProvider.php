@@ -130,13 +130,15 @@ class CManager_DataProvider_ModelDataProvider extends CManager_DataProviderAbstr
                     $fields = explode('.', $fieldName);
 
                     $field = array_pop($fields);
-                    $relation = implode('.', $fields);
+                    $relationPath = implode('.', $fields);
+                    $alias = $this->joinWithRelationPath($query, $relationPath, $field);
 
-                    $query->with([$relation => function ($q2) use ($sortDirection, $field) {
-                        if (!$this->isRelationField($q2, $field)) {
-                            $q2->orderBy($field, $sortDirection);
-                        }
-                    }]);
+                    // $query->with([$relationPath => function ($q2) use ($sortDirection, $field) {
+                    //     if (!$this->isRelationField($q2, $field)) {
+                    //         $q2->orderBy($field, $sortDirection);
+                    //     }
+                    // }]);
+                    $query->orderBy($alias, $sortDirection);
                 } else {
                     if (!$this->isRelationField($query, $fieldName)) {
                         $query->orderBy($fieldName, $sortDirection);
@@ -146,6 +148,60 @@ class CManager_DataProvider_ModelDataProvider extends CManager_DataProviderAbstr
         }
 
         return $query;
+    }
+
+    /**
+     * @param $length
+     *
+     * @return string
+     */
+    public static function randomStringAlpha($length) {
+        $pool = array_merge(range('a', 'z'), range('A', 'Z'));
+        $key = '';
+        for ($i = 0; $i < $length; $i++) {
+            $key .= $pool[mt_rand(0, count($pool) - 1)];
+        }
+
+        return $key;
+    }
+
+    protected function joinWithRelationPath($query, $relationPath, $column) {
+        $subQueries = [];
+        //$relations = explode('.', $relationPath);
+        $relation = $query->getModel()->$relationPath();
+        $relationIndex = 0;
+        $relatedModel = $relation->getRelated();
+        /**
+         * @var string
+         */
+        $relatedTable = $relatedModel->getTable();
+
+        $tableAliasPrefix = 'mdp_' . $this->randomStringAlpha(3);
+        $alias = 'mdp_sub_' . $this->randomStringAlpha(3);
+        if ($relation instanceof CModel_Relation_BelongsTo) {
+            $tableAlias = $tableAliasPrefix . $relationIndex;
+            $tableAndAlias = $relatedTable . ' AS ' . $tableAlias;
+            if (!isset($subQueries[$column])) {
+                $subQueries[$alias] = $currentQuery = c::db()->createQueryBuilder()
+                    ->from($tableAndAlias)
+                    ->whereColumn(
+                        $relation->getQualifiedForeignKeyName(), // 'child-table.fk-column'
+                        '=',
+                        $tableAlias . '.' . $relation->getOwnerKeyName()  // 'parent-table.id-column'
+                    )
+                    ->select($tableAlias . '.' . $column);
+
+                if (is_string($column)) {
+                    $query->selectSub($currentQuery, $alias);
+                } else {
+                    throw new \InvalidArgumentException('Columns must be an associative array');
+                }
+            } else {
+                throw new \Exception('Multiple relation chain not implemented yet');
+            }
+        }
+
+        return $alias;
     }
 
     protected function isRelationField($query, $fieldName) {
