@@ -190,4 +190,51 @@ class CRemote_SSH {
     public function getClient() {
         return $this->connection->getGateway()->getConnection();
     }
+
+    /**
+     * Upload a local file to the server.
+     *
+     * @param string $local
+     * @param string $remote
+     *
+     * @return void
+     */
+    public function put($local, $remote) {
+        $this->connection->put($local, $remote);
+    }
+
+    /**
+     * Upload a string to to the given file on the server.
+     *
+     * @param string $remote
+     * @param string $contents
+     *
+     * @return void
+     */
+    public function putString($remote, $contents) {
+        $this->connection->putString($remote, $contents);
+    }
+
+    /**
+     * Download the contents of a remote file.
+     *
+     * @param string $remote
+     * @param string $local
+     *
+     * @return void
+     */
+    public function get($remote, $local) {
+        $this->connection->get($remote, $local);
+    }
+
+    /**
+     * Get the contents of a remote file.
+     *
+     * @param string $remote
+     *
+     * @return string
+     */
+    public function getString($remote) {
+        return $this->connection->getString($remote);
+    }
 }
