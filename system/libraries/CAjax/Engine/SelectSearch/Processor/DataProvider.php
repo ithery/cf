@@ -39,22 +39,22 @@ class CAjax_Engine_SelectSearch_Processor_DataProvider extends CAjax_Engine_Sele
             if ($formatResult instanceof \Opis\Closure\SerializableClosure) {
                 $formatResult = $formatResult->__invoke($model);
                 if ($formatResult instanceof CRenderable) {
-                    $p['cappFormatResult'] = $formatResult->html();
-                    $p['cappFormatResultIsHtml'] = true;
+                    $data['cappFormatResult'] = $formatResult->html();
+                    $data['cappFormatResultIsHtml'] = true;
                 } else {
-                    $p['cappFormatResult'] = $formatResult;
-                    $p['cappFormatResultIsHtml'] = c::isHtml($formatResult);
+                    $data['cappFormatResult'] = $formatResult;
+                    $data['cappFormatResultIsHtml'] = c::isHtml($formatResult);
                 }
             }
             $formatSelection = $this->formatSelection();
             if ($formatSelection instanceof \Opis\Closure\SerializableClosure) {
                 $formatSelection = $formatSelection->__invoke($model);
                 if ($formatSelection instanceof CRenderable) {
-                    $p['cappFormatSelection'] = $formatSelection->html();
-                    $p['cappFormatSelectionIsHtml'] = true;
+                    $data['cappFormatSelection'] = $formatSelection->html();
+                    $data['cappFormatSelectionIsHtml'] = true;
                 } else {
-                    $p['cappFormatSelection'] = $formatSelection;
-                    $p['cappFormatSelectionIsHtml'] = c::isHtml($formatSelection);
+                    $data['cappFormatSelection'] = $formatSelection;
+                    $data['cappFormatSelectionIsHtml'] = c::isHtml($formatSelection);
                 }
             }
 
