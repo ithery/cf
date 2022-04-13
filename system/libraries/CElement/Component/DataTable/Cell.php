@@ -113,7 +113,7 @@ class CElement_Component_DataTable_Cell {
         $html = '';
         $js = '';
 
-        if (is_string($cell)) {
+        if (is_string($cell) || is_numeric($cell)) {
             $html = $cell;
         }
 
