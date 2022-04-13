@@ -131,8 +131,8 @@ class CManager_DataProvider_ModelDataProvider extends CManager_DataProviderAbstr
 
                     $field = array_pop($fields);
                     $relationPath = implode('.', $fields);
-                    $alias = 'mdp_sort_' . $sortIndex;
-                    $this->withSelectRelationColumn($query, $relationPath, $field, $alias);
+
+                    $alias = $this->withSelectRelationColumn($query, $relationPath, $field, $sortIndex);
                     $query->orderBy($alias, $sortDirection);
                 } else {
                     if (!$this->isRelationField($query, $fieldName)) {
@@ -146,13 +146,18 @@ class CManager_DataProvider_ModelDataProvider extends CManager_DataProviderAbstr
         return $query;
     }
 
-    protected function withSelectRelationColumn($query, $relationPath, $column, $alias) {
+    protected function withSelectRelationColumn($query, $relationPath, $column, $index) {
+        $alias = 'mdp_sort_' . $index;
         $subQueries = [];
         $relations = explode('.', $relationPath);
         $firstRelation = array_shift($relations);
         $relation = $query->getModel()->$firstRelation();
 
         $selectQuery = $this->createSelectJoinQuery($query, $relation, $relations, $column);
+
+        if ($index == 0) {
+            $query->addSelect($query->getModel()->getTable() . '.*');
+        }
 
         $query->selectSub($selectQuery, $alias);
 
