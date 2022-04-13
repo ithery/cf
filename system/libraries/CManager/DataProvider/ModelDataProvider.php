@@ -148,7 +148,7 @@ class CManager_DataProvider_ModelDataProvider extends CManager_DataProviderAbstr
 
     protected function withSelectRelationColumn($query, $relationPath, $column, $index) {
         $alias = 'mdp_sort_' . $index;
-        $subQueries = [];
+
         $relations = explode('.', $relationPath);
         $firstRelation = array_shift($relations);
         $relation = $query->getModel()->$firstRelation();
@@ -259,10 +259,8 @@ class CManager_DataProvider_ModelDataProvider extends CManager_DataProviderAbstr
     public function paginate($perPage = null, $columns = ['*'], $pageName = 'page', $page = null, $callback = null) {
         //do nothing
         $query = $this->getModelQuery($callback);
-        c::db()->enableBenchmark();
-        $a = $query->paginate($perPage, $columns, $pageName, $page);
-
-        return $a;
+        //c::db()->enableBenchmark();
+        return $query->paginate($perPage, $columns, $pageName, $page);
     }
 
     /**
