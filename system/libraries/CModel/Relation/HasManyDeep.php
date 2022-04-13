@@ -86,7 +86,7 @@ class CModel_Relation_HasManyDeep extends CModel_Relation_HasManyThrough {
         $alias = $segments[1] ?? null;
 
         foreach ($throughParents as $i => $throughParent) {
-            $predecessor = $throughParents[$i - 1] ?? $this->related;
+            $predecessor = isset($throughParents[$i - 1]) ? $throughParents[$i - 1] : $this->related;
 
             $prefix = $i === 0 && $alias ? $alias . '.' : '';
 
