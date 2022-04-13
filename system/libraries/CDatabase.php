@@ -173,6 +173,7 @@ class CDatabase {
         // Merge the default config with the passed config
         $this->config = array_merge($this->config, $config);
         $this->isBenchmarkQuery = carr::get($this->config, 'benchmark', false);
+
         if (is_string($this->config['connection'])) {
             // Make sure the connection is valid
             if (strpos($this->config['connection'], '://') === false) {

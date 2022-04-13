@@ -104,10 +104,12 @@ class CElement_FormInput_Select extends CElement_FormInput {
     }
 
     protected function build() {
+        parent::build();
         $this->addClass('form-control');
     }
 
     public function html($indent = 0) {
+        parent::html($indent);
         $html = new CStringBuilder();
         $html->setIndent($indent);
         $readonly = '';

@@ -19,4 +19,7 @@ return [
     'push_notification' => [
         'vendor' => 'firebase',
     ],
+    'whatsapp' => [
+        'vendor' => 'wago',
+    ],
 ];
