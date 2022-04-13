@@ -257,6 +257,4 @@ return $config->setRules([
     'list_syntax' => [
         'syntax' => 'long',
     ],
-])
-//->setIndent("\t")
-    ->setLineEnding("\n");
+])->setLineEnding("\n");

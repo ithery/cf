@@ -45,6 +45,8 @@ class CElement_Component_Action extends CElement_Component {
 
     protected $value;
 
+    protected $isActive = false;
+
     public function __construct($id) {
         parent::__construct($id);
         $this->tag = 'a';
@@ -65,6 +67,7 @@ class CElement_Component_Action extends CElement_Component {
         $this->button = false;
         $this->btn_style = 'default';
         $this->value = '';
+        $this->isActive = false;
     }
 
     public static function factory($id = '') {
@@ -102,6 +105,17 @@ class CElement_Component_Action extends CElement_Component {
     public function setLink($link) {
         $this->type = 'link';
         $this->link = $link;
+
+        return $this;
+    }
+
+    /**
+     * @param bool $bool
+     *
+     * @return $this
+     */
+    public function setActive($bool = true) {
+        $this->isActive = true;
 
         return $this;
     }
@@ -299,21 +313,44 @@ class CElement_Component_Action extends CElement_Component {
                     $link = 'javascript:' . $this->jsfunc . '(' . $param . ')';
                 }
             }
+            //prefix
             if ($this->style == 'btn-dropdown') {
                 $html->appendln('<li>');
+            } elseif ($this->style == 'btn-group-toggle-radio') {
+                if ($this->isActive) {
+                    $classes .= ' active';
+                }
+
+                $html->appendln('<label class="btn ' . $add_class . '' . $classes . '">');
             }
+
+            //link
             if ($this->style == 'btn-dropdown') {
                 $html->appendln('<a id="' . $this->id . '" href="' . $link . '"' . $linkTarget . ' class=" ' . $add_class . '' . $classes . '" ' . $disabled . $add_attr . $addition_attribute . $custom_css . '>');
+            } elseif ($this->style == 'btn-group-toggle-radio') {
+                $checkedAttr = '';
+                if ($this->isActive) {
+                    $checkedAttr = 'checked="checked"';
+                }
+                $html->appendln('
+                    <input type="radio" name="' . $this->id . '" id="' . $this->id . '" autocomplete="off" ' . $checkedAttr . '>
+               ');
             } else {
                 $html->appendln('<a id="' . $this->id . '" href="' . $link . '"' . $linkTarget . ' class="btn ' . $add_class . '' . $classes . '" ' . $disabled . $add_attr . $addition_attribute . $custom_css . '>');
             }
+            //ico
             $html->append($this->getIconHtml());
+            //label
             if ($this->style != 'btn-icon-group') {
                 $html->append($this->label);
             }
+            //close tag
             $html->append('</a>');
+            //suffix
             if ($this->style == 'btn-dropdown') {
                 $html->appendln('</li>');
+            } elseif ($this->style == 'btn-group-toggle-radio') {
+                $html->appendln('</label>');
             }
         }
 
