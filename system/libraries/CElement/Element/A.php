@@ -36,10 +36,22 @@ class CElement_Element_A extends CElement_Element {
         return $this;
     }
 
+    /**
+     * @param mixed $target
+     *
+     * @return $this
+     */
     public function setTarget($target = '_blank') {
         $this->target = $target;
 
         return $this;
+    }
+
+    /**
+     * @return $this
+     */
+    public function setTargetBlank() {
+        return $this->setTarget('_blank');
     }
 
     protected function build() {
