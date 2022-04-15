@@ -722,4 +722,12 @@ return [
             'plugins/hljs/hljs.css',
         ],
     ],
+    'ion-rangeslider' => [
+        'js' => [
+            'plugins/ion-rangeslider/ion.rangeSlider.min.js',
+        ],
+        'css' => [
+            'plugins/ion-rangeslider/ion.rangeSlider.min.css',
+        ],
+    ],
 ];
