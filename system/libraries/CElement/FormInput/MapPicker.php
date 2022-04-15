@@ -29,6 +29,14 @@ class CElement_FormInput_MapPicker extends CElement_FormInput {
 
     protected $geoCodingApiKey;
 
+    protected $searchSelector;
+
+    protected $latitudeSelector;
+
+    protected $longitudeSelector;
+
+    protected $radiusSelector;
+
     public function __construct($id) {
         parent::__construct($id);
         $this->type = 'text';
@@ -72,6 +80,42 @@ class CElement_FormInput_MapPicker extends CElement_FormInput {
         return $this;
     }
 
+    public function setLatitudeSelector($latitude) {
+        if ($latitude instanceof CRenderable) {
+            $latitude = '#' . $latitude->id();
+        }
+        $this->latitudeSelector = $latitude;
+
+        return $this;
+    }
+
+    public function setLongitudeSelector($longitude) {
+        if ($longitude instanceof CRenderable) {
+            $longitude = '#' . $longitude->id();
+        }
+        $this->longitudeSelector = $longitude;
+
+        return $this;
+    }
+
+    public function setRadiusSelector($selector) {
+        if ($selector instanceof CRenderable) {
+            $selector = '#' . $selector->id();
+        }
+        $this->radiusSelector = $selector;
+
+        return $this;
+    }
+
+    public function setSearchSelector($selector) {
+        if ($selector instanceof CRenderable) {
+            $selector = '#' . $selector->id();
+        }
+        $this->searchSelector = $selector;
+
+        return $this;
+    }
+
     public function setDraggable($bool = true) {
         $this->draggable = $bool;
 
@@ -104,15 +148,24 @@ class CElement_FormInput_MapPicker extends CElement_FormInput {
         $this->wrapperContainer->add('<script src="https://maps.googleapis.com/maps/api/js?libraries=places&key=' . $this->geoCodingApiKey . '" type="text/javascript"></script>');
 
         if ($this->haveSearch) {
-            $this->searchContainer = $this->wrapperContainer->addDiv()->addClass('mb-3');
-            $this->searchControl = $this->searchContainer->addControl($this->id . '-search', 'text')->setPlaceholder($this->searchPlaceholder);
-            if (!$this->markerDraggable) {
-                $this->searchControl->setReadonly();
+            if ($this->searchSelector == null) {
+                $this->searchContainer = $this->wrapperContainer->addDiv()->addClass('mb-3');
+                $this->searchControl = $this->searchContainer->addControl($this->id . '-search', 'text')->setPlaceholder($this->searchPlaceholder);
+                if (!$this->markerDraggable) {
+                    $this->searchControl->setReadonly();
+                }
+                $this->searchSelector = $this->id . '-search';
             }
         }
 
-        $this->wrapperContainer->addControl($this->id . '-lat', 'hidden')->setValue($this->lat)->setName($this->name . '[lat]');
-        $this->wrapperContainer->addControl($this->id . '-lng', 'hidden')->setValue($this->lng)->setName($this->name . '[lng]');
+        if ($this->latitudeSelector == null) {
+            $this->wrapperContainer->addControl($this->id . '-lat', 'hidden')->setValue($this->lat)->setName($this->name . '[lat]');
+            $this->latitudeSelector = $this->id . '-lat';
+        }
+        if ($this->longitudeSelector == null) {
+            $this->wrapperContainer->addControl($this->id . '-lng', 'hidden')->setValue($this->lng)->setName($this->name . '[lng]');
+            $this->longitudeSelector = $this->id . '-lng';
+        }
 
         $this->wrapperContainer->addDiv($this->id . '-map')
             ->customCss('height', '300px')
@@ -127,14 +180,14 @@ class CElement_FormInput_MapPicker extends CElement_FormInput {
             $('#" . $this->id . "-map').locationpicker({
                 location: {
                     latitude: " . $this->lat . ',
-                    longitude: ' . $this->lng . ",
+                    longitude: ' . $this->lng . ',
                 },
 
                 inputBinding: {
-                    latitudeInput: $('#" . $this->id . "-lat'),
-                    longitudeInput: $('#" . $this->id . "-lng'),
-                    radiusInput: null,
-                    locationNameInput: $('#" . $this->id . "-search')
+                    latitudeInput: ' . ($this->latitudeSelector ? " $('" . $this->latitudeSelector . "')" : 'null') . ',
+                    longitudeInput: ' . ($this->longitudeSelector ? " $('" . $this->longitudeSelector . "')" : 'null') . ',
+                    radiusInput: ' . ($this->radiusSelector ? " $('" . $this->radiusSelector . "')" : 'null') . ',
+                    locationNameInput: ' . ($this->searchSelector ? " $('" . $this->searchSelector . "')" : 'null') . "
                 },
                 enableAutocomplete: true,
                 enableAutocompleteBlur: true,
