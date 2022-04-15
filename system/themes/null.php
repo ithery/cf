@@ -40,6 +40,9 @@ return [
                 'header' => null,
                 'body' => null
             ]
+        ],
+        'range' => [
+            'applyJs' => null, // ion-rangeslider
         ]
     ],
     'custom_js' => '',
