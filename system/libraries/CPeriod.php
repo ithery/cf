@@ -46,7 +46,10 @@ class CPeriod {
     }
 
     public static function today() {
-        return static::days(0);
+        $endDate = CCarbon::today()->endOfDay();
+        $startDate = CCarbon::today()->startOfDay();
+
+        return new static($startDate, $endDate);
     }
 
     public static function yesterday() {
