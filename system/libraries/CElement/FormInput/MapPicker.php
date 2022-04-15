@@ -154,17 +154,17 @@ class CElement_FormInput_MapPicker extends CElement_FormInput {
                 if (!$this->markerDraggable) {
                     $this->searchControl->setReadonly();
                 }
-                $this->searchSelector = $this->id . '-search';
+                $this->searchSelector = '#' . $this->id . '-search';
             }
         }
 
         if ($this->latitudeSelector == null) {
             $this->wrapperContainer->addControl($this->id . '-lat', 'hidden')->setValue($this->lat)->setName($this->name . '[lat]');
-            $this->latitudeSelector = $this->id . '-lat';
+            $this->latitudeSelector = '#' . $this->id . '-lat';
         }
         if ($this->longitudeSelector == null) {
             $this->wrapperContainer->addControl($this->id . '-lng', 'hidden')->setValue($this->lng)->setName($this->name . '[lng]');
-            $this->longitudeSelector = $this->id . '-lng';
+            $this->longitudeSelector = '#' . $this->id . '-lng';
         }
 
         $this->wrapperContainer->addDiv($this->id . '-map')
