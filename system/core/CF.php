@@ -674,6 +674,19 @@ final class CF {
      * @return string
      */
     public static function cliAppCode() {
+        if (CF::isTesting()) {
+            foreach ($_SERVER['argv'] as $argv) {
+                if (substr($argv, -strlen('phpunit.xml')) === (string) 'phpunit.xml') {
+                    if (file_exists($argv)) {
+                        $content = file_get_contents($argv);
+                        $regex = '#<server\s?name="APP_CODE"\s?value="(.+?)"\s?/>#i';
+                        if (preg_match($regex, $content, $matches)) {
+                            return trim($matches[1]);
+                        }
+                    }
+                }
+            }
+        }
         if (isset($_SERVER['argv']) && is_array($_SERVER['argv'])) {
             foreach ($_SERVER['argv'] as $argv) {
                 if (is_string($argv)) {
