@@ -66,6 +66,10 @@ class CConsole_Command_TestCommand extends CConsole_Command {
         //}
 
         $options = array_slice($_SERVER['argv'], $this->option('without-tty') ? 3 : 2);
+        $options = c::collect($options)->reject(function ($option) {
+            return cstr::startsWith($option, 'app:');
+        })->toArray();
+
         $commands = array_merge(
             $this->binary(),
             array_merge(

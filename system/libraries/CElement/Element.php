@@ -54,6 +54,9 @@ abstract class CElement_Element extends CElement {
         $additionAttribute = '';
         $haveClass = false;
         foreach ($this->attr as $k => $v) {
+            if (is_array($v)) {
+                $v = implode(',', $v);
+            }
             $additionAttribute .= ' ' . $k . '="' . $v . '"';
             if ($k == 'class') {
                 $haveClass = true;

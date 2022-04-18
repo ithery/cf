@@ -10,6 +10,12 @@ class CEnv_Adapter_PhpAdapter implements CEnv_AdapterInterface {
 
     public function __construct() {
         $file = c::appRoot() . 'env.php';
+        if (CF::isTesting()) {
+            $file = c::appRoot() . 'env.testing.php';
+            if (!CFile::exists($file)) {
+                $file = c::appRoot() . 'env.php';
+            }
+        }
         if (!CFile::exists($file)) {
             throw new Exception($file . ' not exists');
         }

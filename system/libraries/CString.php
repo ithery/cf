@@ -16,4 +16,8 @@ class CString {
     public static function language() {
         return new CString_Language();
     }
+
+    public static function createPatternBuilder() {
+        return new CString_PatternBuilder();
+    }
 }
