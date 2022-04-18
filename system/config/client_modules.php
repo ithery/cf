@@ -730,4 +730,10 @@ return [
             'plugins/ion-rangeslider/ion.rangeSlider.min.css',
         ],
     ],
+    'wow' => [
+        'js' => [
+            'plugins/wow/wow.js',
+        ],
+
+    ],
 ];
