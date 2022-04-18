@@ -173,7 +173,7 @@ final class CQueue {
 
     public static function worker() {
         $isDownForMaintenance = function () {
-            return false;
+            return CF::isDownForMaintenance();
         };
 
         return new CQueue_Worker(static::queuer(), CEvent::dispatcher(), CException::exceptionHandler(), $isDownForMaintenance);
