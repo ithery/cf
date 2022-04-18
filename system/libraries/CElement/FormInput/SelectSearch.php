@@ -379,7 +379,9 @@ class CElement_FormInput_SelectSearch extends CElement_FormInput {
 
         $additionAttribute = '';
         foreach ($this->attr as $k => $v) {
-            $additionAttribute .= ' ' . $k . '="' . $v . '"';
+            if ($k !== 'value') {
+                $additionAttribute .= ' ' . $k . '="' . $v . '"';
+            }
         }
         $selectedRows = $this->getSelectedRow();
 
