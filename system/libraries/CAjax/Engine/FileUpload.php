@@ -5,7 +5,7 @@ class CAjax_Engine_FileUpload extends CAjax_Engine {
         $data = $this->ajaxMethod->getData();
         $inputName = carr::get($data, 'inputName');
         $fileId = '';
-
+        $fileName = '';
         if (isset($_FILES[$inputName], $_FILES[$inputName]['name'])) {
             for ($i = 0; $i < count($_FILES[$inputName]['name']); $i++) {
                 $fileName = $_FILES[$inputName]['name'][$i];

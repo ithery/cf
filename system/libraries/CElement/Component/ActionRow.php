@@ -23,6 +23,8 @@ class CElement_Component_ActionRow extends CElement_Component_Action {
 
     public function withRowCallback($callback) {
         $this->rowCallback = new SerializableClosure($callback);
+
+        return $this;
     }
 
     public function applyRowCallback($row) {

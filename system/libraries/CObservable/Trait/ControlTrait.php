@@ -53,6 +53,20 @@ trait CObservable_Trait_ControlTrait {
      *
      * @param null|string $id
      *
+     * @return CElement_FormInput_Range
+     */
+    public function addRangeControl($id = null) {
+        $control = new CElement_FormInput_Range($id);
+        $this->wrapper->add($control);
+
+        return $control;
+    }
+
+    /**
+     * Create Text Control.
+     *
+     * @param null|string $id
+     *
      * @return CElement_FormInput_Textarea
      */
     public function addTextareaControl($id = null) {
