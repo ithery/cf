@@ -880,7 +880,6 @@ export default class Cresenity {
     }
     blockElement(selector, options) {
         const blockHtml = window?.capp?.block?.html ?? '<div class="sk-wave sk-primary"><div class="sk-rect sk-rect1"></div> <div class="sk-rect sk-rect2"></div> <div class="sk-rect sk-rect3"></div> <div class="sk-rect sk-rect4"></div> <div class="sk-rect sk-rect5"></div></div>';
-        console.log(blockHtml);
         let settings = $.extend({
             innerMessage: blockHtml
         }, options);
