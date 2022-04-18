@@ -417,7 +417,7 @@ class CElement_FormInput_SelectSearch extends CElement_FormInput {
 
                     $valueTemp = is_array($this->value) ? $this->value[$index] : $this->value;
 
-                    $html->appendln('<option value="' . $valueTemp . '" data-content="' . c::e($strSelection) . '" selected="selected" >' . $strSelection . '</option>');
+                    $html->appendln('<option data-multiple="' . ($this->multiple ? '1' : '0') . '" value="' . $valueTemp . '" data-content="' . c::e($strSelection) . '" selected="selected" >' . $strSelection . '</option>');
                 }
             }
         }
@@ -539,7 +539,6 @@ class CElement_FormInput_SelectSearch extends CElement_FormInput {
                 result['" . $variableUniqueKey . "']= $('" . $dependsOnSelector . "').val();
             ";
         }
-
         $str = "
 
             $('#" . $this->id . "').select2({
@@ -596,11 +595,22 @@ class CElement_FormInput_SelectSearch extends CElement_FormInput {
                     return $('<div>" . $strResult . "</div>');
                 },
                 templateSelection: function(item) {
-                    if(item.selected && item.element) {
-                        let dataContent = $(item.element).attr('data-content');
-                        if(dataContent) {
 
-                            return $(dataContent);
+                    if(item.selected && item.element) {
+                        let dataMultiple = $(item.element).attr('data-multiple');
+                        if(dataMultiple == '0') {
+                            let dataContent = $(item.element).attr('data-content');
+
+                            if(dataContent) {
+                                if(/<\/?[a-z][\s\S]*>/i.test(dataContent)) {
+                                    return $(dataContent);
+                                }
+                                return dataContent;
+                            }
+                        } else {
+                            if(item.text){
+                                return item.text;
+                            }
                         }
                     }
                     if(item.cappFormatSelection) {
@@ -610,9 +620,16 @@ class CElement_FormInput_SelectSearch extends CElement_FormInput {
                             return item.cappFormatSelection;
                         }
                     }
-                    if (item.id === '') {
+                    if (item.id === '' && item.text) {
+
                         return item.text;
                     }
+
+                    let htmlResult = '" . $strSelection . "';
+                    if(htmlResult==='undefined') {
+                        return item.text;
+                    }
+
 
                     return $('<div>" . $strSelection . "</div>');
 
