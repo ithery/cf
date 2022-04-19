@@ -90,6 +90,11 @@ return [
                 'label' => c::__('Element'),
                 'uri' => 'docs/app/element',
             ],
+            [
+                'name' => 'app.other',
+                'label' => c::__('Other'),
+                'uri' => 'docs/app/other',
+            ],
         ]
     ],
     [
