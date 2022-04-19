@@ -57,7 +57,7 @@ class CElement_Component_DataTable_Cell {
             $html = $html->toArray();
         }
         if (is_array($html)) {
-            $html = implode(',', $html);
+            $html = json_encode($html);
         }
 
         //do transform
