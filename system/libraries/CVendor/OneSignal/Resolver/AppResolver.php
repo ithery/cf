@@ -19,6 +19,8 @@ class CVendor_OneSignal_Resolver_AppResolver implements CVendor_OneSignal_Resolv
             ->setAllowedTypes('apns_p12_password', 'string')
             ->setDefined('gcm_key')
             ->setAllowedTypes('gcm_key', 'string')
+            ->setDefined('android_gcm_sender_id')
+            ->setAllowedTypes('android_gcm_sender_id', 'string')
             ->setDefined('chrome_key')
             ->setAllowedTypes('chrome_key', 'string')
             ->setDefined('safari_apns_p12')
@@ -49,6 +51,8 @@ class CVendor_OneSignal_Resolver_AppResolver implements CVendor_OneSignal_Resolv
             ->setAllowedTypes('chrome_web_default_notification_icon', 'string')
             ->setDefined('chrome_web_sub_domain')
             ->setAllowedTypes('chrome_web_sub_domain', 'string')
+            ->setDefined('organization_id')
+            ->setAllowedTypes('organization_id', 'string')
             ->resolve($data);
     }
 }
