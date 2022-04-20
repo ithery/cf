@@ -8,6 +8,11 @@ class CDebug_CollectorManager {
      */
     private $exception;
 
+    /**
+     * @var CDebug_Collector_Deprecated
+     */
+    private $deprecated;
+
     public static function instance() {
         if (static::$instance == null) {
             static::$instance = new static();

@@ -88,6 +88,15 @@ class CSession {
     public static function sessionConfigured() {
         return !is_null(carr::get(static::manager()->getSessionConfig(), 'driver'));
     }
+
+    /**
+     * @deprecated 1.3
+     *
+     * @return void
+     */
+    public function destroy() {
+        return $this->store()->invalidate();
+    }
 }
 
 // End Session Class

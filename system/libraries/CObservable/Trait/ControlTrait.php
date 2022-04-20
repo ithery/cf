@@ -147,6 +147,20 @@ trait CObservable_Trait_ControlTrait {
     }
 
     /**
+     * Create Select Control.
+     *
+     * @param null|string $id
+     *
+     * @return CElement_FormInput_Time
+     */
+    public function addTimeControl($id = null) {
+        $control = new CElement_FormInput_Time($id);
+        $this->wrapper->add($control);
+
+        return $control;
+    }
+
+    /**
      * Create Date Range Drop Down Control.
      *
      * @param null|string $id
