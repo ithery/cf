@@ -260,6 +260,7 @@ export default class Cresenity {
                             if (data.js && data.js.length > 0) {
                                 let script = this.base64.decode(data.js);
                                 eval(script);
+                                this.applyDeferXData();
                             }
 
 
@@ -969,21 +970,19 @@ export default class Cresenity {
         }
     }
 
-
+    applyDeferXData() {
+        const comp = document.querySelector("[defer-x-data]")
+        if(comp) {
+            comp.setAttribute('x-data', comp.getAttribute('defer-x-data'))
+            window.Alpine.start();
+        }
+    }
     initAlpineAndUi() {
         Alpine.plugin(AlpineCleave);
         Alpine.plugin(AlpineAutoNumeric);
         window.Alpine = Alpine;
         this.ui.start();
         window.Alpine.start();
-        window.addEventListener('DOMContentLoaded', () => {
-            const comp = document.querySelector("[defer-x-data]")
-            if(comp) {
-                comp.setAttribute('x-data', comp.getAttribute('defer-x-data'))
-                window.Alpine.start();
-            }
-            // document.dispatchEvent(new CustomEvent('turbolinks:load'))
-        });
         this.alpine = new CresAlpine(window.Alpine);
     }
 
@@ -1028,6 +1027,7 @@ export default class Cresenity {
             root.classList.add('cresenity-loaded');
             root.classList.remove('no-js');
             dispatchWindowEvent('cresenity:loaded');
+            this.applyDeferXData();
         });
 
 
