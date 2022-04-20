@@ -37,7 +37,7 @@ class CModel_Relation_BelongsToThrough extends CModel_Relation {
      * @param \CModel_Query $query
      * @param CModel        $parent
      * @param CModel[]      $throughParents
-     * @param string|null   $localKey
+     * @param null|string   $localKey
      * @param string        $prefix
      * @param array         $foreignKeyLookup
      *
@@ -69,7 +69,7 @@ class CModel_Relation_BelongsToThrough extends CModel_Relation {
     /**
      * Set the join clauses on the query.
      *
-     * @param \CModel_Query|null $query
+     * @param null|\CModel_Query $query
      *
      * @return void
      */
@@ -94,7 +94,7 @@ class CModel_Relation_BelongsToThrough extends CModel_Relation {
     /**
      * Get the foreign key for a model.
      *
-     * @param CModel|null $model
+     * @param null|CModel $model
      *
      * @return string
      */
@@ -117,7 +117,7 @@ class CModel_Relation_BelongsToThrough extends CModel_Relation {
      * @return bool
      */
     public function hasSoftDeletes(CModel $model) {
-        return in_array(SoftDeletes::class, c::classUsesRecursive($model));
+        return in_array(CModel_SoftDelete_SoftDeleteTrait::class, c::classUsesRecursive($model));
     }
 
     /**
@@ -205,7 +205,7 @@ class CModel_Relation_BelongsToThrough extends CModel_Relation {
      *
      * @param array $columns
      *
-     * @return CModel|object|static|null
+     * @return null|CModel|object|static
      */
     public function first($columns = ['*']) {
         if ($columns === ['*']) {
