@@ -134,7 +134,9 @@ class LocalFilesystemAdapter implements FilesystemAdapter {
             dirname($prefixedLocation),
             $this->resolveDirectoryVisibility($config->get(Config::OPTION_DIRECTORY_VISIBILITY))
         );
-        error_clear_last();
+        if (\function_exists('error_clear_last')) {
+            error_clear_last();
+        }
 
         if (@file_put_contents($prefixedLocation, $contents, $this->writeFlags) === false) {
             throw UnableToWriteFile::atLocation($path, isset(error_get_last()['message']) ? error_get_last()['message'] : '');
@@ -151,8 +153,9 @@ class LocalFilesystemAdapter implements FilesystemAdapter {
         if (!file_exists($location)) {
             return;
         }
-
-        error_clear_last();
+        if (\function_exists('error_clear_last')) {
+            error_clear_last();
+        }
 
         if (!@unlink($location)) {
             throw UnableToDeleteFile::atLocation($location, isset(error_get_last()['message']) ? error_get_last()['message'] : '');
@@ -276,7 +279,9 @@ class LocalFilesystemAdapter implements FilesystemAdapter {
 
     public function read($path) {
         $location = $this->prefixer->prefixPath($path);
-        error_clear_last();
+        if (\function_exists('error_clear_last')) {
+            error_clear_last();
+        }
         $contents = @file_get_contents($location);
 
         if ($contents === false) {
@@ -288,7 +293,9 @@ class LocalFilesystemAdapter implements FilesystemAdapter {
 
     public function readStream($path) {
         $location = $this->prefixer->prefixPath($path);
-        error_clear_last();
+        if (\function_exists('error_clear_last')) {
+            error_clear_last();
+        }
         $contents = @fopen($location, 'rb');
 
         if ($contents === false) {
@@ -308,8 +315,9 @@ class LocalFilesystemAdapter implements FilesystemAdapter {
         if (is_dir($dirname)) {
             return;
         }
-
-        error_clear_last();
+        if (\function_exists('error_clear_last')) {
+            error_clear_last();
+        }
 
         if (!@mkdir($dirname, $visibility, true)) {
             $mkdirError = error_get_last();
@@ -362,8 +370,9 @@ class LocalFilesystemAdapter implements FilesystemAdapter {
 
             return;
         }
-
-        error_clear_last();
+        if (\function_exists('error_clear_last')) {
+            error_clear_last();
+        }
 
         if (!@mkdir($location, $permissions, true)) {
             throw UnableToCreateDirectory::atLocation($path, isset(error_get_last()['message']) ? error_get_last()['message'] : '');
@@ -393,7 +402,9 @@ class LocalFilesystemAdapter implements FilesystemAdapter {
     public function visibility($path) {
         $location = $this->prefixer->prefixPath($path);
         clearstatcache(false, $location);
-        error_clear_last();
+        if (\function_exists('error_clear_last')) {
+            error_clear_last();
+        }
         $fileperms = @fileperms($location);
 
         if ($fileperms === false) {
@@ -424,7 +435,9 @@ class LocalFilesystemAdapter implements FilesystemAdapter {
      */
     public function mimeType($path) {
         $location = $this->prefixer->prefixPath($path);
-        error_clear_last();
+        if (\function_exists('error_clear_last')) {
+            error_clear_last();
+        }
         $mimeType = $this->mimeTypeDetector->detectMimeTypeFromFile($location);
 
         if ($mimeType === null) {
@@ -441,7 +454,9 @@ class LocalFilesystemAdapter implements FilesystemAdapter {
      */
     public function lastModified($path) {
         $location = $this->prefixer->prefixPath($path);
-        error_clear_last();
+        if (\function_exists('error_clear_last')) {
+            error_clear_last();
+        }
         $lastModified = @filemtime($location);
 
         if ($lastModified === false) {
@@ -458,7 +473,9 @@ class LocalFilesystemAdapter implements FilesystemAdapter {
      */
     public function fileSize($path) {
         $location = $this->prefixer->prefixPath($path);
-        error_clear_last();
+        if (\function_exists('error_clear_last')) {
+            error_clear_last();
+        }
 
         if (is_file($location) && ($fileSize = @filesize($location)) !== false) {
             return new FileAttributes($path, $fileSize);
@@ -491,7 +508,9 @@ class LocalFilesystemAdapter implements FilesystemAdapter {
      * @return void
      */
     private function setPermissions($location, $visibility) {
-        error_clear_last();
+        if (\function_exists('error_clear_last')) {
+            error_clear_last();
+        }
         if (!@chmod($location, $visibility)) {
             $extraMessage = isset(error_get_last()['message']) ? error_get_last()['message'] : '';
 
