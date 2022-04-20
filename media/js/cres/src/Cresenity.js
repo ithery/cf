@@ -978,8 +978,10 @@ export default class Cresenity {
         window.Alpine.start();
         window.addEventListener('DOMContentLoaded', () => {
             const comp = document.querySelector("[defer-x-data]")
-            comp.setAttribute('x-data', comp.getAttribute('defer-x-data'))
-            window.Alpine.start();
+            if(comp) {
+                comp.setAttribute('x-data', comp.getAttribute('defer-x-data'))
+                window.Alpine.start();
+            }
             // document.dispatchEvent(new CustomEvent('turbolinks:load'))
         });
         this.alpine = new CresAlpine(window.Alpine);
