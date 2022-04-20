@@ -974,7 +974,7 @@ export default class Cresenity {
         const comp = document.querySelector("[defer-x-data]")
         if(comp) {
             comp.setAttribute('x-data', comp.getAttribute('defer-x-data'))
-            window.Alpine.start();
+            //window.Alpine.start();
         }
     }
     initAlpineAndUi() {
