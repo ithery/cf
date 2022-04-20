@@ -1,115 +1,158 @@
 <?php
 
-declare(strict_types=1);
-
 namespace League\Flysystem;
 
-interface FilesystemAdapter
-{
+interface FilesystemAdapter {
     /**
+     * @param string $path
+     *
      * @throws FilesystemException
      * @throws UnableToCheckExistence
      */
-    public function fileExists(string $path): bool;
+    public function fileExists($path);
 
     /**
+     * @param string $path
+     *
      * @throws FilesystemException
      * @throws UnableToCheckExistence
      */
-    public function directoryExists(string $path): bool;
+    public function directoryExists($path);
 
     /**
+     * @param string $path
+     * @param string $contents
+     *
      * @throws UnableToWriteFile
      * @throws FilesystemException
      */
-    public function write(string $path, string $contents, Config $config): void;
+    public function write($path, $contents, Config $config);
 
     /**
      * @param resource $contents
+     * @param string   $path
      *
      * @throws UnableToWriteFile
      * @throws FilesystemException
      */
-    public function writeStream(string $path, $contents, Config $config): void;
+    public function writeStream($path, $contents, Config $config);
 
     /**
-     * @throws UnableToReadFile
-     * @throws FilesystemException
-     */
-    public function read(string $path): string;
-
-    /**
-     * @return resource
+     * @param string $path
      *
      * @throws UnableToReadFile
      * @throws FilesystemException
      */
-    public function readStream(string $path);
+    public function read($path);
 
     /**
+     * @param string $path
+     *
+     * @throws UnableToReadFile
+     * @throws FilesystemException
+     *
+     * @return resource
+     */
+    public function readStream($path);
+
+    /**
+     * @param string $path
+     *
      * @throws UnableToDeleteFile
      * @throws FilesystemException
      */
-    public function delete(string $path): void;
+    public function delete($path);
 
     /**
+     * @param string $path
+     *
      * @throws UnableToDeleteDirectory
      * @throws FilesystemException
      */
-    public function deleteDirectory(string $path): void;
+    public function deleteDirectory($path);
 
     /**
+     * @param string $path
+     *
      * @throws UnableToCreateDirectory
      * @throws FilesystemException
      */
-    public function createDirectory(string $path, Config $config): void;
+    public function createDirectory($path, Config $config);
 
     /**
+     * @param string $path
+     * @param string $visibility
+     *
      * @throws InvalidVisibilityProvided
      * @throws FilesystemException
      */
-    public function setVisibility(string $path, string $visibility): void;
+    public function setVisibility($path, $visibility);
 
     /**
+     * @param string $path
+     *
      * @throws UnableToRetrieveMetadata
      * @throws FilesystemException
+     *
+     * @return FileAttributes
      */
-    public function visibility(string $path): FileAttributes;
+    public function visibility($path);
 
     /**
+     * @param string $path
+     *
      * @throws UnableToRetrieveMetadata
      * @throws FilesystemException
+     *
+     * @return FileAttributes
      */
-    public function mimeType(string $path): FileAttributes;
+    public function mimeType($path);
 
     /**
+     * @param string $path
+     *
      * @throws UnableToRetrieveMetadata
      * @throws FilesystemException
+     *
+     * @return FileAttributes
      */
-    public function lastModified(string $path): FileAttributes;
+    public function lastModified($path);
 
     /**
+     * @param string $path
+     *
      * @throws UnableToRetrieveMetadata
      * @throws FilesystemException
+     *
+     * @return FileAttributes
      */
-    public function fileSize(string $path): FileAttributes;
+    public function fileSize($path);
 
     /**
-     * @return iterable<StorageAttributes>
+     * @param string $path
+     * @param bool   $deep
      *
      * @throws FilesystemException
+     *
+     * @return iterable<StorageAttributes>
      */
-    public function listContents(string $path, bool $deep): iterable;
+    public function listContents($path, $deep);
 
     /**
+     * @param string $source
+     * @param string $destination
+     *
      * @throws UnableToMoveFile
      * @throws FilesystemException
      */
-    public function move(string $source, string $destination, Config $config): void;
+    public function move($source, $destination, Config $config);
 
     /**
+     * @param string $source
+     * @param string $destination
+     *
      * @throws UnableToCopyFile
      * @throws FilesystemException
      */
-    public function copy(string $source, string $destination, Config $config): void;
+    public function copy($source, $destination, Config $config);
 }

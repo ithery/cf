@@ -412,7 +412,7 @@ class CStorage_Adapter implements CStorage_CloudInterface {
      * @return string
      */
     public function getVisibility($path) {
-        if ($this->driver->visibility($path) == Visibility::PUBLIC) {
+        if ($this->driver->visibility($path) == Visibility::VISIBILITY_PUBLIC) {
             return CStorage_FilesystemInterface::VISIBILITY_PUBLIC;
         }
 
@@ -686,7 +686,9 @@ class CStorage_Adapter implements CStorage_CloudInterface {
         }
 
         if ($this->temporaryUrlCallback) {
-            return $this->temporaryUrlCallback->bindTo($this, static::class)(
+            $callback = $this->temporaryUrlCallback->bindTo($this, static::class);
+
+            return $callback(
                 $path,
                 $expiration,
                 $options
@@ -734,7 +736,7 @@ class CStorage_Adapter implements CStorage_CloudInterface {
      * @return array
      */
     public function files($directory = null, $recursive = false) {
-        return $this->driver->listContents($directory ?? '', $recursive)
+        return $this->driver->listContents($directory ?: '', $recursive)
             ->filter(function (StorageAttributes $attributes) {
                 return $attributes->isFile();
             })
@@ -764,7 +766,7 @@ class CStorage_Adapter implements CStorage_CloudInterface {
      * @return array
      */
     public function directories($directory = null, $recursive = false) {
-        return $this->driver->listContents($directory ?? '', $recursive)
+        return $this->driver->listContents($directory ?: '', $recursive)
             ->filter(function (StorageAttributes $attributes) {
                 return $attributes->isDir();
             })
@@ -869,9 +871,9 @@ class CStorage_Adapter implements CStorage_CloudInterface {
         }
         switch ($visibility) {
             case CStorage_FilesystemInterface::VISIBILITY_PUBLIC:
-                return Visibility::PUBLIC;
+                return Visibility::VISIBILITY_PUBLIC;
             case CStorage_FilesystemInterface::VISIBILITY_PRIVATE:
-                return Visibility::PRIVATE;
+                return Visibility::VISIBILITY_PRIVATE;
         }
 
         throw new InvalidArgumentException("Unknown visibility: {$visibility}");

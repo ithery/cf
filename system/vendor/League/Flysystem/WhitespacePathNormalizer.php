@@ -1,28 +1,37 @@
 <?php
 
-declare(strict_types=1);
-
 namespace League\Flysystem;
 
-class WhitespacePathNormalizer implements PathNormalizer
-{
-    public function normalizePath(string $path): string
-    {
+class WhitespacePathNormalizer implements PathNormalizer {
+    /**
+     * @param string $path
+     *
+     * @return string
+     */
+    public function normalizePath($path) {
         $path = str_replace('\\', '/', $path);
         $this->rejectFunkyWhiteSpace($path);
 
         return $this->normalizeRelativePath($path);
     }
 
-    private function rejectFunkyWhiteSpace(string $path): void
-    {
+    /**
+     * @param string $path
+     *
+     * @return void
+     */
+    private function rejectFunkyWhiteSpace($path) {
         if (preg_match('#\p{C}+#u', $path)) {
             throw CorruptedPathDetected::forPath($path);
         }
     }
 
-    private function normalizeRelativePath(string $path): string
-    {
+    /**
+     * @param string $path
+     *
+     * @return string
+     */
+    private function normalizeRelativePath($path) {
         $parts = [];
 
         foreach (explode('/', $path) as $part) {
@@ -36,10 +45,12 @@ class WhitespacePathNormalizer implements PathNormalizer
                         throw PathTraversalDetected::forPath($path);
                     }
                     array_pop($parts);
+
                     break;
 
                 default:
                     $parts[] = $part;
+
                     break;
             }
         }

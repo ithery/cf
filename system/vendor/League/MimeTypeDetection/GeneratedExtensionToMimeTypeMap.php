@@ -1,17 +1,14 @@
 <?php
 
-declare(strict_types=1);
-
 namespace League\MimeTypeDetection;
 
-class GeneratedExtensionToMimeTypeMap implements ExtensionToMimeTypeMap
-{
+class GeneratedExtensionToMimeTypeMap implements ExtensionToMimeTypeMap {
     /**
      * @var string[]
      *
      * @internal
      */
-    public const MIME_TYPES_FOR_EXTENSIONS = [
+    public static $MIME_TYPES_FOR_EXTENSIONS = [
         '1km' => 'application/vnd.1000minds.decision-model+xml',
         '3dml' => 'text/vnd.in3d.3dml',
         '3ds' => 'image/x-3ds',
@@ -1213,8 +1210,12 @@ class GeneratedExtensionToMimeTypeMap implements ExtensionToMimeTypeMap
         'zsh' => 'text/x-scriptzsh',
     ];
 
-    public function lookupMimeType(string $extension): ?string
-    {
-        return self::MIME_TYPES_FOR_EXTENSIONS[$extension] ?? null;
+    /**
+     * @param string $extension
+     *
+     * @return null|string
+     */
+    public function lookupMimeType($extension) {
+        return isset(self::$MIME_TYPES_FOR_EXTENSIONS[$extension]) ? self::$MIME_TYPES_FOR_EXTENSIONS[$extension] : null;
     }
 }
