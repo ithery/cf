@@ -213,7 +213,7 @@ export default class Cresenity {
 
         $(selector).each((index, element) => {
             let idTarget = $(element).attr('id');
-            url = this.url.addQueryString(url, 'capp_current_container_id', idTarget);
+            //url = this.url.addQueryString(url, 'capp_current_container_id', idTarget);
 
 
             if (typeof settings.onBlock === 'function') {

@@ -80,16 +80,8 @@ class CObservable_Listener_Handler_DispatchWindowEventHandler extends CObservabl
             $js .= "window.cresenity.dispatchWindowEvent('" . c::e($this->method) . "'";
 
             if (is_array($this->parameters) && count($this->parameters) > 0) {
-                foreach ($this->parameters as $param) {
-                    if (is_array($param)) {
-                        $param = $this->applyArrayParams($param);
-                    }
-                    if (is_string($param)) {
-                        $param = CBase::createStringParamable($param, $this->params)->get();
-                    }
-
-                    $js .= ',' . json_encode($param);
-                }
+                $parameters = $this->applyArrayParams($this->parameters);
+                $js .= ',' . json_encode($parameters);
             }
             $js .= ');';
         }
