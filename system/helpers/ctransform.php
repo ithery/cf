@@ -11,11 +11,11 @@ class ctransform {
         if (strlen($rp) == 0) {
             return $rp;
         }
-        $ds = ccfg::get('decimal_separator');
+        $ds = c::formatter()->getDecimalSeparator();
         if ($ds == null) {
             $ds = '.'; //decimal separator
         }
-        $ts = ccfg::get('thousand_separator');
+        $ts = c::formatter()->getThousandSeparator();
         if ($ts == null) {
             $ts = ','; //thousand separator
         }
@@ -86,6 +86,7 @@ class ctransform {
         if (strlen($x) > 10) {
             $x = substr($x, 0, 10);
         }
+
         return $x;
     }
 
@@ -117,6 +118,7 @@ class ctransform {
         if (strlen($date_format) == 0) {
             return $x;
         }
+
         return date($date_format, strtotime($x));
     }
 
@@ -179,6 +181,7 @@ class ctransform {
         $ret = $x;
         $ret = str_replace($ts, '', $ret);
         $ret = str_replace($ds, '.', $ret);
+
         return $ret;
     }
 }
