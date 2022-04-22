@@ -4,6 +4,15 @@ defined('SYSPATH') or die('No direct access allowed.');
 
 //@codingStandardsIgnoreStart
 class ctransform {
+    /**
+     * @param mixed $rp
+     * @param mixed $decimal
+     * @param bool  $always_decimal
+     *
+     * @deprecated since 1.3, use c::app()->formatter()
+     *
+     * @return string
+     */
     public static function thousand_separator($rp, $decimal = null, $always_decimal = false) {
         $minus_str = '';
         $rp = floatval($rp);
