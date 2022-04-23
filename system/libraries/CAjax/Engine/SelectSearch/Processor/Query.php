@@ -115,10 +115,6 @@ class CAjax_Engine_SelectSearch_Processor_Query extends CAjax_Engine_SelectSearc
 
         $qfilter .= ' ' . $tempOrderBy . ' ' . $sLimit;
 
-        if (isset($_GET['debug2'])) {
-            cdbg::varDump($qfilter);
-            die;
-        }
         $r = $db->query($qfilter);
 
         $result = $r->result(false);
