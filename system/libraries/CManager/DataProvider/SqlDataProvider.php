@@ -104,6 +104,10 @@ class CManager_DataProvider_SqlDataProvider extends CManager_DataProviderAbstrac
         $limit = $perPage;
         $sLimit = 'LIMIT ' . intval($offset) . ', ' . intval($limit);
 
+        if (isset($_GET['debug'])) {
+            cdbg::dd($sLimit);
+        }
+
         return $sLimit;
     }
 
