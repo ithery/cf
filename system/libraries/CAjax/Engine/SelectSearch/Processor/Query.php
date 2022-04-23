@@ -110,6 +110,11 @@ class CAjax_Engine_SelectSearch_Processor_Query extends CAjax_Engine_SelectSearc
         }
 
         $qfilter = 'select * from (' . $base_q . ') as a ' . $sWhere . ' ' . $sOrder;
+
+        if (isset($_GET['debug2'])) {
+            cdbg::dd($qfilter);
+        }
+
         $total = cdbutils::get_row_count_from_base_query($qfilter);
 
         $qfilter .= ' ' . $tempOrderBy . ' ' . $sLimit;
