@@ -16,15 +16,6 @@ final class CF {
     // Security check that is added to all generated PHP files
     const FILE_SECURITY = '<?php defined(\'SYSPATH\') OR die(\'No direct script access.\');';
 
-    // The singleton instance of the controller (last of the controller)
-
-    /**
-     * @var null
-     *
-     * @deprecated since 1.2, use CF::controller()
-     */
-    public static $instance;
-
     /**
      * Chartset used for this application.
      *

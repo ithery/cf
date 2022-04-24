@@ -14,6 +14,8 @@ abstract class CController {
 
     /**
      * @var CController_Input
+     *
+     * @deprecated 1.3
      */
     protected $input;
 
@@ -30,10 +32,6 @@ abstract class CController {
      * @return void
      */
     public function __construct() {
-        if (CF::$instance == null) {
-            // Set the instance to the first controller loaded
-            CF::$instance = $this;
-        }
 
         // Input should always be available
         $this->input = CController_Input::instance();
