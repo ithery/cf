@@ -11,6 +11,7 @@ defined('SYSPATH') or die('No direct access allowed.');
 class CElement_FormInput_Time extends CElement_FormInput {
     use CTrait_Compat_Element_FormInput_Time,
         CTrait_Element_Property_Placeholder;
+
     protected $show_second;
 
     protected $template;
@@ -62,7 +63,7 @@ class CElement_FormInput_Time extends CElement_FormInput {
         }
 
         $html->appendln('<div class="bootstrap-timepicker">');
-        $html->appendln('<input type="text" name="' . $this->name . '" id="' . $this->id . '" class="input-unstyled ' . $classes . $this->validation->validation_class() . '" value="' . $this->value . '"' . $disabled . $custom_css . $addition_attribute . $placeholder . '>')->br();
+        $html->appendln('<input type="text" name="' . $this->name . '" id="' . $this->id . '" class="input-unstyled ' . $classes . $this->validation->validationClass() . '" value="' . $this->value . '"' . $disabled . $custom_css . $addition_attribute . $placeholder . '>')->br();
         $html->appendln('</div>');
 
         return $html->text();
