@@ -8,13 +8,6 @@ defined('SYSPATH') or die('No direct access allowed.');
  */
 abstract class CController {
     /**
-     * @var string
-     *
-     * @deprecated 1.3
-     */
-    protected $baseUri;
-
-    /**
      * @var CController_Input
      *
      * @deprecated 1.3
@@ -37,8 +30,6 @@ abstract class CController {
 
         // Input should always be available
         $this->input = CController_Input::instance();
-
-        $this->baseUri = CFRouter::controllerUri();
     }
 
     /**
