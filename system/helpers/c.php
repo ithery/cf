@@ -284,13 +284,11 @@ class c {
      * @return void
      */
     public static function report($exception) {
-        //@codingStandardsIgnoreStart
         if ($exception instanceof Throwable
             && !$exception instanceof Exception
         ) {
             $exception = new FatalThrowableError($exception);
         }
-        //@codingStandardsIgnoreEnd
 
         $exceptionHandler = CException::exceptionHandler();
         $exceptionHandler->report($exception);
