@@ -697,6 +697,19 @@ final class CF {
 
     public static function domain() {
         $domain = '';
+        if (CF::isTesting()) {
+            foreach ($_SERVER['argv'] as $argv) {
+                if (substr($argv, -strlen('phpunit.xml')) === (string) 'phpunit.xml') {
+                    if (file_exists($argv)) {
+                        $content = file_get_contents($argv);
+                        $regex = '#<server\s?name="APP_CODE"\s?value="(.+?)"\s?/>#i';
+                        if (preg_match($regex, $content, $matches)) {
+                            return trim($matches[1]) . '.test';
+                        }
+                    }
+                }
+            }
+        }
         if (static::isCli() || static::isCFCli()) {
             // Command line requires a bit of hacking
             if (static::isCFCli() || static::isTesting()) {
