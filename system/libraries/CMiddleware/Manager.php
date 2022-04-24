@@ -238,14 +238,15 @@ class CMiddleware_Manager {
      * @return void
      */
     protected function syncMiddlewareToRouter() {
-        $this->router->middlewarePriority = $this->middlewarePriority;
+        $router = c::router();
+        $router->middlewarePriority = $this->middlewarePriority;
 
         foreach ($this->middlewareGroups as $key => $middleware) {
-            $this->router->middlewareGroup($key, $middleware);
+            $router->middlewareGroup($key, $middleware);
         }
 
         foreach ($this->routeMiddleware as $key => $middleware) {
-            $this->router->aliasMiddleware($key, $middleware);
+            $router->aliasMiddleware($key, $middleware);
         }
     }
 
