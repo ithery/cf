@@ -125,4 +125,16 @@ class CController_Input {
     public function ip_address() {
         return CHTTP::request()->ip();
     }
+
+    public function originalGetData() {
+        return CBase::originalGetData();
+    }
+
+    public function originalPostData() {
+        return CBase::originalPostData();
+    }
+
+    public function originalFilesData() {
+        return CBase::originalFilesData();
+    }
 }
