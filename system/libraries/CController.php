@@ -7,9 +7,11 @@ defined('SYSPATH') or die('No direct access allowed.');
  * properly, so this class is defined as abstract.
  */
 abstract class CController {
-    // Allow all controllers to run in production by default
-    const ALLOW_PRODUCTION = true;
-
+    /**
+     * @var string
+     *
+     * @deprecated 1.3
+     */
     protected $baseUri;
 
     /**
