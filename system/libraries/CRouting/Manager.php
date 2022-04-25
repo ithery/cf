@@ -24,7 +24,7 @@ class CRouting_Manager {
         $this->uriRoutings[$uri] = $routedUri;
     }
 
-    public function getUriRouting() {
+    public function getUriRoutings() {
         return $this->uriRoutings;
     }
 

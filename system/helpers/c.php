@@ -284,13 +284,11 @@ class c {
      * @return void
      */
     public static function report($exception) {
-        //@codingStandardsIgnoreStart
         if ($exception instanceof Throwable
             && !$exception instanceof Exception
         ) {
             $exception = new FatalThrowableError($exception);
         }
-        //@codingStandardsIgnoreEnd
 
         $exceptionHandler = CException::exceptionHandler();
         $exceptionHandler->report($exception);
@@ -328,6 +326,22 @@ class c {
         }
 
         return CEvent::dispatch(...$args);
+    }
+
+    /**
+     * Log a debug message to the logs.
+     *
+     * @param null|string $message
+     * @param array       $context
+     *
+     * @return null|\CLogger
+     */
+    public static function logger($message = null, array $context = []) {
+        if (is_null($message)) {
+            return CLogger::instance();
+        }
+
+        return CLogger::instance()->add(CLogger::DEBUG, $message, $context);
     }
 
     //@codingStandardsIgnoreEnd
@@ -1139,6 +1153,14 @@ class c {
         return $job instanceof Closure
             ? new CQueue_PendingClosureDispatch(CQueue_CallQueuedClosure::create($job))
             : new CQueue_PendingDispatch($job);
+    }
+
+    public static function dispatchSync($job, $handler = null) {
+        return CQueue::dispatcher()->dispatchSync($job, $handler);
+    }
+
+    public static function dispatchNow($job, $handler = null) {
+        return CQueue::dispatcher()->dispatchNow($job, $handler);
     }
 
     /**

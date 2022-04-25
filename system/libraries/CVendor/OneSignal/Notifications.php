@@ -1,6 +1,6 @@
 <?php
 
-class CVendor_OneSignal_Resolver_Notifications extends CVendor_OneSignal_AbstractApi {
+class CVendor_OneSignal_Notifications extends CVendor_OneSignal_AbstractApi {
     const NOTIFICATIONS_LIMIT = 50;
 
     private $resolverFactory;

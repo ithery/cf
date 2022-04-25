@@ -7,13 +7,10 @@ defined('SYSPATH') or die('No direct access allowed.');
  * properly, so this class is defined as abstract.
  */
 abstract class CController {
-    // Allow all controllers to run in production by default
-    const ALLOW_PRODUCTION = true;
-
-    protected $baseUri;
-
     /**
      * @var CController_Input
+     *
+     * @deprecated 1.4
      */
     protected $input;
 
@@ -30,15 +27,9 @@ abstract class CController {
      * @return void
      */
     public function __construct() {
-        if (CF::$instance == null) {
-            // Set the instance to the first controller loaded
-            CF::$instance = $this;
-        }
 
         // Input should always be available
         $this->input = CController_Input::instance();
-
-        $this->baseUri = CFRouter::controllerUri();
     }
 
     /**
