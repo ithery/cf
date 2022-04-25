@@ -1,10 +1,5 @@
 <?php
 
-use GuzzleHttp\Client as GuzzleClient;
-use Http\Adapter\Guzzle6\Client as GuzzleAdapter;
-use Http\Message\MessageFactory\GuzzleMessageFactory;
-use Http\Client\Common\HttpMethodsClient as HttpClient;
-
 class CVendor {
     /**
      * @param string $accessToken
@@ -39,12 +34,7 @@ class CVendor {
             $config->setUserAuthKey($userKey);
         }
 
-        $guzzle = new GuzzleClient([// http://docs.guzzlephp.org/en/stable/quickstart.html
-            // ..config
-        ]);
-
-        $client = new HttpClient(new GuzzleAdapter($guzzle), new GuzzleMessageFactory());
-        $api = new CVendor_OneSignal($config, $client);
+        $api = new CVendor_OneSignal($config);
 
         return $api;
     }

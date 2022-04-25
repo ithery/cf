@@ -677,7 +677,7 @@ class CSession_Store implements CSession_Contract_SessionInterface {
      * @return void
      */
     public function setRequestOnHandler($request) {
-        if ($this->handlerNeedsRequest()) {
+        if ($this->handler instanceof CSession_Handler_CookieSessionHandler) {
             $this->handler->setRequest($request);
         }
     }

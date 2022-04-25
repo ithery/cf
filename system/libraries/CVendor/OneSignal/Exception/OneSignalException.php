@@ -1,4 +1,4 @@
 <?php
 
-class CVendor_OneSignal_OneSignalException extends \RuntimeException {
+class CVendor_OneSignal_Exception_OneSignalException extends \RuntimeException {
 }
