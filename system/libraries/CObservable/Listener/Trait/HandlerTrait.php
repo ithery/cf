@@ -40,6 +40,16 @@ trait CObservable_Listener_Trait_HandlerTrait {
     }
 
     /**
+     * @return \CObservable_Listener_Handler_DispatchWindowEventHandler
+     */
+    public function addDispatchWindowEventHandler() {
+        $handler = new CObservable_Listener_Handler_DispatchWindowEventHandler($this);
+        $this->handlers[] = $handler;
+
+        return $handler;
+    }
+
+    /**
      * @return \CObservable_Listener_Handler_AppendHandler
      */
     public function addAppendHandler() {

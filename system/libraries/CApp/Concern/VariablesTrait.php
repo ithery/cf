@@ -45,6 +45,8 @@ trait CApp_Concern_VariablesTrait {
         $variables['vscode']['liveReload'] = CF::config('cresjs.vscode.live_reload');
         $variables['react'] = [];
         $variables['react']['enable'] = CF::config('cresjs.react.enable');
+        $variables['block'] = [];
+        $variables['block']['html'] = CF::config('cresjs.block.html');
         $bootstrap = ccfg::get('bootstrap');
         $themeData = CManager::instance()->getThemeData();
         if (isset($themeData) && strlen(carr::get($themeData, 'bootstrap')) > 0) {

@@ -124,28 +124,118 @@ class CManager_DataProvider_ModelDataProvider extends CManager_DataProviderAbstr
         //process ordering
         if (count($this->sort) > 0) {
             $query->getQuery()->orders = null;
-
+            $sortIndex = 0;
             foreach ($this->sort as $fieldName => $sortDirection) {
                 if (strpos($fieldName, '.') !== false) {
                     $fields = explode('.', $fieldName);
 
                     $field = array_pop($fields);
-                    $relation = implode('.', $fields);
+                    $relationPath = implode('.', $fields);
 
-                    $query->with([$relation => function ($q2) use ($sortDirection, $field) {
-                        if (!$this->isRelationField($q2, $field)) {
-                            $q2->orderBy($field, $sortDirection);
-                        }
-                    }]);
+                    $alias = $this->withSelectRelationColumn($query, $relationPath, $field, $sortIndex);
+                    $query->orderBy($alias, $sortDirection);
                 } else {
                     if (!$this->isRelationField($query, $fieldName)) {
                         $query->orderBy($fieldName, $sortDirection);
                     }
                 }
+                $sortIndex++;
             }
         }
 
         return $query;
+    }
+
+    protected function withSelectRelationColumn($query, $relationPath, $column, $index) {
+        $alias = 'mdp_sort_' . $index;
+
+        $relations = explode('.', $relationPath);
+        $firstRelation = array_shift($relations);
+        $relation = $query->getModel()->$firstRelation();
+
+        $selectQuery = $this->createSelectJoinQuery($query, $relation, $relations, $column);
+
+        if ($index == 0) {
+            $query->addSelect($query->getModel()->getTable() . '.*');
+        }
+
+        $query->selectSub($selectQuery, $alias);
+
+        return $alias;
+    }
+
+    /**
+     * @param $length
+     *
+     * @return string
+     */
+    public static function randomStringAlpha($length) {
+        $pool = array_merge(range('a', 'z'), range('A', 'Z'));
+        $key = '';
+        for ($i = 0; $i < $length; $i++) {
+            $key .= $pool[mt_rand(0, count($pool) - 1)];
+        }
+
+        return $key;
+    }
+
+    protected function createSelectJoinQuery($query, $relation, array $joinRelations, $column) {
+        $tableAlias = 'mdp_join_main';
+
+        $relatedModel = $relation->getRelated();
+        $relatedTable = $relatedModel->getTable();
+        $tableAndAlias = $relatedTable . ' AS ' . $tableAlias;
+        $newQuery = c::db()->createQueryBuilder()
+            ->from($tableAndAlias);
+
+        $currentModel = $relatedModel;
+        $joinIndex = 0;
+        $beforeAlias = $tableAlias;
+        $columnAlias = $tableAlias;
+        foreach ($joinRelations as $joinRelation) {
+            $joinAlias = 'mdp_join_' . $joinIndex;
+            $currentRelation = $currentModel->$joinRelation();
+            $joinModel = $currentRelation->getRelated();
+            $joinTable = $joinModel->getTable();
+
+            if ($currentRelation instanceof CModel_Relation_BelongsTo) {
+                $newQuery->leftJoin($joinTable . ' AS ' . $joinAlias, $joinAlias . '.' . $joinModel->getKeyName(), '=', $beforeAlias . '.' . $currentRelation->getForeignKeyName());
+            } else {
+                throw new Exception('Far Relation currently support BelongsTo only');
+            }
+
+            $currentModel = $joinModel;
+            $joinIndex++;
+            $columnAlias = $joinAlias;
+        }
+
+        if ($relation instanceof CModel_Relation_BelongsTo) {
+            $newQuery->whereColumn(
+                $relation->getQualifiedForeignKeyName(),
+                '=',
+                $tableAlias . '.' . $relation->getOwnerKeyName()
+            );
+        }
+        if ($relation instanceof CModel_Relation_HasOneOrMany) {
+            $newQuery->whereColumn(
+                $relation->getQualifiedParentKeyName(),
+                '=',
+                $tableAlias . '.' . $relation->getForeignKeyName()
+            )->limit(1);
+        }
+        if ($relation instanceof CModel_Relation_MorphOneOrMany) {
+            $newQuery->where(
+                $tableAlias . '.' . $relation->getMorphType(),
+                $relation->getMorphClass()
+            );
+        }
+        $newQuery->select($columnAlias . '.' . $column);
+
+        if ($this->hasSoftDeletes($relatedModel)) {
+            $newQuery->where($tableAlias . '.' . $relatedModel->getStatusColumn(), '>', 0);
+        }
+
+        return $newQuery;
     }
 
     protected function isRelationField($query, $fieldName) {
@@ -169,8 +259,19 @@ class CManager_DataProvider_ModelDataProvider extends CManager_DataProviderAbstr
     public function paginate($perPage = null, $columns = ['*'], $pageName = 'page', $page = null, $callback = null) {
         //do nothing
         $query = $this->getModelQuery($callback);
-
+        //c::db()->enableBenchmark();
         return $query->paginate($perPage, $columns, $pageName, $page);
+    }
+
+    /**
+     * Determine whether a model uses SoftDeletes.
+     *
+     * @param CModel $model
+     *
+     * @return bool
+     */
+    public function hasSoftDeletes(CModel $model) {
+        return in_array(CModel_SoftDelete_SoftDeleteTrait::class, c::classUsesRecursive($model));
     }
 
     public function queryCallback($callback) {

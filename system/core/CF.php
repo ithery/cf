@@ -674,6 +674,28 @@ final class CF {
      * @return string
      */
     public static function cliAppCode() {
+        if (CF::isTesting()) {
+            foreach ($_SERVER['argv'] as $argv) {
+                if (substr($argv, -strlen('phpunit.xml')) === (string) 'phpunit.xml') {
+                    if (file_exists($argv)) {
+                        $content = file_get_contents($argv);
+                        $regex = '#<server\s?name="APP_CODE"\s?value="(.+?)"\s?/>#i';
+                        if (preg_match($regex, $content, $matches)) {
+                            return trim($matches[1]);
+                        }
+                    }
+                }
+            }
+        }
+        if (isset($_SERVER['argv']) && is_array($_SERVER['argv'])) {
+            foreach ($_SERVER['argv'] as $argv) {
+                if (is_string($argv)) {
+                    if (strncmp($argv, 'app:', strlen('app:')) === 0) {
+                        return substr($argv, 4);
+                    }
+                }
+            }
+        }
         $domain = null;
         if (file_exists(static::CFCLI_CURRENT_APPCODE_FILE)) {
             $domain = trim(file_get_contents(static::CFCLI_CURRENT_APPCODE_FILE));
@@ -687,6 +709,15 @@ final class CF {
         if (static::isCli() || static::isCFCli()) {
             // Command line requires a bit of hacking
             if (static::isCFCli() || static::isTesting()) {
+                if (isset($_SERVER['argv']) && is_array($_SERVER['argv'])) {
+                    foreach ($_SERVER['argv'] as $argv) {
+                        if (is_string($argv)) {
+                            if (strncmp($argv, 'app:', strlen('app:')) === 0) {
+                                return substr($argv, 4) . '.local';
+                            }
+                        }
+                    }
+                }
                 $domain = static::cliDomain();
             } else {
                 if (isset($_SERVER['argv'][2])) {

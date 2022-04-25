@@ -213,7 +213,7 @@ export default class Cresenity {
 
         $(selector).each((index, element) => {
             let idTarget = $(element).attr('id');
-            url = this.url.addQueryString(url, 'capp_current_container_id', idTarget);
+            //url = this.url.addQueryString(url, 'capp_current_container_id', idTarget);
 
 
             if (typeof settings.onBlock === 'function') {
@@ -260,6 +260,7 @@ export default class Cresenity {
                             if (data.js && data.js.length > 0) {
                                 let script = this.base64.decode(data.js);
                                 eval(script);
+                                this.applyDeferXData();
                             }
 
 
@@ -879,8 +880,9 @@ export default class Cresenity {
         $.unblockUI();
     }
     blockElement(selector, options) {
+        const blockHtml = window?.capp?.block?.html ?? '<div class="sk-wave sk-primary"><div class="sk-rect sk-rect1"></div> <div class="sk-rect sk-rect2"></div> <div class="sk-rect sk-rect3"></div> <div class="sk-rect sk-rect4"></div> <div class="sk-rect sk-rect5"></div></div>';
         let settings = $.extend({
-            innerMessage: '<div class="sk-wave sk-primary"><div class="sk-rect sk-rect1"></div> <div class="sk-rect sk-rect2"></div> <div class="sk-rect sk-rect3"></div> <div class="sk-rect sk-rect4"></div> <div class="sk-rect sk-rect5"></div></div>'
+            innerMessage: blockHtml
         }, options);
 
         $(selector).block({
@@ -968,7 +970,13 @@ export default class Cresenity {
         }
     }
 
-
+    applyDeferXData() {
+        const comp = document.querySelector("[defer-x-data]")
+        if(comp) {
+            comp.setAttribute('x-data', comp.getAttribute('defer-x-data'))
+            //window.Alpine.start();
+        }
+    }
     initAlpineAndUi() {
         Alpine.plugin(AlpineCleave);
         Alpine.plugin(AlpineAutoNumeric);
@@ -1019,6 +1027,7 @@ export default class Cresenity {
             root.classList.add('cresenity-loaded');
             root.classList.remove('no-js');
             dispatchWindowEvent('cresenity:loaded');
+            this.applyDeferXData();
         });
 
 
@@ -1278,5 +1287,21 @@ export default class Cresenity {
             return (c === 'x' ? r : (r & 0x3 | 0x8)).toString(16);
         });
 
+    }
+    getScrollParent(element, includeHidden = false) {
+        var style = getComputedStyle(element);
+        var excludeStaticParent = style.position === "absolute";
+        var overflowRegex = includeHidden ? /(auto|scroll|hidden)/ : /(auto|scroll)/;
+
+        if (style.position === "fixed") return document.body;
+        for (var parent = element; (parent = parent.parentElement);) {
+            style = getComputedStyle(parent);
+            if (excludeStaticParent && style.position === "static") {
+                continue;
+            }
+            if (overflowRegex.test(style.overflow + style.overflowY + style.overflowX)) return parent;
+        }
+
+        return document.body;
     }
 }

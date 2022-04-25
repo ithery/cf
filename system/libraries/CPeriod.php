@@ -45,6 +45,20 @@ class CPeriod {
         return new static($startDate, $endDate);
     }
 
+    public static function today() {
+        $endDate = CCarbon::today()->endOfDay();
+        $startDate = CCarbon::today()->startOfDay();
+
+        return new static($startDate, $endDate);
+    }
+
+    public static function yesterday() {
+        $endDate = CCarbon::today()->subDays(1)->endOfDay();
+        $startDate = CCarbon::today()->subDays(1)->startOfDay();
+
+        return new static($startDate, $endDate);
+    }
+
     public static function months($numberOfMonths) {
         $endDate = CCarbon::today();
         $startDate = CCarbon::today()->subMonths($numberOfMonths)->startOfDay();

@@ -1,14 +1,13 @@
 <?php
 
-class CVendor_OneSignal_Resolver_Notifications {
+class CVendor_OneSignal_Notifications extends CVendor_OneSignal_AbstractApi {
     const NOTIFICATIONS_LIMIT = 50;
-
-    protected $api;
 
     private $resolverFactory;
 
-    public function __construct(CVendor_OneSignal $api, CVendor_OneSignal_Resolver_ResolverFactory $resolverFactory) {
-        $this->api = $api;
+    public function __construct(CVendor_OneSignal $client, CVendor_OneSignal_Resolver_ResolverFactory $resolverFactory) {
+        parent::__construct($client);
+
         $this->resolverFactory = $resolverFactory;
     }
 
@@ -22,11 +21,10 @@ class CVendor_OneSignal_Resolver_Notifications {
      * @return array
      */
     public function getOne($id) {
-        $url = '/notifications/' . $id . '?app_id=' . $this->api->getConfig()->getApplicationId();
+        $request = $this->createRequest('GET', "/notifications/${id}?app_id={$this->client->getConfig()->getApplicationId()}");
+        $request = $request->withHeader('Authorization', "Basic {$this->client->getConfig()->getApplicationAuthKey()}");
 
-        return $this->api->request('GET', $url, [
-            'Authorization' => 'Basic ' . $this->api->getConfig()->getApplicationAuthKey(),
-        ]);
+        return $this->client->sendRequest($request);
     }
 
     /**
@@ -40,15 +38,24 @@ class CVendor_OneSignal_Resolver_Notifications {
      * @return array
      */
     public function getAll($limit = self::NOTIFICATIONS_LIMIT, $offset = 0) {
-        $query = [
-            'limit' => max(1, min(self::NOTIFICATIONS_LIMIT, filter_var($limit, FILTER_VALIDATE_INT))),
-            'offset' => max(0, filter_var($offset, FILTER_VALIDATE_INT)),
-            'app_id' => $this->api->getConfig()->getApplicationId(),
-        ];
+        $query = ['app_id' => $this->client->getConfig()->getApplicationId()];
 
-        return $this->api->request('GET', '/notifications?' . http_build_query($query), [
-            'Authorization' => 'Basic ' . $this->api->getConfig()->getApplicationAuthKey(),
-        ]);
+        if ($limit !== null) {
+            $query['limit'] = $limit;
+        }
+
+        if ($offset !== null) {
+            $query['offset'] = $offset;
+        }
+
+        if (func_num_args() > 2 && is_int(func_get_arg(2))) {
+            $query['kind'] = func_get_arg(2);
+        }
+
+        $request = $this->createRequest('GET', '/notifications?' . http_build_query($query));
+        $request = $request->withHeader('Authorization', "Basic {$this->client->getConfig()->getApplicationAuthKey()}");
+
+        return $this->client->sendRequest($request);
     }
 
     /**
@@ -61,11 +68,14 @@ class CVendor_OneSignal_Resolver_Notifications {
      * @return array
      */
     public function add(array $data) {
-        $data = $this->resolverFactory->createNotificationResolver()->resolve($data);
+        $resolvedData = $this->resolverFactory->createNotificationResolver()->resolve($data);
 
-        return $this->api->request('POST', '/notifications', [
-            'Authorization' => 'Basic ' . $this->api->getConfig()->getApplicationAuthKey(),
-        ], json_encode($data));
+        $request = $this->createRequest('POST', '/notifications');
+        $request = $request->withHeader('Authorization', "Basic {$this->client->getConfig()->getApplicationAuthKey()}");
+        $request = $request->withHeader('Content-Type', 'application/json');
+        $request = $request->withBody($this->createStream($resolvedData));
+
+        return $this->client->sendRequest($request);
     }
 
     /**
@@ -78,12 +88,15 @@ class CVendor_OneSignal_Resolver_Notifications {
      * @return array
      */
     public function open($id) {
-        return $this->api->request('PUT', '/notifications/' . $id, [
-            'Authorization' => 'Basic ' . $this->api->getConfig()->getApplicationAuthKey(),
-        ], json_encode([
-            'app_id' => $this->api->getConfig()->getApplicationId(),
+        $request = $this->createRequest('PUT', "/notifications/${id}");
+        $request = $request->withHeader('Authorization', "Basic {$this->client->getConfig()->getApplicationAuthKey()}");
+        $request = $request->withHeader('Content-Type', 'application/json');
+        $request = $request->withBody($this->createStream([
+            'app_id' => $this->client->getConfig()->getApplicationId(),
             'opened' => true,
         ]));
+
+        return $this->client->sendRequest($request);
     }
 
     /**
@@ -96,10 +109,30 @@ class CVendor_OneSignal_Resolver_Notifications {
      * @return array
      */
     public function cancel($id) {
-        $url = '/notifications/' . $id . '?app_id=' . $this->api->getConfig()->getApplicationId();
+        $request = $this->createRequest('DELETE', "/notifications/${id}?app_id={$this->client->getConfig()->getApplicationId()}");
+        $request = $request->withHeader('Authorization', "Basic {$this->client->getConfig()->getApplicationAuthKey()}");
 
-        return $this->api->request('DELETE', $url, [
-            'Authorization' => 'Basic ' . $this->api->getConfig()->getApplicationAuthKey(),
-        ]);
+        return $this->client->sendRequest($request);
+    }
+
+    /**
+     * View the devices sent a notification.
+     *
+     * Application authentication key and ID must be set.
+     *
+     * @param string $id Notification ID
+     *
+     * @return array
+     */
+    public function history($id, array $data) {
+        $resolvedData = $this->resolverFactory->createNotificationHistoryResolver()->resolve($data);
+
+        $request = $this->createRequest('POST', "/notifications/${id}/history");
+        $request = $request->withHeader('Authorization', "Basic {$this->client->getConfig()->getApplicationAuthKey()}");
+        $request = $request->withHeader('Cache-Control', 'no-cache');
+        $request = $request->withHeader('Content-Type', 'application/json');
+        $request = $request->withBody($this->createStream($resolvedData));
+
+        return $this->client->sendRequest($request);
     }
 }

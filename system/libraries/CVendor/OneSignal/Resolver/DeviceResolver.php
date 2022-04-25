@@ -28,6 +28,8 @@ class CVendor_OneSignal_Resolver_DeviceResolver implements CVendor_OneSignal_Res
         $resolver = (new OptionsResolver())
             ->setDefined('identifier')
             ->setAllowedTypes('identifier', 'string')
+            ->setDefined('identifier_auth_hash')
+            ->setAllowedTypes('identifier_auth_hash', 'string')
             ->setDefined('language')
             ->setAllowedTypes('language', 'string')
             ->setDefined('timezone')
@@ -68,6 +70,10 @@ class CVendor_OneSignal_Resolver_DeviceResolver implements CVendor_OneSignal_Res
             ->setAllowedTypes('lat', 'double')
             ->setDefined('country')
             ->setAllowedTypes('country', 'string')
+            ->setDefined('external_user_id')
+            ->setAllowedTypes('external_user_id', 'string')
+            ->setDefined('external_user_id_auth_hash')
+            ->setAllowedTypes('external_user_id_auth_hash', 'string')
             ->setDefault('app_id', $this->config->getApplicationId())
             ->setAllowedTypes('app_id', 'string');
 
@@ -89,17 +95,19 @@ class CVendor_OneSignal_Resolver_DeviceResolver implements CVendor_OneSignal_Res
                     CVendor_OneSignal_Devices::MACOS,
                     CVendor_OneSignal_Devices::ALEXA,
                     CVendor_OneSignal_Devices::EMAIL,
+                    CVendor_OneSignal_Devices::HUAWEI,
+                    CVendor_OneSignal_Devices::SMS,
                 ]);
+        } else {
+            $resolver
+                ->setDefined('ip')
+                ->setAllowedTypes('ip', 'string')
+                ->setAllowedValues('ip', static function ($ip) {
+                    return (bool) filter_var($ip, FILTER_VALIDATE_IP);
+                });
         }
 
         return $resolver->resolve($data);
-    }
-
-    /**
-     * @return bool
-     */
-    public function getIsNewDevice() {
-        return $this->isNewDevice;
     }
 
     /**
@@ -107,5 +115,12 @@ class CVendor_OneSignal_Resolver_DeviceResolver implements CVendor_OneSignal_Res
      */
     public function setIsNewDevice($isNewDevice) {
         $this->isNewDevice = $isNewDevice;
+    }
+
+    /**
+     * @return bool
+     */
+    public function getIsNewDevice() {
+        return $this->isNewDevice;
     }
 }

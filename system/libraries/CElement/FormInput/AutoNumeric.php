@@ -47,6 +47,10 @@ class CElement_FormInput_AutoNumeric extends CElement_FormInput {
         $this->setAttr('data-m-dec', $this->decimalDigit);
         $this->setAttr('data-a-sep', $this->thousandSeparator);
         $this->setAttr('data-a-dec', $this->decimalSeparator);
+        if ($this->placeholder) {
+            $this->setAttr('placeholder', $this->placeholder);
+        }
+
         if ($this->maxValue !== null) {
             $this->setAttr('data-v-max', $this->maxValue);
         }

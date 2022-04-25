@@ -56,7 +56,7 @@ export default function (Alpine) {
 
             $(el).autoNumeric('init',config);
             el.__autonumeric = $(el).data('autoNumeric');
-            $(el).bind('blur focusout', valueChangeCallback(el));
+            $(el).bind('blur focusout change', valueChangeCallback(el));
 
 
             if (el._x_model) {
@@ -67,12 +67,15 @@ export default function (Alpine) {
 
             if(el._x_bindings && el._x_bindings['value']) {
                 effect(() =>  {
-                    Alpine.mutateDom(() => $(el).autoNumeric('set',el._x_bindings['value']));
+
+                    Alpine.mutateDom(() => {
+                        $(el).autoNumeric('set',el._x_bindings['value'])
+                    });
                 });
 
             }
             cleanup(()=>{
-                $(el).unbind('blur focusout', valueChangeCallback(el));
+                $(el).unbind('blur focusout change', valueChangeCallback(el));
                 $(el).autoNumeric('destroy');
             });
 

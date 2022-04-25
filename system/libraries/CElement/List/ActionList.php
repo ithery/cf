@@ -40,7 +40,7 @@ class CElement_List_ActionList extends CElement_List {
      * @return $this
      */
     public function setStyle($style) {
-        if (in_array($style, ['form-action', 'btn-group', 'btn-icon-group', 'btn-list', 'icon-segment', 'btn-dropdown', 'widget-action', 'table-header-action'])) {
+        if (in_array($style, ['form-action', 'btn-group', 'btn-group-toggle', 'btn-group-toggle-checkbox', 'btn-group-toggle-radio', 'btn-icon-group', 'btn-list', 'icon-segment', 'btn-dropdown', 'widget-action', 'table-header-action'])) {
             $this->style = $style;
         } else {
             trigger_error('style is not defined');
@@ -109,7 +109,15 @@ class CElement_List_ActionList extends CElement_List {
                 break;
             case 'btn-group':
             case 'btn-icon-group':
-                $pretag = '<div class="btn-group ' . $classes . '">';
+            case 'btn-group-toggle':
+            case 'btn-group-toggle-radio':
+            case 'btn-group-toggle-checkbox':
+                $attributes = '';
+                if (cstr::startsWith($this->style, 'btn-group-toggle')) {
+                    $classes .= ' btn-group-toggle';
+                    $attributes = ' data-toggle="buttons"';
+                }
+                $pretag = '<div class="btn-group ' . $classes . '"' . $attributes . '>';
 
                 break;
             case 'widget-action':
