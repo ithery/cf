@@ -1,12 +1,16 @@
 <?php
 
 class CDebug_Collector_Exception extends CDebug_CollectorAbstract {
+    protected function shouldCollect($exception) {
+        return $exception instanceof Exception && (!$exception instanceof CDebug_Contract_ShouldNotCollectException);
+    }
+
     public function collect($exception) {
         if (!CF::config('collector.exception')) {
             return null;
         }
 
-        if ($exception instanceof Exception) {
+        if ($this->shouldCollect($exception)) {
             $data = $this->getDataFromException($exception);
             $this->put($data);
         }
