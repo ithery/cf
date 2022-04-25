@@ -1181,4 +1181,16 @@ class CRouting_Router {
 
         return $routeRegistrar->attribute($method, $parameters[0]);
     }
+
+    /**
+     * @param string         $uri
+     * @param string|Closure $routedUri
+     *
+     * @return $this
+     */
+    public function addUriRouting($uri, $routedUri) {
+        CRouting_Manager::instance()->addUriRouting($uri, $routedUri);
+
+        return $this;
+    }
 }
