@@ -16,7 +16,7 @@ class CAnalytics_Google {
      * @return CAnalytics_Google_Analytic
      */
     public static function universalAnalytic($options) {
-        $client = CAnalytics_Google_ClientFactory::createForConfig($options);
+        $client = CAnalytics_Google_ClientFactory::createForConfig($options = []);
 
         return new CAnalytics_Google_Analytic($client, carr::get($options, 'view_id'));
     }

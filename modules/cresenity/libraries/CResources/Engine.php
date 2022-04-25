@@ -99,6 +99,7 @@ abstract class CResources_Engine implements CResources_EngineInterface {
             throw new CResources_Exception(sprintf('The %s resource file is not writable.', $path));
         }
         $this->filename = $temp_file_name;
+
         return $temp_file_name;
     }
 
@@ -132,6 +133,7 @@ abstract class CResources_Engine implements CResources_EngineInterface {
             throw new CResources_Exception(sprintf('The %s resource file is not writable.', $path));
         }
         $this->filename = $temp_file_name;
+
         return $temp_file_name;
     }
 
@@ -170,6 +172,7 @@ abstract class CResources_Engine implements CResources_EngineInterface {
             throw new CResources_Exception(sprintf('The %s resource file is not writable.', $path));
         }
         $this->filename = $tempFileName;
+
         return $tempFileName;
     }
 
@@ -200,6 +203,7 @@ abstract class CResources_Engine implements CResources_EngineInterface {
             throw new CResources_Exception(sprintf('The %s resource file is not writable.', $path));
         }
         $this->filename = $temp_file_name;
+
         return $temp_file_name;
     }
 
@@ -231,6 +235,7 @@ abstract class CResources_Engine implements CResources_EngineInterface {
             throw new CResources_Exception(sprintf('The %s resource file is not writable.', $path));
         }
         $this->filename = $temp_file_name;
+
         return $temp_file_name;
     }
 
@@ -246,6 +251,7 @@ abstract class CResources_Engine implements CResources_EngineInterface {
             if (strlen($size) > 0) {
                 $imageLoader->setSize($size);
             }
+
             return $imageLoader->getUrl();
         }
         if ($this->resource_type == 'file' || $this->resource_type == 'pdf') {
@@ -253,6 +259,7 @@ abstract class CResources_Engine implements CResources_EngineInterface {
                 'app_code' => $this->appCode,
             ];
             $fileLoader = CResources::file($filename, $options);
+
             return $fileLoader->getUrl();
         }
 
@@ -275,6 +282,11 @@ abstract class CResources_Engine implements CResources_EngineInterface {
 
     public function setRootDirectory($_root_directory) {
         $this->rootDirectory = $_root_directory;
+
         return $this;
+    }
+
+    public function addSize($size_name, $options) {
+        throw new Exception('not implemented');
     }
 }
