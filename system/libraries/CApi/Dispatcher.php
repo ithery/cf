@@ -7,6 +7,8 @@ class CApi_Dispatcher {
 
     protected $methodNamespace;
 
+    protected $isDispatching = false;
+
     public function __construct($group) {
         $this->group = $group;
         $this->prefix = CF::config('api.groups.' . $group . '.prefix', '');
@@ -57,6 +59,7 @@ class CApi_Dispatcher {
         }
 
         try {
+            $this->isDispatching = true;
             $request = CApi_HTTP_Request::createFromBaseHttp($request);
             $request->setGroup($this->group);
             $kernel = new CApi_Kernel($this->group);
@@ -67,8 +70,14 @@ class CApi_Dispatcher {
         } catch (Throwable $e) {
             $this->reportException($e);
             $response = $this->renderException($request, $e);
+        } finally {
+            $this->isDispatching = false;
         }
 
         return $response;
+    }
+
+    public function isDispatching() {
+        return $this->isDispatching;
     }
 }
