@@ -20,7 +20,7 @@ class CVendor_Xendit_Customers extends CVendor_Xendit_Base {
      * @return array please check for responses parameters here
      *               https://developers.xendit.co/api-reference/?bash#create-customer
      */
-    public static function createCustomer($params = []) {
+    public function createCustomer($params = []) {
         $requiredParams = ['reference_id'];
 
         if (array_key_exists('api-version', $params)
@@ -45,9 +45,9 @@ class CVendor_Xendit_Customers extends CVendor_Xendit_Base {
 
         self::validateParams($params, $requiredParams);
 
-        $url = static::classUrl();
+        $url = $this->classUrl();
 
-        return static::request('POST', $url, $params);
+        return $this->request('POST', $url, $params);
     }
 
     /**
@@ -61,10 +61,10 @@ class CVendor_Xendit_Customers extends CVendor_Xendit_Base {
      * @return array please check for responses parameters here
      *               https://developers.xendit.co/api-reference/?bash#get-customer-by-reference-id
      */
-    public static function getCustomerByReferenceID($reference_id, $params = []) {
-        $url = static::classUrl()
+    public function getCustomerByReferenceID($reference_id, $params = []) {
+        $url = $this->classUrl()
             . '?reference_id=' . $reference_id;
 
-        return static::request('GET', $url, $params);
+        return $this->request('GET', $url, $params);
     }
 }
