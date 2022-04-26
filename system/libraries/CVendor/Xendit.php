@@ -667,6 +667,25 @@ class CVendor_Xendit {
         return $response;
     }
 
+    public function createChargePaylater($planId, $referenceId, $options) {
+        $data = [];
+        $endPoint = $this->server_domain . '/paylater/charges';
+        if (!isset($options['checkout_method'])) {
+            $data['checkout_method'] = 'ONE_TIME_PAYMENT';
+        }
+        if (isset($options['success_redirect_url'])) {
+            $data['success_redirect_url'] = carr::get($options, 'success_redirect_url');
+        }
+        if (isset($options['failure_redirect_url'])) {
+            $data['failure_redirect_url'] = carr::get($options, 'failure_redirect_url');
+        }
+        $data['plan_id'] = $planId;
+        $data['reference_id'] = $referenceId;
+        $response = $this->requestToXendit($endPoint, 'POST', $data);
+
+        return $response;
+    }
+
     public function createQRCode($externalId, $url, $amount) {
         $data['external_id'] = $externalId;
         $data['type'] = 'DYNAMIC';
@@ -678,7 +697,8 @@ class CVendor_Xendit {
         return $response;
     }
 
-    public function createCustomer($options) {
+    public function createCustomer($referenceId, $options) {
+        $options['reference_id'] = $referenceId;
         $data = $options;
         $endPoint = $this->server_domain . '/customers';
         $response = $this->requestToXendit($endPoint, 'POST', $data);
