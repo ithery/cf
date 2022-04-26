@@ -9,11 +9,11 @@ defined('SYSPATH') or die('No direct access allowed.');
  * @since May 17, 2019, 7:55:48 PM
  */
 class CVendor_Xendit {
+    const VERSION = '2.5.0';
+
     protected $factory;
 
     protected $libVersion;
-
-    const VERSION = '2.5.0';
 
     public function __construct($options) {
         $this->server_domain = 'https://api.xendit.co';
@@ -34,7 +34,7 @@ class CVendor_Xendit {
     }
 
     /**
-     * Get Xendit Factory
+     * Get Xendit Factory.
      *
      * @return CVendor_Xendit_Factory
      */
@@ -42,6 +42,7 @@ class CVendor_Xendit {
         if ($this->factory == null) {
             $this->factory = new CVendor_Xendit_Factory($this);
         }
+
         return $this->factory;
     }
 
@@ -54,6 +55,7 @@ class CVendor_Xendit {
         if (!isset($invoiceOptions['callback_virtual_account_id']) && !empty($invoiceOptions['callback_virtual_account_id'])) {
             $data['callback_virtual_account_id'] = $invoiceOptions['callback_virtual_account_id'];
         }
+
         return $this->factory()->invoice()->create($data);
     }
 
@@ -84,6 +86,7 @@ class CVendor_Xendit {
         $response = curl_exec($curl);
         curl_close($curl);
         $responseObject = json_decode($response, true);
+
         return $responseObject;
     }
 
@@ -141,6 +144,7 @@ class CVendor_Xendit {
         curl_close($curl);
 
         $responseObject = json_decode($response, true);
+
         return $responseObject;
     }
 
@@ -181,6 +185,7 @@ class CVendor_Xendit {
 
         curl_close($curl);
         $responseObject = json_decode($response, true);
+
         return $responseObject;
     }
 
@@ -199,6 +204,7 @@ class CVendor_Xendit {
 
         curl_close($curl);
         $responseObject = json_decode($response, true);
+
         return $responseObject;
     }
 
@@ -214,6 +220,7 @@ class CVendor_Xendit {
         $response = curl_exec($curl);
         curl_close($curl);
         $responseObject = json_decode($response, true);
+
         return $responseObject;
     }
 
@@ -226,15 +233,15 @@ class CVendor_Xendit {
     }
 
     /**
-     * Send GET request to retrieve data
+     * Send GET request to retrieve data.
      *
      * @param string $accountType account type (CASH|HOLDING|TAX)
+     *
+     * @throws CVendor_Xendit_Exception_ApiException
      *
      * @return array[
      *                'balance' => int
      *                ]
-     *
-     * @throws CVendor_Xendit_Exception_ApiException
      */
     public function getBalance($accountType = 'CASH') {
         return $this->factory()->balance()->getBalance($accountType);
@@ -277,6 +284,7 @@ class CVendor_Xendit {
         curl_close($curl);
 
         $responseObject = json_decode($response, true);
+
         return $responseObject;
     }
 
@@ -285,6 +293,7 @@ class CVendor_Xendit {
         $data['bin'] = $bin;
         $data['amount'] = $amount;
         $response = $this->requestToXendit($endPoint, 'get', $data);
+
         return $response;
     }
 
@@ -308,6 +317,7 @@ class CVendor_Xendit {
         $response = curl_exec($curl);
         curl_close($curl);
         $responseObject = json_decode($response, true);
+
         return $responseObject;
     }
 
@@ -328,6 +338,7 @@ class CVendor_Xendit {
         $response = curl_exec($curl);
         curl_close($curl);
         $responseObject = json_decode($response, true);
+
         return $responseObject;
     }
 
@@ -347,6 +358,7 @@ class CVendor_Xendit {
         $info = curl_getinfo($curl);
         curl_close($curl);
         $responseObject = json_decode($response, true);
+
         return $responseObject;
     }
 
@@ -463,6 +475,7 @@ class CVendor_Xendit {
         curl_close($curl);
 
         $responseObject = json_decode($response, true);
+
         return $responseObject;
     }
 
@@ -492,6 +505,7 @@ class CVendor_Xendit {
 
         curl_close($curl);
         $responseObject = json_decode($response, true);
+
         return $responseObject;
     }
 
@@ -519,6 +533,7 @@ class CVendor_Xendit {
 
         curl_close($curl);
         $responseObject = json_decode($response, true);
+
         return $responseObject;
     }
 
@@ -550,6 +565,7 @@ class CVendor_Xendit {
 
         curl_close($curl);
         $responseObject = json_decode($response, true);
+
         return $responseObject;
     }
 
@@ -599,6 +615,7 @@ class CVendor_Xendit {
         curl_close($curl);
 
         $responseObject = json_decode($response, true);
+
         return $responseObject;
     }
 
@@ -606,6 +623,7 @@ class CVendor_Xendit {
         $endPoint = $this->server_domain . '/v2/invoices';
 
         $response = $this->requestToXendit($endPoint, 'GET', $data);
+
         return $response;
     }
 
@@ -620,6 +638,7 @@ class CVendor_Xendit {
     public function virtualAccountSimulatePayment($id, $amount) {
         $endPoint = $this->server_domain . '/callback_virtual_accounts/external_id=' . $id . '/simulate_payment';
         $response = $this->requestToXendit($endPoint, 'POST', ['amount' => $amount]);
+
         return $response;
     }
 
@@ -631,6 +650,56 @@ class CVendor_Xendit {
         $data['payment_code'] = $payment_code;
         $data['transfer_amount'] = $transfer_amount;
         $response = $this->requestToXendit($endPoint, 'POST', $data);
+
+        return $response;
+    }
+
+    public function createInitiatePlanPaylater($customerId, $amount, $options) {
+        $data = [];
+        $endPoint = $this->server_domain . '/paylater/plans';
+        $data['customer_id'] = $customerId;
+        $data['currency'] = 'IDR';
+        $data['channel_code'] = carr::get($options, 'channel_code');
+        $data['amount'] = $amount;
+        $data['order_items'][] = carr::get($options, 'orderItems', []);
+        $response = $this->requestToXendit($endPoint, 'POST', $data);
+
+        return $response;
+    }
+
+    public function createQRCode($externalId, $url, $amount) {
+        $data['external_id'] = $externalId;
+        $data['type'] = 'DYNAMIC';
+        $data['amount'] = $amount;
+        $data['callback_url'] = $url;
+        $endPoint = $this->server_domain . '/qr_codes';
+        $response = $this->requestToXendit($endPoint, 'POST', $data);
+
+        return $response;
+    }
+
+    public function createCustomer($options) {
+        $data = $options;
+        $endPoint = $this->server_domain . '/customers';
+        $response = $this->requestToXendit($endPoint, 'POST', $data);
+
+        return $response;
+    }
+
+    public function getCustomer($referenceId) {
+        $data = [];
+        $data['reference_id'] = $referenceId;
+        $endPoint = $this->server_domain . '/customers';
+        $response = $this->requestToXendit($endPoint, 'GET', $data);
+
+        return $response;
+    }
+
+    public function getQRByExternalId($externalId) {
+        $data = [];
+        $endPoint = $this->server_domain . '/qr_codes/' . $externalId;
+        $response = $this->requestToXendit($endPoint, 'GET', $data);
+
         return $response;
     }
 
@@ -638,7 +707,6 @@ class CVendor_Xendit {
         $curl = curl_init();
         $headers = [];
         $headers[] = 'Content-Type: application/json';
-
         curl_setopt($curl, CURLOPT_HTTPHEADER, $headers);
         curl_setopt($curl, CURLOPT_USERPWD, $this->secret_api_key . ':');
         curl_setopt($curl, CURLOPT_URL, $endPoint);
@@ -657,9 +725,9 @@ class CVendor_Xendit {
         curl_setopt($curl, CURLOPT_RETURNTRANSFER, true);
         $response = curl_exec($curl);
 
-
         curl_close($curl);
         $responseObject = json_decode($response, true);
+
         return $responseObject;
     }
 }
