@@ -69,7 +69,6 @@ class CVendor_OneSignal_Notifications extends CVendor_OneSignal_AbstractApi {
      */
     public function add(array $data) {
         $resolvedData = $this->resolverFactory->createNotificationResolver()->resolve($data);
-
         $request = $this->createRequest('POST', '/notifications');
         $request = $request->withHeader('Authorization', "Basic {$this->client->getConfig()->getApplicationAuthKey()}");
         $request = $request->withHeader('Content-Type', 'application/json');

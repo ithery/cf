@@ -8,59 +8,47 @@ abstract class CVendor_Xendit_Base {
     }
 
     /**
-     * Instantiate base URL
+     * Instantiate base URL.
      *
      * @return string
      */
     abstract protected function classUrl();
 
     /**
-     * Instantiate required params for Create
-     *
-     * @return array
-     */
-    abstract protected function createReqParams();
-
-    /**
-     * Instantiate required params for Update
-     *
-     * @return array
-     */
-    abstract protected function updateReqParams();
-
-    /**
-     * Parameters validation
+     * Parameters validation.
      *
      * @param array $params         user's parameters
      * @param array $requiredParams required parameters
      *
-     * @return void
-     *
      * @throws CVendor_Xendit_Exception_InvalidArgumentException
+     *
+     * @return void
      */
     protected function validateParams($params = [], $requiredParams = []) {
         $currParams = array_diff_key(array_flip($requiredParams), $params);
         if ($params && !is_array($params)) {
             $message = 'You must pass an array as params.';
+
             throw new CVendor_Xendit_Exception_InvalidArgumentException($message);
         }
         if (count($currParams) > 0) {
             $message = 'You must pass required parameters on your params. '
             . 'Check https://xendit.github.io/apireference/ for more information.';
+
             throw new CVendor_Xendit_Exception_InvalidArgumentException($message);
         }
     }
 
     /**
-     * Send request to Api Requestor
+     * Send request to Api Requestor.
      *
      * @param $method string
      * @param $url    string ext url to the API
      * @param $params array parameters
      *
-     * @return array
-     *
      * @throws CVendor_Xendit_Exception_ApiException
+     *
+     * @return array
      */
     protected function request(
         $method,
@@ -90,6 +78,7 @@ abstract class CVendor_Xendit_Base {
         }
 
         $requestor = $this->apiRequestor;
+
         return $requestor->request($method, $url, $params, $headers);
     }
 }
