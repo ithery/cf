@@ -113,7 +113,7 @@ abstract class CApp_Api_Method implements CApp_Api_MethodInterface {
 
         if ($apiKey != $requestApiKey && $secretKey != $requestSecretKey) {
             $this->errCode = 9999;
-            $this->errMessage = 'Authentication Failed! ' . CF::domain() . '|' . $apiKey . '|' . $requestApiKey . '|' . $secretKey . '|' . $requestSecretKey;
+            $this->errMessage = 'Authentication Failed! ';// . json_encode(c::request()->secure()) . '#' . json_encode(c::request()->all()) . '|' . CF::domain() . '|' . $apiKey . '|' . $requestApiKey . '|' . $secretKey . '|' . $requestSecretKey;
         }
     }
 
