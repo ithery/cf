@@ -1,4 +1,4 @@
-# Standard - Element
+# Element - Standard Element
 ### Introduction
 
 Terdapat default bawaan element yang sudah ada element.
@@ -14,15 +14,18 @@ return $app;
 
 untuk setiap element yang di add pada CApp, jika id tidak dipassing pada saat menambahkan element maka CApp akan melakukan generateId baru terhadap element tersebut
 
-```php
-$app->addDiv();
-//<div id="00000000262e89430000000042533b79"></div>
 
+### &lt;div&gt;
+```php
+$div = $app->addDiv();
+$div->add('Ini didalam div');
 ```
 
-tambah A
+### &lt;a&gt;
 ```php
-$app->addA();
-//<div id="00000000262e89430000000042533b79"></div>
-
+$a = $app->addA();
+$a->setHref(c::url('to/url'));
+$a->setTarget('_blank');
+$a->add('Click link ini');
+$a->add('Click link ini');
 ```

@@ -1,7 +1,8 @@
-# Element - Table
+# Element - Table Element
 ### Introduction
 
 Table element digunakan untuk mempresentasikan ui table
+
 
 ### Table Data
 
