@@ -22,7 +22,12 @@ return [
                 'name' => 'starter.configuration',
                 'label' => c::__('Configuration'),
                 'uri' => 'docs/starter/configuration',
-            ]
+            ],
+            [
+                'name' => 'starter.vscode',
+                'label' => c::__('VS Code Extension'),
+                'uri' => 'docs/starter/vscode',
+            ],
         ]
     ],
     [
@@ -95,6 +100,23 @@ return [
                 'label' => c::__('Other'),
                 'uri' => 'docs/app/other',
             ],
+        ]
+    ],
+    [
+        'name' => 'element',
+        'label' => c::__('Elements'),
+        'subnav' => [
+            [
+                'name' => 'element.standard',
+                'label' => c::__('Standard Element'),
+                'uri' => 'docs/element/standard',
+            ],
+            [
+                'name' => 'element.table',
+                'label' => c::__('Table'),
+                'uri' => 'docs/element/table',
+            ],
+
         ]
     ],
     [
