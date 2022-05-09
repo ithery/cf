@@ -1,13 +1,13 @@
 <?php
 
-use PHPUnit\Framework\Exception\AssertionFailedError;
 use PHPUnit\Framework\Test;
 use PHPUnit\Framework\TestCase;
 use PHPUnit\Framework\TestSuite;
+use SebastianBergmann\Timer\Timer;
 use PHPUnit\Framework\Exception\Warning;
 use Symfony\Component\Console\Input\ArgvInput;
 use Symfony\Component\Console\Output\ConsoleOutput;
-use SebastianBergmann\Timer\Timer;
+use PHPUnit\Framework\Exception\AssertionFailedError;
 
 /**
  * @internal
@@ -18,7 +18,7 @@ final class CTesting_PhpUnit_Printer implements \PHPUnit\TextUI\ResultPrinter {
      *
      * Style is a class we use to interact with output.
      *
-     * @var Style
+     * @var CTesting_PhpUnit_Style
      */
     private $style;
 
@@ -53,7 +53,7 @@ final class CTesting_PhpUnit_Printer implements \PHPUnit\TextUI\ResultPrinter {
      *
      * @throws \ReflectionException
      */
-    public function __construct(\Symfony\Component\Console\Output\ConsoleOutputInterface $output = null, $verbose = false, $colors = 'always') {
+    public function __construct(Symfony\Component\Console\Output\ConsoleOutputInterface $output = null, $verbose = false, $colors = 'always') {
         $this->timer = CTesting_PhpUnit_Timer::start();
 
         $decorated = $colors === 'always' || $colors === 'auto';
@@ -69,9 +69,9 @@ final class CTesting_PhpUnit_Printer implements \PHPUnit\TextUI\ResultPrinter {
     }
 
     /**
-     * {@inheritdoc}
+     * @inheritdoc
      */
-    public function addError(Test $testCase, Throwable $throwable, $time) {
+    public function addError(Test $testCase, Exception $throwable, $time) {
         $this->failed = true;
 
         $testCase = $this->testCaseFromTest($testCase);
@@ -80,7 +80,7 @@ final class CTesting_PhpUnit_Printer implements \PHPUnit\TextUI\ResultPrinter {
     }
 
     /**
-     * {@inheritdoc}
+     * @inheritdoc
      */
     public function addWarning(Test $testCase, Warning $warning, $time) {
         $testCase = $this->testCaseFromTest($testCase);
@@ -89,7 +89,7 @@ final class CTesting_PhpUnit_Printer implements \PHPUnit\TextUI\ResultPrinter {
     }
 
     /**
-     * {@inheritdoc}
+     * @inheritdoc
      */
     public function addFailure(Test $testCase, AssertionFailedError $error, $time) {
         $this->failed = true;
@@ -109,7 +109,7 @@ final class CTesting_PhpUnit_Printer implements \PHPUnit\TextUI\ResultPrinter {
     }
 
     /**
-     * {@inheritdoc}
+     * @inheritdoc
      */
     public function addIncompleteTest(Test $testCase, Throwable $throwable, $time) {
         $testCase = $this->testCaseFromTest($testCase);
@@ -118,7 +118,7 @@ final class CTesting_PhpUnit_Printer implements \PHPUnit\TextUI\ResultPrinter {
     }
 
     /**
-     * {@inheritdoc}
+     * @inheritdoc
      */
     public function addRiskyTest(Test $testCase, Throwable $throwable, $time) {
         $testCase = $this->testCaseFromTest($testCase);
@@ -127,7 +127,7 @@ final class CTesting_PhpUnit_Printer implements \PHPUnit\TextUI\ResultPrinter {
     }
 
     /**
-     * {@inheritdoc}
+     * @inheritdoc
      */
     public function addSkippedTest(Test $testCase, Throwable $throwable, $time) {
         $testCase = $this->testCaseFromTest($testCase);
@@ -136,7 +136,7 @@ final class CTesting_PhpUnit_Printer implements \PHPUnit\TextUI\ResultPrinter {
     }
 
     /**
-     * {@inheritdoc}
+     * @inheritdoc
      */
     public function startTestSuite(TestSuite $suite) {
         if ($this->state->suiteTotalTests === null) {
@@ -145,14 +145,14 @@ final class CTesting_PhpUnit_Printer implements \PHPUnit\TextUI\ResultPrinter {
     }
 
     /**
-     * {@inheritdoc}
+     * @inheritdoc
      */
     public function endTestSuite(TestSuite $suite) {
         // ..
     }
 
     /**
-     * {@inheritdoc}
+     * @inheritdoc
      */
     public function startTest(Test $testCase) {
         $testCase = $this->testCaseFromTest($testCase);
@@ -166,7 +166,7 @@ final class CTesting_PhpUnit_Printer implements \PHPUnit\TextUI\ResultPrinter {
     }
 
     /**
-     * {@inheritdoc}
+     * @inheritdoc
      */
     public function endTest(Test $testCase, $time) {
         $testCase = $this->testCaseFromTest($testCase);
@@ -207,7 +207,7 @@ final class CTesting_PhpUnit_Printer implements \PHPUnit\TextUI\ResultPrinter {
     /**
      * Intentionally left blank as we output things on events of the listener.
      */
-    public function printResult(\PHPUnit\Framework\TestResult $result) {
+    public function printResult(PHPUnit\Framework\TestResult $result) {
         if ($result->count() === 0) {
             $this->style->writeWarning('No tests executed!');
         }

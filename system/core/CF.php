@@ -661,6 +661,9 @@ final class CF {
      */
     public static function cliDomain() {
         $domain = null;
+        if (defined('CFCLI_APPCODE') && CFCLI_APPCODE) {
+            return CFCLI_APPCODE . '.test';
+        }
         if (file_exists(static::CFCLI_CURRENT_DOMAIN_FILE)) {
             $domain = trim(file_get_contents(static::CFCLI_CURRENT_DOMAIN_FILE));
         }
@@ -711,6 +714,9 @@ final class CF {
         $domain = '';
         if (static::isCli() || static::isCFCli()) {
             // Command line requires a bit of hacking
+            if (defined('CFCLI_APPCODE') && CFCLI_APPCODE) {
+                return CFCLI_APPCODE . '.test';
+            }
             if (static::isCFCli() || static::isTesting()) {
                 if (isset($_SERVER['argv']) && is_array($_SERVER['argv'])) {
                     foreach ($_SERVER['argv'] as $argv) {
