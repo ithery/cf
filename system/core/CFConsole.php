@@ -53,6 +53,7 @@ class CFConsole {
         CConsole_Command_DevSuite_DevSuiteDeployInitCommand::class,
         CConsole_Command_DevSuite_DevSuiteDeployRunCommand::class,
         CConsole_Command_Make_MakeControllerCommand::class,
+        CConsole_Command_Make_MakeModelCommand::class,
         CConsole_Command_Make_MakeConfigCommand::class,
         CConsole_Command_Make_MakeNavCommand::class,
         CConsole_Command_Make_MakeThemeCommand::class,
