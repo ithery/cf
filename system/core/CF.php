@@ -674,6 +674,9 @@ final class CF {
      * @return string
      */
     public static function cliAppCode() {
+        if (defined('CFCLI_APPCODE') && CFCLI_APPCODE) {
+            return CFCLI_APPCODE;
+        }
         if (CF::isTesting()) {
             foreach ($_SERVER['argv'] as $argv) {
                 if (substr($argv, -strlen('phpunit.xml')) === (string) 'phpunit.xml') {
