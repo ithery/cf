@@ -26,6 +26,8 @@ class CConsole_Command_Make_MakeModelCommand extends CConsole_Command {
             return CConsole::FAILURE_EXIT;
         }
         $model = $this->argument('model');
+        $this->info('Creating ' . ucfirst($model) . ' model...');
+
         $modelPath = c::fixPath(CF::appDir()) . 'default' . DS . 'libraries' . DS . $prefix . 'Model' . DS;
         $modelClass = $prefix . 'Model';
         if (!CFile::isDirectory($modelPath)) {
@@ -39,6 +41,9 @@ class CConsole_Command_Make_MakeModelCommand extends CConsole_Command {
 
             return CConsole::SUCCESS_EXIT;
         }
+
+        $fields = $this->getField($model);
+
         $modelClass .= '_' . ucfirst($model);
         $stubFile = CF::findFile('stubs', 'controller', true, 'stub');
         if (!$stubFile) {
@@ -52,5 +57,65 @@ class CConsole_Command_Make_MakeModelCommand extends CConsole_Command {
         // CFile::put($modelFile, $content);
 
         $this->info('Model ' . $model . ' created on:' . $modelFile);
+    }
+
+    private function getField(string $table) {
+        $table = str_replace(['user', 'role'], ['users', 'roles'], $table);
+        $excludedFields = ['created', 'createdby', 'updated', 'updatedby', 'deleted', 'deletedby', 'status'];
+        $this->line($table);
+        $db = c::db();
+
+        $result = $db->query("desc ${table}");
+        foreach ($result as $value) {
+            $field = $value->Field;
+            $type = $value->Type;
+            $temp = explode('(', $type);
+            if ($temp) {
+                $type = c::get($temp, 0);
+            }
+            $type = $this->getType($type);
+            if (!in_array($field, $excludedFields)) {
+                $this->line("${field}:${type}");
+            }
+        }
+    }
+
+    private function getType(string $type) {
+        $typeConvertion = [
+            'tinyint' => 'int',
+            'smallint' => 'int',
+            'mediumint' => 'int',
+            'int' => 'int',
+            'bigint' => 'int',
+            'decimal' => 'int',
+            'float' => 'float',
+            'double' => 'double',
+            'bit' => 'int',
+            'char' => 'string',
+            'varchar' => 'string',
+            'binary' => 'string',
+            'varbinary' => 'string',
+            'tinyblob' => 'string',
+            'blob' => 'string',
+            'mediumblob' => 'string',
+            'longblob' => 'string',
+            'tinytext' => 'string',
+            'text' => 'string',
+            'mediumtext' => 'string',
+            'longtext' => 'string',
+            'enum' => 'string',
+            'set' => 'string',
+            'date' => 'CCarbon',
+            'time' => 'string',
+            'datetime' => 'string',
+            'timestamp' => 'string',
+            'year' => 'string',
+        ];
+
+        if ($result = c::get($typeConvertion, $type)) {
+            return $result;
+        }
+
+        return $type;
     }
 }
