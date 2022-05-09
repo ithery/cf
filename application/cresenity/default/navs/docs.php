@@ -220,6 +220,17 @@ return [
         ]
     ],
     [
+        'name' => 'phpcf',
+        'label' => c::__('PHP CF'),
+        'subnav' => [
+            [
+                'name' => 'phpcf.install',
+                'label' => c::__('Installation'),
+                'uri' => 'docs/phpcf/install',
+            ],
+        ]
+    ],
+    [
         'name' => 'other',
         'label' => c::__('Other'),
         'subnav' => [
