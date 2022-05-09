@@ -77,7 +77,6 @@ abstract class CApp_Api_Method implements CApp_Api_MethodInterface {
         $apiKey = CF::config('devcloud.api_key');
         $secretKey = CF::config('devcloud.secret_key');
 
-        $config = CF::config('devcloud');
         $requestApiKey = carr::get($this->request(), 'apiKey');
         $requestSecretKey = carr::get($this->request(), 'secretKey');
 
