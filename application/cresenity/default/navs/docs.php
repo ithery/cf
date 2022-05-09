@@ -228,6 +228,11 @@ return [
                 'label' => c::__('Installation'),
                 'uri' => 'docs/phpcf/install',
             ],
+            [
+                'name' => 'phpcf.test',
+                'label' => c::__('Testing'),
+                'uri' => 'docs/phpcf/testing',
+            ],
         ]
     ],
     [
