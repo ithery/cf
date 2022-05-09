@@ -111,7 +111,7 @@ final class CTesting_PhpUnit_Printer implements \PHPUnit\TextUI\ResultPrinter {
     /**
      * @inheritdoc
      */
-    public function addIncompleteTest(Test $testCase, Throwable $throwable, $time) {
+    public function addIncompleteTest(Test $testCase, Exception $throwable, $time) {
         $testCase = $this->testCaseFromTest($testCase);
 
         $this->state->add(CTesting_PhpUnit_TestResult::fromTestCase($testCase, CTesting_PhpUnit_TestResult::INCOMPLETE, $throwable));
@@ -120,7 +120,7 @@ final class CTesting_PhpUnit_Printer implements \PHPUnit\TextUI\ResultPrinter {
     /**
      * @inheritdoc
      */
-    public function addRiskyTest(Test $testCase, Throwable $throwable, $time) {
+    public function addRiskyTest(Test $testCase, Exception $throwable, $time) {
         $testCase = $this->testCaseFromTest($testCase);
 
         $this->state->add(CTesting_PhpUnit_TestResult::fromTestCase($testCase, CTesting_PhpUnit_TestResult::RISKY, $throwable));
@@ -129,7 +129,7 @@ final class CTesting_PhpUnit_Printer implements \PHPUnit\TextUI\ResultPrinter {
     /**
      * @inheritdoc
      */
-    public function addSkippedTest(Test $testCase, Throwable $throwable, $time) {
+    public function addSkippedTest(Test $testCase, Exception $throwable, $time) {
         $testCase = $this->testCaseFromTest($testCase);
 
         $this->state->add(CTesting_PhpUnit_TestResult::fromTestCase($testCase, CTesting_PhpUnit_TestResult::SKIPPED, $throwable));
