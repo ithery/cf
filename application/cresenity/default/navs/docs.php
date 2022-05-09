@@ -229,6 +229,11 @@ return [
                 'uri' => 'docs/phpcf/install',
             ],
             [
+                'name' => 'phpcf.testing',
+                'label' => c::__('Testing'),
+                'uri' => 'docs/phpcf/testing',
+            ],
+            [
                 'name' => 'phpcf.make',
                 'label' => c::__('Make'),
                 'uri' => 'docs/phpcf/make',
