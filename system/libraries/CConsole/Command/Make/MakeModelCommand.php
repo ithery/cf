@@ -16,8 +16,6 @@ class CConsole_Command_Make_MakeModelCommand extends CConsole_Command {
     protected $description = 'Create a new model class based on created table on database';
 
     public function handle() {
-        $this->warn('this command is uncompleted');
-
         CConsole::domainRequired($this);
         $prefix = CF::config('app.prefix');
         if (strlen($prefix) == 0) {
@@ -42,10 +40,8 @@ class CConsole_Command_Make_MakeModelCommand extends CConsole_Command {
             return CConsole::SUCCESS_EXIT;
         }
 
-        $fields = $this->getField($model);
-
         $modelClass .= '_' . ucfirst($model);
-        $stubFile = CF::findFile('stubs', 'controller', true, 'stub');
+        $stubFile = CF::findFile('stubs', 'model', true, 'stub');
         if (!$stubFile) {
             $this->error('model stub not found');
             exit(1);
@@ -53,19 +49,54 @@ class CConsole_Command_Make_MakeModelCommand extends CConsole_Command {
         $content = CFile::get($stubFile);
         $content = str_replace('{ModelClass}', $modelClass, $content);
         $content = str_replace('{prefix}', $prefix, $content);
+        $content = str_replace('{table}', $model, $content);
+        $content = str_replace('{primaryKey}', $model . '_id', $content);
+        $content = str_replace('{properties}', $this->getProperties(), $content);
 
-        // CFile::put($modelFile, $content);
+        CFile::put($modelFile, $content);
 
-        $this->info('Model ' . $model . ' created on:' . $modelFile);
+        $this->info(ucfirst($model) . 'Model created on:' . $modelFile);
     }
 
-    private function getField(string $table) {
-        $table = str_replace(['user', 'role'], ['users', 'roles'], $table);
+    private function getTable() {
+        $table = $model = $this->argument('model');
+        switch ($model) {
+            case 'user':
+                $table = 'users';
+
+                break;
+            case 'role':
+                $table = 'roles';
+
+                break;
+        }
+
+        return $table;
+    }
+
+    private function getProperties() {
+        $properties = [];
+        $fields = $this->getFields();
+        foreach ($fields as $field => $type) {
+            if ($field == $this->getTable() . '_id') {
+                $properties[] = " * @property-read ${type} $${field}";
+            } else {
+                $properties[] = " * @property ${type} $${field}";
+            }
+        }
+
+        $result = implode("\n", $properties);
+
+        return $result;
+    }
+
+    private function getFields() {
+        $table = $this->getTable();
         $excludedFields = ['created', 'createdby', 'updated', 'updatedby', 'deleted', 'deletedby', 'status'];
-        $this->line($table);
         $db = c::db();
 
         $result = $db->query("desc ${table}");
+        $properties = [];
         foreach ($result as $value) {
             $field = $value->Field;
             $type = $value->Type;
@@ -75,9 +106,11 @@ class CConsole_Command_Make_MakeModelCommand extends CConsole_Command {
             }
             $type = $this->getType($type);
             if (!in_array($field, $excludedFields)) {
-                $this->line("${field}:${type}");
+                $properties[$field] = $type;
             }
         }
+
+        return $properties;
     }
 
     private function getType(string $type) {
@@ -85,7 +118,6 @@ class CConsole_Command_Make_MakeModelCommand extends CConsole_Command {
             'tinyint' => 'int',
             'smallint' => 'int',
             'mediumint' => 'int',
-            'int' => 'int',
             'bigint' => 'int',
             'decimal' => 'int',
             'float' => 'float',
@@ -110,6 +142,7 @@ class CConsole_Command_Make_MakeModelCommand extends CConsole_Command {
             'datetime' => 'string',
             'timestamp' => 'string',
             'year' => 'string',
+            'boolean' => 'bool',
         ];
 
         if ($result = c::get($typeConvertion, $type)) {
