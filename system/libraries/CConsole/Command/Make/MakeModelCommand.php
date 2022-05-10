@@ -6,7 +6,7 @@ class CConsole_Command_Make_MakeModelCommand extends CConsole_Command {
      *
      * @var string
      */
-    protected $signature = 'make:model {model}';
+    protected $signature = 'make:model {table}';
 
     /**
      * The console command description.
@@ -23,8 +23,9 @@ class CConsole_Command_Make_MakeModelCommand extends CConsole_Command {
 
             return CConsole::FAILURE_EXIT;
         }
-        $model = $this->argument('model');
-        $this->info('Creating ' . ucfirst($model) . ' model...');
+        $model = $this->getModel();
+        $table = $this->getTable();
+        $this->info('Creating ' . $model . ' model...');
 
         $modelPath = c::fixPath(CF::appDir()) . 'default' . DS . 'libraries' . DS . $prefix . 'Model' . DS;
         $modelClass = $prefix . 'Model';
@@ -32,7 +33,7 @@ class CConsole_Command_Make_MakeModelCommand extends CConsole_Command {
             CFile::makeDirectory($modelPath);
         }
 
-        $modelFile = $modelPath . ucfirst($model) . EXT;
+        $modelFile = $modelPath . $model . EXT;
 
         if (file_exists($modelFile)) {
             $this->info('Model ' . $model . ' already created, no changes');
@@ -40,7 +41,7 @@ class CConsole_Command_Make_MakeModelCommand extends CConsole_Command {
             return CConsole::SUCCESS_EXIT;
         }
 
-        $modelClass .= '_' . ucfirst($model);
+        $modelClass .= '_' . $model;
         $stubFile = CF::findFile('stubs', 'model', true, 'stub');
         if (!$stubFile) {
             $this->error('model stub not found');
@@ -49,18 +50,18 @@ class CConsole_Command_Make_MakeModelCommand extends CConsole_Command {
         $content = CFile::get($stubFile);
         $content = str_replace('{ModelClass}', $modelClass, $content);
         $content = str_replace('{prefix}', $prefix, $content);
-        $content = str_replace('{table}', $model, $content);
-        $content = str_replace('{primaryKey}', $model . '_id', $content);
+        $content = str_replace('{table}', $table, $content);
+        $content = str_replace('{primaryKey}', $table . '_id', $content);
         $content = str_replace('{properties}', $this->getProperties(), $content);
 
         CFile::put($modelFile, $content);
 
-        $this->info(ucfirst($model) . 'Model created on:' . $modelFile);
+        $this->info($model . 'Model created on:' . $modelFile);
     }
 
     private function getTable() {
-        $table = $model = $this->argument('model');
-        switch ($model) {
+        $table = $this->argument('table');
+        switch ($table) {
             case 'user':
                 $table = 'users';
 
@@ -72,6 +73,28 @@ class CConsole_Command_Make_MakeModelCommand extends CConsole_Command {
         }
 
         return $table;
+    }
+
+    private function getModel() {
+        $model = $table = $this->argument('table');
+        switch ($table) {
+            case 'users':
+                $model = 'user';
+
+                break;
+            case 'roles':
+                $model = 'role';
+
+                break;
+        }
+
+        $temp = explode('_', $model);
+        $model = '';
+        foreach ($temp as $val) {
+            $model .= ucfirst($val);
+        }
+
+        return $model;
     }
 
     private function getProperties() {
