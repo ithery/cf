@@ -56,9 +56,6 @@ class CElement_Component_DataTable_Cell {
         if ($html instanceof CCollection) {
             $html = $html->toArray();
         }
-        if (is_array($html)) {
-            $html = json_encode($html);
-        }
 
         //do transform
         foreach ($this->column->transforms as $trans) {
