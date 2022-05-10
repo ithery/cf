@@ -348,6 +348,7 @@ class CElement_FormInput_SelectSearch extends CElement_FormInput {
     public function html($indent = 0) {
         //call parent to trigger build
         parent::html($indent);
+
         if ($this->applyJs == 'select2v2.3') {
             return $this->htmlSelect2v23($indent);
         }
