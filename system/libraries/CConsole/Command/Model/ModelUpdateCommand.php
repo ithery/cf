@@ -1,24 +1,24 @@
 <?php
 
-class CConsole_Command_Make_MakeModelCommand extends CConsole_Command_AppCommand {
+class CConsole_Command_Model_ModelUpdateCommand extends CConsole_Command_AppCommand {
     /**
      * The name and signature of the console command.
      *
      * @var string
      */
-    protected $signature = 'make:model {table}';
+    protected $signature = 'model:update {table}';
 
     /**
      * The console command description.
      *
      * @var string
      */
-    protected $description = 'Create a new model class based on created table on database';
+    protected $description = 'Update model properties';
 
     public function handle() {
         $model = $this->getModel();
         $table = $this->getTable();
-        $this->info('Creating ' . $model . ' model...');
+        $this->info('Updating ' . $model . ' model...');
 
         $modelPath = c::fixPath(CF::appDir()) . 'default' . DS . 'libraries' . DS . $this->prefix . 'Model' . DS;
         $modelClass = $this->prefix . 'Model';
@@ -28,10 +28,10 @@ class CConsole_Command_Make_MakeModelCommand extends CConsole_Command_AppCommand
 
         $modelFile = $modelPath . $model . EXT;
 
-        if (file_exists($modelFile)) {
-            $this->info('Model ' . $model . ' already created, no changes');
+        if (!file_exists($modelFile)) {
+            $this->warn('Model ' . $model . ' is not exist, please create it first using "make:model" command');
 
-            return CConsole::SUCCESS_EXIT;
+            return CConsole::FAILURE_EXIT;
         }
 
         $modelClass .= '_' . $model;
@@ -40,16 +40,16 @@ class CConsole_Command_Make_MakeModelCommand extends CConsole_Command_AppCommand
             $this->error('model stub not found');
             exit(1);
         }
-        $content = CFile::get($stubFile);
-        $content = str_replace('{ModelClass}', $modelClass, $content);
-        $content = str_replace('{prefix}', $this->prefix, $content);
-        $content = str_replace('{table}', $table, $content);
-        $content = str_replace('{primaryKey}', $table . '_id', $content);
-        $content = str_replace('{properties}', $this->getProperties(), $content);
+        // $content = CFile::get($modelFile);
+        // $content = str_replace('{properties}', $this->getProperties(), $content);
 
-        CFile::put($modelFile, $content);
+        // $compared = $this->compareField();
+        // $this->info(json_encode($compared, JSON_PRETTY_PRINT));
+        $this->info($this->getUpdatedProperties());
+        // $this->info($content);
+        // CFile::put($modelFile, $content);
 
-        $this->info($model . 'Model created on:' . $modelFile);
+        $this->info($model . 'Model updated');
     }
 
     private function getTable() {
@@ -102,6 +102,28 @@ class CConsole_Command_Make_MakeModelCommand extends CConsole_Command_AppCommand
         }
 
         $result = implode("\n", $properties);
+
+        return $result;
+    }
+
+    private function getCurrentProperties() {
+        $modelPath = c::fixPath(CF::appDir()) . 'default' . DS . 'libraries' . DS . $this->prefix . 'Model' . DS;
+        $modelFile = $modelPath . $this->getModel() . EXT;
+        $content = CFile::get($modelFile);
+        preg_match_all('/@property.*/', $content, $matches);
+        $props = c::get($matches, 0);
+        $result = [];
+        foreach ($props as $prop) {
+            $prop = preg_replace('/\s+/', ' ', $prop);
+            $temp = explode(' ', $prop);
+            $var = c::get($temp, 2);
+            $result[] = [
+                'prop' => c::get($temp, 0),
+                'type' => c::get($temp, 1),
+                'var' => $var,
+                'field' => str_replace('$', '', $var),
+            ];
+        }
 
         return $result;
     }
@@ -166,5 +188,64 @@ class CConsole_Command_Make_MakeModelCommand extends CConsole_Command_AppCommand
         }
 
         return $type;
+    }
+
+    public function compareField() {
+        $compared = [];
+        $currentProperties = $this->getCurrentProperties();
+        $fileds = $this->getFields();
+        $currentPropertiyFields = array_column($currentProperties, 'field');
+        $classMethods = get_class_methods($this->prefix . 'Model_' . $this->getModel());
+
+        foreach ($fileds as $field => $type) {
+            $i = array_search($field, $currentPropertiyFields);
+            if ($i === false) {
+                $compared[] = [
+                    $field => 'add',
+                ];
+            } else {
+                $prop = c::get($currentProperties, $i);
+                $propType = c::get($prop, 'type');
+
+                if ($propType !== $type) {
+                    $compared[] = [
+                        $field => 'update',
+                    ];
+                }
+            }
+        }
+
+        foreach ($currentPropertiyFields as $field) {
+            $i = array_search($field, array_keys($fileds));
+            if ($i === false && !in_array($field, $classMethods)) {
+                $compared[] = [
+                    $field => 'delete',
+                ];
+            }
+        }
+
+        return $compared;
+    }
+
+    public function getUpdatedProperties() {
+        $properties = [];
+        $fields = $this->getFields();
+        $currentProperties = $this->getCurrentProperties();
+        $compare = $this->compareField();
+        $this->info(json_encode($compare, JSON_PRETTY_PRINT));
+        // foreach ($variable as $key => $value) {
+        //     # code...
+        // }
+        // foreach ($fields as $field => $type) {
+        //     if ($field == $this->getTable() . '_id') {
+        //         $properties[] = " * @property-read ${type} $${field}";
+        //     } else {
+        //         $properties[] = " * @property ${type} $${field}";
+        //     }
+        // }
+
+        $result = implode("\n", $properties);
+
+        return $result;
     }
 }
