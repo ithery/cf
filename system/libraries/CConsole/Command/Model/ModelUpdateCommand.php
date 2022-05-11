@@ -40,13 +40,14 @@ class CConsole_Command_Model_ModelUpdateCommand extends CConsole_Command_AppComm
             $this->error('model stub not found');
             exit(1);
         }
-        // $content = CFile::get($modelFile);
+        $content = CFile::get($modelFile);
         // $content = str_replace('{properties}', $this->getProperties(), $content);
 
         // $compared = $this->compareField();
         // $this->info(json_encode($compared, JSON_PRETTY_PRINT));
-        $this->info($this->getUpdatedProperties());
-        // $this->info($content);
+        $updatedProperties = $this->getUpdatedProperties();
+        $this->info($updatedProperties);
+        $this->info($content);
         // CFile::put($modelFile, $content);
 
         $this->info($model . 'Model updated');
@@ -200,17 +201,13 @@ class CConsole_Command_Model_ModelUpdateCommand extends CConsole_Command_AppComm
         foreach ($fileds as $field => $type) {
             $i = array_search($field, $currentPropertiyFields);
             if ($i === false) {
-                $compared[] = [
-                    $field => 'add',
-                ];
+                $compared[$field] = 'add';
             } else {
                 $prop = c::get($currentProperties, $i);
                 $propType = c::get($prop, 'type');
 
                 if ($propType !== $type) {
-                    $compared[] = [
-                        $field => 'update',
-                    ];
+                    $compared[$field] = 'update';
                 }
             }
         }
@@ -218,9 +215,7 @@ class CConsole_Command_Model_ModelUpdateCommand extends CConsole_Command_AppComm
         foreach ($currentPropertiyFields as $field) {
             $i = array_search($field, array_keys($fileds));
             if ($i === false && !in_array($field, $classMethods)) {
-                $compared[] = [
-                    $field => 'delete',
-                ];
+                $compared[$field] = 'delete';
             }
         }
 
@@ -232,17 +227,33 @@ class CConsole_Command_Model_ModelUpdateCommand extends CConsole_Command_AppComm
         $fields = $this->getFields();
         $currentProperties = $this->getCurrentProperties();
         $compare = $this->compareField();
-        $this->info(json_encode($compare, JSON_PRETTY_PRINT));
-        // foreach ($variable as $key => $value) {
-        //     # code...
-        // }
-        // foreach ($fields as $field => $type) {
-        //     if ($field == $this->getTable() . '_id') {
-        //         $properties[] = " * @property-read ${type} $${field}";
-        //     } else {
-        //         $properties[] = " * @property ${type} $${field}";
-        //     }
-        // }
+
+        foreach ($compare as $field => $status) {
+            $i = array_search($field, array_column($currentProperties, 'field'));
+            switch ($status) {
+                case 'add':
+                    $currentProperties[] = [
+                        'prop' => $this->getTable() . '_id' === $field ? '@property-read' : '@property',
+                        'type' => 'string',
+                        'var' => '$' . $field,
+                        'field' => $field
+                    ];
+
+                    break;
+                case 'delete':
+                    unset($currentProperties[$i]);
+
+                    break;
+                case 'update':
+                    $currentProperties[$i]['type'] = $fields[$field];
+
+                    break;
+            }
+        }
+
+        foreach ($currentProperties as $property) {
+            $properties[] = ' * ' . c::get($property, 'prop') . ' ' . c::get($property, 'type') . ' ' . c::get($property, 'var');
+        }
 
         $result = implode("\n", $properties);
 
