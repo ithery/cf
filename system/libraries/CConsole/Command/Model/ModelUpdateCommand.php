@@ -41,14 +41,12 @@ class CConsole_Command_Model_ModelUpdateCommand extends CConsole_Command_AppComm
             exit(1);
         }
         $content = CFile::get($modelFile);
-        // $content = str_replace('{properties}', $this->getProperties(), $content);
+        $content = preg_replace('/.*@property.*/', '{properties}', $content);
+        $content = preg_replace('/{properties}/', $this->getUpdatedProperties(), $content, 1);
+        $content = str_replace("{properties}\n", '', $content);
 
-        // $compared = $this->compareField();
-        // $this->info(json_encode($compared, JSON_PRETTY_PRINT));
         $updatedProperties = $this->getUpdatedProperties();
-        $this->info($updatedProperties);
-        $this->info($content);
-        // CFile::put($modelFile, $content);
+        CFile::put($modelFile, $content);
 
         $this->info($model . 'Model updated');
     }
