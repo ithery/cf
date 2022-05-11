@@ -17,7 +17,6 @@ class CConsole_Command_Model_ModelUpdateCommand extends CConsole_Command_AppComm
 
     public function handle() {
         $model = $this->getModel();
-        $table = $this->getTable();
         $this->info('Updating ' . $model . ' model...');
 
         $modelPath = c::fixPath(CF::appDir()) . 'default' . DS . 'libraries' . DS . $this->prefix . 'Model' . DS;
@@ -45,7 +44,6 @@ class CConsole_Command_Model_ModelUpdateCommand extends CConsole_Command_AppComm
         $content = preg_replace('/{properties}/', $this->getUpdatedProperties(), $content, 1);
         $content = str_replace("{properties}\n", '', $content);
 
-        $updatedProperties = $this->getUpdatedProperties();
         CFile::put($modelFile, $content);
 
         $this->info($model . 'Model updated');
@@ -87,22 +85,6 @@ class CConsole_Command_Model_ModelUpdateCommand extends CConsole_Command_AppComm
         }
 
         return $model;
-    }
-
-    private function getProperties() {
-        $properties = [];
-        $fields = $this->getFields();
-        foreach ($fields as $field => $type) {
-            if ($field == $this->getTable() . '_id') {
-                $properties[] = " * @property-read ${type} $${field}";
-            } else {
-                $properties[] = " * @property ${type} $${field}";
-            }
-        }
-
-        $result = implode("\n", $properties);
-
-        return $result;
     }
 
     private function getCurrentProperties() {
