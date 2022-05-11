@@ -1,6 +1,6 @@
 <?php
 
-trait CAuth_Concern_ThrottlesLogins {
+trait CAuth_Concern_ThrottlesLogin {
     /**
      * Determine if the user has too many failed login attempts.
      *
@@ -81,7 +81,7 @@ trait CAuth_Concern_ThrottlesLogins {
      * @return string
      */
     protected function throttleKey(CHTTP_Request $request) {
-        return cstr::transliterate(cstr::lower($request->input($this->username())) . '|' . $request->ip());
+        return cstr::transliterate(cstr::lower($this->username()) . '|' . $request->ip());
     }
 
     /**
