@@ -8,8 +8,13 @@ class CConsole_Command_AppCommand extends CConsole_Command {
         $this->prefix = CF::config('app.prefix');
 
         if (strlen($this->prefix) == 0) {
-            echo "Application prefix is required, make sure You on app directory. You can define it on app config using key \"prefix\"\n";
-            exit;
+            // echo "Application prefix is required, make sure You on app directory. You can define it on app config using key \"prefix\"\n";
+            // echo "\n" . get_called_class()."\n";
+            // exit;
         }
     }
+
+    // public function handler() {
+    //
+    // }
 }
