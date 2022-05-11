@@ -1,6 +1,6 @@
 <?php
 
-class CConsole_Command_Make_MakeModelCommand extends CConsole_Command {
+class CConsole_Command_Make_MakeModelCommand extends CConsole_Command_AppCommand {
     /**
      * The name and signature of the console command.
      *
@@ -16,19 +16,12 @@ class CConsole_Command_Make_MakeModelCommand extends CConsole_Command {
     protected $description = 'Create a new model class based on created table on database';
 
     public function handle() {
-        CConsole::domainRequired($this);
-        $prefix = CF::config('app.prefix');
-        if (strlen($prefix) == 0) {
-            $this->error('Application prefix is required, you can define it on app config using key "prefix"');
-
-            return CConsole::FAILURE_EXIT;
-        }
         $model = $this->getModel();
         $table = $this->getTable();
         $this->info('Creating ' . $model . ' model...');
 
-        $modelPath = c::fixPath(CF::appDir()) . 'default' . DS . 'libraries' . DS . $prefix . 'Model' . DS;
-        $modelClass = $prefix . 'Model';
+        $modelPath = c::fixPath(CF::appDir()) . 'default' . DS . 'libraries' . DS . $this->prefix . 'Model' . DS;
+        $modelClass = $this->prefix . 'Model';
         if (!CFile::isDirectory($modelPath)) {
             CFile::makeDirectory($modelPath);
         }
@@ -49,7 +42,7 @@ class CConsole_Command_Make_MakeModelCommand extends CConsole_Command {
         }
         $content = CFile::get($stubFile);
         $content = str_replace('{ModelClass}', $modelClass, $content);
-        $content = str_replace('{prefix}', $prefix, $content);
+        $content = str_replace('{prefix}', $this->prefix, $content);
         $content = str_replace('{table}', $table, $content);
         $content = str_replace('{primaryKey}', $table . '_id', $content);
         $content = str_replace('{properties}', $this->getProperties(), $content);
