@@ -884,9 +884,17 @@ final class CF {
                 return CF::cliAppCode();
             }
         }
+
         $data = self::data($domain);
 
-        return isset($data['app_code']) ? $data['app_code'] : null;
+        $appCode = isset($data['app_code']) ? $data['app_code'] : null;
+        if ($appCode == null) {
+            if (substr(CF::domain(), -5) === '.test') {
+                $appCode = substr(CF::domain(), 0, -5);
+            }
+        }
+
+        return $appCode;
     }
 
     /**
