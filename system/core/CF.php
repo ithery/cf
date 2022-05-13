@@ -652,6 +652,9 @@ final class CF {
      */
     public static function cliDomain() {
         $domain = null;
+        if (defined('CFCLI_APPCODE') && CFCLI_APPCODE) {
+            return CFCLI_APPCODE . '.test';
+        }
         if (file_exists(static::CFCLI_CURRENT_DOMAIN_FILE)) {
             $domain = trim(file_get_contents(static::CFCLI_CURRENT_DOMAIN_FILE));
         }
@@ -665,6 +668,9 @@ final class CF {
      * @return string
      */
     public static function cliAppCode() {
+        if (defined('CFCLI_APPCODE') && CFCLI_APPCODE) {
+            return CFCLI_APPCODE;
+        }
         if (CF::isTesting()) {
             foreach ($_SERVER['argv'] as $argv) {
                 if (substr($argv, -strlen('phpunit.xml')) === (string) 'phpunit.xml') {
@@ -712,6 +718,9 @@ final class CF {
         }
         if (static::isCli() || static::isCFCli()) {
             // Command line requires a bit of hacking
+            if (defined('CFCLI_APPCODE') && CFCLI_APPCODE) {
+                return CFCLI_APPCODE . '.test';
+            }
             if (static::isCFCli() || static::isTesting()) {
                 if (isset($_SERVER['argv']) && is_array($_SERVER['argv'])) {
                     foreach ($_SERVER['argv'] as $argv) {
@@ -879,9 +888,17 @@ final class CF {
                 return CF::cliAppCode();
             }
         }
+
         $data = self::data($domain);
 
-        return isset($data['app_code']) ? $data['app_code'] : null;
+        $appCode = isset($data['app_code']) ? $data['app_code'] : null;
+        if ($appCode == null) {
+            if (substr(CF::domain(), -5) === '.test') {
+                $appCode = substr(CF::domain(), 0, -5);
+            }
+        }
+
+        return $appCode;
     }
 
     /**
