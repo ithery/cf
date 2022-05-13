@@ -46,6 +46,7 @@ class CElement_FormInput_Password extends CElement_FormInput {
 
     public function setShowPassword($bool = true) {
         $this->showPassword = $bool;
+
         return $this;
     }
 }

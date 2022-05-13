@@ -77,7 +77,6 @@ abstract class CApp_Api_Method implements CApp_Api_MethodInterface {
         $apiKey = CF::config('devcloud.api_key');
         $secretKey = CF::config('devcloud.secret_key');
 
-        $config = CF::config('devcloud');
         $requestApiKey = carr::get($this->request(), 'apiKey');
         $requestSecretKey = carr::get($this->request(), 'secretKey');
 
@@ -113,7 +112,7 @@ abstract class CApp_Api_Method implements CApp_Api_MethodInterface {
 
         if ($apiKey != $requestApiKey && $secretKey != $requestSecretKey) {
             $this->errCode = 9999;
-            $this->errMessage = 'Authentication Failed! ' . CF::domain() . '|' . $apiKey . '|' . $requestApiKey . '|' . $secretKey . '|' . $requestSecretKey;
+            $this->errMessage = 'Authentication Failed! ';// . json_encode(c::request()->secure()) . '#' . json_encode(c::request()->all()) . '|' . CF::domain() . '|' . $apiKey . '|' . $requestApiKey . '|' . $secretKey . '|' . $requestSecretKey;
         }
     }
 

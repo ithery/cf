@@ -381,7 +381,7 @@ class CElement_Component_Form extends CElement_Component {
 						}
 						" . $script_redirect_url . "
 					} else {
-						$.cresenity.message('error',data);
+						cresenity.message('error',data);
 					}
 
 
@@ -401,7 +401,7 @@ class CElement_Component_Form extends CElement_Component {
                 //the response is json
                 $on_success_script = "
 				jQuery('#" . $this->ajax_submit_target . "').html(data.html);
-				var script = $.cresenity.base64.decode(data.js);
+				var script = cresenity.base64.decode(data.js);
 
 				eval(script);
 				jQuery('#" . $this->ajax_submit_target . "').removeClass('loading');
@@ -423,7 +423,7 @@ class CElement_Component_Form extends CElement_Component {
                 //the response is json
                 $on_success_script = "
 				jQuery('." . $this->ajax_submit_target_class . "').html(data.html);
-				var script = $.cresenity.base64.decode(data.js);
+				var script = cresenity.base64.decode(data.js);
 
 				eval(script);
 				jQuery('." . $this->ajax_submit_target_class . "').removeClass('loading');
@@ -489,14 +489,12 @@ class CElement_Component_Form extends CElement_Component {
 							dataType: '" . $this->ajax_datatype . "',
 							type: '" . $this->method . "',
 							success: function(data) {
-                                                            $.cresenity._handle_response(data,function() {
-                                                                    $('#" . $this->id . "').find('*').removeClass('disabled');
-                                                                    $('#" . $this->id . "').removeClass('loading');
-                                                                    " . $on_success_script . "
-                                                                });
-                                                                //do callback
-
-
+                                cresenity.handleResponse(data,function() {
+                                    $('#" . $this->id . "').find('*').removeClass('disabled');
+                                    $('#" . $this->id . "').removeClass('loading');
+                                    " . $on_success_script . "
+                                });
+                                //do callback
 							},
 
 							error: function(xhr, status, error) {

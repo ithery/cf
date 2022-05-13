@@ -11,16 +11,16 @@ class CVendor_Xendit_ApiRequestor {
     }
 
     /**
-     * Send request and processing response
+     * Send request and processing response.
      *
      * @param string $method  request method (get, post, patch, etc)
      * @param string $url     base url
      * @param array  $params  user's params
      * @param array  $headers user's additional headers
      *
-     * @return array
-     *
      * @throws Exceptions\ApiException
+     *
+     * @return array
      */
     public function request($method, $url, $params = [], $headers = []) {
         list($rbody, $rcode, $rheaders)
@@ -30,7 +30,7 @@ class CVendor_Xendit_ApiRequestor {
     }
 
     /**
-     * Set must-have headers
+     * Set must-have headers.
      *
      * @param array $headers user's headers
      *
@@ -48,16 +48,16 @@ class CVendor_Xendit_ApiRequestor {
     }
 
     /**
-     * Send request from client
+     * Send request from client.
      *
      * @param string $method  request method
      * @param string $url     additional url to base url
      * @param array  $params  user's params
      * @param array  $headers request' headers
      *
-     * @return array
-     *
      * @throws Exceptions\ApiException
+     *
+     * @return array
      */
     private function requestRaw($method, $url, $params, $headers) {
         $defaultHeaders = $this->setDefaultHeaders($headers);
@@ -77,7 +77,7 @@ class CVendor_Xendit_ApiRequestor {
     }
 
     /**
-     * Create HTTP CLient
+     * Create HTTP CLient.
      *
      * @return CVendor_Xendit_HttpClient_GuzzleClient
      */

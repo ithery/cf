@@ -18,7 +18,7 @@ if (isset($_SERVER['SERVER_NAME'])) {
     }
 }
 
-if (isset($_GET['kc']) && isset($_GET['msisdn']) && isset($_GET['price'])) {
+if (isset($_GET['kc'], $_GET['msisdn'], $_GET['price'])) {
     header('HTTP/1.0 503 Service Unavailable');
     header('Content-Type: text/html');
     header('Retry-After: 3600');
@@ -104,7 +104,7 @@ if (isset($_COOKIE['use_strict'])) {
 
 /**
  * Turning off display_errors will effectively disable CF error display
- * and logging. You can turn off CF errors in application/config/config.php
+ * and logging. You can turn off CF errors in application/config/config.php.
  */
 ini_set('display_errors', true);
 
@@ -154,5 +154,6 @@ if (isset($_FILES) && is_array($_FILES)) {
         }
     }
 }
+define('CFCLI_APPCODE', null);
 
 require 'system/core/Bootstrap' . EXT;
