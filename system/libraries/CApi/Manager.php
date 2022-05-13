@@ -126,7 +126,7 @@ class CApi_Manager {
                 $this->routerAdapter(),
                 $this->exceptionHandler(),
                 $this->getConfig('domain', CF::domain()),
-                $this->getConfig('prefix', ''),
+                $this->getConfig('prefix', '')
             );
         }
 

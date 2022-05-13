@@ -10,7 +10,7 @@ class CApi_Kernel {
     public function handle(CHTTP_Request $request, Closure $methodResolver) {
         try {
             $request = CApi_HTTP_Request::createFromBase($request);
-
+            CEvent::dispatch(new CApi_Event_IncomingRequest($request));
             $response = $this->sendRequestThroughPipeline($request, $methodResolver);
         } catch (Exception $e) {
             $this->reportException($e);
@@ -54,7 +54,9 @@ class CApi_Kernel {
     protected function dispatchMethod(CApi_MethodAbstract $method) {
         return function ($request) use ($method) {
             $method->execute();
+            CEvent::dispatch(new CApi_Event_BeforeDispatch($method));
             $methodResponse = new CApi_MethodResponse($request, $method);
+            CEvent::dispatch(new CApi_Event_AfterDispatch($methodResponse));
 
             return $methodResponse->toResponse();
         };

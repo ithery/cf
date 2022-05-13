@@ -92,7 +92,10 @@ abstract class CNotification_ChannelAbstract implements CNotification_ChannelInt
                         $vendorResponse = $resultResponse;
                     }
 
-                    $vendorResponse = json_encode($vendorResponse);
+                    if (!is_string($vendorResponse)) {
+                        $vendorResponse = json_encode($vendorResponse);
+                    }
+
                     $logNotificationModel->vendor_response = $vendorResponse;
 
                     CDaemon::log('vendor response:' . $vendorResponse);

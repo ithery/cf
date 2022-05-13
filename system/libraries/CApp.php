@@ -482,6 +482,7 @@ class CApp implements CInterface_Responsable, CInterface_Renderable, CInterface_
         }
 
         $asset = CManager::asset();
+        $html = $this->element->html();
         $js = $this->element->js();
         $js = $asset->renderJsRequire($js, 'cresenity.cf.require');
 
@@ -495,7 +496,7 @@ class CApp implements CInterface_Responsable, CInterface_Renderable, CInterface_
         // }
 
         //$js .= $cappScript;
-        $data['html'] = $message . $this->html() . $cappScript;
+        $data['html'] = $message . $html . $cappScript;
         $data['js'] = base64_encode($js);
         if (CF::config('app.debug')) {
             $data['jsRaw'] = $js;

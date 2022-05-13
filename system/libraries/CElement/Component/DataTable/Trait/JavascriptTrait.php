@@ -405,6 +405,7 @@ jQuery('.data_table-quick_search').on('keyup change', function() {
                 });
             ");
         }
+
         $js->appendln($this->js_cell);
         if (!$this->ajax) {
             $js->append(parent::js($indent))->br();
