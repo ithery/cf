@@ -54,6 +54,10 @@ abstract class CApi_MethodAbstract implements CInterface_Arrayable {
         $this->apiRequest = $apiRequest;
     }
 
+    public function getApiRequest() {
+        return $this->apiRequest;
+    }
+
     /**
      * Register middleware on the controller.
      *

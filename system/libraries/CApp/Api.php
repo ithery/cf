@@ -59,7 +59,12 @@ class CApp_Api {
         }
 
         $logger = null;
-        if (class_exists($className)) {
+
+        $invalidClass = [
+            CApp_Api_Method_Server::class,
+        ];
+
+        if (!in_array($className, $invalidClass) && class_exists($className)) {
             $methodObject = new $className($this, $method);
 
             if ($methodObject->getErrCode() == 0) {

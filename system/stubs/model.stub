@@ -1,0 +1,12 @@
+<?php
+
+defined('SYSPATH') or die('No direct script access.');
+
+/**
+{properties}
+ **/
+class {ModelClass} extends {prefix}Model {
+    protected $table = '{table}';
+
+    protected $guarded = ['{primaryKey}'];
+}

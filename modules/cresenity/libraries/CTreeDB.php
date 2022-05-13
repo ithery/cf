@@ -4,6 +4,7 @@ defined('SYSPATH') or die('No direct access allowed.');
 
 class CTreeDB {
     use CTrait_Compat_TreeDb;
+
     protected $db = null;
 
     protected $pk_column = '';
@@ -20,7 +21,7 @@ class CTreeDB {
 
     public function __construct($table_name, $domain = null, $db = null, $prefix = '') {
         if ($domain == null) {
-            $domain = crouter::domain();
+            $domain = CF::domain();
         }
         if ($db == null) {
             $db = CDatabase::instance(null, null, $domain);
@@ -261,8 +262,8 @@ class CTreeDB {
                 FROM ' . $db->escape_table($this->table_name) . '
                 WHERE ' . $db->escape_column($this->pk_column) . ' = ' . $db->escape($parent_id);
         $row = cdbutils::get_row($q);
-        $rgt = cobj::get($row, 'rgt');
-        $lft = cobj::get($row, 'lft');
+        $rgt = c::get($row, 'rgt');
+        $lft = c::get($row, 'lft');
 
         $q = ' select * from ' . $db->escape_table($this->table_name) . ' where  status>0 and lft<' . $db->escape($lft) . ' and rgt>' . $db->escape($rgt) . ' ';
         if (strlen($this->org_id) > 0) {
@@ -282,8 +283,8 @@ class CTreeDB {
                 FROM ' . $db->escape_table($this->table_name) . '
                 WHERE ' . $db->escape_column($this->pk_column) . ' = ' . $db->escape($parent_id);
         $row = cdbutils::get_row($q);
-        $rgt = cobj::get($row, 'rgt');
-        $lft = cobj::get($row, 'lft');
+        $rgt = c::get($row, 'rgt');
+        $lft = c::get($row, 'lft');
 
         $q = ' select * from ' . $db->escape_table($this->table_name) . ' where  status>0 and lft<' . $db->escape($lft) . ' and rgt>' . $db->escape($rgt) . ' ';
         if (strlen($this->org_id) > 0) {

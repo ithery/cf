@@ -17,4 +17,7 @@ return [
         'key' => c::env('ZENZIVA_API_KEY'),
         'secret' => c::env('ZENZIVA_API_SECRET'),
     ],
+    'onesignal' => [
+        'user_key' => c::env('ONESIGNAL_USER_KEY'),
+    ],
 ];
