@@ -273,6 +273,9 @@ class CVendor_Xendit {
         if (!empty($capture_options['installment'])) {
             $data['installment'] = $capture_options['installment'];
         }
+        if (!empty($capture_options['billing_details'])) {
+            $data['billing_details'] = $capture_options['billing_details'];
+        }
         $payload = json_encode($data);
         curl_setopt($curl, CURLOPT_HTTPHEADER, $headers);
         curl_setopt($curl, CURLOPT_USERPWD, $this->secret_api_key . ':');
@@ -660,7 +663,7 @@ class CVendor_Xendit {
         $data['customer_id'] = $customerId;
         $data['currency'] = 'IDR';
         $data['channel_code'] = carr::get($options, 'channel_code');
-        $data['amount'] = $amount;
+        $data['amount'] = (int) $amount;
         $data['order_items'][] = carr::get($options, 'orderItems', []);
         $response = $this->requestToXendit($endPoint, 'POST', $data);
 

@@ -294,7 +294,7 @@ class Controller_Cresenity extends CController {
         }
         $avatarApi->render();
         */
-        ob_start('ob_gzhandler');
+        //ob_start('ob_gzhandler');
         $headers = [
             'Content-Type' => 'image/png',
             'Pragma' => 'public',
@@ -306,12 +306,16 @@ class Controller_Cresenity extends CController {
             return $avatarApi->render();
         }
 
-        return c::response()->stream(function () use ($avatarApi) {
-            $avatarApi->render();
-        }, 200, $headers);
+        return c::response($avatarApi->render(), 200, $headers);
+        // return c::response()->stream(function () use ($avatarApi) {
+        //     $avatarApi->render();
+        // }, 200, $headers);
     }
 
     public function connector($engine, $method = null) {
+        if ($method == null) {
+            return c::abort(404);
+        }
         $engineName = 'FileManager';
         switch ($engine) {
             case 'elfinder':
