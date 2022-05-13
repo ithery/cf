@@ -313,6 +313,9 @@ class Controller_Cresenity extends CController {
     }
 
     public function connector($engine, $method = null) {
+        if ($method == null) {
+            return c::abort(404);
+        }
         $engineName = 'FileManager';
         switch ($engine) {
             case 'elfinder':
