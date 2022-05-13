@@ -269,12 +269,12 @@ class Controller_Cresenity extends CController {
     }
 
     public function avatar($method = 'initials') {
-        // if (!function_exists('gd_info')) {
-        //     throw new Exception('GD Library extension must be installed/enabled to use avatar endpoint.');
-        // }
-        // if (!function_exists('finfo_buffer')) {
-        //     throw new Exception('PHP fileinfo extension must be installed/enabled to use avatar endpoint.');
-        // }
+        if (!function_exists('gd_info')) {
+            throw new Exception('GD Library extension must be installed/enabled to use avatar endpoint.');
+        }
+        if (!function_exists('finfo_buffer')) {
+            throw new Exception('PHP fileinfo extension must be installed/enabled to use avatar endpoint.');
+        }
 
         $engineName = 'Initials';
         switch ($method) {
@@ -294,7 +294,7 @@ class Controller_Cresenity extends CController {
         }
         $avatarApi->render();
         */
-        ob_start('ob_gzhandler');
+        //ob_start('ob_gzhandler');
         $headers = [
             'Content-Type' => 'image/png',
             'Pragma' => 'public',
@@ -306,9 +306,10 @@ class Controller_Cresenity extends CController {
             return $avatarApi->render();
         }
 
-        return c::response()->stream(function () use ($avatarApi) {
-            $avatarApi->render();
-        }, 200, $headers);
+        return c::response($avatarApi->render(), 200, $headers);
+        // return c::response()->stream(function () use ($avatarApi) {
+        //     $avatarApi->render();
+        // }, 200, $headers);
     }
 
     public function connector($engine, $method = null) {
