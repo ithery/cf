@@ -731,6 +731,19 @@ class cstr {
     }
 
     /**
+     * Transliterate a string to its closest ASCII representation.
+     *
+     * @param string      $string
+     * @param null|string $unknown
+     * @param null|bool   $strict
+     *
+     * @return string
+     */
+    public static function transliterate($string, $unknown = '?', $strict = false) {
+        return CASCII::toTransliterate($string, $unknown, $strict);
+    }
+
+    /**
      * Returns the replacements for the ascii method.
      *
      * Note: Adapted from Stringy\Stringy.

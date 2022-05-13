@@ -14,6 +14,6 @@ class CNotification_Message_Onesignal extends CNotification_MessageAbstract {
         //     CDaemon::log('Fail send to ' . $report->target()->type() . ':' . $report->target()->value() . ', reason:' . $report->error()->getMessage());
         // }
 
-        // return $multicastReport;
+        return $message;
     }
 }

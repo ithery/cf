@@ -114,13 +114,8 @@ class CConsole_Command_ServeCommand extends CConsole_Command {
             (new PhpExecutableFinder())->find(false),
             '-S',
             $this->host() . ':' . $this->port(),
-        ];
-
-        return [
-            (new PhpExecutableFinder())->find(false),
-            '-S',
-            $this->host() . ':' . $this->port(),
-            DOCROOT . 'index.php',
+            '-t',
+            DOCROOT,
         ];
     }
 
