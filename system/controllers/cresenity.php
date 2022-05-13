@@ -269,12 +269,12 @@ class Controller_Cresenity extends CController {
     }
 
     public function avatar($method = 'initials') {
-        if (!function_exists('gd_info')) {
-            throw new Exception('GD Library extension must be installed/enabled to use avatar endpoint.');
-        }
-        if (!function_exists('finfo_buffer')) {
-            throw new Exception('PHP fileinfo extension must be installed/enabled to use avatar endpoint.');
-        }
+        // if (!function_exists('gd_info')) {
+        //     throw new Exception('GD Library extension must be installed/enabled to use avatar endpoint.');
+        // }
+        // if (!function_exists('finfo_buffer')) {
+        //     throw new Exception('PHP fileinfo extension must be installed/enabled to use avatar endpoint.');
+        // }
 
         $engineName = 'Initials';
         switch ($method) {
