@@ -297,8 +297,11 @@ class CException_ExceptionHandler implements CException_ExceptionHandlerInterfac
      */
     protected function invalidJson($request, CValidation_Exception $exception) {
         return c::response()->json([
-            'message' => $exception->getMessage(),
-            'errors' => $exception->errors(),
+            'errCode' => '422',
+            'errMessage' => $exception->getMessage(),
+            'data' => [
+                'errors' => $exception->errors(),
+            ],
         ], $exception->status);
     }
 
@@ -479,6 +482,7 @@ class CException_ExceptionHandler implements CException_ExceptionHandlerInterfac
                 $response->getStatusCode(),
                 $response->headers->all()
             );
+            $response->setRequest(c::request());
         } else {
             $response = new CHTTP_Response(
                 $response->getContent(),
