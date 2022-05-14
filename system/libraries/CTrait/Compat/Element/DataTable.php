@@ -242,14 +242,37 @@ trait CTrait_Compat_Element_DataTable {
         return $this->setApplyDataTable($bool);
     }
 
+    /**
+     * @param int $length
+     *
+     * @return $this
+     *
+     * @deprecated 1.2
+     */
     public function set_display_length($length) {
         return $this->setDisplayLength($length);
     }
 
+    /**
+     * @param callable|Closure $func
+     * @param string           $require
+     *
+     * @return $this
+     *
+     * @deprecated 1.2
+     */
     public function cell_callback_func($func, $require = '') {
         return $this->cellCallbackFunc($func, $require);
     }
 
+    /**
+     * @param callable|Closure $func
+     * @param string           $require
+     *
+     * @return $this
+     *
+     * @deprecated 1.2
+     */
     public function filter_action_callback_func($func, $require = '') {
         return $this->filterActionCallbackFunc($func, $require);
     }
