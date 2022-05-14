@@ -436,7 +436,8 @@ class CVendor_Shipper {
         $data['best_price'] = $bestPrice;
         $endPoint = $this->url . 'v3/order/';
         $response = $this->requestToShipper($endPoint, 'POST', $data);
-        $response["request"] = $data;
+        $response['request'] = $data;
+
         return $response;
     }
 
@@ -465,8 +466,6 @@ class CVendor_Shipper {
      *      'pickup_time'   => '2021-12-30T19:00:00+07:00',     // the class
      *  );
      *
-     * @method getOrder
-     *
      * @param mixed $orderActivation
      *
      * @return object JSON Results
@@ -489,8 +488,6 @@ class CVendor_Shipper {
      *      'end_time'   => '2021-12-30T19:00:00+07:00',     // the class
      *      'timezone'   => 'Asia/Jakarta',     // the class
      *  );
-     *
-     * @method getOrder
      *
      * @param mixed $orderActivation
      *
