@@ -57,6 +57,7 @@ class CBootstrap {
 
     public function boot() {
         if (!$this->booted) {
+            CBase::boot();
             //we boot all bootstrapper
             $this->bootstrapper = c::collect($this->getBootstrapperClass())->map(function ($item) {
                 return c::tap((new $item()), function ($bootstrapper) {
