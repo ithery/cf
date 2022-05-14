@@ -46,10 +46,6 @@ class CDebug_Bar extends CDebug_AbstractBar {
         }
     }
 
-    public function disable() {
-        $this->enabled = false;
-    }
-
     public function shouldCollect($name, $default = false) {
         return CF::config('debug.debugbar.collectors.' . $name, $default);
     }
