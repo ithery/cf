@@ -28,6 +28,6 @@ class CImage_Avatar_Api_Initials {
             ->rounded($input->rounded)
             ->generate();
 
-        echo $image->stream('png', 100);
+        return $image->stream('png', 100);
     }
 }

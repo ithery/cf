@@ -13,6 +13,10 @@ use Symfony\Component\HttpFoundation\StreamedResponse;
 use Symfony\Component\HttpFoundation\BinaryFileResponse;
 
 class CDebug_Bar_Renderer {
+    const REPLACEABLE_TAG = '<!-- CAPP-DEBUGBAR-CODE -->';
+
+    const REPLACEABLE_JS_TAG = '/* CAPP-DEBUGBAR-CODE */';
+
     /**
      * @var CDebug_Bar
      */
@@ -59,10 +63,6 @@ class CDebug_Bar_Renderer {
         'debug/debugbar/openhandler.js',
         'debug/debugbar/highlightjs/highlight.pack.js',
     ];
-
-    const REPLACEABLE_TAG = '<!-- CAPP-DEBUGBAR-CODE -->';
-
-    const REPLACEABLE_JS_TAG = '/* CAPP-DEBUGBAR-CODE */';
 
     public function __construct(CDebug_Bar $bar) {
         $this->debugBar = $bar;
@@ -115,7 +115,7 @@ class CDebug_Bar_Renderer {
     }
 
     /**
-     * {@inheritdoc}
+     * @inheritdoc
      */
     public function renderHead() {
         $html = '';
@@ -174,11 +174,12 @@ class CDebug_Bar_Renderer {
                 $string = $string . $javascriptCode;
             }
         }
+
         return $string;
     }
 
     /**
-     * Returns the code needed to display the debug bar
+     * Returns the code needed to display the debug bar.
      *
      * AJAX request should not render the initialization code.
      *
@@ -199,11 +200,12 @@ class CDebug_Bar_Renderer {
         }
         $suffix = !$initialize ? '(ajax)' : null;
         $js .= $this->getAddDatasetCode($this->debugBar->getCurrentRequestId(), $this->debugBar->getData(), $suffix);
+
         return $js;
     }
 
     /**
-     * Returns the js code needed to initialize the debug bar
+     * Returns the js code needed to initialize the debug bar.
      *
      * @return string
      */
@@ -223,11 +225,12 @@ class CDebug_Bar_Renderer {
         if ($this->openHandlerUrl !== null) {
             $js .= sprintf("%s.setOpenHandler(new %s(%s));\n", $this->variableName, $this->openHandlerClass, json_encode(['url' => $this->openHandlerUrl]));
         }
+
         return $js;
     }
 
     /**
-     * Returns the js code needed to initialized the controls and data mapping of the debug bar
+     * Returns the js code needed to initialized the controls and data mapping of the debug bar.
      *
      * Controls can be defined by collectors themselves or using {@see addControl()}
      *
@@ -275,7 +278,7 @@ class CDebug_Bar_Renderer {
                     isset($options['position']) ? $options['position'] : 'right'
                 );
             }
-            if (isset($options['map']) && isset($options['default'])) {
+            if (isset($options['map'], $options['default'])) {
                 $dataMap[$name] = [$options['map'], $options['default']];
             }
         }
@@ -287,6 +290,7 @@ class CDebug_Bar_Renderer {
         $js .= sprintf("%s.setDataMap({\n%s\n});\n", $varname, implode(",\n", $mapJson));
         // activate state restoration
         $js .= sprintf("%s.restoreState();\n", $varname);
+
         return $js;
     }
 
@@ -299,15 +303,18 @@ class CDebug_Bar_Renderer {
         CEvent::dispatcher()->listen(CHTTP_Event_RequestHandled::class, function ($event) use ($renderer) {
             $response = $event->response;
             $jsonHelper = CHelper::json();
+
             if (!$renderer->isFileResponse($response)) {
-                if ($response instanceof CHTTP_JsonResponse && CApp::isAjax()) {
+                if ($response instanceof CHTTP_JsonResponse) {
                     $output = $response->getContent();
+
                     try {
                         if (!headers_sent()) {
                             header('phpdebugbar-body:1');
                         }
 
                         $json = null;
+
                         try {
                             $json = $jsonHelper->parse($output);
                         } catch (Exception $ex) {
@@ -330,6 +337,7 @@ class CDebug_Bar_Renderer {
 
                     if (cstr::startsWith(trim($output), '{') && CApp::isAjax()) {
                         $json = null;
+
                         try {
                             $json = $jsonHelper->parse($output);
                             $json = array_merge($json, $this->debugBar->getDataAsHeaders('phpdebugbar', 4096, PHP_INT_MAX));
@@ -357,7 +365,7 @@ class CDebug_Bar_Renderer {
     }
 
     /**
-     * Returns the js code needed to add a dataset
+     * Returns the js code needed to add a dataset.
      *
      * @param string $requestId
      * @param array  $data
@@ -367,11 +375,12 @@ class CDebug_Bar_Renderer {
      */
     protected function getAddDatasetCode($requestId, $data, $suffix = null) {
         $js = sprintf("%s.addDataSet(%s, \"%s\"%s);\n", $this->variableName, json_encode($data), $requestId, $suffix ? ', ' . json_encode($suffix) : '');
+
         return $js;
     }
 
     /**
-     * Sets the class name of the ajax handler
+     * Sets the class name of the ajax handler.
      *
      * Set to false to disable
      *
@@ -379,11 +388,12 @@ class CDebug_Bar_Renderer {
      */
     public function setAjaxHandlerClass($className) {
         $this->ajaxHandlerClass = $className;
+
         return $this;
     }
 
     /**
-     * Returns the class name of the ajax handler
+     * Returns the class name of the ajax handler.
      *
      * @return string
      */
@@ -392,17 +402,18 @@ class CDebug_Bar_Renderer {
     }
 
     /**
-     * Sets whether to call bindToJquery() on the ajax handler
+     * Sets whether to call bindToJquery() on the ajax handler.
      *
      * @param bool $bind
      */
     public function setBindAjaxHandlerToJquery($bind = true) {
         $this->ajaxHandlerBindToJquery = $bind;
+
         return $this;
     }
 
     /**
-     * Checks whether bindToJquery() will be called on the ajax handler
+     * Checks whether bindToJquery() will be called on the ajax handler.
      *
      * @return bool
      */
@@ -411,17 +422,18 @@ class CDebug_Bar_Renderer {
     }
 
     /**
-     * Sets whether to call bindToXHR() on the ajax handler
+     * Sets whether to call bindToXHR() on the ajax handler.
      *
      * @param bool $bind
      */
     public function setBindAjaxHandlerToXHR($bind = true) {
         $this->ajaxHandlerBindToXHR = $bind;
+
         return $this;
     }
 
     /**
-     * Checks whether bindToXHR() will be called on the ajax handler
+     * Checks whether bindToXHR() will be called on the ajax handler.
      *
      * @return bool
      */
@@ -437,6 +449,7 @@ class CDebug_Bar_Renderer {
      */
     public function setAjaxHandlerAutoShow($autoShow = true) {
         $this->ajaxHandlerAutoShow = $autoShow;
+
         return $this;
     }
 
@@ -450,17 +463,18 @@ class CDebug_Bar_Renderer {
     }
 
     /**
-     * Sets the class name of the js open handler
+     * Sets the class name of the js open handler.
      *
      * @param string $className
      */
     public function setOpenHandlerClass($className) {
         $this->openHandlerClass = $className;
+
         return $this;
     }
 
     /**
-     * Returns the class name of the js open handler
+     * Returns the class name of the js open handler.
      *
      * @return string
      */
@@ -469,17 +483,18 @@ class CDebug_Bar_Renderer {
     }
 
     /**
-     * Sets the url of the open handler
+     * Sets the url of the open handler.
      *
      * @param string $url
      */
     public function setOpenHandlerUrl($url) {
         $this->openHandlerUrl = $url;
+
         return $this;
     }
 
     /**
-     * Returns the url for the open handler
+     * Returns the url for the open handler.
      *
      * @return string
      */
