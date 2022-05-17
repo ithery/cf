@@ -47,6 +47,8 @@ trait CApp_Concern_VariablesTrait {
         $variables['react']['enable'] = CF::config('cresjs.react.enable');
         $variables['block'] = [];
         $variables['block']['html'] = CF::config('cresjs.block.html');
+        $variables['timezoneString'] = c::now()->format('P');
+
         $bootstrap = ccfg::get('bootstrap');
         $themeData = CManager::instance()->getThemeData();
         if (isset($themeData) && strlen(carr::get($themeData, 'bootstrap')) > 0) {
