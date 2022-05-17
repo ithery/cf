@@ -2,6 +2,36 @@
 
 class CPeriod_Factory {
     /**
+     * @param string $string
+     *
+     * @return CPeriod
+     */
+    public static function fromString($string) {
+        preg_match('/(\[|\()([\d\-\s\:]+)[,]+([\d\-\s\:]+)(\]|\))/', $string, $matches);
+
+        list(1 => $startBoundary, 2 => $startDate, 3 => $endDate, 4 => $endBoundary) = $matches;
+
+        $boundaries = CPeriod_Boundaries::fromString($startBoundary, $endBoundary);
+
+        $startDate = trim($startDate);
+
+        $endDate = trim($endDate);
+
+        $precision = CPeriod_Precision::fromString($startDate);
+
+        $start = self::resolveDate($startDate, $precision->dateFormat());
+
+        $end = self::resolveDate($endDate, $precision->dateFormat());
+
+        return new CPeriod(
+            $start,
+            $end,
+            $precision,
+            $boundaries,
+        );
+    }
+
+    /**
      * @param DateTimeInterface|string $start
      * @param DateTimeInterface|string $end
      * @param null|Precision           $precision

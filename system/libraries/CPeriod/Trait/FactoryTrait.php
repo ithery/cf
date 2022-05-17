@@ -25,4 +25,13 @@ trait CPeriod_Trait_FactoryTrait {
             $format,
         );
     }
+
+    /**
+     * @param string $string
+     *
+     * @return static
+     */
+    public static function fromString($string) {
+        return CPeriod_Factory::fromString($string);
+    }
 }
