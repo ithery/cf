@@ -345,16 +345,25 @@ trait CApp_Trait_BaseTrait {
         return CHTTP::request()->ip();
     }
 
+    /**
+     * @param int    $width
+     * @param int    $height
+     * @param string $backgroundColor
+     * @param string $color
+     * @param string $text
+     *
+     * @return string
+     */
     public static function noImageUrl($width = 100, $height = 100, $backgroundColor = 'EFEFEF', $color = 'AAAAAA', $text = 'NO IMAGE') {
-        return curl::httpbase() . 'cresenity/noimage/' . $width . '/' . $height . '/' . $backgroundColor . '/' . $color . '/' . rawurlencode($text);
+        return c::url('cresenity/noimage/' . $width . '/' . $height . '/' . $backgroundColor . '/' . $color . '/' . rawurlencode($text));
     }
 
     public static function transparentImageUrl($width = 100, $height = 100) {
-        return curl::httpbase() . 'cresenity/transparent/' . $width . '/' . $height;
+        return c::url('cresenity/transparent/' . $width . '/' . $height);
     }
 
     public static function qrCodeImageUrl($code) {
-        return curl::httpbase() . 'cresenity/qrcode?d=' . rawurlencode($code);
+        return c::url('cresenity/qrcode?d=' . rawurlencode($code));
     }
 
     public static function gravatarImageUrl($email, $s = 100, $default = 'mp') {
@@ -367,7 +376,7 @@ trait CApp_Trait_BaseTrait {
     }
 
     public static function initialAvatarUrl($name, $size = 100) {
-        return curl::httpbase() . 'cresenity/avatar/initials/?name=' . cstr::lower($name) . '&size=' . $size;
+        return c::url('cresenity/avatar/initials/?name=' . cstr::lower($name) . '&size=' . $size);
     }
 
     public static function havePermission($action) {
