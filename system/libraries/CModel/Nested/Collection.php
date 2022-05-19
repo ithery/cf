@@ -33,6 +33,7 @@ class CModel_Nested_Collection extends CModel_Collection {
             }
             $node->setRelation('children', CModel_Collection::make($children));
         }
+
         return $this;
     }
 
@@ -49,7 +50,7 @@ class CModel_Nested_Collection extends CModel_Collection {
      */
     public function toTree($root = false) {
         if ($this->isEmpty()) {
-            return new static;
+            return new static();
         }
         $this->linkNodes();
         $items = [];
@@ -60,6 +61,7 @@ class CModel_Nested_Collection extends CModel_Collection {
                 $items[] = $node;
             }
         }
+
         return new static($items);
     }
 
@@ -85,6 +87,7 @@ class CModel_Nested_Collection extends CModel_Collection {
                 $root = $node->getParentId();
             }
         }
+
         return $root;
     }
 
@@ -97,19 +100,20 @@ class CModel_Nested_Collection extends CModel_Collection {
      * @return static
      */
     public function toFlatTree($root = false) {
-        $result = new static;
+        $result = new static();
         if ($this->isEmpty()) {
             return $result;
         }
         $groupedNodes = $this->groupBy($this->first()->getParentIdName());
+
         return $result->flattenTree($groupedNodes, $this->getRootNodeId($root));
     }
 
     /**
      * Flatten a tree into a non recursive array.
      *
-     * @param Collection $groupedNodes
-     * @param mixed      $parentId
+     * @param CModel_Nested_Collection $groupedNodes
+     * @param mixed                    $parentId
      *
      * @return $this
      */
@@ -118,6 +122,7 @@ class CModel_Nested_Collection extends CModel_Collection {
             $this->push($node);
             $this->flattenTree($groupedNodes, $node->getKey());
         }
+
         return $this;
     }
 }
