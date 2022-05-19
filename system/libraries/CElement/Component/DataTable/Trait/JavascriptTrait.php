@@ -258,7 +258,7 @@ trait CElement_Component_DataTable_Trait_JavascriptTrait {
                 ->appendln("'aaSorting': [],")->br()
 
                 ->appendln("'oLanguage': " . json_encode($this->getLegacyLabels()) . ',')->br()
-                ->appendln("'language': " . json_encode($this->labels) . ',')->br()
+                ->appendln("'language': " . json_encode($this->getLabels()) . ',')->br()
                 ->appendln("'aoColumns': vaoColumns,")->br()
                 ->appendln("'aLengthMenu': [
                     [" . $km . '],
