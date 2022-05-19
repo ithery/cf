@@ -120,6 +120,23 @@ return [
         ]
     ],
     [
+        'name' => 'forminput',
+        'label' => c::__('Form Input'),
+        'subnav' => [
+            [
+                'name' => 'forminput.standard',
+                'label' => c::__('Standard Control'),
+                'uri' => 'docs/forminput/standard',
+            ],
+            [
+                'name' => 'forminput.selectsearch',
+                'label' => c::__('Select Search'),
+                'uri' => 'docs/forminput/selectsearch',
+            ],
+
+        ]
+    ],
+    [
         'name' => 'helper',
         'label' => c::__('Helpers'),
         'subnav' => [
