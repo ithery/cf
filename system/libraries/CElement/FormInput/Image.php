@@ -20,6 +20,10 @@ class CElement_FormInput_Image extends CElement_FormInput {
 
     protected $disabledUpload;
 
+    protected $accept;
+
+    protected $labels = [];
+
     public function __construct($id) {
         parent::__construct($id);
         $this->type = 'image';
@@ -43,24 +47,55 @@ class CElement_FormInput_Image extends CElement_FormInput {
         });
     }
 
+    /**
+     * @param string $imgsrc
+     *
+     * @return $this'
+     */
     public function setImgSrc($imgsrc) {
         $this->imgSrc = $imgsrc;
 
         return $this;
     }
 
+    /**
+     * @param int $maxwidth
+     *
+     * @return $this
+     */
     public function setMaxWidth($maxwidth) {
         $this->maxWidth = $maxwidth;
 
         return $this;
     }
 
+    /**
+     * @param int $maxheight
+     *
+     * @return $this
+     */
     public function setMaxHeight($maxheight) {
         $this->maxHeight = $maxheight;
 
         return $this;
     }
 
+    /**
+     * @param string $accept
+     *
+     * @return $this
+     */
+    public function setAccept($accept) {
+        $this->accept = $accept;
+
+        return $this;
+    }
+
+    /**
+     * @param bool $bool
+     *
+     * @return $this
+     */
     public function setDisabledUpload($bool) {
         $this->disabledUpload = $bool;
 
