@@ -1,21 +1,28 @@
 <?php
 
 /**
- * Description of ImageAjax
+ * Description of ImageAjax.
  *
  * @author Hery
  */
 class CElement_FormInput_ImageAjax extends CElement_FormInput {
-    use CElement_Trait_Template,
+    use CElement_Trait_UseViewTrait,
         CTrait_Compat_Element_FormInput_Image;
 
     protected $imgSrc;
+
     protected $maxWidth;
+
     protected $maxHeight;
+
     protected $maxUploadSize;   // in MB
+
     protected $disabledUpload;
+
     protected $cropper;
+
     protected $tempStorage;
+
     protected $accept;
 
     public function __construct($id) {
@@ -28,7 +35,7 @@ class CElement_FormInput_ImageAjax extends CElement_FormInput {
         $this->maxUploadSize = 0;
         $this->disabledUpload = false;
         $this->accept = 'image/*';
-        $this->templateName = 'CElement/FormInput/ImageAjax';
+        $this->view = 'cresenity/element/form-input/image-ajax';
         $this->onBeforeParse(function () {
             $ajaxName = $this->name;
             $ajaxName = str_replace('[', '-', $ajaxName);
@@ -62,6 +69,7 @@ class CElement_FormInput_ImageAjax extends CElement_FormInput {
      */
     public function setImgSrc($imgsrc) {
         $this->imgSrc = $imgsrc;
+
         return $this;
     }
 
@@ -72,6 +80,7 @@ class CElement_FormInput_ImageAjax extends CElement_FormInput {
      */
     public function setMaxWidth($maxwidth) {
         $this->maxWidth = $maxwidth;
+
         return $this;
     }
 
@@ -82,6 +91,7 @@ class CElement_FormInput_ImageAjax extends CElement_FormInput {
      */
     public function setMaxHeight($maxheight) {
         $this->maxHeight = $maxheight;
+
         return $this;
     }
 
@@ -92,6 +102,7 @@ class CElement_FormInput_ImageAjax extends CElement_FormInput {
      */
     public function setMaxUploadSize($size) {
         $this->maxUploadSize = $size;
+
         return $this;
     }
 
@@ -102,6 +113,7 @@ class CElement_FormInput_ImageAjax extends CElement_FormInput {
      */
     public function setAccept($accept) {
         $this->accept = $accept;
+
         return $this;
     }
 
@@ -112,6 +124,7 @@ class CElement_FormInput_ImageAjax extends CElement_FormInput {
      */
     public function setDisabledUpload($bool) {
         $this->disabledUpload = $bool;
+
         return $this;
     }
 
@@ -121,11 +134,12 @@ class CElement_FormInput_ImageAjax extends CElement_FormInput {
      * @return string
      */
     public function html($indent = 0) {
-        $templateHtml = $this->getTemplateHtml();
+        $templateHtml = $this->getViewHtml();
         $html = $templateHtml;
         if ($this->cropper != null) {
             $html .= $this->cropper->html();
         }
+
         return $html;
     }
 
@@ -135,11 +149,12 @@ class CElement_FormInput_ImageAjax extends CElement_FormInput {
      * @return string
      */
     public function js($indent = 0) {
-        $templateJs = $this->getTemplateJs();
+        $templateJs = $this->getViewJs();
         $js = $templateJs;
         if ($this->cropper != null) {
             $js .= $this->cropper->js();
         }
+
         return $js;
     }
 
@@ -151,11 +166,13 @@ class CElement_FormInput_ImageAjax extends CElement_FormInput {
             $this->cropper = new CElement_Helper_Cropper($this->id . '__cropper');
             $this->cropper->setOwner($this);
         }
+
         return $this->cropper;
     }
 
     public function setTempStorage($tempStorage) {
         $this->tempStorage = $tempStorage;
+
         return $this;
     }
 }
