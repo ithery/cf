@@ -256,22 +256,9 @@ trait CElement_Component_DataTable_Trait_JavascriptTrait {
                 ->appendln("'iDisplayLength': " . $this->display_length . ',')->br()
                 ->appendln("'bSortCellsTop': " . $hs_val . ',')->br()
                 ->appendln("'aaSorting': [],")->br()
-                ->appendln("'oLanguage': {
-                    sSearch : '" . c::__('Search') . "',
-                    sSearchPlaceholder : '" . c::__($this->searchPlaceholder) . "',
-                    sProcessing : '" . c::__('Processing') . "',
-                    sLengthMenu  : '" . c::__('Show') . ' _MENU_ ' . c::__('Entries') . "',
-                    oPaginate  : {
-                        'sFirst' : '" . c::__('First') . "',
-                        'sLast' : '" . c::__('Last') . "',
-                        'sNext' : '" . c::__('Next') . "',
-                        'sPrevious' : '" . c::__('Previous') . "'
-                    },
-                    sInfo: '" . $this->infoText . "',
-                    sInfoEmpty  : '" . c::__($this->labels['noData']) . "',
-                    sEmptyTable  : '" . c::__($this->labels['noData']) . "',
-                    sInfoThousands   : '" . c::__('') . "',
-                },")->br()
+
+                ->appendln("'oLanguage': " . json_encode($this->getLegacyLabels()) . ',')->br()
+                ->appendln("'language': " . json_encode($this->labels) . ',')->br()
                 ->appendln("'aoColumns': vaoColumns,")->br()
                 ->appendln("'aLengthMenu': [
                     [" . $km . '],

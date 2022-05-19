@@ -123,20 +123,14 @@ class CElement_Component_DataTable extends CElement_Component {
 
     protected $actionHeaderLabel = 'Actions';
 
-    protected $labels = [
-        'noData' => 'No data available in table',
-        'first' => 'First',
-        'last' => 'Last',
-        'previous' => 'Previous',
-        'next' => 'Next',
-        'processing' => 'Processing'
-    ];
+    protected $labels = [];
 
     public function __construct($id = '') {
         parent::__construct($id);
         $this->defaultPagingList['-1'] = c::__('ALL');
         $this->tag = 'table';
         $this->responsive = false;
+        $this->labels = [];
 
         $db = CDatabase::instance();
 
@@ -212,12 +206,57 @@ class CElement_Component_DataTable extends CElement_Component {
         $this->classes = CElement_Helper::getClasses(c::theme('datatable.class'));
 
         $this->checkboxRenderer = CManager::theme()->getData('datatable.renderer.checkbox', [CElement_Component_DataTable_Renderer::class, 'checkboxCell']);
-        $this->labels['noData'] = CManager::theme()->getData('datatable.label.noData', 'No data available in table');
-        $this->labels['first'] = CManager::theme()->getData('datatable.label.first', 'First');
-        $this->labels['last'] = CManager::theme()->getData('datatable.label.last', 'Last');
-        $this->labels['previous'] = CManager::theme()->getData('datatable.label.previous', 'Previous');
-        $this->labels['next'] = CManager::theme()->getData('datatable.label.next', 'Next');
-        $this->labels['processing'] = CManager::theme()->getData('datatable.label.processing', 'Processing');
+        $this->labels['emptyTable'] = CManager::theme()->getData('datatable.label.emptyTable', c::__('element/datatable.emptyTable'));
+        $this->labels['first'] = CManager::theme()->getData('datatable.label.first', c::__('element/datatable.paginate.first'));
+        $this->labels['last'] = CManager::theme()->getData('datatable.label.last', c::__('element/datatable.paginate.last'));
+        $this->labels['previous'] = CManager::theme()->getData('datatable.label.previous', c::__('element/datatable.paginate.previous'));
+        $this->labels['next'] = CManager::theme()->getData('datatable.label.next', c::__('element/datatable.paginate.next'));
+        $this->labels['processing'] = CManager::theme()->getData('datatable.label.processing', c::__('element/datatable.processing'));
+        $this->labels['search'] = CManager::theme()->getData('datatable.label.search', c::__('element/datatable.search'));
+        $this->labels['show'] = CManager::theme()->getData('datatable.label.show', c::__('element/datatable.show'));
+        $this->labels['entries'] = CManager::theme()->getData('datatable.label.entries', c::__('element/datatable.entries'));
+        $this->loadTranslation();
+    }
+
+    protected function loadTranslation() {
+        $translator = CTranslation::translator();
+        $translation = $translator->getLoader()->load($translator->getLocale(), 'element/datatable');
+        $dots = carr::dot($translation);
+        foreach ($dots as $key => $value) {
+            carr::set($this->labels, $key, $value);
+        }
+    }
+
+    public function getLabels() {
+        $labels = $this->labels;
+
+        $labels['searchPlaceholder'] = $this->searchPlaceholder;
+
+        return $labels;
+    }
+
+    protected function getLegacyLabels() {
+        $legacy = [];
+
+        $legacyDotsMaps = [
+            'sSearch' => 'search',
+            'sProcessing' => 'processing',
+            'sLengthMenu' => 'lengthMenu',
+            'oPaginate.sFirst' => 'paginate.first',
+            'oPaginate.sLast' => 'paginate.last',
+            'oPaginate.sNext' => 'paginate.next',
+            'oPaginate.sPrevious' => 'paginate.previous',
+            'sInfo' => 'info',
+            'sInfoEmpty' => 'infoEmpty',
+            'sEmptyTable' => 'emptyTable',
+            'sInfoThousands' => 'thousands',
+        ];
+        foreach ($legacyDotsMaps as $keyLegacy => $key) {
+            carr::set($legacy, $keyLegacy, carr::get($this->labels, $key, $keyLegacy));
+        }
+        $legacy['sSearchPlaceholder'] = $this->searchPlaceholder;
+
+        return $legacy;
     }
 
     public static function factory($id = '') {
