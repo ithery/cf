@@ -1,13 +1,4 @@
-<?php
-defined('SYSPATH') or die('No direct access allowed.');
-
-/**
- * @author Hery Kurniawan
- * @license Ittron Global Teknologi <ittron.co.id>
- *
- * @since Jan 13, 2018, 10:58:37 AM
- */
-//sanitize maxWidth
+@php
 $suffixWidth = '';
 $lastMaxWidth = substr($maxWidth, -1);
 if (is_numeric($lastMaxWidth)) {
@@ -21,11 +12,11 @@ if (is_numeric($lastMaxHeight)) {
 }
 $maxWidth .= $suffixWidth;
 $maxHeight .= $suffixHeight;
-?>
+@endphp
 
-<div id="container-<?php echo $id; ?>" class="fileupload fileupload-new" >
+<div id="container-{{ $id }}" class="fileupload fileupload-new" >
     <div class="fileupload-new thumbnail" >
-        <img id="cimg-<?php echo $id; ?>" src="<?php echo $imgSrc; ?>" style="max-width: <?php echo $maxWidth; ?>; max-height: <?php echo $maxHeight; ?>;"  />
+        <img id="cimg-{{ $id }}" src="{{ $imgSrc }}" style="max-width: <?php echo $maxWidth; ?>; max-height: <?php echo $maxHeight; ?>;"  />
     </div>
     <div class="fileupload-preview fileupload-exists thumbnail" style="max-width: <?php echo $maxWidth; ?>; max-height: <?php echo $maxHeight; ?>; line-height: 20px;">
 
@@ -33,8 +24,8 @@ $maxHeight .= $suffixHeight;
     <div>
         <?php if (!$disabledUpload): ?>
             <span class="btn btn-file btn-primary">
-                <span class="fileupload-new"><?php echo clang::__('Select Image'); ?></span>
-                <span class="fileupload-change fileupload-exists"><?php echo clang::__('Change'); ?></span>
+                <span class="fileupload-new">{{ c::__('Select Image') }}</span>
+                <span class="fileupload-change fileupload-exists">{{ c::__('Change') }}</span>
                 <input id="input-temp-<?php echo $id; ?>" accept="<?php echo $accept; ?>" type="file" name="input-temp-<?php echo $id; ?>" style="display:none;" accept="image/*"/>
                 <input type="hidden" id="<?php echo $id; ?>" name="<?php echo $name; ?>" value="<?php echo $value; ?>" />
             </span>
