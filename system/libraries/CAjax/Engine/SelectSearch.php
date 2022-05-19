@@ -8,7 +8,7 @@ defined('SYSPATH') or die('No direct access allowed.');
  *
  * @since Jun 15, 2018, 12:46:23 AM
  */
-class CAjax_Engine_SearchSelect extends CAjax_Engine {
+class CAjax_Engine_SelectSearch extends CAjax_Engine {
     /**
      * @param string $class
      *

@@ -262,7 +262,7 @@ class CElement_FormInput_SelectSearch extends CElement_FormInput {
 
     public function createAjaxUrl() {
         $ajaxMethod = CAjax::createMethod();
-        $ajaxMethod->setType('SearchSelect');
+        $ajaxMethod->setType(CAjax::TYPE_SELECT_SEARCH);
         $ajaxMethod->setData('query', $this->query);
         $ajaxMethod->setData('dataProvider', serialize($this->dataProvider));
         $ajaxMethod->setData('keyField', $this->keyField);
