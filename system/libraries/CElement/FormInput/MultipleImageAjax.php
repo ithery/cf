@@ -6,7 +6,7 @@
  * @author Hery
  */
 class CElement_FormInput_MultipleImageAjax extends CElement_FormInput {
-    use CApp_Trait_Template;
+    use CElement_Trait_UseViewTrait;
 
     protected $imgSrc;
 
@@ -47,7 +47,7 @@ class CElement_FormInput_MultipleImageAjax extends CElement_FormInput {
         $this->limitFile = 10;
         $this->accept = 'image/*';
         $this->disabledUpload = false;
-        $this->templateName = 'CElement/FormInput/MultipleImageAjax';
+        $this->view = 'cresenity/element/form-input/multiple-image-ajax';
         $this->removeLink = true;
         $this->files = [];
         $this->maximum = null;
@@ -84,44 +84,13 @@ class CElement_FormInput_MultipleImageAjax extends CElement_FormInput {
         });
     }
 
-    // protected function build() {
-    //     $ajaxName = $this->name;
-    //     $ajaxName = str_replace('[', '-', $ajaxName);
-    //     $ajaxName = str_replace(']', '-', $ajaxName);
-
-    //     $ajaxUrl = CAjax::createMethod()->setType('ImgUpload')
-    //         ->setData('inputName', $ajaxName)
-    //         ->makeUrl();
-
-    //     $viewData['id'] = $this->id;
-    //     $viewData['imgSrc'] = $this->imgSrc;
-    //     $viewData['maxWidth'] = $this->maxWidth;
-    //     $viewData['maxHeight'] = $this->maxHeight;
-    //     $viewData['maxUploadSize'] = $this->maxUploadSize;
-    //     $viewData['limitFile'] = $this->limitFile;
-    //     $viewData['disabledUpload'] = $this->disabledUpload;
-    //     $viewData['preTag'] = $this->preTag();
-    //     $viewData['postTag'] = $this->postTag();
-    //     $viewData['name'] = $this->name;
-    //     $viewData['value'] = $this->value;
-    //     $viewData['ajaxName'] = $ajaxName;
-    //     $viewData['ajaxUrl'] = $this->ajaxUrl;
-    //     $viewData['files'] = $this->files;
-    //     $viewData['maximum'] = $this->maximum == null ?: 0;
-    //     $viewData['removeLink'] = $this->removeLink;
-    //     $viewData['customControl'] = $this->customControl;
-    //     $viewData['cropper'] = $this->cropper;
-    //     $viewData['accept'] = $this->accept;
-    //     cdbg::dd($viewData);
-    // }
-
     /**
      * @param int $indent
      *
      * @return string
      */
     public function html($indent = 0) {
-        $templateHtml = $this->getTemplateHtml();
+        $templateHtml = $this->getViewHtml();
         $html = $templateHtml;
         if ($this->cropper != null) {
             $html .= $this->cropper->html();
@@ -131,7 +100,7 @@ class CElement_FormInput_MultipleImageAjax extends CElement_FormInput {
     }
 
     public function js($indent = 0) {
-        $templateJs = $this->getTemplateJs();
+        $templateJs = $this->getViewJs();
         $js = $templateJs;
         if ($this->cropper != null) {
             $js .= $this->cropper->js();
