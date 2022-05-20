@@ -32,4 +32,11 @@ class CString {
     public static function numberToWords($number, $locale = null) {
         return CString_NumberToWords::toWords($number, $locale);
     }
+
+    /**
+     * @return CString_Formatter
+     */
+    public static function formatter() {
+        return new CBase_ForwarderStaticClass(CString_Formatter::class);
+    }
 }
