@@ -72,6 +72,7 @@ class CElement_View extends CElement {
             $html = '';
             $js = '';
             if ($view != null) {
+                $view->with('__CAppElementView', $this);
                 $output = $view->render();
                 //parse the output of view
                 preg_match_all('#<script>(.*?)</script>#ims', $output, $matches);
@@ -93,8 +94,6 @@ class CElement_View extends CElement {
     }
 
     public function html($indent = 0) {
-        CApp::setRenderingElement($this);
-
         return carr::get($this->collectHtmlJsOnce(), 'html');
     }
 
