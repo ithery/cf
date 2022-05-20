@@ -1038,6 +1038,7 @@ export default class Cresenity {
 
             root.classList.add('cresenity-loaded');
             root.classList.remove('no-js');
+            removePreloader();
             dispatchWindowEvent('cresenity:loaded');
             this.applyDeferXData();
         });
