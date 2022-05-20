@@ -70,6 +70,7 @@ trait CApp_Concern_AuthTrait {
 
     public function setRoleResolver($resolver) {
         $this->roleResolver = $resolver;
+        $this->role = null;
 
         return $this;
     }
