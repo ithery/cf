@@ -96,12 +96,21 @@ class CVendor {
     }
 
     /**
-     * @param type $options
+     * @param array $options
      *
      * @return \CVendor_Xendit
      */
     public static function xendit($options) {
         return new CVendor_Xendit($options);
+    }
+
+    /**
+     * @param array $options
+     *
+     * @return \CVendor_Midtrans
+     */
+    public static function midtrans($options) {
+        return new CVendor_Midtrans($options);
     }
 
     /**
