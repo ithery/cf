@@ -220,14 +220,15 @@ trait CApp_Trait_BaseTrait {
         return 'system';
     }
 
-    public static function roleName() {
+    public static function role() {
         $app = CApp::instance();
         $role = $app->role();
-        if ($role != null) {
-            return $role->name;
-        }
 
-        return '';
+        return $role;
+    }
+
+    public static function roleName() {
+        return c::optional(static::role())->name ?: null;
     }
 
     /**
