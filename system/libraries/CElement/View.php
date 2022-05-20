@@ -9,16 +9,9 @@ defined('SYSPATH') or die('No direct access allowed.');
  * @since Nov 28, 2020
  */
 class CElement_View extends CElement {
-    /**
-     * @var CView_View
-     */
-    protected $view;
+    use CElement_Trait_UseViewTrait;
 
     protected $viewElement;
-
-    protected $htmlJs;
-
-    protected $data;
 
     public function __construct($id, $view = null, $data = []) {
         parent::__construct($id);
@@ -27,78 +20,17 @@ class CElement_View extends CElement {
         }
         $this->viewElement = [];
         $this->htmlJs = null;
-    }
-
-    public function resolveView() {
-        $view = $this->view;
-        if ($view != null) {
-            $data = $this->data;
-            if (!($view instanceof CView_View)) {
-                if ($data == null) {
-                    $data = [];
-                }
-                $view = CView::factory($view, $data);
-            } else {
-                if ($data !== null) {
-                    $view->set($data);
-                }
-            }
-        }
-
-        return $view;
-    }
-
-    public function setView($view, $data = null) {
-        $this->view = $view;
-        $this->data = $data;
-    }
-
-    /**
-     * Set Data to View.
-     *
-     * @param array $data
-     *
-     * @return $this
-     */
-    public function setData(array $data) {
-        $this->data = $data;
-
-        return $this;
-    }
-
-    public function collectHtmlJsOnce() {
-        if ($this->htmlJs == null) {
-            $view = $this->resolveView();
-            $html = '';
-            $js = '';
-            if ($view != null) {
-                $view->with('__CAppElementView', $this);
-                $output = $view->render();
-                //parse the output of view
-                preg_match_all('#<script>(.*?)</script>#ims', $output, $matches);
-
-                foreach ($matches[1] as $value) {
-                    $js .= $value;
-                }
-                $html = preg_replace('#<script>(.*?)</script>#is', '', $output);
-            }
-
-            $htmlJs = [
-                'html' => $html,
-                'js' => $js,
-            ];
-            $this->htmlJs = $htmlJs;
-        }
-
-        return $this->htmlJs;
+        $this->onBeforeParse(function (CView_View $view) {
+            $view->with('__CAppElementView', $this);
+        });
     }
 
     public function html($indent = 0) {
-        return carr::get($this->collectHtmlJsOnce(), 'html');
+        return $this->getViewHtml($indent);
     }
 
     public function js($indent = 0) {
-        return carr::get($this->collectHtmlJsOnce(), 'js');
+        return $this->getViewJs($indent);
     }
 
     /**

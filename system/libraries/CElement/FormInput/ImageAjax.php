@@ -23,7 +23,7 @@ class CElement_FormInput_ImageAjax extends CElement_FormInput_Image {
         $this->disabledUpload = false;
         $this->accept = 'image/*';
         $this->view = 'cresenity/element/form-input/image-ajax';
-        $this->onBeforeParse(function () {
+        $this->onBeforeParse(function (CView_View $view) {
             $ajaxName = $this->name;
             $ajaxName = str_replace('[', '-', $ajaxName);
             $ajaxName = str_replace(']', '-', $ajaxName);
@@ -32,20 +32,20 @@ class CElement_FormInput_ImageAjax extends CElement_FormInput_Image {
                 ->setData('inputName', $ajaxName)
                 ->makeUrl();
 
-            $this->setVar('id', $this->id);
-            $this->setVar('imgSrc', $this->imgSrc);
-            $this->setVar('maxWidth', $this->maxWidth);
-            $this->setVar('maxHeight', $this->maxHeight);
-            $this->setVar('maxUploadSize', $this->maxUploadSize);
-            $this->setVar('disabledUpload', $this->disabledUpload);
-            $this->setVar('preTag', $this->pretag());
-            $this->setVar('postTag', $this->posttag());
-            $this->setVar('name', $this->name);
-            $this->setVar('value', $this->value);
-            $this->setVar('ajaxName', $ajaxName);
-            $this->setVar('ajaxUrl', $ajaxUrl);
-            $this->setVar('cropper', $this->cropper);
-            $this->setVar('accept', $this->accept);
+            $view->with('id', $this->id);
+            $view->with('imgSrc', $this->imgSrc);
+            $view->with('maxWidth', $this->maxWidth);
+            $view->with('maxHeight', $this->maxHeight);
+            $view->with('maxUploadSize', $this->maxUploadSize);
+            $view->with('disabledUpload', $this->disabledUpload);
+            $view->with('preTag', $this->pretag());
+            $view->with('postTag', $this->posttag());
+            $view->with('name', $this->name);
+            $view->with('value', $this->value);
+            $view->with('ajaxName', $ajaxName);
+            $view->with('ajaxUrl', $ajaxUrl);
+            $view->with('cropper', $this->cropper);
+            $view->with('accept', $this->accept);
         });
     }
 

@@ -6,11 +6,11 @@ trait CElement_Trait_UseViewTrait {
      */
     protected $view;
 
-    protected $viewElement;
-
     protected $htmlJs;
 
     protected $viewData;
+
+    protected $onBeforeParse;
 
     protected function resolveView() {
         $view = $this->view;
@@ -61,11 +61,11 @@ trait CElement_Trait_UseViewTrait {
 
     private function collectHtmlJsOnce() {
         if ($this->htmlJs == null) {
+            $view = $this->resolveView();
             if ($this->onBeforeParse != null) {
                 $callable = $this->onBeforeParse;
-                $callable();
+                $callable($view);
             }
-            $view = $this->resolveView();
             $html = '';
             $js = '';
             if ($view != null) {
@@ -89,7 +89,7 @@ trait CElement_Trait_UseViewTrait {
         return $this->htmlJs;
     }
 
-    public function onBeforeParse(callable $callable) {
+    protected function onBeforeParse(callable $callable) {
         $this->onBeforeParse = $callable;
 
         return $this;
