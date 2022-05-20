@@ -96,8 +96,6 @@ trait CElement_Trait_UseViewTrait {
     }
 
     public function getViewHtml($indent = 0) {
-        CApp::setRenderingElement($this);
-
         return carr::get($this->collectHtmlJsOnce(), 'html');
     }
 
