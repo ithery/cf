@@ -3,6 +3,8 @@
 class CVendor_Midtrans {
     public function __construct($options) {
         $serverKey = carr::get($options, 'serverKey');
+        $clientKey = carr::get($options, 'clientKey');
+
         $isProduction = carr::get($options, 'isProduction', true);
         $isSanitized = carr::get($options, 'isSanitized');
         $is3ds = carr::get($options, 'is3ds', true);
@@ -17,6 +19,9 @@ class CVendor_Midtrans {
         }
         if ($is3ds !== null) {
             CVendor_Midtrans_Config::$is3ds = $is3ds;
+        }
+        if ($clientKey !== null) {
+            CVendor_Midtrans_Config::$clientKey = $clientKey;
         }
     }
 
