@@ -5,7 +5,7 @@ class CVendor_Midtrans {
         $serverKey = carr::get($options, 'serverKey');
         $isProduction = carr::get($options, 'isProduction', true);
         $isSanitized = carr::get($options, 'isSanitized');
-        $is3ds = carr::get($options, 'is3ds');
+        $is3ds = carr::get($options, 'is3ds', true);
         $overrideNotifUrl = carr::get($options, 'overrideNotifUrl');
         CVendor_Midtrans_Config::$serverKey = $serverKey;
         CVendor_Midtrans_Config::$isProduction = $isProduction;
