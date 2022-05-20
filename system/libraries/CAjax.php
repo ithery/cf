@@ -9,8 +9,10 @@ defined('SYSPATH') or die('No direct access allowed.');
  * @since Jun 6, 2018, 11:32:00 AM
  */
 class CAjax {
+    const TYPE_SELECT_SEARCH = 'SelectSearch';
+
     /**
-     * @param type $options
+     * @param null|array|string $options
      *
      * @return \CAjax_Method
      */

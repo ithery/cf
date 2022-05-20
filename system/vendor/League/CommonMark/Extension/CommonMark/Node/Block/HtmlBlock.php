@@ -54,11 +54,19 @@ class HtmlBlock extends AbstractBlock implements StringContainerInterface {
         $this->type = $type;
     }
 
-    public function getLiteral(): string {
+    /**
+     * @return string
+     */
+    public function getLiteral() {
         return $this->literal;
     }
 
-    public function setLiteral(string $literal): void {
+    /**
+     * @param string $literal
+     *
+     * @return void
+     */
+    public function setLiteral($literal) {
         $this->literal = $literal;
     }
 }

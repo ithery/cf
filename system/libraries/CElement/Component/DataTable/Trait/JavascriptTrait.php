@@ -256,22 +256,9 @@ trait CElement_Component_DataTable_Trait_JavascriptTrait {
                 ->appendln("'iDisplayLength': " . $this->display_length . ',')->br()
                 ->appendln("'bSortCellsTop': " . $hs_val . ',')->br()
                 ->appendln("'aaSorting': [],")->br()
-                ->appendln("'oLanguage': {
-                    sSearch : '" . c::__('Search') . "',
-                    sSearchPlaceholder : '" . c::__($this->searchPlaceholder) . "',
-                    sProcessing : '" . c::__('Processing') . "',
-                    sLengthMenu  : '" . c::__('Show') . ' _MENU_ ' . c::__('Entries') . "',
-                    oPaginate  : {
-                        'sFirst' : '" . c::__('First') . "',
-                        'sLast' : '" . c::__('Last') . "',
-                        'sNext' : '" . c::__('Next') . "',
-                        'sPrevious' : '" . c::__('Previous') . "'
-                    },
-                    sInfo: '" . $this->infoText . "',
-                    sInfoEmpty  : '" . c::__($this->labels['noData']) . "',
-                    sEmptyTable  : '" . c::__($this->labels['noData']) . "',
-                    sInfoThousands   : '" . c::__('') . "',
-                },")->br()
+
+                ->appendln("'oLanguage': " . json_encode($this->getLegacyLabels()) . ',')->br()
+                ->appendln("'language': " . json_encode($this->getLabels()) . ',')->br()
                 ->appendln("'aoColumns': vaoColumns,")->br()
                 ->appendln("'aLengthMenu': [
                     [" . $km . '],
@@ -373,23 +360,22 @@ trait CElement_Component_DataTable_Trait_JavascriptTrait {
                 ->appendln('if (dttable_quick_search == "1") { buildFilters_' . $this->id . '(); }');
             if ($this->customSearchSelector != null) {
                 $js->appendln("
-$('" . $this->customSearchSelector . "').keyup(() => {
-
-    oTable.fnFilter($('" . $this->customSearchSelector . "').val());
-});
+                    $('" . $this->customSearchSelector . "').keyup(() => {
+                        oTable.fnFilter($('" . $this->customSearchSelector . "').val());
+                    });
                 ");
             }
             $js->appendln("
-jQuery('.data_table-quick_search').on('keyup change', function() {
-    var inputType = $(this).prop('tagName');
-    " . ($this->ajax
-            ? 'table.fnClearTable( 0 );table.fnDraw();'
-            : "if (inputType.toLowerCase() == 'select' && $(this).val()) {
-                table.fnFilter(\"^\"+$(this).val()+\"$\",$(this).attr('data-column-index'), true)
-            } else {
-                table.fnFilter($(this).val(),$(this).attr('data-column-index'))
-            };") . '
-});
+                jQuery('.data_table-quick_search').on('keyup change', function() {
+                    var inputType = $(this).prop('tagName');
+                    " . ($this->ajax
+                            ? 'table.fnClearTable( 0 );table.fnDraw();'
+                            : "if (inputType.toLowerCase() == 'select' && $(this).val()) {
+                                table.fnFilter(\"^\"+$(this).val()+\"$\",$(this).attr('data-column-index'), true)
+                            } else {
+                                table.fnFilter($(this).val(),$(this).attr('data-column-index'))
+                            };") . '
+                });
             ');
         }
         if ($this->checkbox) {

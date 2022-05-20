@@ -1590,6 +1590,15 @@ class carr {
 
         return $merged;
     }
+
+    /**
+     * @param array $array
+     *
+     * @return array
+     */
+    public static function mirror(array $array) {
+        return array_combine($array, $array);
+    }
 }
 
 // End carr

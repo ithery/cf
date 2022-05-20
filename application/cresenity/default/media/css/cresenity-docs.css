@@ -534,3 +534,6 @@ a:hover {
     position: fixed;
     top: 5px;
 }
+.main-content img {
+    max-width: 100%;
+}

@@ -111,6 +111,18 @@ class CElement_FormInput_DateRange_Dropdown extends CElement_FormInput {
         return $phpFormat;
     }
 
+    public function setValue($value) {
+        if ($value instanceof CPeriod) {
+            $this->setValueStart($value->startDate);
+            $this->setValueEnd($value->endDate);
+        } else {
+            $this->setValueStart($value);
+            $this->setValueEnd($value);
+        }
+
+        return $this;
+    }
+
     public function setValueStart($dateStart) {
         $this->dateStart = $dateStart;
 

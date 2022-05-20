@@ -1,7 +1,7 @@
 <?php
 
 /**
- * Description of RedirectResponse
+ * Description of RedirectResponse.
  *
  * @author Hery
  */
@@ -58,7 +58,7 @@ class CHTTP_RedirectResponse extends BaseRedirectResponse {
     /**
      * Flash an array of input to the session.
      *
-     * @param array|null $input
+     * @param null|array $input
      *
      * @return $this
      */
@@ -120,10 +120,10 @@ class CHTTP_RedirectResponse extends BaseRedirectResponse {
     public function withErrors($provider, $key = 'default') {
         $value = $this->parseErrors($provider);
 
-        $errors = $this->session()->get('errors', new CBase_ViewErrorBag);
+        $errors = $this->session()->get('errors', new CBase_ViewErrorBag());
 
         if (!$errors instanceof CBase_ViewErrorBag) {
-            $errors = new CBase_ViewErrorBag;
+            $errors = new CBase_ViewErrorBag();
         }
 
         $this->session()->flash(
@@ -176,13 +176,12 @@ class CHTTP_RedirectResponse extends BaseRedirectResponse {
      * @return null
      */
     public function getOriginalContent() {
-        //
     }
 
     /**
      * Get the request instance.
      *
-     * @return CHTTP_Request|null
+     * @return null|CHTTP_Request
      */
     public function getRequest() {
         return $this->request;
@@ -205,9 +204,9 @@ class CHTTP_RedirectResponse extends BaseRedirectResponse {
      * @param string $method
      * @param array  $parameters
      *
-     * @return mixed
-     *
      * @throws \BadMethodCallException
+     *
+     * @return mixed
      */
     public function __call($method, $parameters) {
         if (static::hasMacro($method)) {
@@ -222,11 +221,11 @@ class CHTTP_RedirectResponse extends BaseRedirectResponse {
     }
 
     /**
-     * Get session instance
+     * Get session instance.
      *
-     * @return CSession
+     * @return CSession_Store
      */
     public function session() {
-        return CSession::instance();
+        return c::session();
     }
 }

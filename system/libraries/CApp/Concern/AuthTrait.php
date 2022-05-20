@@ -14,6 +14,8 @@ trait CApp_Concern_AuthTrait {
 
     private $role = null;
 
+    private $roleResolver = null;
+
     /**
      * @var string
      */
@@ -66,13 +68,15 @@ trait CApp_Concern_AuthTrait {
         return $this->auth()->user();
     }
 
-    /**
-     * Get Role Object.
-     *
-     * @return CApp_Model_Roles
-     */
-    public function role() {
-        if ($this->role == null) {
+    public function setRoleResolver($resolver) {
+        $this->roleResolver = $resolver;
+        $this->role = null;
+
+        return $this;
+    }
+
+    protected function defaultRoleResolver() {
+        return function () {
             $user = $this->user();
             if ($user) {
                 $modelClass = $this->auth()->getRoleModelClass();
@@ -80,8 +84,26 @@ trait CApp_Concern_AuthTrait {
                 /** @var CApp_Model_Roles $model */
                 $keyName = $model->getKeyName();
                 $roleId = $user->$keyName;
-                $this->role = $this->getRole($roleId);
+
+                return $this->getRole($roleId);
             }
+        };
+    }
+
+    protected function resolveRole() {
+        $resolver = $this->roleResolver ?: $this->defaultRoleResolver();
+
+        return $resolver();
+    }
+
+    /**
+     * Get Role Object.
+     *
+     * @return CApp_Model_Roles
+     */
+    public function role() {
+        if ($this->role == null) {
+            $this->role = $this->resolveRole();
         }
 
         return $this->role;
