@@ -2,6 +2,7 @@ import Url from './module/Url';
 import cf from './CF';
 import ScrollToTop from './module/ScrollToTop';
 import UI from './ui';
+import { mergeOptions } from './util/config';
 import {
     dispatch as dispatchWindowEvent,
     showHtmlModal,
