@@ -47,26 +47,11 @@ return [
             'CacheControl' => 'max-age=604800',
         ],
     ],
-    'responsive_images' => [
-        /*
-         * This class is responsible for calculating the target widths of the responsive
-         * images. By default we optimize for filesize and create variations that each are 20%
-         * smaller than the previous one. More info in the documentation.
-         *
-         * https://docs.spatie.be/laravel-medialibrary/v7/advanced-usage/generating-responsive-images
-         */
-        //'width_calculator' => Spatie\MediaLibrary\ResponsiveImages\WidthCalculator\FileSizeOptimizedWidthCalculator::class,
-        /*
-         * By default rendering media to a responsive image will add some javascript and a tiny placeholder.
-         * This ensures that the browser can already determine the correct layout.
-         */
-        'use_tiny_placeholders' => true,
-        /*
-     * This class will generate the tiny placeholder used for progressive image loading. By default
-     * the medialibrary will use a tiny blurred jpg image.
+
+    /*
+     * This is the class that is responsible for naming generated files.
      */
-        //'tiny_placeholder_generator' => Spatie\MediaLibrary\ResponsiveImages\TinyPlaceholderGenerator\Blurred::class,
-    ],
+    'file_namer' => CResources_FileNamer_DefaultFileNamer::class,
     /*
      * When urls to files get generated, this class will be called. Leave empty
      * if your files are stored locally above the site root or on s3.
@@ -137,4 +122,55 @@ return [
         'perform_conversions' => CResources_TaskQueue_PerformConversions::class,
         'generate_responsive_images' => CResources_TaskQueue_PerformConversions_GenerateResponsiveImages::class,
     ],
+    'remote' => [
+        /*
+         * Any extra headers that should be included when uploading resource to
+         * a remote disk. Even though supported headers may vary between
+         * different drivers, a sensible default has been provided.
+         *
+         * Supported by S3: CacheControl, Expires, StorageClass,
+         * ServerSideEncryption, Metadata, ACL, ContentEncoding
+         */
+        'extra_headers' => [
+            'CacheControl' => 'max-age=604800',
+        ],
+    ],
+    'responsive_images' => [
+        /*
+         * This class is responsible for calculating the target widths of the responsive
+         * images. By default we optimize for filesize and create variations that each are 30%
+         * smaller than the previous one. More info in the documentation.
+         *
+         * https://docs.spatie.be/laravel-medialibrary/v9/advanced-usage/generating-responsive-images
+         */
+        'width_calculator' => CResources_ResponsiveImage_WidthCalculator_FileSizeOptimizedWidthCalculator::class,
+
+        /*
+         * By default rendering media to a responsive image will add some javascript and a tiny placeholder.
+         * This ensures that the browser can already determine the correct layout.
+         */
+        'use_tiny_placeholders' => true,
+
+        /*
+         * This class will generate the tiny placeholder used for progressive image loading. By default
+         * the media library will use a tiny blurred jpg image.
+         */
+        'tiny_placeholder_generator' => CResources_ResponsiveImage_TinyPlaceholderGenerator_Blurred::class,
+    ],
+    /*
+     * When using the addMediaFromUrl method you may want to replace the default downloader.
+     * This is particularly useful when the url of the image is behind a firewall and
+     * need to add additional flags, possibly using curl.
+     */
+    'media_downloader' => CResources_Downloader_DefaultDownloader::class,
+    /*
+     * When converting Resource instances to response the resource library will add
+     * a `loading` attribute to the `img` tag. Here you can set the default
+     * value of that attribute.
+     *
+     * Possible values: 'lazy', 'eager', 'auto' or null if you don't want to set any loading instruction.
+     *
+     * More info: https://css-tricks.com/native-lazy-loading/
+     */
+    'default_loading_attribute_value' => null,
 ];

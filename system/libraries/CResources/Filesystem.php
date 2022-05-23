@@ -99,7 +99,7 @@ class CResources_Filesystem {
         $this->filesystem->disk($resource->disk)->delete($path);
     }
 
-    public function removeResponsiveImages(CModel_Resource_ResourceInterface $resource, $conversionName = 'resourcelibrary_original') {
+    public function removeResponsiveImages(CModel_Resource_ResourceInterface $resource, $conversionName = 'resource_original') {
         $responsiveImagesDirectory = $this->getResponsiveImagesDirectory($resource);
         $allFilePaths = $this->filesystem->allFiles($responsiveImagesDirectory);
         $responsiveImagePaths = array_filter($allFilePaths, function ($path) use ($conversionName) {

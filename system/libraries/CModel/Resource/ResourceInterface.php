@@ -24,4 +24,8 @@ interface CModel_Resource_ResourceInterface extends CInterface_Responsable, CInt
     public function getResourceConversionNames();
 
     public function getCustomHeaders();
+
+    public function hasResponsiveImages($conversionName = '');
+
+    public function responsiveImages($conversionName = '');
 }

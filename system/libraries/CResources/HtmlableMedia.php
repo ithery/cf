@@ -63,23 +63,25 @@ class CResources_HtmlableMedia implements CInterface_Htmlable, \Stringable {
     }
 
     public function toHtml() {
-        $imageGenerator = CResources_Factory::ImageGeneratorFactory::forMedia($this->media) ?? new Image();
+        $imageGenerator = CResources_ImageGenerator_Factory::forResource($this->resource) ?: new CResources_ImageGenerator_FileType_ImageType();
 
-        if (!$imageGenerator->canHandleMime($this->media->mime_type)) {
+        if (!$imageGenerator->canHandleMime($this->resource->mime_type)) {
             return '';
         }
 
-        $attributeString = collect($this->extraAttributes)
-            ->map(fn ($value, $name) => $name . '="' . $value . '"')->implode(' ');
+        $attributeString = c::collect($this->extraAttributes)
+            ->map(function ($value, $name) {
+                return $name . '="' . $value . '"';
+            })->implode(' ');
 
         if (strlen($attributeString)) {
             $attributeString = ' ' . $attributeString;
         }
 
-        $loadingAttributeValue = config('media-library.default_loading_attribute_value');
+        $loadingAttributeValue = CF::config('resource.default_loading_attribute_value');
 
         if ($this->conversionName !== '') {
-            $conversionObject = ConversionCollection::createForMedia($this->media)->getByName($this->conversionName);
+            $conversionObject = CResources_ConversionCollection::createForResource($this->resource)->getByName($this->conversionName);
 
             $loadingAttributeValue = $conversionObject->getLoadingAttributeValue();
         }
@@ -92,21 +94,21 @@ class CResources_HtmlableMedia implements CInterface_Htmlable, \Stringable {
         $width = '';
         $height = '';
 
-        if ($this->media->hasResponsiveImages($this->conversionName)) {
-            $viewName = config('media-library.responsive_images.use_tiny_placeholders')
-                ? 'responsiveImageWithPlaceholder'
-                : 'responsiveImage';
+        if ($this->resource->hasResponsiveImages($this->conversionName)) {
+            $viewName = CF::config('resource.responsive_images.use_tiny_placeholders')
+                ? 'responsive-image-with-placeholder'
+                : 'responsive-image';
 
-            $responsiveImage = $this->media->responsiveImages($this->conversionName)->files->first();
+            $responsiveImage = $this->resource->responsiveImages($this->conversionName)->files->first();
 
             $width = $responsiveImage->width();
             $height = $responsiveImage->height();
         }
 
-        $media = $this->media;
+        $media = $this->resource;
         $conversion = $this->conversionName;
 
-        return view("media-library::{$viewName}", compact(
+        return c::view("cresenity.resource.{$viewName}", compact(
             'media',
             'conversion',
             'attributeString',
@@ -116,7 +118,7 @@ class CResources_HtmlableMedia implements CInterface_Htmlable, \Stringable {
         ))->render();
     }
 
-    public function __toString(): string {
+    public function __toString() {
         return $this->toHtml();
     }
 }
