@@ -1,4 +1,4 @@
-# Queue
+# CQueue
 
 ### Introduction
 

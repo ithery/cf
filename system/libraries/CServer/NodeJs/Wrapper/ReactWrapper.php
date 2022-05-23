@@ -61,6 +61,7 @@ class CServer_NodeJs_Wrapper_ReactWrapper extends CServer_NodeJs_WrapperAbstract
             'es2015',
             'react',
         ]));
+
         $arguments = '--presets ' . $presets
             . ' --plugins ' . $plugins . ' ' . $inFile
             . ' --out-file ' . $outFile;

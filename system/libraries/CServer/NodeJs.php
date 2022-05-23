@@ -38,7 +38,7 @@ class CServer_NodeJs {
      *
      * @return CServer_NodeJs_Wrapper_ReactWrapper
      */
-    public function createReact($reactScript, $sourceMap = true) {
+    public function createReact($reactScript, $sourceMap = false) {
         $react = new CServer_NodeJs_Wrapper_ReactWrapper($this->createRunner(), $reactScript, $sourceMap);
 
         return $react;

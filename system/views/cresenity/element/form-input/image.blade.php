@@ -9,9 +9,9 @@ defined('SYSPATH') or die('No direct access allowed.');
  */
 ?>
 
-<div id="container-<?php echo $id ?>" class="fileupload fileupload-new" >
+<div id="container-{{ $id }}" class="fileupload fileupload-new" >
     <div class="fileupload-new thumbnail" >
-        <img id="cimg-<?php echo $id; ?>" src="<?php echo $imgSrc; ?>" style="max-width: <?php echo $maxWidth; ?>px; max-height: <?php echo $maxHeight; ?>px;"  />
+        <img id="cimg-{{ $id }}" src="{{ $imgSrc }}" style="max-width: <?php echo $maxWidth; ?>px; max-height: <?php echo $maxHeight; ?>px;"  />
     </div>
     <div class="fileupload-preview fileupload-exists thumbnail" style="max-width: <?php echo $maxWidth; ?>px; max-height: <?php echo $maxHeight; ?>px; line-height: 20px;"></div>'
     <div>
