@@ -44,18 +44,27 @@ class CSession_Store implements CSession_Contract_SessionInterface {
     protected $started = false;
 
     /**
+     * The session store's serialization strategy.
+     *
+     * @var string
+     */
+    protected $serialization = 'php';
+
+    /**
      * Create a new session instance.
      *
      * @param string                   $name
      * @param \SessionHandlerInterface $handler
      * @param null|string              $id
+     * @param mixed                    $serialization
      *
      * @return void
      */
-    public function __construct($name, SessionHandlerInterface $handler, $id = null) {
+    public function __construct($name, SessionHandlerInterface $handler, $id = null, $serialization = 'php') {
         $this->setId($id);
         $this->name = $name;
         $this->handler = $handler;
+        $this->serialization = $serialization;
     }
 
     /**
@@ -80,6 +89,7 @@ class CSession_Store implements CSession_Contract_SessionInterface {
      */
     protected function loadSession() {
         $this->attributes = array_merge($this->attributes, $this->readFromHandler());
+        $this->marshalErrorBag();
     }
 
     /**
@@ -89,9 +99,13 @@ class CSession_Store implements CSession_Contract_SessionInterface {
      */
     protected function readFromHandler() {
         if ($data = $this->handler->read($this->getId())) {
-            $data = @unserialize($this->prepareForUnserialize($data));
+            if ($this->serialization === 'json') {
+                $data = json_decode($this->prepareForUnserialize($data), true);
+            } else {
+                $data = @unserialize($this->prepareForUnserialize($data));
+            }
 
-            if ($data !== false && !is_null($data) && is_array($data)) {
+            if ($data !== false && is_array($data)) {
                 return $data;
             }
         }
@@ -111,18 +125,61 @@ class CSession_Store implements CSession_Contract_SessionInterface {
     }
 
     /**
+     * Marshal the ViewErrorBag when using JSON serialization for sessions.
+     *
+     * @return void
+     */
+    protected function marshalErrorBag() {
+        if ($this->serialization !== 'json' || $this->missing('errors')) {
+            return;
+        }
+
+        $errorBag = new CBase_ViewErrorBag();
+
+        foreach ($this->get('errors') as $key => $value) {
+            $messageBag = new CBase_MessageBag($value['messages']);
+
+            $errorBag->put($key, $messageBag->setFormat($value['format']));
+        }
+
+        $this->put('errors', $errorBag);
+    }
+
+    /**
      * Save the session data to storage.
      *
      * @return void
      */
     public function save() {
         $this->ageFlashData();
-
+        $this->prepareErrorBagForSerialization();
         $this->handler->write($this->getId(), $this->prepareForStorage(
-            serialize($this->attributes)
+            $this->serialization === 'json' ? json_encode($this->attributes) : serialize($this->attributes)
         ));
 
         $this->started = false;
+    }
+
+    /**
+     * Prepare the ViewErrorBag instance for JSON serialization.
+     *
+     * @return void
+     */
+    protected function prepareErrorBagForSerialization() {
+        if ($this->serialization !== 'json' || $this->missing('errors')) {
+            return;
+        }
+
+        $errors = [];
+
+        foreach ($this->attributes['errors']->getBags() as $key => $value) {
+            $errors[$key] = [
+                'format' => $value->getFormat(),
+                'messages' => $value->getMessages(),
+            ];
+        }
+
+        $this->attributes['errors'] = $errors;
     }
 
     /**
@@ -182,6 +239,17 @@ class CSession_Store implements CSession_Contract_SessionInterface {
         return !c::collect(is_array($key) ? $key : func_get_args())->contains(function ($key) use ($placeholder) {
             return $this->get($key, $placeholder) === $placeholder;
         });
+    }
+
+    /**
+     * Determine if the given key is missing from the session data.
+     *
+     * @param string|array $key
+     *
+     * @return bool
+     */
+    public function missing($key) {
+        return !$this->exists($key);
     }
 
     /**

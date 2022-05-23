@@ -2,6 +2,7 @@ import Url from './module/Url';
 import cf from './CF';
 import ScrollToTop from './module/ScrollToTop';
 import UI from './ui';
+import { mergeOptions } from './util/config';
 import {
     dispatch as dispatchWindowEvent,
     showHtmlModal,
@@ -26,6 +27,7 @@ import CresAlpine from './module/CresAlpine';
 import SSE from './module/SSE';
 import AlpineCleave from './alpine/cleave';
 import AlpineAutoNumeric from './alpine/autonumeric';
+import { attachWaves } from './ui/waves';
 export default class Cresenity {
     constructor() {
         this.cf = cf;
@@ -969,7 +971,17 @@ export default class Cresenity {
             initValidation();
         }
     }
-
+    initWaves() {
+        if($) {
+            const selector = window.capp.waves.selector ?? '.cres-waves-effect' ;
+            $(selector).each((index,item) => {
+                if(!$(item).hasClass('cres-waves-effect')) {
+                    $(item).addClass('cres-waves-effect')
+                }
+                attachWaves(item)
+            });
+        }
+    }
     applyDeferXData() {
         const comp = document.querySelector("[defer-x-data]")
         if(comp) {
@@ -1019,6 +1031,7 @@ export default class Cresenity {
             this.initConfirm();
             this.initReload();
             this.initValidation();
+            this.initWaves();
             this.initAlpineAndUi();
             this.initLiveReload();
             initProgressive();
@@ -1026,6 +1039,7 @@ export default class Cresenity {
 
             root.classList.add('cresenity-loaded');
             root.classList.remove('no-js');
+            removePreloader();
             dispatchWindowEvent('cresenity:loaded');
             this.applyDeferXData();
         });

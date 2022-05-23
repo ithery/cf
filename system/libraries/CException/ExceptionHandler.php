@@ -71,6 +71,7 @@ class CException_ExceptionHandler implements CException_ExceptionHandlerInterfac
      * @var array
      */
     protected $dontFlash = [
+        'current_password',
         'password',
         'password_confirmation',
     ];
@@ -189,7 +190,9 @@ class CException_ExceptionHandler implements CException_ExceptionHandlerInterfac
             }
 
             if (CView::exists('errors/http/' . $e->getStatusCode())) {
-                return c::response()->view('errors/http/' . $e->getStatusCode(), [], $e->getStatusCode());
+                return c::response()->view('errors/http/' . $e->getStatusCode(), [
+                    'exception' => $e,
+                ], $e->getStatusCode());
             } else {
                 if ($e->getStatusCode() == 404) {
                     //backward compatibility old view
@@ -296,8 +299,11 @@ class CException_ExceptionHandler implements CException_ExceptionHandlerInterfac
      */
     protected function invalidJson($request, CValidation_Exception $exception) {
         return c::response()->json([
-            'message' => $exception->getMessage(),
-            'errors' => $exception->errors(),
+            'errCode' => '422',
+            'errMessage' => $exception->getMessage(),
+            'data' => [
+                'errors' => $exception->errors(),
+            ],
         ], $exception->status);
     }
 
@@ -355,6 +361,14 @@ class CException_ExceptionHandler implements CException_ExceptionHandlerInterfac
         try {
             return CException_LegacyExceptionHandler::getContent($e);
             if (CF::isProduction()) {
+                if (CView::exists('errors/http/' . '500')) {
+                    if (!isset($_GET['show_debug_error'])) {
+                        return c::view('errors/http/500', [
+                            'exception' => $e,
+                        ])->render();
+                    }
+                }
+
                 return CException_LegacyExceptionHandler::getContent($e);
             }
 
@@ -478,6 +492,7 @@ class CException_ExceptionHandler implements CException_ExceptionHandlerInterfac
                 $response->getStatusCode(),
                 $response->headers->all()
             );
+            $response->setRequest(c::request());
         } else {
             $response = new CHTTP_Response(
                 $response->getContent(),
