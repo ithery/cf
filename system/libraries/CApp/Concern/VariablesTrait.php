@@ -33,7 +33,7 @@ trait CApp_Concern_VariablesTrait {
         $variables['format']['datetime'] = static::formatter()->getDateFormat();
         $variables['have_clock'] = ccfg::get('have_clock') === null ? false : ccfg::get('have_clock');
         $variables['haveClock'] = ccfg::get('have_clock') === null ? false : ccfg::get('have_clock');
-        $variables['have_scroll_to_top'] = $variables['haveScrollToTop'] = CF::config('cresjs', 'scroll_to_top');
+        $variables['have_scroll_to_top'] = $variables['haveScrollToTop'] = CF::config('cresjs.scroll_to_top');
         $variables['CFVersion'] = CF::version();
         $variables['domain'] = CF::domain();
         $variables['appCode'] = CF::appCode();
