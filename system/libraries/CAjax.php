@@ -11,6 +11,18 @@ defined('SYSPATH') or die('No direct access allowed.');
 class CAjax {
     const TYPE_SELECT_SEARCH = 'SelectSearch';
 
+    const TYPE_CALLBACK = 'Callback';
+
+    const TYPE_DATA_TABLE = 'DataTable';
+
+    const TYPE_FILE_MANAGER = 'FileManager';
+
+    const TYPE_IMG_UPLOAD = 'ImgUpload';
+
+    const TYPE_FILE_UPLOAD = 'FileUpload';
+
+    const TYPE_RELOAD = 'Reload';
+
     /**
      * @param null|array|string $options
      *
@@ -49,7 +61,7 @@ class CAjax {
 
         $disk = CTemporary::disk();
 
-        $json = $disk->put($file, json_encode($data));
+        $disk->put($file, json_encode($data));
 
         return $data;
     }
