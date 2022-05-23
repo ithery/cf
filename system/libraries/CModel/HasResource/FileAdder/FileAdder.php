@@ -8,10 +8,10 @@ defined('SYSPATH') or die('No direct access allowed.');
  *
  * @since May 1, 2019, 11:15:13 PM
  */
+use CResources_File as PendingFile;
+use CResources_Helpers_File as File;
 use Symfony\Component\HttpFoundation\File\UploadedFile;
 use Symfony\Component\HttpFoundation\File\File as SymfonyFile;
-use CResources_Helpers_File as File;
-use CResources_File as PendingFile;
 use CResources_ImageGenerator_FileType_ImageType as ImageGenerator;
 
 class CModel_HasResource_FileAdder_FileAdder {
@@ -21,7 +21,7 @@ class CModel_HasResource_FileAdder_FileAdder {
     protected $subject;
 
     /**
-     * @var \Spatie\ResourceLibrary\Filesystem\Filesystem
+     * @var \CResources_Filesystem
      */
     protected $filesystem;
 
@@ -91,7 +91,7 @@ class CModel_HasResource_FileAdder_FileAdder {
     protected $customHeaders = [];
 
     /**
-     * @param Filesystem $fileSystem
+     * @param CResources_Filesystem $fileSystem
      */
     public function __construct(CResources_Filesystem $fileSystem) {
         $this->filesystem = $fileSystem;
@@ -107,6 +107,7 @@ class CModel_HasResource_FileAdder_FileAdder {
      */
     public function setSubject(CModel $subject) {
         $this->subject = $subject;
+
         return $this;
     }
 
@@ -123,6 +124,7 @@ class CModel_HasResource_FileAdder_FileAdder {
             $this->pathToFile = $file;
             $this->setFileName(pathinfo($file, PATHINFO_BASENAME));
             $this->resourceName = pathinfo($file, PATHINFO_FILENAME);
+
             return $this;
         }
         if ($file instanceof CResources_Support_RemoteFile) {
@@ -136,19 +138,23 @@ class CModel_HasResource_FileAdder_FileAdder {
             $this->pathToFile = $file->getPath() . '/' . $file->getFilename();
             $this->setFileName($file->getClientOriginalName());
             $this->resourceName = pathinfo($file->getClientOriginalName(), PATHINFO_FILENAME);
+
             return $this;
         }
         if ($file instanceof SymfonyFile) {
             $this->pathToFile = $file->getPath() . '/' . $file->getFilename();
             $this->setFileName(pathinfo($file->getFilename(), PATHINFO_BASENAME));
             $this->resourceName = pathinfo($file->getFilename(), PATHINFO_FILENAME);
+
             return $this;
         }
+
         throw CResources_Exception_FileCannotBeAdded_UnknownType::create();
     }
 
     public function preservingOriginal() {
         $this->preserveOriginal = true;
+
         return $this;
     }
 
@@ -158,6 +164,7 @@ class CModel_HasResource_FileAdder_FileAdder {
 
     public function setName($name) {
         $this->resourceName = $name;
+
         return $this;
     }
 
@@ -167,11 +174,13 @@ class CModel_HasResource_FileAdder_FileAdder {
 
     public function setFileName($fileName) {
         $this->fileName = $fileName;
+
         return $this;
     }
 
     public function withCustomProperties(array $customProperties) {
         $this->customProperties = $customProperties;
+
         return $this;
     }
 
@@ -183,11 +192,13 @@ class CModel_HasResource_FileAdder_FileAdder {
 
     public function withManipulations(array $manipulations) {
         $this->manipulations = $manipulations;
+
         return $this;
     }
 
     public function withProperties(array $properties) {
         $this->properties = $properties;
+
         return $this;
     }
 
@@ -197,12 +208,14 @@ class CModel_HasResource_FileAdder_FileAdder {
 
     public function withResponsiveImages() {
         $this->generateResponsiveImages = true;
+
         return $this;
     }
 
     public function addCustomHeaders(array $customRemoteHeaders) {
         $this->customHeaders = $customRemoteHeaders;
         $this->filesystem->addCustomRemoteHeaders($customRemoteHeaders);
+
         return $this;
     }
 
@@ -210,6 +223,7 @@ class CModel_HasResource_FileAdder_FileAdder {
         if ($diskName == null) {
             $diskName = CF::config('storage.cloud');
         }
+
         return $this->toResourceCollection($collectionName, $diskName);
     }
 
@@ -307,6 +321,7 @@ class CModel_HasResource_FileAdder_FileAdder {
         }
         $resource->fill($this->properties);
         $this->attachResource($resource);
+
         return $resource;
     }
 
@@ -320,6 +335,7 @@ class CModel_HasResource_FileAdder_FileAdder {
                 return $collectionDiskName;
             }
         }
+
         return CF::config('resource.disk');
     }
 
@@ -345,6 +361,7 @@ class CModel_HasResource_FileAdder_FileAdder {
 
     public function sanitizingFileName(callable $fileNameSanitizer) {
         $this->fileNameSanitizer = $fileNameSanitizer;
+
         return $this;
     }
 
@@ -357,6 +374,7 @@ class CModel_HasResource_FileAdder_FileAdder {
                     $this->processResourceItem($model, $resource, $fileAdder);
                 });
             });
+
             return;
         }
         $this->processResourceItem($this->subject, $resource, $this);
@@ -388,10 +406,11 @@ class CModel_HasResource_FileAdder_FileAdder {
 
     protected function getResourceCollection($collectionName) {
         $this->subject->registerResourceCollections();
+
         return c::collect($this->subject->resourceCollections)
-                        ->first(function (CResources_ResourceCollection $collection) use ($collectionName) {
-                            return $collection->name === $collectionName;
-                        });
+            ->first(function (CResources_ResourceCollection $collection) use ($collectionName) {
+                return $collection->name === $collectionName;
+            });
     }
 
     protected function guardAgainstDisallowedFileAdditions(CApp_Model_Interface_ResourceInterface $resource) {
