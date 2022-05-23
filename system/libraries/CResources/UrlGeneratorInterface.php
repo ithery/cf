@@ -16,11 +16,11 @@ interface CResources_UrlGeneratorInterface {
     public function getPath();
 
     /**
-     * @param CApp_Model_Interface_ResourceInterface $resource
+     * @param CModel_Resource_ResourceInterface $resource
      *
      * @return CResources_UrlGeneratorInterface
      */
-    public function setResource(CApp_Model_Interface_ResourceInterface $resource);
+    public function setResource(CModel_Resource_ResourceInterface $resource);
 
     /**
      * @param CResources_Conversion $conversion

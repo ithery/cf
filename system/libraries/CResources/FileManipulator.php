@@ -14,11 +14,11 @@ class CResources_FileManipulator {
     /**
      * Create all derived files for the given resource.
      *
-     * @param CApp_Model_Interface_ResourceInterface $resource
-     * @param array                                  $only
-     * @param bool                                   $onlyIfMissing
+     * @param CModel_Resource_ResourceInterface $resource
+     * @param array                             $only
+     * @param bool                              $onlyIfMissing
      */
-    public function createDerivedFiles(CApp_Model_Interface_ResourceInterface $resource, array $only = [], $onlyIfMissing = false) {
+    public function createDerivedFiles(CModel_Resource_ResourceInterface $resource, array $only = [], $onlyIfMissing = false) {
         $profileCollection = CResources_ConversionCollection::createForResource($resource);
         if (!empty($only)) {
             $profileCollection = $profileCollection->filter(function ($collection) use ($only) {
@@ -41,11 +41,11 @@ class CResources_FileManipulator {
     /**
      * Perform the given conversions for the given resource.
      *
-     * @param CResources_ConversionCollection        $conversions
-     * @param CApp_Model_Interface_ResourceInterface $resource
-     * @param bool                                   $onlyIfMissing
+     * @param CResources_ConversionCollection   $conversions
+     * @param CModel_Resource_ResourceInterface $resource
+     * @param bool                              $onlyIfMissing
      */
-    public function performConversions(CResources_ConversionCollection $conversions, CApp_Model_Interface_ResourceInterface $resource, $onlyIfMissing = false) {
+    public function performConversions(CResources_ConversionCollection $conversions, CModel_Resource_ResourceInterface $resource, $onlyIfMissing = false) {
         if ($conversions->isEmpty()) {
             return;
         }
@@ -94,7 +94,7 @@ class CResources_FileManipulator {
         CResources_Helpers_TemporaryDirectory::delete($temporaryDirectoryPath);
     }
 
-    public function performManipulations(CApp_Model_Interface_ResourceInterface $resource, CResources_Conversion $conversion, $imageFile) {
+    public function performManipulations(CModel_Resource_ResourceInterface $resource, CResources_Conversion $conversion, $imageFile) {
         if ($conversion->getManipulations()->isEmpty()) {
             return $imageFile;
         }
@@ -102,7 +102,7 @@ class CResources_FileManipulator {
                 . $conversion->getName()
                 . '.'
                 . $resource->getExtensionAttribute();
-        CHelper::file()->copy($imageFile, $conversionTempFile);
+        CFile::copy($imageFile, $conversionTempFile);
         $supportedFormats = ['jpg', 'pjpg', 'png', 'gif'];
         if ($conversion->shouldKeepOriginalImageFormat() && in_array(strtolower($resource->getExtensionAttribute()), $supportedFormats)) {
             $conversion->format($resource->getExtensionAttribute());
@@ -110,10 +110,11 @@ class CResources_FileManipulator {
         CResources_Helpers_ImageFactory::load($conversionTempFile)
             ->manipulate($conversion->getManipulations())
             ->save();
+
         return $conversionTempFile;
     }
 
-    protected function dispatchQueuedConversions(CApp_Model_Interface_ResourceInterface $resource, CResources_ConversionCollection $queuedConversions) {
+    protected function dispatchQueuedConversions(CModel_Resource_ResourceInterface $resource, CResources_ConversionCollection $queuedConversions) {
         $performConversionsJobClass = CF::config('resource.task_queue.perform_conversions', CResources_TaskQueue_PerformConversions::class);
         $job = new $performConversionsJobClass($queuedConversions, $resource);
 
@@ -124,11 +125,13 @@ class CResources_FileManipulator {
     }
 
     /**
-     * @param CApp_Model_Interface_ResourceInterface $resource
+     * @param CModel_Resource_ResourceInterface $resource
      *
-     * @return \Spatie\ResourceLibrary\ImageGenerators\ImageGenerator|null
+     * @see CModel_Resource_ResourceTrait
+     *
+     * @return null|\Spatie\ResourceLibrary\ImageGenerators\ImageGenerator
      */
-    public function determineImageGenerator(CApp_Model_Interface_ResourceInterface $resource) {
+    public function determineImageGenerator(CModel_Resource_ResourceInterface $resource) {
         return $resource->getImageGenerators()
             ->map(function ($imageGeneratorClassName) {
                 return CContainer::getInstance()->build($imageGeneratorClassName);

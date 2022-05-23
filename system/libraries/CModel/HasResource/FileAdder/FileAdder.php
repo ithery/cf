@@ -301,7 +301,7 @@ class CModel_HasResource_FileAdder_FileAdder {
 
         $resourceClass = CF::config('resource.resource_model');
         if ($resourceClass == null) {
-            $resourceClass = 'CApp_Model_Resource';
+            $resourceClass = CApp_Model_Resource::class;
         }
         /** @var CApp_Model_Resource $resource */
         $resource = new $resourceClass();
@@ -365,12 +365,12 @@ class CModel_HasResource_FileAdder_FileAdder {
         return $this;
     }
 
-    protected function attachResource(CApp_Model_Interface_ResourceInterface $resource) {
+    protected function attachResource(CModel_Resource_ResourceInterface $resource) {
         if (!$this->subject->exists) {
             $this->subject->prepareToAttachResource($resource, $this);
             $class = get_class($this->subject);
             $class::created(function ($model) {
-                $model->processUnattachedResource(function (CApp_Model_Interface_ResourceInterface $resource, CModel_HasResource_FileAdder_FileAdder $fileAdder) use ($model) {
+                $model->processUnattachedResource(function (CModel_Resource_ResourceInterface $resource, CModel_HasResource_FileAdder_FileAdder $fileAdder) use ($model) {
                     $this->processResourceItem($model, $resource, $fileAdder);
                 });
             });
@@ -380,7 +380,7 @@ class CModel_HasResource_FileAdder_FileAdder {
         $this->processResourceItem($this->subject, $resource, $this);
     }
 
-    protected function processResourceItem(CModel_HasResourceInterface $model, CApp_Model_Interface_ResourceInterface $resource, self $fileAdder) {
+    protected function processResourceItem(CModel_HasResourceInterface $model, CModel_Resource_ResourceInterface $resource, self $fileAdder) {
         $this->guardAgainstDisallowedFileAdditions($resource, $model);
         $model->resource()->save($resource);
         $this->filesystem->add($fileAdder->pathToFile, $resource, $fileAdder->fileName);
@@ -413,7 +413,7 @@ class CModel_HasResource_FileAdder_FileAdder {
             });
     }
 
-    protected function guardAgainstDisallowedFileAdditions(CApp_Model_Interface_ResourceInterface $resource) {
+    protected function guardAgainstDisallowedFileAdditions(CModel_Resource_ResourceInterface $resource) {
         $file = PendingFile::createFromResource($resource);
         if (!$collection = $this->getResourceCollection($resource->collection_name)) {
             return;

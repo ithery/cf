@@ -1,6 +1,6 @@
 <?php
 /**
- * @property-read CModel_Collection|CApp_Model_Interface_ResourceInterface[] $resource
+ * @property-read CModel_Collection|CModel_Resource_ResourceInterface[] $resource
  */
 trait CModel_HasResource_HasResourceTrait {
     /**
@@ -310,7 +310,7 @@ trait CModel_HasResource_HasResourceTrait {
             ->map(function (array $newResourceItem) use ($collectionName) {
                 static $orderColumn = 1;
                 $resourceClass = CF::config('resource.resource_model');
-                /** @var CApp_Model_Interface_ResourceInterface|CModel $resourceClass */
+                /** @var CModel_Resource_ResourceInterface|CModel $resourceClass */
                 $currentResource = $resourceClass::findOrFail($newResourceItem['id']);
                 if ($currentResource->collection_name !== $collectionName) {
                     throw CResources_Exception_ResourceCannotBeUpdated::doesNotBelongToCollection($collectionName, $currentResource);
@@ -330,7 +330,7 @@ trait CModel_HasResource_HasResourceTrait {
 
     protected function removeResourceItemsNotPresentInArray(array $newResourceArray, $collectionName = 'default') {
         $this->getResource($collectionName)
-            ->reject(function (CApp_Model_Interface_ResourceInterface $currentResourceItem) use ($newResourceArray) {
+            ->reject(function (CModel_Resource_ResourceInterface $currentResourceItem) use ($newResourceArray) {
                 return in_array($currentResourceItem->id, array_column($newResourceArray, 'id'));
             })
             ->each->delete();
@@ -356,13 +356,13 @@ trait CModel_HasResource_HasResourceTrait {
     /**
      * Remove all resource in the given collection except some.
      *
-     * @param string                                                                   $collectionName
-     * @param \Spatie\ResourceLibrary\Models\Resource[]|\Illuminate\Support\Collection $excludedResource
+     * @param string                                                 $collectionName
+     * @param \Spatie\ResourceLibrary\Models\Resource[]|\CCollection $excludedResource
      *
      * @return $this
      */
     public function clearResourceCollectionExcept($collectionName = 'default', $excludedResource = []) {
-        if ($excludedResource instanceof CApp_Model_Interface_ResourceInterface) {
+        if ($excludedResource instanceof CModel_Resource_ResourceInterface) {
             $excludedResource = c::collect()->push($excludedResource);
         }
         $excludedResource = c::collect($excludedResource);
@@ -372,7 +372,7 @@ trait CModel_HasResource_HasResourceTrait {
         }
 
         $this->getResource($collectionName)
-            ->reject(function (CApp_Model_Interface_ResourceInterface $resource) use ($excludedResource) {
+            ->reject(function (CModel_Resource_ResourceInterface $resource) use ($excludedResource) {
                 return $excludedResource->where('resource_id', $resource->resource_id)->count();
             })
             ->each->delete();
@@ -392,7 +392,7 @@ trait CModel_HasResource_HasResourceTrait {
      * @throws \CResources_Exception_ResourceCannotBeDeleted
      */
     public function deleteResource($resourceId) {
-        if ($resourceId instanceof CApp_Model_Interface_ResourceInterface) {
+        if ($resourceId instanceof CModel_Resource_ResourceInterface) {
             $resourceId = $resourceId->id;
         }
         $resource = $this->resource->find($resourceId);
@@ -457,7 +457,7 @@ trait CModel_HasResource_HasResourceTrait {
     public function loadResource($collectionName) {
         $collection = $this->exists ? $this->resource : c::collect($this->unAttachedResourceLibraryItems)->pluck('resource');
         $values = $collection
-            ->filter(function (CApp_Model_Interface_ResourceInterface $resourceItem) use ($collectionName) {
+            ->filter(function (CModel_Resource_ResourceInterface $resourceItem) use ($collectionName) {
                 if ($collectionName == '') {
                     return true;
                 }
@@ -470,7 +470,7 @@ trait CModel_HasResource_HasResourceTrait {
         return $values;
     }
 
-    public function prepareToAttachResource(CApp_Model_Interface_ResourceInterface $resource, CModel_HasResource_FileAdder_FileAdder $fileAdder) {
+    public function prepareToAttachResource(CModel_Resource_ResourceInterface $resource, CModel_HasResource_FileAdder_FileAdder $fileAdder) {
         $this->unAttachedResourceLibraryItems[] = compact('resource', 'fileAdder');
     }
 
@@ -506,13 +506,13 @@ trait CModel_HasResource_HasResourceTrait {
         }
     }
 
-    public function registerResourceConversions(CApp_Model_Interface_ResourceInterface $resource = null) {
+    public function registerResourceConversions(CModel_Resource_ResourceInterface $resource = null) {
     }
 
     public function registerResourceCollections() {
     }
 
-    public function registerAllResourceConversions(CApp_Model_Interface_ResourceInterface $resource = null) {
+    public function registerAllResourceConversions(CModel_Resource_ResourceInterface $resource = null) {
         $this->registerResourceCollections();
         c::collect($this->resourceCollections)->each(function (CResources_ResourceCollection $resourceCollection) use ($resource) {
             $actualResourceConversions = $this->resourceConversions;

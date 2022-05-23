@@ -10,14 +10,14 @@ defined('SYSPATH') or die('No direct access allowed.');
  */
 class CResources_Repository {
     /**
-     * @var CApp_Model_Interface_ResourceInterface|CModel
+     * @var CModel_Resource_ResourceInterface|CModel
      */
     protected $model;
 
     /**
-     * @param CApp_Model_Interface_ResourceInterface $model
+     * @param CModel_Resource_ResourceInterface $model
      */
-    public function __construct(CApp_Model_Interface_ResourceInterface $model = null) {
+    public function __construct(CModel_Resource_ResourceInterface $model = null) {
         if ($model == null) {
             $resourceModel = CF::config('resource.resource_model', CApp_Model_Resource::class);
             $model = new $resourceModel();
@@ -87,7 +87,7 @@ class CResources_Repository {
      * @return \Closure
      */
     protected function getDefaultFilterFunction(array $filters) {
-        return function (CApp_Model_Interface_ResourceInterface $resource) use ($filters) {
+        return function (CModel_Resource_ResourceInterface $resource) use ($filters) {
             foreach ($filters as $property => $value) {
                 if (!carr::has($resource->custom_properties, $property)) {
                     return false;

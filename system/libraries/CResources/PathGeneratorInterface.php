@@ -12,15 +12,15 @@ interface CResources_PathGeneratorInterface {
     /**
      * Get the path for the given resource, relative to the root storage path.
      */
-    public function getPath(CApp_Model_Interface_ResourceInterface $resource);
+    public function getPath(CModel_Resource_ResourceInterface $resource);
 
     /**
      * Get the path for conversions of the given resource, relative to the root storage path.
      */
-    public function getPathForConversions(CApp_Model_Interface_ResourceInterface $resource);
+    public function getPathForConversions(CModel_Resource_ResourceInterface $resource);
 
     /**
      * Get the path for responsive images of the given resource, relative to the root storage path.
      */
-    public function getPathForResponsiveImages(CApp_Model_Interface_ResourceInterface $resource);
+    public function getPathForResponsiveImages(CModel_Resource_ResourceInterface $resource);
 }

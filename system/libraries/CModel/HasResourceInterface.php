@@ -63,8 +63,8 @@ interface CModel_HasResourceInterface {
     /**
      * Remove all resource in the given collection except some.
      *
-     * @param string                                                 $collectionName
-     * @param \CApp_Model_Interface_ResourceInterface[]|\CCollection $excludedResource
+     * @param string                                            $collectionName
+     * @param \CModel_Resource_ResourceInterface[]|\CCollection $excludedResource
      *
      * @return string $collectionName
      */
@@ -98,9 +98,9 @@ interface CModel_HasResourceInterface {
     /**
      * Register the resource conversions.
      *
-     * @param CApp_Model_Interface_ResourceInterface $resource
+     * @param CModel_Resource_ResourceInterface $resource
      */
-    public function registerResourceConversions(CApp_Model_Interface_ResourceInterface $resource = null);
+    public function registerResourceConversions(CModel_Resource_ResourceInterface $resource = null);
 
     /**
      * Register the resource collections.

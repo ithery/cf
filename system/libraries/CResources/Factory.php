@@ -19,6 +19,7 @@ class CResources_Factory {
             $pathGeneratorClass = $customPathClass;
         }
         static::guardAgainstInvalidPathGenerator($pathGeneratorClass);
+
         return new $pathGeneratorClass();
     }
 
@@ -27,7 +28,7 @@ class CResources_Factory {
      *
      * @return CResources_UrlGeneratorAbstract
      */
-    public static function createUrlGeneratorForResource(CApp_Model_Interface_ResourceInterface $resource, $conversionName = '') {
+    public static function createUrlGeneratorForResource(CModel_Resource_ResourceInterface $resource, $conversionName = '') {
         $urlGeneratorClass = CF::config('resource.url_generator');
         if ($urlGeneratorClass == null) {
             $diskDriverName = $resource->getDiskDriverName();
@@ -47,6 +48,7 @@ class CResources_Factory {
             $conversion = CResources_ConversionCollection::createForResource($resource)->getByName($conversionName);
             $urlGenerator->setConversion($conversion);
         }
+
         return $urlGenerator;
     }
 

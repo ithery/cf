@@ -26,13 +26,13 @@ class CResources_Filesystem {
         $this->filesystem = $filesystem;
     }
 
-    public function add($file, CApp_Model_Interface_ResourceInterface $resource, $targetFileName = null) {
+    public function add($file, CModel_Resource_ResourceInterface $resource, $targetFileName = null) {
         $this->copyToResourceLibrary($file, $resource, null, $targetFileName);
         CEvent::dispatch(new CResources_Event_ResourceHasBeenAdded($resource));
         CResources_Factory::createFileManipulator()->createDerivedFiles($resource);
     }
 
-    public function copyToResourceLibrary($pathToFile, CApp_Model_Interface_ResourceInterface $resource, $type = null, $targetFileName = null) {
+    public function copyToResourceLibrary($pathToFile, CModel_Resource_ResourceInterface $resource, $type = null, $targetFileName = null) {
         $destinationFileName = $targetFileName ?: pathinfo($pathToFile, PATHINFO_BASENAME);
         $destination = $this->getResourceDirectory($resource, $type) . $destinationFileName;
 
@@ -42,6 +42,7 @@ class CResources_Filesystem {
                 ->disk($resource->disk)
                 ->put($destination, $file);
             fclose($file);
+
             return;
         }
 
@@ -60,15 +61,17 @@ class CResources_Filesystem {
     public function getRemoteHeadersForFile($file, array $resourceCustomHeaders = []) {
         $mimeTypeHeader = ['ContentType' => CResources_Helpers_File::getMimeType($file)];
         $extraHeaders = CF::config('resource.remote.extra_headers');
+
         return array_merge($mimeTypeHeader, $extraHeaders, $this->customRemoteHeaders, $resourceCustomHeaders);
     }
 
-    public function getStream(CApp_Model_Interface_ResourceInterface $resource) {
+    public function getStream(CModel_Resource_ResourceInterface $resource) {
         $sourceFile = $this->getResourceDirectory($resource) . '/' . $resource->file_name;
+
         return $this->filesystem->disk($resource->disk)->readStream($sourceFile);
     }
 
-    public function copyFromResourceLibrary(CApp_Model_Interface_ResourceInterface $resource, $targetFile) {
+    public function copyFromResourceLibrary(CModel_Resource_ResourceInterface $resource, $targetFile) {
         touch($targetFile);
         $stream = $this->getStream($resource);
         $targetFileStream = fopen($targetFile, 'a');
@@ -78,10 +81,11 @@ class CResources_Filesystem {
         }
         fclose($stream);
         fclose($targetFileStream);
+
         return $targetFile;
     }
 
-    public function removeAllFiles(CApp_Model_Interface_ResourceInterface $resource) {
+    public function removeAllFiles(CModel_Resource_ResourceInterface $resource) {
         $resourceDirectory = $this->getResourceDirectory($resource);
         $conversionsDirectory = $this->getResourceDirectory($resource, 'conversions');
         $responsiveImagesDirectory = $this->getResourceDirectory($resource, 'responsiveImages');
@@ -91,25 +95,26 @@ class CResources_Filesystem {
             });
     }
 
-    public function removeFile(CApp_Model_Interface_ResourceInterface $resource, $path) {
+    public function removeFile(CModel_Resource_ResourceInterface $resource, $path) {
         $this->filesystem->disk($resource->disk)->delete($path);
     }
 
-    public function removeResponsiveImages(CApp_Model_Interface_ResourceInterface $resource, $conversionName = 'resourcelibrary_original') {
+    public function removeResponsiveImages(CModel_Resource_ResourceInterface $resource, $conversionName = 'resourcelibrary_original') {
         $responsiveImagesDirectory = $this->getResponsiveImagesDirectory($resource);
         $allFilePaths = $this->filesystem->allFiles($responsiveImagesDirectory);
         $responsiveImagePaths = array_filter($allFilePaths, function ($path) use ($conversionName) {
-            return str_contains($path, $conversionName);
+            return cstr::contains($path, $conversionName);
         });
         $this->filesystem->delete($responsiveImagePaths);
     }
 
-    public function syncFileNames(CApp_Model_Interface_ResourceInterface $resource) {
+    public function syncFileNames(CModel_Resource_ResourceInterface $resource) {
         $this->renameResourceFile($resource);
         $this->renameConversionFiles($resource);
     }
 
-    protected function renameResourceFile(CApp_Model_Interface_ResourceInterface $resource) {
+    protected function renameResourceFile(CModel_Resource_ResourceInterface $resource) {
+        /** @var CModel|CModel_Resource_ResourceInterface $resource */
         $newFileName = $resource->file_name;
         $oldFileName = $resource->getOriginal('file_name');
         $resourceDirectory = $this->getResourceDirectory($resource);
@@ -118,8 +123,9 @@ class CResources_Filesystem {
         $this->filesystem->disk($resource->disk)->move($oldFile, $newFile);
     }
 
-    protected function renameConversionFiles(CApp_Model_Interface_ResourceInterface $resource) {
+    protected function renameConversionFiles(CModel_Resource_ResourceInterface $resource) {
         $newFileName = $resource->file_name;
+        /** @var CModel|CModel_Resource_ResourceInterface $resource */
         $oldFileName = $resource->getOriginal('file_name');
         $conversionDirectory = $this->getConversionDirectory($resource);
         $conversionCollection = CResources_ConversionCollection::createForResource($resource);
@@ -136,7 +142,7 @@ class CResources_Filesystem {
         }
     }
 
-    public function getResourceDirectory(CApp_Model_Interface_ResourceInterface $resource, $type = null) {
+    public function getResourceDirectory(CModel_Resource_ResourceInterface $resource, $type = null) {
         $pathGenerator = CResources_Factory::createPathGenerator();
         if (!$type) {
             $directory = $pathGenerator->getPath($resource);
@@ -150,14 +156,15 @@ class CResources_Filesystem {
         if (!in_array($resource->getDiskDriverName(), ['s3'], true)) {
             $this->filesystem->disk($resource->disk)->makeDirectory($directory);
         }
+
         return $directory;
     }
 
-    public function getConversionDirectory(CApp_Model_Interface_ResourceInterface $resource) {
+    public function getConversionDirectory(CModel_Resource_ResourceInterface $resource) {
         return $this->getResourceDirectory($resource, 'conversions');
     }
 
-    public function getResponsiveImagesDirectory(CApp_Model_Interface_ResourceInterface $resource) {
+    public function getResponsiveImagesDirectory(CModel_Resource_ResourceInterface $resource) {
         return $this->getResourceDirectory($resource, 'responsiveImages');
     }
 }
