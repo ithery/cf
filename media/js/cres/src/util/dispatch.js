@@ -1,9 +1,9 @@
-export function dispatch(eventName) {
-    const event = document.createEvent('Events');
+export function dispatch(eventName, params={}) {
+    const event = new CustomEvent(eventName, {
+        detail: params
+    });
 
-    event.initEvent(eventName, true, true);
-
-    document.dispatchEvent(event);
+    window.dispatchEvent(event);
 
     return event;
 }

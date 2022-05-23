@@ -19,8 +19,8 @@ class CConsole_Command_Daemon_DaemonStartCommand extends CConsole_Command {
 
         $errCode = 0;
         $errMessage = '';
-        $daemonManager = CManager::daemon();
-        if ($daemonManager->isRunning($class)) {
+        $daemonRunner = CDaemon::createRunner($class);
+        if ($daemonRunner->isRunning()) {
             $errCode++;
             $errMessage = $class . ' already running';
         }
@@ -28,7 +28,7 @@ class CConsole_Command_Daemon_DaemonStartCommand extends CConsole_Command {
             $this->info('Starting ' . $class);
 
             try {
-                $started = $daemonManager->start($class);
+                $started = $daemonRunner->run();
                 $this->info('Daemon ' . $class . ' is running now');
             } catch (Exception $ex) {
                 $errCode++;

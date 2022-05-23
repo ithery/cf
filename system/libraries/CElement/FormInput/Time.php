@@ -13,8 +13,11 @@ class CElement_FormInput_Time extends CElement_FormInput {
         CTrait_Element_Property_Placeholder;
 
     protected $show_second;
+
     protected $template;
+
     protected $show_meridian;
+
     protected $minute_step;
 
     public function __construct($id) {
@@ -33,7 +36,7 @@ class CElement_FormInput_Time extends CElement_FormInput {
 
     public function html($indent = 0) {
         $html = new CStringBuilder();
-        $html->set_indent($indent);
+        $html->setIndent($indent);
         $disabled = '';
         if ($this->disabled) {
             $disabled = ' disabled="disabled"';
@@ -58,23 +61,17 @@ class CElement_FormInput_Time extends CElement_FormInput {
         if (strlen($this->placeholder) > 0) {
             $placeholder = ' placeholder="' . $this->placeholder . '"';
         }
-        if ($this->bootstrap == '3.3') {
-            $classes = $classes . ' form-control timepicker';
-            $html->appendln('<input type="text" name="' . $this->name . '" id="' . $this->id . '" class="input-unstyled ' . $classes . $this->validation->validation_class() . '" value="' . $this->value . '"' . $disabled . $custom_css . $addition_attribute . $placeholder . '>')->br();
-        } else {
-            if ($this->bootstrap == '3') {
-                $classes = $classes . ' form-control ';
-            }
-            $html->appendln('<div class="bootstrap-timepicker">');
-            $html->appendln('<input type="text" name="' . $this->name . '" id="' . $this->id . '" class="input-unstyled ' . $classes . $this->validation->validation_class() . '" value="' . $this->value . '"' . $disabled . $custom_css . $addition_attribute . $placeholder . '>')->br();
-            $html->appendln('</div>');
-        }
+
+        $html->appendln('<div class="bootstrap-timepicker">');
+        $html->appendln('<input type="text" name="' . $this->name . '" id="' . $this->id . '" class="input-unstyled ' . $classes . $this->validation->validationClass() . '" value="' . $this->value . '"' . $disabled . $custom_css . $addition_attribute . $placeholder . '>')->br();
+        $html->appendln('</div>');
+
         return $html->text();
     }
 
     public function js($indent = 0) {
         $js = new CStringBuilder();
-        $js->set_indent($indent);
+        $js->setIndent($indent);
 
         $js->appendln("$('#" . $this->id . "').timepicker({");
         if (strlen($this->value) > 0) {

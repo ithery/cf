@@ -14,16 +14,16 @@ defined('SYSPATH') or die('No direct access allowed.');
  *
  * @link https://mariadb.com/kb/en/the-mariadb-library/reserved-words/
  */
-final class CDatabase_Platform_Keywords_MariaDb102 extends CDatabase_Platform_Keywords_Mysql {
+final class CDatabase_Platform_Keywords_MariaDb102 extends CDatabase_Platform_Keywords_MySql {
     /**
-     * {@inheritdoc}
+     * @inheritdoc
      */
     public function getName() {
         return 'MariaDb102';
     }
 
     /**
-     * {@inheritdoc}
+     * @inheritdoc
      */
     protected function getKeywords() {
         return [

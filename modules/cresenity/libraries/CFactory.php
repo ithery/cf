@@ -40,10 +40,8 @@ class CFactory {
         return CElement_Factory::createComponent('DataTable', $id);
     }
 
-    public static function create_row($row_id = '') {
-        $row = CTableRow::factory($row_id);
-
-        return $row;
+    public static function createTableRow($id = '') {
+        return CElement_Factory::createComponent(CElement_Component_TableRow::class, $id);
     }
 
     public static function create_tab_list($tabs_id = '') {
@@ -84,10 +82,8 @@ class CFactory {
         return $rowf;
     }
 
-    public static function create_span($id = '') {
-        $span = CSpan::factory($id);
-
-        return $span;
+    public static function createSpan($id = '') {
+        return CElement_Factory::create(CElement_Element_Span::class, $id);
     }
 
     public static function create_img($id = '') {

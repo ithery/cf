@@ -289,6 +289,32 @@ CREATE TABLE `queue_failed` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 
+DROP TABLE IF EXISTS `queue_batch`;
+CREATE TABLE `queue_batch` (
+  `queue_batch_id` bigint(20) unsigned NOT NULL AUTO_INCREMENT,
+  `org_id` bigint(20) unsigned DEFAULT NULL,
+  `app_code` varchar(200) DEFAULT NULL,
+  `name` varchar(200) DEFAULT NULL,
+  `id` varchar(255) DEFAULT NULL,
+  `total_jobs` int DEFAULT NULL,
+  `pending_jobs` int DEFAULT NULL,
+  `failed_jobs` int DEFAULT NULL,
+  `failed_job_ids` TEXT DEFAULT NULL,
+  `options` LONGTEXT DEFAULT NULL,
+  `cancelled_at` datetime DEFAULT NULL,
+  `finished_at` datetime DEFAULT NULL,
+  `created` datetime DEFAULT NULL,
+  `createdby` varchar(255) DEFAULT NULL,
+  `updated` datetime DEFAULT NULL,
+  `updatedby` varchar(255) DEFAULT NULL,
+  `deleted` datetime DEFAULT NULL,
+  `deletedby` varchar(255) DEFAULT NULL,
+  `status` int(11) NOT NULL DEFAULT '1',
+  PRIMARY KEY (`queue_batch_id`),
+  UNIQUE KEY `queue_batch_id` (`queue_batch_id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+
 
 CREATE TABLE `meta` (
   `meta_id` bigint(20) unsigned NOT NULL AUTO_INCREMENT,
@@ -344,6 +370,29 @@ CREATE TABLE `log_activity` (
   `status` int(11) NOT NULL DEFAULT '1',
   PRIMARY KEY (`log_activity_id`),
   UNIQUE KEY `log_activity_id` (`log_activity_id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+
+DROP TABLE IF EXISTS `log_sse`;
+CREATE TABLE `log_sse` (
+  `log_sse_id` bigint(20) unsigned NOT NULL AUTO_INCREMENT,
+  `org_id` bigint(20) unsigned DEFAULT NULL,
+  `ref_id` bigint(20) unsigned DEFAULT NULL,
+  `ref_type` varchar(255) DEFAULT NULL,
+  `message` longtext DEFAULT NULL,
+  `event` varchar(50) DEFAULT NULL,
+  `type` varchar(255) DEFAULT NULL,
+  `delivered` tinyint DEFAULT 0,
+  `client` varchar(255) DEFAULT NULL,
+  `created` datetime DEFAULT NULL,
+  `createdby` varchar(255) DEFAULT NULL,
+  `updated` datetime DEFAULT NULL,
+  `updatedby` varchar(255) DEFAULT NULL,
+  `deleted` datetime DEFAULT NULL,
+  `deletedby` varchar(255) DEFAULT NULL,
+  `status` int(11) NOT NULL DEFAULT '1',
+  PRIMARY KEY (`log_sse_id`),
+  UNIQUE KEY `log_sse_id` (`log_sse_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 
@@ -436,6 +485,8 @@ CREATE TABLE `websocket_statistic` (
   `status` int(11) NOT NULL DEFAULT 1,
   PRIMARY KEY (`websocket_statistic_id`)
 ) ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8mb4;
+
+
 
 /*!40101 SET SQL_MODE=IFNULL(@OLD_SQL_MODE, '') */;
 /*!40014 SET FOREIGN_KEY_CHECKS=IF(@OLD_FOREIGN_KEY_CHECKS IS NULL, 1, @OLD_FOREIGN_KEY_CHECKS) */;

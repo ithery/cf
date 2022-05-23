@@ -10,7 +10,6 @@ defined('SYSPATH') or die('No direct access allowed.');
  */
 class CElement_FormInput_Textarea_Quill extends CElement_Element_Div {
     use CTrait_Element_Property_Value;
-
     protected $theme;
 
     protected $toolbar;
@@ -24,6 +23,7 @@ class CElement_FormInput_Textarea_Quill extends CElement_Element_Div {
 
     public function setTheme($theme) {
         $this->theme = $theme;
+
         return $this;
     }
 
@@ -70,8 +70,10 @@ class CElement_FormInput_Textarea_Quill extends CElement_Element_Div {
                         ['clean']                                         // remove formatting button
                     ]
                 ";
+
                 break;
         }
+
         return $json;
     }
 
@@ -84,9 +86,11 @@ class CElement_FormInput_Textarea_Quill extends CElement_Element_Div {
         switch ($this->theme) {
             case 'bubble':
                 CManager::registerCss('plugins/quill/quill.bubble.css');
+
                 break;
             case 'snow':
                 CManager::registerCss('plugins/quill/quill.snow.css');
+
                 break;
         }
 
@@ -103,6 +107,7 @@ class CElement_FormInput_Textarea_Quill extends CElement_Element_Div {
         ';
 
         $js .= $this->jsChild();
+
         return $js;
     }
 }

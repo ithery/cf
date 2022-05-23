@@ -1,7 +1,7 @@
 <?php
 
 /**
- * Description of DaemonStopCommand
+ * Description of DaemonStopCommand.
  *
  * @author Hery
  */
@@ -19,15 +19,16 @@ class CConsole_Command_Daemon_DaemonStopCommand extends CConsole_Command {
 
         $errCode = 0;
         $errMessage = '';
-        $daemonManager = CManager::daemon();
-        if (!$daemonManager->isRunning($class)) {
+        $daemonRunner = CDaemon::createRunner($class);
+        if (!$daemonRunner->isRunning()) {
             $errCode++;
             $errMessage = $class . ' already stopped';
         }
         if ($errCode == 0) {
             $this->info('Stopping ' . $class);
+
             try {
-                $started = $daemonManager->stop($class);
+                $stopped = $daemonRunner->stop();
 
                 $this->info('Daemon ' . $class . ' is stopped now');
             } catch (Exception $ex) {
@@ -38,6 +39,7 @@ class CConsole_Command_Daemon_DaemonStopCommand extends CConsole_Command {
 
         if ($errCode > 0) {
             $this->error($errMessage);
+
             return 1;
         }
 

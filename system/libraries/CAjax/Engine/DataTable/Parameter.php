@@ -19,13 +19,24 @@ class CAjax_Engine_DataTable_Parameter {
     }
 
     public function pageSize() {
-        return carr::get($this->requestGet, 'iDisplayLength');
+        $pageSize = carr::get($this->requestGet, 'iDisplayLength');
+        if (!is_numeric($pageSize)) {
+            $pageSize = 10;
+        }
+
+        return $pageSize;
     }
 
     public function page() {
         $pageSize = $this->pageSize();
-        if (strlen($pageSize) > 0 && $pageSize != 0) {
-            return (carr::get($this->requestGet, 'iDisplayStart') / $pageSize) + 1;
+        if (strlen($pageSize) > 0 && $pageSize > 0) {
+            $iDisplayStart = carr::get($this->requestGet, 'iDisplayStart');
+            if (!is_numeric($iDisplayStart)) {
+                return 1;
+            }
+            $page = ($iDisplayStart / $pageSize) + 1;
+
+            return $page;
         }
 
         return 1;

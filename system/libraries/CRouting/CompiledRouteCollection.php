@@ -1,11 +1,11 @@
 <?php
 
-use Symfony\Component\HttpKernel\Exception\MethodNotAllowedHttpException;
+use Symfony\Component\Routing\RequestContext;
+use Symfony\Component\Routing\Matcher\CompiledUrlMatcher;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 use Symfony\Component\Routing\Exception\MethodNotAllowedException;
 use Symfony\Component\Routing\Exception\ResourceNotFoundException;
-use Symfony\Component\Routing\Matcher\CompiledUrlMatcher;
-use Symfony\Component\Routing\RequestContext;
+use Symfony\Component\HttpKernel\Exception\MethodNotAllowedHttpException;
 
 class CRouting_CompiledRouteCollection extends CRouting_RouteCollectionAbstract {
     /**
@@ -25,21 +25,21 @@ class CRouting_CompiledRouteCollection extends CRouting_RouteCollectionAbstract 
     /**
      * The dynamically added routes that were added after loading the cached, compiled routes.
      *
-     * @var \Illuminate\Routing\RouteCollection|null
+     * @var null|\CRouting_RouteCollection
      */
     protected $routes;
 
     /**
      * The router instance used by the route.
      *
-     * @var \Illuminate\Routing\Router
+     * @var \CRouting_Router
      */
     protected $router;
 
     /**
      * The container instance used by the route.
      *
-     * @var \Illuminate\Container\Container
+     * @var \CContainer_Container
      */
     protected $container;
 
@@ -54,7 +54,7 @@ class CRouting_CompiledRouteCollection extends CRouting_RouteCollectionAbstract 
     public function __construct(array $compiled, array $attributes) {
         $this->compiled = $compiled;
         $this->attributes = $attributes;
-        $this->routes = new CRouting_RouteCollection;
+        $this->routes = new CRouting_RouteCollection();
     }
 
     /**
@@ -76,7 +76,6 @@ class CRouting_CompiledRouteCollection extends CRouting_RouteCollectionAbstract 
      * @return void
      */
     public function refreshNameLookups() {
-        //
     }
 
     /**
@@ -87,7 +86,6 @@ class CRouting_CompiledRouteCollection extends CRouting_RouteCollectionAbstract 
      * @return void
      */
     public function refreshActionLookups() {
-        //
     }
 
     /**
@@ -95,15 +93,15 @@ class CRouting_CompiledRouteCollection extends CRouting_RouteCollectionAbstract 
      *
      * @param CHTTP_Request $request
      *
-     * @return CRouting_Route
-     *
      * @throws \Symfony\Component\HttpKernel\Exception\MethodNotAllowedHttpException
      * @throws \Symfony\Component\HttpKernel\Exception\NotFoundHttpException
+     *
+     * @return CRouting_Route
      */
     public function match(CHTTP_Request $request) {
         $matcher = new CompiledUrlMatcher(
             $this->compiled,
-            (new RequestContext)->fromRequest(
+            (new RequestContext())->fromRequest(
                 $trimmedRequest = $this->requestWithoutTrailingSlash($request)
             )
         );
@@ -114,11 +112,10 @@ class CRouting_CompiledRouteCollection extends CRouting_RouteCollectionAbstract 
             if ($result = $matcher->matchRequest($trimmedRequest)) {
                 $route = $this->getByName($result['_route']);
             }
-        } catch (ResourceNotFoundException | MethodNotAllowedException $e) {
+        } catch (ResourceNotFoundException|MethodNotAllowedException $e) {
             try {
                 return $this->routes->match($request);
             } catch (NotFoundHttpException $e) {
-                //
             }
         }
 
@@ -129,8 +126,7 @@ class CRouting_CompiledRouteCollection extends CRouting_RouteCollectionAbstract 
                 if (!$dynamicRoute->isFallback) {
                     $route = $dynamicRoute;
                 }
-            } catch (NotFoundHttpException | MethodNotAllowedHttpException $e) {
-                //
+            } catch (NotFoundHttpException|MethodNotAllowedHttpException $e) {
             }
         }
 
@@ -160,9 +156,9 @@ class CRouting_CompiledRouteCollection extends CRouting_RouteCollectionAbstract 
     /**
      * Get routes from the collection by method.
      *
-     * @param string|null $method
+     * @param null|string $method
      *
-     * @return \Illuminate\Routing\Route[]
+     * @return \CRouting_Route[]
      */
     public function get($method = null) {
         return $this->getRoutesByMethod()[$method] ?? [];
@@ -184,7 +180,7 @@ class CRouting_CompiledRouteCollection extends CRouting_RouteCollectionAbstract 
      *
      * @param string $name
      *
-     * @return \Illuminate\Routing\Route|null
+     * @return null|\CRouting_Route
      */
     public function getByName($name) {
         if (isset($this->attributes[$name])) {
@@ -199,7 +195,7 @@ class CRouting_CompiledRouteCollection extends CRouting_RouteCollectionAbstract 
      *
      * @param string $action
      *
-     * @return \Illuminate\Routing\Route|null
+     * @return null|\CRouting_Route
      */
     public function getByAction($action) {
         $attributes = c::collect($this->attributes)->first(function (array $attributes) use ($action) {
@@ -220,7 +216,7 @@ class CRouting_CompiledRouteCollection extends CRouting_RouteCollectionAbstract 
     /**
      * Get all of the routes in the collection.
      *
-     * @return \Illuminate\Routing\Route[]
+     * @return \CRouting_Route[]
      */
     public function getRoutes() {
         return c::collect($this->attributes)
@@ -268,7 +264,7 @@ class CRouting_CompiledRouteCollection extends CRouting_RouteCollectionAbstract 
      *
      * @param array $attributes
      *
-     * @return \Illuminate\Routing\Route
+     * @return \CRouting_Route
      */
     protected function newRoute(array $attributes) {
         if (empty($attributes['action']['prefix'] ?? '')) {

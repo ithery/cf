@@ -1,13 +1,9 @@
 <?php
-
+/**
+ * @see CApp
+ * @see CApp_SEO
+ */
 class CApp_SEO_JsonLd implements CApp_SEO_JsonLdInterface {
-    /**
-     * Singleton instance of this class.
-     *
-     * @var CApp_SEO_JsonLd
-     */
-    protected $instance = null;
-
     /**
      * @var array
      */
@@ -42,6 +38,13 @@ class CApp_SEO_JsonLd implements CApp_SEO_JsonLdInterface {
      * @var array
      */
     protected $config = [];
+
+    /**
+     * Singleton instance of this class.
+     *
+     * @var CApp_SEO_JsonLd
+     */
+    private static $instance = null;
 
     private function __construct() {
         $this->config = CF::config('seo.twitter');

@@ -20,14 +20,14 @@ class CManager_Asset_Compiler {
     protected $maxImportSize;
 
     /**
-     * The last modified time of the newest Asset in the Assets array
+     * The last modified time of the newest Asset in the Assets array.
      *
      * @var int
      */
     protected $lastModTimeNewestAsset = 0;
 
     /**
-     * The last modified time of the compiled Asset
+     * The last modified time of the compiled Asset.
      *
      * @var int
      */
@@ -62,8 +62,10 @@ class CManager_Asset_Compiler {
     }
 
     protected function determineOutFile() {
+        $firstFile = carr::first($this->files);
+        $ymd = date('Ymd', filemtime($firstFile));
         $basePath = defined('CFPUBLIC') ? DOCROOT . 'public' . DS : DOCROOT;
-        $this->outFile = $basePath . 'compiled/asset/' . $this->type . '/' . md5(implode(':', $this->files)) . '.' . $this->type;
+        $this->outFile = $basePath . 'compiled/asset/' . $this->type . '/' . $ymd . '/' . md5(implode(':', $this->files)) . '.' . $this->type;
     }
 
     protected function determineLastModified() {
@@ -95,10 +97,12 @@ class CManager_Asset_Compiler {
         if ($this->needToRecompile()) {
             $dirname = dirname($this->outFile);
             if (!is_dir($dirname)) {
-                cfs::mkdir($dirname);
+                CFile::makeDirectory($dirname, 0755, true);
             }
 
-            file_put_contents($this->outFile, '');
+            if (file_exists($this->outFile)) {
+                CFile::put($this->outFile, '');
+            }
             foreach ($this->files as $file) {
                 $compiledOutput = file_get_contents($file);
                 // strip BOM, if any

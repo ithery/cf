@@ -2,7 +2,6 @@
 
 class CElement_Component_Alert extends CElement_Component {
     use CTrait_Element_Property_Title;
-
     /**
      * @var CElement_Element_H4
      */
@@ -21,8 +20,9 @@ class CElement_Component_Alert extends CElement_Component {
 
     public function __construct($id = '', $tag = 'div') {
         parent::__construct($id, $tag);
-        $this->dismissableButton = $this->addButton()->addClass('close')->setAttr([
+        $this->dismissableButton = $this->addButton()->addClass('btn-close close')->setAttr([
             'data-dismiss' => 'alert',
+            'data-bs-dismiss' => 'alert',
             'aria-hidden' => 'true',
         ])->add('×');
         $this->header = $this->addH4();
@@ -35,11 +35,13 @@ class CElement_Component_Alert extends CElement_Component {
 
     public function setType($type) {
         $this->type = $type;
+
         return $this;
     }
 
     public function setDismissable($bool = true) {
         $this->isDismissable = $bool;
+
         return $this;
     }
 
@@ -49,20 +51,26 @@ class CElement_Component_Alert extends CElement_Component {
         }
         if (!$this->isDismissable) {
             $this->dismissableButton->setVisibility(false);
+        } else {
+            $this->addClass('alert-dismissible');
         }
         $this->header->add($this->getTranslationTitle());
         switch ($this->type) {
             case 'error':
                 $this->addClass('alert-danger');
+
                 break;
             case 'info':
                 $this->addClass('alert-info');
+
                 break;
             case 'warning':
                 $this->addClass('alert-warning');
+
                 break;
             default:
                 $this->addClass('alert-success');
+
                 break;
         }
     }

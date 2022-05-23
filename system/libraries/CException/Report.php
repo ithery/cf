@@ -148,7 +148,8 @@ class CException_Report {
     public function __construct() {
         $this->applicationPath = c::docRoot();
         $this->trackingUuid = self::$fakeTrackingUuid ?: $this->generateUuid();
-        $this->applicationVersion = CF::version();
+        $this->applicationVersion = '';
+        $this->frameworkVersion = CF::version();
     }
 
     /**

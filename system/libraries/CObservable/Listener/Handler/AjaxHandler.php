@@ -1,6 +1,5 @@
 <?php
 
-
 class CObservable_Listener_Handler_AjaxHandler extends CObservable_Listener_Handler {
     use CObservable_Listener_Handler_Trait_AjaxHandlerTrait,
         CObservable_Listener_Handler_Trait_TargetHandlerTrait,
@@ -30,8 +29,9 @@ class CObservable_Listener_Handler_AjaxHandler extends CObservable_Listener_Hand
         $optionsJson .= '}';
         $js = '';
         $js .= '
-            cresenity.ajax(' . $optionsJson . ');;
+            cresenity.ajax(' . $optionsJson . ');
          ';
+
         return $js;
     }
 }

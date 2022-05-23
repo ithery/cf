@@ -3,7 +3,7 @@ class CQueue_Queue_SyncQueue extends CQueue_AbstractQueue {
     /**
      * Get the size of the queue.
      *
-     * @param string|null $queue
+     * @param null|string $queue
      *
      * @return int
      */
@@ -16,11 +16,11 @@ class CQueue_Queue_SyncQueue extends CQueue_AbstractQueue {
      *
      * @param string      $job
      * @param mixed       $data
-     * @param string|null $queue
-     *
-     * @return mixed
+     * @param null|string $queue
      *
      * @throws \Throwable
+     *
+     * @return mixed
      */
     public function push($job, $data = '', $queue = null) {
         $queueJob = $this->resolveJob($this->createPayload($job, $queue, $data), $queue);
@@ -79,8 +79,8 @@ class CQueue_Queue_SyncQueue extends CQueue_AbstractQueue {
     /**
      * Raise the exception occurred queue job event.
      *
-     * @param \Illuminate\Contracts\Queue\Job $job
-     * @param \Throwable                      $e
+     * @param \CQueue_JobInterface $job
+     * @param \Throwable           $e
      *
      * @return void
      */
@@ -93,12 +93,12 @@ class CQueue_Queue_SyncQueue extends CQueue_AbstractQueue {
     /**
      * Handle an exception that occurred while processing a job.
      *
-     * @param \Illuminate\Contracts\Queue\Job $queueJob
-     * @param \Throwable                      $e
-     *
-     * @return void
+     * @param \CQueue_JobInterface $queueJob
+     * @param \Throwable           $e
      *
      * @throws \Throwable
+     *
+     * @return void
      */
     protected function handleException(CQueue_JobInterface $queueJob, Throwable $e) {
         $this->raiseExceptionOccurredJobEvent($queueJob, $e);
@@ -112,13 +112,12 @@ class CQueue_Queue_SyncQueue extends CQueue_AbstractQueue {
      * Push a raw payload onto the queue.
      *
      * @param string      $payload
-     * @param string|null $queue
+     * @param null|string $queue
      * @param array       $options
      *
      * @return mixed
      */
     public function pushRaw($payload, $queue = null, array $options = []) {
-        //
     }
 
     /**
@@ -127,7 +126,7 @@ class CQueue_Queue_SyncQueue extends CQueue_AbstractQueue {
      * @param \DateTimeInterface|\DateInterval|int $delay
      * @param string                               $job
      * @param mixed                                $data
-     * @param string|null                          $queue
+     * @param null|string                          $queue
      *
      * @return mixed
      */
@@ -138,11 +137,10 @@ class CQueue_Queue_SyncQueue extends CQueue_AbstractQueue {
     /**
      * Pop the next job off of the queue.
      *
-     * @param string|null $queue
+     * @param null|string $queue
      *
-     * @return \CQueue_JobInterface|null
+     * @return null|\CQueue_JobInterface
      */
     public function pop($queue = null) {
-        //
     }
 }

@@ -9,8 +9,9 @@ defined('SYSPATH') or die('No direct access allowed.');
  * @since Jun 3, 2018, 2:52:36 PM
  */
 class CElement_FormInput_Select extends CElement_FormInput {
-    use CTrait_Compat_Element_FormInput_Select,
-        CTrait_Element_Property_ApplyJs;
+    use CTrait_Compat_Element_FormInput_Select;
+    use CTrait_Element_Property_ApplyJs;
+    use CTrait_Element_Property_DependsOn;
 
     protected $group_list = [];
 
@@ -103,10 +104,12 @@ class CElement_FormInput_Select extends CElement_FormInput {
     }
 
     protected function build() {
+        parent::build();
         $this->addClass('form-control');
     }
 
     public function html($indent = 0) {
+        parent::html($indent);
         $html = new CStringBuilder();
         $html->setIndent($indent);
         $readonly = '';
@@ -141,7 +144,7 @@ class CElement_FormInput_Select extends CElement_FormInput {
             $addition_attribute .= ' ' . $k . '="' . $v . '"';
         }
         $html
-            ->appendln('<select name="' . $name . '" id="' . $this->id . '" class="' . $classes . $this->validation->validation_class() . '"' . $custom_css . $disabled . $readonly . $multiple . $addition_attribute . '>')
+            ->appendln('<select name="' . $name . '" id="' . $this->id . '" class="' . $classes . $this->validation->validationClass() . '"' . $custom_css . $disabled . $readonly . $multiple . $addition_attribute . '>')
             ->incIndent()
             ->br();
         if (count($this->group_list) > 0) {
@@ -269,6 +272,51 @@ class CElement_FormInput_Select extends CElement_FormInput {
         }
         if ($this->applyJs == 'dualselect') {
             $js->append("$('#" . $this->id . "').multiSelect();")->br();
+        }
+
+        foreach ($this->dependsOn as $dependOn) {
+            //we create ajax method
+
+            $dependsOnSelector = $dependOn->getSelector();
+            $targetSelector = '#' . $this->id();
+            $ajaxMethod = CAjax::createMethod();
+            $ajaxMethod->setType('DependsOn');
+            $ajaxMethod->setMethod('post');
+            $ajaxMethod->setData('dependsOn', serialize($dependOn));
+            $ajaxMethod->setData('from', static::class);
+            $ajaxUrl = $ajaxMethod->makeUrl();
+            $throttle = $dependOn->getThrottle();
+            $optionsJson = '{';
+            $optionsJson .= "url:'" . $ajaxUrl . "',";
+            $optionsJson .= "method:'" . 'post' . "',";
+            $optionsJson .= !$dependOn->getBlock() ? 'block: false,' : '';
+
+            $optionsJson .= "dataAddition: { value: $('" . $dependsOnSelector . "').val() },";
+            $optionsJson .= "onSuccess: (data) => {
+                 let jQuerySelect = $('" . $targetSelector . "');
+                 jQuerySelect.empty();
+                 let beforeValue = '" . $this->value . "';
+                 data.forEach((item,index)=>{
+                     let newOption = new Option(item.value,item.key);
+                     if(beforeValue==item.key) {
+                         newOption.selected='selected';
+                     }
+                     jQuerySelect.append(newOption);
+                 });
+            },";
+            $optionsJson .= 'handleJsonResponse: true';
+            $optionsJson .= '}';
+
+            $optionsJson = str_replace(["\r\n", "\n", "\r"], '', $optionsJson);
+
+            $dependsOnFunctionName = 'dependsOnFunction' . uniqid();
+            $js->appendln('
+                 let ' . $dependsOnFunctionName . ' = () => {
+                     cresenity.ajax(' . $optionsJson . ");
+                 };
+                 $('" . $dependsOnSelector . "').change(cresenity.debounce(" . $dependsOnFunctionName . ' ,' . $throttle . '));
+                 ' . $dependsOnFunctionName . '();
+             ');
         }
 
         return $js->text();

@@ -7,26 +7,28 @@
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  */
+
 namespace PHPUnit\Framework\MockObject;
 
 use function assert;
 use function implode;
 use function sprintf;
-use PHPUnit\Framework\ExpectationFailedException;
-use PHPUnit\Framework\MockObject\Rule\AnyInvokedCount;
-use PHPUnit\Framework\MockObject\Rule\AnyParameters;
-use PHPUnit\Framework\MockObject\Rule\InvocationOrder;
-use PHPUnit\Framework\MockObject\Rule\InvokedCount;
-use PHPUnit\Framework\MockObject\Rule\MethodName;
-use PHPUnit\Framework\MockObject\Rule\ParametersRule;
-use PHPUnit\Framework\MockObject\Stub\Stub;
 use PHPUnit\Framework\TestFailure;
+use PHPUnit\Framework\MockObject\Stub\Stub;
+use PHPUnit\Framework\MockObject\Rule\MethodName;
+use PHPUnit\Framework\MockObject\Rule\InvokedCount;
+use PHPUnit\Framework\MockObject\Rule\AnyParameters;
+use PHPUnit\Framework\MockObject\Rule\ParametersRule;
+use PHPUnit\Framework\MockObject\Rule\AnyInvokedCount;
+use PHPUnit\Framework\MockObject\Rule\InvocationOrder;
+use PHPUnit\Framework\Exception\ExpectationFailedException;
+use PHPUnit\Framework\MockObject\Exception\MatchBuilderNotFoundException;
+use PHPUnit\Framework\MockObject\Exception\MethodNameNotConfiguredException;
 
 /**
  * @internal This class is not covered by the backward compatibility promise for PHPUnit
  */
-final class Matcher
-{
+final class Matcher {
     /**
      * @var InvocationOrder
      */
@@ -57,48 +59,39 @@ final class Matcher
      */
     private $stub;
 
-    public function __construct(InvocationOrder $rule)
-    {
+    public function __construct(InvocationOrder $rule) {
         $this->invocationRule = $rule;
     }
 
-    public function hasMatchers()
-    {
+    public function hasMatchers() {
         return !$this->invocationRule instanceof AnyInvokedCount;
     }
 
-    public function hasMethodNameRule()
-    {
+    public function hasMethodNameRule() {
         return $this->methodNameRule !== null;
     }
 
-    public function getMethodNameRule()
-    {
+    public function getMethodNameRule() {
         return $this->methodNameRule;
     }
 
-    public function setMethodNameRule(MethodName $rule)
-    {
+    public function setMethodNameRule(MethodName $rule) {
         $this->methodNameRule = $rule;
     }
 
-    public function hasParametersRule()
-    {
+    public function hasParametersRule() {
         return $this->parametersRule !== null;
     }
 
-    public function setParametersRule(ParametersRule $rule)
-    {
+    public function setParametersRule(ParametersRule $rule) {
         $this->parametersRule = $rule;
     }
 
-    public function setStub(Stub $stub)
-    {
+    public function setStub(Stub $stub) {
         $this->stub = $stub;
     }
 
-    public function setAfterMatchBuilderId($id)
-    {
+    public function setAfterMatchBuilderId($id) {
         $this->afterMatchBuilderId = $id;
     }
 
@@ -108,16 +101,15 @@ final class Matcher
      * @throws RuntimeException
      * @throws ExpectationFailedException
      */
-    public function invoked(Invocation $invocation)
-    {
+    public function invoked(Invocation $invocation) {
         if ($this->methodNameRule === null) {
-            throw new MethodNameNotConfiguredException;
+            throw new MethodNameNotConfiguredException();
         }
 
         if ($this->afterMatchBuilderId !== null) {
             $matcher = $invocation->getObject()
-                                  ->__phpunit_getInvocationHandler()
-                                  ->lookupMatcher($this->afterMatchBuilderId);
+                ->__phpunit_getInvocationHandler()
+                ->lookupMatcher($this->afterMatchBuilderId);
 
             if (!$matcher) {
                 throw new MatchBuilderNotFoundException($this->afterMatchBuilderId);
@@ -162,12 +154,11 @@ final class Matcher
      * @throws ExpectationFailedException
      * @throws \SebastianBergmann\RecursionContext\InvalidArgumentException
      */
-    public function matches(Invocation $invocation)
-    {
+    public function matches(Invocation $invocation) {
         if ($this->afterMatchBuilderId !== null) {
             $matcher = $invocation->getObject()
-                                  ->__phpunit_getInvocationHandler()
-                                  ->lookupMatcher($this->afterMatchBuilderId);
+                ->__phpunit_getInvocationHandler()
+                ->lookupMatcher($this->afterMatchBuilderId);
 
             if (!$matcher) {
                 throw new MatchBuilderNotFoundException($this->afterMatchBuilderId);
@@ -181,7 +172,7 @@ final class Matcher
         }
 
         if ($this->methodNameRule === null) {
-            throw new MethodNameNotConfiguredException;
+            throw new MethodNameNotConfiguredException();
         }
 
         if (!$this->invocationRule->matches($invocation)) {
@@ -212,20 +203,19 @@ final class Matcher
      * @throws ExpectationFailedException
      * @throws \SebastianBergmann\RecursionContext\InvalidArgumentException
      */
-    public function verify()
-    {
+    public function verify() {
         if ($this->methodNameRule === null) {
-            throw new MethodNameNotConfiguredException;
+            throw new MethodNameNotConfiguredException();
         }
 
         try {
             $this->invocationRule->verify();
 
             if ($this->parametersRule === null) {
-                $this->parametersRule = new AnyParameters;
+                $this->parametersRule = new AnyParameters();
             }
 
-            $invocationIsAny   = $this->invocationRule instanceof AnyInvokedCount;
+            $invocationIsAny = $this->invocationRule instanceof AnyInvokedCount;
             $invocationIsNever = $this->invocationRule instanceof InvokedCount && $this->invocationRule->isNever();
 
             if (!$invocationIsAny && !$invocationIsNever) {
@@ -243,8 +233,7 @@ final class Matcher
         }
     }
 
-    public function toString()
-    {
+    public function toString() {
         $list = [];
 
         if ($this->invocationRule !== null) {

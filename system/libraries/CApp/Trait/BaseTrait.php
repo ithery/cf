@@ -178,13 +178,10 @@ trait CApp_Trait_BaseTrait {
     /**
      * User dari session CApp.
      *
-     * @return stdClass
+     * @return null|stdClass
      */
     public static function user() {
-        $session = self::session();
-        $user = $session->get('user');
-
-        return $user;
+        return c::app()->user();
     }
 
     /**
@@ -193,7 +190,7 @@ trait CApp_Trait_BaseTrait {
      * @return int
      */
     public static function userId() {
-        return c::get(self::user(), 'user_id');
+        return c::optional(self::user())->user_id;
     }
 
     /**
@@ -392,15 +389,17 @@ trait CApp_Trait_BaseTrait {
      */
     public static function notAccessible() {
         cmsg::add('error', clang::__('You do not have access to this module, please call administrator'));
-        curl::redirect('home');
 
-        return false;
+        return c::redirect('');
     }
 
     /**
      * @return bool
      */
     public static function isDevelopment() {
+        if (CF::isProduction()) {
+            return false;
+        }
         $domain = CF::domain();
         $pos = strpos($domain, 'app.ittron.co.id');
         if ($pos === false) {

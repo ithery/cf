@@ -161,7 +161,6 @@ class CLogger {
             'context' => $context,
             'exception' => $exception,
         ];
-
         if (CLogger::$writeOnAdd) {
             // Write logs as they are added
             $this->write();

@@ -2,13 +2,6 @@
 
 class CApp_SEO_Twitter implements CApp_SEO_TwitterInterface {
     /**
-     * Singleton instance of this class.
-     *
-     * @var CApp_SEO_OpenGraph
-     */
-    protected $instance = null;
-
-    /**
      * @var string
      */
     protected $prefix = 'twitter:';
@@ -32,6 +25,13 @@ class CApp_SEO_Twitter implements CApp_SEO_TwitterInterface {
      * @var array
      */
     protected $config = [];
+
+    /**
+     * Singleton instance of this class.
+     *
+     * @var CApp_SEO_Twitter
+     */
+    private static $instance = null;
 
     private function __construct() {
         $this->config = CF::config('seo.twitter');

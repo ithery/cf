@@ -10,64 +10,64 @@
 
 namespace PHPUnit\TextUI;
 
-use const PATH_SEPARATOR;
-use const PHP_EOL;
+use Throwable;
 use const STDIN;
-use function array_keys;
-use function assert;
-use function class_exists;
+use const PHP_EOL;
 use function copy;
-use function extension_loaded;
+use function sort;
+use function trim;
 use function fgets;
-use function file_get_contents;
-use function file_put_contents;
+use function assert;
 use function getcwd;
+use function is_dir;
+use function printf;
+use function strpos;
+use ReflectionClass;
 use function ini_get;
 use function ini_set;
-use function is_callable;
-use function is_dir;
 use function is_file;
-use function is_string;
-use function printf;
-use function realpath;
-use function sort;
 use function sprintf;
-use function stream_resolve_include_path;
-use function strpos;
-use function trim;
-use function version_compare;
-use PharIo\Manifest\ApplicationName;
-use PharIo\Manifest\Exception as ManifestException;
-use PharIo\Manifest\ManifestLoader;
-use PharIo\Version\Version as PharIoVersion;
-use PHPUnit\Framework\TestSuite;
-use PHPUnit\Runner\StandardTestSuiteLoader;
-use PHPUnit\Runner\TestSuiteLoader;
+use function realpath;
+use function is_string;
+use function array_keys;
+use const PATH_SEPARATOR;
+use function is_callable;
+use PHPUnit\Util\Printer;
+use function class_exists;
 use PHPUnit\Runner\Version;
-use PHPUnit\TextUI\CliArguments\Builder;
-use PHPUnit\TextUI\CliArguments\Configuration;
-use PHPUnit\TextUI\CliArguments\Exception as ArgumentsException;
-use PHPUnit\TextUI\CliArguments\Mapper;
-use PHPUnit\TextUI\XmlConfiguration\CodeCoverage\FilterMapper;
-use PHPUnit\TextUI\XmlConfiguration\Generator;
-use PHPUnit\TextUI\XmlConfiguration\Loader;
-use PHPUnit\TextUI\XmlConfiguration\Migration\Migrator;
-use PHPUnit\TextUI\XmlConfiguration\PHP\PhpHandler;
-use PHPUnit\TextUI\Exception\RuntimeException;
-use PHPUnit\TextUI\Exception\Exception;
-use PHPUnit\TextUI\Exception\ReflectionException;
 use PHPUnit\Util\FileLoader;
 use PHPUnit\Util\Filesystem;
-use PHPUnit\Util\Printer;
-use PHPUnit\Util\TextTestListRenderer;
+use function version_compare;
+use function extension_loaded;
+use function file_get_contents;
+use function file_put_contents;
+use PHPUnit\Framework\TestSuite;
+use SebastianBergmann\Timer\Timer;
+use PharIo\Manifest\ManifestLoader;
+use PHPUnit\Runner\TestSuiteLoader;
+use PharIo\Manifest\ApplicationName;
 use PHPUnit\Util\Xml\SchemaDetector;
 use PHPUnit\Util\XmlTestListRenderer;
-use ReflectionClass;
+use PHPUnit\Util\TextTestListRenderer;
+use PHPUnit\TextUI\CliArguments\Mapper;
+use PHPUnit\TextUI\Exception\Exception;
+use PHPUnit\TextUI\CliArguments\Builder;
+use function stream_resolve_include_path;
 use SebastianBergmann\CodeCoverage\Filter;
+use PHPUnit\Runner\StandardTestSuiteLoader;
+use PHPUnit\TextUI\XmlConfiguration\Loader;
+use PharIo\Version\Version as PharIoVersion;
+use PHPUnit\TextUI\CliArguments\Configuration;
+use PHPUnit\TextUI\Exception\RuntimeException;
+use PHPUnit\TextUI\XmlConfiguration\Generator;
+use PHPUnit\TextUI\Exception\ReflectionException;
+use PharIo\Manifest\Exception as ManifestException;
+use PHPUnit\TextUI\XmlConfiguration\PHP\PhpHandler;
+use PHPUnit\TextUI\XmlConfiguration\Migration\Migrator;
+use PHPUnit\TextUI\XmlConfiguration\CodeCoverage\FilterMapper;
 use SebastianBergmann\CodeCoverage\StaticAnalysis\CacheWarmer;
+use PHPUnit\TextUI\CliArguments\Exception as ArgumentsException;
 use SebastianBergmann\FileIterator\Facade as FileIteratorFacade;
-use SebastianBergmann\Timer\Timer;
-use Throwable;
 
 /**
  * @no-named-arguments Parameter names are not covered by the backward compatibility promise for PHPUnit
@@ -94,13 +94,13 @@ class Command {
     private $warnings = [];
 
     /**
-     * @throws Exception
-     *
      * @param mixed $exit
+     *
+     * @throws Exception
      */
     public static function main($exit = true) {
         try {
-            return (new static)->run($_SERVER['argv'], $exit);
+            return (new static())->run($_SERVER['argv'], $exit);
         } catch (Throwable $t) {
             throw new RuntimeException(
                 $t->getMessage(),
@@ -111,9 +111,9 @@ class Command {
     }
 
     /**
-     * @throws Exception
-     *
      * @param mixed $exit
+     *
+     * @throws Exception
      */
     public function run(array $argv, $exit = true) {
         $this->handleArguments($argv);
@@ -222,7 +222,7 @@ class Command {
      */
     protected function handleArguments(array $argv) {
         try {
-            $arguments = (new Builder)->fromParameters($argv, array_keys($this->longOptions));
+            $arguments = (new Builder())->fromParameters($argv, array_keys($this->longOptions));
         } catch (ArgumentsException $e) {
             $this->exitWithErrorMessage($e->getMessage());
         }
@@ -279,7 +279,7 @@ class Command {
             );
         }
 
-        $this->arguments = (new Mapper)->mapToLegacyArray($arguments);
+        $this->arguments = (new Mapper())->mapToLegacyArray($arguments);
 
         $this->handleCustomOptions($arguments->unrecognizedOptions());
         $this->handleCustomTestSuite();
@@ -333,7 +333,7 @@ class Command {
 
         if (isset($this->arguments['configuration'])) {
             try {
-                $this->arguments['configurationObject'] = (new Loader)->load($this->arguments['configuration']);
+                $this->arguments['configurationObject'] = (new Loader())->load($this->arguments['configuration']);
             } catch (Throwable $e) {
                 print $e->getMessage() . PHP_EOL;
 
@@ -342,7 +342,7 @@ class Command {
 
             $phpunitConfiguration = $this->arguments['configurationObject']->phpunit();
 
-            (new PhpHandler)->handle($this->arguments['configurationObject']->php());
+            (new PhpHandler())->handle($this->arguments['configurationObject']->php());
 
             if (isset($this->arguments['bootstrap'])) {
                 $this->handleBootstrap($this->arguments['bootstrap']);
@@ -386,7 +386,7 @@ class Command {
 
             if (!isset($this->arguments['test'])) {
                 try {
-                    $this->arguments['test'] = (new TestSuiteMapper)->map(
+                    $this->arguments['test'] = (new TestSuiteMapper())->map(
                         $this->arguments['configurationObject']->testSuite(),
                         isset($this->arguments['testsuite']) ? $this->arguments['testsuite'] : ''
                     );
@@ -481,10 +481,10 @@ class Command {
     /**
      * Handles the loading of the PHPUnit\Util\Printer implementation.
      *
-     * @return null|Printer|string
-     *
      * @param mixed $printerClass
      * @param mixed $printerFile
+     *
+     * @return null|Printer|string
      */
     protected function handlePrinter($printerClass, $printerFile = '') {
         if (!class_exists($printerClass, false)) {
@@ -587,7 +587,7 @@ class Command {
      */
     protected function showHelp() {
         $this->printVersionString();
-        (new Help)->writeToConsole();
+        (new Help())->writeToConsole();
     }
 
     /**
@@ -615,7 +615,7 @@ class Command {
     }
 
     private function handleExtensions($directory) {
-        foreach ((new FileIteratorFacade)->getFilesAsArray($directory, '.phar') as $file) {
+        foreach ((new FileIteratorFacade())->getFilesAsArray($directory, '.phar') as $file) {
             if (!is_file('phar://' . $file . '/manifest.xml')) {
                 $this->arguments['notLoadedExtensions'][] = $file . ' is not an extension for PHPUnit';
 
@@ -677,10 +677,10 @@ class Command {
     }
 
     /**
+     * @param mixed $exit
+     *
      * @throws \PHPUnit\Framework\Exception
      * @throws \PHPUnit\TextUI\XmlConfiguration\Exception
-     *
-     * @param mixed $exit
      */
     private function handleListSuites($exit) {
         $this->printVersionString();
@@ -702,14 +702,14 @@ class Command {
     }
 
     /**
-     * @throws \SebastianBergmann\RecursionContext\InvalidArgumentException
-     *
      * @param mixed $exit
+     *
+     * @throws \SebastianBergmann\RecursionContext\InvalidArgumentException
      */
     private function handleListTests(TestSuite $suite, $exit) {
         $this->printVersionString();
 
-        $renderer = new TextTestListRenderer;
+        $renderer = new TextTestListRenderer();
 
         print $renderer->render($suite);
 
@@ -721,15 +721,15 @@ class Command {
     }
 
     /**
-     * @throws \SebastianBergmann\RecursionContext\InvalidArgumentException
-     *
      * @param mixed $target
      * @param mixed $exit
+     *
+     * @throws \SebastianBergmann\RecursionContext\InvalidArgumentException
      */
     private function handleListTestsXml(TestSuite $suite, $target, $exit) {
         $this->printVersionString();
 
-        $renderer = new XmlTestListRenderer;
+        $renderer = new XmlTestListRenderer();
 
         file_put_contents($target, $renderer->render($suite));
 
@@ -781,7 +781,7 @@ class Command {
             $cacheDirectory = '.phpunit.cache';
         }
 
-        $generator = new Generator;
+        $generator = new Generator();
 
         file_put_contents(
             'phpunit.xml',
@@ -803,7 +803,7 @@ class Command {
     private function migrateConfiguration($filename) {
         $this->printVersionString();
 
-        if (!(new SchemaDetector)->detect($filename)->detected()) {
+        if (!(new SchemaDetector())->detect($filename)->detected()) {
             print $filename . ' does not need to be migrated.' . PHP_EOL;
 
             exit(TestRunner::EXCEPTION_EXIT);
@@ -816,7 +816,7 @@ class Command {
         try {
             file_put_contents(
                 $filename,
-                (new Migrator)->migrate($filename)
+                (new Migrator())->migrate($filename)
             );
 
             print 'Migrated configuration: ' . $filename . PHP_EOL;
@@ -862,10 +862,10 @@ class Command {
             exit(TestRunner::EXCEPTION_EXIT);
         }
 
-        $filter = new Filter;
+        $filter = new Filter();
 
         if ($configuration->codeCoverage()->hasNonEmptyListOfFilesToBeIncludedInCodeCoverageReport()) {
-            (new FilterMapper)->map(
+            (new FilterMapper())->map(
                 $filter,
                 $configuration->codeCoverage()
             );
@@ -885,12 +885,12 @@ class Command {
             exit(TestRunner::EXCEPTION_EXIT);
         }
 
-        $timer = new Timer;
+        $timer = new Timer();
         $timer->start();
 
         print 'Warming cache for static analysis ... ';
 
-        (new CacheWarmer)->warmCache(
+        (new CacheWarmer())->warmCache(
             $cacheDirectory,
             !$configuration->codeCoverage()->disableCodeCoverageIgnore(),
             $configuration->codeCoverage()->ignoreDeprecatedCodeUnits(),

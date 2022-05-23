@@ -4,6 +4,8 @@ class CObject {
     use CTrait_Compat_Object;
     use CTrait_Macroable;
     use CTrait_Tappable;
+    use CTrait_Conditionable;
+
     protected $id;
 
     protected $domain = '';
@@ -13,6 +15,7 @@ class CObject {
         if ($id == '') {
             $id = spl_object_hash($this);
         }
+
         $this->id = $id;
         $this->domain = CF::domain();
         $observer->add($this);
@@ -54,5 +57,13 @@ class CObject {
      */
     public function domain() {
         return $this->domain;
+    }
+
+    public function toArray() {
+        $data = [
+            'id' => $this->id,
+        ];
+
+        return $data;
     }
 }

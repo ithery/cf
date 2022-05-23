@@ -10,10 +10,12 @@ defined('SYSPATH') or die('No direct access allowed.');
  */
 class CCache_Driver_FileDriver_Engine_TempEngine extends CCache_Driver_FileDriver_EngineAbstract {
     protected $tempFiles;
+
     protected $directory;
 
     public function __construct($options) {
         parent::__construct($options);
+
         $this->directory = $this->getOption('directory', 'default');
         $this->tempFiles = [];
     }
@@ -29,6 +31,7 @@ class CCache_Driver_FileDriver_Engine_TempEngine extends CCache_Driver_FileDrive
             $path = 'cache/' . trim($this->directory, '/') . '/' . implode('/', $parts) . '/' . $hash . '.cache';
             $this->tempFiles[$key] = CTemporary::createFile($path);
         }
+
         return $this->tempFiles[$key];
     }
 
@@ -55,6 +58,7 @@ class CCache_Driver_FileDriver_Engine_TempEngine extends CCache_Driver_FileDrive
     public function deleteDirectory() {
         $dir = rtrim(DOCROOT, '/') . '/temp/cache/' . trim($this->directory, '/');
         $file = new CFile();
+
         return $file->deleteDirectory($dir);
     }
 }

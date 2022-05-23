@@ -21,15 +21,15 @@ class CElement_List_ActionList extends CElement_List {
         parent::__construct($listId);
 
         $this->style = 'btn-list';
-        $this->label = clang::__('Action');
+        $this->label = c::__('Action');
         $this->btn_dropdown_classes = [];
         $this->label_size = 2;
         $this->icon = '';
         $this->withCaret = true;
     }
 
-    public static function factory($list_id = '') {
-        return new CElement_List_ActionList($list_id);
+    public static function factory($id = null) {
+        return new static($id);
     }
 
     /**
@@ -40,13 +40,10 @@ class CElement_List_ActionList extends CElement_List {
      * @return $this
      */
     public function setStyle($style) {
-        if (in_array($style, ['form-action', 'btn-group', 'btn-icon-group', 'btn-list', 'icon-segment', 'btn-dropdown', 'widget-action', 'table-header-action'])) {
+        if (in_array($style, ['form-action', 'btn-group', 'btn-group-toggle', 'btn-group-toggle-checkbox', 'btn-group-toggle-radio', 'btn-icon-group', 'btn-list', 'icon-segment', 'btn-dropdown', 'widget-action', 'table-header-action'])) {
             $this->style = $style;
         } else {
             trigger_error('style is not defined');
-        }
-        if ($this->id == 'test-123') {
-            //echo($this->style);
         }
 
         return $this;
@@ -66,22 +63,16 @@ class CElement_List_ActionList extends CElement_List {
         return $this->withCaret ? '<span class="caret"></span>' : '';
     }
 
-    public function html($indent = 0) {
-        if ($this->id == 'test-123') {
-            //die($this->style);
-        }
-        //apply render style to child before render
-        if (count($this->btn_dropdown_classes) == 0) {
-            if ($this->bootstrap >= '3') {
-                $this->btn_dropdown_classes[] = 'btn-primary';
-                $this->btn_dropdown_classes[] = 'btn-sm';
-            }
-        }
+    protected function applyStyleToChild() {
+        $this->apply('style', $this->style, [CElement_Component_Action::class]);
+    }
 
-        $this->apply('style', $this->style, 'CElement_Component_Action');
+    public function html($indent = 0) {
+        $this->applyStyleToChild();
+
         $html = new CStringBuilder();
         $html->setIndent($indent);
-        $classes = $this->getNormalizedClasses();
+        $classes = $this->getClasses();
         $ulDropdownClasses = '';
         if (!in_array('dropdown-menu-right', $classes)
             && !in_array('dropdown-menu-left', $classes)
@@ -113,21 +104,20 @@ class CElement_List_ActionList extends CElement_List {
         $pretag = '<div id="' . $this->id . '" class="button-list ' . $classes . '">';
         switch ($this->style) {
             case 'form-action':
-                if ($this->bootstrap == '3.3') {
-                    $control_size = 12 - $this->label_size;
-                    $pretag = '
-                        <div class="form-group clear-both ' . $classes . '">
-                            <label class="col-md-' . $this->label_size . ' control-label"></label>
-                                <div class="col-md-' . $control_size . '">
-                            ';
-                } else {
-                    $pretag = '<div class="form-actions clear-both ' . $classes . '">';
-                }
+                $pretag = '<div class="form-actions clear-both ' . $classes . '">';
 
                 break;
             case 'btn-group':
             case 'btn-icon-group':
-                $pretag = '<div class="btn-group ' . $classes . '">';
+            case 'btn-group-toggle':
+            case 'btn-group-toggle-radio':
+            case 'btn-group-toggle-checkbox':
+                $attributes = '';
+                if (cstr::startsWith($this->style, 'btn-group-toggle')) {
+                    $classes .= ' btn-group-toggle';
+                    $attributes = ' data-toggle="buttons"';
+                }
+                $pretag = '<div class="btn-group ' . $classes . '"' . $attributes . '>';
 
                 break;
             case 'widget-action':
@@ -173,11 +163,7 @@ class CElement_List_ActionList extends CElement_List {
 
                 break;
             case 'form-action':
-                if ($this->bootstrap == '3.3') {
-                    $posttag = '</div></div>';
-                } else {
-                    $posttag = '</div>';
-                }
+                $posttag = '</div>';
 
                 break;
             default:

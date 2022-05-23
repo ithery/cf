@@ -11,4 +11,10 @@ class CEmail {
     public static function sender(array $config = []) {
         return new CEmail_Sender($config);
     }
+
+    public static function isValid($email) {
+        $checker = new CEmail_Checker();
+
+        return $checker->isValid($email);
+    }
 }

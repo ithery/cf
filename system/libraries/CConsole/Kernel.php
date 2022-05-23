@@ -63,13 +63,7 @@ class CConsole_Kernel implements CConsole_KernelInterface {
      * @return void
      */
     protected function defineConsoleSchedule() {
-        $this->app->singleton(Schedule::class, function ($app) {
-            return new Schedule;
-        });
-
-        $schedule = $this->app->make(Schedule::class);
-
-        $this->schedule($schedule);
+        $this->schedule(CCron::schedule());
     }
 
     /**
@@ -117,12 +111,11 @@ class CConsole_Kernel implements CConsole_KernelInterface {
     /**
      * Define the application's command schedule.
      *
-     * @param \Illuminate\Console\Scheduling\Schedule $schedule
+     * @param \CCron_Schedule $schedule
      *
      * @return void
      */
-    protected function schedule(Schedule $schedule) {
-        //
+    protected function schedule(CCron_Schedule $schedule) {
     }
 
     /**
@@ -131,7 +124,6 @@ class CConsole_Kernel implements CConsole_KernelInterface {
      * @return void
      */
     protected function commands() {
-        //
     }
 
     /**
@@ -140,13 +132,13 @@ class CConsole_Kernel implements CConsole_KernelInterface {
      * @param string   $signature
      * @param \Closure $callback
      *
-     * @return \Illuminate\Foundation\Console\ClosureCommand
+     * @return \CConsole_ClosureCommand
      */
     public function command($signature, Closure $callback) {
-        $command = new ClosureCommand($signature, $callback);
+        $command = new CConsole_ClosureCommand($signature, $callback);
 
-        CConsole_Application::starting(function ($artisan) use ($command) {
-            $artisan->add($command);
+        CConsole_Application::starting(function ($cfCli) use ($command) {
+            $cfCli->add($command);
         });
 
         return $command;
@@ -170,23 +162,23 @@ class CConsole_Kernel implements CConsole_KernelInterface {
             return;
         }
 
-        $namespace = $this->app->getNamespace();
+        // $namespace = $this->app->getNamespace();
 
-        foreach ((new Finder)->in($paths)->files() as $command) {
-            $command = $namespace . str_replace(
-                ['/', '.php'],
-                ['\\', ''],
-                cstr::after($command->getPathname(), app_path() . DIRECTORY_SEPARATOR)
-            );
+        // foreach ((new Finder())->in($paths)->files() as $command) {
+        //     $command = $namespace . str_replace(
+        //         ['/', '.php'],
+        //         ['\\', ''],
+        //         cstr::after($command->getPathname(), app_path() . DIRECTORY_SEPARATOR)
+        //     );
 
-            if (is_subclass_of($command, Command::class)
-                && !(new ReflectionClass($command))->isAbstract()
-            ) {
-                Artisan::starting(function ($artisan) use ($command) {
-                    $artisan->resolve($command);
-                });
-            }
-        }
+        //     if (is_subclass_of($command, CConsole_Command::class)
+        //         && !(new ReflectionClass($command))->isAbstract()
+        //     ) {
+        //         CConsole_Application::starting(function ($artisan) use ($command) {
+        //             $artisan->resolve($command);
+        //         });
+        //     }
+        // }
     }
 
     /**
@@ -221,10 +213,10 @@ class CConsole_Kernel implements CConsole_KernelInterface {
      * @param string $command
      * @param array  $parameters
      *
-     * @return \Illuminate\Foundation\Bus\PendingDispatch
+     * @return \CQueue_PendingDispatch
      */
     public function queue($command, array $parameters = []) {
-        return QueuedCommand::dispatch(func_get_args());
+        return CConsole_QueuedCommand::dispatch(func_get_args());
     }
 
     /**
@@ -269,17 +261,25 @@ class CConsole_Kernel implements CConsole_KernelInterface {
     }
 
     /**
-     * Get the Artisan application instance.
+     * Get the CConsole application instance.
      *
      * @return CConsole_Application
      */
     protected function getCFCli() {
         if (is_null($this->cfCli)) {
-            return $this->cfCli = (new CConsole_Application())
-                ->resolveCommands($this->commands);
+            $this->cfCli = (new CConsole_Application())->resolveCommands($this->commands);
         }
 
         return $this->cfCli;
+    }
+
+    /**
+     * Get the CConsole application instance.
+     *
+     * @return CConsole_Application
+     */
+    public function cfCli() {
+        return $this->getCFCli();
     }
 
     /**
@@ -322,7 +322,8 @@ class CConsole_Kernel implements CConsole_KernelInterface {
      * @return void
      */
     protected function renderException($output, Exception $e) {
+        CException::exceptionHandler()->renderForConsole($output, $e);
         //$this->app[ExceptionHandler::class]->renderForConsole($output, $e);
-        (new ConsoleApplication)->renderException($e, $output);
+        //(new ConsoleApplication())->renderException($e, $output);
     }
 }

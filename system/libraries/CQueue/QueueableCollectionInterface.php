@@ -12,7 +12,7 @@ interface CQueue_QueueableCollectionInterface {
     /**
      * Get the type of the entities being queued.
      *
-     * @return string|null
+     * @return null|string
      */
     public function getQueueableClass();
 
@@ -33,7 +33,7 @@ interface CQueue_QueueableCollectionInterface {
     /**
      * Get the connection of the entities being queued.
      *
-     * @return string|null
+     * @return null|string
      */
     public function getQueueableConnection();
 }

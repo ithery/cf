@@ -10,11 +10,11 @@ use Psr\Http\Message\ResponseInterface as PsrResponseInterface;
 use Symfony\Bridge\PsrHttpMessage\Factory\HttpFoundationFactory;
 use Symfony\Component\HttpFoundation\Response as SymfonyResponse;
 
+/* implements  BindingRegistrar, RegistrarContract */
 /**
  * @mixin CRouting_RouteRegistrar
  */
-class CRouting_Router /* implements  BindingRegistrar, RegistrarContract */
-{
+class CRouting_Router {
     use CTrait_Macroable {
         __call as macroCall;
     }
@@ -293,79 +293,6 @@ class CRouting_Router /* implements  BindingRegistrar, RegistrarContract */
      */
     public function match($methods, $uri, $action = null) {
         return $this->addRoute(array_map('strtoupper', (array) $methods), $uri, $action);
-    }
-
-    /**
-     * Register an array of resource controllers.
-     *
-     * @param array $resources
-     * @param array $options
-     *
-     * @return void
-     */
-    public function resources(array $resources, array $options = []) {
-        foreach ($resources as $name => $controller) {
-            $this->resource($name, $controller, $options);
-        }
-    }
-
-    /**
-     * Route a resource to a controller.
-     *
-     * @param string $name
-     * @param string $controller
-     * @param array  $options
-     *
-     * @return \Illuminate\Routing\PendingResourceRegistration
-     */
-    public function resource($name, $controller, array $options = []) {
-        if ($this->container && $this->container->bound(ResourceRegistrar::class)) {
-            $registrar = $this->container->make(ResourceRegistrar::class);
-        } else {
-            $registrar = new ResourceRegistrar($this);
-        }
-
-        return new PendingResourceRegistration(
-            $registrar,
-            $name,
-            $controller,
-            $options
-        );
-    }
-
-    /**
-     * Register an array of API resource controllers.
-     *
-     * @param array $resources
-     * @param array $options
-     *
-     * @return void
-     */
-    public function apiResources(array $resources, array $options = []) {
-        foreach ($resources as $name => $controller) {
-            $this->apiResource($name, $controller, $options);
-        }
-    }
-
-    /**
-     * Route an API resource to a controller.
-     *
-     * @param string $name
-     * @param string $controller
-     * @param array  $options
-     *
-     * @return \Illuminate\Routing\PendingResourceRegistration
-     */
-    public function apiResource($name, $controller, array $options = []) {
-        $only = ['index', 'show', 'store', 'update', 'destroy'];
-
-        if (isset($options['except'])) {
-            $only = array_diff($only, (array) $options['except']);
-        }
-
-        return $this->resource($name, $controller, array_merge([
-            'only' => $only,
-        ], $options));
     }
 
     /**
@@ -650,7 +577,7 @@ class CRouting_Router /* implements  BindingRegistrar, RegistrarContract */
     protected function findRoute($request) {
         $this->current = $route = $this->routes->match($request);
 
-        $this->container->instance(CHTTP_Route::class, $route);
+        //$this->container->instance(CHTTP_Route::class, $route);
 
         return $route;
     }
@@ -799,7 +726,7 @@ class CRouting_Router /* implements  BindingRegistrar, RegistrarContract */
      *
      * @param CRouting_Route $route
      *
-     * @throws CModel_Exception_ModelNotFound
+     * @throws CModel_Exception_ModelNotFoundException
      *
      * @return CRouting_Route
      */
@@ -818,7 +745,7 @@ class CRouting_Router /* implements  BindingRegistrar, RegistrarContract */
      *
      * @param CRouting_Route $route
      *
-     * @throws CModel_Exception_ModelNotFound
+     * @throws CModel_Exception_ModelNotFoundException
      *
      * @return void
      */
@@ -1171,39 +1098,6 @@ class CRouting_Router /* implements  BindingRegistrar, RegistrarContract */
     }
 
     /**
-     * Set the unmapped global resource parameters to singular.
-     *
-     * @param bool $singular
-     *
-     * @return void
-     */
-    public function singularResourceParameters($singular = true) {
-        ResourceRegistrar::singularParameters($singular);
-    }
-
-    /**
-     * Set the global resource parameter mapping.
-     *
-     * @param array $parameters
-     *
-     * @return void
-     */
-    public function resourceParameters(array $parameters = []) {
-        ResourceRegistrar::setParameters($parameters);
-    }
-
-    /**
-     * Get or set the verbs used in the resource URIs.
-     *
-     * @param array $verbs
-     *
-     * @return null|array
-     */
-    public function resourceVerbs(array $verbs = []) {
-        return ResourceRegistrar::verbs($verbs);
-    }
-
-    /**
      * Get the underlying route collection.
      *
      * @return CRouting_RouteCollectionInterface
@@ -1280,10 +1174,23 @@ class CRouting_Router /* implements  BindingRegistrar, RegistrarContract */
             return $this->macroCall($method, $parameters);
         }
 
+        $routeRegistrar = new CRouting_RouteRegistrar($this);
         if ($method === 'middleware') {
-            return (new RouteRegistrar($this))->attribute($method, is_array($parameters[0]) ? $parameters[0] : $parameters);
+            return $routeRegistrar->attribute($method, is_array($parameters[0]) ? $parameters[0] : $parameters);
         }
 
-        return (new RouteRegistrar($this))->attribute($method, $parameters[0]);
+        return $routeRegistrar->attribute($method, $parameters[0]);
+    }
+
+    /**
+     * @param string         $uri
+     * @param string|Closure $routedUri
+     *
+     * @return $this
+     */
+    public function addUriRouting($uri, $routedUri) {
+        CRouting_Manager::instance()->addUriRouting($uri, $routedUri);
+
+        return $this;
     }
 }

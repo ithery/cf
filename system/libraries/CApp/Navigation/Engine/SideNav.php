@@ -90,7 +90,7 @@ class CApp_Navigation_Engine_SideNav extends CApp_Navigation_Engine {
 
                 $iconClass = carr::get($d, 'icon');
                 if (strlen($iconClass) > 0 && strpos($iconClass, 'fa-') === false && strpos($iconClass, 'ion-') === false) {
-                    $iconClass = 'icon-' . $iconClass;
+                    $iconClass = c::theme('icon.prefix', 'icon-') . $iconClass;
                 }
                 $icon_html = '';
                 if (strlen($iconClass) > 0) {

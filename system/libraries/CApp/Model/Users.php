@@ -8,9 +8,9 @@ defined('SYSPATH') or die('No direct access allowed.');
  *
  * @since Jun 19, 2018, 3:37:54 AM
  */
-class CApp_Model_Users extends CApp_Model implements CAuth_AuthenticatableInterface {
+class CApp_Model_Users extends CApp_Model implements CAuth_AuthenticatableInterface, CAuth_Contract_ImpersonateableInterface {
     use CApp_Model_Trait_Users;
-
     use CAuth_Concern_AuthenticatableTrait,
         CAuth_Concern_AuthorizableTrait;
+    use CAuth_Concern_ImpersonateableTrait;
 }

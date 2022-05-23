@@ -8,8 +8,8 @@ defined('SYSPATH') or die('No direct access allowed.');
  *
  * @since Apr 24, 2019, 1:09:54 AM
  */
-use Symfony\Component\Process\ExecutableFinder;
 use Symfony\Component\Process\Process;
+use Symfony\Component\Process\ExecutableFinder;
 
 class CGit_Client {
     protected $path;
@@ -35,6 +35,7 @@ class CGit_Client {
             throw new \RuntimeException('A GIT repository already exists at ' . $path);
         }
         $repository = new CGit_Repository($path, $this);
+
         return $repository->create($bare);
     }
 
@@ -49,6 +50,7 @@ class CGit_Client {
         if (!file_exists($path) || !file_exists($path . '/.git/HEAD') && !file_exists($path . '/HEAD')) {
             throw new \RuntimeException('There is no GIT repository at ' . $path);
         }
+
         return new CGit_Repository($path, $this);
     }
 
@@ -56,12 +58,14 @@ class CGit_Client {
         if (version_compare($this->getVersion(), '1.7.2', '>=')) {
             $command = '-c "color.ui"=false ' . $command;
         }
+
         $process = new Process($this->getPath() . ' ' . $command, $repository->getPath());
         $process->setTimeout(180);
         $process->run();
         if (!$process->isSuccessful()) {
             throw new \RuntimeException($process->getErrorOutput());
         }
+
         return $process->getOutput();
     }
 
@@ -76,6 +80,7 @@ class CGit_Client {
             throw new \RuntimeException($process->getErrorOutput());
         }
         $version = trim(substr($process->getOutput(), 12));
+
         return $version;
     }
 
@@ -95,6 +100,7 @@ class CGit_Client {
      */
     protected function setPath($path) {
         $this->path = $path;
+
         return $this;
     }
 }

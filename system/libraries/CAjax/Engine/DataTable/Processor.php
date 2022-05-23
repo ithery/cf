@@ -68,6 +68,13 @@ abstract class CAjax_Engine_DataTable_Processor implements CAjax_Engine_DataTabl
         return $this->table->getActionLocation();
     }
 
+    /**
+     * @return bool
+     */
+    public function haveRowAction() {
+        return $this->table->haveRowAction();
+    }
+
     public function table() {
         if ($this->table == null) {
             $data = $this->engine->getData();

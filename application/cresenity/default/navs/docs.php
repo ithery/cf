@@ -22,7 +22,12 @@ return [
                 'name' => 'starter.configuration',
                 'label' => c::__('Configuration'),
                 'uri' => 'docs/starter/configuration',
-            ]
+            ],
+            [
+                'name' => 'starter.vscode',
+                'label' => c::__('VS Code Extension'),
+                'uri' => 'docs/starter/vscode',
+            ],
         ]
     ],
     [
@@ -90,6 +95,28 @@ return [
                 'label' => c::__('Element'),
                 'uri' => 'docs/app/element',
             ],
+            [
+                'name' => 'app.other',
+                'label' => c::__('Other'),
+                'uri' => 'docs/app/other',
+            ],
+        ]
+    ],
+    [
+        'name' => 'element',
+        'label' => c::__('Elements'),
+        'subnav' => [
+            [
+                'name' => 'element.standard',
+                'label' => c::__('Standard Element'),
+                'uri' => 'docs/element/standard',
+            ],
+            [
+                'name' => 'element.table',
+                'label' => c::__('Table'),
+                'uri' => 'docs/element/table',
+            ],
+
         ]
     ],
     [
@@ -133,6 +160,11 @@ return [
                 'label' => c::__('Daemon'),
                 'uri' => 'docs/module/daemon',
             ],
+            [
+                'name' => 'module.cron',
+                'label' => c::__('Cron'),
+                'uri' => 'docs/module/cron',
+            ],
         ]
     ],
     [
@@ -164,6 +196,11 @@ return [
                 'label' => c::__('UI'),
                 'uri' => 'docs/cresjs/ui',
             ],
+            [
+                'name' => 'cresjs.helper',
+                'label' => c::__('Helper'),
+                'uri' => 'docs/cresjs/helper',
+            ],
         ]
     ],
     [
@@ -179,6 +216,27 @@ return [
                 'name' => 'command.basic',
                 'label' => c::__('Basic'),
                 'uri' => 'docs/command/basic',
+            ],
+        ]
+    ],
+    [
+        'name' => 'phpcf',
+        'label' => c::__('PHP CF'),
+        'subnav' => [
+            [
+                'name' => 'phpcf.install',
+                'label' => c::__('Installation'),
+                'uri' => 'docs/phpcf/install',
+            ],
+            [
+                'name' => 'phpcf.testing',
+                'label' => c::__('Testing'),
+                'uri' => 'docs/phpcf/testing',
+            ],
+            [
+                'name' => 'phpcf.make',
+                'label' => c::__('Make'),
+                'uri' => 'docs/phpcf/make',
             ],
         ]
     ],

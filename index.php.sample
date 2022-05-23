@@ -20,44 +20,6 @@ if (isset($_SERVER['SERVER_NAME'])) {
     }
 }
 
-if (isset($_GET['kc']) && isset($_GET['msisdn']) && isset($_GET['price'])) {
-    header('HTTP/1.0 503 Service Unavailable');
-    header('Content-Type: text/html');
-    header('Retry-After: 3600');
-    header('Content-Type: text/html');
-    echo '<html><body><p><b>Server under undue load</b><br />';
-    echo 'Please wait 1 hours before retrying.</p></body></html>';
-    exit;
-}
-
-//
-//if (!isset($_GET['force-nobot'])) {
-//    if (isset($_SERVER['HTTP_USER_AGENT']) && preg_match('/bot|crawl|slurp|spider|mediapartners/i', $_SERVER['HTTP_USER_AGENT'])) {
-//        //bot detected
-//        $allow = false;
-//
-//        if (isset($_SERVER['PHP_SELF']) AND $_SERVER['PHP_SELF'] AND $_SERVER['PHP_SELF'] == '/index.php/check') {
-//            $allow = true;
-//        }
-//        if (preg_match('/Googlebot/i', $_SERVER['HTTP_USER_AGENT'])) {
-//            $allow = true;
-//        }
-//        if (!$allow) {
-//
-//            //$logText = '';
-//            //$logText .= 'SERVER:' . json_encode($_SERVER) . PHP_EOL;
-//            //file_put_contents('botlog.log', $logText);
-//            header('HTTP/1.0 503 Service Unavailable');
-//            header('Content-Type: text/html');
-//            header("Retry-After: 3600");
-//            header('Content-Type: text/html');
-//            echo "<html><body><p><b>Server under undue load</b><br />";
-//            echo "Please wait 1 hours before retrying.</p></body></html>";
-//            exit;
-//        }
-//    }
-//}
-
 define('IN_PRODUCTION', false);
 
 /**
@@ -107,8 +69,6 @@ ini_set('display_errors', true);
 
 //
 // DO NOT EDIT BELOW THIS LINE, UNLESS YOU FULLY UNDERSTAND THE IMPLICATIONS.
-// ----------------------------------------------------------------------------
-// $Id: index.php 3915 2009-01-20 20:52:20Z zombor $
 //
 if (isset($_FILES) && is_array($_FILES)) {
     foreach ($_FILES as $k => $v) {

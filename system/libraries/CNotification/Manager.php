@@ -2,7 +2,9 @@
 
 class CNotification_Manager {
     protected $channels;
+
     protected $vendors;
+
     protected static $instance;
 
     /**
@@ -12,11 +14,24 @@ class CNotification_Manager {
         if (static::$instance == null) {
             static::$instance = new CNotification_Manager();
         }
+
         return static::$instance;
     }
 
     private function __construct() {
         $this->channels = [];
+    }
+
+    public function registerChannel($channel, $config = null) {
+        $className = 'CNotification_Channel_' . $channel . 'Channel';
+        if ($config != null) {
+            return new $className($config);
+        }
+        if (!isset($this->channels[$channel])) {
+            return new $className();
+        }
+
+        return $this->channels[$channel];
     }
 
     /**
@@ -26,14 +41,18 @@ class CNotification_Manager {
      * @return \CNotification_ChannelAbstract
      */
     public function channel($channel, $config = null) {
-        $className = 'CNotification_Channel_' . $channel . 'Channel';
-        if ($config != null) {
-            return new $className($config);
-        }
         if (!isset($this->channels[$channel])) {
-            return new $className();
+            return $this->registerChannel($channel, $config);
         }
+
         return $this->channels[$channel];
+    }
+
+    public function createCustomChannel($channelName, $messageHandler) {
+        $channel = new CNotification_Channel_CustomChannel(['channel' => $channelName]);
+        $channel->setMessageHandler($messageHandler);
+
+        return $this->channels[$channelName] = $channel;
     }
 
     /**
@@ -64,6 +83,7 @@ class CNotification_Manager {
             default:
                 return ucfirst(cstr::camel($vendor));
         }
+
         return ucfirst(cstr::camel($vendor));
     }
 
@@ -79,6 +99,7 @@ class CNotification_Manager {
      */
     public function createLogNotificationModel() {
         $modelName = $this->logNotificationModelName();
+
         return new $modelName();
     }
 }

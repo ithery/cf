@@ -40,9 +40,9 @@ interface CModel_Validating_ValidatingInterface {
      *
      * @param bool $value
      *
-     * @return void
-     *
      * @throws InvalidArgumentException
+     *
+     * @return void
      */
     public function setThrowValidationExceptions($value);
 
@@ -60,16 +60,16 @@ interface CModel_Validating_ValidatingInterface {
      *
      * @param bool $value
      *
-     * @return void
-     *
      * @throws InvalidArgumentException
+     *
+     * @return void
      */
     public function setInjectUniqueIdentifier($value);
 
     /**
      * Get the model.
      *
-     * @return \Illuminate\Database\Eloquent\Model
+     * @return \CModel
      */
     public function getModel();
 
@@ -99,7 +99,7 @@ interface CModel_Validating_ValidatingInterface {
     /**
      * Get the validation error messages from the model.
      *
-     * @return \Illuminate\Support\MessageBag
+     * @return \CBase_MessageBag
      */
     public function getErrors();
 
@@ -122,9 +122,9 @@ interface CModel_Validating_ValidatingInterface {
     /**
      * Returns if the model is valid, otherwise throws an exception.
      *
-     * @return bool
-     *
      * @throws \Watson\Validating\ValidationException
+     *
+     * @return bool
      */
     public function isValidOrFail();
 
@@ -146,9 +146,9 @@ interface CModel_Validating_ValidatingInterface {
      * Perform a one-off save that will raise an exception on validation error
      * instead of returning a boolean (which is the default behaviour).
      *
-     * @return void
-     *
      * @throws \Watson\Validating\ValidatingException
+     *
+     * @return void
      */
     public function saveOrFail();
 
@@ -161,14 +161,14 @@ interface CModel_Validating_ValidatingInterface {
     public function saveOrReturn();
 
     /**
-     * Get the Validator instance
+     * Get the Validator instance.
      *
      * @return CValidation_Factory
      */
     public function getValidator();
 
     /**
-     * Set the Validator instance
+     * Set the Validator instance.
      *
      * @param CValidation_Factory $validator
      */

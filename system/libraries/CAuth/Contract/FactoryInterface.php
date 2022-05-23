@@ -1,5 +1,5 @@
 <?php
-interface Factory {
+interface CAuth_Contract_FactoryInterface {
     /**
      * Get a guard instance by name.
      *

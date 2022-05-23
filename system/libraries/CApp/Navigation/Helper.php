@@ -41,10 +41,20 @@ class CApp_Navigation_Helper {
             $navController = carr::get($nav, 'controller', '');
 
             $navAlias = carr::wrap(carr::get($nav, 'alias', ''));
+            $navAliases = carr::wrap(carr::get($nav, 'aliases', []));
             $navUri = carr::get($nav, 'uri', '');
+            $routerUri = $path . $controller . '/' . $method;
 
             if ($navUri != null) {
-                return trim($navUri, '/') == trim(CFRouter::$current_uri, '/');
+                if (trim($navUri, '/') == trim($routerUri, '/')) {
+                    return $nav;
+                }
+            }
+
+            if (is_array($navAliases)) {
+                if (in_array(trim($routerUri, '/'), $navAliases)) {
+                    return $nav;
+                }
             }
 
             if ($navController != ''
@@ -203,8 +213,9 @@ class CApp_Navigation_Helper {
             if (isset($d['subnav']) && is_array($d['subnav']) && count($d['subnav']) > 0) {
                 $subnav = self::asUserRightsArray($appId, $roleId, $d['subnav'], $appRoleId, $domain, $level + 1);
             }
-            if (count($subnav) == 0 && (!isset($d['controller']) || strlen($d['controller']) == 0)) {
-                if (!isset($d['link']) || strlen($d['link']) == 0) {
+
+            if (count($subnav) == 0 && ((!isset($d['controller']) || strlen($d['controller']) == 0))) {
+                if (!isset($d['uri']) || strlen($d['uri']) == 0) {
                     continue;
                 }
             }
@@ -288,20 +299,23 @@ class CApp_Navigation_Helper {
         $navname = carr::get($nav, 'name');
         $app = CApp::instance();
 
+        $appRole = null;
         if (strlen($appRoleId) == 0) {
-            if ($app->user() != null) {
-                $appRoleId = c::get($app->user(), 'role_id');
+            $appRole = $app->role();
+            if ($appRole) {
+                $appRoleId = c::get($appRole, 'role_id');
             }
+        } else {
+            $appRole = c::app()->getRole($appRoleId);
         }
 
         if (strlen($appRoleId) > 0) {
-            $app_role = c::app()->getRole($appRoleId);
-            if ($app_role != null && $app_role->parent_id == null) {
+            if ($appRole != null && $appRole->parent_id == null) {
                 return true;
             }
-            if ($app_role != null && (!isset($nav['subnav']) || count($nav['subnav']) == 0)) {
-                $parent_role_id = $app_role->parent_id;
-                if ($parent_role_id != null) {
+            if ($appRole != null && (!isset($nav['subnav']) || count($nav['subnav']) == 0)) {
+                $parentRoleId = $appRole->parent_id;
+                if ($parentRoleId != null) {
                     if (!self::haveAccess($nav, $appRoleId, $appId)) {
                         return false;
                     }

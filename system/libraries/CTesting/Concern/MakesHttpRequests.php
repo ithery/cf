@@ -1,7 +1,7 @@
 <?php
 
-use Symfony\Component\HttpFoundation\File\UploadedFile as SymfonyUploadedFile;
 use Symfony\Component\HttpFoundation\Request as SymfonyRequest;
+use Symfony\Component\HttpFoundation\File\UploadedFile as SymfonyUploadedFile;
 
 trait CTesting_Concern_MakesHttpRequests {
     /**
@@ -76,7 +76,7 @@ trait CTesting_Concern_MakesHttpRequests {
      *
      * @return $this
      */
-    public function withHeader(string $name, string $value) {
+    public function withHeader($name, $value) {
         $this->defaultHeaders[$name] = $value;
 
         return $this;
@@ -90,7 +90,7 @@ trait CTesting_Concern_MakesHttpRequests {
      *
      * @return $this
      */
-    public function withToken(string $token, string $type = 'Bearer') {
+    public function withToken($token, $type = 'Bearer') {
         return $this->withHeader('Authorization', $type . ' ' . $token);
     }
 
@@ -121,7 +121,7 @@ trait CTesting_Concern_MakesHttpRequests {
     /**
      * Disable middleware for the test.
      *
-     * @param string|array|null $middleware
+     * @param null|string|array $middleware
      *
      * @return $this
      */
@@ -133,7 +133,7 @@ trait CTesting_Concern_MakesHttpRequests {
         }
 
         foreach ((array) $middleware as $abstract) {
-            $this->app->instance($abstract, new class {
+            $this->app->instance($abstract, new class() {
                 public function handle($request, $next) {
                     return $next($request);
                 }
@@ -146,7 +146,7 @@ trait CTesting_Concern_MakesHttpRequests {
     /**
      * Enable the given middleware for the test.
      *
-     * @param string|array|null $middleware
+     * @param null|string|array $middleware
      *
      * @return $this
      */
@@ -185,7 +185,7 @@ trait CTesting_Concern_MakesHttpRequests {
      *
      * @return $this
      */
-    public function withCookie(string $name, string $value) {
+    public function withCookie($name, $value) {
         $this->defaultCookies[$name] = $value;
 
         return $this;
@@ -212,7 +212,7 @@ trait CTesting_Concern_MakesHttpRequests {
      *
      * @return $this
      */
-    public function withUnencryptedCookie(string $name, string $value) {
+    public function withUnencryptedCookie($name, $value) {
         $this->unencryptedCookies[$name] = $value;
 
         return $this;
@@ -258,7 +258,7 @@ trait CTesting_Concern_MakesHttpRequests {
      *
      * @return $this
      */
-    public function from(string $url) {
+    public function from($url) {
         $this->app['session']->setPreviousUrl($url);
 
         return $this->withHeader('referer', $url);
@@ -477,7 +477,7 @@ trait CTesting_Concern_MakesHttpRequests {
      * @param array       $cookies
      * @param array       $files
      * @param array       $server
-     * @param string|null $content
+     * @param null|string $content
      *
      * @return CTesting_TestResponse
      */

@@ -26,6 +26,8 @@ class CAuth_Manager {
      */
     protected $userResolver;
 
+    protected $defaultGuard;
+
     private static $instance;
 
     /**
@@ -50,6 +52,7 @@ class CAuth_Manager {
         $this->userResolver = function ($guard = null) {
             return $this->guard($guard)->user();
         };
+        $this->defaultGuard = CF::config('auth.defaults.guard');
     }
 
     /**
@@ -76,7 +79,7 @@ class CAuth_Manager {
      *
      * @throws \InvalidArgumentException
      *
-     * @return \Illuminate\Contracts\Auth\Guard|\Illuminate\Contracts\Auth\StatefulGuard
+     * @return \CAuth_Contract_GuardInterface|\CAuth_Contract_StatefulGuardInterface
      */
     protected function resolve($name) {
         $config = $this->getConfig($name);
@@ -94,6 +97,9 @@ class CAuth_Manager {
         if (method_exists($this, $driverMethod)) {
             return $this->{$driverMethod}($name, $config);
         }
+        if (class_exists($config['driver'])) {
+            return $this->createCustomClassDriver($config['driver'], $name, $config);
+        }
 
         throw new InvalidArgumentException(
             "Auth driver [{$config['driver']}] for guard [{$name}] is not defined."
@@ -109,7 +115,20 @@ class CAuth_Manager {
      * @return mixed
      */
     protected function callCustomCreator($name, array $config) {
-        return $this->customCreators[$config['driver']]($this->app, $name, $config);
+        return $this->customCreators[$config['driver']]($name, $config);
+    }
+
+    /**
+     * Call a custom class driver creator.
+     *
+     * @param string $driver
+     * @param string $name
+     * @param array  $config
+     *
+     * @return mixed
+     */
+    protected function createCustomClassDriver($driver, $name, array $config) {
+        return new $driver($name, $config);
     }
 
     /**
@@ -214,7 +233,7 @@ class CAuth_Manager {
      * @return void
      */
     public function setDefaultDriver($name) {
-        $this->app['config']['auth.defaults.guard'] = $name;
+        $this->defaultGuard = $name;
     }
 
     /**

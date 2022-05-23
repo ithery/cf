@@ -1,23 +1,23 @@
 <?php
 
-defined('SYSPATH') OR die('No direct access allowed.');
+defined('SYSPATH') or die('No direct access allowed.');
 
 /**
  * @author Hery Kurniawan
- * @since Jun 23, 2019, 1:01:13 PM
  * @license Ittron Global Teknologi <ittron.co.id>
+ *
+ * @since Jun 23, 2019, 1:01:13 PM
  */
 use Psr\Cache\CacheItemInterface;
 
 class CCache_PsrBridge_CacheItem implements CacheItemInterface {
-
     /**
      * @var string
      */
     private $key;
 
     /**
-     * @var mixed|null
+     * @var null|mixed
      */
     private $value;
 
@@ -33,8 +33,8 @@ class CCache_PsrBridge_CacheItem implements CacheItemInterface {
 
     /**
      * @param string $key
-     * @param mixed $value
-     * @param bool $hit
+     * @param mixed  $value
+     * @param bool   $hit
      */
     public function __construct($key, $value = null, $hit = false) {
         $this->key = $key;
@@ -43,36 +43,37 @@ class CCache_PsrBridge_CacheItem implements CacheItemInterface {
     }
 
     /**
-     * {@inheritdoc}
+     * @inheritdoc
      */
     public function getKey() {
         return $this->key;
     }
 
     /**
-     * {@inheritdoc}
+     * @inheritdoc
      */
     public function get() {
         return $this->value;
     }
 
     /**
-     * {@inheritdoc}
+     * @inheritdoc
      */
     public function isHit() {
         return $this->hit;
     }
 
     /**
-     * {@inheritdoc}
+     * @inheritdoc
      */
     public function set($value) {
         $this->value = $value;
+
         return $this;
     }
 
     /**
-     * {@inheritdoc}
+     * @inheritdoc
      */
     public function expiresAt($expires) {
         if ($expires instanceof DateTimeInterface && !$expires instanceof DateTimeImmutable) {
@@ -81,15 +82,17 @@ class CCache_PsrBridge_CacheItem implements CacheItemInterface {
             $expires->setTimezone($timezone);
         }
         $this->expires = $expires;
+
         return $this;
     }
 
     /**
-     * {@inheritdoc}
+     * @inheritdoc
      */
     public function expiresAfter($time) {
         if ($time === null) {
             $this->expires = null;
+
             return;
         }
         $this->expires = new DateTimeImmutable();
@@ -97,6 +100,7 @@ class CCache_PsrBridge_CacheItem implements CacheItemInterface {
             $time = new DateInterval(sprintf('PT%sS', $time));
         }
         $this->expires = $this->expires->add($time);
+
         return $this;
     }
 
@@ -106,5 +110,4 @@ class CCache_PsrBridge_CacheItem implements CacheItemInterface {
     public function getExpiresAt() {
         return $this->expires;
     }
-
 }

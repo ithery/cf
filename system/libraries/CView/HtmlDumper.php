@@ -14,7 +14,7 @@ class CView_HtmlDumper extends BaseHtmlDumper {
         return $this->dump($clonedData);
     }
 
-    public function dump(Data $data, $output = null, array $extraDisplayOptions = []): string {
+    public function dump(Data $data, $output = null, array $extraDisplayOptions = []) {
         return (string) parent::dump($data, true, [
             'maxDepth' => 3,
             'maxStringLength' => 160,

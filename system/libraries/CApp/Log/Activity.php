@@ -37,6 +37,7 @@ class CApp_Log_Activity {
         $appId = Base::appId();
         $orgId = Base::orgId();
         $userId = Base::userId();
+        $username = Base::username();
         $model->fill([
             'org_id' => $orgId,
             'app_id' => $appId,
@@ -50,13 +51,14 @@ class CApp_Log_Activity {
             'user_id' => $userId,
             'uri' => CFRouter::getCompleteUri(),
             'routed_uri' => crouter::routed_uri(),
-            'controller' => crouter::controller(),
-            'method' => crouter::method(),
+            'controller' => CFRouter::getController(),
+            'method' => CFRouter::getControllerMethod(),
             'query_string' => crouter::query_string(),
             'nav' => $navName,
             'nav_label' => $navLabel,
             'action' => $actionName,
             'action_label' => $actionLabel,
+            'createdby' => $username,
         ]);
 
         $model->data = json_encode($data);

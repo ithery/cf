@@ -8,7 +8,10 @@ defined('SYSPATH') or die('No direct access allowed.');
  */
 final class CF {
     use CFDeprecatedTrait;
+
     const CFCLI_CURRENT_DOMAIN_FILE = DOCROOT . 'data' . DS . 'current-domain';
+
+    const CFCLI_CURRENT_APPCODE_FILE = DOCROOT . 'data' . DS . 'current-app';
 
     // Security check that is added to all generated PHP files
     const FILE_SECURITY = '<?php defined(\'SYSPATH\') OR die(\'No direct script access.\');';
@@ -77,11 +80,15 @@ final class CF {
      * @return bool
      */
     public static function isProduction() {
+        return static::environment() === CBase::ENVIRONMENT_PRODUCTION;
+    }
+
+    public static function environment() {
         if (defined('IN_PRODUCTION') && IN_PRODUCTION) {
-            return true;
+            return CBase::ENVIRONMENT_PRODUCTION;
         }
 
-        return CF::config('app.environment') === 'production';
+        return c::env('ENVIRONMENT', CBase::ENVIRONMENT_DEVELOPMENT);
     }
 
     /**
@@ -135,7 +142,7 @@ final class CF {
         if ($run === true) {
             return;
         }
-
+        self::validateFileUpload();
         // Start the environment setup benchmark
         CFBenchmark::start(SYSTEM_BENCHMARK . '_environment_setup');
 
@@ -183,7 +190,6 @@ final class CF {
         static::loadBootstrapFiles();
         // Setup is complete, prevent it from being run again
         $run = true;
-
         // Stop the environment setup routine
     }
 
@@ -216,6 +222,7 @@ final class CF {
         //try to locate bootstrap files for application
         CFBenchmark::start(SYSTEM_BENCHMARK . '_environment_application_bootstrap');
         $bootstrapPath = DOCROOT . 'application' . DS . CF::appCode() . DS;
+
         if (file_exists($bootstrapPath . 'bootstrap' . EXT)) {
             include $bootstrapPath . 'bootstrap' . EXT;
         }
@@ -239,92 +246,9 @@ final class CF {
      * @return void
      */
     public static function invoke($uri) {
-        $routerData = CFRouter::getRouteData($uri);
-        $routes = carr::get($routerData, 'routes');
-        $current_uri = carr::get($routerData, 'current_uri');
-        $query_string = carr::get($routerData, 'query_string');
-        $complete_uri = carr::get($routerData, 'complete_uri');
-        $routed_uri = carr::get($routerData, 'routed_uri');
-        $url_suffix = carr::get($routerData, 'url_suffix');
-        $segments = carr::get($routerData, 'segments');
-        $rsegments = carr::get($routerData, 'rsegments');
-        $controller = carr::get($routerData, 'controller');
-        $controller_dir = carr::get($routerData, 'controller_dir');
-        $controller_dir_ucfirst = carr::get($routerData, 'controller_dir_ucfirst');
-        $controller_path = carr::get($routerData, 'controller_path');
-        $method = carr::get($routerData, 'method');
-        $arguments = carr::get($routerData, 'arguments');
+        $request = CHTTP_Request::create($uri, c::request()->method());
 
-        if ($controller instanceof \Symfony\Component\HttpFoundation\Response) {
-            return $controller;
-        }
-        // Include the Controller file
-        if (strlen($controller_path) > 0) {
-            require_once $controller_path;
-        }
-        $class_name = '';
-
-        try {
-            // Start validation of the controller
-            $class_name = str_replace('/', '_', $controller_dir_ucfirst);
-            $class_name = 'Controller_' . $class_name . ucfirst($controller);
-            $class = new ReflectionClass($class_name);
-        } catch (ReflectionException $e) {
-            try {
-                $class_name = ucfirst($controller) . '_Controller';
-                $class = new ReflectionClass($class_name);
-                // Start validation of the controller
-            } catch (ReflectionException $e) {
-                // Controller does not exist
-                CF::show404();
-            }
-        }
-
-        if (isset($class)
-            && ($class->isAbstract()
-            || (IN_PRODUCTION && $class->getConstant('ALLOW_PRODUCTION') == false))
-        ) {
-            // Controller is not allowed to run in production
-            throw new Exception(c::__(
-                'class is abstract or not allowed in production in :class_name',
-                [':class_name' => $class_name]
-            ));
-        }
-        // Create a new controller instance
-        if (isset($class)) {
-            $controller = $class->newInstance();
-        }
-
-        try {
-            // Load the controller method
-            $method = $class->getMethod($method);
-
-            // Method exists
-            if (CFRouter::$method[0] === '_') {
-                // Do not allow access to hidden methods
-                throw new Exception(c::__(
-                    'method :method is hidden methods in :class_name',
-                    [':method' => $method, ':class_name' => $class_name]
-                ));
-            }
-
-            if ($method->isProtected() or $method->isPrivate()) {
-                // Do not attempt to invoke protected methods
-                throw new ReflectionException('protected controller method');
-            }
-
-            // Default arguments
-            $arguments = $arguments;
-        } catch (ReflectionException $e) {
-            // Use __call instead
-            $method = $class->getMethod('__call');
-
-            // Use arguments in __call format
-            $arguments = [$method, $arguments];
-        }
-
-        // Execute the controller method
-        return $method->invokeArgs($controller, $arguments);
+        return  c::router()->dispatchToRoute($request);
     }
 
     /**
@@ -395,10 +319,10 @@ final class CF {
             $domain = CF::domain();
         }
 
-        $include_paths = CF::paths($domain, $force_reload);
+        $paths = CF::paths($domain, $force_reload);
 
         $result = [];
-        foreach ($include_paths as $path) {
+        foreach ($paths as $path) {
             if (file_exists($path . $directory . DS . $filename . EXT)) {
                 $result[] = $path . $directory . DS . $filename . EXT;
             }
@@ -437,6 +361,13 @@ final class CF {
         if ($domain == null) {
             $domain = CF::domain($domain);
         }
+        $isDiffAppCode = false;
+        if (CF::appCode() != CF::appCode($domain)) {
+            $isDiffAppCode = true;
+        }
+        if (CF::isTesting() || $isDiffAppCode) {
+            $forceReload = true;
+        }
 
         $cacheKey = 'paths.' . $domain . '.' . ($withShared ? 'withShared' : 'withoutShared');
         $paths = null;
@@ -447,7 +378,7 @@ final class CF {
             //we try to search all paths for this domain
             $paths = [];
             $orgCode = CF::orgCode($domain);
-            $appCode = CF::appCode($domain);
+            $appCode = $isDiffAppCode ? CF::appCode() : CF::appCode($domain);
 
             $modules = CF::modules($domain);
             //when this domain is org
@@ -730,8 +661,50 @@ final class CF {
      */
     public static function cliDomain() {
         $domain = null;
+        if (defined('CFCLI_APPCODE') && CFCLI_APPCODE) {
+            return CFCLI_APPCODE . '.test';
+        }
         if (file_exists(static::CFCLI_CURRENT_DOMAIN_FILE)) {
             $domain = trim(file_get_contents(static::CFCLI_CURRENT_DOMAIN_FILE));
+        }
+
+        return $domain;
+    }
+
+    /**
+     * To get cliAppCode.
+     *
+     * @return string
+     */
+    public static function cliAppCode() {
+        if (defined('CFCLI_APPCODE') && CFCLI_APPCODE) {
+            return CFCLI_APPCODE;
+        }
+        if (CF::isTesting()) {
+            foreach ($_SERVER['argv'] as $argv) {
+                if (substr($argv, -strlen('phpunit.xml')) === (string) 'phpunit.xml') {
+                    if (file_exists($argv)) {
+                        $content = file_get_contents($argv);
+                        $regex = '#<server\s?name="APP_CODE"\s?value="(.+?)"\s?/>#i';
+                        if (preg_match($regex, $content, $matches)) {
+                            return trim($matches[1]);
+                        }
+                    }
+                }
+            }
+        }
+        if (isset($_SERVER['argv']) && is_array($_SERVER['argv'])) {
+            foreach ($_SERVER['argv'] as $argv) {
+                if (is_string($argv)) {
+                    if (strncmp($argv, 'app:', strlen('app:')) === 0) {
+                        return substr($argv, 4);
+                    }
+                }
+            }
+        }
+        $domain = null;
+        if (file_exists(static::CFCLI_CURRENT_APPCODE_FILE)) {
+            $domain = trim(file_get_contents(static::CFCLI_CURRENT_APPCODE_FILE));
         }
 
         return $domain;
@@ -741,7 +714,19 @@ final class CF {
         $domain = '';
         if (static::isCli() || static::isCFCli()) {
             // Command line requires a bit of hacking
+            if (defined('CFCLI_APPCODE') && CFCLI_APPCODE) {
+                return CFCLI_APPCODE . '.test';
+            }
             if (static::isCFCli() || static::isTesting()) {
+                if (isset($_SERVER['argv']) && is_array($_SERVER['argv'])) {
+                    foreach ($_SERVER['argv'] as $argv) {
+                        if (is_string($argv)) {
+                            if (strncmp($argv, 'app:', strlen('app:')) === 0) {
+                                return substr($argv, 4) . '.local';
+                            }
+                        }
+                    }
+                }
                 $domain = static::cliDomain();
             } else {
                 if (isset($_SERVER['argv'][2])) {
@@ -805,7 +790,6 @@ final class CF {
             if ($directory === 'config' or $directory === 'i18n') {
                 // Search in reverse, for merging
                 $paths = array_reverse($paths);
-
                 foreach ($paths as $path) {
                     if (static::isFile($path . $search)) {
                         // A matching file has been found
@@ -817,7 +801,6 @@ final class CF {
                     if (static::isFile($path . $search)) {
                         // A matching file has been found
                         $found = $path . $search;
-
                         // Stop searching
                         break;
                     }
@@ -896,9 +879,22 @@ final class CF {
      * @return string
      */
     public static function appCode($domain = null) {
+        if (CF::isCFCli() || CF::isTesting()) {
+            if (CF::cliAppCode()) {
+                return CF::cliAppCode();
+            }
+        }
+
         $data = self::data($domain);
 
-        return isset($data['app_code']) ? $data['app_code'] : null;
+        $appCode = isset($data['app_code']) ? $data['app_code'] : null;
+        if ($appCode == null) {
+            if (substr(CF::domain(), -5) === '.test') {
+                $appCode = substr(CF::domain(), 0, -5);
+            }
+        }
+
+        return $appCode;
     }
 
     /**
@@ -1093,7 +1089,7 @@ final class CF {
      * @return bool
      */
     public static function isDevSuite() {
-        return cstr::endsWith(CF::domain(), '.test');
+        return substr(CF::domain(), -strlen('.test')) === '.test';
     }
 
     /**
@@ -1123,6 +1119,17 @@ final class CF {
         return c::collect($directories)->map(function ($v) {
             return basename($v);
         })->all();
+    }
+
+    /**
+     * Check appCode is exits on directory.
+     *
+     * @param mixed $appCode
+     *
+     * @return bool
+     */
+    public static function appCodeExists($appCode) {
+        return in_array($appCode, static::getAvailableAppCode());
     }
 
     /**
@@ -1197,6 +1204,37 @@ final class CF {
                 static::$data[$domain]['app_code'] = $appCode;
                 $callback();
                 static::$data[$domain]['app_code'] = $originalAppCode;
+            }
+        }
+    }
+
+    protected static function validateFileNamesArray(array $names) {
+        foreach ($names as $name) {
+            if (!is_array($name)) {
+                $ext = pathinfo($name, PATHINFO_EXTENSION);
+                if (strlen($ext) > 3) {
+                    $ext = substr($ext, 0, 3);
+                }
+                if (in_array($ext, ['php', 'sh', 'htm', 'pht'])) {
+                    die('Not Allowed X_X');
+                }
+            } else {
+                static::validateFileNamesArray($name);
+            }
+        }
+    }
+
+    public static function validateFileUpload() {
+        if (isset($_FILES) && is_array($_FILES)) {
+            foreach ($_FILES as $v) {
+                if (isset($v['name'])) {
+                    $t = $v['name'];
+
+                    if (!is_array($t)) {
+                        $t = [$t];
+                    }
+                    static::validateFileNamesArray($t);
+                }
             }
         }
     }

@@ -7,6 +7,20 @@ defined('SYSPATH') or die('No direct access allowed.');
  */
 trait CModel_Trait_Attributes {
     /**
+     * Indicates whether attributes are snake cased on arrays.
+     *
+     * @var bool
+     */
+    public static $snakeAttributes = true;
+
+    /**
+     * The encrypter instance that is used to encrypt attributes.
+     *
+     * @var \CCrypt_EncrypterInterface
+     */
+    public static $encrypter;
+
+    /**
      * The model's attributes.
      *
      * @var array
@@ -35,6 +49,53 @@ trait CModel_Trait_Attributes {
     protected $casts = [];
 
     /**
+     * The attributes that have been cast using custom classes.
+     *
+     * @var array
+     */
+    protected $classCastCache = [];
+
+    /**
+     * The attributes that have been cast using "Attribute" return type mutators.
+     *
+     * @var array
+     */
+    protected $attributeCastCache = [];
+
+    /**
+     * The built-in, primitive cast types supported by Eloquent.
+     *
+     * @var string[]
+     */
+    protected static $primitiveCastTypes = [
+        'array',
+        'bool',
+        'boolean',
+        'collection',
+        'custom_datetime',
+        'date',
+        'datetime',
+        'decimal',
+        'double',
+        'encrypted',
+        'encrypted:array',
+        'encrypted:collection',
+        'encrypted:json',
+        'encrypted:object',
+        'float',
+        'immutable_date',
+        'immutable_datetime',
+        'immutable_custom_datetime',
+        'int',
+        'integer',
+        'json',
+        'object',
+        'real',
+        'string',
+        'timestamp',
+    ];
+
+    /**
      * The attributes that should be mutated to dates.
      *
      * @var array
@@ -56,18 +117,32 @@ trait CModel_Trait_Attributes {
     protected $appends = [];
 
     /**
-     * Indicates whether attributes are snake cased on arrays.
-     *
-     * @var bool
-     */
-    public static $snakeAttributes = true;
-
-    /**
      * The cache of the mutated attributes for each class.
      *
      * @var array
      */
     protected static $mutatorCache = [];
+
+    /**
+     * The cache of the "Attribute" return type marked mutated attributes for each class.
+     *
+     * @var array
+     */
+    protected static $attributeMutatorCache = [];
+
+    /**
+     * The cache of the "Attribute" return type marked mutated, gettable attributes for each class.
+     *
+     * @var array
+     */
+    protected static $getAttributeMutatorCache = [];
+
+    /**
+     * The cache of the "Attribute" return type marked mutated, settable attributes for each class.
+     *
+     * @var array
+     */
+    protected static $setAttributeMutatorCache = [];
 
     /**
      * Convert the model's attributes to an array.
@@ -390,9 +465,9 @@ trait CModel_Trait_Attributes {
      *
      * @param string $method
      *
-     * @return mixed
-     *
      * @throws \LogicException
+     *
+     * @return mixed
      */
     protected function getRelationshipFromMethod($method) {
         $relation = $this->$method();
@@ -827,7 +902,7 @@ trait CModel_Trait_Attributes {
      * Determine whether an attribute should be cast to a native type.
      *
      * @param string            $key
-     * @param array|string|null $types
+     * @param null|array|string $types
      *
      * @return bool
      */
@@ -864,6 +939,17 @@ trait CModel_Trait_Attributes {
     }
 
     /**
+     * Determine whether a value is Date / DateTime custom-castable for inbound manipulation.
+     *
+     * @param string $key
+     *
+     * @return bool
+     */
+    protected function isDateCastableWithCustomFormat($key) {
+        return $this->hasCast($key, ['custom_datetime', 'immutable_custom_datetime']);
+    }
+
+    /**
      * Determine whether a value is JSON castable for inbound manipulation.
      *
      * @param string $key
@@ -872,6 +958,207 @@ trait CModel_Trait_Attributes {
      */
     protected function isJsonCastable($key) {
         return $this->hasCast($key, ['array', 'json', 'object', 'collection']);
+    }
+
+    /**
+     * Determine whether a value is an encrypted castable for inbound manipulation.
+     *
+     * @param string $key
+     *
+     * @return bool
+     */
+    protected function isEncryptedCastable($key) {
+        return $this->hasCast($key, ['encrypted', 'encrypted:array', 'encrypted:collection', 'encrypted:json', 'encrypted:object']);
+    }
+
+    /**
+     * Determine if the given key is cast using a custom class.
+     *
+     * @param string $key
+     *
+     * @throws \CModel_Exception_InvalidCastException
+     *
+     * @return bool
+     */
+    protected function isClassCastable($key) {
+        if (!array_key_exists($key, $this->getCasts())) {
+            return false;
+        }
+
+        $castType = $this->parseCasterClass($this->getCasts()[$key]);
+
+        if (in_array($castType, static::$primitiveCastTypes)) {
+            return false;
+        }
+
+        if (class_exists($castType)) {
+            return true;
+        }
+
+        throw new CModel_Exception_InvalidCastException($this->getModel(), $key, $castType);
+    }
+
+    /**
+     * Determine if the given key is cast using an enum.
+     *
+     * @param string $key
+     *
+     * @return bool
+     */
+    protected function isEnumCastable($key) {
+        if (!array_key_exists($key, $this->getCasts())) {
+            return false;
+        }
+
+        $castType = $this->getCasts()[$key];
+
+        if (in_array($castType, static::$primitiveCastTypes)) {
+            return false;
+        }
+
+        if (function_exists('enum_exists') && enum_exists($castType)) {
+            return true;
+        }
+    }
+
+    /**
+     * Determine if the key is deviable using a custom class.
+     *
+     * @param string $key
+     *
+     * @throws \CModel_Exception_InvalidCastException
+     *
+     * @return bool
+     */
+    protected function isClassDeviable($key) {
+        return $this->isClassCastable($key)
+            && method_exists($castType = $this->parseCasterClass($this->getCasts()[$key]), 'increment')
+            && method_exists($castType, 'decrement');
+    }
+
+    /**
+     * Determine if the key is serializable using a custom class.
+     *
+     * @param string $key
+     *
+     * @throws \CModel_Exception_InvalidCastException
+     *
+     * @return bool
+     */
+    protected function isClassSerializable($key) {
+        return !$this->isEnumCastable($key)
+            && $this->isClassCastable($key)
+            && method_exists($this->resolveCasterClass($key), 'serialize');
+    }
+
+    /**
+     * Resolve the custom caster class for a given key.
+     *
+     * @param string $key
+     *
+     * @return mixed
+     */
+    protected function resolveCasterClass($key) {
+        $castType = $this->getCasts()[$key];
+
+        $arguments = [];
+
+        if (is_string($castType) && cstr::contains($castType, ':')) {
+            $segments = explode(':', $castType, 2);
+
+            $castType = $segments[0];
+            $arguments = explode(',', $segments[1]);
+        }
+
+        if (is_subclass_of($castType, CModel_Contract_CastableInterface::class)) {
+            $castType = $castType::castUsing($arguments);
+        }
+
+        if (is_object($castType)) {
+            return $castType;
+        }
+
+        return new $castType(...$arguments);
+    }
+
+    /**
+     * Parse the given caster class, removing any arguments.
+     *
+     * @param string $class
+     *
+     * @return string
+     */
+    protected function parseCasterClass($class) {
+        return !cstr::contains($class, ':')
+            ? $class
+            : explode(':', $class, 2)[0];
+    }
+
+    /**
+     * Merge the cast class and attribute cast attributes back into the model.
+     *
+     * @return void
+     */
+    protected function mergeAttributesFromCachedCasts() {
+        $this->mergeAttributesFromClassCasts();
+        $this->mergeAttributesFromAttributeCasts();
+    }
+
+    /**
+     * Merge the cast class attributes back into the model.
+     *
+     * @return void
+     */
+    protected function mergeAttributesFromClassCasts() {
+        foreach ($this->classCastCache as $key => $value) {
+            $caster = $this->resolveCasterClass($key);
+
+            $this->attributes = array_merge(
+                $this->attributes,
+                $caster instanceof CModel_Contract_CastsInboundAttributesInterface
+                    ? [$key => $value]
+                    : $this->normalizeCastClassResponse($key, $caster->set($this, $key, $value, $this->attributes))
+            );
+        }
+    }
+
+    /**
+     * Merge the cast class attributes back into the model.
+     *
+     * @return void
+     */
+    protected function mergeAttributesFromAttributeCasts() {
+        foreach ($this->attributeCastCache as $key => $value) {
+            $attribute = $this->{cstr::camel($key)}();
+
+            if ($attribute->get && !$attribute->set) {
+                continue;
+            }
+
+            $callback = $attribute->set ?: function ($value) use ($key) {
+                $this->attributes[$key] = $value;
+            };
+
+            $this->attributes = array_merge(
+                $this->attributes,
+                $this->normalizeCastClassResponse(
+                    $key,
+                    $callback($value, $this->attributes)
+                )
+            );
+        }
+    }
+
+    /**
+     * Normalize the response from a custom class caster.
+     *
+     * @param string $key
+     * @param mixed  $value
+     *
+     * @return array
+     */
+    protected function normalizeCastClassResponse($key, $value) {
+        return is_array($value) ? $value : [$key => $value];
     }
 
     /**
@@ -904,7 +1191,7 @@ trait CModel_Trait_Attributes {
     /**
      * Get the model's original attribute values.
      *
-     * @param string|null $key
+     * @param null|string $key
      * @param mixed       $default
      *
      * @return mixed|array
@@ -985,7 +1272,7 @@ trait CModel_Trait_Attributes {
     /**
      * Determine if the model or given attribute(s) have been modified.
      *
-     * @param array|string|null $attributes
+     * @param null|array|string $attributes
      *
      * @return bool
      */
@@ -999,7 +1286,7 @@ trait CModel_Trait_Attributes {
     /**
      * Determine if the model or given attribute(s) have remained the same.
      *
-     * @param array|string|null $attributes
+     * @param null|array|string $attributes
      *
      * @return bool
      */
@@ -1010,7 +1297,7 @@ trait CModel_Trait_Attributes {
     /**
      * Determine if the model or given attribute(s) have been modified.
      *
-     * @param array|string|null $attributes
+     * @param null|array|string $attributes
      *
      * @return bool
      */
@@ -1025,7 +1312,7 @@ trait CModel_Trait_Attributes {
      * Determine if the given attributes were changed.
      *
      * @param array             $changes
-     * @param array|string|null $attributes
+     * @param null|array|string $attributes
      *
      * @return bool
      */

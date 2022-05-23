@@ -7,25 +7,23 @@
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  */
+
 namespace PHPUnit\Framework\Attributes;
 
 use Attribute;
 
 #[Attribute(Attribute::TARGET_CLASS | Attribute::TARGET_METHOD)]
-class TestDox
-{
+class TestDox {
     /**
      * @var string
      */
     private $text;
 
-    public function __construct($text)
-    {
+    public function __construct($text) {
         $this->text = $text;
     }
 
-    public function text()
-    {
+    public function text() {
         return $this->text;
     }
 }

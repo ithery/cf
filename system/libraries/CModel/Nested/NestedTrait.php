@@ -10,6 +10,18 @@ defined('SYSPATH') or die('No direct access allowed.');
  */
 trait CModel_Nested_NestedTrait {
     /**
+     * @var \Carbon\Carbon
+     */
+    public static $deletedAt;
+
+    /**
+     * Keep track of the number of performed operations.
+     *
+     * @var int
+     */
+    public static $actionsPerformed = 0;
+
+    /**
      * Pending operation.
      *
      * @var array
@@ -22,18 +34,6 @@ trait CModel_Nested_NestedTrait {
      * @var bool
      */
     protected $moved = false;
-
-    /**
-     * @var \Carbon\Carbon
-     */
-    public static $deletedAt;
-
-    /**
-     * Keep track of the number of performed operations.
-     *
-     * @var int
-     */
-    public static $actionsPerformed = 0;
 
     /**
      * Sign on model events.
@@ -66,6 +66,7 @@ trait CModel_Nested_NestedTrait {
      */
     protected function setNodeAction($action) {
         $this->pending = func_get_args();
+
         return $this;
     }
 
@@ -103,8 +104,10 @@ trait CModel_Nested_NestedTrait {
             $cut = $this->getLowerBound() + 1;
             $this->setLft($cut);
             $this->setRgt($cut + 1);
+
             return true;
         }
+
         return $this->insertAt($this->getLowerBound() + 1);
     }
 
@@ -134,13 +137,14 @@ trait CModel_Nested_NestedTrait {
         }
         $this->setDepthWithSubtree();
         $parent->refreshNode();
+
         return true;
     }
 
     /**
      * Apply parent model.
      *
-     * @param Model|null $value
+     * @param null|Model $value
      *
      * @return $this
      */
@@ -148,6 +152,7 @@ trait CModel_Nested_NestedTrait {
         $this->setParentId($value ? $value->getKey() : null)
             ->setRelation('parent', $value);
         $this->setDepth($value ? $value->getDepth() + 1 : 0);
+
         return $this;
     }
 
@@ -161,6 +166,7 @@ trait CModel_Nested_NestedTrait {
      */
     protected function actionBeforeOrAfter(self $node, $after = false) {
         $node->refreshNode();
+
         return $this->insertAt($after ? $node->getRgt() + 1 : $node->getLft());
     }
 
@@ -173,6 +179,7 @@ trait CModel_Nested_NestedTrait {
         }
         $attributes = $this->newNestedSetQuery()->getNodeData($this->getKey());
         $this->attributes = array_merge($this->attributes, $attributes);
+
         return $this;
         //        $this->original = array_merge($this->original, $attributes);
     }
@@ -303,6 +310,7 @@ trait CModel_Nested_NestedTrait {
      */
     public function makeRoot() {
         $this->setParent(null)->dirtyBounds();
+
         return $this->setNodeAction('root');
     }
 
@@ -315,6 +323,7 @@ trait CModel_Nested_NestedTrait {
         if ($this->exists && $this->isRoot()) {
             return $this->save();
         }
+
         return $this->makeRoot()->save();
     }
 
@@ -325,7 +334,7 @@ trait CModel_Nested_NestedTrait {
      *
      * @return bool
      */
-    public function appendNode(self $node) {
+    public function appendNode($node) {
         return $node->appendToNode($this)->save();
     }
 
@@ -336,7 +345,7 @@ trait CModel_Nested_NestedTrait {
      *
      * @return bool
      */
-    public function prependNode(self $node) {
+    public function prependNode($node) {
         return $node->prependToNode($this)->save();
     }
 
@@ -347,7 +356,7 @@ trait CModel_Nested_NestedTrait {
      *
      * @return $this
      */
-    public function appendToNode(self $parent) {
+    public function appendToNode($parent) {
         return $this->appendOrPrependTo($parent);
     }
 
@@ -358,7 +367,7 @@ trait CModel_Nested_NestedTrait {
      *
      * @return $this
      */
-    public function prependToNode(self $parent) {
+    public function prependToNode($parent) {
         return $this->appendOrPrependTo($parent, true);
     }
 
@@ -368,7 +377,7 @@ trait CModel_Nested_NestedTrait {
      *
      * @return self
      */
-    public function appendOrPrependTo(self $parent, $prepend = false) {
+    public function appendOrPrependTo($parent, $prepend = false) {
         $this->assertNodeExists($parent)
             ->assertNotDescendant($parent)
             ->assertSameScope($parent);
@@ -384,7 +393,7 @@ trait CModel_Nested_NestedTrait {
      *
      * @return $this
      */
-    public function afterNode(self $node) {
+    public function afterNode($node) {
         return $this->beforeOrAfterNode($node, true);
     }
 
@@ -395,7 +404,7 @@ trait CModel_Nested_NestedTrait {
      *
      * @return $this
      */
-    public function beforeNode(self $node) {
+    public function beforeNode($node) {
         return $this->beforeOrAfterNode($node);
     }
 
@@ -405,7 +414,7 @@ trait CModel_Nested_NestedTrait {
      *
      * @return self
      */
-    public function beforeOrAfterNode(self $node, $after = false) {
+    public function beforeOrAfterNode($node, $after = false) {
         $this->assertNodeExists($node)
             ->assertNotDescendant($node)
             ->assertSameScope($node);
@@ -413,6 +422,7 @@ trait CModel_Nested_NestedTrait {
             $this->setParent($node->getRelationValue('parent'));
         }
         $this->dirtyBounds();
+
         return $this->setNodeAction('beforeOrAfter', $node, $after);
     }
 
@@ -423,7 +433,7 @@ trait CModel_Nested_NestedTrait {
      *
      * @return bool
      */
-    public function insertAfterNode(self $node) {
+    public function insertAfterNode($node) {
         return $this->afterNode($node)->save();
     }
 
@@ -434,12 +444,13 @@ trait CModel_Nested_NestedTrait {
      *
      * @return bool
      */
-    public function insertBeforeNode(self $node) {
+    public function insertBeforeNode($node) {
         if (!$this->beforeNode($node)->save()) {
             return false;
         }
         // We'll update the target node since it will be moved
         $node->refreshNode();
+
         return true;
     }
 
@@ -461,6 +472,7 @@ trait CModel_Nested_NestedTrait {
         }
 
         $this->setLft($lft)->setRgt($rgt)->setDepth($depth)->setParentId($parentId);
+
         return $this->setNodeAction('raw');
     }
 
@@ -479,6 +491,7 @@ trait CModel_Nested_NestedTrait {
         if (!$sibling) {
             return false;
         }
+
         return $this->insertBeforeNode($sibling);
     }
 
@@ -497,6 +510,7 @@ trait CModel_Nested_NestedTrait {
         if (!$sibling) {
             return false;
         }
+
         return $this->insertAfterNode($sibling);
     }
 
@@ -510,6 +524,7 @@ trait CModel_Nested_NestedTrait {
     protected function insertAt($position) {
         ++static::$actionsPerformed;
         $result = $this->exists ? $this->moveNode($position) : $this->insertNode($position);
+
         return $result;
     }
 
@@ -532,6 +547,7 @@ trait CModel_Nested_NestedTrait {
         if ($updated) {
             $this->refreshNode();
         }
+
         return $updated;
     }
 
@@ -549,6 +565,7 @@ trait CModel_Nested_NestedTrait {
         $height = $this->getNodeHeight();
         $this->setLft($position);
         $this->setRgt($position + $height - 1);
+
         return true;
     }
 
@@ -581,7 +598,7 @@ trait CModel_Nested_NestedTrait {
     }
 
     /**
-     * {@inheritdoc}
+     * @inheritdoc
      *
      * @since 2.0
      */
@@ -600,6 +617,7 @@ trait CModel_Nested_NestedTrait {
      */
     public function newNestedSetQuery($table = null) {
         $builder = $this->usesSoftDelete() ? $this->withTrashed() : $this->newQuery();
+
         return $this->applyNestedSetScope($builder, $table);
     }
 
@@ -628,6 +646,7 @@ trait CModel_Nested_NestedTrait {
         foreach ($scoped as $attribute) {
             $query->where($table . '.' . $attribute, '=', $this->getAttributeValue($attribute));
         }
+
         return $query;
     }
 
@@ -644,13 +663,14 @@ trait CModel_Nested_NestedTrait {
      * @return self
      */
     public static function scoped(array $attributes) {
-        $instance = new static;
+        $instance = new static();
         $instance->setRawAttributes($attributes);
+
         return $instance->newScopedQuery();
     }
 
     /**
-     * {@inheritdoc}
+     * @inheritdoc
      */
     public function newCollection(array $models = []) {
         return new CModel_Nested_Collection($models);
@@ -671,12 +691,13 @@ trait CModel_Nested_NestedTrait {
         }
         $instance->save();
         // Now create children
-        $relation = new CModel_Collection;
+        $relation = new CModel_Collection();
         foreach ((array) $children as $child) {
             $relation->add($child = static::create($child, $instance));
             $child->setRelation('parent', $instance);
         }
         $instance->refreshNode();
+
         return $instance->setRelation('children', $relation);
     }
 
@@ -689,6 +710,7 @@ trait CModel_Nested_NestedTrait {
         if (!$this->exists) {
             return 2;
         }
+
         return $this->getRgt() - $this->getLft() + 1;
     }
 
@@ -1000,6 +1022,7 @@ trait CModel_Nested_NestedTrait {
         $result = parent::getArrayableRelations();
         // To fix #17 when converting tree to json falling to infinite recursion.
         unset($result['parent']);
+
         return $result;
     }
 
@@ -1026,6 +1049,7 @@ trait CModel_Nested_NestedTrait {
      */
     public function setLft($value) {
         $this->attributes[$this->getLftName()] = $value;
+
         return $this;
     }
 
@@ -1036,6 +1060,7 @@ trait CModel_Nested_NestedTrait {
      */
     public function setRgt($value) {
         $this->attributes[$this->getRgtName()] = $value;
+
         return $this;
     }
 
@@ -1062,6 +1087,7 @@ trait CModel_Nested_NestedTrait {
      */
     public function setParentId($value) {
         $this->attributes[$this->getParentIdName()] = $value;
+
         return $this;
     }
 
@@ -1072,6 +1098,7 @@ trait CModel_Nested_NestedTrait {
         $this->original[$this->getLftName()] = null;
         $this->original[$this->getRgtName()] = null;
         $this->original[$this->getDepthName()] = null;
+
         return $this;
     }
 
@@ -1084,8 +1111,10 @@ trait CModel_Nested_NestedTrait {
         if ($node == $this || $node->isDescendantOf($this)) {
             $str = 'this lft:' . $this->getLft() . ', this rgt:' . $this->getRgt() . ' other lft:' . $node->getLft() . ' other rgt:' . $node->getRgt();
             $str .= '-- this id' . $this->getKey() . ',other id:' . $node->getKey();
+
             throw new LogicException('Node must not be a descendant.' . $str);
         }
+
         return $this;
     }
 
@@ -1098,6 +1127,7 @@ trait CModel_Nested_NestedTrait {
         if (!$node->getLft() || !$node->getRgt()) {
             throw new LogicException('Node must exists.');
         }
+
         return $this;
     }
 
@@ -1116,9 +1146,9 @@ trait CModel_Nested_NestedTrait {
     }
 
     /**
-     * @param array|null $except
+     * @param null|array $except
      *
-     * @return \Illuminate\Database\Eloquent\Model
+     * @return \CModel
      */
     public function replicate(array $except = null) {
         $defaults = [
@@ -1127,6 +1157,7 @@ trait CModel_Nested_NestedTrait {
             $this->getRgtName(),
         ];
         $except = $except ? array_unique(array_merge($except, $defaults)) : $defaults;
+
         return parent::replicate($except);
     }
 
@@ -1157,11 +1188,12 @@ trait CModel_Nested_NestedTrait {
         if ($node->equals($this)) {
             return $this->ancestors()->count();
         }
+
         return $node->getLevel() + $nesting;
     }
 
     /**
-     * Return an array with the last node we could reach and its nesting level
+     * Return an array with the last node we could reach and its nesting level.
      *
      * @param Baum\Node $node
      * @param int       $nesting
@@ -1187,7 +1219,7 @@ trait CModel_Nested_NestedTrait {
      * @return bool
      */
     public function equals($node) {
-        return ($this == $node);
+        return $this == $node;
     }
 
     /**

@@ -62,5 +62,29 @@ interface CAuth_Contract_StatefulGuardInterface extends CAuth_Contract_GuardInte
      */
     public function logout();
 
+    /**
+     * Get the hasher for current guard.
+     *
+     * @return CCrypt_HasherInterface
+     */
     public function hasher();
+
+    /**
+     * Log a user into the application without firing the Login event.
+     *
+     * @param \CAuth_AuthenticatableInterface $user
+     *
+     * @return void
+     */
+    public function quietLogin(CAuth_AuthenticatableInterface $user);
+
+    /**
+     * Logout the user without updating remember_token
+     * and without firing the Logout event.
+     *
+     * @param   void
+     *
+     * @return void
+     */
+    public function quietLogout();
 }

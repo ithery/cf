@@ -6,10 +6,14 @@ class CManager_Asset_File_CssFile extends CManager_Asset_FileAbstract {
     public function __construct(array $options) {
         parent::__construct($options);
         $this->type = 'css';
+
         $this->media = carr::get($options, 'media');
     }
 
     public function getUrl($withHttp = false) {
+        if ($this->isRemote) {
+            return $this->script;
+        }
         $file = $this->getPath();
         $path = $file;
         $path = carr::first(explode('?', $file));

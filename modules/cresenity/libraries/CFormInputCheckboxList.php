@@ -21,6 +21,7 @@ class CFormInputCheckboxList extends CFormInput {
 
     public function set_applyjs($applyjs) {
         $this->applyjs = $applyjs;
+
         return $this;
     }
 
@@ -29,6 +30,7 @@ class CFormInputCheckboxList extends CFormInput {
 
     public function add_group_list($group, $list) {
         $this->group_list[$group] = $list;
+
         return $this;
     }
 
@@ -47,9 +49,7 @@ class CFormInputCheckboxList extends CFormInput {
         if (strlen($classes) > 0) {
             $classes = ' ' . $classes;
         }
-        if ($this->bootstrap == '3') {
-            $classes = $classes . ' form-control ';
-        }
+
         $custom_css = $this->custom_css;
         $custom_css = $this->renderStyle($custom_css);
         if (strlen($custom_css) > 0) {

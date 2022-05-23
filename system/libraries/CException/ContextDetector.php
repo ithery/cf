@@ -15,6 +15,9 @@ class CException_ContextDetector implements CException_Contract_ContextDetectorI
     }
 
     private function runningInConsole() {
+        if (CF::isCli()) {
+            return true;
+        }
         if (isset($_ENV['APP_RUNNING_IN_CONSOLE'])) {
             return $_ENV['APP_RUNNING_IN_CONSOLE'] === 'true';
         }

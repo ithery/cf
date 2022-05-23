@@ -11,13 +11,15 @@ defined('SYSPATH') or die('No direct access allowed.');
 class CCache_Driver_FileDriver extends CCache_DriverAbstract {
     use CTrait_Helper_InteractsWithTime,
         CCache_Trait_RetrievesMultipleKeys;
+
     protected $engine;
 
     public function __construct($options) {
         parent::__construct($options);
         $engineName = $this->getOption('engine', 'Temp');
         $engineOptions = $this->getOption('options', []);
-        $engineClass = 'CCache_Driver_FileDriver_Engine_' . $engineName . 'Engine';
+
+        $engineClass = 'CCache_Driver_FileDriver_Engine_' . cstr::ucfirst($engineName) . 'Engine';
         $this->engine = new $engineClass($engineOptions);
     }
 

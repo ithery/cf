@@ -13,7 +13,6 @@ class CObservable_Javascript_JQuery {
         CObservable_Javascript_JQuery_Trait_EventsTrait,
         CObservable_Javascript_JQuery_Trait_AjaxTrait,
         CObservable_Javascript_JQuery_Trait_InternalTrait;
-
     /**
      * @var CObservable_Javascript
      */
@@ -43,10 +42,14 @@ class CObservable_Javascript_JQuery {
         $this->jQueryStatement = null;
     }
 
+    /**
+     * @return CJavascript_Statement_JQuery
+     */
     public function jQueryStatement() {
         if ($this->jQueryStatement == null) {
             $this->jQueryStatement = CJavascript::jqueryStatement($this->getSelector());
         }
+
         return $this->jQueryStatement;
     }
 

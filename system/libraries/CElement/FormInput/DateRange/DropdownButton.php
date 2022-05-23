@@ -12,7 +12,6 @@ use Carbon\Carbon;
 
 class CElement_FormInput_DateRange_DropdownButton extends CElement_FormInput_DateRange_Dropdown {
     use CElement_FormInput_Trait_PredefinedDateRangeTrait;
-
     protected $start;
 
     protected $end;

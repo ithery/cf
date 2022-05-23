@@ -7,13 +7,13 @@
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  */
+
 namespace PHPUnit\Framework;
 
 /**
  * @internal This class is not covered by the backward compatibility promise for PHPUnit
  */
-final class IncompleteTestCase extends TestCase
-{
+final class IncompleteTestCase extends TestCase {
     /**
      * @var bool
      */
@@ -34,15 +34,13 @@ final class IncompleteTestCase extends TestCase
      */
     private $message;
 
-    public function __construct($className, $methodName, $message = '')
-    {
+    public function __construct($className, $methodName, $message = '') {
         parent::__construct($className . '::' . $methodName);
 
         $this->message = $message;
     }
 
-    public function getMessage()
-    {
+    public function getMessage() {
         return $this->message;
     }
 
@@ -51,16 +49,14 @@ final class IncompleteTestCase extends TestCase
      *
      * @throws \SebastianBergmann\RecursionContext\InvalidArgumentException
      */
-    public function toString()
-    {
+    public function toString() {
         return $this->getName();
     }
 
     /**
      * @throws Exception
      */
-    protected function runTest()
-    {
+    protected function runTest() {
         $this->markTestIncomplete($this->message);
     }
 }

@@ -14,6 +14,8 @@ class CException_Context_ConsoleContext extends CException_ContextAbstract imple
         return [
             'arguments' => $this->arguments,
             'git' => $this->getGit(),
+            'app' => $this->getAppData(),
+            'debug' => $this->getDebugData(),
         ];
     }
 }

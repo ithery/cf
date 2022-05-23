@@ -11,6 +11,8 @@ defined('SYSPATH') or die('No direct access allowed.');
 final class CHelper {
     /**
      * @return \CHelper_File
+     *
+     * @deprecated 1.2, use CFile
      */
     public static function file() {
         return new CHelper_File();
@@ -53,6 +55,8 @@ final class CHelper {
 
     /**
      * @return \CHelper_Closure
+     *
+     * @deprecated since 1.3
      */
     public static function closure() {
         return new CHelper_Closure();

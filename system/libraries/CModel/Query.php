@@ -15,7 +15,7 @@ defined('SYSPATH') or die('No direct access allowed.');
  * @method static              CModel|CModel_Collection|static|null find($id, $columns = ['*'])                                             Find a model by its primary key.
  * @method static              CModel_Collection findMany($ids, $columns = ['*'])                                                           Find a model by its primary key.
  * @method static              CModel|CModel_Collection|static findOrFail($id, $columns = ['*'])                                            Find a model by its primary key or throw an exception.
- * @method static              CModel|CModel_Query|static|null first($columns = ['*'])                                                      Execute the query and get the first result.
+ * @method static              static|CModel|CModel_Query|null first($columns = ['*'])                                                      Execute the query and get the first result.
  * @method static              CModel|CModel_Query|static firstOrFail($columns = ['*'])                                                     Execute the query and get the first result or throw an exception.
  * @method static              CModel_Collection|CModel_Query[]|static[] get($columns = ['*'])                                              Execute the query as a "select" statement.
  * @method mixed               value($column)                                                                                               Get a single column's value from the first result of a query.
@@ -27,6 +27,7 @@ defined('SYSPATH') or die('No direct access allowed.');
  * @method array               eagerLoadRelations(array $models)                                                                            Eager load the relationships for the models.
  * @method array               loadRelation(array $models, $name, Closure $constraints)                                                     Eagerly load the relationship on a set of models.
  * @method static              CModel_Query|static where($column, $operator = null, $value = null, $boolean = 'and')                        Add a basic where clause to the query.
+ * @method static              CModel_Query|static whereHas($relation, Closure $callback = null, $operator = '>=', $count = 1)              Add a relationship count / exists condition to the query with where clauses.
  * @method static              CModel_Query|static orWhere($column, $operator = null, $value = null)                                        Add an "or where" clause to the query.
  * @method static              CModel_Query|static has($relation, $operator = '>=', $count = 1, $boolean = 'and', Closure $callback = null) Add a relationship count condition to the query.
  * @method static              CDatabase_Query_Builder|static whereRaw($sql, array $bindings = [])
@@ -67,6 +68,10 @@ defined('SYSPATH') or die('No direct access allowed.');
  * @method CModel_Query|static offset($value)
  * @method CModel_Query|static take($value)
  * @method CModel_Query|static limit($value)
+ * @method CModel_Query|static lockForUpdate()                                                                                              Lock the selected rows in the table for updating.
+ *
+ * @see CModel
+ * @see CDatabase_Query_Builder
  */
 class CModel_Query {
     use CDatabase_Trait_Builder,
@@ -121,7 +126,7 @@ class CModel_Query {
      * @var array
      */
     protected $passthru = [
-        'insert', 'insertGetId', 'getBindings', 'toSql', 'dump', 'dd',
+        'insert', 'insertGetId', 'getBindings', 'toSql', 'toCompiledSql', 'dump', 'dd',
         'exists', 'count', 'min', 'max', 'avg', 'sum', 'getConnection', 'raw',
     ];
 
@@ -184,7 +189,7 @@ class CModel_Query {
     /**
      * Remove a registered global scope.
      *
-     * @param \Illuminate\Database\Eloquent\Scope|string $scope
+     * @param \CModel_Interface_Scope|string $scope
      *
      * @return $this
      */
@@ -366,7 +371,7 @@ class CModel_Query {
      * @param mixed $id
      * @param array $columns
      *
-     * @throws \CModel_Exception_ModelNotFound
+     * @throws \CModel_Exception_ModelNotFoundException
      *
      * @return CModel|CModel_Collection
      */
@@ -381,7 +386,7 @@ class CModel_Query {
             return $result;
         }
 
-        throw (new CModel_Exception_ModelNotFound())->setModel(
+        throw (new CModel_Exception_ModelNotFoundException())->setModel(
             get_class($this->model),
             $id
         );
@@ -456,7 +461,7 @@ class CModel_Query {
      *
      * @param array $columns
      *
-     * @throws CModel_Exception_ModelNotFound
+     * @throws CModel_Exception_ModelNotFoundException
      *
      * @return CModel|static
      */
@@ -465,7 +470,7 @@ class CModel_Query {
             return $model;
         }
 
-        throw (new CModel_Exception_ModelNotFound())->setModel(get_class($this->model));
+        throw (new CModel_Exception_ModelNotFoundException())->setModel(get_class($this->model));
     }
 
     /**
@@ -722,7 +727,7 @@ class CModel_Query {
      * @param string      $column
      * @param null|string $key
      *
-     * @return \Illuminate\Support\Collection
+     * @return \CCollection
      */
     public function pluck($column, $key = null) {
         $results = $this->toBase()->pluck($column, $key);
@@ -815,7 +820,7 @@ class CModel_Query {
      *
      * @param array $attributes
      *
-     * @return \Illuminate\Database\Eloquent\Model|$this
+     * @return \CModel|$this
      */
     public function forceCreate(array $attributes) {
         return $this->model->unguarded(function () use ($attributes) {
@@ -1023,8 +1028,8 @@ class CModel_Query {
     /**
      * Nest where conditions by slicing them at the given where count.
      *
-     * @param \Illuminate\Database\Query\Builder $query
-     * @param int                                $originalWhereCount
+     * @param \CDatabase_Query_Builder $query
+     * @param int                      $originalWhereCount
      *
      * @return void
      */

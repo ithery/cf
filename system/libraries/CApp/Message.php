@@ -52,6 +52,7 @@ class CApp_Message {
         static::clear($type);
         if (strlen($message) > 0) {
             $alert = new CElement_Component_Alert();
+            $alert->addClass('capp-message');
             $header = ucfirst($type) . '!';
 
             $message = $alert->setType($type)

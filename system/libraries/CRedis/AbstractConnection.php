@@ -4,14 +4,14 @@ abstract class CRedis_AbstractConnection implements CRedis_ConnectionInterface {
     /**
      * The Redis client.
      *
-     * @var \Redis
+     * @var \Predis\ClientInterface
      */
     protected $client;
 
     /**
      * The Redis connection name.
      *
-     * @var string|null
+     * @var null|string
      */
     protected $name;
 
@@ -58,7 +58,7 @@ abstract class CRedis_AbstractConnection implements CRedis_ConnectionInterface {
     /**
      * Get the underlying Redis client.
      *
-     * @return \Redis
+     * @return \Predis\ClientInterface
      */
     public function client() {
         return $this->client;
@@ -103,6 +103,7 @@ abstract class CRedis_AbstractConnection implements CRedis_ConnectionInterface {
         if (isset($this->events)) {
             $this->event(new CRedis_Event_CommandExecuted($method, $parameters, $time, $this));
         }
+
         return $result;
     }
 
@@ -135,7 +136,7 @@ abstract class CRedis_AbstractConnection implements CRedis_ConnectionInterface {
     /**
      * Get the connection name.
      *
-     * @return string|null
+     * @return null|string
      */
     public function getName() {
         return $this->name;
@@ -150,6 +151,7 @@ abstract class CRedis_AbstractConnection implements CRedis_ConnectionInterface {
      */
     public function setName($name) {
         $this->name = $name;
+
         return $this;
     }
 

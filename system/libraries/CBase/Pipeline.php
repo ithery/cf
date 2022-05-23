@@ -148,7 +148,6 @@ class CBase_Pipeline implements CBase_PipelineInterface {
                         return $pipe($passable, $stack);
                     } elseif (!is_object($pipe)) {
                         list($name, $parameters) = $this->parsePipeString($pipe);
-
                         // If the pipe is a string we will parse the string and resolve the class out
                         // of the dependency injection container. We can then build a callable and
                         // execute the pipe function giving in the parameters that are required.

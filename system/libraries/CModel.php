@@ -9,9 +9,9 @@ defined('SYSPATH') or die('No direct access allowed.');
 /**
  * Class CModel.
  *
- * @method static                                     CModel|static|null find($id, $columns = ['*'])                                                               Find a model by its primary key.
+ * @method static                                     static|null find($id, $columns = ['*'])                                                                      Find a model by its primary key.
  * @method static                                     CModel_Collection findMany($ids, $columns = ['*'])                                                           Find a model by its primary key.
- * @method static                                     CModel|static findOrFail($id, $columns = ['*'])                                                              Find a model by its primary key or throw an exception.
+ * @method static                                     static findOrFail($id, $columns = ['*'])                                                                     Find a model by its primary key or throw an exception.
  * @method static                                     CModel|CModel_Query|static|null first($columns = ['*'])                                                      Execute the query and get the first result.
  * @method static                                     CModel|CModel_Query|static firstOrFail($columns = ['*'])                                                     Execute the query and get the first result or throw an exception.
  * @method static                                     CModel_Collection|CModel_Query[]|static[] get($columns = ['*'])                                              Execute the query as a "select" statement.
@@ -24,8 +24,8 @@ defined('SYSPATH') or die('No direct access allowed.');
  * @method void                                       onDelete(Closure $callback)                                                                                  Register a replacement for the default delete function.
  * @method CModel[]                                   getModels($columns = ['*'])                                                                                  Get the hydrated models without eager loading.
  * @method array                                      eagerLoadRelations(array $models)                                                                            Eager load the relationships for the models.
- * @method array                                      loadRelation(array $models, $name, Closure $constraints)                                                     Eagerly load the relationship on a set of models.
  * @method static                                     CModel_Query|static where($column, $operator = null, $value = null, $boolean = 'and')                        Add a basic where clause to the query.
+ * @method static                                     CModel_Query|static whereHas($relation, Closure $callback = null, $operator = '>=', $count = 1)              Add a relationship count / exists condition to the query with where clauses.
  * @method static                                     CModel_Query|static orWhere($column, $operator = null, $value = null)                                        Add an "or where" clause to the query.
  * @method static                                     CModel_Query|static has($relation, $operator = '>=', $count = 1, $boolean = 'and', Closure $callback = null) Add a relationship count condition to the query.
  * @method static                                     CModel_Query|static whereRaw($sql, array $bindings = [])
@@ -67,6 +67,9 @@ defined('SYSPATH') or die('No direct access allowed.');
  * @method static                                     CModel_Query|static offset($value)
  * @method static                                     CModel_Query|static take($value)
  * @method static                                     CModel_Query|static limit($value)
+ * @method static                                     CModel_Query|static lockForUpdate()                                                                          Lock the selected rows in the table for updating.
+ *
+ * @see CModel_Query
  */
 abstract class CModel implements ArrayAccess, CInterface_Arrayable, CInterface_Jsonable, CQueue_QueueableEntityInterface {
     use CModel_Trait_GuardsAttributes,
@@ -221,11 +224,39 @@ abstract class CModel implements ArrayAccess, CInterface_Arrayable, CInterface_J
     protected static $booted = [];
 
     /**
+     * The array of trait initializers that will be called on each new instance.
+     *
+     * @var array
+     */
+    protected static $traitInitializers = [];
+
+    /**
      * The array of global scopes on the model.
      *
      * @var array
      */
     protected static $globalScopes = [];
+
+    /**
+     * The list of models classes that should not be affected with touch.
+     *
+     * @var array
+     */
+    protected static $ignoreOnTouch = [];
+
+    /**
+     * Indicates whether lazy loading should be restricted on all models.
+     *
+     * @var bool
+     */
+    protected static $modelsShouldPreventLazyLoading = false;
+
+    /**
+     * The callback that is responsible for handling lazy loading violations.
+     *
+     * @var null|callable
+     */
+    protected static $lazyLoadingViolationCallback;
 
     /**
      * The array of mapping model class.
@@ -270,9 +301,10 @@ abstract class CModel implements ArrayAccess, CInterface_Arrayable, CInterface_J
      * @return void
      */
     public function __construct(array $attributes = []) {
-        $this->primaryKey = $this->table . '_id';
+        $this->primaryKey = $this->table ? $this->table . '_id' : 'id';
         $this->bootIfNotBooted();
 
+        $this->initializeTraits();
         $this->syncOriginal();
 
         $this->fill($attributes);
@@ -320,12 +352,33 @@ abstract class CModel implements ArrayAccess, CInterface_Arrayable, CInterface_J
     protected static function bootTraits() {
         $class = static::class;
         $booted = [];
+        static::$traitInitializers[$class] = [];
         foreach (c::classUsesRecursive($class) as $trait) {
             $method = 'boot' . c::classBasename($trait);
             $classMethod = $class . $method;
             if (method_exists($class, $method) && !in_array($classMethod, $booted)) {
                 forward_static_call([$class, $method]);
                 $booted[] = $classMethod;
+            }
+            if (method_exists($class, $method = 'initialize' . c::classBasename($trait))) {
+                static::$traitInitializers[$class][] = $method;
+
+                static::$traitInitializers[$class] = array_unique(
+                    static::$traitInitializers[$class]
+                );
+            }
+        }
+    }
+
+    /**
+     * Initialize any initializable traits on the model.
+     *
+     * @return void
+     */
+    protected function initializeTraits() {
+        if (isset(static::$traitInitializers[static::class])) {
+            foreach (static::$traitInitializers[static::class] as $method) {
+                $this->{$method}();
             }
         }
     }
@@ -1193,7 +1246,7 @@ abstract class CModel implements ArrayAccess, CInterface_Arrayable, CInterface_J
      *
      * @param null|array $except
      *
-     * @return \CModel
+     * @return \static
      */
     public function replicate(array $except = null) {
         $defaults = [
@@ -1646,15 +1699,6 @@ abstract class CModel implements ArrayAccess, CInterface_Arrayable, CInterface_J
     }
 
     /**
-     * When a model is being unserialized, check if it needs to be booted.
-     *
-     * @return void
-     */
-    public function __wakeup() {
-        $this->bootIfNotBooted();
-    }
-
-    /**
      * @return bool
      */
     public static function usesSoftDelete() {
@@ -1682,5 +1726,29 @@ abstract class CModel implements ArrayAccess, CInterface_Arrayable, CInterface_J
         }
 
         return false;
+    }
+
+    /**
+     * Prepare the object for serialization.
+     *
+     * @return array
+     */
+    public function __sleep() {
+        $this->mergeAttributesFromCachedCasts();
+
+        $this->classCastCache = [];
+        $this->attributeCastCache = [];
+
+        return array_keys(get_object_vars($this));
+    }
+
+    /**
+     * When a model is being unserialized, check if it needs to be booted.
+     *
+     * @return void
+     */
+    public function __wakeup() {
+        $this->bootIfNotBooted();
+        $this->initializeTraits();
     }
 }

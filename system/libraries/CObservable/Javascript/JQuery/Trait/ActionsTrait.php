@@ -10,20 +10,10 @@ defined('SYSPATH') or die('No direct access allowed.');
  */
 trait CObservable_Javascript_JQuery_Trait_ActionsTrait {
     /**
-     * @return string
-     */
-    abstract public function getSelector();
-
-    abstract public function resetJQueryStatement();
-
-    abstract public function jQueryStatement();
-
-    abstract public function filterArgs();
-
-    /**
      * @param string $class
      */
     public function addClass($class = '') {
+        /** @var CObservable_Javascript_JQuery $this */
         $this->jQueryStatement()->addClass($class);
         $this->resetJQueryStatement();
 
@@ -31,30 +21,39 @@ trait CObservable_Javascript_JQuery_Trait_ActionsTrait {
     }
 
     public function after($element) {
+        /** @var CObservable_Javascript_JQuery $this */
         $this->jQueryStatement()->after($element);
         $this->resetJQueryStatement();
+
         return $this;
     }
 
     public function before($element) {
+        /** @var CObservable_Javascript_JQuery $this */
         $this->jQueryStatement()->before($element);
         $this->resetJQueryStatement();
+
         return $this;
     }
 
     public function prepend($element) {
+        /** @var CObservable_Javascript_JQuery $this */
         $this->jQueryStatement()->prepend($element);
         $this->resetJQueryStatement();
+
         return $this;
     }
 
     public function append($element) {
+        /** @var CObservable_Javascript_JQuery $this */
         $this->jQueryStatement()->append($element);
         $this->resetJQueryStatement();
+
         return $this;
     }
 
     public function val() {
+        /** @var CObservable_Javascript_JQuery $this */
         $args = func_get_args();
         $object = $this->jQueryStatement();
         $object = call_user_func_array([$object, 'val'], $args);
@@ -63,10 +62,12 @@ trait CObservable_Javascript_JQuery_Trait_ActionsTrait {
         if (count($args) == 0) {
             return $statement;
         }
+
         return $this;
     }
 
     public function html() {
+        /** @var CObservable_Javascript_JQuery $this */
         $args = func_get_args();
         $object = $this->jQueryStatement();
         $args = $this->filterArgs($args);
@@ -77,10 +78,12 @@ trait CObservable_Javascript_JQuery_Trait_ActionsTrait {
         if (count($args) == 0) {
             return $statement;
         }
+
         return $this;
     }
 
     public function find() {
+        /** @var CObservable_Javascript_JQuery $this */
         $args = func_get_args();
         $object = $this->jQueryStatement();
         $object = call_user_func_array([$object, 'find'], $args);
@@ -88,48 +91,63 @@ trait CObservable_Javascript_JQuery_Trait_ActionsTrait {
             return $this;
         }
         $this->resetJQueryStatement();
+
         return $this;
     }
 
     public function remove() {
+        /** @var CObservable_Javascript_JQuery $this */
         $this->jQueryStatement()->remove();
         $this->resetJQueryStatement();
+
         return $this;
     }
 
     public function detach() {
+        /** @var CObservable_Javascript_JQuery $this */
         $this->jQueryStatement()->detach();
         $this->resetJQueryStatement();
+
         return $this;
     }
 
     public function appendTo(CObservable $to) {
+        /** @var CObservable_Javascript_JQuery $this */
         $this->jQueryStatement()->appendTo($to->jquery()->getSelector());
         $this->resetJQueryStatement();
+
         return $this;
     }
 
     public function trigger($eventName) {
+        /** @var CObservable_Javascript_JQuery $this */
         $this->jQueryStatement()->trigger($eventName);
         $this->resetJQueryStatement();
+
         return $this;
     }
 
     public function hide() {
+        /** @var CObservable_Javascript_JQuery $this */
         $this->jQueryStatement()->hide();
         $this->resetJQueryStatement();
+
         return $this;
     }
 
     public function show() {
+        /** @var CObservable_Javascript_JQuery $this */
         $this->jQueryStatement()->show();
         $this->resetJQueryStatement();
+
         return $this;
     }
 
     public function toggle() {
+        /** @var CObservable_Javascript_JQuery $this */
         $this->jQueryStatement()->toggle();
         $this->resetJQueryStatement();
+
         return $this;
     }
 }

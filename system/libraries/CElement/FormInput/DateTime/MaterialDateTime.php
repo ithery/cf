@@ -10,9 +10,13 @@ defined('SYSPATH') or die('No direct access allowed.');
  */
 class CElement_FormInput_DateTime_MaterialDateTime extends CElement_FormInput_DateTime {
     protected $dateTimeFormat;
+
     protected $disableYesterday;
+
     protected $disableTomorrow;
+
     protected $disableDate;
+
     protected $disableTime;
 
     public function __construct($id) {
@@ -25,7 +29,7 @@ class CElement_FormInput_DateTime_MaterialDateTime extends CElement_FormInput_Da
         $this->disableDate = false;
         $this->disableTime = false;
 
-        $dateTimeFormat = ccfg::get('long_date_formatted');
+        $dateTimeFormat = c::formatter()->getDatetimeFormat();
         if ($dateTimeFormat != null) {
             $dateTimeFormat = str_replace('Y', 'YYYY', $dateTimeFormat);
             $dateTimeFormat = str_replace('m', 'MM', $dateTimeFormat);
@@ -38,30 +42,39 @@ class CElement_FormInput_DateTime_MaterialDateTime extends CElement_FormInput_Da
         }
     }
 
+    public static function factory($id = null) {
+        return new static($id);
+    }
+
     public function setDateTimeFormat($format) {
         $this->dateTimeFormat = $format;
+
         return $this;
     }
 
     public function setDisableYesterday($bool = true) {
         $this->disableYesterday = $bool;
+
         return $this;
     }
 
     public function setDisableTomorrow($bool = true) {
         $this->disableTomorrow = $bool;
+
         return $this;
     }
 
     public function setDisableDate($bool = true) {
         $this->dateTimeFormat = 'HH:mm';
         $this->disableDate = $bool;
+
         return $this;
     }
 
     public function setDisableTime($bool = true) {
         $this->dateTimeFormat = 'YYYY-MM-DD';
         $this->disableTime = $bool;
+
         return $this;
     }
 
@@ -102,6 +115,7 @@ class CElement_FormInput_DateTime_MaterialDateTime extends CElement_FormInput_Da
         //$option .= " ,minDate : new Date()";
 
         $js->append("$('#" . $this->id . "').bootstrapMaterialDatePicker({" . $option . '});')->br();
+
         return $js->text();
     }
 }

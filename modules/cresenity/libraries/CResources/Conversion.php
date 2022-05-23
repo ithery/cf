@@ -10,26 +10,46 @@ defined('SYSPATH') or die('No direct access allowed.');
  */
 
 /** @mixin CImage_Manipulations */
+/**
+ * @mixin CImage_Manipulations
+ *
+ * @method static width($width);
+ * @method static height($height)
+ */
 class CResources_Conversion {
-    /** @var string */
+    /**
+     * @var string
+     */
     protected $name = '';
 
-    /** @var int */
+    /**
+     * @var int
+     */
     protected $extractVideoFrameAtSecond = 0;
 
-    /** @var CImage_Manipulations */
+    /**
+     * @var CImage_Manipulations
+     */
     protected $manipulations;
 
-    /** @var array */
+    /**
+     * @var array
+     */
     protected $performOnCollections = [];
 
-    /** @var bool */
+    /**
+     * @var bool
+     */
     protected $performOnQueue = true;
 
-    /** @var bool */
+    /**
+     * @var bool
+     */
     protected $keepOriginalImageFormat = false;
 
-    /** @var bool */
+    /**
+     * @var bool
+     */
     protected $generateResponsiveImages = false;
 
     public function __construct($name) {
@@ -55,6 +75,7 @@ class CResources_Conversion {
      */
     public function extractVideoFrameAtSecond($timeCode) {
         $this->extractVideoFrameAtSecond = $timeCode;
+
         return $this;
     }
 
@@ -64,6 +85,7 @@ class CResources_Conversion {
 
     public function keepOriginalImageFormat() {
         $this->keepOriginalImageFormat = true;
+
         return $this;
     }
 
@@ -80,11 +102,13 @@ class CResources_Conversion {
 
     public function removeManipulation($manipulationName) {
         $this->manipulations->removeManipulation($manipulationName);
+
         return $this;
     }
 
     public function withoutManipulations() {
         $this->manipulations = new CImage_Manipulations();
+
         return $this;
     }
 
@@ -93,6 +117,7 @@ class CResources_Conversion {
             throw new BadMethodCallException("Manipulation `{$name}` does not exist");
         }
         $this->manipulations->$name(...$arguments);
+
         return $this;
     }
 
@@ -110,13 +135,14 @@ class CResources_Conversion {
         if (is_callable($manipulations)) {
             $manipulations($this->manipulations);
         }
+
         return $this;
     }
 
     /**
      * Add the given manipulations as the first ones.
      *
-     * @param \Spatie\Image\Manipulations $manipulations
+     * @param \CImage_Manipulations $manipulations
      *
      * @return $this
      */
@@ -125,18 +151,20 @@ class CResources_Conversion {
         $this->manipulations
             ->getManipulationSequence()
             ->mergeArray($manipulationSequence);
+
         return $this;
     }
 
     /**
      * Set the collection names on which this conversion must be performed.
      *
-     * @param  $collectionNames
+     * @param $collectionNames
      *
      * @return $this
      */
     public function performOnCollections(...$collectionNames) {
         $this->performOnCollections = $collectionNames;
+
         return $this;
     }
 
@@ -154,6 +182,7 @@ class CResources_Conversion {
         if (in_array('*', $this->performOnCollections)) {
             return true;
         }
+
         return in_array($collectionName, $this->performOnCollections);
     }
 
@@ -164,6 +193,7 @@ class CResources_Conversion {
      */
     public function queued() {
         $this->performOnQueue = true;
+
         return $this;
     }
 
@@ -174,6 +204,7 @@ class CResources_Conversion {
      */
     public function nonQueued() {
         $this->performOnQueue = false;
+
         return $this;
     }
 
@@ -184,6 +215,7 @@ class CResources_Conversion {
      */
     public function nonOptimized() {
         $this->removeManipulation('optimize');
+
         return $this;
     }
 
@@ -192,6 +224,7 @@ class CResources_Conversion {
      */
     public function withResponsiveImages() {
         $this->generateResponsiveImages = true;
+
         return $this;
     }
 
@@ -223,6 +256,7 @@ class CResources_Conversion {
         if ($manipulationArgument = $this->manipulations->getManipulationArgument('format')) {
             return $manipulationArgument;
         }
+
         return $originalFileExtension;
     }
 
@@ -232,6 +266,7 @@ class CResources_Conversion {
         if (!$extension) {
             $extension = pathinfo($file, PATHINFO_EXTENSION);
         }
+
         return "{$fileName}-{$this->getName()}.{$extension}";
     }
 }

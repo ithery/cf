@@ -22,6 +22,7 @@ class CQueue_Runner {
      * @var CCache_Repository
      */
     protected $cache;
+
     protected static $listenedForEvents = false;
 
     /**
@@ -36,12 +37,14 @@ class CQueue_Runner {
      *
      * @param CQueue_Worker     $worker
      * @param CCache_Repository $cache
+     * @param array             $options
      *
      * @return void
      */
-    public function __construct(CQueue_Worker $worker, CCache_Repository $cache = null) {
+    public function __construct(CQueue_Worker $worker, CCache_Repository $cache = null, array $options = []) {
         $this->cache = $cache;
         $this->worker = $worker;
+        $this->options = $options;
     }
 
     public function run($connection = null, $queue = null) {
@@ -52,6 +55,7 @@ class CQueue_Runner {
         if ($this->downForMaintenance() && $this->getOption('once')) {
             return $this->worker->sleep($this->getOption('sleep'));
         }
+
         // We'll listen to the processed and failed events so we can write information
         // to the console as jobs are processed, which will let the developer watch
         // which jobs are coming through a queue and be informed on its progress.
@@ -76,6 +80,7 @@ class CQueue_Runner {
      */
     protected function runWorker($connection, $queue) {
         $this->worker->setCache($this->cache);
+
         return $this->worker->{$this->getOption('once') ? 'runNextJob' : 'daemon'}(
             $connection,
             $queue,
@@ -89,13 +94,17 @@ class CQueue_Runner {
 
     protected function gatherWorkerOptions() {
         return new CQueue_WorkerOptions(
-            $this->getOption('delay'),
+            $this->getOption('name'),
+            max($this->getOption('backoff'), $this->getOption('delay')),
             $this->getOption('memory'),
             $this->getOption('timeout'),
             $this->getOption('sleep'),
-            $this->getOption('tries'),
+            $this->getOption('maxTries'),
             $this->getOption('force'),
-            $this->getOption('stopWhenEmpty')
+            $this->getOption('stopWhenEmpty'),
+            $this->getOption('maxJobs'),
+            $this->getOption('maxTime'),
+            $this->getOption('rest')
         );
         //return new CQueue_WorkerOptions();
     }
@@ -106,8 +115,7 @@ class CQueue_Runner {
      * @return bool
      */
     protected function downForMaintenance() {
-        //return $this->getOption('force') ? false : $this->laravel->isDownForMaintenance();
-        return false;
+        return $this->getOption('force') ? false : CF::isDownForMaintenance();
     }
 
     /**
@@ -207,21 +215,42 @@ class CQueue_Runner {
 
     public function setOption($name, $value) {
         $this->options[$name] = $value;
+
         return $this;
     }
 
     protected function getOption($name) {
         $defaultOptions = [];
-
+        //The name of the worker
+        $defaultOptions['name'] = 'default';
+        //The number of seconds to delay failed jobs (Deprecated)
         $defaultOptions['delay'] = 0;
+        //The number of seconds to wait before retrying a job that encountered an uncaught exception
+        $defaultOptions['backoff'] = 0;
+        //The number of jobs to process before stopping
+        $defaultOptions['maxJobs'] = 0;
+        //The maximum number of seconds the worker should run
+        $defaultOptions['maxTime'] = 0;
+        //The memory limit in megabytes
         $defaultOptions['memory'] = 1024;
+        //The number of seconds a child process can run
         $defaultOptions['timeout'] = 300;
-        $defaultOptions['sleep'] = 0;
-        $defaultOptions['maxTries'] = 1;
+        //Force the worker to run even in maintenance mode
         $defaultOptions['force'] = false;
+        //Number of seconds to sleep when no job is available
+        $defaultOptions['sleep'] = 3;
+        //Number of times to attempt a job before logging it failed
+        $defaultOptions['maxTries'] = 1;
+        //Stop when the queue is empty
         $defaultOptions['stopWhenEmpty'] = false;
+        //Only process the next job on the queue
         $defaultOptions['once'] = true;
         $options = array_merge($defaultOptions, $this->options);
+
         return carr::get($options, $name);
+    }
+
+    public function getCurrentJobName() {
+        return $this->worker->getCurrentJobName();
     }
 }

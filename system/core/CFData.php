@@ -31,7 +31,6 @@ final class CFData {
 
     public static function get($dataName, $folder = '') {
         $file = static::getFile($dataName, $folder);
-
         if (file_exists($file . EXT)) {
             return self::load_value($file . EXT);
         }

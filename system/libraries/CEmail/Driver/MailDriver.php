@@ -7,12 +7,16 @@ class CEmail_Driver_MailDriver extends CEmail_DriverAbstract {
         $headers = [];
 
         foreach (['cc' => 'Cc', 'bcc' => 'Bcc', 'reply_to' => 'Reply-To'] as $key => $headerKey) {
-            $value = $this->formatAddresses(carr::get($options, $key));
-            $headers[$headerKey] = $value;
+            $value = $this->formatAddresses(carr::get($options, $key, []));
+            if (!empty($value)) {
+                $headers[$headerKey] = $value;
+            }
         }
         $response = @mail($addresses, $subject, $body, $headers, '-oi -f ' . $returnPath);
         if ($response === false) {
-            throw new \CEmail_Exception_EmailSendingFailedException('Failed sending email');
+            $lastErrorMessage = carr::get(error_get_last(), 'message');
+
+            throw new \CEmail_Exception_EmailSendingFailedException('Failed sending email:' . ($lastErrorMessage ?: 'unknown'));
         }
 
         return $response;

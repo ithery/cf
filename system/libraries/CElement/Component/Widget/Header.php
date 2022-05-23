@@ -11,6 +11,7 @@ defined('SYSPATH') or die('No direct access allowed.');
 class CElement_Component_Widget_Header extends CElement_Element {
     use CTrait_Element_Property_Icon,
         CTrait_Element_Property_Title;
+
     /**
      * @var CElement_List_ActionList
      */
@@ -43,6 +44,9 @@ class CElement_Component_Widget_Header extends CElement_Element {
         return $this->parent;
     }
 
+    /**
+     * @return CElement_List_ActionList
+     */
     public function actions() {
         if ($this->actions == null) {
             $this->actions = CElement_Factory::createList('ActionList', $this->parent->id . '_header');

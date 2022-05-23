@@ -2,13 +2,6 @@
 
 class CApp_SEO_OpenGraph implements CApp_SEO_OpenGraphInterface {
     /**
-     * Singleton instance of this class.
-     *
-     * @var CApp_SEO_OpenGraph
-     */
-    protected $instance = null;
-
-    /**
      * OpenGraph Prefix.
      *
      * @var string
@@ -147,6 +140,13 @@ class CApp_SEO_OpenGraph implements CApp_SEO_OpenGraphInterface {
      * @var array
      */
     protected $images = [];
+
+    /**
+     * Singleton instance of this class.
+     *
+     * @var CApp_SEO_OpenGraph
+     */
+    private static $instance = null;
 
     private function __construct() {
         $this->config = CF::config('seo.opengraph');

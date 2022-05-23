@@ -8,6 +8,7 @@ class CDatabase {
     use CTrait_Compat_Database;
     use CDatabase_Trait_DetectDeadlock;
     use CDatabase_Trait_DetectLostConnection;
+    use CDatabase_Trait_DetectConcurrencyErrors;
     use CDatabase_Trait_ManageTransaction;
 
     /**
@@ -28,6 +29,8 @@ class CDatabase {
 
     public $name;
 
+    protected $isBenchmarkQuery;
+
     /**
      * Default Database.
      *
@@ -36,6 +39,8 @@ class CDatabase {
     protected static $defaultConnection = 'default';
 
     /**
+     * Instance of schema manager.
+     *
      * @var CDatabase_Schema_Manager
      */
     protected $schemaManager;
@@ -44,6 +49,11 @@ class CDatabase {
      * @var CDatabase_Platform
      */
     protected $platform;
+
+    /**
+     * @var CDatabase_Driver_Mysqli
+     */
+    protected $driver;
 
     /**
      * @var string
@@ -68,13 +78,6 @@ class CDatabase {
         'cache' => false,
         'escape' => true,
     ];
-
-    /**
-     * @var CDatabase_Driver_Mysqli
-     */
-    protected $driver;
-
-    protected $driver_name;
 
     protected $link;
 
@@ -112,6 +115,11 @@ class CDatabase {
      * @var CDatabase_Query_Grammar_Processor
      */
     protected $postProcessor;
+
+    /**
+     * @var CDatabase_TransactionManager
+     */
+    protected $transactionManager;
 
     /**
      * Sets up the database configuration, loads the CDatabase_Driver.
@@ -164,6 +172,7 @@ class CDatabase {
         $this->name = $configName;
         // Merge the default config with the passed config
         $this->config = array_merge($this->config, $config);
+        $this->isBenchmarkQuery = carr::get($this->config, 'benchmark', false);
 
         if (is_string($this->config['connection'])) {
             // Make sure the connection is valid
@@ -254,12 +263,12 @@ class CDatabase {
         $this->events = CEvent::dispatcher();
         CModel::setEventDispatcher($this->events);
         $this->configuration = new CDatabase_Configuration();
-
         // Validate the driver
         if (!($this->driver instanceof CDatabase_Driver)) {
             throw new CDatabase_Exception('The :driver driver for the :class library must implement the :interface interface', [':driver' => $driver, ':class' => get_class($this), ':interface' => 'CDatabase_Driver']);
         }
 
+        $this->transactionManager = new CDatabase_TransactionManager();
         CF::log(CLogger::DEBUG, 'Database Library initialized');
     }
 
@@ -1145,8 +1154,12 @@ class CDatabase {
         return carr::get($this->config, 'log', false);
     }
 
+    public function enableBenchmark() {
+        $this->isBenchmarkQuery = true;
+    }
+
     public function isBenchmarkQuery() {
-        return carr::get($this->config, 'benchmark', false);
+        return $this->isBenchmarkQuery;
     }
 
     public function benchmarkQuery($query, $time = null, $rowsCount = null) {
@@ -1360,6 +1373,41 @@ class CDatabase {
 
     public function getTablePrefix() {
         return carr::get($this->config, 'table_prefix');
+    }
+
+    /**
+     * Get a Doctrine Schema Column instance.
+     *
+     * @param string $table
+     * @param string $column
+     *
+     * @return \CDatabase_Schema_Column
+     */
+    public function getColumn($table, $column) {
+        $schema = $this->getSchemaManager();
+
+        return $schema->listTableDetails($table)->getColumn($column);
+    }
+
+    public static function resetBenchmarks() {
+        static::$benchmarks = [];
+    }
+
+    public static function getBenchmarks() {
+        return static::$benchmarks;
+    }
+
+    public static function manager() {
+        return CDatabase_Manager::instance();
+    }
+
+    /**
+     * Reconnect to the database if a PDO connection is missing.
+     *
+     * @return void
+     */
+    protected function reconnectIfMissingConnection() {
+        $this->driver->reconnect();
     }
 }
 

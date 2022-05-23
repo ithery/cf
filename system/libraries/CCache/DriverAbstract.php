@@ -8,7 +8,7 @@ defined('SYSPATH') or die('No direct access allowed.');
 abstract class CCache_DriverAbstract implements CCache_DriverInterface {
     protected $options = [];
 
-    public function __construct($options) {
+    public function __construct($options = []) {
         $this->options = $options;
     }
 

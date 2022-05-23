@@ -1,12 +1,12 @@
 <?php
 
 /**
- * Description of ComposerCommand
+ * Description of ComposerCommand.
  *
  * @author Hery
  */
-use Symfony\Component\Process\PhpExecutableFinder;
 use Symfony\Component\Process\Process;
+use Symfony\Component\Process\PhpExecutableFinder;
 
 class CConsole_Command_TestInstallCommand extends CConsole_Command {
     /**
@@ -75,9 +75,11 @@ class CConsole_Command_TestInstallCommand extends CConsole_Command {
 
             if ($errCode > 0) {
                 $this->error($errMessage);
+
                 return false;
             }
         }
+
         return true;
     }
 
@@ -94,6 +96,7 @@ class CConsole_Command_TestInstallCommand extends CConsole_Command {
                 exit(1);
             }
             $content = CFile::get($stubFile);
+            $content = str_replace('{APP_CODE}', CF::appCode(), $content);
             CFile::put($configFile, $content);
             $this->info('PHPUnit configuration ' . basename($configFile) . ' created on ' . $configFile);
         }

@@ -6,6 +6,7 @@ defined('SYSPATH') or die('No direct access allowed.');
  * @author Hery Kurniawan
  * @license Ittron Global Teknologi <ittron.co.id>
  *
+ * @see CDatabase
  * @since Jun 30, 2019, 7:10:21 PM
  */
 trait CDatabase_Trait_ManageTransaction {
@@ -17,9 +18,9 @@ trait CDatabase_Trait_ManageTransaction {
      * @param \Closure $callback
      * @param int      $attempts
      *
-     * @return mixed
-     *
      * @throws \Exception|\Throwable
+     *
+     * @return mixed
      */
     public function transaction(Closure $callback, $attempts = 1) {
         for ($currentAttempt = 1; $currentAttempt <= $attempts; $currentAttempt++) {
@@ -28,9 +29,7 @@ trait CDatabase_Trait_ManageTransaction {
             // catch any exception we can rollback this transaction so that none of this
             // gets actually persisted to a database or stored in a permanent fashion.
             try {
-                return CF::tap($callback($this), function () {
-                    $this->commit();
-                });
+                $callbackResult = $callback($this);
             } catch (Exception $e) {
                 // If we catch an exception we'll rollback this transaction and try again if we
                 // are not out of attempts. If we are out of attempts we will just throw the
@@ -42,8 +41,43 @@ trait CDatabase_Trait_ManageTransaction {
                 );
             } catch (Throwable $e) {
                 $this->rollBack();
+
                 throw $e;
             }
+
+            try {
+                if ($this->transactions == 1) {
+                    $this->commit();
+                }
+
+                $this->transactions = max(0, $this->transactions - 1);
+
+                if ($this->transactions == 0) {
+                    if ($this->transactionManager) {
+                        $this->transactionManager->commit($this->getName());
+                    }
+                }
+            } catch (Exception $e) {
+                $this->handleCommitTransactionException(
+                    $e,
+                    $currentAttempt,
+                    $attempts
+                );
+
+                continue;
+            } catch (Throwable $e) {
+                $this->handleCommitTransactionException(
+                    $e,
+                    $currentAttempt,
+                    $attempts
+                );
+
+                continue;
+            }
+
+            $this->fireConnectionEvent('committed');
+
+            return $callbackResult;
         }
     }
 
@@ -54,9 +88,9 @@ trait CDatabase_Trait_ManageTransaction {
      * @param int        $currentAttempt
      * @param int        $maxAttempts
      *
-     * @return void
-     *
      * @throws \Exception
+     *
+     * @return void
      */
     protected function handleTransactionException($e, $currentAttempt, $maxAttempts) {
         // On a deadlock, MySQL rolls back the entire transaction so we can't just
@@ -66,6 +100,7 @@ trait CDatabase_Trait_ManageTransaction {
             && $this->transactions > 1
         ) {
             $this->transactions--;
+
             throw $e;
         }
         // If there was an exception we will rollback this transaction and then we
@@ -75,6 +110,7 @@ trait CDatabase_Trait_ManageTransaction {
         if ($this->causedByDeadlock($e) && $currentAttempt < $maxAttempts) {
             return;
         }
+
         throw $e;
     }
 
@@ -83,25 +119,31 @@ trait CDatabase_Trait_ManageTransaction {
      *
      * @param bool $isSavePoint
      *
-     * @return void
-     *
      * @throws \Exception
+     *
+     * @return void
      */
     public function beginTransaction($isSavePoint = true) {
-        if ($this->transactions == 0) {
-            $this->isSavePoint = $isSavePoint;
-        }
         $this->createTransaction();
+
         $this->transactions++;
+
+        if ($this->transactionManager) {
+            $this->transactionManager->begin(
+                $this->getName(),
+                $this->transactions
+            );
+        }
+
         $this->fireConnectionEvent('beganTransaction');
     }
 
     /**
-     * Alias of beginTransaction but will not create save point
-     *
-     * @return void
+     * Alias of beginTransaction but will not create save point.
      *
      * @throws \Exception
+     *
+     * @return void
      */
     public function begin() {
         return $this->beginTransaction(false);
@@ -113,15 +155,12 @@ trait CDatabase_Trait_ManageTransaction {
      * @return void
      */
     protected function createTransaction() {
-        if ($this->transactions > 0 && !$this->isSavePoint) {
-            //no need to handle this transaction
-
-            return;
-        }
         if ($this->transactions == 0) {
+            $this->reconnectIfMissingConnection();
+
             try {
                 $this->driver->beginTransaction();
-            } catch (Exception $e) {
+            } catch (Throwable $e) {
                 $this->handleBeginTransactionException($e);
             }
         } elseif ($this->transactions >= 1 && $this->getQueryGrammar()->supportsSavepoints()) {
@@ -145,9 +184,9 @@ trait CDatabase_Trait_ManageTransaction {
      *
      * @param \Throwable $e
      *
-     * @return void
-     *
      * @throws \Exception
+     *
+     * @return void
      */
     protected function handleBeginTransactionException($e) {
         if ($this->causedByLostConnection($e)) {
@@ -168,23 +207,59 @@ trait CDatabase_Trait_ManageTransaction {
             $this->driver->commit();
         }
         $this->transactions = max(0, $this->transactions - 1);
+
+        if ($this->transactions == 0) {
+            if ($this->transactionManager) {
+                $this->transactionManager->commit($this->getName());
+            }
+        }
         $this->fireConnectionEvent('committed');
+    }
+
+    /**
+     * Handle an exception encountered when committing a transaction.
+     *
+     * @param \Throwable $e
+     * @param int        $currentAttempt
+     * @param int        $maxAttempts
+     *
+     * @throws \Throwable
+     *
+     * @return void
+     */
+    protected function handleCommitTransactionException($e, $currentAttempt, $maxAttempts) {
+        $this->transactions = max(0, $this->transactions - 1);
+
+        if ($this->causedByConcurrencyError($e)
+            && $currentAttempt < $maxAttempts
+        ) {
+            return;
+        }
+
+        if ($this->causedByLostConnection($e)) {
+            $this->transactions = 0;
+        }
+
+        throw $e;
     }
 
     /**
      * Rollback the active database transaction.
      *
-     * @param int|null $toLevel
-     *
-     * @return void
+     * @param null|int $toLevel
      *
      * @throws \Exception
+     *
+     * @return void
      */
     public function rollback($toLevel = null) {
         // We allow developers to rollback to a certain transaction level. We will verify
         // that this given transaction level is valid before attempting to rollback to
         // that level. If it's not we will just return out and not attempt anything.
-        $toLevel = is_null($toLevel) ? $this->transactions - 1 : $toLevel;
+        $toLevel = is_null($toLevel)
+                    ? $this->transactions - 1
+                    : $toLevel;
+
         if ($toLevel < 0 || $toLevel >= $this->transactions) {
             return;
         }
@@ -193,10 +268,19 @@ trait CDatabase_Trait_ManageTransaction {
         // level that was passed into this method so it will be right from here out.
         try {
             $this->performRollBack($toLevel);
-        } catch (Exception $e) {
+        } catch (Throwable $e) {
             $this->handleRollBackException($e);
         }
+
         $this->transactions = $toLevel;
+
+        if ($this->transactionManager) {
+            $this->transactionManager->rollback(
+                $this->getName(),
+                $this->transactions
+            );
+        }
+
         $this->fireConnectionEvent('rollingBack');
     }
 
@@ -208,7 +292,8 @@ trait CDatabase_Trait_ManageTransaction {
      * @return void
      */
     protected function performRollBack($toLevel) {
-        if ($toLevel == 0 || $this->isSavePoint == false) {
+        /** @var CDatabase $this */
+        if ($toLevel == 0) {
             $this->driver->rollBack();
         } elseif ($this->getQueryGrammar()->supportsSavepoints()) {
             $this->driver->query(
@@ -227,7 +312,14 @@ trait CDatabase_Trait_ManageTransaction {
     protected function handleRollBackException($e) {
         if ($this->causedByLostConnection($e)) {
             $this->transactions = 0;
+            if ($this->transactionManager) {
+                $this->transactionManager->rollback(
+                    $this->getName(),
+                    $this->transactions
+                );
+            }
         }
+
         throw $e;
     }
 
@@ -245,5 +337,22 @@ trait CDatabase_Trait_ManageTransaction {
      */
     public function inTransaction() {
         return $this->transactions > 0;
+    }
+
+    /**
+     * Execute the callback after a transaction commits.
+     *
+     * @param callable $callback
+     *
+     * @throws \RuntimeException
+     *
+     * @return void
+     */
+    public function afterCommit($callback) {
+        if ($this->transactionsManager) {
+            return $this->transactionsManager->addCallback($callback);
+        }
+
+        throw new RuntimeException('Transactions Manager has not been set.');
     }
 }

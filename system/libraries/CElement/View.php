@@ -32,15 +32,16 @@ class CElement_View extends CElement {
     public function resolveView() {
         $view = $this->view;
         if ($view != null) {
+            $data = $this->data;
             if (!($view instanceof CView_View)) {
-                $data = $this->data;
                 if ($data == null) {
                     $data = [];
                 }
                 $view = CView::factory($view, $data);
-            }
-            if ($data !== null) {
-                $view->set($data);
+            } else {
+                if ($data !== null) {
+                    $view->set($data);
+                }
             }
         }
 

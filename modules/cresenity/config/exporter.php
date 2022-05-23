@@ -250,7 +250,7 @@ return [
         'handler' => 'db',
     ],
 
-    'temporary_files' => [
+    'temporary' => [
         /*
         |--------------------------------------------------------------------------
         | Local Temporary Path
@@ -261,6 +261,7 @@ return [
         |
         */
         'local_path' => DOCROOT . 'temp',
+        'path' => 'temp',
 
         /*
         |--------------------------------------------------------------------------
@@ -276,8 +277,8 @@ return [
         | in conjunction with queued imports and exports.
         |
         */
-        'remote_disk' => null,
-        'remote_prefix' => null,
+        'disk' => null,
+        'prefix' => null,
 
         /*
         |--------------------------------------------------------------------------

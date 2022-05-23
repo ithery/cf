@@ -8,19 +8,26 @@ class Controller_Cresenity extends CController {
     }
 
     public function cron() {
-        CJob::cliRunner();
+        CCron::run();
     }
 
     public function task() {
         CJob::cliRunner();
     }
 
+    /**
+     * @return void
+     */
     public function dispatch() {
         CQueue::run();
     }
 
     public function daemon() {
-        CDaemon::cliRunner();
+        try {
+            CDaemon::cliRunner();
+        } catch (CDaemon_Exception_AlreadyRunningException $ex) {
+            //do nothing when exception is already running
+        }
     }
 
     public function component() {
@@ -45,11 +52,13 @@ class Controller_Cresenity extends CController {
 
         $disk = CTemporary::disk();
         if (!$disk->exists($file)) {
-            throw new Exception(c::__('failed to get temporary file :filename', ['filename' => $file]));
+            c::abort(404, c::__('failed to get temporary file :filename', ['filename' => $file]));
+            //throw new Exception(c::__('failed to get temporary file :filename', ['filename' => $file]));
         }
         $json = $disk->get($file);
 
         $ajaxMethod = CAjax::createMethod($json)->setArgs($args);
+
         $response = $ajaxMethod->executeEngine();
 
         return $response;
@@ -62,29 +71,6 @@ class Controller_Cresenity extends CController {
         $data = CApp::api()->exec(...$methods);
 
         return c::response()->json($data);
-    }
-
-    //@codingStandardsIgnoreStart
-
-    /**
-     * change lang.
-     *
-     * @param string $lang
-     *
-     * @return void
-     *
-     * @deprecated version
-     */
-    public function change_lang($lang) {
-        clang::setlang($lang);
-
-        return c::redirect(crequest::referrer());
-    }
-
-    public function change_theme($theme) {
-        CManager::theme()->setTheme($theme);
-
-        return c::redirect(crequest::referrer());
     }
 
     //@codingStandardsIgnoreEnd
@@ -232,6 +218,9 @@ class Controller_Cresenity extends CController {
     }
 
     public function noimage($width = 200, $height = 150, $bg_color = 'EFEFEF', $txt_color = 'AAAAAA', $text = 'NO IMAGE') {
+        if (strlen($text) > 0) {
+            $text = urldecode($text);
+        }
         //Create the image resource
         $width = (int) $width;
         $height = (int) $height;
@@ -295,9 +284,7 @@ class Controller_Cresenity extends CController {
                 break;
         }
 
-        ob_start('ob_gzhandler');
         $avatarApi = CImage::avatar()->api($engineName);
-
         /*
         if (!isset($_GET['noheader'])) {
             header('Content-type: image/png');
@@ -307,7 +294,7 @@ class Controller_Cresenity extends CController {
         }
         $avatarApi->render();
         */
-
+        //ob_start('ob_gzhandler');
         $headers = [
             'Content-Type' => 'image/png',
             'Pragma' => 'public',
@@ -315,12 +302,20 @@ class Controller_Cresenity extends CController {
             'Expires' => gmdate('D, d M Y H:i:s \G\M\T', time() + 172800),
         ];
 
-        return c::response()->stream(function () use ($avatarApi) {
-            $avatarApi->render();
-        }, 200, $headers);
+        if (isset($_GET['debug_avatar'])) {
+            return $avatarApi->render();
+        }
+
+        return c::response($avatarApi->render(), 200, $headers);
+        // return c::response()->stream(function () use ($avatarApi) {
+        //     $avatarApi->render();
+        // }, 200, $headers);
     }
 
     public function connector($engine, $method = null) {
+        if ($method == null) {
+            return c::abort(404);
+        }
         $engineName = 'FileManager';
         switch ($engine) {
             case 'elfinder':
@@ -352,8 +347,9 @@ class Controller_Cresenity extends CController {
 
         CManager::registerModule('pdfjs');
 
-        $app->setViewName('cresenity/pdf');
-        echo $app->render();
+        $app->setView('cresenity.pdf');
+
+        return $app;
     }
 
     public function upload($method = 'temp') {
@@ -446,12 +442,6 @@ class Controller_Cresenity extends CController {
         $qrcode->outputImage();
     }
 
-    public function auth() {
-        $args = func_get_args();
-        $method = carr::get($args, 0);
-        $parameters = array_slice($args, 1);
-    }
-
     public function symlink($appCode) {
         $appDir = DOCROOT . 'application' . DS . $appCode;
         if (is_dir($appDir)) {
@@ -472,11 +462,48 @@ class Controller_Cresenity extends CController {
     }
 
     public function health() {
-        echo 'OK';
+        return c::response('OK');
     }
 
     public function clear() {
         CView::blade()->clearCompiled();
         CHTTP_FileServeDriver::clearPublic();
+    }
+
+    public function broadcast($method = null) {
+        $request = CHTTP::request();
+        if ($method == 'auth') {
+            if ($request->hasSession()) {
+                $request->session()->reflash();
+            }
+
+            return CBroadcast::manager()->driver()->auth($request);
+        }
+
+        return c::response('Cresenity Broadcasting Endpoint', 200);
+    }
+
+    public function version() {
+        return c::response(CF::version());
+    }
+
+    public function cache($method) {
+        if ($method == 'delete') {
+            $key = c::request()->key;
+            $tags = c::request()->tags;
+
+            $cache = CCache::manager();
+
+            if (!empty($tags)) {
+                $tags = json_decode($tags, true);
+                $cache = $cache->tags($tags);
+            } else {
+                unset($tags);
+            }
+
+            $success = $cache->forget($key);
+
+            return c::response()->json(compact('success'));
+        }
     }
 }

@@ -6,12 +6,12 @@ use Symfony\Component\Mime\Exception\InvalidArgumentException;
 
 class CException_Context_RequestContext extends CException_ContextAbstract implements CException_Contract_ContextInterface {
     /**
-     * @var null|\Symfony\Component\HttpFoundation\Request
+     * @var null|\CHTTP_Request
      */
     protected $request;
 
-    public function __construct(Request $request = null) {
-        $this->request = $request ?: Request::createFromGlobals();
+    public function __construct(CHTTP_Request $request = null) {
+        $this->request = $request ?: CHTTP::request();
     }
 
     public function getRequest() {
@@ -66,8 +66,7 @@ class CException_Context_RequestContext extends CException_ContextAbstract imple
 
     public function getSession() {
         try {
-            //$session = $this->request->getSession();
-            $session = CSession::instance();
+            $session = $this->request->session();
         } catch (\Exception $exception) {
             $session = [];
         }
@@ -114,18 +113,51 @@ class CException_Context_RequestContext extends CException_ContextAbstract imple
             'cookies' => $this->getCookies(),
             'session' => $this->getSession(),
             'user' => $this->getUser(),
+            'role' => $this->getRole(),
             'route' => $this->getRoute(),
             'git' => $this->getGit(),
+            'app' => $this->getAppData(),
+            'debug' => $this->getDebugData(),
+
         ];
     }
 
     public function getRoute() {
-        return [
-            'route' => CFRouter::$routed_uri,
-            'routeParameters' => CFRouter::$arguments,
-            'controllerAction' => CFRouter::$controller . '@' . CFRouter::$method,
-            'middleware' => [],
+        $route = c::request()->route();
+        $routeData = [];
+        if ($route && $route->getRouteData()) {
+            $routeData = $route->getRouteData()->toArray();
+        }
+        $controller = c::optional($route)->controller;
+        $defaultData = [
+            'route' => c::optional($route)->getName(),
+            'routeParameters' => $this->getRouteParameters(),
+            'controllerClass' => $controller ? get_class($controller) : null,
+            'controllerAction' => c::optional($route)->getActionName(),
+            'middleware' => array_values(c::optional($route)->gatherMiddleware() ?: []),
         ];
+
+        return array_merge($defaultData, $routeData);
+    }
+
+    protected function getRouteParameters() {
+        try {
+            $parameters = c::optional($this->request->route())->parameters;
+            if ($parameters == null) {
+                $parameters = [];
+            }
+
+            return c::collect($parameters)
+                ->map(function ($parameter) {
+                    return $parameter instanceof CModel ? $parameter->withoutRelations() : $parameter;
+                })
+                ->map(function ($parameter) {
+                    return method_exists($parameter, 'toFlare') ? $parameter->toFlare() : $parameter;
+                })
+                ->toArray();
+        } catch (Throwable $e) {
+            return [];
+        }
     }
 
     public function getUser() {
@@ -135,6 +167,8 @@ class CException_Context_RequestContext extends CException_ContextAbstract imple
             if (!$user) {
                 return [];
             }
+        } catch (Exception $e) {
+            return [];
         } catch (Throwable $e) {
             return [];
         }
@@ -148,6 +182,39 @@ class CException_Context_RequestContext extends CException_ContextAbstract imple
             }
 
             return (array) $user;
+        } catch (Exception $e) {
+            return [];
+        } catch (Throwable $e) {
+            return [];
+        }
+
+        return [];
+    }
+
+    public function getRole() {
+        try {
+            $role = c::app()->role();
+
+            if (!$role) {
+                return [];
+            }
+        } catch (Exception $e) {
+            return [];
+        } catch (Throwable $e) {
+            return [];
+        }
+
+        try {
+            if ($role instanceof CInterface_Arrayable) {
+                return $role->toArray();
+            }
+            if ($role instanceof CModel) {
+                return $role->getAttributes();
+            }
+
+            return (array) $role;
+        } catch (Exception $e) {
+            return [];
         } catch (Throwable $e) {
             return [];
         }

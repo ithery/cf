@@ -12,27 +12,6 @@ class CDatabase_Schema_Blueprint {
     use CTrait_Macroable;
 
     /**
-     * The table the blueprint describes.
-     *
-     * @var string
-     */
-    protected $table;
-
-    /**
-     * The columns that should be added to the table.
-     *
-     * @var CBase_Fluent[]
-     */
-    protected $columns = [];
-
-    /**
-     * The commands that should be run for the table.
-     *
-     * @var CBase_Fluent[]
-     */
-    protected $commands = [];
-
-    /**
      * The storage engine that should be used for the table.
      *
      * @var string
@@ -57,10 +36,31 @@ class CDatabase_Schema_Blueprint {
     public $temporary = false;
 
     /**
+     * The table the blueprint describes.
+     *
+     * @var string
+     */
+    protected $table;
+
+    /**
+     * The columns that should be added to the table.
+     *
+     * @var CBase_Fluent[]
+     */
+    protected $columns = [];
+
+    /**
+     * The commands that should be run for the table.
+     *
+     * @var CBase_Fluent[]
+     */
+    protected $commands = [];
+
+    /**
      * Create a new schema blueprint.
      *
      * @param string        $table
-     * @param \Closure|null $callback
+     * @param null|\Closure $callback
      *
      * @return void
      */
@@ -75,12 +75,12 @@ class CDatabase_Schema_Blueprint {
     /**
      * Execute the blueprint against the database.
      *
-     * @param \Illuminate\Database\Connection              $connection
-     * @param \Illuminate\Database\Schema\Grammars\Grammar $grammar
+     * @param \CDatabase                $connection
+     * @param \CDatabase_Schema_Grammar $grammar
      *
      * @return void
      */
-    public function build(Connection $connection, Grammar $grammar) {
+    public function build(CDatabase $connection, CDatabase_Schema_Grammar $grammar) {
         foreach ($this->toSql($connection, $grammar) as $statement) {
             $connection->statement($statement);
         }
@@ -89,12 +89,12 @@ class CDatabase_Schema_Blueprint {
     /**
      * Get the raw SQL statements for the blueprint.
      *
-     * @param \Illuminate\Database\Connection              $connection
-     * @param \Illuminate\Database\Schema\Grammars\Grammar $grammar
+     * @param \CDatabase                $connection
+     * @param \CDatabase_Schema_Grammar $grammar
      *
      * @return array
      */
-    public function toSql(Connection $connection, Grammar $grammar) {
+    public function toSql(CDatabase $connection, CDatabase_Schema_Grammar $grammar) {
         $this->addImpliedCommands();
 
         $statements = [];
@@ -145,12 +145,14 @@ class CDatabase_Schema_Blueprint {
                     // to "true" (boolean), no name has been specified for this index so the
                     // index method can be called without a name and it will generate one.
                     $this->{$index}($column->name);
+
                     continue 2;
                 } elseif (isset($column->{$index})) {
                     // If the index has been specified on the given column, and it has a string
                     // value, we'll go ahead and call the index method and pass the name for
                     // the index since the developer specified the explicit name for this.
                     $this->{$index}($column->name, $column->{$index});
+
                     continue 2;
                 }
             }
@@ -345,7 +347,7 @@ class CDatabase_Schema_Blueprint {
      *
      * @param string|array $columns
      * @param string       $name
-     * @param string|null  $algorithm
+     * @param null|string  $algorithm
      *
      * @return CBase_Fluent
      */
@@ -358,7 +360,7 @@ class CDatabase_Schema_Blueprint {
      *
      * @param string|array $columns
      * @param string       $name
-     * @param string|null  $algorithm
+     * @param null|string  $algorithm
      *
      * @return CBase_Fluent
      */
@@ -371,7 +373,7 @@ class CDatabase_Schema_Blueprint {
      *
      * @param string|array $columns
      * @param string       $name
-     * @param string|null  $algorithm
+     * @param null|string  $algorithm
      *
      * @return CBase_Fluent
      */
@@ -467,7 +469,7 @@ class CDatabase_Schema_Blueprint {
      * @return CBase_Fluent
      */
     public function char($column, $length = null) {
-        $length = $length ?: Builder::$defaultStringLength;
+        $length = $length ?: CDatabase_Schema_Builder::$defaultStringLength;
 
         return $this->addColumn('char', $column, compact('length'));
     }
@@ -481,7 +483,7 @@ class CDatabase_Schema_Blueprint {
      * @return CBase_Fluent
      */
     public function string($column, $length = null) {
-        $length = $length ?: Builder::$defaultStringLength;
+        $length = $length ?: CDatabase_Schema_Builder::$defaultStringLength;
 
         return $this->addColumn('string', $column, compact('length'));
     }
@@ -661,8 +663,8 @@ class CDatabase_Schema_Blueprint {
      * Create a new double column on the table.
      *
      * @param string   $column
-     * @param int|null $total
-     * @param int|null $places
+     * @param null|int $total
+     * @param null|int $places
      *
      * @return CBase_Fluent
      */
@@ -1024,7 +1026,7 @@ class CDatabase_Schema_Blueprint {
      * Add the proper columns for a polymorphic table.
      *
      * @param string      $name
-     * @param string|null $indexName
+     * @param null|string $indexName
      *
      * @return void
      */
@@ -1040,7 +1042,7 @@ class CDatabase_Schema_Blueprint {
      * Add nullable columns for a polymorphic table.
      *
      * @param string      $name
-     * @param string|null $indexName
+     * @param null|string $indexName
      *
      * @return void
      */
@@ -1067,7 +1069,7 @@ class CDatabase_Schema_Blueprint {
      * @param string       $type
      * @param string|array $columns
      * @param string       $index
-     * @param string|null  $algorithm
+     * @param null|string  $algorithm
      *
      * @return CBase_Fluent
      */
@@ -1187,7 +1189,7 @@ class CDatabase_Schema_Blueprint {
      * @return string
      */
     public function getTable() {
-        return $this->table ;
+        return $this->table;
     }
 
     /**

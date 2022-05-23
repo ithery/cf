@@ -65,7 +65,7 @@ class CSession_Middleware_SessionMiddleware {
 
         $lockFor = $request->route() && $request->route()->locksFor() ? $request->route()->locksFor() : 10;
 
-        $lock = $this->cache($this->manager->blockDriver())
+        $lock = $this->cache(CSession::manager()->blockDriver())
             ->lock('session:' . $session->getId(), $lockFor)
             ->betweenBlockedAttemptsSleepFor(50);
 
@@ -90,13 +90,6 @@ class CSession_Middleware_SessionMiddleware {
      * @return mixed
      */
     protected function handleStatefulRequest(CHTTP_Request $request, $session, Closure $next) {
-        // If a session driver has been configured, we will need to start the session here
-        // so that the data is ready for an application. Note that the Laravel sessions
-        // do not make use of PHP "native" sessions in any way since they are crappy.
-        $request->setCFSession(
-            $this->startSession($request, $session)
-        );
-
         $this->collectGarbage($session);
 
         $response = $next($request);
@@ -117,21 +110,6 @@ class CSession_Middleware_SessionMiddleware {
     }
 
     /**
-     * Start the session for the given request.
-     *
-     * @param CHTTP_Request   $request
-     * @param \CSession_Store $session
-     *
-     * @return \CSession_Store
-     */
-    protected function startSession(CHTTP_Request $request, $session) {
-        return c::tap($session, function ($session) use ($request) {
-            $session->setRequestOnHandler($request);
-            $session->start();
-        });
-    }
-
-    /**
      * Get the session implementation from the manager.
      *
      * @param CHTTP_Request $request
@@ -139,9 +117,7 @@ class CSession_Middleware_SessionMiddleware {
      * @return CSession_Store
      */
     public function getSession(CHTTP_Request $request) {
-        return c::tap(CSession::instance()->store(), function ($session) use ($request) {
-            $session->setId($request->cookies->get($session->getName()));
-        });
+        return CBase::session();
     }
 
     /**
@@ -202,7 +178,7 @@ class CSession_Middleware_SessionMiddleware {
      * Add the session cookie to the application response.
      *
      * @param \Symfony\Component\HttpFoundation\Response $response
-     * @param \Illuminate\Contracts\Session\Session      $session
+     * @param \CSession_Store                            $session
      *
      * @return void
      */
@@ -270,7 +246,7 @@ class CSession_Middleware_SessionMiddleware {
      * @return bool
      */
     protected function sessionIsPersistent(array $config = null) {
-        $config = $config ?: $this->manager->getSessionConfig();
+        $config = $config ?: CSession::manager()->getSessionConfig();
 
         return !is_null(carr::get($config, 'driver'));
     }

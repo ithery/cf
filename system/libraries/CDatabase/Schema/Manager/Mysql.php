@@ -10,21 +10,21 @@ defined('SYSPATH') or die('No direct access allowed.');
  */
 class CDatabase_Schema_Manager_Mysql extends CDatabase_Schema_Manager {
     /**
-     * {@inheritdoc}
+     * @inheritdoc
      */
     protected function getPortableViewDefinition($view) {
         return new CDatabase_Schema_View($view['TABLE_NAME'], $view['VIEW_DEFINITION']);
     }
 
     /**
-     * {@inheritdoc}
+     * @inheritdoc
      */
     protected function getPortableTableDefinition($table) {
         return array_shift($table);
     }
 
     /**
-     * {@inheritdoc}
+     * @inheritdoc
      */
     protected function getPortableUserDefinition($user) {
         return [
@@ -34,7 +34,7 @@ class CDatabase_Schema_Manager_Mysql extends CDatabase_Schema_Manager {
     }
 
     /**
-     * {@inheritdoc}
+     * @inheritdoc
      */
     protected function getPortableTableIndexesList($tableIndexes, $tableName = null) {
         foreach ($tableIndexes as $k => $v) {
@@ -56,21 +56,21 @@ class CDatabase_Schema_Manager_Mysql extends CDatabase_Schema_Manager {
     }
 
     /**
-     * {@inheritdoc}
+     * @inheritdoc
      */
     protected function getPortableSequenceDefinition($sequence) {
         return end($sequence);
     }
 
     /**
-     * {@inheritdoc}
+     * @inheritdoc
      */
     protected function getPortableDatabaseDefinition($database) {
         return $database['Database'];
     }
 
     /**
-     * {@inheritdoc}
+     * @inheritdoc
      */
     protected function getPortableTableColumnDefinition($tableColumn) {
         $tableColumn = array_change_key_case($tableColumn, CASE_LOWER);
@@ -100,6 +100,7 @@ class CDatabase_Schema_Manager_Mysql extends CDatabase_Schema_Manager {
             case 'char':
             case 'binary':
                 $fixed = true;
+
                 break;
             case 'float':
             case 'double':
@@ -111,24 +112,31 @@ class CDatabase_Schema_Manager_Mysql extends CDatabase_Schema_Manager {
                     $scale = $match[2];
                     $length = null;
                 }
+
                 break;
             case 'tinytext':
-                $length = CDatabase_Platform_Mysql::LENGTH_LIMIT_TINYTEXT;
+                $length = CDatabase_Platform_MySql::LENGTH_LIMIT_TINYTEXT;
+
                 break;
             case 'text':
-                $length = CDatabase_Platform_Mysql::LENGTH_LIMIT_TEXT;
+                $length = CDatabase_Platform_MySql::LENGTH_LIMIT_TEXT;
+
                 break;
             case 'mediumtext':
-                $length = CDatabase_Platform_Mysql::LENGTH_LIMIT_MEDIUMTEXT;
+                $length = CDatabase_Platform_MySql::LENGTH_LIMIT_MEDIUMTEXT;
+
                 break;
             case 'tinyblob':
-                $length = CDatabase_Platform_Mysql::LENGTH_LIMIT_TINYBLOB;
+                $length = CDatabase_Platform_MySql::LENGTH_LIMIT_TINYBLOB;
+
                 break;
             case 'blob':
-                $length = CDatabase_Platform_Mysql::LENGTH_LIMIT_BLOB;
+                $length = CDatabase_Platform_MySql::LENGTH_LIMIT_BLOB;
+
                 break;
             case 'mediumblob':
-                $length = CDatabase_Platform_Mysql::LENGTH_LIMIT_MEDIUMBLOB;
+                $length = CDatabase_Platform_MySql::LENGTH_LIMIT_MEDIUMBLOB;
+
                 break;
             case 'tinyint':
             case 'smallint':
@@ -138,6 +146,7 @@ class CDatabase_Schema_Manager_Mysql extends CDatabase_Schema_Manager {
             case 'bigint':
             case 'year':
                 $length = null;
+
                 break;
         }
 
@@ -209,11 +218,12 @@ class CDatabase_Schema_Manager_Mysql extends CDatabase_Schema_Manager {
             case 'curtime()':
                 return $platform->getCurrentTimeSQL();
         }
+
         return $columnDefault;
     }
 
     /**
-     * {@inheritdoc}
+     * @inheritdoc
      */
     protected function getPortableTableForeignKeysList($tableForeignKeys) {
         $list = [];
@@ -259,6 +269,7 @@ class CDatabase_Schema_Manager_Mysql extends CDatabase_Schema_Manager {
 
     public function getDatabaseRowCount() {
         $databaseName = $this->db->getDatabaseName();
+
         return $this->db->getValue('
     	    	SELECT SUM(table_rows)
     	    	FROM INFORMATION_SCHEMA.TABLES
@@ -269,6 +280,7 @@ class CDatabase_Schema_Manager_Mysql extends CDatabase_Schema_Manager {
 
     public function getDatabaseSize() {
         $databaseName = $this->db->getDatabaseName();
+
         return $this->db->getValue(sprintf('SELECT SUM(data_length + index_length)
             FROM INFORMATION_SCHEMA.TABLES
             WHERE table_schema = %s

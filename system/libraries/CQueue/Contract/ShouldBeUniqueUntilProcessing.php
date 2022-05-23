@@ -1,0 +1,6 @@
+<?php
+
+use CQueue_Contract_ShouldBeUniqueInterface as GlobalCQueue_Contract_ShouldBeUniqueInterface;
+
+interface CQueue_Contract_ShouldBeUniqueUntilProcessingInterface extends GlobalCQueue_Contract_ShouldBeUniqueInterface {
+}
