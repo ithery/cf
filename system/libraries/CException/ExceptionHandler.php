@@ -189,7 +189,9 @@ class CException_ExceptionHandler implements CException_ExceptionHandlerInterfac
             }
 
             if (CView::exists('errors/http/' . $e->getStatusCode())) {
-                return c::response()->view('errors/http/' . $e->getStatusCode(), [], $e->getStatusCode());
+                return c::response()->view('errors/http/' . $e->getStatusCode(), [
+                    'exception' => $e,
+                ], $e->getStatusCode());
             } else {
                 if ($e->getStatusCode() == 404) {
                     //backward compatibility old view
@@ -355,6 +357,14 @@ class CException_ExceptionHandler implements CException_ExceptionHandlerInterfac
         try {
             return CException_LegacyExceptionHandler::getContent($e);
             if (CF::isProduction()) {
+                if (CView::exists('errors/http/' . '500')) {
+                    if (!isset($_GET['show_debug_error'])) {
+                        return c::view('errors/http/500', [
+                            'exception' => $e,
+                        ])->render();
+                    }
+                }
+
                 return CException_LegacyExceptionHandler::getContent($e);
             }
 

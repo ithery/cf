@@ -4,13 +4,12 @@ declare(strict_types=1);
 
 namespace Phpml\SupportVectorMachine;
 
+use Phpml\Helper\Trainable;
+use Phpml\Exception\LibsvmCommandException;
 use Phpml\Exception\InvalidArgumentException;
 use Phpml\Exception\InvalidOperationException;
-use Phpml\Exception\LibsvmCommandException;
-use Phpml\Helper\Trainable;
 
-class SupportVectorMachine
-{
+class SupportVectorMachine {
     use Trainable;
 
     /**
@@ -39,7 +38,7 @@ class SupportVectorMachine
     private $degree;
 
     /**
-     * @var float|null
+     * @var null|float
      */
     private $gamma;
 
@@ -120,22 +119,23 @@ class SupportVectorMachine
         $this->shrinking = $shrinking;
         $this->probabilityEstimates = $probabilityEstimates;
 
-        $rootPath = realpath(implode(DIRECTORY_SEPARATOR, [__DIR__, '..', '..'])).DIRECTORY_SEPARATOR;
+        //$rootPath = realpath(implode(DIRECTORY_SEPARATOR, [__DIR__, '..', '..'])) . DIRECTORY_SEPARATOR;
 
-        $this->binPath = $rootPath.'bin'.DIRECTORY_SEPARATOR.'libsvm'.DIRECTORY_SEPARATOR;
-        $this->varPath = $rootPath.'var'.DIRECTORY_SEPARATOR;
+        $this->binPath = rtrim(DOCROOT, DIRECTORY_SEPARATOR) . DIRECTORY_SEPARATOR . '.bin' . DIRECTORY_SEPARATOR . 'libsvm' . DIRECTORY_SEPARATOR;
+        $this->varPath = rtrim(DOCROOT, DIRECTORY_SEPARATOR) . DIRECTORY_SEPARATOR . 'temp' . DIRECTORY_SEPARATOR . 'phpml' . DIRECTORY_SEPARATOR;
+        if (!\is_dir($this->varPath)) {
+            \mkdir($this->varPath);
+        }
     }
 
-    public function setBinPath(string $binPath): void
-    {
+    public function setBinPath(string $binPath): void {
         $this->ensureDirectorySeparator($binPath);
         $this->verifyBinPath($binPath);
 
         $this->binPath = $binPath;
     }
 
-    public function setVarPath(string $varPath): void
-    {
+    public function setVarPath(string $varPath): void {
         if (!is_writable($varPath)) {
             throw new InvalidArgumentException(sprintf('The specified path "%s" is not writable', $varPath));
         }
@@ -144,18 +144,18 @@ class SupportVectorMachine
         $this->varPath = $varPath;
     }
 
-    public function train(array $samples, array $targets): void
-    {
+    public function train(array $samples, array $targets): void {
         $this->samples = array_merge($this->samples, $samples);
         $this->targets = array_merge($this->targets, $targets);
 
         $trainingSet = DataTransformer::trainingSet($this->samples, $this->targets, in_array($this->type, [Type::EPSILON_SVR, Type::NU_SVR], true));
-        file_put_contents($trainingSetFileName = $this->varPath.uniqid('phpml', true), $trainingSet);
-        $modelFileName = $trainingSetFileName.'-model';
+        file_put_contents($trainingSetFileName = $this->varPath . uniqid('phpml', true), $trainingSet);
+        $modelFileName = $trainingSetFileName . '-model';
 
         $command = $this->buildTrainCommand($trainingSetFileName, $modelFileName);
         $output = [];
-        exec(escapeshellcmd($command).' 2>&1', $output, $return);
+
+        exec(escapeshellcmd($command) . ' 2>&1', $output, $return);
 
         unlink($trainingSetFileName);
 
@@ -170,18 +170,16 @@ class SupportVectorMachine
         unlink($modelFileName);
     }
 
-    public function getModel(): string
-    {
+    public function getModel(): string {
         return $this->model;
     }
 
     /**
-     * @return array|string
-     *
      * @throws LibsvmCommandException
+     *
+     * @return array|string
      */
-    public function predict(array $samples)
-    {
+    public function predict(array $samples) {
         $predictions = $this->runSvmPredict($samples, false);
 
         if (in_array($this->type, [Type::C_SVC, Type::NU_SVC], true)) {
@@ -198,12 +196,11 @@ class SupportVectorMachine
     }
 
     /**
-     * @return array|string
-     *
      * @throws LibsvmCommandException
+     *
+     * @return array|string
      */
-    public function predictProbability(array $samples)
-    {
+    public function predictProbability(array $samples) {
         if (!$this->probabilityEstimates) {
             throw new InvalidOperationException('Model does not support probabiliy estimates');
         }
@@ -223,12 +220,11 @@ class SupportVectorMachine
         return $predictions;
     }
 
-    private function runSvmPredict(array $samples, bool $probabilityEstimates): string
-    {
+    private function runSvmPredict(array $samples, bool $probabilityEstimates): string {
         $testSet = DataTransformer::testSet($samples);
-        file_put_contents($testSetFileName = $this->varPath.uniqid('phpml', true), $testSet);
-        file_put_contents($modelFileName = $testSetFileName.'-model', $this->model);
-        $outputFileName = $testSetFileName.'-output';
+        file_put_contents($testSetFileName = $this->varPath . uniqid('phpml', true), $testSet);
+        file_put_contents($modelFileName = $testSetFileName . '-model', $this->model);
+        $outputFileName = $testSetFileName . '-output';
 
         $command = $this->buildPredictCommand(
             $testSetFileName,
@@ -237,7 +233,7 @@ class SupportVectorMachine
             $probabilityEstimates
         );
         $output = [];
-        exec(escapeshellcmd($command).' 2>&1', $output, $return);
+        exec(escapeshellcmd($command) . ' 2>&1', $output, $return);
 
         unlink($testSetFileName);
         unlink($modelFileName);
@@ -254,8 +250,7 @@ class SupportVectorMachine
         return $predictions;
     }
 
-    private function getOSExtension(): string
-    {
+    private function getOSExtension(): string {
         $os = strtoupper(substr(PHP_OS, 0, 3));
         if ($os === 'WIN') {
             return '.exe';
@@ -266,8 +261,7 @@ class SupportVectorMachine
         return '';
     }
 
-    private function buildTrainCommand(string $trainingSetFileName, string $modelFileName): string
-    {
+    private function buildTrainCommand(string $trainingSetFileName, string $modelFileName): string {
         return sprintf(
             '%ssvm-train%s -s %s -t %s -c %s -n %F -d %s%s -r %s -p %F -m %F -e %F -h %d -b %d %s %s',
             $this->binPath,
@@ -277,7 +271,7 @@ class SupportVectorMachine
             $this->cost,
             $this->nu,
             $this->degree,
-            $this->gamma !== null ? ' -g '.$this->gamma : '',
+            $this->gamma !== null ? ' -g ' . $this->gamma : '',
             $this->coef0,
             $this->epsilon,
             $this->cacheSize,
@@ -306,22 +300,20 @@ class SupportVectorMachine
         );
     }
 
-    private function ensureDirectorySeparator(string &$path): void
-    {
+    private function ensureDirectorySeparator(string &$path): void {
         if (substr($path, -1) !== DIRECTORY_SEPARATOR) {
             $path .= DIRECTORY_SEPARATOR;
         }
     }
 
-    private function verifyBinPath(string $path): void
-    {
+    private function verifyBinPath(string $path): void {
         if (!is_dir($path)) {
             throw new InvalidArgumentException(sprintf('The specified path "%s" does not exist', $path));
         }
 
         $osExtension = $this->getOSExtension();
         foreach (['svm-predict', 'svm-scale', 'svm-train'] as $filename) {
-            $filePath = $path.$filename.$osExtension;
+            $filePath = $path . $filename . $osExtension;
             if (!file_exists($filePath)) {
                 throw new InvalidArgumentException(sprintf('File "%s" not found', $filePath));
             }
