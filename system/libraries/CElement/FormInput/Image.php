@@ -34,16 +34,16 @@ class CElement_FormInput_Image extends CElement_FormInput {
         $this->disabledUpload = false;
         $this->templateName = 'cresenity/element/form-input/image';
 
-        $this->onBeforeParse(function () {
-            $this->setVar('id', $this->id);
-            $this->setVar('imgSrc', $this->imgSrc);
-            $this->setVar('maxWidth', $this->maxWidth);
-            $this->setVar('maxHeight', $this->maxHeight);
-            $this->setVar('disabledUpload', $this->disabledUpload);
-            $this->setVar('preTag', $this->pretag());
-            $this->setVar('postTag', $this->posttag());
-            $this->setVar('name', $this->name);
-            $this->setVar('value', $this->value);
+        $this->onBeforeParse(function (CView_View $view) {
+            $view->with('id', $this->id);
+            $view->with('imgSrc', $this->imgSrc);
+            $view->with('maxWidth', $this->maxWidth);
+            $view->with('maxHeight', $this->maxHeight);
+            $view->with('disabledUpload', $this->disabledUpload);
+            $view->with('preTag', $this->pretag());
+            $view->with('postTag', $this->posttag());
+            $view->with('name', $this->name);
+            $view->with('value', $this->value);
         });
     }
 

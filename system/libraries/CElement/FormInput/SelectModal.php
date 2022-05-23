@@ -55,22 +55,22 @@ class CElement_FormInput_SelectModal extends CElement_FormInput {
         $this->delay = '1000';
         $this->view = 'cresenity/element/form-input/select-modal';
 
-        $this->onBeforeParse(function () {
-            $this->setVar('id', $this->id);
-            $this->setVar('title', $this->title);
-            $this->setVar('itemName', $this->itemName);
-            $this->setVar('imgSrc', $this->imgSrc);
-            $this->setVar('minWidth', $this->minWidth);
-            $this->setVar('minHeight', $this->minHeight);
-            $this->setVar('buttonLabel', $this->buttonLabel);
-            $this->setVar('placeholder', $this->placeholder);
-            $this->setVar('delay', $this->delay);
-            $this->setVar('preTag', $this->pretag());
-            $this->setVar('postTag', $this->posttag());
-            $this->setVar('name', $this->name);
-            $this->setVar('value', $this->value);
-            $this->setVar('ajaxName', $this->createAjaxName());
-            $this->setVar('ajaxUrl', $this->createAjaxUrl());
+        $this->onBeforeParse(function (CView_View $view) {
+            $view->with('id', $this->id);
+            $view->with('title', $this->title);
+            $view->with('itemName', $this->itemName);
+            $view->with('imgSrc', $this->imgSrc);
+            $view->with('minWidth', $this->minWidth);
+            $view->with('minHeight', $this->minHeight);
+            $view->with('buttonLabel', $this->buttonLabel);
+            $view->with('placeholder', $this->placeholder);
+            $view->with('delay', $this->delay);
+            $view->with('preTag', $this->pretag());
+            $view->with('postTag', $this->posttag());
+            $view->with('name', $this->name);
+            $view->with('value', $this->value);
+            $view->with('ajaxName', $this->createAjaxName());
+            $view->with('ajaxUrl', $this->createAjaxUrl());
         });
     }
 

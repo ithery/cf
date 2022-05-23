@@ -22,7 +22,7 @@ class CElement_FormInput_FileAjax extends CElement_FormInput {
         $this->maxUploadSize = 0;
         $this->disabledUpload = false;
         $this->view = 'cresenity/element/form-input/file-ajax';
-        $this->onBeforeParse(function () {
+        $this->onBeforeParse(function (CView_View $view) {
             $ajaxName = $this->name;
             $ajaxName = str_replace('[', '-', $ajaxName);
             $ajaxName = str_replace(']', '-', $ajaxName);
@@ -31,17 +31,17 @@ class CElement_FormInput_FileAjax extends CElement_FormInput {
                 ->setData('inputName', $ajaxName)
                 ->makeUrl();
 
-            $this->setVar('id', $this->id);
-            $this->setVar('fileName', $this->fileName);
-            $this->setVar('acceptFile', $this->acceptFile);
-            $this->setVar('maxUploadSize', $this->maxUploadSize);
-            $this->setVar('disabledUpload', $this->disabledUpload);
-            $this->setVar('preTag', $this->pretag());
-            $this->setVar('postTag', $this->posttag());
-            $this->setVar('name', $this->name);
-            $this->setVar('value', $this->value);
-            $this->setVar('ajaxName', $ajaxName);
-            $this->setVar('ajaxUrl', $ajaxUrl);
+            $view->with('id', $this->id);
+            $view->with('fileName', $this->fileName);
+            $view->with('acceptFile', $this->acceptFile);
+            $view->with('maxUploadSize', $this->maxUploadSize);
+            $view->with('disabledUpload', $this->disabledUpload);
+            $view->with('preTag', $this->pretag());
+            $view->with('postTag', $this->posttag());
+            $view->with('name', $this->name);
+            $view->with('value', $this->value);
+            $view->with('ajaxName', $ajaxName);
+            $view->with('ajaxUrl', $ajaxUrl);
         });
     }
 

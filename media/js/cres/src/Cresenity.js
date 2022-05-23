@@ -2,6 +2,7 @@ import Url from './module/Url';
 import cf from './CF';
 import ScrollToTop from './module/ScrollToTop';
 import UI from './ui';
+import { mergeOptions } from './util/config';
 import {
     dispatch as dispatchWindowEvent,
     showHtmlModal,
@@ -1038,6 +1039,7 @@ export default class Cresenity {
 
             root.classList.add('cresenity-loaded');
             root.classList.remove('no-js');
+            removePreloader();
             dispatchWindowEvent('cresenity:loaded');
             this.applyDeferXData();
         });
