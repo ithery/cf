@@ -80,7 +80,7 @@ class CResources_ResponsiveImage_Generator {
      * @return void
      */
     public function generateResponsiveImagesForConversion(CModel_Resource_ResourceInterface $resource, CResources_Conversion $conversion, string $baseImage): void {
-        $temporaryDirectory = CTemporary::customDirectory();
+        $temporaryDirectory = CTemporary_CustomDirectory::create();
 
         $resource = $this->cleanResponsiveImages($resource, $conversion->getName());
 
@@ -122,7 +122,6 @@ class CResources_ResponsiveImage_Generator {
     ) {
         $extension = $this->fileNamer->extensionFromBaseImage($baseImage);
         $responsiveImagePath = $this->fileNamer->temporaryFileName($resource, $extension);
-
         $tempDestination = $temporaryDirectory->path($responsiveImagePath);
 
         CResources_Helpers_ImageFactory::load($baseImage)

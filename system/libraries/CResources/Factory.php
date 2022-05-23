@@ -9,6 +9,13 @@ defined('SYSPATH') or die('No direct access allowed.');
  * @since May 2, 2019, 1:24:32 AM
  */
 class CResources_Factory {
+    public static function createResponsiveImageGenerator() {
+        $widthCalculatorClass = CF::config('media-library.responsive_images.width_calculator', CResources_ResponsiveImage_WidthCalculator_FileSizeOptimizedWidthCalculator::class);
+        $tinyPlaceholderClass = CF::config('media-library.responsive_images.tiny_placeholder_generator', CResources_ResponsiveImage_TinyPlaceholderGenerator_Blurred::class);
+
+        return new CResources_ResponsiveImage_Generator(new $widthCalculatorClass(), new $tinyPlaceholderClass());
+    }
+
     /**
      * @return CResources_PathGenerator
      */

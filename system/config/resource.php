@@ -111,7 +111,7 @@ return [
     'ffprobe_path' => '/usr/bin/ffprobe',
     /*
      * The path where to store temporary files while performing image conversions.
-     * If set to null, storage_path('medialibrary/temp') will be used.
+     * If set to null, DOCROOT.'temp/resource/temp/ will be used.
      */
     'temporary_directory_path' => null,
     /*
