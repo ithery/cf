@@ -299,20 +299,23 @@ class CApp_Navigation_Helper {
         $navname = carr::get($nav, 'name');
         $app = CApp::instance();
 
+        $appRole = null;
         if (strlen($appRoleId) == 0) {
-            if ($app->user() != null) {
-                $appRoleId = c::get($app->user(), 'role_id');
+            $appRole = $app->role();
+            if ($appRole) {
+                $appRoleId = c::get($appRole, 'role_id');
             }
+        } else {
+            $appRole = c::app()->getRole($appRoleId);
         }
 
         if (strlen($appRoleId) > 0) {
-            $app_role = c::app()->getRole($appRoleId);
-            if ($app_role != null && $app_role->parent_id == null) {
+            if ($appRole != null && $appRole->parent_id == null) {
                 return true;
             }
-            if ($app_role != null && (!isset($nav['subnav']) || count($nav['subnav']) == 0)) {
-                $parent_role_id = $app_role->parent_id;
-                if ($parent_role_id != null) {
+            if ($appRole != null && (!isset($nav['subnav']) || count($nav['subnav']) == 0)) {
+                $parentRoleId = $appRole->parent_id;
+                if ($parentRoleId != null) {
                     if (!self::haveAccess($nav, $appRoleId, $appId)) {
                         return false;
                     }
