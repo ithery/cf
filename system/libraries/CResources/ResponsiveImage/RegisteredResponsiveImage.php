@@ -1,5 +1,5 @@
 <?php
-class CResource_ResponsiveImage_RegisteredResponsiveImage {
+class CResources_ResponsiveImage_RegisteredResponsiveImage {
     /**
      * @var CCollection
      */

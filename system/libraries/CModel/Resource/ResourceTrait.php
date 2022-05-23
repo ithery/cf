@@ -302,42 +302,15 @@ trait CModel_Resource_ResourceTrait {
     }
 
     /**
-     * @param string|array $conversion
-     * @param array        $extraAttributes
+     * @param string $conversionName
+     * @param array  $extraAttributes
      *
-     * @return string
+     * @return CResources_HtmlableMedia
      */
-    public function img($conversion = '', array $extraAttributes = []) {
-        if (!(new Image())->canHandleMime($this->mime_type)) {
-            return '';
-        }
-        if (is_array($conversion)) {
-            $attributes = $conversion;
-            $conversion = isset($attributes['conversion']) ? $attributes['conversion'] : '';
-            unset($attributes['conversion']);
-            $extraAttributes = array_merge($attributes, $extraAttributes);
-        }
-        $attributeString = c::collect($extraAttributes)
-            ->map(function ($value, $name) {
-                return $name . '="' . $value . '"';
-            })->implode(' ');
-        if (strlen($attributeString)) {
-            $attributeString = ' ' . $attributeString;
-        }
-        $media = $this;
-        $viewName = 'image';
-        $width = '';
-        if ($this->hasResponsiveImages($conversion)) {
-            $viewName = CF::config('resource.responsive_images.use_tiny_placeholders') ? 'responsiveImageWithPlaceholder' : 'responsiveImage';
-            $width = $this->responsiveImages($conversion)->files->first()->width();
-        }
-
-        return c::view("medialibrary::{$viewName}", compact(
-            'media',
-            'conversion',
-            'attributeString',
-            'width'
-        ));
+    public function img($conversionName = '', array $extraAttributes = []) {
+        return (new CResources_HtmlableMedia($this))
+            ->conversion($conversionName)
+            ->attributes($extraAttributes);
     }
 
     public function move(CModel_HasResourceInterface $model, $collectionName = 'default') {
@@ -348,7 +321,7 @@ trait CModel_Resource_ResourceTrait {
     }
 
     public function copy(CModel_HasResourceInterface $model, $collectionName = 'default') {
-        $temporaryDirectory = TemporaryDirectory::create();
+        $temporaryDirectory = CTemporary::customDirectory();
         $temporaryFile = $temporaryDirectory->path($this->file_name);
         CResources_Factory::createFileSystem()->copyFromResourceLibrary($this, $temporaryFile);
         $newMedia = $model
@@ -362,7 +335,7 @@ trait CModel_Resource_ResourceTrait {
     }
 
     public function responsiveImages($conversionName = '') {
-        return new RegisteredResponsiveImages($this, $conversionName);
+        return new CResources_ResponsiveImage_RegisteredResponsiveImage($this, $conversionName);
     }
 
     public function stream() {

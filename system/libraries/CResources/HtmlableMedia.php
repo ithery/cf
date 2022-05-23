@@ -1,11 +1,5 @@
 <?php
 
-use CInterface_Htmlable;
-use Spatie\MediaLibrary\MediaCollections\Models\Media;
-use Spatie\MediaLibrary\Conversions\ConversionCollection;
-use Spatie\MediaLibrary\Conversions\ImageGenerators\Image;
-use Spatie\MediaLibrary\Conversions\ImageGenerators\ImageGeneratorFactory;
-
 class CResources_HtmlableMedia implements CInterface_Htmlable, \Stringable {
     /**
      * @var string
