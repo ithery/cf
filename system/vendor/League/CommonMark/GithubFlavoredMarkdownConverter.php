@@ -18,15 +18,13 @@ use League\CommonMark\Environment\Environment;
 /**
  * Converts Github Flavored Markdown to HTML.
  */
-final class GithubFlavoredMarkdownConverter extends MarkdownConverter
-{
+final class GithubFlavoredMarkdownConverter extends MarkdownConverter {
     /**
      * Create a new commonmark converter instance.
      *
      * @param array<string, mixed> $config
      */
-    public function __construct(array $config = [])
-    {
+    public function __construct(array $config = []) {
         $environment = Environment::createGFMEnvironment();
         $environment->mergeConfig($config);
 

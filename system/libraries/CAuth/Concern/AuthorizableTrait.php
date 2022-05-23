@@ -10,7 +10,7 @@ trait CAuth_Concern_AuthorizableTrait {
      * @return bool
      */
     public function can($abilities, $arguments = []) {
-        return app(Gate::class)->forUser($this)->check($abilities, $arguments);
+        return CAuth::gate()->forUser($this)->check($abilities, $arguments);
     }
 
     /**
@@ -22,7 +22,7 @@ trait CAuth_Concern_AuthorizableTrait {
      * @return bool
      */
     public function canAny($abilities, $arguments = []) {
-        return app(Gate::class)->forUser($this)->any($abilities, $arguments);
+        return CAuth::gate()->forUser($this)->any($abilities, $arguments);
     }
 
     /**

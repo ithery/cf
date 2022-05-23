@@ -157,11 +157,12 @@ class CDatabase_Driver_Mysqli_Result extends CDatabase_Result {
 
         // Return the row
         $fetch = $this->fetch_type;
+
         return $this->result->$fetch($this->return_type);
     }
 
     /**
-     * {@inheritdoc}
+     * @inheritdoc
      */
     public function fetchAll($fetchMode = null, $fetchArgument = null, $ctorArgs = null) {
         return $this->resultArray(false);

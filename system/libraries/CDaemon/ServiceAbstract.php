@@ -163,7 +163,7 @@ abstract class CDaemon_ServiceAbstract implements CDaemon_ServiceInterface {
      *
      * @var stream
      */
-    private static $log_handle = false;
+    private static $logHandle = false;
 
     /**
      * Implement this method to define plugins.
@@ -244,6 +244,7 @@ abstract class CDaemon_ServiceAbstract implements CDaemon_ServiceInterface {
      * @return void
      */
     private function init() {
+        // SIGKILL, you can't override SIGKILL so it is useless
         $signals = [
             // Handled by CDaemon_ServiceAbstract:
             SIGTERM, SIGINT, SIGUSR1, SIGHUP, SIGCHLD,
@@ -317,9 +318,9 @@ abstract class CDaemon_ServiceAbstract implements CDaemon_ServiceInterface {
 
         try {
             $this->pid(getmypid());
-            if (pcntl_fork() > 0) {
-                exit();
-            }
+            // if (pcntl_fork() > 0) {
+            //     exit();
+            // }
             $this->pid(getmypid()); // We have a new pid now
             $pidFile = $this->pidFile;
 
@@ -575,40 +576,40 @@ abstract class CDaemon_ServiceAbstract implements CDaemon_ServiceInterface {
      */
     public function log($message, $label = '', $indent = 0) {
         static $logFile = '';
-        static $logFile_check_at = 0;
-        static $logFile_error = false;
+        static $logFileCheckAt = 0;
+        static $logFileError = false;
         $header = "\nDate                  PID   Label         Message\n";
         $date = date('Y-m-d H:i:s');
         $pid = str_pad($this->pid, 5, ' ', STR_PAD_LEFT);
         $label = str_pad(substr($label, 0, 12), 13, ' ', STR_PAD_RIGHT);
         $prefix = "[${date}] ${pid} ${label}" . str_repeat("\t", $indent);
-        if (time() >= $logFile_check_at && $this->logFile() != $logFile) {
+        if (time() >= $logFileCheckAt && $this->logFile() != $logFile) {
             $logFile = $this->logFile();
-            $logFile_check_at = mktime(date('H'), (date('i') - (date('i') % 5)) + 5, null);
-            @fclose(self::$log_handle);
-            self::$log_handle = $logFile_error = false;
+            $logFileCheckAt = mktime(date('H'), (date('i') - (date('i') % 5)) + 5, null);
+            @fclose(self::$logHandle);
+            self::$logHandle = $logFileError = false;
         }
-        if (self::$log_handle === false) {
+        if (self::$logHandle === false) {
             if (strlen($logFile) > 0 && file_exists($logFile)) {
                 $rotator = CLogger_Rotator::createRotate($logFile);
 
                 $rotator->size($this->sizeToRotate)->run();
             }
-            if (strlen($logFile) > 0 && self::$log_handle = @fopen($logFile, 'a+')) {
+            if (strlen($logFile) > 0 && self::$logHandle = @fopen($logFile, 'a+')) {
                 if ($this->parent) {
-                    fwrite(self::$log_handle, $header);
+                    fwrite(self::$logHandle, $header);
                     if ($this->stdout) {
                         echo $header;
                     }
                 }
-            } elseif (!$logFile_error) {
-                $logFile_error = true;
+            } elseif (!$logFileError) {
+                $logFileError = true;
                 trigger_error(__CLASS__ . 'Error: Could not write to logfile ' . $logFile, E_USER_WARNING);
             }
         }
         $message = $prefix . ' ' . str_replace("\n", "\n${prefix} ", trim($message)) . "\n";
-        if (self::$log_handle) {
-            fwrite(self::$log_handle, $message);
+        if (self::$logHandle) {
+            fwrite(self::$logHandle, $message);
         }
         if ($this->stdout) {
             echo $message;
@@ -699,8 +700,8 @@ abstract class CDaemon_ServiceAbstract implements CDaemon_ServiceInterface {
                     fclose(STDIN);
                 }
                 // Close the static log handle to prevent it being inherrited by the new process.
-                if (is_resource(self::$log_handle)) {
-                    fclose(self::$log_handle);
+                if (is_resource(self::$logHandle)) {
+                    fclose(self::$logHandle);
                 }
 
                 break;
@@ -735,7 +736,7 @@ abstract class CDaemon_ServiceAbstract implements CDaemon_ServiceInterface {
         foreach ($this->workers as $worker) {
             $workers .= sprintf('%s %s [%s], ', $worker, $this->{$worker}->guid, $this->{$worker}->is_idle() ? 'AVAILABLE' : 'BUFFERING');
         }
-        $pretty_memory = function ($bytes) {
+        $prettyMemory = function ($bytes) {
             $kb = 1024;
             $mb = $kb * 1024;
             $gb = $mb * 1024;
@@ -750,7 +751,7 @@ abstract class CDaemon_ServiceAbstract implements CDaemon_ServiceInterface {
                     return $bytes;
             }
         };
-        $pretty_duration = function ($seconds) {
+        $prettyDuration = function ($seconds) {
             $m = 60;
             $h = $m * 60;
             $d = $h * 24;
@@ -774,9 +775,10 @@ abstract class CDaemon_ServiceAbstract implements CDaemon_ServiceInterface {
 
             return $out;
         };
-        $pretty_bool = function ($bool) {
+        $prettyBool = function ($bool) {
             return $bool ? 'Yes' : 'No';
         };
+
         $out = [];
         $out[] = '---------------------------------------------------------------------------------------------------';
         $out[] = 'Application Runtime Statistics';
@@ -786,16 +788,16 @@ abstract class CDaemon_ServiceAbstract implements CDaemon_ServiceInterface {
         $out[] = 'Idle Probability      ' . $this->idleProbability;
         $out[] = 'Restart Interval:     ' . $this->autoRestartInterval;
         $out[] = sprintf('Start Time:           %s (%s)', $this->startTime, date('Y-m-d H:i:s', $this->startTime));
-        $out[] = sprintf('Duration:             %s (%s)', $this->runtime(), $pretty_duration($this->runtime()));
+        $out[] = sprintf('Duration:             %s (%s)', $this->runtime(), $prettyDuration($this->runtime()));
         $out[] = 'Log File:             ' . $this->logFile();
-        $out[] = 'Shutdown Signal:      ' . $pretty_bool($this->shutdown);
+        $out[] = 'Shutdown Signal:      ' . $prettyBool($this->shutdown);
         $out[] = 'Process Type:         ' . ($this->parent ? 'Application Process' : 'Background Process');
-        $out[] = 'Plugins:              ' . implode(', ', $this->plugins);
+        $out[] = 'Plugins:              ' . implode(', ', array_keys($this->plugins));
         $out[] = 'Workers:              ' . $workers;
-        $out[] = sprintf('Memory:               %s (%s)', memory_get_usage(true), $pretty_memory(memory_get_usage(true)));
-        $out[] = sprintf('Peak Memory:          %s (%s)', memory_get_peak_usage(true), $pretty_memory(memory_get_peak_usage(true)));
-        $out[] = 'Current User:         ' . get_current_user();
-        $out[] = 'Priority:             ' . pcntl_getpriority();
+        $out[] = sprintf('Memory:               %s (%s)', memory_get_usage(true), $prettyMemory(memory_get_usage(true)));
+        $out[] = sprintf('Peak Memory:          %s (%s)', memory_get_peak_usage(true), $prettyMemory(memory_get_peak_usage(true)));
+        $out[] = 'Current User:         ' . @get_current_user();
+        $out[] = 'Priority:             ' . @pcntl_getpriority();
         $out[] = 'Loop: duration, idle: ' . implode(', ', $this->statsMean()) . ' (Mean Seconds)';
         $out[] = 'Stats sample size:    ' . count($this->stats);
         $this->log(implode("\n", $out));
@@ -887,7 +889,7 @@ abstract class CDaemon_ServiceAbstract implements CDaemon_ServiceInterface {
         }
         $pid = $this->getPidFromPidFile();
 
-        $command = 'kill -9 ' . $pid;
+        $command = 'kill -2 ' . $pid;
         if (defined('CFCLI')) {
             $process = new Process($command);
             $process->run();
@@ -929,15 +931,12 @@ abstract class CDaemon_ServiceAbstract implements CDaemon_ServiceInterface {
             fclose(STDIN);
         }
         // Close the static log handle to prevent it being inherrited by the new process.
-        if (is_resource(self::$log_handle)) {
-            fclose(self::$log_handle);
+        if (is_resource(self::$logHandle)) {
+            fclose(self::$logHandle);
         }
 
-        $daemonConfig = $this->config;
-        $daemonConfig['command'] = 'start';
-
-        $daemon = new CDaemon($daemonConfig);
-        $daemon->run();
+        $class = get_class($this);
+        CDaemon::createRunner($class)->run();
 
         // A new daemon process has been created. This one will stick around just long enough to clean up the worker processes.
         exit();
@@ -1197,22 +1196,8 @@ abstract class CDaemon_ServiceAbstract implements CDaemon_ServiceInterface {
         }
         $this->loopInterval = $setValue;
         $this->log('Adjusting Event Loop Duration: ' . number_format($this->getLoopInterval(), 2)) . ' seconds';
-        $priority = -1;
-        if ($setValue >= 5.0 || $setValue <= 0.0) {
-            $priority = 0;
-        }
-        if ($priority == pcntl_getpriority()) {
-            return;
-        }
-        @pcntl_setpriority($priority);
-        if (pcntl_getpriority() == $priority) {
-            $this->log('Adjusting Process Priority to ' . $priority);
-        } else {
-            $this->log(
-                "Warning: At configured loopInterval a process priorty of `{$priority}` is suggested but this process does not have setpriority privileges.\n"
-                    . "         Consider running the daemon with `CAP_SYS_RESOURCE` privileges or set it manually using `sudo renice -n {$priority} -p {$this->pid}`"
-            );
-        }
+
+        $this->log('Current Process Priority: ' . pcntl_getpriority() . '');
     }
 
     /**

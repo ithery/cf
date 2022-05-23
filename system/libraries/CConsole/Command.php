@@ -1,18 +1,15 @@
 <?php
 
-use Symfony\Component\Console\Helper\Table;
 use Symfony\Component\Console\Input\ArrayInput;
 use Symfony\Component\Console\Output\NullOutput;
-use Symfony\Component\Console\Question\Question;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
-use Symfony\Component\Console\Question\ChoiceQuestion;
-use Symfony\Component\Console\Formatter\OutputFormatterStyle;
 use Symfony\Component\Console\Command\Command as SymfonyCommand;
 
 class CConsole_Command extends SymfonyCommand {
-    use CConsole_Trait_InteractsWithIOTrait,
-        CTrait_Macroable;
+    use CConsole_Trait_InteractsWithIOTrait;
+    use CConsole_Trait_HasParameters;
+    use CTrait_Macroable;
 
     /**
      * The name and signature of the console command.
@@ -87,24 +84,6 @@ class CConsole_Command extends SymfonyCommand {
     }
 
     /**
-     * Specify the arguments and options on the command.
-     *
-     * @return void
-     */
-    protected function specifyParameters() {
-        // We will loop through all of the arguments and options for the command and
-        // set them all on the base command instance. This specifies what can get
-        // passed into these commands as "parameters" to control the execution.
-        foreach ($this->getArguments() as $arguments) {
-            call_user_func_array([$this, 'addArgument'], $arguments);
-        }
-
-        foreach ($this->getOptions() as $options) {
-            call_user_func_array([$this, 'addOption'], $options);
-        }
-    }
-
-    /**
      * Run the console command.
      *
      * @param \Symfony\Component\Console\Input\InputInterface   $input
@@ -161,7 +140,7 @@ class CConsole_Command extends SymfonyCommand {
 
         return $this->getApplication()->find($command)->run(
             $this->createInputFromArguments($arguments),
-            new NullOutput
+            new NullOutput()
         );
     }
 
@@ -178,23 +157,5 @@ class CConsole_Command extends SymfonyCommand {
                 $input->setInteractive(false);
             }
         });
-    }
-
-    /**
-     * Get the console command arguments.
-     *
-     * @return array
-     */
-    protected function getArguments() {
-        return [];
-    }
-
-    /**
-     * Get the console command options.
-     *
-     * @return array
-     */
-    protected function getOptions() {
-        return [];
     }
 }

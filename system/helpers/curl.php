@@ -14,7 +14,7 @@ class curl {
      * @return string
      */
     public static function current($qs = false) {
-        return ($qs === true) ? CFRouter::$complete_uri : CFRouter::$current_uri;
+        return ltrim(($qs === true) ? c::request()->getRequestUri() : c::request()->path(), '/');
     }
 
     /**
@@ -86,12 +86,7 @@ class curl {
      * @return string
      */
     public static function fullUrl($qs = true) {
-        $requestUri = carr::get($_SERVER, 'REQUEST_URI');
-        if ($qs && strlen($requestUri) > 0) {
-            return trim(curl::httpbase(), '/') . $requestUri;
-        }
-
-        return curl::httpbase() . curl::current() . ($qs ? CFRouter::$query_string : '');
+        return $qs ? c::url()->full() : c::url()->current();
     }
 
     /**
@@ -145,31 +140,10 @@ class curl {
     }
 
     /**
-     * Merges an array of arguments with the current URI and query string to
-     * overload, instead of replace, the current query string.
-     *
-     * @param   array   associative array of arguments
-     *
-     * @return string
-     */
-    public static function merge(array $arguments) {
-        if ($_GET === $arguments) {
-            $query = CFRouter::$query_string;
-        } elseif ($query = http_build_query(array_merge($_GET, $arguments))) {
-            $query = '?' . $query;
-        }
-
-        // Return the current URI with the arguments merged into the query string
-        return CFRouter::$current_uri . $query;
-    }
-
-    /**
      * Convert a phrase to a URL-safe title.
      *
-     * @param   string  phrase to convert
-     * @param   string  word separator (- or _)
-     * @param mixed $title
-     * @param mixed $separator
+     * @param string $title     phrase to convert
+     * @param string $separator word separator (- or _)
      *
      * @return string
      */
@@ -248,7 +222,10 @@ class curl {
 
         // We are about to exit, so run the send_headers event
         CFEvent::run('system.send_headers');
-
+        //force save the session
+        if ($session = CSession::instance()->store()) {
+            $session->save();
+        }
         exit('<h1>' . $method . ' - ' . $codes[$method] . '</h1>' . $output);
     }
 

@@ -5,8 +5,6 @@ use Predis\Connection\Aggregate\ClusterInterface;
 
 /**
  * @mixin \Predis\Client
- *
- * @deprecated Predis is no longer maintained by its original author
  */
 class CRedis_Connection_PredisConnection extends CRedis_AbstractConnection {
     /**
@@ -57,7 +55,7 @@ class CRedis_Connection_PredisConnection extends CRedis_AbstractConnection {
             return $this->command('flushdb');
         }
         foreach ($this->getConnection() as $node) {
-            $node->executeCommand(new ServerFlushDatabase);
+            $node->executeCommand(new ServerFlushDatabase());
         }
     }
 }

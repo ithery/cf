@@ -1,7 +1,7 @@
 <?php
 
 /**
- * Description of CreatesRegularExpressionRouteConstraints
+ * Description of CreatesRegularExpressionRouteConstraints.
  *
  * @author Hery
  */

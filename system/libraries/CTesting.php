@@ -1,12 +1,15 @@
 <?php
 
 class CTesting {
+    protected static $loggedExceptionCollection;
+
     public static function isInstalled() {
         $phpUnitBinaryExists = file_exists(static::phpUnitBinary());
         $phpUnitConfigExists = file_exists(static::phpUnitConfig());
         $testDirectoryExists = CFile::isDirectory(static::testDirectory());
         $testUnitDirectoryExists = CFile::isDirectory(static::testUnitDirectory());
         $testFeatureDirectoryExists = CFile::isDirectory(static::testFeatureDirectory());
+
         return $phpUnitBinaryExists
             && $phpUnitConfigExists
             && $testDirectoryExists
@@ -32,5 +35,13 @@ class CTesting {
 
     public static function testFeatureDirectory() {
         return static::testDirectory() . DS . 'Feature';
+    }
+
+    public static function loggedExceptionCollection() {
+        if (static::$loggedExceptionCollection == null) {
+            static::$loggedExceptionCollection = new CTesting_LoggedExceptionCollection();
+        }
+
+        return static::$loggedExceptionCollection;
     }
 }

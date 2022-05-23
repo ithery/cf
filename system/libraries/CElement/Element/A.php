@@ -15,20 +15,12 @@ class CElement_Element_A extends CElement_Element {
     }
 
     /**
-     * Set href attribute.
+     * @param string $id
      *
-     * @param string $href
-     *
-     * @return $this
-     *
-     * @deprecated 1.2 use setHref
+     * @return static
      */
-    // @codingStandardsIgnoreStart
-    public function set_href($href) {
-        // @codingStandardsIgnoreEnd
-        $this->href = $href;
-
-        return $this;
+    public static function factory($id = '') {
+        return CElement_Factory::create(static::class, $id = '');
     }
 
     /**
@@ -44,13 +36,26 @@ class CElement_Element_A extends CElement_Element {
         return $this;
     }
 
+    /**
+     * @param mixed $target
+     *
+     * @return $this
+     */
     public function setTarget($target = '_blank') {
         $this->target = $target;
 
         return $this;
     }
 
-    public function build($indent = 0) {
+    /**
+     * @return $this
+     */
+    public function setTargetBlank() {
+        return $this->setTarget('_blank');
+    }
+
+    protected function build() {
+        parent::build();
         if (strlen($this->href) > 0) {
             $this->addAttr('href', $this->href);
         }

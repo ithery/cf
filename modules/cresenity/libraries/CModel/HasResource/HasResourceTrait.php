@@ -1,5 +1,7 @@
 <?php
-
+/**
+ * @property-read CModel_Collection|CApp_Model_Interface_ResourceInterface[] $resource
+ */
 trait CModel_HasResource_HasResourceTrait {
     /**
      * @var array
@@ -106,9 +108,9 @@ trait CModel_HasResource_HasResourceTrait {
      * //@param string       $url
      * //@param string|array ...$allowedMimeTypes
      *
-     * @return CModel_HasResource_FileAdder_FileAdder
-     *
      * @throws CResources_Exception_FileCannotBeAdded
+     *
+     * @return CModel_HasResource_FileAdder_FileAdder
      */
     public function addResourceFromUrl() {
         $args = func_get_args();
@@ -226,6 +228,8 @@ trait CModel_HasResource_HasResourceTrait {
      *
      * @param mixed $collectionName
      * @param mixed $conversionName
+     *
+     * @return string
      */
     public function getFirstResourceUrl($collectionName = 'default', $conversionName = '') {
         $resource = $this->getFirstResource($collectionName);
@@ -243,6 +247,8 @@ trait CModel_HasResource_HasResourceTrait {
      *
      * @param mixed $collectionName
      * @param mixed $conversionName
+     *
+     * @return string
      */
     public function getFirstResourceFullUrl($collectionName = 'default', $conversionName = '') {
         $resource = $this->getFirstResource($collectionName);
@@ -293,9 +299,9 @@ trait CModel_HasResource_HasResourceTrait {
      * @param array  $newResourceArray
      * @param string $collectionName
      *
-     * @return CCollection
-     *
      * @throws \CResources_Exception_ResourceCannotBeUpdated
+     *
+     * @return CCollection
      */
     public function updateResource(array $newResourceArray, $collectionName = 'default') {
         $this->removeResourceItemsNotPresentInArray($newResourceArray, $collectionName);
@@ -399,7 +405,9 @@ trait CModel_HasResource_HasResourceTrait {
     /**
      * Add a conversion.
      *
-     * @param mixed $name
+     * @param string $name
+     *
+     * @return CResources_Conversion
      */
     public function addResourceConversion($name) {
         $conversion = CResources_Conversion::create($name);
@@ -475,11 +483,11 @@ trait CModel_HasResource_HasResourceTrait {
 
     /**
      * //@param string $file
-     * //@param string ..$allowedMimeTypes
-     *
-     * @return type
+     * //@param string ..$allowedMimeTypes.
      *
      * @throws type
+     *
+     * @return type
      */
     protected function guardAgainstInvalidMimeType() {
         $args = func_get_args();

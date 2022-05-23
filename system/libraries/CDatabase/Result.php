@@ -1,7 +1,7 @@
 <?php
 
 /**
- * CDatabase_Result
+ * CDatabase_Result.
  */
 abstract class CDatabase_Result implements CDatabase_ResultInterface, ArrayAccess, Iterator, Countable {
     use CTrait_Compat_Database_Result;
@@ -78,14 +78,14 @@ abstract class CDatabase_Result implements CDatabase_ResultInterface, ArrayAcces
     abstract public function seek($offset);
 
     /**
-     * Countable: count
+     * Countable: count.
      */
     public function count() {
         return $this->total_rows;
     }
 
     /**
-     * ArrayAccess: offsetExists
+     * ArrayAccess: offsetExists.
      *
      * @param mixed $offset
      */
@@ -101,7 +101,7 @@ abstract class CDatabase_Result implements CDatabase_ResultInterface, ArrayAcces
     }
 
     /**
-     * ArrayAccess: offsetGet
+     * ArrayAccess: offsetGet.
      *
      * @param mixed $offset
      */
@@ -115,7 +115,7 @@ abstract class CDatabase_Result implements CDatabase_ResultInterface, ArrayAcces
     }
 
     /**
-     * ArrayAccess: offsetSet
+     * ArrayAccess: offsetSet.
      *
      * @param mixed $offset
      * @param mixed $value
@@ -127,7 +127,7 @@ abstract class CDatabase_Result implements CDatabase_ResultInterface, ArrayAcces
     }
 
     /**
-     * ArrayAccess: offsetUnset
+     * ArrayAccess: offsetUnset.
      *
      * @param mixed $offset
      *
@@ -138,45 +138,48 @@ abstract class CDatabase_Result implements CDatabase_ResultInterface, ArrayAcces
     }
 
     /**
-     * Iterator: current
+     * Iterator: current.
      */
     public function current() {
         return $this->offsetGet($this->current_row);
     }
 
     /**
-     * Iterator: key
+     * Iterator: key.
      */
     public function key() {
         return $this->current_row;
     }
 
     /**
-     * Iterator: next
+     * Iterator: next.
      */
     public function next() {
         ++$this->current_row;
+
         return $this;
     }
 
     /**
-     * Iterator: prev
+     * Iterator: prev.
      */
     public function prev() {
         --$this->current_row;
+
         return $this;
     }
 
     /**
-     * Iterator: rewind
+     * Iterator: rewind.
      */
     public function rewind() {
         $this->current_row = 0;
+
         return $this;
     }
 
     /**
-     * Iterator: valid
+     * Iterator: valid.
      */
     public function valid() {
         return $this->offsetExists($this->current_row);

@@ -16,7 +16,7 @@
  * @method CRouting_RouteRegistrar prefix(string  $prefix)
  * @method CRouting_RouteRegistrar where(array  $where)
  */
-class RouteRegistrar {
+class CRouting_RouteRegistrar {
     /**
      * The router instance.
      *

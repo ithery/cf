@@ -29,7 +29,7 @@ abstract class CDatabase_Schema_Manager {
      * Constructor. Accepts the Connection instance to manage the schema for.
      *
      * @param CDatabase               $conn
-     * @param CDatabase_Platform|null $platform
+     * @param null|CDatabase_Platform $platform
      */
     public function __construct(CDatabase $conn, CDatabase_Platform $platform = null) {
         $this->db = $conn;
@@ -99,7 +99,7 @@ abstract class CDatabase_Schema_Manager {
     /**
      * Lists the available sequences for this connection.
      *
-     * @param string|null $database
+     * @param null|string $database
      *
      * @return \Doctrine\DBAL\Schema\Sequence[]
      */
@@ -125,7 +125,7 @@ abstract class CDatabase_Schema_Manager {
      * in the platformDetails array.
      *
      * @param string      $table    the name of the table
-     * @param string|null $database
+     * @param null|string $database
      *
      * @return \Doctrine\DBAL\Schema\Column[]
      */
@@ -209,7 +209,7 @@ abstract class CDatabase_Schema_Manager {
     }
 
     /**
-     * @return string|null
+     * @return null|string
      */
     protected function getFilterSchemaAssetsExpression() {
         return $this->db->getConfiguration()->getFilterSchemaAssetsExpression();
@@ -218,7 +218,7 @@ abstract class CDatabase_Schema_Manager {
     /**
      * Lists the tables for this connection.
      *
-     * @return \Doctrine\DBAL\Schema\Table[]
+     * @return \CDatabase_Schema_Table[]
      */
     public function listTables() {
         $tableNames = $this->listTableNames();
@@ -234,7 +234,7 @@ abstract class CDatabase_Schema_Manager {
     /**
      * @param string $tableName
      *
-     * @return \Doctrine\DBAL\Schema\Table
+     * @return \CDatabase_Schema_Table
      */
     public function listTableDetails($tableName) {
         $columns = $this->listTableColumns($tableName);
@@ -250,7 +250,7 @@ abstract class CDatabase_Schema_Manager {
     /**
      * Lists the views this connection has.
      *
-     * @return \Doctrine\DBAL\Schema\View[]
+     * @return \CDatabase_Schema_View[]
      */
     public function listViews() {
         $database = $this->db->getDatabase();
@@ -264,9 +264,9 @@ abstract class CDatabase_Schema_Manager {
      * Lists the foreign keys for the given table.
      *
      * @param string      $table    the name of the table
-     * @param string|null $database
+     * @param null|string $database
      *
-     * @return \Doctrine\DBAL\Schema\ForeignKeyConstraint[]
+     * @return \CDatabase_Schema_ForeignKeyConstraint[]
      */
     public function listTableForeignKeys($table, $database = null) {
         if ($database === null) {
@@ -335,8 +335,8 @@ abstract class CDatabase_Schema_Manager {
     /**
      * Drops a foreign key from a table.
      *
-     * @param \Doctrine\DBAL\Schema\ForeignKeyConstraint|string $foreignKey the name of the foreign key
-     * @param \Doctrine\DBAL\Schema\Table|string                $table      the name of the table with the foreign key
+     * @param \CDatabase_Schema_ForeignKeyConstraint|string $foreignKey the name of the foreign key
+     * @param \CDatabase_Schema_Table|string                $table      the name of the table with the foreign key
      *
      * @return void
      */
@@ -396,9 +396,9 @@ abstract class CDatabase_Schema_Manager {
      *
      * @param \CDatabase_Schema_Sequence $sequence
      *
-     * @return void
-     *
      * @throws \Doctrine\DBAL\ConnectionException if something fails at database level
+     *
+     * @return void
      */
     public function createSequence($sequence) {
         $this->execSql($this->platform->getCreateSequenceSQL($sequence));
@@ -500,9 +500,9 @@ abstract class CDatabase_Schema_Manager {
      *
      * @param \CDatabase_Schema_Sequence $sequence
      *
-     * @return void
-     *
      * @throws \Doctrine\DBAL\ConnectionException if something fails at database level
+     *
+     * @return void
      */
     public function dropAndCreateSequence(CDatabase_Schema_Sequence $sequence) {
         $this->tryMethod('dropSequence', $sequence->getQuotedName($this->platform));
@@ -579,7 +579,7 @@ abstract class CDatabase_Schema_Manager {
 
     /**
      * Methods for filtering return values of list*() methods to convert
-     * the native DBMS data definition to a portable Doctrine definition
+     * the native DBMS data definition to a portable Doctrine definition.
      *
      * @param mixed $databases
      */
@@ -706,9 +706,9 @@ abstract class CDatabase_Schema_Manager {
     /**
      * @param array $sequence
      *
-     * @return \CDatabase_Schema_Sequence
-     *
      * @throws \CDatabase_Exception
+     *
+     * @return \CDatabase_Schema_Sequence
      */
     protected function getPortableSequenceDefinition($sequence) {
         throw CDatabase_Exception::notSupported('Sequences');
@@ -765,7 +765,7 @@ abstract class CDatabase_Schema_Manager {
      * Aggregates and groups the index results according to the required data result.
      *
      * @param array       $tableIndexRows
-     * @param string|null $tableName
+     * @param null|string $tableName
      *
      * @return array
      */

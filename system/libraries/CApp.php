@@ -8,19 +8,23 @@ defined('SYSPATH') or die('No direct access allowed.');
  * @see CRenderable
  * @see CElement
  *
- * @method CElement_Component_Action      addAction($id=null)
- * @method CElement_List_ActionList       addActionList($id=null)
- * @method CElement_Component_Alert       addAlert($id=null)
- * @method CElement_Element_Div           addDiv($id=null)
- * @method CElement_Component_FileManager addFileManager($id=null)
- * @method CElement_Component_Form        addForm($id=null)
- * @method CElement_Element_Pre           addPre($id=null)
- * @method CElement_Component_DataTable   addTable($id=null)
- * @method CElement_List_TabList          addTabList($id=null)
- * @method CElement_Template              addTemplate($id=null)
- * @method CElement_View                  addView($view = null, $data = null, $id = null)
- * @method CElement_Component_Widget      addWidget($id=null)
- * @method $this                          addJs($js)
+ * @method CElement_Component_Action       addAction($id=null)
+ * @method CElement_Component_Alert        addAlert($id=null)
+ * @method CElement_Component_FileManager  addFileManager($id=null)
+ * @method CElement_Component_Form         addForm($id=null)
+ * @method CElement_Component_DataTable    addTable($id=null)
+ * @method CElement_Element_Div            addDiv($id=null)
+ * @method CElement_Element_A              addA($id=null)
+ * @method CElement_Element_Span           addSpan($id=null)
+ * @method CElement_Element_Pre            addPre($id=null)
+ * @method CElement_List_ActionList        addActionList($id=null)
+ * @method CElement_List_TabList           addTabList($id=null)
+ * @method CElement_FormInput_Select       addSelectControl($id=null)
+ * @method CElement_FormInput_SelectSearch addSelectSearchControl($id=null)
+ * @method CElement_Template               addTemplate($id=null)
+ * @method CElement_View                   addView($view = null, $data = null, $id = null)
+ * @method CElement_Component_Widget       addWidget($id=null)
+ * @method $this                           addJs($js)
  */
 class CApp implements CInterface_Responsable, CInterface_Renderable, CInterface_Jsonable {
     use CTrait_Compat_App,
@@ -48,6 +52,8 @@ class CApp implements CInterface_Responsable, CInterface_Renderable, CInterface_
      * @var CApp_Element
      */
     protected $element;
+
+    protected $baseResolver = null;
 
     private $content = '';
 
@@ -97,12 +103,6 @@ class CApp implements CInterface_Responsable, CInterface_Renderable, CInterface_
             include $appBootFile;
         }
 
-        if (ccfg::get('set_timezone')) {
-            $timezone = ccfg::get('default_timezone');
-
-            date_default_timezone_set($timezone);
-        }
-
         $this->id = 'capp';
         //check login
 
@@ -121,6 +121,10 @@ class CApp implements CInterface_Responsable, CInterface_Renderable, CInterface_
         if ($haveUserLogin === false) {
             $this->authEnabled = false;
         }
+
+        $this->baseResolver = function () {
+            return CF::config('app.classes.base', CApp_Base::class);
+        };
     }
 
     /**
@@ -132,6 +136,13 @@ class CApp implements CInterface_Responsable, CInterface_Renderable, CInterface_
         }
     }
 
+    /**
+     * @return CApp_Contract_BaseInterface
+     */
+    public function base() {
+        return new CBase_ForwarderStaticClass(c::value($this->baseResolver));
+    }
+
     public function __call($method, $parameters) {
         if (method_exists($this->element, $method)) {
             return call_user_func_array([$this->element, $method], $parameters);
@@ -141,15 +152,6 @@ class CApp implements CInterface_Responsable, CInterface_Renderable, CInterface_
         }
 
         throw new Exception('undefined method on CApp: ' . $method);
-    }
-
-    /**
-     * @param string $domain
-     *
-     * @return CApp_Navigation
-     */
-    public static function navigation($domain = null) {
-        return CApp_Navigation::instance($domain);
     }
 
     /**
@@ -181,6 +183,8 @@ class CApp implements CInterface_Responsable, CInterface_Renderable, CInterface_
     /**
      * @param string $modelName
      *
+     * @deprecated 1.3
+     *
      * @return CApp_Model
      */
     public static function model($modelName) {
@@ -195,6 +199,15 @@ class CApp implements CInterface_Responsable, CInterface_Renderable, CInterface_
      * @return CApp_Navigation
      */
     public static function nav($domain = null) {
+        return CApp_Navigation::instance($domain);
+    }
+
+    /**
+     * @param string $domain
+     *
+     * @return CApp_Navigation
+     */
+    public static function navigation($domain = null) {
         return CApp_Navigation::instance($domain);
     }
 
@@ -438,8 +451,9 @@ class CApp implements CInterface_Responsable, CInterface_Renderable, CInterface_
         if (strlen($orgId) == 0) {
             $orgId = CApp_Base::orgId();
         }
-
-        $nodes = self::model('Roles')->getDescendantsTree($roleId, $orgId, $type);
+        $roleModel = c::container()->make($this->auth()->getRoleModelClass());
+        /** @var CApp_Model_Roles $roleModel */
+        $nodes = $roleModel->getDescendantsTree($roleId, $orgId, $type);
         $childList = [];
 
         $traverse = function ($childs) use (&$traverse, &$childList) {
@@ -466,14 +480,28 @@ class CApp implements CInterface_Responsable, CInterface_Renderable, CInterface_
                 $message = $messageOrig;
             }
         }
-        $data['html'] = $message . $this->html();
+
         $asset = CManager::asset();
+        $html = $this->element->html();
         $js = $this->element->js();
-        $cappScript = $this->yieldPushContent('capp-script');
-        $js .= $cappScript;
         $js = $asset->renderJsRequire($js, 'cresenity.cf.require');
+
+        $cappScript = $this->yieldPushContent('capp-script');
+        //strip cappScript from <script>
+        //parse the output of view
+        // preg_match_all('#<script>(.*?)</script>#ims', $cappScript, $matches);
+
+        // foreach ($matches[1] as $value) {
+        //     $js = $value . $js;
+        // }
+
+        //$js .= $cappScript;
+        $data['html'] = $message . $html . $cappScript;
         $data['js'] = base64_encode($js);
-        $data['jsRaw'] = $js;
+        if (CF::config('app.debug')) {
+            $data['jsRaw'] = $js;
+        }
+
         $data['css_require'] = $asset->getAllCssFileUrl();
         $data['message'] = $messageOrig;
         $data['ajaxData'] = $this->ajaxData;
@@ -542,11 +570,11 @@ class CApp implements CInterface_Responsable, CInterface_Renderable, CInterface_
     }
 
     public static function isAdministrator() {
-        return carr::first(explode('/', trim(CFRouter::getUri(), '/'))) == 'administrator';
+        return carr::first(explode('/', trim(curl::current(), '/'))) == 'administrator';
     }
 
     public static function setTheme($theme) {
-        CManager::theme()->setTheme($theme);
+        return CManager::theme()->setTheme($theme);
     }
 
     public static function setHaveScrollToTop($bool = true) {
@@ -555,7 +583,7 @@ class CApp implements CInterface_Responsable, CInterface_Renderable, CInterface_
 
     public static function haveScrollToTop() {
         if (static::$haveScrollToTop === null) {
-            static::$haveScrollToTop = ccfg::get('have_scroll_to_top') === null ? true : ccfg::get('have_scroll_to_top');
+            static::$haveScrollToTop = CF::config('cresjs', 'scroll_to_top', false);
         }
 
         return static::$haveScrollToTop;
@@ -565,5 +593,14 @@ class CApp implements CInterface_Responsable, CInterface_Renderable, CInterface_
         $this->data[$key] = $value;
 
         return $this;
+    }
+
+    /**
+     * Get CApp Formatter Instance.
+     *
+     * @return CApp_Formatter
+     */
+    public static function formatter() {
+        return CApp_Formatter::instance();
     }
 }

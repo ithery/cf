@@ -2,9 +2,13 @@
 
 namespace Psr\Http\Client;
 
-/**
- * Every HTTP client related exception MUST implement this interface.
- */
-interface ClientExceptionInterface 
-{
+if (\class_exists(\Throwable::class)) {
+    /**
+     * Every HTTP client related exception MUST implement this interface.
+     */
+    interface ClientExceptionInterface extends \Throwable {
+    }
+} else {
+    interface ClientExceptionInterface {
+    }
 }

@@ -7,9 +7,13 @@ class CEmail_Driver_MailgunDriver extends CEmail_DriverAbstract {
         $from = carr::get($options, 'from', $this->config->getFrom());
         $fromName = carr::get($options, 'from_name', $this->config->getFromName());
 
-        $domain = carr::get($options, 'domain');
+        $domain = carr::get($options, 'domain', carr::get($options, 'smtp_domain'));
 
-        $url = 'https://api.mailgun.net/v3/' . $domain . '/messages';
+        $url = 'https://api.mailgun.net/v3/messages';
+        if ($domain) {
+            $url = 'https://api.mailgun.net/v3/' . $domain . '/messages';
+        }
+
         /*
           $template_id = '<your_template_id>';
           $js = array(

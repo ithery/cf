@@ -12,7 +12,7 @@ defined('SYSPATH') or die('No direct access allowed.');
 /**
  * @mixin CQueue_QueueInterface
  */
-class CQueue_Manager implements CQueue_FactoryInterface, CQueue_MonitorInterface {
+class CQueue_Manager implements CQueue_FactoryInterface, CQueue_Contract_MonitorInterface {
     /**
      * The array of resolved queue connections.
      *
@@ -28,7 +28,7 @@ class CQueue_Manager implements CQueue_FactoryInterface, CQueue_MonitorInterface
     protected $connectors = [];
 
     /**
-     * The event dispatcher instance
+     * The event dispatcher instance.
      *
      * @var CEvent_DispatcherInterface
      */
@@ -115,7 +115,7 @@ class CQueue_Manager implements CQueue_FactoryInterface, CQueue_MonitorInterface
     /**
      * Determine if the driver is connected.
      *
-     * @param string|null $name
+     * @param null|string $name
      *
      * @return bool
      */
@@ -126,7 +126,7 @@ class CQueue_Manager implements CQueue_FactoryInterface, CQueue_MonitorInterface
     /**
      * Resolve a queue connection instance.
      *
-     * @param string|null $name
+     * @param null|string $name
      *
      * @return \CQueue_QueueInterface
      */
@@ -164,14 +164,15 @@ class CQueue_Manager implements CQueue_FactoryInterface, CQueue_MonitorInterface
      *
      * @param string $driver
      *
-     * @return CQueue_AbstractConnector
-     *
      * @throws \InvalidArgumentException
+     *
+     * @return CQueue_AbstractConnector
      */
     protected function getConnector($driver) {
         if (!isset($this->connectors[$driver])) {
-            throw new InvalidArgumentException("No connector for [$driver]");
+            throw new InvalidArgumentException("No connector for [${driver}]");
         }
+
         return call_user_func($this->connectors[$driver]);
     }
 
@@ -210,6 +211,7 @@ class CQueue_Manager implements CQueue_FactoryInterface, CQueue_MonitorInterface
         if (!is_null($name) && $name !== 'null') {
             return CQueue::config("connections.{$name}");
         }
+
         return ['driver' => 'null'];
     }
 
@@ -236,7 +238,7 @@ class CQueue_Manager implements CQueue_FactoryInterface, CQueue_MonitorInterface
     /**
      * Get the full name for the given connection.
      *
-     * @param string|null $connection
+     * @param null|string $connection
      *
      * @return string
      */

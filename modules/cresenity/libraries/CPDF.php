@@ -4,8 +4,6 @@ defined('SYSPATH') or die('No direct access allowed.');
 /**
  * PHP Excel library. Helper class to make spreadsheet creation easier.
  *
- * @package    Spreadsheet
- *
  * @author     Flynsarmy
  * @website    http://www.flynsarmy.com/
  *
@@ -18,9 +16,13 @@ require_once dirname(__FILE__) . '/Lib/fpdf/fpdf.php';
 //@codingStandardsIgnoreStart
 class CPDF extends FPDF {
     private $header_enabled = true;
+
     private $footer_enabled = true;
+
     private $param = [];
+
     private $header_callback_func = '';
+
     private $footer_callback_func = '';
 
     public function GetParam() {
@@ -29,35 +31,40 @@ class CPDF extends FPDF {
 
     public function SetParam($p) {
         $this->param = $p;
+
         return $this;
     }
 
     public function HeaderEnabled($bool) {
         $header_enabled = $bool;
+
         return $this;
     }
 
     public function HeaderCallback($func) {
         $this->header_callback_func = $func;
+
         return $this;
     }
 
     public function FooterEnabled($bool) {
         $header_enabled = $bool;
+
         return $this;
     }
 
     public function FooterCallback($func) {
         $this->footer_callback_func = $func;
+
         return $this;
     }
 
     public function Header() {
         if ($this->header_enabled) {
             if (($this->header_callback_func) != null) {
-                $v = CDynFunction::factory($this->header_callback_func)
-                        ->add_param($this)
-                        ->execute();
+                $v = CFunction::factory($this->header_callback_func)
+                    ->addArg($this)
+                    ->execute();
             }
         }
     }
@@ -65,9 +72,9 @@ class CPDF extends FPDF {
     public function Footer() {
         if ($this->footer_enabled) {
             if (($this->footer_callback_func) != null) {
-                $v = CDynFunction::factory($this->footer_callback_func)
-                        ->add_param($this)
-                        ->execute();
+                $v = CFunction::factory($this->footer_callback_func)
+                    ->addArg($this)
+                    ->execute();
 
                 return $v;
             }
@@ -129,6 +136,7 @@ class CPDF extends FPDF {
                 if ($border && $nl == 2) {
                     $b = $b2;
                 }
+
                 continue;
             }
             if ($c == ' ') {
@@ -169,6 +177,7 @@ class CPDF extends FPDF {
             $b .= 'B';
         }
         $line++;
+
         return $line;
     }
 }

@@ -1,11 +1,12 @@
 <?php
 
 /**
- * @mixin \Illuminate\Database\Eloquent\Builder
+ * @mixin \CModel_Query
  */
 class CModel_Relation_BelongsTo extends CModel_Relation {
-    use CModel_Relation_Trait_ComparesRelatedModels,
-        CModel_Relation_Trait_SupportsDefaultModels;
+    use CModel_Relation_Trait_ComparesRelatedModels;
+    use CModel_Relation_Trait_SupportsDefaultModels;
+    use CModel_Relation_Trait_InteractsWithDictionary;
 
     /**
      * The child model instance of the relation.
@@ -166,15 +167,17 @@ class CModel_Relation_BelongsTo extends CModel_Relation {
         $dictionary = [];
 
         foreach ($results as $result) {
-            $dictionary[$result->getAttribute($owner)] = $result;
+            $attribute = $this->getDictionaryKey($result->getAttribute($owner));
+            $dictionary[$attribute] = $result;
         }
 
         // Once we have the dictionary constructed, we can loop through all the parents
         // and match back onto their children using these keys of the dictionary and
         // the primary key of the children to map them onto the correct instances.
         foreach ($models as $model) {
-            if (isset($dictionary[$model->{$foreign}])) {
-                $model->setRelation($relation, $dictionary[$model->{$foreign}]);
+            $attribute = $this->getDictionaryKey($model->{$foreign});
+            if (isset($dictionary[$attribute])) {
+                $model->setRelation($relation, $dictionary[$attribute]);
             }
         }
 

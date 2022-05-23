@@ -1,7 +1,10 @@
 # Application - Element
-### Standard Element
+### Introduction
 
-Terdapat default bawaan element yang sudah ada element.
+Object CApp langsung dapat ditambahkan element untuk pembuatan UI (User Interface)
+
+Contoh element yang ada di CApp:
+
 ```php
 $app = c::app();
 $app->addDiv(); //<div> element
@@ -9,6 +12,7 @@ $app->addA(); //<a> element
 $app->addUl(); //<ul> element
 $app->addOl(); //<ol> element
 $app->addLi(); //<li> element
+$app->addView(); //View/ Blade View element
 return $app;
 ```
 

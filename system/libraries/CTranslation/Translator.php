@@ -10,6 +10,7 @@ defined('SYSPATH') or die('No direct access allowed.');
  */
 class CTranslation_Translator extends CBase_NamespacedItemResolver implements CTranslation_TranslatorInterface {
     use CTrait_Macroable;
+
     /**
      * The loader implementation.
      *
@@ -113,7 +114,6 @@ class CTranslation_Translator extends CBase_NamespacedItemResolver implements CT
         // was not passed, we will use the default locales which was given to us when
         // the translator was instantiated. Then, we can load the lines and return.
         $locales = $fallback ? $this->localeArray($locale) : [$locale ?: $this->locale];
-
         foreach ($locales as $locale) {
             if (!is_null($line = $this->getLine(
                 $namespace,

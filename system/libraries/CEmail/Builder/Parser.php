@@ -69,6 +69,9 @@ class CEmail_Builder_Parser {
         $this->context = new CEmail_Builder_Context();
     }
 
+    /**
+     * @return string
+     */
     public function parse() {
         //$this->globalDatas['headRaw'] = $this->processing($cHead, $headHelpers);
         CEmail::Builder()->globalData()->set('headRaw', $this->getHead());

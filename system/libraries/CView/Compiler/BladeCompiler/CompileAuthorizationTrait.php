@@ -1,11 +1,11 @@
 <?php
 
 /**
- * Description of CompilesAuthorizationTrait
+ * Description of CompilesAuthorizationTrait.
  *
  * @author Hery
  */
-trait CView_Compiler_BladeCompiler_CompilesAuthorizationTrait {
+trait CView_Compiler_BladeCompiler_CompileAuthorizationTrait {
     /**
      * Compile the can statements into valid PHP.
      *
@@ -14,7 +14,7 @@ trait CView_Compiler_BladeCompiler_CompilesAuthorizationTrait {
      * @return string
      */
     protected function compileCan($expression) {
-        return "<?php if (app(\Illuminate\\Contracts\\Auth\\Access\\Gate::class)->check{$expression}): ?>";
+        return "<?php if (c::gate()->check{$expression}): ?>";
     }
 
     /**
@@ -25,7 +25,7 @@ trait CView_Compiler_BladeCompiler_CompilesAuthorizationTrait {
      * @return string
      */
     protected function compileCannot($expression) {
-        return "<?php if (app(\Illuminate\\Contracts\\Auth\\Access\\Gate::class)->denies{$expression}): ?>";
+        return "<?php if (c::gate()->denies{$expression}): ?>";
     }
 
     /**
@@ -36,7 +36,7 @@ trait CView_Compiler_BladeCompiler_CompilesAuthorizationTrait {
      * @return string
      */
     protected function compileCanany($expression) {
-        return "<?php if (app(\Illuminate\\Contracts\\Auth\\Access\\Gate::class)->any{$expression}): ?>";
+        return "<?php if (c::gate()->any{$expression}): ?>";
     }
 
     /**
@@ -47,7 +47,7 @@ trait CView_Compiler_BladeCompiler_CompilesAuthorizationTrait {
      * @return string
      */
     protected function compileElsecan($expression) {
-        return "<?php elseif (app(\Illuminate\\Contracts\\Auth\\Access\\Gate::class)->check{$expression}): ?>";
+        return "<?php elseif (c::gate()->check{$expression}): ?>";
     }
 
     /**
@@ -58,7 +58,7 @@ trait CView_Compiler_BladeCompiler_CompilesAuthorizationTrait {
      * @return string
      */
     protected function compileElsecannot($expression) {
-        return "<?php elseif (app(\Illuminate\\Contracts\\Auth\\Access\\Gate::class)->denies{$expression}): ?>";
+        return "<?php elseif (c::gate()->denies{$expression}): ?>";
     }
 
     /**
@@ -69,7 +69,7 @@ trait CView_Compiler_BladeCompiler_CompilesAuthorizationTrait {
      * @return string
      */
     protected function compileElsecanany($expression) {
-        return "<?php elseif (app(\Illuminate\\Contracts\\Auth\\Access\\Gate::class)->any{$expression}): ?>";
+        return "<?php elseif (c::gate()->any{$expression}): ?>";
     }
 
     /**

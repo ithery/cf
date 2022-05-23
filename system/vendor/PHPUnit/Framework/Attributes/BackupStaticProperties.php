@@ -7,25 +7,23 @@
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  */
+
 namespace PHPUnit\Framework\Attributes;
 
 use Attribute;
 
 #[Attribute(Attribute::TARGET_CLASS | Attribute::TARGET_METHOD)]
-final class BackupStaticProperties
-{
+final class BackupStaticProperties {
     /**
      * @var bool
      */
     private $enabled;
 
-    public function __construct($enabled)
-    {
+    public function __construct($enabled) {
         $this->enabled = $enabled;
     }
 
-    public function enabled()
-    {
+    public function enabled() {
         return $this->enabled;
     }
 }

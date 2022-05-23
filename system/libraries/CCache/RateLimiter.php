@@ -36,7 +36,7 @@ class CCache_RateLimiter {
      *
      * @return $this
      */
-    public function aliasFor(string $name, Closure $callback) {
+    public function aliasFor($name, Closure $callback) {
         $this->limiters[$name] = $callback;
 
         return $this;
@@ -49,7 +49,7 @@ class CCache_RateLimiter {
      *
      * @return \Closure
      */
-    public function limiter(string $name) {
+    public function limiter($name) {
         return carr::get($this->limiters, $name);
     }
 

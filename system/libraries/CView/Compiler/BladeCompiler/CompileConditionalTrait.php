@@ -1,7 +1,7 @@
 <?php
 
 /**
- * Description of CompileConditionalTrait
+ * Description of CompileConditionalTrait.
  *
  * @author Hery
  */
@@ -16,7 +16,7 @@ trait CView_Compiler_BladeCompiler_CompileConditionalTrait {
     /**
      * Compile the if-auth statements into valid PHP.
      *
-     * @param string|null $guard
+     * @param null|string $guard
      *
      * @return string
      */
@@ -29,7 +29,7 @@ trait CView_Compiler_BladeCompiler_CompileConditionalTrait {
     /**
      * Compile the else-auth statements into valid PHP.
      *
-     * @param string|null $guard
+     * @param null|string $guard
      *
      * @return string
      */
@@ -89,7 +89,7 @@ trait CView_Compiler_BladeCompiler_CompileConditionalTrait {
     /**
      * Compile the if-guest statements into valid PHP.
      *
-     * @param string|null $guard
+     * @param null|string $guard
      *
      * @return string
      */
@@ -102,7 +102,7 @@ trait CView_Compiler_BladeCompiler_CompileConditionalTrait {
     /**
      * Compile the else-guest statements into valid PHP.
      *
-     * @param string|null $guard
+     * @param null|string $guard
      *
      * @return string
      */
@@ -291,5 +291,38 @@ trait CView_Compiler_BladeCompiler_CompileConditionalTrait {
      */
     public function compileEndOnce() {
         return '<?php endif; ?>';
+    }
+
+    /**
+     * Compile a selected block into valid PHP.
+     *
+     * @param string $condition
+     *
+     * @return string
+     */
+    protected function compileSelected($condition) {
+        return "<?php if{$condition}: echo 'selected'; endif; ?>";
+    }
+
+    /**
+     * Compile a checked block into valid PHP.
+     *
+     * @param string $condition
+     *
+     * @return string
+     */
+    protected function compileChecked($condition) {
+        return "<?php if{$condition}: echo 'checked'; endif; ?>";
+    }
+
+    /**
+     * Compile a disabled block into valid PHP.
+     *
+     * @param string $condition
+     *
+     * @return string
+     */
+    protected function compileDisabled($condition) {
+        return "<?php if{$condition}: echo 'disabled'; endif; ?>";
     }
 }

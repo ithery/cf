@@ -9,6 +9,8 @@ defined('SYSPATH') or die('No direct access allowed.');
  * @since Jun 24, 2018, 1:15:35 PM
  */
 trait CDatabase_Trait_Builder {
+    use CTrait_Conditionable;
+
     /**
      * Chunk the results of the query.
      *
@@ -38,6 +40,7 @@ trait CDatabase_Trait_Builder {
             unset($results);
             $page++;
         } while ($countResults == $count);
+
         return true;
     }
 
@@ -64,8 +67,8 @@ trait CDatabase_Trait_Builder {
      *
      * @param int         $count
      * @param callable    $callback
-     * @param string|null $column
-     * @param string|null $alias
+     * @param null|string $column
+     * @param null|string $alias
      *
      * @return bool
      */
@@ -118,8 +121,8 @@ trait CDatabase_Trait_Builder {
      *
      * @param callable    $callback
      * @param int         $count
-     * @param string|null $column
-     * @param string|null $alias
+     * @param null|string $column
+     * @param null|string $alias
      *
      * @return bool
      */
@@ -138,7 +141,7 @@ trait CDatabase_Trait_Builder {
      *
      * @param array $columns
      *
-     * @return CModel|object|static|null
+     * @return null|CModel|object|static
      */
     public function first($columns = ['*']) {
         return $this->take(1)->get($columns)->first();
@@ -149,20 +152,20 @@ trait CDatabase_Trait_Builder {
      *
      * @param array|string $columns
      *
-     * @return \Illuminate\Database\Eloquent\Model|object|static|null
-     *
      * @throws \CDatabase_Exception_RecordsNotFoundException
      * @throws \CDatabase_Exception_MultipleRecordsFoundException
+     *
+     * @return null|\CModel|object|static
      */
     public function sole($columns = ['*']) {
         $result = $this->take(2)->get($columns);
 
         if ($result->isEmpty()) {
-            throw new CDatabase_Exception_RecordsNotFoundException;
+            throw new CDatabase_Exception_RecordsNotFoundException();
         }
 
         if ($result->count() > 1) {
-            throw new CDatabase_Exception_MultipleRecordsFoundException;
+            throw new CDatabase_Exception_MultipleRecordsFoundException();
         }
 
         return $result->first();
@@ -183,6 +186,7 @@ trait CDatabase_Trait_Builder {
         } elseif ($default) {
             return $default($this, $value) ?: $this;
         }
+
         return $this;
     }
 
@@ -212,6 +216,7 @@ trait CDatabase_Trait_Builder {
         } elseif ($default) {
             return $default($this, $value) ?: $this;
         }
+
         return $this;
     }
 

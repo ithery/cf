@@ -1,25 +1,25 @@
 <?php
 
 /**
- * Move
+ * Move.
  */
 class CModel_Nested_Move {
     /**
-     * Node on which the move operation will be performed
+     * Node on which the move operation will be performed.
      *
      * @var CModel
      */
     protected $node = null;
 
     /**
-     * Destination node
+     * Destination node.
      *
-     * @var CModel | int
+     * @var CModel|int
      */
     protected $target = null;
 
     /**
-     * Move target position, one of: child, left, right, root
+     * Move target position, one of: child, left, right, root.
      *
      * @var string
      */
@@ -142,18 +142,18 @@ class CModel_Nested_Move {
         $wrappedId = $grammar->wrap($this->node->getKeyName());
 
         $lftSql = "CASE
-      WHEN $wrappedLeft BETWEEN $a AND $b THEN $wrappedLeft + $d - $b
-      WHEN $wrappedLeft BETWEEN $c AND $d THEN $wrappedLeft + $a - $c
-      ELSE $wrappedLeft END";
+      WHEN ${wrappedLeft} BETWEEN ${a} AND ${b} THEN ${wrappedLeft} + ${d} - ${b}
+      WHEN ${wrappedLeft} BETWEEN ${c} AND ${d} THEN ${wrappedLeft} + ${a} - ${c}
+      ELSE ${wrappedLeft} END";
 
         $rgtSql = "CASE
-      WHEN $wrappedRight BETWEEN $a AND $b THEN $wrappedRight + $d - $b
-      WHEN $wrappedRight BETWEEN $c AND $d THEN $wrappedRight + $a - $c
-      ELSE $wrappedRight END";
+      WHEN ${wrappedRight} BETWEEN ${a} AND ${b} THEN ${wrappedRight} + ${d} - ${b}
+      WHEN ${wrappedRight} BETWEEN ${c} AND ${d} THEN ${wrappedRight} + ${a} - ${c}
+      ELSE ${wrappedRight} END";
 
         $parentSql = "CASE
-      WHEN $wrappedId = $currentId THEN $parentId
-      ELSE $wrappedParent END";
+      WHEN ${wrappedId} = ${currentId} THEN ${parentId}
+      ELSE ${wrappedParent} END";
 
         $updateConditions = [
             $leftColumn => $connection->raw($lftSql),
@@ -237,22 +237,27 @@ class CModel_Nested_Move {
         switch ($this->position) {
             case 'child':
                 $this->bound1 = $this->target->getRight();
+
                 break;
 
             case 'left':
                 $this->bound1 = $this->target->getLeft();
+
                 break;
 
             case 'right':
                 $this->bound1 = $this->target->getRight() + 1;
+
                 break;
 
             case 'root':
                 $this->bound1 = $this->node->newNestedSetQuery()->max($this->node->getRightColumnName()) + 1;
+
                 break;
         }
 
         $this->bound1 = (($this->bound1 > $this->node->getRight()) ? $this->bound1 - 1 : $this->bound1);
+
         return $this->bound1;
     }
 
@@ -268,6 +273,7 @@ class CModel_Nested_Move {
         }
 
         $this->bound2 = (($this->bound1() > $this->node->getRight()) ? $this->node->getRight() + 1 : $this->node->getLeft() - 1);
+
         return $this->bound2;
     }
 
@@ -325,7 +331,7 @@ class CModel_Nested_Move {
      * @return bool
      */
     protected function promotingToRoot() {
-        return ($this->position == 'root');
+        return $this->position == 'root';
     }
 
     /**
@@ -361,7 +367,7 @@ class CModel_Nested_Move {
             return true;
         }
 
-        // Basically the same as \Illuminate\Database\Eloquent\Model->fireModelEvent
+        // Basically the same as \CModel->fireModelEvent
         // but we relay the event into the node instance.
         $event = "model.{$event}: " . get_class($this->node);
 

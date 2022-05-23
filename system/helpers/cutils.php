@@ -7,6 +7,7 @@ class cutils {
         for ($i = 0; $i < $n; $i++) {
             $res .= $char;
         }
+
         return $res;
     }
 
@@ -17,6 +18,7 @@ class cutils {
     public function add_date($givendate, $day = 0, $mth = 0, $yr = 0) {
         $cd = strtotime($givendate);
         $newdate = date('Y-m-d h:i:s', mktime(date('h', $cd), date('i', $cd), date('s', $cd), date('m', $cd) + $mth, date('d', $cd) + $day, date('Y', $cd) + $yr));
+
         return $newdate;
     }
 
@@ -24,6 +26,7 @@ class cutils {
         if (strlen($strdate) > 0) {
             return date('m', strtotime($strdate));
         }
+
         return date('m');
     }
 
@@ -31,6 +34,7 @@ class cutils {
         if (strlen($strdate) > 0) {
             return date('Y', strtotime($strdate));
         }
+
         return date('Y');
     }
 
@@ -38,6 +42,7 @@ class cutils {
         if (strlen($strdate) > 0) {
             return date('d', strtotime($strdate));
         }
+
         return date('d');
     }
 
@@ -45,6 +50,7 @@ class cutils {
         $value = '';
         $timestamp = mktime(0, 0, 0, $month, $day, $year);
         $value = date('D', $timestamp);
+
         return $value;
     }
 
@@ -55,36 +61,40 @@ class cutils {
         if (empty($year)) {
             $year = date('Y');
         }
+
         return date('d', mktime(0, 0, 0, $month + 1, 0, $year));
     }
 
     public static function begin_date_month() {
         $d1 = '1';
-        $m1 = Date('m');
-        $y1 = Date('Y');
+        $m1 = date('m');
+        $y1 = date('Y');
         $date1 = $y1 . '-' . $m1 . '-' . $d1;
         $date_format = ccfg::get('date_formatted');
         if ($date_format != null) {
             $date1 = date($date_format, strtotime($date1));
         }
+
         return $date1;
     }
 
     public static function last_date_month() {
         $d2 = cutils::day_count();
-        $m2 = Date('m');
-        $y2 = Date('Y');
+        $m2 = date('m');
+        $y2 = date('Y');
         $date2 = $y2 . '-' . $m2 . '-' . $d2;
         $date_format = ccfg::get('date_formatted');
         if ($date_format != null) {
             $date2 = date($date_format, strtotime($date2));
         }
+
         return $date2;
     }
 
     public static function randmd5() {
         $rand = rand(0, 9999);
         $base = date('YmdHis') . $rand;
+
         return md5($rand);
     }
 
@@ -136,6 +146,7 @@ class cutils {
             }
         }
         $res = trim($res);
+
         return $res;
     }
 
@@ -169,6 +180,7 @@ class cutils {
         $tempval = $val % 1000;
         $res = $res . ' ' . self::get_under_1000($tempval);
         $result = trim($res);
+
         return $result;
     }
 
@@ -177,6 +189,7 @@ class cutils {
         for ($i = 1; $i <= 31; $i++) {
             $day['' . $i] = $i;
         }
+
         return $day;
     }
 
@@ -187,18 +200,40 @@ class cutils {
             $day_list[] = strftime('%A', $timestamp);
             $timestamp = strtotime('+1 day', $timestamp);
         }
+
         return $day_list;
     }
 
     public static function month_list($clang = true) {
-        return cstatic::month_list($clang);
+        $ret = [
+            1 => 'January',
+            2 => 'February',
+            3 => 'March',
+            4 => 'April',
+            5 => 'May',
+            6 => 'June',
+            7 => 'July',
+            8 => 'August',
+            9 => 'September',
+            10 => 'October',
+            11 => 'November',
+            12 => 'December'
+        ];
+        if ($clang) {
+            foreach ($ret as $k => $v) {
+                $ret[$k] = c::__($v);
+            }
+        }
+
+        return $ret;
     }
 
     public static function month_name($month, $clang = true) {
-        $list = cstatic::month($clang);
+        $list = static::month_list($clang);
         if (isset($list[$month])) {
             return $list[$month];
         }
+
         return 'Unknown';
     }
 
@@ -216,6 +251,7 @@ class cutils {
         for ($i = $start; $i <= $end; $i++) {
             $list[$i] = $i;
         }
+
         return $list;
     }
 
@@ -229,6 +265,7 @@ class cutils {
                 $ret = $prefix . substr($ret, 1);
             }
         }
+
         return $ret;
     }
 
@@ -244,30 +281,43 @@ class cutils {
         $result = '';
         switch ($bln) {
             case '1': $result = 'I';
+
                 break;
             case '2': $result = 'II';
+
                 break;
             case '3': $result = 'III';
+
                 break;
             case '4': $result = 'IV';
+
                 break;
             case '5': $result = 'V';
+
                 break;
             case '6': $result = 'VI';
+
                 break;
             case '7': $result = 'VII';
+
                 break;
             case '8': $result = 'VIII';
+
                 break;
             case '9': $result = 'IX';
+
                 break;
             case '10': $result = 'X';
+
                 break;
             case '11': $result = 'XI';
+
                 break;
             case '12': $result = 'XII';
+
                 break;
         }
+
         return $result;
     }
 
@@ -278,6 +328,7 @@ class cutils {
         $text = str_replace("\r\n", '', $text);
         $text = str_replace("\r", '', $text);
         $text = str_replace("\n", '', $text);
+
         return $text;
     }
 
@@ -299,6 +350,7 @@ class cutils {
         $days = (($to->format('U') - $from->format('U')) / (60 * 60 * 24));
         $months = (($to->format('U') - $from->format('U')) / (60 * 60 * 24 * 30));
         $years = (($to->format('U') - $from->format('U')) / (60 * 60 * 24 * 30 * 12));
+
         return $years;
     }
 
@@ -320,6 +372,7 @@ class cutils {
         $days = (($to->format('U') - $from->format('U')) / (60 * 60 * 24));
         $months = (($to->format('U') - $from->format('U')) / (60 * 60 * 24 * 30));
         $years = (($to->format('U') - $from->format('U')) / (60 * 60 * 24 * 30 * 12));
+
         return $months;
     }
 
@@ -341,6 +394,7 @@ class cutils {
         $days = (($to->format('U') - $from->format('U')) / (60 * 60 * 24));
         $months = (($to->format('U') - $from->format('U')) / (60 * 60 * 24 * 30));
         $years = (($to->format('U') - $from->format('U')) / (60 * 60 * 24 * 30 * 12));
+
         return $days;
     }
 
@@ -362,6 +416,7 @@ class cutils {
         $days = (($to->format('U') - $from->format('U')) / (60 * 60 * 24));
         $months = (($to->format('U') - $from->format('U')) / (60 * 60 * 24 * 30));
         $years = (($to->format('U') - $from->format('U')) / (60 * 60 * 24 * 30 * 12));
+
         return $hours;
     }
 
@@ -383,6 +438,7 @@ class cutils {
         $days = (($to->format('U') - $from->format('U')) / (60 * 60 * 24));
         $months = (($to->format('U') - $from->format('U')) / (60 * 60 * 24 * 30));
         $years = (($to->format('U') - $from->format('U')) / (60 * 60 * 24 * 30 * 12));
+
         return $minutes;
     }
 
@@ -404,6 +460,7 @@ class cutils {
         $days = (($to->format('U') - $from->format('U')) / (60 * 60 * 24));
         $months = (($to->format('U') - $from->format('U')) / (60 * 60 * 24 * 30));
         $years = (($to->format('U') - $from->format('U')) / (60 * 60 * 24 * 30 * 12));
+
         return $seconds;
     }
 
@@ -661,9 +718,9 @@ class cutils {
     /**
      * @param $digit
      *
-     * @return string
-     *
      * @throws \LogicException
+     *
+     * @return string
      */
     protected static function numberToWordConvertDigit($digit) {
         switch ($digit) {

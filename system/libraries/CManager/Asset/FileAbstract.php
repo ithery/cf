@@ -5,14 +5,36 @@ abstract class CManager_Asset_FileAbstract {
 
     protected $type;
 
+    /**
+     * @var string
+     */
     protected $pos;
 
+    /**
+     * @var array
+     */
     protected $mediaPaths = [];
+
+    /**
+     * @var bool
+     */
+    protected $isRemote = false;
+
+    protected $compiled = false;
+
+    protected $compiledFrom;
 
     public function __construct(array $options) {
         $this->script = carr::get($options, 'script');
         $this->type = carr::get($options, 'type', 'js');
+        $this->compiled = carr::get($options, 'compiled', false);
+        $this->compiledFrom = carr::get($options, 'compiledFrom');
         $this->mediaPaths = carr::get($options, 'mediaPaths', []);
+        if ((cstr::startsWith($this->script, 'http') && strpos($this->script, '//') !== false)
+            || cstr::startsWith($this->script, '//')
+        ) {
+            $this->isRemote = true;
+        }
     }
 
     public function getUrl() {
@@ -43,6 +65,9 @@ abstract class CManager_Asset_FileAbstract {
     }
 
     public function getPath() {
+        if ($this->compiled) {
+            return $this->script;
+        }
         $file = $this->script;
         $dirFile = $this->script;
         $fileVersion = '';
@@ -75,5 +100,12 @@ abstract class CManager_Asset_FileAbstract {
 
     public function __toString() {
         return $this->getPath();
+    }
+
+    /**
+     * @return bool
+     */
+    public function isRemote() {
+        return $this->isRemote;
     }
 }

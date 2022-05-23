@@ -7,6 +7,27 @@ abstract class CPagination_AbstractPaginator implements CInterface_Htmlable {
     use CTrait_ForwardsCalls;
 
     /**
+     * The number of links to display on each side of current page link.
+     *
+     * @var int
+     */
+    public $onEachSide = 3;
+
+    /**
+     * The default pagination view.
+     *
+     * @var string
+     */
+    public static $defaultView = 'pagination.tailwind';
+
+    /**
+     * The default "simple" pagination view.
+     *
+     * @var string
+     */
+    public static $defaultSimpleView = 'pagination.simple-tailwind';
+
+    /**
      * All of the items being paginated.
      *
      * @var CCollection
@@ -44,7 +65,7 @@ abstract class CPagination_AbstractPaginator implements CInterface_Htmlable {
     /**
      * The URL fragment to add to all URLs.
      *
-     * @var string|null
+     * @var null|string
      */
     protected $fragment;
 
@@ -54,13 +75,6 @@ abstract class CPagination_AbstractPaginator implements CInterface_Htmlable {
      * @var string
      */
     protected $pageName = 'page';
-
-    /**
-     * The number of links to display on each side of current page link.
-     *
-     * @var int
-     */
-    public $onEachSide = 3;
 
     /**
      * The paginator options.
@@ -98,20 +112,6 @@ abstract class CPagination_AbstractPaginator implements CInterface_Htmlable {
     protected static $viewFactoryResolver;
 
     /**
-     * The default pagination view.
-     *
-     * @var string
-     */
-    public static $defaultView = 'pagination.tailwind';
-
-    /**
-     * The default "simple" pagination view.
-     *
-     * @var string
-     */
-    public static $defaultSimpleView = 'pagination.simple-tailwind';
-
-    /**
      * Determine if the given value is a valid page number.
      *
      * @param int $page
@@ -125,7 +125,7 @@ abstract class CPagination_AbstractPaginator implements CInterface_Htmlable {
     /**
      * Get the URL for the previous page.
      *
-     * @return string|null
+     * @return null|string
      */
     public function previousPageUrl() {
         if ($this->currentPage() > 1) {
@@ -177,9 +177,9 @@ abstract class CPagination_AbstractPaginator implements CInterface_Htmlable {
     /**
      * Get / set the URL fragment to be appended to URLs.
      *
-     * @param string|null $fragment
+     * @param null|string $fragment
      *
-     * @return $this|string|null
+     * @return null|$this|string
      */
     public function fragment($fragment = null) {
         if (is_null($fragment)) {
@@ -194,8 +194,8 @@ abstract class CPagination_AbstractPaginator implements CInterface_Htmlable {
     /**
      * Add a set of query string values to the paginator.
      *
-     * @param array|string|null $key
-     * @param string|null       $value
+     * @param null|array|string $key
+     * @param null|string       $value
      *
      * @return $this
      */
@@ -430,7 +430,7 @@ abstract class CPagination_AbstractPaginator implements CInterface_Htmlable {
     /**
      * Get the base path for paginator generated URLs.
      *
-     * @return string|null
+     * @return null|string
      */
     public function path() {
         return $this->path;
@@ -612,7 +612,7 @@ abstract class CPagination_AbstractPaginator implements CInterface_Htmlable {
     /**
      * Get the paginator's underlying collection.
      *
-     * @return \Illuminate\Support\Collection
+     * @return \CCollection
      */
     public function getCollection() {
         return $this->items;

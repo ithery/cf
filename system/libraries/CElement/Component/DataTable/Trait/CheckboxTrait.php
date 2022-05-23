@@ -74,7 +74,7 @@ trait CElement_Component_DataTable_Trait_CheckboxTrait {
         return $this->checkboxRenderer;
     }
 
-    public function callCheckboxRenderer(array $row) {
+    public function callCheckboxRenderer($row) {
         return call_user_func_array($this->getCheckboxRenderer(), [$this, $row]);
     }
 }

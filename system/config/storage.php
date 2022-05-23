@@ -16,6 +16,16 @@ return [
     'default' => 'local',
     /*
       |--------------------------------------------------------------------------
+      | Default Temporary Disk
+      |--------------------------------------------------------------------------
+      |
+      | Here you may specify the default filesystem disk that should be used
+      | by the temporary for the framework.
+      |
+     */
+    'temp' => 'local-temp',
+    /*
+      |--------------------------------------------------------------------------
       | Default Cloud Filesystem Disk
       |--------------------------------------------------------------------------
       |
@@ -42,6 +52,10 @@ return [
             'driver' => 'local',
             'root' => DOCROOT,
         ],
+        'local-files' => [
+            'driver' => 'local',
+            'root' => DOCROOT . 'files',
+        ],
         'local-temp' => [
             'driver' => 'local',
             'root' => DOCROOT . 'temp',
@@ -54,20 +68,24 @@ return [
             'url' => curl::httpbase() . 'public',
             'visibility' => 'public',
         ],
-        //        's3' => [
-        //            'driver' => 's3',
-        //            'key' => env('AWS_ACCESS_KEY_ID'),
-        //            'secret' => env('AWS_SECRET_ACCESS_KEY'),
-        //            'region' => env('AWS_DEFAULT_REGION'),
-        //            'bucket' => env('AWS_BUCKET'),
-        //            'url' => env('AWS_URL'),
-        //        ],
-        //        'google' => [
-        //            'driver' => 'google',
-        //            'clientId' => env("GOOGLE_CLIENT_ID"),
-        //            'clientSecret' => env("GOOGLE_CLIENT_SECRET"),
-        //            'refreshToken' => env("GOOGLE_REFRESH_TOKEN"),
-        //            'folderId' => env("GOOGLE_DRIVE_FOLDER_ID"),
-        //        ],
+        's3' => [
+            'driver' => 's3',
+            'key' => c::env('S3_AWS_KEY'),
+            'secret' => c::env('S3_AWS_SECRET'),
+            'region' => 'sgp1',
+            'bucket' => 'resource',
+            'endpoint' => c::env('S3_AWS_ENDPOINT'),
+            'visibility' => 'public',
+            'stream_reads' => true,
+        ],
+        's3-temp' => [
+            'driver' => 's3',
+            'key' => c::env('S3_AWS_KEY'),
+            'secret' => c::env('S3_AWS_SECRET'),
+            'region' => 'sgp1',
+            'bucket' => 'temp-files',
+            'endpoint' => c::env('S3_AWS_ENDPOINT'),
+            'visibility' => 'public',
+        ],
     ],
 ];

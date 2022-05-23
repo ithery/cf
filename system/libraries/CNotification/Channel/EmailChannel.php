@@ -1,13 +1,16 @@
 <?php
 
 class CNotification_Channel_EmailChannel extends CNotification_ChannelAbstract {
-    protected static $channelName = 'Email';
+    public function __construct($config = []) {
+        parent::__construct($config);
+        $this->channelName = 'Email';
+    }
 
     protected function handleMessage($data, $logNotificationModel) {
         $to = carr::get($data, 'recipient');
         $subject = carr::get($data, 'subject');
         $message = carr::get($data, 'message');
-        $attachment = carr::get($data, 'attachment', []);
+        $attachment = carr::get($data, 'attachments', carr::get($data, 'attachment', []));
         $cc = carr::get($data, 'cc', []);
         $bcc = carr::get($data, 'bcc', []);
         $options = carr::get($data, 'options', []);

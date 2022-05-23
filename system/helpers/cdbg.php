@@ -220,57 +220,60 @@ class cdbg {
 				</script>');
             }
         } elseif (is_object($var)) {
-            $uuid = 'include-php-' . uniqid();
+            if (is_callable($var)) {
+                $html .= '<span style="color:#588bff;">Closure</span><span style="color:#999;"></span>';
+            } else {
+                $uuid = 'include-php-' . uniqid();
 
-            $html .= '<span style="color:#588bff;">object</span>(' . get_class($var) . ') <img id="' . $uuid . '" data-expand="data:image/png;base64,' . self::$icon_expand . '" style="position:relative;left:-5px;top:-1px;cursor:pointer;" src="data:image/png;base64,' . self::$icon_collapse . '" /><br /><span id="' . $uuid . '-collapsable">[<br />';
+                $html .= '<span style="color:#588bff;">object</span>(' . get_class($var) . ') <img id="' . $uuid . '" data-expand="data:image/png;base64,' . self::$icon_expand . '" style="position:relative;left:-5px;top:-1px;cursor:pointer;" src="data:image/png;base64,' . self::$icon_collapse . '" /><br /><span id="' . $uuid . '-collapsable">[<br />';
 
-            $original = $var;
-            $var = (array) $var;
+                $original = $var;
+                $var = (array) $var;
 
-            $indent = 4;
-            $longest_key = 0;
+                $indent = 4;
+                $longest_key = 0;
 
-            foreach ($var as $key => $value) {
-                if (substr($key, 0, 2) == "\0*") {
-                    unset($var[$key]);
-                    $key = 'protected:' . substr($key, 2);
-                    $var[$key] = $value;
-                } elseif (substr($key, 0, 1) == "\0") {
-                    unset($var[$key]);
-                    $key = 'private:' . substr($key, 1, strpos(substr($key, 1), "\0")) . ':' . substr($key, strpos(substr($key, 1), "\0") + 1);
-                    $var[$key] = $value;
-                }
+                foreach ($var as $key => $value) {
+                    if (substr($key, 0, 2) == "\0*") {
+                        unset($var[$key]);
+                        $key = 'protected:' . substr($key, 2);
+                        $var[$key] = $value;
+                    } elseif (substr($key, 0, 1) == "\0") {
+                        unset($var[$key]);
+                        $key = 'private:' . substr($key, 1, strpos(substr($key, 1), "\0")) . ':' . substr($key, strpos(substr($key, 1), "\0") + 1);
+                        $var[$key] = $value;
+                    }
 
-                if (is_string($key)) {
-                    $longest_key = max($longest_key, strlen($key) + 2);
-                } else {
-                    $longest_key = max($longest_key, strlen($key));
-                }
-            }
-
-            foreach ($var as $key => $value) {
-                if (is_numeric($key)) {
-                    $html .= str_repeat(' ', $indent) . str_pad($key, $longest_key, ' ');
-                } else {
-                    $html .= str_repeat(' ', $indent) . str_pad('"' . htmlentities($key) . '"', $longest_key, ' ');
-                }
-
-                $html .= ' => ';
-
-                $value = explode('<br />', self::varDumpPlain($value));
-
-                foreach ($value as $line => $val) {
-                    if ($line != 0) {
-                        $value[$line] = str_repeat(' ', $indent * 2) . $val;
+                    if (is_string($key)) {
+                        $longest_key = max($longest_key, strlen($key) + 2);
+                    } else {
+                        $longest_key = max($longest_key, strlen($key));
                     }
                 }
 
-                $html .= implode('<br />', $value) . '<br />';
-            }
+                foreach ($var as $key => $value) {
+                    if (is_numeric($key)) {
+                        $html .= str_repeat(' ', $indent) . str_pad($key, $longest_key, ' ');
+                    } else {
+                        $html .= str_repeat(' ', $indent) . str_pad('"' . htmlentities($key) . '"', $longest_key, ' ');
+                    }
 
-            $html .= ']</span>';
+                    $html .= ' => ';
 
-            $html .= preg_replace('/ +/', ' ', '<script type="text/javascript">(function() {
+                    $value = explode('<br />', self::varDumpPlain($value));
+
+                    foreach ($value as $line => $val) {
+                        if ($line != 0) {
+                            $value[$line] = str_repeat(' ', $indent * 2) . $val;
+                        }
+                    }
+
+                    $html .= implode('<br />', $value) . '<br />';
+                }
+
+                $html .= ']</span>';
+
+                $html .= preg_replace('/ +/', ' ', '<script type="text/javascript">(function() {
 			var img = document.getElementById("' . $uuid . '");
 			img.onclick = function() {
 				if ( document.getElementById("' . $uuid . '-collapsable").style.display == "none" ) {
@@ -302,6 +305,7 @@ class cdbg {
 			};
 			})();
 			</script>');
+            }
         }
 
         return $html;
@@ -686,7 +690,9 @@ class cdbg {
 
             //return CEmail::sender()->send($email, $subject, $message, []);
         } catch (Exception $ex) {
-            echo 'Error Email Deprecated' . $ex->getMessage();
+            if (!CF::isProduction()) {
+                throw $ex;
+            }
         }
 
         return true;

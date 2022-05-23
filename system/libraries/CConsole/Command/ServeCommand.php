@@ -1,14 +1,14 @@
 <?php
 
 /**
- * Description of ServeCommand
+ * Description of ServeCommand.
  *
  * @author Hery
  */
+use Carbon\Carbon;
+use Symfony\Component\Process\Process;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Process\PhpExecutableFinder;
-use Symfony\Component\Process\Process;
-use Carbon\Carbon;
 
 class CConsole_Command_ServeCommand extends CConsole_Command {
     /**
@@ -35,9 +35,9 @@ class CConsole_Command_ServeCommand extends CConsole_Command {
     /**
      * Execute the console command.
      *
-     * @return int
-     *
      * @throws \Exception
+     *
+     * @return int
      */
     public function handle() {
         $this->line("<info>Starting CF development server:</info> http://{$this->host()}:{$this->port()}");
@@ -111,15 +111,11 @@ class CConsole_Command_ServeCommand extends CConsole_Command {
      */
     protected function serverCommand() {
         return [
-            (new PhpExecutableFinder)->find(false),
+            (new PhpExecutableFinder())->find(false),
             '-S',
             $this->host() . ':' . $this->port(),
-        ];
-        return [
-            (new PhpExecutableFinder)->find(false),
-            '-S',
-            $this->host() . ':' . $this->port(),
-            DOCROOT . 'index.php',
+            '-t',
+            DOCROOT,
         ];
     }
 
@@ -163,6 +159,7 @@ class CConsole_Command_ServeCommand extends CConsole_Command {
         if ($domain == null) {
             $domain = 'localhost';
         }
+
         return [
             ['host', null, InputOption::VALUE_OPTIONAL, 'The host address to serve the application on', $domain],
             ['port', null, InputOption::VALUE_OPTIONAL, 'The port to serve the application on', 8080],

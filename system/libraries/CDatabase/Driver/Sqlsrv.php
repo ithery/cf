@@ -9,7 +9,7 @@ class CDatabase_Driver_Sqlsrv extends CDatabase_Driver {
     /**
      * Database connection link.
      *
-     * @var mysqli
+     * @var resource
      */
     protected $link;
 
@@ -32,7 +32,7 @@ class CDatabase_Driver_Sqlsrv extends CDatabase_Driver {
 
     public function close() {
         if ($this->link) {
-            mysqli_close($this->link);
+            sqlsrv_close($this->link);
         }
         $this->link = null;
     }
@@ -68,6 +68,10 @@ class CDatabase_Driver_Sqlsrv extends CDatabase_Driver {
                 'PWD' => $pass
             ];
 
+            if ($charset = $this->dbConfig['character_set']) {
+                $connectionInfo['CharacterSet'] = $charset;
+            }
+
             $hostPort = $host . ',' . $port;
             if ($this->link = sqlsrv_connect($hostPort, $connectionInfo)) {
                 //if ($this->link = new PDO('sqlsrv:Server=' . $hostPort . ';Database=' . $database, $user, $pass)) {
@@ -86,10 +90,6 @@ class CDatabase_Driver_Sqlsrv extends CDatabase_Driver {
     public function reconnect() {
         if (!$this->link) {
             return $this->connect();
-        }
-        if (!mysqli_ping($this->link)) {
-            $this->close();
-            $this->connect();
         }
     }
 
@@ -112,12 +112,6 @@ class CDatabase_Driver_Sqlsrv extends CDatabase_Driver {
         }
 
         return new CDatabase_Driver_Sqlsrv_Result($this->link, $this->dbConfig['object'], $sql);
-    }
-
-    public function setCharset($charset) {
-        if ($this->link->set_charset($charset) === false) {
-            throw new CDatabase_Exception('There was an SQL error: :error', [':error' => $this->showError()]);
-        }
     }
 
     public function escapeTable($table) {
@@ -217,10 +211,12 @@ class CDatabase_Driver_Sqlsrv extends CDatabase_Driver {
         if (!$this->dbConfig['escape']) {
             return $str;
         }
+        if (is_numeric($str)) {
+            return $str;
+        }
+        $unpacked = unpack('H*hex', $str);
 
-        is_object($this->link) or $this->connect();
-
-        return $this->link->real_escape_string($str);
+        return '0x' . $unpacked['hex'];
     }
 
     public function listTables() {
@@ -285,16 +281,9 @@ class CDatabase_Driver_Sqlsrv extends CDatabase_Driver {
         if (!$this->link) {
             $this->connect();
         }
-        $serverInfos = $this->link->get_server_info();
-        if (false !== stripos($serverInfos, 'mariadb')) {
-            return $serverInfos;
-        }
+        $serverInfo = sqlsrv_server_info($this->link);
 
-        $majorVersion = floor($this->link->server_version / 10000);
-        $minorVersion = floor(($this->link->server_version - $majorVersion * 10000) / 100);
-        $patchVersion = floor($this->link->server_version - $majorVersion * 10000 - $minorVersion * 100);
-
-        return $majorVersion . '.' . $minorVersion . '.' . $patchVersion;
+        return $serverInfo['SQLServerVersion'];
     }
 
     public function requiresQueryForServerVersion() {

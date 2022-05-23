@@ -53,6 +53,7 @@ class CRemote_SSH {
         if (strlen($host) == 0) {
             $host = carr::get($config, 'host');
         }
+
         $this->setOutput($connection = new CRemote_SSH_Connection(
             $name,
             $host,
@@ -113,13 +114,7 @@ class CRemote_SSH {
 
     public function outputContent() {
         $output = $this->output();
-        preg_match('#^\[.+?\] \(*.+?\) (.*)#ims', $output, $matches);
-        $content = '';
-        if (isset($matches[1])) {
-            $content = $matches[1];
-        } else {
-            $content = $output;
-        }
+        $content = preg_replace('/\[.+?\] \(*.+?\) /', '', $output);
 
         return $content;
     }
@@ -139,12 +134,42 @@ class CRemote_SSH {
     }
 
     /**
+     * @param string $commands
+     *
+     * @return string
+     */
+    public function exec($commands) {
+        return $this->connection->exec($commands);
+    }
+
+    /**
+     * Run a set of commands against the connection (blocking).
+     *
+     * @param string|array $commands
+     * @param mixed        $timeout
+     *
+     * @return string
+     */
+    public function runBlocking($commands, $timeout = 2) {
+        return $this->connection->runBlocking($commands, $timeout);
+    }
+
+    /**
      * Get log ssh with defined NET_SSH2_LOGGING.
      *
      * @return string
      */
     public function getLog() {
         return $this->connection->getGateway()->getLog();
+    }
+
+    public function disconnect() {
+        return $this->connection->disconnect();
+    }
+
+    public function reconnect() {
+        $this->disconnect();
+        $this->connection = $this->makeConnection($this->name, $this->config);
     }
 
     /**
@@ -157,5 +182,59 @@ class CRemote_SSH {
      */
     public function __call($method, $parameters) {
         return call_user_func_array([$this->connection, $method], $parameters);
+    }
+
+    /**
+     * @return \phpseclib3\Net\SFTP
+     */
+    public function getClient() {
+        return $this->connection->getGateway()->getConnection();
+    }
+
+    /**
+     * Upload a local file to the server.
+     *
+     * @param string $local
+     * @param string $remote
+     *
+     * @return void
+     */
+    public function put($local, $remote) {
+        $this->connection->put($local, $remote);
+    }
+
+    /**
+     * Upload a string to to the given file on the server.
+     *
+     * @param string $remote
+     * @param string $contents
+     *
+     * @return void
+     */
+    public function putString($remote, $contents) {
+        $this->connection->putString($remote, $contents);
+    }
+
+    /**
+     * Download the contents of a remote file.
+     *
+     * @param string $remote
+     * @param string $local
+     *
+     * @return void
+     */
+    public function get($remote, $local) {
+        $this->connection->get($remote, $local);
+    }
+
+    /**
+     * Get the contents of a remote file.
+     *
+     * @param string $remote
+     *
+     * @return string
+     */
+    public function getString($remote) {
+        return $this->connection->getString($remote);
     }
 }

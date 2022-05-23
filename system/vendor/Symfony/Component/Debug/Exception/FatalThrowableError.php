@@ -19,13 +19,12 @@ namespace Symfony\Component\Debug\Exception;
  * @author Nicolas Grekas <p@tchwork.com>
  *
  * @deprecated since Symfony 4.4, use Symfony\Component\ErrorHandler\Exception\ErrorException instead.
+ * @see \Symfony\Component\ErrorHandler\Exception\ErrorException
  */
-class FatalThrowableError extends FatalErrorException
-{
+class FatalThrowableError extends FatalErrorException {
     private $originalClassName;
 
-    public function __construct(\Throwable $e)
-    {
+    public function __construct(\Throwable $e) {
         $this->originalClassName = \get_class($e);
 
         if ($e instanceof \ParseError) {
@@ -48,8 +47,7 @@ class FatalThrowableError extends FatalErrorException
         $this->setTrace($e->getTrace());
     }
 
-    public function getOriginalClassName()
-    {
+    public function getOriginalClassName() {
         return $this->originalClassName;
     }
 }

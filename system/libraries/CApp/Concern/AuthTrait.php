@@ -14,6 +14,11 @@ trait CApp_Concern_AuthTrait {
 
     private $role = null;
 
+    private $roleResolver = null;
+
+    /**
+     * @var string
+     */
     private $guard = null;
 
     /**
@@ -25,7 +30,7 @@ trait CApp_Concern_AuthTrait {
         if ($guard === null) {
             $guard = $this->guard;
             if ($this->guard === null) {
-                $this->guard = CF::config('app.auth.guard');
+                $this->guard = CF::config('auth.defaults.guard');
             }
             $guard = $this->guard;
         }
@@ -56,22 +61,49 @@ trait CApp_Concern_AuthTrait {
         return $this->isAuthEnabled();
     }
 
+    /**
+     * @return CModel|object
+     */
     public function user() {
         return $this->auth()->user();
     }
 
-    public function role() {
-        if ($this->role == null) {
-            $user = $this->user();
+    public function setRoleResolver($resolver) {
+        $this->roleResolver = $resolver;
+        $this->role = null;
 
+        return $this;
+    }
+
+    protected function defaultRoleResolver() {
+        return function () {
+            $user = $this->user();
             if ($user) {
-                $modelClass = CF::config('app.model.role', CApp_Model_Roles::class);
+                $modelClass = $this->auth()->getRoleModelClass();
                 $model = new $modelClass();
                 /** @var CApp_Model_Roles $model */
                 $keyName = $model->getKeyName();
                 $roleId = $user->$keyName;
-                $this->role = $this->getRole($roleId);
+
+                return $this->getRole($roleId);
             }
+        };
+    }
+
+    protected function resolveRole() {
+        $resolver = $this->roleResolver ?: $this->defaultRoleResolver();
+
+        return $resolver();
+    }
+
+    /**
+     * Get Role Object.
+     *
+     * @return CApp_Model_Roles
+     */
+    public function role() {
+        if ($this->role == null) {
+            $this->role = $this->resolveRole();
         }
 
         return $this->role;
@@ -86,7 +118,12 @@ trait CApp_Concern_AuthTrait {
         if ($roleId == null) {
             return null;
         }
-        $modelClass = CF::config('app.model.role', CApp_Model_Roles::class);
+        if ($this->user() != null) {
+            if ($this->user()->role_id == $roleId && $this->role != null) {
+                return $this->role;
+            }
+        }
+        $modelClass = $this->auth()->getRoleModelClass();
 
         return $modelClass::find($roleId);
     }
@@ -100,9 +137,8 @@ trait CApp_Concern_AuthTrait {
         if ($userId == null) {
             return null;
         }
-        $modelClass = CF::config('app.model.user', CApp_Model_Users::class);
 
-        return $modelClass::find($userId);
+        return $this->auth()->guard()->getProvider()->retrieveById($userId);
     }
 
     public function isAuthEnabled() {
@@ -116,10 +152,10 @@ trait CApp_Concern_AuthTrait {
     }
 
     public function enableAuth() {
-        return $this->setAuth(true);
+        return $this->setAuthEnable(true);
     }
 
     public function disableAuth() {
-        return $this->setAuth(false);
+        return $this->setAuthEnable(false);
     }
 }

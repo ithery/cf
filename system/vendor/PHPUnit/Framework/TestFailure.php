@@ -7,19 +7,22 @@
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  */
+
 namespace PHPUnit\Framework;
 
-use function get_class;
-use function sprintf;
-use function trim;
-use PHPUnit\Framework\Error\Error;
 use Throwable;
+use function trim;
+use function sprintf;
+use function get_class;
+use PHPUnit\Framework\Exception\Error;
+use PHPUnit\Framework\Exception\AssertionFailedError;
+use PHPUnit\Framework\Exception\PHPTAssertionFailedError;
+use PHPUnit\Framework\Exception\ExpectationFailedException;
 
 /**
  * @internal This class is not covered by the backward compatibility promise for PHPUnit
  */
-final class TestFailure
-{
+final class TestFailure {
     /**
      * @var null|Test
      */
@@ -37,9 +40,10 @@ final class TestFailure
 
     /**
      * Returns a description for an exception.
+     *
+     * @param mixed $e
      */
-    public static function exceptionToString( $e)
-    {
+    public static function exceptionToString($e) {
         if ($e instanceof SelfDescribing) {
             $buffer = $e->toString();
 
@@ -71,9 +75,10 @@ final class TestFailure
 
     /**
      * Constructs a TestFailure with the given test and exception.
+     *
+     * @param mixed $t
      */
-    public function __construct(Test $failedTest,  $t)
-    {
+    public function __construct(Test $failedTest, $t) {
         if ($failedTest instanceof SelfDescribing) {
             $this->testName = $failedTest->toString();
         } else {
@@ -90,8 +95,7 @@ final class TestFailure
     /**
      * Returns a short description of the failure.
      */
-    public function toString()
-    {
+    public function toString() {
         return sprintf(
             '%s: %s',
             $this->testName,
@@ -102,16 +106,14 @@ final class TestFailure
     /**
      * Returns a description for the thrown exception.
      */
-    public function getExceptionAsString()
-    {
+    public function getExceptionAsString() {
         return self::exceptionToString($this->thrownException);
     }
 
     /**
      * Returns the name of the failing test (including data set, if any).
      */
-    public function getTestName()
-    {
+    public function getTestName() {
         return $this->testName;
     }
 
@@ -123,24 +125,21 @@ final class TestFailure
      *
      * @see Exception
      */
-    public function failedTest()
-    {
+    public function failedTest() {
         return $this->failedTest;
     }
 
     /**
      * Gets the thrown exception.
      */
-    public function thrownException()
-    {
+    public function thrownException() {
         return $this->thrownException;
     }
 
     /**
      * Returns the exception's message.
      */
-    public function exceptionMessage()
-    {
+    public function exceptionMessage() {
         return $this->thrownException()->getMessage();
     }
 
@@ -148,8 +147,7 @@ final class TestFailure
      * Returns true if the thrown exception
      * is of type AssertionFailedError.
      */
-    public function isFailure()
-    {
+    public function isFailure() {
         return $this->thrownException() instanceof AssertionFailedError;
     }
 }

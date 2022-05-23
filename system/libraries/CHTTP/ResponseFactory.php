@@ -1,15 +1,15 @@
 <?php
 
 /**
- * Description of ResponseFactory
+ * Description of ResponseFactory.
  *
  * @author Hery
  */
 
-use Symfony\Component\HttpFoundation\BinaryFileResponse;
 use Symfony\Component\HttpFoundation\StreamedResponse;
+use Symfony\Component\HttpFoundation\BinaryFileResponse;
 
-class CHTTP_ResponseFactory {
+class CHTTP_ResponseFactory implements CHTTP_Contract_ResponseFactoryInterface {
     use CTrait_Macroable;
 
     protected static $instance;
@@ -21,6 +21,7 @@ class CHTTP_ResponseFactory {
         if (static::$instance == null) {
             static::$instance = new static();
         }
+
         return static::$instance;
     }
 
@@ -119,9 +120,9 @@ class CHTTP_ResponseFactory {
      * Create a new streamed response instance as a file download.
      *
      * @param \Closure    $callback
-     * @param string|null $name
+     * @param null|string $name
      * @param array       $headers
-     * @param string|null $disposition
+     * @param null|string $disposition
      *
      * @return \Symfony\Component\HttpFoundation\StreamedResponse
      */
@@ -143,9 +144,9 @@ class CHTTP_ResponseFactory {
      * Create a new file download response.
      *
      * @param \SplFileInfo|string $file
-     * @param string|null         $name
+     * @param null|string         $name
      * @param array               $headers
-     * @param string|null         $disposition
+     * @param null|string         $disposition
      *
      * @return \Symfony\Component\HttpFoundation\BinaryFileResponse
      */
@@ -188,7 +189,7 @@ class CHTTP_ResponseFactory {
      * @param string    $path
      * @param int       $status
      * @param array     $headers
-     * @param bool|null $secure
+     * @param null|bool $secure
      *
      * @return CHTTP_RedirectResponse
      */
@@ -230,7 +231,7 @@ class CHTTP_ResponseFactory {
      * @param string    $path
      * @param int       $status
      * @param array     $headers
-     * @param bool|null $secure
+     * @param null|bool $secure
      *
      * @return CHTTP_RedirectResponse
      */
@@ -244,7 +245,7 @@ class CHTTP_ResponseFactory {
      * @param string    $default
      * @param int       $status
      * @param array     $headers
-     * @param bool|null $secure
+     * @param null|bool $secure
      *
      * @return CHTTP_RedirectResponse
      */

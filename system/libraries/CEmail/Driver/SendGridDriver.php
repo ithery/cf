@@ -7,9 +7,15 @@ class CEmail_Driver_SendGridDriver extends CEmail_DriverAbstract {
         $from = carr::get($options, 'from', $this->config->getFrom());
         $fromName = carr::get($options, 'from_name', $this->config->getFromName());
         $attachments = carr::get($options, 'attachments', []);
+        $replyTo = carr::get($options, 'replyTo', '');
+        $cc = carr::get($options, 'cc', []);
+        $bcc = carr::get($options, 'bcc', []);
 
         $mail = new CVendor_SendGrid_Mail_Mail();
         $mail->setFrom($from, $fromName);
+        if (strlen($replyTo) > 0) {
+            $mail->setReplyTo($replyTo);
+        }
 
         $toSendGrid = [];
         if (!is_array($to)) {
@@ -26,7 +32,14 @@ class CEmail_Driver_SendGridDriver extends CEmail_DriverAbstract {
         }
         $mail->setSubject($subject);
         $mail->addContent('text/html', $body);
-
+        $cc = carr::wrap($cc);
+        $bcc = carr::wrap($bcc);
+        foreach ($cc as $email) {
+            $mail->addCc($email);
+        }
+        foreach ($bcc as $email) {
+            $mail->addBcc($email);
+        }
         $subjectPreview = carr::get($options, 'subject_preview');
         foreach ($attachments as $att) {
             $disk = '';
@@ -74,11 +87,11 @@ class CEmail_Driver_SendGridDriver extends CEmail_DriverAbstract {
 
         $sg = new CVendor_SendGrid($apiKey);
 
-
         $response = $sg->send($mail);
         if ($response->statusCode() > 400) {
             throw new Exception('Fail to send mail, API Response:(' . $response->statusCode() . ')' . $response->body());
         }
+
         return $response;
     }
 }

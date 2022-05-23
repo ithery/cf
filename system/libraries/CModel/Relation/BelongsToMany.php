@@ -672,7 +672,7 @@ class CModel_Relation_BelongsToMany extends CModel_Relation {
      * @param mixed $id
      * @param array $columns
      *
-     * @throws CModel_Exception_ModelNotFound
+     * @throws CModel_Exception_ModelNotFoundException
      *
      * @return CModel|CModel_Collection
      */
@@ -689,7 +689,7 @@ class CModel_Relation_BelongsToMany extends CModel_Relation {
             return $result;
         }
 
-        throw (new CModel_Exception_ModelNotFound())->setModel(get_class($this->related), $id);
+        throw (new CModel_Exception_ModelNotFoundException())->setModel(get_class($this->related), $id);
     }
 
     /**
@@ -724,7 +724,7 @@ class CModel_Relation_BelongsToMany extends CModel_Relation {
      *
      * @param array $columns
      *
-     * @throws \CModel_Exception_ModelNotFound
+     * @throws \CModel_Exception_ModelNotFoundException
      *
      * @return \CModel|static
      */
@@ -733,7 +733,7 @@ class CModel_Relation_BelongsToMany extends CModel_Relation {
             return $model;
         }
 
-        throw (new CModel_Exception_ModelNotFound())->setModel(get_class($this->related));
+        throw (new CModel_Exception_ModelNotFoundException())->setModel(get_class($this->related));
     }
 
     /**

@@ -2,7 +2,6 @@
 
 class CElement_FormInput_File extends CElement_FormInput {
     use CTrait_Compat_Element_FormInput_File;
-
     protected $multiple;
 
     protected $applyjs;
@@ -16,10 +15,7 @@ class CElement_FormInput_File extends CElement_FormInput {
 
         $this->input_help = '';
 
-        $fileupload = carr::get($this->theme_data, 'fileupload');
-        if (strlen($fileupload) > 0) {
-            $this->applyjs = $fileupload;
-        }
+        $this->applyjs = c::theme('fileupload', 'file-upload');
     }
 
     public static function factory($id) {
@@ -49,9 +45,7 @@ class CElement_FormInput_File extends CElement_FormInput {
         if (strlen($classes) > 0) {
             $classes = ' ' . $classes;
         }
-        if ($this->bootstrap == '3') {
-            $classes = $classes . ' form-control ';
-        }
+
         $custom_css = $this->custom_css;
         $custom_css = $this->renderStyle($custom_css);
         if (strlen($custom_css) > 0) {
@@ -158,16 +152,19 @@ class CElement_FormInput_File extends CElement_FormInput {
             }
             $js->append('});');
         }
+
         return $js->text();
     }
 
     public function setMultiple($bool) {
         $this->multiple = true;
+
         return $this;
     }
 
     public function setApplyJs($applyjs) {
         $this->applyjs = $applyjs;
+
         return $this;
     }
 }

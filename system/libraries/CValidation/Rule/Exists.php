@@ -22,7 +22,7 @@ class CValidation_Rule_Exists {
 
     public function __sleep() {
         $this->using = c::collect($this->using)->map(function ($item) {
-            return CHelper::closure()->serialize($item);
+            return c::toSerializableClosure($item);
         })->all();
 
         return array_keys(get_object_vars($this));
@@ -30,7 +30,7 @@ class CValidation_Rule_Exists {
 
     public function __wakeup() {
         $this->using = c::collect($this->using)->map(function ($item) {
-            return CHelper::closure()->unserialize($item);
+            return c::toCallable($item);
         })->all();
     }
 }

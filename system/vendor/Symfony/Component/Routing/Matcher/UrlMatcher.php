@@ -85,7 +85,6 @@ class UrlMatcher implements UrlMatcherInterface, RequestMatcherInterface {
      */
     public function match($pathinfo) {
         $this->allow = $this->allowSchemes = [];
-
         if ($ret = $this->matchCollection(rawurldecode($pathinfo) ?: '/', $this->routes)) {
             return $ret;
         }

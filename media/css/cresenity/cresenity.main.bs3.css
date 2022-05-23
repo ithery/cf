@@ -15,8 +15,6 @@ body {
     overflow-x: hidden;
 }
 
-
-
 h1,
 h2,
 h3,
@@ -615,7 +613,7 @@ button.btn-info.dim:active, a.btn-info.dim:active {
     box-shadow: none;
 }
 .form-horizontal input[type="text"], .form-horizontal input[type="password"], .form-horizontal textarea {
-    width: 100%; 
+    width: 100%;
 }
 input[readonly=readonly],select[readonly=readonly],textarea[readonly=readonly] {
     background: #f0f0f0;
@@ -1184,7 +1182,7 @@ div.dataTables_wrapper .ui-widget-header {
     margin: 0;
     position: relative;
     vertical-align: middle;
-} 
+}
 
 .select2-container.form-control {
     padding: 0;
@@ -1263,7 +1261,7 @@ div.dataTables_wrapper .ui-widget-header {
     border: 1px solid #e7eaec;
 
 }
-.select2-container.select2-drop-above .select2-choice { 
+.select2-container.select2-drop-above .select2-choice {
     border-radius:0px
 }
 /* file upload*/
@@ -1532,8 +1530,7 @@ body.mini-navbar #page-wrapper {
     }
 
     .dropdown-submenu:hover>a:after {
-        border-left-color: #262626; 
+        border-left-color: #262626;
         border-top-color: transparent;
     }
 }
-

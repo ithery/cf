@@ -14,35 +14,29 @@ declare(strict_types=1);
 namespace League\CommonMark\Extension\Strikethrough;
 
 use League\CommonMark\Delimiter\DelimiterInterface;
-use League\CommonMark\Delimiter\Processor\DelimiterProcessorInterface;
 use League\CommonMark\Node\Inline\AbstractStringContainer;
+use League\CommonMark\Delimiter\Processor\DelimiterProcessorInterface;
 
-final class StrikethroughDelimiterProcessor implements DelimiterProcessorInterface
-{
-    public function getOpeningCharacter(): string
-    {
+final class StrikethroughDelimiterProcessor implements DelimiterProcessorInterface {
+    public function getOpeningCharacter() {
         return '~';
     }
 
-    public function getClosingCharacter(): string
-    {
+    public function getClosingCharacter() {
         return '~';
     }
 
-    public function getMinLength(): int
-    {
+    public function getMinLength() {
         return 2;
     }
 
-    public function getDelimiterUse(DelimiterInterface $opener, DelimiterInterface $closer): int
-    {
+    public function getDelimiterUse(DelimiterInterface $opener, DelimiterInterface $closer) {
         $min = \min($opener->getLength(), $closer->getLength());
 
         return $min >= 2 ? $min : 0;
     }
 
-    public function process(AbstractStringContainer $opener, AbstractStringContainer $closer, int $delimiterUse): void
-    {
+    public function process(AbstractStringContainer $opener, AbstractStringContainer $closer, $delimiterUse) {
         $strikethrough = new Strikethrough();
 
         $tmp = $opener->next();

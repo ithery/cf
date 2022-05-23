@@ -15,11 +15,9 @@ class CAjax_Engine_Reload extends CAjax_Engine {
         $json = carr::get($data, 'json');
         $callback = carr::get($data, 'callback');
         if ($callback != null) {
-            $callback = CHelper::closure()->deserializeClosure($callback);
-
             $parameters = [];
 
-            return call_user_func_array($callback, $parameters);
+            return c::value($callback, ...$parameters);
         } else {
             return $json;
         }

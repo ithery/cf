@@ -1,13 +1,15 @@
 <?php
 
 class CFConsole {
-    private static $commands = [];
+    public static $commands = [];
 
-    private static $defaultCommands = [
+    public static $defaultCommands = [
         CConsole_Command_VersionCommand::class,
         CConsole_Command_StatusCommand::class,
         CConsole_Command_ServeCommand::class,
         CConsole_Command_ComposerCommand::class,
+        CConsole_Command_EnvironmentCommand::class,
+        CConsole_Command_Api_JWTSecretCommand::class,
         CConsole_Command_Domain_DomainListCommand::class,
         CConsole_Command_Domain_DomainCreateCommand::class,
         CConsole_Command_Domain_DomainDeleteCommand::class,
@@ -16,6 +18,13 @@ class CFConsole {
         CConsole_Command_Daemon_DaemonStartCommand::class,
         CConsole_Command_Daemon_DaemonStatusCommand::class,
         CConsole_Command_Daemon_DaemonStopCommand::class,
+        CConsole_Command_Cron_ScheduleListCommand::class,
+        CConsole_Command_Cron_ScheduleFinishCommand::class,
+        CConsole_Command_Cron_ScheduleRunCommand::class,
+        CConsole_Command_Cron_ScheduleWorkCommand::class,
+        CConsole_Command_Cron_ScheduleTestCommand::class,
+        CConsole_Command_Queue_ClearCommand::class,
+        CConsole_Command_Queue_ListFailedCommand::class,
         CConsole_Command_DevSuite_DevSuiteInstallCommand::class,
         CConsole_Command_DevSuite_DevSuiteStartCommand::class,
         CConsole_Command_DevSuite_DevSuiteUninstallCommand::class,
@@ -45,9 +54,14 @@ class CFConsole {
         CConsole_Command_DevSuite_DevSuiteDeployInitCommand::class,
         CConsole_Command_DevSuite_DevSuiteDeployRunCommand::class,
         CConsole_Command_Make_MakeControllerCommand::class,
+        CConsole_Command_Make_MakeModelCommand::class,
         CConsole_Command_Make_MakeConfigCommand::class,
         CConsole_Command_Make_MakeNavCommand::class,
         CConsole_Command_Make_MakeThemeCommand::class,
+        CConsole_Command_Make_MakeTestCommand::class,
+        CConsole_Command_Model_ModelListCommand::class,
+        CConsole_Command_Model_ModelTablesCommand::class,
+        CConsole_Command_Model_ModelUpdateCommand::class,
         CConsole_Command_App_AppCreateCommand::class,
         CConsole_Command_App_AppPresetCommand::class,
         CConsole_Command_App_AppPresetAdminCommand::class,

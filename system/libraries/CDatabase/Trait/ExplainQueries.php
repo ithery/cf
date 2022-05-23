@@ -1,6 +1,6 @@
 <?php
 
-trait CDatabase_Trait_ExplainsQueries {
+trait CDatabase_Trait_ExplainQueries {
     /**
      * Explains the query.
      *

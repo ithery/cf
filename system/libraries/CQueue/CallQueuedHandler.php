@@ -12,7 +12,7 @@ class CQueue_CallQueuedHandler {
     /**
      * The bus dispatcher implementation.
      *
-     * @var \Illuminate\Contracts\Bus\Dispatcher
+     * @var \CQueue_DispatcherInterface
      */
     protected $dispatcher;
 
@@ -38,8 +38,8 @@ class CQueue_CallQueuedHandler {
     /**
      * Handle the queued job.
      *
-     * @param \Illuminate\Contracts\Queue\Job $job
-     * @param array                           $data
+     * @param \CQueue_AbstractJob $job
+     * @param array               $data
      *
      * @return void
      */
@@ -49,7 +49,7 @@ class CQueue_CallQueuedHandler {
                 $job,
                 unserialize($data['command'])
             );
-        } catch (CModel_Exception_ModelNotFound $e) {
+        } catch (CModel_Exception_ModelNotFoundException $e) {
             return $this->handleModelNotFound($job, $e);
         }
 
@@ -73,13 +73,13 @@ class CQueue_CallQueuedHandler {
      */
     protected function dispatchThroughMiddleware(CQueue_AbstractJob $job, $command) {
         return (new CQueue_Pipeline($this->container))->send($command)
-                        ->through(array_merge(method_exists($command, 'middleware') ? $command->middleware() : [], isset($command->middleware) ? $command->middleware : []))
-                        ->then(function ($command) use ($job) {
-                            return $this->dispatcher->dispatchNow(
-                                $command,
-                                $this->resolveHandler($job, $command)
-                            );
-                        });
+            ->through(array_merge(method_exists($command, 'middleware') ? $command->middleware() : [], isset($command->middleware) ? $command->middleware : []))
+            ->then(function ($command) use ($job) {
+                return $this->dispatcher->dispatchNow(
+                    $command,
+                    $this->resolveHandler($job, $command)
+                );
+            });
     }
 
     /**
@@ -95,6 +95,7 @@ class CQueue_CallQueuedHandler {
         if ($handler) {
             $this->setJobInstanceIfNecessary($job, $handler);
         }
+
         return $handler;
     }
 
@@ -137,6 +138,7 @@ class CQueue_CallQueuedHandler {
      */
     protected function handleModelNotFound(CQueue_AbstractJob $job, $e) {
         $class = $job->resolveName();
+
         try {
             $reflectionClass = new ReflectionClass($class);
             $reflectionProperties = $reflectionClass->getDefaultProperties();
@@ -147,6 +149,7 @@ class CQueue_CallQueuedHandler {
         if ($shouldDelete) {
             return $job->delete();
         }
+
         return $job->fail($e);
     }
 

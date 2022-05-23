@@ -10,7 +10,7 @@ defined('SYSPATH') or die('No direct access allowed.');
  */
 class CDatabase_Query_Builder {
     use CDatabase_Trait_Builder,
-        CDatabase_Trait_ExplainsQueries,
+        CDatabase_Trait_ExplainQueries,
         CTrait_ForwardsCalls,
         CDatabase_Query_Concern_BuilderWhereTrait;
     use CTrait_Macroable {
@@ -959,6 +959,10 @@ class CDatabase_Query_Builder {
      * @return $this
      */
     public function forPage($page, $perPage = 15) {
+        if ($perPage <= 0) {
+            return $this;
+        }
+
         return $this->offset(($page - 1) * $perPage)->limit($perPage);
     }
 
@@ -1111,6 +1115,15 @@ class CDatabase_Query_Builder {
      */
     public function toSql() {
         return $this->grammar->compileSelect($this);
+    }
+
+    /**
+     * Get the SQL representation of the query with bindings.
+     *
+     * @return string
+     */
+    public function toCompiledSql() {
+        return $this->db->compileBinds($this->toSql(), $this->getBindings());
     }
 
     /**

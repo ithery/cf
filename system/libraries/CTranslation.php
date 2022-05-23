@@ -11,6 +11,11 @@ defined('SYSPATH') or die('No direct access allowed.');
 class CTranslation {
     protected static $translator;
 
+    /**
+     * @param string $locale
+     *
+     * @return CTranslation_Translator
+     */
     public static function translator($locale = null) {
         if ($locale == null) {
             $locale = CF::getLocale();
@@ -24,5 +29,12 @@ class CTranslation {
         }
 
         return static::$translator[$locale];
+    }
+
+    /**
+     * @return CTranslation_Manager
+     */
+    public static function manager() {
+        return CTranslation_Manager::instance();
     }
 }

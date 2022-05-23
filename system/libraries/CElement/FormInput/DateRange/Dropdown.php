@@ -23,7 +23,7 @@ class CElement_FormInput_DateRange_Dropdown extends CElement_FormInput {
         CManager::instance()->registerModule('bootstrap-daterangepicker');
 
         $this->type = 'text';
-        $dateFormat = ccfg::get('date_formatted');
+        $dateFormat = c::formatter()->getDateFormat();
         if ($dateFormat == null) {
             $dateFormat = 'Y-m-d';
         }
@@ -109,6 +109,18 @@ class CElement_FormInput_DateRange_Dropdown extends CElement_FormInput {
         $phpFormat = strtr($format, $replacements);
 
         return $phpFormat;
+    }
+
+    public function setValue($value) {
+        if ($value instanceof CPeriod) {
+            $this->setValueStart($value->startDate);
+            $this->setValueEnd($value->endDate);
+        } else {
+            $this->setValueStart($value);
+            $this->setValueEnd($value);
+        }
+
+        return $this;
     }
 
     public function setValueStart($dateStart) {

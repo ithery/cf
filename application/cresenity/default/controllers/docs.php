@@ -9,10 +9,12 @@ defined('SYSPATH') or die('No direct access allowed.');
  *
  * @license Ittron Global Teknologi
  */
+use Cresenity\Documentation\Renderer;
 use League\CommonMark\CommonMarkConverter;
 use League\CommonMark\Environment\Environment;
+use League\CommonMark\Extension\Table\TableExtension;
 use League\CommonMark\Extension\GithubFlavoredMarkdownExtension;
-use Cresenity\Documentation\Renderer;
+use League\CommonMark\Extension\CommonMark\CommonMarkCoreExtension;
 
 class Controller_Docs extends CController {
     public function __construct() {
@@ -47,10 +49,21 @@ class Controller_Docs extends CController {
             'html_input' => 'strip',
             'allow_unsafe_links' => false,
         ]);
+        // Define your configuration, if needed
+        $config = [
+            'table' => [
+                'wrap' => [
+                    'enabled' => false,
+                    'tag' => 'div',
+                    'attributes' => [],
+                ],
+            ],
+        ];
 
-        $environment = Environment::createCommonMarkEnvironment();
+        $environment = Environment::createCommonMarkEnvironment($config);
+        $environment->addExtension(new CommonMarkCoreExtension());
         $environment->addExtension(new GithubFlavoredMarkdownExtension());
-
+        $environment->addExtension(new TableExtension());
         $converter = new CommonMarkConverter([], $environment);
         $html = $converter->convertToHtml($content);
 
@@ -79,6 +92,7 @@ class Controller_Docs extends CController {
                 'page' => $page,
             ])->render();
         });
+
         return $app;
     }
 

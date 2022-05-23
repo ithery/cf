@@ -41,8 +41,8 @@ class CRedis_Limiter_DurationLimiterBuilder {
     /**
      * Create a new builder instance.
      *
-     * @param \Illuminate\Redis\Connections\Connection $connection
-     * @param string                                   $name
+     * @param \CRedis_AbstractConnection $connection
+     * @param string                     $name
      *
      * @return void
      */
@@ -60,6 +60,7 @@ class CRedis_Limiter_DurationLimiterBuilder {
      */
     public function allow($maxLocks) {
         $this->maxLocks = $maxLocks;
+
         return $this;
     }
 
@@ -72,6 +73,7 @@ class CRedis_Limiter_DurationLimiterBuilder {
      */
     public function every($decay) {
         $this->decay = $this->secondsUntil($decay);
+
         return $this;
     }
 
@@ -84,6 +86,7 @@ class CRedis_Limiter_DurationLimiterBuilder {
      */
     public function block($timeout) {
         $this->timeout = $timeout;
+
         return $this;
     }
 
@@ -91,11 +94,11 @@ class CRedis_Limiter_DurationLimiterBuilder {
      * Execute the given callback if a lock is obtained, otherwise call the failure callback.
      *
      * @param callable      $callback
-     * @param callable|null $failure
-     *
-     * @return mixed
+     * @param null|callable $failure
      *
      * @throws CRedis_Exception_LimiterTimeoutException
+     *
+     * @return mixed
      */
     public function then(callable $callback, callable $failure = null) {
         try {
@@ -109,6 +112,7 @@ class CRedis_Limiter_DurationLimiterBuilder {
             if ($failure) {
                 return $failure($e);
             }
+
             throw $e;
         }
     }

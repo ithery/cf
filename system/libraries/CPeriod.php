@@ -8,7 +8,7 @@ defined('SYSPATH') or die('No direct access allowed.');
  *
  * @since Jun 23, 2019, 12:50:57 PM
  */
-use \Carbon\Carbon;
+use Carbon\Carbon;
 
 class CPeriod {
     const INTERVAL_MONTH = 'month';
@@ -18,12 +18,12 @@ class CPeriod {
     const INTERVAL_HOUR = 'hour';
 
     /**
-     * @var \Carbon\Carbon
+     * @var \CarbonV3\Carbon
      */
     public $startDate;
 
     /**
-     * @var \Carbon\Carbon
+     * @var \CarbonV3\Carbon
      */
     public $endDate;
 
@@ -34,30 +34,49 @@ class CPeriod {
     public static function lifetime($minimumDate = null) {
         $endDate = CCarbon::today();
         $startDate = CCarbon::createFromTimestamp(0);
+
         return new static($startDate, $endDate);
     }
 
     public static function days($numberOfDays) {
         $endDate = CCarbon::today();
         $startDate = CCarbon::today()->subDays($numberOfDays)->startOfDay();
+
+        return new static($startDate, $endDate);
+    }
+
+    public static function today() {
+        $endDate = CCarbon::today()->endOfDay();
+        $startDate = CCarbon::today()->startOfDay();
+
+        return new static($startDate, $endDate);
+    }
+
+    public static function yesterday() {
+        $endDate = CCarbon::today()->subDays(1)->endOfDay();
+        $startDate = CCarbon::today()->subDays(1)->startOfDay();
+
         return new static($startDate, $endDate);
     }
 
     public static function months($numberOfMonths) {
         $endDate = CCarbon::today();
         $startDate = CCarbon::today()->subMonths($numberOfMonths)->startOfDay();
+
         return new static($startDate, $endDate);
     }
 
     public static function years($numberOfYears) {
         $endDate = CCarbon::today();
         $startDate = CCarbon::today()->subYears($numberOfYears)->startOfDay();
+
         return new static($startDate, $endDate);
     }
 
     public static function minutes($numberOfMinutes) {
         $endDate = CCarbon::now();
         $startDate = CCarbon::now()->subMinutes($numberOfMinutes);
+
         return new static($startDate, $endDate);
     }
 
@@ -131,6 +150,7 @@ class CPeriod {
         $endDate->hour = 23;
         $endDate->minute = 59;
         $endDate->second = 59;
+
         return new static($startDate, $endDate);
     }
 
@@ -168,6 +188,7 @@ class CPeriod {
                 }
             }
         }
+
         return new static($start, $end);
     }
 

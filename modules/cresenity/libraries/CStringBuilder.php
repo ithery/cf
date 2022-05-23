@@ -22,7 +22,7 @@ class CStringBuilder {
     }
 
     /**
-     * Set indentation of string
+     * Set indentation of string.
      *
      * @param int $ind
      *
@@ -30,11 +30,12 @@ class CStringBuilder {
      */
     public function setIndent($ind) {
         $this->indent = $ind;
+
         return $this;
     }
 
     /**
-     * Get indentation of string
+     * Get indentation of string.
      *
      * @return int
      */
@@ -43,7 +44,7 @@ class CStringBuilder {
     }
 
     /**
-     * Increment the indentation
+     * Increment the indentation.
      *
      * @param int $n
      *
@@ -51,11 +52,12 @@ class CStringBuilder {
      */
     public function incIndent($n = 1) {
         $this->indent += $n;
+
         return $this;
     }
 
     /**
-     * Decrement the indentation
+     * Decrement the indentation.
      *
      * @param int $n
      *
@@ -63,21 +65,25 @@ class CStringBuilder {
      */
     public function decIndent($n = 1) {
         $this->indent -= $n;
+
         return $this;
     }
 
     public function append($str) {
         $this->text .= $str;
+
         return $this;
     }
 
     public function appendln($str) {
-        $this->text .= cutils::indent($this->indent);
+        $this->text .= static::indent($this->indent);
+
         return $this->append($str);
     }
 
     public function br() {
         $this->text .= "\r\n";
+
         return $this;
     }
 
@@ -87,5 +93,9 @@ class CStringBuilder {
 
     public function __toString() {
         return $this->text;
+    }
+
+    public static function indent($n, $char = "\t") {
+        return str_repeat($char, $n);
     }
 }

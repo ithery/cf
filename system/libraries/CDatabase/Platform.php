@@ -88,7 +88,7 @@ abstract class CDatabase_Platform {
     const TRIM_BOTH = CDatabase_Platform_Helper_TrimMode::BOTH;
 
     /**
-     * @var array|null
+     * @var null|array
      */
     protected $doctrineTypeMapping = null;
 
@@ -96,7 +96,7 @@ abstract class CDatabase_Platform {
      * Contains a list of all columns that should generate parseable column comments for type-detection
      * in reverse engineering scenarios.
      *
-     * @var array|null
+     * @var null|array
      */
     protected $doctrineTypeComments = null;
 
@@ -294,9 +294,9 @@ abstract class CDatabase_Platform {
      * @param int  $length
      * @param bool $fixed
      *
-     * @return string
-     *
      * @throws CDatabase_Exception if not supported on this platform
+     *
+     * @return string
      */
     protected function getVarcharTypeDeclarationSQLSnippet($length, $fixed) {
         throw CDatabase_Exception::notSupported('VARCHARs not supported by Platform.');
@@ -308,9 +308,9 @@ abstract class CDatabase_Platform {
      * @param int  $length the length of the column
      * @param bool $fixed  whether the column length is fixed
      *
-     * @return string
-     *
      * @throws CDatabase_Exception if not supported on this platform
+     *
+     * @return string
      */
     protected function getBinaryTypeDeclarationSQLSnippet($length, $fixed) {
         throw CDatabase_Exception::notSupported('BINARY/VARBINARY column types are not supported by this platform.');
@@ -373,9 +373,9 @@ abstract class CDatabase_Platform {
      *
      * @param string $dbType
      *
-     * @return string
-     *
      * @throws CDatabase_Exception
+     *
+     * @return string
      */
     public function getDoctrineTypeMapping($dbType) {
         if ($this->doctrineTypeMapping === null) {
@@ -564,9 +564,9 @@ abstract class CDatabase_Platform {
     /**
      * Returns the regular expression operator.
      *
-     * @return string
-     *
      * @throws CDatabase_Exception if not supported on this platform
+     *
+     * @return string
      */
     public function getRegexpExpression() {
         throw CDatabase_Exception::notSupported(__METHOD__);
@@ -575,9 +575,9 @@ abstract class CDatabase_Platform {
     /**
      * Returns the global unique identifier expression.
      *
-     * @return string
-     *
      * @throws CDatabase_Exception if not supported on this platform
+     *
+     * @return string
      *
      * @deprecated Use application-generated UUIDs instead
      */
@@ -718,14 +718,17 @@ abstract class CDatabase_Platform {
         switch ($mode) {
             case CDatabase_Platform_TrimMode::LEADING:
                 $expression = 'LEADING ';
+
                 break;
 
             case CDatabase_Platform_TrimMode::TRAILING:
                 $expression = 'TRAILING ';
+
                 break;
 
             case CDatabase_Platform_TrimMode::BOTH:
                 $expression = 'BOTH ';
+
                 break;
         }
 
@@ -793,9 +796,9 @@ abstract class CDatabase_Platform {
      * @param string   $substr   literal string to find
      * @param int|bool $startPos position to start at, beginning of string by default
      *
-     * @return string
-     *
      * @throws CDatabase_Exception if not supported on this platform
+     *
+     * @return string
      */
     public function getLocateExpression($str, $substr, $startPos = false) {
         throw CDatabase_Exception::notSupported(__METHOD__);
@@ -819,7 +822,7 @@ abstract class CDatabase_Platform {
      *
      * @param string   $value  an sql string literal or column name/alias
      * @param int      $from   where to start the substring portion
-     * @param int|null $length the substring portion length
+     * @param null|int $length the substring portion length
      *
      * @return string
      */
@@ -952,9 +955,9 @@ abstract class CDatabase_Platform {
      * @param string $date1
      * @param string $date2
      *
-     * @return string
-     *
      * @throws CDatabase_Exception if not supported on this platform
+     *
+     * @return string
      */
     public function getDateDiffExpression($date1, $date2) {
         throw CDatabase_Exception::notSupported(__METHOD__);
@@ -966,9 +969,9 @@ abstract class CDatabase_Platform {
      * @param string $date
      * @param int    $seconds
      *
-     * @return string
-     *
      * @throws CDatabase_Exception if not supported on this platform
+     *
+     * @return string
      */
     public function getDateAddSecondsExpression($date, $seconds) {
         return $this->getDateArithmeticIntervalExpression($date, '+', $seconds, CDatabase_Platform_DateIntervalUnit::SECOND);
@@ -980,9 +983,9 @@ abstract class CDatabase_Platform {
      * @param string $date
      * @param int    $seconds
      *
-     * @return string
-     *
      * @throws CDatabase_Exception if not supported on this platform
+     *
+     * @return string
      */
     public function getDateSubSecondsExpression($date, $seconds) {
         return $this->getDateArithmeticIntervalExpression($date, '-', $seconds, CDatabase_Platform_DateIntervalUnit::SECOND);
@@ -994,9 +997,9 @@ abstract class CDatabase_Platform {
      * @param string $date
      * @param int    $minutes
      *
-     * @return string
-     *
      * @throws CDatabase_Exception if not supported on this platform
+     *
+     * @return string
      */
     public function getDateAddMinutesExpression($date, $minutes) {
         return $this->getDateArithmeticIntervalExpression($date, '+', $minutes, CDatabase_Platform_DateIntervalUnit::MINUTE);
@@ -1008,9 +1011,9 @@ abstract class CDatabase_Platform {
      * @param string $date
      * @param int    $minutes
      *
-     * @return string
-     *
      * @throws CDatabase_Exception if not supported on this platform
+     *
+     * @return string
      */
     public function getDateSubMinutesExpression($date, $minutes) {
         return $this->getDateArithmeticIntervalExpression($date, '-', $minutes, CDatabase_Platform_DateIntervalUnit::MINUTE);
@@ -1022,9 +1025,9 @@ abstract class CDatabase_Platform {
      * @param string $date
      * @param int    $hours
      *
-     * @return string
-     *
      * @throws CDatabase_Exception if not supported on this platform
+     *
+     * @return string
      */
     public function getDateAddHourExpression($date, $hours) {
         return $this->getDateArithmeticIntervalExpression($date, '+', $hours, CDatabase_Platform_DateIntervalUnit::HOUR);
@@ -1036,9 +1039,9 @@ abstract class CDatabase_Platform {
      * @param string $date
      * @param int    $hours
      *
-     * @return string
-     *
      * @throws CDatabase_Exception if not supported on this platform
+     *
+     * @return string
      */
     public function getDateSubHourExpression($date, $hours) {
         return $this->getDateArithmeticIntervalExpression($date, '-', $hours, CDatabase_Platform_DateIntervalUnit::HOUR);
@@ -1050,9 +1053,9 @@ abstract class CDatabase_Platform {
      * @param string $date
      * @param int    $days
      *
-     * @return string
-     *
      * @throws CDatabase_Exception if not supported on this platform
+     *
+     * @return string
      */
     public function getDateAddDaysExpression($date, $days) {
         return $this->getDateArithmeticIntervalExpression($date, '+', $days, CDatabase_Platform_DateIntervalUnit::DAY);
@@ -1064,9 +1067,9 @@ abstract class CDatabase_Platform {
      * @param string $date
      * @param int    $days
      *
-     * @return string
-     *
      * @throws CDatabase_Exception if not supported on this platform
+     *
+     * @return string
      */
     public function getDateSubDaysExpression($date, $days) {
         return $this->getDateArithmeticIntervalExpression($date, '-', $days, CDatabase_Platform_DateIntervalUnit::DAY);
@@ -1078,9 +1081,9 @@ abstract class CDatabase_Platform {
      * @param string $date
      * @param int    $weeks
      *
-     * @return string
-     *
      * @throws CDatabase_Exception if not supported on this platform
+     *
+     * @return string
      */
     public function getDateAddWeeksExpression($date, $weeks) {
         return $this->getDateArithmeticIntervalExpression($date, '+', $weeks, CDatabase_Platform_DateIntervalUnit::WEEK);
@@ -1092,9 +1095,9 @@ abstract class CDatabase_Platform {
      * @param string $date
      * @param int    $weeks
      *
-     * @return string
-     *
      * @throws CDatabase_Exception if not supported on this platform
+     *
+     * @return string
      */
     public function getDateSubWeeksExpression($date, $weeks) {
         return $this->getDateArithmeticIntervalExpression($date, '-', $weeks, CDatabase_Platform_DateIntervalUnit::WEEK);
@@ -1106,9 +1109,9 @@ abstract class CDatabase_Platform {
      * @param string $date
      * @param int    $months
      *
-     * @return string
-     *
      * @throws CDatabase_Exception if not supported on this platform
+     *
+     * @return string
      */
     public function getDateAddMonthExpression($date, $months) {
         return $this->getDateArithmeticIntervalExpression($date, '+', $months, CDatabase_Platform_DateIntervalUnit::MONTH);
@@ -1120,9 +1123,9 @@ abstract class CDatabase_Platform {
      * @param string $date
      * @param int    $months
      *
-     * @return string
-     *
      * @throws CDatabase_Exception if not supported on this platform
+     *
+     * @return string
      */
     public function getDateSubMonthExpression($date, $months) {
         return $this->getDateArithmeticIntervalExpression($date, '-', $months, CDatabase_Platform_DateIntervalUnit::MONTH);
@@ -1134,9 +1137,9 @@ abstract class CDatabase_Platform {
      * @param string $date
      * @param int    $quarters
      *
-     * @return string
-     *
      * @throws CDatabase_Exception if not supported on this platform
+     *
+     * @return string
      */
     public function getDateAddQuartersExpression($date, $quarters) {
         return $this->getDateArithmeticIntervalExpression($date, '+', $quarters, CDatabase_Platform_DateIntervalUnit::QUARTER);
@@ -1148,9 +1151,9 @@ abstract class CDatabase_Platform {
      * @param string $date
      * @param int    $quarters
      *
-     * @return string
-     *
      * @throws CDatabase_Exception if not supported on this platform
+     *
+     * @return string
      */
     public function getDateSubQuartersExpression($date, $quarters) {
         return $this->getDateArithmeticIntervalExpression($date, '-', $quarters, CDatabase_Platform_DateIntervalUnit::QUARTER);
@@ -1162,9 +1165,9 @@ abstract class CDatabase_Platform {
      * @param string $date
      * @param int    $years
      *
-     * @return string
-     *
      * @throws CDatabase_Exception if not supported on this platform
+     *
+     * @return string
      */
     public function getDateAddYearsExpression($date, $years) {
         return $this->getDateArithmeticIntervalExpression($date, '+', $years, CDatabase_Platform_DateIntervalUnit::YEAR);
@@ -1176,9 +1179,9 @@ abstract class CDatabase_Platform {
      * @param string $date
      * @param int    $years
      *
-     * @return string
-     *
      * @throws CDatabase_Exception if not supported on this platform
+     *
+     * @return string
      */
     public function getDateSubYearsExpression($date, $years) {
         return $this->getDateArithmeticIntervalExpression($date, '-', $years, CDatabase_Platform_DateIntervalUnit::YEAR);
@@ -1193,9 +1196,9 @@ abstract class CDatabase_Platform {
      * @param string $unit     The unit of the interval that shall be calculated into the date.
      *                         One of the DATE_INTERVAL_UNIT_* constants.
      *
-     * @return string
-     *
      * @throws CDatabase_Exception if not supported on this platform
+     *
+     * @return string
      */
     protected function getDateArithmeticIntervalExpression($date, $operator, $interval, $unit) {
         throw CDatabase_Exception::notSupported(__METHOD__);
@@ -1238,7 +1241,7 @@ abstract class CDatabase_Platform {
      * Honors that some SQL vendors such as MsSql use table hints for locking instead of the ANSI SQL FOR UPDATE specification.
      *
      * @param string   $fromClause the FROM clause to append the hint for the given lock mode to
-     * @param int|null $lockMode   One of the Doctrine\DBAL\LockMode::* constants. If null is given, nothing will
+     * @param null|int $lockMode   One of the Doctrine\DBAL\LockMode::* constants. If null is given, nothing will
      *                             be appended to the FROM clause.
      *
      * @return string
@@ -1286,9 +1289,9 @@ abstract class CDatabase_Platform {
      *
      * @param CDatabase_Schema_Table|string $table
      *
-     * @return string
-     *
      * @throws \InvalidArgumentException
+     *
+     * @return string
      */
     public function getDropTableSQL($table) {
         $tableArg = $table;
@@ -1328,9 +1331,9 @@ abstract class CDatabase_Platform {
      * @param CDatabase_Schema_Index|string $index
      * @param CDatabase_Schema_Table|string $table
      *
-     * @return string
-     *
      * @throws \InvalidArgumentException
+     *
+     * @return string
      */
     public function getDropIndexSQL($index, $table = null) {
         if ($index instanceof CDatabase_Schema_Index) {
@@ -1395,10 +1398,10 @@ abstract class CDatabase_Platform {
      * @param CDatabase_Schema_Table $table
      * @param int                    $createFlags
      *
-     * @return array the sequence of SQL statements
-     *
      * @throws CDatabase_Exception
      * @throws \InvalidArgumentException
+     *
+     * @return array the sequence of SQL statements
      */
     public function getCreateTableSQL(CDatabase_Schema_Table $table, $createFlags = self::CREATE_INDEXES) {
         if (!is_int($createFlags)) {
@@ -1511,9 +1514,9 @@ abstract class CDatabase_Platform {
      *
      * @param string $comment
      *
-     * @return string
-     *
      * @throws CDatabase_Exception if not supported on this platform
+     *
+     * @return string
      */
     public function getInlineColumnCommentSQL($comment) {
         if (!$this->supportsInlineColumnComments()) {
@@ -1582,9 +1585,9 @@ abstract class CDatabase_Platform {
      *
      * @param CDatabase_Schema_Sequence $sequence
      *
-     * @return string
-     *
      * @throws CDatabase_Exception if not supported on this platform
+     *
+     * @return string
      */
     public function getCreateSequenceSQL(CDatabase_Schema_Sequence $sequence) {
         throw CDatabase_Exception::notSupported(__METHOD__);
@@ -1595,9 +1598,9 @@ abstract class CDatabase_Platform {
      *
      * @param CDatabase_Schema_Sequence $sequence
      *
-     * @return string
-     *
      * @throws CDatabase_Exception if not supported on this platform
+     *
+     * @return string
      */
     public function getAlterSequenceSQL(CDatabase_Schema_Sequence $sequence) {
         throw CDatabase_Exception::notSupported(__METHOD__);
@@ -1609,9 +1612,9 @@ abstract class CDatabase_Platform {
      * @param CDatabase_Schema_Constraint   $constraint
      * @param CDatabase_Schema_Table|string $table
      *
-     * @return string
-     *
      * @throws \InvalidArgumentException
+     *
+     * @return string
      */
     public function getCreateConstraintSQL(CDatabase_Schema_Constraint $constraint, $table) {
         if ($table instanceof CDatabase_Schema_Table) {
@@ -1650,9 +1653,9 @@ abstract class CDatabase_Platform {
      * @param CDatabase_Schema_Index        $index
      * @param CDatabase_Schema_Table|string $table the name of the table on which the index is to be created
      *
-     * @return string
-     *
      * @throws \InvalidArgumentException
+     *
+     * @return string
      */
     public function getCreateIndexSQL(CDatabase_Schema_Index $index, $table) {
         if ($table instanceof CDatabase_Schema_Table) {
@@ -1718,9 +1721,9 @@ abstract class CDatabase_Platform {
      *
      * @param string $schemaName
      *
-     * @return string
-     *
      * @throws CDatabase_Exception if not supported on this platform
+     *
+     * @return string
      */
     public function getCreateSchemaSQL($schemaName) {
         throw CDatabase_Exception::notSupported(__METHOD__);
@@ -1787,9 +1790,9 @@ abstract class CDatabase_Platform {
      *
      * @param CDatabase_Schema_Table_Diff $diff
      *
-     * @return array
-     *
      * @throws CDatabase_Exception if not supported on this platform
+     *
+     * @return array
      */
     public function getAlterTableSQL(CDatabase_Schema_Table_Diff $diff) {
         throw CDatabase_Exception::notSupported(__METHOD__);
@@ -1856,10 +1859,10 @@ abstract class CDatabase_Platform {
     }
 
     /**
-     * @param string                     $oldColumnName
-     * @param CDatabase_Schema_Column    $column
-     * @param CDatabase_Schema_TableDiff $diff
-     * @param array                      $columnSql
+     * @param string                      $oldColumnName
+     * @param CDatabase_Schema_Column     $column
+     * @param CDatabase_Schema_Table_Diff $diff
+     * @param array                       $columnSql
      *
      * @return bool
      */
@@ -2154,9 +2157,9 @@ abstract class CDatabase_Platform {
      * @param string                 $name  the name of the unique constraint
      * @param CDatabase_Schema_Index $index the index definition
      *
-     * @return string DBMS specific SQL code portion needed to set a constraint
-     *
      * @throws \InvalidArgumentException
+     *
+     * @return string DBMS specific SQL code portion needed to set a constraint
      */
     public function getUniqueConstraintDeclarationSQL($name, CDatabase_Schema_Index $index) {
         $columns = $index->getQuotedColumns($this);
@@ -2178,9 +2181,9 @@ abstract class CDatabase_Platform {
      * @param string                 $name  the name of the index
      * @param CDatabase_Schema_Index $index the index definition
      *
-     * @return string DBMS specific SQL code portion needed to set an index
-     *
      * @throws \InvalidArgumentException
+     *
+     * @return string DBMS specific SQL code portion needed to set an index
      */
     public function getIndexDeclarationSQL($name, CDatabase_Schema_Index $index) {
         $columns = $index->getQuotedColumns($this);
@@ -2307,9 +2310,9 @@ abstract class CDatabase_Platform {
      *
      * @param string $action the foreign key referential action
      *
-     * @return string
-     *
      * @throws \InvalidArgumentException if unknown referential action given
+     *
+     * @return string
      */
     public function getForeignKeyReferentialActionSQL($action) {
         $upper = strtoupper($action);
@@ -2331,9 +2334,9 @@ abstract class CDatabase_Platform {
      *
      * @param CDatabase_Schema_ForeignKeyConstraint $foreignKey
      *
-     * @return string
-     *
      * @throws \InvalidArgumentException
+     *
+     * @return string
      */
     public function getForeignKeyBaseDeclarationSQL(CDatabase_Schema_ForeignKeyConstraint $foreignKey) {
         $sql = '';
@@ -2446,13 +2449,13 @@ abstract class CDatabase_Platform {
     }
 
     /**
-     * Some platforms have boolean literals that needs to be correctly converted
+     * Some platforms have boolean literals that needs to be correctly converted.
      *
      * The default conversion tries to convert value into bool "(bool)$item"
      *
      * @param mixed $item
      *
-     * @return bool|null
+     * @return null|bool
      */
     public function convertFromBoolean($item) {
         return null === $item ? null : (bool) $item;
@@ -2491,7 +2494,7 @@ abstract class CDatabase_Platform {
     }
 
     /**
-     * Returns the SQL specific for the platform to get the current timestamp
+     * Returns the SQL specific for the platform to get the current timestamp.
      *
      * @return string
      */
@@ -2504,9 +2507,9 @@ abstract class CDatabase_Platform {
      *
      * @param int $level
      *
-     * @return string
-     *
      * @throws \InvalidArgumentException
+     *
+     * @return string
      */
     protected function getTransactionIsolationLevelSQL($level) {
         switch ($level) {
@@ -2524,9 +2527,9 @@ abstract class CDatabase_Platform {
     }
 
     /**
-     * @return string
-     *
      * @throws CDatabase_Exception if not supported on this platform
+     *
+     * @return string
      */
     public function getListDatabasesSQL() {
         throw CDatabase_Exception::notSupported(__METHOD__);
@@ -2535,9 +2538,9 @@ abstract class CDatabase_Platform {
     /**
      * Returns the SQL statement for retrieving the namespaces defined in the database.
      *
-     * @return string
-     *
      * @throws CDatabase_Exception if not supported on this platform
+     *
+     * @return string
      */
     public function getListNamespacesSQL() {
         throw CDatabase_Exception::notSupported(__METHOD__);
@@ -2546,9 +2549,9 @@ abstract class CDatabase_Platform {
     /**
      * @param string $database
      *
-     * @return string
-     *
      * @throws CDatabase_Exception if not supported on this platform
+     *
+     * @return string
      */
     public function getListSequencesSQL($database) {
         throw CDatabase_Exception::notSupported(__METHOD__);
@@ -2557,9 +2560,9 @@ abstract class CDatabase_Platform {
     /**
      * @param string $table
      *
-     * @return string
-     *
      * @throws CDatabase_Exception if not supported on this platform
+     *
+     * @return string
      */
     public function getListTableConstraintsSQL($table) {
         throw CDatabase_Exception::notSupported(__METHOD__);
@@ -2567,29 +2570,29 @@ abstract class CDatabase_Platform {
 
     /**
      * @param string      $table
-     * @param string|null $database
-     *
-     * @return string
+     * @param null|string $database
      *
      * @throws CDatabase_Exception if not supported on this platform
+     *
+     * @return string
      */
     public function getListTableColumnsSQL($table, $database = null) {
         throw CDatabase_Exception::notSupported(__METHOD__);
     }
 
     /**
-     * @return string
-     *
      * @throws CDatabase_Exception if not supported on this platform
+     *
+     * @return string
      */
     public function getListTablesSQL() {
         throw CDatabase_Exception::notSupported(__METHOD__);
     }
 
     /**
-     * @return string
-     *
      * @throws CDatabase_Exception if not supported on this platform
+     *
+     * @return string
      */
     public function getListUsersSQL() {
         throw CDatabase_Exception::notSupported(__METHOD__);
@@ -2600,9 +2603,9 @@ abstract class CDatabase_Platform {
      *
      * @param string $database
      *
-     * @return string
-     *
      * @throws CDatabase_Exception if not supported on this platform
+     *
+     * @return string
      */
     public function getListViewsSQL($database) {
         throw CDatabase_Exception::notSupported(__METHOD__);
@@ -2621,9 +2624,9 @@ abstract class CDatabase_Platform {
      * @param string $table
      * @param string $currentDatabase
      *
-     * @return string
-     *
      * @throws CDatabase_Exception if not supported on this platform
+     *
+     * @return string
      */
     public function getListTableIndexesSQL($table, $currentDatabase = null) {
         throw CDatabase_Exception::notSupported(__METHOD__);
@@ -2632,9 +2635,9 @@ abstract class CDatabase_Platform {
     /**
      * @param string $table
      *
-     * @return string
-     *
      * @throws CDatabase_Exception if not supported on this platform
+     *
+     * @return string
      */
     public function getListTableForeignKeysSQL($table) {
         throw CDatabase_Exception::notSupported(__METHOD__);
@@ -2644,9 +2647,9 @@ abstract class CDatabase_Platform {
      * @param string $name
      * @param string $sql
      *
-     * @return string
-     *
      * @throws CDatabase_Exception if not supported on this platform
+     *
+     * @return string
      */
     public function getCreateViewSQL($name, $sql) {
         throw CDatabase_Exception::notSupported(__METHOD__);
@@ -2655,9 +2658,9 @@ abstract class CDatabase_Platform {
     /**
      * @param string $name
      *
-     * @return string
-     *
      * @throws CDatabase_Exception if not supported on this platform
+     *
+     * @return string
      */
     public function getDropViewSQL($name) {
         throw CDatabase_Exception::notSupported(__METHOD__);
@@ -2668,9 +2671,9 @@ abstract class CDatabase_Platform {
      *
      * @param Sequence|string $sequence
      *
-     * @return string
-     *
      * @throws CDatabase_Exception if not supported on this platform
+     *
+     * @return string
      */
     public function getDropSequenceSQL($sequence) {
         throw CDatabase_Exception::notSupported(__METHOD__);
@@ -2679,9 +2682,9 @@ abstract class CDatabase_Platform {
     /**
      * @param string $sequenceName
      *
-     * @return string
-     *
      * @throws CDatabase_Exception if not supported on this platform
+     *
+     * @return string
      */
     public function getSequenceNextValSQL($sequenceName) {
         throw CDatabase_Exception::notSupported(__METHOD__);
@@ -2692,9 +2695,9 @@ abstract class CDatabase_Platform {
      *
      * @param string $database the name of the database that should be created
      *
-     * @return string
-     *
      * @throws CDatabase_Exception if not supported on this platform
+     *
+     * @return string
      */
     public function getCreateDatabaseSQL($database) {
         throw CDatabase_Exception::notSupported(__METHOD__);
@@ -2705,9 +2708,9 @@ abstract class CDatabase_Platform {
      *
      * @param int $level
      *
-     * @return string
-     *
      * @throws CDatabase_Exception if not supported on this platform
+     *
+     * @return string
      */
     public function getSetTransactionIsolationSQL($level) {
         throw CDatabase_Exception::notSupported(__METHOD__);
@@ -2719,9 +2722,9 @@ abstract class CDatabase_Platform {
      *
      * @param array $fieldDeclaration
      *
-     * @return string
-     *
      * @throws CDatabase_Exception if not supported on this platform
+     *
+     * @return string
      */
     public function getDateTimeTypeDeclarationSQL(array $fieldDeclaration) {
         throw CDatabase_Exception::notSupported(__METHOD__);
@@ -2744,9 +2747,9 @@ abstract class CDatabase_Platform {
      *
      * @param array $fieldDeclaration
      *
-     * @return string
-     *
      * @throws CDatabase_Exception if not supported on this platform
+     *
+     * @return string
      */
     public function getDateTypeDeclarationSQL(array $fieldDeclaration) {
         throw CDatabase_Exception::notSupported(__METHOD__);
@@ -2758,9 +2761,9 @@ abstract class CDatabase_Platform {
      *
      * @param array $fieldDeclaration
      *
-     * @return string
-     *
      * @throws CDatabase_Exception if not supported on this platform
+     *
+     * @return string
      */
     public function getTimeTypeDeclarationSQL(array $fieldDeclaration) {
         throw CDatabase_Exception::notSupported(__METHOD__);
@@ -2828,9 +2831,9 @@ abstract class CDatabase_Platform {
      * @param string $tableName  the name of the table to return the sequence name for
      * @param string $columnName the name of the identity column in the table to return the sequence name for
      *
-     * @return string
-     *
      * @throws CDatabase_Exception if not supported on this platform
+     *
+     * @return string
      *
      * @see    usesSequenceEmulatedIdentityColumns
      */
@@ -2916,7 +2919,7 @@ abstract class CDatabase_Platform {
      * @return bool
      */
     public function supportsForeignKeyOnUpdate() {
-        return ($this->supportsForeignKeyConstraints() && true);
+        return $this->supportsForeignKeyConstraints() && true;
     }
 
     /**
@@ -2932,8 +2935,7 @@ abstract class CDatabase_Platform {
      * Whether this platform can emulate schemas.
      *
      * Platforms that either support or emulate schemas don't automatically
-     * filter a schema for the namespaced elements in {@link
-     * AbstractManager#createSchema}.
+     * filter a schema for the namespaced elements in {@link * AbstractManager#createSchema}.
      *
      * @return bool
      */
@@ -2944,9 +2946,9 @@ abstract class CDatabase_Platform {
     /**
      * Returns the default schema name.
      *
-     * @return string
-     *
      * @throws CDatabase_Exception if not supported on this platform
+     *
+     * @return string
      */
     public function getDefaultSchemaName() {
         throw CDatabase_Exception::notSupported(__METHOD__);
@@ -3079,12 +3081,12 @@ abstract class CDatabase_Platform {
      * Adds an driver-specific LIMIT clause to the query.
      *
      * @param string   $query
-     * @param int|null $limit
-     * @param int|null $offset
-     *
-     * @return string
+     * @param null|int $limit
+     * @param null|int $offset
      *
      * @throws DBALException
+     *
+     * @return string
      */
     final public function modifyLimitQuery($query, $limit, $offset = null) {
         if ($limit !== null) {
@@ -3114,8 +3116,8 @@ abstract class CDatabase_Platform {
      * Adds an platform-specific LIMIT clause to the query.
      *
      * @param string   $query
-     * @param int|null $limit
-     * @param int|null $offset
+     * @param null|int $limit
+     * @param null|int $offset
      *
      * @return string
      */
@@ -3248,9 +3250,9 @@ abstract class CDatabase_Platform {
     /**
      * Returns the keyword list instance of this platform.
      *
-     * @return CDatabase_Platform_Keywords
-     *
      * @throws CDatabase_Exception if no keyword list is specified
+     *
+     * @return CDatabase_Platform_Keywords
      */
     final public function getReservedKeywordsList() {
         // Check for an existing instantiation of the keywords class.
@@ -3259,7 +3261,7 @@ abstract class CDatabase_Platform {
         }
 
         $class = $this->getReservedKeywordsClass();
-        $keywords = new $class;
+        $keywords = new $class();
         if (!$keywords instanceof CDatabase_Platform_Keywords) {
             throw CDatabase_Exception::notSupported(__METHOD__);
         }
@@ -3273,9 +3275,9 @@ abstract class CDatabase_Platform {
     /**
      * Returns the class name of the reserved keywords list.
      *
-     * @return string
-     *
      * @throws CDatabase_Exception if not supported on this platform
+     *
+     * @return string
      */
     protected function getReservedKeywordsClass() {
         throw CDatabase_Exception::notSupported(__METHOD__);

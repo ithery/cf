@@ -17,6 +17,7 @@ class CModel_HasResource_FileAdder_FileAdderFactory {
      */
     public static function create(CModel $subject, $file) {
         $fileAdder = new CModel_HasResource_FileAdder_FileAdder(new CResources_Filesystem());
+
         return $fileAdder->setSubject($subject)->setFile($file);
     }
 
@@ -39,18 +40,21 @@ class CModel_HasResource_FileAdder_FileAdderFactory {
                 throw CResources_Exception_FileCannotBeAdded_RequestDoesNotHaveFile::create($key);
             }
             $files = CHTTP::request()->file($key);
+
             if (!is_array($files)) {
                 return static::create($subject, $files);
             }
+
             return array_map(function ($file) use ($subject) {
                 return static::create($subject, $file);
             }, $files);
         })
-                        ->flatten();
+            ->flatten();
     }
 
     public static function createAllFromRequest(CModel $subject) {
         $fileKeys = array_keys(CHTTP::request()->allFiles());
+
         return static::createMultipleFromRequest($subject, $fileKeys);
     }
 }

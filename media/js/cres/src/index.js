@@ -1,3 +1,5 @@
+import './polyfills/index';
+
 // eslint-disable-next-line no-extend-native
 String.prototype.contains = function (a) {
     return !!~this.indexOf(a);

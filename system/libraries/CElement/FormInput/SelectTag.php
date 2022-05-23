@@ -10,7 +10,6 @@ defined('SYSPATH') or die('No direct access allowed.');
  */
 class CElement_FormInput_SelectTag extends CElement_FormInput {
     use CTrait_Compat_Element_FormInput_SelectTag;
-
     protected $multiple;
 
     public function __construct($id) {
@@ -93,7 +92,7 @@ class CElement_FormInput_SelectTag extends CElement_FormInput {
         }
         $html = new CStringBuilder();
         $html->setIndent($indent);
-        $html->append($this->html_child($indent));
+        $html->append($this->htmlChild($indent));
 
         $custom_css = $this->renderStyle($this->custom_css);
         $multiple = ' multiple="multiple"';
@@ -104,9 +103,6 @@ class CElement_FormInput_SelectTag extends CElement_FormInput {
         $classes = implode(' ', $this->classes);
         if (strlen($classes) > 0) {
             $classes = ' ' . $classes;
-        }
-        if ($this->bootstrap == '3') {
-            $classes = $classes . ' form-control ';
         }
 
         $html->appendln('<input type="hidden"  class="' . $classes . '" name="' . $this->name . '" id="' . $this->id . '" ' . $custom_css . '/>')->br();
@@ -125,6 +121,7 @@ class CElement_FormInput_SelectTag extends CElement_FormInput {
                 });
 
             ";
+
             return $js;
         }
         $vals = $this->value;

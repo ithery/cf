@@ -58,6 +58,7 @@ class CException_ExceptionHandler implements CException_ExceptionHandlerInterfac
         CAuth_Exception_AuthorizationException::class,
         HttpException::class,
         CHTTP_Exception_ResponseException::class,
+        CModel_Exception_ModelNotFoundException::class,
         CModel_Exception_ModelNotFound::class,
         //SuspiciousOperationException::class,
         //TokenMismatchException::class,
@@ -96,10 +97,10 @@ class CException_ExceptionHandler implements CException_ExceptionHandlerInterfac
         if ($this->shouldntReport($e)) {
             return;
         }
+
         if (is_callable($reportCallable = [$e, 'report'])) {
             return $this->container->call($reportCallable);
         }
-
         foreach ($this->reportCallbacks as $reportCallback) {
             if ($reportCallback->handles($e)) {
                 if ($reportCallback($e) === false) {
@@ -107,7 +108,6 @@ class CException_ExceptionHandler implements CException_ExceptionHandlerInterfac
                 }
             }
         }
-
         CLogger::instance()->add(CLogger::ERROR, $e->getMessage(), null, $this->context(), $e);
         //        try {
         //            CLogger::instance()->add($reportCallable, $message)
@@ -189,7 +189,9 @@ class CException_ExceptionHandler implements CException_ExceptionHandlerInterfac
             }
 
             if (CView::exists('errors/http/' . $e->getStatusCode())) {
-                return c::response()->view('errors/http/' . $e->getStatusCode(), [], $e->getStatusCode());
+                return c::response()->view('errors/http/' . $e->getStatusCode(), [
+                    'exception' => $e,
+                ], $e->getStatusCode());
             } else {
                 if ($e->getStatusCode() == 404) {
                     //backward compatibility old view
@@ -231,7 +233,7 @@ class CException_ExceptionHandler implements CException_ExceptionHandlerInterfac
      * @return \Exception
      */
     protected function prepareException($e) {
-        if ($e instanceof CModel_Exception_ModelNotFound) {
+        if ($e instanceof CModel_Exception_ModelNotFoundException) {
             $e = new NotFoundHttpException($e->getMessage(), $e);
         } elseif ($e instanceof CAuth_Exception_AuthorizationException) {
             $e = new AccessDeniedHttpException($e->getMessage(), $e);
@@ -355,6 +357,14 @@ class CException_ExceptionHandler implements CException_ExceptionHandlerInterfac
         try {
             return CException_LegacyExceptionHandler::getContent($e);
             if (CF::isProduction()) {
+                if (CView::exists('errors/http/' . '500')) {
+                    if (!isset($_GET['show_debug_error'])) {
+                        return c::view('errors/http/500', [
+                            'exception' => $e,
+                        ])->render();
+                    }
+                }
+
                 return CException_LegacyExceptionHandler::getContent($e);
             }
 
@@ -534,7 +544,7 @@ class CException_ExceptionHandler implements CException_ExceptionHandlerInterfac
     }
 
     protected function isDebug() {
-        $isDebug = CF::config('core.debug');
+        $isDebug = CF::config('app.debug');
         if ($isDebug === null) {
             $isDebug = !CF::isProduction();
         }

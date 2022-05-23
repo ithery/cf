@@ -14,11 +14,11 @@ trait CModel_Scout_SearchableTrait {
      * @return void
      */
     public static function bootSearchableTrait() {
-        static::addGlobalScope(new CModel_Scout_SearchableScope);
+        static::addGlobalScope(new CModel_Scout_SearchableScope());
 
-        static::observe(new CModel_Scout_ModelObserver);
+        static::observe(new CModel_Scout_ModelObserver());
 
-        (new static)->registerSearchableMacros();
+        (new static())->registerSearchableMacros();
     }
 
     /**
@@ -108,7 +108,7 @@ trait CModel_Scout_SearchableTrait {
      */
     public static function search($query = '', $callback = null) {
         return CContainer::getInstance()->make(CModel_Scout_Builder::class, [
-            'model' => new static,
+            'model' => new static(),
             'query' => $query,
             'callback' => $callback,
             'softDelete' => static::usesSoftDelete() && CF::config('model.scout.soft_delete', true),
@@ -123,7 +123,7 @@ trait CModel_Scout_SearchableTrait {
      * @return void
      */
     public static function makeAllSearchable($chunk = null) {
-        $self = new static;
+        $self = new static();
 
         $softDelete = static::usesSoftDelete() && CF::config('model.scout.soft_delete', true);
 
@@ -141,9 +141,9 @@ trait CModel_Scout_SearchableTrait {
     /**
      * Modify the query used to retrieve models when making all of the models searchable.
      *
-     * @param \Illuminate\Database\Eloquent\Builder $query
+     * @param \CModel_Query $query
      *
-     * @return \Illuminate\Database\Eloquent\Builder
+     * @return \CModel_Query
      */
     protected function makeAllSearchableUsing($query) {
         return $query;
@@ -164,7 +164,7 @@ trait CModel_Scout_SearchableTrait {
      * @return void
      */
     public static function removeAllFromSearch() {
-        $self = new static;
+        $self = new static();
 
         $self->searchableUsing()->flush($self);
     }

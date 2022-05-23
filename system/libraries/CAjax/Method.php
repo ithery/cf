@@ -58,6 +58,10 @@ class CAjax_Method implements CInterface_Jsonable {
      * @return $this
      */
     public function setType($type) {
+        if (class_exists($type)) {
+            $type = c::classBasename($type);
+        }
+
         $this->type = $type;
 
         return $this;
@@ -187,13 +191,17 @@ class CAjax_Method implements CInterface_Jsonable {
     }
 
     /**
-     * @param type $input
+     * @param string $input
      *
-     * @return type
+     * @return string
      */
     public function executeEngine($input = null) {
         $engine = self::createEngine($this, $input);
+        $response = $engine->execute();
+        if ($response != null && $response instanceof CHTTP_JsonResponse) {
+            return $response->getContent();
+        }
 
-        return $engine->execute();
+        return $response;
     }
 }

@@ -12,7 +12,9 @@ if ($user) {
     $username = $user->username;
 }
 $app = CApp::instance();
+
 $org = $app->org();
+
 ?>
 <!DOCTYPE html>
 <html class="no-js capp-legacy" lang="<?php echo clang::getlang(); ?>" >
@@ -148,7 +150,7 @@ $org = $app->org();
 
         </div> <!-- /navbar -->
 
-        <div class="subnavbar" id="subnavbar" <?php echo(!$show_nav ? 'style="display:none"' : ''); ?>>
+        <div class="subnavbar" id="subnavbar" <?php echo !$show_nav ? 'style="display:none"' : ''; ?>>
 
             <div class="subnavbar-inner">
 
@@ -184,7 +186,7 @@ $org = $app->org();
                     <div class="container-fluid">
                     -->
                     <?php if ($show_title): ?>
-                        <h1><?php echo $title ?></h1>
+                        <h1><?php echo $title; ?></h1>
                     <?php endif; ?>
                     <?php if ($show_breadcrumb): ?>
                         <?php
@@ -198,7 +200,7 @@ $org = $app->org();
                             <div id="breadcrumb">
                                 <a href="<?php echo curl::base(); ?>" class="tip-left" data-original-title="Go to Home"><i class="icon-home"></i> Home</a>
                                 <?php foreach ($breadcrumb as $k => $b) : ?>
-                                    <a href="<?php echo $b ?>" class=""><?php echo $k; ?></a>
+                                    <a href="<?php echo $b; ?>" class=""><?php echo $k; ?></a>
                                 <?php endforeach; ?>
                                 <a href="javascript:;" class="current"><?php echo $title; ?></a>
                             </div>
@@ -251,7 +253,7 @@ echo $ready_client_script;
 <?php echo $load_client_script; ?>
                 }
             }
-<?php echo $custom_js ?>
+<?php echo $custom_js; ?>
         </script>
         <?php echo $custom_footer; ?>
     </body>

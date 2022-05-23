@@ -224,8 +224,7 @@ class CServer_Service_Beanstalkd {
      *
      * @param string $tube
      * @param string $method
-     * @param mixed  $decode
-     * @param mixed  $autoDecode
+     * @param bool   $autoDecode
      */
     private function peek($tube, $method, $autoDecode = false) {
         $peek = [];

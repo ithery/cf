@@ -9,29 +9,17 @@ defined('SYSPATH') or die('No direct access allowed.');
  * @since Nov 12, 2017, 3:34:27 AM
  */
 abstract class CElement_Element extends CElement {
-    protected $before;
-    protected $after;
     protected $isBuilded = false;
+
     protected $isOneTag = false;
+
     protected $haveIndent = true;
-    protected $is_show = true;
-    private $isBuild = false;
 
     public function __construct($id = '', $tag = 'div') {
         parent::__construct($id);
 
-        $this->theme = CManager::theme()->getCurrentTheme();
-
-        $this->before = null;
-        $this->after = null;
-
         $this->isBuilded = false;
         $this->isOneTag = false;
-
-        $this->bootstrap = ccfg::get('bootstrap');
-        if (strlen($this->bootstrap) == 0) {
-            $this->bootstrap = '2';
-        }
     }
 
     public function onetag() {
@@ -53,19 +41,23 @@ abstract class CElement_Element extends CElement {
      */
     public function setHaveIndent($bool = true) {
         $this->haveIndent = $bool;
+
         return $this;
     }
 
     protected function htmlAttr() {
-        $custom_css = $this->custom_css;
-        $custom_css = static::renderStyle($custom_css);
-        if (strlen($custom_css) > 0) {
-            $custom_css = ' style="' . $custom_css . '"';
+        $customCss = $this->custom_css;
+        $customCss = static::renderStyle($customCss);
+        if (strlen($customCss) > 0) {
+            $customCss = ' style="' . $customCss . '"';
         }
-        $addition_attribute = '';
+        $additionAttribute = '';
         $haveClass = false;
         foreach ($this->attr as $k => $v) {
-            $addition_attribute .= ' ' . $k . '="' . $v . '"';
+            if (is_array($v)) {
+                $v = implode(',', $v);
+            }
+            $additionAttribute .= ' ' . $k . '="' . $v . '"';
             if ($k == 'class') {
                 $haveClass = true;
             }
@@ -76,8 +68,9 @@ abstract class CElement_Element extends CElement {
             $classes = implode(' ', $classes);
             $classAttr = ' class="' . $classes . '"';
         }
-        $html_attr = 'id="' . $this->id . '" ' . $classAttr . $custom_css . $addition_attribute;
-        return $html_attr;
+        $htmlAttr = 'id="' . $this->id . '" ' . $classAttr . $customCss . $additionAttribute;
+
+        return $htmlAttr;
     }
 
     protected function buildOnce() {
@@ -104,20 +97,6 @@ abstract class CElement_Element extends CElement {
         return $this->after()->js($indent);
     }
 
-    public function before() {
-        if ($this->before == null) {
-            $this->before = CElement_PseudoElement::factory();
-        }
-        return $this->before;
-    }
-
-    public function after() {
-        if ($this->after == null) {
-            $this->after = CElement_PseudoElement::factory();
-        }
-        return $this->after;
-    }
-
     protected function build() {
     }
 
@@ -134,28 +113,25 @@ abstract class CElement_Element extends CElement {
         if ($this->isOneTag) {
             $html->$appendMethod($this->onetag());
         } else {
-            if ($this->is_show) {
-                $html->$appendMethod($this->pretag());
-                if ($this->haveIndent) {
-                    $html->br();
-                }
-                if ($this->haveIndent) {
-                    $html->incIndent();
-                }
+            $html->$appendMethod($this->pretag());
+            if ($this->haveIndent) {
+                $html->br();
+            }
+            if ($this->haveIndent) {
+                $html->incIndent();
             }
 
             $html->$appendMethod($this->htmlChild($html->getIndent()));
             if ($this->haveIndent) {
                 $html->br();
             }
-            if ($this->is_show) {
-                if ($this->haveIndent) {
-                    $html->decIndent();
-                }
-                $html->$appendMethod($this->posttag());
-                if ($this->haveIndent) {
-                    $html->br();
-                }
+
+            if ($this->haveIndent) {
+                $html->decIndent();
+            }
+            $html->$appendMethod($this->posttag());
+            if ($this->haveIndent) {
+                $html->br();
             }
         }
         $html->$appendMethod($this->afterHtml($indent));
