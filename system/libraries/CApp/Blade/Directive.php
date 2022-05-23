@@ -60,7 +60,7 @@ class CApp_Blade_Directive {
 
     public static function element($expression) {
         if (cstr::startsWith(trim($expression), 'function')) {
-            return "<?php echo \CApp::instance()->yieldViewElement(" . $expression . '); ?>';
+            return "<?php echo \CApp::instance()->yieldViewElement(isset(\$__CAppElementView) ? \$__CAppElementView : null, " . $expression . '); ?>';
         }
         $expression = str_replace(['(', ')'], '', $expression);
         $expression = str_replace(['"', '\''], '', $expression);
