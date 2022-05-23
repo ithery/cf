@@ -1,7 +1,7 @@
 <?php
 
 /**
- * Description of collector
+ * Description of collector.
  *
  * @author Hery
  */
