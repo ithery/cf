@@ -2,6 +2,7 @@
 
 namespace Illuminate\Contracts\Mail;
 
+use CQueue_FactoryInterface;
 use Illuminate\Contracts\Queue\Factory as Queue;
 
 interface CEmail_Contract_MailableInterface {
@@ -17,11 +18,11 @@ interface CEmail_Contract_MailableInterface {
     /**
      * Queue the given message.
      *
-     * @param \Illuminate\Contracts\Queue\Factory $queue
+     * @param \CQueue_FactoryInterface $queue
      *
      * @return mixed
      */
-    public function queue(Queue $queue);
+    public function queue(CQueue_FactoryInterface $queue);
 
     /**
      * Deliver the queued message after (n) seconds.
