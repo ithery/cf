@@ -20,7 +20,6 @@ class CResources_ResponsiveImage_RegisteredResponsiveImage {
         $this->generatedFor = $conversionName === ''
             ? 'resource_original'
             : $conversionName;
-
         $this->files = c::collect($resource->responsive_images[$this->generatedFor]['urls'] ?? [])
             ->map(function ($fileName) use ($resource) {
                 return new CResources_ResponsiveImage($fileName, $resource);

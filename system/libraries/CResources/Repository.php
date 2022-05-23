@@ -66,6 +66,22 @@ class CResources_Repository {
         return $this->model->whereIn('id', $ids)->get();
     }
 
+    /**
+     * @param int    $startingFromId
+     * @param bool   $excludeStartingId
+     * @param string $modelType
+     *
+     * @return CModel_Collection
+     */
+    public function getByIdGreaterThan($startingFromId, $excludeStartingId = false, $modelType = '') {
+        return $this->query()
+            ->where($this->model->getKeyName(), $excludeStartingId ? '>' : '>=', $startingFromId)
+            ->when($modelType !== '', function (CModel_Query $q) use ($modelType) {
+                $q->where('model_type', $modelType);
+            })
+            ->get();
+    }
+
     public function getByModelTypeAndCollectionName($modelType, $collectionName) {
         return $this->model
             ->where('model_type', $modelType)
@@ -77,6 +93,13 @@ class CResources_Repository {
         return $this->model
             ->where('collection_name', $collectionName)
             ->get();
+    }
+
+    /**
+     * @return CModel_Query
+     */
+    protected function query() {
+        return $this->model->newQuery();
     }
 
     /**

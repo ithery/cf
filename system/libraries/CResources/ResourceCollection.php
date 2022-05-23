@@ -30,6 +30,11 @@ class CResources_ResourceCollection {
     public $resourceConversionRegistrations;
 
     /**
+     * @var bool
+     */
+    public $generateResponsiveImages = false;
+
+    /**
      * @var callable
      */
     public $acceptsFile;

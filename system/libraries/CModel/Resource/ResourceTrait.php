@@ -298,7 +298,7 @@ trait CModel_Resource_ResourceTrait {
     }
 
     public function toHtml() {
-        return $this->img();
+        return $this->img()->toHtml();
     }
 
     /**
@@ -321,7 +321,7 @@ trait CModel_Resource_ResourceTrait {
     }
 
     public function copy(CModel_HasResourceInterface $model, $collectionName = 'default') {
-        $temporaryDirectory = CTemporary::customDirectory();
+        $temporaryDirectory = CResources_Helpers_TemporaryDirectory::create();
         $temporaryFile = $temporaryDirectory->path($this->file_name);
         CResources_Factory::createFileSystem()->copyFromResourceLibrary($this, $temporaryFile);
         $newMedia = $model
