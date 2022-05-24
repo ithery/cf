@@ -120,7 +120,7 @@ return [
      */
     'task_queue' => [
         'perform_conversions' => CResources_TaskQueue_PerformConversions::class,
-        'generate_responsive_images' => CResources_TaskQueue_PerformConversions_GenerateResponsiveImages::class,
+        'generate_responsive_images' => CResources_TaskQueue_GenerateResponsiveImage::class,
     ],
     'remote' => [
         /*

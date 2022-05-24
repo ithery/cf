@@ -10,6 +10,14 @@ class CResources_UrlGeneratorFactory {
     public static function createForResource(CModel_Resource_ResourceInterface $resource, $conversionName = '') {
         $urlGeneratorClass = CF::config('resoure.url_generator');
 
+        if ($urlGeneratorClass == null) {
+            $diskDriverName = $resource->getDiskDriverName();
+            $urlGeneratorClass = CResources_UrlGenerator_DefaultUrlGenerator::class;
+            if (strlen($diskDriverName) > 0) {
+                $urlGeneratorClass = 'CResources_UrlGenerator_' . ucfirst($diskDriverName) . 'UrlGenerator';
+            }
+        }
+
         static::guardAgainstInvalidUrlGenerator($urlGeneratorClass);
 
         /** @var \CResources_UrlGeneratorInterface $urlGenerator */
@@ -22,7 +30,7 @@ class CResources_UrlGeneratorFactory {
             ->setPathGenerator($pathGenerator);
 
         if ($conversionName !== '') {
-            $conversion = CResources_ConversionCollection::createForMedia($resource)->getByName($conversionName);
+            $conversion = CResources_ConversionCollection::createForResource($resource)->getByName($conversionName);
 
             $urlGenerator->setConversion($conversion);
         }

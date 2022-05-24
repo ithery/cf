@@ -11,42 +11,43 @@ class CModel_Resource_ResourceObserver {
         if ($resource->file_name !== $resource->getOriginal('file_name')) {
             /** @var CResources_Filesystem $filesystem */
             $filesystem = CResources_Factory::createFileSystem();
-
+            /** @var CModel|CModel_Resource_ResourceInterface $resource */
             $filesystem->syncFileNames($resource);
         }
     }
 
-    public function updated(CModel $media) {
-        if (is_null($media->getOriginal('model_id'))) {
+    public function updated(CModel $resource) {
+        if (is_null($resource->getOriginal('model_id'))) {
             return;
         }
 
-        $original = $media->getOriginal('manipulations');
+        $original = $resource->getOriginal('manipulations');
 
         $original = json_decode($original, true);
 
-        if ($media->manipulations !== $original) {
+        if ($resource->manipulations !== $original) {
             $eventDispatcher = CModel::getEventDispatcher();
             CModel::unsetEventDispatcher();
 
-            /** @var \Spatie\MediaLibrary\Conversions\FileManipulator $fileManipulator */
+            /** @var \CResources_FileManipulator $fileManipulator */
             $fileManipulator = CResources_Factory::createFileManipulator();
-            $fileManipulator->createDerivedFiles($media);
+            /** @var CModel|CModel_Resource_ResourceInterface $resource */
+            $fileManipulator->createDerivedFiles($resource);
 
             CModel::setEventDispatcher($eventDispatcher);
         }
     }
 
-    public function deleted(CModel $media) {
-        if ($media->usesSoftDelete()) {
-            if (!$media->isForceDeleting()) {
+    public function deleted(CModel $resource) {
+        if ($resource->usesSoftDelete()) {
+            if (!$resource->isForceDeleting()) {
                 return;
             }
         }
 
-        /** @var \Spatie\MediaLibrary\MediaCollections\Filesystem $filesystem */
+        /** @var \CResources_Filesystem $filesystem */
         $filesystem = CResources_Factory::createFileSystem();
-
-        $filesystem->removeAllFiles($media);
+        /** @var CModel|CModel_Resource_ResourceInterface $resource */
+        $filesystem->removeAllFiles($resource);
     }
 }

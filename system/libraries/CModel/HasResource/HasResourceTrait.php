@@ -116,7 +116,6 @@ trait CModel_HasResource_HasResourceTrait {
         $args = func_get_args();
         $url = carr::get($args, 0);
         $allowedMimeTypes = array_slice($args, 2);
-
         if (!$stream = @fopen($url, 'r')) {
             throw CResources_Exception_FileCannotBeAdded_UnreachableUrl::create($url);
         }

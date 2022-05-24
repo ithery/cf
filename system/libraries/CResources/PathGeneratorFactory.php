@@ -1,6 +1,5 @@
 <?php
 
-use Spatie\MediaLibrary\MediaCollections\Models\Media;
 use Spatie\MediaLibrary\MediaCollections\Exceptions\InvalidPathGenerator;
 
 class CResources_PathGeneratorFactory {
@@ -11,10 +10,12 @@ class CResources_PathGeneratorFactory {
      */
     public static function create(CModel_Resource_ResourceInterface $resource) {
         $pathGeneratorClass = self::getPathGeneratorClass($resource);
-
+        if ($pathGeneratorClass == null) {
+            $pathGeneratorClass = CResources_PathGenerator::class;
+        }
         static::guardAgainstInvalidPathGenerator($pathGeneratorClass);
 
-        return app($pathGeneratorClass);
+        return c::container($pathGeneratorClass);
     }
 
     protected static function getPathGeneratorClass(CModel_Resource_ResourceInterface $resource) {
@@ -29,13 +30,18 @@ class CResources_PathGeneratorFactory {
         return $defaultPathGeneratorClass;
     }
 
-    protected static function guardAgainstInvalidPathGenerator(string $pathGeneratorClass): void {
+    /**
+     * @param string $pathGeneratorClass
+     *
+     * @return void
+     */
+    protected static function guardAgainstInvalidPathGenerator($pathGeneratorClass) {
         if (!class_exists($pathGeneratorClass)) {
-            throw InvalidPathGenerator::doesntExist($pathGeneratorClass);
+            throw CResources_Exception_InvalidPathGenerator::doesntExist($pathGeneratorClass);
         }
 
-        if (!is_subclass_of($pathGeneratorClass, PathGenerator::class)) {
-            throw InvalidPathGenerator::doesNotImplementPathGenerator($pathGeneratorClass);
+        if (!is_subclass_of($pathGeneratorClass, CResources_PathGeneratorInterface::class)) {
+            throw CResources_Exception_InvalidPathGenerator::doesNotImplementPathGenerator($pathGeneratorClass);
         }
     }
 }

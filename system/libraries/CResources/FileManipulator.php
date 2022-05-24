@@ -17,8 +17,9 @@ class CResources_FileManipulator {
      * @param CModel_Resource_ResourceInterface $resource
      * @param array                             $only
      * @param bool                              $onlyIfMissing
+     * @param bool                              $withResponsiveImages
      */
-    public function createDerivedFiles(CModel_Resource_ResourceInterface $resource, array $only = [], $onlyIfMissing = false) {
+    public function createDerivedFiles(CModel_Resource_ResourceInterface $resource, array $only = [], $onlyIfMissing = false, $withResponsiveImages = false) {
         $profileCollection = CResources_ConversionCollection::createForResource($resource);
         if (!empty($only)) {
             $profileCollection = $profileCollection->filter(function ($collection) use ($only) {
@@ -36,6 +37,8 @@ class CResources_FileManipulator {
         if ($queuedConversions->isNotEmpty()) {
             $this->dispatchQueuedConversions($resource, $queuedConversions);
         }
+
+        $this->generateResponsiveImages($resource, $withResponsiveImages);
     }
 
     /**
@@ -114,7 +117,16 @@ class CResources_FileManipulator {
         return $conversionTempFile;
     }
 
+    /**
+     * @param CModel_Resource_ResourceInterface $resource
+     * @param CResources_ConversionCollection   $queuedConversions
+     *
+     * @return $this
+     */
     protected function dispatchQueuedConversions(CModel_Resource_ResourceInterface $resource, CResources_ConversionCollection $queuedConversions) {
+        if ($queuedConversions->isEmpty()) {
+            return $this;
+        }
         $performConversionsJobClass = CF::config('resource.task_queue.perform_conversions', CResources_TaskQueue_PerformConversions::class);
         $job = new $performConversionsJobClass($queuedConversions, $resource);
 
@@ -122,6 +134,33 @@ class CResources_FileManipulator {
             $job->onQueue($customQueue);
         }
         CQueue::dispatcher()->dispatch($job);
+
+        return $this;
+    }
+
+    protected function generateResponsiveImages(CModel_Resource_ResourceInterface $resource, bool $withResponsiveImages) {
+        if (!$withResponsiveImages) {
+            return $this;
+        }
+
+        if (!count($resource->responsive_images)) {
+            return $this;
+        }
+
+        $generateResponsiveImagesJobClass = CF::config(
+            'resource.task_queue.generate_responsive_images',
+            CResources_TaskQueue_GenerateResponsiveImage::class
+        );
+
+        /** @var CResources_TaskQueue_GenerateResponsiveImage $job */
+        $job = (new $generateResponsiveImagesJobClass($resource));
+        if ($customQueue = CF::config('resource.queue_name')) {
+            $job->onQueue($customQueue);
+        }
+
+        CQueue::dispatcher()->dispatch($job);
+
+        return $this;
     }
 
     /**
@@ -129,7 +168,7 @@ class CResources_FileManipulator {
      *
      * @see CModel_Resource_ResourceTrait
      *
-     * @return null|\Spatie\ResourceLibrary\ImageGenerators\ImageGenerator
+     * @return null|\CResources_ImageGenerator_FileTypeAbstract
      */
     public function determineImageGenerator(CModel_Resource_ResourceInterface $resource) {
         return $resource->getImageGenerators()
@@ -139,5 +178,16 @@ class CResources_FileManipulator {
             ->first(function (CResources_ImageGenerator_FileTypeAbstract $imageGenerator) use ($resource) {
                 return $imageGenerator->canConvert($resource);
             });
+    }
+
+    /**
+     * @param CModel_Resource_ResourceInterface $resource
+     *
+     * @return bool
+     */
+    protected function canConvertResource(CModel_Resource_ResourceInterface $resource) {
+        $imageGenerator = CResources_ImageGenerator_Factory::forResource($resource);
+
+        return $imageGenerator ? true : false;
     }
 }

@@ -212,6 +212,12 @@ class CModel_HasResource_FileAdder_FileAdder {
         return $this;
     }
 
+    public function withResponsiveImagesIf($condition) {
+        $this->generateResponsiveImages = (bool) (is_callable($condition) ? $condition() : $condition);
+
+        return $this;
+    }
+
     public function addCustomHeaders(array $customRemoteHeaders) {
         $this->customHeaders = $customRemoteHeaders;
         $this->filesystem->addCustomRemoteHeaders($customRemoteHeaders);
