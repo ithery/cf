@@ -20,6 +20,9 @@ class CElement_Component_DataTable extends CElement_Component {
 
     const ACTION_LOCATION_LAST = 'last';
 
+    /**
+     * @var array
+     */
     public $defaultPagingList = [
         '10' => '10',
         '25' => '25',
@@ -124,6 +127,8 @@ class CElement_Component_DataTable extends CElement_Component {
     protected $actionHeaderLabel = 'Actions';
 
     protected $labels = [];
+
+    protected $buttons = [];
 
     public function __construct($id = '') {
         parent::__construct($id);
@@ -233,6 +238,12 @@ class CElement_Component_DataTable extends CElement_Component {
         $labels['searchPlaceholder'] = $this->searchPlaceholder;
 
         return $labels;
+    }
+
+    public function setButtons(array $buttons) {
+        $this->buttons = $buttons;
+
+        return $this;
     }
 
     protected function getLegacyLabels() {

@@ -8,9 +8,8 @@ defined('SYSPATH') or die('No direct access allowed.');
  *
  * @since May 1, 2019, 11:37:14 PM
  */
-class CApp_Model_Resource extends CApp_Model implements CApp_Model_Interface_ResourceInterface {
-    use CApp_Model_Trait_Resource,
-        CModel_Resource_ResourceTrait;
+class CApp_Model_Resource extends CApp_Model implements CModel_Resource_ResourceInterface {
+    use CModel_Resource_ResourceTrait;
 
     protected $table = 'resource';
 

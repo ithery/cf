@@ -24,6 +24,15 @@ class CTemporary_CustomDirectory {
     }
 
     /**
+     * @param string $location
+     *
+     * @return self
+     */
+    public static function make($location = '') {
+        return (new self($location))->create();
+    }
+
+    /**
      * @return self
      */
     public function create() {
