@@ -10,29 +10,30 @@ defined('SYSPATH') or die('No direct access allowed.');
  */
 class CResources_ConversionCollection extends CCollection {
     /**
-     * @var CApp_Model_Interface_ResourceInterface
+     * @var CModel_Resource_ResourceInterface
      */
     protected $resource;
 
     /**
-     * @param CApp_Model_Interface_ResourceInterface $resource
+     * @param CModel_Resource_ResourceInterface $resource
      *
      * @return static
      */
-    public static function createForResource(CApp_Model_Interface_ResourceInterface $resource) {
+    public static function createForResource(CModel_Resource_ResourceInterface $resource) {
         return (new static())->setResource($resource);
     }
 
     /**
-     * @param CApp_Model_Interface_ResourceInterface $resource
+     * @param CModel_Resource_ResourceInterface $resource
      *
      * @return $this
      */
-    public function setResource(CApp_Model_Interface_ResourceInterface $resource) {
+    public function setResource(CModel_Resource_ResourceInterface $resource) {
         $this->resource = $resource;
         $this->items = [];
         $this->addConversionsFromRelatedModel($resource);
         $this->addManipulationsFromDb($resource);
+
         return $this;
     }
 
@@ -41,9 +42,9 @@ class CResources_ConversionCollection extends CCollection {
      *
      * @param string $name
      *
-     * @return CResources_Conversion
-     *
      * @throws CResources_Exception_InvalidConversion
+     *
+     * @return CResources_Conversion
      */
     public function getByName($name) {
         $conversion = $this->first(function (CResources_Conversion $conversion) use ($name) {
@@ -52,6 +53,7 @@ class CResources_ConversionCollection extends CCollection {
         if (!$conversion) {
             throw CResources_Exception_InvalidConversion::unknownName($name);
         }
+
         return $conversion;
     }
 
@@ -61,7 +63,7 @@ class CResources_ConversionCollection extends CCollection {
      *
      * @param \Spatie\ResourceLibrary\Models\Resource $resource
      */
-    protected function addConversionsFromRelatedModel(CApp_Model_Interface_ResourceInterface $resource) {
+    protected function addConversionsFromRelatedModel(CModel_Resource_ResourceInterface $resource) {
         $modelName = carr::get(CModel_Relation::morphMap(), $resource->model_type, $resource->model_type);
         /* @var CModel_HasResourceInterface $model */
         $model = new $modelName();
@@ -82,9 +84,9 @@ class CResources_ConversionCollection extends CCollection {
     /**
      * Add the extra manipulations that are defined on the given resource.
      *
-     * @param CApp_Model_Interface_ResourceInterface $resource
+     * @param CModel_Resource_ResourceInterface $resource
      */
-    protected function addManipulationsFromDb(CApp_Model_Interface_ResourceInterface $resource) {
+    protected function addManipulationsFromDb(CModel_Resource_ResourceInterface $resource) {
         c::collect($resource->manipulations)->each(function ($manipulations, $conversionName) {
             $this->addManipulationToConversion(new CImage_Manipulations([$manipulations]), $conversionName);
         });
@@ -94,6 +96,7 @@ class CResources_ConversionCollection extends CCollection {
         if ($collectionName === '') {
             return $this;
         }
+
         return $this->filter->shouldBePerformedOn($collectionName);
     }
 
@@ -136,6 +139,7 @@ class CResources_ConversionCollection extends CCollection {
      */
     public function getConversionsFiles($collectionName = '') {
         $fileName = pathinfo($this->resource->file_name, PATHINFO_FILENAME);
+
         return $this->getConversions($collectionName)->map(function (CResources_Conversion $conversion) use ($fileName) {
             return $conversion->getConversionFile($fileName);
         });

@@ -1,7 +1,7 @@
 <?php
 
 abstract class CResources_ImageGenerator_FileTypeAbstract implements CResources_ImageGenerator_FileTypeInterface {
-    public function canConvert(CApp_Model_Interface_ResourceInterface $resource) {
+    public function canConvert(CModel_Resource_ResourceInterface $resource) {
         if (!$this->requirementsAreInstalled()) {
             return false;
         }
@@ -11,6 +11,7 @@ abstract class CResources_ImageGenerator_FileTypeAbstract implements CResources_
         if ($this->supportedMimetypes()->contains(strtolower($resource->mime_type))) {
             return true;
         }
+
         return false;
     }
 

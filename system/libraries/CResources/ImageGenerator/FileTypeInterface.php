@@ -1,13 +1,13 @@
 <?php
 
 interface CResources_ImageGenerator_FileTypeInterface {
-    public function canConvert(CApp_Model_Interface_ResourceInterface $resource);
+    public function canConvert(CModel_Resource_ResourceInterface $resource);
 
     /**
      * Receive a file and return a thumbnail in jpg/png format.
      *
      * @param string                     $path
-     * @param CResources_Conversion|null $conversion
+     * @param null|CResources_Conversion $conversion
      *
      * @return string
      */

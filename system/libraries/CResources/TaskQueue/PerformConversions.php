@@ -7,7 +7,7 @@ class CResources_TaskQueue_PerformConversions extends CQueue_AbstractTask {
     protected $conversions;
 
     /**
-     * @var CApp_Model_Interface_ResourceInterface
+     * @var CModel_Resource_ResourceInterface
      */
     protected $resource;
 
@@ -16,7 +16,7 @@ class CResources_TaskQueue_PerformConversions extends CQueue_AbstractTask {
      */
     protected $onlyMissing;
 
-    public function __construct(CResources_ConversionCollection $conversions, CApp_Model_Interface_ResourceInterface $resource, $onlyMissing = false) {
+    public function __construct(CResources_ConversionCollection $conversions, CModel_Resource_ResourceInterface $resource, $onlyMissing = false) {
         $this->conversions = $conversions;
         $this->resource = $resource;
         $this->onlyMissing = $onlyMissing;
@@ -24,6 +24,7 @@ class CResources_TaskQueue_PerformConversions extends CQueue_AbstractTask {
 
     public function execute() {
         CResources_Factory::createFileManipulator()->performConversions($this->conversions, $this->resource, $this->onlyMissing);
+
         return true;
     }
 }

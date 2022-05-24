@@ -12,11 +12,11 @@ class CResources_Event_ResourceHasBeenAdded {
     use CQueue_Trait_SerializesModels;
 
     /**
-     * @var \CApp_Model_Interface_ResourceInterface
+     * @var \CModel_Resource_ResourceInterface
      */
     public $media;
 
-    public function __construct(CApp_Model_Interface_ResourceInterface $media) {
+    public function __construct(CModel_Resource_ResourceInterface $media) {
         $this->media = $media;
     }
 }

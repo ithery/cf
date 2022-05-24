@@ -52,6 +52,16 @@ class CResources_Conversion {
      */
     protected $generateResponsiveImages = false;
 
+    /**
+     * @var null|string
+     */
+    protected $loadingAttributeValue;
+
+    /**
+     * @var int
+     */
+    protected $pdfPageNumber = 1;
+
     public function __construct($name) {
         $this->name = $name;
         $this->manipulations = (new CImage_Manipulations())
@@ -268,5 +278,41 @@ class CResources_Conversion {
         }
 
         return "{$fileName}-{$this->getName()}.{$extension}";
+    }
+
+    /**
+     * @param string $value
+     *
+     * @return self
+     */
+    public function useLoadingAttributeValue($value) {
+        $this->loadingAttributeValue = $value;
+
+        return $this;
+    }
+
+    /**
+     * @return null|string
+     */
+    public function getLoadingAttributeValue() {
+        return $this->loadingAttributeValue;
+    }
+
+    /**
+     * @param int $pageNumber
+     *
+     * @return self
+     */
+    public function pdfPageNumber($pageNumber) {
+        $this->pdfPageNumber = $pageNumber;
+
+        return $this;
+    }
+
+    /**
+     * @return int
+     */
+    public function getPdfPageNumber() {
+        return $this->pdfPageNumber;
     }
 }

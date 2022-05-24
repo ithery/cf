@@ -2,7 +2,7 @@
 
 abstract class CResources_UrlGeneratorAbstract implements CResources_UrlGeneratorInterface {
     /**
-     * @var CApp_Model_Interface_ResourceInterface
+     * @var CModel_Resource_ResourceInterface
      */
     protected $resource;
 
@@ -17,12 +17,13 @@ abstract class CResources_UrlGeneratorAbstract implements CResources_UrlGenerato
     protected $pathGenerator;
 
     /**
-     * @param CApp_Model_Interface_ResourceInterface $resource
+     * @param CModel_Resource_ResourceInterface $resource
      *
      * @return CResources_UrlGeneratorInterface
      */
-    public function setResource(CApp_Model_Interface_ResourceInterface $resource) {
+    public function setResource(CModel_Resource_ResourceInterface $resource) {
         $this->resource = $resource;
+
         return $this;
     }
 
@@ -33,6 +34,7 @@ abstract class CResources_UrlGeneratorAbstract implements CResources_UrlGenerato
      */
     public function setConversion(CResources_Conversion $conversion) {
         $this->conversion = $conversion;
+
         return $this;
     }
 
@@ -43,6 +45,7 @@ abstract class CResources_UrlGeneratorAbstract implements CResources_UrlGenerato
      */
     public function setPathGenerator(CResources_PathGeneratorInterface $pathGenerator) {
         $this->pathGenerator = $pathGenerator;
+
         return $this;
     }
 
@@ -53,6 +56,7 @@ abstract class CResources_UrlGeneratorAbstract implements CResources_UrlGenerato
         if (is_null($this->conversion)) {
             return $this->pathGenerator->getPath($this->resource) . ($this->resource->file_name);
         }
+
         return $this->pathGenerator->getPathForConversions($this->resource)
                 . pathinfo($this->resource->file_name, PATHINFO_FILENAME)
                 . '-' . $this->conversion->getName()
@@ -78,6 +82,7 @@ abstract class CResources_UrlGeneratorAbstract implements CResources_UrlGenerato
         if (!CF::config('resource.version_urls')) {
             return $path;
         }
+
         return "{$path}?v={$this->resource->updated->timestamp}";
     }
 }

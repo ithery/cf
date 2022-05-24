@@ -9,6 +9,13 @@ defined('SYSPATH') or die('No direct access allowed.');
  * @since May 2, 2019, 1:24:32 AM
  */
 class CResources_Factory {
+    public static function createResponsiveImageGenerator() {
+        $widthCalculatorClass = CF::config('media-library.responsive_images.width_calculator', CResources_ResponsiveImage_WidthCalculator_FileSizeOptimizedWidthCalculator::class);
+        $tinyPlaceholderClass = CF::config('media-library.responsive_images.tiny_placeholder_generator', CResources_ResponsiveImage_TinyPlaceholderGenerator_Blurred::class);
+
+        return new CResources_ResponsiveImage_Generator(new $widthCalculatorClass(), new $tinyPlaceholderClass());
+    }
+
     /**
      * @return CResources_PathGenerator
      */
@@ -19,6 +26,7 @@ class CResources_Factory {
             $pathGeneratorClass = $customPathClass;
         }
         static::guardAgainstInvalidPathGenerator($pathGeneratorClass);
+
         return new $pathGeneratorClass();
     }
 
@@ -27,7 +35,7 @@ class CResources_Factory {
      *
      * @return CResources_UrlGeneratorAbstract
      */
-    public static function createUrlGeneratorForResource(CApp_Model_Interface_ResourceInterface $resource, $conversionName = '') {
+    public static function createUrlGeneratorForResource(CModel_Resource_ResourceInterface $resource, $conversionName = '') {
         $urlGeneratorClass = CF::config('resource.url_generator');
         if ($urlGeneratorClass == null) {
             $diskDriverName = $resource->getDiskDriverName();
@@ -47,6 +55,7 @@ class CResources_Factory {
             $conversion = CResources_ConversionCollection::createForResource($resource)->getByName($conversionName);
             $urlGenerator->setConversion($conversion);
         }
+
         return $urlGenerator;
     }
 

@@ -30,6 +30,11 @@ class CResources_ResourceCollection {
     public $resourceConversionRegistrations;
 
     /**
+     * @var bool
+     */
+    public $generateResponsiveImages = false;
+
+    /**
      * @var callable
      */
     public $acceptsFile;
@@ -74,6 +79,7 @@ class CResources_ResourceCollection {
 
     public function useDisk($diskName) {
         $this->diskName = $diskName;
+
         return $this;
     }
 
@@ -85,11 +91,13 @@ class CResources_ResourceCollection {
 
     public function acceptsFile(callable $acceptsFile) {
         $this->acceptsFile = $acceptsFile;
+
         return $this;
     }
 
     public function acceptsMimeTypes($mimeTypes) {
         $this->acceptsMimeTypes = $mimeTypes;
+
         return $this;
     }
 
@@ -103,6 +111,7 @@ class CResources_ResourceCollection {
         }
         $this->singleFile = ($maximumNumberOfItemsInCollection === 1);
         $this->collectionSizeLimit = $maximumNumberOfItemsInCollection;
+
         return $this;
     }
 
@@ -112,11 +121,25 @@ class CResources_ResourceCollection {
 
     public function useFallbackUrl($url) {
         $this->fallbackUrl = $url;
+
         return $this;
     }
 
     public function useFallbackPath($path) {
         $this->fallbackPath = $path;
+
+        return $this;
+    }
+
+    public function withResponsiveImages() {
+        $this->generateResponsiveImages = true;
+
+        return $this;
+    }
+
+    public function withResponsiveImagesIf($condition) {
+        $this->generateResponsiveImages = (bool) (is_callable($condition) ? $condition() : $condition);
+
         return $this;
     }
 }

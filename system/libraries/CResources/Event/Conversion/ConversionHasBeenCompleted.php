@@ -3,13 +3,17 @@
 class CResources_Event_Conversion_ConversionHasBeenCompleted {
     use CQueue_Trait_SerializesModels;
 
-    /** @var CApp_Model_Interface_ResourceInterface */
+    /**
+     * @var CModel_Resource_ResourceInterface
+     */
     public $resource;
 
-    /** @var CResources_Conversion */
+    /**
+     * @var CResources_Conversion
+     */
     public $conversion;
 
-    public function __construct(CApp_Model_Interface_ResourceInterface $resource, CResources_Conversion $conversion) {
+    public function __construct(CModel_Resource_ResourceInterface $resource, CResources_Conversion $conversion) {
         $this->resource = $resource;
         $this->conversion = $conversion;
     }
