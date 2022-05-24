@@ -1,13 +1,6 @@
 <?php
 
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
-
 class CExporter_Import_HeadingRowFormatter {
-
     /**
      * @const string
      */
@@ -42,9 +35,9 @@ class CExporter_Import_HeadingRowFormatter {
      * @return array
      */
     public static function format(array $headings) {
-        return (new Collection($headings))->map(function ($value) {
-                    return static::callFormatter($value);
-                })->toArray();
+        return (new CCollection($headings))->map(function ($value) {
+            return static::callFormatter($value);
+        })->toArray();
     }
 
     /**
@@ -95,5 +88,4 @@ class CExporter_Import_HeadingRowFormatter {
         // No formatter (FORMATTER_NONE)
         return $value;
     }
-
 }

@@ -3,9 +3,13 @@ use PhpOffice\PhpSpreadsheet\Shared\Date;
 use PhpOffice\PhpSpreadsheet\Cell\DataType;
 
 use PhpOffice\PhpSpreadsheet\Cell\Coordinate;
+use PhpOffice\PhpSpreadsheet\Style\Alignment;
 use PhpOffice\PhpSpreadsheet\Style\NumberFormat;
 
 class CExporter_Exportable_DataTable extends CExporter_Exportable implements CExporter_Concern_ShouldAutoSize, CExporter_Concern_FromDataTable, CExporter_Concern_WithHeadings, CExporter_Concern_WithMapping, CExporter_Concern_WithColumnFormatting, CExporter_Concern_WithEvents {
+    /**
+     * @var CElement_Component_DataTable
+     */
     protected $table;
 
     protected $columnFormats;
@@ -39,23 +43,25 @@ class CExporter_Exportable_DataTable extends CExporter_Exportable implements CEx
         $newRow = [];
         $columnIntIndex = 0;
         $detectedDataType = null;
-        $currencyTransforms = [
-            'format_currency',
-            'formatCurrency',
-            'thousand_separator',
+        $transformMaps = [
+            'format_currency' => 'currency',
+            'formatCurrency' => 'currency',
+            'thousand_separator' => 'float',
+            'formatDatetime' => 'datetime',
+            'formatDate' => 'date',
+
         ];
-        $datetimeTransforms = [
-            'format_currency',
-            'formatCurrency',
-            'thousand_separator',
-        ];
+
         foreach ($columns as $column) {
             $value = carr::get($data, $column->getFieldname());
             foreach ($column->transforms as $trans) {
-                if (!in_array($trans->getFunction(), $currencyTransforms)) {
+                $tempDataType = carr::get($transformMaps, $trans->getFunction());
+                if ($tempDataType === null) {
                     $value = $trans->execute($value);
                 } else {
-                    $detectedDataType = 'currency';
+                    $detectedDataType = $tempDataType;
+
+                    break;
                 }
             }
             if (strlen($column->format) > 0) {
@@ -203,7 +209,34 @@ class CExporter_Exportable_DataTable extends CExporter_Exportable implements CEx
         $worksheet = $event->sheet->getDelegate();
         $columnString = $worksheet->getHighestColumn();
         $lastColumn = Coordinate::columnIndexFromString($columnString);
+
+        // last column as letter value (e.g., D)
+        $lastColumnStr = Coordinate::stringFromColumnIndex($lastColumn);
+
+        // set up a style array for cell formatting
+        $styleTextCenter = [
+            'alignment' => [
+                'horizontal' => Alignment::HORIZONTAL_CENTER
+            ]
+        ];
+
+        $reportHeaders = $this->table->getReportHeaders();
+        $headersCount = count($reportHeaders);
+        if ($headersCount > 0) {
+            // at row 1, insert 2 rows
+            $worksheet->insertNewRowBefore(1, $headersCount);
+            for ($i = 1; $i <= $headersCount; $i++) {
+                // merge cells for full-width
+                $worksheet->mergeCells(sprintf('A%d:%s%d', $i, $lastColumnStr, $i));
+
+                // assign cell values
+                $worksheet->setCellValue(sprintf('A%d', $i), $reportHeaders[$i - 1]);
+            }
+        }
+        //$worksheet->getStyle(sprintf('A%d:A%d', $i, $headersCount))->applyFromArray($styleTextCenter);
+
         $lastRow = $worksheet->getHighestRow();
+
         $event->sheet->autoSize();
         $footerFields = $this->table->getFooterFields();
         $currentRow = $lastRow;

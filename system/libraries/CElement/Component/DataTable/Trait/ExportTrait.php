@@ -493,6 +493,10 @@ trait CElement_Component_DataTable_Trait_ExportTrait {
         return $this;
     }
 
+    public function getReportHeaders() {
+        return $this->report_header;
+    }
+
     public function exportExcel($filename, $sheet_name = 'data') {
         $this->export_excel = true;
         $excel = CExcel::factory()->setCreator('cresenity_system')->setSubject('Cresenity Report');
