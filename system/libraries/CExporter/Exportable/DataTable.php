@@ -44,6 +44,11 @@ class CExporter_Exportable_DataTable extends CExporter_Exportable implements CEx
             'formatCurrency',
             'thousand_separator',
         ];
+        $datetimeTransforms = [
+            'format_currency',
+            'formatCurrency',
+            'thousand_separator',
+        ];
         foreach ($columns as $column) {
             $value = carr::get($data, $column->getFieldname());
             foreach ($column->transforms as $trans) {
@@ -161,7 +166,7 @@ class CExporter_Exportable_DataTable extends CExporter_Exportable implements CEx
 
     public static function dataTypeToColumnFormat($dataType) {
         if ($dataType == 'date') {
-            return 'yyyy-mm-dd';
+            return NumberFormat::FORMAT_DATE_YYYYMMDD2;
         }
         if ($dataType == 'datetime') {
             return 'yyyy-mm-dd hh:mm:ss';
