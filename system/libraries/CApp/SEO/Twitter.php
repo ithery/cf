@@ -172,7 +172,7 @@ class CApp_SEO_Twitter implements CApp_SEO_TwitterInterface {
     /**
      * @param $image
      *
-     * @return TwitterCardsContract
+     * @return CApp_SEO_TwitterInterface
      */
     public function setImage($image) {
         return $this->addValue('image', $image);
