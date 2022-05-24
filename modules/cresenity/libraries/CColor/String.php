@@ -19,7 +19,7 @@ class CColor_String {
     public function __construct($string, $options = []) {
         $this->string = $string;
         $this->int32 = hexdec(substr(md5($this->string), 0, 8));
-        $this->options = [];
+        $this->options = $options;
     }
 
     private function pickHue() {
