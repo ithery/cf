@@ -258,7 +258,7 @@ HTML;
 
         CView::factory()->share(
             'errors',
-            CSession::instance()->get('errors') ?: new CBase_ViewErrorBag()
+            c::session()->get('errors') ?: new CBase_ViewErrorBag()
         );
 
         $viewData = $this->getViewData();
