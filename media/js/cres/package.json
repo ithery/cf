@@ -1,6 +1,7 @@
 {
     "main": "dist/cres.js",
     "name": "cf-cres",
+    "version": "1.4.1",
     "scripts": {
         "build": "cross-env NODE_ENV=production npx rollup -c",
         "dev": "npx rollup -c -w"
