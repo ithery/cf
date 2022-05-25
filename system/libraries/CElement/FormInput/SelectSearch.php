@@ -51,6 +51,8 @@ class CElement_FormInput_SelectSearch extends CElement_FormInput {
 
     protected $queryResolver;
 
+    protected $language;
+
     public function __construct($id) {
         parent::__construct($id);
         $this->dropdownClasses = [];
@@ -71,6 +73,11 @@ class CElement_FormInput_SelectSearch extends CElement_FormInput {
 
         $this->value = null;
         $this->allowClear = false;
+        $language = CF::getLocale();
+        if (strlen($language) > 2) {
+            $language = strtolower(substr($language, 0, 2));
+        }
+        $this->language = $language;
     }
 
     public static function factory($id = null) {
@@ -434,6 +441,7 @@ class CElement_FormInput_SelectSearch extends CElement_FormInput {
         if ($this->applyJs == 'select2v2.3') {
             return $this->jsSelect2v23($indent);
         }
+
         $ajaxUrl = $this->createAjaxUrl();
 
         $strSelection = $this->formatSelection;
@@ -546,6 +554,7 @@ class CElement_FormInput_SelectSearch extends CElement_FormInput {
 
             $('#" . $this->id . "').select2({
                 width: '100%',
+                language: '" . $this->language . "',
                 placeholder: '" . $placeholder . "',
                 allowClear: " . ($this->allowClear ? 'true' : 'false') . ",
                 minimumInputLength: '" . $this->minInputLength . "',
