@@ -914,7 +914,7 @@ class c {
      * @return string
      */
     public static function csrfToken() {
-        $session = CSession::instance();
+        $session = c::session();
 
         if (isset($session)) {
             return $session->token();
