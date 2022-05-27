@@ -1,5 +1,5 @@
 <?php
-trait CModel_Notification_HasHasNotificationTrait {
+trait CModel_Notification_HasNotificationTrait {
     /**
      * Get the entity's notifications.
      *
