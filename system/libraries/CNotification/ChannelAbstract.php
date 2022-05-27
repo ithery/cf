@@ -195,8 +195,5 @@ abstract class CNotification_ChannelAbstract implements CNotification_ChannelInt
         return CNotification::manager()->createMessage($this->getVendorName(), $vendorConfig, $data);
     }
 
-    protected function dispatchQueuedConversions(CApp_Model_Interface_ResourceInterface $resource, CResources_ConversionCollection $queuedConversions) {
-    }
-
     abstract protected function handleMessage($data, $logNotificationModel);
 }
