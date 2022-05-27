@@ -22,4 +22,7 @@ return [
     'whatsapp' => [
         'vendor' => 'wago',
     ],
+    'database' => [
+        'model' => CModel_Notification_NotificationModel::class,
+    ],
 ];

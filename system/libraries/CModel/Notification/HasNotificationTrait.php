@@ -1,0 +1,31 @@
+<?php
+trait CModel_Notification_HasHasNotificationTrait {
+    /**
+     * Get the entity's notifications.
+     *
+     * @return \CModel_RelationMorphMany
+     */
+    public function notifications() {
+        $notificationModelClass = CF::config('notification.database.model', CModel_Notification_NotificationModel::class);
+
+        return $this->morphMany($notificationModelClass, 'notifiable')->latest();
+    }
+
+    /**
+     * Get the entity's read notifications.
+     *
+     * @return \CDatabase_Query_Builder
+     */
+    public function readNotifications() {
+        return $this->notifications()->read();
+    }
+
+    /**
+     * Get the entity's unread notifications.
+     *
+     * @return \CDatabase_Query_Builder
+     */
+    public function unreadNotifications() {
+        return $this->notifications()->unread();
+    }
+}
