@@ -8,6 +8,7 @@ class CNotification_Channel_DatabaseChannel extends CNotification_ChannelAbstrac
 
     protected function handleMessage($data, $logNotificationModel) {
         $message = new CNotification_Message_Database($this->config, $data);
+        $message->setType($logNotificationModel->message_class);
 
         return $message->send();
     }
