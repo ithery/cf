@@ -62,7 +62,7 @@ class CElement_FormInput_SelectSearch extends CElement_FormInput {
         $this->formatResult = null;
         $this->keyField = '';
         $this->searchField = [];
-        $this->placeholder = c::__('Search for an item');
+        $this->placeholder = c::__('element.selectsearch.placeholder');
         $this->multiple = false;
         $this->autoSelect = false;
         $this->minInputLength = 0;
@@ -476,11 +476,7 @@ class CElement_FormInput_SelectSearch extends CElement_FormInput {
             $strResult = preg_replace("/[\r\n]+/", '', $strResult);
         }
 
-        $placeholder = c::__('Search for an item');
-        if (strlen($this->placeholder) > 0) {
-            $placeholder = $this->placeholder;
-        }
-
+        $placeholder = $this->placeholder;
         $strJsChange = '';
         if ($this->submit_onchange) {
             $strJsChange = "$(this).closest('form').submit();";
