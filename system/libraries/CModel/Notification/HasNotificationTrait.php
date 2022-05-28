@@ -5,7 +5,7 @@ trait CModel_Notification_HasNotificationTrait {
      *
      * @return \CModel_RelationMorphMany
      */
-    public function notifications() {
+    public function notification() {
         $notificationModelClass = CF::config('notification.database.model', CModel_Notification_NotificationModel::class);
 
         return $this->morphMany($notificationModelClass, 'notifiable')->latest();
@@ -16,8 +16,8 @@ trait CModel_Notification_HasNotificationTrait {
      *
      * @return \CDatabase_Query_Builder
      */
-    public function readNotifications() {
-        return $this->notifications()->read();
+    public function readNotification() {
+        return $this->notification()->read();
     }
 
     /**
@@ -25,7 +25,7 @@ trait CModel_Notification_HasNotificationTrait {
      *
      * @return \CDatabase_Query_Builder
      */
-    public function unreadNotifications() {
-        return $this->notifications()->unread();
+    public function unreadNotification() {
+        return $this->notification()->unread();
     }
 }
