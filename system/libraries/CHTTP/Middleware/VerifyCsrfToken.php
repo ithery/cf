@@ -28,12 +28,10 @@ class CHTTP_Middleware_VerifyCsrfToken {
     /**
      * Create a new middleware instance.
      *
-     * @param \CCrypt_EncrypterInterface $encrypter
-     *
      * @return void
      */
-    public function __construct(CCrypt_EncrypterInterface $encrypter) {
-        $this->encrypter = $encrypter;
+    public function __construct() {
+        $this->encrypter = CCrypt::encrypter();
     }
 
     /**
@@ -79,7 +77,7 @@ class CHTTP_Middleware_VerifyCsrfToken {
      * @return bool
      */
     protected function runningUnitTests() {
-        return $this->app->runningInConsole() && $this->app->runningUnitTests();
+        return CF::isCli() && CF::isTesting();
     }
 
     /**
@@ -167,7 +165,7 @@ class CHTTP_Middleware_VerifyCsrfToken {
             new Cookie(
                 'XSRF-TOKEN',
                 $request->session()->token(),
-                $this->availableAt(60 * $config['lifetime']),
+                $this->availableAt($config['expiration']),
                 $config['path'],
                 $config['domain'],
                 $config['secure'],

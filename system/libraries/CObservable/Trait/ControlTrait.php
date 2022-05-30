@@ -91,6 +91,20 @@ trait CObservable_Trait_ControlTrait {
     }
 
     /**
+     * Create Csrf Hidden Control.
+     *
+     * @param null|string $id
+     *
+     * @return CElement_FormInput_Csrf
+     */
+    public function addCsrfControl($id = null) {
+        $control = new CElement_FormInput_Csrf($id);
+        $this->wrapper->add($control);
+
+        return $control;
+    }
+
+    /**
      * Create Text Control.
      *
      * @param null|string $id

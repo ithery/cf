@@ -9,7 +9,7 @@ class CExporter_Import_HeadingRowExtractor {
     const DEFAULT_HEADING_ROW = 1;
 
     /**
-     * @param WithHeadingRow|mixed $importable
+     * @param CExporter_Concern_WithHeadingRow|mixed $importable
      *
      * @return int
      */
@@ -18,7 +18,7 @@ class CExporter_Import_HeadingRowExtractor {
     }
 
     /**
-     * @param WithHeadingRow|mixed $importable
+     * @param CExporter_Concern_WithHeadingRow|mixed $importable
      *
      * @return int
      */
@@ -32,8 +32,8 @@ class CExporter_Import_HeadingRowExtractor {
     }
 
     /**
-     * @param Worksheet            $worksheet
-     * @param WithHeadingRow|mixed $importable
+     * @param Worksheet                              $worksheet
+     * @param CExporter_Concern_WithHeadingRow|mixed $importable
      *
      * @return array
      */
