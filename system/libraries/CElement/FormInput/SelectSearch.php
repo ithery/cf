@@ -62,7 +62,7 @@ class CElement_FormInput_SelectSearch extends CElement_FormInput {
         $this->formatResult = null;
         $this->keyField = '';
         $this->searchField = [];
-        $this->placeholder = c::__('element.selectsearch.placeholder');
+        $this->placeholder = c::__('element/selectsearch.placeholder');
         $this->multiple = false;
         $this->autoSelect = false;
         $this->minInputLength = 0;
