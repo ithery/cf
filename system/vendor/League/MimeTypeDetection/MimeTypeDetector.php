@@ -1,19 +1,34 @@
 <?php
 
-declare(strict_types=1);
-
 namespace League\MimeTypeDetection;
 
-interface MimeTypeDetector
-{
+interface MimeTypeDetector {
     /**
+     * @param string          $path
      * @param string|resource $contents
+     *
+     * @return null|string
      */
-    public function detectMimeType(string $path, $contents): ?string;
+    public function detectMimeType($path, $contents);
 
-    public function detectMimeTypeFromBuffer(string $contents): ?string;
+    /**
+     * @param string $contents
+     *
+     * @return null|string
+     */
+    public function detectMimeTypeFromBuffer($contents);
 
-    public function detectMimeTypeFromPath(string $path): ?string;
+    /**
+     * @param string $path
+     *
+     * @return null|string
+     */
+    public function detectMimeTypeFromPath($path);
 
-    public function detectMimeTypeFromFile(string $path): ?string;
+    /**
+     * @param string $path
+     *
+     * @return null|string
+     */
+    public function detectMimeTypeFromFile($path);
 }

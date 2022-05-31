@@ -4,25 +4,24 @@ declare(strict_types=1);
 
 namespace League\Flysystem\InMemory;
 
+use function rtrim;
+use function strpos;
+use function array_keys;
 use League\Flysystem\Config;
-use League\Flysystem\DirectoryAttributes;
+use League\Flysystem\Visibility;
 use League\Flysystem\FileAttributes;
-use League\Flysystem\FilesystemAdapter;
 use League\Flysystem\UnableToCopyFile;
 use League\Flysystem\UnableToMoveFile;
 use League\Flysystem\UnableToReadFile;
-use League\Flysystem\UnableToRetrieveMetadata;
+use League\Flysystem\FilesystemAdapter;
+use League\Flysystem\DirectoryAttributes;
 use League\Flysystem\UnableToSetVisibility;
-use League\Flysystem\Visibility;
-use League\MimeTypeDetection\FinfoMimeTypeDetector;
+
+use League\Flysystem\UnableToRetrieveMetadata;
 use League\MimeTypeDetection\MimeTypeDetector;
+use League\MimeTypeDetection\FinfoMimeTypeDetector;
 
-use function array_keys;
-use function rtrim;
-use function strpos;
-
-class InMemoryFilesystemAdapter implements FilesystemAdapter
-{
+class InMemoryFilesystemAdapter implements FilesystemAdapter {
     const DUMMY_FILE_FOR_FORCED_LISTING_IN_FLYSYSTEM_TEST = '______DUMMY_FILE_FOR_FORCED_LISTING_IN_FLYSYSTEM_TEST';
 
     /**
@@ -40,19 +39,28 @@ class InMemoryFilesystemAdapter implements FilesystemAdapter
      */
     private $mimeTypeDetector;
 
-    public function __construct(string $defaultVisibility = Visibility::PUBLIC, MimeTypeDetector $mimeTypeDetector = null)
-    {
+    public function __construct(string $defaultVisibility = Visibility::VISIBILITY_PUBLIC, MimeTypeDetector $mimeTypeDetector = null) {
         $this->defaultVisibility = $defaultVisibility;
         $this->mimeTypeDetector = $mimeTypeDetector ?: new FinfoMimeTypeDetector();
     }
 
-    public function fileExists(string $path): bool
-    {
+    /**
+     * @param string $path
+     *
+     * @return bool
+     */
+    public function fileExists($path) {
         return array_key_exists($this->preparePath($path), $this->files);
     }
 
-    public function write(string $path, string $contents, Config $config): void
-    {
+    /**
+     * @param string $path
+     * @param string $contents
+     * @param Config $config
+     *
+     * @return void
+     */
+    public function write($path, $contents, Config $config) {
         $path = $this->preparePath($path);
         $file = $this->files[$path] = $this->files[$path] ?? new InMemoryFile();
         $file->updateContents($contents, $config->get('timestamp'));
@@ -61,13 +69,23 @@ class InMemoryFilesystemAdapter implements FilesystemAdapter
         $file->setVisibility($visibility);
     }
 
-    public function writeStream(string $path, $contents, Config $config): void
-    {
+    /**
+     * @param string          $path
+     * @param string|resource $contents
+     * @param Config          $config
+     *
+     * @return void
+     */
+    public function writeStream($path, $contents, Config $config) {
         $this->write($path, (string) stream_get_contents($contents), $config);
     }
 
-    public function read(string $path): string
-    {
+    /**
+     * @param string $path
+     *
+     * @return string
+     */
+    public function read($path) {
         $path = $this->preparePath($path);
 
         if (array_key_exists($path, $this->files) === false) {
@@ -77,8 +95,12 @@ class InMemoryFilesystemAdapter implements FilesystemAdapter
         return $this->files[$path]->read();
     }
 
-    public function readStream(string $path)
-    {
+    /**
+     * @param string $path
+     *
+     * @return void
+     */
+    public function readStream($path) {
         $path = $this->preparePath($path);
 
         if (array_key_exists($path, $this->files) === false) {
@@ -88,13 +110,21 @@ class InMemoryFilesystemAdapter implements FilesystemAdapter
         return $this->files[$path]->readStream();
     }
 
-    public function delete(string $path): void
-    {
+    /**
+     * @param string $path
+     *
+     * @return void
+     */
+    public function delete($path) {
         unset($this->files[$this->preparePath($path)]);
     }
 
-    public function deleteDirectory(string $prefix): void
-    {
+    /**
+     * @param string $prefix
+     *
+     * @return void
+     */
+    public function deleteDirectory($prefix) {
         $prefix = $this->preparePath($prefix);
         $prefix = rtrim($prefix, '/') . '/';
 
@@ -105,14 +135,23 @@ class InMemoryFilesystemAdapter implements FilesystemAdapter
         }
     }
 
-    public function createDirectory(string $path, Config $config): void
-    {
+    /**
+     * @param string $path
+     * @param Config $config
+     *
+     * @return void
+     */
+    public function createDirectory($path, Config $config) {
         $filePath = rtrim($path, '/') . '/' . self::DUMMY_FILE_FOR_FORCED_LISTING_IN_FLYSYSTEM_TEST;
         $this->write($filePath, '', $config);
     }
 
-    public function directoryExists(string $path): bool
-    {
+    /**
+     * @param string $path
+     *
+     * @return bool
+     */
+    public function directoryExists($path) {
         $prefix = $this->preparePath($path);
         $prefix = rtrim($prefix, '/') . '/';
 
@@ -125,8 +164,13 @@ class InMemoryFilesystemAdapter implements FilesystemAdapter
         return false;
     }
 
-    public function setVisibility(string $path, string $visibility): void
-    {
+    /**
+     * @param string $path
+     * @param string $visibility
+     *
+     * @return void
+     */
+    public function setVisibility($path, $visibility) {
         $path = $this->preparePath($path);
 
         if (array_key_exists($path, $this->files) === false) {
@@ -136,8 +180,12 @@ class InMemoryFilesystemAdapter implements FilesystemAdapter
         $this->files[$path]->setVisibility($visibility);
     }
 
-    public function visibility(string $path): FileAttributes
-    {
+    /**
+     * @param string $path
+     *
+     * @return FileAttributes
+     */
+    public function visibility($path) {
         $path = $this->preparePath($path);
 
         if (array_key_exists($path, $this->files) === false) {
@@ -147,8 +195,12 @@ class InMemoryFilesystemAdapter implements FilesystemAdapter
         return new FileAttributes($path, null, $this->files[$path]->visibility());
     }
 
-    public function mimeType(string $path): FileAttributes
-    {
+    /**
+     * @param string $path
+     *
+     * @return FileAttributes
+     */
+    public function mimeType($path) {
         $preparedPath = $this->preparePath($path);
 
         if (array_key_exists($preparedPath, $this->files) === false) {
@@ -164,8 +216,12 @@ class InMemoryFilesystemAdapter implements FilesystemAdapter
         return new FileAttributes($preparedPath, null, null, null, $mimeType);
     }
 
-    public function lastModified(string $path): FileAttributes
-    {
+    /**
+     * @param string $path
+     *
+     * @return FileAttributes
+     */
+    public function lastModified($path) {
         $path = $this->preparePath($path);
 
         if (array_key_exists($path, $this->files) === false) {
@@ -175,8 +231,12 @@ class InMemoryFilesystemAdapter implements FilesystemAdapter
         return new FileAttributes($path, null, null, $this->files[$path]->lastModified());
     }
 
-    public function fileSize(string $path): FileAttributes
-    {
+    /**
+     * @param string $path
+     *
+     * @return FileAttributes
+     */
+    public function fileSize($path) {
         $path = $this->preparePath($path);
 
         if (array_key_exists($path, $this->files) === false) {
@@ -186,8 +246,13 @@ class InMemoryFilesystemAdapter implements FilesystemAdapter
         return new FileAttributes($path, $this->files[$path]->fileSize());
     }
 
-    public function listContents(string $path, bool $deep): iterable
-    {
+    /**
+     * @param string $path
+     * @param bool   $deep
+     *
+     * @return iterable
+     */
+    public function listContents($path, $deep) {
         $prefix = rtrim($this->preparePath($path), '/') . '/';
         $prefixLength = strlen($prefix);
         $listedDirectories = [];
@@ -208,7 +273,7 @@ class InMemoryFilesystemAdapter implements FilesystemAdapter
 
                         $dirPath .= $part . '/';
 
-                        if ( ! in_array($dirPath, $listedDirectories)) {
+                        if (!in_array($dirPath, $listedDirectories)) {
                             $listedDirectories[] = $dirPath;
                             yield new DirectoryAttributes(trim($prefix . $dirPath, '/'));
                         }
@@ -227,12 +292,18 @@ class InMemoryFilesystemAdapter implements FilesystemAdapter
         }
     }
 
-    public function move(string $source, string $destination, Config $config): void
-    {
+    /**
+     * @param string $source
+     * @param string $destination
+     * @param Config $config
+     *
+     * @return void
+     */
+    public function move($source, $destination, Config $config) {
         $source = $this->preparePath($source);
         $destination = $this->preparePath($destination);
 
-        if ( ! $this->fileExists($source) || $this->fileExists($destination)) {
+        if (!$this->fileExists($source) || $this->fileExists($destination)) {
             throw UnableToMoveFile::fromLocationTo($source, $destination);
         }
 
@@ -240,12 +311,18 @@ class InMemoryFilesystemAdapter implements FilesystemAdapter
         unset($this->files[$source]);
     }
 
-    public function copy(string $source, string $destination, Config $config): void
-    {
+    /**
+     * @param string $source
+     * @param string $destination
+     * @param Config $config
+     *
+     * @return void
+     */
+    public function copy($source, $destination, Config $config) {
         $source = $this->preparePath($source);
         $destination = $this->preparePath($destination);
 
-        if ( ! $this->fileExists($source)) {
+        if (!$this->fileExists($source)) {
             throw UnableToCopyFile::fromLocationTo($source, $destination);
         }
 
@@ -254,13 +331,19 @@ class InMemoryFilesystemAdapter implements FilesystemAdapter
         $this->files[$destination] = $this->files[$source]->withLastModified($lastModified);
     }
 
-    private function preparePath(string $path): string
-    {
+    /**
+     * @param string $path
+     *
+     * @return string
+     */
+    private function preparePath($path) {
         return '/' . ltrim($path, '/');
     }
 
-    public function deleteEverything(): void
-    {
+    /**
+     * @return void
+     */
+    public function deleteEverything() {
         $this->files = [];
     }
 }
