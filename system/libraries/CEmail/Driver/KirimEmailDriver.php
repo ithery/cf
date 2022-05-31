@@ -16,10 +16,11 @@ class CEmail_Driver_KirimEmailDriver extends CEmail_DriverAbstract {
         $cc = carr::get($options, 'cc', []);
         $bcc = carr::get($options, 'bcc', []);
 
-        $toEmail = '';
+        $toEmailConcat = '';
         if (!is_array($to)) {
             $to = [$to];
         }
+
         foreach ($to as $toItem) {
             $toName = '';
             $toEmail = $toItem;
@@ -29,10 +30,10 @@ class CEmail_Driver_KirimEmailDriver extends CEmail_DriverAbstract {
                 $toEmail = carr::get($toItem, 'toEmail');
                 $email = $toName . '" <' . $toEmail . '>';
             }
-            if (strlen($toEmail) > 0) {
-                $toEmail .= ';';
+            if (strlen($toEmailConcat) > 0) {
+                $toEmailConcat .= ';';
             }
-            $toEmail .= $email;
+            $toEmailConcat .= $email;
         }
         $cc = carr::wrap($cc);
         $bcc = carr::wrap($bcc);
@@ -81,18 +82,19 @@ class CEmail_Driver_KirimEmailDriver extends CEmail_DriverAbstract {
         }
 
         //build params
-        $auth = 'api:' . $generatedToken;
+        $auth = base64_encode('api:' . $apiKey);
         $apiEndPoint = 'https://aplikasi.kirim.email/api/v3/transactional/messages';
         $headers = [
             'Domain' => $domain,
             'Authorization' => 'Basic ' . $auth,
         ];
+
         $post = [
             'from' => $from,
-            'to' => $toEmail,
+            'to' => $toEmailConcat,
             'subject' => $subject,
             'html' => $body,
-            'headers' => []
+
         ];
         if (strlen($fromName) > 0) {
             $post['from_name'] = $fromName;
@@ -100,12 +102,19 @@ class CEmail_Driver_KirimEmailDriver extends CEmail_DriverAbstract {
         if (strlen($replyTo) > 0) {
             $post['headers']['Reply-To'] = $replyTo;
         }
-        $curl = CCurl::factory($apiEndPoint);
-        $curl->setHttpHeader(c::collect($headers)->map(function ($value, $key) {
+
+        $httpHeaders = array_values(c::collect($headers)->map(function ($value, $key) {
             return $key . ':' . $value;
         })->toArray());
+
+        $curl = CCurl::factory($apiEndPoint);
+
+        $curl->setHttpHeader($httpHeaders);
         $curl->setPost($post);
+
         $response = $curl->exec()->response();
+
+        cdbg::dd($response);
 
         return $response;
     }
