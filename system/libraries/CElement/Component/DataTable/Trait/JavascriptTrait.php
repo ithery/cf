@@ -64,7 +64,7 @@ trait CElement_Component_DataTable_Trait_JavascriptTrait {
                 $km .= $k;
                 $vm .= "'" . $v . "'";
             }
-            $hs_val = $this->header_sortable ? 'true' : 'false';
+            $hs_val = $this->headerSortable ? 'true' : 'false';
             $js->appendln("var table = jQuery('#" . $this->id . "');")->br();
             $js->appendln('var header_sortable = ' . $hs_val . ';')->br();
             $js->appendln('var vaoColumns = [];')->br();
@@ -92,7 +92,7 @@ trait CElement_Component_DataTable_Trait_JavascriptTrait {
             }
             foreach ($this->columns as $col) {
                 $aojson = [];
-                $aojson['bSortable'] = $col->sortable && $this->header_sortable;
+                $aojson['bSortable'] = $col->sortable && $this->headerSortable;
                 $aojson['bSearchable'] = $col->searchable;
                 $aojson['bVisible'] = $col->visible;
 
@@ -202,7 +202,7 @@ trait CElement_Component_DataTable_Trait_JavascriptTrait {
             if (CClientModules::instance()->isRegisteredModule('jquery.ui') || CClientModules::instance()->isRegisteredModule('jquery-ui-1.12.1.custom')) {
                 $jqueryui = "'bJQueryUI': true,";
             }
-
+            $js->appendln('buttons:        ' . json_encode($this->buttons) . ',')->br();
             if ($this->scrollY) {
                 $scrollY = $this->scrollY;
                 if (is_bool($scrollY)) {

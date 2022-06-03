@@ -1,6 +1,7 @@
 {
     "main": "dist/cres.js",
     "name": "cf-cres",
+    "version": "1.4.1",
     "scripts": {
         "build": "cross-env NODE_ENV=production npx rollup -c",
         "dev": "npx rollup -c -w"
@@ -46,6 +47,7 @@
         "date-fns": "^2.28.0",
         "event-source-polyfill": "^1.0.25",
         "locutus": "^2.0.15",
-        "pusher-js": "^7.0.3"
+        "pusher-js": "^7.0.3",
+        "tippy.js": "^6.3.7"
     }
 }

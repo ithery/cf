@@ -32,7 +32,7 @@ class CServer_Chrome_PageCapture {
     protected $temporaryHtmlDirectory;
 
     /**
-     * @var \Spatie\Image\Manipulations
+     * @var \CImage_Manipulations
      */
     protected $imageManipulations;
 
