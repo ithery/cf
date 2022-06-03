@@ -32,7 +32,7 @@ class CVendor_Twilio_Verification {
      * @param $phoneNumber
      * @param $channel
      *
-     * @return Result
+     * @return CVendor_Twilio_Verification_Result
      */
     public function startVerification($phoneNumber, $channel) {
         try {
@@ -54,7 +54,7 @@ class CVendor_Twilio_Verification {
      * @param $phoneNumber
      * @param $code
      *
-     * @return Result
+     * @return CVendor_Twilio_Verification_Result
      */
     public function checkVerification($phoneNumber, $code) {
         try {
