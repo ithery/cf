@@ -656,6 +656,9 @@ return [
         'js' => [
             'plugins/tippy/tippy.js',
         ],
+        'css' => [
+            'plugins/tippy/tippy.css',
+        ],
     ],
     'waypoints' => [
         'js' => [
