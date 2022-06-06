@@ -32,7 +32,7 @@ class CApi_OAuth {
      *
      * @var null|\DateTimeInterface
      *
-     * @deprecated will be removed in the next major Passport release
+     * @deprecated will be removed in the next major OAuth release
      */
     public $tokensExpireAt;
 
@@ -48,7 +48,7 @@ class CApi_OAuth {
      *
      * @var null|\DateTimeInterface
      *
-     * @deprecated will be removed in the next major Passport release
+     * @deprecated will be removed in the next major OAuth release
      */
     public $refreshTokensExpireAt;
 
@@ -64,7 +64,7 @@ class CApi_OAuth {
      *
      * @var null|\DateTimeInterface
      *
-     * @deprecated will be removed in the next major Passport release
+     * @deprecated will be removed in the next major OAuth release
      */
     public $personalAccessTokensExpireAt;
 
@@ -83,7 +83,7 @@ class CApi_OAuth {
     public $cookie = 'cf_oauth_token';
 
     /**
-     * Indicates if Passport should ignore incoming CSRF tokens.
+     * Indicates if OAuth should ignore incoming CSRF tokens.
      *
      * @var bool
      */
@@ -101,14 +101,14 @@ class CApi_OAuth {
      *
      * @var string
      */
-    public $authCodeModel = 'Laravel\Passport\AuthCode';
+    public $authCodeModel = CApi_OAuth_Model_OAuthAuthCode::class;
 
     /**
      * The client model class name.
      *
      * @var string
      */
-    public $clientModel = 'Laravel\Passport\Client';
+    public $clientModel = CApi_OAuth_Model_OAuthClient::class;
 
     /**
      * Indicates if client's are identified by UUIDs.
@@ -122,21 +122,21 @@ class CApi_OAuth {
      *
      * @var string
      */
-    public $personalAccessClientModel = 'Laravel\Passport\PersonalAccessClient';
+    public $personalAccessClientModel = CApi_OAuth_Model_OAuthPersonalAccessClient::class;
 
     /**
      * The token model class name.
      *
      * @var string
      */
-    public $tokenModel = 'Laravel\Passport\Token';
+    public $tokenModel = CApi_OAuth_Model_OAuthAccessToken::class;
 
     /**
      * The refresh token model class name.
      *
      * @var string
      */
-    public $refreshTokenModel = 'Laravel\Passport\RefreshToken';
+    public $refreshTokenModel = CApi_OAuth_Model_OAuthRefreshToken::class;
 
     /**
      * Indicates if Passport should unserializes cookies.
@@ -482,17 +482,19 @@ class CApi_OAuth {
      *
      * @return string
      */
-    public static function authCodeModel() {
-        return static::$authCodeModel;
+    public function authCodeModel() {
+        return $this->authCodeModel;
     }
 
     /**
      * Get a new auth code model instance.
      *
-     * @return \Laravel\Passport\AuthCode
+     * @return \CApi_OAuth_Model_OAuthAuthCode
      */
-    public static function authCode() {
-        return new static::$authCodeModel();
+    public function authCode() {
+        $authCodeModel = $this->authCodeModel();
+
+        return new $authCodeModel();
     }
 
     /**
@@ -502,8 +504,10 @@ class CApi_OAuth {
      *
      * @return void
      */
-    public static function useClientModel($clientModel) {
-        static::$clientModel = $clientModel;
+    public function useClientModel($clientModel) {
+        $this->clientModel = $clientModel;
+
+        return $this;
     }
 
     /**
@@ -511,17 +515,19 @@ class CApi_OAuth {
      *
      * @return string
      */
-    public static function clientModel() {
-        return static::$clientModel;
+    public function clientModel() {
+        return $this->clientModel;
     }
 
     /**
      * Get a new client model instance.
      *
-     * @return \Laravel\Passport\Client
+     * @return \CApi_OAuth_Model_OAuthClient
      */
-    public static function client() {
-        return new static::$clientModel();
+    public function client() {
+        $clientModel = $this->clientModel();
+
+        return new $clientModel();
     }
 
     /**
@@ -529,8 +535,8 @@ class CApi_OAuth {
      *
      * @return bool
      */
-    public static function clientUuids() {
-        return static::$clientUuids;
+    public function clientUuids() {
+        return $this->clientUuids;
     }
 
     /**
@@ -540,8 +546,10 @@ class CApi_OAuth {
      *
      * @return void
      */
-    public static function setClientUuids($value) {
-        static::$clientUuids = $value;
+    public function setClientUuids($value) {
+        $this->clientUuids = $value;
+
+        return $this;
     }
 
     /**
@@ -551,8 +559,10 @@ class CApi_OAuth {
      *
      * @return void
      */
-    public static function usePersonalAccessClientModel($clientModel) {
-        static::$personalAccessClientModel = $clientModel;
+    public function usePersonalAccessClientModel($clientModel) {
+        $this->personalAccessClientModel = $clientModel;
+
+        return $this;
     }
 
     /**
@@ -560,17 +570,19 @@ class CApi_OAuth {
      *
      * @return string
      */
-    public static function personalAccessClientModel() {
-        return static::$personalAccessClientModel;
+    public function personalAccessClientModel() {
+        return $this->personalAccessClientModel;
     }
 
     /**
      * Get a new personal access client model instance.
      *
-     * @return \Laravel\Passport\PersonalAccessClient
+     * @return \CApi_OAuth_Model_OAuthPersonalAccessClient
      */
-    public static function personalAccessClient() {
-        return new static::$personalAccessClientModel();
+    public function personalAccessClient() {
+        $personalAccessClientModel = $this->personalAccessClientModel();
+
+        return new $personalAccessClientModel();
     }
 
     /**
@@ -580,8 +592,10 @@ class CApi_OAuth {
      *
      * @return void
      */
-    public static function useTokenModel($tokenModel) {
-        static::$tokenModel = $tokenModel;
+    public function useTokenModel($tokenModel) {
+        $this->tokenModel = $tokenModel;
+
+        return $this;
     }
 
     /**
@@ -589,17 +603,19 @@ class CApi_OAuth {
      *
      * @return string
      */
-    public static function tokenModel() {
-        return static::$tokenModel;
+    public function tokenModel() {
+        return $this->tokenModel;
     }
 
     /**
      * Get a new personal access client model instance.
      *
-     * @return \Laravel\Passport\Token
+     * @return \CApi_OAuth_Model_OAuthAccessToken
      */
-    public static function token() {
-        return new static::$tokenModel();
+    public function token() {
+        $tokenModel = $this->tokenModel();
+
+        return new $tokenModel();
     }
 
     /**
@@ -634,7 +650,7 @@ class CApi_OAuth {
     }
 
     /**
-     * Configure Passport to hash client credential secrets.
+     * Configure OAuth to hash client credential secrets.
      *
      * @return static
      */
@@ -671,7 +687,7 @@ class CApi_OAuth {
     }
 
     /**
-     * Instruct Passport to enable cookie serialization.
+     * Instruct OAuth to enable cookie serialization.
      *
      * @return static
      */
@@ -682,7 +698,7 @@ class CApi_OAuth {
     }
 
     /**
-     * Instruct Passport to disable cookie serialization.
+     * Instruct OAuth to disable cookie serialization.
      *
      * @return static
      */

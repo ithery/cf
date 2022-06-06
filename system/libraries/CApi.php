@@ -75,7 +75,7 @@ class CApi {
         static::$call++;
 
         if (static::$call == 2) {
-            cdbg::dd(cdbg::getTraceString());
+            //cdbg::dd(cdbg::getTraceString());
         }
         if (!is_array(static::$oauth)) {
             static::$oauth = [];
