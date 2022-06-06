@@ -90,7 +90,8 @@ class CApi_Dispatcher {
      */
     public function oauth() {
         if ($this->oauth == null) {
-            $this->oauth = new CApi_OAuth($this);
+            $this->oauth = new CApi_OAuth($this->group);
+            $this->oauth->initLoader();
         }
 
         return $this->oauth;

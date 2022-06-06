@@ -171,12 +171,21 @@ class CApi_OAuth {
     public $authorizationServerResponseType;
 
     /**
+     * @var string
+     */
+    private $apiGroup;
+
+    /**
      * @var CApi_OAuth_Loader
      */
     private $loader;
 
-    public function __construct(CApi_Dispatcher $dispatcher) {
-        $this->loader = new CApi_OAuth_Loader($dispatcher);
+    public function __construct($apiGroup) {
+        $this->apiGroup = $apiGroup;
+    }
+
+    public function initLoader() {
+        $this->loader = new CApi_OAuth_Loader($this->apiGroup);
     }
 
     /**
@@ -357,11 +366,11 @@ class CApi_OAuth {
     /**
      * Set the current user for the application with the given scopes.
      *
-     * @param \CAuth_AuthenticatableInterface|\Laravel\Passport\HasApiTokens $user
-     * @param array                                                          $scopes
-     * @param string                                                         $guard
+     * @param \CAuth_AuthenticatableInterface|\CApi_OAuth_Trait_HasApiTokenTrait $user
+     * @param array                                                              $scopes
+     * @param string                                                             $guard
      *
-     * @return \Illuminate\Contracts\Auth\Authenticatable
+     * @return \CAuth_AuthenticatableInterface
      */
     public static function actingAs($user, $scopes = [], $guard = 'api') {
         $token = Mockery::mock(self::tokenModel())->shouldIgnoreMissing(false);
@@ -376,9 +385,9 @@ class CApi_OAuth {
             $user->wasRecentlyCreated = false;
         }
 
-        app('auth')->guard($guard)->setUser($user);
+        c::auth()->guard($guard)->setUser($user);
 
-        app('auth')->shouldUse($guard);
+        c::auth()->shouldUse($guard);
 
         return $user;
     }
@@ -424,8 +433,8 @@ class CApi_OAuth {
      *
      * @return void
      */
-    public static function loadKeysFrom($path) {
-        static::$keyPath = $path;
+    public function loadKeysFrom($path) {
+        $this->keyPath = $path;
     }
 
     /**
@@ -435,12 +444,12 @@ class CApi_OAuth {
      *
      * @return string
      */
-    public static function keyPath($file) {
+    public function keyPath($file) {
         $file = ltrim($file, '/\\');
 
-        return static::$keyPath
-            ? rtrim(static::$keyPath, '/\\') . DIRECTORY_SEPARATOR . $file
-            : storage_path($file);
+        return $this->keyPath
+            ? rtrim($this->keyPath, '/\\') . DIRECTORY_SEPARATOR . $file
+            : DOCROOT . $file;
     }
 
     /**
@@ -450,8 +459,8 @@ class CApi_OAuth {
      *
      * @return void
      */
-    public static function useAuthCodeModel($authCodeModel) {
-        static::$authCodeModel = $authCodeModel;
+    public function useAuthCodeModel($authCodeModel) {
+        $this->authCodeModel = $authCodeModel;
     }
 
     /**

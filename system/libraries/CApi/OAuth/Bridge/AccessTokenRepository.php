@@ -1,12 +1,11 @@
 <?php
 
-use Illuminate\Contracts\Events\Dispatcher;
 use Laravel\Passport\Events\AccessTokenCreated;
 use League\OAuth2\Server\Entities\ClientEntityInterface;
 use League\OAuth2\Server\Entities\AccessTokenEntityInterface;
 use League\OAuth2\Server\Repositories\AccessTokenRepositoryInterface;
 
-class AccessTokenRepository implements AccessTokenRepositoryInterface {
+class CApi_OAuth_Bridge_AccessTokenRepository implements AccessTokenRepositoryInterface {
     use CApi_OAuth_Bridge_Trait_FormatScopesForStorageTrait;
 
     /**
@@ -39,7 +38,7 @@ class AccessTokenRepository implements AccessTokenRepositoryInterface {
      * @inheritdoc
      */
     public function getNewToken(ClientEntityInterface $clientEntity, array $scopes, $userIdentifier = null) {
-        return new AccessToken($userIdentifier, $scopes, $clientEntity);
+        return new CApi_OAuth_Bridge_AccessToken($userIdentifier, $scopes, $clientEntity);
     }
 
     /**
@@ -57,7 +56,7 @@ class AccessTokenRepository implements AccessTokenRepositoryInterface {
             'expires_at' => $accessTokenEntity->getExpiryDateTime(),
         ]);
 
-        $this->events->dispatch(new AccessTokenCreated(
+        $this->events->dispatch(new CApi_OAuth_Event_AccessTokenCreated(
             $accessTokenEntity->getIdentifier(),
             $accessTokenEntity->getUserIdentifier(),
             $accessTokenEntity->getClient()->getIdentifier()

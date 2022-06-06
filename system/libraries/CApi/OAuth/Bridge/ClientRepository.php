@@ -6,7 +6,7 @@ class CApi_OAuth_Bridge_ClientRepository implements ClientRepositoryInterface {
     /**
      * The client model repository.
      *
-     * @var \Laravel\Passport\ClientRepository
+     * @var \CApi_OAuth_ClientRepository
      */
     protected $clients;
 
