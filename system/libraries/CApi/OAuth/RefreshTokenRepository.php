@@ -2,6 +2,22 @@
 
 class CApi_OAuth_RefreshTokenRepository {
     /**
+     * CApi OAuth.
+     *
+     * @var CApi_OAuth
+     */
+    protected $oauth;
+
+    /**
+     * Create a new refresh token repository.
+     *
+     * @return void
+     */
+    public function __construct(CApi_OAuth $oauth) {
+        $this->oauth = $oauth;
+    }
+
+    /**
      * Creates a new refresh token.
      *
      * @param array $attributes
@@ -9,7 +25,7 @@ class CApi_OAuth_RefreshTokenRepository {
      * @return \CApi_OAuth_Model_OAuthRefreshToken
      */
     public function create($attributes) {
-        return CApi::oauth()->refreshToken()->create($attributes);
+        return $this->oauth->refreshToken()->create($attributes);
     }
 
     /**
@@ -20,7 +36,7 @@ class CApi_OAuth_RefreshTokenRepository {
      * @return \CApi_OAuth_Model_OAuthRefreshToken
      */
     public function find($id) {
-        return CApi::oauth()->refreshToken()->where('id', $id)->first();
+        return $this->oauth->refreshToken()->where('id', $id)->first();
     }
 
     /**
@@ -42,7 +58,7 @@ class CApi_OAuth_RefreshTokenRepository {
      * @return mixed
      */
     public function revokeRefreshToken($id) {
-        return CApi::oauth()->refreshToken()->where('id', $id)->update(['revoked' => true]);
+        return $this->oauth->refreshToken()->where('id', $id)->update(['revoked' => true]);
     }
 
     /**
@@ -53,7 +69,7 @@ class CApi_OAuth_RefreshTokenRepository {
      * @return void
      */
     public function revokeRefreshTokensByAccessTokenId($tokenId) {
-        CApi::oauth()->refreshToken()->where('access_token_id', $tokenId)->update(['revoked' => true]);
+        $this->oauth->refreshToken()->where('access_token_id', $tokenId)->update(['revoked' => true]);
     }
 
     /**

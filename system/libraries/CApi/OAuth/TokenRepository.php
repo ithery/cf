@@ -2,6 +2,22 @@
 
 class CApi_OAuth_TokenRepository {
     /**
+     * CApi OAuth.
+     *
+     * @var CApi_OAuth
+     */
+    protected $oauth;
+
+    /**
+     * Create a new refresh token repository.
+     *
+     * @return void
+     */
+    public function __construct(CApi_OAuth $oauth) {
+        $this->oauth = $oauth;
+    }
+
+    /**
      * Creates a new Access Token.
      *
      * @param array $attributes
@@ -9,7 +25,7 @@ class CApi_OAuth_TokenRepository {
      * @return \CApi_OAuth_Model_OAuthAccessToken
      */
     public function create($attributes) {
-        return CApi::oauth()->token()->create($attributes);
+        return $this->oauth->token()->create($attributes);
     }
 
     /**
@@ -20,7 +36,7 @@ class CApi_OAuth_TokenRepository {
      * @return \CApi_OAuth_Model_OAuthAccessToken
      */
     public function find($id) {
-        return CApi::oauth()->token()->where('id', $id)->first();
+        return $this->oauth->token()->where('id', $id)->first();
     }
 
     /**
@@ -32,7 +48,7 @@ class CApi_OAuth_TokenRepository {
      * @return null|\CApi_OAuth_Model_OAuthAccessToken
      */
     public function findForUser($id, $userId) {
-        return CApi::oauth()->token()->where('id', $id)->where('user_id', $userId)->first();
+        return $this->oauth->token()->where('id', $id)->where('user_id', $userId)->first();
     }
 
     /**
@@ -43,14 +59,14 @@ class CApi_OAuth_TokenRepository {
      * @return \CModel_Collection
      */
     public function forUser($userId) {
-        return CApi::oauth()->token()->where('user_id', $userId)->get();
+        return $this->oauth->token()->where('user_id', $userId)->get();
     }
 
     /**
      * Get a valid token instance for the given user and client.
      *
-     * @param \Illuminate\Database\Eloquent\Model $user
-     * @param \CApi_OAuth_Model_OAuthClient       $client
+     * @param \CModel                       $user
+     * @param \CApi_OAuth_Model_OAuthClient $client
      *
      * @return null|\CApi_OAuth_Model_OAuthAccessToken
      */
@@ -81,7 +97,7 @@ class CApi_OAuth_TokenRepository {
      * @return mixed
      */
     public function revokeAccessToken($id) {
-        return CApi::oauth()->token()->where('id', $id)->update(['revoked' => true]);
+        return $this->oauth->token()->where('id', $id)->update(['revoked' => true]);
     }
 
     /**

@@ -33,6 +33,8 @@ class CApi_OAuth_Loader {
 
     private $tokenRepository;
 
+    private $refreshTokenRepository;
+
     private $resourceServer;
 
     /**
@@ -274,7 +276,7 @@ class CApi_OAuth_Loader {
 
     protected function getBridgeRefreshTokenRepository() {
         if ($this->bridgeRefreshTokenRepository == null) {
-            $this->bridgeRefreshTokenRepository = new CApi_OAuth_Bridge_RefreshTokenRepository(new CApi_OAuth_RefreshTokenRepository());
+            $this->bridgeRefreshTokenRepository = new CApi_OAuth_Bridge_RefreshTokenRepository($this->getRefreshTokenRepository());
         }
 
         return $this->bridgeRefreshTokenRepository;
@@ -316,10 +318,18 @@ class CApi_OAuth_Loader {
 
     public function getTokenRepository() {
         if ($this->tokenRepository == null) {
-            $this->tokenRepository = new CApi_OAuth_TokenRepository();
+            $this->tokenRepository = new CApi_OAuth_TokenRepository($this->oauth);
         }
 
         return $this->tokenRepository;
+    }
+
+    public function getRefreshTokenRepository() {
+        if ($this->refreshTokenRepository == null) {
+            $this->refreshTokenRepository = new CApi_OAuth_RefreshTokenRepository($this->oauth);
+        }
+
+        return $this->refreshTokenRepository;
     }
 
     public function getEncrypter() {
