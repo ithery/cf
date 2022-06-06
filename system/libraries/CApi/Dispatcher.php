@@ -9,8 +9,6 @@ class CApi_Dispatcher {
 
     protected $isDispatching = false;
 
-    protected $oauth;
-
     public function __construct($group) {
         $this->group = $group;
         $this->prefix = CF::config('api.groups.' . $group . '.prefix', '');
@@ -89,11 +87,6 @@ class CApi_Dispatcher {
      * @return CApi_OAuth
      */
     public function oauth() {
-        if ($this->oauth == null) {
-            $this->oauth = new CApi_OAuth($this->group);
-            $this->oauth->initLoader();
-        }
-
-        return $this->oauth;
+        return CApi::oauth($this->group);
     }
 }

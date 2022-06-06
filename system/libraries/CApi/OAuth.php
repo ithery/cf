@@ -185,10 +185,7 @@ class CApi_OAuth {
 
     public function __construct($apiGroup) {
         $this->apiGroup = $apiGroup;
-    }
-
-    public function initLoader() {
-        $this->loader = new CApi_OAuth_Loader($this->apiGroup);
+        $this->loader = new CApi_OAuth_Loader($this);
     }
 
     /**
@@ -196,6 +193,20 @@ class CApi_OAuth {
      */
     public function authorizationServer() {
         return $this->loader->getAuthorizationServer();
+    }
+
+    /**
+     * @return \CApi_OAuth_TokenRepository
+     */
+    public function tokenRepository() {
+        return $this->loader->getTokenRepository();
+    }
+
+    /**
+     * @return \League\OAuth2\Server\ResourceServer
+     */
+    public function resourceServer() {
+        return $this->loader->getResourceServer();
     }
 
     /**
@@ -679,5 +690,9 @@ class CApi_OAuth {
         $this->unserializesCookies = false;
 
         return $this;
+    }
+
+    public function getGroup() {
+        return $this->apiGroup;
     }
 }

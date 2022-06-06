@@ -18,7 +18,10 @@ class CApi_OAuth_Loader {
      */
     private $authorizationServer;
 
-    private $apiGroup;
+    /**
+     * @var CApi_OAuth
+     */
+    private $oauth;
 
     private $bridgeRefreshTokenRepository;
 
@@ -42,8 +45,9 @@ class CApi_OAuth_Loader {
      */
     private $jwtParser;
 
-    public function __construct($apiGroup) {
-        $this->apiGroup = $apiGroup;
+    public function __construct($oauth) {
+        $this->oauth = $oauth;
+        $this->apiGroup = $oauth->getGroup();
         $this->registerAuthorizationServer();
         $this->registerClientRepository();
         $this->registerJWTParser();
@@ -63,7 +67,7 @@ class CApi_OAuth_Loader {
             new CApi_OAuth_Bridge_ScopeRepository(),
             $this->makeCryptKey('private'),
             CCrypt::encrypter()->getKey(),
-            CApi::oauth()->authorizationServerResponseType
+            $this->oauth->authorizationServerResponseType
         );
     }
 
@@ -74,37 +78,37 @@ class CApi_OAuth_Loader {
      */
     protected function registerAuthorizationServer() {
         $this->authorizationServer = c::tap($this->makeAuthorizationServer(), function ($server) {
-            $server->setDefaultScope(CApi::oauth()->defaultScope);
+            $server->setDefaultScope($this->oauth->defaultScope);
 
             $server->enableGrantType(
                 $this->makeAuthCodeGrant(),
-                CApi::oauth()->tokensExpireIn()
+                $this->oauth->tokensExpireIn()
             );
 
             $server->enableGrantType(
                 $this->makeRefreshTokenGrant(),
-                CApi::oauth()->tokensExpireIn()
+                $this->oauth->tokensExpireIn()
             );
 
             $server->enableGrantType(
                 $this->makePasswordGrant(),
-                CApi::oauth()->tokensExpireIn()
+                $this->oauth->tokensExpireIn()
             );
 
             $server->enableGrantType(
                 new CApi_OAuth_Bridge_PersonalAccessGrant(),
-                CApi::oauth()->personalAccessTokensExpireIn()
+                $this->oauth->personalAccessTokensExpireIn()
             );
 
             $server->enableGrantType(
                 new ClientCredentialsGrant(),
-                CApi::oauth()->tokensExpireIn()
+                $this->oauth->tokensExpireIn()
             );
 
-            if (CApi::oauth()->implicitGrantEnabled) {
+            if ($this->oauth->implicitGrantEnabled) {
                 $server->enableGrantType(
                     $this->makeImplicitGrant(),
-                    CApi::oauth()->tokensExpireIn()
+                    $this->oauth->tokensExpireIn()
                 );
             }
         });
@@ -124,7 +128,7 @@ class CApi_OAuth_Loader {
      */
     protected function makeAuthCodeGrant() {
         return c::tap($this->buildAuthCodeGrant(), function ($grant) {
-            $grant->setRefreshTokenTTL(CApi::oauth()->refreshTokensExpireIn());
+            $grant->setRefreshTokenTTL($this->oauth->refreshTokensExpireIn());
         });
     }
 
@@ -150,7 +154,7 @@ class CApi_OAuth_Loader {
         $repository = $this->getBridgeRefreshTokenRepository();
 
         return c::tap(new RefreshTokenGrant($repository), function ($grant) {
-            $grant->setRefreshTokenTTL(CApi::oauth()->refreshTokensExpireIn());
+            $grant->setRefreshTokenTTL($this->oauth->refreshTokensExpireIn());
         });
     }
 
@@ -165,7 +169,7 @@ class CApi_OAuth_Loader {
             $this->getBridgeRefreshTokenRepository(),
         );
 
-        $grant->setRefreshTokenTTL(CApi::oauth()->refreshTokensExpireIn());
+        $grant->setRefreshTokenTTL($this->oauth->refreshTokensExpireIn());
 
         return $grant;
     }
@@ -176,7 +180,7 @@ class CApi_OAuth_Loader {
      * @return \League\OAuth2\Server\Grant\ImplicitGrant
      */
     protected function makeImplicitGrant() {
-        return new ImplicitGrant(CApi::oauth()->tokensExpireIn());
+        return new ImplicitGrant($this->oauth->tokensExpireIn());
     }
 
     /**
@@ -217,7 +221,7 @@ class CApi_OAuth_Loader {
         $key = str_replace('\\n', "\n", CF::config('api.groups.' . $this->apiGroup . '.oauth.' . $type . '_key') ?: '');
 
         if (!$key) {
-            $key = 'file://' . CApi::oauth()->keyPath('oauth-' . $type . '.key');
+            $key = 'file://' . $this->oauth->keyPath('oauth-' . $type . '.key');
         }
 
         return new CryptKey($key, null, false);
@@ -262,8 +266,8 @@ class CApi_OAuth_Loader {
      */
     protected function deleteCookieOnLogout() {
         CEvent::dispatcher()->listen(CAuth_Event_Logout::class, function () {
-            if (c::request()->hasCookie(CApi::oauth()->cookie())) {
-                CHTTP::cookie()->queue(CHTTP::cookie()->forget(CApi::oauth()->cookie()));
+            if (c::request()->hasCookie($this->oauth->cookie())) {
+                CHTTP::cookie()->queue(CHTTP::cookie()->forget($this->oauth->cookie()));
             }
         });
     }
@@ -292,7 +296,7 @@ class CApi_OAuth_Loader {
         return $this->bridgeUserRepository;
     }
 
-    protected function getResourceServer() {
+    public function getResourceServer() {
         if ($this->resourceServer == null) {
             $this->resourceServer = new ResourceServer($this->getBridgeAccessTokenRepository(), $this->makeCryptKey('public'));
         }
@@ -300,7 +304,7 @@ class CApi_OAuth_Loader {
         return $this->resourceServer;
     }
 
-    protected function getClientRepository() {
+    public function getClientRepository() {
         if ($this->clientRepository == null) {
             $personalAccessClientId = CF::config('api.groups.' . $this->apiGroup . '.oauth.personal_access_client.id');
             $personalAccessClientSecret = CF::config('api.groups.' . $this->apiGroup . '.oauth.personal_access_client.secret');
@@ -310,7 +314,7 @@ class CApi_OAuth_Loader {
         return $this->clientRepository;
     }
 
-    protected function getTokenRepository() {
+    public function getTokenRepository() {
         if ($this->tokenRepository == null) {
             $this->tokenRepository = new CApi_OAuth_TokenRepository();
         }
@@ -318,7 +322,7 @@ class CApi_OAuth_Loader {
         return $this->tokenRepository;
     }
 
-    protected function getEncrypter() {
+    public function getEncrypter() {
         if ($this->encrypter == null) {
             $this->encrypter = CCrypt::encrypter();
         }
@@ -326,7 +330,7 @@ class CApi_OAuth_Loader {
         return $this->encrypter;
     }
 
-    protected function getJwtParser() {
+    public function getJwtParser() {
         if ($this->jwtParser == null) {
             $this->jwtParser = Configuration::forUnsecuredSigner()->parser();
         }

@@ -148,6 +148,9 @@ class CHTTP {
         return CHTTP_ResponseCache::instance();
     }
 
+    /**
+     * @return CHTTP_Client
+     */
     public static function client() {
         return CHTTP_Client::instance();
     }
