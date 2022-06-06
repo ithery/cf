@@ -10,6 +10,8 @@ class CApi_HTTP_Request extends CHTTP_Request implements CApi_Contract_HTTP_Requ
      */
     protected $accept;
 
+    protected $apiData = [];
+
     /**
      * Create a new Dingo request instance from an Illuminate request instance.
      *
@@ -91,5 +93,11 @@ class CApi_HTTP_Request extends CHTTP_Request implements CApi_Contract_HTTP_Requ
         }
 
         $this->accept = $this->manager()->httpParseAccept()->parse($this);
+    }
+
+    public function setApiData($key, $value) {
+        $this->apiData[$key] = $value;
+
+        return $this;
     }
 }
