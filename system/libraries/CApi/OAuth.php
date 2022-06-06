@@ -649,11 +649,11 @@ class CApi_OAuth {
     /**
      * Generate an encryption key for encrypting JWT tokens.
      *
-     * @param \CCrypt_EncrypterInterface $encrypter
+     * @param \CCrypt_Encrypter $encrypter
      *
      * @return string
      */
-    public static function tokenEncryptionKey(CCrypt_EncrypterInterface $encrypter) {
+    public static function tokenEncryptionKey(CCrypt_Encrypter $encrypter) {
         return is_callable(static::$tokenEncryptionKeyCallback)
             ? (static::$tokenEncryptionKeyCallback)($encrypter)
             : $encrypter->getKey();
