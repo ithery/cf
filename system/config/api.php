@@ -34,6 +34,15 @@ return [
              *authenticate an incoming API request.
              */
             'auth' => [
+                'guard' => 'apiapp',
+            ],
+            'oauth' => [
+                'private_key' => c::env('OAUTH_PRIVATE_KEY'),
+                'public_key' => c::env('OAUTH_PUBLIC_KEY'),
+                'personal_access_client' => [
+                    'id' => c::env('OAUTH_PERSONAL_ACCESS_TOKEN_ID'),
+                    'secret' => c::env('OAUTH_PERSONAL_ACCESS_TOKEN_SECRET'),
+                ]
 
             ],
             /**

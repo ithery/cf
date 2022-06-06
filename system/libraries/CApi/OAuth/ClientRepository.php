@@ -2,6 +2,13 @@
 
 class CApi_OAuth_ClientRepository {
     /**
+     * CApi OAuth.
+     *
+     * @var CApi_OAuth
+     */
+    protected $oauth;
+
+    /**
      * The personal access client ID.
      *
      * @var null|int|string
@@ -23,7 +30,8 @@ class CApi_OAuth_ClientRepository {
      *
      * @return void
      */
-    public function __construct($personalAccessClientId = null, $personalAccessClientSecret = null) {
+    public function __construct(CApi_OAuth $oauth, $personalAccessClientId = null, $personalAccessClientSecret = null) {
+        $this->oauth = $oauth;
         $this->personalAccessClientId = $personalAccessClientId;
         $this->personalAccessClientSecret = $personalAccessClientSecret;
     }
@@ -36,7 +44,7 @@ class CApi_OAuth_ClientRepository {
      * @return null|\CApi_OAuth_Model_OAuthClient
      */
     public function find($id) {
-        $client = CApi::currentDispatcher()->oauth()->client();
+        $client = $this->oauth->client();
 
         return $client->where($client->getKeyName(), $id)->first();
     }
@@ -63,7 +71,7 @@ class CApi_OAuth_ClientRepository {
      * @return null|\CApi_OAuth_Model_OAuthClient
      */
     public function findForUser($clientId, $userId) {
-        $client = CApi::oauth()->client();
+        $client = $this->oauth->client();
 
         return $client
             ->where($client->getKeyName(), $clientId)
@@ -79,7 +87,7 @@ class CApi_OAuth_ClientRepository {
      * @return \CModel_Collection
      */
     public function forUser($userId) {
-        return CApi::oauth()->client()
+        return $this->oauth->client()
             ->where('user_id', $userId)
             ->orderBy('name', 'asc')->get();
     }
@@ -109,7 +117,7 @@ class CApi_OAuth_ClientRepository {
             return $this->find($this->personalAccessClientId);
         }
 
-        $client = CApi::oauth()->personalAccessClient();
+        $client = $this->oauth->personalAccessClient();
 
         if (!$client->exists()) {
             throw new RuntimeException('Personal access client not found. Please create one.');
@@ -132,7 +140,7 @@ class CApi_OAuth_ClientRepository {
      * @return \CApi_OAuth_Model_OAuthClient
      */
     public function create($userId, $name, $redirect, $provider = null, $personalAccess = false, $password = false, $confidential = true) {
-        $client = CApi::oauth()->client()->forceFill([
+        $client = $this->oauth->client()->forceFill([
             'user_id' => $userId,
             'name' => $name,
             'secret' => ($confidential || $personalAccess) ? cstr::random(40) : null,
@@ -159,7 +167,7 @@ class CApi_OAuth_ClientRepository {
      */
     public function createPersonalAccessClient($userId, $name, $redirect) {
         return c::tap($this->create($userId, $name, $redirect, null, true), function ($client) {
-            $accessClient = CApi::oauth()->personalAccessClient();
+            $accessClient = $this->oauth->personalAccessClient();
             $accessClient->client_id = $client->id;
             $accessClient->save();
         });

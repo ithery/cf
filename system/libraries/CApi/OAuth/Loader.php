@@ -308,7 +308,7 @@ class CApi_OAuth_Loader {
         if ($this->clientRepository == null) {
             $personalAccessClientId = CF::config('api.groups.' . $this->apiGroup . '.oauth.personal_access_client.id');
             $personalAccessClientSecret = CF::config('api.groups.' . $this->apiGroup . '.oauth.personal_access_client.secret');
-            $this->clientRepository = new CApi_OAuth_ClientRepository($personalAccessClientId, $personalAccessClientSecret);
+            $this->clientRepository = new CApi_OAuth_ClientRepository($this->oauth, $personalAccessClientId, $personalAccessClientSecret);
         }
 
         return $this->clientRepository;
