@@ -14,11 +14,11 @@ class CApi_OAuth_Exception_OAuthServerException extends Exception {
      * Create a new OAuthServerException.
      *
      * @param \League\OAuth2\Server\Exception\OAuthServerException $e
-     * @param \CHTTP_ResponseResponse                              $response
+     * @param \CHTTP_Response                                      $response
      *
      * @return void
      */
-    public function __construct(LeagueException $e, Response $response) {
+    public function __construct(LeagueException $e, CHTTP_Response $response) {
         parent::__construct($e->getMessage(), $e->getCode(), $e);
 
         $this->response = $response;
@@ -27,9 +27,9 @@ class CApi_OAuth_Exception_OAuthServerException extends Exception {
     /**
      * Render the exception into an HTTP response.
      *
-     * @param \Illuminate\Http\Request $request
+     * @param \CHTTP_Request $request
      *
-     * @return \Illuminate\Http\Response
+     * @return \CHTTP_Response
      */
     public function render($request) {
         return $this->response;

@@ -63,8 +63,17 @@ return [
                 ],
 
             ],
-            'transformer' => CApi_Transformer_Adapter_FractalAdapter::class
+            'transformer' => CApi_Transformer_Adapter_FractalAdapter::class,
+
         ],
 
+    ],
+    'oauth' => [
+        'client_uuids' => false,
+        'storage' => [
+            'database' => [
+                'connection' => 'default',
+            ],
+        ],
     ],
 ];
