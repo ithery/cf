@@ -73,19 +73,19 @@ class CApi_OAuth_Model_OAuthClient extends CModel {
     /**
      * Get all of the authentication codes for the client.
      *
-     * @return \Illuminate\Database\Eloquent\Relations\HasMany
+     * @return \CModel_Relation_HasMany
      */
     public function authCodes() {
-        return $this->hasMany(Passport::authCodeModel(), 'client_id');
+        return $this->hasMany(CApi::oauth()->authCodeModel(), 'client_id');
     }
 
     /**
      * Get all of the tokens that belong to the client.
      *
-     * @return \Illuminate\Database\Eloquent\Relations\HasMany
+     * @return \CModel_Relation_HasMany
      */
     public function tokens() {
-        return $this->hasMany(Passport::tokenModel(), 'client_id');
+        return $this->hasMany(CApi::oauth()->tokenModel(), 'client_id');
     }
 
     /**
@@ -109,7 +109,7 @@ class CApi_OAuth_Model_OAuthClient extends CModel {
     public function setSecretAttribute($value) {
         $this->plainSecret = $value;
 
-        if (is_null($value) || !Passport::$hashesClientSecrets) {
+        if (is_null($value) || !CApi::oauth()->hashesClientSecrets) {
             $this->attributes['secret'] = $value;
 
             return;
@@ -151,7 +151,7 @@ class CApi_OAuth_Model_OAuthClient extends CModel {
      * @return string
      */
     public function getKeyType() {
-        return Passport::clientUuids() ? 'string' : $this->keyType;
+        return CApi::oauth()->clientUuids() ? 'string' : $this->keyType;
     }
 
     /**
@@ -160,7 +160,7 @@ class CApi_OAuth_Model_OAuthClient extends CModel {
      * @return bool
      */
     public function getIncrementing() {
-        return Passport::clientUuids() ? false : $this->incrementing;
+        return CApi::oauth()->clientUuids() ? false : $this->incrementing;
     }
 
     /**

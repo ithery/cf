@@ -20,6 +20,9 @@ abstract class CApi_MethodAbstract implements CInterface_Arrayable {
 
     protected $session;
 
+    /**
+     * @var null|CApi_HTTP_Request
+     */
     protected $apiRequest;
 
     /**

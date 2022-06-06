@@ -61,4 +61,15 @@ class CApi {
     public static function setCurrentDispatcher(CApi_Dispatcher $dispatcher = null) {
         static::$dispatcher = $dispatcher;
     }
+
+    /**
+     * @return null|CApi_OAuth
+     */
+    public static function oauth() {
+        if (static::$dispatcher) {
+            return static::$dispatcher->oauth();
+        }
+
+        return null;
+    }
 }

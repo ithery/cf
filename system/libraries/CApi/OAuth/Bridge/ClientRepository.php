@@ -1,9 +1,5 @@
 <?php
 
-namespace Laravel\Passport\Bridge;
-
-use Laravel\Passport\Passport;
-use Laravel\Passport\ClientRepository as ClientModelRepository;
 use League\OAuth2\Server\Repositories\ClientRepositoryInterface;
 
 class CApi_OAuth_Bridge_ClientRepository implements ClientRepositoryInterface {
@@ -17,11 +13,11 @@ class CApi_OAuth_Bridge_ClientRepository implements ClientRepositoryInterface {
     /**
      * Create a new repository instance.
      *
-     * @param \Laravel\Passport\ClientRepository $clients
+     * @param \CApi_OAuth_ClientRepository $clients
      *
      * @return void
      */
-    public function __construct(ClientModelRepository $clients) {
+    public function __construct(CApi_OAuth_ClientRepository $clients) {
         $this->clients = $clients;
     }
 
@@ -35,7 +31,7 @@ class CApi_OAuth_Bridge_ClientRepository implements ClientRepositoryInterface {
             return;
         }
 
-        return new Client(
+        return new CApi_OAuth_Bridge_Client(
             $clientIdentifier,
             $record->name,
             $record->redirect,
@@ -63,8 +59,8 @@ class CApi_OAuth_Bridge_ClientRepository implements ClientRepositoryInterface {
     /**
      * Determine if the given client can handle the given grant type.
      *
-     * @param \CApi_OAuth_Contract_ClientModelInterface $record
-     * @param string                                    $grantType
+     * @param \CApi_OAuth_Model_OAuthClient $record
+     * @param string                        $grantType
      *
      * @return bool
      */
@@ -96,8 +92,8 @@ class CApi_OAuth_Bridge_ClientRepository implements ClientRepositoryInterface {
      * @return bool
      */
     protected function verifySecret($clientSecret, $storedHash) {
-        return Passport::$hashesClientSecrets
-                    ? password_verify($clientSecret, $storedHash)
-                    : hash_equals($storedHash, $clientSecret);
+        return CApi::oauth()->hashesClientSecrets
+            ? password_verify($clientSecret, $storedHash)
+            : hash_equals($storedHash, $clientSecret);
     }
 }
