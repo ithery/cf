@@ -1,6 +1,6 @@
 <?php
 
-class PersonalAccessTokenResult implements CInterface_Arrayable, CInterface_Jsonable {
+class CApi_OAuth_PersonalAccessTokenResult implements CInterface_Arrayable, CInterface_Jsonable {
     /**
      * The access token.
      *

@@ -17,14 +17,14 @@ class CApi_OAuth_PersonalAccessTokenFactory {
     /**
      * The client repository instance.
      *
-     * @var \Laravel\Passport\ClientRepository
+     * @var \CApi_OAuth_ClientRepository
      */
     protected $clients;
 
     /**
      * The token repository instance.
      *
-     * @var \Laravel\Passport\TokenRepository
+     * @var \CApi_OAuth_TokenRepository
      */
     protected $tokens;
 
@@ -41,16 +41,16 @@ class CApi_OAuth_PersonalAccessTokenFactory {
      * Create a new personal access token factory instance.
      *
      * @param \League\OAuth2\Server\AuthorizationServer $server
-     * @param \Laravel\Passport\ClientRepository        $clients
-     * @param \Laravel\Passport\TokenRepository         $tokens
+     * @param \CApi_OAuth_ClientRepository              $clients
+     * @param \CApi_OAuth_TokenRepository               $tokens
      * @param \Lcobucci\JWT\Parser                      $jwt
      *
      * @return void
      */
     public function __construct(
         AuthorizationServer $server,
-        ClientRepository $clients,
-        TokenRepository $tokens,
+        CApi_OAuth_ClientRepository $clients,
+        CApi_OAuth_TokenRepository $tokens,
         JwtParser $jwt
     ) {
         $this->jwt = $jwt;
@@ -66,7 +66,7 @@ class CApi_OAuth_PersonalAccessTokenFactory {
      * @param string $name
      * @param array  $scopes
      *
-     * @return \Laravel\Passport\PersonalAccessTokenResult
+     * @return \CApi_OAuth_PersonalAccessTokenResult
      */
     public function make($userId, $name, array $scopes = []) {
         $response = $this->dispatchRequestToAuthorizationServer(
@@ -80,7 +80,7 @@ class CApi_OAuth_PersonalAccessTokenFactory {
             ]));
         });
 
-        return new PersonalAccessTokenResult(
+        return new CApi_OAuth_PersonalAccessTokenResult(
             $response['access_token'],
             $token
         );
@@ -126,7 +126,7 @@ class CApi_OAuth_PersonalAccessTokenFactory {
      *
      * @param array $response
      *
-     * @return \Laravel\Passport\Token
+     * @return \CApi_OAuth_Model_OAuthAccessToken
      */
     protected function findAccessToken(array $response) {
         return $this->tokens->find(
