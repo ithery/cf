@@ -15,6 +15,11 @@ class CApi {
     protected static $request;
 
     /**
+     * @var null|CApi_Dispatcher
+     */
+    protected static $dispatcher;
+
+    /**
      * Get CApi_Runner instance.
      *
      * @return CApi_Runner
@@ -44,5 +49,16 @@ class CApi {
 
     public static function manager($group = null) {
         return CApi_Manager::instance($group);
+    }
+
+    /**
+     * @return null|CApi_Dispatcher
+     */
+    public static function currentDispatcher() {
+        return static::$dispatcher;
+    }
+
+    public static function setCurrentDispatcher(CApi_Dispatcher $dispatcher = null) {
+        static::$dispatcher = $dispatcher;
     }
 }
