@@ -4,7 +4,7 @@ class CApi_OAuth_UserProvider implements CAuth_UserProviderInterface {
     /**
      * The user provider instance.
      *
-     * @var \Illuminate\Contracts\Auth\UserProvider
+     * @var \CAuth_UserProviderInterface
      */
     protected $provider;
 
@@ -38,6 +38,13 @@ class CApi_OAuth_UserProvider implements CAuth_UserProviderInterface {
     /**
      * @inheritdoc
      */
+    public function retrieveByObject($obj) {
+        return $this->provider->retrieveById(c::optional($obj)->user_id);
+    }
+
+    /**
+     * @inheritdoc
+     */
     public function retrieveByToken($identifier, $token) {
         return $this->provider->retrieveByToken($identifier, $token);
     }
@@ -45,7 +52,7 @@ class CApi_OAuth_UserProvider implements CAuth_UserProviderInterface {
     /**
      * @inheritdoc
      */
-    public function updateRememberToken(CAuth_AuthenticatableInterface $user, $token) {
+    public function updateRememberToken($user, $token) {
         $this->provider->updateRememberToken($user, $token);
     }
 
@@ -70,5 +77,9 @@ class CApi_OAuth_UserProvider implements CAuth_UserProviderInterface {
      */
     public function getProviderName() {
         return $this->providerName;
+    }
+
+    public function hasher() {
+        return $this->provider->hasher();
     }
 }

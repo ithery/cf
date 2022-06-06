@@ -1,4 +1,6 @@
 <?php
+use Lcobucci\JWT\Parser;
+use Lcobucci\JWT\Configuration;
 use League\OAuth2\Server\CryptKey;
 use League\OAuth2\Server\ResourceServer;
 use League\OAuth2\Server\AuthorizationServer;
@@ -20,13 +22,33 @@ class CApi_OAuth_Loader {
 
     private $bridgeRefreshTokenRepository;
 
+    private $bridgeAccessTokenRepository;
+
+    private $bridgeUserRepository;
+
+    private $clientRepository;
+
+    private $tokenRepository;
+
+    private $resourceServer;
+
+    /**
+     * @var \CCrypt_EncrypterInterface
+     */
+    private $encrypter;
+
+    /**
+     * @var \Lcobucci\JWT\Parser
+     */
+    private $jwtParser;
+
     public function __construct($apiGroup) {
         $this->apiGroup = $apiGroup;
         $this->registerAuthorizationServer();
-        // $this->registerClientRepository();
-        // $this->registerJWTParser();
-        // $this->registerResourceServer();
-        // $this->registerGuard();
+        $this->registerClientRepository();
+        $this->registerJWTParser();
+        $this->registerResourceServer();
+        $this->registerGuard();
     }
 
     /**
@@ -36,9 +58,9 @@ class CApi_OAuth_Loader {
      */
     public function makeAuthorizationServer() {
         return new AuthorizationServer(
-            new CApi_OAuth_Bridge_ClientRepository(new CApi_OAuth_ClientRepository()),
-            new CApi_OAuth_Bridge_AccessTokenRepository(new CApi_OAuth_TokenRepository()),
-            new CApi_OAuth_Bridge_ScopeRepository(new CApi_OAuth_TokenRepository()),
+            new CApi_OAuth_Bridge_ClientRepository($this->getClientRepository()),
+            new CApi_OAuth_Bridge_AccessTokenRepository($this->getTokenRepository()),
+            new CApi_OAuth_Bridge_ScopeRepository(),
             $this->makeCryptKey('private'),
             CCrypt::encrypter()->getKey(),
             CApi::oauth()->authorizationServerResponseType
@@ -139,7 +161,7 @@ class CApi_OAuth_Loader {
      */
     protected function makePasswordGrant() {
         $grant = new PasswordGrant(
-            new CApi_OAuth_Bridge_UserRepository(),
+            $this->getBridgeUserRepository(),
             $this->getBridgeRefreshTokenRepository(),
         );
 
@@ -163,11 +185,7 @@ class CApi_OAuth_Loader {
      * @return void
      */
     protected function registerClientRepository() {
-        $this->app->singleton(ClientRepository::class, function ($container) {
-            $config = $container->make('config')->get('passport.personal_access_client');
-
-            return new ClientRepository($config['id'] ?? null, $config['secret'] ?? null);
-        });
+        $this->getClientRepository();
     }
 
     /**
@@ -176,9 +194,7 @@ class CApi_OAuth_Loader {
      * @return void
      */
     protected function registerJWTParser() {
-        $this->app->singleton(Parser::class, function () {
-            return Configuration::forUnsecuredSigner()->parser();
-        });
+        $this->getJwtParser();
     }
 
     /**
@@ -187,12 +203,7 @@ class CApi_OAuth_Loader {
      * @return void
      */
     protected function registerResourceServer() {
-        $this->app->singleton(ResourceServer::class, function ($container) {
-            return new ResourceServer(
-                $container->make(Bridge\AccessTokenRepository::class),
-                $this->makeCryptKey('public')
-            );
-        });
+        $this->getResourceServer();
     }
 
     /**
@@ -235,11 +246,11 @@ class CApi_OAuth_Loader {
     protected function makeGuard(array $config) {
         return new CAuth_Guard_RequestGuard(function ($request) use ($config) {
             return (new CApi_OAuth_Guard_TokenGuard(
-                $this->app->make(ResourceServer::class),
-                new PassportUserProvider(Auth::createUserProvider($config['provider']), $config['provider']),
-                $this->app->make(TokenRepository::class),
-                $this->app->make(ClientRepository::class),
-                $this->app->make('encrypter')
+                $this->getResourceServer(),
+                new CApi_OAuth_UserProvider(c::auth()->createUserProvider($config['provider']), $config['provider']),
+                $this->getTokenRepository(),
+                $this->getClientRepository(),
+                $this->getEncrypter()
             ))->user($request);
         }, $this->app['request']);
     }
@@ -250,9 +261,9 @@ class CApi_OAuth_Loader {
      * @return void
      */
     protected function deleteCookieOnLogout() {
-        Event::listen(Logout::class, function () {
-            if (Request::hasCookie(CApi::oauth()->cookie())) {
-                Cookie::queue(Cookie::forget(CApi::oauth()->cookie()));
+        CEvent::dispatcher()->listen(CAuth_Event_Logout::class, function () {
+            if (c::request()->hasCookie(CApi::oauth()->cookie())) {
+                CHTTP::cookie()->queue(CHTTP::cookie()->forget(CApi::oauth()->cookie()));
             }
         });
     }
@@ -263,5 +274,63 @@ class CApi_OAuth_Loader {
         }
 
         return $this->bridgeRefreshTokenRepository;
+    }
+
+    protected function getBridgeAccessTokenRepository() {
+        if ($this->bridgeAccessTokenRepository == null) {
+            $this->bridgeAccessTokenRepository = new CApi_OAuth_Bridge_AccessTokenRepository($this->getTokenRepository());
+        }
+
+        return $this->bridgeAccessTokenRepository;
+    }
+
+    protected function getBridgeUserRepository() {
+        if ($this->bridgeUserRepository == null) {
+            $this->bridgeUserRepository = new CApi_OAuth_Bridge_UserRepository($this->apiGroup);
+        }
+
+        return $this->bridgeUserRepository;
+    }
+
+    protected function getResourceServer() {
+        if ($this->resourceServer == null) {
+            $this->resourceServer = new ResourceServer($this->getBridgeAccessTokenRepository(), $this->makeCryptKey('public'));
+        }
+
+        return $this->resourceServer;
+    }
+
+    protected function getClientRepository() {
+        if ($this->clientRepository == null) {
+            $personalAccessClientId = CF::config('api.groups.' . $this->apiGroup . '.oauth.personal_access_client.id');
+            $personalAccessClientSecret = CF::config('api.groups.' . $this->apiGroup . '.oauth.personal_access_client.secret');
+            $this->clientRepository = new CApi_OAuth_ClientRepository($personalAccessClientId, $personalAccessClientSecret);
+        }
+
+        return $this->clientRepository;
+    }
+
+    protected function getTokenRepository() {
+        if ($this->tokenRepository == null) {
+            $this->tokenRepository = new CApi_OAuth_TokenRepository();
+        }
+
+        return $this->tokenRepository;
+    }
+
+    protected function getEncrypter() {
+        if ($this->encrypter == null) {
+            $this->encrypter = CCrypt::encrypter();
+        }
+
+        return $this->encrypter;
+    }
+
+    protected function getJwtParser() {
+        if ($this->jwtParser == null) {
+            $this->jwtParser = Configuration::forUnsecuredSigner()->parser();
+        }
+
+        return $this->jwtParser;
     }
 }

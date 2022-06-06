@@ -1,5 +1,8 @@
 <?php
 
+use League\OAuth2\Server\ResourceServer;
+use Psr\Http\Message\ServerRequestInterface;
+
 class CApi_OAuth {
     /**
      * Indicates if the implicit grant type is enabled.
@@ -77,7 +80,7 @@ class CApi_OAuth {
      *
      * @var string
      */
-    public $cookie = 'laravel_token';
+    public $cookie = 'cf_oauth_token';
 
     /**
      * Indicates if Passport should ignore incoming CSRF tokens.
@@ -395,13 +398,13 @@ class CApi_OAuth {
     /**
      * Set the current client for the application with the given scopes.
      *
-     * @param \Laravel\Passport\Client $client
-     * @param array                    $scopes
+     * @param \CApi_OAuth_Model_OAuthClient $client
+     * @param array                         $scopes
      *
-     * @return \Laravel\Passport\Client
+     * @return \CApi_OAuth_Model_OAuthClient
      */
     public static function actingAsClient($client, $scopes = []) {
-        $token = app(self::tokenModel());
+        $token = c::container(self::tokenModel());
 
         $token->client_id = $client->id;
         $token->setRelation('client', $client);
@@ -416,12 +419,12 @@ class CApi_OAuth {
                     ->withAttribute('oauth_scopes', $token->scopes);
             });
 
-        app()->instance(ResourceServer::class, $mock);
+        c::container()->instance(ResourceServer::class, $mock);
 
-        $mock = Mockery::mock(TokenRepository::class);
+        $mock = Mockery::mock(CApi_OAuth_TokenRepository::class);
         $mock->shouldReceive('find')->andReturn($token);
 
-        app()->instance(TokenRepository::class, $mock);
+        c::container()->instance(CApi_OAuth_TokenRepository::class, $mock);
 
         return $client;
     }
@@ -628,6 +631,32 @@ class CApi_OAuth {
         $this->hashesClientSecrets = true;
 
         return $this;
+    }
+
+    /**
+     * Specify the callback that should be invoked to generate encryption keys for encrypting JWT tokens.
+     *
+     * @param callable $callback
+     *
+     * @return static
+     */
+    public function encryptTokensUsing($callback) {
+        $this->tokenEncryptionKeyCallback = $callback;
+
+        return $this;
+    }
+
+    /**
+     * Generate an encryption key for encrypting JWT tokens.
+     *
+     * @param \CCrypt_EncrypterInterface $encrypter
+     *
+     * @return string
+     */
+    public static function tokenEncryptionKey(CCrypt_EncrypterInterface $encrypter) {
+        return is_callable(static::$tokenEncryptionKeyCallback)
+            ? (static::$tokenEncryptionKeyCallback)($encrypter)
+            : $encrypter->getKey();
     }
 
     /**

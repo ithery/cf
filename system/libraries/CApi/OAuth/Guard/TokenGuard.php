@@ -2,18 +2,9 @@
 
 use Firebase\JWT\JWT;
 use Firebase\JWT\Key;
-use Illuminate\Http\Request;
-use Laravel\Passport\Passport;
-use Illuminate\Container\Container;
-use Laravel\Passport\TransientToken;
-use Laravel\Passport\TokenRepository;
 use Nyholm\Psr7\Factory\Psr17Factory;
-use Laravel\Passport\ClientRepository;
-use Illuminate\Cookie\CookieValuePrefix;
 use League\OAuth2\Server\ResourceServer;
-use Laravel\Passport\PassportUserProvider;
-use Illuminate\Contracts\Encryption\Encrypter;
-use Illuminate\Contracts\Debug\ExceptionHandler;
+
 use Illuminate\Cookie\Middleware\EncryptCookies;
 use League\OAuth2\Server\Exception\OAuthServerException;
 use Symfony\Bridge\PsrHttpMessage\Factory\PsrHttpFactory;
@@ -50,27 +41,27 @@ class CApi_OAuth_Guard_TokenGuard {
     /**
      * The encrypter implementation.
      *
-     * @var \Illuminate\Contracts\Encryption\Encrypter
+     * @var \CCrypt_EncrypterInterface
      */
     protected $encrypter;
 
     /**
      * Create a new token guard instance.
      *
-     * @param \League\OAuth2\Server\ResourceServer       $server
-     * @param \Laravel\Passport\PassportUserProvider     $provider
-     * @param \Laravel\Passport\TokenRepository          $tokens
-     * @param \Laravel\Passport\ClientRepository         $clients
-     * @param \Illuminate\Contracts\Encryption\Encrypter $encrypter
+     * @param \League\OAuth2\Server\ResourceServer $server
+     * @param \CApi_OAuth_UserProvider             $provider
+     * @param \CApi_OAuth_TokenRepository          $tokens
+     * @param \CApi_OAuth_ClientRepository         $clients
+     * @param \CCrypt_EncrypterInterface           $encrypter
      *
      * @return void
      */
     public function __construct(
         ResourceServer $server,
-        PassportUserProvider $provider,
-        TokenRepository $tokens,
-        ClientRepository $clients,
-        Encrypter $encrypter
+        CApi_OAuth_UserProvider $provider,
+        CApi_OAuth_TokenRepository $tokens,
+        CApi_OAuth_ClientRepository $clients,
+        CCrypt_EncrypterInterface $encrypter
     ) {
         $this->server = $server;
         $this->tokens = $tokens;
@@ -82,11 +73,11 @@ class CApi_OAuth_Guard_TokenGuard {
     /**
      * Determine if the requested provider matches the client's provider.
      *
-     * @param \Illuminate\Http\Request $request
+     * @param \CHTTP_Request $request
      *
      * @return bool
      */
-    protected function hasValidProvider(Request $request) {
+    protected function hasValidProvider(CHTTP_Request $request) {
         $client = $this->client($request);
 
         if ($client && !$client->provider) {
@@ -99,14 +90,14 @@ class CApi_OAuth_Guard_TokenGuard {
     /**
      * Get the user for the incoming request.
      *
-     * @param \Illuminate\Http\Request $request
+     * @param \CHTTP_Request $request
      *
      * @return mixed
      */
-    public function user(Request $request) {
+    public function user(CHTTP_Request $request) {
         if ($request->bearerToken()) {
             return $this->authenticateViaBearerToken($request);
-        } elseif ($request->cookie(Passport::cookie())) {
+        } elseif ($request->cookie(CApi::oauth()->cookie())) {
             return $this->authenticateViaCookie($request);
         }
     }
@@ -114,11 +105,11 @@ class CApi_OAuth_Guard_TokenGuard {
     /**
      * Get the client for the incoming request.
      *
-     * @param \Illuminate\Http\Request $request
+     * @param \CHTTP_Request $request
      *
      * @return mixed
      */
-    public function client(Request $request) {
+    public function client(CHTTP_Request $request) {
         if ($request->bearerToken()) {
             if (!$psr = $this->getPsrRequestViaBearerToken($request)) {
                 return;
@@ -127,7 +118,7 @@ class CApi_OAuth_Guard_TokenGuard {
             return $this->clients->findActive(
                 $psr->getAttribute('oauth_client_id')
             );
-        } elseif ($request->cookie(Passport::cookie())) {
+        } elseif ($request->cookie(CApi::oauth()->cookie())) {
             if ($token = $this->getTokenViaCookie($request)) {
                 return $this->clients->findActive($token['aud']);
             }
@@ -137,7 +128,7 @@ class CApi_OAuth_Guard_TokenGuard {
     /**
      * Authenticate the incoming request via the Bearer token.
      *
-     * @param \Illuminate\Http\Request $request
+     * @param \CHTTP_Request $request
      *
      * @return mixed
      */
@@ -183,7 +174,7 @@ class CApi_OAuth_Guard_TokenGuard {
     /**
      * Authenticate and get the incoming PSR-7 request via the Bearer token.
      *
-     * @param \Illuminate\Http\Request $request
+     * @param \CHTTP_Request $request
      *
      * @return \Psr\Http\Message\ServerRequestInterface
      */
@@ -203,16 +194,14 @@ class CApi_OAuth_Guard_TokenGuard {
         } catch (OAuthServerException $e) {
             $request->headers->set('Authorization', '', true);
 
-            Container::getInstance()->make(
-                ExceptionHandler::class
-            )->report($e);
+            CException::exceptionHandler()->report($e);
         }
     }
 
     /**
      * Authenticate the incoming request via the token cookie.
      *
-     * @param \Illuminate\Http\Request $request
+     * @param \CHTTP_Request $request
      *
      * @return mixed
      */
@@ -225,14 +214,14 @@ class CApi_OAuth_Guard_TokenGuard {
         // the user model. The transient token assumes it has all scopes since the user
         // is physically logged into the application via the application's interface.
         if ($user = $this->provider->retrieveById($token['sub'])) {
-            return $user->withAccessToken(new TransientToken());
+            return $user->withAccessToken(new CApi_OAuth_TransientToken());
         }
     }
 
     /**
      * Get the token cookie via the incoming request.
      *
-     * @param \Illuminate\Http\Request $request
+     * @param \CHTTP_Request $request
      *
      * @return mixed
      */
@@ -249,8 +238,9 @@ class CApi_OAuth_Guard_TokenGuard {
         // We will compare the CSRF token in the decoded API token against the CSRF header
         // sent with the request. If they don't match then this request isn't sent from
         // a valid source and we won't authenticate the request for further handling.
-        if (!Passport::$ignoreCsrfToken && (!$this->validCsrf($token, $request)
-            || time() >= $token['expiry'])) {
+        if (!CApi::oauth()->ignoreCsrfToken && (!$this->validCsrf($token, $request)
+            || time() >= $token['expiry'])
+        ) {
             return;
         }
 
@@ -260,22 +250,22 @@ class CApi_OAuth_Guard_TokenGuard {
     /**
      * Decode and decrypt the JWT token cookie.
      *
-     * @param \Illuminate\Http\Request $request
+     * @param \CHTTP_Request $request
      *
      * @return array
      */
     protected function decodeJwtTokenCookie($request) {
         return (array) JWT::decode(
-            CookieValuePrefix::remove($this->encrypter->decrypt($request->cookie(Passport::cookie()), Passport::$unserializesCookies)),
-            new Key(Passport::tokenEncryptionKey($this->encrypter), 'HS256')
+            CHTTP_Cookie_CookieValuePrefix::remove($this->encrypter->decrypt($request->cookie(CApi::oauth()->cookie()), CApi::oauth()->unserializesCookies)),
+            new Key(CApi::oauth()->tokenEncryptionKey($this->encrypter), 'HS256')
         );
     }
 
     /**
      * Determine if the CSRF / header are valid and match.
      *
-     * @param array                    $token
-     * @param \Illuminate\Http\Request $request
+     * @param array          $token
+     * @param \CHTTP_Request $request
      *
      * @return bool
      */
@@ -289,7 +279,7 @@ class CApi_OAuth_Guard_TokenGuard {
     /**
      * Get the CSRF token from the request.
      *
-     * @param \Illuminate\Http\Request $request
+     * @param \CHTTP_Request $request
      *
      * @return string
      */
@@ -297,7 +287,7 @@ class CApi_OAuth_Guard_TokenGuard {
         $token = $request->header('X-CSRF-TOKEN');
 
         if (!$token && $header = $request->header('X-XSRF-TOKEN')) {
-            $token = CookieValuePrefix::remove($this->encrypter->decrypt($header, static::serialized()));
+            $token = CHTTP_Cookie_CookieValuePrefix::remove($this->encrypter->decrypt($header, static::serialized()));
         }
 
         return $token;
@@ -309,6 +299,6 @@ class CApi_OAuth_Guard_TokenGuard {
      * @return bool
      */
     public static function serialized() {
-        return EncryptCookies::serialized('XSRF-TOKEN');
+        return CHTTP_Cookie_Middleware_EncryptCookies::serialized('XSRF-TOKEN');
     }
 }
