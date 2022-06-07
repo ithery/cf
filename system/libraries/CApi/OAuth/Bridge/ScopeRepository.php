@@ -6,10 +6,19 @@ use League\OAuth2\Server\Repositories\ScopeRepositoryInterface;
 
 class CApi_OAuth_Bridge_ScopeRepository implements ScopeRepositoryInterface {
     /**
+     * @var CApi_OAuth
+     */
+    protected $oauth;
+
+    public function __construct(CApi_OAuth $oauth) {
+        $this->oauth = $oauth;
+    }
+
+    /**
      * @inheritdoc
      */
     public function getScopeEntityByIdentifier($identifier) {
-        if (CApi::oauth()->hasScope($identifier)) {
+        if ($this->oauth->hasScope($identifier)) {
             return new CApi_OAuth_Bridge_Scope($identifier);
         }
     }
@@ -30,7 +39,7 @@ class CApi_OAuth_Bridge_ScopeRepository implements ScopeRepositoryInterface {
         }
 
         return c::collect($scopes)->filter(function ($scope) {
-            return CApi::oauth()->hasScope($scope->getIdentifier());
+            return $this->oauth->hasScope($scope->getIdentifier());
         })->values()->all();
     }
 }

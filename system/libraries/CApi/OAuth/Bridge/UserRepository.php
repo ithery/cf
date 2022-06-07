@@ -5,28 +5,19 @@ use League\OAuth2\Server\Repositories\UserRepositoryInterface;
 
 class CApi_OAuth_Bridge_UserRepository implements UserRepositoryInterface {
     /**
-     * The hasher implementation.
-     *
-     * @var CCrypt_HasherInterface
+     * @var CApi_OAuth
      */
-    protected $apiGroup;
+    protected $oauth;
 
-    /**
-     * Create a new repository instance.
-     *
-     * @param mixed $apiGroup
-     *
-     * @return void
-     */
-    public function __construct($apiGroup) {
-        $this->apiGroup = $apiGroup;
+    public function __construct(CApi_OAuth $oauth) {
+        $this->oauth = $oauth;
     }
 
     /**
      * @inheritdoc
      */
     public function getUserEntityByUserCredentials($username, $password, $grantType, ClientEntityInterface $clientEntity) {
-        $guard = CF::config('api.groups.' . $this->apiGroup . '.auth.guard', 'api');
+        $guard = $this->oauth->getGuardName();
 
         $provider = $clientEntity->provider ?: CF::config('auth.guards.' . $guard . '.provider');
 
