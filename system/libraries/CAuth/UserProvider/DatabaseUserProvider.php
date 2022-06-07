@@ -69,7 +69,7 @@ class CAuth_UserProvider_DatabaseUserProvider extends CAuth_UserProviderAbstract
      * @param mixed  $identifier
      * @param string $token
      *
-     * @return null|\Illuminate\Contracts\Auth\Authenticatable
+     * @return null|\CAuth_AuthenticatableInterface
      */
     public function retrieveByToken($identifier, $token) {
         $user = $this->getGenericUser(
@@ -99,7 +99,7 @@ class CAuth_UserProvider_DatabaseUserProvider extends CAuth_UserProviderAbstract
      *
      * @param array $credentials
      *
-     * @return null|\Illuminate\Contracts\Auth\Authenticatable
+     * @return null|\CAuth_AuthenticatableInterface
      */
     public function retrieveByCredentials(array $credentials) {
         if (empty($credentials)

@@ -327,7 +327,7 @@ trait CTesting_Concern_MakesHttpRequests {
      * @param array  $data
      * @param array  $headers
      *
-     * @return \Illuminate\Testing\TestResponse
+     * @return \CTesting_TestResponse
      */
     public function put($uri, array $data = [], array $headers = []) {
         $server = $this->transformHeadersToServerVars($headers);

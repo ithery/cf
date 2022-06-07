@@ -67,6 +67,7 @@ class CModel_MongoDB_Relation_BelongsToMany extends CModel_Relation_BelongsToMan
     protected function setWhere() {
         $foreign = $this->getForeignKey();
         $this->query->where($foreign, '=', $this->parent->getKey());
+
         return $this;
     }
 
@@ -76,6 +77,7 @@ class CModel_MongoDB_Relation_BelongsToMany extends CModel_Relation_BelongsToMan
     public function save(CModel $model, array $joining = [], $touch = true) {
         $model->save(['touch' => false]);
         $this->attach($model, $joining, $touch);
+
         return $model;
     }
 
@@ -89,6 +91,7 @@ class CModel_MongoDB_Relation_BelongsToMany extends CModel_Relation_BelongsToMan
         // accomplish this which will insert the record and any more attributes.
         $instance->save(['touch' => false]);
         $this->attach($instance, $joining, $touch);
+
         return $instance;
     }
 
@@ -137,6 +140,7 @@ class CModel_MongoDB_Relation_BelongsToMany extends CModel_Relation_BelongsToMan
         if (count($changes['attached']) || count($changes['updated'])) {
             $this->touchIfTouching();
         }
+
         return $changes;
     }
 
@@ -195,6 +199,7 @@ class CModel_MongoDB_Relation_BelongsToMany extends CModel_Relation_BelongsToMan
         if ($touch) {
             $this->touchIfTouching();
         }
+
         return count($ids);
     }
 
@@ -212,6 +217,7 @@ class CModel_MongoDB_Relation_BelongsToMany extends CModel_Relation_BelongsToMan
                 $dictionary[$item][] = $result;
             }
         }
+
         return $dictionary;
     }
 
@@ -256,7 +262,7 @@ class CModel_MongoDB_Relation_BelongsToMany extends CModel_Relation_BelongsToMan
 
     /**
      * Format the sync list so that it is keyed by ID. (Legacy Support)
-     * The original function has been renamed to formatRecordsList since Laravel 5.3
+     * The original function has been renamed to formatRecordsList.
      *
      * @param array $records
      *
@@ -272,6 +278,7 @@ class CModel_MongoDB_Relation_BelongsToMany extends CModel_Relation_BelongsToMan
             }
             $results[$id] = $attributes;
         }
+
         return $results;
     }
 

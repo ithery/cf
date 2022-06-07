@@ -1,5 +1,9 @@
 <?php
-
+/**
+ * Websocket implementation.
+ *
+ * @see https://github.com/beyondcode/laravel-websockets
+ */
 class CWebSocket {
     /**
      * @var CWebSocket_Contract_ChannelManagerInterface

@@ -61,7 +61,7 @@ trait CApp_Auth_Controller_AuthTrait {
      * @param CHTTP_Request $request
      * @param null|mixed    $callback
      *
-     * @return \Laravel\Fortify\Contracts\LogoutResponse
+     * @return \CApp_Auth_Contract_LogoutResponseInterface
      */
     public function destroy($request, $callback = null) {
         c::auth()->guard()->logout();

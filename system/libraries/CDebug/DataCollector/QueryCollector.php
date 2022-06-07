@@ -257,8 +257,8 @@ class CDebug_DataCollector_QueryCollector extends CDebug_DataCollector implement
     /**
      * Collect a database transaction event.
      *
-     * @param string                          $event
-     * @param \Illuminate\Database\Connection $connection
+     * @param string     $event
+     * @param \CDatabase $connection
      *
      * @return array
      */

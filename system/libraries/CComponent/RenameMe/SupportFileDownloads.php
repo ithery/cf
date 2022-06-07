@@ -1,15 +1,14 @@
 <?php
 
-use Illuminate\Support\Str;
 use Symfony\Component\HttpFoundation\StreamedResponse;
 use Symfony\Component\HttpFoundation\BinaryFileResponse;
 
 class CComponent_RenameMe_SupportFileDownloads {
-    public static function init() {
-        return new static;
-    }
-
     protected $downloadsById = [];
+
+    public static function init() {
+        return new static();
+    }
 
     public function __construct() {
         CComponent_Manager::instance()->listen('action.returned', function ($component, $action, $returned) {

@@ -305,7 +305,7 @@ class CHTTP_Request extends SymfonyRequest implements CInterface_Arrayable, Arra
     }
 
     /**
-     * This method belongs to Symfony HttpFoundation and is not usually needed when using Laravel.
+     * This method belongs to Symfony HttpFoundation and is not usually needed.
      *
      * Instead, you may use the "input" method.
      *

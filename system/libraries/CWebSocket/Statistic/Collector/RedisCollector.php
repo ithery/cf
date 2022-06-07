@@ -1,9 +1,6 @@
 <?php
 
-use Illuminate\Cache\RedisLock;
 use React\Promise\PromiseInterface;
-use BeyondCode\LaravelWebSockets\Helpers;
-use BeyondCode\LaravelWebSockets\Statistics\Statistic;
 
 class CWebSocket_Statistic_Collector_RedisCollector extends CWebSocket_Statistic_Collector_MemoryCollector {
     /**
@@ -219,7 +216,7 @@ class CWebSocket_Statistic_Collector_RedisCollector extends CWebSocket_Statistic
                         ->then(function ($list) use ($appId, &$appsWithStatistics) {
                             $appsWithStatistics[$appId] = $this->arrayToStatisticInstance(
                                 $appId,
-                                Helpers::redisListToArray($list)
+                                CWebSocket_Helper::redisListToArray($list)
                             );
                         });
                 }
@@ -233,7 +230,7 @@ class CWebSocket_Statistic_Collector_RedisCollector extends CWebSocket_Statistic
      *
      * @param string|int $appId
      *
-     * @return PromiseInterface[\BeyondCode\LaravelWebSockets\Statistics\Statistic|null]
+     * @return PromiseInterface[\CWebSocket_Statistic|null]
      */
     public function getAppStatistics($appId) {
         return $this->channelManager
