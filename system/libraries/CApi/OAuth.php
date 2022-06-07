@@ -183,44 +183,80 @@ class CApi_OAuth {
      */
     private $loader;
 
+    /**
+     * @var CApi_OAuth_RouteManager
+     */
+    private $routeManager;
+
+    /**
+     * @var CApi_OAuth_ViewManager
+     */
+    private $viewManager;
+
     public function __construct($apiGroup) {
         $this->apiGroup = $apiGroup;
-        $this->loader = new CApi_OAuth_Loader($this);
+        $this->routeManager = new CApi_OAuth_RouteManager();
+        $this->viewManager = new CApi_OAuth_ViewManager();
+    }
+
+    /**
+     * @return CApi_OAuth_RouteManager
+     */
+    public function routeManager() {
+        return $this->routeManager;
+    }
+
+    /**
+     * @return CApi_OAuth_ViewManager
+     */
+    public function viewManager() {
+        return $this->viewManager;
+    }
+
+    /**
+     * @return CApi_OAuth_Loader
+     */
+    public function loader() {
+        if ($this->loader == null) {
+            $this->loader = new CApi_OAuth_Loader($this);
+        }
+
+        return $this->loader;
     }
 
     /**
      * @return \League\OAuth2\Server\AuthorizationServer
      */
     public function authorizationServer() {
-        return $this->loader->getAuthorizationServer();
+        return $this->loader()->getAuthorizationServer();
     }
 
     /**
      * @return \CApi_OAuth_TokenRepository
      */
     public function tokenRepository() {
-        return $this->loader->getTokenRepository();
+        return $this->loader()->getTokenRepository();
     }
 
     /**
      * @return \CApi_OAuth_Bridge_UserRepository
      */
     public function bridgeUserRepository() {
-        return $this->loader->getBridgeUserRepository();
+        return $this->loader()->getBridgeUserRepository();
     }
 
     /**
      * @return \CApi_OAuth_ClientRepository
      */
     public function clientRepository() {
-        return $this->loader->getClientRepository();
+        return $this->loader()->getClientRepository();
     }
 
     /**
      * @return \League\OAuth2\Server\ResourceServer
      */
     public function resourceServer() {
-        return $this->loader->getResourceServer();
+        return $this->loader()->getResourceServer();
     }
 
     /**

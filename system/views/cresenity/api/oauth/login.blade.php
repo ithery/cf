@@ -42,8 +42,14 @@
                     </div>
                     <div class="card-body">
                             <!-- Login Button -->
-                            <form method="post" action="{{ c::url('api/app/auth/member/authorization/login') }}">
+                            <form method="post" action="{{ $loginUri }}">
                                 @csrf
+
+                                @if(c::request()->error)
+                                <div class="alert alert-danger mb-3">
+                                    {{ c::request()->error }}
+                                </div>
+                                @endif
                                 <!-- Email input -->
                                 <div class="form-outline mb-4">
                                     <label class="form-label" for="form2Example1">Email address</label>
@@ -58,7 +64,7 @@
                                 <input type="hidden" name="client_id" value="{{ $client->oauth_client_id }}">
                                 <input type="hidden" name="redirect_uri" value="{{ $redirectUri }}">
                                 <input type="hidden" name="auth_token" value="{{ $authToken }}">
-                                <button type="submit" class="btn btn-success btn-signin">Sign in</button>
+                                <button type="submit" class="btn btn-success btn-signin w-100">Sign in</button>
                             </form>
 
                     </div>
