@@ -324,7 +324,7 @@ class CApi_OAuth_Loader {
 
     public function getBridgeUserRepository() {
         if ($this->bridgeUserRepository == null) {
-            $this->bridgeUserRepository = new CApi_OAuth_Bridge_UserRepository($this->apiGroup);
+            $this->bridgeUserRepository = new CApi_OAuth_Bridge_UserRepository($this->oauth);
         }
 
         return $this->bridgeUserRepository;
