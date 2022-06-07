@@ -8,8 +8,11 @@ defined('SYSPATH') or die('No direct access allowed.');
  *
  * @since Nov 30, 2020
  */
-CPagination_Paginator::useBootstrap();
+CPolyfill::php74();
+CPolyfill::php80();
+CPolyfill::php81();
 
+CPagination_Paginator::useBootstrap();
 CBootstrap::instance()->addBootstrapper([
     CApp_Bootstrapper_DependencyChecker::class,
 ]);
