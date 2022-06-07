@@ -129,8 +129,10 @@ class CApi_OAuth_PersonalAccessTokenFactory {
      * @return \CApi_OAuth_Model_OAuthAccessToken
      */
     protected function findAccessToken(array $response) {
+        $parsedToken = $this->jwt->parse($response['access_token']);
+        /** @var \Lcobucci\JWT\UnencryptedToken $parsedToken */
         return $this->tokens->find(
-            $this->jwt->parse($response['access_token'])->claims()->get('jti')
+            $parsedToken->claims()->get('jti')
         );
     }
 }
