@@ -42,8 +42,14 @@
                     </div>
                     <div class="card-body">
                             <!-- Login Button -->
-                            <form method="post" action="{{ c::url('api/app/auth/member/authorization/login') }}">
+                            <form method="post" action="{{ $loginUri }}">
                                 @csrf
+
+                                @if(c::request()->error)
+                                <div class="alert alert-danger mb-3">
+                                    {{ c::request()->error }}
+                                </div>
+                                @endif
                                 <!-- Email input -->
                                 <div class="form-outline mb-4">
                                     <label class="form-label" for="form2Example1">Email address</label>
