@@ -353,7 +353,7 @@ class CHTTP_Request extends SymfonyRequest implements CInterface_Arrayable, Arra
     }
 
     /**
-     * Create a new request instance from the given Laravel request.
+     * Create a new request instance from the given request.
      *
      * @param \CHTTP_Request      $from
      * @param null|\CHTTP_Request $to
