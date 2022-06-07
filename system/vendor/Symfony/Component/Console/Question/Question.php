@@ -11,8 +11,8 @@
 
 namespace Symfony\Component\Console\Question;
 
-use Symfony\Component\Console\Exception\InvalidArgumentException;
 use Symfony\Component\Console\Exception\LogicException;
+use Symfony\Component\Console\Exception\InvalidArgumentException;
 
 /**
  * Represents a Question.
@@ -21,14 +21,23 @@ use Symfony\Component\Console\Exception\LogicException;
  */
 class Question {
     private $question;
+
     private $attempts;
+
     private $hidden = false;
+
     private $hiddenFallback = true;
+
     private $autocompleterCallback;
+
     private $validator;
+
     private $default;
+
     private $normalizer;
+
     private $trimmable = true;
+
     private $multiline = false;
 
     /**
@@ -68,9 +77,11 @@ class Question {
     /**
      * Sets whether the user response should accept newline characters.
      *
+     * @param bool $multiline
+     *
      * @return $this
      */
-    public function setMultiline(bool $multiline) {
+    public function setMultiline($multiline) {
         $this->multiline = $multiline;
 
         return $this;
@@ -90,9 +101,9 @@ class Question {
      *
      * @param bool $hidden
      *
-     * @return $this
-     *
      * @throws LogicException In case the autocompleter is also used
+     *
+     * @return $this
      */
     public function setHidden($hidden) {
         if ($this->autocompleterCallback) {
@@ -129,7 +140,7 @@ class Question {
     /**
      * Gets values for the autocompleter.
      *
-     * @return iterable|null
+     * @return null|iterable
      */
     public function getAutocompleterValues() {
         $callback = $this->getAutocompleterCallback();
@@ -140,11 +151,11 @@ class Question {
     /**
      * Sets values for the autocompleter.
      *
-     * @return $this
+     * @param mixed $values
      *
      * @throws LogicException
      *
-     * @param mixed $values
+     * @return $this
      */
     public function setAutocompleterValues($values) {
         if (\is_array($values)) {
@@ -156,7 +167,7 @@ class Question {
         } elseif ($values instanceof \Traversable) {
             $valueCache = null;
             $callback = static function () use ($values, &$valueCache) {
-                return $valueCache ?? $valueCache = iterator_to_array($values, false);
+                return $valueCache ?: $valueCache = iterator_to_array($values, false);
             };
         } else {
             $callback = null;
@@ -168,7 +179,7 @@ class Question {
     /**
      * Gets the callback function used for the autocompleter.
      */
-    public function getAutocompleterCallback(): ?callable {
+    public function getAutocompleterCallback() {
         return $this->autocompleterCallback;
     }
 
@@ -192,9 +203,9 @@ class Question {
     /**
      * Sets a validator for the question.
      *
-     * @return $this
-     *
      * @param null|mixed $validator
+     *
+     * @return $this
      */
     public function setValidator($validator = null) {
         $this->validator = $validator;
@@ -205,7 +216,7 @@ class Question {
     /**
      * Gets the validator for the question.
      *
-     * @return callable|null
+     * @return null|callable
      */
     public function getValidator() {
         return $this->validator;
@@ -216,11 +227,11 @@ class Question {
      *
      * Null means an unlimited number of attempts.
      *
-     * @return $this
+     * @param mixed $attempts
      *
      * @throws InvalidArgumentException in case the number of attempts is invalid
      *
-     * @param mixed $attempts
+     * @return $this
      */
     public function setMaxAttempts($attempts) {
         if (null !== $attempts) {
@@ -240,7 +251,7 @@ class Question {
      *
      * Null means an unlimited number of attempts.
      *
-     * @return int|null
+     * @return null|int
      */
     public function getMaxAttempts() {
         return $this->attempts;
@@ -251,9 +262,9 @@ class Question {
      *
      * The normalizer can be a callable (a string), a closure or a class implementing __invoke.
      *
-     * @return $this
-     *
      * @param mixed $normalizer
+     *
+     * @return $this
      */
     public function setNormalizer($normalizer) {
         $this->normalizer = $normalizer;
@@ -266,7 +277,7 @@ class Question {
      *
      * The normalizer can ba a callable (a string), a closure or a class implementing __invoke.
      *
-     * @return callable|null
+     * @return null|callable
      */
     public function getNormalizer() {
         return $this->normalizer;
@@ -276,14 +287,16 @@ class Question {
         return (bool) \count(array_filter(array_keys($array), 'is_string'));
     }
 
-    public function isTrimmable(): bool {
+    public function isTrimmable() {
         return $this->trimmable;
     }
 
     /**
+     * @param mixed $trimmable
+     *
      * @return $this
      */
-    public function setTrimmable(bool $trimmable) {
+    public function setTrimmable($trimmable) {
         $this->trimmable = $trimmable;
 
         return $this;
