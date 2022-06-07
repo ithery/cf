@@ -100,7 +100,7 @@ abstract class CSocialLogin_OAuth2_AbstractProvider implements CSocialLogin_Abst
     /**
      * The cached user instance.
      *
-     * @var null|\Laravel\Socialite\Two\User
+     * @var null|\CSocialLogin_OAuth2_User
      */
     protected $user;
 
@@ -153,7 +153,7 @@ abstract class CSocialLogin_OAuth2_AbstractProvider implements CSocialLogin_Abst
      *
      * @param array $user
      *
-     * @return \Laravel\Socialite\Two\User
+     * @return \CSocialLogin_OAuth2_User
      */
     abstract protected function mapUserToObject(array $user);
 

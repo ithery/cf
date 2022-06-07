@@ -13,7 +13,7 @@ trait CHTTP_Trait_InteractsWithInput {
      * Retrieve a server variable from the request.
      *
      * @param string            $key
-     * @param string|array|null $default
+     * @param null|string|array $default
      *
      * @return string|array
      */
@@ -36,7 +36,7 @@ trait CHTTP_Trait_InteractsWithInput {
      * Retrieve a header from the request.
      *
      * @param string            $key
-     * @param string|array|null $default
+     * @param null|string|array $default
      *
      * @return string|array
      */
@@ -47,7 +47,7 @@ trait CHTTP_Trait_InteractsWithInput {
     /**
      * Get the bearer token from the request headers.
      *
-     * @return string|null
+     * @return null|string
      */
     public function bearerToken() {
         $header = $this->header('Authorization', '');
@@ -176,7 +176,7 @@ trait CHTTP_Trait_InteractsWithInput {
      * Retrieve an input item from the request.
      *
      * @param string            $key
-     * @param string|array|null $default
+     * @param null|string|array $default
      *
      * @return string|array
      */
@@ -200,7 +200,7 @@ trait CHTTP_Trait_InteractsWithInput {
 
         $input = $this->all();
 
-        $placeholder = new stdClass;
+        $placeholder = new stdClass();
 
         foreach (is_array($keys) ? $keys : func_get_args() as $key) {
             $value = carr::get($input, $key, $placeholder);
@@ -234,7 +234,7 @@ trait CHTTP_Trait_InteractsWithInput {
      * Retrieve a query string item from the request.
      *
      * @param string            $key
-     * @param string|array|null $default
+     * @param null|string|array $default
      *
      * @return string|array
      */
@@ -246,7 +246,7 @@ trait CHTTP_Trait_InteractsWithInput {
      * Retrieve a request payload item from the request.
      *
      * @param string            $key
-     * @param string|array|null $default
+     * @param null|string|array $default
      *
      * @return string|array
      */
@@ -269,7 +269,7 @@ trait CHTTP_Trait_InteractsWithInput {
      * Retrieve a cookie from the request.
      *
      * @param string            $key
-     * @param string|array|null $default
+     * @param null|string|array $default
      *
      * @return string|array
      */
@@ -289,7 +289,7 @@ trait CHTTP_Trait_InteractsWithInput {
     }
 
     /**
-     * Convert the given array of Symfony UploadedFiles to custom Laravel UploadedFiles.
+     * Convert the given array of Symfony UploadedFiles to custom UploadedFiles.
      *
      * @param array $files
      *
@@ -343,7 +343,7 @@ trait CHTTP_Trait_InteractsWithInput {
      * @param string $key
      * @param mixed  $default
      *
-     * @return CHTTP_UploadedFile|array|null
+     * @return null|CHTTP_UploadedFile|array
      */
     public function file($key = null, $default = null) {
         return c::get($this->allFiles(), $key, $default);
@@ -354,7 +354,7 @@ trait CHTTP_Trait_InteractsWithInput {
      *
      * @param string            $source
      * @param string            $key
-     * @param string|array|null $default
+     * @param null|string|array $default
      *
      * @return string|array
      */

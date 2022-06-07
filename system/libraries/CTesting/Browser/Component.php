@@ -11,12 +11,11 @@ abstract class CTesting_Browser_Component {
     /**
      * Assert that the current page contains this component.
      *
-     * @param \Laravel\Dusk\Browser $browser
+     * @param \CTesting_Browser $browser
      *
      * @return void
      */
-    public function assert(Browser $browser) {
-        //
+    public function assert(CTesting_Browser $browser) {
     }
 
     /**
