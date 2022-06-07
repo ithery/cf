@@ -20,7 +20,7 @@ class CApi_OAuth_Model_OAuthPersonalAccessClient extends CModel {
      *
      * @return \CModel_Relation_BelongsTo
      */
-    public function client() {
+    public function oauthClient() {
         return $this->belongsTo(CApi::oauth()->clientModel());
     }
 

@@ -73,7 +73,7 @@ class CApi_OAuth_PersonalAccessTokenFactory {
             $this->createRequest($this->clients->personalAccessClient(), $userId, $scopes)
         );
 
-        $token = tap($this->findAccessToken($response), function ($token) use ($userId, $name) {
+        $token = c::tap($this->findAccessToken($response), function ($token) use ($userId, $name) {
             $this->tokens->save($token->forceFill([
                 'user_id' => $userId,
                 'name' => $name,

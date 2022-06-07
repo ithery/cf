@@ -45,16 +45,20 @@ class CApi_OAuth_Bridge_AccessTokenRepository implements AccessTokenRepositoryIn
      * @inheritdoc
      */
     public function persistNewAccessToken(AccessTokenEntityInterface $accessTokenEntity) {
-        $this->tokenRepository->create([
-            'id' => $accessTokenEntity->getIdentifier(),
+        $tokenData = [
+            'token' => $accessTokenEntity->getIdentifier(),
             'user_id' => $accessTokenEntity->getUserIdentifier(),
-            'client_id' => $accessTokenEntity->getClient()->getIdentifier(),
+            'user_type' => $this->tokenRepository->oauth()->getUserModelFromProvider(),
+            'oauth_client_id' => $accessTokenEntity->getClient()->getIdentifier(),
             'scopes' => $this->scopesToArray($accessTokenEntity->getScopes()),
             'revoked' => false,
-            'created_at' => new DateTime(),
-            'updated_at' => new DateTime(),
+            'created' => c::now(),
+            'createdby' => c::base()->username(),
+            'updated' => c::now(),
+            'updatedby' => c::base()->username(),
             'expires_at' => $accessTokenEntity->getExpiryDateTime(),
-        ]);
+        ];
+        $this->tokenRepository->create($tokenData);
 
         $this->events->dispatch(new CApi_OAuth_Event_AccessTokenCreated(
             $accessTokenEntity->getIdentifier(),

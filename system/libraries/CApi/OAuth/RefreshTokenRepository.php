@@ -86,4 +86,8 @@ class CApi_OAuth_RefreshTokenRepository {
 
         return true;
     }
+
+    public function oauth() {
+        return $this->oauth;
+    }
 }

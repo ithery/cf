@@ -59,7 +59,7 @@ class CAuth_Guard_TokenGuard implements CAuth_Contract_GuardInterface {
     /**
      * Get the currently authenticated user.
      *
-     * @return null|\Illuminate\Contracts\Auth\Authenticatable
+     * @return null|\CAuth_AuthenticatableInterface
      */
     public function user() {
         // If we've already retrieved the user for the current request we can just

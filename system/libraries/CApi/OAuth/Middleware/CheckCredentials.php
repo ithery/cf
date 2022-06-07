@@ -13,6 +13,8 @@ abstract class CApi_OAuth_Middleware_CheckCredentials implements CApi_Contract_A
      */
     protected $group;
 
+    protected $request;
+
     public function setGroup($group) {
         $this->group = $group;
 
@@ -41,7 +43,8 @@ abstract class CApi_OAuth_Middleware_CheckCredentials implements CApi_Contract_A
      *
      * @return mixed
      */
-    public function handle($request, Closure $next, ...$scopes) {
+    public function handle(CApi_HTTP_Request $request, $next, ...$scopes) {
+        $this->request = $request;
         $psr = (new PsrHttpFactory(
             new Psr17Factory(),
             new Psr17Factory(),
@@ -71,7 +74,7 @@ abstract class CApi_OAuth_Middleware_CheckCredentials implements CApi_Contract_A
      * @return void
      */
     protected function validate($psr, $scopes) {
-        $token = $this->repository->find($psr->getAttribute('oauth_access_token_id'));
+        $token = $this->tokenRepository()->findToken($psr->getAttribute('oauth_access_token_id'));
 
         $this->validateCredentials($token);
 

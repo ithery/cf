@@ -29,14 +29,25 @@ class CApi_OAuth_TokenRepository {
     }
 
     /**
-     * Get a token by the given ID.
+     * Get a model by the given ID.
      *
-     * @param string $id
+     * @param int $id
      *
-     * @return \CApi_OAuth_Model_OAuthAccessToken
+     * @return null|\CApi_OAuth_Model_OAuthAccessToken
      */
     public function find($id) {
-        return $this->oauth->token()->where('id', $id)->first();
+        return $this->oauth->token()->where('oauth_access_token_id', $id)->first();
+    }
+
+    /**
+     * Get a model by the given token.
+     *
+     * @param string $token
+     *
+     * @return null|\CApi_OAuth_Model_OAuthAccessToken
+     */
+    public function findToken($token) {
+        return $this->oauth->token()->where('token', $token)->first();
     }
 
     /**
@@ -92,23 +103,23 @@ class CApi_OAuth_TokenRepository {
     /**
      * Revoke an access token.
      *
-     * @param string $id
+     * @param string $tokenStr
      *
      * @return mixed
      */
-    public function revokeAccessToken($id) {
-        return $this->oauth->token()->where('id', $id)->update(['revoked' => true]);
+    public function revokeAccessToken($tokenStr) {
+        return $this->oauth->token()->where('token', $tokenStr)->update(['revoked' => true]);
     }
 
     /**
      * Check if the access token has been revoked.
      *
-     * @param string $id
+     * @param string $tokenStr
      *
      * @return bool
      */
-    public function isAccessTokenRevoked($id) {
-        if ($token = $this->find($id)) {
+    public function isAccessTokenRevoked($tokenStr) {
+        if ($token = $this->findToken($tokenStr)) {
             return $token->revoked;
         }
 
@@ -124,11 +135,26 @@ class CApi_OAuth_TokenRepository {
      * @return null|\CApi_OAuth_Model_OAuthAccessToken
      */
     public function findValidToken($user, $client) {
-        return $client->tokens()
-            ->whereUserId($user->getAuthIdentifier())
+        $userType = $this->oauth->getUserModelFromProvider();
+
+        $query = $client->tokens()
+            ->where('user_id', '=', $user->getAuthIdentifier())
             ->where('revoked', 0)
             ->where('expires_at', '>', CCarbon::now())
             ->latest('expires_at')
             ->first();
+
+        if ($userType) {
+            $query->where('user_type', '=', $userType);
+        }
+
+        return $query->first();
+    }
+
+    /**
+     * @return CApi_OAuth
+     */
+    public function oauth() {
+        return $this->oauth;
     }
 }

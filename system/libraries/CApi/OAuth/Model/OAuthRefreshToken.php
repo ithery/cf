@@ -1,13 +1,6 @@
 <?php
 class CApi_OAuth_Model_OAuthRefreshToken extends CModel {
     /**
-     * Indicates if the IDs are auto-incrementing.
-     *
-     * @var bool
-     */
-    public $incrementing = false;
-
-    /**
      * Indicates if the model should be timestamped.
      *
      * @var bool
@@ -20,13 +13,6 @@ class CApi_OAuth_Model_OAuthRefreshToken extends CModel {
      * @var string
      */
     protected $table = 'oauth_refresh_token';
-
-    /**
-     * The "type" of the primary key ID.
-     *
-     * @var string
-     */
-    protected $keyType = 'string';
 
     /**
      * The guarded attributes on the model.
@@ -42,6 +28,7 @@ class CApi_OAuth_Model_OAuthRefreshToken extends CModel {
      */
     protected $casts = [
         'revoked' => 'bool',
+        'expires_at' => 'datetime',
     ];
 
     /**
@@ -58,7 +45,7 @@ class CApi_OAuth_Model_OAuthRefreshToken extends CModel {
      *
      * @return \CModel_Relation_BelongsTo
      */
-    public function accessToken() {
+    public function oauthAccessToken() {
         return $this->belongsTo(CApi::oauth()->tokenModel());
     }
 

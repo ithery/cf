@@ -21,7 +21,7 @@ class CApi_OAuth_Bridge_RefreshTokenRepository implements RefreshTokenRepository
     /**
      * Create a new repository instance.
      *
-     * @param \Laravel\Passport\RefreshTokenRepository $refreshTokenRepository
+     * @param \CApi_OAuth_RefreshTokenRepository $refreshTokenRepository
      *
      * @return void
      */
@@ -41,9 +41,12 @@ class CApi_OAuth_Bridge_RefreshTokenRepository implements RefreshTokenRepository
      * @inheritdoc
      */
     public function persistNewRefreshToken(RefreshTokenEntityInterface $refreshTokenEntity) {
+        $oauth = $this->refreshTokenRepository->oauth();
+        $tokenModel = $oauth->token()->where('token', '=', $refreshTokenEntity->getAccessToken()->getIdentifier())->first();
+
         $this->refreshTokenRepository->create([
-            'id' => $id = $refreshTokenEntity->getIdentifier(),
-            'access_token_id' => $accessTokenId = $refreshTokenEntity->getAccessToken()->getIdentifier(),
+            'token' => $id = $refreshTokenEntity->getIdentifier(),
+            'oauth_access_token_id' => $accessTokenId = $tokenModel->getKey(),
             'revoked' => false,
             'expires_at' => $refreshTokenEntity->getExpiryDateTime(),
         ]);

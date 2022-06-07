@@ -2,20 +2,6 @@
 
 class CApi_OAuth_Model_OAuthAuthCode extends CModel {
     /**
-     * Indicates if the IDs are auto-incrementing.
-     *
-     * @var bool
-     */
-    public $incrementing = false;
-
-    /**
-     * Indicates if the model should be timestamped.
-     *
-     * @var bool
-     */
-    public $timestamps = false;
-
-    /**
      * The database table used by the model.
      *
      * @var string
@@ -48,18 +34,11 @@ class CApi_OAuth_Model_OAuthAuthCode extends CModel {
     ];
 
     /**
-     * The "type" of the primary key ID.
-     *
-     * @var string
-     */
-    protected $keyType = 'string';
-
-    /**
      * Get the client that owns the authentication code.
      *
      * @return \CModel_Relation_BelongsTo
      */
-    public function client() {
+    public function oauthClient() {
         return $this->belongsTo(CApi::oauth()->clientModel());
     }
 

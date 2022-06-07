@@ -2,32 +2,11 @@
 
 class CApi_OAuth_Model_OAuthAccessToken extends CModel {
     /**
-     * Indicates if the IDs are auto-incrementing.
-     *
-     * @var bool
-     */
-    public $incrementing = false;
-
-    /**
-     * Indicates if the model should be timestamped.
-     *
-     * @var bool
-     */
-    public $timestamps = false;
-
-    /**
      * The database table used by the model.
      *
      * @var string
      */
     protected $table = 'oauth_access_token';
-
-    /**
-     * The "type" of the primary key ID.
-     *
-     * @var string
-     */
-    protected $keyType = 'string';
 
     /**
      * The guarded attributes on the model.
@@ -44,6 +23,7 @@ class CApi_OAuth_Model_OAuthAccessToken extends CModel {
     protected $casts = [
         'scopes' => 'array',
         'revoked' => 'bool',
+        'expires_at' => 'datetime'
     ];
 
     /**
@@ -60,7 +40,7 @@ class CApi_OAuth_Model_OAuthAccessToken extends CModel {
      *
      * @return \CModel_Relation_BelongsTo
      */
-    public function client() {
+    public function oauthClient() {
         return $this->belongsTo(CApi::oauth()->clientModel());
     }
 
@@ -70,11 +50,16 @@ class CApi_OAuth_Model_OAuthAccessToken extends CModel {
      * @return \CModel_Relation_BelongsTo
      */
     public function user() {
-        $provider = CF::config('auth.guards.api.provider');
+        $userModel = CApi::oauth()->getUserModelFromProvider();
+        if ($userModel == null) {
+            $provider = CF::config('auth.guards.api.provider');
 
-        $model = CF::config('auth.providers.' . $provider . '.model');
+            $model = CF::config('auth.providers.' . $provider . '.model');
 
-        return $this->belongsTo($model, 'user_id', (new $model())->getKeyName());
+            return $this->belongsTo($model, 'user_id', (new $model())->getKeyName());
+        } else {
+            return $this->morphTo('user');
+        }
     }
 
     /**

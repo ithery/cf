@@ -235,7 +235,7 @@ class CApi_OAuth_Loader {
      * @return void
      */
     protected function registerGuard() {
-        CAuth::manager()->extend('oauth', function ($app, $name, array $config) {
+        CAuth::manager()->extend('oauth', function ($name, array $config) {
             return c::tap($this->makeGuard($config), function ($guard) {
                 $guard->setRequest(c::request());
             });
@@ -258,7 +258,7 @@ class CApi_OAuth_Loader {
                 $this->getClientRepository(),
                 $this->getEncrypter()
             ))->user($request);
-        }, $this->app['request']);
+        }, c::request());
     }
 
     /**

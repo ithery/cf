@@ -203,6 +203,13 @@ class CApi_OAuth {
     }
 
     /**
+     * @return \CApi_OAuth_ClientRepository
+     */
+    public function clientRepository() {
+        return $this->loader->getClientRepository();
+    }
+
+    /**
      * @return \League\OAuth2\Server\ResourceServer
      */
     public function resourceServer() {
@@ -710,5 +717,13 @@ class CApi_OAuth {
 
     public function getGroup() {
         return $this->apiGroup;
+    }
+
+    public function getUserModelFromProvider() {
+        $guard = CF::config('api.groups.' . $this->apiGroup . '.auth.guard', 'api');
+
+        $provider = CF::config('auth.guards.' . $guard . '.provider');
+
+        return CF::config('auth.providers.' . $provider . '.model');
     }
 }

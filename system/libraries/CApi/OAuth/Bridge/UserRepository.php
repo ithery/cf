@@ -19,7 +19,6 @@ class CApi_OAuth_Bridge_UserRepository implements UserRepositoryInterface {
      * @return void
      */
     public function __construct($apiGroup) {
-        $this->hasher = c::hash();
         $this->apiGroup = $apiGroup;
     }
 
@@ -27,14 +26,14 @@ class CApi_OAuth_Bridge_UserRepository implements UserRepositoryInterface {
      * @inheritdoc
      */
     public function getUserEntityByUserCredentials($username, $password, $grantType, ClientEntityInterface $clientEntity) {
-        $guard = CF::config('api.groups.' . $this->apiGroup . 'auth.guard', 'api');
+        $guard = CF::config('api.groups.' . $this->apiGroup . '.auth.guard', 'api');
 
         $provider = $clientEntity->provider ?: CF::config('auth.guards.' . $guard . '.provider');
 
         if (is_null($model = CF::config('auth.providers.' . $provider . '.model'))) {
             throw new RuntimeException('Unable to determine authentication model from configuration.');
         }
-
+        $hasher = c::hash(CF::config('auth.providers.' . $provider . '.hasher', 'md5'));
         if (method_exists($model, 'findAndValidateForOAuth')) {
             $user = (new $model())->findAndValidateForOAuth($username, $password);
 
@@ -57,7 +56,7 @@ class CApi_OAuth_Bridge_UserRepository implements UserRepositoryInterface {
             if (!$user->validateForPassportPasswordGrant($password)) {
                 return;
             }
-        } elseif (!$this->hasher->check($password, $user->getAuthPassword())) {
+        } elseif (!$hasher->check($password, $user->getAuthPassword())) {
             return;
         }
 

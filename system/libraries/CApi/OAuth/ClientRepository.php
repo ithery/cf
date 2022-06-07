@@ -129,7 +129,9 @@ class CApi_OAuth_ClientRepository {
     /**
      * Store a new client.
      *
+     * @param int         $orgId
      * @param int         $userId
+     * @param string      $userType
      * @param string      $name
      * @param string      $redirect
      * @param null|string $provider
@@ -139,9 +141,11 @@ class CApi_OAuth_ClientRepository {
      *
      * @return \CApi_OAuth_Model_OAuthClient
      */
-    public function create($userId, $name, $redirect, $provider = null, $personalAccess = false, $password = false, $confidential = true) {
+    public function create($orgId, $userId, $userType, $name, $redirect, $provider = null, $personalAccess = false, $password = false, $confidential = true) {
         $client = $this->oauth->client()->forceFill([
+            'org_id' => $orgId,
             'user_id' => $userId,
+            'user_type' => $userType,
             'name' => $name,
             'secret' => ($confidential || $personalAccess) ? cstr::random(40) : null,
             'provider' => $provider,
@@ -162,11 +166,13 @@ class CApi_OAuth_ClientRepository {
      * @param int    $userId
      * @param string $name
      * @param string $redirect
+     * @param mixed  $orgId
+     * @param mixed  $userType
      *
      * @return \CApi_OAuth_Model_OAuthClient
      */
-    public function createPersonalAccessClient($userId, $name, $redirect) {
-        return c::tap($this->create($userId, $name, $redirect, null, true), function ($client) {
+    public function createPersonalAccessClient($orgId, $userId, $userType, $name, $redirect) {
+        return c::tap($this->create($orgId, $userId, $userType, $name, $redirect, null, true), function ($client) {
             $accessClient = $this->oauth->personalAccessClient();
             $accessClient->client_id = $client->id;
             $accessClient->save();
@@ -180,11 +186,12 @@ class CApi_OAuth_ClientRepository {
      * @param string      $name
      * @param string      $redirect
      * @param null|string $provider
+     * @param mixed       $userType
      *
      * @return \CApi_OAuth_Model_OAuthClient
      */
-    public function createPasswordGrantClient($userId, $name, $redirect, $provider = null) {
-        return $this->create($userId, $name, $redirect, $provider, false, true);
+    public function createPasswordGrantClient($userId, $userType, $name, $redirect, $provider = null) {
+        return $this->create($userId, $userType, $name, $redirect, $provider, false, true);
     }
 
     /**
