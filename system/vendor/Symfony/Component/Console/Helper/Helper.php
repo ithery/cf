@@ -11,6 +11,7 @@
 
 namespace Symfony\Component\Console\Helper;
 
+use Symfony\Component\String\UnicodeString;
 use Symfony\Component\Console\Formatter\OutputFormatterInterface;
 
 /**
@@ -33,6 +34,26 @@ abstract class Helper implements HelperInterface {
      */
     public function getHelperSet() {
         return $this->helperSet;
+    }
+
+    /**
+     * Returns the width of a string, using mb_strwidth if it is available.
+     * The width is how many characters positions the string will use.
+     *
+     * @param mixed $string
+     */
+    public static function width($string) {
+        $string ??= '';
+
+        if (preg_match('//u', $string)) {
+            return (new UnicodeString($string))->width(false);
+        }
+
+        if (false === $encoding = mb_detect_encoding($string, null, true)) {
+            return \strlen($string);
+        }
+
+        return mb_strwidth($string, $encoding);
     }
 
     /**
