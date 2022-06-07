@@ -256,44 +256,6 @@ class CApi_Routing_Router {
     }
 
     /**
-     * Register an array of resources.
-     *
-     * @param array $resources
-     *
-     * @return void
-     */
-    public function resources(array $resources) {
-        foreach ($resources as $name => $resource) {
-            $options = [];
-
-            if (is_array($resource)) {
-                list($resource, $options) = $resource;
-            }
-
-            $this->resource($name, $resource, $options);
-        }
-    }
-
-    /**
-     * Register a resource controller.
-     *
-     * @param string $name
-     * @param string $controller
-     * @param array  $options
-     *
-     * @return void
-     */
-    public function resource($name, $controller, array $options = []) {
-        if ($this->container->bound(ResourceRegistrar::class)) {
-            $registrar = $this->container->make(ResourceRegistrar::class);
-        } else {
-            $registrar = new ResourceRegistrar($this);
-        }
-
-        $registrar->register($name, $controller, $options);
-    }
-
-    /**
      * Add a route to the routing adapter.
      *
      * @param string|array          $methods
@@ -475,7 +437,7 @@ class CApi_Routing_Router {
         $methodResolver = $this->manager()->getMethodResolver();
 
         $methodClass = call_user_func($methodResolver, [$request]);
-        $method = CApi_Factory::createMethod($methodClass, $request);
+        $method = CApi_Factory::createMethod($methodClass, $this->apiGroup, $request);
         /**
          * @var CApi_MethodAbstract $method
          */
