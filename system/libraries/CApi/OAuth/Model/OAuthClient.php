@@ -76,7 +76,7 @@ class CApi_OAuth_Model_OAuthClient extends CModel {
      * @return \CModel_Relation_HasMany
      */
     public function oauthAuthCodes() {
-        return $this->hasMany(CApi::oauth()->authCodeModel(), 'client_id');
+        return $this->hasMany(CApi::oauth()->authCodeModel(), 'oauth_client_id');
     }
 
     /**
@@ -85,7 +85,7 @@ class CApi_OAuth_Model_OAuthClient extends CModel {
      * @return \CModel_Relation_HasMany
      */
     public function oauthAccessToken() {
-        return $this->hasMany(CApi::oauth()->tokenModel(), 'client_id');
+        return $this->hasMany(CApi::oauth()->tokenModel(), 'oauth_client_id');
     }
 
     /**

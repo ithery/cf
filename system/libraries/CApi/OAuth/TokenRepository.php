@@ -129,23 +129,24 @@ class CApi_OAuth_TokenRepository {
     /**
      * Find a valid token for the given user and client.
      *
-     * @param \Illuminate\Database\Eloquent\Model $user
-     * @param \CApi_OAuth_Model_OAuthClient       $client
+     * @param \CModel                       $user
+     * @param \CApi_OAuth_Model_OAuthClient $client
      *
      * @return null|\CApi_OAuth_Model_OAuthAccessToken
      */
     public function findValidToken($user, $client) {
         $userType = $this->oauth->getUserModelFromProvider();
 
-        $query = $client->tokens()
-            ->where('user_id', '=', $user->getAuthIdentifier())
+        $query = $client->oauthAccessToken()
             ->where('revoked', 0)
             ->where('expires_at', '>', CCarbon::now())
             ->latest('expires_at')
             ->first();
-
-        if ($userType) {
-            $query->where('user_type', '=', $userType);
+        if ($user) {
+            $query->where('user_id', '=', c::optional($user)->getAuthIdentifier());
+            if ($userType) {
+                $query->where('user_type', '=', $userType);
+            }
         }
 
         return $query->first();

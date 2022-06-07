@@ -7,6 +7,15 @@ class CApi_OAuth_Bridge_AuthCodeRepository implements AuthCodeRepositoryInterfac
     use CApi_OAuth_Bridge_Trait_FormatScopesForStorageTrait;
 
     /**
+     * @var CApi_OAuth
+     */
+    protected $oauth;
+
+    public function __construct(CApi_OAuth $oauth) {
+        $this->oauth = $oauth;
+    }
+
+    /**
      * @inheritdoc
      */
     public function getNewAuthCode() {
@@ -17,29 +26,33 @@ class CApi_OAuth_Bridge_AuthCodeRepository implements AuthCodeRepositoryInterfac
      * @inheritdoc
      */
     public function persistNewAuthCode(AuthCodeEntityInterface $authCodeEntity) {
+        $userType = $this->oauth->getUserModelFromProvider();
         $attributes = [
-            'id' => $authCodeEntity->getIdentifier(),
+            'code' => $authCodeEntity->getIdentifier(),
             'user_id' => $authCodeEntity->getUserIdentifier(),
-            'client_id' => $authCodeEntity->getClient()->getIdentifier(),
+            'user_type' => $userType,
+            'oauth_client_id' => $authCodeEntity->getClient()->getIdentifier(),
             'scopes' => $this->formatScopesForStorage($authCodeEntity->getScopes()),
             'revoked' => false,
             'expires_at' => $authCodeEntity->getExpiryDateTime(),
+            'createdby' => c::base()->username(),
+            'updatedby' => c::base()->username(),
         ];
 
-        CApi::oauth()->authCode()->forceFill($attributes)->save();
+        $this->oauth->authCode()->forceFill($attributes)->save();
     }
 
     /**
      * @inheritdoc
      */
     public function revokeAuthCode($codeId) {
-        CApi::oauth()->authCode()->where('id', $codeId)->update(['revoked' => true]);
+        $this->oauth->authCode()->where('code', $codeId)->update(['revoked' => true]);
     }
 
     /**
      * @inheritdoc
      */
     public function isAuthCodeRevoked($codeId) {
-        return CApi::oauth()->authCode()->where('id', $codeId)->where('revoked', 1)->exists();
+        return $this->oauth->authCode()->where('code', $codeId)->where('revoked', 1)->exists();
     }
 }

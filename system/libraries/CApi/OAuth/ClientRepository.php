@@ -174,7 +174,7 @@ class CApi_OAuth_ClientRepository {
     public function createPersonalAccessClient($orgId, $userId, $userType, $name, $redirect) {
         return c::tap($this->create($orgId, $userId, $userType, $name, $redirect, null, true), function ($client) {
             $accessClient = $this->oauth->personalAccessClient();
-            $accessClient->client_id = $client->id;
+            $accessClient->oauth_client_id = $client->oauth_client_id;
             $accessClient->save();
         });
     }
@@ -268,5 +268,12 @@ class CApi_OAuth_ClientRepository {
      */
     public function getPersonalAccessClientSecret() {
         return $this->personalAccessClientSecret;
+    }
+
+    /**
+     * @return CApi_OAuth
+     */
+    public function oauth() {
+        return $this->oauth;
     }
 }

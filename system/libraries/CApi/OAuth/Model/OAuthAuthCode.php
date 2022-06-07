@@ -22,6 +22,7 @@ class CApi_OAuth_Model_OAuthAuthCode extends CModel {
      */
     protected $casts = [
         'revoked' => 'bool',
+        'expires_at' => 'datetime',
     ];
 
     /**

@@ -23,11 +23,25 @@ class CApi_OAuth_Loader {
      */
     private $oauth;
 
+    /**
+     * @var CApi_OAuth_Bridge_RefreshTokenRepository
+     */
     private $bridgeRefreshTokenRepository;
 
+    /**
+     * @var CApi_OAuth_Bridge_AccessTokenRepository
+     */
     private $bridgeAccessTokenRepository;
 
+    /**
+     * @var CApi_OAuth_Bridge_UserRepository
+     */
     private $bridgeUserRepository;
+
+    /**
+     * @var CApi_OAuth_Bridge_AuthCodeRepository
+     */
+    private $bridgeAuthCodeRepository;
 
     private $clientRepository;
 
@@ -141,7 +155,7 @@ class CApi_OAuth_Loader {
      */
     protected function buildAuthCodeGrant() {
         return new AuthCodeGrant(
-            new CApi_OAuth_Bridge_AuthCodeRepository(),
+            $this->getBridgeAuthCodeRepository(),
             $this->getBridgeRefreshTokenRepository(),
             new DateInterval('PT10M')
         );
@@ -274,7 +288,7 @@ class CApi_OAuth_Loader {
         });
     }
 
-    protected function getBridgeRefreshTokenRepository() {
+    public function getBridgeRefreshTokenRepository() {
         if ($this->bridgeRefreshTokenRepository == null) {
             $this->bridgeRefreshTokenRepository = new CApi_OAuth_Bridge_RefreshTokenRepository($this->getRefreshTokenRepository());
         }
@@ -282,7 +296,7 @@ class CApi_OAuth_Loader {
         return $this->bridgeRefreshTokenRepository;
     }
 
-    protected function getBridgeAccessTokenRepository() {
+    public function getBridgeAccessTokenRepository() {
         if ($this->bridgeAccessTokenRepository == null) {
             $this->bridgeAccessTokenRepository = new CApi_OAuth_Bridge_AccessTokenRepository($this->getTokenRepository());
         }
@@ -290,12 +304,20 @@ class CApi_OAuth_Loader {
         return $this->bridgeAccessTokenRepository;
     }
 
-    protected function getBridgeUserRepository() {
+    public function getBridgeUserRepository() {
         if ($this->bridgeUserRepository == null) {
             $this->bridgeUserRepository = new CApi_OAuth_Bridge_UserRepository($this->apiGroup);
         }
 
         return $this->bridgeUserRepository;
+    }
+
+    public function getBridgeAuthCodeRepository() {
+        if ($this->bridgeAuthCodeRepository == null) {
+            $this->bridgeAuthCodeRepository = new CApi_OAuth_Bridge_AuthCodeRepository($this->oauth);
+        }
+
+        return $this->bridgeAuthCodeRepository;
     }
 
     public function getResourceServer() {

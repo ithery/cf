@@ -203,6 +203,13 @@ class CApi_OAuth {
     }
 
     /**
+     * @return \CApi_OAuth_Bridge_UserRepository
+     */
+    public function bridgeUserRepository() {
+        return $this->loader->getBridgeUserRepository();
+    }
+
+    /**
      * @return \CApi_OAuth_ClientRepository
      */
     public function clientRepository() {
@@ -719,6 +726,24 @@ class CApi_OAuth {
 
     public function getGroup() {
         return $this->apiGroup;
+    }
+
+    public function createSessionGuard() {
+        $guard = $this->getGuardName();
+        $guardConfig = CF::config('auth.guards.' . $guard);
+        $auth = CAuth::manager()->createSessionDriver($guard, $guardConfig);
+
+        return $auth;
+    }
+
+    public function getGuardName() {
+        $guard = CF::config('api.groups.' . $this->apiGroup . '.auth.guard', 'api');
+
+        return $guard;
+    }
+
+    public function getGuard() {
+        return c::auth($this->getGuardName());
     }
 
     public function getUserModelFromProvider() {

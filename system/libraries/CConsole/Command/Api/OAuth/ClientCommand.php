@@ -1,6 +1,9 @@
 <?php
 
 class CConsole_Command_Api_OAuth_ClientCommand extends CConsole_Command {
+    /**
+     * @var CApi_OAuth
+     */
     protected $oauth;
 
     /**
@@ -95,6 +98,8 @@ class CConsole_Command_Api_OAuth_ClientCommand extends CConsole_Command {
 
         $client = $clients->createPasswordGrantClient(
             null,
+            null,
+            null,
             $name,
             'http://localhost',
             $provider
@@ -149,11 +154,13 @@ class CConsole_Command_Api_OAuth_ClientCommand extends CConsole_Command {
 
         $redirect = $this->option('redirect_uri') ?: $this->ask(
             'Where should we redirect the request after authorization?',
-            c::url('/auth/callback')
+            c::url('auth/callback')
         );
-
+        $userType = $this->oauth->getUserModelFromProvider();
         $client = $clients->create(
+            null,
             $userId,
+            $userType,
             $name,
             $redirect,
             null,

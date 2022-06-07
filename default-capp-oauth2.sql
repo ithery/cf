@@ -5,10 +5,12 @@
  */
 
 
-DROP TABLE IF EXISTS `oauth_code`;
+DROP TABLE IF EXISTS `oauth_auth_code`;
 CREATE TABLE `oauth_auth_code` (
   `oauth_code_id` bigint(20) unsigned NOT NULL AUTO_INCREMENT,
   `org_id` bigint(20) unsigned DEFAULT NULL,
+  `user_id` bigint(20) unsigned DEFAULT NULL,
+  `user_type` varchar(255) DEFAULT NULL,
   `code` varchar(100) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci,
   `oauth_client_id` bigint(20) unsigned DEFAULT NULL,
   `scopes` text CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
