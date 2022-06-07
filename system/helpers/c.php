@@ -1553,6 +1553,17 @@ class c {
     public static function isHtml($string) {
         return preg_match('/<[^<]+>/', $string, $m) != 0;
     }
+
+    /**
+     * Generate a form field to spoof the HTTP verb used by forms.
+     *
+     * @param string $method
+     *
+     * @return \CBase_HtmlString
+     */
+    public static function methodField($method) {
+        return new CBase_HtmlString('<input type="hidden" name="_method" value="' . $method . '">');
+    }
 }
 
 // End c

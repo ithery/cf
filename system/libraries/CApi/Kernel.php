@@ -1,4 +1,5 @@
 <?php
+use Symfony\Component\HttpFoundation\Response as SymfonyResponse;
 
 class CApi_Kernel {
     use CApi_Trait_HasGroupPropertyTrait;
@@ -53,12 +54,16 @@ class CApi_Kernel {
      */
     protected function dispatchMethod(CApi_MethodAbstract $method) {
         return function ($request) use ($method) {
-            $method->execute();
             CEvent::dispatch(new CApi_Event_BeforeDispatch($method));
-            $methodResponse = new CApi_MethodResponse($request, $method);
-            CEvent::dispatch(new CApi_Event_AfterDispatch($methodResponse));
+            $response = $method->execute();
+            $isResponse = $response instanceof SymfonyResponse;
+            if (!$isResponse) {
+                $methodResponse = new CApi_MethodResponse($request, $method);
+                $response = $methodResponse->toResponse();
+            }
+            CEvent::dispatch(new CApi_Event_AfterDispatch($response));
 
-            return $methodResponse->toResponse();
+            return $response;
         };
     }
 

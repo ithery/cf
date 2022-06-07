@@ -161,6 +161,7 @@ class CBase_Pipeline implements CBase_PipelineInterface {
                         $parameters = [$passable, $stack];
                     }
 
+                    $pipe = $this->handlePipe($pipe);
                     $carry = method_exists($pipe, $this->method) ? $pipe->{$this->method}(...$parameters) : $pipe(...$parameters);
 
                     return $this->handleCarry($carry);
@@ -206,6 +207,17 @@ class CBase_Pipeline implements CBase_PipelineInterface {
      */
     protected function getContainer() {
         return CContainer::getInstance();
+    }
+
+    /**
+     * Handle the middleware returned from each pipe before handle.
+     *
+     * @param mixed $pipe
+     *
+     * @return mixed
+     */
+    protected function handlePipe($pipe) {
+        return $pipe;
     }
 
     /**

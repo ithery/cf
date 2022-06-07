@@ -60,6 +60,7 @@ class CApi_Dispatcher {
 
         try {
             $this->isDispatching = true;
+            CApi::setCurrentDispatcher($this);
             $request = CApi_HTTP_Request::createFromBaseHttp($request);
             $request->setGroup($this->group);
             $kernel = new CApi_Kernel($this->group);
@@ -71,6 +72,7 @@ class CApi_Dispatcher {
             $this->reportException($e);
             $response = $this->renderException($request, $e);
         } finally {
+            CApi::setCurrentDispatcher(null);
             $this->isDispatching = false;
         }
 
@@ -79,5 +81,12 @@ class CApi_Dispatcher {
 
     public function isDispatching() {
         return $this->isDispatching;
+    }
+
+    /**
+     * @return CApi_OAuth
+     */
+    public function oauth() {
+        return CApi::oauth($this->group);
     }
 }
