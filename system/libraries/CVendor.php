@@ -196,6 +196,22 @@ class CVendor {
      *
      * @return \CVendor_Firebase
      */
+    public static function twilio($options = null) {
+        if (!is_array($options)) {
+            $options = CF::config('vendor.twilio');
+        }
+
+        $sid = carr::get($options, 'sid');
+        $token = carr::get($options, 'token');
+
+        return new CVendor_Twilio($sid, $token);
+    }
+
+    /**
+     * @param array $options
+     *
+     * @return \CVendor_Firebase
+     */
     public static function firebase($options = null) {
         if (!is_array($options)) {
             $options = CF::config('vendor.firebase');

@@ -1,43 +1,48 @@
 <?php
 
-declare(strict_types=1);
-
 namespace League\Flysystem;
 
 use function array_merge;
 
-class Config
-{
-    public const OPTION_VISIBILITY = 'visibility';
-    public const OPTION_DIRECTORY_VISIBILITY = 'directory_visibility';
+class Config {
+    const OPTION_VISIBILITY = 'visibility';
+
+    const OPTION_DIRECTORY_VISIBILITY = 'directory_visibility';
 
     /**
      * @var array
      */
     private $options;
 
-    public function __construct(array $options = [])
-    {
+    public function __construct(array $options = []) {
         $this->options = $options;
     }
 
     /**
-     * @param mixed $default
+     * @param string $property
+     * @param mixed  $default
      *
      * @return mixed
      */
-    public function get(string $property, $default = null)
-    {
-        return $this->options[$property] ?? $default;
+    public function get($property, $default = null) {
+        return isset($this->options[$property]) ? $this->options[$property] : $default;
     }
 
-    public function extend(array $options): Config
-    {
+    /**
+     * @param array $options
+     *
+     * @return Config
+     */
+    public function extend(array $options) {
         return new Config(array_merge($this->options, $options));
     }
 
-    public function withDefaults(array $defaults): Config
-    {
+    /**
+     * @param array $defaults
+     *
+     * @return Config
+     */
+    public function withDefaults(array $defaults) {
         return new Config($this->options + $defaults);
     }
 }

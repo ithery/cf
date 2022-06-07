@@ -177,13 +177,13 @@ class CAuth_Manager {
         // user in the database or another persistence layer where users are.
         $guard = new CAuth_Guard_TokenGuard(
             $this->createUserProvider(carr::get($config, 'provider', null)),
-            $this->app['request'],
+            c::request(),
             carr::get($config, 'input_key', 'api_token'),
             carr::get($config, 'storage_key', 'api_token'),
             carr::get($config, 'hash', false)
         );
 
-        $this->app->refresh('request', $guard, 'setRequest');
+        c::container()->refresh('request', $guard, 'setRequest');
 
         return $guard;
     }

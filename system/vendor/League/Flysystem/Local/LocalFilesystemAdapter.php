@@ -1,7 +1,5 @@
 <?php
 
-declare(strict_types=1);
-
 namespace League\Flysystem\Local;
 
 use Generator;
@@ -47,12 +45,12 @@ class LocalFilesystemAdapter implements FilesystemAdapter {
     /**
      * @var int
      */
-    public const SKIP_LINKS = 0001;
+    const SKIP_LINKS = 0001;
 
     /**
      * @var int
      */
-    public const DISALLOW_LINKS = 0002;
+    const DISALLOW_LINKS = 0002;
 
     /**
      * @var PathPrefixer
@@ -79,11 +77,18 @@ class LocalFilesystemAdapter implements FilesystemAdapter {
      */
     private $mimeTypeDetector;
 
+    /**
+     * @param string                   $location
+     * @param null|VisibilityConverter $visibility
+     * @param [type] $writeFlags
+     * @param [type] $linkHandling
+     * @param null|MimeTypeDetector $mimeTypeDetector
+     */
     public function __construct(
-        string $location,
+        $location,
         VisibilityConverter $visibility = null,
-        int $writeFlags = LOCK_EX,
-        int $linkHandling = self::DISALLOW_LINKS,
+        $writeFlags = LOCK_EX,
+        $linkHandling = self::DISALLOW_LINKS,
         MimeTypeDetector $mimeTypeDetector = null
     ) {
         $this->prefixer = new PathPrefixer($location, DIRECTORY_SEPARATOR);
@@ -94,27 +99,47 @@ class LocalFilesystemAdapter implements FilesystemAdapter {
         $this->mimeTypeDetector = $mimeTypeDetector ?: new FinfoMimeTypeDetector();
     }
 
-    public function write(string $path, string $contents, Config $config): void {
-        $this->writeToFile($path, $contents, $config);
-    }
-
-    public function writeStream(string $path, $contents, Config $config): void {
+    /**
+     * @param string $path
+     * @param string $contents
+     * @param Config $config
+     *
+     * @return void
+     */
+    public function write($path, $contents, Config $config) {
         $this->writeToFile($path, $contents, $config);
     }
 
     /**
-     * @param resource|string $contents
+     * @param string $path
+     * @param [type] $contents
+     * @param Config $config
+     *
+     * @return void
      */
-    private function writeToFile(string $path, $contents, Config $config): void {
+    public function writeStream($path, $contents, Config $config) {
+        $this->writeToFile($path, $contents, $config);
+    }
+
+    /**
+     * @param string          $path
+     * @param resource|string $contents
+     * @param Config          $config
+     *
+     * @return void
+     */
+    private function writeToFile($path, $contents, Config $config) {
         $prefixedLocation = $this->prefixer->prefixPath($path);
         $this->ensureDirectoryExists(
             dirname($prefixedLocation),
             $this->resolveDirectoryVisibility($config->get(Config::OPTION_DIRECTORY_VISIBILITY))
         );
-        error_clear_last();
+        if (\function_exists('error_clear_last')) {
+            error_clear_last();
+        }
 
         if (@file_put_contents($prefixedLocation, $contents, $this->writeFlags) === false) {
-            throw UnableToWriteFile::atLocation($path, error_get_last()['message'] ?? '');
+            throw UnableToWriteFile::atLocation($path, isset(error_get_last()['message']) ? error_get_last()['message'] : '');
         }
 
         if ($visibility = $config->get(Config::OPTION_VISIBILITY)) {
@@ -122,21 +147,22 @@ class LocalFilesystemAdapter implements FilesystemAdapter {
         }
     }
 
-    public function delete(string $path): void {
+    public function delete($path) {
         $location = $this->prefixer->prefixPath($path);
 
         if (!file_exists($location)) {
             return;
         }
-
-        error_clear_last();
+        if (\function_exists('error_clear_last')) {
+            error_clear_last();
+        }
 
         if (!@unlink($location)) {
-            throw UnableToDeleteFile::atLocation($location, error_get_last()['message'] ?? '');
+            throw UnableToDeleteFile::atLocation($location, isset(error_get_last()['message']) ? error_get_last()['message'] : '');
         }
     }
 
-    public function deleteDirectory(string $prefix): void {
+    public function deleteDirectory($prefix) {
         $location = $this->prefixer->prefixPath($prefix);
 
         if (!is_dir($location)) {
@@ -155,21 +181,32 @@ class LocalFilesystemAdapter implements FilesystemAdapter {
         unset($contents);
 
         if (!@rmdir($location)) {
-            throw UnableToDeleteDirectory::atLocation($prefix, error_get_last()['message'] ?? '');
+            throw UnableToDeleteDirectory::atLocation($prefix, isset(error_get_last()['message']) ? error_get_last()['message'] : '');
         }
     }
 
+    /**
+     * @param string $path
+     * @param [type] $mode
+     *
+     * @return Generator
+     */
     private function listDirectoryRecursively(
         string $path,
         int $mode = RecursiveIteratorIterator::SELF_FIRST
-    ): Generator {
-        yield from new RecursiveIteratorIterator(
+    ) {
+        yield from (new RecursiveIteratorIterator(
             new RecursiveDirectoryIterator($path, FilesystemIterator::SKIP_DOTS),
             $mode
-        );
+        ));
     }
 
-    protected function deleteFileInfoObject(SplFileInfo $file): bool {
+    /**
+     * @param SplFileInfo $file
+     *
+     * @return bool
+     */
+    protected function deleteFileInfoObject(SplFileInfo $file) {
         switch ($file->getType()) {
             case 'dir':
                 return @rmdir((string) $file->getRealPath());
@@ -180,7 +217,7 @@ class LocalFilesystemAdapter implements FilesystemAdapter {
         }
     }
 
-    public function listContents(string $path, bool $deep): iterable {
+    public function listContents($path, $deep) {
         $location = $this->prefixer->prefixPath($path);
 
         if (!is_dir($location)) {
@@ -214,7 +251,7 @@ class LocalFilesystemAdapter implements FilesystemAdapter {
         }
     }
 
-    public function move(string $source, string $destination, Config $config): void {
+    public function move($source, $destination, Config $config) {
         $sourcePath = $this->prefixer->prefixPath($source);
         $destinationPath = $this->prefixer->prefixPath($destination);
         $this->ensureDirectoryExists(
@@ -227,7 +264,7 @@ class LocalFilesystemAdapter implements FilesystemAdapter {
         }
     }
 
-    public function copy(string $source, string $destination, Config $config): void {
+    public function copy($source, $destination, Config $config) {
         $sourcePath = $this->prefixer->prefixPath($source);
         $destinationPath = $this->prefixer->prefixPath($destination);
         $this->ensureDirectoryExists(
@@ -240,36 +277,47 @@ class LocalFilesystemAdapter implements FilesystemAdapter {
         }
     }
 
-    public function read(string $path): string {
+    public function read($path) {
         $location = $this->prefixer->prefixPath($path);
-        error_clear_last();
+        if (\function_exists('error_clear_last')) {
+            error_clear_last();
+        }
         $contents = @file_get_contents($location);
 
         if ($contents === false) {
-            throw UnableToReadFile::fromLocation($path, error_get_last()['message'] ?? '');
+            throw UnableToReadFile::fromLocation($path, isset(error_get_last()['message']) ? error_get_last()['message'] : '');
         }
 
         return $contents;
     }
 
-    public function readStream(string $path) {
+    public function readStream($path) {
         $location = $this->prefixer->prefixPath($path);
-        error_clear_last();
+        if (\function_exists('error_clear_last')) {
+            error_clear_last();
+        }
         $contents = @fopen($location, 'rb');
 
         if ($contents === false) {
-            throw UnableToReadFile::fromLocation($path, error_get_last()['message'] ?? '');
+            throw UnableToReadFile::fromLocation($path, isset(error_get_last()['message']) ? error_get_last()['message'] : '');
         }
 
         return $contents;
     }
 
-    protected function ensureDirectoryExists(string $dirname, int $visibility): void {
+    /**
+     * @param string $dirname
+     * @param int    $visibility
+     *
+     * @return void
+     */
+    protected function ensureDirectoryExists($dirname, $visibility) {
         if (is_dir($dirname)) {
             return;
         }
-
-        error_clear_last();
+        if (\function_exists('error_clear_last')) {
+            error_clear_last();
+        }
 
         if (!@mkdir($dirname, $visibility, true)) {
             $mkdirError = error_get_last();
@@ -284,19 +332,35 @@ class LocalFilesystemAdapter implements FilesystemAdapter {
         }
     }
 
-    public function fileExists(string $location): bool {
+    /**
+     * @param string $location
+     *
+     * @return bool
+     */
+    public function fileExists($location) {
         $location = $this->prefixer->prefixPath($location);
 
         return is_file($location);
     }
 
-    public function directoryExists(string $location): bool {
+    /**
+     * @param string $location
+     *
+     * @return bool
+     */
+    public function directoryExists($location) {
         $location = $this->prefixer->prefixPath($location);
 
         return is_dir($location);
     }
 
-    public function createDirectory(string $path, Config $config): void {
+    /**
+     * @param string $path
+     * @param Config $config
+     *
+     * @return void
+     */
+    public function createDirectory($path, Config $config) {
         $location = $this->prefixer->prefixPath($path);
         $visibility = $config->get(Config::OPTION_VISIBILITY, $config->get(Config::OPTION_DIRECTORY_VISIBILITY));
         $permissions = $this->resolveDirectoryVisibility($visibility);
@@ -306,15 +370,22 @@ class LocalFilesystemAdapter implements FilesystemAdapter {
 
             return;
         }
-
-        error_clear_last();
+        if (\function_exists('error_clear_last')) {
+            error_clear_last();
+        }
 
         if (!@mkdir($location, $permissions, true)) {
-            throw UnableToCreateDirectory::atLocation($path, error_get_last()['message'] ?? '');
+            throw UnableToCreateDirectory::atLocation($path, isset(error_get_last()['message']) ? error_get_last()['message'] : '');
         }
     }
 
-    public function setVisibility(string $path, string $visibility): void {
+    /**
+     * @param string $path
+     * @param string $visibility
+     *
+     * @return void
+     */
+    public function setVisibility($path, $visibility) {
         $path = $this->prefixer->prefixPath($path);
         $visibility = is_dir($path) ? $this->visibility->forDirectory($visibility) : $this->visibility->forFile(
             $visibility
@@ -323,14 +394,21 @@ class LocalFilesystemAdapter implements FilesystemAdapter {
         $this->setPermissions($path, $visibility);
     }
 
-    public function visibility(string $path): FileAttributes {
+    /**
+     * @param string $path
+     *
+     * @return FileAttributes
+     */
+    public function visibility($path) {
         $location = $this->prefixer->prefixPath($path);
         clearstatcache(false, $location);
-        error_clear_last();
+        if (\function_exists('error_clear_last')) {
+            error_clear_last();
+        }
         $fileperms = @fileperms($location);
 
         if ($fileperms === false) {
-            throw UnableToRetrieveMetadata::visibility($path, error_get_last()['message'] ?? '');
+            throw UnableToRetrieveMetadata::visibility($path, isset(error_get_last()['message']) ? error_get_last()['message'] : '');
         }
 
         $permissions = $fileperms & 0777;
@@ -339,48 +417,79 @@ class LocalFilesystemAdapter implements FilesystemAdapter {
         return new FileAttributes($path, null, $visibility);
     }
 
-    private function resolveDirectoryVisibility(?string $visibility): int {
+    /**
+     * @param null|string $visibility
+     *
+     * @return int
+     */
+    private function resolveDirectoryVisibility($visibility = null) {
         return $visibility === null ? $this->visibility->defaultForDirectories() : $this->visibility->forDirectory(
             $visibility
         );
     }
 
-    public function mimeType(string $path): FileAttributes {
+    /**
+     * @param string $path
+     *
+     * @return FileAttributes
+     */
+    public function mimeType($path) {
         $location = $this->prefixer->prefixPath($path);
-        error_clear_last();
+        if (\function_exists('error_clear_last')) {
+            error_clear_last();
+        }
         $mimeType = $this->mimeTypeDetector->detectMimeTypeFromFile($location);
 
         if ($mimeType === null) {
-            throw UnableToRetrieveMetadata::mimeType($path, error_get_last()['message'] ?? '');
+            throw UnableToRetrieveMetadata::mimeType($path, isset(error_get_last()['message']) ? error_get_last()['message'] : '');
         }
 
         return new FileAttributes($path, null, null, null, $mimeType);
     }
 
-    public function lastModified(string $path): FileAttributes {
+    /**
+     * @param string $path
+     *
+     * @return FileAttributes
+     */
+    public function lastModified($path) {
         $location = $this->prefixer->prefixPath($path);
-        error_clear_last();
+        if (\function_exists('error_clear_last')) {
+            error_clear_last();
+        }
         $lastModified = @filemtime($location);
 
         if ($lastModified === false) {
-            throw UnableToRetrieveMetadata::lastModified($path, error_get_last()['message'] ?? '');
+            throw UnableToRetrieveMetadata::lastModified($path, isset(error_get_last()['message']) ? error_get_last()['message'] : '');
         }
 
         return new FileAttributes($path, null, null, $lastModified);
     }
 
-    public function fileSize(string $path): FileAttributes {
+    /**
+     * @param string $path
+     *
+     * @return FileAttributes
+     */
+    public function fileSize($path) {
         $location = $this->prefixer->prefixPath($path);
-        error_clear_last();
+        if (\function_exists('error_clear_last')) {
+            error_clear_last();
+        }
 
         if (is_file($location) && ($fileSize = @filesize($location)) !== false) {
             return new FileAttributes($path, $fileSize);
         }
 
-        throw UnableToRetrieveMetadata::fileSize($path, error_get_last()['message'] ?? '');
+        throw UnableToRetrieveMetadata::fileSize($path, isset(error_get_last()['message']) ? error_get_last()['message'] : '');
     }
 
-    private function listDirectory(string $location): Generator {
+    /**
+     * @param string $location
+     *
+     * @return Generator
+     */
+    private function listDirectory($location) {
         $iterator = new DirectoryIterator($location);
 
         foreach ($iterator as $item) {
@@ -392,10 +501,18 @@ class LocalFilesystemAdapter implements FilesystemAdapter {
         }
     }
 
-    private function setPermissions(string $location, int $visibility): void {
-        error_clear_last();
+    /**
+     * @param string $location
+     * @param int    $visibility
+     *
+     * @return void
+     */
+    private function setPermissions($location, $visibility) {
+        if (\function_exists('error_clear_last')) {
+            error_clear_last();
+        }
         if (!@chmod($location, $visibility)) {
-            $extraMessage = error_get_last()['message'] ?? '';
+            $extraMessage = isset(error_get_last()['message']) ? error_get_last()['message'] : '';
 
             throw UnableToSetVisibility::atLocation($this->prefixer->stripPrefix($location), $extraMessage);
         }

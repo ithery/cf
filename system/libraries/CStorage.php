@@ -183,7 +183,7 @@ class CStorage {
     public function createLocalDriver(array $config) {
         $visibility = PortableVisibilityConverter::fromArray(
             carr::get($config, 'permissions', []),
-            carr::get($config, 'directory_visibility', carr::get($config, 'visibility', Visibility::PUBLIC)),
+            carr::get($config, 'directory_visibility', carr::get($config, 'visibility', Visibility::VISIBILITY_PUBLIC))
         );
 
         $links = (isset($config['links']) ? $config['links'] : null) === 'skip' ? LocalAdapter::SKIP_LINKS : LocalAdapter::DISALLOW_LINKS;
@@ -248,7 +248,7 @@ class CStorage {
         $root = (string) carr::get($s3Config, 'root', '');
 
         $visibility = new AwsS3PortableVisibilityConverter(
-            $config['visibility'] ?? Visibility::PUBLIC
+            isset($config['visibility']) ? $config['visibility'] : Visibility::VISIBILITY_PRIVATE
         );
 
         $streamReads = carr::get($s3Config, 'stream_reads', false);

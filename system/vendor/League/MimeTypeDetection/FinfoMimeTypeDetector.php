@@ -1,17 +1,14 @@
 <?php
 
-declare(strict_types=1);
-
 namespace League\MimeTypeDetection;
 
-use const FILEINFO_MIME_TYPE;
-
-use const PATHINFO_EXTENSION;
 use finfo;
 
-class FinfoMimeTypeDetector implements MimeTypeDetector
-{
-    private const INCONCLUSIVE_MIME_TYPES = ['application/x-empty', 'text/plain', 'text/x-asm'];
+use const FILEINFO_MIME_TYPE;
+use const PATHINFO_EXTENSION;
+
+class FinfoMimeTypeDetector implements MimeTypeDetector {
+    const INCONCLUSIVE_MIME_TYPES = ['application/x-empty', 'text/plain', 'text/x-asm'];
 
     /**
      * @var finfo
@@ -24,52 +21,78 @@ class FinfoMimeTypeDetector implements MimeTypeDetector
     private $extensionMap;
 
     /**
-     * @var int|null
+     * @var null|int
      */
     private $bufferSampleSize;
 
+    /**
+     * @param string                      $magicFile
+     * @param null|ExtensionToMimeTypeMap $extensionMap
+     * @param null|int                    $bufferSampleSize
+     */
     public function __construct(
-        string $magicFile = '',
+        $magicFile = '',
         ExtensionToMimeTypeMap $extensionMap = null,
-        ?int $bufferSampleSize = null
+        $bufferSampleSize = null
     ) {
         $this->finfo = new finfo(FILEINFO_MIME_TYPE, $magicFile);
         $this->extensionMap = $extensionMap ?: new GeneratedExtensionToMimeTypeMap();
         $this->bufferSampleSize = $bufferSampleSize;
     }
 
-    public function detectMimeType(string $path, $contents): ?string
-    {
+    /**
+     * @param string $path
+     * @param [type] $contents
+     *
+     * @return null|string
+     */
+    public function detectMimeType($path, $contents) {
         $mimeType = is_string($contents)
             ? (@$this->finfo->buffer($this->takeSample($contents)) ?: null)
             : null;
 
-        if ($mimeType !== null && ! in_array($mimeType, self::INCONCLUSIVE_MIME_TYPES)) {
+        if ($mimeType !== null && !in_array($mimeType, self::INCONCLUSIVE_MIME_TYPES)) {
             return $mimeType;
         }
 
         return $this->detectMimeTypeFromPath($path);
     }
 
-    public function detectMimeTypeFromPath(string $path): ?string
-    {
+    /**
+     * @param string $path
+     *
+     * @return null|string
+     */
+    public function detectMimeTypeFromPath($path) {
         $extension = strtolower(pathinfo($path, PATHINFO_EXTENSION));
 
         return $this->extensionMap->lookupMimeType($extension);
     }
 
-    public function detectMimeTypeFromFile(string $path): ?string
-    {
+    /**
+     * @param string $path
+     *
+     * @return null|string
+     */
+    public function detectMimeTypeFromFile($path) {
         return @$this->finfo->file($path) ?: null;
     }
 
-    public function detectMimeTypeFromBuffer(string $contents): ?string
-    {
+    /**
+     * @param string $contents
+     *
+     * @return null|string
+     */
+    public function detectMimeTypeFromBuffer($contents) {
         return @$this->finfo->buffer($this->takeSample($contents)) ?: null;
     }
 
-    private function takeSample(string $contents): string
-    {
+    /**
+     * @param string $contents
+     *
+     * @return string
+     */
+    private function takeSample($contents) {
         if ($this->bufferSampleSize === null) {
             return $contents;
         }

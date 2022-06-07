@@ -125,3 +125,7 @@ public/*
 # Deployment file
 deploy.blade.php
 **/deploy.blade.php
+
+#generated file
+oauth-public.key
+oauth-private.key

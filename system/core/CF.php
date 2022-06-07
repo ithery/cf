@@ -652,8 +652,8 @@ final class CF {
      */
     public static function cliDomain() {
         $domain = null;
-        if (defined('CFCLI_APPCODE') && CFCLI_APPCODE) {
-            return CFCLI_APPCODE . '.test';
+        if (defined('CFCLI_APPCODE')) {
+            return constant('CFCLI_APPCODE') . '.test';
         }
         if (file_exists(static::CFCLI_CURRENT_DOMAIN_FILE)) {
             $domain = trim(file_get_contents(static::CFCLI_CURRENT_DOMAIN_FILE));
@@ -668,8 +668,8 @@ final class CF {
      * @return string
      */
     public static function cliAppCode() {
-        if (defined('CFCLI_APPCODE') && CFCLI_APPCODE) {
-            return CFCLI_APPCODE;
+        if (defined('CFCLI_APPCODE')) {
+            return constant('CFCLI_APPCODE');
         }
         if (CF::isTesting()) {
             foreach ($_SERVER['argv'] as $argv) {
@@ -718,8 +718,8 @@ final class CF {
         }
         if (static::isCli() || static::isCFCli()) {
             // Command line requires a bit of hacking
-            if (defined('CFCLI_APPCODE') && CFCLI_APPCODE) {
-                return CFCLI_APPCODE . '.test';
+            if (defined('CFCLI_APPCODE')) {
+                return constant('CFCLI_APPCODE') . '.test';
             }
             if (static::isCFCli() || static::isTesting()) {
                 if (isset($_SERVER['argv']) && is_array($_SERVER['argv'])) {
@@ -1057,6 +1057,7 @@ final class CF {
     public static function setLocale($locale) {
         static::$locale = $locale;
         CTranslation::translator()->setLocale($locale);
+        CCarbon::setLocale($locale);
         CEvent::dispatch('cf.locale.updated');
     }
 
