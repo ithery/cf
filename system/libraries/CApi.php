@@ -14,10 +14,14 @@ class CApi {
 
     protected static $request;
 
+    protected static $oauth = [];
+
     /**
      * @var null|CApi_Dispatcher
      */
     protected static $dispatcher;
+
+    protected static $call = 0;
 
     /**
      * Get CApi_Runner instance.
@@ -60,5 +64,38 @@ class CApi {
 
     public static function setCurrentDispatcher(CApi_Dispatcher $dispatcher = null) {
         static::$dispatcher = $dispatcher;
+    }
+
+    /**
+     * @param null|mixed $apiGroup
+     *
+     * @return null|CApi_OAuth
+     */
+    public static function oauth($apiGroup = null) {
+        static::$call++;
+
+        if (static::$call == 2) {
+            //cdbg::dd(cdbg::getTraceString());
+        }
+        if (!is_array(static::$oauth)) {
+            static::$oauth = [];
+        }
+        if ($apiGroup == null) {
+            if (static::$dispatcher) {
+                $apiGroup = static::$dispatcher->getGroup();
+            }
+        }
+        if ($apiGroup == null) {
+            $apiGroup = CF::config('api.default');
+        }
+        if ($apiGroup != null) {
+            if (!isset(static::$oauth[$apiGroup])) {
+                static::$oauth[$apiGroup] = new CApi_OAuth($apiGroup);
+            }
+
+            return static::$oauth[$apiGroup];
+        }
+
+        return null;
     }
 }

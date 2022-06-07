@@ -6,6 +6,7 @@ defined('SYSPATH') or die('No direct access allowed.');
  * @author Hery Kurniawan
  * @license Ittron Global Teknologi <ittron.co.id>
  *
+ * @see CModel
  * @since Mar 14, 2019, 7:00:37 PM
  */
 trait CModel_SoftDelete_SoftDeleteTrait {
@@ -22,13 +23,13 @@ trait CModel_SoftDelete_SoftDeleteTrait {
      * @return void
      */
     public static function bootSoftDeleteTrait() {
-        static::addGlobalScope(new CModel_SoftDelete_Scope);
+        static::addGlobalScope(new CModel_SoftDelete_Scope());
     }
 
     /**
      * Force a hard delete on a soft deleted model.
      *
-     * @return bool|null
+     * @return null|bool
      */
     public function forceDelete() {
         $this->forceDeleting = true;
@@ -89,7 +90,7 @@ trait CModel_SoftDelete_SoftDeleteTrait {
     /**
      * Restore a soft-deleted model instance.
      *
-     * @return bool|null
+     * @return null|bool
      */
     public function restore() {
         // If the restoring event does not return false, we will proceed with this

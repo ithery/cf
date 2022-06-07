@@ -82,4 +82,11 @@ class CApi_Dispatcher {
     public function isDispatching() {
         return $this->isDispatching;
     }
+
+    /**
+     * @return CApi_OAuth
+     */
+    public function oauth() {
+        return CApi::oauth($this->group);
+    }
 }

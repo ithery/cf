@@ -29,4 +29,8 @@ trait CApi_Trait_HasGroupPropertyTrait {
     public function manager() {
         return c::api($this->group);
     }
+
+    public function getGroup() {
+        return $this->group;
+    }
 }
