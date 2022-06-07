@@ -5,6 +5,7 @@ class CEmail_Factory {
         'sendgrid' => CEmail_Driver_SendGridDriver::class,
         'mailgun' => CEmail_Driver_MailgunDriver::class,
         'mail' => CEmail_Driver_MailDriver::class,
+        'kirimemail' => CEmail_Driver_KirimEmailDriver::class,
     ];
 
     /**

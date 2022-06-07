@@ -379,7 +379,7 @@ class CModel_Scout_Engine_TNTSearchEngine extends CModel_Scout_EngineAbstract {
         }
 
         /**
-         * Use standard behaviour of Laravel Scout builder class to support soft deletes.
+         * Use standard behaviour of Scout builder class to support soft deletes.
          *
          * When no __soft_deleted statement is given return all entries
          */

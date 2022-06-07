@@ -1,78 +1,113 @@
 <?php
 
-declare(strict_types=1);
-
 namespace League\Flysystem;
 
 /**
  * This interface contains everything to read from and inspect
  * a filesystem. All methods containing are non-destructive.
  */
-interface FilesystemReader
-{
-    public const LIST_SHALLOW = false;
-    public const LIST_DEEP = true;
+interface FilesystemReader {
+    const LIST_SHALLOW = false;
+
+    const LIST_DEEP = true;
 
     /**
+     * @param string $location
+     *
      * @throws FilesystemException
      * @throws UnableToCheckExistence
+     *
+     * @return bool
      */
-    public function fileExists(string $location): bool;
+    public function fileExists($location);
 
     /**
+     * @param string $location
+     *
      * @throws FilesystemException
      * @throws UnableToCheckExistence
+     *
+     * @return bool
      */
-    public function directoryExists(string $location): bool;
+    public function directoryExists($location);
 
     /**
+     * @param string $location
+     *
      * @throws FilesystemException
      * @throws UnableToCheckExistence
+     *
+     * @return bool
      */
-    public function has(string $location): bool;
+    public function has($location);
 
     /**
+     * @param string $location
+     *
      * @throws UnableToReadFile
      * @throws FilesystemException
+     *
+     * @return string
      */
-    public function read(string $location): string;
+    public function read($location);
 
     /**
+     * @param string $location
+     *
+     * @throws UnableToReadFile
+     * @throws FilesystemException
+     *
      * @return resource
-     *
-     * @throws UnableToReadFile
-     * @throws FilesystemException
      */
-    public function readStream(string $location);
+    public function readStream($location);
 
     /**
+     * @param string $location
+     * @param bool   $deep
+     *
+     * @throws FilesystemException
+     *
      * @return DirectoryListing<StorageAttributes>
+     */
+    public function listContents($location, $deep = self::LIST_SHALLOW);
+
+    /**
+     * @param string $path
      *
-     * @throws FilesystemException
-     */
-    public function listContents(string $location, bool $deep = self::LIST_SHALLOW): DirectoryListing;
-
-    /**
      * @throws UnableToRetrieveMetadata
      * @throws FilesystemException
+     *
+     * @return int
      */
-    public function lastModified(string $path): int;
+    public function lastModified($path);
 
     /**
+     * @param string $path
+     *
      * @throws UnableToRetrieveMetadata
      * @throws FilesystemException
+     *
+     *  @return
      */
-    public function fileSize(string $path): int;
+    public function fileSize($path);
 
     /**
+     * @param string $path
+     *
      * @throws UnableToRetrieveMetadata
      * @throws FilesystemException
+     *
+     * @return string
      */
-    public function mimeType(string $path): string;
+    public function mimeType($path);
 
     /**
+     * @param string $path
+     *
      * @throws UnableToRetrieveMetadata
      * @throws FilesystemException
+     *
+     * @return string
      */
-    public function visibility(string $path): string;
+    public function visibility($path);
 }

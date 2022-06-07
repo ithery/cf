@@ -20,6 +20,9 @@ class CElement_Component_DataTable extends CElement_Component {
 
     const ACTION_LOCATION_LAST = 'last';
 
+    /**
+     * @var array
+     */
     public $defaultPagingList = [
         '10' => '10',
         '25' => '25',
@@ -53,7 +56,7 @@ class CElement_Component_DataTable extends CElement_Component {
 
     public $customColumnHeader;
 
-    public $header_sortable;
+    public $headerSortable;
 
     public $cellCallbackFunc;
 
@@ -125,6 +128,8 @@ class CElement_Component_DataTable extends CElement_Component {
 
     protected $labels = [];
 
+    protected $buttons = [];
+
     public function __construct($id = '') {
         parent::__construct($id);
         $this->defaultPagingList['-1'] = c::__('ALL');
@@ -142,15 +147,14 @@ class CElement_Component_DataTable extends CElement_Component {
         $this->data = [];
         $this->keyField = '';
         $this->columns = [];
-        $this->rowActionList = CElement_List_ActionRowList::factory();
-        $this->rowActionList->setStyle('btn-icon-group')->addClass('btn-table-action');
+        $this->rowActionList = null;
         $this->headerActionList = null;
         $this->footerActionList = null;
         $this->checkbox = false;
         $this->checkboxValue = [];
         $this->numbering = false;
         $this->query = '';
-        $this->header_sortable = true;
+        $this->headerSortable = true;
         $this->footerTitle = '';
         $this->footer = false;
         $this->footerFields = [];
@@ -233,6 +237,12 @@ class CElement_Component_DataTable extends CElement_Component {
         $labels['searchPlaceholder'] = $this->searchPlaceholder;
 
         return $labels;
+    }
+
+    public function setButtons(array $buttons) {
+        $this->buttons = $buttons;
+
+        return $this;
     }
 
     protected function getLegacyLabels() {
@@ -559,7 +569,7 @@ class CElement_Component_DataTable extends CElement_Component {
      * @return $this
      */
     public function setHeaderSortable($bool = true) {
-        $this->header_sortable = $bool;
+        $this->headerSortable = $bool;
 
         return $this;
     }
@@ -909,8 +919,8 @@ class CElement_Component_DataTable extends CElement_Component {
             $this->footerActionList->setStyle('btn-list');
         }
 
-        if ($this->rowActionList != null) {
-            $this->rowActionList->addClass('btn-table-action');
+        if ($this->haveRowAction()) {
+            $this->getRowActionList()->addClass('btn-table-action capp-table-action');
         }
         if ($this->ajax == false) {
             if (is_string($this->query) && $this->query) {

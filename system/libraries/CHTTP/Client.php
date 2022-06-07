@@ -234,8 +234,8 @@ class CHTTP_Client {
     /**
      * Record a request response pair.
      *
-     * @param \Illuminate\Http\Client\Request $request
-     * @param \CHTTP_Client_Response          $response
+     * @param \CHTTP_Client_Request  $request
+     * @param \CHTTP_Client_Response $response
      *
      * @return void
      */
@@ -365,7 +365,7 @@ class CHTTP_Client {
     /**
      * Get the current event dispatcher implementation.
      *
-     * @return null|\Illuminate\Contracts\Events\Dispatcher
+     * @return null|\CEvent_DispatcherInterface
      */
     public function getDispatcher() {
         return $this->dispatcher;

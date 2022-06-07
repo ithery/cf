@@ -1,11 +1,8 @@
 <?php
 
-declare(strict_types=1);
-
 namespace League\Flysystem;
 
-class Filesystem implements FilesystemOperator
-{
+class Filesystem implements FilesystemOperator {
     /**
      * @var FilesystemAdapter
      */
@@ -31,25 +28,43 @@ class Filesystem implements FilesystemOperator
         $this->pathNormalizer = $pathNormalizer ?: new WhitespacePathNormalizer();
     }
 
-    public function fileExists(string $location): bool
-    {
+    /**
+     * @param string $location
+     *
+     * @return bool
+     */
+    public function fileExists($location) {
         return $this->adapter->fileExists($this->pathNormalizer->normalizePath($location));
     }
 
-    public function directoryExists(string $location): bool
-    {
+    /**
+     * @param string $location
+     *
+     * @return bool
+     */
+    public function directoryExists($location) {
         return $this->adapter->directoryExists($this->pathNormalizer->normalizePath($location));
     }
 
-    public function has(string $location): bool
-    {
+    /**
+     * @param string $location
+     *
+     * @return bool
+     */
+    public function has($location) {
         $path = $this->pathNormalizer->normalizePath($location);
 
         return $this->adapter->fileExists($path) || $this->adapter->directoryExists($path);
     }
 
-    public function write(string $location, string $contents, array $config = []): void
-    {
+    /**
+     * @param string $location
+     * @param string $contents
+     * @param array  $config
+     *
+     * @return void
+     */
+    public function write($location, $contents, array $config = []) {
         $this->adapter->write(
             $this->pathNormalizer->normalizePath($location),
             $contents,
@@ -57,8 +72,14 @@ class Filesystem implements FilesystemOperator
         );
     }
 
-    public function writeStream(string $location, $contents, array $config = []): void
-    {
+    /**
+     * @param string          $location
+     * @param string|resource $contents
+     * @param array           $config
+     *
+     * @return void
+     */
+    public function writeStream($location, $contents, array $config = []) {
         /* @var resource $contents */
         $this->assertIsResource($contents);
         $this->rewindStream($contents);
@@ -69,43 +90,75 @@ class Filesystem implements FilesystemOperator
         );
     }
 
-    public function read(string $location): string
-    {
+    /**
+     * @param string $location
+     *
+     * @return string
+     */
+    public function read($location) {
         return $this->adapter->read($this->pathNormalizer->normalizePath($location));
     }
 
-    public function readStream(string $location)
-    {
+    /**
+     * @param string $location
+     *
+     * @return void
+     */
+    public function readStream($location) {
         return $this->adapter->readStream($this->pathNormalizer->normalizePath($location));
     }
 
-    public function delete(string $location): void
-    {
+    /**
+     * @param string $location
+     *
+     * @return void
+     */
+    public function delete($location) {
         $this->adapter->delete($this->pathNormalizer->normalizePath($location));
     }
 
-    public function deleteDirectory(string $location): void
-    {
+    /**
+     * @param string $location
+     *
+     * @return void
+     */
+    public function deleteDirectory($location) {
         $this->adapter->deleteDirectory($this->pathNormalizer->normalizePath($location));
     }
 
-    public function createDirectory(string $location, array $config = []): void
-    {
+    /**
+     * @param string $location
+     * @param array  $config
+     *
+     * @return void
+     */
+    public function createDirectory($location, array $config = []) {
         $this->adapter->createDirectory(
             $this->pathNormalizer->normalizePath($location),
             $this->config->extend($config)
         );
     }
 
-    public function listContents(string $location, bool $deep = self::LIST_SHALLOW): DirectoryListing
-    {
+    /**
+     * @param string $location
+     * @param bool   $deep
+     *
+     * @return DirectoryListing
+     */
+    public function listContents($location, $deep = self::LIST_SHALLOW) {
         $path = $this->pathNormalizer->normalizePath($location);
 
         return new DirectoryListing($this->adapter->listContents($path, $deep));
     }
 
-    public function move(string $source, string $destination, array $config = []): void
-    {
+    /**
+     * @param string $source
+     * @param string $destination
+     * @param array  $config
+     *
+     * @return void
+     */
+    public function move($source, $destination, array $config = []) {
         $this->adapter->move(
             $this->pathNormalizer->normalizePath($source),
             $this->pathNormalizer->normalizePath($destination),
@@ -113,8 +166,14 @@ class Filesystem implements FilesystemOperator
         );
     }
 
-    public function copy(string $source, string $destination, array $config = []): void
-    {
+    /**
+     * @param string $source
+     * @param string $destination
+     * @param array  $config
+     *
+     * @return void
+     */
+    public function copy($source, $destination, array $config = []) {
         $this->adapter->copy(
             $this->pathNormalizer->normalizePath($source),
             $this->pathNormalizer->normalizePath($destination),
@@ -122,52 +181,75 @@ class Filesystem implements FilesystemOperator
         );
     }
 
-    public function lastModified(string $path): int
-    {
+    /**
+     * @param string $path
+     *
+     * @return int
+     */
+    public function lastModified($path) {
         return $this->adapter->lastModified($this->pathNormalizer->normalizePath($path))->lastModified();
     }
 
-    public function fileSize(string $path): int
-    {
+    /**
+     * @param string $path
+     *
+     * @return int
+     */
+    public function fileSize($path) {
         return $this->adapter->fileSize($this->pathNormalizer->normalizePath($path))->fileSize();
     }
 
-    public function mimeType(string $path): string
-    {
+    /**
+     * @param string $path
+     *
+     * @return string
+     */
+    public function mimeType($path) {
         return $this->adapter->mimeType($this->pathNormalizer->normalizePath($path))->mimeType();
     }
 
-    public function setVisibility(string $path, string $visibility): void
-    {
+    /**
+     * @param string $path
+     * @param string $visibility
+     *
+     * @return void
+     */
+    public function setVisibility($path, $visibility) {
         $this->adapter->setVisibility($this->pathNormalizer->normalizePath($path), $visibility);
     }
 
-    public function visibility(string $path): string
-    {
+    /**
+     * @param string $path
+     *
+     * @return string
+     */
+    public function visibility($path) {
         return $this->adapter->visibility($this->pathNormalizer->normalizePath($path))->visibility();
     }
 
     /**
      * @param mixed $contents
+     *
+     * @return void
      */
-    private function assertIsResource($contents): void
-    {
+    private function assertIsResource($contents) {
         if (is_resource($contents) === false) {
             throw new InvalidStreamProvided(
-                "Invalid stream provided, expected stream resource, received " . gettype($contents)
+                'Invalid stream provided, expected stream resource, received ' . gettype($contents)
             );
         } elseif ($type = get_resource_type($contents) !== 'stream') {
             throw new InvalidStreamProvided(
-                "Invalid stream provided, expected stream resource, received resource of type " . $type
+                'Invalid stream provided, expected stream resource, received resource of type ' . $type
             );
         }
     }
 
     /**
      * @param resource $resource
+     *
+     * @return void
      */
-    private function rewindStream($resource): void
-    {
+    private function rewindStream($resource) {
         if (ftell($resource) !== 0 && stream_get_meta_data($resource)['seekable']) {
             rewind($resource);
         }

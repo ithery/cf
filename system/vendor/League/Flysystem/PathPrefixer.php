@@ -1,15 +1,12 @@
 <?php
 
-declare(strict_types=1);
-
 namespace League\Flysystem;
 
 use function rtrim;
 use function strlen;
 use function substr;
 
-final class PathPrefixer
-{
+final class PathPrefixer {
     /**
      * @var string
      */
@@ -20,8 +17,11 @@ final class PathPrefixer
      */
     private $separator = '/';
 
-    public function __construct(string $prefix, string $separator = '/')
-    {
+    /**
+     * @param string $prefix
+     * @param string $separator
+     */
+    public function __construct($prefix, $separator = '/') {
         $this->prefix = rtrim($prefix, '\\/');
 
         if ($this->prefix !== '' || $prefix === $separator) {
@@ -31,24 +31,40 @@ final class PathPrefixer
         $this->separator = $separator;
     }
 
-    public function prefixPath(string $path): string
-    {
+    /**
+     * @param string $path
+     *
+     * @return string
+     */
+    public function prefixPath($path) {
         return $this->prefix . ltrim($path, '\\/');
     }
 
-    public function stripPrefix(string $path): string
-    {
+    /**
+     * @param string $path
+     *
+     * @return string
+     */
+    public function stripPrefix($path) {
         /* @var string */
         return substr($path, strlen($this->prefix));
     }
 
-    public function stripDirectoryPrefix(string $path): string
-    {
+    /**
+     * @param string $path
+     *
+     * @return string
+     */
+    public function stripDirectoryPrefix($path) {
         return rtrim($this->stripPrefix($path), '\\/');
     }
 
-    public function prefixDirectoryPath(string $path): string
-    {
+    /**
+     * @param string $path
+     *
+     * @return string
+     */
+    public function prefixDirectoryPath($path) {
         $prefixedPath = $this->prefixPath(rtrim($path, '\\/'));
 
         if ($prefixedPath === '' || substr($prefixedPath, -1) === $this->separator) {

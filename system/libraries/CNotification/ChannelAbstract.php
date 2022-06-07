@@ -14,6 +14,7 @@ abstract class CNotification_ChannelAbstract implements CNotification_ChannelInt
         $notificationSenderJobClass = CF::config('notification.task_queue.notification_sender', CNotification_TaskQueue_NotificationSender::class);
 
         $isQueued = carr::get($options, 'queued', CF::config('notification.queue.queued'));
+
         $options = [
             'channel' => $this->channelName,
             'className' => $className,
@@ -121,6 +122,18 @@ abstract class CNotification_ChannelAbstract implements CNotification_ChannelInt
         $model = CNotification::manager()->createLogNotificationModel();
         $options = c::collect($result);
         $recipient = $options->pull('recipient');
+        if ($recipient instanceof CModel_Collection) {
+            $firstModel = $recipient->first();
+            if ($firstModel) {
+                /** @var CModel $firstModel */
+                $recipient = $recipient->pluck($firstModel->getKeyName());
+            } else {
+                $recipient = [];
+            }
+        }
+        if ($recipient instanceof CModel) {
+            $recipient = [$recipient->getKey()];
+        }
         if (is_array($recipient)) {
             $recipient = CHelper::json()->encode($recipient);
         }
@@ -180,9 +193,6 @@ abstract class CNotification_ChannelAbstract implements CNotification_ChannelInt
         }
 
         return CNotification::manager()->createMessage($this->getVendorName(), $vendorConfig, $data);
-    }
-
-    protected function dispatchQueuedConversions(CApp_Model_Interface_ResourceInterface $resource, CResources_ConversionCollection $queuedConversions) {
     }
 
     abstract protected function handleMessage($data, $logNotificationModel);

@@ -35,4 +35,11 @@ class CNotification {
     public static function whatsapp() {
         return static::manager()->channel('Whatsapp');
     }
+
+    /**
+     * @return CNotification_Channel_DatabaseChannel
+     */
+    public static function database() {
+        return static::manager()->channel('Database');
+    }
 }
