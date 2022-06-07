@@ -200,7 +200,6 @@ trait CConsole_Trait_InteractsWithIOTrait {
      */
     public function choice($question, array $choices, $default = null, $attempts = null, $multiple = false) {
         $question = new ChoiceQuestion($question, $choices, $default);
-
         $question->setMaxAttempts($attempts)->setMultiselect($multiple);
 
         return $this->output->askQuestion($question);
@@ -209,10 +208,10 @@ trait CConsole_Trait_InteractsWithIOTrait {
     /**
      * Format input to textual table.
      *
-     * @param array                                         $headers
-     * @param \Illuminate\Contracts\Support\Arrayable|array $rows
-     * @param string                                        $tableStyle
-     * @param array                                         $columnStyles
+     * @param array                       $headers
+     * @param \CInterface_Arrayable|array $rows
+     * @param string                      $tableStyle
+     * @param array                       $columnStyles
      *
      * @return void
      */

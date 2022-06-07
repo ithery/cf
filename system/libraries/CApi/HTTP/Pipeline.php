@@ -36,4 +36,12 @@ class CApi_HTTP_Pipeline extends CHTTP_Pipeline {
 
         return $response;
     }
+
+    protected function handlePipe($pipe) {
+        if ($pipe instanceof CApi_Contract_ApiGroupMiddlewareInterface) {
+            $pipe->setGroup($this->group);
+        }
+
+        return $pipe;
+    }
 }
