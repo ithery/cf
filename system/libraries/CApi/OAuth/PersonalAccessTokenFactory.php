@@ -89,14 +89,14 @@ class CApi_OAuth_PersonalAccessTokenFactory {
     /**
      * Create a request instance for the given client.
      *
-     * @param \Laravel\Passport\Client $client
-     * @param mixed                    $userId
-     * @param array                    $scopes
+     * @param \CApi_OAuth_Model_OAuthClient $client
+     * @param mixed                         $userId
+     * @param array                         $scopes
      *
      * @return \Psr\Http\Message\ServerRequestInterface
      */
     protected function createRequest($client, $userId, array $scopes) {
-        $secret = Passport::$hashesClientSecrets ? $this->clients->getPersonalAccessClientSecret() : $client->secret;
+        $secret = CApi::oauth()->hashesClientSecrets ? $this->clients->getPersonalAccessClientSecret() : $client->secret;
 
         return (new ServerRequest('POST', 'not-important'))->withParsedBody([
             'grant_type' => 'personal_access',

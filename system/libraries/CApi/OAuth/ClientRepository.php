@@ -242,7 +242,7 @@ class CApi_OAuth_ClientRepository {
     /**
      * Delete the given client.
      *
-     * @param \Laravel\Passport\Client $client
+     * @param \CApi_OAuth_Model_OAuthClient $client
      *
      * @return void
      */

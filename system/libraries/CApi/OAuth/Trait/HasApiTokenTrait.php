@@ -13,7 +13,7 @@ trait CApi_OAuth_Trait_HasApiTokenTrait {
      *
      * @return \CModel_Relation_HasMany
      */
-    public function clients() {
+    public function oauthClient() {
         return $this->hasMany(CApi::oauth()->clientModel(), 'user_id');
     }
 
@@ -22,7 +22,7 @@ trait CApi_OAuth_Trait_HasApiTokenTrait {
      *
      * @return \CModel_Relation_HasMany
      */
-    public function tokens() {
+    public function oauthAccessToken() {
         return $this->hasMany(CApi::oauth()->tokenModel(), 'user_id')->orderBy('created_at', 'desc');
     }
 
@@ -55,7 +55,7 @@ trait CApi_OAuth_Trait_HasApiTokenTrait {
      * @return \CApi_OAuth_PersonalAccessTokenResult
      */
     public function createToken($name, array $scopes = []) {
-        return c::container()->make(PersonalAccessTokenFactory::class)->make(
+        return c::container()->make(CApi_OAuth_PersonalAccessTokenFactory::class)->make(
             $this->getKey(),
             $name,
             $scopes
@@ -65,7 +65,7 @@ trait CApi_OAuth_Trait_HasApiTokenTrait {
     /**
      * Set the current access token for the user.
      *
-     * @param \Laravel\Passport\Token $accessToken
+     * @param \CApi_OAuth_Model_OAuthAccessToken $accessToken
      *
      * @return $this
      */

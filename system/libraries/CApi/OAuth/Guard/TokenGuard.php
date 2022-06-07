@@ -5,7 +5,6 @@ use Firebase\JWT\Key;
 use Nyholm\Psr7\Factory\Psr17Factory;
 use League\OAuth2\Server\ResourceServer;
 
-use Illuminate\Cookie\Middleware\EncryptCookies;
 use League\OAuth2\Server\Exception\OAuthServerException;
 use Symfony\Bridge\PsrHttpMessage\Factory\PsrHttpFactory;
 
@@ -20,21 +19,21 @@ class CApi_OAuth_Guard_TokenGuard {
     /**
      * The user provider implementation.
      *
-     * @var \Laravel\Passport\PassportUserProvider
+     * @var \CApi_OAuth_UserProvider
      */
     protected $provider;
 
     /**
      * The token repository instance.
      *
-     * @var \Laravel\Passport\TokenRepository
+     * @var \CApi_OAuth_TokenRepository
      */
     protected $tokens;
 
     /**
      * The client repository instance.
      *
-     * @var \Laravel\Passport\ClientRepository
+     * @var \CApi_OAuth_ClientRepository
      */
     protected $clients;
 
@@ -167,7 +166,7 @@ class CApi_OAuth_Guard_TokenGuard {
         if ($this->clients->revoked($clientId)) {
             return;
         }
-
+        /** @var CApi_OAuth_Trait_HasApiTokenTrait $user */
         return $token ? $user->withAccessToken($token) : null;
     }
 
@@ -214,6 +213,8 @@ class CApi_OAuth_Guard_TokenGuard {
         // the user model. The transient token assumes it has all scopes since the user
         // is physically logged into the application via the application's interface.
         if ($user = $this->provider->retrieveById($token['sub'])) {
+            /** @var CApi_OAuth_Trait_HasApiTokenTrait $user */
+
             return $user->withAccessToken(new CApi_OAuth_TransientToken());
         }
     }
