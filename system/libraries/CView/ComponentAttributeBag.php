@@ -38,6 +38,7 @@ class CView_ComponentAttributeBag implements ArrayAccess, CInterface_Htmlable, I
      */
     public function first($default = null) {
         $current = $this->getIterator()->current();
+
         return $current ? $current : c::value($default);
     }
 
@@ -173,7 +174,7 @@ class CView_ComponentAttributeBag implements ArrayAccess, CInterface_Htmlable, I
         }, $attributeDefaults);
 
         list($appendableAttributes, $nonAppendableAttributes) = c::collect($this->attributes)
-                ->partition(function ($value, $key) use ($attributeDefaults) {
+            ->partition(function ($value, $key) use ($attributeDefaults) {
                     return $key === 'class'
                     || (isset($attributeDefaults[$key])
                     && $attributeDefaults[$key] instanceof CView_AppendableAttributeValue);
@@ -278,7 +279,7 @@ class CView_ComponentAttributeBag implements ArrayAccess, CInterface_Htmlable, I
      *
      * @param array $attributeDefaults
      *
-     * @return \Illuminate\Support\HtmlString
+     * @return \CBase_HtmlString
      */
     public function __invoke(array $attributeDefaults = []) {
         return new CBase_HtmlString((string) $this->merge($attributeDefaults));

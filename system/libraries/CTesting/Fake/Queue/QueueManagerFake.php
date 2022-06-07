@@ -246,7 +246,7 @@ class CTesting_Fake_Queue_QueueManagerFake extends CQueue_Manager implements CQu
      *
      * @param mixed $value
      *
-     * @return \Illuminate\Contracts\Queue\Queue
+     * @return \CQueue_QueueInterface
      */
     public function connection($value = null) {
         return $this;
@@ -339,7 +339,7 @@ class CTesting_Fake_Queue_QueueManagerFake extends CQueue_Manager implements CQu
      *
      * @param null|string $queue
      *
-     * @return null|\Illuminate\Contracts\Queue\Job
+     * @return null|\CQueue_JobInterface
      */
     public function pop($queue = null) {
     }

@@ -4,11 +4,6 @@ defined('SYSPATH') or die('No direct access allowed.');
 
 class CValidation_Factory implements CValidation_FactoryInterface {
     /**
-     * @var CValidation_Factory
-     */
-    private static $instance;
-
-    /**
      * The Translator implementation.
      *
      * @var CTranslation_Translator
@@ -71,10 +66,16 @@ class CValidation_Factory implements CValidation_FactoryInterface {
      */
     protected $resolver;
 
+    /**
+     * @var CValidation_Factory
+     */
+    private static $instance;
+
     public static function instance() {
         if (static::$instance == null) {
             static::$instance = new CValidation_Factory();
         }
+
         return static::$instance;
     }
 
@@ -118,6 +119,7 @@ class CValidation_Factory implements CValidation_FactoryInterface {
             $validator->setContainer($this->container);
         }
         $this->addExtensions($validator);
+
         return $validator;
     }
 
@@ -129,9 +131,9 @@ class CValidation_Factory implements CValidation_FactoryInterface {
      * @param array $messages
      * @param array $customAttributes
      *
-     * @return array
+     * @throws \CValidation_Exception
      *
-     * @throws \Illuminate\Validation\ValidationException
+     * @return array
      */
     public function validate(array $data, array $rules, array $messages = [], array $customAttributes = []) {
         return $this->make($data, $rules, $messages, $customAttributes)->validate();
@@ -151,8 +153,10 @@ class CValidation_Factory implements CValidation_FactoryInterface {
         if (is_null($this->resolver)) {
             $validator = new CValidation_Validator($data, $rules, $messages, $customAttributes);
             $validator->setTranslator($this->translator);
+
             return $validator;
         }
+
         return call_user_func($this->resolver, $data, $rules, $messages, $customAttributes);
     }
 
@@ -179,7 +183,7 @@ class CValidation_Factory implements CValidation_FactoryInterface {
      *
      * @param string          $rule
      * @param \Closure|string $extension
-     * @param string|null     $message
+     * @param null|string     $message
      *
      * @return void
      */
@@ -195,7 +199,7 @@ class CValidation_Factory implements CValidation_FactoryInterface {
      *
      * @param string          $rule
      * @param \Closure|string $extension
-     * @param string|null     $message
+     * @param null|string     $message
      *
      * @return void
      */
@@ -211,7 +215,7 @@ class CValidation_Factory implements CValidation_FactoryInterface {
      *
      * @param string          $rule
      * @param \Closure|string $extension
-     * @param string|null     $message
+     * @param null|string     $message
      *
      * @return void
      */

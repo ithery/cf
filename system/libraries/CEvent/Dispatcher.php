@@ -524,7 +524,7 @@ class CEvent_Dispatcher implements CEvent_DispatcherInterface {
     /**
      * Get the queue implementation from the resolver.
      *
-     * @return \Illuminate\Contracts\Queue\Queue
+     * @return \CQueue_QueueInterface
      */
     protected function resolveQueue() {
         return call_user_func($this->queueResolver);

@@ -13,7 +13,7 @@ class CLogger_Logger implements LoggerInterface {
     /**
      * The event dispatcher instance.
      *
-     * @var null|\Illuminate\Contracts\Events\Dispatcher
+     * @var null|\CEvent_DispatcherInterface
      */
     protected $dispatcher;
 
