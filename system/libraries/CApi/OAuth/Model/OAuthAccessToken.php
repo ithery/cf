@@ -35,6 +35,27 @@ class CApi_OAuth_Model_OAuthAccessToken extends CModel {
         'expires_at',
     ];
 
+    public static function boot() {
+        parent::boot();
+
+        static::deleting(function (CApi_OAuth_Model_OAuthAccessToken $model) {
+            if (static::usesSoftDelete() && $model->isForceDeleting()) {
+                $model->oauthRefreshToken->each->forceDelete();
+            } else {
+                $model->oauthRefreshToken->each->delete();
+            }
+        });
+    }
+
+    /**
+     * Get the refresh token has many.
+     *
+     * @return \CModel_Relation_HasMany
+     */
+    public function oauthRefreshToken() {
+        return $this->hasMany(CApi::oauth()->refreshTokenModel());
+    }
+
     /**
      * Get the client that the token belongs to.
      *

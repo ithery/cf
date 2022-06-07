@@ -58,12 +58,12 @@ class CApi_OAuth_Bridge_AccessTokenRepository implements AccessTokenRepositoryIn
             'updatedby' => c::base()->username(),
             'expires_at' => $accessTokenEntity->getExpiryDateTime(),
         ];
-        $this->tokenRepository->create($tokenData);
-
+        $tokenModel = $this->tokenRepository->create($tokenData);
         $this->events->dispatch(new CApi_OAuth_Event_AccessTokenCreated(
             $accessTokenEntity->getIdentifier(),
             $accessTokenEntity->getUserIdentifier(),
-            $accessTokenEntity->getClient()->getIdentifier()
+            $accessTokenEntity->getClient()->getIdentifier(),
+            $tokenModel,
         ));
     }
 

@@ -509,7 +509,7 @@ class CApi_OAuth {
      *
      * @param string $clientModel
      *
-     * @return void
+     * @return $this
      */
     public function useClientModel($clientModel) {
         $this->clientModel = $clientModel;
@@ -551,7 +551,7 @@ class CApi_OAuth {
      *
      * @param bool $value
      *
-     * @return void
+     * @return $this
      */
     public function setClientUuids($value) {
         $this->clientUuids = $value;
@@ -562,12 +562,12 @@ class CApi_OAuth {
     /**
      * Set the personal access client model class name.
      *
-     * @param string $clientModel
+     * @param string $personalAccessClientModel
      *
-     * @return void
+     * @return $this
      */
-    public function usePersonalAccessClientModel($clientModel) {
-        $this->personalAccessClientModel = $clientModel;
+    public function usePersonalAccessClientModel($personalAccessClientModel) {
+        $this->personalAccessClientModel = $personalAccessClientModel;
 
         return $this;
     }
@@ -597,7 +597,7 @@ class CApi_OAuth {
      *
      * @param string $tokenModel
      *
-     * @return void
+     * @return $this
      */
     public function useTokenModel($tokenModel) {
         $this->tokenModel = $tokenModel;
@@ -630,10 +630,12 @@ class CApi_OAuth {
      *
      * @param string $refreshTokenModel
      *
-     * @return void
+     * @return $this
      */
-    public static function useRefreshTokenModel($refreshTokenModel) {
-        static::$refreshTokenModel = $refreshTokenModel;
+    public function useRefreshTokenModel($refreshTokenModel) {
+        $this->refreshTokenModel = $refreshTokenModel;
+
+        return $this;
     }
 
     /**
@@ -641,8 +643,8 @@ class CApi_OAuth {
      *
      * @return string
      */
-    public static function refreshTokenModel() {
-        return static::$refreshTokenModel;
+    public function refreshTokenModel() {
+        return $this->refreshTokenModel;
     }
 
     /**
