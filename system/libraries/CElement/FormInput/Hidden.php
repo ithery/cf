@@ -13,5 +13,6 @@ class CElement_FormInput_Hidden extends CElement_FormInput {
     protected function build() {
         $this->setAttr('type', $this->type);
         $this->setAttr('value', $this->value);
+        $this->setAttr('name', $this->name);
     }
 }

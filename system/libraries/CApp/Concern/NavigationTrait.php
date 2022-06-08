@@ -19,6 +19,9 @@ trait CApp_Concern_NavigationTrait {
     }
 
     public function resolveNav($nav) {
+        if ($nav === null) {
+            return [];
+        }
         $this->resolvedNavName = null;
         if (is_callable($nav)) {
             $this->resolvedNavName = '{Closure}';
