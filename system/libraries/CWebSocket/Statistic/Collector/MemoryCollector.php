@@ -12,7 +12,7 @@ class CWebSocket_Statistic_Collector_MemoryCollector implements CWebSocket_Contr
     /**
      * The Channel manager.
      *
-     * @var \CWebSocket_Contract_ChannelManagerInterface
+     * @var \CWebSocket_Contract_ChannelManagerInterface|\CWebSocket_ChannelManager_LocalChannelManager|\CWebSocket_ChannelManager_RedisChannelManager
      */
     protected $channelManager;
 
@@ -128,7 +128,7 @@ class CWebSocket_Statistic_Collector_MemoryCollector implements CWebSocket_Contr
      *
      * @param string|int $appId
      *
-     * @return PromiseInterface[\BeyondCode\LaravelWebSockets\Statistics\Statistic|null]
+     * @return PromiseInterface[CWebSocket_Statistic|null]
      */
     public function getAppStatistics($appId) {
         return CWebSocket_Helper::createFulfilledPromise(

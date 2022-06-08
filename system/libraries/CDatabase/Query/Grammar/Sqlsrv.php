@@ -43,7 +43,7 @@ class CDatabase_Query_Grammar_Sqlsrv extends CDatabase_Query_Grammar {
      * @param \CDatabase_Query_Builder $query
      * @param array                    $columns
      *
-     * @return string|null
+     * @return null|string
      */
     protected function compileColumns(CDatabase_Query_Builder $query, $columns) {
         if (!is_null($query->aggregate)) {
@@ -121,7 +121,7 @@ class CDatabase_Query_Grammar_Sqlsrv extends CDatabase_Query_Grammar {
      * @return string
      */
     protected function compileJsonContains($column, $value) {
-        [$field, $path] = $this->wrapJsonFieldAndPath($column);
+        list($field, $path) = $this->wrapJsonFieldAndPath($column);
 
         return $value . ' in (select [value] from openjson(' . $field . $path . '))';
     }
@@ -147,7 +147,7 @@ class CDatabase_Query_Grammar_Sqlsrv extends CDatabase_Query_Grammar {
      * @return string
      */
     protected function compileJsonLength($column, $operator, $value) {
-        [$field, $path] = $this->wrapJsonFieldAndPath($column);
+        list($field, $path) = $this->wrapJsonFieldAndPath($column);
 
         return '(select count(*) from openjson(' . $field . $path . ')) ' . $operator . ' ' . $value;
     }
@@ -477,7 +477,7 @@ class CDatabase_Query_Grammar_Sqlsrv extends CDatabase_Query_Grammar {
      * @return string
      */
     protected function wrapJsonSelector($value) {
-        [$field, $path] = $this->wrapJsonFieldAndPath($value);
+        list($field, $path) = $this->wrapJsonFieldAndPath($value);
 
         return 'json_value(' . $field . $path . ')';
     }
@@ -496,7 +496,7 @@ class CDatabase_Query_Grammar_Sqlsrv extends CDatabase_Query_Grammar {
     /**
      * Wrap a table in keyword identifiers.
      *
-     * @param \Illuminate\Database\Query\Expression|string $table
+     * @param \CDatabase_Query_Expression|string $table
      *
      * @return string
      */

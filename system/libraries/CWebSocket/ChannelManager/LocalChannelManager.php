@@ -2,8 +2,6 @@
 use Carbon\Carbon;
 use Ratchet\ConnectionInterface;
 use React\EventLoop\LoopInterface;
-use BeyondCode\LaravelWebSockets\Channels\Channel;
-use BeyondCode\LaravelWebSockets\Channels\PresenceChannel;
 
 class CWebSocket_ChannelManager_LocalChannelManager implements CWebSocket_Contract_ChannelManagerInterface {
     /**

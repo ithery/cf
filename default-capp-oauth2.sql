@@ -1,22 +1,20 @@
-/* 
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
+
 /**
- * Author:  ittron
- * Created: Dec 5, 2019
+ * Author:  Hery Kurniawan
+ * Created: June 06, 2022
  */
 
 
-
-DROP TABLE IF EXISTS `oauth_code`;
+DROP TABLE IF EXISTS `oauth_auth_code`;
 CREATE TABLE `oauth_auth_code` (
   `oauth_code_id` bigint(20) unsigned NOT NULL AUTO_INCREMENT,
   `org_id` bigint(20) unsigned DEFAULT NULL,
-  `client_id` varchar(255) DEFAULT NULL,
-  `scopes` text DEFAULT NULL,
-  `revoked` int(64) DEFAULT 0,
+  `user_id` bigint(20) unsigned DEFAULT NULL,
+  `user_type` varchar(255) DEFAULT NULL,
+  `code` varchar(100) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci,
+  `oauth_client_id` bigint(20) unsigned DEFAULT NULL,
+  `scopes` text CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `revoked` int(1) DEFAULT 0,
   `expires_at` datetime DEFAULT NULL,
   `created` datetime DEFAULT NULL,
   `createdby` varchar(50) DEFAULT NULL,
@@ -32,9 +30,12 @@ DROP TABLE IF EXISTS `oauth_access_token`;
 CREATE TABLE `oauth_access_token` (
   `oauth_access_token_id` bigint(20) unsigned NOT NULL AUTO_INCREMENT,
   `org_id` bigint(20) unsigned DEFAULT NULL,
-  `client_id` varchar(255) DEFAULT NULL,
-  `name` varchar(255) DEFAULT NULL,
-  `scopes` text DEFAULT NULL,
+  `oauth_client_id` bigint(20) unsigned DEFAULT NULL,
+  `user_id` bigint(20) unsigned DEFAULT NULL,
+  `user_type` varchar(255) DEFAULT NULL,
+  `token` varchar(100) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `name` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `scopes` text CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
   `revoked` int(1) DEFAULT 0,
   `expires_at` datetime DEFAULT NULL,
   `created` datetime DEFAULT NULL,
@@ -53,7 +54,7 @@ CREATE TABLE `oauth_refresh_token` (
   `oauth_refresh_token_id` bigint(20) unsigned NOT NULL AUTO_INCREMENT,
   `org_id` bigint(20) unsigned DEFAULT NULL,
   `oauth_access_token_id` bigint(20) unsigned DEFAULT NULL,
-  `client_id` varchar(255) DEFAULT NULL,
+  `token` varchar(100) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
   `revoked` int(1) DEFAULT 0,
   `expires_at` datetime DEFAULT NULL,
   `created` datetime DEFAULT NULL,
@@ -71,9 +72,12 @@ DROP TABLE IF EXISTS `oauth_client`;
 CREATE TABLE `oauth_client` (
   `oauth_client_id` bigint(20) unsigned NOT NULL AUTO_INCREMENT,
   `org_id` bigint(20) unsigned DEFAULT NULL,
-  `name` varchar(255) DEFAULT NULL,
-  `secret` varchar(100) DEFAULT NULL,
-  `redirect` varchar(500) DEFAULT NULL,
+  `user_id` bigint(20) unsigned DEFAULT NULL,
+  `user_type` varchar(255) DEFAULT NULL,
+  `name` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `secret` varchar(100) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `provider` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `redirect` text CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
   `personal_access_client` int(1) DEFAULT 0,
   `password_client` int(1) DEFAULT 0,
   `revoked` int(1) DEFAULT 0,

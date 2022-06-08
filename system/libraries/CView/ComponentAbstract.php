@@ -8,8 +8,21 @@ defined('SYSPATH') or die('No direct access allowed.');
  *
  * @since Dec 6, 2020
  */
-
 abstract class CView_ComponentAbstract {
+    /**
+     * The component alias name.
+     *
+     * @var string
+     */
+    public $componentName;
+
+    /**
+     * The component attributes.
+     *
+     * @var \CView_ComponentAttributeBag
+     */
+    public $attributes;
+
     /**
      * The cache of public property names, keyed by class.
      *
@@ -32,30 +45,16 @@ abstract class CView_ComponentAbstract {
     protected $except = [];
 
     /**
-     * The component alias name.
-     *
-     * @var string
-     */
-    public $componentName;
-
-    /**
-     * The component attributes.
-     *
-     * @var \Illuminate\View\ComponentAttributeBag
-     */
-    public $attributes;
-
-    /**
      * Get the view / view contents that represent the component.
      *
-     * @return \Illuminate\Contracts\View\View|\Illuminate\Contracts\Support\Htmlable|\Closure|string
+     * @return \CView_ViewInterface|\CInterface_Htmlable|\Closure|string
      */
     abstract public function render();
 
     /**
      * Resolve the Blade view or view file that should be used when rendering the component.
      *
-     * @return CView_View|\Illuminate\Contracts\Support\Htmlable|\Closure|string
+     * @return CView_View|\CInterface_Htmlable|\Closure|string
      */
     public function resolveView() {
         $view = $this->render();
@@ -116,7 +115,7 @@ abstract class CView_ComponentAbstract {
      * @return array
      */
     public function data() {
-        $this->attributes = $this->attributes ?: new CView_ComponentAttributeBag;
+        $this->attributes = $this->attributes ?: new CView_ComponentAttributeBag();
 
         return array_merge($this->extractPublicProperties(), $this->extractPublicMethods());
     }
@@ -258,7 +257,7 @@ abstract class CView_ComponentAbstract {
      * @return $this
      */
     public function withAttributes(array $attributes) {
-        $this->attributes = $this->attributes ?: new CView_ComponentAttributeBag;
+        $this->attributes = $this->attributes ?: new CView_ComponentAttributeBag();
 
         $this->attributes->setAttributes($attributes);
 

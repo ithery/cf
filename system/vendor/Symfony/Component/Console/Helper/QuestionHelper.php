@@ -11,64 +11,69 @@
 
 namespace Symfony\Component\Console\Helper;
 
-use Symfony\Component\Console\Exception\InvalidArgumentException;
-use Symfony\Component\Console\Exception\RuntimeException;
-use Symfony\Component\Console\Formatter\OutputFormatter;
-use Symfony\Component\Console\Formatter\OutputFormatterStyle;
-use Symfony\Component\Console\Input\InputInterface;
-use Symfony\Component\Console\Input\StreamableInputInterface;
-use Symfony\Component\Console\Output\ConsoleOutputInterface;
-use Symfony\Component\Console\Output\OutputInterface;
+use Symfony\Component\Console\Terminal;
 use Symfony\Component\Console\Question\Question;
+use Symfony\Component\Console\Input\InputInterface;
+use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Question\ChoiceQuestion;
+use Symfony\Component\Console\Formatter\OutputFormatter;
+use Symfony\Component\Console\Exception\RuntimeException;
+use Symfony\Component\Console\Output\ConsoleOutputInterface;
+use Symfony\Component\Console\Formatter\OutputFormatterStyle;
+use Symfony\Component\Console\Input\StreamableInputInterface;
+use Symfony\Component\Console\Exception\MissingInputException;
+use Symfony\Component\Console\Exception\InvalidArgumentException;
 
 /**
  * The QuestionHelper class provides helpers to interact with the user.
  *
  * @author Fabien Potencier <fabien@symfony.com>
  */
-class QuestionHelper extends Helper
-{
+class QuestionHelper extends Helper {
     private $inputStream;
+
     private static $shell;
+
     private static $stty;
 
     /**
      * Asks a question to the user.
      *
-     * @return mixed The user answer
-     *
      * @throws RuntimeException If there is no data to read in the input stream
+     *
+     * @return mixed The user answer
      */
-    public function ask(InputInterface $input, OutputInterface $output, Question $question)
-    {
+    public function ask(InputInterface $input, OutputInterface $output, Question $question) {
         if ($output instanceof ConsoleOutputInterface) {
             $output = $output->getErrorOutput();
         }
-
         if (!$input->isInteractive()) {
-            if ($question instanceof ChoiceQuestion) {
-                $choices = $question->getChoices();
-
-                return $choices[$question->getDefault()];
-            }
-
-            return $question->getDefault();
+            return $this->getDefaultAnswer($question);
         }
 
         if ($input instanceof StreamableInputInterface && $stream = $input->getStream()) {
             $this->inputStream = $stream;
         }
 
-        if (!$question->getValidator()) {
-            return $this->doAsk($output, $question);
+        try {
+            if (!$question->getValidator()) {
+                return $this->doAsk($output, $question);
+            }
+
+            $interviewer = function () use ($output, $question) {
+                return $this->doAsk($output, $question);
+            };
+
+            return $this->validateAttempts($interviewer, $output, $question);
+        } catch (MissingInputException $exception) {
+            $input->setInteractive(false);
+
+            if (null === $fallbackOutput = $this->getDefaultAnswer($question)) {
+                throw $exception;
+            }
+
+            return $fallbackOutput;
         }
-
-        $interviewer = function () use ($output, $question) {
-            return $this->doAsk($output, $question);
-        };
-
-        return $this->validateAttempts($interviewer, $output, $question);
     }
 
     /**
@@ -83,8 +88,7 @@ class QuestionHelper extends Helper
      *
      * @throws InvalidArgumentException In case the stream is not a resource
      */
-    public function setInputStream($stream)
-    {
+    public function setInputStream($stream) {
         @trigger_error(sprintf('The %s() method is deprecated since Symfony 3.2 and will be removed in 4.0. Use %s::setStream() instead.', __METHOD__, StreamableInputInterface::class), E_USER_DEPRECATED);
 
         if (!is_resource($stream)) {
@@ -102,8 +106,7 @@ class QuestionHelper extends Helper
      *
      * @return resource
      */
-    public function getInputStream()
-    {
+    public function getInputStream() {
         if (0 === func_num_args() || func_get_arg(0)) {
             @trigger_error(sprintf('The %s() method is deprecated since Symfony 3.2 and will be removed in 4.0. Use %s::getStream() instead.', __METHOD__, StreamableInputInterface::class), E_USER_DEPRECATED);
         }
@@ -112,36 +115,32 @@ class QuestionHelper extends Helper
     }
 
     /**
-     * {@inheritdoc}
+     * @inheritdoc
      */
-    public function getName()
-    {
+    public function getName() {
         return 'question';
     }
 
     /**
      * Prevents usage of stty.
      */
-    public static function disableStty()
-    {
+    public static function disableStty() {
         self::$stty = false;
     }
 
     /**
      * Asks the question to the user.
      *
-     * @return bool|mixed|null|string
-     *
      * @throws RuntimeException In case the fallback is deactivated and the response cannot be hidden
+     *
+     * @return null|bool|mixed|string
      */
-    private function doAsk(OutputInterface $output, Question $question)
-    {
+    private function doAsk(OutputInterface $output, Question $question) {
         $this->writePrompt($output, $question);
 
         $inputStream = $this->inputStream ?: STDIN;
-        $autocomplete = $question->getAutocompleterValues();
-
-        if (null === $autocomplete || !$this->hasSttyAvailable()) {
+        $autocomplete = $question->getAutocompleterCallback();
+        if (null === $autocomplete || !self::$stty || !Terminal::hasSttyAvailable()) {
             $ret = false;
             if ($question->isHidden()) {
                 try {
@@ -156,12 +155,15 @@ class QuestionHelper extends Helper
             if (false === $ret) {
                 $ret = fgets($inputStream, 4096);
                 if (false === $ret) {
-                    throw new RuntimeException('Aborted');
+                    throw new MissingInputException('Aborted.');
                 }
-                $ret = trim($ret);
+                if ($question->isTrimmable()) {
+                    $ret = trim($ret);
+                }
             }
         } else {
-            $ret = trim($this->autocomplete($output, $question, $inputStream, is_array($autocomplete) ? $autocomplete : iterator_to_array($autocomplete, false)));
+            $autocomplete = $this->autocomplete($output, $question, $inputStream, $autocomplete);
+            $ret = $question->isTrimmable() ? trim($autocomplete) : $autocomplete;
         }
 
         $ret = strlen($ret) > 0 ? $ret : $question->getDefault();
@@ -173,23 +175,42 @@ class QuestionHelper extends Helper
         return $ret;
     }
 
+    private function getDefaultAnswer(Question $question) {
+        $default = $question->getDefault();
+
+        if (null === $default) {
+            return $default;
+        }
+
+        if ($validator = $question->getValidator()) {
+            return \call_user_func($question->getValidator(), $default);
+        } elseif ($question instanceof ChoiceQuestion) {
+            $choices = $question->getChoices();
+
+            if (!$question->isMultiselect()) {
+                return isset($choices[$default]) ? $choices[$default] : $default;
+            }
+
+            $default = explode(',', $default);
+            foreach ($default as $k => $v) {
+                $v = $question->isTrimmable() ? trim($v) : $v;
+                $default[$k] = $choices[$v] ?? $v;
+            }
+        }
+
+        return $default;
+    }
+
     /**
      * Outputs the question prompt.
      */
-    protected function writePrompt(OutputInterface $output, Question $question)
-    {
+    protected function writePrompt(OutputInterface $output, Question $question) {
         $message = $question->getQuestion();
 
         if ($question instanceof ChoiceQuestion) {
-            $maxWidth = max(array_map(array($this, 'strlen'), array_keys($question->getChoices())));
-
-            $messages = (array) $question->getQuestion();
-            foreach ($question->getChoices() as $key => $value) {
-                $width = $maxWidth - $this->strlen($key);
-                $messages[] = '  [<info>'.$key.str_repeat(' ', $width).'</info>] '.$value;
-            }
-
-            $output->writeln($messages);
+            $output->writeln(array_merge([
+                $question->getQuestion(),
+            ], $this->formatChoiceQuestionChoices($question, 'info')));
 
             $message = $question->getPrompt();
         }
@@ -198,14 +219,30 @@ class QuestionHelper extends Helper
     }
 
     /**
+     * @return string[]
+     */
+    protected function formatChoiceQuestionChoices(ChoiceQuestion $question, string $tag): array {
+        $messages = [];
+
+        $maxWidth = max(array_map([__CLASS__, 'width'], array_keys($choices = $question->getChoices())));
+
+        foreach ($choices as $key => $value) {
+            $padding = str_repeat(' ', $maxWidth - self::width($key));
+
+            $messages[] = sprintf("  [<${tag}>%s${padding}</${tag}>] %s", $key, $value);
+        }
+
+        return $messages;
+    }
+
+    /**
      * Outputs an error message.
      */
-    protected function writeError(OutputInterface $output, \Exception $error)
-    {
+    protected function writeError(OutputInterface $output, \Exception $error) {
         if (null !== $this->getHelperSet() && $this->getHelperSet()->has('formatter')) {
             $message = $this->getHelperSet()->get('formatter')->formatBlock($error->getMessage(), 'error');
         } else {
-            $message = '<error>'.$error->getMessage().'</error>';
+            $message = '<error>' . $error->getMessage() . '</error>';
         }
 
         $output->writeln($message);
@@ -221,8 +258,7 @@ class QuestionHelper extends Helper
      *
      * @return string
      */
-    private function autocomplete(OutputInterface $output, Question $question, $inputStream, array $autocomplete)
-    {
+    private function autocomplete(OutputInterface $output, Question $question, $inputStream, array $autocomplete) {
         $ret = '';
 
         $i = 0;
@@ -288,6 +324,7 @@ class QuestionHelper extends Helper
 
                     if ("\n" === $c) {
                         $output->write($c);
+
                         break;
                     }
 
@@ -318,7 +355,7 @@ class QuestionHelper extends Helper
                 // Save cursor position
                 $output->write("\0337");
                 // Write highlighted text
-                $output->write('<hl>'.OutputFormatter::escapeTrailingBackslash(substr($matches[$ofs], $i)).'</hl>');
+                $output->write('<hl>' . OutputFormatter::escapeTrailingBackslash(substr($matches[$ofs], $i)) . '</hl>');
                 // Restore cursor position
                 $output->write("\0338");
             }
@@ -336,18 +373,17 @@ class QuestionHelper extends Helper
      * @param OutputInterface $output      An Output instance
      * @param resource        $inputStream The handler resource
      *
-     * @return string The answer
-     *
      * @throws RuntimeException In case the fallback is deactivated and the response cannot be hidden
+     *
+     * @return string The answer
      */
-    private function getHiddenResponse(OutputInterface $output, $inputStream)
-    {
+    private function getHiddenResponse(OutputInterface $output, $inputStream) {
         if ('\\' === DIRECTORY_SEPARATOR) {
-            $exe = __DIR__.'/../Resources/bin/hiddeninput.exe';
+            $exe = __DIR__ . '/../Resources/bin/hiddeninput.exe';
 
             // handle code running from a phar
             if ('phar:' === substr(__FILE__, 0, 5)) {
-                $tmpExe = sys_get_temp_dir().'/hiddeninput.exe';
+                $tmpExe = sys_get_temp_dir() . '/hiddeninput.exe';
                 copy($exe, $tmpExe);
                 $exe = $tmpExe;
             }
@@ -398,12 +434,11 @@ class QuestionHelper extends Helper
      * @param OutputInterface $output      An Output instance
      * @param Question        $question    A Question instance
      *
-     * @return mixed The validated response
-     *
      * @throws \Exception In case the max number of attempts has been reached and no valid response has been given
+     *
+     * @return mixed The validated response
      */
-    private function validateAttempts(callable $interviewer, OutputInterface $output, Question $question)
-    {
+    private function validateAttempts(callable $interviewer, OutputInterface $output, Question $question) {
         $error = null;
         $attempts = $question->getMaxAttempts();
         while (null === $attempts || $attempts--) {
@@ -427,8 +462,7 @@ class QuestionHelper extends Helper
      *
      * @return string|bool The valid shell name, false in case no valid shell is found
      */
-    private function getShell()
-    {
+    private function getShell() {
         if (null !== self::$shell) {
             return self::$shell;
         }
@@ -438,9 +472,10 @@ class QuestionHelper extends Helper
         if (file_exists('/usr/bin/env')) {
             // handle other OSs with bash/zsh/ksh/csh if available to hide the answer
             $test = "/usr/bin/env %s -c 'echo OK' 2> /dev/null";
-            foreach (array('bash', 'zsh', 'ksh', 'csh') as $sh) {
+            foreach (['bash', 'zsh', 'ksh', 'csh'] as $sh) {
                 if ('OK' === rtrim(shell_exec(sprintf($test, $sh)))) {
                     self::$shell = $sh;
+
                     break;
                 }
             }
@@ -454,8 +489,7 @@ class QuestionHelper extends Helper
      *
      * @return bool
      */
-    private function hasSttyAvailable()
-    {
+    private function hasSttyAvailable() {
         if (null !== self::$stty) {
             return self::$stty;
         }

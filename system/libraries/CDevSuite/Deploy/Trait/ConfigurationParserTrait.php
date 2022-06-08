@@ -1,7 +1,7 @@
 <?php
 
 /**
- * Description of ConfigurationParserTrait
+ * Description of ConfigurationParserTrait.
  *
  * @author Hery
  */
@@ -11,7 +11,7 @@ trait CDevSuite_Deploy_Trait_ConfigurationParserTrait {
      *
      * @param string $host
      *
-     * @return string|null
+     * @return null|string
      */
     protected function getConfiguredServer($host) {
         if ($config = $this->getSshConfig($this->getSystemUser())) {
@@ -24,7 +24,7 @@ trait CDevSuite_Deploy_Trait_ConfigurationParserTrait {
      *
      * @param string $user
      *
-     * @return \Laravel\Envoy\SSHConfigFile|null
+     * @return null|\CDevSuite_Deploy_SSHConfigFile
      */
     protected function getSshConfig($user) {
         if (file_exists($path = $this->getHomeDirectory($user) . '/.ssh/config')) {
@@ -37,7 +37,7 @@ trait CDevSuite_Deploy_Trait_ConfigurationParserTrait {
      *
      * @param string $user
      *
-     * @return string|null
+     * @return null|string
      */
     protected function getHomeDirectory($user) {
         $system = strtolower(php_uname());

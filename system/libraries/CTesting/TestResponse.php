@@ -1,7 +1,7 @@
 <?php
 
 /**
- * @mixin \Illuminate\Http\Response
+ * @mixin \CHTTP_Response
  */
 
 use CTesting_Assert as PHPUnit;

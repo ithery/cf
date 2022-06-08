@@ -10,6 +10,8 @@ class CApi_HTTP_Request extends CHTTP_Request implements CApi_Contract_HTTP_Requ
      */
     protected $accept;
 
+    protected $apiData = [];
+
     /**
      * Create a new Dingo request instance from an Illuminate request instance.
      *
@@ -91,5 +93,27 @@ class CApi_HTTP_Request extends CHTTP_Request implements CApi_Contract_HTTP_Requ
         }
 
         $this->accept = $this->manager()->httpParseAccept()->parse($this);
+    }
+
+    /**
+     * @param string $key
+     * @param mixed  $value
+     *
+     * @return $this
+     */
+    public function setApiData($key, $value) {
+        $this->apiData[$key] = $value;
+
+        return $this;
+    }
+
+    /**
+     * @param string     $key
+     * @param null|mixed $default
+     *
+     * @return mixed
+     */
+    public function getApiData($key, $default = null) {
+        return c::value(carr::get($this->apiData, $key, $default));
     }
 }

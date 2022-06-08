@@ -20,6 +20,9 @@ abstract class CApi_MethodAbstract implements CInterface_Arrayable {
 
     protected $session;
 
+    /**
+     * @var null|CApi_HTTP_Request
+     */
     protected $apiRequest;
 
     /**
@@ -38,6 +41,8 @@ abstract class CApi_MethodAbstract implements CInterface_Arrayable {
 
     protected $sessionIdParameter = 'sessionId';
 
+    protected $group;
+
     public function __construct($orgId = null, $sessionId = null, $request = null) {
         if ($orgId == null) {
             $orgId = CF::orgId();
@@ -52,6 +57,14 @@ abstract class CApi_MethodAbstract implements CInterface_Arrayable {
 
     public function setApiRequest(CApi_HTTP_Request $apiRequest) {
         $this->apiRequest = $apiRequest;
+
+        return $this;
+    }
+
+    public function setGroup($group) {
+        $this->group = $group;
+
+        return $this;
     }
 
     public function getApiRequest() {

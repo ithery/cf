@@ -5,7 +5,7 @@ interface CConsole_KernelInterface {
      * Handle an incoming console command.
      *
      * @param \Symfony\Component\Console\Input\InputInterface        $input
-     * @param \Symfony\Component\Console\Output\OutputInterface|null $output
+     * @param null|\Symfony\Component\Console\Output\OutputInterface $output
      *
      * @return int
      */
@@ -16,7 +16,7 @@ interface CConsole_KernelInterface {
      *
      * @param string                                                 $command
      * @param array                                                  $parameters
-     * @param \Symfony\Component\Console\Output\OutputInterface|null $outputBuffer
+     * @param null|\Symfony\Component\Console\Output\OutputInterface $outputBuffer
      *
      * @return int
      */
@@ -28,7 +28,7 @@ interface CConsole_KernelInterface {
      * @param string $command
      * @param array  $parameters
      *
-     * @return \Illuminate\Foundation\Bus\PendingDispatch
+     * @return \CQueue_PendingDispatch
      */
     public function queue($command, array $parameters = []);
 
