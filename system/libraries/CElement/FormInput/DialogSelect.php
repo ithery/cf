@@ -4,6 +4,7 @@ defined('SYSPATH') or die('No direct access allowed.');
 
 class CElement_FormInput_DialogSelect extends CElement_FormInput {
     use CElement_Trait_Template;
+
     protected $fields;
 
     protected $format;

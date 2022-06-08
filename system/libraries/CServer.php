@@ -130,4 +130,12 @@ class CServer {
     public static function dns() {
         return new CServer_Dns();
     }
+
+    public static function nodeJs($nodePath = null) {
+        return new CServer_NodeJs($nodePath);
+    }
+
+    public static function browsershot($url = '', $deviceEmulate = false) {
+        return new CServer_Browsershot($url, $deviceEmulate);
+    }
 }

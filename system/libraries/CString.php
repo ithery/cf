@@ -20,4 +20,23 @@ class CString {
     public static function createPatternBuilder() {
         return new CString_PatternBuilder();
     }
+
+    /**
+     * @param string      $number
+     * @param null|string $locale
+     *
+     * @throws Symfony\Component\Routing\Exception\InvalidParameterException
+     *
+     * @return string
+     */
+    public static function numberToWords($number, $locale = null) {
+        return CString_NumberToWords::toWords($number, $locale);
+    }
+
+    /**
+     * @return CString_Formatter
+     */
+    public static function formatter() {
+        return new CBase_ForwarderStaticClass(CString_Formatter::class);
+    }
 }

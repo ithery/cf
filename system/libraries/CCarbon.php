@@ -11,7 +11,7 @@ class CCarbon extends BaseCarbon implements JsonSerializable {
     /**
      * The custom Carbon JSON serializer.
      *
-     * @var callable|null
+     * @var null|callable
      */
     protected static $serializer;
 
@@ -46,7 +46,7 @@ class CCarbon extends BaseCarbon implements JsonSerializable {
     /**
      * Get the difference in seconds using timestamps.
      *
-     * @param \Carbon\CarbonInterface|\DateTimeInterface|string|null $date
+     * @param null|\Carbon\CarbonInterface|\DateTimeInterface|string $date
      * @param bool                                                   $absolute Get the absolute of the difference
      *
      * @return int
@@ -63,7 +63,7 @@ class CCarbon extends BaseCarbon implements JsonSerializable {
      * Return the Carbon instance passed through, a now instance in the same timezone
      * if null given or parse the input if string given.
      *
-     * @param \Carbon\Carbon|\DateTimeInterface|string|null $date
+     * @param null|\Carbon\Carbon|\DateTimeInterface|string $date
      *
      * @return static
      */
@@ -92,7 +92,7 @@ class CCarbon extends BaseCarbon implements JsonSerializable {
     protected static function expectDateTime($date, $other = []) {
         $message = 'Expected ';
         foreach ((array) $other as $expect) {
-            $message .= "$expect, ";
+            $message .= "${expect}, ";
         }
 
         if (!$date instanceof DateTime && !$date instanceof DateTimeInterface) {
@@ -101,5 +101,9 @@ class CCarbon extends BaseCarbon implements JsonSerializable {
                 . (is_object($date) ? get_class($date) : gettype($date)) . ' given'
             );
         }
+    }
+
+    public static function businessTime() {
+        return new CCarbon_BusinessTime();
     }
 }

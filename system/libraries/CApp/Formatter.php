@@ -104,7 +104,9 @@ class CApp_Formatter {
     }
 
     public function unformatDate($x) {
-        return date('Y-m-d', strtotime($x));
+        $date = CCarbon::createFromFormat($this->dateFormat, $x);
+
+        return $date->format('Y-m-d');
     }
 
     public function formatDatetime($x) {
@@ -120,7 +122,9 @@ class CApp_Formatter {
     }
 
     public function unformatDatetime($x) {
-        return date('Y-m-d H:i:s', strtotime($x));
+        $date = CCarbon::createFromFormat($this->datetimeFormat, $x);
+
+        return $date->format('Y-m-d H:i:s');
     }
 
     public function formatCurrency($x, $decimalDigit = null) {
@@ -153,5 +157,9 @@ class CApp_Formatter {
         settype($number, $type);
 
         return $number;
+    }
+
+    public function unformatNumber($number) {
+        return $this->unformatCurrency($number);
     }
 }

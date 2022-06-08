@@ -34,10 +34,7 @@ trait CElement_FormInput_SelectSearch_Trait_Select2v23Trait {
         }
 
         $strResult = preg_replace("/[\r\n]+/", '', $strResult);
-        $placeholder = 'Search for a item';
-        if (strlen($this->placeholder) > 0) {
-            $placeholder = $this->placeholder;
-        }
+        $placeholder = $this->placeholder;
         $strJsChange = '';
         if ($this->submit_onchange) {
             $strJsChange = "$(this).closest('form').submit();";

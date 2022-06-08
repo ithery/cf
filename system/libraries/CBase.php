@@ -10,6 +10,21 @@ class CBase {
     const ENVIRONMENT_TESTING = 'testing';
 
     /**
+     * @var array
+     */
+    protected static $originalPost;
+
+    /**
+     * @var array
+     */
+    protected static $originalGet;
+
+    /**
+     * @var array
+     */
+    protected static $originalFiles;
+
+    /**
      * CF Session.
      *
      * @var CSession_Store
@@ -46,5 +61,28 @@ class CBase {
      */
     public static function forwarderStaticClass($class) {
         return new CBase_ForwarderStaticClass($class);
+    }
+
+    /**
+     * Called for CBootstrap boot before app boot.
+     *
+     * @return void
+     */
+    public static function boot() {
+        static::$originalPost = $_POST;
+        static::$originalGet = $_GET;
+        static::$originalFiles = $_FILES;
+    }
+
+    public static function originalGetData() {
+        return static::$originalGet;
+    }
+
+    public static function originalPostData() {
+        return static::$originalPost;
+    }
+
+    public static function originalFilesData() {
+        return static::$originalPost;
     }
 }

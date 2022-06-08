@@ -6,7 +6,7 @@
  * @author Hery
  */
 class CElement_FormInput_MultipleImageAjax extends CElement_FormInput {
-    use CApp_Trait_Template;
+    use CElement_Trait_UseViewTrait;
 
     protected $imgSrc;
 
@@ -47,13 +47,13 @@ class CElement_FormInput_MultipleImageAjax extends CElement_FormInput {
         $this->limitFile = 10;
         $this->accept = 'image/*';
         $this->disabledUpload = false;
-        $this->templateName = 'CElement/FormInput/MultipleImageAjax';
+        $this->view = 'cresenity/element/form-input/multiple-image-ajax';
         $this->removeLink = true;
         $this->files = [];
         $this->maximum = null;
         $this->customControl = [];
         $this->customControlValue = [];
-        $this->onBeforeParse(function () {
+        $this->onBeforeParse(function (CView_View $view) {
             $ajaxName = $this->name;
             $ajaxName = str_replace('[', '-', $ajaxName);
             $ajaxName = str_replace(']', '-', $ajaxName);
@@ -61,59 +61,28 @@ class CElement_FormInput_MultipleImageAjax extends CElement_FormInput {
             $ajaxUrl = CAjax::createMethod()->setType('ImgUpload')
                 ->setData('inputName', $ajaxName)
                 ->makeUrl();
-            $this->setVar('id', $this->id);
-            $this->setVar('imgSrc', $this->imgSrc);
-            $this->setVar('maxWidth', $this->maxWidth);
-            $this->setVar('maxHeight', $this->maxHeight);
-            $this->setVar('maxUploadSize', $this->maxUploadSize);
-            $this->setVar('limitFile', $this->limitFile);
-            $this->setVar('disabledUpload', $this->disabledUpload);
-            $this->setVar('preTag', $this->pretag());
-            $this->setVar('postTag', $this->posttag());
-            $this->setVar('name', $this->name);
-            $this->setVar('value', $this->value);
-            $this->setVar('ajaxName', $ajaxName);
-            $this->setVar('ajaxUrl', $ajaxUrl);
-            $this->setVar('files', $this->files);
-            $this->setVar('maximum', $this->maximum == null ? 0 : $this->maximum);
-            $this->setVar('removeLink', $this->removeLink);
-            $this->setVar('customControl', $this->customControl);
-            $this->setVar('customControlValue', $this->customControlValue);
-            $this->setVar('cropper', $this->cropper);
-            $this->setVar('accept', $this->accept);
+            $view->with('id', $this->id);
+            $view->with('imgSrc', $this->imgSrc);
+            $view->with('maxWidth', $this->maxWidth);
+            $view->with('maxHeight', $this->maxHeight);
+            $view->with('maxUploadSize', $this->maxUploadSize);
+            $view->with('limitFile', $this->limitFile);
+            $view->with('disabledUpload', $this->disabledUpload);
+            $view->with('preTag', $this->pretag());
+            $view->with('postTag', $this->posttag());
+            $view->with('name', $this->name);
+            $view->with('value', $this->value);
+            $view->with('ajaxName', $ajaxName);
+            $view->with('ajaxUrl', $ajaxUrl);
+            $view->with('files', $this->files);
+            $view->with('maximum', $this->maximum == null ? 0 : $this->maximum);
+            $view->with('removeLink', $this->removeLink);
+            $view->with('customControl', $this->customControl);
+            $view->with('customControlValue', $this->customControlValue);
+            $view->with('cropper', $this->cropper);
+            $view->with('accept', $this->accept);
         });
     }
-
-    // protected function build() {
-    //     $ajaxName = $this->name;
-    //     $ajaxName = str_replace('[', '-', $ajaxName);
-    //     $ajaxName = str_replace(']', '-', $ajaxName);
-
-    //     $ajaxUrl = CAjax::createMethod()->setType('ImgUpload')
-    //         ->setData('inputName', $ajaxName)
-    //         ->makeUrl();
-
-    //     $viewData['id'] = $this->id;
-    //     $viewData['imgSrc'] = $this->imgSrc;
-    //     $viewData['maxWidth'] = $this->maxWidth;
-    //     $viewData['maxHeight'] = $this->maxHeight;
-    //     $viewData['maxUploadSize'] = $this->maxUploadSize;
-    //     $viewData['limitFile'] = $this->limitFile;
-    //     $viewData['disabledUpload'] = $this->disabledUpload;
-    //     $viewData['preTag'] = $this->preTag();
-    //     $viewData['postTag'] = $this->postTag();
-    //     $viewData['name'] = $this->name;
-    //     $viewData['value'] = $this->value;
-    //     $viewData['ajaxName'] = $ajaxName;
-    //     $viewData['ajaxUrl'] = $this->ajaxUrl;
-    //     $viewData['files'] = $this->files;
-    //     $viewData['maximum'] = $this->maximum == null ?: 0;
-    //     $viewData['removeLink'] = $this->removeLink;
-    //     $viewData['customControl'] = $this->customControl;
-    //     $viewData['cropper'] = $this->cropper;
-    //     $viewData['accept'] = $this->accept;
-    //     cdbg::dd($viewData);
-    // }
 
     /**
      * @param int $indent
@@ -121,7 +90,7 @@ class CElement_FormInput_MultipleImageAjax extends CElement_FormInput {
      * @return string
      */
     public function html($indent = 0) {
-        $templateHtml = $this->getTemplateHtml();
+        $templateHtml = $this->getViewHtml();
         $html = $templateHtml;
         if ($this->cropper != null) {
             $html .= $this->cropper->html();
@@ -131,7 +100,7 @@ class CElement_FormInput_MultipleImageAjax extends CElement_FormInput {
     }
 
     public function js($indent = 0) {
-        $templateJs = $this->getTemplateJs();
+        $templateJs = $this->getViewJs();
         $js = $templateJs;
         if ($this->cropper != null) {
             $js .= $this->cropper->js();

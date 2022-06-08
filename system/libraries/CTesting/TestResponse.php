@@ -1059,6 +1059,41 @@ class CTesting_TestResponse implements ArrayAccess {
     }
 
     /**
+     * Dump the content from the response and end the script.
+     *
+     * @return never
+     */
+    public function dd() {
+        $this->dump();
+
+        exit(1);
+    }
+
+    /**
+     * Dump the headers from the response and end the script.
+     *
+     * @return never
+     */
+    public function ddHeaders() {
+        $this->dumpHeaders();
+
+        exit(1);
+    }
+
+    /**
+     * Dump the session from the response and end the script.
+     *
+     * @param string|array $keys
+     *
+     * @return never
+     */
+    public function ddSession($keys = []) {
+        $this->dumpSession($keys);
+
+        exit(1);
+    }
+
+    /**
      * Dump the content from the response.
      *
      * @return $this
@@ -1083,7 +1118,7 @@ class CTesting_TestResponse implements ArrayAccess {
      * @return $this
      */
     public function dumpHeaders() {
-        dump($this->headers->all());
+        c::dump($this->headers->all());
 
         return $this;
     }
@@ -1099,9 +1134,9 @@ class CTesting_TestResponse implements ArrayAccess {
         $keys = (array) $keys;
 
         if (empty($keys)) {
-            dump($this->session()->all());
+            c::dump($this->session()->all());
         } else {
-            dump($this->session()->only($keys));
+            c::dump($this->session()->only($keys));
         }
 
         return $this;
@@ -1126,6 +1161,19 @@ class CTesting_TestResponse implements ArrayAccess {
         $this->sendContent();
 
         return $this->streamedContent = ob_get_clean();
+    }
+
+    /**
+     * Set the previous exceptions on the response.
+     *
+     * @param \CCollection $exceptions
+     *
+     * @return $this
+     */
+    public function withExceptions(CCollection $exceptions) {
+        $this->exceptions = $exceptions;
+
+        return $this;
     }
 
     /**

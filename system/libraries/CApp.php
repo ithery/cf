@@ -400,7 +400,7 @@ class CApp implements CInterface_Responsable, CInterface_Renderable, CInterface_
             }
         }
 
-        $manager->registerThemeModule('block-ui');
+        $manager->registerModule('block-ui');
     }
 
     public function reset() {

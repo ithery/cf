@@ -66,3 +66,43 @@ return $app;
 ---
 
 Koneksi yang digunakan pada table adalah sesuai koneksi `default` pada config `database.php`
+
+
+### Translations/Label
+
+Secara default translation dapat dicopy dari path `{DOCROOT}system/i18n/en_US/element/datatable.php`
+setelah dicopy ke path yang sesuai pada application maka labels otomatis dapat di overwrite dengan yang baru
+
+Key language sama dengan key javascript datatables yang dapat dilihat pada documentation datatable
+
+<a href="https://datatables.net/plug-ins/i18n/English.html" target="_blank">Data Table Language Documentation</a>
+
+
+<br/><br/>
+Contoh isi file translation:
+
+
+```php
+<?php
+
+return  [
+    'emptyTable' => 'No data available in table',
+    'info' => 'Showing _START_ to _END_ of _TOTAL_ entries',
+    'infoEmpty' => 'Showing 0 to 0 of 0 entries',
+    'infoFiltered' => '(filtered from _MAX_ total entries)',
+    'infoThousands' => ',',
+    'lengthMenu' => 'Show _MENU_ entries',
+    'loadingRecords' => 'Loading...',
+    'processing' => 'Processing...',
+    'search' => 'Search',
+    'zeroRecords' => 'No matching records found',
+    'thousands' => ',',
+    'paginate' => [
+        'first' => 'First',
+        'last' => 'Last',
+        'next' => 'Next',
+        'previous' => 'Previous'
+    ],
+    // ...
+]
+```

@@ -64,7 +64,7 @@ trait CElement_Component_DataTable_Trait_JavascriptTrait {
                 $km .= $k;
                 $vm .= "'" . $v . "'";
             }
-            $hs_val = $this->header_sortable ? 'true' : 'false';
+            $hs_val = $this->headerSortable ? 'true' : 'false';
             $js->appendln("var table = jQuery('#" . $this->id . "');")->br();
             $js->appendln('var header_sortable = ' . $hs_val . ';')->br();
             $js->appendln('var vaoColumns = [];')->br();
@@ -92,7 +92,7 @@ trait CElement_Component_DataTable_Trait_JavascriptTrait {
             }
             foreach ($this->columns as $col) {
                 $aojson = [];
-                $aojson['bSortable'] = $col->sortable && $this->header_sortable;
+                $aojson['bSortable'] = $col->sortable && $this->headerSortable;
                 $aojson['bSearchable'] = $col->searchable;
                 $aojson['bVisible'] = $col->visible;
 
@@ -202,7 +202,7 @@ trait CElement_Component_DataTable_Trait_JavascriptTrait {
             if (CClientModules::instance()->isRegisteredModule('jquery.ui') || CClientModules::instance()->isRegisteredModule('jquery-ui-1.12.1.custom')) {
                 $jqueryui = "'bJQueryUI': true,";
             }
-
+            $js->appendln('buttons:        ' . json_encode($this->buttons) . ',')->br();
             if ($this->scrollY) {
                 $scrollY = $this->scrollY;
                 if (is_bool($scrollY)) {
@@ -256,22 +256,9 @@ trait CElement_Component_DataTable_Trait_JavascriptTrait {
                 ->appendln("'iDisplayLength': " . $this->display_length . ',')->br()
                 ->appendln("'bSortCellsTop': " . $hs_val . ',')->br()
                 ->appendln("'aaSorting': [],")->br()
-                ->appendln("'oLanguage': {
-                    sSearch : '" . c::__('Search') . "',
-                    sSearchPlaceholder : '" . c::__($this->searchPlaceholder) . "',
-                    sProcessing : '" . c::__('Processing') . "',
-                    sLengthMenu  : '" . c::__('Show') . ' _MENU_ ' . c::__('Entries') . "',
-                    oPaginate  : {
-                        'sFirst' : '" . c::__('First') . "',
-                        'sLast' : '" . c::__('Last') . "',
-                        'sNext' : '" . c::__('Next') . "',
-                        'sPrevious' : '" . c::__('Previous') . "'
-                    },
-                    sInfo: '" . $this->infoText . "',
-                    sInfoEmpty  : '" . c::__($this->labels['noData']) . "',
-                    sEmptyTable  : '" . c::__($this->labels['noData']) . "',
-                    sInfoThousands   : '" . c::__('') . "',
-                },")->br()
+
+                ->appendln("'oLanguage': " . json_encode($this->getLegacyLabels()) . ',')->br()
+                ->appendln("'language': " . json_encode($this->getLabels()) . ',')->br()
                 ->appendln("'aoColumns': vaoColumns,")->br()
                 ->appendln("'aLengthMenu': [
                     [" . $km . '],
@@ -373,23 +360,22 @@ trait CElement_Component_DataTable_Trait_JavascriptTrait {
                 ->appendln('if (dttable_quick_search == "1") { buildFilters_' . $this->id . '(); }');
             if ($this->customSearchSelector != null) {
                 $js->appendln("
-$('" . $this->customSearchSelector . "').keyup(() => {
-
-    oTable.fnFilter($('" . $this->customSearchSelector . "').val());
-});
+                    $('" . $this->customSearchSelector . "').keyup(() => {
+                        oTable.fnFilter($('" . $this->customSearchSelector . "').val());
+                    });
                 ");
             }
             $js->appendln("
-jQuery('.data_table-quick_search').on('keyup change', function() {
-    var inputType = $(this).prop('tagName');
-    " . ($this->ajax
-            ? 'table.fnClearTable( 0 );table.fnDraw();'
-            : "if (inputType.toLowerCase() == 'select' && $(this).val()) {
-                table.fnFilter(\"^\"+$(this).val()+\"$\",$(this).attr('data-column-index'), true)
-            } else {
-                table.fnFilter($(this).val(),$(this).attr('data-column-index'))
-            };") . '
-});
+                jQuery('.data_table-quick_search').on('keyup change', function() {
+                    var inputType = $(this).prop('tagName');
+                    " . ($this->ajax
+                            ? 'table.fnClearTable( 0 );table.fnDraw();'
+                            : "if (inputType.toLowerCase() == 'select' && $(this).val()) {
+                                table.fnFilter(\"^\"+$(this).val()+\"$\",$(this).attr('data-column-index'), true)
+                            } else {
+                                table.fnFilter($(this).val(),$(this).attr('data-column-index'))
+                            };") . '
+                });
             ');
         }
         if ($this->checkbox) {

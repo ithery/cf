@@ -2,106 +2,47 @@
 
 namespace League\Flysystem;
 
-class Config
-{
+use function array_merge;
+
+class Config {
+    const OPTION_VISIBILITY = 'visibility';
+
+    const OPTION_DIRECTORY_VISIBILITY = 'directory_visibility';
+
     /**
      * @var array
      */
-    protected $settings = [];
+    private $options;
 
-    /**
-     * @var Config
-     */
-    protected $fallback;
-
-    /**
-     * Constructor.
-     *
-     * @param array $settings
-     */
-    public function __construct(array $settings = [])
-    {
-        $this->settings = $settings;
+    public function __construct(array $options = []) {
+        $this->options = $options;
     }
 
     /**
-     * Get a setting.
-     *
-     * @param string $key
+     * @param string $property
      * @param mixed  $default
      *
-     * @return mixed config setting or default when not found
+     * @return mixed
      */
-    public function get($key, $default = null)
-    {
-        if ( ! array_key_exists($key, $this->settings)) {
-            return $this->getDefault($key, $default);
-        }
-
-        return $this->settings[$key];
+    public function get($property, $default = null) {
+        return isset($this->options[$property]) ? $this->options[$property] : $default;
     }
 
     /**
-     * Check if an item exists by key.
+     * @param array $options
      *
-     * @param string $key
-     *
-     * @return bool
+     * @return Config
      */
-    public function has($key)
-    {
-        if (array_key_exists($key, $this->settings)) {
-            return true;
-        }
-
-        return $this->fallback instanceof Config
-            ? $this->fallback->has($key)
-            : false;
+    public function extend(array $options) {
+        return new Config(array_merge($this->options, $options));
     }
 
     /**
-     * Try to retrieve a default setting from a config fallback.
+     * @param array $defaults
      *
-     * @param string $key
-     * @param mixed  $default
-     *
-     * @return mixed config setting or default when not found
+     * @return Config
      */
-    protected function getDefault($key, $default)
-    {
-        if ( ! $this->fallback) {
-            return $default;
-        }
-
-        return $this->fallback->get($key, $default);
-    }
-
-    /**
-     * Set a setting.
-     *
-     * @param string $key
-     * @param mixed  $value
-     *
-     * @return $this
-     */
-    public function set($key, $value)
-    {
-        $this->settings[$key] = $value;
-
-        return $this;
-    }
-
-    /**
-     * Set the fallback.
-     *
-     * @param Config $fallback
-     *
-     * @return $this
-     */
-    public function setFallback(Config $fallback)
-    {
-        $this->fallback = $fallback;
-
-        return $this;
+    public function withDefaults(array $defaults) {
+        return new Config($this->options + $defaults);
     }
 }

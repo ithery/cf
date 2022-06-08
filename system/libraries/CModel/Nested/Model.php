@@ -11,6 +11,6 @@
  * Nested sets are appropiate when you want either an ordered tree (menus,
  * commercial categories, etc.) or an efficient way of querying big trees.
  */
-abstract class CModel_Nesterd_Model extends CModel {
+abstract class CModel_Nested_Model extends CModel {
     use CModel_Nested_NestedTrait;
 }

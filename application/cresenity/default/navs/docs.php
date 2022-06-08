@@ -120,6 +120,23 @@ return [
         ]
     ],
     [
+        'name' => 'forminput',
+        'label' => c::__('Form Input'),
+        'subnav' => [
+            [
+                'name' => 'forminput.standard',
+                'label' => c::__('Standard Control'),
+                'uri' => 'docs/forminput/standard',
+            ],
+            [
+                'name' => 'forminput.selectsearch',
+                'label' => c::__('Select Search'),
+                'uri' => 'docs/forminput/selectsearch',
+            ],
+
+        ]
+    ],
+    [
         'name' => 'helper',
         'label' => c::__('Helpers'),
         'subnav' => [
@@ -152,18 +169,23 @@ return [
         'subnav' => [
             [
                 'name' => 'module.queue',
-                'label' => c::__('Queue'),
+                'label' => c::__('CQueue'),
                 'uri' => 'docs/module/queue',
             ],
             [
                 'name' => 'module.daemon',
-                'label' => c::__('Daemon'),
+                'label' => c::__('CDaemon'),
                 'uri' => 'docs/module/daemon',
             ],
             [
                 'name' => 'module.cron',
-                'label' => c::__('Cron'),
+                'label' => c::__('CCron'),
                 'uri' => 'docs/module/cron',
+            ],
+            [
+                'name' => 'module.period',
+                'label' => c::__('CPeriod'),
+                'uri' => 'docs/module/period',
             ],
         ]
     ],

@@ -261,7 +261,9 @@ class CF {
 
         let resolver = this.getConfig().react.enable
             ? (callback) => {
-                this.loadJQuery(this.loadReact(callback));
+                this.loadJQuery(()=>{
+                    this.loadReact(callback)
+                });
             }
             : (callback) => {
                 this.loadJQuery(callback);
