@@ -31,8 +31,16 @@ class CElement_Component_DataTable extends CElement_Component {
         '-1' => 'ALL',
     ];
 
+    /**
+     * @var int
+     */
     public $current_row = 1;
 
+    /**
+     * Database connection name.
+     *
+     * @var string
+     */
     public $dbName;
 
     public $dbConfig;
@@ -44,10 +52,16 @@ class CElement_Component_DataTable extends CElement_Component {
      */
     public $columns;
 
+    /**
+     * @var array
+     */
     public $requires = [];
 
     public $data;
 
+    /**
+     * @var string
+     */
     public $keyField;
 
     public $numbering;
@@ -70,6 +84,9 @@ class CElement_Component_DataTable extends CElement_Component {
 
     public $options;
 
+    /**
+     * @var bool
+     */
     public $applyDataTable;
 
     public $group_by;
@@ -104,8 +121,14 @@ class CElement_Component_DataTable extends CElement_Component {
 
     protected $haveRowSelection = false;
 
+    /**
+     * @var bool
+     */
     protected $tableStriped;
 
+    /**
+     * @var bool
+     */
     protected $tableBordered;
 
     protected $tbodyId;

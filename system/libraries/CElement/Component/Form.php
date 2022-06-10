@@ -3,6 +3,9 @@
 class CElement_Component_Form extends CElement_Component {
     use CTrait_Compat_Element_Form;
 
+    /**
+     * @var string
+     */
     protected $name;
 
     /**
@@ -13,14 +16,26 @@ class CElement_Component_Form extends CElement_Component {
      */
     protected $method;
 
+    /**
+     * @var bool
+     */
     protected $autocomplete;
 
+    /**
+     * @var string
+     */
     protected $layout;
 
+    /**
+     * @var string
+     */
     protected $action;
 
     protected $target;
 
+    /**
+     * @var string
+     */
     protected $enctype;
 
     /**
@@ -62,8 +77,8 @@ class CElement_Component_Form extends CElement_Component {
 
     protected $validationPromptPosition;
 
-    public function __construct($form_id = '') {
-        parent::__construct($form_id);
+    public function __construct($formId = '') {
+        parent::__construct($formId);
         $this->tag = 'form';
 
         $this->name = $this->id;
@@ -114,12 +129,22 @@ class CElement_Component_Form extends CElement_Component {
         return $this->submitListener;
     }
 
+    /**
+     * @param string $name
+     *
+     * @return $this
+     */
     public function setName($name) {
         $this->name = $name;
 
         return $this;
     }
 
+    /**
+     * @param string $layout
+     *
+     * @return $this
+     */
     public function setLayout($layout) {
         $this->layout = $layout;
 
@@ -219,7 +244,7 @@ class CElement_Component_Form extends CElement_Component {
             }
 
             $ajaxMethod = CAjax::createMethod();
-            $ajaxMethod->setType('Validation');
+            $ajaxMethod->setType(CAjax::TYPE_VALIDATION);
             $ajaxMethod->setData('dataValidation', serialize($validationData));
             $ajaxMethod->setData('formId', $this->id());
             $ajaxUrl = $ajaxMethod->makeUrl();
@@ -259,6 +284,11 @@ class CElement_Component_Form extends CElement_Component {
         return $this;
     }
 
+    /**
+     * @param int $indent
+     *
+     * @return array
+     */
     public function toArray($indent = 0) {
         $data = [];
         $data = array_merge_recursive($data, parent::toArray());
@@ -273,6 +303,9 @@ class CElement_Component_Form extends CElement_Component {
         return $data;
     }
 
+    /**
+     * @return void
+     */
     public function build() {
         if ($this->autocomplete) {
             $this->setAttr('autocomplete', 'on');
