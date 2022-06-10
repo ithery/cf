@@ -119,6 +119,14 @@ class CManager_DataProvider_ModelDataProvider extends CManager_DataProviderAbstr
                     }
                 }
             });
+
+            foreach ($dataSearch as $fieldName => $value) {
+                if (strpos($fieldName, '.') === false) {
+                    if (in_array($fieldName, $aggregateFields)) {
+                        $query->having($fieldName, 'like', '%' . $value . '%');
+                    }
+                }
+            }
         }
 
         //process ordering
