@@ -2,6 +2,8 @@
 
 trait CElement_Component_DataTable_Trait_JavascriptTrait {
     public function js($indent = 0) {
+        $quickSearchPlaceholder = $this->quickSearchPlaceholder ? "'" . $this->quickSearchPlaceholder . "'" : "'Search ' + title";
+
         /** @var CElement_Component_DataTable $this */
         $this->buildOnce();
         $ajax_url = '';
@@ -295,7 +297,7 @@ trait CElement_Component_DataTable_Trait_JavascriptTrait {
         var title = jQuery('#" . $this->id . " thead th').eq( jQuery(this).index() ).text();
         var haveAction = " . ($this->haveRowAction() ? '1' : '0') . ';
 
-        var placeholder =  ' . ($this->haveQuickSearchPlaceholder ? "'Search ' + title" : "''") . ";
+        var placeholder =  ' . ($this->haveQuickSearchPlaceholder ? $quickSearchPlaceholder : "''") . ";
         var totalTh = jQuery('#" . $this->id . " thead th').length;
         var input = '';
         var haveCheckbox = " . ($this->checkbox ? '1' : '0') . ';
