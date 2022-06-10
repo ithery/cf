@@ -100,9 +100,10 @@ class CAjax_Engine_DataTable_Processor_DataProvider extends CAjax_Engine_DataTab
                 $transforms = carr::get($qsConditionValue, 'transforms');
                 if (strlen($transforms) > 0) {
                     $transforms = json_decode($transforms, true);
-
-                    foreach ($transforms as $transforms_k => $transforms_v) {
-                        $value = ctransform::{$transforms_v['func']}($value, true);
+                    if (is_array($transforms)) {
+                        foreach ($transforms as $transforms_k => $transforms_v) {
+                            $value = ctransform::{$transforms_v['func']}($value, true);
+                        }
                     }
                 }
 
