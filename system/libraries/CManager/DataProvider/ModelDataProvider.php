@@ -28,7 +28,8 @@ class CManager_DataProvider_ModelDataProvider extends CManager_DataProviderAbstr
                 if ($col instanceof CDatabase_Query_Expression) {
                     $statement = $col->getValue();
                     //$regex = '/([\w]++)`?+(?:\s++as\s++[^,\s]++)?+\s*+(?:FROM\s*+|$)/i';
-                    $regex = '/([\w]++)`?+\s*+(?:FROM\s*+|$)/i';
+                    // $regex = '/([\w]++)`?+\s*+(?:FROM\s*+|$)/i';
+                    $regex = '/([\w]++)`?+\s*+$/i';
 
                     if (preg_match($regex, $statement, $match)) {
                         $fields[] = $match[1]; // field stored in $match[1]
@@ -119,6 +120,14 @@ class CManager_DataProvider_ModelDataProvider extends CManager_DataProviderAbstr
                     }
                 }
             });
+
+            foreach ($dataSearch as $fieldName => $value) {
+                if (strpos($fieldName, '.') === false) {
+                    if (in_array($fieldName, $aggregateFields)) {
+                        $query->having($fieldName, 'like', '%' . $value . '%');
+                    }
+                }
+            }
         }
 
         //process ordering

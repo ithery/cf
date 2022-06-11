@@ -23,6 +23,8 @@ class CAjax {
 
     const TYPE_RELOAD = 'Reload';
 
+    const TYPE_VALIDATION = 'Validation';
+
     /**
      * @param null|array|string $options
      *
