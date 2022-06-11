@@ -37,12 +37,13 @@ class CValidation_Rule_In {
      *
      * @return string
      *
-     * @see \Illuminate\Validation\ValidationRuleParser::parseParameters
+     * @see \CValidation_RuleParser::parseParameters
      */
     public function __toString() {
         $values = array_map(function ($value) {
             return '"' . str_replace('"', '""', $value) . '"';
         }, $this->values);
+
         return $this->rule . ':' . implode(',', $values);
     }
 }

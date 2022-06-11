@@ -165,7 +165,7 @@ class CDatabase_Manager {
      *
      * @param null|string $name
      *
-     * @return \Illuminate\Database\Connection
+     * @return \CDatabase_Connection
      */
     public function reconnect($name = null) {
         $this->disconnect($name = $name ?: $this->getDefaultConnection());

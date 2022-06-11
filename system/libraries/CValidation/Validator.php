@@ -13,6 +13,48 @@ class CValidation_Validator {
         CValidation_Trait_FormatMessageTrait;
 
     /**
+     * The array of custom error messages.
+     *
+     * @var array
+     */
+    public $customMessages = [];
+
+    /**
+     * The array of fallback error messages.
+     *
+     * @var array
+     */
+    public $fallbackMessages = [];
+
+    /**
+     * The array of custom attribute names.
+     *
+     * @var array
+     */
+    public $customAttributes = [];
+
+    /**
+     * The array of custom displayable values.
+     *
+     * @var array
+     */
+    public $customValues = [];
+
+    /**
+     * All of the custom validator extensions.
+     *
+     * @var array
+     */
+    public $extensions = [];
+
+    /**
+     * All of the custom replacer extensions.
+     *
+     * @var array
+     */
+    public $replacers = [];
+
+    /**
      * The Translator implementation.
      *
      * @var CTranslation_Translator
@@ -92,7 +134,7 @@ class CValidation_Validator {
     /**
      * The callback that should be used to format the attribute.
      *
-     * @var callable|null
+     * @var null|callable
      */
     protected $implicitAttributesFormatter;
 
@@ -109,48 +151,6 @@ class CValidation_Validator {
      * @var array
      */
     protected $after = [];
-
-    /**
-     * The array of custom error messages.
-     *
-     * @var array
-     */
-    public $customMessages = [];
-
-    /**
-     * The array of fallback error messages.
-     *
-     * @var array
-     */
-    public $fallbackMessages = [];
-
-    /**
-     * The array of custom attribute names.
-     *
-     * @var array
-     */
-    public $customAttributes = [];
-
-    /**
-     * The array of custom displayable values.
-     *
-     * @var array
-     */
-    public $customValues = [];
-
-    /**
-     * All of the custom validator extensions.
-     *
-     * @var array
-     */
-    public $extensions = [];
-
-    /**
-     * All of the custom replacer extensions.
-     *
-     * @var array
-     */
-    public $replacers = [];
 
     /**
      * The validation rules that may be applied to files.
@@ -346,9 +346,9 @@ class CValidation_Validator {
     /**
      * Run the validator's rules against its data.
      *
-     * @return array
-     *
      * @throws CValidation_Exception
+     *
+     * @return array
      */
     public function validate() {
         if ($this->fails()) {
@@ -363,7 +363,7 @@ class CValidation_Validator {
     }
 
     /**
-     * Alias of method passes
+     * Alias of method passes.
      *
      * @return array
      */
@@ -583,9 +583,9 @@ class CValidation_Validator {
     /**
      * Validate an attribute using a custom rule object.
      *
-     * @param string                                $attribute
-     * @param mixed                                 $value
-     * @param \Illuminate\Contracts\Validation\Rule $rule
+     * @param string                     $attribute
+     * @param mixed                      $value
+     * @param \CValidation_RuleInterface $rule
      *
      * @return void
      */
@@ -769,7 +769,7 @@ class CValidation_Validator {
      * @param string       $attribute
      * @param string|array $rules
      *
-     * @return array|null
+     * @return null|array
      */
     protected function getRule($attribute, $rules) {
         if (!array_key_exists($attribute, $this->rules)) {
@@ -869,7 +869,7 @@ class CValidation_Validator {
         // of the explicit rules needed for the given data. For example the rule
         // names.* would get expanded to names.0, names.1, etc. for this data.
         $response = (new CValidation_RuleParser($this->data))
-                ->explode($rules);
+            ->explode($rules);
 
         $this->rules = array_merge_recursive(
             $this->rules,
@@ -1061,7 +1061,7 @@ class CValidation_Validator {
     /**
      * Set the callback that used to format an implicit attribute..
      *
-     * @param callable|null $formatter
+     * @param null|callable $formatter
      *
      * @return $this
      */
@@ -1111,9 +1111,9 @@ class CValidation_Validator {
     /**
      * Get the Presence Verifier implementation.
      *
-     * @return CValdation_PresenceVerifierInterface
-     *
      * @throws \RuntimeException
+     *
+     * @return CValdation_PresenceVerifierInterface
      */
     public function getPresenceVerifier() {
         if (!isset($this->presenceVerifier)) {
@@ -1129,9 +1129,9 @@ class CValidation_Validator {
      *
      * @param string $connection
      *
-     * @return CValidation_PresenceVerifierInterface
-     *
      * @throws \RuntimeException
+     *
+     * @return CValidation_PresenceVerifierInterface
      */
     protected function getPresenceVerifierFor($connection) {
         return c::tap($this->getPresenceVerifier(), function ($verifier) use ($connection) {
@@ -1159,6 +1159,7 @@ class CValidation_Validator {
         if ($this->translator == null) {
             $this->translator = CTranslation::translator();
         }
+
         return $this->translator;
     }
 
@@ -1190,7 +1191,7 @@ class CValidation_Validator {
      * @param string $rule
      * @param array  $parameters
      *
-     * @return bool|null
+     * @return null|bool
      */
     protected function callExtension($rule, $parameters) {
         $callback = $this->extensions[$rule];
@@ -1222,9 +1223,9 @@ class CValidation_Validator {
      * @param string $method
      * @param array  $parameters
      *
-     * @return mixed
-     *
      * @throws \BadMethodCallException
+     *
+     * @return mixed
      */
     public function __call($method, $parameters) {
         $rule = cstr::snake(substr($method, 8));

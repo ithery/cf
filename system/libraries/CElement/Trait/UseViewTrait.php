@@ -43,7 +43,7 @@ trait CElement_Trait_UseViewTrait {
      *
      * @return $this
      */
-    protected function setData(array $viewData) {
+    public function setData(array $viewData) {
         $this->viewData = $viewData;
 
         return $this;

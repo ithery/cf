@@ -74,7 +74,7 @@ class CJavascript_Validation_Remote {
      * @param mixed                 $result
      * @param CValidation_Validator $validator
      *
-     * @throws \Illuminate\Validation\ValidationException|\Illuminate\Http\Exceptions\HttpResponseException
+     * @throws \CValidation_Exception|\CHTTP_Exception_ResponseException
      *
      * @return void
      */

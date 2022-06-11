@@ -11,15 +11,15 @@
 
 namespace League\CommonMark\Extension\CommonMark\Parser\Block;
 
-use League\CommonMark\Extension\CommonMark\Node\Block\ListBlock;
+use League\CommonMark\Parser\Cursor;
+use League\CommonMark\Node\Block\Paragraph;
+use League\CommonMark\Node\Block\AbstractBlock;
+use League\CommonMark\Parser\Block\BlockContinue;
 use League\CommonMark\Extension\CommonMark\Node\Block\ListData;
 use League\CommonMark\Extension\CommonMark\Node\Block\ListItem;
-use League\CommonMark\Node\Block\AbstractBlock;
-use League\CommonMark\Node\Block\Paragraph;
 use League\CommonMark\Parser\Block\AbstractBlockContinueParser;
-use League\CommonMark\Parser\Block\BlockContinue;
+use League\CommonMark\Extension\CommonMark\Node\Block\ListBlock;
 use League\CommonMark\Parser\Block\BlockContinueParserInterface;
-use League\CommonMark\Parser\Cursor;
 
 final class ListItemParser extends AbstractBlockContinueParser {
     /**
@@ -45,7 +45,10 @@ final class ListItemParser extends AbstractBlockContinueParser {
         return $this->block;
     }
 
-    public function isContainer(): bool {
+    /**
+     * @return bool
+     */
+    public function isContainer() {
         return true;
     }
 

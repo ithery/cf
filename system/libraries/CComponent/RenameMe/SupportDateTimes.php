@@ -1,12 +1,8 @@
 <?php
 
-use DateTime;
-use Carbon\Carbon;
-use Illuminate\Support\Carbon as IlluminateCarbon;
-
 class CComponent_RenameMe_SupportDateTimes {
     public static function init() {
-        return new static;
+        return new static();
     }
 
     public function __construct() {
@@ -34,7 +30,7 @@ class CComponent_RenameMe_SupportDateTimes {
             $types = [
                 'native' => DateTime::class,
                 'carbon' => Carbon::class,
-                'illuminate' => IlluminateCarbon::class,
+                'illuminate' => CCarbon::class,
             ];
 
             foreach ($dates as $name => $type) {

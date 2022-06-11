@@ -17,18 +17,18 @@ namespace League\CommonMark\Node\Block;
 use League\CommonMark\Node\Node;
 
 /**
- * Block-level element
+ * Block-level element.
  *
  * @method parent() ?AbstractBlock
  */
 abstract class AbstractBlock extends Node {
     /**
-     * @var int|null
+     * @var null|int
      */
     protected $startLine;
 
     /**
-     * @var int|null
+     * @var null|int
      */
     protected $endLine;
 

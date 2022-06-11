@@ -8,19 +8,12 @@ defined('SYSPATH') or die('No direct access allowed.');
  *
  * @since Oct 21, 2019, 9:31:14 PM
  */
-use MongoDB\BSON\ObjectID;
-use MongoDB\BSON\UTCDateTime;
 use MongoDB\BSON\Regex;
 use MongoDB\BSON\Binary;
+use MongoDB\BSON\ObjectID;
+use MongoDB\BSON\UTCDateTime;
 
 class CDatabase_Query_Builder_MongoDBBuilder extends CDatabase_Query_Builder {
-    /**
-     * The database collection.
-     *
-     * @var MongoCollection
-     */
-    protected $collection;
-
     /**
      * The column projections.
      *
@@ -105,6 +98,13 @@ class CDatabase_Query_Builder_MongoDBBuilder extends CDatabase_Query_Builder {
     ];
 
     /**
+     * The database collection.
+     *
+     * @var MongoCollection
+     */
+    protected $collection;
+
+    /**
      * Operator conversion.
      *
      * @var array
@@ -120,7 +120,7 @@ class CDatabase_Query_Builder_MongoDBBuilder extends CDatabase_Query_Builder {
     ];
 
     /**
-     * Check if we need to return Collections instead of plain arrays (laravel >= 5.3 )
+     * Check if we need to return Collections instead of plain arrays (laravel >= 5.3 ).
      *
      * @var bool
      */
@@ -133,21 +133,7 @@ class CDatabase_Query_Builder_MongoDBBuilder extends CDatabase_Query_Builder {
         $this->grammar = new CDatabase_Query_Grammar_MongoDB();
         $this->connection = $connection;
         $this->processor = $processor;
-        $this->useCollections = $this->shouldUseCollections();
-    }
-
-    /**
-     * Returns true if Laravel or Lumen >= 5.3
-     *
-     * @return bool
-     */
-    protected function shouldUseCollections() {
-        // if (function_exists('app')) {
-        //     $version = app()->version();
-        //     $version = filter_var(explode(')', $version)[0], FILTER_SANITIZE_NUMBER_FLOAT, FILTER_FLAG_ALLOW_FRACTION); // lumen
-        //     return version_compare($version, '5.3', '>=');
-        // }
-        return true;
+        $this->useCollections = true;
     }
 
     /**
@@ -159,6 +145,7 @@ class CDatabase_Query_Builder_MongoDBBuilder extends CDatabase_Query_Builder {
      */
     public function project($columns) {
         $this->projections = is_array($columns) ? $columns : func_get_args();
+
         return $this;
     }
 
@@ -171,6 +158,7 @@ class CDatabase_Query_Builder_MongoDBBuilder extends CDatabase_Query_Builder {
      */
     public function timeout($seconds) {
         $this->timeout = $seconds;
+
         return $this;
     }
 
@@ -183,6 +171,7 @@ class CDatabase_Query_Builder_MongoDBBuilder extends CDatabase_Query_Builder {
      */
     public function hint($index) {
         $this->hint = $index;
+
         return $this;
     }
 
@@ -198,6 +187,7 @@ class CDatabase_Query_Builder_MongoDBBuilder extends CDatabase_Query_Builder {
      */
     public function value($column) {
         $result = (array) $this->first([$column]);
+
         return carr::get($result, $column);
     }
 
@@ -323,6 +313,7 @@ class CDatabase_Query_Builder_MongoDBBuilder extends CDatabase_Query_Builder {
             } else {
                 $result = $this->collection->distinct($column);
             }
+
             return $this->useCollections ? new CCollection($result) : $result;
         } else {
             // Normal query
@@ -386,6 +377,7 @@ class CDatabase_Query_Builder_MongoDBBuilder extends CDatabase_Query_Builder {
             'limit' => $this->limit,
             'aggregate' => $this->aggregate,
         ];
+
         return md5(serialize(array_values($key)));
     }
 
@@ -409,6 +401,7 @@ class CDatabase_Query_Builder_MongoDBBuilder extends CDatabase_Query_Builder {
         $this->bindings['select'] = $previousSelectBindings;
         if (isset($results[0])) {
             $result = (array) $results[0];
+
             return $result['aggregate'];
         }
     }
@@ -428,6 +421,7 @@ class CDatabase_Query_Builder_MongoDBBuilder extends CDatabase_Query_Builder {
         if ($column) {
             $this->columns = [$column];
         }
+
         return $this;
     }
 
@@ -443,6 +437,7 @@ class CDatabase_Query_Builder_MongoDBBuilder extends CDatabase_Query_Builder {
         } else {
             $this->orders[$column] = $direction;
         }
+
         return $this;
     }
 
@@ -459,6 +454,7 @@ class CDatabase_Query_Builder_MongoDBBuilder extends CDatabase_Query_Builder {
     public function whereAll($column, array $values, $boolean = 'and', $not = false) {
         $type = 'all';
         $this->wheres[] = compact('column', 'type', 'boolean', 'values', 'not');
+
         return $this;
     }
 
@@ -468,6 +464,7 @@ class CDatabase_Query_Builder_MongoDBBuilder extends CDatabase_Query_Builder {
     public function whereBetween($column, array $values, $boolean = 'and', $not = false) {
         $type = 'between';
         $this->wheres[] = compact('column', 'type', 'boolean', 'values', 'not');
+
         return $this;
     }
 
@@ -476,6 +473,7 @@ class CDatabase_Query_Builder_MongoDBBuilder extends CDatabase_Query_Builder {
      */
     public function forPage($page, $perPage = 15) {
         $this->paginating = true;
+
         return $this->skip(($page - 1) * $perPage)->take($perPage);
     }
 
@@ -491,6 +489,7 @@ class CDatabase_Query_Builder_MongoDBBuilder extends CDatabase_Query_Builder {
             // inserting a single document.
             if (!is_array($value)) {
                 $batch = false;
+
                 break;
             }
         }
@@ -499,7 +498,8 @@ class CDatabase_Query_Builder_MongoDBBuilder extends CDatabase_Query_Builder {
         }
         // Batch insert
         $result = $this->collection->insertMany($values);
-        return (1 == (int) $result->isAcknowledged());
+
+        return 1 == (int) $result->isAcknowledged();
     }
 
     /**
@@ -524,6 +524,7 @@ class CDatabase_Query_Builder_MongoDBBuilder extends CDatabase_Query_Builder {
         if (!cstr::startsWith(key($values), '$')) {
             $values = ['$set' => $values];
         }
+
         return $this->performUpdate($values, $options);
     }
 
@@ -540,6 +541,7 @@ class CDatabase_Query_Builder_MongoDBBuilder extends CDatabase_Query_Builder {
             $query->where($column, 'exists', false);
             $query->orWhereNotNull($column);
         });
+
         return $this->performUpdate($query, $options);
     }
 
@@ -573,10 +575,12 @@ class CDatabase_Query_Builder_MongoDBBuilder extends CDatabase_Query_Builder {
         if ($key == '_id') {
             $results = $results->map(function ($item) {
                 $item['_id'] = (string) $item['_id'];
+
                 return $item;
             });
         }
         $p = carr::pluck($results, $column, $key);
+
         return $this->useCollections ? new CCollection($p) : $p;
     }
 
@@ -595,6 +599,7 @@ class CDatabase_Query_Builder_MongoDBBuilder extends CDatabase_Query_Builder {
         if (1 == (int) $result->isAcknowledged()) {
             return $result->getDeletedCount();
         }
+
         return 0;
     }
 
@@ -605,6 +610,7 @@ class CDatabase_Query_Builder_MongoDBBuilder extends CDatabase_Query_Builder {
         if ($collection) {
             $this->collection = $this->connection->driver()->getCollection($collection);
         }
+
         return parent::from($collection);
     }
 
@@ -613,7 +619,8 @@ class CDatabase_Query_Builder_MongoDBBuilder extends CDatabase_Query_Builder {
      */
     public function truncate() {
         $result = $this->collection->drop();
-        return (1 == (int) $result->ok);
+
+        return 1 == (int) $result->ok;
     }
 
     /**
@@ -667,6 +674,7 @@ class CDatabase_Query_Builder_MongoDBBuilder extends CDatabase_Query_Builder {
         } else {
             $query = [$operator => [$column => $value]];
         }
+
         return $this->performUpdate($query);
     }
 
@@ -688,6 +696,7 @@ class CDatabase_Query_Builder_MongoDBBuilder extends CDatabase_Query_Builder {
         } else {
             $query = [$operator => [$column => $value]];
         }
+
         return $this->performUpdate($query);
     }
 
@@ -707,6 +716,7 @@ class CDatabase_Query_Builder_MongoDBBuilder extends CDatabase_Query_Builder {
             $fields[$column] = 1;
         }
         $query = ['$unset' => $fields];
+
         return $this->performUpdate($query);
     }
 
@@ -735,6 +745,7 @@ class CDatabase_Query_Builder_MongoDBBuilder extends CDatabase_Query_Builder {
         if (1 == (int) $result->isAcknowledged()) {
             return $result->getModifiedCount() ? $result->getModifiedCount() : $result->getUpsertedCount();
         }
+
         return 0;
     }
 
@@ -752,6 +763,7 @@ class CDatabase_Query_Builder_MongoDBBuilder extends CDatabase_Query_Builder {
         if (is_string($id) && strlen($id) === 16 && preg_match('~[^\x20-\x7E\t\r\n]~', $id) > 0) {
             return new Binary($id, Binary::TYPE_UUID);
         }
+
         return $id;
     }
 
@@ -767,6 +779,7 @@ class CDatabase_Query_Builder_MongoDBBuilder extends CDatabase_Query_Builder {
                 $operator = substr($operator, 1);
             }
         }
+
         return call_user_func_array('parent::where', $params);
     }
 
@@ -851,6 +864,7 @@ class CDatabase_Query_Builder_MongoDBBuilder extends CDatabase_Query_Builder {
             // Merge the compiled where with the others.
             $compiled = array_merge_recursive($compiled, $result);
         }
+
         return $compiled;
     }
 
@@ -861,6 +875,7 @@ class CDatabase_Query_Builder_MongoDBBuilder extends CDatabase_Query_Builder {
      */
     protected function compileWhereAll(array $where) {
         extract($where);
+
         return [$column => ['$all' => array_values($values)]];
     }
 
@@ -921,6 +936,7 @@ class CDatabase_Query_Builder_MongoDBBuilder extends CDatabase_Query_Builder {
      */
     protected function compileWhereNested(array $where) {
         extract($where);
+
         return $query->compileWheres();
     }
 
@@ -931,6 +947,7 @@ class CDatabase_Query_Builder_MongoDBBuilder extends CDatabase_Query_Builder {
      */
     protected function compileWhereIn(array $where) {
         extract($where);
+
         return [$column => ['$in' => array_values($values)]];
     }
 
@@ -941,6 +958,7 @@ class CDatabase_Query_Builder_MongoDBBuilder extends CDatabase_Query_Builder {
      */
     protected function compileWhereNotIn(array $where) {
         extract($where);
+
         return [$column => ['$nin' => array_values($values)]];
     }
 
@@ -952,6 +970,7 @@ class CDatabase_Query_Builder_MongoDBBuilder extends CDatabase_Query_Builder {
     protected function compileWhereNull(array $where) {
         $where['operator'] = '=';
         $where['value'] = null;
+
         return $this->compileWhereBasic($where);
     }
 
@@ -963,6 +982,7 @@ class CDatabase_Query_Builder_MongoDBBuilder extends CDatabase_Query_Builder {
     protected function compileWhereNotNull(array $where) {
         $where['operator'] = '!=';
         $where['value'] = null;
+
         return $this->compileWhereBasic($where);
     }
 
@@ -989,6 +1009,7 @@ class CDatabase_Query_Builder_MongoDBBuilder extends CDatabase_Query_Builder {
                 ],
             ];
         }
+
         return [
             $column => [
                 '$gte' => $values[0],
@@ -1015,6 +1036,7 @@ class CDatabase_Query_Builder_MongoDBBuilder extends CDatabase_Query_Builder {
      */
     public function options(array $options) {
         $this->options = $options;
+
         return $this;
     }
 
@@ -1025,6 +1047,7 @@ class CDatabase_Query_Builder_MongoDBBuilder extends CDatabase_Query_Builder {
         if ($method == 'unset') {
             return call_user_func_array([$this, 'drop'], $parameters);
         }
+
         return parent::__call($method, $parameters);
     }
 }
