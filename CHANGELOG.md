@@ -2,6 +2,32 @@
 
 All notable changes to `CF` will be documented in this file
 
+## 1.4 - 2022-06-01
+
+### Added
+
+- add integrated phpcf with composer installed phpcf globally for php cf cli
+### Fixes
+
+- Fixes for cres.js:
+  - waves setting
+  - remove have_clock
+- Automatic set CCarbon locale when CF locale changed
+- Fix and automatic translation for CElement SelectSearch and DataTable for current CF locale
+- Fix view blade for get current view being rendered for nested view element CApp
+- Fix block-ui to runtime modules, next on version 1.5 block-ui will not registered automatic from CApp
+
+
+### Improved
+
+- Using League Storage V3
+- Improve CElement
+  - DataTable setDataFromModel
+  -
+- Added CApi module
+- Improve CPeriod
+
+
 ## 1.3 - 2022-01-24
 
 ### Important
