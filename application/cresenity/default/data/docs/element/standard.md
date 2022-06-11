@@ -29,3 +29,41 @@ $a->setTarget('_blank');
 $a->add('Click link ini');
 $a->add('Click link ini');
 ```
+
+### &lt;h1&gt;
+```php
+$h1 = $app->addH1();
+$h1->add('Header H1')
+```
+
+### &lt;h2&gt;
+```php
+$h2 = $app->addH2();
+$h2->add('Header H2')
+```
+
+### &lt;h3&gt;
+```php
+$h3 = $app->addH3();
+$h3->add('Header H3')
+```
+
+### &lt;h4&gt;
+```php
+$h4 = $app->addH4();
+$h4->add('Header H4')
+```
+
+
+### &lt;h5&gt;
+```php
+$h5 = $app->addH5();
+$h5->add('Header H5')
+```
+
+
+### &lt;h6&gt;
+```php
+$h6 = $app->addH6();
+$h6->add('Header H6')
+```
