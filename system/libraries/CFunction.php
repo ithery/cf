@@ -27,6 +27,9 @@ class CFunction {
     public $type = 'defined'; //defined,class,
 
     private function __construct($func) {
+        if ($func instanceof Closure) {
+            $func = new OpisSerializableClosure($func);
+        }
         $this->func = $func;
     }
 
