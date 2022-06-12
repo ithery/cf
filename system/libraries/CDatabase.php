@@ -1409,6 +1409,13 @@ class CDatabase {
     protected function reconnectIfMissingConnection() {
         $this->driver->reconnect();
     }
+
+    /**
+     * @return CDatabase_TransactionManager
+     */
+    public function getTransactionManager() {
+        return $this->transactionManager;
+    }
 }
 
 // End Database Class
