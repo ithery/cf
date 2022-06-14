@@ -201,6 +201,7 @@ class CManager_DataProvider_ModelDataProvider extends CManager_DataProviderAbstr
         $joinIndex = 0;
         $beforeAlias = $tableAlias;
         $columnAlias = $tableAlias;
+
         foreach ($joinRelations as $joinRelation) {
             $joinAlias = 'mdp_join_' . $joinIndex;
             $currentRelation = $currentModel->$joinRelation();
@@ -240,6 +241,18 @@ class CManager_DataProvider_ModelDataProvider extends CManager_DataProviderAbstr
         }
         $newQuery->select($columnAlias . '.' . $column);
 
+        if ($relation instanceof CModel_Relation_BelongsToOne) {
+            $joinAlias = 'mdp_bto_join_' . $column;
+
+            $joinTable = $relation->getTable();
+            $newQuery->join($joinTable . ' AS ' . $joinAlias, $joinAlias . '.' . $relation->getRelatedPivotKeyName(), '=', $tableAlias . '.' . $relation->getRelatedKeyName());
+            $newQuery->whereColumn(
+                $relation->getQualifiedParentKeyName(),
+                '=',
+                $joinAlias . '.' . $relation->getForeignPivotKeyName()
+            );
+            $newQuery->limit(1);
+        }
         if ($this->hasSoftDeletes($relatedModel)) {
             $newQuery->where($tableAlias . '.' . $relatedModel->getStatusColumn(), '>', 0);
         }
