@@ -1,7 +1,5 @@
 <?php
 
-declare(strict_types=1);
-
 /*
  * This is part of the league/commonmark package.
  *
@@ -15,13 +13,11 @@ declare(strict_types=1);
 
 namespace League\CommonMark\Extension\Table;
 
-use League\CommonMark\Environment\ConfigurableEnvironmentInterface;
 use League\CommonMark\Extension\ExtensionInterface;
+use League\CommonMark\Environment\ConfigurableEnvironmentInterface;
 
-final class TableExtension implements ExtensionInterface
-{
-    public function register(ConfigurableEnvironmentInterface $environment): void
-    {
+final class TableExtension implements ExtensionInterface {
+    public function register(ConfigurableEnvironmentInterface $environment) {
         $environment
             ->addBlockStartParser(new TableStartParser())
 

@@ -116,6 +116,11 @@ return [
                 'label' => c::__('Table'),
                 'uri' => 'docs/element/table',
             ],
+            [
+                'name' => 'element.form',
+                'label' => c::__('Form'),
+                'uri' => 'docs/element/form',
+            ],
 
         ]
     ],
@@ -223,6 +228,7 @@ return [
                 'label' => c::__('Helper'),
                 'uri' => 'docs/cresjs/helper',
             ],
+
         ]
     ],
     [
