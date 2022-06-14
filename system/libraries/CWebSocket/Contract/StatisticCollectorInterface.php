@@ -64,7 +64,7 @@ interface CWebSocket_Contract_StatisticCollectorInterface {
      *
      * @param string|int $appId
      *
-     * @return PromiseInterface[\BeyondCode\LaravelWebSockets\Statistics\Statistic|null]
+     * @return PromiseInterface[\CWebSocket_Statistic|null]
      */
     public function getAppStatistics($appId);
 

@@ -403,8 +403,8 @@ class CDatabase_Query_Builder {
     /**
      * Set the table which the query is targeting.
      *
-     * @param \Closure|\Illuminate\Database\Query\Builder|string $table
-     * @param null|string                                        $as
+     * @param \Closure|\CDatabase_Query_Builder|string $table
+     * @param null|string                              $as
      *
      * @return $this
      */
@@ -1331,7 +1331,7 @@ class CDatabase_Query_Builder {
      * @param string      $column
      * @param null|string $key
      *
-     * @return \Illuminate\Support\Collection
+     * @return \CCollection
      */
     public function pluck($column, $key = null) {
         // First, we will need to select the results of the query accounting for the

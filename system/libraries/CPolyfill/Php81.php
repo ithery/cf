@@ -12,13 +12,24 @@ class CPolyfill_Php81 {
         }
 
         if (!function_exists('array_is_list')) {
-            function array_is_list(array $array): bool {
+            /**
+             * @param array $array
+             *
+             * @return bool
+             */
+            function array_is_list(array $array) {
                 return p\Php81::array_is_list($array);
             }
         }
 
         if (!function_exists('enum_exists')) {
-            function enum_exists(string $enum, bool $autoload = true): bool {
+            /**
+             * @param string $enum
+             * @param bool   $autoload
+             *
+             * @return bool
+             */
+            function enum_exists($enum, $autoload = true) {
                 return $autoload && class_exists($enum) && false;
             }
         }

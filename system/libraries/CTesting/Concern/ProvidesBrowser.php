@@ -46,10 +46,10 @@ trait CTesting_Concern_ProvidesBrowser {
      *
      * @param \Closure $callback
      *
-     * @return \Laravel\Dusk\Browser|void
-     *
      * @throws \Exception
      * @throws \Throwable
+     *
+     * @return \CTesting_Browser|void
      */
     public function browse(Closure $callback) {
         $browsers = $this->createBrowsersFor($callback);
@@ -78,9 +78,9 @@ trait CTesting_Concern_ProvidesBrowser {
      *
      * @param \Closure $callback
      *
-     * @return CCollection|array
-     *
      * @throws \ReflectionException
+     *
+     * @return CCollection|array
      */
     protected function createBrowsersFor(Closure $callback) {
         if (count(static::$browsers) === 0) {
@@ -101,10 +101,10 @@ trait CTesting_Concern_ProvidesBrowser {
      *
      * @param \Facebook\WebDriver\Remote\RemoteWebDriver $driver
      *
-     * @return \Laravel\Dusk\Browser
+     * @return \CTesting_Browser
      */
     protected function newBrowser($driver) {
-        return new Browser($driver);
+        return new CTesting_Browser($driver);
     }
 
     /**
@@ -112,9 +112,9 @@ trait CTesting_Concern_ProvidesBrowser {
      *
      * @param \Closure $callback
      *
-     * @return int
-     *
      * @throws \ReflectionException
+     *
+     * @return int
      */
     protected function browsersNeededFor(Closure $callback) {
         return (new ReflectionFunction($callback))->getNumberOfParameters();
@@ -123,7 +123,7 @@ trait CTesting_Concern_ProvidesBrowser {
     /**
      * Capture failure screenshots for each browser.
      *
-     * @param \Illuminate\Support\Collection $browsers
+     * @param \CCollection $browsers
      *
      * @return void
      */
@@ -142,7 +142,7 @@ trait CTesting_Concern_ProvidesBrowser {
     /**
      * Store the console output for the given browsers.
      *
-     * @param \Illuminate\Support\Collection $browsers
+     * @param \CCollection $browsers
      *
      * @return void
      */
@@ -157,7 +157,7 @@ trait CTesting_Concern_ProvidesBrowser {
     /**
      * Store the source code for the given browsers (if necessary).
      *
-     * @param \Illuminate\Support\Collection $browsers
+     * @param \CCollection $browsers
      *
      * @return void
      */
@@ -198,9 +198,9 @@ trait CTesting_Concern_ProvidesBrowser {
     /**
      * Create the remote web driver instance.
      *
-     * @return \Facebook\WebDriver\Remote\RemoteWebDriver
-     *
      * @throws \Exception
+     *
+     * @return \Facebook\WebDriver\Remote\RemoteWebDriver
      */
     protected function createWebDriver() {
         return c::retry(5, function () {

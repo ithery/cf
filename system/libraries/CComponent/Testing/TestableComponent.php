@@ -1,7 +1,9 @@
 
 <?php
 
-/** @mixin \Illuminate\Testing\TestResponse */
+/**
+ * @mixin \CTesting_TestResponse
+ */
 class CComponent_Testing_TestableComponent {
     use CTrait_Macroable {
         __call as macroCall;

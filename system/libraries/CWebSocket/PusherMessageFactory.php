@@ -1,17 +1,15 @@
 <?php
 
-use Illuminate\Support\Str;
 use Ratchet\ConnectionInterface;
 use Ratchet\RFC6455\Messaging\MessageInterface;
-use BeyondCode\LaravelWebSockets\Contracts\PusherMessage;
 
 class CWebSocket_PusherMessageFactory {
     /**
      * Create a new message.
      *
-     * @param \Ratchet\RFC6455\Messaging\MessageInterface            $message
-     * @param \Ratchet\ConnectionInterface                           $connection
-     * @param \BeyondCode\LaravelWebSockets\Contracts\ChannelManager $channelManager
+     * @param \Ratchet\RFC6455\Messaging\MessageInterface  $message
+     * @param \Ratchet\ConnectionInterface                 $connection
+     * @param \CWebSocket_Contract_ChannelManagerInterface $channelManager
      *
      * @return CWebSocket_Contract_PusherMessageInterface
      */

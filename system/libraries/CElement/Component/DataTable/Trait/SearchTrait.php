@@ -7,6 +7,8 @@ trait CElement_Component_DataTable_Trait_SearchTrait {
 
     protected $haveQuickSearchPlaceholder = true;
 
+    protected $quickSearchPlaceholder = '';
+
     protected $initialSearch;
 
     protected $customSearchSelector;
@@ -25,6 +27,12 @@ trait CElement_Component_DataTable_Trait_SearchTrait {
 
     public function setSearchPlaceholder($placeholder) {
         $this->searchPlaceholder = $placeholder;
+
+        return $this;
+    }
+
+    public function setQuickSearchPlaceholder($placeholder) {
+        $this->quickSearchPlaceholder = $placeholder;
 
         return $this;
     }

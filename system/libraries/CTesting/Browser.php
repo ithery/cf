@@ -108,7 +108,7 @@ class CTesting_Browser {
      * Create a browser instance.
      *
      * @param \Facebook\WebDriver\Remote\RemoteWebDriver $driver
-     * @param \Laravel\Dusk\ElementResolver              $resolver
+     * @param \CTesting_Browser_ElementResolver          $resolver
      *
      * @return void
      */
@@ -524,8 +524,8 @@ class CTesting_Browser {
     /**
      * Set the current component state.
      *
-     * @param \Laravel\Dusk\Component       $component
-     * @param \Laravel\Dusk\ElementResolver $parentResolver
+     * @param \CTesting_Browser_Component       $component
+     * @param \CTesting_Browser_ElementResolver $parentResolver
      *
      * @return void
      */

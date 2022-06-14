@@ -25,6 +25,7 @@ class CApp_Navigation {
         if ($domain == null) {
             $domain = CF::domain();
         }
+
         return carr::get(self::$accessCallback, $domain);
     }
 
@@ -35,6 +36,7 @@ class CApp_Navigation {
         if ($domain == null) {
             $domain = CF::domain();
         }
+
         return carr::get(self::$activeCallback, $domain);
     }
 
@@ -75,6 +77,7 @@ class CApp_Navigation {
         if (!isset(self::$instance[$domain])) {
             self::$instance[$domain] = new CApp_Navigation($domain);
         }
+
         return self::$instance[$domain];
     }
 
@@ -104,6 +107,7 @@ class CApp_Navigation {
         $app = CApp::instance();
         $app->setNavRenderer($engineClass);
         $app->setNav(CApp_Navigation_Data::get());
+
         return $app->renderNavigation();
     }
 

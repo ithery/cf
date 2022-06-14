@@ -78,7 +78,6 @@ trait CModel_Metable_MetableTrait {
 
         if (method_exists($builder, 'upsert')) {
             // use upsert if available to store all data in a single query
-            // requires Laravel >8.0
             $metaModels = new CCollection();
             foreach ($metaDictionary as $key => $value) {
                 $metaModels[$key] = $this->makeMeta($key, $value);
