@@ -40,17 +40,28 @@ class HtmlBlock extends AbstractBlock implements StringContainerInterface {
      */
     protected $literal = '';
 
-    public function __construct(int $type) {
+    /**
+     * @param int $type
+     */
+    public function __construct($type) {
         parent::__construct();
 
         $this->type = $type;
     }
 
-    public function getType(): int {
+    /**
+     * @return int
+     */
+    public function getType() {
         return $this->type;
     }
 
-    public function setType(int $type): void {
+    /**
+     * @param int $type
+     *
+     * @return void
+     */
+    public function setType($type) {
         $this->type = $type;
     }
 
