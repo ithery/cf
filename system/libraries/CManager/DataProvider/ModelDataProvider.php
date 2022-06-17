@@ -285,6 +285,13 @@ class CManager_DataProvider_ModelDataProvider extends CManager_DataProviderAbstr
         return $query->paginate($perPage, $columns, $pageName, $page);
     }
 
+    public function first($callback = null) {
+        //do nothing
+        $query = $this->getModelQuery($callback);
+        //c::db()->enableBenchmark();
+        return $query->first();
+    }
+
     /**
      * Determine whether a model uses SoftDeletes.
      *
