@@ -106,3 +106,31 @@ return  [
     // ...
 ]
 ```
+
+### Row Actions
+
+Contoh kode untuk ubah label sesuai condition:
+```php
+    $table->addRowAction()->withRowCallback(function ($element, $row) {
+        $isActive = carr::get($row, 'is_active');
+        $element->setIcon($isActive ? 'ti ti-close' : 'ti ti-check')
+            ->setLabel($isActive ? 'Non Aktifkan' : 'Aktifkan')
+            ->setLink(c::url('url/toactivate/or/nonactivate/customer/{customer_id}'));
+    });
+```
+
+Contoh kode untuk hide / show action saat kondisi tertentu
+```php
+    $table->addRowAction()->withRowCallback(function ($element, $row) {
+        $isLocked = carr::get($row, 'is_locked');
+        if (!$isLocked) {
+            $element->setVisibility(true);
+            $element->setIcon('ti ti-trash')
+                ->setLabel('Delete')
+                ->setConfirm(true)
+                ->setLink(c::url('url/todelete/{something_id}'));
+        } else {
+            $element->setVisibility(false);
+        }
+    });
+```
