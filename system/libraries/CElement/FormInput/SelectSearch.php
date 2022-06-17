@@ -319,18 +319,9 @@ class CElement_FormInput_SelectSearch extends CElement_FormInput {
                             $q->where($this->keyField, '=', $value);
                         });
                     }
-                    $result = $query->paginate(1);
-                    $items = $result->items();
+                    $model = $query->first();
 
-                    $item = carr::first($items);
-                    if ($item) {
-                        $itemArray = $item->toArray();
-                        $itemArray['id'] = $item->getKey();
-
-                        return $itemArray;
-                    }
-
-                    return null;
+                    return $model;
                 }
                 $q = 'select * from (' . $this->query() . ') as a limit 1';
 
@@ -344,12 +335,23 @@ class CElement_FormInput_SelectSearch extends CElement_FormInput {
                 }
 
                 return null;
-            })->toArray();
+            });
+
+            if (!($this->dataProvider instanceof CManager_DataProvider_ModelDataProvider)) {
+                $result = $result->toArray();
+            }
 
             return $result;
         }
 
         return null;
+    }
+
+    public function modelToSelect2Array(CModel $model) {
+        $itemArray = $model->toArray();
+        $itemArray['id'] = $model->getKey();
+
+        return $itemArray;
     }
 
     public function html($indent = 0) {
@@ -400,6 +402,11 @@ class CElement_FormInput_SelectSearch extends CElement_FormInput {
             foreach ($selectedRows as $index => $selectedRow) {
                 if ($selectedRow != null) {
                     $row = $selectedRow;
+                    $model = null;
+                    if ($row instanceof CModel) {
+                        $model = $row;
+                        $row = $this->modelToSelect2Array($model);
+                    }
                     if (isset($this->valueCallback) && is_callable($this->valueCallback)) {
                         foreach ($row as $k => $v) {
                             $row[$k] = $this->valueCallback($row, $k, $v);
@@ -410,8 +417,9 @@ class CElement_FormInput_SelectSearch extends CElement_FormInput {
                     if ($strSelection == null) {
                         $strSelection = '{' . carr::first($this->searchField) . '}';
                     }
+
                     if ($strSelection instanceof \Opis\Closure\SerializableClosure) {
-                        $strSelection = $strSelection->__invoke($row);
+                        $strSelection = $strSelection->__invoke($model ?: $row);
                     }
                     $strSelection = c::value($strSelection);
                     $strSelection = str_replace("'", "\'", $strSelection);
@@ -494,6 +502,11 @@ class CElement_FormInput_SelectSearch extends CElement_FormInput {
             foreach ($selectedRows as $index => $selectedRow) {
                 if ($selectedRow != null) {
                     $row = $selectedRow;
+                    $model = null;
+                    if ($row instanceof CModel) {
+                        $model = $row;
+                        $row = $this->modelToSelect2Array($model);
+                    }
                     if (is_object($row)) {
                         $row = (array) $row;
                     }
