@@ -131,7 +131,7 @@ trait CElement_Component_DataTable_Trait_JavascriptTrait {
                     ->appendln("'sServerMethod': '" . strtoupper($this->ajax_method) . "',")->br()
                     ->appendln("'fnServerData': function ( sSource, aoData, fnCallback, oSettings ) {
         var data_quick_search = [];
-        jQuery('.data_table-quick_search').each(function(){
+        jQuery('#" . $this->id() . " .data_table-quick_search').each(function(){
             if (jQuery(this).val() != '') {
                 var input_name = jQuery(this).attr('name');
                 var cur_transforms = jQuery(this).attr('transforms');
