@@ -67,7 +67,9 @@ trait CElement_Component_DataTable_Trait_JavascriptTrait {
                 $vm .= "'" . $v . "'";
             }
             $hs_val = $this->headerSortable ? 'true' : 'false';
-            $js->appendln("var table = jQuery('#" . $this->id . "');")->br();
+            $varName = 'table_' . cstr::slug($this->id(), '_');
+            $varNameOTable = 'otable_' . cstr::slug($this->id(), '_');
+            $js->appendln('var ' . $varName . " = jQuery('#" . $this->id . "');")->br();
             $js->appendln('var header_sortable = ' . $hs_val . ';')->br();
             $js->appendln('var vaoColumns = [];')->br();
             if ($this->numbering) {
@@ -109,7 +111,7 @@ trait CElement_Component_DataTable_Trait_JavascriptTrait {
             }
 
             $js->appendln('var tableStyled_' . $this->id . ' = false;')->br()
-                ->appendln('var oTable = table.dataTable({')->br()->incIndent();
+                ->appendln('var ' . $varNameOTable . ' = ' . $varName . '.dataTable({')->br()->incIndent();
 
             //   $js->appendln("responsive: {
             //        details: {
@@ -355,7 +357,7 @@ trait CElement_Component_DataTable_Trait_JavascriptTrait {
         var td = jQuery('<td>').append(input);
         quick_search.append(td);
     });")->br()
-                ->appendln("table.children('thead').append(quick_search);")->br()
+                ->appendln($varName . ".children('thead').append(quick_search);")->br()
                 ->decIndent()
                 ->appendln('}')->br()
                 ->appendln('var dttable_quick_search = ' . ($this->quickSearch ? '1' : '0') . ';')->br()
@@ -363,19 +365,19 @@ trait CElement_Component_DataTable_Trait_JavascriptTrait {
             if ($this->customSearchSelector != null) {
                 $js->appendln("
                     $('" . $this->customSearchSelector . "').keyup(() => {
-                        oTable.fnFilter($('" . $this->customSearchSelector . "').val());
+                        " . $varNameOTable . ".fnFilter($('" . $this->customSearchSelector . "').val());
                     });
                 ");
             }
             $js->appendln("
-                jQuery('.data_table-quick_search').on('keyup change', function() {
+                jQuery('#" . $this->id . " .data_table-quick_search').on('input', function() {
                     var inputType = $(this).prop('tagName');
                     " . ($this->ajax
-                            ? 'table.fnClearTable( 0 );table.fnDraw();'
+                            ? $varName . '.fnClearTable( 0 );' . $varName . '.fnDraw();'
                             : "if (inputType.toLowerCase() == 'select' && $(this).val()) {
-                                table.fnFilter(\"^\"+$(this).val()+\"$\",$(this).attr('data-column-index'), true)
+                                " . $varName . ".fnFilter(\"^\"+$(this).val()+\"$\",$(this).attr('data-column-index'), true)
                             } else {
-                                table.fnFilter($(this).val(),$(this).attr('data-column-index'))
+                                " . $varName . ".fnFilter($(this).val(),$(this).attr('data-column-index'))
                             };") . '
                 });
             ');
