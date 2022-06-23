@@ -9,11 +9,13 @@ class CDebug_Collector_Exception extends CDebug_CollectorAbstract {
         if (!CF::config('collector.exception')) {
             return null;
         }
-
+        $data = null;
         if ($this->shouldCollect($exception)) {
             $data = $this->getDataFromException($exception);
             $this->put($data);
         }
+
+        return $data;
     }
 
     public function getDataFromException($exception) {
@@ -31,6 +33,7 @@ class CDebug_Collector_Exception extends CDebug_CollectorAbstract {
         $file = $exception->getFile();
         $line = $exception->getLine();
         $trace = $exception->getTrace();
+        $uuid = cstr::uuid();
 
         $browser = new CBrowser();
         $data = [];
@@ -43,6 +46,7 @@ class CDebug_Collector_Exception extends CDebug_CollectorAbstract {
         $data['orgCode'] = CApp_Base::orgCode();
         $data['error'] = $error;
         $data['message'] = $message;
+        $data['uuid'] = $uuid;
         $data['file'] = $file;
         $data['line'] = $line;
         $data['trace'] = json_encode($trace);
