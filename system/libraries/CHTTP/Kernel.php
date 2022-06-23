@@ -97,7 +97,7 @@ class CHTTP_Kernel {
                     $headerValue = implode(':', array_splice($headerExploded, 1));
 
                     if (strtolower($headerKey) != 'set-cookie') {
-                        $response->header($headerKey, $headerValue);
+                        $response->headers->set($headerKey, $headerValue);
                     }
                 }
             }

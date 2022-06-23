@@ -13,7 +13,7 @@ abstract class CNotification_ChannelAbstract implements CNotification_ChannelInt
     public function send($className, array $options = []) {
         $notificationSenderJobClass = CF::config('notification.task_queue.notification_sender', CNotification_TaskQueue_NotificationSender::class);
 
-        $isQueued = carr::get($options, 'queued', CF::config('notification.queue.queued'));
+        $isQueued = CF::config('notification.queue.queued');
 
         $options = [
             'channel' => $this->channelName,
