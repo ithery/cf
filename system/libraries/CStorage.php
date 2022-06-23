@@ -131,6 +131,19 @@ class CStorage {
     }
 
     /**
+     * @param string $name
+     *
+     * @return string
+     */
+    protected function sanitizeDriverName($name) {
+        if ($name == 'bunnycdn') {
+            $name = 'bunnyCDN';
+        }
+
+        return ucfirst($name);
+    }
+
+    /**
      * Resolve the given disk.
      *
      * @param string     $name
@@ -152,7 +165,7 @@ class CStorage {
             return $this->callCustomCreator($config);
         }
 
-        $driverMethod = 'create' . ucfirst($config['driver']) . 'Driver';
+        $driverMethod = 'create' . $this->sanitizeDriverName($config['driver']) . 'Driver';
         if (!method_exists($this, $driverMethod)) {
             throw new InvalidArgumentException("Driver [{$name}] is not supported.");
         }
@@ -193,6 +206,32 @@ class CStorage {
             carr::get($config, 'lock', LOCK_EX),
             $links
         );
+
+        return new CStorage_Adapter($this->createFlysystem($adapter, $config), $adapter, $config);
+    }
+
+    /**
+     * Create an instance of the ftp driver.
+     *
+     * @param array $config
+     *
+     * @return \CStorage_FilesystemInterface
+     */
+    public function createBunnyCDNDriver(array $config) {
+        $adapter = new CStorage_Adapter_BunnyCDNAdapter(
+            new CStorage_Vendor_BunnyCDN_Client(
+                $config['storage_zone'],
+                $config['api_key'],
+                $config['region']
+            ),
+            isset($config['endpoint']) ? $config['endpoint'] : null
+        );
+
+        // return new FilesystemAdapter(
+        //     new Filesystem($adapter, $config),
+        //     $adapter,
+        //     $config
+        // );
 
         return new CStorage_Adapter($this->createFlysystem($adapter, $config), $adapter, $config);
     }
