@@ -4,4 +4,5 @@ return  [
     'remove' => 'Remove',
     'uploadImage' => 'Upload Image',
     'errorMessageLimitFile' => 'Only :limit image can be uploaded',
+    'errorMessageMaxUploadSize' => 'Image Size is more than :sizeMB MB',
 ];

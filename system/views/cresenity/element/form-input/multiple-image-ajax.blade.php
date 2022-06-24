@@ -139,7 +139,9 @@
 
     (function ($) {
         $(function () {
-            var removeLabel = "@lang('element/image.remove')";
+            const errorMessageLimitFile = '@lang("element/image.errorMessageLimitFile",["limit"=>$limitFile])';
+            const errorMessageMaxUploadSize = '@lang("element/image.errorMessageMaxUploadSize",["sizeMB"=>$maxUploadSize])';
+            const removeLabel = "@lang('element/image.remove')";
             var haveCropper = <?php echo ($cropper != null) ? 'true' : 'false' ?>;
             var maxUploadSize = <?= $maxUploadSize ?> * 1024 * 1024;
 
@@ -299,8 +301,8 @@
                     div_cc.append(cc);
                     div.append(div_cc);
                 <?php endforeach; ?>
-                @if ($removeLink)
-                    var remove = $("<a>").addClass("multi-image-ajax-remove").html(removeLabel);
+                @if($removeLink)
+                    var remove = $("<a>").addClass("multi-image-ajax-remove").html("@lang('element/image.remove')");
                     div.append(remove);
                 @endif
                 div.append("<img class=\"multi-image-ajax-loading\" src=\"<?php echo curl::base(); ?>media/img/ring.gif\" />");
@@ -363,12 +365,11 @@
                                     var filesize = event.total;
                                     var maxUploadSize = {{ $maxUploadSize }} * 1024 * 1024;
                                     var limitFile = {{ $limitFile }};
-                                    var errorMessageLimitFile = '@lang("element/image.errorMessageLimitFile",["limit"=>$limitFile])';
                                     if (limitFile && $('#{{ $id }}').children().length >= limitFile) {
-                                        cresenity.message('', '<div class="alert alert-danger text-center"><b>Error:</b> ' + errorMessageLimitFile + '</div>', 'bootbox');
+                                        cresenity.showError(errorMessageLimitFile);
                                     } else {
                                         if (maxUploadSize && filesize > maxUploadSize) {
-                                            cresenity.message('', '<div class="alert alert-danger text-center"><b>Error:</b> Image Size is more than ' + <?= $maxUploadSize ?> + ' MB</div>', 'bootbox');
+                                            cresenity.showError(errorMessageMaxUploadSize);
                                         } else {
                                             insertFile(reader, file, fileList, event);
                                         }
@@ -402,12 +403,11 @@
                         var filesize = event.total;
                         var maxUploadSize = <?= $maxUploadSize ?> * 1024 * 1024;
                         var limitFile = <?= $limitFile ?>;
-                        const errorMessageLimitFile = '@lang("element/image.errorMessageLimitFile",["limit"=>$limitFile])';
                         if (limitFile && $("#<?= $id ?>").children().length >= limitFile) {
-                            cresenity.message('', '<div class="alert alert-danger text-center"><b>Error:</b> ' + errorMessageLimitFile + '</div>', 'bootbox');
+                            cresenity.showError(errorMessageLimitFile);
                         } else {
                             if (maxUploadSize && filesize > maxUploadSize) {
-                                cresenity.message('', '<div class="alert alert-danger text-center"><b>Error:</b> Image Size is more than ' + <?= $maxUploadSize ?> + ' MB</div>', 'bootbox');
+                                cresenity.showError(errorMessageMaxUploadSize);
                             } else {
                                 insertFile(reader, file, fileList, event);
                             }
