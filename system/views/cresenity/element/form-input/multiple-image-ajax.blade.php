@@ -142,8 +142,25 @@
             const errorMessageLimitFile = '@lang("element/image.errorMessageLimitFile",["limit"=>$limitFile])';
             const errorMessageMaxUploadSize = '@lang("element/image.errorMessageMaxUploadSize",["sizeMB"=>$maxUploadSize])';
             const removeLabel = "@lang('element/image.remove')";
+            const elementId = "{{ $id }}";
             var haveCropper = <?php echo ($cropper != null) ? 'true' : 'false' ?>;
-            var maxUploadSize = <?= $maxUploadSize ?> * 1024 * 1024;
+            const maxUploadSize = <?= $maxUploadSize ?> * 1024 * 1024;
+            const readerOnLoadResolver = (child, file, reader) =>{
+                return $.proxy(function (file, fileList, event) {
+                    var filesize = event.total;
+                    var limitFile = <?= $limitFile ?>;
+                    if (limitFile && $("#" + elementId).children().length >= limitFile) {
+                        cresenity.showError(errorMessageLimitFile);
+                    } else {
+                        if (maxUploadSize && filesize > maxUploadSize) {
+                            cresenity.showError(errorMessageMaxUploadSize);
+                        } else {
+                            insertFile(reader, file, fileList, event);
+                        }
+                    }
+                }, child, file, $("#" + elementId));
+            };
+
 
 <?php if ($cropper != null) : ?>
             var cropperWidth = parseFloat('<?php echo $cropper->getCropperWidth(); ?>');
@@ -333,8 +350,8 @@
 
             fileUploadRemove();
 
-            $("#<?php echo $id ?>").sortable();
-            $("#<?php echo $id ?>").on({
+            $("#" + elementId).sortable();
+            $("#" + elementId).on({
                 "dragover dragenter": function (e) {
                     $(this).addClass("ondrag");
                 },
@@ -343,9 +360,9 @@
                 },
                 "drop": function (e) {
                     $(this).removeClass("ondrag");
-                    var container = $('#container-<?php echo $id ?>');
+                    var container = $('#container-' + elementId);
                     if (!container.hasClass('disabled')) {
-                        $("#<?php echo $id ?>").sortable();
+                        $("#"+elementId).sortable();
                         var dataTransfer = e.originalEvent.dataTransfer;
                         if (dataTransfer && dataTransfer.files.length) {
                             dataTransferFiles = dataTransfer.files;
@@ -356,25 +373,12 @@
                             }
                             e.preventDefault();
                             e.stopPropagation();
-                            $("#container-<?php echo $id ?> .multi-image-ajax-description").remove();
+                            $("#container-" + elementId +" .multi-image-ajax-description").remove();
                             $.each(dataTransferFiles, function (i, file) {
                                 var reader = new FileReader();
                                 reader.fileName = file.name;
 
-                                reader.onload = $.proxy(function (file, fileList, event) {
-                                    var filesize = event.total;
-                                    var maxUploadSize = {{ $maxUploadSize }} * 1024 * 1024;
-                                    var limitFile = {{ $limitFile }};
-                                    if (limitFile && $('#{{ $id }}').children().length >= limitFile) {
-                                        cresenity.showError(errorMessageLimitFile);
-                                    } else {
-                                        if (maxUploadSize && filesize > maxUploadSize) {
-                                            cresenity.showError(errorMessageMaxUploadSize);
-                                        } else {
-                                            insertFile(reader, file, fileList, event);
-                                        }
-                                    }
-                                }, this, file, $("#<?php echo $id; ?>"));
+                                reader.onload = readerOnLoadResolver(this,file,reader);
                                 reader.readAsDataURL(file);
                             });
                         }
@@ -382,37 +386,24 @@
                 }
             })
             if (!haveCropper) {
-                $("#<?php echo $id; ?>_input_temp").attr('multiple', 'multiple');
+                $("#" + elementId + "_input_temp").attr('multiple', 'multiple');
             }
 
             // Add Image by Click
-            $("#<?php echo $id; ?>").click(function () {
+            $("#" + elementId).click(function () {
                 var container = $('#container-<?php echo $id ?>');
                 if (!container.hasClass('disabled')) {
                     $("#<?php echo $id; ?>_input_temp").trigger("click");
                 }
             })
-            $("#<?php echo $id; ?>_input_temp").change(function (e) {
-                $("#<?php echo $id; ?>_description").remove();
+            $("#" + elementId +"_input_temp").change(function (e) {
+                $("#" + elementId + "_description").remove();
                 $.each(e.target.files, function (i, file) {
 
                     var reader = new FileReader();
 
                     reader.fileName = file.name;
-                    reader.onload = $.proxy(function (file, fileList, event) {
-                        var filesize = event.total;
-                        var maxUploadSize = <?= $maxUploadSize ?> * 1024 * 1024;
-                        var limitFile = <?= $limitFile ?>;
-                        if (limitFile && $("#<?= $id ?>").children().length >= limitFile) {
-                            cresenity.showError(errorMessageLimitFile);
-                        } else {
-                            if (maxUploadSize && filesize > maxUploadSize) {
-                                cresenity.showError(errorMessageMaxUploadSize);
-                            } else {
-                                insertFile(reader, file, fileList, event);
-                            }
-                        }
-                    }, this, file, $("#<?php echo $id; ?>"));
+                    reader.onload = readerOnLoadResolver(this,file,reader);
                     reader.readAsDataURL(file);
                 })
                 $(this).val("");
