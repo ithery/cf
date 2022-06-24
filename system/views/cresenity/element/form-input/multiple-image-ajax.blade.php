@@ -96,12 +96,12 @@
     }
 </style>
 
-<div id="container-<?php echo $id ?>" class="container-multi-image-ajax" data-maximum="<?php echo $maximum; ?>" >
-    <input id="<?php echo $id ?>_input_temp" type="file" accept="<?php echo $accept;?>" name="<?php echo $id ?>_input_temp[]" class="multi-image-ajax-input-temp"  style="display:none;">
-    <div id="<?php echo $id ?>_message" class="row alert alert-danger fade in multi-image-ajax-message">
+<div id="container-{{ $id }}" class="container-multi-image-ajax" data-maximum="<?php echo $maximum; ?>" >
+    <input id="{{ $id }}_input_temp" type="file" accept="<?php echo $accept;?>" name="<?php echo $id ?>_input_temp[]" class="multi-image-ajax-input-temp"  style="display:none;">
+    <div id="{{ $id }}_message" class="row alert alert-danger fade in multi-image-ajax-message">
     </div>
-    <div id="<?php echo $id ?>_description" class="multi-image-ajax-description"><?php echo clang::__('Click or Drop Files On Box Below')?></div>
-    <div id="<?php echo $id ?>" class="row control-fileupload multi-image-ajax">
+    <div id="{{ $id }}_description" class="multi-image-ajax-description">@lang('element/image.clickOrDropFilesOnBoxBelow')</div>
+    <div id="{{ $id }}" class="row control-fileupload multi-image-ajax">
         <?php foreach ($files as $f):  ?>
             <?php
             $input_name = carr::get($f, 'input_name');
