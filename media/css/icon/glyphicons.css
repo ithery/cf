@@ -9,8 +9,8 @@
 @font-face {
     font-family: 'Glyphicons Halflings';
 
-    src: url('glyphicons/glyphicons-halflings-regular.eot');
-    src: url('glyphicons/glyphicons-halflings-regular.eot?#iefix') format('embedded-opentype'), url('glyphicons/glyphicons-halflings-regular.woff2') format('woff2'), url('glyphicons/glyphicons-halflings-regular.woff') format('woff'), url('glyphicons/glyphicons-halflings-regular.ttf') format('truetype'), url('glyphicons/glyphicons-halflings-regular.svg#glyphicons_halflingsregular') format('svg');
+    src: url('./glyphicons/glyphicons-halflings-regular.eot');
+    src: url('./glyphicons/glyphicons-halflings-regular.eot?#iefix') format('embedded-opentype'), url('./glyphicons/glyphicons-halflings-regular.woff2') format('woff2'), url('./glyphicons/glyphicons-halflings-regular.woff') format('woff'), url('./glyphicons/glyphicons-halflings-regular.ttf') format('truetype'), url('./glyphicons/glyphicons-halflings-regular.svg#glyphicons_halflingsregular') format('svg');
 }
 .glyphicon {
     position: relative;
