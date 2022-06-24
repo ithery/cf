@@ -26,7 +26,7 @@ return [
             * the headers of the webhook request. A webhook client can use the signature
             * to verify the request hasn't been tampered with.
             */
-            'signer' => \Spatie\WebhookServer\Signer\DefaultSigner::class,
+            'signer' => \CWebhook_Server_Signer_DefaultSigner::class,
 
             /*
             * This is the name of the header where the signature will be added.
@@ -54,7 +54,7 @@ return [
             /*
             * This class determines how many seconds there should be between attempts.
             */
-            'backoff_strategy' => \Spatie\WebhookServer\BackoffStrategy\ExponentialBackoffStrategy::class,
+            'backoff_strategy' => \CWebhook_Server_BackoffStrategy_ExponentialBackoffStrategy::class,
 
             /*
             * By default we will verify that the ssl certificate of the destination

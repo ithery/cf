@@ -1,11 +1,5 @@
 <?php
 
-use Spatie\WebhookServer\Signer\Signer;
-use Spatie\WebhookServer\Exceptions\InvalidSigner;
-use Spatie\WebhookServer\Exceptions\CouldNotCallWebhook;
-use Spatie\WebhookServer\BackoffStrategy\BackoffStrategy;
-use Spatie\WebhookServer\Exceptions\InvalidBackoffStrategy;
-
 class CWebhook_Server_WebhookCall {
     protected CWebhook_Server_TaskQueue_CallWebhookTask $callWebhookJob;
 
