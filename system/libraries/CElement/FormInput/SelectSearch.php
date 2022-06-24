@@ -15,6 +15,7 @@ class CElement_FormInput_SelectSearch extends CElement_FormInput {
     use CElement_FormInput_SelectSearch_Trait_Select2v23Trait;
     use CTrait_Element_Property_ApplyJs;
     use CTrait_Element_Property_DependsOn;
+    use CTrait_Element_Property_Placeholder;
 
     protected $query;
 
@@ -30,8 +31,6 @@ class CElement_FormInput_SelectSearch extends CElement_FormInput {
     protected $searchField = [];
 
     protected $multiple;
-
-    protected $placeholder;
 
     protected $autoSelect;
 
@@ -229,12 +228,6 @@ class CElement_FormInput_SelectSearch extends CElement_FormInput {
             $fmt = new \Opis\Closure\SerializableClosure($fmt);
         }
         $this->formatSelection = $fmt;
-
-        return $this;
-    }
-
-    public function setPlaceholder($placeholder) {
-        $this->placeholder = $placeholder;
 
         return $this;
     }
