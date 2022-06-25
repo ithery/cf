@@ -153,7 +153,9 @@ HTML;
             $viewData = [];
             $this->content = $this->element->html();
             $this->js = $this->element->js();
-
+            if (CF::config('app.javascript.minify')) {
+                $this->js = $this->minifyJavascript($this->js);
+            }
             $viewData['content'] = $this->content;
 
             $viewData['title'] = $this->title;
