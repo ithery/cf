@@ -115,12 +115,12 @@ class CElement_FormInput_DateRange_DropdownButton extends CElement_FormInput_Dat
             $dateStart = carr::get($range, 'dateStart');
             $dateEnd = carr::get($range, 'dateEnd');
             $dateStartJs = 'null';
-            if (strlen($dateStart > 0)) {
-                $dateStartJs = "moment('" . $dateStart . "')";
+            if ($dateStart != null) {
+                $dateStartJs = "moment('" . ((string) $dateStart) . "')";
             }
             $dateEndJs = 'null';
-            if (strlen($dateStart > 0)) {
-                $dateEndJs = "moment('" . $dateEnd . "')";
+            if ($dateEnd != null) {
+                $dateEndJs = "moment('" . ((string) $dateEnd) . "')";
             }
             $jsRange .= "'" . $label . "': [" . $dateStartJs . ', ' . $dateEndJs . '],';
         }
@@ -177,16 +177,16 @@ class CElement_FormInput_DateRange_DropdownButton extends CElement_FormInput_Dat
                 }
             }, function (start, end) {
                 $('#" . $this->id . "').html(start.format('" . $this->previewMomentFormat . "') + ' - ' + end.format('" . $this->previewMomentFormat . "'));
-                $('#" . $this->id . "-start').val(start.format('" . $this->momentFormat . "'));
-                $('#" . $this->id . "-end').val(end.format('" . $this->momentFormat . "'));
-                if(start.format('" . $this->momentFormat . "')=='1970-01-01') {
+                $('#" . $this->id . "-start').val(start.format('YYYY-MM-DD'));
+                $('#" . $this->id . "-end').val(end.format('YYYY-MM-DD'));
+                if(start.format('YYYY-MM-DD')=='1970-01-01') {
                     $('#" . $this->id . "').html(untilLabel + ' ' + end.format('" . $this->previewMomentFormat . "'));
                 }
                 " . $jsChange . "
             });
 
             $('#" . $this->id . "').html(moment('" . $this->dateStart . "').format('" . $this->previewMomentFormat . "') + ' - ' + moment('" . $this->dateEnd . "').format('" . $this->previewMomentFormat . "'));
-            if(moment('" . $this->dateStart . "').format('" . $this->momentFormat . "')=='1970-01-01') {
+            if(moment('" . $this->dateStart . "').format('YYYY-MM-DD')=='1970-01-01') {
                 $('#" . $this->id . "').html(untilLabel + ' ' + moment('" . $this->dateEnd . "').format('" . $this->previewMomentFormat . "'));
             }
             $('#" . $this->id . "').removeClass('uninit');
