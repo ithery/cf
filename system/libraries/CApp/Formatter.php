@@ -110,11 +110,11 @@ class CApp_Formatter {
         return $date->format('Y-m-d');
     }
 
-    public function formatDatetime($x) {
+    public function formatDatetime($x, $format = null) {
         if (strlen($x) == 0) {
             return $x;
         }
-        $datetimeFormat = $this->datetimeFormat;
+        $datetimeFormat = $format ?: $this->datetimeFormat;
         if (strlen($datetimeFormat) == 0) {
             return $x;
         }
@@ -122,32 +122,31 @@ class CApp_Formatter {
         return date($datetimeFormat, strtotime($x));
     }
 
-    public function unformatDatetime($x) {
+    public function unformatDatetime($x, $fromFormat = null) {
+        $datetimeFormat = $fromFormat ?: $this->datetimeFormat;
         $date = CCarbon::createFromFormat($this->datetimeFormat, $x);
 
         return $date->format('Y-m-d H:i:s');
     }
 
-    public function formatCurrency($x, $decimalDigit = null) {
-        if ($decimalDigit == null) {
-            $decimalDigit = $this->decimalDigit;
-        }
+    public function formatCurrency($x, $decimalDigit = null, $decimalSeparator = null, $thousandSeparator = null, $currencyPrefix = null, $currencySuffix = null) {
+        $decimalSeparator = $decimalSeparator ?: $this->decimalSeparator;
+        $thousandSeparator = $thousandSeparator ?: $this->thousandSeparator;
+        $decimalDigit = $decimalDigit ?: $this->decimalDigit;
+        $currencySuffix = $currencySuffix ?: $this->currencySuffix;
+        $currencyPrefix = $currencyPrefix ?: $this->currencyPrefix;
 
-        $x = number_format($x, $decimalDigit, $this->decimalSeparator, $this->thousandSeparator);
+        $x = number_format($x, $decimalDigit, $decimalSeparator, $thousandSeparator);
 
-        return $this->currencyPrefix . $x . $this->currencySuffix;
+        return $currencyPrefix . $x . $currencySuffix;
     }
 
-    public function formatNumber($x) {
-        return number_format($x, 0, $this->decimalSeparator, $this->thousandSeparator);
+    public function formatNumber($x, $decimalSeparator = null, $thousandSeparator = null) {
+        return $this->formatDecimal($x, 0, $decimalSeparator, $thousandSeparator);
     }
 
-    public function formatDecimal($x, $decimalDigit = null) {
-        if ($decimalDigit == null) {
-            $decimalDigit = $this->decimalDigit;
-        }
-
-        return number_format($x, $decimalDigit, $this->decimalSeparator, $this->thousandSeparator);
+    public function formatDecimal($x, $decimalDigit = null, $decimalSeparator = null, $thousandSeparator = null) {
+        return $this->formatCurrency($x, $decimalDigit, $decimalSeparator, $thousandSeparator, '', '');
     }
 
     public function unformatCurrency($number) {

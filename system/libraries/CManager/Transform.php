@@ -25,7 +25,8 @@ class CManager_Transform {
         }
     }
 
-    public function getCallable($method) {
+    public function getCallable($methods) {
+        list($method, $params) = $this->parseMethod($methods);
         $callable = carr::get($this->callbacks, $method);
         if ($callable == null) {
             //locate from CManager_Transform_DefaultMethod
@@ -42,17 +43,28 @@ class CManager_Transform {
         return $callable;
     }
 
-    public function methodExists($method) {
-        return $this->getCallable($method) != null;
+    public function parseMethod($methods) {
+        return CManager_Transform_Parser::parse($methods);
     }
 
-    public function call($method, $args = []) {
-        $callable = $this->getCallable($method);
+    public function methodExists($method) {
+        return $this->isTransformable($method);
+    }
 
-        if ($callable == null) {
-            throw new Exception(c::__("method :method doesn't exists", [':method' => $method]));
-        }
+    public function isTransformable($method) {
+        return CManager_Transform_Transformer::isTransformable($method);
+    }
 
-        return call_user_func_array($callable, $args);
+    public function call($method, $item, $args = []) {
+        $transformer = new CManager_Transform_Transformer($method);
+
+        return $transformer->transform($item, $args);
+        // $callable = $this->getCallable($method);
+        // $parameters = array_merge([$item], array_values($args));
+        // if ($callable == null) {
+        //     throw new Exception(c::__("method :method doesn't exists", [':method' => $method]));
+        // }
+
+        // return call_user_func_array($callable, $parameters);
     }
 }

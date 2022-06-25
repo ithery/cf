@@ -8,12 +8,27 @@ class CManager_Transform_Parser {
      *
      * @return string
      */
-    protected static function normalizeMethod($method) {
+    public static function normalizeMethod($method) {
         $methodMap = [
             'format_date' => 'formatDate',
+            'short_date_format' => 'formatDate',
+            'date_formatted' => 'formatDate',
+            'long_date_formatted' => 'formatDatetime',
+            'unformat_date' => 'unformatDate',
+            'format_long_date' => 'formatDatetime',
+            'format_datetime' => 'formatDatetime',
+            'unformat_long_date' => 'unformatDatetime',
+            'thousand_separator' => 'thousandSeparator',
+            'month_name' => 'monthName',
+            'html_specialchars' => 'htmlSpecialChars',
+            'format_currency' => 'formatCurrency',
+            'unformat_currency' => 'unformatCurrency',
+
         ];
 
-        return carr::get($methodMap, $method, $method);
+        $method = carr::get($methodMap, $method, $method);
+
+        return cstr::studly(trim($method));
     }
 
     /**
@@ -35,6 +50,36 @@ class CManager_Transform_Parser {
     }
 
     /**
+     * Parse an array based method.
+     *
+     * @param array $rules
+     *
+     * @return array
+     */
+    protected static function parseArrayMethod(array $method) {
+        return [static::normalizeMethod(carr::get($method, 0, '')), array_slice($method, 1)];
+    }
+
+    /**
+     * Parse a string based method.
+     *
+     * @param string $method
+     *
+     * @return array
+     */
+    protected static function parseStringMethod($method) {
+        $parameters = [];
+
+        if (strpos($method, ':') !== false) {
+            list($method, $parameter) = explode(':', $method, 2);
+
+            $parameters = static::parseParameters($method, $parameter);
+        }
+
+        return [static::normalizeMethod($method), $parameters];
+    }
+
+    /**
      * Extract the methods name and parameters from a method.
      *
      * @param array|string $methods
@@ -42,6 +87,30 @@ class CManager_Transform_Parser {
      * @return array
      */
     public static function parse($methods) {
+        if (is_array($methods)) {
+            $methods = static::parseArrayMethod($methods);
+        } else {
+            $methods = static::parseStringMethod($methods);
+        }
+
         return $methods;
+    }
+
+    public static function getArguments(array $parameters, $data) {
+        foreach ($parameters as $index => $parameter) {
+            $value = $parameter;
+            preg_match_all("/{([\w]*)}/", $value, $matches, PREG_SET_ORDER);
+
+            foreach ($matches as $match) {
+                $str = $match[1]; //matches str without bracket {}
+                $bStr = $match[0]; //matches str with bracket {}
+                if (isset($data[$str])) {
+                    $value = str_replace($bStr, $data[$str], $value);
+                }
+            }
+            $parameters[$index] = $value;
+        }
+
+        return $parameters;
     }
 }
