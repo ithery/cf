@@ -46,7 +46,7 @@ class CManager_Transform {
         return $this->getCallable($method) != null;
     }
 
-    public function call($method, $args) {
+    public function call($method, $args = []) {
         $callable = $this->getCallable($method);
 
         if ($callable == null) {

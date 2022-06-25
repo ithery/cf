@@ -29,6 +29,7 @@ import AlpineCleave from './alpine/cleave';
 import AlpineAutoNumeric from './alpine/autonumeric';
 import AlpineTippy from './alpine/tippy';
 import { attachWaves } from './ui/waves';
+import formatter from './formatter';
 export default class Cresenity {
     constructor() {
         this.cf = cf;
@@ -63,6 +64,7 @@ export default class Cresenity {
         this.websocket = null;
         this.debounce = debounce;
         this.sse = new SSE();
+        this.formatter = formatter;
     }
     loadJs(filename, callback) {
         let fileref = document.createElement('script');

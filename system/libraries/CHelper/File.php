@@ -28,9 +28,9 @@ class CHelper_File {
      * @param string $path
      * @param bool   $lock
      *
-     * @return string
-     *
      * @throws CStorage_Exception_FileNotFoundException
+     *
+     * @return string
      */
     public static function get($path, $lock = false) {
         if (self::isFile($path)) {
@@ -74,9 +74,9 @@ class CHelper_File {
      *
      * @param string $path
      *
-     * @return mixed
-     *
      * @throws CStorage_Exception_FileNotFoundException
+     *
+     * @return mixed
      */
     public static function getRequire($path) {
         if (self::isFile($path)) {

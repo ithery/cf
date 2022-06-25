@@ -91,11 +91,11 @@ class CApp_Formatter {
         return $this;
     }
 
-    public function formatDate($x) {
+    public function formatDate($x, $format = null) {
         if (strlen($x) == 0) {
             return $x;
         }
-        $dateFormat = $this->dateFormat;
+        $dateFormat = $format ?: $this->dateFormat;
         if (strlen($dateFormat) == 0) {
             return $x;
         }
@@ -103,8 +103,9 @@ class CApp_Formatter {
         return date($dateFormat, strtotime($x));
     }
 
-    public function unformatDate($x) {
-        $date = CCarbon::createFromFormat($this->dateFormat, $x);
+    public function unformatDate($x, $fromFormat = null) {
+        $dateFormat = $fromFormat ?: $this->dateFormat;
+        $date = CCarbon::createFromFormat($dateFormat, $x);
 
         return $date->format('Y-m-d');
     }

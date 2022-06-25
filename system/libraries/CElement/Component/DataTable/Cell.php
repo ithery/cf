@@ -59,6 +59,7 @@ class CElement_Component_DataTable_Cell {
 
         //do transform
         foreach ($this->column->transforms as $trans) {
+            //$html = CManager::transform()->call($trans);
             $html = $trans->execute($html);
         }
 
