@@ -84,7 +84,7 @@ class CDynFunction {
         }
         if ($error == 0) {
             $transformManager = CManager_Transform::instance();
-            if ($transformManager->methodExists($this->func)) {
+            if ($transformManager->isTransformable($this->func)) {
                 $item = carr::first($params);
                 $parameters = array_slice($params, 1);
 

@@ -125,7 +125,7 @@ class CFunction {
             //try to get from transform
             $transformer = CManager_Transform::instance();
 
-            if ($transformer->methodExists($this->func)) {
+            if ($transformer->isTransformable($this->func)) {
                 $item = carr::first($args);
                 $parameters = array_slice($args, 1);
 

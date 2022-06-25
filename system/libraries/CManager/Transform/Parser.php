@@ -10,6 +10,7 @@ class CManager_Transform_Parser {
      */
     public static function normalizeMethod($method) {
         $methodMap = [
+            'formatBytes' => 'formatByte',
             'format_date' => 'formatDate',
             'short_date_format' => 'formatDate',
             'date_formatted' => 'formatDate',

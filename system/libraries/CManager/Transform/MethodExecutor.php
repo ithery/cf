@@ -62,4 +62,46 @@ class CManager_Transform_MethodExecutor {
     public function transformHtmlSpecialChars($value) {
         return c::e($value);
     }
+
+    /**
+     * Format bytes to kb, mb, gb, tb.
+     *
+     * @param int $size
+     * @param int $precision
+     *
+     * @return string
+     */
+    public static function transformFormatByte($size, $precision = 2) {
+        if ($size <= 0) {
+            return (string) $size;
+        }
+
+        $base = log($size) / log(1024);
+        $suffixes = [' bytes', ' KB', ' MB', ' GB', ' TB'];
+
+        return round(1024 ** ($base - floor($base)), $precision) . $suffixes[(int) floor($base)];
+    }
+
+    public static function transformMonthName($month) {
+        $list = [
+            1 => 'January',
+            2 => 'February',
+            3 => 'March',
+            4 => 'April',
+            5 => 'May',
+            6 => 'June',
+            7 => 'July',
+            8 => 'August',
+            9 => 'September',
+            10 => 'October',
+            11 => 'November',
+            12 => 'December'
+        ];
+
+        if (isset($list[$month])) {
+            return $list[$month];
+        }
+
+        return 'Unknown';
+    }
 }
