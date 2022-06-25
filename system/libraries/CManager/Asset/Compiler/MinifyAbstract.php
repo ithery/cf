@@ -13,6 +13,15 @@ use Psr\Cache\CacheItemInterface;
 
 abstract class CManager_Asset_Compiler_MinifyAbstract {
     /**
+     * This array will hold content of strings and regular expressions that have
+     * been extracted from the JS source code, so we can reliably match "code",
+     * without having to worry about potential "code-like" characters inside.
+     *
+     * @var string[]
+     */
+    public $extracted = [];
+
+    /**
      * The data to be minified.
      *
      * @var string[]
@@ -25,15 +34,6 @@ abstract class CManager_Asset_Compiler_MinifyAbstract {
      * @var string[]
      */
     protected $patterns = [];
-
-    /**
-     * This array will hold content of strings and regular expressions that have
-     * been extracted from the JS source code, so we can reliably match "code",
-     * without having to worry about potential "code-like" characters inside.
-     *
-     * @var string[]
-     */
-    public $extracted = [];
 
     /**
      * Init the minify class - optionally, code may be passed along already.
@@ -63,6 +63,7 @@ abstract class CManager_Asset_Compiler_MinifyAbstract {
         foreach ($args as $data) {
             if (is_array($data)) {
                 call_user_func_array([$this, 'add'], $data);
+
                 continue;
             }
 
@@ -89,9 +90,9 @@ abstract class CManager_Asset_Compiler_MinifyAbstract {
      *
      * @param string|string[] $data
      *
-     * @return static
+     * @throws Exception
      *
-     * @throws IOException
+     * @return static
      */
     public function addFile($data /* $data = null, ... */) {
         // bogus "usage" of parameter $data: scrutinizer warns this variable is
@@ -104,6 +105,7 @@ abstract class CManager_Asset_Compiler_MinifyAbstract {
         foreach ($args as $path) {
             if (is_array($path)) {
                 call_user_func_array([$this, 'addFile'], $path);
+
                 continue;
             }
 
@@ -112,7 +114,7 @@ abstract class CManager_Asset_Compiler_MinifyAbstract {
 
             // check if we can read the file
             if (!$this->canImportFile($path)) {
-                throw new IOException('The file "' . $path . '" could not be opened for reading. Check if PHP has enough permissions.');
+                throw new Exception('The file "' . $path . '" could not be opened for reading. Check if PHP has enough permissions.');
             }
 
             $this->add($path);
@@ -162,12 +164,13 @@ abstract class CManager_Asset_Compiler_MinifyAbstract {
     /**
      * Minify the data & write it to a CacheItemInterface object.
      *
-     * @param CacheItemInterface $item Cache item to write the data to
+     * @param CacheItemInterface $item    Cache item to write the data to
+     * @param string             $content
      *
      * @return CacheItemInterface Cache item with the minifier data
      */
-    public function cache(CacheItemInterface $item) {
-        $content = $this->execute();
+    public function cache($content, CacheItemInterface $item) {
+        $content = $this->execute($content);
         $item->set($content);
 
         return $item;
@@ -176,8 +179,7 @@ abstract class CManager_Asset_Compiler_MinifyAbstract {
     /**
      * Minify the data.
      *
-     * @param string $path    Path to write the data to
-     * @param mixed  $content
+     * @param string $content
      *
      * @return string The minified data
      */
@@ -210,7 +212,7 @@ abstract class CManager_Asset_Compiler_MinifyAbstract {
      * @param string $content The minified data
      * @param string $path    The path to save the minified data to
      *
-     * @throws IOException
+     * @throws Exception
      */
     protected function save($content, $path) {
         $handler = $this->openFileForWriting($path);
@@ -286,6 +288,7 @@ abstract class CManager_Asset_Compiler_MinifyAbstract {
             // no more matches to find: everything's been processed, break out
             if (!$matches) {
                 $processed .= $content;
+
                 break;
             }
 
@@ -423,11 +426,10 @@ abstract class CManager_Asset_Compiler_MinifyAbstract {
      */
     protected function canImportFile($path) {
         $parsed = parse_url($path);
-        if (
         // file is elsewhere
-                isset($parsed['host'])
-                // file responds to queries (may change, or need to bypass cache)
-                || isset($parsed['query'])
+        // file responds to queries (may change, or need to bypass cache)
+        if (isset($parsed['host'])
+            || isset($parsed['query'])
         ) {
             return false;
         }
@@ -440,13 +442,13 @@ abstract class CManager_Asset_Compiler_MinifyAbstract {
      *
      * @param string $path The path to the file
      *
-     * @return resource Specifier for the target file
-     *
      * @throws IOException
+     *
+     * @return resource Specifier for the target file
      */
     protected function openFileForWriting($path) {
         if (($handler = @fopen($path, 'w')) === false) {
-            throw new IOException('The file "' . $path . '" could not be opened for writing. Check if PHP has enough permissions.');
+            throw new Exception('The file "' . $path . '" could not be opened for writing. Check if PHP has enough permissions.');
         }
 
         return $handler;
@@ -459,11 +461,11 @@ abstract class CManager_Asset_Compiler_MinifyAbstract {
      * @param string   $content The content to write
      * @param string   $path    The path to the file (for exception printing only)
      *
-     * @throws IOException
+     * @throws Exception
      */
     protected function writeToFile($handler, $content, $path = '') {
         if (($result = @fwrite($handler, $content)) === false || ($result < strlen($content))) {
-            throw new IOException('The file "' . $path . '" could not be written to. Check your disk space and file permissions.');
+            throw new Exception('The file "' . $path . '" could not be written to. Check your disk space and file permissions.');
         }
     }
 }

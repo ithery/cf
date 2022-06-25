@@ -124,9 +124,9 @@ class CManager_Asset_Compiler_Minify_MinifyCss extends CManager_Asset_Compiler_M
      * @param string   $content The CSS content to combine imports for
      * @param string[] $parents Parent paths, for circular reference checks
      *
-     * @return string
-     *
      * @throws FileImportException
+     *
+     * @return string
      */
     protected function combineImports($source, $content, $parents) {
         $importRegexes = [
