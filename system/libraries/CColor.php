@@ -31,4 +31,14 @@ class CColor {
     public static function fromString($string, $options = []) {
         return new CColor_String($string, $options);
     }
+
+    /**
+     * @param string $bgHex
+     * @param string $fgHex
+     *
+     * @return CColor_Css
+     */
+    public static function css($bgHex = '', $fgHex = '') {
+        return CColor_Css::make($bgHex, $fgHex);
+    }
 }
