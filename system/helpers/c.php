@@ -1397,7 +1397,7 @@ class c {
      * @return CApp_Formatter
      */
     public static function formatter() {
-        return CApp::formatter();
+        return CApp_Formatter::instance();
     }
 
     /**
