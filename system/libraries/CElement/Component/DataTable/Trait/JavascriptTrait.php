@@ -256,7 +256,6 @@ trait CElement_Component_DataTable_Trait_JavascriptTrait {
              *
              */
             $js->appendln($jqueryui)->br()
-                ->appendln("'bStateSave': false,")->br()
                 ->appendln("'iDisplayLength': " . $this->display_length . ',')->br()
                 ->appendln("'bSortCellsTop': " . $hs_val . ',')->br()
                 ->appendln("'aaSorting': [],")->br()
@@ -278,6 +277,7 @@ trait CElement_Component_DataTable_Trait_JavascriptTrait {
                 ->appendln($this->options->toJsonRow('deferRender'))->br()
                 ->appendln($this->options->toJsonRow('autoWidth'))->br()
                 ->appendln($this->options->toJsonRow('ordering'))->br()
+                ->appendln($this->options->toJsonRow('stateSave'))->br()
                 ->appendln($this->fixedColumn ? '' : $this->options->toJsonRow('scrollX'))->br()
                 ->br();
 
