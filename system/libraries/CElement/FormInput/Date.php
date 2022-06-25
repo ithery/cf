@@ -193,7 +193,6 @@ class CElement_FormInput_Date extends CElement_FormInput {
                     return cresenity.formatter.unformatDate(date,'" . $this->dateFormat . "');
                 }
             }
-            ,locale:'id'
             ,language: 'custom'
         ";
 
@@ -220,6 +219,8 @@ class CElement_FormInput_Date extends CElement_FormInput {
             $js->append("$('#" . $this->id . "').datepicker(" . $option . ');')->br();
         }
 
-        return $jsLanguages . $js->text();
+        $jsText = $jsLanguages . $js->text();
+
+        return $jsText;
     }
 }
