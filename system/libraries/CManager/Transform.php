@@ -47,12 +47,12 @@ class CManager_Transform {
         return CManager_Transform_Parser::parse($methods);
     }
 
-    public function methodExists($method) {
-        return $this->isTransformable($method);
+    public function methodExists($methods) {
+        return $this->isTransformable($methods);
     }
 
-    public function isTransformable($method) {
-        return CManager_Transform_Transformer::isTransformable($method);
+    public function isTransformable($methods) {
+        return CManager_Transform_Transformer::isTransformable($methods);
     }
 
     public function call($method, $item, $args = []) {
