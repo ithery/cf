@@ -5,6 +5,7 @@ defined('SYSPATH') or die('No direct access allowed.');
 /**
  * Common helper class.
  */
+use Faker\Factory as FackerFactory;
 use Opis\Closure\SerializableClosure;
 use Symfony\Component\VarDumper\VarDumper;
 use Symfony\Component\PropertyAccess\PropertyAccess;
@@ -1563,6 +1564,12 @@ class c {
      */
     public static function methodField($method) {
         return new CBase_HtmlString('<input type="hidden" name="_method" value="' . $method . '">');
+    }
+
+    public static function faker($property = null) {
+        $faker = FackerFactory::create();
+
+        return $property ? $faker->{$property} : $faker;
     }
 }
 
