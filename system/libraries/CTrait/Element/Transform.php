@@ -33,6 +33,10 @@ trait CTrait_Element_Transform {
     }
 
     public function applyTransform($value, $data = []) {
+        if (empty($this->transforms)) {
+            return $value;
+        }
+
         return c::manager()->transform()->call($this->transforms, $value, $data);
     }
 }
