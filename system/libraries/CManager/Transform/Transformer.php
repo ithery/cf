@@ -32,10 +32,11 @@ class CManager_Transform_Transformer {
      * @return void
      */
     public function addMethods($methods) {
-        // The primary purpose of this parser is to expand any "*" rules to the all
-        // of the explicit rules needed for the given data. For example the rule
-        // names.* would get expanded to names.0, names.1, etc. for this data.
-        $methods = carr::wrap($methods);
+        if (empty($methods)) {
+            return;
+        }
+
+        $methods = CManager_Transform_Parser::explodeMethods($methods);
 
         $this->methods = array_merge_recursive(
             $this->methods,

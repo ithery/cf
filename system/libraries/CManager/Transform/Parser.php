@@ -32,6 +32,47 @@ class CManager_Transform_Parser {
         return cstr::studly(trim($method));
     }
 
+    public static function explodeMethods($methods) {
+        $methods = carr::wrap($methods);
+        $exploded = [];
+        foreach ($methods as $method) {
+            $exploded = array_merge($exploded, static::explodeMethod($method));
+        }
+
+        return $exploded;
+    }
+
+    public static function explodeMethod($method) {
+        if (is_string($method)) {
+            return explode('|', $method);
+        } elseif (is_object($method)) {
+            return [static::prepareMethod($method)];
+        }
+
+        return array_map([static::class, 'prepareMethod'], $method);
+    }
+
+    /**
+     * Prepare the given rule for the Validator.
+     *
+     * @param mixed $method
+     *
+     * @return mixed
+     */
+    protected function prepareMethod($method) {
+        if ($method instanceof Closure) {
+            $method = new CManager_Transform_Method_ClosureMethod($method);
+        }
+
+        if (!is_object($method)
+            || $method instanceof CManager_Transform_Contract_TransformMethodInterface
+        ) {
+            return $method;
+        }
+
+        return (string) $method;
+    }
+
     /**
      * Parse a parameter list.
      *
