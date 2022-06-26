@@ -100,12 +100,12 @@ class CApp_Formatter {
             return $x;
         }
 
-        return date($dateFormat, strtotime($x));
+        return CCarbon::parse($x)->translatedFormat($dateFormat);
     }
 
     public function unformatDate($x, $fromFormat = null) {
         $dateFormat = $fromFormat ?: $this->dateFormat;
-        $date = CCarbon::createFromFormat($dateFormat, $x);
+        $date = CCarbon::createFromLocaleFormat($dateFormat, CCarbon::getLocale(), $x);
 
         return $date->format('Y-m-d');
     }
@@ -119,12 +119,12 @@ class CApp_Formatter {
             return $x;
         }
 
-        return date($datetimeFormat, strtotime($x));
+        return CCarbon::parse($x)->translatedFormat($datetimeFormat);
     }
 
     public function unformatDatetime($x, $fromFormat = null) {
         $datetimeFormat = $fromFormat ?: $this->datetimeFormat;
-        $date = CCarbon::createFromFormat($this->datetimeFormat, $x);
+        $date = CCarbon::createFromLocaleFormat($datetimeFormat, CCarbon::getLocale(), $x);
 
         return $date->format('Y-m-d H:i:s');
     }
