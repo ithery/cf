@@ -129,7 +129,7 @@ class CApp_Formatter {
         return $date->format('Y-m-d H:i:s');
     }
 
-    public function formatCurrency($x, $decimalDigit = null, $decimalSeparator = null, $thousandSeparator = null, $currencyPrefix = null, $currencySuffix = null) {
+    public function formatCurrency($x, $decimalDigit = null, $decimalSeparator = null, $thousandSeparator = null, $currencyPrefix = null, $currencySuffix = null, $stripZeroDecimal = false) {
         $decimalSeparator = $decimalSeparator ?: $this->decimalSeparator;
         $thousandSeparator = $thousandSeparator ?: $this->thousandSeparator;
         $decimalDigit = $decimalDigit ?: $this->decimalDigit;
@@ -137,6 +137,11 @@ class CApp_Formatter {
         $currencyPrefix = $currencyPrefix ?: $this->currencyPrefix;
 
         $x = number_format($x, $decimalDigit, $decimalSeparator, $thousandSeparator);
+        if ($stripZeroDecimal) {
+            if (substr($x, ($decimalDigit + 1) * -1) === '.' . cstr::repeat('0', $decimalDigit)) {
+                $x = substr($x, 0, ($decimalDigit + 1) * -1);
+            }
+        }
 
         return $currencyPrefix . $x . $currencySuffix;
     }
@@ -145,8 +150,8 @@ class CApp_Formatter {
         return $this->formatDecimal($x, 0, $decimalSeparator, $thousandSeparator);
     }
 
-    public function formatDecimal($x, $decimalDigit = null, $decimalSeparator = null, $thousandSeparator = null) {
-        return $this->formatCurrency($x, $decimalDigit, $decimalSeparator, $thousandSeparator, '', '');
+    public function formatDecimal($x, $decimalDigit = null, $decimalSeparator = null, $thousandSeparator = null, $stripZeroDecimal = false) {
+        return $this->formatCurrency($x, $decimalDigit, $decimalSeparator, $thousandSeparator, '', '', $stripZeroDecimal);
     }
 
     public function unformatCurrency($number) {

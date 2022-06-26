@@ -43,6 +43,10 @@ class CManager_Transform_MethodExecutor {
         return c::formatter()->formatDecimal($value, $decimalDigit, $decimalSeparator, $thousandSeparator);
     }
 
+    public function transformThousandSeparator($value, $decimalDigit = null, $decimalSeparator = null, $thousandSeparator = null) {
+        $value = c::formatter()->formatDecimal($value, $decimalDigit, $decimalSeparator, $thousandSeparator, true);
+    }
+
     public function transformFormatCurrency($value, $decimalDigit = null, $decimalSeparator = null, $thousandSeparator = null, $currencyPrefix = null, $currencySuffix = null) {
         return c::formatter()->formatDecimal($value, $decimalDigit, $decimalSeparator, $thousandSeparator, $currencyPrefix, $currencySuffix);
     }
@@ -59,7 +63,7 @@ class CManager_Transform_MethodExecutor {
         return cstr::lower($value);
     }
 
-    public function transformHtmlSpecialChars($value) {
+    public function transformEscape($value) {
         return c::e($value);
     }
 

@@ -21,7 +21,8 @@ class CManager_Transform_Parser {
             'unformat_long_date' => 'unformatDatetime',
             'thousand_separator' => 'thousandSeparator',
             'month_name' => 'monthName',
-            'html_specialchars' => 'htmlSpecialChars',
+            'html_specialchars' => 'escape',
+            'htmlSpecialChars' => 'escape',
             'format_currency' => 'formatCurrency',
             'unformat_currency' => 'unformatCurrency',
 
