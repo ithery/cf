@@ -1,30 +1,28 @@
 <?php
 
-defined('SYSPATH') OR die('No direct access allowed.');
+defined('SYSPATH') or die('No direct access allowed.');
 
 /**
  * @author Hery Kurniawan
- * @since Feb 17, 2018, 12:52:11 AM
  * @license Ittron Global Teknologi <ittron.co.id>
+ *
+ * @since Feb 17, 2018, 12:52:11 AM
  */
 trait CTrait_Element_Transform {
-
     /**
-     *
      * @var array
      */
-    protected $transforms = array();
+    protected $transforms = [];
 
-    public function addTransform($name, $args = array()) {
+    public function addTransform($name, $args = []) {
         $func = CFunction::factory($name);
         if (!is_array($args)) {
-            $args = array($args);
+            $args = [$args];
         }
         $func->setArgs($args);
 
-
         $this->transforms[] = $func;
+
         return $this;
     }
-
 }
