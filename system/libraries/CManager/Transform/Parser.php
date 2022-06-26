@@ -60,7 +60,7 @@ class CManager_Transform_Parser {
      * @return mixed
      */
     protected function prepareMethod($method) {
-        if ($method instanceof Closure) {
+        if ($method instanceof Closure || $method instanceof \Opis\Closure\SerializableClosure) {
             $method = new CManager_Transform_Method_ClosureMethod($method);
         }
 
@@ -139,6 +139,9 @@ class CManager_Transform_Parser {
     }
 
     public static function getArguments(array $parameters, $data) {
+        if ($data instanceof CModel || $data instanceof CInterface_Arrayable) {
+            $data = $data->toArray();
+        }
         foreach ($parameters as $index => $parameter) {
             $value = $parameter;
             preg_match_all("/{([\w]*)}/", $value, $matches, PREG_SET_ORDER);

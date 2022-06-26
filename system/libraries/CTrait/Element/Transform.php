@@ -15,23 +15,24 @@ trait CTrait_Element_Transform {
      */
     protected $transforms = [];
 
-    public function addTransform($name, $args = []) {
-        $transform = $name;
-        if (is_array($args) && !empty($args)) {
-            $transform = carr::wrap($transform);
-            $transform = array_merge(array_values($args));
-        }
+    public function addTransform($transform) {
+        $transform = carr::wrap($transform);
 
-        $this->transforms[] = $transform;
+        //serialize when closure
+        foreach ($transform as $key => $t) {
+            if ($t instanceof Closure) {
+                $transform[$key] = new \Opis\Closure\SerializableClosure($t);
+            }
+        }
+        $this->transforms = array_merge(
+            $this->transforms,
+            array_values($transform)
+        );
 
         return $this;
     }
 
     public function applyTransform($value, $data = []) {
-        if ($data instanceof CModel) {
-            $data = $data->toArray();
-        }
-
         return c::manager()->transform()->call($this->transforms, $value, $data);
     }
 }

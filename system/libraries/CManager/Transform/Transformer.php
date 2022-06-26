@@ -44,7 +44,7 @@ class CManager_Transform_Transformer {
         );
     }
 
-    public function transform($value, array $data = []) {
+    public function transform($value, $data = []) {
         foreach ($this->methods as $method) {
             $value = $this->transformMethod($method, $value, $data);
             if ($this->shouldStopTransforming($method, $value)) {
@@ -55,11 +55,15 @@ class CManager_Transform_Transformer {
         return $value;
     }
 
-    protected function transformMethod($method, $value, array $data = []) {
-        list($method, $parameters) = CManager_Transform_Parser::parse($method);
+    protected function transformMethod($method, $value, $data = []) {
+        $parameters = [];
+        $arguments = $data;
+        if (!$method instanceof CManager_Transform_Contract_TransformMethodInterface) {
+            list($method, $parameters) = CManager_Transform_Parser::parse($method);
+            $arguments = CManager_Transform_Parser::getArguments($parameters, $data);
+        }
         $transformable = $this->isTransformable($method, $value);
 
-        $arguments = CManager_Transform_Parser::getArguments($parameters, $data);
         if ($transformable) {
             $methodExecutor = new CManager_Transform_MethodExecutor($method);
 
