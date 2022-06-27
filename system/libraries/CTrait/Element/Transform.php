@@ -5,8 +5,9 @@ defined('SYSPATH') or die('No direct access allowed.');
 /**
  * @author Hery Kurniawan
  * @license Ittron Global Teknologi <ittron.co.id>
- *null
  *
+ * @see CManager_Transform_MethodExecutor
+ * @see CManager_Transform_Parser
  * @since Feb 17, 2018, 12:52:11 AM
  */
 trait CTrait_Element_Transform {
