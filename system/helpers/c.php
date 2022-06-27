@@ -1571,6 +1571,36 @@ class c {
 
         return $property ? $faker->{$property} : $faker;
     }
+
+    public static function stopwatch($callback, $times = 1) {
+        $totalTime = 0;
+
+        foreach (range(1, $times) as $time) {
+            $start = microtime(true);
+
+            $callback();
+
+            $totalTime += microtime(true) - $start;
+        }
+
+        return $totalTime / $times;
+    }
+
+    public static function swap(&$a, &$b) {
+        $temp = $a;
+        $a = $b;
+        $b = $temp;
+    }
+
+    /**
+     * @param null|string               $time
+     * @param null|\DateTimeZone|string $tz
+     *
+     * @return CCarbon
+     */
+    public static function carbon($time = null, $tz = null) {
+        return new CCarbon($time, $tz);
+    }
 }
 
 // End c
