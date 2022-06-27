@@ -25,8 +25,6 @@
  * ?>
  * </code>
  *
- * @category  Net
- *
  * @author    Jim Wigginton <terrafrost@php.net>
  * @copyright 2009 Jim Wigginton
  * @license   http://www.opensource.org/licenses/mit-license.html  MIT License
@@ -42,6 +40,7 @@ use phpseclib3\Net\SFTP\Attribute;
 use phpseclib3\Net\SFTP\OpenFlag5;
 use phpseclib3\Net\SFTP\StatusCode;
 use phpseclib3\Common\Functions\Strings;
+use phpseclib3\Net\SSH2\DisconnectReason;
 use phpseclib3\Exception\FileNotFoundException;
 use phpseclib3\Net\SFTP\PacketType as SFTPPacketType;
 use phpseclib3\Net\SSH2\MessageType as SSH2MessageType;
@@ -467,20 +466,15 @@ class SFTP extends SSH2 {
         /*
          A Note on SFTPv4/5/6 support:
          <http://tools.ietf.org/html/draft-ietf-secsh-filexfer-13#section-5.1> states the following:
-
          "If the client wishes to interoperate with servers that support noncontiguous version
           numbers it SHOULD send '3'"
-
          Given that the server only sends its version number after the client has already done so, the above
          seems to be suggesting that v3 should be the default version.  This makes sense given that v3 is the
          most popular.
-
          <http://tools.ietf.org/html/draft-ietf-secsh-filexfer-13#section-5.5> states the following;
-
          "If the server did not send the "versions" extension, or the version-from-list was not included, the
           server MAY send a status response describing the failure, but MUST then close the channel without
           processing any further requests."
-
          So what do you do if you have a client whose initial SSH_FXP_INIT packet says it implements v3 and
          a server whose initial SSH_FXP_VERSION reply says it implements v4 and only v4?  If it only implements
          v4, the "versions" extension is likely not going to have been sent so version re-negotiation as discussed
@@ -539,7 +533,16 @@ class SFTP extends SSH2 {
         }
 
         $this->pwd = true;
-        $this->pwd = $this->realpath('.');
+
+        try {
+            $this->pwd = $this->realpath('.');
+        } catch (\UnexpectedValueException $e) {
+            if (!$this->canonicalize_paths) {
+                throw $e;
+            }
+            $this->$this->canonicalize_paths = false;
+            $this->reset_connection(DisconnectReason::CONNECTION_LOST);
+        }
 
         $this->update_stat_cache($this->pwd, []);
 
@@ -575,7 +578,9 @@ class SFTP extends SSH2 {
     }
 
     /**
-     * Enable path canonicalization.
+     * Disable path canonicalization.
+     *
+     * If this is enabled then $sftp->pwd() will not return the canonicalized absolute path
      */
     public function disablePathCanonicalization() {
         $this->canonicalize_paths = false;
@@ -652,7 +657,34 @@ class SFTP extends SSH2 {
         }
 
         if (!$this->canonicalize_paths) {
-            return $path;
+            if ($this->pwd === true) {
+                return '.';
+            }
+            if (!strlen($path) || $path[0] != '/') {
+                $path = $this->pwd . '/' . $path;
+            }
+            $parts = explode('/', $path);
+            $afterPWD = $beforePWD = [];
+            foreach ($parts as $part) {
+                switch ($part) {
+                    //case '': // some SFTP servers /require/ double /'s. see https://github.com/phpseclib/phpseclib/pull/1137
+                    case '.':
+                        break;
+                    case '..':
+                        if (!empty($afterPWD)) {
+                            array_pop($afterPWD);
+                        } else {
+                            $beforePWD[] = '..';
+                        }
+
+                        break;
+                    default:
+                        $afterPWD[] = $part;
+                }
+            }
+            $beforePWD = count($beforePWD) ? implode('/', $beforePWD) : '.';
+
+            return $beforePWD . '/' . implode('/', $afterPWD);
         }
 
         if ($this->pwd === true) {
@@ -1420,7 +1452,6 @@ class SFTP extends SSH2 {
     public function chown($filename, $uid, $recursive = false) {
         /*
          quoting <https://datatracker.ietf.org/doc/html/draft-ietf-secsh-filexfer-13#section-7.5>,
-
          "To avoid a representation that is tied to a particular underlying
           implementation at the client or server, the use of UTF-8 strings has
           been chosen.  The string should be of the form "user@dns_domain".
@@ -1429,7 +1460,6 @@ class SFTP extends SSH2 {
           can be interpreted by both.  In the case where there is no
           translation available to the client or server, the attribute value
           must be constructed without the "@"."
-
          phpseclib _could_ auto append the dns_domain to $uid BUT what if it shouldn't
          have one? phpseclib would have no way of knowing so rather than guess phpseclib
          will just use whatever value the user provided
@@ -1565,7 +1595,6 @@ class SFTP extends SSH2 {
          "Because some systems must use separate system calls to set various attributes, it is possible that a failure
           response will be returned, but yet some of the attributes may be have been successfully modified.  If possible,
           servers SHOULD avoid this situation; however, clients MUST be aware that this is possible."
-
           -- http://tools.ietf.org/html/draft-ietf-secsh-filexfer-13#section-8.6
         */
         $response = $this->get_sftp_packet();
@@ -1722,7 +1751,6 @@ class SFTP extends SSH2 {
         $link = $this->realpath($link);
 
         /* quoting https://datatracker.ietf.org/doc/html/draft-ietf-secsh-filexfer-09#section-12.1 :
-
            Changed the SYMLINK packet to be LINK and give it the ability to
            create hard links.  Also change it's packet number because many
            implementation implemented SYMLINK with the arguments reversed.
@@ -1734,16 +1762,13 @@ class SFTP extends SSH2 {
         } else {
             $type = SFTPPacketType::SYMLINK;
             /* quoting http://bxr.su/OpenBSD/usr.bin/ssh/PROTOCOL#347 :
-
                3.1. sftp: Reversal of arguments to SSH_FXP_SYMLINK
-
                When OpenSSH's sftp-server was implemented, the order of the arguments
                to the SSH_FXP_SYMLINK method was inadvertently reversed. Unfortunately,
                the reversal was not noticed until the server was widely deployed. Since
                fixing this to follow the specification would cause incompatibility, the
                current order was retained. For correct operation, clients should send
                SSH_FXP_SYMLINK as follows:
-
                    uint32      id
                    string      targetpath
                    string      linkpath */
@@ -2002,7 +2027,7 @@ class SFTP extends SSH2 {
             case is_resource($data):
                 $mode = $mode & ~self::SOURCE_LOCAL_FILE;
                 $info = stream_get_meta_data($data);
-                if ($info['wrapper_type'] == 'PHP' && $info['stream_type'] == 'Input') {
+                if (isset($info['wrapper_type']) && $info['wrapper_type'] == 'PHP' && $info['stream_type'] == 'Input') {
                     $fp = fopen('php://memory', 'w+');
                     stream_copy_to_stream($data, $fp);
                     rewind($fp);
@@ -2103,8 +2128,8 @@ class SFTP extends SSH2 {
             if ($this->preserveTime) {
                 $stat = stat($data);
                 $attr = $this->version < 4
-                    ? pack('N3', Attribute::ACCESSTIME, $stat['atime'], $stat['time'])
-                    : Strings::packSSH2('NQ2', Attribute::ACCESSTIME | Attribute::MODIFYTIME, $stat['atime'], $stat['time']);
+                    ? pack('N3', Attribute::ACCESSTIME, $stat['atime'], $stat['mtime'])
+                    : Strings::packSSH2('NQ2', Attribute::ACCESSTIME | Attribute::MODIFYTIME, $stat['atime'], $stat['mtime']);
                 if (!$this->setstat($remote_file, $attr, false)) {
                     throw new \RuntimeException('Error setting file time');
                 }
@@ -2192,7 +2217,7 @@ class SFTP extends SSH2 {
      *
      * @throws \UnexpectedValueException on receipt of unexpected packets
      *
-     * @return string|false
+     * @return string|bool
      */
     public function get($remote_file, $local_file = false, $offset = 0, $length = -1, $progressCallback = null) {
         if (!$this->precheck()) {
@@ -2435,7 +2460,7 @@ class SFTP extends SSH2 {
         // normally $entries would have at least . and .. but it might not if the directories
         // permissions didn't allow reading
         if (empty($entries)) {
-            return false;
+            $entries = [];
         }
 
         unset($entries['.'], $entries['..']);
@@ -2807,13 +2832,10 @@ class SFTP extends SSH2 {
         $packet = Strings::packSSH2('ss', $oldname, $newname);
         if ($this->version >= 5) {
             /* quoting https://datatracker.ietf.org/doc/html/draft-ietf-secsh-filexfer-05#section-6.5 ,
-
                'flags' is 0 or a combination of:
-
                    SSH_FXP_RENAME_OVERWRITE  0x00000001
                    SSH_FXP_RENAME_ATOMIC     0x00000002
                    SSH_FXP_RENAME_NATIVE     0x00000004
-
                (none of these are currently supported) */
             $packet .= "\0\0\0\0";
         }
@@ -3230,7 +3252,10 @@ class SFTP extends SSH2 {
         // SFTP packet type and data payload
         while ($tempLength > 0) {
             $temp = $this->get_channel_packet(self::CHANNEL, true);
-            if (is_bool($temp)) {
+            if ($temp === true) {
+                if ($this->channel_status[self::CHANNEL] === SSH2MessageType::CHANNEL_CLOSE) {
+                    $this->channel_close = true;
+                }
                 $this->packet_type = false;
                 $this->packet_buffer = '';
 
