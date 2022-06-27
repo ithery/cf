@@ -90,23 +90,6 @@ class CElement_FormInput extends CElement_Element {
         return $this->id;
     }
 
-    public function addTransform($transform) {
-        $transform = carr::wrap($transform);
-
-        //serialize when closure
-        foreach ($transform as $key => $t) {
-            if ($t instanceof Closure) {
-                $transform[$key] = new \Opis\Closure\SerializableClosure($t);
-            }
-        }
-        $this->transforms = array_merge(
-            $this->transforms,
-            array_values($transform)
-        );
-
-        return $this;
-    }
-
     public function setValue($val) {
         $this->value = $val;
 
