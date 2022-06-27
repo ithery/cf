@@ -113,7 +113,7 @@ return [
         'base' => CApp_Base::class,
     ],
     'javascript' => [
-        'minify' => CF::isProduction(),
+        'minify' => false,
     ],
     'lang' => 'id', //deprecated
     'app_id' => 1, //deprecated
