@@ -8,8 +8,6 @@
 class CElement_FormInput extends CElement_Element {
     use CTrait_Compat_Element_FormInput;
 
-    protected $transforms = [];
-
     protected $name;
 
     protected $type;
