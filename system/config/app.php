@@ -61,7 +61,7 @@ return [
      * stack traces will be shown on every error that occurs within your
      * application. If disabled, a simple generic error page is shown.
      */
-    'debug' => c::env('DEBUG', c::env('ENVIRONMENT') ? c::env('ENVIRONMENT') != CBase::ENVIRONMENT_PRODUCTION : !IN_PRODUCTION),
+    'debug' => c::env('DEBUG', c::env('ENVIRONMENT') ? c::env('ENVIRONMENT') != CBase::ENVIRONMENT_PRODUCTION : !CF::isProduction()),
 
     'auth' => [
         'enable' => true,
@@ -112,7 +112,9 @@ return [
     'classes' => [
         'base' => CApp_Base::class,
     ],
-
+    'javascript' => [
+        'minify' => CF::isProduction(),
+    ],
     'lang' => 'id', //deprecated
     'app_id' => 1, //deprecated
     'install' => false, //deprecated
