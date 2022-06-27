@@ -67,6 +67,10 @@ class CManager_Transform_MethodExecutor {
         return c::e($value);
     }
 
+    public function transformAscii($value) {
+        return cstr::ascii($value);
+    }
+
     /**
      * Format bytes to kb, mb, gb, tb.
      *
