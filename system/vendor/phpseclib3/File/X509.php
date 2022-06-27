@@ -16,8 +16,6 @@
  * be encoded.  It can be encoded explicitly or left out all together.  This would effect the signature value and thus may invalidate the
  * the certificate all together unless the certificate is re-signed.
  *
- * @category  File
- *
  * @author    Jim Wigginton <terrafrost@php.net>
  * @copyright 2012 Jim Wigginton
  * @license   http://www.opensource.org/licenses/mit-license.html  MIT License
@@ -980,7 +978,6 @@ class X509 {
         }
 
         /* From RFC5280 "PKIX Certificate and CRL Profile":
-
            If the keyUsage extension is present, then the subject public key
            MUST NOT be used to verify signatures on certificates or CRLs unless
            the corresponding keyCertSign or cRLSign bit is set. */
@@ -990,7 +987,6 @@ class X509 {
         //}
 
         /* From RFC5280 "PKIX Certificate and CRL Profile":
-
            The cA boolean indicates whether the certified public key may be used
            to verify certificate signatures.  If the cA boolean is not asserted,
            then the keyCertSign bit in the key usage extension MUST NOT be
@@ -1046,7 +1042,6 @@ class X509 {
                     switch ($key) {
                         case 'dNSName':
                             /* From RFC2818 "HTTP over TLS":
-
                                If a subjectAltName extension of type dNSName is present, that MUST
                                be used as the identity. Otherwise, the (most specific) Common Name
                                field in the Subject field of the certificate MUST be used. Although
@@ -1059,7 +1054,6 @@ class X509 {
                             break;
                         case 'iPAddress':
                             /* From RFC2818 "HTTP over TLS":
-
                                In some cases, the URI is specified as an IP address rather than a
                                hostname. In this case, the iPAddress subjectAltName must be present
                                in the certificate and must exactly match the IP in the URI. */
@@ -1211,9 +1205,7 @@ class X509 {
          "Conforming applications that support HTTP or FTP for accessing
           certificates MUST be able to accept .cer files and SHOULD be able
           to accept .p7c files." -- https://tools.ietf.org/html/rfc4325
-
          A .p7c file is 'a "certs-only" CMS message as specified in RFC 2797"
-
          These are currently unsupported
         */
         if (!is_array($parent->loadX509($cert))) {
@@ -1271,7 +1263,6 @@ class X509 {
         /* TODO:
            "emailAddress attribute values are not case-sensitive (e.g., "subscriber@example.com" is the same as "SUBSCRIBER@EXAMPLE.COM")."
             -- http://tools.ietf.org/html/rfc5280#section-4.1.2.6
-
            implement pathLenConstraint in the id-ce-basicConstraints extension */
 
         switch (true) {
@@ -2626,7 +2617,6 @@ class X509 {
             /* "The serial number MUST be a positive integer"
                "Conforming CAs MUST NOT use serialNumber values longer than 20 octets."
                 -- https://tools.ietf.org/html/rfc5280#section-4.1.2.2
-
                for the integer to be positive the leading bit needs to be 0 hence the
                application of a bitmap
             */
@@ -3073,7 +3063,6 @@ class X509 {
           To indicate that a certificate has no well-defined expiration date,
           the notAfter SHOULD be assigned the GeneralizedTime value of
           99991231235959Z.
-
           -- http://tools.ietf.org/html/rfc5280#section-4.1.2.5
         */
         if (is_string($date) && strtolower($date) === 'lifetime') {
@@ -3773,7 +3762,7 @@ class X509 {
      *
      * @return array
      */
-    private function dnsName($domain) {
+    private static function dnsName($domain) {
         return ['dNSName' => $domain];
     }
 
