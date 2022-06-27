@@ -16,31 +16,15 @@ class CManager_Transform {
         return self::$instance;
     }
 
-    public function addCallback($method, callable $callback) {
-        if (!is_array($method)) {
-            $method = [$method];
-        }
-        foreach ($method as $m) {
-            $this->callbacks[$m] = $callback;
-        }
+    /**
+     * @return CManager_Transform_Repository
+     */
+    public function repository() {
+        return CManager_Transform_Repository::instance();
     }
 
-    public function getCallable($methods) {
-        list($method, $params) = $this->parseMethod($methods);
-        $callable = carr::get($this->callbacks, $method);
-        if ($callable == null) {
-            //locate from CManager_Transform_DefaultMethod
-            if (method_exists(CManager_Transform_DefaultMethod::class, $method)) {
-                $callable = [CManager_Transform_DefaultMethod::class, $method];
-            }
-        }
-        if ($callable == null) {
-            if (method_exists(ctransform::class, $method)) {
-                $callable = [ctransform::class, $method];
-            }
-        }
-
-        return $callable;
+    public function addCallback($method, callable $callback) {
+        return $this->repository()->addMethods($method, $callback);
     }
 
     public function parseMethod($methods) {

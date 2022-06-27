@@ -46,9 +46,18 @@ class CManager_Transform_Transformer {
 
     public function transform($value, $data = []) {
         foreach ($this->methods as $method) {
-            $value = $this->transformMethod($method, $value, $data);
-            if ($this->shouldStopTransforming($method, $value)) {
-                break;
+            if ($resolveds = CManager_Transform_Repository::instance()->resolveMethod($method, $method)) {
+                foreach ($resolveds as $resolved) {
+                    $value = $this->transformMethod($resolved, $value, $data);
+                    if ($this->shouldStopTransforming($resolved, $value)) {
+                        break;
+                    }
+                }
+            } else {
+                $value = $this->transformMethod($method, $value, $data);
+                if ($this->shouldStopTransforming($method, $value)) {
+                    break;
+                }
             }
         }
 
@@ -58,6 +67,7 @@ class CManager_Transform_Transformer {
     protected function transformMethod($method, $value, $data = []) {
         $parameters = [];
         $arguments = $data;
+
         if (!$method instanceof CManager_Transform_Contract_TransformMethodInterface) {
             list($method, $parameters) = CManager_Transform_Parser::parse($method);
             $arguments = CManager_Transform_Parser::getArguments($parameters, $data);
