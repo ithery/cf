@@ -49,6 +49,7 @@ class CElement_Component_DataTable_Options {
         'bProcessing' => 'processing',
         'bServerSide' => 'serverSide',
         'bDeferRender' => 'deferRender',
+        'bStateSave' => 'stateSave',
         'sPaginationType' => 'pagingType',
     ];
 
@@ -67,6 +68,7 @@ class CElement_Component_DataTable_Options {
             'autoWidth' => false,
             'pagingType' => static::OPTION_PAGING_TYPE_FULL_NUMBERS,
             'height' => false,
+            'stateSave' => false,
         ];
         foreach ($defaultOptions as $key => $value) {
             $defaultOptions[$key] = c::theme('datatable.options.' . $key, $value);
