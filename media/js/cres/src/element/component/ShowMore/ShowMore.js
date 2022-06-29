@@ -19,8 +19,9 @@ export default class ShowMore {
      * @param {Object} object
      */
     constructor(className, { onMoreLess = () => {}, regex = {}, config } = {}) {
+
         // all html elements
-        const elements = [].slice.call(document.querySelectorAll(className));
+        const elements = className instanceof Element ? [className] : [].slice.call(document.querySelectorAll(className));
 
         // colback function
         this._onMoreLess = onMoreLess;

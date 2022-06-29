@@ -12,5 +12,8 @@
         &:hover {
             color: red;
         }
+        &:focus, &:active {
+            outline: none;
+        }
     }
 }

@@ -1,7 +1,7 @@
 import ShowMore from "./ShowMore";
 import "./index.scss";
-const initShowMore = () => {
-    new ShowMore('.cres\\:element\\:component\\:ShowMore');
+const initShowMore = (element) => {
+    new ShowMore(element);
 }
 
 export {
