@@ -59,7 +59,6 @@ class CException_ExceptionHandler implements CException_ExceptionHandlerInterfac
         HttpException::class,
         CHTTP_Exception_ResponseException::class,
         CModel_Exception_ModelNotFoundException::class,
-        CModel_Exception_ModelNotFound::class,
         SuspiciousOperationException::class,
         CSession_Exception_TokenMismatchException::class,
         CValidation_Exception::class,
