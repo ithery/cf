@@ -12,7 +12,7 @@ method setDataFromArray tidak direkomendasikan jika data array sangat banyak
 
 ```php
 $app = c::app();
-$table $app->addTable();
+$table = $app->addTable();
 $table->setDataFromArray([
     [
         'role'=>'Developer',
@@ -66,6 +66,16 @@ return $app;
 ---
 
 Koneksi yang digunakan pada table adalah sesuai koneksi `default` pada config `database.php`
+
+
+### Column Callback
+
+```php
+$table->addColumn('request')->setLabel('Request')->setCallback(function ($row, $value) {
+    return CElement_Component_ShowMore::factory()->addClass('whitespace-pre')->add(json_encode(json_decode($value, true), JSON_PRETTY_PRINT));
+});
+```
+
 
 
 ### Translations/Label

@@ -122,6 +122,12 @@ return [
                 'uri' => 'docs/element/form',
             ],
 
+            [
+                'name' => 'element.shimmer',
+                'label' => c::__('Shimmer'),
+                'uri' => 'docs/element/shimmer',
+            ],
+
         ]
     ],
     [
