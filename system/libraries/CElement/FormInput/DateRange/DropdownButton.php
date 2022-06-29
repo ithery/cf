@@ -130,7 +130,8 @@ class CElement_FormInput_DateRange_DropdownButton extends CElement_FormInput_Dat
         }
 
         $js .= "
-            const untilLabel = '" . c::__('element/date.until') . "';
+
+            var untilLabel = '" . c::__('element/date.until') . "';
             $('#" . $this->id . "').daterangepicker({
                 startDate: moment('" . $this->dateStart . "'),
                 endDate: moment('" . $this->dateEnd . "'),
@@ -190,6 +191,7 @@ class CElement_FormInput_DateRange_DropdownButton extends CElement_FormInput_Dat
                 $('#" . $this->id . "').html(untilLabel + ' ' + moment('" . $this->dateEnd . "').format('" . $this->previewMomentFormat . "'));
             }
             $('#" . $this->id . "').removeClass('uninit');
+
         ";
 
         return $js;
