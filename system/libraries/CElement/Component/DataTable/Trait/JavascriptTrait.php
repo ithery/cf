@@ -53,7 +53,7 @@ trait CElement_Component_DataTable_Trait_JavascriptTrait {
             $totalColumn++;
         }
 
-        if ($this->applyDataTable > 0) {
+        if ($this->applyDataTable) {
             $km = '';
             $vm = '';
             foreach ($this->paging_list as $k => $v) {
@@ -111,7 +111,7 @@ trait CElement_Component_DataTable_Trait_JavascriptTrait {
             }
 
             $js->appendln('var tableStyled_' . $this->id . ' = false;')->br()
-                ->appendln('var ' . $varNameOTable . ' = ' . $varName . '.dataTable({')->br()->incIndent();
+                ->appendln('window.' . $varNameOTable . ' = ' . $varName . '.dataTable({')->br()->incIndent();
 
             //   $js->appendln("responsive: {
             //        details: {

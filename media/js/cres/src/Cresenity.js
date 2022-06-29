@@ -15,7 +15,8 @@ import { elementReady, elementRendered } from './util/dom-observer';
 import { debounce } from './util/debounce';
 import { confirmFromElement, defaultConfirmHandler } from './module/confirm-handler';
 import initValidation from './module/validation';
-
+import initPlugin from './plugin';
+import {element, initElement} from './element';
 import ucfirst from 'locutus/php/strings/ucfirst';
 import Alpine from 'alpinejs';
 import cresReact from './react';
@@ -37,6 +38,7 @@ export default class Cresenity {
             encode: base64encode,
             decode: base64decode
         };
+        this.element = element;
         this.windowEventList = [
             'cresenity:confirm',
             'cresenity:jquery:loaded',
@@ -974,6 +976,12 @@ export default class Cresenity {
             initValidation();
         }
     }
+    initPlugin() {
+        initPlugin();
+    }
+    initElement() {
+        initElement();
+    }
     initWaves() {
         if($) {
             const selector = window.capp.waves.selector ?? '.cres-waves-effect' ;
@@ -1032,9 +1040,11 @@ export default class Cresenity {
                     this.scrollToTop.init();
                 }
             }
+            this.initElement();
             this.initConfirm();
             this.initReload();
             this.initValidation();
+            this.initPlugin();
             this.initWaves();
             this.initAlpineAndUi();
             this.initLiveReload();

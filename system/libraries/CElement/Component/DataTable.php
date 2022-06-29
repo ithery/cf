@@ -517,8 +517,8 @@ class CElement_Component_DataTable extends CElement_Component {
      * @return CElement_Component_DataTable
      */
     public function setApplyDataTable($bool) {
-        $this->applyDataTable = $bool;
-        if ($this->applyDataTable == false) {
+        $this->applyDataTable = (bool) $bool;
+        if ($this->applyDataTable === false) {
             $this->setAjax(false);
         }
 
