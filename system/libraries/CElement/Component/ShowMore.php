@@ -1,13 +1,29 @@
 <?php
 
 class CElement_Component_ShowMore extends CElement_Component {
+    protected $showMoreLabel;
+
+    protected $showLessLabel;
+
+    protected $limit;
+
+    protected $type;
+
+    public function __construct($id = null) {
+        parent::__construct($id);
+        $this->showMoreLabel = '→ show more';
+        $this->showLessLabel = '← show less';
+        $this->limit = 120;
+        $this->type = 'text';
+    }
+
     protected function build() {
         $this->addClass('cres:element:component:ShowMore');
         $config = [
-            'type' => 'text',
-            'limit' => 120,
-            'more' => '→ show more',
-            'less' => '← read less',
+            'type' => $this->type,
+            'limit' => (int) $this->limit,
+            'more' => $this->showMoreLabel,
+            'less' => $this->showLessLabel,
 
         ];
         /*
