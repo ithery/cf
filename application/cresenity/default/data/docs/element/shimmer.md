@@ -1,7 +1,7 @@
 # Element - Shimmer
 ### Introduction
 
-Shimmer digunakan untuk mempresentasikan ui loading
+Element Shimmer digunakan untuk mempresentasikan ui loading
 
 Contoh Sederhana untuk shimmer
 ```php

@@ -121,7 +121,11 @@ return [
                 'label' => c::__('Form'),
                 'uri' => 'docs/element/form',
             ],
-
+            [
+                'name' => 'element.tab',
+                'label' => c::__('Tab'),
+                'uri' => 'docs/element/tab',
+            ],
             [
                 'name' => 'element.shimmer',
                 'label' => c::__('Shimmer'),
