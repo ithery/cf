@@ -148,11 +148,7 @@ trait CElement_Component_DataTable_Trait_JavascriptTrait {
                 fnCallback(data.datatable);
                 if(data.js && data.js.length>0) {
                     var script = data.js;
-                    if(cresenity) {
-                        script = cresenity.base64.decode(script);
-                    } else {
-                        script = $.cresenity.base64.decode(script);
-                    }
+                    script = cresenity.base64.decode(script);
                     if(script.trim().length > 0) {
                         eval(script);
                     }

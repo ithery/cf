@@ -1,20 +1,47 @@
 <?php
 
 class CElement_Component_ShowMore extends CElement_Component {
+    /**
+     * @var string
+     */
     protected $showMoreLabel;
 
+    /**
+     * @var string
+     */
     protected $showLessLabel;
 
+    /**
+     * @var int
+     */
     protected $limit;
 
+    /**
+     * @var string
+     */
     protected $type;
 
     public function __construct($id = null) {
         parent::__construct($id);
         $this->showMoreLabel = '→ show more';
         $this->showLessLabel = '← show less';
-        $this->limit = 120;
+        $this->limit = 50;
         $this->type = 'text';
+    }
+
+    public static function factory($id = null) {
+        return new static($id);
+    }
+
+    /**
+     * @param int $limit
+     *
+     * @return $this
+     */
+    public function setLimit($limit) {
+        $this->limit = $limit;
+
+        return $this;
     }
 
     protected function build() {

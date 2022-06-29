@@ -27,7 +27,7 @@ const isElementInitialized = (element) => {
 let inited = false;
 const initElement = () => {
     if(!inited) {
-        elementRendered('[class^="cres\\:element\\:"]', (element)=>{
+        elementRendered('[class*="cres\\:element\\:"]', (element)=>{
             if(!isElementInitialized(element)) {
                 const className = getClassElement(element);
                 if(className) {

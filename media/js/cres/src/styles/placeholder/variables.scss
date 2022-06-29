@@ -1,0 +1,16 @@
+@use "sass:color";
+
+$cres-ph-direction:            ltr !default;
+$cres-ph-bg:                   #fff !default;
+$cres-ph-color:                #ced4da !default;
+$cres-ph-border:               1px solid color.scale($cres-ph-bg, $lightness: -10%) !default;
+$cres-ph-border-radius:        2px !default;
+
+$cres-ph-cols:                 12 !default;
+$cres-ph-cols-remove-odd:      true !default;
+$cres-ph-gutter:               30px !default;
+$cres-ph-spacer:               15px !default;
+
+$cres-ph-avatar-border-radius: 50% !default;
+
+$cres-ph-animation-duration:   0.8s !default;
