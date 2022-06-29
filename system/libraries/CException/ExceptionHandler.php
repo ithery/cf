@@ -61,7 +61,7 @@ class CException_ExceptionHandler implements CException_ExceptionHandlerInterfac
         CModel_Exception_ModelNotFoundException::class,
         CModel_Exception_ModelNotFound::class,
         //SuspiciousOperationException::class,
-        //TokenMismatchException::class,
+        CSession_Exception_TokenMismatchException::class,
         CValidation_Exception::class,
     ];
 
