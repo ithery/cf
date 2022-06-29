@@ -130,68 +130,68 @@ class CElement_FormInput_DateRange_DropdownButton extends CElement_FormInput_Dat
         }
 
         $js .= "
-            (function() {
-                const untilLabel = '" . c::__('element/date.until') . "';
-                $('#" . $this->id . "').daterangepicker({
-                    startDate: moment('" . $this->dateStart . "'),
-                    endDate: moment('" . $this->dateEnd . "'),
-                    " . $jsRangeProperty . '
-                    ' . $jsCustomRange . '
-                    ' . $jsSpan . "
-                    opens: '" . $this->openDirection . "',
-                    locale: {
-                        format: '" . $this->momentFormat . "',
-                        separator: ' - ',
-                        applyLabel: '" . $this->getTranslation('applyLabel') . "',
-                        cancelLabel: '" . $this->getTranslation('cancelLabel') . "',
-                        fromLabel: '" . $this->getTranslation('fromLabel') . "',
-                        toLabel: '" . $this->getTranslation('toLabel') . "',
-                        customRangeLabel: '" . $this->getTranslation('customRangeLabel') . "',
-                        weekLabel: '" . $this->getTranslation('weekLabel') . "',
-                        daysOfWeek: [
-                            '" . $this->getTranslation('daysOfWeek.Su') . "',
-                            '" . $this->getTranslation('daysOfWeek.Mo') . "',
-                            '" . $this->getTranslation('daysOfWeek.Tu') . "',
-                            '" . $this->getTranslation('daysOfWeek.We') . "',
-                            '" . $this->getTranslation('daysOfWeek.Th') . "',
-                            '" . $this->getTranslation('daysOfWeek.Fr') . "',
-                            '" . $this->getTranslation('daysOfWeek.Sa') . "'
-                        ],
-                        monthNames: [
-                            '" . $this->getTranslation('monthNames.January') . "',
-                            '" . $this->getTranslation('monthNames.February') . "',
-                            '" . $this->getTranslation('monthNames.March') . "',
-                            '" . $this->getTranslation('monthNames.April') . "',
-                            '" . $this->getTranslation('monthNames.May') . "',
-                            '" . $this->getTranslation('monthNames.June') . "',
-                            '" . $this->getTranslation('monthNames.July') . "',
-                            '" . $this->getTranslation('monthNames.August') . "',
-                            '" . $this->getTranslation('monthNames.September') . "',
-                            '" . $this->getTranslation('monthNames.October') . "',
-                            '" . $this->getTranslation('monthNames.November') . "',
-                            '" . $this->getTranslation('monthNames.December') . "'
-                        ],
-                        firstDay: 1
-                    },
-                    isInvalidDate: function() {
 
-                    }
-                }, function (start, end) {
-                    $('#" . $this->id . "').html(start.format('" . $this->previewMomentFormat . "') + ' - ' + end.format('" . $this->previewMomentFormat . "'));
-                    $('#" . $this->id . "-start').val(start.format('" . $this->momentFormat . "'));
-                    $('#" . $this->id . "-end').val(end.format('" . $this->momentFormat . "'));
-                    if(start.format('" . $this->momentFormat . "')=='1970-01-01') {
-                        $('#" . $this->id . "').html(untilLabel + ' ' + end.format('" . $this->previewMomentFormat . "'));
-                    }
-                    " . $jsChange . "
-                });
+            var untilLabel = '" . c::__('element/date.until') . "';
+            $('#" . $this->id . "').daterangepicker({
+                startDate: moment('" . $this->dateStart . "'),
+                endDate: moment('" . $this->dateEnd . "'),
+                " . $jsRangeProperty . '
+                ' . $jsCustomRange . '
+                ' . $jsSpan . "
+                opens: '" . $this->openDirection . "',
+                locale: {
+                    format: '" . $this->momentFormat . "',
+                    separator: ' - ',
+                    applyLabel: '" . $this->getTranslation('applyLabel') . "',
+                    cancelLabel: '" . $this->getTranslation('cancelLabel') . "',
+                    fromLabel: '" . $this->getTranslation('fromLabel') . "',
+                    toLabel: '" . $this->getTranslation('toLabel') . "',
+                    customRangeLabel: '" . $this->getTranslation('customRangeLabel') . "',
+                    weekLabel: '" . $this->getTranslation('weekLabel') . "',
+                    daysOfWeek: [
+                        '" . $this->getTranslation('daysOfWeek.Su') . "',
+                        '" . $this->getTranslation('daysOfWeek.Mo') . "',
+                        '" . $this->getTranslation('daysOfWeek.Tu') . "',
+                        '" . $this->getTranslation('daysOfWeek.We') . "',
+                        '" . $this->getTranslation('daysOfWeek.Th') . "',
+                        '" . $this->getTranslation('daysOfWeek.Fr') . "',
+                        '" . $this->getTranslation('daysOfWeek.Sa') . "'
+                    ],
+                    monthNames: [
+                        '" . $this->getTranslation('monthNames.January') . "',
+                        '" . $this->getTranslation('monthNames.February') . "',
+                        '" . $this->getTranslation('monthNames.March') . "',
+                        '" . $this->getTranslation('monthNames.April') . "',
+                        '" . $this->getTranslation('monthNames.May') . "',
+                        '" . $this->getTranslation('monthNames.June') . "',
+                        '" . $this->getTranslation('monthNames.July') . "',
+                        '" . $this->getTranslation('monthNames.August') . "',
+                        '" . $this->getTranslation('monthNames.September') . "',
+                        '" . $this->getTranslation('monthNames.October') . "',
+                        '" . $this->getTranslation('monthNames.November') . "',
+                        '" . $this->getTranslation('monthNames.December') . "'
+                    ],
+                    firstDay: 1
+                },
+                isInvalidDate: function() {
 
-                $('#" . $this->id . "').html(moment('" . $this->dateStart . "').format('" . $this->previewMomentFormat . "') + ' - ' + moment('" . $this->dateEnd . "').format('" . $this->previewMomentFormat . "'));
-                if(moment('" . $this->dateStart . "').format('" . $this->momentFormat . "')=='1970-01-01') {
-                    $('#" . $this->id . "').html(untilLabel + ' ' + moment('" . $this->dateEnd . "').format('" . $this->previewMomentFormat . "'));
                 }
-                $('#" . $this->id . "').removeClass('uninit');
-            })();
+            }, function (start, end) {
+                $('#" . $this->id . "').html(start.format('" . $this->previewMomentFormat . "') + ' - ' + end.format('" . $this->previewMomentFormat . "'));
+                $('#" . $this->id . "-start').val(start.format('" . $this->momentFormat . "'));
+                $('#" . $this->id . "-end').val(end.format('" . $this->momentFormat . "'));
+                if(start.format('" . $this->momentFormat . "')=='1970-01-01') {
+                    $('#" . $this->id . "').html(untilLabel + ' ' + end.format('" . $this->previewMomentFormat . "'));
+                }
+                " . $jsChange . "
+            });
+
+            $('#" . $this->id . "').html(moment('" . $this->dateStart . "').format('" . $this->previewMomentFormat . "') + ' - ' + moment('" . $this->dateEnd . "').format('" . $this->previewMomentFormat . "'));
+            if(moment('" . $this->dateStart . "').format('" . $this->momentFormat . "')=='1970-01-01') {
+                $('#" . $this->id . "').html(untilLabel + ' ' + moment('" . $this->dateEnd . "').format('" . $this->previewMomentFormat . "'));
+            }
+            $('#" . $this->id . "').removeClass('uninit');
+
         ";
 
         return $js;
