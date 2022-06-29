@@ -92,7 +92,8 @@ HTML;
 
         $pushesScript = $this->yieldPushContent('capp-script');
 
-        $cresJs = curl::base() . 'media/js/cres/dist/cres.js?v=' . md5(CFile::lastModified(DOCROOT . 'media/js/cres/dist/cres.js'));
+        $cresJsFile = 'cres.min.js';
+        $cresJs = curl::base() . 'media/js/cres/dist/' . $cresJsFile . '?v=' . md5(CFile::lastModified(DOCROOT . 'media/js/cres/dist/' . $cresJsFile . ''));
 
         return <<<HTML
             ${endClientScript}
