@@ -1,7 +1,7 @@
 # Element - Tab
 ### Introduction
 
-Tab digunakan untuk mempresentasikan ui tab
+Element Tab digunakan untuk mempresentasikan ui tab
 
 Contoh Sederhana untuk tab
 

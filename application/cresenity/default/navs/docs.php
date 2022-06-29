@@ -127,6 +127,11 @@ return [
                 'uri' => 'docs/element/tab',
             ],
             [
+                'name' => 'element.showmore',
+                'label' => c::__('ShowMore'),
+                'uri' => 'docs/element/showmore',
+            ],
+            [
                 'name' => 'element.shimmer',
                 'label' => c::__('Shimmer'),
                 'uri' => 'docs/element/shimmer',
@@ -217,6 +222,11 @@ return [
                 'name' => 'cresjs.basic',
                 'label' => c::__('Basic'),
                 'uri' => 'docs/cresjs/basic',
+            ],
+            [
+                'name' => 'cresjs.css',
+                'label' => c::__('Css'),
+                'uri' => 'docs/cresjs/css',
             ],
             [
                 'name' => 'cresjs.php',
