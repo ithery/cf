@@ -1,39 +1,36 @@
 <?php
 
 /**
- * OpenSSL Modular Exponentiation Engine
+ * OpenSSL Modular Exponentiation Engine.
  *
  * PHP version 5 and 7
  *
  * @category  Math
- * @package   BigInteger
+ *
  * @author    Jim Wigginton <terrafrost@php.net>
  * @copyright 2017 Jim Wigginton
  * @license   http://www.opensource.org/licenses/mit-license.html  MIT License
+ *
  * @link      http://pear.php.net/package/Math_BigInteger
  */
 
 namespace phpseclib3\Math\BigInteger\Engines;
 
-use phpseclib3\Crypt\RSA\Formats\Keys\PKCS8;
 use phpseclib3\Math\BigInteger;
+use phpseclib3\Crypt\RSA\Formats\Keys\PKCS8;
 
 /**
- * OpenSSL Modular Exponentiation Engine
+ * OpenSSL Modular Exponentiation Engine.
  *
- * @package Engines
  * @author  Jim Wigginton <terrafrost@php.net>
- * @access  public
  */
-abstract class OpenSSL
-{
+abstract class OpenSSL {
     /**
-     * Test for engine validity
+     * Test for engine validity.
      *
      * @return bool
      */
-    public static function isValidEngine()
-    {
+    public static function isValidEngine() {
         return extension_loaded('openssl') && static::class != __CLASS__;
     }
 
@@ -43,10 +40,10 @@ abstract class OpenSSL
      * @param Engine $x
      * @param Engine $e
      * @param Engine $n
+     *
      * @return Engine
      */
-    public static function powModHelper(Engine $x, Engine $e, Engine $n)
-    {
+    public static function powModHelper(Engine $x, Engine $e, Engine $n) {
         if ($n->getLengthInBytes() < 31 || $n->getLengthInBytes() > 16384) {
             throw new \OutOfRangeException('Only modulo between 31 and 16384 bits are accepted');
         }
@@ -67,6 +64,7 @@ abstract class OpenSSL
         }
 
         $class = get_class($x);
+
         return new $class($result, 256);
     }
 }

@@ -23,6 +23,22 @@ return [
         'datatable' => [
             'dom' => null,
             'class' => null,
+            'options' => [
+                'deferRender' => true,
+                'searching' => true,
+                'processing' => true,
+                'ordering' => true,
+                'scrollX' => false,
+                'serverSide' => false,
+                'info' => true,
+                'paging' => true,
+                'searching' => true,
+                'lengthChange' => true,
+                'autoWidth' => false,
+                'pagingType' => 'full_numbers',
+                'height' => false,
+                'stateSave' => false,
+            ]
         ],
         'select2' => [
             'version' => null, //select2 version

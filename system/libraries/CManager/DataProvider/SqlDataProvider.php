@@ -47,7 +47,7 @@ class CManager_DataProvider_SqlDataProvider extends CManager_DataProviderAbstrac
     public function paginate($perPage = null, $columns = ['*'], $pageName = 'page', $page = null, $callback = null) {
         $page = $page ?: CPagination_Paginator::resolveCurrentPage($pageName);
 
-        $total = $this->getCountForPagination();
+        $total = $this->getTotalFilteredRecord();
         $results = c::collect();
         if ($total > 0) {
             $query = $this->getQueryForPage($page, $perPage);
@@ -197,7 +197,7 @@ class CManager_DataProvider_SqlDataProvider extends CManager_DataProviderAbstrac
         return $sWhere;
     }
 
-    protected function getTotalRecord() {
+    public function getTotalRecord() {
         $q = $this->getBaseQuery();
         // get total record
         $qTotal = 'select count(*) as cnt from (' . $q . ') as a';
@@ -210,7 +210,7 @@ class CManager_DataProvider_SqlDataProvider extends CManager_DataProviderAbstrac
         return $totalRecord;
     }
 
-    protected function getTotalFilteredRecord() {
+    public function getTotalFilteredRecord() {
         $qBase = $this->getBaseQuery();
         $sWhere = $this->getQueryWhere();
         $qFiltered = 'select * from (' . $qBase . ') as a ' . $sWhere;

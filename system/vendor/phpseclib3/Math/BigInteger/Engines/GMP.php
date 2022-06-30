@@ -1,15 +1,16 @@
 <?php
 
 /**
- * GMP BigInteger Engine
+ * GMP BigInteger Engine.
  *
  * PHP version 5 and 7
  *
  * @category  Math
- * @package   BigInteger
+ *
  * @author    Jim Wigginton <terrafrost@php.net>
  * @copyright 2017 Jim Wigginton
  * @license   http://www.opensource.org/licenses/mit-license.html  MIT License
+ *
  * @link      http://pear.php.net/package/Math_BigInteger
  */
 
@@ -20,49 +21,44 @@ use phpseclib3\Exception\BadConfigurationException;
 /**
  * GMP Engine.
  *
- * @package GMP
  * @author  Jim Wigginton <terrafrost@php.net>
- * @access  public
  */
-class GMP extends Engine
-{
+class GMP extends Engine {
     /**
      * Can Bitwise operations be done fast?
      *
      * @see parent::bitwise_leftRotate()
      * @see parent::bitwise_rightRotate()
-     * @access protected
      */
     const FAST_BITWISE = true;
 
     /**
-     * Engine Directory
+     * Engine Directory.
      *
      * @see parent::setModExpEngine
-     * @access protected
      */
     const ENGINE_DIR = 'GMP';
 
     /**
-     * Test for engine validity
+     * Test for engine validity.
      *
      * @return bool
+     *
      * @see parent::__construct()
      */
-    public static function isValidEngine()
-    {
+    public static function isValidEngine() {
         return extension_loaded('gmp');
     }
 
     /**
-     * Default constructor
+     * Default constructor.
      *
-     * @param mixed $x integer Base-10 number or base-$base number if $base set.
-     * @param int $base
+     * @param mixed $x    integer Base-10 number or base-$base number if $base set
+     * @param int   $base
+     *
      * @see parent::__construct()
      */
-    public function __construct($x = 0, $base = 10)
-    {
+    public function __construct($x = 0, $base = 10) {
         if (!isset(static::$isValidEngine[static::class])) {
             static::$isValidEngine[static::class] = self::isValidEngine();
         }
@@ -72,6 +68,7 @@ class GMP extends Engine
 
         if ($x instanceof \GMP) {
             $this->value = $x;
+
             return;
         }
 
@@ -81,23 +78,25 @@ class GMP extends Engine
     }
 
     /**
-     * Initialize a GMP BigInteger Engine instance
+     * Initialize a GMP BigInteger Engine instance.
      *
      * @param int $base
+     *
      * @see parent::__construct()
      */
-    protected function initialize($base)
-    {
+    protected function initialize($base) {
         switch (abs($base)) {
             case 256:
                 $this->value = gmp_import($this->value);
                 if ($this->is_negative) {
                     $this->value = -$this->value;
                 }
+
                 break;
             case 16:
                 $temp = $this->is_negative ? '-0x' . $this->value : '0x' . $this->value;
                 $this->value = gmp_init($temp);
+
                 break;
             case 10:
                 $this->value = gmp_init(isset($this->value) ? $this->value : '0');
@@ -109,9 +108,8 @@ class GMP extends Engine
      *
      * @return string
      */
-    public function toString()
-    {
-        return (string)$this->value;
+    public function toString() {
+        return (string) $this->value;
     }
 
     /**
@@ -121,10 +119,10 @@ class GMP extends Engine
      * saved as two's compliment.
      *
      * @param bool $twos_compliment
+     *
      * @return string
      */
-    public function toBits($twos_compliment = false)
-    {
+    public function toBits($twos_compliment = false) {
         $hex = $this->toHex($twos_compliment);
 
         $bits = gmp_strval(gmp_init($hex, 16), 2);
@@ -144,10 +142,10 @@ class GMP extends Engine
      * Converts a BigInteger to a byte string (eg. base-256).
      *
      * @param bool $twos_compliment
+     *
      * @return string
      */
-    public function toBytes($twos_compliment = false)
-    {
+    public function toBytes($twos_compliment = false) {
         if ($twos_compliment) {
             return $this->toBytesHelper();
         }
@@ -158,19 +156,19 @@ class GMP extends Engine
 
         $temp = gmp_export($this->value);
 
-        return $this->precision > 0 ?
-            substr(str_pad($temp, $this->precision >> 3, chr(0), STR_PAD_LEFT), -($this->precision >> 3)) :
-            ltrim($temp, chr(0));
+        return $this->precision > 0
+            ? substr(str_pad($temp, $this->precision >> 3, chr(0), STR_PAD_LEFT), -($this->precision >> 3))
+            : ltrim($temp, chr(0));
     }
 
     /**
      * Adds two BigIntegers.
      *
      * @param GMP $y
+     *
      * @return GMP
      */
-    public function add(GMP $y)
-    {
+    public function add(GMP $y) {
         $temp = new self();
         $temp->value = $this->value + $y->value;
 
@@ -181,10 +179,10 @@ class GMP extends Engine
      * Subtracts two BigIntegers.
      *
      * @param GMP $y
+     *
      * @return GMP
      */
-    public function subtract(GMP $y)
-    {
+    public function subtract(GMP $y) {
         $temp = new self();
         $temp->value = $this->value - $y->value;
 
@@ -195,10 +193,10 @@ class GMP extends Engine
      * Multiplies two BigIntegers.
      *
      * @param GMP $x
+     *
      * @return GMP
      */
-    public function multiply(GMP $x)
-    {
+    public function multiply(GMP $x) {
         $temp = new self();
         $temp->value = $this->value * $x->value;
 
@@ -214,10 +212,10 @@ class GMP extends Engine
      * and the divisor (basically, the "common residue" is the first positive modulo).
      *
      * @param GMP $y
+     *
      * @return array{GMP, GMP}
      */
-    public function divide(GMP $y)
-    {
+    public function divide(GMP $y) {
         $quotient = new self();
         $remainder = new self();
 
@@ -245,12 +243,12 @@ class GMP extends Engine
      * {@internal Could return $this->subtract($x), but that's not as fast as what we do do.}
      *
      * @param GMP $y
-     * @return int in case < 0 if $this is less than $y; > 0 if $this is greater than $y, and 0 if they are equal.
-     * @access public
+     *
+     * @return int in case < 0 if $this is less than $y; > 0 if $this is greater than $y, and 0 if they are equal
+     *
      * @see self::equals()
      */
-    public function compare(GMP $y)
-    {
+    public function compare(GMP $y) {
         $r = gmp_cmp($this->value, $y->value);
         if ($r < -1) {
             $r = -1;
@@ -258,6 +256,7 @@ class GMP extends Engine
         if ($r > 1) {
             $r = 1;
         }
+
         return $r;
     }
 
@@ -267,10 +266,10 @@ class GMP extends Engine
      * If you need to see if one number is greater than or less than another number, use BigInteger::compare()
      *
      * @param GMP $x
+     *
      * @return bool
      */
-    public function equals(GMP $x)
-    {
+    public function equals(GMP $x) {
         return $this->value == $x->value;
     }
 
@@ -280,10 +279,10 @@ class GMP extends Engine
      * Say you have (30 mod 17 * x mod 17) mod 17 == 1.  x can be found using modular inverses.
      *
      * @param GMP $n
+     *
      * @return false|GMP
      */
-    public function modInverse(GMP $n)
-    {
+    public function modInverse(GMP $n) {
         $temp = new self();
         $temp->value = gmp_invert($this->value, $n->value);
 
@@ -299,10 +298,10 @@ class GMP extends Engine
      * {@link http://en.wikipedia.org/wiki/B%C3%A9zout%27s_identity Bezout's identity - Wikipedia} for more information.
      *
      * @param GMP $n
+     *
      * @return GMP[]
      */
-    public function extendedGCD(GMP $n)
-    {
+    public function extendedGCD(GMP $n) {
         extract(gmp_gcdext($this->value, $n->value));
 
         return [
@@ -313,16 +312,17 @@ class GMP extends Engine
     }
 
     /**
-     * Calculates the greatest common divisor
+     * Calculates the greatest common divisor.
      *
      * Say you have 693 and 609.  The GCD is 21.
      *
      * @param GMP $n
+     *
      * @return GMP
      */
-    public function gcd(GMP $n)
-    {
+    public function gcd(GMP $n) {
         $r = gmp_gcd($this->value, $n->value);
+
         return $this->normalize(new self($r));
     }
 
@@ -330,10 +330,8 @@ class GMP extends Engine
      * Absolute value.
      *
      * @return GMP
-     * @access public
      */
-    public function abs()
-    {
+    public function abs() {
         $temp = new self();
         $temp->value = gmp_abs($this->value);
 
@@ -341,13 +339,13 @@ class GMP extends Engine
     }
 
     /**
-     * Logical And
+     * Logical And.
      *
      * @param GMP $x
+     *
      * @return GMP
      */
-    public function bitwise_and(GMP $x)
-    {
+    public function bitwise_and(GMP $x) {
         $temp = new self();
         $temp->value = $this->value & $x->value;
 
@@ -355,13 +353,13 @@ class GMP extends Engine
     }
 
     /**
-     * Logical Or
+     * Logical Or.
      *
      * @param GMP $x
+     *
      * @return GMP
      */
-    public function bitwise_or(GMP $x)
-    {
+    public function bitwise_or(GMP $x) {
         $temp = new self();
         $temp->value = $this->value | $x->value;
 
@@ -369,13 +367,13 @@ class GMP extends Engine
     }
 
     /**
-     * Logical Exclusive Or
+     * Logical Exclusive Or.
      *
      * @param GMP $x
+     *
      * @return GMP
      */
-    public function bitwise_xor(GMP $x)
-    {
+    public function bitwise_xor(GMP $x) {
         $temp = new self();
         $temp->value = $this->value ^ $x->value;
 
@@ -383,15 +381,15 @@ class GMP extends Engine
     }
 
     /**
-     * Logical Right Shift
+     * Logical Right Shift.
      *
      * Shifts BigInteger's by $shift bits, effectively dividing by 2**$shift.
      *
      * @param int $shift
+     *
      * @return GMP
      */
-    public function bitwise_rightShift($shift)
-    {
+    public function bitwise_rightShift($shift) {
         // 0xFFFFFFFF >> 2 == -1 (on 32-bit systems)
         // gmp_init('0xFFFFFFFF') >> 2 == gmp_init('0x3FFFFFFF')
 
@@ -402,15 +400,15 @@ class GMP extends Engine
     }
 
     /**
-     * Logical Left Shift
+     * Logical Left Shift.
      *
      * Shifts BigInteger's by $shift bits, effectively multiplying by 2**$shift.
      *
      * @param int $shift
+     *
      * @return GMP
      */
-    public function bitwise_leftShift($shift)
-    {
+    public function bitwise_leftShift($shift) {
         $temp = new self();
         $temp->value = $this->value << $shift;
 
@@ -422,10 +420,10 @@ class GMP extends Engine
      *
      * @param GMP $e
      * @param GMP $n
+     *
      * @return GMP
      */
-    public function modPow(GMP $e, GMP $n)
-    {
+    public function modPow(GMP $e, GMP $n) {
         return $this->powModOuter($e, $n);
     }
 
@@ -436,10 +434,10 @@ class GMP extends Engine
      *
      * @param GMP $e
      * @param GMP $n
+     *
      * @return GMP
      */
-    public function powMod(GMP $e, GMP $n)
-    {
+    public function powMod(GMP $e, GMP $n) {
         return $this->powModOuter($e, $n);
     }
 
@@ -448,24 +446,25 @@ class GMP extends Engine
      *
      * @param GMP $e
      * @param GMP $n
+     *
      * @return GMP
      */
-    protected function powModInner(GMP $e, GMP $n)
-    {
+    protected function powModInner(GMP $e, GMP $n) {
         $class = static::$modexpEngine[static::class];
+
         return $class::powModHelper($this, $e, $n);
     }
 
     /**
-     * Normalize
+     * Normalize.
      *
      * Removes leading zeros and truncates (if necessary) to maintain the appropriate precision
      *
      * @param GMP $result
+     *
      * @return GMP
      */
-    protected function normalize(GMP $result)
-    {
+    protected function normalize(GMP $result) {
         $result->precision = $this->precision;
         $result->bitmask = $this->bitmask;
 
@@ -484,15 +483,15 @@ class GMP extends Engine
     }
 
     /**
-     * Performs some post-processing for randomRangePrime
+     * Performs some post-processing for randomRangePrime.
      *
      * @param Engine $x
      * @param Engine $min
      * @param Engine $max
+     *
      * @return GMP
      */
-    protected static function randomRangePrimeInner(Engine $x, Engine $min, Engine $max)
-    {
+    protected static function randomRangePrimeInner(Engine $x, Engine $min, Engine $max) {
         $p = gmp_nextprime($x->value);
 
         if ($p <= $max->value) {
@@ -507,21 +506,21 @@ class GMP extends Engine
     }
 
     /**
-     * Generate a random prime number between a range
+     * Generate a random prime number between a range.
      *
      * If there's not a prime within the given range, false will be returned.
      *
      * @param GMP $min
      * @param GMP $max
+     *
      * @return false|GMP
      */
-    public static function randomRangePrime(GMP $min, GMP $max)
-    {
+    public static function randomRangePrime(GMP $min, GMP $max) {
         return self::randomRangePrimeOuter($min, $max);
     }
 
     /**
-     * Generate a random number between a range
+     * Generate a random number between a range.
      *
      * Returns a random number between $min and $max where $min and $max
      * can be defined using one of the two methods:
@@ -531,33 +530,32 @@ class GMP extends Engine
      *
      * @param GMP $min
      * @param GMP $max
+     *
      * @return GMP
      */
-    public static function randomRange(GMP $min, GMP $max)
-    {
+    public static function randomRange(GMP $min, GMP $max) {
         return self::randomRangeHelper($min, $max);
     }
 
     /**
-     * Make the current number odd
+     * Make the current number odd.
      *
      * If the current number is odd it'll be unchanged.  If it's even, one will be added to it.
      *
      * @see self::randomPrime()
      */
-    protected function make_odd()
-    {
+    protected function make_odd() {
         gmp_setbit($this->value, 0);
     }
 
     /**
-     * Tests Primality
+     * Tests Primality.
      *
      * @param int $t
+     *
      * @return bool
      */
-    protected function testPrimality($t)
-    {
+    protected function testPrimality($t) {
         return gmp_prob_prime($this->value, $t) != 0;
     }
 
@@ -567,12 +565,13 @@ class GMP extends Engine
      * Returns the nth root of a positive biginteger, where n defaults to 2
      *
      * @param int $n
+     *
      * @return GMP
      */
-    protected function rootInner($n)
-    {
+    protected function rootInner($n) {
         $root = new self();
         $root->value = gmp_root($this->value, $n);
+
         return $this->normalize($root);
     }
 
@@ -580,10 +579,10 @@ class GMP extends Engine
      * Performs exponentiation.
      *
      * @param GMP $n
+     *
      * @return GMP
      */
-    public function pow(GMP $n)
-    {
+    public function pow(GMP $n) {
         $temp = new self();
         $temp->value = $this->value ** $n->value;
 
@@ -594,10 +593,10 @@ class GMP extends Engine
      * Return the minimum BigInteger between an arbitrary number of BigIntegers.
      *
      * @param GMP ...$nums
+     *
      * @return GMP
      */
-    public static function min(GMP ...$nums)
-    {
+    public static function min(GMP ...$nums) {
         return self::minHelper($nums);
     }
 
@@ -605,53 +604,54 @@ class GMP extends Engine
      * Return the maximum BigInteger between an arbitrary number of BigIntegers.
      *
      * @param GMP ...$nums
+     *
      * @return GMP
      */
-    public static function max(GMP ...$nums)
-    {
+    public static function max(GMP ...$nums) {
         return self::maxHelper($nums);
     }
 
     /**
-     * Tests BigInteger to see if it is between two integers, inclusive
+     * Tests BigInteger to see if it is between two integers, inclusive.
      *
      * @param GMP $min
      * @param GMP $max
+     *
      * @return bool
      */
-    public function between(GMP $min, GMP $max)
-    {
+    public function between(GMP $min, GMP $max) {
         return $this->compare($min) >= 0 && $this->compare($max) <= 0;
     }
 
     /**
-     * Create Recurring Modulo Function
+     * Create Recurring Modulo Function.
      *
      * Sometimes it may be desirable to do repeated modulos with the same number outside of
      * modular exponentiation
      *
      * @return callable
      */
-    public function createRecurringModuloFunction()
-    {
+    public function createRecurringModuloFunction() {
         $temp = $this->value;
+
         return function (GMP $x) use ($temp) {
             return new GMP($x->value % $temp);
         };
     }
 
     /**
-     * Scan for 1 and right shift by that amount
+     * Scan for 1 and right shift by that amount.
      *
      * ie. $s = gmp_scan1($n, 0) and $r = gmp_div_q($n, gmp_pow(gmp_init('2'), $s));
      *
      * @param GMP $r
+     *
      * @return int
      */
-    public static function scan1divide(GMP $r)
-    {
+    public static function scan1divide(GMP $r) {
         $s = gmp_scan1($r->value, 0);
         $r->value >>= $s;
+
         return $s;
     }
 
@@ -660,18 +660,18 @@ class GMP extends Engine
      *
      * @return bool
      */
-    public function isOdd()
-    {
+    public function isOdd() {
         return gmp_testbit($this->value, 0);
     }
 
     /**
-     * Tests if a bit is set
+     * Tests if a bit is set.
+     *
+     * @param mixed $x
      *
      * @return bool
      */
-    public function testBit($x)
-    {
+    public function testBit($x) {
         return gmp_testbit($this->value, $x);
     }
 
@@ -680,20 +680,18 @@ class GMP extends Engine
      *
      * @return bool
      */
-    public function isNegative()
-    {
+    public function isNegative() {
         return gmp_sign($this->value) == -1;
     }
 
     /**
-     * Negate
+     * Negate.
      *
      * Given $k, returns -$k
      *
      * @return GMP
      */
-    public function negate()
-    {
+    public function negate() {
         $temp = clone $this;
         $temp->value = -$this->value;
 
