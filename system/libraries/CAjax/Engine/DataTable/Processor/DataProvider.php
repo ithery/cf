@@ -27,19 +27,26 @@ class CAjax_Engine_DataTable_Processor_DataProvider extends CAjax_Engine_DataTab
         $pageSize = $this->parameter->pageSize();
         $collections = null;
         $totalItem = 0;
+        $totalFilteredItem = 0;
 
         if ($pageSize && $pageSize != '-1') {
             $paginationResult = $query->paginate($this->parameter->pageSize(), ['*'], 'page', $this->parameter->page());
             $collections = $paginationResult->items();
             $totalItem = $paginationResult->total();
+            $totalFilteredItem = $totalItem;
+            if ($query instanceof CManager_DataProvider_SqlDataProvider) {
+                $totalItem = $query->getCountForPagination();
+                $totalFilteredItem = $query->getTotalFilteredRecord();
+            }
         } else {
             $collections = $query->toEnumerable();
             $totalItem = $collections->count();
+            $totalFilteredItem = $totalItem;
         }
         $output = [
             'sEcho' => intval(carr::get($request, 'sEcho')),
             'iTotalRecords' => $totalItem,
-            'iTotalDisplayRecords' => $totalItem,
+            'iTotalDisplayRecords' => $totalFilteredItem,
             'aaData' => $this->populateAAData($collections, $this->table(), $request, $js),
         ];
 
