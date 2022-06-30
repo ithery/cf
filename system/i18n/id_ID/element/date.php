@@ -1,0 +1,46 @@
+<?php
+
+return [
+    'until' => 'Hingga',
+    'daterange:lifetime' => 'Semua Waktu',
+    'daterange:today' => 'Hari Ini',
+    'daterange:yesterday' => 'Kemarin',
+    'daterange:lastNDays' => ':n Hari Terakhir',
+    'daterange:thisWeek' => 'Minggu Ini',
+    'daterange:lastWeek' => 'Minggu Kemarin',
+    'daterange:thisMonth' => 'Bulan Ini',
+    'daterange:lastMonth' => 'Bulan Kemarin',
+    'daterange:customRange' => 'Rentang Kustom',
+    'daterangepicker' => [
+        'applyLabel' => 'Terapkan',
+        'cancelLabel' => 'Batal',
+        'fromLabel' => 'Dari',
+        'toLabel' => 'Hingga',
+        'customRangeLabel' => 'Rentang Kustom',
+        'weekLabel' => 'W',
+        'daysOfWeek' => [
+            'Su' => 'Min',
+            'Mo' => 'Sen',
+            'Tu' => 'Sel',
+            'We' => 'Rab',
+            'Th' => 'Kam',
+            'Fr' => 'Jum',
+            'Sa' => 'Sab',
+        ],
+        'monthNames' => [
+            'January' => 'Januari',
+            'February' => 'Februari',
+            'March' => 'Maret',
+            'April' => 'April',
+            'May' => 'Mei',
+            'June' => 'Juni',
+            'July' => 'Juli',
+            'August' => 'Agustus',
+            'September' => 'September',
+            'October' => 'Oktober',
+            'November' => 'November',
+            'December' => 'Desember',
+        ],
+
+    ],
+];

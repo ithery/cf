@@ -1,0 +1,3 @@
+<?php
+class CStorage_Vendor_BunnyCDN_Exception_DirectoryNotEmptyException extends CStorage_Vendor_BunnyCDN_Exception {
+}
