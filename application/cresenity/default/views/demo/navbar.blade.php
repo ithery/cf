@@ -73,11 +73,7 @@
             </div>
         </div>
         <div class="navbar-nav align-items-center ml-3">
-            <a class="btn btn-info text-white btn-demo-show-code" cres-handler="modal" cres-config="@jsonAttr([
-                'reload'=> [
-                    'url'=> c::url('code?uri='.c::request()->path())
-                ]
-            ])">Show Codes</a>
+            <a id="btn-demo-show-code" class="btn btn-info text-white btn-demo-show-code" data-uri="{{ c::request()->path() }}">Show Codes</a>
         </div>
 
     </div>
