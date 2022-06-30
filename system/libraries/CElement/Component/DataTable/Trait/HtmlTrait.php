@@ -248,7 +248,7 @@ trait CElement_Component_DataTable_Trait_HtmlTrait {
                     $visibility = CFunction::factory($this->filterActionCallbackFunc)
                         ->addArg($this)
                         ->addArg('action')
-                        ->addArg($row)
+                        ->addArg($row->toArray())
                         ->addArg($action)
                         ->setRequire($this->requires)
                         ->execute();
@@ -258,7 +258,7 @@ trait CElement_Component_DataTable_Trait_HtmlTrait {
                     $action->setVisibility($visibility);
                 }
                 if ($action instanceof CElement_Component_ActionRow) {
-                    $action->applyRowCallback($row);
+                    $action->applyRowCallback($row->toArray());
                 }
             }
 
