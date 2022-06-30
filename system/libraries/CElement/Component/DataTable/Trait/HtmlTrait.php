@@ -241,11 +241,10 @@ trait CElement_Component_DataTable_Trait_HtmlTrait {
             $this->getRowActionList()->regenerateId(true);
             $this->getRowActionList()->apply('setJsParam', $jsparam);
             $this->getRowActionList()->apply('setHandlerParam', $jsparam);
+            $actions = $this->getRowActionList()->childs();
 
-            if (($this->filterActionCallbackFunc) != null) {
-                $actions = $this->getRowActionList()->childs();
-
-                foreach ($actions as &$action) {
+            foreach ($actions as &$action) {
+                if (($this->filterActionCallbackFunc) != null) {
                     $visibility = CFunction::factory($this->filterActionCallbackFunc)
                         ->addArg($this)
                         ->addArg('action')
@@ -257,6 +256,9 @@ trait CElement_Component_DataTable_Trait_HtmlTrait {
                         $action->addClass('d-none');
                     }
                     $action->setVisibility($visibility);
+                }
+                if ($action instanceof CElement_Component_ActionRow) {
+                    $action->applyRowCallback($row);
                 }
             }
 
