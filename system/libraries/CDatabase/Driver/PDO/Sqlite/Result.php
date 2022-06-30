@@ -40,8 +40,12 @@ class CDatabase_Driver_PDO_Sqlite_Result extends CDatabase_Result {
                 $this->total_rows = $result->rowCount();
             }
         } else {
+            $errorInfo = $link->errorInfo();
+            if (is_array($errorInfo)) {
+                $errorInfo = implode(',', $errorInfo);
+            }
             // SQL error
-            throw new CDatabase_Exception('There was an SQL error: :error', [':error' => $link->errorInfo() . ' - ' . $sql]);
+            throw new CDatabase_Exception_QueryException(c::__('There was an SQL error: :error', [':error' => $errorInfo . ' (SQL: ' . $sql . ')']));
         }
 
         // Set result type
