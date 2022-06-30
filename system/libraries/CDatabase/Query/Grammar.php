@@ -926,7 +926,7 @@ class CDatabase_Query_Grammar extends CDatabase_Grammar {
      *
      * @return string
      */
-    public function compileUpdate(CDatabase_Query_Builder $query, $values) {
+    public function compileUpdate(CDatabase_Query_Builder $query, array $values) {
         $table = $this->wrapTable($query->from);
 
         $columns = $this->compileUpdateColumns($query, $values);
