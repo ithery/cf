@@ -63,6 +63,7 @@ class CElement_Component_ShowMore extends CElement_Component {
             "number": true // adds the number of items to the button
         }
         */
-        $this->setAttr('data-config', htmlspecialchars(json_encode($config), ENT_QUOTES, 'UTF-8'));
+        $this->setAttr('cres-element', 'component:ShowMore');
+        $this->setAttr('cres-config', htmlspecialchars(json_encode($config), ENT_QUOTES, 'UTF-8'));
     }
 }

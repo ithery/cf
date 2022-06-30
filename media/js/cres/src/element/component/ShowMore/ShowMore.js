@@ -30,7 +30,7 @@ export default class ShowMore {
         this._regex = { ...defaultRegex, ...regex };
 
         elements.map((item, index) => {
-            const configData = JSON.parse(item.getAttribute('data-config'));
+            const configData = JSON.parse(item.getAttribute('cres-config'));
             const configGlobal = config;
 
             const configDataAndGlobal = { ...configGlobal, ...configData };

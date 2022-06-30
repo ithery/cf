@@ -26,7 +26,6 @@ return [
         'theme-material',
     ],
     'js' => [
-        'capp.js?v=1',
         'cresenity.js',
         'cresenity/cresenity.bs4.js?v=3',
         'cresenity-demo.js',

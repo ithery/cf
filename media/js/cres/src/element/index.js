@@ -2,17 +2,6 @@
 import { elementRendered } from "../util/dom-observer";
 import { initComponent, component } from "./component";
 
-const getClassElement = (element) => {
-    const classList = element.className.split(/\s+/);
-    for (let i = 0; i < classList.length; i++) {
-        if (classList[i].startsWith('cres:element')) {
-            return classList[i];
-        }
-    }
-    return null;
-
-}
-
 const isElementInitialized = (element) => {
     const classList = element.className.split(/\s+/);
     for (let i = 0; i < classList.length; i++) {
@@ -27,13 +16,11 @@ const isElementInitialized = (element) => {
 let inited = false;
 const initElement = () => {
     if(!inited) {
-        elementRendered('[class*="cres\\:element\\:"]', (element)=>{
+        elementRendered('[cres-element]', (element)=>{
             if(!isElementInitialized(element)) {
-                const className = getClassElement(element);
-                if(className) {
-                    if(className.startsWith('cres:element:component')) {
-                        initComponent(element,className);
-                    }
+                const elementName = element.getAttribute('cres-element');
+                if(elementName.startsWith('component')) {
+                    initComponent(element);
                 }
                 element.classList.add("cres:initialized");
             }
