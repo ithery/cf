@@ -34,10 +34,6 @@ class CAjax_Engine_DataTable_Processor_DataProvider extends CAjax_Engine_DataTab
             $collections = $paginationResult->items();
             $totalItem = $paginationResult->total();
             $totalFilteredItem = $totalItem;
-            if ($query instanceof CManager_DataProvider_SqlDataProvider) {
-                $totalItem = $query->getCountForPagination();
-                $totalFilteredItem = $query->getTotalFilteredRecord();
-            }
         } else {
             $collections = $query->toEnumerable();
             $totalItem = $collections->count();
