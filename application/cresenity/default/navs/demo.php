@@ -16,6 +16,11 @@ return [
         'label' => c::__('Elements'),
         'subnav' => [
             [
+                'name' => 'elements.table',
+                'label' => c::__('Table'),
+                'uri' => 'demo/elements/table/index',
+            ],
+            [
                 'name' => 'elements.Shimmer',
                 'label' => c::__('Shimmer'),
                 'uri' => 'demo/elements/shimmer/index',

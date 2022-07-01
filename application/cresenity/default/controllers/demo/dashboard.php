@@ -1,4 +1,5 @@
 <?php
+use Cresenity\Demo\Model\Dummy as DummyModel;
 use Cresenity\Demo\Model\Country as CountryModel;
 
 class Controller_Demo_Dashboard extends \Cresenity\Demo\Controller {
@@ -16,6 +17,17 @@ class Controller_Demo_Dashboard extends \Cresenity\Demo\Controller {
         $table->addColumn('code3')->setLabel('Code 3');
         $table->addColumn('num')->setLabel('Number');
         $table->addColumn('isd')->setLabel('ISD');
+        $table->setAjax();
+
+        $table = $app->addTable();
+
+        $table->setDataFromModel(DummyModel::class, function ($q) {
+            $q->where('userId', '=', 3);
+        });
+        $table->addColumn('userId')->setLabel('userId');
+        $table->addColumn('id')->setLabel('ID');
+        $table->addColumn('title')->setLabel('Title');
+        $table->addColumn('completed')->setLabel('Completed');
         $table->setAjax();
 
         return $app;

@@ -27,6 +27,13 @@ class CManager_Transform_Repository {
     }
 
     public function resolveMethod($method) {
+        if ($method instanceof CManager_Transform_Contract_TransformMethodInterface) {
+            return null;
+        }
+        if ($method instanceof Closure || $method instanceof \Opis\Closure\SerializableClosure) {
+            return null;
+        }
+
         if (isset($this->methods[$method])) {
             return CManager_Transform_Parser::explodeMethods($this->methods[$method]);
         }
