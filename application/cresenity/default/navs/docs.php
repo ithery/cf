@@ -127,6 +127,11 @@ return [
                 'uri' => 'docs/element/tab',
             ],
             [
+                'name' => 'element.widget',
+                'label' => c::__('Widget'),
+                'uri' => 'docs/element/widget',
+            ],
+            [
                 'name' => 'element.showmore',
                 'label' => c::__('ShowMore'),
                 'uri' => 'docs/element/showmore',
