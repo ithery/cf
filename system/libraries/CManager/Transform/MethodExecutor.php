@@ -44,7 +44,7 @@ class CManager_Transform_MethodExecutor {
     }
 
     public function transformThousandSeparator($value, $decimalDigit = null, $decimalSeparator = null, $thousandSeparator = null) {
-        $value = c::formatter()->formatDecimal($value, $decimalDigit, $decimalSeparator, $thousandSeparator, true);
+        return c::formatter()->formatDecimal($value, $decimalDigit, $decimalSeparator, $thousandSeparator, true);
     }
 
     public function transformFormatCurrency($value, $decimalDigit = null, $decimalSeparator = null, $thousandSeparator = null, $currencyPrefix = null, $currencySuffix = null) {
