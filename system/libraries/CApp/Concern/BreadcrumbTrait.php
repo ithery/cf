@@ -11,10 +11,19 @@ defined('SYSPATH') or die('No direct access allowed.');
  * @since Jul 27, 2019, 10:18:47 PM
  */
 trait CApp_Concern_BreadcrumbTrait {
+    /**
+     * @var bool
+     */
     private $showBreadcrumb = true;
 
+    /**
+     * @var array
+     */
     private $breadcrumb = [];
 
+    /**
+     * @var null|Closure
+     */
     private $breadcrumbCallback = null;
 
     public function showBreadcrumb($bool = true) {

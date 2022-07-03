@@ -58,9 +58,7 @@ class CQueue_Queue_SyncQueue extends CQueue_AbstractQueue {
      * @return void
      */
     protected function raiseBeforeJobEvent(CQueue_JobInterface $job) {
-        if ($this->container->bound('events')) {
-            $this->container['events']->dispatch(new CQueue_Event_JobProcessing($this->connectionName, $job));
-        }
+        CEvent::dispatcher()->dispatch(new CQueue_Event_JobProcessing($this->connectionName, $job));
     }
 
     /**
@@ -71,9 +69,7 @@ class CQueue_Queue_SyncQueue extends CQueue_AbstractQueue {
      * @return void
      */
     protected function raiseAfterJobEvent(CQueue_JobInterface $job) {
-        if ($this->container->bound('events')) {
-            $this->container['events']->dispatch(new CQueue_Event_JobProcessed($this->connectionName, $job));
-        }
+        CEvent::dispatcher()->dispatch(new CQueue_Event_JobProcessed($this->connectionName, $job));
     }
 
     /**
@@ -85,9 +81,7 @@ class CQueue_Queue_SyncQueue extends CQueue_AbstractQueue {
      * @return void
      */
     protected function raiseExceptionOccurredJobEvent(CQueue_JobInterface $job, Throwable $e) {
-        if ($this->container->bound('events')) {
-            $this->container['events']->dispatch(new CQueue_Event_JobExceptionOccurred($this->connectionName, $job, $e));
-        }
+        CEvent::dispatcher()->dispatch(new CQueue_Event_JobExceptionOccurred($this->connectionName, $job, $e));
     }
 
     /**

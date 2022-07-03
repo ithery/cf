@@ -122,7 +122,7 @@ class CQueue_Worker {
      * @return void
      */
     public function daemon($connectionName, $queue, CQueue_WorkerOptions $options) {
-        if ($this->supportsAsyncSignals()) {
+        if ($supportsAsyncSignals = $this->supportsAsyncSignals()) {
             $this->listenForSignals();
         }
         $lastRestart = $this->getTimestampOfLastQueueRestart();
@@ -150,7 +150,7 @@ class CQueue_Worker {
                 $this->manager->connection($connectionName),
                 $queue
             );
-            if ($this->supportsAsyncSignals()) {
+            if ($supportsAsyncSignals) {
                 $this->registerTimeoutHandler($job, $options);
             }
             // If the daemon should run (not in maintenance mode, etc.), then we can run
@@ -390,8 +390,9 @@ class CQueue_Worker {
                 $this->exceptions->report($e);
             }
             $this->stopWorkerIfLostConnection($e);
+        } finally {
+            $this->currentJobName = null;
         }
-        $this->currentJobName = null;
     }
 
     /**

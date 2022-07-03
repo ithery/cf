@@ -12,7 +12,7 @@ class CManager_Asset_Compiler_Compiled {
     protected $filepath;
 
     /**
-     * The last modified time of the newest Asset in the Assets array
+     * The last modified time of the newest Asset in the Assets array.
      *
      * @var int
      */

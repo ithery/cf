@@ -1443,6 +1443,20 @@ class carr {
     }
 
     /**
+     * Run a map transforms over each of the items.
+     *
+     * @param array        $collection
+     * @param string|array $transforms
+     *
+     * @return array
+     */
+    public static function mapTransform($collection, $transforms) {
+        return static::map($collection, function ($item) use ($transforms) {
+            return c::manager()->transform()->call($transforms, $item);
+        });
+    }
+
+    /**
      * Creates a new array concatenating `array` with any additional arrays
      * and/or values.
      *

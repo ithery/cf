@@ -1,7 +1,5 @@
 <?php
 
-declare(strict_types=1);
-
 /*
  * This is part of the league/commonmark package.
  *
@@ -15,16 +13,15 @@ declare(strict_types=1);
 
 namespace League\CommonMark\Extension\Table;
 
-use League\CommonMark\Node\Block\AbstractBlock;
-use League\CommonMark\Parser\Block\AbstractBlockContinueParser;
-use League\CommonMark\Parser\Block\BlockContinue;
-use League\CommonMark\Parser\Block\BlockContinueParserInterface;
 use League\CommonMark\Parser\Cursor;
-use League\CommonMark\Parser\InlineParserEngineInterface;
 use League\CommonMark\Util\ArrayCollection;
+use League\CommonMark\Node\Block\AbstractBlock;
+use League\CommonMark\Parser\Block\BlockContinue;
+use League\CommonMark\Parser\InlineParserEngineInterface;
+use League\CommonMark\Parser\Block\AbstractBlockContinueParser;
+use League\CommonMark\Parser\Block\BlockContinueParserInterface;
 
-final class TableParser extends AbstractBlockContinueParser
-{
+final class TableParser extends AbstractBlockContinueParser {
     /**
      * @var Table
      *
@@ -40,7 +37,7 @@ final class TableParser extends AbstractBlockContinueParser
     private $bodyLines;
 
     /**
-     * @var array<int, string|null>
+     * @var array<int, null|string>
      *
      * @psalm-readonly
      */
@@ -61,32 +58,31 @@ final class TableParser extends AbstractBlockContinueParser
     private $nextIsSeparatorLine = true;
 
     /**
-     * @param array<int, string|null> $columns
+     * @param array<int, null|string> $columns
      * @param array<int, string>      $headerCells
      */
-    public function __construct(array $columns, array $headerCells)
-    {
-        $this->block       = new Table();
-        $this->bodyLines   = new ArrayCollection();
-        $this->columns     = $columns;
+    public function __construct(array $columns, array $headerCells) {
+        $this->block = new Table();
+        $this->bodyLines = new ArrayCollection();
+        $this->columns = $columns;
         $this->headerCells = $headerCells;
     }
 
-    public function canHaveLazyContinuationLines(): bool
-    {
+    /**
+     * @return bool
+     */
+    public function canHaveLazyContinuationLines() {
         return true;
     }
 
     /**
      * @return Table
      */
-    public function getBlock(): AbstractBlock
-    {
+    public function getBlock() {
         return $this->block;
     }
 
-    public function tryContinue(Cursor $cursor, BlockContinueParserInterface $activeBlockParser): ?BlockContinue
-    {
+    public function tryContinue(Cursor $cursor, BlockContinueParserInterface $activeBlockParser): ?BlockContinue {
         if (\strpos($cursor->getLine(), '|') === false) {
             return BlockContinue::none();
         }
@@ -94,8 +90,12 @@ final class TableParser extends AbstractBlockContinueParser
         return BlockContinue::at($cursor);
     }
 
-    public function addLine(string $line): void
-    {
+    /**
+     * @param string $line
+     *
+     * @return void
+     */
+    public function addLine($line) {
         if ($this->nextIsSeparatorLine) {
             $this->nextIsSeparatorLine = false;
         } else {
@@ -103,8 +103,12 @@ final class TableParser extends AbstractBlockContinueParser
         }
     }
 
-    public function parseInlines(InlineParserEngineInterface $inlineParser): void
-    {
+    /**
+     * @param InlineParserEngineInterface $inlineParser
+     *
+     * @return void
+     */
+    public function parseInlines(InlineParserEngineInterface $inlineParser) {
         $headerColumns = \count($this->headerCells);
 
         $head = new TableSection(TableSection::TYPE_HEAD);
@@ -113,7 +117,7 @@ final class TableParser extends AbstractBlockContinueParser
         $headerRow = new TableRow();
         $head->appendChild($headerRow);
         for ($i = 0; $i < $headerColumns; $i++) {
-            $cell      = $this->headerCells[$i];
+            $cell = $this->headerCells[$i];
             $tableCell = $this->parseCell($cell, $i, $inlineParser);
             $tableCell->setType(TableCell::TYPE_HEAD);
             $headerRow->appendChild($tableCell);
@@ -122,11 +126,11 @@ final class TableParser extends AbstractBlockContinueParser
         $body = null;
         foreach ($this->bodyLines as $rowLine) {
             $cells = self::split($rowLine);
-            $row   = new TableRow();
+            $row = new TableRow();
 
             // Body can not have more columns than head
             for ($i = 0; $i < $headerColumns; $i++) {
-                $cell      = $cells[$i] ?? '';
+                $cell = $cells[$i] ?? '';
                 $tableCell = $this->parseCell($cell, $i, $inlineParser);
                 $row->appendChild($tableCell);
             }
@@ -141,8 +145,7 @@ final class TableParser extends AbstractBlockContinueParser
         }
     }
 
-    private function parseCell(string $cell, int $column, InlineParserEngineInterface $inlineParser): TableCell
-    {
+    private function parseCell(string $cell, int $column, InlineParserEngineInterface $inlineParser): TableCell {
         $tableCell = new TableCell();
 
         if ($column < \count($this->columns)) {
@@ -157,10 +160,11 @@ final class TableParser extends AbstractBlockContinueParser
     /**
      * @internal
      *
+     * @param int $line
+     *
      * @return array<int, string>
      */
-    public static function split(string $line): array
-    {
+    public static function split($line) {
         $cursor = new Cursor(\trim($line));
 
         if ($cursor->getCharacter() === '|') {
@@ -168,9 +172,9 @@ final class TableParser extends AbstractBlockContinueParser
         }
 
         $cells = [];
-        $sb    = '';
+        $sb = '';
 
-        while (! $cursor->isAtEnd()) {
+        while (!$cursor->isAtEnd()) {
             switch ($c = $cursor->getCharacter()) {
                 case '\\':
                     if ($cursor->peek() === '|') {
@@ -187,7 +191,8 @@ final class TableParser extends AbstractBlockContinueParser
                     break;
                 case '|':
                     $cells[] = $sb;
-                    $sb      = '';
+                    $sb = '';
+
                     break;
                 default:
                     $sb .= $c;

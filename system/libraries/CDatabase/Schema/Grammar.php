@@ -1,6 +1,8 @@
 <?php
 
 abstract class CDatabase_Schema_Grammar extends CDatabase_Grammar {
+    use CDatabase_Trait_CompileJsonPathTrait;
+
     /**
      * If this Grammar supports schema changes wrapped in a transaction.
      *
@@ -333,15 +335,6 @@ abstract class CDatabase_Schema_Grammar extends CDatabase_Grammar {
      */
     public function compileTableExists() {
         throw new LogicException('This database driver does not support check table exists.');
-    }
-
-    /**
-     * Compile the query to determine the list of columns.
-     *
-     * @return string
-     */
-    public function compileColumnListing() {
-        throw new LogicException('This database driver does not support column listing.');
     }
 
     /**

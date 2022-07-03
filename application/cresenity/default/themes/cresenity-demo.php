@@ -26,9 +26,8 @@ return [
         'theme-material',
     ],
     'js' => [
-        'capp.js?v=1',
         'cresenity.js',
-        'cresenity/cresenity.bs4.js?v=3',
+        'cresenity/cresenity.bs4.js',
         'cresenity-demo.js',
     ],
     'css' => [
@@ -36,7 +35,7 @@ return [
         'cresenity/cresenity.bs4.css?v=' . uniqid(),
         'uikit.css',
         'spinkit.css',
-        'cresenity/cresenity.main.bs4.css?v=' . uniqid(),
+        'cresenity/cresenity.main.bs4.css',
         'administrator/theme-material/theme-material.css?v=' . uniqid(),
         'cresenity-demo.css',
     ],

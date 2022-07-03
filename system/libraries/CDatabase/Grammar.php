@@ -87,6 +87,7 @@ abstract class CDatabase_Grammar {
      */
     protected function wrapSegments($segments) {
         $collection = c::collect($segments);
+
         return $collection->map(function ($segment, $key) use ($segments) {
             return $key == 0 && count($segments) > 1 ? $this->wrapTable($segment) : $this->wrapValue($segment);
         })->implode('.');
@@ -105,6 +106,17 @@ abstract class CDatabase_Grammar {
         }
 
         return $value;
+    }
+
+    /**
+     * Determine if the given string is a JSON selector.
+     *
+     * @param string $value
+     *
+     * @return bool
+     */
+    protected function isJsonSelector($value) {
+        return str_contains($value, '->');
     }
 
     /**
@@ -152,7 +164,7 @@ abstract class CDatabase_Grammar {
             return implode(', ', array_map([$this, __FUNCTION__], $value));
         }
 
-        return "'$value'";
+        return "'${value}'";
     }
 
     /**

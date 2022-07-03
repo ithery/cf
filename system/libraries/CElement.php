@@ -140,6 +140,7 @@ abstract class CElement extends CObservable {
 
         //     return $this;
         // }
+
         $this->attr[$k] = $v;
 
         return $this;
