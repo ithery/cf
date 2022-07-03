@@ -136,7 +136,7 @@ class CApp_Formatter {
         $currencySuffix = $currencySuffix ?: $this->currencySuffix;
         $currencyPrefix = $currencyPrefix ?: $this->currencyPrefix;
 
-        $x = number_format($x, $decimalDigit, $decimalSeparator, $thousandSeparator);
+        $x = number_format((float) $x, $decimalDigit, $decimalSeparator, $thousandSeparator);
         if ($stripZeroDecimal) {
             if (substr($x, ($decimalDigit + 1) * -1) === '.' . cstr::repeat('0', $decimalDigit)) {
                 $x = substr($x, 0, ($decimalDigit + 1) * -1);
