@@ -94,7 +94,7 @@ class CQueue_Job_RedisJob extends CQueue_AbstractJob {
      * @return int
      */
     public function attempts() {
-        return ($this->decoded['attempts'] ?? null) + 1;
+        return (isset($this->decoded['attempts']) ? $this->decoded['attempts'] : null) + 1;
     }
 
     /**
@@ -103,7 +103,7 @@ class CQueue_Job_RedisJob extends CQueue_AbstractJob {
      * @return null|string
      */
     public function getJobId() {
-        return $this->decoded['id'] ?? null;
+        return isset($this->decoded['id']) ? $this->decoded['id'] : null;
     }
 
     /**

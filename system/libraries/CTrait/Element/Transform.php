@@ -1,30 +1,43 @@
 <?php
 
-defined('SYSPATH') OR die('No direct access allowed.');
+defined('SYSPATH') or die('No direct access allowed.');
 
 /**
  * @author Hery Kurniawan
- * @since Feb 17, 2018, 12:52:11 AM
  * @license Ittron Global Teknologi <ittron.co.id>
+ *
+ * @see CManager_Transform_MethodExecutor
+ * @see CManager_Transform_Parser
+ * @since Feb 17, 2018, 12:52:11 AM
  */
 trait CTrait_Element_Transform {
-
     /**
-     *
      * @var array
      */
-    protected $transforms = array();
+    protected $transforms = [];
 
-    public function addTransform($name, $args = array()) {
-        $func = CFunction::factory($name);
-        if (!is_array($args)) {
-            $args = array($args);
+    public function addTransform($transform) {
+        $transform = carr::wrap($transform);
+
+        //serialize when closure
+        foreach ($transform as $key => $t) {
+            if ($t instanceof Closure) {
+                $transform[$key] = new \Opis\Closure\SerializableClosure($t);
+            }
         }
-        $func->setArgs($args);
+        $this->transforms = array_merge(
+            $this->transforms,
+            array_values($transform)
+        );
 
-
-        $this->transforms[] = $func;
         return $this;
     }
 
+    public function applyTransform($value, $data = []) {
+        if (empty($this->transforms)) {
+            return $value;
+        }
+
+        return c::manager()->transform()->call($this->transforms, $value, $data);
+    }
 }

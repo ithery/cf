@@ -35,3 +35,12 @@ class Controller_Example extends CController {
 
 }
 ```
+
+### Custom Routing
+
+Contoh dibawah untuk mendaftarkan route kustom robots.txt (letakkan pada bootstrap.php)
+```php
+c::router()->get('robots.txt', function () {
+    return CHTTP::robotsTxt()->addUserAgent('*')->addDisallow(WP::isDevelopment() ? '/' : '/admin')->toResponse();
+});
+```

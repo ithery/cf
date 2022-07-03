@@ -18,7 +18,7 @@ class CDatabase_Schema_Builder {
     /**
      * The database connection instance.
      *
-     * @var \CDatabase_Connection
+     * @var \CDatabase
      */
     protected $connection;
 
@@ -39,11 +39,11 @@ class CDatabase_Schema_Builder {
     /**
      * Create a new database Schema manager.
      *
-     * @param \CDatabase_Connection $connection
+     * @param \CDatabase $connection
      *
      * @return void
      */
-    public function __construct(CDatabase_Connection $connection) {
+    public function __construct(CDatabase $connection) {
         $this->connection = $connection;
         $this->grammar = $connection->getSchemaGrammar();
     }

@@ -1,7 +1,7 @@
 <?php
 
-use Pheanstalk\Job as PheanstalkJob;
 use Pheanstalk\Pheanstalk;
+use Pheanstalk\Job as PheanstalkJob;
 
 class CQueue_Job_BeanstalkdJob extends CQueue_AbstractJob {
     /**
@@ -77,6 +77,7 @@ class CQueue_Job_BeanstalkdJob extends CQueue_AbstractJob {
      */
     public function attempts() {
         $stats = $this->pheanstalk->statsJob($this->job);
+
         return (int) $stats->reserves;
     }
 

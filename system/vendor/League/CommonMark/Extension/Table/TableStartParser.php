@@ -15,15 +15,13 @@ declare(strict_types=1);
 
 namespace League\CommonMark\Extension\Table;
 
-use League\CommonMark\Parser\Block\BlockStart;
-use League\CommonMark\Parser\Block\BlockStartParserInterface;
 use League\CommonMark\Parser\Cursor;
+use League\CommonMark\Parser\Block\BlockStart;
 use League\CommonMark\Parser\MarkdownParserStateInterface;
+use League\CommonMark\Parser\Block\BlockStartParserInterface;
 
-final class TableStartParser implements BlockStartParserInterface
-{
-    public function tryStart(Cursor $cursor, MarkdownParserStateInterface $parserState): ?BlockStart
-    {
+final class TableStartParser implements BlockStartParserInterface {
+    public function tryStart(Cursor $cursor, MarkdownParserStateInterface $parserState): ?BlockStart {
         $paragraph = $parserState->getParagraphContent();
         if ($paragraph === null || \strpos($paragraph, '|') === false || \strpos($paragraph, "\n") !== false) {
             return BlockStart::none();
@@ -47,17 +45,16 @@ final class TableStartParser implements BlockStartParserInterface
     }
 
     /**
-     * @return array<int, string|null>
+     * @return array<int, null|string>
      *
      * @psalm-return list<string|null>
      */
-    private static function parseSeparator(Cursor $cursor): array
-    {
+    private static function parseSeparator(Cursor $cursor): array {
         $columns = [];
-        $pipes   = 0;
-        $valid   = false;
+        $pipes = 0;
+        $valid = false;
 
-        while (! $cursor->isAtEnd()) {
+        while (!$cursor->isAtEnd()) {
             switch ($c = $cursor->getCharacter()) {
                 case '|':
                     $cursor->advanceBy(1);
@@ -69,6 +66,7 @@ final class TableStartParser implements BlockStartParserInterface
 
                     // Need at least one pipe, even for a one-column table
                     $valid = true;
+
                     break;
                 case '-':
                 case ':':
@@ -77,7 +75,7 @@ final class TableStartParser implements BlockStartParserInterface
                         return [];
                     }
 
-                    $left  = false;
+                    $left = false;
                     $right = false;
                     if ($c === ':') {
                         $left = true;
@@ -97,11 +95,13 @@ final class TableStartParser implements BlockStartParserInterface
                     $columns[] = self::getAlignment($left, $right);
                     // Next, need another pipe
                     $pipes = 0;
+
                     break;
                 case ' ':
                 case "\t":
                     // White space is allowed between pipes and columns
                     $cursor->advanceToNextNonSpaceOrTab();
+
                     break;
                 default:
                     // Any other character is invalid
@@ -109,7 +109,7 @@ final class TableStartParser implements BlockStartParserInterface
             }
         }
 
-        if (! $valid) {
+        if (!$valid) {
             return [];
         }
 
@@ -117,10 +117,14 @@ final class TableStartParser implements BlockStartParserInterface
     }
 
     /**
+     * @param bool $left
+     * @param bool $right
+     *
+     * @return null|string
+     *
      * @psalm-pure
      */
-    private static function getAlignment(bool $left, bool $right): ?string
-    {
+    private static function getAlignment($left, $right) {
         if ($left && $right) {
             return TableCell::ALIGN_CENTER;
         }

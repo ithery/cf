@@ -56,4 +56,22 @@ class CApp {
     public function addForm($id = null) {
         return $this->element->addForm($id);
     }
+
+    /**
+     * @param null|string $id
+     *
+     * @return CElement_Component_Shimmer
+     */
+    public function addShimmer($id = null) {
+        return $this->element->addShimmer($id);
+    }
+
+    /**
+     * @param null|string $id
+     *
+     * @return CElement_Component_ShowMore
+     */
+    public function addShowMore($id = null) {
+        return $this->element->addShowMore($id);
+    }
 }

@@ -298,6 +298,44 @@ class CDebug_Bar_Renderer {
         return ($response instanceof StreamedResponse) || ($response instanceof BinaryFileResponse);
     }
 
+    protected function modifyContent($output) {
+        $jsonHelper = CHelper::json();
+        $isJson = false;
+        $isJsonp = false;
+
+        if (CApp::isAjax()) {
+            $jsonpRegex = '#^/\*\*/(.+?)\((.+?)\);$#ims';
+            $jsonCallback = null;
+            $jsonOutput = $output;
+            if (preg_match($jsonpRegex, $output, $matches)) {
+                $isJsonp = true;
+                $jsonOutput = carr::get($matches, 2);
+                $jsonCallback = carr::get($matches, 1);
+            }
+            if (cstr::startsWith(trim($jsonOutput), '{') && CApp::isAjax()) {
+                $json = null;
+
+                try {
+                    $json = $jsonHelper->parse($jsonOutput);
+                    $json = array_merge($json, $this->debugBar->getDataAsHeaders('phpdebugbar', 4096, PHP_INT_MAX));
+
+                    $jsonOutput = $jsonHelper->stringify($json);
+                    $isJson = true;
+                } catch (Exception $ex) {
+                }
+            }
+            $output = $jsonOutput;
+            if ($isJsonp) {
+                $output = sprintf('/**/%s(%s);', $jsonCallback, $output);
+            }
+        }
+        if (!$isJson) {
+            $output = $this->replaceJavascriptCode($output);
+        }
+
+        return $output;
+    }
+
     public function apply() {
         $renderer = $this;
         CEvent::dispatcher()->listen(CHTTP_Event_RequestHandled::class, function ($event) use ($renderer) {
@@ -309,21 +347,9 @@ class CDebug_Bar_Renderer {
                     $output = $response->getContent();
 
                     try {
-                        if (!headers_sent()) {
-                            header('phpdebugbar-body:1');
-                        }
+                        $output = $this->modifyContent($output);
 
-                        $json = null;
-
-                        try {
-                            $json = $jsonHelper->parse($output);
-                        } catch (Exception $ex) {
-                        }
-                        if (is_array($json)) {
-                            $json = array_merge($json, $this->debugBar->getDataAsHeaders('phpdebugbar', 4096, PHP_INT_MAX));
-                            $output = $jsonHelper->stringify($json);
-                            $response->setContent($output);
-                        }
+                        $response->setContent($output);
                     } catch (Exception $ex) {
                     }
                 } else {
@@ -333,32 +359,18 @@ class CDebug_Bar_Renderer {
                     }
                     $output = $response->getContent();
 
-                    $isJson = false;
+                    $output = $this->modifyContent($output);
 
-                    if (cstr::startsWith(trim($output), '{') && CApp::isAjax()) {
-                        $json = null;
-
-                        try {
-                            $json = $jsonHelper->parse($output);
-                            $json = array_merge($json, $this->debugBar->getDataAsHeaders('phpdebugbar', 4096, PHP_INT_MAX));
-                            $output = $jsonHelper->stringify($json);
-                            $isJson = true;
-                        } catch (Exception $ex) {
-                        }
-                    }
-                    if (!$isJson) {
-                        $output = $renderer->replaceJavascriptCode($output);
-                    } else {
-                        if (!headers_sent()) {
-                            header('phpdebugbar-body:1');
-                        }
-                    }
                     $response->setContent($output);
                     $response->headers->remove('Content-Length');
+
                     // Restore original response (eg. the View or Ajax data)
                     if ($original) {
                         $response->original = $original;
                     }
+                }
+                if (CApp::isAjax()) {
+                    $response->headers->set('phpdebugbar-body', 1);
                 }
             }
         });

@@ -26,6 +26,13 @@ abstract class CQueue_AbstractQueue implements CQueue_QueueInterface {
     protected $connectionName;
 
     /**
+     * Indicates that jobs should be dispatched after all database transactions have committed.
+     *
+     * @return $this
+     */
+    protected $dispatchAfterCommit;
+
+    /**
      * The create payload callbacks.
      *
      * @var callable[]
@@ -86,8 +93,12 @@ abstract class CQueue_AbstractQueue implements CQueue_QueueInterface {
      * @return string
      */
     protected function createPayload($job, $queue, $data = '') {
-        $payload = json_encode($this->createPayloadArray($job, $queue, $data));
-        if (JSON_ERROR_NONE !== json_last_error()) {
+        if ($job instanceof Closure) {
+            $job = CQueue_CallQueuedClosure::create($job);
+        }
+
+        $payload = json_encode($this->createPayloadArray($job, $queue, $data), \JSON_UNESCAPED_UNICODE);
+        if (json_last_error() !== JSON_ERROR_NONE) {
             throw new CQueue_Exception_InvalidPayloadException(
                 'Unable to JSON encode payload. Error code: ' . json_last_error()
             );
@@ -106,7 +117,9 @@ abstract class CQueue_AbstractQueue implements CQueue_QueueInterface {
      * @return array
      */
     protected function createPayloadArray($job, $queue, $data = '') {
-        return is_object($job) ? $this->createObjectPayload($job, $queue) : $this->createStringPayload($job, $queue, $data);
+        return is_object($job)
+            ? $this->createObjectPayload($job, $queue)
+            : $this->createStringPayload($job, $queue, $data);
     }
 
     /**
@@ -119,23 +132,29 @@ abstract class CQueue_AbstractQueue implements CQueue_QueueInterface {
      */
     protected function createObjectPayload($job, $queue) {
         $payload = $this->withCreatePayloadHooks($queue, [
+            'uuid' => (string) cstr::uuid(),
             'displayName' => $this->getDisplayName($job),
             'job' => 'CQueue_CallQueuedHandler@call',
             'maxTries' => isset($job->tries) ? $job->tries : null,
-            'delay' => $this->getJobRetryDelay($job),
+            'maxExceptions' => isset($job->maxExceptions) ? ($job->maxExceptions ?: false) : false,
+            'failOnTimeout' => isset($job->failOnTimeout) ? ($job->failOnTimeout ?: false) : false,
+            'backoff' => $this->getJobBackoff($job),
             'timeout' => isset($job->timeout) ? $job->timeout : null,
-            'timeoutAt' => $this->getJobExpiration($job),
+            'retryUntil' => $this->getJobExpiration($job),
             'data' => [
                 'commandName' => $job,
                 'command' => $job,
             ],
         ]);
+        $command = $this->jobShouldBeEncrypted($job)
+                    ? CCrypt::encrypter()->encrypt(serialize(clone $job))
+                    : serialize(clone $job);
 
         return array_merge($payload, [
-            'data' => [
+            'data' => array_merge($payload['data'], [
                 'commandName' => get_class($job),
-                'command' => serialize(clone $job),
-            ],
+                'command' => $command,
+            ]),
         ]);
     }
 
@@ -151,19 +170,27 @@ abstract class CQueue_AbstractQueue implements CQueue_QueueInterface {
     }
 
     /**
-     * Get the retry delay for an object-based queue handler.
+     * Get the backoff for an object-based queue handler.
      *
      * @param mixed $job
      *
      * @return mixed
      */
-    public function getJobRetryDelay($job) {
-        if (!method_exists($job, 'retryAfter') && !isset($job->retryAfter)) {
+    public function getJobBackoff($job) {
+        if (!method_exists($job, 'backoff') && !isset($job->backoff)) {
             return;
         }
-        $delay = isset($job->retryAfter) ? $job->retryAfter : $job->retryAfter();
 
-        return $delay instanceof DateTimeInterface ? $this->secondsUntil($delay) : $delay;
+        if (is_null($backoff = (isset($job->backoff) ? $job->backoff : $job->backoff()))) {
+            return;
+        }
+
+        return c::collect(carr::wrap($backoff))
+            ->map(function ($backoff) {
+                return $backoff instanceof DateTimeInterface
+                    ? $this->secondsUntil($backoff)
+                    : $backoff;
+            })->implode(',');
     }
 
     /**
@@ -174,12 +201,29 @@ abstract class CQueue_AbstractQueue implements CQueue_QueueInterface {
      * @return mixed
      */
     public function getJobExpiration($job) {
-        if (!method_exists($job, 'retryUntil') && !isset($job->timeoutAt)) {
+        if (!method_exists($job, 'retryUntil') && !isset($job->retryUntil)) {
             return;
         }
-        $expiration = isset($job->timeoutAt) ? $job->timeoutAt : $job->retryUntil();
 
-        return $expiration instanceof DateTimeInterface ? $expiration->getTimestamp() : $expiration;
+        $expiration = isset($job->retryUntil) ? $job->retryUntil : $job->retryUntil();
+
+        return $expiration instanceof DateTimeInterface
+                        ? $expiration->getTimestamp() : $expiration;
+    }
+
+    /**
+     * Determine if the job should be encrypted.
+     *
+     * @param object $job
+     *
+     * @return bool
+     */
+    protected function jobShouldBeEncrypted($job) {
+        if ($job instanceof CQueue_Contract_ShouldBeEncryptedInterface) {
+            return true;
+        }
+
+        return isset($job->shouldBeEncrypted) && $job->shouldBeEncrypted;
     }
 
     /**
@@ -193,10 +237,13 @@ abstract class CQueue_AbstractQueue implements CQueue_QueueInterface {
      */
     protected function createStringPayload($job, $queue, $data) {
         return $this->withCreatePayloadHooks($queue, [
+            'uuid' => (string) cstr::uuid(),
             'displayName' => is_string($job) ? explode('@', $job)[0] : null,
             'job' => $job,
             'maxTries' => null,
-            'delay' => null,
+            'maxExceptions' => null,
+            'failOnTimeout' => false,
+            'backoff' => null,
             'timeout' => null,
             'data' => $data,
         ]);
@@ -252,10 +299,10 @@ abstract class CQueue_AbstractQueue implements CQueue_QueueInterface {
      * @return mixed
      */
     protected function enqueueUsing($job, $payload, $queue, $delay, $callback) {
-        if ($this->shouldDispatchAfterCommit($job)
-            && $this->container->bound('db.transactions')
-        ) {
-            return $this->container->make('db.transactions')->addCallback(
+        if ($this->shouldDispatchAfterCommit($job)) {
+            $transactionManager = c::db()->getTransactionManager();
+
+            return $transactionManager->addCallback(
                 function () use ($payload, $queue, $delay, $callback, $job) {
                     return c::tap($callback($payload, $queue, $delay), function ($jobId) use ($job) {
                         $this->raiseJobQueuedEvent($jobId, $job);
@@ -297,9 +344,7 @@ abstract class CQueue_AbstractQueue implements CQueue_QueueInterface {
      * @return void
      */
     protected function raiseJobQueuedEvent($jobId, $job) {
-        if ($this->container->bound('events')) {
-            $this->container['events']->dispatch(new CQueue_Event_JobQueued($this->connectionName, $jobId, $job));
-        }
+        CEvent::dispatcher()->dispatch(new CQueue_Event_JobQueued($this->connectionName, $jobId, $job));
     }
 
     /**

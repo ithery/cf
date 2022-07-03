@@ -53,7 +53,7 @@ trait CElement_Component_DataTable_Trait_JavascriptTrait {
             $totalColumn++;
         }
 
-        if ($this->applyDataTable > 0) {
+        if ($this->applyDataTable) {
             $km = '';
             $vm = '';
             foreach ($this->paging_list as $k => $v) {
@@ -111,7 +111,7 @@ trait CElement_Component_DataTable_Trait_JavascriptTrait {
             }
 
             $js->appendln('var tableStyled_' . $this->id . ' = false;')->br()
-                ->appendln('var ' . $varNameOTable . ' = ' . $varName . '.dataTable({')->br()->incIndent();
+                ->appendln('window.' . $varNameOTable . ' = ' . $varName . '.dataTable({')->br()->incIndent();
 
             //   $js->appendln("responsive: {
             //        details: {
@@ -148,11 +148,7 @@ trait CElement_Component_DataTable_Trait_JavascriptTrait {
                 fnCallback(data.datatable);
                 if(data.js && data.js.length>0) {
                     var script = data.js;
-                    if(cresenity) {
-                        script = cresenity.base64.decode(script);
-                    } else {
-                        script = $.cresenity.base64.decode(script);
-                    }
+                    script = cresenity.base64.decode(script);
                     if(script.trim().length > 0) {
                         eval(script);
                     }

@@ -1,6 +1,6 @@
 <nav id="layout-sidenav" class="layout-sidenav sidenav sidenav-vertical bg-sidenav-theme navbar-default navbar-static-side layout-color-white" role="navigation">
     <div class="brand">
-        <div class="brand-inner d-flex flex-nowrap align-items-center m-auto">
+        <div class="brand-inner d-flex flex-nowrap align-items-center">
             <span class="brand-logo">
                 <img src="{{ c::media('img/favico.png') }}" />
             </span>

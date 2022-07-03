@@ -14,8 +14,14 @@ class CJavascript {
      */
     protected static $statements = [];
 
+    /**
+     * @var array
+     */
     protected static $deferredStatements = [];
 
+    /**
+     * @var int
+     */
     protected static $deferredStack = -1;
 
     public static function compile() {
@@ -32,6 +38,9 @@ class CJavascript {
         return self::$statements;
     }
 
+    /**
+     * @return CJavascript_Statement[]
+     */
     public static function getDeferredStatements() {
         if (!isset(self::$deferredStatements[self::$deferredStack])) {
             self::$deferredStatements[self::$deferredStack] = [];
@@ -40,6 +49,11 @@ class CJavascript {
         return self::$deferredStatements[self::$deferredStack];
     }
 
+    /**
+     * @param CJavascript_Statement $statement
+     *
+     * @return void
+     */
     public static function addStatement(CJavascript_Statement $statement) {
         if (self::$deferredStack >= 0) {
             return self::addDeferredStatement($statement);
@@ -60,6 +74,12 @@ class CJavascript {
         }
     }
 
+    /**
+     * @param CJavascript_Statement $statement
+     * @param bool                  $allStack
+     *
+     * @return void
+     */
     public static function removeDeferredStatement(CJavascript_Statement $statement, $allStack = true) {
         if (!isset(self::$deferredStatements[self::$deferredStack])) {
             self::$deferredStatements[self::$deferredStack] = [];
@@ -77,10 +97,16 @@ class CJavascript {
         }
     }
 
+    /**
+     * @return void
+     */
     public static function clearStatement() {
         self::$statements = [];
     }
 
+    /**
+     * @return void
+     */
     public static function clearDeferredStatement() {
         if (!isset(self::$deferredStatements[self::$deferredStack])) {
             self::$deferredStatements[self::$deferredStack] = [];
