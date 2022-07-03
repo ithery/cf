@@ -33,6 +33,12 @@ trait CTrait_Element_Transform {
         return $this;
     }
 
+    /**
+     * @param mixed $value
+     * @param mixed $data
+     *
+     * @return mixed
+     */
     public function applyTransform($value, $data = []) {
         if (empty($this->transforms)) {
             return $value;
