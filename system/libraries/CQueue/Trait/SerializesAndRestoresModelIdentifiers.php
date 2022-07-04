@@ -50,8 +50,9 @@ trait CQueue_Trait_SerializesAndRestoresModelIdentifiers {
             return $value;
         }
 
-        return is_array($value->id) ? $this->restoreCollection($value) : $this->getQueryForModelRestoration((new $value->class)->setConnection($value->connection), $value->id)
-                        ->useWritePdo()->firstOrFail();
+        return is_array($value->id)
+            ? $this->restoreCollection($value)
+            : $this->restoreModel($value);
     }
 
     /**
@@ -63,13 +64,41 @@ trait CQueue_Trait_SerializesAndRestoresModelIdentifiers {
      */
     protected function restoreCollection($value) {
         if (!$value->class || count($value->id) === 0) {
-            return new CModel_Collection;
+            return new CModel_Collection();
         }
-
-        return $this->getQueryForModelRestoration(
-            (new $value->class)->setConnection($value->connection),
+        $collection = $this->getQueryForModelRestoration(
+            (new $value->class())->setConnection($value->connection),
             $value->id
         )->useWritePdo()->get();
+        if (is_a($value->class, CModel_Relation_Pivot::class, true)
+            || in_array(CModel_Relation_Trait_AsPivot::class, class_uses($value->class))
+        ) {
+            return $collection;
+        }
+
+        $collection = $collection->keyBy->getKey();
+
+        $collectionClass = get_class($collection);
+
+        return new $collectionClass(
+            c::collect($value->id)->map(function ($id) use ($collection) {
+                return $collection[$id] ?? null;
+            })->filter()
+        );
+    }
+
+    /**
+     * Restore the model from the model identifier instance.
+     *
+     * @param \CModel_Identifier $value
+     *
+     * @return \CModel
+     */
+    public function restoreModel($value) {
+        return $this->getQueryForModelRestoration(
+            (new $value->class())->setConnection($value->connection),
+            $value->id
+        )->useWritePdo()->firstOrFail()->load(isset($value->relations) ? ($value->relations ?: []) : []);
     }
 
     /**

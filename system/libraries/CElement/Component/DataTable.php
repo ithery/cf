@@ -517,8 +517,8 @@ class CElement_Component_DataTable extends CElement_Component {
      * @return CElement_Component_DataTable
      */
     public function setApplyDataTable($bool) {
-        $this->applyDataTable = $bool;
-        if ($this->applyDataTable == false) {
+        $this->applyDataTable = (bool) $bool;
+        if ($this->applyDataTable === false) {
             $this->setAjax(false);
         }
 
@@ -893,6 +893,20 @@ class CElement_Component_DataTable extends CElement_Component {
         $this->footerActionList = null;
         $this->options = null;
         $this->data = null;
+
+        return $this;
+    }
+
+    public function getForAjaxSerialization() {
+        $table = clone $this;
+        $table->prepareForAjaxSerialization();
+
+        return $table;
+    }
+
+    public function prepareForAjaxSerialization() {
+        $this->parent = null;
+        $this->wrapper = null;
 
         return $this;
     }

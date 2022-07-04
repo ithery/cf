@@ -91,62 +91,67 @@ class CApp_Formatter {
         return $this;
     }
 
-    public function formatDate($x) {
+    public function formatDate($x, $format = null) {
         if (strlen($x) == 0) {
             return $x;
         }
-        $dateFormat = $this->dateFormat;
+        $dateFormat = $format ?: $this->dateFormat;
         if (strlen($dateFormat) == 0) {
             return $x;
         }
 
-        return date($dateFormat, strtotime($x));
+        return CCarbon::parse($x)->translatedFormat($dateFormat);
     }
 
-    public function unformatDate($x) {
-        $date = CCarbon::createFromFormat($this->dateFormat, $x);
+    public function unformatDate($x, $fromFormat = null) {
+        $dateFormat = $fromFormat ?: $this->dateFormat;
+        $date = CCarbon::createFromLocaleFormat($dateFormat, CCarbon::getLocale(), $x);
 
         return $date->format('Y-m-d');
     }
 
-    public function formatDatetime($x) {
+    public function formatDatetime($x, $format = null) {
         if (strlen($x) == 0) {
             return $x;
         }
-        $datetimeFormat = $this->datetimeFormat;
+        $datetimeFormat = $format ?: $this->datetimeFormat;
         if (strlen($datetimeFormat) == 0) {
             return $x;
         }
 
-        return date($datetimeFormat, strtotime($x));
+        return CCarbon::parse($x)->translatedFormat($datetimeFormat);
     }
 
-    public function unformatDatetime($x) {
-        $date = CCarbon::createFromFormat($this->datetimeFormat, $x);
+    public function unformatDatetime($x, $fromFormat = null) {
+        $datetimeFormat = $fromFormat ?: $this->datetimeFormat;
+        $date = CCarbon::createFromLocaleFormat($datetimeFormat, CCarbon::getLocale(), $x);
 
         return $date->format('Y-m-d H:i:s');
     }
 
-    public function formatCurrency($x, $decimalDigit = null) {
-        if ($decimalDigit == null) {
-            $decimalDigit = $this->decimalDigit;
+    public function formatCurrency($x, $decimalDigit = null, $decimalSeparator = null, $thousandSeparator = null, $currencyPrefix = null, $currencySuffix = null, $stripZeroDecimal = false) {
+        $decimalSeparator = $decimalSeparator ?: $this->decimalSeparator;
+        $thousandSeparator = $thousandSeparator ?: $this->thousandSeparator;
+        $decimalDigit = $decimalDigit ?: $this->decimalDigit;
+        $currencySuffix = $currencySuffix ?: $this->currencySuffix;
+        $currencyPrefix = $currencyPrefix ?: $this->currencyPrefix;
+
+        $x = number_format((float) $x, $decimalDigit, $decimalSeparator, $thousandSeparator);
+        if ($stripZeroDecimal) {
+            if (substr($x, ($decimalDigit + 1) * -1) === '.' . cstr::repeat('0', $decimalDigit)) {
+                $x = substr($x, 0, ($decimalDigit + 1) * -1);
+            }
         }
 
-        $x = number_format($x, $decimalDigit, $this->decimalSeparator, $this->thousandSeparator);
-
-        return $this->currencyPrefix . $x . $this->currencySuffix;
+        return $currencyPrefix . $x . $currencySuffix;
     }
 
-    public function formatNumber($x) {
-        return number_format($x, 0, $this->decimalSeparator, $this->thousandSeparator);
+    public function formatNumber($x, $decimalSeparator = null, $thousandSeparator = null) {
+        return $this->formatDecimal($x, 0, $decimalSeparator, $thousandSeparator);
     }
 
-    public function formatDecimal($x, $decimalDigit = null) {
-        if ($decimalDigit == null) {
-            $decimalDigit = $this->decimalDigit;
-        }
-
-        return number_format($x, $decimalDigit, $this->decimalSeparator, $this->thousandSeparator);
+    public function formatDecimal($x, $decimalDigit = null, $decimalSeparator = null, $thousandSeparator = null, $stripZeroDecimal = false) {
+        return $this->formatCurrency($x, $decimalDigit, $decimalSeparator, $thousandSeparator, '', '', $stripZeroDecimal);
     }
 
     public function unformatCurrency($number) {

@@ -35,14 +35,7 @@ class CElement_FormInput_Date extends CElement_FormInput {
         }
 
         $this->type = 'date';
-        $this->dateFormat = 'yyyy-mm-dd';
-        $dateFormat = c::formatter()->getDateFormat();
-        if ($dateFormat != null) {
-            $dateFormat = str_replace('Y', 'yyyy', $dateFormat);
-            $dateFormat = str_replace('m', 'mm', $dateFormat);
-            $dateFormat = str_replace('d', 'dd', $dateFormat);
-            $this->dateFormat = $dateFormat;
-        }
+        $this->dateFormat = c::formatter()->getDateFormat();
 
         $this->have_button = false;
         $this->startDate = '';
@@ -98,14 +91,81 @@ class CElement_FormInput_Date extends CElement_FormInput {
                         <span class="add-on"><i class="icon-th"></i></span>
                     </div>')->br();
         } else {
-            $html->appendln('<input type="text" name="' . $this->name . '"  data-date-format="' . $this->dateFormat . '" id="' . $this->id . '" class="datepicker input-unstyled' . $classes . $this->validation->validationClass() . '" value="' . $this->value . '"' . $disabled . $readonly . $addition_attribute . $custom_css . '>')->br();
+            $html->appendln('<input type="text" name="' . $this->name . '" id="' . $this->id . '" class="datepicker input-unstyled' . $classes . $this->validation->validationClass() . '" value="' . c::formatter()->formatDate($this->value, $this->dateFormat) . '"' . $disabled . $readonly . $addition_attribute . $custom_css . '>')->br();
         }
         //$html->appendln('<input type="text" name="'.$this->name.'"  data-date-format="'.$this->dateFormat.'" id="'.$this->id.'" class="datepicker input-unstyled'.$classes.$this->validation->validation_class().'" value="'.$this->value.'"'.$disabled.$custom_css.'>')->br();
 
         return $html->text();
     }
 
+    protected function getTranslation($key) {
+        return c::__('element/date.datepicker.' . $key);
+    }
+
     public function js($indent = 0) {
+        $jsLanguages = "$.fn.datepicker.dates['custom'] = {
+            days: [
+                '" . $this->getTranslation('days.Sunday') . "',
+                '" . $this->getTranslation('days.Monday') . "',
+                '" . $this->getTranslation('days.Tuesday') . "',
+                '" . $this->getTranslation('days.Wednesday') . "',
+                '" . $this->getTranslation('days.Thursday') . "',
+                '" . $this->getTranslation('days.Friday') . "',
+                '" . $this->getTranslation('days.Saturday') . "'
+            ],
+            daysShort: [
+                '" . $this->getTranslation('daysShort.Sun') . "',
+                '" . $this->getTranslation('daysShort.Mon') . "',
+                '" . $this->getTranslation('daysShort.Tue') . "',
+                '" . $this->getTranslation('daysShort.Wed') . "',
+                '" . $this->getTranslation('daysShort.Thu') . "',
+                '" . $this->getTranslation('daysShort.Fri') . "',
+                '" . $this->getTranslation('daysShort.Sat') . "'
+            ],
+            daysMin: [
+                '" . $this->getTranslation('daysMin.Su') . "',
+                '" . $this->getTranslation('daysMin.Mo') . "',
+                '" . $this->getTranslation('daysMin.Tu') . "',
+                '" . $this->getTranslation('daysMin.We') . "',
+                '" . $this->getTranslation('daysMin.Th') . "',
+                '" . $this->getTranslation('daysMin.Fr') . "',
+                '" . $this->getTranslation('daysMin.Sa') . "'
+            ],
+            months: [
+                '" . $this->getTranslation('months.January') . "',
+                '" . $this->getTranslation('months.February') . "',
+                '" . $this->getTranslation('months.March') . "',
+                '" . $this->getTranslation('months.April') . "',
+                '" . $this->getTranslation('months.May') . "',
+                '" . $this->getTranslation('months.June') . "',
+                '" . $this->getTranslation('months.July') . "',
+                '" . $this->getTranslation('months.August') . "',
+                '" . $this->getTranslation('months.September') . "',
+                '" . $this->getTranslation('months.October') . "',
+                '" . $this->getTranslation('months.November') . "',
+                '" . $this->getTranslation('months.December') . "'
+            ],
+            monthsShort: [
+                '" . $this->getTranslation('monthsShort.Jan') . "',
+                '" . $this->getTranslation('monthsShort.Feb') . "',
+                '" . $this->getTranslation('monthsShort.Mar') . "',
+                '" . $this->getTranslation('monthsShort.Apr') . "',
+                '" . $this->getTranslation('monthsShort.May') . "',
+                '" . $this->getTranslation('monthsShort.Jun') . "',
+                '" . $this->getTranslation('monthsShort.Jul') . "',
+                '" . $this->getTranslation('monthsShort.Aug') . "',
+                '" . $this->getTranslation('monthsShort.Sep') . "',
+                '" . $this->getTranslation('monthsShort.Oct') . "',
+                '" . $this->getTranslation('monthsShort.Nov') . "',
+                '" . $this->getTranslation('monthsShort.Dec') . "',
+            ],
+            today: '" . $this->getTranslation('today') . "',
+            clear: '" . $this->getTranslation('clear') . "',
+            format: 'yyyy-mm-dd',
+            titleFormat: 'MM yyyy', /* Leverages same syntax as 'format' */
+            weekStart: 0
+        }
+        ";
         $day_map = [
             'sunday' => '0',
             'monday' => '1',
@@ -124,35 +184,31 @@ class CElement_FormInput_Date extends CElement_FormInput {
 
         $disable_day_str = implode(',', $this->disable_day);
 
-        $option = '';
+        $jsOption = "
+            format: {
+                toDisplay: function (date, format, language) {
+                    return cresenity.formatter.formatDate(new Date(date),'" . $this->dateFormat . "');
+                },
+                toValue: function (date, format, language) {
+                    return cresenity.formatter.unformatDate(date,'" . $this->dateFormat . "');
+                }
+            }
+            ,language: 'custom'
+        ";
 
         if (strlen($this->startDate) > 0) {
-            if (strlen($option) > 0) {
-                $option .= ',';
-            }
-            $option .= "startDate: '" . $this->startDate . "'";
+            $jsOption .= ",startDate: '" . $this->startDate . "'";
         }
         if (strlen($this->end_date) > 0) {
-            if (strlen($option) > 0) {
-                $option .= ',';
-            }
-            $option .= "endDate: '" . $this->end_date . "'";
+            $jsOption .= ",endDate: '" . $this->end_date . "'";
         }
         if (strlen($disable_day_str)) {
-            if (strlen($option) > 0) {
-                $option .= ',';
-            }
-            $option .= "daysOfWeekDisabled: '" . $disable_day_str . "'";
+            $jsOption .= ",daysOfWeekDisabled: '" . $disable_day_str . "'";
         }
         $autoclose = 'true';
-        if (strlen($option) > 0) {
-            $option .= ',';
-        }
-        $option .= 'autoclose: ' . $autoclose . '';
+        $jsOption .= ',autoclose: ' . $autoclose . '';
 
-        if (strlen($option) > 0) {
-            $option = '{' . $option . '}';
-        }
+        $option = '{' . $jsOption . '}';
         $js = new CStringBuilder();
         $js->setIndent($indent);
         $js->append(parent::js($indent))->br();
@@ -163,6 +219,8 @@ class CElement_FormInput_Date extends CElement_FormInput {
             $js->append("$('#" . $this->id . "').datepicker(" . $option . ');')->br();
         }
 
-        return $js->text();
+        $jsText = $jsLanguages . $js->text();
+
+        return $jsText;
     }
 }

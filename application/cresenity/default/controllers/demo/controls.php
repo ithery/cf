@@ -16,6 +16,7 @@ class Controller_Demo_Controls extends \Cresenity\Demo\Controller {
         $radioField->addControl(null, 'radio')->setLabel('Radio 2')->setName('field-radio');
 
         $form->addField()->setLabel('Label')->addControl(null, 'label')->setValue('Label Only');
+
         return $app;
     }
 }

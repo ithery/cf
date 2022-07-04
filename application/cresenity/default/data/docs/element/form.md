@@ -1,7 +1,7 @@
 # Element - Form Element
 ### Introduction
 
-Form element digunakan untuk mempresentasikan ui form html
+Element Form digunakan untuk mempresentasikan ui form html
 
 Contoh Sederhana untuk form change password
 

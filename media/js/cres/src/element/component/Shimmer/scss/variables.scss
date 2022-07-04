@@ -1,0 +1,16 @@
+@use "sass:color";
+
+$cres-shimmer-direction:            ltr !default;
+$cres-shimmer-bg:                   #fff !default;
+$cres-shimmer-color:                #ced4da !default;
+$cres-shimmer-border:               1px solid color.scale($cres-shimmer-bg, $lightness: -10%) !default;
+$cres-shimmer-border-radius:        2px !default;
+
+$cres-shimmer-cols:                 12 !default;
+$cres-shimmer-cols-remove-odd:      true !default;
+$cres-shimmer-gutter:               30px !default;
+$cres-shimmer-spacer:               15px !default;
+
+$cres-shimmer-avatar-border-radius: 50% !default;
+
+$cres-shimmer-animation-duration:   0.8s !default;

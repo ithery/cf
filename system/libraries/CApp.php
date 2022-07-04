@@ -469,6 +469,12 @@ class CApp implements CInterface_Responsable, CInterface_Renderable, CInterface_
         return $childList;
     }
 
+    protected function minifyJavascript($buffer) {
+        $minifier = new CManager_Asset_Compiler_Minify_MinifyJs();
+
+        return $minifier->execute($buffer);
+    }
+
     public function toArray() {
         $data = [];
         $data['title'] = $this->title;
@@ -484,6 +490,10 @@ class CApp implements CInterface_Responsable, CInterface_Renderable, CInterface_
         $asset = CManager::asset();
         $html = $this->element->html();
         $js = $this->element->js();
+        if (CF::config('app.javascript.minify')) {
+            $js = $this->minifyJavascript($js);
+        }
+
         $js = $asset->renderJsRequire($js, 'cresenity.cf.require');
 
         $cappScript = $this->yieldPushContent('capp-script');

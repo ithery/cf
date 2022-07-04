@@ -96,7 +96,11 @@ class CQueue_Queue_RedisQueue extends CQueue_AbstractQueue implements CQueue_Con
         $this->getConnection()->pipeline(function () use ($jobs, $data, $queue) {
             $this->getConnection()->transaction(function () use ($jobs, $data, $queue) {
                 foreach ((array) $jobs as $job) {
-                    $this->push($job, $data, $queue);
+                    if (isset($job->delay)) {
+                        $this->later($job->delay, $job, $data, $queue);
+                    } else {
+                        $this->push($job, $data, $queue);
+                    }
                 }
             });
         });
@@ -182,7 +186,9 @@ class CQueue_Queue_RedisQueue extends CQueue_AbstractQueue implements CQueue_Con
             $payload
         );
 
-        return json_decode($payload, true)['id'] ?? null;
+        $decoded = json_decode($payload, true);
+
+        return isset($decoded['id']) ? $decoded['id'] : null;
     }
 
     /**
