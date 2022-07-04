@@ -70,6 +70,15 @@ trait CApp_Concern_VariablesTrait {
         $variables['labelCancel'] = c::__('Cancel');
         $variables['isAuthEnabled'] = c::app()->isAuthEnabled();
 
+        $labels = [
+            'confirm' => [
+                'areYouSure' => c::__('app.confirm:areYouSure'),
+                'labelOk' => c::__('app.confirm:labelCancel'),
+                'labelCancel' => c::__('app.confirm:labelCancel'),
+            ]
+        ];
+        $variables['labels'] = $labels;
+
         $asset = CManager::asset();
         $variables['requireJs'] = false;
 
