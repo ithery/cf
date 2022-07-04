@@ -832,7 +832,7 @@ class CStorage_Adapter implements CStorage_CloudInterface {
     /**
      * Get the Flysystem driver.
      *
-     * @return \League\Flysystem\FilesystemInterface
+     * @return \League\Flysystem\FilesystemOperator
      */
     public function getDriver() {
         return $this->driver;
@@ -915,5 +915,9 @@ class CStorage_Adapter implements CStorage_CloudInterface {
         }
 
         return call_user_func_array([$this->driver, $method], $parameters);
+    }
+
+    public function getPrefixer() {
+        return $this->prefixer;
     }
 }
