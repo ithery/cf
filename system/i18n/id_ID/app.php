@@ -1,6 +1,8 @@
 <?php
 return [
     'confirm:areYouSure' => 'Apakah anda yakin ?',
-    'confirm:labelOk' => 'OK',
-    'confirm:labelCancel' => 'Batal',
+    'confirm:yes' => 'Ya',
+    'confirm:no' => 'Tidak',
+    'yes' => 'Ya',
+    'no' => 'Tidak',
 ];

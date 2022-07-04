@@ -2,6 +2,8 @@
 
 return [
     'confirm:areYouSure' => 'Are you sure ?',
-    'confirm:labelOk' => 'OK',
-    'confirm:labelCancel' => 'Cancel',
+    'confirm:yes' => 'Yes',
+    'confirm:no' => 'No',
+    'yes' => 'Yes',
+    'no' => 'No',
 ];
