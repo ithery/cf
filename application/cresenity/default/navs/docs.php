@@ -244,6 +244,16 @@ return [
                 'uri' => 'docs/cresjs/reload',
             ],
             [
+                'name' => 'cresjs.confirm',
+                'label' => c::__('Confirm'),
+                'uri' => 'docs/cresjs/confirm',
+            ],
+            [
+                'name' => 'cresjs.observer',
+                'label' => c::__('Observer'),
+                'uri' => 'docs/cresjs/observer',
+            ],
+            [
                 'name' => 'cresjs.ui',
                 'label' => c::__('UI'),
                 'uri' => 'docs/cresjs/ui',

@@ -19,10 +19,9 @@ class Controller_Demo_Dashboard extends \Cresenity\Demo\Controller {
         // $table->addColumn('isd')->setLabel('ISD');
         // $table->setAjax();
 
-        $table = $app->addTable();
+        $table = $app->addTable('dummytable');
 
         $table->setDataFromModel(DummyModel::class, function ($q) {
-            $q->where('userId', '=', 3);
         });
         $table->addColumn('userId')->setLabel('userId');
         $table->addColumn('id')->setLabel('ID');

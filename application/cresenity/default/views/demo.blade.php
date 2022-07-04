@@ -45,4 +45,14 @@ $name = \Cresenity\Demo\DemoVariable::username();
     </div>
     <div class="layout-overlay layout-sidenav-toggle"></div>
 </div><!-- /wrapper -->
+
+<script>
+    window.addEventListener('cresenity:loaded',()=>{
+        cresenity.setConfirmHandler((owner, setting, callback)=>{
+            const confirmed = window.confirm('Sungguhan ta?');
+            callback(confirmed);
+        });
+    });
+
+</script>
 @endsection
