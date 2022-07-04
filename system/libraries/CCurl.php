@@ -4,7 +4,7 @@ class CCurl {
     use CTrait_Compat_Curl;
 
     /**
-     * CurlHandle
+     * CurlHandle.
      *
      * @var CurlHandle|mixed
      */
@@ -84,6 +84,7 @@ class CCurl {
 
     public function setSoapAction($action) {
         $this->soap_action = $action;
+
         return $this;
     }
 
@@ -93,6 +94,7 @@ class CCurl {
 
     public function setEngine($engine) {
         $this->engine = $engine;
+
         return $this;
     }
 
@@ -100,6 +102,7 @@ class CCurl {
         switch ($this->engine) {
             case 'curl':
                 $this->handle = curl_init();
+
                 break;
             case 'soapclient':
                 $http_header = [
@@ -108,8 +111,10 @@ class CCurl {
                     'uri' => $this->url,
                 ];
                 $this->handle = new SoapClient(null, $http_header);
+
                 break;
         }
+
         return $this;
     }
 
@@ -117,9 +122,11 @@ class CCurl {
         switch ($this->engine) {
             case 'curl':
                 @curl_close($this->handle);
+
                 break;
         }
         $this->handle = null;
+
         return $this;
     }
 
@@ -130,11 +137,12 @@ class CCurl {
             }
         }
         $this->options[$key] = $value;
+
         return $this;
     }
 
     /**
-     * Get value from key
+     * Get value from key.
      *
      * @param string $key
      *
@@ -144,6 +152,7 @@ class CCurl {
         if (isset($this->options[$key])) {
             return $this->options[$key];
         }
+
         return null;
     }
 
@@ -153,6 +162,7 @@ class CCurl {
 
     public function setHttpUserAgent($http_user_agent) {
         $this->http_user_agent = $http_user_agent;
+
         return $this;
     }
 
@@ -170,8 +180,10 @@ class CCurl {
             $request = $this->getOpt(CURLOPT_POSTFIELDS);
             if ($this->handle != null) {
                 $this->last_response_body = $this->last_response = $this->handle->__doRequest($request, $this->url, $this->soap_action, 1);
+
                 return true;
             }
+
             return false;
         }
 
@@ -220,11 +232,12 @@ class CCurl {
                 $this->last_response_body = $arr[1];
             }
         }
+
         return $this;
     }
 
     /**
-     * Parse Header
+     * Parse Header.
      *
      * @param string $header_str
      *
@@ -279,9 +292,11 @@ class CCurl {
         switch ($this->engine) {
             case 'curl':
                 $httpcode = curl_getinfo($this->handle, CURLINFO_HTTP_CODE);
+
                 break;
             case 'soapclient':
                 $httpcode = '200';
+
                 break;
         }
 
@@ -311,6 +326,7 @@ class CCurl {
             foreach ($this->last_followed as $ah) {
                 $arr[] = explode("\r\n", $ah);
             }
+
             return $arr;
         }
 
@@ -319,14 +335,14 @@ class CCurl {
 
     public function hasError() {
         if (isset($this->last_status['error'])) {
-            return (empty($this->last_status['error']) ? false : $this->last_status['error']);
+            return empty($this->last_status['error']) ? false : $this->last_status['error'];
         } else {
             return false;
         }
     }
 
     /**
-     * Get last response
+     * Get last response.
      *
      * @return string
      */
@@ -337,11 +353,13 @@ class CCurl {
     public function setCookiesFile($filename) {
         $this->setOpt(CURLOPT_COOKIEJAR, $filename);
         $this->setOpt(CURLOPT_COOKIEFILE, $filename);
+
         return $this;
     }
 
     public function setTimeout($milisecond) {
         $this->setOpt(CURLOPT_TIMEOUT, $milisecond);
+
         return $this;
     }
 
@@ -349,6 +367,7 @@ class CCurl {
         $this->post_data = $string;
         $this->setOpt(CURLOPT_POST, true);
         $this->setOpt(CURLOPT_POSTFIELDS, $string);
+
         return $this;
     }
 
@@ -357,33 +376,39 @@ class CCurl {
         $post_data = curl::asPostString($data);
         $this->setOpt(CURLOPT_POST, true);
         $this->setOpt(CURLOPT_POSTFIELDS, $post_data);
+
         return $this;
     }
 
     public function setSSL() {
         $this->setOpt(CURLOPT_SSL_VERIFYPEER, false);
         $this->setOpt(CURLOPT_SSL_VERIFYHOST, false);
+
         return $this;
     }
 
     public function setReferrer($referrer) {
         $this->setOpt(CURLOPT_REFERER, $referrer);
+
         return $this;
     }
 
     public function setUserAgent($useragent) {
         $this->setOpt(CURLOPT_USERAGENT, $useragent);
+
         return $this;
     }
 
     public function setHttpHeader($http_header) {
         $this->setOpt(CURLOPT_HTTPHEADER, $http_header);
+
         return $this;
     }
 
     public function setUrl($url) {
         $this->setOpt(CURLOPT_URL, $url);
         $this->url = $url;
+
         return $this;
     }
 

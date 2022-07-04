@@ -40,6 +40,9 @@ class CManager_File_Connector_FileManager_FM_StorageRepository {
     }
 
     public function rootPath() {
+        $prefixer = $this->disk->getPrefixer();
+
+        return $prefixer->prefixPath('');
         $adapter = $this->disk->getDriver()->getAdapter();
         if ($adapter instanceof CachedAdapter) {
             $adapter = $adapter->getAdapter();
@@ -54,6 +57,7 @@ class CManager_File_Connector_FileManager_FM_StorageRepository {
         if ($this->isDirectory()) {
             return $this->moveRecursive($this->path, $newFmPath->path('storage'));
         }
+
         return $this->disk->move($this->path, $newFmPath->path('storage'));
     }
 
@@ -68,6 +72,7 @@ class CManager_File_Connector_FileManager_FM_StorageRepository {
         $pathExploded = explode('/', $path);
         $lastDirectory = carr::get($pathExploded, count($pathExploded) - 1);
         $parentPath = substr($path, 0, strlen($path) - strlen($lastDirectory));
+
         return in_array($path, $this->disk->directories($parentPath));
     }
 
@@ -75,6 +80,7 @@ class CManager_File_Connector_FileManager_FM_StorageRepository {
         if ($this->isDirectory($from)) {
             return $this->moveDirectory($from, $to);
         }
+
         return $this->disk->move($from, $to);
     }
 
