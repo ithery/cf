@@ -1,7 +1,7 @@
 # Element - Table Element
 ### Introduction
 
-Table element digunakan untuk mempresentasikan ui table
+Element Table digunakan untuk mempresentasikan ui table
 
 
 ### Table Data
@@ -12,7 +12,7 @@ method setDataFromArray tidak direkomendasikan jika data array sangat banyak
 
 ```php
 $app = c::app();
-$table $app->addTable();
+$table = $app->addTable();
 $table->setDataFromArray([
     [
         'role'=>'Developer',
@@ -68,6 +68,16 @@ return $app;
 Koneksi yang digunakan pada table adalah sesuai koneksi `default` pada config `database.php`
 
 
+### Column Callback
+
+```php
+$table->addColumn('request')->setLabel('Request')->setCallback(function ($row, $value) {
+    return CElement_Component_ShowMore::factory()->addClass('whitespace-pre')->add(json_encode(json_decode($value, true), JSON_PRETTY_PRINT));
+});
+```
+
+
+
 ### Translations/Label
 
 Secara default translation dapat dicopy dari path `{DOCROOT}system/i18n/en_US/element/datatable.php`
@@ -111,26 +121,26 @@ return  [
 
 Contoh kode untuk ubah label sesuai condition:
 ```php
-    $table->addRowAction()->withRowCallback(function ($element, $row) {
-        $isActive = carr::get($row, 'is_active');
-        $element->setIcon($isActive ? 'ti ti-close' : 'ti ti-check')
-            ->setLabel($isActive ? 'Non Aktifkan' : 'Aktifkan')
-            ->setLink(c::url('url/toactivate/or/nonactivate/customer/{customer_id}'));
-    });
+$table->addRowAction()->withRowCallback(function ($element, $row) {
+    $isActive = carr::get($row, 'is_active');
+    $element->setIcon($isActive ? 'ti ti-close' : 'ti ti-check')
+        ->setLabel($isActive ? 'Non Aktifkan' : 'Aktifkan')
+        ->setLink(c::url('url/toactivate/or/nonactivate/customer/{customer_id}'));
+});
 ```
 
 Contoh kode untuk hide / show action saat kondisi tertentu
 ```php
-    $table->addRowAction()->withRowCallback(function ($element, $row) {
-        $isLocked = carr::get($row, 'is_locked');
-        if (!$isLocked) {
-            $element->setVisibility(true);
-            $element->setIcon('ti ti-trash')
-                ->setLabel('Delete')
-                ->setConfirm(true)
-                ->setLink(c::url('url/todelete/{something_id}'));
-        } else {
-            $element->setVisibility(false);
-        }
-    });
+$table->addRowAction()->withRowCallback(function ($element, $row) {
+    $isLocked = carr::get($row, 'is_locked');
+    if (!$isLocked) {
+        $element->setVisibility(true);
+        $element->setIcon('ti ti-trash')
+            ->setLabel('Delete')
+            ->setConfirm(true)
+            ->setLink(c::url('url/todelete/{something_id}'));
+    } else {
+        $element->setVisibility(false);
+    }
+});
 ```

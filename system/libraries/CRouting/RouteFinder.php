@@ -15,10 +15,7 @@ class CRouting_RouteFinder {
      */
     public static function find($uri = null) {
         if ($uri == null) {
-            $uri = CHTTP::request()->path();
-            if (PHP_SAPI == 'cli') {
-                $uri = CRouting_UrlFinder::getUri();
-            }
+            $uri = PHP_SAPI == 'cli' ? CRouting_UrlFinder::getUri() : CHTTP::request()->path();
 
             $uri = trim($uri, '/');
         }
@@ -52,6 +49,7 @@ class CRouting_RouteFinder {
             //cdbg::dd($routedUri);
             //$routedUri = 't/ittron/feeds/hashtag/posts/{any0}';
             $route = new CRouting_Route(CRouting_Router::$verbs, $routedUri, $className . '@' . $method, $parameters);
+
             $route->setRouteData($routeData);
         }
 

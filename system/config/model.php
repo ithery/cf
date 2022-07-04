@@ -178,4 +178,7 @@ return [
             CModel_Metable_DataType_Handler_ObjectHandler::class,
         ],
     ],
+    'array_driver' => [
+
+    ]
 ];

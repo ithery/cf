@@ -68,7 +68,8 @@ class CQueue_Job_SqsJob extends CQueue_AbstractJob {
     public function delete() {
         parent::delete();
         $this->sqs->deleteMessage([
-            'QueueUrl' => $this->queue, 'ReceiptHandle' => $this->job['ReceiptHandle'],
+            'QueueUrl' => $this->queue,
+            'ReceiptHandle' => $this->job['ReceiptHandle'],
         ]);
     }
 

@@ -10,6 +10,7 @@ defined('SYSPATH') or die('No direct access allowed.');
  * @license Ittron Global Teknologi
  */
 use Cresenity\Documentation\Renderer;
+use League\CommonMark\MarkdownConverter;
 use League\CommonMark\CommonMarkConverter;
 use League\CommonMark\Environment\Environment;
 use League\CommonMark\Extension\Table\TableExtension;
@@ -59,12 +60,13 @@ class Controller_Docs extends CController {
                 ],
             ],
         ];
-
-        $environment = Environment::createCommonMarkEnvironment($config);
+        // Define your configuration, if needed
+        $config = [];
+        $environment = new Environment($config);
         $environment->addExtension(new CommonMarkCoreExtension());
         $environment->addExtension(new GithubFlavoredMarkdownExtension());
-        $environment->addExtension(new TableExtension());
-        $converter = new CommonMarkConverter([], $environment);
+
+        $converter = new MarkdownConverter($environment);
         $html = $converter->convertToHtml($content);
 
         $renderer = new Renderer($html);

@@ -29,8 +29,8 @@ trait CApp_Concern_VariablesTrait {
         $variables['format']['decimalSeparator'] = static::formatter()->getDecimalSeparator();
         $variables['format']['thousandSeparator'] = static::formatter()->getThousandSeparator();
         $variables['format']['decimalDigit'] = static::formatter()->getDecimalDigit();
-        $variables['format']['date'] = static::formatter()->getDatetimeFormat();
-        $variables['format']['datetime'] = static::formatter()->getDateFormat();
+        $variables['format']['date'] = static::formatter()->getDateFormat();
+        $variables['format']['datetime'] = static::formatter()->getDatetimeFormat();
         $variables['have_clock'] = $variables['haveClock'] = false;
         $variables['have_scroll_to_top'] = $variables['haveScrollToTop'] = CF::config('cresjs.scroll_to_top');
         $variables['CFVersion'] = CF::version();
@@ -69,6 +69,17 @@ trait CApp_Concern_VariablesTrait {
         $variables['label_cancel'] = c::__('Cancel');
         $variables['labelCancel'] = c::__('Cancel');
         $variables['isAuthEnabled'] = c::app()->isAuthEnabled();
+
+        $labels = [
+            'confirm' => [
+                'areYouSure' => c::__('app.confirm:areYouSure'),
+                'yes' => c::__('app.confirm:yes'),
+                'no' => c::__('app.confirm:no'),
+            ],
+            'yes' => c::__('app.yes'),
+            'no' => c::__('app.no'),
+        ];
+        $variables['labels'] = $labels;
 
         $asset = CManager::asset();
         $variables['requireJs'] = false;

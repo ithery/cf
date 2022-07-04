@@ -272,15 +272,6 @@ abstract class CQueue_AbstractJob implements CQueue_JobInterface {
     }
 
     /**
-     * Get the number of seconds to delay a failed job before retrying it.
-     *
-     * @return null|int
-     */
-    public function delaySeconds() {
-        return isset($this->payload()['delay']) ? $this->payload()['delay'] : null;
-    }
-
-    /**
      * Get the number of seconds the job can run.
      *
      * @return null|int
@@ -296,15 +287,6 @@ abstract class CQueue_AbstractJob implements CQueue_JobInterface {
      */
     public function retryUntil() {
         return isset($this->payload()['retryUntil']) ? $this->payload()['retryUntil'] : (isset($this->payload()['timeoutAt']) ? $this->payload()['timeoutAt'] : null);
-    }
-
-    /**
-     * Get the timestamp indicating when the job should timeout.
-     *
-     * @return null|int
-     */
-    public function timeoutAt() {
-        return isset($this->payload()['timeoutAt']) ? $this->payload()['timeoutAt'] : null;
     }
 
     /**

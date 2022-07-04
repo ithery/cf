@@ -37,7 +37,7 @@ trait CElement_FormInput_Trait_PredefinedDateRangeTrait {
 
         $dateStart = Carbon::createFromTimestamp(0);
         $dateEnd = Carbon::now();
-        $this->addRange($labelTranslated, $dateStart->format($this->dateFormat), $dateEnd->format($this->dateFormat));
+        $this->addRange($labelTranslated, $dateStart, $dateEnd);
 
         return $this;
     }
@@ -50,7 +50,7 @@ trait CElement_FormInput_Trait_PredefinedDateRangeTrait {
 
         $dateStart = Carbon::now();
         $dateEnd = Carbon::now();
-        $this->addRange($labelTranslated, $dateStart->format($this->dateFormat), $dateEnd->format($this->dateFormat));
+        $this->addRange($labelTranslated, $dateStart, $dateEnd);
 
         return $this;
     }
@@ -62,7 +62,7 @@ trait CElement_FormInput_Trait_PredefinedDateRangeTrait {
         }
         $dateStart = Carbon::yesterday()->hour(0)->minute(0)->second(0);
         $dateEnd = Carbon::yesterday()->hour(23)->minute(59)->second(59);
-        $this->addRange($labelTranslated, $dateStart->format($this->dateFormat), $dateEnd->format($this->dateFormat));
+        $this->addRange($labelTranslated, $dateStart, $dateEnd);
 
         return $this;
     }
@@ -74,7 +74,7 @@ trait CElement_FormInput_Trait_PredefinedDateRangeTrait {
         }
         $dateStart = Carbon::now()->subDay(7);
         $dateEnd = Carbon::now();
-        $this->addRange($labelTranslated, $dateStart->format($this->dateFormat), $dateEnd->format($this->dateFormat));
+        $this->addRange($labelTranslated, $dateStart, $dateEnd);
 
         return $this;
     }
@@ -86,7 +86,7 @@ trait CElement_FormInput_Trait_PredefinedDateRangeTrait {
         }
         $dateStart = Carbon::now()->subDay(14);
         $dateEnd = Carbon::now();
-        $this->addRange($labelTranslated, $dateStart->format($this->dateFormat), $dateEnd->format($this->dateFormat));
+        $this->addRange($labelTranslated, $dateStart, $dateEnd);
 
         return $this;
     }
@@ -98,7 +98,7 @@ trait CElement_FormInput_Trait_PredefinedDateRangeTrait {
         }
         $dateStart = Carbon::now()->subDay(30);
         $dateEnd = Carbon::now();
-        $this->addRange($labelTranslated, $dateStart->format($this->dateFormat), $dateEnd->format($this->dateFormat));
+        $this->addRange($labelTranslated, $dateStart, $dateEnd);
 
         return $this;
     }
@@ -110,7 +110,7 @@ trait CElement_FormInput_Trait_PredefinedDateRangeTrait {
         }
         $dateStart = Carbon::now()->modify('this week');
         $dateEnd = Carbon::now()->modify('this week +6 days');
-        $this->addRange($labelTranslated, $dateStart->format($this->dateFormat), $dateEnd->format($this->dateFormat));
+        $this->addRange($labelTranslated, $dateStart, $dateEnd);
 
         return $this;
     }
@@ -122,7 +122,7 @@ trait CElement_FormInput_Trait_PredefinedDateRangeTrait {
         }
         $dateStart = Carbon::now()->modify('last week');
         $dateEnd = Carbon::now()->modify('last week +6 days');
-        $this->addRange($labelTranslated, $dateStart->format($this->dateFormat), $dateEnd->format($this->dateFormat));
+        $this->addRange($labelTranslated, $dateStart, $dateEnd);
 
         return $this;
     }
@@ -134,7 +134,7 @@ trait CElement_FormInput_Trait_PredefinedDateRangeTrait {
         }
         $dateStart = Carbon::now()->modify('first day of this month');
         $dateEnd = Carbon::now()->modify('last day of this month');
-        $this->addRange($labelTranslated, $dateStart->format($this->dateFormat), $dateEnd->format($this->dateFormat));
+        $this->addRange($labelTranslated, $dateStart, $dateEnd);
 
         return $this;
     }
@@ -146,7 +146,7 @@ trait CElement_FormInput_Trait_PredefinedDateRangeTrait {
         }
         $dateStart = Carbon::now()->modify('first day of last month');
         $dateEnd = Carbon::now()->modify('last day of last month');
-        $this->addRange($labelTranslated, $dateStart->format($this->dateFormat), $dateEnd->format($this->dateFormat));
+        $this->addRange($labelTranslated, $dateStart, $dateEnd);
 
         return $this;
     }
