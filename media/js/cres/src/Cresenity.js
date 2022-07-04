@@ -326,7 +326,7 @@ export default class Cresenity {
             // These are the defaults.
             method: 'get',
             dataAddition: {},
-            message: 'Are you sure?',
+            message: capp?.labels?.confirm?.areYouSure ?? 'Are you sure?',
             onConfirmed: false,
             confirmCallback: false,
             owner: null
