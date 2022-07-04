@@ -263,6 +263,11 @@ return [
                 'label' => c::__('Helper'),
                 'uri' => 'docs/cresjs/helper',
             ],
+            [
+                'name' => 'cresjs.cssVar',
+                'label' => c::__('CSS Var'),
+                'uri' => 'docs/cresjs/cssVar',
+            ],
 
         ]
     ],

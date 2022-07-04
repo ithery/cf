@@ -13,7 +13,8 @@ class Controller_Demo_Controls_Text extends \Cresenity\Demo\Controller {
         $div->addH5()->add('Text Input With Placeholder');
         $div->addTextControl()->setPlaceholder('My Placeholder');
 
-        $app->addAction()->setLabel('Action')->addClass('btn-primary')->setConfirm()->setLink(c::url('asd'));
+        $app->addAction()->setLabel('Action')->addClass('btn-primary')->addAttr('style', 'height: calc( var(--cres-window-height) / 2)')
+            ->setConfirm()->setLink(c::url('asd'));
 
         $app->addForm()->addField()->setLabel('My Field')->setTooltipText('abc');
         $app->addDiv()->addClass('my-element');

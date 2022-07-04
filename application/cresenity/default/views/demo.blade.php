@@ -48,9 +48,9 @@ $name = \Cresenity\Demo\DemoVariable::username();
 
 <script>
     window.addEventListener('cresenity:loaded',()=>{
-        cresenity.setConfirmHandler((owner, setting, callback)=>{
-            const confirmed = window.confirm('Sungguhan ta?');
-            callback(confirmed);
+        cresenity.observer.elementRendered('.my-element',(element) => {
+
+            element.innerHTML = element.innerHTML + '|rendered dari js';
         });
     });
 
