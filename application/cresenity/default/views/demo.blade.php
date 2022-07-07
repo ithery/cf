@@ -45,4 +45,14 @@ $name = \Cresenity\Demo\DemoVariable::username();
     </div>
     <div class="layout-overlay layout-sidenav-toggle"></div>
 </div><!-- /wrapper -->
+
+<script>
+    window.addEventListener('cresenity:loaded',()=>{
+        cresenity.observer.elementRendered('.my-element',(element) => {
+
+            element.innerHTML = element.innerHTML + '|rendered dari js';
+        });
+    });
+
+</script>
 @endsection

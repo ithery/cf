@@ -10,6 +10,12 @@ abstract class CNotification_ChannelAbstract implements CNotification_ChannelInt
         $this->channelName = 'Custom';
     }
 
+    /**
+     * @param string $className
+     * @param array  $options
+     *
+     * @return CQueue_AbstractTask
+     */
     public function send($className, array $options = []) {
         $notificationSenderJobClass = CF::config('notification.task_queue.notification_sender', CNotification_TaskQueue_NotificationSender::class);
 

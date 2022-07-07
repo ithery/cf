@@ -73,7 +73,7 @@ class CObservable_Listener extends CObservable_ListenerAbstract {
         if ($this->confirm) {
             $confirmMessage = $this->confirmMessage;
             if (strlen($confirmMessage) == 0) {
-                $confirmMessage = c::__('Are you sure ?');
+                $confirmMessage = c::__('app.confirm:areYouSure');
             }
             $confirmStartScript = "
                 window.cresenity.confirm({owner:thiselm, message:'" . c::e($confirmMessage) . "',confirmCallback: function(confirmed) {
