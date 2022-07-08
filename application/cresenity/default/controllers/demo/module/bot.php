@@ -2,7 +2,10 @@
 
 class Controller_Demo_Module_Bot extends \Cresenity\Demo\Controller {
     public function index() {
-        $bot = CBot::createBot();
+        $config = [
+            'bot_id' => uniqid(),
+        ];
+        $bot = CBot::createBot($config);
 
         $bot->hears('Hello BotMan!', function ($bot) {
             $bot->reply('Hello!');

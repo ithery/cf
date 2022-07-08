@@ -43,7 +43,7 @@ abstract class CBot_DriverAbstract implements CBot_Contract_DriverInterface {
     /**
      * Return the driver configuration.
      *
-     * @return Collection
+     * @return CCollection
      */
     public function getConfig() {
         return $this->config;

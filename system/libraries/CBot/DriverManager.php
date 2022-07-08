@@ -1,11 +1,5 @@
 <?php
 
-use BotMan\BotMan\Http\Curl;
-use Illuminate\Support\Collection;
-use BotMan\BotMan\Interfaces\HttpInterface;
-use BotMan\BotMan\Interfaces\DriverInterface;
-use BotMan\BotMan\Interfaces\VerifiesService;
-
 class CBot_DriverManager {
     /**
      * @var array

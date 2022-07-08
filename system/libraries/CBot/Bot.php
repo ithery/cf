@@ -3,6 +3,57 @@
  * @see CBot
  */
 class CBot_Bot {
+    use CBot_Trait_ProvidesStorageTrait;
+    use CBot_Trait_HandlesConversationsTrait;
+    use CBot_Trait_HandlesExceptionsTrait;
+
+    /**
+     * @var CBot_MiddlewareManager
+     */
+    public $middleware;
+
+    /**
+     * @var \CCollection
+     */
+    protected $event;
+
+    /**
+     * @var CBot_Command
+     */
+    protected $command;
+
+    /**
+     * @var CBot_Message_Incoming_IncomingMessage
+     */
+    protected $message;
+
+    /**
+     * @var CBot_Message_Outgoing_OutgoingMessage|CBot_Message_Outgoing_Question
+     */
+    protected $outgoingMessage;
+
+    /**
+     * @var string
+     */
+    protected $driverName;
+
+    /**
+     * @var null|array
+     */
+    protected $currentConversationData;
+
+    /**
+     * @var CBot_Contract_ExceptionHandlerInterface
+     */
+    protected $exceptionHandler;
+
+    /**
+     * IncomingMessage service events.
+     *
+     * @var array
+     */
+    protected $events = [];
+
     /**
      * The fallback message to use, if no match
      * could be heard.
@@ -10,6 +61,11 @@ class CBot_Bot {
      * @var null|callable
      */
     protected $fallbackMessage;
+
+    /**
+     * @var array
+     */
+    protected $groupAttributes = [];
 
     /**
      * @var array
@@ -22,9 +78,19 @@ class CBot_Bot {
     protected $driver;
 
     /**
+     * @var CBot_ConversationManager
+     */
+    protected $conversationManager;
+
+    /**
      * @var CBot_Message_Matcher
      */
     protected $matcher;
+
+    /**
+     * @var CBot_Contract_StorageInterface
+     */
+    protected $storage;
 
     /**
      * @var bool
@@ -41,12 +107,27 @@ class CBot_Bot {
      */
     protected $runsOnSocket = false;
 
-    public function __construct(array $config, CBot_Contract_DriverInterface $driver, CBot_Message_Matcher $matcher = null) {
+    /**
+     * @var CCache_Repository
+     */
+    private $cache;
+
+    public function __construct(
+        array $config,
+        CBot_Contract_DriverInterface $driver,
+        CBot_Contract_StorageInterface $storage,
+        CCache_Repository $cache,
+        CBot_Message_Matcher $matcher = null
+    ) {
         $this->config = $config;
         $this->driver = $driver;
+        $this->cache = $cache;
+        $this->storage = $storage;
+        $this->message = new CBot_Message_Incoming_IncomingMessage('', '', '', null, $this->config['bot_id']);
         $this->matcher = new CBot_Message_Matcher();
         $this->middleware = new CBot_MiddlewareManager($this);
         $this->conversationManager = new CBot_ConversationManager($matcher);
+        $this->exceptionHandler = new CBot_ExceptionHandler();
     }
 
     /**
@@ -131,7 +212,7 @@ class CBot_Bot {
         $this->cache->put(
             'user_' . $this->driver->getName() . '_' . $user->getId(),
             $user,
-            $this->config['user_cache_time'] ?? 30
+            $this->config['user_cache_time'] ?? 30 * 60
         );
 
         return $user;

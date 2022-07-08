@@ -1,22 +1,5 @@
 <?php
 
-use Closure;
-use CBot_Bot;
-use BotMan\BotMan\BotMan;
-use Mpociot\Pipeline\Pipeline;
-use CBot_Contract_MiddlewareInterface;
-use CBot_Contract_Middleware_HeardInterface;
-use BotMan\BotMan\Interfaces\Middleware\Heard;
-use CBot_Contract_Middleware_SendingInterface;
-use CBot_Contract_Middleware_CapturedInterface;
-use CBot_Contract_Middleware_MatchingInterface;
-use CBot_Contract_Middleware_ReceivedInterface;
-use BotMan\BotMan\Interfaces\Middleware\Sending;
-use BotMan\BotMan\Interfaces\Middleware\Captured;
-use BotMan\BotMan\Interfaces\Middleware\Matching;
-use BotMan\BotMan\Interfaces\Middleware\Received;
-use BotMan\BotMan\Interfaces\MiddlewareInterface;
-
 class CBot_MiddlewareManager {
     /**
      * @var CBot_Contract_Middleware_ReceivedInterface[]

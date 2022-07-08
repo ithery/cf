@@ -1,12 +1,6 @@
 <?php
 
-use Closure;
-use Illuminate\Support\Collection;
 use Opis\Closure\SerializableClosure;
-
-use BotMan\BotMan\Interfaces\ShouldQueue;
-use BotMan\BotMan\Messages\Outgoing\Question;
-use BotMan\BotMan\Messages\Incoming\IncomingMessage;
 
 trait CBot_Trait_HandlesConversationsTrait {
     /**
@@ -24,10 +18,10 @@ trait CBot_Trait_HandlesConversationsTrait {
     }
 
     /**
-     * @param \CBot_Message_ConversationAbstract $instance
-     * @param array|Closure                      $next
-     * @param string|Question                    $question
-     * @param array                              $additionalParameters
+     * @param \CBot_Message_ConversationAbstract    $instance
+     * @param array|Closure                         $next
+     * @param string|CBot_Message_Outgoing_Question $question
+     * @param array                                 $additionalParameters
      */
     public function storeConversation(CBot_Message_ConversationAbstract $instance, $next, $question = null, $additionalParameters = []) {
         $conversation_cache_time = $instance->getConversationCacheTime();
@@ -81,7 +75,7 @@ trait CBot_Trait_HandlesConversationsTrait {
      *
      * @param null|CBot_Message_Incoming_IncomingMessage $message
      *
-     * @return string|Question
+     * @return string|CBot_Message_Outgoing_Question
      */
     public function getStoredConversationQuestion($message = null) {
         $conversation = $this->getStoredConversation($message);
