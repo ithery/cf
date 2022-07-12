@@ -218,7 +218,7 @@ class CEmail_MailManager implements CEmail_Contract_FactoryInterface {
             $config
         );
 
-        $config = Arr::except($config, ['transport']);
+        $config = carr::except($config, ['transport']);
 
         return new SesTransport(
             new SesClient($this->addSesCredentials($config)),
