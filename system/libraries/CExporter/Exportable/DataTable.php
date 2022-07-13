@@ -54,10 +54,14 @@ class CExporter_Exportable_DataTable extends CExporter_Exportable implements CEx
 
         foreach ($columns as $column) {
             $value = carr::get($data, $column->getFieldname());
-            foreach ($column->transforms as $trans) {
-                $tempDataType = carr::get($transformMaps, $trans->getFunction());
+            foreach ($column->getTransforms() as $trans) {
+                $tempDataType = null;
+                if (is_string($trans)) {
+                    $tempDataType = carr::get($transformMaps, $trans);
+                }
+
                 if ($tempDataType === null) {
-                    $value = $trans->execute($value);
+                    $value = c::manager()->transform()->call($trans, $value, $data);
                 } else {
                     $detectedDataType = $tempDataType;
 

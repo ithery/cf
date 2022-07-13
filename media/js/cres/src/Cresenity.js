@@ -31,6 +31,7 @@ import AlpineAutoNumeric from './alpine/autonumeric';
 import AlpineTippy from './alpine/tippy';
 import { attachWaves } from './ui/waves';
 import formatter from './formatter';
+import { initCssDomVar } from './module/css-dom-var';
 export default class Cresenity {
     constructor() {
         this.cf = cf;
@@ -1000,6 +1001,9 @@ export default class Cresenity {
             //window.Alpine.start();
         }
     }
+    initCssDomVar() {
+        initCssDomVar();
+    }
     initAlpineAndUi() {
         Alpine.plugin(AlpineCleave);
         Alpine.plugin(AlpineAutoNumeric);
@@ -1008,6 +1012,7 @@ export default class Cresenity {
         this.ui.start();
         window.Alpine.start();
         this.alpine = new CresAlpine(window.Alpine);
+
     }
 
     initLiveReload() {
@@ -1047,6 +1052,7 @@ export default class Cresenity {
             this.initPlugin();
             this.initWaves();
             this.initAlpineAndUi();
+            this.initCssDomVar();
             this.initLiveReload();
             initProgressive();
             let root = document.getElementsByTagName('html')[0]; // '0' to assign the first (and only `HTML` tag)
