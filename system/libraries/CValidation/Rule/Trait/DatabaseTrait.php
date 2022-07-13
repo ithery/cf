@@ -46,15 +46,43 @@ trait CValidation_Rule_Trait_DatabaseTrait {
      * @return void
      */
     public function __construct($table, $column = 'NULL') {
-        $this->table = $table;
         $this->column = $column;
+
+        $this->table = $this->resolveTableName($table);
+    }
+
+    /**
+     * Resolves the name of the table from the given string.
+     *
+     * @param string $table
+     *
+     * @return string
+     */
+    public function resolveTableName($table) {
+        if (!str_contains($table, '\\') || !class_exists($table)) {
+            return $table;
+        }
+
+        if (is_subclass_of($table, CModel::class)) {
+            $model = new $table();
+
+            if (str_contains($model->getTable(), '.')) {
+                return $table;
+            }
+
+            return implode('.', array_map(function ($part) {
+                return trim($part, '.');
+            }, array_filter([$model->getConnectionName(), $model->getTable()])));
+        }
+
+        return $table;
     }
 
     /**
      * Set a "where" constraint on the query.
      *
      * @param string|\Closure   $column
-     * @param array|string|null $value
+     * @param null|array|string $value
      *
      * @return $this
      */

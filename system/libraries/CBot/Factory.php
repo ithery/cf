@@ -17,12 +17,42 @@ class CBot_Factory {
         $driverManager = new CBot_DriverManager($config);
         $driver = $driverManager->getMatchingDriver($request);
         if ($storage == null) {
-            $storage = new CBot_Storage_FileStorage(DOCROOT . 'temp' . DS . 'bot' . DS);
+            $storage = static::createDefaultFileStorage();
         }
         if ($cache == null) {
-            $cache = c::cache()->store();
+            $cache = CCache::manager()->driver('array');
         }
 
         return new CBot_Bot($config, $driver, $storage, $cache);
+    }
+
+    /**
+     * @param null|string $driverName
+     *
+     * @return CBot_Storage_FileStorage
+     */
+    public static function createDefaultFileStorage($driverName = null) {
+        $dir = DOCROOT . 'temp' . DS . 'bot' . DS;
+        if ($driverName) {
+            $dir .= $driverName . DS;
+        }
+
+        return new CBot_Storage_FileStorage($dir);
+    }
+
+    /**
+     * @return CCache_Repository
+     */
+    public static function getDefaultArrayCache() {
+        return CCache::manager()->driver('array');
+    }
+
+    public static function createForDiscord(
+        array $config,
+        LoopInterface $loop,
+        CCache_Repository $cache = null,
+        CBot_Contract_StorageInterface $storageDriver = null
+    ) {
+        return CBot_Driver_DiscordDriver_Factory::createForDiscord($config, $loop, $cache, $storageDriver);
     }
 }
