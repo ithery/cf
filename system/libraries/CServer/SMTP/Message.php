@@ -1,6 +1,6 @@
 <?php
 
-use Zend\Mail\Message as ZendMessage;
+use Laminas\Mail\Message as LaminasMessage;
 
 class CServer_SMTP_Message {
     /**
@@ -61,20 +61,20 @@ class CServer_SMTP_Message {
     /**
      * Create a mailable from the message.
      *
-     * @return Mailable
+     * @return CServer_SMTP_Mailable
      */
-    public function makeMailable(): Mailable {
-        return (new Mailable())
-            ->setZendMessage($this->getZendMessage());
+    public function makeMailable()  {
+        return (new CServer_SMTP_Mailable())
+            ->setLaminasMessage($this->getLaminasMessage());
     }
 
     /**
      * Get the zend message.
      *
-     * @return ZendMessage
+     * @return LaminasMessage
      */
-    public function getZendMessage() {
-        return ZendMessage::fromString($this->raw)
+    public function getLaminasMessage() {
+        return LaminasMessage::fromString($this->raw)
             ->setFrom($this->from)
             ->setTo($this->to);
     }
