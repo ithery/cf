@@ -1,18 +1,24 @@
 <?php
 
-namespace React\Http;
+namespace React\Http\Io;
 
 use Evenement\EventEmitter;
 use React\Stream\ReadableStreamInterface;
-use React\Stream\WritableStreamInterface;
 use React\Stream\Util;
+use React\Stream\WritableStreamInterface;
 
-/** @internal */
+/**
+ * [Internal] Limits the amount of data the given stream can emit
+ *
+ * This is used internally to limit the size of the underlying connection stream
+ * to the size defined by the "Content-Length" header of the incoming request.
+ *
+ * @internal
+ */
 class LengthLimitedStream extends EventEmitter implements ReadableStreamInterface
 {
     private $stream;
     private $closed = false;
-    private $encoder;
     private $transferredLength = 0;
     private $maxLength;
 
@@ -66,13 +72,13 @@ class LengthLimitedStream extends EventEmitter implements ReadableStreamInterfac
     /** @internal */
     public function handleData($data)
     {
-        if (($this->transferredLength + strlen($data)) > $this->maxLength) {
+        if (($this->transferredLength + \strlen($data)) > $this->maxLength) {
             // Only emit data until the value of 'Content-Length' is reached, the rest will be ignored
-            $data = (string)substr($data, 0, $this->maxLength - $this->transferredLength);
+            $data = (string)\substr($data, 0, $this->maxLength - $this->transferredLength);
         }
 
         if ($data !== '') {
-            $this->transferredLength += strlen($data);
+            $this->transferredLength += \strlen($data);
             $this->emit('data', array($data));
         }
 

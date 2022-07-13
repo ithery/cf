@@ -1,17 +1,23 @@
 <?php
 
-namespace React\Http;
+namespace React\Http\Io;
 
 use Evenement\EventEmitter;
 use React\Stream\ReadableStreamInterface;
-use React\Stream\WritableStreamInterface;
 use React\Stream\Util;
+use React\Stream\WritableStreamInterface;
 
-/** @internal */
+/**
+ * [Internal] Encodes given payload stream with "Transfer-Encoding: chunked" and emits encoded data
+ *
+ * This is used internally to encode outgoing requests with this encoding.
+ *
+ * @internal
+ */
 class ChunkedEncoder extends EventEmitter implements ReadableStreamInterface
 {
     private $input;
-    private $closed;
+    private $closed = false;
 
     public function __construct(ReadableStreamInterface $input)
     {
@@ -40,9 +46,7 @@ class ChunkedEncoder extends EventEmitter implements ReadableStreamInterface
 
     public function pipe(WritableStreamInterface $dest, array $options = array())
     {
-        Util::pipe($this, $dest, $options);
-
-        return $dest;
+        return Util::pipe($this, $dest, $options);
     }
 
     public function close()
@@ -61,13 +65,11 @@ class ChunkedEncoder extends EventEmitter implements ReadableStreamInterface
     /** @internal */
     public function handleData($data)
     {
-        if ($data === '') {
-            return;
+        if ($data !== '') {
+            $this->emit('data', array(
+                \dechex(\strlen($data)) . "\r\n" . $data . "\r\n"
+            ));
         }
-
-        $completeChunk = $this->createChunk($data);
-
-        $this->emit('data', array($completeChunk));
     }
 
     /** @internal */
@@ -87,19 +89,4 @@ class ChunkedEncoder extends EventEmitter implements ReadableStreamInterface
             $this->close();
         }
     }
-
-    /**
-     * @param string $data - string to be transformed in an valid
-     *                       HTTP encoded chunk string
-     * @return string
-     */
-    private function createChunk($data)
-    {
-        $byteSize = strlen($data);
-        $byteSize = dechex($byteSize);
-        $chunkBeginning = $byteSize . "\r\n";
-
-        return $chunkBeginning . $data . "\r\n";
-    }
-
 }

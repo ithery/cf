@@ -56,7 +56,7 @@ class CBot_Driver_DiscordDriver_Factory {
         }
 
         if (empty($storageDriver)) {
-            $storageDriver = new CBot_Contract_StorageInterface(__DIR__);
+            $storageDriver = CBot_Factory::createDefaultFileStorage(CBot_Driver_DiscordDriver::getName());
         }
 
         $driver = new CBot_Driver_DiscordDriver($config, $client);

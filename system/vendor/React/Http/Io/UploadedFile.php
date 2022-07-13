@@ -1,13 +1,21 @@
 <?php
 
-namespace React\Http;
+namespace React\Http\Io;
 
-use InvalidArgumentException;
 use Psr\Http\Message\StreamInterface;
 use Psr\Http\Message\UploadedFileInterface;
+use InvalidArgumentException;
 use RuntimeException;
 
 /**
+ * [Internal] Implementation of the PSR-7 `UploadedFileInterface`
+ *
+ * This is used internally to represent each incoming file upload.
+ *
+ * Note that this is an internal class only and nothing you should usually care
+ * about. See the `UploadedFileInterface` for more details.
+ *
+ * @see UploadedFileInterface
  * @internal
  */
 final class UploadedFile implements UploadedFileInterface
@@ -49,15 +57,15 @@ final class UploadedFile implements UploadedFileInterface
         $this->stream = $stream;
         $this->size = $size;
 
-        if (!is_int($error) || !in_array($error, array(
-            UPLOAD_ERR_OK,
-            UPLOAD_ERR_INI_SIZE,
-            UPLOAD_ERR_FORM_SIZE,
-            UPLOAD_ERR_PARTIAL,
-            UPLOAD_ERR_NO_FILE,
-            UPLOAD_ERR_NO_TMP_DIR,
-            UPLOAD_ERR_CANT_WRITE,
-            UPLOAD_ERR_EXTENSION,
+        if (!\is_int($error) || !\in_array($error, array(
+            \UPLOAD_ERR_OK,
+            \UPLOAD_ERR_INI_SIZE,
+            \UPLOAD_ERR_FORM_SIZE,
+            \UPLOAD_ERR_PARTIAL,
+            \UPLOAD_ERR_NO_FILE,
+            \UPLOAD_ERR_NO_TMP_DIR,
+            \UPLOAD_ERR_CANT_WRITE,
+            \UPLOAD_ERR_EXTENSION,
         ))) {
             throw new InvalidArgumentException(
                 'Invalid error code, must be an UPLOAD_ERR_* constant'
@@ -73,7 +81,7 @@ final class UploadedFile implements UploadedFileInterface
      */
     public function getStream()
     {
-        if ($this->error !== UPLOAD_ERR_OK) {
+        if ($this->error !== \UPLOAD_ERR_OK) {
             throw new RuntimeException('Cannot retrieve stream due to upload error');
         }
 
