@@ -183,7 +183,7 @@ class CBot_Driver_DiscordDriver implements CBot_Contract_DriverInterface {
      */
     public function getUser(CBot_Message_Incoming_IncomingMessage $matchingMessage) {
         $user = null;
-        $this->client->getUserById($matchingMessage->getSender())->then(function ($_user) use (&$user) {
+        $this->client->users->fetch($matchingMessage->getSender())->then(function ($_user) use (&$user) {
             $user = $_user;
         });
         if (!is_null($user)) {
