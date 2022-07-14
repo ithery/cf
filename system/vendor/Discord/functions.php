@@ -11,12 +11,12 @@
 
 namespace Discord;
 
+use Discord\Parts\Part;
+use Discord\Parts\User\User;
+use Discord\Parts\Guild\Role;
+use Discord\Parts\User\Member;
 use Discord\Parts\Channel\Channel;
 use Discord\Parts\Channel\Message;
-use Discord\Parts\Guild\Role;
-use Discord\Parts\Part;
-use Discord\Parts\User\Member;
-use Discord\Parts\User\User;
 use Symfony\Component\OptionsResolver\Options;
 
 /**
@@ -67,13 +67,12 @@ const COLORTABLE = [
 /**
  * Checks to see if a part has been mentioned.
  *
- * @param Part|string $part    The part or mention to look for.
- * @param Message     $message The message to check.
+ * @param Part|string $part    the part or mention to look for
+ * @param Message     $message the message to check
  *
- * @return bool Whether the part was mentioned.
+ * @return bool whether the part was mentioned
  */
-function mentioned($part, Message $message): bool
-{
+function mentioned($part, Message $message): bool {
     if ($part instanceof User || $part instanceof Member) {
         return $message->mentions->has($part->id);
     } elseif ($part instanceof Role) {
@@ -88,12 +87,11 @@ function mentioned($part, Message $message): bool
 /**
  * Get int value for color.
  *
- * @param int|string $color The color's int, hexcode or htmlname.
+ * @param int|string $color the color's int, hexcode or htmlname
  *
  * @return int color
  */
-function getColor($color = 0): int
-{
+function getColor($color = 0): int {
     if (is_integer($color)) {
         return $color;
     }
@@ -115,13 +113,12 @@ function getColor($color = 0): int
 /**
  * Checks if a string contains an array of phrases.
  *
- * @param string $string  The string to check.
- * @param array  $matches Array containing one or more phrases to match.
+ * @param string $string  the string to check
+ * @param array  $matches array containing one or more phrases to match
  *
  * @return bool
  */
-function contains(string $string, array $matches): bool
-{
+function contains(string $string, array $matches): bool {
     foreach ($matches as $match) {
         if (strpos($string, $match) !== false) {
             return true;
@@ -134,12 +131,11 @@ function contains(string $string, array $matches): bool
 /**
  * Converts a string to studlyCase.
  *
- * @param string $string The string to convert.
+ * @param string $string the string to convert
  *
  * @return string
  */
-function studly(string $string): string
-{
+function studly(string $string): string {
     $ret = '';
     preg_match_all('/([a-z0-9]+)/ui', $string, $matches);
 
@@ -157,8 +153,7 @@ function studly(string $string): string
  *
  * @return int
  */
-function poly_strlen($str)
-{
+function poly_strlen($str) {
     // If mbstring is installed, use it.
     if (function_exists('mb_strlen')) {
         return mb_strlen($str);
@@ -174,9 +169,8 @@ function poly_strlen($str)
  *
  * @return string
  */
-function imageToBase64(string $filepath): string
-{
-    if (! file_exists($filepath)) {
+function imageToBase64(string $filepath): string {
+    if (!file_exists($filepath)) {
         throw new \InvalidArgumentException('The given filepath does not exist.');
     }
 
@@ -188,7 +182,7 @@ function imageToBase64(string $filepath): string
 
     $contents = file_get_contents($filepath);
 
-    return "data:{$mimetype};base64,".base64_encode($contents);
+    return "data:{$mimetype};base64," . base64_encode($contents);
 }
 
 /**
@@ -199,19 +193,18 @@ function imageToBase64(string $filepath): string
  *
  * @return int
  */
-function getSnowflakeTimestamp(string $snowflake)
-{
+function getSnowflakeTimestamp(string $snowflake) {
     if (\PHP_INT_SIZE === 4) { //x86
         $binary = \str_pad(\base_convert($snowflake, 10, 2), 64, 0, \STR_PAD_LEFT);
         $time = \base_convert(\substr($binary, 0, 42), 2, 10);
-        $timestamp = (float) ((((int) \substr($time, 0, -3)) + 1420070400).'.'.\substr($time, -3));
+        $timestamp = (float) ((((int) \substr($time, 0, -3)) + 1420070400) . '.' . \substr($time, -3));
         $workerID = (int) \base_convert(\substr($binary, 42, 5), 2, 10);
         $processID = (int) \base_convert(\substr($binary, 47, 5), 2, 10);
         $increment = (int) \base_convert(\substr($binary, 52, 12), 2, 10);
     } else { //x64
         $snowflake = (int) $snowflake;
         $time = (string) ($snowflake >> 22);
-        $timestamp = (float) ((((int) \substr($time, 0, -3)) + 1420070400).'.'.\substr($time, -3));
+        $timestamp = (float) ((((int) \substr($time, 0, -3)) + 1420070400) . '.' . \substr($time, -3));
         $workerID = ($snowflake & 0x3E0000) >> 17;
         $processID = ($snowflake & 0x1F000) >> 12;
         $increment = ($snowflake & 0xFFF);
@@ -233,8 +226,7 @@ function getSnowflakeTimestamp(string $snowflake)
  *
  * @internal
  */
-function normalizePartId($id_field = 'id')
-{
+function normalizePartId($id_field = 'id') {
     return static function (Options $options, $part) use ($id_field) {
         if ($part instanceof Part) {
             return $part->{$id_field};
@@ -249,11 +241,10 @@ function normalizePartId($id_field = 'id')
  * _Italics_, **Bold**, __Underline__, ~~Strikethrough~~, ||spoiler||
  * `Code`, ```Code block```, > Quotes, >>> Block quotes
  * #Channel @User
- * A backslash will be added before the each formatting symbol
- * 
+ * A backslash will be added before the each formatting symbol.
+ *
  * @return string the escaped string unformatted as plain text
  */
-function escapeMarkdown(string $text): string
-{
+function escapeMarkdown(string $text): string {
     return addcslashes($text, '#*:>@_`|~');
 }

@@ -11,12 +11,12 @@
 
 namespace Discord\Repository;
 
-use Discord\Factory\Factory;
-use Discord\Helpers\Collection;
-use Discord\Http\Endpoint;
 use Discord\Http\Http;
 use Discord\Parts\Part;
+use Discord\Http\Endpoint;
 use React\Promise\Promise;
+use Discord\Factory\Factory;
+use Discord\Helpers\Collection;
 
 /**
  * Repositories provide a way to store and update parts on the Discord server.
@@ -78,9 +78,9 @@ abstract class AbstractRepository extends Collection {
     /**
      * Freshens the repository collection.
      *
-     * @return Promise
-     *
      * @throws \Exception
+     *
+     * @return Promise
      */
     public function freshen(): Promise {
         if (!isset($this->endpoints['all'])) {
@@ -110,9 +110,9 @@ abstract class AbstractRepository extends Collection {
      * @param array $attributes the attributes for the new part
      * @param bool  $created
      *
-     * @return Part the new part
-     *
      * @throws \Exception
+     *
+     * @return Part the new part
      */
     public function create(array $attributes = [], bool $created = false): Part {
         $attributes = array_merge($attributes, $this->vars);
@@ -125,9 +125,9 @@ abstract class AbstractRepository extends Collection {
      *
      * @param Part $part the part to save
      *
-     * @return Promise
-     *
      * @throws \Exception
+     *
+     * @return Promise
      */
     public function save(Part $part): Promise {
         if ($part->created) {
@@ -166,9 +166,9 @@ abstract class AbstractRepository extends Collection {
      *
      * @param Part|snowflake $part the part to delete
      *
-     * @return Promise
-     *
      * @throws \Exception
+     *
+     * @return Promise
      */
     public function delete($part): Promise {
         if (!($part instanceof Part)) {
@@ -198,9 +198,9 @@ abstract class AbstractRepository extends Collection {
      *
      * @param Part $part the part to get fresh values
      *
-     * @return Promise
-     *
      * @throws \Exception
+     *
+     * @return Promise
      */
     public function fresh(Part $part): Promise {
         if (!$part->created) {
@@ -227,9 +227,9 @@ abstract class AbstractRepository extends Collection {
      * @param string $id    the ID to search for
      * @param bool   $fresh whether we should skip checking the cache
      *
-     * @return Promise
-     *
      * @throws \Exception
+     *
+     * @return Promise
      */
     public function fetch(string $id, bool $fresh = false): Promise {
         if (!$fresh && $part = $this->get($this->discrim, $id)) {
