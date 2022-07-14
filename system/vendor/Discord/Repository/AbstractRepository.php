@@ -14,9 +14,9 @@ namespace Discord\Repository;
 use Discord\Http\Http;
 use Discord\Parts\Part;
 use Discord\Http\Endpoint;
-use React\Promise\Promise;
 use Discord\Factory\Factory;
 use Discord\Helpers\Collection;
+use React\Promise\PromiseInterface;
 
 /**
  * Repositories provide a way to store and update parts on the Discord server.
@@ -80,9 +80,9 @@ abstract class AbstractRepository extends Collection {
      *
      * @throws \Exception
      *
-     * @return Promise
+     * @return PromiseInterface
      */
-    public function freshen(): Promise {
+    public function freshen(): PromiseInterface {
         if (!isset($this->endpoints['all'])) {
             return \React\Promise\reject(new \Exception('You cannot freshen this repository.'));
         }
@@ -127,9 +127,9 @@ abstract class AbstractRepository extends Collection {
      *
      * @throws \Exception
      *
-     * @return Promise
+     * @return PromiseInterface
      */
-    public function save(Part $part): Promise {
+    public function save(Part $part): PromiseInterface {
         if ($part->created) {
             if (!isset($this->endpoints['update'])) {
                 return \React\Promise\reject(new \Exception('You cannot update this part.'));
@@ -168,9 +168,9 @@ abstract class AbstractRepository extends Collection {
      *
      * @throws \Exception
      *
-     * @return Promise
+     * @return PromiseInterface
      */
-    public function delete($part): Promise {
+    public function delete($part): PromiseInterface {
         if (!($part instanceof Part)) {
             $part = $this->factory->part($this->class, [$this->discrim => $part], true);
         }
@@ -200,9 +200,9 @@ abstract class AbstractRepository extends Collection {
      *
      * @throws \Exception
      *
-     * @return Promise
+     * @return PromiseInterface
      */
-    public function fresh(Part $part): Promise {
+    public function fresh(Part $part): PromiseInterface {
         if (!$part->created) {
             return \React\Promise\reject(new \Exception('You cannot get a non-existant part.'));
         }
@@ -229,9 +229,9 @@ abstract class AbstractRepository extends Collection {
      *
      * @throws \Exception
      *
-     * @return Promise
+     * @return PromiseInterface
      */
-    public function fetch(string $id, bool $fresh = false): Promise {
+    public function fetch(string $id, bool $fresh = false): PromiseInterface {
         if (!$fresh && $part = $this->get($this->discrim, $id)) {
             return \React\Promise\resolve($part);
         }
