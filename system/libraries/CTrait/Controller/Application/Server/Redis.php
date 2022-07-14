@@ -16,7 +16,7 @@ trait CTrait_Controller_Application_Server_Redis {
         $table = $app->addTable();
         $table->setDataFromArray($connections);
         $table->addColumn('connection')->setLabel('Connection');
-        $table->addRowAction()->setLabel('Detail')->setIcon('ti ti-search')
+        $table->addRowAction()->setLabel('Detail')->setIcon('ti ti-search')->addClass('btn-primary')
             ->setLink($this->controllerUrl() . 'connection/{connection}');
 
         return $app;

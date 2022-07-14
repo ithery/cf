@@ -1,7 +1,14 @@
 <?php
 
-class CDatabase_Manager {
+class CDatabase_Manager implements CDatabase_Contract_ConnectionResolverInterface {
     protected $defaultConnection;
+
+    /**
+     * The active connection instances.
+     *
+     * @var array<string, \CDatabase_Connection>
+     */
+    protected $connections = [];
 
     private static $instance;
 
@@ -33,7 +40,21 @@ class CDatabase_Manager {
      * @return \CDatabase_Connection
      */
     public function connection($name = null) {
-        return new CDatabase_Connection($name);
+        list($database, $type) = $this->parseConnectionName($name);
+
+        $name = $name ?: $database;
+
+        // If we haven't created this connection, we'll create it based on the config
+        // provided in the application. Once we've created the connections we will
+        // set the "fetch mode" for PDO which determines the query return types.
+        if (!isset($this->connections[$name])) {
+            $this->connections[$name] = $this->configure(
+                $this->makeConnection($database),
+                $type
+            );
+        }
+
+        return $this->connections[$name];
     }
 
     /**
@@ -47,7 +68,7 @@ class CDatabase_Manager {
         $name = $name ?: $this->getDefaultConnection();
 
         return cstr::endsWith($name, ['::read', '::write'])
-                            ? explode('::', $name, 2) : [$name, null];
+            ? explode('::', $name, 2) : [$name, null];
     }
 
     /**

@@ -2,6 +2,8 @@
 
 trait CElement_Component_DataTable_Trait_JavascriptTrait {
     public function js($indent = 0) {
+        $quickSearchPlaceholder = $this->quickSearchPlaceholder ? "'" . $this->quickSearchPlaceholder . "'" : "'Search ' + title";
+
         /** @var CElement_Component_DataTable $this */
         $this->buildOnce();
         $ajax_url = '';
@@ -23,7 +25,9 @@ trait CElement_Component_DataTable_Trait_JavascriptTrait {
             $ajaxMethod->setData('isModelQuery', $isModelQuery);
             $ajaxMethod->setData('isDataProvider', $this->query instanceof CManager_Contract_DataProviderInterface);
 
-            $ajaxMethod->setData('table', serialize($this));
+            $table = $this->getForAjaxSerialization();
+
+            $ajaxMethod->setData('table', serialize($table));
 
             $ajaxMethod->setData('dbConfig', $this->dbConfig);
             $ajaxMethod->setData('dbName', $this->dbName);
@@ -51,7 +55,7 @@ trait CElement_Component_DataTable_Trait_JavascriptTrait {
             $totalColumn++;
         }
 
-        if ($this->applyDataTable > 0) {
+        if ($this->applyDataTable) {
             $km = '';
             $vm = '';
             foreach ($this->paging_list as $k => $v) {
@@ -64,8 +68,10 @@ trait CElement_Component_DataTable_Trait_JavascriptTrait {
                 $km .= $k;
                 $vm .= "'" . $v . "'";
             }
-            $hs_val = $this->header_sortable ? 'true' : 'false';
-            $js->appendln("var table = jQuery('#" . $this->id . "');")->br();
+            $hs_val = $this->headerSortable ? 'true' : 'false';
+            $varName = 'table_' . cstr::slug($this->id(), '_');
+            $varNameOTable = 'otable_' . cstr::slug($this->id(), '_');
+            $js->appendln('var ' . $varName . " = jQuery('#" . $this->id . "');")->br();
             $js->appendln('var header_sortable = ' . $hs_val . ';')->br();
             $js->appendln('var vaoColumns = [];')->br();
             if ($this->numbering) {
@@ -92,7 +98,7 @@ trait CElement_Component_DataTable_Trait_JavascriptTrait {
             }
             foreach ($this->columns as $col) {
                 $aojson = [];
-                $aojson['bSortable'] = $col->sortable && $this->header_sortable;
+                $aojson['bSortable'] = $col->sortable && $this->headerSortable;
                 $aojson['bSearchable'] = $col->searchable;
                 $aojson['bVisible'] = $col->visible;
 
@@ -107,7 +113,7 @@ trait CElement_Component_DataTable_Trait_JavascriptTrait {
             }
 
             $js->appendln('var tableStyled_' . $this->id . ' = false;')->br()
-                ->appendln('var oTable = table.dataTable({')->br()->incIndent();
+                ->appendln('window.' . $varNameOTable . ' = ' . $varName . '.dataTable({')->br()->incIndent();
 
             //   $js->appendln("responsive: {
             //        details: {
@@ -127,7 +133,7 @@ trait CElement_Component_DataTable_Trait_JavascriptTrait {
                     ->appendln("'sServerMethod': '" . strtoupper($this->ajax_method) . "',")->br()
                     ->appendln("'fnServerData': function ( sSource, aoData, fnCallback, oSettings ) {
         var data_quick_search = [];
-        jQuery('.data_table-quick_search').each(function(){
+        jQuery('#" . $this->id() . " .data_table-quick_search').each(function(){
             if (jQuery(this).val() != '') {
                 var input_name = jQuery(this).attr('name');
                 var cur_transforms = jQuery(this).attr('transforms');
@@ -144,11 +150,7 @@ trait CElement_Component_DataTable_Trait_JavascriptTrait {
                 fnCallback(data.datatable);
                 if(data.js && data.js.length>0) {
                     var script = data.js;
-                    if(cresenity) {
-                        script = cresenity.base64.decode(script);
-                    } else {
-                        script = $.cresenity.base64.decode(script);
-                    }
+                    script = cresenity.base64.decode(script);
                     if(script.trim().length > 0) {
                         eval(script);
                     }
@@ -202,7 +204,7 @@ trait CElement_Component_DataTable_Trait_JavascriptTrait {
             if (CClientModules::instance()->isRegisteredModule('jquery.ui') || CClientModules::instance()->isRegisteredModule('jquery-ui-1.12.1.custom')) {
                 $jqueryui = "'bJQueryUI': true,";
             }
-
+            $js->appendln('buttons:        ' . json_encode($this->buttons) . ',')->br();
             if ($this->scrollY) {
                 $scrollY = $this->scrollY;
                 if (is_bool($scrollY)) {
@@ -252,26 +254,12 @@ trait CElement_Component_DataTable_Trait_JavascriptTrait {
              *
              */
             $js->appendln($jqueryui)->br()
-                ->appendln("'bStateSave': false,")->br()
                 ->appendln("'iDisplayLength': " . $this->display_length . ',')->br()
                 ->appendln("'bSortCellsTop': " . $hs_val . ',')->br()
                 ->appendln("'aaSorting': [],")->br()
-                ->appendln("'oLanguage': {
-                    sSearch : '" . c::__('Search') . "',
-                    sSearchPlaceholder : '" . c::__($this->searchPlaceholder) . "',
-                    sProcessing : '" . c::__('Processing') . "',
-                    sLengthMenu  : '" . c::__('Show') . ' _MENU_ ' . c::__('Entries') . "',
-                    oPaginate  : {
-                        'sFirst' : '" . c::__('First') . "',
-                        'sLast' : '" . c::__('Last') . "',
-                        'sNext' : '" . c::__('Next') . "',
-                        'sPrevious' : '" . c::__('Previous') . "'
-                    },
-                    sInfo: '" . $this->infoText . "',
-                    sInfoEmpty  : '" . c::__($this->labels['noData']) . "',
-                    sEmptyTable  : '" . c::__($this->labels['noData']) . "',
-                    sInfoThousands   : '" . c::__('') . "',
-                },")->br()
+
+                ->appendln("'oLanguage': " . json_encode($this->getLegacyLabels()) . ',')->br()
+                ->appendln("'language': " . json_encode($this->getLabels()) . ',')->br()
                 ->appendln("'aoColumns': vaoColumns,")->br()
                 ->appendln("'aLengthMenu': [
                     [" . $km . '],
@@ -287,6 +275,7 @@ trait CElement_Component_DataTable_Trait_JavascriptTrait {
                 ->appendln($this->options->toJsonRow('deferRender'))->br()
                 ->appendln($this->options->toJsonRow('autoWidth'))->br()
                 ->appendln($this->options->toJsonRow('ordering'))->br()
+                ->appendln($this->options->toJsonRow('stateSave'))->br()
                 ->appendln($this->fixedColumn ? '' : $this->options->toJsonRow('scrollX'))->br()
                 ->br();
 
@@ -308,7 +297,7 @@ trait CElement_Component_DataTable_Trait_JavascriptTrait {
         var title = jQuery('#" . $this->id . " thead th').eq( jQuery(this).index() ).text();
         var haveAction = " . ($this->haveRowAction() ? '1' : '0') . ';
 
-        var placeholder =  ' . ($this->haveQuickSearchPlaceholder ? "'Search ' + title" : "''") . ";
+        var placeholder =  ' . ($this->haveQuickSearchPlaceholder ? $quickSearchPlaceholder : "''") . ";
         var totalTh = jQuery('#" . $this->id . " thead th').length;
         var input = '';
         var haveCheckbox = " . ($this->checkbox ? '1' : '0') . ';
@@ -366,30 +355,29 @@ trait CElement_Component_DataTable_Trait_JavascriptTrait {
         var td = jQuery('<td>').append(input);
         quick_search.append(td);
     });")->br()
-                ->appendln("table.children('thead').append(quick_search);")->br()
+                ->appendln($varName . ".children('thead').append(quick_search);")->br()
                 ->decIndent()
                 ->appendln('}')->br()
                 ->appendln('var dttable_quick_search = ' . ($this->quickSearch ? '1' : '0') . ';')->br()
                 ->appendln('if (dttable_quick_search == "1") { buildFilters_' . $this->id . '(); }');
             if ($this->customSearchSelector != null) {
                 $js->appendln("
-$('" . $this->customSearchSelector . "').keyup(() => {
-
-    oTable.fnFilter($('" . $this->customSearchSelector . "').val());
-});
+                    $('" . $this->customSearchSelector . "').keyup(() => {
+                        " . $varNameOTable . ".fnFilter($('" . $this->customSearchSelector . "').val());
+                    });
                 ");
             }
             $js->appendln("
-jQuery('.data_table-quick_search').on('keyup change', function() {
-    var inputType = $(this).prop('tagName');
-    " . ($this->ajax
-            ? 'table.fnClearTable( 0 );table.fnDraw();'
-            : "if (inputType.toLowerCase() == 'select' && $(this).val()) {
-                table.fnFilter(\"^\"+$(this).val()+\"$\",$(this).attr('data-column-index'), true)
-            } else {
-                table.fnFilter($(this).val(),$(this).attr('data-column-index'))
-            };") . '
-});
+                jQuery('#" . $this->id . " .data_table-quick_search').on('input', function() {
+                    var inputType = $(this).prop('tagName');
+                    " . ($this->ajax
+                            ? $varName . '.fnClearTable( 0 );' . $varName . '.fnDraw();'
+                            : "if (inputType.toLowerCase() == 'select' && $(this).val()) {
+                                " . $varName . ".fnFilter(\"^\"+$(this).val()+\"$\",$(this).attr('data-column-index'), true)
+                            } else {
+                                " . $varName . ".fnFilter($(this).val(),$(this).attr('data-column-index'))
+                            };") . '
+                });
             ');
         }
         if ($this->checkbox) {

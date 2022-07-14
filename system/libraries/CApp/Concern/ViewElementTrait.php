@@ -9,37 +9,26 @@ defined('SYSPATH') or die('No direct access allowed.');
  * @since Dec 7, 2020
  */
 trait CApp_Concern_ViewElementTrait {
-    private static $renderingElement;
-
-    public static function renderingElement() {
-        return static::$renderingElement;
-    }
-
-    public static function setRenderingElement(&$element) {
-        static::$renderingElement = $element;
-    }
-
     /**
      * Get the string contents of a push section.
      *
      * @param string $key
      * @param string $default
+     * @param mixed  $element
      *
      * @return string
      */
-    public function yieldViewElement($key, $default = '') {
-        $element = null;
+    public function yieldViewElement($element, $key, $default = '') {
         $output = '';
         if ($key instanceof Closure) {
             $element = c::value($key);
         } else {
-            $renderingElement = self::renderingElement();
-            if ($renderingElement == null) {
+            if ($element == null) {
                 return $default;
             }
 
-            if ($renderingElement instanceof CElement_View) {
-                $element = $renderingElement->viewElement($key);
+            if ($element instanceof CElement_View) {
+                $element = $element->viewElement($key);
             }
         }
         if ($element != null && $element instanceof CRenderable) {
@@ -56,14 +45,5 @@ trait CApp_Concern_ViewElementTrait {
         }
 
         return $output;
-    }
-
-    /**
-     * Flush all of the stacks.
-     *
-     * @return void
-     */
-    public function flushViewElements() {
-        $this->viewElements = [];
     }
 }

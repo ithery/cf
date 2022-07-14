@@ -1,5 +1,5 @@
 const removePreloader = () =>{
-    let preloader = document.querySelector('#capp-preloader');
+    let preloader = document.getElementById('capp-preloader');
     if(preloader) {
         preloader.style.display = 'none';
     }

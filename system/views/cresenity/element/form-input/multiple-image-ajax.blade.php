@@ -96,24 +96,24 @@
     }
 </style>
 
-<div id="container-<?php echo $id ?>" class="container-multi-image-ajax" data-maximum="<?php echo $maximum; ?>" >
-    <input id="<?php echo $id ?>_input_temp" type="file" accept="<?php echo $accept;?>" name="<?php echo $id ?>_input_temp[]" class="multi-image-ajax-input-temp"  style="display:none;">
-    <div id="<?php echo $id ?>_message" class="row alert alert-danger fade in multi-image-ajax-message">
+<div id="container-{{ $id }}" class="container-multi-image-ajax" data-maximum="{{ $maximum }}" >
+    <input id="{{ $id }}_input_temp" type="file" accept="<?php echo $accept;?>" name="{{ $id }}_input_temp[]" class="multi-image-ajax-input-temp"  style="display:none;">
+    <div id="{{ $id }}_message" class="row alert alert-danger fade in multi-image-ajax-message">
     </div>
-    <div id="<?php echo $id ?>_description" class="multi-image-ajax-description"><?php echo clang::__('Click or Drop Files On Box Below')?></div>
-    <div id="<?php echo $id ?>" class="row control-fileupload multi-image-ajax">
-        <?php foreach ($files as $f):  ?>
-            <?php
+    <div id="{{ $id }}_description" class="multi-image-ajax-description">@lang('element/image.clickOrDropFilesOnBoxBelow')</div>
+    <div id="{{ $id }}" class="row control-fileupload multi-image-ajax">
+        @foreach($files as $f)
+            @php
             $input_name = carr::get($f, 'input_name');
             $input_value = carr::get($f, 'input_value');
             $file_url = carr::get($f, 'file_url');
-            ?>
+            @endphp
             <div class="multi-image-ajax-file container-file-upload">
                 <div class="div-img">
-                    <img src="<?php echo $file_url; ?>" />
-                    <input type="hidden" name="<?php echo $name; ?>[<?php echo $input_name; ?>]" value="<?php echo $input_value; ?>">
+                    <img src="{{ $file_url }}" />
+                    <input type="hidden" name="{{ $name }}[{{ $input_name }}]" value="{{ $input_value }}">
                 </div>
-                <?php foreach ($customControl as $cc): ?>
+                @foreach ($customControl as $cc)
                     <?php
                     $control = carr::get($cc, 'control');
                     $control_name = carr::get($cc, 'input_name');
@@ -123,20 +123,15 @@
                     $control_value = carr::get($control_value_array, $control_name);
                     ?>
                     <div class="div-custom-control">
-                        <label><?php echo $control_label; ?>:</label><input type="<?php echo $control; ?>" name="<?php echo $name; ?>_custom_control[<?php echo $input_name; ?>][<?php echo $control_name; ?>]" value="<?php echo $control_value; ?>"  >
+                        <label><?php echo $control_label; ?>:</label><input type="{{ $control }}" name="{{ $name }}_custom_control[{{ $input_name }}][{{ $control_name }}]" value="{{ $control_value }}"  >
                     </div>
-                <?php endforeach; ?>
-                <a class="multi-image-ajax-remove">Remove</a>
+                @endforeach
+                <a class="multi-image-ajax-remove">@lang('element/image.remove')</a>
             </div>
-        <?php endforeach; ?>
-
-
-
-
-
+        @endforeach
     </div>
     <div>
-        <div class="multi-image-ajax-btn-upload btn btn-success"><?php echo clang::__('Upload Image'); ?></div>
+        <div class="multi-image-ajax-btn-upload btn btn-success">@lang('element/image.uploadImage')</div>
     </div>
 
 </div>
@@ -144,8 +139,28 @@
 
     (function ($) {
         $(function () {
+            const errorMessageLimitFile = '@lang("element/image.errorMessageLimitFile",["limit"=>$limitFile])';
+            const errorMessageMaxUploadSize = '@lang("element/image.errorMessageMaxUploadSize",["sizeMB"=>$maxUploadSize])';
+            const removeLabel = "@lang('element/image.remove')";
+            const elementId = "{{ $id }}";
             var haveCropper = <?php echo ($cropper != null) ? 'true' : 'false' ?>;
-            var maxUploadSize = <?= $maxUploadSize ?> * 1024 * 1024;
+            const maxUploadSize = <?= $maxUploadSize ?> * 1024 * 1024;
+            const readerOnLoadResolver = (child, file, reader) =>{
+                return $.proxy(function (file, fileList, event) {
+                    var filesize = event.total;
+                    var limitFile = <?= $limitFile ?>;
+                    if (limitFile && $("#" + elementId).children().length >= limitFile) {
+                        cresenity.showError(errorMessageLimitFile);
+                    } else {
+                        if (maxUploadSize && filesize > maxUploadSize) {
+                            cresenity.showError(errorMessageMaxUploadSize);
+                        } else {
+                            insertFile(reader, file, fileList, event);
+                        }
+                    }
+                }, child, file, $("#" + elementId));
+            };
+
 
 <?php if ($cropper != null) : ?>
             var cropperWidth = parseFloat('<?php echo $cropper->getCropperWidth(); ?>');
@@ -303,10 +318,10 @@
                     div_cc.append(cc);
                     div.append(div_cc);
                 <?php endforeach; ?>
-                <?php if ($removeLink): ?>
-                    var remove = $("<a>").addClass("multi-image-ajax-remove").html("Remove");
+                @if($removeLink)
+                    var remove = $("<a>").addClass("multi-image-ajax-remove").html("@lang('element/image.remove')");
                     div.append(remove);
-                <?php endif; ?>
+                @endif
                 div.append("<img class=\"multi-image-ajax-loading\" src=\"<?php echo curl::base(); ?>media/img/ring.gif\" />");
                 fileList.append(div.addClass("loading"));
                 fileUploadRemove();
@@ -335,8 +350,8 @@
 
             fileUploadRemove();
 
-            $("#<?php echo $id ?>").sortable();
-            $("#<?php echo $id ?>").on({
+            $("#" + elementId).sortable();
+            $("#" + elementId).on({
                 "dragover dragenter": function (e) {
                     $(this).addClass("ondrag");
                 },
@@ -345,9 +360,9 @@
                 },
                 "drop": function (e) {
                     $(this).removeClass("ondrag");
-                    var container = $('#container-<?php echo $id ?>');
+                    var container = $('#container-' + elementId);
                     if (!container.hasClass('disabled')) {
-                        $("#<?php echo $id ?>").sortable();
+                        $("#"+elementId).sortable();
                         var dataTransfer = e.originalEvent.dataTransfer;
                         if (dataTransfer && dataTransfer.files.length) {
                             dataTransferFiles = dataTransfer.files;
@@ -358,25 +373,12 @@
                             }
                             e.preventDefault();
                             e.stopPropagation();
-                            $("#container-<?php echo $id ?> .multi-image-ajax-description").remove();
+                            $("#container-" + elementId +" .multi-image-ajax-description").remove();
                             $.each(dataTransferFiles, function (i, file) {
                                 var reader = new FileReader();
                                 reader.fileName = file.name;
 
-                                reader.onload = $.proxy(function (file, fileList, event) {
-                                    var filesize = event.total;
-                                    var maxUploadSize = <?= $maxUploadSize ?> * 1024 * 1024;
-                                    var limitFile = <?= $limitFile ?>;
-                                    if (limitFile && $("#<?= $id ?>").children().length >= limitFile) {
-                                        $.cresenity.message('', '<div class="alert alert-danger text-center"><b>Error:</b> Only ' + limitFile + ' image can be uploaded</div>', 'bootbox');
-                                    } else {
-                                        if (maxUploadSize && filesize > maxUploadSize) {
-                                            $.cresenity.message('', '<div class="alert alert-danger text-center"><b>Error:</b> Image Size is more than ' + <?= $maxUploadSize ?> + ' MB</div>', 'bootbox');
-                                        } else {
-                                            insertFile(reader, file, fileList, event);
-                                        }
-                                    }
-                                }, this, file, $("#<?php echo $id; ?>"));
+                                reader.onload = readerOnLoadResolver(this,file,reader);
                                 reader.readAsDataURL(file);
                             });
                         }
@@ -384,37 +386,24 @@
                 }
             })
             if (!haveCropper) {
-                $("#<?php echo $id; ?>_input_temp").attr('multiple', 'multiple');
+                $("#" + elementId + "_input_temp").attr('multiple', 'multiple');
             }
 
             // Add Image by Click
-            $("#<?php echo $id; ?>").click(function () {
+            $("#" + elementId).click(function () {
                 var container = $('#container-<?php echo $id ?>');
                 if (!container.hasClass('disabled')) {
                     $("#<?php echo $id; ?>_input_temp").trigger("click");
                 }
             })
-            $("#<?php echo $id; ?>_input_temp").change(function (e) {
-                $("#<?php echo $id; ?>_description").remove();
+            $("#" + elementId +"_input_temp").change(function (e) {
+                $("#" + elementId + "_description").remove();
                 $.each(e.target.files, function (i, file) {
 
                     var reader = new FileReader();
 
                     reader.fileName = file.name;
-                    reader.onload = $.proxy(function (file, fileList, event) {
-                        var filesize = event.total;
-                        var maxUploadSize = <?= $maxUploadSize ?> * 1024 * 1024;
-                        var limitFile = <?= $limitFile ?>;
-                        if (limitFile && $("#<?= $id ?>").children().length >= limitFile) {
-                            $.cresenity.message('', '<div class="alert alert-danger text-center"><b>Error:</b> Only ' + limitFile + ' image can be uploaded</div>', 'bootbox');
-                        } else {
-                            if (maxUploadSize && filesize > maxUploadSize) {
-                                $.cresenity.message('', '<div class="alert alert-danger text-center"><b>Error:</b> Image Size is more than ' + <?= $maxUploadSize ?> + ' MB</div>', 'bootbox');
-                            } else {
-                                insertFile(reader, file, fileList, event);
-                            }
-                        }
-                    }, this, file, $("#<?php echo $id; ?>"));
+                    reader.onload = readerOnLoadResolver(this,file,reader);
                     reader.readAsDataURL(file);
                 })
                 $(this).val("");

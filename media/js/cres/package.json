@@ -1,9 +1,11 @@
 {
     "main": "dist/cres.js",
     "name": "cf-cres",
+    "version": "1.4.1",
     "scripts": {
         "build": "cross-env NODE_ENV=production npx rollup -c",
-        "dev": "npx rollup -c -w"
+        "dev": "npx rollup -c -w",
+        "minify": "google-closure-compiler 'dist/cres.js' --js_output_file 'dist/cres.min.js'"
     },
     "author": "Hery Kurniawan",
     "license": "MIT",

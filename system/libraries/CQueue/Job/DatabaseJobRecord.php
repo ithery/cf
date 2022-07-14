@@ -36,6 +36,7 @@ class CQueue_Job_DatabaseJobRecord {
      */
     public function increment() {
         $this->record->attempts++;
+
         return $this->record->attempts;
     }
 
@@ -45,7 +46,8 @@ class CQueue_Job_DatabaseJobRecord {
      * @return int
      */
     public function touch() {
-        $this->record->reserved_at = $this->currentTime();
+        $this->record->reserved_at = date('Y-m-d H:i:s', $this->currentTime());
+
         return $this->record->reserved_at;
     }
 

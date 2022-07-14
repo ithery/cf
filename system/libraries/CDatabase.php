@@ -29,6 +29,8 @@ class CDatabase {
 
     public $name;
 
+    protected $isPdo = false;
+
     protected $isBenchmarkQuery;
 
     /**
@@ -59,6 +61,11 @@ class CDatabase {
      * @var string
      */
     protected $driverName;
+
+    /**
+     * @var string
+     */
+    protected $driverClass;
 
     /**
      * @var CDatabase_Configuration
@@ -238,26 +245,27 @@ class CDatabase {
         // Set driver name
 
         $connectionType = $this->config['connection']['type'];
-        switch ($this->config['connection']['type']) {
-            case 'mongodb':
-                $this->driverName = 'MongoDB';
+        $this->isPdo = carr::get($this->config, 'connection.pdo');
+        $pdoDriverMap = [
+            'sqlite' => CDatabase_Driver_PDO_Sqlite::class
+        ];
+        $nativeDriverMap = [
+            'mysqli' => CDatabase_Driver_Mysqli::class,
+            'sqlsrv' => CDatabase_Driver_Sqlsrv::class,
+            'mongodb' => CDatabase_Driver_MongoDB::class,
+        ];
+        $driverMap = $this->isPdo ? $pdoDriverMap : $nativeDriverMap;
 
-                break;
-            default:
-                $this->driverName = ucfirst($this->config['connection']['type']);
-
-                break;
-        }
-
-        $driver = 'CDatabase_Driver_' . $this->driverName;
+        $this->driverName = c::classBasename(carr::get($driverMap, $connectionType, ucfirst($connectionType)));
+        $this->driverClass = carr::get($driverMap, $connectionType, 'CDatabase_Driver_' . $this->driverName);
 
         try {
             // Validation of the driver
-            $class = new ReflectionClass($driver);
+            $class = new ReflectionClass($this->driverClass);
             // Initialize the driver
             $this->driver = $class->newInstance($this, $this->config);
         } catch (ReflectionException $ex) {
-            throw new CDatabase_Exception('The :driver driver for the :class library could not be found', [':driver' => $driver, ':class' => get_class($this)]);
+            throw new CDatabase_Exception('The :driver driver for the :class library could not be found', [':driver' => $this->driverClass, ':class' => get_class($this)]);
         }
 
         $this->events = CEvent::dispatcher();
@@ -265,7 +273,7 @@ class CDatabase {
         $this->configuration = new CDatabase_Configuration();
         // Validate the driver
         if (!($this->driver instanceof CDatabase_Driver)) {
-            throw new CDatabase_Exception('The :driver driver for the :class library must implement the :interface interface', [':driver' => $driver, ':class' => get_class($this), ':interface' => 'CDatabase_Driver']);
+            throw new CDatabase_Exception('The :driver driver for the :class library must implement the :interface interface', [':driver' => $this->driverClass, ':class' => get_class($this), ':interface' => 'CDatabase_Driver']);
         }
 
         $this->transactionManager = new CDatabase_TransactionManager();
@@ -285,6 +293,10 @@ class CDatabase {
 
     public function config() {
         return $this->config;
+    }
+
+    public function getConfig($key, $default = null) {
+        return carr::get($this->config, $key, $default);
     }
 
     /**
@@ -1027,9 +1039,9 @@ class CDatabase {
      */
     public function getQueryGrammar() {
         if ($this->queryGrammar == null) {
-            $driver_name = $this->driverName();
-            $grammar_class = 'CDatabase_Query_Grammar_' . $driver_name;
-            $this->queryGrammar = new $grammar_class();
+            $driverName = $this->driverName();
+            $grammarClass = 'CDatabase_Query_Grammar_' . $driverName;
+            $this->queryGrammar = new $grammarClass();
         }
 
         return $this->queryGrammar;
@@ -1408,6 +1420,37 @@ class CDatabase {
      */
     protected function reconnectIfMissingConnection() {
         $this->driver->reconnect();
+    }
+
+    /**
+     * @return CDatabase_TransactionManager
+     */
+    public function getTransactionManager() {
+        return $this->transactionManager;
+    }
+
+    /**
+     * Get a schema builder instance for the connection.
+     *
+     * @return \CDatabase_Schema_Builder
+     */
+    public function getSchemaBuilder() {
+        return new CDatabase_Schema_Builder($this);
+    }
+
+    /**
+     * Get a schema builder instance for the connection.
+     *
+     * @return \CDatabase_Schema_Grammar
+     */
+    public function getSchemaGrammar() {
+        if ($this->queryGrammar == null) {
+            $driverName = $this->driverName();
+            $grammarClass = 'CDatabase_Schema_Grammar_' . $driverName;
+            $this->queryGrammar = new $grammarClass();
+        }
+
+        return $this->queryGrammar;
     }
 }
 

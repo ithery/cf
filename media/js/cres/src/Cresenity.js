@@ -15,7 +15,8 @@ import { elementReady, elementRendered } from './util/dom-observer';
 import { debounce } from './util/debounce';
 import { confirmFromElement, defaultConfirmHandler } from './module/confirm-handler';
 import initValidation from './module/validation';
-
+import initPlugin from './plugin';
+import {element, initElement} from './element';
 import ucfirst from 'locutus/php/strings/ucfirst';
 import Alpine from 'alpinejs';
 import cresReact from './react';
@@ -29,6 +30,8 @@ import AlpineCleave from './alpine/cleave';
 import AlpineAutoNumeric from './alpine/autonumeric';
 import AlpineTippy from './alpine/tippy';
 import { attachWaves } from './ui/waves';
+import formatter from './formatter';
+import { initCssDomVar } from './module/css-dom-var';
 export default class Cresenity {
     constructor() {
         this.cf = cf;
@@ -36,6 +39,7 @@ export default class Cresenity {
             encode: base64encode,
             decode: base64decode
         };
+        this.element = element;
         this.windowEventList = [
             'cresenity:confirm',
             'cresenity:jquery:loaded',
@@ -63,6 +67,7 @@ export default class Cresenity {
         this.websocket = null;
         this.debounce = debounce;
         this.sse = new SSE();
+        this.formatter = formatter;
     }
     loadJs(filename, callback) {
         let fileref = document.createElement('script');
@@ -322,7 +327,7 @@ export default class Cresenity {
             // These are the defaults.
             method: 'get',
             dataAddition: {},
-            message: 'Are you sure?',
+            message: capp?.labels?.confirm?.areYouSure ?? 'Are you sure?',
             onConfirmed: false,
             confirmCallback: false,
             owner: null
@@ -972,6 +977,12 @@ export default class Cresenity {
             initValidation();
         }
     }
+    initPlugin() {
+        initPlugin();
+    }
+    initElement() {
+        initElement();
+    }
     initWaves() {
         if($) {
             const selector = window.capp.waves.selector ?? '.cres-waves-effect' ;
@@ -990,6 +1001,9 @@ export default class Cresenity {
             //window.Alpine.start();
         }
     }
+    initCssDomVar() {
+        initCssDomVar();
+    }
     initAlpineAndUi() {
         Alpine.plugin(AlpineCleave);
         Alpine.plugin(AlpineAutoNumeric);
@@ -998,6 +1012,7 @@ export default class Cresenity {
         this.ui.start();
         window.Alpine.start();
         this.alpine = new CresAlpine(window.Alpine);
+
     }
 
     initLiveReload() {
@@ -1030,11 +1045,14 @@ export default class Cresenity {
                     this.scrollToTop.init();
                 }
             }
+            this.initElement();
             this.initConfirm();
             this.initReload();
             this.initValidation();
+            this.initPlugin();
             this.initWaves();
             this.initAlpineAndUi();
+            this.initCssDomVar();
             this.initLiveReload();
             initProgressive();
             let root = document.getElementsByTagName('html')[0]; // '0' to assign the first (and only `HTML` tag)

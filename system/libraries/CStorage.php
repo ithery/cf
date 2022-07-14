@@ -9,15 +9,17 @@ defined('SYSPATH') or die('No direct access allowed.');
  * @since Aug 11, 2019, 3:29:43 AM
  */
 use Aws\S3\S3Client;
-use League\Flysystem\AdapterInterface;
-use League\Flysystem\Sftp\SftpAdapter;
-use League\Flysystem\FilesystemInterface;
-use League\Flysystem\Cached\CachedAdapter;
+use League\Flysystem\Visibility;
+use League\Flysystem\Ftp\FtpAdapter;
 use League\Flysystem\Filesystem as Flysystem;
-use League\Flysystem\Adapter\Ftp as FtpAdapter;
-use League\Flysystem\Adapter\Local as LocalAdapter;
-use League\Flysystem\AwsS3v3\AwsS3Adapter as S3Adapter;
-use League\Flysystem\Cached\Storage\Memory as MemoryStore;
+use League\Flysystem\PhpseclibV3\SftpAdapter;
+use League\Flysystem\Ftp\FtpConnectionOptions;
+use League\Flysystem\PhpseclibV3\SftpConnectionProvider;
+use League\Flysystem\AwsS3V3\AwsS3V3Adapter as S3Adapter;
+use League\Flysystem\FilesystemAdapter as FlysystemAdapter;
+use League\Flysystem\UnixVisibility\PortableVisibilityConverter;
+use League\Flysystem\Local\LocalFilesystemAdapter as LocalAdapter;
+use League\Flysystem\AwsS3V3\PortableVisibilityConverter as AwsS3PortableVisibilityConverter;
 
 class CStorage {
     protected static $instance;
@@ -104,6 +106,20 @@ class CStorage {
     }
 
     /**
+     * Build an on-demand disk.
+     *
+     * @param string|array $config
+     *
+     * @return \CStorage_FilesystemInterface
+     */
+    public function build($config) {
+        return $this->resolve('ondemand', is_array($config) ? $config : [
+            'driver' => 'local',
+            'root' => $config,
+        ]);
+    }
+
+    /**
      * Attempt to get the disk from the local cache.
      *
      * @param string $name
@@ -115,26 +131,46 @@ class CStorage {
     }
 
     /**
+     * @param string $name
+     *
+     * @return string
+     */
+    protected function sanitizeDriverName($name) {
+        if ($name == 'bunnycdn') {
+            $name = 'bunnyCDN';
+        }
+
+        return ucfirst($name);
+    }
+
+    /**
      * Resolve the given disk.
      *
-     * @param string $name
+     * @param string     $name
+     * @param null|mixed $config
      *
      * @throws \InvalidArgumentException
      *
      * @return CStorage_FilesystemInterface
      */
-    protected function resolve($name) {
-        $config = $this->getConfig($name);
+    protected function resolve($name, $config = null) {
+        if ($config == null) {
+            $config = $this->getConfig($name);
+        }
+        if (empty($config['driver'])) {
+            throw new InvalidArgumentException("Disk [{$name}] does not have a configured driver.");
+        }
+        $name = $config['driver'];
         if (isset($this->customCreators[$config['driver']])) {
             return $this->callCustomCreator($config);
         }
 
-        $driverMethod = 'create' . ucfirst($config['driver']) . 'Driver';
-        if (method_exists($this, $driverMethod)) {
-            return $this->{$driverMethod}($config);
-        } else {
-            throw new InvalidArgumentException("Driver [{$config['driver']}] is not supported.");
+        $driverMethod = 'create' . $this->sanitizeDriverName($config['driver']) . 'Driver';
+        if (!method_exists($this, $driverMethod)) {
+            throw new InvalidArgumentException("Driver [{$name}] is not supported.");
         }
+
+        return $this->{$driverMethod}($config);
     }
 
     /**
@@ -145,33 +181,9 @@ class CStorage {
      * @return CStorage_FilesystemInterface
      */
     protected function callCustomCreator(array $config) {
-        $driver = $this->customCreators[$config['driver']]($this->app, $config);
-        if ($driver instanceof FilesystemInterface) {
-            return $this->adapt($driver);
-        }
+        $driver = $this->customCreators[$config['driver']]($config);
 
         return $driver;
-    }
-
-    /**
-     * Create an instance of the google drive driver.
-     *
-     * @param array $config
-     *
-     * @return \CStorage_FilesystemInterface
-     */
-    public function createGoogleDriver(array $config) {
-        $client = new \Google_Client();
-        $client->setClientId(carr::get($config, 'clientId'));
-        $client->setClientSecret(carr::get($config, 'clientSecret'));
-        $client->refreshToken(carr::get($config, 'refreshToken'));
-        $folderId = carr::get($config, 'folderId');
-        $service = new \Google_Service_Drive($client);
-
-        return $this->adapt($this->createFlysystem(
-            new CStorage_Adapter_GoogleDriveAdapter($service, $folderId),
-            $config
-        ));
     }
 
     /**
@@ -182,15 +194,46 @@ class CStorage {
      * @return CStorage_FilesystemInterface
      */
     public function createLocalDriver(array $config) {
-        $permissions = isset($config['permissions']) ? $config['permissions'] : [];
-        $links = (isset($config['links']) ? $config['links'] : null) === 'skip' ? LocalAdapter::SKIP_LINKS : LocalAdapter::DISALLOW_LINKS;
+        $visibility = PortableVisibilityConverter::fromArray(
+            carr::get($config, 'permissions', []),
+            carr::get($config, 'directory_visibility', carr::get($config, 'visibility', Visibility::VISIBILITY_PUBLIC))
+        );
 
-        return $this->adapt($this->createFlysystem(new LocalAdapter(
+        $links = (isset($config['links']) ? $config['links'] : null) === 'skip' ? LocalAdapter::SKIP_LINKS : LocalAdapter::DISALLOW_LINKS;
+        $adapter = new LocalAdapter(
             $config['root'],
-            isset($config['lock']) ? $config['lock'] : LOCK_EX,
-            $links,
-            $permissions
-        ), $config));
+            $visibility,
+            carr::get($config, 'lock', LOCK_EX),
+            $links
+        );
+
+        return new CStorage_Adapter($this->createFlysystem($adapter, $config), $adapter, $config);
+    }
+
+    /**
+     * Create an instance of the ftp driver.
+     *
+     * @param array $config
+     *
+     * @return \CStorage_FilesystemInterface
+     */
+    public function createBunnyCDNDriver(array $config) {
+        $adapter = new CStorage_Adapter_BunnyCDNAdapter(
+            new CStorage_Vendor_BunnyCDN_Client(
+                $config['storage_zone'],
+                $config['api_key'],
+                $config['region']
+            ),
+            isset($config['endpoint']) ? $config['endpoint'] : null
+        );
+
+        // return new FilesystemAdapter(
+        //     new Filesystem($adapter, $config),
+        //     $adapter,
+        //     $config
+        // );
+
+        return new CStorage_Adapter($this->createFlysystem($adapter, $config), $adapter, $config);
     }
 
     /**
@@ -201,10 +244,13 @@ class CStorage {
      * @return \CStorage_FilesystemInterface
      */
     public function createFtpDriver(array $config) {
-        return $this->adapt($this->createFlysystem(
-            new FtpAdapter($config),
-            $config
-        ));
+        if (!isset($config['root'])) {
+            $config['root'] = '';
+        }
+
+        $adapter = new FtpAdapter(FtpConnectionOptions::fromArray($config));
+
+        return new CStorage_Adapter($this->createFlysystem($adapter, $config), $adapter, $config);
     }
 
     /**
@@ -215,10 +261,17 @@ class CStorage {
      * @return \CStorage_FilesystemInterface
      */
     public function createSftpDriver(array $config) {
-        return $this->adapt($this->createFlysystem(
-            new SftpAdapter($config),
-            $config
-        ));
+        $provider = SftpConnectionProvider::fromArray($config);
+
+        $root = carr::get($config, 'root', '/');
+
+        $visibility = PortableVisibilityConverter::fromArray(
+            carr::get($config, 'permissions', [])
+        );
+
+        $adapter = new SftpAdapter($provider, $root, $visibility);
+
+        return new CStorage_Adapter($this->createFlysystem($adapter, $config), $adapter, $config);
     }
 
     /**
@@ -230,14 +283,25 @@ class CStorage {
      */
     public function createS3Driver(array $config) {
         $s3Config = $this->formatS3Config($config);
-        $root = isset($s3Config['root']) ? $s3Config['root'] : null;
-        $options = isset($config['options']) ? $config['options'] : [];
-        $streamReads = isset($config['stream_reads']) ? $config['stream_reads'] : false;
 
-        return $this->adapt($this->createFlysystem(
-            new S3Adapter(new S3Client($s3Config), $s3Config['bucket'], $root, $options, $streamReads),
-            $config
-        ));
+        $root = (string) carr::get($s3Config, 'root', '');
+
+        $visibility = new AwsS3PortableVisibilityConverter(
+            isset($config['visibility']) ? $config['visibility'] : Visibility::VISIBILITY_PRIVATE
+        );
+
+        $streamReads = carr::get($s3Config, 'stream_reads', false);
+
+        $client = new S3Client($s3Config);
+
+        $adapter = new S3Adapter($client, $s3Config['bucket'], $root, $visibility, null, carr::get($config, 'options', []), $streamReads);
+
+        return new CStorage_Adapter_AwsS3V3Adapter(
+            $this->createFlysystem($adapter, $config),
+            $adapter,
+            $s3Config,
+            $client
+        );
     }
 
     /**
@@ -259,51 +323,19 @@ class CStorage {
     /**
      * Create a Flysystem instance with the given adapter.
      *
-     * @param \League\Flysystem\AdapterInterface $adapter
-     * @param array                              $config
+     * @param \League\Flysystem\FilesystemAdapter $adapter
+     * @param array                               $config
      *
-     * @return \League\Flysystem\FilesystemInterface
+     * @return \League\Flysystem\FilesystemOperator
      */
-    protected function createFlysystem(AdapterInterface $adapter, array $config) {
-        $cache = carr::pull($config, 'cache');
-        $config = carr::only($config, ['visibility', 'disable_asserts', 'url']);
-        if ($cache) {
-            $adapter = new CachedAdapter($adapter, $this->createCacheStore($cache));
-        }
-
-        return new Flysystem($adapter, count($config) > 0 ? $config : null);
-    }
-
-    /**
-     * Create a cache store instance.
-     *
-     * @param mixed $config
-     *
-     * @throws \InvalidArgumentException
-     *
-     * @return \League\Flysystem\Cached\CacheInterface
-     */
-    protected function createCacheStore($config) {
-        if ($config === true) {
-            return new MemoryStore();
-        }
-
-        return new Cache(
-            $this->app['cache']->store($config['store']),
-            isset($config['prefix']) ? $config['prefix'] : 'flysystem',
-            isset($config['expire']) ? $config['expire'] : null
-        );
-    }
-
-    /**
-     * Adapt the filesystem implementation.
-     *
-     * @param \League\Flysystem\FilesystemInterface $filesystem
-     *
-     * @return CStorage_FilesystemInterface
-     */
-    protected function adapt(FilesystemInterface $filesystem) {
-        return new CStorage_Adapter($filesystem);
+    protected function createFlysystem(FlysystemAdapter $adapter, array $config) {
+        return new Flysystem($adapter, carr::only($config, [
+            'directory_visibility',
+            'disable_asserts',
+            'temporary_url',
+            'url',
+            'visibility',
+        ]));
     }
 
     /**
@@ -371,6 +403,21 @@ class CStorage {
         }
 
         return $this;
+    }
+
+    /**
+     * Disconnect the given disk and remove from local cache.
+     *
+     * @param null|string $name
+     *
+     * @return void
+     */
+    public function purge($name = null) {
+        if ($name == null) {
+            $name = $this->getDefaultDriver();
+        }
+
+        unset($this->disks[$name]);
     }
 
     /**

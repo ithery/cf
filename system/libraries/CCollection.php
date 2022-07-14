@@ -662,6 +662,17 @@ class CCollection implements ArrayAccess, CInterface_Enumerable, CBase_Contract_
     }
 
     /**
+     * @param string|array $transforms
+     *
+     * @return static
+     */
+    public function mapTransform($transforms) {
+        return $this->map(function ($item) use ($transforms) {
+            return c::manager()->transform()->call($transforms, $item);
+        });
+    }
+
+    /**
      * Run a dictionary map over the items.
      *
      * The callback should return an associative array with a single key/value pair.

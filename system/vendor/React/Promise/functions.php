@@ -2,8 +2,7 @@
 
 namespace React\Promise;
 
-function resolve($promiseOrValue = null)
-{
+function resolve($promiseOrValue = null) {
     if ($promiseOrValue instanceof PromiseInterface) {
         return $promiseOrValue;
     }
@@ -23,8 +22,7 @@ function resolve($promiseOrValue = null)
     return new FulfilledPromise($promiseOrValue);
 }
 
-function reject($promiseOrValue = null)
-{
+function reject($promiseOrValue = null) {
     if ($promiseOrValue instanceof PromiseInterface) {
         return resolve($promiseOrValue)->then(function ($value) {
             return new RejectedPromise($value);
@@ -34,15 +32,13 @@ function reject($promiseOrValue = null)
     return new RejectedPromise($promiseOrValue);
 }
 
-function all(array $promisesOrValues)
-{
+function all(array $promisesOrValues) {
     return map($promisesOrValues, function ($val) {
         return $val;
     });
 }
 
-function race(array $promisesOrValues)
-{
+function race(array $promisesOrValues) {
     if (!$promisesOrValues) {
         return new Promise(function () {});
     }
@@ -59,16 +55,14 @@ function race(array $promisesOrValues)
     }, $cancellationQueue);
 }
 
-function any(array $promisesOrValues)
-{
+function any(array $promisesOrValues) {
     return some($promisesOrValues, 1)
         ->then(function ($val) {
             return array_shift($val);
         });
 }
 
-function some(array $promisesOrValues, $howMany)
-{
+function some(array $promisesOrValues, $howMany) {
     if ($howMany < 1) {
         return resolve([]);
     }
@@ -93,9 +87,9 @@ function some(array $promisesOrValues, $howMany)
 
     return new Promise(function ($resolve, $reject) use ($len, $promisesOrValues, $howMany, $cancellationQueue) {
         $toResolve = $howMany;
-        $toReject  = ($len - $toResolve) + 1;
-        $values    = [];
-        $reasons   = [];
+        $toReject = ($len - $toResolve) + 1;
+        $values = [];
+        $reasons = [];
 
         foreach ($promisesOrValues as $i => $promiseOrValue) {
             $fulfiller = function ($val) use ($i, &$values, &$toResolve, $toReject, $resolve) {
@@ -130,8 +124,7 @@ function some(array $promisesOrValues, $howMany)
     }, $cancellationQueue);
 }
 
-function map(array $promisesOrValues, callable $mapFunc)
-{
+function map(array $promisesOrValues, callable $mapFunc) {
     if (!$promisesOrValues) {
         return resolve([]);
     }
@@ -140,7 +133,7 @@ function map(array $promisesOrValues, callable $mapFunc)
 
     return new Promise(function ($resolve, $reject) use ($promisesOrValues, $mapFunc, $cancellationQueue) {
         $toResolve = count($promisesOrValues);
-        $values    = [];
+        $values = [];
 
         foreach ($promisesOrValues as $i => $promiseOrValue) {
             $cancellationQueue->enqueue($promiseOrValue);
@@ -162,8 +155,7 @@ function map(array $promisesOrValues, callable $mapFunc)
     }, $cancellationQueue);
 }
 
-function reduce(array $promisesOrValues, callable $reduceFunc, $initialValue = null)
-{
+function reduce(array $promisesOrValues, callable $reduceFunc, $initialValue = null) {
     $cancellationQueue = new Internal\CancellationQueue();
 
     return new Promise(function ($resolve, $reject) use ($promisesOrValues, $reduceFunc, $initialValue, $cancellationQueue) {
@@ -192,8 +184,7 @@ function reduce(array $promisesOrValues, callable $reduceFunc, $initialValue = n
 /**
  * @internal
  */
-function enqueue(callable $task)
-{
+function enqueue(callable $task) {
     static $queue;
 
     if (!$queue) {
@@ -205,9 +196,10 @@ function enqueue(callable $task)
 
 /**
  * @internal
+ *
+ * @param mixed $error
  */
-function fatalError($error)
-{
+function fatalError($error) {
     try {
         trigger_error($error, E_USER_ERROR);
     } catch (\Throwable $e) {
@@ -221,9 +213,10 @@ function fatalError($error)
 
 /**
  * @internal
+ *
+ * @param mixed $object
  */
-function _checkTypehint(callable $callback, $object)
-{
+function _checkTypehint(callable $callback, $object) {
     if (!is_object($object)) {
         return true;
     }

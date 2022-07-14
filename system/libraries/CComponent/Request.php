@@ -16,16 +16,16 @@ class CComponent_Request {
     public $memo;
 
     public function __construct($payload) {
-        $this->fingerprint = $payload['fingerprint'];
-        $this->updates = $payload['updates'];
-        $this->memo = $payload['serverMemo'];
+        $this->fingerprint = carr::get($payload, 'fingerprint');
+        $this->updates = carr::get($payload, 'updates');
+        $this->memo = carr::get($payload, 'serverMemo');
     }
 
     public function id() {
-        return $this->fingerprint['id'];
+        return carr::get($this->fingerprint, 'id');
     }
 
     public function name() {
-        return $this->fingerprint['name'];
+        return carr::get($this->fingerprint, 'name');
     }
 }

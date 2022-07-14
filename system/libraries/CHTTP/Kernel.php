@@ -77,7 +77,6 @@ class CHTTP_Kernel {
 
         try {
             $response = $this->sendRequestThroughRouter($request);
-            //$response = $this->invokeController($request);
         } catch (Exception $e) {
             throw $e;
         } finally {
@@ -98,7 +97,7 @@ class CHTTP_Kernel {
                     $headerValue = implode(':', array_splice($headerExploded, 1));
 
                     if (strtolower($headerKey) != 'set-cookie') {
-                        $response->header($headerKey, $headerValue);
+                        $response->headers->set($headerKey, $headerValue);
                     }
                 }
             }
@@ -158,9 +157,6 @@ class CHTTP_Kernel {
             }
         }
         CEvent::dispatch(new CHTTP_Event_RequestHandled($request, $response));
-        // if ($response->getStatusCode() != 200) {
-        //     $this->endOutputBuffering();
-        // }
 
         $this->isHandled = true;
 

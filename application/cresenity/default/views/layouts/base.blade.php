@@ -10,6 +10,5 @@
 <body>
     @yield('content')
     @CAppScripts
-    @stack('custom-scripts')
 </body>
 </html>

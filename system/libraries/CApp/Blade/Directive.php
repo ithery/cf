@@ -60,24 +60,13 @@ class CApp_Blade_Directive {
 
     public static function element($expression) {
         if (cstr::startsWith(trim($expression), 'function')) {
-            return "<?php echo \CApp::instance()->yieldViewElement(" . $expression . '); ?>';
+            return "<?php echo \CApp::instance()->yieldViewElement(isset(\$__CAppElementView) ? \$__CAppElementView : null, " . $expression . '); ?>';
         }
         $expression = str_replace(['(', ')'], '', $expression);
         $expression = str_replace(['"', '\''], '', $expression);
         $expression = str_replace(',', ' ', $expression);
-        $renderingElement = CApp::instance()->renderingElement();
 
-        if ($renderingElement != null) {
-            if ($renderingElement instanceof CElement_View) {
-                $ownerId = $renderingElement->id();
-
-                return "<?php echo \CApp::instance()->yieldViewElement('" . $expression . "'); ?>";
-            } else {
-                throw new Exception('Directive CApp Element must be rendered when called from CElement_View');
-            }
-        }
-
-        return '';
+        return "<?php echo \CApp::instance()->yieldViewElement(isset(\$__CAppElementView) ? \$__CAppElementView : null, '" . $expression . "'); ?>";
     }
 
     public static function directive($expression) {

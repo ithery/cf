@@ -1,20 +1,19 @@
 <?php
 
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
-
 class CBackup_Zip {
-
-    /** @var \ZipArchive */
+    /**
+     * @var \ZipArchive
+     */
     protected $zipFile;
 
-    /** @var int */
+    /**
+     * @var int
+     */
     protected $fileCount = 0;
 
-    /** @var string */
+    /**
+     * @var string
+     */
     protected $pathToZip;
 
     public static function createForManifest(CBackup_Manifest $manifest, $pathToZip) {
@@ -24,6 +23,7 @@ class CBackup_Zip {
             $zip->add($file, self::determineNameOfFileInZip($file, $pathToZip));
         }
         $zip->close();
+
         return $zip;
     }
 
@@ -33,6 +33,7 @@ class CBackup_Zip {
         if (cstr::startsWith($fileDirectory, $zipDirectory)) {
             return str_replace($zipDirectory, '', $pathToFile);
         }
+
         return $pathToFile;
     }
 
@@ -50,6 +51,7 @@ class CBackup_Zip {
         if ($this->fileCount === 0) {
             return 0;
         }
+
         return filesize($this->pathToZip);
     }
 
@@ -67,9 +69,9 @@ class CBackup_Zip {
 
     /**
      * @param string|array $files
-     * @param string $nameInZip
+     * @param string       $nameInZip
      *
-     * @return \Spatie\Backup\Tasks\Backup\Zip
+     * @return \CBackup_Zip
      */
     public function add($files, $nameInZip = null) {
         if (is_array($files)) {
@@ -87,11 +89,11 @@ class CBackup_Zip {
             }
             $this->fileCount++;
         }
+
         return $this;
     }
 
     public function count() {
         return $this->fileCount;
     }
-
 }

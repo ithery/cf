@@ -29,6 +29,7 @@ class CElement_Component_DataTable_Cell {
     protected function processHtmlJs() {
         $html = null;
         $js = '';
+
         if ($this->row instanceof CModel) {
             $fieldName = $this->column->getFieldname();
             if (strpos($fieldName, '.') !== false) {
@@ -58,9 +59,7 @@ class CElement_Component_DataTable_Cell {
         }
 
         //do transform
-        foreach ($this->column->transforms as $trans) {
-            $html = $trans->execute($html);
-        }
+        $html = $this->column->applyTransform($html, $this->row);
 
         //if formatted
         if (strlen($this->column->getFormat()) > 0) {

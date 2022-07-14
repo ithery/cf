@@ -22,7 +22,7 @@ class CElement_Component_Nestable extends CElement_Component {
 
     protected $input;
 
-    protected $displayCallbackFunc;
+    protected $displayCallback;
 
     protected $filterActionCallbackFunc;
 
@@ -42,7 +42,7 @@ class CElement_Component_Nestable extends CElement_Component {
         $this->input = '';
         $this->rowActionList = CElement_List_ActionRowList::factory();
         $this->rowActionList->setStyle('btn-icon-group');
-        $this->displayCallbackFunc = false;
+        $this->displayCallback = false;
         $this->filterActionCallbackFunc = '';
         $this->checkbox = false;
         $this->requires = [];
@@ -53,8 +53,8 @@ class CElement_Component_Nestable extends CElement_Component {
         return new CElement_Component_Nestable($id);
     }
 
-    public function displayCallbackFunc($func, $require = '') {
-        $this->displayCallbackFunc = $func;
+    public function setDisplayCallback($func, $require = '') {
+        $this->displayCallback = $func;
         if (strlen($require) > 0) {
             $this->requires[] = $require;
         }
@@ -183,8 +183,8 @@ class CElement_Component_Nestable extends CElement_Component {
                 }
                 $val = carr::get($d, $this->valueKey);
                 $newV = $val;
-                if ($this->displayCallbackFunc !== false && is_callable($this->displayCallbackFunc)) {
-                    $newV = CFunction::factory($this->displayCallbackFunc)
+                if ($this->displayCallback !== false && is_callable($this->displayCallback)) {
+                    $newV = CFunction::factory($this->displayCallback)
                         ->addArg($this)
                         ->addArg($d)
                         ->addArg($val)
@@ -194,35 +194,7 @@ class CElement_Component_Nestable extends CElement_Component {
                 $html->appendln($newV);
                 $html->decIndent()->appendln('</div>');
                 if ($this->haveRowAction()) {
-                    foreach ($d as $k => $v) {
-                        $jsparam[$k] = $v;
-                    }
-                    $jsparam['param1'] = carr::get($d, $this->idKey);
-
-                    $this->getRowActionList()->regenerateId(true);
-                    $this->getRowActionList()->apply('jsparam', $jsparam);
-                    $this->getRowActionList()->apply('setHandlerParam', $jsparam);
-
-                    if (($this->filterActionCallbackFunc) != null) {
-                        $actions = $this->getRowActionList()->childs();
-
-                        foreach ($actions as $action) {
-                            $visibility = CFunction::factory($this->filterActionCallbackFunc)
-                                ->addArg($this)
-                                ->addArg($d)
-                                ->addArg($action)
-                                ->setRequire($this->requires)
-                                ->execute();
-                            if ($visibility == false) {
-                                $action->addClass('d-none');
-                            }
-                            $action->setVisibility($visibility);
-                        }
-                    }
-
-                    $this->js_cell .= $this->getRowActionList()->js();
-
-                    $html->appendln($this->getRowActionList()->html($html->getIndent()));
+                    $this->js_cell .= $this->drawActionAndGetJs($html, $d, $this->idKey);
                 }
 
                 $depthBefore = $depth;
@@ -282,5 +254,48 @@ class CElement_Component_Nestable extends CElement_Component {
         $js->append($this->jsChild($indent))->br();
 
         return $js->text();
+    }
+
+    protected function drawActionAndGetJs(CStringBuilder $html, array $row, $key) {
+        $js = '';
+        if ($this->haveRowAction()) {
+            $html->appendln('<td class="low-padding align-center cell-action td-action">')->incIndent()->br();
+            foreach ($row as $k => $v) {
+                $jsparam[$k] = $v;
+            }
+
+            $jsparam['param1'] = $key;
+
+            $this->getRowActionList()->regenerateId(true);
+            $this->getRowActionList()->apply('setJsParam', $jsparam);
+            $this->getRowActionList()->apply('setHandlerParam', $jsparam);
+            $actions = $this->getRowActionList()->childs();
+
+            foreach ($actions as &$action) {
+                if (($this->filterActionCallbackFunc) != null) {
+                    $visibility = CFunction::factory($this->filterActionCallbackFunc)
+                        ->addArg($this)
+                        ->addArg('action')
+                        ->addArg($row)
+                        ->addArg($action)
+                        ->setRequire($this->requires)
+                        ->execute();
+                    if ($visibility == false) {
+                        $action->addClass('d-none');
+                    }
+                    $action->setVisibility($visibility);
+                }
+                if ($action instanceof CElement_Component_ActionRow) {
+                    $action->applyRowCallback($row);
+                }
+            }
+
+            $js = $this->getRowActionList()->js();
+
+            $html->appendln($this->getRowActionList()->html($html->getIndent()));
+            $html->decIndent()->appendln('</td>')->br();
+        }
+
+        return $js;
     }
 }

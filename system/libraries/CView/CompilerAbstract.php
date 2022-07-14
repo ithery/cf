@@ -1,7 +1,7 @@
 <?php
 
 /**
- * Description of CompilerAbstract
+ * Description of CompilerAbstract.
  *
  * @author Hery
  */
@@ -16,9 +16,9 @@ abstract class CView_CompilerAbstract {
     /**
      * Create a new compiler instance.
      *
-     * @return void
-     *
      * @throws \InvalidArgumentException
+     *
+     * @return void
      */
     public function __construct() {
         $this->cachePath = CView_Factory::compiledPath();

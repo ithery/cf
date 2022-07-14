@@ -756,6 +756,9 @@ class CView_Compiler_BladeCompiler extends CView_CompilerAbstract implements CVi
         //$path = CView_Factory::compiledPath();
         $path = CF::config('view.compiled');
         $path = rtrim($path, '/');
+        if (CF::appCode()) {
+            $path .= DIRECTORY_SEPARATOR . CF::appCode();
+        }
         $files = glob($path . '/*');
 
         CFile::delete($files);

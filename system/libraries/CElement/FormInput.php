@@ -8,8 +8,6 @@
 class CElement_FormInput extends CElement_Element {
     use CTrait_Compat_Element_FormInput;
 
-    protected $transforms = [];
-
     protected $name;
 
     protected $type;
@@ -88,20 +86,6 @@ class CElement_FormInput extends CElement_Element {
 
     public function getFieldId() {
         return $this->id;
-    }
-
-    public function addTransform($name, $args = []) {
-        $func = CFunction::factory($name);
-        if (!is_array($args)) {
-            $args = [$args];
-        }
-        foreach ($args as $arg) {
-            $func->addArg($arg);
-        }
-
-        $this->transforms[] = $func;
-
-        return $this;
     }
 
     public function setValue($val) {

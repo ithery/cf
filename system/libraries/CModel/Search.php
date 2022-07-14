@@ -18,6 +18,7 @@ class CModel_Search {
      */
     public function registerAspect(CModel_Search_SearchAspect $searchAspect) {
         $this->aspects[$searchAspect->getType()] = $searchAspect;
+
         return $this;
     }
 
@@ -30,6 +31,7 @@ class CModel_Search {
         }
         $searchAspect = new CModel_Search_ModelSearchAspect($modelClass, $attributes, $callback);
         $this->registerAspect($searchAspect);
+
         return $this;
     }
 
@@ -44,9 +46,10 @@ class CModel_Search {
     public function perform($query, $user = null, $page = null, $perPage = null) {
         $searchResults = new CModel_Search_SearchResultCollection();
         c::collect($this->getSearchAspects())
-                ->each(function (CModel_Search_SearchAspect $aspect) use ($query, $user, $page, $perPage, $searchResults) {
-                    $searchResults->addResults($aspect->getType(), $aspect->getResults($query, $user, $page, $perPage));
-                });
+            ->each(function (CModel_Search_SearchAspect $aspect) use ($query, $user, $page, $perPage, $searchResults) {
+                $searchResults->addResults($aspect->getType(), $aspect->getResults($query, $user, $page, $perPage));
+            });
+
         return $searchResults;
     }
 }

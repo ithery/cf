@@ -19,9 +19,10 @@ class CApi_OAuth_Method_Token extends CApi_OAuth_MethodAbstract {
             );
         });
 
-        $data = $this->reformatContent(json_decode($response->getContent(), true));
+        return $response;
+        // $data = $this->reformatContent(json_decode($response->getContent(), true));
 
-        $this->data = $data;
+        // $this->data = $data;
     }
 
     protected function reformatContent(array $data) {

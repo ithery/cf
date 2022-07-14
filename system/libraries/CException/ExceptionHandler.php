@@ -59,9 +59,8 @@ class CException_ExceptionHandler implements CException_ExceptionHandlerInterfac
         HttpException::class,
         CHTTP_Exception_ResponseException::class,
         CModel_Exception_ModelNotFoundException::class,
-        CModel_Exception_ModelNotFound::class,
-        //SuspiciousOperationException::class,
-        //TokenMismatchException::class,
+        SuspiciousOperationException::class,
+        CSession_Exception_TokenMismatchException::class,
         CValidation_Exception::class,
     ];
 
@@ -71,6 +70,7 @@ class CException_ExceptionHandler implements CException_ExceptionHandlerInterfac
      * @var array
      */
     protected $dontFlash = [
+        'current_password',
         'password',
         'password_confirmation',
     ];
@@ -298,8 +298,11 @@ class CException_ExceptionHandler implements CException_ExceptionHandlerInterfac
      */
     protected function invalidJson($request, CValidation_Exception $exception) {
         return c::response()->json([
-            'message' => $exception->getMessage(),
-            'errors' => $exception->errors(),
+            'errCode' => '422',
+            'errMessage' => $exception->getMessage(),
+            'data' => [
+                'errors' => $exception->errors(),
+            ],
         ], $exception->status);
     }
 
@@ -488,6 +491,7 @@ class CException_ExceptionHandler implements CException_ExceptionHandlerInterfac
                 $response->getStatusCode(),
                 $response->headers->all()
             );
+            $response->setRequest(c::request());
         } else {
             $response = new CHTTP_Response(
                 $response->getContent(),
