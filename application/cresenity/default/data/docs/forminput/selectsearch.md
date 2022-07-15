@@ -37,7 +37,7 @@ $form->addField()->setLabel('User')->addSelectSearchControl('userId')
 
         return $html;
     })->setPlaceholder(c::__('Pilih Outlet'))->setValue('')
-    ->prependData([
+    ->prependRow([
         'outlet_id' => 'ALL',
     ])->setValue('ALL');
 ```
@@ -59,11 +59,11 @@ $controlOutlet = $app->addField()->setLabel('Outlet')->addSelectSearchControl('o
 
         return $html;
     })->setPlaceholder(c::__('Pilih Outlet'))->setValue('')
-    ->prependData([
+    ->prependRow([
         'outlet_id' => 'ALL 1',
-    ])->prependData([
+    ])->prependRow([
         'outlet_id' => 'ALL 2',
-    ])->prependData([
+    ])->prependRow([
         'outlet_id' => 'ALL 3',
     ])->setValue('ALL 3')->setPerPage(5);
 ```
