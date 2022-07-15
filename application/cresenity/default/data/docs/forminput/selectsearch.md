@@ -15,7 +15,31 @@ $form->addField()->setLabel('User')->addSelectSearchControl('userId')
     ->setValue($deviceId);
 ```
 
+### Prepending Data
+```php
+    $controlOutlet = $app->addField()->setLabel('Outlet')->addSelectSearchControl('outletId')
+    ->setDataFromModel(SEModel_Outlet::class, function ($query) {
+        $query->where('outlet_type', 'fisik');
+    })->setKeyField('outlet_id')
+    ->setFormat(function ($outlet) {
+        if (is_array($outlet)) {
+            if (carr::get($outlet, 'outlet_id') == 'ALL') {
+                return 'ALL';
+            }
+        }
+        $html = '<div>';
+        if (SE::isAdmin()) {
+            $html .= $outlet->vendor->name . ' - ';
+        }
+        $html .= $outlet->name . ' <span class="badge badge-success">[' . ucwords($outlet->outlet_type) . ']</span>';
+        $html .= '</div>';
 
+        return $html;
+    })->setPlaceholder(c::__('Pilih Outlet'))->setValue('')
+    ->prependData([
+        'outlet_id' => 'ALL',
+    ])->setValue('ALL');
+```
 ### Extending SelectSearch
 
 ```php

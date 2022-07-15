@@ -52,6 +52,8 @@ class CElement_FormInput_SelectSearch extends CElement_FormInput {
 
     protected $language;
 
+    protected $prependData;
+
     public function __construct($id) {
         parent::__construct($id);
         $this->dropdownClasses = [];
@@ -72,6 +74,7 @@ class CElement_FormInput_SelectSearch extends CElement_FormInput {
 
         $this->value = null;
         $this->allowClear = false;
+        $this->prependData = [];
         $language = CF::getLocale();
         if (strlen($language) > 2) {
             $language = strtolower(substr($language, 0, 2));
@@ -186,6 +189,12 @@ class CElement_FormInput_SelectSearch extends CElement_FormInput {
         return $this;
     }
 
+    public function prependData(array $row) {
+        $this->prependData[] = $row;
+
+        return $this;
+    }
+
     /**
      * @param string $query
      *
@@ -271,6 +280,7 @@ class CElement_FormInput_SelectSearch extends CElement_FormInput {
         $ajaxMethod->setData('formatSelection', serialize($this->formatSelection));
         $ajaxMethod->setData('formatResult', serialize($this->formatResult));
         $ajaxMethod->setData('dependsOn', serialize($this->dependsOn));
+        $ajaxMethod->setData('prependData', serialize($this->prependData));
 
         $ajaxUrl = $ajaxMethod->makeUrl();
 
@@ -304,6 +314,12 @@ class CElement_FormInput_SelectSearch extends CElement_FormInput {
             $values = carr::wrap($value);
             $result = c::collect($values)->map(function ($value) {
                 $db = c::db();
+                if (count($this->prependData) > 0) {
+                    $resultFromPrepend = c::collect($this->prependData)->where($this->keyField, '=', $value)->first();
+                    if ($resultFromPrepend != null) {
+                        return $resultFromPrepend;
+                    }
+                }
                 if ($this->dataProvider instanceof CManager_DataProvider_ModelDataProvider) {
                     $query = clone $this->dataProvider;
 
