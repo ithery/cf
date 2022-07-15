@@ -54,6 +54,8 @@ class CElement_FormInput_SelectSearch extends CElement_FormInput {
 
     protected $prependData;
 
+    protected $perPage;
+
     public function __construct($id) {
         parent::__construct($id);
         $this->dropdownClasses = [];
@@ -71,7 +73,7 @@ class CElement_FormInput_SelectSearch extends CElement_FormInput {
         $this->requires = [];
         $this->valueCallback = null;
         $this->applyJs = c::theme('selectsearch.applyJs', 'select2');
-
+        $this->perPage = 10;
         $this->value = null;
         $this->allowClear = false;
         $this->prependData = [];
@@ -133,6 +135,19 @@ class CElement_FormInput_SelectSearch extends CElement_FormInput {
      */
     public function setDelay($val) {
         $this->delay = $val;
+
+        return $this;
+    }
+
+    /**
+     * Set per page for ajax, default is 10.
+     *
+     * @param mixed $perPage
+     *
+     * @return $this
+     */
+    public function setPerPage($perPage) {
+        $this->perPage = $perPage;
 
         return $this;
     }
@@ -586,14 +601,14 @@ class CElement_FormInput_SelectSearch extends CElement_FormInput {
                         let result = {
                             q: params.term, // search term
                             page: params.page,
-                            limit: 10
+                            limit: ' . $this->perPage . '
                         };
                         ' . $additionalRequestDataJs . '
                         return result;
                     },
                     processResults: function (data, params) {
                         params.page = params.page || 1;
-                        var more = (params.page * 10) < data.total;
+                        var more = (params.page * ' . $this->perPage . ') < data.total;
                         return {
                             results: data.data,
                             pagination: {
