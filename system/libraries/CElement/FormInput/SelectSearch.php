@@ -204,7 +204,7 @@ class CElement_FormInput_SelectSearch extends CElement_FormInput {
         return $this;
     }
 
-    public function prependData(array $data) {
+    public function setPrependData(array $data) {
         $this->prependData = $data;
 
         return $this;
