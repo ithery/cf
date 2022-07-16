@@ -1,16 +1,11 @@
 <?php
 
 use Discord\Discord;
-use BotMan\BotMan\BotMan;
 use React\EventLoop\LoopInterface;
-use BotMan\BotMan\Cache\ArrayCache;
-use BotMan\BotMan\Interfaces\CacheInterface;
-use BotMan\BotMan\Interfaces\StorageInterface;
-use BotMan\BotMan\Storages\Drivers\FileStorage;
 
 class CBot_Driver_DiscordDriver_Factory {
     /**
-     * Create a new BotMan instance.
+     * Create a new Bot instance.
      *
      * @param array                          $config
      * @param LoopInterface                  $loop
@@ -34,14 +29,14 @@ class CBot_Driver_DiscordDriver_Factory {
     }
 
     /**
-     * Create a new BotMan instance.
+     * Create a new Bot instance.
      *
      * @param array                          $config
      * @param Discord                        $client
-     * @param CacheInterface                 $cache
+     * @param CCache_Repository              $cache
      * @param CBot_Contract_StorageInterface $storageDriver
      *
-     * @return BotMan
+     * @return CBot_Bot
      *
      * @internal param LoopInterface $loop
      */

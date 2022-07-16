@@ -13,6 +13,7 @@ defined('SYSPATH') or die('No direct access allowed.');
  * @method CElement_Component_FileManager  addFileManager($id=null)
  * @method CElement_Component_Form         addForm($id=null)
  * @method CElement_Component_DataTable    addTable($id=null)
+ * @method CElement_Component_Form_Field   addField($id=null)
  * @method CElement_Element_Div            addDiv($id=null)
  * @method CElement_Element_A              addA($id=null)
  * @method CElement_Element_Span           addSpan($id=null)

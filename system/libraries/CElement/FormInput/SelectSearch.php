@@ -52,6 +52,10 @@ class CElement_FormInput_SelectSearch extends CElement_FormInput {
 
     protected $language;
 
+    protected $prependData;
+
+    protected $perPage;
+
     public function __construct($id) {
         parent::__construct($id);
         $this->dropdownClasses = [];
@@ -69,9 +73,10 @@ class CElement_FormInput_SelectSearch extends CElement_FormInput {
         $this->requires = [];
         $this->valueCallback = null;
         $this->applyJs = c::theme('selectsearch.applyJs', 'select2');
-
+        $this->perPage = 10;
         $this->value = null;
         $this->allowClear = false;
+        $this->prependData = [];
         $language = CF::getLocale();
         if (strlen($language) > 2) {
             $language = strtolower(substr($language, 0, 2));
@@ -135,6 +140,19 @@ class CElement_FormInput_SelectSearch extends CElement_FormInput {
     }
 
     /**
+     * Set per page for ajax, default is 10.
+     *
+     * @param mixed $perPage
+     *
+     * @return $this
+     */
+    public function setPerPage($perPage) {
+        $this->perPage = $perPage;
+
+        return $this;
+    }
+
+    /**
      * @param bool $bool
      *
      * @return $this
@@ -182,6 +200,18 @@ class CElement_FormInput_SelectSearch extends CElement_FormInput {
         if ($this->formatResult == null) {
             $this->formatResult = '{' . carr::first($searchField) . '}';
         }
+
+        return $this;
+    }
+
+    public function setPrependData(array $data) {
+        $this->prependData = $data;
+
+        return $this;
+    }
+
+    public function prependRow(array $row) {
+        $this->prependData[] = $row;
 
         return $this;
     }
@@ -271,6 +301,7 @@ class CElement_FormInput_SelectSearch extends CElement_FormInput {
         $ajaxMethod->setData('formatSelection', serialize($this->formatSelection));
         $ajaxMethod->setData('formatResult', serialize($this->formatResult));
         $ajaxMethod->setData('dependsOn', serialize($this->dependsOn));
+        $ajaxMethod->setData('prependData', serialize($this->prependData));
 
         $ajaxUrl = $ajaxMethod->makeUrl();
 
@@ -304,6 +335,12 @@ class CElement_FormInput_SelectSearch extends CElement_FormInput {
             $values = carr::wrap($value);
             $result = c::collect($values)->map(function ($value) {
                 $db = c::db();
+                if (count($this->prependData) > 0) {
+                    $resultFromPrepend = c::collect($this->prependData)->where($this->keyField, '=', $value)->first();
+                    if ($resultFromPrepend != null) {
+                        return $resultFromPrepend;
+                    }
+                }
                 if ($this->dataProvider instanceof CManager_DataProvider_ModelDataProvider) {
                     $query = clone $this->dataProvider;
 
@@ -570,14 +607,14 @@ class CElement_FormInput_SelectSearch extends CElement_FormInput {
                         let result = {
                             q: params.term, // search term
                             page: params.page,
-                            limit: 10
+                            limit: ' . $this->perPage . '
                         };
                         ' . $additionalRequestDataJs . '
                         return result;
                     },
                     processResults: function (data, params) {
                         params.page = params.page || 1;
-                        var more = (params.page * 10) < data.total;
+                        var more = (params.page * ' . $this->perPage . ') < data.total;
                         return {
                             results: data.data,
                             pagination: {
