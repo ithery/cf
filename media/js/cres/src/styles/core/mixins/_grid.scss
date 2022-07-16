@@ -1,3 +1,4 @@
+@use "sass:math";
 /// Grid system
 //
 // Generate semantic grid columns with these mixins.
@@ -20,7 +21,7 @@
 @mixin make-col($size: false, $columns: $grid-columns) {
     @if $size {
         flex: 0 0 auto;
-        width: percentage($size / $columns);
+        width: percentage(math.div($size , $columns));
     } @else {
         flex: 1 1 0;
         max-width: 100%;
@@ -42,20 +43,20 @@
     $breakpoints: $grid-breakpoints
 ) {
     @each $breakpoint in map-keys($breakpoints) {
-        $prefix: breakpoint-prefix($breakpoint, $breakpoints);
+        $middle: breakpoint-middle($breakpoint, $breakpoints);
 
         @include media-breakpoint-up($breakpoint, $breakpoints) {
-            .#{$prefix}col {
+            .col#{$middle} {
                 flex: 1 0 0%;
             }
 
-            .#{$prefix}col-auto {
+            .col-#{$middle}auto {
                 @include make-col-auto();
             }
 
             @if $columns > 0 {
                 @for $i from 1 through $columns {
-                    .#{$prefix}col-#{$i} {
+                    .col-#{$middle}#{$i} {
                         @include make-col($i, $columns);
                     }
                 }
