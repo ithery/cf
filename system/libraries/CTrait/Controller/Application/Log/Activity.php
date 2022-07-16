@@ -17,11 +17,7 @@ trait CTrait_Controller_Application_Log_Activity {
             ->setCallback(function ($row, $val) {
                 $action = new CElement_Element_A();
                 $action->add($val)
-                    ->setHref('javascript:;')
-                    ->onClickListener()
-                    ->addDialogHandler()
-                    ->setTitle('Activity Detail')
-                    ->setUrl($this->controllerUrl() . 'activityDetail/' . $val);
+                    ->setHref($this->controllerUrl() . 'activityDetail/' . $val);
 
                 return $action;
             });
@@ -44,84 +40,155 @@ trait CTrait_Controller_Application_Log_Activity {
         if (!isset($this->logActivityModel)) {
             $this->logActivityModel = CApp_Model_LogActivity::class;
         }
-        $logActivityModel = $this->logActivityModel;
-        $logActivityModel = $logActivityModel::find($logActivityId);
-        if (!$logActivityModel) {
-            cmsg::add('error', 'Log Activity not found');
 
-            return $app;
+        $logActivityModel = $this->logActivityModel;
+        $logActivityModel = $logActivityModel::findOrFail($logActivityId);
+        $title = 'Activity';
+        if (method_exists($this, 'getTitle')) {
+            $title = $this->getTitle();
         }
+        $app->addBreadcrumb($title, static::controllerUrl());
+        $app->title($logActivityModel->description);
 
         $form = $app->addForm();
-        $form->addField()
+        $divRow = $form->addDiv()->addClass('row');
+
+        $divRow->addDiv()->addClass('col-md-4')->addField()
             ->setLabel('ID')
             ->addDiv()
             ->add($logActivityModel->log_activity_id);
-        $form->addField()
+        $divRow->addDiv()->addClass('col-md-4')->addField()
             ->setLabel('Description')
             ->addDiv()
             ->add($logActivityModel->description);
-        $form->addField()
+        $divRow->addDiv()->addClass('col-md-4')->addField()
             ->setLabel('User Id')
             ->addDiv()
             ->add($logActivityModel->user_id);
-        $form->addField()
+        $divRow->addDiv()->addClass('col-md-4')->addField()
             ->setLabel('App Id')
             ->addDiv()
             ->add($logActivityModel->app_id);
-        $form->addField()
+        $divRow->addDiv()->addClass('col-md-4')->addField()
             ->setLabel('Session Id')
             ->addDiv()
             ->add($logActivityModel->session_id);
-        $form->addField()
+        $divRow->addDiv()->addClass('col-md-4')->addField()
             ->setLabel('Remote Address')
             ->addDiv()
             ->add($logActivityModel->remote_addr);
-        $form->addField()
+        $divRow->addDiv()->addClass('col-md-4')->addField()
             ->setLabel('User Agent')
             ->addDiv()
             ->add($logActivityModel->user_agent);
-        $form->addField()
+        $divRow->addDiv()->addClass('col-md-4')->addField()
             ->setLabel('Platform')
             ->addDiv()
             ->add($logActivityModel->platform);
-        $form->addField()
+        $divRow->addDiv()->addClass('col-md-4')->addField()
             ->setLabel('Browser')
             ->addDiv()
             ->add($logActivityModel->browser . ' (' . $logActivityModel->browser_version . ')');
-        $form->addField()
+        $divRow->addDiv()->addClass('col-md-4')->addField()
             ->setLabel('Uri')
             ->addDiv()
             ->add($logActivityModel->uri);
-        $form->addField()
+        $divRow->addDiv()->addClass('col-md-4')->addField()
             ->setLabel('Routed Uri')
             ->addDiv()
             ->add($logActivityModel->routed_uri);
-        $form->addField()
+        $divRow->addDiv()->addClass('col-md-4')->addField()
             ->setLabel('Controller')
             ->addDiv()
             ->add($logActivityModel->controller);
-        $form->addField()
+        $divRow->addDiv()->addClass('col-md-4')->addField()
             ->setLabel('Method')
             ->addDiv()
             ->add($logActivityModel->method);
-        $form->addField()
+        $divRow->addDiv()->addClass('col-md-4')->addField()
             ->setLabel('Query String')
             ->addDiv()
             ->add($logActivityModel->query_string);
-        $form->addField()
+        $divRow->addDiv()->addClass('col-md-4')->addField()
             ->setLabel('Nav')
             ->addDiv()
             ->add($logActivityModel->nav);
-        $form->addField()
+        $divRow->addDiv()->addClass('col-md-4')->addField()
             ->setLabel('Nav Label')
             ->addDiv()
             ->add($logActivityModel->nav_label);
-        $form->addField()
-            ->setLabel('Data')
-            ->addDiv()
-            ->add($logActivityModel->data);
+
+        $originalData = $logActivityModel->data;
+        $data = $originalData;
+        if (!is_array($data)) {
+            $data = json_decode($data, true);
+        }
+        if (!is_array($data)) {
+            $divRow->addDiv()->addClass('col-md-4')->addField()
+                ->setLabel('Data')
+                ->addDiv()
+                ->add($originalData);
+        } else {
+            //display the data
+            $dataDiv = $divRow->addDiv()->addClass('col-md-12');
+            foreach ($data as $record) {
+                $table = carr::get($record, 'table');
+                $key = carr::get($record, 'key');
+                $type = carr::get($record, 'type');
+                $beforeData = carr::get($record, 'before', []);
+                $afterData = carr::get($record, 'after', []);
+                $beforeKeys = c::collect($beforeData)->mapWithKeys(function ($before, $key) {
+                    return [$key => $key];
+                })->toArray();
+                $afterKeys = c::collect($afterData)->mapWithKeys(function ($before, $key) {
+                    return [$key => $key];
+                })->toArray();
+                $keys = array_merge($beforeKeys, $afterKeys);
+                $changedData = c::collect($keys)->map(function ($value, $key) use ($beforeData, $afterData) {
+                    $beforeValue = carr::get($beforeData, $key);
+                    $afterValue = carr::get($afterData, $key);
+                    $beforeValue = $this->transformToString($beforeValue);
+                    $afterValue = $this->transformToString($afterValue);
+                    $isChanged = $beforeValue != $afterValue;
+
+                    return [
+                        'key' => $key,
+                        'before' => $beforeValue,
+                        'after' => $afterValue,
+                        'isChanged' => (bool) $isChanged,
+                    ];
+                })->toArray();
+                $keyBadge = ' <span class="badge badge-success">' . c::e($key) . '</span>';
+                $typeBadge = ' <span class="badge badge-info">' . c::e($type) . '</span>';
+                $widgetData = $dataDiv->addWidget();
+                $widgetData->setTitle($table . $keyBadge . $typeBadge, false);
+                $widgetData->setNoPadding()->addClass('mb-3');
+                $widgetData->setIcon('ti ti-layers');
+                $tableData = $widgetData->addTable();
+                $tableData->setDataFromArray($changedData)->setApplyDataTable(false)->setAjax(false);
+                $tableData->addColumn('key')->setLabel('Field');
+                $tableData->addColumn('before')->setLabel('Before')->addTransform('showMore:50');
+                $tableData->addColumn('after')->setLabel('After')->addTransform('showMore:50');
+                $tableData->addColumn('isChanged')->setLabel('Changed')->setCallback(function ($row, $val) {
+                    return  $val ? '<span class="badge badge-success">' . 'YES' . '</span>' : '<span class="badge badge-danger">' . 'NO' . '</span>';
+                });
+            }
+        }
 
         return $app;
+    }
+
+    private function transformToString($value) {
+        if ($value instanceof CCarbon) {
+            $value = (string) $value;
+        }
+        if (is_array($value)) {
+            $value = json_encode($value);
+        }
+        if (is_object($value)) {
+            $value = json_encode($value);
+        }
+
+        return $value;
     }
 }
