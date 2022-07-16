@@ -34,6 +34,11 @@ class crouter {
         return c::router()->current()->getRouteData()->getMethod();
     }
 
+    /**
+     * @return string
+     *
+     * @deprecated since 1.3, dont use anymore, build from c::request
+     */
     public static function routed_uri() {
         return c::router()->current()->getRouteData()->getRoutedUri();
     }
