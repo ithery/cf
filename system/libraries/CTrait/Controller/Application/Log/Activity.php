@@ -47,7 +47,7 @@ trait CTrait_Controller_Application_Log_Activity {
         if (method_exists($this, 'getTitle')) {
             $title = $this->getTitle();
         }
-        $app->addBreadcrumb($title, static::controllerUrl());
+        $app->addBreadcrumb($title, static::controllerUrl() . '?tab=activity');
         $app->title($logActivityModel->description);
 
         $form = $app->addForm();
