@@ -71,6 +71,32 @@ class CManager_Transform_MethodExecutor {
         return cstr::ascii($value);
     }
 
+    public function transformShowMore($value, $limit = 100) {
+        if (is_string($value) && strlen($value) > 100) {
+            return CElement_Component_ShowMore::factory()->setLimit($limit)->add($value);
+        }
+
+        return $value;
+    }
+
+    public function transformDiv($value, ...$classes) {
+        $classes = implode(' ', $classes);
+        if ($value instanceof CRenderable) {
+            return CElement_Element_Div::factory()->addClass($classes)->add($value);
+        }
+
+        return '<div class="' . $classes . '">' . $value . '</div>';
+    }
+
+    public function transformSpan($value, ...$classes) {
+        $classes = implode(' ', $classes);
+        if ($value instanceof CRenderable) {
+            return CElement_Element_Span::factory()->addClass($classes)->add($value);
+        }
+
+        return '<span class="' . $classes . '">' . $value . '</span>';
+    }
+
     /**
      * Format bytes to kb, mb, gb, tb.
      *
