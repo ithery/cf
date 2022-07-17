@@ -790,6 +790,17 @@ class c {
     }
 
     /**
+     * Find route from uri.
+     *
+     * @param string $uri
+     *
+     * @return null|CRouting_Route
+     */
+    public static function findRoute($uri) {
+        return static::router()->getRoutes()->match(CHTTP_Request::create($uri));
+    }
+
+    /**
      * Generate the URL to a named route.
      *
      * @param array|string $name
