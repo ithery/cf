@@ -12,7 +12,6 @@ trait CTrait_Controller_Application_OAuth_RefreshToken {
     public function index() {
         $app = c::app();
         $app->title($this->getTitle());
-
         $oauth = CApi::oauth($this->getApiGroup());
         $table = $app->addTable();
         $table->setDataFromModel($oauth->refreshTokenModel(), function (CModel_Query $q) {
