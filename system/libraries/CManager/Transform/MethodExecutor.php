@@ -63,6 +63,10 @@ class CManager_Transform_MethodExecutor {
         return cstr::lower($value);
     }
 
+    public function transformYesNo($value) {
+        return $value ? 'YES' : 'NO';
+    }
+
     public function transformEscape($value) {
         return c::e($value);
     }
