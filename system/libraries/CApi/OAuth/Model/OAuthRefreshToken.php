@@ -5,7 +5,7 @@ class CApi_OAuth_Model_OAuthRefreshToken extends CModel {
      *
      * @var bool
      */
-    public $timestamps = false;
+    public $timestamps = true;
 
     /**
      * The database table used by the model.

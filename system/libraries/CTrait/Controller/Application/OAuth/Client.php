@@ -15,7 +15,7 @@ trait CTrait_Controller_Application_OAuth_Client {
 
         $oauth = CApi::oauth($this->getApiGroup());
         $table = $app->addTable();
-        $table->setDataFromModel($oauth->clientModel, function (CModel_Query $q) {
+        $table->setDataFromModel($oauth->clientModel(), function (CModel_Query $q) {
             $q->orderBy('created', 'desc');
         });
         $table->addColumn('name')->setLabel('Name');
