@@ -15,13 +15,16 @@ trait CTrait_Controller_Application_OAuth_Client {
 
         $oauth = CApi::oauth($this->getApiGroup());
         $table = $app->addTable();
-        $table->setDataFromModel($oauth->clientModel);
+        $table->setDataFromModel($oauth->clientModel, function (CModel_Query $q) {
+            $q->orderBy('created', 'desc');
+        });
         $table->addColumn('name')->setLabel('Name');
         $table->addColumn('secret')->setLabel('Secret');
         $table->addColumn('provider')->setLabel('Provider');
         $table->addColumn('redirect')->setLabel('Redirect');
         $table->addColumn('personal_access_client')->setLabel('Personal Access Client')->addTransform('yesNo');
         $table->addColumn('password_client')->setLabel('Password Client')->addTransform('yesNo');
+        $table->setAjax(true);
 
         return $app;
     }
