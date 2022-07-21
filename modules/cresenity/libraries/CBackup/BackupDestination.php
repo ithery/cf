@@ -46,7 +46,7 @@ class CBackup_BackupDestination {
         if (is_null($this->disk)) {
             return 'unknown';
         }
-        $adapterClass = get_class($this->disk->getDriver()->getAdapter());
+        $adapterClass = get_class($this->disk->getAdapter());
         $filesystemType = carr::last(explode('\\', $adapterClass));
 
         return strtolower($filesystemType);
