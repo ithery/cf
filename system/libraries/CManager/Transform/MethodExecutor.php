@@ -35,6 +35,10 @@ class CManager_Transform_MethodExecutor {
         return c::formatter()->unformatDatetime($value, $format);
     }
 
+    public function transformCarbonDiffForHumans($value) {
+        return CCarbon::parse($value)->diffForHumans();
+    }
+
     public function transformFormatNumber($value, $decimalSeparator = null, $thousandSeparator = null) {
         return c::formatter()->formatNumber($value, $decimalSeparator, $thousandSeparator);
     }
@@ -63,6 +67,10 @@ class CManager_Transform_MethodExecutor {
         return cstr::lower($value);
     }
 
+    public function transformYesNo($value) {
+        return $value ? 'YES' : 'NO';
+    }
+
     public function transformEscape($value) {
         return c::e($value);
     }
@@ -72,7 +80,7 @@ class CManager_Transform_MethodExecutor {
     }
 
     public function transformShowMore($value, $limit = 100) {
-        if (is_string($value) && strlen($value) > 100) {
+        if (is_string($value) && strlen($value) > $limit) {
             return CElement_Component_ShowMore::factory()->setLimit($limit)->add($value);
         }
 
