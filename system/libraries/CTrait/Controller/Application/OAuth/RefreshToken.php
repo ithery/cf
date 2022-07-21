@@ -16,6 +16,8 @@ trait CTrait_Controller_Application_OAuth_RefreshToken {
         $table = $app->addTable();
         $table->setDataFromModel($oauth->refreshTokenModel(), function (CModel_Query $q) {
             $q->with(['oauthAccessToken', 'oauthAccessToken.oauthClient']);
+            $q->whereHas('oauthAccessToken');
+            $q->whereHas('oauthAccessToken.oauthClient');
             $q->orderBy('created', 'desc');
         });
         $table->addColumn('oauthAccessToken.oauthClient.name')->setLabel('Client');

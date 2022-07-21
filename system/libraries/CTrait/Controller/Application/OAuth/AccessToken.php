@@ -17,6 +17,8 @@ trait CTrait_Controller_Application_OAuth_AccessToken {
         $table = $app->addTable();
         $table->setDataFromModel($oauth->tokenModel(), function (CModel_Query $q) {
             $q->with(['oauthClient']);
+            $q->whereHas('oauthClient');
+
             $q->orderBy('created', 'desc');
         });
         $table->addColumn('oauthClient.name')->setLabel('Client');
