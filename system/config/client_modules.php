@@ -74,12 +74,13 @@ return [
         'css' => ['plugins' . DS . 'dialog2' . DS . 'jquery.dialog2.css'],
     ],
     'jquery.datatable' => [
+        'css' => [
+            'plugins/datatable/datatables.css',
+            'plugins/datatable/fixedColumns.dataTables.min.css'
+        ],
         'js' => [
-            'plugins' . DS . 'datatable' . DS . 'jquery.dataTables.js',
-            'plugins' . DS . 'datatable' . DS . 'TableTools.min.js',
-            'plugins' . DS . 'datatable' . DS . 'ColReorder.min.js',
-            'plugins' . DS . 'datatable' . DS . 'ColVis.min.js',
-            'plugins' . DS . 'datatable' . DS . 'jquery.dataTables.columnFilter.js',
+            'plugins/datatable/datatables.js',
+            'plugins/datatable/dataTables.fixedColumns.min.js'
         ],
     ],
     'jquery.datatable.tabletools' => [
@@ -736,6 +737,16 @@ return [
     'wow' => [
         'js' => [
             'plugins/wow/wow.js',
+        ],
+
+    ],
+    'swagger-ui' => [
+        'js' => [
+            'plugins/swagger-ui/swagger-ui-bundle.js',
+            'plugins/swagger-ui/swagger-ui-standalone-preset.js',
+        ],
+        'css' => [
+            'plugins/swagger-ui/swagger-ui.css',
         ],
 
     ],

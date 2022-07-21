@@ -181,6 +181,11 @@ trait CObservable_Trait_ComponentTrait {
         return $treeView;
     }
 
+    /**
+     * @param null|string $id
+     *
+     * @return CElement_Component_PrismCode
+     */
     public function addPrismCode($id = null) {
         $prismCode = new CElement_Component_PrismCode($id);
         $this->wrapper->add($prismCode);
@@ -188,8 +193,35 @@ trait CObservable_Trait_ComponentTrait {
         return $prismCode;
     }
 
+    /**
+     * @param null|string $id
+     *
+     * @return CElement_Component_Blockly
+     */
     public function addBlockly($id = null) {
         return c::tap(new CElement_Component_Blockly($id), function (CElement_Component_Blockly $el) {
+            $this->wrapper->add($el);
+        });
+    }
+
+    /**
+     * @param null|string $id
+     *
+     * @return CElement_Component_Shimmer
+     */
+    public function addShimmer($id = null) {
+        return c::tap(new CElement_Component_Shimmer($id), function (CElement_Component_Shimmer $el) {
+            $this->wrapper->add($el);
+        });
+    }
+
+    /**
+     * @param null|string $id
+     *
+     * @return CElement_Component_ShowMore
+     */
+    public function addShowMore($id = null) {
+        return c::tap(new CElement_Component_ShowMore($id), function (CElement_Component_ShowMore $el) {
             $this->wrapper->add($el);
         });
     }

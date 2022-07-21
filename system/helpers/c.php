@@ -5,6 +5,7 @@ defined('SYSPATH') or die('No direct access allowed.');
 /**
  * Common helper class.
  */
+use Faker\Factory as FackerFactory;
 use Opis\Closure\SerializableClosure;
 use Symfony\Component\VarDumper\VarDumper;
 use Symfony\Component\PropertyAccess\PropertyAccess;
@@ -789,6 +790,17 @@ class c {
     }
 
     /**
+     * Find route from uri.
+     *
+     * @param string $uri
+     *
+     * @return null|CRouting_Route
+     */
+    public static function findRoute($uri) {
+        return static::router()->getRoutes()->match(CHTTP_Request::create($uri));
+    }
+
+    /**
      * Generate the URL to a named route.
      *
      * @param array|string $name
@@ -1183,7 +1195,11 @@ class c {
      */
     public static function transform($value, $callback, $default = null) {
         if (c::filled($value)) {
-            return $callback($value);
+            if ($callback instanceof Closure) {
+                return $callback($value);
+            } else {
+                return c::manager()->transform()->call($callback, $value);
+            }
         }
 
         if (is_callable($default)) {
@@ -1397,7 +1413,7 @@ class c {
      * @return CApp_Formatter
      */
     public static function formatter() {
-        return CApp::formatter();
+        return CApp_Formatter::instance();
     }
 
     /**
@@ -1563,6 +1579,42 @@ class c {
      */
     public static function methodField($method) {
         return new CBase_HtmlString('<input type="hidden" name="_method" value="' . $method . '">');
+    }
+
+    public static function faker($property = null) {
+        $faker = FackerFactory::create();
+
+        return $property ? $faker->{$property} : $faker;
+    }
+
+    public static function stopwatch($callback, $times = 1) {
+        $totalTime = 0;
+
+        foreach (range(1, $times) as $time) {
+            $start = microtime(true);
+
+            $callback();
+
+            $totalTime += microtime(true) - $start;
+        }
+
+        return $totalTime / $times;
+    }
+
+    public static function swap(&$a, &$b) {
+        $temp = $a;
+        $a = $b;
+        $b = $temp;
+    }
+
+    /**
+     * @param null|string               $time
+     * @param null|\DateTimeZone|string $tz
+     *
+     * @return CCarbon
+     */
+    public static function carbon($time = null, $tz = null) {
+        return new CCarbon($time, $tz);
     }
 }
 

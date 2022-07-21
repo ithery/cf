@@ -1,17 +1,12 @@
 <?php
 
-namespace Illuminate\Contracts\Mail;
-
-use CQueue_FactoryInterface;
-use Illuminate\Contracts\Queue\Factory as Queue;
-
 interface CEmail_Contract_MailableInterface {
     /**
      * Send the message using the given mailer.
      *
-     * @param \Illuminate\Contracts\Mail\Factory|\Illuminate\Contracts\Mail\Mailer $mailer
+     * @param \CEmail_Contract_FactoryInterface|\CEmail_Contract_MailerInterface $mailer
      *
-     * @return null|\Illuminate\Mail\SentMessage
+     * @return null|\CEmail_SentMessage
      */
     public function send($mailer);
 
@@ -32,7 +27,7 @@ interface CEmail_Contract_MailableInterface {
      *
      * @return mixed
      */
-    public function later($delay, Queue $queue);
+    public function later($delay, CQueue_FactoryInterface $queue);
 
     /**
      * Set the recipients of the message.

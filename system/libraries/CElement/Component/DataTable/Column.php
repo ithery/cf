@@ -4,11 +4,10 @@ use Twilio\Serialize;
 use SuperClosure\SerializableClosure;
 
 class CElement_Component_DataTable_Column extends CObject {
-    use CTrait_Compat_Element_DataTable_Column,
-        CTrait_Element_Property_Label,
-        CTrait_Element_Responsive;
-
-    public $transforms = [];
+    use CTrait_Compat_Element_DataTable_Column;
+    use CTrait_Element_Property_Label;
+    use CTrait_Element_Responsive;
+    use CTrait_Element_Transform;
 
     public $fieldname;
 
@@ -220,20 +219,6 @@ class CElement_Component_DataTable_Column extends CObject {
 
     public function setExportLabel($label) {
         $this->exportLabel = $label;
-
-        return $this;
-    }
-
-    public function addTransform($name, $args = []) {
-        $func = CFunction::factory($name);
-        if (!is_array($args)) {
-            $args = [$args];
-        }
-        foreach ($args as $arg) {
-            $func->addArg($arg);
-        }
-
-        $this->transforms[] = $func;
 
         return $this;
     }

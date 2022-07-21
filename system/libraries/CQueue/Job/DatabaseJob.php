@@ -36,7 +36,7 @@ class CQueue_Job_DatabaseJob extends CQueue_AbstractJob implements CQueue_JobInt
      */
 
     /**
-     * The database primary Key
+     * The database primary Key.
      *
      * @var \stdClass
      */
@@ -58,7 +58,7 @@ class CQueue_Job_DatabaseJob extends CQueue_AbstractJob implements CQueue_JobInt
     public function release($delay = 0) {
         parent::release($delay);
         $this->delete();
-        return $this->database->release($this->queue, $this->job, $delay);
+        $this->database->deleteAndRelease($this->queue, $this, $delay);
     }
 
     /**
@@ -96,5 +96,14 @@ class CQueue_Job_DatabaseJob extends CQueue_AbstractJob implements CQueue_JobInt
      */
     public function getRawBody() {
         return $this->job->payload;
+    }
+
+    /**
+     * Get the database job record.
+     *
+     * @return \CQueue_Job_DatabaseJobRecord
+     */
+    public function getJobRecord() {
+        return $this->job;
     }
 }

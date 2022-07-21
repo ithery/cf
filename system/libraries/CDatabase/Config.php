@@ -1,6 +1,11 @@
 <?php
 
 class CDatabase_Config {
+    /**
+     * @param string|array $name
+     *
+     * @return null|array
+     */
     public static function resolve($name) {
         $config = null;
         if (is_string($name)) {

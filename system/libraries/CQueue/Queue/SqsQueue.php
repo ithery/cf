@@ -38,19 +38,23 @@ class CQueue_Queue_SqsQueue extends CQueue_AbstractQueue {
      * @param \Aws\Sqs\SqsClient $sqs
      * @param string             $default
      * @param string             $prefix
+     * @param bool               $dispatchAfterCommit
+     * @param mixed              $suffix
      *
      * @return void
      */
-    public function __construct(SqsClient $sqs, $default, $prefix = '') {
+    public function __construct(SqsClient $sqs, $default, $prefix = '', $suffix = '', $dispatchAfterCommit = false) {
         $this->sqs = $sqs;
         $this->prefix = $prefix;
+        $this->suffix = $suffix;
         $this->default = $default;
+        $this->dispatchAfterCommit = $dispatchAfterCommit;
     }
 
     /**
      * Get the size of the queue.
      *
-     * @param string|null $queue
+     * @param null|string $queue
      *
      * @return int
      */
@@ -60,6 +64,7 @@ class CQueue_Queue_SqsQueue extends CQueue_AbstractQueue {
             'AttributeNames' => ['ApproximateNumberOfMessages'],
         ]);
         $attributes = $response->get('Attributes');
+
         return (int) $attributes['ApproximateNumberOfMessages'];
     }
 
@@ -68,19 +73,27 @@ class CQueue_Queue_SqsQueue extends CQueue_AbstractQueue {
      *
      * @param string      $job
      * @param mixed       $data
-     * @param string|null $queue
+     * @param null|string $queue
      *
      * @return mixed
      */
     public function push($job, $data = '', $queue = null) {
-        return $this->pushRaw($this->createPayload($job, $queue ?: $this->default, $data), $queue);
+        return $this->enqueueUsing(
+            $job,
+            $this->createPayload($job, $queue ?: $this->default, $data),
+            $queue,
+            null,
+            function ($payload, $queue) {
+                return $this->pushRaw($payload, $queue);
+            }
+        );
     }
 
     /**
      * Push a raw payload onto the queue.
      *
      * @param string      $payload
-     * @param string|null $queue
+     * @param null|string $queue
      * @param array       $options
      *
      * @return mixed
@@ -97,24 +110,51 @@ class CQueue_Queue_SqsQueue extends CQueue_AbstractQueue {
      * @param \DateTimeInterface|\DateInterval|int $delay
      * @param string                               $job
      * @param mixed                                $data
-     * @param string|null                          $queue
+     * @param null|string                          $queue
      *
      * @return mixed
      */
     public function later($delay, $job, $data = '', $queue = null) {
-        return $this->sqs->sendMessage([
-            'QueueUrl' => $this->getQueue($queue),
-            'MessageBody' => $this->createPayload($job, $queue ?: $this->default, $data),
-            'DelaySeconds' => $this->secondsUntil($delay),
-        ])->get('MessageId');
+        return $this->enqueueUsing(
+            $job,
+            $this->createPayload($job, $queue ?: $this->default, $data),
+            $queue,
+            $delay,
+            function ($payload, $queue, $delay) {
+                return $this->sqs->sendMessage([
+                    'QueueUrl' => $this->getQueue($queue),
+                    'MessageBody' => $payload,
+                    'DelaySeconds' => $this->secondsUntil($delay),
+                ])->get('MessageId');
+            }
+        );
+    }
+
+    /**
+     * Push an array of jobs onto the queue.
+     *
+     * @param array       $jobs
+     * @param mixed       $data
+     * @param null|string $queue
+     *
+     * @return void
+     */
+    public function bulk($jobs, $data = '', $queue = null) {
+        foreach ((array) $jobs as $job) {
+            if (isset($job->delay)) {
+                $this->later($job->delay, $job, $data, $queue);
+            } else {
+                $this->push($job, $data, $queue);
+            }
+        }
     }
 
     /**
      * Pop the next job off of the queue.
      *
-     * @param string|null $queue
+     * @param null|string $queue
      *
-     * @return \CQueue_JobInterface|null
+     * @return null|\CQueue_JobInterface
      */
     public function pop($queue = null) {
         $response = $this->sqs->receiveMessage([
@@ -135,12 +175,13 @@ class CQueue_Queue_SqsQueue extends CQueue_AbstractQueue {
     /**
      * Get the queue or return the default.
      *
-     * @param string|null $queue
+     * @param null|string $queue
      *
      * @return string
      */
     public function getQueue($queue) {
         $queue = $queue ?: $this->default;
+
         return filter_var($queue, FILTER_VALIDATE_URL) === false ? rtrim($this->prefix, '/') . '/' . $queue : $queue;
     }
 

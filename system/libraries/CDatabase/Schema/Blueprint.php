@@ -82,7 +82,7 @@ class CDatabase_Schema_Blueprint {
      */
     public function build(CDatabase $connection, CDatabase_Schema_Grammar $grammar) {
         foreach ($this->toSql($connection, $grammar) as $statement) {
-            $connection->statement($statement);
+            $connection->query($statement);
         }
     }
 

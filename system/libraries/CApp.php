@@ -13,6 +13,7 @@ defined('SYSPATH') or die('No direct access allowed.');
  * @method CElement_Component_FileManager  addFileManager($id=null)
  * @method CElement_Component_Form         addForm($id=null)
  * @method CElement_Component_DataTable    addTable($id=null)
+ * @method CElement_Component_Form_Field   addField($id=null)
  * @method CElement_Element_Div            addDiv($id=null)
  * @method CElement_Element_A              addA($id=null)
  * @method CElement_Element_Span           addSpan($id=null)
@@ -469,6 +470,12 @@ class CApp implements CInterface_Responsable, CInterface_Renderable, CInterface_
         return $childList;
     }
 
+    protected function minifyJavascript($buffer) {
+        $minifier = new CManager_Asset_Compiler_Minify_MinifyJs();
+
+        return $minifier->execute($buffer);
+    }
+
     public function toArray() {
         $data = [];
         $data['title'] = $this->title;
@@ -484,6 +491,10 @@ class CApp implements CInterface_Responsable, CInterface_Renderable, CInterface_
         $asset = CManager::asset();
         $html = $this->element->html();
         $js = $this->element->js();
+        if (CF::config('app.javascript.minify')) {
+            $js = $this->minifyJavascript($js);
+        }
+
         $js = $asset->renderJsRequire($js, 'cresenity.cf.require');
 
         $cappScript = $this->yieldPushContent('capp-script');

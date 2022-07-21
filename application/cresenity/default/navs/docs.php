@@ -121,6 +121,26 @@ return [
                 'label' => c::__('Form'),
                 'uri' => 'docs/element/form',
             ],
+            [
+                'name' => 'element.tab',
+                'label' => c::__('Tab'),
+                'uri' => 'docs/element/tab',
+            ],
+            [
+                'name' => 'element.widget',
+                'label' => c::__('Widget'),
+                'uri' => 'docs/element/widget',
+            ],
+            [
+                'name' => 'element.showmore',
+                'label' => c::__('ShowMore'),
+                'uri' => 'docs/element/showmore',
+            ],
+            [
+                'name' => 'element.shimmer',
+                'label' => c::__('Shimmer'),
+                'uri' => 'docs/element/shimmer',
+            ],
 
         ]
     ],
@@ -209,6 +229,11 @@ return [
                 'uri' => 'docs/cresjs/basic',
             ],
             [
+                'name' => 'cresjs.css',
+                'label' => c::__('Css'),
+                'uri' => 'docs/cresjs/css',
+            ],
+            [
                 'name' => 'cresjs.php',
                 'label' => c::__('PHPJS Function'),
                 'uri' => 'docs/cresjs/php',
@@ -219,6 +244,16 @@ return [
                 'uri' => 'docs/cresjs/reload',
             ],
             [
+                'name' => 'cresjs.confirm',
+                'label' => c::__('Confirm'),
+                'uri' => 'docs/cresjs/confirm',
+            ],
+            [
+                'name' => 'cresjs.observer',
+                'label' => c::__('Observer'),
+                'uri' => 'docs/cresjs/observer',
+            ],
+            [
                 'name' => 'cresjs.ui',
                 'label' => c::__('UI'),
                 'uri' => 'docs/cresjs/ui',
@@ -227,6 +262,11 @@ return [
                 'name' => 'cresjs.helper',
                 'label' => c::__('Helper'),
                 'uri' => 'docs/cresjs/helper',
+            ],
+            [
+                'name' => 'cresjs.cssVar',
+                'label' => c::__('CSS Var'),
+                'uri' => 'docs/cresjs/cssVar',
             ],
 
         ]

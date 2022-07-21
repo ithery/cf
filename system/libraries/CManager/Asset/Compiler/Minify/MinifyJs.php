@@ -106,12 +106,12 @@ class CManager_Asset_Compiler_Minify_MinifyJs extends CManager_Asset_Compiler_Mi
     protected $operatorsAfter = [];
 
     /**
-     * {@inheritdoc}
+     * @inheritdoc
      */
     public function __construct() {
         call_user_func_array(['parent', '__construct'], func_get_args());
 
-        $dataDir = DOCROOT . 'modules/cresenity/data/minify/js/';
+        $dataDir = DOCROOT . 'system/data/minify/js/';
         $options = FILE_IGNORE_NEW_LINES | FILE_SKIP_EMPTY_LINES;
         $this->keywordsReserved = file($dataDir . 'keywords_reserved.txt', $options);
         $this->keywordsBefore = file($dataDir . 'keywords_before.txt', $options);
@@ -569,6 +569,7 @@ class CManager_Asset_Compiler_Minify_MinifyJs extends CManager_Asset_Compiler_Mi
                     // only restore `while` if amount of `{` and `}` are the same;
                     // otherwise, that `for` isn't associated with this `do`
                     $content = substr_replace($content, 'while(!0)', $offsetWhile, strlen('for(;;)'));
+
                     break;
                 }
             }

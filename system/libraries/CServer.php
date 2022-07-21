@@ -138,4 +138,8 @@ class CServer {
     public static function browsershot($url = '', $deviceEmulate = false) {
         return new CServer_Browsershot($url, $deviceEmulate);
     }
+
+    public static function runSMTPServer($options=[]) {
+        return CServer_SMTP_ServerManager::run($options);
+    }
 }
