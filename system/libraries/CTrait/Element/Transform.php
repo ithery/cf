@@ -16,6 +16,10 @@ trait CTrait_Element_Transform {
      */
     protected $transforms = [];
 
+    public function getTransforms() {
+        return $this->transforms;
+    }
+
     public function addTransform($transform) {
         $transform = carr::wrap($transform);
 

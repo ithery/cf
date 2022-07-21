@@ -21,6 +21,21 @@ return [
                 'uri' => 'demo/elements/table/index',
             ],
             [
+                'name' => 'elements.widget',
+                'label' => c::__('Widget'),
+                'uri' => 'demo/elements/widget/index',
+            ],
+            [
+                'name' => 'elements.tab',
+                'label' => c::__('Tab'),
+                'uri' => 'demo/elements/tab/index',
+            ],
+            [
+                'name' => 'elements.form',
+                'label' => c::__('Form'),
+                'uri' => 'demo/elements/tab/index',
+            ],
+            [
                 'name' => 'elements.Shimmer',
                 'label' => c::__('Shimmer'),
                 'uri' => 'demo/elements/shimmer/index',
@@ -29,6 +44,17 @@ return [
                 'name' => 'elements.showMore',
                 'label' => c::__('Show More'),
                 'uri' => 'demo/elements/showMore/index',
+            ],
+        ]
+    ],
+    [
+        'name' => 'controls',
+        'label' => c::__('Controls'),
+        'subnav' => [
+            [
+                'name' => 'controls.text',
+                'label' => c::__('Text'),
+                'uri' => 'demo/controls/text/index',
             ],
         ]
     ],

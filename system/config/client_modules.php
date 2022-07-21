@@ -740,5 +740,15 @@ return [
         ],
 
     ],
+    'swagger-ui' => [
+        'js' => [
+            'plugins/swagger-ui/swagger-ui-bundle.js',
+            'plugins/swagger-ui/swagger-ui-standalone-preset.js',
+        ],
+        'css' => [
+            'plugins/swagger-ui/swagger-ui.css',
+        ],
+
+    ],
 
 ];

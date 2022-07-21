@@ -60,11 +60,19 @@ class CApi_OAuth_RouteManager {
         return $resolver();
     }
 
+    public function getTokenUrl() {
+        return c::url($this->resolvePrefix() . '/token');
+    }
+
     public function getAuthorizeUrl() {
         return c::url($this->resolvePrefix() . '/authorize');
     }
 
     public function getLoginUrl() {
         return c::url($this->resolvePrefix() . '/authorization/login');
+    }
+
+    public function getSwaggerRedirectUrl() {
+        return c::url($this->resolvePrefix() . '/swagger/redirect');
     }
 }

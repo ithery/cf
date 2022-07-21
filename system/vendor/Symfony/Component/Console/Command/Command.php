@@ -11,16 +11,16 @@
 
 namespace Symfony\Component\Console\Command;
 
-use Symfony\Component\Console\Exception\ExceptionInterface;
-use Symfony\Component\Console\Input\InputDefinition;
+use Symfony\Component\Console\Application;
+use Symfony\Component\Console\Helper\HelperSet;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
+use Symfony\Component\Console\Input\InputDefinition;
 use Symfony\Component\Console\Output\OutputInterface;
-use Symfony\Component\Console\Application;
-use Symfony\Component\Console\Helper\HelperSet;
-use Symfony\Component\Console\Exception\InvalidArgumentException;
 use Symfony\Component\Console\Exception\LogicException;
+use Symfony\Component\Console\Exception\ExceptionInterface;
+use Symfony\Component\Console\Exception\InvalidArgumentException;
 
 /**
  * Base class for all commands.
@@ -28,8 +28,15 @@ use Symfony\Component\Console\Exception\LogicException;
  * @author Fabien Potencier <fabien@symfony.com>
  */
 class Command {
+    // see https://tldp.org/LDP/abs/html/exitcodes.html
+    const SUCCESS = 0;
+
+    const FAILURE = 1;
+
+    const INVALID = 2;
+
     /**
-     * @var string|null The default command name
+     * @var null|string The default command name
      */
     protected static $defaultName;
 
@@ -64,7 +71,7 @@ class Command {
     private $helperSet;
 
     /**
-     * @return string|null The default command name or null when no default name is set
+     * @return null|string The default command name or null when no default name is set
      */
     public static function getDefaultName() {
         $class = get_called_class();
@@ -74,7 +81,7 @@ class Command {
     }
 
     /**
-     * @param string|null $name The name of the command; passing null means it must be set in configure()
+     * @param null|string $name The name of the command; passing null means it must be set in configure()
      *
      * @throws LogicException When the command name is empty
      */
@@ -154,9 +161,9 @@ class Command {
      * execute() method, you set the code to execute by passing
      * a Closure to the setCode() method.
      *
-     * @return null|int null or 0 if everything went fine, or an error code
-     *
      * @throws LogicException When this abstract method is not implemented
+     *
+     * @return null|int null or 0 if everything went fine, or an error code
      *
      * @see setCode()
      */
@@ -190,9 +197,9 @@ class Command {
      * setCode() method or by overriding the execute() method
      * in a sub-class.
      *
-     * @return int The command exit code
-     *
      * @throws \Exception When binding input fails. Bypass this by calling {@link ignoreValidationErrors()}.
+     *
+     * @return int The command exit code
      *
      * @see setCode()
      * @see execute()
@@ -262,9 +269,9 @@ class Command {
      *
      * @param callable $code A callable(InputInterface $input, OutputInterface $output)
      *
-     * @return $this
-     *
      * @throws InvalidArgumentException
+     *
+     * @return $this
      *
      * @see execute()
      */
@@ -400,9 +407,9 @@ class Command {
      *
      * @param string $name The command name
      *
-     * @return $this
-     *
      * @throws InvalidArgumentException When the name is invalid
+     *
+     * @return $this
      */
     public function setName($name) {
         $this->validateName($name);
@@ -527,9 +534,9 @@ class Command {
      *
      * @param string[] $aliases An array of aliases for the command
      *
-     * @return $this
-     *
      * @throws InvalidArgumentException When an alias is invalid
+     *
+     * @return $this
      */
     public function setAliases($aliases) {
         if (!is_array($aliases) && !$aliases instanceof \Traversable) {
@@ -602,10 +609,10 @@ class Command {
      *
      * @param string $name The helper name
      *
-     * @return mixed The helper value
-     *
      * @throws LogicException           if no HelperSet is defined
      * @throws InvalidArgumentException if the helper is not defined
+     *
+     * @return mixed The helper value
      */
     public function getHelper($name) {
         if (null === $this->helperSet) {

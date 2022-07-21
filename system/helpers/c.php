@@ -790,6 +790,17 @@ class c {
     }
 
     /**
+     * Find route from uri.
+     *
+     * @param string $uri
+     *
+     * @return null|CRouting_Route
+     */
+    public static function findRoute($uri) {
+        return static::router()->getRoutes()->match(CHTTP_Request::create($uri));
+    }
+
+    /**
      * Generate the URL to a named route.
      *
      * @param array|string $name
@@ -1184,7 +1195,11 @@ class c {
      */
     public static function transform($value, $callback, $default = null) {
         if (c::filled($value)) {
-            return $callback($value);
+            if ($callback instanceof Closure) {
+                return $callback($value);
+            } else {
+                return c::manager()->transform()->call($callback, $value);
+            }
         }
 
         if (is_callable($default)) {

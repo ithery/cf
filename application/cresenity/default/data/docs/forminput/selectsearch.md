@@ -15,7 +15,58 @@ $form->addField()->setLabel('User')->addSelectSearchControl('userId')
     ->setValue($deviceId);
 ```
 
+### Prepending Data
+#### Prepending Data With Model
+```php
+    $controlOutlet = $app->addField()->setLabel('Outlet')->addSelectSearchControl('outletId')
+    ->setDataFromModel(SEModel_Outlet::class, function ($query) {
+        $query->where('outlet_type', 'fisik');
+    })->setKeyField('outlet_id')
+    ->setFormat(function ($outlet) {
+        if (is_array($outlet)) {
+            if (carr::get($outlet, 'outlet_id') == 'ALL') {
+                return 'ALL';
+            }
+        }
+        $html = '<div>';
+        if (SE::isAdmin()) {
+            $html .= $outlet->vendor->name . ' - ';
+        }
+        $html .= $outlet->name . ' <span class="badge badge-success">[' . ucwords($outlet->outlet_type) . ']</span>';
+        $html .= '</div>';
 
+        return $html;
+    })->setPlaceholder(c::__('Pilih Outlet'))->setValue('')
+    ->prependRow([
+        'outlet_id' => 'ALL',
+    ])->setValue('ALL');
+```
+
+#### Prepending Data With Query
+```php
+$controlOutlet = $app->addField()->setLabel('Outlet')->addSelectSearchControl('outletId')
+    ->setQuery("select * from outlet where status>0 and outlet_type='fisik'")->setKeyField('outlet_id')
+    ->setFormat(function ($outlet) {
+        if (is_array($outlet)) {
+            if (cstr::startsWith(carr::get($outlet, 'outlet_id'), 'ALL')) {
+                return carr::get($outlet, 'outlet_id');
+            }
+        }
+        $html = '<div>';
+
+        $html .= carr::get($outlet, 'name') . ' <span class="badge badge-success">[' . ucwords(carr::get($outlet, 'outlet_type')) . ']</span>';
+        $html .= '</div>';
+
+        return $html;
+    })->setPlaceholder(c::__('Pilih Outlet'))->setValue('')
+    ->prependRow([
+        'outlet_id' => 'ALL 1',
+    ])->prependRow([
+        'outlet_id' => 'ALL 2',
+    ])->prependRow([
+        'outlet_id' => 'ALL 3',
+    ])->setValue('ALL 3')->setPerPage(5);
+```
 ### Extending SelectSearch
 
 ```php

@@ -31,6 +31,7 @@ import AlpineAutoNumeric from './alpine/autonumeric';
 import AlpineTippy from './alpine/tippy';
 import { attachWaves } from './ui/waves';
 import formatter from './formatter';
+import { initCssDomVar } from './module/css-dom-var';
 export default class Cresenity {
     constructor() {
         this.cf = cf;
@@ -153,7 +154,7 @@ export default class Cresenity {
         if (error !== 'abort') {
             this.message('error', 'Error, please call administrator... (' + error + ')');
             if(xhr.status!=200) {
-                if(window.capp && window.capp.environment && window.capp.environment!=='production') {
+                if(window.capp?.environment !== 'production') {
                     this.htmlModal(xhr.responseText);
                 }
             }
@@ -665,9 +666,9 @@ export default class Cresenity {
         rp = '' + rp;
         let rupiah = '';
         let vfloat = '';
-        let ds = window.capp.decimal_separator;
-        let ts = window.capp.thousand_separator;
-        let dd = window.capp.decimal_digit;
+        let ds = window.capp?.format?.decimalSeparator ?? '.';
+        let ts = window.capp?.format?.thousandSeparator ?? ',';
+        let dd = window.capp?.format?.decimalDigit ?? 2;
         dd = parseInt(dd, 10);
         let minusStr = '';
         if (rp.indexOf('-') >= 0) {
@@ -698,13 +699,9 @@ export default class Cresenity {
         if (typeof rp == 'undefined') {
             rp = '';
         }
-        let ds = window.capp.decimal_separator;
-        let ts = window.capp.thousand_separator;
-        let last3 = rp.substr(rp.length - 3);
-        let char_last3 = last3.charAt(0);
-        if (char_last3 != ts) {
-            rp = this.replaceAll(rp, ts, '');
-        }
+        let ds = window.capp?.format?.decimalSeparator ?? '.';
+        let ts = window.capp?.format?.thousandSeparator ?? ',';
+        rp = this.replaceAll(rp, ts, '');
 
         rp = rp.replace(ds, '.');
         return rp;
@@ -984,7 +981,7 @@ export default class Cresenity {
     }
     initWaves() {
         if($) {
-            const selector = window.capp.waves.selector ?? '.cres-waves-effect' ;
+            const selector = window.capp?.waves?.selector ?? '.cres-waves-effect' ;
             $(selector).each((index,item) => {
                 if(!$(item).hasClass('cres-waves-effect')) {
                     $(item).addClass('cres-waves-effect')
@@ -1000,6 +997,9 @@ export default class Cresenity {
             //window.Alpine.start();
         }
     }
+    initCssDomVar() {
+        initCssDomVar();
+    }
     initAlpineAndUi() {
         Alpine.plugin(AlpineCleave);
         Alpine.plugin(AlpineAutoNumeric);
@@ -1008,6 +1008,7 @@ export default class Cresenity {
         this.ui.start();
         window.Alpine.start();
         this.alpine = new CresAlpine(window.Alpine);
+
     }
 
     initLiveReload() {
@@ -1047,6 +1048,7 @@ export default class Cresenity {
             this.initPlugin();
             this.initWaves();
             this.initAlpineAndUi();
+            this.initCssDomVar();
             this.initLiveReload();
             initProgressive();
             let root = document.getElementsByTagName('html')[0]; // '0' to assign the first (and only `HTML` tag)

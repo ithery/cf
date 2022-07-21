@@ -52,6 +52,11 @@ final class CModel_Activity {
         $this->isStarted = false;
     }
 
+    public function cancel() {
+        $this->isStarted = false;
+        $this->data = [];
+    }
+
     public function addData($table, $key, $type, $before, $after, $changes) {
         $d['table'] = $table;
         $d['key'] = $key;

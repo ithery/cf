@@ -183,4 +183,23 @@ class CApi_Manager {
     public function createDocsGenerator() {
         return new CApi_Docs_GeneratorFactory($this->group);
     }
+
+    // /**
+    //  * @return CHTTP_RESPONSE
+    //  */
+    // public function createRunnerResponse() {
+    //     $urlToDocs = $this->generateDocumentationFileURL($documentation, $config);
+    //     $useAbsolutePath = config('l5-swagger.documentations.' . $documentation . '.paths.use_absolute_path', true);
+
+    //     // Need the / at the end to avoid CORS errors on Homestead systems.
+    //     return c::response()->view('cresenity.api.swagger', [
+    //         'documentation' => $documentation,
+    //         'secure' => c::request()->secure(),
+    //         'urlToDocs' => $urlToDocs,
+    //         'operationsSorter' => $config['operations_sort'],
+    //         'configUrl' => $config['additional_config_url'],
+    //         'validatorUrl' => $config['validator_url'],
+    //         'useAbsolutePath' => $useAbsolutePath,
+    //     ], 200);
+    // }
 }
