@@ -1195,7 +1195,11 @@ class c {
      */
     public static function transform($value, $callback, $default = null) {
         if (c::filled($value)) {
-            return $callback($value);
+            if ($callback instanceof Closure) {
+                return $callback($value);
+            } else {
+                return c::manager()->transform()->call($callback, $value);
+            }
         }
 
         if (is_callable($default)) {

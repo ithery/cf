@@ -120,9 +120,12 @@ class CAjax_Engine_SelectSearch_Processor_Query extends CAjax_Engine_SelectSearc
 
         $r = $db->query($qfilter);
 
-        $result = $r->result(false);
+        $result = $r->resultArray(false);
+        if (!is_array($prependData)) {
+            $prependData = [];
+        }
         $data = [];
-        $items = c::collect($prependData)->merge($result);
+        $items = c::collect(array_merge($prependData, $result));
         $data = $items->map(function ($row) use ($valueCallbackFunction, $keyField) {
             $p = [];
             foreach ($row as $k => $v) {
