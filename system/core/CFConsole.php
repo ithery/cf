@@ -21,6 +21,8 @@ class CFConsole {
         CConsole_Command_Daemon_DaemonStartCommand::class,
         CConsole_Command_Daemon_DaemonStatusCommand::class,
         CConsole_Command_Daemon_DaemonStopCommand::class,
+        CConsole_Command_Daemon_Supervisor_StartCommand::class,
+        CConsole_Command_Daemon_Supervisor_StatusCommand::class,
         CConsole_Command_Cron_ScheduleListCommand::class,
         CConsole_Command_Cron_ScheduleFinishCommand::class,
         CConsole_Command_Cron_ScheduleRunCommand::class,
