@@ -2,26 +2,9 @@
 
 class CGeo_Geocoder {
     /**
-     * @var Provider[]
+     * @var CGeo_ProviderAggregator
      */
-    private $providers = [];
-
-    /**
-     * @var Provider
-     */
-    private $provider;
-
-    /**
-     * @var int
-     */
-    private $limit;
-
-    /**
-     * A callable that decided what provider to use.
-     *
-     * @var callable
-     */
-    private $decider;
+    private $providerAggregator;
 
     private static $instance;
 
@@ -31,5 +14,9 @@ class CGeo_Geocoder {
         }
 
         return static::$instance;
+    }
+
+    public function __construct() {
+        $this->providerAggregator = new CGeo_ProviderAggregator();
     }
 }

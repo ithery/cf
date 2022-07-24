@@ -210,8 +210,8 @@ final class CGeo_Provider_GoogleMaps extends CGeo_ProviderHttpAbstract implement
                 }
             }
 
-            /** @var GoogleAddress $address */
-            $address = $builder->build(GoogleAddress::class);
+            /** @var CGeo_Provider_GoogleMaps_Model_GoogleAddress $address */
+            $address = $builder->build(CGeo_Provider_GoogleMaps_Model_GoogleAddress::class);
             $address = $address->withId($builder->getValue('id'));
             if (isset($result->geometry->location_type)) {
                 $address = $address->withLocationType($result->geometry->location_type);
