@@ -8,7 +8,7 @@ defined('SYSPATH') or die('No direct access allowed.');
  *
  * @since Aug 18, 2018, 8:04:37 PM
  */
-abstract class CGeo_Provider implements CGeo_Interface_ProviderInterface {
+abstract class CGeo_ProviderAbstract implements CGeo_Interface_ProviderInterface {
     /**
      * Returns the results for the 'localhost' special case.
      *
