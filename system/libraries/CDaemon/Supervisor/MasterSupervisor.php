@@ -229,6 +229,7 @@ class CDaemon_Supervisor_MasterSupervisor implements CDaemon_Contract_PausableIn
      */
     protected function processPendingCommands() {
         foreach (CDaemon_Supervisor::supervisorCommandQueue()->pending($this->commandQueue()) as $command) {
+            CDaemon::log('Get Pending Command:' . $command->command);
             c::container($command->command)->process($this, $command->options);
         }
     }
