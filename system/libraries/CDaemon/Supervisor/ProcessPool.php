@@ -28,7 +28,7 @@ class CDaemon_Supervisor_ProcessPool implements Countable {
     /**
      * The supervisor options for the process pool.
      *
-     * @var SupervisorOptions
+     * @var CDaemon_Supervisor_SupervisorOptions
      */
     public $options;
 
