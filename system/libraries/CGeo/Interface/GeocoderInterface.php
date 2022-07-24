@@ -26,9 +26,9 @@ interface CGeo_Interface_GeocoderInterface extends CGeo_Interface_ProviderInterf
      *
      * @param string $value
      *
-     * @return CGeo_Interface_CollectionInterface
-     *
      * @throws CGeo_Interface_ExceptionInterface
+     *
+     * @return CGeo_Interface_CollectionInterface
      */
     public function geocode($value);
 
@@ -38,9 +38,9 @@ interface CGeo_Interface_GeocoderInterface extends CGeo_Interface_ProviderInterf
      * @param float $latitude
      * @param float $longitude
      *
-     * @return CGeo_Interface_CollectionInterface
-     *
      * @throws CGeo_Interface_ExceptionInterface
+     *
+     * @return CGeo_Interface_CollectionInterface
      */
     public function reverse($latitude, $longitude);
 }
