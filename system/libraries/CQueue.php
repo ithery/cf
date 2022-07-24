@@ -155,13 +155,6 @@ final class CQueue {
      * @return void
      */
     protected static function registerRedisConnector($manager) {
-        if (static::$isUsingRedisSupervisor) {
-            $manager->addConnector('redis', function () {
-                return new CDaemon_Supervisor_Queue_RedisConnector(CRedis::instance());
-            });
-
-            return;
-        }
         $manager->addConnector('redis', function () {
             return new CQueue_Connector_RedisConnector(CRedis::instance());
         });
@@ -305,13 +298,5 @@ final class CQueue {
             CF::config('app.name'),
             $config['table']
         );
-    }
-
-    public static function isUsingRedisSupervisor() {
-        return static::$isUsingRedisSupervisor;
-    }
-
-    public static function usingRedisSupervisor($isUsing = true) {
-        static::$isUsingRedisSupervisor = $isUsing;
     }
 }

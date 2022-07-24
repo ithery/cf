@@ -27,8 +27,19 @@ class CDaemon_Supervisor {
     protected static $metricsRepository;
 
     /**
-     * @return CDaemon_Supervisor_Contract_SupervisorCommandQueueInterface
+     * @var CDaemon_Supervisor_Contract_TagRepositoryInterface
      */
+    protected static $tagRepository;
+
+    /**
+     * @var CDaemon_Supervisor_Contract_ProcessRepositoryInterface
+     */
+    protected static $processRepository;
+
+    /**
+     * @var CDaemon_Supervisor_Contract_WorkloadRepositoryInterface
+     */
+    protected static $workloadRepository;
 
     /**
      * @var CDaemon_Supervisor_WaitTimeCalculator
@@ -49,6 +60,11 @@ class CDaemon_Supervisor {
      * @var CDaemon_Supervisor_Repository_RedisJobRepository
      */
     protected static $jobRepository;
+
+    /**
+     * @var CDaemon_Supervisor_Stopwatch
+     */
+    protected static $stopwatch;
 
     public static function supervisorCommandQueue() {
         if (static::$supervisorCommandQueue == null) {
@@ -89,6 +105,39 @@ class CDaemon_Supervisor {
         }
 
         return static::$metricsRepository;
+    }
+
+    /**
+     * @return CDaemon_Supervisor_Contract_TagRepositoryInterface
+     */
+    public static function tagRepository() {
+        if (static::$tagRepository == null) {
+            static::$tagRepository = new CDaemon_Supervisor_Repository_RedisTagRepository();
+        }
+
+        return static::$tagRepository;
+    }
+
+    /**
+     * @return CDaemon_Supervisor_Contract_ProcessRepositoryInterface
+     */
+    public static function processRepository() {
+        if (static::$processRepository == null) {
+            static::$processRepository = new CDaemon_Supervisor_Repository_RedisProcessRepository();
+        }
+
+        return static::$processRepository;
+    }
+
+    /**
+     * @return CDaemon_Supervisor_Contract_WorkloadRepositoryInterface
+     */
+    public static function workloadRepository() {
+        if (static::$workloadRepository == null) {
+            static::$workloadRepository = new CDaemon_Supervisor_Repository_RedisWorkloadRepository();
+        }
+
+        return static::$workloadRepository;
     }
 
     /**
@@ -146,6 +195,17 @@ class CDaemon_Supervisor {
         return static::$jobRepository;
     }
 
+    /**
+     * @return CDaemon_Supervisor_Stopwatch
+     */
+    public static function stopwatch() {
+        if (static::$stopwatch == null) {
+            static::$stopwatch = new CDaemon_Supervisor_Stopwatch();
+        }
+
+        return static::$stopwatch;
+    }
+
     public static function totalPausedMasters() {
         if (!$masters = static::masterSupervisorRepository()->all()) {
             return 0;
@@ -177,5 +237,9 @@ class CDaemon_Supervisor {
         return c::collect($masters)->every(function ($master) {
             return $master->status === 'paused';
         }) ? 'paused' : 'running';
+    }
+
+    public static function boot() {
+        CDaemon_Supervisor_Bootstrap::boot();
     }
 }

@@ -1,10 +1,5 @@
 <?php
 
-use Illuminate\Support\Str;
-use Laravel\Horizon\Contracts\HorizonCommandQueue;
-use Laravel\Horizon\Events\MasterSupervisorDeployed;
-use Laravel\Horizon\MasterSupervisorCommands\AddSupervisor;
-
 class CDaemon_Supervisor_ProvisioningPlan {
     /**
      * The master supervisor's name.
@@ -119,9 +114,10 @@ class CDaemon_Supervisor_ProvisioningPlan {
      * @return void
      */
     protected function add(CDaemon_Supervisor_SupervisorOptions $options) {
+        CDaemon::log('master:' . $this->master);
         CDaemon_Supervisor::supervisorCommandQueue()->push(
             CDaemon_Supervisor_MasterSupervisor::commandQueueFor($this->master),
-            CDaemon_Supervisor_MasterSupervisorCommand_AddSupervisor_AddSupervisor::class,
+            CDaemon_Supervisor_MasterSupervisorCommand_AddSupervisor::class,
             $options->toArray()
         );
     }

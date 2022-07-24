@@ -112,7 +112,7 @@ class CRedis_Limiter_DurationLimiter {
      * @return bool
      */
     public function tooManyAttempts() {
-        list($this->decaysAt, $this->remaining) = $this->redis->eval(
+        list($this->decaysAt, $this->remaining) = $this->redis->doEval(
             $this->tooManyAttemptsLuaScript(),
             1,
             $this->name,

@@ -160,7 +160,7 @@ class CDaemon_Supervisor_MasterSupervisor implements CDaemon_Contract_PausableIn
             sleep(1);
         }
 
-        if (CF::config('supervisor.fast_termination')) {
+        if (CF::config('daemon.supervisor.fast_termination')) {
             CCache::manager()->store()->forget('supervisor:terminate:wait');
         }
 
@@ -215,7 +215,7 @@ class CDaemon_Supervisor_MasterSupervisor implements CDaemon_Contract_PausableIn
             }
 
             $this->persist();
-
+            CDaemon::log('Master Supervisor Looped');
             c::event(new CDaemon_Supervisor_Event_MasterSupervisorLooped($this));
         } catch (Throwable $e) {
             CException::exceptionHandler()->report($e);

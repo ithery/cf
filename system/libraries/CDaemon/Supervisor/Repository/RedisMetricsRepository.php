@@ -1,8 +1,6 @@
 <?php
 
-use Laravel\Horizon\Lock;
 use CarbonV3\CarbonImmutable;
-use Laravel\Horizon\WaitTimeCalculator;
 
 class CDaemon_Supervisor_Repository_RedisMetricsRepository implements CDaemon_Supervisor_Contract_MetricsRepositoryInterface {
     /**
@@ -168,7 +166,7 @@ class CDaemon_Supervisor_Repository_RedisMetricsRepository implements CDaemon_Su
      * @return void
      */
     public function incrementJob($job, $runtime) {
-        $this->connection()->eval(
+        $this->connection()->doEval(
             CDaemon_Supervisor_LuaScripts::updateMetrics(),
             2,
             'job:' . $job,
@@ -186,7 +184,7 @@ class CDaemon_Supervisor_Repository_RedisMetricsRepository implements CDaemon_Su
      * @return void
      */
     public function incrementQueue($queue, $runtime) {
-        $this->connection()->eval(
+        $this->connection()->doEval(
             CDaemon_Supervisor_LuaScripts::updateMetrics(),
             2,
             'queue:' . $queue,
@@ -271,7 +269,7 @@ class CDaemon_Supervisor_Repository_RedisMetricsRepository implements CDaemon_Su
         $this->connection()->zremrangebyrank(
             'snapshot:' . $key,
             0,
-            -abs(1 + CF::config('supervisor.metrics.trim_snapshots.job', 24))
+            -abs(1 + CF::config('daemon.supervisor.metrics.trim_snapshots.job', 24))
         );
     }
 
@@ -299,7 +297,7 @@ class CDaemon_Supervisor_Repository_RedisMetricsRepository implements CDaemon_Su
         $this->connection()->zremrangebyrank(
             'snapshot:' . $key,
             0,
-            -abs(1 + CF::config('supervisor.metrics.trim_snapshots.queue', 24))
+            -abs(1 + CF::config('daemon.supervisor.metrics.trim_snapshots.queue', 24))
         );
     }
 

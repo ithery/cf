@@ -177,7 +177,7 @@ LUA;
 
         $keys = $client->pipeline(function (Pipeline $pipe) use ($keys, $script) {
             foreach ($keys as $key) {
-                $pipe->eval($script, 1, $key);
+                $pipe->doEval($script, 1, $key);
             }
         });
 

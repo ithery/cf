@@ -701,7 +701,7 @@ class CDaemon_Supervisor_Repository_RedisJobRepository implements CDaemon_Superv
      * @return int
      */
     public function purge($queue) {
-        return $this->connection()->eval(
+        return $this->connection()->doEval(
             CDaemon_Supervisor_LuaScripts::purge(),
             2,
             'recent_jobs',

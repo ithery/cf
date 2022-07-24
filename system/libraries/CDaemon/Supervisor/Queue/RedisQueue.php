@@ -115,9 +115,11 @@ class CDaemon_Supervisor_Queue_RedisQueue extends CQueue_Queue_RedisQueue {
      *
      * @param string $queue
      *
-     * @return null|\Illuminate\Contracts\Queue\Job
+     * @return null|\CQueue_JobInterface
      */
     public function pop($queue = null) {
+        CDaemon::log('RedisQueue:Reserved');
+
         return c::tap(parent::pop($queue), function ($result) use ($queue) {
             if ($result) {
                 $this->event($this->getQueue($queue), new CDaemon_Supervisor_Event_RedisEvent_JobReserved($result->getReservedJob()));
@@ -178,6 +180,10 @@ class CDaemon_Supervisor_Queue_RedisQueue extends CQueue_Queue_RedisQueue {
      */
     protected function event($queue, $event) {
         $queue = cstr::replaceFirst('queues:', '', $queue);
+
+        CDaemon::log('connection:' . $this->getConnectionName());
+        CDaemon::log('queue:' . $queue);
+        CDaemon::log('event:' . get_class($event));
         CEvent::dispatcher()->dispatch(
             $event->connection($this->getConnectionName())->queue($queue)
         );

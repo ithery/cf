@@ -42,15 +42,15 @@ return [
         'use' => 'default',
 
         /*
-    |--------------------------------------------------------------------------
-    | Horizon Redis Prefix
-    |--------------------------------------------------------------------------
-    |
-    | This prefix will be used when storing all Horizon data in Redis. You
-    | may modify the prefix when you are running multiple installations
-    | of Horizon on the same server so that they don't have problems.
-    |
-    */
+        |--------------------------------------------------------------------------
+        | Horizon Redis Prefix
+        |--------------------------------------------------------------------------
+        |
+        | This prefix will be used when storing all Horizon data in Redis. You
+        | may modify the prefix when you are running multiple installations
+        | of Horizon on the same server so that they don't have problems.
+        |
+        */
 
         'prefix' => c::env(
             'DAEMON_PREFIX',

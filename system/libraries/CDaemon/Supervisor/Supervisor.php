@@ -22,7 +22,7 @@ class CDaemon_Supervisor_Supervisor implements CDaemon_Contract_PausableInterfac
     /**
      * All of the process pools being managed.
      *
-     * @var \Illuminate\Support\Collection
+     * @var \CCollection
      */
     public $processPools;
 
@@ -36,7 +36,7 @@ class CDaemon_Supervisor_Supervisor implements CDaemon_Contract_PausableInterfac
     /**
      * The time at which auto-scaling last ran for this supervisor.
      *
-     * @var \Carbon\CarbonImmutable
+     * @var \CarbonV3\CarbonImmutable
      */
     public $lastAutoScaled;
 
@@ -215,7 +215,7 @@ class CDaemon_Supervisor_Supervisor implements CDaemon_Contract_PausableInterfac
      * @return bool
      */
     protected function shouldWait() {
-        return !CF::config('supervisor.fast_termination')
+        return !CF::config('daemon.supervisor.fast_termination')
                || CCache::manager()->store()->get('supervisor:terminate:wait');
     }
 
@@ -277,7 +277,7 @@ class CDaemon_Supervisor_Supervisor implements CDaemon_Contract_PausableInterfac
             // user interface. This contains information on the specific options for it and
             // the current number of worker processes per queue for easy load monitoring.
             $this->persist();
-
+            CDaemon::log('Supervisor Looped');
             c::event(new CDaemon_Supervisor_Event_SupervisorLooped($this));
         } catch (Throwable $e) {
             CException::exceptionHandler()->report($e);
@@ -354,7 +354,7 @@ class CDaemon_Supervisor_Supervisor implements CDaemon_Contract_PausableInterfac
     /**
      * Get all of the current processes as a collection.
      *
-     * @return \Illuminate\Support\Collection
+     * @return \CCollection
      */
     public function processes() {
         return $this->processPools->map->processes()->collapse();
@@ -363,7 +363,7 @@ class CDaemon_Supervisor_Supervisor implements CDaemon_Contract_PausableInterfac
     /**
      * Get the processes that are still terminating.
      *
-     * @return \Illuminate\Support\Collection
+     * @return \CCollection
      */
     public function terminatingProcesses() {
         return $this->processPools->map->terminatingProcesses()->collapse();

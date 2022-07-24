@@ -18,7 +18,7 @@ class CDaemon_Supervisor_Event_RedisEvent {
     /**
      * The job payload.
      *
-     * @var JobPayload
+     * @var CDaemon_Supervisor_Queue_JobPayload
      */
     public $payload;
 

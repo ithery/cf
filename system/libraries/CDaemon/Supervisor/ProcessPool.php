@@ -169,7 +169,7 @@ class CDaemon_Supervisor_ProcessPool implements Countable {
      * @return \CDaemon_WorkerProcess
      */
     protected function createProcess() {
-        $class = CF::config('supervisor.fast_termination')
+        $class = CF::config('daemon.supervisor.fast_termination')
                     ? CDaemon_BackgroundProcess::class
                     : Process::class;
 
