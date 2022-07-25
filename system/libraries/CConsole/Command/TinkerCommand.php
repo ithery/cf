@@ -112,14 +112,11 @@ class CConsole_Command_TinkerCommand extends CConsole_Command {
      */
     protected function getCasters() {
         $casters = [
-            'Illuminate\Support\Collection' => 'Laravel\Tinker\TinkerCaster::castCollection',
-            'Illuminate\Support\HtmlString' => 'Laravel\Tinker\TinkerCaster::castHtmlString',
-            'Illuminate\Support\Stringable' => 'Laravel\Tinker\TinkerCaster::castStringable',
+            'CCollection' => 'CConsole_Tinker_TinkerCaster::castCollection',
+            'CBase_HtmlString' => 'CConsole_Tinker_TinkerCaster::castHtmlString',
+            'CBase_String' => 'CConsole_Tinker_TinkerCaster::castStringable',
+            'CModel' => 'CConsole_Tinker_TinkerCaster::castModel',
         ];
-
-        // if (class_exists('Illuminate\Database\Eloquent\Model')) {
-        //     $casters['Illuminate\Database\Eloquent\Model'] = 'Laravel\Tinker\TinkerCaster::castModel';
-        // }
 
         // if (class_exists('Illuminate\Foundation\Application')) {
         //     $casters['Illuminate\Foundation\Application'] = 'Laravel\Tinker\TinkerCaster::castApplication';
