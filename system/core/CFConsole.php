@@ -7,6 +7,7 @@ class CFConsole {
         CConsole_Command_VersionCommand::class,
         CConsole_Command_StatusCommand::class,
         CConsole_Command_ServeCommand::class,
+        CConsole_Command_TinkerCommand::class,
         CConsole_Command_KeyGenerateCommand::class,
         CConsole_Command_ComposerCommand::class,
         CConsole_Command_EnvironmentCommand::class,
