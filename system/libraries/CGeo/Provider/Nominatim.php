@@ -2,8 +2,6 @@
 
 use Http\Client\HttpClient;
 
-use Geocoder\Provider\Nominatim\Model\NominatimAddress;
-
 /**
  * @author Niklas Närhinen <niklas@narhinen.net>
  * @author Jonathan Beliën <jbe@geo6.be>
@@ -22,6 +20,11 @@ final class CGeo_Provider_Nominatim extends CGeo_ProviderHttpAbstract implements
     /**
      * @var string
      */
+    private $extension;
+
+    /**
+     * @var string
+     */
     private $referer;
 
     /**
@@ -31,26 +34,37 @@ final class CGeo_Provider_Nominatim extends CGeo_ProviderHttpAbstract implements
      *
      * @return Nominatim
      */
-    public static function withOpenStreetMapServer(HttpClient $client, string $userAgent, string $referer = ''): self {
-        return new self($client, 'https://nominatim.openstreetmap.org', $userAgent, $referer);
+    public static function withOpenStreetMapServer(HttpClient $client, $userAgent, $referer = ''): self {
+        return new self($client, 'https://nominatim.openstreetmap.org', $userAgent, '', $referer);
     }
 
     /**
      * @param HttpClient $client    an HTTP client
      * @param string     $rootUrl   Root URL of the nominatim server
      * @param string     $userAgent Value of the User-Agent header
+     * @param string     $extension Value of extension nominatim path
      * @param string     $referer   Value of the Referer header
      */
-    public function __construct(HttpClient $client, $rootUrl, string $userAgent, string $referer = '') {
+    public function __construct(HttpClient $client, $rootUrl, $userAgent, $extension = '', $referer = '') {
         parent::__construct($client);
 
         $this->rootUrl = rtrim($rootUrl, '/');
         $this->userAgent = $userAgent;
         $this->referer = $referer;
+        $this->extension = $extension;
 
         if (empty($this->userAgent)) {
             throw new CGeo_Exception_InvalidArgument('The User-Agent must be set to use the Nominatim provider.');
         }
+    }
+
+    protected function getExtension() {
+        $extension = $this->extension;
+        if ($extension && !cstr::startsWith($extension, '.')) {
+            $extension = '.' . $extension;
+        }
+
+        return $extension;
     }
 
     /**
@@ -58,14 +72,13 @@ final class CGeo_Provider_Nominatim extends CGeo_ProviderHttpAbstract implements
      */
     public function geocodeQuery(CGeo_Query_GeocodeQuery $query) {
         $address = $query->getText();
-
         // This API doesn't handle IPs
         if (filter_var($address, FILTER_VALIDATE_IP)) {
             throw new CGeo_Exception_UnsupportedOperation('The Nominatim provider does not support IP addresses.');
         }
 
         $url = $this->rootUrl
-            . '/search?'
+            . '/search' . $this->getExtension() . '?'
             . http_build_query([
                 'format' => 'jsonv2',
                 'q' => $address,
@@ -131,7 +144,7 @@ final class CGeo_Provider_Nominatim extends CGeo_ProviderHttpAbstract implements
         $latitude = $coordinates->getLatitude();
 
         $url = $this->rootUrl
-            . '/reverse?'
+            . '/reverse' . $this->getExtension() . '?'
             . http_build_query([
                 'format' => 'jsonv2',
                 'lat' => $latitude,
@@ -201,8 +214,8 @@ final class CGeo_Provider_Nominatim extends CGeo_ProviderHttpAbstract implements
 
         $builder->setBounds($place->boundingbox[0], $place->boundingbox[2], $place->boundingbox[1], $place->boundingbox[3]);
 
-        /** @var NominatimAddress $location */
-        $location = $builder->build(NominatimAddress::class);
+        /** @var CGeo_Provider_Nominatim_Model_NominatimAddress $location */
+        $location = $builder->build(CGeo_Provider_Nominatim_Model_NominatimAddress::class);
         $location = $location->withAttribution($place->licence);
         $location = $location->withDisplayName($place->display_name);
 
