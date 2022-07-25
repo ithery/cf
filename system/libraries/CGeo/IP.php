@@ -51,9 +51,9 @@ class CGeo_IP {
      *
      * @param string $ip
      *
-     * @return CGeo_Model_AddressCollection
-     *
      * @throws \Exception
+     *
+     * @return CGeo_Model_AddressCollection
      */
     private function find($ip = null) {
         // If IP not set, user remote IP
@@ -72,6 +72,7 @@ class CGeo_IP {
                 throw $e;
             }
         }
+
         throw new CGeo_Exception_InvalidArgument('Invalid IP Address:' . $ip);
     }
 
@@ -80,9 +81,9 @@ class CGeo_IP {
      *
      * @param null|mixed $providerClass
      *
-     * @return CGeo_Provider
-     *
      * @throws Exception
+     *
+     * @return CGeo_ProviderAbstract
      */
     public function getProvider($providerClass = null) {
         if ($providerClass == null) {
@@ -98,9 +99,11 @@ class CGeo_IP {
             case 'CGeo_Provider_GeoIP2':
                 $databaseFile = DOCROOT . 'modules/cresenity/data/GeoLite2/Country.mmdb';
                 $adapter = new CGeo_Provider_GeoIP2_Adapter(new \GeoIp2\Database\Reader($databaseFile), CGeo_Provider_GeoIP2_Adapter::GEOIP2_MODEL_COUNTRY);
+
                 break;
         }
         $provider = new $providerClass($adapter);
+
         return $provider;
     }
 
@@ -128,6 +131,7 @@ class CGeo_IP {
                 }
             }
         }
+
         return '127.0.0.0';
     }
 
@@ -143,6 +147,7 @@ class CGeo_IP {
         ) {
             return false;
         }
+
         return true;
     }
 }

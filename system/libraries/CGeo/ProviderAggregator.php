@@ -10,12 +10,12 @@ defined('SYSPATH') or die('No direct access allowed.');
  */
 class CGeo_ProviderAggregator implements CGeo_Interface_GeocoderInterface {
     /**
-     * @var Provider[]
+     * @var CGeo_Interface_ProviderInterface[]
      */
     private $providers = [];
 
     /**
-     * @var Provider
+     * @var CGeo_Interface_ProviderInterface
      */
     private $provider;
 

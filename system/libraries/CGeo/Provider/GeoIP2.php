@@ -12,7 +12,7 @@ use GeoIp2\Exception\OutOfQueriesException;
 use GeoIp2\Exception\AuthenticationException;
 use GeoIp2\Exception\AddressNotFoundException;
 
-final class CGeo_Provider_GeoIP2 extends CGeo_Provider {
+final class CGeo_Provider_GeoIP2 extends CGeo_ProviderAbstract {
     /**
      * @var CGeo_Provider_GeoIP2_Adapter
      */
