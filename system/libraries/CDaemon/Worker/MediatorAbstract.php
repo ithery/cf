@@ -15,7 +15,7 @@ abstract class CDaemon_Worker_MediatorAbstract extends CDaemon_TaskAbstract {
     const VERSION = 2.0;
 
     /**
-     * Message Types
+     * Message Types.
      */
     const WORKER_CALL = 3;
 
@@ -24,7 +24,7 @@ abstract class CDaemon_Worker_MediatorAbstract extends CDaemon_TaskAbstract {
     const WORKER_RETURN = 1;
 
     /**
-     * Call Statuses
+     * Call Statuses.
      */
     const UNCALLED = 0;
 
@@ -39,7 +39,7 @@ abstract class CDaemon_Worker_MediatorAbstract extends CDaemon_TaskAbstract {
     const TIMEOUT = 10;
 
     /**
-     * Forking Strategies
+     * Forking Strategies.
      */
     const LAZY = 1;
 
@@ -61,7 +61,45 @@ abstract class CDaemon_Worker_MediatorAbstract extends CDaemon_TaskAbstract {
     ];
 
     /**
-     * The forking strategy of the Worker
+     * @var CDaemon_ServiceAbstract
+     */
+    public $service;
+
+    /**
+     * Array of accumulated error counts. Error thresholds are localized and when reached will
+     * raise a fatal error. Generally thresholds on workers are much lower than on the daemon process.
+     *
+     * @var array
+     *
+     * @todo should we move error counts to the mediator? And the Via object needs to report errors to the mediator? I think probably yes.
+     */
+    public $errorCounts = [
+        'communication' => 0,
+        'corruption' => 0,
+        'catchall' => 0,
+    ];
+
+    /**
+     * Error thresholds for (worker, parent). We want a certain tolerance of errors without restarting the application
+     * and these settings can be tweaked per-application.
+     *
+     * Errors in worker processes have lower thresholds because it is trivial to replace a worker, and workers regularly
+     * retire themselves anyway.
+     *
+     * Communication errors are anything related to a Via object's connection.
+     * Corruption errors indicate the Via object was able to get or put a message but that it seemed improperly formatted
+     * Catch-all for everything else.
+     *
+     * @var array
+     */
+    public $errorThresholds = [
+        'communication' => [10, 50],
+        'corruption' => [10, 25],
+        'catchall' => [10, 25],
+    ];
+
+    /**
+     * The forking strategy of the Worker.
      *
      * @example self::LAZY
      * Daemon Startup:      No processes are forked
@@ -82,17 +120,12 @@ abstract class CDaemon_Worker_MediatorAbstract extends CDaemon_TaskAbstract {
     protected $forkingStrategy = self::MIXED;
 
     /**
-     * @var CDaemon_ServiceAbstract
-     */
-    public $service;
-
-    /**
      * @var CDaemon_Worker_ViaInterface
      */
     protected $via;
 
     /**
-     * Methods available on the $object
+     * Methods available on the $object.
      *
      * @var array
      */
@@ -100,7 +133,7 @@ abstract class CDaemon_Worker_MediatorAbstract extends CDaemon_TaskAbstract {
 
     /**
      * All Calls
-     * A periodic garbage collection routine unsets ->args, ->return, leaving just the lightweight call meta-data behind
+     * A periodic garbage collection routine unsets ->args, ->return, leaving just the lightweight call meta-data behind.
      *
      * @var CDaemon_Worker_Call[]
      */
@@ -131,7 +164,7 @@ abstract class CDaemon_Worker_MediatorAbstract extends CDaemon_TaskAbstract {
     protected $alias = '';
 
     /**
-     * The number of allowed concurrent workers
+     * The number of allowed concurrent workers.
      *
      * @example Set the worker count using $this->workers();
      *
@@ -173,7 +206,7 @@ abstract class CDaemon_Worker_MediatorAbstract extends CDaemon_TaskAbstract {
     protected $onReturn;
 
     /**
-     * Callback that's called when a worker timeout is reached. See phpdoc comments on the $timeout property
+     * Callback that's called when a worker timeout is reached. See phpdoc comments on the $timeout property.
      *
      * @example set a Timeout Handler using $this->onTimeout();
      *
@@ -182,54 +215,21 @@ abstract class CDaemon_Worker_MediatorAbstract extends CDaemon_TaskAbstract {
     protected $onTimeout;
 
     /**
-     * The ID of this worker pool -- used to address shared IPC resources
+     * The ID of this worker pool -- used to address shared IPC resources.
      *
      * @var int
      */
     protected $guid;
 
     /**
-     * Flag to enable or disable worker auto-restart mechanism
+     * Flag to enable or disable worker auto-restart mechanism.
      *
      * @var bool
      */
     protected $autoRestart = true;
 
     /**
-     * Array of accumulated error counts. Error thresholds are localized and when reached will
-     * raise a fatal error. Generally thresholds on workers are much lower than on the daemon process
-     *
-     * @var array
-     *
-     * @todo should we move error counts to the mediator? And the Via object needs to report errors to the mediator? I think probably yes.
-     */
-    public $errorCounts = [
-        'communication' => 0,
-        'corruption' => 0,
-        'catchall' => 0,
-    ];
-
-    /**
-     * Error thresholds for (worker, parent). We want a certain tolerance of errors without restarting the application
-     * and these settings can be tweaked per-application.
-     *
-     * Errors in worker processes have lower thresholds because it is trivial to replace a worker, and workers regularly
-     * retire themselves anyway.
-     *
-     * Communication errors are anything related to a Via object's connection.
-     * Corruption errors indicate the Via object was able to get or put a message but that it seemed improperly formatted
-     * Catch-all for everything else.
-     *
-     * @var array
-     */
-    public $errorThresholds = [
-        'communication' => [10, 50],
-        'corruption' => [10, 25],
-        'catchall' => [10, 25],
-    ];
-
-    /**
-     * Return a valid callback for the supplied $method
+     * Return a valid callback for the supplied $method.
      *
      * @param $method
      */
@@ -245,12 +245,15 @@ abstract class CDaemon_Worker_MediatorAbstract extends CDaemon_TaskAbstract {
         switch (true) {
             case $interval > 2 || $interval === 0:
                 $this->forkingStrategy = self::LAZY;
+
                 break;
             case $interval > 1:
                 $this->forkingStrategy = self::MIXED;
+
                 break;
             default:
                 $this->forkingStrategy = self::AGGRESSIVE;
+
                 break;
         }
         $this->forkingStrategy = self::LAZY;
@@ -273,7 +276,7 @@ abstract class CDaemon_Worker_MediatorAbstract extends CDaemon_TaskAbstract {
 
     /**
      * Make private & protected instance vars available for inspection
-     * Primarily for access within the debugshell during mediator development
+     * Primarily for access within the debugshell during mediator development.
      *
      * @param mixed $k
      */
@@ -281,6 +284,7 @@ abstract class CDaemon_Worker_MediatorAbstract extends CDaemon_TaskAbstract {
         if (array_key_exists($k, get_object_vars($this))) {
             return $this->{$k};
         }
+
         return null;
     }
 
@@ -288,6 +292,7 @@ abstract class CDaemon_Worker_MediatorAbstract extends CDaemon_TaskAbstract {
         if (function_exists('posix_kill') == false) {
             $errors[] = 'The POSIX Extension is Not Installed';
         }
+
         return $this->via->checkEnvironment($errors);
     }
 
@@ -317,6 +322,7 @@ abstract class CDaemon_Worker_MediatorAbstract extends CDaemon_TaskAbstract {
             switch ($method) {
                 case 'drop':
                     $callId = $args[0];
+
                     break;
                 default:
                     if (isset($args[0]) && $args[0] instanceof CDaemon_Worker_Call) {
@@ -326,6 +332,7 @@ abstract class CDaemon_Worker_MediatorAbstract extends CDaemon_TaskAbstract {
             if ($callId) {
                 return $shell->incrementIndent($alias . $callId);
             }
+
             return 0;
         };
         $this->via->prompt_prefix_callback = function ($method, $args) use ($alias) {
@@ -343,6 +350,7 @@ abstract class CDaemon_Worker_MediatorAbstract extends CDaemon_TaskAbstract {
             if (!$args[0] instanceof CDaemon_Worker_Call) {
                 return false;
             }
+
             return "[Call {$args[0]->id}] " . $statuses[$args[0]->status];
         };
         $this->via->prompts['drop'] = function ($method, $args) use ($alias) {
@@ -376,15 +384,17 @@ abstract class CDaemon_Worker_MediatorAbstract extends CDaemon_TaskAbstract {
                 $function = [$context, $matches[1]];
                 if (!is_callable($function)) {
                     $printer('Function Not Callable!');
+
                     return false;
                 }
-                $printer("Calling Function $matches[1]()...");
+                $printer("Calling Function {$matches[1]}()...");
                 $return = call_user_func_array($function, $args);
                 if (is_scalar($return)) {
-                    $printer("Return: $return", 100);
+                    $printer("Return: ${return}", 100);
                 } else {
                     $printer('Return: [' . gettype($return) . ']');
                 }
+
                 return false;
             }
         ];
@@ -395,6 +405,7 @@ abstract class CDaemon_Worker_MediatorAbstract extends CDaemon_TaskAbstract {
             'closure' => function ($matches, $printer) use ($that) {
                 if (!is_array($that->calls)) {
                     $printer('No Calls In Memory', PHP_EOL);
+
                     return;
                 }
                 if (isset($that->calls[$matches[1]])) {
@@ -445,7 +456,7 @@ abstract class CDaemon_Worker_MediatorAbstract extends CDaemon_TaskAbstract {
                     $out[] = 'Processes:';
                     if ($processes) {
                         foreach ($processes as $pid => $process) {
-                            $out[] = "[$pid] Runtime: " . $process->runtime();
+                            $out[] = "[${pid}] Runtime: " . $process->runtime();
                         }
                     } else {
                         $out[] = 'None';
@@ -499,6 +510,7 @@ abstract class CDaemon_Worker_MediatorAbstract extends CDaemon_TaskAbstract {
         if (isset($tmp)) {
             $this->via->indentCallback = $tmp;
         }
+
         return $return;
     }
 
@@ -519,7 +531,7 @@ abstract class CDaemon_Worker_MediatorAbstract extends CDaemon_TaskAbstract {
             $this->guid = ftok($ftok, $this->alias[0]);
             @unlink($ftok);
             if ($this->guid == -1) {
-                $this->fatalError("Unable to create Worker ID. ftok() failed. Unexpected return value: $this->guid");
+                $this->fatalError("Unable to create Worker ID. ftok() failed. Unexpected return value: {$this->guid}");
             }
             $this->via->setup();
             $this->via->purge();
@@ -580,16 +592,19 @@ abstract class CDaemon_Worker_MediatorAbstract extends CDaemon_TaskAbstract {
                 if ($processes > count($this->runningCalls)) {
                     $forks = 0;
                 }
+
                 break;
             case self::MIXED:
                 if ($this->callCount == 0) {
                     $forks = 0;
+
                     break;
                 }
                 // no break
             case self::AGGRESSIVE:
             default:
                 $forks = $this->workers - $processes;
+
                 break;
         }
         // Handle a case where we have a new process in a LAZY or MIXED strategy with pending messages on the queue
@@ -613,12 +628,14 @@ abstract class CDaemon_Worker_MediatorAbstract extends CDaemon_TaskAbstract {
                 $process->timeout = $this->timeout;
                 $process->min_ttl = 30;
                 $errors = 0;
+
                 continue;
             }
             // If the forking failed, we can retry a few times and then fatal-error
             // The most common reason this could happen is the PID table gets full or the machine runs out of memory.
             if ($errors++ < 3) {
                 $i--;
+
                 continue;
             }
             $this->fatalError('Could Not Fork: See PHP error log for an error code and more information.');
@@ -635,6 +652,7 @@ abstract class CDaemon_Worker_MediatorAbstract extends CDaemon_TaskAbstract {
         if (empty($this->calls)) {
             return;
         }
+
         try {
             // If there are any callbacks registered (onReturn, onTimeout, etc), we will pass
             // the call object and this $logger closure to them
@@ -646,6 +664,7 @@ abstract class CDaemon_Worker_MediatorAbstract extends CDaemon_TaskAbstract {
                 if (!isset($this->calls[$call->id])) {
                     $this->log('Warning: Message received that was enqueued by a previous instance of this application.');
                     $this->log('         Consider purging any pending messages using whatever process exists for your selected queue provider');
+
                     continue;
                 }
                 $this->runningCalls[$call->id] = true;
@@ -659,6 +678,7 @@ abstract class CDaemon_Worker_MediatorAbstract extends CDaemon_TaskAbstract {
                 if (!isset($this->calls[$call->id])) {
                     $this->log('Warning: Message received that was enqueued by a previous instance of this application.');
                     $this->log('         Consider purging any pending messages using whatever process exists for your selected queue provider');
+
                     continue;
                 }
                 unset($this->runningCalls[$call->id]);
@@ -683,7 +703,7 @@ abstract class CDaemon_Worker_MediatorAbstract extends CDaemon_TaskAbstract {
                         if (!$this->breakpoint("[{$this->alias} Call {$callId}] Enforcing timeout at runtime: " . $call->runtime(), $callId - 1)) {
                             continue;
                         }
-                        $this->log("Enforcing Timeout on Call $callId in pid " . $call->pid);
+                        $this->log("Enforcing Timeout on Call ${callId} in pid " . $call->pid);
                         if ($this->process($call->pid) instanceof CDaemon_Process) {
                             $this->process($call->pid)->kill();
                         }
@@ -711,7 +731,7 @@ abstract class CDaemon_Worker_MediatorAbstract extends CDaemon_TaskAbstract {
 
     /**
      * Starts the event loop in the Forked process that will listen for messages
-     * Note: Runs only in the worker (forked) process
+     * Note: Runs only in the worker (forked) process.
      *
      * @return void
      */
@@ -738,11 +758,13 @@ abstract class CDaemon_Worker_MediatorAbstract extends CDaemon_TaskAbstract {
                     // If the current via supports it, calls can be cancelled while they are enqueued
                     if ($call->status == self::CANCELLED) {
                         $this->log("Call {$call->id} Cancelled By Mediator -- Skipping...");
+
                         continue;
                     }
                     $alias = ($this instanceof CDaemon_Worker_MediatorObject) ? $call->method : $this->alias;
                     if (!$this->breakpoint(sprintf('[Call %s] Calling method in worker', $call->id, $alias), $call->id)) {
                         $call->cancelled();
+
                         continue;
                     }
                     $call->running();
@@ -764,7 +786,7 @@ abstract class CDaemon_Worker_MediatorAbstract extends CDaemon_TaskAbstract {
     /**
      * Mediate all calls to methods on the contained $object and pass them to instances of $object running in the background.
      *
-     * @param Core_Worker_Call $call
+     * @param CDaemon_Worker_Call $call
      *
      * @return int A unique-per-process identifier for the call OR false on error. That ID can be used to interact
      *             with the call, eg checking the call status.
@@ -774,12 +796,15 @@ abstract class CDaemon_Worker_MediatorAbstract extends CDaemon_TaskAbstract {
         $alias = ($this instanceof CDaemon_Worker_MediatorObject) ? $call->method : $this->alias;
         if (!$this->breakpoint(sprintf('[Call %s] Call to %s()', $call->id, $alias), $call->id)) {
             $call->cancelled();
+
             return false;
         }
+
         try {
             if ($this->via->put($call)) {
                 $call->called();
                 $this->fork();
+
                 return $call->id;
             }
         } catch (Exception $e) {
@@ -788,29 +813,31 @@ abstract class CDaemon_Worker_MediatorAbstract extends CDaemon_TaskAbstract {
         // The call failed -- args could be big so trim it back proactively, leaving
         // the call metadata the same way the GC process works
         $call->args = null;
+
         return false;
     }
 
     /**
-     * Intercept method calls on worker objects and pass them to the worker processes
+     * Intercept method calls on worker objects and pass them to the worker processes.
      *
      * @param $method
      * @param $args
      *
-     * @return bool
-     *
      * @throws Exception
+     *
+     * @return bool
      */
     public function __call($method, $args) {
         if (!in_array($method, $this->methods)) {
             throw new Exception(__METHOD__ . " Failed. Method `{$method}` is not callable.");
         }
         $this->callCount++;
+
         return $this->call(new CDaemon_Worker_Call($this->callCount, $method, $args));
     }
 
     /**
-     * Return the requested call from the local call cache if it exists
+     * Return the requested call from the local call cache if it exists.
      *
      * @param mixed $callId
      *
@@ -820,15 +847,16 @@ abstract class CDaemon_Worker_MediatorAbstract extends CDaemon_TaskAbstract {
         if (isset($this->calls[$callId])) {
             return $this->calls[$callId];
         }
+
         return null;
     }
 
     /**
-     * Set the supplied $call into the local call cache, doing any merging with a previously-cached version is necessary
+     * Set the supplied $call into the local call cache, doing any merging with a previously-cached version is necessary.
      *
      * @param CDaemon_Worker_Call $call
      */
-    public function set_struct(CDaemon_Worker_Call $call) {
+    public function setStruct(CDaemon_Worker_Call $call) {
         if (isset($this->calls[$call->id])) {
             $this->calls[$call->id] = $call->merge($this->calls[$call->id]);
         } else {
@@ -885,6 +913,7 @@ abstract class CDaemon_Worker_MediatorAbstract extends CDaemon_TaskAbstract {
             if ($call->retries > 3) {
                 $call->cancelled();
                 $this->error("Dropped Call. Requeue threshold reached. Call {$call->id} will not be requeued.");
+
                 continue;
             }
             // Requeue the message. If somehow the original message is still out there the worker will compare timestamps
@@ -905,7 +934,7 @@ abstract class CDaemon_Worker_MediatorAbstract extends CDaemon_TaskAbstract {
     public function countError($type) {
         $this->errorCounts[$type]++;
         if ($this->errorCounts[$type] > $this->errorThresholds[$type][(int) $this->service->isParent()]) {
-            $this->fatalError("IPC '$type' Error Threshold Reached");
+            $this->fatalError("IPC '${type}' Error Threshold Reached");
         }
     }
 
@@ -920,7 +949,7 @@ abstract class CDaemon_Worker_MediatorAbstract extends CDaemon_TaskAbstract {
     }
 
     /**
-     * If your worker object implements an execute() method, it can be called in the daemon using $this->MyAlias()
+     * If your worker object implements an execute() method, it can be called in the daemon using $this->MyAlias().
      *
      * @return bool
      */
@@ -929,7 +958,7 @@ abstract class CDaemon_Worker_MediatorAbstract extends CDaemon_TaskAbstract {
     }
 
     /**
-     * Helper function to retrieve the selected process from the Core_Daemon process registry
+     * Helper function to retrieve the selected process from the Core_Daemon process registry.
      *
      * @param $pid
      *
@@ -939,11 +968,12 @@ abstract class CDaemon_Worker_MediatorAbstract extends CDaemon_TaskAbstract {
         if (isset($this->service->ProcessManager)) {
             return $this->service->ProcessManager->process($pid);
         }
+
         return null;
     }
 
     /**
-     * Helper function to retrieve all of this workers processes from the Core_Daemon process registry
+     * Helper function to retrieve all of this workers processes from the Core_Daemon process registry.
      *
      * @return Core_Lib_Process[]
      */
@@ -951,11 +981,12 @@ abstract class CDaemon_Worker_MediatorAbstract extends CDaemon_TaskAbstract {
         if (isset($this->service->ProcessManager)) {
             return $this->service->ProcessManager->processes($this->alias);
         }
+
         return [];
     }
 
     /**
-     * Helper function to retrieve the process count from the ProcessManager for this worker
+     * Helper function to retrieve the process count from the ProcessManager for this worker.
      *
      * @return mixed
      */
@@ -964,11 +995,12 @@ abstract class CDaemon_Worker_MediatorAbstract extends CDaemon_TaskAbstract {
         if ($processManager != null) {
             return $processManager->count($this->alias);
         }
+
         return 0;
     }
 
     /**
-     * Retrieves the number of worker processes that are currently running
+     * Retrieves the number of worker processes that are currently running.
      *
      * @return number
      */
@@ -1047,7 +1079,7 @@ abstract class CDaemon_Worker_MediatorAbstract extends CDaemon_TaskAbstract {
     }
 
     /**
-     * Write do the Daemon's event log
+     * Write do the Daemon's event log.
      *
      * Part of the Worker API - Use from your workers to log events to the Daemon event log
      *
@@ -1057,11 +1089,11 @@ abstract class CDaemon_Worker_MediatorAbstract extends CDaemon_TaskAbstract {
      * @return void
      */
     public function log($message, $indent = 0) {
-        $this->service->log("$message", $this->alias, $indent);
+        $this->service->log("${message}", $this->alias, $indent);
     }
 
     /**
-     * Dispatch ON_ERROR event and write an error message to the Daemon's event log
+     * Dispatch ON_ERROR event and write an error message to the Daemon's event log.
      *
      * Part of the Worker API - Use from your workers to log an error message.
      *
@@ -1070,7 +1102,7 @@ abstract class CDaemon_Worker_MediatorAbstract extends CDaemon_TaskAbstract {
      * @return void
      */
     public function error($message) {
-        $this->service->error("$message", $this->alias);
+        $this->service->error("${message}", $this->alias);
     }
 
     /**
@@ -1084,14 +1116,14 @@ abstract class CDaemon_Worker_MediatorAbstract extends CDaemon_TaskAbstract {
      */
     public function fatalError($message) {
         if ($this->service->isParent()) {
-            $this->service->fatalError("Fatal Error: $message", $this->alias);
+            $this->service->fatalError("Fatal Error: ${message}", $this->alias);
         } else {
-            $this->service->fatalError("Fatal Error: $message\nWorker process will restart", $this->alias);
+            $this->service->fatalError("Fatal Error: ${message}\nWorker process will restart", $this->alias);
         }
     }
 
     /**
-     * Access daemon properties from within your workers
+     * Access daemon properties from within your workers.
      *
      * Part of the Worker API - Use from your worker to access data set on your Daemon class
      *
@@ -1106,6 +1138,7 @@ abstract class CDaemon_Worker_MediatorAbstract extends CDaemon_TaskAbstract {
         if (isset($this->service->{$property}) && !is_callable($this->service->{$property})) {
             return $this->service->{$property};
         }
+
         return null;
     }
 
@@ -1119,7 +1152,7 @@ abstract class CDaemon_Worker_MediatorAbstract extends CDaemon_TaskAbstract {
      * example You set a timeout handler using onTimeout. The worker will pass the timed-out call to the handler as a
      * stdClass object. You can re-run it by passing the object here.
      *
-     * @param stdClass $call
+     * @param CDaemon_Worker_Call $call
      *
      * @return bool
      */
@@ -1129,6 +1162,7 @@ abstract class CDaemon_Worker_MediatorAbstract extends CDaemon_TaskAbstract {
         }
         $this->log("Retrying Call {$call->id} To `{$call->method}`");
         $call->retry();
+
         return $this->call($call);
     }
 
@@ -1146,6 +1180,7 @@ abstract class CDaemon_Worker_MediatorAbstract extends CDaemon_TaskAbstract {
         if (isset($this->calls[$callId])) {
             return $this->calls[$callId]->status;
         }
+
         return null;
     }
 
@@ -1226,7 +1261,7 @@ abstract class CDaemon_Worker_MediatorAbstract extends CDaemon_TaskAbstract {
 
     /**
      * Enable or disable worker auto restart mechanism. To find out how it works
-     * look at the beginning of Core_Worker_Mediator::start() method
+     * look at the beginning of Core_Worker_Mediator::start() method.
      *
      * Auto restart is enabled by default
      *

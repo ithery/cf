@@ -1170,6 +1170,10 @@ class CDatabase {
         $this->isBenchmarkQuery = true;
     }
 
+    public function disableBenchmark() {
+        $this->isBenchmarkQuery = false;
+    }
+
     public function isBenchmarkQuery() {
         return $this->isBenchmarkQuery;
     }

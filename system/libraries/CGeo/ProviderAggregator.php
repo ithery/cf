@@ -88,9 +88,9 @@ class CGeo_ProviderAggregator implements CGeo_Interface_GeocoderInterface {
     /**
      * Registers a new provider to the aggregator.
      *
-     * @param Provider $provider
+     * @param CGeo_Interface_ProviderInterface $provider
      *
-     * @return ProviderAggregator
+     * @return CGeo_ProviderAggregator
      */
     public function registerProvider(CGeo_Interface_ProviderInterface $provider) {
         $this->providers[$provider->getName()] = $provider;
@@ -101,9 +101,9 @@ class CGeo_ProviderAggregator implements CGeo_Interface_GeocoderInterface {
     /**
      * Registers a set of providers.
      *
-     * @param Provider[] $providers
+     * @param CGeo_Interface_ProviderInterface[] $providers
      *
-     * @return ProviderAggregator
+     * @return CGeo_ProviderAggregator
      */
     public function registerProviders(array $providers = []) {
         foreach ($providers as $provider) {
@@ -125,6 +125,17 @@ class CGeo_ProviderAggregator implements CGeo_Interface_GeocoderInterface {
             throw CGeo_Exception_ProviderNotRegistered::create($name != null ? $name : '', $this->providers);
         }
         $this->provider = $this->providers[$name];
+
+        return $this;
+    }
+
+    /**
+     * Clear registered providers.
+     *
+     * @return CGeo_ProviderAggregator
+     */
+    public function clearProvider() {
+        $this->providers = [];
 
         return $this;
     }

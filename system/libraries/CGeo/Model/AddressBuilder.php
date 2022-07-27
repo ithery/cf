@@ -82,7 +82,7 @@ final class CGeo_Model_AddressBuilder {
      */
     public function build($class = CGeo_Model_Address::class) {
         if (!is_a($class, CGeo_Model_Address::class, true)) {
-            throw new CGeo_Exception_LogicException('First parameter to LocationBuilder::build must be a class name extending Geocoder\Model\Address');
+            throw new CGeo_Exception_LogicException('First parameter to AddressBuilder::build must be a class name extending CGeo_Model_Address, class:' . $class);
         }
 
         $country = null;

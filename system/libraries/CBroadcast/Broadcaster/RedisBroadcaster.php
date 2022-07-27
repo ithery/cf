@@ -118,7 +118,7 @@ class CBroadcast_Broadcaster_RedisBroadcaster extends CBroadcast_BroadcasterAbst
         ]);
 
         /** @var CRedis_Connection_PhpRedisConnection $connection */
-        $connection->eval(
+        $connection->doEval(
             $this->broadcastMultipleChannelsScript(),
             0,
             $payload,

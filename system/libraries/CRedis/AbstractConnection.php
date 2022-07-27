@@ -4,7 +4,7 @@ abstract class CRedis_AbstractConnection implements CRedis_ConnectionInterface {
     /**
      * The Redis client.
      *
-     * @var \Predis\ClientInterface
+     * @var \Redis
      */
     protected $client;
 
@@ -58,7 +58,7 @@ abstract class CRedis_AbstractConnection implements CRedis_ConnectionInterface {
     /**
      * Get the underlying Redis client.
      *
-     * @return \Predis\ClientInterface
+     * @return mixed
      */
     public function client() {
         return $this->client;
@@ -98,6 +98,7 @@ abstract class CRedis_AbstractConnection implements CRedis_ConnectionInterface {
      */
     public function command($method, array $parameters = []) {
         $start = microtime(true);
+
         $result = $this->client->{$method}(...$parameters);
         $time = round((microtime(true) - $start) * 1000, 2);
         if (isset($this->events)) {

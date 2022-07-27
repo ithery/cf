@@ -11,6 +11,8 @@ use Aws\DynamoDb\DynamoDbClient;
  * @since Sep 8, 2019, 2:18:08 AM
  */
 final class CQueue {
+    protected static $isUsingRedisSupervisor = false;
+
     /**
      * @var CQueue_Dispatcher
      */
