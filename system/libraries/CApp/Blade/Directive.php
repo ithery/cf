@@ -90,4 +90,31 @@ class CApp_Blade_Directive {
 
         return $expression;
     }
+
+    public static function pwa($expression) {
+        $expression = str_replace(['(', ')'], '', $expression);
+        $expression = str_replace(['"', '\''], '', $expression);
+        $expression = str_replace(',', ' ', $expression);
+
+        return (new CApp_PWA_MetaService())->render($expression);
+    }
+
+    public static function preloader($expression) {
+        if (strlen($expression) == 0) {
+            $expression = c::url('media/img/logo.png');
+        }
+
+        return <<<HTML
+<!-- Cres Preloader Start Here ${expression} -->
+<div id="cres-preloader">
+    <div class="preloader-container">
+        <div class="preloader-loader">
+        </div>
+        <img src="<?php echo ${expression}; ?>" />
+    </div>
+</div>
+
+<!-- Cres Preloader End Here -->
+HTML;
+    }
 }
