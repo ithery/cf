@@ -154,7 +154,6 @@ final class CGeo_Provider_Nominatim extends CGeo_ProviderHttpAbstract implements
             ], '', '&', PHP_QUERY_RFC3986);
 
         $content = $this->executeQuery($url, $query->getLocale());
-
         $json = json_decode($content);
         if (is_null($json) || isset($json->error)) {
             return new CGeo_Model_AddressCollection([]);
