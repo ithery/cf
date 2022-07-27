@@ -42,7 +42,7 @@ class CVendor_Twilio_Verification {
 
             return new CVendor_Twilio_Verification_Result($verification->sid);
         } catch (TwilioException $exception) {
-            throw $exception;
+            throw new CVendor_Twilio_Exception($exception->getMessage());
 
             //return new Exception(["Verification failed to start: {$exception->getMessage()}"]);
         }
@@ -65,10 +65,10 @@ class CVendor_Twilio_Verification {
                 return new CVendor_Twilio_Verification_Result($verificationCheck->sid);
             }
 
-            throw new Exception('Verification check failed: Invalid code.');
+            throw new CVendor_Twilio_Exception_InvalidCodeException('Verification check failed: Invalid code.');
             //return new CVendor_Twilio_Verification_Result(['Verification check failed: Invalid code.']);
         } catch (TwilioException $exception) {
-            throw new Exception("Verification check failed: {$exception->getMessage()}");
+            throw new CVendor_Twilio_Exception("Verification check failed: {$exception->getMessage()}");
             //return new CVendor_Twilio_Verification_Result(["Verification check failed: {$exception->getMessage()}"]);
         }
     }

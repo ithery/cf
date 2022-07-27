@@ -291,12 +291,5 @@ class CDatabase_Driver_Sqlsrv extends CDatabase_Driver {
     }
 
     public function ping() {
-        if (!$this->link) {
-            $this->connect();
-        }
-
-        return mysqli_ping($this->link);
     }
 }
-
-// End Database_Mysqli_Driver Class

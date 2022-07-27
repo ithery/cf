@@ -14,6 +14,10 @@ class CElement_Element_Span extends CElement_Element {
         $this->tag = 'span';
     }
 
+    public static function factory($id = null) {
+        return new static($id);
+    }
+
     // @codingStandardsIgnoreStart
     public function set_col($col = null) {
         // @codingStandardsIgnoreEnd
