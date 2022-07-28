@@ -243,4 +243,18 @@ trait CObservable_Trait_ControlTrait {
 
         return $control;
     }
+
+    /**
+     * Create Block Editor Control.
+     *
+     * @param null|string $id
+     *
+     * @return CElement_FormInput_EditorJs
+     */
+    public function addEditorJsControl($id = null) {
+        $control = new CElement_FormInput_EditorJs($id);
+        $this->wrapper->add($control);
+
+        return $control;
+    }
 }

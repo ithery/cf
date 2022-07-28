@@ -395,4 +395,11 @@ final class CManager {
     public static function transform() {
         return CManager_Transform::instance();
     }
+
+    /**
+     * @return CManager_EditorJs
+     */
+    public static function editorJs() {
+        return new CBase_ForwarderStaticClass(CManager_EditorJs::class);
+    }
 }
