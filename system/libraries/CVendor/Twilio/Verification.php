@@ -54,6 +54,9 @@ class CVendor_Twilio_Verification {
      * @param $phoneNumber
      * @param $code
      *
+     * @throws CVendor_Twilio_Exception_InvalidCodeException
+     * @throws CVendor_Twilio_Exception
+     *
      * @return CVendor_Twilio_Verification_Result
      */
     public function checkVerification($phoneNumber, $code) {
