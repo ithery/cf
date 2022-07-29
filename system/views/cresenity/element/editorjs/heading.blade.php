@@ -1,7 +1,7 @@
 
 
 <div class="cres-editor-js-block">
-    <{{ "h{$level}" }}>
+    <{{ "h{$level}" }} class="{{ isset($alignment) ? 'text-'.$alignment : 'text-left' }}">
         {{ $text }}
     </{{ "h{$level}" }}>
 </div>

@@ -15,6 +15,10 @@ class CElement_FormInput_EditorJs_DefaultConfig {
          * Configure tools.
          */
         'toolSettings' => [
+            'paragraph' => [
+                'enabled' => true,
+                'inlineToolbar' => true,
+            ],
             'header' => [
                 'enabled' => true,
                 'placeholder' => 'Heading',
@@ -26,12 +30,12 @@ class CElement_FormInput_EditorJs_DefaultConfig {
                 'shortcut' => 'CMD+SHIFT+L'
             ],
             'code' => [
-                'enabled' => true,
+                'enabled' => false,
                 'placeholder' => '',
                 'shortcut' => 'CMD+SHIFT+C'
             ],
             'link' => [
-                'enabled' => true,
+                'enabled' => false,
                 'shortcut' => 'CMD+SHIFT+L'
             ],
             'image' => [
@@ -83,11 +87,11 @@ class CElement_FormInput_EditorJs_DefaultConfig {
                 ]
             ],
             'inlineCode' => [
-                'enabled' => true,
+                'enabled' => false,
                 'shortcut' => 'CMD+SHIFT+A',
             ],
             'checklist' => [
-                'enabled' => true,
+                'enabled' => false,
                 'inlineToolbar' => true,
                 'shortcut' => 'CMD+SHIFT+J',
             ],
@@ -103,11 +107,11 @@ class CElement_FormInput_EditorJs_DefaultConfig {
                 'inlineToolbar' => true,
             ],
             'raw' => [
-                'enabled' => true,
+                'enabled' => false,
                 'placeholder' => '',
             ],
             'embed' => [
-                'enabled' => true,
+                'enabled' => false,
                 'inlineToolbar' => true,
                 'services' => [
                     'codepen' => true,
@@ -131,12 +135,22 @@ class CElement_FormInput_EditorJs_DefaultConfig {
                     'level' => [
                         'type' => 'int',
                         'canBeOnly' => [1, 2, 3, 4, 5]
+                    ],
+                    'alignment' => [
+                        'type' => 'string',
+                        'canBeOnly' => ['left', 'center', 'right', 'justify'],
+                        'required' => false,
                     ]
                 ],
                 'paragraph' => [
                     'text' => [
                         'type' => 'string',
                         'allowedTags' => 'i,b,u,a[href],span[class],code[class],mark[class]'
+                    ],
+                    'alignment' => [
+                        'type' => 'string',
+                        'canBeOnly' => ['left', 'center', 'right', 'justify'],
+                        'required' => false,
                     ]
                 ],
                 'list' => [

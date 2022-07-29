@@ -53,17 +53,19 @@ class CElement_FormInput_EditorJs_BlockHandler {
      *
      * @param string $blockType
      * @param array  $blockData
+     * @param array  $blockTunes
      *
      * @throws CElement_FormInput_EditorJs_EditorJsException
      *
      * @return array|bool
      */
-    public function sanitizeBlock($blockType, $blockData) {
+    public function sanitizeBlock($blockType, $blockData, $blockTunes = []) {
         $rule = $this->rules->tools[$blockType];
 
         return [
             'type' => $blockType,
-            'data' => $this->sanitize($rule, $blockData)
+            'data' => $this->sanitize($rule, $blockData),
+            'tunes' => $blockTunes
         ];
     }
 

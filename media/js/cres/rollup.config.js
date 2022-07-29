@@ -11,6 +11,7 @@ import postcss from 'rollup-plugin-postcss';
 import nodePolyfills from 'rollup-plugin-polyfill-node';
 import serve from 'rollup-plugin-serve';
 import livereload from 'rollup-plugin-livereload';
+import svg from 'rollup-plugin-svg';
 // eslint-disable-next-line no-process-env
 const isProduction = process.env.NODE_ENV === 'production';
 
@@ -31,7 +32,7 @@ export default {
         warn(warning);
     },
     plugins: [
-
+        svg(),
         resolve(),
         commonjs({
             // These npm packages still use common-js modules. Ugh.

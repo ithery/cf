@@ -87,6 +87,18 @@ class CManager_EditorJs {
         }
     }
 
+    protected function getBlockData($block) {
+        $data = $block['data'];
+        if (isset($block['tunes'])) {
+            $alignment = carr::get($block, 'tunes.alignment.alignment');
+            if ($data) {
+                $data['alignment'] = $alignment;
+            }
+        }
+
+        return $data;
+    }
+
     /**
      * Registers all default render helpers.
      */
@@ -94,29 +106,29 @@ class CManager_EditorJs {
         $this->addRenderer(
             'header',
             function ($block) {
-                return c::view('cresenity.element.editorjs.heading', $block['data'])->render();
+                return c::view('cresenity.element.editorjs.heading', $this->getBlockData($block))->render();
             }
         );
 
         $this->addRenderer(
             'paragraph',
             function ($block) {
-                return c::view('cresenity.element.editorjs.paragraph', $block['data'])->render();
+                return c::view('cresenity.element.editorjs.paragraph', $this->getBlockData($block))->render();
             }
         );
 
         $this->addRenderer(
             'list',
             function ($block) {
-                return c::view('cresenity.element.editorjs.list', $block['data'])->render();
+                return c::view('cresenity.element.editorjs.list', $this->getBlockData($block))->render();
             }
         );
 
         $this->addRenderer(
             'image',
             function ($block) {
-                return c::view('cresenity.element.editorjs.image', array_merge($block['data'], [
-                    'classes' => $this->calculateImageClasses($block['data'])
+                return c::view('cresenity.element.editorjs.image', array_merge($this->getBlockData($block), [
+                    'classes' => $this->calculateImageClasses($this->getBlockData($block))
                 ]))->render();
             }
         );
@@ -124,49 +136,49 @@ class CManager_EditorJs {
         $this->addRenderer(
             'code',
             function ($block) {
-                return c::view('cresenity.element.editorjs.code', $block['data'])->render();
+                return c::view('cresenity.element.editorjs.code', $this->getBlockData($block))->render();
             }
         );
 
         $this->addRenderer(
             'linkTool',
             function ($block) {
-                return c::view('cresenity.element.editorjs.link', $block['data'])->render();
+                return c::view('cresenity.element.editorjs.link', $this->getBlockData($block))->render();
             }
         );
 
         $this->addRenderer(
             'checklist',
             function ($block) {
-                return c::view('cresenity.element.editorjs.checklist', $block['data'])->render();
+                return c::view('cresenity.element.editorjs.checklist', $this->getBlockData($block))->render();
             }
         );
 
         $this->addRenderer(
             'delimiter',
             function ($block) {
-                return c::view('cresenity.element.editorjs.delimiter', $block['data'])->render();
+                return c::view('cresenity.element.editorjs.delimiter', $this->getBlockData($block))->render();
             }
         );
 
         $this->addRenderer(
             'table',
             function ($block) {
-                return c::view('cresenity.element.editorjs.table', $block['data'])->render();
+                return c::view('cresenity.element.editorjs.table', $this->getBlockData($block))->render();
             }
         );
 
         $this->addRenderer(
             'raw',
             function ($block) {
-                return c::view('cresenity.element.editorjs.raw', $block['data'])->render();
+                return c::view('cresenity.element.editorjs.raw', $this->getBlockData($block))->render();
             }
         );
 
         $this->addRenderer(
             'embed',
             function ($block) {
-                return c::view('cresenity.element.editorjs.embed', $block['data'])->render();
+                return c::view('cresenity.element.editorjs.embed', $this->getBlockData($block))->render();
             }
         );
     }

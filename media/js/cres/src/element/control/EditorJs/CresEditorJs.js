@@ -13,6 +13,7 @@ import { markerCallback } from './blocks/marker';
 import { paragraphCallback } from './blocks/paragraph';
 import { rawCallback } from './blocks/raw';
 import { tableCallback } from './blocks/table';
+import { alignmentCallback } from './blocks/alignment';
 class CresEditorJs {
     constructor() {
         this.defaultConfigObject = {
@@ -33,7 +34,8 @@ class CresEditorJs {
             markerCallback,
             paragraphCallback,
             rawCallback,
-            tableCallback
+            tableCallback,
+            alignmentCallback
         ];
     }
 

@@ -1,5 +1,7 @@
 <?php
-
+/**
+ * @see CManager_EditorJs
+ */
 class CElement_FormInput_EditorJs extends CElement_FormInput {
     use CTrait_Element_Property_Placeholder;
     use CElement_FormInput_EditorJs_Trait_EditorJsToolTrait;
@@ -78,7 +80,6 @@ class CElement_FormInput_EditorJs extends CElement_FormInput {
         $this->setAttr('value', c::jsonAttr($value));
         $manager = c::manager();
         $manager->registerJs('https://cdn.jsdelivr.net/npm/@editorjs/editorjs@latest');
-        $manager->registerJs('https://cdn.jsdelivr.net/npm/@editorjs/header@latest');
         $manager->registerJs('https://cdn.jsdelivr.net/npm/@editorjs/simple-image@latest');
         $manager->registerJs('https://cdn.jsdelivr.net/npm/@editorjs/list@latest');
         $manager->registerJs('https://cdn.jsdelivr.net/npm/@editorjs/quote@latest');
@@ -92,7 +93,6 @@ class CElement_FormInput_EditorJs extends CElement_FormInput {
         $manager->registerJs('https://cdn.jsdelivr.net/npm/@editorjs/checklist@latest');
         $manager->registerJs('https://cdn.jsdelivr.net/npm/@editorjs/delimiter@latest');
         $manager->registerJs('https://cdn.jsdelivr.net/npm/@editorjs/embed@latest');
-        $manager->registerJs('https://cdn.jsdelivr.net/npm/@editorjs/paragraph@latest');
         $manager->registerJs('https://cdn.jsdelivr.net/npm/@editorjs/raw@latest');
         $manager->registerJs('https://cdn.jsdelivr.net/npm/@editorjs/table@latest');
     }
