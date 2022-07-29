@@ -1,7 +1,7 @@
 export const imageCallback = (editorConfig, fieldConfig) => {
     if (fieldConfig.toolSettings.image.enabled === true) {
-        editorConfig.tools.image = {
-            class: ImageTool,
+
+        const params = fieldConfig.toolSettings.image.isSimple ? {} : {
             config: {
                 endpoints: {
                     byFile: fieldConfig.uploadImageByFileEndpoint,
@@ -11,6 +11,11 @@ export const imageCallback = (editorConfig, fieldConfig) => {
                     'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]')?.getAttribute('content'),
                 },
             },
+        }
+        editorConfig.tools.image = {
+            class: fieldConfig.toolSettings.image.isSimple ? SimpleImage : ImageTool,
+            ...params
+
         };
     }
 };

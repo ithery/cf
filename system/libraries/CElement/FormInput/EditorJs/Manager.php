@@ -75,7 +75,7 @@ class CElement_FormInput_EditorJs_Manager {
             return new CBase_HtmlString(
                 c::view('cresenity.element.editorjs.content', ['content' => $htmlOutput])->render()
             );
-        } catch (CElement_FormInput_EditorJs_EditorJSException $exception) {
+        } catch (CElement_FormInput_EditorJs_EditorJsException $exception) {
             // process exception
             return new CBase_HtmlString(
                 "Something went wrong: {$exception->getMessage()}"

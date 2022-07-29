@@ -1,6 +1,6 @@
 
 
-<div class="editor-js-block">
+<div class="cres-editor-js-block">
     <{{ "h{$level}" }}>
         {{ $text }}
     </{{ "h{$level}" }}>

@@ -146,4 +146,8 @@ class CManager_Transform_MethodExecutor {
 
         return 'Unknown';
     }
+
+    public static function transformEditorJsHtml($data) {
+        return c::manager()->editorJs()->generateHtmlOutput($data)->__toString();
+    }
 }

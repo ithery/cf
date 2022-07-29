@@ -1,4 +1,4 @@
-<div class="editor-js-block">
+<div class="cres-editor-js-block">
     {{ ($style == 'unordered') ? '<ul>' : '<ol>' }}
     @foreach ($items as $item)
         <li>

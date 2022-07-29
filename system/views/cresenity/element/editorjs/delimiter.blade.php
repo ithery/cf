@@ -1,3 +1,3 @@
-<div class="editor-js-block">
-    <div class="editor-js-delimiter"></div>
+<div class="cres-editor-js-block">
+    <div class="cres-editor-js-delimiter"></div>
 </div>

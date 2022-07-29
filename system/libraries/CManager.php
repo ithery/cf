@@ -400,6 +400,6 @@ final class CManager {
      * @return CManager_EditorJs
      */
     public static function editorJs() {
-        return new CBase_ForwarderStaticClass(CManager_EditorJs::class);
+        return CManager_EditorJs::instance();
     }
 }

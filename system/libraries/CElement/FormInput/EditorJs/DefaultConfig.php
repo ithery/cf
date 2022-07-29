@@ -36,6 +36,7 @@ class CElement_FormInput_EditorJs_DefaultConfig {
             ],
             'image' => [
                 'enabled' => true,
+                'isSimple' => false,
                 'shortcut' => 'CMD+SHIFT+I',
                 'path' => 'editorjs/image',
                 'disk' => 'local-temp',

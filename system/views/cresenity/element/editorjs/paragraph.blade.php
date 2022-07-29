@@ -1,5 +1,5 @@
-<div class="editor-js-block">
+<div class="cres-editor-js-block">
     <p>
-        {{ $text }}
+        {!! $text !!}
     </p>
 </div>

@@ -1,3 +1,3 @@
-<div class="editor-js-content">
+<div class="cres-editor-js-content">
     {!! $content !!}
 </div>
