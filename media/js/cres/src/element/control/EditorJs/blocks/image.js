@@ -14,6 +14,7 @@ export const imageCallback = (editorConfig, fieldConfig) => {
         }
         editorConfig.tools.image = {
             class: fieldConfig.toolSettings.image.isSimple ? SimpleImage : ImageTool,
+            tunes: ['alignment'],
             ...params
 
         };
