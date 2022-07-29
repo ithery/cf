@@ -97,6 +97,7 @@ export default class Paragraph {
          * Placeholder for paragraph if it is first Block
          * @type {string}
          */
+
         this._placeholder = config.placeholder ? config.placeholder : Paragraph.DEFAULT_PLACEHOLDER;
 
         this._data = {

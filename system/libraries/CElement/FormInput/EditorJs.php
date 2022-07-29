@@ -45,11 +45,18 @@ class CElement_FormInput_EditorJs extends CElement_FormInput {
             'link' => new CElement_FormInput_EditorJs_Tool_LinkTool(),
             'list' => new CElement_FormInput_EditorJs_Tool_ListTool(),
             'marker' => new CElement_FormInput_EditorJs_Tool_MarkerTool(),
+            'paragraph' => new CElement_FormInput_EditorJs_Tool_ParagraphTool(),
             'raw' => new CElement_FormInput_EditorJs_Tool_RawTool(),
             'table' => new CElement_FormInput_EditorJs_Tool_TableTool(),
         ];
         $this->uploadImageByFileEndpoint = c::url('cresenity/editorjs/upload/file');
         $this->uploadImageByUrlEndpoint = c::url('cresenity/editorjs/upload/url');
+    }
+
+    public function setInitialBlock($block) {
+        $this->initialBlock = $block;
+
+        return $this;
     }
 
     public function holderId() {
@@ -100,7 +107,7 @@ class CElement_FormInput_EditorJs extends CElement_FormInput {
     protected function buildControlConfig() {
         $editorSettings = [
             'placeholder' => (string) $this->placeholder,
-            'initialBlock' => (string) $this->initialBlock,
+            'initialBlock' => $this->initialBlock,
             'autofocus' => (bool) $this->autofocus,
         ];
 

@@ -18,6 +18,8 @@ class CElement_FormInput_EditorJs_DefaultConfig {
             'paragraph' => [
                 'enabled' => true,
                 'inlineToolbar' => true,
+                'placeholder' => '',
+                'shortcut' => 'CMD+SHIFT+P',
             ],
             'header' => [
                 'enabled' => true,
@@ -151,7 +153,8 @@ class CElement_FormInput_EditorJs_DefaultConfig {
                         'type' => 'string',
                         'canBeOnly' => ['left', 'center', 'right', 'justify'],
                         'required' => false,
-                    ]
+                    ],
+
                 ],
                 'list' => [
                     'style' => [

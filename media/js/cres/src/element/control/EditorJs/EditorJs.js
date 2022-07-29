@@ -63,10 +63,6 @@ export default class EditorJs {
                  */
                 holder,
                 /**
-                 * This Tool will be used as default
-                 */
-                defaultBlock: editorSettings.initialBlock,
-                /**
                      * Default placeholder
                      */
                 placeholder: editorSettings.placeholder,
@@ -87,6 +83,9 @@ export default class EditorJs {
                 onChange: async function () {
                     await editorjsSave(this.holder);
                 }
+            }
+            if(editorSettings.initialBlock) {
+                editorConfig.defaultBlock = editorSettings.initialBlock;
             }
             listenForFormSubmit(holder);
 
