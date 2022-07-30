@@ -20,6 +20,11 @@ function extend() {
 	if ( typeof target !== "object" && typeof target !== "function" ) {
 		target = {};
 	}
+    // Extend itself if only one argument is passed
+    if ( i === length ) {
+        target = this;
+        i--;
+    }
 
 
 	for ( ; i < length; i++ ) {

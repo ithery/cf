@@ -33,6 +33,7 @@ import { attachWaves } from './ui/waves';
 import formatter from './formatter';
 import { initCssDomVar } from './module/css-dom-var';
 import extend from './core/extend';
+import hasClass from './dom/hasClass';
 export default class Cresenity {
     constructor() {
         this.cf = cf;
@@ -70,6 +71,9 @@ export default class Cresenity {
         this.sse = new SSE();
         this.formatter = formatter;
         this.extend = extend;
+        this.dom = {
+            hasClass
+        };
     }
     loadJs(filename, callback) {
         let fileref = document.createElement('script');
