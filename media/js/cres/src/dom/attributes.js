@@ -48,12 +48,12 @@ export const attr = ( elem, name, value ) => {
 
 
 export const removeAttr = ( elem, value ) => {
-    var name,
-        i = 0,
+    let name,
+        i = 0;
 
         // Attribute names can contain non-HTML whitespace characters
         // https://html.spec.whatwg.org/multipage/syntax.html#attributes-2
-        attrNames = value && value.match( rnothtmlwhite );
+    const attrNames = value && value.match( rnothtmlwhite );
 
     if ( attrNames && elem.nodeType === 1 ) {
         while ( ( name = attrNames[ i++ ] ) ) {

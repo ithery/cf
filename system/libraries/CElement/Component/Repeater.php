@@ -33,7 +33,8 @@ class CElement_Component_Repeater extends CElement_Component {
     }
 
     protected function build() {
-        $this->addClass('cres:element:component:repeater');
+        $this->addClass('cres:element:component:Repeater');
+        $this->setAttr('cres-element', 'component:Repeater');
         $divItems = $this->addDiv()->addClass('cres-repeater-wrapper');
         if ($this->itemBuilder != null) {
             $divRow = $divItems->addDiv()->addClass('cres-repeater-row');

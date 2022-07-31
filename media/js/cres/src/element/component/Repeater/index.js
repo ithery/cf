@@ -1,7 +1,7 @@
 import Repeater from "./Repeater";
 import "./index.scss";
 const initRepeater = (element) => {
-    new Repeater(element);
+    return new Repeater(element);
 }
 
 export {
