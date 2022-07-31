@@ -33,7 +33,7 @@ return [
             [
                 'name' => 'elements.form',
                 'label' => c::__('Form'),
-                'uri' => 'demo/elements/tab/index',
+                'uri' => 'demo/elements/form/index',
             ],
             [
                 'name' => 'elements.repeater',
