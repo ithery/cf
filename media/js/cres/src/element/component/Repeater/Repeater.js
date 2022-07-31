@@ -1,6 +1,7 @@
 import { addClass } from '../../../dom/classes';
 import { getChildrenByClassName } from '../../../dom/finder';
-const getIndexInArray = function(array, el) {
+import { updateUi } from './updater';
+const getIndexInArray = function (array, el) {
     return Array.prototype.indexOf.call(array, el);
 };
 
@@ -10,44 +11,38 @@ function getBlocksList(element) {
         'cres-repeater-row'
     );
 }
-function addBlock(element) {
+
+const addBlock = (element) => {
     let clone;
     if (element.blocks.length > 0) {
         clone = element.blocks[element.blocks.length - 1].cloneNode(true);
-
     } else {
         clone = element.firstBlock.cloneNode(true);
-
     }
 
     if (element.cloneClass) {
-        addClass(clone, element.cloneClass)
-    };
+        addClass(clone, element.cloneClass);
+    }
     // modify name/for/id attributes
-    updateBlockAttrs(clone);
-
     element.blockWrapper[0].appendChild(clone);
-    // update blocks list
-    getBlocksList(element);
-}
+    componentUpdate(element);
+};
 function removeBlock(element, trigger) {
     var block = trigger.closest('.cres-repeater-row');
     if (block) {
         var index = getIndexInArray(element.blocks, block);
         block.remove();
-        // update blocks list
-        getBlocksList(element);
-        // need to reset all blocks after that -> name/for/id values
-        for (var i = index; i < element.blocks.length; i++) {
-            updateBlockAttrs(
-                element.blocks[i],
-            );
-        }
+        componentUpdate(element);
     }
 }
-function updateBlockAttrs(block) {
 
+function componentUpdate(element) {
+    setTimeout(() => {
+        getBlocksList(element);
+        updateUi(element);
+    }, 0);
 }
+
 function initRepeater(element) {
     if (
         element.addNew.length < 1 ||
@@ -71,7 +66,9 @@ function initRepeater(element) {
         event.preventDefault();
         addBlock(element);
     });
+    updateUi(element);
 }
+
 export default class Repeater {
     constructor(className, config = {}) {
         window.myrepeater = this;
@@ -97,7 +94,7 @@ export default class Repeater {
         );
         this.cloneClass = this.element.getAttribute('data-repeater-class');
         this.inputName = this.element.getAttribute('data-repeater-input-name');
+        this.minItem = cresConfig.minItem ?? 1;
         initRepeater(this);
-
     }
 }

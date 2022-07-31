@@ -32,9 +32,19 @@ class CElement_Component_Repeater extends CElement_Component {
         return $this;
     }
 
+    public function setMinItem($minItem) {
+        $this->minItem = (int) $minItem;
+
+        return $this;
+    }
+
     protected function build() {
+        $config = [
+            'minItem' => $this->minItem,
+        ];
         $this->addClass('cres:element:component:Repeater');
         $this->setAttr('cres-element', 'component:Repeater');
+        $this->setAttr('cres-config', htmlspecialchars(json_encode($config), ENT_QUOTES, 'UTF-8'));
         $divItems = $this->addDiv()->addClass('cres-repeater-wrapper');
         if ($this->itemBuilder != null) {
             $divRow = $divItems->addDiv()->addClass('cres-repeater-row');

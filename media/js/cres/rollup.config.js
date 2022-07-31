@@ -36,7 +36,7 @@ export default {
         resolve(),
         commonjs({
             // These npm packages still use common-js modules. Ugh.
-            include: /node_modules\/(get-value|isobject|core-js|locutus|pusher-js|event-source-polyfill|lodash.merge|lodash.clonedeep)/
+            include: /node_modules\/(get-value|isobject|core-js|locutus|pusher-js|event-source-polyfill|lodash.merge|lodash.clonedeep|@babel\/runtime)/
         }),
         postcss({
             config: {
@@ -56,7 +56,8 @@ export default {
             }
         }),
         babel({
-            exclude: 'node_modules/**'
+            exclude: 'node_modules/**',
+            runtimeHelpers: true
         }),
         alias({
             entries: [

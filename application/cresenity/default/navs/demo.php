@@ -36,7 +36,12 @@ return [
                 'uri' => 'demo/elements/tab/index',
             ],
             [
-                'name' => 'elements.Shimmer',
+                'name' => 'elements.repeater',
+                'label' => c::__('Repeater'),
+                'uri' => 'demo/elements/repeater/index',
+            ],
+            [
+                'name' => 'elements.shimmer',
                 'label' => c::__('Shimmer'),
                 'uri' => 'demo/elements/shimmer/index',
             ],
