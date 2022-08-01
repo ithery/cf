@@ -34,6 +34,8 @@ import formatter from './formatter';
 import { initCssDomVar } from './module/css-dom-var';
 import extend from './core/extend';
 import {hasClass,addClass, removeClass} from './dom/classes';
+import scrollTo from './animation/scrollTo';
+import setHeight from './animation/setHeight';
 export default class Cresenity {
     constructor() {
         this.cf = cf;
@@ -75,6 +77,11 @@ export default class Cresenity {
             hasClass,
             addClass,
             removeClass
+        };
+
+        this.animation = {
+            scrollTo,
+            setHeight
         };
     }
     loadJs(filename, callback) {
