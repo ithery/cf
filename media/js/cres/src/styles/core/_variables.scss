@@ -100,12 +100,12 @@ $darkmode: (
 //
 // Quickly modify global styling by enabling or disabling optional features.
 
-$enable-rounded: true !default;
-$enable-shadows: true !default;
-$enable-transitions: true !default;
-$enable-reduced-motion: true !default;
-$enable-grid-classes: true !default;
-$enable-important-utilities: true !default;
+$enable-rounded: false !default;
+$enable-shadows: false !default;
+$enable-transitions: false !default;
+$enable-reduced-motion: false !default;
+$enable-grid-classes: false !default;
+$enable-important-utilities: false !default;
 
 // scss-docs-start grid-breakpoints
 $grid-breakpoints: (
