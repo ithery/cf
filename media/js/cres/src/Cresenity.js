@@ -32,6 +32,10 @@ import AlpineTippy from './alpine/tippy';
 import { attachWaves } from './ui/waves';
 import formatter from './formatter';
 import { initCssDomVar } from './module/css-dom-var';
+import extend from './core/extend';
+import {hasClass,addClass, removeClass} from './dom/classes';
+import scrollTo from './animation/scrollTo';
+import setHeight from './animation/setHeight';
 export default class Cresenity {
     constructor() {
         this.cf = cf;
@@ -59,8 +63,8 @@ export default class Cresenity {
         this.php = php;
         this.react = cresReact;
         this.observer = {
-            elementRendered: elementRendered,
-            elementReady: elementReady
+            elementRendered,
+            elementReady
         };
         this.confirmHandler = defaultConfirmHandler;
         this.dispatchWindowEvent = dispatchWindowEvent;
@@ -68,6 +72,17 @@ export default class Cresenity {
         this.debounce = debounce;
         this.sse = new SSE();
         this.formatter = formatter;
+        this.extend = extend;
+        this.dom = {
+            hasClass,
+            addClass,
+            removeClass
+        };
+
+        this.animation = {
+            scrollTo,
+            setHeight
+        };
     }
     loadJs(filename, callback) {
         let fileref = document.createElement('script');
@@ -182,7 +197,7 @@ export default class Cresenity {
             }
         }
 
-        let settings = $.extend({
+        let settings = extend({
             // These are the defaults.
             method: 'get',
             dataAddition: {},
@@ -323,7 +338,7 @@ export default class Cresenity {
         this.reload(options);
     }
     confirm(options) {
-        let settings = $.extend({
+        let settings = extend({
             // These are the defaults.
             method: 'get',
             dataAddition: {},
@@ -341,7 +356,7 @@ export default class Cresenity {
         }
     }
     modal(options) {
-        let settings = $.extend({
+        let settings = extend({
             // These are the defaults.
             haveHeader: false,
             haveFooter: false,
@@ -474,7 +489,7 @@ export default class Cresenity {
         this.closeLastModal();
     }
     ajax(options) {
-        let settings = $.extend({
+        let settings = extend({
             block: true,
             url: window.location.href,
             method: 'post'
@@ -536,7 +551,7 @@ export default class Cresenity {
         return $.ajax(ajaxOptions);
     }
     ajaxSubmit(options) {
-        let settings = $.extend({}, options);
+        let settings = extend({}, options);
         let selector = settings.selector;
         $(selector).each((index, element) => {
             //don't do it again if still loading
@@ -600,7 +615,7 @@ export default class Cresenity {
         }
     }
     toast(type, message, options) {
-        let settings = $.extend({
+        let settings = extend({
             title: ucfirst(type),
             position: 'top-right'
         }, options);
@@ -863,7 +878,7 @@ export default class Cresenity {
         return newElement;
     }
     blockPage(options) {
-        let settings = $.extend({
+        let settings = extend({
             innerMessage: '<div class="sk-folding-cube sk-primary"><div class="sk-cube1 sk-cube"></div><div class="sk-cube2 sk-cube"></div><div class="sk-cube4 sk-cube"></div><div class="sk-cube3 sk-cube"></div></div><h5 style="color: #444">LOADING...</h5>'
         }, options);
         $.blockUI({
@@ -885,7 +900,7 @@ export default class Cresenity {
     }
     blockElement(selector, options) {
         const blockHtml = window?.capp?.block?.html ?? '<div class="sk-wave sk-primary"><div class="sk-rect sk-rect1"></div> <div class="sk-rect sk-rect2"></div> <div class="sk-rect sk-rect3"></div> <div class="sk-rect sk-rect4"></div> <div class="sk-rect sk-rect5"></div></div>';
-        let settings = $.extend({
+        let settings = extend({
             innerMessage: blockHtml
         }, options);
 
@@ -1064,7 +1079,7 @@ export default class Cresenity {
         this.cf.init();
     }
     downloadProgress(options) {
-        let settings = $.extend({
+        let settings = extend({
             // These are the defaults.
             method: 'get',
             dataAddition: {},

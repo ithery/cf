@@ -1,6 +1,7 @@
 
 import { elementRendered } from "../util/dom-observer";
 import { initComponent, component } from "./component";
+import { initControl, control } from "./control";
 
 const isElementInitialized = (element) => {
     const classList = element.className.split(/\s+/);
@@ -14,6 +15,7 @@ const isElementInitialized = (element) => {
 }
 
 let inited = false;
+
 const initElement = () => {
     if(!inited) {
         elementRendered('[cres-element]', (element)=>{
@@ -22,16 +24,20 @@ const initElement = () => {
                 if(elementName.startsWith('component')) {
                     initComponent(element);
                 }
+                if(elementName.startsWith('control')) {
+                    initControl(element);
+                }
                 element.classList.add("cres:initialized");
             }
         });
     }
 }
+
 const element = {
-    component
+    component,
+    control
 }
 export {
     element,
     initElement,
-
 }

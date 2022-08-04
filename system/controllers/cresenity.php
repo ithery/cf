@@ -392,4 +392,17 @@ class Controller_Cresenity extends CController {
             return c::response()->json(compact('success'));
         }
     }
+
+    public function editorjs($method, $submethod) {
+        if ($method == 'upload') {
+            $uploadHandler = c::manager()->editorJs()->createImageUploadHandler();
+
+            if ($submethod == 'file') {
+                return c::response()->json($uploadHandler->byFile(c::request()));
+            }
+            if ($submethod == 'url') {
+                return c::response()->json($uploadHandler->byUrl(c::request()));
+            }
+        }
+    }
 }

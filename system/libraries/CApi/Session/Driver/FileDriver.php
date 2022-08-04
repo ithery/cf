@@ -16,6 +16,7 @@ class CApi_Session_Driver_FileDriver extends CApi_Session_DriverAbstract {
 
     public function exists($id) {
         $path = $this->getFilePath($id);
+
         return file_exists($path);
     }
 
@@ -26,6 +27,7 @@ class CApi_Session_Driver_FileDriver extends CApi_Session_DriverAbstract {
 
             //return include $path;
         }
+
         return [];
     }
 
@@ -46,14 +48,16 @@ class CApi_Session_Driver_FileDriver extends CApi_Session_DriverAbstract {
         $strYmd = substr($sessionId, 0, 8);
         $strH = substr($sessionId, 8, 2);
         $sessionPath = rtrim($this->basePath(), '/') . '/' . $strYmd . '/' . $strH . '/';
+
         return $sessionPath . $sessionId . '.php';
     }
 
     protected function basePath() {
-        $basePath = DOCROOT . 'application/' . CF::appCode() . '/default/sessions/XCApi/';
+        $basePath = DOCROOT . 'application/' . CF::appCode() . '/default/sessions/';
         if (strlen($this->group) > 0) {
             $basePath .= $this->group . '/';
         }
+
         return $basePath;
     }
 }
