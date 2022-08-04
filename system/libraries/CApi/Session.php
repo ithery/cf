@@ -5,6 +5,7 @@ class CApi_Session {
     protected $data;
 
     protected $apiGroup;
+
     protected $driver = false;
 
     public function __construct(CApi_Session_DriverAbstract $driver, $sessionId) {
@@ -29,15 +30,16 @@ class CApi_Session {
     public function setData($data) {
         $this->data = $data;
         $this->save();
+
         return $this;
     }
 
     public function set($key, $val, $save = true) {
-
         $this->data[$key] = $val;
         if ($save) {
             $this->save();
         }
+
         return $this;
     }
 
@@ -56,6 +58,10 @@ class CApi_Session {
     }
 
     public function sessionId() {
+        return $this->sessionId;
+    }
+
+    public function getId() {
         return $this->sessionId;
     }
 

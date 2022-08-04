@@ -37,6 +37,8 @@ class CElement_FormInput_MapPicker extends CElement_FormInput {
 
     protected $radiusSelector;
 
+    protected $rawJsOnChanged;
+
     public function __construct($id) {
         parent::__construct($id);
         $this->type = 'text';
@@ -59,6 +61,7 @@ class CElement_FormInput_MapPicker extends CElement_FormInput {
         $this->markerInCenter = true;
 
         $this->geoCodingApiKey = CF::config('vendor.google.geocoding_api_key');
+        $this->rawJsOnChanged;
     }
 
     public function setValue($val) {
@@ -140,6 +143,12 @@ class CElement_FormInput_MapPicker extends CElement_FormInput {
         return $this;
     }
 
+    public function setJsOnChanged($js) {
+        $this->rawJsOnChanged = $js;
+
+        return $this;
+    }
+
     public function build() {
         if (strlen($this->geoCodingApiKey) == 0) {
             throw new Exception('no api key found in config vendor.google.geocoding_api_key');
@@ -176,7 +185,7 @@ class CElement_FormInput_MapPicker extends CElement_FormInput {
         $js = new CStringBuilder();
         $js->setIndent($indent);
 
-        $miniColorJs = "
+        $locationPickerJs = "
             $('#" . $this->id . "-map').locationpicker({
                 location: {
                     latitude: " . $this->lat . ',
@@ -198,13 +207,14 @@ class CElement_FormInput_MapPicker extends CElement_FormInput {
                 onchanged: function (currentLocation, radius, isMarkerDropped) {
                     $('#" . $this->id . "-lat').val(currentLocation.latitude);
                     $('#" . $this->id . "-lng').val(currentLocation.longitude);
+                    " . $this->rawJsOnChanged . '
                 },
-                markerDraggable: " . json_encode($this->markerDraggable) . ',
+                markerDraggable: ' . json_encode($this->markerDraggable) . ',
                 markerInCenter: ' . json_encode($this->markerInCenter) . ',
             });
         ';
 
-        $js->appendln($miniColorJs);
+        $js->appendln($locationPickerJs);
         $js->append(parent::js());
 
         return $js->text();

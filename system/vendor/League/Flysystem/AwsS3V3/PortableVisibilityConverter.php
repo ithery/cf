@@ -5,13 +5,13 @@ namespace League\Flysystem\AwsS3V3;
 use League\Flysystem\Visibility;
 
 class PortableVisibilityConverter implements VisibilityConverter {
-    private const PUBLIC_GRANTEE_URI = 'http://acs.amazonaws.com/groups/global/AllUsers';
+    const PUBLIC_GRANTEE_URI = 'http://acs.amazonaws.com/groups/global/AllUsers';
 
-    private const PUBLIC_GRANTS_PERMISSION = 'READ';
+    const PUBLIC_GRANTS_PERMISSION = 'READ';
 
-    private const PUBLIC_ACL = 'public-read';
+    const PUBLIC_ACL = 'public-read';
 
-    private const PRIVATE_ACL = 'private';
+    const PRIVATE_ACL = 'private';
 
     /**
      * @var string

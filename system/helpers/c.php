@@ -1528,6 +1528,10 @@ class c {
         return json_encode($data, $options, $depth);
     }
 
+    public static function jsonAttr($data, $options = null, $depth = 512) {
+        return htmlspecialchars(c::json($data, $options, $depth), ENT_QUOTES, 'UTF-8');
+    }
+
     /**
      * @return CApp_Contract_BaseInterface
      */

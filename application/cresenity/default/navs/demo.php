@@ -33,10 +33,15 @@ return [
             [
                 'name' => 'elements.form',
                 'label' => c::__('Form'),
-                'uri' => 'demo/elements/tab/index',
+                'uri' => 'demo/elements/form/index',
             ],
             [
-                'name' => 'elements.Shimmer',
+                'name' => 'elements.repeater',
+                'label' => c::__('Repeater'),
+                'uri' => 'demo/elements/repeater/index',
+            ],
+            [
+                'name' => 'elements.shimmer',
                 'label' => c::__('Shimmer'),
                 'uri' => 'demo/elements/shimmer/index',
             ],

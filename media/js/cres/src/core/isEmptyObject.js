@@ -1,0 +1,9 @@
+
+const isEmptyObject = ( obj ) => {
+    for ( const name in obj ) {
+        return false;
+    }
+    return true;
+};
+
+export default isEmptyObject;
