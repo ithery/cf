@@ -56,8 +56,7 @@ export default {
             }
         }),
         babel({
-            exclude: 'node_modules/**',
-            runtimeHelpers: true
+            exclude: 'node_modules/**'
         }),
         alias({
             entries: [

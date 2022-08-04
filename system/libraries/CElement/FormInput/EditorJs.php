@@ -53,6 +53,18 @@ class CElement_FormInput_EditorJs extends CElement_FormInput {
         $this->uploadImageByUrlEndpoint = c::url('cresenity/editorjs/upload/url');
     }
 
+    public function setUploadImageByFileEndpoint($url) {
+        $this->uploadImageByFileEndpoint = $url;
+
+        return $this;
+    }
+
+    public function setUploadImageByUrlEndpoint($url) {
+        $this->uploadImageByUrlEndpoint = $url;
+
+        return $this;
+    }
+
     public function setInitialBlock($block) {
         $this->initialBlock = $block;
 
