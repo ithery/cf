@@ -11,7 +11,7 @@ import {
 } from './util';
 import {encode as base64encode, decode as base64decode} from './util/base64';
 import php from './php';
-import { elementReady, elementRendered } from './util/dom-observer';
+import { domReady, elementReady, elementRendered } from './util/dom-observer';
 import { debounce } from './util/debounce';
 import { confirmFromElement, defaultConfirmHandler } from './module/confirm-handler';
 import initValidation from './module/validation';
@@ -1070,7 +1070,7 @@ export default class Cresenity {
 
             root.classList.add('cresenity-loaded');
             root.classList.remove('no-js');
-            removePreloader();
+            domReady(()=>removePreloader());
             dispatchWindowEvent('cresenity:loaded');
             this.applyDeferXData();
         });

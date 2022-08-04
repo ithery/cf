@@ -50,6 +50,11 @@ class CApp implements CInterface_Responsable, CInterface_Renderable, CInterface_
     protected $data = [];
 
     /**
+     * @var CApp_PWA
+     */
+    protected $pwa;
+
+    /**
      * @var CApp_Element
      */
     protected $element;
@@ -613,5 +618,17 @@ class CApp implements CInterface_Responsable, CInterface_Renderable, CInterface_
      */
     public static function formatter() {
         return CApp_Formatter::instance();
+    }
+
+    public function enablePWA($startUrl = '', $theme = 'cresenity') {
+        $this->pwa()->enable($startUrl, $theme);
+    }
+
+    public function pwa() {
+        if ($this->pwa == null) {
+            $this->pwa = new CApp_PWA();
+        }
+
+        return $this->pwa;
     }
 }
