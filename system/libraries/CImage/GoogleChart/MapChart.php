@@ -35,7 +35,7 @@ class CImage_GoogleChart_MapChart extends CImage_GoogleChart_Chart {
     }
 
     /**
-     * Specifies the colors of the chart
+     * Specifies the colors of the chart.
      *
      * @param string $defaultColor   The color of regions that do not have data assigned. An RRGGBB format
      *                               hexadecimal number. Suggested value is BEBEBE (medium gray).

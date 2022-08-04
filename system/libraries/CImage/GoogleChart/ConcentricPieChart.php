@@ -20,7 +20,7 @@ class CImage_GoogleChart_ConcentricPieChart extends CImage_GoogleChart_PieChart 
     }
 
     /**
-     * Adds the legend for Concentric Pie Charts
+     * Adds the legend for Concentric Pie Charts.
      *
      * Run an instance of this function for each data set.
      *
