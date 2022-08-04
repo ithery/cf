@@ -12,6 +12,8 @@ class CApi_HTTP_Request extends CHTTP_Request implements CApi_Contract_HTTP_Requ
 
     protected $apiData = [];
 
+    protected $sessionResolver;
+
     /**
      * Create a new Dingo request instance from an Illuminate request instance.
      *
@@ -115,5 +117,38 @@ class CApi_HTTP_Request extends CHTTP_Request implements CApi_Contract_HTTP_Requ
      */
     public function getApiData($key, $default = null) {
         return c::value(carr::get($this->apiData, $key, $default));
+    }
+
+    /**
+     * Get the session associated with the request.
+     *
+     * @throws \RuntimeException
+     *
+     * @return \CSession_Store
+     */
+    public function session() {
+        return call_user_func($this->getSessionResolver());
+    }
+    /**
+     * Get the user resolver callback.
+     *
+     * @return \Closure
+     */
+    public function getSessionResolver() {
+        return $this->sessionResolver ?: function () {
+            return CBase::session();
+        };
+    }
+    /**
+     * Get the session associated with the request.
+     *
+     * @throws \RuntimeException
+     *
+     * @return \CSession_Store
+     */
+    public function setSessionResolver(Closure $callback) {
+        $this->sessionResolver = $callback;
+
+        return $this;
     }
 }
