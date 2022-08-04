@@ -129,6 +129,7 @@ class CApi_HTTP_Request extends CHTTP_Request implements CApi_Contract_HTTP_Requ
     public function session() {
         return call_user_func($this->getSessionResolver());
     }
+
     /**
      * Get the user resolver callback.
      *
@@ -139,6 +140,7 @@ class CApi_HTTP_Request extends CHTTP_Request implements CApi_Contract_HTTP_Requ
             return CBase::session();
         };
     }
+
     /**
      * Get the session associated with the request.
      *

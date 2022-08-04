@@ -31,11 +31,12 @@ final class CApi_SessionFactory {
 
         $driver = static::createDriver($driver, $options);
         $driver->write($sessionId, $data);
+
         return static::getSession($sessionId, $options);
     }
 
     /**
-     * Undocumented function
+     * Undocumented function.
      *
      * @param string $sessionId
      * @param array  $options
@@ -44,7 +45,32 @@ final class CApi_SessionFactory {
      */
     public static function getSession($sessionId, $options = []) {
         $driver = carr::get($options, 'driver', CApi::SESSION_DRIVER_FILE);
+
         $session = new CApi_Session(static::createDriver($driver, $options), $sessionId);
+
+        return $session;
+    }
+
+    /**
+     * Undocumented function.
+     *
+     * @param string $sessionId
+     * @param array  $options
+     *
+     * @return CApi_Session
+     */
+    public static function getOrCreateSession($sessionId, $options = []) {
+        $driver = carr::get($options, 'driver', CApi::SESSION_DRIVER_FILE);
+        $driver = static::createDriver($driver, $options);
+        if (!$driver->exists($sessionId)) {
+            $data = [
+                'sessionId' => $sessionId
+            ];
+
+            $driver->write($sessionId, $data);
+        }
+        $session = new CApi_Session($driver, $sessionId);
+
         return $session;
     }
 
@@ -56,6 +82,7 @@ final class CApi_SessionFactory {
      */
     public static function createDriver($driver, $options = []) {
         $method = 'create' . $driver . 'Driver';
+
         return static::$method($options);
     }
 
@@ -79,6 +106,7 @@ final class CApi_SessionFactory {
         $redisStore = new CCache_Repository($driver);
         //$expirationSeconds = CF::config($expiration);
         $handler = new CApi_Session_Driver_RedisDriver($options, $redisStore, $expirationSeconds);
+
         return $handler;
     }
 }
