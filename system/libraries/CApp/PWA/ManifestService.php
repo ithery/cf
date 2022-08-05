@@ -1,20 +1,27 @@
 <?php
 
 class CApp_PWA_ManifestService {
-    public function generate($startUrl) {
-        $basicManifest = [
-            'name' => CF::config('pwa.manifest.name'),
-            'short_name' => CF::config('pwa.manifest.short_name'),
-            'start_url' => $startUrl,
-            'display' => CF::config('pwa.manifest.display'),
-            'theme_color' => CF::config('pwa.manifest.theme_color'),
-            'background_color' => CF::config('pwa.manifest.background_color'),
-            'orientation' => CF::config('pwa.manifest.orientation'),
-            'status_bar' => CF::config('pwa.manifest.status_bar'),
-            'splash' => CF::config('pwa.manifest.splash')
-        ];
+    use CApp_PWA_Trait_GroupConfigTrait;
 
-        foreach (CF::config('pwa.manifest.icons') as $size => $file) {
+    protected $group;
+
+    public function __construct($group) {
+        $this->group = $group;
+    }
+
+    public function generate() {
+        $basicManifest = [
+            'name' => $this->getGroupConfig('manifest.name'),
+            'short_name' => $this->getGroupConfig('manifest.short_name'),
+            'start_url' => $this->getGroupConfig('start_url'),
+            'display' => $this->getGroupConfig('manifest.display'),
+            'theme_color' => $this->getGroupConfig('manifest.theme_color'),
+            'background_color' => $this->getGroupConfig('manifest.background_color'),
+            'orientation' => $this->getGroupConfig('manifest.orientation'),
+            'status_bar' => $this->getGroupConfig('manifest.status_bar'),
+            'splash' => $this->getGroupConfig('manifest.splash')
+        ];
+        foreach ($this->getGroupConfig('manifest.icons') as $size => $file) {
             $fileInfo = pathinfo($file['path']);
             $basicManifest['icons'][] = [
                 'src' => $file['path'],
@@ -23,8 +30,8 @@ class CApp_PWA_ManifestService {
                 'purpose' => $file['purpose']
             ];
         }
-        if (CF::config('pwa.manifest.shortcuts')) {
-            foreach (CF::config('pwa.manifest.shortcuts') as $shortcut) {
+        if ($this->getGroupConfig('manifest.shortcuts')) {
+            foreach ($this->getGroupConfig('manifest.shortcuts') as $shortcut) {
                 if (array_key_exists('icons', $shortcut)) {
                     $fileInfo = pathinfo($shortcut['icons']['src']);
                     $icon = [
@@ -50,7 +57,7 @@ class CApp_PWA_ManifestService {
             }
         }
 
-        foreach (CF::config('pwa.manifest.custom') as $tag => $value) {
+        foreach ($this->getGroupConfig('manifest.custom') as $tag => $value) {
             $basicManifest[$tag] = $value;
         }
 
