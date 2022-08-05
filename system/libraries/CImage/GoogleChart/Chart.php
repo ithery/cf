@@ -2,21 +2,6 @@
 
 class CImage_GoogleChart_Chart {
     /**
-     * This variable holds all the chart information.
-     *
-     * @var array
-     */
-    private $chart;
-
-    /**
-     * API server URL
-     *
-     * @var string
-     * @usedby getUrl()
-     */
-    private $baseUrl = 'chart.apis.google.com/chart?';
-
-    /**
      * Data set values.
      * Every array entry is a data set.
      *
@@ -25,40 +10,74 @@ class CImage_GoogleChart_Chart {
     protected $values = [];
 
     /**
-     * Width of the chart
+     * This variable holds all the chart information.
+     *
+     * @var array
+     */
+    private $chart;
+
+    /**
+     * API server URL.
+     *
+     * @var string
+     * @usedby getUrl()
+     */
+    private $baseUrl = 'chart.apis.google.com/chart?';
+
+    /**
+     * Width of the chart.
      *
      * @var int
      */
     private $width;
 
-    private function setWidth($width) {
-        $this->width = $width;
-    }
-
-    public function getWidth() {
-        return($this->width);
-    }
-
     /**
-     * Height of the chart
+     * Height of the chart.
      *
      * @var int
      */
     private $height;
-
-    private function setHeight($height) {
-        $this->height = $height;
-    }
-
-    public function getHeight() {
-        return($this->height);
-    }
 
     /**
      * Data precision
      * Defines the precision of the rounding in textEncodeData(). By default it is 2.
      */
     private $precision = 2;
+
+    /**
+     * Handles the number of items in the dataset.
+     */
+    private $dataCount;
+
+    /**
+     * Data encoding char.
+     *
+     * @var char
+     */
+    private $dataEncodingType = 't';
+
+    /**
+     * Server number processing the chart.
+     *
+     * @var int
+     */
+    private $serverNum;
+
+    private function setWidth($width) {
+        $this->width = $width;
+    }
+
+    public function getWidth() {
+        return $this->width;
+    }
+
+    private function setHeight($height) {
+        $this->height = $height;
+    }
+
+    public function getHeight() {
+        return $this->height;
+    }
 
     public function setPrecision($precision) {
         $this->precision = $precision;
@@ -67,11 +86,6 @@ class CImage_GoogleChart_Chart {
     public function getPrecision() {
         return $this->precision;
     }
-
-    /**
-     * Handles the number of items in the dataset.
-     */
-    private $dataCount;
 
     public function setDataCount($dataCount) {
         if (!isset($this->dataCount)) {
@@ -83,19 +97,12 @@ class CImage_GoogleChart_Chart {
         return $this->dataCount;
     }
 
-    /**
-     * Data encoding char
-     *
-     * @var char
-     */
-    private $dataEncodingType = 't';
-
     public function setEncodingType($newEncodeType) {
         $this->dataEncodingType = $newEncodeType;
     }
 
     public function getEncodingType() {
-        return ($this->dataEncodingType);
+        return $this->dataEncodingType;
     }
 
     protected function encodeData($data, $separator, $encodigData = '') {
@@ -110,6 +117,7 @@ class CImage_GoogleChart_Chart {
         }
         $retStr = $this->separateData($data, $separator, '|');
         $retStr = trim($retStr, '|');
+
         return $retStr;
     }
 
@@ -127,11 +135,12 @@ class CImage_GoogleChart_Chart {
         }
         $retStr = trim($retStr, $separator);
         $retStr .= $datasetSeparator;
+
         return $retStr;
     }
 
     /**
-     * Adds a data set
+     * Adds a data set.
      *
      * @param $data Array Data Set values
      */
@@ -188,6 +197,7 @@ class CImage_GoogleChart_Chart {
         } else {
             $encodedData = $data;
         }
+
         return $encodedData;
     }
 
@@ -210,12 +220,12 @@ class CImage_GoogleChart_Chart {
                 if (is_array($array)) {
                     $encodedData2 = [];
                     foreach ($array as $elem) {
-                        $index = (int)$elem / $rate;
+                        $index = (int) $elem / $rate;
                         array_push($encodedData2, $encode_string[$index]);
                     }
                     array_push($encodedData, $encodedData2);
                 } else {
-                    $index = (int)$array / $rate;
+                    $index = (int) $array / $rate;
                     array_push($encodedData, $encode_string[$index]);
                 }
             }
@@ -232,6 +242,7 @@ class CImage_GoogleChart_Chart {
                 }
             }
         }
+
         return $encodedData;
     }
 
@@ -287,7 +298,7 @@ class CImage_GoogleChart_Chart {
                 if (is_array($array)) {
                     $encodedData2 = [];
                     foreach ($array as $elem) {
-                        $toEncode = (int)$elem / $rate;
+                        $toEncode = (int) $elem / $rate;
                         $s = '';
                         for ($i = 0; $i < 2; ++$i) {
                             $m = $toEncode % 64;
@@ -298,7 +309,7 @@ class CImage_GoogleChart_Chart {
                     }
                     array_push($encodedData, $encodedData2);
                 } else {
-                    $toEncode = (int)$array / $rate;
+                    $toEncode = (int) $array / $rate;
                     $s = '';
                     $encodedData2 = [];
                     for ($i = 0; $i < 2; ++$i) {
@@ -335,6 +346,7 @@ class CImage_GoogleChart_Chart {
                 }
             }
         }
+
         return $encodedData;
     }
 
@@ -348,13 +360,6 @@ class CImage_GoogleChart_Chart {
     }
 
     /**
-     * Server number processing the chart
-     *
-     * @var int
-     */
-    private $serverNum;
-
-    /**
      * Sets server number processing the chart.
      *
      * @param $newServerNum Integer The server number. The function will scale this number to the range 0-9
@@ -364,16 +369,16 @@ class CImage_GoogleChart_Chart {
     }
 
     /**
-     * Returns the server number processing the chart
+     * Returns the server number processing the chart.
      *
      * @return int
      */
     public function getServerNumber() {
-        return ($this->serverNum);
+        return $this->serverNum;
     }
 
     /**
-     * Sets the chart property
+     * Sets the chart property.
      *
      * @param $key String Name of the chart parameter
      * @param $value String Value of the chart parameter
@@ -389,13 +394,13 @@ class CImage_GoogleChart_Chart {
     }
 
     /**
-     * Gets a chart property
+     * Gets a chart property.
      *
      * @param $key String Name of the chart parameter
      */
     public function getProperty($key) {
         if (isset($this->chart[$key])) {
-            return ($this->chart[$key]);
+            return $this->chart[$key];
         }
     }
 
@@ -425,15 +430,15 @@ class CImage_GoogleChart_Chart {
      *
      * This is the basic function. The data in the array are interpreted as one color one data set.
      *
-     * @param array $colors Specifies colors using a 6-character string of hexadecimal values,
-     *                      plus two optional transparency values, in the format RRGGBB[AA].
+     * @param array $colors specifies colors using a 6-character string of hexadecimal values,
+     *                      plus two optional transparency values, in the format RRGGBB[AA]
      */
     public function setColors($colors) {
         $this->setProperty('chco', $this->encodeData($this->getApplicableLabels($colors), ','));
     }
 
     /**
-     * Sets the labels for the legend
+     * Sets the labels for the legend.
      *
      * @param $labels Array
      */
@@ -442,7 +447,7 @@ class CImage_GoogleChart_Chart {
     }
 
     /**
-     * Sets the position and the order of the legend
+     * Sets the position and the order of the legend.
      *
      * @param $position String Please refer to the documentation for the acceptable values
      * @param $order String Please refer to the documentation for the acceptable values
@@ -469,10 +474,10 @@ class CImage_GoogleChart_Chart {
     }
 
     /**
-     * Sets font size and color of the title
+     * Sets font size and color of the title.
      *
      * @param $color String The title color, in RRGGBB hexadecimal format. Default color is black.
-     * @param $size Integer Font size of the title, in points.
+     * @param $size Integer Font size of the title, in points
      */
     public function setTitleOptions($color, $size) {
         $this->setProperty('chts', $color . ',' . $size);
@@ -508,8 +513,8 @@ class CImage_GoogleChart_Chart {
      * Specifies the range of values that appear on each axis independently.
      *
      * @param int $axisIndex This is a zero-based index into the axis array specified by setVisibleAxes
-     * @param int $startVal  A number, defining the low value for this axis.
-     * @param int $endVal    A number, defining the high value for this axis.
+     * @param int $startVal  a number, defining the low value for this axis
+     * @param int $endVal    a number, defining the high value for this axis
      * @param int $step      The count step between ticks on the axis. There is no default step value; the step
      *                       is calculated to try to show a set of nicely spaced labels.
      */
@@ -526,7 +531,7 @@ class CImage_GoogleChart_Chart {
      * Specifies the labels that appear on each axis independently.
      *
      * @param $axisIndex Integer This is a zero-based index into the axis array specified by setVisibleAxes
-     * @param $axisLabel Array One or more labels to place along this axis.
+     * @param $axisLabel Array One or more labels to place along this axis
      */
     public function addAxisLabel($axisIndex, $axisLabel) {
         $this->setProperty('chxl', $this->encodeData(array_merge([$axisIndex . ':'], $axisLabel), '|'), true);
@@ -567,7 +572,7 @@ class CImage_GoogleChart_Chart {
     }
 
     /**
-     * Adds the background fill
+     * Adds the background fill.
      *
      * Specifies a solid fill for the background and/or chart area, or assign a transparency value to the whole chart.
      *
@@ -587,7 +592,7 @@ class CImage_GoogleChart_Chart {
      * so that one can fade into the other. Each additional gradient is specified by a <color>,<color_centerpoint>  pair.
      *
      * @param string $fillType  The part of the chart being filled. Please refer to the documentation for the acceptable values
-     * @param int    $fillAngle A number specifying the angle of the gradient from 0 (horizontal) to 90 (vertical).
+     * @param int    $fillAngle a number specifying the angle of the gradient from 0 (horizontal) to 90 (vertical)
      * @param array  $colors    An array of couples <color> (The color of the fill, in RRGGBB hexadecimal format) and
      *                          <color_centerpoint> (Specifies the anchor point for the color. The color will start to fade from this
      *                          point as it approaches another anchor. The value range is from 0.0 (bottom or left edge) to 1.0 (top
@@ -602,7 +607,7 @@ class CImage_GoogleChart_Chart {
      * Specifies a striped background fill for your chart area, or the whole chart.
      *
      * @param string $fillType  The part of the chart being filled. Please refer to the documentation for the acceptable values
-     * @param int    $fillAngle A number specifying the angle of the gradient from 0 (horizontal) to 90 (vertical).
+     * @param int    $fillAngle a number specifying the angle of the gradient from 0 (horizontal) to 90 (vertical)
      * @param array  $colors    An array of couples <color> (The color of the fill, in RRGGBB hexadecimal format) and <width>
      *                          (The width of this stripe, from 0 to 1, where 1 is the full width of the chart. Stripes are repeated
      *                          until the chart is filled. Repeat <color> and <width> for each additional stripe. You must have at
@@ -622,14 +627,14 @@ class CImage_GoogleChart_Chart {
      * @param int    $startLineIndex The index of the line at which the fill starts. The first data
      *                               series specified in addDataSet() has an index of zero (0), the
      *                               second data series has an index of 1, and so on.
-     * @param int    $endLineIndex   Please refer to the documentation for the usage of this parameter.
+     * @param int    $endLineIndex   please refer to the documentation for the usage of this parameter
      */
     public function addLineFill($where, $color, $startLineIndex, $endLineIndex) {
         $this->setProperty('chm', $this->encodeData([$where, $color, $startLineIndex, $endLineIndex, 0], ','), true);
     }
 
     /**
-     * Specifies solid or dotted grid lines on your chart
+     * Specifies solid or dotted grid lines on your chart.
      *
      * @param int $xAxisStepSize Used to calculate how many x grid lines to show on the chart.
      *                           100 / step_size = how many grid lines on the chart.
@@ -638,8 +643,8 @@ class CImage_GoogleChart_Chart {
      * @param int $dashLength    the Length of each line dash, in pixels. By default it is 4
      * @param int $spaceLength   The spacing between dashes, in pixels. Specify 0 for for a solid line.
      *                           By default it is 1
-     * @param int $xOffset       The number of units, according to the chart scale, to offset the x grid line.
-     * @param int $yOffset       The number of units, according to the chart scale, to offset the y grid line.
+     * @param int $xOffset       the number of units, according to the chart scale, to offset the x grid line
+     * @param int $yOffset       the number of units, according to the chart scale, to offset the y grid line
      */
     public function setGridLines($xAxisStepSize, $yAxisStepSize, $dashLength = 4, $spaceLength = 1, $xOffset = 0, $yOffset = 0) {
         $this->setProperty('chg', $this->encodeData([$xAxisStepSize, $yAxisStepSize, $dashLength, $spaceLength, $xOffset, $yOffset], ','));
@@ -669,7 +674,7 @@ class CImage_GoogleChart_Chart {
     }
 
     /**
-     * Prepares the Data Set String
+     * Prepares the Data Set String.
      */
     protected function setDataSetString() {
         if (!empty($this->values)) {
@@ -691,6 +696,7 @@ class CImage_GoogleChart_Chart {
         foreach ($this->chart as $key => $value) {
             $parms[] = $key . '=' . $value;
         }
+
         return $fullUrl . implode('&amp;', $parms);
     }
 
@@ -703,11 +709,11 @@ class CImage_GoogleChart_Chart {
         $code = '<img src="';
         $code .= $this->getUrl() . '"';
         $code .= 'alt="gChartPhp Chart" width=' . $this->width . ' height=' . $this->height . '>';
-        print($code);
+        print $code;
     }
 
     /**
-     * Serversite chart renderer
+     * Serversite chart renderer.
      *
      * See view.html and img.php for an example of how to use this function.
      * Please refer to the API documentation for further examples.

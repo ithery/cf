@@ -18,7 +18,7 @@ class CImage_GoogleChart_MeterChart extends CImage_GoogleChart_Chart {
     }
 
     /**
-     * Sets the labels for each arrow
+     * Sets the labels for each arrow.
      *
      * You can obtain the same result of this function by setting visible axis x and adding the labels on that axis.
      *

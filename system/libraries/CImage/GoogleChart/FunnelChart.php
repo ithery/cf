@@ -7,7 +7,7 @@ class CImage_GoogleChart_FunnelChart extends CImage_GoogleChart_BarChart {
     }
 
     /**
-     * This function creates the funnel effect by calculating the hidden dataset
+     * This function creates the funnel effect by calculating the hidden dataset.
      *
      * @param mixed $data
      */

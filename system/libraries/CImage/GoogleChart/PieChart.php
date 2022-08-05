@@ -25,7 +25,7 @@ class CImage_GoogleChart_PieChart extends CImage_GoogleChart_Chart {
     }
 
     /**
-     * Sets the labels for Pie Charts
+     * Sets the labels for Pie Charts.
      *
      * @param array $labels
      */
@@ -56,8 +56,8 @@ class CImage_GoogleChart_PieChart extends CImage_GoogleChart_Chart {
      * This is the basic function. The data in the array are interpreted as one color one slice. If you are
      * using gConcentricPieChart(), consider using setColors() for more customization.
      *
-     * @param array $colors Specifies colors using a 6-character string of hexadecimal values,
-     *                      plus two optional transparency values, in the format RRGGBB[AA].
+     * @param array $colors specifies colors using a 6-character string of hexadecimal values,
+     *                      plus two optional transparency values, in the format RRGGBB[AA]
      */
     public function setColors($colors) {
         $this->setProperty('chco', $this->encodeData($this->getApplicableLabels($colors), '|'), true);

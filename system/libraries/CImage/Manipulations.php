@@ -9,7 +9,7 @@ defined('SYSPATH') or die('No direct access allowed.');
  * @since May 2, 2019, 2:35:07 AM
  */
 
-use League\Flysystem\FileNotFoundException;
+use League\Glide\Filesystem\FileNotFoundException;
 
 class CImage_Manipulations {
     const CROP_TOP_LEFT = 'crop-top-left';
@@ -132,7 +132,7 @@ class CImage_Manipulations {
     /**
      * @param string $orientation
      *
-     * @throws InvalidManipulation
+     * @throws CImage_Exception_InvalidManipulationException
      *
      * @return $this
      */
@@ -153,7 +153,7 @@ class CImage_Manipulations {
      * @param int    $width
      * @param int    $height
      *
-     * @throws InvalidManipulation
+     * @throws CImage_Exception_InvalidManipulationException
      *
      * @return $this
      */
@@ -192,7 +192,7 @@ class CImage_Manipulations {
      * @param int $x
      * @param int $y
      *
-     * @throws InvalidManipulation
+     * @throws CImage_Exception_InvalidManipulationException
      *
      * @return $this
      */
@@ -210,7 +210,7 @@ class CImage_Manipulations {
     /**
      * @param int $width
      *
-     * @throws InvalidManipulation
+     * @throws CImage_Exception_InvalidManipulationException
      *
      * @return $this
      */
@@ -225,7 +225,7 @@ class CImage_Manipulations {
     /**
      * @param int $height
      *
-     * @throws InvalidManipulation
+     * @throws CImage_Exception_InvalidManipulationException
      *
      * @return $this
      */
@@ -242,7 +242,7 @@ class CImage_Manipulations {
      * @param int    $width
      * @param int    $height
      *
-     * @throws InvalidManipulation
+     * @throws CImage_Exception_InvalidManipulationException
      *
      * @return $this
      */
@@ -263,7 +263,7 @@ class CImage_Manipulations {
     /**
      * @param int $ratio A value between 1 and 8
      *
-     * @throws InvalidManipulation
+     * @throws CImage_Exception_InvalidManipulationException
      *
      * @return $this
      */
@@ -278,7 +278,7 @@ class CImage_Manipulations {
     /**
      * @param int $brightness A value between -100 and 100
      *
-     * @throws InvalidManipulation
+     * @throws CImage_Exception_InvalidManipulationException
      *
      * @return $this
      */
@@ -293,7 +293,7 @@ class CImage_Manipulations {
     /**
      * @param float $gamma A value between 0.01 and 9.99
      *
-     * @throws InvalidManipulation
+     * @throws CImage_Exception_InvalidManipulationException
      *
      * @return $this
      */
@@ -308,7 +308,7 @@ class CImage_Manipulations {
     /**
      * @param int $contrast A value between -100 and 100
      *
-     * @throws InvalidManipulation
+     * @throws CImage_Exception_InvalidManipulationException
      *
      * @return $this
      */
@@ -323,7 +323,7 @@ class CImage_Manipulations {
     /**
      * @param int $sharpen A value between 0 and 100
      *
-     * @throws InvalidManipulation
+     * @throws CImage_Exception_InvalidManipulationException
      *
      * @return $this
      */
@@ -338,7 +338,7 @@ class CImage_Manipulations {
     /**
      * @param int $blur A value between 0 and 100
      *
-     * @throws InvalidManipulation
+     * @throws CImage_Exception_InvalidManipulationException
      *
      * @return $this
      */
@@ -353,7 +353,7 @@ class CImage_Manipulations {
     /**
      * @param int $pixelate A value between 0 and 1000
      *
-     * @throws InvalidManipulation
+     * @throws CImage_Exception_InvalidManipulationException
      *
      * @return $this
      */
@@ -393,7 +393,7 @@ class CImage_Manipulations {
      * @param string $color
      * @param string $borderType
      *
-     * @throws InvalidManipulation
+     * @throws CImage_Exception_InvalidManipulationException
      *
      * @return $this
      */
@@ -415,7 +415,7 @@ class CImage_Manipulations {
     /**
      * @param int $quality
      *
-     * @throws InvalidManipulation
+     * @throws CImage_Exception_InvalidManipulationException
      *
      * @return $this
      */
@@ -430,7 +430,7 @@ class CImage_Manipulations {
     /**
      * @param string $format
      *
-     * @throws InvalidManipulation
+     * @throws CImage_Exception_InvalidManipulationException
      *
      * @return $this
      */
@@ -449,7 +449,7 @@ class CImage_Manipulations {
     /**
      * @param string $filterName
      *
-     * @throws InvalidManipulation
+     * @throws CImage_Exception_InvalidManipulationException
      *
      * @return $this
      */
@@ -508,7 +508,7 @@ class CImage_Manipulations {
     /**
      * @param string $fitMethod how is the watermark fitted into the watermarkWidth and watermarkHeight properties
      *
-     * @throws InvalidManipulation
+     * @throws CImage_Exception_InvalidManipulationException
      *
      * @return $this
      */
@@ -544,7 +544,7 @@ class CImage_Manipulations {
     /**
      * @param string $position
      *
-     * @throws InvalidManipulation
+     * @throws CImage_Exception_InvalidManipulationException
      *
      * @return $this
      */
@@ -565,7 +565,7 @@ class CImage_Manipulations {
      *
      * @param int $opacity a value between 0 and 100
      *
-     * @throws InvalidManipulation
+     * @throws CImage_Exception_InvalidManipulationException
      *
      * @return $this
      */
