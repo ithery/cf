@@ -183,4 +183,8 @@ class CJavascript {
     public static function ifStatement($operand1, $operator, $operand2) {
         return CJavascript_StatementFactory::createIf($operand1, $operator, $operand2);
     }
+
+    public static function cresJs() {
+        return CJavascript_CresJs::instance();
+    }
 }
