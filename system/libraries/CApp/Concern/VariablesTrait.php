@@ -24,7 +24,7 @@ trait CApp_Concern_VariablesTrait {
         $variables['decimal_separator'] = $variables['decimalSeparator'] = static::formatter()->getDecimalSeparator();
         $variables['thousand_separator'] = $variables['thousandSeparator'] = static::formatter()->getThousandSeparator();
         $variables['decimal_digit'] = $variables['decimalDigit'] = static::formatter()->getDecimalDigit();
-
+        $cresjsConfig = CJavascript::cresJs()->getConfig();
         $variables['format'] = [];
         $variables['format']['decimalSeparator'] = static::formatter()->getDecimalSeparator();
         $variables['format']['thousandSeparator'] = static::formatter()->getThousandSeparator();
@@ -32,7 +32,7 @@ trait CApp_Concern_VariablesTrait {
         $variables['format']['date'] = static::formatter()->getDateFormat();
         $variables['format']['datetime'] = static::formatter()->getDatetimeFormat();
         $variables['have_clock'] = $variables['haveClock'] = false;
-        $variables['have_scroll_to_top'] = $variables['haveScrollToTop'] = CF::config('cresjs.scroll_to_top');
+        $variables['have_scroll_to_top'] = $variables['haveScrollToTop'] = carr::get($cresjsConfig, 'scroll_to_top');
         $variables['CFVersion'] = CF::version();
         $variables['domain'] = CF::domain();
         $variables['appCode'] = CF::appCode();
@@ -41,13 +41,13 @@ trait CApp_Concern_VariablesTrait {
         $variables['environment'] = CF::environment();
         $variables['csrfToken'] = c::csrfToken();
         $variables['vscode'] = [];
-        $variables['vscode']['liveReload'] = CF::config('cresjs.vscode.live_reload');
+        $variables['vscode']['liveReload'] = carr::get($cresjsConfig, 'vscode.live_reload');
         $variables['react'] = [];
-        $variables['react']['enable'] = CF::config('cresjs.react.enable');
+        $variables['react']['enable'] = carr::get($cresjsConfig, 'react.enable');
         $variables['block'] = [];
-        $variables['block']['html'] = CF::config('cresjs.block.html');
+        $variables['block']['html'] = carr::get($cresjsConfig, 'block.html');
         $variables['waves'] = [];
-        $variables['waves']['selector'] = CF::config('cresjs.waves.selector');
+        $variables['waves']['selector'] = carr::get($cresjsConfig, 'waves.selector');
         $variables['timezoneString'] = c::now()->format('P');
         $bootstrap = ccfg::get('bootstrap');
         $themeData = CManager::instance()->getThemeData();

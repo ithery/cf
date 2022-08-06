@@ -96,7 +96,7 @@ class CApp_Blade_Directive {
         $expression = str_replace(['"', '\''], '', $expression);
         $expression = str_replace(',', ' ', $expression);
 
-        return (new CApp_PWA_MetaService())->render($expression);
+        return (new CApp_PWA_MetaService($expression))->render();
     }
 
     public static function preloader($expression) {

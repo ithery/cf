@@ -27,7 +27,7 @@ final class CImage_GlideConversion {
     /**
      * @param string $inputImage
      *
-     * @return \GlideConversion
+     * @return \CImage_GlideConversion
      */
     public static function create($inputImage) {
         return new self($inputImage);
@@ -107,7 +107,7 @@ final class CImage_GlideConversion {
      * @param string $inputFile
      * @param string $watermarkPath
      *
-     * @return type \League\Glide\Server
+     * @return \League\Glide\Server
      */
     private function createGlideServer($inputFile, $watermarkPath = null) {
         $config = [

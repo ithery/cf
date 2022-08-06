@@ -1,16 +1,27 @@
 <?php
 
 class CApp_PWA {
+    use CApp_PWA_Trait_GroupConfigTrait;
+
+    protected $group;
+
     protected $enabled = false;
 
     protected $startUrl = '';
 
-    public function enable($startUrl, $theme) {
+    public function __construct($group = 'default') {
+        $this->group = $group;
+        $startUrl = $this->getGroupConfig('start_url', '/');
+        $startUrl = '/' . trim($startUrl, '/') . '/';
+        $this->startUrl = $startUrl;
+    }
+
+    public function enable() {
+        $startUrl = $this->startUrl;
+        $theme = $this->getGroupConfig('theme');
         if (!$this->enabled) {
-            $startUrl = '/' . trim($startUrl, '/') . '/';
-            $this->startUrl = $startUrl;
-            c::router()->get($this->manifestUrl(), function () use ($startUrl) {
-                $output = (new CApp_PWA_ManifestService())->generate($startUrl);
+            c::router()->get($this->manifestUrl(), function () {
+                $output = (new CApp_PWA_ManifestService($this->group))->generate();
 
                 return c::response()->json($output);
             });
@@ -26,13 +37,6 @@ class CApp_PWA {
             });
             $this->enabled = true;
         }
-    }
-
-    /**
-     * @return string
-     */
-    public function startUrl() {
-        return $this->startUrl;
     }
 
     /**

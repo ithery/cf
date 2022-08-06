@@ -620,15 +620,18 @@ class CApp implements CInterface_Responsable, CInterface_Renderable, CInterface_
         return CApp_Formatter::instance();
     }
 
-    public function enablePWA($startUrl = '', $theme = 'cresenity') {
-        $this->pwa()->enable($startUrl, $theme);
+    public function enablePWA($group) {
+        $this->pwa($group)->enable();
     }
 
-    public function pwa() {
+    public function pwa($group) {
         if ($this->pwa == null) {
-            $this->pwa = new CApp_PWA();
+            $this->pwa = [];
+        }
+        if (!isset($this->pwa[$group])) {
+            $this->pwa[$group] = new CApp_PWA($group);
         }
 
-        return $this->pwa;
+        return $this->pwa[$group];
     }
 }

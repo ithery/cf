@@ -1,5 +1,5 @@
 <!-- Web Application Manifest -->
-<link rel="manifest" href="{{ c::app()->pwa()->manifestUrl() }}">
+<link rel="manifest" href="{{ c::app()->pwa($group)->manifestUrl() }}">
 <!-- Chrome for Android theme color -->
 <meta name="theme-color" content="{{ $config['theme_color'] }}">
 
@@ -33,14 +33,14 @@
 <script type="text/javascript">
     // Initialize the service worker
     if ('serviceWorker' in navigator) {
-        navigator.serviceWorker.register('{{ c::app()->pwa()->serviceWorkerUrl() }}', {
+        navigator.serviceWorker.register('{{ c::app()->pwa($group)->serviceWorkerUrl() }}', {
             scope: '.'
         }).then(function (registration) {
             // Registration was successful
-            console.log('CF PWA: ServiceWorker registration successful with scope: ', registration.scope);
+            console.log('CF PWA[{{ $group }}]: ServiceWorker registration successful with scope: ', registration.scope);
         }, function (err) {
             // registration failed :(
-            console.log('CF PWA: ServiceWorker registration failed: ', err);
+            console.log('CF PWA[{{ $group }}]: ServiceWorker registration failed: ', err);
         });
     }
 </script>
