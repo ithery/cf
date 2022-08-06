@@ -13,7 +13,7 @@ class CApp_PWA_ManifestService {
         $basicManifest = [
             'name' => $this->getGroupConfig('manifest.name'),
             'short_name' => $this->getGroupConfig('manifest.short_name'),
-            'start_url' => $this->getGroupConfig('start_url'),
+            'start_url' => $this->getGroupConfig('manifest.start_url'),
             'display' => $this->getGroupConfig('manifest.display'),
             'theme_color' => $this->getGroupConfig('manifest.theme_color'),
             'background_color' => $this->getGroupConfig('manifest.background_color'),

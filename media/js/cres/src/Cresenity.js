@@ -25,7 +25,7 @@ import removePreloader from './module/preloader';
 import initProgressive from './module/progressive';
 import cresToast from './module/toast';
 import CresAlpine from './module/CresAlpine';
-import SSE from './module/SSE';
+import SSE from './cresenity/SSE';
 import AlpineCleave from './alpine/cleave';
 import AlpineAutoNumeric from './alpine/autonumeric';
 import AlpineTippy from './alpine/tippy';
@@ -36,6 +36,11 @@ import extend from './core/extend';
 import {hasClass,addClass, removeClass} from './dom/classes';
 import scrollTo from './animation/scrollTo';
 import setHeight from './animation/setHeight';
+import Theme from './cresenity/Theme';
+import { initThemeMode } from './module/theme';
+import { initMenu } from './module/menu';
+import { formatCurrency, unformatCurrency } from './formatter/currency';
+
 export default class Cresenity {
     constructor() {
         this.cf = cf;
@@ -83,6 +88,7 @@ export default class Cresenity {
             scrollTo,
             setHeight
         };
+        this.theme = new Theme();
     }
     loadJs(filename, callback) {
         let fileref = document.createElement('script');
@@ -678,48 +684,11 @@ export default class Cresenity {
     }
 
     formatCurrency(rp) {
-        rp = '' + rp;
-        let rupiah = '';
-        let vfloat = '';
-        let ds = window.capp?.format?.decimalSeparator ?? '.';
-        let ts = window.capp?.format?.thousandSeparator ?? ',';
-        let dd = window.capp?.format?.decimalDigit ?? 2;
-        dd = parseInt(dd, 10);
-        let minusStr = '';
-        if (rp.indexOf('-') >= 0) {
-            minusStr = rp.substring(rp.indexOf('-'), 1);
-            rp = rp.substring(rp.indexOf('-') + 1);
-        }
-
-        if (rp.indexOf('.') >= 0) {
-            vfloat = rp.substring(rp.indexOf('.'));
-            rp = rp.substring(0, rp.indexOf('.'));
-        }
-        let p = rp.length;
-        while (p > 3) {
-            rupiah = ts + rp.substring(p - 3) + rupiah;
-            let l = rp.length - 3;
-            rp = rp.substring(0, l);
-            p = rp.length;
-        }
-        rupiah = rp + rupiah;
-        vfloat = vfloat.replace('.', ds);
-        if (vfloat.length > dd) {
-            vfloat = vfloat.substring(0, dd + 1);
-        }
-        return minusStr + rupiah + vfloat;
+        return formatCurrency(rp);
     }
 
     unformatCurrency(rp) {
-        if (typeof rp == 'undefined') {
-            rp = '';
-        }
-        let ds = window.capp?.format?.decimalSeparator ?? '.';
-        let ts = window.capp?.format?.thousandSeparator ?? ',';
-        rp = this.replaceAll(rp, ts, '');
-
-        rp = rp.replace(ds, '.');
-        return rp;
+        return unformatCurrency(rp);
     }
 
     getStyles(selector, only, except) {
@@ -994,6 +963,7 @@ export default class Cresenity {
     initElement() {
         initElement();
     }
+
     initWaves() {
         if($) {
             const selector = window.capp?.waves?.selector ?? '.cres-waves-effect' ;
@@ -1064,15 +1034,22 @@ export default class Cresenity {
             this.initWaves();
             this.initAlpineAndUi();
             this.initCssDomVar();
+
             this.initLiveReload();
             initProgressive();
             let root = document.getElementsByTagName('html')[0]; // '0' to assign the first (and only `HTML` tag)
 
             root.classList.add('cresenity-loaded');
             root.classList.remove('no-js');
-            domReady(()=>removePreloader());
-            dispatchWindowEvent('cresenity:loaded');
+            domReady(() => {
+                removePreloader(()=>{
+                    initThemeMode(this.theme.localStorageKey);
+                    initMenu();
+                });
+                dispatchWindowEvent('cresenity:loaded');
+            });
             this.applyDeferXData();
+
         });
 
 
