@@ -1,9 +1,19 @@
 import { fadeOut } from "./animation";
 
-const removePreloader = () =>{
+const removePreloader = (callback) =>{
     let preloader = document.getElementById('cres-preloader');
     if(preloader) {
-        fadeOut(preloader).then(()=>preloader.remove());
+        fadeOut(preloader).then(()=>{
+            preloader.remove();
+            if(callback) {
+                callback();
+            }
+
+        });
+    } else {
+        if(callback) {
+            callback();
+        }
     }
 };
 
