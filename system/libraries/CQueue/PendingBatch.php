@@ -54,7 +54,7 @@ class CQueue_PendingBatch {
      * @return array
      */
     public function thenCallbacks() {
-        return $this->options['then'] ?? [];
+        return carr::get($this->options, 'then', []);
     }
 
     /**
@@ -78,7 +78,7 @@ class CQueue_PendingBatch {
      * @return array
      */
     public function catchCallbacks() {
-        return $this->options['catch'] ?? [];
+        return carr::get($this->options, 'catch', []);
     }
 
     /**
@@ -102,7 +102,7 @@ class CQueue_PendingBatch {
      * @return array
      */
     public function finallyCallbacks() {
-        return $this->options['finally'] ?? [];
+        return carr::get($this->options, 'finally', []);
     }
 
     /**
@@ -134,7 +134,7 @@ class CQueue_PendingBatch {
      *
      * @return $this
      */
-    public function name(string $name) {
+    public function name($name) {
         $this->name = $name;
 
         return $this;
@@ -147,7 +147,7 @@ class CQueue_PendingBatch {
      *
      * @return $this
      */
-    public function onConnection(string $connection) {
+    public function onConnection($connection) {
         $this->options['connection'] = $connection;
 
         return $this;
@@ -159,7 +159,7 @@ class CQueue_PendingBatch {
      * @return null|string
      */
     public function connection() {
-        return $this->options['connection'] ?? null;
+        return carr::get($this->options, 'connection');
     }
 
     /**
@@ -169,7 +169,7 @@ class CQueue_PendingBatch {
      *
      * @return $this
      */
-    public function onQueue(string $queue) {
+    public function onQueue($queue) {
         $this->options['queue'] = $queue;
 
         return $this;
@@ -181,7 +181,7 @@ class CQueue_PendingBatch {
      * @return null|string
      */
     public function queue() {
-        return $this->options['queue'] ?? null;
+        return carr::get($this->options, 'queue');
     }
 
     /**

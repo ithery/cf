@@ -145,7 +145,7 @@ class CQueue_Queue_RedisQueue extends CQueue_AbstractQueue implements CQueue_Con
             $payload
         );
 
-        return json_decode($payload, true)['id'] ?? null;
+        return carr::get(json_decode($payload, true), 'id');
     }
 
     /**
