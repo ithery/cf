@@ -11,7 +11,6 @@ class CApp_PWA_ServiceWorkerService {
     }
 
     protected function getAssetUrl($theme) {
-        //return [];
         c::manager()->theme()->setTheme($theme);
         c::app()->registerCoreModules();
         $jsUrl = CManager::asset()->getAllJsFileUrl();
