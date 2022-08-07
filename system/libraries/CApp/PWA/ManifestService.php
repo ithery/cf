@@ -13,13 +13,15 @@ class CApp_PWA_ManifestService {
         $basicManifest = [
             'name' => $this->getGroupConfig('manifest.name'),
             'short_name' => $this->getGroupConfig('manifest.short_name'),
+            'description' => $this->getGroupConfig('manifest.description', ''),
             'start_url' => $this->getGroupConfig('manifest.start_url'),
             'display' => $this->getGroupConfig('manifest.display'),
             'theme_color' => $this->getGroupConfig('manifest.theme_color'),
             'background_color' => $this->getGroupConfig('manifest.background_color'),
             'orientation' => $this->getGroupConfig('manifest.orientation'),
             'status_bar' => $this->getGroupConfig('manifest.status_bar'),
-            'splash' => $this->getGroupConfig('manifest.splash')
+            'scope' => $this->getGroupConfig('manifest.scope'),
+            'splash' => $this->getGroupConfig('manifest.splash'),
         ];
         foreach ($this->getGroupConfig('manifest.icons') as $size => $file) {
             $fileInfo = pathinfo($file['path']);
