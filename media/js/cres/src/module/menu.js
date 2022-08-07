@@ -90,7 +90,6 @@ const initMenuTrigger = () => {
     var menuTriggers = document.querySelectorAll('[cres-menu]');
 
     menuTriggers.forEach((trigger) => {
-        console.log(trigger);
         return trigger.addEventListener('click', (event) => {
             const allActiveMenu =
                 document.querySelectorAll('.cres-menu-active');
