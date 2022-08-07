@@ -11,12 +11,13 @@ class CApp_PWA_ServiceWorkerService {
     }
 
     protected function getAssetUrl($theme) {
-        c::manager()->theme()->setTheme($theme);
-        c::app()->registerCoreModules();
-        $jsUrl = CManager::asset()->getAllJsFileUrl();
-        $cssUrl = CManager::asset()->getAllCssFileUrl();
+        return [];
+        // c::manager()->theme()->setTheme($theme);
+        // c::app()->registerCoreModules();
+        // $jsUrl = CManager::asset()->getAllJsFileUrl();
+        // $cssUrl = CManager::asset()->getAllCssFileUrl();
 
-        return array_merge($cssUrl, $jsUrl);
+        // return array_merge($cssUrl, $jsUrl);
     }
 
     protected function installScript() {
