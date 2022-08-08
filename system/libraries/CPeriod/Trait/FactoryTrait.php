@@ -22,7 +22,7 @@ trait CPeriod_Trait_FactoryTrait {
             $end,
             $precision,
             $boundaries,
-            $format,
+            $format
         );
     }
 
