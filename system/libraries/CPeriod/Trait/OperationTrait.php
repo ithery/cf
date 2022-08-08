@@ -65,7 +65,7 @@ trait CPeriod_Trait_OperationTrait {
             $includedStart,
             $includedEnd,
             $this->precision(),
-            $this->boundaries(),
+            $this->boundaries()
         );
     }
 
