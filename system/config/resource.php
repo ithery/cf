@@ -30,8 +30,8 @@ return [
     'resource_model' => 'CApp_Model_Resource',
     's3' => [
         /*
-     * The domain that should be prepended when generating urls.
-     */
+        * The domain that should be prepended when generating urls.
+        */
         //'domain' => 'https://' . env('AWS_BUCKET') . '.s3.amazonaws.com',
     ],
     'remote' => [

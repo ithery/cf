@@ -177,7 +177,7 @@ class CQueue_Batch implements CInterface_Arrayable, JsonSerializable {
             $this->queue->connection(isset($this->options['connection']) ? $this->options['connection'] : null)->bulk(
                 $jobs->all(),
                 $data = '',
-                $this->options['queue'] ?? null
+                carr::get($this->options, 'queue')
             );
         });
 
