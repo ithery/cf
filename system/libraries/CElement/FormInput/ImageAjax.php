@@ -10,6 +10,8 @@ class CElement_FormInput_ImageAjax extends CElement_FormInput_Image {
 
     protected $allowedExtension;
 
+    protected $validationCallback;
+
     protected $cropper;
 
     protected $tempStorage;
@@ -34,6 +36,7 @@ class CElement_FormInput_ImageAjax extends CElement_FormInput_Image {
             $ajaxUrl = CAjax::createMethod()->setType('ImgUpload')
                 ->setData('inputName', $ajaxName)
                 ->setData('allowedExtension', $this->allowedExtension)
+                ->setData('validationCallback', $this->validationCallback)
                 ->makeUrl();
 
             $view->with('id', $this->id);
@@ -75,6 +78,12 @@ class CElement_FormInput_ImageAjax extends CElement_FormInput_Image {
             $arr = [$ext];
         }
         $this->allowedExtension = $arr;
+
+        return $this;
+    }
+
+    public function setValidationCallback($callback) {
+        $this->validationCallback = c::toSerializableClosure($callback);
 
         return $this;
     }
