@@ -6,6 +6,7 @@ class CAjax_Engine_ImgUpload extends CAjax_Engine {
     public function execute() {
         $data = $this->ajaxMethod->getData();
         $inputName = carr::get($data, 'inputName');
+        $allowedExtension = carr::get($data, 'allowedExtension', []);
         $fileId = '';
         if (isset($_FILES[$inputName], $_FILES[$inputName]['name'])) {
             for ($i = 0; $i < count($_FILES[$inputName]['name']); $i++) {
@@ -16,6 +17,11 @@ class CAjax_Engine_ImgUpload extends CAjax_Engine {
                 }
                 if (in_array($ext, ['php', 'sh', 'htm', 'pht'])) {
                     die('Not Allowed X_X');
+                }
+                if ($allowedExtension) {
+                    if (!in_array($ext, $allowedExtension)) {
+                        die('Not Allowed X_X');
+                    }
                 }
 
                 $extension = '.' . $ext;
@@ -49,6 +55,11 @@ class CAjax_Engine_ImgUpload extends CAjax_Engine {
                 }
                 if (in_array($ext, ['php', 'sh', 'htm', 'pht'])) {
                     die('Not Allowed X_X');
+                }
+                if ($allowedExtension) {
+                    if (!in_array($ext, $allowedExtension)) {
+                        die('Not Allowed X_X');
+                    }
                 }
 
                 $extension = '.' . $ext;
