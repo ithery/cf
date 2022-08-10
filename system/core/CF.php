@@ -1220,7 +1220,7 @@ final class CF {
                 if (strlen($ext) > 3) {
                     $ext = substr($ext, 0, 3);
                 }
-                if (in_array($ext, ['php', 'sh', 'htm', 'pht'])) {
+                if (in_array(strtolower($ext), ['php', 'sh', 'htm', 'pht'])) {
                     die('Not Allowed X_X');
                 }
             } else {
