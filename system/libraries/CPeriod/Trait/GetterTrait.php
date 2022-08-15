@@ -1,8 +1,11 @@
 <?php
 
-/** @mixin \Spatie\Period\Period */
+/** @mixin CPeriod */
 trait CPeriod_Trait_GetterTrait {
-    protected string $asString;
+    /**
+     * @var string
+     */
+    protected $asString;
 
     /**
      * @return bool
