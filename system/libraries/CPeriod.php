@@ -187,6 +187,21 @@ class CPeriod implements IteratorAggregate {
         return new static($startDate, $endDate);
     }
 
+    public static function lastMonth() {
+        $startDate = CCarbon::now()->modify('first day of last month');
+        $endDate = CCarbon::now()->modify('last day of last month');
+
+        $startDate->hour = 0;
+        $startDate->minute = 0;
+        $startDate->second = 0;
+
+        $endDate->hour = 23;
+        $endDate->minute = 59;
+        $endDate->second = 59;
+
+        return new static($startDate, $endDate);
+    }
+
     public static function thisYear() {
         $startDate = CCarbon::now()->modify('first day of this year');
         $endDate = CCarbon::now()->modify('last day of this year');
