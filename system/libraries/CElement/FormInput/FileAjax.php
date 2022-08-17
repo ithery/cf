@@ -9,6 +9,10 @@ class CElement_FormInput_FileAjax extends CElement_FormInput {
 
     protected $maxUploadSize;   // in MB
 
+    protected $allowedExtension;
+
+    protected $validationCallback;
+
     protected $disabledUpload;
 
     protected $tempStorage;
@@ -20,6 +24,7 @@ class CElement_FormInput_FileAjax extends CElement_FormInput {
         $this->fileName = '';
         $this->acceptFile = '.doc,.docx,.xml,.pdf';
         $this->maxUploadSize = 0;
+        $this->allowedExtension = [];
         $this->disabledUpload = false;
         $this->view = 'cresenity/element/form-input/file-ajax';
         $this->onBeforeParse(function (CView_View $view) {
@@ -29,6 +34,8 @@ class CElement_FormInput_FileAjax extends CElement_FormInput {
 
             $ajaxUrl = CAjax::createMethod()->setType('FileUpload')
                 ->setData('inputName', $ajaxName)
+                ->setData('allowedExtension', $this->allowedExtension)
+                ->setData('validationCallback', $this->validationCallback)
                 ->makeUrl();
 
             $view->with('id', $this->id);
@@ -59,6 +66,27 @@ class CElement_FormInput_FileAjax extends CElement_FormInput {
 
     public function setMaxUploadSize($size) {
         $this->maxUploadSize = $size;
+
+        return $this;
+    }
+
+    /**
+     * @param int $ext
+     *
+     * @return $this
+     */
+    public function setAllowedExtension($ext) {
+        $arr = $ext;
+        if (!is_array($arr)) {
+            $arr = [$ext];
+        }
+        $this->allowedExtension = $arr;
+
+        return $this;
+    }
+
+    public function setValidationCallback($callback) {
+        $this->validationCallback = c::toSerializableClosure($callback);
 
         return $this;
     }

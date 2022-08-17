@@ -139,7 +139,7 @@ class CServer {
         return new CServer_Browsershot($url, $deviceEmulate);
     }
 
-    public static function runSMTPServer($options=[]) {
-        return CServer_SMTP_ServerManager::run($options);
+    public static function runSMTPServer($options = []) {
+        return CServer_SMTP_ServerManager::instance()->run($options);
     }
 }
