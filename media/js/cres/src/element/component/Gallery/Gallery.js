@@ -1378,7 +1378,7 @@ export default class Gallery {
                 .find('.cres-gallery-current')
                 .first()
                 .attr('id');
-            prevIndex = parseInt(currentItemId.split('-')[3]) || 0;
+            prevIndex = parseInt(currentItemId.split('-')[4]) || 0;
         } catch (error) {
             prevIndex = 0;
         }
@@ -1464,7 +1464,6 @@ export default class Gallery {
     slide(index, fromTouch, fromThumb, direction) {
         const prevIndex = this.getPreviousSlideIndex();
         this.currentItemsInDom = this.organizeSlideItems(index, prevIndex);
-
         // Prevent multiple call, Required for hsh plugin
         if (this.cresGalleryOn && prevIndex === index) {
             return;
