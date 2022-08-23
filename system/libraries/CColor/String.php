@@ -78,7 +78,7 @@ class CColor_String {
     }
 
     /**
-     * @return CColor_Format_Type_Hex
+     * @return CColor_Format_Hex
      */
     public function toHex() {
         $hsv = $this->toHsv();
@@ -87,7 +87,7 @@ class CColor_String {
     }
 
     /**
-     * @return CColor_Format_Type_Rgb
+     * @return CColor_Format_Rgb
      */
     public function toRgb() {
         $hsv = $this->toHsv();
@@ -96,7 +96,7 @@ class CColor_String {
     }
 
     /**
-     * @return CColor_Format_Type_Hsl
+     * @return CColor_Format_Hsl
      */
     public function toHsl() {
         $hsv = $this->toHsv();
@@ -105,14 +105,14 @@ class CColor_String {
     }
 
     /**
-     * @return \CColor_Format_Type_Hsv
+     * @return \CColor_Format_Hsv
      */
     public function toHsv() {
-        $h = $this->pickHue();
-        $s = $this->pickSaturation($h);
-        $v = $this->pickBrightness($h, $s);
+        $h = (int) $this->pickHue();
+        $s = (int) $this->pickSaturation($h);
+        $v = (int) $this->pickBrightness($h, $s);
 
-        return new CColor_Format_Type_Hsv(compact('h', 's', 'v'));
+        return new CColor_Format_Hsv($h . ',' . $s . ',' . $v);
     }
 
     public function getModulo($range) {
