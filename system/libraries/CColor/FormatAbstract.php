@@ -293,7 +293,7 @@ abstract class CColor_FormatAbstract {
     /**
      * @param $percent
      *
-     * @return float|\OzdemirBurak\Iris\Color\Hsla|\OzdemirBurak\Iris\Color\Rgba
+     * @return float|\CColor_Format_Hsla|\CColor_Format_Rgba
      */
     public function fadeOut($percent) {
         return $this->fadeIn(-1 * $percent);
@@ -311,7 +311,7 @@ abstract class CColor_FormatAbstract {
     /**
      * @param \CColor_FormatAbstract $color
      *
-     * @return $this|\OzdemirBurak\Iris\Color\Hex|\OzdemirBurak\Iris\Color\Hsl|\OzdemirBurak\Iris\Color\Hsv|\OzdemirBurak\Iris\Color\Rgb
+     * @return static|\CColor_Format_Hex|\CColor_Format_Hsl|\CColor_Format_Hsv|\CColor_Format_Rgb
      */
     public function back(CColor_FormatAbstract $color) {
         return $this->{'to' . $this->getColorModelName($color)}();
@@ -330,7 +330,8 @@ abstract class CColor_FormatAbstract {
      * @return false|string
      */
     public function getColorModelName(CColor_FormatAbstract $color) {
-        return substr(strrchr(get_class($color), '\\'), 1);
+
+        return substr(strrchr(get_class($color), '_'), 1);
     }
 
     public function toCssStyle() {
