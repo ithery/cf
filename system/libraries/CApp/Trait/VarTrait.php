@@ -56,7 +56,11 @@ trait CApp_Trait_VarTrait {
         }
         if (!isset(self::$vars[$orgId][$key])) {
             $db = CDatabase::instance();
-            $value = cdbutils::get_value('select `value` from var where org_id = ' . $db->escape($orgId) . ' and `key`= ' . $db->escape($key));
+            if ($orgId === null) {
+                $value = cdbutils::get_value('select `value` from var where org_id is null and `key`= ' . $db->escape($key));
+            } else {
+                $value = cdbutils::get_value('select `value` from var where org_id = ' . $db->escape($orgId) . ' and `key`= ' . $db->escape($key));
+            }
             if ($value == null) {
                 $value = $default;
             }
@@ -72,7 +76,11 @@ trait CApp_Trait_VarTrait {
             $orgId = CApp_Base::orgId();
         }
         $db = CDatabase::instance();
-        $row = cdbutils::get_row('select * from var where org_id = ' . $db->escape($orgId) . ' and `key` = ' . $db->escape($key));
+        if ($orgId === null) {
+            $row = cdbutils::get_row('select * from var where org_id is null and `key` = ' . $db->escape($key));
+        } else {
+            $row = cdbutils::get_row('select * from var where org_id = ' . $db->escape($orgId) . ' and `key` = ' . $db->escape($key));
+        }
         $data['value'] = $val;
         if (!isset(self::$vars[$orgId])) {
             self::$vars[$orgId] = [];
