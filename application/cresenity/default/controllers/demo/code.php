@@ -25,7 +25,7 @@ class Controller_Demo_Code extends \Cresenity\Demo\Controller {
             if (is_array($matches)) {
                 foreach ($matches[1] as $view) {
                     $viewPath = CView_Finder::instance()->find($view);
-                    $div->addH6()->add($view);
+                    $div->addH5()->addClass('mt-3')->add($view);
                     $viewCode = CFile::get($viewPath);
                     $div->addPrismCode()->add(c::e($viewCode));
                 }
