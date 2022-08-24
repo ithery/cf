@@ -15,6 +15,8 @@ class CElement_FormInput_Password extends CElement_FormInput {
 
     private $showPassword = false;
 
+    private $toggleVisibility = false;
+
     public function __construct($id) {
         parent::__construct($id);
         $this->type = 'password';
@@ -28,25 +30,36 @@ class CElement_FormInput_Password extends CElement_FormInput {
         $this->setAttr('value', $this->value);
         $this->setAttr('placeholder', $this->placeholder);
         $this->setAttr('autocomplete', $this->autoComplete ? 'on' : 'off');
-
+        $this->addClass('cres:element:control:EditorJs');
+        $this->setAttr('cres-element', 'control:Password');
+        $this->setAttr('cres-config', c::jsonAttr($this->buildControlConfig()));
         if ($this->readonly) {
             $this->setAttr('readonly', 'readonly');
         }
-    }
-
-    public function after() {
-        $after = parent::after();
         if ($this->showPassword) {
-            $span = $after->addSpan();
+            $span = $this->after()->addSpan();
             $span->addClass('input-group-btn show-password text-muted fa fa-eye-slash');
         }
-
-        return $after;
     }
 
     public function setShowPassword($bool = true) {
         $this->showPassword = $bool;
 
         return $this;
+    }
+
+    public function setToggleVisibility($bool = true) {
+        $this->toggleVisibility = $bool;
+
+        return $this;
+    }
+
+    protected function buildControlConfig() {
+        $config = [
+            'toggleVisibility' => (bool) $this->toggleVisibility,
+
+        ];
+
+        return $config;
     }
 }
