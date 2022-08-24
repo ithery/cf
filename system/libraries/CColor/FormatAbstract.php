@@ -184,7 +184,7 @@ abstract class CColor_FormatAbstract {
      *
      * @return mixed
      */
-    public function mix(CColor_FormatAbstract $color, int $percent = 50) {
+    public function mix(CColor_FormatAbstract $color, $percent = 50) {
         $first = $this->toRgb();
         $second = $color->toRgb();
         $weight = $percent / 100;
@@ -206,7 +206,7 @@ abstract class CColor_FormatAbstract {
      *
      * @return mixed
      */
-    public function mixInHsv(CColor_FormatAbstract $color, int $percent = 50) {
+    public function mixInHsv(CColor_FormatAbstract $color, $percent = 50) {
         $first = $this->toHsv();
         $second = $color->toHsv();
         $weight = $percent / 100;
@@ -330,7 +330,6 @@ abstract class CColor_FormatAbstract {
      * @return false|string
      */
     public function getColorModelName(CColor_FormatAbstract $color) {
-
         return substr(strrchr(get_class($color), '_'), 1);
     }
 
