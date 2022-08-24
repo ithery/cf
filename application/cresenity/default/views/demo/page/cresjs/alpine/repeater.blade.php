@@ -3,8 +3,6 @@
 
 <section class="repeater">
 
-    <!-- Um Probleme mit jQuery/pjax zu vermeiden wird die Komponente verzögert geladen -->
-    <!-- Zum initialisieren wird das gespeicherte Objekt übergeben -->
     <div x-data="repeater()" id="x-repeater">
 
         <template x-if="groups.length">
@@ -34,7 +32,7 @@
                 </header>
 
                 <div>
-                    <!-- Felddefinitionen der Gruppe -->
+                    <!-- Group field definitions -->
                     <label :for="'group-headline-'+groupIndex">Headline</label>
                     <input type="text"
                            class="form-control mb-3"
@@ -67,7 +65,7 @@
                             </header>
 
                             <div>
-                                <!-- Felddefinitionen innerhalb der Gruppe -->
+                                <!-- Field definitions within the group -->
                                 <label :for="'title-'+groupIndex+'-'+index">Title</label>
                                 <input type="text"
                                        class="form-control mb-3"
@@ -97,8 +95,8 @@
 
         <a href="#" type="button" class="btn btn-primary" @click.prevent="addGroup(1)"><i class="fas fa-plus-circle"></i> New Group</a>
 
-        <!--  REX_VALUE in der die Daten als JSON gespeichert werden...  -->
-        <!--  Daten werden nach blur aktualisiert  -->
+        <!--  Repeater Value in which the data is stored as JSON...  -->
+        <!--  Data is updated after blur  -->
         <textarea name="repeater-value" cols="30" rows="10" x-bind:value="value"></textarea>
     </div>
 </section>
