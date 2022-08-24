@@ -63,4 +63,10 @@ return [
             ],
         ]
     ],
+
+    [
+        'name' => 'cresjs',
+        'label' => c::__('Cres JS'),
+        'subnav' => include dirname(__FILE__) . '/demo/cresjs.php',
+    ],
 ];
