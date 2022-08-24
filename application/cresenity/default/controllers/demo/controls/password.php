@@ -11,7 +11,7 @@ class Controller_Demo_Controls_Password extends \Cresenity\Demo\Controller {
 
         $div = $app->addDiv()->addClass('border-1 p-3 mb-3');
         $div->addH5()->add('Password Input With Placeholder');
-        $div->addPasswordControl()->setPlaceholder('My Placeholder');
+        $div->addPasswordControl()->setPlaceholder('Input your password');
 
         $div = $app->addDiv()->addClass('border-1 p-3 mb-3');
         $div->addH5()->add('Password Input With Show Password');
