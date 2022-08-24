@@ -21,7 +21,7 @@ class Controller_Demo_Code extends \Cresenity\Demo\Controller {
             $div->addPrismCode()->add(c::e($code));
 
             //we will regex all views
-            preg_match_all('#->addView\(\'(.+?)\'\);#ims', $code, $matches);
+            preg_match_all('#->addView\(\'(.+?)\'#ims', $code, $matches);
             if (is_array($matches)) {
                 foreach ($matches[1] as $view) {
                     $viewPath = CView_Finder::instance()->find($view);
@@ -32,7 +32,7 @@ class Controller_Demo_Code extends \Cresenity\Demo\Controller {
             }
 
             //we will regex all model
-            preg_match_all('#->setDataFromModel\((.+?)\:\:class\);#ims', $code, $matches);
+            preg_match_all('#->setDataFromModel\((.+?)\:\:class#ims', $code, $matches);
             if (is_array($matches)) {
                 foreach ($matches[1] as $class) {
                     $filePath = CF::findFile('libraries', $class);
