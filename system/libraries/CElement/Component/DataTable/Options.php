@@ -122,8 +122,11 @@ class CElement_Component_DataTable_Options {
         }
 
         $jsonRow = '';
-
         foreach ($keys as $key) {
+            if ($key == 'scrollX' && $value == false) {
+                break;
+            }
+
             $jsonRow .= " '" . $key . "': " . json_encode($value) . ',';
         }
         if (strlen($jsonRow) > 0) {
