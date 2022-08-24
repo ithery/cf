@@ -6,16 +6,13 @@ return [
         'label' => c::__('Dashboard'),
         'uri' => 'demo/dashboard/index',
     ],
-    [
-        'name' => 'controls',
-        'label' => c::__('Controls'),
-        'uri' => 'demo/controls/index',
-    ],
+
     [
         'name' => 'elements',
         'label' => c::__('Elements'),
         'subnav' => include dirname(__FILE__) . '/demo/elements.php',
     ],
+
     [
         'name' => 'controls',
         'label' => c::__('Controls'),
@@ -32,7 +29,11 @@ return [
             ],
         ]
     ],
-
+    [
+        'name' => 'model',
+        'label' => c::__('Model'),
+        'subnav' => include dirname(__FILE__) . '/demo/model.php',
+    ],
     [
         'name' => 'cresjs',
         'label' => c::__('Cres JS'),
