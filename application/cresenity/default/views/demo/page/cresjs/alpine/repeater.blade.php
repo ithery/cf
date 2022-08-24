@@ -160,7 +160,7 @@
     window.repeater = () =>
     {
         return {
-            groups: [{headline:'123131',fields:[{title:'12313213',text:'1231321'}]}],
+            groups: [{headline:'Headline Value',fields:[{title:'Awesome Title',text:'Some Text'}]}],
             value: '',
             $alpineLoader: document.querySelector('.alpine-loader'),
             init() {
