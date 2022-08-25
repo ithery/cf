@@ -97,6 +97,7 @@
 
         <!--  Repeater Value in which the data is stored as JSON...  -->
         <!--  Data is updated after blur  -->
+        <hr class="border-1 my-3"></hr>
         <textarea name="repeater-value" cols="30" rows="10" x-bind:value="value"></textarea>
     </div>
 </section>
