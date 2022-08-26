@@ -1,5 +1,6 @@
 <?php
-class CCarbon_Day {
+
+class CPeriod_OpeningHours_Day {
     const MONDAY = 'monday';
 
     const TUESDAY = 'tuesday';
@@ -26,19 +27,19 @@ class CCarbon_Day {
         ];
     }
 
-    public static function mapDays(callable $callback) {
+    public static function mapDays($callback) {
         return carr::map(carr::mirror(static::days()), $callback);
     }
 
-    public static function isValid(string $day): bool {
+    public static function isValid($day) {
         return in_array($day, static::days());
     }
 
-    public static function onDateTime(DateTimeInterface $dateTime): string {
+    public static function onDateTime(DateTimeInterface $dateTime) {
         return static::days()[$dateTime->format('N') - 1];
     }
 
-    public static function toISO(string $day): int {
+    public static function toISO($day) {
         return array_search($day, static::days()) + 1;
     }
 }

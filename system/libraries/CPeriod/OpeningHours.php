@@ -1,27 +1,19 @@
 <?php
 
-use Spatie\OpeningHours\Helpers\Arr;
-use Spatie\OpeningHours\Exceptions\Exception;
-use Spatie\OpeningHours\Exceptions\InvalidDate;
-use Spatie\OpeningHours\Exceptions\InvalidDayName;
-use Spatie\OpeningHours\Exceptions\InvalidTimezone;
-use Spatie\OpeningHours\Exceptions\InvalidDateTimeClass;
-use Spatie\OpeningHours\Exceptions\MaximumLimitExceeded;
-
-class CCarbon_OpeningHours {
-    use CCarbon_Trait_DataTrait;
-    use CCarbon_Trait_DateTimeCopierTrait;
-    use CCarbon_Trait_DiffTrait;
+class CPeriod_OpeningHours {
+    use CPeriod_Trait_DataTrait;
+    use CPeriod_Trait_DateTimeCopierTrait;
+    use CPeriod_OpeningHours_Trait_DiffTrait;
 
     const DEFAULT_DAY_LIMIT = 8;
 
     /**
-     * @var \CCarbon_Day[]
+     * @var \CPeriod_OpeningHours_Day[]
      */
     protected $openingHours = [];
 
     /**
-     * @var \Spatie\OpeningHours\OpeningHoursForDay[]
+     * @var \CPeriod_OpeningHours_OpeningHoursForDay[]
      */
     protected $exceptions = [];
 
@@ -34,6 +26,11 @@ class CCarbon_OpeningHours {
      * @var null|DateTimeZone
      */
     protected $timezone = null;
+
+    /**
+     * @var null|DateTimeZone
+     */
+    protected $outputTimezone = null;
 
     /**
      * @var bool Allow for overflowing time ranges which overflow into the next day
@@ -50,17 +47,16 @@ class CCarbon_OpeningHours {
      */
     protected $dateTimeClass = DateTime::class;
 
-    public function __construct($timezone = null) {
-        if ($timezone instanceof DateTimeZone) {
-            $this->timezone = $timezone;
-        } elseif (is_string($timezone)) {
-            $this->timezone = new DateTimeZone($timezone);
-        } elseif ($timezone) {
-            throw InvalidTimezone::create();
-        }
+    /**
+     * @param null|string|DateTimeZone $timezone
+     * @param null|string|DateTimeZone $outputTimezone
+     */
+    public function __construct($timezone = null, $outputTimezone = null) {
+        $this->setTimezone($timezone);
+        $this->setOutputTimezone($outputTimezone);
 
-        $this->openingHours = Day::mapDays(function () {
-            return new OpeningHoursForDay();
+        $this->openingHours = CPeriod_OpeningHours_Day::mapDays(static function () {
+            return new CPeriod_OpeningHours_OpeningHoursForDay();
         });
     }
 
@@ -78,11 +74,12 @@ class CCarbon_OpeningHours {
      *             overflow?: bool,
      *         }                         $data
      * @param null|string|DateTimeZone $timezone
+     * @param null|string|DateTimeZone $outputTimezone
      *
      * @return static
      */
-    public static function create(array $data, $timezone = null): self {
-        return (new static($timezone))->fill($data);
+    public static function create(array $data, $timezone = null, $outputTimezone = null): self {
+        return (new static($timezone, $outputTimezone))->fill($data);
     }
 
     /**
@@ -98,9 +95,9 @@ class CCarbon_OpeningHours {
         foreach (static::filterHours($data, $excludedKeys) as $key => $value) {
             $value = is_array($value)
                 ? static::mergeOverlappingRanges($value, ['data'])
-                : (is_string($value) ? TimeRange::fromString($value) : $value);
+                : (is_string($value) ? CPeriod_OpeningHours_TimeRange::fromString($value) : $value);
 
-            if ($value instanceof TimeRange) {
+            if ($value instanceof CPeriod_OpeningHours_TimeRange) {
                 $newRanges = [];
 
                 foreach ($ranges as $range) {
@@ -109,7 +106,7 @@ class CCarbon_OpeningHours {
                     }
 
                     if ($value->overlaps($range) || $range->overlaps($value)) {
-                        $value = TimeRange::fromList([$value, $range]);
+                        $value = CPeriod_OpeningHours_TimeRange::fromList([$value, $range]);
 
                         continue;
                     }
@@ -147,11 +144,12 @@ class CCarbon_OpeningHours {
      *             overflow?: bool,
      *         }                         $data
      * @param null|string|DateTimeZone $timezone
+     * @param null|string|DateTimeZone $outputTimezone
      *
      * @return static
      */
-    public static function createAndMergeOverlappingRanges(array $data, $timezone = null) {
-        return static::create(static::mergeOverlappingRanges($data), $timezone);
+    public static function createAndMergeOverlappingRanges(array $data, $timezone = null, $outputTimezone = null) {
+        return static::create(static::mergeOverlappingRanges($data), $timezone, $outputTimezone);
     }
 
     /**
@@ -174,13 +172,13 @@ class CCarbon_OpeningHours {
      *
      * @param null|string $dateTimeClass
      *
-     * @throws InvalidDateTimeClass if $dateTimeClass is set with a string that is not a valid DateTimeInterface
+     * @throws CPeriod_Exception_InvalidDateTimeClass if $dateTimeClass is set with a string that is not a valid DateTimeInterface
      *
      * @return $this
      */
-    public function setDateTimeClass(string $dateTimeClass = null) {
+    public function setDateTimeClass($dateTimeClass = null) {
         if ($dateTimeClass !== null && !is_a($dateTimeClass, DateTimeInterface::class, true)) {
-            throw InvalidDateTimeClass::forString($dateTimeClass);
+            throw CPeriod_Exception_InvalidDateTimeClass::forString($dateTimeClass);
         }
 
         $this->dateTimeClass = $dateTimeClass ?? DateTime::class;
@@ -221,6 +219,21 @@ class CCarbon_OpeningHours {
     }
 
     public function fill(array $data) {
+        $timezones = array_key_exists('timezone', $data) ? $data['timezone'] : [];
+        unset($data['timezone']);
+
+        if (!is_array($timezones)) {
+            $timezones = ['input' => $timezones];
+        }
+
+        if (array_key_exists('input', $timezones)) {
+            $this->timezone = $this->parseTimezone($timezones['input']);
+        }
+
+        if (array_key_exists('output', $timezones)) {
+            $this->outputTimezone = $this->parseTimezone($timezones['output']);
+        }
+
         list($openingHours, $exceptions, $metaData, $filters, $overflow, $dateTimeClass) = $this
             ->parseOpeningHoursAndExceptions($data);
 
@@ -282,24 +295,34 @@ class CCarbon_OpeningHours {
         return $concatenatedDays;
     }
 
-    public function forDay(string $day): OpeningHoursForDay {
+    /**
+     * @param string $day
+     *
+     * @return CPeriod_OpeningHours_OpeningHoursForDay
+     */
+    public function forDay($day) {
         $day = $this->normalizeDayName($day);
 
         return $this->openingHours[$day];
     }
 
-    public function forDate(DateTimeInterface $date): OpeningHoursForDay {
+    /**
+     * @param DateTimeInterface $date
+     *
+     * @return CPeriod_OpeningHours_OpeningHoursForDay
+     */
+    public function forDate(DateTimeInterface $date) {
         $date = $this->applyTimezone($date);
 
         foreach ($this->filters as $filter) {
             $result = $filter($date);
 
             if (is_array($result)) {
-                return OpeningHoursForDay::fromStrings($result);
+                return CPeriod_OpeningHours_OpeningHoursForDay::fromStrings($result);
             }
         }
 
-        return $this->exceptions[$date->format('Y-m-d')] ?? ($this->exceptions[$date->format('m-d')] ?? $this->forDay(Day::onDateTime($date)));
+        return $this->exceptions[$date->format('Y-m-d')] ?? ($this->exceptions[$date->format('m-d')] ?? $this->forDay(CPeriod_OpeningHours_Day::onDateTime($date)));
     }
 
     /**
@@ -308,11 +331,13 @@ class CCarbon_OpeningHours {
      * @return TimeRange[]
      */
     public function forDateTime(DateTimeInterface $date): array {
+        $date = $this->applyTimezone($date);
+
         return array_merge(
             iterator_to_array($this->forDate(
                 $this->yesterday($date)
-            )->forNightTime(Time::fromDateTime($date))),
-            iterator_to_array($this->forDate($date)->forTime(Time::fromDateTime($date)))
+            )->forNightTime(CPeriod_OpeningHours_Time::fromDateTime($date))),
+            iterator_to_array($this->forDate($date)->forTime(CPeriod_OpeningHours_Time::fromDateTime($date)))
         );
     }
 
@@ -325,7 +350,7 @@ class CCarbon_OpeningHours {
             list(, $year, $month, $day) = $match;
             $year = $year ?: date('Y');
 
-            return count($this->forDate(new DateTimeImmutable("${year}-${month}-${day}", $this->timezone))) > 0;
+            return count($this->forDate(new DateTimeImmutable("{$year}-{$month}-{$day}", $this->timezone))) > 0;
         }
 
         return count($this->forDay($day)) > 0;
@@ -335,20 +360,25 @@ class CCarbon_OpeningHours {
         return !$this->isOpenOn($day);
     }
 
-    public function isOpenAt(DateTimeInterface $dateTime): bool {
+    /**
+     * @param DateTimeInterface $dateTime
+     *
+     * @return bool
+     */
+    public function isOpenAt(DateTimeInterface $dateTime) {
         $dateTime = $this->applyTimezone($dateTime);
 
         if ($this->overflow) {
             $dateTimeMinus1Day = $this->yesterday($dateTime);
             $openingHoursForDayBefore = $this->forDate($dateTimeMinus1Day);
-            if ($openingHoursForDayBefore->isOpenAtNight(Time::fromDateTime($dateTimeMinus1Day))) {
+            if ($openingHoursForDayBefore->isOpenAtNight(CPeriod_OpeningHours_PreciseTime::fromDateTime($dateTimeMinus1Day))) {
                 return true;
             }
         }
 
         $openingHoursForDay = $this->forDate($dateTime);
 
-        return $openingHoursForDay->isOpenAt(Time::fromDateTime($dateTime));
+        return $openingHoursForDay->isOpenAt(CPeriod_OpeningHours_PreciseTime::fromDateTime($dateTime));
     }
 
     public function isClosedAt(DateTimeInterface $dateTime): bool {
@@ -364,12 +394,15 @@ class CCarbon_OpeningHours {
     }
 
     public function currentOpenRange(DateTimeInterface $dateTime) {
+        $dateTime = $this->applyTimezone($dateTime);
         $list = $this->forDateTime($dateTime);
 
         return end($list) ?: false;
     }
 
     public function currentOpenRangeStart(DateTimeInterface $dateTime) {
+        $outputTimezone = $this->getOutputTimezone($dateTime);
+        $dateTime = $this->applyTimezone($dateTime);
         /** @var TimeRange $range */
         $range = $this->currentOpenRange($dateTime);
 
@@ -385,10 +418,15 @@ class CCarbon_OpeningHours {
             $dateTime = $dateTime->modify('-1 day');
         }
 
-        return $dateTime->setTime($nextDateTime->format('G'), $nextDateTime->format('i'), 0);
+        return $this->getDateWithTimezone(
+            $dateTime->setTime($nextDateTime->format('G'), $nextDateTime->format('i'), 0),
+            $outputTimezone
+        );
     }
 
     public function currentOpenRangeEnd(DateTimeInterface $dateTime) {
+        $outputTimezone = $this->getOutputTimezone($dateTime);
+        $dateTime = $this->applyTimezone($dateTime);
         /** @var TimeRange $range */
         $range = $this->currentOpenRange($dateTime);
 
@@ -404,19 +442,23 @@ class CCarbon_OpeningHours {
             $dateTime = $dateTime->modify('+1 day');
         }
 
-        return $dateTime->setTime($nextDateTime->format('G'), $nextDateTime->format('i'), 0);
+        return $this->getDateWithTimezone(
+            $dateTime->setTime($nextDateTime->format('G'), $nextDateTime->format('i'), 0),
+            $outputTimezone
+        );
     }
 
     public function nextOpen(DateTimeInterface $dateTime = null): DateTimeInterface {
-        $dateTime = $dateTime ?? new $this->dateTimeClass();
+        $outputTimezone = $this->getOutputTimezone($dateTime);
+        $dateTime = $this->applyTimezone($dateTime ?? new $this->dateTimeClass());
         $dateTime = $this->copyDateTime($dateTime);
         $openingHoursForDay = $this->forDate($dateTime);
-        $nextOpen = $openingHoursForDay->nextOpen(Time::fromDateTime($dateTime));
+        $nextOpen = $openingHoursForDay->nextOpen(CPeriod_OpeningHours_PreciseTime::fromDateTime($dateTime));
         $tries = $this->getDayLimit();
 
         while ($nextOpen === false || $nextOpen->hours() >= 24) {
             if (--$tries < 0) {
-                throw MaximumLimitExceeded::forString(
+                throw CPeriod_OpeningHours_Exception_MaximumLimitExceededException::forString(
                     'No open date/time found in the next ' . $this->getDayLimit() . ' days,'
                     . ' use $openingHours->setDayLimit() to increase the limit.'
                 );
@@ -426,39 +468,46 @@ class CCarbon_OpeningHours {
                 ->modify('+1 day')
                 ->setTime(0, 0, 0);
 
-            if ($this->isOpenAt($dateTime) && !$openingHoursForDay->isOpenAt(Time::fromString('23:59'))) {
-                return $dateTime;
+            if ($this->isOpenAt($dateTime) && !$openingHoursForDay->isOpenAt(CPeriod_OpeningHours_Time::fromString('23:59'))) {
+                return $this->getDateWithTimezone($dateTime, $outputTimezone);
             }
 
             $openingHoursForDay = $this->forDate($dateTime);
 
-            $nextOpen = $openingHoursForDay->nextOpen(Time::fromDateTime($dateTime));
+            $nextOpen = $openingHoursForDay->nextOpen(CPeriod_OpeningHours_PreciseTime::fromDateTime($dateTime));
         }
 
         if ($dateTime->format('H:i') === '00:00' && $this->isOpenAt((clone $dateTime)->modify('-1 second'))) {
-            return $this->nextOpen($dateTime->modify('+1 minute'));
+            return $this->getDateWithTimezone(
+                $this->nextOpen($dateTime->modify('+1 minute')),
+                $outputTimezone
+            );
         }
 
         $nextDateTime = $nextOpen->toDateTime();
 
-        return $dateTime->setTime($nextDateTime->format('G'), $nextDateTime->format('i'), 0);
+        return $this->getDateWithTimezone(
+            $dateTime->setTime($nextDateTime->format('G'), $nextDateTime->format('i'), 0),
+            $outputTimezone
+        );
     }
 
     public function nextClose(DateTimeInterface $dateTime = null): DateTimeInterface {
-        $dateTime = $dateTime ?? new $this->dateTimeClass();
+        $outputTimezone = $this->getOutputTimezone($dateTime);
+        $dateTime = $this->applyTimezone($dateTime ?? new $this->dateTimeClass());
         $dateTime = $this->copyDateTime($dateTime);
         $nextClose = null;
         if ($this->overflow) {
             $dateTimeMinus1Day = $this->copyDateTime($dateTime)->modify('-1 day');
             $openingHoursForDayBefore = $this->forDate($dateTimeMinus1Day);
-            if ($openingHoursForDayBefore->isOpenAtNight(Time::fromDateTime($dateTimeMinus1Day))) {
-                $nextClose = $openingHoursForDayBefore->nextClose(Time::fromDateTime($dateTime));
+            if ($openingHoursForDayBefore->isOpenAtNight(CPeriod_OpeningHours_PreciseTime::fromDateTime($dateTimeMinus1Day))) {
+                $nextClose = $openingHoursForDayBefore->nextClose(CPeriod_OpeningHours_PreciseTime::fromDateTime($dateTime));
             }
         }
 
         $openingHoursForDay = $this->forDate($dateTime);
         if (!$nextClose) {
-            $nextClose = $openingHoursForDay->nextClose(Time::fromDateTime($dateTime));
+            $nextClose = $openingHoursForDay->nextClose(CPeriod_OpeningHours_PreciseTime::fromDateTime($dateTime));
 
             if ($nextClose && $nextClose->hours() < 24 && $nextClose->format('Gi') < $dateTime->format('Gi')) {
                 $dateTime = $dateTime->modify('+1 day');
@@ -469,7 +518,7 @@ class CCarbon_OpeningHours {
 
         while ($nextClose === false || $nextClose->hours() >= 24) {
             if (--$tries < 0) {
-                throw MaximumLimitExceeded::forString(
+                throw CPeriod_OpeningHours_Exception_MaximumLimitExceededException::forString(
                     'No close date/time found in the next ' . $this->getDayLimit() . ' days,'
                     . ' use $openingHours->setDayLimit() to increase the limit.'
                 );
@@ -479,29 +528,38 @@ class CCarbon_OpeningHours {
                 ->modify('+1 day')
                 ->setTime(0, 0, 0);
 
-            if ($this->isClosedAt($dateTime) && $openingHoursForDay->isOpenAt(Time::fromString('23:59'))) {
-                return $dateTime;
+            if ($this->isClosedAt($dateTime) && $openingHoursForDay->isOpenAt(CPeriod_OpeningHours_Time::fromString('23:59'))) {
+                return $this->getDateWithTimezone($dateTime, $outputTimezone);
             }
 
             $openingHoursForDay = $this->forDate($dateTime);
 
-            $nextClose = $openingHoursForDay->nextClose(Time::fromDateTime($dateTime));
+            $nextClose = $openingHoursForDay->nextClose(CPeriod_OpeningHours_PreciseTime::fromDateTime($dateTime));
         }
 
         $nextDateTime = $nextClose->toDateTime();
 
-        return $dateTime->setTime($nextDateTime->format('G'), $nextDateTime->format('i'), 0);
+        return $this->getDateWithTimezone(
+            $dateTime->setTime($nextDateTime->format('G'), $nextDateTime->format('i'), 0),
+            $outputTimezone
+        );
     }
 
-    public function previousOpen(DateTimeInterface $dateTime): DateTimeInterface {
-        $dateTime = $this->copyDateTime($dateTime);
+    /**
+     * @param DateTimeInterface $dateTime
+     *
+     * @return DateTimeInterface
+     */
+    public function previousOpen(DateTimeInterface $dateTime) {
+        $outputTimezone = $this->getOutputTimezone($dateTime);
+        $dateTime = $this->copyDateTime($this->applyTimezone($dateTime));
         $openingHoursForDay = $this->forDate($dateTime);
-        $previousOpen = $openingHoursForDay->previousOpen(Time::fromDateTime($dateTime));
+        $previousOpen = $openingHoursForDay->previousOpen(CPeriod_OpeningHours_PreciseTime::fromDateTime($dateTime));
         $tries = $this->getDayLimit();
 
         while ($previousOpen === false || ($previousOpen->hours() === 0 && $previousOpen->minutes() === 0)) {
             if (--$tries < 0) {
-                throw MaximumLimitExceeded::forString(
+                throw CPeriod_OpeningHours_Exception_MaximumLimitExceededException::forString(
                     'No open date/time found in the previous ' . $this->getDayLimit() . ' days,'
                     . ' use $openingHours->setDayLimit() to increase the limit.'
                 );
@@ -513,39 +571,48 @@ class CCarbon_OpeningHours {
 
             $openingHoursForDay = $this->forDate($dateTime);
 
-            if ($this->isOpenAt($midnight) && !$openingHoursForDay->isOpenAt(Time::fromString('23:59'))) {
-                return $midnight;
+            if ($this->isOpenAt($midnight) && !$openingHoursForDay->isOpenAt(CPeriod_OpeningHours_Time::fromString('23:59'))) {
+                return $this->getDateWithTimezone($midnight, $outputTimezone);
             }
 
-            $previousOpen = $openingHoursForDay->previousOpen(Time::fromDateTime($dateTime));
+            $previousOpen = $openingHoursForDay->previousOpen(CPeriod_OpeningHours_PreciseTime::fromDateTime($dateTime));
         }
 
         $nextDateTime = $previousOpen->toDateTime();
 
-        return $dateTime->setTime($nextDateTime->format('G'), $nextDateTime->format('i'), 0);
+        return $this->getDateWithTimezone(
+            $dateTime->setTime($nextDateTime->format('G'), $nextDateTime->format('i'), 0),
+            $outputTimezone
+        );
     }
 
-    public function previousClose(DateTimeInterface $dateTime): DateTimeInterface {
-        $dateTime = $this->copyDateTime($dateTime);
+    /**
+     * @param DateTimeInterface $dateTime
+     *
+     * @return DateTimeInterface
+     */
+    public function previousClose(DateTimeInterface $dateTime) {
+        $outputTimezone = $this->getOutputTimezone($dateTime);
+        $dateTime = $this->copyDateTime($this->applyTimezone($dateTime));
         $previousClose = null;
         if ($this->overflow) {
             $dateTimeMinus1Day = $this->copyDateTime($dateTime)->modify('-1 day');
             $openingHoursForDayBefore = $this->forDate($dateTimeMinus1Day);
-            if ($openingHoursForDayBefore->isOpenAtNight(Time::fromDateTime($dateTimeMinus1Day))) {
-                $previousClose = $openingHoursForDayBefore->previousClose(Time::fromDateTime($dateTime));
+            if ($openingHoursForDayBefore->isOpenAtNight(CPeriod_OpeningHours_PreciseTime::fromDateTime($dateTimeMinus1Day))) {
+                $previousClose = $openingHoursForDayBefore->previousClose(CPeriod_OpeningHours_PreciseTime::fromDateTime($dateTime));
             }
         }
 
         $openingHoursForDay = $this->forDate($dateTime);
         if (!$previousClose) {
-            $previousClose = $openingHoursForDay->previousClose(Time::fromDateTime($dateTime));
+            $previousClose = $openingHoursForDay->previousClose(CPeriod_OpeningHours_PreciseTime::fromDateTime($dateTime));
         }
 
         $tries = $this->getDayLimit();
 
         while ($previousClose === false || ($previousClose->hours() === 0 && $previousClose->minutes() === 0)) {
             if (--$tries < 0) {
-                throw MaximumLimitExceeded::forString(
+                throw CPeriod_OpeningHours_Exception_MaximumLimitExceededException::forString(
                     'No close date/time found in the previous ' . $this->getDayLimit() . ' days,'
                     . ' use $openingHours->setDayLimit() to increase the limit.'
                 );
@@ -556,50 +623,73 @@ class CCarbon_OpeningHours {
             $dateTime = $dateTime->modify('-1 minute');
             $openingHoursForDay = $this->forDate($dateTime);
 
-            if ($this->isClosedAt($midnight) && $openingHoursForDay->isOpenAt(Time::fromString('23:59'))) {
-                return $midnight;
+            if ($this->isClosedAt($midnight) && $openingHoursForDay->isOpenAt(CPeriod_OpeningHours_Time::fromString('23:59'))) {
+                return $this->getDateWithTimezone($midnight, $outputTimezone);
             }
 
-            $previousClose = $openingHoursForDay->previousClose(Time::fromDateTime($dateTime));
+            $previousClose = $openingHoursForDay->previousClose(CPeriod_OpeningHours_PreciseTime::fromDateTime($dateTime));
         }
 
         $previousDateTime = $previousClose->toDateTime();
 
-        return $dateTime->setTime($previousDateTime->format('G'), $previousDateTime->format('i'), 0);
+        return $this->getDateWithTimezone(
+            $dateTime->setTime($previousDateTime->format('G'), $previousDateTime->format('i'), 0),
+            $outputTimezone
+        );
     }
 
-    public function regularClosingDays(): array {
-        return array_keys($this->filter(function (OpeningHoursForDay $openingHoursForDay) {
+    /**
+     * @return array
+     */
+    public function regularClosingDays() {
+        return array_keys($this->filter(static function (CPeriod_OpeningHours_OpeningHoursForDay $openingHoursForDay) {
             return $openingHoursForDay->isEmpty();
         }));
     }
 
-    public function regularClosingDaysISO(): array {
-        return Arr::map($this->regularClosingDays(), [Day::class, 'toISO']);
+    /**
+     * @return array
+     */
+    public function regularClosingDaysISO() {
+        return carr::map($this->regularClosingDays(), [CPeriod_OpeningHours_Day::class, 'toISO']);
     }
 
     public function exceptionalClosingDates(): array {
-        $dates = array_keys($this->filterExceptions(function (OpeningHoursForDay $openingHoursForDay) {
+        $dates = array_keys($this->filterExceptions(static function (CPeriod_OpeningHours_OpeningHoursForDay $openingHoursForDay) {
             return $openingHoursForDay->isEmpty();
         }));
 
-        return Arr::map($dates, function ($date) {
+        return carr::map($dates, static function ($date) {
             return DateTime::createFromFormat('Y-m-d', $date);
         });
     }
 
+    /**
+     * @param null|string|DateTimeZone $timezone
+     *
+     * @return void
+     */
     public function setTimezone($timezone) {
-        $this->timezone = new DateTimeZone($timezone);
+        $this->timezone = $this->parseTimezone($timezone);
+    }
+
+    /**
+     * @param null|string|DateTimeZone $timezone
+     *
+     * @return void
+     */
+    public function setOutputTimezone($timezone) {
+        $this->outputTimezone = $this->parseTimezone($timezone);
     }
 
     protected function parseOpeningHoursAndExceptions(array $data): array {
-        $dateTimeClass = Arr::pull($data, 'dateTimeClass', null);
-        $metaData = Arr::pull($data, 'data', null);
+        $dateTimeClass = carr::pull($data, 'dateTimeClass', null);
+        $metaData = carr::pull($data, 'data', null);
         $exceptions = [];
-        $filters = Arr::pull($data, 'filters', []);
-        $overflow = (bool) Arr::pull($data, 'overflow', false);
+        $filters = carr::pull($data, 'filters', []);
+        $overflow = (bool) carr::pull($data, 'overflow', false);
 
-        foreach (Arr::pull($data, 'exceptions', []) as $key => $exception) {
+        foreach (carr::pull($data, 'exceptions', []) as $key => $exception) {
             if (is_callable($exception)) {
                 $filters[] = $exception;
 
@@ -628,7 +718,7 @@ class CCarbon_OpeningHours {
             unset($openingHours['data']);
         }
 
-        $this->openingHours[$day] = OpeningHoursForDay::fromStrings($openingHours)->setData($data);
+        $this->openingHours[$day] = CPeriod_OpeningHours_OpeningHoursForDay::fromStrings($openingHours)->setData($data);
     }
 
     protected function setExceptionsFromStrings(array $exceptions) {
@@ -640,66 +730,121 @@ class CCarbon_OpeningHours {
             $this->dayLimit = 366;
         }
 
-        $this->exceptions = Arr::map($exceptions, function (array $openingHours, string $date) {
+        $this->exceptions = carr::map($exceptions, static function (array $openingHours, string $date) {
             $recurring = DateTime::createFromFormat('m-d', $date);
 
             if ($recurring === false || $recurring->format('m-d') !== $date) {
                 $dateTime = DateTime::createFromFormat('Y-m-d', $date);
 
                 if ($dateTime === false || $dateTime->format('Y-m-d') !== $date) {
-                    throw InvalidDate::invalidDate($date);
+                    throw CPeriod_Exception_InvalidDateException::forFormat($date, 'Y-m-d');
                 }
             }
 
-            return OpeningHoursForDay::fromStrings($openingHours);
+            return CPeriod_OpeningHours_OpeningHoursForDay::fromStrings($openingHours);
         });
     }
 
-    protected function normalizeDayName(string $day) {
+    /**
+     * @param string $day
+     *
+     * @return void
+     */
+    protected function normalizeDayName($day) {
         $day = strtolower($day);
 
-        if (!Day::isValid($day)) {
-            throw InvalidDayName::invalidDayName($day);
+        if (!CPeriod_OpeningHours_Day::isValid($day)) {
+            throw CPeriod_OpeningHours_Exception_InvalidDayNameException::invalidDayName($day);
         }
 
         return $day;
     }
 
     protected function applyTimezone(DateTimeInterface $date) {
-        if ($this->timezone) {
-            $date = $date->setTimezone($this->timezone);
+        return $this->getDateWithTimezone($date, $this->timezone);
+    }
+
+    /**
+     * @param DateTimeInterface $date
+     * @param null|DateTimeZone $timezone
+     *
+     * @return DateTimeInterface
+     */
+    protected function getDateWithTimezone(DateTimeInterface $date, $timezone) {
+        if ($timezone) {
+            if ($date instanceof DateTime) {
+                $date = clone $date;
+            }
+
+            $date = $date->setTimezone($timezone);
         }
 
         return $date;
     }
 
-    public function filter(callable $callback): array {
-        return Arr::filter($this->openingHours, $callback);
+    /**
+     * @param callable $callback
+     *
+     * @return array
+     */
+    public function filter(callable $callback) {
+        return carr::filter($this->openingHours, $callback);
     }
 
-    public function map(callable $callback): array {
-        return Arr::map($this->openingHours, $callback);
+    /**
+     * @param callable $callback
+     *
+     * @return array
+     */
+    public function map($callback) {
+        return carr::map($this->openingHours, $callback);
     }
 
-    public function flatMap(callable $callback): array {
-        return Arr::flatMap($this->openingHours, $callback);
+    /**
+     * @param callable $callback
+     *
+     * @return array
+     */
+    public function flatMap($callback) {
+        return CPeriod_OpeningHours_Helper::flatMap($this->openingHours, $callback);
     }
 
-    public function filterExceptions(callable $callback): array {
-        return Arr::filter($this->exceptions, $callback);
+    /**
+     * @param callable $callback
+     *
+     * @return array
+     */
+    public function filterExceptions($callback) {
+        return carr::filter($this->exceptions, $callback);
     }
 
-    public function mapExceptions(callable $callback): array {
-        return Arr::map($this->exceptions, $callback);
+    /**
+     * @param callable $callback
+     *
+     * @return array
+     */
+    public function mapExceptions($callback) {
+        return carr::map($this->exceptions, $callback);
     }
 
-    public function flatMapExceptions(callable $callback): array {
-        return Arr::flatMap($this->exceptions, $callback);
+    /**
+     * @param callable $callback
+     *
+     * @return array
+     */
+    public function flatMapExceptions($callback) {
+        return CPeriod_OpeningHours_Helper::flatMap($this->exceptions, $callback);
     }
 
-    public function asStructuredData(string $format = 'H:i', $timezone = null): array {
-        $regularHours = $this->flatMap(function (OpeningHoursForDay $openingHoursForDay, string $day) use ($format, $timezone) {
-            return $openingHoursForDay->map(function (TimeRange $timeRange) use ($format, $timezone, $day) {
+    /**
+     * @param string $format
+     * @param mixed  $timezone
+     *
+     * @return array
+     */
+    public function asStructuredData($format = 'H:i', $timezone = null) {
+        $regularHours = $this->flatMap(static function (CPeriod_OpeningHours_OpeningHoursForDay $openingHoursForDay, $day) use ($format, $timezone) {
+            return $openingHoursForDay->map(static function (CPeriod_OpeningHours_TimeRange $timeRange) use ($format, $timezone, $day) {
                 return [
                     '@type' => 'OpeningHoursSpecification',
                     'dayOfWeek' => ucfirst($day),
@@ -709,9 +854,9 @@ class CCarbon_OpeningHours {
             });
         });
 
-        $exceptions = $this->flatMapExceptions(function (OpeningHoursForDay $openingHoursForDay, string $date) use ($format, $timezone) {
+        $exceptions = $this->flatMapExceptions(static function (CPeriod_OpeningHours_OpeningHoursForDay $openingHoursForDay, $date) use ($format, $timezone) {
             if ($openingHoursForDay->isEmpty()) {
-                $zero = Time::fromString('00:00')->format($format, $timezone);
+                $zero = CPeriod_OpeningHours_Time::fromString('00:00')->format($format, $timezone);
 
                 return [[
                     '@type' => 'OpeningHoursSpecification',
@@ -722,7 +867,7 @@ class CCarbon_OpeningHours {
                 ]];
             }
 
-            return $openingHoursForDay->map(function (TimeRange $timeRange) use ($format, $date, $timezone) {
+            return $openingHoursForDay->map(static function (CPeriod_OpeningHours_TimeRange $timeRange) use ($format, $date, $timezone) {
                 return [
                     '@type' => 'OpeningHoursSpecification',
                     'opens' => $timeRange->start()->format($format, $timezone),
@@ -736,7 +881,13 @@ class CCarbon_OpeningHours {
         return array_merge($regularHours, $exceptions);
     }
 
-    private static function filterHours(array $data, array $excludedKeys): Generator {
+    /**
+     * @param array $data
+     * @param array $excludedKeys
+     *
+     * @return Generator
+     */
+    private static function filterHours(array $data, array $excludedKeys) {
         foreach ($data as $key => $value) {
             if (in_array($key, $excludedKeys, true)) {
                 continue;
@@ -744,7 +895,7 @@ class CCarbon_OpeningHours {
 
             if (is_int($key) && is_array($value) && isset($value['hours'])) {
                 foreach ((array) $value['hours'] as $subKey => $hour) {
-                    yield "${key}.${subKey}" => $hour;
+                    yield "{$key}.{$subKey}" => $hour;
                 }
 
                 continue;
@@ -752,5 +903,45 @@ class CCarbon_OpeningHours {
 
             yield $key => $value;
         }
+    }
+
+    /**
+     * @param mixed $timezone
+     *
+     * @throws CPeriod_Exception_InvalidTimezoneException
+     *
+     * @return null|DateTimeZone
+     */
+    private function parseTimezone($timezone) {
+        if ($timezone instanceof DateTimeZone) {
+            return $timezone;
+        }
+
+        if (is_string($timezone)) {
+            return new DateTimeZone($timezone);
+        }
+
+        if ($timezone) {
+            throw CPeriod_Exception_InvalidTimezoneException::create();
+        }
+
+        return null;
+    }
+
+    /**
+     * @param null|DateTimeInterface $dateTime
+     *
+     * @return null|DateTimeZone
+     */
+    private function getOutputTimezone(DateTimeInterface $dateTime = null) {
+        if ($this->outputTimezone !== null) {
+            return $this->outputTimezone;
+        }
+
+        if ($this->timezone === null || $dateTime === null) {
+            return $this->timezone;
+        }
+
+        return $dateTime->getTimezone();
     }
 }
