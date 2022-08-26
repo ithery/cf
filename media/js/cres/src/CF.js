@@ -117,6 +117,7 @@ class CF {
             let string = '<script type=\'text/javascript\'  src=\'' + url + '\'></script>';
             if ((document.readyState === 'loading' /* || mwd.readyState === 'interactive'*/) && !!window.CanvasRenderingContext2D && self === parent) {
                 document.write(string);
+                callback();
             } else {
                 let el;
                 el = this.document.createElement('script');
@@ -124,15 +125,12 @@ class CF {
                 el.setAttribute('type', 'text/javascript');
                 // IE 6 & 7
                 if (typeof (callback) === 'function') {
-                    el.onload = callback;
-                    el.onreadystatechange = () => {
-                        if (this.readyState == 'complete') {
-                            dispatchWindowEvent('cresenity:js:loaded', {
-                                url:url,
-                            });
-                            callback();
-                        }
-                    };
+                    el.addEventListener('load', ()=> {
+                        dispatchWindowEvent('cresenity:js:loaded', {
+                            url:url,
+                        });
+                        callback();
+                    })
                 }
                 this.document.body.appendChild(el);
             }

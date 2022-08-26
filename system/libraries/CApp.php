@@ -501,7 +501,7 @@ class CApp implements CInterface_Responsable, CInterface_Renderable, CInterface_
             $js = $this->minifyJavascript($js);
         }
 
-        $js = $asset->renderJsRequire($js, 'cresenity.cf.require');
+        $js = $asset->renderJsRequire($js, 'cresenity.cf.requireJs');
 
         $cappScript = $this->yieldPushContent('capp-script');
         //strip cappScript from <script>
