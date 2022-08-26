@@ -18,6 +18,8 @@ trait CObservable_Trait_EventsTrait {
             $compiledJs = $this->javascript()->endDeferred();
         }
         $this->javascript->jquery()->onClick($compiledJs);
+
+        return $this;
     }
 
     public function onChange(Closure $event, $options = []) {
@@ -30,5 +32,7 @@ trait CObservable_Trait_EventsTrait {
         }
 
         $this->javascript()->jquery()->onChange($compiledJs);
+
+        return $this;
     }
 }

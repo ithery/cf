@@ -6,7 +6,11 @@ return [
         'label' => c::__('Dashboard'),
         'uri' => 'demo/dashboard/index',
     ],
-
+    [
+        'name' => 'app',
+        'label' => c::__('App'),
+        'subnav' => include dirname(__FILE__) . '/demo/app.php',
+    ],
     [
         'name' => 'elements',
         'label' => c::__('Elements'),
