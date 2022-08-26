@@ -109,11 +109,23 @@ class CF {
         }
     }
     requireJs(url, callback) {
-        if (!~this.required.indexOf(url)) {
-            this.required.push(url);
-            if (document.querySelector('link[href="' + url + '"],script[src="' + url + '"]') !== null) {
-                return;
+        if (typeof url != 'string') {
+            url = url[0];
+        }
+
+        if (!url) {
+            if (typeof (callback) === 'function') {
+                callback();
             }
+            return;
+        }
+
+        let loaded = ~this.required.indexOf(url);
+        if(!loaded) {
+            loaded = document.querySelector('link[href="' + url + '"],script[src="' + url + '"]') !== null;
+        }
+        if (!loaded) {
+            this.required.push(url);
             let string = '<script type=\'text/javascript\'  src=\'' + url + '\'></script>';
             if ((document.readyState === 'loading' /* || mwd.readyState === 'interactive'*/) && !!window.CanvasRenderingContext2D && self === parent) {
                 document.write(string);
