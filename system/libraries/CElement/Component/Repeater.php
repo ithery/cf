@@ -13,8 +13,8 @@ class CElement_Component_Repeater extends CElement_Component {
 
     protected $minItem;
 
-    public function __construct() {
-        parent::__construct();
+    public function __construct($id = null) {
+        parent::__construct($id);
         $this->canDelete = true;
         $this->canAdd = true;
         $this->deleteLabel = 'Delete';

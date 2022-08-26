@@ -36,6 +36,11 @@ return [
         'uri' => 'demo/elements/showMore/index',
     ],
     [
+        'name' => 'elements.progressBar',
+        'label' => c::__('Progress Bar'),
+        'uri' => 'demo/elements/progressBar/index',
+    ],
+    [
         'name' => 'elements.gallery',
         'label' => c::__('Gallery'),
         'uri' => 'demo/elements/gallery/index',

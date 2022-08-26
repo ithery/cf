@@ -247,4 +247,15 @@ trait CObservable_Trait_ComponentTrait {
             $this->wrapper->add($el);
         });
     }
+
+    /**
+     * @param null|string $id
+     *
+     * @return CElement_Component_ProgressBar
+     */
+    public function addProgressBar($id = null) {
+        return c::tap(new CElement_Component_ProgressBar($id), function (CElement_Component_ProgressBar $el) {
+            $this->wrapper->add($el);
+        });
+    }
 }
