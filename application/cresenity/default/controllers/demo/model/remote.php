@@ -12,7 +12,7 @@ class Controller_Demo_Model_Remote extends \Cresenity\Demo\Controller {
         $table->addColumn('userId')->setLabel('userId');
         $table->addColumn('id')->setLabel('ID');
         $table->addColumn('title')->setLabel('Title');
-        $table->addColumn('completed')->setLabel('Completed');
+        $table->addColumn('completed')->setLabel('Completed')->addTransform(['yesNo']);
         $table->setAjax();
 
         return $app;
