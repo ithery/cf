@@ -3,7 +3,7 @@ return [
     [
         'name' => 'elements.table',
         'label' => c::__('Table'),
-        'uri' => 'demo/elements/table/index',
+        'subnav' => include dirname(__FILE__) . '/elements/table.php',
     ],
     [
         'name' => 'elements.widget',
