@@ -49,11 +49,11 @@ class Controller_Demo_App_Javascript extends \Cresenity\Demo\Controller {
         });
 
 
-        $divHtml = $app->addDiv()->addClass('d-inline')->addClass('p-3 border-1');
+        $divHtml = $app->addDiv()->addClass('d-inline-block my-3 p-3 border-1');
         $divHtml->add('Hover me to see');
-        $divHtml->onMouseEnter(function (CObservable_Javascript $js) use ($divHtml) {
+        $divHtml->onMouseEnter(function (CObservable_Javascript $js) {
             $js->jquery()->addClass('bg-primary');
-        })->onMouseLeave(function (CObservable_Javascript $js) use ($divHtml) {
+        })->onMouseLeave(function (CObservable_Javascript $js) {
             $js->jquery()->removeClass('bg-primary');
         });
 

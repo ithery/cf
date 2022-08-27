@@ -16,6 +16,9 @@ trait CObservable_Javascript_JQuery_Trait_EventsTrait {
 
     abstract public function resetJQueryStatement();
 
+    /**
+     * @return CJavascript_Statement_JQuery
+     */
     abstract public function jQueryStatement();
 
     public function onClick($statements, $options = []) {

@@ -11,12 +11,7 @@ defined('SYSPATH') or die('No direct access allowed.');
 trait CObservable_Trait_EventsTrait {
     public function onClick(Closure $event = null, $options = []) {
         /** @var CObservable $this */
-        $compiledJs = '';
-        if ($event instanceof Closure) {
-            $this->javascript()->startDeferred();
-            $event($this->javascript());
-            $compiledJs = $this->javascript()->endDeferred();
-        }
+        $compiledJs = $this->getCompiledEventJs($event);
 
         $this->javascript()->jquery()->onClick($compiledJs);
 
@@ -26,12 +21,7 @@ trait CObservable_Trait_EventsTrait {
 
     public function onHover(Closure $event = null, $options = []) {
         /** @var CObservable $this */
-        $compiledJs = '';
-        if ($event instanceof Closure) {
-            $this->javascript()->startDeferred();
-            $event($this->javascript());
-            $compiledJs = $this->javascript()->endDeferred();
-        }
+        $compiledJs = $this->getCompiledEventJs($event);
 
         $this->javascript()->jquery()->onHover($compiledJs);
 
