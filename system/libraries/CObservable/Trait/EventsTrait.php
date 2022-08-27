@@ -23,7 +23,8 @@ trait CObservable_Trait_EventsTrait {
         return $this;
     }
 
-    public function onChange(Closure $event, $options = []) {
+
+    public function onHover(Closure $event = null, $options = []) {
         /** @var CObservable $this */
         $compiledJs = '';
         if ($event instanceof Closure) {
@@ -32,8 +33,43 @@ trait CObservable_Trait_EventsTrait {
             $compiledJs = $this->javascript()->endDeferred();
         }
 
+        $this->javascript()->jquery()->onHover($compiledJs);
+
+        return $this;
+    }
+
+
+    public function onMouseEnter(Closure $event = null, $options = []) {
+        /** @var CObservable $this */
+        $compiledJs = $this->getCompiledEventJs($event);
+
+        $this->javascript()->jquery()->onMouseEnter($compiledJs);
+
+        return $this;
+    }
+
+
+    public function onMouseLeave(Closure $event = null, $options = []) {
+        /** @var CObservable $this */
+        $compiledJs = $this->getCompiledEventJs($event);
+
+        $this->javascript()->jquery()->onMouseLeave($compiledJs);
+
+        return $this;
+    }
+
+    public function onChange(Closure $event, $options = []) {
+        /** @var CObservable $this */
+        $compiledJs = $this->getCompiledEventJs($event);
         $this->javascript()->jquery()->onChange($compiledJs);
 
         return $this;
+    }
+
+    private function getCompiledEventJs(Closure $event) {
+        /** @var CObservable $this */
+        $this->javascript()->startDeferred();
+        $event($this->javascript());
+        return $this->javascript()->endDeferred();
     }
 }

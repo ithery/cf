@@ -20,6 +20,17 @@ trait CObservable_Javascript_JQuery_Trait_ActionsTrait {
         return $this;
     }
 
+    /**
+     * @param string $class
+     */
+    public function removeClass($class = '') {
+        /** @var CObservable_Javascript_JQuery $this */
+        $this->jQueryStatement()->removeClass($class);
+        $this->resetJQueryStatement();
+
+        return $this;
+    }
+
     public function after($element) {
         /** @var CObservable_Javascript_JQuery $this */
         $this->jQueryStatement()->after($element);
