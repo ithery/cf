@@ -196,4 +196,8 @@ class CObservable_Javascript {
 
         return $arg;
     }
+
+    public function ifStatement($operand1, $operator = null, $operand2 = null) {
+        $statement = new CJavascript_Statement_IfStatement($operand1, $operator, $operand2);
+    }
 }

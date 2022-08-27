@@ -48,13 +48,20 @@ class Controller_Demo_App_Javascript extends \Cresenity\Demo\Controller {
             $js->jquery('#test')->hide();
         });
 
-
         $divHtml = $app->addDiv()->addClass('d-inline-block my-3 p-3 border-1');
         $divHtml->add('Hover me to see');
         $divHtml->onMouseEnter(function (CObservable_Javascript $js) {
             $js->jquery()->addClass('bg-primary');
         })->onMouseLeave(function (CObservable_Javascript $js) {
             $js->jquery()->removeClass('bg-primary');
+        });
+
+        $divWidget = $app->addWidget()->setTitle('Widget Collapsible');
+        $actionCollapse = $divWidget->addHeaderAction()->setLabel('Collapse');
+        $divWidget->add('Some Content <br/> Another Content');
+        $actionCollapse->onClick(function (CObservable_Javascript $js) {
+            $js->jquery()->closest('.widget-box')->find('.widget-content')->slideToggle();
+            $js->jquery()->toggleClass('btn-primary');
         });
 
         return $app;

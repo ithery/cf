@@ -18,7 +18,6 @@ trait CObservable_Trait_EventsTrait {
         return $this;
     }
 
-
     public function onHover(Closure $event = null, $options = []) {
         /** @var CObservable $this */
         $compiledJs = $this->getCompiledEventJs($event);
@@ -28,7 +27,6 @@ trait CObservable_Trait_EventsTrait {
         return $this;
     }
 
-
     public function onMouseEnter(Closure $event = null, $options = []) {
         /** @var CObservable $this */
         $compiledJs = $this->getCompiledEventJs($event);
@@ -37,7 +35,6 @@ trait CObservable_Trait_EventsTrait {
 
         return $this;
     }
-
 
     public function onMouseLeave(Closure $event = null, $options = []) {
         /** @var CObservable $this */
@@ -57,9 +54,6 @@ trait CObservable_Trait_EventsTrait {
     }
 
     private function getCompiledEventJs(Closure $event) {
-        /** @var CObservable $this */
-        $this->javascript()->startDeferred();
-        $event($this->javascript());
-        return $this->javascript()->endDeferred();
+        return CJavascript::getJsStatementFromClosure($event, [$this->javascript()]);
     }
 }
