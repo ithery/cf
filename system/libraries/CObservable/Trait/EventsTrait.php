@@ -17,7 +17,8 @@ trait CObservable_Trait_EventsTrait {
             $event($this->javascript());
             $compiledJs = $this->javascript()->endDeferred();
         }
-        $this->javascript->jquery()->onClick($compiledJs);
+
+        $this->javascript()->jquery()->onClick($compiledJs);
 
         return $this;
     }
