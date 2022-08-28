@@ -2,7 +2,7 @@ import strtotime from 'locutus/php/datetime/strtotime';
 import strlen from 'locutus/php/strings/strlen';
 import is_numeric from 'locutus/php/var/is_numeric';
 import array_diff from 'locutus/php/array/array_diff';
-import DateFormatter from './DateFormatter';
+import DateFormatter from '../formatter/DateFormatter';
 let appValidation = {
 
     implicitRules: ['Required', 'Confirmed'],
@@ -242,12 +242,6 @@ let appValidation = {
  *
  */
 
-
-/*!
- * references from https://github.com/proengsoft/laravel-jsvalidation
- * Timezone Helper functions used by validators
- *
- */
 const initValidation = () => {
     $.extend(true, appValidation, {
 

@@ -44,8 +44,6 @@ class CElement_FormInput_MapPicker extends CElement_FormInput {
         $this->type = 'text';
         $this->tag = 'div';
         $this->addClass('form-control');
-
-        CManager::registerModule('locationpicker');
         //default to Jakarta lat lng
         $this->lat = '-6.200000';
         $this->lng = '106.816666';
@@ -62,6 +60,13 @@ class CElement_FormInput_MapPicker extends CElement_FormInput {
 
         $this->geoCodingApiKey = CF::config('vendor.google.geocoding_api_key');
         $this->rawJsOnChanged;
+        if (strlen($this->geoCodingApiKey) == 0) {
+            throw new Exception('no api key found in config vendor.google.geocoding_api_key');
+        }
+        CManager::registerModule('locationpicker-googleruntime', [
+            'js' => 'https://maps.googleapis.com/maps/api/js?libraries=places&key=' . $this->geoCodingApiKey . ''
+        ]);
+        CManager::registerModule('locationpicker');
     }
 
     public function setValue($val) {
@@ -150,11 +155,7 @@ class CElement_FormInput_MapPicker extends CElement_FormInput {
     }
 
     public function build() {
-        if (strlen($this->geoCodingApiKey) == 0) {
-            throw new Exception('no api key found in config vendor.google.geocoding_api_key');
-        }
-
-        $this->wrapperContainer->add('<script src="https://maps.googleapis.com/maps/api/js?libraries=places&key=' . $this->geoCodingApiKey . '" type="text/javascript"></script>');
+        //$this->wrapperContainer->add('<script src="https://maps.googleapis.com/maps/api/js?libraries=places&key=' . $this->geoCodingApiKey . '" type="text/javascript"></script>');
 
         if ($this->haveSearch) {
             if ($this->searchSelector == null) {

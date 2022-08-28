@@ -231,6 +231,20 @@ trait CObservable_Trait_ControlTrait {
     }
 
     /**
+     * Create Image Ajax Control.
+     *
+     * @param null|string $id
+     *
+     * @return CElement_FormInput_ImageAjax
+     */
+    public function addImageAjaxControl($id = null) {
+        $control = new CElement_FormInput_ImageAjax($id);
+        $this->wrapper->add($control);
+
+        return $control;
+    }
+
+    /**
      * Create Multiple Image Ajax Control.
      *
      * @param null|string $id
@@ -253,6 +267,20 @@ trait CObservable_Trait_ControlTrait {
      */
     public function addEditorJsControl($id = null) {
         $control = new CElement_FormInput_EditorJs($id);
+        $this->wrapper->add($control);
+
+        return $control;
+    }
+
+    /**
+     * Create Text Control.
+     *
+     * @param null|string $id
+     *
+     * @return CElement_FormInput_Radio
+     */
+    public function addRadioControl($id = null) {
+        $control = new CElement_FormInput_Radio($id);
         $this->wrapper->add($control);
 
         return $control;

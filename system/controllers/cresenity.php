@@ -373,6 +373,10 @@ class Controller_Cresenity extends CController {
         return c::response(CF::version());
     }
 
+    public function alive() {
+        return $this->version();
+    }
+
     public function cache($method) {
         if ($method == 'delete') {
             $key = c::request()->key;

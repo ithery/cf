@@ -69,7 +69,7 @@ trait CPeriod_Trait_GetterTrait {
      * @return DateTimeImmutable
      */
     public function ceilingEnd(CPeriod_Precision $precision = null) {
-        $precision ??= $this->precision;
+        $precision = $precision ?: $this->precision;
 
         if ($precision->higherThan($this->precision)) {
             throw CPeriod_Exception_CannotCeilLowerPrecisionException::precisionIsLower($this->precision, $precision);

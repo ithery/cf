@@ -22,6 +22,7 @@ class CElement_FormInput_EditorJs_BlockHandler {
      * @throws CElement_FormInput_EditorJs_EditorJsException
      */
     public function __construct($configuration = null) {
+        require_once DOCROOT . 'system/vendor/HTMLPurifier.auto.php';
         $this->rules = new CElement_FormInput_EditorJs_ConfigLoader($configuration);
     }
 

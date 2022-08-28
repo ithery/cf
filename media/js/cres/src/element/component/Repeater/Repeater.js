@@ -71,7 +71,7 @@ function initRepeater(element) {
 
 export default class Repeater {
     constructor(className, config = {}) {
-        window.myrepeater = this;
+
         // all html elements
         this.elements =
             className instanceof Element

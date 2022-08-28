@@ -5,6 +5,13 @@ const isProduction = process.env.NODE_ENV === 'production';
 module.exports = {
     plugins: {
         tailwindcss: {},
-        autoprefixer: {}
+        autoprefixer: {},
+        'postcss-url':{ url: 'inline' },
+        'postcss-inline-base64': {
+            baseDir: 'src/',
+        },
+        'postcss-import': {
+            path: __dirname,
+        }
     }
 };

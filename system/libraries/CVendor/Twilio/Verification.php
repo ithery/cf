@@ -31,14 +31,15 @@ class CVendor_Twilio_Verification {
      *
      * @param $phoneNumber
      * @param $channel
+     * @param array $options
      *
      * @return CVendor_Twilio_Verification_Result
      */
-    public function startVerification($phoneNumber, $channel) {
+    public function startVerification($phoneNumber, $channel, $options = []) {
         try {
             $verification = $this->client->verify->v2->services($this->verificationSid)
                 ->verifications
-                ->create($phoneNumber, $channel);
+                ->create($phoneNumber, $channel, $options);
 
             return new CVendor_Twilio_Verification_Result($verification->sid);
         } catch (TwilioException $exception) {

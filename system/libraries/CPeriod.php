@@ -296,4 +296,26 @@ class CPeriod implements IteratorAggregate {
 
         throw CPeriod_Exception_CannotComparePeriodException::precisionDoesNotMatch();
     }
+
+    /**
+     * @param  array{
+     *             monday?: array<string|array>,
+     *             tuesday?: array<string|array>,
+     *             wednesday?: array<string|array>,
+     *             thursday?: array<string|array>,
+     *             friday?: array<string|array>,
+     *             saturday?: array<string|array>,
+     *             sunday?: array<string|array>,
+     *             exceptions?: array<array<string|array>>,
+     *             filters?: callable[],
+     *             overflow?: bool,
+     *         }                         $data
+     * @param null|string|DateTimeZone $timezone
+     * @param null|string|DateTimeZone $outputTimezone
+     *
+     * @return CPeriod_OpeningHours
+     */
+    public static function openingHours(array $data, $timezone = null, $outputTimezone = null) {
+        return CPeriod_OpeningHours::create($data, $timezone, $outputTimezone);
+    }
 }

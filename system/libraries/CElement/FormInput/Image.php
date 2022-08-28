@@ -32,7 +32,7 @@ class CElement_FormInput_Image extends CElement_FormInput {
         $this->maxWidth = '200';
         $this->maxHeight = '150';
         $this->disabledUpload = false;
-        $this->templateName = 'cresenity/element/form-input/image';
+        $this->view = 'cresenity/element/form-input/image';
 
         $this->onBeforeParse(function (CView_View $view) {
             $view->with('id', $this->id);

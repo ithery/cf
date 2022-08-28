@@ -1620,6 +1620,17 @@ class c {
     public static function carbon($time = null, $tz = null) {
         return new CCarbon($time, $tz);
     }
+
+    public static function call($callback, array $args = []) {
+        if (is_callable($callback)) {
+            return call_user_func_array($callback, $args);
+        }
+        if ($callback instanceof \Opis\Closure\SerializableClosure) {
+            return $callback->__invoke(...$args);
+        }
+
+        throw new Exception('callback is not callable');
+    }
 }
 
 // End c
