@@ -29,6 +29,16 @@ class Controller_Demo_Elements_Table_Action extends \Cresenity\Demo\Controller {
         });
         $table->addColumn('num')->setLabel('Number');
         $table->addColumn('isd')->setLabel('ISD')->setAlign('right');
+        $table->addColumn('isd')->setLabel('ISD H/L')->setCallback(function ($row, $value) {
+            return $value > 100 ? 'HIGH' : 'LOW';
+        })->setSearchCallback(function ($q, $keyword) {
+            if ($keyword == 'HIGH') {
+                $q->where('isd', '>', 100);
+            }
+            if ($keyword == 'LOW') {
+                $q->where('isd', '<=', 100);
+            }
+        });
         $table->setAjax(true);
         $table->setRowActionStyle('btn-dropdown');
         $table->addRowAction()->setLabel('Edit')

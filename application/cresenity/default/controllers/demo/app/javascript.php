@@ -5,6 +5,9 @@ class Controller_Demo_App_Javascript extends \Cresenity\Demo\Controller {
         $app = c::app();
 
         $app->setTitle('Javascript');
+
+        $app->addH5()->addClass('py-4')->add('Don\'t use on PRODUCTION');
+
         $div = $app->addDiv();
 
         $js = $div->javascript();

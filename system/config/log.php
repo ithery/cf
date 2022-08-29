@@ -10,7 +10,7 @@ use Monolog\Handler\SyslogUdpHandler;
  */
 
 return [
-    'threshold' => LOG_WARNING, //LOG_WARNING ,4
+    'threshold' => CF::isProduction() ? LOG_WARNING : LOG_INFO, //LOG_WARNING ,4
 
     /*
     |--------------------------------------------------------------------------

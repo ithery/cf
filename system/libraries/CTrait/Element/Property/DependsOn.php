@@ -49,13 +49,17 @@ trait CTrait_Element_Property_DependsOn {
                 let jQueryTarget = $('" . $targetSelector . "');
                 jQueryTarget.empty();
                 if(typeof data == 'object') {
-                    if(typeof data.html === 'undefined') {
-                        cresenity.htmlModal(data);
+                    if(data.value) {
+                        jQueryTarget.html(data.value);
                     } else {
-                        jQueryTarget.html(data.html);
-                        if (data.js && data.js.length > 0) {
-                            let script = cresenity.base64.decode(data.js);
-                            eval(script);
+                        if(typeof data.html === 'undefined') {
+                            cresenity.htmlModal(data);
+                        } else {
+                            jQueryTarget.html(data.html);
+                            if (data.js && data.js.length > 0) {
+                                let script = cresenity.base64.decode(data.js);
+                                eval(script);
+                            }
                         }
                     }
                 } else {
