@@ -116,7 +116,6 @@ class CLogger {
         if (!is_numeric($level)) {
             $level = static::EMERGENCY;
         }
-
         if ($level >= $this->threshold) {
             return;
         }
