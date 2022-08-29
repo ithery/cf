@@ -33,10 +33,10 @@ class Controller_Demo_Elements_Table_Action extends \Cresenity\Demo\Controller {
             return $value > 100 ? 'HIGH' : 'LOW';
         })->setSearchCallback(function ($q, $keyword) {
             if ($keyword == 'HIGH') {
-                return $q->where('isd', '>', 100);
+                $q->where('isd', '>', 100);
             }
             if ($keyword == 'LOW') {
-                return $q->where('isd', '<=', 100);
+                $q->where('isd', '<=', 100);
             }
         });
         $table->setAjax(true);
