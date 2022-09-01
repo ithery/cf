@@ -32,4 +32,9 @@ return [
         'label' => c::__('Cres JS'),
         'subnav' => include dirname(__FILE__) . '/demo/cresjs.php',
     ],
+    [
+        'name' => 'module',
+        'label' => c::__('Module'),
+        'subnav' => include dirname(__FILE__) . '/demo/module.php',
+    ],
 ];

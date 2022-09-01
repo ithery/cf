@@ -2,35 +2,50 @@
 use React\EventLoop\Factory;
 
 class Controller_Demo_Module_Bot extends \Cresenity\Demo\Controller {
-    public function index() {
-        $config = [
-            'bot_id' => uniqid(),
-        ];
-        $bot = CBot::createBot($config);
+    /**
+     * @var CBot_Bot
+     */
+    protected $bot;
 
-        $bot->hears('Hello CApp Bot!', function ($bot) {
-            $bot->reply('Hello!');
-            $bot->ask('Whats your name?', function ($answer, $bot) {
-                $bot->say('Welcome ' . $answer->getText());
-            });
-        });
-
-        $bot->listen();
+    public function __construct() {
+        parent::__construct();
+        $this->bot = CBot::createBot([
+            'driver' => 'web',
+            'bot_id' => 'web'
+        ]);
     }
 
-    public function discord() {
-        $loop = Factory::create();
+    public function index() {
+        $app = c::app();
+        $app->setTitle('Chat Bot');
 
-        $bot = CBot::createForDiscord([
-            'discord' => [
-                'token' => 'ODg2NjY3Njg3MDgwNjMyMzgx.YT47og.RWbJwD4zwSYnaWEkm0ZsbT_sIQk',
-            ]
-        ], $loop);
+        $app->addView('demo.page.module.bot');
 
-        $bot->hears('hello', function ($bot) {
-            $bot->reply('Hi there!');
+        return $app;
+    }
+
+    public function frame() {
+        return c::view('demo.page.module.bot.frame');
+    }
+
+    public function api() {
+        $this->bot->hears('{message}', function ($botman, $message) {
+            if ($message == 'Hi') {
+                $this->askName($botman);
+            } else {
+                $botman->reply("Write 'Hi' for testing...");
+            }
         });
 
-        $loop->run();
+        $this->bot->listen();
+    }
+
+    public function askName(CBot_Bot $botman) {
+        $botman->ask('Hello! What is your Name?', function (CBot_Message_Incoming_Answer $answer) {
+            /** @var CBot_Message_Conversation_InlineConversation $this */
+            $name = $answer->getText();
+
+            $this->say('Nice to meet you ' . $name);
+        });
     }
 }
