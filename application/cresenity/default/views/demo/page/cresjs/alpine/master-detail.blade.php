@@ -169,13 +169,10 @@
                             if (confirmed) {
                                 this.items.splice(index, 1); // 2nd parameter means remove one item only
                             }
-
                         }
                     });
-
                 }
             },
-
             recalculate() {
                 let itemTotal = 0;
 
