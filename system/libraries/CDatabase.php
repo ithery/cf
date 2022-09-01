@@ -1032,6 +1032,11 @@ class CDatabase {
         $this->events = $events;
     }
 
+    public function unsetEventDispatcher() {
+        $this->events = null;
+        return $this;
+    }
+
     /**
      * Get the query grammar used by the connection.
      *

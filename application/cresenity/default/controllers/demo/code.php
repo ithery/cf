@@ -25,9 +25,26 @@ class Controller_Demo_Code extends \Cresenity\Demo\Controller {
             if (is_array($matches)) {
                 foreach ($matches[1] as $view) {
                     $viewPath = CView_Finder::instance()->find($view);
-                    $div->addH5()->addClass('mt-4')->add($view);
-                    $viewCode = CFile::get($viewPath);
-                    $div->addPrismCode()->add(c::e($viewCode));
+                    $div->addH5()->addClass('mt-4')->add('View:' . $view);
+                    if (CFile::exists($viewPath)) {
+                        $viewCode = CFile::get($viewPath);
+                        $div->addPrismCode()->add(c::e($viewCode));
+                    } else {
+                        $div->add('View:' . $viewPath . ' not found');
+                    }
+                }
+            }
+            preg_match_all('#c::view\(\'(.+?)\'#ims', $code, $matches);
+            if (is_array($matches)) {
+                foreach ($matches[1] as $view) {
+                    $viewPath = CView_Finder::instance()->find($view);
+                    $div->addH5()->addClass('mt-4')->add('View:' . $view);
+                    if (CFile::exists($viewPath)) {
+                        $viewCode = CFile::get($viewPath);
+                        $div->addPrismCode()->add(c::e($viewCode));
+                    } else {
+                        $div->add('View:' . $viewPath . ' not found');
+                    }
                 }
             }
 
@@ -60,7 +77,7 @@ class Controller_Demo_Code extends \Cresenity\Demo\Controller {
                         $filePath = CF::findFile('libraries', $routingFile);
                     }
                     if ($filePath) {
-                        $div->addH5()->addClass('mt-4')->add($class);
+                        $div->addH5()->addClass('mt-4')->add('Model:' . $class);
                         $fileCode = CFile::get($filePath);
                         $div->addPrismCode()->add(c::e($fileCode));
                     }

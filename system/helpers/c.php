@@ -986,10 +986,12 @@ class c {
     /**
      * Get the CDatabase instance.
      *
+     * @param null|string $name
+     *
      * @return \CDatabase
      */
-    public static function db() {
-        return CDatabase::instance();
+    public static function db($name = null) {
+        return CDatabase::instance($name);
     }
 
     public static function userAgent() {

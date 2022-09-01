@@ -8,6 +8,13 @@ class CDatabase_TransactionManager {
     protected $transactions;
 
     /**
+     * The database transaction that should be ignored by callbacks.
+     *
+     * @var \CDatabase_TransactionRecord
+     */
+    protected $callbacksShouldIgnore;
+
+    /**
      * Create a new database transactions manager instance.
      *
      * @return void
@@ -77,6 +84,19 @@ class CDatabase_TransactionManager {
         }
 
         $callback();
+    }
+
+    /**
+     * Specify that callbacks should ignore the given transaction when determining if they should be executed.
+     *
+     * @param \CDatabase_TransactionRecord $transaction
+     *
+     * @return $this
+     */
+    public function callbacksShouldIgnore(CDatabase_TransactionRecord $transaction) {
+        $this->callbacksShouldIgnore = $transaction;
+
+        return $this;
     }
 
     /**

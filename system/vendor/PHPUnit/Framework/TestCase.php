@@ -92,7 +92,6 @@ use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Util\Exception as UtilException;
 use SebastianBergmann\Comparator\Comparator;
 use PHPUnit\Framework\MockObject\MockBuilder;
-use SebastianBergmann\GlobalState\ExcludeList;
 use PHPUnit\Framework\Exception\RiskyTestError;
 use PHPUnit\Framework\Exception\SkippedTestError;
 use PHPUnit\Framework\MockObject\Stub\ReturnStub;
@@ -106,6 +105,7 @@ use PHPUnit\Framework\MockObject\Generator as MockGenerator;
 use SebastianBergmann\Comparator\Factory as ComparatorFactory;
 use PHPUnit\Framework\MockObject\Stub\Exception as ExceptionStub;
 use PHPUnit\Framework\MockObject\Stub\ReturnSelf as ReturnSelfStub;
+use SebastianBergmann\GlobalState\ExcludeList as GlobalStateExcludeList;
 use PHPUnit\Framework\MockObject\Rule\InvokedCount as InvokedCountMatcher;
 use PHPUnit\Framework\MockObject\Stub\ReturnArgument as ReturnArgumentStub;
 use PHPUnit\Framework\MockObject\Stub\ReturnCallback as ReturnCallbackStub;
@@ -173,6 +173,11 @@ abstract class TestCase extends Assert implements Reorderable, SelfDescribing, T
      * @var list<ExecutionOrderDependency>
      */
     protected $providedTests = [];
+
+    /**
+     * @var null|bool
+     */
+    private $backupStaticProperties = null;
 
     /**
      * @var bool
@@ -357,6 +362,8 @@ abstract class TestCase extends Assert implements Reorderable, SelfDescribing, T
     /**
      * Returns a matcher that matches when the method is executed
      * zero or more times.
+     *
+     * @return AnyInvokedCountMatcher
      */
     public static function any() {
         return new AnyInvokedCountMatcher();
@@ -364,6 +371,8 @@ abstract class TestCase extends Assert implements Reorderable, SelfDescribing, T
 
     /**
      * Returns a matcher that matches when the method is never executed.
+     *
+     * @return InvokedCountMatcher
      */
     public static function never() {
         return new InvokedCountMatcher(0);
@@ -374,6 +383,8 @@ abstract class TestCase extends Assert implements Reorderable, SelfDescribing, T
      * at least N times.
      *
      * @param mixed $requiredInvocations
+     *
+     * @return InvokedAtLeastCountMatcher
      */
     public static function atLeast($requiredInvocations) {
         return new InvokedAtLeastCountMatcher(
@@ -383,6 +394,8 @@ abstract class TestCase extends Assert implements Reorderable, SelfDescribing, T
 
     /**
      * Returns a matcher that matches when the method is executed at least once.
+     *
+     * @return InvokedAtLeastOnceMatcher
      */
     public static function atLeastOnce() {
         return new InvokedAtLeastOnceMatcher();
@@ -390,6 +403,8 @@ abstract class TestCase extends Assert implements Reorderable, SelfDescribing, T
 
     /**
      * Returns a matcher that matches when the method is executed exactly once.
+     *
+     * @return InvokedCountMatcher
      */
     public static function once() {
         return new InvokedCountMatcher(1);
@@ -399,7 +414,9 @@ abstract class TestCase extends Assert implements Reorderable, SelfDescribing, T
      * Returns a matcher that matches when the method is executed
      * exactly $count times.
      *
-     * @param mixed $count
+     * @param int $count
+     *
+     * @return InvokedCountMatcher
      */
     public static function exactly($count) {
         return new InvokedCountMatcher($count);
@@ -409,43 +426,28 @@ abstract class TestCase extends Assert implements Reorderable, SelfDescribing, T
      * Returns a matcher that matches when the method is executed
      * at most N times.
      *
-     * @param mixed $allowedInvocations
+     * @param int $allowedInvocations
+     *
+     * @return InvokedAtMostCountMatcher
      */
     public static function atMost($allowedInvocations) {
         return new InvokedAtMostCountMatcher($allowedInvocations);
     }
 
     /**
-     * Returns a matcher that matches when the method is executed
-     * at the given index.
+     * @param mixed $value
      *
-     * @deprecated https://github.com/sebastianbergmann/phpunit/issues/4297
-     * @codeCoverageIgnore
-     *
-     * @param mixed $index
+     * @return ReturnStub
      */
-    public static function at($index) {
-        $stack = debug_backtrace();
-
-        while (!empty($stack)) {
-            $frame = array_pop($stack);
-
-            if (isset($frame['object']) && $frame['object'] instanceof self) {
-                $frame['object']->addWarning(
-                    'The at() matcher has been deprecated. It will be removed in PHPUnit 10. Please refactor your test to not rely on the order in which methods are invoked.'
-                );
-
-                break;
-            }
-        }
-
-        return new InvokedAtIndexMatcher($index);
-    }
-
     public static function returnValue($value) {
         return new ReturnStub($value);
     }
 
+    /**
+     * @param array $valueMap
+     *
+     * @return ReturnValueMapStub
+     */
     public static function returnValueMap(array $valueMap) {
         return new ReturnValueMapStub($valueMap);
     }
@@ -571,22 +573,22 @@ abstract class TestCase extends Assert implements Reorderable, SelfDescribing, T
             case Deprecated::class:
                 $this->addWarning('Support for using expectException() with PHPUnit\Framework\Error\Deprecated is deprecated and will be removed in PHPUnit 10. Use expectDeprecation() instead.');
 
-            break;
+                break;
 
             case Error::class:
                 $this->addWarning('Support for using expectException() with PHPUnit\Framework\Error\Error is deprecated and will be removed in PHPUnit 10. Use expectError() instead.');
 
-            break;
+                break;
 
             case Notice::class:
                 $this->addWarning('Support for using expectException() with PHPUnit\Framework\Error\Notice is deprecated and will be removed in PHPUnit 10. Use expectNotice() instead.');
 
-            break;
+                break;
 
             case WarningError::class:
                 $this->addWarning('Support for using expectException() with PHPUnit\Framework\Error\Warning is deprecated and will be removed in PHPUnit 10. Use expectWarning() instead.');
 
-            break;
+                break;
         }
         // @codeCoverageIgnoreEnd
 
@@ -2272,18 +2274,10 @@ abstract class TestCase extends Assert implements Reorderable, SelfDescribing, T
     }
 
     private function createGlobalStateSnapshot($backupGlobals) {
-        $excludeList = new ExcludeList();
+        $excludeList = new GlobalStateExcludeList();
 
         foreach ($this->backupGlobalsExcludeList as $globalVariable) {
             $excludeList->addGlobalVariable($globalVariable);
-        }
-
-        if (!empty($this->backupGlobalsBlacklist)) {
-            $this->addWarning('PHPUnit\Framework\TestCase::$backupGlobalsBlacklist is deprecated and will be removed in PHPUnit 10. Please use PHPUnit\Framework\TestCase::$backupGlobalsExcludeList instead.');
-
-            foreach ($this->backupGlobalsBlacklist as $globalVariable) {
-                $excludeList->addGlobalVariable($globalVariable);
-            }
         }
 
         if (!defined('PHPUNIT_TESTSUITE')) {
@@ -2301,16 +2295,6 @@ abstract class TestCase extends Assert implements Reorderable, SelfDescribing, T
             foreach ($this->backupStaticAttributesExcludeList as $class => $attributes) {
                 foreach ($attributes as $attribute) {
                     $excludeList->addStaticAttribute($class, $attribute);
-                }
-            }
-
-            if (!empty($this->backupStaticAttributesBlacklist)) {
-                $this->addWarning('PHPUnit\Framework\TestCase::$backupStaticAttributesBlacklist is deprecated and will be removed in PHPUnit 10. Please use PHPUnit\Framework\TestCase::$backupStaticAttributesExcludeList instead.');
-
-                foreach ($this->backupStaticAttributesBlacklist as $class => $attributes) {
-                    foreach ($attributes as $attribute) {
-                        $excludeList->addStaticAttribute($class, $attribute);
-                    }
                 }
             }
         }

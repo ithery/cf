@@ -651,7 +651,7 @@ final class CF {
      * @return string
      */
     public static function cliDomain() {
-        $domain = null;
+        $domain = static::cliAppCode() . '.test';
         if (defined('CFCLI_APPCODE')) {
             return constant('CFCLI_APPCODE') . '.test';
         }

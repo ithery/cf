@@ -409,4 +409,8 @@ class Controller_Cresenity extends CController {
             }
         }
     }
+
+    public function chat() {
+        return c::view('cresenity.bot.chat');
+    }
 }

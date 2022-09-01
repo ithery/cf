@@ -231,6 +231,20 @@ trait CObservable_Trait_ControlTrait {
     }
 
     /**
+     * Create Image Control.
+     *
+     * @param null|string $id
+     *
+     * @return CElement_FormInput_Image
+     */
+    public function addImageControl($id = null) {
+        $control = new CElement_FormInput_Image($id);
+        $this->wrapper->add($control);
+
+        return $control;
+    }
+
+    /**
      * Create Image Ajax Control.
      *
      * @param null|string $id

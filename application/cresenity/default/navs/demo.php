@@ -20,18 +20,7 @@ return [
     [
         'name' => 'controls',
         'label' => c::__('Controls'),
-        'subnav' => [
-            [
-                'name' => 'controls.text',
-                'label' => c::__('Text'),
-                'uri' => 'demo/controls/text/index',
-            ],
-            [
-                'name' => 'controls.password',
-                'label' => c::__('Password'),
-                'uri' => 'demo/controls/password/index',
-            ],
-        ]
+        'subnav' => include dirname(__FILE__) . '/demo/controls.php',
     ],
     [
         'name' => 'model',
@@ -42,5 +31,10 @@ return [
         'name' => 'cresjs',
         'label' => c::__('Cres JS'),
         'subnav' => include dirname(__FILE__) . '/demo/cresjs.php',
+    ],
+    [
+        'name' => 'module',
+        'label' => c::__('Module'),
+        'subnav' => include dirname(__FILE__) . '/demo/module.php',
     ],
 ];
