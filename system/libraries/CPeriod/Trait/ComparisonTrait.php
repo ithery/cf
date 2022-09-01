@@ -2,49 +2,54 @@
 
 /** @mixin CPeriod */
 trait CPeriod_Trait_ComparisonTrait {
-    public function startsBefore(DateTimeInterface $date): bool {
+    public function startsBefore(DateTimeInterface $date) {
         return $this->includedStart() < $date;
     }
 
-    public function startsBeforeOrAt(DateTimeInterface $date): bool {
+    public function startsBeforeOrAt(DateTimeInterface $date) {
         return $this->includedStart() <= $date;
     }
 
-    public function startsAfter(DateTimeInterface $date): bool {
+    public function startsAfter(DateTimeInterface $date) {
         return $this->includedStart() > $date;
     }
 
-    public function startsAfterOrAt(DateTimeInterface $date): bool {
+    public function startsAfterOrAt(DateTimeInterface $date) {
         return $this->includedStart() >= $date;
     }
 
-    public function startsAt(DateTimeInterface $date): bool {
+    public function startsAt(DateTimeInterface $date) {
         return $this->includedStart()->getTimestamp()
             === $this->precision->roundDate($date)->getTimestamp();
     }
 
-    public function endsBefore(DateTimeInterface $date): bool {
+    public function endsBefore(DateTimeInterface $date) {
         return $this->includedEnd() < $this->precision->roundDate($date);
     }
 
-    public function endsBeforeOrAt(DateTimeInterface $date): bool {
+    public function endsBeforeOrAt(DateTimeInterface $date) {
         return $this->includedEnd() <= $this->precision->roundDate($date);
     }
 
-    public function endsAfter(DateTimeInterface $date): bool {
+    public function endsAfter(DateTimeInterface $date) {
         return $this->includedEnd() > $this->precision->roundDate($date);
     }
 
-    public function endsAfterOrAt(DateTimeInterface $date): bool {
+    public function endsAfterOrAt(DateTimeInterface $date) {
         return $this->includedEnd() >= $this->precision->roundDate($date);
     }
 
-    public function endsAt(DateTimeInterface $date): bool {
+    public function endsAt(DateTimeInterface $date) {
         return $this->includedEnd()->getTimestamp()
             === $this->precision->roundDate($date)->getTimestamp();
     }
 
-    public function overlapsWith(CPeriod $period): bool {
+    /**
+     * @param CPeriod $period
+     *
+     * @return bool
+     */
+    public function overlapsWith(CPeriod $period) {
         $this->ensurePrecisionMatches($period);
 
         if ($this->includedStart() > $period->includedEnd()) {
@@ -58,7 +63,12 @@ trait CPeriod_Trait_ComparisonTrait {
         return true;
     }
 
-    public function touchesWith(CPeriod $other): bool {
+    /**
+     * @param CPeriod $other
+     *
+     * @return bool
+     */
+    public function touchesWith(CPeriod $other) {
         $this->ensurePrecisionMatches($other);
 
         if ($this->includedEnd() < $other->includedStart()) {
@@ -99,7 +109,7 @@ trait CPeriod_Trait_ComparisonTrait {
      *
      * @return bool
      */
-    public function contains($other): bool {
+    public function contains($other) {
         if ($other instanceof CPeriod) {
             return $this->includedStart() <= $other->includedStart()
                 && $this->includedEnd() >= $other->includedEnd();
@@ -110,7 +120,12 @@ trait CPeriod_Trait_ComparisonTrait {
         return $roundedDate >= $this->includedStart() && $roundedDate <= $this->includedEnd();
     }
 
-    public function equals(CPeriod $period): bool {
+    /**
+     * @param CPeriod $period
+     *
+     * @return bool
+     */
+    public function equals(CPeriod $period) {
         $this->ensurePrecisionMatches($period);
 
         if ($period->includedStart()->getTimestamp() !== $this->includedStart()->getTimestamp()) {

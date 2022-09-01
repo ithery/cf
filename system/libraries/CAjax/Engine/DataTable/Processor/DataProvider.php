@@ -77,12 +77,36 @@ class CAjax_Engine_DataTable_Processor_DataProvider extends CAjax_Engine_DataTab
                 $fieldName = $column->getFieldname();
 
                 if (isset($request['bSearchable_' . ($i + $i2)]) && $request['bSearchable_' . ($i + $i2)] == 'true') {
-                    $searchData[$fieldName] = $request['sSearch'];
+                    if ($callback = $column->getSearchCallback()) {
+                        $table = $this->table();
+                        $query = $table->getQuery();
+                        if (!($query instanceof CManager_DataProvider_ModelDataProvider)) {
+                            throw new Exception('SearchCallback only running on ModelDataProvider');
+                        }
+                        $keyword = $request['sSearch'];
+                        $searchData[$fieldName] = $this->createSearchCallable($callback, $keyword);
+                    } else {
+                        $searchData[$fieldName] = $request['sSearch'];
+                    }
                 }
             }
         }
 
         return $searchData;
+    }
+
+    protected function createSearchCallable($callback, $keyword) {
+        return function ($q) use ($keyword, $callback) {
+            $args = [$q, $keyword];
+            if (is_callable($callback)) {
+                return call_user_func_array($callback, $args);
+            }
+            if ($callback instanceof \Opis\Closure\SerializableClosure) {
+                return $callback->__invoke(...$args);
+            }
+
+            throw new Exception('callback is not callable on ' . __CLASS__);
+        };
     }
 
     protected function getSearchDataAnd() {

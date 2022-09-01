@@ -1,13 +1,13 @@
 <?php
 
-use PHPUnit\Framework\Constraint\Constraint;
 use PHPUnit\Runner\Version;
+use PHPUnit\Framework\Constraint\Constraint;
 use SebastianBergmann\Comparator\ComparisonFailure;
 
 /**
- * @internal This class is not meant to be used or overwritten outside the framework itself.
+ * @internal this class is not meant to be used or overwritten outside the framework itself
  */
-final class ArraySubset extends Constraint {
+final class CTesting_Constraint_ArraySubset extends Constraint {
     /**
      * @var iterable
      */
@@ -45,10 +45,10 @@ final class ArraySubset extends Constraint {
      * @param string $description
      * @param bool   $returnResult
      *
-     * @return bool|null
-     *
      * @throws \PHPUnit\Framework\ExpectationFailedException
      * @throws \SebastianBergmann\RecursionContext\InvalidArgumentException
+     *
+     * @return null|bool
      */
     public function evaluate($other, $description = '', $returnResult = false) {
         // type cast $other & $this->subset as an array to allow
@@ -101,9 +101,9 @@ final class ArraySubset extends Constraint {
      *
      * @param mixed $other
      *
-     * @return string
-     *
      * @throws \SebastianBergmann\RecursionContext\InvalidArgumentException
+     *
+     * @return string
      */
     protected function failureDescription($other): string {
         return 'an array ' . $this->toString();

@@ -16,6 +16,9 @@ trait CObservable_Javascript_JQuery_Trait_EventsTrait {
 
     abstract public function resetJQueryStatement();
 
+    /**
+     * @return CJavascript_Statement_JQuery
+     */
     abstract public function jQueryStatement();
 
     public function onClick($statements, $options = []) {
@@ -26,6 +29,46 @@ trait CObservable_Javascript_JQuery_Trait_EventsTrait {
             $statements = $statements->getStatement();
         }
         $statement = $this->jQueryStatement()->event('click', $statements, $options);
+        $this->resetJQueryStatement();
+
+        return $this;
+    }
+
+
+    public function onHover($statements, $options = []) {
+        $retFalse = carr::get($options, 'retFalse', true);
+        $preventDefault = carr::get($options, 'preventDefault', false);
+        $stopPropagation = carr::get($options, 'stopPropagation', false);
+        if ($statements instanceof CJavascript_Statement) {
+            $statements = $statements->getStatement();
+        }
+        $statement = $this->jQueryStatement()->event('hover', $statements, $options);
+        $this->resetJQueryStatement();
+
+        return $this;
+    }
+
+    public function onMouseEnter($statements, $options = []) {
+        $retFalse = carr::get($options, 'retFalse', true);
+        $preventDefault = carr::get($options, 'preventDefault', false);
+        $stopPropagation = carr::get($options, 'stopPropagation', false);
+        if ($statements instanceof CJavascript_Statement) {
+            $statements = $statements->getStatement();
+        }
+        $statement = $this->jQueryStatement()->event('mouseenter', $statements, $options);
+        $this->resetJQueryStatement();
+
+        return $this;
+    }
+
+    public function onMouseLeave($statements, $options = []) {
+        $retFalse = carr::get($options, 'retFalse', true);
+        $preventDefault = carr::get($options, 'preventDefault', false);
+        $stopPropagation = carr::get($options, 'stopPropagation', false);
+        if ($statements instanceof CJavascript_Statement) {
+            $statements = $statements->getStatement();
+        }
+        $statement = $this->jQueryStatement()->event('mouseleave', $statements, $options);
         $this->resetJQueryStatement();
 
         return $this;

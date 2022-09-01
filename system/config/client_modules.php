@@ -750,5 +750,14 @@ return [
         ],
 
     ],
+    'aos' => [
+        'js' => [
+            'plugins/aos/aos.js',
+        ],
+        'css' => [
+            'plugins/aos/aos.css',
+        ],
+
+    ],
 
 ];

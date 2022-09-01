@@ -26,4 +26,11 @@ return [
     */
     'user_cache_time' => 30,
 
+    'drivers' => [
+        'web' => [
+            'matchingData' => [
+                'driver' => 'web',
+            ]
+        ]
+    ]
 ];

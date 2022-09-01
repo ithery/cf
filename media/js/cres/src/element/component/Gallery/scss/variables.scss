@@ -1,0 +1,68 @@
+$cres-gallery-backdrop-opacity: 1 !default;
+$cres-gallery-toolbar-bg: linear-gradient(
+    0deg,
+    rgba(0, 0, 0, 0),
+    rgba(0, 0, 0, 0.4)
+) !default;
+$cres-gallery-border-radius-base: 2px !default;
+$cres-gallery-theme-highlight: rgb(169, 7, 7) !default;
+$cres-gallery-theme-color: #000 !default;
+
+// basic icon colours
+$cres-gallery-icon-bg: rgba(0, 0, 0, 0.45) !default;
+$cres-gallery-icon-color: #999 !default;
+$cres-gallery-icon-hover-color: #fff !default;
+
+// counter
+$cres-gallery-counter-color: #e6e6e6 !default;
+$cres-gallery-counter-font-size: 16px !default;
+
+// Next prev icons
+$cres-gallery-next-prev-bg: $cres-gallery-icon-bg !default;
+$cres-gallery-next-prev-color: $cres-gallery-icon-color !default;
+$cres-gallery-next-prev-hover-color: $cres-gallery-icon-hover-color !default;
+
+// toolbar icons
+$cres-gallery-toolbar-icon-color: $cres-gallery-icon-color !default;
+$cres-gallery-toolbar-icon-hover-color: $cres-gallery-icon-hover-color !default;
+$cres-gallery-toolbar-icon-disabled-opacity: 0.75 !default;
+
+// autoplay progress bar
+$cres-gallery-progress-bar-bg: #333 !default;
+$cres-gallery-progress-bar-active-bg: $cres-gallery-theme-highlight !default;
+$cres-gallery-progress-bar-height: 5px !default;
+
+// paths
+$cres-gallery-path-fonts: 'fonts' !default;
+$cres-gallery-path-images: 'images' !default;
+
+// Zoom plugin
+$zoom-transition-duration: 0.5s !default;
+
+// Sub html - titile
+$cres-gallery-sub-html-bg: linear-gradient(
+    180deg,
+    rgba(0, 0, 0, 0),
+    rgba(0, 0, 0, 0.6)
+) !default;
+$cres-gallery-sub-html-color: #eee !default;
+
+// thumbnail toggle button
+$cres-gallery-thumb-toggle-bg: #0d0a0a !default;
+$cres-gallery-thumb-toggle-color: $cres-gallery-icon-color !default;
+$cres-gallery-thumb-bg: #0d0a0a !default;
+$cres-gallery-thumb-container-height: 100px;
+
+// Pager
+
+// z-index
+$zindex-outer: 9050 !default;
+$zindex-progressbar: 9083 !default;
+$zindex-controls: 9080 !default;
+$zindex-toolbar: 9082 !default;
+$zindex-subhtml: 9080 !default;
+$zindex-components: 9080 !default;
+$zindex-pager: 9080 !default;
+$zindex-playbutton: 9080 !default;
+$zindex-item: 9060 !default;
+$zindex-backdrop: 9040 !default;

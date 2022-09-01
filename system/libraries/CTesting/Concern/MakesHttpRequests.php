@@ -630,6 +630,8 @@ trait CTesting_Concern_MakesHttpRequests {
      * @return CTesting_TestResponse
      */
     protected function createTestResponse($response) {
-        return CTesting_TestResponse::fromBaseResponse($response);
+        return c::tap(CTesting_TestResponse::fromBaseResponse($response), function ($response) {
+            $response->withExceptions(CTesting::loggedExceptionCollection());
+        });
     }
 }

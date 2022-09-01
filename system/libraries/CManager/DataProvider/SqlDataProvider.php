@@ -19,7 +19,7 @@ class CManager_DataProvider_SqlDataProvider extends CManager_DataProviderAbstrac
     }
 
     protected function getQuery() {
-        return c::db($this->connection)->compileBinds($this->sql, $this->bindings);
+        return $this->getDb()->compileBinds($this->sql, $this->bindings);
     }
 
     public function setConnection($connection) {
@@ -27,7 +27,12 @@ class CManager_DataProvider_SqlDataProvider extends CManager_DataProviderAbstrac
     }
 
     public function getConnection() {
-        return c::value($this->connection) ?: 'default';
+        $connection = c::value($this->connection) ?: 'default';
+        if ($connection instanceof SerializableClosure) {
+            $connection = $connection->__invoke();
+        }
+
+        return $connection;
     }
 
     public function getDb() {
@@ -201,7 +206,7 @@ class CManager_DataProvider_SqlDataProvider extends CManager_DataProviderAbstrac
         $q = $this->getBaseQuery();
         // get total record
         $qTotal = 'select count(*) as cnt from (' . $q . ') as a';
-        $rTotal = c::db($this->connection)->query($qTotal);
+        $rTotal = $this->getDb()->query($qTotal);
         $totalRecord = 0;
         if ($rTotal->count() > 0) {
             $totalRecord = $rTotal[0]->cnt;
@@ -216,7 +221,7 @@ class CManager_DataProvider_SqlDataProvider extends CManager_DataProviderAbstrac
         $qFiltered = 'select * from (' . $qBase . ') as a ' . $sWhere;
 
         $qTotalFiltered = 'select count(*) as cnt from (' . $qFiltered . ') as a';
-        $rTotalFiltered = c::db($this->connection)->query($qTotalFiltered);
+        $rTotalFiltered = $this->getDb()->query($qTotalFiltered);
         $totalFilteredRecord = 0;
         if ($rTotalFiltered->count() > 0) {
             $totalFilteredRecord = $rTotalFiltered[0]->cnt;

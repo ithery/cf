@@ -718,6 +718,47 @@ class CVendor_Xendit {
         return $response;
     }
 
+    public function getTransaction($options = []) {
+        $data = [];
+        $endPoint = $this->server_domain . '/transactions';
+
+        if (isset($options['types'])) {
+            $data['types'] = carr::get($options, 'types', []);
+        }
+        if (isset($options['status'])) {
+            $data['statuses'] = carr::get($options, 'status');
+        }
+        if (isset($options['referenceId'])) {
+            $data['reference_id'] = carr::get($options, 'referenceId');
+        }
+        if (isset($options['productId'])) {
+            $data['product_id'] = carr::get($options, 'productId');
+        }
+        if (isset($options['accountIdentifier'])) {
+            $data['account_identifier'] = carr::get($options, 'accountIdentifier');
+        }
+        if (isset($options['currency'])) {
+            $data['currency'] = carr::get($options, 'currency');
+        }
+        if (isset($options['created'])) {
+            $data['created'] = carr::get($options, 'created');
+        }
+        if (isset($options['updated'])) {
+            $data['updated'] = carr::get($options, 'updated');
+        }
+        if (isset($options['afterId'])) {
+            $data['after_id'] = carr::get($options, 'afterId');
+        }
+        if (isset($options['beforeId'])) {
+            $data['before_id'] = carr::get($options, 'beforeId');
+        }
+        if (isset($options['limit'])) {
+            $data['limit'] = carr::get($options, 'limit');
+        }
+        $response = $this->requestToXendit($endPoint, 'GET', $data);
+        return $response;
+    }
+
     public function getQRByExternalId($externalId) {
         $data = [];
         $endPoint = $this->server_domain . '/qr_codes/' . $externalId;

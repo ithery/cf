@@ -398,9 +398,10 @@ trait CApp_Trait_BaseTrait {
      * @return bool
      */
     public static function notAccessible() {
-        cmsg::add('error', clang::__('You do not have access to this module, please call administrator'));
+        $message = c::__('You do not have access to this module, please call administrator');
+        cmsg::add('error', $message);
 
-        return c::redirect('');
+        throw (new CHTTP_Exception_RedirectHttpException($message))->setUri('');
     }
 
     /**

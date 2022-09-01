@@ -18,5 +18,13 @@ return [
     ],
     'waves' => [
         'selector' => '.cres-waves-effect'
-    ]
+    ],
+    'theme'=> [
+        'mode' => null,
+    ],
+    'themes' => [
+        'cresenity'=>[
+
+        ]
+    ],
 ];

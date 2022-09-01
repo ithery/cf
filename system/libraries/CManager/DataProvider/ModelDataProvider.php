@@ -73,22 +73,28 @@ class CManager_DataProvider_ModelDataProvider extends CManager_DataProviderAbstr
             $dataSearch = $this->searchOr;
             $query->where(function (CModel_Query $q) use ($dataSearch, $aggregateFields) {
                 foreach ($dataSearch as $fieldName => $value) {
-                    if (strpos($fieldName, '.') !== false) {
-                        $fields = explode('.', $fieldName);
-
-                        $field = array_pop($fields);
-                        $relation = implode('.', $fields);
-
-                        $q->orWhereHas($relation, function ($q2) use ($value, $field) {
-                            $q2->where($field, 'like', '%' . $value . '%');
+                    if ($this->isCallable($value)) {
+                        $q->orWhere(function ($q) use ($value) {
+                            $this->callCallable($value, [$q]);
                         });
                     } else {
-                        //check this is aggregate field where or not
-                        if (in_array($fieldName, $aggregateFields)) {
-                            //TODO apply search on aggregateFields
+                        if (strpos($fieldName, '.') !== false) {
+                            $fields = explode('.', $fieldName);
+
+                            $field = array_pop($fields);
+                            $relation = implode('.', $fields);
+
+                            $q->orWhereHas($relation, function ($q2) use ($value, $field) {
+                                $q2->where($field, 'like', '%' . $value . '%');
+                            });
                         } else {
-                            if (!$this->isRelationField($q, $fieldName)) {
-                                $q->orWhere($fieldName, 'like', '%' . $value . '%');
+                            //check this is aggregate field where or not
+                            if (in_array($fieldName, $aggregateFields)) {
+                                //TODO apply search on aggregateFields
+                            } else {
+                                if (!$this->isRelationField($q, $fieldName)) {
+                                    $q->orWhere($fieldName, 'like', '%' . $value . '%');
+                                }
                             }
                         }
                     }
@@ -282,6 +288,12 @@ class CManager_DataProvider_ModelDataProvider extends CManager_DataProviderAbstr
         //do nothing
         $query = $this->getModelQuery($callback);
         //c::db()->enableBenchmark();
+        // //create sub query for select * from($q) as t
+        // $newQuery = $query->getModel()->newQuery();
+        // $newQuery->withoutGlobalScope(CModel_SoftDelete_Scope::class);
+        // $newQuery->fromSub($query, 't')->select('*');
+
+        //$newQuery->disableSoftDelete();
         return $query->paginate($perPage, $columns, $pageName, $page);
     }
 

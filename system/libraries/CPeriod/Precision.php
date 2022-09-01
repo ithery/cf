@@ -138,7 +138,7 @@ class CPeriod_Precision {
      *
      * @return DateTimeImmutable
      */
-    public function roundDate(DateTimeInterface $date): DateTimeImmutable {
+    public function roundDate(DateTimeInterface $date) {
         list($year, $month, $day, $hour, $minute, $second) = explode(' ', $date->format('Y m d H i s'));
 
         $month = (self::MONTH & $this->mask) === self::MONTH ? $month : '01';

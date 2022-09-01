@@ -35,7 +35,7 @@ class CManager_Transform_MethodExecutor {
         return c::formatter()->unformatDatetime($value, $format);
     }
 
-    public function transformCarbonDiffForHumans($value) {
+    public function transformCarbonDiffForHuman($value) {
         return CCarbon::parse($value)->diffForHumans();
     }
 
@@ -145,5 +145,9 @@ class CManager_Transform_MethodExecutor {
         }
 
         return 'Unknown';
+    }
+
+    public static function transformEditorJsHtml($data) {
+        return c::manager()->editorJs()->generateHtmlOutput($data)->__toString();
     }
 }

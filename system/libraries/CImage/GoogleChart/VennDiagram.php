@@ -2,7 +2,9 @@
 
 class CImage_GoogleChart_VennDiagram extends CImage_GoogleChart_Chart {
     private $sizes;
+
     private $intersections;
+
     private $numData;
 
     public function __construct($width = 200, $height = 200) {

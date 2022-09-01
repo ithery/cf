@@ -62,6 +62,7 @@ trait CElement_Trait_UseViewTrait {
     private function collectHtmlJsOnce() {
         if ($this->htmlJs == null) {
             $view = $this->resolveView();
+
             if ($this->onBeforeParse != null) {
                 $callable = $this->onBeforeParse;
                 $callable($view);

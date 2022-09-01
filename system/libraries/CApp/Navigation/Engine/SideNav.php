@@ -73,7 +73,10 @@ class CApp_Navigation_Engine_SideNav extends CApp_Navigation_Engine {
                     $isActive = CFunction::factory($activeCallback)->addArg($d)->addArg($isActive)->execute();
                 }
                 if ($isActive) {
-                    $activeClass = ' active open';
+                    $activeClass = ' active';
+                    if (strlen(trim($childHtml)) > 0) {
+                        $activeClass .= ' open';
+                    }
                 }
 
                 $li_class = 'sidenav-item ';
