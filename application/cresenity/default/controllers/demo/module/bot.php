@@ -9,10 +9,6 @@ class Controller_Demo_Module_Bot extends \Cresenity\Demo\Controller {
 
     public function __construct() {
         parent::__construct();
-        $this->bot = CBot::createBot([
-            'driver' => 'web',
-            'bot_id' => 'web'
-        ]);
     }
 
     public function index() {
@@ -29,7 +25,11 @@ class Controller_Demo_Module_Bot extends \Cresenity\Demo\Controller {
     }
 
     public function api() {
-        $this->bot->hears('{message}', function ($botman, $message) {
+        $bot = CBot::createBot([
+            'driver' => 'web',
+            'bot_id' => 'web'
+        ]);
+        $bot->hears('{message}', function ($botman, $message) {
             if ($message == 'Hi') {
                 $this->askName($botman);
             } else {
@@ -37,7 +37,7 @@ class Controller_Demo_Module_Bot extends \Cresenity\Demo\Controller {
             }
         });
 
-        $this->bot->listen();
+        $bot->listen();
     }
 
     public function askName(CBot_Bot $botman) {
