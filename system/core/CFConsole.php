@@ -11,6 +11,7 @@ class CFConsole {
         CConsole_Command_KeyGenerateCommand::class,
         CConsole_Command_ComposerCommand::class,
         CConsole_Command_EnvironmentCommand::class,
+        CConsole_Command_Database_DbCommand::class,
         CConsole_Command_Api_JWTSecretCommand::class,
         CConsole_Command_Api_OAuth_KeyCommand::class,
         CConsole_Command_Api_OAuth_ClientCommand::class,
