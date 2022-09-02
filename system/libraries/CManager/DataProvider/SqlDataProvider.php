@@ -119,7 +119,7 @@ class CManager_DataProvider_SqlDataProvider extends CManager_DataProviderAbstrac
         //process ordering
         if (count($this->sort) > 0) {
             foreach ($this->sort as $fieldName => $sortDirection) {
-                $sOrder .= ', ' . c::db($this->connection)->escapeColumn($fieldName) . ' ' . c::db($this->connection)->escapeStr($sortDirection);
+                $sOrder .= ', ' . $this->getDb()->escapeColumn($fieldName) . ' ' . $this->getDb()->escapeStr($sortDirection);
             }
         }
 
