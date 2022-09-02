@@ -48,13 +48,7 @@ export default {
             // modules: true,
         }),
         filesize(),
-        isProduction && terser({
-            mangle: false,
-            compress: {
-                // eslint-disable-next-line camelcase
-                drop_debugger: false
-            }
-        }),
+        terser({ format: { comments: false } }),
         babel({
             exclude: 'node_modules/**',
             runtimeHelpers: true

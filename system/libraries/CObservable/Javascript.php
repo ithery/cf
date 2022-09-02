@@ -118,9 +118,15 @@ class CObservable_Javascript {
     }
 
     /**
+     * @param null|string $selector
+     *
      * @return CObservable_Javascript_JQuery
      */
-    public function jquery() {
+    public function jquery($selector = null) {
+        if ($selector != null) {
+            return new CObservable_Javascript_JQuery(new CObservable_Javascript($selector));
+        }
+
         return $this->jQueryObject;
     }
 
@@ -189,5 +195,9 @@ class CObservable_Javascript {
         }
 
         return $arg;
+    }
+
+    public function ifStatement($operand1, $operator = null, $operand2 = null) {
+        $statement = new CJavascript_Statement_IfStatement($operand1, $operator, $operand2);
     }
 }

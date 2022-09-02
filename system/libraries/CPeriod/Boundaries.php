@@ -18,7 +18,7 @@ class CPeriod_Boundaries {
         $this->mask = $mask;
     }
 
-    public static function fromString(string $startBoundary, string $endBoundary): self {
+    public static function fromString($startBoundary, $endBoundary) {
         $matchMap = [
             '[]' => self::EXCLUDE_NONE(),
             '[)' => self::EXCLUDE_END(),

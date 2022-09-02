@@ -22,6 +22,7 @@ class CObservable_Javascript_Native {
         $variableStatement = CJavascript::variableStatement($varName, $varValue);
 
         $this->javascript->addStatement($variableStatement);
+
         return $this;
     }
 
@@ -29,6 +30,7 @@ class CObservable_Javascript_Native {
         $variableStatement = CJavascript::rawStatement($js);
 
         $this->javascript->addStatement($variableStatement);
+
         return $this;
     }
 }

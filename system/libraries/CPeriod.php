@@ -187,6 +187,21 @@ class CPeriod implements IteratorAggregate {
         return new static($startDate, $endDate);
     }
 
+    public static function lastMonth() {
+        $startDate = CCarbon::now()->modify('first day of last month');
+        $endDate = CCarbon::now()->modify('last day of last month');
+
+        $startDate->hour = 0;
+        $startDate->minute = 0;
+        $startDate->second = 0;
+
+        $endDate->hour = 23;
+        $endDate->minute = 59;
+        $endDate->second = 59;
+
+        return new static($startDate, $endDate);
+    }
+
     public static function thisYear() {
         $startDate = CCarbon::now()->modify('first day of this year');
         $endDate = CCarbon::now()->modify('last day of this year');
@@ -280,5 +295,27 @@ class CPeriod implements IteratorAggregate {
         }
 
         throw CPeriod_Exception_CannotComparePeriodException::precisionDoesNotMatch();
+    }
+
+    /**
+     * @param  array{
+     *             monday?: array<string|array>,
+     *             tuesday?: array<string|array>,
+     *             wednesday?: array<string|array>,
+     *             thursday?: array<string|array>,
+     *             friday?: array<string|array>,
+     *             saturday?: array<string|array>,
+     *             sunday?: array<string|array>,
+     *             exceptions?: array<array<string|array>>,
+     *             filters?: callable[],
+     *             overflow?: bool,
+     *         }                         $data
+     * @param null|string|DateTimeZone $timezone
+     * @param null|string|DateTimeZone $outputTimezone
+     *
+     * @return CPeriod_OpeningHours
+     */
+    public static function openingHours(array $data, $timezone = null, $outputTimezone = null) {
+        return CPeriod_OpeningHours::create($data, $timezone, $outputTimezone);
     }
 }

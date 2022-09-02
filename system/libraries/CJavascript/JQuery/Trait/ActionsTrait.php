@@ -22,6 +22,18 @@ trait CJavascript_JQuery_Trait_ActionsTrait {
     }
 
     /**
+     * Check has class from element.
+     *
+     * @param string $element
+     * @param string $class to check
+     *
+     * @return string
+     */
+    public function hasClass($element = 'this', $class = '') {
+        return $this->genericCallValue('hasClass', $element, $class);
+    }
+
+    /**
      * Execute a javascript library detach action.
      *
      * @param string $element element

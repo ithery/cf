@@ -40,6 +40,7 @@ import Theme from './cresenity/Theme';
 import { initThemeMode } from './module/theme';
 import { initMenu } from './module/menu';
 import { formatCurrency, unformatCurrency } from './formatter/currency';
+import { cresQuery } from './module/CresQuery';
 
 export default class Cresenity {
     constructor() {
@@ -89,6 +90,7 @@ export default class Cresenity {
             setHeight
         };
         this.theme = new Theme();
+        this.$ = cresQuery;
     }
     loadJs(filename, callback) {
         let fileref = document.createElement('script');

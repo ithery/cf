@@ -27,6 +27,13 @@ class CTesting_TestResponse implements ArrayAccess {
     protected $streamedContent;
 
     /**
+     * The collection of logged exceptions for the request.
+     *
+     * @var \CCollection
+     */
+    protected $exceptions;
+
+    /**
      * Create a new test response instance.
      *
      * @param CHTTP_Response $response
@@ -35,6 +42,7 @@ class CTesting_TestResponse implements ArrayAccess {
      */
     public function __construct($response) {
         $this->baseResponse = $response;
+        $this->exceptions = new CCollection();
     }
 
     /**

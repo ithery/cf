@@ -187,4 +187,11 @@ class CJavascript {
     public static function cresJs() {
         return CJavascript_CresJs::instance();
     }
+
+    public static function getJsStatementFromClosure(Closure $event, array $args) {
+        CJavascript::pushDeferredStack();
+        call_user_func_array($event, $args);
+
+        return CJavascript::popDeferredStack();
+    }
 }

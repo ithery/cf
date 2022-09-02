@@ -166,7 +166,7 @@ class CManager_Asset {
         return $js_before . $js . PHP_EOL . ';' . PHP_EOL;
     }
 
-    public function renderJsRequire($js, $require = 'cresenity.cf.require') {
+    public function renderJsRequire($js, $require = 'cresenity.cf.requireJs') {
         //return CClientModules::instance()->require_js($js);
         $app = CApp::instance();
 

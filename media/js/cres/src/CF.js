@@ -109,14 +109,27 @@ class CF {
         }
     }
     requireJs(url, callback) {
-        if (!~this.required.indexOf(url)) {
-            this.required.push(url);
-            if (document.querySelector('link[href="' + url + '"],script[src="' + url + '"]') !== null) {
-                return;
+        if (typeof url != 'string') {
+            url = url[0];
+        }
+
+        if (!url) {
+            if (typeof (callback) === 'function') {
+                callback();
             }
+            return;
+        }
+
+        let loaded = ~this.required.indexOf(url);
+        if(!loaded) {
+            loaded = document.querySelector('link[href="' + url + '"],script[src="' + url + '"]') !== null;
+        }
+        if (!loaded) {
+            this.required.push(url);
             let string = '<script type=\'text/javascript\'  src=\'' + url + '\'></script>';
             if ((document.readyState === 'loading' /* || mwd.readyState === 'interactive'*/) && !!window.CanvasRenderingContext2D && self === parent) {
                 document.write(string);
+                callback();
             } else {
                 let el;
                 el = this.document.createElement('script');
@@ -124,15 +137,12 @@ class CF {
                 el.setAttribute('type', 'text/javascript');
                 // IE 6 & 7
                 if (typeof (callback) === 'function') {
-                    el.onload = callback;
-                    el.onreadystatechange = () => {
-                        if (this.readyState == 'complete') {
-                            dispatchWindowEvent('cresenity:js:loaded', {
-                                url:url,
-                            });
-                            callback();
-                        }
-                    };
+                    el.addEventListener('load', ()=> {
+                        dispatchWindowEvent('cresenity:js:loaded', {
+                            url:url,
+                        });
+                        callback();
+                    })
                 }
                 this.document.body.appendChild(el);
             }

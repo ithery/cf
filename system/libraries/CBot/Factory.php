@@ -20,7 +20,7 @@ class CBot_Factory {
             $storage = static::createDefaultFileStorage();
         }
         if ($cache == null) {
-            $cache = CCache::manager()->driver('array');
+            $cache = CCache::manager()->driver('file');
         }
 
         return new CBot_Bot($config, $driver, $storage, $cache);
