@@ -170,7 +170,7 @@ class CManager_DataProvider_SqlDataProvider extends CManager_DataProviderAbstrac
             $dataSearchOr = $this->searchOr;
 
             foreach ($dataSearchOr as $fieldName => $value) {
-                $sWhereOr .= 'OR ' . c::db()->escapeColumn($fieldName) . " LIKE '%" . c::db($this->connection)->escapeLike($value) . "%' ";
+                $sWhereOr .= 'OR ' . $this->getDb()->escapeColumn($fieldName) . " LIKE '%" . $this->getDb()->escapeLike($value) . "%' ";
             }
             if (strlen($sWhereOr) > 0) {
                 $sWhereOr = '(' . substr($sWhereOr, 3) . ')';
@@ -181,7 +181,7 @@ class CManager_DataProvider_SqlDataProvider extends CManager_DataProviderAbstrac
             $dataSearchAnd = $this->searchAnd;
 
             foreach ($dataSearchAnd as $fieldName => $value) {
-                $sWhereAnd .= 'AND ' . c::db()->escapeColumn($fieldName) . " LIKE '%" . c::db($this->connection)->escapeLike($value) . "%' ";
+                $sWhereAnd .= 'AND ' . $this->getDb()->escapeColumn($fieldName) . " LIKE '%" . $this->getDb()->escapeLike($value) . "%' ";
             }
             if (strlen($sWhereAnd) > 0) {
                 $sWhereAnd = '(' . substr($sWhereAnd, 4) . ')';
