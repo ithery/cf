@@ -1,9 +1,9 @@
 <?php
 
-use Facebook\WebDriver\Interactions\WebDriverActions;
-use Facebook\WebDriver\Remote\LocalFileDetector;
 use Facebook\WebDriver\WebDriverBy;
 use Facebook\WebDriver\WebDriverKeys;
+use Facebook\WebDriver\Remote\LocalFileDetector;
+use Facebook\WebDriver\Interactions\WebDriverActions;
 
 trait CTesting_BrowserConcern_InteractsWithElements {
     /**
@@ -22,7 +22,7 @@ trait CTesting_BrowserConcern_InteractsWithElements {
      *
      * @param string $selector
      *
-     * @return \Facebook\WebDriver\Remote\RemoteWebElement|null
+     * @return null|\Facebook\WebDriver\Remote\RemoteWebElement
      */
     public function element($selector) {
         return $this->resolver->find($selector);
@@ -50,7 +50,7 @@ trait CTesting_BrowserConcern_InteractsWithElements {
      * Directly get or set the value attribute of an input field.
      *
      * @param string      $selector
-     * @param string|null $value
+     * @param null|string $value
      *
      * @return $this
      */
@@ -292,7 +292,7 @@ trait CTesting_BrowserConcern_InteractsWithElements {
     public function attach($field, $path) {
         $element = $this->resolver->resolveForAttachment($field);
 
-        $element->setFileDetector(new LocalFileDetector)->sendKeys($path);
+        $element->setFileDetector(new LocalFileDetector())->sendKeys($path);
 
         return $this;
     }
