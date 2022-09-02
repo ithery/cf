@@ -296,10 +296,6 @@ class CModel_Scout_Engine_TNTSearchEngine extends CModel_Scout_EngineAbstract {
     public function initIndex($model) {
         $indexName = $model->searchableAs();
 
-        if (file_exists($this->tnt->config['storage'] . "/{$indexName}.index")) {
-            unlink($this->tnt->config['storage'] . "/{$indexName}.index");
-        }
-
         if (!file_exists($this->tnt->config['storage'] . "/{$indexName}.index")) {
             $indexer = $this->tnt->createIndex("${indexName}.index");
             //try to get PDO

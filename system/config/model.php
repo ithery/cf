@@ -140,7 +140,7 @@ return [
         ],
 
         'tntsearch' => [
-            'storage' => DOCROOT . 'temp/scout/', //place where the index files will be stored
+            'storage' => null, //place where the index files will be stored, default is DOCROOT . 'temp/scout/{appCode}'.
             'fuzziness' => false,
             'fuzzy' => [
                 'prefix_length' => 2,
