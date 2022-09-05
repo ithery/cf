@@ -118,5 +118,9 @@ class CConsole_Command_TestInstallCommand extends CConsole_Command {
             CFile::makeDirectory($testFeatureDirectory, 0755, true);
             $this->info('Test Feature directory created on ' . $testFeatureDirectory);
         }
+
+        //create gitignore
+        $path = c::fixPath($testDirectory) . '.gitignore';
+        CFile::put($path, './Browser' . PHP_EOL . './Browser/*' . PHP_EOL);
     }
 }
