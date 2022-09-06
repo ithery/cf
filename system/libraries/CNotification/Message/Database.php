@@ -17,7 +17,7 @@ class CNotification_Message_Database extends CNotification_MessageAbstract {
             throw new Exception('data for database channel must be an array');
         }
         if ($title !== null && strlen($title) > 1000) {
-            throw new Exception('titile for database channel must be max 1000 chars');
+            throw new Exception('title for database channel must be max 1000 chars');
         }
         if ($model instanceof CModel) {
             /** @var CModel $model */
