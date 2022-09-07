@@ -34,7 +34,6 @@ class CConsole_Command_Cron_ScheduleTestCommand extends CConsole_Command {
         $event = $commands[$index];
 
         $this->line('<info>[' . date('c') . '] Running scheduled command:</info> ' . $event->getSummaryForDisplay());
-
         $event->run();
     }
 }

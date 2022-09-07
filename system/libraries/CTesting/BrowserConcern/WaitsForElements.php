@@ -1,9 +1,9 @@
 <?php
 
 use Carbon\Carbon;
-use Facebook\WebDriver\Exception\NoSuchElementException;
 use Facebook\WebDriver\Exception\TimeOutException;
 use Facebook\WebDriver\WebDriverExpectedCondition;
+use Facebook\WebDriver\Exception\NoSuchElementException;
 
 trait CTesting_BrowserConcern_WaitsForElements {
     /**
@@ -13,9 +13,9 @@ trait CTesting_BrowserConcern_WaitsForElements {
      * @param \Closure $callback
      * @param int      $seconds
      *
-     * @return $this
-     *
      * @throws \Facebook\WebDriver\Exception\TimeOutException
+     *
+     * @return $this
      */
     public function whenAvailable($selector, Closure $callback, $seconds = null) {
         return $this->waitFor($selector, $seconds)->with($selector, $callback);
@@ -27,9 +27,9 @@ trait CTesting_BrowserConcern_WaitsForElements {
      * @param string $selector
      * @param int    $seconds
      *
-     * @return $this
-     *
      * @throws \Facebook\WebDriver\Exception\TimeOutException
+     *
+     * @return $this
      */
     public function waitFor($selector, $seconds = null) {
         $message = $this->formatTimeOutMessage('Waited %s seconds for selector', $selector);
@@ -45,9 +45,9 @@ trait CTesting_BrowserConcern_WaitsForElements {
      * @param string $selector
      * @param int    $seconds
      *
-     * @return $this
-     *
      * @throws \Facebook\WebDriver\Exception\TimeOutException
+     *
+     * @return $this
      */
     public function waitUntilMissing($selector, $seconds = null) {
         $message = $this->formatTimeOutMessage('Waited %s seconds for removal of selector', $selector);
@@ -69,9 +69,9 @@ trait CTesting_BrowserConcern_WaitsForElements {
      * @param string $text
      * @param int    $seconds
      *
-     * @return $this
-     *
      * @throws \Facebook\WebDriver\Exception\TimeOutException
+     *
+     * @return $this
      */
     public function waitUntilMissingText($text, $seconds = null) {
         $text = carr::wrap($text);
@@ -89,9 +89,9 @@ trait CTesting_BrowserConcern_WaitsForElements {
      * @param array|string $text
      * @param int          $seconds
      *
-     * @return $this
-     *
      * @throws \Facebook\WebDriver\Exception\TimeOutException
+     *
+     * @return $this
      */
     public function waitForText($text, $seconds = null) {
         $text = carr::wrap($text);
@@ -110,9 +110,9 @@ trait CTesting_BrowserConcern_WaitsForElements {
      * @param array|string $text
      * @param int          $seconds
      *
-     * @return $this
-     *
      * @throws \Facebook\WebDriver\Exception\TimeOutException
+     *
+     * @return $this
      */
     public function waitForTextIn($selector, $text, $seconds = null) {
         $message = 'Waited %s seconds for text "' . $text . '" in selector ' . $selector;
@@ -128,9 +128,9 @@ trait CTesting_BrowserConcern_WaitsForElements {
      * @param string $link
      * @param int    $seconds
      *
-     * @return $this
-     *
      * @throws \Facebook\WebDriver\Exception\TimeOutException
+     *
+     * @return $this
      */
     public function waitForLink($link, $seconds = null) {
         $message = $this->formatTimeOutMessage('Waited %s seconds for link', $link);
@@ -146,9 +146,9 @@ trait CTesting_BrowserConcern_WaitsForElements {
      * @param string $path
      * @param int    $seconds
      *
-     * @return $this
-     *
      * @throws \Facebook\WebDriver\Exception\TimeOutException
+     *
+     * @return $this
      */
     public function waitForLocation($path, $seconds = null) {
         $message = $this->formatTimeOutMessage('Waited %s seconds for location', $path);
@@ -163,9 +163,9 @@ trait CTesting_BrowserConcern_WaitsForElements {
      * @param array  $parameters
      * @param int    $seconds
      *
-     * @return $this
-     *
      * @throws \Facebook\WebDriver\Exception\TimeOutException
+     *
+     * @return $this
      */
     public function waitForRoute($route, $parameters = [], $seconds = null) {
         return $this->waitForLocation(c::route($route, $parameters, false), $seconds);
@@ -178,9 +178,9 @@ trait CTesting_BrowserConcern_WaitsForElements {
      * @param int    $seconds
      * @param string $message
      *
-     * @return $this
-     *
      * @throws \Facebook\WebDriver\Exception\TimeOutException
+     *
+     * @return $this
      */
     public function waitUntil($script, $seconds = null, $message = null) {
         if (!cstr::startsWith($script, 'return ')) {
@@ -201,7 +201,7 @@ trait CTesting_BrowserConcern_WaitsForElements {
      *
      * @param string      $key
      * @param string      $value
-     * @param string|null $componentSelector
+     * @param null|string $componentSelector
      * @param null|mixed  $seconds
      *
      * @return $this
@@ -219,7 +219,7 @@ trait CTesting_BrowserConcern_WaitsForElements {
      *
      * @param string      $key
      * @param string      $value
-     * @param string|null $componentSelector
+     * @param null|string $componentSelector
      * @param null|mixed  $seconds
      *
      * @return $this
@@ -256,9 +256,9 @@ trait CTesting_BrowserConcern_WaitsForElements {
      * @param \Closure $callback
      * @param int      $seconds
      *
-     * @return $this
-     *
      * @throws \Facebook\WebDriver\Exception\TimeOutException
+     *
+     * @return $this
      */
     public function waitForReload($callback = null, $seconds = null) {
         $token = cstr::random();
@@ -280,11 +280,11 @@ trait CTesting_BrowserConcern_WaitsForElements {
      * @param int         $seconds
      * @param int         $interval
      * @param \Closure    $callback
-     * @param string|null $message
-     *
-     * @return $this
+     * @param null|string $message
      *
      * @throws \Facebook\WebDriver\Exception\TimeOutException
+     *
+     * @return $this
      */
     public function waitUsing($seconds, $interval, Closure $callback, $message = null) {
         $seconds = is_null($seconds) ? static::$waitSeconds : $seconds;
@@ -299,11 +299,10 @@ trait CTesting_BrowserConcern_WaitsForElements {
                     break;
                 }
             } catch (Exception $e) {
-                //
             }
 
             if ($started->lt(Carbon::now()->subSeconds($seconds))) {
-                throw new TimeOutException(
+                throw new TimeoutException(
                     $message
                     ? sprintf($message, $seconds)
                     : "Waited {$seconds} seconds for callback."
