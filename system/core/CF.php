@@ -237,7 +237,8 @@ final class CF {
      * @return void
      */
     public static function invoke($uri) {
-        $request = CHTTP_Request::create($uri, c::request()->method());
+        $oldRequest = c::request();
+        $request = CHTTP_Request::create($uri, $oldRequest->method());
 
         return  c::router()->dispatchToRoute($request);
     }
