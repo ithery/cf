@@ -8,10 +8,20 @@ class CEmail {
         return CEmail_Builder::instance();
     }
 
+    /**
+     * @param array $config
+     *
+     * @return CEmail_Sender
+     */
     public static function sender(array $config = []) {
         return new CEmail_Sender($config);
     }
 
+    /**
+     * @param string $email
+     *
+     * @return bool
+     */
     public static function isValid($email) {
         $checker = new CEmail_Checker();
 
