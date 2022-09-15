@@ -35,7 +35,7 @@ class CEmail_Client_Imap_FetchResponse {
      */
     public function getEnvelope($bForce = false) {
         if (null === $this->aEnvelopeCache || $bForce) {
-            $this->aEnvelopeCache = $this->getFetchValue(Enumerations\FetchType::ENVELOPE);
+            $this->aEnvelopeCache = $this->getFetchValue(CEmail_Client_Imap_FetchType::ENVELOPE);
         }
 
         return $this->aEnvelopeCache;
@@ -57,7 +57,7 @@ class CEmail_Client_Imap_FetchResponse {
      *
      * @return null|\CEmail_Client_Mime_EmailCollection
      */
-    public function getFetchEnvelopeEmailCollection($iIndex, $sParentCharset = \MailSo\Base\Enumerations\Charset::ISO_8859_1) {
+    public function getFetchEnvelopeEmailCollection($iIndex, $sParentCharset = \CEmail_Client_Utils::CHARSET_ISO_8859_1) {
         $oResult = null;
         $aEmails = $this->GetFetchEnvelopeValue($iIndex, null);
         if (is_array($aEmails) && 0 < count($aEmails)) {
@@ -98,15 +98,15 @@ class CEmail_Client_Imap_FetchResponse {
      *
      * @return null|\CEmail_Client_Imap_BodyStructure
      */
-    public function GetFetchBodyStructure($sRfc822SubMimeIndex = '') {
+    public function getFetchBodyStructure($sRfc822SubMimeIndex = '') {
         $oBodyStructure = null;
         $aBodyStructureArray = $this->GetFetchValue(Enumerations\FetchType::BODYSTRUCTURE);
 
         if (is_array($aBodyStructureArray)) {
             if (0 < strlen($sRfc822SubMimeIndex)) {
-                $oBodyStructure = BodyStructure::newInstanceFromRfc822SubPart($aBodyStructureArray, $sRfc822SubMimeIndex);
+                $oBodyStructure = CEmail_Client_Imap_BodyStructure::newInstanceFromRfc822SubPart($aBodyStructureArray, $sRfc822SubMimeIndex);
             } else {
-                $oBodyStructure = BodyStructure::newInstance($aBodyStructureArray);
+                $oBodyStructure = CEmail_Client_Imap_BodyStructure::newInstance($aBodyStructureArray);
             }
         }
 

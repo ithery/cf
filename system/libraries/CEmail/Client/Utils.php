@@ -54,6 +54,22 @@ class CEmail_Client_Utils {
     const ENCODING_8_BIT = '8bit';
 
     /**
+     * @var string
+     */
+    public static $sValidUtf8Regexp = <<<'END'
+    /
+      (
+        (?: [\x00-\x7F]                 # single-byte sequences   0xxxxxxx
+        |   [\xC0-\xDF][\x80-\xBF]      # double-byte sequences   110xxxxx 10xxxxxx
+        |   [\xE0-\xEF][\x80-\xBF]{2}   # triple-byte sequences   1110xxxx 10xxxxxx * 2
+        |   [\xF0-\xF7][\x80-\xBF]{3}   # quadruple-byte sequence 11110xxx 10xxxxxx * 3
+        ){1,100}                        # ...one or more times
+      )
+    | .                                 # anything else
+    /x
+    END;
+
+    /**
      * @var array
      */
     public static $suppostedCharsets = [
@@ -977,5 +993,117 @@ class CEmail_Client_Utils {
         }
 
         return $sValue;
+    }
+
+    /**
+     * @param string $sContentType
+     * @param string $sFileName
+     *
+     * @return string
+     */
+    public static function contentTypeType($sContentType, $sFileName) {
+        $sResult = '';
+        $sContentType = \strtolower($sContentType);
+        if (0 === \strpos($sContentType, 'image/')) {
+            $sResult = 'image';
+        } else {
+            switch ($sContentType) {
+                case 'application/zip':
+                case 'application/x-7z-compressed':
+                case 'application/x-rar-compressed':
+                case 'application/x-msdownload':
+                case 'application/vnd.ms-cab-compressed':
+                case 'application/x-gzip':
+                case 'application/x-bzip':
+                case 'application/x-bzip2':
+                case 'application/x-debian-package':
+                    $sResult = 'archive';
+
+                    break;
+                case 'application/msword':
+                case 'application/rtf':
+                case 'application/vnd.ms-excel':
+                case 'application/vnd.ms-powerpoint':
+                case 'application/vnd.openxmlformats-officedocument.wordprocessingml.document':
+                case 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet':
+                case 'application/vnd.openxmlformats-officedocument.wordprocessingml.template':
+                case 'application/vnd.openxmlformats-officedocument.presentationml.presentation':
+                case 'application/vnd.oasis.opendocument.text':
+                case 'application/vnd.oasis.opendocument.spreadsheet':
+                    $sResult = 'doc';
+
+                    break;
+                case 'application/pdf':
+                case 'application/x-pdf':
+                    $sResult = 'pdf';
+
+                    break;
+                case 'application/x-font-linux-psf':
+                case 'application/x-font-otf':
+                case 'application/x-font-pcf':
+                case 'application/x-font-snf':
+                case 'application/x-font-ttf':
+                case 'application/x-font-ttf':
+                case 'application/font-woff':
+                case 'application/font-ttf':
+                case 'application/vnd.ms-fontobject':
+                case 'application/font-otf':
+                    $sResult = 'font';
+
+                    break;
+            }
+
+            if ('' === $sResult) {
+                switch (\strtolower(static::getFileExtension($sFileName))) {
+                    case 'zip':
+                    case '7z':
+                    case 'rar':
+                        $sResult = 'archive';
+
+                        break;
+                }
+            }
+        }
+
+        return $sResult;
+    }
+
+    /**
+     * @param string $sUtfString
+     * @param string $sReplaceOn = ''
+     *
+     * @return string
+     */
+    public static function utf8Clear($sUtfString, $sReplaceOn = '') {
+        if ('' === $sUtfString) {
+            return $sUtfString;
+        }
+
+        $sUtfString = \preg_replace(\CEmail_Client_Utils::$sValidUtf8Regexp, '$1', $sUtfString);
+
+        $sUtfString = \preg_replace(
+            '/\xE0[\x80-\x9F][\x80-\xBF]'
+            . '|\xEF\xBF\xBF'
+            . '|\xED[\xA0-\xBF][\x80-\xBF]/S',
+            $sReplaceOn,
+            $sUtfString
+        );
+
+        $sUtfString = \preg_replace('/\xEF\xBF\xBD/', '?', $sUtfString);
+
+        $sNewUtfString = false;
+        if (false === $sNewUtfString && \CEmail_Client_Utils::isMbStringSupported()) {
+            $sNewUtfString = \CEmail_Client_Utils::MbConvertEncoding($sUtfString, 'UTF-8', 'UTF-8');
+        }
+
+        if (false === $sNewUtfString && \CEmail_Client_Utils::IsIconvSupported()) {
+            $sNewUtfString = \CEmail_Client_Utils::IconvConvertEncoding($sUtfString, 'UTF-8', 'UTF-8');
+        }
+
+        if (false !== $sNewUtfString) {
+            $sUtfString = $sNewUtfString;
+        }
+
+        return $sUtfString;
     }
 }
