@@ -210,15 +210,15 @@ abstract class CEmail_Client_AbstractNetClient {
             $this->securityType
         );
 
-        $this->sConnectedHost = \in_array(\strtolower(\substr($this->sConnectedHost, 0, 6)), ['ssl://', 'tcp://'])
-            ? \substr($this->sConnectedHost, 6) : $this->sConnectedHost;
+        $this->connectedHost = \in_array(\strtolower(\substr($this->connectedHost, 0, 6)), ['ssl://', 'tcp://'])
+            ? \substr($this->connectedHost, 6) : $this->connectedHost;
 
-        $this->sConnectedHost = ($this->isSecure ? 'ssl://' : 'tcp://') . $this->sConnectedHost;
-        //$this->sConnectedHost = ($this->bSecure ? 'ssl://' : '').$this->sConnectedHost;
+        $this->connectedHost = ($this->isSecure ? 'ssl://' : 'tcp://') . $this->connectedHost;
+        //$this->connectedHost = ($this->bSecure ? 'ssl://' : '').$this->connectedHost;
 
         if (!$this->isSecure && \CEmail_Client::SECURITY_TYPE_SSL === $this->securityType) {
             $this->writeLogException(
-                new \CEmail_Client_Exception_SocketUnsuppoterdSecureConnectionException('SSL isn\'t supported: (' . \implode(', ', \stream_get_transports()) . ')'),
+                new \CEmail_Client_Exception_SocketUnsupportedSecureConnectionException('SSL isn\'t supported: (' . \implode(', ', \stream_get_transports()) . ')'),
                 \CLogger::ERROR,
                 true
             );
@@ -226,7 +226,7 @@ abstract class CEmail_Client_AbstractNetClient {
 
         $this->startConnectTime = \microtime(true);
         $this->writeLog(
-            'Start connection to "' . $this->sConnectedHost . ':' . $this->iConnectedPort . '"',
+            'Start connection to "' . $this->connectedHost . ':' . $this->iConnectedPort . '"',
             \CLogger::INFO
         );
 
@@ -310,7 +310,7 @@ abstract class CEmail_Client_AbstractNetClient {
         if (\is_resource($this->connection)) {
             $bResult = \fclose($this->connection);
 
-            $this->writeLog('Disconnected from "' . $this->sConnectedHost . ':' . $this->iConnectedPort . '" ('
+            $this->writeLog('Disconnected from "' . $this->connectedHost . ':' . $this->iConnectedPort . '" ('
                 . (($bResult) ? 'success' : 'unsuccess') . ')', \CLogger::INFO);
 
             if (0 !== $this->iStartConnectTime) {

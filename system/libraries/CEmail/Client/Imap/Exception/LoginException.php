@@ -1,0 +1,3 @@
+<?php
+class CEmail_Client_Imap_Exception_LoginException extends \CEmail_Client_Imap_Exception_NegativeResponseException {
+}
