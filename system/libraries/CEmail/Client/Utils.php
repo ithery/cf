@@ -1106,4 +1106,33 @@ class CEmail_Client_Utils {
 
         return $sUtfString;
     }
+
+    /**
+     * @param int $iTimeToReset = 15
+     * @param int $iTimeToAdd   = 120
+     *
+     * @return bool
+     */
+    public static function resetTimeLimit($iTimeToReset = 15, $iTimeToAdd = 120) {
+        static $bValidateAction = null;
+        static $iResetTimer = null;
+
+        if (null === $bValidateAction) {
+            $iResetTimer = 0;
+
+            $sSafeMode = \strtolower(\trim(@\ini_get('safe_mode')));
+            $bSafeMode = 'on' === $sSafeMode || '1' === $sSafeMode || 'true' === $sSafeMode;
+
+            $bValidateAction = !$bSafeMode && \CBase_DependencyUtils::functionExistsAndEnabled('set_time_limit');
+        }
+
+        if ($bValidateAction && $iTimeToReset < \time() - $iResetTimer) {
+            $iResetTimer = \time();
+            \set_time_limit($iTimeToAdd);
+
+            return true;
+        }
+
+        return false;
+    }
 }

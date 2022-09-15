@@ -118,8 +118,8 @@ class CEmail_Client_ImapClient extends \CEmail_Client_AbstractNetClient {
      * @param bool   $bVerifySsl    = false
      *
      * @throws \CEmail_Client_Exception_InvalidArgumentException
-     * @throws \CEmail_Client\Net\Exceptions\Exception
-     * @throws \CEmail_Client_Imap_Exception_Exception
+     * @throws \CEmail_Client_Exception
+     * @throws \CEmail_Client_Imap_Exception
      *
      * @return \CEmail_Client_ImapClient
      */
@@ -158,8 +158,8 @@ class CEmail_Client_ImapClient extends \CEmail_Client_AbstractNetClient {
      * @param bool   $bUseAuthPlainIfSupported = false
      *
      * @throws \CEmail_Client_Exception_InvalidArgumentException
-     * @throws \CEmail_Client\Net\Exceptions\Exception
-     * @throws \CEmail_Client_Imap_Exception_Exception
+     * @throws \CEmail_Client_Exception
+     * @throws \CEmail_Client_Imap_Exception
      *
      * @return \CEmail_Client_ImapClient
      */
@@ -267,8 +267,8 @@ class CEmail_Client_ImapClient extends \CEmail_Client_AbstractNetClient {
      * @param string $sXOAuth2Token
      *
      * @throws \CEmail_Client_Exception_InvalidArgumentException
-     * @throws \CEmail_Client\Net\Exceptions\Exception
-     * @throws \CEmail_Client_Imap_Exception_Exception
+     * @throws \CEmail_Client_Exception
+     * @throws \CEmail_Client_Imap_Exception
      *
      * @return \CEmail_Client_ImapClient
      */
@@ -311,7 +311,7 @@ class CEmail_Client_ImapClient extends \CEmail_Client_AbstractNetClient {
     }
 
     /**
-     * @throws \CEmail_Client\Net\Exceptions\Exception
+     * @throws \CEmail_Client_Exception
      *
      * @return \CEmail_Client_ImapClient
      */
@@ -348,8 +348,8 @@ class CEmail_Client_ImapClient extends \CEmail_Client_AbstractNetClient {
     }
 
     /**
-     * @throws \CEmail_Client\Net\Exceptions\Exception
-     * @throws \CEmail_Client_Imap_Exception_Exception
+     * @throws \CEmail_Client_Exception
+     * @throws \CEmail_Client_Imap_Exception
      *
      * @return null|array
      */
@@ -362,8 +362,8 @@ class CEmail_Client_ImapClient extends \CEmail_Client_AbstractNetClient {
     /**
      * @param string $sExtentionName
      *
-     * @throws \CEmail_Client\Net\Exceptions\Exception
-     * @throws \CEmail_Client_Imap_Exception_Exception
+     * @throws \CEmail_Client_Exception
+     * @throws \CEmail_Client_Imap_Exception
      *
      * @return bool
      */
@@ -378,8 +378,8 @@ class CEmail_Client_ImapClient extends \CEmail_Client_AbstractNetClient {
     }
 
     /**
-     * @throws \CEmail_Client\Net\Exceptions\Exception
-     * @throws \CEmail_Client_Imap_Exception_Exception
+     * @throws \CEmail_Client_Exception
+     * @throws \CEmail_Client_Imap_Exception
      *
      * @return null|\CEmail_Client\Imap\NamespaceResult
      */
@@ -398,7 +398,7 @@ class CEmail_Client_ImapClient extends \CEmail_Client_AbstractNetClient {
             if (\CEmail_Client_Imap_Response::RESPONSE_TYPE_UNTAGGED === $oImapResponse->responseType
                 && 'NAMESPACE' === $oImapResponse->statusOrIndex
             ) {
-                $oReturn = NamespaceResult::newInstance();
+                $oReturn = CEmail_Client_Imap_NamespaceResult::newInstance();
                 $oReturn->InitByImapResponse($oImapResponse);
 
                 break;
@@ -430,8 +430,8 @@ class CEmail_Client_ImapClient extends \CEmail_Client_AbstractNetClient {
      * @param string $sFolderName
      *
      * @throws \CEmail_Client_Exception_InvalidArgumentException
-     * @throws \CEmail_Client\Net\Exceptions\Exception
-     * @throws \CEmail_Client_Imap_Exception_Exception
+     * @throws \CEmail_Client_Exception
+     * @throws \CEmail_Client_Imap_Exception
      *
      * @return \CEmail_Client_ImapClient
      */
@@ -446,8 +446,8 @@ class CEmail_Client_ImapClient extends \CEmail_Client_AbstractNetClient {
      * @param string $sFolderName
      *
      * @throws \CEmail_Client_Exception_InvalidArgumentException
-     * @throws \CEmail_Client\Net\Exceptions\Exception
-     * @throws \CEmail_Client_Imap_Exception_Exception
+     * @throws \CEmail_Client_Exception
+     * @throws \CEmail_Client_Imap_Exception
      *
      * @return \CEmail_Client_ImapClient
      */
@@ -462,8 +462,8 @@ class CEmail_Client_ImapClient extends \CEmail_Client_AbstractNetClient {
      * @param string $sFolderName
      *
      * @throws \CEmail_Client_Exception_InvalidArgumentException
-     * @throws \CEmail_Client\Net\Exceptions\Exception
-     * @throws \CEmail_Client_Imap_Exception_Exception
+     * @throws \CEmail_Client_Exception
+     * @throws \CEmail_Client_Imap_Exception
      *
      * @return \CEmail_Client_ImapClient
      */
@@ -478,8 +478,8 @@ class CEmail_Client_ImapClient extends \CEmail_Client_AbstractNetClient {
      * @param string $sFolderName
      *
      * @throws \CEmail_Client_Exception_InvalidArgumentException
-     * @throws \CEmail_Client\Net\Exceptions\Exception
-     * @throws \CEmail_Client_Imap_Exception_Exception
+     * @throws \CEmail_Client_Exception
+     * @throws \CEmail_Client_Imap_Exception
      *
      * @return \CEmail_Client_ImapClient
      */
@@ -495,8 +495,8 @@ class CEmail_Client_ImapClient extends \CEmail_Client_AbstractNetClient {
      * @param string $sNewFolderName
      *
      * @throws \CEmail_Client_Exception_InvalidArgumentException
-     * @throws \CEmail_Client\Net\Exceptions\Exception
-     * @throws \CEmail_Client_Imap_Exception_Exception
+     * @throws \CEmail_Client_Exception
+     * @throws \CEmail_Client_Imap_Exception
      *
      * @return \CEmail_Client_ImapClient
      */
@@ -542,8 +542,8 @@ class CEmail_Client_ImapClient extends \CEmail_Client_AbstractNetClient {
      * @param array  $aStatusItems
      *
      * @throws \CEmail_Client_Exception_InvalidArgumentException
-     * @throws \CEmail_Client\Net\Exceptions\Exception
-     * @throws \CEmail_Client_Imap_Exception_Exception
+     * @throws \CEmail_Client_Exception
+     * @throws \CEmail_Client_Imap_Exception
      *
      * @return array|bool
      */
@@ -641,8 +641,8 @@ class CEmail_Client_ImapClient extends \CEmail_Client_AbstractNetClient {
      * @param string $sListPattern      = '*'
      * @param bool   $bUseListStatus    = false
      *
-     * @throws \CEmail_Client\Net\Exceptions\Exception
-     * @throws \CEmail_Client_Imap_Exception_Exception
+     * @throws \CEmail_Client_Exception
+     * @throws \CEmail_Client_Imap_Exception
      *
      * @return array
      */
@@ -686,8 +686,8 @@ class CEmail_Client_ImapClient extends \CEmail_Client_AbstractNetClient {
      * @param string $sParentFolderName = ''
      * @param string $sListPattern      = '*'
      *
-     * @throws \CEmail_Client\Net\Exceptions\Exception
-     * @throws \CEmail_Client_Imap_Exception_Exception
+     * @throws \CEmail_Client_Exception
+     * @throws \CEmail_Client_Imap_Exception
      *
      * @return array
      */
@@ -699,8 +699,8 @@ class CEmail_Client_ImapClient extends \CEmail_Client_AbstractNetClient {
      * @param string $sParentFolderName = ''
      * @param string $sListPattern      = '*'
      *
-     * @throws \CEmail_Client\Net\Exceptions\Exception
-     * @throws \CEmail_Client_Imap_Exception_Exception
+     * @throws \CEmail_Client_Exception
+     * @throws \CEmail_Client_Imap_Exception
      *
      * @return array
      */
@@ -712,8 +712,8 @@ class CEmail_Client_ImapClient extends \CEmail_Client_AbstractNetClient {
      * @param string $sParentFolderName = ''
      * @param string $sListPattern      = '*'
      *
-     * @throws \CEmail_Client\Net\Exceptions\Exception
-     * @throws \CEmail_Client_Imap_Exception_Exception
+     * @throws \CEmail_Client_Exception
+     * @throws \CEmail_Client_Imap_Exception
      *
      * @return array
      */
@@ -790,8 +790,8 @@ class CEmail_Client_ImapClient extends \CEmail_Client_AbstractNetClient {
      * @param bool   $bReSelectSameFolders
      *
      * @throws \CEmail_Client_Exception_InvalidArgumentException
-     * @throws \CEmail_Client\Net\Exceptions\Exception
-     * @throws \CEmail_Client_Imap_Exception_Exception
+     * @throws \CEmail_Client_Exception
+     * @throws \CEmail_Client_Imap_Exception
      *
      * @return \CEmail_Client_ImapClient
      */
@@ -830,8 +830,8 @@ class CEmail_Client_ImapClient extends \CEmail_Client_AbstractNetClient {
      * @param bool   $bReSelectSameFolders = false
      *
      * @throws \CEmail_Client_Exception_InvalidArgumentException
-     * @throws \CEmail_Client\Net\Exceptions\Exception
-     * @throws \CEmail_Client_Imap_Exception_Exception
+     * @throws \CEmail_Client_Exception
+     * @throws \CEmail_Client_Imap_Exception
      *
      * @return \CEmail_Client_ImapClient
      */
@@ -844,12 +844,12 @@ class CEmail_Client_ImapClient extends \CEmail_Client_AbstractNetClient {
      * @param bool   $bReSelectSameFolders = false
      *
      * @throws \CEmail_Client_Exception_InvalidArgumentException
-     * @throws \CEmail_Client\Net\Exceptions\Exception
-     * @throws \CEmail_Client_Imap_Exception_Exception
+     * @throws \CEmail_Client_Exception
+     * @throws \CEmail_Client_Imap_Exception
      *
      * @return \CEmail_Client_ImapClient
      */
-    public function FolderExamine($sFolderName, $bReSelectSameFolders = false) {
+    public function folderExamine($sFolderName, $bReSelectSameFolders = false) {
         return $this->selectOrExamineFolder($sFolderName, $this->__FORCE_SELECT_ON_EXAMINE__, $bReSelectSameFolders);
     }
 
@@ -859,8 +859,8 @@ class CEmail_Client_ImapClient extends \CEmail_Client_AbstractNetClient {
      * @param bool   $bIndexIsUid
      *
      * @throws \CEmail_Client_Exception_InvalidArgumentException
-     * @throws \CEmail_Client\Net\Exceptions\Exception
-     * @throws \CEmail_Client_Imap_Exception_Exception
+     * @throws \CEmail_Client_Exception
+     * @throws \CEmail_Client_Imap_Exception
      *
      * @return array
      */
@@ -874,7 +874,7 @@ class CEmail_Client_ImapClient extends \CEmail_Client_AbstractNetClient {
             );
         }
 
-        $aFetchItems = \CEmail_Client\Imap\Enumerations\FetchType::ChangeFetchItemsBefourRequest($aInputFetchItems);
+        $aFetchItems = \CEmail_Client_Imap_FetchType::changeFetchItemsBefourRequest($aInputFetchItems);
         foreach ($aFetchItems as $sName => $mItem) {
             if (0 < \strlen($sName) && '' !== $mItem) {
                 if (null === $this->aFetchCallbacks) {
@@ -892,9 +892,9 @@ class CEmail_Client_ImapClient extends \CEmail_Client_AbstractNetClient {
         $aReturn = [];
         $oImapResponse = null;
         foreach ($aResult as $oImapResponse) {
-            if (FetchResponse::isValidFetchImapResponse($oImapResponse)) {
-                if (FetchResponse::isNotEmptyFetchImapResponse($oImapResponse)) {
-                    $aReturn[] = FetchResponse::newInstance($oImapResponse);
+            if (CEmail_Client_Imap_FetchResponse::isValidFetchImapResponse($oImapResponse)) {
+                if (CEmail_Client_Imap_FetchResponse::isNotEmptyFetchImapResponse($oImapResponse)) {
+                    $aReturn[] = CEmail_Client_Imap_FetchResponse::newInstance($oImapResponse);
                 } else {
                     if ($this->oLogger) {
                         $this->oLogger->Write('Skipped Imap Response! [' . $oImapResponse->ToLine() . ']', \CLogger::NOTICE);
@@ -907,8 +907,8 @@ class CEmail_Client_ImapClient extends \CEmail_Client_AbstractNetClient {
     }
 
     /**
-     * @throws \CEmail_Client\Net\Exceptions\Exception
-     * @throws \CEmail_Client_Imap_Exception_Exception
+     * @throws \CEmail_Client_Exception
+     * @throws \CEmail_Client_Imap_Exception
      *
      * @return array|false
      */
@@ -999,7 +999,7 @@ class CEmail_Client_ImapClient extends \CEmail_Client_AbstractNetClient {
      * @param array  $aParams  = array()
      *
      * @throws \CEmail_Client_Exception_InvalidArgumentException
-     * @throws \CEmail_Client\Net\Exceptions\Exception
+     * @throws \CEmail_Client_Exception
      *
      * @return void
      */
@@ -1056,8 +1056,8 @@ class CEmail_Client_ImapClient extends \CEmail_Client_AbstractNetClient {
      * @param bool   $bFindCapa = false
      *
      * @throws \CEmail_Client_Exception_InvalidArgumentException
-     * @throws \CEmail_Client\Net\Exceptions\Exception
-     * @throws \CEmail_Client_Imap_Exception_Exception
+     * @throws \CEmail_Client_Exception
+     * @throws \CEmail_Client_Imap_Exception
      *
      * @return \CEmail_Client_ImapClient
      */
@@ -1105,7 +1105,7 @@ class CEmail_Client_ImapClient extends \CEmail_Client_AbstractNetClient {
             if (\CEmail_Client_Imap_Response::RESPONSE_STATUS_OK !== $aResult[$iCnt - 1]->statusOrIndex) {
                 if (isset($aResult[$iCnt - 1]->responseList[2][0]) && strtoupper($aResult[$iCnt - 1]->responseList[2][0]) === 'ALREADYEXISTS') {
                     $this->writeLogException(
-                        new \CEmail_Client\Mail\Exceptions\AlreadyExistsFolder(),
+                        new \CEmail_Client_Mail_Exception_AlreadyExistsFolderException(),
                         \CLogger::WARNING,
                         true
                     );
@@ -1134,7 +1134,7 @@ class CEmail_Client_ImapClient extends \CEmail_Client_AbstractNetClient {
             $sEndTag = (null === $sEndTag) ? $this->getCurrentTag() : $sEndTag;
 
             while (true) {
-                $oImapResponse = Response::newInstance();
+                $oImapResponse = CEmail_Client_Imap_Response::newInstance();
 
                 $this->partialParseResponseBranch($oImapResponse);
 
@@ -1218,7 +1218,7 @@ class CEmail_Client_ImapClient extends \CEmail_Client_AbstractNetClient {
      * @param mixed $bTreatAsAtom
      * @param mixed $sParentToken
      *
-     * @throws \CEmail_Client\Net\Exceptions\Exception
+     * @throws \CEmail_Client_Exception
      *
      * @return array|string
      */
@@ -1303,7 +1303,7 @@ class CEmail_Client_ImapClient extends \CEmail_Client_AbstractNetClient {
                         $sLiteral .= $sAddRead;
                         $iRead -= \strlen($sAddRead);
 
-                        \CEmail_Client\Base\Utils::ResetTimeLimit();
+                        \CEmail_Client_Utils::resetTimeLimit();
                     }
 
                     if (false !== $sLiteral) {
@@ -1660,7 +1660,7 @@ class CEmail_Client_ImapClient extends \CEmail_Client_AbstractNetClient {
             && \is_callable($this->aFetchCallbacks[$sFetchKey])
         ) {
             $rImapLiteralStream
-                = \CEmail_Client\Base\StreamWrappers\Literal::CreateStream($rImapStream, $iLiteralLen);
+                = \CEmail_Client_StreamWrapper_Literal::createStream($rImapStream, $iLiteralLen, $this->loader);
 
             $bResult = true;
             $this->writeLog('Start Callback for ' . $sParent . ' / ' . $sLiteralAtomUpperCase
@@ -1695,7 +1695,7 @@ class CEmail_Client_ImapClient extends \CEmail_Client_AbstractNetClient {
                             break;
                         }
 
-                        \CEmail_Client\Base\Utils::ResetTimeLimit();
+                        \CEmail_Client_Utils::resetTimeLimit();
                         $iNotReadLiteralLen += \strlen($sBuf);
                     }
 

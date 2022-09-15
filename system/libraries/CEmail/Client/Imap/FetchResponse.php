@@ -100,7 +100,7 @@ class CEmail_Client_Imap_FetchResponse {
      */
     public function getFetchBodyStructure($sRfc822SubMimeIndex = '') {
         $oBodyStructure = null;
-        $aBodyStructureArray = $this->GetFetchValue(Enumerations\FetchType::BODYSTRUCTURE);
+        $aBodyStructureArray = $this->GetFetchValue(CEmail_Client_Imap_FetchType::BODYSTRUCTURE);
 
         if (is_array($aBodyStructureArray)) {
             if (0 < strlen($sRfc822SubMimeIndex)) {
@@ -118,14 +118,14 @@ class CEmail_Client_Imap_FetchResponse {
      *
      * @return mixed
      */
-    public function GetFetchValue($sFetchItemName) {
+    public function getFetchValue($sFetchItemName) {
         $mReturn = null;
         $bNextIsValue = false;
 
-        if (Enumerations\FetchType::INDEX === $sFetchItemName) {
-            $mReturn = $this->oImapResponse->ResponseList[1];
-        } elseif (isset($this->oImapResponse->ResponseList[3]) && \is_array($this->oImapResponse->ResponseList[3])) {
-            foreach ($this->oImapResponse->ResponseList[3] as $mItem) {
+        if (CEmail_Client_Imap_FetchType::INDEX === $sFetchItemName) {
+            $mReturn = $this->oImapResponse->responseList[1];
+        } elseif (isset($this->oImapResponse->responseList[3]) && \is_array($this->oImapResponse->responseList[3])) {
+            foreach ($this->oImapResponse->responseList[3] as $mItem) {
                 if (is_string($mItem) && preg_match("/(BODY\[(.*?)\])<0>/i", $mItem, $aMatches)) {
                     $mItem = $aMatches[1];
                 }
@@ -150,25 +150,23 @@ class CEmail_Client_Imap_FetchResponse {
      *
      * @return string
      */
-    public function GetHeaderFieldsValue($sRfc822SubMimeIndex = '') {
+    public function getHeaderFieldsValue($sRfc822SubMimeIndex = '') {
         $sReturn = '';
         $bNextIsValue = false;
 
         $sRfc822SubMimeIndex = 0 < \strlen($sRfc822SubMimeIndex) ? '' . $sRfc822SubMimeIndex . '.' : '';
 
-        if (isset($this->oImapResponse->ResponseList[3]) && \is_array($this->oImapResponse->ResponseList[3])) {
-            foreach ($this->oImapResponse->ResponseList[3] as $mItem) {
+        if (isset($this->oImapResponse->responseList[3]) && \is_array($this->oImapResponse->responseList[3])) {
+            foreach ($this->oImapResponse->responseList[3] as $mItem) {
                 if ($bNextIsValue) {
                     $sReturn = (string) $mItem;
 
                     break;
                 }
 
-                if (\is_string($mItem) && (
-                    $mItem === 'BODY[' . $sRfc822SubMimeIndex . 'HEADER]'
-                    || 0 === \strpos($mItem, 'BODY[' . $sRfc822SubMimeIndex . 'HEADER.FIELDS')
-                    || $mItem === 'BODY[' . $sRfc822SubMimeIndex . 'MIME]'
-                )) {
+                if (\is_string($mItem)
+                    && ($mItem === 'BODY[' . $sRfc822SubMimeIndex . 'HEADER]' || 0 === \strpos($mItem, 'BODY[' . $sRfc822SubMimeIndex . 'HEADER.FIELDS') || $mItem === 'BODY[' . $sRfc822SubMimeIndex . 'MIME]')
+                ) {
                     $bNextIsValue = true;
                 }
             }
@@ -182,9 +180,9 @@ class CEmail_Client_Imap_FetchResponse {
         $bSize = false;
         if (is_array($aList)) {
             foreach ($aList as $mItem) {
-                if (\CEmail_Client_Imap_Enumerations\FetchType::UID === $mItem) {
+                if (\CEmail_Client_Imap_FetchType::UID === $mItem) {
                     $bUid = true;
-                } elseif (\CEmail_Client_Imap_Enumerations\FetchType::RFC822_SIZE === $mItem) {
+                } elseif (\CEmail_Client_Imap_FetchType::RFC822_SIZE === $mItem) {
                     $bSize = true;
                 }
             }
@@ -198,13 +196,13 @@ class CEmail_Client_Imap_FetchResponse {
      *
      * @return bool
      */
-    public static function IsValidFetchImapResponse($oImapResponse) {
+    public static function isValidFetchImapResponse($oImapResponse) {
         return
             $oImapResponse
             && true !== $oImapResponse->IsStatusResponse
-            && \CEmail_Client_Imap_Enumerations\ResponseType::UNTAGGED === $oImapResponse->ResponseType
-            && 3 < count($oImapResponse->ResponseList) && 'FETCH' === $oImapResponse->ResponseList[2]
-            && is_array($oImapResponse->ResponseList[3]);
+            && \CEmail_Client_Imap_Response::RESPONSE_TYPE_UNTAGGED === $oImapResponse->responseType
+            && 3 < count($oImapResponse->responseList) && 'FETCH' === $oImapResponse->responseList[2]
+            && is_array($oImapResponse->responseList[3]);
     }
 
     /**
@@ -212,12 +210,12 @@ class CEmail_Client_Imap_FetchResponse {
      *
      * @return bool
      */
-    public static function IsNotEmptyFetchImapResponse($oImapResponse) {
+    public static function isNotEmptyFetchImapResponse($oImapResponse) {
         return
             $oImapResponse
-            && self::IsValidFetchImapResponse($oImapResponse)
-            && isset($oImapResponse->ResponseList[3])
-            && self::findFetchUidAndSize($oImapResponse->ResponseList[3]);
+            && self::isValidFetchImapResponse($oImapResponse)
+            && isset($oImapResponse->responseList[3])
+            && self::findFetchUidAndSize($oImapResponse->responseList[3]);
     }
 
     /**

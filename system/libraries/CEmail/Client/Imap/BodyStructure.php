@@ -740,7 +740,7 @@ class CEmail_Client_Imap_BodyStructure {
      *
      * @return null|\CEmail_Client_Imap_BodyStructure
      */
-    public static function mewInstanceFromRfc822SubPart(array $aBodyStructure, $sSubPartID) {
+    public static function newInstanceFromRfc822SubPart(array $aBodyStructure, $sSubPartID) {
         $oBody = null;
         $aBodySubStructure = self::findPartByIndexInArray($aBodyStructure, $sSubPartID);
         if ($aBodySubStructure && \is_array($aBodySubStructure) && isset($aBodySubStructure[8])) {
