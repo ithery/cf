@@ -36,4 +36,11 @@ class CEmail {
     public static function mailer($name = '') {
         return CEmail_MailManager::instance()->mailer($name);
     }
+
+    /**
+     * @return CEmail_Client
+     */
+    public static function client() {
+        return new CEmail_Client();
+    }
 }
