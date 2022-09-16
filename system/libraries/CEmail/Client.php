@@ -43,4 +43,8 @@ class CEmail_Client {
         $this->preferStartTlsIfAutoDetect = true;
         $this->systemLogger = null;
     }
+
+    public function imap() {
+        return CEmail_Client_ImapClient::newInstance();
+    }
 }

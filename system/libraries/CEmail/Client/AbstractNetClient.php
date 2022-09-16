@@ -147,13 +147,13 @@ abstract class CEmail_Client_AbstractNetClient {
 
     /**
      * @param int $iConnectTimeOut = 10
-     * @param int $iSocketTimeOut  = 10
+     * @param int $socketTimeOut   = 10
      *
      * @return void
      */
-    public function setTimeOuts($iConnectTimeOut = 10, $iSocketTimeOut = 10) {
+    public function setTimeOuts($iConnectTimeOut = 10, $socketTimeOut = 10) {
         $this->connectTimeOut = $iConnectTimeOut;
-        $this->socketTimeOut = $iSocketTimeOut;
+        $this->socketTimeOut = $socketTimeOut;
     }
 
     /**
@@ -161,6 +161,18 @@ abstract class CEmail_Client_AbstractNetClient {
      */
     public function getConnection() {
         return $this->connection;
+    }
+
+    /**
+     * @param int    $iErrNo
+     * @param string $sErrStr
+     * @param string $sErrFile
+     * @param int    $iErrLine
+     *
+     * @return bool
+     */
+    public function capturePhpErrorWithException($iErrNo, $sErrStr, $sErrFile, $iErrLine) {
+        throw new CEmail_Client_Exception($sErrStr, $iErrNo);
     }
 
     /**
@@ -226,7 +238,7 @@ abstract class CEmail_Client_AbstractNetClient {
 
         $this->startConnectTime = \microtime(true);
         $this->writeLog(
-            'Start connection to "' . $this->connectedHost . ':' . $this->iConnectedPort . '"',
+            'Start connection to "' . $this->connectedHost . ':' . $this->connectedPort . '"',
             \CLogger::INFO
         );
 
@@ -275,13 +287,13 @@ abstract class CEmail_Client_AbstractNetClient {
         }
 
         $this->writeLog(
-            (\microtime(true) - $this->iStartConnectTime) . ' (raw connection)',
+            (\microtime(true) - $this->startConnectTime) . ' (raw connection)',
             \CLogger::INFO
         );
 
         if ($this->connection) {
             if (\CBase_DependencyUtils::functionExistsAndEnabled('stream_set_timeout')) {
-                @\stream_set_timeout($this->connection, $this->iSocketTimeOut);
+                @\stream_set_timeout($this->connection, $this->socketTimeOut);
             }
         }
     }
@@ -310,16 +322,16 @@ abstract class CEmail_Client_AbstractNetClient {
         if (\is_resource($this->connection)) {
             $bResult = \fclose($this->connection);
 
-            $this->writeLog('Disconnected from "' . $this->connectedHost . ':' . $this->iConnectedPort . '" ('
+            $this->writeLog('Disconnected from "' . $this->connectedHost . ':' . $this->connectedPort . '" ('
                 . (($bResult) ? 'success' : 'unsuccess') . ')', \CLogger::INFO);
 
-            if (0 !== $this->iStartConnectTime) {
+            if (0 !== $this->startConnectTime) {
                 $this->writeLog(
-                    (\microtime(true) - $this->iStartConnectTime) . ' (net session)',
+                    (\microtime(true) - $this->startConnectTime) . ' (net session)',
                     \CLogger::INFO
                 );
 
-                $this->iStartConnectTime = 0;
+                $this->startConnectTime = 0;
             }
 
             $this->connection = null;
@@ -396,7 +408,7 @@ abstract class CEmail_Client_AbstractNetClient {
         $bFake = 0 < \strlen($sFakeRaw);
         $sRaw .= "\r\n";
 
-        if ($this->oLogger && $this->oLogger->IsShowSecter()) {
+        if ($this->logger && $this->logger->isShowSecter()) {
             $bFake = false;
         }
 
@@ -515,8 +527,8 @@ abstract class CEmail_Client_AbstractNetClient {
      * @return void
      */
     protected function writeLog($sDesc, $iDescType = \CLogger::INFO) {
-        if ($this->oLogger) {
-            $this->oLogger->Write($sDesc, $iDescType, $this->getLogName());
+        if ($this->logger) {
+            $this->logger->Write($sDesc, $iDescType, $this->getLogName());
         }
     }
 
@@ -574,7 +586,7 @@ abstract class CEmail_Client_AbstractNetClient {
      * @return null|object
      */
     public function logger() {
-        return $this->oLogger;
+        return $this->logger;
     }
 
     /**

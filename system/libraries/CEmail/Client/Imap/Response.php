@@ -91,6 +91,6 @@ class CEmail_Client_Imap_Response {
      * @return string
      */
     public function toLine() {
-        return $this->recToLine($this->ResponseList);
+        return $this->recToLine($this->responseList);
     }
 }

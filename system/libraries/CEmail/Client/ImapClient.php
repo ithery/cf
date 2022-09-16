@@ -197,8 +197,8 @@ class CEmail_Client_ImapClient extends \CEmail_Client_AbstractNetClient {
 
                     if ($oContinuationResponse) {
                         $sToken = \base64_encode("\0" . $sLogin . "\0" . $sPassword);
-                        if ($this->oLogger) {
-                            $this->oLogger->AddSecret($sToken);
+                        if ($this->logger) {
+                            $this->logger->AddSecret($sToken);
                         }
 
                         $this->Logger()->WriteDump($aResponse);
@@ -211,8 +211,8 @@ class CEmail_Client_ImapClient extends \CEmail_Client_AbstractNetClient {
                 }
             } elseif ($bUseAuthPlainIfSupported && $this->isSupported('AUTH=PLAIN')) {
                 $sToken = \base64_encode("\0" . $sLogin . "\0" . $sPassword);
-                if ($this->oLogger) {
-                    $this->oLogger->AddSecret($sToken);
+                if ($this->logger) {
+                    $this->logger->AddSecret($sToken);
                 }
 
                 if ($this->isSupported('AUTH=SASL-IR') && false) {
@@ -225,8 +225,8 @@ class CEmail_Client_ImapClient extends \CEmail_Client_AbstractNetClient {
                     $this->parseResponseWithValidation();
                 }
             } else {
-                if ($this->oLogger) {
-                    $this->oLogger->AddSecret($this->EscapeString($sPassword));
+                if ($this->logger) {
+                    $this->logger->AddSecret($this->EscapeString($sPassword));
                 }
 
                 $this->sendRequestWithCheck(
@@ -741,24 +741,24 @@ class CEmail_Client_ImapClient extends \CEmail_Client_AbstractNetClient {
                         $oResult->Flags = $oImapResponse->responseList[2];
                     }
 
-                    if (is_array($oImapResponse->OptionalResponse) && \count($oImapResponse->OptionalResponse) > 1) {
-                        if ('PERMANENTFLAGS' === $oImapResponse->OptionalResponse[0]
-                            && is_array($oImapResponse->OptionalResponse[1])
+                    if (is_array($oImapResponse->optionalResponse) && \count($oImapResponse->optionalResponse) > 1) {
+                        if ('PERMANENTFLAGS' === $oImapResponse->optionalResponse[0]
+                            && is_array($oImapResponse->optionalResponse[1])
                         ) {
-                            $oResult->PermanentFlags = $oImapResponse->OptionalResponse[1];
-                        } elseif ('UIDVALIDITY' === $oImapResponse->OptionalResponse[0]
-                            && isset($oImapResponse->OptionalResponse[1])
+                            $oResult->PermanentFlags = $oImapResponse->optionalResponse[1];
+                        } elseif ('UIDVALIDITY' === $oImapResponse->optionalResponse[0]
+                            && isset($oImapResponse->optionalResponse[1])
                         ) {
-                            $oResult->Uidvalidity = $oImapResponse->OptionalResponse[1];
-                        } elseif ('UNSEEN' === $oImapResponse->OptionalResponse[0]
-                            && isset($oImapResponse->OptionalResponse[1])
-                            && is_numeric($oImapResponse->OptionalResponse[1])
+                            $oResult->Uidvalidity = $oImapResponse->optionalResponse[1];
+                        } elseif ('UNSEEN' === $oImapResponse->optionalResponse[0]
+                            && isset($oImapResponse->optionalResponse[1])
+                            && is_numeric($oImapResponse->optionalResponse[1])
                         ) {
-                            $oResult->Unread = (int) $oImapResponse->OptionalResponse[1];
-                        } elseif ('UIDNEXT' === $oImapResponse->OptionalResponse[0]
-                            && isset($oImapResponse->OptionalResponse[1])
+                            $oResult->Unread = (int) $oImapResponse->optionalResponse[1];
+                        } elseif ('UIDNEXT' === $oImapResponse->optionalResponse[0]
+                            && isset($oImapResponse->optionalResponse[1])
                         ) {
-                            $oResult->Uidnext = $oImapResponse->OptionalResponse[1];
+                            $oResult->Uidnext = $oImapResponse->optionalResponse[1];
                         }
                     }
 
@@ -896,8 +896,8 @@ class CEmail_Client_ImapClient extends \CEmail_Client_AbstractNetClient {
                 if (CEmail_Client_Imap_FetchResponse::isNotEmptyFetchImapResponse($oImapResponse)) {
                     $aReturn[] = CEmail_Client_Imap_FetchResponse::newInstance($oImapResponse);
                 } else {
-                    if ($this->oLogger) {
-                        $this->oLogger->Write('Skipped Imap Response! [' . $oImapResponse->ToLine() . ']', \CLogger::NOTICE);
+                    if ($this->logger) {
+                        $this->logger->Write('Skipped Imap Response! [' . $oImapResponse->ToLine() . ']', \CLogger::NOTICE);
                     }
                 }
             }
@@ -1094,7 +1094,7 @@ class CEmail_Client_ImapClient extends \CEmail_Client_AbstractNetClient {
         }
 
         if ($aResult[$iCnt - 1]->responseType !== \CEmail_Client_Imap_Response::RESPONSE_TYPE_CONTINUATION) {
-            if (!$aResult[$iCnt - 1]->IsStatusResponse) {
+            if (!$aResult[$iCnt - 1]->isStatusResponse) {
                 $this->writeLogException(
                     new CEmail_Client_Imap_Exception_InvalidResponseException($aResult),
                     \CLogger::WARNING,
@@ -1129,7 +1129,7 @@ class CEmail_Client_ImapClient extends \CEmail_Client_AbstractNetClient {
      * @return array|bool
      */
     protected function parseResponse($sEndTag = null, $bFindCapa = false) {
-        if (\is_resource($this->rConnect)) {
+        if (\is_resource($this->connection)) {
             $oImapResponse = null;
             $sEndTag = (null === $sEndTag) ? $this->getCurrentTag() : $sEndTag;
 
@@ -1199,11 +1199,11 @@ class CEmail_Client_ImapClient extends \CEmail_Client_AbstractNetClient {
                 && 'CAPABILITY' === \strtoupper($oImapResponse->responseList[1])
             ) {
                 $aList = \array_slice($oImapResponse->responseList, 2);
-            } elseif ($oImapResponse->OptionalResponse && \is_array($oImapResponse->OptionalResponse)
-                && 1 < \count($oImapResponse->OptionalResponse) && \is_string($oImapResponse->OptionalResponse[0])
-                && 'CAPABILITY' === \strtoupper($oImapResponse->OptionalResponse[0])
+            } elseif ($oImapResponse->optionalResponse && \is_array($oImapResponse->optionalResponse)
+                && 1 < \count($oImapResponse->optionalResponse) && \is_string($oImapResponse->optionalResponse[0])
+                && 'CAPABILITY' === \strtoupper($oImapResponse->optionalResponse[0])
             ) {
-                $aList = \array_slice($oImapResponse->OptionalResponse, 1);
+                $aList = \array_slice($oImapResponse->optionalResponse, 1);
             }
 
             if (\is_array($aList) && 0 < \count($aList)) {
@@ -1281,7 +1281,7 @@ class CEmail_Client_ImapClient extends \CEmail_Client_AbstractNetClient {
                 if ($this->partialResponseLiteralCallbackCallable(
                     $sParentToken,
                     null === $sPreviousAtomUpperCase ? '' : \strtoupper($sPreviousAtomUpperCase),
-                    $this->rConnect,
+                    $this->connection,
                     $iLiteralLen
                 )
                 ) {
@@ -1293,7 +1293,7 @@ class CEmail_Client_ImapClient extends \CEmail_Client_AbstractNetClient {
                     $iRead = $iLiteralLen;
 
                     while (0 < $iRead) {
-                        $sAddRead = \fread($this->rConnect, $iRead);
+                        $sAddRead = \fread($this->connection, $iRead);
                         if (false === $sAddRead) {
                             $sLiteral = false;
 
@@ -1365,8 +1365,8 @@ class CEmail_Client_ImapClient extends \CEmail_Client_AbstractNetClient {
                 $aList[] = $aSubItems;
                 $iPos = $this->iResponseBufParsedPos;
                 $sPreviousAtomUpperCase = null;
-                if (null !== $oImapResponse && $oImapResponse->IsStatusResponse) {
-                    $oImapResponse->OptionalResponse = $aSubItems;
+                if (null !== $oImapResponse && $oImapResponse->isStatusResponse) {
+                    $oImapResponse->optionalResponse = $aSubItems;
 
                     $bIsGotoDefault = true;
                     $bIsGotoNotAtomBracket = false;
@@ -1515,7 +1515,7 @@ class CEmail_Client_ImapClient extends \CEmail_Client_AbstractNetClient {
                 default:
                     $iCharBlockStartPos = $iPos;
 
-                    if (null !== $oImapResponse && $oImapResponse->IsStatusResponse) {
+                    if (null !== $oImapResponse && $oImapResponse->isStatusResponse) {
                         $iPos = $iBufferEndIndex;
 
                         while ($iPos > $iCharBlockStartPos && $this->sResponseBuffer[$iCharBlockStartPos] == ' ') {
@@ -1607,11 +1607,11 @@ class CEmail_Client_ImapClient extends \CEmail_Client_AbstractNetClient {
                                     || $oImapResponse->statusOrIndex == \CEmail_Client_Imap_Response::RESPONSE_STATUS_BYE
                                     || $oImapResponse->statusOrIndex == \CEmail_Client_Imap_Response::RESPONSE_STATUS_PREAUTH
                                 ) {
-                                    $oImapResponse->IsStatusResponse = true;
+                                    $oImapResponse->isStatusResponse = true;
                                 }
                             } elseif (\CEmail_Client_Imap_Response::RESPONSE_TYPE_CONTINUATION === $oImapResponse->responseType) {
                                 $oImapResponse->HumanReadable = $sLastCharBlock;
-                            } elseif ($oImapResponse->IsStatusResponse) {
+                            } elseif ($oImapResponse->isStatusResponse) {
                                 $oImapResponse->HumanReadable = $sLastCharBlock;
                             }
                         }
@@ -1782,26 +1782,26 @@ class CEmail_Client_ImapClient extends \CEmail_Client_AbstractNetClient {
     }
 
     /**
-     * @param \CEmail_Client\Log\Logger $oLogger
+     * @param \CEmail_Client\Log\Logger $logger
      *
      * @throws \CEmail_Client_Exception_InvalidArgumentException
      *
      * @return \CEmail_Client_ImapClient
      */
-    public function setLogger($oLogger) {
-        parent::setLogger($oLogger);
+    public function setLogger($logger) {
+        parent::setLogger($logger);
 
         return $this;
     }
 
     /**
-     * @param resource $rConnect
+     * @param resource $connection
      * @param array    $aCapabilityItems = array()
      *
      * @return \CEmail_Client_ImapClient
      */
-    public function testSetValues($rConnect, $aCapabilityItems = []) {
-        $this->rConnect = $rConnect;
+    public function testSetValues($connection, $aCapabilityItems = []) {
+        $this->connection = $connection;
         $this->aCapabilityItems = $aCapabilityItems;
 
         return $this;
