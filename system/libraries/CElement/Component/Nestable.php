@@ -34,6 +34,8 @@ class CElement_Component_Nestable extends CElement_Component {
 
     protected $js_cell;
 
+    protected $isCollapsed = false;
+
     public function __construct($id) {
         parent::__construct($id);
         CManager::registerModule('jquery.nestable');
@@ -73,6 +75,17 @@ class CElement_Component_Nestable extends CElement_Component {
 
     public function setDataFromTreeDb(CTreeDB $treedb, $parentId = null) {
         $this->data = $treedb->getChildrenData($parentId);
+
+        return $this;
+    }
+
+    /**
+     * @param bool $bool
+     *
+     * @return $this
+     */
+    public function setCollapsed($bool = true) {
+        $this->isCollapsed = $bool;
 
         return $this;
     }
@@ -128,6 +141,18 @@ class CElement_Component_Nestable extends CElement_Component {
         return $this;
     }
 
+    public function disableDnd() {
+        $this->disable_dnd = true;
+
+        return $this;
+    }
+
+    public function enableDnd() {
+        $this->disable_dnd = false;
+
+        return $this;
+    }
+
     public function setHaveCheckbox($checkbox) {
         $this->checkbox = $checkbox;
 
@@ -155,7 +180,8 @@ class CElement_Component_Nestable extends CElement_Component {
     public function html($indent = 0) {
         $html = new CStringBuilder();
         $html->setIndent($indent);
-        $html->appendln('<div id="' . $this->id . '" class="dd nestable">')->incIndent();
+        $styles = $this->disable_dnd ? 'pointer-events: none;' : '';
+        $html->appendln('<div id="' . $this->id . '" cres-element="component:Nestable" class="dd nestable cres-nestable cres:element:component:Nestable" style="' . $styles . '">')->incIndent();
         if (count($this->data) > 0) {
             $depthBefore = -1;
             $in = 0;
@@ -245,6 +271,11 @@ class CElement_Component_Nestable extends CElement_Component {
                     } else {
                         jQuery('#" . $this->input . "').val('JSON browser support required for this demo.');
                     }
+                ");
+            }
+            if ($this->isCollapsed) {
+                $js->appendln("
+                    jQuery('#" . $this->id . "').nestable('collapseAll');
                 ");
             }
         }

@@ -117,10 +117,16 @@ class CEmail_Config {
         return $config;
     }
 
+    /**
+     * @return string
+     */
     public function getDriver() {
         return $this->driver;
     }
 
+    /**
+     * @return string
+     */
     public function getUsername() {
         return $this->username;
     }

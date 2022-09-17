@@ -86,7 +86,7 @@ class CApi_Docs_Generator {
      * @throws CApi_Docs_Exception_SwaggerException
      */
     public function generateDocs() {
-        $this->prepareDirectory()
+        return $this->prepareDirectory()
             ->defineConstants()
             ->scanFilesForDocumentation()
             ->populateServers()

@@ -44,7 +44,7 @@ class CBot_Driver_WebDriver extends CBot_DriverAbstract {
         $this->payload = $request->request->all();
         $this->event = CCollection::make($this->payload);
         $this->files = CCollection::make($request->files->all());
-        $this->config = CCollection::make($this->config->get('web', []));
+        $this->config = CCollection::make($this->config->get('drivers.web', []));
     }
 
     public static function getName() {

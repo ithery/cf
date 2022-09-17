@@ -3,7 +3,6 @@
 class CEmail_Driver_SendGridDriver extends CEmail_DriverAbstract {
     public function send(array $to, $subject, $body, $options = []) {
         $apiKey = $this->config->getPassword();
-
         $from = carr::get($options, 'from', $this->config->getFrom());
         $fromName = carr::get($options, 'from_name', $this->config->getFromName());
         $attachments = carr::get($options, 'attachments', []);
