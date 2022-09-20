@@ -65,6 +65,12 @@ class CServer {
         return gethostname();
     }
 
+    public static function getCurrentProcessUser() {
+        $processUser = posix_getpwuid(posix_geteuid());
+
+        return carr::get($processUser, 'name');
+    }
+
     public static function getOS() {
         $os = self::config()->get('os');
         if ($os == null) {
