@@ -6,7 +6,7 @@ defined('SYSPATH') or die('No direct access allowed.');
  * @author Hery Kurniawan
  * @license Ittron Global Teknologi <ittron.co.id>
  *
- * @since Feb 17, 2019, 2:08:19 AM
+ * @see https://github.com/nehakadam/DateTimePicker
  */
 class CElement_FormInput_DateTime_ModalDateTime extends CElement_FormInput_DateTime {
     public function __construct($id) {
