@@ -11,6 +11,11 @@ return [
         'uri' => 'demo/controls/password/index',
     ],
     [
+        'name' => 'controls.datetime',
+        'label' => c::__('Date Time'),
+        'uri' => 'demo/controls/datetime/index',
+    ],
+    [
         'name' => 'controls.image',
         'label' => c::__('Image'),
         'uri' => 'demo/controls/image/index',
