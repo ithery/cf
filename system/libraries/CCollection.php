@@ -1522,6 +1522,7 @@ class CCollection implements ArrayAccess, CInterface_Enumerable, CBase_Contract_
      *
      * @return \ArrayIterator
      */
+    #[\ReturnTypeWillChange]
     public function getIterator() {
         return new ArrayIterator($this->items);
     }
@@ -1531,6 +1532,7 @@ class CCollection implements ArrayAccess, CInterface_Enumerable, CBase_Contract_
      *
      * @return int
      */
+    #[\ReturnTypeWillChange]
     public function count() {
         return count($this->items);
     }
@@ -1575,6 +1577,7 @@ class CCollection implements ArrayAccess, CInterface_Enumerable, CBase_Contract_
      *
      * @return bool
      */
+    #[\ReturnTypeWillChange]
     public function offsetExists($key) {
         return isset($this->items[$key]);
     }
@@ -1598,6 +1601,7 @@ class CCollection implements ArrayAccess, CInterface_Enumerable, CBase_Contract_
      *
      * @return void
      */
+    #[\ReturnTypeWillChange]
     public function offsetSet($key, $value) {
         if (is_null($key)) {
             $this->items[] = $value;
@@ -1613,6 +1617,7 @@ class CCollection implements ArrayAccess, CInterface_Enumerable, CBase_Contract_
      *
      * @return void
      */
+    #[\ReturnTypeWillChange]
     public function offsetUnset($key) {
         unset($this->items[$key]);
     }
