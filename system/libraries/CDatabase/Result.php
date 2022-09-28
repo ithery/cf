@@ -80,6 +80,7 @@ abstract class CDatabase_Result implements CDatabase_ResultInterface, ArrayAcces
     /**
      * Countable: count.
      */
+    #[\ReturnTypeWillChange]
     public function count() {
         return $this->total_rows;
     }
@@ -89,6 +90,7 @@ abstract class CDatabase_Result implements CDatabase_ResultInterface, ArrayAcces
      *
      * @param mixed $offset
      */
+    #[\ReturnTypeWillChange]
     public function offsetExists($offset) {
         if ($this->total_rows > 0) {
             $min = 0;
@@ -122,6 +124,7 @@ abstract class CDatabase_Result implements CDatabase_ResultInterface, ArrayAcces
      *
      * @throws CDatabase_Exception
      */
+    #[\ReturnTypeWillChange]
     public function offsetSet($offset, $value) {
         throw new CDatabase_Exception('Query results are read only');
     }
@@ -133,6 +136,7 @@ abstract class CDatabase_Result implements CDatabase_ResultInterface, ArrayAcces
      *
      * @throws CDatabase_Exception
      */
+    #[\ReturnTypeWillChange]
     public function offsetUnset($offset) {
         throw new CDatabase_Exception('Query results are read only');
     }
@@ -154,6 +158,7 @@ abstract class CDatabase_Result implements CDatabase_ResultInterface, ArrayAcces
     /**
      * Iterator: next.
      */
+    #[\ReturnTypeWillChange]
     public function next() {
         ++$this->current_row;
 
@@ -172,6 +177,7 @@ abstract class CDatabase_Result implements CDatabase_ResultInterface, ArrayAcces
     /**
      * Iterator: rewind.
      */
+    #[\ReturnTypeWillChange]
     public function rewind() {
         $this->current_row = 0;
 
@@ -181,6 +187,7 @@ abstract class CDatabase_Result implements CDatabase_ResultInterface, ArrayAcces
     /**
      * Iterator: valid.
      */
+    #[\ReturnTypeWillChange]
     public function valid() {
         return $this->offsetExists($this->current_row);
     }

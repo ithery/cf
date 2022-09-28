@@ -32,7 +32,7 @@ class CBase_ViewErrorBag implements Countable {
      * @return CBase_MessageBag
      */
     public function getBag($key) {
-        return carr::get($this->bags, $key) ?: new CBase_MessageBag;
+        return carr::get($this->bags, $key) ?: new CBase_MessageBag();
     }
 
     /**
@@ -72,6 +72,7 @@ class CBase_ViewErrorBag implements Countable {
      *
      * @return int
      */
+    #[\ReturnTypeWillChange]
     public function count() {
         return $this->getBag('default')->count();
     }
