@@ -374,10 +374,10 @@ final class CF {
 
             $modules = CF::modules($domain);
             //when this domain is org
-            if (strlen($orgCode) > 0) {
+            if ($orgCode != null && strlen($orgCode) > 0) {
                 $paths[] = APPPATH . $appCode . DS . $orgCode . DS;
             }
-            if (strlen($appCode) > 0) {
+            if ($appCode != null && strlen($appCode) > 0) {
                 //add theme path if theme exists
                 $paths[] = APPPATH . $appCode . DS . 'default' . DS;
             }

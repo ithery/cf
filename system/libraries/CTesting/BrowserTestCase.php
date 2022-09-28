@@ -40,10 +40,15 @@ abstract class CTesting_BrowserTestCase extends CTesting_TestCase {
      * @return \Facebook\WebDriver\Remote\RemoteWebDriver
      */
     protected function driver() {
-        $driver = RemoteWebDriver::create(
-            'http://localhost:9515',
-            DesiredCapabilities::chrome()
-        );
+        $driver = null;
+        try {
+            $driver = RemoteWebDriver::create(
+                'http://localhost:9515',
+                DesiredCapabilities::chrome()
+            );
+        } catch (Exception $e) {
+            cdbg::dd($e->getMessage());
+        }
 
         return $driver;
     }
