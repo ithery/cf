@@ -116,6 +116,48 @@ return [
                 'label' => c::__('Table'),
                 'uri' => 'docs/element/table',
             ],
+            [
+                'name' => 'element.form',
+                'label' => c::__('Form'),
+                'uri' => 'docs/element/form',
+            ],
+            [
+                'name' => 'element.tab',
+                'label' => c::__('Tab'),
+                'uri' => 'docs/element/tab',
+            ],
+            [
+                'name' => 'element.widget',
+                'label' => c::__('Widget'),
+                'uri' => 'docs/element/widget',
+            ],
+            [
+                'name' => 'element.showmore',
+                'label' => c::__('ShowMore'),
+                'uri' => 'docs/element/showmore',
+            ],
+            [
+                'name' => 'element.shimmer',
+                'label' => c::__('Shimmer'),
+                'uri' => 'docs/element/shimmer',
+            ],
+
+        ]
+    ],
+    [
+        'name' => 'forminput',
+        'label' => c::__('Form Input'),
+        'subnav' => [
+            [
+                'name' => 'forminput.standard',
+                'label' => c::__('Standard Control'),
+                'uri' => 'docs/forminput/standard',
+            ],
+            [
+                'name' => 'forminput.selectsearch',
+                'label' => c::__('Select Search'),
+                'uri' => 'docs/forminput/selectsearch',
+            ],
 
         ]
     ],
@@ -152,18 +194,23 @@ return [
         'subnav' => [
             [
                 'name' => 'module.queue',
-                'label' => c::__('Queue'),
+                'label' => c::__('CQueue'),
                 'uri' => 'docs/module/queue',
             ],
             [
                 'name' => 'module.daemon',
-                'label' => c::__('Daemon'),
+                'label' => c::__('CDaemon'),
                 'uri' => 'docs/module/daemon',
             ],
             [
                 'name' => 'module.cron',
-                'label' => c::__('Cron'),
+                'label' => c::__('CCron'),
                 'uri' => 'docs/module/cron',
+            ],
+            [
+                'name' => 'module.period',
+                'label' => c::__('CPeriod'),
+                'uri' => 'docs/module/period',
             ],
         ]
     ],
@@ -182,6 +229,11 @@ return [
                 'uri' => 'docs/cresjs/basic',
             ],
             [
+                'name' => 'cresjs.css',
+                'label' => c::__('Css'),
+                'uri' => 'docs/cresjs/css',
+            ],
+            [
                 'name' => 'cresjs.php',
                 'label' => c::__('PHPJS Function'),
                 'uri' => 'docs/cresjs/php',
@@ -190,6 +242,16 @@ return [
                 'name' => 'cresjs.reload',
                 'label' => c::__('Reload'),
                 'uri' => 'docs/cresjs/reload',
+            ],
+            [
+                'name' => 'cresjs.confirm',
+                'label' => c::__('Confirm'),
+                'uri' => 'docs/cresjs/confirm',
+            ],
+            [
+                'name' => 'cresjs.observer',
+                'label' => c::__('Observer'),
+                'uri' => 'docs/cresjs/observer',
             ],
             [
                 'name' => 'cresjs.ui',
@@ -201,6 +263,12 @@ return [
                 'label' => c::__('Helper'),
                 'uri' => 'docs/cresjs/helper',
             ],
+            [
+                'name' => 'cresjs.cssVar',
+                'label' => c::__('CSS Var'),
+                'uri' => 'docs/cresjs/cssVar',
+            ],
+
         ]
     ],
     [

@@ -15,7 +15,7 @@ use League\CommonMark\Node\Block\AbstractBlock;
 use League\CommonMark\Parser\InlineParserEngineInterface;
 
 /**
- * Base class for a block parser
+ * Base class for a block parser.
  *
  * Slightly more convenient to extend from vs. implementing the interface
  */

@@ -57,9 +57,9 @@ class CJavascript_Validation_ValidatorDelegated {
     }
 
     /**
-     * Get current \Illuminate\Validation\Validator instance.
+     * Get current Validator instance.
      *
-     * @return \Illuminate\Validation\Validator
+     * @return \CValidation_Validator
      */
     public function getValidator() {
         return $this->validator;
@@ -194,6 +194,7 @@ class CJavascript_Validation_ValidatorDelegated {
      */
     public function __call($method, $params) {
         $arrCaller = [$this->validator, $method];
+
         return call_user_func_array($arrCaller, $params);
     }
 }

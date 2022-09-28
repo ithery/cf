@@ -386,4 +386,13 @@ final class CManager {
     public static function createClosureDataProvider($sql, $requires) {
         return new CManager_DataProvider_ClosureDataProvider($sql, carr::wrap($requires));
     }
+
+    /**
+     * Get Transform Manager.
+     *
+     * @return CManager_Transform
+     */
+    public static function transform() {
+        return CManager_Transform::instance();
+    }
 }

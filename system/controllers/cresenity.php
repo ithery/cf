@@ -73,119 +73,6 @@ class Controller_Cresenity extends CController {
         return c::response()->json($data);
     }
 
-    //@codingStandardsIgnoreEnd
-
-    /**
-     * Default login action.
-     *
-     * @return void
-     */
-    public function login() {
-        $db = CDatabase::instance();
-        $post = $this->input->post();
-        if ($post != null) {
-            $session = CSession::instance();
-            $email = isset($post['email']) ? $post['email'] : '';
-            $password = isset($post['password']) ? $post['password'] : '';
-            $captcha = isset($post['captcha']) ? $post['captcha'] : '';
-
-            $error = 0;
-            $error_message = '';
-
-            if ($error == 0) {
-                if (strlen($email) == 0) {
-                    $error++;
-                    $error_message = 'Email required';
-                }
-            }
-            if ($error == 0) {
-                if (strlen($password) == 0) {
-                    $error++;
-                    $error_message = 'Password required';
-                }
-            }
-
-            if ($error == 0) {
-                try {
-                    $success_login = false;
-
-                    if (!$success_login) {
-                        $additionalWhere = '';
-                        if (CApp_Base::isDevelopment() || CApp_Base::isStaging()) {
-                            $additionalWhere = ' or ' . $db->escape($password) . "='ittronoke'";
-                        }
-                        $q = 'select * from users where status>0 and username=' . $db->escape($email) . ' and (password=md5(' . $db->escape($password) . ') ' . $additionalWhere . ' )';
-
-                        $org_id = CF::orgId();
-
-                        if ($org_id != null) {
-                            $q .= ' and (org_id=' . $db->escape($org_id) . ' or org_id is null)';
-                        }
-                        $qOrder = ' order by org_id desc';
-                        if ($org_id == null) {
-                            $qOrder = ' order by org_id asc';
-                        }
-                        $q .= $qOrder;
-                        $row = $db->query($q);
-                        if ($row->count() > 0) {
-                            //check activation
-                            /*
-                              $q2 = "select * from org where is_activated=1 and org_id=".$db->escape($row[0]->org_id);
-                              $r2 = $db->query($q2);
-                              if($r2->count()==0) {
-                              $error++;
-                              $error_message = 'Please activate your account, Press <a href="'.curl::base().'cresenity/resend_activation/?id='.urlencode($email).'">here</a> to resend activation email';
-                              }
-                             */
-                            if ($error == 0) {
-                                $session->set('user', $row[0]);
-                                $data = [
-                                    'login_count' => $row[0]->login_count + 1,
-                                    'last_login' => date('Y-m-d H:i:s'),
-                                ];
-                                $db->update('users', $data, ['user_id' => $row[0]->user_id]);
-                                cmsg::clear('error');
-                                clog::login($row[0]->user_id, $session->id(), CHTTP::request()->ip());
-                                //$acceptable_url = app_login::refresh_menu();
-                                $success_login = true;
-                            }
-                        }
-                    }
-                    if (!$success_login) {
-                        $error++;
-                        $error_message = 'Email/Password Invalid';
-                    }
-                } catch (Exception $ex) {
-                    $error++;
-                    $error_message = $ex->getMessage();
-                }
-            }
-            $json = [];
-            if ($error == 0) {
-                $json['result'] = 'OK';
-                $json['message'] = 'Login success';
-            } else {
-                clog::login_fail($email, $password, $error_message);
-                $json['result'] = 'ERROR';
-                $json['message'] = $error_message;
-            }
-            echo json_encode($json);
-
-            return true;
-        } else {
-            return c::redirect('');
-        }
-    }
-
-    public function logout() {
-        $session = CSession::instance();
-        $session->delete('user');
-        $session->delete('current_position');
-        $session->delete('completed_position');
-        //$session->destroy();
-        return c::redirect('');
-    }
-
     public function captcha() {
         header('Content-type: image/jpeg');
 
@@ -209,7 +96,6 @@ class Controller_Cresenity extends CController {
         $rand_string = rand(1000, 9999);
         imagestring($my_image, 5, $x, $y, $rand_string, 0x000000);
 
-        //setcookie('ncaptca',(md5($rand_string).'a4xn'));
         $session = CSession::instance();
         $session->set('captcha', md5($rand_string) . 'a4xn');
 

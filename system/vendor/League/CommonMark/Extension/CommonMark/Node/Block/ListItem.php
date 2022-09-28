@@ -1,7 +1,5 @@
 <?php
 
-declare(strict_types=1);
-
 /*
  * This file is part of the league/commonmark package.
  *
@@ -18,8 +16,7 @@ namespace League\CommonMark\Extension\CommonMark\Node\Block;
 
 use League\CommonMark\Node\Block\AbstractBlock;
 
-class ListItem extends AbstractBlock
-{
+class ListItem extends AbstractBlock {
     /**
      * @var ListData
      *
@@ -27,15 +24,16 @@ class ListItem extends AbstractBlock
      */
     protected $listData;
 
-    public function __construct(ListData $listData)
-    {
+    public function __construct(ListData $listData) {
         parent::__construct();
 
         $this->listData = $listData;
     }
 
-    public function getListData(): ListData
-    {
+    /**
+     * @return ListData
+     */
+    public function getListData() {
         return $this->listData;
     }
 }

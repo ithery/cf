@@ -28,6 +28,13 @@ class CBase_Pipeline implements CBase_PipelineInterface {
     protected $pipes = [];
 
     /**
+     * The additional parameters.
+     *
+     * @var array
+     */
+    protected $parameters = [];
+
+    /**
      * The method to call on each pipe.
      *
      * @var string
@@ -88,6 +95,19 @@ class CBase_Pipeline implements CBase_PipelineInterface {
     }
 
     /**
+     * Set the additional parameters to send.
+     *
+     * @param mixed $parameters
+     *
+     * @return $this
+     */
+    public function with(...$parameters) {
+        $this->parameters = $parameters;
+
+        return $this;
+    }
+
+    /**
      * Run the pipeline with a final destination callback.
      *
      * @param \Closure $destination
@@ -139,13 +159,17 @@ class CBase_Pipeline implements CBase_PipelineInterface {
      */
     protected function carry() {
         return function ($stack, $pipe) {
-            return function ($passable) use ($stack, $pipe) {
+            return function () use ($stack, $pipe) {
+                $passable = func_get_args();
+                $passable[] = $stack;
+                $passable = array_merge($passable, $this->parameters);
+
                 try {
                     if (is_callable($pipe)) {
                         // If the pipe is a callable, then we will call it directly, but otherwise we
                         // will resolve the pipes out of the dependency container and call it with
                         // the appropriate method and arguments, returning the results back out.
-                        return $pipe($passable, $stack);
+                        return call_user_func_array($pipe, $passable);
                     } elseif (!is_object($pipe)) {
                         list($name, $parameters) = $this->parsePipeString($pipe);
                         // If the pipe is a string we will parse the string and resolve the class out
@@ -153,15 +177,16 @@ class CBase_Pipeline implements CBase_PipelineInterface {
                         // execute the pipe function giving in the parameters that are required.
                         $pipe = $this->getContainer()->make($name);
 
-                        $parameters = array_merge([$passable, $stack], $parameters);
+                        $parameters = array_merge($passable, $parameters);
                     } else {
                         // If the pipe is already an object we'll just make a callable and pass it to
                         // the pipe as-is. There is no need to do any extra parsing and formatting
                         // since the object we're given was already a fully instantiated object.
-                        $parameters = [$passable, $stack];
+                        $parameters = $passable;
                     }
 
-                    $carry = method_exists($pipe, $this->method) ? $pipe->{$this->method}(...$parameters) : $pipe(...$parameters);
+                    $pipe = $this->handlePipe($pipe);
+                    $carry = method_exists($pipe, $this->method) ? call_user_func_array([$pipe, $this->method], $parameters) : $pipe(...$parameters);
 
                     return $this->handleCarry($carry);
                 } catch (Exception $e) {
@@ -206,6 +231,17 @@ class CBase_Pipeline implements CBase_PipelineInterface {
      */
     protected function getContainer() {
         return CContainer::getInstance();
+    }
+
+    /**
+     * Handle the middleware returned from each pipe before handle.
+     *
+     * @param mixed $pipe
+     *
+     * @return mixed
+     */
+    protected function handlePipe($pipe) {
+        return $pipe;
     }
 
     /**

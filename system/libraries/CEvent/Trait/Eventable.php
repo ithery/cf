@@ -38,9 +38,9 @@ trait CEvent_Trait_Eventable {
     /**
      * Broadcast the event with the given arguments.
      *
-     * @return \Illuminate\Broadcasting\PendingBroadcast
+     * @return \CBroadcast_PendingBroadcast
      */
     public static function broadcast() {
-        // return broadcast(new static(...func_get_args()));
+        return c::broadcast(new static(...func_get_args()));
     }
 }

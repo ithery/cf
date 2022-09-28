@@ -17,4 +17,13 @@ class CEmail {
 
         return $checker->isValid($email);
     }
+
+    /**
+     * @param string $name
+     *
+     * @return CEmail_Contract_MailerInterface
+     */
+    public static function mailer($name = '') {
+        return CEmail_MailManager::instance()->mailer($name);
+    }
 }

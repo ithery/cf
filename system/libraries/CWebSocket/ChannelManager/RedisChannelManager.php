@@ -415,7 +415,7 @@ class CWebSocket_ChannelManager_RedisChannelManager extends CWebSocket_ChannelMa
     }
 
     /**
-     * Build the Redis connection URL from Laravel database config.
+     * Build the Redis connection URL from database config.
      *
      * @return string
      */

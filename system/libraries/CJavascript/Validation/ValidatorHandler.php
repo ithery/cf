@@ -83,11 +83,12 @@ class CJavascript_Validation_ValidatorHandler {
             $newRules = $this->jsConvertRules($attribute, $rules, $this->remote);
             $jsValidations = array_merge($jsValidations, $newRules);
         }
+
         return $jsValidations;
     }
 
     /**
-     * Make Laravel Validations compatible with JQuery Validation Plugin.
+     * Make Validations compatible with JQuery Validation Plugin.
      *
      * @param $attribute
      * @param $rules
@@ -107,6 +108,7 @@ class CJavascript_Validation_ValidatorHandler {
                 ];
             }
         }
+
         return $jsRules;
     }
 
@@ -141,6 +143,7 @@ class CJavascript_Validation_ValidatorHandler {
     public function validationData() {
         $jsMessages = [];
         $jsValidations = $this->generateJavascriptValidations();
+
         return [
             'rules' => $jsValidations,
             'messages' => $jsMessages,

@@ -12,7 +12,7 @@ trait CView_Concern_BladeCollectViewExceptionTrait {
     }
 
     public function filterViewData(array $data) {
-        // By default, Laravel views get two shared data keys:
+        // By default, views get two shared data keys:
         // __env and app. We try to filter them out.
         return array_filter($data, function ($value, $key) {
             if ($key === 'app') {

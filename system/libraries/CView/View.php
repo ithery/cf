@@ -353,6 +353,17 @@ class CView_View implements ArrayAccess, CInterface_Htmlable, CView_ViewInterfac
         return $this->with($data);
     }
 
+    /**
+     * Alias with.
+     *
+     * @param array $data
+     *
+     * @return $this
+     */
+    public function setData($data) {
+        return $this->with($data);
+    }
+
     public function toExportable() {
         return new CExporter_Exportable_View($this);
     }

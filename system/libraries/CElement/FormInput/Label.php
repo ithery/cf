@@ -2,6 +2,7 @@
 
 class CElement_FormInput_Label extends CElement_FormInput {
     use CTrait_Element_Property_DependsOn;
+    use CTrait_Element_Transform;
 
     public function __construct($id) {
         parent::__construct($id);
@@ -12,7 +13,7 @@ class CElement_FormInput_Label extends CElement_FormInput {
     }
 
     public static function factory($id = '') {
-        return CElement_Factory::create(static::class, $id);
+        return new static($id);
     }
 
     protected function build() {
@@ -22,6 +23,7 @@ class CElement_FormInput_Label extends CElement_FormInput {
             $this->addJs($value->js());
             $value = $this->value;
         }
+        $value = $this->applyTransform($value);
         $this->value = (string) $value;
         $this->addJs($this->getDependsOnContentJavascript());
         $this->addClass('label');

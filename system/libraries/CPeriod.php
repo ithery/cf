@@ -10,7 +10,12 @@ defined('SYSPATH') or die('No direct access allowed.');
  */
 use Carbon\Carbon;
 
-class CPeriod {
+class CPeriod implements IteratorAggregate {
+    use CPeriod_Trait_FactoryTrait;
+    use CPeriod_Trait_OperationTrait;
+    use CPeriod_Trait_ComparisonTrait;
+    use CPeriod_Trait_GetterTrait;
+
     const INTERVAL_MONTH = 'month';
 
     const INTERVAL_DAY = 'day';
@@ -26,6 +31,63 @@ class CPeriod {
      * @var \CarbonV3\Carbon
      */
     public $endDate;
+
+    /**
+     * @var DateInterval
+     */
+    protected $interval;
+
+    /**
+     * @var CPeriod_Precision
+     */
+    protected $precision;
+
+    /**
+     * @var CPeriod_Boundaries
+     */
+    protected $boundaries;
+
+    /**
+     * @var CPeriod_Duration
+     */
+    protected $duration;
+
+    /**
+     * @var DateTimeImmutable
+     */
+    protected $includedStart;
+
+    /**
+     * @var DateTimeImmutable
+     */
+    protected $includedEnd;
+
+    public function __construct($startDate, $endDate, CPeriod_Precision $precision = null, CPeriod_Boundaries $boundaries = null) {
+        if ($startDate > $endDate) {
+            throw CPeriod_Exception_InvalidPeriodException::startDateCannotBeAfterEndDate($startDate, $endDate);
+        }
+        if ($startDate instanceof DateTime) {
+            $startDate = new Carbon($startDate->format('Y-m-d H:i:s.u'), $startDate->getTimezone());
+        }
+        if ($endDate instanceof DateTime) {
+            $endDate = new Carbon($endDate->format('Y-m-d H:i:s.u'), $endDate->getTimezone());
+        }
+        if ($precision == null) {
+            $precision = CPeriod_Precision::DAY();
+        }
+        if ($boundaries == null) {
+            $boundaries = CPeriod_Boundaries::EXCLUDE_NONE();
+        }
+
+        $this->startDate = $startDate;
+        $this->endDate = $endDate;
+        $this->precision = $precision;
+        $this->boundaries = $boundaries;
+        $this->interval = $this->precision->interval();
+        $this->includedStart = $boundaries->startIncluded() ? $startDate : $startDate->add($this->interval);
+        $this->includedEnd = $boundaries->endIncluded() ? $endDate : $endDate->sub($this->interval);
+        $this->duration = new CPeriod_Duration($this);
+    }
 
     public static function create($startDate, $endDate) {
         return new static($startDate, $endDate);
@@ -154,21 +216,6 @@ class CPeriod {
         return new static($startDate, $endDate);
     }
 
-    public function __construct($startDate, $endDate) {
-        if ($startDate > $endDate) {
-            throw CPeriod_Exception_InvalidPeriod::startDateCannotBeAfterEndDate($startDate, $endDate);
-        }
-        if ($startDate instanceof DateTime) {
-            $startDate = new Carbon($startDate->format('Y-m-d H:i:s.u'), $startDate->getTimezone());
-        }
-        if ($endDate instanceof DateTime) {
-            $endDate = new Carbon($endDate->format('Y-m-d H:i:s.u'), $endDate->getTimezone());
-        }
-
-        $this->startDate = $startDate;
-        $this->endDate = $endDate;
-    }
-
     public static function createFromInterval($interval = 'month', $count = 1, $start = '') {
         if (empty($start)) {
             $start = CCarbon::now();
@@ -208,5 +255,30 @@ class CPeriod {
 
     public function toArray() {
         return [$this->startDate, $this->endDate];
+    }
+
+    /**
+     * @return DatePeriod
+     */
+    public function getIterator() {
+        return new DatePeriod(
+            $this->includedStart(),
+            $this->interval,
+            // We need to add 1 second (the smallest unit available within this package) to ensure entries are counted correctly
+            $this->includedEnd()->add(new DateInterval('PT1S'))
+        );
+    }
+
+    /**
+     * @param CPeriod $other
+     *
+     * @return void
+     */
+    protected function ensurePrecisionMatches(CPeriod $other) {
+        if ($this->precision->equals($other->precision)) {
+            return;
+        }
+
+        throw CPeriod_Exception_CannotComparePeriodException::precisionDoesNotMatch();
     }
 }

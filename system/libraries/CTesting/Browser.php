@@ -1,10 +1,10 @@
 <?php
-use Facebook\WebDriver\Remote\WebDriverBrowserType;
 use Facebook\WebDriver\WebDriverBy;
-use Facebook\WebDriver\WebDriverDimension;
 use Facebook\WebDriver\WebDriverPoint;
+use Facebook\WebDriver\WebDriverDimension;
+use Facebook\WebDriver\Remote\WebDriverBrowserType;
 
-class Browser {
+class CTesting_Browser {
     use CTesting_BrowserConcern_InteractsWithAuthentication,
     CTesting_BrowserConcern_InteractsWithCookies,
     CTesting_BrowserConcern_InteractsWithElements,
@@ -108,7 +108,7 @@ class Browser {
      * Create a browser instance.
      *
      * @param \Facebook\WebDriver\Remote\RemoteWebDriver $driver
-     * @param \Laravel\Dusk\ElementResolver              $resolver
+     * @param \CTesting_Browser_ElementResolver          $resolver
      *
      * @return void
      */
@@ -338,7 +338,7 @@ class Browser {
     public function scrollIntoView($selector) {
         $selector = addslashes($this->resolver->format($selector));
 
-        $this->driver->executeScript("document.querySelector(\"$selector\").scrollIntoView();");
+        $this->driver->executeScript("document.querySelector(\"${selector}\").scrollIntoView();");
 
         return $this;
     }
@@ -355,7 +355,7 @@ class Browser {
 
         $selector = addslashes($this->resolver->format($selector));
 
-        $this->driver->executeScript("jQuery(\"html, body\").animate({scrollTop: jQuery(\"$selector\").offset().top}, 0);");
+        $this->driver->executeScript("jQuery(\"html, body\").animate({scrollTop: jQuery(\"${selector}\").offset().top}, 0);");
 
         return $this;
     }
@@ -524,8 +524,8 @@ class Browser {
     /**
      * Set the current component state.
      *
-     * @param \Laravel\Dusk\Component       $component
-     * @param \Laravel\Dusk\ElementResolver $parentResolver
+     * @param \CTesting_Browser_Component       $component
+     * @param \CTesting_Browser_ElementResolver $parentResolver
      *
      * @return void
      */
@@ -632,9 +632,9 @@ class Browser {
      * @param string $method
      * @param array  $parameters
      *
-     * @return mixed
-     *
      * @throws \BadMethodCallException
+     *
+     * @return mixed
      */
     public function __call($method, $parameters) {
         if (static::hasMacro($method)) {

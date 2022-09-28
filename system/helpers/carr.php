@@ -200,136 +200,31 @@ class carr {
      *     // Using an array of keys
      *     $colors = carr::path($array, array('theme', '*', 'color'));
      *
-     * @param array  $array     array to search
-     * @param mixed  $path      key path string (delimiter separated) or array of keys
-     * @param mixed  $default   default value if the path is not set
-     * @param string $delimiter key path delimiter
+     * @param array  $array   array to search
+     * @param string $path    key path string (delimiter separated) or array of keys
+     * @param mixed  $default default value if the path is not set
      *
      * @return mixed
      *
      * @deprecated since 1.2, use carr::get
      */
-    public static function path($array, $path, $default = null, $delimiter = null) {
-        if (!carr::isArray($array)) {
-            // This is not an array!
-            return $default;
-        }
-
-        if (is_array($path)) {
-            // The path has already been separated into keys
-            $keys = $path;
-        } else {
-            if (array_key_exists($path, $array)) {
-                // No need to do extra processing
-                return $array[$path];
-            }
-
-            if ($delimiter === null) {
-                // Use the default delimiter .
-                $delimiter = '.';
-            }
-
-            // Remove starting delimiters and spaces
-            $path = ltrim($path, "{$delimiter} ");
-
-            // Remove ending delimiters, spaces, and wildcards
-            $path = rtrim($path, "{$delimiter} *");
-
-            // Split the keys by delimiter
-            $keys = explode($delimiter, $path);
-        }
-
-        do {
-            $key = array_shift($keys);
-
-            if (ctype_digit($key)) {
-                // Make the key an integer
-                $key = (int) $key;
-            }
-
-            if (isset($array[$key])) {
-                if ($keys) {
-                    if (carr::isArray($array[$key])) {
-                        // Dig down into the next part of the path
-                        $array = $array[$key];
-                    } else {
-                        // Unable to dig deeper
-                        break;
-                    }
-                } else {
-                    // Found the path requested
-                    return $array[$key];
-                }
-            } elseif ($key === '*') {
-                // Handle wildcards
-
-                $values = [];
-                foreach ($array as $arr) {
-                    if ($value = carr::path($arr, implode('.', $keys))) {
-                        $values[] = $value;
-                    }
-                }
-
-                if ($values) {
-                    // Found the values requested
-                    return $values;
-                } else {
-                    // Unable to dig deeper
-                    break;
-                }
-            } else {
-                // Unable to dig deeper
-                break;
-            }
-        } while ($keys);
-
-        // Unable to find the value requested
-        return $default;
+    public static function path($array, $path, $default = null) {
+        return carr::get($array, $path, $default);
     }
 
     /**
      * Set a value on an array by path.
      *
-     * @param array  $array     Array to update
-     * @param string $path      Path
-     * @param mixed  $value     Value to set
-     * @param string $delimiter Path delimiter
+     * @param array  $array Array to update
+     * @param string $path  Path
+     * @param mixed  $value Value to set
      *
      * @see carr::path()
      * @deprecated since 1.2 use set
      */
     //@codingStandardsIgnoreStart
-    public static function set_path(&$array, $path, $value, $delimiter = null) {
-        if (!$delimiter) {
-            // Use the default delimiter
-            $delimiter = '.';
-        }
-
-        // The path has already been separated into keys
-        $keys = $path;
-        if (!carr::isArray($path)) {
-            // Split the keys by delimiter
-            $keys = explode($delimiter, $path);
-        }
-
-        // Set current $array to inner-most array path
-        while (count($keys) > 1) {
-            $key = array_shift($keys);
-
-            if (ctype_digit($key)) {
-                // Make the key an integer
-                $key = (int) $key;
-            }
-
-            if (!isset($array[$key])) {
-                $array[$key] = [];
-            }
-
-            $array = &$array[$key];
-        }
-
-        // Set key on inner-most array
-        $array[array_shift($keys)] = $value;
+    public static function set_path(&$array, $path, $value) {
+        return carr::set($array, $path, $value);
     }
 
     //@codingStandardsIgnoreEnd
@@ -1548,6 +1443,20 @@ class carr {
     }
 
     /**
+     * Run a map transforms over each of the items.
+     *
+     * @param array        $collection
+     * @param string|array $transforms
+     *
+     * @return array
+     */
+    public static function mapTransform($collection, $transforms) {
+        return static::map($collection, function ($item) use ($transforms) {
+            return c::manager()->transform()->call($transforms, $item);
+        });
+    }
+
+    /**
      * Creates a new array concatenating `array` with any additional arrays
      * and/or values.
      *
@@ -1694,6 +1603,15 @@ class carr {
         }
 
         return $merged;
+    }
+
+    /**
+     * @param array $array
+     *
+     * @return array
+     */
+    public static function mirror(array $array) {
+        return array_combine($array, $array);
     }
 }
 

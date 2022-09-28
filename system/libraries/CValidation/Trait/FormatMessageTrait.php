@@ -72,7 +72,7 @@ trait CValidation_Trait_FormatMessageTrait {
      * @param string $attribute
      * @param string $rule
      *
-     * @return string|null
+     * @return null|string
      */
     protected function getInlineMessage($attribute, $rule) {
         $inlineEntry = $this->getFromLocalArray($attribute, cstr::snake($rule));
@@ -85,9 +85,9 @@ trait CValidation_Trait_FormatMessageTrait {
      *
      * @param string     $attribute
      * @param string     $lowerRule
-     * @param array|null $source
+     * @param null|array $source
      *
-     * @return string|null
+     * @return null|string
      */
     protected function getFromLocalArray($attribute, $lowerRule, $source = null) {
         $source = $source ?: $this->customMessages;
@@ -349,13 +349,13 @@ trait CValidation_Trait_FormatMessageTrait {
     /**
      * Call a custom validator message replacer.
      *
-     * @param string                           $message
-     * @param string                           $attribute
-     * @param string                           $rule
-     * @param array                            $parameters
-     * @param \Illuminate\Validation\Validator $validator
+     * @param string                 $message
+     * @param string                 $attribute
+     * @param string                 $rule
+     * @param array                  $parameters
+     * @param \CValidation_Validator $validator
      *
-     * @return string|null
+     * @return null|string
      */
     protected function callReplacer($message, $attribute, $rule, $parameters, $validator) {
         $callback = $this->replacers[$rule];
@@ -370,12 +370,12 @@ trait CValidation_Trait_FormatMessageTrait {
     /**
      * Call a class based validator message replacer.
      *
-     * @param string                           $callback
-     * @param string                           $message
-     * @param string                           $attribute
-     * @param string                           $rule
-     * @param array                            $parameters
-     * @param \Illuminate\Validation\Validator $validator
+     * @param string                 $callback
+     * @param string                 $message
+     * @param string                 $attribute
+     * @param string                 $rule
+     * @param array                  $parameters
+     * @param \CValidation_Validator $validator
      *
      * @return string
      */

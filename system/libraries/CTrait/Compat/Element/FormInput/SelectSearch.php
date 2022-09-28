@@ -123,6 +123,7 @@ trait CTrait_Compat_Element_FormInput_SelectSearch {
      * @return $this
      */
     public function set_placeholder($placeholder) {
+        /** @var CElement_FormInput_SelectSearch $this */
         return $this->setPlaceholder($placeholder);
     }
 

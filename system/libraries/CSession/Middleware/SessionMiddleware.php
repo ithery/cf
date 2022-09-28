@@ -65,14 +65,20 @@ class CSession_Middleware_SessionMiddleware {
 
         $lockFor = $request->route() && $request->route()->locksFor() ? $request->route()->locksFor() : 10;
 
-        $lock = $this->cache(CSession::manager()->blockDriver())
-            ->lock('session:' . $session->getId(), $lockFor)
-            ->betweenBlockedAttemptsSleepFor(50);
+        $cache = $this->cache(CSession::manager()->blockDriver());
+        $lock=null;
+        if ($cache instanceof CCache_LockProviderInterface) {
+            $lock = $cache
+                ->lock('session:' . $session->getId(), $lockFor)
+                ->betweenBlockedAttemptsSleepFor(50);
+        }
 
         try {
-            $lock->block(
-                !is_null($request->route()->waitsFor()) ? $request->route()->waitsFor() : 10
-            );
+            if ($lock != null) {
+                $lock->block(
+                    !is_null($request->route()->waitsFor()) ? $request->route()->waitsFor() : 10
+                );
+            }
 
             return $this->handleStatefulRequest($request, $session, $next);
         } finally {

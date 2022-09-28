@@ -15,6 +15,7 @@ class CElement_FormInput_SelectSearch extends CElement_FormInput {
     use CElement_FormInput_SelectSearch_Trait_Select2v23Trait;
     use CTrait_Element_Property_ApplyJs;
     use CTrait_Element_Property_DependsOn;
+    use CTrait_Element_Property_Placeholder;
 
     protected $query;
 
@@ -30,8 +31,6 @@ class CElement_FormInput_SelectSearch extends CElement_FormInput {
     protected $searchField = [];
 
     protected $multiple;
-
-    protected $placeholder;
 
     protected $autoSelect;
 
@@ -51,6 +50,8 @@ class CElement_FormInput_SelectSearch extends CElement_FormInput {
 
     protected $queryResolver;
 
+    protected $language;
+
     public function __construct($id) {
         parent::__construct($id);
         $this->dropdownClasses = [];
@@ -60,7 +61,7 @@ class CElement_FormInput_SelectSearch extends CElement_FormInput {
         $this->formatResult = null;
         $this->keyField = '';
         $this->searchField = [];
-        $this->placeholder = 'Search for a item';
+        $this->placeholder = c::__('element/selectsearch.placeholder');
         $this->multiple = false;
         $this->autoSelect = false;
         $this->minInputLength = 0;
@@ -71,6 +72,11 @@ class CElement_FormInput_SelectSearch extends CElement_FormInput {
 
         $this->value = null;
         $this->allowClear = false;
+        $language = CF::getLocale();
+        if (strlen($language) > 2) {
+            $language = strtolower(substr($language, 0, 2));
+        }
+        $this->language = $language;
     }
 
     public static function factory($id = null) {
@@ -226,12 +232,6 @@ class CElement_FormInput_SelectSearch extends CElement_FormInput {
         return $this;
     }
 
-    public function setPlaceholder($placeholder) {
-        $this->placeholder = $placeholder;
-
-        return $this;
-    }
-
     public function addDropdownClass($c) {
         if (is_array($c)) {
             $this->dropdownClasses = array_merge($c, $this->dropdownClasses);
@@ -262,7 +262,7 @@ class CElement_FormInput_SelectSearch extends CElement_FormInput {
 
     public function createAjaxUrl() {
         $ajaxMethod = CAjax::createMethod();
-        $ajaxMethod->setType('SearchSelect');
+        $ajaxMethod->setType(CAjax::TYPE_SELECT_SEARCH);
         $ajaxMethod->setData('query', $this->query);
         $ajaxMethod->setData('dataProvider', serialize($this->dataProvider));
         $ajaxMethod->setData('keyField', $this->keyField);
@@ -312,18 +312,9 @@ class CElement_FormInput_SelectSearch extends CElement_FormInput {
                             $q->where($this->keyField, '=', $value);
                         });
                     }
-                    $result = $query->paginate(1);
-                    $items = $result->items();
+                    $model = $query->first();
 
-                    $item = carr::first($items);
-                    if ($item) {
-                        $itemArray = $item->toArray();
-                        $itemArray['id'] = $item->getKey();
-
-                        return $itemArray;
-                    }
-
-                    return null;
+                    return $model;
                 }
                 $q = 'select * from (' . $this->query() . ') as a limit 1';
 
@@ -337,12 +328,23 @@ class CElement_FormInput_SelectSearch extends CElement_FormInput {
                 }
 
                 return null;
-            })->toArray();
+            });
+
+            if (!($this->dataProvider instanceof CManager_DataProvider_ModelDataProvider)) {
+                $result = $result->toArray();
+            }
 
             return $result;
         }
 
         return null;
+    }
+
+    public function modelToSelect2Array(CModel $model) {
+        $itemArray = $model->toArray();
+        $itemArray['id'] = $model->getKey();
+
+        return $itemArray;
     }
 
     public function html($indent = 0) {
@@ -393,6 +395,11 @@ class CElement_FormInput_SelectSearch extends CElement_FormInput {
             foreach ($selectedRows as $index => $selectedRow) {
                 if ($selectedRow != null) {
                     $row = $selectedRow;
+                    $model = null;
+                    if ($row instanceof CModel) {
+                        $model = $row;
+                        $row = $this->modelToSelect2Array($model);
+                    }
                     if (isset($this->valueCallback) && is_callable($this->valueCallback)) {
                         foreach ($row as $k => $v) {
                             $row[$k] = $this->valueCallback($row, $k, $v);
@@ -403,8 +410,9 @@ class CElement_FormInput_SelectSearch extends CElement_FormInput {
                     if ($strSelection == null) {
                         $strSelection = '{' . carr::first($this->searchField) . '}';
                     }
+
                     if ($strSelection instanceof \Opis\Closure\SerializableClosure) {
-                        $strSelection = $strSelection->__invoke($row);
+                        $strSelection = $strSelection->__invoke($model ?: $row);
                     }
                     $strSelection = c::value($strSelection);
                     $strSelection = str_replace("'", "\'", $strSelection);
@@ -434,6 +442,7 @@ class CElement_FormInput_SelectSearch extends CElement_FormInput {
         if ($this->applyJs == 'select2v2.3') {
             return $this->jsSelect2v23($indent);
         }
+
         $ajaxUrl = $this->createAjaxUrl();
 
         $strSelection = $this->formatSelection;
@@ -468,10 +477,7 @@ class CElement_FormInput_SelectSearch extends CElement_FormInput {
             $strResult = preg_replace("/[\r\n]+/", '', $strResult);
         }
 
-        $placeholder = 'Search for a item';
-        if (strlen($this->placeholder) > 0) {
-            $placeholder = $this->placeholder;
-        }
+        $placeholder = $this->placeholder;
         $strJsChange = '';
         if ($this->submit_onchange) {
             $strJsChange = "$(this).closest('form').submit();";
@@ -489,6 +495,11 @@ class CElement_FormInput_SelectSearch extends CElement_FormInput {
             foreach ($selectedRows as $index => $selectedRow) {
                 if ($selectedRow != null) {
                     $row = $selectedRow;
+                    $model = null;
+                    if ($row instanceof CModel) {
+                        $model = $row;
+                        $row = $this->modelToSelect2Array($model);
+                    }
                     if (is_object($row)) {
                         $row = (array) $row;
                     }
@@ -545,6 +556,7 @@ class CElement_FormInput_SelectSearch extends CElement_FormInput {
 
             $('#" . $this->id . "').select2({
                 width: '100%',
+                language: '" . $this->language . "',
                 placeholder: '" . $placeholder . "',
                 allowClear: " . ($this->allowClear ? 'true' : 'false') . ",
                 minimumInputLength: '" . $this->minInputLength . "',

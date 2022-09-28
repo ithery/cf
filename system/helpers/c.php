@@ -5,6 +5,7 @@ defined('SYSPATH') or die('No direct access allowed.');
 /**
  * Common helper class.
  */
+use Faker\Factory as FackerFactory;
 use Opis\Closure\SerializableClosure;
 use Symfony\Component\VarDumper\VarDumper;
 use Symfony\Component\PropertyAccess\PropertyAccess;
@@ -284,13 +285,11 @@ class c {
      * @return void
      */
     public static function report($exception) {
-        //@codingStandardsIgnoreStart
         if ($exception instanceof Throwable
             && !$exception instanceof Exception
         ) {
             $exception = new FatalThrowableError($exception);
         }
-        //@codingStandardsIgnoreEnd
 
         $exceptionHandler = CException::exceptionHandler();
         $exceptionHandler->report($exception);
@@ -328,6 +327,22 @@ class c {
         }
 
         return CEvent::dispatch(...$args);
+    }
+
+    /**
+     * Log a debug message to the logs.
+     *
+     * @param null|string $message
+     * @param array       $context
+     *
+     * @return null|\CLogger
+     */
+    public static function logger($message = null, array $context = []) {
+        if (is_null($message)) {
+            return CLogger::instance();
+        }
+
+        return CLogger::instance()->add(CLogger::DEBUG, $message, $context);
     }
 
     //@codingStandardsIgnoreEnd
@@ -1141,6 +1156,14 @@ class c {
             : new CQueue_PendingDispatch($job);
     }
 
+    public static function dispatchSync($job, $handler = null) {
+        return CQueue::dispatcher()->dispatchSync($job, $handler);
+    }
+
+    public static function dispatchNow($job, $handler = null) {
+        return CQueue::dispatcher()->dispatchNow($job, $handler);
+    }
+
     /**
      * Determine whether the current environment is Windows based.
      *
@@ -1375,7 +1398,7 @@ class c {
      * @return CApp_Formatter
      */
     public static function formatter() {
-        return CApp::formatter();
+        return CApp_Formatter::instance();
     }
 
     /**
@@ -1530,6 +1553,53 @@ class c {
 
     public static function isHtml($string) {
         return preg_match('/<[^<]+>/', $string, $m) != 0;
+    }
+
+    /**
+     * Generate a form field to spoof the HTTP verb used by forms.
+     *
+     * @param string $method
+     *
+     * @return \CBase_HtmlString
+     */
+    public static function methodField($method) {
+        return new CBase_HtmlString('<input type="hidden" name="_method" value="' . $method . '">');
+    }
+
+    public static function faker($property = null) {
+        $faker = FackerFactory::create();
+
+        return $property ? $faker->{$property} : $faker;
+    }
+
+    public static function stopwatch($callback, $times = 1) {
+        $totalTime = 0;
+
+        foreach (range(1, $times) as $time) {
+            $start = microtime(true);
+
+            $callback();
+
+            $totalTime += microtime(true) - $start;
+        }
+
+        return $totalTime / $times;
+    }
+
+    public static function swap(&$a, &$b) {
+        $temp = $a;
+        $a = $b;
+        $b = $temp;
+    }
+
+    /**
+     * @param null|string               $time
+     * @param null|\DateTimeZone|string $tz
+     *
+     * @return CCarbon
+     */
+    public static function carbon($time = null, $tz = null) {
+        return new CCarbon($time, $tz);
     }
 }
 

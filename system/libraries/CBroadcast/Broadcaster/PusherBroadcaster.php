@@ -1,7 +1,6 @@
 <?php
 use Pusher\Pusher;
 use Pusher\ApiErrorException;
-use Illuminate\Broadcasting\BroadcastException;
 use Symfony\Component\HttpKernel\Exception\AccessDeniedHttpException;
 
 class CBroadcast_Broadcaster_PusherBroadcaster extends CBroadcast_BroadcasterAbstract {

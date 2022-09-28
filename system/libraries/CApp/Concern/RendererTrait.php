@@ -92,7 +92,8 @@ HTML;
 
         $pushesScript = $this->yieldPushContent('capp-script');
 
-        $cresJs = curl::base() . 'media/js/cres/dist/cres.js?v=' . md5(CFile::lastModified(DOCROOT . 'media/js/cres/dist/cres.js'));
+        $cresJsFile = 'cres.js';
+        $cresJs = curl::base() . 'media/js/cres/dist/' . $cresJsFile . '?v=' . md5(CFile::lastModified(DOCROOT . 'media/js/cres/dist/' . $cresJsFile . ''));
 
         return <<<HTML
             ${endClientScript}
@@ -153,7 +154,9 @@ HTML;
             $viewData = [];
             $this->content = $this->element->html();
             $this->js = $this->element->js();
-
+            if (CF::config('app.javascript.minify')) {
+                $this->js = $this->minifyJavascript($this->js);
+            }
             $viewData['content'] = $this->content;
 
             $viewData['title'] = $this->title;
@@ -258,7 +261,7 @@ HTML;
 
         CView::factory()->share(
             'errors',
-            CSession::instance()->get('errors') ?: new CBase_ViewErrorBag()
+            c::session()->get('errors') ?: new CBase_ViewErrorBag()
         );
 
         $viewData = $this->getViewData();

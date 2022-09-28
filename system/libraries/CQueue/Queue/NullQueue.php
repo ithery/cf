@@ -4,7 +4,7 @@ class CQueue_Queue_NullQueue extends CQueue_AbstractQueue {
     /**
      * Get the size of the queue.
      *
-     * @param string|null $queue
+     * @param null|string $queue
      *
      * @return int
      */
@@ -17,25 +17,23 @@ class CQueue_Queue_NullQueue extends CQueue_AbstractQueue {
      *
      * @param string      $job
      * @param mixed       $data
-     * @param string|null $queue
+     * @param null|string $queue
      *
      * @return mixed
      */
     public function push($job, $data = '', $queue = null) {
-        //
     }
 
     /**
      * Push a raw payload onto the queue.
      *
      * @param string      $payload
-     * @param string|null $queue
+     * @param null|string $queue
      * @param array       $options
      *
      * @return mixed
      */
     public function pushRaw($payload, $queue = null, array $options = []) {
-        //
     }
 
     /**
@@ -44,22 +42,20 @@ class CQueue_Queue_NullQueue extends CQueue_AbstractQueue {
      * @param \DateTimeInterface|\DateInterval|int $delay
      * @param string                               $job
      * @param mixed                                $data
-     * @param string|null                          $queue
+     * @param null|string                          $queue
      *
      * @return mixed
      */
     public function later($delay, $job, $data = '', $queue = null) {
-        //
     }
 
     /**
      * Pop the next job off of the queue.
      *
-     * @param string|null $queue
+     * @param null|string $queue
      *
-     * @return \CQueue_JobInterface|null
+     * @return null|\CQueue_JobInterface
      */
     public function pop($queue = null) {
-        //
     }
 }

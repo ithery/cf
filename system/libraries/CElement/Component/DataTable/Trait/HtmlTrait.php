@@ -157,47 +157,11 @@ trait CElement_Component_DataTable_Trait_HtmlTrait {
                         $js .= $this->drawActionAndGetJs($html, $dataRow, $key);
                     }
                     foreach ($this->columns as $col) {
-                        $colValue = $dataRow->getValue($col->getFieldname());
-                        if ($colValue instanceof CRenderable) {
-                            $colValue = $colValue->html();
-                        }
-                        $originalValue = $colValue;
-                        foreach ($col->transforms as $trans) {
-                            $colValue = $trans->execute($colValue);
-                        }
+                        $cell = new CElement_Component_DataTable_Cell($this, $col, $row);
 
-                        //if formatted
-                        if (strlen($col->format) > 0) {
-                            $tempValue = $col->format;
-                            foreach ($row as $k2 => $v2) {
-                                if (strpos($tempValue, '{' . $k2 . '}') !== false) {
-                                    $tempValue = str_replace('{' . $k2 . '}', $v2, $tempValue);
-                                }
-                            }
-                            $colValue = $tempValue;
-                        }
-                        //if have callback
-                        if ($col->callback != null) {
-                            $colValue = CFunction::factory($col->callback)
-                                    // ->addArg($table)
-                                ->addArg($row)
-                                ->addArg($colValue)
-                                ->setRequire($col->callbackRequire)
-                                ->execute();
+                        $newValue = $cell->html();
+                        $js .= $cell->js();
 
-                            list($colValue, $jsCell) = $this->getHtmlJsCell($colValue);
-                            $js .= $jsCell;
-                        }
-                        $newValue = $colValue;
-
-                        if (($this->cellCallbackFunc) != null) {
-                            $newValue = CFunction::factory($this->cellCallbackFunc)
-                                ->setArgs([$this, $col->getFieldname(), $row, $newValue])
-                                ->setRequire($this->requires)
-                                ->execute();
-                            list($newValue, $jsCell) = $this->getHtmlJsCell($newValue);
-                            $js .= $jsCell;
-                        }
                         $class = $col->getClassAttribute();
                         switch ($col->getAlign()) {
                             case CConstant::ALIGN_LEFT:
@@ -277,15 +241,14 @@ trait CElement_Component_DataTable_Trait_HtmlTrait {
             $this->getRowActionList()->regenerateId(true);
             $this->getRowActionList()->apply('setJsParam', $jsparam);
             $this->getRowActionList()->apply('setHandlerParam', $jsparam);
+            $actions = $this->getRowActionList()->childs();
 
-            if (($this->filterActionCallbackFunc) != null) {
-                $actions = $this->getRowActionList()->childs();
-
-                foreach ($actions as &$action) {
+            foreach ($actions as &$action) {
+                if (($this->filterActionCallbackFunc) != null) {
                     $visibility = CFunction::factory($this->filterActionCallbackFunc)
                         ->addArg($this)
                         ->addArg('action')
-                        ->addArg($row)
+                        ->addArg($row->toArray())
                         ->addArg($action)
                         ->setRequire($this->requires)
                         ->execute();
@@ -293,6 +256,9 @@ trait CElement_Component_DataTable_Trait_HtmlTrait {
                         $action->addClass('d-none');
                     }
                     $action->setVisibility($visibility);
+                }
+                if ($action instanceof CElement_Component_ActionRow) {
+                    $action->applyRowCallback($row->toArray());
                 }
             }
 

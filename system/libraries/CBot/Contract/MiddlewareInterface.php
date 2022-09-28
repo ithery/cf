@@ -1,0 +1,4 @@
+<?php
+
+interface CBot_Contract_MiddlewareInterface extends CBot_Contract_Middleware_CapturedInterface, CBot_Contract_Middleware_ReceivedInterface, CBot_Contract_Middleware_MatchingInterface, CBot_Contract_Middleware_HeardInterface, CBot_Contract_Middleware_SendingInterface {
+}

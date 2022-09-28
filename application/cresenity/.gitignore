@@ -9,18 +9,9 @@
 /*/files/
 
 
-*/config/app_setting.php
-*/config/database.php
-*/config/resources.php
-*/config/resource.php
-*/config/elastic.php
-*/config/storage.php
-*/config/renderer.php
-*/config/queue.php
-*/config/backup.php
-*/config/cresenity.php
-*/config/assets.php
 
 vendor
 composer.phar
 composer.lock
+
+env.php

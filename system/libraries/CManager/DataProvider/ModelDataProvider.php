@@ -28,7 +28,8 @@ class CManager_DataProvider_ModelDataProvider extends CManager_DataProviderAbstr
                 if ($col instanceof CDatabase_Query_Expression) {
                     $statement = $col->getValue();
                     //$regex = '/([\w]++)`?+(?:\s++as\s++[^,\s]++)?+\s*+(?:FROM\s*+|$)/i';
-                    $regex = '/([\w]++)`?+\s*+(?:FROM\s*+|$)/i';
+                    // $regex = '/([\w]++)`?+\s*+(?:FROM\s*+|$)/i';
+                    $regex = '/([\w]++)`?+\s*+$/i';
 
                     if (preg_match($regex, $statement, $match)) {
                         $fields[] = $match[1]; // field stored in $match[1]
@@ -119,6 +120,14 @@ class CManager_DataProvider_ModelDataProvider extends CManager_DataProviderAbstr
                     }
                 }
             });
+
+            foreach ($dataSearch as $fieldName => $value) {
+                if (strpos($fieldName, '.') === false) {
+                    if (in_array($fieldName, $aggregateFields)) {
+                        $query->having($fieldName, 'like', '%' . $value . '%');
+                    }
+                }
+            }
         }
 
         //process ordering
@@ -192,6 +201,7 @@ class CManager_DataProvider_ModelDataProvider extends CManager_DataProviderAbstr
         $joinIndex = 0;
         $beforeAlias = $tableAlias;
         $columnAlias = $tableAlias;
+
         foreach ($joinRelations as $joinRelation) {
             $joinAlias = 'mdp_join_' . $joinIndex;
             $currentRelation = $currentModel->$joinRelation();
@@ -231,6 +241,18 @@ class CManager_DataProvider_ModelDataProvider extends CManager_DataProviderAbstr
         }
         $newQuery->select($columnAlias . '.' . $column);
 
+        if ($relation instanceof CModel_Relation_BelongsToOne) {
+            $joinAlias = 'mdp_bto_join_' . $column;
+
+            $joinTable = $relation->getTable();
+            $newQuery->join($joinTable . ' AS ' . $joinAlias, $joinAlias . '.' . $relation->getRelatedPivotKeyName(), '=', $tableAlias . '.' . $relation->getRelatedKeyName());
+            $newQuery->whereColumn(
+                $relation->getQualifiedParentKeyName(),
+                '=',
+                $joinAlias . '.' . $relation->getForeignPivotKeyName()
+            );
+            $newQuery->limit(1);
+        }
         if ($this->hasSoftDeletes($relatedModel)) {
             $newQuery->where($tableAlias . '.' . $relatedModel->getStatusColumn(), '>', 0);
         }
@@ -261,6 +283,13 @@ class CManager_DataProvider_ModelDataProvider extends CManager_DataProviderAbstr
         $query = $this->getModelQuery($callback);
         //c::db()->enableBenchmark();
         return $query->paginate($perPage, $columns, $pageName, $page);
+    }
+
+    public function first($callback = null) {
+        //do nothing
+        $query = $this->getModelQuery($callback);
+        //c::db()->enableBenchmark();
+        return $query->first();
     }
 
     /**

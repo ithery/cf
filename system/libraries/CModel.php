@@ -296,7 +296,7 @@ abstract class CModel implements ArrayAccess, CInterface_Arrayable, CInterface_J
      *
      * @param array $attributes
      *
-     * @throws CModel_Exception_MassAssignment
+     * @throws CModel_Exception_MassAssignmentException
      *
      * @return void
      */
@@ -418,7 +418,7 @@ abstract class CModel implements ArrayAccess, CInterface_Arrayable, CInterface_J
      *
      * @param array $attributes
      *
-     * @throws CModel_Exception_MassAssignment
+     * @throws CModel_Exception_MassAssignmentException
      *
      * @return $this
      */
@@ -433,7 +433,7 @@ abstract class CModel implements ArrayAccess, CInterface_Arrayable, CInterface_J
             if ($this->isFillable($key)) {
                 $this->setAttribute($key, $value);
             } elseif ($totallyGuarded) {
-                throw new CModel_Exception_MassAssignment(sprintf(
+                throw new CModel_Exception_MassAssignmentException(sprintf(
                     'Add [%s] to fillable property to allow mass assignment on [%s].',
                     $key,
                     get_class($this)
@@ -449,7 +449,7 @@ abstract class CModel implements ArrayAccess, CInterface_Arrayable, CInterface_J
      *
      * @param array $attributes
      *
-     * @throws CModel_Exception_MassAssignment
+     * @throws CModel_Exception_MassAssignmentException
      *
      * @return $this
      */
@@ -480,7 +480,7 @@ abstract class CModel implements ArrayAccess, CInterface_Arrayable, CInterface_J
      * @param array $attributes
      * @param bool  $exists
      *
-     * @throws CModel_Exception_MassAssignment
+     * @throws CModel_Exception_MassAssignmentException
      *
      * @return static
      */
@@ -507,7 +507,7 @@ abstract class CModel implements ArrayAccess, CInterface_Arrayable, CInterface_J
      * @param array       $attributes
      * @param null|string $connection
      *
-     * @throws CModel_Exception_MassAssignment
+     * @throws CModel_Exception_MassAssignmentException
      *
      * @return static
      */
@@ -615,7 +615,7 @@ abstract class CModel implements ArrayAccess, CInterface_Arrayable, CInterface_J
      * @param int    $amount
      * @param array  $extra
      *
-     * @throws CModel_Exception_MassAssignment
+     * @throws CModel_Exception_MassAssignmentException
      *
      * @return int
      */
@@ -630,7 +630,7 @@ abstract class CModel implements ArrayAccess, CInterface_Arrayable, CInterface_J
      * @param int    $amount
      * @param array  $extra
      *
-     * @throws CModel_Exception_MassAssignment
+     * @throws CModel_Exception_MassAssignmentException
      *
      * @return int
      */
@@ -646,7 +646,7 @@ abstract class CModel implements ArrayAccess, CInterface_Arrayable, CInterface_J
      * @param array  $extra
      * @param string $method
      *
-     * @throws CModel_Exception_MassAssignment
+     * @throws CModel_Exception_MassAssignmentException
      *
      * @return int
      */
@@ -673,7 +673,7 @@ abstract class CModel implements ArrayAccess, CInterface_Arrayable, CInterface_J
      * @param array  $extra
      * @param string $method
      *
-     * @throws CModel_Exception_MassAssignment
+     * @throws CModel_Exception_MassAssignmentException
      *
      * @return void
      */
@@ -691,7 +691,7 @@ abstract class CModel implements ArrayAccess, CInterface_Arrayable, CInterface_J
      * @param array $attributes
      * @param array $options
      *
-     * @throws CModel_Exception_MassAssignment
+     * @throws CModel_Exception_MassAssignmentException
      *
      * @return bool
      */

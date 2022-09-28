@@ -1,5 +1,7 @@
 <?php
 
+use Symfony\Component\HttpFoundation\StreamedResponse;
+
 defined('SYSPATH') or die('No direct access allowed.');
 
 /**
@@ -44,7 +46,8 @@ trait CRouting_Concern_RouteOutputBufferRunner {
                 foreach ($headers as $header) {
                     list($headerKey, $headerValue) = explode(':', $header);
                     header_remove($headerKey);
-                    $response->header($headerKey, $headerValue);
+
+                    $response->headers->set($headerKey, $headerValue);
                 }
             }
         }

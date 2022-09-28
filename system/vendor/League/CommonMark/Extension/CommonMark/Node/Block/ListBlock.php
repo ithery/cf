@@ -17,9 +17,9 @@ namespace League\CommonMark\Extension\CommonMark\Node\Block;
 use League\CommonMark\Node\Block\AbstractBlock;
 
 class ListBlock extends AbstractBlock {
-    public const TYPE_BULLET = 'bullet';
+    const TYPE_BULLET = 'bullet';
 
-    public const TYPE_ORDERED = 'ordered';
+    const TYPE_ORDERED = 'ordered';
 
     /**
      * @var bool
@@ -39,7 +39,10 @@ class ListBlock extends AbstractBlock {
         $this->listData = $listData;
     }
 
-    public function getListData(): ListData {
+    /**
+     * @return ListData
+     */
+    public function getListData() {
         return $this->listData;
     }
 

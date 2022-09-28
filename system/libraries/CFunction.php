@@ -27,6 +27,9 @@ class CFunction {
     public $type = 'defined'; //defined,class,
 
     private function __construct($func) {
+        if ($func instanceof Closure) {
+            $func = new OpisSerializableClosure($func);
+        }
         $this->func = $func;
     }
 
@@ -122,8 +125,11 @@ class CFunction {
             //try to get from transform
             $transformer = CManager_Transform::instance();
 
-            if ($transformer->methodExists($this->func)) {
-                return $transformer->call($this->func, $args);
+            if ($transformer->isTransformable($this->func)) {
+                $item = carr::first($args);
+                $parameters = array_slice($args, 1);
+
+                return $transformer->call($this->func, $item, $parameters);
             }
 
             //not the function name, let check it if it is function from ctransform class

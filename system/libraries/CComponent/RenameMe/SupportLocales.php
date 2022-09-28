@@ -1,10 +1,8 @@
 <?php
 
-use Illuminate\Support\Facades\App;
-
 class CComponent_RenameMe_SupportLocales {
     public static function init() {
-        return new static;
+        return new static();
     }
 
     public function __construct() {
