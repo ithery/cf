@@ -180,9 +180,9 @@ abstract class CPagination_CursorPaginatorAbstract implements CInterface_Htmlabl
         return c::collect($this->parameters)
             ->flip()
             ->map(function ($_, $parameterName) use ($item) {
-                if ($item instanceof CHTTP_Resource_Json_JsonResource) {
-                    $item = $item->resource;
-                }
+                // if ($item instanceof CHTTP_Resource_Json_JsonResource) {
+                //     $item = $item->resource;
+                // }
 
                 if ($item instanceof CModel
                     && !is_null($parameter = $this->getPivotParameterForItem($item, $parameterName))
@@ -190,11 +190,11 @@ abstract class CPagination_CursorPaginatorAbstract implements CInterface_Htmlabl
                     return $parameter;
                 } elseif ($item instanceof ArrayAccess || is_array($item)) {
                     return $this->ensureParameterIsPrimitive(
-                        $item[$parameterName] ?? $item[cstr::afterLast($parameterName, '.')]
+                        isset($item[$parameterName]) ? $item[$parameterName] : $item[cstr::afterLast($parameterName, '.')]
                     );
                 } elseif (is_object($item)) {
                     return $this->ensureParameterIsPrimitive(
-                        $item->{$parameterName} ?? $item->{cstr::afterLast($parameterName, '.')}
+                        isset($item->{$parameterName}) ? $item->{$parameterName} : $item->{cstr::afterLast($parameterName, '.')}
                     );
                 }
 
@@ -295,7 +295,7 @@ abstract class CPagination_CursorPaginatorAbstract implements CInterface_Htmlabl
      * @return $this
      */
     public function withQueryString() {
-        if (!is_null($query = CPagination_Paginator::resolveQueryString())) {
+        if (!is_null($query = CPagination_AbstractPaginator::resolveQueryString())) {
             return $this->appends($query);
         }
 

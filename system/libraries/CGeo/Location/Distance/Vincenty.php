@@ -1,20 +1,16 @@
 <?php
 
-defined('SYSPATH') OR die('No direct access allowed.');
+defined('SYSPATH') or die('No direct access allowed.');
 
 /**
- * @author Hery Kurniawan
- * @since Aug 18, 2018, 7:34:53 PM
- * @license Ittron Global Teknologi <ittron.co.id>
- */
-
-/**
- * Implementation of distance calculation with Vincenty Method
- * @see      http://www.movable-type.co.uk/scripts/latlong-vincenty.html
+ * Implementation of distance calculation with Vincenty Method.
  *
+ * @author Hery Kurniawan
+ * @license Ittron Global Teknologi <ittron.co.id>
+ *
+ * @see      http://www.movable-type.co.uk/scripts/latlong-vincenty.html
  */
 class CGeo_Location_Distance_Vincenty implements CGeo_Location_Distance_DistanceInterface {
-
     /**
      * @param CGeo_Location_Coordinate $point1
      * @param CGeo_Location_Coordinate $point2
@@ -48,8 +44,8 @@ class CGeo_Location_Distance_Vincenty implements CGeo_Location_Distance_Distance
             $sinLambda = sin($lambda);
             $cosLambda = cos($lambda);
             $sinSigma = sqrt(
-                    ($cosU2 * $sinLambda) * ($cosU2 * $sinLambda) +
-                    ($cosU1 * $sinU2 - $sinU1 * $cosU2 * $cosLambda) * ($cosU1 * $sinU2 - $sinU1 * $cosU2 * $cosLambda)
+                ($cosU2 * $sinLambda) * ($cosU2 * $sinLambda)
+                + ($cosU1 * $sinU2 - $sinU1 * $cosU2 * $cosLambda) * ($cosU1 * $sinU2 - $sinU1 * $cosU2 * $cosLambda)
             );
             if (abs($sinSigma) < 0.000001) {
                 return 0.0;
@@ -64,19 +60,19 @@ class CGeo_Location_Distance_Vincenty implements CGeo_Location_Distance_Distance
             }
             $C = $f / 16 * $cosSqAlpha * (4 + $f * (4 - 3 * $cosSqAlpha));
             $lambdaP = $lambda;
-            $lambda = $L + (1 - $C) * $f * $sinAlpha * ($sigma + $C * $sinSigma * ($cos2SigmaM + $C * $cosSigma * (- 1 + 2 * $cos2SigmaM * $cos2SigmaM)));
+            $lambda = $L + (1 - $C) * $f * $sinAlpha * ($sigma + $C * $sinSigma * ($cos2SigmaM + $C * $cosSigma * (-1 + 2 * $cos2SigmaM * $cos2SigmaM)));
         } while (abs($lambda - $lambdaP) > 1e-12 && --$iterationLimit > 0);
         if ($iterationLimit === 0) {
-            throw new NotConvergingException('Vincenty calculation does not converge');
+            throw new CGeo_Exception_NotConvergingException('Vincenty calculation does not converge');
         }
         $uSq = $cosSqAlpha * ($a * $a - $b * $b) / ($b * $b);
-        $A = 1 + $uSq / 16384 * (4096 + $uSq * (- 768 + $uSq * (320 - 175 * $uSq)));
-        $B = $uSq / 1024 * (256 + $uSq * (- 128 + $uSq * (74 - 47 * $uSq)));
+        $A = 1 + $uSq / 16384 * (4096 + $uSq * (-768 + $uSq * (320 - 175 * $uSq)));
+        $B = $uSq / 1024 * (256 + $uSq * (-128 + $uSq * (74 - 47 * $uSq)));
         $deltaSigma = $B * $sinSigma * (
-                $cos2SigmaM + $B / 4 * ($cosSigma * (- 1 + 2 * $cos2SigmaM * $cos2SigmaM) - $B / 6 * $cos2SigmaM * (- 3 + 4 * $sinSigma * $sinSigma) * (- 3 + 4 * $cos2SigmaM * $cos2SigmaM))
-                );
+            $cos2SigmaM + $B / 4 * ($cosSigma * (-1 + 2 * $cos2SigmaM * $cos2SigmaM) - $B / 6 * $cos2SigmaM * (-3 + 4 * $sinSigma * $sinSigma) * (-3 + 4 * $cos2SigmaM * $cos2SigmaM))
+        );
         $s = $b * $A * ($sigma - $deltaSigma);
+
         return round($s, 3);
     }
-
 }

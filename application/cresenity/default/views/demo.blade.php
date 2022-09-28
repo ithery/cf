@@ -4,6 +4,7 @@ $name = \Cresenity\Demo\DemoVariable::username();
 
 @extends('layouts.base')
 @section('content')
+@CAppPreloader(c::media('img/favico.png'))
 <div id="wrapper" class="layout-wrapper layout-2">
     <div class="layout-inner">
         @include('demo.sidenav')

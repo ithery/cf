@@ -1,4 +1,6 @@
 <?php
+use React\EventLoop\LoopInterface;
+
 /**
  * Websocket implementation.
  *
@@ -114,5 +116,9 @@ class CWebSocket {
         }
 
         return static::$statisticCollector;
+    }
+
+    public static function client(LoopInterface $loop = null) {
+        return new CWebSocket_Client($loop);
     }
 }

@@ -175,6 +175,34 @@ trait CObservable_Trait_ControlTrait {
     }
 
     /**
+     * Create Date Time Modal Control.
+     *
+     * @param null|string $id
+     *
+     * @return CElement_FormInput_DateTime_ModalDateTime
+     */
+    public function addDateTimeModalControl($id = null) {
+        $control = new CElement_FormInput_DateTime_ModalDateTime($id);
+        $this->wrapper->add($control);
+
+        return $control;
+    }
+
+    /**
+     * Create Date Time Modal Control.
+     *
+     * @param null|string $id
+     *
+     * @return CElement_FormInput_DateTime_MaterialDateTime
+     */
+    public function addDateTimeMaterialControl($id = null) {
+        $control = new CElement_FormInput_DateTime_MaterialDateTime($id);
+        $this->wrapper->add($control);
+
+        return $control;
+    }
+
+    /**
      * Create Date Range Drop Down Control.
      *
      * @param null|string $id
