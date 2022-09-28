@@ -29,6 +29,10 @@ abstract class CManager_DataProviderAbstract implements CManager_Contract_DataPr
     }
 
     protected function isCallable($callable) {
+        if (is_string($callable)) {
+            return false;
+        }
+
         return is_callable($callable) || ($callable instanceof \Opis\Closure\SerializableClosure);
     }
 
