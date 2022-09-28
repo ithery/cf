@@ -1,0 +1,80 @@
+<?php
+
+class CDaemon_Supervisor_Bootstrap {
+    protected static $booted = false;
+
+    public static function boot() {
+        if (!static::$booted) {
+            //boot logic
+            $queuer = CQueue::queuer();
+            $queuer->addConnector('redis', function () {
+                return new CDaemon_Supervisor_Queue_RedisConnector(CRedis::instance());
+            });
+            static::listenForEvents();
+
+            static::$booted = true;
+        }
+    }
+
+    private static function listenForEvents() {
+        $events = [
+            CDaemon_Supervisor_Event_RedisEvent_JobPushed::class => [
+                CDaemon_Supervisor_Listener_StoreJob::class,
+                CDaemon_Supervisor_Listener_StoreMonitoredTags::class,
+            ],
+
+            CDaemon_Supervisor_Event_RedisEvent_JobReserved::class => [
+                CDaemon_Supervisor_Listener_MarkJobAsReserved::class,
+                CDaemon_Supervisor_Listener_StartTimingJob::class,
+            ],
+
+            CDaemon_Supervisor_Event_RedisEvent_JobReleased::class => [
+                CDaemon_Supervisor_Listener_MarkJobAsReleased::class,
+            ],
+
+            CDaemon_Supervisor_Event_RedisEvent_JobDeleted::class => [
+                CDaemon_Supervisor_Listener_MarkJobAsComplete::class,
+                CDaemon_Supervisor_Listener_UpdateJobMetrics::class,
+            ],
+
+            CDaemon_Supervisor_Event_RedisEvent_JobsMigrated::class => [
+                CDaemon_Supervisor_Listener_MarkJobsAsMigrated::class,
+            ],
+
+            CQueue_Event_JobFailed::class => [
+                CDaemon_Supervisor_Listener_MarshalFailedEvent::class,
+            ],
+
+            CDaemon_Supervisor_Event_JobFailed::class => [
+                CDaemon_Supervisor_Listener_MarkJobAsFailed::class,
+                CDaemon_Supervisor_Listener_StoreTagsForFailedJob::class,
+            ],
+
+            CDaemon_Supervisor_Event_MasterSupervisorLooped::class => [
+                CDaemon_Supervisor_Listener_TrimRecentJobs::class,
+                CDaemon_Supervisor_Listener_TrimFailedJobs::class,
+                CDaemon_Supervisor_Listener_TrimMonitoredJobs::class,
+                CDaemon_Supervisor_Listener_ExpireSupervisors::class,
+                CDaemon_Supervisor_Listener_MonitorMasterSupervisorMemory::class,
+            ],
+
+            CDaemon_Supervisor_Event_SupervisorLooped::class => [
+                CDaemon_Supervisor_Listener_PruneTerminatingProcesses::class,
+                CDaemon_Supervisor_Listener_MonitorSupervisorMemory::class,
+                CDaemon_Supervisor_Listener_MonitorWaitTimes::class,
+            ],
+
+            CDaemon_Supervisor_Event_WorkerProcessRestarting::class => [
+
+            ],
+
+            CDaemon_Supervisor_Event_SupervisorProcessRestarting::class => [
+
+            ],
+
+            CDaemon_Supervisor_Event_LongWaitDetected::class => [
+                //CDaemon_Supervisor_Listener_SendNotification::class,
+            ],
+        ];
+    }
+}

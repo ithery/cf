@@ -10,7 +10,7 @@ defined('SYSPATH') or die('No direct access allowed.');
  */
 interface CDaemon_Worker_ViaInterface {
     /**
-     * Puts the message on the queue
+     * Puts the message on the queue.
      *
      * @param CDaemon_Worker_Call $message
      *
@@ -19,7 +19,7 @@ interface CDaemon_Worker_ViaInterface {
     public function put(CDaemon_Worker_Call $message);
 
     /**
-     * Retrieves a message from the queue
+     * Retrieves a message from the queue.
      *
      * @param $desired_type
      * @param $blocking
@@ -29,7 +29,7 @@ interface CDaemon_Worker_ViaInterface {
     public function get($desired_type, $blocking = false);
 
     /**
-     * Handle an Error
+     * Handle an Error.
      *
      * @param mixed $error
      * @param mixed $try
@@ -46,7 +46,7 @@ interface CDaemon_Worker_ViaInterface {
     public function state();
 
     /**
-     * Drop the single message
+     * Drop the single message.
      *
      * @param mixed $callId
      *
@@ -55,7 +55,7 @@ interface CDaemon_Worker_ViaInterface {
     public function drop($callId);
 
     /**
-     * Drop any pending messages in the queue
+     * Drop any pending messages in the queue.
      *
      * @return void
      */

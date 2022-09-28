@@ -1341,6 +1341,7 @@ class CCollection_LazyCollection implements CInterface_Enumerable, CBase_Contrac
      *
      * @return \Generator
      */
+    #[\ReturnTypeWillChange]
     public function getIterator() {
         return $this->makeIterator($this->source);
     }
@@ -1350,6 +1351,7 @@ class CCollection_LazyCollection implements CInterface_Enumerable, CBase_Contrac
      *
      * @return int
      */
+    #[\ReturnTypeWillChange]
     public function count() {
         if (is_array($this->source)) {
             return count($this->source);

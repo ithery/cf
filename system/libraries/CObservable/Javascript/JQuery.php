@@ -13,6 +13,7 @@ class CObservable_Javascript_JQuery {
         CObservable_Javascript_JQuery_Trait_EventsTrait,
         CObservable_Javascript_JQuery_Trait_AjaxTrait,
         CObservable_Javascript_JQuery_Trait_InternalTrait;
+
     /**
      * @var CObservable_Javascript
      */

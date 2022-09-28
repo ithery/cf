@@ -461,7 +461,11 @@ class CCron_Event {
      */
     protected function ensureOutputIsBeingCaptured() {
         if (is_null($this->output) || $this->output == $this->getDefaultOutput()) {
-            $this->sendOutputTo(storage_path('logs/schedule-' . sha1($this->mutexName()) . '.log'));
+            $path = DOCROOT . 'temp' . DIRECTORY_SEPARATOR . 'cron' . DIRECTORY_SEPARATOR . CF::appCode() . DIRECTORY_SEPARATOR . 'schedule-' . sha1($this->mutexName()) . '.log';
+            if (!CFile::isDirectory(CFile::dirname($path))) {
+                CFile::makeDirectory(CFile::dirname($path), 0755, true);
+            }
+            $this->sendOutputTo($path);
         }
     }
 
@@ -481,9 +485,9 @@ class CCron_Event {
             return;
         }
 
-        $mailer->raw($text, function ($m) use ($addresses) {
-            $m->to($addresses)->subject($this->getEmailSubject());
-        });
+        // $mailer->raw($text, function ($m) use ($addresses) {
+        //     $m->to($addresses)->subject($this->getEmailSubject());
+        // });
     }
 
     /**

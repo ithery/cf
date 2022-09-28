@@ -4,9 +4,9 @@ trait CTesting_Concern_ProvidesBrowser {
     /**
      * All of the active browser instances.
      *
-     * @var array
+     * @var CCollection
      */
-    protected static $browsers = [];
+    protected static $browsers;
 
     /**
      * The callbacks that should be run on class tear down.
@@ -83,6 +83,9 @@ trait CTesting_Concern_ProvidesBrowser {
      * @return CCollection|array
      */
     protected function createBrowsersFor(Closure $callback) {
+        if (static::$browsers == null) {
+            static::$browsers = c::collect();
+        }
         if (count(static::$browsers) === 0) {
             static::$browsers = c::collect([$this->newBrowser($this->createWebDriver())]);
         }

@@ -59,7 +59,7 @@ class CApi_OAuth_TokenRepository {
      * @return null|\CApi_OAuth_Model_OAuthAccessToken
      */
     public function findForUser($id, $userId) {
-        return $this->oauth->token()->where('id', $id)->where('user_id', $userId)->first();
+        return $this->oauth->token()->where('oauth_access_token_id', $id)->where('user_id', $userId)->first();
     }
 
     /**

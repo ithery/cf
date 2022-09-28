@@ -1,11 +1,15 @@
+
+import { addClass, hasClass, removeClass } from '../dom/classes';
 import { isJson } from './helper';
 
 export const toggleFullscreen = (element) => {
     if(!element) {
         element = document.documentElement;
     }
-    if (!$('body').hasClass('full-screen')) {
-        $('body').addClass('full-screen');
+    let body = document.querySelector('body');
+
+    if (!hasClass(body,'full-screen')) {
+        addClass(body,'full-screen');
         if (element.requestFullscreen) {
             element.requestFullscreen();
         } else if (element.mozRequestFullScreen) {
@@ -16,7 +20,7 @@ export const toggleFullscreen = (element) => {
             element.msRequestFullscreen();
         }
     } else {
-        $('body').removeClass('full-screen');
+        removeClass(body,'full-screen');
         if (document.exitFullscreen) {
             document.exitFullscreen();
         } else if (document.mozCancelFullScreen) {

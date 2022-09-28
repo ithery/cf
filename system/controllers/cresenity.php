@@ -373,6 +373,10 @@ class Controller_Cresenity extends CController {
         return c::response(CF::version());
     }
 
+    public function alive() {
+        return $this->version();
+    }
+
     public function cache($method) {
         if ($method == 'delete') {
             $key = c::request()->key;
@@ -391,5 +395,22 @@ class Controller_Cresenity extends CController {
 
             return c::response()->json(compact('success'));
         }
+    }
+
+    public function editorjs($method, $submethod) {
+        if ($method == 'upload') {
+            $uploadHandler = c::manager()->editorJs()->createImageUploadHandler();
+
+            if ($submethod == 'file') {
+                return c::response()->json($uploadHandler->byFile(c::request()));
+            }
+            if ($submethod == 'url') {
+                return c::response()->json($uploadHandler->byUrl(c::request()));
+            }
+        }
+    }
+
+    public function chat() {
+        return c::view('cresenity.bot.chat');
     }
 }

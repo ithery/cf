@@ -4,6 +4,8 @@ class CAjax_Engine_FileUpload extends CAjax_Engine {
     public function execute() {
         $data = $this->ajaxMethod->getData();
         $inputName = carr::get($data, 'inputName');
+        $allowedExtension = carr::get($data, 'allowedExtension', []);
+        $validationCallback = carr::get($data, 'validationCallback');
         $fileId = '';
         $fileName = '';
         if (isset($_FILES[$inputName], $_FILES[$inputName]['name'])) {
@@ -15,6 +17,14 @@ class CAjax_Engine_FileUpload extends CAjax_Engine {
                 }
                 if (in_array($ext, ['php', 'sh', 'htm', 'pht'])) {
                     die('Not Allowed X_X');
+                }
+                if ($allowedExtension) {
+                    if (!in_array(strtolower($ext), $allowedExtension)) {
+                        die('Not Allowed X_X');
+                    }
+                }
+                if ($validationCallback && $validationCallback instanceof Opis\Closure\SerializableClosure) {
+                    $validationCallback->__invoke($_FILES[$inputName]['name'][$i], $_FILES[$inputName]['tmp_name'][$i]);
                 }
 
                 $extension = '.' . $ext;
@@ -50,6 +60,15 @@ class CAjax_Engine_FileUpload extends CAjax_Engine {
                 if (in_array($ext, ['php', 'sh', 'htm', 'pht'])) {
                     die('Not Allowed X_X');
                 }
+                if ($allowedExtension) {
+                    if (!in_array(strtolower($ext), $allowedExtension)) {
+                        die('Not Allowed X_X');
+                    }
+                }
+                if ($validationCallback && $validationCallback instanceof Opis\Closure\SerializableClosure) {
+                    $validationCallback->__invoke($fileName, $fileData);
+                }
+
                 $extension = '.' . $ext;
 
                 $filteredData = substr($fileData, strpos($fileData, ',') + 1);

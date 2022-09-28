@@ -11,6 +11,7 @@ class CManager_Transform_Parser {
     public static function normalizeMethod($method) {
         $methodMap = [
             'formatBytes' => 'formatByte',
+            'formatSize' => 'formatByte',
             'format_date' => 'formatDate',
             'short_date_format' => 'formatDate',
             'date_formatted' => 'formatDate',
@@ -25,6 +26,9 @@ class CManager_Transform_Parser {
             'htmlSpecialChars' => 'escape',
             'format_currency' => 'formatCurrency',
             'unformat_currency' => 'unformatCurrency',
+            'CarbonDiffForHumans' => 'CarbonDiffForHuman',
+            'diffForHumans' => 'CarbonDiffForHuman',
+            'diffForHuman' => 'CarbonDiffForHuman',
 
         ];
 

@@ -436,7 +436,7 @@ abstract class CDatabase_Driver {
             $type = $str;
         }
 
-        empty($sql_types[$type]) and exit('Unknown field type: ' . $type);
+        empty($sqlTypes[$type]) and exit('Unknown field type: ' . $type);
 
         // Fetch the field definition
         $field = $sqlTypes[$type];

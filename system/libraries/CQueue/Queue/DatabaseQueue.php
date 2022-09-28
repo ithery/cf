@@ -143,7 +143,7 @@ class CQueue_Queue_DatabaseQueue extends CQueue_AbstractQueue {
                 return $this->buildDatabaseRecord(
                     $queue,
                     $this->createPayload($job, $this->getQueue($queue), $data),
-                    isset($job->delay) ? $this->availableAt($job->delay) : $now,
+                    isset($job->delay) ? $this->availableAt($job->delay) : $now
                 );
             }
         )->all());
@@ -302,9 +302,9 @@ class CQueue_Queue_DatabaseQueue extends CQueue_AbstractQueue {
     /**
      * Mark the given job ID as reserved.
      *
-     * @param CDatabase_Job_DatabaseJobRecord $job
+     * @param CQueue_Job_DatabaseJobRecord $job
      *
-     * @return CDatabase_Job_DatabaseJobRecord
+     * @return CQueue_Job_DatabaseJob
      */
     protected function markJobAsReserved($job) {
         $this->database->table($this->table)->where($this->primaryKey(), $job->{$this->primaryKey()})->update([

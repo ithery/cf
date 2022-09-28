@@ -70,9 +70,9 @@ class CTesting_Browser_ElementResolver {
      *
      * @param string $field
      *
-     * @return \Facebook\WebDriver\Remote\RemoteWebElement
-     *
      * @throws \Exception
+     *
+     * @return \Facebook\WebDriver\Remote\RemoteWebElement
      */
     public function resolveForTyping($field) {
         if (!is_null($element = $this->findById($field))) {
@@ -89,9 +89,9 @@ class CTesting_Browser_ElementResolver {
      *
      * @param string $field
      *
-     * @return \Facebook\WebDriver\Remote\RemoteWebElement
-     *
      * @throws \Exception
+     *
+     * @return \Facebook\WebDriver\Remote\RemoteWebElement
      */
     public function resolveForSelection($field) {
         if (!is_null($element = $this->findById($field))) {
@@ -109,9 +109,9 @@ class CTesting_Browser_ElementResolver {
      * @param string $field
      * @param array  $values
      *
-     * @return \Facebook\WebDriver\Remote\RemoteWebElement[]
-     *
      * @throws \Exception
+     *
+     * @return \Facebook\WebDriver\Remote\RemoteWebElement[]
      */
     public function resolveSelectOptions($field, array $values) {
         $options = $this
@@ -133,10 +133,10 @@ class CTesting_Browser_ElementResolver {
      * @param string $field
      * @param string $value
      *
-     * @return \Facebook\WebDriver\Remote\RemoteWebElement
-     *
      * @throws \Exception
      * @throws \InvalidArgumentException
+     *
+     * @return \Facebook\WebDriver\Remote\RemoteWebElement
      */
     public function resolveForRadioSelection($field, $value = null) {
         if (!is_null($element = $this->findById($field))) {
@@ -157,12 +157,12 @@ class CTesting_Browser_ElementResolver {
     /**
      * Resolve the element for a given checkbox "field".
      *
-     * @param string|null $field
+     * @param null|string $field
      * @param string      $value
      *
-     * @return \Facebook\WebDriver\Remote\RemoteWebElement
-     *
      * @throws \Exception
+     *
+     * @return \Facebook\WebDriver\Remote\RemoteWebElement
      */
     public function resolveForChecking($field, $value = null) {
         if (!is_null($element = $this->findById($field))) {
@@ -189,9 +189,9 @@ class CTesting_Browser_ElementResolver {
      *
      * @param string $field
      *
-     * @return \Facebook\WebDriver\Remote\RemoteWebElement
-     *
      * @throws \Exception
+     *
+     * @return \Facebook\WebDriver\Remote\RemoteWebElement
      */
     public function resolveForAttachment($field) {
         if (!is_null($element = $this->findById($field))) {
@@ -208,9 +208,9 @@ class CTesting_Browser_ElementResolver {
      *
      * @param string $field
      *
-     * @return \Facebook\WebDriver\Remote\RemoteWebElement
-     *
      * @throws \Exception
+     *
+     * @return \Facebook\WebDriver\Remote\RemoteWebElement
      */
     public function resolveForField($field) {
         if (!is_null($element = $this->findById($field))) {
@@ -228,9 +228,9 @@ class CTesting_Browser_ElementResolver {
      *
      * @param string $button
      *
-     * @return \Facebook\WebDriver\Remote\RemoteWebElement
-     *
      * @throws \InvalidArgumentException
+     *
+     * @return \Facebook\WebDriver\Remote\RemoteWebElement
      */
     public function resolveForButtonPress($button) {
         foreach ($this->buttonFinders as $method) {
@@ -249,7 +249,7 @@ class CTesting_Browser_ElementResolver {
      *
      * @param string $button
      *
-     * @return \Facebook\WebDriver\Remote\RemoteWebElement|null
+     * @return null|\Facebook\WebDriver\Remote\RemoteWebElement
      */
     protected function findButtonBySelector($button) {
         if (!is_null($element = $this->find($button))) {
@@ -262,7 +262,7 @@ class CTesting_Browser_ElementResolver {
      *
      * @param string $button
      *
-     * @return \Facebook\WebDriver\Remote\RemoteWebElement|null
+     * @return null|\Facebook\WebDriver\Remote\RemoteWebElement
      */
     protected function findButtonByName($button) {
         if (!is_null($element = $this->find("input[type=submit][name='{$button}']"))
@@ -278,7 +278,7 @@ class CTesting_Browser_ElementResolver {
      *
      * @param string $button
      *
-     * @return \Facebook\WebDriver\Remote\RemoteWebElement|null
+     * @return null|\Facebook\WebDriver\Remote\RemoteWebElement
      */
     protected function findButtonByValue($button) {
         foreach ($this->all('input[type=submit]') as $element) {
@@ -293,7 +293,7 @@ class CTesting_Browser_ElementResolver {
      *
      * @param string $button
      *
-     * @return \Facebook\WebDriver\Remote\RemoteWebElement|null
+     * @return null|\Facebook\WebDriver\Remote\RemoteWebElement
      */
     protected function findButtonByText($button) {
         foreach ($this->all('button') as $element) {
@@ -308,7 +308,7 @@ class CTesting_Browser_ElementResolver {
      *
      * @param string $selector
      *
-     * @return \Facebook\WebDriver\Remote\RemoteWebElement|null
+     * @return null|\Facebook\WebDriver\Remote\RemoteWebElement
      */
     protected function findById($selector) {
         if (preg_match('/^#[\w\-:]+$/', $selector)) {
@@ -321,13 +321,12 @@ class CTesting_Browser_ElementResolver {
      *
      * @param string $selector
      *
-     * @return \Facebook\WebDriver\Remote\RemoteWebElement|null
+     * @return null|\Facebook\WebDriver\Remote\RemoteWebElement
      */
     public function find($selector) {
         try {
             return $this->findOrFail($selector);
         } catch (Exception $e) {
-            //
         }
     }
 
@@ -336,16 +335,15 @@ class CTesting_Browser_ElementResolver {
      *
      * @param array $selectors
      *
-     * @return \Facebook\WebDriver\Remote\RemoteWebElement
-     *
      * @throws \Exception
+     *
+     * @return \Facebook\WebDriver\Remote\RemoteWebElement
      */
     public function firstOrFail($selectors) {
         foreach ((array) $selectors as $selector) {
             try {
                 return $this->findOrFail($selector);
             } catch (Exception $e) {
-                //
             }
         }
 
@@ -382,7 +380,6 @@ class CTesting_Browser_ElementResolver {
                 WebDriverBy::cssSelector($this->format($selector))
             );
         } catch (Exception $e) {
-            //
         }
 
         return [];

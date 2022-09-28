@@ -8,6 +8,7 @@ defined('SYSPATH') or die('No direct access allowed.');
  *
  * @since Mar 16, 2019, 2:40:46 AM
  */
+
 use CApp_Base as Base;
 
 class CApp_Log_Activity {
@@ -19,8 +20,24 @@ class CApp_Log_Activity {
         $navLabel = '';
         $actionName = '';
         $actionLabel = '';
-        $controller = CFRouter::$controller;
-        $method = CFRouter::$method;
+        $controller = '';
+        $method = '';
+        $queryString = '';
+        $routedUri = '';
+        $completeUri = '';
+        $request = c::request();
+        $route = $request->route();
+        if ($route) {
+            /** @var CRouting_Route $route */
+            $routeData = $route->getRouteData();
+            if ($routeData) {
+                $controller = $routeData->getControllerClass();
+                $method = $routeData->getMethod();
+                $queryString = $routeData->getQueryString();
+                $routedUri = $routeData->getRoutedUri();
+                $completeUri = $routeData->getCompleteUri();
+            }
+        }
 
         if ($nav) {
             $navName = $nav['name'];
@@ -49,22 +66,41 @@ class CApp_Log_Activity {
             'platform' => CApp::platformName(),
             'platform_version' => CApp::platformVersion(),
             'user_id' => $userId,
-            'uri' => CFRouter::getCompleteUri(),
-            'routed_uri' => crouter::routed_uri(),
-            'controller' => CFRouter::getController(),
-            'method' => CFRouter::getControllerMethod(),
-            'query_string' => crouter::query_string(),
+            'uri' => $completeUri,
+            'routed_uri' => $routedUri,
+            'controller' => $controller,
+            'method' => $method,
+            'query_string' => $queryString,
             'nav' => $navName,
             'nav_label' => $navLabel,
             'action' => $actionName,
             'action_label' => $actionLabel,
             'createdby' => $username,
         ]);
-
+        $data = static::normalizeDataForJsonEncoding($data);
         $model->data = json_encode($data);
 
-        $model->activity_date = CApp_Base::now();
+        $model->activity_date = c::now();
         $model->description = $description;
         $model->save();
+    }
+
+    protected static function normalizeDataForJsonEncoding($data) {
+        foreach ($data as $dataIndex => $record) {
+            $beforeData = carr::get($record, 'before');
+            $afterData = carr::get($record, 'after');
+            foreach ($beforeData as $beforeIndex => $value) {
+                if ($value instanceof CCarbon || $value instanceof CarbonV3\Carbon || $value instanceof CarbonLegacy\Carbon) {
+                    $data[$dataIndex]['before'][$beforeIndex] = (string) $value;
+                }
+            }
+            foreach ($afterData as $afterIndex => $value) {
+                if ($value instanceof CCarbon || $value instanceof CarbonV3\Carbon || $value instanceof CarbonLegacy\Carbon) {
+                    $data[$dataIndex]['after'][$afterIndex] = (string) $value;
+                }
+            }
+        }
+
+        return $data;
     }
 }

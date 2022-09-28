@@ -4,7 +4,9 @@ class CBot_DriverManager {
     /**
      * @var array
      */
-    protected static $drivers = [];
+    protected static $drivers = [
+        CBot_Driver_WebDriver::class
+    ];
 
     /**
      * @var array
@@ -63,6 +65,7 @@ class CBot_DriverManager {
         if (is_null($request)) {
             $request = c::request();
         }
+
         foreach (self::getAvailableDrivers() as $driver) {
             /** @var CBot_DriverAbstract $driver */
             $driver = new $driver($request, $config);

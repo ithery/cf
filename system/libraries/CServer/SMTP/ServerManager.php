@@ -29,6 +29,9 @@ class CServer_SMTP_ServerManager {
 
     private $instance;
 
+    /**
+     * @return CServer_SMTP_ServerManager
+     */
     public static function instance() {
         if (static::$instance == null) {
             static::$instance = new static();
@@ -43,14 +46,14 @@ class CServer_SMTP_ServerManager {
      * @throws CContainer_Exception_BindingResolutionException
      */
     public function __construct() {
-        $this->recipientHandler = $app->make($this->config->get('smtpd.auth.authorize_recipients'));
+        $this->recipientHandler = c::container()->make(CF::config('server.smtpd.auth.authorize_recipients'));
 
-        $this->logger = $app->make(Logger::class);
+        $this->logger = c::container()->make(Logger::class);
 
         if ($handler = CF::config('server.smtp.auth.handler')) {
             $this->authHandler = new $handler();
         }
-        $this->authHandler = new CServer_SMTP_Auth_GuardHandler(CF::config('server.smtp.auth.guard', 'smtp'));
+        $this->authHandler = new CServer_SMTP_Auth_GuardHandler(CF::config('server.smtpd.auth.guard', 'smtp'));
     }
 
     /**

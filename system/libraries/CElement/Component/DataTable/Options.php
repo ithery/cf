@@ -48,6 +48,7 @@ class CElement_Component_DataTable_Options {
         'bInfo' => 'info',
         'bProcessing' => 'processing',
         'bServerSide' => 'serverSide',
+        'bAutoWidth' => 'autoWidth',
         'bDeferRender' => 'deferRender',
         'bStateSave' => 'stateSave',
         'sPaginationType' => 'pagingType',
@@ -122,9 +123,14 @@ class CElement_Component_DataTable_Options {
         }
 
         $jsonRow = '';
-
         foreach ($keys as $key) {
-            $jsonRow .= " '" . $key . "': " . json_encode($value) . ',';
+            if ($key == 'scrollX' && $value == false) {
+                //dont draw this key for false falue
+                break;
+            }
+
+            $key = (strpos($key, ' ') !== false || strpos($key, '-') !== false) ? "'" . $key . "'" : $key;
+            $jsonRow .= ' ' . $key . ': ' . json_encode($value) . ',';
         }
         if (strlen($jsonRow) > 0) {
             //remove space

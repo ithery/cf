@@ -1,0 +1,15 @@
+.cres\:element\:component\:Repeater {
+    .cres-repeater-wrapper {
+        .cres-repeater-row {
+            display: flex;
+            flex-wrap: nowrap;
+            padding: 10px 0px;
+            .cres-repeater-item {
+                flex-grow: 1;
+            }
+            .cres-repeater-item-action {
+                margin-left:10px;
+            }
+        }
+    }
+}

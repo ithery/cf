@@ -1,14 +1,14 @@
 <?php
 
 use PHPUnit\Framework\Assert as PHPUnit;
-use PHPUnit\Framework\Constraint\Filesystem\DirectoryExists;
-use PHPUnit\Framework\Constraint\Filesystem\FileExists;
 use PHPUnit\Framework\Constraint\Operator\LogicalNot;
-use PHPUnit\Framework\Constraint\String\RegularExpression;
+use PHPUnit\Framework\Constraint\Filesystem\FileExists;
 use PHPUnit\Framework\Exception\InvalidArgumentException;
+use PHPUnit\Framework\Constraint\String\RegularExpression;
+use PHPUnit\Framework\Constraint\Filesystem\DirectoryExists;
 
 /**
- * @internal This class is not meant to be used or overwritten outside the framework itself.
+ * @internal this class is not meant to be used or overwritten outside the framework itself
  */
 abstract class CTesting_Assert extends PHPUnit {
     /**
@@ -30,7 +30,7 @@ abstract class CTesting_Assert extends PHPUnit {
             throw InvalidArgumentException::create(2, 'array or ArrayAccess');
         }
 
-        $constraint = new ArraySubset($subset, $checkForIdentity);
+        $constraint = new CTesting_Constraint_ArraySubset($subset, $checkForIdentity);
 
         PHPUnit::assertThat($array, $constraint, $msg);
     }
@@ -44,7 +44,7 @@ abstract class CTesting_Assert extends PHPUnit {
      * @return void
      */
     public static function assertFileDoesNotExist($filename, $message = '') {
-        static::assertThat($filename, new LogicalNot(new FileExists), $message);
+        static::assertThat($filename, new LogicalNot(new FileExists()), $message);
     }
 
     /**
@@ -56,7 +56,7 @@ abstract class CTesting_Assert extends PHPUnit {
      * @return void
      */
     public static function assertDirectoryDoesNotExist($directory, $message = '') {
-        static::assertThat($directory, new LogicalNot(new DirectoryExists), $message);
+        static::assertThat($directory, new LogicalNot(new DirectoryExists()), $message);
     }
 
     /**

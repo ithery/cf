@@ -51,7 +51,7 @@ class CPeriod_Duration {
         $here = $this->period->includedEnd()->diff($this->period->includedStart(), true);
         $there = $other->period->includedEnd()->diff($other->period->includedStart(), true);
 
-        return $now->add($here)->getTimestamp() <=> $now->add($there)->getTimestamp();
+        return c::spaceshipOperator($now->add($here)->getTimestamp(), $now->add($there)->getTimestamp());
     }
 
     /**

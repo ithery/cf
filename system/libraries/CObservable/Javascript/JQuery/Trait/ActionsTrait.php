@@ -6,6 +6,7 @@ defined('SYSPATH') or die('No direct access allowed.');
  * @author Hery Kurniawan
  * @license Ittron Global Teknologi <ittron.co.id>
  *
+ * @see CJavascript_Statement_JQuery
  * @since Sep 2, 2018, 6:38:10 PM
  */
 trait CObservable_Javascript_JQuery_Trait_ActionsTrait {
@@ -15,6 +16,39 @@ trait CObservable_Javascript_JQuery_Trait_ActionsTrait {
     public function addClass($class = '') {
         /** @var CObservable_Javascript_JQuery $this */
         $this->jQueryStatement()->addClass($class);
+        $this->resetJQueryStatement();
+
+        return $this;
+    }
+
+    /**
+     * @param string $class
+     */
+    public function toggleClass($class = '') {
+        /** @var CObservable_Javascript_JQuery $this */
+        $this->jQueryStatement()->toggleClass($class);
+        $this->resetJQueryStatement();
+
+        return $this;
+    }
+
+    /**
+     * @param string $class
+     */
+    public function removeClass($class = '') {
+        /** @var CObservable_Javascript_JQuery $this */
+        $this->jQueryStatement()->removeClass($class);
+        $this->resetJQueryStatement();
+
+        return $this;
+    }
+
+    /**
+     * @param string $class
+     */
+    public function hasClass($class = '') {
+        /** @var CObservable_Javascript_JQuery $this */
+        $this->jQueryStatement()->hasClass($class);
         $this->resetJQueryStatement();
 
         return $this;
@@ -95,6 +129,19 @@ trait CObservable_Javascript_JQuery_Trait_ActionsTrait {
         return $this;
     }
 
+    public function closest() {
+        /** @var CObservable_Javascript_JQuery $this */
+        $args = func_get_args();
+        $object = $this->jQueryStatement();
+        $object = call_user_func_array([$object, 'closest'], $args);
+        if (count($args) > 0) {
+            return $this;
+        }
+        $this->resetJQueryStatement();
+
+        return $this;
+    }
+
     public function remove() {
         /** @var CObservable_Javascript_JQuery $this */
         $this->jQueryStatement()->remove();
@@ -138,6 +185,14 @@ trait CObservable_Javascript_JQuery_Trait_ActionsTrait {
     public function show() {
         /** @var CObservable_Javascript_JQuery $this */
         $this->jQueryStatement()->show();
+        $this->resetJQueryStatement();
+
+        return $this;
+    }
+
+    public function slideToggle() {
+        /** @var CObservable_Javascript_JQuery $this */
+        $this->jQueryStatement()->slideToggle();
         $this->resetJQueryStatement();
 
         return $this;

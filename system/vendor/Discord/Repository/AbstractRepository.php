@@ -11,12 +11,12 @@
 
 namespace Discord\Repository;
 
-use Discord\Factory\Factory;
-use Discord\Helpers\Collection;
-use Discord\Http\Endpoint;
 use Discord\Http\Http;
 use Discord\Parts\Part;
-use React\Promise\Promise;
+use Discord\Http\Endpoint;
+use Discord\Factory\Factory;
+use Discord\Helpers\Collection;
+use React\Promise\PromiseInterface;
 
 /**
  * Repositories provide a way to store and update parts on the Discord server.
@@ -78,11 +78,11 @@ abstract class AbstractRepository extends Collection {
     /**
      * Freshens the repository collection.
      *
-     * @return Promise
-     *
      * @throws \Exception
+     *
+     * @return PromiseInterface
      */
-    public function freshen(): Promise {
+    public function freshen(): PromiseInterface {
         if (!isset($this->endpoints['all'])) {
             return \React\Promise\reject(new \Exception('You cannot freshen this repository.'));
         }
@@ -110,9 +110,9 @@ abstract class AbstractRepository extends Collection {
      * @param array $attributes the attributes for the new part
      * @param bool  $created
      *
-     * @return Part the new part
-     *
      * @throws \Exception
+     *
+     * @return Part the new part
      */
     public function create(array $attributes = [], bool $created = false): Part {
         $attributes = array_merge($attributes, $this->vars);
@@ -125,11 +125,11 @@ abstract class AbstractRepository extends Collection {
      *
      * @param Part $part the part to save
      *
-     * @return Promise
-     *
      * @throws \Exception
+     *
+     * @return PromiseInterface
      */
-    public function save(Part $part): Promise {
+    public function save(Part $part): PromiseInterface {
         if ($part->created) {
             if (!isset($this->endpoints['update'])) {
                 return \React\Promise\reject(new \Exception('You cannot update this part.'));
@@ -166,11 +166,11 @@ abstract class AbstractRepository extends Collection {
      *
      * @param Part|snowflake $part the part to delete
      *
-     * @return Promise
-     *
      * @throws \Exception
+     *
+     * @return PromiseInterface
      */
-    public function delete($part): Promise {
+    public function delete($part): PromiseInterface {
         if (!($part instanceof Part)) {
             $part = $this->factory->part($this->class, [$this->discrim => $part], true);
         }
@@ -198,11 +198,11 @@ abstract class AbstractRepository extends Collection {
      *
      * @param Part $part the part to get fresh values
      *
-     * @return Promise
-     *
      * @throws \Exception
+     *
+     * @return PromiseInterface
      */
-    public function fresh(Part $part): Promise {
+    public function fresh(Part $part): PromiseInterface {
         if (!$part->created) {
             return \React\Promise\reject(new \Exception('You cannot get a non-existant part.'));
         }
@@ -227,11 +227,11 @@ abstract class AbstractRepository extends Collection {
      * @param string $id    the ID to search for
      * @param bool   $fresh whether we should skip checking the cache
      *
-     * @return Promise
-     *
      * @throws \Exception
+     *
+     * @return PromiseInterface
      */
-    public function fetch(string $id, bool $fresh = false): Promise {
+    public function fetch(string $id, bool $fresh = false): PromiseInterface {
         if (!$fresh && $part = $this->get($this->discrim, $id)) {
             return \React\Promise\resolve($part);
         }

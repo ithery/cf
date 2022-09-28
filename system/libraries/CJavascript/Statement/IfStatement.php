@@ -29,6 +29,10 @@ class CJavascript_Statement_IfStatement extends CJavascript_Statement {
         return $this;
     }
 
+    public function whenTrue(Closure $callback) {
+
+    }
+
     public function getStatement() {
         if ($this->operand1 instanceof CJavascript_Statement) {
             $this->operand1 = trim($this->operand1->getStatement(), ';');

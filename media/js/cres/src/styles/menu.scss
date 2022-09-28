@@ -1,0 +1,129 @@
+.cres-menu-hider {
+    position: fixed;
+    top: -100px;
+    bottom: -100px;
+    left: 0;
+    right: 0;
+    background-color: rgba(0,0,0,.35);
+    z-index: 100;
+    pointer-events: none;
+    opacity: 0;
+    transition: all .3s ease;
+}
+.cres-menu {
+    position:fixed;
+    -webkit-backdrop-filter:saturate(180%) blur(20px);
+    backdrop-filter:saturate(180%) blur(20px);
+    background-color:#fff;
+    z-index:101;
+    overflow:scroll;
+    overflow-x:hidden;
+    transition:all .3s ease;
+    -webkit-overflow-scrolling:touch
+}
+.cres-menu .content{
+    margin-bottom:0!important
+}
+.cres-menu-box-left {
+    left: 0;
+    top: 0!important;
+    width: 250px;
+    height: 100%;
+    bottom: 0;
+    transform: translate3d(-100%,0,0);
+}
+.cres-menu-box-right{
+    right:0;
+    transform:translateX(100%);
+    top:0!important;
+    height:100%;
+    bottom:0;
+    width:250px
+}
+.cres-menu-box-top{
+    transform:translate3d(0,-115%,0);
+    top:0;
+    left:0;
+    right:0;
+    height:300px
+}
+.cres-menu-box-bottom{
+    bottom:0;
+    left:0;
+    right:0;
+    height:300px;
+    transform:translate3d(0,110%,0)
+}
+.cres-menu-box-modal{
+    top:50%;
+    left:50%;
+    transform:translate(-50%,-40%);
+    opacity:0;
+    pointer-events:none;
+    transition:all .2s ease
+}
+.cres-menu-box-top.cres-menu-box-detached{
+    top:10px;
+    left:10px;
+    right:10px
+}
+.cres-menu-box-bottom.cres-menu-box-detached{
+    bottom:20px;
+    left:10px;
+    right:10px
+}
+
+.cres-menu-box-left.cres-menu-active{
+    transform:translate3d(0,0,0)!important
+}
+.cres-menu-box-right.cres-menu-active{
+    transform:translate3d(0,0,0)!important
+}
+.cres-menu-box-top.cres-menu-active{
+    transform:translate3d(0,0,0)!important
+}
+.cres-menu-box-bottom.menu-active{
+    transform:translate3d(0,20px,0)!important
+}
+.cres-menu-box-bottom-full.cres-menu-active{
+    transform:translate3d(0,0,0)!important
+}
+.cres-menu-box-modal.cres-menu-active{
+    transition:all .2s ease;
+    pointer-events:all!important;
+    opacity:1!important;
+    transform:translate(-50%,-50%)!important
+}
+.cres-menu-hider.cres-menu-active{
+    transition:all .3s ease;
+    opacity:1;
+    pointer-events:all
+}
+.cres-menu-hider.cres-menu-active.cres-menu-active-clear{
+    background-color:transparent!important
+}
+.cres-menu-box-left[cres-menu-effect=menu-reveal]{
+    display:none;
+    pointer-events:none;
+    transform:translate(0)!important;
+    z-index:86
+}
+.cres-menu-box-right[cres-menu-effect=menu-reveal]{
+    display:none;
+    pointer-events:none;
+    transform:translate(0)!important;
+    z-index:86
+}
+.cres-menu-active.cres-menu{
+    opacity:1!important;
+    transition:all .3s ease;
+    pointer-events:all!important
+}
+.cres-menu-active{
+    opacity:1!important
+}
+.cres-menu-active-no-click{
+    opacity:1;
+    background-color:rgba(0,0,0,.7);
+    pointer-events:all!important
+}

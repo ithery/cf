@@ -11,6 +11,7 @@ class CImage_GoogleChart_Helper {
                 $maxValue = max($maxValue, $temp);
             }
         }
+
         return $maxValue;
     }
 }

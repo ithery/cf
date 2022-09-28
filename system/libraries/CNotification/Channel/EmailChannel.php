@@ -21,8 +21,20 @@ class CNotification_Channel_EmailChannel extends CNotification_ChannelAbstract {
                 $options['cc'] = $cc;
                 $options['bcc'] = $bcc;
                 $options['attachments'] = $attachment;
+                $senderOptions = $options;
+                // $emailConfig = CF::config('notification.email');
+                // $vendor = carr::get($emailConfig, 'vendor');
+                // if ($vendor) {
+                //     $senderOptions['driver'] = $vendor;
+                //     $password = CF::config('vendor.' . $vendor . '.key');
+                //     if ($password) {
+                //         $senderOptions['password'] = $password;
+                //     }
+                // }
 
-                $response = CEmail::sender($options)->send($to, $subject, $message, $options);
+                $sender = CEmail::sender($senderOptions);
+
+                $response = $sender->send($to, $subject, $message, $options);
             } catch (Exception $ex) {
                 $errCode++;
                 $errMessage = $ex->getMessage();

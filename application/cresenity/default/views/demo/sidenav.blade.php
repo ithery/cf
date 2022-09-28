@@ -4,7 +4,7 @@
             <span class="brand-logo">
                 <img src="{{ c::media('img/favico.png') }}" />
             </span>
-            <a href={{ c::url('admin') }} class="brand-name sidenav-text font-weight-normal ml-2">
+            <a href={{ c::url('demo') }} class="brand-name sidenav-text font-weight-normal ml-2">
                 CF DEMO
             </a>
         </div>
