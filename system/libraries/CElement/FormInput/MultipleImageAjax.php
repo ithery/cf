@@ -162,6 +162,14 @@ class CElement_FormInput_MultipleImageAjax extends CElement_FormInput {
         return $this->cropper;
     }
 
+    public function setFileFromResources(CModel_Collection $collection, $inputName = '') {
+        foreach ($collection as $model) {
+            $this->addFile($model->getUrl(), $inputName, $model->getKey());
+        }
+
+        return $this;
+    }
+
     public function addFile($fileUrl, $inputName = '', $inputValue = '') {
         $arr = [];
         $arr['input_name'] = $inputName;
