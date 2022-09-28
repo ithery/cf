@@ -897,6 +897,20 @@ class CElement_Component_DataTable extends CElement_Component {
         return $this;
     }
 
+    public function getForAjaxSerialization() {
+        $table = clone $this;
+        $table->prepareForAjaxSerialization();
+
+        return $table;
+    }
+
+    public function prepareForAjaxSerialization() {
+        $this->parent = null;
+        $this->wrapper = null;
+
+        return $this;
+    }
+
     /**
      * @return CCollection
      */

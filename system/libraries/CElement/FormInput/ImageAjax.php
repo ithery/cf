@@ -8,6 +8,10 @@
 class CElement_FormInput_ImageAjax extends CElement_FormInput_Image {
     protected $maxUploadSize;   // in MB
 
+    protected $allowedExtension;
+
+    protected $validationCallback;
+
     protected $cropper;
 
     protected $tempStorage;
@@ -20,6 +24,7 @@ class CElement_FormInput_ImageAjax extends CElement_FormInput_Image {
         $this->maxWidth = '200';
         $this->maxHeight = '150';
         $this->maxUploadSize = 0;
+        $this->allowedExtension = [];
         $this->disabledUpload = false;
         $this->accept = 'image/*';
         $this->view = 'cresenity/element/form-input/image-ajax';
@@ -30,6 +35,8 @@ class CElement_FormInput_ImageAjax extends CElement_FormInput_Image {
 
             $ajaxUrl = CAjax::createMethod()->setType('ImgUpload')
                 ->setData('inputName', $ajaxName)
+                ->setData('allowedExtension', $this->allowedExtension)
+                ->setData('validationCallback', $this->validationCallback)
                 ->makeUrl();
 
             $view->with('id', $this->id);
@@ -56,6 +63,27 @@ class CElement_FormInput_ImageAjax extends CElement_FormInput_Image {
      */
     public function setMaxUploadSize($size) {
         $this->maxUploadSize = $size;
+
+        return $this;
+    }
+
+    /**
+     * @param int $ext
+     *
+     * @return $this
+     */
+    public function setAllowedExtension($ext) {
+        $arr = $ext;
+        if (!is_array($arr)) {
+            $arr = [$ext];
+        }
+        $this->allowedExtension = $arr;
+
+        return $this;
+    }
+
+    public function setValidationCallback($callback) {
+        $this->validationCallback = c::toSerializableClosure($callback);
 
         return $this;
     }

@@ -37,6 +37,9 @@ trait CRouting_Concern_RouteOutputBufferRunner {
             $output = $this->cleanOutputBuffer();
         }
         if ($response == null || is_bool($response)) {
+            if (!is_string($output)) {
+                $output = '';
+            }
             //collect the header
             $response = c::response($output);
 

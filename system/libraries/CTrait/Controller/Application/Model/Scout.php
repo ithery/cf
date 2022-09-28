@@ -23,7 +23,6 @@ trait CTrait_Controller_Application_Model_Scout {
             $model = new $class();
             $tnt = $this->loadTNTEngine($model);
             $indexName = $model->searchableAs() . '.index';
-
             try {
                 $tnt->selectIndex($indexName);
                 $rowsIndexed = $tnt->totalDocumentsInCollection();

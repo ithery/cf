@@ -25,7 +25,9 @@ trait CElement_Component_DataTable_Trait_JavascriptTrait {
             $ajaxMethod->setData('isModelQuery', $isModelQuery);
             $ajaxMethod->setData('isDataProvider', $this->query instanceof CManager_Contract_DataProviderInterface);
 
-            $ajaxMethod->setData('table', serialize($this));
+            $table = $this->getForAjaxSerialization();
+
+            $ajaxMethod->setData('table', serialize($table));
 
             $ajaxMethod->setData('dbConfig', $this->dbConfig);
             $ajaxMethod->setData('dbName', $this->dbName);
@@ -124,12 +126,12 @@ trait CElement_Component_DataTable_Trait_JavascriptTrait {
             if ($this->ajax) {
                 $this->options->setOption('serverSide', true);
                 $js->append('')
-                    ->appendln("'bRetrieve': true,")->br()
+                    ->appendln('bRetrieve: true,')->br()
                     ->appendln($this->options->toJsonRow('processing'))->br()
                     ->appendln($this->options->toJsonRow('serverSide'))->br()
-                    ->appendln("'sAjaxSource': '" . $ajax_url . "',")->br()
-                    ->appendln("'sServerMethod': '" . strtoupper($this->ajax_method) . "',")->br()
-                    ->appendln("'fnServerData': function ( sSource, aoData, fnCallback, oSettings ) {
+                    ->appendln("sAjaxSource: '" . $ajax_url . "',")->br()
+                    ->appendln("sServerMethod: '" . strtoupper($this->ajax_method) . "',")->br()
+                    ->appendln("fnServerData: function ( sSource, aoData, fnCallback, oSettings ) {
         var data_quick_search = [];
         jQuery('#" . $this->id() . " .data_table-quick_search').each(function(){
             if (jQuery(this).val() != '') {
@@ -166,7 +168,7 @@ trait CElement_Component_DataTable_Trait_JavascriptTrait {
         })
     },")
                     ->br()
-                    ->appendln("'fnRowCallback': function( nRow, aData, iDisplayIndex, iDisplayIndexFull ) {
+                    ->appendln("fnRowCallback: function( nRow, aData, iDisplayIndex, iDisplayIndexFull ) {
         var footer_action = $('#" . $this->id . "_wrapper .footer_action');
         " . ($this->haveFooterAction() ? 'footer_action.html(' . json_encode($this->footerActionList->html()) . ');' : '') . '
         ' . ($this->haveFooterAction() ? '' . $this->footerActionList->js() . '' : '') . "
@@ -191,16 +193,14 @@ trait CElement_Component_DataTable_Trait_JavascriptTrait {
                 $('td:eq('+i+')', nRow).addClass(dataClass);
             }
         }
-    },")
-                    ->br()
-                    ->appendln("'fnInitComplete': function() {
+    },")->br()->appendln('fnInitComplete: function() {
         this.fnAdjustColumnSizing(true);
-    },")->br();
+    },')->br();
             }
 
-            $jqueryui = "'bJQueryUI': false,";
+            $jqueryui = 'bJQueryUI: false,';
             if (CClientModules::instance()->isRegisteredModule('jquery.ui') || CClientModules::instance()->isRegisteredModule('jquery-ui-1.12.1.custom')) {
-                $jqueryui = "'bJQueryUI': true,";
+                $jqueryui = 'bJQueryUI: true,';
             }
             $js->appendln('buttons:        ' . json_encode($this->buttons) . ',')->br();
             if ($this->scrollY) {
@@ -252,15 +252,15 @@ trait CElement_Component_DataTable_Trait_JavascriptTrait {
              *
              */
             $js->appendln($jqueryui)->br()
-                ->appendln("'iDisplayLength': " . $this->display_length . ',')->br()
-                ->appendln("'bSortCellsTop': " . $hs_val . ',')->br()
-                ->appendln("'aaSorting': [],")->br()
+                ->appendln('iDisplayLength: ' . $this->display_length . ',')->br()
+                ->appendln('bSortCellsTop: ' . $hs_val . ',')->br()
+                ->appendln('aaSorting: [],')->br()
 
-                ->appendln("'oLanguage': " . json_encode($this->getLegacyLabels()) . ',')->br()
-                ->appendln("'language': " . json_encode($this->getLabels()) . ',')->br()
-                ->appendln("'aoColumns': vaoColumns,")->br()
-                ->appendln("'aLengthMenu': [
-                    [" . $km . '],
+                ->appendln('oLanguage: ' . json_encode($this->getLegacyLabels()) . ',')->br()
+                ->appendln('language: ' . json_encode($this->getLabels()) . ',')->br()
+                ->appendln('aoColumns: vaoColumns,')->br()
+                ->appendln('aLengthMenu: [
+                    [' . $km . '],
                     [' . $vm . ']
 				],')->br();
 
@@ -282,7 +282,7 @@ trait CElement_Component_DataTable_Trait_JavascriptTrait {
             }
             $dom = str_replace("'", "\'", $this->dom);
             $js->append('')
-                ->appendln("'sDom': '" . $dom . "',")->br();
+                ->appendln("sDom: '" . $dom . "',")->br();
 
             $js->append('')
                 ->decIndent()->appendln('});')->br();

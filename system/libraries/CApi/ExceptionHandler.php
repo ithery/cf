@@ -88,7 +88,7 @@ class CApi_ExceptionHandler implements CApi_Contract_ExceptionHandlerInterface, 
      * @return mixed
      */
     public function render($request, $exception) {
-        return $this->handle($exception);
+        return $this->handle($request, $exception);
     }
 
     /**
@@ -120,16 +120,22 @@ class CApi_ExceptionHandler implements CApi_Contract_ExceptionHandlerInterface, 
      * Handle an exception if it has an existing handler.
      *
      * @param Throwable|Exception $exception
+     * @param mixed               $request
      *
      * @return CHTTP_Response
      */
-    public function handle($exception) {
+    public function handle($request, $exception) {
+
         // Convert Eloquent's 500 ModelNotFoundException into a 404 NotFoundHttpException
         if ($exception instanceof CModel_Exception_ModelNotFoundException) {
             $exception = new NotFoundHttpException($exception->getMessage(), $exception);
         }
         if ($exception instanceof CApi_Exception_ApiMethodNotFoundException) {
             $exception = new NotFoundHttpException($exception->getMessage(), $exception);
+        }
+
+        if ($exception instanceof CApi_OAuth_Contract_OAuthExceptionInterface) {
+            return $exception->render($request);
         }
 
         foreach ($this->handlers as $hint => $handler) {
@@ -170,8 +176,12 @@ class CApi_ExceptionHandler implements CApi_Contract_ExceptionHandlerInterface, 
         });
 
         $response = $this->recursivelyRemoveEmptyReplacements($response);
+        $statusCode = $this->getStatusCode($exception);
+        if ($exception instanceof CAuth_Exception_AuthenticationException) {
+            $statusCode = 401;
+        }
 
-        return new CHTTP_Response($response, $this->getStatusCode($exception), $this->getHeaders($exception));
+        return new CHTTP_Response($response, $statusCode, $this->getHeaders($exception));
     }
 
     /**
@@ -186,6 +196,8 @@ class CApi_ExceptionHandler implements CApi_Contract_ExceptionHandlerInterface, 
 
         if ($exception instanceof CValidation_Exception) {
             $statusCode = $exception->status;
+        } elseif ($exception instanceof CAuth_Exception_AuthenticationException) {
+            $statusCode = 401;
         } elseif ($exception instanceof HttpExceptionInterface) {
             $statusCode = $exception->getStatusCode();
         } else {
@@ -330,6 +342,9 @@ class CApi_ExceptionHandler implements CApi_Contract_ExceptionHandlerInterface, 
      * @return int
      */
     protected function getExceptionStatusCode(Exception $exception, $defaultStatusCode = 500) {
+        if ($exception instanceof CAuth_Exception_AuthenticationException) {
+            return 401;
+        }
         return ($exception instanceof HttpExceptionInterface) ? $exception->getStatusCode() : $defaultStatusCode;
     }
 

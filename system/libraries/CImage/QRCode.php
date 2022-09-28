@@ -7,6 +7,7 @@
  */
 class CImage_QRCode {
     use CImage_QRCode_Trait_QRCodePropertyTrait;
+
     private $data;
 
     private $options;

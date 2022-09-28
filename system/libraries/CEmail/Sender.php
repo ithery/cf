@@ -70,4 +70,11 @@ class CEmail_Sender {
 
         return $options;
     }
+
+    /**
+     * @return CEmail_DriverAbstract
+     */
+    public function getDriver() {
+        return $this->driver;
+    }
 }

@@ -39,16 +39,16 @@ class CManager_Transform {
         return CManager_Transform_Transformer::isTransformable($methods);
     }
 
+    /**
+     * @param mixed $method
+     * @param mixed $item
+     * @param mixed $args
+     *
+     * @return mixed
+     */
     public function call($method, $item, $args = []) {
         $transformer = new CManager_Transform_Transformer($method);
 
         return $transformer->transform($item, $args);
-        // $callable = $this->getCallable($method);
-        // $parameters = array_merge([$item], array_values($args));
-        // if ($callable == null) {
-        //     throw new Exception(c::__("method :method doesn't exists", [':method' => $method]));
-        // }
-
-        // return call_user_func_array($callable, $parameters);
     }
 }

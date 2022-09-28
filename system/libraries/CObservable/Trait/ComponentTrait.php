@@ -225,4 +225,37 @@ trait CObservable_Trait_ComponentTrait {
             $this->wrapper->add($el);
         });
     }
+
+    /**
+     * @param null|string $id
+     *
+     * @return CElement_Component_Repeater
+     */
+    public function addRepeater($id = null) {
+        return c::tap(new CElement_Component_Repeater($id), function (CElement_Component_Repeater $el) {
+            $this->wrapper->add($el);
+        });
+    }
+
+    /**
+     * @param null|string $id
+     *
+     * @return CElement_Component_Gallery
+     */
+    public function addGallery($id = null) {
+        return c::tap(new CElement_Component_Gallery($id), function (CElement_Component_Gallery $el) {
+            $this->wrapper->add($el);
+        });
+    }
+
+    /**
+     * @param null|string $id
+     *
+     * @return CElement_Component_ProgressBar
+     */
+    public function addProgressBar($id = null) {
+        return c::tap(new CElement_Component_ProgressBar($id), function (CElement_Component_ProgressBar $el) {
+            $this->wrapper->add($el);
+        });
+    }
 }

@@ -82,7 +82,7 @@ class CCron {
      *
      * @return void
      */
-    public static function log(string $message) {
+    public static function log($message) {
         if (static::$runningEvent) {
             static::$runningEvent->log($message);
         }

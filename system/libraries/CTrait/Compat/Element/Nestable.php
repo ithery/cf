@@ -70,7 +70,7 @@ trait CTrait_Compat_Element_Nestable {
      * @param mixed $require
      */
     public function display_callback_func($func, $require = '') {
-        return $this->displayCallbackFunc($func, $require);
+        return $this->setDisplayCallback($func, $require);
     }
 
     /**
@@ -137,11 +137,23 @@ trait CTrait_Compat_Element_Nestable {
     /**
      * @deprecated since version 1.2
      *
-     * @return $this
-     *
      * @param mixed $a
+     *
+     * @return $this
      */
     public function set_data_from_array($a) {
         return $this->setDataFromArray($a);
+    }
+
+    /**
+     * @deprecated since version 1.4, use setDisplayCallback
+     *
+     * @param mixed $func
+     * @param mixed $require
+     *
+     * @return $this
+     */
+    public function displayCallbackFunc($func, $require = '') {
+        return $this->setDisplayCallback($func, $require);
     }
 }

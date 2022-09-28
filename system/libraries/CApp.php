@@ -13,6 +13,7 @@ defined('SYSPATH') or die('No direct access allowed.');
  * @method CElement_Component_FileManager  addFileManager($id=null)
  * @method CElement_Component_Form         addForm($id=null)
  * @method CElement_Component_DataTable    addTable($id=null)
+ * @method CElement_Component_Form_Field   addField($id=null)
  * @method CElement_Element_Div            addDiv($id=null)
  * @method CElement_Element_A              addA($id=null)
  * @method CElement_Element_Span           addSpan($id=null)
@@ -24,6 +25,7 @@ defined('SYSPATH') or die('No direct access allowed.');
  * @method CElement_Template               addTemplate($id=null)
  * @method CElement_View                   addView($view = null, $data = null, $id = null)
  * @method CElement_Component_Widget       addWidget($id=null)
+ * @method CElement_Component_Gallery      addGallery($id=null)
  * @method $this                           addJs($js)
  */
 class CApp implements CInterface_Responsable, CInterface_Renderable, CInterface_Jsonable {
@@ -47,6 +49,11 @@ class CApp implements CInterface_Responsable, CInterface_Renderable, CInterface_
     protected $renderer;
 
     protected $data = [];
+
+    /**
+     * @var CApp_PWA
+     */
+    protected $pwa;
 
     /**
      * @var CApp_Element
@@ -494,7 +501,7 @@ class CApp implements CInterface_Responsable, CInterface_Renderable, CInterface_
             $js = $this->minifyJavascript($js);
         }
 
-        $js = $asset->renderJsRequire($js, 'cresenity.cf.require');
+        $js = $asset->renderJsRequire($js, 'cresenity.cf.requireJs');
 
         $cappScript = $this->yieldPushContent('capp-script');
         //strip cappScript from <script>
@@ -612,5 +619,20 @@ class CApp implements CInterface_Responsable, CInterface_Renderable, CInterface_
      */
     public static function formatter() {
         return CApp_Formatter::instance();
+    }
+
+    public function enablePWA($group) {
+        $this->pwa($group)->enable();
+    }
+
+    public function pwa($group) {
+        if ($this->pwa == null) {
+            $this->pwa = [];
+        }
+        if (!isset($this->pwa[$group])) {
+            $this->pwa[$group] = new CApp_PWA($group);
+        }
+
+        return $this->pwa[$group];
     }
 }

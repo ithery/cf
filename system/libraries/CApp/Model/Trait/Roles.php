@@ -21,6 +21,7 @@ defined('SYSPATH') or die('No direct access allowed.');
  */
 trait CApp_Model_Trait_Roles {
     use CModel_Nested_NestedTrait;
+
     /**
      * @var null|\CCollection
      */

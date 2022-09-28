@@ -29,6 +29,6 @@ class CImage_GoogleChart_Formula extends CImage_GoogleChart_Chart {
             $code .= ' height=' . $this->height;
         }
         $code .= '>';
-        print($code);
+        print $code;
     }
 }

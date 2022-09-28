@@ -128,6 +128,13 @@ class CElement_FormInput_Textarea_Summernote extends CElement_FormInput_Textarea
                         ['link', ['link']],
                     ]
                 ";
+            case 'text-link':
+                $json = "
+                    [
+                        ['style', ['bold', 'italic', 'underline']],
+                        ['link', ['link']],
+                    ]
+                ";
                 break;
         }
         return $json;

@@ -790,6 +790,17 @@ class c {
     }
 
     /**
+     * Find route from uri.
+     *
+     * @param string $uri
+     *
+     * @return null|CRouting_Route
+     */
+    public static function findRoute($uri) {
+        return static::router()->getRoutes()->match(CHTTP_Request::create($uri));
+    }
+
+    /**
      * Generate the URL to a named route.
      *
      * @param array|string $name
@@ -975,10 +986,12 @@ class c {
     /**
      * Get the CDatabase instance.
      *
+     * @param null|string $name
+     *
      * @return \CDatabase
      */
-    public static function db() {
-        return CDatabase::instance();
+    public static function db($name = null) {
+        return CDatabase::instance($name);
     }
 
     public static function userAgent() {
@@ -1184,7 +1197,11 @@ class c {
      */
     public static function transform($value, $callback, $default = null) {
         if (c::filled($value)) {
-            return $callback($value);
+            if ($callback instanceof Closure) {
+                return $callback($value);
+            } else {
+                return c::manager()->transform()->call($callback, $value);
+            }
         }
 
         if (is_callable($default)) {
@@ -1513,6 +1530,10 @@ class c {
         return json_encode($data, $options, $depth);
     }
 
+    public static function jsonAttr($data, $options = null, $depth = 512) {
+        return htmlspecialchars(c::json($data, $options, $depth), ENT_QUOTES, 'UTF-8');
+    }
+
     /**
      * @return CApp_Contract_BaseInterface
      */
@@ -1600,6 +1621,17 @@ class c {
      */
     public static function carbon($time = null, $tz = null) {
         return new CCarbon($time, $tz);
+    }
+
+    public static function call($callback, array $args = []) {
+        if (is_callable($callback)) {
+            return call_user_func_array($callback, $args);
+        }
+        if ($callback instanceof \Opis\Closure\SerializableClosure) {
+            return $callback->__invoke(...$args);
+        }
+
+        throw new Exception('callback is not callable');
     }
 }
 

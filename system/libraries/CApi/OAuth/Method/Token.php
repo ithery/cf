@@ -12,16 +12,16 @@ class CApi_OAuth_Method_Token extends CApi_OAuth_MethodAbstract {
 
     public function execute() {
         $request = $this->apiRequest;
-
         $response = $this->withErrorHandling(function () use ($request) {
             return $this->convertResponse(
                 $this->oauthServer()->respondToAccessTokenRequest($this->toServerRequestInterface($request), new Psr7Response())
             );
         });
 
-        $data = $this->reformatContent(json_decode($response->getContent(), true));
+        return $response;
+        // $data = $this->reformatContent(json_decode($response->getContent(), true));
 
-        $this->data = $data;
+        // $this->data = $data;
     }
 
     protected function reformatContent(array $data) {

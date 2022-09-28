@@ -73,7 +73,31 @@ class CDatabase_Config {
             'escape' => true,
         ];
 
-        return array_merge($defaultConfig, $config);
+        $config = array_merge($defaultConfig, $config);
+        if (!isset($config['port']) || $config['port'] == false) {
+            $port = static::getDefaultPort($config['driver']);
+            if ($port !== null) {
+                $config['port'] = $port;
+            }
+        }
+
+        return $config;
+    }
+
+    protected static function normalizeDriver($driver) {
+        $mappedDriver = [
+            'mysqli' => 'mysql'
+        ];
+
+        return carr::get($mappedDriver, $driver, $driver);
+    }
+
+    protected static function getDefaultPort($driver) {
+        $mappedPort = [
+            'mysql' => '3306'
+        ];
+
+        return carr::get($mappedPort, static::normalizeDriver($driver));
     }
 
     protected static function reformatConnectionFormat($connection) {

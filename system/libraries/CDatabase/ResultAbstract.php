@@ -37,6 +37,10 @@ abstract class CDatabase_ResultAbstract implements CDatabase_ResultInterface, Ar
      */
     abstract public function listFields();
 
+    /**
+     * @return int
+     */
+    #[\ReturnTypeWillChange]
     abstract public function count();
 
     abstract public function fetch();
@@ -48,6 +52,7 @@ abstract class CDatabase_ResultAbstract implements CDatabase_ResultInterface, Ar
      *
      * @param mixed $offset
      */
+    #[\ReturnTypeWillChange]
     public function offsetExists($offset) {
         if ($this->count() > 0) {
             $min = 0;
@@ -81,6 +86,7 @@ abstract class CDatabase_ResultAbstract implements CDatabase_ResultInterface, Ar
      *
      * @throws CDatabase_Exception
      */
+    #[\ReturnTypeWillChange]
     public function offsetSet($offset, $value) {
         throw new CDatabase_Exception('Query results are read only');
     }
@@ -92,6 +98,7 @@ abstract class CDatabase_ResultAbstract implements CDatabase_ResultInterface, Ar
      *
      * @throws CDatabase_Exception
      */
+    #[\ReturnTypeWillChange]
     public function offsetUnset($offset) {
         throw new CDatabase_Exception('Query results are read only');
     }

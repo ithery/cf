@@ -60,7 +60,7 @@ class Country extends \CModel {
         ['code' => 'CD', 'code3' => 'COD', 'num' => '180', 'isd' => '243', 'name' => 'The Democratic Republic of The Congo', 'continent' => 'Africa'],
         ['code' => 'CK', 'code3' => 'COK', 'num' => '184', 'isd' => '682', 'name' => 'Cook Islands', 'continent' => 'Oceania'],
         ['code' => 'CR', 'code3' => 'CRI', 'num' => '188', 'isd' => '506', 'name' => 'Costa Rica', 'continent' => 'North America'],
-        ['code' => 'CI', 'code3' => 'CIV', 'num' => '384', 'isd' => '225', 'name' => "Cote D'ivoire", 'continent' => 'Africa'],
+        ['code' => 'CI', 'code3' => 'CIV', 'num' => '384', 'isd' => '225', 'name' => 'Cote D\'ivoire', 'continent' => 'Africa'],
         ['code' => 'CW', 'code3' => 'CUW', 'num' => '531', 'isd' => '599', 'name' => 'Curaçao', 'continent' => 'North America'],
         ['code' => 'HR', 'code3' => 'HRV', 'num' => '191', 'isd' => '385', 'name' => 'Croatia', 'continent' => 'Europe'],
         ['code' => 'CU', 'code3' => 'CUB', 'num' => '192', 'isd' => '53', 'name' => 'Cuba', 'continent' => 'North America'],

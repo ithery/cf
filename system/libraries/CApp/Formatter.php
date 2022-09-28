@@ -99,8 +99,12 @@ class CApp_Formatter {
         if (strlen($dateFormat) == 0) {
             return $x;
         }
+        $carbon = CCarbon::parse($x);
+        if ($carbon instanceof \CarbonV3\Carbon) {
+            return $carbon->translatedFormat($dateFormat);
+        }
 
-        return CCarbon::parse($x)->translatedFormat($dateFormat);
+        return $carbon->format($dateFormat);
     }
 
     public function unformatDate($x, $fromFormat = null) {
@@ -119,7 +123,12 @@ class CApp_Formatter {
             return $x;
         }
 
-        return CCarbon::parse($x)->translatedFormat($datetimeFormat);
+        $carbon = CCarbon::parse($x);
+        if ($carbon instanceof \CarbonV3\Carbon) {
+            return $carbon->translatedFormat($datetimeFormat);
+        }
+
+        return $carbon->format($datetimeFormat);
     }
 
     public function unformatDatetime($x, $fromFormat = null) {
@@ -136,7 +145,7 @@ class CApp_Formatter {
         $currencySuffix = $currencySuffix ?: $this->currencySuffix;
         $currencyPrefix = $currencyPrefix ?: $this->currencyPrefix;
 
-        $x = number_format($x, $decimalDigit, $decimalSeparator, $thousandSeparator);
+        $x = number_format((float) $x, $decimalDigit, $decimalSeparator, $thousandSeparator);
         if ($stripZeroDecimal) {
             if (substr($x, ($decimalDigit + 1) * -1) === '.' . cstr::repeat('0', $decimalDigit)) {
                 $x = substr($x, 0, ($decimalDigit + 1) * -1);

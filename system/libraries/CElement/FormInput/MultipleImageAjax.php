@@ -16,6 +16,10 @@ class CElement_FormInput_MultipleImageAjax extends CElement_FormInput {
 
     protected $maxUploadSize;
 
+    protected $allowedExtension;
+
+    protected $validationCallback;
+
     protected $limitFile;
 
     protected $disabledUpload;
@@ -44,6 +48,7 @@ class CElement_FormInput_MultipleImageAjax extends CElement_FormInput {
         $this->maxWidth = '200';
         $this->maxHeight = '150';
         $this->maxUploadSize = 0;
+        $this->allowedExtension = [];
         $this->limitFile = 10;
         $this->accept = 'image/*';
         $this->disabledUpload = false;
@@ -60,7 +65,10 @@ class CElement_FormInput_MultipleImageAjax extends CElement_FormInput {
 
             $ajaxUrl = CAjax::createMethod()->setType('ImgUpload')
                 ->setData('inputName', $ajaxName)
+                ->setData('allowedExtension', $this->allowedExtension)
+                ->setData('validationCallback', $this->validationCallback)
                 ->makeUrl();
+
             $view->with('id', $this->id);
             $view->with('imgSrc', $this->imgSrc);
             $view->with('maxWidth', $this->maxWidth);
@@ -115,6 +123,27 @@ class CElement_FormInput_MultipleImageAjax extends CElement_FormInput {
         return $this;
     }
 
+    /**
+     * @param int $ext
+     *
+     * @return $this
+     */
+    public function setAllowedExtension($ext) {
+        $arr = $ext;
+        if (!is_array($arr)) {
+            $arr = [$ext];
+        }
+        $this->allowedExtension = $arr;
+
+        return $this;
+    }
+
+    public function setValidationCallback($callback) {
+        $this->validationCallback = c::toSerializableClosure($callback);
+
+        return $this;
+    }
+
     public function setLimitFile($limit) {
         $this->limitFile = $limit;
 
@@ -131,6 +160,14 @@ class CElement_FormInput_MultipleImageAjax extends CElement_FormInput {
         }
 
         return $this->cropper;
+    }
+
+    public function setFileFromResources(CModel_Collection $collection, $inputName = '') {
+        foreach ($collection as $model) {
+            $this->addFile($model->getUrl(), $inputName, $model->getKey());
+        }
+
+        return $this;
     }
 
     public function addFile($fileUrl, $inputName = '', $inputValue = '') {

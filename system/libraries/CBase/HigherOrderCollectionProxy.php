@@ -1,7 +1,7 @@
 <?php
 
 /**
- * @mixin \Illuminate\Support\Enumerable
+ * @mixin \CInterface_Enumerable
  */
 class CBase_HigherOrderCollectionProxy {
     /**

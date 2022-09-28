@@ -8,6 +8,7 @@ class CImage_GoogleChart_LineChart extends CImage_GoogleChart_Chart {
 
     public function getUrl() {
         $retStr = parent::getUrl();
+
         return $retStr;
     }
 }

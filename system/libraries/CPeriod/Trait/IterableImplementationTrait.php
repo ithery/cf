@@ -9,10 +9,16 @@ trait CPeriod_Trait_IterableImplementationTrait {
      * @return mixed
      */
     public function offsetGet($offset) {
-        return $this->periods[$offset] ?? null;
+        return carr::get($this->periods, $offset);
     }
 
-    public function offsetSet(mixed $offset, mixed $value): void {
+    /**
+     * @param mixed $offset
+     * @param mixed $value
+     *
+     * @return void
+     */
+    public function offsetSet($offset, $value) {
         if (is_null($offset)) {
             $this->periods[] = $value;
 
@@ -22,31 +28,46 @@ trait CPeriod_Trait_IterableImplementationTrait {
         $this->periods[$offset] = $value;
     }
 
-    public function offsetExists(mixed $offset): bool {
+    public function offsetExists($offset) {
         return array_key_exists($offset, $this->periods);
     }
 
-    public function offsetUnset(mixed $offset): void {
+    public function offsetUnset($offset) {
         unset($this->periods[$offset]);
     }
 
-    public function next(): void {
+    /**
+     * @return void
+     */
+    public function next() {
         $this->position++;
     }
 
-    public function key(): mixed {
+    /**
+     * @return mixed
+     */
+    public function key() {
         return $this->position;
     }
 
-    public function valid(): bool {
+    /**
+     * @return boolean
+     */
+    public function valid() {
         return array_key_exists($this->position, $this->periods);
     }
 
-    public function rewind(): void {
+    /**
+     * @return void
+     */
+    public function rewind() {
         $this->position = 0;
     }
 
-    public function count(): int {
+    /**
+     * @return integer
+     */
+    public function count() {
         return count($this->periods);
     }
 }

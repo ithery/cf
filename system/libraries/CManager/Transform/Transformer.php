@@ -44,6 +44,12 @@ class CManager_Transform_Transformer {
         );
     }
 
+    /**
+     * @param mixed $value
+     * @param mixed $data
+     *
+     * @return mixed
+     */
     public function transform($value, $data = []) {
         foreach ($this->methods as $method) {
             if ($resolveds = CManager_Transform_Repository::instance()->resolveMethod($method, $method)) {

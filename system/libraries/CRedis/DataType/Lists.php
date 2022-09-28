@@ -63,6 +63,6 @@ redis.call('lset', KEYS[1], ARGV[1], '__DELETED__');
 redis.call('lrem', KEYS[1], 1, '__DELETED__');
 LUA;
 
-        return $this->getConnection()->eval($lua, 1, $key, $index);
+        return $this->getConnection()->doEval($lua, 1, $key, $index);
     }
 }

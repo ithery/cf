@@ -237,7 +237,8 @@ final class CF {
      * @return void
      */
     public static function invoke($uri) {
-        $request = CHTTP_Request::create($uri, c::request()->method());
+        $oldRequest = c::request();
+        $request = CHTTP_Request::create($uri, $oldRequest->method());
 
         return  c::router()->dispatchToRoute($request);
     }
@@ -651,7 +652,7 @@ final class CF {
      * @return string
      */
     public static function cliDomain() {
-        $domain = null;
+        $domain = static::cliAppCode() . '.test';
         if (defined('CFCLI_APPCODE')) {
             return constant('CFCLI_APPCODE') . '.test';
         }
@@ -1220,7 +1221,7 @@ final class CF {
                 if (strlen($ext) > 3) {
                     $ext = substr($ext, 0, 3);
                 }
-                if (in_array($ext, ['php', 'sh', 'htm', 'pht'])) {
+                if (in_array(strtolower($ext), ['php', 'sh', 'htm', 'pht'])) {
                     die('Not Allowed X_X');
                 }
             } else {

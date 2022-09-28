@@ -334,7 +334,7 @@
                     if (this.readyState == 4 && this.status == 200) {
                         var dataFile = JSON.parse(this.responseText);
                         div.removeClass("loading");
-                        div.append("<input type=\"hidden\" name=\"<?php echo $name; ?>[" + index + "]\" value=" + dataFile.fileId + ">");
+                        div.append("<input type=\"hidden\" name=\"<?php echo $name; ?>[]\" value=" + dataFile.fileId + ">");
                         if(file.type.match("image.*")){
                             img.attr('src', data.url);
                         }

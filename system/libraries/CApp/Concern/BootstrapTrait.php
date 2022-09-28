@@ -113,7 +113,8 @@ trait CApp_Concern_BootstrapTrait {
             CView::blade()->directive('CAppEndPrependScript', [CApp_Blade_Directive::class, 'endPrependScript']);
             CView::blade()->directive('CAppElement', [CApp_Blade_Directive::class, 'element']);
             CView::blade()->directive('CAppMessage', [CApp_Blade_Directive::class, 'message']);
-
+            CView::blade()->directive('CAppPWA', [CApp_Blade_Directive::class, 'pwa']);
+            CView::blade()->directive('CAppPreloader', [CApp_Blade_Directive::class, 'preloader']);
             static::$registerBladeBooted = true;
         }
     }

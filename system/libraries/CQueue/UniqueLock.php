@@ -28,7 +28,7 @@ class CQueue_UniqueLock {
     public function acquire($job) {
         $uniqueId = method_exists($job, 'uniqueId')
                     ? $job->uniqueId()
-                    : ($job->uniqueId ?? '');
+                    : (isset($job->uniqueId) ? ($job->uniqueId ?: '') : '');
 
         $cache = method_exists($job, 'uniqueVia')
                     ? $job->uniqueVia()
@@ -36,7 +36,7 @@ class CQueue_UniqueLock {
 
         return (bool) $cache->lock(
             $key = 'laravel_unique_job:' . get_class($job) . $uniqueId,
-            $job->uniqueFor ?? 0
+            isset($job->uniqueFor) ? ($job->uniqueFor ?: 0) : 0
         )->get();
     }
 }

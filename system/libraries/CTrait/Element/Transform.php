@@ -16,6 +16,10 @@ trait CTrait_Element_Transform {
      */
     protected $transforms = [];
 
+    public function getTransforms() {
+        return $this->transforms;
+    }
+
     public function addTransform($transform) {
         $transform = carr::wrap($transform);
 
@@ -33,6 +37,12 @@ trait CTrait_Element_Transform {
         return $this;
     }
 
+    /**
+     * @param mixed $value
+     * @param mixed $data
+     *
+     * @return mixed
+     */
     public function applyTransform($value, $data = []) {
         if (empty($this->transforms)) {
             return $value;

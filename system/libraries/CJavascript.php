@@ -183,4 +183,15 @@ class CJavascript {
     public static function ifStatement($operand1, $operator, $operand2) {
         return CJavascript_StatementFactory::createIf($operand1, $operator, $operand2);
     }
+
+    public static function cresJs() {
+        return CJavascript_CresJs::instance();
+    }
+
+    public static function getJsStatementFromClosure(Closure $event, array $args) {
+        CJavascript::pushDeferredStack();
+        call_user_func_array($event, $args);
+
+        return CJavascript::popDeferredStack();
+    }
 }

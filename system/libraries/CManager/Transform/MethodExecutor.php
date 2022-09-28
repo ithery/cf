@@ -35,6 +35,10 @@ class CManager_Transform_MethodExecutor {
         return c::formatter()->unformatDatetime($value, $format);
     }
 
+    public function transformCarbonDiffForHuman($value) {
+        return CCarbon::parse($value)->diffForHumans();
+    }
+
     public function transformFormatNumber($value, $decimalSeparator = null, $thousandSeparator = null) {
         return c::formatter()->formatNumber($value, $decimalSeparator, $thousandSeparator);
     }
@@ -44,7 +48,7 @@ class CManager_Transform_MethodExecutor {
     }
 
     public function transformThousandSeparator($value, $decimalDigit = null, $decimalSeparator = null, $thousandSeparator = null) {
-        $value = c::formatter()->formatDecimal($value, $decimalDigit, $decimalSeparator, $thousandSeparator, true);
+        return c::formatter()->formatDecimal($value, $decimalDigit, $decimalSeparator, $thousandSeparator, true);
     }
 
     public function transformFormatCurrency($value, $decimalDigit = null, $decimalSeparator = null, $thousandSeparator = null, $currencyPrefix = null, $currencySuffix = null) {
@@ -63,12 +67,42 @@ class CManager_Transform_MethodExecutor {
         return cstr::lower($value);
     }
 
+    public function transformYesNo($value) {
+        return $value ? 'YES' : 'NO';
+    }
+
     public function transformEscape($value) {
         return c::e($value);
     }
 
     public function transformAscii($value) {
         return cstr::ascii($value);
+    }
+
+    public function transformShowMore($value, $limit = 100) {
+        if (is_string($value) && strlen($value) > $limit) {
+            return CElement_Component_ShowMore::factory()->setLimit($limit)->add($value);
+        }
+
+        return $value;
+    }
+
+    public function transformDiv($value, ...$classes) {
+        $classes = implode(' ', $classes);
+        if ($value instanceof CRenderable) {
+            return CElement_Element_Div::factory()->addClass($classes)->add($value);
+        }
+
+        return '<div class="' . $classes . '">' . $value . '</div>';
+    }
+
+    public function transformSpan($value, ...$classes) {
+        $classes = implode(' ', $classes);
+        if ($value instanceof CRenderable) {
+            return CElement_Element_Span::factory()->addClass($classes)->add($value);
+        }
+
+        return '<span class="' . $classes . '">' . $value . '</span>';
     }
 
     /**
@@ -111,5 +145,9 @@ class CManager_Transform_MethodExecutor {
         }
 
         return 'Unknown';
+    }
+
+    public static function transformEditorJsHtml($data) {
+        return c::manager()->editorJs()->generateHtmlOutput($data)->__toString();
     }
 }

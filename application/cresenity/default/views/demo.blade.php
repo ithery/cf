@@ -4,6 +4,7 @@ $name = \Cresenity\Demo\DemoVariable::username();
 
 @extends('layouts.base')
 @section('content')
+@CAppPreloader(c::media('img/favico.png'))
 <div id="wrapper" class="layout-wrapper layout-2">
     <div class="layout-inner">
         @include('demo.sidenav')
@@ -45,4 +46,14 @@ $name = \Cresenity\Demo\DemoVariable::username();
     </div>
     <div class="layout-overlay layout-sidenav-toggle"></div>
 </div><!-- /wrapper -->
+
+<script>
+    window.addEventListener('cresenity:loaded',()=>{
+        cresenity.observer.elementRendered('.my-element',(element) => {
+
+            element.innerHTML = element.innerHTML + '|rendered dari js';
+        });
+    });
+
+</script>
 @endsection

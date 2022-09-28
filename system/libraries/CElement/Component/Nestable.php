@@ -22,7 +22,7 @@ class CElement_Component_Nestable extends CElement_Component {
 
     protected $input;
 
-    protected $displayCallbackFunc;
+    protected $displayCallback;
 
     protected $filterActionCallbackFunc;
 
@@ -34,6 +34,8 @@ class CElement_Component_Nestable extends CElement_Component {
 
     protected $js_cell;
 
+    protected $isCollapsed = false;
+
     public function __construct($id) {
         parent::__construct($id);
         CManager::registerModule('jquery.nestable');
@@ -42,7 +44,7 @@ class CElement_Component_Nestable extends CElement_Component {
         $this->input = '';
         $this->rowActionList = CElement_List_ActionRowList::factory();
         $this->rowActionList->setStyle('btn-icon-group');
-        $this->displayCallbackFunc = false;
+        $this->displayCallback = false;
         $this->filterActionCallbackFunc = '';
         $this->checkbox = false;
         $this->requires = [];
@@ -53,8 +55,8 @@ class CElement_Component_Nestable extends CElement_Component {
         return new CElement_Component_Nestable($id);
     }
 
-    public function displayCallbackFunc($func, $require = '') {
-        $this->displayCallbackFunc = $func;
+    public function setDisplayCallback($func, $require = '') {
+        $this->displayCallback = $func;
         if (strlen($require) > 0) {
             $this->requires[] = $require;
         }
@@ -73,6 +75,17 @@ class CElement_Component_Nestable extends CElement_Component {
 
     public function setDataFromTreeDb(CTreeDB $treedb, $parentId = null) {
         $this->data = $treedb->getChildrenData($parentId);
+
+        return $this;
+    }
+
+    /**
+     * @param bool $bool
+     *
+     * @return $this
+     */
+    public function setCollapsed($bool = true) {
+        $this->isCollapsed = $bool;
 
         return $this;
     }
@@ -128,6 +141,18 @@ class CElement_Component_Nestable extends CElement_Component {
         return $this;
     }
 
+    public function disableDnd() {
+        $this->disable_dnd = true;
+
+        return $this;
+    }
+
+    public function enableDnd() {
+        $this->disable_dnd = false;
+
+        return $this;
+    }
+
     public function setHaveCheckbox($checkbox) {
         $this->checkbox = $checkbox;
 
@@ -155,7 +180,8 @@ class CElement_Component_Nestable extends CElement_Component {
     public function html($indent = 0) {
         $html = new CStringBuilder();
         $html->setIndent($indent);
-        $html->appendln('<div id="' . $this->id . '" class="dd nestable">')->incIndent();
+        $styles = $this->disable_dnd ? 'pointer-events: none;' : '';
+        $html->appendln('<div id="' . $this->id . '" cres-element="component:Nestable" class="dd nestable cres-nestable cres:element:component:Nestable" style="' . $styles . '">')->incIndent();
         if (count($this->data) > 0) {
             $depthBefore = -1;
             $in = 0;
@@ -183,8 +209,8 @@ class CElement_Component_Nestable extends CElement_Component {
                 }
                 $val = carr::get($d, $this->valueKey);
                 $newV = $val;
-                if ($this->displayCallbackFunc !== false && is_callable($this->displayCallbackFunc)) {
-                    $newV = CFunction::factory($this->displayCallbackFunc)
+                if ($this->displayCallback !== false && is_callable($this->displayCallback)) {
+                    $newV = CFunction::factory($this->displayCallback)
                         ->addArg($this)
                         ->addArg($d)
                         ->addArg($val)
@@ -194,35 +220,7 @@ class CElement_Component_Nestable extends CElement_Component {
                 $html->appendln($newV);
                 $html->decIndent()->appendln('</div>');
                 if ($this->haveRowAction()) {
-                    foreach ($d as $k => $v) {
-                        $jsparam[$k] = $v;
-                    }
-                    $jsparam['param1'] = carr::get($d, $this->idKey);
-
-                    $this->getRowActionList()->regenerateId(true);
-                    $this->getRowActionList()->apply('jsparam', $jsparam);
-                    $this->getRowActionList()->apply('setHandlerParam', $jsparam);
-
-                    if (($this->filterActionCallbackFunc) != null) {
-                        $actions = $this->getRowActionList()->childs();
-
-                        foreach ($actions as $action) {
-                            $visibility = CFunction::factory($this->filterActionCallbackFunc)
-                                ->addArg($this)
-                                ->addArg($d)
-                                ->addArg($action)
-                                ->setRequire($this->requires)
-                                ->execute();
-                            if ($visibility == false) {
-                                $action->addClass('d-none');
-                            }
-                            $action->setVisibility($visibility);
-                        }
-                    }
-
-                    $this->js_cell .= $this->getRowActionList()->js();
-
-                    $html->appendln($this->getRowActionList()->html($html->getIndent()));
+                    $this->js_cell .= $this->drawActionAndGetJs($html, $d, $this->idKey);
                 }
 
                 $depthBefore = $depth;
@@ -275,6 +273,11 @@ class CElement_Component_Nestable extends CElement_Component {
                     }
                 ");
             }
+            if ($this->isCollapsed) {
+                $js->appendln("
+                    jQuery('#" . $this->id . "').nestable('collapseAll');
+                ");
+            }
         }
 
         $js->append($this->js_cell)->br();
@@ -282,5 +285,48 @@ class CElement_Component_Nestable extends CElement_Component {
         $js->append($this->jsChild($indent))->br();
 
         return $js->text();
+    }
+
+    protected function drawActionAndGetJs(CStringBuilder $html, array $row, $key) {
+        $js = '';
+        if ($this->haveRowAction()) {
+            $html->appendln('<td class="low-padding align-center cell-action td-action">')->incIndent()->br();
+            foreach ($row as $k => $v) {
+                $jsparam[$k] = $v;
+            }
+
+            $jsparam['param1'] = $key;
+
+            $this->getRowActionList()->regenerateId(true);
+            $this->getRowActionList()->apply('setJsParam', $jsparam);
+            $this->getRowActionList()->apply('setHandlerParam', $jsparam);
+            $actions = $this->getRowActionList()->childs();
+
+            foreach ($actions as &$action) {
+                if (($this->filterActionCallbackFunc) != null) {
+                    $visibility = CFunction::factory($this->filterActionCallbackFunc)
+                        ->addArg($this)
+                        ->addArg('action')
+                        ->addArg($row)
+                        ->addArg($action)
+                        ->setRequire($this->requires)
+                        ->execute();
+                    if ($visibility == false) {
+                        $action->addClass('d-none');
+                    }
+                    $action->setVisibility($visibility);
+                }
+                if ($action instanceof CElement_Component_ActionRow) {
+                    $action->applyRowCallback($row);
+                }
+            }
+
+            $js = $this->getRowActionList()->js();
+
+            $html->appendln($this->getRowActionList()->html($html->getIndent()));
+            $html->decIndent()->appendln('</td>')->br();
+        }
+
+        return $js;
     }
 }

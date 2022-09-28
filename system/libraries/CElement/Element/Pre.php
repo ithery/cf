@@ -8,4 +8,13 @@ class CElement_Element_Pre extends CElement_Element {
         $this->tag = 'pre';
         $this->haveIndent = false;
     }
+
+    /**
+     * @param string $id
+     *
+     * @return CElement_Element_Pre
+     */
+    public static function factory($id = '') {
+        return new static($id);
+    }
 }

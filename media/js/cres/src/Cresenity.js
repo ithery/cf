@@ -11,7 +11,7 @@ import {
 } from './util';
 import {encode as base64encode, decode as base64decode} from './util/base64';
 import php from './php';
-import { elementReady, elementRendered } from './util/dom-observer';
+import { domReady, elementReady, elementRendered } from './util/dom-observer';
 import { debounce } from './util/debounce';
 import { confirmFromElement, defaultConfirmHandler } from './module/confirm-handler';
 import initValidation from './module/validation';
@@ -25,12 +25,23 @@ import removePreloader from './module/preloader';
 import initProgressive from './module/progressive';
 import cresToast from './module/toast';
 import CresAlpine from './module/CresAlpine';
-import SSE from './module/SSE';
+import SSE from './cresenity/SSE';
 import AlpineCleave from './alpine/cleave';
 import AlpineAutoNumeric from './alpine/autonumeric';
 import AlpineTippy from './alpine/tippy';
 import { attachWaves } from './ui/waves';
 import formatter from './formatter';
+import { initCssDomVar } from './module/css-dom-var';
+import extend from './core/extend';
+import {hasClass,addClass, removeClass} from './dom/classes';
+import scrollTo from './animation/scrollTo';
+import setHeight from './animation/setHeight';
+import Theme from './cresenity/Theme';
+import { initThemeMode } from './module/theme';
+import { initMenu } from './module/menu';
+import { formatCurrency, unformatCurrency } from './formatter/currency';
+import { cresQuery } from './module/CresQuery';
+
 export default class Cresenity {
     constructor() {
         this.cf = cf;
@@ -58,8 +69,8 @@ export default class Cresenity {
         this.php = php;
         this.react = cresReact;
         this.observer = {
-            elementRendered: elementRendered,
-            elementReady: elementReady
+            elementRendered,
+            elementReady
         };
         this.confirmHandler = defaultConfirmHandler;
         this.dispatchWindowEvent = dispatchWindowEvent;
@@ -67,6 +78,19 @@ export default class Cresenity {
         this.debounce = debounce;
         this.sse = new SSE();
         this.formatter = formatter;
+        this.extend = extend;
+        this.dom = {
+            hasClass,
+            addClass,
+            removeClass
+        };
+
+        this.animation = {
+            scrollTo,
+            setHeight
+        };
+        this.theme = new Theme();
+        this.$ = cresQuery;
     }
     loadJs(filename, callback) {
         let fileref = document.createElement('script');
@@ -153,7 +177,7 @@ export default class Cresenity {
         if (error !== 'abort') {
             this.message('error', 'Error, please call administrator... (' + error + ')');
             if(xhr.status!=200) {
-                if(window.capp && window.capp.environment && window.capp.environment!=='production') {
+                if(window.capp?.environment !== 'production') {
                     this.htmlModal(xhr.responseText);
                 }
             }
@@ -181,7 +205,7 @@ export default class Cresenity {
             }
         }
 
-        let settings = $.extend({
+        let settings = extend({
             // These are the defaults.
             method: 'get',
             dataAddition: {},
@@ -322,11 +346,11 @@ export default class Cresenity {
         this.reload(options);
     }
     confirm(options) {
-        let settings = $.extend({
+        let settings = extend({
             // These are the defaults.
             method: 'get',
             dataAddition: {},
-            message: 'Are you sure?',
+            message: capp?.labels?.confirm?.areYouSure ?? 'Are you sure?',
             onConfirmed: false,
             confirmCallback: false,
             owner: null
@@ -340,7 +364,7 @@ export default class Cresenity {
         }
     }
     modal(options) {
-        let settings = $.extend({
+        let settings = extend({
             // These are the defaults.
             haveHeader: false,
             haveFooter: false,
@@ -473,7 +497,7 @@ export default class Cresenity {
         this.closeLastModal();
     }
     ajax(options) {
-        let settings = $.extend({
+        let settings = extend({
             block: true,
             url: window.location.href,
             method: 'post'
@@ -535,7 +559,7 @@ export default class Cresenity {
         return $.ajax(ajaxOptions);
     }
     ajaxSubmit(options) {
-        let settings = $.extend({}, options);
+        let settings = extend({}, options);
         let selector = settings.selector;
         $(selector).each((index, element) => {
             //don't do it again if still loading
@@ -599,7 +623,7 @@ export default class Cresenity {
         }
     }
     toast(type, message, options) {
-        let settings = $.extend({
+        let settings = extend({
             title: ucfirst(type),
             position: 'top-right'
         }, options);
@@ -662,52 +686,11 @@ export default class Cresenity {
     }
 
     formatCurrency(rp) {
-        rp = '' + rp;
-        let rupiah = '';
-        let vfloat = '';
-        let ds = window.capp.decimal_separator;
-        let ts = window.capp.thousand_separator;
-        let dd = window.capp.decimal_digit;
-        dd = parseInt(dd, 10);
-        let minusStr = '';
-        if (rp.indexOf('-') >= 0) {
-            minusStr = rp.substring(rp.indexOf('-'), 1);
-            rp = rp.substring(rp.indexOf('-') + 1);
-        }
-
-        if (rp.indexOf('.') >= 0) {
-            vfloat = rp.substring(rp.indexOf('.'));
-            rp = rp.substring(0, rp.indexOf('.'));
-        }
-        let p = rp.length;
-        while (p > 3) {
-            rupiah = ts + rp.substring(p - 3) + rupiah;
-            let l = rp.length - 3;
-            rp = rp.substring(0, l);
-            p = rp.length;
-        }
-        rupiah = rp + rupiah;
-        vfloat = vfloat.replace('.', ds);
-        if (vfloat.length > dd) {
-            vfloat = vfloat.substring(0, dd + 1);
-        }
-        return minusStr + rupiah + vfloat;
+        return formatCurrency(rp);
     }
 
     unformatCurrency(rp) {
-        if (typeof rp == 'undefined') {
-            rp = '';
-        }
-        let ds = window.capp.decimal_separator;
-        let ts = window.capp.thousand_separator;
-        let last3 = rp.substr(rp.length - 3);
-        let char_last3 = last3.charAt(0);
-        if (char_last3 != ts) {
-            rp = this.replaceAll(rp, ts, '');
-        }
-
-        rp = rp.replace(ds, '.');
-        return rp;
+        return unformatCurrency(rp);
     }
 
     getStyles(selector, only, except) {
@@ -866,7 +849,7 @@ export default class Cresenity {
         return newElement;
     }
     blockPage(options) {
-        let settings = $.extend({
+        let settings = extend({
             innerMessage: '<div class="sk-folding-cube sk-primary"><div class="sk-cube1 sk-cube"></div><div class="sk-cube2 sk-cube"></div><div class="sk-cube4 sk-cube"></div><div class="sk-cube3 sk-cube"></div></div><h5 style="color: #444">LOADING...</h5>'
         }, options);
         $.blockUI({
@@ -888,7 +871,7 @@ export default class Cresenity {
     }
     blockElement(selector, options) {
         const blockHtml = window?.capp?.block?.html ?? '<div class="sk-wave sk-primary"><div class="sk-rect sk-rect1"></div> <div class="sk-rect sk-rect2"></div> <div class="sk-rect sk-rect3"></div> <div class="sk-rect sk-rect4"></div> <div class="sk-rect sk-rect5"></div></div>';
-        let settings = $.extend({
+        let settings = extend({
             innerMessage: blockHtml
         }, options);
 
@@ -982,9 +965,10 @@ export default class Cresenity {
     initElement() {
         initElement();
     }
+
     initWaves() {
         if($) {
-            const selector = window.capp.waves.selector ?? '.cres-waves-effect' ;
+            const selector = window.capp?.waves?.selector ?? '.cres-waves-effect' ;
             $(selector).each((index,item) => {
                 if(!$(item).hasClass('cres-waves-effect')) {
                     $(item).addClass('cres-waves-effect')
@@ -1000,6 +984,9 @@ export default class Cresenity {
             //window.Alpine.start();
         }
     }
+    initCssDomVar() {
+        initCssDomVar();
+    }
     initAlpineAndUi() {
         Alpine.plugin(AlpineCleave);
         Alpine.plugin(AlpineAutoNumeric);
@@ -1008,6 +995,7 @@ export default class Cresenity {
         this.ui.start();
         window.Alpine.start();
         this.alpine = new CresAlpine(window.Alpine);
+
     }
 
     initLiveReload() {
@@ -1047,22 +1035,30 @@ export default class Cresenity {
             this.initPlugin();
             this.initWaves();
             this.initAlpineAndUi();
+            this.initCssDomVar();
+
             this.initLiveReload();
             initProgressive();
             let root = document.getElementsByTagName('html')[0]; // '0' to assign the first (and only `HTML` tag)
 
             root.classList.add('cresenity-loaded');
             root.classList.remove('no-js');
-            removePreloader();
-            dispatchWindowEvent('cresenity:loaded');
+            domReady(() => {
+                removePreloader(()=>{
+                    initThemeMode(this.theme.localStorageKey);
+                    initMenu();
+                });
+                dispatchWindowEvent('cresenity:loaded');
+            });
             this.applyDeferXData();
+
         });
 
 
         this.cf.init();
     }
     downloadProgress(options) {
-        let settings = $.extend({
+        let settings = extend({
             // These are the defaults.
             method: 'get',
             dataAddition: {},

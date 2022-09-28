@@ -65,6 +65,12 @@ class CServer {
         return gethostname();
     }
 
+    public static function getCurrentProcessUser() {
+        $processUser = posix_getpwuid(posix_geteuid());
+
+        return carr::get($processUser, 'name');
+    }
+
     public static function getOS() {
         $os = self::config()->get('os');
         if ($os == null) {
@@ -137,5 +143,16 @@ class CServer {
 
     public static function browsershot($url = '', $deviceEmulate = false) {
         return new CServer_Browsershot($url, $deviceEmulate);
+    }
+
+    public static function runSMTPServer($options = []) {
+        return CServer_SMTP_ServerManager::instance()->run($options);
+    }
+
+    /**
+     * @return CServer_OS
+     */
+    public static function os() {
+        return new CBase_ForwarderStaticClass(CServer_OS::class);
     }
 }
