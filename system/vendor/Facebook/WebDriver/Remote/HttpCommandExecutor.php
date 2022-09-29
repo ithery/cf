@@ -181,7 +181,7 @@ class HttpCommandExecutor implements WebDriverCommandExecutor
      */
     protected $url;
     /**
-     * @var resource
+     * @var \CurlHandle
      */
     protected $curl;
     /**
