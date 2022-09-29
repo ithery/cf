@@ -76,6 +76,13 @@ class CApp_Notification {
     /**
      * @return string
      */
+    public function serviceWorkerScope() {
+        return $this->startUrl;
+    }
+
+    /**
+     * @return string
+     */
     public function getSendTokenUrl() {
         return $this->startUrl . $this->sendTokenPath;
     }

@@ -101,11 +101,10 @@ HTML;
             $notificationScript = c::view('cresenity.notification.javascript')->render();
         }
 
-
         return <<<HTML
             ${endClientScript}
             <script defer src="${cresJs}"></script>
-
+            ${notificationScript}
             <script>
                 ${js}
                 ${readyClientScript}
@@ -116,7 +115,6 @@ HTML;
                 }
                 ${customJs}
             </script>
-            ${notificationScript}
             ${pushesScript}
 
 HTML;
