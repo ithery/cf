@@ -36,7 +36,7 @@ class CApp_Notification {
         $this->driver = carr::get($this->config, 'driver');
         $this->startUrl = carr::get($this->config, 'startUrl', '');
         $this->sendTokenPath = carr::get($this->config, 'sendTokenPath', 'notification/token');
-        $this->tokenLocalStorageKey = carr::get($this->config, 'tokenLocalStorageKey', 'cres-'.$this->driver.'-token');
+        $this->tokenLocalStorageKey = carr::get($this->config, 'tokenLocalStorageKey', 'cres-' . $this->driver . '-token');
         $options = carr::get($this->config, 'options', []);
         if (is_string($options)) {
             $options = json_decode($options, true);
@@ -94,7 +94,6 @@ class CApp_Notification {
     public function getOptions() {
         return $this->options;
     }
-
 
     /**
      * @return bool
