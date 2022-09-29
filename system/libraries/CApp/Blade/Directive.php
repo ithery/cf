@@ -99,6 +99,7 @@ class CApp_Blade_Directive {
         return (new CApp_PWA_MetaService($expression))->render();
     }
 
+
     public static function preloader($expression) {
         if (strlen($expression) == 0) {
             $expression = c::url('media/img/logo.png');
