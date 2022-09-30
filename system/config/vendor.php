@@ -20,4 +20,7 @@ return [
     'onesignal' => [
         'user_key' => c::env('ONESIGNAL_USER_KEY'),
     ],
+    'wago' => [
+        'token' => c::env('WAGO_TOKEN'),
+    ],
 ];

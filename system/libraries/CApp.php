@@ -636,6 +636,9 @@ class CApp implements CInterface_Responsable, CInterface_Renderable, CInterface_
         return $this->pwa[$group];
     }
 
+    /**
+     * @return CApp_Notification
+     */
     public function notification() {
         return CApp_Notification::instance();
     }
