@@ -37,6 +37,18 @@ class CVendor_Wago_Device {
         return $this->handleResponse($this->client->get('webhook/get'));
     }
 
+    public function unsetWebhook() {
+        return $this->handleResponse($this->client->post('webhook/unset'));
+    }
+
+    public function setWebhook($url) {
+        $options = [
+            'endpoint' => $url
+        ];
+
+        return $this->handleResponse($this->client->post('webhook/set', $options));
+    }
+
     public function handleResponse($response) {
         if (is_string($response)) {
             $response = json_decode($response, true);
