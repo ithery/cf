@@ -145,7 +145,14 @@ class CLogger {
                 $trace = array_slice(debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS), 1);
             }
         }
-
+        $file = isset($trace[0]['file']) ? $trace[0]['file'] : null;
+        $line = isset($trace[0]['line']) ? $trace[0]['line'] : null;
+        if ($file == null && $exception != null) {
+            $file = $exception->getFile();
+        }
+        if ($line == null && $exception != null) {
+            $line = $exception->getLine();
+        }
         // Create a new message
         $this->messages[] = [
             'time' => time(),
@@ -153,8 +160,8 @@ class CLogger {
             'body' => $message,
             'trace' => $trace,
             'domain' => CF::domain(),
-            'file' => isset($trace[0]['file']) ? $trace[0]['file'] : null,
-            'line' => isset($trace[0]['line']) ? $trace[0]['line'] : null,
+            'file' => $file,
+            'line' => $line,
             'class' => isset($trace[0]['class']) ? $trace[0]['class'] : null,
             'function' => isset($trace[0]['function']) ? $trace[0]['function'] : null,
             'context' => $context,
