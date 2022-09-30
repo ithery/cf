@@ -219,4 +219,11 @@ class CVendor {
 
         return new CVendor_Firebase($options);
     }
+
+    /**
+     * @return \CVendor_Wago
+     */
+    public static function wago() {
+        return new CBase_ForwarderStaticClass(CVendor_Wago::class);
+    }
 }
