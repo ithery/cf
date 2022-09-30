@@ -79,6 +79,10 @@ class CManager_Transform_MethodExecutor {
         return cstr::ascii($value);
     }
 
+    public function transformJson($value) {
+        return json_encode($value, JSON_PRETTY_PRINT);
+    }
+
     public function transformShowMore($value, $limit = 100) {
         if (is_string($value) && strlen($value) > $limit) {
             return CElement_Component_ShowMore::factory()->setLimit($limit)->add($value);
