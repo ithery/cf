@@ -5,7 +5,8 @@ class CBot_DriverManager {
      * @var array
      */
     protected static $drivers = [
-        CBot_Driver_WebDriver::class
+        'web' => CBot_Driver_WebDriver::class,
+        'wago' => CBot_Driver_WagoDriver::class
     ];
 
     /**
@@ -148,6 +149,17 @@ class CBot_DriverManager {
         }
 
         return false;
+    }
+
+    public function getDriverFor($driver, CHTTP_Request $request) {
+        $driver = carr::get(static::getAvailableDrivers(), $driver);
+        if ($driver) {
+            $driver = new $driver($request, $this->config);
+
+            return $driver;
+        }
+
+        return new CBot_Driver_NullDriver($request, []);
     }
 
     /**

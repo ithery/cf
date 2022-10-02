@@ -71,7 +71,8 @@ defined('SYSPATH') or die('No direct access allowed.');
  * @method        CModel_Query|static                       take($value)
  * @method        CModel_Query|static                       limit($value)
  * @method        CModel_Query|static                       lockForUpdate()                                                                          Lock the selected rows in the table for updating.
- * @method        bool                                      exists()                                                                                 Determine if any rows exist for the current query.                                                                                                     Lock the selected rows in the table for updating.
+ * @method        bool                                      exists()                                                                                 Determine if any rows exist for the current query
+ * @method        mixed                                     sum($column)                                                                             Retrieve the sum of the values of a given column..
  *
  * @see CModel
  * @see CDatabase_Query_Builder
