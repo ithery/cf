@@ -51,10 +51,10 @@ trait CTrait_Controller_Application_Log_System {
         $app = c::app();
         $path = DOCROOT . 'logs/' . cf::appCode();
         if ($year) {
-            $path .= "/${year}";
+            $path .= DS . $year;
 
             if ($month) {
-                $path .= "/${month}";
+                $path .= DS . $month;
             }
         }
         $phpFiles = [];
@@ -84,12 +84,13 @@ trait CTrait_Controller_Application_Log_System {
                     $domain = carr::get($matches, 2);
                     $status = carr::get($matches, 3);
                     $message = carr::get($matches, 4);
-
+                    $filename = str_replace('.php', '', basename($file));
                     $report[] = [
                         'time' => $time,
                         'domain' => $domain,
                         'status' => $status,
-                        'message' => $message
+                        'message' => $message,
+                        'filename' => $filename,
                     ];
                 }
             }
@@ -101,6 +102,27 @@ trait CTrait_Controller_Application_Log_System {
         $table->addColumn('domain')->setLabel('Domain');
         $table->addColumn('status')->setLabel('Status');
         $table->addColumn('message')->setLabel('Message');
+        $table->addRowAction()->setLabel('View Raw')->addClass('btn-primary')->setLink($this->controllerUrl() . 'systemRaw/{filename}');
+        //$table->addHeaderAction()->setLabel('View Raw')->addClass('btn-primary')->setLink($this->controllerUrl() . 'systemRaw/' . $year . '/' . $month);
+
+        return $app;
+    }
+
+    public function systemRaw($file) {
+        $app = c::app();
+        $path = DOCROOT . 'logs/' . cf::appCode();
+        $year = substr($file, 0, 4);
+        $month = substr($file, 4, 2);
+        if ($year) {
+            $path .= DS . $year;
+
+            if ($month) {
+                $path .= DS . $month;
+            }
+        }
+        $file = $path . DS . $file . '.php';
+        $content = file_get_contents($file);
+        $app->addPre()->add($content);
 
         return $app;
     }
