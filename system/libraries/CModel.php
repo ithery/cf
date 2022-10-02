@@ -70,6 +70,7 @@ defined('SYSPATH') or die('No direct access allowed.');
  * @method static CModel_Query|static                        take($value)
  * @method static CModel_Query|static                        limit($value)
  * @method static CModel_Query|static                        lockForUpdate()                                                                          Lock the selected rows in the table for updating.
+ * @method static mixed                                      sum($column)                                                                             Retrieve the sum of the values of a given column..
  *
  * @see CModel_Query
  */
