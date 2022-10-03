@@ -327,8 +327,6 @@ class CException_ExceptionHandler implements CException_ExceptionHandlerInterfac
             $e
         );
 
-        //@codingStandardsIgnoreEnd
-
         return $response;
     }
 

@@ -65,7 +65,7 @@ class CQueue_Queue_DatabaseQueue extends CQueue_AbstractQueue {
      */
     public function size($queue = null) {
         return $this->database->table($this->table)
-            ->where('queue', $this->getQueue($queue))
+            ->where('name', $this->getQueue($queue))
             ->count();
     }
 
