@@ -27,14 +27,14 @@ trait CTrait_Controller_Application_OAuth_RefreshToken {
             try {
                 $crypto = Crypto::decryptWithPassword($refreshToken, $encKey);
             } catch (Exception $exception) {
-                return $exception;
+                c::msg('error', $exception->getMessage());
             }
 
             $jsonDecrypted = json_encode(json_decode($crypto, true), JSON_PRETTY_PRINT);
             $form->addPre()->addClass('my-3')->add($jsonDecrypted);
         }
 
-        $form->addActionList()->addAction()->setLabel('Decrypt')->setSubmit();
+        $form->addActionList()->addAction()->setLabel('Decode')->setSubmit();
         $table = $app->addTable();
 
         $table->setDataFromModel($oauth->refreshTokenModel(), function (CModel_Query $q) {
