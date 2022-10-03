@@ -58,7 +58,7 @@ class CApi_OAuth_RefreshTokenRepository {
      * @return mixed
      */
     public function revokeRefreshToken($id) {
-        return $this->oauth->refreshToken()->where('oauth_refresh_token_id', $id)->update(['revoked' => true]);
+        return $this->oauth->refreshToken()->where('token', $id)->update(['revoked' => true]);
     }
 
     /**
