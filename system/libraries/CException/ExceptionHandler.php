@@ -16,6 +16,8 @@ use Symfony\Component\HttpFoundation\RedirectResponse as SymfonyRedirectResponse
 
 /**
  * @author Hery Kurniawans
+ *
+ * @see CException
  */
 class CException_ExceptionHandler implements CException_ExceptionHandlerInterface {
     use CTrait_ReflectsClosureTrait;

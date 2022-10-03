@@ -97,6 +97,10 @@ class CException extends Exception {
         return static::$exceptionHandler;
     }
 
+    public static function setExceptionHandler(CException_ExceptionHandlerInterface $exceptionHandler) {
+        static::$exceptionHandler = $exceptionHandler;
+    }
+
     /**
      * Create Exception Solution.
      *
