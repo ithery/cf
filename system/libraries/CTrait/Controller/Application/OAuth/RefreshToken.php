@@ -30,7 +30,7 @@ trait CTrait_Controller_Application_OAuth_RefreshToken {
                 return $exception;
             }
 
-            $jsonDecrypted = json_decode($crypto, true);
+            $jsonDecrypted = json_encode(json_decode($crypto, true), JSON_PRETTY_PRINT);
             $form->addPre()->addClass('my-3')->add($jsonDecrypted);
         }
 
