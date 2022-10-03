@@ -62,6 +62,7 @@ class CException_ExceptionHandler implements CException_ExceptionHandlerInterfac
         SuspiciousOperationException::class,
         CSession_Exception_TokenMismatchException::class,
         CValidation_Exception::class,
+        CException_Contract_DontReportInterface::class
     ];
 
     /**
@@ -73,6 +74,11 @@ class CException_ExceptionHandler implements CException_ExceptionHandlerInterfac
         'current_password',
         'password',
         'password_confirmation',
+        'passwordConfirmation',
+        'confirm_password',
+        'old_password',
+        'new_password',
+        'confirmPassword',
     ];
 
     /**
