@@ -15,7 +15,7 @@ trait CTrait_Controller_Application_OAuth_AccessToken {
 
         $oauth = CApi::oauth($this->getApiGroup());
 
-        $widget = $app->addWidget()->setTitle('Access Token Decoder')->setIcon('ti ti-layers');
+        $widget = $app->addWidget()->setTitle('Access Token Decoder')->setIcon('ti ti-layers')->addClass('mb-3');
         $form = $widget->addForm();
         $form->addField()->setLabel('Access Token')->addTextControl('access_token')->setValue(c::request()->access_token);
         if (c::request()->method() == 'POST') {

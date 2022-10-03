@@ -15,7 +15,7 @@ trait CTrait_Controller_Application_OAuth_RefreshToken {
         $app->title($this->getTitle());
         $oauth = CApi::oauth($this->getApiGroup());
 
-        $widget = $app->addWidget()->setTitle('Refresh Token Decoder')->setIcon('ti ti-layers');
+        $widget = $app->addWidget()->setTitle('Refresh Token Decoder')->setIcon('ti ti-layers')->addClass('mb-3');
         $form = $widget->addForm();
         $form->addField()->setLabel('Refresh Token')->addTextControl('refresh_token')->setValue(c::request()->refresh_token);
         if (c::request()->method() == 'POST') {
