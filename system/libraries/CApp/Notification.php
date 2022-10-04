@@ -46,19 +46,23 @@ class CApp_Notification {
 
     public function enable() {
         if (!$this->enabled) {
-            c::router()->get($this->serviceWorkerUrl(), function () {
-                $options = [
-                    'driver' => $this->driver,
-                    'options' => $this->options,
+            $path = c::request()->path();
 
-                ];
-                $output = (new CApp_Notification_ServiceWorkerService())->generate($options);
+            if (cstr::startsWith($path, trim($this->startUrl, '/'))) {
+                c::router()->get($this->serviceWorkerUrl(), function () {
+                    $options = [
+                        'driver' => $this->driver,
+                        'options' => $this->options,
 
-                return c::response($output, 200, [
-                    'Content-Type' => 'text/javascript',
-                ]);
-            });
-            $this->enabled = true;
+                    ];
+                    $output = (new CApp_Notification_ServiceWorkerService())->generate($options);
+
+                    return c::response($output, 200, [
+                        'Content-Type' => 'text/javascript',
+                    ]);
+                });
+                $this->enabled = true;
+            }
         }
     }
 

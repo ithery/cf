@@ -176,7 +176,7 @@ trait CApp_Trait_BaseTrait {
     }
 
     /**
-     * User dari session CApp.
+     * User from session.
      *
      * @return null|stdClass
      */

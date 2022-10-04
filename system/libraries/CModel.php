@@ -64,7 +64,6 @@ defined('SYSPATH') or die('No direct access allowed.');
  * @method static CModel_Query|static                        selectRaw($expression, array $bindings = [])
  * @method static CModel_Query|static                        orderBy($column, $direction = 'asc')
  * @method static CModel_Query|static                        orderByDesc($column)
- * @method static CModel_Query|static                        orderByAsc($column)
  * @method static CModel_Query|static                        skip($value)
  * @method static CModel_Query|static                        offset($value)
  * @method static CModel_Query|static                        take($value)

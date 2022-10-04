@@ -68,7 +68,7 @@ CREATE TABLE IF NOT EXISTS `roles` (
 -- Dumping data for table torsb2c.roles: ~6 rows (approximately)
 /*!40000 ALTER TABLE `roles` DISABLE KEYS */;
 INSERT INTO `roles` (`role_id`, `parent_id`, `depth`, `org_id`, `lft`, `rgt`, `is_base`, `name`, `description`, `store_id`, `created`, `createdby`, `updated`, `updatedby`, `status`, `role_level`) VALUES
-	(1, NULL, NULL, NULL, 1, 2, 0, 'SUPERADMIN', NULL, NULL, NULL, NULL, NULL, NULL, 1, 0);
+	(1, NULL, 0, NULL, 1, 2, 1, 'SUPERADMIN', NULL, NULL, NULL, NULL, NULL, NULL, 1, 0);
 /*!40000 ALTER TABLE `roles` ENABLE KEYS */;
 
 
