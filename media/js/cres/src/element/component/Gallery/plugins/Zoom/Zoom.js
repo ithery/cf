@@ -1,7 +1,7 @@
 import { cresQuery } from "../../../../../module/CresQuery";
 import { galleryEvent } from "../../event";
 import { zoomConfig } from "./config";
-
+const ZOOM_TRANSITION_DURATION = 500;
 export default class Zoom {
     /**
      * @param {Gallery} gallery - Gallery object
