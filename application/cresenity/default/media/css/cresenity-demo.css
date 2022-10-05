@@ -21,7 +21,7 @@
     width:calc(100vw - 250px);
 }
 @media (max-width: 767px) {
-    .modal-large .modal-dialog {
+    .modal.modal-large .modal-dialog {
         max-width: 100vw;
         width:100vw;
     }
