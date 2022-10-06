@@ -27,12 +27,12 @@ return [
     ],
     [
         'name' => 'elements.repeater',
-        'label' => c::__('Repeater'),
+        'label' => c::__('Repeater') . ' [DEV]',
         'uri' => 'demo/elements/repeater/index',
     ],
     [
         'name' => 'elements.shimmer',
-        'label' => c::__('Shimmer'),
+        'label' => c::__('Shimmer') . ' [DEV]',
         'uri' => 'demo/elements/shimmer/index',
     ],
     [
