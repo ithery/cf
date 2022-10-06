@@ -46,6 +46,8 @@ class CElement_Component_Image extends CElement_Component {
     }
 
     public function build() {
+        $this->addClass('cres:element:component:Image');
+        $this->setAttr('cres-element', 'component:Image');
         if ($this->progressiveThumbnail != null && is_string($this->progressiveThumbnail)) {
             $this->tag = 'a';
             $this->addClass('cres-progressive replace');
