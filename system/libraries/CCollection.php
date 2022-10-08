@@ -987,7 +987,7 @@ class CCollection implements ArrayAccess, CInterface_Enumerable, CBase_Contract_
      *
      * @param int $count
      *
-     * @return mixed
+     * @return static
      */
     public function shift($count = 1) {
         if ($count === 1) {
