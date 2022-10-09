@@ -20,6 +20,11 @@ class CObservable_Javascript {
     private $jQueryObject;
 
     /**
+     * @var CObservable_Javascript_CresJs
+     */
+    private $cresObject;
+
+    /**
      * @var CObservable_Javascript_Native
      */
     private $nativeObject;
@@ -31,8 +36,7 @@ class CObservable_Javascript {
 
     public function __construct($owner = null) {
         $this->owner = $owner;
-        $this->jQueryObject = new CObservable_Javascript_JQuery($this);
-        $this->nativeObject = new CObservable_Javascript_Native($this);
+
         $this->handlerObject = new CObservable_Javascript_Handler($this);
     }
 
@@ -100,7 +104,6 @@ class CObservable_Javascript {
         return $this;
     }
 
-
     /**
      * @param CJavascript_Statement_Raw $statement
      *
@@ -111,7 +114,6 @@ class CObservable_Javascript {
 
         return $this;
     }
-
 
     /**
      * @param CJavascript_Statement $statement
@@ -129,7 +131,22 @@ class CObservable_Javascript {
      * @return CObservable_Javascript_Native
      */
     public function native() {
+        if ($this->nativeObject == null) {
+            $this->nativeObject = new CObservable_Javascript_Native($this);
+        }
+
         return $this->nativeObject;
+    }
+
+    /**
+     * @return CObservable_Javascript_Cresjs
+     */
+    public function cresjs() {
+        if ($this->cresObject == null) {
+            $this->cresObject = new CObservable_Javascript_Cresjs($this);
+        }
+
+        return $this->cresObject;
     }
 
     /**
@@ -140,6 +157,9 @@ class CObservable_Javascript {
     public function jquery($selector = null) {
         if ($selector != null) {
             return new CObservable_Javascript_JQuery(new CObservable_Javascript($selector));
+        }
+        if ($this->jQueryObject == null) {
+            $this->jQueryObject = new CObservable_Javascript_JQuery($this);
         }
 
         return $this->jQueryObject;

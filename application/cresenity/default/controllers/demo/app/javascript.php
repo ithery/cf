@@ -79,6 +79,7 @@ class Controller_Demo_App_Javascript extends \Cresenity\Demo\Controller {
             $js->raw(<<<JAVASCRIPT
                 $('#result1').html('Loading...');
             JAVASCRIPT);
+            $js->cresjs()->toast('info', 'Loading from ajax');
             $js->jquery()->ajax([
                 'url' => $this->controllerUrl() . 'ajax',
                 'success' => <<<JAVASCRIPT
