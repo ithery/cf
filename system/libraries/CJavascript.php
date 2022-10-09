@@ -60,6 +60,19 @@ class CJavascript {
         self::$statements[$statement->hash()] = $statement;
     }
 
+    /**
+     * @param string $js
+     *
+     * @return void
+     */
+    public static function addRaw($js) {
+        $statement = self::createRawStatement($js);
+        if (self::$deferredStack >= 0) {
+            return self::addDeferredStatement($statement);
+        }
+        self::$statements[$statement->hash()] = $statement;
+    }
+
     public static function addDeferredStatement(CJavascript_Statement $statement) {
         if (!isset(self::$deferredStatements[self::$deferredStack])) {
             self::$deferredStatements[self::$deferredStack] = [];
@@ -158,7 +171,7 @@ class CJavascript {
      *
      * @return CJavascript_Statement_Raw
      */
-    public static function rawStatement($js) {
+    public static function createRawStatement($js) {
         return CJavascript_StatementFactory::createRaw($js);
     }
 

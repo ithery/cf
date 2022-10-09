@@ -100,6 +100,19 @@ class CObservable_Javascript {
         return $this;
     }
 
+
+    /**
+     * @param CJavascript_Statement_Raw $statement
+     *
+     * @return $this
+     */
+    public function raw($statement) {
+        CJavascript::addRaw($statement);
+
+        return $this;
+    }
+
+
     /**
      * @param CJavascript_Statement $statement
      *

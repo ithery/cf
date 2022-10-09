@@ -74,7 +74,10 @@ class CJavascript_Statement_JQuery_Ajax implements CJavascript_Statement_JQuery_
             $str .= 'complete:' . $this->complete . ',';
         }
         if ($this->success != null) {
-            $func = CJavascript::closureToJs($this->success);
+            $func = $this->success;
+            // if ($func instanceof Closure) {
+            //     $func = CJavascript::closureToJs($func);
+            // }
             // $args = ['data'];
             // $this->success = $this->compileAjaxEvent($this->success, $args);
             $str .= 'success:' . trim($func, "\t\n\r\0\x0B;") . ',';
