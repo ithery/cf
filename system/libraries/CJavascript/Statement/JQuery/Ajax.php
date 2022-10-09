@@ -59,6 +59,11 @@ class CJavascript_Statement_JQuery_Ajax implements CJavascript_Statement_JQuery_
     }
 
     public function compile() {
+        // $ajaxMethod = CAjax::createMethod();
+        // $ajaxMethod->setType(CAjax_Engine_AjaxJavascript::class);
+        // $ajaxMethod->setData('url', $this->url);
+
+        // $ajaxUrl = $ajaxMethod->makeUrl();
         $str = '.ajax({';
         $str .= 'url:' . CJavascript_Helper_Javascript::prepValue($this->url) . ',';
         $str .= 'dataType:' . CJavascript_Helper_Javascript::prepValue($this->dataType) . ',';
@@ -69,9 +74,10 @@ class CJavascript_Statement_JQuery_Ajax implements CJavascript_Statement_JQuery_
             $str .= 'complete:' . $this->complete . ',';
         }
         if ($this->success != null) {
-            $args = ['data'];
-            $this->success = $this->compileAjaxEvent($this->success, $args);
-            $str .= 'success:' . $this->success . ',';
+            $func = CJavascript::closureToJs($this->success);
+            // $args = ['data'];
+            // $this->success = $this->compileAjaxEvent($this->success, $args);
+            $str .= 'success:' . trim($func, "\t\n\r\0\x0B;") . ',';
         }
         if ($this->error != null) {
             $args = ['jqXhr', 'textStatus', 'errorThrown'];
@@ -81,6 +87,7 @@ class CJavascript_Statement_JQuery_Ajax implements CJavascript_Statement_JQuery_
 
         $str .= 'method:' . CJavascript_Helper_Javascript::prepValue($this->method);
         $str .= '})';
+
         return $str;
     }
 }

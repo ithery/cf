@@ -70,6 +70,8 @@ class CObservable_Javascript {
         $closure = carr::get($args, 0);
         $args = array_slice($args, 1);
 
+        $js = CJavascript::closureToJs($closure);
+
         $this->startDeferred();
         call_user_func_array($closure, $args);
 
@@ -199,5 +201,15 @@ class CObservable_Javascript {
 
     public function ifStatement($operand1, $operator = null, $operand2 = null) {
         $statement = new CJavascript_Statement_IfStatement($operand1, $operator, $operand2);
+    }
+
+    public function createFunction($funcName, $callback) {
+        $serializedClosure = new \Opis\Closure\SerializableClosure($callback);
+        $serialized = serialize($serializedClosure);
+        $regex = "#\:\"(function\s*+\(.+?})\";#ims";
+        if (preg_match($regex, $serialized, $matches)) {
+            $script = $matches[1];
+            CJavascript::phpToJs('<?php' . PHP_EOL . $script . PHP_EOL . '?>');
+        }
     }
 }

@@ -1,7 +1,6 @@
 <?php
 
 defined('SYSPATH') or die('No direct access allowed.');
-
 /**
  * @author Hery Kurniawan
  * @license Ittron Global Teknologi <ittron.co.id>
@@ -193,5 +192,24 @@ class CJavascript {
         call_user_func_array($event, $args);
 
         return CJavascript::popDeferredStack();
+    }
+
+    public static function phpToJs($phpScript) {
+        $code = CJavascript_PhpJs::phpToJs($phpScript);
+
+        return $code;
+    }
+
+    public static function closureToJs(Closure $closure) {
+        $serializedClosure = new \Opis\Closure\SerializableClosure($closure);
+        $serialized = serialize($serializedClosure);
+        $regex = "#\:\"(function\s*+\(.+?})\";#ims";
+        if (preg_match($regex, $serialized, $matches)) {
+            $script = $matches[1];
+
+            return CJavascript::phpToJs('<?php' . PHP_EOL . $script . PHP_EOL . '?>');
+        }
+
+        throw new Exception('Invalid Closure');
     }
 }
