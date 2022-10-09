@@ -351,16 +351,34 @@ CREATE TABLE `notification` (
   `message` longtext CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
   `read_at` datetime DEFAULT NULL,
   `created` datetime DEFAULT NULL,
-  `updated` datetime DEFAULT NULL,
-  `status` int(11) NOT NULL DEFAULT 1,
   `createdby` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `updated` datetime DEFAULT NULL,
   `updatedby` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
   `deleted` datetime DEFAULT NULL,
   `deletedby` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `status` int(11) NOT NULL DEFAULT 1,
   PRIMARY KEY (`notification_id`),
   UNIQUE KEY `notification_id` (`notification_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE utf8mb4_unicode_ci;
 
+
+CREATE TABLE `translation` (
+  `translation_id` bigint(20) unsigned NOT NULL AUTO_INCREMENT,
+  `org_id` bigint(20) unsigned,
+  `translatable_type` varchar(255) NOT NULL,
+  `translatable_id` bigint(20) unsigned NOT NULL,
+  `language` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `content` longtext CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `created` datetime DEFAULT NULL,
+  `createdby` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `updated` datetime DEFAULT NULL,
+  `updatedby` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `deleted` datetime DEFAULT NULL,
+  `deletedby` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `status` int(11) NOT NULL DEFAULT 1,
+  PRIMARY KEY (`translation_id`),
+  UNIQUE KEY `translation_id` (`translation_id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE utf8mb4_unicode_ci;
 
 DROP TABLE IF EXISTS `log_activity`;
 CREATE TABLE `log_activity` (
