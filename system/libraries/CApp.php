@@ -633,6 +633,11 @@ class CApp implements CInterface_Responsable, CInterface_Renderable, CInterface_
         $this->pwa($group)->enable();
     }
 
+    /**
+     * @param string $group
+     *
+     * @return CApp_PWA
+     */
     public function pwa($group) {
         if ($this->pwa == null) {
             $this->pwa = [];
