@@ -21,13 +21,18 @@ return [
         'uri' => 'demo/elements/form/index',
     ],
     [
+        'name' => 'elements.image',
+        'label' => c::__('Image'),
+        'uri' => 'demo/elements/image/index',
+    ],
+    [
         'name' => 'elements.repeater',
-        'label' => c::__('Repeater'),
+        'label' => c::__('Repeater') . ' [DEV]',
         'uri' => 'demo/elements/repeater/index',
     ],
     [
         'name' => 'elements.shimmer',
-        'label' => c::__('Shimmer'),
+        'label' => c::__('Shimmer') . ' [DEV]',
         'uri' => 'demo/elements/shimmer/index',
     ],
     [

@@ -154,4 +154,7 @@ class CManager_Transform_MethodExecutor {
     public static function transformEditorJsHtml($data) {
         return c::manager()->editorJs()->generateHtmlOutput($data)->__toString();
     }
+
+    public static function transformLink($value, $url) {
+    }
 }

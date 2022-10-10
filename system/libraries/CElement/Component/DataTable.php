@@ -970,4 +970,15 @@ class CElement_Component_DataTable extends CElement_Component {
     public function isUsingDataProvider() {
         return $this->query instanceof CManager_Contract_DataProviderInterface;
     }
+
+    /**
+     * @return null|CManager_Contract_DataProviderInterface
+     */
+    public function getDataProvider() {
+        if ($this->isUsingDataProvider()) {
+            return $this->query;
+        }
+
+        return null;
+    }
 }

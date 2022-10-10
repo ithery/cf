@@ -238,6 +238,24 @@ class CManager_DataProvider_SqlDataProvider extends CManager_DataProviderAbstrac
         return $q;
     }
 
+    /**
+     * @param string $method
+     * @param string $column
+     *
+     * @return mixed
+     */
+    public function aggregate($method, $column) {
+        if (!$this->isValidAggregateMethod($method)) {
+            throw new Exception($method . ': is not valid aggregate method');
+        }
+        $q = $this->getFullQuery();
+        $alias = $method . '_' . $column;
+        $qTotal = 'select ' . $method . '(' . $this->db->escapeColumn($column) . ') as ' . $alias . ' from (' . $q . ') as t';
+        $rTotal = c::db()->query($qTotal);
+
+        return $rTotal[0]->$alias;
+    }
+
     protected function getFullQuery() {
         $qBase = $this->getBaseQuery();
 

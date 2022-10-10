@@ -20,6 +20,11 @@ class CObservable_Javascript {
     private $jQueryObject;
 
     /**
+     * @var CObservable_Javascript_CresJs
+     */
+    private $cresObject;
+
+    /**
      * @var CObservable_Javascript_Native
      */
     private $nativeObject;
@@ -31,8 +36,7 @@ class CObservable_Javascript {
 
     public function __construct($owner = null) {
         $this->owner = $owner;
-        $this->jQueryObject = new CObservable_Javascript_JQuery($this);
-        $this->nativeObject = new CObservable_Javascript_Native($this);
+
         $this->handlerObject = new CObservable_Javascript_Handler($this);
     }
 
@@ -70,6 +74,8 @@ class CObservable_Javascript {
         $closure = carr::get($args, 0);
         $args = array_slice($args, 1);
 
+        $js = CJavascript::closureToJs($closure);
+
         $this->startDeferred();
         call_user_func_array($closure, $args);
 
@@ -99,6 +105,17 @@ class CObservable_Javascript {
     }
 
     /**
+     * @param CJavascript_Statement_Raw $statement
+     *
+     * @return $this
+     */
+    public function raw($statement) {
+        CJavascript::addRaw($statement);
+
+        return $this;
+    }
+
+    /**
      * @param CJavascript_Statement $statement
      *
      * @return $this
@@ -114,7 +131,22 @@ class CObservable_Javascript {
      * @return CObservable_Javascript_Native
      */
     public function native() {
+        if ($this->nativeObject == null) {
+            $this->nativeObject = new CObservable_Javascript_Native($this);
+        }
+
         return $this->nativeObject;
+    }
+
+    /**
+     * @return CObservable_Javascript_Cresjs
+     */
+    public function cresjs() {
+        if ($this->cresObject == null) {
+            $this->cresObject = new CObservable_Javascript_Cresjs($this);
+        }
+
+        return $this->cresObject;
     }
 
     /**
@@ -125,6 +157,9 @@ class CObservable_Javascript {
     public function jquery($selector = null) {
         if ($selector != null) {
             return new CObservable_Javascript_JQuery(new CObservable_Javascript($selector));
+        }
+        if ($this->jQueryObject == null) {
+            $this->jQueryObject = new CObservable_Javascript_JQuery($this);
         }
 
         return $this->jQueryObject;
@@ -199,5 +234,15 @@ class CObservable_Javascript {
 
     public function ifStatement($operand1, $operator = null, $operand2 = null) {
         $statement = new CJavascript_Statement_IfStatement($operand1, $operator, $operand2);
+    }
+
+    public function createFunction($funcName, $callback) {
+        $serializedClosure = new \Opis\Closure\SerializableClosure($callback);
+        $serialized = serialize($serializedClosure);
+        $regex = "#\:\"(function\s*+\(.+?})\";#ims";
+        if (preg_match($regex, $serialized, $matches)) {
+            $script = $matches[1];
+            CJavascript::phpToJs('<?php' . PHP_EOL . $script . PHP_EOL . '?>');
+        }
     }
 }

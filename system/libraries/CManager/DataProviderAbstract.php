@@ -46,4 +46,10 @@ abstract class CManager_DataProviderAbstract implements CManager_Contract_DataPr
 
         throw new Exception('Cannot call callable on Data Provider');
     }
+
+    protected function isValidAggregateMethod($method) {
+        $validAggregate = ['sum', 'avg', 'min', 'max'];
+
+        return in_array($method, $validAggregate);
+    }
 }

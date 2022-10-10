@@ -26,7 +26,6 @@ trait CTesting_Chrome_SupportChromeTrait {
      */
     public static function startChromeDriver(array $arguments = []) {
         static::$chromeProcess = static::buildChromeProcess($arguments);
-
         static::$chromeProcess->start();
 
         static::afterClass(function () {

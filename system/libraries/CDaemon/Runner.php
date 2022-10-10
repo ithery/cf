@@ -44,24 +44,13 @@ class CDaemon_Runner {
     }
 
     public function isRunning() {
-        $result = '';
         if ($pid = $this->getPid()) {
             $pid = trim($pid);
 
-            $command = 'ps x | grep "' . $pid . '" | grep "'
-                . $this->serviceClass
-                . '" | grep -v "grep"';
-
-            if (defined('CFCLI')) {
-                $process = new Process($command);
-                $process->run();
-                $result = $process->getOutput();
-            } else {
-                $result = shell_exec($command);
-            }
+            return CDaemon_Utils::daemonIsRunningWithPid($pid, $this->serviceClass);
         }
 
-        return strlen(trim($result)) > 0;
+        return false;
     }
 
     public function getPid() {

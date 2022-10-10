@@ -1,16 +1,17 @@
 <?php
 
-class Controller_Demo_Controls_EditorJs extends \Cresenity\Demo\Controller {
+class Controller_Demo_Controls_Editorjs extends \Cresenity\Demo\Controller {
+    const CACHE_KEY = 'cresenity.demo.control.editorjs';
+
     public function index() {
         $app = c::app();
         $app->title('Editor JS');
         $post = $_POST;
-        $cacheKey = 'cresenity.demo.control.editorjs';
-        $content = c::cache()->store()->get($cacheKey);
+        $content = c::cache()->store()->get(static::CACHE_KEY);
         if ($post != null) {
             $origPost = CBase::originalPostData();
             $content = trim(carr::get($origPost, 'content'));
-            c::cache()->store()->forever($cacheKey, $content);
+            c::cache()->store()->forever(static::CACHE_KEY, $content);
         }
 
         $form = $app->addForm()->setMethod('post');
@@ -41,6 +42,7 @@ class Controller_Demo_Controls_EditorJs extends \Cresenity\Demo\Controller {
         $form->setMethod('post');
         $widget = $form->addWidget()->addClass('mb-3');
         $widget->setIcon('ti ti-write')->setTitle('Content')->setNopadding();
+        $widget->addHeaderAction()->addClass('btn-primary')->setLabel('Clear')->setLink($this->controllerUrl() . 'clear');
         $editorControl = $widget->addDiv()->addClass('app-editor-js-wrapper')->addEditorJsControl('content')->setValue($content);
         $editorControl->setInitialBlock(null);
         $editorControl->setPlaceholder('Let`s write an awesome story!');
@@ -52,5 +54,11 @@ class Controller_Demo_Controls_EditorJs extends \Cresenity\Demo\Controller {
         $widget->add($html);
 
         return $app;
+    }
+
+    public function clear() {
+        c::cache()->store()->clear(static::CACHE_KEY);
+
+        return c::redirect()->back();
     }
 }

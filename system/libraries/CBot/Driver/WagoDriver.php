@@ -33,8 +33,6 @@ class CBot_Driver_WagoDriver extends CBot_DriverAbstract {
      * @return \CBot_Contract_UserInterface
      */
     public function getUser(CBot_Message_Incoming_IncomingMessage $matchingMessage) {
-        throw new Exception('getUser');
-
         return new CBot_User($matchingMessage->getSender());
     }
 
@@ -97,7 +95,11 @@ class CBot_Driver_WagoDriver extends CBot_DriverAbstract {
      */
     public function getMessages() {
         if (empty($this->messages)) {
-            $message = new CBot_Message_Incoming_IncomingMessage($this->getEventData('data.message.body'), $this->getEventData('data.message.from'), $this->getEventData('data.message.to'));
+            $sender = $this->getEventData('data.message.author');
+            if (!$sender) {
+                $this->getEventData('data.message.from');
+            }
+            $message = new CBot_Message_Incoming_IncomingMessage($this->getEventData('data.message.body'), $sender, $this->getEventData('data.message.to'), $this->event->toArray());
 
             $this->messages = [$message];
         }
@@ -118,7 +120,7 @@ class CBot_Driver_WagoDriver extends CBot_DriverAbstract {
 
         $parameters['originate'] = $matchingMessage->getRecipient() === '';
         $parameters['recipient'] = $matchingMessage->getSender();
-        $parameters['sender'] = $matchingMessage->getRecipient();
+        $parameters['sender'] = carr::get($matchingMessage->getPayload(), 'data.message.from');
         $parameters['buttons'] = [];
 
         if ($message instanceof CBot_Message_Outgoing_Question) {
@@ -143,7 +145,6 @@ class CBot_Driver_WagoDriver extends CBot_DriverAbstract {
         /** @var CBot_Message_Outgoing_OutgoingMessage $outgoing */
         $sender = carr::get($payload, 'sender');
 
-        $sender = str_replace('@c.us', '@g.us', $sender);
         $token = $this->config->get('token');
         $options = $this->config->get('options', []);
         $deviceApi = CVendor::wago()->device($token, $options);

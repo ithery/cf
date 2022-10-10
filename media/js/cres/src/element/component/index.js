@@ -4,6 +4,7 @@ import { initRepeater, Repeater } from "./Repeater";
 import { initGallery, Gallery } from "./Gallery";
 import { initProgressBar, ProgressBar } from "./ProgressBar";
 import { initNestable, Nestable } from "./Nestable";
+import { initImage, Image } from "./Image";
 
 const initComponent = (element) => {
     const elementName  = element.getAttribute('cres-element');
@@ -25,6 +26,9 @@ const initComponent = (element) => {
     if(elementName == 'component:Nestable') {
         initNestable(element);
     }
+    if(elementName == 'component:Image') {
+        initImage(element);
+    }
 }
 const component = {
     ShowMore
@@ -33,6 +37,7 @@ const component = {
     ,Gallery
     ,ProgressBar
     ,Nestable
+    ,Image
 }
 export {
     component,
