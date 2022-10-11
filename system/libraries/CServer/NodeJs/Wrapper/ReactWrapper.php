@@ -2,8 +2,6 @@
 class CServer_NodeJs_Wrapper_ReactWrapper extends CServer_NodeJs_WrapperAbstract {
     protected $sourceMap;
 
-    protected $lastFile;
-
     public function __construct(CServer_NodeJs_Runner $node, $file, $sourceMap = false) {
         $this->sourceMap = $sourceMap;
         parent::__construct($node, $file);
@@ -25,30 +23,15 @@ class CServer_NodeJs_Wrapper_ReactWrapper extends CServer_NodeJs_WrapperAbstract
         parent::write($file);
     }
 
-    public function getSourceMapFile() {
-        if (!$this->lastFile) {
-            return;
-        }
+    public function compile($destination = null) {
+        $path = $this->path;
 
-        return $this->lastFile . '.map';
-    }
-
-    public function getSourceMap() {
-        if (!($file = $this->getSourceMapFile())) {
-            return;
-        }
-
-        return file_get_contents($file);
-    }
-
-    public function compile() {
-        $path = $this->getPath('source.jsx');
-        if (!$this->lastFile) {
-            $this->lastFile = sys_get_temp_dir() . DIRECTORY_SEPARATOR . preg_replace('/\.jsx$/i', '', basename($path)) . '.js';
-        }
-        $destination = $this->lastFile;
         $inFile = escapeshellarg($path);
-        $outFile = escapeshellarg($destination);
+        $outFile = $destination;
+        if ($outFile == null) {
+            $outFile = sys_get_temp_dir() . DIRECTORY_SEPARATOR . preg_replace('/\.jsx$/i', '', basename($path)) . '.js';
+        }
+        $outFile = escapeshellarg($outFile);
         $appDirectory = $this->node->getDirectory();
         $plugins = implode(',', array_map(function ($plugin) use ($appDirectory) {
             return escapeshellarg(implode(DIRECTORY_SEPARATOR, [$appDirectory, 'node_modules', 'babel-plugin-' . $plugin]));
@@ -74,11 +57,8 @@ class CServer_NodeJs_Wrapper_ReactWrapper extends CServer_NodeJs_WrapperAbstract
         if (preg_match('/Exception|Error/i', $output)) {
             throw new \ErrorException("Command error: ${output}", 2);
         }
-        if (is_null($output) && file_exists($destination)) {
-            $output = file_get_contents($destination);
-        }
 
-        return $output;
+        return $outFile;
     }
 
     public function fallback() {
