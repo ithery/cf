@@ -1,7 +1,8 @@
 <style>
-    .accordion {
+.accordion {
   max-width: 600px;
   margin: 2rem auto;
+  color:#fff;
 }
 
 .accordion-title {
@@ -9,11 +10,11 @@
   flex-direction: row;
   justify-content: space-between;
   cursor: pointer;
-  background-color: #21aeca;
+  background-color: #CC131F;
 }
 
 .accordion-title:hover {
-  background-color: #3ab4cc;
+  background-color: #FF131F;
 }
 
 .accordion-title,
@@ -22,7 +23,7 @@
 }
 
 .accordion-content {
-  background-color: #39b9d2;
+  background-color: #CC131F;
 }
 
 </style>
