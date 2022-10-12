@@ -11,4 +11,9 @@ return [
         'label' => c::__('Table Action'),
         'uri' => 'demo/elements/table/action/index',
     ],
+    [
+        'name' => 'elements.table.relation',
+        'label' => c::__('Table Relation'),
+        'uri' => 'demo/elements/table/relation/index',
+    ],
 ];
