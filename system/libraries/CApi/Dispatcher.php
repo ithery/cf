@@ -69,6 +69,7 @@ class CApi_Dispatcher {
             })->join($nameSpaced ? '\\' : '_');
 
             $class = $this->methodNamespace . ($nameSpaced ? '\\' : '_') . $classPath;
+
             if (!class_exists($class)) {
                 //try to search oauth
                 if ($this->oauthEnable) {

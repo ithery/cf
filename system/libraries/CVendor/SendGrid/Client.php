@@ -1,20 +1,18 @@
 <?php
 
 /**
- * Class Client
- *
- * @package SendGrid
+ * Class Client.
  *
  * @version Release:3.9.5
  *
  * Quickly and easily access any REST or REST-like API.
  *
- * @method CVendor_SendGrid_Response get($body = null, $query = null, $headers = null)
- * @method CVendor_SendGrid_Response post($body = null, $query = null, $headers = null)
- * @method CVendor_SendGrid_Response patch($body = null, $query = null, $headers = null)
- * @method CVendor_SendGrid_Response put($body = null, $query = null, $headers = null)
- * @method CVendor_SendGrid_Response delete($body = null, $query = null, $headers = null)
- * @method CVendor_SendGrid_Client version($value)
+ * @method CVendor_SendGrid_Response        get($body = null, $query = null, $headers = null)
+ * @method CVendor_SendGrid_Response        post($body = null, $query = null, $headers = null)
+ * @method CVendor_SendGrid_Response        patch($body = null, $query = null, $headers = null)
+ * @method CVendor_SendGrid_Response        put($body = null, $query = null, $headers = null)
+ * @method CVendor_SendGrid_Response        delete($body = null, $query = null, $headers = null)
+ * @method CVendor_SendGrid_Client          version($value)
  * @method CVendor_SendGrid_Client|Response send()
  *
  * Adding all the endpoints as a method so code completion works
@@ -194,14 +192,14 @@ class CVendor_SendGrid_Client {
     protected $retryOnLimit;
 
     /**
-     * These are the supported HTTP verbs
+     * These are the supported HTTP verbs.
      *
      * @var array
      */
     private $methods = ['get', 'post', 'patch', 'put', 'delete'];
 
     /**
-     * Initialize the client
+     * Initialize the client.
      *
      * @param string $host         the base url (e.g. https://api.sendgrid.com)
      * @param array  $headers      global request headers
@@ -236,7 +234,7 @@ class CVendor_SendGrid_Client {
     }
 
     /**
-     * @return string|null
+     * @return null|string
      */
     public function getVersion() {
         return $this->version;
@@ -257,7 +255,7 @@ class CVendor_SendGrid_Client {
     }
 
     /**
-     * Set extra options to set during curl initialization
+     * Set extra options to set during curl initialization.
      *
      * @param array $options
      *
@@ -270,7 +268,7 @@ class CVendor_SendGrid_Client {
     }
 
     /**
-     * Set default retry on limit flag
+     * Set default retry on limit flag.
      *
      * @param bool $retry
      *
@@ -283,7 +281,7 @@ class CVendor_SendGrid_Client {
     }
 
     /**
-     * Set concurrent request flag
+     * Set concurrent request flag.
      *
      * @param bool $isConcurrent
      *
@@ -296,7 +294,7 @@ class CVendor_SendGrid_Client {
     }
 
     /**
-     * Build the final URL to be passed
+     * Build the final URL to be passed.
      *
      * @param array $queryParams an array of all the query parameters
      *
@@ -307,12 +305,13 @@ class CVendor_SendGrid_Client {
         if (isset($queryParams)) {
             $path .= '?' . http_build_query($queryParams);
         }
+
         return sprintf('%s%s%s', $this->host, $this->version ?: '', $path);
     }
 
     /**
      * Creates curl options for a request
-     * this function does not mutate any private variables
+     * this function does not mutate any private variables.
      *
      * @param string $method
      * @param array  $body
@@ -376,10 +375,10 @@ class CVendor_SendGrid_Client {
     }
 
     /**
-     * Prepare response object
+     * Prepare response object.
      *
-     * @param CurlHandle $channel the curl resource
-     * @param string     $content
+     * @param CurlHandle|resource $channel the curl resource
+     * @param string              $content
      *
      * @return CVendor_SendGrid_Response object
      */
@@ -397,7 +396,7 @@ class CVendor_SendGrid_Client {
     }
 
     /**
-     * Retry request
+     * Retry request.
      *
      * @param array  $responseHeaders headers from rate limited response
      * @param string $method          the HTTP verb
@@ -410,6 +409,7 @@ class CVendor_SendGrid_Client {
     private function retryRequest(array $responseHeaders, $method, $url, $body, $headers) {
         $sleepDurations = $responseHeaders['X-Ratelimit-Reset'] - time();
         sleep($sleepDurations > 0 ? $sleepDurations : 0);
+
         return $this->makeRequest($method, $url, $body, $headers, false);
     }
 
@@ -423,9 +423,9 @@ class CVendor_SendGrid_Client {
      * @param array  $headers      any additional request headers
      * @param bool   $retryOnLimit should retry if rate limit is reach?
      *
-     * @return CVendor_SendGrid_Response object
-     *
      * @throws CVendor_SendGrid_Exception_InvalidRequest
+     *
+     * @return CVendor_SendGrid_Response object
      */
     public function makeRequest($method, $url, $body = null, $headers = null, $retryOnLimit = false) {
         $channel = curl_init($url);
@@ -443,6 +443,7 @@ class CVendor_SendGrid_Client {
 
         if ($response->statusCode() === self::TOO_MANY_REQUESTS_HTTP_CODE && $retryOnLimit) {
             $responseHeaders = $response->headers(true);
+
             return $this->retryRequest($responseHeaders, $method, $url, $body, $headers);
         }
 
@@ -452,7 +453,7 @@ class CVendor_SendGrid_Client {
     }
 
     /**
-     * Send all saved requests at once
+     * Send all saved requests at once.
      *
      * @param array $requests
      *
@@ -501,6 +502,7 @@ class CVendor_SendGrid_Client {
             sleep($sleepDurations > 0 ? $sleepDurations : 0);
             $responses = array_merge($responses, $this->makeAllRequests($retryRequests));
         }
+
         return $responses;
     }
 
@@ -529,18 +531,19 @@ class CVendor_SendGrid_Client {
 
     /**
      * Dynamically add method calls to the url, then call a method.
-     * (e.g. client.name.name.method())
+     * (e.g. client.name.name.method()).
      *
      * @param string $name name of the dynamic method call or HTTP verb
      * @param array  $args parameters passed with the method call
      *
-     * @return CVendor_SendGrid_Client|CVendor_SendGrid_Response|CVendor_SendGrid_Response[]|null object
+     * @return null|CVendor_SendGrid_Client|CVendor_SendGrid_Response|CVendor_SendGrid_Response[] object
      */
     public function __call($name, $args) {
         $name = strtolower($name);
 
         if ($name === 'version') {
             $this->version = $args[0];
+
             return $this->_();
         }
 
@@ -560,6 +563,7 @@ class CVendor_SendGrid_Client {
                 // save request to be sent later
                 $requestData = ['method' => $name, 'url' => $url, 'body' => $body, 'headers' => $headers];
                 $this->savedRequests[] = $this->createSavedRequest($requestData, $retryOnLimit);
+
                 return null;
             }
 

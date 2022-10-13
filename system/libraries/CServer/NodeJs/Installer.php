@@ -66,7 +66,6 @@ class CServer_NodeJs_Installer {
         $result = [];
         $result['message'] = [];
         $result['error'] = false;
-
         $installed = $this->installPackages($npm, function ($install) use (&$result) {
             $result['message'][] = 'Package added to be installed/updated with npm: ' . $install;
         });
