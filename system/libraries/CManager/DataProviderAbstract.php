@@ -48,7 +48,7 @@ abstract class CManager_DataProviderAbstract implements CManager_Contract_DataPr
     }
 
     protected function isValidAggregateMethod($method) {
-        $validAggregate = ['sum', 'avg', 'min', 'max'];
+        $validAggregate = ['sum', 'avg', 'min', 'max', 'count'];
 
         return in_array($method, $validAggregate);
     }
