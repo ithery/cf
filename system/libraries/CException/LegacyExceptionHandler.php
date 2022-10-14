@@ -26,7 +26,6 @@ class CException_LegacyExceptionHandler {
         $trace = $exception->getTraceAsString();
         $uri = CFRouter::$current_uri;
         $template = 'errors/exception-legacy';
-
         if (is_numeric($code)) {
             $codes = static::$errorLang;
 
@@ -48,8 +47,10 @@ class CException_LegacyExceptionHandler {
         $file = str_replace('\\', '/', realpath($file));
         $file = preg_replace('|^' . preg_quote(DOCROOT) . '|', '', $file);
 
-        require CF::findFile('views', $template);
-        $output = ob_get_clean();
+        $output = c::view($template, compact('code', 'file', 'message', 'line', 'trace', 'level', 'uri', 'description', 'error'))->render();
+        // require CF::findFile('views', $template);
+
+        // $output = ob_get_clean();
 
         // Fetch memory usage in MB
         $memory = function_exists('memory_get_usage') ? (memory_get_usage() / 1024 / 1024) : 0;

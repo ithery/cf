@@ -17,7 +17,7 @@ class Controller_Demo_Elements_Table_Relation extends \Cresenity\Demo\Controller
         $table->addColumn('category.name')->setLabel('Category')->setWidth('200');
         $table->setAjax(false);
 
-        $app->addH1()->add('&nbsp;'); // tricky use for space separator
+        $app->addDiv()->addClass('py-3'); // tricky use for space separator
 
         // data show by parent
         $app->addP()->add('Demo for table setDataFromModel with relation, data show by parent');
@@ -27,12 +27,7 @@ class Controller_Demo_Elements_Table_Relation extends \Cresenity\Demo\Controller
         });
         $table2->addColumn('name')->setLabel('Name')->setWidth('200');
         $table2->addColumn('name')->setLabel('Items')->setCallback(function (Category $category, $value) {
-            $items = c::collect($category->item)->pluck('name')->toArray();
-            if (count($items) == 0) {
-                return '-';
-            }
-
-            return implode(', ', $items);
+            return c::collect($category->item)->pluck('name')->implode(', ') ?: '-';
         });
         $table2->setAjax(false);
 
