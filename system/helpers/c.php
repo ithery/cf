@@ -975,6 +975,17 @@ class c {
     }
 
     /**
+     * Create Div instance.
+     *
+     * @param null|string $id
+     *
+     * @return \CElement_Element_Div
+     */
+    public static function div($id = null) {
+        return CElement_Element_Div::factory($id);
+    }
+
+    /**
      * Get the CApp instance.
      *
      * @return \CManager
