@@ -113,4 +113,25 @@ class CVendor_Cloudflare_Api {
     public function dnsAnalytics() {
         return new \Cloudflare\API\Endpoints\DNSAnalytics($this->adapter);
     }
+
+    /**
+     * @return \Cloudflare\API\Endpoints\Zones
+     */
+    public function zones() {
+        return new \Cloudflare\API\Endpoints\Zones($this->adapter);
+    }
+
+    /**
+     * @return \Cloudflare\API\Endpoints\ZoneSubscriptions
+     */
+    public function zoneSubscriptions() {
+        return new \Cloudflare\API\Endpoints\ZoneSubscriptions($this->adapter);
+    }
+
+    /**
+     * @return \Cloudflare\API\Endpoints\ZoneSettings
+     */
+    public function zoneSettings() {
+        return new \Cloudflare\API\Endpoints\ZoneSettings($this->adapter);
+    }
 }
