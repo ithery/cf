@@ -110,6 +110,12 @@ class Controller_Cresenity extends CController {
         //Create the image resource
         $width = (int) $width;
         $height = (int) $height;
+        if ($width === 0) {
+            $width = 1;
+        }
+        if ($height === 0) {
+            $height = 1;
+        }
         $image = imagecreate($width, $height);
         //Making of colors, we are changing HEX to RGB
         $bg_color = imagecolorallocate($image, base_convert(substr($bg_color, 0, 2), 16, 10), base_convert(substr($bg_color, 2, 2), 16, 10), base_convert(substr($bg_color, 4, 2), 16, 10));
@@ -149,9 +155,16 @@ class Controller_Cresenity extends CController {
         $color = imagecolorallocatealpha($img, 0, 0, 0, 127);
         imagefill($img, 0, 0, $color);
         //Tell the browser what kind of file is come in
-        header('Content-Type: image/png');
-        imagepng($img);
-        imagedestroy($img);
+        $headers = [
+            'Content-Type' => 'image/png',
+        ];
+
+        return c::response()->stream(function () use ($img) {
+            //Output the newly created image in png format
+            imagepng($img);
+            //Free up resources
+            imagedestroy($img);
+        }, 200, $headers);
     }
 
     public function avatar($method = 'initials') {
