@@ -94,10 +94,26 @@ class CApi_Dispatcher {
         };
     }
 
-    public function dispatch($request = null) {
+    public function dispatchMethod($className, $request, $method = 'POST') {
+        if (!($request instanceof CHTTP_Request)) {
+            $request = new CHTTP_Request($request, $request);
+            $request->setMethod($method);
+        }
+        if (!($request instanceof CApi_HTTP_Request)) {
+            $request = CApi_HTTP_Request::createFromBaseHttp($request);
+        }
+        $methodResolver = function () use ($className, $request) {
+            return CApi_Factory::createMethod($className, $this->group, $request);
+        };
+
+        return $this->dispatch($request, $methodResolver);
+    }
+
+    public function dispatch($request = null, $methodResolver = null) {
         if ($request == null) {
             $request = c::request();
         }
+        $methodResolver = $methodResolver ?: $this->methodResolver();
 
         try {
             $this->isDispatching = true;
@@ -105,7 +121,7 @@ class CApi_Dispatcher {
             $request = CApi_HTTP_Request::createFromBaseHttp($request);
             $request->setGroup($this->group);
             $kernel = new CApi_Kernel($this->group);
-            $response = $kernel->handle($request, $this->methodResolver());
+            $response = $kernel->handle($request, $methodResolver);
         } catch (Exception $e) {
             $this->reportException($e);
             $response = $this->renderException($request, $e);
