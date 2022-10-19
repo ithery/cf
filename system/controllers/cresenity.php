@@ -408,6 +408,8 @@ class Controller_Cresenity extends CController {
 
             return c::response()->json(compact('success'));
         }
+
+        return c::abort(404);
     }
 
     public function editorjs($method, $submethod) {
@@ -421,6 +423,8 @@ class Controller_Cresenity extends CController {
                 return c::response()->json($uploadHandler->byUrl(c::request()));
             }
         }
+
+        return c::abort(404);
     }
 
     public function chat() {
