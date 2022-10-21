@@ -1,10 +1,10 @@
 <?php
 
-class CQC_PHPUnit_TestSuite {
+class CQC_Testing_TestSuite {
     protected $path;
 
     /**
-     * @var CQC_PHPUnit_TestCase[]
+     * @var CQC_Testing_TestCase[]
      */
     protected $testCases;
 
@@ -21,7 +21,7 @@ class CQC_PHPUnit_TestSuite {
     }
 
     protected function addTestCaseFile($file) {
-        $this->testCases[] = new CQC_PHPUnit_TestCase((string) $file);
+        $this->testCases[] = new CQC_Testing_TestCase((string) $file);
 
         return $this;
     }
@@ -34,7 +34,7 @@ class CQC_PHPUnit_TestSuite {
     }
 
     /**
-     * @return CQC_PHPUnit_TestCase[]
+     * @return CQC_Testing_TestCase[]
      */
     public function getTestCases() {
         return $this->testCases;

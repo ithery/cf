@@ -836,9 +836,9 @@ class CDatabase_Schema_Blueprint {
      * @return void
      */
     public function timestamps($precision = 0) {
-        $this->timestamp('created_at', $precision)->nullable();
+        $this->timestamp('created', $precision)->nullable();
 
-        $this->timestamp('updated_at', $precision)->nullable();
+        $this->timestamp('updated', $precision)->nullable();
     }
 
     /**

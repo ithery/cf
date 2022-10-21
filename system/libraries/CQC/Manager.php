@@ -11,7 +11,7 @@ class CQC_Manager {
 
     protected static $instance;
 
-    protected $phpUnit;
+    protected $testing;
 
     /**
      * @return CQC_Manager
@@ -25,17 +25,17 @@ class CQC_Manager {
     }
 
     public function __construct() {
-        $this->phpUnit = new CQC_PHPUnit();
+        $this->testing = new CQC_Testing();
 
         if (CFile::isDirectory($unitPath = c::appRoot('default/tests/Unit'))) {
-            $this->phpUnit->addSuite($unitPath);
+            $this->testing->addSuite($unitPath);
         }
     }
 
     /**
-     * @return CQC_PHPUnit
+     * @return CQC_Testing
      */
-    public function phpUnit() {
-        return $this->phpUnit;
+    public function testing() {
+        return $this->testing;
     }
 }

@@ -85,4 +85,11 @@ class CQC {
     public static function manager() {
         return CQC_Manager::instance();
     }
+
+    /**
+     * @return CQC_Executor
+     */
+    public static function createExecutor() {
+        return new CQC_Executor();
+    }
 }

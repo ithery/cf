@@ -1,6 +1,6 @@
 <?php
 
-class CQC_PHPUnit_TestCase {
+class CQC_Testing_TestCase {
     protected $file;
 
     protected $methods = [];
