@@ -16,7 +16,7 @@ trait CQC_Testing_Repository_Concern_TestTrait {
      */
     protected function findTestByFileAndSuite($file, $suite) {
         $exists = CQC_Testing_Model_Test::where('name', $file->getRelativePathname())
-            ->where('suite_id', $suite->id)
+            ->where('suite_id', $suite->suite_id)
             ->first();
 
         return $exists;
@@ -25,8 +25,8 @@ trait CQC_Testing_Repository_Concern_TestTrait {
     /**
      * Create or update a test.
      *
-     * @param \Symfony\Component\Finder\SplFileInfo    $file
-     * @param \CQC_Testing_Model_Suite $suite
+     * @param \Symfony\Component\Finder\SplFileInfo $file
+     * @param \CQC_Testing_Model_Suite              $suite
      *
      * @return bool
      */
@@ -103,7 +103,7 @@ trait CQC_Testing_Repository_Concern_TestTrait {
 
         $test->state = $ok ? CQC_Testing::STATE_OK : CQC_Testing::STATE_FAILED;
 
-        $test->last_run_id = $run->id;
+        $test->last_run_id = $run->run_id;
 
         $test->save();
 
@@ -136,7 +136,7 @@ trait CQC_Testing_Repository_Concern_TestTrait {
      * @return mixed
      */
     protected function findTestByNameAndSuite($file, $suite) {
-        return CQC_Testing_Model_Test::where('name', $file->getRelativePathname())->where('suite_id', $suite->id)->first();
+        return CQC_Testing_Model_Test::where('name', $file->getRelativePathname())->where('suite_id', $suite->suite_id)->first();
     }
 
     /**
@@ -260,15 +260,18 @@ trait CQC_Testing_Repository_Concern_TestTrait {
      * @return mixed
      */
     private function updateRun($run, $test, $lines, $ok, $startedAt, $endedAt) {
-        $run->test_id = $test->id;
+        /** @var CQC_Testing_Repository $this */
+        $run->test_id = $test->test_id;
         $run->was_ok = $ok;
         $run->log = $this->formatLog($lines, $test) ?: '(empty)';
-        $run->html = $this->getOutput(
-            $test,
-            $test->suite->tester->output_folder,
-            $test->suite->tester->output_html_fail_extension
-        );
-        $run->screenshots = $this->getScreenshots($test, $lines);
+        //TODO: html
+        // $run->html = $this->getOutput(
+        //     $test,
+        //     $test->suite->tester->output_folder,
+        //     $test->suite->tester->output_html_fail_extension
+        // );
+        //TODO: screenshots
+        //$run->screenshots = $this->getScreenshots($test, $lines);
         $run->started_at = $startedAt;
         $run->ended_at = $endedAt;
 

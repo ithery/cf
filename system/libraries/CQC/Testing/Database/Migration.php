@@ -59,7 +59,7 @@ class CQC_Testing_Database_Migration {
 
             $table->boolean('enabled')->default(true);
 
-            $table->integer('last_run_test_id')->unsigned()->nullable();
+            $table->integer('last_run_id')->unsigned()->nullable();
 
             $table->string('sha1')->nullable();
             $table->tinyInteger('status')->default(1);

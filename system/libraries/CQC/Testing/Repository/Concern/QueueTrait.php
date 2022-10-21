@@ -13,7 +13,7 @@ trait CQC_Testing_Repository_Concern_QueueTrait {
     public function isEnqueued($test) {
         return
             $test->state == CQC_Testing::STATE_QUEUED
-            && QueueModel::where('test_id', $test->id)->first();
+            && QueueModel::where('test_id', $test->test_id)->first();
     }
 
     /**
@@ -50,7 +50,7 @@ trait CQC_Testing_Repository_Concern_QueueTrait {
         if ($test->enabled && $test->suite->project->enabled && !$this->isEnqueued($test)) {
             $test->updateSha1();
 
-            QueueModel::updateOrCreate(['test_id' => $test->id]);
+            QueueModel::updateOrCreate(['test_id' => $test->test_id]);
 
             // After queueing, if it's the only one, it may take the test and run it right away,
             // so we must wait a little for it to happen
@@ -94,7 +94,7 @@ trait CQC_Testing_Repository_Concern_QueueTrait {
      * @return mixed
      */
     protected function removeTestFromQueue($test) {
-        QueueModel::where('test_id', $test->id)->delete();
+        QueueModel::where('test_id', $test->test_id)->delete();
 
         return $test;
     }
@@ -105,7 +105,7 @@ trait CQC_Testing_Repository_Concern_QueueTrait {
      * @param $test
      */
     protected function resetTest($test) {
-        QueueModel::where('test_id', $test->id)->delete();
+        QueueModel::where('test_id', $test->test_id)->delete();
 
         $test->state = CQC_Testing::STATE_IDLE;
 

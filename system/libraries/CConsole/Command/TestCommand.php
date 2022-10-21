@@ -60,7 +60,7 @@ class CConsole_Command_TestCommand extends CConsole_Command {
             throw new RuntimeException('Running Collision ^5.0 artisan test command requires PHPUnit ^9.0.');
         }
 
-        $options = array_slice($_SERVER['argv'], $this->option('without-tty') ? 3 : 2);
+        $options = array_slice(isset($_SERVER['argv']) ? $_SERVER['argv'] : [], $this->option('without-tty') ? 3 : 2);
         $options = c::collect($options)->reject(function ($option) {
             return cstr::startsWith($option, 'app:');
         })->toArray();

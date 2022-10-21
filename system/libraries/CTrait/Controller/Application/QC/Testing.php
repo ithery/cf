@@ -78,6 +78,35 @@ trait CTrait_Controller_Application_QC_Testing {
     }
 
     public function run() {
+        $test = CQC_Testing_Model_Test::find(1);
+        $ok = false;
+
+        $lines = '';
+        $repository = CQC::manager()->testing()->repository();
+        $run = $repository->markTestAsRunning($test);
+        $file = $test->path . DS . $test->name;
+
+        //$this->log('RUNNING: ' . $command . ' - at ' . $test->suite->path . ' - cwd:' . getcwd(), 'comment');
+
+        $logOutput = '';
+        $executor = CQC::createExecutor();
+        $startedAt = c::now();
+        for ($times = 0; $times <= $test->suite->retries; $times++) {
+            if ($times > 0) {
+                $this->log('retrying...');
+            }
+            $cfCli = CConsole::kernel()->cfCli();
+            $exitCode = $cfCli->call('test ' . $file);
+            $lines = $cfCli->output();
+            if ($ok = $exitCode === 0) {
+                break;
+            }
+        }
+
+        $endedAt = c::now();
+        $this->log($ok ? 'OK' : 'FAILED');
+        $repository->storeTestResult($run, $test, $lines, $ok, $startedAt, $endedAt);
+        cdbg::dd($lines);
     }
 
     public function poll() {
@@ -94,7 +123,7 @@ trait CTrait_Controller_Application_QC_Testing {
 
             return $app;
         }
-
-        return c::abort(404);
+        echo $method;
+        //return c::abort(404);
     }
 }
