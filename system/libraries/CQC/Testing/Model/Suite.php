@@ -1,4 +1,8 @@
 <?php
+
+/**
+ * @property-read int $suite_id
+ */
 class CQC_Testing_Model_Suite extends CQC_Testing_AbstractModel {
     protected $table = 'suite';
 
@@ -22,12 +26,7 @@ class CQC_Testing_Model_Suite extends CQC_Testing_AbstractModel {
      * @return mixed|string
      */
     public function getTestsFullPathAttribute($value) {
-        return c::makePath(
-            [
-                $this->project->tests_full_path,
-                $this->tests_path,
-            ]
-        );
+        return $this->tests_path;
     }
 
     /**

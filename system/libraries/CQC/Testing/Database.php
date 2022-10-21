@@ -42,8 +42,15 @@ class CQC_Testing_Database {
         }
     }
 
+    private function getModifiedTime() {
+        $time1 = filemtime(__FILE__);
+        $class = new ReflectionClass(CQC_Testing_Database_Migration::class);
+        $time2 = filemtime($class->getFileName());
+        return max($time1, $time2);
+    }
+
     public function shouldMigrate() {
-        $currentTime = filemtime(__FILE__);
+        $currentTime = $this->getModifiedTime();
         $datamtime = $this->data->get('datamtime');
         if (!$datamtime) {
             return true;

@@ -31,6 +31,7 @@ class CQC_Testing {
 
             $this->db()->migrate();
         }
+        $this->load();
     }
 
     public function addSuite($path) {
@@ -81,5 +82,13 @@ class CQC_Testing {
      */
     public function repository() {
         return $this->repository;
+    }
+
+    private function load() {
+        if (CFile::isDirectory($unitPath = c::appRoot('default/tests/Unit'))) {
+            $this->addSuite($unitPath);
+        }
+        $loader = new CQC_Testing_Loader($this->repository);
+        $loader->refreshSuites($this->suites);
     }
 }

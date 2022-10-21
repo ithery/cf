@@ -42,6 +42,7 @@ class CQC_Testing_Database_Migration {
             $table->string('coverage_enabled')->boolean(false);
 
             $table->string('coverage_index')->nullable();
+            $table->tinyInteger('status')->default(1);
             $table->timestamps();
         });
     }
@@ -53,13 +54,15 @@ class CQC_Testing_Database_Migration {
             $table->integer('suite_id')->unsigned();
 
             $table->string('name');
-
+            $table->string('path')->nullable();
             $table->string('state')->default('idle');
 
             $table->boolean('enabled')->default(true);
 
             $table->integer('last_run_test_id')->unsigned()->nullable();
+
             $table->string('sha1')->nullable();
+            $table->tinyInteger('status')->default(1);
             $table->timestamps();
         });
         $schema->table('test', function (CDatabase_Schema_Blueprint $table) {
@@ -76,6 +79,7 @@ class CQC_Testing_Database_Migration {
             $table->increments('queue_id');
 
             $table->integer('test_id')->unsigned();
+            $table->tinyInteger('status')->default(1);
 
             $table->timestamps();
         });
@@ -106,6 +110,7 @@ class CQC_Testing_Database_Migration {
             $table->timestamp('ended_at')->nullable();
 
             $table->timestamp('notified_at')->nullable();
+            $table->tinyInteger('status')->default(1);
             $table->timestamps();
         });
         $schema->table('run', function (CDatabase_Schema_Blueprint $table) {

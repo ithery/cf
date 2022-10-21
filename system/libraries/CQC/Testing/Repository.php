@@ -273,8 +273,7 @@ class CQC_Testing_Repository {
     /**
      * Properly render HTML source code.
      *
-     * @param string
-     * @param mixed $contents
+     * @param string $contents
      *
      * @return string
      */
@@ -421,7 +420,7 @@ class CQC_Testing_Repository {
             $this->getEditorBinary($suite)
         ));
 
-        return ends_with($command, ':')
+        return cstr::endsWith($command, ':')
             ? substr($command, 0, -1)
             : $command;
     }
@@ -477,7 +476,7 @@ class CQC_Testing_Repository {
 
         $path = str_replace(DIRECTORY_SEPARATOR . DIRECTORY_SEPARATOR, DIRECTORY_SEPARATOR, $path);
 
-        if (ends_with($path, DIRECTORY_SEPARATOR)) {
+        if (cstr::endsWith($path, DIRECTORY_SEPARATOR)) {
             $path = substr($path, 0, -1);
         }
 
@@ -525,9 +524,7 @@ class CQC_Testing_Repository {
     /**
      * Get all tests.
      *
-     * @param null $project_id
-     *
-     * @return array
+     * @return CCollection
      */
     public function getTests() {
         $order = "(case

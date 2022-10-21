@@ -26,10 +26,6 @@ class CQC_Manager {
 
     public function __construct() {
         $this->testing = new CQC_Testing();
-
-        if (CFile::isDirectory($unitPath = c::appRoot('default/tests/Unit'))) {
-            $this->testing->addSuite($unitPath);
-        }
     }
 
     /**

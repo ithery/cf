@@ -10,7 +10,7 @@
     $brandPrimary = CColor::create('#2654b2')->toCssStyle();
     $brandSecondary = CColor::create('#e9ecee')->toCssStyle();
     $brandGrayDarker = CColor::create($brandGray)
-        ->darken(10)
+        ->darken(60)
         ->toCssStyle();
     $brandInfoLight = CColor::create($brandInfo)
         ->lighten(20)

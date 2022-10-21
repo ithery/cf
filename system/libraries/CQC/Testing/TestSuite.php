@@ -1,6 +1,9 @@
 <?php
 
 class CQC_Testing_TestSuite {
+    /**
+     * @var string
+     */
     protected $path;
 
     /**
@@ -24,6 +27,30 @@ class CQC_Testing_TestSuite {
         $this->testCases[] = new CQC_Testing_TestCase((string) $file);
 
         return $this;
+    }
+
+    public function getPath() {
+        return $this->path;
+    }
+
+    public function getRetries() {
+        return 3;
+    }
+
+    public function getCommandOptions() {
+        return '';
+    }
+
+    public function getFileMask() {
+        return '*';
+    }
+
+    public function isCoverageEnabled() {
+        return false;
+    }
+
+    public function getCoverageIndex() {
+        return null;
     }
 
     /**

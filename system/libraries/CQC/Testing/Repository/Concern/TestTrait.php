@@ -26,7 +26,7 @@ trait CQC_Testing_Repository_Concern_TestTrait {
      * Create or update a test.
      *
      * @param \Symfony\Component\Finder\SplFileInfo    $file
-     * @param \PragmaRX\Tddd\Package\Data\Models\Suite $suite
+     * @param \CQC_Testing_Model_Suite $suite
      *
      * @return bool
      */
@@ -40,7 +40,7 @@ trait CQC_Testing_Repository_Concern_TestTrait {
                 'sha1' => sha1("{$path}/{$name}"),
                 'path' => $path,
                 'name' => $name,
-                'suite_id' => $suite->id,
+                'suite_id' => $suite->suite_id,
             ]);
         }
 
@@ -55,11 +55,11 @@ trait CQC_Testing_Repository_Concern_TestTrait {
      * Sync all tests.
      *
      * @param $exclusions
-     * @param mixed $showTests
      */
-    public function syncTests($exclusions, $showTests) {
+    public function syncTests($exclusions) {
+        /** @var CQC_Testing_Repository $this */
         foreach ($this->getSuites() as $suite) {
-            $this->syncSuiteTests($suite, $exclusions, $showTests);
+            $this->syncSuiteTests($suite, $exclusions);
         }
     }
 

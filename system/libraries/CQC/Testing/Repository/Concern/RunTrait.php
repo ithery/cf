@@ -34,14 +34,13 @@ trait CQC_Testing_Repository_Concern_RunTrait {
         $run = CQC_Testing_Model_Run::where('test_id', $test->id)->orderBy('created', 'desc')->first();
 
         return [
-            'id' => $test->id,
+            'testId' => $test->test_id,
             'suiteName' => $test->suite->name,
             'path' => $test->path . DIRECTORY_SEPARATOR,
             'name' => $test->name,
-            'updatedAt' => $test->updated_at->diffForHumans(null, false, true),
+            'updatedAt' => $test->updated->diffForHumans(null, false, true),
             'state' => $test->state,
             'enabled' => $test->enabled,
-            'editor_name' => $this->getEditor($test->suite)['name'],
             'coverage' => ['enabled' => $test->suite->coverage_enabled, 'index' => $test->suite->coverage_index],
 
             'run' => $run,

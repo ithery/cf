@@ -5,24 +5,22 @@ trait CQC_Testing_Repository_Concern_SuiteTrait {
     /**
      * Create or update a suite.
      *
-     * @param $name
-     * @param $suite_data
+     * @param CQC_Testing_TestSuite $suite
      *
      * @return null|CQC_Testing_Model_Suite|bool
      */
-    public function createOrUpdateSuite($name, $suite_data) {
+    public function createOrUpdateSuite(CQC_Testing_TestSuite $suite) {
         return CQC_Testing_Model_Suite::updateOrCreate(
             [
-                'name' => $name,
+                'name' => $suite->getName(),
             ],
             [
-                'tests_path' => carr::get($suite_data, 'tests_path'),
-                'command_options' => carr::get($suite_data, 'command_options'),
-                'file_mask' => carr::get($suite_data, 'file_mask'),
-                'retries' => carr::get($suite_data, 'retries'),
-                'editor' => carr::get($suite_data, 'editor'),
-                'coverage_enabled' => carr::get($suite_data, 'coverage.enabled', false),
-                'coverage_index' => carr::get($suite_data, 'coverage.index'),
+                'tests_path' => $suite->getPath(),
+                'command_options' => $suite->getCommandOptions(),
+                'file_mask' => $suite->getFileMask(),
+                'retries' => $suite->getRetries(),
+                'coverage_enabled' => $suite->isCoverageEnabled(),
+                'coverage_index' => $suite->getCoverageIndex(),
             ]
         );
     }
@@ -64,11 +62,10 @@ trait CQC_Testing_Repository_Concern_SuiteTrait {
     /**
      * Remove suites that are not in present in config.
      *
-     * @param $suites
-     * @param $project
+     * @param array $suites
      */
-    public function removeMissingSuites($suites, $project) {
-        CQC_Testing_Model_Suite::where('project_id', $project->id)->whereNotIn('name', c::collect($suites)->keys())->each(function ($suite) {
+    public function removeMissingSuites(array $suites) {
+        CQC_Testing_Model_Suite::whereNotIn('name', $suites)->each(function ($suite) {
             $suite->delete();
         });
     }
@@ -78,18 +75,14 @@ trait CQC_Testing_Repository_Concern_SuiteTrait {
      *
      * @param $suite
      * @param $exclusions
-     * @param mixed $showTests
      */
-    protected function syncSuiteTests($suite, $exclusions, $showTests) {
+    protected function syncSuiteTests($suite, $exclusions) {
+        /** @var CQC_Testing_Repository $this */
         $files = $this->getAllFilesFromSuite($suite);
 
         foreach ($files as $file) {
             if (!$this->isExcluded($exclusions, null, $file) && $this->isTestable($file->getRealPath())) {
                 $this->createOrUpdateTest($file, $suite);
-
-                if ($showTests) {
-                    $this->addMessage('NEW TEST: ' . $file->getRealPath());
-                }
             } else {
                 // If the test already exists, delete it.
                 //

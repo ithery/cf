@@ -18,23 +18,15 @@ trait CTrait_Controller_Application_QC_Testing {
         $testing = CQC::manager()->testing();
 
         $repository = $testing->repository();
-        $repository->getTests();
+
         $divDaemon = $app->addDiv();
         $this->daemonContainer($divDaemon);
         if (!$testing->daemonIsRunning()) {
             return $app;
         }
-        $tests = [];
-        foreach ($testing->getTestSuites() as $testSuite) {
-            foreach ($testSuite->getTestCases() as $testCase) {
-                $test = $testCase->toArray();
-                $test['time'] = null;
-                $test['state'] = 'idle';
-                $test['enabled'] = true;
-                $test['suiteName'] = $testSuite->getName();
-                $tests[] = $test;
-            }
-        }
+
+        $tests = $repository->getTests()->toArray();
+
         $runTestUrl = $this->controllerUrl() . 'run';
         $pollUrl = $this->controllerUrl() . 'poll';
         $app->addView('cresenity.qc.tests', [
@@ -89,6 +81,9 @@ trait CTrait_Controller_Application_QC_Testing {
     }
 
     public function poll() {
+        $tests = CQC::manager()->testing()->repository()->getTests()->toArray();
+
+        return CApp_Base::toJsonResponse(0, '', $tests);
     }
 
     public function log($method) {

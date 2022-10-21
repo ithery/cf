@@ -1,72 +1,41 @@
 <?php
 
 class CQC_Testing_Loader {
+    /**
+     * @var CQC_Testing_Repository
+     */
+    protected $dataRepository;
+
+    protected $exclusions;
     public function __construct(CQC_Testing_Repository $repository) {
         $this->dataRepository = $repository;
+        $this->exclusions = [];
     }
 
-    public function refreshSuites($data) {
-        $this->dataRepository->removeMissingSuites($suites = $data['suites'], $project);
+    /**
+     * @param CQC_Testing_TestSuite[] $data
+     *
+     * @return void
+     */
+    public function refreshSuites(array $data) {
+        $currentSuites = c::collect($data)->map(function (CQC_Testing_TestSuite $suite) {
+            return $suite->getName();
+        })->toArray();
+        $this->dataRepository->removeMissingSuites($currentSuites);
 
-        c::collect($suites)->map(function ($data, $name) {
-            $this->createSuite($name, $data);
+        c::collect($data)->map(function (CQC_Testing_TestSuite $suite) {
+            $this->createSuite($suite);
         });
+        $this->dataRepository->syncTests($this->exclusions);
     }
 
     /**
      * Create or update the suite.
      *
-     * @param $suite_name
-     * @param $project
-     * @param $suite_data
+     * @param CQC_Testing_TestSuite $suite
      */
-    private function createSuite($suite_name, $suite_data) {
-        $this->showProgress("  -- suite '{$suite_name}'");
-
-        if (!$this->dataRepository->createOrUpdateSuite($suite_name, $suite_data)) {
-            $this->displayMessages($this->dataRepository->getMessages());
-            die;
-        }
-    }
-
-    /**
-     * Show progress in terminal.
-     *
-     * @param $line
-     * @param mixed $type
-     */
-    public function showProgress($line, $type = 'line') {
-        $this->command->{$type}($line);
-    }
-
-    /**
-     * Show a comment in terminal.
-     *
-     * @param $comment
-     */
-    public function showComment($comment) {
-        $this->command->comment($comment);
-    }
-
-    /**
-     * Display messages in terminal.
-     *
-     * @param $messages
-     */
-    protected function displayMessages($messages) {
-        $fatal = $messages->reduce(function ($carry, $message) {
-            $prefix = $message['type'] == 'error' ? 'FATAL ERROR: ' : '';
-
-            $this->command->{$message['type']}($prefix . $message['body']);
-
-            if ($message['type'] == 'error') {
-                return true;
-            }
-
-            return $carry;
-        });
-
-        if ($fatal == true) {
+    private function createSuite(CQC_Testing_TestSuite $suite) {
+        if (!$this->dataRepository->createOrUpdateSuite($suite)) {
             die;
         }
     }

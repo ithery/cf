@@ -101,6 +101,7 @@
             </template>
         </tbody>
     </table>
+
 </div>
 @CAppPushScript
 <script>
@@ -109,7 +110,7 @@
             tests: @json($tests),
             filter:'',
             init() {
-                console.log('A');
+                this.initPolling();
             },
             resetFilter() {
                 this.filter = '';
@@ -201,6 +202,12 @@
                         },
                     });
                 });
+            },
+
+            initPolling() {
+                setInterval(() => {
+                    this.loadData();
+                }, 300);
             },
         }
     }
