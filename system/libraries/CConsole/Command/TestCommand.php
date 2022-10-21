@@ -132,7 +132,21 @@ class CConsole_Command_TestCommand extends CConsole_Command {
             throw new Exception('File not found:' . $file);
         }
 
+        $options = $this->reformatOptionsPath($options);
+
         return array_merge(['-c', $file], $options);
+    }
+
+    protected function reformatOptionsPath(array $options) {
+        foreach ($options as $key => $option) {
+            $rootPath = c::appRoot();
+            $path = $rootPath . 'default/tests/' . $option;
+            if (CFile::isDirectory($path) || CFile::isFile($path)) {
+                $options[$key] = $path;
+            }
+        }
+
+        return $options;
     }
 
     /**
