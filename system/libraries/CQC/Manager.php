@@ -11,6 +11,8 @@ class CQC_Manager {
 
     protected static $instance;
 
+    protected $phpUnit;
+
     /**
      * @return CQC_Manager
      */
@@ -20,5 +22,20 @@ class CQC_Manager {
         }
 
         return self::$instance;
+    }
+
+    public function __construct() {
+        $this->phpUnit = new CQC_PHPUnit();
+
+        if (CFile::isDirectory($unitPath = c::appRoot('default/tests/Unit'))) {
+            $this->phpUnit->loadPath($unitPath);
+        }
+    }
+
+    /**
+     * @return CQC_PHPUnit
+     */
+    public function phpUnit() {
+        return $this->phpUnit;
     }
 }

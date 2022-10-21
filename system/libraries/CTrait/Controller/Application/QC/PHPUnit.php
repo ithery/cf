@@ -5,29 +5,25 @@
  *
  * @author Hery
  */
-trait CTrait_Controller_Application_QC_UnitTest {
+trait CTrait_Controller_Application_QC_PHPUnit {
     protected function getTitle() {
         return 'Unit Test';
     }
 
     public function index() {
         $app = c::app();
-        $db = CDatabase::instance();
 
         $app->title($this->getTitle());
-        $actionContainer = $app->addDiv()->addClass('action-container mb-3');
 
-        $reloadAction = $actionContainer->addAction()->setLabel('Reload')->addClass('btn-primary')->setIcon('fas fa-sync');
-
-        $tableUnitTestDiv = $app->addDiv('tableUnitTest');
-
-        $handlerActionClick = $reloadAction->addListener('click')->addReloadHandler();
-        $handlerActionClick->setTarget('tableUnitTest');
-        $handlerActionClick->setUrl($this->controllerUrl() . 'reloadTabUnitTest');
-        $handlerActionClick->setBlockerType('shimmer');
-
-        $reloadOptions = [];
-        static::reloadTabUnitTest($tableUnitTestDiv, $reloadOptions);
+        $phpUnit = CQC::manager()->phpUnit();
+        foreach ($phpUnit->getTestCases() as $testCase) {
+            $app->addWidget()->setTitle($testCase->getName());
+            foreach ($testCase->getMethods() as $method) {
+                $divMethod = $app->addDiv()->customCss('style', 'display:flex; justify-content:space-between');
+                $divMethod->addDiv()->add($method);
+                $divMethod->addDiv()->addAction()->setLabel('Run')->setIcon('fas fa-play')->addClass('btn-success');
+            }
+        }
 
         return $app;
     }
@@ -116,10 +112,6 @@ trait CTrait_Controller_Application_QC_UnitTest {
         if ($container == null) {
             echo $app->render();
         }
-    }
-
-    public static function cellCallback($table, $col, $row, $val) {
-        return $val;
     }
 
     public function detail($class = null) {
