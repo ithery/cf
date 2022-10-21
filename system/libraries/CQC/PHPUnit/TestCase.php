@@ -7,12 +7,10 @@ class CQC_PHPUnit_TestCase {
 
     public function __construct($file) {
         $this->file = $file;
-        $suite = new PHPUnit\Framework\TestSuite();
-        $suite->addTestFile($file);
     }
 
     public function getRelativePath() {
-        $testRoot = c::appRoot('default/tests');
+        $testRoot = c::appRoot('');
         $path = $this->file;
         if (cstr::startsWith($path, $testRoot)) {
             $path = substr($path, strlen($testRoot));
@@ -32,5 +30,14 @@ class CQC_PHPUnit_TestCase {
 
     public function getMethods() {
         return $this->methods;
+    }
+
+    public function toArray() {
+        return [
+            'file' => $this->file,
+            'path' => $this->getRelativePath(),
+            'name' => $this->getName(),
+            'updatedAt' => date('Y-m-d H:i:s', CFile::lastModified($this->file))
+        ];
     }
 }

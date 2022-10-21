@@ -1,31 +1,22 @@
 <?php
 
 class CQC_PHPUnit {
-    protected $testCases;
+    protected $suites;
 
     public function __construct() {
-        $this->testCases = [];
+        $this->suites = [];
     }
 
-    public function loadPath($path) {
-        $files = CFile::allFiles($path);
-        foreach ($files as $file) {
-            $this->addTestCaseFile($file);
-        }
-    }
-
-    protected function addTestCaseFile($file) {
-        $this->testCases[] = new CQC_PHPUnit_TestCase((string) $file);
-
-        return $this;
+    public function addSuite($path) {
+        $this->suites[] = new CQC_PHPUnit_TestSuite($path);
     }
 
     /**
-     * Get array of CQC_PHPUnit_TestCase.
+     * Get array of CQC_PHPUnit_TestSuite.
      *
-     * @return CQC_PHPUnit_TestCase[]
+     * @return CQC_PHPUnit_TestSuite[]
      */
-    public function getTestCases() {
-        return $this->testCases;
+    public function getTestSuites() {
+        return $this->suites;
     }
 }

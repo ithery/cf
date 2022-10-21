@@ -28,7 +28,7 @@ class CQC_Manager {
         $this->phpUnit = new CQC_PHPUnit();
 
         if (CFile::isDirectory($unitPath = c::appRoot('default/tests/Unit'))) {
-            $this->phpUnit->loadPath($unitPath);
+            $this->phpUnit->addSuite($unitPath);
         }
     }
 
