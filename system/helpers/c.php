@@ -1635,6 +1635,27 @@ class c {
     }
 
     public static function call($callback, array $args = []) {
+        if (is_string($callback)) {
+            $className = null;
+            $method = null;
+            if (strpos($callback, '::') !== false) {
+                list($className, $method) = explode('::', $callback);
+            }
+            if ($className == null && $method == null) {
+                if (strpos($callback, '@') !== false) {
+                    list($className, $method) = explode('@', $callback);
+                }
+            }
+            if ($className == null && $method == null) {
+                if (class_exists($callback)) {
+                    $className = $callback;
+                    $method == '__invoke';
+                }
+            }
+            if ($className != null && $method !== null) {
+                return call_user_func_array([$className, $method], $args);
+            }
+        }
         if (is_callable($callback)) {
             return call_user_func_array($callback, $args);
         }
@@ -1643,6 +1664,21 @@ class c {
         }
 
         throw new Exception('callback is not callable');
+    }
+
+    /**
+     * @param array $parts
+     *
+     * @return string
+     */
+    public static function makePath(array $parts) {
+        $path = implode(DIRECTORY_SEPARATOR, $parts);
+
+        while (strpos($path, DIRECTORY_SEPARATOR . DIRECTORY_SEPARATOR) !== false) {
+            $path = str_replace(DIRECTORY_SEPARATOR . DIRECTORY_SEPARATOR, DIRECTORY_SEPARATOR, $path);
+        }
+
+        return $path;
     }
 }
 

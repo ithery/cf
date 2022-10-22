@@ -169,6 +169,9 @@ class CDaemon_Runner {
         return null;
     }
 
+    /**
+     * @return void
+     */
     public function logDump() {
         $pid = $this->getPid();
         if ($pid) {
@@ -176,6 +179,11 @@ class CDaemon_Runner {
         }
     }
 
+    /**
+     * @param bool $exit
+     *
+     * @return string
+     */
     public function stop($exit = true) {
         $pid = $this->getPid();
         $command = 'kill -9 ' . $pid;
@@ -190,8 +198,21 @@ class CDaemon_Runner {
         return $result;
     }
 
+    public function getLogFile() {
+        return CDaemon_Helper::getLogFile($this->serviceClass);
+    }
+
+    public function getLog() {
+        $logFile = $this->getLogFile();
+        if (CFile::exists($logFile)) {
+            return CFile::get($logFile);
+        }
+
+        return null;
+    }
+
     public function rotateLog() {
-        $logFile = CDaemon_Helper::getLogFile($this->serviceClass);
+        $logFile = $this->getLogFile();
 
         if (strlen($logFile) > 0 && file_exists($logFile)) {
             $rotator = CLogger_Rotator::createRotate($logFile);

@@ -1,7 +1,7 @@
 <?php
 
 /**
- * Description of UnitTestTrait
+ * Description of UnitTestTrait.
  *
  * @author Hery
  */
@@ -32,6 +32,7 @@ trait CQC_Manager_UnitTestTrait {
             foreach ($this->unitTestGroup as $groupArray) {
                 $allDaemons = array_diff_key($allDaemons, $groupArray);
             }
+
             return $allDaemons;
         }
         if ($group !== null) {
@@ -39,6 +40,7 @@ trait CQC_Manager_UnitTestTrait {
                 throw new Exception('group unit test ' . $group . ' not available');
             }
         }
+
         return $this->unitTestGroup[$group];
     }
 
