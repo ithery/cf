@@ -66,6 +66,11 @@ trait CQC_Testing_Repository_Concern_QueueTrait {
 
             //     $test->save();
             // }
+            $test->state = CQC_Testing::STATE_QUEUED;
+
+            $test->timestamps = false;
+
+            $test->save();
         }
     }
 
