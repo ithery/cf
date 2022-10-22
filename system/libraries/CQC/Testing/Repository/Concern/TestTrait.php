@@ -237,7 +237,7 @@ trait CQC_Testing_Repository_Concern_TestTrait {
         }
 
         if ($test_id && $test_id != 'all') {
-            $query->where('tddd_tests.id', $test_id);
+            $query->where('tests.test_id', $test_id);
         }
 
         return $query;

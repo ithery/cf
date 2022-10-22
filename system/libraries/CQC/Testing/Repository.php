@@ -233,7 +233,7 @@ class CQC_Testing_Repository {
      * @return mixed
      */
     protected function removeBefore($diff) {
-        return str_replace('before', '', $diff);
+        return str_replace(['before',' sebelumnya'], '', $diff);
     }
 
     /**

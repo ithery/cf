@@ -43,9 +43,9 @@
     <table class="table table-striped">
         <thead>
             <tr>
-                <th>
+                {{-- <th>
                     <input x-on:click="enableAll()" type="checkbox" x-bind:checked="allEnabled()">
-                </th>
+                </th> --}}
                 <th width="6%">run</th>
                 <th width="8%">state</th>
                 <th>suite</th>
@@ -59,10 +59,10 @@
         <tbody>
             <template x-for="(test, i) in filteredTests">
                 <tr x-bind:class="!test.enabled ? 'dim' : ''">
-                    <td>
+                    {{-- <td>
                         <input type="checkbox" class="testCheckbox" @click="toggleTest(test)"
                             x-bind:checked="test.enabled" />
-                    </td>
+                    </td> --}}
 
                     <td>
                         <div x-on:click="runTest(test)" x-show="test.state !== 'running' && test.state !== 'queued'"
@@ -81,10 +81,10 @@
                     </td>
 
                     <td>
-                        <div x-on:click="editFile(test.edit_file_url)" class="table-link">
-                            <span class="table-test-path mr-1" x-text="test.path"></span><span class="table-test-name"
+                        {{-- <div x-on:click="editFile(test.edit_file_url)" class="table-link"> --}}
+                            <span class="table-test-path" x-text="test.path"></span><span class="table-test-name"
                                 x-text="test.name"></span>
-                        </div>
+                        {{-- </div> --}}
                     </td>
 
                     <td x-text="test.time"></td>

@@ -38,6 +38,7 @@ trait CQC_Testing_Repository_Concern_RunTrait {
      * @return array
      */
     protected function getTestInfo($test) {
+        /** @var CQC_Testing_Repository $this */
         $run = CQC_Testing_Model_Run::where('test_id', $test->test_id)->orderBy('created', 'desc')->first();
 
         return [

@@ -155,8 +155,7 @@ trait CTrait_Controller_Application_QC_Testing {
 
             return $app;
         }
-        echo $method;
-        //return c::abort(404);
+        return c::abort(404);
     }
 
     protected function success($data = []) {

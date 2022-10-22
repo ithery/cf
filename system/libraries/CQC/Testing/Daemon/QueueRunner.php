@@ -58,7 +58,7 @@ class CQC_Testing_Daemon_QueueRunner extends CDaemon_ServiceAbstract {
         //$this->log('RUNNING: ' . $command . ' - at ' . $test->getFile() . ' - cwd:' . getcwd(), 'comment');
 
         $logOutput = '';
-
+        $startedAt = c::now();
         for ($times = 0; $times <= $test->suite->retries; $times++) {
             if ($times > 0) {
                 $this->log('retrying...');
@@ -82,10 +82,10 @@ class CQC_Testing_Daemon_QueueRunner extends CDaemon_ServiceAbstract {
                 break;
             }
         }
-
+        $endedAt = c::now();
         $this->log($ok ? 'OK' : 'FAILED');
         $this->log('Updating Result..');
-        $this->repository()->storeTestResult($run, $test, $lines, $ok, $this->executor->startedAt, $this->executor->endedAt);
+        $this->repository()->storeTestResult($run, $test, $lines, $ok, $startedAt, $endedAt);
         $this->log('Result Updated');
 
         return true;
