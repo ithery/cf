@@ -241,7 +241,9 @@
             },
             async loadData() {
                 const data = await this.requestPost('{{ $pollUrl }}');
-                this.tests = data;
+                if(data) {
+                    this.tests = data;
+                }
             },
             initPolling() {
                 setInterval(() => {
