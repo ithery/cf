@@ -233,7 +233,7 @@ class CQC_Testing_Repository {
      * @return mixed
      */
     protected function removeBefore($diff) {
-        return str_replace(['before',' sebelumnya'], '', $diff);
+        return str_replace(['before', ' sebelumnya'], '', $diff);
     }
 
     /**
@@ -479,5 +479,14 @@ class CQC_Testing_Repository {
         return c::collect($query->get())->map(function ($test) {
             return $this->getTestInfo($test);
         });
+    }
+
+    /**
+     * @param int $testId
+     *
+     * @return null|CQC_Testing_Model_Test
+     */
+    public function findTest($testId) {
+        return CQC_Testing_Model_Test::find($testId);
     }
 }

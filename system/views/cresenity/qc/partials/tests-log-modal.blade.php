@@ -39,7 +39,9 @@
                         <button x-bind:disabled="selectedTest.state == 'running' || selectedTest.state == 'queued'" x-on:click="runTest(selectedTest)" x-bind:class="'btn btn-sm btn-'+(selectedTest.state !== 'running' && selectedTest.state !== 'queued' ? 'danger' : 'secondary')">
                             <i class="fa fa-play"></i> run it
                         </button>
-
+                        <button class="btn btn-info" x-on:click="showCode(selectedTest)">
+                            <i class="fa fa-file"></i> show code
+                        </button>
 
                     </div>
                 </div>

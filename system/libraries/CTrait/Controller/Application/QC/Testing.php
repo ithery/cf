@@ -31,13 +31,14 @@ trait CTrait_Controller_Application_QC_Testing {
         $pollUrl = $this->controllerUrl() . 'poll';
         $resetUrl = $this->controllerUrl() . 'reset';
         $runAllUrl = $this->controllerUrl() . 'run/all';
+        $codeUrl = $this->controllerUrl() . 'code';
         $app->addView('cresenity.qc.tests', [
             'tests' => $tests,
             'runTestUrl' => $runTestUrl,
             'pollUrl' => $pollUrl,
             'resetUrl' => $resetUrl,
             'runAllUrl' => $runAllUrl,
-
+            'codeUrl' => $codeUrl,
         ]);
 
         return $app;
@@ -67,7 +68,9 @@ trait CTrait_Controller_Application_QC_Testing {
         $action->addClass('btn-info');
         $action->onClickListener()->addDialogHandler()
             ->setUrl($this->controllerUrl() . 'log/daemon')
-            ->setSidebar();
+            ->setSidebar()
+            ->setFull()
+            ->setTitle('Daemon Log');
     }
 
     public function daemon($method) {
@@ -155,10 +158,20 @@ trait CTrait_Controller_Application_QC_Testing {
 
             return $app;
         }
+
         return c::abort(404);
     }
 
     protected function success($data = []) {
         return CApp_Base::toJsonResponse(0, '', $data);
+    }
+
+    public function code() {
+        $app = c::app();
+        $test = CQC::manager()->testing()->repository()->findTest(c::request()->testId);
+        $file = $test->getFile();
+        $app->addDiv()->addPrismCode()->add(c::e(CFile::get($file)));
+
+        return $app;
     }
 }

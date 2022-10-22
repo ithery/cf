@@ -65,6 +65,8 @@ final class CF {
      */
     private static $sharedAppCode = [];
 
+    private static $forceAppCode = null;
+
     /**
      * Check CF is running on production.
      *
@@ -884,6 +886,9 @@ final class CF {
      * @return string
      */
     public static function appCode($domain = null) {
+        if (static::$forceAppCode) {
+            return static::$forceAppCode;
+        }
         if (CF::isCFCli() || CF::isTesting()) {
             if (CF::cliAppCode()) {
                 return CF::cliAppCode();
@@ -1206,10 +1211,13 @@ final class CF {
         if (is_callable($callback)) {
             $domain = CF::domain();
             $originalAppCode = static::appCode();
+
             if ($originalAppCode) {
+                static::$forceAppCode = $appCode;
                 static::$data[$domain]['app_code'] = $appCode;
                 $callback();
                 static::$data[$domain]['app_code'] = $originalAppCode;
+                static::$forceAppCode = null;
             }
         }
     }

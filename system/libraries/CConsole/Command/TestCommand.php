@@ -70,7 +70,7 @@ class CConsole_Command_TestCommand extends CConsole_Command {
             array_merge(
                 $this->arguments,
                 $this->phpunitArguments($options),
-                $phpunitArgs,
+                $this->reformatOptionsPath($phpunitArgs),
             )
         );
 

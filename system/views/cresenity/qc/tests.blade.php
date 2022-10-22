@@ -81,10 +81,10 @@
                     </td>
 
                     <td>
-                        {{-- <div x-on:click="editFile(test.edit_file_url)" class="table-link"> --}}
+                        <div x-on:click="showCode(test)" class="table-link">
                             <span class="table-test-path" x-text="test.path"></span><span class="table-test-name"
                                 x-text="test.name"></span>
-                        {{-- </div> --}}
+                        </div>
                     </td>
 
                     <td x-text="test.time"></td>
@@ -197,6 +197,22 @@
                 this.requestPost('{{ $runTestUrl }}',{
                     testId:test.testId
                 });
+            },
+            showCode(test) {
+                cresenity.modal({
+                    reload: {
+                        url:'{{ $codeUrl }}',
+                        method:'post',
+                        dataAddition: {
+                            testId:test.testId
+                        }
+                    },
+                    title:'Code of ' + test.name,
+                    isSidebar:true,
+                    isFull:true,
+
+                });
+
             },
             async requestPost(url,data = {}) {
                 return new Promise((resolve, reject) => {
