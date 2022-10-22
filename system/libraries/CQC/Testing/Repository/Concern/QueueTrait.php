@@ -47,25 +47,25 @@ trait CQC_Testing_Repository_Concern_QueueTrait {
      * @param bool $force
      */
     public function addTestToQueue($test, $force = false) {
-        if ($test->enabled && $test->suite->project->enabled && !$this->isEnqueued($test)) {
+        if ($test->enabled && !$this->isEnqueued($test)) {
             $test->updateSha1();
 
             QueueModel::updateOrCreate(['test_id' => $test->test_id]);
 
             // After queueing, if it's the only one, it may take the test and run it right away,
             // so we must wait a little for it to happen
-            sleep(1);
+            // sleep(1);
 
-            // We then get a fresh model, which may have a different state now
-            $test = $test->fresh();
+            // // We then get a fresh model, which may have a different state now
+            // $test = $test->fresh();
 
-            if ($force || !in_array($test->state, [CQC_Testing::STATE_RUNNING, CQC_Testing::STATE_QUEUED])) {
-                $test->state = CQC_Testing::STATE_QUEUED;
+            // if ($force || !in_array($test->state, [CQC_Testing::STATE_RUNNING, CQC_Testing::STATE_QUEUED])) {
+            //     $test->state = CQC_Testing::STATE_QUEUED;
 
-                $test->timestamps = false;
+            //     $test->timestamps = false;
 
-                $test->save();
-            }
+            //     $test->save();
+            // }
         }
     }
 

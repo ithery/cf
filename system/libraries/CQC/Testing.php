@@ -88,6 +88,9 @@ class CQC_Testing {
         if (CFile::isDirectory($unitPath = c::appRoot('default/tests/Unit'))) {
             $this->addSuite($unitPath);
         }
+        if (CFile::isDirectory($featurePath = c::appRoot('default/tests/Feature'))) {
+            $this->addSuite($featurePath);
+        }
         $loader = new CQC_Testing_Loader($this->repository);
         $loader->refreshSuites($this->suites);
     }

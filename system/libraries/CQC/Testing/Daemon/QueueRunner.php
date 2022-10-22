@@ -34,6 +34,7 @@ class CQC_Testing_Daemon_QueueRunner extends CDaemon_ServiceAbstract {
             $this->isIdle = false;
         }
         if (c::now()->diffInHours($this->lastActiveTime) > 1) {
+            $this->log('Stopping...');
             $this->stop();
         }
     }
@@ -52,11 +53,9 @@ class CQC_Testing_Daemon_QueueRunner extends CDaemon_ServiceAbstract {
 
         $run = $this->repository()->markTestAsRunning($test);
 
-        $command = CConsole::kernel()->cfCli()->call(CConsole_Command_TestCommand::class, $test->file);
+        //$this->log('Testing...' . $test->getFile());
 
-        chdir($test->suite->path);
-
-        $this->log('RUNNING: ' . $command . ' - at ' . $test->suite->project->path . ' - cwd:' . getcwd(), 'comment');
+        //$this->log('RUNNING: ' . $command . ' - at ' . $test->getFile() . ' - cwd:' . getcwd(), 'comment');
 
         $logOutput = '';
 
@@ -64,25 +63,30 @@ class CQC_Testing_Daemon_QueueRunner extends CDaemon_ServiceAbstract {
             if ($times > 0) {
                 $this->log('retrying...');
             }
+            $cfCli = CConsole::kernel()->cfCli();
 
-            $process = $this->executor->exec($command, $test->suite->project->path, function ($type, $buffer) use ($run, $test, &$logOutput) {
-                $logOutput .= $buffer;
+            $this->log('command:' . 'test ' . $test->getFile());
+            $exitCode = $cfCli->call('test ' . $test->getFile());
+            $lines = $cfCli->output();
+            // $process = $this->executor->exec($command, null, function ($type, $buffer) use ($run, $test, &$logOutput) {
+            //     $logOutput .= $buffer;
 
-                $this->repository()->updateRunLog($run, $this->getOutput($this->dataRepository->formatLog($logOutput, $test), $test));
+            //     $this->repository()->updateRunLog($run, $this->getOutput($this->dataRepository->formatLog($logOutput, $test), $test));
 
-                $this->log($buffer);
-            });
+            //     $this->log($buffer);
+            // });
 
-            $lines = $this->getOutput($process, $test);
-
-            if ($ok = $this->testPassed($process->getExitCode(), $test)) {
+            //$lines = $this->getOutput($process, $test);
+            $this->log($this->repository()->formatLog($lines, $test));
+            if ($ok = $this->testPassed($exitCode, $test)) {
                 break;
             }
         }
 
         $this->log($ok ? 'OK' : 'FAILED');
-
+        $this->log('Updating Result..');
         $this->repository()->storeTestResult($run, $test, $lines, $ok, $this->executor->startedAt, $this->executor->endedAt);
+        $this->log('Result Updated');
 
         return true;
     }

@@ -9,6 +9,13 @@ trait CQC_Testing_Repository_Concern_RunTrait {
     }
 
     /**
+     * Get all data from runs table.
+     */
+    public function getAllRun() {
+        return CQC_Testing_Model_Run::get();
+    }
+
+    /**
      * Create a new run record for a test.
      *
      * @param $test

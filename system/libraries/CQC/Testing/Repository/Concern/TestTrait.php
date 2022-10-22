@@ -175,10 +175,30 @@ trait CQC_Testing_Repository_Concern_TestTrait {
     }
 
     /**
+     * Run all test.
+     *
+     * @param bool $force
+     */
+    public function runAllTest($force = false) {
+        foreach (CQC_Testing_Model_Test::get() as $test) {
+            $this->runTest($test, $force);
+        }
+    }
+
+    /**
+     * Reset all tests.
+     */
+    public function resetAllTest() {
+        foreach (CQC_Testing_Model_Test::get() as $test) {
+            $this->resetTest($test);
+        }
+    }
+
+    /**
      * Enable a test.
      *
      * @param $enable
-     * @param \PragmaRX\Tddd\Package\Data\Models\Test $test
+     * @param \CQC_Testing_Model_Test $test
      */
     protected function enableTest($enable, $test) {
         $test->timestamps = false;

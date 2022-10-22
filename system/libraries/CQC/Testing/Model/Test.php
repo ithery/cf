@@ -1,5 +1,11 @@
 <?php
 /**
+ * @property      string                  $path
+ * @property      string                  $name
+ * @property      string                  $state
+ * @property      bool                    $enabled
+ * @property      int                     $suite_id
+ * @property-read int                     $test_id
  * @property-read CQC_Testing_Model_Suite $suite
  */
 class CQC_Testing_Model_Test extends CQC_Testing_AbstractModel {
@@ -11,6 +17,10 @@ class CQC_Testing_Model_Test extends CQC_Testing_AbstractModel {
         'name',
         'state',
         'sha1',
+    ];
+
+    protected $casts = [
+        'enabled' => 'bool',
     ];
 
     /**
@@ -71,5 +81,9 @@ class CQC_Testing_Model_Test extends CQC_Testing_AbstractModel {
      */
     public function sha1Changed() {
         return $this->sha1 !== @sha1_file($this->fullPath);
+    }
+
+    public function getFile() {
+        return c::makePath([$this->path, $this->name]);
     }
 }

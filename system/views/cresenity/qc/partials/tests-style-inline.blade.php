@@ -130,6 +130,9 @@
     .capp-testing-container .table-header .title {
         font-size: 1.8em;
     }
+    .capp-testing-container .terminal {
+        background-color: {{ $brandDarkest }};
+    }
 
     .capp-testing-container .dim {
         filter: alpha(opacity=40);
@@ -152,4 +155,5 @@
         opacity: 0.1;
         /* fx, safari, opera */
     }
+
 </style>

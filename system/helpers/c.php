@@ -1666,7 +1666,12 @@ class c {
         throw new Exception('callback is not callable');
     }
 
-    public static function makePath($parts) {
+    /**
+     * @param array $parts
+     *
+     * @return string
+     */
+    public static function makePath(array $parts) {
         $path = implode(DIRECTORY_SEPARATOR, $parts);
 
         while (strpos($path, DIRECTORY_SEPARATOR . DIRECTORY_SEPARATOR) !== false) {

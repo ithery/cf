@@ -133,25 +133,6 @@ class CQC_Testing_Repository {
     }
 
     /**
-     * Generates data for the javascript client.
-     */
-    public function getJavascriptClientData() {
-        $data = [
-            'routes' => [
-                'prefixes' => config('tddd.routes.prefixes'),
-            ],
-
-            'project_id' => request()->get('project_id'),
-
-            'test_id' => request()->get('test_id'),
-
-            'root' => config('tddd.root'),
-        ];
-
-        return json_encode($data);
-    }
-
-    /**
      * Get a list of png files to store in database.
      *
      * @param $test
@@ -168,7 +149,7 @@ class CQC_Testing_Repository {
             return;
         }
 
-        $screenshots = collect($screenshots)->map(function ($path) use ($test) {
+        $screenshots = c::collect($screenshots)->map(function ($path) use ($test) {
             return replace_suite_paths($test->suite, $path);
         });
 
@@ -218,21 +199,6 @@ class CQC_Testing_Repository {
         }
 
         return $this->CRToBr($lines);
-    }
-
-    /**
-     * @param $test
-     *
-     * @return string
-     */
-    protected function makeEditFileUrl($test) {
-        return route(
-            'tests-watcher.file.edit',
-            [
-                'filename' => base64_encode($test->path . DIRECTORY_SEPARATOR . $test->name),
-                'suite_id' => $test->suite->id,
-            ]
-        );
     }
 
     /**
@@ -295,7 +261,7 @@ class CQC_Testing_Repository {
     public function isExcluded($exclusions, $path, $file = '') {
         if ($file) {
             if (!$file instanceof SplFileInfo) {
-                $path = make_path([$path, $file]);
+                $path = c::makePath([$path, $file]);
             } else {
                 $path = $file->getPathname();
             }
@@ -370,8 +336,8 @@ class CQC_Testing_Repository {
             return;
         }
 
-        $file = replace_suite_paths($test->suite, make_path([
-            make_path([$test->suite->project->path, $outputFolder]),
+        $file = replace_suite_paths($test->suite, c::makePath([
+            c::makePath([$test->suite->path, $outputFolder]),
             str_replace(['.php', '::', '\\', '/'], ['', '.', '', ''], $test->name) . $extension,
         ]));
 
@@ -398,34 +364,6 @@ class CQC_Testing_Repository {
     }
 
     /**
-     * Make open file command.
-     *
-     * @param $file
-     * @param $line
-     * @param int $suite_id
-     *
-     * @return string
-     */
-    public function makeEditFileCommand($file, $line, $suite_id) {
-        $suite = $this->findSuiteById($suite_id);
-
-        $file = $this->addProjectRootPath(
-            base64_decode($file),
-            $suite
-        );
-
-        $command = trim(str_replace(
-            ['{file}', '{line}'],
-            [$file, $line],
-            $this->getEditorBinary($suite)
-        ));
-
-        return cstr::endsWith($command, ':')
-            ? substr($command, 0, -1)
-            : $command;
-    }
-
-    /**
      * Check if a file exists for a particular test.
      *
      * @param $filename
@@ -448,7 +386,7 @@ class CQC_Testing_Repository {
      * @return string
      */
     public function addProjectRootPath($fileName, $suite) {
-        if (starts_with($fileName, DIRECTORY_SEPARATOR) || empty($suite)) {
+        if (cstr::startsWith($fileName, DIRECTORY_SEPARATOR) || empty($suite)) {
             return $fileName;
         }
 

@@ -16,27 +16,27 @@
             </div>
 
             <div class="modal-body">
-                <div class="row">
+                <div class="row mb-3">
                     <div class="col-8">
-                        <div x-show="selectedTest.log" :class="'btn btn-pill ' + getPillColor('log')" x-on:click="setPanelLog()">
+                        <div x-show="selectedTest.log" x-bind:class="'btn btn-pill ' + getPillColor('log')" x-on:click="setPanel('log')">
                             command output
                         </div>
                         &nbsp;
-                        <div x-show="selectedTest.run.screenshots"  :class="'btn btn-pill ' + getPillColor('screenshot')" x-on:click="setPanelScreenshot()">
+                        <div x-show="selectedTest.run.screenshots"  x-bind:class="'btn btn-pill ' + getPillColor('screenshot')" x-on:click="setPanel('screenshot')">
                             screenshots
                         </div>
                         &nbsp;
-                        <div x-show="selectedTest.coverage.enabled"  :class="'btn btn-pill ' + getPillColor('coverage')" x-on:click="setPanelCoverage()">
+                        <div x-show="selectedTest.coverage.enabled && false"  x-bind:class="'btn btn-pill ' + getPillColor('coverage')" x-on:click="setPanel('coverage')">
                             coverage
                         </div>
                         &nbsp;
-                        <div v-if="selectedTest.html" :class="'btn btn-pill ' + getPillColor('html')" x-on:click="setPanelHtml()">
-                            {{ getHtmlPaneName() }}
+                        <div x-show="selectedTest.html" x-bind:class="'btn btn-pill ' + getPillColor('html')" x-on:click="setPanel('html')">
+                            <span x-text="getHtmlPanelName()"></span>
                         </div>
                     </div>
 
                     <div class="col-4 text-right">
-                        <button x-bind:disabled="selectedTest.state == 'running' || selectedTest.state == 'queued'" x-on:click="runTest(selectedTest.testId)" x-bind:class="'btn btn-sm btn-'+(selectedTest.state !== 'running' && selectedTest.state !== 'queued' ? 'danger' : 'secondary')">
+                        <button x-bind:disabled="selectedTest.state == 'running' || selectedTest.state == 'queued'" x-on:click="runTest(selectedTest)" x-bind:class="'btn btn-sm btn-'+(selectedTest.state !== 'running' && selectedTest.state !== 'queued' ? 'danger' : 'secondary')">
                             <i class="fa fa-play"></i> run it
                         </button>
 
@@ -50,7 +50,7 @@
 
                     <div x-show="selectedPanel == 'screenshot'" x-bind:class="'tab-pane ' + (selectedPanel == 'screenshot' ? 'active' : '')">
                         <div v-for="screenshot in JSON.parse(selectedTest.run.screenshots)" class="text-center">
-                            <h3>{{ String(screenshot).substring(screenshot.lastIndexOf('/') + 1) }}</h3>
+                            <h3 x-text="String(screenshot).substring(screenshot.lastIndexOf('/') + 1)"></h3>
                             <img x-bind:src="makeScreenshot(screenshot)" alt="screenshot" class="screenshot"/>
                         </div>
                     </div>

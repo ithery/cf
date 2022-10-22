@@ -25,6 +25,8 @@ class CQC_Testing_DaemonManager {
     }
 
     public function start() {
+        $this->daemonQueueRunner->rotateLog();
+
         return $this->daemonQueueRunner->start();
     }
 
@@ -33,6 +35,6 @@ class CQC_Testing_DaemonManager {
     }
 
     public function getLog() {
-        $this->daemonQueueRunner->getLog();
+        return $this->daemonQueueRunner->getLog();
     }
 }

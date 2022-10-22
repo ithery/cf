@@ -3,7 +3,7 @@
     <div class="card toolbar">
         <div class="card-block">
             <div class="row align-middle">
-                <div class="col-md-6 align-middle">
+                <div class="col-md-7 align-middle">
                     <span x-bind:class="'badge badge-'+stateColor('count')" x-text="'tests: '+statistics.count"></span>&nbsp;
                     <span x-bind:class="'badge badge-'+stateColor('ok')" x-text="'success: '+statistics.success"></span>&nbsp;
                     <span x-bind:class="'badge badge-'+stateColor('failed')" x-text="'failed: '+statistics.failed"></span>&nbsp;
@@ -14,7 +14,7 @@
                     <span x-bind:class="'badge badge-'+stateColor('queued')" x-text="'queued: '+statistics.queued"></span>&nbsp;
                 </div>
 
-                <div class="col-md-6 text-right align-middle">
+                <div class="col-md-5 text-right align-middle">
                     <div class="row">
                         <div class="col-md-5">
                             <div class="input-group mb-2 mb-sm-0 search-group">
@@ -27,10 +27,10 @@
                         </div>
 
                         <div class="col-md-7" v-if="selectedProject.enabled">
-                            <div class="btn btn-danger" @click="runAll()">
+                            <div class="btn btn-danger" x-on:click="runAll()">
                                 run all
                             </div>
-                            <div class="btn btn-warning" @click="reset()">
+                            <div class="btn btn-warning" x-on:click="reset()">
                                 reset state
                             </div>
                         </div>
@@ -65,7 +65,7 @@
                     </td>
 
                     <td>
-                        <div @click="runTest(test.id)" x-show="test.state !== 'running' && test.state !== 'queued'"
+                        <div x-on:click="runTest(test)" x-show="test.state !== 'running' && test.state !== 'queued'"
                             x-bind:class="'btn btn-sm btn-' + (test.state == 'failed' ? 'danger' : 'secondary')">
                             run
                         </div>
@@ -101,7 +101,7 @@
             </template>
         </tbody>
     </table>
-
+    @include('cresenity.qc.partials.tests-log-modal')
 </div>
 @CAppPushScript
 <script>
@@ -109,16 +109,37 @@
         return {
             tests: @json($tests),
             filter:'',
+            selectedPanel:null,
+            selectedTest:null,
+
             init() {
                 this.initPolling();
+            },
+            showLog(test) {
+                this.selectedTest = test;
+                this.selectedPanel = 'log';
+                jQuery('#capp-logModal').modal('show');
+            },
+            setPanel(panel) {
+                this.selectedPanel = panel;
             },
             resetFilter() {
                 this.filter = '';
             },
             get filteredTests() {
-                return this.tests;
+
+                const filtered = this.tests.filter((test)=>{
+                    return test.state.toLowerCase().includes(this.filter.toLowerCase())
+                        || test.name.toLowerCase().includes(this.filter.toLowerCase())
+                        || test.suiteName.toLowerCase().includes(this.filter.toLowerCase())
+                        || test.path.toLowerCase().includes(this.filter.toLowerCase());
+                });
+                return filtered;
             },
             get statistics() {
+                if(!this.tests) {
+                    return {};
+                }
                 return {
                     count : this.tests.length,
                     enabled : this.tests.filter((test) => test.enabled).length,
@@ -129,6 +150,12 @@
                     idle : this.tests.filter((test) => test.state=='idle').length,
 
                 }
+            },
+            getPillColor(button) {
+                if (button == this.selectedPanel) {
+                    return 'btn-primary';
+                }
+                return 'btn-outline-primary';
             },
 
             stateColor(state) {
@@ -157,9 +184,18 @@
             allEnabled() {
                 return this.statistics.count == this.statistics.enabled;
             },
+            runAll() {
+                jQuery('#capp-logModal').modal('hide');
+                this.requestPost('{{ $runAllUrl }}');
+            },
+            reset() {
+                jQuery('#capp-logModal').modal('hide');
+                this.requestPost('{{ $resetUrl }}');
+            },
             runTest(test) {
-                requestPost('{{ $runTestUrl }}',{
-                    file:test.file
+                jQuery('#capp-logModal').modal('hide');
+                this.requestPost('{{ $runTestUrl }}',{
+                    testId:test.testId
                 });
             },
             async requestPost(url,data = {}) {
@@ -168,13 +204,13 @@
                     $.ajax({
                         url: url,
                         cache: false,
-                        type: 'get',
+                        type: 'post',
                         dataType: 'json',
+                        contentType: 'application/json',
                         processData: false,
-                        contentType: false,
-                        data: data,
+                        data: JSON.stringify(data),
                         success: function(responseData) {
-                            console.log('responseData', responseData);
+                            //console.log('responseData', responseData);
                             if (typeof responseData.errCode === 'undefined') {
                                 cresenity.toast('error','Unknown error');
                                 return resolve(false);
@@ -203,11 +239,14 @@
                     });
                 });
             },
-
+            async loadData() {
+                const data = await this.requestPost('{{ $pollUrl }}');
+                this.tests = data;
+            },
             initPolling() {
                 setInterval(() => {
                     this.loadData();
-                }, 300);
+                }, 1000);
             },
         }
     }

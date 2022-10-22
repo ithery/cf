@@ -9,6 +9,7 @@ use Dotenv\Parser\Parser;
 use Dotenv\Store\StoreBuilder;
 use Symfony\Component\Process\Process;
 use Dotenv\Exception\InvalidPathException;
+use Symfony\Component\Process\PhpExecutableFinder;
 use Symfony\Component\Process\Exception\ProcessSignaledException;
 
 /**
@@ -20,7 +21,7 @@ class CConsole_Command_TestCommand extends CConsole_Command {
      *
      * @var string
      */
-    protected $signature = 'test {--without-tty : Disable output to TTY}';
+    protected $signature = 'test {phpunitArgs?*} {--without-tty : Disable output to TTY}';
 
     /**
      * The console command description.
@@ -59,22 +60,21 @@ class CConsole_Command_TestCommand extends CConsole_Command {
         if ((int) \PHPUnit\Runner\Version::id()[0] < 9) {
             throw new RuntimeException('Running Collision ^5.0 artisan test command requires PHPUnit ^9.0.');
         }
+        //$options = array_slice(isset($_SERVER['argv']) ? $_SERVER['argv'] : [], $this->option('without-tty') ? 3 : 2);
+        $options = [];
+        $phpunitArgs = carr::get($this->input->getArguments(), 'phpunitArgs');
 
-        $options = array_slice(isset($_SERVER['argv']) ? $_SERVER['argv'] : [], $this->option('without-tty') ? 3 : 2);
-        $options = c::collect($options)->reject(function ($option) {
-            return cstr::startsWith($option, 'app:');
-        })->toArray();
 
         $commands = array_merge(
             $this->binary(),
             array_merge(
                 $this->arguments,
-                $this->phpunitArguments($options)
+                $this->phpunitArguments($options),
+                $phpunitArgs,
             )
         );
 
         //$this->clearEnv();
-
         $process = (new Process($commands))->setTimeout(null);
 
         try {
@@ -107,10 +107,19 @@ class CConsole_Command_TestCommand extends CConsole_Command {
         $command = DOCROOT . '.bin' . DS . 'phpunit' . DS . 'phpunit';
 
         if ('phpdbg' === PHP_SAPI) {
-            return [PHP_BINARY, '-qrr', $command];
+            return [$this->getPhpBinary(), '-qrr', $command];
         }
 
-        return [PHP_BINARY, $command];
+        return [$this->getPhpBinary(), $command];
+    }
+
+    /**
+     * @return false|string
+     */
+    protected function getPhpBinary() {
+        $executableFinder = new PhpExecutableFinder();
+
+        return $executableFinder->find();
     }
 
     /**

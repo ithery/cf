@@ -29,10 +29,14 @@ trait CTrait_Controller_Application_QC_Testing {
 
         $runTestUrl = $this->controllerUrl() . 'run';
         $pollUrl = $this->controllerUrl() . 'poll';
+        $resetUrl = $this->controllerUrl() . 'reset';
+        $runAllUrl = $this->controllerUrl() . 'run/all';
         $app->addView('cresenity.qc.tests', [
             'tests' => $tests,
             'runTestUrl' => $runTestUrl,
             'pollUrl' => $pollUrl,
+            'resetUrl' => $resetUrl,
+            'runAllUrl' => $runAllUrl,
 
         ]);
 
@@ -77,12 +81,40 @@ trait CTrait_Controller_Application_QC_Testing {
         return c::redirect()->back();
     }
 
-    public function run() {
+    public function reset() {
+        CQC::manager()->testing()->repository()->resetAllTest();
+
+        return $this->success();
+    }
+
+    public function run($all = null) {
+        $testId = c::request()->testId;
+        $result = [];
+
+        if ($all == 'all') {
+            $result = CQC::manager()->testing()->repository()->runAllTest();
+        } else {
+            if ($testId) {
+                $result = CQC::manager()->testing()->repository()->runTest($testId);
+            }
+        }
+
+        return $this->success($result);
+    }
+
+    public function test() {
+        $cfCli = CConsole::kernel()->cfCli();
+        $exitCode = $cfCli->call('test /home/appittro/public_html/application/semut/default/tests/Unit/UtilsTest.php');
+
+        $output = $cfCli->output();
+        cdbg::dd($output, $exitCode);
         $test = CQC_Testing_Model_Test::find(1);
         $ok = false;
 
         $lines = '';
         $repository = CQC::manager()->testing()->repository();
+
+        cdbg::dd($repository->getAllRun());
         $run = $repository->markTestAsRunning($test);
         $file = $test->path . DS . $test->name;
 
@@ -112,7 +144,7 @@ trait CTrait_Controller_Application_QC_Testing {
     public function poll() {
         $tests = CQC::manager()->testing()->repository()->getTests()->toArray();
 
-        return CApp_Base::toJsonResponse(0, '', $tests);
+        return $this->success($tests);
     }
 
     public function log($method) {
@@ -125,5 +157,9 @@ trait CTrait_Controller_Application_QC_Testing {
         }
         echo $method;
         //return c::abort(404);
+    }
+
+    protected function success($data = []) {
+        return CApp_Base::toJsonResponse(0, '', $data);
     }
 }
