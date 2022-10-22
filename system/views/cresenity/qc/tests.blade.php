@@ -58,7 +58,7 @@
 
         <tbody>
             <template x-for="(test, i) in filteredTests">
-                <tr x-bind:class="!test.enabled ? 'dim' : ''">
+                <tr x-bind:class="(!test.enabled ? 'dim' : '') + ' ' + (test.isLoading ? 'pale' : '')">
                     {{-- <td>
                         <input type="checkbox" class="testCheckbox" @click="toggleTest(test)"
                             x-bind:checked="test.enabled" />
@@ -197,6 +197,12 @@
                 this.requestPost('{{ $runTestUrl }}',{
                     testId:test.testId
                 });
+                const finded = this.tests.find((t) => {
+                    return t.testId==test.testId
+                });
+                if(finded) {
+                    finded.isLoading=true;
+                }
             },
             showCode(test) {
                 cresenity.modal({
@@ -264,7 +270,7 @@
             initPolling() {
                 setInterval(() => {
                     this.loadData();
-                }, 1000);
+                }, 500);
             },
         }
     }

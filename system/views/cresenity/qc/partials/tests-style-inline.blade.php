@@ -146,13 +146,13 @@
     }
 
     .capp-testing-container .pale {
-        filter: alpha(opacity=10);
+        filter: alpha(opacity=60);
         /* internet explorer */
-        -khtml-opacity: 0.1;
+        -khtml-opacity: 0.6;
         /* khtml, old safari */
-        -moz-opacity: 0.1;
+        -moz-opacity: 0.6;
         /* mozilla, netscape */
-        opacity: 0.1;
+        opacity: 0.6;
         /* fx, safari, opera */
     }
 
