@@ -84,15 +84,37 @@ class CVendor_Zenziva {
             'userkey' => $this->username,
             'passkey' => $this->password,
             'nohp' => $this->to,
+            'to' => $this->to,
             'pesan' => $this->message,
+            'message' => $this->message,
         ];
 
         $client = new Client();
 
         try {
             $response = $client->request('POST', $this->url(), ['form_params' => $options]);
+            $json = $response->getBody()->getContents();
 
-            $this->lastResponse = json_decode($response->getBody()->getContents());
+            try {
+                $xml = simplexml_load_string($json);
+                $json = json_encode($xml);
+            } catch (Exception $ex) {
+                //do nothing
+            }
+
+            $array = json_decode($json, true);
+            //cdbg::dd($array, json_last_error_msg());
+            if (!is_array($array)) {
+                throw new Exception('Invalid Zenziva Response');
+            }
+            if (isset($array['message'])) {
+                $message = $array['message'];
+                if (carr::get($message, 'status') != 0) {
+                    throw new Exception(carr::get($message, 'text'));
+                }
+            }
+
+            $this->lastResponse = $array;
             $this->responses[] = $this->lastResponse;
 
             return true;
@@ -109,6 +131,7 @@ class CVendor_Zenziva {
 
         switch ($this->subdomain) {
             case 'reguler':
+                return 'https://console.zenziva.net/reguler/api/sendsms/';
             case 'alpha':
                 $path = '/apps/smsapi.php';
 
