@@ -21,4 +21,9 @@ return [
         'label' => c::__('Table Cell'),
         'uri' => 'demo/elements/table/cell/index',
     ],
+    [
+        'name' => 'elements.table.export',
+        'label' => c::__('Table Export'),
+        'uri' => 'demo/elements/table/export/index',
+    ],
 ];
