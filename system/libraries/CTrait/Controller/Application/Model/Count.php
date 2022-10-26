@@ -47,7 +47,7 @@ trait CTrait_Controller_Application_Model_Count {
         $cardContainer = $app->addDiv()->addClass('row');
 
         foreach ($this->models as $model) {
-            $name = preg_replace('/(.*_)/', '', $model);
+            $name = c::classBasename($model);
             $count = $model::where('created', '>=', $dateStart)->where('created', '<=', $dateEnd)->count();
 
             $div = $cardContainer->addDiv()
