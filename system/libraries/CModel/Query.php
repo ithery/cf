@@ -454,7 +454,7 @@ class CModel_Query {
      * @return CModel
      */
     public function updateOrCreate(array $attributes, array $values = []) {
-        return $this->tap($this->firstOrNew($attributes), function ($instance) use ($values) {
+        return c::tap($this->firstOrNew($attributes), function ($instance) use ($values) {
             $instance->fill($values)->save();
         });
     }

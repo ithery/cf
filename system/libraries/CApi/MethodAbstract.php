@@ -105,7 +105,12 @@ abstract class CApi_MethodAbstract implements CInterface_Arrayable {
 
     public function request() {
         if ($this->request == null) {
-            return array_merge($_GET, $_POST);
+            $request = [];
+            if ($this->apiRequest && $this->apiRequest instanceof CApi_HTTP_Request) {
+                $request = $this->apiRequest->all();
+            }
+
+            return array_merge($_GET, $_POST, $request);
         }
 
         return $this->request;

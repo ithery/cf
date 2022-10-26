@@ -411,6 +411,7 @@ trait CApp_Trait_BaseTrait {
         if (CF::isProduction()) {
             return false;
         }
+
         $domain = CF::domain();
         $pos = strpos($domain, 'app.ittron.co.id');
         if ($pos === false) {

@@ -47,6 +47,8 @@ class CCron_Runner {
         } else {
             if ($output) {
                 $output->writeln('<info>Skipping command (has already run on another server):</info> ' . $event->getSummaryForDisplay());
+            } else {
+                $event->log('Skipping command (has already run on another server): ' . $event->getSummaryForDisplay());
             }
         }
     }
@@ -68,9 +70,10 @@ class CCron_Runner {
         $start = microtime(true);
 
         try {
+            $event->log('Starting scheduled job : ' . $event->getSummaryForDisplay());
             $event->run();
             $runtime = round(microtime(true) - $start, 2);
-            $event->log('Run scheduled job : ' . $event->getSummaryForDisplay() . " [${runtime}s]");
+            $event->log('Ended scheduled job : ' . $event->getSummaryForDisplay() . " [${runtime}s]");
 
             CEvent::dispatch(new CCron_Event_ScheduledTaskFinished(
                 $event,
@@ -81,20 +84,20 @@ class CCron_Runner {
         } catch (Throwable $e) {
             CEvent::dispatch(new CCron_Event_ScheduledTaskFailed($event, $e));
             CException::exceptionHandler()->report($e);
-            $event->log();
-            $event->log(str_repeat('#', 64));
-            $event->log('# Error : ' . $e->getMessage() . "\n# " . $e->getFile() . ' (' . $e->getLine() . ')');
-            $event->log(str_repeat('#', 64));
-            $event->log();
+            $this->writeError($event, $e);
         } catch (Exception $e) {
             CEvent::dispatch(new CCron_Event_ScheduledTaskFailed($event, $e));
             CException::exceptionHandler()->report($e);
-            $event->log();
-            $event->log(str_repeat('#', 64));
-            $event->log('# Error : ' . $e->getMessage() . "\n# " . $e->getFile() . ' (' . $e->getLine() . ')');
-            $event->log(str_repeat('#', 64));
-            $event->log();
+            $this->writeError($event, $e);
         }
         CCron::unsetEvent();
+    }
+
+    private function writeError($event, $exception) {
+        $event->log();
+        $event->log(str_repeat('#', 64));
+        $event->log('# Error : ' . $exception->getMessage() . "\n# " . $exception->getFile() . ' (' . $exception->getLine() . ')');
+        $event->log(str_repeat('#', 64));
+        $event->log();
     }
 }

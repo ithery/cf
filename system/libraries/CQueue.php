@@ -77,7 +77,7 @@ final class CQueue {
         // foreach (['Null', 'Sync', 'Database', 'Redis', 'Beanstalkd', 'Sqs'] as $connector) {
         //     self::{"register{$connector}Connector"}($manager);
         // }
-        foreach (['Null', 'Sync', 'Database', 'Redis', 'AsyncRedis', 'Beanstalkd', 'Sqs'] as $connector) {
+        foreach (['Null', 'Sync', 'Database', 'Redis', 'AsyncRedis', 'Beanstalkd', 'Sqs', 'File'] as $connector) {
             self::{"register{$connector}Connector"}($manager);
         }
     }
@@ -92,6 +92,19 @@ final class CQueue {
     protected static function registerNullConnector($manager) {
         $manager->addConnector('null', function () {
             return new CQueue_Connector_NullConnector();
+        });
+    }
+
+    /**
+     * Register the File queue connector.
+     *
+     * @param CQueue_Manager $manager
+     *
+     * @return void
+     */
+    protected static function registerFileConnector($manager) {
+        $manager->addConnector('file', function () {
+            return new CQueue_Connector_FileConnector();
         });
     }
 

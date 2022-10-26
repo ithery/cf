@@ -2,6 +2,6 @@
 
 return [
     'cache' => [
-        'store' => 'default'
+        'store' => 'file'
     ],
 ];

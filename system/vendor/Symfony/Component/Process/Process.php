@@ -320,7 +320,7 @@ class Process implements \IteratorAggregate {
      * @throws LogicException   In case a callback is provided and output has been disabled
      */
     public function start(callable $callback = null, $env = []) {
-        if($env == null) {
+        if ($env == null) {
             $env = [];
         }
         if ($this->isRunning()) {
@@ -337,7 +337,6 @@ class Process implements \IteratorAggregate {
             $env += '\\' === \DIRECTORY_SEPARATOR ? array_diff_ukey($this->env, $env, 'strcasecmp') : $this->env;
         }
         $env += '\\' === \DIRECTORY_SEPARATOR ? array_diff_ukey($this->getDefaultEnv(), $env, 'strcasecmp') : $this->getDefaultEnv();
-
 
         if (\is_array($commandline = $this->commandline)) {
             $commandline = implode(' ', array_map([$this, 'escapeArgument'], $commandline));
@@ -367,7 +366,7 @@ class Process implements \IteratorAggregate {
         $envPairs = [];
         foreach ($env as $k => $v) {
             if (false !== $v && false === \in_array($k, ['argc', 'argv', 'ARGC', 'ARGV'], true)) {
-                $envPairs[] = $k.'='.$v;
+                $envPairs[] = $k . '=' . $v;
             }
         }
 
@@ -1682,19 +1681,19 @@ class Process implements \IteratorAggregate {
                 }
 
                 $value = str_replace(['!LF!', '"^!"', '"^%"', '"^^"', '""'], ["\n", '!', '%', '^', '"'], $value);
-                $value = '"'.preg_replace('/(\\\\*)"/', '$1$1\\"', $value).'"';
-                $var = $uid.++$varCount;
+                $value = '"' . preg_replace('/(\\\\*)"/', '$1$1\\"', $value) . '"';
+                $var = $uid . ++$varCount;
 
                 $env[$var] = $value;
 
-                return $varCache[$m[0]] = '!'.$var.'!';
+                return $varCache[$m[0]] = '!' . $var . '!';
             },
             $cmd
         );
 
-        $cmd = 'cmd /V:ON /E:ON /D /C ('.str_replace("\n", ' ', $cmd).')';
+        $cmd = 'cmd /V:ON /E:ON /D /C (' . str_replace("\n", ' ', $cmd) . ')';
         foreach ($this->processPipes->getFiles() as $offset => $filename) {
-            $cmd .= ' '.$offset.'>"'.$filename.'"';
+            $cmd .= ' ' . $offset . '>"' . $filename . '"';
         }
 
         return $cmd;
@@ -1754,16 +1753,34 @@ class Process implements \IteratorAggregate {
     private function replacePlaceholders($commandline, array $env) {
         return preg_replace_callback('/"\$\{:([_a-zA-Z]++[_a-zA-Z0-9]*+)\}"/', function ($matches) use ($commandline, $env) {
             if (!isset($env[$matches[1]]) || false === $env[$matches[1]]) {
-                throw new InvalidArgumentException(sprintf('Command line is missing a value for parameter "%s": ', $matches[1]).$commandline);
+                throw new InvalidArgumentException(sprintf('Command line is missing a value for parameter "%s": ', $matches[1]) . $commandline);
             }
 
             return $this->escapeArgument($env[$matches[1]]);
         }, $commandline);
     }
-    private function getDefaultEnv() {
-        $env = getenv();
-        $env = ('\\' === \DIRECTORY_SEPARATOR ? array_intersect_ukey($env, $_SERVER, 'strcasecmp') : array_intersect_key($env, $_SERVER)) ?: $env;
 
-        return $_ENV + ('\\' === \DIRECTORY_SEPARATOR ? array_diff_ukey($env, $_ENV, 'strcasecmp') : $env);
+    private function getDefaultEnv() {
+        if (version_compare(PHP_VERSION, '6.0.0') >= 0) {
+            $env = getenv();
+            $env = ('\\' === \DIRECTORY_SEPARATOR ? array_intersect_ukey($env, $_SERVER, 'strcasecmp') : array_intersect_key($env, $_SERVER)) ?: $env;
+
+            return $_ENV + ('\\' === \DIRECTORY_SEPARATOR ? array_diff_ukey($env, $_ENV, 'strcasecmp') : $env);
+        }
+        $env = [];
+
+        foreach ($_SERVER as $k => $v) {
+            if (\is_string($v) && false !== $v = getenv($k)) {
+                $env[$k] = $v;
+            }
+        }
+
+        foreach ($_ENV as $k => $v) {
+            if (\is_string($v)) {
+                $env[$k] = $v;
+            }
+        }
+
+        return $env;
     }
 }
