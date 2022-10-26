@@ -62,7 +62,7 @@ trait CTrait_Controller_Application_Model_Count {
             $div->addSpan()->addClass('fas fa-database text-success display-4 mr-3');
             $datail = $div->addDiv();
             $datail->addDiv()->add($name)->setAttr('style', 'font-size:18px;font-weight:600');
-            $datail->addDiv()->add($count)->setAttr('style', 'font-size:14px;font-weight:400');
+            $datail->addDiv()->add(c::formatter()->formatNumber($count))->setAttr('style', 'font-size:14px;font-weight:400');
         }
 
         return $app;
