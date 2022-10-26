@@ -3,10 +3,19 @@ use Symfony\Component\Process\Process;
 use Symfony\Component\Process\PhpExecutableFinder;
 
 class CDaemon_Runner {
+    /**
+     * @var string
+     */
     protected $serviceClass;
 
+    /**
+     * @var string
+     */
     protected $domain;
 
+    /**
+     * @var bool
+     */
     protected $debug = false;
 
     public function __construct($serviceClass, $domain = null) {
@@ -51,6 +60,13 @@ class CDaemon_Runner {
         }
 
         return false;
+    }
+
+    /**
+     * @return string
+     */
+    public function getServiceClass() {
+        return $this->serviceClass;
     }
 
     public function getPid() {

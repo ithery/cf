@@ -14,7 +14,7 @@ class CCron_CacheEventMutex implements CCron_Contract_EventMutexInterface, CCron
      * @return void
      */
     public function __construct() {
-        $this->store = CF::config('schedule.cache.store');
+        $this->store = CF::config('cron.cache.store');
     }
 
     /**
