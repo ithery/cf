@@ -106,11 +106,10 @@ trait CTrait_Controller_Application_Log_Notification {
         $widget = $app->addWidget();
         $widget->setTitle('Message');
         $widget->setNoPadding();
-        $widget->addIframe()->setSrc($this->controllerUrl() . 'iframe/'.$logNotificationId)
+        $widget->addIframe()->setSrc($this->controllerUrl() . 'iframe/' . $logNotificationId)
             ->customCss('width', '100%')
             ->customCss('border', 'none')
             ->customCss('height', '500px');
-
 
         return $app;
     }
@@ -125,19 +124,5 @@ trait CTrait_Controller_Application_Log_Notification {
         $logNotificationModel = $logNotificationModel::findOrFail($logNotificationId);
 
         return c::response($logNotificationModel->message);
-    }
-
-    private function transformToString($value) {
-        if ($value instanceof CCarbon) {
-            $value = (string) $value;
-        }
-        if (is_array($value)) {
-            $value = json_encode($value);
-        }
-        if (is_object($value)) {
-            $value = json_encode($value);
-        }
-
-        return $value;
     }
 }
