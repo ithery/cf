@@ -736,6 +736,36 @@ class cstr {
     }
 
     /**
+     * Replace text within a portion of a string.
+     *
+     * @param string|string[] $string
+     * @param string|string[] $replace
+     * @param int|int[]       $offset
+     * @param null|int|int[]  $length
+     *
+     * @return string|string[]
+     */
+    public static function substrReplace($string, $replace, $offset = 0, $length = null) {
+        if ($length === null) {
+            $length = strlen($string);
+        }
+
+        return substr_replace($string, $replace, $offset, $length);
+    }
+
+    /**
+     * Swap multiple keywords in a string with other keywords.
+     *
+     * @param array  $map
+     * @param string $subject
+     *
+     * @return string
+     */
+    public static function swap(array $map, $subject) {
+        return strtr($subject, $map);
+    }
+
+    /**
      * Return the length of the given string.
      *
      * @param string $value
@@ -1171,20 +1201,36 @@ class cstr {
     }
 
     /**
-     * Uppercase words that are not separated by spaces, using a custom
-     * delimiter or the default.
+     * Make a string's first character lowercase.
      *
-     *      $str = cstr::ucfirst('content-type'); // returns "Content-Type"
-     *
-     * @param string $string    string to transform
-     * @param string $delimiter delimiter to use
-     *
-     * @uses    CUTF8::ucfirst
+     * @param string $string
      *
      * @return string
      */
-    public static function ucfirst($string, $delimiter = ' ') {
+    public static function lcfirst($string) {
+        return static::lower(static::substr($string, 0, 1)) . static::substr($string, 1);
+    }
+
+    /**
+     * Make a string's first character uppercase.
+     *
+     * @param string $string
+     *
+     * @return string
+     */
+    public static function ucfirst($string) {
         return static::upper(static::substr($string, 0, 1)) . static::substr($string, 1);
+    }
+
+    /**
+     * Split a string into pieces by uppercase characters.
+     *
+     * @param string $string
+     *
+     * @return string[]
+     */
+    public static function ucsplit($string) {
+        return preg_split('/(?=\p{Lu})/u', $string, -1, PREG_SPLIT_NO_EMPTY);
     }
 
     /**
@@ -1207,15 +1253,6 @@ class cstr {
         return static::$uuidFactory
             ? call_user_func(static::$uuidFactory)
             : Uuid::uuid4();
-    }
-
-    /**
-     * Generate a ULID.
-     *
-     * @return \Symfony\Component\Uid\Ulid
-     */
-    public static function ulid() {
-        return new Ulid();
     }
 
     /**
@@ -1254,12 +1291,82 @@ class cstr {
     }
 
     /**
+     * Set the sequence that will be used to generate UUIDs.
+     *
+     * @param array         $sequence
+     * @param null|callable $whenMissing
+     *
+     * @return void
+     */
+    public static function createUuidsUsingSequence(array $sequence, $whenMissing = null) {
+        $next = 0;
+
+        if ($whenMissing == null) {
+            $whenMissing = function () use (&$next) {
+                $factoryCache = static::$uuidFactory;
+
+                static::$uuidFactory = null;
+
+                $uuid = static::uuid();
+
+                static::$uuidFactory = $factoryCache;
+
+                $next++;
+
+                return $uuid;
+            };
+        }
+
+        static::createUuidsUsing(function () use (&$next, $sequence, $whenMissing) {
+            if (array_key_exists($next, $sequence)) {
+                return $sequence[$next++];
+            }
+
+            return $whenMissing();
+        });
+    }
+
+    /**
+     * Always return the same UUID when generating new UUIDs.
+     *
+     * @param null|\Closure $callback
+     *
+     * @return \Ramsey\Uuid\UuidInterface
+     */
+    public static function freezeUuids(Closure $callback = null) {
+        $uuid = cstr::uuid();
+
+        cstr::createUuidsUsing(function () use ($uuid) {
+            return $uuid;
+        });
+
+        if ($callback !== null) {
+            try {
+                $callback($uuid);
+            } finally {
+                cstr::createUuidsNormally();
+            }
+        }
+
+        return $uuid;
+    }
+
+    /**
      * Indicate that UUIDs should be created normally and not using a custom factory.
      *
      * @return void
      */
     public static function createUuidsNormally() {
         static::$uuidFactory = null;
+    }
+
+    /**
+     * Generate a ULID.
+     *
+     * @return \Symfony\Component\Uid\Ulid
+     */
+    public static function ulid() {
+        return new Ulid();
     }
 
     /**
