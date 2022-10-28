@@ -1,13 +1,6 @@
 <?php
 
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
-
 interface CVendor_Google_Recaptcha_Http_ResponseInterface extends CInterface_Arrayable, CInterface_Jsonable, JsonSerializable {
-
     /**
      * Get error codes.
      *
@@ -23,28 +16,28 @@ interface CVendor_Google_Recaptcha_Http_ResponseInterface extends CInterface_Arr
     public function getHostname();
 
     /**
-     * Get challenge timestamp
+     * Get challenge timestamp.
      *
      * @return string
      */
     public function getChallengeTs();
 
     /**
-     * Get APK package name
+     * Get APK package name.
      *
      * @return string
      */
     public function getApkPackageName();
 
     /**
-     * Get score
+     * Get score.
      *
      * @return float
      */
     public function getScore();
 
     /**
-     * Get action
+     * Get action.
      *
      * @return string
      */
@@ -58,7 +51,7 @@ interface CVendor_Google_Recaptcha_Http_ResponseInterface extends CInterface_Arr
     /**
      * Build the response from the expected JSON returned by the service.
      *
-     * @param  string  $json
+     * @param string $json
      *
      * @return CVendor_Google_Recaptcha_Http_ResponseV3
      */
@@ -67,7 +60,7 @@ interface CVendor_Google_Recaptcha_Http_ResponseInterface extends CInterface_Arr
     /**
      * Build the response from an array.
      *
-     * @param  array  $array
+     * @param array $array
      *
      * @return CVendor_Google_Recaptcha_Http_ResponseV3
      */
@@ -88,7 +81,7 @@ interface CVendor_Google_Recaptcha_Http_ResponseInterface extends CInterface_Arr
     /**
      * Check the score.
      *
-     * @param  float  $score
+     * @param float $score
      *
      * @return bool
      */
@@ -97,7 +90,7 @@ interface CVendor_Google_Recaptcha_Http_ResponseInterface extends CInterface_Arr
     /**
      * Check the hostname.
      *
-     * @param  string  $hostname
+     * @param string $hostname
      *
      * @return bool
      */
@@ -106,7 +99,7 @@ interface CVendor_Google_Recaptcha_Http_ResponseInterface extends CInterface_Arr
     /**
      * Check the action name.
      *
-     * @param  string  $action
+     * @param string $action
      *
      * @return bool
      */
