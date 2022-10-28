@@ -58,6 +58,13 @@ class CAuth_Guard_SessionGuard implements CAuth_Contract_StatefulGuardInterface,
     protected $events;
 
     /**
+     * The timebox instance.
+     *
+     * @var \CBase_Timebox
+     */
+    protected $timebox;
+
+    /**
      * Indicates if the logout method has been called.
      *
      * @var bool
@@ -91,6 +98,7 @@ class CAuth_Guard_SessionGuard implements CAuth_Contract_StatefulGuardInterface,
         $this->session = $session;
         $this->request = $request;
         $this->provider = $provider;
+        $this->timebox = new CBase_Timebox();
     }
 
     /**
@@ -361,13 +369,16 @@ class CAuth_Guard_SessionGuard implements CAuth_Contract_StatefulGuardInterface,
      * @return bool
      */
     protected function hasValidCredentials($user, $credentials) {
-        $validated = !is_null($user) && $this->provider->validateCredentials($user, $credentials);
+        return $this->timebox->call(function ($timebox) use ($user, $credentials) {
+            $validated = !is_null($user) && $this->provider->validateCredentials($user, $credentials);
 
-        if ($validated) {
-            $this->fireValidatedEvent($user);
-        }
+            if ($validated) {
+                $timebox->returnEarly();
+                $this->fireValidatedEvent($user);
+            }
 
-        return $validated;
+            return $validated;
+        }, 200 * 1000);
     }
 
     /**
@@ -864,5 +875,14 @@ class CAuth_Guard_SessionGuard implements CAuth_Contract_StatefulGuardInterface,
         $this->user = null;
 
         $this->loggedOut = true;
+    }
+
+    /**
+     * Get the timebox instance used by the guard.
+     *
+     * @return \CBase_Timebox
+     */
+    public function getTimebox() {
+        return $this->timebox;
     }
 }
