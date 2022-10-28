@@ -67,6 +67,17 @@ class CBase_String implements Stringable {
     }
 
     /**
+     * Append a new line to the string.
+     *
+     * @param int $count
+     *
+     * @return $this
+     */
+    public function newLine($count = 1) {
+        return $this->append(str_repeat(PHP_EOL, $count));
+    }
+
+    /**
      * Transliterate a UTF-8 value to ASCII.
      *
      * @param string $language
@@ -129,6 +140,18 @@ class CBase_String implements Stringable {
      */
     public function between($from, $to) {
         return new static(cstr::between($this->value, $from, $to));
+    }
+
+    /**
+     * Get the smallest possible portion of a string between two given values.
+     *
+     * @param string $from
+     * @param string $to
+     *
+     * @return static
+     */
+    public function betweenFirst($from, $to) {
+        return new static(cstr::betweenFirst($this->value, $from, $to));
     }
 
     /**
@@ -258,6 +281,24 @@ class CBase_String implements Stringable {
     }
 
     /**
+     * Determine if a given string is valid JSON.
+     *
+     * @return bool
+     */
+    public function isJson() {
+        return cstr::isJson($this->value);
+    }
+
+    /**
+     * Determine if a given string is a valid UUID.
+     *
+     * @return bool
+     */
+    public function isUuid() {
+        return cstr::isUuid($this->value);
+    }
+
+    /**
      * Determine if the given string is empty.
      *
      * @return bool
@@ -317,6 +358,42 @@ class CBase_String implements Stringable {
     }
 
     /**
+     * Convert GitHub flavored Markdown into HTML.
+     *
+     * @param array $options
+     *
+     * @return static
+     */
+    public function markdown(array $options = []) {
+        return new static(cstr::markdown($this->value, $options));
+    }
+
+    /**
+     * Convert inline Markdown into HTML.
+     *
+     * @param array $options
+     *
+     * @return static
+     */
+    public function inlineMarkdown(array $options = []) {
+        return new static(cstr::inlineMarkdown($this->value, $options));
+    }
+
+    /**
+     * Masks a portion of a string with a repeated character.
+     *
+     * @param string   $character
+     * @param int      $index
+     * @param null|int $length
+     * @param string   $encoding
+     *
+     * @return static
+     */
+    public function mask($character, $index, $length = null, $encoding = 'UTF-8') {
+        return new static(cstr::mask($this->value, $character, $index, $length, $encoding));
+    }
+
+    /**
      * Get the string matching the given pattern.
      *
      * @param string $pattern
@@ -348,6 +425,17 @@ class CBase_String implements Stringable {
         }
 
         return c::collect(isset($matches[1]) ? $matches[1] : $matches[0]);
+    }
+
+    /**
+     * Determine if the string matches the given pattern.
+     *
+     * @param string $pattern
+     *
+     * @return bool
+     */
+    public function test($pattern) {
+        return $this->match($pattern)->isNotEmpty();
     }
 
     /**
@@ -439,7 +527,7 @@ class CBase_String implements Stringable {
      * @return static
      */
     public function replace($search, $replace) {
-        return new static(str_replace($search, $replace, $this->value));
+        return new static(cstr::replace($search, $replace, $this->value));
     }
 
     /**
@@ -496,6 +584,26 @@ class CBase_String implements Stringable {
     }
 
     /**
+     * Parse input from a string to a collection, according to a format.
+     *
+     * @param string $format
+     *
+     * @return \CCollection
+     */
+    public function scan($format) {
+        return c::collect(sscanf($this->value, $format));
+    }
+
+    /**
+     * Remove all "extra" blank space from the given string.
+     *
+     * @return static
+     */
+    public function squish() {
+        return new static(cstr::squish($this->value));
+    }
+
+    /**
      * Begin a string with a single instance of a given value.
      *
      * @param string $prefix
@@ -504,6 +612,17 @@ class CBase_String implements Stringable {
      */
     public function start($prefix) {
         return new static(cstr::start($this->value, $prefix));
+    }
+
+    /**
+     * Strip HTML and PHP tags from the given string.
+     *
+     * @param string $allowedTags
+     *
+     * @return static
+     */
+    public function stripTags($allowedTags = null) {
+        return new static(strip_tags($this->value, $allowedTags));
     }
 
     /**
@@ -522,6 +641,15 @@ class CBase_String implements Stringable {
      */
     public function title() {
         return new static(cstr::title($this->value));
+    }
+
+    /**
+     * Convert the given string to title case for each word.
+     *
+     * @return static
+     */
+    public function headline() {
+        return new static(cstr::headline($this->value));
     }
 
     /**
@@ -602,6 +730,30 @@ class CBase_String implements Stringable {
     }
 
     /**
+     * Replace text within a portion of a string.
+     *
+     * @param string|string[] $replace
+     * @param int|int[]       $offset
+     * @param null|int|int[]  $length
+     *
+     * @return static
+     */
+    public function substrReplace($replace, $offset = 0, $length = null) {
+        return new static(cstr::substrReplace($this->value, $replace, $offset, $length));
+    }
+
+    /**
+     * Swap multiple keywords in a string with other keywords.
+     *
+     * @param array $map
+     *
+     * @return static
+     */
+    public function swap(array $map) {
+        return new static(strtr($this->value, $map));
+    }
+
+    /**
      * Trim the string of the given characters.
      *
      * @param string $characters
@@ -635,12 +787,56 @@ class CBase_String implements Stringable {
     }
 
     /**
+     * Make a string's first character lowercase.
+     *
+     * @return static
+     */
+    public function lcfirst() {
+        return new static(cstr::lcfirst($this->value));
+    }
+
+    /**
      * Make a string's first character uppercase.
      *
      * @return static
      */
     public function ucfirst() {
         return new static(cstr::ucfirst($this->value));
+    }
+
+    /**
+     * Split a string by uppercase characters.
+     *
+     * @return \CCollection
+     */
+    public function ucsplit() {
+        return c::collect(cstr::ucsplit($this->value));
+    }
+
+    /**
+     * Execute the given callback if the string contains a given substring.
+     *
+     * @param string|iterable<string> $needles
+     * @param callable                $callback
+     * @param null|callable           $default
+     *
+     * @return static
+     */
+    public function whenContains($needles, $callback, $default = null) {
+        return $this->when($this->contains($needles), $callback, $default);
+    }
+
+    /**
+     * Execute the given callback if the string contains all array values.
+     *
+     * @param array<string> $needles
+     * @param callable      $callback
+     * @param null|callable $default
+     *
+     * @return static
+     */
+    public function whenContainsAll(array $needles, $callback, $default = null) {
+        return $this->when($this->containsAll($needles), $callback, $default);
     }
 
     /**
@@ -680,6 +876,120 @@ class CBase_String implements Stringable {
     }
 
     /**
+     * Execute the given callback if the string is not empty.
+     *
+     * @param callable      $callback
+     * @param null|callable $default
+     *
+     * @return static
+     */
+    public function whenNotEmpty($callback, $default = null) {
+        return $this->when($this->isNotEmpty(), $callback, $default);
+    }
+
+    /**
+     * Execute the given callback if the string ends with a given substring.
+     *
+     * @param string|iterable<string> $needles
+     * @param callable                $callback
+     * @param null|callable           $default
+     *
+     * @return static
+     */
+    public function whenEndsWith($needles, $callback, $default = null) {
+        return $this->when($this->endsWith($needles), $callback, $default);
+    }
+
+    /**
+     * Execute the given callback if the string is an exact match with the given value.
+     *
+     * @param string        $value
+     * @param callable      $callback
+     * @param null|callable $default
+     *
+     * @return static
+     */
+    public function whenExactly($value, $callback, $default = null) {
+        return $this->when($this->exactly($value), $callback, $default);
+    }
+
+    /**
+     * Execute the given callback if the string is not an exact match with the given value.
+     *
+     * @param string        $value
+     * @param callable      $callback
+     * @param null|callable $default
+     *
+     * @return static
+     */
+    public function whenNotExactly($value, $callback, $default = null) {
+        return $this->when(!$this->exactly($value), $callback, $default);
+    }
+
+    /**
+     * Execute the given callback if the string matches a given pattern.
+     *
+     * @param string|iterable<string> $pattern
+     * @param callable                $callback
+     * @param null|callable           $default
+     *
+     * @return static
+     */
+    public function whenIs($pattern, $callback, $default = null) {
+        return $this->when($this->is($pattern), $callback, $default);
+    }
+
+    /**
+     * Execute the given callback if the string is 7 bit ASCII.
+     *
+     * @param callable      $callback
+     * @param null|callable $default
+     *
+     * @return static
+     */
+    public function whenIsAscii($callback, $default = null) {
+        return $this->when($this->isAscii(), $callback, $default);
+    }
+
+    /**
+     * Execute the given callback if the string is a valid UUID.
+     *
+     * @param callable      $callback
+     * @param null|callable $default
+     *
+     * @return static
+     */
+    public function whenIsUuid($callback, $default = null) {
+        return $this->when($this->isUuid(), $callback, $default);
+    }
+
+    /**
+     * Execute the given callback if the string starts with a given substring.
+     *
+     * @param string|iterable<string> $needles
+     * @param callable                $callback
+     * @param null|callable           $default
+     *
+     * @return static
+     */
+    public function whenStartsWith($needles, $callback, $default = null) {
+        return $this->when($this->startsWith($needles), $callback, $default);
+    }
+
+    /**
+     * Execute the given callback if the string matches the given pattern.
+     *
+     * @param string        $pattern
+     * @param callable      $callback
+     * @param null|callable $default
+     *
+     * @return static
+     */
+    public function whenTest($pattern, $callback, $default = null) {
+        return $this->when($this->test($pattern), $callback, $default);
+    }
+
+    /**
      * Limit the number of words in a string.
      *
      * @param int    $words
@@ -689,6 +999,36 @@ class CBase_String implements Stringable {
      */
     public function words($words = 100, $end = '...') {
         return new static(cstr::words($this->value, $words, $end));
+    }
+
+    /**
+     * Get the number of words a string contains.
+     *
+     * @return int
+     */
+    public function wordCount() {
+        return str_word_count($this->value);
+    }
+
+    /**
+     * Wrap the string with the given strings.
+     *
+     * @param string      $before
+     * @param null|string $after
+     *
+     * @return static
+     */
+    public function wrap($before, $after = null) {
+        return new static(cstr::wrap($this->value, $before, $after));
+    }
+
+    /**
+     * Convert the string into a `CBase_HtmlString` instance.
+     *
+     * @return \CBase_HtmlString
+     */
+    public function toHtmlString() {
+        return new CBase_HtmlString($this->value);
     }
 
     /**
@@ -714,6 +1054,71 @@ class CBase_String implements Stringable {
     }
 
     /**
+     * Get the underlying string value.
+     *
+     * @return string
+     */
+    public function value() {
+        return $this->toString();
+    }
+
+    /**
+     * Get the underlying string value.
+     *
+     * @return string
+     */
+    public function toString() {
+        return $this->value;
+    }
+
+    /**
+     * Get the underlying string value as an integer.
+     *
+     * @return int
+     */
+    public function toInteger() {
+        return intval($this->value);
+    }
+
+    /**
+     * Get the underlying string value as a float.
+     *
+     * @return float
+     */
+    public function toFloat() {
+        return floatval($this->value);
+    }
+
+    /**
+     * Get the underlying string value as a boolean.
+     *
+     * Returns true when value is "1", "true", "on", and "yes". Otherwise, returns false.
+     *
+     * @return bool
+     */
+    public function toBoolean() {
+        return filter_var($this->value, FILTER_VALIDATE_BOOLEAN);
+    }
+
+    /**
+     * Get the underlying string value as a Carbon instance.
+     *
+     * @param null|string $format
+     * @param null|string $tz
+     *
+     * @throws \CarbonV3\Exceptions\InvalidFormatException
+     *
+     * @return \CCarbon
+     */
+    public function toDate($format = null, $tz = null) {
+        if (is_null($format)) {
+            return CCarbon::parse($this->value, $tz);
+        }
+
+        return CCarbon::createFromFormat($format, $this->value, $tz);
+    }
+
+    /**
      * Proxy dynamic properties onto methods.
      *
      * @param string $key
@@ -722,6 +1127,15 @@ class CBase_String implements Stringable {
      */
     public function __get($key) {
         return $this->{$key}();
+    }
+
+    /**
+     * Convert the object to a string when JSON encoded.
+     *
+     * @return string
+     */
+    public function jsonSerialize() {
+        return $this->__toString();
     }
 
     /**

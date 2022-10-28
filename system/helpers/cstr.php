@@ -1546,4 +1546,15 @@ class cstr {
 
         return Ulid::isValid($value);
     }
+
+    /**
+     * Convert the string into a `CBase_HtmlString` instance.
+     *
+     * @param string $string
+     *
+     * @return \CBase_HtmlString
+     */
+    public function toHtmlString($string) {
+        return new CBase_HtmlString($string);
+    }
 }
