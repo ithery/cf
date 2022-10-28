@@ -10,4 +10,9 @@ return [
         'label' => c::__('Formatter'),
         'uri' => 'demo/module/formatter/index',
     ],
+    [
+        'name' => 'module.transform',
+        'label' => c::__('Transform'),
+        'uri' => 'demo/module/transform/index',
+    ],
 ];

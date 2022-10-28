@@ -51,8 +51,8 @@ class CManager_Transform_MethodExecutor {
         return c::formatter()->formatDecimal($value, $decimalDigit, $decimalSeparator, $thousandSeparator, true);
     }
 
-    public function transformFormatCurrency($value, $decimalDigit = null, $decimalSeparator = null, $thousandSeparator = null, $currencyPrefix = null, $currencySuffix = null) {
-        return c::formatter()->formatDecimal($value, $decimalDigit, $decimalSeparator, $thousandSeparator, $currencyPrefix, $currencySuffix);
+    public function transformFormatCurrency($value, $decimalDigit = null, $decimalSeparator = null, $thousandSeparator = null, $currencyPrefix = null, $currencySuffix = null, $stripZeroDecimal = null) {
+        return c::formatter()->formatCurrency($value, $decimalDigit, $decimalSeparator, $thousandSeparator, $currencyPrefix, $currencySuffix, $stripZeroDecimal);
     }
 
     public function transformUnformatCurrency($value) {
@@ -126,6 +126,26 @@ class CManager_Transform_MethodExecutor {
         $suffixes = [' bytes', ' KB', ' MB', ' GB', ' TB'];
 
         return round(1024 ** ($base - floor($base)), $precision) . $suffixes[(int) floor($base)];
+    }
+
+    /**
+     * Format bytes to kb, mb, gb, tb.
+     *
+     * @param int $meters
+     * @param int $precision
+     *
+     * @return string
+     */
+    public static function transformFormatDistance($meters, $precision = 2) {
+        if ($meters >= 1000) {
+            $meters /= 1000;
+            $units = 'km';
+        } else {
+            $precision = 0;
+            $units = 'm';
+        }
+
+        return c::formatter()->formatDecimal($meters, $precision, null, null, true) . ' ' . $units;
     }
 
     public static function transformMonthName($month) {
