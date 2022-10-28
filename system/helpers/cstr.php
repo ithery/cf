@@ -2,9 +2,13 @@
 
 use Ramsey\Uuid\Uuid;
 use Ramsey\Uuid\UuidFactory;
+use League\CommonMark\MarkdownConverter;
 use Ramsey\Uuid\Generator\CombGenerator;
+use League\CommonMark\Environment\Environment;
 use Ramsey\Uuid\Codec\TimestampFirstCombCodec;
 use League\CommonMark\GithubFlavoredMarkdownConverter;
+use League\CommonMark\Extension\GithubFlavoredMarkdownExtension;
+use League\CommonMark\Extension\InlinesOnly\InlinesOnlyExtension;
 
 // @codingStandardsIgnoreStart
 class cstr {
@@ -69,6 +73,23 @@ class cstr {
         }
 
         return static::beforeLast(static::after($subject, $from), $to);
+    }
+
+    /**
+     * Get the smallest possible portion of a string between two given values.
+     *
+     * @param string $subject
+     * @param string $from
+     * @param string $to
+     *
+     * @return string
+     */
+    public static function betweenFirst($subject, $from, $to) {
+        if ($from === '' || $to === '') {
+            return $subject;
+        }
+
+        return static::before(static::after($subject, $from), $to);
     }
 
     public static function sanitize($string = '', $is_filename = false) {
@@ -258,6 +279,17 @@ class cstr {
     }
 
     /**
+     * Reverse the given string.
+     *
+     * @param string $value
+     *
+     * @return string
+     */
+    public static function reverse($value) {
+        return implode(array_reverse(mb_str_split($value)));
+    }
+
+    /**
      * Determine if a given string contains a given substring.
      *
      * @param string       $haystack
@@ -375,6 +407,17 @@ class cstr {
     }
 
     /**
+     * Remove all "extra" blank space from the given string.
+     *
+     * @param string $value
+     *
+     * @return string
+     */
+    public static function squish($value) {
+        return preg_replace('~(\s|\x{3164})+~u', ' ', preg_replace('~^[\s]+|[\s]+$~u', '', $value));
+    }
+
+    /**
      * Determine if a given string starts with a given substring.
      *
      * @param string       $haystack
@@ -410,6 +453,50 @@ class cstr {
         }
 
         return false;
+    }
+
+    /**
+     * Extracts an excerpt from text that matches the first instance of a phrase.
+     *
+     * @param string $text
+     * @param string $phrase
+     * @param array  $options
+     *
+     * @return null|string
+     */
+    public static function excerpt($text, $phrase = '', $options = []) {
+        $radius = carr::get($options, 'radius', 100);
+        $omission = carr::get($options, 'omission', '...');
+
+        preg_match('/^(.*?)(' . preg_quote((string) $phrase) . ')(.*)$/iu', (string) $text, $matches);
+
+        if (empty($matches)) {
+            return null;
+        }
+
+        $start = ltrim($matches[1]);
+
+        $start = c::str(mb_substr($start, max(mb_strlen($start, 'UTF-8') - $radius, 0), $radius, 'UTF-8'))->ltrim()->unless(
+            function ($startWithRadius) use ($start) {
+                return $startWithRadius->exactly($start);
+            },
+            function ($startWithRadius) use ($omission) {
+                return $startWithRadius->prepend($omission);
+            }
+        );
+
+        $end = rtrim($matches[3]);
+
+        $end = c::str(mb_substr($end, 0, $radius, 'UTF-8'))->rtrim()->unless(
+            function ($endWithRadius) use ($end) {
+                return $endWithRadius->exactly($end);
+            },
+            function ($endWithRadius) use ($omission) {
+                return $endWithRadius->append($omission);
+            }
+        );
+
+        return $start->append($matches[2], $end)->toString();
     }
 
     /**
@@ -560,6 +647,19 @@ class cstr {
         $quoted = preg_quote($cap, '/');
 
         return preg_replace('/(?:' . $quoted . ')+$/u', '', $value) . $cap;
+    }
+
+    /**
+     * Wrap the string with the given strings.
+     *
+     * @param string      $before
+     * @param null|string $after
+     * @param mixed       $value
+     *
+     * @return string
+     */
+    public static function wrap($value, $before, $after = null) {
+        return $before . $value . ($after ?: $before);
     }
 
     /**
@@ -948,6 +1048,25 @@ class cstr {
     }
 
     /**
+     * Converts inline Markdown into HTML.
+     *
+     * @param string $string
+     * @param array  $options
+     *
+     * @return string
+     */
+    public static function inlineMarkdown($string, array $options = []) {
+        $environment = new Environment($options);
+
+        $environment->addExtension(new GithubFlavoredMarkdownExtension());
+        $environment->addExtension(new InlinesOnlyExtension());
+
+        $converter = new MarkdownConverter($environment);
+
+        return (string) $converter->convertToHtml($string);
+    }
+
+    /**
      * Splits a Unicode `string` into an array of its words.
      *
      * @param string $string the string to inspect
@@ -1243,12 +1362,42 @@ class cstr {
     /**
      * Determine if a given string is 7 bit ASCII.
      *
-     * @param mixed $str
+     * @param string $value
      *
      * @return bool
      */
-    public static function isAscii($str) {
-        return $str == static::ascii($str);
+    public static function isAscii($value) {
+        return CASCII::isAscii((string) $value);
+    }
+
+    /**
+     * Determine if a given string is valid JSON.
+     *
+     * @param string $value
+     *
+     * @return bool
+     */
+    public static function isJson($value) {
+        if (!is_string($value)) {
+            return false;
+        }
+
+        if (PHP_MAJOR_VERSION >= 7 && defined(JSON_THROW_ON_ERROR)) {
+            try {
+                json_decode($value, true, 512, JSON_THROW_ON_ERROR);
+            } catch (JsonException $ex) {
+                return false;
+            } catch (Exception $ex) {
+                return false;
+            }
+        } else {
+            json_decode($value, true, 512);
+            if (json_last_error() != JSON_ERROR_NONE) {
+                return false;
+            }
+        }
+
+        return true;
     }
 
     /**

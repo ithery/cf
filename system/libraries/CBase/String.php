@@ -12,6 +12,8 @@ use Symfony\Component\VarDumper\VarDumper;
 
 class CBase_String implements Stringable {
     use CTrait_Macroable;
+    use CTrait_Conditionable;
+    use CTrait_Tappable;
 
     /**
      * The underlying string value.
