@@ -373,7 +373,7 @@ class c {
     }
 
     public static function html($str) {
-        return chtml::specialchars($str);
+        return c::e($str);
     }
 
     public static function dirname($path, $count = 1) {
@@ -1733,6 +1733,13 @@ class c {
         } finally {
             CF::setLocale($original);
         }
+    }
+
+    /**
+     * @return CAuth_Access_Gate
+     */
+    public static function gate() {
+        return CAuth_Access_Gate::instance();
     }
 }
 
