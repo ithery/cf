@@ -372,6 +372,13 @@ class c {
         return [$s, ($mt - $s) * 1e+6];
     }
 
+    /**
+     * @param string $str
+     *
+     * @deprecated use c::e
+     *
+     * @return string
+     */
     public static function html($str) {
         return c::e($str);
     }
