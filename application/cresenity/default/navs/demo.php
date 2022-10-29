@@ -42,4 +42,9 @@ return [
         'label' => c::__('Module'),
         'subnav' => include dirname(__FILE__) . '/demo/module.php',
     ],
+    [
+        'name' => 'system',
+        'label' => c::__('System'),
+        'subnav' => include dirname(__FILE__) . '/demo/system.php',
+    ],
 ];

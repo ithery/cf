@@ -120,6 +120,13 @@ abstract class CApi_MethodAbstract implements CInterface_Arrayable {
         if ($this->sessionId == null) {
             $this->sessionId = carr::get($this->request(), $this->sessionIdParameter);
         }
+        if ($this->sessionId == null) {
+            $request = $this->apiRequest ?: c::request();
+            $token = $request->bearerToken();
+            if ($token) {
+                $this->sessionId = $token;
+            }
+        }
 
         return $this->sessionId;
     }

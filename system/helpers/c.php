@@ -1680,6 +1680,60 @@ class c {
 
         return $path;
     }
+
+    /**
+     * @param null|sting $locale
+     *
+     * @return array
+     */
+    public static function months($locale = null) {
+        if ($locale == null) {
+            $locale = CF::getLocale();
+        }
+        $format = function ($index) use ($locale) {
+            if (class_exists(IntlDateFormatter::class)) {
+                $formatter = new IntlDateFormatter($locale);
+                $formatter->setPattern('MMMM');
+
+                return ucfirst($formatter->format(mktime(0, 0, 0, $index)));
+            } else {
+                return static::withLocale($locale, function () use ($index) {
+                    return CCarbon::createFromTimestamp(mktime(0, 0, 0, $index, 1))->isoFormat('MMMM');
+                });
+            }
+        };
+
+        return array_combine(
+            range(1, 12),
+            array_map(function ($index) use ($format) {
+                return $format($index);
+            }, range(1, 12))
+        );
+    }
+
+    /**
+     * Run the callback with the given locale.
+     *
+     * @param string   $locale
+     * @param \Closure $callback
+     *
+     * @return mixed
+     */
+    public function withLocale($locale, $callback) {
+        if (!$locale) {
+            return $callback();
+        }
+
+        $original = CF::getLocale();
+
+        try {
+            CF::setLocale($locale);
+
+            return $callback();
+        } finally {
+            CF::setLocale($original);
+        }
+    }
 }
 
 // End c

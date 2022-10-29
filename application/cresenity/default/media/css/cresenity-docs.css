@@ -597,3 +597,17 @@ a:hover {
     color: rgb(79 70 229/1);
 
 }
+
+.aside-nav.nav {
+    max-height: calc(100vh - 2rem);
+    overflow-y: auto;
+    overflow-x:hidden;
+    flex-wrap: nowrap;
+}
+.page-wrapper .aside-nav.nav.affix  {
+    max-width: calc(25% - 2.5rem);
+    width:inherit;
+}
+.page-wrapper.toggled .aside-nav.nav.affix  {
+    max-width: calc(25% - 7rem);
+}

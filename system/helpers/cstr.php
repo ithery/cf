@@ -2,9 +2,14 @@
 
 use Ramsey\Uuid\Uuid;
 use Ramsey\Uuid\UuidFactory;
+use Symfony\Component\Uid\Ulid;
+use League\CommonMark\MarkdownConverter;
 use Ramsey\Uuid\Generator\CombGenerator;
+use League\CommonMark\Environment\Environment;
 use Ramsey\Uuid\Codec\TimestampFirstCombCodec;
 use League\CommonMark\GithubFlavoredMarkdownConverter;
+use League\CommonMark\Extension\GithubFlavoredMarkdownExtension;
+use League\CommonMark\Extension\InlinesOnly\InlinesOnlyExtension;
 
 // @codingStandardsIgnoreStart
 class cstr {
@@ -69,6 +74,23 @@ class cstr {
         }
 
         return static::beforeLast(static::after($subject, $from), $to);
+    }
+
+    /**
+     * Get the smallest possible portion of a string between two given values.
+     *
+     * @param string $subject
+     * @param string $from
+     * @param string $to
+     *
+     * @return string
+     */
+    public static function betweenFirst($subject, $from, $to) {
+        if ($from === '' || $to === '') {
+            return $subject;
+        }
+
+        return static::before(static::after($subject, $from), $to);
     }
 
     public static function sanitize($string = '', $is_filename = false) {
@@ -258,6 +280,17 @@ class cstr {
     }
 
     /**
+     * Reverse the given string.
+     *
+     * @param string $value
+     *
+     * @return string
+     */
+    public static function reverse($value) {
+        return implode(array_reverse(mb_str_split($value)));
+    }
+
+    /**
      * Determine if a given string contains a given substring.
      *
      * @param string       $haystack
@@ -375,6 +408,17 @@ class cstr {
     }
 
     /**
+     * Remove all "extra" blank space from the given string.
+     *
+     * @param string $value
+     *
+     * @return string
+     */
+    public static function squish($value) {
+        return preg_replace('~(\s|\x{3164})+~u', ' ', preg_replace('~^[\s]+|[\s]+$~u', '', $value));
+    }
+
+    /**
      * Determine if a given string starts with a given substring.
      *
      * @param string       $haystack
@@ -410,6 +454,50 @@ class cstr {
         }
 
         return false;
+    }
+
+    /**
+     * Extracts an excerpt from text that matches the first instance of a phrase.
+     *
+     * @param string $text
+     * @param string $phrase
+     * @param array  $options
+     *
+     * @return null|string
+     */
+    public static function excerpt($text, $phrase = '', $options = []) {
+        $radius = carr::get($options, 'radius', 100);
+        $omission = carr::get($options, 'omission', '...');
+
+        preg_match('/^(.*?)(' . preg_quote((string) $phrase) . ')(.*)$/iu', (string) $text, $matches);
+
+        if (empty($matches)) {
+            return null;
+        }
+
+        $start = ltrim($matches[1]);
+
+        $start = c::str(mb_substr($start, max(mb_strlen($start, 'UTF-8') - $radius, 0), $radius, 'UTF-8'))->ltrim()->unless(
+            function ($startWithRadius) use ($start) {
+                return $startWithRadius->exactly($start);
+            },
+            function ($startWithRadius) use ($omission) {
+                return $startWithRadius->prepend($omission);
+            }
+        );
+
+        $end = rtrim($matches[3]);
+
+        $end = c::str(mb_substr($end, 0, $radius, 'UTF-8'))->rtrim()->unless(
+            function ($endWithRadius) use ($end) {
+                return $endWithRadius->exactly($end);
+            },
+            function ($endWithRadius) use ($omission) {
+                return $endWithRadius->append($omission);
+            }
+        );
+
+        return $start->append($matches[2], $end)->toString();
     }
 
     /**
@@ -563,6 +651,19 @@ class cstr {
     }
 
     /**
+     * Wrap the string with the given strings.
+     *
+     * @param string      $before
+     * @param null|string $after
+     * @param mixed       $value
+     *
+     * @return string
+     */
+    public static function wrap($value, $before, $after = null) {
+        return $before . $value . ($after ?: $before);
+    }
+
+    /**
      * Determine if a given string matches a given pattern.
      *
      * @param string|array $pattern
@@ -632,6 +733,36 @@ class cstr {
         } else {
             return substr_count($haystack, $needle, $offset);
         }
+    }
+
+    /**
+     * Replace text within a portion of a string.
+     *
+     * @param string|string[] $string
+     * @param string|string[] $replace
+     * @param int|int[]       $offset
+     * @param null|int|int[]  $length
+     *
+     * @return string|string[]
+     */
+    public static function substrReplace($string, $replace, $offset = 0, $length = null) {
+        if ($length === null) {
+            $length = strlen($string);
+        }
+
+        return substr_replace($string, $replace, $offset, $length);
+    }
+
+    /**
+     * Swap multiple keywords in a string with other keywords.
+     *
+     * @param array  $map
+     * @param string $subject
+     *
+     * @return string
+     */
+    public static function swap(array $map, $subject) {
+        return strtr($subject, $map);
     }
 
     /**
@@ -948,6 +1079,25 @@ class cstr {
     }
 
     /**
+     * Converts inline Markdown into HTML.
+     *
+     * @param string $string
+     * @param array  $options
+     *
+     * @return string
+     */
+    public static function inlineMarkdown($string, array $options = []) {
+        $environment = new Environment($options);
+
+        $environment->addExtension(new GithubFlavoredMarkdownExtension());
+        $environment->addExtension(new InlinesOnlyExtension());
+
+        $converter = new MarkdownConverter($environment);
+
+        return (string) $converter->convertToHtml($string);
+    }
+
+    /**
      * Splits a Unicode `string` into an array of its words.
      *
      * @param string $string the string to inspect
@@ -1051,20 +1201,36 @@ class cstr {
     }
 
     /**
-     * Uppercase words that are not separated by spaces, using a custom
-     * delimiter or the default.
+     * Make a string's first character lowercase.
      *
-     *      $str = cstr::ucfirst('content-type'); // returns "Content-Type"
-     *
-     * @param string $string    string to transform
-     * @param string $delimiter delimiter to use
-     *
-     * @uses    CUTF8::ucfirst
+     * @param string $string
      *
      * @return string
      */
-    public static function ucfirst($string, $delimiter = ' ') {
+    public static function lcfirst($string) {
+        return static::lower(static::substr($string, 0, 1)) . static::substr($string, 1);
+    }
+
+    /**
+     * Make a string's first character uppercase.
+     *
+     * @param string $string
+     *
+     * @return string
+     */
+    public static function ucfirst($string) {
         return static::upper(static::substr($string, 0, 1)) . static::substr($string, 1);
+    }
+
+    /**
+     * Split a string into pieces by uppercase characters.
+     *
+     * @param string $string
+     *
+     * @return string[]
+     */
+    public static function ucsplit($string) {
+        return preg_split('/(?=\p{Lu})/u', $string, -1, PREG_SPLIT_NO_EMPTY);
     }
 
     /**
@@ -1125,12 +1291,82 @@ class cstr {
     }
 
     /**
+     * Set the sequence that will be used to generate UUIDs.
+     *
+     * @param array         $sequence
+     * @param null|callable $whenMissing
+     *
+     * @return void
+     */
+    public static function createUuidsUsingSequence(array $sequence, $whenMissing = null) {
+        $next = 0;
+
+        if ($whenMissing == null) {
+            $whenMissing = function () use (&$next) {
+                $factoryCache = static::$uuidFactory;
+
+                static::$uuidFactory = null;
+
+                $uuid = static::uuid();
+
+                static::$uuidFactory = $factoryCache;
+
+                $next++;
+
+                return $uuid;
+            };
+        }
+
+        static::createUuidsUsing(function () use (&$next, $sequence, $whenMissing) {
+            if (array_key_exists($next, $sequence)) {
+                return $sequence[$next++];
+            }
+
+            return $whenMissing();
+        });
+    }
+
+    /**
+     * Always return the same UUID when generating new UUIDs.
+     *
+     * @param null|\Closure $callback
+     *
+     * @return \Ramsey\Uuid\UuidInterface
+     */
+    public static function freezeUuids(Closure $callback = null) {
+        $uuid = cstr::uuid();
+
+        cstr::createUuidsUsing(function () use ($uuid) {
+            return $uuid;
+        });
+
+        if ($callback !== null) {
+            try {
+                $callback($uuid);
+            } finally {
+                cstr::createUuidsNormally();
+            }
+        }
+
+        return $uuid;
+    }
+
+    /**
      * Indicate that UUIDs should be created normally and not using a custom factory.
      *
      * @return void
      */
     public static function createUuidsNormally() {
         static::$uuidFactory = null;
+    }
+
+    /**
+     * Generate a ULID.
+     *
+     * @return \Symfony\Component\Uid\Ulid
+     */
+    public static function ulid() {
+        return new Ulid();
     }
 
     /**
@@ -1243,12 +1479,42 @@ class cstr {
     /**
      * Determine if a given string is 7 bit ASCII.
      *
-     * @param mixed $str
+     * @param string $value
      *
      * @return bool
      */
-    public static function isAscii($str) {
-        return $str == static::ascii($str);
+    public static function isAscii($value) {
+        return CASCII::isAscii((string) $value);
+    }
+
+    /**
+     * Determine if a given string is valid JSON.
+     *
+     * @param string $value
+     *
+     * @return bool
+     */
+    public static function isJson($value) {
+        if (!is_string($value)) {
+            return false;
+        }
+
+        if (PHP_MAJOR_VERSION >= 7 && defined(JSON_THROW_ON_ERROR)) {
+            try {
+                json_decode($value, true, 512, JSON_THROW_ON_ERROR);
+            } catch (JsonException $ex) {
+                return false;
+            } catch (Exception $ex) {
+                return false;
+            }
+        } else {
+            json_decode($value, true, 512);
+            if (json_last_error() != JSON_ERROR_NONE) {
+                return false;
+            }
+        }
+
+        return true;
     }
 
     /**
@@ -1264,5 +1530,31 @@ class cstr {
         }
 
         return preg_match('/^[\da-f]{8}-[\da-f]{4}-[\da-f]{4}-[\da-f]{4}-[\da-f]{12}$/iD', $value) > 0;
+    }
+
+    /**
+     * Determine if a given string is a valid ULID.
+     *
+     * @param string $value
+     *
+     * @return bool
+     */
+    public static function isUlid($value) {
+        if (!is_string($value)) {
+            return false;
+        }
+
+        return Ulid::isValid($value);
+    }
+
+    /**
+     * Convert the string into a `CBase_HtmlString` instance.
+     *
+     * @param string $string
+     *
+     * @return \CBase_HtmlString
+     */
+    public function toHtmlString($string) {
+        return new CBase_HtmlString($string);
     }
 }
