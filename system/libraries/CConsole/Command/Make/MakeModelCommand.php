@@ -94,6 +94,9 @@ class CConsole_Command_Make_MakeModelCommand extends CConsole_Command_AppCommand
         $properties = [];
         $fields = $this->getFields();
         foreach ($fields as $field => $type) {
+            if (strpos($type, ' unsigned') !== false) {
+                $type = cstr::replace(' unsigned', '', $type);
+            }
             if ($field == $this->getTable() . '_id') {
                 $properties[] = " * @property-read ${type} $${field}";
             } else {
