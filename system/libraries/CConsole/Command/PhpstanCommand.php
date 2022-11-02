@@ -1,15 +1,15 @@
 <?php
 
 /**
- * Description of PhpStanCommand
+ * Description of PhpStanCommand.
  *
  * @author Hery
  */
-use Symfony\Component\Console\Formatter\OutputFormatterStyle;
-use Symfony\Component\Process\PhpExecutableFinder;
 use Symfony\Component\Process\Process;
+use Symfony\Component\Process\PhpExecutableFinder;
+use Symfony\Component\Console\Formatter\OutputFormatterStyle;
 
-class CConsole_Command_PhpStanCommand extends CConsole_Command {
+class CConsole_Command_PhpstanCommand extends CConsole_Command {
     /**
      * The name and signature of the console command.
      *
@@ -47,6 +47,7 @@ class CConsole_Command_PhpStanCommand extends CConsole_Command {
 
     protected function isPhpStanInstalled($appDir) {
         $phpStan = $this->getPhpStanBinary($appDir);
+
         return file_exists($phpStan);
     }
 

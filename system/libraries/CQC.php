@@ -92,4 +92,11 @@ class CQC {
     public static function createExecutor() {
         return new CQC_Executor();
     }
+
+    /**
+     * @return CQC_Phpstan
+     */
+    public static function phpstan() {
+        return CQC_Phpstan::instance();
+    }
 }
