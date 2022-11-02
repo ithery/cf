@@ -42,7 +42,7 @@ class CLogger_Writer_File extends CLogger_Writer {
         }
 
         if (!is_dir($dir) or !is_writable($dir)) {
-            throw new Exception(c::__('Directory :dir must be writable', ['dir' => $path]));
+            throw new Exception(c::__('Directory :dir must be writable', ['dir' => $dir]));
         }
 
         // Determine the directory path
