@@ -8,7 +8,7 @@
 use Symfony\Component\Process\Process;
 use Symfony\Component\Process\PhpExecutableFinder;
 
-class CConsole_Command_TestInstallCommand extends CConsole_Command {
+class CConsole_Command_PhpstanInstallCommand extends CConsole_Command {
     /**
      * Command line options that should not be gathered dynamically.
      *
@@ -84,7 +84,7 @@ class CConsole_Command_TestInstallCommand extends CConsole_Command {
     protected function downloadPhpstanPharOnBinPath() {
         $pharPath = CQC::phpstan()->phpstanPhar();
         if (!file_exists($pharPath)) {
-            $this->info('Downloading phpstan');
+            $this->info('Downloading phpstan.phar');
             $errCode = 0;
             $errMessage = '';
 
@@ -107,5 +107,20 @@ class CConsole_Command_TestInstallCommand extends CConsole_Command {
         }
 
         return true;
+    }
+
+    protected function setupPhpstanConfig() {
+        $configFile = CQC::phpstan()->phpstanConfiguration();
+        if (!CFile::exists($configFile)) {
+            // $stubFile = CF::findFile('stubs', 'phpunit.xml', true, 'stub');
+            // if (!$stubFile) {
+            //     $this->error('phpunit xml stub not found');
+            //     exit(1);
+            // }
+            // $content = CFile::get($stubFile);
+            // $content = str_replace('{APP_CODE}', CF::appCode(), $content);
+            // CFile::put($configFile, $content);
+            // $this->info('PHPUnit configuration ' . basename($configFile) . ' created on ' . $configFile);
+        }
     }
 }

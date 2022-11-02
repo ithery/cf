@@ -18,15 +18,13 @@ class CConsole_Command_PhpstanCommand extends CConsole_Command {
     protected $signature = 'phpstan';
 
     public function handle() {
-        $domain = CConsole::domain();
-        $domainData = CFData::domain($domain);
-        $appCode = carr::get($domainData, 'app_code');
-        $appDir = DOCROOT . 'application' . DS . $appCode;
-        if (!$this->isPhpStanInstalled($appDir)) {
-            $this->installPhpStan();
+        $appDir = c::appRoot();
+
+        if (!$this->isPhpStanInstalled()) {
+            throw new RuntimeException('phpstan is not installed, please install with phpstan:install command');
         }
 
-        $command = [$this->phpBinary(), '-d', 'memory_limit=1G', '-d', 'max_execution_time=0', $this->getPhpStanPhar($appDir), 'analyze', '--level', '1', $appDir];
+        $command = [$this->phpBinary(), '-c', CQC::phpstan()->phpstanConfiguration(), '-d', 'memory_limit=1G', '-d', 'max_execution_time=0', $this->getPhpStanPhar($appDir), 'analyze', '--level', '1', $appDir];
 
         $process = Process::fromShellCommandline($command, $appDir);
         $process->setTimeout(60 * 60);
@@ -45,24 +43,16 @@ class CConsole_Command_PhpstanCommand extends CConsole_Command {
         }
     }
 
-    protected function isPhpStanInstalled($appDir) {
-        $phpStan = $this->getPhpStanBinary($appDir);
-
-        return file_exists($phpStan);
+    protected function isPhpStanInstalled() {
+        return CQC::phpstan()->isInstalled();
     }
 
-    protected function getPhpStanBinary($appDir) {
-        return $appDir . DS . 'vendor' . DS . 'bin' . DS . 'phpstan';
+    protected function getPhpStanBinary() {
+        return CQC::phpstan()->phpstanBinary();
     }
 
     protected function getPhpStanPhar($appDir) {
-        return $appDir . DS . 'vendor' . DS . 'phpstan' . DS . 'phpstan' . DS . 'phpstan.phar';
-    }
-
-    protected function installPhpStan() {
-        $this->call('composer', [
-            'args' => ['require', 'phpstan/phpstan'], '--opts' => ['dev']
-        ]);
+        return CQC::phpstan()->phpstanPhar();
     }
 
     protected function phpBinary() {

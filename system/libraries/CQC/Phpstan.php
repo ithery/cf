@@ -14,16 +14,22 @@ class CQC_Phpstan {
     public function isInstalled() {
         $phpstanBinaryExists = file_exists(static::phpstanBinary());
         $phpstanPharExists = file_exists(static::phpstanPhar());
+        $phpstanConfiguratioExists = file_exists(static::phpstanConfiguration());
 
         return $phpstanBinaryExists
-            && $phpstanPharExists;
+            && $phpstanPharExists
+            && $phpstanConfiguratioExists;
     }
 
     public static function phpstanBinary() {
-        return DOCROOT . '.bin' . DS . 'phpunit' . DS . 'phpstan';
+        return DOCROOT . '.bin' . DS . 'phpstan' . DS . 'phpstan';
+    }
+
+    public static function phpstanConfiguration() {
+        return c::appRoot() . 'phpstan.neon';
     }
 
     public static function phpstanPhar() {
-        return DOCROOT . '.bin' . DS . 'phpunit' . DS . 'phpstan.phar';
+        return DOCROOT . '.bin' . DS . 'phpstan' . DS . 'phpstan.phar';
     }
 }
