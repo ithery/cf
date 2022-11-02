@@ -65,19 +65,6 @@ class CFile {
     }
 
     /**
-     * Write the contents of a file.
-     *
-     * @param string $path
-     * @param string $contents
-     * @param bool   $lock
-     *
-     * @return int|bool
-     */
-    public static function put($path, $contents, $lock = false) {
-        return file_put_contents($path, $contents, $lock ? LOCK_EX : 0);
-    }
-
-    /**
      * Get the contents of a file.
      *
      * @param string $path
@@ -236,6 +223,18 @@ class CFile {
     }
 
     /**
+     * Determine if the given path is a directory that does not contain any other files or directories.
+     *
+     * @param string $directory
+     * @param bool   $ignoreDotFiles
+     *
+     * @return bool
+     */
+    public static function isEmptyDirectory($directory, $ignoreDotFiles = false) {
+        return !Finder::create()->ignoreDotFiles($ignoreDotFiles)->in($directory)->depth(0)->hasResults();
+    }
+
+    /**
      * Determine if the given path is readable.
      *
      * @param string $path
@@ -255,6 +254,20 @@ class CFile {
      */
     public static function isWritable($path) {
         return is_writable($path);
+    }
+
+    /**
+     * Determine if two files are the same by comparing their hashes.
+     *
+     * @param string $firstFile
+     * @param string $secondFile
+     *
+     * @return bool
+     */
+    public static function hasSameHash($firstFile, $secondFile) {
+        $hash = @md5_file($firstFile);
+
+        return $hash && $hash === @md5_file($secondFile);
     }
 
     /**
@@ -310,6 +323,25 @@ class CFile {
      */
     public static function extension($path) {
         return pathinfo($path, PATHINFO_EXTENSION);
+    }
+
+    /**
+     * Guess the file extension from the mime-type of a given file.
+     *
+     * @param string $path
+     *
+     * @throws \RuntimeException
+     *
+     * @return null|string
+     */
+    public static function guessExtension($path) {
+        if (!class_exists(MimeTypes::class)) {
+            throw new RuntimeException(
+                'To enable support for guessing extensions, please install the symfony/mime package.'
+            );
+        }
+
+        return (new MimeTypes())->getExtensions(static::mimeType($path))[0] ?? null;
     }
 
     /**
@@ -542,6 +574,148 @@ class CFile {
     }
 
     /**
+     * Require the given file once.
+     *
+     * @param string $path
+     * @param array  $data
+     *
+     * @throws \CStorage_Exception_FileNotFoundException
+     *
+     * @return mixed
+     */
+    public static function requireOnce($path, array $data = []) {
+        if (static::isFile($path)) {
+            $__path = $path;
+            $__data = $data;
+
+            return (static function () use ($__path, $__data) {
+                extract($__data, EXTR_SKIP);
+
+                return require_once $__path;
+            })();
+        }
+
+        throw new CStorage_Exception_FileNotFoundException("File does not exist at path {$path}.");
+    }
+
+    /**
+     * Get the contents of a file one line at a time.
+     *
+     * @param string $path
+     *
+     * @throws \CStorage_Exception_FileNotFoundException
+     *
+     * @return \CCollection_LazyCollection
+     */
+    public static function lines($path) {
+        if (!static::isFile($path)) {
+            throw new CStorage_Exception_FileNotFoundException(
+                "File does not exist at path {$path}."
+            );
+        }
+
+        return CCollection_LazyCollection::make(function () use ($path) {
+            $file = new SplFileObject($path);
+
+            $file->setFlags(SplFileObject::DROP_NEW_LINE);
+
+            while (!$file->eof()) {
+                yield $file->fgets();
+            }
+        });
+    }
+
+    /**
+     * Get the hash of the file at the given path.
+     *
+     * @param string $path
+     * @param string $algorithm
+     *
+     * @return string
+     */
+    public static function hash($path, $algorithm = 'md5') {
+        return hash_file($algorithm, $path);
+    }
+
+    /**
+     * Write the contents of a file.
+     *
+     * @param string $path
+     * @param string $contents
+     * @param bool   $lock
+     *
+     * @return int|bool
+     */
+    public static function put($path, $contents, $lock = false) {
+        return file_put_contents($path, $contents, $lock ? LOCK_EX : 0);
+    }
+
+    /**
+     * Write the contents of a file, replacing it atomically if it already exists.
+     *
+     * @param string $path
+     * @param string $content
+     *
+     * @return void
+     */
+    public static function replace($path, $content) {
+        // If the path already exists and is a symlink, get the real path...
+        clearstatcache(true, $path);
+
+        $path = realpath($path) ?: $path;
+
+        $tempPath = tempnam(dirname($path), basename($path));
+
+        // Fix permissions of tempPath because `tempnam()` creates it with permissions set to 0600...
+        chmod($tempPath, 0777 - umask());
+
+        file_put_contents($tempPath, $content);
+
+        rename($tempPath, $path);
+    }
+
+    /**
+     * Replace a given string within a given file.
+     *
+     * @param array|string $search
+     * @param array|string $replace
+     * @param string       $path
+     *
+     * @return void
+     */
+    public static function replaceInFile($search, $replace, $path) {
+        file_put_contents($path, str_replace($search, $replace, file_get_contents($path)));
+    }
+
+    /**
+     * Prepend to a file.
+     *
+     * @param string $path
+     * @param string $data
+     *
+     * @return int
+     */
+    public static function prepend($path, $data) {
+        if (static::exists($path)) {
+            return static::put($path, $data . static::get($path));
+        }
+
+        return static::put($path, $data);
+    }
+
+    /**
+     * Append to a file.
+     *
+     * @param string $path
+     * @param string $data
+     *
+     * @return int
+     */
+    public static function append($path, $data) {
+        return file_put_contents($path, $data, FILE_APPEND);
+    }
+
+    /**
      * Get or set UNIX mode of a file or directory.
      *
      * @param string   $path
@@ -582,5 +756,83 @@ class CFile {
             Finder::create()->files()->ignoreDotFiles(!$hidden)->in($directory)->depth(0)->sortByName(),
             false
         );
+    }
+
+    /**
+     * Ensure a directory exists.
+     *
+     * @param string $path
+     * @param int    $mode
+     * @param bool   $recursive
+     *
+     * @return void
+     */
+    public static function ensureDirectoryExists($path, $mode = 0755, $recursive = true) {
+        if (!static::isDirectory($path)) {
+            static::makeDirectory($path, $mode, $recursive);
+        }
+    }
+
+    /**
+     * Move a directory.
+     *
+     * @param string $from
+     * @param string $to
+     * @param bool   $overwrite
+     *
+     * @return bool
+     */
+    public static function moveDirectory($from, $to, $overwrite = false) {
+        if ($overwrite && static::isDirectory($to) && !static::deleteDirectory($to)) {
+            return false;
+        }
+
+        return @rename($from, $to) === true;
+    }
+
+    /**
+     * Copy a directory from one location to another.
+     *
+     * @param string   $directory
+     * @param string   $destination
+     * @param null|int $options
+     *
+     * @return bool
+     */
+    public static function copyDirectory($directory, $destination, $options = null) {
+        if (!static::isDirectory($directory)) {
+            return false;
+        }
+
+        $options = $options ?: FilesystemIterator::SKIP_DOTS;
+
+        // If the destination directory does not actually exist, we will go ahead and
+        // create it recursively, which just gets the destination prepared to copy
+        // the files over. Once we make the directory we'll proceed the copying.
+        static::ensureDirectoryExists($destination, 0777);
+
+        $items = new FilesystemIterator($directory, $options);
+
+        foreach ($items as $item) {
+            // As we spin through items, we will check to see if the current file is actually
+            // a directory or a file. When it is actually a directory we will need to call
+            // back into this function recursively to keep copying these nested folders.
+            $target = $destination . '/' . $item->getBasename();
+
+            if ($item->isDir()) {
+                $path = $item->getPathname();
+
+                if (!static::copyDirectory($path, $target, $options)) {
+                    return false;
+                }
+            } elseif (!static::copy($item->getPathname(), $target)) {
+                // If the current items is just a regular file, we will just copy this to the new
+                // location and keep looping. If for some reason the copy fails we'll bail out
+                // and return false, so the developer is aware that the copy process failed.
+                return false;
+            }
+        }
+
+        return true;
     }
 }
