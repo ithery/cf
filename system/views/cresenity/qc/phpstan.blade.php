@@ -1,9 +1,5 @@
 <div x-data="phpstanData()" class="capp-testing-container">
     <a href="javascript:;" x-on:click="run()" class="btn btn-primary">Run</a>
-    <div class="p-3"></div>
-    <div x-show="data!=null">
-        <pre x-html="data.result"></pre>
-    </div>
 
 </div>
 @CAppPushScript

@@ -709,8 +709,8 @@ class CElement_Component_DataTable extends CElement_Component {
     }
 
     /**
-     * @param CModel|CModel_Query $model
-     * @param null|mixed          $queryCallback
+     * @param CModel|CModel_Query|string $model
+     * @param null|mixed                 $queryCallback
      *
      * @return $this
      */

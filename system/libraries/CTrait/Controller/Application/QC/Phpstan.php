@@ -33,6 +33,7 @@ trait CTrait_Controller_Application_QC_Phpstan {
         ]);
         $result = carr::get($data, 'result');
         if (is_array($result)) {
+            $app->addDiv()->addClass('mb-3')->add('Total Error:' . c::formatter()->formatNumber(carr::get($result, 'totals.file_errors')));
             $tableData = c::collect(carr::get($result, 'files'))->map(function ($item, $key) {
                 $file = $key;
                 if (cstr::startsWith($file, DOCROOT)) {
