@@ -763,7 +763,7 @@ class c {
      * @param array       $headers
      * @param null|bool   $secure
      *
-     * @return CHTTP_Redirector|CHttp_RedirectResponse
+     * @return CHTTP_Redirector|CHTTP_RedirectResponse
      */
     public static function redirect($to = null, $status = 302, $headers = [], $secure = null) {
         if ($to instanceof CController) {
