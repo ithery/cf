@@ -642,7 +642,7 @@ final class CF {
     /**
      * Detect CF is running on console or not.
      *
-     * @return type
+     * @return bool
      */
     public static function isCli() {
         return php_sapi_name() === 'cli';
