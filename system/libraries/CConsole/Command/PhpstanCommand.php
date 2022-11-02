@@ -15,16 +15,17 @@ class CConsole_Command_PhpstanCommand extends CConsole_Command {
      *
      * @var string
      */
-    protected $signature = 'phpstan';
+    protected $signature = 'phpstan {--format=table : format to display}';
 
     public function handle() {
+        $format = $this->option('format');
         $appDir = c::appRoot();
 
         if (!$this->isPhpStanInstalled()) {
             throw new RuntimeException('phpstan is not installed, please install with phpstan:install command');
         }
-
-        $command = [$this->phpBinary(), '-c', CQC::phpstan()->phpstanConfiguration(), '-d', 'memory_limit=1G', '-d', 'max_execution_time=0', $this->getPhpStanPhar($appDir), 'analyze', '--level', '1', $appDir];
+        chdir(c::appRoot());
+        $command = [$this->phpBinary(), '-c', CQC::phpstan()->phpstanConfiguration(), '-d', 'memory_limit=1G', '-d', 'max_execution_time=0', $this->getPhpStanBinary(), 'analyze', '--error-format', $format, $appDir];
 
         $process = Process::fromShellCommandline($command, $appDir);
         $process->setTimeout(60 * 60);

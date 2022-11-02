@@ -51,6 +51,12 @@ class CConsole_Command_PhpstanInstallCommand extends CConsole_Command {
         if (!$phpStan->isInstalled()) {
             $this->downloadPhpstanPharOnBinPath();
         }
+        if (!$phpStan->isInstalled()) {
+            $this->setupPhpstanConfig();
+        }
+        if (!$phpStan->isInstalled()) {
+            $this->setupPhpstanBootstrap();
+        }
     }
 
     protected function downloadPhpstanBinaryOnBinPath() {
@@ -112,15 +118,30 @@ class CConsole_Command_PhpstanInstallCommand extends CConsole_Command {
     protected function setupPhpstanConfig() {
         $configFile = CQC::phpstan()->phpstanConfiguration();
         if (!CFile::exists($configFile)) {
-            // $stubFile = CF::findFile('stubs', 'phpunit.xml', true, 'stub');
-            // if (!$stubFile) {
-            //     $this->error('phpunit xml stub not found');
-            //     exit(1);
-            // }
-            // $content = CFile::get($stubFile);
-            // $content = str_replace('{APP_CODE}', CF::appCode(), $content);
-            // CFile::put($configFile, $content);
-            // $this->info('PHPUnit configuration ' . basename($configFile) . ' created on ' . $configFile);
+            $stubFile = CF::findFile('stubs', 'phpstan.neon', true, 'stub');
+            if (!$stubFile) {
+                $this->error('phpstan.neon stub not found');
+                exit(1);
+            }
+            $content = CFile::get($stubFile);
+            $content = str_replace('{APP_CODE}', CF::appCode(), $content);
+            CFile::put($configFile, $content);
+            $this->info('phpstan configuration ' . basename($configFile) . ' created on ' . $configFile);
+        }
+    }
+
+    protected function setupPhpstanBootstrap() {
+        $bootstrapFile = CQC::phpstan()->phpstanBootstrap();
+        if (!CFile::exists($bootstrapFile)) {
+            $stubFile = CF::findFile('stubs', 'phpstan-bootstrap.php', true, 'stub');
+            if (!$stubFile) {
+                $this->error('phpstan-bootstrap.php stub not found');
+                exit(1);
+            }
+            $content = CFile::get($stubFile);
+            $content = str_replace('{APP_CODE}', CF::appCode(), $content);
+            CFile::put($bootstrapFile, $content);
+            $this->info('phpstan bootstrap ' . basename($bootstrapFile) . ' created on ' . $bootstrapFile);
         }
     }
 }

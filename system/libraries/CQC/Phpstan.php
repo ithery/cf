@@ -14,11 +14,13 @@ class CQC_Phpstan {
     public function isInstalled() {
         $phpstanBinaryExists = file_exists(static::phpstanBinary());
         $phpstanPharExists = file_exists(static::phpstanPhar());
-        $phpstanConfiguratioExists = file_exists(static::phpstanConfiguration());
+        $phpstanConfigurationExists = file_exists(static::phpstanConfiguration());
+        $phpstanBootstrapExists = file_exists(static::phpstanBootstrap());
 
         return $phpstanBinaryExists
             && $phpstanPharExists
-            && $phpstanConfiguratioExists;
+            && $phpstanConfigurationExists
+            && $phpstanBootstrapExists;
     }
 
     public static function phpstanBinary() {
@@ -29,7 +31,20 @@ class CQC_Phpstan {
         return c::appRoot() . 'phpstan.neon';
     }
 
+    public static function phpstanBootstrap() {
+        return c::appRoot() . 'phpstan-bootstrap.php';
+    }
+
     public static function phpstanPhar() {
         return DOCROOT . '.bin' . DS . 'phpstan' . DS . 'phpstan.phar';
+    }
+
+    /**
+     * @param null|string $directory
+     *
+     * @return CQC_Phpstan_Runner
+     */
+    public static function createRunner($directory = null) {
+        return new CQC_Phpstan_Runner($directory);
     }
 }

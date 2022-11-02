@@ -645,7 +645,7 @@ final class CF {
      * @return type
      */
     public static function isCli() {
-        return PHP_SAPI === 'cli';
+        return php_sapi_name() === 'cli';
     }
 
     /**
