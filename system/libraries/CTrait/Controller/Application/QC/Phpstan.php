@@ -25,7 +25,6 @@ trait CTrait_Controller_Application_QC_Phpstan {
         $runUrl = $this->controllerUrl() . 'run';
         $pollUrl = $this->controllerUrl() . 'poll';
         $data = CQC::phpstan()->createRunner()->getData();
-
         $app->addView('cresenity.qc.phpstan', [
             'data' => $data,
             'runUrl' => $runUrl,
@@ -34,6 +33,21 @@ trait CTrait_Controller_Application_QC_Phpstan {
         $result = carr::get($data, 'result');
         if (is_array($result)) {
             $app->addDiv()->addClass('mb-3')->add('Total Error:' . c::formatter()->formatNumber(carr::get($result, 'totals.file_errors')));
+            $errors = carr::get($result, 'errors');
+            $errorData = c::collect($errors)
+                ->filter(function ($item) {
+                    return !cstr::startsWith($item, 'Child process error');
+                })->map(function ($item) {
+                    return [
+                        'file' => '#',
+                        'errors' => 1,
+                        // 'messages' => c::collect(carr::get($item, 'messages'))->filter(function ($message) {
+                        //     return carr::get($message, 'ignorable') === true;
+                        // })->toArray()
+                        'messages' => $item,
+                    ];
+                })->toArray();
+
             $tableData = c::collect(carr::get($result, 'files'))->map(function ($item, $key) {
                 $file = $key;
                 if (cstr::startsWith($file, DOCROOT)) {
@@ -51,6 +65,7 @@ trait CTrait_Controller_Application_QC_Phpstan {
             })->filter(function ($row) {
                 return count(carr::get($row, 'messages')) > 0;
             })->toArray();
+            $tableData = array_merge($errorData, $tableData);
             $table = $app->addTable();
             $table->setDataFromArray($tableData);
             $table->addColumn('file')->setLabel('File');

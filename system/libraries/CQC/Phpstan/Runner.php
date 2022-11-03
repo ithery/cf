@@ -80,9 +80,9 @@ class CQC_Phpstan_Runner {
     public function getData() {
         $content = $this->getDoneContent();
         $progress = CFile::exists($this->doneFile()) ? 100 : 0;
-        if ($this->isRunning()) {
-            $content = $this->getRunContent();
-        }
+        // if ($this->isRunning()) {
+        //     $content = $this->getRunContent();
+        // }
 
         return [
             'isRunning' => $this->isRunning(),

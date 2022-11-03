@@ -1,6 +1,14 @@
 parameters:
-    level: 5
+    universalObjectCratesClasses:
+        - CHTTP_Request
+        - COptional
+    level: 4
     paths:
         - default
     bootstrapFiles:
         - phpstan-bootstrap.php
+    excludePaths:
+        - default/tests/*
+        - default/data/*
+        - default/media/*
+        - *.blade.php
