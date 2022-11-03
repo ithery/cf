@@ -27,7 +27,7 @@ trait CTrait_Controller_Application_QC_Phpstan {
         $data = CQC::phpstan()->createRunner()->getData();
 
         $app->addView('cresenity.qc.phpstan', [
-            'data' => CQC::phpstan()->createRunner()->getData(),
+            'data' => $data,
             'runUrl' => $runUrl,
             'pollUrl' => $pollUrl,
         ]);

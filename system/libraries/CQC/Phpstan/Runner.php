@@ -36,6 +36,10 @@ class CQC_Phpstan_Runner {
     }
 
     public function getDoneContent() {
+        if (!CFile::isFile($this->doneFile())) {
+            return '';
+        }
+
         return CFile::get($this->doneFile());
     }
 
