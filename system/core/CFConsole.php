@@ -77,6 +77,7 @@ class CFConsole {
         CConsole_Command_TestCommand::class,
         CConsole_Command_PhpstanInstallCommand::class,
         CConsole_Command_PhpstanCommand::class,
+        CConsole_Command_PhpstanClearCommand::class,
         CWebSocket_Console_Command_StartServer::class,
         CTesting_Console_ChromeDriverCommand::class,
     ];

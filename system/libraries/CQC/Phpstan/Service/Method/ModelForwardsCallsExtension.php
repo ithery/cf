@@ -178,7 +178,6 @@ final class CQC_Phpstan_Service_Method_ModelForwardsCallsExtension implements Me
             $reflection = $builderReflection->getNativeMethod($methodName);
 
             $parametersAcceptor = ParametersAcceptorSelector::selectSingle($this->transformStaticParameters($reflection, $genericBuilderAndModelType));
-
             $returnType = TypeTraverser::map($parametersAcceptor->getReturnType(), static function (Type $type, callable $traverse) use ($genericBuilderAndModelType) {
                 if ($type instanceof TypeWithClassName && $type->getClassName() === CModel_Query::class) {
                     return $genericBuilderAndModelType;

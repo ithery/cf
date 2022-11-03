@@ -9,28 +9,22 @@ use Symfony\Component\Process\Process;
 use Symfony\Component\Process\PhpExecutableFinder;
 use Symfony\Component\Console\Formatter\OutputFormatterStyle;
 
-class CConsole_Command_PhpstanCommand extends CConsole_Command {
+class CConsole_Command_PhpstanClearCommand extends CConsole_Command {
     /**
      * The name and signature of the console command.
      *
      * @var string
      */
-    protected $signature = 'phpstan {--format=table : format to display} {--debug}';
+    protected $signature = 'phpstan:clear';
 
     public function handle() {
-        $format = $this->option('format');
-        $debug = $this->option('debug');
         $appDir = c::appRoot();
 
         if (!$this->isPhpStanInstalled()) {
             throw new RuntimeException('phpstan is not installed, please install with phpstan:install command');
         }
         chdir(c::appRoot());
-        $command = [$this->phpBinary(), '-c', CQC::phpstan()->phpstanConfiguration(), '-d', 'memory_limit=1G', '-d', 'max_execution_time=0', $this->getPhpStanBinary(), 'analyze', '--error-format', $format, '--autoload-file', CQC::phpstan()->phpstanBootstrap()];
-        if ($debug) {
-            $command[] = '--debug';
-        }
-        $command[] = $appDir;
+        $command = [$this->phpBinary(), '-c', CQC::phpstan()->phpstanConfiguration(), '-d', 'memory_limit=1G', '-d', 'max_execution_time=0', $this->getPhpStanBinary(), 'clear-result-cache', '--autoload-file', CQC::phpstan()->phpstanBootstrap()];
 
         $process = Process::fromShellCommandline($command, $appDir);
         $process->setTimeout(60 * 60);

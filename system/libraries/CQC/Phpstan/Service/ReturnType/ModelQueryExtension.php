@@ -49,7 +49,6 @@ final class CQC_Phpstan_Service_ReturnType_ModelQueryExtension implements Dynami
         }
 
         $templateTypeMap = $methodReflection->getDeclaringClass()->getActiveTemplateTypeMap();
-
         if (!$templateTypeMap->getType('TModelClass') instanceof ObjectType) {
             return false;
         }
