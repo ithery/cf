@@ -221,7 +221,7 @@ class ClassReflection
 	}
 
 	/**
-	 * @return class-string
+	 * @return string
 	 */
 	public function getName(): string
 	{

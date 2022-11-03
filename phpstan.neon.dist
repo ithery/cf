@@ -1,0 +1,27 @@
+parameters:
+    level: 4
+    phpVersion: 74000
+    universalObjectCratesClasses:
+        - CHTTP_Request
+        - COptional
+    earlyTerminatingFunctionCalls:
+        - c::abort
+        - cdbg::dd
+    checkModelProperties: false
+
+parametersSchema:
+    checkModelProperties: bool()
+
+services:
+    -
+        class: CQC_Phpstan_Service_Method_RelationForwardsCallsExtension
+        tags:
+            - phpstan.broker.methodsClassReflectionExtension
+    -
+        class: CQC_Phpstan_Service_Method_ModelQueryForwardsCallsExtension
+        tags:
+            - phpstan.broker.methodsClassReflectionExtension
+    -
+        class: CQC_Phpstan_Service_BuilderHelper
+        arguments:
+            checkProperties: %checkModelProperties%

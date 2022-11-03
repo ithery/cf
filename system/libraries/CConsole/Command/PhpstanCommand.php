@@ -25,7 +25,7 @@ class CConsole_Command_PhpstanCommand extends CConsole_Command {
             throw new RuntimeException('phpstan is not installed, please install with phpstan:install command');
         }
         chdir(c::appRoot());
-        $command = [$this->phpBinary(), '-c', CQC::phpstan()->phpstanConfiguration(), '-d', 'memory_limit=1G', '-d', 'max_execution_time=0', $this->getPhpStanBinary(), 'analyze', '--error-format', $format, $appDir];
+        $command = [$this->phpBinary(), '-c', CQC::phpstan()->phpstanConfiguration(), '-d', 'memory_limit=1G', '-d', 'max_execution_time=0', $this->getPhpStanBinary(), 'analyze', '--error-format', $format, '--autoload-file', CQC::phpstan()->phpstanBootstrap(), $appDir];
 
         $process = Process::fromShellCommandline($command, $appDir);
         $process->setTimeout(60 * 60);
