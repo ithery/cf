@@ -1,7 +1,7 @@
+includes:
+	- ../../phpstan.neon.dist
+
 parameters:
-    universalObjectCratesClasses:
-        - CHTTP_Request
-        - COptional
     level: 4
     paths:
         - default
@@ -11,4 +11,5 @@ parameters:
         - default/tests/*
         - default/data/*
         - default/media/*
+        - default/i18n/*
         - *.blade.php

@@ -220,6 +220,9 @@ trait CApp_Trait_BaseTrait {
         return 'system';
     }
 
+    /**
+     * @return CApp_Model_Roles
+     */
     public static function role() {
         $app = CApp::instance();
         $role = $app->role();

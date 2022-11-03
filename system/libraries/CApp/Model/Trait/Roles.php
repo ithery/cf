@@ -14,6 +14,7 @@ defined('SYSPATH') or die('No direct access allowed.');
  * @property      CCarbon $created
  * @property      CCarbon $updated
  * @property      int     $status
+ * @property      int     $depth
  * @property-read int     $role_id
  *
  * @method static CModel_Collection byAccess(string $permitWithoutWildcard)

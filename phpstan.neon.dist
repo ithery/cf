@@ -18,6 +18,10 @@ services:
         tags:
             - phpstan.broker.methodsClassReflectionExtension
     -
+        class: CQC_Phpstan_Service_Method_ModelForwardsCallsExtension
+        tags:
+            - phpstan.broker.methodsClassReflectionExtension
+    -
         class: CQC_Phpstan_Service_Method_ModelQueryForwardsCallsExtension
         tags:
             - phpstan.broker.methodsClassReflectionExtension
