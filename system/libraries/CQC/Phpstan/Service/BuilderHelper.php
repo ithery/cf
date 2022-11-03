@@ -129,7 +129,7 @@ class CQC_Phpstan_Service_BuilderHelper {
      *
      * @return null|MethodReflection
      */
-    public function searchOnEloquentBuilder(ClassReflection $eloquentBuilder, string $methodName, ClassReflection $model): ?MethodReflection {
+    public function searchOnModelQuery(ClassReflection $eloquentBuilder, string $methodName, ClassReflection $model): ?MethodReflection {
         // Check for local query scopes
         if (array_key_exists('scope' . ucfirst($methodName), $model->getMethodTags())) {
             $methodTag = $model->getMethodTags()['scope' . ucfirst($methodName)];
