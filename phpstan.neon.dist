@@ -26,6 +26,10 @@ services:
         tags:
             - phpstan.broker.methodsClassReflectionExtension
     -
+        class: CQC_Phpstan_Service_Method_RedirectResponseMethodsClassReflectionExtension
+        tags:
+            - phpstan.broker.methodsClassReflectionExtension
+    -
         class: CQC_Phpstan_Service_BuilderHelper
         arguments:
             checkProperties: %checkModelProperties%
