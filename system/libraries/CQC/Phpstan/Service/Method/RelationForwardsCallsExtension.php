@@ -1,7 +1,5 @@
 <?php
 
-
-
 use PHPStan\Type\Type;
 use PHPStan\Type\ObjectType;
 use PHPStan\Type\TypeWithClassName;
@@ -17,7 +15,7 @@ use PHPStan\Reflection\MissingMethodFromReflectionException;
 
 final class CQC_Phpstan_Service_Method_RelationForwardsCallsExtension implements MethodsClassReflectionExtension {
     /**
-     * @var BuilderHelper
+     * @var CQC_Phpstan_Service_BuilderHelper
      */
     private $builderHelper;
 
@@ -66,11 +64,16 @@ final class CQC_Phpstan_Service_Method_RelationForwardsCallsExtension implements
     }
 
     /**
+     * @param ClassReflection $classReflection
+     * @param string          $methodName
+     *
      * @throws MissingMethodFromReflectionException
      * @throws ShouldNotHappenException
+     *
+     * @return null|MethodReflection
      */
-    private function findMethod(ClassReflection $classReflection, string $methodName): ?MethodReflection {
-        if (!$classReflection->isSubclassOf(Relation::class)) {
+    private function findMethod(ClassReflection $classReflection, $methodName) {
+        if (!$classReflection->isSubclassOf(CModel_Relation::class)) {
             return null;
         }
 
@@ -109,7 +112,7 @@ final class CQC_Phpstan_Service_Method_RelationForwardsCallsExtension implements
         $types = [$relatedModel];
 
         // BelongsTo relation needs second generic type
-        if ((new ObjectType(BelongsTo::class))->isSuperTypeOf(new ObjectType($classReflection->getName()))->yes()) {
+        if ((new ObjectType(CModel_Relation_BelongsTo::class))->isSuperTypeOf(new ObjectType($classReflection->getName()))->yes()) {
             $childType = $classReflection->getActiveTemplateTypeMap()->getType('TChildModel');
 
             if ($childType !== null) {
@@ -117,7 +120,7 @@ final class CQC_Phpstan_Service_Method_RelationForwardsCallsExtension implements
             }
         }
 
-        if ((new ObjectType(Builder::class))->isSuperTypeOf($returnType)->yes()) {
+        if ((new ObjectType(CModel_Query::class))->isSuperTypeOf($returnType)->yes()) {
             return new CQC_Phpstan_Reflection_ModelQueryMethodReflection(
                 $methodName,
                 $classReflection,

@@ -7,7 +7,7 @@ parameters:
     earlyTerminatingFunctionCalls:
         - c::abort
         - cdbg::dd
-    checkModelProperties: false
+    checkModelProperties: true
 
 parametersSchema:
     checkModelProperties: bool()
@@ -29,6 +29,33 @@ services:
         class: CQC_Phpstan_Service_Method_RedirectResponseMethodsClassReflectionExtension
         tags:
             - phpstan.broker.methodsClassReflectionExtension
+    -
+        class: CQC_Phpstan_Service_ReturnType_ModelQueryExtension
+        tags:
+            - phpstan.broker.dynamicMethodReturnTypeExtension
+    -
+        class: CQC_Phpstan_Service_ReturnType_ModelFindExtension
+        tags:
+            - phpstan.broker.dynamicStaticMethodReturnTypeExtension
+    -
+        class: CQC_Phpstan_Service_ReturnType_ModelQueryFindExtension
+        tags:
+            - phpstan.broker.dynamicMethodReturnTypeExtension
+
+    -
+        class: CQC_Phpstan_Service_Rule_ModelProperty_ModelPropertyStaticCallRule
+    -
+        class: CQC_Phpstan_Service_Type_GenericModelQueryTypeNodeResolverExtension
+        tags:
+            - phpstan.phpDoc.typeNodeResolverExtension
+    -
+        class: CQC_Phpstan_Service_Type_ModelProperty_ModelPropertyTypeNodeResolverExtension
+        tags:
+            - phpstan.phpDoc.typeNodeResolverExtension
+        arguments:
+            active: %checkModelProperties%
+    -
+        class: CQC_Phpstan_Service_Rule_ModelProperty_ModelPropertiesRuleHelper
     -
         class: CQC_Phpstan_Service_BuilderHelper
         arguments:

@@ -342,7 +342,7 @@ class CModel_Query {
      * @param mixed $id
      * @param array $columns
      *
-     * @return null|CModel|CModel_Collection|static[]|static
+     * @return null|static|CModel|CModel_Collection|static[]
      */
     public function find($id, $columns = ['*']) {
         if (is_array($id) || $id instanceof CInterface_Arrayable) {

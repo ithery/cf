@@ -34,17 +34,17 @@ final class CQC_Phpstan_Service_Method_ModelForwardsCallsExtension implements Me
     /**
      * @var EloquentBuilderForwardsCallsExtension
      */
-    private $eloquentBuilderForwardsCallsExtension;
+    private $modelQueryForwardsCallsExtension;
 
     /**
      * @var array<string, MethodReflection>
      */
     private $cache = [];
 
-    public function __construct(CQC_Phpstan_Service_BuilderHelper $builderHelper, ReflectionProvider $reflectionProvider, CQC_Phpstan_Service_Method_ModelQueryForwardsCallsExtension $eloquentBuilderForwardsCallsExtension) {
+    public function __construct(CQC_Phpstan_Service_BuilderHelper $builderHelper, ReflectionProvider $reflectionProvider, CQC_Phpstan_Service_Method_ModelQueryForwardsCallsExtension $modelQueryForwardsCallsExtension) {
         $this->builderHelper = $builderHelper;
         $this->reflectionProvider = $reflectionProvider;
-        $this->eloquentBuilderForwardsCallsExtension = $eloquentBuilderForwardsCallsExtension;
+        $this->modelQueryForwardsCallsExtension = $modelQueryForwardsCallsExtension;
     }
 
     /**
@@ -197,8 +197,8 @@ final class CQC_Phpstan_Service_Method_ModelForwardsCallsExtension implements Me
             );
         }
 
-        if ($this->eloquentBuilderForwardsCallsExtension->hasMethod($builderReflection, $methodName)) {
-            return $this->eloquentBuilderForwardsCallsExtension->getMethod($builderReflection, $methodName);
+        if ($this->modelQueryForwardsCallsExtension->hasMethod($builderReflection, $methodName)) {
+            return $this->modelQueryForwardsCallsExtension->getMethod($builderReflection, $methodName);
         }
 
         return null;
