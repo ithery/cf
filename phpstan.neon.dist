@@ -8,9 +8,13 @@ parameters:
         - c::abort
         - cdbg::dd
     checkModelProperties: true
+    excludePaths:
+        - system/stubs
+
 
 parametersSchema:
     checkModelProperties: bool()
+
 conditionalTags:
     CQC_Phpstan_Service_Rule_ModelProperty_ModelPropertyRule:
         phpstan.rules.rule: %checkModelProperties%
@@ -76,6 +80,3 @@ services:
         class: CQC_Phpstan_Service_BuilderHelper
         arguments:
             checkProperties: %checkModelProperties%
-    -
-        class: CQC_Phpstan_Service_CFStubFilesExtension
-        tags: [phpstan.stubFilesExtension]

@@ -12,6 +12,8 @@ defined('SYSPATH') or die('No direct access allowed.');
 /**
  * Class CModel_Query.
  *
+ * @template TModelClass of CModel
+ *
  * @method static CModel|CModel_Collection|static|null      find($id, $columns = ['*'])                                                              Find a model by its primary key.
  * @method static CModel_Collection                         findMany($ids, $columns = ['*'])                                                         Find a model by its primary key.
  * @method static CModel|CModel_Collection|static           findOrFail($id, $columns = ['*'])                                                        Find a model by its primary key or throw an exception.
@@ -343,6 +345,8 @@ class CModel_Query {
      * @param array $columns
      *
      * @return null|static|CModel|CModel_Collection|static[]
+     *
+     * @phpstan-return ($id is (\CInterface_Arrayable<array-key, mixed>|array<mixed>) ? \CModel_Collection<int, TModelClass> : TModelClass)|null
      */
     public function find($id, $columns = ['*']) {
         if (is_array($id) || $id instanceof CInterface_Arrayable) {
