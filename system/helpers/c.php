@@ -682,7 +682,7 @@ class c {
      * @param null|array|string $key
      * @param mixed             $default
      *
-     * @return CHTTP_Request|string|array
+     * @return ($key is null ? CHTTP_Request : string|array)
      */
     public static function request($key = null, $default = null) {
         if (is_null($key)) {

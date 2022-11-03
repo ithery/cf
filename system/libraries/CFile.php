@@ -340,8 +340,9 @@ class CFile {
                 'To enable support for guessing extensions, please install the symfony/mime package.'
             );
         }
+        $mimeTypes = (new MimeTypes())->getExtensions(static::mimeType($path));
 
-        return (new MimeTypes())->getExtensions(static::mimeType($path))[0] ?? null;
+        return isset($mimeTypes[0]) ? $mimeTypes[0] : null;
     }
 
     /**
@@ -587,12 +588,13 @@ class CFile {
         if (static::isFile($path)) {
             $__path = $path;
             $__data = $data;
-
-            return (static function () use ($__path, $__data) {
+            $function = static function () use ($__path, $__data) {
                 extract($__data, EXTR_SKIP);
 
-                return require_once $__path;
-            })();
+                return require $__path;
+            };
+
+            return $function();
         }
 
         throw new CStorage_Exception_FileNotFoundException("File does not exist at path {$path}.");

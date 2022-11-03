@@ -44,19 +44,10 @@ class CConsole_Command_PhpstanInstallCommand extends CConsole_Command {
 
     public function handle() {
         $phpStan = CQC::phpstan();
-        CConsole::domainRequired($this);
-        if (!$phpStan->isInstalled()) {
-            $this->downloadPhpstanBinaryOnBinPath();
-        }
-        if (!$phpStan->isInstalled()) {
-            $this->downloadPhpstanPharOnBinPath();
-        }
-        if (!$phpStan->isInstalled()) {
-            $this->setupPhpstanConfig();
-        }
-        if (!$phpStan->isInstalled()) {
-            $this->setupPhpstanBootstrap();
-        }
+        $this->downloadPhpstanBinaryOnBinPath();
+        $this->downloadPhpstanPharOnBinPath();
+        $this->setupPhpstanConfig();
+        $this->setupPhpstanBootstrap();
     }
 
     protected function downloadPhpstanBinaryOnBinPath() {

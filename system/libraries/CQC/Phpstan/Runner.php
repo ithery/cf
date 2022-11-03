@@ -59,7 +59,7 @@ class CQC_Phpstan_Runner {
 
     public function run() {
         if ($this->isRunning()) {
-            throw new Exception('qc phpstan runner is running');
+            //throw new Exception('qc phpstan runner is running');
         }
         if (!$this->startRun()) {
             throw new Exception('qc phpstan runner failed running, please check directory permission at:' . $this->directory);

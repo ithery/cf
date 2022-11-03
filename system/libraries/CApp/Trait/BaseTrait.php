@@ -62,7 +62,7 @@ trait CApp_Trait_BaseTrait {
     }
 
     /**
-     * @return int
+     * @return null|int
      */
     public static function orgId() {
         $orgId = CF::orgId();
