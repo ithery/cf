@@ -62,7 +62,7 @@ trait CTrait_Controller_Application_QC_Phpstan {
                     foreach ($value as $val) {
                         $line = carr::get($val, 'line');
                         $message = carr::get($val, 'message');
-                        $ul->addLi()->add('line ' . $line . ':' . $message . (carr::get($val, 'ignorable') ? ' (ignorable)' : ' (not ignorable)'));
+                        $ul->addLi()->add('line ' . $line . ':' . c::e($message));
                     }
                 } else {
                     $div->add($value);
