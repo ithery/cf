@@ -32,7 +32,7 @@ final class CQC_Phpstan_Service_Method_ModelForwardsCallsExtension implements Me
     private $reflectionProvider;
 
     /**
-     * @var EloquentBuilderForwardsCallsExtension
+     * @var CQC_Phpstan_Service_Method_ModelQueryForwardsCallsExtension
      */
     private $modelQueryForwardsCallsExtension;
 

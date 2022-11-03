@@ -50,7 +50,7 @@ final class CQC_Phpstan_Service_ReturnType_ModelFindExtension implements Dynamic
         if (!cstr::startsWith($methodName, 'find')) {
             return false;
         }
-
+        PHPStan\dumpType('test');
         if (!$this->reflectionProvider->getClass(CModel_Query::class)->hasNativeMethod($methodName)
             && !$this->reflectionProvider->getClass(CDatabase_Query_Builder::class)->hasNativeMethod($methodName)
         ) {
@@ -79,6 +79,7 @@ final class CQC_Phpstan_Service_ReturnType_ModelFindExtension implements Dynamic
         }
 
         $modelName = $class->toString();
+
         $returnType = $methodReflection->getVariants()[0]->getReturnType();
         $argType = $scope->getType($methodCall->getArgs()[0]->value);
 
@@ -91,10 +92,12 @@ final class CQC_Phpstan_Service_ReturnType_ModelFindExtension implements Dynamic
 
             return TypeCombinator::remove($returnType, new ObjectType($modelName));
         }
-
+        $returnType = TypeCombinator::union($returnType, new ObjectType($modelName));
         if ($argType instanceof MixedType) {
             return $returnType;
         }
+
+        //return TypeCombinator::addNull(new ObjectType($modelName));
 
         return TypeCombinator::remove(
             TypeCombinator::remove(

@@ -91,7 +91,7 @@ final class CQC_Phpstan_Service_Method_ModelQueryForwardsCallsExtension implemen
             return null;
         }
 
-        $ref = $this->builderHelper->searchOnEloquentBuilder($classReflection, $methodName, $modelReflection);
+        $ref = $this->builderHelper->searchOnModelQuery($classReflection, $methodName, $modelReflection);
 
         if ($ref === null) {
             // Special case for `SoftDeletes` trait
