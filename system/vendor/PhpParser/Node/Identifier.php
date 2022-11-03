@@ -1,5 +1,4 @@
-<?php
-declare(strict_types=1);
+<?php declare(strict_types=1);
 
 namespace PhpParser\Node;
 
@@ -8,14 +7,13 @@ use PhpParser\NodeAbstract;
 /**
  * Represents a non-namespaced name. Namespaced names are represented using Name nodes.
  */
-class Identifier extends NodeAbstract {
-    /**
-     * @var string Identifier as string
-     */
+class Identifier extends NodeAbstract
+{
+    /** @var string Identifier as string */
     public $name;
 
     private static $specialClassNames = [
-        'self' => true,
+        'self'   => true,
         'parent' => true,
         'static' => true,
     ];
@@ -38,7 +36,7 @@ class Identifier extends NodeAbstract {
     /**
      * Get identifier as string.
      *
-     * @return string identifier as string
+     * @return string Identifier as string.
      */
     public function toString() : string {
         return $this->name;
@@ -70,7 +68,7 @@ class Identifier extends NodeAbstract {
     public function __toString() : string {
         return $this->name;
     }
-
+    
     public function getType() : string {
         return 'Identifier';
     }

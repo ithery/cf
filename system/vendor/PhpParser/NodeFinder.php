@@ -1,12 +1,12 @@
-<?php
+<?php declare(strict_types=1);
 
 namespace PhpParser;
 
 use PhpParser\NodeVisitor\FindingVisitor;
 use PhpParser\NodeVisitor\FirstFindingVisitor;
 
-class NodeFinder {
-
+class NodeFinder
+{
     /**
      * Find all nodes satisfying a filter callback.
      *
@@ -15,14 +15,17 @@ class NodeFinder {
      *
      * @return Node[] Found nodes satisfying the filter callback
      */
-    public function find($nodes, callable $filter) {
+    public function find($nodes, callable $filter) : array {
         if (!is_array($nodes)) {
             $nodes = [$nodes];
         }
+
         $visitor = new FindingVisitor($filter);
+
         $traverser = new NodeTraverser;
         $traverser->addVisitor($visitor);
         $traverser->traverse($nodes);
+
         return $visitor->getFoundNodes();
     }
 
@@ -34,10 +37,10 @@ class NodeFinder {
      *
      * @return Node[] Found nodes (all instances of $class)
      */
-    public function findInstanceOf($nodes, $class) {
+    public function findInstanceOf($nodes, string $class) : array {
         return $this->find($nodes, function ($node) use ($class) {
-                    return $node instanceof $class;
-                });
+            return $node instanceof $class;
+        });
     }
 
     /**
@@ -52,10 +55,13 @@ class NodeFinder {
         if (!is_array($nodes)) {
             $nodes = [$nodes];
         }
+
         $visitor = new FirstFindingVisitor($filter);
+
         $traverser = new NodeTraverser;
         $traverser->addVisitor($visitor);
         $traverser->traverse($nodes);
+
         return $visitor->getFoundNode();
     }
 
@@ -67,10 +73,9 @@ class NodeFinder {
      *
      * @return null|Node Found node, which is an instance of $class (or null if none found)
      */
-    public function findFirstInstanceOf($nodes, $class) {
+    public function findFirstInstanceOf($nodes, string $class) {
         return $this->findFirst($nodes, function ($node) use ($class) {
-                    return $node instanceof $class;
-                });
+            return $node instanceof $class;
+        });
     }
-
 }
