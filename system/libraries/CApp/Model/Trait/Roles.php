@@ -36,10 +36,10 @@ trait CApp_Model_Trait_Roles {
     }
 
     /**
-     * @return CModel_Relation_BelongsTo
+     * @return CModel_Relation_BelongsTo|CModel_Query
      */
     public function org() {
-        return $this->belongsTo(CApp_Model_Org::class);
+        return $this->belongsTo(CApp_Model_Org::class)->withTrashed();
     }
 
     public function rolePermission() {
