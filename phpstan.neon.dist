@@ -4,6 +4,7 @@ parameters:
     universalObjectCratesClasses:
         - CHTTP_Request
         - COptional
+        - CModel_Relation_Pivot
     earlyTerminatingFunctionCalls:
         - c::abort
         - cdbg::dd

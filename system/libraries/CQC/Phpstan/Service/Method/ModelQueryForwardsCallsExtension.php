@@ -87,14 +87,18 @@ final class CQC_Phpstan_Service_Method_ModelQueryForwardsCallsExtension implemen
             $modelReflection = $this->reflectionProvider->getClass(CModel::class);
         }
 
+        // Special case for `CModel_Chartable_ChartableTrait` trait
         if ($modelReflection === null) {
             return null;
         }
-
         $ref = $this->builderHelper->searchOnModelQuery($classReflection, $methodName, $modelReflection);
-
+        if (in_array($methodName, ['countForGroup', 'countByDays', 'countByMonths', 'valuesByDays', 'sumByDays', 'sumByMonths'], true)
+            && in_array(CModel_Chartable_ChartableTrait::class, array_keys($modelReflection->getTraits(true)))
+        ) {
+            return $ref;
+        }
         if ($ref === null) {
-            // Special case for `SoftDeletes` trait
+            // Special case for `CModel_SoftDelete_SoftDeleteTrait` trait
             if (in_array($methodName, ['withTrashed', 'onlyTrashed', 'withoutTrashed', 'restore'], true)
                 && in_array(CModel_SoftDelete_SoftDeleteTrait::class, array_keys($modelReflection->getTraits(true)))
             ) {
