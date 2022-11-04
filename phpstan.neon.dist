@@ -35,6 +35,10 @@ services:
         tags:
             - phpstan.broker.methodsClassReflectionExtension
     -
+        class: CQC_Phpstan_Service_Method_HigherOrderCollectionProxyExtension
+        tags:
+            - phpstan.broker.methodsClassReflectionExtension
+    -
         class: CQC_Phpstan_Service_Method_Extension
         tags:
             - phpstan.broker.methodsClassReflectionExtension

@@ -25,13 +25,16 @@ class CQC_Manager {
     }
 
     public function __construct() {
-        $this->testing = new CQC_Testing();
     }
 
     /**
      * @return CQC_Testing
      */
     public function testing() {
+        if ($this->testing == null) {
+            $this->testing = new CQC_Testing();
+        }
+
         return $this->testing;
     }
 }

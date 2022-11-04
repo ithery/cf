@@ -8,9 +8,12 @@ parameters:
     bootstrapFiles:
         - phpstan-bootstrap.php
     excludePaths:
-        - default/tests/*
-        - default/data/*
-        - default/media/*
-        - default/i18n/*
-        - default/templates/*
-        - *.blade.php
+        analyseAndScan:
+            - default/tests/*
+            - default/data/*
+            - default/media/*
+            - default/i18n/*
+            - default/templates/*
+            - *.blade.php
+        analyse:
+            - default/vendor
