@@ -327,4 +327,18 @@ trait CObservable_Trait_ControlTrait {
 
         return $control;
     }
+
+    /**
+     * Create Text Control.
+     *
+     * @param null|string $id
+     *
+     * @return CElement_FormInput_QueryBuilder
+     */
+    public function addQueryBuilderControl($id = null) {
+        $control = new CElement_FormInput_QueryBuilder($id);
+        $this->wrapper->add($control);
+
+        return $control;
+    }
 }
