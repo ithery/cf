@@ -1,0 +1,36 @@
+
+
+<?php
+
+/**
+ * @template TKey of array-key
+ * @template TValue
+ *
+ * @property-read CBase_HigherOrderCollectionProxy<'average', TValue>    $average
+ * @property-read CBase_HigherOrderCollectionProxy<'avg', TValue>        $avg
+ * @property-read CBase_HigherOrderCollectionProxy<'contains', TValue>   $contains
+ * @property-read CBase_HigherOrderCollectionProxy<'each', TValue>       $each
+ * @property-read CBase_HigherOrderCollectionProxy<'every', TValue>      $every
+ * @property-read CBase_HigherOrderCollectionProxy<'filter', TValue>     $filter
+ * @property-read CBase_HigherOrderCollectionProxy<'first', TValue>      $first
+ * @property-read CBase_HigherOrderCollectionProxy<'flatMap', TValue>    $flatMap
+ * @property-read CBase_HigherOrderCollectionProxy<'groupBy', TValue>    $groupBy
+ * @property-read CBase_HigherOrderCollectionProxy<'keyBy', TValue>      $keyBy
+ * @property-read CBase_HigherOrderCollectionProxy<'map', TValue>        $map
+ * @property-read CBase_HigherOrderCollectionProxy<'max', TValue>        $max
+ * @property-read CBase_HigherOrderCollectionProxy<'min', TValue>        $min
+ * @property-read CBase_HigherOrderCollectionProxy<'partition', TValue>  $partition
+ * @property-read CBase_HigherOrderCollectionProxy<'reject', TValue>     $reject
+ * @property-read CBase_HigherOrderCollectionProxy<'some', TValue>       $some
+ * @property-read CBase_HigherOrderCollectionProxy<'sortBy', TValue>     $sortBy
+ * @property-read CBase_HigherOrderCollectionProxy<'sortByDesc', TValue> $sortByDesc
+ * @property-read CBase_HigherOrderCollectionProxy<'skipUntil', TValue>  $skipUntil
+ * @property-read CBase_HigherOrderCollectionProxy<'skipWhile', TValue>  $skipWhile
+ * @property-read CBase_HigherOrderCollectionProxy<'sum', TValue>        $sum
+ * @property-read CBase_HigherOrderCollectionProxy<'takeUntil', TValue>  $takeUntil
+ * @property-read CBase_HigherOrderCollectionProxy<'takeWhile', TValue>  $takeWhile
+ * @property-read CBase_HigherOrderCollectionProxy<'unique', TValue>     $unique
+ * @property-read CBase_HigherOrderCollectionProxy<'until', TValue>      $until
+ */
+trait CCollection_Concern_EnumeratesValuesTrait {
+}
