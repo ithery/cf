@@ -764,6 +764,8 @@ class c {
      * @param null|bool   $secure
      *
      * @return CHTTP_Redirector|CHTTP_RedirectResponse
+     *
+     * @phpstan-return ($to is null ? CHTTP_Redirector : CHTTP_RedirectResponse)
      */
     public static function redirect($to = null, $status = 302, $headers = [], $secure = null) {
         if ($to instanceof CController) {
