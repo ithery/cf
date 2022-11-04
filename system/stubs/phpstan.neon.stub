@@ -12,4 +12,5 @@ parameters:
         - default/data/*
         - default/media/*
         - default/i18n/*
+        - default/templates/*
         - *.blade.php
