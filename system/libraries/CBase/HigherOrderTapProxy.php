@@ -1,5 +1,9 @@
 <?php
-
+/**
+ * @template TClass
+ *
+ * @property TClass $target
+ */
 class CBase_HigherOrderTapProxy {
     /**
      * The target being tapped.
@@ -11,7 +15,7 @@ class CBase_HigherOrderTapProxy {
     /**
      * Create a new tap proxy instance.
      *
-     * @param mixed $target
+     * @param TClass $target
      *
      * @return void
      */
@@ -29,6 +33,7 @@ class CBase_HigherOrderTapProxy {
      */
     public function __call($method, $parameters) {
         $this->target->{$method}(...$parameters);
+
         return $this->target;
     }
 }

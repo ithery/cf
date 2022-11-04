@@ -11,7 +11,8 @@ use PHPStan\Reflection\MethodsClassReflectionExtension;
 
 final class CQC_Phpstan_Service_Method_HigherOrderCollectionProxyExtension implements MethodsClassReflectionExtension {
     public function hasMethod(ClassReflection $classReflection, string $methodName): bool {
-        return CQC_Phpstan_Service_Support_HigherOrderCollectionProxyHelper::hasPropertyOrMethod($classReflection, $methodName, 'method');
+        $result = CQC_Phpstan_Service_Support_HigherOrderCollectionProxyHelper::hasPropertyOrMethod($classReflection, $methodName, 'method');
+        return $result;
     }
 
     public function getMethod(
@@ -29,7 +30,6 @@ final class CQC_Phpstan_Service_Method_HigherOrderCollectionProxyExtension imple
         $modelMethodReflection = $valueType->getMethod($methodName, new OutOfClassScope());
 
         $modelMethodReturnType = ParametersAcceptorSelector::selectSingle($modelMethodReflection->getVariants())->getReturnType();
-
         $returnType = CQC_Phpstan_Service_Support_HigherOrderCollectionProxyHelper::determineReturnType($methodType->getValue(), $valueType, $modelMethodReturnType);
 
         return new class($classReflection, $methodName, $modelMethodReflection, $returnType) implements MethodReflection {

@@ -85,3 +85,6 @@ services:
         class: CQC_Phpstan_Service_BuilderHelper
         arguments:
             checkProperties: %checkModelProperties%
+    -
+        class: CQC_Phpstan_Service_CFStubFilesExtension
+        tags: [phpstan.stubFilesExtension]
