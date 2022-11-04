@@ -15,6 +15,8 @@ defined('SYSPATH') or die('No direct access allowed.');
  *
  * @method static width($width);
  * @method static height($height)
+ * @method static quality($quality)
+ * @method static nonQueued()
  */
 class CResources_Conversion {
     /**
