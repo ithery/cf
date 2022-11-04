@@ -9,14 +9,10 @@ defined('SYSPATH') or die('No direct access allowed.');
  * @since May 2, 2019, 2:28:30 AM
  */
 
-/** @mixin CImage_Manipulations */
 /**
- * @mixin CImage_Manipulations
- *
  * @method static width($width);
  * @method static height($height)
  * @method static quality($quality)
- * @method static nonQueued()
  */
 class CResources_Conversion {
     /**

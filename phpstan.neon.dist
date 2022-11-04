@@ -8,6 +8,7 @@ parameters:
         - c::abort
         - cdbg::dd
     checkModelProperties: true
+    reportUnmatchedIgnoredErrors: false
     excludePaths:
         - system/stubs
 
