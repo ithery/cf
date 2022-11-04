@@ -30,4 +30,9 @@ return [
         'label' => c::__('Editor JS'),
         'uri' => 'demo/controls/editorjs/index',
     ],
+    [
+        'name' => 'controls.querybuilder',
+        'label' => c::__('Query Builder'),
+        'uri' => 'demo/controls/querybuilder/index',
+    ],
 ];
