@@ -34,11 +34,7 @@ class CConsole_Command_Model_ModelUpdateCommand extends CConsole_Command_AppComm
         }
 
         $modelClass .= '_' . $model;
-        $stubFile = CF::findFile('stubs', 'model', true, 'stub');
-        if (!$stubFile) {
-            $this->error('model stub not found');
-            exit(1);
-        }
+
         $content = CFile::get($modelFile);
         $content = preg_replace('/.*@property.*/', '{properties}', $content);
         $content = preg_replace('/{properties}/', $this->getUpdatedProperties(), $content, 1);
@@ -115,14 +111,14 @@ class CConsole_Command_Model_ModelUpdateCommand extends CConsole_Command_AppComm
         $db = c::db();
 
         $result = $db->query("desc ${table}");
+        $result = $db->getSchemaManager()->listTableColumns($table);
+
         $properties = [];
-        foreach ($result as $value) {
-            $field = $value->Field;
-            $type = $value->Type;
-            $temp = explode('(', $type);
-            if ($temp) {
-                $type = c::get($temp, 0);
-            }
+        foreach ($result as $key => $column) {
+            /** @var CDatabase_Schema_Column $column */
+            $field = $key;
+            $type = $column->getType()->getName();
+
             $type = $this->getType($type);
             if (!in_array($field, $excludedFields)) {
                 $properties[$field] = $type;
@@ -157,15 +153,15 @@ class CConsole_Command_Model_ModelUpdateCommand extends CConsole_Command_AppComm
             'longtext' => 'string',
             'enum' => 'string',
             'set' => 'string',
-            'date' => 'CCarbon',
+            'date' => 'CCarbon|\Carbon\Carbon',
             'time' => 'string',
-            'datetime' => 'CCarbon',
+            'datetime' => 'CCarbon|\Carbon\Carbon',
             'timestamp' => 'string',
             'year' => 'string',
             'boolean' => 'bool',
         ];
 
-        if ($result = c::get($typeConvertion, $type)) {
+        if ($result = carr::get($typeConvertion, $type)) {
             return $result;
         }
 
@@ -175,11 +171,11 @@ class CConsole_Command_Model_ModelUpdateCommand extends CConsole_Command_AppComm
     public function compareField() {
         $compared = [];
         $currentProperties = $this->getCurrentProperties();
-        $fileds = $this->getFields();
+        $fields = $this->getFields();
         $currentPropertiyFields = array_column($currentProperties, 'field');
         $classMethods = get_class_methods($this->prefix . 'Model_' . $this->getModel());
 
-        foreach ($fileds as $field => $type) {
+        foreach ($fields as $field => $type) {
             $i = array_search($field, $currentPropertiyFields);
             if ($i === false) {
                 $compared[$field] = 'add';
@@ -194,7 +190,7 @@ class CConsole_Command_Model_ModelUpdateCommand extends CConsole_Command_AppComm
         }
 
         foreach ($currentPropertiyFields as $field) {
-            $i = array_search($field, array_keys($fileds));
+            $i = array_search($field, array_keys($fields));
             if ($i === false && !in_array($field, $classMethods)) {
                 $compared[$field] = 'delete';
             }
