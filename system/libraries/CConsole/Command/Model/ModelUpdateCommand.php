@@ -192,7 +192,9 @@ class CConsole_Command_Model_ModelUpdateCommand extends CConsole_Command_AppComm
         foreach ($currentPropertiyFields as $field) {
             $i = array_search($field, array_keys($fields));
             if ($i === false && !in_array($field, $classMethods)) {
-                $compared[$field] = 'delete';
+                if (!cstr::endsWith($field, '_count')) {
+                    $compared[$field] = 'delete';
+                }
             }
         }
 
