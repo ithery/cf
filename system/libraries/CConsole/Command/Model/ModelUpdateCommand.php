@@ -93,12 +93,17 @@ class CConsole_Command_Model_ModelUpdateCommand extends CConsole_Command_AppComm
         foreach ($props as $prop) {
             $prop = preg_replace('/\s+/', ' ', $prop);
             $temp = explode(' ', $prop);
-            $var = c::get($temp, 2);
+            $var = carr::get($temp, 2);
+            $desc = carr::get($temp, 3);
+            if ($desc) {
+                $desc = implode(' ', array_slice($temp, 3));
+            }
             $result[] = [
                 'prop' => c::get($temp, 0),
                 'type' => c::get($temp, 1),
                 'var' => $var,
                 'field' => str_replace('$', '', $var),
+                'desc' => $desc
             ];
         }
 
@@ -114,11 +119,16 @@ class CConsole_Command_Model_ModelUpdateCommand extends CConsole_Command_AppComm
         $result = $db->getSchemaManager()->listTableColumns($table);
 
         $properties = [];
+        $modelInstance = $this->getModelInstance();
         foreach ($result as $key => $column) {
             /** @var CDatabase_Schema_Column $column */
             $field = $key;
             $type = $column->getType()->getName();
 
+            $casts = $modelInstance->getCasts();
+
+            $type = carr::get($casts, $field, $type);
+            //check for model casts
             $type = $this->getType($type);
             if (!in_array($field, $excludedFields)) {
                 $properties[$field] = $type;
@@ -159,6 +169,10 @@ class CConsole_Command_Model_ModelUpdateCommand extends CConsole_Command_AppComm
             'timestamp' => 'string',
             'year' => 'string',
             'boolean' => 'bool',
+            //casts convertion
+            'integer' => 'int',
+            'array' => 'array',
+            'json' => 'array',
         ];
 
         if ($result = carr::get($typeConvertion, $type)) {
@@ -166,6 +180,19 @@ class CConsole_Command_Model_ModelUpdateCommand extends CConsole_Command_AppComm
         }
 
         return $type;
+    }
+
+    public function getModelClass() {
+        return  $this->prefix . 'Model_' . $this->getModel();
+    }
+
+    /**
+     * @return CModel
+     */
+    public function getModelInstance() {
+        $modelClass = $this->getModelClass();
+
+        return new $modelClass();
     }
 
     public function compareField() {
@@ -215,7 +242,8 @@ class CConsole_Command_Model_ModelUpdateCommand extends CConsole_Command_AppComm
                         'prop' => $this->getTable() . '_id' === $field ? '@property-read' : '@property',
                         'type' => 'string',
                         'var' => '$' . $field,
-                        'field' => $field
+                        'field' => $field,
+                        'desc' => '',
                     ];
 
                     break;
@@ -229,9 +257,32 @@ class CConsole_Command_Model_ModelUpdateCommand extends CConsole_Command_AppComm
                     break;
             }
         }
+        $propLength = 0;
+        $typeLength = 0;
+        $varLength = 0;
 
         foreach ($currentProperties as $property) {
-            $properties[] = ' * ' . c::get($property, 'prop') . ' ' . c::get($property, 'type') . ' ' . c::get($property, 'var');
+            if ($propLength < strlen(carr::get($property, 'prop'))) {
+                $propLength = strlen(carr::get($property, 'prop'));
+            }
+            if ($typeLength < strlen(carr::get($property, 'type'))) {
+                $typeLength = strlen(carr::get($property, 'type'));
+            }
+            if ($varLength < strlen(carr::get($property, 'var'))) {
+                $varLength = strlen(carr::get($property, 'var'));
+            }
+        }
+        foreach ($currentProperties as $property) {
+            $prop = ' * ';
+            $prop .= cstr::padRight(carr::get($property, 'prop'), $propLength);
+            $prop .= ' ' . cstr::padRight(carr::get($property, 'type'), $typeLength);
+            if (carr::get($property, 'desc')) {
+                $prop .= ' ' . cstr::padRight(carr::get($property, 'var'), $varLength);
+                $prop .= ' ' . carr::get($property, 'desc');
+            } else {
+                $prop .= ' ' . carr::get($property, 'var');
+            }
+            $properties[] = $prop;
         }
 
         $result = implode("\n", $properties);
