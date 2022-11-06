@@ -15,12 +15,17 @@ class CConsole_Command_PhpstanCommand extends CConsole_Command {
      *
      * @var string
      */
-    protected $signature = 'phpstan {--format=table : format to display} {--debug}';
+    protected $signature = 'phpstan {file} {--format=table : format to display} {--debug}';
 
     public function handle() {
         $format = $this->option('format');
         $debug = $this->option('debug');
         $appDir = c::appRoot();
+        $file = $this->argument('file');
+        $scanPath = $appDir;
+        if ($file) {
+            $scanPath = $file;
+        }
 
         if (!$this->isPhpStanInstalled()) {
             throw new RuntimeException('phpstan is not installed, please install with phpstan:install command');
@@ -30,9 +35,8 @@ class CConsole_Command_PhpstanCommand extends CConsole_Command {
         if ($debug) {
             $command[] = '--debug';
         }
-        $command[] = $appDir;
-
-        $process = Process::fromShellCommandline($command, $appDir);
+        $command[] = $scanPath;
+        $process = Process::fromShellCommandline($command, c::appRoot());
         $process->setTimeout(60 * 60);
         $process->start(function ($type, $buffer) {
             $this->output->write($buffer);
