@@ -53,19 +53,15 @@ class CConsole_Command_PhpstanCommand extends CConsole_Command {
         }
     }
 
-    protected function isPhpStanInstalled() {
+    private function isPhpStanInstalled() {
         return CQC::phpstan()->isInstalled();
     }
 
-    protected function getPhpStanBinary() {
+    private function getPhpStanBinary() {
         return CQC::phpstan()->phpstanBinary();
     }
 
-    protected function getPhpStanPhar($appDir) {
-        return CQC::phpstan()->phpstanPhar();
-    }
-
-    protected function phpBinary() {
+    private function phpBinary() {
         return (new PhpExecutableFinder())->find(false);
     }
 }
