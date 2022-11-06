@@ -110,6 +110,116 @@ class CConsole_Command_Model_ModelUpdateCommand extends CConsole_Command_AppComm
         return $result;
     }
 
+    private function getRelationMethods() {
+        //get relation field
+        $reflectionClass = new ReflectionClass($this->getModelClass());
+        $blacklistMethods = [
+            'belongsTo'
+        ];
+        $returnTypeClasses = [
+            CModel_Relation_BelongsTo::class,
+            CModel_Relation_BelongsToMany::class,
+            CModel_Relation_HasMany::class,
+            CModel_Relation_HasOne::class,
+        ];
+
+        $methods = c::collect($reflectionClass->getMethods())->map(function (ReflectionMethod $method) use ($returnTypeClasses, $blacklistMethods) {
+            if (in_array($method->getName(), $blacklistMethods)) {
+                //skip when method is blacklisted to be processed
+                return false;
+            }
+            if ($method->getFileName() != $method->getDeclaringClass()->getFileName()) {
+                //skip when method is not in same file
+                return false;
+            }
+            $docComment = $method->getDocComment();
+
+            if ($docComment) {
+                if (strpos($docComment, '@return') !== false) {
+                    if (preg_match('#\@return\s(.+?)\n#ims', $docComment, $matches)) {
+                        $matches = array_slice($matches, 1);
+                        foreach ($matches as $match) {
+                            $returnTypes = explode('|', $match);
+                            foreach ($returnTypes as $returnType) {
+                                if (in_array($returnType, $returnTypeClasses)) {
+                                    list($relationClass, $isWithTrashed) = $this->getRelationClass($method);
+                                    if ($relationClass && $relationType = $this->getRelationType($returnType, $relationClass, $isWithTrashed)) {
+                                        return [
+                                            'method' => $method->getName(),
+                                            'returnType' => $returnType,
+                                            'relationClass' => $relationClass,
+                                            'type' => $relationType,
+                                            'isWithTrashed' => $isWithTrashed,
+                                        ];
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+
+            return false;
+        })->filter()->toArray();
+
+        return $methods;
+    }
+
+    private function getRelationType($returnType, $relationClass, $isWithTrashed) {
+        $relationType = null;
+        if ($returnType == CModel_Relation_BelongsTo::class) {
+            $relationType = $relationClass;
+            if (!$isWithTrashed) {
+                $relationType = 'null|' . $relationType;
+            }
+        }
+
+        if ($returnType == CModel_Relation_BelongsToMany::class || $returnType == CModel_Relation_HasMany::class) {
+            $relationType = 'CModel_Collection|' . $relationClass . '[]';
+        }
+        if ($returnType == CModel_Relation_HasOne::class) {
+            $relationType = 'null|' . $relationClass;
+        }
+
+        return $relationType;
+    }
+
+    private function getRelationClass(ReflectionMethod $method) {
+        $codeSnippet = $this->getCodeSnippet($method->getFileName(), $method->getStartLine(), $method->getEndLine());
+        $regex = '#\$this->.+?\((.+?)[\,\)]#ims';
+        if (preg_match($regex, $codeSnippet, $matches)) {
+            $relationClass = $matches[1];
+            if (cstr::endsWith($relationClass, '::class')) {
+                $relationClass = cstr::substr($relationClass, 0, cstr::len($relationClass) - 7);
+            }
+            if (cstr::len($relationClass) > 1 && cstr::startsWith($relationClass, '\'') && cstr::endsWith($relationClass, '\'')) {
+                $relationClass = cstr::substr($relationClass, 1, cstr::len($relationClass) - 2);
+            }
+
+            $isWithTrashed = strpos($codeSnippet, '->withTrashed') !== false;
+
+            return [$relationClass, $isWithTrashed];
+        }
+
+        return [null, null];
+    }
+
+    private function getCodeSnippet($path, $startLine, $endLine) {
+        if ($endLine < $startLine) {
+            return [];
+        }
+        $file = new SplFileObject($path);
+        $file->seek($startLine - 1);
+        $code = [];
+        $code[] = $file->current();
+        for ($i = $startLine; $i < $endLine; $i++) {
+            $file->next();
+            $code[] = $file->current();
+        }
+
+        return implode(PHP_EOL, $code);
+    }
+
     private function getFields() {
         $table = $this->getTable();
         $excludedFields = ['created', 'createdby', 'updated', 'updatedby', 'deleted', 'deletedby', 'status'];
@@ -195,68 +305,97 @@ class CConsole_Command_Model_ModelUpdateCommand extends CConsole_Command_AppComm
         return new $modelClass();
     }
 
-    public function compareField() {
-        $compared = [];
-        $currentProperties = $this->getCurrentProperties();
+    public function updateFieldProperties($properties) {
         $fields = $this->getFields();
-        $currentPropertiyFields = array_column($currentProperties, 'field');
-        $classMethods = get_class_methods($this->prefix . 'Model_' . $this->getModel());
+        $currentPropertyFields = array_column($properties, 'field');
 
         foreach ($fields as $field => $type) {
-            $i = array_search($field, $currentPropertiyFields);
+            $i = array_search($field, $currentPropertyFields);
             if ($i === false) {
-                $compared[$field] = 'add';
+                $properties[] = [
+                    'prop' => $this->getTable() . '_id' === $field ? '@property-read' : '@property',
+                    'type' => 'string',
+                    'var' => '$' . $field,
+                    'field' => $field,
+                    'desc' => '',
+                ];
             } else {
-                $prop = c::get($currentProperties, $i);
+                $prop = carr::get($properties, $i);
                 $propType = c::get($prop, 'type');
 
                 if ($propType !== $type) {
-                    $compared[$field] = 'update';
+                    $properties[$i]['type'] = $fields[$field];
                 }
             }
         }
 
-        foreach ($currentPropertiyFields as $field) {
+        while (true) {
+            $missingIndex = $this->getMissingPropertyIndex($properties, $fields);
+            if ($missingIndex !== false) {
+                unset($properties[$missingIndex]);
+            } else {
+                break;
+            }
+        }
+
+        return $properties;
+    }
+
+    private function getMissingPropertyIndex($properties) {
+        $fields = $this->getFields();
+        $classMethods = get_class_methods($this->prefix . 'Model_' . $this->getModel());
+        foreach ($properties as $index => $property) {
+            $field = carr::get($property, 'field');
             $i = array_search($field, array_keys($fields));
             if ($i === false && !in_array($field, $classMethods)) {
                 if (!cstr::endsWith($field, '_count')) {
-                    $compared[$field] = 'delete';
+                    return $index;
                 }
             }
         }
 
-        return $compared;
+        return false;
+    }
+
+    public function updateFieldRelation($properties) {
+        $compared = [];
+
+        $methods = $this->getRelationMethods();
+        $fields = carr::pluck($methods, 'method');
+        $currentPropertyFields = array_column($properties, 'field');
+
+        foreach ($methods as $methodIndex => $method) {
+            $field = carr::get($method, 'method');
+            $i = array_search($field, $currentPropertyFields);
+            if ($i === false) {
+                $properties[] = [
+                    'prop' => '@property-read',
+                    'type' => carr::get($method, 'type'),
+                    'var' => '$' . $field,
+                    'field' => $field,
+                    'isRelation' => true,
+                    'desc' => '',
+                ];
+            } else {
+                $prop = carr::get($properties, $i);
+                $propType = c::get($prop, 'type');
+
+                if ($propType !== carr::get($method, 'type')) {
+                    $properties[$i]['type'] = carr::get($method, 'type');
+                }
+            }
+        }
+
+        return $properties;
     }
 
     public function getUpdatedProperties() {
         $properties = [];
-        $fields = $this->getFields();
+
         $currentProperties = $this->getCurrentProperties();
-        $compare = $this->compareField();
+        $currentProperties = $this->updateFieldProperties($currentProperties);
+        $currentProperties = $this->updateFieldRelation($currentProperties);
 
-        foreach ($compare as $field => $status) {
-            $i = array_search($field, array_column($currentProperties, 'field'));
-            switch ($status) {
-                case 'add':
-                    $currentProperties[] = [
-                        'prop' => $this->getTable() . '_id' === $field ? '@property-read' : '@property',
-                        'type' => 'string',
-                        'var' => '$' . $field,
-                        'field' => $field,
-                        'desc' => '',
-                    ];
-
-                    break;
-                case 'delete':
-                    unset($currentProperties[$i]);
-
-                    break;
-                case 'update':
-                    $currentProperties[$i]['type'] = $fields[$field];
-
-                    break;
-            }
-        }
         $propLength = 0;
         $typeLength = 0;
         $varLength = 0;
