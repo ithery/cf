@@ -2,6 +2,7 @@
 
 class CEmail_Builder_Type_Adapter_ColorAdapter extends CEmail_Builder_Type_AbstractAdapter {
     const MATCHER = '/^color/im';
+
     const TYPE = 'color';
 
     public static $colorList = [
@@ -177,6 +178,7 @@ class CEmail_Builder_Type_Adapter_ColorAdapter extends CEmail_Builder_Type_Abstr
         if (preg_match($shorthandRegex, $this->value)) {
             return preg_replace($replaceInputRegex, $replaceOutput, $this->value);
         }
+
         return $this->value;
     }
 }

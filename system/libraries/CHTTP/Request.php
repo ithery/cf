@@ -584,6 +584,7 @@ class CHTTP_Request extends SymfonyRequest implements CInterface_Arrayable, Arra
      *
      * @return bool
      */
+    #[\ReturnTypeWillChange]
     public function offsetExists($offset) {
         $routeParameters = $this->route() ? $this->route()->parameters() : [];
 
@@ -612,6 +613,7 @@ class CHTTP_Request extends SymfonyRequest implements CInterface_Arrayable, Arra
      *
      * @return void
      */
+    #[\ReturnTypeWillChange]
     public function offsetSet($offset, $value) {
         $this->getInputSource()->set($offset, $value);
     }
@@ -623,6 +625,7 @@ class CHTTP_Request extends SymfonyRequest implements CInterface_Arrayable, Arra
      *
      * @return void
      */
+    #[\ReturnTypeWillChange]
     public function offsetUnset($offset) {
         $this->getInputSource()->remove($offset);
     }

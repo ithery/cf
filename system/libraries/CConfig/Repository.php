@@ -131,6 +131,7 @@ class CConfig_Repository implements ArrayAccess, CConfig_Contract_RepositoryInte
      *
      * @return bool
      */
+    #[\ReturnTypeWillChange]
     public function offsetExists($key) {
         return $this->has($key);
     }
@@ -152,6 +153,7 @@ class CConfig_Repository implements ArrayAccess, CConfig_Contract_RepositoryInte
      * @param string $key
      * @param mixed  $value
      */
+    #[\ReturnTypeWillChange]
     public function offsetSet($key, $value) {
         $this->set($key, $value);
     }
@@ -161,6 +163,7 @@ class CConfig_Repository implements ArrayAccess, CConfig_Contract_RepositoryInte
      *
      * @param string $key
      */
+    #[\ReturnTypeWillChange]
     public function offsetUnset($key) {
         $this->set($key, null);
     }

@@ -12,95 +12,17 @@ return [
     [
         'name' => 'starter',
         'label' => c::__('Getting Started'),
-        'subnav' => [
-            [
-                'name' => 'starter.installation',
-                'label' => c::__('Installation'),
-                'uri' => 'docs/starter/installation',
-            ],
-            [
-                'name' => 'starter.configuration',
-                'label' => c::__('Configuration'),
-                'uri' => 'docs/starter/configuration',
-            ],
-            [
-                'name' => 'starter.vscode',
-                'label' => c::__('VS Code Extension'),
-                'uri' => 'docs/starter/vscode',
-            ],
-        ]
+        'subnav' => include dirname(__FILE__) . '/docs/starter.php',
     ],
     [
         'name' => 'basic',
         'label' => c::__('The Basic'),
-        'subnav' => [
-            [
-                'name' => 'basic.bootstrap',
-                'label' => c::__('Bootstrap'),
-                'uri' => 'docs/basic/bootstrap',
-            ],
-            [
-                'name' => 'basic.routing',
-                'label' => c::__('Routing'),
-                'uri' => 'docs/basic/routing',
-            ],
-            [
-                'name' => 'basic.controller',
-                'label' => c::__('Controller'),
-                'uri' => 'docs/basic/controller',
-            ],
-            [
-                'name' => 'basic.request',
-                'label' => c::__('Request'),
-                'uri' => 'docs/basic/request',
-            ],
-            [
-                'name' => 'basic.view',
-                'label' => c::__('View'),
-                'uri' => 'docs/basic/view',
-            ],
-        ]
+        'subnav' => include dirname(__FILE__) . '/docs/basic.php',
     ],
     [
         'name' => 'app',
         'label' => c::__('Application'),
-        'subnav' => [
-            [
-                'name' => 'app.introduction',
-                'label' => c::__('Introduction'),
-                'uri' => 'docs/app/introduction',
-            ],
-            [
-                'name' => 'app.setup',
-                'label' => c::__('Setup'),
-                'uri' => 'docs/app/setup',
-            ],
-            [
-                'name' => 'app.navigation',
-                'label' => c::__('Navigation'),
-                'uri' => 'docs/app/navigation',
-            ],
-            [
-                'name' => 'app.auth',
-                'label' => c::__('Authentication'),
-                'uri' => 'docs/app/auth',
-            ],
-            [
-                'name' => 'app.theme',
-                'label' => c::__('Theme'),
-                'uri' => 'docs/app/theme',
-            ],
-            [
-                'name' => 'app.element',
-                'label' => c::__('Element'),
-                'uri' => 'docs/app/element',
-            ],
-            [
-                'name' => 'app.other',
-                'label' => c::__('Other'),
-                'uri' => 'docs/app/other',
-            ],
-        ]
+        'subnav' => include dirname(__FILE__) . '/docs/app.php',
     ],
     [
         'name' => 'element',
@@ -302,9 +224,9 @@ return [
                 'uri' => 'docs/phpcf/testing',
             ],
             [
-                'name' => 'phpcf.make',
-                'label' => c::__('Make'),
-                'uri' => 'docs/phpcf/make',
+                'name' => 'phpcf.model',
+                'label' => c::__('Model'),
+                'uri' => 'docs/phpcf/model',
             ],
         ]
     ],

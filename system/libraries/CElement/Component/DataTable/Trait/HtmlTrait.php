@@ -5,7 +5,6 @@ trait CElement_Component_DataTable_Trait_HtmlTrait {
     }
 
     public function html($indent = 0) {
-
         /** @var CElement_Component_DataTable $this */
         $this->buildOnce();
         $html = new CStringBuilder();
@@ -125,6 +124,9 @@ trait CElement_Component_DataTable_Trait_HtmlTrait {
             }
             if (is_array($this->data) || $this->data instanceof Traversable || $this->data instanceof CInterface_Enumerable) {
                 foreach ($this->data as $row) {
+                    if ($row == null) {
+                        continue;
+                    }
                     if ($row instanceof CRenderable) {
                         $html->appendln($row->html());
 

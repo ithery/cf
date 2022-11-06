@@ -15,12 +15,21 @@ class CBot_Factory {
     public static function create(array $config, CBot_Contract_StorageInterface $storage = null, CCache_Repository $cache = null, CHTTP_Request $request = null) {
         $request = $request ?: c::request();
         $driverManager = new CBot_DriverManager($config);
-        $driver = $driverManager->getMatchingDriver($request);
+        $driver = null;
+        $driverName = carr::get($config, 'driver');
+
+        if ($driverName) {
+            $driver = $driverManager->getDriverFor($driverName, $request);
+        }
+        if ($driver == null) {
+            $driver = $driverManager->getMatchingDriver($request);
+        }
+
         if ($storage == null) {
             $storage = static::createDefaultFileStorage();
         }
         if ($cache == null) {
-            $cache = CCache::manager()->driver('array');
+            $cache = CCache::manager()->driver('file');
         }
 
         return new CBot_Bot($config, $driver, $storage, $cache);

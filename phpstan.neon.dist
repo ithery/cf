@@ -1,0 +1,95 @@
+parameters:
+    level: 4
+    phpVersion: 74000
+    universalObjectCratesClasses:
+        - CHTTP_Request
+        - COptional
+        - CModel_Relation_Pivot
+    earlyTerminatingFunctionCalls:
+        - c::abort
+        - cdbg::dd
+    checkModelProperties: true
+    reportUnmatchedIgnoredErrors: false
+    excludePaths:
+        - system/stubs
+
+
+parametersSchema:
+    checkModelProperties: bool()
+
+conditionalTags:
+    CQC_Phpstan_Service_Rule_ModelProperty_ModelPropertyRule:
+        phpstan.rules.rule: %checkModelProperties%
+    CQC_Phpstan_Service_Rule_ModelProperty_ModelPropertyStaticCallRule:
+        phpstan.rules.rule: %checkModelProperties%
+services:
+    -
+        class: CQC_Phpstan_Service_Method_RelationForwardsCallsExtension
+        tags:
+            - phpstan.broker.methodsClassReflectionExtension
+    -
+        class: CQC_Phpstan_Service_Method_ModelForwardsCallsExtension
+        tags:
+            - phpstan.broker.methodsClassReflectionExtension
+    -
+        class: CQC_Phpstan_Service_Method_ModelQueryForwardsCallsExtension
+        tags:
+            - phpstan.broker.methodsClassReflectionExtension
+    -
+        class: CQC_Phpstan_Service_Property_ModelPropertyExtension
+        tags:
+            - phpstan.broker.propertiesClassReflectionExtension
+    -
+        class: CQC_Phpstan_Service_Method_HigherOrderCollectionProxyExtension
+        tags:
+            - phpstan.broker.methodsClassReflectionExtension
+    -
+        class: CQC_Phpstan_Service_Method_Extension
+        tags:
+            - phpstan.broker.methodsClassReflectionExtension
+    -
+        class: CQC_Phpstan_Service_Method_RedirectResponseMethodsClassReflectionExtension
+        tags:
+            - phpstan.broker.methodsClassReflectionExtension
+    -
+        class: CQC_Phpstan_Service_ReturnType_ModelQueryExtension
+        tags:
+            - phpstan.broker.dynamicMethodReturnTypeExtension
+    -
+        class: CQC_Phpstan_Service_ReturnType_ModelFindExtension
+        tags:
+            - phpstan.broker.dynamicStaticMethodReturnTypeExtension
+    -
+        class: CQC_Phpstan_Service_ReturnType_ModelQueryFindExtension
+        tags:
+            - phpstan.broker.dynamicMethodReturnTypeExtension
+    -
+        class: CQC_Phpstan_Service_Type_GenericModelCollectionTypeNodeResolverExtension
+        tags:
+            - phpstan.phpDoc.typeNodeResolverExtension
+
+    -
+        class: CQC_Phpstan_Service_Rule_ModelProperty_ModelPropertyRule
+    -
+        class: CQC_Phpstan_Service_Rule_ModelProperty_ModelPropertyStaticCallRule
+    -
+        class: CQC_Phpstan_Service_Type_GenericModelQueryTypeNodeResolverExtension
+        tags:
+            - phpstan.phpDoc.typeNodeResolverExtension
+    -
+        class: CQC_Phpstan_Service_Type_ModelProperty_ModelPropertyTypeNodeResolverExtension
+        tags:
+            - phpstan.phpDoc.typeNodeResolverExtension
+        arguments:
+            active: %checkModelProperties%
+    -
+        class: CQC_Phpstan_Service_Rule_ModelProperty_ModelPropertiesRuleHelper
+    -
+        class: CQC_Phpstan_Service_Rule_ModelRuleHelper
+    -
+        class: CQC_Phpstan_Service_BuilderHelper
+        arguments:
+            checkProperties: %checkModelProperties%
+    -
+        class: CQC_Phpstan_Service_CFStubFilesExtension
+        tags: [phpstan.stubFilesExtension]

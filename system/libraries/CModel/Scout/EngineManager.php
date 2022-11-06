@@ -18,6 +18,10 @@ class CModel_Scout_EngineManager extends CBase_ManagerAbstract {
 
         $config = CF::config('model.scout.tntsearch');
         $storage = carr::get($config, 'storage');
+        if ($storage == null) {
+            $storage = DOCROOT.'temp/scout/tnt/'.CF::appCode().'/';
+            $config['storage'] = $storage;
+        }
         if (!is_dir($storage)) {
             CFile::makeDirectory($storage, 0755, true);
         }

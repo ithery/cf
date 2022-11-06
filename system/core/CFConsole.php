@@ -11,6 +11,7 @@ class CFConsole {
         CConsole_Command_KeyGenerateCommand::class,
         CConsole_Command_ComposerCommand::class,
         CConsole_Command_EnvironmentCommand::class,
+        CConsole_Command_Database_DbCommand::class,
         CConsole_Command_Api_JWTSecretCommand::class,
         CConsole_Command_Api_OAuth_KeyCommand::class,
         CConsole_Command_Api_OAuth_ClientCommand::class,
@@ -74,7 +75,11 @@ class CFConsole {
         CConsole_Command_App_AppCodeCommand::class,
         CConsole_Command_TestInstallCommand::class,
         CConsole_Command_TestCommand::class,
+        CConsole_Command_PhpstanInstallCommand::class,
+        CConsole_Command_PhpstanCommand::class,
+        CConsole_Command_PhpstanClearCommand::class,
         CWebSocket_Console_Command_StartServer::class,
+        CTesting_Console_ChromeDriverCommand::class,
     ];
 
     public static function execute() {

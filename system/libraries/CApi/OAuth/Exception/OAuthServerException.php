@@ -2,7 +2,7 @@
 
 use League\OAuth2\Server\Exception\OAuthServerException as LeagueException;
 
-class CApi_OAuth_Exception_OAuthServerException extends Exception implements CApi_OAuth_Contract_OAuthExceptionInterface {
+class CApi_OAuth_Exception_OAuthServerException extends Exception implements CApi_OAuth_Contract_OAuthExceptionInterface, CDebug_Contract_ShouldNotCollectException {
     /**
      * The response to render.
      *

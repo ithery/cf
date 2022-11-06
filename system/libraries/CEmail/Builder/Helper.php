@@ -14,10 +14,12 @@ class CEmail_Builder_Helper {
         switch ($widthUnit) {
             case '%':
                 $parsedWidth = $parseFloatToInt ? floor($parsedWidth) : $parsedWidth;
+
                 break;
             case 'px':
             default:
                 $parsedWidth = floor($parsedWidth);
+
                 break;
         }
         if (strlen($widthUnit) == 0) {
@@ -36,6 +38,7 @@ class CEmail_Builder_Helper {
                 return $c . '-' . $suffix;
             }));
         }
+
         return '';
     }
 
@@ -52,6 +55,7 @@ class CEmail_Builder_Helper {
             if ($v != null && strlen($v) > 0) {
                 return $output . ' ' . $name . '="' . $v . '"';
             }
+
             return $output;
         }, '');
 
@@ -77,10 +81,12 @@ class CEmail_Builder_Helper {
         if (!is_array($styles)) {
             $styles = [$styles];
         }
+
         return carr::reduce($styles, function ($output, $value, $name) {
             if ($value !== null && strlen($value) > 0) {
                 return $output . $name . ':' . $value . ';';
             }
+
             return $output;
         }, '');
     }
@@ -90,6 +96,7 @@ class CEmail_Builder_Helper {
         $startNegationConditionalTag = '<!--[if !mso | IE]><!-->';
         $endConditionalTag = '<![endif]-->';
         $endNegationConditionalTag = '<!--<![endif]-->';
+
         return ($negation ? $startNegationConditionalTag : $startConditionalTag) . $content . ($negation ? $endNegationConditionalTag : $endConditionalTag);
     }
 
@@ -98,6 +105,7 @@ class CEmail_Builder_Helper {
         $startMsoNegationConditionalTag = '<!--[if !mso><!-->';
         $endConditionalTag = '<![endif]-->';
         $endNegationConditionalTag = '<!--<![endif]-->';
+
         return ($negation ? $startMsoNegationConditionalTag : $startMsoConditionalTag) . $content . ($negation ? $endNegationConditionalTag : $endConditionalTag);
     }
 
@@ -107,17 +115,21 @@ class CEmail_Builder_Helper {
         switch (count($splittedCssValue)) {
             case 2:
                 $directions = ['top' => 0, 'bottom' => 0, 'left' => 1, 'right' => 1];
+
                 break;
             case 3:
                 $directions = ['top' => 0, 'left' => 0, 'right' => 1, 'bottom' => 2];
+
                 break;
             case 4:
                 $directions = ['top' => 0, 'right' => 1, 'bottom' => 2, 'left' => 3];
+
                 break;
             case 1:
             default:
                 return $cssValue;
         }
+
         return carr::get($splittedCssValue, $directions[$direction], 0);
     }
 

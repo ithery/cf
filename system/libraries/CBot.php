@@ -1,6 +1,9 @@
 <?php
 use React\EventLoop\LoopInterface;
 
+/**
+ * @see CBot_Driver_WagoDriver
+ */
 class CBot {
     /**
      * @param array $config

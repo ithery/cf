@@ -1,4 +1,7 @@
 <?php
+/**
+ * @property-read CModel_Collection|CModel_AccessToken_AccessTokenModel[] $accessToken
+ */
 trait CModel_AccessToken_HasAccessTokenTrait {
     /**
      * The access token the user is using for the current request.

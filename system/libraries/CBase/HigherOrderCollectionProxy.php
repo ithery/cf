@@ -1,7 +1,10 @@
 <?php
 
 /**
- * @mixin \Illuminate\Support\Enumerable
+ * @template T
+ * @template TValue
+ *
+ * @mixin \CInterface_Enumerable
  */
 class CBase_HigherOrderCollectionProxy {
     /**

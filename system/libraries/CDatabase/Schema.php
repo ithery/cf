@@ -10,13 +10,6 @@ defined('SYSPATH') or die('No direct access allowed.');
  */
 class CDatabase_Schema extends CDatabase_AbstractAsset {
     /**
-     * The namespaces in this schema.
-     *
-     * @var array
-     */
-    private $namespaces = [];
-
-    /**
      * @var CDatabase_Schema_Table[]
      */
     protected $tables = [];
@@ -30,6 +23,13 @@ class CDatabase_Schema extends CDatabase_AbstractAsset {
      * @var CDatabase_Schema_Config
      */
     protected $schemaConfig = false;
+
+    /**
+     * The namespaces in this schema.
+     *
+     * @var array
+     */
+    private $namespaces = [];
 
     /**
      * @param CDatabase_Schema_Table[]    $tables
@@ -67,9 +67,9 @@ class CDatabase_Schema extends CDatabase_AbstractAsset {
     /**
      * @param CDatabase_Schema_Table $table
      *
-     * @return void
-     *
      * @throws CDatabase_Schema_Exception
+     *
+     * @return void
      */
     protected function addTable(CDatabase_Schema_Table $table) {
         $namespaceName = $table->getNamespaceName();
@@ -90,9 +90,9 @@ class CDatabase_Schema extends CDatabase_AbstractAsset {
     /**
      * @param CDatabase_Schema_Sequence $sequence
      *
-     * @return void
-     *
      * @throws CDatabase_Schema_Exception
+     *
+     * @return void
      */
     protected function addSequence(CDatabase_Schema_Sequence $sequence) {
         $namespaceName = $sequence->getNamespaceName();
@@ -130,9 +130,9 @@ class CDatabase_Schema extends CDatabase_AbstractAsset {
     /**
      * @param string $tableName
      *
-     * @return CDatabase_Schema_Table
-     *
      * @throws CDatabase_Schema_SchemaException
+     *
+     * @return CDatabase_Schema_Table
      */
     public function getTable($tableName) {
         $tableName = $this->getFullQualifiedAssetName($tableName);
@@ -154,6 +154,7 @@ class CDatabase_Schema extends CDatabase_AbstractAsset {
         if (strpos($name, '.') === false) {
             $name = $this->getName() . '.' . $name;
         }
+
         return strtolower($name);
     }
 
@@ -194,6 +195,7 @@ class CDatabase_Schema extends CDatabase_AbstractAsset {
      */
     public function hasTable($tableName) {
         $tableName = $this->getFullQualifiedAssetName($tableName);
+
         return isset($this->tables[$tableName]);
     }
 
@@ -220,9 +222,9 @@ class CDatabase_Schema extends CDatabase_AbstractAsset {
     /**
      * @param string $sequenceName
      *
-     * @return CDatabase_Schema_Sequence
-     *
      * @throws CDatabase_Schema_SchemaException
+     *
+     * @return CDatabase_Schema_Sequence
      */
     public function getSequence($sequenceName) {
         $sequenceName = $this->getFullQualifiedAssetName($sequenceName);
@@ -245,9 +247,9 @@ class CDatabase_Schema extends CDatabase_AbstractAsset {
      *
      * @param string $namespaceName the name of the namespace to create
      *
-     * @return CDatabase_Schema_Schema this schema instance
-     *
      * @throws CDatabase_Exception_SchemaException
+     *
+     * @return CDatabase_Schema_Schema this schema instance
      */
     public function createNamespace($namespaceName) {
         $unquotedNamespaceName = strtolower($this->getUnquotedAssetName($namespaceName));
@@ -343,7 +345,7 @@ class CDatabase_Schema extends CDatabase_AbstractAsset {
     /**
      * Returns an array of necessary SQL queries to create the schema on the given platform.
      *
-     * @param CDatabase_Schema $platform
+     * @param CDatabase_Platform $platform
      *
      * @return array
      */
@@ -369,8 +371,8 @@ class CDatabase_Schema extends CDatabase_AbstractAsset {
     }
 
     /**
-     * @param CDatabase_Schema_Schema $toSchema
-     * @param CDatabase_Platform      $platform
+     * @param CDatabase_Schema   $toSchema
+     * @param CDatabase_Platform $platform
      *
      * @return array
      */

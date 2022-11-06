@@ -14,6 +14,7 @@ defined('SYSPATH') or die('No direct access allowed.');
  * @property      CCarbon $created
  * @property      CCarbon $updated
  * @property      int     $status
+ * @property      int     $depth
  * @property-read int     $role_id
  *
  * @method static CModel_Collection byAccess(string $permitWithoutWildcard)
@@ -35,10 +36,10 @@ trait CApp_Model_Trait_Roles {
     }
 
     /**
-     * @return CModel_Relation_BelongsTo
+     * @return CModel_Relation_BelongsTo|CModel_Query
      */
     public function org() {
-        return $this->belongsTo(CApp_Model_Org::class);
+        return $this->belongsTo(CApp_Model_Org::class)->withTrashed();
     }
 
     public function rolePermission() {

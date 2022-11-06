@@ -119,7 +119,7 @@ class CManager_DataProvider_SqlDataProvider extends CManager_DataProviderAbstrac
         //process ordering
         if (count($this->sort) > 0) {
             foreach ($this->sort as $fieldName => $sortDirection) {
-                $sOrder .= ', ' . c::db($this->connection)->escapeColumn($fieldName) . ' ' . c::db($this->connection)->escapeStr($sortDirection);
+                $sOrder .= ', ' . $this->getDb()->escapeColumn($fieldName) . ' ' . $this->getDb()->escapeStr($sortDirection);
             }
         }
 
@@ -170,7 +170,7 @@ class CManager_DataProvider_SqlDataProvider extends CManager_DataProviderAbstrac
             $dataSearchOr = $this->searchOr;
 
             foreach ($dataSearchOr as $fieldName => $value) {
-                $sWhereOr .= 'OR ' . c::db()->escapeColumn($fieldName) . " LIKE '%" . c::db($this->connection)->escapeLike($value) . "%' ";
+                $sWhereOr .= 'OR ' . $this->getDb()->escapeColumn($fieldName) . " LIKE '%" . $this->getDb()->escapeLike($value) . "%' ";
             }
             if (strlen($sWhereOr) > 0) {
                 $sWhereOr = '(' . substr($sWhereOr, 3) . ')';
@@ -181,7 +181,7 @@ class CManager_DataProvider_SqlDataProvider extends CManager_DataProviderAbstrac
             $dataSearchAnd = $this->searchAnd;
 
             foreach ($dataSearchAnd as $fieldName => $value) {
-                $sWhereAnd .= 'AND ' . c::db()->escapeColumn($fieldName) . " LIKE '%" . c::db($this->connection)->escapeLike($value) . "%' ";
+                $sWhereAnd .= 'AND ' . $this->getDb()->escapeColumn($fieldName) . " LIKE '%" . $this->getDb()->escapeLike($value) . "%' ";
             }
             if (strlen($sWhereAnd) > 0) {
                 $sWhereAnd = '(' . substr($sWhereAnd, 4) . ')';
@@ -236,6 +236,24 @@ class CManager_DataProvider_SqlDataProvider extends CManager_DataProviderAbstrac
         $q .= ' ' . $sLimit;
 
         return $q;
+    }
+
+    /**
+     * @param string $method
+     * @param string $column
+     *
+     * @return mixed
+     */
+    public function aggregate($method, $column) {
+        if (!$this->isValidAggregateMethod($method)) {
+            throw new Exception($method . ': is not valid aggregate method');
+        }
+        $q = $this->getFullQuery();
+        $alias = $method . '_' . $column;
+        $qTotal = 'select ' . $method . '(' . $this->db->escapeColumn($column) . ') as ' . $alias . ' from (' . $q . ') as t';
+        $rTotal = c::db()->query($qTotal);
+
+        return $rTotal[0]->$alias;
     }
 
     protected function getFullQuery() {

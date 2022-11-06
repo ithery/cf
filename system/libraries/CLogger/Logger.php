@@ -215,7 +215,7 @@ class CLogger_Logger implements LoggerInterface {
             throw new RuntimeException('Events dispatcher has not been set.');
         }
 
-        $this->dispatcher->listen(MessageLogged::class, $callback);
+        $this->dispatcher->listen(CLogger_Event_MessageLogged::class, $callback);
     }
 
     /**

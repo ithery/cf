@@ -2,6 +2,7 @@
 
 class CEmail_Builder_Validator {
     protected $options;
+
     protected $element;
 
     public function __construct(CEmail_Builder_Node $element, $options = []) {

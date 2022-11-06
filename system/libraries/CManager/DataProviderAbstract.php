@@ -29,6 +29,10 @@ abstract class CManager_DataProviderAbstract implements CManager_Contract_DataPr
     }
 
     protected function isCallable($callable) {
+        if (is_string($callable)) {
+            return false;
+        }
+
         return is_callable($callable) || ($callable instanceof \Opis\Closure\SerializableClosure);
     }
 
@@ -41,5 +45,11 @@ abstract class CManager_DataProviderAbstract implements CManager_Contract_DataPr
         }
 
         throw new Exception('Cannot call callable on Data Provider');
+    }
+
+    protected function isValidAggregateMethod($method) {
+        $validAggregate = ['sum', 'avg', 'min', 'max', 'count'];
+
+        return in_array($method, $validAggregate);
     }
 }

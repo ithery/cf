@@ -9,11 +9,13 @@ class CObservable_Listener_Handler_ToastHandler extends CObservable_Listener_Han
 
     public function setMessage($message) {
         $this->message = $message;
+
         return $this;
     }
 
     public function setType($type) {
-        $this->type = $type;
+        $this->toastType = $type;
+
         return $this;
     }
 

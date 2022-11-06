@@ -1,0 +1,4 @@
+<?php
+
+class CEmail_Client_Imap_Exception_InvalidResponseException extends CEmail_Client_Imap_Exception_ResponseException {
+}

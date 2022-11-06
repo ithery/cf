@@ -4,8 +4,8 @@ trait CHTTP_Trait_InteractsWithFlashData {
     /**
      * Retrieve an old input item.
      *
-     * @param string|null       $key
-     * @param string|array|null $default
+     * @param null|string       $key
+     * @param null|string|array $default
      *
      * @return string|array
      */

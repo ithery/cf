@@ -319,20 +319,12 @@ class Process implements \IteratorAggregate {
      * @throws RuntimeException When process is already running
      * @throws LogicException   In case a callback is provided and output has been disabled
      */
-    public function start(callable $callback = null/*, array $env = array()*/) {
+    public function start(callable $callback = null, $env = []) {
+        if ($env == null) {
+            $env = [];
+        }
         if ($this->isRunning()) {
             throw new RuntimeException('Process is already running');
-        }
-        if (2 <= \func_num_args()) {
-            $env = func_get_arg(1);
-        } else {
-            if (__CLASS__ !== static::class) {
-                $r = new \ReflectionMethod($this, __FUNCTION__);
-                if (__CLASS__ !== $r->getDeclaringClass()->getName() && (2 > $r->getNumberOfParameters() || 'env' !== $r->getParameters()[1]->name)) {
-                    @trigger_error(sprintf('The %s::start() method expects a second "$env" argument since Symfony 3.3. It will be made mandatory in 4.0.', static::class), E_USER_DEPRECATED);
-                }
-            }
-            $env = null;
         }
 
         $this->resetProcessData();
@@ -340,7 +332,11 @@ class Process implements \IteratorAggregate {
         $this->callback = $this->buildCallback($callback);
         $this->hasCallback = null !== $callback;
         $descriptors = $this->getDescriptors();
-        $inheritEnv = $this->inheritEnv;
+
+        if ($this->env) {
+            $env += '\\' === \DIRECTORY_SEPARATOR ? array_diff_ukey($this->env, $env, 'strcasecmp') : $this->env;
+        }
+        $env += '\\' === \DIRECTORY_SEPARATOR ? array_diff_ukey($this->getDefaultEnv(), $env, 'strcasecmp') : $this->getDefaultEnv();
 
         if (\is_array($commandline = $this->commandline)) {
             $commandline = implode(' ', array_map([$this, 'escapeArgument'], $commandline));
@@ -349,28 +345,13 @@ class Process implements \IteratorAggregate {
                 // exec is mandatory to deal with sending a signal to the process
                 $commandline = 'exec ' . $commandline;
             }
+        } else {
+            $commandline = $this->replacePlaceholders($commandline, $env);
         }
 
-        if (null === $env) {
-            $env = $this->env;
-        } else {
-            if ($this->env) {
-                $env += $this->env;
-            }
-            $inheritEnv = true;
-        }
-
-        if (null !== $env && $inheritEnv) {
-            $env += $this->getDefaultEnv();
-        } elseif (null !== $env) {
-            @trigger_error('Not inheriting environment variables is deprecated since Symfony 3.3 and will always happen in 4.0. Set "Process::inheritEnvironmentVariables()" to true instead.', E_USER_DEPRECATED);
-        } else {
-            $env = $this->getDefaultEnv();
-        }
-        if ('\\' === \DIRECTORY_SEPARATOR && $this->enhanceWindowsCompatibility) {
-            $this->options['bypass_shell'] = true;
+        if ('\\' === \DIRECTORY_SEPARATOR) {
             $commandline = $this->prepareWindowsCommandLine($commandline, $env);
-        } elseif (!$this->useFileHandles && $this->enhanceSigchildCompatibility && $this->isSigchildEnabled()) {
+        } elseif (!$this->useFileHandles && $this->isSigchildEnabled()) {
             // last exit code is output on the fourth pipe and caught to work around --enable-sigchild
             $descriptors[3] = ['pipe', 'w'];
 
@@ -382,22 +363,18 @@ class Process implements \IteratorAggregate {
             // @see : https://bugs.php.net/69442
             $ptsWorkaround = fopen(__FILE__, 'r');
         }
-        if (\defined('HHVM_VERSION')) {
-            $envPairs = $env;
-        } else {
-            $envPairs = [];
-            foreach ($env as $k => $v) {
-                if (false !== $v) {
-                    $envPairs[] = $k . '=' . $v;
-                }
+        $envPairs = [];
+        foreach ($env as $k => $v) {
+            if (false !== $v && false === \in_array($k, ['argc', 'argv', 'ARGC', 'ARGV'], true)) {
+                $envPairs[] = $k . '=' . $v;
             }
         }
 
         if (!is_dir($this->cwd)) {
-            @trigger_error('The provided cwd does not exist. Command is currently ran against getcwd(). This behavior is deprecated since Symfony 3.4 and will be removed in 4.0.', E_USER_DEPRECATED);
+            throw new RuntimeException(sprintf('The provided cwd "%s" does not exist.', $this->cwd));
         }
 
-        $this->process = proc_open($commandline, $descriptors, $this->processPipes->pipes, $this->cwd, $envPairs, $this->options);
+        $this->process = @proc_open($commandline, $descriptors, $this->processPipes->pipes, $this->cwd, $envPairs, $this->options);
 
         if (!\is_resource($this->process)) {
             throw new RuntimeException('Unable to launch a new process.');
@@ -665,6 +642,7 @@ class Process implements \IteratorAggregate {
      *
      * @return \Generator
      */
+    #[\ReturnTypeWillChange]
     public function getIterator($flags = 0) {
         $this->readPipesForOutput(__FUNCTION__, false);
 
@@ -1755,11 +1733,11 @@ class Process implements \IteratorAggregate {
      * @return string The escaped argument
      */
     private function escapeArgument($argument) {
-        if ('\\' !== \DIRECTORY_SEPARATOR) {
-            return "'" . str_replace("'", "'\\''", $argument) . "'";
-        }
         if ('' === $argument = (string) $argument) {
             return '""';
+        }
+        if ('\\' !== \DIRECTORY_SEPARATOR) {
+            return "'" . str_replace("'", "'\\''", $argument) . "'";
         }
         if (false !== strpos($argument, "\0")) {
             $argument = str_replace("\0", '?', $argument);
@@ -1772,7 +1750,23 @@ class Process implements \IteratorAggregate {
         return '"' . str_replace(['"', '^', '%', '!', "\n"], ['""', '"^^"', '"^%"', '"^!"', '!LF!'], $argument) . '"';
     }
 
+    private function replacePlaceholders($commandline, array $env) {
+        return preg_replace_callback('/"\$\{:([_a-zA-Z]++[_a-zA-Z0-9]*+)\}"/', function ($matches) use ($commandline, $env) {
+            if (!isset($env[$matches[1]]) || false === $env[$matches[1]]) {
+                throw new InvalidArgumentException(sprintf('Command line is missing a value for parameter "%s": ', $matches[1]) . $commandline);
+            }
+
+            return $this->escapeArgument($env[$matches[1]]);
+        }, $commandline);
+    }
+
     private function getDefaultEnv() {
+        if (version_compare(PHP_VERSION, '6.0.0') >= 0) {
+            $env = getenv();
+            $env = ('\\' === \DIRECTORY_SEPARATOR ? array_intersect_ukey($env, $_SERVER, 'strcasecmp') : array_intersect_key($env, $_SERVER)) ?: $env;
+
+            return $_ENV + ('\\' === \DIRECTORY_SEPARATOR ? array_diff_ukey($env, $_ENV, 'strcasecmp') : $env);
+        }
         $env = [];
 
         foreach ($_SERVER as $k => $v) {

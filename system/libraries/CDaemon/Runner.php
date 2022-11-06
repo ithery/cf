@@ -3,10 +3,19 @@ use Symfony\Component\Process\Process;
 use Symfony\Component\Process\PhpExecutableFinder;
 
 class CDaemon_Runner {
+    /**
+     * @var string
+     */
     protected $serviceClass;
 
+    /**
+     * @var string
+     */
     protected $domain;
 
+    /**
+     * @var bool
+     */
     protected $debug = false;
 
     public function __construct($serviceClass, $domain = null) {
@@ -44,24 +53,20 @@ class CDaemon_Runner {
     }
 
     public function isRunning() {
-        $result = '';
         if ($pid = $this->getPid()) {
             $pid = trim($pid);
 
-            $command = 'ps x | grep "' . $pid . '" | grep "'
-                . $this->serviceClass
-                . '" | grep -v "grep"';
-
-            if (defined('CFCLI')) {
-                $process = new Process($command);
-                $process->run();
-                $result = $process->getOutput();
-            } else {
-                $result = shell_exec($command);
-            }
+            return CDaemon_Utils::daemonIsRunningWithPid($pid, $this->serviceClass);
         }
 
-        return strlen(trim($result)) > 0;
+        return false;
+    }
+
+    /**
+     * @return string
+     */
+    public function getServiceClass() {
+        return $this->serviceClass;
     }
 
     public function getPid() {
@@ -180,6 +185,9 @@ class CDaemon_Runner {
         return null;
     }
 
+    /**
+     * @return void
+     */
     public function logDump() {
         $pid = $this->getPid();
         if ($pid) {
@@ -187,6 +195,11 @@ class CDaemon_Runner {
         }
     }
 
+    /**
+     * @param bool $exit
+     *
+     * @return string
+     */
     public function stop($exit = true) {
         $pid = $this->getPid();
         $command = 'kill -9 ' . $pid;
@@ -201,8 +214,21 @@ class CDaemon_Runner {
         return $result;
     }
 
+    public function getLogFile() {
+        return CDaemon_Helper::getLogFile($this->serviceClass);
+    }
+
+    public function getLog() {
+        $logFile = $this->getLogFile();
+        if (CFile::exists($logFile)) {
+            return CFile::get($logFile);
+        }
+
+        return null;
+    }
+
     public function rotateLog() {
-        $logFile = CDaemon_Helper::getLogFile($this->serviceClass);
+        $logFile = $this->getLogFile();
 
         if (strlen($logFile) > 0 && file_exists($logFile)) {
             $rotator = CLogger_Rotator::createRotate($logFile);

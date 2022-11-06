@@ -41,31 +41,8 @@ class CLogger_Writer_File extends CLogger_Writer {
             }
         }
 
-        $path = carr::get($options, 'path');
-        if (!is_dir($dir . ltrim($path, '/'))) {
-            if (!is_dir($dir)) {
-                mkdir($dir, 02777);
-                // Set permissions (must be manually set to fix umask issues)
-                chmod($dir, 02777);
-            }
-
-            if (strlen($path) > 0) {
-                $folders = explode('/', $path);
-
-                foreach ($folders as $folder) {
-                    if (strlen($folder) > 0) {
-                        if (!is_dir($dir)) {
-                            mkdir($dir, 02777);
-                            // Set permissions (must be manually set to fix umask issues)
-                            chmod($dir, 02777);
-                        }
-                    }
-                }
-            }
-        }
-
         if (!is_dir($dir) or !is_writable($dir)) {
-            throw new Exception(c::__('Directory :dir must be writable', ['dir' => $path]));
+            throw new Exception(c::__('Directory :dir must be writable', ['dir' => $dir]));
         }
 
         // Determine the directory path

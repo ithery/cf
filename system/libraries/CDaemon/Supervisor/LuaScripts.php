@@ -33,7 +33,7 @@ LUA;
      *
      * KEYS[1] - The name of the recent jobs sorted set
      * KEYS[2] - The name of the pending jobs sorted set
-     * ARGV[1] - The prefix of the Horizon keys
+     * ARGV[1] - The prefix of the Supervisor keys
      * ARGV[2] - The name of the queue to purge
      *
      * @return string

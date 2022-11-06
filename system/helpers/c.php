@@ -372,8 +372,15 @@ class c {
         return [$s, ($mt - $s) * 1e+6];
     }
 
+    /**
+     * @param string $str
+     *
+     * @deprecated use c::e
+     *
+     * @return string
+     */
     public static function html($str) {
-        return chtml::specialchars($str);
+        return c::e($str);
     }
 
     public static function dirname($path, $count = 1) {
@@ -675,7 +682,7 @@ class c {
      * @param null|array|string $key
      * @param mixed             $default
      *
-     * @return CHTTP_Request|string|array
+     * @return ($key is null ? CHTTP_Request : string|array)
      */
     public static function request($key = null, $default = null) {
         if (is_null($key)) {
@@ -756,7 +763,9 @@ class c {
      * @param array       $headers
      * @param null|bool   $secure
      *
-     * @return CHTTP_Redirector|CHttp_RedirectResponse
+     * @return CHTTP_Redirector|CHTTP_RedirectResponse
+     *
+     * @phpstan-return ($to is null ? CHTTP_Redirector : CHTTP_RedirectResponse)
      */
     public static function redirect($to = null, $status = 302, $headers = [], $secure = null) {
         if ($to instanceof CController) {
@@ -972,6 +981,17 @@ class c {
      */
     public static function app() {
         return CApp::instance();
+    }
+
+    /**
+     * Create Div instance.
+     *
+     * @param null|string $id
+     *
+     * @return \CElement_Element_Div
+     */
+    public static function div($id = null) {
+        return CElement_Element_Div::factory($id);
     }
 
     /**
@@ -1624,6 +1644,27 @@ class c {
     }
 
     public static function call($callback, array $args = []) {
+        if (is_string($callback)) {
+            $className = null;
+            $method = null;
+            if (strpos($callback, '::') !== false) {
+                list($className, $method) = explode('::', $callback);
+            }
+            if ($className == null && $method == null) {
+                if (strpos($callback, '@') !== false) {
+                    list($className, $method) = explode('@', $callback);
+                }
+            }
+            if ($className == null && $method == null) {
+                if (class_exists($callback)) {
+                    $className = $callback;
+                    $method == '__invoke';
+                }
+            }
+            if ($className != null && $method !== null) {
+                return call_user_func_array([$className, $method], $args);
+            }
+        }
         if (is_callable($callback)) {
             return call_user_func_array($callback, $args);
         }
@@ -1632,6 +1673,82 @@ class c {
         }
 
         throw new Exception('callback is not callable');
+    }
+
+    /**
+     * @param array $parts
+     *
+     * @return string
+     */
+    public static function makePath(array $parts) {
+        $path = implode(DIRECTORY_SEPARATOR, $parts);
+
+        while (strpos($path, DIRECTORY_SEPARATOR . DIRECTORY_SEPARATOR) !== false) {
+            $path = str_replace(DIRECTORY_SEPARATOR . DIRECTORY_SEPARATOR, DIRECTORY_SEPARATOR, $path);
+        }
+
+        return $path;
+    }
+
+    /**
+     * @param null|sting $locale
+     *
+     * @return array
+     */
+    public static function months($locale = null) {
+        if ($locale == null) {
+            $locale = CF::getLocale();
+        }
+        $format = function ($index) use ($locale) {
+            if (class_exists(IntlDateFormatter::class)) {
+                $formatter = new IntlDateFormatter($locale);
+                $formatter->setPattern('MMMM');
+
+                return ucfirst($formatter->format(mktime(0, 0, 0, $index)));
+            } else {
+                return static::withLocale($locale, function () use ($index) {
+                    return CCarbon::createFromTimestamp(mktime(0, 0, 0, $index, 1))->isoFormat('MMMM');
+                });
+            }
+        };
+
+        return array_combine(
+            range(1, 12),
+            array_map(function ($index) use ($format) {
+                return $format($index);
+            }, range(1, 12))
+        );
+    }
+
+    /**
+     * Run the callback with the given locale.
+     *
+     * @param string   $locale
+     * @param \Closure $callback
+     *
+     * @return mixed
+     */
+    public function withLocale($locale, $callback) {
+        if (!$locale) {
+            return $callback();
+        }
+
+        $original = CF::getLocale();
+
+        try {
+            CF::setLocale($locale);
+
+            return $callback();
+        } finally {
+            CF::setLocale($original);
+        }
+    }
+
+    /**
+     * @return CAuth_Access_Gate
+     */
+    public static function gate() {
+        return CAuth_Access_Gate::instance();
     }
 }
 

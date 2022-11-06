@@ -3,13 +3,10 @@
 abstract class CServer_NodeJs_WrapperAbstract implements CServer_NodeJs_Contract_WrapperInterface {
     protected $path;
 
-    protected $contents;
-
     protected $node;
 
     public function __construct(CServer_NodeJs_Runner $node, $file) {
-        $key = file_exists($file) ? 'path' : 'contents';
-        $this->$key = $file;
+        $this->path = $file;
         $this->node = $node;
     }
 
@@ -23,24 +20,15 @@ abstract class CServer_NodeJs_WrapperAbstract implements CServer_NodeJs_Contract
     }
 
     public function getPath($defaultName = 'source.tmp') {
-        if ($this->path) {
-            return $this->path;
-        }
-
-        $path = sys_get_temp_dir() . DIRECTORY_SEPARATOR . $defaultName;
-        file_put_contents($path, $this->contents);
-
-        return $path;
+        return $this->path;
     }
 
     public function getSource() {
-        return isset($this->contents)
-            ? $this->contents
-            : file_get_contents($this->path);
+        return file_get_contents($this->path);
     }
 
-    public function getResult() {
-        $result = $this->compile();
+    public function getResult($outfile = null) {
+        $result = $this->compile($outfile);
         if ($result !== false && $result !== null) {
             return $result;
         }

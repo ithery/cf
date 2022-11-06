@@ -2,7 +2,7 @@
 
 use Symfony\Component\Process\Process;
 
-class ChromeProcess {
+class CTesting_Chrome_ChromeProcess {
     /**
      * The path to the Chromedriver.
      *
@@ -15,9 +15,9 @@ class ChromeProcess {
      *
      * @param string $driver
      *
-     * @return void
-     *
      * @throws \RuntimeException
+     *
+     * @return void
      */
     public function __construct($driver = null) {
         $this->driver = $driver;
@@ -40,11 +40,11 @@ class ChromeProcess {
         }
 
         if ($this->onWindows()) {
-            $this->driver = realpath(__DIR__ . '/../../bin/chromedriver-win.exe');
+            $this->driver = realpath(DOCROOT . '.bin/chrome-driver/chromedriver-win.exe');
         } elseif ($this->onMac()) {
-            $this->driver = realpath(__DIR__ . '/../../bin/chromedriver-mac');
+            $this->driver = realpath(DOCROOT . '.bin/chrome-driver/chromedriver-mac');
         } else {
-            $this->driver = realpath(__DIR__ . '/../../bin/chromedriver-linux');
+            $this->driver = realpath(DOCROOT . '.bin/chrome-driver/chromedriver-linux');
         }
 
         return $this->process($arguments);

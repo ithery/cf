@@ -146,7 +146,7 @@ class CServer_Dns_Response {
     }
 
     /**
-     * @return CServer_Dns_Result[]|mixed[]
+     * @return mixed[]|CServer_Dns_Result[]
      */
     public function getResourceResults() {
         return $this->resourceResults;

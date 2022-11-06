@@ -1,10 +1,10 @@
 <?php
 
-trait CTesting_Chrome_SupportsChromeTrait {
+trait CTesting_Chrome_SupportChromeTrait {
     /**
      * The path to the custom Chromedriver binary.
      *
-     * @var string|null
+     * @var null|string
      */
     protected static $chromeDriver;
 
@@ -20,13 +20,12 @@ trait CTesting_Chrome_SupportsChromeTrait {
      *
      * @param array $arguments
      *
-     * @return void
-     *
      * @throws \RuntimeException
+     *
+     * @return void
      */
     public static function startChromeDriver(array $arguments = []) {
         static::$chromeProcess = static::buildChromeProcess($arguments);
-
         static::$chromeProcess->start();
 
         static::afterClass(function () {
@@ -50,12 +49,12 @@ trait CTesting_Chrome_SupportsChromeTrait {
      *
      * @param array $arguments
      *
-     * @return \Symfony\Component\Process\Process
-     *
      * @throws \RuntimeException
+     *
+     * @return \Symfony\Component\Process\Process
      */
     protected static function buildChromeProcess(array $arguments = []) {
-        return (new ChromeProcess(static::$chromeDriver))->toProcess($arguments);
+        return (new CTesting_Chrome_ChromeProcess(static::$chromeDriver))->toProcess($arguments);
     }
 
     /**

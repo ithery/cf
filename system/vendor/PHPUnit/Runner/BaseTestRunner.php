@@ -7,22 +7,22 @@
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  */
+
 namespace PHPUnit\Runner;
 
 use function is_dir;
-use function is_file;
 use function substr;
-use PHPUnit\Framework\Exception\Exception;
-use PHPUnit\Framework\TestSuite;
 use ReflectionClass;
+use function is_file;
 use ReflectionException;
+use PHPUnit\Framework\TestSuite;
+use PHPUnit\Framework\Exception\Exception;
 use SebastianBergmann\FileIterator\Facade as FileIteratorFacade;
 
 /**
  * @internal This class is not covered by the backward compatibility promise for PHPUnit
  */
-abstract class BaseTestRunner
-{
+abstract class BaseTestRunner {
     /**
      * @var int
      */
@@ -71,9 +71,8 @@ abstract class BaseTestRunner
     /**
      * Returns the loader to be used.
      */
-    public function getLoader()
-    {
-        return new StandardTestSuiteLoader;
+    public function getLoader() {
+        return new StandardTestSuiteLoader();
     }
 
     /**
@@ -82,14 +81,14 @@ abstract class BaseTestRunner
      * the runFailed() and clearStatus() methods.
      *
      * @param string|string[] $suffixes
+     * @param mixed           $suiteClassFile
      *
      * @throws Exception
      */
-    public function getTest($suiteClassFile, $suffixes = '')
-    {
+    public function getTest($suiteClassFile, $suffixes = '') {
         if (is_dir($suiteClassFile)) {
             /** @var string[] $files */
-            $files = (new FileIteratorFacade)->getFilesAsArray(
+            $files = (new FileIteratorFacade())->getFilesAsArray(
                 $suiteClassFile,
                 $suffixes
             );
@@ -101,7 +100,7 @@ abstract class BaseTestRunner
         }
 
         if (is_file($suiteClassFile) && substr($suiteClassFile, -5, 5) === '.phpt') {
-            $suite = new TestSuite;
+            $suite = new TestSuite();
             $suite->addTestFile($suiteClassFile);
 
             return $suite;
@@ -112,6 +111,7 @@ abstract class BaseTestRunner
                 $suiteClassFile
             );
         } catch (\PHPUnit\Exception $e) {
+            /** @var \Throwable $e */
             $this->runFailed($e->getMessage());
 
             return null;
@@ -140,22 +140,24 @@ abstract class BaseTestRunner
 
     /**
      * Returns the loaded ReflectionClass for a suite name.
+     *
+     * @param mixed $suiteClassFile
      */
-    protected function loadSuiteClass($suiteClassFile)
-    {
+    protected function loadSuiteClass($suiteClassFile) {
         return $this->getLoader()->load($suiteClassFile);
     }
 
     /**
      * Clears the status message.
      */
-    protected function clearStatus()
-    {
+    protected function clearStatus() {
     }
 
     /**
      * Override to define how to handle a failed loading of
      * a test suite.
+     *
+     * @param mixed $message
      */
     abstract protected function runFailed($message);
 }

@@ -68,7 +68,7 @@ CREATE TABLE IF NOT EXISTS `roles` (
 -- Dumping data for table torsb2c.roles: ~6 rows (approximately)
 /*!40000 ALTER TABLE `roles` DISABLE KEYS */;
 INSERT INTO `roles` (`role_id`, `parent_id`, `depth`, `org_id`, `lft`, `rgt`, `is_base`, `name`, `description`, `store_id`, `created`, `createdby`, `updated`, `updatedby`, `status`, `role_level`) VALUES
-	(1, NULL, NULL, NULL, 1, 2, 0, 'SUPERADMIN', NULL, NULL, NULL, NULL, NULL, NULL, 1, 0);
+	(1, NULL, 0, NULL, 1, 2, 1, 'SUPERADMIN', NULL, NULL, NULL, NULL, NULL, NULL, 1, 0);
 /*!40000 ALTER TABLE `roles` ENABLE KEYS */;
 
 
@@ -351,16 +351,34 @@ CREATE TABLE `notification` (
   `message` longtext CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
   `read_at` datetime DEFAULT NULL,
   `created` datetime DEFAULT NULL,
-  `updated` datetime DEFAULT NULL,
-  `status` int(11) NOT NULL DEFAULT 1,
   `createdby` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `updated` datetime DEFAULT NULL,
   `updatedby` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
   `deleted` datetime DEFAULT NULL,
   `deletedby` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `status` int(11) NOT NULL DEFAULT 1,
   PRIMARY KEY (`notification_id`),
   UNIQUE KEY `notification_id` (`notification_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE utf8mb4_unicode_ci;
 
+
+CREATE TABLE `translation` (
+  `translation_id` bigint(20) unsigned NOT NULL AUTO_INCREMENT,
+  `org_id` bigint(20) unsigned,
+  `translatable_type` varchar(255) NOT NULL,
+  `translatable_id` bigint(20) unsigned NOT NULL,
+  `language` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `content` longtext CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `created` datetime DEFAULT NULL,
+  `createdby` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `updated` datetime DEFAULT NULL,
+  `updatedby` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `deleted` datetime DEFAULT NULL,
+  `deletedby` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `status` int(11) NOT NULL DEFAULT 1,
+  PRIMARY KEY (`translation_id`),
+  UNIQUE KEY `translation_id` (`translation_id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE utf8mb4_unicode_ci;
 
 DROP TABLE IF EXISTS `log_activity`;
 CREATE TABLE `log_activity` (
@@ -370,7 +388,7 @@ CREATE TABLE `log_activity` (
   `app_id` bigint(20) unsigned DEFAULT NULL,
   `session_id` varchar(255) DEFAULT NULL,
   `remote_addr` varchar(50) DEFAULT NULL,
-  `user_agent` varchar(255) DEFAULT NULL,
+  `user_agent` TEXT DEFAULT NULL,
   `platform_version` varchar(255) DEFAULT NULL,
   `platform` varchar(255) DEFAULT NULL,
   `browser_version` varchar(255) DEFAULT NULL,
@@ -430,7 +448,7 @@ CREATE TABLE IF NOT EXISTS `log_login` (
   `app_id` bigint(20) unsigned DEFAULT NULL,
   `session_id` varchar(255) DEFAULT NULL,
   `remote_addr` varchar(50) DEFAULT NULL,
-  `user_agent` varchar(255) DEFAULT NULL,
+  `user_agent` TEXT DEFAULT NULL,
   `platform_version` varchar(255) DEFAULT NULL,
   `platform` varchar(255) DEFAULT NULL,
   `browser_version` varchar(255) DEFAULT NULL,
@@ -459,7 +477,7 @@ CREATE TABLE IF NOT EXISTS `log_login_fail` (
   `error_message` varchar(255) DEFAULT NULL,
   `session_id` varchar(255) DEFAULT NULL,
   `remote_addr` varchar(50) DEFAULT NULL,
-  `user_agent` varchar(255) DEFAULT NULL,
+  `user_agent` TEXT DEFAULT NULL,
   `platform_version` varchar(255) DEFAULT NULL,
   `platform` varchar(255) DEFAULT NULL,
   `browser_version` varchar(255) DEFAULT NULL,

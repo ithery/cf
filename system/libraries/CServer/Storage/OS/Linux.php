@@ -4,9 +4,6 @@ defined('SYSPATH') or die('No direct access allowed.');
 
 /**
  * @author Hery Kurniawan
- * @license Ittron Global Teknologi <ittron.co.id>
- *
- * @since Aug 19, 2018, 3:48:13 AM
  */
 class CServer_Storage_OS_Linux extends CServer_Storage_OS {
     /**

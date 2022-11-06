@@ -94,7 +94,7 @@ class CDevSuite_Windows_Nginx extends CDevSuite_Nginx {
     public function installNginxDirectory() {
         CDevSuite::info('Installing nginx directory...');
 
-        if (!$this->files->isDir($nginxDirectory = CDevSuite::homePath() . '/Nginx')) {
+        if (!$this->files->isDir($nginxDirectory = CDevSuite::homePath() . 'Nginx')) {
             $this->files->mkdirAsUser($nginxDirectory);
         }
 

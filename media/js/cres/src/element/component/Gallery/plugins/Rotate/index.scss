@@ -1,0 +1,58 @@
+@import '../../scss/variables';
+@import '../../scss/mixins';
+.cres-gallery-outer {
+    .cres-gallery-img-rotate {
+        position: absolute;
+        left: 0;
+        right: 0;
+        top: 0;
+        bottom: 0;
+        @include transitionCustom(
+            transform 0.4s cubic-bezier(0, 0, 0.25, 1) 0s
+        );
+    }
+    &[data-cres-gallery-slide-type='video'],
+    &[data-cres-gallery-slide-type='iframe'] {
+        .cres-gallery-rotate-left,
+        .cres-gallery-rotate-right,
+        .cres-gallery-flip-ver,
+        .cres-gallery-flip-hor {
+            opacity: $cres-gallery-toolbar-icon-disabled-opacity;
+            pointer-events: none;
+        }
+    }
+    .cres-gallery-img-rotate {
+        &:before {
+            content: '';
+            display: inline-block;
+            height: 100%;
+            vertical-align: middle;
+        }
+    }
+}
+.cres-gallery-rotate-left {
+    &:after {
+        content: '\e900';
+    }
+}
+.cres-gallery-rotate-right {
+    &:after {
+        content: '\e901';
+    }
+}
+.cres-gallery-icon {
+    &.cres-gallery-flip-hor,
+    &.cres-gallery-flip-ver {
+        font-size: 26px;
+    }
+}
+.cres-gallery-flip-ver {
+    &:after {
+        content: '\e903';
+    }
+}
+.cres-gallery-flip-hor {
+    &:after {
+        content: '\e902';
+    }
+}

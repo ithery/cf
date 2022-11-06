@@ -273,8 +273,8 @@ class CElement_FormInput_SelectSearch extends CElement_FormInput {
     }
 
     /**
-     * @param CModel|CModel_Query $model
-     * @param null|mixed          $queryCallback
+     * @param CModel|CModel_Query|string $model
+     * @param null|mixed                 $queryCallback
      *
      * @return $this
      */
@@ -309,7 +309,6 @@ class CElement_FormInput_SelectSearch extends CElement_FormInput {
     }
 
     private function generateSelect2Template($template) {
-
         //escape the character
         $template = str_replace("'", "\'", $template);
         preg_match_all("/{([\w]*)}/", $template, $matches, PREG_SET_ORDER);

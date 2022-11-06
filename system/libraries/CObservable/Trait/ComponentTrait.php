@@ -258,4 +258,15 @@ trait CObservable_Trait_ComponentTrait {
             $this->wrapper->add($el);
         });
     }
+
+    /**
+     * @param null|string $id
+     *
+     * @return CElement_Component_Image
+     */
+    public function addImage($id = null) {
+        return c::tap(new CElement_Component_Image($id), function (CElement_Component_Image $el) {
+            $this->wrapper->add($el);
+        });
+    }
 }

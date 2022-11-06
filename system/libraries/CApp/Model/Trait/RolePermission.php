@@ -23,16 +23,16 @@ trait CApp_Model_Trait_RolePermission {
     }
 
     /**
-     * @return CModel_Relation_BelongsTo
+     * @return CModel_Relation_BelongsTo|CModel_Query
      */
     public function org() {
-        return $this->belongsTo(CApp_Model_Org::class);
+        return $this->belongsTo(CApp_Model_Org::class)->withTrashed();
     }
 
     /**
-     * @return CModel_Relation_BelongsTo
+     * @return CModel_Relation_BelongsTo|CModel_Query
      */
     public function roles() {
-        return $this->belongsTo(CApp_Model_Roles::class);
+        return $this->belongsTo(CApp_Model_Roles::class)->withTrashed();
     }
 }

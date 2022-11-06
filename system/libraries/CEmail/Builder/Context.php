@@ -26,6 +26,7 @@ class CEmail_Builder_Context {
 
     public function getBackgroundColor($color) {
         $globalData = CEmail::builder()->globalData();
+
         return $globalData->get('backgroundColor');
     }
 

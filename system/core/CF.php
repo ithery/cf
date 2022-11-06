@@ -65,6 +65,8 @@ final class CF {
      */
     private static $sharedAppCode = [];
 
+    private static $forceAppCode = null;
+
     /**
      * Check CF is running on production.
      *
@@ -237,7 +239,8 @@ final class CF {
      * @return void
      */
     public static function invoke($uri) {
-        $request = CHTTP_Request::create($uri, c::request()->method());
+        $oldRequest = c::request();
+        $request = CHTTP_Request::create($uri, $oldRequest->method());
 
         return  c::router()->dispatchToRoute($request);
     }
@@ -373,10 +376,10 @@ final class CF {
 
             $modules = CF::modules($domain);
             //when this domain is org
-            if (strlen($orgCode) > 0) {
+            if ($orgCode != null && strlen($orgCode) > 0) {
                 $paths[] = APPPATH . $appCode . DS . $orgCode . DS;
             }
-            if (strlen($appCode) > 0) {
+            if ($appCode != null && strlen($appCode) > 0) {
                 //add theme path if theme exists
                 $paths[] = APPPATH . $appCode . DS . 'default' . DS;
             }
@@ -639,10 +642,10 @@ final class CF {
     /**
      * Detect CF is running on console or not.
      *
-     * @return type
+     * @return bool
      */
     public static function isCli() {
-        return PHP_SAPI === 'cli';
+        return php_sapi_name() === 'cli';
     }
 
     /**
@@ -883,6 +886,9 @@ final class CF {
      * @return string
      */
     public static function appCode($domain = null) {
+        if (static::$forceAppCode) {
+            return static::$forceAppCode;
+        }
         if (CF::isCFCli() || CF::isTesting()) {
             if (CF::cliAppCode()) {
                 return CF::cliAppCode();
@@ -1205,10 +1211,13 @@ final class CF {
         if (is_callable($callback)) {
             $domain = CF::domain();
             $originalAppCode = static::appCode();
+
             if ($originalAppCode) {
+                static::$forceAppCode = $appCode;
                 static::$data[$domain]['app_code'] = $appCode;
                 $callback();
                 static::$data[$domain]['app_code'] = $originalAppCode;
+                static::$forceAppCode = null;
             }
         }
     }

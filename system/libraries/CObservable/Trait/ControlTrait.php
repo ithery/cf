@@ -175,6 +175,34 @@ trait CObservable_Trait_ControlTrait {
     }
 
     /**
+     * Create Date Time Modal Control.
+     *
+     * @param null|string $id
+     *
+     * @return CElement_FormInput_DateTime_ModalDateTime
+     */
+    public function addDateTimeModalControl($id = null) {
+        $control = new CElement_FormInput_DateTime_ModalDateTime($id);
+        $this->wrapper->add($control);
+
+        return $control;
+    }
+
+    /**
+     * Create Date Time Modal Control.
+     *
+     * @param null|string $id
+     *
+     * @return CElement_FormInput_DateTime_MaterialDateTime
+     */
+    public function addDateTimeMaterialControl($id = null) {
+        $control = new CElement_FormInput_DateTime_MaterialDateTime($id);
+        $this->wrapper->add($control);
+
+        return $control;
+    }
+
+    /**
      * Create Date Range Drop Down Control.
      *
      * @param null|string $id
@@ -295,6 +323,20 @@ trait CObservable_Trait_ControlTrait {
      */
     public function addRadioControl($id = null) {
         $control = new CElement_FormInput_Radio($id);
+        $this->wrapper->add($control);
+
+        return $control;
+    }
+
+    /**
+     * Create Text Control.
+     *
+     * @param null|string $id
+     *
+     * @return CElement_FormInput_QueryBuilder
+     */
+    public function addQueryBuilderControl($id = null) {
+        $control = new CElement_FormInput_QueryBuilder($id);
         $this->wrapper->add($control);
 
         return $control;

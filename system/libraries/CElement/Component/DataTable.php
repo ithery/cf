@@ -709,8 +709,8 @@ class CElement_Component_DataTable extends CElement_Component {
     }
 
     /**
-     * @param CModel|CModel_Query $model
-     * @param null|mixed          $queryCallback
+     * @param CModel|CModel_Query|string $model
+     * @param null|mixed                 $queryCallback
      *
      * @return $this
      */
@@ -969,5 +969,16 @@ class CElement_Component_DataTable extends CElement_Component {
 
     public function isUsingDataProvider() {
         return $this->query instanceof CManager_Contract_DataProviderInterface;
+    }
+
+    /**
+     * @return null|CManager_Contract_DataProviderInterface
+     */
+    public function getDataProvider() {
+        if ($this->isUsingDataProvider()) {
+            return $this->query;
+        }
+
+        return null;
     }
 }
