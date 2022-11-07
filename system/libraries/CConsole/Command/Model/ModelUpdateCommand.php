@@ -199,7 +199,7 @@ class CConsole_Command_Model_ModelUpdateCommand extends CConsole_Command_AppComm
         $codeSnippet = $this->getCodeSnippet($method->getFileName(), $method->getStartLine(), $method->getEndLine());
         $regex = '#\$this->.+?\((.+?)[\,\)]#ims';
         if (preg_match($regex, $codeSnippet, $matches)) {
-            $relationClass = $matches[1];
+            $relationClass = trim($matches[1]);
             if (cstr::endsWith($relationClass, '::class')) {
                 $relationClass = cstr::substr($relationClass, 0, cstr::len($relationClass) - 7);
             }
@@ -239,16 +239,19 @@ class CConsole_Command_Model_ModelUpdateCommand extends CConsole_Command_AppComm
         $excludedFields = ['created', 'createdby', 'updated', 'updatedby', 'deleted', 'deletedby', 'status'];
         $db = c::db();
 
-        $result = $db->query("desc ${table}");
         $result = $db->getSchemaManager()->listTableColumns($table);
 
         $properties = [];
         $modelInstance = $this->getModelInstance();
+
         foreach ($result as $key => $column) {
             /** @var CDatabase_Schema_Column $column */
             $field = trim($key, '`');
             $type = $column->getType()->getName();
-
+            if ($type == 'boolean') {
+                //when type is boolean, we cast it on int first then cast again when cast defined
+                $type = 'int';
+            }
             $casts = $modelInstance->getCasts();
 
             $type = carr::get($casts, $field, $type);
