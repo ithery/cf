@@ -28,10 +28,18 @@ class CQC_Phpstan {
     }
 
     public static function phpstanConfiguration() {
+        if (CF::appCode() === null) {
+            return DOCROOT . 'phpstan.neon.dist';
+        }
+
         return c::appRoot() . 'phpstan.neon';
     }
 
     public static function phpstanBootstrap() {
+        if (CF::appCode() == null) {
+            return DOCROOT . 'system' . DS . 'core' . DS . 'BootstrapPhpstan.php';
+        }
+
         return c::appRoot() . 'phpstan-bootstrap.php';
     }
 

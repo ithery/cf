@@ -15,13 +15,14 @@ class CConsole_Command_PhpstanCommand extends CConsole_Command {
      *
      * @var string
      */
-    protected $signature = 'phpstan {file} {--format=table : format to display} {--debug} {--no-progress}';
+    protected $signature = 'phpstan {file?} {--format=table : format to display} {--debug} {--no-progress}';
 
     public function handle() {
+        $isFramework = CF::appCode() == null;
         $format = $this->option('format');
         $debug = $this->option('debug');
         $noProgress = $this->option('no-progress');
-        $appDir = c::appRoot();
+        $appDir = $isFramework ? DOCROOT . 'system/libraries/CAuth' : c::appRoot();
         $file = $this->argument('file');
         $scanPath = $appDir;
         if ($file) {
@@ -31,7 +32,8 @@ class CConsole_Command_PhpstanCommand extends CConsole_Command {
         if (!$this->isPhpStanInstalled()) {
             throw new RuntimeException('phpstan is not installed, please install with phpstan:install command');
         }
-        chdir(c::appRoot());
+
+        chdir($isFramework ? DOCROOT : c::appRoot());
         $command = [$this->phpBinary(), '-c', CQC::phpstan()->phpstanConfiguration(), '-d', 'memory_limit=1G', '-d', 'max_execution_time=0', $this->getPhpStanBinary(), 'analyze', '--error-format', $format, '--autoload-file', CQC::phpstan()->phpstanBootstrap()];
         if ($debug) {
             $command[] = '--debug';

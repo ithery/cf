@@ -11,7 +11,10 @@ parameters:
     checkModelProperties: true
     reportUnmatchedIgnoredErrors: false
     excludePaths:
-        - system/stubs
+        analyseAndScan:
+            - system/stubs
+        analyse:
+            - system/vendor
 
 
 parametersSchema:
