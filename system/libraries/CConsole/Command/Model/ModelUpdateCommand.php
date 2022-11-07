@@ -246,8 +246,9 @@ class CConsole_Command_Model_ModelUpdateCommand extends CConsole_Command_AppComm
         $modelInstance = $this->getModelInstance();
         foreach ($result as $key => $column) {
             /** @var CDatabase_Schema_Column $column */
-            $field = $key;
+            $field = trim($key, '`');
             $type = $column->getType()->getName();
+
             $casts = $modelInstance->getCasts();
 
             $type = carr::get($casts, $field, $type);
