@@ -118,8 +118,12 @@ class CConsole_Command_Model_ModelUpdateCommand extends CConsole_Command_AppComm
         ];
         $returnTypeClasses = [
             CModel_Relation_BelongsTo::class,
+            CModel_Relation_BelongsToThrough::class,
             CModel_Relation_BelongsToMany::class,
             CModel_Relation_HasMany::class,
+            CModel_Relation_HasManyThrough::class,
+            CModel_Relation_HasManyDeep::class,
+            CModel_Relation_MorphMany::class,
             CModel_Relation_HasOne::class,
         ];
 
@@ -167,14 +171,21 @@ class CConsole_Command_Model_ModelUpdateCommand extends CConsole_Command_AppComm
 
     private function getRelationType($returnType, $relationClass, $isWithTrashed) {
         $relationType = null;
-        if ($returnType == CModel_Relation_BelongsTo::class) {
+        if ($returnType == CModel_Relation_BelongsTo::class
+            || $returnType == CModel_Relation_BelongsToThrough::class
+        ) {
             $relationType = $relationClass;
             if (!$isWithTrashed) {
                 $relationType = 'null|' . $relationType;
             }
         }
 
-        if ($returnType == CModel_Relation_BelongsToMany::class || $returnType == CModel_Relation_HasMany::class) {
+        if ($returnType == CModel_Relation_BelongsToMany::class
+            || $returnType == CModel_Relation_HasMany::class
+            || $returnType == CModel_Relation_MorphMany::class
+            || $returnType == CModel_Relation_HasManyThrough::class
+            || $returnType == CModel_Relation_HasManyDeep::class
+        ) {
             $relationType = 'CModel_Collection|' . $relationClass . '[]';
         }
         if ($returnType == CModel_Relation_HasOne::class) {
@@ -196,6 +207,9 @@ class CConsole_Command_Model_ModelUpdateCommand extends CConsole_Command_AppComm
                 $relationClass = cstr::substr($relationClass, 1, cstr::len($relationClass) - 2);
             }
 
+            if (cstr::startsWith($relationClass, [')', '->', '$'])) {
+                return [null, null];
+            }
             $isWithTrashed = strpos($codeSnippet, '->withTrashed') !== false;
 
             return [$relationClass, $isWithTrashed];
@@ -234,14 +248,17 @@ class CConsole_Command_Model_ModelUpdateCommand extends CConsole_Command_AppComm
             /** @var CDatabase_Schema_Column $column */
             $field = $key;
             $type = $column->getType()->getName();
-
             $casts = $modelInstance->getCasts();
 
             $type = carr::get($casts, $field, $type);
-            //check for model casts
             $type = $this->getType($type);
+
             if (!in_array($field, $excludedFields)) {
-                $properties[$field] = $type;
+                $properties[$field] = [
+                    'type' => $type,
+                    'notnull' => $column->getNotnull(),
+                    'default' => $column->getDefault(),
+                ];
             }
         }
 
@@ -305,16 +322,25 @@ class CConsole_Command_Model_ModelUpdateCommand extends CConsole_Command_AppComm
         return new $modelClass();
     }
 
+    private function getGenericTypeForFieldProperty(array $property) {
+        $type = carr::get($property, 'type');
+        if (!carr::get($property, 'notnull')) {
+            $type = 'null|' . $type;
+        }
+
+        return $type;
+    }
+
     public function updateFieldProperties($properties) {
         $fields = $this->getFields();
         $currentPropertyFields = array_column($properties, 'field');
-
-        foreach ($fields as $field => $type) {
+        foreach ($fields as $field => $fieldProperty) {
+            $type = $this->getGenericTypeForFieldProperty($fieldProperty);
             $i = array_search($field, $currentPropertyFields);
             if ($i === false) {
                 $properties[] = [
                     'prop' => $this->getTable() . '_id' === $field ? '@property-read' : '@property',
-                    'type' => 'string',
+                    'type' => $type,
                     'var' => '$' . $field,
                     'field' => $field,
                     'desc' => '',
@@ -324,7 +350,7 @@ class CConsole_Command_Model_ModelUpdateCommand extends CConsole_Command_AppComm
                 $propType = c::get($prop, 'type');
 
                 if ($propType !== $type) {
-                    $properties[$i]['type'] = $fields[$field];
+                    $properties[$i]['type'] = $type;
                 }
             }
         }
@@ -342,11 +368,11 @@ class CConsole_Command_Model_ModelUpdateCommand extends CConsole_Command_AppComm
     }
 
     private function getMissingPropertyIndex($properties) {
-        $fields = $this->getFields();
+        $fieldsKey = c::collect($this->getFields())->keys()->toArray();
         $classMethods = get_class_methods($this->prefix . 'Model_' . $this->getModel());
         foreach ($properties as $index => $property) {
             $field = carr::get($property, 'field');
-            $i = array_search($field, array_keys($fields));
+            $i = array_search($field, $fieldsKey);
             if ($i === false && !in_array($field, $classMethods)) {
                 if (!cstr::endsWith($field, '_count')) {
                     return $index;
