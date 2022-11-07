@@ -1309,14 +1309,17 @@ class c {
      * @param null|string|array $path
      * @param null|string       $appCode
      *
-     * @return string
+     * @return null|string
      */
     public static function appRoot($path = null, $appCode = null) {
         if ($appCode == null) {
             $appCode = CF::appCode();
         }
+        if ($appCode === null) {
+            return null;
+        }
         if (!in_array($appCode, CF::getAvailableAppCode())) {
-            throw new CBase_Exception_AppCodeNotFoundException('appCode ' . $appCode . ' doesn\'t exists');
+            return null;
         }
         if (is_array($path)) {
             $path = implode(DS, $path);
