@@ -12,8 +12,8 @@ class CHTTP_RedirectResponse extends BaseRedirectResponse {
     use CTrait_ForwardsCalls,
         CHTTP_Trait_ResponseTrait,
         CTrait_Macroable {
-        CTrait_Macroable::__call as macroCall;
-    }
+            CTrait_Macroable::__call as macroCall;
+        }
 
     /**
      * The request instance.
@@ -112,8 +112,8 @@ class CHTTP_RedirectResponse extends BaseRedirectResponse {
     /**
      * Flash a container of errors to the session.
      *
-     * @param CBase_MessageProvider|array|string $provider
-     * @param string                             $key
+     * @param CBase_MessageProviderInterface|array|string $provider
+     * @param string                                      $key
      *
      * @return $this
      */
@@ -176,6 +176,7 @@ class CHTTP_RedirectResponse extends BaseRedirectResponse {
      * @return null
      */
     public function getOriginalContent() {
+        return null;
     }
 
     /**

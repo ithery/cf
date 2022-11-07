@@ -53,6 +53,8 @@ trait CHTTP_Trait_InteractsWithInput {
 
             return cstr::contains($header, ',') ? strstr($header, ',', true) : $header;
         }
+
+        return null;
     }
 
     /**
@@ -261,10 +263,10 @@ trait CHTTP_Trait_InteractsWithInput {
     /**
      * Retrieve an input item from the request.
      *
-     * @param string            $key
-     * @param null|string|array $default
+     * @param null|string $key
+     * @param mixed       $default
      *
-     * @return string|array
+     * @return mixed
      */
     public function input($key = null, $default = null) {
         return c::get(
@@ -343,7 +345,7 @@ trait CHTTP_Trait_InteractsWithInput {
      * @param null|string $format
      * @param null|string $tz
      *
-     * @throws \Carbon\Exceptions\InvalidFormatException
+     * @throws \CarbonV3\Exceptions\InvalidFormatException
      *
      * @return null|\CCarbon
      */
@@ -472,10 +474,10 @@ trait CHTTP_Trait_InteractsWithInput {
     /**
      * Retrieve a cookie from the request.
      *
-     * @param string            $key
+     * @param null|string       $key
      * @param null|string|array $default
      *
-     * @return string|array
+     * @return null|string|array
      */
     public function cookie($key = null, $default = null) {
         return $this->retrieveItem('cookies', $key, $default);
@@ -557,7 +559,7 @@ trait CHTTP_Trait_InteractsWithInput {
      * Retrieve a parameter item from a given source.
      *
      * @param string            $source
-     * @param string            $key
+     * @param null|string       $key
      * @param null|string|array $default
      *
      * @return null|string|array

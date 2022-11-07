@@ -12,7 +12,6 @@ class CHTTP_ResponseCache_CacheProfile {
 
     public function __construct() {
         $this->isEnabled = false;
-        $this->cacheResponseEnabled = false;
         $this->isAddCacheTimeHeader = false;
         $this->cacheLifetimeInSeconds = CF::config('responsecache.cache_lifetime_in_seconds', 60 * 5);
         $this->cacheNameSuffix = '';
@@ -36,6 +35,7 @@ class CHTTP_ResponseCache_CacheProfile {
      */
     public function setAddCacheTimeHeader($bool) {
         $this->isAddCacheTimeHeader = $bool;
+
         return $this;
     }
 
@@ -135,11 +135,13 @@ class CHTTP_ResponseCache_CacheProfile {
 
     public function setCacheLifetime($seconds) {
         $this->cacheLifetimeInSeconds = $seconds;
+
         return $this;
     }
 
     public function setCacheNameSuffix($suffix) {
         $this->cacheNameSuffix = $suffix;
+
         return $this;
     }
 }

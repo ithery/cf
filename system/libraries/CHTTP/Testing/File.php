@@ -1,12 +1,11 @@
 <?php
 
 /**
- * Description of File
+ * Description of File.
  *
  * @author Hery
  */
 class CHTTP_Testing_File extends CHTTP_UploadedFile {
-
     /**
      * The name of the file.
      *
@@ -31,15 +30,16 @@ class CHTTP_Testing_File extends CHTTP_UploadedFile {
     /**
      * The MIME type to report.
      *
-     * @var string|null
+     * @var null|string
      */
     public $mimeTypeToReport;
 
     /**
      * Create a new file instance.
      *
-     * @param  string  $name
-     * @param  resource  $tempFile
+     * @param string   $name
+     * @param resource $tempFile
+     *
      * @return void
      */
     public function __construct($name, $tempFile) {
@@ -47,48 +47,56 @@ class CHTTP_Testing_File extends CHTTP_UploadedFile {
         $this->tempFile = $tempFile;
 
         parent::__construct(
-                $this->tempFilePath(), $name, $this->getMimeType(), null, true
+            $this->tempFilePath(),
+            $name,
+            $this->getMimeType(),
+            null,
+            true
         );
     }
 
     /**
      * Create a new fake file.
      *
-     * @param  string  $name
-     * @param  string|int  $kilobytes
+     * @param string     $name
+     * @param string|int $kilobytes
+     *
      * @return CHTTP_Testing_File
      */
     public static function create($name, $kilobytes = 0) {
-        return (new CHTTP_Testing_FileFactory)->create($name, $kilobytes);
+        return (new CHTTP_Testing_FileFactory())->create($name, $kilobytes);
     }
 
     /**
      * Create a new fake file with content.
      *
-     * @param  string  $name
-     * @param  string  $content
+     * @param string $name
+     * @param string $content
+     *
      * @return CHTTP_Testing_File
      */
     public static function createWithContent($name, $content) {
-        return (new CHTTP_Testing_FileFactory)->createWithContent($name, $content);
+        return (new CHTTP_Testing_FileFactory())->createWithContent($name, $content);
     }
 
     /**
      * Create a new fake image.
      *
-     * @param  string  $name
-     * @param  int  $width
-     * @param  int  $height
+     * @param string $name
+     * @param int    $width
+     * @param int    $height
+     *
      * @return CHTTP_Testing_File
      */
     public static function image($name, $width = 10, $height = 10) {
-        return (new CHTTP_Testing_FileFactory)->image($name, $width, $height);
+        return (new CHTTP_Testing_FileFactory())->image($name, $width, $height);
     }
 
     /**
      * Set the "size" of the file in kilobytes.
      *
-     * @param  int  $kilobytes
+     * @param int $kilobytes
+     *
      * @return $this
      */
     public function size($kilobytes) {
@@ -102,14 +110,16 @@ class CHTTP_Testing_File extends CHTTP_UploadedFile {
      *
      * @return int
      */
+    #[\ReturnTypeWillChange]
     public function getSize() {
-        return $this->sizeToReport ? : parent::getSize();
+        return $this->sizeToReport ?: parent::getSize();
     }
 
     /**
      * Set the "MIME type" for the file.
      *
-     * @param  string  $mimeType
+     * @param string $mimeType
+     *
      * @return $this
      */
     public function mimeType($mimeType) {
@@ -124,7 +134,7 @@ class CHTTP_Testing_File extends CHTTP_UploadedFile {
      * @return string
      */
     public function getMimeType() {
-        return $this->mimeTypeToReport ? : MimeType::from($this->name);
+        return $this->mimeTypeToReport ?: CHTTP_Testing_MimeType::from($this->name);
     }
 
     /**
@@ -135,5 +145,4 @@ class CHTTP_Testing_File extends CHTTP_UploadedFile {
     protected function tempFilePath() {
         return stream_get_meta_data($this->tempFile)['uri'];
     }
-
 }

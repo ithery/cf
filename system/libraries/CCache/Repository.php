@@ -9,6 +9,7 @@ defined('SYSPATH') or die('No direct access allowed.');
  */
 class CCache_Repository implements CCache_RepositoryInterface, ArrayAccess {
     use CTrait_Helper_InteractsWithTime;
+
     /**
      * @var CCache_DriverAbstract
      */
@@ -536,6 +537,7 @@ class CCache_Repository implements CCache_RepositoryInterface, ArrayAccess {
      *
      * @return bool
      */
+    #[\ReturnTypeWillChange]
     public function offsetExists($key) {
         return $this->has($key);
     }
@@ -559,6 +561,7 @@ class CCache_Repository implements CCache_RepositoryInterface, ArrayAccess {
      *
      * @return void
      */
+    #[\ReturnTypeWillChange]
     public function offsetSet($key, $value) {
         $this->put($key, $value, $this->default);
     }
@@ -570,6 +573,7 @@ class CCache_Repository implements CCache_RepositoryInterface, ArrayAccess {
      *
      * @return void
      */
+    #[\ReturnTypeWillChange]
     public function offsetUnset($key) {
         $this->forget($key);
     }

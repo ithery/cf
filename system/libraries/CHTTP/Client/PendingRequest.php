@@ -684,7 +684,7 @@ class CHTTP_Client_PendingRequest {
             return $this->makePromise($method, $url, $options);
         }
 
-        return c::retry($this->tries ?? 1, function () use ($method, $url, $options) {
+        return c::retry($this->tries ?: 1, function () use ($method, $url, $options) {
             try {
                 return c::tap(new CHTTP_Client_Response($this->sendRequest($method, $url, $options)), function ($response) {
                     $this->populateResponse($response);
