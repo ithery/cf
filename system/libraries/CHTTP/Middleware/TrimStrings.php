@@ -1,6 +1,6 @@
 <?php
 
-class CHTTP_Middleware_TrimStrings extends CHTTP_Middleware_TransformsRequest {
+class CHTTP_Middleware_TrimStrings extends CHTTP_Middleware_TransformRequest {
     /**
      * All of the registered skip callbacks.
      *
