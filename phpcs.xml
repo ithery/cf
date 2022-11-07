@@ -39,6 +39,7 @@
         <exclude name="Generic.Commenting.DocComment.MissingShort"/>
         <exclude name="Generic.Commenting.DocComment.TagValueIndent"/>
         <exclude name="Generic.Commenting.DocComment.NonParamGroup"/>
+        <exclude name="Generic.Commenting.DocComment.ParamNotFirst"/>
 
 
 
