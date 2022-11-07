@@ -1,13 +1,8 @@
 <?php
 
 defined('SYSPATH') or die('No direct access allowed.');
+use Symfony\Component\VarDumper\VarDumper;
 
-/**
- * @author Hery Kurniawan
- * @license Ittron Global Teknologi <ittron.co.id>
- *
- * @since Jun 23, 2019, 5:32:55 AM
- */
 trait CHTTP_Trait_InteractsWithInput {
     /**
      * Retrieve a server variable from the request.
@@ -15,7 +10,7 @@ trait CHTTP_Trait_InteractsWithInput {
      * @param string            $key
      * @param null|string|array $default
      *
-     * @return string|array
+     * @return null|string|array
      */
     public function server($key = null, $default = null) {
         return $this->retrieveItem('server', $key, $default);
@@ -38,7 +33,7 @@ trait CHTTP_Trait_InteractsWithInput {
      * @param string            $key
      * @param null|string|array $default
      *
-     * @return string|array
+     * @return null|string|array
      */
     public function header($key = null, $default = null) {
         return $this->retrieveItem('headers', $key, $default);
@@ -52,8 +47,11 @@ trait CHTTP_Trait_InteractsWithInput {
     public function bearerToken() {
         $header = $this->header('Authorization', '');
 
-        if (cstr::startsWith($header, 'Bearer ')) {
-            return cstr::substr($header, 7);
+        $position = strrpos($header, 'Bearer ');
+        if ($position !== false) {
+            $header = substr($header, $position + 7);
+
+            return cstr::contains($header, ',') ? strstr($header, ',', true) : $header;
         }
     }
 
@@ -92,20 +90,36 @@ trait CHTTP_Trait_InteractsWithInput {
     /**
      * Determine if the request contains any of the given inputs.
      *
-     * @param dynamic $key
+     * @param string|array $keys
      *
      * @return bool
      */
-    public function hasAny(...$keys) {
+    public function hasAny($keys) {
+        $keys = is_array($keys) ? $keys : func_get_args();
         $input = $this->all();
 
-        foreach ($keys as $key) {
-            if (carr::has($input, $key)) {
-                return true;
-            }
+        return carr::hasAny($input, $keys);
+    }
+
+    /**
+     * Apply the callback if the request contains the given input item key.
+     *
+     * @param string        $key
+     * @param callable      $callback
+     * @param null|callable $default
+     *
+     * @return $this|mixed
+     */
+    public function whenHas($key, $callback, $default = null) {
+        if ($this->has($key)) {
+            return $callback(c::get($this->all(), $key)) ?: $this;
         }
 
-        return false;
+        if ($default) {
+            return $default();
+        }
+
+        return $this;
     }
 
     /**
@@ -125,6 +139,78 @@ trait CHTTP_Trait_InteractsWithInput {
         }
 
         return true;
+    }
+
+    /**
+     * Determine if the request contains an empty value for an input item.
+     *
+     * @param string|array $key
+     *
+     * @return bool
+     */
+    public function isNotFilled($key) {
+        $keys = is_array($key) ? $key : func_get_args();
+
+        foreach ($keys as $value) {
+            if (!$this->isEmptyString($value)) {
+                return false;
+            }
+        }
+
+        return true;
+    }
+
+    /**
+     * Determine if the request contains a non-empty value for any of the given inputs.
+     *
+     * @param string|array $keys
+     *
+     * @return bool
+     */
+    public function anyFilled($keys) {
+        $keys = is_array($keys) ? $keys : func_get_args();
+
+        foreach ($keys as $key) {
+            if ($this->filled($key)) {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
+    /**
+     * Apply the callback if the request contains a non-empty value for the given input item key.
+     *
+     * @param string        $key
+     * @param callable      $callback
+     * @param null|callable $default
+     *
+     * @return $this|mixed
+     */
+    public function whenFilled($key, $callback, $default = null) {
+        if ($this->filled($key)) {
+            return $callback(c::get($this->all(), $key)) ?: $this;
+        }
+
+        if ($default) {
+            return $default();
+        }
+
+        return $this;
+    }
+
+    /**
+     * Determine if the request is missing a given input item key.
+     *
+     * @param string|array $key
+     *
+     * @return bool
+     */
+    public function missing($key) {
+        $keys = is_array($key) ? $key : func_get_args();
+
+        return !$this->has($keys);
     }
 
     /**
@@ -189,6 +275,124 @@ trait CHTTP_Trait_InteractsWithInput {
     }
 
     /**
+     * Retrieve input from the request as a Stringable instance.
+     *
+     * @param string $key
+     * @param mixed  $default
+     *
+     * @return \CBase_String
+     */
+    public function str($key, $default = null) {
+        return $this->string($key, $default);
+    }
+
+    /**
+     * Retrieve input from the request as a Stringable instance.
+     *
+     * @param string $key
+     * @param mixed  $default
+     *
+     * @return \CBase_String
+     */
+    public function string($key, $default = null) {
+        return c::str($this->input($key, $default));
+    }
+
+    /**
+     * Retrieve input as a boolean value.
+     *
+     * Returns true when value is "1", "true", "on", and "yes". Otherwise, returns false.
+     *
+     * @param null|string $key
+     * @param bool        $default
+     *
+     * @return bool
+     */
+    public function boolean($key = null, $default = false) {
+        return filter_var($this->input($key, $default), FILTER_VALIDATE_BOOLEAN);
+    }
+
+    /**
+     * Retrieve input as an integer value.
+     *
+     * @param string $key
+     * @param int    $default
+     *
+     * @return int
+     */
+    public function integer($key, $default = 0) {
+        return intval($this->input($key, $default));
+    }
+
+    /**
+     * Retrieve input as a float value.
+     *
+     * @param string $key
+     * @param float  $default
+     *
+     * @return float
+     */
+    public function float($key, $default = 0.0) {
+        return floatval($this->input($key, $default));
+    }
+
+    /**
+     * Retrieve input from the request as a Carbon instance.
+     *
+     * @param string      $key
+     * @param null|string $format
+     * @param null|string $tz
+     *
+     * @throws \Carbon\Exceptions\InvalidFormatException
+     *
+     * @return null|\CCarbon
+     */
+    public function date($key, $format = null, $tz = null) {
+        if ($this->isNotFilled($key)) {
+            return null;
+        }
+
+        if (is_null($format)) {
+            return CCarbon::parse($this->input($key), $tz);
+        }
+
+        return CCarbon::createFromFormat($format, $this->input($key), $tz);
+    }
+
+    /**
+     * Retrieve input from the request as an enum.
+     *
+     * @template TEnum
+     *
+     * @param string              $key
+     * @param class-string<TEnum> $enumClass
+     *
+     * @return null|TEnum
+     */
+    public function enum($key, $enumClass) {
+        if ($this->isNotFilled($key)
+            || !function_exists('enum_exists')
+            || !enum_exists($enumClass)
+            || !method_exists($enumClass, 'tryFrom')
+        ) {
+            return null;
+        }
+
+        return $enumClass::tryFrom($this->input($key));
+    }
+
+    /**
+     * Retrieve input from the request as a collection.
+     *
+     * @param null|array|string $key
+     *
+     * @return \CCollection
+     */
+    public function collect($key = null) {
+        return c::collect(is_array($key) ? $this->only($key) : $this->input($key));
+    }
+
+    /**
      * Get a subset containing the provided keys with values from the input data.
      *
      * @param array|mixed $keys
@@ -203,7 +407,7 @@ trait CHTTP_Trait_InteractsWithInput {
         $placeholder = new stdClass();
 
         foreach (is_array($keys) ? $keys : func_get_args() as $key) {
-            $value = carr::get($input, $key, $placeholder);
+            $value = c::get($input, $key, $placeholder);
 
             if ($value !== $placeholder) {
                 carr::set($results, $key, $value);
@@ -236,7 +440,7 @@ trait CHTTP_Trait_InteractsWithInput {
      * @param string            $key
      * @param null|string|array $default
      *
-     * @return string|array
+     * @return null|string|array
      */
     public function query($key = null, $default = null) {
         return $this->retrieveItem('query', $key, $default);
@@ -248,7 +452,7 @@ trait CHTTP_Trait_InteractsWithInput {
      * @param string            $key
      * @param null|string|array $default
      *
-     * @return string|array
+     * @return null|string|array
      */
     public function post($key = null, $default = null) {
         return $this->retrieveItem('request', $key, $default);
@@ -356,7 +560,7 @@ trait CHTTP_Trait_InteractsWithInput {
      * @param string            $key
      * @param null|string|array $default
      *
-     * @return string|array
+     * @return null|string|array
      */
     protected function retrieveItem($source, $key, $default) {
         if (is_null($key)) {
@@ -364,5 +568,33 @@ trait CHTTP_Trait_InteractsWithInput {
         }
 
         return $this->$source->get($key, $default);
+    }
+
+    /**
+     * Dump the request items and end the script.
+     *
+     * @param mixed $keys
+     *
+     * @return never
+     */
+    public function dd(...$keys) {
+        $this->dump(...$keys);
+
+        exit(1);
+    }
+
+    /**
+     * Dump the items.
+     *
+     * @param mixed $keys
+     *
+     * @return $this
+     */
+    public function dump($keys = []) {
+        $keys = is_array($keys) ? $keys : func_get_args();
+
+        VarDumper::dump(count($keys) > 0 ? $this->only($keys) : $this->all());
+
+        return $this;
     }
 }
