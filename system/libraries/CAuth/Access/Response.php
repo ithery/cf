@@ -46,6 +46,7 @@ class CAuth_Access_Response implements CInterface_Arrayable {
      * @return CAuth_Access_Response
      */
     public static function allow($message = null, $code = null) {
+        /** @phpstan-ignore-next-line */
         return new static(true, $message, $code);
     }
 
@@ -58,6 +59,7 @@ class CAuth_Access_Response implements CInterface_Arrayable {
      * @return CAuth_Access_Response
      */
     public static function deny($message = null, $code = null) {
+        /** @phpstan-ignore-next-line */
         return new static(false, $message, $code);
     }
 

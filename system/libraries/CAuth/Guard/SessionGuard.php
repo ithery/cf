@@ -83,7 +83,7 @@ class CAuth_Guard_SessionGuard implements CAuth_Contract_StatefulGuardInterface,
      *
      * @param string                                         $name
      * @param CAuth_UserProviderInterface                    $provider
-     * @param CSession                                       $session
+     * @param CSession_Store                                 $session
      * @param null|\Symfony\Component\HttpFoundation\Request $request
      *
      * @return void

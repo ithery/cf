@@ -69,6 +69,8 @@ trait CAuth_Guard_Concern_GuardHelper {
         if ($this->user()) {
             return $this->user()->getAuthIdentifier();
         }
+
+        return null;
     }
 
     /**
