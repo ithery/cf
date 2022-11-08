@@ -22,7 +22,7 @@ class CConsole_Command_PhpstanCommand extends CConsole_Command {
         $format = $this->option('format');
         $debug = $this->option('debug');
         $noProgress = $this->option('no-progress');
-        $appDir = $isFramework ? DOCROOT . 'system/libraries/CHTTP' : c::appRoot();
+        $appDir = $isFramework ? DOCROOT . 'system/libraries/CElement' : c::appRoot();
         $file = $this->argument('file');
         $scanPath = $appDir;
         if ($file) {

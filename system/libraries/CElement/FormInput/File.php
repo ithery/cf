@@ -2,6 +2,7 @@
 
 class CElement_FormInput_File extends CElement_FormInput {
     use CTrait_Compat_Element_FormInput_File;
+
     protected $multiple;
 
     protected $applyjs;
@@ -18,8 +19,8 @@ class CElement_FormInput_File extends CElement_FormInput {
         $this->applyjs = c::theme('fileupload', 'file-upload');
     }
 
-    public static function factory($id) {
-        return new static($id);
+    public static function factory($id = null) {
+        return new CElement_FormInput_File($id);
     }
 
     public function html($indent = 0) {

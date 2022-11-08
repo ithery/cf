@@ -11,6 +11,7 @@ defined('SYSPATH') or die('No direct access allowed.');
 class CElement_FormInput_Radio extends CElement_FormInput {
     use CTrait_Compat_Element_FormInput_Radio,
         CTrait_Element_Property_Label;
+
     protected $checked;
 
     // protected $label;
@@ -35,8 +36,8 @@ class CElement_FormInput_Radio extends CElement_FormInput {
         }
     }
 
-    public static function factory($id) {
-        return new static($id);
+    public static function factory($id = null) {
+        return new CElement_FormInput_Radio($id);
     }
 
     public function setChecked($bool = true) {

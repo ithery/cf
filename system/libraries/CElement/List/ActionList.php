@@ -29,7 +29,8 @@ class CElement_List_ActionList extends CElement_List {
     }
 
     public static function factory($id = null) {
-        return new static($id);
+        /** @phpstan-ignore-next-line */
+        return new CElement_List_ActionList($id);
     }
 
     /**

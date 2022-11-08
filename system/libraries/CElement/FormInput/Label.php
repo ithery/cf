@@ -12,8 +12,8 @@ class CElement_FormInput_Label extends CElement_FormInput {
         $this->isOneTag = false;
     }
 
-    public static function factory($id = '') {
-        return new static($id);
+    public static function factory($id = null) {
+        return new CElement_FormInput_Label($id);
     }
 
     protected function build() {

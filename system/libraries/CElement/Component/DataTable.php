@@ -292,7 +292,8 @@ class CElement_Component_DataTable extends CElement_Component {
         return $legacy;
     }
 
-    public static function factory($id = '') {
+    public static function factory($id = null) {
+        // @phpstan-ignore-next-line
         return new static($id);
     }
 

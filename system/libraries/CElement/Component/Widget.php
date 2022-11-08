@@ -57,7 +57,7 @@ class CElement_Component_Widget extends CElement_Component {
         $this->js_collapse = true;
     }
 
-    public static function factory($id = '') {
+    public static function factory($id = null) {
         return new CElement_Component_Widget($id);
     }
 
