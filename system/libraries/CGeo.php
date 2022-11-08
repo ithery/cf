@@ -23,4 +23,11 @@ class CGeo {
     public static function geocoder() {
         return CGeo_Geocoder::instance();
     }
+
+    /**
+     * @return CGeo_Spatial
+     */
+    public static function spatial() {
+        //TODO: move CModel_Spatial_Geometry to here
+    }
 }

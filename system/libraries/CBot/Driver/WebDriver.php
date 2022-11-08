@@ -38,7 +38,7 @@ class CBot_Driver_WebDriver extends CBot_DriverAbstract {
     protected $files;
 
     /**
-     * @param Request $request
+     * @param CHTTP_Request $request
      */
     public function buildPayload(CHTTP_Request $request) {
         $this->payload = $request->request->all();

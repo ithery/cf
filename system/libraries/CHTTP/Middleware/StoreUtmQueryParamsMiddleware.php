@@ -3,8 +3,8 @@ class CHTTP_Middleware_StoreUtmQueryParamsMiddleware {
     /**
      * Handle an incoming request.
      *
-     * @param Request $request
-     * @param Closure $next
+     * @param CHTTP_Request $request
+     * @param Closure       $next
      *
      * @return mixed
      */

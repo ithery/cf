@@ -152,6 +152,7 @@ class CConsole_Command_StatusCommand extends CConsole_Command {
     protected function gatherApplicationInformation() {
         static::addToSection('Environment', fn () => [
             'Application Name' => CF::config('app.name'),
+            'Application Code' => CF::appCode(),
             'CF Version' => CF::version(),
             'PHP Version' => phpversion(),
             'Composer Version' => (new CBase_Composer())->getVersion() ?? '<fg=yellow;options=bold>-</>',

@@ -21,7 +21,7 @@ class CVendor_Google_Recaptcha_RecaptchaV2 extends CVendor_Google_Recaptcha_Abst
     /**
      * Get script source link.
      *
-     * @param string|null $callbackName
+     * @param null|string $callbackName
      *
      * @return string
      */
@@ -48,7 +48,7 @@ class CVendor_Google_Recaptcha_RecaptchaV2 extends CVendor_Google_Recaptcha_Abst
     /**
      * Display Captcha.
      *
-     * @param string|null $name
+     * @param null|string $name
      * @param array       $attributes
      *
      * @return CElement_Element_Div
@@ -66,7 +66,7 @@ class CVendor_Google_Recaptcha_RecaptchaV2 extends CVendor_Google_Recaptcha_Abst
     /**
      * Display image Captcha.
      *
-     * @param string|null $name
+     * @param null|string $name
      * @param array       $attributes
      *
      * @return CElement_Element_Div
@@ -81,7 +81,7 @@ class CVendor_Google_Recaptcha_RecaptchaV2 extends CVendor_Google_Recaptcha_Abst
     /**
      * Display audio Captcha.
      *
-     * @param string|null $name
+     * @param null|string $name
      * @param array       $attributes
      *
      * @return \Arcanedev\Html\Elements\Div
@@ -108,13 +108,14 @@ class CVendor_Google_Recaptcha_RecaptchaV2 extends CVendor_Google_Recaptcha_Abst
             ['data-callback' => $dataCallback],
             $this->prepareAttributes($attributes)
         ))->add($value);
+
         return $button->html();
     }
 
     /**
      * Get script tag.
      *
-     * @param string|null $callbackName
+     * @param null|string $callbackName
      *
      * @return string
      */
@@ -186,7 +187,7 @@ class CVendor_Google_Recaptcha_RecaptchaV2 extends CVendor_Google_Recaptcha_Abst
             $script = implode(PHP_EOL, [
                 $this->getApiScript(),
                 '<script>',
-                "var $callbackName = function() {",
+                "var {$callbackName} = function() {",
                 $this->renderCaptchas($captchas),
                 '};',
                 '</script>',
@@ -218,7 +219,7 @@ class CVendor_Google_Recaptcha_RecaptchaV2 extends CVendor_Google_Recaptcha_Abst
     /**
      * Check if callback is not empty.
      *
-     * @param string|null $callbackName
+     * @param null|string $callbackName
      *
      * @return bool
      */
@@ -284,11 +285,11 @@ class CVendor_Google_Recaptcha_RecaptchaV2 extends CVendor_Google_Recaptcha_Abst
     /**
      * Prepare the name and id attributes.
      *
-     * @param string|null $name
-     *
-     * @return array
+     * @param null|string $name
      *
      * @throws \Arcanedev\NoCaptcha\Exceptions\InvalidArgumentException
+     *
+     * @return array
      */
     protected static function prepareNameAttribute($name) {
         if (is_null($name)) {

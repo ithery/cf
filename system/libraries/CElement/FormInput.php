@@ -169,7 +169,9 @@ class CElement_FormInput extends CElement_Element {
 
     protected function build() {
         parent::build();
-        $this->setAttr('value', $this->value);
+        if (!is_array($this->value)) {
+            $this->setAttr('value', $this->value);
+        }
         if ($this->readonly) {
             $this->setAttr('readonly', 'readonly');
         }

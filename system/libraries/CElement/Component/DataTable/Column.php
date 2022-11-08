@@ -205,6 +205,24 @@ class CElement_Component_DataTable_Column extends CObject {
         return $this;
     }
 
+    /**
+     * Set align to right.
+     *
+     * @return $this
+     */
+    public function setAlignRight() {
+        return $this->setAlign('right');
+    }
+
+    /**
+     * Set align to center.
+     *
+     * @return $this
+     */
+    public function setAlignCenter() {
+        return $this->setAlign('center');
+    }
+
     public function setCallback($callback, $require = '') {
         //$this->callback = c::toSerializableClosure($callback);
         $this->callback = c::toSerializableClosure($callback);

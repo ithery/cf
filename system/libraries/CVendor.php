@@ -219,4 +219,18 @@ class CVendor {
 
         return new CVendor_Firebase($options);
     }
+
+    /**
+     * @return \CVendor_Wago
+     */
+    public static function wago() {
+        return new CBase_ForwarderStaticClass(CVendor_Wago::class);
+    }
+
+    /**
+     * @return \CVendor_TugasHarian
+     */
+    public static function tugasHarian() {
+        return new CBase_ForwarderStaticClass(CVendor_TugasHarian::class);
+    }
 }

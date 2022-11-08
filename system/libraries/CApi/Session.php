@@ -14,7 +14,7 @@ class CApi_Session {
         $this->sessionId = $sessionId;
 
         if (!$this->driver->exists($sessionId)) {
-            throw new CApi_Exception('sessionId ' . $sessionId . 'not found');
+            throw new CApi_Exception_SessionNotFoundException('sessionId ' . $sessionId . ' not found');
         }
         $this->load();
     }

@@ -11,8 +11,8 @@ defined('SYSPATH') or die('No direct access allowed.');
  */
 use League\Flysystem\Adapter\Local;
 use League\Flysystem\AdapterInterface;
-use League\Flysystem\Filesystem as LeagueFilesystem;
 use Spatie\TemporaryDirectory\TemporaryDirectory;
+use League\Flysystem\Filesystem as LeagueFilesystem;
 
 /**
  * @mixin CStorage_Adapter
@@ -92,7 +92,7 @@ class CRunner_FFMpeg_Storage_Disk {
             return $this->filesystemAdapter;
         }
 
-        if ($this->disk instanceof Filesystem) {
+        if ($this->disk instanceof CStorage_Adapter) {
             return $this->filesystemAdapter = $this->disk;
         }
 

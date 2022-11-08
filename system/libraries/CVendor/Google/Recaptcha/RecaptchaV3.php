@@ -25,13 +25,14 @@ class CVendor_Google_Recaptcha_RecaptchaV3 extends CVendor_Google_Recaptcha_Abst
      */
     public function input($name = 'g-recaptcha-response') {
         $hidden = new CElement_FormInput_Hidden($name);
+
         return $hidden->html();
     }
 
     /**
      * Get script tag.
      *
-     * @param string|null $callbackName
+     * @param null|string $callbackName
      *
      * @return string
      */
@@ -72,7 +73,7 @@ class CVendor_Google_Recaptcha_RecaptchaV3 extends CVendor_Google_Recaptcha_Abst
     /**
      * Check if callback is not empty.
      *
-     * @param string|null $callbackName
+     * @param null|string $callbackName
      *
      * @return bool
      */
@@ -99,7 +100,7 @@ class CVendor_Google_Recaptcha_RecaptchaV3 extends CVendor_Google_Recaptcha_Abst
     /**
      * Get script source link.
      *
-     * @param string|null $callbackName
+     * @param null|string $callbackName
      *
      * @return string
      */

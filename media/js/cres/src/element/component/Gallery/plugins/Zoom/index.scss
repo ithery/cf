@@ -1,0 +1,124 @@
+@import '../../scss/variables';
+@import '../../scss/mixins';
+.cres-gallery-outer {
+    // reset transition duration
+    &.cres-gallery-css3.cres-gallery-zoom-dragging {
+        .cres-gallery-item.cres-gallery-complete.cres-gallery-zoomable {
+            .cres-gallery-img-wrap,
+            .cres-gallery-image {
+                @include transition-duration(0ms !important);
+            }
+        }
+    }
+    &.cres-gallery-use-transition-for-zoom {
+        .cres-gallery-item.cres-gallery-complete.cres-gallery-zoomable {
+            .cres-gallery-img-wrap {
+                will-change: transform;
+                @include transitionCustom(
+                    transform $zoom-transition-duration
+                        cubic-bezier(0.12, 0.415, 0.01, 1.19) 0s
+                );
+            }
+        }
+        &.cres-gallery-zoom-drag-transition {
+            .cres-gallery-item.cres-gallery-complete.cres-gallery-zoomable {
+                .cres-gallery-img-wrap {
+                    will-change: transform;
+                    @include transitionCustom(
+                        transform 0.8s cubic-bezier(0, 0, 0.25, 1) 0s
+                    );
+                }
+            }
+        }
+    }
+
+    .cres-gallery-item.cres-gallery-complete.cres-gallery-zoomable {
+        .cres-gallery-img-wrap {
+            @include translate3d(0, 0, 0);
+            @include backface-visibility(hidden);
+        }
+
+        .cres-gallery-image,
+        .cres-gallery-dummy-img {
+            // Translate required for zoom
+            @include scale3d(1, 1, 1);
+            @include transitionCustom(
+                transform $zoom-transition-duration
+                    cubic-bezier(0.12, 0.415, 0.01, 1.19) 0s,
+                opacity 0.15s !important
+            );
+            @include backface-visibility(hidden);
+
+            &.no-transition {
+                transition: none !important;
+            }
+            &.reset-transition {
+                transform: scale3d(1, 1, 1) translate3d(-50%, -50%, 0px) !important;
+                max-width: none !important;
+                max-height: none !important;
+                top: 50% !important;
+                left: 50% !important;
+            }
+            &.reset-transition-x {
+                transform: scale3d(1, 1, 1) translate3d(-50%, 0, 0px) !important;
+                top: 0 !important;
+                left: 50% !important;
+                max-width: none !important;
+                max-height: none !important;
+            }
+            &.reset-transition-y {
+                transform: scale3d(1, 1, 1) translate3d(0, -50%, 0px) !important;
+                top: 50% !important;
+                left: 0% !important;
+                max-width: none !important;
+                max-height: none !important;
+            }
+        }
+    }
+}
+
+.cres-gallery-icon {
+    // zoom buttons
+    &.cres-gallery-zoom-in {
+        &:after {
+            content: '\e311';
+        }
+        .cres-gallery-actual-size & {
+            opacity: 0.5;
+            pointer-events: none;
+        }
+    }
+
+    &.cres-gallery-actual-size {
+        font-size: 20px;
+        &:after {
+            content: '\e033';
+        }
+    }
+
+    &.cres-gallery-zoom-out {
+        opacity: 0.5;
+        pointer-events: none;
+
+        &:after {
+            content: '\e312';
+        }
+
+        .cres-gallery-zoomed & {
+            opacity: 1;
+            pointer-events: auto;
+        }
+    }
+}
+.cres-gallery-outer {
+    &[data-cres-gallery-slide-type='video'],
+    &[data-cres-gallery-slide-type='iframe'],
+    &.cres-gallery-first-slide-loading {
+        .cres-gallery-zoom-in,
+        .cres-gallery-actual-size,
+        .cres-gallery-zoom-out {
+            opacity: $cres-gallery-toolbar-icon-disabled-opacity;
+            pointer-events: none;
+        }
+    }
+}

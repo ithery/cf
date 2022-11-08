@@ -14,7 +14,7 @@ class CHTTP_Middleware_ValidatePostSize {
     public function handle($request, $next) {
         $max = $this->getPostMaxSize();
 
-        if ($max > 0 && $request->server('CONTENT_LENGTH') > $max) {
+        if ($max > 0 && ((int) $request->server('CONTENT_LENGTH')) > $max) {
             throw new CHTTP_Exception_PostTooLargeException();
         }
 

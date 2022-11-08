@@ -14,6 +14,8 @@ class cdownload {
      * @param mixed  $data     data to be sent if the filename does not exist
      * @param string $nicename suggested filename to display in the download
      *
+     * @deprecated use Response to download
+     *
      * @return void
      */
     public static function force($filename = null, $data = null, $nicename = null) {

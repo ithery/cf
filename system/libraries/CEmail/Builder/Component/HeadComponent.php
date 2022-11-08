@@ -10,6 +10,7 @@ class CEmail_Builder_Component_HeadComponent extends CEmail_Builder_Component {
         }
         $attributes = carr::get($options, 'attributes', []);
         $index = 0;
+
         return carr::map($childrens, function ($children) use ($attributes) {
             $component = $children;
             if ($children instanceof CEmail_Builder_Node) {
@@ -26,6 +27,7 @@ class CEmail_Builder_Component_HeadComponent extends CEmail_Builder_Component {
                 // eslint-disable-next-line no-console
                 //console.error(`No matching component for tag : ${children.tagName}`)
                 throw new Exception('No matching component for tag : ' . $children->tagName);
+
                 return null;
             }
 
@@ -35,6 +37,7 @@ class CEmail_Builder_Component_HeadComponent extends CEmail_Builder_Component {
             if (method_exists($component, 'render')) {
                 return $component->render();
             }
+
             return null;
         });
     }

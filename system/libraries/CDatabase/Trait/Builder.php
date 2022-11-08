@@ -3,10 +3,7 @@
 defined('SYSPATH') or die('No direct access allowed.');
 
 /**
- * @author Hery Kurniawan
- * @license Ittron Global Teknologi <ittron.co.id>
- *
- * @since Jun 24, 2018, 1:15:35 PM
+ * @template TModelClass
  */
 trait CDatabase_Trait_Builder {
     use CTrait_Conditionable;
@@ -142,6 +139,8 @@ trait CDatabase_Trait_Builder {
      * @param array $columns
      *
      * @return null|CModel|object|static
+     *
+     * @phpstan-return TModelClass|null
      */
     public function first($columns = ['*']) {
         return $this->take(1)->get($columns)->first();

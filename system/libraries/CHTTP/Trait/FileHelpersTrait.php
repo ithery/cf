@@ -37,7 +37,7 @@ trait CHTTP_Trait_FileHelpersTrait {
     /**
      * Get a filename for the file.
      *
-     * @param string|null $path
+     * @param null|string $path
      *
      * @return string
      */

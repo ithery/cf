@@ -3,10 +3,8 @@
 defined('SYSPATH') or die('No direct access allowed.');
 
 /**
- * @author Hery Kurniawan
- * @license Ittron Global Teknologi <ittron.co.id>
- *
- * @since Jun 19, 2018, 3:37:54 AM
+ * @property-read int $role_id
+ * @property      int $depth
  */
 class CApp_Model_Roles extends CApp_Model implements CApp_Auth_Contract_RoleInterface {
     use CApp_Model_Trait_Roles;

@@ -20,7 +20,7 @@ class CHTTP_Client_ResponseSequence {
     /**
      * The response that should be returned when the sequence is empty.
      *
-     * @var \GuzzleHttp\Promise\PromiseInterface
+     * @var null|\GuzzleHttp\Promise\PromiseInterface
      */
     protected $emptyResponse;
 

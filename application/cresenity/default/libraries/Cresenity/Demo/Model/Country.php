@@ -2,6 +2,14 @@
 
 namespace Cresenity\Demo\Model;
 
+/**
+ * @property-read string $code
+ * @property-read string $code3
+ * @property-read string $num
+ * @property-read string $name
+ * @property-read string $continent
+ * @property-read string $isd
+ */
 class Country extends \CModel {
     use \CModel_ArrayDriver_ArrayDriverTrait;
 

@@ -8,12 +8,14 @@ class chtml {
     public static $windowed_urls = false;
 
     /**
-     * Convert special characters to HTML entities
+     * Convert special characters to HTML entities.
      *
      * @param   string   string to convert
      * @param   bool  encode existing entities
      * @param mixed $str
      * @param mixed $double_encode
+     *
+     * @deprecated use c::e
      *
      * @return string
      */
@@ -143,6 +145,7 @@ class chtml {
             // Create list of anchors
             $anchors[] = chtml::anchor($link, $title);
         }
+
         return $anchors;
     }
 
@@ -160,11 +163,13 @@ class chtml {
             switch (($letter === '@') ? rand(1, 2) : rand(1, 3)) {
                 // HTML entity code
                 case 1: $safe .= '&#' . ord($letter) . ';';
+
                     break;
-                // Hex character code
+                    // Hex character code
                 case 2: $safe .= '&#x' . dechex(ord($letter)) . ';';
+
                     break;
-                // Raw (no) encoding
+                    // Raw (no) encoding
                 case 3: $safe .= $letter;
             }
         }
@@ -213,7 +218,6 @@ class chtml {
         // Encoded start of the href="" is a static encoded version of 'mailto:'
         return '<a href="&#109;&#097;&#105;&#108;&#116;&#111;&#058;' . $safe . $params . '"' . $attributes . '>' . $title . '</a>';
     }
-
 
     /**
      * Creates a meta tag.

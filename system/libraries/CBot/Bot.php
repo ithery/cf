@@ -398,11 +398,11 @@ class CBot_Bot {
                     }
                 }
 
-                /*
-                * If the driver has a  "messagesHandled" method, call it.
-                * This method can be used to trigger driver methods
-                * once the messages are handles.
-                */
+                /**
+                 * If the driver has a  "messagesHandled" method, call it.
+                 * This method can be used to trigger driver methods
+                 * once the messages are handles.
+                 */
                 if (method_exists($this->getDriver(), 'messagesHandled')) {
                     $this->getDriver()->messagesHandled();
                 }

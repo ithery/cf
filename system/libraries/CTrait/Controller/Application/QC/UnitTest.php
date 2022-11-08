@@ -1,18 +1,17 @@
 <?php
 
 /**
- * Description of UnitTest
+ * Description of UnitTest.
  *
  * @author Hery
  */
 trait CTrait_Controller_Application_QC_UnitTest {
-
     protected function getTitle() {
         return 'Unit Test';
     }
 
     public function index() {
-        $app = CApp::instance();
+        $app = c::app();
         $db = CDatabase::instance();
 
         $app->title($this->getTitle());
@@ -27,27 +26,25 @@ trait CTrait_Controller_Application_QC_UnitTest {
         $handlerActionClick->setUrl($this->controllerUrl() . 'reloadTabUnitTest');
         $handlerActionClick->setBlockerType('shimmer');
 
-
-
-        $reloadOptions = array();
+        $reloadOptions = [];
         static::reloadTabUnitTest($tableUnitTestDiv, $reloadOptions);
 
-        echo $app->render();
+        return $app;
     }
 
-    public static function reloadTabUnitTest($container = null, $options = array()) {
+    public static function reloadTabUnitTest($container = null, $options = []) {
         $app = $container;
         if ($container == null) {
             $app = CApp::instance();
         }
-        $qcManager = CQC_Manager::instance();
+        $qcManager = CQC::manager();
         $request = $options;
         if ($request == null) {
             $request = CApp_Base::getRequest();
         }
         $db = CDatabase::instance();
         $listUnitTest = $qcManager->unitTests();
-        $dataUnitTest = array();
+        $dataUnitTest = [];
         $groupTab = carr::get($_GET, 'group');
         if ($qcManager->haveUnitTestGroup()) {
             $tabList = $app->addTabList()->setAjax(false);
@@ -75,7 +72,7 @@ trait CTrait_Controller_Application_QC_UnitTest {
         }
     }
 
-    public static function reloadTableUnitTest($container = null, $options = array()) {
+    public static function reloadTableUnitTest($container = null, $options = []) {
         $app = $container;
         if ($container == null) {
             $app = CApp::instance();
@@ -88,9 +85,9 @@ trait CTrait_Controller_Application_QC_UnitTest {
         $db = CDatabase::instance();
         $group = carr::get($request, 'group');
         $listUnitTest = $qcManager->unitTests($group);
-        $dataUnitTest = array();
+        $dataUnitTest = [];
         foreach ($listUnitTest as $kUnitTest => $vUnitTest) {
-            $dUnitTest = array();
+            $dUnitTest = [];
             $dUnitTest['unit_test_class'] = $kUnitTest;
             $dUnitTest['unit_test_name'] = $vUnitTest;
             $dataUnitTest[] = $dUnitTest;
@@ -100,10 +97,9 @@ trait CTrait_Controller_Application_QC_UnitTest {
         $table->addColumn('unit_test_name')->setLabel('Name');
         $table->setTitle('UnitTest List');
         $table->setApplyDataTable(false);
-        $table->cellCallbackFunc(array(__CLASS__, 'cellCallback'), __FILE__);
+        $table->cellCallbackFunc([__CLASS__, 'cellCallback'], __FILE__);
 
         $table->setRowActionStyle('btn-dropdown');
-
 
         $groupQueryString = '';
         if (strlen($group) > 0) {
@@ -111,10 +107,10 @@ trait CTrait_Controller_Application_QC_UnitTest {
         }
 
         $actMonitor = $table->addRowAction();
-        $actMonitor->setIcon("fas fa-file")->setLabel('Detail');
+        $actMonitor->setIcon('fas fa-file')->setLabel('Detail');
         $actMonitor->setLink(static::controllerUrl() . 'detail/{unit_test_class}' . $groupQueryString);
         $actStart = $table->addRowAction();
-        $actStart->setIcon("fas fa-play")->setLabel('Run');
+        $actStart->setIcon('fas fa-play')->setLabel('Run');
         $actStart->setLink(static::controllerUrl() . 'run/{unit_test_class}' . $groupQueryString)->setConfirm();
 
         if ($container == null) {
@@ -131,29 +127,24 @@ trait CTrait_Controller_Application_QC_UnitTest {
         if ($class == null) {
             curl::redirect($this->controllerUrl());
         }
-        $name = carr::last(explode("_", $class));
+        $name = carr::last(explode('_', $class));
 
         $app->title('Test Case of ' . $name);
         $app->addBreadcrumb($this->getTitle(), $this->controllerUrl());
 
-
         $actionContainer = $app->addDiv()->addClass('action-container mb-3');
         $backAction = $actionContainer->addAction()->setLabel('Back')->addClass('btn-primary')->setIcon('fas fa-arrow-left')->setLink(static::controllerUrl() . static::groupQueryString());
         $rotateAction = $actionContainer->addAction()->setLabel('Run All')->addClass('btn-primary')->setIcon('fas fa-play')
-                ->setConfirm()
-                ->addListener('click')->addHandler('custom')
-                ->setJs("
-                    $('.btn-run-method').trigger('click');
-                    ");
-
-
+            ->setConfirm()
+            ->onClickListener()->addCustomHandler()
+            ->setJs(<<<JS
+                $('.btn-run-method').trigger('click');
+            JS);
 
         $runner = CQC::createUnitTestRunner($class);
         $methods = $runner->getTestMethods();
 
         foreach ($methods as $method) {
-
-
             $template = $app->addTemplate()->setTemplate('CApp/QC/UnitTest/Method');
             $template->setVar('method', $method);
             $template->setVar('name', $name);
@@ -165,17 +156,16 @@ trait CTrait_Controller_Application_QC_UnitTest {
     }
 
     public function check($className, $method = null) {
-
         $cfCommand = 'qc:phpunit --class=' . $className;
         if (strlen($method) > 0) {
-            $cfCommand.= ' --method=' . $method;
+            $cfCommand .= ' --method=' . $method;
         }
-
 
         $errCode = 0;
         $errMessage = '';
         $data = [];
         $output = '';
+
         try {
             $CFCli = new CApp_CFCli();
 
@@ -196,7 +186,6 @@ trait CTrait_Controller_Application_QC_UnitTest {
     }
 
     /**
-     * 
      * @return string
      */
     private static function groupQueryString() {
@@ -205,7 +194,7 @@ trait CTrait_Controller_Application_QC_UnitTest {
         if (strlen($group) > 0) {
             $groupQueryString = '?group=' . $group;
         }
+
         return $groupQueryString;
     }
-
 }

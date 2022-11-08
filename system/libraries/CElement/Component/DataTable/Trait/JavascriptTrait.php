@@ -397,14 +397,17 @@ trait CElement_Component_DataTable_Trait_JavascriptTrait {
             $js->append(parent::js($indent))->br();
             if (is_array($this->data)) {
                 foreach ($this->data as $row) {
+                    if ($row == null) {
+                        continue;
+                    }
                     if ($row instanceof CRenderable) {
                         $js->appendln($row->js())->br();
 
                         continue;
                     }
-                    foreach ($row as $row_k => $row_v) {
-                        if ($row_v instanceof CRenderable) {
-                            $js->appendln($row_v->js())->br();
+                    foreach ($row as $rowV) {
+                        if ($rowV instanceof CRenderable) {
+                            $js->appendln($rowV->js())->br();
                         }
                     }
                 }

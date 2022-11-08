@@ -7,12 +7,12 @@ abstract class CVendor_Google_Recaptcha_Http_AbstractResponse implements CInterf
      */
 
     /**
-     * Did not receive a 200 from the service
+     * Did not receive a 200 from the service.
      */
     const E_BAD_RESPONSE = 'bad-response';
 
     /**
-     * ReCAPTCHA response not provided
+     * ReCAPTCHA response not provided.
      */
     const E_MISSING_INPUT_RESPONSE = 'missing-input-response';
 
@@ -24,7 +24,7 @@ abstract class CVendor_Google_Recaptcha_Http_AbstractResponse implements CInterf
     /**
      * Success or failure.
      *
-     * @var boolean
+     * @var bool
      */
     protected $success = false;
 
@@ -43,14 +43,14 @@ abstract class CVendor_Google_Recaptcha_Http_AbstractResponse implements CInterf
     protected $hostname;
 
     /**
-     * Timestamp of the challenge load (ISO format yyyy-MM-dd'T'HH:mm:ssZZ)
+     * Timestamp of the challenge load (ISO format yyyy-MM-dd'T'HH:mm:ssZZ).
      *
      * @var string
      */
     protected $challengeTs;
 
     /**
-     * APK package name
+     * APK package name.
      *
      * @var string
      */
@@ -66,11 +66,11 @@ abstract class CVendor_Google_Recaptcha_Http_AbstractResponse implements CInterf
      *
      * @param bool        $success
      * @param array       $errorCodes
-     * @param string|null $hostname
-     * @param string|null $challengeTs
-     * @param string|null $apkPackageName
-     * @param float|null  $score
-     * @param string|null $action
+     * @param null|string $hostname
+     * @param null|string $challengeTs
+     * @param null|string $apkPackageName
+     * @param null|float  $score
+     * @param null|string $action
      */
     public function __construct($success, array $errorCodes = [], $hostname = null, $challengeTs = null, $apkPackageName = null, $score = null, $action = null) {
         $this->success = $success;
@@ -104,7 +104,7 @@ abstract class CVendor_Google_Recaptcha_Http_AbstractResponse implements CInterf
     }
 
     /**
-     * Get challenge timestamp
+     * Get challenge timestamp.
      *
      * @return string
      */
@@ -113,7 +113,7 @@ abstract class CVendor_Google_Recaptcha_Http_AbstractResponse implements CInterf
     }
 
     /**
-     * Get APK package name
+     * Get APK package name.
      *
      * @return string
      */

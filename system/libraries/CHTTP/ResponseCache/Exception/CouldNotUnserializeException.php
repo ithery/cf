@@ -4,9 +4,9 @@ class CHTTP_ResponseCache_Exception_CouldNotUnserializeException extends Excepti
     /**
      * @param string $serializedResponse
      *
-     * @return static
+     * @return CHTTP_ResponseCache_Exception_CouldNotUnserializeException
      */
     public static function serializedResponse($serializedResponse) {
-        return new static("Could not unserialize serialized response `{$serializedResponse}`");
+        return new self("Could not unserialize serialized response `{$serializedResponse}`");
     }
 }

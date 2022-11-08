@@ -76,7 +76,7 @@ class CServer_Storage extends CServer_Base {
      */
     public function getFreeSpace() {
         if ($this->freeSpace == null) {
-            $this->freeSpace = disk_free_space('.');
+            $this->freeSpace = disk_free_space('/');
         }
 
         return $this->freeSpace;

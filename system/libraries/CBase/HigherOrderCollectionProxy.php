@@ -1,6 +1,9 @@
 <?php
 
 /**
+ * @template T
+ * @template TValue
+ *
  * @mixin \CInterface_Enumerable
  */
 class CBase_HigherOrderCollectionProxy {

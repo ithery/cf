@@ -7,36 +7,37 @@
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  */
+
 namespace PHPUnit\Runner;
 
-use function array_diff;
-use function array_values;
-use function basename;
-use function class_exists;
-use function get_declared_classes;
-use function sprintf;
-use function stripos;
 use function strlen;
 use function substr;
-use PHPUnit\Framework\TestCase;
-use PHPUnit\Util\FileLoader;
 use ReflectionClass;
+use function sprintf;
+use function stripos;
+use function basename;
+use function array_diff;
 use ReflectionException;
+use function array_values;
+use function class_exists;
+use PHPUnit\Util\FileLoader;
+use PHPUnit\Framework\TestCase;
+use function get_declared_classes;
 
 /**
  * @internal This class is not covered by the backward compatibility promise for PHPUnit
  *
  * @deprecated see https://github.com/sebastianbergmann/phpunit/issues/4039
  */
-final class StandardTestSuiteLoader implements TestSuiteLoader
-{
+final class StandardTestSuiteLoader implements TestSuiteLoader {
     /**
+     * @param mixed $suiteClassFile
+     *
      * @throws Exception
      */
-    public function load($suiteClassFile)
-    {
+    public function load($suiteClassFile) {
         $suiteClassName = basename($suiteClassFile, '.php');
-        $loadedClasses  = get_declared_classes();
+        $loadedClasses = get_declared_classes();
 
         if (!class_exists($suiteClassName, false)) {
             /* @noinspection UnusedFunctionResultInspection */
@@ -105,13 +106,11 @@ final class StandardTestSuiteLoader implements TestSuiteLoader
         throw $this->exceptionFor($suiteClassName, $suiteClassFile);
     }
 
-    public function reload(ReflectionClass $aClass)
-    {
+    public function reload(ReflectionClass $aClass) {
         return $aClass;
     }
 
-    private function exceptionFor($className, $filename)
-    {
+    private function exceptionFor($className, $filename) {
         return new Exception(
             sprintf(
                 "Class '%s' could not be found in '%s'.",

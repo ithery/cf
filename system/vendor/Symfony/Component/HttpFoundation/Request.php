@@ -399,7 +399,7 @@ class Request {
                 if (!isset($server['CONTENT_TYPE'])) {
                     $server['CONTENT_TYPE'] = 'application/x-www-form-urlencoded';
                 }
-            // no break
+                // no break
             case 'PATCH':
                 $request = $parameters;
                 $query = [];

@@ -73,11 +73,13 @@ $domain = array_slice(explode('.', $siteName), -1)[0];
 foreach ($devSuiteConfig['paths'] as $path) {
     if (is_dir($path . '/' . $siteName)) {
         $devSuiteSitePath = $path . '/' . $siteName;
+
         break;
     }
 
     if (is_dir($path . '/' . $domain)) {
         $devSuiteSitePath = $path . '/' . $domain;
+
         break;
     }
 }
@@ -134,7 +136,7 @@ if ($uri !== '/' && !$isPhpFile && $staticFilePath = $devSuiteDriver->isStaticFi
     return $devSuiteDriver->serveStaticFile($staticFilePath, $devSuiteSitePath, $siteName, $uri);
 }
 
-/*
+/**
  * Attempt to load server environment variables.
  */
 $devSuiteDriver->loadServerEnvironmentVariables(

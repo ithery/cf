@@ -8,6 +8,9 @@ class CElement_FormInput_QueryBuilder_Filter implements CInterface_Arrayable {
 
     protected $id;
 
+    /**
+     * @var string
+     */
     protected $label;
 
     protected $type;
@@ -35,6 +38,11 @@ class CElement_FormInput_QueryBuilder_Filter implements CInterface_Arrayable {
         return $this;
     }
 
+    /**
+     * @param string $label
+     *
+     * @return $this
+     */
     public function setLabel($label) {
         $this->label = $label;
 

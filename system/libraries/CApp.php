@@ -16,6 +16,12 @@ defined('SYSPATH') or die('No direct access allowed.');
  * @method CElement_Component_Form_Field   addField($id=null)
  * @method CElement_Element_Div            addDiv($id=null)
  * @method CElement_Element_A              addA($id=null)
+ * @method CElement_Element_H1             addH1($id=null)
+ * @method CElement_Element_H2             addH2($id=null)
+ * @method CElement_Element_H3             addH3($id=null)
+ * @method CElement_Element_H4             addH4($id=null)
+ * @method CElement_Element_H5             addH5($id=null)
+ * @method CElement_Element_H6             addH6($id=null)
  * @method CElement_Element_Span           addSpan($id=null)
  * @method CElement_Element_Pre            addPre($id=null)
  * @method CElement_List_ActionList        addActionList($id=null)
@@ -26,6 +32,8 @@ defined('SYSPATH') or die('No direct access allowed.');
  * @method CElement_View                   addView($view = null, $data = null, $id = null)
  * @method CElement_Component_Widget       addWidget($id=null)
  * @method CElement_Component_Gallery      addGallery($id=null)
+ * @method CElement_Element_Img            addImg($id=null)
+ * @method CElement_Component_Image        addImage($id=null)
  * @method $this                           addJs($js)
  */
 class CApp implements CInterface_Responsable, CInterface_Renderable, CInterface_Jsonable {
@@ -625,6 +633,11 @@ class CApp implements CInterface_Responsable, CInterface_Renderable, CInterface_
         $this->pwa($group)->enable();
     }
 
+    /**
+     * @param string $group
+     *
+     * @return CApp_PWA
+     */
     public function pwa($group) {
         if ($this->pwa == null) {
             $this->pwa = [];
@@ -634,5 +647,12 @@ class CApp implements CInterface_Responsable, CInterface_Renderable, CInterface_
         }
 
         return $this->pwa[$group];
+    }
+
+    /**
+     * @return CApp_Notification
+     */
+    public function notification() {
+        return CApp_Notification::instance();
     }
 }

@@ -84,7 +84,7 @@ abstract class CApi_OAuth_Middleware_CheckCredentials implements CApi_Contract_A
     /**
      * Validate token credentials.
      *
-     * @param \CApi_OAuth_Model_OAuthAccessToken $token
+     * @param null|\CApi_OAuth_Model_OAuthAccessToken $token
      *
      * @throws \CAuth_Exception_AuthenticationException
      *
@@ -95,8 +95,8 @@ abstract class CApi_OAuth_Middleware_CheckCredentials implements CApi_Contract_A
     /**
      * Validate token scopes.
      *
-     * @param \CApi_OAuth_Model_OAuthAccessToken $token
-     * @param array                              $scopes
+     * @param null|\CApi_OAuth_Model_OAuthAccessToken $token
+     * @param array                                   $scopes
      *
      * @throws \CApi_OAuth_Exception_MissingScopeException
      *

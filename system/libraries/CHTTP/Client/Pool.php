@@ -9,7 +9,7 @@ class CHTTP_Client_Pool {
     /**
      * The factory instance.
      *
-     * @var \CHTTP_Client_Factory
+     * @var \CHTTP_Client
      */
     protected $factory;
 

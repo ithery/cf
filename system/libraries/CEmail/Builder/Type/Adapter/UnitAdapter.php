@@ -2,6 +2,7 @@
 
 class CEmail_Builder_Type_Adapter_UnitAdapter extends CEmail_Builder_Type_AbstractAdapter {
     const MATCHER = '/^(unit|unitWithNegative)\(.*\)/im';
+
     const TYPE = 'unit';
 
     public function __construct($typeConfig, $value) {

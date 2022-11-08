@@ -24,6 +24,7 @@ return [
         'jquery.datatable',
         'select2',
         'theme-material',
+        'toastr',
     ],
     'js' => [
         'cresenity.js',

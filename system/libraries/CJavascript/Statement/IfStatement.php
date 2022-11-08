@@ -30,7 +30,6 @@ class CJavascript_Statement_IfStatement extends CJavascript_Statement {
     }
 
     public function whenTrue(Closure $callback) {
-
     }
 
     public function getStatement() {

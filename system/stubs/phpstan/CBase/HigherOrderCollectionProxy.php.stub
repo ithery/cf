@@ -1,0 +1,7 @@
+<?php
+/**
+ * @template T
+ * @template TValue
+ */
+class CBase_HigherOrderCollectionProxy {
+}

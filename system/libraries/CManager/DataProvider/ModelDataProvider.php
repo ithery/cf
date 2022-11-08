@@ -326,4 +326,19 @@ class CManager_DataProvider_ModelDataProvider extends CManager_DataProviderAbstr
 
         return $query->get();
     }
+
+    /**
+     * @param string $method
+     * @param string $column
+     *
+     * @return mixed
+     */
+    public function aggregate($method, $column) {
+        if (!$this->isValidAggregateMethod($method)) {
+            throw new Exception($method . ': is not valid aggregate method');
+        }
+        $query = $this->getModelQuery();
+
+        return $query->$method($column);
+    }
 }

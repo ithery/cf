@@ -2,6 +2,7 @@
 
 class CEmail_Builder_Type_Adapter_BooleanAdapter extends CEmail_Builder_Type_AbstractAdapter {
     const MATCHER = '/^boolean/im';
+
     const TYPE = 'boolean';
 
     public function __construct($typeConfig, $value) {

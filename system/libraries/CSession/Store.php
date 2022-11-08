@@ -675,7 +675,7 @@ class CSession_Store implements CSession_Contract_SessionInterface {
     /**
      * Get the CSRF token value.
      *
-     * @return string
+     * @return null|string
      */
     public function token() {
         return $this->get('_token');

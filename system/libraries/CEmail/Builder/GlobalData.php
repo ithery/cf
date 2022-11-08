@@ -2,12 +2,14 @@
 
 class CEmail_Builder_GlobalData {
     protected $data = [];
+
     protected static $instance;
 
     public static function instance() {
         if (static::$instance == null) {
             static::$instance = new static();
         }
+
         return static::$instance;
     }
 

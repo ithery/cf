@@ -1,5 +1,7 @@
 <?php
-
+/**
+ * @see CLogger
+ */
 abstract class CLogger_Writer {
     /**
      * @var string timestamp format for log entries.

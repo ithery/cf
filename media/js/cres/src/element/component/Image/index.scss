@@ -1,0 +1,16 @@
+.cres\:element\:component\:Image {
+    display: block;
+    outline: none;
+    overflow: hidden;
+    position: relative;
+    img {
+        border: 0;
+        display: block;
+        height: auto;
+        max-width: none;
+        width: 100%;
+    }
+}
+
+.cres-progressive {
+}
