@@ -30,7 +30,7 @@ trait CApp_Model_Trait_Users {
     }
 
     /**
-     * @return CModel_Relation_BelongsTo
+     * @return CModel_Relation_BelongsTo|CModel_Query
      */
     public function role() {
         return $this->belongsTo(c::app()->auth()->getRoleModelClass())->withTrashed();

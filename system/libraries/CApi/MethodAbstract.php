@@ -6,16 +6,34 @@
  * @author Hery
  */
 abstract class CApi_MethodAbstract implements CInterface_Arrayable {
+    /**
+     * @var int
+     */
     protected $errCode = 0;
 
+    /**
+     * @var string
+     */
     protected $errMessage = '';
 
+    /**
+     * @var array
+     */
     protected $data = [];
 
+    /**
+     * @var array
+     */
     protected $request;
 
+    /**
+     * @var null|string
+     */
     protected $lang = null;
 
+    /**
+     * @var null|string
+     */
     protected $sessionId = null;
 
     protected $session;

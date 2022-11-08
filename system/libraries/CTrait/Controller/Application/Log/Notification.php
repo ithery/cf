@@ -31,7 +31,6 @@ trait CTrait_Controller_Application_Log_Notification {
             return 'ERROR';
         });
         $table->addColumn('recipient')->setLabel('Recipient');
-        $table->addColumn('uri')->setLabel('URI');
         $table->addColumn('createdby')->setLabel('Created By');
         $table->addColumn('created')->setLabel('Created');
 
@@ -48,7 +47,7 @@ trait CTrait_Controller_Application_Log_Notification {
         $logNotificationModel = $logNotificationModel::findOrFail($logNotificationId);
         $title = 'Detail Notification';
         $app->setTitle($title);
-        $app->addBreadcrumb($title, static::controllerUrl() . '?tab=notification');
+        $app->addBreadcrumb('Log', static::controllerUrl() . '?tab=notification');
         $app->title($logNotificationModel->description);
 
         $form = $app->addForm();

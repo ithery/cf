@@ -46,12 +46,10 @@ use GuzzleHttp\Psr7\Response as Psr7Response;
  *
  * @see \CHTTP_Client_PendingRequest
  */
-class CHTTP_Client {
+final class CHTTP_Client {
     use CTrait_Macroable {
         __call as macroCall;
     }
-
-    public static $instance;
 
     /**
      * The event dispatcher implementation.
@@ -88,12 +86,14 @@ class CHTTP_Client {
      */
     protected $responseSequences = [];
 
+    private static $instance;
+
     public static function instance() {
-        if (static::$instance == null) {
-            static::$instance = new static();
+        if (self::$instance == null) {
+            self::$instance = new self();
         }
 
-        return static::$instance;
+        return self::$instance;
     }
 
     /**
@@ -125,9 +125,7 @@ class CHTTP_Client {
 
         $response = new Psr7Response($status, $headers, $body);
 
-        return class_exists(\GuzzleHttp\Promise\Create::class)
-            ? \GuzzleHttp\Promise\Create::promiseFor($response)
-            : \GuzzleHttp\Promise\promise_for($response);
+        return \GuzzleHttp\Promise\Create::promiseFor($response);
     }
 
     /**

@@ -26,9 +26,9 @@ class CHTTP_Cookie_Middleware_AddQueuedCookiesToResponse {
      * @return mixed
      */
     public function handle($request, Closure $next) {
+        /** @var CHTTP_Response $response */
         $response = $next($request);
 
-        /** @var CHTTP_Response $response */
         foreach ($this->cookies->getQueuedCookies() as $cookie) {
             $response->headers->setCookie($cookie);
         }

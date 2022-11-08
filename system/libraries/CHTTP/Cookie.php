@@ -1,13 +1,13 @@
 <?php
 
 /**
- * Description of Cookie
+ * Description of Cookie.
  *
  * @author Hery
  */
 use Symfony\Component\HttpFoundation\Cookie;
 
-class CHTTP_Cookie {
+class CHTTP_Cookie implements CHTTP_Contract_CookieInterface {
     use CTrait_Helper_InteractsWithTime,
         CTrait_Macroable;
 
@@ -28,7 +28,7 @@ class CHTTP_Cookie {
     /**
      * The default secure setting (defaults to null).
      *
-     * @var bool|null
+     * @var null|bool
      */
     protected $secure;
 
@@ -52,12 +52,12 @@ class CHTTP_Cookie {
      * @param string      $name
      * @param string      $value
      * @param int         $minutes
-     * @param string|null $path
-     * @param string|null $domain
-     * @param bool|null   $secure
+     * @param null|string $path
+     * @param null|string $domain
+     * @param null|bool   $secure
      * @param bool        $httpOnly
      * @param bool        $raw
-     * @param string|null $sameSite
+     * @param null|string $sameSite
      *
      * @return \Symfony\Component\HttpFoundation\Cookie
      */
@@ -74,12 +74,12 @@ class CHTTP_Cookie {
      *
      * @param string      $name
      * @param string      $value
-     * @param string|null $path
-     * @param string|null $domain
-     * @param bool|null   $secure
+     * @param null|string $path
+     * @param null|string $domain
+     * @param null|bool   $secure
      * @param bool        $httpOnly
      * @param bool        $raw
-     * @param string|null $sameSite
+     * @param null|string $sameSite
      *
      * @return \Symfony\Component\HttpFoundation\Cookie
      */
@@ -91,8 +91,8 @@ class CHTTP_Cookie {
      * Expire the given cookie.
      *
      * @param string      $name
-     * @param string|null $path
-     * @param string|null $domain
+     * @param null|string $path
+     * @param null|string $domain
      *
      * @return \Symfony\Component\HttpFoundation\Cookie
      */
@@ -104,7 +104,7 @@ class CHTTP_Cookie {
      * Determine if a cookie has been queued.
      *
      * @param string      $key
-     * @param string|null $path
+     * @param null|string $path
      *
      * @return bool
      */
@@ -117,9 +117,9 @@ class CHTTP_Cookie {
      *
      * @param string      $key
      * @param mixed       $default
-     * @param string|null $path
+     * @param null|string $path
      *
-     * @return \Symfony\Component\HttpFoundation\Cookie|null
+     * @return null|\Symfony\Component\HttpFoundation\Cookie
      */
     public function queued($key, $default = null, $path = null) {
         $queued = carr::get($this->queued, $key, $default);
@@ -156,7 +156,7 @@ class CHTTP_Cookie {
      * Remove a cookie from the queue.
      *
      * @param string      $name
-     * @param string|null $path
+     * @param null|string $path
      *
      * @return void
      */
@@ -179,8 +179,8 @@ class CHTTP_Cookie {
      *
      * @param string      $path
      * @param string      $domain
-     * @param bool|null   $secure
-     * @param string|null $sameSite
+     * @param null|bool   $secure
+     * @param null|string $sameSite
      *
      * @return array
      */
@@ -194,7 +194,7 @@ class CHTTP_Cookie {
      * @param string      $path
      * @param string      $domain
      * @param bool        $secure
-     * @param string|null $sameSite
+     * @param null|string $sameSite
      *
      * @return $this
      */

@@ -1,7 +1,7 @@
 <?php
 
 /**
- * Description of FileFactory
+ * Description of FileFactory.
  *
  * @author Hery
  */
@@ -11,9 +11,9 @@ class CHTTP_Testing_FileFactory {
      *
      * @param string      $name
      * @param string|int  $kilobytes
-     * @param string|null $mimeType
+     * @param null|string $mimeType
      *
-     * @return CHttp_Testing_File
+     * @return CHTTP_Testing_File
      */
     public function create($name, $kilobytes = 0, $mimeType = null) {
         if (is_string($kilobytes)) {
@@ -82,9 +82,11 @@ class CHTTP_Testing_FileFactory {
             switch ($type) {
                 case 'jpeg':
                     imagejpeg($image);
+
                     break;
                 case 'png':
                     imagepng($image);
+
                     break;
             }
 

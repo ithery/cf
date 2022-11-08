@@ -33,58 +33,58 @@ use CarbonV3\Traits\DeprecatedProperties;
  * @property      int              $second
  * @property      int              $micro
  * @property      int              $microsecond
- * @property      int|float|string $timestamp             seconds since the Unix Epoch
- * @property      string           $englishDayOfWeek      the day of week in English
- * @property      string           $shortEnglishDayOfWeek the abbreviated day of week in English
- * @property      string           $englishMonth          the month in English
- * @property      string           $shortEnglishMonth     the abbreviated month in English
+ * @property      int|float|string $timestamp               seconds since the Unix Epoch
+ * @property      string           $englishDayOfWeek        the day of week in English
+ * @property      string           $shortEnglishDayOfWeek   the abbreviated day of week in English
+ * @property      string           $englishMonth            the month in English
+ * @property      string           $shortEnglishMonth       the abbreviated month in English
  * @property      int              $milliseconds
  * @property      int              $millisecond
  * @property      int              $milli
- * @property      int              $week                  1 through 53
- * @property      int              $isoWeek               1 through 53
- * @property      int              $weekYear              year according to week format
- * @property      int              $isoWeekYear           year according to ISO week format
- * @property      int              $dayOfYear             1 through 366
- * @property      int              $age                   does a diffInYears() with default parameters
- * @property      int              $offset                the timezone offset in seconds from UTC
- * @property      int              $offsetMinutes         the timezone offset in minutes from UTC
- * @property      int              $offsetHours           the timezone offset in hours from UTC
- * @property      CarbonTimeZone   $timezone              the current timezone
- * @property      CarbonTimeZone   $tz                    alias of $timezone
- * @property-read int              $dayOfWeek                                                                           0 (for Sunday) through 6 (for Saturday)
- * @property-read int              $dayOfWeekIso                                                                        1 (for Monday) through 7 (for Sunday)
- * @property-read int              $weekOfYear                                                                          ISO-8601 week number of year, weeks starting on Monday
- * @property-read int              $daysInMonth                                                                         number of days in the given month
- * @property-read string           $latinMeridiem                                                                       "am"/"pm" (Ante meridiem or Post meridiem latin lowercase mark)
- * @property-read string           $latinUpperMeridiem                                                                  "AM"/"PM" (Ante meridiem or Post meridiem latin uppercase mark)
- * @property-read string           $timezoneAbbreviatedName                                                             the current timezone abbreviated name
- * @property-read string           $tzAbbrName                                                                          alias of $timezoneAbbreviatedName
- * @property-read string           $dayName                                                                             long name of weekday translated according to Carbon locale, in english if no translation available for current language
- * @property-read string           $shortDayName                                                                        short name of weekday translated according to Carbon locale, in english if no translation available for current language
- * @property-read string           $minDayName                                                                          very short name of weekday translated according to Carbon locale, in english if no translation available for current language
- * @property-read string           $monthName                                                                           long name of month translated according to Carbon locale, in english if no translation available for current language
- * @property-read string           $shortMonthName                                                                      short name of month translated according to Carbon locale, in english if no translation available for current language
- * @property-read string           $meridiem                                                                            lowercase meridiem mark translated according to Carbon locale, in latin if no translation available for current language
- * @property-read string           $upperMeridiem                                                                       uppercase meridiem mark translated according to Carbon locale, in latin if no translation available for current language
- * @property-read int              $noZeroHour                                                                          current hour from 1 to 24
- * @property-read int              $weeksInYear                                                                         51 through 53
- * @property-read int              $isoWeeksInYear                                                                      51 through 53
- * @property-read int              $weekOfMonth                                                                         1 through 5
- * @property-read int              $weekNumberInMonth                                                                   1 through 5
- * @property-read int              $firstWeekDay                                                                        0 through 6
- * @property-read int              $lastWeekDay                                                                         0 through 6
- * @property-read int              $daysInYear                                                                          365 or 366
- * @property-read int              $quarter                                                                             the quarter of this instance, 1 - 4
- * @property-read int              $decade                                                                              the decade of this instance
- * @property-read int              $century                                                                             the century of this instance
- * @property-read int              $millennium                                                                          the millennium of this instance
- * @property-read bool             $dst                                                                                 daylight savings time indicator, true if DST, false otherwise
- * @property-read bool             $local                                                                               checks if the timezone is local, true if local, false otherwise
- * @property-read bool             $utc                                                                                 checks if the timezone is UTC, true if UTC, false otherwise
- * @property-read string           $timezoneName                                                                        the current timezone name
- * @property-read string           $tzName                                                                              alias of $timezoneName
- * @property-read string           $locale                                                                              locale of the current instance
+ * @property      int              $week                    1 through 53
+ * @property      int              $isoWeek                 1 through 53
+ * @property      int              $weekYear                year according to week format
+ * @property      int              $isoWeekYear             year according to ISO week format
+ * @property      int              $dayOfYear               1 through 366
+ * @property      int              $age                     does a diffInYears() with default parameters
+ * @property      int              $offset                  the timezone offset in seconds from UTC
+ * @property      int              $offsetMinutes           the timezone offset in minutes from UTC
+ * @property      int              $offsetHours             the timezone offset in hours from UTC
+ * @property      CarbonTimeZone   $timezone                the current timezone
+ * @property      CarbonTimeZone   $tz                      alias of $timezone
+ * @property-read int              $dayOfWeek               0 (for Sunday) through 6 (for Saturday)
+ * @property-read int              $dayOfWeekIso            1 (for Monday) through 7 (for Sunday)
+ * @property-read int              $weekOfYear              ISO-8601 week number of year, weeks starting on Monday
+ * @property-read int              $daysInMonth             number of days in the given month
+ * @property-read string           $latinMeridiem           "am"/"pm" (Ante meridiem or Post meridiem latin lowercase mark)
+ * @property-read string           $latinUpperMeridiem      "AM"/"PM" (Ante meridiem or Post meridiem latin uppercase mark)
+ * @property-read string           $timezoneAbbreviatedName the current timezone abbreviated name
+ * @property-read string           $tzAbbrName              alias of $timezoneAbbreviatedName
+ * @property-read string           $dayName                 long name of weekday translated according to Carbon locale, in english if no translation available for current language
+ * @property-read string           $shortDayName            short name of weekday translated according to Carbon locale, in english if no translation available for current language
+ * @property-read string           $minDayName              very short name of weekday translated according to Carbon locale, in english if no translation available for current language
+ * @property-read string           $monthName               long name of month translated according to Carbon locale, in english if no translation available for current language
+ * @property-read string           $shortMonthName          short name of month translated according to Carbon locale, in english if no translation available for current language
+ * @property-read string           $meridiem                lowercase meridiem mark translated according to Carbon locale, in latin if no translation available for current language
+ * @property-read string           $upperMeridiem           uppercase meridiem mark translated according to Carbon locale, in latin if no translation available for current language
+ * @property-read int              $noZeroHour              current hour from 1 to 24
+ * @property-read int              $weeksInYear             51 through 53
+ * @property-read int              $isoWeeksInYear          51 through 53
+ * @property-read int              $weekOfMonth             1 through 5
+ * @property-read int              $weekNumberInMonth       1 through 5
+ * @property-read int              $firstWeekDay            0 through 6
+ * @property-read int              $lastWeekDay             0 through 6
+ * @property-read int              $daysInYear              365 or 366
+ * @property-read int              $quarter                 the quarter of this instance, 1 - 4
+ * @property-read int              $decade                  the decade of this instance
+ * @property-read int              $century                 the century of this instance
+ * @property-read int              $millennium              the millennium of this instance
+ * @property-read bool             $dst                     daylight savings time indicator, true if DST, false otherwise
+ * @property-read bool             $local                   checks if the timezone is local, true if local, false otherwise
+ * @property-read bool             $utc                     checks if the timezone is UTC, true if UTC, false otherwise
+ * @property-read string           $timezoneName            the current timezone name
+ * @property-read string           $tzName                  alias of $timezoneName
+ * @property-read string           $locale                  locale of the current instance
  *
  * @method bool         isUtc()                                                                              Check if the current instance has UTC timezone. (Both isUtc and isUTC cases are valid.)
  * @method bool         isLocal()                                                                                                                                                                                                                                       Check if the current instance has non-UTC timezone.
@@ -502,8 +502,8 @@ use CarbonV3\Traits\DeprecatedProperties;
  * @method string       longRelativeToNowDiffForHumans(DateTimeInterface $other = null, int $parts = 1)      Get the difference (long format, 'RelativeToNow' mode) in a human readable format in the current locale. ($other and $parts parameters can be swapped.)
  * @method string       shortRelativeToOtherDiffForHumans(DateTimeInterface $other = null, int $parts = 1)   Get the difference (short format, 'RelativeToOther' mode) in a human readable format in the current locale. ($other and $parts parameters can be swapped.)
  * @method string       longRelativeToOtherDiffForHumans(DateTimeInterface $other = null, int $parts = 1)    Get the difference (long format, 'RelativeToOther' mode) in a human readable format in the current locale. ($other and $parts parameters can be swapped.)
- * @method static       Carbon|false createFromFormat(string $format, string $time, string|DateTimeZone $timezone = null)                                                                                                                                               Parse a string into a new Carbon object according to the specified format.
- * @method static       Carbon       __set_state(array $array)                                                                                                                                                                                                          https://php.net/manual/en/datetime.set-state.php
+ * @method static|false createFromFormat(string $format, string $time, string|DateTimeZone $timezone = null)                                                                                                                                                            Parse a string into a new Carbon object according to the specified format.
+ * @method static       __set_state(array $array)                                                                                                                                                                                                                       https://php.net/manual/en/datetime.set-state.php
  *
  * </autodoc>
  */

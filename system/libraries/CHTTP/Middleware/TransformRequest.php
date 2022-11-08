@@ -2,7 +2,7 @@
 
 use Symfony\Component\HttpFoundation\ParameterBag;
 
-class CHTTP_Middleware_TransformsRequest {
+class CHTTP_Middleware_TransformRequest {
     /**
      * Handle an incoming request.
      *

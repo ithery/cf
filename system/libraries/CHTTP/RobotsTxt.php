@@ -2,7 +2,7 @@
 /**
  * @see CHTTP
  */
-class CHTTP_RobotsTxt {
+final class CHTTP_RobotsTxt {
     /**
      * The lines of for the robots.txt.
      *
@@ -18,11 +18,11 @@ class CHTTP_RobotsTxt {
     private static $instance;
 
     public static function instance() {
-        if (static::$instance == null) {
-            static::$instance = new static();
+        if (self::$instance == null) {
+            self::$instance = new self();
         }
 
-        return static::$instance;
+        return self::$instance;
     }
 
     /**

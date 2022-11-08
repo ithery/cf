@@ -85,7 +85,7 @@ class CLogger {
         }
 
         $writer = CLogger_Writer::factory($type, $options);
-        $this->_writers["{$writer}"] = [
+        $this->_writers[$writer->__toString()] = [
             'object' => $writer,
             'levels' => $levels,
         ];

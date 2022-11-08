@@ -47,7 +47,7 @@ class CAuth_Password_BrokerManager implements CAuth_Contract_PasswordBrokerFacto
         // aggregate service of sorts providing a convenient interface for resets.
         return new CAuth_Password_Broker(
             $this->createTokenRepository($config),
-            $this->app['auth']->createUserProvider($config['provider'] ?? null)
+            CAuth::manager()->createUserProvider($config['provider'] ?? null)
         );
     }
 
@@ -69,7 +69,7 @@ class CAuth_Password_BrokerManager implements CAuth_Contract_PasswordBrokerFacto
 
         return new CAuth_Password_DatabaseTokenRepository(
             CDatabase::instance($connection),
-            $this->app['hash'],
+            c::hash()->driver(),
             $config['table'],
             $key,
             $config['expire'],
@@ -82,7 +82,7 @@ class CAuth_Password_BrokerManager implements CAuth_Contract_PasswordBrokerFacto
      *
      * @param string $name
      *
-     * @return array
+     * @return null|array
      */
     protected function getConfig($name) {
         return CF::config("auth.passwords.{$name}");
@@ -106,7 +106,7 @@ class CAuth_Password_BrokerManager implements CAuth_Contract_PasswordBrokerFacto
      *
      * @param string $name
      *
-     * @return void
+     * @return $this
      */
     public function setDefaultDriver($name) {
         $this->defaultDriver = $name;

@@ -13,7 +13,7 @@ class Controller_Demo_Elements_Table_Relation extends \Cresenity\Demo\Controller
         $table->setDataFromModel(Cresenity\Demo\Model\Item::class, function (CModel_Query $query) {
             $query->with('category');
         });
-        $table->addColumn('name')->setLabel('Name');
+        $table->addColumn('name')->setLabel('Name')->addTransform(['showMore:10']);
         $table->addColumn('category.name')->setLabel('Category')->setWidth('200');
         $table->setAjax(false);
 

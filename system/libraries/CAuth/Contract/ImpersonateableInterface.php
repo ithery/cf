@@ -3,16 +3,12 @@ interface CAuth_Contract_ImpersonateableInterface {
     /**
      * Return true or false if the user can impersonate an other user.
      *
-     * @param void
-     *
      * @return bool
      */
     public function canImpersonate();
 
     /**
      * Return true or false if the user can be impersonate.
-     *
-     * @param void
      *
      * @return bool
      */

@@ -1,5 +1,12 @@
 <?php
 
+/**
+ * @property-read int     $access_token_id
+ * @property-read string  $name
+ * @property-read string  $token
+ * @property-read array   $abilities
+ * @property-read CCarbon $last_used_at
+ */
 class CModel_AccessToken_AccessTokenModel extends CModel implements CModel_AccessToken_Contract_HasAbilitiesInterface {
     use CModel_AccessToken_AccessTokenModelTrait;
 

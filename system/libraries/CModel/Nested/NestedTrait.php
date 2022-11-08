@@ -2,12 +2,6 @@
 
 defined('SYSPATH') or die('No direct access allowed.');
 
-/**
- * @author Hery Kurniawan
- * @license Ittron Global Teknologi <ittron.co.id>
- *
- * @since Mar 14, 2019, 6:59:51 PM
- */
 trait CModel_Nested_NestedTrait {
     /**
      * @var \Carbon\Carbon
