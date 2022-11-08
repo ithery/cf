@@ -68,7 +68,7 @@ class CElement_FormInput_ImageAjax extends CElement_FormInput_Image {
     }
 
     /**
-     * @param int $ext
+     * @param int|array $ext
      *
      * @return $this
      */
