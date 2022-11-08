@@ -69,7 +69,7 @@ class CHTTP_Middleware_HandleCors {
     /**
      * Determine if the request has a URI that should pass through the CORS flow.
      *
-     * @param \CHttp_Request $request
+     * @param \CHTTP_Request $request
      *
      * @return bool
      */

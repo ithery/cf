@@ -72,7 +72,7 @@ class CHTTP_Middleware_TrustProxies {
     /**
      * Specify the IP addresses to trust explicitly.
      *
-     * @param \CHttp_Request $request
+     * @param \CHTTP_Request $request
      * @param array          $trustedIps
      */
     private function setTrustedProxyIpAddressesToSpecificIps(CHTTP_Request $request, $trustedIps) {
