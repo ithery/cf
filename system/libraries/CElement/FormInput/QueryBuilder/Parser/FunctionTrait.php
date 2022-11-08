@@ -166,16 +166,16 @@ trait CElement_FormInput_QueryBuilder_Parser_FunctionTrait {
      *
      * @throws CElement_FormInput_QueryBuilder_Exception_ParseException
      *
-     * @return \Carbon\Carbon
+     * @return \CCarbon|\CCarbon[]
      */
     protected function convertDatetimeToCarbon($value) {
         if (is_array($value)) {
             return array_map(function ($v) {
-                return new Carbon($v);
+                return new CCarbon($v);
             }, $value);
         }
 
-        return new Carbon($value);
+        return new CCarbon($value);
     }
 
     /**

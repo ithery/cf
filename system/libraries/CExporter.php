@@ -182,7 +182,7 @@ class CExporter {
      * @param string      $writerType
      * @param mixed       $diskOptions
      *
-     * @return PendingDispatch
+     * @return CQueue_PendingDispatch
      */
     public static function queue($export, $filePath, $disk = null, $writerType = null, $diskOptions = []) {
         $writerType = CExporter_FileTypeDetector::detectStrict($filePath, $writerType);
