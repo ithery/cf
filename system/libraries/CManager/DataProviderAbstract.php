@@ -27,4 +27,23 @@ abstract class CManager_DataProviderAbstract implements CManager_Contract_DataPr
     public function createParameter() {
         return new CManager_DataProviderParameter($this->searchAnd, $this->searchOr, $this->sort);
     }
+
+    protected function isCallable($callable) {
+        if (is_string($callable)) {
+            return false;
+        }
+
+        return is_callable($callable) || ($callable instanceof \Opis\Closure\SerializableClosure);
+    }
+
+    protected function callCallable($callable, array $args) {
+        if (is_callable($callable)) {
+            return call_user_func_array($callable, $args);
+        }
+        if ($callable instanceof \Opis\Closure\SerializableClosure) {
+            return $callable->__invoke(...$args);
+        }
+
+        throw new Exception('Cannot call callable on Data Provider');
+    }
 }

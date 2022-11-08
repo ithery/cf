@@ -57,6 +57,7 @@ class CApi_Kernel {
             CEvent::dispatch(new CApi_Event_BeforeDispatch($method));
             $response = $method->execute();
             $isResponse = $response instanceof SymfonyResponse;
+
             if (!$isResponse) {
                 $methodResponse = new CApi_MethodResponse($request, $method);
                 $response = $methodResponse->toResponse();

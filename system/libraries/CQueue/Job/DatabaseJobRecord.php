@@ -46,7 +46,7 @@ class CQueue_Job_DatabaseJobRecord {
      * @return int
      */
     public function touch() {
-        $this->record->reserved_at = date('Y-m-d H:i:s', $this->currentTime());
+        $this->record->reserved_at = $this->currentTime();
 
         return $this->record->reserved_at;
     }

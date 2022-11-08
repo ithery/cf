@@ -2,7 +2,7 @@
 
 class CImage_GoogleChart_BarChart extends CImage_GoogleChart_Chart {
     /**
-     * Constructor for the gBarChart
+     * Constructor for the gBarChart.
      *
      * With this constructor you can specify all the type of Bar Charts.
      *
@@ -22,6 +22,7 @@ class CImage_GoogleChart_BarChart extends CImage_GoogleChart_Chart {
 
     public function getUrl() {
         $retStr = parent::getUrl();
+
         return $retStr;
     }
 

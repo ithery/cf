@@ -1032,6 +1032,11 @@ class CDatabase {
         $this->events = $events;
     }
 
+    public function unsetEventDispatcher() {
+        $this->events = null;
+        return $this;
+    }
+
     /**
      * Get the query grammar used by the connection.
      *
@@ -1168,6 +1173,10 @@ class CDatabase {
 
     public function enableBenchmark() {
         $this->isBenchmarkQuery = true;
+    }
+
+    public function disableBenchmark() {
+        $this->isBenchmarkQuery = false;
     }
 
     public function isBenchmarkQuery() {

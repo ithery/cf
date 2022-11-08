@@ -19,7 +19,7 @@ class CCache_Lock_PhpRedisLock extends CCache_Lock_RedisLock {
      * @inheritDoc
      */
     public function release() {
-        return (bool) $this->redis->eval(
+        return (bool) $this->redis->doEval(
             CCache_LuaScripts::releaseLock(),
             1,
             $this->name,

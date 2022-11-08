@@ -69,9 +69,10 @@ trait CApp_Concern_RendererTrait {
     }
     input:-webkit-autofill, select:-webkit-autofill, textarea:-webkit-autofill {
         animation-duration: 50000s;
-        animation-name: livecfautofill;
+        animation-name: cresautofill;
+
     }
-    @keyframes livecfautofill { from {} }
+    @keyframes cresautofill { from {} }
 </style>
 ${cresStyle}
 ${allStyles}

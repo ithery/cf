@@ -65,7 +65,7 @@ trait CPeriod_Trait_OperationTrait {
             $includedStart,
             $includedEnd,
             $this->precision(),
-            $this->boundaries(),
+            $this->boundaries()
         );
     }
 
@@ -142,7 +142,7 @@ trait CPeriod_Trait_OperationTrait {
                 $this->includedStart(),
                 $other->includedStart()->sub($this->interval),
                 $this->precision(),
-                $this->boundaries(),
+                $this->boundaries()
             );
         }
 
@@ -151,7 +151,7 @@ trait CPeriod_Trait_OperationTrait {
                 $other->includedEnd()->add($this->interval),
                 $this->includedEnd(),
                 $this->precision(),
-                $this->boundaries(),
+                $this->boundaries()
             );
         }
 

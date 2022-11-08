@@ -169,7 +169,7 @@ class CBackup_BackupJob {
                 return $backupDestination->filesystemType() === 'local';
             })
             ->map(function (CBackup_BackupDestination $backupDestination) {
-                return $backupDestination->disk()->getDriver()->getAdapter()->applyPathPrefix('') . $backupDestination->backupName();
+                return $backupDestination->disk()->path('') . $backupDestination->backupName();
             })
             ->each(function ($backupDestinationDirectory) {
                 $this->fileSelection->excludeFilesFrom($backupDestinationDirectory);

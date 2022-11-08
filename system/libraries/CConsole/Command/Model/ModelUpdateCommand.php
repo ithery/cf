@@ -141,6 +141,7 @@ class CConsole_Command_Model_ModelUpdateCommand extends CConsole_Command_AppComm
             'decimal' => 'int',
             'float' => 'float',
             'double' => 'double',
+            'double unsigned' => 'double',
             'bit' => 'int',
             'char' => 'string',
             'varchar' => 'string',

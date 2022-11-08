@@ -750,5 +750,23 @@ return [
         ],
 
     ],
+    'aos' => [
+        'js' => [
+            'plugins/aos/aos.js',
+        ],
+        'css' => [
+            'plugins/aos/aos.css',
+        ],
+
+    ],
+    'datetimepicker' => [
+        'js' => [
+            'plugins/datetimepicker/datetimepicker.min.js',
+        ],
+        'css' => [
+            'plugins/datetimepicker/datetimepicker.min.css',
+        ],
+
+    ],
 
 ];

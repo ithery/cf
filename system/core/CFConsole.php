@@ -7,9 +7,11 @@ class CFConsole {
         CConsole_Command_VersionCommand::class,
         CConsole_Command_StatusCommand::class,
         CConsole_Command_ServeCommand::class,
+        CConsole_Command_TinkerCommand::class,
         CConsole_Command_KeyGenerateCommand::class,
         CConsole_Command_ComposerCommand::class,
         CConsole_Command_EnvironmentCommand::class,
+        CConsole_Command_Database_DbCommand::class,
         CConsole_Command_Api_JWTSecretCommand::class,
         CConsole_Command_Api_OAuth_KeyCommand::class,
         CConsole_Command_Api_OAuth_ClientCommand::class,
@@ -21,6 +23,8 @@ class CFConsole {
         CConsole_Command_Daemon_DaemonStartCommand::class,
         CConsole_Command_Daemon_DaemonStatusCommand::class,
         CConsole_Command_Daemon_DaemonStopCommand::class,
+        CConsole_Command_Daemon_Supervisor_StartCommand::class,
+        CConsole_Command_Daemon_Supervisor_StatusCommand::class,
         CConsole_Command_Cron_ScheduleListCommand::class,
         CConsole_Command_Cron_ScheduleFinishCommand::class,
         CConsole_Command_Cron_ScheduleRunCommand::class,
@@ -72,6 +76,7 @@ class CFConsole {
         CConsole_Command_TestInstallCommand::class,
         CConsole_Command_TestCommand::class,
         CWebSocket_Console_Command_StartServer::class,
+        CTesting_Console_ChromeDriverCommand::class,
     ];
 
     public static function execute() {

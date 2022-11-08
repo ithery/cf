@@ -1,0 +1,21 @@
+.ce-tune-alignment--right {
+    text-align: right;
+}
+.ce-tune-alignment--center {
+    text-align: center;
+}
+.ce-tune-alignment--left {
+    text-align: left;
+}
+
+.ce-tune-alignment--center .image-tool__image-picture {
+    margin-left:auto;
+    margin-right: auto;
+}
+
+.ce-tune-alignment--left .image-tool__image-picture {
+    margin-right: auto;
+}
+.ce-tune-alignment--right .image-tool__image-picture {
+    margin-left:auto;
+}

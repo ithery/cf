@@ -74,7 +74,7 @@ class CQueue_Queue_RedisQueue extends CQueue_AbstractQueue implements CQueue_Con
     public function size($queue = null) {
         $queue = $this->getQueue($queue);
 
-        return $this->getConnection()->eval(
+        return $this->getConnection()->doEval(
             CQueue_LuaScripts::size(),
             3,
             $queue,
@@ -137,7 +137,7 @@ class CQueue_Queue_RedisQueue extends CQueue_AbstractQueue implements CQueue_Con
      * @return mixed
      */
     public function pushRaw($payload, $queue = null, array $options = []) {
-        $this->getConnection()->eval(
+        $this->getConnection()->doEval(
             CQueue_LuaScripts::push(),
             2,
             $this->getQueue($queue),
@@ -145,7 +145,7 @@ class CQueue_Queue_RedisQueue extends CQueue_AbstractQueue implements CQueue_Con
             $payload
         );
 
-        return json_decode($payload, true)['id'] ?? null;
+        return carr::get(json_decode($payload, true), 'id');
     }
 
     /**
@@ -255,7 +255,7 @@ class CQueue_Queue_RedisQueue extends CQueue_AbstractQueue implements CQueue_Con
      * @return array
      */
     public function migrateExpiredJobs($from, $to) {
-        return $this->getConnection()->eval(
+        return $this->getConnection()->doEval(
             CQueue_LuaScripts::migrateExpiredJobs(),
             3,
             $from,
@@ -274,7 +274,7 @@ class CQueue_Queue_RedisQueue extends CQueue_AbstractQueue implements CQueue_Con
      * @return array
      */
     protected function retrieveNextJob($queue, $block = true) {
-        $nextJob = $this->getConnection()->eval(
+        $nextJob = $this->getConnection()->doEval(
             CQueue_LuaScripts::pop(),
             3,
             $queue,
@@ -322,7 +322,7 @@ class CQueue_Queue_RedisQueue extends CQueue_AbstractQueue implements CQueue_Con
     public function deleteAndRelease($queue, $job, $delay) {
         $queue = $this->getQueue($queue);
 
-        $this->getConnection()->eval(
+        $this->getConnection()->doEval(
             CQueue_LuaScripts::release(),
             2,
             $queue . ':delayed',
@@ -342,7 +342,7 @@ class CQueue_Queue_RedisQueue extends CQueue_AbstractQueue implements CQueue_Con
     public function clear($queue) {
         $queue = $this->getQueue($queue);
 
-        return $this->getConnection()->eval(
+        return $this->getConnection()->doEval(
             CQueue_LuaScripts::clear(),
             4,
             $queue,

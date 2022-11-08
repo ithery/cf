@@ -19,41 +19,6 @@ class CColor_Random {
         $this->options = array_merge($optionsDefault, $options);
     }
 
-    public function one() {
-        $h = $this->pickHue();
-        $s = $this->pickSaturation($h);
-        $v = $this->pickBrightness($h, $s);
-        return $this->formatType(compact('h', 's', 'v'), $this->getOption('format'));
-    }
-
-    public function many($count) {
-        $colors = [];
-        for ($i = 0; $i < $count; $i++) {
-            $colors[] = $this->one();
-        }
-        return $colors;
-    }
-
-    public function formatType($hsvArray, $format = 'hex') {
-        $hsv = new CColor_Format_Type_Hsv($hsvArray);
-        switch ($format) {
-            case 'hsv':
-                return $hsv;
-            case 'hsl':
-                return $hsv->toHsl();
-            case 'hslCss':
-                $hsl = $hsv->toHsl()->value;
-                return 'hsl(' . $hsl['h'] . ',' . $hsl['s'] . '%,' . $hsl['l'] . '%)';
-            case 'rgb':
-                return $hsv->toRgb();
-            case 'rgbCss':
-                return 'rgb(' . implode(',', $hsv->toRgb()->value()) . ')';
-            case 'hex':
-            default:
-                return $hsv->toHex();
-        }
-    }
-
     private function pickHue() {
         $range = $this->getHueRange();
         if (empty($range)) {
@@ -65,6 +30,7 @@ class CColor_Random {
         if ($hue < 0) {
             $hue = 360 + $hue;
         }
+
         return $hue;
     }
 
@@ -81,12 +47,15 @@ class CColor_Random {
             switch ($this->getOption('luminosity')) {
                 case 'bright':
                     $range[0] = 55;
+
                     break;
                 case 'dark':
                     $range[0] = $range[1] - 10;
+
                     break;
                 case 'light':
                     $range[1] = 55;
+
                     break;
             }
         }
@@ -103,13 +72,16 @@ class CColor_Random {
                 switch ($this->getOption('luminosity')) {
                     case 'dark':
                         $range[1] = $range[0] + 20;
+
                         break;
                     case 'light':
                         $range[0] = ($range[1] + $range[0]) / 2;
+
                         break;
                 }
             }
         }
+
         return $this->rand($range);
     }
 
@@ -144,9 +116,48 @@ class CColor_Random {
     private function rand($bounds) {
         if ($this->haveOption('prng')) {
             $prng = $this->getOption('prng');
+
             return $prng($bounds[0], $bounds[1]);
         } else {
             return mt_rand($bounds[0], $bounds[1]);
         }
+    }
+
+    /**
+     * @return CColor_Format_Hex
+     */
+    public function toHex() {
+        $hsv = $this->toHsv();
+
+        return $hsv->toHex();
+    }
+
+    /**
+     * @return CColor_Format_Rgb
+     */
+    public function toRgb() {
+        $hsv = $this->toHsv();
+
+        return $hsv->toRgb();
+    }
+
+    /**
+     * @return CColor_Format_Hsl
+     */
+    public function toHsl() {
+        $hsv = $this->toHsv();
+
+        return $hsv->toHsl();
+    }
+
+    /**
+     * @return \CColor_Format_Hsv
+     */
+    public function toHsv() {
+        $h = (int) $this->pickHue();
+        $s = (int) $this->pickSaturation($h);
+        $v = (int) $this->pickBrightness($h, $s);
+
+        return new CColor_Format_Hsv($h . ',' . $s . ',' . $v);
     }
 }

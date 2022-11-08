@@ -10,7 +10,7 @@ defined('SYSPATH') or die('No direct access allowed.');
  */
 class CJavascript_Statement_JQuery_Event implements CJavascript_Statement_JQuery_CompilableInterface {
     protected $jqueryEvents = [
-        'bind', 'blur', 'change', 'click', 'dblclick', 'delegate', 'die', 'error', 'focus', 'focusin', 'focusout', 'hover', 'keydown', 'keypress', 'keyup', 'live', 'load', 'mousedown', 'mousseenter', 'mouseleave', 'mousemove', 'mouseout', 'mouseover', 'mouseup', 'off', 'on', 'one', 'ready', 'resize', 'scroll', 'select', 'submit', 'toggle', 'trigger', 'triggerHandler', 'undind', 'undelegate', 'unload'
+        'bind', 'blur', 'change', 'click', 'dblclick', 'delegate', 'die', 'error', 'focus', 'focusin', 'focusout', 'hover', 'keydown', 'keypress', 'keyup', 'live', 'load', 'mousedown', 'mouseenter', 'mouseleave', 'mousemove', 'mouseout', 'mouseover', 'mouseup', 'off', 'on', 'one', 'ready', 'resize', 'scroll', 'select', 'submit', 'toggle', 'trigger', 'triggerHandler', 'undind', 'undelegate', 'unload'
     ];
 
     protected $name;

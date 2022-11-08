@@ -19,7 +19,10 @@ class CAjax_Engine_SelectSearch_Processor_Query extends CAjax_Engine_SelectSearc
         $term = $this->searchTerm();
         $limit = $this->pageSize();
         $page = $this->page();
-
+        $prependData = [];
+        if ($page == 1) {
+            $prependData = $this->prependData();
+        }
         $base_q = $q;
         $posOrderBy = strpos(strtolower($base_q), 'order by', strpos(strtolower($base_q), 'from'));
 
@@ -117,9 +120,13 @@ class CAjax_Engine_SelectSearch_Processor_Query extends CAjax_Engine_SelectSearc
 
         $r = $db->query($qfilter);
 
-        $result = $r->result(false);
+        $result = $r->resultArray(false);
+        if (!is_array($prependData)) {
+            $prependData = [];
+        }
         $data = [];
-        foreach ($r as $row) {
+        $items = c::collect(array_merge($prependData, $result));
+        $data = $items->map(function ($row) use ($valueCallbackFunction, $keyField) {
             $p = [];
             foreach ($row as $k => $v) {
                 if ($valueCallbackFunction != null && is_callable($valueCallbackFunction)) {
@@ -153,9 +160,10 @@ class CAjax_Engine_SelectSearch_Processor_Query extends CAjax_Engine_SelectSearc
                     $p['cappFormatSelectionIsHtml'] = c::isHtml($formatSelection);
                 }
             }
-            //$p["id"]=$row["item_id"];
-            $data[] = $p;
-        }
+
+            return $p;
+        });
+
         $result = [];
         $result['data'] = $data;
         $result['total'] = $total;

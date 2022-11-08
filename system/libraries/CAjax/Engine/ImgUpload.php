@@ -6,6 +6,8 @@ class CAjax_Engine_ImgUpload extends CAjax_Engine {
     public function execute() {
         $data = $this->ajaxMethod->getData();
         $inputName = carr::get($data, 'inputName');
+        $allowedExtension = carr::get($data, 'allowedExtension', []);
+        $validationCallback = carr::get($data, 'validationCallback');
         $fileId = '';
         if (isset($_FILES[$inputName], $_FILES[$inputName]['name'])) {
             for ($i = 0; $i < count($_FILES[$inputName]['name']); $i++) {
@@ -14,8 +16,16 @@ class CAjax_Engine_ImgUpload extends CAjax_Engine {
                 if (strlen($ext) > 3) {
                     $ext = substr($ext, 0, 3);
                 }
-                if (in_array($ext, ['php', 'sh', 'htm', 'pht'])) {
+                if (in_array(strtolower($ext), ['php', 'sh', 'htm', 'pht'])) {
                     die('Not Allowed X_X');
+                }
+                if ($allowedExtension) {
+                    if (!in_array(strtolower($ext), $allowedExtension)) {
+                        die('Not Allowed X_X');
+                    }
+                }
+                if ($validationCallback && $validationCallback instanceof Opis\Closure\SerializableClosure) {
+                    $validationCallback->__invoke($_FILES[$inputName]['name'][$i], $_FILES[$inputName]['tmp_name'][$i]);
                 }
 
                 $extension = '.' . $ext;
@@ -47,8 +57,16 @@ class CAjax_Engine_ImgUpload extends CAjax_Engine {
                 if (strlen($ext) > 3) {
                     $ext = substr($ext, 0, 3);
                 }
-                if (in_array($ext, ['php', 'sh', 'htm', 'pht'])) {
+                if (in_array(strtolower($ext), ['php', 'sh', 'htm', 'pht'])) {
                     die('Not Allowed X_X');
+                }
+                if ($allowedExtension) {
+                    if (!in_array(strtolower($ext), $allowedExtension)) {
+                        die('Not Allowed X_X');
+                    }
+                }
+                if ($validationCallback && $validationCallback instanceof Opis\Closure\SerializableClosure) {
+                    $validationCallback->__invoke($filename, $imageData);
                 }
 
                 $extension = '.' . $ext;

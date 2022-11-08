@@ -6,14 +6,14 @@ use Facebook\WebDriver\Remote\WebDriverBrowserType;
 
 class CTesting_Browser {
     use CTesting_BrowserConcern_InteractsWithAuthentication,
-    CTesting_BrowserConcern_InteractsWithCookies,
-    CTesting_BrowserConcern_InteractsWithElements,
-    CTesting_BrowserConcern_InteractsWithJavascript,
-    CTesting_BrowserConcern_InteractsWithMouse,
-    CTesting_BrowserConcern_MakesAssertions,
-    CTesting_BrowserConcern_MakesUrlAssertions,
-    CTesting_BrowserConcern_WaitsForElements,
-    CTrait_Macroable {
+        CTesting_BrowserConcern_InteractsWithCookies,
+        CTesting_BrowserConcern_InteractsWithElements,
+        CTesting_BrowserConcern_InteractsWithJavascript,
+        CTesting_BrowserConcern_InteractsWithMouse,
+        CTesting_BrowserConcern_MakesAssertions,
+        CTesting_BrowserConcern_MakesUrlAssertions,
+        CTesting_BrowserConcern_WaitsForElements;
+    use CTrait_Macroable {
         __call as macroCall;
     }
 
@@ -141,7 +141,6 @@ class CTesting_Browser {
         if (!cstr::startsWith($url, ['http://', 'https://'])) {
             $url = static::$baseUrl . '/' . ltrim($url, '/');
         }
-
         $this->driver->navigate()->to($url);
 
         // If the page variable was set, we will call the "on" method which will set a

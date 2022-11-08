@@ -1,7 +1,8 @@
 export default class Url {
     constructor() {
-
+        this.baseUrl = window.capp?.baseUrl ?? '/';
     }
+
     addQueryString(url, key, value) {
         key = encodeURI(key);
         value = encodeURI(value);

@@ -7,7 +7,7 @@ class CImage_GoogleChart_ScatterChart extends CImage_GoogleChart_Chart {
     }
 
     /**
-     * Returns the applicable labels
+     * Returns the applicable labels.
      *
      * There is no reason to use this function. Please refer to the documentation to know how to use colors and legend.
      *

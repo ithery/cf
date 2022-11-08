@@ -1,16 +1,5 @@
 <?php
 
-use BotMan\BotMan\BotMan;
-use CBot_Message_Outgoing_Question;
-use BotMan\BotMan\Interfaces\ShouldQueue;
-use BotMan\BotMan\Messages\Attachments\File;
-use BotMan\BotMan\Messages\Attachments\Audio;
-use BotMan\BotMan\Messages\Attachments\Image;
-use BotMan\BotMan\Messages\Attachments\Video;
-use BotMan\BotMan\Messages\Attachments\Contact;
-use BotMan\BotMan\Messages\Attachments\Location;
-use BotMan\BotMan\Messages\Incoming\IncomingMessage;
-
 /**
  * Class Conversation.
  */

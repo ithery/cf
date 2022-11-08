@@ -27,7 +27,7 @@ class CElement_Component_Shimmer extends CElement_Component {
 
     protected function build() {
         $this->addClass('cres:element:component:Shimmer');
-        $this->setAttr('cres:element', 'component:Shimmer');
+        $this->setAttr('cres-element', 'component:Shimmer');
         $this->add($this->builder()->toHtml());
     }
 }

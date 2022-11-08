@@ -6,10 +6,25 @@ use Intervention\Image\ImageManagerStatic as InterventionImage;
 class CImage_Image {
     protected $pathToImage = '';
 
-    /** @var string|null */
+    /**
+     * @var null|string
+     */
     protected $temporaryDirectory = null;
 
+    /**
+     * @var string
+     */
     protected $imageDriver = 'gd';
+
+    /**
+     * @var CImage_Manipulations
+     */
+    protected $manipulations;
+
+    /**
+     * @var null|CImage_OptimizerChain
+     */
+    protected $optimizerChain = null;
 
     /**
      * @param string $pathToImage
@@ -30,15 +45,27 @@ class CImage_Image {
 
     public function setTemporaryDirectory($tempDir) {
         $this->temporaryDirectory = $tempDir;
+
+        return $this;
+    }
+
+    /**
+     * @param CImage_OptimizerChain $optimizerChain
+     *
+     * @return static
+     */
+    public function setOptimizerChain(CImage_OptimizerChain $optimizerChain) {
+        $this->optimizerChain = $optimizerChain;
+
         return $this;
     }
 
     /**
      * @param string $imageDriver
      *
-     * @return $this
+     * @throws CImage_Exception_InvalidImageDriverException
      *
-     * @throws InvalidImageDriver
+     * @return $this
      */
     public function useImageDriver($imageDriver) {
         if (!in_array($imageDriver, ['gd', 'imagick'])) {
@@ -48,32 +75,49 @@ class CImage_Image {
         InterventionImage::configure([
             'driver' => $this->imageDriver,
         ]);
+
         return $this;
     }
 
+    /**
+     * @return string
+     */
     public function mime() {
         return mime_content_type($this->pathToImage);
     }
 
+    /**
+     * @return string
+     */
     public function path() {
         return $this->pathToImage;
     }
 
+    /**
+     * @return string
+     */
     public function extension() {
         $extension = pathinfo($this->pathToImage, PATHINFO_EXTENSION);
+
         return strtolower($extension);
     }
 
+    /**
+     * @return int
+     */
     public function getWidth() {
         return InterventionImage::make($this->pathToImage)->width();
     }
 
+    /**
+     * @return int
+     */
     public function getHeight() {
         return InterventionImage::make($this->pathToImage)->height();
     }
 
     /**
-     * @param callable|$manipulations
+     * @param callable|CImage_Manipulations $manipulations
      *
      * @return $this
      */
@@ -84,6 +128,7 @@ class CImage_Image {
         if ($manipulations instanceof CImage_Manipulations) {
             $this->manipulations->mergeManipulations($manipulations);
         }
+
         return $this;
     }
 
@@ -117,10 +162,10 @@ class CImage_Image {
     }
 
     protected function performOptimization($path, array $optimizerChainConfiguration) {
-        $optimizerChain = CImage_OptimizerChainFactory::create();
+        $optimizerChain = $this->optimizerChain ?: CImage_OptimizerChainFactory::create();
         if (count($optimizerChainConfiguration)) {
             $optimizers = array_map(function (array $optimizerOptions, $optimizerClassName) {
-                return (new $optimizerClassName)->setOptions($optimizerOptions);
+                return (new $optimizerClassName())->setOptions($optimizerOptions);
             }, $optimizerChainConfiguration, array_keys($optimizerChainConfiguration));
             $optimizerChain->setOptimizers($optimizers);
         }
@@ -147,6 +192,7 @@ class CImage_Image {
             throw new BadMethodCallException("Manipulation `{$name}` does not exist");
         }
         $this->manipulations->$name(...$arguments);
+
         return $this;
     }
 }

@@ -11,6 +11,7 @@ import postcss from 'rollup-plugin-postcss';
 import nodePolyfills from 'rollup-plugin-polyfill-node';
 import serve from 'rollup-plugin-serve';
 import livereload from 'rollup-plugin-livereload';
+import svg from 'rollup-plugin-svg';
 // eslint-disable-next-line no-process-env
 const isProduction = process.env.NODE_ENV === 'production';
 
@@ -31,11 +32,11 @@ export default {
         warn(warning);
     },
     plugins: [
-
+        svg(),
         resolve(),
         commonjs({
             // These npm packages still use common-js modules. Ugh.
-            include: /node_modules\/(get-value|isobject|core-js|locutus|pusher-js|event-source-polyfill)/
+            include: /node_modules\/(get-value|isobject|core-js|locutus|pusher-js|event-source-polyfill|lodash.merge|lodash.clonedeep|@babel\/runtime)/
         }),
         postcss({
             config: {
@@ -47,15 +48,10 @@ export default {
             // modules: true,
         }),
         filesize(),
-        isProduction && terser({
-            mangle: false,
-            compress: {
-                // eslint-disable-next-line camelcase
-                drop_debugger: false
-            }
-        }),
+        terser({ format: { comments: false } }),
         babel({
-            exclude: 'node_modules/**'
+            exclude: 'node_modules/**',
+            runtimeHelpers: true
         }),
         alias({
             entries: [

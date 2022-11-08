@@ -61,14 +61,12 @@ class CCron_CallbackEvent extends CCron_Event {
                 $this->removeMutex();
             }
         });
-
         parent::callBeforeCallbacks();
 
         try {
             $response = is_object($this->callback)
                 ? c::container()->call([$this->callback, '__invoke'], $this->parameters)
                 : c::container()->call($this->callback, $this->parameters);
-
             $this->exitCode = $response === false ? 1 : 0;
         } catch (Throwable $e) {
             $this->exitCode = 1;

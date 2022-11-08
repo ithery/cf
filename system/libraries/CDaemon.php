@@ -85,4 +85,11 @@ class CDaemon {
     public static function isDaemon() {
         return self::getRunningService() != null;
     }
+
+    /**
+     * @return CDaemon_Supervisor
+     */
+    public static function supervisor() {
+        return new CBase_ForwarderStaticClass(CDaemon_Supervisor::class);
+    }
 }

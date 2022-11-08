@@ -82,7 +82,7 @@ trait CQueue_Trait_SerializesAndRestoresModelIdentifiers {
 
         return new $collectionClass(
             c::collect($value->id)->map(function ($id) use ($collection) {
-                return $collection[$id] ?? null;
+                return carr::get($collection, $id);
             })->filter()
         );
     }

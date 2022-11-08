@@ -127,7 +127,7 @@ trait CDatabase_Trait_ManageTransaction {
         $this->createTransaction();
 
         $this->transactions++;
-
+        /** @var CDatabase $this */
         if ($this->transactionManager) {
             $this->transactionManager->begin(
                 $this->getName(),
@@ -203,6 +203,7 @@ trait CDatabase_Trait_ManageTransaction {
      * @return void
      */
     public function commit() {
+        /** @var CDatabase $this */
         if ($this->transactions == 1) {
             $this->driver->commit();
         }

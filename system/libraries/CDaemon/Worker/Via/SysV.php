@@ -15,7 +15,7 @@ class CDaemon_Worker_Via_SysV implements CDaemon_Worker_ViaInterface, CDaemon_Pl
     const HEADER_ADDRESS = 1;
 
     /**
-     * Unknown error constant
+     * Unknown error constant.
      */
     const ERROR_UNKNOWN = -1;
 
@@ -25,7 +25,7 @@ class CDaemon_Worker_Via_SysV implements CDaemon_Worker_ViaInterface, CDaemon_Pl
     public $mediator;
 
     /**
-     * A handle to the IPC message queue
+     * A handle to the IPC message queue.
      *
      * @var resource
      */
@@ -35,7 +35,7 @@ class CDaemon_Worker_Via_SysV implements CDaemon_Worker_ViaInterface, CDaemon_Pl
      * A handle to the IPC Shared Memory resource
      * This should be a `protected` property but in a few instances in this class closures are used in a way that
      * really makes a lot of sense and they need access. I think these issues will be fixed with the improvements
-     * to $this lexical scoping in PHP5.4
+     * to $this lexical scoping in PHP5.4.
      *
      * @var resource
      */
@@ -53,7 +53,7 @@ class CDaemon_Worker_Via_SysV implements CDaemon_Worker_ViaInterface, CDaemon_Pl
 
     /**
      * Under-allocated shared memory is perhaps the largest possible cause of Worker failures, so if the Mediator believes
-     * the memory is under-allocated it will set this variable and write the warning to the event log
+     * the memory is under-allocated it will set this variable and write the warning to the event log.
      *
      * @var bool
      */
@@ -74,7 +74,7 @@ class CDaemon_Worker_Via_SysV implements CDaemon_Worker_ViaInterface, CDaemon_Pl
     }
 
     /**
-     * Called on Construct or Init
+     * Called on Construct or Init.
      *
      * @return void
      */
@@ -92,7 +92,7 @@ class CDaemon_Worker_Via_SysV implements CDaemon_Worker_ViaInterface, CDaemon_Pl
     }
 
     /**
-     * Called on Destruct
+     * Called on Destruct.
      *
      * @return void
      */
@@ -100,7 +100,7 @@ class CDaemon_Worker_Via_SysV implements CDaemon_Worker_ViaInterface, CDaemon_Pl
     }
 
     /**
-     * This is called during object construction to validate any dependencies
+     * This is called during object construction to validate any dependencies.
      *
      * @return array Return array of error messages (Think stuff like "GD Library Extension Required" or "Cannot open /tmp for Writing") or an empty array
      */
@@ -119,11 +119,11 @@ class CDaemon_Worker_Via_SysV implements CDaemon_Worker_ViaInterface, CDaemon_Pl
     }
 
     /**
-     * Write and Verify the SHM header
-     *
-     * @return void
+     * Write and Verify the SHM header.
      *
      * @throws Exception
+     *
+     * @return void
      */
     private function setupShm() {
         // Write a header to the shared memory block
@@ -151,13 +151,14 @@ class CDaemon_Worker_Via_SysV implements CDaemon_Worker_ViaInterface, CDaemon_Pl
                     $o = @shm_get_var($this->shm, $i);
                     if (!is_object($o)) {
                         @shm_remove_var($this->shm, $i);
+
                         continue;
                     }
-                    $this->mediator->set_struct($o);
+                    $this->mediator->setStruct($o);
                     $max_id = $i;
                 }
             }
-            $this->mediator->log("Starting Job Numbering at $max_id.");
+            $this->mediator->log("Starting Job Numbering at ${max_id}.");
             $this->callCount = $max_id;
         }
     }
@@ -195,11 +196,12 @@ class CDaemon_Worker_Via_SysV implements CDaemon_Worker_ViaInterface, CDaemon_Pl
             }
             $this->memoryAllocation = $bytes;
         }
+
         return $this->memoryAllocation;
     }
 
     /**
-     * Puts the message on the queue
+     * Puts the message on the queue.
      *
      * @param CDaemon_Worker_Call $call
      *
@@ -212,8 +214,10 @@ class CDaemon_Worker_Via_SysV implements CDaemon_Worker_ViaInterface, CDaemon_Pl
             case CDaemon_Worker_MediatorAbstract::RETURNED:
                 $encoder = function ($call) use ($that) {
                     shm_put_var($that->shm, $call->id, $call);
+
                     return shm_has_var($that->shm, $call->id);
                 };
+
                 break;
             default:
                 $encoder = function ($call) {
@@ -232,13 +236,15 @@ class CDaemon_Worker_Via_SysV implements CDaemon_Worker_ViaInterface, CDaemon_Pl
         $call->errors++;
         if ($this->error($error_code, $call->errors) && $call->errors < 3) {
             $this->mediator->log("SysV::put() Failed for call_id {$call->id}: Retrying. Error Code: " . $error_code);
+
             return $this->put($call);
         }
+
         return false;
     }
 
     /**
-     * Retrieves a message from the queue
+     * Retrieves a message from the queue.
      *
      * @param $desired_type
      * @param mixed $blocking
@@ -251,6 +257,7 @@ class CDaemon_Worker_Via_SysV implements CDaemon_Worker_ViaInterface, CDaemon_Pl
         msg_receive($this->queue, $desired_type, $message_type, $this->memoryAllocation, $message, true, $blocking, $message_error);
         if (!$message) {
             $this->error($message_error);
+
             return false;
         }
         $that = $this;
@@ -262,8 +269,10 @@ class CDaemon_Worker_Via_SysV implements CDaemon_Worker_ViaInterface, CDaemon_Pl
                     if ($message['microtime'] < $call->time[CDaemon_Worker_MediatorAbstract::UNCALLED]) {    // Has been requeued - Cancel this call
                         $call->cancelled();
                     }
+
                     return $call;
                 };
+
                 break;
             case CDaemon_Worker_MediatorAbstract::RETURNED:
                 $decoder = function ($message) use ($that) {
@@ -271,8 +280,10 @@ class CDaemon_Worker_Via_SysV implements CDaemon_Worker_ViaInterface, CDaemon_Pl
                     if ($call && $call->status == $message['status']) {
                         @shm_remove_var($that->shm, $message['call_id']);
                     }
+
                     return $call;
                 };
+
                 break;
             default:
                 $decoder = function ($message) use ($that) {
@@ -284,6 +295,7 @@ class CDaemon_Worker_Via_SysV implements CDaemon_Worker_ViaInterface, CDaemon_Pl
                     }
                     $call->status($message['status']);
                     $call->pid = $message['pid'];
+
                     return $call;
                 };
         }
@@ -301,6 +313,7 @@ class CDaemon_Worker_Via_SysV implements CDaemon_Worker_ViaInterface, CDaemon_Pl
             $this->mediator->log("WARNING: The memory allocated to this worker is too low and may lead to out-of-shared-memory errors.\n"
                     . "         Based on this job, the memory allocation should be at least {$suggested_size} bytes. Current allocation: {$this->memoryAllocation} bytes.");
         }
+
         return $call;
     }
 
@@ -322,17 +335,18 @@ class CDaemon_Worker_Via_SysV implements CDaemon_Worker_ViaInterface, CDaemon_Pl
         if (is_array($header)) {
             $out['memoryAllocation'] = $header['memoryAllocation'];
         }
+
         return $out;
     }
 
     /**
-     * Drop any pending messages in the queue
+     * Drop any pending messages in the queue.
      *
      * @return bool
      */
     public function purge() {
-        $this->purge_mq();
-        $this->purge_shm();
+        $this->purgeMq();
+        $this->purgeShm();
         $this->setupIpc();
     }
 
@@ -342,7 +356,7 @@ class CDaemon_Worker_Via_SysV implements CDaemon_Worker_ViaInterface, CDaemon_Pl
      *
      * @return void
      */
-    private function purge_shm() {
+    private function purgeShm() {
         if (!is_resource($this->shm)) {
             $this->setupIpc();
         }
@@ -357,7 +371,7 @@ class CDaemon_Worker_Via_SysV implements CDaemon_Worker_ViaInterface, CDaemon_Pl
      *
      * @return void
      */
-    private function purge_mq() {
+    private function purgeMq() {
         if (!is_resource($this->queue)) {
             $this->setupIpc();
         }
@@ -366,7 +380,7 @@ class CDaemon_Worker_Via_SysV implements CDaemon_Worker_ViaInterface, CDaemon_Pl
     }
 
     /**
-     * Handle IPC Errors
+     * Handle IPC Errors.
      *
      * @param $error
      * @param int $try Inform error() of repeated failures of the same $error_code
@@ -382,6 +396,7 @@ class CDaemon_Worker_Via_SysV implements CDaemon_Worker_ViaInterface, CDaemon_Pl
             $key = mt_rand(1000 * 1000, 2000 * 1000);
             @shm_put_var($that->shm, $key, $arr);
             usleep(5000);
+
             return @shm_get_var($that->shm, $key) == $arr;
         };
         switch ($error) {
@@ -390,23 +405,28 @@ class CDaemon_Worker_Via_SysV implements CDaemon_Worker_ViaInterface, CDaemon_Pl
             case MSG_ENOMSG:    // No message of desired type
                 // Ignored Errors
                 return true;
+
                 break;
             case MSG_EAGAIN:    // Temporary Problem, Try Again
                 usleep($this->mediator->backoff(20000, $try));
+
                 return true;
+
                 break;
             case 13:
                 // Permission Denied
                 $this->mediator->countError('communication');
                 $this->mediator->log('Permission Denied: Cannot connect to message queue');
-                $this->purge_mq();
+                $this->purgeMq();
                 if ($this->mediator->service->isParent()) {
                     usleep($this->mediator->backoff(100000, $try));
                 } else {
                     sleep($this->mediator->backoff(3, $try));
                 }
                 $this->setupIpc();
+
                 return true;
+
                 break;
             case 22:
             // Invalid Argument
@@ -421,7 +441,9 @@ class CDaemon_Worker_Via_SysV implements CDaemon_Worker_ViaInterface, CDaemon_Pl
                     sleep($this->mediator->backoff(2, $try));
                 }
                 $this->setupIpc();
+
                 return true;
+
                 break;
             case self::ERROR_UNKNOWN:
                 // Almost certainly an issue with shared memory
@@ -432,6 +454,7 @@ class CDaemon_Worker_Via_SysV implements CDaemon_Worker_ViaInterface, CDaemon_Pl
                 if (!$this->mediator->service->isParent()) {
                     sleep($this->mediator->backoff(3, $try));
                     $this->setupIpc();
+
                     return true;
                 }
                 // If this is the parent, do some diagnostic checks and attempt correction.
@@ -466,13 +489,14 @@ class CDaemon_Worker_Via_SysV implements CDaemon_Worker_ViaInterface, CDaemon_Pl
                     }
                     if ($cached->status == CDaemon_Worker_MediatorAbstract::UNCALLED) {
                         $itemsToCall[$i] = $call;
+
                         continue;
                     }
                     $items_to_copy[$i] = $call;
                 }
                 $this->mediator->log('IPC DIAG: Preparing to clean SHM and Reconnect...');
                 for ($i = 0; $i < 2; $i++) {
-                    $this->purge_shm();
+                    $this->purgeShm();
                     $this->setupIpc();
                     if (!empty($items_to_copy)) {
                         foreach ($items_to_copy as $key => $value) {
@@ -491,6 +515,7 @@ class CDaemon_Worker_Via_SysV implements CDaemon_Worker_ViaInterface, CDaemon_Pl
                 foreach ($itemsToCall as $call) {
                     $this->mediator->retry($call);
                 }
+
                 return true;
             default:
                 if ($error) {
@@ -503,12 +528,13 @@ class CDaemon_Worker_Via_SysV implements CDaemon_Worker_ViaInterface, CDaemon_Pl
                 }
                 $this->mediator->countError('catchall');
                 $this->setupIpc();
+
                 return false;
         }
     }
 
     /**
-     * Drop the single message
+     * Drop the single message.
      *
      * @param mixed $call_id
      *
@@ -521,7 +547,7 @@ class CDaemon_Worker_Via_SysV implements CDaemon_Worker_ViaInterface, CDaemon_Pl
     }
 
     /**
-     * Remove and release shared memory and message queue resources
+     * Remove and release shared memory and message queue resources.
      *
      * @return mixed
      */

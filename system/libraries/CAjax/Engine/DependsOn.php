@@ -21,6 +21,11 @@ class CAjax_Engine_DependsOn extends CAjax_Engine {
             $app->add($data);
             $data = $app->toArray();
         }
+        if (!is_array($data)) {
+            $data = [
+                'value' => $data
+            ];
+        }
 
         return $this->toJsonResponse($errCode, $errMessage, $data);
     }
