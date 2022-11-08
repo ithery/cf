@@ -1,6 +1,6 @@
 <?php
 
-class CAuth_Manager {
+final class CAuth_Manager {
     use CAuth_Concern_CreateUserProvider;
 
     /**
@@ -36,11 +36,11 @@ class CAuth_Manager {
      * @return CAuth_Manager
      */
     public static function instance() {
-        if (static::$instance == null) {
-            static::$instance = new static();
+        if (self::$instance == null) {
+            self::$instance = new self();
         }
 
-        return static::$instance;
+        return self::$instance;
     }
 
     /**
@@ -60,7 +60,7 @@ class CAuth_Manager {
      *
      * @param null|string $name
      *
-     * @return \CAuth_Contract_GuardInterface|\CAuth_Contract_StatefulGuardInterface
+     * @return CAuth_Contract_StatefulGuardInterface|CAuth_Contract_GuardInterface
      */
     public function guard($name = null) {
         $name = $name ?: $this->getDefaultDriver();
@@ -142,7 +142,7 @@ class CAuth_Manager {
     public function createSessionDriver($name, $config) {
         $provider = $this->createUserProvider(carr::get($config, 'provider', null));
 
-        $guard = new CAuth_Guard_SessionGuard($name, $provider, CSession::instance());
+        $guard = new CAuth_Guard_SessionGuard($name, $provider, CSession::instance()->store());
 
         // When using the remember me functionality of the authentication services we
         // will need to be set the encryption instance of the guard, which allows
@@ -193,7 +193,7 @@ class CAuth_Manager {
      *
      * @param string $name
      *
-     * @return array
+     * @return null|array
      */
     protected function getConfig($name) {
         return CF::config("auth.guards.{$name}");
@@ -248,7 +248,7 @@ class CAuth_Manager {
         return $this->extend($driver, function () use ($callback) {
             $guard = new CAuth_Guard_RequestGuard($callback, CHTTP::request(), $this->createUserProvider());
 
-            $this->app->refresh('request', $guard, 'setRequest');
+            //c::container()->refresh('request', $guard, 'setRequest');
 
             return $guard;
         });

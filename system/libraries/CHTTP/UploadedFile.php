@@ -21,7 +21,7 @@ class CHTTP_UploadedFile extends SymfonyUploadedFile {
      * @return CHTTP_Testing_FileFactory
      */
     public static function fake() {
-        return new CHTTP_Testing_FileFactory;
+        return new CHTTP_Testing_FileFactory();
     }
 
     /**
@@ -47,6 +47,7 @@ class CHTTP_UploadedFile extends SymfonyUploadedFile {
     public function storePublicly($path, $options = []) {
         $options = $this->parseOptions($options);
         $options['visibility'] = 'public';
+
         return $this->storeAs($path, $this->hashName(), $options);
     }
 
@@ -62,6 +63,7 @@ class CHTTP_UploadedFile extends SymfonyUploadedFile {
     public function storePubliclyAs($path, $name, $options = []) {
         $options = $this->parseOptions($options);
         $options['visibility'] = 'public';
+
         return $this->storeAs($path, $name, $options);
     }
 
@@ -89,14 +91,15 @@ class CHTTP_UploadedFile extends SymfonyUploadedFile {
     /**
      * Get the contents of the uploaded file.
      *
-     * @return bool|string
-     *
      * @throws \CStorage_Exception_FileNotFoundException
+     *
+     * @return bool|string
      */
     public function get() {
         if (!$this->isValid()) {
             throw new CStorage_Exception_FileNotFoundException("File does not exist at path {$this->getPathname()}");
         }
+
         return file_get_contents($this->getPathname());
     }
 
@@ -118,6 +121,7 @@ class CHTTP_UploadedFile extends SymfonyUploadedFile {
      * @return static
      */
     public static function createFromBase(SymfonyUploadedFile $file, $test = false) {
+        /** @phpstan-ignore-next-line */
         return $file instanceof static ? $file : new static(
             $file->getPathname(),
             $file->getClientOriginalName(),
@@ -138,6 +142,7 @@ class CHTTP_UploadedFile extends SymfonyUploadedFile {
         if (is_string($options)) {
             $options = ['disk' => $options];
         }
+
         return $options;
     }
 }

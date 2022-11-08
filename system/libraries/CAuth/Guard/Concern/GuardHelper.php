@@ -7,7 +7,7 @@ trait CAuth_Guard_Concern_GuardHelper {
     /**
      * The currently authenticated user.
      *
-     * @var CAuth_AuthenticatableInterface
+     * @var null|CAuth_AuthenticatableInterface
      */
     protected $user;
 
@@ -69,6 +69,8 @@ trait CAuth_Guard_Concern_GuardHelper {
         if ($this->user()) {
             return $this->user()->getAuthIdentifier();
         }
+
+        return null;
     }
 
     /**

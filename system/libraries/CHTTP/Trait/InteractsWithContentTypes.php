@@ -116,6 +116,8 @@ trait CHTTP_Trait_InteractsWithContentTypes {
                 }
             }
         }
+
+        return null;
     }
 
     /**

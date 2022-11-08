@@ -24,7 +24,7 @@ class CHTTP_Middleware_ThrottleRequest {
     /**
      * Handle an incoming request.
      *
-     * @param \CHttp_Request $request
+     * @param \CHTTP_Request $request
      * @param \Closure       $next
      * @param int|string     $maxAttempts
      * @param float|int      $decayMinutes

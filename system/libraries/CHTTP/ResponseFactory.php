@@ -9,20 +9,20 @@
 use Symfony\Component\HttpFoundation\StreamedResponse;
 use Symfony\Component\HttpFoundation\BinaryFileResponse;
 
-class CHTTP_ResponseFactory implements CHTTP_Contract_ResponseFactoryInterface {
+final class CHTTP_ResponseFactory implements CHTTP_Contract_ResponseFactoryInterface {
     use CTrait_Macroable;
 
-    protected static $instance;
+    private static $instance;
 
     private function __construct() {
     }
 
     public static function instance() {
-        if (static::$instance == null) {
-            static::$instance = new static();
+        if (self::$instance == null) {
+            self::$instance = new self();
         }
 
-        return static::$instance;
+        return self::$instance;
     }
 
     /**
@@ -53,18 +53,16 @@ class CHTTP_ResponseFactory implements CHTTP_Contract_ResponseFactoryInterface {
     /**
      * Create a new response for a given view.
      *
-     * @param string|CView $view
-     * @param array        $data
-     * @param int          $status
-     * @param array        $headers
+     * @param string|CView_View $view
+     * @param array             $data
+     * @param int               $status
+     * @param array             $headers
      *
      * @return CHTTP_Response
      */
     public function view($view, $data = [], $status = 200, array $headers = []) {
         if (!$view instanceof CView_View) {
-            if (!$view instanceof CView) {
-                $view = CView::factory($view, $data);
-            }
+            $view = CView::factory($view, $data);
         } else {
             if (is_array($data) && count($data) > 0) {
                 $view->set($data);
@@ -194,7 +192,7 @@ class CHTTP_ResponseFactory implements CHTTP_Contract_ResponseFactoryInterface {
      * @return CHTTP_RedirectResponse
      */
     public function redirectTo($path, $status = 302, $headers = [], $secure = null) {
-        return $this->redirector->to($path, $status, $headers, $secure);
+        return CHTTP_Redirector::instance()->to($path, $status, $headers, $secure);
     }
 
     /**
@@ -208,7 +206,7 @@ class CHTTP_ResponseFactory implements CHTTP_Contract_ResponseFactoryInterface {
      * @return CHTTP_RedirectResponse
      */
     public function redirectToRoute($route, $parameters = [], $status = 302, $headers = []) {
-        return $this->redirector->route($route, $parameters, $status, $headers);
+        return CHTTP_Redirector::instance()->route($route, $parameters, $status, $headers);
     }
 
     /**
@@ -222,7 +220,7 @@ class CHTTP_ResponseFactory implements CHTTP_Contract_ResponseFactoryInterface {
      * @return CHTTP_RedirectResponse
      */
     public function redirectToAction($action, $parameters = [], $status = 302, $headers = []) {
-        return $this->redirector->action($action, $parameters, $status, $headers);
+        return CHTTP_Redirector::instance()->action($action, $parameters, $status, $headers);
     }
 
     /**
@@ -236,7 +234,7 @@ class CHTTP_ResponseFactory implements CHTTP_Contract_ResponseFactoryInterface {
      * @return CHTTP_RedirectResponse
      */
     public function redirectGuest($path, $status = 302, $headers = [], $secure = null) {
-        return $this->redirector->guest($path, $status, $headers, $secure);
+        return CHTTP_Redirector::instance()->guest($path, $status, $headers, $secure);
     }
 
     /**
@@ -250,6 +248,6 @@ class CHTTP_ResponseFactory implements CHTTP_Contract_ResponseFactoryInterface {
      * @return CHTTP_RedirectResponse
      */
     public function redirectToIntended($default = '/', $status = 302, $headers = [], $secure = null) {
-        return $this->redirector->intended($default, $status, $headers, $secure);
+        return CHTTP_Redirector::instance()->intended($default, $status, $headers, $secure);
     }
 }

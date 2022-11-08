@@ -1,6 +1,6 @@
 <?php
 
-class CAuth_Access_Gate implements CAuth_Contract_GateInterface {
+final class CAuth_Access_Gate implements CAuth_Contract_GateInterface {
     use CAuth_Access_Concern_HandleAuthorizationTrait;
 
     /**
@@ -55,11 +55,11 @@ class CAuth_Access_Gate implements CAuth_Contract_GateInterface {
     private static $instance;
 
     public static function instance() {
-        if (static::$instance == null) {
-            static::$instance = new static();
+        if (self::$instance == null) {
+            self::$instance = new self();
         }
 
-        return static::$instance;
+        return self::$instance;
     }
 
     /**
@@ -311,9 +311,9 @@ class CAuth_Access_Gate implements CAuth_Contract_GateInterface {
      * @param string      $ability
      * @param array|mixed $arguments
      *
-     * @throws \Illuminate\Auth\Access\AuthorizationException
+     * @throws \CAuth_Exception_AuthorizationException
      *
-     * @return \Illuminate\Auth\Access\Response
+     * @return \CAuth_Access_Response
      */
     public function authorize($ability, $arguments = []) {
         return $this->inspect($ability, $arguments)->authorize();
@@ -425,13 +425,13 @@ class CAuth_Access_Gate implements CAuth_Contract_GateInterface {
         } catch (Exception $e) {
             return false;
         }
-
+        /** @phpstan-ignore-next-line */
         if ($method) {
             $parameters = $method->getParameters();
 
             return isset($parameters[0]) && $this->parameterAllowsGuests($parameters[0]);
         }
-
+        /** @phpstan-ignore-next-line */
         return false;
     }
 
@@ -496,15 +496,17 @@ class CAuth_Access_Gate implements CAuth_Contract_GateInterface {
                 return $result;
             }
         }
+
+        return null;
     }
 
     /**
      * Call all of the after callbacks with check result.
      *
-     * @param \Illuminate\Contracts\Auth\Authenticatable $user
-     * @param string                                     $ability
-     * @param array                                      $arguments
-     * @param bool                                       $result
+     * @param \CAuth_AuthenticatableInterface $user
+     * @param string                          $ability
+     * @param array                           $arguments
+     * @param bool                            $result
      *
      * @return null|bool
      */
@@ -516,7 +518,7 @@ class CAuth_Access_Gate implements CAuth_Contract_GateInterface {
 
             $afterResult = $after($user, $ability, $result, $arguments);
 
-            $result = $result ?? $afterResult;
+            $result = $result ?: $afterResult;
         }
 
         return $result;
@@ -647,12 +649,12 @@ class CAuth_Access_Gate implements CAuth_Contract_GateInterface {
      *
      * @param object|string $class
      *
-     * @throws \Illuminate\Contracts\Container\BindingResolutionException
+     * @throws \CContainer_Exception_BindingResolutionException
      *
      * @return mixed
      */
     public function resolvePolicy($class) {
-        return $this->container->make($class);
+        return c::container()->make($class);
     }
 
     /**

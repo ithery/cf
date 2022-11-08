@@ -682,7 +682,9 @@ class c {
      * @param null|array|string $key
      * @param mixed             $default
      *
-     * @return ($key is null ? CHTTP_Request : string|array)
+     * @return CHTTP_Request|string|array
+     *
+     * @phpstan-return ($key is null ? CHTTP_Request : string|array)
      */
     public static function request($key = null, $default = null) {
         if (is_null($key)) {
@@ -1309,14 +1311,17 @@ class c {
      * @param null|string|array $path
      * @param null|string       $appCode
      *
-     * @return string
+     * @return null|string
      */
     public static function appRoot($path = null, $appCode = null) {
         if ($appCode == null) {
             $appCode = CF::appCode();
         }
+        if ($appCode === null) {
+            return null;
+        }
         if (!in_array($appCode, CF::getAvailableAppCode())) {
-            throw new CBase_Exception_AppCodeNotFoundException('appCode ' . $appCode . ' doesn\'t exists');
+            return null;
         }
         if (is_array($path)) {
             $path = implode(DS, $path);

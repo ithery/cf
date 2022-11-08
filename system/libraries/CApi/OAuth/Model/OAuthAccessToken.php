@@ -1,5 +1,22 @@
 <?php
-
+/**
+ * @property      int                                 $status
+ * @property      null|string                         $createdby
+ * @property      null|string                         $updatedby
+ * @property      null|CCarbon|\Carbon\Carbon         $updated
+ * @property      null|CCarbon|\Carbon\Carbon         $created
+ * @property      null|CCarbon|\Carbon\Carbon         $expires_at
+ * @property      null|bool                           $revoked
+ * @property      null|array                          $scopes
+ * @property      null|string                         $name
+ * @property      null|string                         $token
+ * @property      null|string                         $user_type
+ * @property      null|int                            $user_id
+ * @property      null|int                            $oauth_client_id
+ * @property      null|int                            $org_id
+ * @property-read int                                 $oauth_access_token
+ * @property-read null|CAuth_AuthenticatableInterface $user
+ */
 class CApi_OAuth_Model_OAuthAccessToken extends CModel {
     /**
      * The database table used by the model.

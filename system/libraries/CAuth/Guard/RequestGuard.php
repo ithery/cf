@@ -60,6 +60,7 @@ class CAuth_Guard_RequestGuard implements CAuth_Contract_GuardInterface {
      * @return bool
      */
     public function validate(array $credentials = []) {
+        /** @phpstan-ignore-next-line */
         return !is_null((new static(
             $this->callback,
             $credentials['request'],

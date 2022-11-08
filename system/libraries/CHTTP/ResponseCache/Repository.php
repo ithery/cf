@@ -37,18 +37,20 @@ class CHTTP_ResponseCache_Repository {
         if ($this->cache != null) {
             return $this->cache->has($key);
         }
+
         return false;
     }
 
     /**
      * @param string $key
      *
-     * @return Response
+     * @return null|Response
      */
     public function get($key) {
         if ($this->cache != null) {
             return $this->responseSerializer->unserialize($this->cache->get($key));
         }
+
         return null;
     }
 
@@ -57,6 +59,7 @@ class CHTTP_ResponseCache_Repository {
      */
     public function clear() {
         if ($this->cache != null) {
+            // @phpstan-ignore-next-line
             if ($this->cache instanceof CCache_TaggedCache && !empty($this->cache->getTags())) {
                 $this->cache->flush();
 
@@ -84,34 +87,31 @@ class CHTTP_ResponseCache_Repository {
         if ($this->cache != null) {
             return $this->cache->forget($key);
         }
+
+        return false;
     }
 
     /**
      * @param array $tags
      *
-     * @return self
+     * @return null|self
      */
     public function tags(array $tags) {
         if ($this->cache != null) {
+            // @phpstan-ignore-next-line
             if ($this->cache instanceof CCache_TaggedCache && !empty($this->cache->getTags())) {
                 $tags = array_merge($this->cache->getTags()->getNames(), $tags);
             }
 
             return new self($this->cache->tags($tags));
         }
-    }
 
-    /**
-     * @param mixed $repository
-     *
-     * @return bool
-     */
-    public function isTagged($repository) {
-        return $repository instanceof CCache_TaggedCache && !empty($repository->getTags());
+        return null;
     }
 
     public function setCache(CCache_Repository $cache) {
         $this->cache = $cache;
+
         return $this;
     }
 
@@ -124,5 +124,15 @@ class CHTTP_ResponseCache_Repository {
 
     public function hasCache() {
         return $this->cache != null;
+    }
+
+    /**
+     * @param mixed $repository
+     *
+     * @return bool
+     */
+    public function isTagged($repository) {
+        // @phpstan-ignore-next-line
+        return $repository instanceof CCache_TaggedCache && !empty($repository->getTags());
     }
 }
