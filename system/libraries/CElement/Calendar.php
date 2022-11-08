@@ -24,8 +24,9 @@ class CElement_Calendar extends CElement {
      *
      * @return \CElement_Calendar
      */
-    public static function factory($id = '', $tag = 'div') {
-        return new CElement_Calendar($id);
+    public static function factory($id = null, $tag = 'div') {
+        /** @phpstan-ignore-next-line */
+        return new static($id, $tag);
     }
 
     public function html($indent = 0) {

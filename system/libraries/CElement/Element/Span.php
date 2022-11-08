@@ -15,7 +15,8 @@ class CElement_Element_Span extends CElement_Element {
     }
 
     public static function factory($id = null) {
-        return new CElement_Element_Span($id);
+        /** @phpstan-ignore-next-line */
+        return new static($id);
     }
 
     // @codingStandardsIgnoreStart

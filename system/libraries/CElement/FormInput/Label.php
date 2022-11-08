@@ -13,7 +13,8 @@ class CElement_FormInput_Label extends CElement_FormInput {
     }
 
     public static function factory($id = null) {
-        return new CElement_FormInput_Label($id);
+        /** @phpstan-ignore-next-line */
+        return new static($id);
     }
 
     protected function build() {

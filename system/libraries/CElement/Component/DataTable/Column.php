@@ -1,8 +1,5 @@
 <?php
 
-use Twilio\Serialize;
-use SuperClosure\SerializableClosure;
-
 class CElement_Component_DataTable_Column extends CObject {
     use CTrait_Compat_Element_DataTable_Column;
     use CTrait_Element_Property_Label;

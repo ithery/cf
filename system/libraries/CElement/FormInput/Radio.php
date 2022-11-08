@@ -37,7 +37,8 @@ class CElement_FormInput_Radio extends CElement_FormInput {
     }
 
     public static function factory($id = null) {
-        return new CElement_FormInput_Radio($id);
+        /** @phpstan-ignore-next-line */
+        return new static($id);
     }
 
     public function setChecked($bool = true) {

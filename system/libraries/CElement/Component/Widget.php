@@ -58,7 +58,8 @@ class CElement_Component_Widget extends CElement_Component {
     }
 
     public static function factory($id = null) {
-        return new CElement_Component_Widget($id);
+        /** @phpstan-ignore-next-line */
+        return new static($id);
     }
 
     /**

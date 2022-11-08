@@ -20,7 +20,8 @@ class CElement_FormInput_File extends CElement_FormInput {
     }
 
     public static function factory($id = null) {
-        return new CElement_FormInput_File($id);
+        /** @phpstan-ignore-next-line */
+        return new static($id);
     }
 
     public function html($indent = 0) {

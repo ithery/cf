@@ -33,7 +33,8 @@ class CElement_Component_FileManager extends CElement_Component {
     }
 
     public static function factory($id = '') {
-        return new CElement_Component_FileManager($id);
+        /** @phpstan-ignore-next-line */
+        return new static($id);
     }
 
     /**

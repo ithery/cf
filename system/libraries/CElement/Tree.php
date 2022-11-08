@@ -22,8 +22,9 @@ class CElement_Tree extends CElement {
         CClientModules::instance()->register_module('jstree');
     }
 
-    public static function factory($id = '') {
-        return new CElement_Tree($id);
+    public static function factory($id = null) {
+        /** @phpstan-ignore-next-line */
+        return new static($id);
     }
 
     public function set_data($data) {

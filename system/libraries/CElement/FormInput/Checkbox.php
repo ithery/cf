@@ -36,7 +36,8 @@ class CElement_FormInput_Checkbox extends CElement_FormInput {
     }
 
     public static function factory($id = null) {
-        return new CElement_FormInput_Checkbox($id);
+        /** @phpstan-ignore-next-line */
+        return new static($id);
     }
 
     public function setChecked($bool) {
