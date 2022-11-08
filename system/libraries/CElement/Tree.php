@@ -19,7 +19,7 @@ class CElement_Tree extends CElement {
         $this->url = null;
         $this->callback = null;
         $this->requires = [];
-        CClientModules::instance()->register_module('jstree');
+        CClientModules::instance()->registerModule('jstree');
     }
 
     public static function factory($id = null) {
@@ -99,15 +99,7 @@ class CElement_Tree extends CElement {
                 <div class="content image" style="display:none; position:relative;"><img src="" alt="" style="display:block; position:absolute; left:50%; top:50%; padding:0; max-height:90%; max-width:90%;" /></div>
                 <div class="content default" style="text-align:center;">Select a node from the tree.</div>
             </div>');
-//            $html->appendln($this->render($this->data));
-//                    '<ul>
-//                          <li>Root node 1
-//                            <ul>
-//                              <li>Child node 1</li>
-//                              <li><a href="#">Child node 2</a></li>
-//                            </ul>
-//                          </li>
-//                        </ul>
+
         $html->appendln('</div>');
 
         $html->appendln('
