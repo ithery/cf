@@ -34,7 +34,7 @@ class CConsole_Command_PhpstanCommand extends CConsole_Command {
         }
 
         chdir($isFramework ? DOCROOT : c::appRoot());
-        $command = [$this->phpBinary(), '-c', CQC::phpstan()->phpstanConfiguration(), '-d', 'memory_limit=1G', '-d', 'max_execution_time=0', $this->getPhpStanBinary(), 'analyze', '--error-format', $format, '--autoload-file', CQC::phpstan()->phpstanBootstrap()];
+        $command = [$this->phpBinary(), '-d', 'memory_limit=1G', '-d', 'max_execution_time=0', $this->getPhpStanBinary(), 'analyze', '-c', CQC::phpstan()->phpstanConfiguration(), '--error-format', $format, '--autoload-file', CQC::phpstan()->phpstanBootstrap()];
         if ($debug) {
             $command[] = '--debug';
         }
