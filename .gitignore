@@ -129,3 +129,6 @@ deploy.blade.php
 #generated file
 oauth-public.key
 oauth-private.key
+
+#escape local development
+capp.code-workspace
