@@ -1039,6 +1039,7 @@ abstract class CModel implements ArrayAccess, CInterface_Arrayable, CInterface_J
      * Begin querying the model.
      *
      * @return CModel_Query|static
+     * @phpstan-return CModel_Query<static>|static
      */
     public static function query() {
         return (new static())->newQuery();

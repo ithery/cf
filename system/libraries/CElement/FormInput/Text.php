@@ -33,11 +33,11 @@ class CElement_FormInput_Text extends CElement_FormInput {
     }
 
     /**
-     * @param type $id
+     * @param null|string $id
      *
-     * @return \CFormInputText
+     * @return \CElement_FormInput_Text
      */
-    public static function factory($id = '') {
+    public static function factory($id = null) {
         return new CElement_FormInput_Text($id);
     }
 

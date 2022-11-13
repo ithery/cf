@@ -2,7 +2,7 @@
 
 trait CElement_Trait_UseViewTrait {
     /**
-     * @var CView_View
+     * @var CView_View|string
      */
     protected $view;
 

@@ -9,8 +9,8 @@ class CElement_FormInput_Hidden extends CElement_FormInput {
         $this->type = 'hidden';
     }
 
-    public static function factory($id) {
-        return new static($id);
+    public static function factory($id = null) {
+        return new CElement_FormInput_Hidden($id);
     }
 
     protected function build() {

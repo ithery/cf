@@ -70,8 +70,9 @@ class CElement_Component_Action extends CElement_Component {
         $this->isActive = false;
     }
 
-    public static function factory($id = '') {
-        return new CElement_Component_Action($id);
+    public static function factory($id = null) {
+        // @phpstan-ignore-next-line
+        return new static($id);
     }
 
     /**

@@ -2,7 +2,7 @@
 
 class CElement_FormInput_GoogleRecaptcha extends CElement_FormInput {
     /**
-     * @var CVendor_Google_Recaptcha_AbstractRecaptcha
+     * @var null|CVendor_Google_Recaptcha_AbstractRecaptcha
      */
     protected $recaptcha;
 

@@ -44,6 +44,7 @@ class CElement_Component_ElFinder extends CElement_Component {
         $js = "
             jQuery('#" . $this->id() . "').elfinder(" . json_encode($options) . ');
         ';
+
         return $js;
     }
 }

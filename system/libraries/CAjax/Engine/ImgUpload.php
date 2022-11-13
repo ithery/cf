@@ -13,9 +13,6 @@ class CAjax_Engine_ImgUpload extends CAjax_Engine {
             for ($i = 0; $i < count($_FILES[$inputName]['name']); $i++) {
                 $ext = pathinfo($_FILES[$inputName]['name'][$i], PATHINFO_EXTENSION);
 
-                if (strlen($ext) > 3) {
-                    $ext = substr($ext, 0, 3);
-                }
                 if (in_array(strtolower($ext), ['php', 'sh', 'htm', 'pht'])) {
                     die('Not Allowed X_X');
                 }
@@ -54,9 +51,6 @@ class CAjax_Engine_ImgUpload extends CAjax_Engine {
                 $filename = carr::get($filenameArray, $k);
                 $ext = pathinfo($filename, PATHINFO_EXTENSION);
 
-                if (strlen($ext) > 3) {
-                    $ext = substr($ext, 0, 3);
-                }
                 if (in_array(strtolower($ext), ['php', 'sh', 'htm', 'pht'])) {
                     die('Not Allowed X_X');
                 }

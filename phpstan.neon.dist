@@ -94,5 +94,13 @@ services:
         arguments:
             checkProperties: %checkModelProperties%
     -
+        class: CQC_Phpstan_Service_Rule_StringToClassRule
+        tags:
+            - phpstan.rules.rule
+    -
+        class: CQC_Phpstan_Service_Rule_ClassNotationRule
+        tags:
+            - phpstan.rules.rule
+    -
         class: CQC_Phpstan_Service_CFStubFilesExtension
         tags: [phpstan.stubFilesExtension]

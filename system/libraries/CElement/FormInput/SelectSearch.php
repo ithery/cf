@@ -85,6 +85,7 @@ class CElement_FormInput_SelectSearch extends CElement_FormInput {
     }
 
     public static function factory($id = null) {
+        /** @phpstan-ignore-next-line */
         return new static($id);
     }
 

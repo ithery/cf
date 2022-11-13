@@ -18,6 +18,7 @@ class CElement_Element_Div extends CElement_Element {
     }
 
     public static function factory($id = null) {
+        // @phpstan-ignore-next-line
         return new static($id);
     }
 
