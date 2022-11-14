@@ -16,6 +16,11 @@ class CAjax_Engine_ImgUpload extends CAjax_Engine {
                 if (in_array(strtolower($ext), ['php', 'sh', 'htm', 'pht'])) {
                     die('Not Allowed X_X');
                 }
+
+                if (cstr::startsWith($ext, ['php', 'sh', 'htm', 'pht'])) {
+                    die('Not Allowed X_X');
+                }
+
                 if ($allowedExtension) {
                     if (!in_array(strtolower($ext), $allowedExtension)) {
                         die('Not Allowed X_X');
@@ -54,6 +59,10 @@ class CAjax_Engine_ImgUpload extends CAjax_Engine {
                 if (in_array(strtolower($ext), ['php', 'sh', 'htm', 'pht'])) {
                     die('Not Allowed X_X');
                 }
+                if (cstr::startsWith($ext, ['php', 'sh', 'htm', 'pht'])) {
+                    die('Not Allowed X_X');
+                }
+
                 if ($allowedExtension) {
                     if (!in_array(strtolower($ext), $allowedExtension)) {
                         die('Not Allowed X_X');
