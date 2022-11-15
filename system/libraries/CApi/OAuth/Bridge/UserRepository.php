@@ -44,7 +44,7 @@ class CApi_OAuth_Bridge_UserRepository implements UserRepositoryInterface {
         if (!$user) {
             return;
         } elseif (method_exists($user, 'validateForOAuthPasswordGrant')) {
-            if (!$user->validateForPassportPasswordGrant($password)) {
+            if (!$user->validateForOAuthPasswordGrant($password)) {
                 return;
             }
         } elseif (!$hasher->check($password, $user->getAuthPassword())) {
