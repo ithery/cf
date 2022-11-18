@@ -69,6 +69,10 @@ defined('SYSPATH') or die('No direct access allowed.');
  * @method        bool                           exists()                                                                                 Determine if any rows exist for the current query
  * @method        mixed                          sum($column)                                                                             Retrieve the sum of the values of a given column..
  *
+ * @property-read CModel_HigherOrderBuilderProxy $orWhere
+ * @property-read CModel_HigherOrderBuilderProxy $whereNot
+ * @property-read CModel_HigherOrderBuilderProxy $orWhereNot
+ *
  * @see CModel
  * @see CDatabase_Query_Builder
  */

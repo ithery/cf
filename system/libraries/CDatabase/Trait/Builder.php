@@ -134,6 +134,39 @@ trait CDatabase_Trait_Builder {
     }
 
     /**
+     * Query lazily, by chunks of the given size.
+     *
+     * @param int $chunkSize
+     *
+     * @throws \InvalidArgumentException
+     *
+     * @return \CCollection_LazyCollection
+     */
+    public function lazy($chunkSize = 1000) {
+        if ($chunkSize < 1) {
+            throw new InvalidArgumentException('The chunk size should be at least 1');
+        }
+
+        $this->enforceOrderBy();
+
+        return CCollection_LazyCollection::make(function () use ($chunkSize) {
+            $page = 1;
+
+            while (true) {
+                $results = $this->forPage($page++, $chunkSize)->get();
+
+                foreach ($results as $result) {
+                    yield $result;
+                }
+
+                if ($results->count() < $chunkSize) {
+                    return;
+                }
+            }
+        });
+    }
+
+    /**
      * Execute the query and get the first result.
      *
      * @param array $columns
