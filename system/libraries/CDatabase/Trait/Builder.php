@@ -167,6 +167,86 @@ trait CDatabase_Trait_Builder {
     }
 
     /**
+     * Query lazily, by chunking the results of a query by comparing IDs.
+     *
+     * @param int         $chunkSize
+     * @param null|string $column
+     * @param null|string $alias
+     *
+     * @throws \InvalidArgumentException
+     *
+     * @return \CCollection_LazyCollection
+     */
+    public function lazyById($chunkSize = 1000, $column = null, $alias = null) {
+        return $this->orderedLazyById($chunkSize, $column, $alias);
+    }
+
+    /**
+     * Query lazily, by chunking the results of a query by comparing IDs in descending order.
+     *
+     * @param int         $chunkSize
+     * @param null|string $column
+     * @param null|string $alias
+     *
+     * @throws \InvalidArgumentException
+     *
+     * @return \CCollection_LazyCollection
+     */
+    public function lazyByIdDesc($chunkSize = 1000, $column = null, $alias = null) {
+        return $this->orderedLazyById($chunkSize, $column, $alias, true);
+    }
+
+    /**
+     * Query lazily, by chunking the results of a query by comparing IDs in a given order.
+     *
+     * @param int         $chunkSize
+     * @param null|string $column
+     * @param null|string $alias
+     * @param bool        $descending
+     *
+     * @throws \InvalidArgumentException
+     *
+     * @return \CCollection_LazyCollection
+     */
+    protected function orderedLazyById($chunkSize = 1000, $column = null, $alias = null, $descending = false) {
+        if ($chunkSize < 1) {
+            throw new InvalidArgumentException('The chunk size should be at least 1');
+        }
+
+        if ($column == null) {
+            $column = $this->defaultKeyName();
+        }
+
+        if ($alias == null) {
+            $alias = $column;
+        }
+
+        return CCollection_LazyCollection::make(function () use ($chunkSize, $column, $alias, $descending) {
+            $lastId = null;
+
+            while (true) {
+                $clone = clone $this;
+
+                if ($descending) {
+                    $results = $clone->forPageBeforeId($chunkSize, $lastId, $column)->get();
+                } else {
+                    $results = $clone->forPageAfterId($chunkSize, $lastId, $column)->get();
+                }
+
+                foreach ($results as $result) {
+                    yield $result;
+                }
+
+                if ($results->count() < $chunkSize) {
+                    return;
+                }
+
+                $lastId = $results->last()->{$alias};
+            }
+        });
+    }
+
+    /**
      * Execute the query and get the first result.
      *
      * @param array $columns
