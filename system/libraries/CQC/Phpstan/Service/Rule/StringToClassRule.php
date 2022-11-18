@@ -32,6 +32,9 @@ final class CQC_Phpstan_Service_Rule_StringToClassRule implements Rule {
             $className = \substr($className, 1);
         }
         $messages = [];
+        if (!$this->startsWithUpper($className)) {
+            return $messages;
+        }
         if (!\preg_match('/^\\w.+\\w$/u', $className)) {
             return $messages;
         }
@@ -47,5 +50,11 @@ final class CQC_Phpstan_Service_Rule_StringToClassRule implements Rule {
         return [
             \sprintf('Class %s should be written with ::class notation, string found.', $className),
         ];
+    }
+
+    private function startsWithUpper($str) {
+        $chr = mb_substr($str, 0, 1, 'UTF-8');
+
+        return mb_strtolower($chr, 'UTF-8') != $chr;
     }
 }
