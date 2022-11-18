@@ -191,7 +191,7 @@ class CElement_FormInput_Date extends CElement_FormInput {
                 },
                 toValue: function (date, format, language) {
                     let dateUnformat = cresenity.formatter.unformatDate(date,'" . $this->dateFormat . "');
-                    dateUnformat.setHours(dateUnformat.getUTCHours());//FIX for datepicker
+                    // dateUnformat.setHours(dateUnformat.getUTCHours());//FIX for datepicker
                     return dateUnformat;
                 }
             }
