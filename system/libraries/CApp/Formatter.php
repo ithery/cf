@@ -184,7 +184,7 @@ class CApp_Formatter {
     }
 
     public function formatNumber($x, $decimalSeparator = null, $thousandSeparator = null) {
-        return $this->formatDecimal($x, 0, $decimalSeparator, $thousandSeparator);
+        return $this->formatDecimal($x, 0, $decimalSeparator, $thousandSeparator, true);
     }
 
     public function formatDecimal($x, $decimalDigit = null, $decimalSeparator = null, $thousandSeparator = null, $stripZeroDecimal = false) {
