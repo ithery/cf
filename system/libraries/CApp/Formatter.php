@@ -175,7 +175,7 @@ class CApp_Formatter {
 
         $x = number_format((float) $x, $decimalDigit, $decimalSeparator, $thousandSeparator);
         if ($stripZeroDecimal) {
-            if (substr($x, ($decimalDigit + 1) * -1) === '.' . cstr::repeat('0', $decimalDigit)) {
+            if (substr($x, ($decimalDigit + 1) * -1) === $decimalSeparator . cstr::repeat('0', $decimalDigit)) {
                 $x = substr($x, 0, ($decimalDigit + 1) * -1);
             }
         }
@@ -184,7 +184,7 @@ class CApp_Formatter {
     }
 
     public function formatNumber($x, $decimalSeparator = null, $thousandSeparator = null) {
-        return $this->formatDecimal($x, 0, $decimalSeparator, $thousandSeparator);
+        return $this->formatDecimal($x, 0, $decimalSeparator, $thousandSeparator, true);
     }
 
     public function formatDecimal($x, $decimalDigit = null, $decimalSeparator = null, $thousandSeparator = null, $stripZeroDecimal = false) {
