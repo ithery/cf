@@ -4,7 +4,14 @@ class Controller_Demo_Controls_Querybuilder extends \Cresenity\Demo\Controller {
     public function index() {
         $app = c::app();
         $query = c::request()->post('query');
+        $app->add(<<<HTML
+        <style>
+        .query-builder.form-inline {
+            display: block!important;
+        }
 
+        </style>
+        HTML);
         if ($query) {
             $modelQuery = CElement_FormInput_QueryBuilder::parseToModelQuery($query, \Cresenity\Demo\Model\Country::class);
             /** @var CModel_Query $modelQuery */
