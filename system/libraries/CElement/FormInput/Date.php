@@ -33,7 +33,7 @@ class CElement_FormInput_Date extends CElement_FormInput {
         } else {
             CManager::instance()->registerModule('datepicker');
         }
-
+        //CManager::instance()->registerModule('datepicker');
         $this->type = 'date';
         $this->dateFormat = c::formatter()->getDateFormat();
 
@@ -187,12 +187,17 @@ class CElement_FormInput_Date extends CElement_FormInput {
         $jsOption = "
             format: {
                 toDisplay: function (date, format, language) {
-                    return cresenity.formatter.formatDate(new Date(date),'" . $this->dateFormat . "');
+                    let timezoneOffset = date.getTimezoneOffset();
+                    let newDate = new Date(date.getTime() + (timezoneOffset * 60000));
+                    let formatted = cresenity.formatter.formatDate(newDate,'" . $this->dateFormat . "');
+
+                    return formatted;
                 },
                 toValue: function (date, format, language) {
                     let dateUnformat = cresenity.formatter.unformatDate(date,'" . $this->dateFormat . "');
-                    // dateUnformat.setHours(dateUnformat.getUTCHours());//FIX for datepicker
-                    return dateUnformat;
+                    let timezoneOffset = dateUnformat.getTimezoneOffset();
+                    return new Date(dateUnformat.getTime() - (timezoneOffset * 60000));
+
                 }
             }
             ,language: 'custom'
