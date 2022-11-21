@@ -287,6 +287,20 @@ trait CObservable_Trait_ControlTrait {
     }
 
     /**
+     * Create Image Ajax Control.
+     *
+     * @param null|string $id
+     *
+     * @return CElement_FormInput_FileAjax
+     */
+    public function addFileAjaxControl($id = null) {
+        $control = new CElement_FormInput_FileAjax($id);
+        $this->wrapper->add($control);
+
+        return $control;
+    }
+
+    /**
      * Create Multiple Image Ajax Control.
      *
      * @param null|string $id
