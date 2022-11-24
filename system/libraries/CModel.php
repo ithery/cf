@@ -14,6 +14,7 @@ defined('SYSPATH') or die('No direct access allowed.');
  * @method static static                                     findOrFail($id, $columns = ['*'])                                                        Find a model by its primary key or throw an exception.
  * @method static CModel|CModel_Query|static|null            first($columns = ['*'])                                                                  Execute the query and get the first result.
  * @method static CModel|CModel_Query|static                 firstOrFail($columns = ['*'])                                                            Execute the query and get the first result or throw an exception.
+ * @method static CModel|CModel_Query|static                 firstOrNew(array $attributes, array $values = [])                                        Get the first record matching the attributes or instantiate it.
  * @method static CModel_Collection|CModel_Query[]|static[]  get($columns = ['*'])                                                                    Execute the query as a "select" statement.
  * @method        mixed                                      value($column)                                                                           Get a single column's value from the first result of a query.
  * @method        mixed                                      pluck($column)                                                                           Get a single column's value from the first result of a query.
@@ -1039,6 +1040,7 @@ abstract class CModel implements ArrayAccess, CInterface_Arrayable, CInterface_J
      * Begin querying the model.
      *
      * @return CModel_Query|static
+     *
      * @phpstan-return CModel_Query<static>|static
      */
     public static function query() {
