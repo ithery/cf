@@ -236,7 +236,7 @@ class CConsole_Command_Model_ModelUpdateCommand extends CConsole_Command_AppComm
 
     private function getFields() {
         $table = $this->getTable();
-        $excludedFields = ['created', 'createdby', 'updated', 'updatedby', 'deleted', 'deletedby', 'status'];
+        $excludedFields = ['created', 'createdby', 'updated', 'updatedby', 'status'];
         $db = c::db();
 
         $result = $db->getSchemaManager()->listTableColumns($table);

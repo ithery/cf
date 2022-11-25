@@ -194,7 +194,7 @@ class CVendor {
     /**
      * @param array $options
      *
-     * @return \CVendor_Firebase
+     * @return \CVendor_Twilio
      */
     public static function twilio($options = null) {
         if (!is_array($options)) {

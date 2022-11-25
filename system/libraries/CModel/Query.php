@@ -406,6 +406,8 @@ class CModel_Query {
      * @param array $columns
      *
      * @return CModel
+     *
+     * @phpstan-return TModelClass
      */
     public function findOrNew($id, $columns = ['*']) {
         if (!is_null($model = $this->find($id, $columns))) {
@@ -422,6 +424,8 @@ class CModel_Query {
      * @param array $values
      *
      * @return CModel
+     *
+     * @phpstan-return TModelClass
      */
     public function firstOrNew(array $attributes, array $values = []) {
         if (!is_null($instance = $this->where($attributes)->first())) {

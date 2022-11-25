@@ -42,7 +42,7 @@ final class CQC_Phpstan_Service_Rule_ClassNotationRule implements Rule {
         $fqcn = $node->namespacedName->toString();
         if ($node instanceof Interface_) {
             if (!\preg_match('/Interface$/', $name)) {
-                $messages[] = \sprintf('Interface %s should end with "Interface" suffix.', $fqcn);
+                // $messages[] = \sprintf('Interface %s should end with "Interface" suffix.', $fqcn);
             }
         } elseif ($node instanceof Trait_) {
             if (!\preg_match('/Trait$/', $name)) {
