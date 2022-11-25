@@ -2,11 +2,20 @@
 
 /**
  * @mixin CModel_Query
+ *
+ * @template TRelatedModel of \CModel
  */
 abstract class CModel_Relation {
     use CTrait_ForwardsCalls, CTrait_Macroable {
         __call as macroCall;
     }
+
+    /**
+     * An array to map class names to their morph names in database.
+     *
+     * @var array
+     */
+    public static $morphMap = [];
 
     /**
      * The model query builder instance.
@@ -35,13 +44,6 @@ abstract class CModel_Relation {
      * @var bool
      */
     protected static $constraints = true;
-
-    /**
-     * An array to map class names to their morph names in database.
-     *
-     * @var array
-     */
-    public static $morphMap = [];
 
     /**
      * The count of self joins.
@@ -324,7 +326,7 @@ abstract class CModel_Relation {
     /**
      * Set or get the morph map for polymorphic relations.
      *
-     * @param array|null $map
+     * @param null|array $map
      * @param bool       $merge
      *
      * @return array
@@ -342,9 +344,9 @@ abstract class CModel_Relation {
     /**
      * Builds a table-keyed array from model class names.
      *
-     * @param string[]|null $models
+     * @param null|string[] $models
      *
-     * @return array|null
+     * @return null|array
      */
     protected static function buildMorphMapFromModels(array $models = null) {
         if (is_null($models) || carr::isAssoc($models)) {
@@ -352,7 +354,7 @@ abstract class CModel_Relation {
         }
 
         return array_combine(array_map(function ($model) {
-            return (new $model)->getTable();
+            return (new $model())->getTable();
         }, $models), $models);
     }
 
@@ -361,7 +363,7 @@ abstract class CModel_Relation {
      *
      * @param string $alias
      *
-     * @return string|null
+     * @return null|string
      */
     public static function getMorphedModel($alias) {
         return array_key_exists($alias, self::$morphMap) ? self::$morphMap[$alias] : null;

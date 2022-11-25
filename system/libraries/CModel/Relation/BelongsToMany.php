@@ -1,5 +1,9 @@
 <?php
-
+/**
+ * @template TRelatedModel of \CModel
+ *
+ * @extends CModel_Relation<TRelatedModel>
+ */
 class CModel_Relation_BelongsToMany extends CModel_Relation {
     use CModel_Relation_Trait_InteractsWithPivotTable;
 
