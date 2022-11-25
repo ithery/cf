@@ -75,7 +75,7 @@ class CApp_OpenGraph {
      *
      * @param bool $validate
      *
-     * @return OpenGraph
+     * @return CApp_OpenGraph
      */
     public function validate($validate = true) {
         $this->validate = $validate;
@@ -115,7 +115,7 @@ class CApp_OpenGraph {
      *
      * @param string $name
      *
-     * @return OpenGraph
+     * @return CApp_OpenGraph
      */
     public function forget($name) {
         foreach ($this->tags as $key => $tag) {
@@ -130,7 +130,7 @@ class CApp_OpenGraph {
     /**
      * Remove all tags.
      *
-     * @return OpenGraph
+     * @return CApp_OpenGraph
      */
     public function clear() {
         $this->tags = [];
@@ -145,7 +145,7 @@ class CApp_OpenGraph {
      * @param mixed  $value    The value of the tag
      * @param bool   $prefixed Add the "og"-prefix?
      *
-     * @return OpenGraph
+     * @return CApp_OpenGraph
      */
     public function tag($name, $value, $prefixed = true) {
         $value = $this->convertDate($value);
@@ -162,7 +162,7 @@ class CApp_OpenGraph {
      * @param string[] $valid      Array with names of valid attributes
      * @param bool     $prefixed   Add the "og"-prefix?
      *
-     * @return OpenGraph
+     * @return CApp_OpenGraph
      */
     public function attributes($tagName, array $attributes = [], array $valid = [], $prefixed = true) {
         foreach ($attributes as $name => $value) {
@@ -185,7 +185,7 @@ class CApp_OpenGraph {
      * @param array    $attributes Array with attributes (pairs of name and value)
      * @param string[] $valid      Array with names of valid attributes
      *
-     * @return OpenGraph
+     * @return CApp_OpenGraph
      */
     public function unprefixedAttributes($tagName, array $attributes = [], array $valid = []) {
         return $this->attributes($tagName, $attributes, $valid, false);
@@ -196,7 +196,7 @@ class CApp_OpenGraph {
      *
      * @param string $title
      *
-     * @return OpenGraph
+     * @return CApp_OpenGraph
      */
     public function title($title) {
         $title = trim($title);
@@ -214,7 +214,7 @@ class CApp_OpenGraph {
      *
      * @param string $type
      *
-     * @return OpenGraph
+     * @return CApp_OpenGraph
      */
     public function type($type) {
         $types = [
@@ -247,7 +247,7 @@ class CApp_OpenGraph {
      * @param string     $imageFile  The URL of the image file
      * @param null|array $attributes Array with additional attributes (pairs of name and value)
      *
-     * @return OpenGraph
+     * @return CApp_OpenGraph
      */
     public function image($imageFile, array $attributes = null) {
         if ($this->validate and !$imageFile) {
@@ -300,7 +300,7 @@ class CApp_OpenGraph {
      *
      * @param string $url
      *
-     * @return OpenGraph
+     * @return CApp_OpenGraph
      */
     public function url($url = null) {
         return curl::httpbase();
@@ -335,7 +335,7 @@ class CApp_OpenGraph {
      *
      * @param string $locale
      *
-     * @return OpenGraph
+     * @return CApp_OpenGraph
      */
     public function locale($locale) {
         if ($this->validate and !$locale) {
@@ -352,7 +352,7 @@ class CApp_OpenGraph {
      *
      * @param string[] $locales An array of alternative locales
      *
-     * @return OpenGraph
+     * @return CApp_OpenGraph
      */
     public function localeAlternate(array $locales = []) {
         if (is_string($locales)) {
@@ -374,7 +374,7 @@ class CApp_OpenGraph {
      *
      * @param string $siteName
      *
-     * @return OpenGraph
+     * @return CApp_OpenGraph
      */
     public function siteName($siteName) {
         if ($this->validate and !$siteName) {
@@ -391,7 +391,7 @@ class CApp_OpenGraph {
      *
      * @param string $determiner
      *
-     * @return OpenGraph
+     * @return CApp_OpenGraph
      */
     public function determiner($determiner = '') {
         $enum = [
@@ -416,7 +416,7 @@ class CApp_OpenGraph {
      * @param string     $audioFile  The URL of the video file
      * @param null|array $attributes Array with additional attributes (pairs of name and value)
      *
-     * @return OpenGraph
+     * @return CApp_OpenGraph
      */
     public function audio($audioFile, array $attributes = null) {
         if ($this->validate and !$audioFile) {
@@ -481,7 +481,7 @@ class CApp_OpenGraph {
      * @param string     $videoFile  The URL of the video file
      * @param null|array $attributes Array with additional attributes (pairs of name and value)
      *
-     * @return OpenGraph
+     * @return CApp_OpenGraph
      */
     public function video($videoFile, array $attributes = null) {
         if ($this->validate and !$videoFile) {
@@ -528,7 +528,7 @@ class CApp_OpenGraph {
      *
      * @param array $attributes Array with attributes (pairs of name and value)
      *
-     * @return OpenGraph
+     * @return CApp_OpenGraph
      */
     public function article(array $attributes = []) {
         $tag = $this->lastTag('type');
@@ -553,7 +553,7 @@ class CApp_OpenGraph {
      *
      * @param array $attributes Array with attributes (pairs of name and value)
      *
-     * @return OpenGraph
+     * @return CApp_OpenGraph
      */
     public function book(array $attributes = []) {
         $tag = $this->lastTag('type');
@@ -576,7 +576,7 @@ class CApp_OpenGraph {
      *
      * @param array $attributes Array with attributes (pairs of name and value)
      *
-     * @return OpenGraph
+     * @return CApp_OpenGraph
      */
     public function profile(array $attributes = []) {
         $tag = $this->lastTag('type');
@@ -599,7 +599,7 @@ class CApp_OpenGraph {
      *
      * @param string $template The template string
      *
-     * @return OpenGraph
+     * @return CApp_OpenGraph
      */
     public function template($template) {
         $this->template = $template;

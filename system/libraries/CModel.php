@@ -20,7 +20,7 @@ defined('SYSPATH') or die('No direct access allowed.');
  * @method        mixed                                      pluck($column)                                                                           Get a single column's value from the first result of a query.
  * @method        void                                       chunk($count, callable $callback)                                                        Chunk the results of the query.
  * @method        \CCollection                               lists($column, $key = null)                                                              Get an array with the values of a given column.
- * @method        \CPagination_LengthAwarePaginatorInterface paginate($perPage = null, $columns = ['*'], $pageName = 'page', $page = null)            Paginate the given query.
+ * @method        \CPagination_LengthAwarePaginator          paginate($perPage = null, $columns = ['*'], $pageName = 'page', $page = null)            Paginate the given query.
  * @method        \CPagination_PaginatorInterface            simplePaginate($perPage = null, $columns = ['*'], $pageName = 'page')                    Paginate the given query into a simple paginator.
  * @method        void                                       onDelete(Closure $callback)                                                              Register a replacement for the default delete function.
  * @method        CModel[]                                   getModels($columns = ['*'])                                                              Get the hydrated models without eager loading.
