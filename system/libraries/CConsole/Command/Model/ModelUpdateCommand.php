@@ -252,8 +252,9 @@ class CConsole_Command_Model_ModelUpdateCommand extends CConsole_Command_AppComm
                 //when type is boolean, we cast it on int first then cast again when cast defined
                 $type = 'int';
             }
-            $casts = $modelInstance->getCasts();
 
+            $casts = $modelInstance->getCasts();
+            $casts = $this->sanitizeCastType($casts);
             $type = carr::get($casts, $field, $type);
             $type = $this->getType($type);
 
@@ -267,6 +268,16 @@ class CConsole_Command_Model_ModelUpdateCommand extends CConsole_Command_AppComm
         }
 
         return $properties;
+    }
+
+    private function sanitizeCastType($casts) {
+        foreach ($casts as $key => $cast) {
+            if (cstr::startsWith($cast, 'date:')) {
+                $casts[$key] = 'datetime';
+            }
+        }
+
+        return $casts;
     }
 
     private function getType(string $type) {
@@ -358,7 +369,6 @@ class CConsole_Command_Model_ModelUpdateCommand extends CConsole_Command_AppComm
                 }
             }
         }
-
         while (true) {
             $missingIndex = $this->getMissingPropertyIndex($properties, $fields);
             if ($missingIndex !== false) {
