@@ -985,6 +985,8 @@ class CDatabase {
      *
      * @param \Closure $callback
      *
+     * @deprecated since 1.5 use CEvent::dispatcher()->listen(CDatabase_Event_OnQueryExecuted::class, function (CDatabase_Event_OnQueryExecuted $query) {});
+     *
      * @return void
      */
     public function listenOnQueryExecuted(Closure $callback) {
@@ -1034,6 +1036,7 @@ class CDatabase {
 
     public function unsetEventDispatcher() {
         $this->events = null;
+
         return $this;
     }
 
