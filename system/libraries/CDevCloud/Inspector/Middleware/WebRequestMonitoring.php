@@ -59,9 +59,7 @@ class CDevCloud_Inspector_Middleware_WebRequestMonitoring implements TerminableI
      * @param \CHTTP_Response $response
      */
     public function terminate($request, $response) {
-
         if (CDevCloud::inspector()->isRecording() && CDevCloud::inspector()->hasTransaction()) {
-
             CDevCloud::inspector()->currentTransaction()
                 ->addContext('Request Body', CDevCloud_Inspector_Filters::hideParameters(
                     $request->request->all(),

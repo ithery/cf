@@ -23,4 +23,17 @@ class CDevCloud {
 
         return self::$inspector;
     }
+
+    public static function bootInspector() {
+        if (CF::config('devcloud.inspector.enable', true)) {
+            $providers = [
+                CDevCloud_Inspector_Provider_DatabaseQueryProvider::class,
+                CDevCloud_Inspector_Provider_ExceptionServiceProvider::class,
+                CDevCloud_Inspector_Provider_TaskQueueServiceProvider::class,
+            ];
+            foreach ($providers as $provider) {
+                c::container()->make($provider)->boot();
+            }
+        }
+    }
 }

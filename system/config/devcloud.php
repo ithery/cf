@@ -13,7 +13,7 @@ return [
         |
         */
 
-        'enable' => c::env('DEVCLOUD_INSPECTOR_ENABLE', true),
+        'enable' => c::env('DEVCLOUD_INSPECTOR_ENABLE', false),
 
         /*
         |--------------------------------------------------------------------------
