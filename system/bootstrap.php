@@ -20,7 +20,7 @@ CBootstrap::instance()->addBootstrapper([
 $domain = CF::domain();
 
 CException::init();
-
+CModel::setEventDispatcher(CEvent::dispatcher());
 if (CF::config('collector.exception')) {
     CException::exceptionHandler()->reportable(function (Exception $e) {
         CDebug::collector()->collectException($e);

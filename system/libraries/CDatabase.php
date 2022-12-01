@@ -269,7 +269,7 @@ class CDatabase {
         }
 
         $this->events = CEvent::dispatcher();
-        CModel::setEventDispatcher($this->events);
+
         $this->configuration = new CDatabase_Configuration();
         // Validate the driver
         if (!($this->driver instanceof CDatabase_Driver)) {
