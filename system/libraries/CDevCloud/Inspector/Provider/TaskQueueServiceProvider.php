@@ -93,7 +93,7 @@ class CDevCloud_Inspector_Provider_TaskQueueServiceProvider extends CDevCloud_In
         if (array_key_exists($id, $this->segments)) {
             $this->segments[$id]->end();
         } else {
-            CDevCloud::inspector()->currentTransaction()
+            CDevCloud::inspector()->transaction()
                 ->setResult($failed ? 'error' : 'success');
         }
 

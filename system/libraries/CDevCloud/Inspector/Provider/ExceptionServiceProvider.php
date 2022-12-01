@@ -29,9 +29,9 @@ class CDevCloud_Inspector_Provider_ExceptionServiceProvider extends CDevCloud_In
 
         // Collect general log messages
         if (CDevCloud::inspector()->isRecording() && CDevCloud::inspector()->hasTransaction()) {
-            CDevCloud::inspector()->currentTransaction()
+            CDevCloud::inspector()->transaction()
                 ->addContext('logs', array_merge(
-                    CDevCloud::inspector()->currentTransaction()->getContext()['logs'] ?? [],
+                    CDevCloud::inspector()->transaction()->getContext()['logs'] ?? [],
                     [
                         compact('level', 'message')
                     ]
@@ -49,6 +49,6 @@ class CDevCloud_Inspector_Provider_ExceptionServiceProvider extends CDevCloud_In
         }
 
         CDevCloud::inspector()->reportException($exception, false);
-        CDevCloud::inspector()->currentTransaction()->setResult('error');
+        CDevCloud::inspector()->transaction()->setResult('error');
     }
 }
