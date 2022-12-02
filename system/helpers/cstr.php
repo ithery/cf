@@ -387,6 +387,21 @@ class cstr {
     }
 
     /**
+     * Humanize the given value into a proper name.
+     *
+     * @param string $value
+     *
+     * @return string
+     */
+    public static function humanize($value) {
+        if (is_object($value)) {
+            return static::humanize(c::classBasename(get_class($value)));
+        }
+
+        return cstr::title(cstr::snake($value, ' '));
+    }
+
+    /**
      * Convert the given string to title case for each word.
      *
      * @param string $value
