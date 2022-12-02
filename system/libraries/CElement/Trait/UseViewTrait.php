@@ -105,10 +105,18 @@ trait CElement_Trait_UseViewTrait {
     }
 
     public function html($indent = 0) {
+        if (method_exists($this, 'buildOnce')) {
+            $this->buildOnce();
+        }
+
         return $this->getViewHtml();
     }
 
     public function js($indent = 0) {
+        if (method_exists($this, 'buildOnce')) {
+            $this->buildOnce();
+        }
+
         return $this->getViewJs();
     }
 }

@@ -6,7 +6,7 @@ class Controller_Demo_Elements_Metric_Value extends \Cresenity\Demo\Controller {
 
         $divRow = $app->addDiv()->addClass('row');
         $divCol = $divRow->addClass('col-md-4');
-        $divCol->addValueMetric();
+        $divCol->addValueMetric()->setIcon('ti ti-layers');
 
         return $app;
     }
