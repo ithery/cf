@@ -22,7 +22,7 @@ abstract class CElement extends CObservable {
 
     protected $after;
 
-    public function __construct($id = '', $tag = 'div') {
+    public function __construct($id = null, $tag = 'div') {
         parent::__construct($id);
 
         $this->classes = [];
