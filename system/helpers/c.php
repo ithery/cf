@@ -358,6 +358,17 @@ class c {
         return CCarbon::now($tz);
     }
 
+    /**
+     * Create a new Carbon instance for the current date.
+     *
+     * @param null|\DateTimeZone|string $tz
+     *
+     * @return CCarbon
+     */
+    public static function today($tz = null) {
+        return CCarbon::today($tz);
+    }
+
     public static function hrtime($getAsNumber = false) {
         if (function_exists('hrtime')) {
             return hrtime($getAsNumber);
