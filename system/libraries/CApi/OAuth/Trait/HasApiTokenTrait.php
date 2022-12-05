@@ -23,7 +23,7 @@ trait CApi_OAuth_Trait_HasApiTokenTrait {
      * @return \CModel_Relation_HasMany
      */
     public function oauthAccessToken() {
-        return $this->hasMany(CApi::oauth()->tokenModel(), 'user_id')->orderBy('created_at', 'desc');
+        return $this->hasMany(CApi::oauth()->tokenModel(), 'user_id')->orderBy('created', 'desc');
     }
 
     /**
