@@ -1,4 +1,7 @@
 @php
+if (!isset($iconClass)) {
+    $iconClass = 'text-success';
+}
 if (!isset($icon)) {
     $icon = 'lnr lnr-cart';
 }
@@ -29,7 +32,9 @@ if(!isset($isUp)) {
 <div class="card card-small mb-3 w-100">
     <div class="card-body">
         <div class="d-flex align-items-center">
-            <div class="{{ $icon }}"></div>
+            <div class="{{ $iconClass }}">
+                <i class="{{ $icon }}"></i>
+            </div>
             <div class="ml-3">
                 @if($label)
                 <div class="text-muted small">{{ $label }}</div>
