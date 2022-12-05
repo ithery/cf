@@ -1608,6 +1608,19 @@ class c {
         return $callback;
     }
 
+    /**
+     * @param callable|Closure|SerializableClosure $callback
+     *
+     * @return bool
+     */
+    public static function isCallable($callback) {
+        if ($callback instanceof SerializableClosure) {
+            return true;
+        }
+
+        return is_callable($callback);
+    }
+
     public static function isHtml($string) {
         return preg_match('/<[^<]+>/', $string, $m) != 0;
     }
@@ -1765,6 +1778,10 @@ class c {
      */
     public static function gate() {
         return CAuth_Access_Gate::instance();
+    }
+
+    public static function resolveUserTimezone(CHTTP_Request $request) {
+        return $request->timezone;
     }
 }
 

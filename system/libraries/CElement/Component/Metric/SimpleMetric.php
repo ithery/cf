@@ -10,7 +10,7 @@ class CElement_Component_Metric_ValueMetric extends CElement_Component {
 
     public function __construct($id = null) {
         parent::__construct($id);
-        $this->view = 'cresenity/element/component/metric/value';
+        $this->view = 'cresenity/element/component/metric/simple';
     }
 
     public function setValueFromModel($model, $callback) {

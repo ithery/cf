@@ -5,9 +5,15 @@ class Controller_Demo_Elements_Metric_Value extends \Cresenity\Demo\Controller {
         $app = c::app();
 
         $divRow = $app->addDiv()->addClass('row');
-        $divCol = $divRow->addClass('col-md-4');
+        $divCol = $divRow->addDiv()->addClass('col-md-3');
+
         $valueMetric = $divCol->addValueMetric()->setIcon('ti ti-layers');
         $valueMetric->setLabel('Country')->setValue(\Cresenity\Demo\Model\Country::count());
+
+        $divCol = $divRow->addDiv()->addClass('col-md-3');
+
+        $valueMetric = $divCol->addValueMetric()->setIcon('ti ti-user');
+        $valueMetric->setLabel('ISG Avg')->setValue(\Cresenity\Demo\Model\Country::avg('isg'));
 
         return $app;
     }
