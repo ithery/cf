@@ -1,6 +1,6 @@
 @php
 if (!isset($iconClass)) {
-    $iconClass = 'text-success';
+    $iconClass = 'text-success fa-2x';
 }
 if (!isset($icon)) {
     $icon = 'lnr lnr-cart';
