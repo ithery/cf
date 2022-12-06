@@ -5,10 +5,12 @@
  *
  * @property CCollection|CModel_Metable_Meta[] $meta
  *
- * @method static CModel_Query|static whereHasMeta($key): void
+ * @method static CModel_Query|static whereHasMeta($key)
  * @method static CModel_Query|static whereDoesntHaveMeta($key)
  * @method static CModel_Query|static whereHasMetaKeys(array $keys)
  * @method static CModel_Query|static whereMeta(string $key, $operator, $value = null)
+ * @method static CModel_Query|static whereMetaNotNull(string $key)
+ * @method static CModel_Query|static whereMetaNull(string $key)
  * @method static CModel_Query|static whereMetaNumeric(string $key, string $operator, $value)
  * @method static CModel_Query|static whereMetaIn(string $key, array $values)
  * @method static CModel_Query|static orderByMeta(string $key, string $direction = 'asc', $strict = false)
@@ -326,6 +328,32 @@ trait CModel_Metable_MetableTrait {
         $q->whereHas('meta', function (CModel_Query $q) use ($key, $operator, $value) {
             $q->where('key', $key);
             $q->where('value', $operator, $value);
+        });
+    }
+
+    /**
+     * @param CModel_Query $q
+     * @param string       $key
+     *
+     * @return void
+     */
+    public function scopeWhereMetaNotNull(CModel_Query $q, $key) {
+        $q->whereHas('meta', function (CModel_Query $q) use ($key) {
+            $q->where('key', $key);
+            $q->whereNotNull('value');
+        });
+    }
+
+    /**
+     * @param CModel_Query $q
+     * @param string       $key
+     *
+     * @return void
+     */
+    public function scopeWhereMetaNull(CModel_Query $q, $key) {
+        $q->whereHas('meta', function (CModel_Query $q) use ($key) {
+            $q->where('key', $key);
+            $q->whereNull('value');
         });
     }
 

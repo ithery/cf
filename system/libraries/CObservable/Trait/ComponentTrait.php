@@ -269,4 +269,15 @@ trait CObservable_Trait_ComponentTrait {
             $this->wrapper->add($el);
         });
     }
+
+    /**
+     * @param null|string $id
+     *
+     * @return CElement_Component_Metric_ValueMetric
+     */
+    public function addValueMetric($id = null) {
+        return c::tap(new CElement_Component_Metric_ValueMetric($id), function (CElement_Component_Metric_ValueMetric $el) {
+            $this->wrapper->add($el);
+        });
+    }
 }

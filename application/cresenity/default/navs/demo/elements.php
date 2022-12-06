@@ -50,4 +50,9 @@ return [
         'label' => c::__('Gallery'),
         'uri' => 'demo/elements/gallery/index',
     ],
+    [
+        'name' => 'elements.metric',
+        'label' => c::__('Metric'),
+        'subnav' => include dirname(__FILE__) . '/elements/metric.php',
+    ],
 ];
