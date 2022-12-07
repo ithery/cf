@@ -23,7 +23,11 @@ trait CElement_Component_DataTable_Trait_HtmlTrait {
         $wrapped = $this->applyDataTable || $this->haveHeaderAction() || $this->haveFooterAction() || strlen($this->title) > 0;
         $classes = $this->classes;
         $tableClass = is_array($classes) ? implode(' ', $classes) : '';
-
+        $custom_css = $this->custom_css;
+        $custom_css = $this->renderStyle($custom_css);
+        if (strlen($custom_css) > 0) {
+            $custom_css = ' style="' . $custom_css . '"';
+        }
         if ($wrapped) {
             $widgetWrapperClass = c::theme('widget.class.wrapper', 'widget-box');
             $widgetHeaderClass = c::theme('widget.class.header', 'widget-title');
@@ -39,7 +43,7 @@ trait CElement_Component_DataTable_Trait_HtmlTrait {
             if ($this->haveDataTableViewAction) {
                 $mainClassTitle .= ' with-elements';
             }
-            $html->appendln('<div id="' . $this->id() . '-widget-box" class="' . $mainClass . ' widget-table">')->incIndent();
+            $html->appendln('<div id="' . $this->id() . '-widget-box" class="' . $mainClass . ' widget-table" ' . $custom_css . '>')->incIndent();
             $showTitle = (strlen($this->title) > 0) || $this->haveHeaderAction();
             if ($showTitle) {
                 $html->appendln('<div class="' . $mainClassTitle . '">')->incIndent();
@@ -281,7 +285,7 @@ trait CElement_Component_DataTable_Trait_HtmlTrait {
         if ($this->headerNoLineBreak) {
             $thClass = ' no-line-break';
         }
-        $htmlResponsiveOpen = '<div class="table-responsive">';
+        $htmlResponsiveOpen = '<div class="table-responsive" style="overflow: visible;">';
         $htmlResponsiveClose = '</div>';
         if ($this->responsive) {
             $htmlResponsiveOpen = '<div class="span12" style="overflow: auto;margin-left: 0;">';
