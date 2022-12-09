@@ -5,10 +5,7 @@
  * @see CMetric
  */
 class CMetric_Metric {
-    /**
-     * @var CMetric_DriverAbstract
-     */
-    protected $driver;
+    use CMetric_Trait_HasDriverTrait;
 
     /**
      * @var
@@ -192,7 +189,7 @@ class CMetric_Metric {
     }
 
     private function escapeFieldValue($value) {
-        $value = str_replace([' ', '"'. '\\'], ['\ ', '\"', '\\\\'], $value);
+        $value = str_replace([' ', '"' . '\\'], ['\ ', '\"', '\\\\'], $value);
 
         return $value;
     }
@@ -257,28 +254,6 @@ class CMetric_Metric {
      */
     public function add() {
         $this->getDriver()->add($this);
-    }
-
-    /**
-     * Return our own driver if we have one, otherwise our Metrics default driver.
-     *
-     * @return AbstractDriver
-     */
-    public function getDriver() {
-        return $this->driver
-            ? $this->driver
-            : CMetric_Manager::instance()->driver();
-    }
-
-    /**
-     * @param CMetric_DriverAbstract $driver
-     *
-     * @return $this
-     */
-    public function setDriver(CMetric_DriverAbstract $driver) {
-        $this->driver = $driver;
-
-        return $this;
     }
 
     /**

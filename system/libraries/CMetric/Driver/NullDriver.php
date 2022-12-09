@@ -19,4 +19,13 @@ class CMetric_Driver_NullDriver extends CMetric_DriverAbstract {
     public function format(CMetric_Metric $metric) {
         return [];
     }
+
+    /**
+     * @param CMetric_QueryBuilder $query
+     *
+     * @return array
+     */
+    public function query(CMetric_QueryBuilder $query) {
+        return [];
+    }
 }

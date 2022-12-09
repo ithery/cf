@@ -20,11 +20,17 @@ class CMetric_Driver_InfluxDBDriver extends CMetric_DriverAbstract {
     protected $precision;
 
     /**
+     * @var string
+     */
+    protected $bucket;
+
+    /**
      * InfluxDB constructor.
      *
      * @param array $options
      */
     public function __construct(array $options) {
+        $this->bucket = carr::get($options, 'bucket');
         $this->client = new Client(carr::only($options, ['url', 'token', 'bucket', 'org', 'precision']));
         $this->precision = carr::get($options, 'precision', WritePrecision::NS);
     }
@@ -124,5 +130,71 @@ class CMetric_Driver_InfluxDBDriver extends CMetric_DriverAbstract {
      */
     public function getPoints() {
         return $this->points;
+    }
+
+    /**
+     * @param CMetric_QueryBuilder $query
+     *
+     * @return string
+     */
+    public function formatQuery(CMetric_QueryBuilder $query) {
+        if ($query->getFrom() == null) {
+            $query->setFrom($this->bucket);
+        }
+
+        return (new CMetric_Driver_InfluxDBDriver_FluxFormatter($query))->toFluxString();
+    }
+
+    public function getBuckets() {
+        $result = $this->client->createQueryApi()->query('buckets()');
+        $first = carr::first($result);
+        $buckets = [];
+        foreach ($first->records as $record) {
+            $buckets[] = $record->values['name'];
+        }
+
+        return $buckets;
+    }
+
+    public function getMeasurements($bucket = null) {
+        if ($bucket == null) {
+            $bucket = $this->bucket;
+        }
+        $result = $this->client->createQueryApi()->query('import "influxdata/influxdb/schema"' . PHP_EOL . PHP_EOL . 'schema.measurements(bucket: "' . $bucket . '")');
+        $first = carr::first($result);
+        $measurements = [];
+        foreach ($first->records as $record) {
+            $measurements[] = $record->values['_value'];
+        }
+
+        return $measurements;
+    }
+
+    public function getFieldKeys($measurement = null, $bucket = null) {
+        if ($bucket == null) {
+            $bucket = $this->bucket;
+        }
+
+        return CMetric_Driver_InfluxDBDriver_FluxSchema::getFieldKeys($this->client, $measurement, $bucket);
+    }
+
+    public function getTagKeys($measurement = null, $bucket = null) {
+        if ($bucket == null) {
+            $bucket = $this->bucket;
+        }
+
+        return CMetric_Driver_InfluxDBDriver_FluxSchema::getTagKeys($this->client, $measurement, $bucket);
+    }
+
+    public function getVersion() {
+        return CMetric_Driver_InfluxDBDriver_FluxSchema::getVersion($this->client);
+    }
+
+    public function query($query) {
+        if ($query instanceof CMetric_QueryBuilder) {
+            $query = $this->formatQuery($query);
+        }
+
+        return (new CMetric_Driver_InfluxDBDriver_FluxQueryResult($this->client->createQueryApi()->query($query)))->toQueryResult();
     }
 }

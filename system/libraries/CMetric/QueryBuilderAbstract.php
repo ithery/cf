@@ -1,31 +1,47 @@
 <?php
-
+/**
+ * Class CMetric_QueryBuilderAbstract.
+ *
+ * @see CDatabase_Query_Builder
+ */
 abstract class CMetric_QueryBuilderAbstract {
+    /**
+     * The bucket which the query is targeting.
+     *
+     * @var string
+     */
     protected $from;
 
-    protected $filters;
+    /**
+     * @var CPeriod
+     */
+    protected $period;
 
-    protected $aggregate;
-
-    protected $yield;
-
-    protected $range;
-
-    abstract public function toString();
-
+    /**
+     * @param string $from
+     *
+     * @return $this
+     */
     public function setFrom($from) {
         $this->from = $from;
 
         return $this;
     }
 
-    public function addFilter($filter) {
-        $this->filters = $filter;
+    /**
+     * @return string
+     */
+    public function getFrom() {
+        return $this->from;
+    }
+
+    public function setPeriod(CPeriod $period) {
+        $this->period = $period;
 
         return $this;
     }
 
-    public function __toString() {
-        return $this->toString();
+    public function getPeriod() {
+        return $this->period;
     }
 }

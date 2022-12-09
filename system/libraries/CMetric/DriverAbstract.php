@@ -33,6 +33,15 @@ abstract class CMetric_DriverAbstract {
     }
 
     /**
+     * @return CMetric_QueryBuilder
+     */
+    public function createQuery() {
+        $query = new CMetric_QueryBuilder($this);
+
+        return $query;
+    }
+
+    /**
      * @param CMetric_Metric $metric
      *
      * @return $this
@@ -88,6 +97,13 @@ abstract class CMetric_DriverAbstract {
      * @return mixed
      */
     abstract public function format(CMetric_Metric $metric);
+
+    /**
+     * @param CMetric_QueryBuilder $metric
+     *
+     * @return mixed
+     */
+    abstract public function query(CMetric_QueryBuilder $query);
 
     /**
      * @return $this
