@@ -1,6 +1,13 @@
 <?php
 
 class CMetric_QueryResult {
-    public function __construct() {
+    protected $data;
+
+    public function __construct($data) {
+        $this->data = $data;
+    }
+
+    public function getData() {
+        return $this->data;
     }
 }

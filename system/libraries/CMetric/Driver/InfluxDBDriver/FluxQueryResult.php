@@ -14,13 +14,24 @@ class CMetric_Driver_InfluxDBDriver_FluxQueryResult {
         foreach ($arrayFluxTable as $table) {
             /** @var \InfluxDB2\FluxTable $fluxTable */
             // *** Column search right here! ****
-            $resultKey = array_search('result', array_column($table->columns, 'label'));
-            $name = $table->columns[$resultKey]->defaultValue;
+            // $resultKey = array_search('result', array_column($table->columns, 'label'));
+            // $name = $table->columns[$resultKey]->defaultValue;
 
             foreach ($table->records as $record) {
-                $tableData[$name][$record->getTime()][$record->getField()] = $record->getValue();
+                // if (!isset($tableData[$record->getTime()])) {
+                //     $tableData[$record->getTime()] = [];
+                //     //$tableData[$record->getTime()]['_time'] = $record->getTime();
+                // }
+                $tableData[$record->getTime()][$record->getField()] = $record->getValue();
+                $valueKeys = array_keys($record->values);
+                if (count($valueKeys) > 8) {
+                    for ($i = 8; $i < count($valueKeys); $i++) {
+                        $tableData[$record->getTime()][$valueKeys[$i]] = $record->values[$valueKeys[$i]];
+                    }
+                }
             }
         }
-        cdbg::dd($tableData);
+
+        return new CMetric_QueryResult($tableData);
     }
 }
