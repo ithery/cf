@@ -186,9 +186,15 @@ class CMetric_Metric {
             return $this->addExtraArray($key, $value);
         }
 
-        $this->extra[$key] = $value;
+        $this->extra[$key] = $this->escapeFieldValue($value);
 
         return $this;
+    }
+
+    private function escapeFieldValue($value) {
+        $value = str_replace([' ', '"'. '\\'], ['\ ', '\"', '\\\\'], $value);
+
+        return $value;
     }
 
     /**
