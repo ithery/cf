@@ -91,6 +91,14 @@ class CMetric_Driver_InfluxDBDriver extends CMetric_DriverAbstract {
      * @throws \InfluxDB2\ApiException
      */
     public function send($metrics) {
+        // $resp = $this->client->createQueryApi()->query('
+        // from(bucket: "testing")
+        // |> range(start: -8h)
+        // |> filter(fn: (r) => r["_measurement"] == "devcloud_home")
+        // ');
+
+        // cdbg::dd($resp);
+
         $writer = $this->createWriter(count($metrics));
         foreach ($metrics as $point) {
             if ($point instanceof CMetric_Metric) {
