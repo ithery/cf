@@ -176,11 +176,55 @@ class CMetric_Metric {
     }
 
     /**
-     * @param $key
-     * @param $value
+     * @param string $key
+     * @param mixed  $value
+     *
+     * @return $this
      */
     public function addExtra($key, $value) {
+        if (is_array($value)) {
+            return $this->addExtraArray($key, $value);
+        }
         $this->extra[$key] = $value;
+
+        return $this;
+    }
+
+    /**
+     * @param string $key
+     * @param array  $value
+     * @param string $separator
+     *
+     * @return $this
+     */
+    public function addExtraArray($key, array $value, $separator = '_') {
+        $array = $this->flattenArray($value, $separator);
+        foreach ($array as $fieldKey => $fieldVal) {
+            $this->addExtra($fieldKey, $fieldVal);
+        }
+
+        return $this;
+    }
+
+    /**
+     * @param array  $value
+     * @param string $separator
+     * @param string $prepend
+     *
+     * @return array
+     */
+    private function flattenArray(array $array, $separator = '_', $prepend = '') {
+        $results = [];
+
+        foreach ($array as $key => $value) {
+            if (is_array($value) && !empty($value)) {
+                $results = array_merge($results, $this->flattenArray($value, $separator, $prepend . $key . $separator));
+            } else {
+                $results[$prepend . $key] = $value;
+            }
+        }
+
+        return $results;
     }
 
     /**
