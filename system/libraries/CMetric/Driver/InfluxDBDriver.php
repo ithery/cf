@@ -4,6 +4,7 @@ use InfluxDB2\Client;
 use InfluxDB2\WriteApi;
 use InfluxDB2\WriteType;
 use InfluxDB2\Model\WritePrecision;
+use InfluxDB2\Service\DBRPsService;
 
 /**
  * Class CMetric_Driver_InfluxDB.
@@ -191,6 +192,7 @@ class CMetric_Driver_InfluxDBDriver extends CMetric_DriverAbstract {
     }
 
     public function query($query) {
+        //cdbg::dd($this->client->createService(DBRPsService::class)->getDBRPs(null, null, 'ittron'));
         if ($query instanceof CMetric_QueryBuilder) {
             $query = $this->formatQuery($query);
         }

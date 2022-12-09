@@ -10,11 +10,17 @@ class CMetric_Driver_InfluxDBDriver_FluxQueryResult {
     public function toQueryResult() {
         $tableData = [];
         $arrayFluxTable = carr::wrap($this->result);
-        $totalTable = count($arrayFluxTable);
-        foreach ($arrayFluxTable as $fluxTable) {
+
+        foreach ($arrayFluxTable as $table) {
             /** @var \InfluxDB2\FluxTable $fluxTable */
-            //cdbg::dd($fluxTable->records[6]);
-            cdbg::dd($fluxTable->records[5]);
+            // *** Column search right here! ****
+            $resultKey = array_search('result', array_column($table->columns, 'label'));
+            $name = $table->columns[$resultKey]->defaultValue;
+
+            foreach ($table->records as $record) {
+                $tableData[$name][$record->getTime()][$record->getField()] = $record->getValue();
+            }
         }
+        cdbg::dd($tableData);
     }
 }

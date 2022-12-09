@@ -151,7 +151,7 @@ class CMetric_Metric {
      * @param $value
      */
     public function addTag($key, $value) {
-        $this->tags[$key] = $value;
+        $this->tags[$key] = $this->escapeFieldValue($value);
     }
 
     /**
