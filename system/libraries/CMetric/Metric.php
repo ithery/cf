@@ -185,6 +185,7 @@ class CMetric_Metric {
         if (is_array($value)) {
             return $this->addExtraArray($key, $value);
         }
+
         $this->extra[$key] = $value;
 
         return $this;
@@ -198,7 +199,7 @@ class CMetric_Metric {
      * @return $this
      */
     public function addExtraArray($key, array $value, $separator = '_') {
-        $array = $this->flattenArray($value, $separator);
+        $array = $this->flattenArray($value, $separator, $key . $separator);
         foreach ($array as $fieldKey => $fieldVal) {
             $this->addExtra($fieldKey, $fieldVal);
         }
