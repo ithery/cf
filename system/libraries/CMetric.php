@@ -7,6 +7,9 @@ class CMetric {
         return $metric;
     }
 
+    /**
+     * @return CMetric_QueryBuilder
+     */
     public static function createQuery() {
         $metric = static::manager()->driver()->createQuery();
 
