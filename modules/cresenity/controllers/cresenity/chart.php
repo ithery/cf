@@ -11,9 +11,8 @@ use CImage_Chart_Constant as Constant;
  * @since Aug 30, 2019, 2:11:47 AM
  */
 class Controller_Cresenity_Chart extends CController {
-    use CTrait_Controller_Cresenity_Chart;
-
     public function __construct() {
+        parent::__construct();
     }
 
     public function json() {
@@ -106,6 +105,7 @@ class Controller_Cresenity_Chart extends CController {
         $get = $_GET;
         $get['chid'] = md5(uniqid(rand(), true));
         $url .= '?' . curl::asPostString($get);
+
         try {
             $context = stream_context_create(
                 ['http' => [
@@ -122,6 +122,7 @@ class Controller_Cresenity_Chart extends CController {
             $response['data'] = [];
             $response['data']['exception'] = get_class($ex); // Reflection might be better here
             $response['data']['trace'] = $ex->getTraceAsString();
+
             return c::response()->json($response);
         }
     }
