@@ -17,9 +17,9 @@ class CImage_Chart_Pie {
     /**
      * Draw the legend of pie chart
      *
-     * @param mixed $x
-     * @param mixed $y
-     * @param mixed $format
+     * @param int|float $x
+     * @param int|float $y
+     * @param string $format
      */
     public function drawPieLegend($x, $y, $format = '') {
         $FontName = isset($format['fontName']) ? $format['fontName'] : $this->chartObject->fontName;
