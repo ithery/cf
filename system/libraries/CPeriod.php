@@ -100,6 +100,13 @@ class CPeriod implements IteratorAggregate {
         return new static($startDate, $endDate);
     }
 
+    public static function hours($numberOfHours) {
+        $endDate = CCarbon::now();
+        $startDate = CCarbon::now()->subHours($numberOfHours);
+
+        return new static($startDate, $endDate);
+    }
+
     public static function days($numberOfDays) {
         $endDate = CCarbon::today();
         $startDate = CCarbon::today()->subDays($numberOfDays)->startOfDay();
@@ -275,6 +282,7 @@ class CPeriod implements IteratorAggregate {
     /**
      * @return DatePeriod
      */
+    #[\ReturnTypeWillChange]
     public function getIterator() {
         return new DatePeriod(
             $this->includedStart(),

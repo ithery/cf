@@ -2572,6 +2572,7 @@ class CImage_Chart_Draw extends CImage_Chart_BaseDraw {
                         }
                     }
                     $lastX = null;
+                    /** @var float|int|null $lastX */
                     $lastY = null;
                     $lastColor = null;
                     foreach ($posArray as $key => $y) {
@@ -2748,7 +2749,9 @@ class CImage_Chart_Draw extends CImage_Chart_BaseDraw {
                     }
                     $lastX = null;
                     $lastY = null;
-                    $lastColor = null;
+                     /** @var float|int|null $lastY */
+                     /** @var float|int|null $lastX */
+                     $lastColor = null;
                     foreach ($posArray as $key => $x) {
                         if ($x != Constant::VOID && $lastX != null) {
                             $slope = ($x - $lastX);
