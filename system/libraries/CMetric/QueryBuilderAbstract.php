@@ -27,11 +27,39 @@ abstract class CMetric_QueryBuilderAbstract {
     protected $period;
 
     /**
-     * The where constraints for the query.
+     * The where constraints for the measurement query.
      *
      * @var array
      */
-    protected $wheres = [];
+    protected $whereMeasurements = [];
+
+    /**
+     * The where constraints for the fields query.
+     *
+     * @var array
+     */
+    protected $whereFields = [];
+
+    /**
+     * The window.
+     *
+     * @var null|array
+     */
+    protected $window = null;
+
+    /**
+     * The window.
+     *
+     * @var null|array
+     */
+    protected $aggregateWindow = null;
+
+    /**
+     * The aggregate.
+     *
+     * @var null|string
+     */
+    protected $aggregate = null;
 
     /**
      * @param string $from
@@ -51,6 +79,16 @@ abstract class CMetric_QueryBuilderAbstract {
         return $this->from;
     }
 
+    public function setAggregate($aggregate) {
+        $this->aggregate = $aggregate;
+
+        return $this;
+    }
+
+    public function getAggregate() {
+        return $this->aggregate;
+    }
+
     public function setPeriod(CPeriod $period) {
         $this->period = $period;
 
@@ -61,57 +99,71 @@ abstract class CMetric_QueryBuilderAbstract {
         return $this->period;
     }
 
+    public function getWhereFields() {
+        return $this->whereFields;
+    }
+
+    public function getWhereMeasurements() {
+        return $this->whereMeasurements;
+    }
+
+    public function setAggregateWindow($options) {
+        $this->aggregateWindow = $options;
+
+        return $this;
+    }
+
+    public function getAggregateWindow() {
+        return $this->aggregateWindow;
+    }
+
+    public function setWindow($options) {
+        $this->window = $options;
+
+        return $this;
+    }
+
+    public function getWindow() {
+        return $this->window;
+    }
+
+    public function getBindings() {
+        return $this->bindings;
+    }
+
     /**
      * Add a basic where clause to the query.
      *
-     * @param string|array|\Closure $column
-     * @param null|string           $operator
-     * @param mixed                 $value
-     * @param string                $boolean
+     * @param string|array $measurement
      *
      * @return $this
      */
-    public function where($column, $operator = null, $value = null, $boolean = 'and') {
-        $type = 'Basic';
-
-        // Now that we are working with just a simple query we can put the elements
-        // in our array and add the query binding to our array of bindings that
-        // will be bound to each SQL statements when it is finally executed.
-
-        $this->wheres[] = compact(
-            'type',
-            'column',
-            'operator',
-            'value',
-            'boolean'
-        );
-
-        if (!$value instanceof CDatabase_Query_Expression) {
-            $this->addBinding($value, 'where');
+    public function whereMeasurement($measurement) {
+        if (is_array($measurement)) {
+            foreach ($measurement as $m) {
+                $this->whereMeasurement($m);
+            }
+        } else {
+            $this->whereMeasurements[] = $measurement;
         }
 
         return $this;
     }
 
     /**
-     * Add a binding to the query.
+     * Add a basic where clause to the query.
      *
-     * @param mixed  $value
-     * @param string $type
-     *
-     * @throws \InvalidArgumentException
+     * @param string|array $field
      *
      * @return $this
      */
-    public function addBinding($value, $type = 'where') {
-        if (!array_key_exists($type, $this->bindings)) {
-            throw new InvalidArgumentException("Invalid binding type: {$type}.");
-        }
-
-        if (is_array($value)) {
-            $this->bindings[$type] = array_values(array_merge($this->bindings[$type], $value));
+    public function whereField($field) {
+        if (is_array($field)) {
+            foreach ($field as $f) {
+                $this->whereField($f);
+            }
         } else {
-            $this->bindings[$type][] = $value;
+            $this->whereFields[] = $field;
         }
 
         return $this;

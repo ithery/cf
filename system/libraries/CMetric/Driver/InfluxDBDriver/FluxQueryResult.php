@@ -24,10 +24,8 @@ class CMetric_Driver_InfluxDBDriver_FluxQueryResult {
                 // }
                 $tableData[$record->getTime()][$record->getField()] = $record->getValue();
                 $valueKeys = array_keys($record->values);
-                if (count($valueKeys) > 8) {
-                    for ($i = 8; $i < count($valueKeys); $i++) {
-                        $tableData[$record->getTime()][$valueKeys[$i]] = $record->values[$valueKeys[$i]];
-                    }
+                for ($i = 0; $i < count($valueKeys); $i++) {
+                    $tableData[$record->getTime()][$valueKeys[$i]] = $record->values[$valueKeys[$i]];
                 }
             }
         }

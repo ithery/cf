@@ -196,7 +196,9 @@ class CMetric_Driver_InfluxDBDriver extends CMetric_DriverAbstract {
         if ($query instanceof CMetric_QueryBuilder) {
             $query = $this->formatQuery($query);
         }
+        $fluxResult = $this->client->createQueryApi()->query($query);
+        //cdbg::dd($query, $fluxResult[0]->records[0], $fluxResult[1]->records[0]);
 
-        return (new CMetric_Driver_InfluxDBDriver_FluxQueryResult($this->client->createQueryApi()->query($query)))->toQueryResult();
+        return (new CMetric_Driver_InfluxDBDriver_FluxQueryResult($fluxResult))->toQueryResult();
     }
 }

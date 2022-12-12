@@ -12,6 +12,9 @@ class CMetric_QueryBuilder extends CMetric_QueryBuilderAbstract {
         $this->period = CPeriod::hours(4);
     }
 
+    /**
+     * @return CMetric_QueryResult
+     */
     public function get() {
         return $this->getDriver()->query($this);
     }
