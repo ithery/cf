@@ -285,7 +285,11 @@ trait CElement_Component_DataTable_Trait_HtmlTrait {
         if ($this->headerNoLineBreak) {
             $thClass = ' no-line-break';
         }
-        $htmlResponsiveOpen = '<div class="table-responsive" style="overflow: visible;">';
+        $defaultOverflow = 'auto';
+        if ($this->applyDataTable) {
+            $defaultOverflow = 'visible';
+        }
+        $htmlResponsiveOpen = '<div class="table-responsive" style="overflow: ' . $defaultOverflow . ';">';
         $htmlResponsiveClose = '</div>';
         if ($this->responsive) {
             $htmlResponsiveOpen = '<div class="span12" style="overflow: auto;margin-left: 0;">';
