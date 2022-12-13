@@ -152,8 +152,7 @@ class CAjax_Engine_DataTable_Processor_DataProvider extends CAjax_Engine_DataTab
                     if (!($query instanceof CManager_DataProvider_ModelDataProvider)) {
                         throw new Exception('SearchCallback only running on ModelDataProvider');
                     }
-                    $keyword = $request['sSearch'];
-                    $searchData[$fieldName] = $this->createSearchCallable($callback, $keyword);
+                    $searchData[$fieldName] = $this->createSearchCallable($callback, $value);
                 } else {
                     $searchData[$fieldName] = $value;
                 }
