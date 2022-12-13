@@ -198,6 +198,8 @@ $maxHeight .= $suffixHeight;
                             xhr.open("post", '<?php echo $ajaxUrl; ?>');
                             xhr.send(data);
                         }
+                    } else {
+                        cresenity.message('', '<div class="alert alert-danger text-center"><b>Error:</b> Only image type can be uploaded</div>', 'bootbox');
                     }
                 }
             };
