@@ -12,14 +12,27 @@ if (is_numeric($lastMaxHeight)) {
 }
 $maxWidth .= $suffixWidth;
 $maxHeight .= $suffixHeight;
+
+$noImageUrl = CApp_Base::noImageUrl();
+
+$class = 'fileupload-new';
+if ($onExists) {
+    $class = 'fileupload-exists';
+}
 @endphp
 
-<div id="container-{{ $id }}" class="fileupload fileupload-new" >
+<div id="container-{{ $id }}" class="fileupload {{ $class }}" >
     <div class="fileupload-new thumbnail" >
+        @if ($onExists)
+        <img id="cimg-{{ $id }}" src="{{ $noImageUrl }}" style="max-width: <?php echo $maxWidth; ?>; max-height: <?php echo $maxHeight; ?>;"  />
+        @else
         <img id="cimg-{{ $id }}" src="{{ $imgSrc }}" style="max-width: <?php echo $maxWidth; ?>; max-height: <?php echo $maxHeight; ?>;"  />
+        @endif
     </div>
     <div class="fileupload-preview fileupload-exists thumbnail" style="max-width: <?php echo $maxWidth; ?>; max-height: <?php echo $maxHeight; ?>; line-height: 20px;">
-
+        @if ($onExists)
+        <img id="cimg-{{ $id }}" src="{{ $imgSrc }}" style="max-width: <?php echo $maxWidth; ?>; max-height: <?php echo $maxHeight; ?>;"  />
+        @endif
     </div>
     <div>
         <?php if (!$disabledUpload): ?>
