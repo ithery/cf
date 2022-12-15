@@ -44,7 +44,7 @@ class cstr {
     protected static $studlyCache = [];
 
     public static function len($str) {
-        return strlen($str);
+        return static::length($str);
     }
 
     public static function toupper($str) {
