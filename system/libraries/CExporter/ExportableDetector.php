@@ -2,6 +2,12 @@
 
 class CExporter_ExportableDetector {
     public static function toExportable($data) {
+        if ($data instanceof CElement_Component_DataTable) {
+            $table = clone $data;
+            $table->prepareForExportable();
+
+            return new XPExport_DataTableExportable($table);
+        }
         if ($data instanceof CExporter_Exportable) {
             return $data;
         }
