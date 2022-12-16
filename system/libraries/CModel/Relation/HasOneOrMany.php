@@ -1,5 +1,9 @@
 <?php
-
+/**
+ * @template TRelatedModel of \CModel
+ *
+ * @extends CModel_Relation<TRelatedModel>
+ */
 abstract class CModel_Relation_HasOneOrMany extends CModel_Relation {
     /**
      * The foreign key of the parent model.

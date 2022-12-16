@@ -12,6 +12,7 @@ class CElement_List_ActionRowList extends CElement_List_ActionList {
     }
 
     public static function factory($id = null) {
+        /** @phpstan-ignore-next-line */
         return new static($id);
     }
 

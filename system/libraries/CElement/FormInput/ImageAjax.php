@@ -16,6 +16,8 @@ class CElement_FormInput_ImageAjax extends CElement_FormInput_Image {
 
     protected $tempStorage;
 
+    protected $onExists;
+
     public function __construct($id) {
         parent::__construct($id);
         $this->type = 'image';
@@ -26,6 +28,7 @@ class CElement_FormInput_ImageAjax extends CElement_FormInput_Image {
         $this->maxUploadSize = 0;
         $this->allowedExtension = [];
         $this->disabledUpload = false;
+        $this->onExists = false;
         $this->accept = 'image/*';
         $this->view = 'cresenity/element/form-input/image-ajax';
         $this->onBeforeParse(function (CView_View $view) {
@@ -53,6 +56,7 @@ class CElement_FormInput_ImageAjax extends CElement_FormInput_Image {
             $view->with('ajaxUrl', $ajaxUrl);
             $view->with('cropper', $this->cropper);
             $view->with('accept', $this->accept);
+            $view->with('onExists', $this->onExists);
         });
     }
 
@@ -68,7 +72,7 @@ class CElement_FormInput_ImageAjax extends CElement_FormInput_Image {
     }
 
     /**
-     * @param int $ext
+     * @param int|array $ext
      *
      * @return $this
      */
@@ -79,6 +83,11 @@ class CElement_FormInput_ImageAjax extends CElement_FormInput_Image {
         }
         $this->allowedExtension = $arr;
 
+        return $this;
+    }
+
+    public function setOnExists($bool) {
+        $this->onExists = $bool;
         return $this;
     }
 

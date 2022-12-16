@@ -106,21 +106,27 @@ class CManager_DataProvider_ModelDataProvider extends CManager_DataProviderAbstr
             $dataSearch = $this->searchAnd;
             $query->where(function (CModel_Query $q) use ($dataSearch, $aggregateFields) {
                 foreach ($dataSearch as $fieldName => $value) {
-                    if (strpos($fieldName, '.') !== false) {
-                        $fields = explode('.', $fieldName);
-
-                        $field = array_pop($fields);
-                        $relation = implode('.', $fields);
-
-                        $q->whereHas($relation, function ($q2) use ($value, $field) {
-                            $q2->where($field, 'like', '%' . $value . '%');
+                    if ($this->isCallable(carr::get($dataSearch, $fieldName))) {
+                        $q->where(function ($q) use ($value) {
+                            $this->callCallable($value, [$q]);
                         });
                     } else {
-                        if (in_array($fieldName, $aggregateFields)) {
-                            //TODO apply search on aggregateFields
+                        if (strpos($fieldName, '.') !== false) {
+                            $fields = explode('.', $fieldName);
+
+                            $field = array_pop($fields);
+                            $relation = implode('.', $fields);
+
+                            $q->whereHas($relation, function ($q2) use ($value, $field) {
+                                $q2->where($field, 'like', '%' . $value . '%');
+                            });
                         } else {
-                            if (!$this->isRelationField($q, $fieldName)) {
-                                $q->where($fieldName, 'like', '%' . $value . '%');
+                            if (in_array($fieldName, $aggregateFields)) {
+                                //TODO apply search on aggregateFields
+                            } else {
+                                if (!$this->isRelationField($q, $fieldName)) {
+                                    $q->where($fieldName, 'like', '%' . $value . '%');
+                                }
                             }
                         }
                     }

@@ -2,11 +2,78 @@
 
 /**
  * @mixin CModel_Query
+ *
+ * @template TRelatedModel of \CModel
+ *
+ * @method        mixed                                value($column)                                                                           Get a single column's value from the first result of a query.
+ * @method        mixed                                pluck($column)                                                                           Get a single column's value from the first result of a query.
+ * @method        void                                 chunk($count, callable $callback)                                                        Chunk the results of the query.
+ * @method        \CCollection                         lists($column, $key = null)                                                              Get an array with the values of a given column.
+ * @method        void                                 onDelete(Closure $callback)                                                              Register a replacement for the default delete function.
+ * @method        CModel[]                             getModels($columns = ['*'])                                                              Get the hydrated models without eager loading.
+ * @method        array                                eagerLoadRelations(array $models)                                                        Eager load the relationships for the models.
+ * @method        array                                loadRelation(array $models, $name, Closure $constraints)                                 Eagerly load the relationship on a set of models.
+ * @method static CModel_Query<TRelatedModel>|static   where($column, $operator = null, $value = null, $boolean = 'and')                        Add a basic where clause to the query.
+ * @method static CModel_Query<TRelatedModel>|static   whereHas($relation, Closure $callback = null, $operator = '>=', $count = 1)              Add a relationship count / exists condition to the query with where clauses.
+ * @method static CModel_Query<TRelatedModel>|static   orWhere($column, $operator = null, $value = null)                                        Add an "or where" clause to the query.
+ * @method static CModel_Query<TRelatedModel>|static   has($relation, $operator = '>=', $count = 1, $boolean = 'and', Closure $callback = null) Add a relationship count condition to the query.
+ * @method static CModel_Query<TRelatedModel>|static   whereRaw($sql, array $bindings = [])
+ * @method static CModel_Query<TRelatedModel>|static   whereBetween($column, array $values)
+ * @method static CModel_Query<TRelatedModel>|static   whereNotBetween($column, array $values)
+ * @method static CModel_Query<TRelatedModel>|static   whereNested(Closure $callback)
+ * @method static CModel_Query<TRelatedModel>|static   addNestedWhereQuery($query)
+ * @method static CModel_Query<TRelatedModel>|static   whereExists(Closure $callback)
+ * @method static CModel_Query<TRelatedModel>|static   whereNotExists(Closure $callback)
+ * @method static CModel_Query<TRelatedModel>|static   whereIn($column, $values)
+ * @method static CModel_Query<TRelatedModel>|static   whereNotIn($column, $values)
+ * @method static CModel_Query<TRelatedModel>|static   whereNull($column)
+ * @method static CModel_Query<TRelatedModel>|static   whereNotNull($column)
+ * @method        CModel_Query<TRelatedModel>|static   orWhereRaw($sql, array $bindings = [])
+ * @method        CModel_Query<TRelatedModel>|static   orWhereBetween($column, array $values)
+ * @method        CModel_Query<TRelatedModel>|static   orWhereNotBetween($column, array $values)
+ * @method        CModel_Query<TRelatedModel>|static   orWhereExists(Closure $callback)
+ * @method        CModel_Query<TRelatedModel>|static   orWhereNotExists(Closure $callback)
+ * @method        CModel_Query<TRelatedModel>|static   orWhereIn($column, $values)
+ * @method        CModel_Query<TRelatedModel>|static   orWhereNotIn($column, $values)
+ * @method        CModel_Query<TRelatedModel>|static   orWhereNull($column)
+ * @method        CModel_Query<TRelatedModel>|static   orWhereNotNull($column)
+ * @method        CModel_Query<TRelatedModel>|static   whereDate($column, $operator, $value)
+ * @method        CModel_Query<TRelatedModel>|static   whereDay($column, $operator, $value)
+ * @method        CModel_Query<TRelatedModel>|static   whereMonth($column, $operator, $value)
+ * @method        CModel_Query<TRelatedModel>|static   whereYear($column, $operator, $value)
+ * @method        CModel_Query<TRelatedModel>|static   join($table, $first, $operator = null, $second = null, $type = 'inner', $where = false)
+ * @method        CModel_Query<TRelatedModel>|static   select($columns = ['*'])
+ * @method        CModel_Query<TRelatedModel>|static   groupBy(...$groups)
+ * @method        CModel_Query<TRelatedModel>|static   newQuery()
+ * @method        CModel_Query<TRelatedModel>|static   withTrashed()
+ * @method        CModel_Query<TRelatedModel>|static   from($table)
+ * @method        CModel_Query<TRelatedModel>|static   leftJoinSub($query, $as, $first, $operator = null, $second = null)
+ * @method        CModel_Query<TRelatedModel>|static   addSelect($column)
+ * @method        CModel_Query<TRelatedModel>|static   selectRaw($expression, array $bindings = [])
+ * @method        CModel_Query<TRelatedModel>|static   orderBy($column, $direction = 'asc')
+ * @method        CModel_Query<TRelatedModel>|static   orderByDesc($column)
+ * @method        CModel_Query<TRelatedModel>|static   skip($value)
+ * @method        CModel_Query<TRelatedModel>|static   offset($value)
+ * @method        CModel_Query<TRelatedModel>|static   take($value)
+ * @method        CModel_Query<TRelatedModel>|static   limit($value)
+ * @method        CModel_Query<TRelatedModel>|static   lockForUpdate()                                                                          Lock the selected rows in the table for updating.
+ * @method        bool                                 exists()                                                                                 Determine if any rows exist for the current query
+ * @method        mixed                                sum($column)                                                                             Retrieve the sum of the values of a given column..
+ * @method        CModel_Collection<int,TRelatedModel> get($columns = ['*'])
+ *
+ * @see CModel_Query
  */
 abstract class CModel_Relation {
     use CTrait_ForwardsCalls, CTrait_Macroable {
         __call as macroCall;
     }
+
+    /**
+     * An array to map class names to their morph names in database.
+     *
+     * @var array
+     */
+    public static $morphMap = [];
 
     /**
      * The model query builder instance.
@@ -35,13 +102,6 @@ abstract class CModel_Relation {
      * @var bool
      */
     protected static $constraints = true;
-
-    /**
-     * An array to map class names to their morph names in database.
-     *
-     * @var array
-     */
-    public static $morphMap = [];
 
     /**
      * The count of self joins.
@@ -324,7 +384,7 @@ abstract class CModel_Relation {
     /**
      * Set or get the morph map for polymorphic relations.
      *
-     * @param array|null $map
+     * @param null|array $map
      * @param bool       $merge
      *
      * @return array
@@ -342,9 +402,9 @@ abstract class CModel_Relation {
     /**
      * Builds a table-keyed array from model class names.
      *
-     * @param string[]|null $models
+     * @param null|string[] $models
      *
-     * @return array|null
+     * @return null|array
      */
     protected static function buildMorphMapFromModels(array $models = null) {
         if (is_null($models) || carr::isAssoc($models)) {
@@ -352,7 +412,7 @@ abstract class CModel_Relation {
         }
 
         return array_combine(array_map(function ($model) {
-            return (new $model)->getTable();
+            return (new $model())->getTable();
         }, $models), $models);
     }
 
@@ -361,7 +421,7 @@ abstract class CModel_Relation {
      *
      * @param string $alias
      *
-     * @return string|null
+     * @return null|string
      */
     public static function getMorphedModel($alias) {
         return array_key_exists($alias, self::$morphMap) ? self::$morphMap[$alias] : null;

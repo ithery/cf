@@ -14,6 +14,9 @@
             body {
                 font-family: 'Nunito';
             }
+            h1, h2, h3, h4, h5, h6 {
+                color: unset;
+            }
         </style>
     </head>
     <body class="antialiased language-php h-full w-full font-sans text-gray-900 antialiased">

@@ -44,7 +44,8 @@ class CElement_List_TabList_Tab extends CElement_Element {
     }
 
     public static function factory($id = '') {
-        return new CElement_List_TabList_Tab($id);
+        /** @phpstan-ignore-next-line */
+        return new static($id);
     }
 
     public function setActive($bool = true) {

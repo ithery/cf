@@ -12,12 +12,13 @@ class CElement_Element_Div extends CElement_Element {
     use CTrait_Element_Handler_ReloadHandler;
     use CTrait_Element_Property_DependsOn;
 
-    public function __construct($id = '') {
+    public function __construct($id = null) {
         parent::__construct($id);
         $this->tag = 'div';
     }
 
     public static function factory($id = null) {
+        // @phpstan-ignore-next-line
         return new static($id);
     }
 

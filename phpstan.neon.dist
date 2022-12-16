@@ -55,7 +55,25 @@ services:
         tags:
             - phpstan.broker.methodsClassReflectionExtension
     -
+        class: CQC_Phpstan_Service_Type_RelationDynamicMethodReturnTypeExtension
+        tags:
+            - phpstan.broker.dynamicMethodReturnTypeExtension
+
+    -
+        class: CQC_Phpstan_Service_Type_ModelRelationsDynamicMethodReturnTypeExtension
+        tags:
+            - phpstan.broker.dynamicMethodReturnTypeExtension
+    -
         class: CQC_Phpstan_Service_ReturnType_ModelQueryExtension
+        tags:
+            - phpstan.broker.dynamicMethodReturnTypeExtension
+    -
+        class: CQC_Phpstan_Service_ReturnType_RelationFindExtension
+        tags:
+            - phpstan.broker.dynamicMethodReturnTypeExtension
+
+    -
+        class: CQC_Phpstan_Service_ReturnType_RelationCollectionExtension
         tags:
             - phpstan.broker.dynamicMethodReturnTypeExtension
     -
@@ -86,6 +104,10 @@ services:
         arguments:
             active: %checkModelProperties%
     -
+        class: CQC_Phpstan_Service_RelationParserHelper
+        arguments:
+            parser: @currentPhpVersionSimpleDirectParser
+    -
         class: CQC_Phpstan_Service_Rule_ModelProperty_ModelPropertiesRuleHelper
     -
         class: CQC_Phpstan_Service_Rule_ModelRuleHelper
@@ -93,6 +115,14 @@ services:
         class: CQC_Phpstan_Service_BuilderHelper
         arguments:
             checkProperties: %checkModelProperties%
+    -
+        class: CQC_Phpstan_Service_Rule_StringToClassRule
+        tags:
+            - phpstan.rules.rule
+    -
+        class: CQC_Phpstan_Service_Rule_ClassNotationRule
+        tags:
+            - phpstan.rules.rule
     -
         class: CQC_Phpstan_Service_CFStubFilesExtension
         tags: [phpstan.stubFilesExtension]

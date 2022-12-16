@@ -2,7 +2,7 @@
 
 trait CElement_Trait_UseViewTrait {
     /**
-     * @var CView_View
+     * @var CView_View|string
      */
     protected $view;
 
@@ -102,5 +102,21 @@ trait CElement_Trait_UseViewTrait {
 
     public function getViewJs($indent = 0) {
         return carr::get($this->collectHtmlJsOnce(), 'js');
+    }
+
+    public function html($indent = 0) {
+        if (method_exists($this, 'buildOnce')) {
+            $this->buildOnce();
+        }
+
+        return $this->getViewHtml();
+    }
+
+    public function js($indent = 0) {
+        if (method_exists($this, 'buildOnce')) {
+            $this->buildOnce();
+        }
+
+        return $this->getViewJs();
     }
 }

@@ -8,6 +8,7 @@ class CElement_Component_Shimmer extends CElement_Component {
     }
 
     public static function factory($id = null) {
+        // @phpstan-ignore-next-line
         return new static($id);
     }
 

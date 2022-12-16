@@ -1,7 +1,9 @@
 <?php
 
 defined('SYSPATH') or die('No direct access allowed.');
-
+/**
+ * @property static $getParent
+ */
 trait CModel_Nested_NestedTrait {
     /**
      * @var \Carbon\Carbon

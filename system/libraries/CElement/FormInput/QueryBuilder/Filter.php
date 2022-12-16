@@ -132,10 +132,11 @@ class CElement_FormInput_QueryBuilder_Filter implements CInterface_Arrayable {
             $result['values'] = $this->values;
         }
 
+        // @phpstan-ignore-next-line
         if ($this->operators && is_array($this->operators) && count($this->operators) > 0) {
             $result['operators'] = $this->operators;
         }
-
+        // @phpstan-ignore-next-line
         if ($this->validation && is_array($this->validation) && count($this->validation) > 0) {
             $result['validation'] = $this->validation;
         }

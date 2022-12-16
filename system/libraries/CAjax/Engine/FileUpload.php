@@ -12,12 +12,13 @@ class CAjax_Engine_FileUpload extends CAjax_Engine {
             for ($i = 0; $i < count($_FILES[$inputName]['name']); $i++) {
                 $fileName = $_FILES[$inputName]['name'][$i];
                 $ext = pathinfo($_FILES[$inputName]['name'][$i], PATHINFO_EXTENSION);
-                if (strlen($ext) > 3) {
-                    $ext = substr($ext, 0, 3);
-                }
                 if (in_array($ext, ['php', 'sh', 'htm', 'pht'])) {
                     die('Not Allowed X_X');
                 }
+                if (cstr::startsWith($ext, ['php', 'sh', 'htm', 'pht'])) {
+                    die('Not Allowed X_X');
+                }
+
                 if ($allowedExtension) {
                     if (!in_array(strtolower($ext), $allowedExtension)) {
                         die('Not Allowed X_X');
@@ -54,12 +55,14 @@ class CAjax_Engine_FileUpload extends CAjax_Engine {
                 $fileName = carr::get($filenameArray, $k);
 
                 $ext = pathinfo($fileName, PATHINFO_EXTENSION);
-                if (strlen($ext) > 3) {
-                    $ext = substr($ext, 0, 3);
-                }
                 if (in_array($ext, ['php', 'sh', 'htm', 'pht'])) {
                     die('Not Allowed X_X');
                 }
+
+                if (cstr::startsWith($ext, ['php', 'sh', 'htm', 'pht'])) {
+                    die('Not Allowed X_X');
+                }
+
                 if ($allowedExtension) {
                     if (!in_array(strtolower($ext), $allowedExtension)) {
                         die('Not Allowed X_X');

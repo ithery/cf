@@ -44,7 +44,7 @@ class cstr {
     protected static $studlyCache = [];
 
     public static function len($str) {
-        return strlen($str);
+        return static::length($str);
     }
 
     public static function toupper($str) {
@@ -384,6 +384,21 @@ class cstr {
      */
     public static function title($value) {
         return mb_convert_case($value, MB_CASE_TITLE, 'UTF-8');
+    }
+
+    /**
+     * Humanize the given value into a proper name.
+     *
+     * @param string $value
+     *
+     * @return string
+     */
+    public static function humanize($value) {
+        if (is_object($value)) {
+            return static::humanize(c::classBasename(get_class($value)));
+        }
+
+        return cstr::title(cstr::snake($value, ' '));
     }
 
     /**
@@ -1556,5 +1571,13 @@ class cstr {
      */
     public function toHtmlString($string) {
         return new CBase_HtmlString($string);
+    }
+
+    public function base64UrlEncode($input) {
+        return strtr(base64_encode($input), '+/=', '._-');
+    }
+
+    public function base64UrlDecode($input) {
+        return base64_decode(strtr($input, '._-', '+/='));
     }
 }

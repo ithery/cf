@@ -64,7 +64,6 @@ class CElement_Component_DataTable_Options {
             'serverSide' => false,
             'info' => true,
             'paging' => true,
-            'searching' => true,
             'lengthChange' => true,
             'autoWidth' => false,
             'pagingType' => static::OPTION_PAGING_TYPE_FULL_NUMBERS,

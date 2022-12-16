@@ -240,8 +240,8 @@ return [
         'css' => ['plugins' . DS . 'select2' . DS . 'select2-4.0.0.min.css'],
     ],
     'datepicker' => [
-        'js' => ['plugins' . DS . 'datepicker' . DS . 'bootstrap-datepicker.js'],
-        'css' => ['plugins' . DS . 'datepicker' . DS . 'datepicker.css'],
+        'js' => ['plugins' . DS . 'datepicker' . DS . '1.9' . DS . 'bootstrap-datepicker.js'],
+        'css' => ['plugins' . DS . 'datepicker' . DS . '1.9' . DS . 'bootstrap-datepicker.css'],
     ],
     'bootstrap3-datepicker' => [
         'js' => ['plugins' . DS . 'datepicker' . DS . 'bootstrap3-datepicker.js'],

@@ -358,6 +358,17 @@ class c {
         return CCarbon::now($tz);
     }
 
+    /**
+     * Create a new Carbon instance for the current date.
+     *
+     * @param null|\DateTimeZone|string $tz
+     *
+     * @return CCarbon
+     */
+    public static function today($tz = null) {
+        return CCarbon::today($tz);
+    }
+
     public static function hrtime($getAsNumber = false) {
         if (function_exists('hrtime')) {
             return hrtime($getAsNumber);
@@ -1597,6 +1608,19 @@ class c {
         return $callback;
     }
 
+    /**
+     * @param callable|Closure|SerializableClosure $callback
+     *
+     * @return bool
+     */
+    public static function isCallable($callback) {
+        if ($callback instanceof SerializableClosure) {
+            return true;
+        }
+
+        return is_callable($callback);
+    }
+
     public static function isHtml($string) {
         return preg_match('/<[^<]+>/', $string, $m) != 0;
     }
@@ -1754,6 +1778,10 @@ class c {
      */
     public static function gate() {
         return CAuth_Access_Gate::instance();
+    }
+
+    public static function resolveUserTimezone(CHTTP_Request $request) {
+        return $request->timezone;
     }
 }
 
