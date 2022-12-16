@@ -98,7 +98,7 @@ class CExporter {
      *
      * @return void
      */
-    public static function forceDownload($export, $fileName, $writerType = null, array $headers = []) {
+    public static function download($export, $fileName, $writerType = null, array $headers = []) {
         $localPath = static::export($export, $fileName, $writerType)->getLocalPath();
         cdownload::force($localPath, null, $fileName);
         unlink($localPath);
@@ -115,7 +115,7 @@ class CExporter {
      *
      * @return void
      */
-    public static function download($export, $fileName, $writerType = null, array $headers = []) {
+    public static function toDownloadResponse($export, $fileName, $writerType = null, array $headers = []) {
         return c::response()->download(
             static::export($export, $fileName, $writerType)->getLocalPath(),
             $fileName,
