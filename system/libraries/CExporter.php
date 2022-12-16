@@ -98,10 +98,29 @@ class CExporter {
      *
      * @return void
      */
-    public static function download($export, $fileName, $writerType = null, array $headers = []) {
+    public static function forceDownload($export, $fileName, $writerType = null, array $headers = []) {
         $localPath = static::export($export, $fileName, $writerType)->getLocalPath();
         cdownload::force($localPath, null, $fileName);
         unlink($localPath);
+    }
+
+    /**
+     * @param object      $export
+     * @param null|string $fileName
+     * @param string      $writerType
+     * @param array       $headers
+     *
+     * @throws \PhpOffice\PhpSpreadsheet\Exception
+     * @throws \PhpOffice\PhpSpreadsheet\Writer\Exception
+     *
+     * @return void
+     */
+    public static function download($export, $fileName, $writerType = null, array $headers = []) {
+        return c::response()->download(
+            static::export($export, $fileName, $writerType)->getLocalPath(),
+            $fileName,
+            $headers
+        )->deleteFileAfterSend(true);
     }
 
     /**
