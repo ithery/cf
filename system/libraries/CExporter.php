@@ -2,7 +2,6 @@
 
 class CExporter {
     use CExporter_Trait_RegistersCustomConcernsTrait;
-
     const ACTION_STORE = 'store';
 
     const ACTION_DOWNLOAD = 'download';
@@ -95,6 +94,7 @@ class CExporter {
      */
     protected static function export($export, $fileName, $writerType = null) {
         $writerType = CExporter_FileTypeDetector::detectStrict($fileName, $writerType);
+
         $export = CExporter_ExportableDetector::toExportable($export);
 
         return static::writer()->export($export, $writerType);
