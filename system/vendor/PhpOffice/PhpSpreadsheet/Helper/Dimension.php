@@ -3,20 +3,16 @@
 namespace PhpOffice\PhpSpreadsheet\Helper;
 
 use PhpOffice\PhpSpreadsheet\Exception;
-use PhpOffice\PhpSpreadsheet\Style\Font;
 use PhpOffice\PhpSpreadsheet\Shared\Drawing;
+use PhpOffice\PhpSpreadsheet\Style\Font;
 
-class Dimension {
+class Dimension
+{
     public const UOM_CENTIMETERS = 'cm';
-
     public const UOM_MILLIMETERS = 'mm';
-
     public const UOM_INCHES = 'in';
-
     public const UOM_PIXELS = 'px';
-
     public const UOM_POINTS = 'pt';
-
     public const UOM_PICA = 'pc';
 
     /**
@@ -48,9 +44,9 @@ class Dimension {
 
     /**
      * @var float|int If this is a width, then size is measured in pixels (if is set)
-     *                or in Excel's default column width units if $unit is null.
+     *                   or in Excel's default column width units if $unit is null.
      *                If this is a height, then size is measured in pixels ()
-     *                or in points () if $unit is null.
+     *                   or in points () if $unit is null.
      */
     protected $size;
 
@@ -59,9 +55,22 @@ class Dimension {
      */
     protected $unit;
 
-    public function __construct($dimension) {
-        list($size, $unit) = sscanf($dimension, '%[1234567890.]%s');
-        $unit = strtolower(trim($unit));
+    /**
+     * Phpstan bug has been fixed; this function allows us to
+     * pass Phpstan whether fixed or not.
+     *
+     * @param mixed $value
+     */
+    private static function stanBugFixed($value): array
+    {
+        return is_array($value) ? $value : [null, null];
+    }
+
+    public function __construct(string $dimension)
+    {
+        [$size, $unit] = self::stanBugFixed(sscanf($dimension, '%[1234567890.]%s'));
+        $unit = strtolower(trim($unit ?? ''));
+        $size = (float) $size;
 
         // If a UoM is specified, then convert the size to pixels for internal storage
         if (isset(self::ABSOLUTE_UNITS[$unit])) {
@@ -75,19 +84,22 @@ class Dimension {
         $this->size = $size;
     }
 
-    public function width() {
+    public function width(): float
+    {
         return (float) ($this->unit === null)
             ? $this->size
             : round(Drawing::pixelsToCellDimension((int) $this->size, new Font(false)), 4);
     }
 
-    public function height() {
+    public function height(): float
+    {
         return (float) ($this->unit === null)
             ? $this->size
             : $this->toUnit(self::UOM_POINTS);
     }
 
-    public function toUnit($unitOfMeasure) {
+    public function toUnit(string $unitOfMeasure): float
+    {
         $unitOfMeasure = strtolower($unitOfMeasure);
         if (!array_key_exists($unitOfMeasure, self::ABSOLUTE_UNITS)) {
             throw new Exception("{$unitOfMeasure} is not a vaid unit of measure");

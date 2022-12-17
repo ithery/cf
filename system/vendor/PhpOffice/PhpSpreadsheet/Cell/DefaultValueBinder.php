@@ -6,18 +6,18 @@ use DateTimeInterface;
 use PhpOffice\PhpSpreadsheet\RichText\RichText;
 use PhpOffice\PhpSpreadsheet\Shared\StringHelper;
 
-class DefaultValueBinder implements IValueBinder {
+class DefaultValueBinder implements IValueBinder
+{
     /**
      * Bind value to a cell.
      *
-     * @param Cell  $cell  Cell to bind value to
+     * @param Cell $cell Cell to bind value to
      * @param mixed $value Value to bind in cell
-     *
-     * @throws \PhpOffice\PhpSpreadsheet\Exception
      *
      * @return bool
      */
-    public function bindValue(Cell $cell, $value) {
+    public function bindValue(Cell $cell, $value)
+    {
         // sanitize UTF-8 strings
         if (is_string($value)) {
             $value = StringHelper::sanitizeUTF8($value);
@@ -26,7 +26,8 @@ class DefaultValueBinder implements IValueBinder {
             if ($value instanceof DateTimeInterface) {
                 $value = $value->format('Y-m-d H:i:s');
             } elseif (!($value instanceof RichText)) {
-                $value = (string) $value;
+                // Attempt to cast any unexpected objects to string
+                $value = (string) $value; // @phpstan-ignore-line
             }
         }
 
@@ -44,7 +45,8 @@ class DefaultValueBinder implements IValueBinder {
      *
      * @return string
      */
-    public static function dataTypeForValue($value) {
+    public static function dataTypeForValue($value)
+    {
         // Match the value against a few data types
         if ($value === null) {
             return DataType::TYPE_NULL;
