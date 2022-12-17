@@ -44,7 +44,7 @@ class cstr {
     protected static $studlyCache = [];
 
     public static function len($str) {
-        return strlen($str);
+        return static::length($str);
     }
 
     public static function toupper($str) {
@@ -1571,5 +1571,13 @@ class cstr {
      */
     public function toHtmlString($string) {
         return new CBase_HtmlString($string);
+    }
+
+    public function base64UrlEncode($input) {
+        return strtr(base64_encode($input), '+/=', '._-');
+    }
+
+    public function base64UrlDecode($input) {
+        return base64_decode(strtr($input, '._-', '+/='));
     }
 }

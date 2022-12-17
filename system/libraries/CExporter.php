@@ -1,8 +1,9 @@
 <?php
 
+use PhpOffice\PhpSpreadsheet\IOFactory;
+
 class CExporter {
     use CExporter_Trait_RegistersCustomConcernsTrait;
-
     const ACTION_STORE = 'store';
 
     const ACTION_DOWNLOAD = 'download';
@@ -31,7 +32,26 @@ class CExporter {
 
     const TCPDF = 'Tcpdf';
 
+    const SNAPPYPDF = 'Snappypdf';
+
+    const SNAPPYIMAGE = 'Snappyimage';
+
     const IS_QUEUE = false;
+
+    protected static $externalWriter = [
+        self::SNAPPYPDF => CExporter_PhpSpreadsheet_SnappyPdf::class,
+        self::SNAPPYIMAGE => CExporter_PhpSpreadsheet_SnappyImage::class,
+    ];
+
+    public static function isExternalWriter($writerType) {
+        return in_array($writerType, array_keys(self::$externalWriter));
+    }
+
+    public static function registerWriter($writerType) {
+        $writerClass = carr::get(self::$externalWriter, $writerType);
+
+        return IOFactory::registerWriter($writerType, $writerClass);
+    }
 
     /**
      * @param object $export
@@ -88,6 +108,25 @@ class CExporter {
      * @param object      $export
      * @param null|string $fileName
      * @param string      $writerType
+     * @param array       $headers
+     *
+     * @throws \PhpOffice\PhpSpreadsheet\Exception
+     * @throws \PhpOffice\PhpSpreadsheet\Writer\Exception
+     *
+     * @return void
+     */
+    public static function toDownloadResponse($export, $fileName, $writerType = null, array $headers = []) {
+        return c::response()->download(
+            static::export($export, $fileName, $writerType)->getLocalPath(),
+            $fileName,
+            $headers
+        )->deleteFileAfterSend(true);
+    }
+
+    /**
+     * @param object      $export
+     * @param null|string $fileName
+     * @param string      $writerType
      *
      * @throws \PhpOffice\PhpSpreadsheet\Exception
      *
@@ -95,7 +134,12 @@ class CExporter {
      */
     protected static function export($export, $fileName, $writerType = null) {
         $writerType = CExporter_FileTypeDetector::detectStrict($fileName, $writerType);
+
         $export = CExporter_ExportableDetector::toExportable($export);
+
+        if (CExporter::isExternalWriter($writerType)) {
+            CExporter::registerWriter($writerType);
+        }
 
         return static::writer()->export($export, $writerType);
     }
@@ -150,7 +194,10 @@ class CExporter {
             case static::MPDF:
             case static::TCPDF:
             case static::DOMPDF:
+            case static::SNAPPYPDF:
                 return 'pdf';
+            case static::SNAPPYIMAGE:
+                return 'jpg';
         }
 
         return 'xlsx';

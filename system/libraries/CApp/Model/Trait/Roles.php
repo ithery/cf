@@ -63,8 +63,14 @@ trait CApp_Model_Trait_Roles {
                 $query->where('org_id', '=', $orgId)->orWhereNull('org_id');
             })->where('status', '>', 0);
         }
-        if (strlen($type) > 0) {
-            $root = $root->where('type', '=', $type);
+        if (is_array($type)) {
+            foreach ($type as $k => $v) {
+                $root = $root->where($k, '=', $v);
+            }
+        } else {
+            if (strlen($type) > 0) {
+                $root = $root->where('type', '=', $type);
+            }
         }
         $tree = $root->get()->toTree();
 

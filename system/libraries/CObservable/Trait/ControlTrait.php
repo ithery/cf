@@ -347,6 +347,20 @@ trait CObservable_Trait_ControlTrait {
      *
      * @param null|string $id
      *
+     * @return CElement_FormInput_Checkbox
+     */
+    public function addCheckboxControl($id = null) {
+        $control = new CElement_FormInput_Checkbox($id);
+        $this->wrapper->add($control);
+
+        return $control;
+    }
+
+    /**
+     * Create Text Control.
+     *
+     * @param null|string $id
+     *
      * @return CElement_FormInput_QueryBuilder
      */
     public function addQueryBuilderControl($id = null) {
