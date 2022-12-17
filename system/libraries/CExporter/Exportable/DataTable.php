@@ -1,5 +1,7 @@
 <?php
 use PhpOffice\PhpSpreadsheet\Shared\Date;
+use PhpOffice\PhpSpreadsheet\Style\Border;
+
 use PhpOffice\PhpSpreadsheet\Cell\DataType;
 
 use PhpOffice\PhpSpreadsheet\Cell\Coordinate;
@@ -15,11 +17,30 @@ class CExporter_Exportable_DataTable extends CExporter_Exportable implements CEx
 
     protected $columnFormats;
 
-    protected $bordered = false;
-
+    /**
+     * @var string|CColor_FormatAbstract
+     */
     protected $headingColor = null;
 
+    /**
+     * @var string|CColor_FormatAbstract
+     */
     protected $headingBackgroundColor = null;
+
+    /**
+     * Possible values:
+     * none, dashDot, dashDotDot, dashed, dotted, double, hair,
+     * medium, mediumDashDot, mediumDashDotDot, slantDashDot
+     * thick, thin.
+     *
+     * @var string
+     */
+    protected $borderStyle = Border::BORDER_NONE;
+
+    /**
+     * @var string|CColor_FormatAbstract
+     */
+    protected $borderColor = null;
 
     public function __construct(CElement_Component_DataTable $table) {
         $this->table = $table;
@@ -271,6 +292,7 @@ class CExporter_Exportable_DataTable extends CExporter_Exportable implements CEx
         $lastRow = $worksheet->getHighestRow();
 
         $event->sheet->autoSize();
+
         $footerFields = $this->table->getFooterFields();
         $currentRow = $lastRow;
         foreach ($footerFields as $footerField) {
@@ -285,6 +307,33 @@ class CExporter_Exportable_DataTable extends CExporter_Exportable implements CEx
             } else {
                 $worksheet->setCellValue(Coordinate::stringFromColumnIndex($lastColumn) . $currentRow, $value, $dataType);
             }
+        }
+
+        if ($this->borderColor) {
+            $worksheet->getStyle(
+                'A1:'
+                . $worksheet->getHighestColumn()
+                . $worksheet->getHighestRow()
+            )->applyFromArray([
+                'borders' => [
+                    'outline' => [
+                        'color' => ['argb' => $this->toSpreadsheetColor($this->borderColor)],
+                    ]
+                ]
+            ]);
+        }
+        if ($this->borderStyle) {
+            $worksheet->getStyle(
+                'A1:'
+                . $worksheet->getHighestColumn()
+                . $worksheet->getHighestRow()
+            )->applyFromArray([
+                'borders' => [
+                    'outline' => [
+                        'style' => $this->borderStyle,
+                    ]
+                ]
+            ]);
         }
         parent::handleAfterSheet($event);
     }
