@@ -6,7 +6,8 @@ use PhpOffice\PhpSpreadsheet\Cell\Coordinate;
 use PhpOffice\PhpSpreadsheet\Style\Alignment;
 use PhpOffice\PhpSpreadsheet\Style\NumberFormat;
 
-class CExporter_Exportable_DataTable extends CExporter_Exportable implements CExporter_Concern_ShouldAutoSize, CExporter_Concern_FromDataTable, CExporter_Concern_WithHeadings, CExporter_Concern_WithMapping, CExporter_Concern_WithColumnFormatting, CExporter_Concern_WithEvents {
+class CExporter_Exportable_DataTable extends CExporter_Exportable implements CExporter_Concern_ShouldAutoSize, CExporter_Concern_FromDataTable, CExporter_Concern_WithHeadings, CExporter_Concern_WithMapping, CExporter_Concern_WithColumnFormatting {
+    use CExporter_Exportable_Trait_UseColorTrait;
     /**
      * @var CElement_Component_DataTable
      */
@@ -14,18 +15,27 @@ class CExporter_Exportable_DataTable extends CExporter_Exportable implements CEx
 
     protected $columnFormats;
 
+    protected $bordered = false;
+
+    protected $headingColor = null;
+
+    protected $headingBackgroundColor = null;
+
     public function __construct(CElement_Component_DataTable $table) {
         $this->table = $table;
         $this->columnFormats = [];
     }
 
-    /**
-     * @return array
-     */
-    public function registerEvents() {
-        return [
-            CExporter_Event_AfterSheet::class => [$this, 'handleAfterSheet'],
-        ];
+    public function setHeadingColor($color) {
+        $this->headingColor = $color;
+
+        return $this;
+    }
+
+    public function setHeadingBackgroundColor($color) {
+        $this->headingBackgroundColor = $color;
+
+        return $this;
     }
 
     /**
@@ -176,7 +186,7 @@ class CExporter_Exportable_DataTable extends CExporter_Exportable implements CEx
 
     public static function dataTypeToColumnFormat($dataType) {
         if ($dataType == 'date') {
-            return NumberFormat::FORMAT_DATE_YYYYMMDD2;
+            return NumberFormat::FORMAT_DATE_YYYYMMDD;
         }
         if ($dataType == 'datetime') {
             return 'yyyy-mm-dd hh:mm:ss';
@@ -223,7 +233,26 @@ class CExporter_Exportable_DataTable extends CExporter_Exportable implements CEx
                 'horizontal' => Alignment::HORIZONTAL_CENTER
             ]
         ];
+        if ($this->headingBackgroundColor) {
+            $worksheet->getStyle('A1:' . $lastColumnStr . '1')->applyFromArray(
+                [
+                    'fill' => [
+                        'fillType' => \PhpOffice\PhpSpreadsheet\Style\Fill::FILL_SOLID,
+                        'color' => ['argb' => $this->toSpreadsheetColor($this->headingBackgroundColor)]
+                    ],
+                ],
+            );
+        }
+        if ($this->headingColor) {
+            $worksheet->getStyle('A1:' . $lastColumnStr . '1')->applyFromArray(
+                [
+                    'font' => [
+                        'color' => ['argb' => $this->toSpreadsheetColor($this->headingColor)],
+                    ],
 
+                ],
+            );
+        }
         $reportHeaders = $this->table->getReportHeaders();
         $headersCount = count($reportHeaders);
         if ($headersCount > 0) {
@@ -250,11 +279,13 @@ class CExporter_Exportable_DataTable extends CExporter_Exportable implements CEx
             $value = $footerField->getValue();
             $dataType = static::detectDataTypeFromValue($value);
             $worksheet->setCellValue('A' . $currentRow, $label);
+            $worksheet->mergeCells(sprintf('A%d:%s%d', $currentRow, $lastColumnStr, $currentRow));
             if ($dataType) {
                 $worksheet->setCellValueExplicit(Coordinate::stringFromColumnIndex($lastColumn) . $currentRow, $value, $dataType);
             } else {
                 $worksheet->setCellValue(Coordinate::stringFromColumnIndex($lastColumn) . $currentRow, $value, $dataType);
             }
         }
+        parent::handleAfterSheet($event);
     }
 }
