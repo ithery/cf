@@ -1,7 +1,15 @@
 <?php
 
 class CChart {
-    public static function pieChart($width = 500, $height = 500) {
-        return new CChart_Chart_PieChart($width, $height);
+    public static function pieChart() {
+        return new CChart_Chart_PieChart();
+    }
+
+    public static function lineChart() {
+        return new CChart_Chart_LineChart();
+    }
+
+    public static function barChart() {
+        return new CChart_Chart_BarChart();
     }
 }

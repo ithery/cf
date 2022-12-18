@@ -20,6 +20,7 @@ class CImage_GoogleChart_Chart {
      * API server URL.
      *
      * @var string
+     *
      * @usedby getUrl()
      */
     private $baseUrl = 'chart.apis.google.com/chart?';

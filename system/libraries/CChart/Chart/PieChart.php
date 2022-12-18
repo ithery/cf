@@ -3,7 +3,7 @@
 class CChart_Chart_PieChart extends CChart_ChartAbstract {
     /**
      * @param string $label
-     * @param array  $data
+     * @param int    $data
      *
      * @return $this
      */
