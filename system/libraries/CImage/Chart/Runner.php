@@ -2,15 +2,13 @@
 
 defined('SYSPATH') or die('No direct access allowed.');
 
-use CImage_Chart_Constant as Constant;
-
 /**
  * @author Hery Kurniawan
  * @license Ittron Global Teknologi <ittron.co.id>
  *
  * @since Aug 30, 2019, 2:11:47 AM
  */
-class Controller_Cresenity_Chart extends CController {
+class CImage_Chart_Runner extends CController {
     public function __construct() {
         parent::__construct();
     }

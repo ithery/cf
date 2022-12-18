@@ -430,4 +430,13 @@ class Controller_Cresenity extends CController {
     public function chat() {
         return c::view('cresenity.bot.chat');
     }
+
+    public function graph() {
+        $request = c::request();
+        $builder = CImage_Chart::createBuilder();
+        $builder->chs($request->chs);
+        $builder->cht($request->cht);
+
+        return $builder->render();
+    }
 }

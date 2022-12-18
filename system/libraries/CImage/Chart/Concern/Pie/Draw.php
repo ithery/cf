@@ -36,7 +36,7 @@ trait CImage_Chart_Concern_Pie_Draw {
 
         /* Do we have an abscissa serie defined? */
         if ($data['abscissa'] == '') {
-            return(Constant::PIE_NO_ABSCISSA);
+            return Constant::PIE_NO_ABSCISSA;
         }
 
         /* Try to find the data serie */
@@ -49,7 +49,7 @@ trait CImage_Chart_Concern_Pie_Draw {
 
         /* Do we have data to compute? */
         if ($dataSerie == '') {
-            return(Constant::PIE_NO_DATASERIE);
+            return Constant::PIE_NO_DATASERIE;
         }
 
         /* Remove unused data */
@@ -60,7 +60,7 @@ trait CImage_Chart_Concern_Pie_Draw {
 
         /* Do we have data to draw? */
         if ($serieSum == 0) {
-            return(Constant::PIE_SUMISNULL);
+            return Constant::PIE_SUMISNULL;
         }
 
         /* Dump the real number of data to draw */
@@ -92,7 +92,7 @@ trait CImage_Chart_Concern_Pie_Draw {
 
         /* Draw the polygon pie elements */
         $step = 360 / (2 * Constant::PI * $radius);
-        $Offset = 0;
+        $offset = 0;
         $ID = 0;
         foreach ($values as $Key => $value) {
             if ($shadow) {
@@ -117,12 +117,12 @@ trait CImage_Chart_Concern_Pie_Draw {
             }
 
             $plots = [];
-            $EndAngle = $Offset + ($value * $scaleFactor);
-            if ($EndAngle > 360) {
-                $EndAngle = 360;
+            $endAngle = $offset + ($value * $scaleFactor);
+            if ($endAngle > 360) {
+                $endAngle = 360;
             }
 
-            $angle = ($EndAngle - $Offset) / 2 + $Offset;
+            $angle = ($endAngle - $offset) / 2 + $offset;
             if ($dataGapAngle == 0) {
                 $x0 = $x;
                 $y0 = $y;
@@ -134,7 +134,7 @@ trait CImage_Chart_Concern_Pie_Draw {
             $plots[] = $x0;
             $plots[] = $y0;
 
-            for ($i = $Offset; $i <= $EndAngle; $i = $i + $step) {
+            for ($i = $offset; $i <= $endAngle; $i = $i + $step) {
                 $xc = cos(($i - 90) * Constant::PI / 180) * $radius + $x;
                 $yc = sin(($i - 90) * Constant::PI / 180) * $radius + $y;
 
@@ -165,7 +165,7 @@ trait CImage_Chart_Concern_Pie_Draw {
                     $settings = ['fillR' => $labelR, 'fillG' => $labelG, 'fillB' => $labelB, 'alpha' => $labelAlpha];
                 }
 
-                $angle = ($EndAngle - $Offset) / 2 + $Offset;
+                $angle = ($endAngle - $offset) / 2 + $offset;
                 $xc = cos(($angle - 90) * Constant::PI / 180) * $radius + $x;
                 $yc = sin(($angle - 90) * Constant::PI / 180) * $radius + $y;
 
@@ -178,14 +178,14 @@ trait CImage_Chart_Concern_Pie_Draw {
                 }
             }
 
-            $Offset = $i + $dataGapAngle;
+            $offset = $i + $dataGapAngle;
             $ID++;
         }
 
         /* Second pass to smooth the angles */
         if ($secondPass) {
             $step = 360 / (2 * Constant::PI * $radius);
-            $Offset = 0;
+            $offset = 0;
             $ID = 0;
             foreach ($values as $Key => $value) {
                 $FirstPoint = true;
@@ -199,23 +199,23 @@ trait CImage_Chart_Concern_Pie_Draw {
                     }
                 }
 
-                $EndAngle = $Offset + ($value * $scaleFactor);
-                if ($EndAngle > 360) {
-                    $EndAngle = 360;
+                $endAngle = $offset + ($value * $scaleFactor);
+                if ($endAngle > 360) {
+                    $endAngle = 360;
                 }
 
                 if ($dataGapAngle == 0) {
                     $x0 = $x;
                     $y0 = $y;
                 } else {
-                    $angle = ($EndAngle - $Offset) / 2 + $Offset;
+                    $angle = ($endAngle - $offset) / 2 + $offset;
                     $x0 = cos(($angle - 90) * Constant::PI / 180) * $dataGapRadius + $x;
                     $y0 = sin(($angle - 90) * Constant::PI / 180) * $dataGapRadius + $y;
                 }
                 $plots[] = $x0;
                 $plots[] = $y0;
 
-                for ($i = $Offset; $i <= $EndAngle; $i = $i + $step) {
+                for ($i = $offset; $i <= $endAngle; $i = $i + $step) {
                     $xc = cos(($i - 90) * Constant::PI / 180) * $radius + $x;
                     $yc = sin(($i - 90) * Constant::PI / 180) * $radius + $y;
 
@@ -235,7 +235,7 @@ trait CImage_Chart_Concern_Pie_Draw {
                         $settings = ['fillR' => $labelR, 'fillG' => $labelG, 'fillB' => $labelB, 'alpha' => $labelAlpha];
                     }
 
-                    $angle = ($EndAngle - $Offset) / 2 + $Offset;
+                    $angle = ($endAngle - $offset) / 2 + $offset;
                     $xc = cos(($angle - 90) * Constant::PI / 180) * $radius + $x;
                     $yc = sin(($angle - 90) * Constant::PI / 180) * $radius + $y;
 
@@ -248,22 +248,22 @@ trait CImage_Chart_Concern_Pie_Draw {
                     }
                 }
 
-                $Offset = $i + $dataGapAngle;
+                $offset = $i + $dataGapAngle;
                 $ID++;
             }
         }
 
         if ($writeValues != null && !$shadow) {
             $step = 360 / (2 * Constant::PI * $radius);
-            $Offset = 0;
+            $offset = 0;
             $ID = count($values) - 1;
             $settings = ['align' => Constant::TEXT_ALIGN_MIDDLEMIDDLE, 'r' => $valueR, 'g' => $valueG, 'b' => $valueB, 'alpha' => $valueAlpha];
             foreach ($values as $Key => $value) {
-                $EndAngle = ($value * $scaleFactor) + $Offset;
-                if ((int)$EndAngle > 360) {
-                    $EndAngle = 0;
+                $endAngle = ($value * $scaleFactor) + $offset;
+                if ((int) $endAngle > 360) {
+                    $endAngle = 0;
                 }
-                $angle = ($EndAngle - $Offset) / 2 + $Offset;
+                $angle = ($endAngle - $offset) / 2 + $offset;
 
                 if ($valuePosition == Constant::PIE_VALUE_OUTSIDE) {
                     $xc = cos(($angle - 90) * Constant::PI / 180) * ($radius + $valuePadding) + $x;
@@ -281,7 +281,7 @@ trait CImage_Chart_Concern_Pie_Draw {
 
                 $this->chartObject->drawText($xc, $yc, $display, $settings);
 
-                $Offset = $EndAngle + $dataGapAngle;
+                $offset = $endAngle + $dataGapAngle;
                 $ID--;
             }
         }
@@ -292,17 +292,17 @@ trait CImage_Chart_Concern_Pie_Draw {
 
         $this->chartObject->shadow = $restoreShadow;
 
-        return(Constant::PIE_RENDERED);
+        return Constant::PIE_RENDERED;
     }
 
     /**
-     * Draw a 3D pie chart
+     * Draw a 3D pie chart.
      *
      * @param mixed $x
      * @param mixed $y
      * @param mixed $format
      */
-    public function draw3DPie($x, $y, $format = '') {
+    public function draw3DPie($x, $y, $format = []) {
         /* Rendering layout */
         $radius = isset($format['radius']) ? $format['radius'] : 80;
         $precision = isset($format['precision']) ? $format['precision'] : 0;
@@ -341,7 +341,7 @@ trait CImage_Chart_Concern_Pie_Draw {
 
         /* Do we have an abscissa serie defined? */
         if ($data['abscissa'] == '') {
-            return(Constant::PIE_NO_ABSCISSA);
+            return Constant::PIE_NO_ABSCISSA;
         }
 
         /* Try to find the data serie */
@@ -354,7 +354,7 @@ trait CImage_Chart_Concern_Pie_Draw {
 
         /* Do we have data to compute? */
         if ($dataSerie == '') {
-            return(Constant::PIE_NO_DATASERIE);
+            return Constant::PIE_NO_DATASERIE;
         }
 
         /* Remove unused data */
@@ -365,7 +365,7 @@ trait CImage_Chart_Concern_Pie_Draw {
 
         /* Do we have data to draw? */
         if ($serieSum == 0) {
-            return(Constant::PIE_SUMISNULL);
+            return Constant::PIE_SUMISNULL;
         }
 
         /* Dump the real number of data to draw */
@@ -393,14 +393,14 @@ trait CImage_Chart_Concern_Pie_Draw {
 
         /* Draw the polygon pie elements */
         $step = 360 / (2 * Constant::PI * $radius);
-        $Offset = 360;
+        $offset = 360;
         $ID = count($values) - 1;
         $values = array_reverse($values);
         $slice = 0;
         $slices = [];
         $sliceColors = [];
-        $visible = '';
-        $sliceAngle = '';
+        $visible = [];
+        $sliceAngle = [];
         foreach ($values as $Key => $value) {
             if (!isset($palette[$ID]['r'])) {
                 $Color = $this->chartObject->getRandomColor();
@@ -411,10 +411,10 @@ trait CImage_Chart_Concern_Pie_Draw {
 
             $sliceColors[$slice] = $settings;
 
-            $startAngle = $Offset;
-            $EndAngle = $Offset - ($value * $scaleFactor);
-            if ($EndAngle < 0) {
-                $EndAngle = 0;
+            $startAngle = $offset;
+            $endAngle = $offset - ($value * $scaleFactor);
+            if ($endAngle < 0) {
+                $endAngle = 0;
             }
 
             if ($startAngle > 180) {
@@ -422,7 +422,7 @@ trait CImage_Chart_Concern_Pie_Draw {
             } else {
                 $visible[$slice]['start'] = true;
             }
-            if ($EndAngle < 180) {
+            if ($endAngle < 180) {
                 $visible[$slice]['End'] = false;
             } else {
                 $visible[$slice]['End'] = true;
@@ -432,7 +432,7 @@ trait CImage_Chart_Concern_Pie_Draw {
                 $x0 = $x;
                 $y0 = $y;
             } else {
-                $angle = ($EndAngle - $Offset) / 2 + $Offset;
+                $angle = ($endAngle - $offset) / 2 + $offset;
                 $x0 = cos(($angle - 90) * Constant::PI / 180) * $dataGapRadius + $x;
                 $y0 = sin(($angle - 90) * Constant::PI / 180) * $dataGapRadius * $skewFactor + $y;
             }
@@ -440,7 +440,7 @@ trait CImage_Chart_Concern_Pie_Draw {
             $slices[$slice][] = $y0;
             $sliceAngle[$slice][] = 0;
 
-            for ($i = $Offset; $i >= $EndAngle; $i = $i - $step) {
+            for ($i = $offset; $i >= $endAngle; $i = $i - $step) {
                 $xc = cos(($i - 90) * Constant::PI / 180) * $radius + $x;
                 $yc = sin(($i - 90) * Constant::PI / 180) * $radius * $skewFactor + $y;
 
@@ -463,7 +463,7 @@ trait CImage_Chart_Concern_Pie_Draw {
                 $sliceAngle[$slice][] = $i;
             }
 
-            $Offset = $i - $dataGapAngle;
+            $offset = $i - $dataGapAngle;
             $ID--;
             $slice++;
         }
@@ -482,21 +482,21 @@ trait CImage_Chart_Concern_Pie_Draw {
             }
 
             $step = 360 / (2 * Constant::PI * $radius);
-            $Offset = 360;
+            $offset = 360;
             foreach ($values as $Key => $value) {
-                $EndAngle = $Offset - ($value * $scaleFactor);
-                if ($EndAngle < 0) {
-                    $EndAngle = 0;
+                $endAngle = $offset - ($value * $scaleFactor);
+                if ($endAngle < 0) {
+                    $endAngle = 0;
                 }
 
-                for ($i = $Offset; $i >= $EndAngle; $i = $i - $step) {
+                for ($i = $offset; $i >= $endAngle; $i = $i - $step) {
                     $xc = cos(($i - 90) * Constant::PI / 180) * $radius + $x + $this->chartObject->shadowX;
                     $yc = sin(($i - 90) * Constant::PI / 180) * $radius * $skewFactor + $y + $this->chartObject->shadowY;
 
                     $this->chartObject->drawAntialiasPixel($xc, $yc, $settings);
                 }
 
-                $Offset = $i - $dataGapAngle;
+                $offset = $i - $dataGapAngle;
                 $ID--;
             }
         }
@@ -513,7 +513,6 @@ trait CImage_Chart_Concern_Pie_Draw {
                     $settings['r'] += 30;
                     $settings['g'] += 30;
                     $settings['b'] += 30;
-                    ;
                 }
 
                 if (isset($sliceAngle[$sliceID][1])) {
@@ -666,7 +665,7 @@ trait CImage_Chart_Concern_Pie_Draw {
         /* Second pass to smooth the angles */
         if ($secondPass) {
             $step = 360 / (2 * Constant::PI * $radius);
-            $Offset = 360;
+            $offset = 360;
             $ID = count($values) - 1;
             foreach ($values as $Key => $value) {
                 $FirstPoint = true;
@@ -680,23 +679,23 @@ trait CImage_Chart_Concern_Pie_Draw {
                     }
                 }
 
-                $EndAngle = $Offset - ($value * $scaleFactor);
-                if ($EndAngle < 0) {
-                    $EndAngle = 0;
+                $endAngle = $offset - ($value * $scaleFactor);
+                if ($endAngle < 0) {
+                    $endAngle = 0;
                 }
 
                 if ($dataGapAngle == 0) {
                     $x0 = $x;
                     $y0 = $y - $sliceHeight;
                 } else {
-                    $angle = ($EndAngle - $Offset) / 2 + $Offset;
+                    $angle = ($endAngle - $offset) / 2 + $offset;
                     $x0 = cos(($angle - 90) * Constant::PI / 180) * $dataGapRadius + $x;
                     $y0 = sin(($angle - 90) * Constant::PI / 180) * $dataGapRadius * $skewFactor + $y - $sliceHeight;
                 }
                 $plots[] = $x0;
                 $plots[] = $y0;
 
-                for ($i = $Offset; $i >= $EndAngle; $i = $i - $step) {
+                for ($i = $offset; $i >= $endAngle; $i = $i - $step) {
                     $xc = cos(($i - 90) * Constant::PI / 180) * $radius + $x;
                     $yc = sin(($i - 90) * Constant::PI / 180) * $radius * $skewFactor + $y - $sliceHeight;
 
@@ -712,23 +711,23 @@ trait CImage_Chart_Concern_Pie_Draw {
                 }
                 $this->chartObject->drawLine($xc, $yc, $x0, $y0, $settings);
 
-                $Offset = $i - $dataGapAngle;
+                $offset = $i - $dataGapAngle;
                 $ID--;
             }
         }
 
         if ($writeValues != null) {
             $step = 360 / (2 * Constant::PI * $radius);
-            $Offset = 360;
+            $offset = 360;
             $ID = count($values) - 1;
             $settings = ['align' => Constant::TEXT_ALIGN_MIDDLEMIDDLE, 'r' => $valueR, 'g' => $valueG, 'b' => $valueB, 'alpha' => $valueAlpha];
             foreach ($values as $Key => $value) {
-                $EndAngle = $Offset - ($value * $scaleFactor);
-                if ($EndAngle < 0) {
-                    $EndAngle = 0;
+                $endAngle = $offset - ($value * $scaleFactor);
+                if ($endAngle < 0) {
+                    $endAngle = 0;
                 }
 
-                $angle = ($EndAngle - $Offset) / 2 + $Offset;
+                $angle = ($endAngle - $offset) / 2 + $offset;
 
                 if ($valuePosition == Constant::PIE_VALUE_OUTSIDE) {
                     $xc = cos(($angle - 90) * Constant::PI / 180) * ($radius + $valuePadding) + $x;
@@ -746,14 +745,14 @@ trait CImage_Chart_Concern_Pie_Draw {
 
                 $this->chartObject->drawText($xc, $yc, $display, $settings);
 
-                $Offset = $EndAngle - $dataGapAngle;
+                $offset = $endAngle - $dataGapAngle;
                 $ID--;
             }
         }
 
         if ($drawLabels) {
             $step = 360 / (2 * Constant::PI * $radius);
-            $Offset = 360;
+            $offset = 360;
             $ID = count($values) - 1;
             foreach ($values as $Key => $value) {
                 if ($labelColor == Constant::PIE_LABEL_COLOR_AUTO) {
@@ -762,12 +761,12 @@ trait CImage_Chart_Concern_Pie_Draw {
                     $settings = ['fillR' => $labelR, 'fillG' => $labelG, 'fillB' => $labelB, 'alpha' => $labelAlpha];
                 }
 
-                $EndAngle = $Offset - ($value * $scaleFactor);
-                if ($EndAngle < 0) {
-                    $EndAngle = 0;
+                $endAngle = $offset - ($value * $scaleFactor);
+                if ($endAngle < 0) {
+                    $endAngle = 0;
                 }
 
-                $angle = ($EndAngle - $Offset) / 2 + $Offset;
+                $angle = ($endAngle - $offset) / 2 + $offset;
                 $xc = cos(($angle - 90) * Constant::PI / 180) * $radius + $x;
                 $yc = sin(($angle - 90) * Constant::PI / 180) * $radius * $skewFactor + $y - $sliceHeight;
 
@@ -781,7 +780,7 @@ trait CImage_Chart_Concern_Pie_Draw {
                     }
                 }
 
-                $Offset = $EndAngle - $dataGapAngle;
+                $offset = $endAngle - $dataGapAngle;
                 $ID--;
             }
         }
@@ -792,11 +791,11 @@ trait CImage_Chart_Concern_Pie_Draw {
 
         $this->chartObject->shadow = $restoreShadow;
 
-        return(Constant::PIE_RENDERED);
+        return Constant::PIE_RENDERED;
     }
 
     /**
-     * Draw a ring chart
+     * Draw a ring chart.
      *
      * @param mixed $x
      * @param mixed $y
@@ -835,7 +834,7 @@ trait CImage_Chart_Concern_Pie_Draw {
 
         /* Do we have an abscissa serie defined? */
         if ($data['abscissa'] == '') {
-            return(Constant::PIE_NO_ABSCISSA);
+            return Constant::PIE_NO_ABSCISSA;
         }
 
         /* Try to find the data serie */
@@ -848,7 +847,7 @@ trait CImage_Chart_Concern_Pie_Draw {
 
         /* Do we have data to compute? */
         if ($dataSerie == '') {
-            return(Constant::PIE_NO_DATASERIE);
+            return Constant::PIE_NO_DATASERIE;
         }
 
         /* Remove unused data */
@@ -859,7 +858,7 @@ trait CImage_Chart_Concern_Pie_Draw {
 
         /* Do we have data to draw? */
         if ($serieSum == 0) {
-            return(Constant::PIE_SUMISNULL);
+            return Constant::PIE_SUMISNULL;
         }
 
         /* Dump the real number of data to draw */
@@ -891,7 +890,7 @@ trait CImage_Chart_Concern_Pie_Draw {
 
         /* Draw the polygon pie elements */
         $step = 360 / (2 * Constant::PI * $OuterRadius);
-        $Offset = 0;
+        $offset = 0;
         $ID = 0;
         foreach ($values as $Key => $value) {
             if ($shadow) {
@@ -915,11 +914,11 @@ trait CImage_Chart_Concern_Pie_Draw {
             $plots = [];
             $boundaries = '';
             $aAPixels = [];
-            $EndAngle = $Offset + ($value * $scaleFactor);
-            if ($EndAngle > 360) {
-                $EndAngle = 360;
+            $endAngle = $offset + ($value * $scaleFactor);
+            if ($endAngle > 360) {
+                $endAngle = 360;
             }
-            for ($i = $Offset; $i <= $EndAngle; $i = $i + $step) {
+            for ($i = $offset; $i <= $endAngle; $i = $i + $step) {
                 $xc = cos(($i - 90) * Constant::PI / 180) * $OuterRadius + $x;
                 $yc = sin(($i - 90) * Constant::PI / 180) * $OuterRadius + $y;
 
@@ -945,9 +944,9 @@ trait CImage_Chart_Concern_Pie_Draw {
             }
             $boundaries[1]['x1'] = $xc;
             $boundaries[1]['y1'] = $yc;
-            $lasti = $EndAngle;
+            $lasti = $endAngle;
 
-            for ($i = $EndAngle; $i >= $Offset; $i = $i - $step) {
+            for ($i = $endAngle; $i >= $offset; $i = $i - $step) {
                 $xc = cos(($i - 90) * Constant::PI / 180) * ($InnerRadius - 1) + $x;
                 $yc = sin(($i - 90) * Constant::PI / 180) * ($InnerRadius - 1) + $y;
 
@@ -997,7 +996,7 @@ trait CImage_Chart_Concern_Pie_Draw {
                     $settings = ['fillR' => $labelR, 'fillG' => $labelG, 'fillB' => $labelB, 'alpha' => $labelAlpha];
                 }
 
-                $angle = ($EndAngle - $Offset) / 2 + $Offset;
+                $angle = ($endAngle - $offset) / 2 + $offset;
                 $xc = cos(($angle - 90) * Constant::PI / 180) * $OuterRadius + $x;
                 $yc = sin(($angle - 90) * Constant::PI / 180) * $OuterRadius + $y;
 
@@ -1010,7 +1009,7 @@ trait CImage_Chart_Concern_Pie_Draw {
                 }
             }
 
-            $Offset = $lasti;
+            $offset = $lasti;
             $ID++;
         }
 
@@ -1020,14 +1019,14 @@ trait CImage_Chart_Concern_Pie_Draw {
 
         if ($writeValues && !$shadow) {
             $step = 360 / (2 * Constant::PI * $OuterRadius);
-            $Offset = 0;
+            $offset = 0;
             foreach ($values as $Key => $value) {
-                $EndAngle = $Offset + ($value * $scaleFactor);
-                if ($EndAngle > 360) {
-                    $EndAngle = 360;
+                $endAngle = $offset + ($value * $scaleFactor);
+                if ($endAngle > 360) {
+                    $endAngle = 360;
                 }
 
-                $angle = $Offset + ($value * $scaleFactor) / 2;
+                $angle = $offset + ($value * $scaleFactor) / 2;
                 if ($valuePosition == Constant::PIE_VALUE_OUTSIDE) {
                     $xc = cos(($angle - 90) * Constant::PI / 180) * ($OuterRadius + $valuePadding) + $x;
                     $yc = sin(($angle - 90) * Constant::PI / 180) * ($OuterRadius + $valuePadding) + $y;
@@ -1058,17 +1057,17 @@ trait CImage_Chart_Concern_Pie_Draw {
                 }
 
                 $this->chartObject->drawText($xc, $yc, $display, ['align' => $align, 'r' => $valueR, 'g' => $valueG, 'b' => $valueB]);
-                $Offset = $EndAngle;
+                $offset = $endAngle;
             }
         }
 
         $this->chartObject->shadow = $restoreShadow;
 
-        return(Constant::PIE_RENDERED);
+        return Constant::PIE_RENDERED;
     }
 
     /**
-     * Draw a 3D ring chart
+     * Draw a 3D ring chart.
      *
      * @param mixed $x
      * @param mixed $y
@@ -1113,7 +1112,7 @@ trait CImage_Chart_Concern_Pie_Draw {
 
         /* Do we have an abscissa serie defined? */
         if ($data['abscissa'] == '') {
-            return(Constant::PIE_NO_ABSCISSA);
+            return Constant::PIE_NO_ABSCISSA;
         }
 
         /* Try to find the data serie */
@@ -1126,7 +1125,7 @@ trait CImage_Chart_Concern_Pie_Draw {
 
         /* Do we have data to compute? */
         if ($dataSerie == '') {
-            return(Constant::PIE_NO_DATASERIE);
+            return Constant::PIE_NO_DATASERIE;
         }
 
         /* Remove unused data */
@@ -1137,7 +1136,7 @@ trait CImage_Chart_Concern_Pie_Draw {
 
         /* Do we have data to draw? */
         if ($serieSum == 0) {
-            return(Constant::PIE_SUMISNULL);
+            return Constant::PIE_SUMISNULL;
         }
 
         /* Dump the real number of data to draw */
@@ -1164,7 +1163,7 @@ trait CImage_Chart_Concern_Pie_Draw {
         }
 
         /* Draw the polygon ring elements */
-        $Offset = 360;
+        $offset = 360;
         $ID = count($values) - 1;
         $values = array_reverse($values);
         $slice = 0;
@@ -1182,10 +1181,10 @@ trait CImage_Chart_Concern_Pie_Draw {
 
             $sliceColors[$slice] = $settings;
 
-            $startAngle = $Offset;
-            $EndAngle = $Offset - ($value * $scaleFactor);
-            if ($EndAngle < 0) {
-                $EndAngle = 0;
+            $startAngle = $offset;
+            $endAngle = $offset - ($value * $scaleFactor);
+            if ($endAngle < 0) {
+                $endAngle = 0;
             }
 
             if ($startAngle > 180) {
@@ -1193,7 +1192,7 @@ trait CImage_Chart_Concern_Pie_Draw {
             } else {
                 $visible[$slice]['start'] = true;
             }
-            if ($EndAngle < 180) {
+            if ($endAngle < 180) {
                 $visible[$slice]['End'] = false;
             } else {
                 $visible[$slice]['End'] = true;
@@ -1202,7 +1201,7 @@ trait CImage_Chart_Concern_Pie_Draw {
             $step = (360 / (2 * Constant::PI * $OuterRadius)) / 2;
             $OutX1 = Constant::VOID;
             $OutY1 = Constant::VOID;
-            for ($i = $Offset; $i >= $EndAngle; $i = $i - $step) {
+            for ($i = $offset; $i >= $endAngle; $i = $i - $step) {
                 $xc = cos(($i - 90) * Constant::PI / 180) * ($OuterRadius + $dataGapRadius - 2) + $x;
                 $yc = sin(($i - 90) * Constant::PI / 180) * ($OuterRadius + $dataGapRadius - 2) * $skewFactor + $y;
                 $slices[$slice]['aA'][] = [$xc, $yc];
@@ -1249,7 +1248,7 @@ trait CImage_Chart_Concern_Pie_Draw {
             $step = (360 / (2 * Constant::PI * $InnerRadius)) / 2;
             $InX1 = Constant::VOID;
             $InY1 = Constant::VOID;
-            for ($i = $EndAngle; $i <= $Offset; $i = $i + $step) {
+            for ($i = $endAngle; $i <= $offset; $i = $i + $step) {
                 $xc = cos(($i - 90) * Constant::PI / 180) * ($InnerRadius + $dataGapRadius - 1) + $x;
                 $yc = sin(($i - 90) * Constant::PI / 180) * ($InnerRadius + $dataGapRadius - 1) * $skewFactor + $y;
                 $slices[$slice]['aA'][] = [$xc, $yc];
@@ -1295,7 +1294,7 @@ trait CImage_Chart_Concern_Pie_Draw {
             $slices[$slice]['OutX2'] = $OutX2;
             $slices[$slice]['OutY2'] = $OutY2;
 
-            $Offset = $lasti - $dataGapAngle;
+            $offset = $lasti - $dataGapAngle;
             $ID--;
             $slice++;
         }
@@ -1328,7 +1327,7 @@ trait CImage_Chart_Concern_Pie_Draw {
             $startAngle = $plots['angle'][0];
             foreach ($plots['angle'] as $Key => $angle) {
                 if ($angle == Constant::VOID) {
-                    $EndAngle = $plots['angle'][$Key - 1];
+                    $endAngle = $plots['angle'][$Key - 1];
                 }
             }
 
@@ -1389,7 +1388,7 @@ trait CImage_Chart_Concern_Pie_Draw {
             $startAngle = $plots['angle'][0];
             foreach ($plots['angle'] as $Key => $angle) {
                 if ($angle == Constant::VOID) {
-                    $EndAngle = $plots['angle'][$Key - 1];
+                    $endAngle = $plots['angle'][$Key - 1];
                 }
             }
 
@@ -1407,7 +1406,7 @@ trait CImage_Chart_Concern_Pie_Draw {
                 $this->chartObject->drawPolygon($points, $settings);
             }
 
-            if ($EndAngle > 180) {
+            if ($endAngle > 180) {
                 $points = [];
                 $points[] = $plots['InX1'];
                 $points[] = $plots['InY1'];
@@ -1433,14 +1432,14 @@ trait CImage_Chart_Concern_Pie_Draw {
             $startAngle = $plots['angle'][0];
             foreach ($plots['angle'] as $Key => $angle) {
                 if ($angle == Constant::VOID) {
-                    $EndAngle = $plots['angle'][$Key - 1];
+                    $endAngle = $plots['angle'][$Key - 1];
                 }
             }
 
             if ($startAngle <= 270 && $startAngle >= 90) {
                 $this->chartObject->drawLine($plots['OutX1'], $plots['OutY1'], $plots['OutX1'], $plots['OutY1'] - $sliceHeight, $settings);
             }
-            if ($EndAngle <= 270 && $EndAngle >= 90) {
+            if ($endAngle <= 270 && $endAngle >= 90) {
                 $this->chartObject->drawLine($plots['OutX2'], $plots['OutY2'], $plots['OutX2'], $plots['OutY2'] - $sliceHeight, $settings);
             }
         }
@@ -1507,12 +1506,12 @@ trait CImage_Chart_Concern_Pie_Draw {
         }
 
         if ($drawLabels) {
-            $Offset = 360;
+            $offset = 360;
             foreach ($values as $Key => $value) {
-                $startAngle = $Offset;
-                $EndAngle = $Offset - ($value * $scaleFactor);
-                if ($EndAngle < 0) {
-                    $EndAngle = 0;
+                $startAngle = $offset;
+                $endAngle = $offset - ($value * $scaleFactor);
+                if ($endAngle < 0) {
+                    $endAngle = 0;
                 }
 
                 if ($labelColor == Constant::PIE_LABEL_COLOR_AUTO) {
@@ -1521,7 +1520,7 @@ trait CImage_Chart_Concern_Pie_Draw {
                     $settings = ['fillR' => $labelR, 'fillG' => $labelG, 'fillB' => $labelB, 'alpha' => $labelAlpha];
                 }
 
-                $angle = ($EndAngle - $Offset) / 2 + $Offset;
+                $angle = ($endAngle - $offset) / 2 + $offset;
                 $xc = cos(($angle - 90) * Constant::PI / 180) * ($OuterRadius + $dataGapRadius) + $x;
                 $yc = sin(($angle - 90) * Constant::PI / 180) * ($OuterRadius + $dataGapRadius) * $skewFactor + $y;
 
@@ -1539,7 +1538,7 @@ trait CImage_Chart_Concern_Pie_Draw {
                     $this->writePieLabel($xc, $yc - $sliceHeight, $label, $angle, $settings, false);
                 }
 
-                $Offset = $EndAngle - $dataGapAngle;
+                $offset = $endAngle - $dataGapAngle;
                 $ID--;
                 $slice++;
             }
@@ -1550,6 +1549,6 @@ trait CImage_Chart_Concern_Pie_Draw {
 
         $this->chartObject->shadow = $restoreShadow;
 
-        return(Constant::PIE_RENDERED);
+        return Constant::PIE_RENDERED;
     }
 }
