@@ -8,6 +8,9 @@ class CExporter_ExportableDetector {
 
             return new XPExport_DataTableExportable($table);
         }
+        if ($data instanceof CView_View) {
+            return new CExporter_Exportable_View($data);
+        }
         if ($data instanceof CExporter_Exportable) {
             return $data;
         }

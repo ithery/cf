@@ -67,7 +67,7 @@ trait CApp_Trait_BaseTrait {
     public static function orgId() {
         $orgId = CF::orgId();
         if ($orgId === null) {
-            $app = CApp::instance();
+            $app = c::app();
             if ($app->user() != null) {
                 if (strlen($app->user()->org_id) > 0) {
                     $orgId = $app->user()->org_id;

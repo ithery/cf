@@ -33,6 +33,11 @@ return [
         'subnav' => include dirname(__FILE__) . '/demo/model.php',
     ],
     [
+        'name' => 'image',
+        'label' => c::__('Image'),
+        'subnav' => include dirname(__FILE__) . '/demo/image.php',
+    ],
+    [
         'name' => 'cresjs',
         'label' => c::__('Cres JS'),
         'subnav' => include dirname(__FILE__) . '/demo/cresjs.php',

@@ -6,7 +6,9 @@ class CImage_Chart_Pie {
     use CImage_Chart_Concern_Pie_Draw;
 
     protected $chartObject;
+
     protected $dataObject;
+
     protected $labelPos = [];
 
     public function __construct(CImage_Chart_Image $image, CImage_Chart_Data $data) {
@@ -15,11 +17,11 @@ class CImage_Chart_Pie {
     }
 
     /**
-     * Draw the legend of pie chart
+     * Draw the legend of pie chart.
      *
      * @param int|float $x
      * @param int|float $y
-     * @param string $format
+     * @param string    $format
      */
     public function drawPieLegend($x, $y, $format = '') {
         $FontName = isset($format['fontName']) ? $format['fontName'] : $this->chartObject->fontName;
@@ -55,7 +57,7 @@ class CImage_Chart_Pie {
 
         /* Do we have an abscissa serie defined? */
         if ($data['abscissa'] == '') {
-            return(Constant::PIE_NO_ABSCISSA);
+            return Constant::PIE_NO_ABSCISSA;
         }
 
         $boundaries = '';
@@ -65,7 +67,7 @@ class CImage_Chart_Pie {
         $boundaries['b'] = 0;
         $vY = $y;
         $vX = $x;
-        foreach ($data['series'][$data['abscissa']]['data'] as $Key => $value) {
+        foreach ($data['series'][$data['abscissa']]['data'] as $key => $value) {
             $boxArray = $this->chartObject->getTextBox($vX + $boxSize + 4, $vY + $boxSize / 2, $FontName, $FontSize, 0, $value);
 
             if ($Mode == Constant::LEGEND_VERTICAL) {
@@ -108,10 +110,10 @@ class CImage_Chart_Pie {
 
         $restoreShadow = $this->chartObject->shadow;
         $this->chartObject->shadow = false;
-        foreach ($data['series'][$data['abscissa']]['data'] as $Key => $value) {
-            $r = $palette[$Key]['r'];
-            $G = $palette[$Key]['g'];
-            $b = $palette[$Key]['b'];
+        foreach ($data['series'][$data['abscissa']]['data'] as $key => $value) {
+            $r = $palette[$key]['r'];
+            $G = $palette[$key]['g'];
+            $b = $palette[$key]['b'];
 
             $this->chartObject->drawFilledRectangle($x + 1, $y + 1, $x + $boxSize + 1, $y + $boxSize + 1, ['r' => 0, 'g' => 0, 'b' => 0, 'alpha' => 20]);
             $this->chartObject->drawFilledRectangle($x, $y, $x + $boxSize, $y + $boxSize, ['r' => $r, 'g' => $G, 'b' => $b, 'Surrounding' => 20]);
@@ -128,7 +130,7 @@ class CImage_Chart_Pie {
     }
 
     /**
-     * Set the color of the specified slice
+     * Set the color of the specified slice.
      *
      * @param mixed $sliceID
      * @param mixed $format
@@ -146,7 +148,7 @@ class CImage_Chart_Pie {
     }
 
     /**
-     * Internally used compute the label positions
+     * Internally used compute the label positions.
      *
      * @param mixed $x
      * @param mixed $y
@@ -181,7 +183,7 @@ class CImage_Chart_Pie {
 
             if ($this->labelPos != '') {
                 $done = false;
-                foreach ($this->labelPos as $Key => $settings) {
+                foreach ($this->labelPos as $key => $settings) {
                     if (!$done) {
                         if ($angle <= 90 && (($yTop >= $settings['yTop'] && $yTop <= $settings['yBottom']) || ($yBottom >= $settings['yTop'] && $yBottom <= $settings['yBottom']))) {
                             $this->shift(0, 180, -($Height + 2), $reversed);
@@ -215,7 +217,7 @@ class CImage_Chart_Pie {
     }
 
     /**
-     * Internally used to shift label positions
+     * Internally used to shift label positions.
      *
      * @param mixed $startAngle
      * @param mixed $EndAngle
@@ -226,23 +228,23 @@ class CImage_Chart_Pie {
         if ($reversed) {
             $Offset = -$Offset;
         }
-        foreach ($this->labelPos as $Key => $settings) {
+        foreach ($this->labelPos as $key => $settings) {
             if ($settings['angle'] > $startAngle && $settings['angle'] <= $EndAngle) {
-                $this->labelPos[$Key]['yTop'] = $settings['yTop'] + $Offset;
-                $this->labelPos[$Key]['yBottom'] = $settings['yBottom'] + $Offset;
-                $this->labelPos[$Key]['y2'] = $settings['y2'] + $Offset;
+                $this->labelPos[$key]['yTop'] = $settings['yTop'] + $Offset;
+                $this->labelPos[$key]['yBottom'] = $settings['yBottom'] + $Offset;
+                $this->labelPos[$key]['y2'] = $settings['y2'] + $Offset;
             }
         }
     }
 
     /**
-     * Internally used to write the re-computed labels
+     * Internally used to write the re-computed labels.
      */
     public function writeShiftedLabels() {
         if ($this->labelPos == '') {
-            return(0);
+            return 0;
         }
-        foreach ($this->labelPos as $Key => $settings) {
+        foreach ($this->labelPos as $key => $settings) {
             $x1 = $settings['x1'];
             $y1 = $settings['y1'];
             $x2 = $settings['x2'];
@@ -263,13 +265,13 @@ class CImage_Chart_Pie {
     }
 
     /**
-     * Serialize an array
+     * Serialize an array.
      *
      * @param mixed $data
      */
     public function arraySerialize($data) {
         $result = '';
-        foreach ($data as $Key => $value) {
+        foreach ($data as $key => $value) {
             if ($result == '') {
                 $result = floor($value);
             } else {
@@ -277,11 +279,11 @@ class CImage_Chart_Pie {
             }
         }
 
-        return($result);
+        return $result;
     }
 
     /**
-     * Reverse an array
+     * Reverse an array.
      *
      * @param mixed $plots
      */
@@ -293,11 +295,11 @@ class CImage_Chart_Pie {
             $result[] = $plots[$i];
         }
 
-        return($result);
+        return $result;
     }
 
     /**
-     * Remove unused series & values
+     * Remove unused series & values.
      *
      * @param mixed $data
      * @param mixed $palette
@@ -305,9 +307,9 @@ class CImage_Chart_Pie {
      * @param mixed $abscissaSerie
      */
     public function clean0Values($data, $palette, $dataSerie, $abscissaSerie) {
-        $NewPalette = '';
-        $NewData = '';
-        $NewAbscissa = '';
+        $newPalette = [];
+        $newData = [];
+        $newAbscissa = [];
 
         /* Remove unused series */
         foreach ($data['series'] as $serieName => $serieSettings) {
@@ -317,18 +319,18 @@ class CImage_Chart_Pie {
         }
 
         /* Remove NULL values */
-        foreach ($data['series'][$dataSerie]['data'] as $Key => $value) {
+        foreach ($data['series'][$dataSerie]['data'] as $key => $value) {
             if ($value != 0) {
-                $NewData[] = $value;
-                $NewAbscissa[] = $data['series'][$abscissaSerie]['data'][$Key];
-                if (isset($palette[$Key])) {
-                    $NewPalette[] = $palette[$Key];
+                $newData[] = $value;
+                $newAbscissa[] = $data['series'][$abscissaSerie]['data'][$key];
+                if (isset($palette[$key])) {
+                    $newPalette[] = $palette[$key];
                 }
             }
         }
-        $data['series'][$dataSerie]['data'] = $NewData;
-        $data['series'][$abscissaSerie]['data'] = $NewAbscissa;
+        $data['series'][$dataSerie]['data'] = $newData;
+        $data['series'][$abscissaSerie]['data'] = $newAbscissa;
 
-        return([$data, $NewPalette]);
+        return [$data, $newPalette];
     }
 }

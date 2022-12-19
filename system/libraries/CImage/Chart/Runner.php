@@ -2,15 +2,13 @@
 
 defined('SYSPATH') or die('No direct access allowed.');
 
-use CImage_Chart_Constant as Constant;
-
 /**
  * @author Hery Kurniawan
  * @license Ittron Global Teknologi <ittron.co.id>
  *
  * @since Aug 30, 2019, 2:11:47 AM
  */
-class Controller_Cresenity_Chart extends CController {
+class CImage_Chart_Runner extends CController {
     public function __construct() {
         parent::__construct();
     }
@@ -62,7 +60,6 @@ class Controller_Cresenity_Chart extends CController {
         $data->setAbscissa('Labels');
         /* Create the image */
         $image = CImage_Chart::createImage($chartWidth, $chartHeight, $data);
-
         $pie = CImage_Chart::createPie($image, $data);
 
         $centerX = $chartWidth / 2;
@@ -70,7 +67,7 @@ class Controller_Cresenity_Chart extends CController {
         $radius = min($centerX, $centerY) - 10;
 
         $chartOptions = [
-            'radius' => $radius,
+            //'radius' => $radius,
             'drawLabels' => $haveLabel,
             'border' => true,
             'labelStacked' => true,
@@ -81,6 +78,9 @@ class Controller_Cresenity_Chart extends CController {
         }
 
         if ($chartType == 'p') {
+            $chartOptions['valuePosition'] = CImage_Chart_Constant::PIE_VALUE_NATURAL;
+            //$chartOptions['valuePosition'] = CImage_Chart_Constant::PIE_VALUE_INSIDE;
+            //$chartOptions['labelStacked'] = false;
             $pie->draw2DPie($centerX, $centerY, $chartOptions);
         }
 
