@@ -109,7 +109,7 @@ class cdbg {
     public static function d() {
         $args = func_get_args();
         foreach ($args as $x) {
-            (new Illuminate\Support\Debug\Dumper())->dump($x);
+            CDebug::dumper()->dump($x);
         }
     }
 
@@ -124,7 +124,7 @@ class cdbg {
         $args = func_get_args();
 
         foreach ($args as $x) {
-            (new Illuminate\Support\Debug\Dumper())->dump($x);
+            CDebug::dumper()->dump($x);
         }
 
         die(1);
