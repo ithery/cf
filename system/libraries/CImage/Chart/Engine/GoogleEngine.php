@@ -66,6 +66,12 @@ class CImage_Chart_Engine_GoogleEngine extends CImage_Chart_EngineAbstract {
                 $googleChart->set3D(true, false);
             }
         }
+        $googleChart->setChartMargins([
+            $this->builder->getLeftMargin(),
+            $this->builder->getRightMargin(),
+            $this->builder->getTopMargin(),
+            $this->builder->getBottomMargin()
+        ]);
 
         return $googleChart->getUrl();
     }
