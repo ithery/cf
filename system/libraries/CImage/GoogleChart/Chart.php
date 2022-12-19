@@ -448,6 +448,15 @@ class CImage_GoogleChart_Chart {
     }
 
     /**
+     * Sets the labels for the data.
+     *
+     * @param $labels Array
+     */
+    public function setLabels($labels) {
+        $this->setProperty('chl', urlencode($this->encodeData($labels, '|')));
+    }
+
+    /**
      * Sets the position and the order of the legend.
      *
      * @param $position String Please refer to the documentation for the acceptable values

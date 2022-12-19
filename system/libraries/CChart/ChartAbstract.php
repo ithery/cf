@@ -18,7 +18,9 @@ class CChart_ChartAbstract {
      */
     protected $values = [];
 
-    protected $labels = [];
+    protected $seriesLabels = [];
+
+    protected $dataLabels = [];
 
     /**
      * @var array<CColor_FormatAbstract>
@@ -74,6 +76,18 @@ class CChart_ChartAbstract {
         return $this->title;
     }
 
+    /**
+     * @param array  $data
+     * @param string $label
+     *
+     * @return $this
+     */
+    public function addSeries(array $data, $label = null) {
+        $this->seriesLabels[] = $label;
+
+        $this->values[] = $data;
+    }
+
     public function setColors(array $colors) {
         $colors = c::collect($colors)->map(function ($color) {
             if (!($color instanceof CColor_FormatAbstract)) {
@@ -91,8 +105,18 @@ class CChart_ChartAbstract {
         return $this->values;
     }
 
-    public function getLabels() {
-        return $this->labels;
+    public function getDataLabels() {
+        return $this->dataLabels;
+    }
+
+    public function setDataLabels(array $labels) {
+        $this->dataLabels = $labels;
+
+        return $this;
+    }
+
+    public function getSeriesLabels() {
+        return $this->seriesLabels;
     }
 
     /**
