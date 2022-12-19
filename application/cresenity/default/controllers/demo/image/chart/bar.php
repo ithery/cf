@@ -10,6 +10,7 @@ class Controller_Demo_Image_Chart_Bar extends \Cresenity\Demo\Controller {
         $barChart->addSeries([400, 500, 800, 300, 500, 100], 'Item 2');
         $barChart->setColors(['#ff0000', '#00ff00']);
         $barChart->setDataLabels(['Bar1', 'Bar2', 'Bar3', 'Bar4', 'Bar5', 'Bar6']);
+        $barChart->setTitle('Vertical Bar');
         $imageChart = CImage::chart(500, 200);
         $imageChart->setChart($barChart);
 
@@ -18,8 +19,10 @@ class Controller_Demo_Image_Chart_Bar extends \Cresenity\Demo\Controller {
         $uri = $imageChart->toUri();
         $app->addImg()->setSrc($uri);
         $app->addBr();
+        $app->addBr();
         $barChart->setDirection(CChart::DIRECTION_HORIZONTAL);
         $imageChart->setSize('500', '500');
+        $barChart->setTitle('Horizontal Bar');
         $uri = $imageChart->toUri();
         $app->addImg()->setSrc($uri);
 

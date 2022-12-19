@@ -55,6 +55,10 @@ class CImage_Chart_Engine_GoogleEngine extends CImage_Chart_EngineAbstract {
 
         $googleChart->setColors($colors);
 
+        if ($chart->getTitle()) {
+            $googleChart->setTitle($chart->getTitle());
+        }
+
         return $googleChart->getUrl();
     }
 }
