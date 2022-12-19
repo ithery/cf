@@ -45,8 +45,11 @@ class CImage_Chart_Engine_GoogleEngine extends CImage_Chart_EngineAbstract {
         if (count(array_filter($seriesLabels)) == 0) {
             $seriesLabels = [];
         }
-        if (count($seriesLabels) > 0) {
+
+        if ($chart->isShowLegend() && count($seriesLabels) > 0) {
+            $legendPosition = $chart->getLegendPosition();
             $googleChart->setLegend($seriesLabels);
+            $googleChart->setLegendPosition($legendPosition);
         }
 
         $colors = c::collect($chart->getColors())->map(function ($color) {

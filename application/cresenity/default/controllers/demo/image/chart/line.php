@@ -12,7 +12,7 @@ class Controller_Demo_Image_Chart_Line extends \Cresenity\Demo\Controller {
 
         $lineChart->setDataLabels(['A', 'B', 'C', 'D', 'E', 'F']);
         $lineChart->setColors(['#ff0000', '#00ff00', '#0000ff']);
-
+        $lineChart->setLegendPosition(CChart::POSITION_BOTTOM);
         $imageChart = CImage::chart(500, 200);
         $imageChart->setChart($lineChart);
 

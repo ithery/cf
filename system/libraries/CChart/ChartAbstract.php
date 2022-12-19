@@ -41,6 +41,13 @@ class CChart_ChartAbstract {
      */
     private $height;
 
+    /**
+     * @var bool
+     */
+    private $isShowLegend = true;
+
+    private $legendPosition = CChart::POSITION_RIGHT;
+
     public function __construct($width = 500, $height = 500) {
         $this->width = $width;
         $this->height = $height;
@@ -132,5 +139,27 @@ class CChart_ChartAbstract {
 
     public function yAxis() {
         return $this->yAxis;
+    }
+
+    public function showLegend() {
+        $this->isShowLegend = true;
+    }
+
+    public function hideLegend() {
+        $this->isShowLegend = false;
+    }
+
+    public function isShowLegend() {
+        return $this->isShowLegend;
+    }
+
+    public function getLegendPosition() {
+        return $this->legendPosition;
+    }
+
+    public function setLegendPosition($position) {
+        $this->legendPosition = $position;
+
+        return $this;
     }
 }
