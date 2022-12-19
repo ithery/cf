@@ -20,6 +20,9 @@ class CChart_ChartAbstract {
 
     protected $labels = [];
 
+    /**
+     * @var array<CColor_FormatAbstract>
+     */
     protected $colors = [];
 
     /**
@@ -71,11 +74,31 @@ class CChart_ChartAbstract {
         return $this->title;
     }
 
+    public function setColors(array $colors) {
+        $colors = c::collect($colors)->map(function ($color) {
+            if (!($color instanceof CColor_FormatAbstract)) {
+                $color = CColor::create($color);
+            }
+
+            return $color;
+        })->all();
+        $this->colors = $colors;
+
+        return $this->colors;
+    }
+
     public function getValues() {
         return $this->values;
     }
 
     public function getLabels() {
         return $this->labels;
+    }
+
+    /**
+     * @return array<CColor_FormatAbstract>
+     */
+    public function getColors() {
+        return $this->colors;
     }
 }

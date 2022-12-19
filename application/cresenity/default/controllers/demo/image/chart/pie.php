@@ -10,6 +10,7 @@ class Controller_Demo_Image_Chart_Pie extends \Cresenity\Demo\Controller {
         $pieChart->addData('B', 200);
         $pieChart->addData('C', 300);
         $pieChart->addData('D', 100);
+        $pieChart->setColors(['#ff0000', '#00ff00', '#0000ff', '#ff00ff']);
 
         $imageChart = CImage::chart(500, 200);
         $imageChart->setChart($pieChart);

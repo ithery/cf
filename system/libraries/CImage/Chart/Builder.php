@@ -56,6 +56,12 @@ class CImage_Chart_Builder {
         return $this->height;
     }
 
+    public function setEngine($engine) {
+        $this->engine = $engine;
+
+        return $this;
+    }
+
     public function toUri() {
         $engine = CImage_Chart_Manager::instance()->resolveEngine($this->engine, $this);
 

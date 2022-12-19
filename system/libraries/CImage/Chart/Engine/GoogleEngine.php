@@ -1,6 +1,8 @@
 <?php
 
 class CImage_Chart_Engine_GoogleEngine extends CImage_Chart_EngineAbstract {
+    use CImage_Chart_Trait_UseColorTrait;
+
     public function toUri() {
         $chart = $this->builder->getChart();
         $googleChart = null;
@@ -19,6 +21,11 @@ class CImage_Chart_Engine_GoogleEngine extends CImage_Chart_EngineAbstract {
         } else {
             $googleChart->setLegend($chart->getLabels());
         }
+        $colors = c::collect($chart->getColors())->map(function ($color) {
+            return $this->toRgba($color);
+        })->all();
+
+        $googleChart->setColors($colors);
 
         return $googleChart->getUrl();
     }
