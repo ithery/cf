@@ -63,7 +63,7 @@ class CImage_Chart_Engine_GoogleEngine extends CImage_Chart_EngineAbstract {
         }
         if ($chart instanceof CChart_Contract_ChartHave3D) {
             if ($chart->is3D()) {
-                $googleChart->set3D();
+                $googleChart->set3D(true, false);
             }
         }
 
