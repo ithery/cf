@@ -125,4 +125,12 @@ class CChart_ChartAbstract {
     public function getColors() {
         return $this->colors;
     }
+
+    public function xAxis() {
+        return $this->xAxis;
+    }
+
+    public function yAxis() {
+        return $this->yAxis;
+    }
 }

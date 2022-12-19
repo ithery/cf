@@ -17,6 +17,11 @@ class Controller_Demo_Image_Chart_Bar extends \Cresenity\Demo\Controller {
         $imageChart->setEngine('google');
         $uri = $imageChart->toUri();
         $app->addImg()->setSrc($uri);
+        $app->addBr();
+        $barChart->setDirection(CChart::DIRECTION_HORIZONTAL);
+        $imageChart->setSize('500', '500');
+        $uri = $imageChart->toUri();
+        $app->addImg()->setSrc($uri);
 
         return $app;
     }

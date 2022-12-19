@@ -56,10 +56,33 @@ class CImage_Chart_Builder {
         return $this->height;
     }
 
+    private function setWidth($width) {
+        $this->width = $width;
+
+        return $this;
+    }
+
+    private function setHeight($height) {
+        $this->height = $height;
+
+        return $this;
+    }
+
     public function setEngine($engine) {
         $this->engine = $engine;
 
         return $this;
+    }
+
+    /**
+     * Sets chart dimensions.
+     *
+     * @param $width Integer
+     * @param $height Integer
+     */
+    public function setSize($width, $height) {
+        $this->setWidth($width);
+        $this->setHeight($height);
     }
 
     public function toUri() {
