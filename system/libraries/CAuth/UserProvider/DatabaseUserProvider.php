@@ -121,6 +121,8 @@ class CAuth_UserProvider_DatabaseUserProvider extends CAuth_UserProviderAbstract
 
             if (is_array($value) || $value instanceof CInterface_Arrayable) {
                 $query->whereIn($key, $value);
+            } elseif ($value instanceof Closure) {
+                $value($query);
             } else {
                 $query->where($key, $value);
             }
