@@ -854,8 +854,8 @@ trait CImage_Chart_Concern_ChartDraw {
                 }
                 $axisId = $serie['axis'];
                 $mode = $data['axis'][$axisId]['display'];
-                $format = $data['axis'][$axisId]['format'];
-                $unit = $data['axis'][$axisId]['unit'];
+                $format = carr::get($data, 'axis.' . $axisId . '.format');
+                $unit = carr::get($data, 'axis.' . $axisId . '.unit');
                 if (isset($serie['description'])) {
                     $serieDescription = $serie['description'];
                 } else {
@@ -891,6 +891,7 @@ trait CImage_Chart_Concern_ChartDraw {
                                 $align = Constant::TEXT_ALIGN_TOPMIDDLE;
                                 $offset = -$displayOffset;
                             }
+
                             $this->drawText(
                                 $x,
                                 $y - $offset - $weight,

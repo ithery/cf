@@ -17,8 +17,13 @@ class Controller_Demo_Image_Chart_Line extends \Cresenity\Demo\Controller {
 
         $imageChart->setChart($lineChart);
 
-        $app->addH5()->add('With Google Engine');
+        $app->addH5()->add('Default Engine');
+        $imageChart->setEngine('default');
+        $uri = $imageChart->toUri();
+        $app->addImg()->setSrc($uri);
 
+        $app->addH5()->add('With Google Engine');
+        $imageChart->setEngine('google');
         $uri = $imageChart->toUri();
         $app->addImg()->setSrc($uri);
 

@@ -23,4 +23,8 @@ class CImage_Chart_Manager {
     public function createGoogleEngine(CImage_Chart_Builder $builder) {
         return new CImage_Chart_Engine_GoogleEngine($builder);
     }
+
+    public function createDefaultEngine(CImage_Chart_Builder $builder) {
+        return new CImage_Chart_Engine_DefaultEngine($builder);
+    }
 }
