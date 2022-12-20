@@ -85,6 +85,7 @@ class QueryResult {
         } catch (\Exception $error) {
             //do nothing
         }
+
         return null;
     }
 
