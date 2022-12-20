@@ -6,18 +6,18 @@ namespace Embed\Http;
 
 use Psr\Http\Client\ClientInterface;
 use Psr\Http\Message\RequestInterface;
-use Psr\Http\Message\ResponseFactoryInterface;
 use Psr\Http\Message\ResponseInterface;
+use Psr\Http\Message\ResponseFactoryInterface;
 
 /**
- * Class to fetch html pages
+ * Class to fetch html pages.
  */
 final class CurlClient implements ClientInterface {
-
     /**
      * @var ResponseFactoryInterface
      */
     private $responseFactory;
+
     /**
      * @var array
      */
@@ -40,5 +40,4 @@ final class CurlClient implements ClientInterface {
     public function sendRequests(RequestInterface ...$request) {
         return CurlDispatcher::fetch($this->settings, $this->responseFactory, ...$request);
     }
-
 }

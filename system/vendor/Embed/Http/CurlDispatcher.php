@@ -6,11 +6,11 @@ namespace Embed\Http;
 
 use Composer\CaBundle\CaBundle;
 use Psr\Http\Message\RequestInterface;
-use Psr\Http\Message\ResponseFactoryInterface;
 use Psr\Http\Message\ResponseInterface;
+use Psr\Http\Message\ResponseFactoryInterface;
 
 /**
- * Class to fetch html pages
+ * Class to fetch html pages.
  */
 final class CurlDispatcher {
     private $request;
@@ -33,6 +33,7 @@ final class CurlDispatcher {
     public static function fetch(array $settings, ResponseFactoryInterface $responseFactory, RequestInterface ...$requests) {
         if (count($requests) === 1) {
             $connection = new static($settings, $requests[0]);
+
             return [$connection->exec($responseFactory)];
         }
 
@@ -62,6 +63,7 @@ final class CurlDispatcher {
                 foreach ($connections as $connection) {
                     if ($connection->curl === $info['handle']) {
                         $connection->result = $info['result'];
+
                         break;
                     }
                 }
@@ -132,8 +134,8 @@ final class CurlDispatcher {
         }
 
         $response = $response
-                ->withAddedHeader('Content-Location', $info['url'])
-                ->withAddedHeader('X-Request-Time', sprintf('%.3f ms', $info['total_time']));
+            ->withAddedHeader('Content-Location', $info['url'])
+            ->withAddedHeader('X-Request-Time', sprintf('%.3f ms', $info['total_time']));
 
         if ($this->body) {
             //5Mb max
