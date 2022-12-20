@@ -26,6 +26,7 @@ class Controller_Demo_Image_Chart_Pie extends \Cresenity\Demo\Controller {
 
         $app->addH5()->add('With Google Engine');
         $imageChart->setEngine('google');
+        $pieChart->setTitle('Regular Pie');
         $pieChart->remove3D();
         $uri = $imageChart->toUri();
         $app->addImg()->setSrc($uri)->addClass('mb-3');

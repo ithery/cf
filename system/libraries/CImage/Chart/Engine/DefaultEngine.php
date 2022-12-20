@@ -69,6 +69,12 @@ class CImage_Chart_Engine_DefaultEngine extends CImage_Chart_EngineAbstract {
             'fontSize' => 8,
         ];
         $image->setFontProperties($fontFormat);
+        $titleHeight = 0;
+        $title = $chart->getTitle();
+        if ($title) {
+            $image->drawText($width / 2, 0, $title, ['fontSize' => 10, 'align' => CImage_Chart_Constant::TEXT_ALIGN_TOPMIDDLE]);
+        }
+
         if (!($chart instanceof CChart_Chart_PieChart)) {
             if ($chartLegendShow) {
                 $legendPosition = $chart->getLegendPosition();
@@ -129,6 +135,7 @@ class CImage_Chart_Engine_DefaultEngine extends CImage_Chart_EngineAbstract {
                 'labelStacked' => true,
                 'valuePosition' => CImage_Chart_Constant::PIE_VALUE_NATURAL
             ];
+            $image->setGraphArea($graphLeft, $graphTop, $graphRight, $graphBottom);
             $pieChart = CImage_Chart::createPie($image, $data);
             if ($chart->is3D()) {
                 $pieChart->draw3DPie($centerX, $centerY, $chartOptions);
