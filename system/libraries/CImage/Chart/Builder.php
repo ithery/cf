@@ -34,13 +34,13 @@ class CImage_Chart_Builder {
 
     protected $chart;
 
-    protected $topMargin = 0;
+    protected $topMargin = 50;
 
-    protected $leftMargin = 0;
+    protected $leftMargin = 50;
 
-    protected $rightMargin = 0;
+    protected $rightMargin = 50;
 
-    protected $bottomMargin = 0;
+    protected $bottomMargin = 50;
 
     public function __construct($width, $height) {
         $this->width = $width;

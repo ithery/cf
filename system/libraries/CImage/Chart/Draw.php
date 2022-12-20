@@ -3121,8 +3121,8 @@ class CImage_Chart_Draw extends CImage_Chart_BaseDraw {
      * @return array
      */
     public function getLegendSize(array $format = []) {
-        $fontName = isset($format['fontName']) ? $this->loadFont($format['fontName'], 'fonts') : $this->FontName;
-        $fontSize = isset($format['fontSize']) ? $format['fontSize'] : $this->FontSize;
+        $fontName = isset($format['fontName']) ? $this->loadFont($format['fontName'], 'fonts') : $this->fontName;
+        $fontSize = isset($format['fontSize']) ? $format['fontSize'] : $this->fontSize;
         $margin = isset($format['margin']) ? $format['margin'] : 5;
         $mode = isset($format['mode']) ? $format['mode'] : Constant::LEGEND_VERTICAL;
         $boxWidth = isset($format['boxWidth']) ? $format['boxWidth'] : 5;
@@ -3143,7 +3143,7 @@ class CImage_Chart_Draw extends CImage_Chart_BaseDraw {
                 }
             }
         }
-        $yStep = max($this->FontSize, $iconAreaHeight) + 5;
+        $yStep = max($this->fontSize, $iconAreaHeight) + 5;
         $xStep = $iconAreaWidth + 5;
         $xStep = $xSpacing;
         $x = 100;
@@ -3176,14 +3176,14 @@ class CImage_Chart_Draw extends CImage_Chart_BaseDraw {
                         $boundaries['b'] = $boxArray[1]['y'] + 2 + $iconAreaHeight / 2;
                     }
                     $lines = preg_split("/\n/", $serie['description']);
-                    $vY = $vY + max($this->FontSize * count($lines), $iconAreaHeight) + 5;
+                    $vY = $vY + max($this->fontSize * count($lines), $iconAreaHeight) + 5;
                 } elseif ($mode == Constant::LEGEND_HORIZONTAL) {
                     $lines = preg_split("/\n/", $serie['description']);
                     $width = [];
                     foreach ($lines as $key => $value) {
                         $boxArray = $this->getTextBox(
                             $vX + $iconAreaWidth + 6,
-                            $y + $iconAreaHeight / 2 + (($this->FontSize + 3) * $key),
+                            $y + $iconAreaHeight / 2 + (($this->fontSize + 3) * $key),
                             $fontName,
                             $fontSize,
                             0,
@@ -3315,7 +3315,7 @@ class CImage_Chart_Draw extends CImage_Chart_BaseDraw {
                             $maxLabelTxt,
                             $this->scaleFormat(round($maxValue, $decimals), $mode, $format, $unit)
                         );
-                        $txtPos = $this->getTextBox($xPos, $yPos, $this->FontName, $this->FontSize, 0, $label);
+                        $txtPos = $this->getTextBox($xPos, $yPos, $this->fontName, $this->fontSize, 0, $label);
                         $xOffset = 0;
                         $yOffset = 0;
                         if ($txtPos[0]['x'] < $this->graphAreaX1) {
@@ -3353,7 +3353,7 @@ class CImage_Chart_Draw extends CImage_Chart_BaseDraw {
                             $minLabelTxt,
                             $this->scaleFormat(round($minValue, $decimals), $mode, $format, $unit)
                         );
-                        $txtPos = $this->getTextBox($xPos, $yPos, $this->FontName, $this->FontSize, 0, $label);
+                        $txtPos = $this->getTextBox($xPos, $yPos, $this->fontName, $this->fontSize, 0, $label);
                         $xOffset = 0;
                         $yOffset = 0;
                         if ($txtPos[0]['x'] < $this->graphAreaX1) {
@@ -3396,7 +3396,7 @@ class CImage_Chart_Draw extends CImage_Chart_BaseDraw {
                         }
                         $xPos = $x + $maxPos * $xStep + $serieOffset;
                         $label = $maxLabelTxt . $this->scaleFormat($maxValue, $mode, $format, $unit);
-                        $txtPos = $this->getTextBox($yPos, $xPos, $this->FontName, $this->FontSize, 0, $label);
+                        $txtPos = $this->getTextBox($yPos, $xPos, $this->fontName, $this->fontSize, 0, $label);
                         $xOffset = 0;
                         $yOffset = 0;
                         if ($txtPos[0]['x'] < $this->graphAreaX1) {
@@ -3430,7 +3430,7 @@ class CImage_Chart_Draw extends CImage_Chart_BaseDraw {
                         }
                         $xPos = $x + $minPos * $xStep + $serieOffset;
                         $label = $minLabelTxt . $this->scaleFormat($minValue, $mode, $format, $unit);
-                        $txtPos = $this->getTextBox($yPos, $xPos, $this->FontName, $this->FontSize, 0, $label);
+                        $txtPos = $this->getTextBox($yPos, $xPos, $this->fontName, $this->fontSize, 0, $label);
                         $xOffset = 0;
                         $yOffset = 0;
                         if ($txtPos[0]['x'] < $this->graphAreaX1) {

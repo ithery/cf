@@ -12,15 +12,30 @@ class Controller_Demo_Image_Chart_Pie extends \Cresenity\Demo\Controller {
         $pieChart->setTitle('Regular Pie');
         $imageChart = CImage::chart(500, 200);
         $imageChart->setChart($pieChart);
+
+        $app->addH5()->add('Default Engine');
+        $imageChart->setEngine('default');
         $uri = $imageChart->toUri();
-        $app->addImg()->setSrc($uri);
+        $app->addImg()->setSrc($uri)->addClass('mb-3');
+        $app->addBr();
+        $app->addBr();
+        $pieChart->make3D();
+        $pieChart->setTitle('3D Pie');
+        $uri = $imageChart->toUri();
+        $app->addImg()->setSrc($uri)->addClass('mb-3');
+
+        $app->addH5()->add('With Google Engine');
+        $imageChart->setEngine('google');
+        $pieChart->remove3D();
+        $uri = $imageChart->toUri();
+        $app->addImg()->setSrc($uri)->addClass('mb-3');
 
         $app->addBr();
         $app->addBr();
         $pieChart->make3D();
         $pieChart->setTitle('3D Pie');
         $uri = $imageChart->toUri();
-        $app->addImg()->setSrc($uri);
+        $app->addImg()->setSrc($uri)->addClass('mb-3');
 
         return $app;
     }
