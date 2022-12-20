@@ -17,6 +17,8 @@ final class CurlDispatcher {
 
     private $curl;
 
+    private $result;
+
     private $headers = [];
 
     private $isBinary = false;
