@@ -28,49 +28,13 @@ class CChart_ChartAbstract {
     protected $colors = [];
 
     /**
-     * Width of the chart.
-     *
-     * @var int
-     */
-    private $width;
-
-    /**
-     * Height of the chart.
-     *
-     * @var int
-     */
-    private $height;
-
-    /**
      * @var bool
      */
     private $isShowLegend = true;
 
     private $legendPosition = CChart::POSITION_RIGHT;
 
-    public function __construct($width = 500, $height = 500) {
-        $this->width = $width;
-        $this->height = $height;
-    }
-
-    public function setWidth($width) {
-        $this->width = $width;
-
-        return $this;
-    }
-
-    public function getWidth() {
-        return $this->width;
-    }
-
-    public function setHeight($height) {
-        $this->height = $height;
-
-        return $this;
-    }
-
-    public function getHeight() {
-        return $this->height;
+    public function __construct() {
     }
 
     public function setTitle($title) {
@@ -118,6 +82,12 @@ class CChart_ChartAbstract {
 
     public function setDataLabels(array $labels) {
         $this->dataLabels = $labels;
+
+        return $this;
+    }
+
+    public function setSeriesLabels(array $labels) {
+        $this->seriesLabels = $labels;
 
         return $this;
     }

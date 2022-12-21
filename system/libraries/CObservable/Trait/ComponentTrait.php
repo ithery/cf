@@ -59,16 +59,16 @@ trait CObservable_Trait_ComponentTrait {
     }
 
     /**
-     * @param string      $type
+     * @param string      $engine
      * @param null|string $id
      *
      * @return CElement_Component_Chart
      */
-    public function addChart($type = 'Chart', $id = '') {
-        $chart = CElement_Component_Chart::factory($type, $id);
-        $this->wrapper->add($chart);
-
-        return $chart;
+    public function addChart($engine = CElement_Component_Chart::ENGINE_CHARTJS, $id = '') {
+        return c::tap(new CElement_Component_Chart($id), function (CElement_Component_Chart $el) use ($engine){
+            $el->setEngine($engine);
+            $this->wrapper->add($el);
+        });
     }
 
     /**
@@ -284,10 +284,11 @@ trait CObservable_Trait_ComponentTrait {
     /**
      * @param null|string $id
      *
-     * @return CElement_Component_Chart_LineChart
+     * @return CElement_Component_Chart
      */
     public function addLineChart($id = '') {
-        return c::tap(new CElement_Component_Chart_LineChart($id), function (CElement_Component_Chart_LineChart $el) {
+        return c::tap(new CElement_Component_Chart($id), function (CElement_Component_Chart $el) {
+            $el->setType(CChart::TYPE_LINE);
             $this->wrapper->add($el);
         });
     }

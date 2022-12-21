@@ -19,6 +19,12 @@ class CChart {
 
     const POSITION_RIGHT = 'r';
 
+    const TYPE_LINE = 'line';
+
+    const TYPE_BAR = 'bar';
+
+    const TYPE_PIE = 'pie';
+
     public static function pieChart() {
         return new CChart_Chart_PieChart();
     }
