@@ -280,15 +280,4 @@ trait CObservable_Trait_ComponentTrait {
             $this->wrapper->add($el);
         });
     }
-
-    /**
-     * @param null|string $id
-     *
-     * @return CElement_Component_Chart_LineChart
-     */
-    public function addLineChart($id = '') {
-        return c::tap(new CElement_Component_Chart_LineChart($id), function (CElement_Component_Chart_LineChart $el) {
-            $this->wrapper->add($el);
-        });
-    }
 }
