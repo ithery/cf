@@ -79,6 +79,37 @@ abstract class CElement_Component_Chart extends CElement_Component {
     public function setChart(CChart_ChartAbstract $chart) {
         $this->chart = $chart;
         $this->updateTypeFromChart($chart);
+        $this->labels = $chart->getDataLabels();
+        $seriesLabels = $chart->getSeriesLabels();
+        $series = [];
+        $colors = $chart->getColors();
+        foreach ($chart->getValues() as $index => $serie) {
+            $dataset = [];
+            $dataset['data'] = $serie;
+            //$dataset['fill'] = false;
+            $label = carr::get($seriesLabels, $index);
+            if ($label) {
+                $dataset['label'] = $label;
+            }
+            $dataset['fill'] = false;
+
+            if ($chart instanceof CChart_Chart_PieChart) {
+                $dataset['color'] = c::collect($colors)->map(function ($color) {
+                    return $this->colorToRgba($color);
+                })->all();
+                $dataset['backgroundColor'] = c::collect($colors)->map(function ($color) {
+                    return $this->colorToRgba($color);
+                })->all();
+            } else {
+                $randColor = CColor::random()->toRgba();
+                $color = carr::get($colors, $index) ?: $randColor;
+                $backgroundColor = carr::get($colors, $index) ?: $randColor->fadeOut(80);
+                $dataset['color'] = $this->colorToRgba($color);
+                $dataset['backgroundColor'] = $this->colorToRgba($backgroundColor);
+            }
+            $series[] = $dataset;
+        }
+        $this->data = $series;
 
         return $this;
     }

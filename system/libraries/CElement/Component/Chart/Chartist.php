@@ -3,6 +3,7 @@
 class CElement_Component_Chart_Chartist extends CElement_Component_Chart {
     public function __construct() {
         parent::__construct();
+        $this->wrapper = $this->addDiv('div-' . $this->id);
         CManager::instance()->registerModule('chartist');
     }
 
@@ -29,10 +30,12 @@ class CElement_Component_Chart_Chartist extends CElement_Component_Chart {
         $options = [];
 
         $js->append('
-	    	new Chartist.' . ucfirst(strtolower($this->type)) . "('#" . $this->id . "', {
-	    		labels: $.parseJSON('" . json_encode($this->labels) . "'),
+            setTimeout(()=>{
+	    	new Chartist.' . ucfirst(strtolower($this->type)) . "('#" . $this->wrapper->id() . "', {
+	    		labels: " . c::json($this->labels) . ",
 	    		series: $.parseJSON('" . json_encode($this->data) . "')
 	    	}, $.parseJSON('" . json_encode($options) . "'));
+        },1000);
 	    ")->br();
 
         return $js->text();
