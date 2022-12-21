@@ -8,6 +8,66 @@ class CElement_Component_Chart_Chart extends CElement_Component_Chart {
         $this->options = [];
     }
 
+    public function setChart(CChart_ChartAbstract $chart) {
+        parent::setChart($chart);
+        $this->labels = $chart->getDataLabels();
+        $seriesLabels = $chart->getSeriesLabels();
+        $series = [];
+        $colors = $chart->getColors();
+        foreach ($chart->getValues() as $index => $serie) {
+            $dataset = [];
+            $dataset['data'] = $serie;
+            //$dataset['fill'] = false;
+            $label = carr::get($seriesLabels, $index);
+            if ($label) {
+                $dataset['label'] = $label;
+            }
+            $dataset['fill'] = false;
+
+            if ($chart instanceof CChart_Chart_PieChart) {
+                $dataset['color'] = c::collect($colors)->map(function ($color) {
+                    return $this->colorToRgba($color);
+                })->all();
+                $dataset['backgroundColor'] = c::collect($colors)->map(function ($color) {
+                    return $this->colorToRgba($color);
+                })->all();
+            } else {
+                $randColor = CColor::random()->toRgba();
+                $color = carr::get($colors, $index) ?: $randColor;
+                $backgroundColor = carr::get($colors, $index) ?: $randColor->fadeOut(80);
+                $dataset['color'] = $this->colorToRgba($color);
+                $dataset['backgroundColor'] = $this->colorToRgba($backgroundColor);
+            }
+            $series[] = $dataset;
+        }
+        $this->data = $series;
+
+        //options
+        if ($chart->isShowLegend()) {
+            $this->setOption('legend.position', $this->normalizeChartPosition($chart));
+            $this->setOption('legend.align', 'center');
+        } else {
+            $this->setOption('legend.position', 'none');
+        }
+
+        if ($chart->getTitle()) {
+            $this->setOption('title.text', $chart->getTitle());
+        }
+
+        return $this;
+    }
+
+    private function normalizeChartPosition(CChart_ChartAbstract $chart) {
+        $posMap = [
+            CChart::POSITION_BOTTOM => 'bottom',
+            CChart::POSITION_TOP => 'top',
+            CChart::POSITION_LEFT => 'left',
+            CChart::POSITION_RIGHT => 'right',
+        ];
+
+        return carr::get($posMap, $chart->getLegendPosition(), 'bottom');
+    }
+
     protected function build() {
         parent::build();
         $this->addClass('cchart-container');

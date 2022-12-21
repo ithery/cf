@@ -34,6 +34,7 @@ defined('SYSPATH') or die('No direct access allowed.');
  * @method CElement_Component_Gallery            addGallery($id=null)
  * @method CElement_Element_Img                  addImg($id=null)
  * @method CElement_Component_Image              addImage($id=null)
+ * @method CElement_Component_Chart              addChart($id=null)
  * @method CElement_Component_Metric_ValueMetric addValueMetric($id=null)
  * @method $this                                 addJs($js)
  */
@@ -52,7 +53,6 @@ class CApp implements CInterface_Responsable, CInterface_Renderable, CInterface_
         CApp_Concern_AuthTrait,
         CApp_Concern_BootstrapTrait,
         CApp_Concern_TitleTrait;
-
     public static $instance = null;
 
     protected $renderer;
