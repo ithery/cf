@@ -57,13 +57,12 @@ class CVendor_Watzap_Device {
     /**
      * @param string $groupId
      * @param string $message
-     * @param mixed  $retryCount
      *
      * @throws CVendor_Watzap_Exception_ApiException
      *
      * @return array
      */
-    public function groupSendMessage($groupId, $message, $retryCount = 0) {
+    public function groupSendMessage($groupId, $message) {
         $path = 'send_message_group';
         $options = [
             'number_key' => TWWatzap::numberKey(),
