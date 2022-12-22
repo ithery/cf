@@ -83,10 +83,16 @@ class CHTTP_Request extends SymfonyRequest implements CInterface_Arrayable, Arra
      * @return string
      */
     public function root() {
-        $baseUrl = $this->getBaseUrl();
-        $root = rtrim($this->getSchemeAndHttpHost() . $baseUrl, '/');
+        return rtrim($this->getSchemeAndHttpHost() . $this->getBaseUrl(), '/');
+    }
 
-        return $root;
+    public function getHost() {
+        $host = parent::getHost();
+        if ($host == null) {
+            $host = CF::domain();
+        }
+
+        return $host;
     }
 
     /**
