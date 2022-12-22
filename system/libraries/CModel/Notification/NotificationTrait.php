@@ -10,6 +10,15 @@ trait CModel_Notification_NotificationTrait {
     }
 
     /**
+     * Get the notifiable entity that the notification belongs to.
+     *
+     * @return \CModel_Relation_MorphTo
+     */
+    public function ref() {
+        return $this->morphTo();
+    }
+
+    /**
      * Mark the notification as read.
      *
      * @return void
