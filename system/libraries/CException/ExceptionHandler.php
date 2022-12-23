@@ -61,6 +61,8 @@ class CException_ExceptionHandler implements CException_ExceptionHandlerInterfac
         HttpException::class,
         CHTTP_Exception_ResponseException::class,
         CModel_Exception_ModelNotFoundException::class,
+        CDatabase_Exception_MultipleRecordsFoundException::class,
+        CDatabase_Exception_RecordsNotFoundException::class,
         SuspiciousOperationException::class,
         CSession_Exception_TokenMismatchException::class,
         CValidation_Exception::class,
@@ -182,8 +184,11 @@ class CException_ExceptionHandler implements CException_ExceptionHandlerInterfac
      * @return \CHTTP_Response|\Symfony\Component\HttpFoundation\Response
      */
     public function render($request, $e) {
-        if (method_exists($e, 'render') && $response = $e->render($request)) {
-            return c::router()->toResponse($request, $response);
+        if (method_exists($e, 'render')) {
+            /** @var CInterface_Renderable $e */
+            if ($response = $e->render($request)) {
+                return c::router()->toResponse($request, $response);
+            }
         }
         if ($e instanceof CInterface_Responsable) {
             return $e->toResponse($request);
