@@ -421,6 +421,9 @@ trait CApp_Trait_BaseTrait {
             $pos = strpos($domain, 'dev.ittron.co.id');
         }
         if ($pos === false) {
+            $pos = strpos($domain, 'dev8.ittron.co.id');
+        }
+        if ($pos === false) {
             $pos = strpos($domain, 'staging.ittron.co.id');
         }
 
