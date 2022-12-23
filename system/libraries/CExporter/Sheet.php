@@ -4,6 +4,7 @@ use PhpOffice\PhpSpreadsheet\IOFactory;
 use PhpOffice\PhpSpreadsheet\Chart\Chart;
 use PhpOffice\PhpSpreadsheet\Reader\Html;
 use PhpOffice\PhpSpreadsheet\Spreadsheet;
+use PhpOffice\PhpSpreadsheet\Shared\StringHelper;
 use PhpOffice\PhpSpreadsheet\Worksheet\Worksheet;
 use PhpOffice\PhpSpreadsheet\Worksheet\BaseDrawing;
 use PhpOffice\PhpSpreadsheet\Cell\Cell as SpreadsheetCell;
@@ -11,7 +12,6 @@ use PhpOffice\PhpSpreadsheet\Cell\Cell as SpreadsheetCell;
 class CExporter_Sheet {
     use CExporter_Trait_DelegatedMacroableTrait,
         CExporter_Trait_HasEventBusTrait;
-
     /**
      * @var int
      */
@@ -110,7 +110,12 @@ class CExporter_Sheet {
         $this->raise(new CExporter_Event_BeforeSheet($this, $this->exportable));
 
         if ($sheetExport instanceof CExporter_Concern_WithTitle) {
-            $this->worksheet->setTitle($sheetExport->title());
+            $title = $sheetExport->title();
+            $title = str_replace(['*', ':', '/', '\\', '?', '[', ']'], '', $title);
+            if (StringHelper::countCharacters($title) > Worksheet::SHEET_TITLE_MAXIMUM_LENGTH) {
+                $title = StringHelper::substring($title, 0, Worksheet::SHEET_TITLE_MAXIMUM_LENGTH);
+            }
+            $this->worksheet->setTitle($title);
         }
 
         if (($sheetExport instanceof CExporter_Concern_FromQuery || $sheetExport instanceof CExporter_Concern_FromCollection || $sheetExport instanceof CExporter_Concern_FromArray) && $sheetExport instanceof CExporter_Concern_FromView && $sheetExport instanceof CExporter_Concern_FromSql) {
@@ -197,7 +202,6 @@ class CExporter_Sheet {
         }
 
         $calculatesFormulas = $import instanceof CExporter_Concern_WithCalculatedFormulas;
-
         if ($import instanceof CExporter_Concern_WithMappedCells) {
             CExporter_MappedReader::map($import, $this->worksheet);
         } else {
