@@ -202,6 +202,8 @@ class CExporter_Sheet {
         }
 
         $calculatesFormulas = $import instanceof CExporter_Concern_WithCalculatedFormulas;
+        $formatData = $import instanceof CExporter_Concern_WithFormatData;
+
         if ($import instanceof CExporter_Concern_WithMappedCells) {
             CExporter_MappedReader::map($import, $this->worksheet);
         } else {
@@ -210,11 +212,22 @@ class CExporter_Sheet {
             }
 
             if ($import instanceof CExporter_Concern_ToCollection) {
-                $import->collection($this->toCollection($import, $startRow, null, $calculatesFormulas));
+                $rows = $this->toCollection($import, $startRow, null, $calculatesFormulas, $formatData);
+                if ($import instanceof CExporter_Concern_WithValidation) {
+                    $rows = $this->validated($import, $startRow, $rows);
+                }
+
+                $import->collection($rows);
             }
 
             if ($import instanceof CExporter_Concern_ToArray) {
-                $import->toArray($this->toArray($import, $startRow, null, $calculatesFormulas));
+                $rows = $this->toArray($import, $startRow, null, $calculatesFormulas, $formatData);
+
+                if ($import instanceof CExporter_Concern_WithValidation) {
+                    $rows = $this->validated($import, $startRow, $rows);
+                }
+
+                $import->toArray($rows);
             }
         }
 
@@ -259,9 +272,12 @@ class CExporter_Sheet {
      * @return array
      */
     public function toArray($import, $startRow = null, $nullValue = null, $calculateFormulas = false, $formatData = false) {
-        $endRow = CExporter_Import_EndRowFinder::find($import, $startRow);
+        if ($startRow > $this->worksheet->getHighestRow()) {
+            return [];
+        }
+        $endRow = CExporter_Import_EndRowFinder::find($import, $startRow, $this->worksheet->getHighestRow());
         $headingRow = CExporter_Import_HeadingRowExtractor::extract($this->worksheet, $import);
-
+        $endColumn = $import instanceof CExporter_Concern_WithColumnLimit ? $import->endColumn() : null;
         $rows = [];
         foreach ($this->worksheet->getRowIterator($startRow, $endRow) as $row) {
             $row = (new CExporter_Row($row, $headingRow))->toArray($nullValue, $calculateFormulas, $formatData);
@@ -425,7 +441,11 @@ class CExporter_Sheet {
 
     public function autoSize() {
         foreach ($this->buildColumnRange('A', $this->worksheet->getHighestDataColumn()) as $col) {
-            $this->worksheet->getColumnDimension($col)->setAutoSize(true);
+            $dimension = $this->worksheet->getColumnDimension($col);
+            // Only auto-size columns that have not have an explicit width.
+            if ($dimension->getWidth() == -1) {
+                $dimension->setAutoSize(true);
+            }
         }
     }
 
@@ -565,10 +585,32 @@ class CExporter_Sheet {
     }
 
     /**
+     * @param mixed $rows
+     * @param int   $startRow
+     *
+     * @return CCollection|array
+     */
+    protected function validated(CExporter_Concern_WithValidation $import, $startRow, $rows) {
+        $toValidate = (new CCollection($rows))->mapWithKeys(function ($row, $index) use ($startRow) {
+            return [($startRow + $index) => $row];
+        });
+
+        try {
+            CExporter_Validator_RowValidator::instance()->validate($toValidate->toArray(), $import);
+        } catch (CExporter_Exception_RowSkippedException $e) {
+            foreach ($e->skippedRows() as $row) {
+                unset($rows[$row - $startRow]);
+            }
+        }
+
+        return $rows;
+    }
+
+    /**
      * @param string $lower
      * @param string $upper
      *
-     * @return \Generator
+     * @return \Generator<string>
      */
     protected function buildColumnRange($lower, $upper) {
         $upper++;
