@@ -104,11 +104,16 @@ class CExporter_Writer {
                 $defaultStyle->getFill()->setFillType(Fill::FILL_SOLID)->setStartColor($backgroundColor);
             }
         }
-        $this->raise(new CExporter_Event_BeforeExport($this, $this->exportable));
 
-        if ($export instanceof CExporter_Concern_WithTitle) {
-            $this->spreadsheet->getProperties()->setTitle($export->title());
+        if ($export instanceof CExporter_Concern_WithDefaultStyles) {
+            $defaultStyle = $this->spreadsheet->getDefaultStyle();
+            $styles = $export->defaultStyles($defaultStyle);
+
+            if (is_array($styles)) {
+                $defaultStyle->applyFromArray($styles);
+            }
         }
+        $this->raise(new CExporter_Event_BeforeExport($this, $this->exportable));
 
         return $this;
     }
