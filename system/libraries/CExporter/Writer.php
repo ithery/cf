@@ -162,6 +162,7 @@ class CExporter_Writer {
 
         if ($temporaryFile instanceof CExporter_File_RemoteTemporaryFile) {
             $temporaryFile->updateRemote();
+            $temporaryFile->deleteLocalCopy();
         }
 
         $this->clearListeners();

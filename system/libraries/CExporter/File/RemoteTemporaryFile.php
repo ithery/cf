@@ -55,6 +55,13 @@ class CExporter_File_RemoteTemporaryFile extends CExporter_File_TemporaryFile {
     /**
      * @return bool
      */
+    public function deleteLocalCopy() {
+        return $this->localTemporaryFile->delete();
+    }
+
+    /**
+     * @return bool
+     */
     public function delete() {
         $this->localTemporaryFile->delete();
 
