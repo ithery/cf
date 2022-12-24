@@ -177,3 +177,26 @@
     display: flex;
     align-items: center;
 }
+
+/*
+* Fix for datatable fixed css
+*/
+
+.DTFC_LeftHeadWrapper .table.dataTable.DTFC_Cloned {
+    margin-bottom: 0 !important;
+}
+.DTFC_LeftBodyWrapper .table.dataTable.DTFC_Cloned {
+    margin-top: -1px !important;
+}
+.table.dataTable.table-bordered.DTFC_Cloned {
+    border: 0 !important;
+}
+.dataTables_scrollBody table.dataTable thead .sorting::before,
+.dataTables_scrollBody table.dataTable thead .sorting::after,
+.DTFC_LeftBodyWrapper table.dataTable thead .sorting::before,
+.DTFC_LeftBodyWrapper table.dataTable thead .sorting::after {
+    display: none !important;
+}
+.DTFC_LeftBodyWrapper table.dataTable tbody {
+    border: 0 !important;
+}
