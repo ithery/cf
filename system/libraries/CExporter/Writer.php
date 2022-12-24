@@ -2,7 +2,9 @@
 
 use PhpOffice\PhpSpreadsheet\Cell\Cell;
 use PhpOffice\PhpSpreadsheet\IOFactory;
+use PhpOffice\PhpSpreadsheet\Style\Fill;
 use PhpOffice\PhpSpreadsheet\Spreadsheet;
+use PhpOffice\PhpSpreadsheet\Style\Color;
 
 class CExporter_Writer {
     use CExporter_Trait_DelegatedMacroableTrait;
@@ -86,6 +88,22 @@ class CExporter_Writer {
 
         $this->handleDocumentProperties($export);
 
+        if ($export instanceof CExporter_Concern_WithBackgroundColor) {
+            $defaultStyle = $this->spreadsheet->getDefaultStyle();
+            $backgroundColor = $export->backgroundColor();
+
+            if (is_string($backgroundColor)) {
+                $defaultStyle->getFill()->setFillType(Fill::FILL_SOLID)->getStartColor()->setRGB($backgroundColor);
+            }
+
+            if (is_array($backgroundColor)) {
+                $defaultStyle->applyFromArray(['fill' => $backgroundColor]);
+            }
+
+            if ($backgroundColor instanceof Color) {
+                $defaultStyle->getFill()->setFillType(Fill::FILL_SOLID)->setStartColor($backgroundColor);
+            }
+        }
         $this->raise(new CExporter_Event_BeforeExport($this, $this->exportable));
 
         if ($export instanceof CExporter_Concern_WithTitle) {
