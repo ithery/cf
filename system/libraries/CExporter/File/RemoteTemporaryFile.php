@@ -22,9 +22,9 @@ class CExporter_File_RemoteTemporaryFile extends CExporter_File_TemporaryFile {
     private $localTemporaryFile;
 
     /**
-     * @param string             $disk
-     * @param string             $filename
-     * @param LocalTemporaryFile $localTemporaryFile
+     * @param string                       $disk
+     * @param string                       $filename
+     * @param CExporter_File_TemporaryFile $localTemporaryFile
      */
     public function __construct($disk, $filename, CExporter_File_LocalTemporaryFile $localTemporaryFile) {
         $this->disk = $disk;
@@ -69,7 +69,7 @@ class CExporter_File_RemoteTemporaryFile extends CExporter_File_TemporaryFile {
     }
 
     /**
-     * @return TemporaryFile
+     * @return CExporter_File_TemporaryFile
      */
     public function sync() {
         if (!$this->localTemporaryFile->exists()) {
