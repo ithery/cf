@@ -634,6 +634,121 @@ class CImage_Chart_Draw extends CImage_Chart_BaseDraw {
         }
     }
 
+    public function getLegendBoundaries($x, $y, array $format = []) {
+        $family = isset($format['family']) ? $format['family'] : Constant::LEGEND_FAMILY_BOX;
+        $fontName = isset($format['fontName']) ? $this->loadFont($format['fontName'], 'fonts') : $this->fontName;
+        $fontSize = isset($format['fontSize']) ? $format['fontSize'] : $this->fontSize;
+        $fontR = isset($format['fontR']) ? $format['fontR'] : $this->fontColorR;
+        $fontG = isset($format['fontG']) ? $format['fontG'] : $this->fontColorG;
+        $fontB = isset($format['fontB']) ? $format['fontB'] : $this->fontColorB;
+        $boxWidth = isset($format['boxWidth']) ? $format['boxWidth'] : 5;
+        $boxHeight = isset($format['boxHeight']) ? $format['boxHeight'] : 5;
+        $iconAreaWidth = isset($format['iconAreaWidth']) ? $format['iconAreaWidth'] : $boxWidth;
+        $iconAreaHeight = isset($format['iconAreaHeight']) ? $format['iconAreaHeight'] : $boxHeight;
+        $margin = isset($format['margin']) ? $format['margin'] : 5;
+        $xSpacing = isset($format['xSpacing']) ? $format['xSpacing'] : 5;
+        $r = isset($format['r']) ? $format['r'] : 200;
+        $g = isset($format['g']) ? $format['g'] : 200;
+        $b = isset($format['b']) ? $format['b'] : 200;
+        $alpha = isset($format['alpha']) ? $format['alpha'] : 100;
+        $borderR = isset($format['borderR']) ? $format['borderR'] : 255;
+        $borderG = isset($format['borderG']) ? $format['borderG'] : 255;
+        $borderB = isset($format['borderB']) ? $format['borderB'] : 255;
+        $surrounding = isset($format['surrounding']) ? $format['surrounding'] : null;
+
+        $mode = isset($format['mode']) ? $format['mode'] : Constant::LEGEND_VERTICAL;
+        if ($surrounding != null) {
+            $borderR = $r + $surrounding;
+            $borderG = $g + $surrounding;
+            $borderB = $b + $surrounding;
+        }
+        $data = $this->dataSet->getData();
+        foreach ($data['series'] as $serieName => $serie) {
+            if ($serie['isDrawable'] == true && $serieName != $data['abscissa'] && isset($serie['picture'])
+            ) {
+                list($picWidth, $picHeight) = $this->getPicInfo($serie['picture']);
+                if ($iconAreaWidth < $picWidth) {
+                    $iconAreaWidth = $picWidth;
+                }
+                if ($iconAreaHeight < $picHeight) {
+                    $iconAreaHeight = $picHeight;
+                }
+            }
+        }
+        $yStep = max($this->fontSize, $iconAreaHeight) + 5;
+        $xStep = $iconAreaWidth + 5;
+        $xStep = $xSpacing;
+        $boundaries = [];
+        $boundaries['l'] = $x;
+        $boundaries['t'] = $y;
+        $boundaries['r'] = 0;
+        $boundaries['b'] = 0;
+        $vY = $y;
+        $vX = $x;
+        foreach ($data['series'] as $serieName => $serie) {
+            if ($serie['isDrawable'] == true && $serieName != $data['abscissa']) {
+                if ($mode == Constant::LEGEND_VERTICAL) {
+                    $boxArray = $this->getTextBox(
+                        $vX + $iconAreaWidth + 4,
+                        $vY + $iconAreaHeight / 2,
+                        $fontName,
+                        $fontSize,
+                        0,
+                        $serie['description']
+                    );
+                    if ($boundaries['t'] > $boxArray[2]['y'] + $iconAreaHeight / 2) {
+                        $boundaries['t'] = $boxArray[2]['y'] + $iconAreaHeight / 2;
+                    }
+                    if ($boundaries['r'] < $boxArray[1]['x'] + 2) {
+                        $boundaries['r'] = $boxArray[1]['x'] + 2;
+                    }
+                    if ($boundaries['b'] < $boxArray[1]['y'] + 2 + $iconAreaHeight / 2) {
+                        $boundaries['b'] = $boxArray[1]['y'] + 2 + $iconAreaHeight / 2;
+                    }
+                    $lines = preg_split("/\n/", $serie['description']);
+                    $vY = $vY + max($this->fontSize * count($lines), $iconAreaHeight) + 5;
+                } elseif ($mode == Constant::LEGEND_HORIZONTAL) {
+                    $lines = preg_split("/\n/", $serie['description']);
+                    $width = [];
+                    foreach ($lines as $key => $value) {
+                        $boxArray = $this->getTextBox(
+                            $vX + $iconAreaWidth + 6,
+                            $y + $iconAreaHeight / 2 + (($this->fontSize + 3) * $key),
+                            $fontName,
+                            $fontSize,
+                            0,
+                            $value
+                        );
+
+                        if ($boundaries['t'] > $boxArray[2]['y'] + $iconAreaHeight / 2) {
+                            $boundaries['t'] = $boxArray[2]['y'] + $iconAreaHeight / 2;
+                        }
+                        if ($boundaries['r'] < $boxArray[1]['x'] + 2) {
+                            $boundaries['r'] = $boxArray[1]['x'] + 2;
+                        }
+                        if ($boundaries['b'] < $boxArray[1]['y'] + 2 + $iconAreaHeight / 2) {
+                            $boundaries['b'] = $boxArray[1]['y'] + 2 + $iconAreaHeight / 2;
+                        }
+                        $width[] = $boxArray[1]['x'];
+                    }
+                    $vX = max($width) + $xStep;
+                }
+            }
+        }
+
+        $vY = $vY - $yStep;
+        $vX = $vX - $xStep;
+        $topOffset = $y - $boundaries['t'];
+        if ($boundaries['b'] - ($vY + $iconAreaHeight) < $topOffset) {
+            $boundaries['b'] = $vY + $iconAreaHeight + $topOffset;
+        }
+        $boundaries['l'] -= $margin;
+        $boundaries['t'] -= $margin;
+        $boundaries['r'] += $margin;
+        $boundaries['b'] += $margin;
+        return $boundaries;
+    }
+
     /**
      * Draw the legend of the active series
      *
@@ -642,6 +757,7 @@ class CImage_Chart_Draw extends CImage_Chart_BaseDraw {
      * @param array $format
      */
     public function drawLegend($x, $y, array $format = []) {
+        $boundaries = $this->getLegendBoundaries($x, $y, $format);
         $family = isset($format['family']) ? $format['family'] : Constant::LEGEND_FAMILY_BOX;
         $fontName = isset($format['fontName']) ? $this->loadFont($format['fontName'], 'fonts') : $this->fontName;
         $fontSize = isset($format['fontSize']) ? $format['fontSize'] : $this->fontSize;
@@ -687,7 +803,7 @@ class CImage_Chart_Draw extends CImage_Chart_BaseDraw {
         $xStep = $xSpacing;
         $boundaries = [];
         $boundaries['l'] = $x;
-        $boundaries['T'] = $y;
+        $boundaries['t'] = $y;
         $boundaries['r'] = 0;
         $boundaries['b'] = 0;
         $vY = $y;
@@ -703,8 +819,8 @@ class CImage_Chart_Draw extends CImage_Chart_BaseDraw {
                         0,
                         $serie['description']
                     );
-                    if ($boundaries['T'] > $boxArray[2]['y'] + $iconAreaHeight / 2) {
-                        $boundaries['T'] = $boxArray[2]['y'] + $iconAreaHeight / 2;
+                    if ($boundaries['t'] > $boxArray[2]['y'] + $iconAreaHeight / 2) {
+                        $boundaries['t'] = $boxArray[2]['y'] + $iconAreaHeight / 2;
                     }
                     if ($boundaries['r'] < $boxArray[1]['x'] + 2) {
                         $boundaries['r'] = $boxArray[1]['x'] + 2;
@@ -726,8 +842,8 @@ class CImage_Chart_Draw extends CImage_Chart_BaseDraw {
                             0,
                             $value
                         );
-                        if ($boundaries['T'] > $boxArray[2]['y'] + $iconAreaHeight / 2) {
-                            $boundaries['T'] = $boxArray[2]['y'] + $iconAreaHeight / 2;
+                        if ($boundaries['t'] > $boxArray[2]['y'] + $iconAreaHeight / 2) {
+                            $boundaries['t'] = $boxArray[2]['y'] + $iconAreaHeight / 2;
                         }
                         if ($boundaries['r'] < $boxArray[1]['x'] + 2) {
                             $boundaries['r'] = $boxArray[1]['x'] + 2;
@@ -743,14 +859,14 @@ class CImage_Chart_Draw extends CImage_Chart_BaseDraw {
         }
         $vY = $vY - $yStep;
         $vX = $vX - $xStep;
-        $topOffset = $y - $boundaries['T'];
+        $topOffset = $y - $boundaries['t'];
         if ($boundaries['b'] - ($vY + $iconAreaHeight) < $topOffset) {
             $boundaries['b'] = $vY + $iconAreaHeight + $topOffset;
         }
         if ($style == Constant::LEGEND_ROUND) {
             $this->drawRoundedFilledRectangle(
                 $boundaries['l'] - $margin,
-                $boundaries['T'] - $margin,
+                $boundaries['t'] - $margin,
                 $boundaries['r'] + $margin,
                 $boundaries['b'] + $margin,
                 $margin,
@@ -767,7 +883,7 @@ class CImage_Chart_Draw extends CImage_Chart_BaseDraw {
         } elseif ($style == Constant::LEGEND_BOX) {
             $this->drawFilledRectangle(
                 $boundaries['l'] - $margin,
-                $boundaries['T'] - $margin,
+                $boundaries['t'] - $margin,
                 $boundaries['r'] + $margin,
                 $boundaries['b'] + $margin,
                 [
@@ -912,7 +1028,7 @@ class CImage_Chart_Draw extends CImage_Chart_BaseDraw {
         $xMargin = isset($format['xMargin']) ? $format['xMargin'] : Constant::AUTO;
         $yMargin = isset($format['yMargin']) ? $format['yMargin'] : 0;
         $scaleSpacing = isset($format['scaleSpacing']) ? $format['scaleSpacing'] : 15;
-        $InnerTickWidth = isset($format['innerTickWidth']) ? $format['innerTickWidth'] : 2;
+        $innerTickWidth = isset($format['innerTickWidth']) ? $format['innerTickWidth'] : 2;
         $outerTickWidth = isset($format['outerTickWidth']) ? $format['outerTickWidth'] : 2;
         $drawXLines = isset($format['drawXLines']) ? $format['drawXLines'] : true;
         $drawYLines = isset($format['drawYLines']) ? $format['drawYLines'] : Constant::ALL;
@@ -940,7 +1056,7 @@ class CImage_Chart_Draw extends CImage_Chart_BaseDraw {
         $xReleasePercent = isset($format['xReleasePercent']) ? $format['xReleasePercent'] : 1;
         $drawArrows = isset($format['drawArrows']) ? $format['drawArrows'] : false;
         $arrowSize = isset($format['arrowSize']) ? $format['arrowSize'] : 8;
-        $CycleBackground = isset($format['CycleBackground']) ? $format['CycleBackground'] : false;
+        $cycleBackground = isset($format['cycleBackground']) ? $format['cycleBackground'] : false;
         $backgroundR1 = isset($format['backgroundR1']) ? $format['backgroundR1'] : 255;
         $backgroundG1 = isset($format['backgroundG1']) ? $format['backgroundG1'] : 255;
         $backgroundB1 = isset($format['backgroundB1']) ? $format['backgroundB1'] : 255;
@@ -1120,6 +1236,7 @@ class CImage_Chart_Draw extends CImage_Chart_BaseDraw {
             } else {
                 $data['axis'][$axisId]['position'] = Constant::AXIS_POSITION_LEFT;
             }
+
             if (isset($data['abscissaName'])) {
                 $data['axis'][$axisId]['name'] = $data['abscissaName'];
             }
@@ -1129,6 +1246,7 @@ class CImage_Chart_Draw extends CImage_Chart_BaseDraw {
                 } else {
                     $height = $this->graphAreaY2 - $this->graphAreaY1;
                 }
+
                 if ($points == 0 || $points == 1) {
                     $data['axis'][$axisId]['margin'] = $height / 2;
                 } else {
@@ -1164,7 +1282,7 @@ class CImage_Chart_Draw extends CImage_Chart_BaseDraw {
         $fontColorBo = $this->fontColorB;
         $axisPos['l'] = $this->graphAreaX1;
         $axisPos['r'] = $this->graphAreaX2;
-        $axisPos['T'] = $this->graphAreaY1;
+        $axisPos['t'] = $this->graphAreaY1;
         $axisPos['b'] = $this->graphAreaY2;
         foreach ($data['axis'] as $axisId => $parameters) {
             if (isset($parameters['color'])) {
@@ -1327,10 +1445,10 @@ class CImage_Chart_Draw extends CImage_Chart_BaseDraw {
                                         ]
                                     );
                                 }
-                                if (($InnerTickWidth != 0 || $outerTickWidth != 0) && !$removeXAxis) {
+                                if (($innerTickWidth != 0 || $outerTickWidth != 0) && !$removeXAxis) {
                                     $this->drawLine(
                                         $xPos,
-                                        $yPos - $InnerTickWidth,
+                                        $yPos - $innerTickWidth,
                                         $xPos,
                                         $yPos + $outerTickWidth,
                                         ['r' => $tickR, 'g' => $tickG, 'b' => $tickB, 'alpha' => $tickalpha]
@@ -1373,27 +1491,27 @@ class CImage_Chart_Draw extends CImage_Chart_BaseDraw {
                                 $floatingOffset = $yMargin;
                                 $this->drawLine(
                                     $this->graphAreaX1 + $parameters['margin'],
-                                    $axisPos['T'],
+                                    $axisPos['t'],
                                     $this->graphAreaX2 - $parameters['margin'],
-                                    $axisPos['T'],
+                                    $axisPos['t'],
                                     ['r' => $axisR, 'g' => $axisG, 'b' => $axisB, 'alpha' => $axisalpha]
                                 );
                             } else {
                                 $floatingOffset = 0;
                                 $this->drawLine(
                                     $this->graphAreaX1,
-                                    $axisPos['T'],
+                                    $axisPos['t'],
                                     $this->graphAreaX2,
-                                    $axisPos['T'],
+                                    $axisPos['t'],
                                     ['r' => $axisR, 'g' => $axisG, 'b' => $axisB, 'alpha' => $axisalpha]
                                 );
                             }
                             if ($drawArrows) {
                                 $this->drawArrow(
                                     $this->graphAreaX2 - $parameters['margin'],
-                                    $axisPos['T'],
+                                    $axisPos['t'],
                                     $this->graphAreaX2 + ($arrowSize * 2),
-                                    $axisPos['T'],
+                                    $axisPos['t'],
                                     ['fillR' => $axisR, 'fillG' => $axisG, 'fillB' => $axisB, 'size' => $arrowSize]
                                 );
                             }
@@ -1404,10 +1522,10 @@ class CImage_Chart_Draw extends CImage_Chart_BaseDraw {
                         } else {
                             $step = $width / $parameters['rows'];
                         }
-                        $minTop = $axisPos['T'];
+                        $minTop = $axisPos['t'];
                         for ($i = 0; $i <= $parameters['rows']; $i++) {
                             $xPos = $this->graphAreaX1 + $parameters['margin'] + $step * $i;
-                            $yPos = $axisPos['T'];
+                            $yPos = $axisPos['t'];
                             if ($abscissa != null) {
                                 $value = '';
                                 if (isset($data['series'][$abscissa]['data'][$i])) {
@@ -1483,10 +1601,10 @@ class CImage_Chart_Draw extends CImage_Chart_BaseDraw {
                                         ]
                                     );
                                 }
-                                if (($InnerTickWidth != 0 || $outerTickWidth != 0) && !$removeXAxis) {
+                                if (($innerTickWidth != 0 || $outerTickWidth != 0) && !$removeXAxis) {
                                     $this->drawLine(
                                         $xPos,
-                                        $yPos + $InnerTickWidth,
+                                        $yPos + $innerTickWidth,
                                         $xPos,
                                         $yPos - $outerTickWidth,
                                         [
@@ -1511,7 +1629,7 @@ class CImage_Chart_Draw extends CImage_Chart_BaseDraw {
                             $minTop = $bounds[2]['y'];
                             $this->dataSet->data['graphArea']['y1'] = $minTop;
                         }
-                        $axisPos['T'] = $minTop - $scaleSpacing;
+                        $axisPos['t'] = $minTop - $scaleSpacing;
                     }
                 } elseif ($pos == Constant::SCALE_POS_TOPBOTTOM) {
                     if ($parameters['position'] == Constant::AXIS_POSITION_LEFT) {
@@ -1651,11 +1769,11 @@ class CImage_Chart_Draw extends CImage_Chart_BaseDraw {
                                         ]
                                     );
                                 }
-                                if (($InnerTickWidth != 0 || $outerTickWidth != 0) && !$removeXAxis) {
+                                if (($innerTickWidth != 0 || $outerTickWidth != 0) && !$removeXAxis) {
                                     $this->drawLine(
                                         $xPos - $outerTickWidth,
                                         $yPos,
-                                        $xPos + $InnerTickWidth,
+                                        $xPos + $innerTickWidth,
                                         $yPos,
                                         ['r' => $tickR, 'g' => $tickG, 'b' => $tickB, 'alpha' => $tickalpha]
                                     );
@@ -1812,11 +1930,11 @@ class CImage_Chart_Draw extends CImage_Chart_BaseDraw {
                                         ]
                                     );
                                 }
-                                if (($InnerTickWidth != 0 || $outerTickWidth != 0) && !$removeXAxis) {
+                                if (($innerTickWidth != 0 || $outerTickWidth != 0) && !$removeXAxis) {
                                     $this->drawLine(
                                         $xPos + $outerTickWidth,
                                         $yPos,
-                                        $xPos - $InnerTickWidth,
+                                        $xPos - $innerTickWidth,
                                         $yPos,
                                         [
                                             'r' => $tickR,
@@ -1909,7 +2027,7 @@ class CImage_Chart_Draw extends CImage_Chart_BaseDraw {
                                     'alpha' => $backgroundalpha2
                                 ];
                             }
-                            if ($lastY != null && $CycleBackground && ($drawYLines == Constant::ALL || in_array($axisId, $drawYLines))
+                            if ($lastY != null && $cycleBackground && ($drawYLines == Constant::ALL || in_array($axisId, $drawYLines))
                             ) {
                                 $this->drawFilledRectangle(
                                     $this->graphAreaX1 + $floatingOffset,
@@ -1952,7 +2070,7 @@ class CImage_Chart_Draw extends CImage_Chart_BaseDraw {
                                 $this->drawLine(
                                     $xPos - $outerTickWidth,
                                     $yPos,
-                                    $xPos + $InnerTickWidth,
+                                    $xPos + $innerTickWidth,
                                     $yPos,
                                     ['r' => $tickR, 'g' => $tickG, 'b' => $tickB, 'alpha' => $tickalpha]
                                 );
@@ -2043,7 +2161,7 @@ class CImage_Chart_Draw extends CImage_Chart_BaseDraw {
                                     'alpha' => $backgroundalpha2
                                 ];
                             }
-                            if ($lastY != null && $CycleBackground && ($drawYLines == Constant::ALL || in_array($axisId, $drawYLines))
+                            if ($lastY != null && $cycleBackground && ($drawYLines == Constant::ALL || in_array($axisId, $drawYLines))
                             ) {
                                 $this->drawFilledRectangle(
                                     $this->graphAreaX1 + $floatingOffset,
@@ -2083,7 +2201,7 @@ class CImage_Chart_Draw extends CImage_Chart_BaseDraw {
                                 );
                             }
                             $this->drawLine(
-                                $xPos - $InnerTickWidth,
+                                $xPos - $innerTickWidth,
                                 $yPos,
                                 $xPos + $outerTickWidth,
                                 $yPos,
@@ -2119,27 +2237,27 @@ class CImage_Chart_Draw extends CImage_Chart_BaseDraw {
                             $floatingOffset = $xMargin;
                             $this->drawLine(
                                 $this->graphAreaX1 + $parameters['margin'],
-                                $axisPos['T'],
+                                $axisPos['t'],
                                 $this->graphAreaX2 - $parameters['margin'],
-                                $axisPos['T'],
+                                $axisPos['t'],
                                 ['r' => $axisR, 'g' => $axisG, 'b' => $axisB, 'alpha' => $axisalpha]
                             );
                         } else {
                             $floatingOffset = 0;
                             $this->drawLine(
                                 $this->graphAreaX1,
-                                $axisPos['T'],
+                                $axisPos['t'],
                                 $this->graphAreaX2,
-                                $axisPos['T'],
+                                $axisPos['t'],
                                 ['r' => $axisR, 'g' => $axisG, 'b' => $axisB, 'alpha' => $axisalpha]
                             );
                         }
                         if ($drawArrows) {
                             $this->drawArrow(
                                 $this->graphAreaX2 - $parameters['margin'],
-                                $axisPos['T'],
+                                $axisPos['t'],
                                 $this->graphAreaX2 + ($arrowSize * 2),
-                                $axisPos['T'],
+                                $axisPos['t'],
                                 [
                                     'fillR' => $axisR,
                                     'fillG' => $axisG,
@@ -2151,11 +2269,11 @@ class CImage_Chart_Draw extends CImage_Chart_BaseDraw {
                         $width = ($this->graphAreaX2 - $this->graphAreaX1) - $parameters['margin'] * 2;
                         $step = $width / $parameters['rows'];
                         $subTicksSize = $step / 2;
-                        $minTop = $axisPos['T'];
+                        $minTop = $axisPos['t'];
                         $lastX = null;
                         for ($i = 0; $i <= $parameters['rows']; $i++) {
                             $xPos = $this->graphAreaX1 + $parameters['margin'] + $step * $i;
-                            $yPos = $axisPos['T'];
+                            $yPos = $axisPos['t'];
                             $value = $this->scaleFormat(
                                 $parameters['scaleMin'] + $parameters['rowHeight'] * $i,
                                 $parameters['display'],
@@ -2177,7 +2295,7 @@ class CImage_Chart_Draw extends CImage_Chart_BaseDraw {
                                     'alpha' => $backgroundalpha2
                                 ];
                             }
-                            if ($lastX != null && $CycleBackground && ($drawYLines == Constant::ALL || in_array($axisId, $drawYLines))
+                            if ($lastX != null && $cycleBackground && ($drawYLines == Constant::ALL || in_array($axisId, $drawYLines))
                             ) {
                                 $this->drawFilledRectangle(
                                     $lastX,
@@ -2220,7 +2338,7 @@ class CImage_Chart_Draw extends CImage_Chart_BaseDraw {
                                 $xPos,
                                 $yPos - $outerTickWidth,
                                 $xPos,
-                                $yPos + $InnerTickWidth,
+                                $yPos + $innerTickWidth,
                                 ['r' => $tickR, 'g' => $tickG, 'b' => $tickB, 'alpha' => $tickalpha]
                             );
                             $bounds = $this->drawText(
@@ -2245,7 +2363,7 @@ class CImage_Chart_Draw extends CImage_Chart_BaseDraw {
                             $minTop = $bounds[2]['y'];
                             $this->dataSet->data['graphArea']['y1'] = $minTop;
                         }
-                        $axisPos['T'] = $minTop - $scaleSpacing;
+                        $axisPos['t'] = $minTop - $scaleSpacing;
                     } elseif ($parameters['position'] == Constant::AXIS_POSITION_BOTTOM) {
                         if ($floating) {
                             $floatingOffset = $xMargin;
@@ -2309,7 +2427,7 @@ class CImage_Chart_Draw extends CImage_Chart_BaseDraw {
                                     'alpha' => $backgroundalpha2
                                 ];
                             }
-                            if ($lastX != null && $CycleBackground && ($drawYLines == Constant::ALL || in_array($axisId, $drawYLines))
+                            if ($lastX != null && $cycleBackground && ($drawYLines == Constant::ALL || in_array($axisId, $drawYLines))
                             ) {
                                 $this->drawFilledRectangle(
                                     $lastX,
@@ -2352,7 +2470,7 @@ class CImage_Chart_Draw extends CImage_Chart_BaseDraw {
                                 $xPos,
                                 $yPos - $outerTickWidth,
                                 $xPos,
-                                $yPos + $InnerTickWidth,
+                                $yPos + $innerTickWidth,
                                 ['r' => $tickR, 'g' => $tickG, 'b' => $tickB, 'alpha' => $tickalpha]
                             );
                             $bounds = $this->drawText(
@@ -3003,8 +3121,8 @@ class CImage_Chart_Draw extends CImage_Chart_BaseDraw {
      * @return array
      */
     public function getLegendSize(array $format = []) {
-        $fontName = isset($format['fontName']) ? $this->loadFont($format['fontName'], 'fonts') : $this->FontName;
-        $fontSize = isset($format['fontSize']) ? $format['fontSize'] : $this->FontSize;
+        $fontName = isset($format['fontName']) ? $this->loadFont($format['fontName'], 'fonts') : $this->fontName;
+        $fontSize = isset($format['fontSize']) ? $format['fontSize'] : $this->fontSize;
         $margin = isset($format['margin']) ? $format['margin'] : 5;
         $mode = isset($format['mode']) ? $format['mode'] : Constant::LEGEND_VERTICAL;
         $boxWidth = isset($format['boxWidth']) ? $format['boxWidth'] : 5;
@@ -3025,7 +3143,7 @@ class CImage_Chart_Draw extends CImage_Chart_BaseDraw {
                 }
             }
         }
-        $yStep = max($this->FontSize, $iconAreaHeight) + 5;
+        $yStep = max($this->fontSize, $iconAreaHeight) + 5;
         $xStep = $iconAreaWidth + 5;
         $xStep = $xSpacing;
         $x = 100;
@@ -3058,14 +3176,14 @@ class CImage_Chart_Draw extends CImage_Chart_BaseDraw {
                         $boundaries['b'] = $boxArray[1]['y'] + 2 + $iconAreaHeight / 2;
                     }
                     $lines = preg_split("/\n/", $serie['description']);
-                    $vY = $vY + max($this->FontSize * count($lines), $iconAreaHeight) + 5;
+                    $vY = $vY + max($this->fontSize * count($lines), $iconAreaHeight) + 5;
                 } elseif ($mode == Constant::LEGEND_HORIZONTAL) {
                     $lines = preg_split("/\n/", $serie['description']);
                     $width = [];
                     foreach ($lines as $key => $value) {
                         $boxArray = $this->getTextBox(
                             $vX + $iconAreaWidth + 6,
-                            $y + $iconAreaHeight / 2 + (($this->FontSize + 3) * $key),
+                            $y + $iconAreaHeight / 2 + (($this->fontSize + 3) * $key),
                             $fontName,
                             $fontSize,
                             0,
@@ -3197,7 +3315,7 @@ class CImage_Chart_Draw extends CImage_Chart_BaseDraw {
                             $maxLabelTxt,
                             $this->scaleFormat(round($maxValue, $decimals), $mode, $format, $unit)
                         );
-                        $txtPos = $this->getTextBox($xPos, $yPos, $this->FontName, $this->FontSize, 0, $label);
+                        $txtPos = $this->getTextBox($xPos, $yPos, $this->fontName, $this->fontSize, 0, $label);
                         $xOffset = 0;
                         $yOffset = 0;
                         if ($txtPos[0]['x'] < $this->graphAreaX1) {
@@ -3235,7 +3353,7 @@ class CImage_Chart_Draw extends CImage_Chart_BaseDraw {
                             $minLabelTxt,
                             $this->scaleFormat(round($minValue, $decimals), $mode, $format, $unit)
                         );
-                        $txtPos = $this->getTextBox($xPos, $yPos, $this->FontName, $this->FontSize, 0, $label);
+                        $txtPos = $this->getTextBox($xPos, $yPos, $this->fontName, $this->fontSize, 0, $label);
                         $xOffset = 0;
                         $yOffset = 0;
                         if ($txtPos[0]['x'] < $this->graphAreaX1) {
@@ -3278,7 +3396,7 @@ class CImage_Chart_Draw extends CImage_Chart_BaseDraw {
                         }
                         $xPos = $x + $maxPos * $xStep + $serieOffset;
                         $label = $maxLabelTxt . $this->scaleFormat($maxValue, $mode, $format, $unit);
-                        $txtPos = $this->getTextBox($yPos, $xPos, $this->FontName, $this->FontSize, 0, $label);
+                        $txtPos = $this->getTextBox($yPos, $xPos, $this->fontName, $this->fontSize, 0, $label);
                         $xOffset = 0;
                         $yOffset = 0;
                         if ($txtPos[0]['x'] < $this->graphAreaX1) {
@@ -3312,7 +3430,7 @@ class CImage_Chart_Draw extends CImage_Chart_BaseDraw {
                         }
                         $xPos = $x + $minPos * $xStep + $serieOffset;
                         $label = $minLabelTxt . $this->scaleFormat($minValue, $mode, $format, $unit);
-                        $txtPos = $this->getTextBox($yPos, $xPos, $this->FontName, $this->FontSize, 0, $label);
+                        $txtPos = $this->getTextBox($yPos, $xPos, $this->fontName, $this->fontSize, 0, $label);
                         $xOffset = 0;
                         $yOffset = 0;
                         if ($txtPos[0]['x'] < $this->graphAreaX1) {

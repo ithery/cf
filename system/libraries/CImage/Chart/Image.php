@@ -122,7 +122,7 @@ class CImage_Chart_Image extends CImage_Chart_Draw {
         imagepng($this->picture, $fileName);
     }
 
-    public function __toString() {
+    public function toData() {
         if ($this->transparentBackground) {
             imagealphablending($this->picture, false);
             imagesavealpha($this->picture, true);
@@ -131,6 +131,9 @@ class CImage_Chart_Image extends CImage_Chart_Draw {
         imagepng($this->picture);
 
         return ob_get_clean();
+    }
+    public function __toString() {
+        return $this->toData();
     }
 
     public function toDataURI() {

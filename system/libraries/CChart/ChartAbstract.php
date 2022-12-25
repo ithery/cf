@@ -18,8 +18,13 @@ class CChart_ChartAbstract {
      */
     protected $values = [];
 
-    protected $labels = [];
+    protected $seriesLabels = [];
 
+    protected $dataLabels = [];
+
+    /**
+     * @var array<CColor_FormatAbstract>
+     */
     protected $colors = [];
 
     /**
@@ -35,6 +40,13 @@ class CChart_ChartAbstract {
      * @var int
      */
     private $height;
+
+    /**
+     * @var bool
+     */
+    private $isShowLegend = true;
+
+    private $legendPosition = CChart::POSITION_RIGHT;
 
     public function __construct($width = 500, $height = 500) {
         $this->width = $width;
@@ -71,11 +83,83 @@ class CChart_ChartAbstract {
         return $this->title;
     }
 
+    /**
+     * @param array  $data
+     * @param string $label
+     *
+     * @return $this
+     */
+    public function addSeries(array $data, $label = null) {
+        $this->seriesLabels[] = $label;
+
+        $this->values[] = $data;
+    }
+
+    public function setColors(array $colors) {
+        $colors = c::collect($colors)->map(function ($color) {
+            if (!($color instanceof CColor_FormatAbstract)) {
+                $color = CColor::create($color);
+            }
+
+            return $color;
+        })->all();
+        $this->colors = $colors;
+
+        return $this->colors;
+    }
+
     public function getValues() {
         return $this->values;
     }
 
-    public function getLabels() {
-        return $this->labels;
+    public function getDataLabels() {
+        return $this->dataLabels;
+    }
+
+    public function setDataLabels(array $labels) {
+        $this->dataLabels = $labels;
+
+        return $this;
+    }
+
+    public function getSeriesLabels() {
+        return $this->seriesLabels;
+    }
+
+    /**
+     * @return array<CColor_FormatAbstract>
+     */
+    public function getColors() {
+        return $this->colors;
+    }
+
+    public function xAxis() {
+        return $this->xAxis;
+    }
+
+    public function yAxis() {
+        return $this->yAxis;
+    }
+
+    public function showLegend() {
+        $this->isShowLegend = true;
+    }
+
+    public function hideLegend() {
+        $this->isShowLegend = false;
+    }
+
+    public function isShowLegend() {
+        return $this->isShowLegend;
+    }
+
+    public function getLegendPosition() {
+        return $this->legendPosition;
+    }
+
+    public function setLegendPosition($position) {
+        $this->legendPosition = $position;
+
+        return $this;
     }
 }

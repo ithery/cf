@@ -13,6 +13,45 @@ class CImage_Chart_Runner extends CController {
         parent::__construct();
     }
 
+    public function imageLine() {
+        $request = TB::getRequest();
+        $dataArray = carr::get($request, 'data', []);
+        $width = carr::get($request, 'width', 500);
+        $height = carr::get($request, 'height', 200);
+
+        if (strlen($dataArray) > 0) {
+            $dataArray = explode(',', $dataArray);
+        }
+
+        $data = $data = CImage_Chart::createData();
+        $data->addPoints($dataArray, 'Probe 3');
+        $data->setSerieTicks('Probe 2', 4);
+        $data->setSerieWeight('Probe 3', 2);
+        $data->setAxisName(0, 'Temperatures');
+        $data->addPoints($dataArray, 'Labels');
+        $data->setSerieDescription('Labels', 'Months');
+        $data->setAbscissa('Labels');
+
+        /* Create the 1st chart */
+        $image = CImage_Chart::createImage($width, $height, $data);
+        $image->setGraphArea(0, 0, $width, $height);
+        $image->drawFilledRectangle(0, 0, $width, $height, [
+            'r' => 255,
+            'g' => 255,
+            'b' => 255,
+            'surrounding' => -200,
+            'alpha' => 10,
+            'Angle' => 90
+        ]);
+        $image->drawScale(['drawSubTicks' => true]);
+        $image->setShadow(true, ['x' => 1, 'y' => 1, 'r' => 0, 'g' => 0, 'b' => 0, 'alpha' => 10]);
+        $image->setFontProperties(['fontName' => 'fonts/pf_arma_five.ttf', 'fontSize' => 6]);
+        $image->drawLineChart(['displayColor' => 691001]);
+        $image->setShadow(false);
+
+        $image->autoOutput('example.drawLineChart.png');
+    }
+
     public function json() {
         $json = CHTTP::request()->get('c', '');
 

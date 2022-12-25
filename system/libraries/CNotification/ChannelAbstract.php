@@ -10,6 +10,13 @@ abstract class CNotification_ChannelAbstract implements CNotification_ChannelInt
         $this->channelName = 'Custom';
     }
 
+    public function getChannelConfig($key) {
+        return CF::config(
+            'notification.' . strtolower(cstr::snake($this->channelName)) . '.' . $key,
+            CF::config('notification.' . $key)
+        );
+    }
+
     /**
      * @param string $className
      * @param array  $options
@@ -19,7 +26,7 @@ abstract class CNotification_ChannelAbstract implements CNotification_ChannelInt
     public function send($className, array $options = []) {
         $notificationSenderJobClass = CF::config('notification.task_queue.notification_sender', CNotification_TaskQueue_NotificationSender::class);
 
-        $isQueued = CF::config('notification.queue.queued');
+        $isQueued = $this->getChannelConfig('queue.queued');
 
         $options = [
             'channel' => $this->channelName,
@@ -29,10 +36,10 @@ abstract class CNotification_ChannelAbstract implements CNotification_ChannelInt
 
         if ($isQueued) {
             $taskQueue = call_user_func([$notificationSenderJobClass, 'dispatch'], $options);
-            if ($customConnection = CF::config('notification.queue.connection')) {
+            if ($customConnection = $this->getChannelConfig('queue.connection')) {
                 $taskQueue->onConnection($customConnection);
             }
-            if ($customQueue = CF::config('notification.queue.name')) {
+            if ($customQueue = $this->getChannelConfig('queue.name')) {
                 $taskQueue->onQueue($customQueue);
             }
         } else {
@@ -109,7 +116,7 @@ abstract class CNotification_ChannelAbstract implements CNotification_ChannelInt
                 } catch (Exception $ex) {
                     //throw $ex;
                     $errCode++;
-                    $errMessage = $ex->getMessage() . ':' . $ex->getTraceAsString();
+                    $errMessage = '[' . get_class($ex) . '] ' . $ex->getMessage() . ':' . $ex->getTraceAsString();
                 }
             }
             if ($errCode > 0) {

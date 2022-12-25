@@ -4,11 +4,17 @@ class CExporter_Import_EndRowFinder {
     /**
      * @param object|WithLimit $import
      * @param int              $startRow
+     * @param null|int         $highestRow
      *
      * @return null|int
      */
-    public static function find($import, $startRow = null) {
+    public static function find($import, $startRow = null, $highestRow = null) {
         if (!$import instanceof CExporter_Concern_WithLimit) {
+            return null;
+        }
+        $limit = $import->limit();
+
+        if ($limit > $highestRow) {
             return null;
         }
 
@@ -18,6 +24,6 @@ class CExporter_Import_EndRowFinder {
 
         // Subtract 1 row from the start row, so a limit
         // of 1 row, will have the same start and end row.
-        return ($startRow - 1) + $import->limit();
+        return ($startRow - 1) + $limit;
     }
 }

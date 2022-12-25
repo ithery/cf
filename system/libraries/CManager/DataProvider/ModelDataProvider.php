@@ -46,7 +46,7 @@ class CManager_DataProvider_ModelDataProvider extends CManager_DataProviderAbstr
      *
      * @return CModel_Query
      */
-    protected function getModelQuery($callback = null) {
+    public function getModelQuery($callback = null) {
         $modelClass = $this->modelClass;
         $query = $modelClass::query();
         /** @var CModel_Query $query */

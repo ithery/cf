@@ -26,6 +26,21 @@ return [
         'uri' => 'demo/elements/image/index',
     ],
     [
+        'name' => 'elements.gallery',
+        'label' => c::__('Gallery'),
+        'uri' => 'demo/elements/gallery/index',
+    ],
+    [
+        'name' => 'elements.chart',
+        'label' => c::__('Chart'),
+        'subnav' => include dirname(__FILE__) . '/elements/chart.php',
+    ],
+    [
+        'name' => 'elements.metric',
+        'label' => c::__('Metric'),
+        'subnav' => include dirname(__FILE__) . '/elements/metric.php',
+    ],
+    [
         'name' => 'elements.repeater',
         'label' => c::__('Repeater') . ' [DEV]',
         'uri' => 'demo/elements/repeater/index',
@@ -44,15 +59,5 @@ return [
         'name' => 'elements.progressBar',
         'label' => c::__('Progress Bar'),
         'uri' => 'demo/elements/progressBar/index',
-    ],
-    [
-        'name' => 'elements.gallery',
-        'label' => c::__('Gallery'),
-        'uri' => 'demo/elements/gallery/index',
-    ],
-    [
-        'name' => 'elements.metric',
-        'label' => c::__('Metric'),
-        'subnav' => include dirname(__FILE__) . '/elements/metric.php',
     ],
 ];
