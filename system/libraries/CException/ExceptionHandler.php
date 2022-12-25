@@ -44,11 +44,25 @@ class CException_ExceptionHandler implements CException_ExceptionHandlerInterfac
     protected $reportCallbacks = [];
 
     /**
+     * A map of exceptions with their corresponding custom log levels.
+     *
+     * @var array<class-string<\Throwable>, \Psr\Log\LogLevel::*>
+     */
+    protected $levels = [];
+
+    /**
      * The callbacks that should be used during rendering.
      *
      * @var array
      */
     protected $renderCallbacks = [];
+
+    /**
+     * The registered exception mappings.
+     *
+     * @var array<string, \Closure>
+     */
+    protected $exceptionMap = [];
 
     /**
      * A list of the internal exception types that should not be reported.
@@ -95,6 +109,100 @@ class CException_ExceptionHandler implements CException_ExceptionHandlerInterfac
     }
 
     /**
+     * Register a reportable callback.
+     *
+     * @param callable $reportUsing
+     *
+     * @return CException_ReportableHandler
+     */
+    public function reportable(callable $reportUsing) {
+        if (PHP_VERSION_ID >= 71000) {
+            if (!$reportUsing instanceof Closure) {
+                $reportUsing = Closure::fromCallable($reportUsing);
+            }
+        }
+
+        return c::tap(new CException_ReportableHandler($reportUsing), function ($callback) {
+            $this->reportCallbacks[] = $callback;
+        });
+    }
+
+    /**
+     * Register a renderable callback.
+     *
+     * @param callable $renderUsing
+     *
+     * @return $this
+     */
+    public function renderable(callable $renderUsing) {
+        if (PHP_VERSION_ID >= 71000) {
+            if (!$renderUsing instanceof Closure) {
+                $renderUsing = Closure::fromCallable($renderUsing);
+            }
+        }
+        $this->renderCallbacks[] = $renderUsing;
+
+        return $this;
+    }
+
+    /**
+     * Register a new exception mapping.
+     *
+     * @param \Closure|string      $from
+     * @param null|\Closure|string $to
+     *
+     * @throws \InvalidArgumentException
+     *
+     * @return $this
+     */
+    public function map($from, $to = null) {
+        if (is_string($to)) {
+            $to = function ($exception) use ($to) {
+                return new $to('', 0, $exception);
+            };
+        }
+
+        if (is_callable($from) && is_null($to)) {
+            $from = $this->firstClosureParameterType($to = $from);
+        }
+
+        if (!is_string($from) || !$to instanceof Closure) {
+            throw new InvalidArgumentException('Invalid exception mapping.');
+        }
+
+        $this->exceptionMap[$from] = $to;
+
+        return $this;
+    }
+
+    /**
+     * Indicate that the given exception type should not be reported.
+     *
+     * @param string $class
+     *
+     * @return $this
+     */
+    public function ignore($class) {
+        $this->dontReport[] = $class;
+
+        return $this;
+    }
+
+    /**
+     * Set the log level for the given exception type.
+     *
+     * @param class-string<\Throwable> $type
+     * @param \Psr\Log\LogLevel::*     $level
+     *
+     * @return $this
+     */
+    public function level($type, $level) {
+        $this->levels[$type] = $level;
+
+        return $this;
+    }
+
+    /**
      * Report or log an exception.
      *
      * @param \Exception $e
@@ -104,10 +212,16 @@ class CException_ExceptionHandler implements CException_ExceptionHandlerInterfac
      * @return mixed
      */
     public function report($e) {
+        $e = $this->mapException($e);
+
         if ($this->shouldntReport($e)) {
             return;
         }
-
+        if (CBase_Reflector::isCallable($reportCallable = [$e, 'report'])
+            && $this->container->call($reportCallable) !== false
+        ) {
+            return;
+        }
         if (is_callable($reportCallable = [$e, 'report'])) {
             return $this->container->call($reportCallable);
         }
@@ -254,6 +368,29 @@ class CException_ExceptionHandler implements CException_ExceptionHandlerInterfac
             $e = new CHTTP_Exception_HttpException(419, $e->getMessage(), $e);
         } elseif ($e instanceof SuspiciousOperationException) {
             $e = new NotFoundHttpException('Bad hostname provided.', $e);
+        }
+
+        return $e;
+    }
+
+    /**
+     * Map the exception using a registered mapper if possible.
+     *
+     * @param \Throwable $e
+     *
+     * @return \Throwable
+     */
+    protected function mapException($e) {
+        if (method_exists($e, 'getInnerException')
+            && ($inner = $e->getInnerException()) instanceof Throwable
+        ) {
+            return $inner;
+        }
+
+        foreach ($this->exceptionMap as $class => $mapper) {
+            if (is_a($e, $class)) {
+                return $mapper($e);
+            }
         }
 
         return $e;
@@ -588,31 +725,5 @@ class CException_ExceptionHandler implements CException_ExceptionHandlerInterfac
      */
     protected function isHttpException($e) {
         return $e instanceof HttpExceptionInterface;
-    }
-
-    /**
-     * Register a reportable callback.
-     *
-     * @param callable $reportUsing
-     *
-     * @return CException_ReportableHandler
-     */
-    public function reportable(callable $reportUsing) {
-        return c::tap(new CException_ReportableHandler($reportUsing), function ($callback) {
-            $this->reportCallbacks[] = $callback;
-        });
-    }
-
-    /**
-     * Register a renderable callback.
-     *
-     * @param callable $renderUsing
-     *
-     * @return $this
-     */
-    public function renderable(callable $renderUsing) {
-        $this->renderCallbacks[] = $renderUsing;
-
-        return $this;
     }
 }
