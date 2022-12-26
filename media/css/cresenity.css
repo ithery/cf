@@ -193,8 +193,26 @@
 }
 .dataTables_scrollBody table.dataTable thead .sorting::before,
 .dataTables_scrollBody table.dataTable thead .sorting::after,
+.dataTables_scrollBody table.dataTable thead .sorting_asc::before,
+.dataTables_scrollBody table.dataTable thead .sorting_asc::after,
+.dataTables_scrollBody table.dataTable thead .sorting_desc::before,
+.dataTables_scrollBody table.dataTable thead .sorting_desc::after,
+.dataTables_scrollBody table.dataTable thead .sorting_asc_disabled::before,
+.dataTables_scrollBody table.dataTable thead .sorting_asc_disabled::after,
+.dataTables_scrollBody table.dataTable thead .sorting_desc_disabled::before,
+.dataTables_scrollBody table.dataTable thead .sorting_desc_disabled::after {
+    display: none;
+}
 .DTFC_LeftBodyWrapper table.dataTable thead .sorting::before,
-.DTFC_LeftBodyWrapper table.dataTable thead .sorting::after {
+.DTFC_LeftBodyWrapper table.dataTable thead .sorting::after,
+.DTFC_LeftBodyWrapper table.dataTable thead .sorting_asc::before,
+.DTFC_LeftBodyWrapper table.dataTable thead .sorting_asc::after,
+.DTFC_LeftBodyWrapper table.dataTable thead .sorting_desc::before,
+.DTFC_LeftBodyWrapper table.dataTable thead .sorting_desc::after,
+.DTFC_LeftBodyWrapper table.dataTable thead .sorting_asc_disabled::before,
+.DTFC_LeftBodyWrapper table.dataTable thead .sorting_asc_disabled::after,
+.DTFC_LeftBodyWrapper table.dataTable thead .sorting_desc_disabled::before,
+.DTFC_LeftBodyWrapper table.dataTable thead .sorting_desc_disabled::after {
     display: none !important;
 }
 .DTFC_LeftBodyWrapper table.dataTable tbody {
