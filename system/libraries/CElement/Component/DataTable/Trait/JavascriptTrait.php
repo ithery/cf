@@ -208,7 +208,10 @@ trait CElement_Component_DataTable_Trait_JavascriptTrait {
                 if (is_bool($scrollY)) {
                     $scrollY = 'true';
                 }
-                $js->appendln('scrollY:        ' . $scrollY . ',')->br();
+                $js->appendln('scrollY :        ' . $scrollY . ',')->br();
+            }
+            if ($this->colReorder) {
+                $js->appendln('colReorder : true,')->br();
             }
             if ($this->fixedColumn) {
                 $scrollY = $this->scrollY;
