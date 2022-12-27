@@ -1,7 +1,9 @@
 <?php
 
+/**
+ * @deprecated dont use anymore
+ */
 class CElement_Dashboard extends CElement_Element {
-
     protected $options;
 
     public function __construct($id, $options) {
@@ -12,5 +14,4 @@ class CElement_Dashboard extends CElement_Element {
     public function opt($key) {
         return carr::get($this->options, $key);
     }
-
 }

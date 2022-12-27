@@ -498,7 +498,9 @@ abstract class CPagination_AbstractPaginator implements CInterface_Htmlable {
      */
     public static function resolveQueryString($default = null) {
         if (isset(static::$queryStringResolver)) {
-            return (static::$queryStringResolver)();
+            $queryResolver = static::$queryStringResolver;
+
+            return $queryResolver();
         }
 
         return $default;

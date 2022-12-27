@@ -1,82 +1,209 @@
 <?php
 
-namespace Facebook\WebDriver\Remote;
+namespace Facebook\WebDriver\Remote\Service;
 
-use Facebook\WebDriver\Exception\WebDriverException;
+use Exception;
+use Facebook\WebDriver\Net\URLChecker;
+use Symfony\Component\Process\Process;
+use Symfony\Component\Process\ProcessBuilder;
 
-class CustomWebDriverCommand extends WebDriverCommand
+/**
+ * Start local WebDriver service (when remote WebDriver server is not used).
+ * This will start new process of respective browser driver and take care of its lifecycle.
+ */
+class DriverService
 {
-    const METHOD_GET = 'GET';
-    const METHOD_POST = 'POST';
-
-    /** @var string */
-    private $customUrl;
-    /** @var string */
-    private $customMethod;
+    /**
+     * @var string
+     */
+    private $executable;
 
     /**
-     * @param string $session_id
-     * @param string $url
-     * @param string $method
-     * @param array $parameters
+     * @var string
      */
-    public function __construct($session_id, $url, $method, array $parameters)
-    {
-        $this->setCustomRequestParameters($url, $method);
+    private $url;
 
-        parent::__construct($session_id, DriverCommand::CUSTOM_COMMAND, $parameters);
+    /**
+     * @var array
+     */
+    private $args;
+
+    /**
+     * @var array
+     */
+    private $environment;
+
+    /**
+     * @var Process|null
+     */
+    private $process;
+
+    /**
+     * @param string $executable
+     * @param int $port The given port the service should use.
+     * @param array $args
+     * @param array|null $environment Use the system environment if it is null
+     */
+    public function __construct($executable, $port, $args = [], $environment = null)
+    {
+        $this->setExecutable($executable);
+        $this->url = sprintf('http://localhost:%d', $port);
+        $this->args = $args;
+        $this->environment = $environment ?: $_ENV;
     }
 
     /**
-     * @throws WebDriverException
      * @return string
      */
-    public function getCustomUrl()
+    public function getURL()
     {
-        if ($this->customUrl === null) {
-            throw new WebDriverException('URL of custom command is not set');
-        }
-
-        return $this->customUrl;
+        return $this->url;
     }
 
     /**
-     * @throws WebDriverException
+     * @return DriverService
+     */
+    public function start()
+    {
+        if ($this->process !== null) {
+            return $this;
+        }
+
+        $this->process = $this->createProcess();
+        $this->process->start();
+
+        $this->checkWasStarted($this->process);
+
+        $checker = new URLChecker();
+        $checker->waitUntilAvailable(20 * 1000, $this->url . '/status');
+
+        return $this;
+    }
+
+    /**
+     * @return DriverService
+     */
+    public function stop()
+    {
+        if ($this->process === null) {
+            return $this;
+        }
+
+        $this->process->stop();
+        $this->process = null;
+
+        $checker = new URLChecker();
+        $checker->waitUntilUnavailable(3 * 1000, $this->url . '/shutdown');
+
+        return $this;
+    }
+
+    /**
+     * @return bool
+     */
+    public function isRunning()
+    {
+        if ($this->process === null) {
+            return false;
+        }
+
+        return $this->process->isRunning();
+    }
+
+    /**
+     * @deprecated Has no effect. Will be removed in next major version. Executable is now checked
+     * when calling setExecutable().
+     * @param string $executable
      * @return string
      */
-    public function getCustomMethod()
+    protected static function checkExecutable($executable)
     {
-        if ($this->customMethod === null) {
-            throw new WebDriverException('Method of custom command is not set');
-        }
-
-        return $this->customMethod;
+        return $executable;
     }
 
     /**
-     * @param string $custom_url
-     * @param string $custom_method
-     * @throws WebDriverException
+     * @param string $executable
+     * @throws Exception
      */
-    protected function setCustomRequestParameters($custom_url, $custom_method)
+    protected function setExecutable($executable)
     {
-        $allowedMethods = [static::METHOD_GET, static::METHOD_POST];
-        if (!in_array($custom_method, $allowedMethods, true)) {
-            throw new WebDriverException(
+        if ($this->isExecutable($executable)) {
+            $this->executable = $executable;
+
+            return;
+        }
+
+        throw new Exception(
+            sprintf(
+                '"%s" is not executable. Make sure the path is correct or use environment variable to specify'
+                 . ' location of the executable.',
+                $executable
+            )
+        );
+    }
+
+    /**
+     * @param Process $process
+     */
+    protected function checkWasStarted($process)
+    {
+        usleep(10000); // wait 10ms, otherwise the asynchronous process failure may not yet be propagated
+
+        if (!$process->isRunning()) {
+            throw new Exception(
                 sprintf(
-                    'Invalid custom method "%s", must be one of [%s]',
-                    $custom_method,
-                    implode(', ', $allowedMethods)
+                    'Error starting driver executable "%s": %s',
+                    $process->getCommandLine(),
+                    $process->getErrorOutput()
                 )
             );
         }
-        $this->customMethod = $custom_method;
+    }
 
-        if (mb_strpos($custom_url, '/') !== 0) {
-            throw new WebDriverException(
-                sprintf('URL of custom command has to start with / but is "%s"', $custom_url)
-            );
+    /**
+     * @return Process
+     */
+    private function createProcess()
+    {
+        // BC: ProcessBuilder deprecated since Symfony 3.4 and removed in Symfony 4.0.
+        if (class_exists(ProcessBuilder::class)
+            && mb_strpos('@deprecated', (new \ReflectionClass(ProcessBuilder::class))->getDocComment()) === false
+        ) {
+            $processBuilder = (new ProcessBuilder())
+                ->setPrefix($this->executable)
+                ->setArguments($this->args)
+                ->addEnvironmentVariables($this->environment);
+
+            return $processBuilder->getProcess();
         }
-        $this->customUrl = $custom_url;
+        // Safe to use since Symfony 3.3
+        $commandLine = array_merge([$this->executable], $this->args);
+
+        return new Process($commandLine, null, $this->environment);
+    }
+
+    /**
+     * Check whether given file is executable directly or using system PATH
+     *
+     * @param string $filename
+     * @return bool
+     */
+    private function isExecutable($filename)
+    {
+        if (is_executable($filename)) {
+            return true;
+        }
+        if ($filename !== basename($filename)) { // $filename is an absolute path, do no try to search it in PATH
+            return false;
+        }
+
+        $paths = explode(PATH_SEPARATOR, getenv('PATH'));
+        foreach ($paths as $path) {
+            if (is_executable($path . DIRECTORY_SEPARATOR . $filename)) {
+                return true;
+            }
+        }
+
+        return false;
     }
 }

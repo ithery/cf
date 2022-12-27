@@ -3,7 +3,7 @@ class CAuth_Access_Event_GateEvaluated {
     /**
      * The authenticatable model.
      *
-     * @var null|\CAuth_Authenticatable
+     * @var null|\CAuth_AuthenticatableInterface
      */
     public $user;
 
@@ -31,10 +31,10 @@ class CAuth_Access_Event_GateEvaluated {
     /**
      * Create a new event instance.
      *
-     * @param null|\CAuth_Authenticatable $user
-     * @param string                      $ability
-     * @param null|bool                   $result
-     * @param array                       $arguments
+     * @param null|\CAuth_AuthenticatableInterface $user
+     * @param string                               $ability
+     * @param null|bool                            $result
+     * @param array                                $arguments
      *
      * @return void
      */

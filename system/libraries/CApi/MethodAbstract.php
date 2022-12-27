@@ -6,16 +6,34 @@
  * @author Hery
  */
 abstract class CApi_MethodAbstract implements CInterface_Arrayable {
+    /**
+     * @var int
+     */
     protected $errCode = 0;
 
+    /**
+     * @var string
+     */
     protected $errMessage = '';
 
+    /**
+     * @var array
+     */
     protected $data = [];
 
+    /**
+     * @var array
+     */
     protected $request;
 
+    /**
+     * @var null|string
+     */
     protected $lang = null;
 
+    /**
+     * @var null|string
+     */
     protected $sessionId = null;
 
     protected $session;
@@ -105,7 +123,12 @@ abstract class CApi_MethodAbstract implements CInterface_Arrayable {
 
     public function request() {
         if ($this->request == null) {
-            return array_merge($_GET, $_POST);
+            $request = [];
+            if ($this->apiRequest && $this->apiRequest instanceof CApi_HTTP_Request) {
+                $request = $this->apiRequest->all();
+            }
+
+            return array_merge($_GET, $_POST, $request);
         }
 
         return $this->request;
@@ -114,6 +137,13 @@ abstract class CApi_MethodAbstract implements CInterface_Arrayable {
     public function sessionId() {
         if ($this->sessionId == null) {
             $this->sessionId = carr::get($this->request(), $this->sessionIdParameter);
+        }
+        if ($this->sessionId == null) {
+            $request = $this->apiRequest ?: c::request();
+            $token = $request->bearerToken();
+            if ($token) {
+                $this->sessionId = $token;
+            }
         }
 
         return $this->sessionId;

@@ -78,7 +78,7 @@ class CAuth_UserProvider_ModelUserProvider extends CAuth_UserProviderAbstract {
         )->first();
 
         if (!$retrievedModel) {
-            return;
+            return null;
         }
 
         $rememberToken = $retrievedModel->getRememberToken();
@@ -119,7 +119,7 @@ class CAuth_UserProvider_ModelUserProvider extends CAuth_UserProviderAbstract {
             || (count($credentials) === 1
             && cstr::contains($this->firstCredentialKey($credentials), 'password'))
         ) {
-            return;
+            return null;
         }
 
         // First we will add each credential element to the query as a where clause.
@@ -132,7 +132,7 @@ class CAuth_UserProvider_ModelUserProvider extends CAuth_UserProviderAbstract {
                 continue;
             }
 
-            if (is_array($value) || $value instanceof Cinterface_Arrayable) {
+            if (is_array($value) || $value instanceof CInterface_Arrayable) {
                 $query->whereIn($key, $value);
             } else {
                 $query->where($key, $value);
@@ -153,6 +153,8 @@ class CAuth_UserProvider_ModelUserProvider extends CAuth_UserProviderAbstract {
         foreach ($credentials as $key => $value) {
             return $key;
         }
+
+        return null;
     }
 
     /**
@@ -185,7 +187,7 @@ class CAuth_UserProvider_ModelUserProvider extends CAuth_UserProviderAbstract {
     /**
      * Create a new instance of the model.
      *
-     * @return CModel
+     * @return CModel|CAuth_AuthenticatableInterface
      */
     public function createModel() {
         $class = '\\' . ltrim($this->model, '\\');

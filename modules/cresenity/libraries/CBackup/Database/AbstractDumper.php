@@ -246,10 +246,10 @@ abstract class CBackup_Database_AbstractDumper {
             throw CBackup_Database_Exception_DumpFailedException::processDidNotEndSuccessfully($process);
         }
         if (!file_exists($outputFile)) {
-            throw CBackup_Database_Exception_DumpFailedException::dumpfileWasNotCreated();
+            throw CBackup_Database_Exception_DumpFailedException::dumpfileWasNotCreated($process);
         }
         if (filesize($outputFile) === 0) {
-            throw CBackup_Database_Exception_DumpFailedException::dumpfileWasEmpty();
+            throw CBackup_Database_Exception_DumpFailedException::dumpfileWasEmpty($process);
         }
     }
 

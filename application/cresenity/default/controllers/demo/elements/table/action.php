@@ -20,7 +20,7 @@ class Controller_Demo_Elements_Table_Action extends \Cresenity\Demo\Controller {
 
             return $image . $value;
         });
-        $table->addColumn('continent')->setLabel('Continent')->addTransform('uppercase');
+        $table->addColumn('continent')->setLabel('Continent')->addTransform(['uppercase']);
         $table->addColumn('code')->setLabel('Code')->setCallback(function ($row, $value) {
             return '<span class="badge badge-info">' . c::e($value) . '</span>';
         });

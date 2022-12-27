@@ -4,6 +4,7 @@ return [
     'scroll_to_top' => true,
     'react' => [
         'enable' => false,
+        'path' => 'js/react',
     ],
     'vscode' => [
         'live_reload' => [
@@ -19,11 +20,11 @@ return [
     'waves' => [
         'selector' => '.cres-waves-effect'
     ],
-    'theme'=> [
+    'theme' => [
         'mode' => null,
     ],
     'themes' => [
-        'cresenity'=>[
+        'cresenity' => [
 
         ]
     ],

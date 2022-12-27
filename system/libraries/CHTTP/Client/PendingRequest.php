@@ -43,7 +43,7 @@ class CHTTP_Client_PendingRequest {
     /**
      * The raw body for the request.
      *
-     * @var string
+     * @var null|string
      */
     protected $pendingBody;
 
@@ -671,7 +671,7 @@ class CHTTP_Client_PendingRequest {
      *
      * @throws \Exception
      *
-     * @return \CHTTP_Client_Response
+     * @return \CHTTP_Client_Response|\GuzzleHttp\Promise\PromiseInterface
      */
     public function send(string $method, string $url, array $options = []) {
         $url = ltrim(rtrim($this->baseUrl, '/') . '/' . ltrim($url, '/'), '/');
@@ -684,7 +684,7 @@ class CHTTP_Client_PendingRequest {
             return $this->makePromise($method, $url, $options);
         }
 
-        return c::retry($this->tries ?? 1, function () use ($method, $url, $options) {
+        return c::retry($this->tries ?: 1, function () use ($method, $url, $options) {
             try {
                 return c::tap(new CHTTP_Client_Response($this->sendRequest($method, $url, $options)), function ($response) {
                     $this->populateResponse($response);

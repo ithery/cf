@@ -541,6 +541,7 @@ class TestSuite implements IteratorAggregate, Reorderable, SelfDescribing, Test 
      *
      * @todo refactor usage of numTests in DefaultResultPrinter
      */
+    #[\ReturnTypeWillChange]
     public function count() {
         $this->numTests = 0;
 
@@ -763,6 +764,7 @@ class TestSuite implements IteratorAggregate, Reorderable, SelfDescribing, Test 
     /**
      * Returns an iterator for this test suite.
      */
+    #[\ReturnTypeWillChange]
     public function getIterator() {
         $iterator = new TestSuiteIterator($this);
 

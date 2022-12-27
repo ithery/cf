@@ -69,4 +69,42 @@ class Controller_Demo_App_Javascript extends \Cresenity\Demo\Controller {
 
         return $app;
     }
+
+    public function advance() {
+        $app = c::app();
+
+        $button = $app->addAction()->addClass('mb-3');
+        $div = $app->addDiv('result1');
+        $button->onClick(function (CObservable_Javascript $js) {
+            $js->raw(<<<JAVASCRIPT
+                $('#result1').html('Loading...');
+            JAVASCRIPT);
+            $js->cresjs()->toast('info', 'Loading from ajax');
+            $js->jquery()->ajax([
+                'url' => $this->controllerUrl() . 'ajax',
+                'success' => <<<JAVASCRIPT
+                function(resp) {
+                    if(resp.errCode==0) {
+                        $('#result1').html(JSON.stringify(resp));
+                    }
+                }
+                JAVASCRIPT
+
+            ]);
+        })->setLabel('Click To Ajax')->addClass('btn-primary');
+
+        return $app;
+    }
+
+    public function ajax() {
+        $errCode = 0;
+        $errMessage = '';
+        $data = [
+            'a' => '1',
+            'b' => '2',
+
+        ];
+
+        return CApp_Base::toJsonResponse($errCode, $errMessage, $data);
+    }
 }

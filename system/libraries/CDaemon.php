@@ -78,6 +78,12 @@ class CDaemon {
         }
     }
 
+    /**
+     * @param string      $serviceClass
+     * @param null|string $domain
+     *
+     * @return CDaemon_Runner
+     */
     public static function createRunner($serviceClass, $domain = null) {
         return new CDaemon_Runner($serviceClass, $domain);
     }

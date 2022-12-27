@@ -171,7 +171,7 @@ class CAuth_Password_Broker implements CAuth_Contract_PasswordBrokerInterface {
     /**
      * Get the password reset token repository implementation.
      *
-     * @return \Illuminate\Auth\Passwords\TokenRepositoryInterface
+     * @return \CAuth_Contract_TokenRepositoryInterface
      */
     public function getRepository() {
         return $this->tokens;

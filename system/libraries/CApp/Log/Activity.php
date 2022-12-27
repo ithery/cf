@@ -13,9 +13,9 @@ use CApp_Base as Base;
 
 class CApp_Log_Activity {
     public static function populate($description, $data) {
-        $model = new CApp_Model_LogActivity();
+        $modelName = CF::config('app.model.log_activity', CApp_Model_LogActivity::class);
+        $model = new $modelName();
         $nav = cnav::nav();
-        $browser = new CBrowser();
         $navName = '';
         $navLabel = '';
         $actionName = '';

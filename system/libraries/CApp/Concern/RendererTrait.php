@@ -96,10 +96,15 @@ HTML;
         $cresJsFile = 'cres.js';
         $cresJs = curl::base() . 'media/js/cres/dist/' . $cresJsFile . '?v=' . md5(CFile::lastModified(DOCROOT . 'media/js/cres/dist/' . $cresJsFile . ''));
 
+        $notificationScript = '';
+        if ($this->notification()->isEnabled()) {
+            $notificationScript = c::view('cresenity.notification.javascript')->render();
+        }
+
         return <<<HTML
             ${endClientScript}
             <script defer src="${cresJs}"></script>
-
+            ${notificationScript}
             <script>
                 ${js}
                 ${readyClientScript}
@@ -110,7 +115,7 @@ HTML;
                 }
                 ${customJs}
             </script>
-                ${pushesScript}
+            ${pushesScript}
 
 HTML;
     }

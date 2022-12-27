@@ -13,7 +13,7 @@ trait CHTTP_Trait_ResponseTrait {
     /**
      * The exception that triggered the error response (if applicable).
      *
-     * @var \Throwable|null
+     * @var null|\Throwable
      */
     public $exception;
 
@@ -111,7 +111,7 @@ trait CHTTP_Trait_ResponseTrait {
     /**
      * Get the callback of the response.
      *
-     * @return string|null
+     * @return null|string
      */
     public function getCallback() {
         return isset($this->callback) ? $this->callback : null;
@@ -133,9 +133,9 @@ trait CHTTP_Trait_ResponseTrait {
     /**
      * Throws the response in a HttpResponseException instance.
      *
-     * @return void
-     *
      * @throws CHTTP_Exception_ResponseException
+     *
+     * @return void
      */
     public function throwResponse() {
         throw new CHTTP_Exception_ResponseException($this);

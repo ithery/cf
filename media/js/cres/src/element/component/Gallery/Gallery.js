@@ -1,7 +1,7 @@
 import { CresQuery, cresQuery } from '../../../module/CresQuery';
 import { galleryConfig } from './config';
 import { galleryEvent } from './event';
-import { Thumbnail } from './plugins';
+import { Thumbnail,Rotate,Zoom } from './plugins';
 import utils from './utils';
 
 /**
@@ -105,6 +105,8 @@ export default class Gallery {
 
     buildPlugins() {
         this.plugins.push(new Thumbnail(this));
+        this.plugins.push(new Rotate(this));
+        this.plugins.push(new Zoom(this));
 
         this.config.plugins.forEach((plugin) => {
             this.plugins.push(new plugin(this));

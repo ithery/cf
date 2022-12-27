@@ -181,7 +181,7 @@ trait CModel_ArrayDriver_ArrayDriverTrait {
     protected function createTableSafely(string $tableName, Closure $callback) {
         $connection = static::resolveConnection();
 
-        /** @var \Illuminate\Database\Schema\SQLiteBuilder $schemaBuilder */
+        /** @var \CDatabase_Schema_Builder_SQLiteBuilder $schemaBuilder */
         $schemaBuilder = static::resolveConnection()->getSchemaBuilder();
 
         try {

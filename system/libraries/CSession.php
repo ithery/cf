@@ -8,6 +8,7 @@ defined('SYSPATH') or die('No direct access allowed.');
  * @see CSession_Store
  *
  * @method void set(string $key, null|mixed $value = null)
+ * @method void delete($keys)
  */
 class CSession {
     use CTrait_Compat_Session;

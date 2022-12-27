@@ -32,30 +32,37 @@ class CAuth_Guard_SessionGuard implements CAuth_Contract_StatefulGuardInterface,
     /**
      * The session used by the guard.
      *
-     * @var CSession
+     * @var CSession_Store
      */
     protected $session;
 
     /**
-     * The Illuminate cookie creator service.
+     * The cookie creator service.
      *
-     * @var \Illuminate\Contracts\Cookie\QueueingFactory
+     * @var null|\CHTTP_Contract_CookieInterface
      */
     protected $cookie;
 
     /**
      * The request instance.
      *
-     * @var \Symfony\Component\HttpFoundation\Request
+     * @var null|\Symfony\Component\HttpFoundation\Request
      */
     protected $request;
 
     /**
      * The event dispatcher instance.
      *
-     * @var CEvent_Dispatcher
+     * @var null|CEvent_Dispatcher
      */
     protected $events;
+
+    /**
+     * The timebox instance.
+     *
+     * @var \CBase_Timebox
+     */
+    protected $timebox;
 
     /**
      * Indicates if the logout method has been called.
@@ -76,7 +83,7 @@ class CAuth_Guard_SessionGuard implements CAuth_Contract_StatefulGuardInterface,
      *
      * @param string                                         $name
      * @param CAuth_UserProviderInterface                    $provider
-     * @param CSession                                       $session
+     * @param CSession_Store                                 $session
      * @param null|\Symfony\Component\HttpFoundation\Request $request
      *
      * @return void
@@ -84,13 +91,14 @@ class CAuth_Guard_SessionGuard implements CAuth_Contract_StatefulGuardInterface,
     public function __construct(
         $name,
         CAuth_UserProviderInterface $provider,
-        CSession $session,
+        CSession_Store $session,
         Request $request = null
     ) {
         $this->name = $name;
         $this->session = $session;
         $this->request = $request;
         $this->provider = $provider;
+        $this->timebox = new CBase_Timebox();
     }
 
     /**
@@ -100,7 +108,7 @@ class CAuth_Guard_SessionGuard implements CAuth_Contract_StatefulGuardInterface,
      */
     public function user() {
         if ($this->loggedOut) {
-            return;
+            return null;
         }
 
         // If we've already retrieved the user for the current request we can just
@@ -168,12 +176,14 @@ class CAuth_Guard_SessionGuard implements CAuth_Contract_StatefulGuardInterface,
      */
     protected function recaller() {
         if (is_null($this->request)) {
-            return;
+            return null;
         }
 
         if ($recaller = $this->request->cookies->get($this->getRecallerName())) {
             return new CAuth_Recaller($recaller);
         }
+
+        return null;
     }
 
     /**
@@ -183,7 +193,7 @@ class CAuth_Guard_SessionGuard implements CAuth_Contract_StatefulGuardInterface,
      */
     public function id() {
         if ($this->loggedOut) {
-            return;
+            return null;
         }
 
         return $this->user()
@@ -246,7 +256,7 @@ class CAuth_Guard_SessionGuard implements CAuth_Contract_StatefulGuardInterface,
      * @param string $field
      * @param array  $extraConditions
      *
-     * @return null|\Symfony\Component\HttpFoundation\Response
+     * @return void|\Symfony\Component\HttpFoundation\Response
      */
     public function basic($field = 'email', $extraConditions = []) {
         if ($this->check()) {
@@ -269,7 +279,11 @@ class CAuth_Guard_SessionGuard implements CAuth_Contract_StatefulGuardInterface,
      * @param string $field
      * @param array  $extraConditions
      *
+     * @throws \Symfony\Component\HttpKernel\Exception\UnauthorizedHttpException
+     *
      * @return null|\Symfony\Component\HttpFoundation\Response
+     *
+     * @phpstan-return void|null
      */
     public function onceBasic($field = 'email', $extraConditions = []) {
         $credentials = $this->basicCredentials($this->getRequest(), $field);
@@ -316,7 +330,7 @@ class CAuth_Guard_SessionGuard implements CAuth_Contract_StatefulGuardInterface,
      *
      * @throws \Symfony\Component\HttpKernel\Exception\UnauthorizedHttpException
      *
-     * @return void
+     * @return null|void
      */
     protected function failedBasicResponse() {
         throw new UnauthorizedHttpException('Basic', 'Invalid credentials.');
@@ -361,13 +375,16 @@ class CAuth_Guard_SessionGuard implements CAuth_Contract_StatefulGuardInterface,
      * @return bool
      */
     protected function hasValidCredentials($user, $credentials) {
-        $validated = !is_null($user) && $this->provider->validateCredentials($user, $credentials);
+        return $this->timebox->call(function ($timebox) use ($user, $credentials) {
+            $validated = !is_null($user) && $this->provider->validateCredentials($user, $credentials);
 
-        if ($validated) {
-            $this->fireValidatedEvent($user);
-        }
+            if ($validated) {
+                $timebox->returnEarly();
+                $this->fireValidatedEvent($user);
+            }
 
-        return $validated;
+            return $validated;
+        }, 200 * 1000);
     }
 
     /**
@@ -558,7 +575,7 @@ class CAuth_Guard_SessionGuard implements CAuth_Contract_StatefulGuardInterface,
      */
     public function logoutOtherDevices($password, $attribute = 'password') {
         if (!$this->user()) {
-            return;
+            return null;
         }
 
         $result = c::tap($this->user()->forceFill([
@@ -735,7 +752,7 @@ class CAuth_Guard_SessionGuard implements CAuth_Contract_StatefulGuardInterface,
      *
      * @throws \RuntimeException
      *
-     * @return \Illuminate\Contracts\Cookie\QueueingFactory
+     * @return \CHTTP_Contract_CookieInterface
      */
     public function getCookieJar() {
         if (!isset($this->cookie)) {
@@ -748,11 +765,11 @@ class CAuth_Guard_SessionGuard implements CAuth_Contract_StatefulGuardInterface,
     /**
      * Set the cookie creator instance used by the guard.
      *
-     * @param \Illuminate\Contracts\Cookie\QueueingFactory $cookie
+     * @param \CHTTP_Contract_CookieInterface $cookie
      *
      * @return void
      */
-    public function setCookieJar(CHTTP_Cookie $cookie) {
+    public function setCookieJar(CHTTP_Contract_CookieInterface $cookie) {
         $this->cookie = $cookie;
     }
 
@@ -779,7 +796,7 @@ class CAuth_Guard_SessionGuard implements CAuth_Contract_StatefulGuardInterface,
     /**
      * Get the session store used by the guard.
      *
-     * @return \CSession
+     * @return \CSession_Store
      */
     public function getSession() {
         return $this->session;
@@ -854,8 +871,6 @@ class CAuth_Guard_SessionGuard implements CAuth_Contract_StatefulGuardInterface,
      * Logout the user without updating remember_token
      * and without firing the Logout event.
      *
-     * @param   void
-     *
      * @return void
      */
     public function quietLogout() {
@@ -864,5 +879,14 @@ class CAuth_Guard_SessionGuard implements CAuth_Contract_StatefulGuardInterface,
         $this->user = null;
 
         $this->loggedOut = true;
+    }
+
+    /**
+     * Get the timebox instance used by the guard.
+     *
+     * @return \CBase_Timebox
+     */
+    public function getTimebox() {
+        return $this->timebox;
     }
 }

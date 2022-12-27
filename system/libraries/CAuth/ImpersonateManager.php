@@ -1,6 +1,6 @@
 <?php
 
-class CAuth_ImpersonateManager {
+final class CAuth_ImpersonateManager {
     const REMEMBER_PREFIX = 'remember_web';
 
     private static $instance;
@@ -9,11 +9,11 @@ class CAuth_ImpersonateManager {
      * @return CAuth_ImpersonateManager
      */
     public static function instance() {
-        if (static::$instance == null) {
-            static::$instance = new static();
+        if (self::$instance == null) {
+            self::$instance = new self();
         }
 
-        return static::$instance;
+        return self::$instance;
     }
 
     /**
@@ -120,6 +120,8 @@ class CAuth_ImpersonateManager {
     }
 
     public function stop() {
+        $impersonator = null;
+
         try {
             $impersonated = c::auth()->guard($this->getImpersonatorGuardUsingName())->user();
             $impersonator = $this->findUserById($this->getImpersonatorId(), $this->getImpersonatorGuardName());
@@ -131,12 +133,9 @@ class CAuth_ImpersonateManager {
             $this->clear();
         } catch (\Exception $e) {
             throw $e;
-            unset($e);
-
-            return false;
         }
 
-        if ($impersonated && $impersonator) {
+        if ($impersonated /* && $impersonator */) {
             c::event()->dispatch(new CAuth_Event_StopImpersonate($impersonator, $impersonated));
         }
 
@@ -178,18 +177,10 @@ class CAuth_ImpersonateManager {
     }
 
     /**
-     * @return null|array
+     * @return null|string
      */
     public function getCurrentAuthGuardName() {
         return c::app()->auth()->guardName();
-        // $guards = array_keys(CF::config('auth.guards'));
-        // foreach ($guards as $guard) {
-        //     if (c::auth()->guard($guard)->check()) {
-        //         return $guard;
-        //     }
-        // }
-
-        // return null;
     }
 
     protected function saveAuthCookieInSession() {

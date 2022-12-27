@@ -120,6 +120,16 @@ trait CObservable_Listener_Trait_HandlerTrait {
     }
 
     /**
+     * @return \CObservable_Listener_Handler_ToggleActiveHandler
+     */
+    public function addToggleActiveHandler() {
+        $handler = new CObservable_Listener_Handler_ToggleActiveHandler($this);
+        $this->handlers[] = $handler;
+
+        return $handler;
+    }
+
+    /**
      * @return \CObservable_Listener_Handler_ToastHandler
      */
     public function addToastHandler() {

@@ -82,8 +82,6 @@ interface CAuth_Contract_StatefulGuardInterface extends CAuth_Contract_GuardInte
      * Logout the user without updating remember_token
      * and without firing the Logout event.
      *
-     * @param   void
-     *
      * @return void
      */
     public function quietLogout();

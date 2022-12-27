@@ -114,12 +114,22 @@ class CLogger_Manager implements LoggerInterface {
      *
      * @return \Psr\Log\LoggerInterface
      */
-    protected function get($name, ?array $config = null) {
+    protected function get($name, array $config = null) {
+        if (isset($this->channels[$name])) {
+            return $this->channels[$name];
+        }
+
         try {
-            return $this->channels[$name] ?? c::with($this->resolve($name, $config), function ($logger) use ($name) {
+            return c::with($this->resolve($name, $config), function ($logger) use ($name) {
                 return $this->channels[$name] = $this->tap($name, new CLogger_Logger($logger, CEvent::dispatcher()));
             });
         } catch (Throwable $e) {
+            return c::tap($this->createEmergencyLogger(), function ($logger) use ($e) {
+                $logger->emergency('Unable to create configured logger. Using emergency logger.', [
+                    'exception' => $e,
+                ]);
+            });
+        } catch (Exception $e) {
             return c::tap($this->createEmergencyLogger(), function ($logger) use ($e) {
                 $logger->emergency('Unable to create configured logger. Using emergency logger.', [
                     'exception' => $e,
@@ -186,8 +196,8 @@ class CLogger_Manager implements LoggerInterface {
      *
      * @return \Psr\Log\LoggerInterface
      */
-    protected function resolve($name, ?array $config = null) {
-        $config = $config ?? $this->configurationFor($name);
+    protected function resolve($name, array $config = null) {
+        $config = $config ?: $this->configurationFor($name);
 
         if (is_null($config)) {
             throw new InvalidArgumentException("Log [{$name}] is not defined.");
@@ -196,7 +206,6 @@ class CLogger_Manager implements LoggerInterface {
         if (isset($this->customCreators[$config['driver']])) {
             return $this->callCustomCreator($config);
         }
-
         $driverMethod = 'create' . ucfirst($config['driver']) . 'Driver';
 
         if (method_exists($this, $driverMethod)) {
@@ -420,7 +429,7 @@ class CLogger_Manager implements LoggerInterface {
         if (!isset($config['formatter'])) {
             $handler->setFormatter($this->formatter());
         } elseif ($config['formatter'] !== 'default') {
-            $handler->setFormatter($this->app->make($config['formatter'], isset($config['formatter_with']) ? $config['formatter_with'] : []));
+            $handler->setFormatter(c::container()->make($config['formatter'], isset($config['formatter_with']) ? $config['formatter_with'] : []));
         }
 
         return $handler;
@@ -454,7 +463,16 @@ class CLogger_Manager implements LoggerInterface {
      * @return array
      */
     protected function configurationFor($name) {
-        return CF::config("log.channels.{$name}");
+        $config = CF::config("log.channels.{$name}");
+        $driver = carr::get($config, 'driver');
+        if (in_array($driver, ['single', 'daily']) && carr::get($config, 'path') == null) {
+            // Set the yearly directory name
+            $date = date('Y-m');
+            list($year, $month) = explode('-', $date);
+            $config['path'] = DOCROOT . 'logs' . DS . CF::appCode() . DS . $year . DS . $month . DS . 'log.log';
+        }
+
+        return $config;
     }
 
     /**
@@ -503,7 +521,7 @@ class CLogger_Manager implements LoggerInterface {
      * @return null|string
      */
     protected function parseDriver($driver) {
-        $driver = $driver ?? $this->getDefaultDriver();
+        $driver = $driver ?: $this->getDefaultDriver();
 
         if (CF::isTesting()) {
             $driver = $driver ?: 'null';

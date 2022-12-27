@@ -1,14 +1,7 @@
 <?php
 use Symfony\Component\HttpFoundation\Response;
 
-class CHTTP_ResponseCache {
-    /**
-     * Singleton Instance
-     *
-     * @var CHTTP_ResponseCache
-     */
-    private static $instance;
-
+final class CHTTP_ResponseCache {
     protected $callback;
 
     protected $hasher;
@@ -16,20 +9,28 @@ class CHTTP_ResponseCache {
     protected $cache;
 
     /**
-     * Cache Profile
+     * Cache Profile.
      *
      * @var CHTTP_ResponseCache_CacheProfile
      */
     protected $cacheProfile;
 
     /**
+     * Singleton Instance.
+     *
+     * @var CHTTP_ResponseCache
+     */
+    private static $instance;
+
+    /**
      * @return CHTTP_ResponseCache
      */
     public static function instance() {
-        if (static::$instance == null) {
-            static::$instance = new static();
+        if (self::$instance == null) {
+            self::$instance = new self();
         }
-        return static::$instance;
+
+        return self::$instance;
     }
 
     public function __construct() {
@@ -41,6 +42,7 @@ class CHTTP_ResponseCache {
 
         $this->getHasher();
         $this->getCache();
+
         return $this;
     }
 
@@ -89,7 +91,7 @@ class CHTTP_ResponseCache {
     }
 
     /**
-     * Undocumented function
+     * Undocumented function.
      *
      * @param CHTTP_Request $request
      * @param Response      $response
@@ -148,6 +150,7 @@ class CHTTP_ResponseCache {
         if ($this->cache == null) {
             $this->cache = new CHTTP_ResponseCache_Repository();
         }
+
         return $this->cache;
     }
 
@@ -158,11 +161,13 @@ class CHTTP_ResponseCache {
         if ($this->hasher == null) {
             $this->hasher = new CHTTP_ResponseCache_Hasher_DefaultHasher($this->cacheProfile);
         }
+
         return $this->hasher;
     }
 
     public function useCache(CCache_Repository $cache) {
         $this->getCache()->setCache($cache);
+
         return $this;
     }
 
@@ -170,6 +175,7 @@ class CHTTP_ResponseCache {
         if (is_callable($callback)) {
             call_user_func_array($callback, [$this->cacheProfile]);
         }
+
         return $this;
     }
 
@@ -207,6 +213,7 @@ class CHTTP_ResponseCache {
         if ($this->cache == null) {
             return false;
         }
+
         return $this->getCache()->hasCache();
     }
 }

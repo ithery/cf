@@ -43,6 +43,10 @@ class CObservable_Javascript_JQuery {
         $this->jQueryStatement = null;
     }
 
+    public function raw($statement) {
+        $this->javascript->raw($statement);
+    }
+
     /**
      * @return CJavascript_Statement_JQuery
      */

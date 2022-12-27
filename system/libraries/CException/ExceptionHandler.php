@@ -16,6 +16,8 @@ use Symfony\Component\HttpFoundation\RedirectResponse as SymfonyRedirectResponse
 
 /**
  * @author Hery Kurniawans
+ *
+ * @see CException
  */
 class CException_ExceptionHandler implements CException_ExceptionHandlerInterface {
     use CTrait_ReflectsClosureTrait;
@@ -62,6 +64,7 @@ class CException_ExceptionHandler implements CException_ExceptionHandlerInterfac
         SuspiciousOperationException::class,
         CSession_Exception_TokenMismatchException::class,
         CValidation_Exception::class,
+        CException_Contract_DontReportInterface::class
     ];
 
     /**
@@ -73,6 +76,11 @@ class CException_ExceptionHandler implements CException_ExceptionHandlerInterfac
         'current_password',
         'password',
         'password_confirmation',
+        'passwordConfirmation',
+        'confirm_password',
+        'old_password',
+        'new_password',
+        'confirmPassword',
     ];
 
     /**
@@ -326,8 +334,6 @@ class CException_ExceptionHandler implements CException_ExceptionHandlerInterfac
             $this->renderHttpException($e),
             $e
         );
-
-        //@codingStandardsIgnoreEnd
 
         return $response;
     }

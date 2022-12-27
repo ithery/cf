@@ -8,13 +8,13 @@ defined('SYSPATH') or die('No direct access allowed.');
  *
  * @since May 17, 2019, 3:35:10 AM
  */
+use PhpParser\Node;
 use PhpParser\Error;
 use PhpParser\NodeDumper;
-use PhpParser\ParserFactory;
-use PhpParser\PrettyPrinter;
-use PhpParser\Node;
 use PhpParser\NodeFinder;
 use PhpParser\NodeTraverser;
+use PhpParser\ParserFactory;
+use PhpParser\PrettyPrinter;
 
 class CConfig_Parser {
     /**
@@ -25,19 +25,21 @@ class CConfig_Parser {
      */
     public function getComment($file, $key) {
         $code = file_get_contents($file);
-        $parser = (new ParserFactory)->create(ParserFactory::PREFER_PHP7);
+        $parser = (new ParserFactory())->create(ParserFactory::PREFER_PHP7);
         $comment = '';
+
         try {
             $ast = $parser->parse($code);
-            $traverser = new NodeTraverser;
+            $traverser = new NodeTraverser();
             $visitor = new CConfig_Parser_CommentVisitor($key);
             $traverser->addVisitor($visitor);
             $modifiedAst = $traverser->traverse($ast);
             $comment = $visitor->getComment();
         } catch (Error $error) {
-            echo "Parse error: {$error->getMessage()}\n";
+            //echo "Parse error: {$error->getMessage()}\n";
             return '';
         }
+
         return $comment;
     }
 }

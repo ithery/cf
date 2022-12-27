@@ -62,7 +62,7 @@ trait CApp_Concern_AuthTrait {
     }
 
     /**
-     * @return CModel|object
+     * @return null|CModel|object
      */
     public function user() {
         return $this->auth()->user();

@@ -51,7 +51,7 @@ class CHTTP_FormRequest extends CHTTP_Request implements CValidation_ValidatesWh
      * @return CValidation_Validator
      */
     protected function getValidatorInstance() {
-        $factory = $this->container->make(ValidationFactory::class);
+        $factory = CValidation_Factory::instance();
 
         if (method_exists($this, 'validator')) {
             $validator = $this->container->call([$this, 'validator'], compact('factory'));
@@ -96,9 +96,9 @@ class CHTTP_FormRequest extends CHTTP_Request implements CValidation_ValidatesWh
      *
      * @param CValidation_Validator $validator
      *
-     * @return void
-     *
      * @throws \CValidation_Exception
+     *
+     * @return void
      */
     protected function failedValidation(CValidation_Validator $validator) {
         throw (new CValidation_Exception($validator))
@@ -141,9 +141,9 @@ class CHTTP_FormRequest extends CHTTP_Request implements CValidation_ValidatesWh
     /**
      * Handle a failed authorization attempt.
      *
-     * @return void
-     *
      * @throws CAuth_Exception_AuthorizationException
+     *
+     * @return void
      */
     protected function failedAuthorization() {
         throw new CAuth_Exception_AuthorizationException('This action is unauthorized.');

@@ -19,13 +19,12 @@ trait CAuth_Concern_CreateUserProvider {
      */
     public function createUserProvider($provider = null) {
         if (is_null($config = $this->getProviderConfiguration($provider))) {
-            return;
+            return null;
         }
 
         if (isset($this->customProviderCreators[$driver = (carr::get($config, 'driver', null))])) {
             return call_user_func(
                 $this->customProviderCreators[$driver],
-                $this->app,
                 $config
             );
         }
@@ -52,6 +51,8 @@ trait CAuth_Concern_CreateUserProvider {
         if ($provider = $provider ?: $this->getDefaultUserProvider()) {
             return CF::config('auth.providers.' . $provider);
         }
+
+        return null;
     }
 
     /**

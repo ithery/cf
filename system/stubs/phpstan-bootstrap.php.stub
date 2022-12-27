@@ -1,0 +1,5 @@
+<?php
+define('CFPHPSTAN', 1);
+define('CFCLI_APPCODE', '{APP_CODE}');
+$_SERVER['APP_ENV'] = 'testing';
+require realpath(dirname(__FILE__) . DIRECTORY_SEPARATOR . '..' . DIRECTORY_SEPARATOR . '..' . DIRECTORY_SEPARATOR . 'system' . DIRECTORY_SEPARATOR . 'core' . DIRECTORY_SEPARATOR . 'Bootstrap.php');

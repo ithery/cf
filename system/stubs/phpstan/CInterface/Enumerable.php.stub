@@ -1,0 +1,10 @@
+<?php
+/**
+ * @template TKey of array-key
+ * @template TValue
+ *
+ * @extends \IteratorAggregate<TKey, TValue>
+ */
+interface CInterface_Enumerable extends \Countable, \IteratorAggregate, \JsonSerializable {
+    // ..
+}

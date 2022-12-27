@@ -23,6 +23,11 @@ return [
         'subnav' => include dirname(__FILE__) . '/demo/controls.php',
     ],
     [
+        'name' => 'handler',
+        'label' => c::__('Handler'),
+        'subnav' => include dirname(__FILE__) . '/demo/handler.php',
+    ],
+    [
         'name' => 'model',
         'label' => c::__('Model'),
         'subnav' => include dirname(__FILE__) . '/demo/model.php',
@@ -36,5 +41,10 @@ return [
         'name' => 'module',
         'label' => c::__('Module'),
         'subnav' => include dirname(__FILE__) . '/demo/module.php',
+    ],
+    [
+        'name' => 'system',
+        'label' => c::__('System'),
+        'subnav' => include dirname(__FILE__) . '/demo/system.php',
     ],
 ];

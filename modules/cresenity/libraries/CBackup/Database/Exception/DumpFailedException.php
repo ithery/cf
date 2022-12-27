@@ -9,20 +9,48 @@ class CBackup_Database_Exception_DumpFailedException extends Exception {
      * @return \CDatabase_Exception_DumpFailed
      */
     public static function processDidNotEndSuccessfully(Process $process) {
-        return new static("The dump process failed with exitcode {$process->getExitCode()} : {$process->getExitCodeText()} : {$process->getErrorOutput()}");
+        $processOutput = static::formatProcessOutput($process);
+
+        return new static("The dump process failed with a none successful exitcode.{$processOutput}");
     }
 
     /**
+     * @param \Symfony\Component\Process\Process $process
+     *
      * @return \CDatabase_Exception_DumpFailed
      */
-    public static function dumpfileWasNotCreated() {
-        return new static('The dumpfile could not be created');
+    public static function dumpfileWasNotCreated(Process $process) {
+        $processOutput = static::formatProcessOutput($process);
+
+        return new static("The dumpfile could not be created.{$processOutput}");
     }
 
     /**
+     * @param \Symfony\Component\Process\Process $process
+     *
      * @return \CDatabase_Exception_DumpFailed
      */
-    public static function dumpfileWasEmpty() {
-        return new static('The created dumpfile is empty');
+    public static function dumpfileWasEmpty(Process $process) {
+        $processOutput = static::formatProcessOutput($process);
+
+        return new static("The created dumpfile is empty.{$processOutput}");
+    }
+
+    protected static function formatProcessOutput(Process $process) {
+        $output = $process->getOutput() ?: '<no output>';
+        $errorOutput = $process->getErrorOutput() ?: '<no output>';
+        $exitCodeText = $process->getExitCodeText() ?: '<no exit text>';
+
+        return <<<CONSOLE
+            Exitcode
+            ========
+            {$process->getExitCode()}: {$exitCodeText}
+            Output
+            ======
+            {$output}
+            Error Output
+            ============
+            {$errorOutput}
+            CONSOLE;
     }
 }

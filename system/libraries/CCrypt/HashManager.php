@@ -137,6 +137,11 @@ class CCrypt_HashManager extends CBase_ManagerAbstract implements CCrypt_HasherI
         return $this->config->get('driver', 'bcrypt');
     }
 
+    /**
+     * @param null|string $driver
+     *
+     * @return CCrypt_HasherInterface
+     */
     public function driver($driver = null) {
         if ($driver == null) {
             $driver = $this->driverName;

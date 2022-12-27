@@ -352,6 +352,9 @@ abstract class CDaemon_ServiceAbstract implements CDaemon_ServiceInterface {
         while ($this->parent && !$this->shutdown) {
             $this->timer(true);
             $this->autoRestart(); // updated on 19-06-2020
+            if ($this->isInvalidPid()) {
+                $this->stopBecauseInvalidPid();
+            }
             if ($this->shouldRun()) {
                 $this->dispatch([self::ON_PREEXECUTE]);
                 $this->loopProcess();
@@ -882,14 +885,9 @@ abstract class CDaemon_ServiceAbstract implements CDaemon_ServiceInterface {
         $this->restart();
     }
 
-    public function stop($exit = true) {
-        $this->log('Stopping...');
-        if (!file_exists($this->pidFile)) {
-            $this->fatalError('No PID file found');
-        }
-        $pid = $this->getPidFromPidFile();
-
+    private function stopPid($pid) {
         $command = 'kill -2 ' . $pid;
+        $result = '';
         if (defined('CFCLI')) {
             $process = new Process($command);
             $process->run();
@@ -897,6 +895,22 @@ abstract class CDaemon_ServiceAbstract implements CDaemon_ServiceInterface {
         } else {
             $result = shell_exec($command);
         }
+
+        return $result;
+    }
+
+    public function stopBecauseInvalidPid() {
+        $this->stopPid($this->pid);
+    }
+
+    public function stop($exit = true) {
+        $this->log('Stopping...');
+        if (!file_exists($this->pidFile)) {
+            $this->fatalError('No PID file found');
+        }
+        $pid = $this->getPidFromPidFile();
+
+        $this->stopPid($pid);
 
         //unlink pid file
         if ($this->pidFile && file_exists($this->pidFile)) {
@@ -1226,11 +1240,16 @@ abstract class CDaemon_ServiceAbstract implements CDaemon_ServiceInterface {
     }
 
     public function isRunning() {
+        $serviceClass = get_called_class();
         if ($pid = $this->getPidFromPidFile()) {
-            $result = shell_exec('ps x | grep "' . $pid . '" | grep "' . $this->serviceName . '" | grep -v "grep"');
+            return CDaemon_Utils::daemonIsRunningWithPid($pid, $serviceClass);
         }
 
-        return strlen(trim($result)) > 0;
+        return false;
+    }
+
+    public function isInvalidPid() {
+        return $this->pid != $this->getPidFromPidFile();
     }
 
     public function status() {

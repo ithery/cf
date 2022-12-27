@@ -11,7 +11,7 @@ class CAuth_UserProvider_DatabaseUserProvider extends CAuth_UserProviderAbstract
     /**
      * The hasher implementation.
      *
-     * @var CCrypt_Hasher
+     * @var CCrypt_HasherInterface
      */
     protected $hasher;
 
@@ -106,7 +106,7 @@ class CAuth_UserProvider_DatabaseUserProvider extends CAuth_UserProviderAbstract
             || (count($credentials) === 1
             && array_key_exists('password', $credentials))
         ) {
-            return;
+            return null;
         }
 
         // First we will add each credential element to the query as a where clause.
@@ -145,6 +145,8 @@ class CAuth_UserProvider_DatabaseUserProvider extends CAuth_UserProviderAbstract
         if (!is_null($user)) {
             return new CAuth_GenericUser((array) $user);
         }
+
+        return null;
     }
 
     /**

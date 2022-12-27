@@ -81,6 +81,7 @@ class CServer_Dns {
         } else {
             $host = $this->server;
         }
+
         if (!$socket = @fsockopen($host, $this->port, $errno, $errstr, $this->timeout)) {
             throw new CServer_Dns_Exception('Failed to open socket to ' . $host);
         }

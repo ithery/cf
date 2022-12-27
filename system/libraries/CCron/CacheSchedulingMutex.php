@@ -13,14 +13,14 @@ class CCron_CacheSchedulingMutex implements CCron_Contract_SchedulingMutexInterf
      * @return void
      */
     public function __construct() {
-        $this->store = CF::config('schedule.cache.store');
+        $this->store = CF::config('cron.cache.store', 'file');
     }
 
     /**
      * Attempt to obtain a scheduling mutex for the given event.
      *
-     * @param \CCron_Event $event
-     * @param \DateTimeInterface       $time
+     * @param \CCron_Event       $event
+     * @param \DateTimeInterface $time
      *
      * @return bool
      */
@@ -35,8 +35,8 @@ class CCron_CacheSchedulingMutex implements CCron_Contract_SchedulingMutexInterf
     /**
      * Determine if a scheduling mutex exists for the given event.
      *
-     * @param \CCron_Event $event
-     * @param \DateTimeInterface       $time
+     * @param \CCron_Event       $event
+     * @param \DateTimeInterface $time
      *
      * @return bool
      */

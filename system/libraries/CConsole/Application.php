@@ -71,7 +71,6 @@ class CConsole_Application extends SymfonyApplication implements CConsole_Applic
                 $output = $output ?: new ConsoleOutput()
             )
         );
-
         $exitCode = parent::run($input, $output);
         $this->events->fire(
             new CConsole_Event_CommandFinished($commandName, $input, $output, $exitCode)

@@ -200,6 +200,8 @@ abstract class CModel_Relation_HasOneOrMany extends CModel_Relation {
      * @param array $values
      *
      * @return CModel
+     *
+     * @phpsta-return TModelClass|CModel
      */
     public function firstOrNew(array $attributes, array $values = []) {
         if (is_null($instance = $this->where($attributes)->first())) {

@@ -1,7 +1,7 @@
 <?php
 
 /**
- * Description of Pipeline
+ * Description of Pipeline.
  *
  * @author Hery
  */
@@ -20,7 +20,7 @@ class CHTTP_Pipeline extends CBase_Pipeline {
      * @return mixed
      */
     protected function handleCarry($carry) {
-        return $carry instanceof CInterface_Responsable ? $carry->toResponse($this->getContainer()->make(Request::class)) : $carry;
+        return $carry instanceof CInterface_Responsable ? $carry->toResponse(c::request()) : $carry;
     }
 
     /**
@@ -29,9 +29,9 @@ class CHTTP_Pipeline extends CBase_Pipeline {
      * @param mixed      $passable
      * @param \Throwable $e
      *
-     * @return mixed
-     *
      * @throws \Throwable
+     *
+     * @return mixed
      */
     protected function handleException($passable, $e) {
         if (!$passable instanceof CHTTP_Request) {

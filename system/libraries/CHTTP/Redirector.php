@@ -1,11 +1,11 @@
 <?php
 
 /**
- * Description of Redirector
+ * Description of Redirector.
  *
  * @author Hery
  */
-class CHTTP_Redirector {
+final class CHTTP_Redirector {
     use CTrait_Macroable;
 
     /**
@@ -18,20 +18,22 @@ class CHTTP_Redirector {
     /**
      * The session store instance.
      *
-     * @var CSession
+     * @var CSession_Store
      */
     protected $session;
+
     protected static $instance;
 
     private function __construct() {
         $this->generator = CRouting::urlGenerator();
-        $this->session = CSession::instance();
+        $this->session = CSession::instance()->store();
     }
 
     public static function instance() {
         if (static::$instance == null) {
             static::$instance = new static();
         }
+
         return static::$instance;
     }
 
@@ -77,7 +79,7 @@ class CHTTP_Redirector {
      * @param string    $path
      * @param int       $status
      * @param array     $headers
-     * @param bool|null $secure
+     * @param null|bool $secure
      *
      * @return CHTTP_RedirectResponse
      */
@@ -99,7 +101,7 @@ class CHTTP_Redirector {
      * @param string    $default
      * @param int       $status
      * @param array     $headers
-     * @param bool|null $secure
+     * @param null|bool $secure
      *
      * @return CHTTP_RedirectResponse
      */
@@ -126,7 +128,7 @@ class CHTTP_Redirector {
      * @param string    $path
      * @param int       $status
      * @param array     $headers
-     * @param bool|null $secure
+     * @param null|bool $secure
      *
      * @return CHTTP_RedirectResponse
      */
@@ -179,7 +181,7 @@ class CHTTP_Redirector {
      *
      * @param string                                    $route
      * @param mixed                                     $parameters
-     * @param \DateTimeInterface|\DateInterval|int|null $expiration
+     * @param null|\DateTimeInterface|\DateInterval|int $expiration
      * @param int                                       $status
      * @param array                                     $headers
      *
@@ -193,7 +195,7 @@ class CHTTP_Redirector {
      * Create a new redirect response to a signed named route.
      *
      * @param string                                    $route
-     * @param \DateTimeInterface|\DateInterval|int|null $expiration
+     * @param null|\DateTimeInterface|\DateInterval|int $expiration
      * @param mixed                                     $parameters
      * @param int                                       $status
      * @param array                                     $headers
@@ -229,10 +231,6 @@ class CHTTP_Redirector {
      */
     protected function createRedirect($path, $status, $headers) {
         return c::tap(new CHTTP_RedirectResponse($path, $status, $headers), function ($redirect) {
-            if (isset($this->session)) {
-                //$redirect->setSession($this->session);
-            }
-
             $redirect->setRequest($this->generator->getRequest());
         });
     }
@@ -249,11 +247,11 @@ class CHTTP_Redirector {
     /**
      * Set the active session store.
      *
-     * @param CSession $session
+     * @param CSession_Store $session
      *
      * @return void
      */
-    public function setSession(CSession $session) {
+    public function setSession(CSession_Store $session) {
         $this->session = $session;
     }
 }

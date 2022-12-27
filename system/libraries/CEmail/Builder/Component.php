@@ -2,20 +2,30 @@
 
 class CEmail_Builder_Component {
     protected $name;
+
     protected $props = [];
 
     /**
      * @var CEmail_Builder_Context
      */
     protected $context = null;
+
     protected $defaultAttributes = [];
+
     protected $allowedAttributes = [];
+
     protected $headStyle = [];
+
     protected $componentHeadStyle = [];
+
     protected $children = [];
+
     protected $content = '';
+
     protected static $rawElement = false;
+
     protected static $endingTag = false;
+
     protected static $tagName = '';
 
     public function __construct($options) {
@@ -66,6 +76,7 @@ class CEmail_Builder_Component {
             $rawElement->setContent($element);
             $this->childs[] = $rawElement;
         }
+
         return $rawElement;
     }
 
@@ -84,29 +95,34 @@ class CEmail_Builder_Component {
     public function addBody() {
         $element = new CEmail_Builder_Component_BodyComponent_Body([]);
         $this->add($element);
+
         return $element;
     }
 
     public function addSection() {
         $element = new CEmail_Builder_Component_BodyComponent_Section([]);
         $this->add($element);
+
         return $element;
     }
 
     public function addColumn() {
         $element = new CEmail_Builder_Component_BodyComponent_Column([]);
         $this->add($element);
+
         return $element;
     }
 
     public function addImage() {
         $element = new CEmail_Builder_Component_BodyComponent_Image([]);
         $this->add($element);
+
         return $element;
     }
 
     public function setAttr($key, $value) {
         $this->attrs[$key] = $value;
+
         return $this;
     }
 
