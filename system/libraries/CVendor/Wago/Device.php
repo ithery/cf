@@ -20,11 +20,28 @@ class CVendor_Wago_Device {
         return $this->isSandbox ? 'https://wapro.dev.ittron.co.id/api/device/' : 'https://wa-go.id/api/device/';
     }
 
+    /**
+     * @param string $phone
+     * @param string $message
+     * @param array  $options
+     *
+     * @throws CVendor_Wago_Exception_ApiException
+     *
+     * @return array
+     */
     public function sendMessage($phone, $message, array $options = []) {
         $request = [
             'phone' => $phone,
             'message' => $message,
         ];
+        $imageUrl = carr::get($options, 'imageUrl');
+        $scheduleAt = carr::get($options, 'scheduleAt');
+        if ($imageUrl) {
+            $request['imageUrl'] = $imageUrl;
+        }
+        if ($scheduleAt) {
+            $request['scheduleAt'] = $scheduleAt;
+        }
 
         return $this->handleResponse($this->client->post('message/send', $request));
     }

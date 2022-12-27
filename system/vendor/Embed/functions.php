@@ -15,6 +15,7 @@ function clean($value, $allowHTML = false) {
     }
 
     $value = trim(preg_replace('/\s+/u', ' ', $value));
+
     return $value === '' ? null : $value;
 }
 
@@ -25,7 +26,7 @@ function html($tagName, array $attributes, $content = null) {
         if ($value === null) {
             continue;
         } elseif ($value === true) {
-            $html .= " $name";
+            $html .= " ${name}";
         } elseif ($value !== false) {
             $html .= ' ' . $name . '="' . htmlspecialchars((string) $value) . '"';
         }
@@ -34,12 +35,13 @@ function html($tagName, array $attributes, $content = null) {
     if ($tagName === 'img') {
         return "${html} />";
     }
+
     return "{$html}>{$content}</{$tagName}>";
 }
 
 /**
  * Resolve a uri within this document
- * (useful to get absolute uris from relative)
+ * (useful to get absolute uris from relative).
  */
 function resolveUri(UriInterface $base, UriInterface $uri) {
     $uri = $uri->withPath(resolvePath($base->getPath(), $uri->getPath()));
@@ -53,8 +55,8 @@ function resolveUri(UriInterface $base, UriInterface $uri) {
     }
 
     return $uri
-                    ->withPath(cleanPath($uri->getPath()))
-                    ->withFragment('');
+        ->withPath(cleanPath($uri->getPath()))
+        ->withFragment('');
 }
 
 function isHttp($uri) {
@@ -91,6 +93,7 @@ function resolvePath($base, $path) {
 
         if ('..' == $part) {
             array_pop($absolutes);
+
             continue;
         }
 
@@ -122,5 +125,27 @@ function matchPath($pattern, $subject) {
 
 function getDirectory($path, $position) {
     $dirs = explode('/', $path);
+
     return isset($dirs[$position + 1]) ? $dirs[$position + 1] : null;
+}
+
+/**
+ * Determine whether at least one of the supplied variables is empty.
+ *
+ * @param mixed ...$values The values to check.
+ *
+ * @return bool
+ */
+function isEmpty(...$values) {
+    $skipValues = [
+        'undefined',
+    ];
+
+    foreach ($values as $value) {
+        if (empty($value) || in_array($value, $skipValues)) {
+            return true;
+        }
+    }
+
+    return false;
 }

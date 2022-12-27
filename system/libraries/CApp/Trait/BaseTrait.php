@@ -67,7 +67,7 @@ trait CApp_Trait_BaseTrait {
     public static function orgId() {
         $orgId = CF::orgId();
         if ($orgId === null) {
-            $app = CApp::instance();
+            $app = c::app();
             if ($app->user() != null) {
                 if (strlen($app->user()->org_id) > 0) {
                     $orgId = $app->user()->org_id;
@@ -419,6 +419,9 @@ trait CApp_Trait_BaseTrait {
         $pos = strpos($domain, 'app.ittron.co.id');
         if ($pos === false) {
             $pos = strpos($domain, 'dev.ittron.co.id');
+        }
+        if ($pos === false) {
+            $pos = strpos($domain, 'dev8.ittron.co.id');
         }
         if ($pos === false) {
             $pos = strpos($domain, 'staging.ittron.co.id');

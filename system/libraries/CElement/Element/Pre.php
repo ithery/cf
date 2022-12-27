@@ -14,7 +14,7 @@ class CElement_Element_Pre extends CElement_Element {
      *
      * @return CElement_Element_Pre
      */
-    public static function factory($id = '') {
-        return new static($id);
+    public static function factory($id = null) {
+        return new CElement_Element_Pre($id);
     }
 }

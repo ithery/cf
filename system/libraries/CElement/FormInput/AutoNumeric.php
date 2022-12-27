@@ -38,7 +38,7 @@ class CElement_FormInput_AutoNumeric extends CElement_FormInput {
     }
 
     public static function factory($id = null) {
-        return new static($id);
+        return new CElement_FormInput_AutoNumeric($id);
     }
 
     protected function build() {

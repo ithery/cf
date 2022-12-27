@@ -194,7 +194,7 @@ class CVendor {
     /**
      * @param array $options
      *
-     * @return \CVendor_Firebase
+     * @return \CVendor_Twilio
      */
     public static function twilio($options = null) {
         if (!is_array($options)) {
@@ -221,10 +221,17 @@ class CVendor {
     }
 
     /**
-     * @return \CVendor_Wago
+     * @return \CVendor_Wago|CBase_ForwarderStaticClass
      */
     public static function wago() {
         return new CBase_ForwarderStaticClass(CVendor_Wago::class);
+    }
+
+    /**
+     * @return \CVendor_Watzap|CBase_ForwarderStaticClass
+     */
+    public static function watzap() {
+        return new CBase_ForwarderStaticClass(CVendor_Watzap::class);
     }
 
     /**

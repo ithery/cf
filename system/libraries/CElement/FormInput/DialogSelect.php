@@ -75,7 +75,7 @@ class CElement_FormInput_DialogSelect extends CElement_FormInput {
         });
     }
 
-    public static function factory($id) {
+    public static function factory($id = null) {
         return new CElement_FormInput_DialogSelect($id);
     }
 

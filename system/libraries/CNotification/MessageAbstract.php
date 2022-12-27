@@ -3,7 +3,6 @@
 abstract class CNotification_MessageAbstract implements CNotification_MessageInterface {
     use CTrait_HasOptions;
     use CNotification_Trait_MessageEventTrait;
-
     protected $config;
 
     /**

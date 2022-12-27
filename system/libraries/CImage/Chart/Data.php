@@ -43,7 +43,7 @@ class CImage_Chart_Data {
     }
 
     /**
-     * Add a single point or an array to the given serie
+     * Add a single point or an array to the given serie.
      *
      * @param mixed  $values
      * @param string $serieName
@@ -66,6 +66,7 @@ class CImage_Chart_Data {
             if (empty($strippedData)) {
                 $this->data['series'][$serieName]['max'] = 0;
                 $this->data['series'][$serieName]['min'] = 0;
+
                 return 0;
             }
             $this->data['series'][$serieName]['max'] = max($strippedData);
@@ -74,7 +75,7 @@ class CImage_Chart_Data {
     }
 
     /**
-     * Strip VOID values
+     * Strip VOID values.
      *
      * @param mixed $values
      *
@@ -90,11 +91,12 @@ class CImage_Chart_Data {
                 $result[] = $value;
             }
         }
+
         return $result;
     }
 
     /**
-     * Return the number of values contained in a given serie
+     * Return the number of values contained in a given serie.
      *
      * @param string $serie
      *
@@ -104,11 +106,12 @@ class CImage_Chart_Data {
         if (isset($this->data['series'][$serie]['data'])) {
             return sizeof($this->data['series'][$serie]['data']);
         }
+
         return 0;
     }
 
     /**
-     * Remove a serie from the pData object
+     * Remove a serie from the pData object.
      *
      * @param mixed $series
      */
@@ -124,7 +127,7 @@ class CImage_Chart_Data {
     }
 
     /**
-     * Return a value from given serie & index
+     * Return a value from given serie & index.
      *
      * @param string $serie
      * @param int    $Index
@@ -135,11 +138,12 @@ class CImage_Chart_Data {
         if (isset($this->data['series'][$serie]['data'][$Index])) {
             return $this->data['series'][$serie]['data'][$Index];
         }
+
         return null;
     }
 
     /**
-     * Return the values array
+     * Return the values array.
      *
      * @param string $serie
      *
@@ -149,11 +153,12 @@ class CImage_Chart_Data {
         if (isset($this->data['series'][$serie]['data'])) {
             return $this->data['series'][$serie]['data'];
         }
+
         return null;
     }
 
     /**
-     * Reverse the values in the given serie
+     * Reverse the values in the given serie.
      *
      * @param mixed $series
      */
@@ -171,21 +176,22 @@ class CImage_Chart_Data {
     }
 
     /**
-     * Return the sum of the serie values
+     * Return the sum of the serie values.
      *
      * @param string $serie
      *
-     * @return int|null
+     * @return null|int
      */
     public function getSum($serie) {
         if (isset($this->data['series'][$serie])) {
             return array_sum($this->data['series'][$serie]['data']);
         }
+
         return null;
     }
 
     /**
-     * Return the max value of a given serie
+     * Return the max value of a given serie.
      *
      * @param string $serie
      *
@@ -195,6 +201,7 @@ class CImage_Chart_Data {
         if (isset($this->data['series'][$serie]['max'])) {
             return $this->data['series'][$serie]['max'];
         }
+
         return null;
     }
 
@@ -207,11 +214,12 @@ class CImage_Chart_Data {
         if (isset($this->data['series'][$serie]['min'])) {
             return $this->data['series'][$serie]['min'];
         }
+
         return null;
     }
 
     /**
-     * Set the description of a given serie
+     * Set the description of a given serie.
      *
      * @param mixed  $series
      * @param string $shape
@@ -228,7 +236,7 @@ class CImage_Chart_Data {
     }
 
     /**
-     * Set the description of a given serie
+     * Set the description of a given serie.
      *
      * @param string|array $series
      * @param string       $description
@@ -245,10 +253,10 @@ class CImage_Chart_Data {
     }
 
     /**
-     * Set a serie as "drawable" while calling a rendering public function
+     * Set a serie as "drawable" while calling a rendering public function.
      *
      * @param string|array $series
-     * @param boolean      $drawable
+     * @param bool         $drawable
      */
     public function setSerieDrawable($series, $drawable = true) {
         if (!is_array($series)) {
@@ -262,7 +270,7 @@ class CImage_Chart_Data {
     }
 
     /**
-     * Set the icon associated to a given serie
+     * Set the icon associated to a given serie.
      *
      * @param mixed $series
      * @param mixed $picture
@@ -279,7 +287,7 @@ class CImage_Chart_Data {
     }
 
     /**
-     * Set the name of the X Axis
+     * Set the name of the X Axis.
      *
      * @param string $name
      */
@@ -288,7 +296,7 @@ class CImage_Chart_Data {
     }
 
     /**
-     * Set the display mode of the  X Axis
+     * Set the display mode of the  X Axis.
      *
      * @param int   $mode
      * @param array $format
@@ -299,7 +307,7 @@ class CImage_Chart_Data {
     }
 
     /**
-     * Set the unit that will be displayed on the X axis
+     * Set the unit that will be displayed on the X axis.
      *
      * @param string $Unit
      */
@@ -308,7 +316,7 @@ class CImage_Chart_Data {
     }
 
     /**
-     * Set the serie that will be used as abscissa
+     * Set the serie that will be used as abscissa.
      *
      * @param string $serie
      */
@@ -319,7 +327,7 @@ class CImage_Chart_Data {
     }
 
     /**
-     * Set the position of the abscissa axis
+     * Set the position of the abscissa axis.
      *
      * @param int $position
      */
@@ -328,7 +336,7 @@ class CImage_Chart_Data {
     }
 
     /**
-     * Set the name of the abscissa axis
+     * Set the name of the abscissa axis.
      *
      * @param string $name
      */
@@ -337,14 +345,14 @@ class CImage_Chart_Data {
     }
 
     /**
-     * Create a scatter group specified in X and Y data series
+     * Create a scatter group specified in X and Y data series.
      *
      * @param string $serieX
      * @param string $serieY
      * @param int    $id
      */
     public function setScatterSerie($serieX, $serieY, $id = 0) {
-        if (isset($this->data['series'][$serieX]) && isset($this->data['series'][$serieY])) {
+        if (isset($this->data['series'][$serieX], $this->data['series'][$serieY])) {
             $this->initScatterSerie($id);
             $this->data['scatterSeries'][$id]['x'] = $serieX;
             $this->data['scatterSeries'][$id]['y'] = $serieY;
@@ -352,7 +360,7 @@ class CImage_Chart_Data {
     }
 
     /**
-     *  Set the shape of a given sctatter serie
+     *  Set the shape of a given sctatter serie.
      *
      * @param int $id
      * @param int $shape
@@ -364,7 +372,7 @@ class CImage_Chart_Data {
     }
 
     /**
-     * Set the description of a given scatter serie
+     * Set the description of a given scatter serie.
      *
      * @param int    $id
      * @param string $description
@@ -376,7 +384,7 @@ class CImage_Chart_Data {
     }
 
     /**
-     * Set the icon associated to a given scatter serie
+     * Set the icon associated to a given scatter serie.
      *
      * @param int   $id
      * @param mixed $picture
@@ -388,10 +396,10 @@ class CImage_Chart_Data {
     }
 
     /**
-     * Set a scatter serie as "drawable" while calling a rendering public function
+     * Set a scatter serie as "drawable" while calling a rendering public function.
      *
-     * @param int     $id
-     * @param boolean $drawable
+     * @param int  $id
+     * @param bool $drawable
      */
     public function setScatterSerieDrawable($id, $drawable = true) {
         if (isset($this->data['scatterSeries'][$id])) {
@@ -400,7 +408,7 @@ class CImage_Chart_Data {
     }
 
     /**
-     * Define if a scatter serie should be draw with ticks
+     * Define if a scatter serie should be draw with ticks.
      *
      * @param int $id
      * @param int $Width
@@ -412,7 +420,7 @@ class CImage_Chart_Data {
     }
 
     /**
-     * Define if a scatter serie should be draw with a special weight
+     * Define if a scatter serie should be draw with a special weight.
      *
      * @param int $id
      * @param int $Weight
@@ -424,7 +432,7 @@ class CImage_Chart_Data {
     }
 
     /**
-     * Associate a color to a scatter serie
+     * Associate a color to a scatter serie.
      *
      * @param int   $id
      * @param array $format
@@ -443,7 +451,7 @@ class CImage_Chart_Data {
     }
 
     /**
-     * Compute the series limits for an individual and global point of view
+     * Compute the series limits for an individual and global point of view.
      *
      * @return array
      */
@@ -463,11 +471,12 @@ class CImage_Chart_Data {
         }
         $this->data['min'] = $globalMin;
         $this->data['max'] = $globalMax;
+
         return [$globalMin, $globalMax];
     }
 
     /**
-     * Mark all series as drawable
+     * Mark all series as drawable.
      */
     public function drawAll() {
         foreach (array_keys($this->data['series']) as $key) {
@@ -478,26 +487,28 @@ class CImage_Chart_Data {
     }
 
     /**
-     * Return the average value of the given serie
+     * Return the average value of the given serie.
      *
      * @param string $serie
      *
-     * @return int|null
+     * @return null|int
      */
     public function getSerieAverage($serie) {
         if (isset($this->data['series'][$serie])) {
             $serieData = $this->stripVOID($this->data['series'][$serie]['data']);
+
             return array_sum($serieData) / sizeof($serieData);
         }
+
         return null;
     }
 
     /**
-     * Return the geometric mean of the given serie
+     * Return the geometric mean of the given serie.
      *
      * @param string $serie
      *
-     * @return int|null
+     * @return null|int
      */
     public function getGeometricMean($serie) {
         if (isset($this->data['series'][$serie])) {
@@ -506,17 +517,19 @@ class CImage_Chart_Data {
             foreach ($serieData as $value) {
                 $seriesum = $seriesum * $value;
             }
+
             return pow($seriesum, 1 / sizeof($serieData));
         }
+
         return null;
     }
 
     /**
-     * Return the harmonic mean of the given serie
+     * Return the harmonic mean of the given serie.
      *
      * @param string $serie
      *
-     * @return int|null
+     * @return null|int
      */
     public function getHarmonicMean($serie) {
         if (isset($this->data['series'][$serie])) {
@@ -525,17 +538,19 @@ class CImage_Chart_Data {
             foreach ($serieData as $value) {
                 $seriesum = $seriesum + 1 / $value;
             }
+
             return sizeof($serieData) / $seriesum;
         }
+
         return null;
     }
 
     /**
-     * Return the standard deviation of the given serie
+     * Return the standard deviation of the given serie.
      *
      * @param string $serie
      *
-     * @return double|null
+     * @return null|float
      */
     public function getStandardDeviation($serie) {
         if (isset($this->data['series'][$serie])) {
@@ -545,17 +560,19 @@ class CImage_Chart_Data {
             foreach ($serieData as $key => $value) {
                 $deviationSum = $deviationSum + ($value - $average) * ($value - $average);
             }
+
             return sqrt($deviationSum / count($serieData));
         }
+
         return null;
     }
 
     /**
-     * Return the Coefficient of variation of the given serie
+     * Return the Coefficient of variation of the given serie.
      *
      * @param string $serie
      *
-     * @return float|null
+     * @return null|float
      */
     public function getCoefficientOfVariation($serie) {
         if (isset($this->data['series'][$serie])) {
@@ -565,11 +582,12 @@ class CImage_Chart_Data {
                 return $standardDeviation / $average;
             }
         }
+
         return null;
     }
 
     /**
-     * Return the median value of the given serie
+     * Return the median value of the given serie.
      *
      * @param string $serie
      *
@@ -584,16 +602,17 @@ class CImage_Chart_Data {
                 return $serieData[$serieCenter];
             }
         }
+
         return null;
     }
 
     /**
-     * Return the x th percentil of the given serie
+     * Return the x th percentil of the given serie.
      *
      * @param string $serie
      * @param int    $percentil
      *
-     * @return int|float| null
+     * @return null|int|float
      */
     public function getSeriePercentile($serie = 'Serie1', $percentil = 95) {
         if (!isset($this->data['series'][$serie]['data'])) {
@@ -609,11 +628,12 @@ class CImage_Chart_Data {
         if (is_numeric($sortedValues[$percentilID])) {
             return $sortedValues[$percentilID];
         }
+
         return null;
     }
 
     /**
-     * Add random values to a given serie
+     * Add random values to a given serie.
      *
      * @param string $serieName
      * @param array  $options
@@ -630,9 +650,9 @@ class CImage_Chart_Data {
     }
 
     /**
-     * Test if we have valid data
+     * Test if we have valid data.
      *
-     * @return boolean|null
+     * @return null|bool
      */
     public function containsData() {
         if (!isset($this->data['series'])) {
@@ -644,11 +664,12 @@ class CImage_Chart_Data {
                 return true;
             }
         }
+
         return null;
     }
 
     /**
-     * Set the display mode of an Axis
+     * Set the display mode of an Axis.
      *
      * @param int   $axisID
      * @param int   $mode
@@ -664,7 +685,7 @@ class CImage_Chart_Data {
     }
 
     /**
-     * Set the position of an Axis
+     * Set the position of an Axis.
      *
      * @param int $axisID
      * @param int $position
@@ -676,7 +697,7 @@ class CImage_Chart_Data {
     }
 
     /**
-     * Associate an unit to an axis
+     * Associate an unit to an axis.
      *
      * @param int    $axisID
      * @param string $Unit
@@ -688,7 +709,7 @@ class CImage_Chart_Data {
     }
 
     /**
-     * Associate a name to an axis
+     * Associate a name to an axis.
      *
      * @param int    $axisID
      * @param string $name
@@ -700,7 +721,7 @@ class CImage_Chart_Data {
     }
 
     /**
-     * Associate a color to an axis
+     * Associate a color to an axis.
      *
      * @param int   $axisID
      * @param array $format
@@ -719,7 +740,7 @@ class CImage_Chart_Data {
     }
 
     /**
-     * Design an axis as X or Y member
+     * Design an axis as X or Y member.
      *
      * @param int $axisID
      * @param int $Identity
@@ -731,7 +752,7 @@ class CImage_Chart_Data {
     }
 
     /**
-     * Associate one data serie with one axis
+     * Associate one data serie with one axis.
      *
      * @param mixed $series
      * @param int   $axisID
@@ -762,7 +783,7 @@ class CImage_Chart_Data {
     }
 
     /**
-     * Define if a serie should be draw with ticks
+     * Define if a serie should be draw with ticks.
      *
      * @param mixed $series
      * @param int   $Width
@@ -779,7 +800,7 @@ class CImage_Chart_Data {
     }
 
     /**
-     * Define if a serie should be draw with a special weight
+     * Define if a serie should be draw with a special weight.
      *
      * @param mixed $series
      * @param int   $Weight
@@ -796,7 +817,7 @@ class CImage_Chart_Data {
     }
 
     /**
-     * Returns the palette of the given serie
+     * Returns the palette of the given serie.
      *
      * @param type $serie
      *
@@ -811,11 +832,12 @@ class CImage_Chart_Data {
         $result['g'] = $this->data['series'][$serie]['color']['g'];
         $result['b'] = $this->data['series'][$serie]['color']['b'];
         $result['alpha'] = $this->data['series'][$serie]['color']['alpha'];
+
         return $result;
     }
 
     /**
-     * Set the color of one serie
+     * Set the color of one serie.
      *
      * @param mixed $series
      * @param array $format
@@ -851,10 +873,10 @@ class CImage_Chart_Data {
     }
 
     /**
-     * Load a palette file
+     * Load a palette file.
      *
-     * @param string  $fileName
-     * @param boolean $overwrite
+     * @param string $fileName
+     * @param bool   $overwrite
      *
      * @throws Exception
      */
@@ -911,7 +933,7 @@ class CImage_Chart_Data {
     }
 
     /**
-     * Initialise a given scatter serie
+     * Initialise a given scatter serie.
      *
      * @param int $id
      *
@@ -937,7 +959,7 @@ class CImage_Chart_Data {
     }
 
     /**
-     * Initialise a given serie
+     * Initialise a given serie.
      *
      * @param string $serie
      */
@@ -1022,7 +1044,7 @@ class CImage_Chart_Data {
     }
 
     /**
-     * Load data from a CSV (or similar) data source
+     * Load data from a CSV (or similar) data source.
      *
      * @param string $fileName
      * @param array  $options
@@ -1070,7 +1092,7 @@ class CImage_Chart_Data {
     }
 
     /**
-     * Create a dataset based on a formula
+     * Create a dataset based on a formula.
      *
      * @param string $serieName
      * @param string $formula
@@ -1150,7 +1172,7 @@ class CImage_Chart_Data {
     }
 
     /**
-     * Return the data & configuration of the series
+     * Return the data & configuration of the series.
      *
      * @return array
      */
@@ -1159,17 +1181,17 @@ class CImage_Chart_Data {
     }
 
     /**
-     * Save a palette element
+     * Save a palette element.
      *
-     * @param integer $id
-     * @param string  $Color
+     * @param int    $id
+     * @param string $Color
      */
     public function savePalette($id, $Color) {
         $this->palette[$id] = $Color;
     }
 
     /**
-     * Return the palette of the series
+     * Return the palette of the series.
      *
      * @return array
      */
@@ -1178,7 +1200,7 @@ class CImage_Chart_Data {
     }
 
     /**
-     * Called by the scaling algorithm to save the config
+     * Called by the scaling algorithm to save the config.
      *
      * @param mixed $axis
      */
@@ -1187,7 +1209,7 @@ class CImage_Chart_Data {
     }
 
     /**
-     * Save the Y Margin if set
+     * Save the Y Margin if set.
      *
      * @param mixed $value
      */
@@ -1196,7 +1218,7 @@ class CImage_Chart_Data {
     }
 
     /**
-     * Save extended configuration to the pData object
+     * Save extended configuration to the pData object.
      *
      * @param string $tag
      * @param mixed  $values
@@ -1206,7 +1228,7 @@ class CImage_Chart_Data {
     }
 
     /**
-     * Called by the scaling algorithm to save the orientation of the scale
+     * Called by the scaling algorithm to save the orientation of the scale.
      *
      * @param mixed $orientation
      */
@@ -1215,7 +1237,7 @@ class CImage_Chart_Data {
     }
 
     /**
-     * Convert a string to a single elements array
+     * Convert a string to a single elements array.
      *
      * @param mixed $value
      *
@@ -1226,7 +1248,7 @@ class CImage_Chart_Data {
     }
 
     /**
-     * Class string wrapper
+     * Class string wrapper.
      *
      * @return string
      */

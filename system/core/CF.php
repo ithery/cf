@@ -68,6 +68,13 @@ final class CF {
     private static $forceAppCode = null;
 
     /**
+     * The array of terminating callbacks.
+     *
+     * @var callable[]
+     */
+    private static $terminatingCallbacks = [];
+
+    /**
      * Check CF is running on production.
      *
      * @return bool
@@ -1250,6 +1257,32 @@ final class CF {
                     static::validateFileNamesArray($t);
                 }
             }
+        }
+    }
+
+    /**
+     * Register a terminating callback with the application.
+     *
+     * @param callable|string $callback
+     *
+     * @return $this
+     */
+    public static function terminating($callback) {
+        self::$terminatingCallbacks[] = $callback;
+    }
+
+    /**
+     * Terminate the application.
+     *
+     * @return void
+     */
+    public static function terminate() {
+        $index = 0;
+
+        while ($index < count(self::$terminatingCallbacks)) {
+            CContainer::getInstance()->call(self::$terminatingCallbacks[$index]);
+
+            $index++;
         }
     }
 }

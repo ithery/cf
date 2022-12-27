@@ -7,6 +7,8 @@ defined('SYSPATH') or die('No direct access allowed.');
  * @license Ittron Global Teknologi <ittron.co.id>
  *
  * @since May 24, 2019, 11:31:50 AM
+ *
+ * @method static CModel_Query<static> distance($latitude, $longitude)
  */
 trait CModel_Geographical_GeographicalTrait {
     /**
@@ -41,6 +43,7 @@ trait CModel_Geographical_GeographicalTrait {
 
     public function scopeGeofence($query, $latitude, $longitude, $inner_radius, $outer_radius) {
         $query = $this->scopeDistance($query, $latitude, $longitude);
+
         return $query->havingRaw('distance BETWEEN ? AND ?', [$inner_radius, $outer_radius]);
     }
 
@@ -59,6 +62,7 @@ trait CModel_Geographical_GeographicalTrait {
             // miles
             $sql = $this->getConnection()->compileBinds($sql, [$latitude, $latitude, $longitude, 1.1515]);
         }
+
         return $query->orderByRaw($sql . ' ' . $direction);
     }
 
@@ -77,6 +81,7 @@ trait CModel_Geographical_GeographicalTrait {
             // miles
             $sql = $this->getConnection()->compileBinds($sql, [$latitude, $latitude, $longitude, 1.1515]);
         }
+
         return $query->whereRaw($sql . ' BETWEEN ? AND ?', [$inner_radius, $outer_radius]);
     }
 

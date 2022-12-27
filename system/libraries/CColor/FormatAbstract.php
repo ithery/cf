@@ -34,6 +34,11 @@ abstract class CColor_FormatAbstract {
     abstract public function toHex();
 
     /**
+     * @return \CColor_Format_Hexa
+     */
+    abstract public function toHexa();
+
+    /**
      * @return \CColor_Format_Hsl
      */
     abstract public function toHsl();

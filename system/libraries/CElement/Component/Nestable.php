@@ -52,7 +52,8 @@ class CElement_Component_Nestable extends CElement_Component {
     }
 
     public static function factory($id) {
-        return new CElement_Component_Nestable($id);
+        /** @phpstan-ignore-next-line */
+        return new static($id);
     }
 
     public function setDisplayCallback($func, $require = '') {

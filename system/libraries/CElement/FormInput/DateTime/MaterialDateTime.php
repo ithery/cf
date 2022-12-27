@@ -41,7 +41,7 @@ class CElement_FormInput_DateTime_MaterialDateTime extends CElement_FormInput_Da
     }
 
     public static function factory($id = null) {
-        return new static($id);
+        return new CElement_FormInput_DateTime_MaterialDateTime($id);
     }
 
     public function setDateTimeFormat($format) {

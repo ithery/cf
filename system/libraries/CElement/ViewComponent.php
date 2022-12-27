@@ -43,6 +43,7 @@ class CElement_ViewComponent extends CElement {
 
     public function setData(array $data) {
         $this->data = $data;
+
         return $this;
     }
 }

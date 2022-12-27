@@ -9,22 +9,24 @@ class CresenityDemo {
     }
 
     initButtonShowCode() {
-        window.addEventListener('cresenity:loaded',()=>{
+        window.addEventListener('cresenity:loaded', ()=>{
             const btnDemo = document.getElementById('btn-demo-show-code');
             if(btnDemo) {
-                btnDemo.addEventListener('click',(e)=>{
-                    const url = capp.baseUrl + 'demo/code/show?uri='+ btnDemo.getAttribute('data-uri')
-                    cresenity.modal({
-                        title:'Code',
-                        isSidebar:true,
-                        modalClass:'modal-large',
+                // eslint-disable-next-line no-unused-vars
+                btnDemo.addEventListener('click', (e)=>{
+                    const url = window.capp.baseUrl + 'demo/code/show?uri='+ btnDemo.getAttribute('data-uri');
+                    window.cresenity.modal({
+                        title: 'Code',
+                        isSidebar: true,
+                        modalClass: 'modal-large',
+                        backdrop: true,
                         reload: {
-                            url:url
+                            url: url
                         }
-                    })
+                    });
                 });
             }
-        })
+        });
     }
 }
 

@@ -20,7 +20,7 @@ CBootstrap::instance()->addBootstrapper([
 $domain = CF::domain();
 
 CException::init();
-
+CModel::setEventDispatcher(CEvent::dispatcher());
 if (CF::config('collector.exception')) {
     CException::exceptionHandler()->reportable(function (Exception $e) {
         CDebug::collector()->collectException($e);
@@ -61,3 +61,6 @@ if (CF::isTesting()) {
 //CView::blade()->component('dynamic-component', CView_Component_DynamicComponent::class);
 CView::blade()->component('icon', \CView_Component_IconComponent::class);
 c::manager()->icon()->registerIconDirectory('orchid', DOCROOT . 'media/img/icons/orchid/');
+if (CF::config('devcloud.inspector.enabled', true)) {
+    CDevCloud::bootInspector();
+}

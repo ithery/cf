@@ -39,18 +39,15 @@ class CDebug_DataCollector_QueryCollector extends CDebug_DataCollector implement
     public function __construct(CDebug_DataCollector_TimeDataCollector $timeCollector = null) {
         $this->timeCollector = $timeCollector;
         $this->setDataFormatter(new CDebug_DataFormatter_QueryFormatter());
-        $db = CDatabase::instance();
 
         try {
-            $db->listenOnQueryExecuted(
-                function ($query) use ($db) {
-                    $bindings = $query->bindings;
-                    $time = $query->time;
-                    $connection = $query->connection;
-                    $sql = $query->sql;
-                    $this->addQuery($sql, $bindings, $time, $connection);
-                }
-            );
+            CEvent::dispatcher()->listen(CDatabase_Event_OnQueryExecuted::class, function (CDatabase_Event_OnQueryExecuted $query) {
+                $bindings = $query->bindings;
+                $time = $query->time;
+                $connection = $query->connection;
+                $sql = $query->sql;
+                $this->addQuery($sql, $bindings, $time, $connection);
+            });
         } catch (\Exception $e) {
             CDebug::bar()->addThrowable(
                 new Exception(

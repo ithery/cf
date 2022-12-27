@@ -117,7 +117,7 @@ class CElement_Component_DataTable_Cell {
             $html = $cell->html();
             $js = $cell->js();
         }
-        if ($cell instanceof Carbon || $cell instanceof CCarbon) {
+        if ($cell instanceof Carbon) {
             $html = $cell->format('Y-m-d H:i:s');
         }
         if (carr::accessible($cell)) {

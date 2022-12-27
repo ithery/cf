@@ -72,7 +72,7 @@ trait CElement_FormInput_Trait_PredefinedDateRangeTrait {
         if ($lang) {
             $labelTranslated = c::__($label, ['n' => 7]);
         }
-        $dateStart = Carbon::now()->subDay(7);
+        $dateStart = Carbon::now()->subDays(7);
         $dateEnd = Carbon::now();
         $this->addRange($labelTranslated, $dateStart, $dateEnd);
 
@@ -84,7 +84,7 @@ trait CElement_FormInput_Trait_PredefinedDateRangeTrait {
         if ($lang) {
             $labelTranslated = c::__($label, ['n' => 14]);
         }
-        $dateStart = Carbon::now()->subDay(14);
+        $dateStart = Carbon::now()->subDays(14);
         $dateEnd = Carbon::now();
         $this->addRange($labelTranslated, $dateStart, $dateEnd);
 
@@ -96,7 +96,7 @@ trait CElement_FormInput_Trait_PredefinedDateRangeTrait {
         if ($lang) {
             $labelTranslated = c::__($label, ['n' => 30]);
         }
-        $dateStart = Carbon::now()->subDay(30);
+        $dateStart = Carbon::now()->subDays(30);
         $dateEnd = Carbon::now();
         $this->addRange($labelTranslated, $dateStart, $dateEnd);
 

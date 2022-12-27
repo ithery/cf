@@ -5,7 +5,6 @@ class CApi_OAuth_Method_Authorization_Deny extends CApi_OAuth_MethodAbstract {
 
     public function __construct() {
         parent::__construct();
-        //$this->middleware(SEApi_Middleware_MethodGetMiddleware::class);
     }
 
     public function execute() {

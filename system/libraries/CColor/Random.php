@@ -142,6 +142,15 @@ class CColor_Random {
     }
 
     /**
+     * @return CColor_Format_Rgba
+     */
+    public function toRgba() {
+        $hsv = $this->toHsv();
+
+        return $hsv->toRgba();
+    }
+
+    /**
      * @return CColor_Format_Hsl
      */
     public function toHsl() {

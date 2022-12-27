@@ -16,11 +16,11 @@ class CExporter_Validator_RowValidator {
     }
 
     /**
-     * @param array          $rows
-     * @param WithValidation $import
+     * @param array                            $rows
+     * @param CExporter_Concern_WithValidation $import
      *
-     * @throws ValidationException
-     * @throws RowSkippedException
+     * @throws CValidation_Exception
+     * @throws CExporter_Exception_RowSkippedException
      */
     public function validate(array $rows, CExporter_Concern_WithValidation $import) {
         $rules = $this->rules($import);
@@ -28,7 +28,12 @@ class CExporter_Validator_RowValidator {
         $attributes = $this->attributes($import);
 
         try {
-            $this->validator->make($rows, $rules, $messages, $attributes)->validate();
+            $validator = $this->validator->make($rows, $rules, $messages, $attributes);
+            if (method_exists($import, 'withValidator')) {
+                $import->withValidator($validator);
+            }
+
+            $validator->validate();
         } catch (CValidation_Exception $e) {
             $failures = [];
             foreach ($e->errors() as $attribute => $messages) {
@@ -40,7 +45,7 @@ class CExporter_Validator_RowValidator {
                     $row,
                     $attributeName,
                     str_replace($attribute, $attributeName, $messages),
-                    $rows[$row]
+                    carr::get($rows, $row, [])
                 );
             }
 
@@ -58,25 +63,29 @@ class CExporter_Validator_RowValidator {
     }
 
     /**
-     * @param WithValidation $import
+     * @param CExporter_Concern_WithValidation $import
      *
      * @return array
      */
     private function messages(CExporter_Concern_WithValidation $import) {
-        return method_exists($import, 'customValidationMessages') ? $this->formatKey($import->customValidationMessages()) : [];
+        return method_exists($import, 'customValidationMessages')
+            ? $this->formatKey($import->customValidationMessages())
+            : [];
     }
 
     /**
-     * @param WithValidation $import
+     * @param CExporter_Concern_WithValidation $import
      *
      * @return array
      */
     private function attributes(CExporter_Concern_WithValidation $import) {
-        return method_exists($import, 'customValidationAttributes') ? $this->formatKey($import->customValidationAttributes()) : [];
+        return method_exists($import, 'customValidationAttributes')
+            ? $this->formatKey($import->customValidationAttributes())
+            : [];
     }
 
     /**
-     * @param WithValidation $import
+     * @param CExporter_Concern_WithValidation $import
      *
      * @return array
      */
@@ -115,7 +124,7 @@ class CExporter_Validator_RowValidator {
             return $rules;
         }
 
-        if (cstr::contains($rules, 'required_if') && preg_match('/(.*):(.*),(.*)/', $rules, $matches)) {
+        if (cstr::contains($rules, 'required_') && preg_match('/(.*):(.*),(.*)/', $rules, $matches)) {
             $column = cstr::startsWith($matches[2], '*.') ? $matches[2] : '*.' . $matches[2];
 
             return $matches[1] . ':' . $column . ',' . $matches[3];

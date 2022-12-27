@@ -7,6 +7,9 @@ class CRouting_Manager {
 
     private static $instance;
 
+    /**
+     * @return CRouting_Manager
+     */
     public static function instance() {
         if (static::$instance == null) {
             static::$instance = new static();

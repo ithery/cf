@@ -28,4 +28,14 @@ class CImage {
     public static function image($pathToImage) {
         return CImage_Image::load($pathToImage);
     }
+
+    /**
+     * @param int $width
+     * @param int $height
+     *
+     * @return CImage_Chart_Builder
+     */
+    public static function chart($width = 500, $height = 200) {
+        return new CImage_Chart_Builder($width, $height);
+    }
 }
