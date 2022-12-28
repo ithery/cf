@@ -4,7 +4,6 @@ defined('SYSPATH') or die('No direct access allowed.');
 
 final class CManager {
     use CTrait_Compat_Manager;
-
     protected $controls = [];
 
     protected $controlsCode = [];
@@ -375,16 +374,43 @@ final class CManager {
         return CManager_Icon::instance();
     }
 
+    /**
+     * @param string  $model
+     * @param Closure $queryCallback
+     *
+     * @return CManager_DataProvider_ModelDataProvider
+     */
     public static function createModelDataProvider($model, $queryCallback = null) {
         return new CManager_DataProvider_ModelDataProvider($model, $queryCallback);
     }
 
+    /**
+     * @param string $sql
+     * @param array  $bindings
+     *
+     * @return CManager_DataProvider_SqlDataProvider
+     */
     public static function createSqlDataProvider($sql, array $bindings = []) {
         return new CManager_DataProvider_SqlDataProvider($sql, $bindings);
     }
 
-    public static function createClosureDataProvider($sql, $requires) {
-        return new CManager_DataProvider_ClosureDataProvider($sql, carr::wrap($requires));
+    /**
+     * @param string|array $requires
+     * @param Closure      $closure
+     *
+     * @return CManager_DataProvider_SqlDataProvider
+     */
+    public static function createClosureDataProvider($closure, $requires = []) {
+        return new CManager_DataProvider_ClosureDataProvider($closure, carr::wrap($requires));
+    }
+
+    /**
+     * @param CCollection $collection
+     *
+     * @return CManager_DataProvider_CollectionDataProvider
+     */
+    public static function createCollectionDataProvider(CCollection $collection) {
+        return new CManager_DataProvider_CollectionDataProvider($collection);
     }
 
     /**

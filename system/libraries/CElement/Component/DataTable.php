@@ -770,12 +770,12 @@ class CElement_Component_DataTable extends CElement_Component {
     }
 
     /**
-     * @param array $arr
+     * @param CCollection $arr
      *
      * @return $this
      */
-    public function setDataFromArray($arr) {
-        $this->data = $arr;
+    public function setDataFromCollection(CCollection $collection) {
+        $this->query = CManager::createCollectionDataProvider($collection);
 
         return $this;
     }
