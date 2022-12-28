@@ -25,11 +25,14 @@ trait CElement_Component_DataTable_Trait_ActionCreationTrait {
         $ajaxMethod = CAjax::createMethod();
         $ajaxMethod->setType(CAjax_Engine_Exporter::class);
         $ajaxMethod->setData('exporter', serialize($exportable));
-        $ajaxMethod->setData('auth', carr::get($options, 'auth'));
         $ajaxMethod->setData('filename', carr::get($options, 'filename'));
         $ajaxMethod->setData('writerType', carr::get($options, 'writerType'));
         $ajaxMethod->setData('headers', carr::get($options, 'headers', []));
-        $ajaxMethod->setExpiration(c::now()->addDays(1)->getTimestamp());
+        $ajaxMethod->setExpiration(carr::get($options, 'expiration', c::now()->addDays(1)->getTimestamp()));
+        if (carr::get($options, 'auth', c::app()->isLoginRequired())) {
+            $ajaxMethod->enableAuth();
+        }
+
         $downloadUrl = $ajaxMethod->makeUrl();
 
         return $downloadUrl;

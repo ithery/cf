@@ -26,11 +26,15 @@ class CAjax_Method implements CInterface_Jsonable {
 
     public $args = [];
 
-    public $expired;
+    public $expiration;
 
+    /**
+     * @var bool|array
+     */
     public $auth;
 
     public function __construct($options = []) {
+        $this->auth = false;
         if ($options == null) {
             $options = [];
         }
@@ -49,8 +53,25 @@ class CAjax_Method implements CInterface_Jsonable {
         return $this;
     }
 
-    public function setExpiration($timestamp) {
-        $this->expired = $timestamp;
+    public function enableAuth() {
+        $guard = c::auth()->guard();
+        $auth = true;
+        if ($guard) {
+            $auth = [];
+            $auth['guard'] = get_class($guard);
+        }
+        if ($guard instanceof CAuth_Guard_SessionGuard) {
+            $auth['id'] = $guard->id();
+        }
+        $this->auth = $auth;
+
+        return $this;
+    }
+
+    public function setExpiration($expiration) {
+        $expiration = $expiration instanceof DateTimeInterface
+        ? $expiration->getTimestamp() : $expiration;
+        $this->expiration = $expiration;
 
         return $this;
     }
@@ -130,6 +151,7 @@ class CAjax_Method implements CInterface_Jsonable {
         $json = $this->toJson($jsonOption);
 
         //save this object to file.
+
         $ajaxMethod = date('Ymd') . cutils::randmd5();
         $disk = CTemporary::disk();
         $filename = $ajaxMethod . '.tmp';
@@ -144,15 +166,15 @@ class CAjax_Method implements CInterface_Jsonable {
 
     public function toArray() {
         return [
-            'name'=>$this->name,
-            'method'=>$this->method,
-            'type'=>$this->type,
-            'target'=>$this->target,
-            'param'=>$this->param,
-            'args'=>$this->args,
-            'expired'=>$this->expired,
-            'auth'=>$this->auth,
-            'data'=>$this->data,
+            'name' => $this->name,
+            'method' => $this->method,
+            'type' => $this->type,
+            'target' => $this->target,
+            'param' => $this->param,
+            'args' => $this->args,
+            'expiration' => $this->expiration,
+            'auth' => $this->auth,
+            'data' => $this->data,
         ];
     }
 
@@ -183,8 +205,9 @@ class CAjax_Method implements CInterface_Jsonable {
         $this->name = carr::get($array, 'name');
         $this->args = carr::get($array, 'args');
         $this->target = carr::get($array, 'target');
-        $this->expired = carr::get($array, 'expired');
+        $this->expiration = carr::get($array, 'expiration');
         $this->auth = carr::get($array, 'auth');
+
         return $this;
     }
 
@@ -222,9 +245,32 @@ class CAjax_Method implements CInterface_Jsonable {
     }
 
     public function getExpiration() {
-        $expiration = $this->expired;
-        return $expiration instanceof DateTimeInterface
-        ? $expiration->getTimestamp() : $expiration;
+        return $this->expiration;
+    }
+
+    protected function checkAuth() {
+        if ($this->auth) {
+            if (c::auth()->check()) {
+                if (is_array($this->auth)) {
+                    $guard = carr::get($this->auth, 'guard');
+                    if ($guard != get_class(c::auth()->guard())) {
+                        return false;
+                    }
+
+                    if ($guard == CAuth_Guard_SessionGuard::class) {
+                        if (carr::get($this->auth, 'id') != c::auth()->id()) {
+                            return false;
+                        }
+                    }
+                }
+
+                return true;
+            }
+
+            return false;
+        }
+
+        return true;
     }
 
     /**
@@ -236,7 +282,10 @@ class CAjax_Method implements CInterface_Jsonable {
         $expiration = $this->getExpiration();
 
         if ($expiration && CCarbon::now()->getTimestamp() > $expiration) {
-            return c::abort(410);
+            return c::abort(404);
+        }
+        if (!$this->checkAuth()) {
+            return c::abort(404);
         }
         $engine = self::createEngine($this, $input);
         $response = $engine->execute();
