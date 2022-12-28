@@ -26,6 +26,10 @@ class CAjax_Method implements CInterface_Jsonable {
 
     public $args = [];
 
+    public $expired;
+
+    public $auth;
+
     public function __construct($options = []) {
         if ($options == null) {
             $options = [];
@@ -41,6 +45,12 @@ class CAjax_Method implements CInterface_Jsonable {
      */
     public function setData($key, $data) {
         $this->data[$key] = $data;
+
+        return $this;
+    }
+
+    public function setExpiration($timestamp) {
+        $this->expired = $timestamp;
 
         return $this;
     }
@@ -132,13 +142,27 @@ class CAjax_Method implements CInterface_Jsonable {
         return $base_url . 'cresenity/ajax/' . $ajaxMethod;
     }
 
+    public function toArray() {
+        return [
+            'name'=>$this->name,
+            'method'=>$this->method,
+            'type'=>$this->type,
+            'target'=>$this->target,
+            'param'=>$this->param,
+            'args'=>$this->args,
+            'expired'=>$this->expired,
+            'auth'=>$this->auth,
+            'data'=>$this->data,
+        ];
+    }
+
     /**
      * @param int $options
      *
      * @return string
      */
     public function toJson($options = 0) {
-        return json_encode($this, $options);
+        return json_encode($this->toArray(), $options);
     }
 
     /**
@@ -156,7 +180,11 @@ class CAjax_Method implements CInterface_Jsonable {
         $this->data = carr::get($array, 'data', []);
         $this->method = carr::get($array, 'method', 'GET');
         $this->type = carr::get($array, 'type');
-
+        $this->name = carr::get($array, 'name');
+        $this->args = carr::get($array, 'args');
+        $this->target = carr::get($array, 'target');
+        $this->expired = carr::get($array, 'expired');
+        $this->auth = carr::get($array, 'auth');
         return $this;
     }
 
@@ -193,12 +221,23 @@ class CAjax_Method implements CInterface_Jsonable {
         return $engine;
     }
 
+    public function getExpiration() {
+        $expiration = $this->expired;
+        return $expiration instanceof DateTimeInterface
+        ? $expiration->getTimestamp() : $expiration;
+    }
+
     /**
      * @param string $input
      *
      * @return string
      */
     public function executeEngine($input = null) {
+        $expiration = $this->getExpiration();
+
+        if ($expiration && CCarbon::now()->getTimestamp() > $expiration) {
+            return c::abort(410);
+        }
         $engine = self::createEngine($this, $input);
         $response = $engine->execute();
         if ($response != null && $response instanceof CHTTP_JsonResponse) {
