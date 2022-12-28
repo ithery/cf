@@ -302,7 +302,7 @@ class CElement_FormInput_SelectSearch extends CElement_FormInput {
         $ajaxMethod->setData('formatResult', serialize($this->formatResult));
         $ajaxMethod->setData('dependsOn', serialize($this->dependsOn));
         $ajaxMethod->setData('prependData', serialize($this->prependData));
-        if (c::app()->isLoginRequired()) {
+        if (c::app()->isAuthEnabled()) {
             $ajaxMethod->enableAuth();
         }
 
