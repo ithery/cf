@@ -1,6 +1,6 @@
 <?php
 
-abstract class CManager_DataProviderAbstract implements CManager_Contract_DataProviderInterface {
+abstract class CManager_DataProviderAbstract {
     protected $searchAnd = [];
 
     protected $searchOr = [];
@@ -36,7 +36,7 @@ abstract class CManager_DataProviderAbstract implements CManager_Contract_DataPr
         return is_callable($callable) || ($callable instanceof \Opis\Closure\SerializableClosure);
     }
 
-    protected function callCallable($callable, array $args) {
+    protected function callCallable($callable, array $args = []) {
         if (is_callable($callable)) {
             return call_user_func_array($callable, $args);
         }

@@ -2,7 +2,7 @@
 
 use Opis\Closure\SerializableClosure;
 
-class CManager_DataProvider_ClosureDataProvider extends CManager_DataProviderAbstract {
+class CManager_DataProvider_ClosureDataProvider extends CManager_DataProviderAbstract implements CManager_Contract_DataProviderInterface {
     protected $connection = '';
 
     /**
