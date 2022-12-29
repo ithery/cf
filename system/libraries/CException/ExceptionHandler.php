@@ -21,7 +21,6 @@ use Symfony\Component\HttpFoundation\RedirectResponse as SymfonyRedirectResponse
  */
 class CException_ExceptionHandler implements CException_ExceptionHandlerInterface {
     use CTrait_ReflectsClosureTrait;
-
     /**
      * The container implementation.
      *
@@ -310,6 +309,9 @@ class CException_ExceptionHandler implements CException_ExceptionHandlerInterfac
 
         $e = $this->prepareException($e);
 
+        if ($request->isCresRequest()) {
+            return $this->prepareJsonResponse($request, $e);
+        }
         if ($e instanceof HttpExceptionInterface) {
             if ($e instanceof CHTTP_Exception_RedirectHttpException) {
                 return c::redirect($e->getUri(), $e->getStatusCode());
@@ -661,7 +663,7 @@ class CException_ExceptionHandler implements CException_ExceptionHandlerInterfac
      */
     protected function prepareJsonResponse($request, $e) {
         return new CHTTP_JsonResponse(
-            $this->convertExceptionToArray($e),
+            $request->isCresRequest() ? $this->convertExceptionToCresArray($e) : $this->convertExceptionToArray($e),
             $e instanceof HttpExceptionInterface ? $e->getStatusCode() : 500,
             $e instanceof HttpExceptionInterface ? $e->getHeaders() : [],
             JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES
@@ -689,6 +691,47 @@ class CException_ExceptionHandler implements CException_ExceptionHandlerInterfac
                 'file' => $e->getFile(),
                 'line' => $e->getLine(),
                 'trace' => $trace,
+            ];
+        }
+
+        return $result;
+    }
+
+    /**
+     * Convert the given exception to an array.
+     *
+     * @param \Exception $e
+     *
+     * @return array
+     */
+    protected function convertExceptionToCresArray($e) {
+        $errMessage = $e->getMessage();
+        if (!$errMessage && $e instanceof NotFoundHttpException) {
+            $errMessage = 'Page Not Found';
+        }
+        if (!$errMessage) {
+            $errMessage = 'Something went wrong...';
+        }
+        $result = [
+            'errCode' => $e->getCode(),
+            'errMessage' => $errMessage,
+            'data' => null,
+        ];
+
+        if ($this->isDebug()) {
+            $trace = c::collect($e->getTrace())->map(function ($trace) {
+                return carr::except($trace, ['args']);
+            })->all();
+            $result = [
+                'errCode' => $e->getCode(),
+                'errMessage' => $errMessage,
+                'data' => [
+                    'message' => $errMessage,
+                    'exception' => get_class($e),
+                    'file' => $e->getFile(),
+                    'line' => $e->getLine(),
+                    'trace' => $trace,
+                ]
             ];
         }
 

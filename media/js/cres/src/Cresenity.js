@@ -265,10 +265,22 @@ export default class Cresenity {
                 },
                 success: (data) => {
                     let isError = false;
-                    if(typeof data.html === 'undefined') {
-                        //error
-                        this.htmlModal(data);
-                        isError = true;
+                    let errMessage = null;
+                    if(typeof data.errCode !== 'undefined') {
+                        isError = data.errCode != 0;
+                        if(isError) {
+                            this.message('error', data.errMessage);
+                            if(typeof data.data !== 'undefined' && data.data && this.isDebug()) {
+                                this.htmlModal(data);
+                            }
+                        }
+                    } else {
+                        if(typeof data.html === 'undefined') {
+                            if(this.isDebug()) {
+                                this.htmlModal(data);
+                            }
+                            isError = true;
+                        }
                     }
                     if(!isError) {
                         this.doCallback('onReloadSuccess', data);
@@ -348,6 +360,12 @@ export default class Cresenity {
     before(options) {
         options.reloadType = 'before';
         this.reload(options);
+    }
+    isDebug() {
+        if(this.cf.getConfig().environment == 'production') {
+            return false;
+        }
+        return this.cf.getConfig().debug ?? false;
     }
     confirm(options) {
         let settings = extend({
@@ -622,7 +640,7 @@ export default class Cresenity {
     }
 
     debug(message) {
-        if (this.cf.getConfig().debug) {
+        if (this.isDebug()) {
             window.console.log(message);
         }
     }

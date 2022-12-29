@@ -30,8 +30,18 @@ class CF {
                 }
             },
             requireJs: false,
-            CFVersion: '1.2',
+            environment: 'production',
+            CFVersion: '1.5',
             isProduction: false,
+            debug: false,
+            format: {
+                decimalSeparator: '.',
+                thousandSeparator: ',',
+                decimalDigit: 0,
+                date: 'Y-m-d',
+                datetime: 'Y-m-d H:i:s'
+            },
+            haveClock: false,
             react: {
                 enable: false
             }
@@ -139,10 +149,10 @@ class CF {
                 if (typeof (callback) === 'function') {
                     el.addEventListener('load', ()=> {
                         dispatchWindowEvent('cresenity:js:loaded', {
-                            url:url,
+                            url: url
                         });
                         callback();
-                    })
+                    });
                 }
                 this.document.body.appendChild(el);
             }
@@ -272,7 +282,7 @@ class CF {
         let resolver = this.getConfig().react.enable
             ? (callback) => {
                 this.loadJQuery(()=>{
-                    this.loadReact(callback)
+                    this.loadReact(callback);
                 });
             }
             : (callback) => {
