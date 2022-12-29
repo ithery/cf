@@ -768,7 +768,16 @@ class CElement_Component_DataTable extends CElement_Component {
 
         return $this;
     }
+    /**
+     * @param array $arr
+     *
+     * @return $this
+     */
+    public function setDataFromArray($arr) {
+        $this->data = $arr;
 
+        return $this;
+    }
     /**
      * @param CCollection $arr
      *
