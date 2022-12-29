@@ -768,6 +768,7 @@ class CElement_Component_DataTable extends CElement_Component {
 
         return $this;
     }
+
     /**
      * @param array $arr
      *
@@ -778,6 +779,7 @@ class CElement_Component_DataTable extends CElement_Component {
 
         return $this;
     }
+
     /**
      * @param CCollection $arr
      *
