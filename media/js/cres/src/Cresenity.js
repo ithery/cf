@@ -91,6 +91,7 @@ export default class Cresenity {
         };
         this.theme = new Theme();
         this.$ = cresQuery;
+        this.version = '1.4.1';
     }
     loadJs(filename, callback) {
         let fileref = document.createElement('script');
@@ -259,7 +260,8 @@ export default class Cresenity {
                 dataType: 'json',
                 data: dataAddition,
                 headers: {
-                    Accept: 'application/json; charset=utf-8'
+                    Accept: 'application/json; charset=utf-8',
+                    'X-Cres-Version': this.version
                 },
                 success: (data) => {
                     let isError = false;
