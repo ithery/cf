@@ -258,6 +258,9 @@ export default class Cresenity {
                 url: url,
                 dataType: 'json',
                 data: dataAddition,
+                headers: {
+                    Accept: 'application/json; charset=utf-8'
+                },
                 success: (data) => {
                     let isError = false;
                     if(typeof data.html === 'undefined') {

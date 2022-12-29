@@ -28,6 +28,11 @@ trait CElement_Component_DataTable_Trait_ActionCreationTrait {
         $ajaxMethod->setData('filename', carr::get($options, 'filename'));
         $ajaxMethod->setData('writerType', carr::get($options, 'writerType'));
         $ajaxMethod->setData('headers', carr::get($options, 'headers', []));
+        $ajaxMethod->setExpiration(carr::get($options, 'expiration', c::now()->addDays(1)->getTimestamp()));
+        if (carr::get($options, 'auth', c::app()->isLoginRequired())) {
+            $ajaxMethod->enableAuth();
+        }
+
         $downloadUrl = $ajaxMethod->makeUrl();
 
         return $downloadUrl;
