@@ -282,10 +282,11 @@ class CAjax_Method implements CInterface_Jsonable {
         $expiration = $this->getExpiration();
 
         if ($expiration && CCarbon::now()->getTimestamp() > $expiration) {
-            return c::abort(404);
+            throw new CAjax_Exception_ExpiredAjaxException('Expired Link');
         }
+
         if (!$this->checkAuth()) {
-            return c::abort(404);
+            throw new CAjax_Exception_AuthAjaxException('Unauthenticated');
         }
         $engine = self::createEngine($this, $input);
         $response = $engine->execute();
