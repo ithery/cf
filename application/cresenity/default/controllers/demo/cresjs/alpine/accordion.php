@@ -6,6 +6,7 @@ class Controller_Demo_Cresjs_Alpine_Accordion extends \Cresenity\Demo\Controller
      */
     public function index() {
         $app = c::app();
+        $app->title('Alpine Accordion');
         $data = [
             [
                 'title' => 'Section 1',
