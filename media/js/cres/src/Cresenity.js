@@ -41,6 +41,7 @@ import { initThemeMode } from './module/theme';
 import { initMenu } from './module/menu';
 import { formatCurrency, unformatCurrency } from './formatter/currency';
 import { cresQuery } from './module/CresQuery';
+import { isJson } from './util/helper';
 
 export default class Cresenity {
     constructor() {
@@ -176,9 +177,16 @@ export default class Cresenity {
     }
     handleAjaxError(xhr, status, error) {
         if (error !== 'abort') {
-            this.message('error', 'Error, please call administrator... (' + error + ')');
+            if(xhr.responseText && isJson(xhr.responseText)) {
+                let data = JSON.parse(xhr.responseText);
+                if(data && typeof data.errCode !== 'undefined') {
+                    this.message('error', data.errMessage);
+                }
+            } else {
+                this.message('error', 'Something went wrong... ' + (error ? ('(' + error + ')') : ''));
+            }
             if(xhr.status!=200) {
-                if(window.capp?.environment !== 'production') {
+                if(this.isDebug()) {
                     this.htmlModal(xhr.responseText);
                 }
             }
@@ -362,6 +370,7 @@ export default class Cresenity {
         this.reload(options);
     }
     isDebug() {
+        console.log(this.cf.getConfig().environment);
         if(this.cf.getConfig().environment == 'production') {
             return false;
         }

@@ -19,6 +19,7 @@ class CF {
         }
         let defaultConfig = {
             baseUrl: '/',
+            domain: 'localhost',
             defaultJQueryUrl: 'https://ajax.googleapis.com/ajax/libs/jquery/3.6.0/jquery.min.js',
             haveScrollToTop: false,
             vscode: {
@@ -39,12 +40,20 @@ class CF {
                 thousandSeparator: ',',
                 decimalDigit: 0,
                 date: 'Y-m-d',
-                datetime: 'Y-m-d H:i:s'
+                datetime: 'Y-m-d H:i:s',
+                currencyDecimalDigit: null,
+                currencyPrefix: '',
+                currencySuffix: '',
+                currencyStripZeroDecimal: false
             },
             haveClock: false,
             react: {
                 enable: false
-            }
+            },
+            waves: {
+                selector: '.cres-waves-effect'
+            },
+            timezoneString: '+07:00'
 
         };
         this.config = mergeOptions(defaultConfig, cappConfig);
