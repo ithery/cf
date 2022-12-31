@@ -67,4 +67,8 @@ class CAjax {
 
         return $data;
     }
+
+    public static function getDefaultExpiration() {
+        return c::now()->addMinutes(CF::config('app.ajax.expiration', 60))->getTimestamp();
+    }
 }

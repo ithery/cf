@@ -37,6 +37,9 @@ trait CElement_Component_DataTable_Trait_JavascriptTrait {
             $ajaxMethod->setData('isCallback', $this->isCallback);
             $ajaxMethod->setData('callbackRequire', $this->callbackRequire);
             $ajaxMethod->setData('callbackOptions', $this->callbackOptions);
+            if (c::app()->isAuthEnabled()) {
+                $ajaxMethod->enableAuth();
+            }
             $ajax_url = $ajaxMethod->makeUrl();
         }
 
@@ -208,7 +211,10 @@ trait CElement_Component_DataTable_Trait_JavascriptTrait {
                 if (is_bool($scrollY)) {
                     $scrollY = 'true';
                 }
-                $js->appendln('scrollY:        ' . $scrollY . ',')->br();
+                $js->appendln('scrollY :        ' . $scrollY . ',')->br();
+            }
+            if ($this->colReorder) {
+                $js->appendln('colReorder : true,')->br();
             }
             if ($this->fixedColumn) {
                 $scrollY = $this->scrollY;

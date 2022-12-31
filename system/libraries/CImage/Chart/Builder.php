@@ -45,7 +45,7 @@ class CImage_Chart_Builder {
     public function __construct($width, $height) {
         $this->width = $width;
         $this->height = $height;
-        $this->engine = 'google';
+        $this->engine = 'default';
     }
 
     public function setChart(CChart_ChartAbstract $chart) {

@@ -163,6 +163,7 @@ class CView_View implements ArrayAccess, CInterface_Htmlable, CView_ViewInterfac
      *
      * @return bool
      */
+    #[\ReturnTypeWillChange]
     public function offsetExists($key) {
         return array_key_exists($key, $this->data);
     }
@@ -186,6 +187,7 @@ class CView_View implements ArrayAccess, CInterface_Htmlable, CView_ViewInterfac
      *
      * @return void
      */
+    #[\ReturnTypeWillChange]
     public function offsetSet($key, $value) {
         $this->with($key, $value);
     }
@@ -197,6 +199,7 @@ class CView_View implements ArrayAccess, CInterface_Htmlable, CView_ViewInterfac
      *
      * @return void
      */
+    #[\ReturnTypeWillChange]
     public function offsetUnset($key) {
         unset($this->data[$key]);
     }
