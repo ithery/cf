@@ -99,7 +99,7 @@ class CDevCloud_Inspector_Provider_TaskQueueServiceProvider extends CDevCloud_In
 
         // Flush normally happens at shutdown... which only happens in the worker if it is run in a standalone execution.
         // Flush immediately if the job is running in a background worker.
-        if ($this->app->runningInConsole()) {
+        if (CF::isCli()) {
             CDevCloud::inspector()->flush();
         }
     }
