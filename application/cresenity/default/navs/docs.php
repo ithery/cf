@@ -27,44 +27,7 @@ return [
     [
         'name' => 'element',
         'label' => c::__('Elements'),
-        'subnav' => [
-            [
-                'name' => 'element.standard',
-                'label' => c::__('Standard Element'),
-                'uri' => 'docs/element/standard',
-            ],
-            [
-                'name' => 'element.table',
-                'label' => c::__('Table'),
-                'uri' => 'docs/element/table',
-            ],
-            [
-                'name' => 'element.form',
-                'label' => c::__('Form'),
-                'uri' => 'docs/element/form',
-            ],
-            [
-                'name' => 'element.tab',
-                'label' => c::__('Tab'),
-                'uri' => 'docs/element/tab',
-            ],
-            [
-                'name' => 'element.widget',
-                'label' => c::__('Widget'),
-                'uri' => 'docs/element/widget',
-            ],
-            [
-                'name' => 'element.showmore',
-                'label' => c::__('ShowMore'),
-                'uri' => 'docs/element/showmore',
-            ],
-            [
-                'name' => 'element.shimmer',
-                'label' => c::__('Shimmer'),
-                'uri' => 'docs/element/shimmer',
-            ],
-
-        ]
+        'subnav' => include dirname(__FILE__) . '/docs/element.php',
     ],
     [
         'name' => 'forminput',
@@ -86,29 +49,7 @@ return [
     [
         'name' => 'helper',
         'label' => c::__('Helpers'),
-        'subnav' => [
-            [
-                'name' => 'helper.c',
-                'label' => c::__('c'),
-                'uri' => 'docs/helper/c',
-            ],
-            [
-                'name' => 'helper.carr',
-                'label' => c::__('carr'),
-                'uri' => 'docs/helper/carr',
-            ],
-            [
-                'name' => 'helper.cstr',
-                'label' => c::__('cstr'),
-                'uri' => 'docs/helper/cstr',
-            ],
-            [
-                'name' => 'helper.curl',
-                'label' => c::__('curl'),
-                'uri' => 'docs/helper/curl',
-            ]
-
-        ]
+        'subnav' => include dirname(__FILE__) . '/docs/element.php',
     ],
     [
         'name' => 'module',

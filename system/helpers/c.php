@@ -1573,6 +1573,10 @@ class c {
         return htmlspecialchars(c::json($data, $options, $depth), ENT_QUOTES, 'UTF-8');
     }
 
+    public static function escAttr($string) {
+        return htmlspecialchars($string, ENT_QUOTES, 'UTF-8');
+    }
+
     /**
      * @return CApp_Contract_BaseInterface
      */
