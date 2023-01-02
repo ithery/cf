@@ -175,9 +175,6 @@ final class CF {
         // Restore error reporting
         error_reporting($ER);
 
-        // Send default text/html UTF-8 header
-        //header('Content-Type: text/html; charset=UTF-8');
-
         // Load locales
         $locale = self::config('app.locale');
 
