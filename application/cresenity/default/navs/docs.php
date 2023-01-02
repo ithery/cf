@@ -182,4 +182,9 @@ return [
             ],
         ]
     ],
+    [
+        'name' => 'change',
+        'label' => c::__('Changes Log'),
+        'subnav' => include dirname(__FILE__) . '/docs/change.php',
+    ],
 ];
