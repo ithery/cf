@@ -139,6 +139,7 @@ class CElement_Component_DataTable extends CElement_Component {
     protected $widget_title;
 
     protected $fixedColumn;
+    protected $fixedHeader;
 
     protected $colReorder;
 
@@ -220,11 +221,12 @@ class CElement_Component_DataTable extends CElement_Component {
         $this->dataTableView = CConstant::TABLE_VIEW_ROW;
         $this->dataTableViewColCount = 5;
         $this->fixedColumn = null;
+        $this->fixedHeader = null;
         $this->scrollX = false;
         $this->scrollY = false;
 
         $this->infoText = clang::__('Showing') . ' _START_ ' . clang::__('to') . ' _END_ ' . clang::__('of') . ' _TOTAL_ ' . clang::__('entries') . '';
-        CClientModules::instance()->registerModule('jquery.datatable');
+        c::manager()->registerModule('jquery.datatable');
 
         //read theme data
 
@@ -413,6 +415,17 @@ class CElement_Component_DataTable extends CElement_Component {
             $column = $column ? 1 : null;
         }
         $this->fixedColumn = $column;
+
+        return $this;
+    }
+
+    /**
+     * @param int $column
+     *
+     * @return \CElement_Component_DataTable
+     */
+    public function setFixedHeader($fixedHeader = true) {
+        $this->fixedHeader = $fixedHeader;
 
         return $this;
     }
