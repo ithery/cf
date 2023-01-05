@@ -130,7 +130,7 @@ class CQueue_Pipeline implements CQueue_PipelineInterface {
             } catch (Exception $e) {
                 return $this->handleException($passable, $e);
             } catch (Throwable $e) {
-                return $this->handleException($passable, new FatalThrowableError($e));
+                return $this->handleException($passable, $e);
             }
         };
     }
@@ -165,10 +165,10 @@ class CQueue_Pipeline implements CQueue_PipelineInterface {
                     $carry = method_exists($pipe, $this->method) ? $pipe->{$this->method}(...$parameters) : $pipe(...$parameters);
 
                     return $this->handleCarry($carry);
+                } catch (Throwable $e) {
+                    return $this->handleException($passable, $e);
                 } catch (Exception $e) {
                     return $this->handleException($passable, $e);
-                } catch (Throwable $e) {
-                    return $this->handleException($passable, new FatalThrowableError($e));
                 }
             };
         };
