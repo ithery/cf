@@ -316,7 +316,8 @@ CREATE TABLE `queue_batch` (
   `deletedby` varchar(255) DEFAULT NULL,
   `status` int(11) NOT NULL DEFAULT '1',
   PRIMARY KEY (`queue_batch_id`),
-  UNIQUE KEY `queue_batch_id` (`queue_batch_id`)
+  UNIQUE KEY `queue_batch_id` (`queue_batch_id`),
+  UNIQUE KEY `id` (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 

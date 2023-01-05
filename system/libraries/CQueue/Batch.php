@@ -152,7 +152,6 @@ class CQueue_Batch implements CInterface_Arrayable, JsonSerializable {
 
         $jobs = CCollection::wrap($jobs)->map(function ($job) use (&$count) {
             $job = $job instanceof Closure ? CQueue_CallQueuedClosure::create($job) : $job;
-
             if (is_array($job)) {
                 $count += count($job);
 

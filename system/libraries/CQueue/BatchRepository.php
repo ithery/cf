@@ -88,13 +88,16 @@ class CQueue_BatchRepository implements CQueue_Contract_PrunableBatchRepositoryI
 
         $this->connection->table($this->table)->insert([
             'id' => $id,
+            'org_id' => $batch->orgId,
+            'app_code' => CF::appCode(),
             'name' => $batch->name,
             'total_jobs' => 0,
             'pending_jobs' => 0,
             'failed_jobs' => 0,
             'failed_job_ids' => '[]',
             'options' => $this->serialize($batch->options),
-            'created_at' => time(),
+            'created' => c::now(),
+            'updated' => c::now(),
             'cancelled_at' => null,
             'finished_at' => null,
         ]);
@@ -193,7 +196,7 @@ class CQueue_BatchRepository implements CQueue_Contract_PrunableBatchRepositoryI
      */
     public function markAsFinished($batchId) {
         $this->connection->table($this->table)->where('id', $batchId)->update([
-            'finished_at' => time(),
+            'finished_at' => c::now(),
         ]);
     }
 
@@ -256,6 +259,29 @@ class CQueue_BatchRepository implements CQueue_Contract_PrunableBatchRepositoryI
         $query = $this->connection->table($this->table)
             ->whereNull('finished_at')
             ->where('created', '<', $before);
+
+        $totalDeleted = 0;
+
+        do {
+            $deleted = $query->take(1000)->delete();
+
+            $totalDeleted += $deleted;
+        } while ($deleted !== 0);
+
+        return $totalDeleted;
+    }
+
+    /**
+     * Prune all of the cancelled entries older than the given date.
+     *
+     * @param \DateTimeInterface $before
+     *
+     * @return int
+     */
+    public function pruneCancelled(DateTimeInterface $before) {
+        $query = $this->connection->table($this->table)
+            ->whereNotNull('cancelled_at')
+            ->where('created', '<', $before->getTimestamp());
 
         $totalDeleted = 0;
 
@@ -332,9 +358,9 @@ class CQueue_BatchRepository implements CQueue_Contract_PrunableBatchRepositoryI
             (int) $batch->failed_jobs,
             json_decode($batch->failed_job_ids, true),
             $this->unserialize($batch->options),
-            CarbonImmutable::createFromTimestamp($batch->created_at),
-            $batch->cancelled_at ? CarbonImmutable::createFromTimestamp($batch->cancelled_at) : $batch->cancelled_at,
-            $batch->finished_at ? CarbonImmutable::createFromTimestamp($batch->finished_at) : $batch->finished_at
+            CarbonImmutable::parse($batch->created),
+            $batch->cancelled_at ? CarbonImmutable::parse($batch->cancelled_at) : $batch->cancelled_at,
+            $batch->finished_at ? CarbonImmutable::parse($batch->finished_at) : $batch->finished_at
         );
     }
 }

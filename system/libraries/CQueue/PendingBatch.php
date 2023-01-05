@@ -9,6 +9,13 @@ class CQueue_PendingBatch {
     public $name = '';
 
     /**
+     * The Org Id.
+     *
+     * @var int
+     */
+    public $orgId = null;
+
+    /**
      * The jobs that belong to the batch.
      *
      * @var \CCollection
@@ -26,11 +33,16 @@ class CQueue_PendingBatch {
      * Create a new pending batch instance.
      *
      * @param \CCollection $jobs
+     * @param null|int     $orgId
      *
      * @return void
      */
-    public function __construct(CCollection $jobs) {
+    public function __construct(CCollection $jobs, $orgId = null) {
         $this->jobs = $jobs;
+        if (func_num_args() == 1) {
+            $orgId = CF::orgId();
+        }
+        $this->orgId = $orgId;
     }
 
     /**
@@ -196,7 +208,6 @@ class CQueue_PendingBatch {
 
         try {
             $batch = $repository->store($this);
-
             $batch = $batch->add($this->jobs);
         } catch (Exception $e) {
             if (isset($batch)) {
