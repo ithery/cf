@@ -136,8 +136,32 @@ class CQueue_Dispatcher implements CQueue_QueueingDispatcherInterface {
      *
      * @return null|\CQueue_Batch
      */
-    public function findBatch(string $batchId) {
+    public function findBatch($batchId) {
         return CQueue::batchRepository()->find($batchId);
+    }
+
+    /**
+     * Create a new batch of queueable jobs.
+     *
+     * @param \CCollection|array|mixed $jobs
+     *
+     * @return \CQueue_PendingBatch
+     */
+    public function batch($jobs) {
+        return new CQueue_PendingBatch(CCollection::wrap($jobs));
+    }
+
+    /**
+     * Create a new chain of queueable jobs.
+     *
+     * @param \CCollection|array $jobs
+     *
+     * @return \CQueue_PendingChain
+     */
+    public function chain($jobs) {
+        $jobs = CCollection::wrap($jobs);
+
+        return new CQueue_PendingChain($jobs->shift(), $jobs->toArray());
     }
 
     /**
@@ -160,7 +184,7 @@ class CQueue_Dispatcher implements CQueue_QueueingDispatcherInterface {
      */
     public function getCommandHandler($command) {
         if ($this->hasCommandHandler($command)) {
-            return $this->container->make($this->handlers[get_class($command)]);
+            return c::container()->make($this->handlers[get_class($command)]);
         }
 
         return false;

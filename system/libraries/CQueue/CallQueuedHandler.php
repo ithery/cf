@@ -47,14 +47,20 @@ class CQueue_CallQueuedHandler {
         try {
             $command = $this->setJobInstanceIfNecessary(
                 $job,
-                unserialize($data['command'])
+                $this->getCommand($data)
             );
         } catch (CModel_Exception_ModelNotFoundException $e) {
             return $this->handleModelNotFound($job, $e);
         }
+        if ($command instanceof CQueue_Contract_ShouldBeUniqueUntilProcessingInterface) {
+            $this->ensureUniqueJobLockIsReleased($command);
+        }
 
         $this->dispatchThroughMiddleware($job, $command);
 
+        if (! $job->isReleased() && ! $command instanceof CQueue_Contract_ShouldBeUniqueUntilProcessingInterface) {
+            $this->ensureUniqueJobLockIsReleased($command);
+        }
         if (!$job->hasFailed() && !$job->isReleased()) {
             $this->ensureNextJobInChainIsDispatched($command);
             $this->ensureSuccessfulBatchJobIsRecorded($command);
@@ -78,11 +84,9 @@ class CQueue_CallQueuedHandler {
             return unserialize($data['command']);
         }
 
-        // if ($this->container->bound(Encrypter::class)) {
-        //     return unserialize($this->container[Encrypter::class]->decrypt($data['command']));
-        // }
+        return unserialize(CCrypt::encrypter()->decrypt($data['command']));
 
-        throw new RuntimeException('Unable to extract job payload.');
+        //throw new RuntimeException('Unable to extract job payload.');
     }
 
     /**
@@ -172,6 +176,20 @@ class CQueue_CallQueuedHandler {
     }
 
     /**
+     * Ensure the lock for a unique job is released.
+     *
+     * @param mixed $command
+     *
+     * @return void
+     */
+    protected function ensureUniqueJobLockIsReleased($command) {
+        if ($command instanceof CQueue_Contract_ShouldBeUniqueInterface) {
+            $lock = new CQueue_UniqueLock(c::cache()->driver());
+            $lock->release($command);
+        }
+    }
+
+    /**
      * Handle a model not found exception.
      *
      * @param CQueue_AbstractJob $job
@@ -209,6 +227,11 @@ class CQueue_CallQueuedHandler {
      */
     public function failed(array $data, $e, $uuid) {
         $command = $this->getCommand($data);
+
+        if (! $command instanceof CQueue_Contract_ShouldBeUniqueUntilProcessingInterface) {
+            $this->ensureUniqueJobLockIsReleased($command);
+        }
+
         if ($command instanceof \__PHP_Incomplete_Class) {
             return;
         }

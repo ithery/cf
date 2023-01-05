@@ -311,4 +311,15 @@ final class CQueue {
             $config['table']
         );
     }
+
+    /**
+     * Create a new batch of queueable jobs.
+     *
+     * @param \CCollection|array|mixed $jobs
+     *
+     * @return \CQueue_PendingBatch
+     */
+    public static function batch($jobs) {
+        return static::dispatcher()->batch($jobs);
+    }
 }
