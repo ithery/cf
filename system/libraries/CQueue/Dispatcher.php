@@ -122,7 +122,7 @@ class CQueue_Dispatcher implements CQueue_QueueingDispatcherInterface {
             $callback = function ($command) {
                 $method = method_exists($command, 'execute') ? 'execute' : (method_exists($command, 'handle') ? 'handle' : '__invoke');
 
-                return $this->container->call([$command, $method]);
+                return c::container()->call([$command, $method]);
             };
         }
 
@@ -244,6 +244,20 @@ class CQueue_Dispatcher implements CQueue_QueueingDispatcherInterface {
         }
 
         return $queue->push($command);
+    }
+
+    /**
+     * Dispatch a command to its appropriate handler after the current process.
+     *
+     * @param mixed $command
+     * @param mixed $handler
+     *
+     * @return void
+     */
+    public function dispatchAfterResponse($command, $handler = null) {
+        CF::terminating(function () use ($command, $handler) {
+            $this->dispatchNow($command, $handler);
+        });
     }
 
     /**

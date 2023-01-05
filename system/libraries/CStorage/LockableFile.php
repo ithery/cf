@@ -78,7 +78,7 @@ class CStorage_LockableFile {
     public function read($length = null) {
         clearstatcache(true, $this->path);
 
-        return fread($this->handle, $length ?? ($this->size() ?: 1));
+        return fread($this->handle, $length ?: ($this->size() ?: 1));
     }
 
     /**
