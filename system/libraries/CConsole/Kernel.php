@@ -105,7 +105,7 @@ class CConsole_Kernel implements CConsole_KernelInterface {
      * @return void
      */
     public function terminate($input, $status) {
-        //$this->app->terminate();
+        CF::terminate();
     }
 
     /**

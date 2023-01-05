@@ -74,6 +74,8 @@ class CQueue_BatchRepository implements CQueue_Contract_PrunableBatchRepositoryI
         if ($batch) {
             return $this->toBatch($batch);
         }
+
+        return null;
     }
 
     /**
@@ -97,7 +99,9 @@ class CQueue_BatchRepository implements CQueue_Contract_PrunableBatchRepositoryI
             'failed_job_ids' => '[]',
             'options' => $this->serialize($batch->options),
             'created' => c::now(),
+            'createdby' => c::base()->username(),
             'updated' => c::now(),
+            'updatedby' => c::base()->username(),
             'cancelled_at' => null,
             'finished_at' => null,
         ]);
@@ -362,5 +366,25 @@ class CQueue_BatchRepository implements CQueue_Contract_PrunableBatchRepositoryI
             $batch->cancelled_at ? CarbonImmutable::parse($batch->cancelled_at) : $batch->cancelled_at,
             $batch->finished_at ? CarbonImmutable::parse($batch->finished_at) : $batch->finished_at
         );
+    }
+
+    /**
+     * Get the underlying database connection.
+     *
+     * @return \CDatabase
+     */
+    public function getConnection() {
+        return $this->connection;
+    }
+
+    /**
+     * Set the underlying database connection.
+     *
+     * @param \CDatabase $connection
+     *
+     * @return void
+     */
+    public function setConnection(CDatabase $connection) {
+        $this->connection = $connection;
     }
 }
