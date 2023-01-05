@@ -34,6 +34,15 @@ class CConsole_Kernel implements CConsole_KernelInterface {
     protected $commandsLoaded = false;
 
     /**
+     * The bootstrap classes for the application.
+     *
+     * @var string[]
+     */
+    protected $bootstrappers = [
+
+    ];
+
+    /**
      * Create a new console kernel instance.
      *
      * @param CEvent_Dispatcher $events
@@ -79,15 +88,13 @@ class CConsole_Kernel implements CConsole_KernelInterface {
             $this->bootstrap();
 
             return $this->getCFCli()->run($input, $output);
-        } catch (Exception $e) {
+        } catch (Throwable $e) {
             $this->reportException($e);
 
             $this->renderException($output, $e);
 
             return 1;
-        } catch (Throwable $e) {
-            $e = new FatalThrowableError($e);
-
+        } catch (Exception $e) {
             $this->reportException($e);
 
             $this->renderException($output, $e);
@@ -116,6 +123,15 @@ class CConsole_Kernel implements CConsole_KernelInterface {
      * @return void
      */
     protected function schedule(CCron_Schedule $schedule) {
+    }
+
+    /**
+     * Get the timezone that should be used by default for scheduled events.
+     *
+     * @return null|\DateTimeZone|string
+     */
+    protected function scheduleTimezone() {
+        return CF::config('app.schedule_timezone', CF::config('app.timezone'));
     }
 
     /**
@@ -310,7 +326,7 @@ class CConsole_Kernel implements CConsole_KernelInterface {
      * @return void
      */
     protected function reportException(Exception $e) {
-        //$this->app[ExceptionHandler::class]->report($e);
+        CException::exceptionHandler()->report($e);
     }
 
     /**
@@ -323,7 +339,5 @@ class CConsole_Kernel implements CConsole_KernelInterface {
      */
     protected function renderException($output, Exception $e) {
         CException::exceptionHandler()->renderForConsole($output, $e);
-        //$this->app[ExceptionHandler::class]->renderForConsole($output, $e);
-        //(new ConsoleApplication())->renderException($e, $output);
     }
 }
