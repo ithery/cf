@@ -7,6 +7,9 @@ if (!is_callable('random_bytes')) {
 final class CCrypt {
     protected static $encrypter;
 
+    /**
+     * @return CCrypt_Encrypter
+     */
     public static function encrypter() {
         if (static::$encrypter == null) {
             $key = CF::config('app.key');
