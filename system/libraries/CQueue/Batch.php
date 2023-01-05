@@ -225,7 +225,6 @@ class CQueue_Batch implements CInterface_Arrayable, JsonSerializable {
      */
     public function recordSuccessfulJob($jobId) {
         $counts = $this->decrementPendingJobs($jobId);
-
         if ($counts->pendingJobs === 0) {
             $this->repository->markAsFinished($this->id);
         }

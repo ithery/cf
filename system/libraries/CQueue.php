@@ -226,7 +226,6 @@ final class CQueue {
     public static function batchRepository() {
         if (static::$batchRepository == null) {
             static::$batchRepository = new CQueue_BatchRepository(
-                static::batchFactory(),
                 CDatabase::instance(CF::config('queue.batching.database')),
                 CF::config('queue.batching.table', 'queue_batch')
             );

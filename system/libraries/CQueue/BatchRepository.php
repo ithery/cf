@@ -27,12 +27,11 @@ class CQueue_BatchRepository implements CQueue_Contract_PrunableBatchRepositoryI
     /**
      * Create a new batch repository instance.
      *
-     * @param \CQueue_BatchFactory $factory
-     * @param \CDatabase           $connection
-     * @param string               $table
+     * @param \CDatabase $connection
+     * @param string     $table
      */
-    public function __construct(CQueue_BatchFactory $factory, CDatabase $connection, $table) {
-        $this->factory = $factory;
+    public function __construct(CDatabase $connection, $table) {
+        $this->factory = CQueue::batchFactory();
         $this->connection = $connection;
         $this->table = $table;
     }
