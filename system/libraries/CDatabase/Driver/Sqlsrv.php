@@ -27,7 +27,7 @@ class CDatabase_Driver_Sqlsrv extends CDatabase_Driver {
         $this->db = $db;
         $this->dbConfig = $config;
 
-        CF::log(CLogger::DEBUG, 'MySQLi Database Driver Initialized');
+        CF::log(CLogger::DEBUG, 'SqlSrv Database Driver Initialized');
     }
 
     public function close() {

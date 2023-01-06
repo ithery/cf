@@ -10,7 +10,6 @@ defined('SYSPATH') or die('No direct access allowed.');
  */
 class CDatabase_Driver_Mysqli_Result extends CDatabase_Result {
     use CTrait_Compat_Database_Driver_Mysqli_Result;
-
     /**
      * @var \mysqli
      */
@@ -33,7 +32,7 @@ class CDatabase_Driver_Mysqli_Result extends CDatabase_Result {
 
         if (!$this->link->multi_query($sql)) {
             // SQL error
-            throw new CDatabase_Exception('There was an SQL error: :error', [':error' => $this->link->error . ' - ' . $sql]);
+            throw new CDatabase_Exception_QueryException(c::__('There was an SQL error: :error', [':error' => $this->link->error . ' - ' . $sql]));
         } else {
             $this->result = $this->link->store_result();
 
@@ -44,7 +43,7 @@ class CDatabase_Driver_Mysqli_Result extends CDatabase_Result {
                 $this->fetch_type = ($object === true) ? 'fetch_object' : 'fetch_array';
             } elseif ($this->link->error) {
                 // SQL error
-                throw new CDatabase_Exception('There was an SQL error: :error', [':error' => $this->link->error . ' - ' . $sql]);
+                throw new CDatabase_Exception_QueryException(c::__('There was an SQL error: :error', [':error' => $this->link->error . ' - ' . $sql]));
             } else {
                 // Its an DELETE, INSERT, REPLACE, or UPDATE query
                 $this->insert_id = $this->link->insert_id;

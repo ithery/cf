@@ -7,7 +7,6 @@ defined('SYSPATH') or die('No direct access allowed.');
  */
 class CDatabase_Driver_Mysqli extends CDatabase_Driver_AbstractMysql {
     use CTrait_Compat_Database_Driver_Mysqli;
-
     /**
      * Database connection link.
      *
@@ -93,7 +92,7 @@ class CDatabase_Driver_Mysqli extends CDatabase_Driver_AbstractMysql {
                 return $this->link;
             }
         } catch (Exception $ex) {
-            throw new CDatabase_Exception($ex->getMessage() . ', Host:' . $host);
+            throw new CDatabase_Exception_QueryException($ex->getMessage() . ', Host:' . $host);
         }
 
         return false;
@@ -132,7 +131,7 @@ class CDatabase_Driver_Mysqli extends CDatabase_Driver_AbstractMysql {
 
     public function setCharset($charset) {
         if ($this->link->set_charset($charset) === false) {
-            throw new CDatabase_Exception('There was an SQL error: :error', [':error' => $this->showError()]);
+            throw new CDatabase_Exception_QueryException(c::__('There was an SQL error: :error', [':error' => $this->showError()]));
         }
     }
 
@@ -274,7 +273,7 @@ class CDatabase_Driver_Mysqli extends CDatabase_Driver_AbstractMysql {
         }
 
         if (!isset($result)) {
-            throw new CDatabase_Exception('Table :table does not exist in your database', [':table' => $table]);
+            throw new CDatabase_Exception_QueryException(c::__('Table :table does not exist in your database', [':table' => $table]));
         }
 
         return $result;
@@ -289,7 +288,7 @@ class CDatabase_Driver_Mysqli extends CDatabase_Driver_AbstractMysql {
     /**
      * @inheritdoc
      *
-     * @return CDatabase_Driver_Mysqli_MySqlSchemaManager
+     * @return CDatabase_Schema_Manager_Mysql
      */
     public function getSchemaManager(CDatabase $db) {
         return new CDatabase_Schema_Manager_Mysql($db);

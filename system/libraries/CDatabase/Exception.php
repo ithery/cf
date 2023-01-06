@@ -73,7 +73,7 @@ class CDatabase_Exception extends CException {
     }
 
     /**
-     * @param string|null $url the URL that was provided in the connection parameters (if any)
+     * @param null|string $url the URL that was provided in the connection parameters (if any)
      *
      * @return CDatabase_Exception
      */
@@ -101,52 +101,6 @@ class CDatabase_Exception extends CException {
     public static function unknownDriver($unknownDriverName, array $knownDrivers) {
         return new self("The given 'driver' " . $unknownDriverName . ' is unknown, '
                 . 'Doctrine currently supports only the following drivers: ' . implode(', ', $knownDrivers));
-    }
-
-    /**
-     * @param \Doctrine\DBAL\Driver $driver
-     * @param \Exception            $driverEx
-     * @param string                $sql
-     * @param array                 $params
-     *
-     * @return CDatabase_Exception
-     */
-    public static function driverExceptionDuringQuery(Driver $driver, \Exception $driverEx, $sql, array $params = []) {
-        $msg = "An exception occurred while executing '" . $sql . "'";
-        if ($params) {
-            $msg .= ' with params ' . self::formatParameters($params);
-        }
-        $msg .= ":\n\n" . $driverEx->getMessage();
-
-        return static::wrapException($driver, $driverEx, $msg);
-    }
-
-    /**
-     * @param \Doctrine\DBAL\Driver $driver
-     * @param \Exception            $driverEx
-     *
-     * @return CDatabase_Exception
-     */
-    public static function driverException(Driver $driver, \Exception $driverEx) {
-        return static::wrapException($driver, $driverEx, 'An exception occurred in driver: ' . $driverEx->getMessage());
-    }
-
-    /**
-     * @param \Doctrine\DBAL\Driver $driver
-     * @param \Exception            $driverEx
-     * @param mixed                 $msg
-     *
-     * @return CDatabase_Exception
-     */
-    private static function wrapException(Driver $driver, \Exception $driverEx, $msg) {
-        if ($driverEx instanceof Exception\DriverException) {
-            return $driverEx;
-        }
-        if ($driver instanceof ExceptionConverterDriver && $driverEx instanceof Driver\DriverException) {
-            return $driver->convertException($msg, $driverEx);
-        }
-
-        return new self($msg, [], 0, $driverEx);
     }
 
     /**
