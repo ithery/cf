@@ -86,18 +86,23 @@ trait CView_Trait_ManageComponentTrait {
     public function renderComponent() {
         $view = array_pop($this->componentStack);
 
-        $data = $this->componentData();
+        $this->currentComponentData = array_merge(
+            $previousComponentData = $this->currentComponentData,
+            $data = $this->componentData()
+        );
 
-        if ($view instanceof Closure) {
-            $view = $view($data);
-        }
+        try {
+            $view = c::value($view, $data);
 
-        if ($view instanceof CView_View) {
-            return $view->with($data)->render();
-        } elseif ($view instanceof CInterface_Htmlable) {
-            return $view->toHtml();
-        } else {
-            return $this->make($view, $data)->render();
+            if ($view instanceof CView_View) {
+                return $view->with($data)->render();
+            } elseif ($view instanceof CInterface_Htmlable) {
+                return $view->toHtml();
+            } else {
+                return $this->make($view, $data)->render();
+            }
+        } finally {
+            $this->currentComponentData = $previousComponentData;
         }
     }
 
@@ -117,8 +122,38 @@ trait CView_Trait_ManageComponentTrait {
             $this->componentData[count($this->componentStack)],
             ['slot' => $defaultSlot],
             $this->slots[count($this->componentStack)],
-            ['__laravel_slots' => $slots]
+            ['__cf_slots' => $slots]
         );
+    }
+
+    /**
+     * Get an item from the component data that exists above the current component.
+     *
+     * @param string $key
+     * @param mixed  $default
+     *
+     * @return null|mixed
+     */
+    public function getConsumableComponentData($key, $default = null) {
+        if (array_key_exists($key, $this->currentComponentData)) {
+            return $this->currentComponentData[$key];
+        }
+
+        $currentComponent = count($this->componentStack);
+
+        if ($currentComponent === 0) {
+            return c::value($default);
+        }
+
+        for ($i = $currentComponent - 1; $i >= 0; $i--) {
+            $data = $this->componentData[$i] ?? [];
+
+            if (array_key_exists($key, $data)) {
+                return $data[$key];
+            }
+        }
+
+        return c::value($default);
     }
 
     /**
@@ -126,18 +161,17 @@ trait CView_Trait_ManageComponentTrait {
      *
      * @param string      $name
      * @param null|string $content
+     * @param array       $attributes
      *
      * @return void
      */
-    public function slot($name, $content = null) {
-        if (func_num_args() > 2) {
-            throw new InvalidArgumentException('You passed too many arguments to the [' . $name . '] slot.');
-        } elseif (func_num_args() === 2) {
+    public function slot($name, $content = null, $attributes = []) {
+        if (func_num_args() === 2 || $content !== null) {
             $this->slots[$this->currentComponent()][$name] = $content;
         } elseif (ob_start()) {
             $this->slots[$this->currentComponent()][$name] = '';
 
-            $this->slotStack[$this->currentComponent()][] = $name;
+            $this->slotStack[$this->currentComponent()][] = [$name, $attributes];
         }
     }
 
@@ -153,7 +187,12 @@ trait CView_Trait_ManageComponentTrait {
             $this->slotStack[$this->currentComponent()]
         );
 
-        $this->slots[$this->currentComponent()][$currentSlot] = new CBase_HtmlString(trim(ob_get_clean()));
+        list($currentName, $currentAttributes) = $currentSlot;
+
+        $this->slots[$this->currentComponent()][$currentName] = new CView_ComponentSlot(
+            trim(ob_get_clean()),
+            $currentAttributes
+        );
     }
 
     /**
@@ -163,5 +202,16 @@ trait CView_Trait_ManageComponentTrait {
      */
     protected function currentComponent() {
         return count($this->componentStack) - 1;
+    }
+
+    /**
+     * Flush all of the component state.
+     *
+     * @return void
+     */
+    protected function flushComponents() {
+        $this->componentStack = [];
+        $this->componentData = [];
+        $this->currentComponentData = [];
     }
 }
