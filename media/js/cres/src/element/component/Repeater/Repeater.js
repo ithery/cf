@@ -28,9 +28,9 @@ const addBlock = (element) => {
     componentUpdate(element);
 };
 function removeBlock(element, trigger) {
-    var block = trigger.closest('.cres-repeater-row');
+    let block = trigger.closest('.cres-repeater-row');
     if (block) {
-        var index = getIndexInArray(element.blocks, block);
+        let index = getIndexInArray(element.blocks, block);
         block.remove();
         componentUpdate(element);
     }
@@ -48,13 +48,12 @@ function initRepeater(element) {
         element.addNew.length < 1 ||
         element.blocks.length < 1 ||
         element.blockWrapper.length < 1
-    )
-        return;
+    ) {return;}
     element.firstBlock = element.blocks[0].cloneNode(true);
 
     // detect click on a Remove button
     element.element.addEventListener('click', function (event) {
-        var deleteBtn = event.target.closest('.cres-repeater-action-delete');
+        let deleteBtn = event.target.closest('.cres-repeater-action-delete');
         if (deleteBtn) {
             event.preventDefault();
             removeBlock(element, deleteBtn);
@@ -71,7 +70,6 @@ function initRepeater(element) {
 
 export default class Repeater {
     constructor(className, config = {}) {
-
         // all html elements
         this.elements =
             className instanceof Element
