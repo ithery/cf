@@ -1763,7 +1763,7 @@ class CDatabase_Query_Builder {
      *
      * @param array $values
      *
-     * @return int
+     * @return CDatabase_Result
      */
     public function update(array $values) {
         $sql = $this->grammar->compileUpdate($this, $values);
