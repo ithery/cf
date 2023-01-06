@@ -211,6 +211,7 @@ class CDatabase_Exception extends CException {
     public static function invalidDsn($dsn) {
         return new self(c::__('database.invalid_dsn', ['dsn' => $dsn]));
     }
+
     public static function tableNotFound($table) {
         return new self(c::__('database.table_not_found', ['table' => $table]));
     }
