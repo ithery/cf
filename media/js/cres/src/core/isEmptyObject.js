@@ -1,6 +1,6 @@
 
-const isEmptyObject = ( obj ) => {
-    for ( const name in obj ) {
+const isEmptyObject = (obj) => {
+    for (const name in obj) {
         return false;
     }
     return true;

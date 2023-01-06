@@ -22,12 +22,12 @@ const bootboxConfirmhandler = (el, options, confirmCallback) => {
         const labelNo = capp?.labels?.confirm?.no ?? 'No';
         optionsButtons = {
             confirm: {
-                label: labelYes,
+                label: labelYes
             },
             cancel: {
-                label: labelNo,
+                label: labelNo
             }
-        }
+        };
     }
     bootboxOptions.buttons = optionsButtons;
     window.bootbox.confirm(bootboxOptions);
@@ -84,12 +84,12 @@ export const confirmFromElement = (el, handler, defaultMessage) => {
         message: message,
         buttons: {
             confirm: {
-                label: labelYes,
+                label: labelYes
             },
             cancel: {
-                label: labelNo,
+                label: labelNo
             }
-        },
+        }
     };
     handler(btn, options, confirmCallback);
 };

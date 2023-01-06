@@ -211,7 +211,7 @@ class CCache_Manager implements CCache_Contract_FactoryInterface {
             $connection,
             $config['table'],
             $this->getPrefix($config),
-            isset($config['lock_table']) ? $config['lock_table'] : 'cache_locks',
+            isset($config['lock_table']) ? $config['lock_table'] : 'cache_lock',
             isset($config['lock_lottery']) ? $config['lock_lottery'] : [2, 100]
         );
 
