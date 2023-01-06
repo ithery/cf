@@ -226,7 +226,7 @@ class CQueue_Pipeline implements CQueue_PipelineInterface {
      *
      * @return mixed
      */
-    protected function handleException($passable, Exception $e) {
+    protected function handleException($passable, $e) {
         throw $e;
     }
 }
