@@ -45,6 +45,30 @@ class CDatabase_Query_Grammar_Mysql extends CDatabase_Query_Grammar {
     }
 
     /**
+     * Compile a "where fulltext" clause.
+     *
+     * @param \CDatabase_Query_Builder $query
+     * @param array                    $where
+     *
+     * @return string
+     */
+    public function whereFullText(CDatabase_Query_Builder $query, $where) {
+        $columns = $this->columnize($where['columns']);
+
+        $value = $this->parameter($where['value']);
+
+        $mode = ($where['options']['mode'] ?? []) === 'boolean'
+            ? ' in boolean mode'
+            : ' in natural language mode';
+
+        $expanded = ($where['options']['expanded'] ?? []) && ($where['options']['mode'] ?? []) !== 'boolean'
+            ? ' with query expansion'
+            : '';
+
+        return "match ({$columns}) against (" . $value . "{$mode}{$expanded})";
+    }
+
+    /**
      * Compile an insert ignore statement into SQL.
      *
      * @param \CDatabase_Query_Builder $query
