@@ -54,7 +54,7 @@ class CDatabase_Driver_PDO_Sqlite extends CDatabase_Driver {
                 $this->setCharset($charset);
             }
         } catch (PDOException $e) {
-            throw new CDatabase_Exception('There was an SQL error: :error', [':error' => $e->getMessage()]);
+            throw CDatabase_Exception::connectionException($e->getMessage());
         }
 
         // Clear password after successful connect
@@ -67,7 +67,7 @@ class CDatabase_Driver_PDO_Sqlite extends CDatabase_Driver {
         try {
             $sth = $this->link->prepare($sql);
         } catch (PDOException $e) {
-            throw new CDatabase_Exception('There was an SQL error: :error', [':error' => $e->getMessage()]);
+            throw CDatabase_Exception::queryException($e->getMessage());
         }
 
         return new CDatabase_Driver_PDO_Sqlite_Result($sth, $this->link, $this->dbConfig['object'], $sql);
@@ -134,6 +134,11 @@ class CDatabase_Driver_PDO_Sqlite extends CDatabase_Driver {
         return $column;
     }
 
+    /**
+     * @param int $limit
+     * @param int $offset
+     * @return string
+     */
     public function limit($limit, $offset = 0) {
         return 'LIMIT ' . $offset . ', ' . $limit;
     }
@@ -144,6 +149,7 @@ class CDatabase_Driver_PDO_Sqlite extends CDatabase_Driver {
         }
 
         if (function_exists('sqlite_escape_string')) {
+            /** @intelephense-ignore-line  */
             $res = sqlite_escape_string($str);
         } else {
             $res = str_replace("'", "''", $str);
@@ -162,7 +168,7 @@ class CDatabase_Driver_PDO_Sqlite extends CDatabase_Driver {
                 $tables[] = current($row);
             }
         } catch (PDOException $e) {
-            throw new CDatabase_Exception('There was an SQL error: :error', [':error' => $e->getMessage()]);
+            throw CDatabase_Exception::queryException($e->getMessage());
         }
 
         return $tables;

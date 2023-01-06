@@ -207,4 +207,19 @@ class CDatabase_Exception extends CException {
     public static function typeNotFound($name) {
         return new self('Type to be overwritten ' . $name . ' does not exist.');
     }
+
+    public static function invalidDsn($dsn) {
+        return new self(c::__('database.invalid_dsn', ['dsn' => $dsn]));
+    }
+    public static function tableNotFound($table) {
+        return new self(c::__('database.table_not_found', ['table' => $table]));
+    }
+
+    public static function queryException($error) {
+        return new CDatabase_Exception_QueryException(c::__('database.sql_error', ['error' => $error]));
+    }
+
+    public static function connectionException($error) {
+        return new CDatabase_Exception_ConnectionException(c::__('database.connection_error', ['error' => $error]));
+    }
 }
