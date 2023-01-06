@@ -15,8 +15,7 @@ class CDatabase_Exception extends CException {
 
     public static function invalidPlatformSpecified() {
         return new self(
-            "Invalid 'platform' option specified, need to give an instance of "
-                . "\Doctrine\DBAL\Platforms\AbstractPlatform."
+            "Invalid 'platform' option specified, need to give an instance of AbstractPlatform."
         );
     }
 
@@ -188,15 +187,7 @@ class CDatabase_Exception extends CException {
      * @return CDatabase_Exception
      */
     public static function unknownColumnType($name) {
-        return new self(
-            'Unknown column type "' . $name . '" requested. Any Doctrine type that you use has '
-                . 'to be registered with \Doctrine\DBAL\Types\Type::addType(). You can get a list of all the '
-                . 'known types with \Doctrine\DBAL\Types\Type::getTypesMap(). If this error occurs during database '
-                . 'introspection then you might have forgotten to register all database types for a Doctrine Type. Use '
-                . 'AbstractPlatform#registerDoctrineTypeMapping() or have your custom types implement '
-                . 'Type#getMappedDatabaseTypes(). If the type name is empty you might '
-                . 'have a problem with the cache or forgot some mapping information.'
-        );
+        return new self('Unknown column type "' . $name . '" requested');
     }
 
     /**
@@ -205,21 +196,41 @@ class CDatabase_Exception extends CException {
      * @return CDatabase_Exception
      */
     public static function typeNotFound($name) {
-        return new self('Type to be overwritten ' . $name . ' does not exist.');
+        return new self(c::__('database.type_not_found', ['type' => $name]));
     }
 
+    /**
+     * @param string $dsn
+     *
+     * @return CDatabase_Exception
+     */
     public static function invalidDsn($dsn) {
         return new self(c::__('database.invalid_dsn', ['dsn' => $dsn]));
     }
 
+    /**
+     * @param string $table
+     *
+     * @return CDatabase_Exception
+     */
     public static function tableNotFound($table) {
         return new self(c::__('database.table_not_found', ['table' => $table]));
     }
 
+    /**
+     * @param string $error
+     *
+     * @return CDatabase_Exception_QueryException
+     */
     public static function queryException($error) {
         return new CDatabase_Exception_QueryException(c::__('database.sql_error', ['error' => $error]));
     }
 
+    /**
+     * @param string $error
+     *
+     * @return CDatabase_Exception_ConnectionException
+     */
     public static function connectionException($error) {
         return new CDatabase_Exception_ConnectionException(c::__('database.connection_error', ['error' => $error]));
     }

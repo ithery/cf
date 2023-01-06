@@ -12,5 +12,6 @@ return [
     'must_use_table' => 'You must set a database table for your query.',
     'table_not_found' => 'Table :table does not exist in your database.',
     'not_implemented' => 'The method you called, :method, is not supported by this driver.',
-    'result_read_only' => 'Query results are read only.'
+    'result_read_only' => 'Query results are read only.',
+    'type_not_found' => 'Type to be overwritten :type does not exist.',
 ];
