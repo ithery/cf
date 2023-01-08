@@ -82,6 +82,7 @@ class CBase_Fluent implements CInterface_Arrayable, ArrayAccess, CInterface_Json
      *
      * @return bool
      */
+    #[\ReturnTypeWillChange]
     public function offsetExists($offset) {
         return isset($this->attributes[$offset]);
     }
@@ -105,6 +106,7 @@ class CBase_Fluent implements CInterface_Arrayable, ArrayAccess, CInterface_Json
      *
      * @return void
      */
+    #[\ReturnTypeWillChange]
     public function offsetSet($offset, $value) {
         $this->attributes[$offset] = $value;
     }
@@ -116,6 +118,7 @@ class CBase_Fluent implements CInterface_Arrayable, ArrayAccess, CInterface_Json
      *
      * @return void
      */
+    #[\ReturnTypeWillChange]
     public function offsetUnset($offset) {
         unset($this->attributes[$offset]);
     }

@@ -22,24 +22,6 @@ class CView_Compiler_BladeCompiler extends CView_CompilerAbstract implements CVi
         CView_Compiler_BladeCompiler_CompileRawPhpTrait,
         CView_Compiler_BladeCompiler_CompileStackTrait,
         CView_Compiler_BladeCompiler_CompileTranslationTrait;
-    /*
-      use Concerns\CompilesAuthorizations,
-      Concerns\CompilesComments,
-      Concerns\CompilesComponents,
-      Concerns\CompilesConditionals,
-      Concerns\CompilesEchos,
-      Concerns\CompilesErrors,
-      Concerns\CompilesHelpers,
-      Concerns\CompilesIncludes,
-      Concerns\CompilesInjections,
-      Concerns\CompilesJson,
-      Concerns\CompilesLayouts,
-      Concerns\CompilesLoops,
-      Concerns\CompilesRawPhp,
-      Concerns\CompilesStacks,
-      Concerns\CompilesTranslations;
-     */
-
     /**
      * All of the registered extensions.
      *
@@ -284,6 +266,59 @@ class CView_Compiler_BladeCompiler extends CView_CompilerAbstract implements CVi
         }
 
         return $result;
+    }
+
+    /**
+     * Evaluate and render a Blade string to HTML.
+     *
+     * @param string $string
+     * @param array  $data
+     * @param bool   $deleteCachedView
+     *
+     * @return string
+     */
+    public static function render($string, $data = [], $deleteCachedView = false) {
+        $component = new class($string) extends CView_ComponentAbstract {
+            protected $template;
+
+            public function __construct($template) {
+                $this->template = $template;
+            }
+
+            public function render() {
+                return $this->template;
+            }
+        };
+
+        $view = CView::factory()->make($component->resolveView(), $data);
+
+        return c::tap($view->render(), function () use ($view, $deleteCachedView) {
+            if ($deleteCachedView) {
+                unlink($view->getPath());
+            }
+        });
+    }
+
+    /**
+     * Render a component instance to HTML.
+     *
+     * @param \CView_ComponentAbstract $component
+     *
+     * @return string
+     */
+    public static function renderComponent(CView_ComponentAbstract $component) {
+        $data = $component->data();
+
+        $view = c::value($component->resolveView(), $data);
+
+        if ($view instanceof CView_View) {
+            return $view->with($data)->render();
+        } elseif ($view instanceof CInterface_Htmlable) {
+            return $view->toHtml();
+        } else {
+            return CView::factory()->make($view, $data)
+                ->render();
+        }
     }
 
     /**

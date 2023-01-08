@@ -12,7 +12,6 @@ class CView_Factory {
         CView_Trait_ManageTranslationTrait,
         CView_Trait_ManageComponentTrait,
         CView_Trait_ManageStackTrait;
-
     /**
      * The extension to engine bindings.
      *
@@ -86,30 +85,6 @@ class CView_Factory {
     /**
      * Get the evaluated view contents for the given view.
      *
-     * @param string                     $view
-     * @param CInterface_Arrayable|array $data
-     * @param array                      $mergeData
-     *
-     * @return CView_View
-     */
-    public function make($view, $data = [], $mergeData = []) {
-        $path = CView_Finder::instance()->find(
-            $view = $this->normalizeName($view)
-        );
-
-        // Next, we will create the view instance and call the view creator for the view
-        // which can set any data, etc. Then we will return the view instance back to
-        // the caller for rendering or performing other view manipulations on this.
-        $data = array_merge($mergeData, $this->parseData($data));
-
-        return c::tap($this->viewInstance($view, $path, $data), function ($view) {
-            $this->callCreator($view);
-        });
-    }
-
-    /**
-     * Get the evaluated view contents for the given view.
-     *
      * @param string                     $path
      * @param CInterface_Arrayable|array $data
      * @param array                      $mergeData
@@ -120,6 +95,29 @@ class CView_Factory {
         $data = array_merge($mergeData, $this->parseData($data));
 
         return c::tap($this->viewInstance($path, $path, $data), function ($view) {
+            $this->callCreator($view);
+        });
+    }
+
+    /**
+     * Get the evaluated view contents for the given view.
+     *
+     * @param string                     $view
+     * @param CInterface_Arrayable|array $data
+     * @param array                      $mergeData
+     *
+     * @return CView_View
+     */
+    public function make($view, $data = [], $mergeData = []) {
+        $path = CView::finder()->find(
+            $view = $this->normalizeName($view)
+        );
+        // Next, we will create the view instance and call the view creator for the view
+        // which can set any data, etc. Then we will return the view instance back to
+        // the caller for rendering or performing other view manipulations on this.
+        $data = array_merge($mergeData, $this->parseData($data));
+
+        return c::tap($this->viewInstance($view, $path, $data), function ($view) {
             $this->callCreator($view);
         });
     }
@@ -242,7 +240,7 @@ class CView_Factory {
      */
     public function exists($view) {
         try {
-            CView_Finder::instance()->find($view);
+            CView::finder()->find($view);
         } catch (InvalidArgumentException $e) {
             return false;
         }
@@ -359,7 +357,7 @@ class CView_Factory {
      * @return void
      */
     public function addLocation($location) {
-        $this->finder->addLocation($location);
+        CView::finder()->addLocation($location);
     }
 
     /**
@@ -385,7 +383,7 @@ class CView_Factory {
      * @return $this
      */
     public function prependNamespace($namespace, $hints) {
-        $this->finder->prependNamespace($namespace, $hints);
+        CView::finder()->prependNamespace($namespace, $hints);
 
         return $this;
     }
@@ -399,7 +397,7 @@ class CView_Factory {
      * @return $this
      */
     public function replaceNamespace($namespace, $hints) {
-        $this->finder->replaceNamespace($namespace, $hints);
+        CView::finder()->replaceNamespace($namespace, $hints);
 
         return $this;
     }
@@ -414,10 +412,10 @@ class CView_Factory {
      * @return void
      */
     public function addExtension($extension, $engine, $resolver = null) {
-        $this->finder->addExtension($extension);
+        CView::finder()->addExtension($extension);
 
         if (isset($resolver)) {
-            $this->engines->register($engine, $resolver);
+            CView::engineResolver()->register($engine, $resolver);
         }
 
         unset($this->extensions[$extension]);
@@ -464,7 +462,7 @@ class CView_Factory {
      * @return \CView_Finder
      */
     public function getFinder() {
-        return $this->finder;
+        return CView::finder();
     }
 
     /**
@@ -514,17 +512,6 @@ class CView_Factory {
      */
     public function getContainer() {
         return CContainer::getInstance();
-    }
-
-    /**
-     * Set the IoC container instance.
-     *
-     * @param \CContainer_Container $container
-     *
-     * @return void
-     */
-    public function setContainer(CContainer_Container $container) {
-        $this->container = $container;
     }
 
     /**

@@ -100,10 +100,23 @@ class CApp_Formatter {
         return $this;
     }
 
+    /**
+     * @return int
+     */
+    public function getCurrencyDecimalDigit() {
+        return $this->currencyDecimalDigit;
+    }
+
     public function setCurrencyStripZeroDecimal($isStriped = true) {
         $this->currencyStripZeroDecimal = $isStriped;
 
         return $this;
+    }
+    /**
+     * @return bool
+     */
+    public function getCurrencyStripZeroDecimal() {
+        return $this->currencyStripZeroDecimal;
     }
 
     public function setCurrencyPrefix($prefix) {
@@ -112,10 +125,24 @@ class CApp_Formatter {
         return $this;
     }
 
+    /**
+     * @return string
+     */
+    public function getCurrencyPrefix() {
+        return $this->currencyPrefix;
+    }
+
     public function setCurrencySuffix($suffix) {
         $this->currencySuffix = $suffix;
 
         return $this;
+    }
+
+    /**
+     * @return string
+     */
+    public function getCurrencySuffix() {
+        return $this->currencySuffix;
     }
 
     public function formatDate($x, $format = null) {
@@ -188,6 +215,7 @@ class CApp_Formatter {
     }
 
     public function formatDecimal($x, $decimalDigit = null, $decimalSeparator = null, $thousandSeparator = null, $stripZeroDecimal = false) {
+        $decimalDigit = $decimalDigit ?: $this->decimalDigit;
         return $this->formatCurrency($x, $decimalDigit, $decimalSeparator, $thousandSeparator, '', '', $stripZeroDecimal);
     }
 

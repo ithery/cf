@@ -94,6 +94,9 @@ abstract class CElement_Component_Chart extends CElement_Component {
             $dataset['fill'] = false;
 
             if ($chart instanceof CChart_Chart_PieChart) {
+                while (count($colors) < count($serie)) {
+                    $colors[] = CColor::random()->toRgba();
+                }
                 $dataset['color'] = c::collect($colors)->map(function ($color) {
                     return $this->colorToRgba($color);
                 })->all();

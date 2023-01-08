@@ -24,7 +24,7 @@ export default class ProgressBar {
                 this.maxValue = data.maxValue;
                 this.minValue = data.minValue;
                 this.updateBar();
-            }
+            };
         }
     }
 
@@ -33,7 +33,5 @@ export default class ProgressBar {
         const offset = this.value - this.config.minValue;
         const percent = length!= 0 ? offset/length * 100 : 0;
         this.bar.style.width = percent + '%';
-
     }
-
 }

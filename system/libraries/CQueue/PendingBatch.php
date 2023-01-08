@@ -9,6 +9,13 @@ class CQueue_PendingBatch {
     public $name = '';
 
     /**
+     * The Org Id.
+     *
+     * @var int
+     */
+    public $orgId = null;
+
+    /**
      * The jobs that belong to the batch.
      *
      * @var \CCollection
@@ -26,11 +33,33 @@ class CQueue_PendingBatch {
      * Create a new pending batch instance.
      *
      * @param \CCollection $jobs
+     * @param null|int     $orgId
      *
      * @return void
      */
-    public function __construct(CCollection $jobs) {
+    public function __construct(CCollection $jobs, $orgId = null) {
         $this->jobs = $jobs;
+        if (func_num_args() == 1) {
+            $orgId = CF::orgId();
+        }
+        $this->orgId = $orgId;
+    }
+
+    /**
+     * Add jobs to the batch.
+     *
+     * @param iterable|object|array $jobs
+     *
+     * @return $this
+     */
+    public function add($jobs) {
+        $jobs = is_iterable($jobs) ? $jobs : carr::wrap($jobs);
+
+        foreach ($jobs as $job) {
+            $this->jobs->push($job);
+        }
+
+        return $this;
     }
 
     /**
@@ -185,6 +214,20 @@ class CQueue_PendingBatch {
     }
 
     /**
+     * Add additional data into the batch's options array.
+     *
+     * @param string $key
+     * @param mixed  $value
+     *
+     * @return $this
+     */
+    public function withOption($key, $value) {
+        $this->options[$key] = $value;
+
+        return $this;
+    }
+
+    /**
      * Dispatch the batch.
      *
      * @throws \Throwable
@@ -196,7 +239,6 @@ class CQueue_PendingBatch {
 
         try {
             $batch = $repository->store($this);
-
             $batch = $batch->add($this->jobs);
         } catch (Exception $e) {
             if (isset($batch)) {
@@ -208,5 +250,53 @@ class CQueue_PendingBatch {
         CEvent::dispatch(new CQueue_Event_BatchDispatched($batch));
 
         return $batch;
+    }
+
+    /**
+     * Dispatch the batch after the response is sent to the browser.
+     *
+     * @return \CQueue_Batch
+     */
+    public function dispatchAfterResponse() {
+        $repository = CQueue::batchRepository();
+
+        $batch = $repository->store($this);
+
+        if ($batch) {
+            CF::terminating(function () use ($batch) {
+                $this->dispatchExistingBatch($batch);
+            });
+        }
+
+        return $batch;
+    }
+
+    /**
+     * Dispatch an existing batch.
+     *
+     * @param \CQueue_Batch $batch
+     *
+     * @throws \Throwable
+     *
+     * @return void
+     */
+    protected function dispatchExistingBatch($batch) {
+        try {
+            $batch = $batch->add($this->jobs);
+        } catch (Throwable $e) {
+            if (isset($batch)) {
+                $batch->delete();
+            }
+
+            throw $e;
+        } catch (Exception $e) {
+            if (isset($batch)) {
+                $batch->delete();
+            }
+
+            throw $e;
+        }
+
+        CEvent::dispatch(new CQueue_Event_BatchDispatched($batch));
     }
 }

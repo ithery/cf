@@ -1,4 +1,4 @@
- /**
+/**
  * Global helper object
  */
 const helper = {
@@ -15,7 +15,7 @@ const helper = {
             monthsShort: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'],
             meridiem: ['AM', 'PM'],
             ordinal: function (number) {
-                var n = number % 10, suffixes = {1: 'st', 2: 'nd', 3: 'rd'};
+                let n = number % 10, suffixes = {1: 'st', 2: 'nd', 3: 'rd'};
                 return Math.floor(number % 100 / 10) === 1 || !suffixes[n] ? 'th' : suffixes[n];
             }
         },
@@ -32,22 +32,22 @@ const helper = {
         return typeof (str1) === 'string' && typeof (str2) === 'string' && str1.toLowerCase() === str2.toLowerCase();
     },
     lpad: function (value, length, chr) {
-        var val = value.toString();
+        let val = value.toString();
         chr = chr || '0';
         return val.length < length ? helper.lpad(chr + val, length) : val;
     },
     merge: function (out) {
-        var i, obj;
+        let i, obj;
         out = out || {};
         for (i = 1; i < arguments.length; i++) {
             obj = arguments[i];
             if (!obj) {
                 continue;
             }
-            for (var key in obj) {
+            for (let key in obj) {
                 if (obj.hasOwnProperty(key)) {
                     if (typeof obj[key] === 'object') {
-                        $h.merge(out[key], obj[key]);
+                        helper.merge(out[key], obj[key]);
                     } else {
                         out[key] = obj[key];
                     }
@@ -57,7 +57,7 @@ const helper = {
         return out;
     },
     getIndex: function (val, arr) {
-        for (var i = 0; i < arr.length; i++) {
+        for (let i = 0; i < arr.length; i++) {
             if (arr[i].toLowerCase() === val.toLowerCase()) {
                 return i;
             }

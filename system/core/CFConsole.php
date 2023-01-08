@@ -32,6 +32,7 @@ class CFConsole {
         CConsole_Command_Cron_ScheduleTestCommand::class,
         CConsole_Command_Queue_ClearCommand::class,
         CConsole_Command_Queue_ListFailedCommand::class,
+        CConsole_Command_Queue_PruneBatchesCommand::class,
         CConsole_Command_DevSuite_DevSuiteInstallCommand::class,
         CConsole_Command_DevSuite_DevSuiteStartCommand::class,
         CConsole_Command_DevSuite_DevSuiteUninstallCommand::class,

@@ -10,7 +10,6 @@ defined('SYSPATH') or die('No direct access allowed.');
  */
 class CView_ComponentAttributeBag implements ArrayAccess, CInterface_Htmlable, IteratorAggregate {
     use CTrait_Macroable;
-
     /**
      * The raw array of attributes.
      *
@@ -175,13 +174,13 @@ class CView_ComponentAttributeBag implements ArrayAccess, CInterface_Htmlable, I
 
         list($appendableAttributes, $nonAppendableAttributes) = c::collect($this->attributes)
             ->partition(function ($value, $key) use ($attributeDefaults) {
-                    return $key === 'class'
+                return $key === 'class'
                     || (isset($attributeDefaults[$key])
                     && $attributeDefaults[$key] instanceof CView_AppendableAttributeValue);
-                });
+            });
 
         $attributes = $appendableAttributes->mapWithKeys(function ($value, $key) use ($attributeDefaults, $escape) {
-            $defaultsValue = isset($attributeDefaults[$key]) && $attributeDefaults[$key] instanceof AppendableAttributeValue ? $this->resolveAppendableAttributeDefault($attributeDefaults, $key, $escape) : (carr::get($attributeDefaults, $key, ''));
+            $defaultsValue = isset($attributeDefaults[$key]) && $attributeDefaults[$key] instanceof CView_AppendableAttributeValue ? $this->resolveAppendableAttributeDefault($attributeDefaults, $key, $escape) : (carr::get($attributeDefaults, $key, ''));
 
             return [$key => implode(' ', array_unique(array_filter([$defaultsValue, $value])))];
         })->merge($nonAppendableAttributes)->all();
@@ -292,6 +291,7 @@ class CView_ComponentAttributeBag implements ArrayAccess, CInterface_Htmlable, I
      *
      * @return bool
      */
+    #[ReturnTypeWillChange]
     public function offsetExists($offset) {
         return isset($this->attributes[$offset]);
     }
@@ -315,6 +315,7 @@ class CView_ComponentAttributeBag implements ArrayAccess, CInterface_Htmlable, I
      *
      * @return void
      */
+    #[ReturnTypeWillChange]
     public function offsetSet($offset, $value) {
         $this->attributes[$offset] = $value;
     }
@@ -326,6 +327,7 @@ class CView_ComponentAttributeBag implements ArrayAccess, CInterface_Htmlable, I
      *
      * @return void
      */
+    #[ReturnTypeWillChange]
     public function offsetUnset($offset) {
         unset($this->attributes[$offset]);
     }
@@ -335,6 +337,7 @@ class CView_ComponentAttributeBag implements ArrayAccess, CInterface_Htmlable, I
      *
      * @return \ArrayIterator
      */
+    #[ReturnTypeWillChange]
     public function getIterator() {
         return new ArrayIterator($this->attributes);
     }
