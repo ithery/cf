@@ -59,6 +59,8 @@ class CApp implements CInterface_Responsable, CInterface_Renderable, CInterface_
 
     protected $data = [];
 
+    protected $id = null;
+
     /**
      * @var CApp_PWA
      */
