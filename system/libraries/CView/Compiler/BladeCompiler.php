@@ -22,6 +22,7 @@ class CView_Compiler_BladeCompiler extends CView_CompilerAbstract implements CVi
         CView_Compiler_BladeCompiler_CompileRawPhpTrait,
         CView_Compiler_BladeCompiler_CompileStackTrait,
         CView_Compiler_BladeCompiler_CompileTranslationTrait;
+
     /**
      * All of the registered extensions.
      *
@@ -278,17 +279,7 @@ class CView_Compiler_BladeCompiler extends CView_CompilerAbstract implements CVi
      * @return string
      */
     public static function render($string, $data = [], $deleteCachedView = false) {
-        $component = new class($string) extends CView_ComponentAbstract {
-            protected $template;
-
-            public function __construct($template) {
-                $this->template = $template;
-            }
-
-            public function render() {
-                return $this->template;
-            }
-        };
+        $component = new CView_Component_TemplateComponent($string);
 
         $view = CView::factory()->make($component->resolveView(), $data);
 
