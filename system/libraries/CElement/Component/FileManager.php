@@ -38,7 +38,7 @@ class CElement_Component_FileManager extends CElement_Component {
     }
 
     /**
-     * @param type $diskName
+     * @param string $diskName
      *
      * @return $this
      */
@@ -85,8 +85,8 @@ class CElement_Component_FileManager extends CElement_Component {
         CManager::instance()->asset()->module()->registerRunTimeModule('jquery-ui-1.12.1.custom');
         CManager::instance()->asset()->module()->registerRunTimeModule('dropzone');
         CManager::instance()->asset()->module()->registerRunTimeModule('cropper');
-        CManager::registerCss('element/filemanager/fm.css?v=2' . uniqid());
-        CManager::registerJs('element/filemanager/fm.js?v=1' . uniqid());
+        CManager::registerCss('element/filemanager/fm.css');
+        CManager::registerJs('element/filemanager/fm.js');
         $this->addTemplate()->setTemplate('CElement/Component/FileManager/Index')->setVar('fm', $fm);
     }
 
