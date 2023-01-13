@@ -28,13 +28,12 @@ class CManager_File_Connector_FileManager_FM {
      * //@param mixed         $payload
      * //@param bool          $halt
      *
-     * @return array|null
+     * @return null|array
      */
     public static function dispatch() {
         $args = func_get_args();
         $event = carr::get($args, 0);
         $payload = array_slice($args, 1);
-
 
         return CEvent::dispatcher()->dispatch($event, $payload);
     }
@@ -44,7 +43,7 @@ class CManager_File_Connector_FileManager_FM {
     }
 
     /**
-     * Get Input
+     * Get Input.
      *
      * @param string $key
      *
@@ -74,6 +73,7 @@ class CManager_File_Connector_FileManager_FM {
         if (in_array($request_type, $available_types)) {
             $fmType = $request_type;
         }
+
         return $fmType;
     }
 
@@ -92,6 +92,7 @@ class CManager_File_Connector_FileManager_FM {
         if ($this->isRunningOnWindows()) {
             $input = iconv('UTF-8', mb_detect_encoding($input), $input);
         }
+
         return $input;
     }
 
@@ -111,6 +112,7 @@ class CManager_File_Connector_FileManager_FM {
     public function getTranslation() {
         $translator = CTranslation::translator();
         $data = $translator->get('filemanager');
+
         return $data;
     }
 
@@ -141,6 +143,7 @@ class CManager_File_Connector_FileManager_FM {
         if (!$this->allowMultiUser()) {
             return true;
         }
+
         return $this->config('allow_share_folder') === true;
     }
 
@@ -152,6 +155,7 @@ class CManager_File_Connector_FileManager_FM {
         if (in_array($targetDisplayType, ['list', 'grid'])) {
             $viewType = $targetDisplayType;
         }
+
         return $viewType;
     }
 
@@ -184,6 +188,7 @@ class CManager_File_Connector_FileManager_FM {
         }
         $app = CApp::instance();
         $user = $app->user();
+
         return $user ? $user->username : '';
     }
 
@@ -197,6 +202,7 @@ class CManager_File_Connector_FileManager_FM {
         if ($this->isRunningOnWindows()) {
             $ds = '\\';
         }
+
         return $ds;
     }
 

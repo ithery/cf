@@ -1,16 +1,9 @@
 <?php
 
-defined('SYSPATH') or die('No direct access allowed.');
-
-/**
- * @author Hery Kurniawan
- * @license Ittron Global Teknologi <ittron.co.id>
- *
- * @since Mar 28, 2019, 1:41:33 AM
- */
 use CManager_File_Connector_FileManager_FM as FM;
 
 class CElement_Component_FileManager extends CElement_Component {
+    //use CElement_Trait_UseViewTrait;
     protected $disk = null;
 
     protected $rootPath = null;
@@ -87,7 +80,8 @@ class CElement_Component_FileManager extends CElement_Component {
         CManager::instance()->asset()->module()->registerRunTimeModule('cropper');
         CManager::registerCss('element/filemanager/fm.css');
         CManager::registerJs('element/filemanager/fm.js');
-        $this->addTemplate()->setTemplate('CElement/Component/FileManager/Index')->setVar('fm', $fm);
+        $this->addView('cresenity.element.component.file-manager.index', ['fm' => $fm]);
+        //$this->addTemplate()->setTemplate('CElement/Component/FileManager/Index')->setVar('fm', $fm);
     }
 
     protected function buildConfig() {

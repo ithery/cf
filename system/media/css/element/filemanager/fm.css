@@ -16,6 +16,9 @@
 .capp-fm #nav .dropdown-menu > a:hover {
     color: #333844;
 }
+.capp-fm .navbar-brand {
+    padding: 0;
+}
 .capp-fm #actions {
     display: flex;
 }
