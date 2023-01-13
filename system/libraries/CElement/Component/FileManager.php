@@ -80,7 +80,10 @@ class CElement_Component_FileManager extends CElement_Component {
         CManager::instance()->asset()->module()->registerRunTimeModule('cropper');
         CManager::registerCss('element/filemanager/fm.css');
         CManager::registerJs('element/filemanager/fm.js');
-        $this->addView('cresenity.element.component.file-manager.index', ['fm' => $fm]);
+        $this->addView(
+            'cresenity.element.component.file-manager.index',
+            ['fm' => $fm]
+        );
         //$this->addTemplate()->setTemplate('CElement/Component/FileManager/Index')->setVar('fm', $fm);
     }
 

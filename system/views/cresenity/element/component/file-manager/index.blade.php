@@ -2,7 +2,7 @@
     <nav class="navbar sticky-top navbar-expand-lg navbar-dark" id="nav">
         <a class="navbar-brand invisible-lg d-none d-lg-inline" id="to-previous">
             <i class="fas fa-arrow-left fa-fw"></i>
-            <span class="d-none d-lg-inline"><?php echo clang::__('filemanager.nav-back'); ?></span>
+            <span class="d-none d-lg-inline">{{ $fm->getLabel('nav-back') }}</span>
         </a>
         <a class="navbar-brand d-block d-lg-none" id="show_tree">
             <i class="fas fa-bars fa-fw"></i>
@@ -12,7 +12,7 @@
         <div class="ml-auto px-2">
             <a class="navbar-link d-none" id="multi_selection_toggle">
                 <i class="fa fa-check-double fa-fw"></i>
-                <span class="d-none d-lg-inline"><?php echo clang::__('filemanager.menu-multiple'); ?></span>
+                <span class="d-none d-lg-inline"><?php echo c::__('filemanager.menu-multiple'); ?></span>
             </a>
         </div>
         <a class="navbar-toggler collapsed border-0 px-1 py-2 m-0" data-toggle="collapse" data-target="#nav-buttons">
@@ -23,18 +23,19 @@
                 <li class="nav-item">
                     <a class="nav-link" data-display="grid">
                         <i class="fas fa-th-large fa-fw"></i>
-                        <span><?php echo clang::__('filemanager.nav-thumbnails'); ?></span>
+                        <span>{{ $fm->getLabel('nav-thumbnails') }}</span>
                     </a>
                 </li>
                 <li class="nav-item">
                     <a class="nav-link" data-display="list">
                         <i class="fas fa-list-ul fa-fw"></i>
-                        <span><?php echo clang::__('filemanager.nav-list'); ?></span>
+                        <span>{{ $fm->getLabel('nav-list') }}</span>
                     </a>
                 </li>
                 <li class="nav-item dropdown">
                     <a class="nav-link dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">
-                        <i class="fas fa-sort fa-fw"></i><?php echo clang::__('filemanager.nav-sort'); ?>
+                        <i class="fas fa-sort fa-fw"></i>
+                        <span>{{ $fm->getLabel('nav-sort') }}</span>
                     </a>
                     <div class="dropdown-menu dropdown-menu-right border-0"></div>
                 </li>
@@ -44,12 +45,12 @@
 
     <nav class="bg-light fixed-bottom border-top d-none" id="actions">
         <a data-action="open" data-multiple="false"><i class="fas fa-folder-open"></i><?php echo clang::__('filemanager.btn-open'); ?></a>
-        <?php if ($fm->config('action.preview')): ?>
+        @if($fm->config('action.preview'))
             <a data-action="preview" data-multiple="true"><i class="fas fa-images"></i><?php echo clang::__('filemanager.menu-view'); ?></a>
-        <?php endif; ?>
-        <?php if ($fm->config('action.use')): ?>
+        @endif
+        @if($fm->config('action.use'))
             <a data-action="use" data-multiple="true"><i class="fas fa-check"></i><?php echo clang::__('filemanager.btn-confirm'); ?></a>
-        <?php endif; ?>
+        @endif
     </nav>
 
     <div class="d-flex flex-row">
@@ -66,7 +67,7 @@
 
             <div id="empty" class="d-none">
                 <i class="far fa-folder-open"></i>
-                <?php echo clang::__('filemanager.message-empty'); ?>
+                {{ $fm->getLabel('message-empty') }}
             </div>
 
             <div id="content"></div>
@@ -88,7 +89,7 @@
         <div class="modal-dialog">
             <div class="modal-content">
                 <div class="modal-header">
-                    <h4 class="modal-title" id="myModalLabel"><?php echo clang::__('filemanager.title-upload'); ?></h4>
+                    <h4 class="modal-title" id="myModalLabel">{{ $fm->getLabel('title-upload') }}</h4>
                     <button type="button" class="close" data-dismiss-modal="uploadModal" aria-label="Close"><span aia-hidden="true">&times;</span></button>
                 </div>
                 <div class="modal-body">
@@ -96,17 +97,17 @@
                         <div class="form-group" id="attachment">
                             <div class="controls text-center">
                                 <div class="input-group w-100">
-                                    <a class="btn btn-primary w-100 text-white" id="upload-button"><?php echo clang::__('filemanager.message-choose'); ?></a>
+                                    <a class="btn btn-primary w-100 text-white" id="upload-button">{{ $fm->getLabel('message-choose') }}</a>
                                 </div>
                             </div>
                         </div>
-                        <input type='hidden' name='working_dir' id='working_dir'>
-                        <input type='hidden' name='type' id='type' value='<?php echo CHTTP::request()->input('type'); ?>'>
-                        <input type='hidden' name='_token' value='{{ c::csrfToken() }}'>
+                        <input type="hidden" name="working_dir" id="working_dir">
+                        <input type="hidden" name="type" id="type" value="{{ c::request()->input('type') }}">
+                        <input type="hidden" name="_token" value="{{ c::csrfToken() }}">
                     </form>
                 </div>
                 <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary w-100" data-dismiss-modal="uploadModal"><?php echo clang::__('filemanager.btn-close'); ?></button>
+                    <button type="button" class="btn btn-secondary w-100" data-dismiss-modal="uploadModal">{{ $fm->getLabel('btn-close') }}</button>
                 </div>
             </div>
         </div>
@@ -117,8 +118,8 @@
             <div class="modal-content">
                 <div class="modal-body"></div>
                 <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary w-100" data-dismiss-modal="notify"><?php echo clang::__('filemanager.btn-close'); ?></button>
-                    <button type="button" class="btn btn-primary w-100" data-dismiss-modal="notify"><?php echo clang::__('filemanager.btn-confirm'); ?></button>
+                    <button type="button" class="btn btn-secondary w-100" data-dismiss-modal="notify">{{ $fm->getLabel('btn-close') }}</button>
+                    <button type="button" class="btn btn-primary w-100" data-dismiss-modal="notify">{{ $fm->getLabel('btn-confirm') }}</button>
                 </div>
             </div>
         </div>
@@ -134,8 +135,8 @@
                     <input type="text" class="form-control">
                 </div>
                 <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary w-100" data-dismiss-modal="dialog"><?php echo clang::__('filemanager.btn-close'); ?></button>
-                    <button type="button" class="btn btn-primary w-100" data-dismiss-modal="dialog"><?php echo clang::__('filemanager.btn-confirm'); ?></button>
+                    <button type="button" class="btn btn-secondary w-100" data-dismiss-modal="dialog">{{ $fm->getLabel('btn-close') }}</button>
+                    <button type="button" class="btn btn-primary w-100" data-dismiss-modal="dialog">{{ $fm->getLabel('btn-confirm') }}</button>
                 </div>
             </div>
         </div>
@@ -195,7 +196,7 @@
         $('#uploadModal').modal('hide');
 
     });
-    var lang = <?php echo json_encode($fm->getTranslation()); ?>;
+    var lang = @json($fm->getTranslation());
     var config = {};
     config.action = <?php echo json_encode($fm->config('action')); ?>;
     var actions = [];

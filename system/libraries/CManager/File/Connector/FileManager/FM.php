@@ -15,6 +15,8 @@ class CManager_File_Connector_FileManager_FM {
 
     protected $config = [];
 
+    protected $labels;
+
     public function __construct($config = []) {
         $this->config = $config;
 
@@ -110,10 +112,16 @@ class CManager_File_Connector_FileManager_FM {
     }
 
     public function getTranslation() {
-        $translator = CTranslation::translator();
-        $data = $translator->get('filemanager');
+        if ($this->labels == null) {
+            $translator = CTranslation::translator();
+            $this->labels = $translator->getLoader()->load($translator->getLocale(), 'element/filemanager');
+        }
 
-        return $data;
+        return $this->labels;
+    }
+
+    public function getLabel($key, $default = null) {
+        return carr::get($this->getTranslation(), $key, $default);
     }
 
     public function allowFolderType($type) {
