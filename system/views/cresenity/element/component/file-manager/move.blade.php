@@ -1,13 +1,3 @@
-<?php
-defined('SYSPATH') or die('No direct access allowed.');
-
-/**
- * @author Hery Kurniawan
- * @license Ittron Global Teknologi <ittron.co.id>
- *
- * @since Aug 11, 2019, 10:03:55 PM
- */
-?>
 <ul class="nav nav-pills flex-column">
     <?php foreach ($rootFolders as $rootFolder): ?>
         <li class="nav-item">

@@ -53,8 +53,8 @@
         @endif
     </nav>
 
-    <div class="d-flex flex-row">
-        <div id="tree"></div>
+    <div class="d-flex flex-row capp-fm-body">
+        <div id="tree" class="capp-fm-tree"></div>
 
         <div id="main">
             <div id="alerts"></div>
@@ -198,7 +198,7 @@
     });
     var lang = @json($fm->getTranslation());
     var config = {};
-    config.action = <?php echo json_encode($fm->config('action')); ?>;
+    config.action = @json($fm->config('action'));
     var actions = [];
     if (config.action.use) {
         actions.push({

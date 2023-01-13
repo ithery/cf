@@ -10,11 +10,14 @@
 }
 .capp-fm #nav, .capp-fm #nav .dropdown-menu, .capp-fm .bg-main {
     background-color: #333844;
-    height: 40px;
     border-radius: 4px;
+    color: #fff;
+}
+.capp-fm #nav {
+    height: 40px;
 }
 .capp-fm #nav .dropdown-menu > a:hover {
-    color: #333844;
+    color: #fff;
 }
 .capp-fm .navbar-brand {
     padding: 0;
@@ -53,6 +56,9 @@
     padding: 10px;
     background: #fff;
     border-bottom: 1px solid #eee;
+}
+.capp-fm-body {
+    position: relative;
 }
 
 @media screen and (min-width: 992px) {

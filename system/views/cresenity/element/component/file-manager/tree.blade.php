@@ -1,4 +1,4 @@
-<div class="m-3 d-none">
+{{-- <div class="m-3 d-none">
     <h1 style="font-size: 1.5rem;">File Manager</h1>
     <small class="d-block">Ver 2.0</small>
     <div class="row mt-3">
@@ -15,7 +15,7 @@
     <div class="progress mt-3" style="height: .5rem;">
         <div class="progress-bar progress-bar-striped progress-bar-animated w-75 bg-main" role="progressbar" aria-valuenow="75" aria-valuemin="0" aria-valuemax="100"></div>
     </div>
-</div>
+</div> --}}
 
 <ul class="nav nav-pills flex-column">
     <?php foreach ($rootFolders as $rootFolder): ?>
