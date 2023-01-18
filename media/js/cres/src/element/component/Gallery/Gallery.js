@@ -52,6 +52,7 @@ export default class Gallery {
             this.config.dynamicEl !== undefined &&
             !Array.isArray(this.config.dynamicEl)
         ) {
+            // eslint-disable-next-line no-throw-literal
             throw 'When using dynamic mode, you must also define dynamicEl as an Array.';
         }
 
@@ -690,6 +691,7 @@ export default class Gallery {
     initPictureFill($img) {
         if (this.config.supportLegacyBrowser) {
             try {
+                // eslint-disable-next-line no-undef
                 picturefill({
                     elements: [$img.get()]
                 });

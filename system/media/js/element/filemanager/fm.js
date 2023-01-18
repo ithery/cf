@@ -680,9 +680,9 @@ var CFileManager = function (options) {
     });
     this.toggleMobileTree = (should_display) => {
         if (should_display === undefined) {
-            should_display = !$('#tree').hasClass('in');
+            should_display = !$('.capp-fm-tree').hasClass('in');
         }
-        $('#tree').toggleClass('in', should_display);
+        $('.capp-fm-tree').toggleClass('in', should_display);
     };
 
     // eslint-disable-next-line no-unused-vars
