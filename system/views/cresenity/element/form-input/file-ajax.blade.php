@@ -3,23 +3,23 @@ defined('SYSPATH') or die('No direct access allowed.');
 
 ?>
 
-<div id="container-<?php echo $id; ?>" class="fileupload fileupload-new" >
+<div id="container-{{ $id }}" class="fileupload fileupload-new" >
     <div class="fileupload-new">
-        <i class="far fa-file fileupload-new"></i> <span class="fileupload-new"><?php echo $fileName; ?></span>
+        <i class="far fa-file fileupload-new"></i> <span class="fileupload-new">{{ $fileName }}</span>
     </div>
     <div class="fileupload-preview fileupload-exists">
         <i class="far fa-file fileupload-exists"></i> <span class="fileupload-exists"></span>
     </div>
     <div>
-        <?php if (!$disabledUpload): ?>
+        @if(!$disabledUpload)
             <span class="btn btn-file btn-primary">
                 <span class="fileupload-new"><?php echo clang::__('Select File'); ?></span>
                 <span class="fileupload-change fileupload-exists"><?php echo clang::__('Change'); ?></span>
-                <input id="input-temp-<?php echo $id; ?>" type="file" name="input-temp-<?php echo $id; ?>" style="display:none;" accept="<?php echo $acceptFile; ?>"/>
-                <input type="hidden" id="<?php echo $id; ?>" name="<?php echo $name; ?>" value="<?php echo $value; ?>" />
+                <input id="input-temp-{{ $id }}" type="file" name="input-temp-{{ $id }}" style="display:none;" accept="{{ $acceptFile }}"/>
+                <input type="hidden" id="{{ $id }}" name="{{ $name }}" value="<?php echo $value; ?>" />
             </span>
             <a href="javascript:;" class="btn fileupload-remove fileupload-exists btn-danger" data-dismiss="fileupload"><?php echo clang::__('Remove'); ?></a>
-        <?php endif; ?>
+        @endif
     </div>
 </div>
 
