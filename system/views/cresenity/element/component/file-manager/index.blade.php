@@ -12,7 +12,7 @@
         <div class="ml-auto px-2">
             <a class="navbar-link d-none" id="multi_selection_toggle">
                 <i class="fa fa-check-double fa-fw"></i>
-                <span class="d-none d-lg-inline"><?php echo c::__('filemanager.menu-multiple'); ?></span>
+                <span class="d-none d-lg-inline">{{ $fm->getLabel('menu-multiple') }}></span>
             </a>
         </div>
         <a class="navbar-toggler collapsed border-0 px-1 py-2 m-0" data-toggle="collapse" data-target="#nav-buttons">
@@ -44,12 +44,12 @@
     </nav>
 
     <nav class="bg-light fixed-bottom border-top d-none" id="actions">
-        <a data-action="open" data-multiple="false"><i class="fas fa-folder-open"></i><?php echo clang::__('filemanager.btn-open'); ?></a>
+        <a data-action="open" data-multiple="false"><i class="fas fa-folder-open"></i>{{ $fm->getLabel('btn-open') }}</a>
         @if($fm->config('action.preview'))
-            <a data-action="preview" data-multiple="true"><i class="fas fa-images"></i><?php echo clang::__('filemanager.menu-view'); ?></a>
+            <a data-action="preview" data-multiple="true"><i class="fas fa-images"></i>{{ $fm->getLabel('menu-view') }}</a>
         @endif
         @if($fm->config('action.use'))
-            <a data-action="use" data-multiple="true"><i class="fas fa-check"></i><?php echo clang::__('filemanager.btn-confirm'); ?></a>
+            <a data-action="use" data-multiple="true"><i class="fas fa-check"></i>{{ $fm->getLabel('btn-confirm') }}</a>
         @endif
     </nav>
 

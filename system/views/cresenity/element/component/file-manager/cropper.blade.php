@@ -22,15 +22,15 @@
                     2:3
                 </label>
                 <label class="btn btn-info btn-aspectRatio" onclick="changeAspectRatio(this, null)">
-                    <?php echo clang::__('filemanager.btn-crop-free'); ?>
+                    {{ $fm->getLabel('btn-crop-free') }}
                 </label>
             </div>
             <br>
             <br>
             <div class="btn-group clearfix">
-                <button class="btn btn-secondary btn-cropper-load-items" ><?php echo clang::__('filemanager.btn-cancel'); ?></button>
-                <button class="btn btn-warning btn-cropper-perform-crop-new" ><?php echo clang::__('filemanager.btn-copy-crop'); ?></button>
-                <button class="btn btn-primary btn-cropper-perform-crop" ><?php echo clang::__('filemanager.btn-crop'); ?></button>
+                <button class="btn btn-secondary btn-cropper-load-items" >{{ $fm->getLabel('btn-cancel') }}</button>
+                <button class="btn btn-warning btn-cropper-perform-crop-new" >{{ $fm->getLabel('btn-copy-crop') }}</button>
+                <button class="btn btn-primary btn-cropper-perform-crop" >{{ $fm->getLabel('btn-crop') }}</button>
             </div>
             <form id='cropForm'>
                 <input type="hidden" id="img" name="img" value="<?php echo $img->name; ?>">

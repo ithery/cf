@@ -28,37 +28,37 @@
                 <tbody>
                     <?php if ($scaled): ?>
                         <tr>
-                            <td class="text-nowrap"><?php echo clang::__('filemanager.resize-ratio'); ?></td>
+                            <td class="text-nowrap">{{ $fm->getLabel('resize-ratio') }}</td>
                             <td class="text-right"><?php echo number_format($ratio, 2); ?></td>
                         </tr>
                         <tr>
-                            <td class="text-nowrap"><?php echo clang::__('filemanager.resize-scaled'); ?></td>
+                            <td class="text-nowrap">{{ $fm->getLabel('resize-scaled') }}</td>
                             <td class="text-right">
-                                <?php echo clang::__('filemanager.resize-true'); ?>
+                                {{ $fm->getLabel('resize-true') }}
                             </td>
                         </tr>
                     <?php endif; ?>
                     <tr>
-                        <td class="text-nowrap"><?php echo clang::__('filemanager.resize-old-height'); ?></td>
+                        <td class="text-nowrap">{{ $fm->getLabel('resize-old-height') }}</td>
                         <td class="text-right"><?php echo $original_height; ?>px</td>
                     </tr>
                     <tr>
-                        <td class="text-nowrap"><?php echo clang::__('filemanager.resize-old-width'); ?></td>
+                        <td class="text-nowrap">{{ $fm->getLabel('resize-old-width') }}</td>
                         <td class="text-right"><?php echo $original_width; ?>px</td>
                     </tr>
                     <tr>
-                        <td class="text-nowrap" style="vertical-align: middle"><?php echo clang::__('filemanager.resize-new-height'); ?></td>
+                        <td class="text-nowrap" style="vertical-align: middle">{{ $fm->getLabel('resize-new-height') }}</td>
                         <td class="text-right"><input type="text" id="height_display" class="form-control w-50 d-inline mr-2" value="<?php echo $height; ?>">px</td>
                     </tr>
                     <tr>
-                        <td class="text-nowrap" style="vertical-align: middle"><?php echo clang::__('filemanager.resize-new-width'); ?></td>
+                        <td class="text-nowrap" style="vertical-align: middle">{{ $fm->getLabel('resize-new-width') }}</td>
                         <td class="text-right"><input type="text" id="width_display" class="form-control w-50 d-inline mr-2" value="<?php echo $width; ?>">px</td>
                     </tr>
                 </tbody>
             </table>
             <div class="d-flex mb-3">
-                <button class="btn btn-secondary w-50 mr-1 btn-resizer-load-items" onclick="loadItems()"><?php echo clang::__('filemanager.btn-cancel'); ?></button>
-                <button class="btn btn-primary w-50 btn-resizer-perform-resize" ><?php echo clang::__('filemanager.btn-resize'); ?></button>
+                <button class="btn btn-secondary w-50 mr-1 btn-resizer-load-items" onclick="loadItems()">{{ $fm->getLabel('btn-cancel') }}</button>
+                <button class="btn btn-primary w-50 btn-resizer-perform-resize" >{{ $fm->getLabel('btn-resize') }}</button>
             </div>
 
             <input type="hidden" id="img" name="img" value="<?php echo $img->name; ?>">
