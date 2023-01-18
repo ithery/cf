@@ -47,7 +47,7 @@ defined('SYSPATH') or die('No direct access allowed.');
                 var filesize = event.total;
                 var maxUploadSize = <?php echo $id; ?>maxUploadSize;
                 if (maxUploadSize && filesize > maxUploadSize) {
-                    $.cresenity.message('', '<div class="alert alert-danger text-center"><b>Error:</b> File Size is more than ' + <?php echo $maxUploadSize; ?> + ' MB</div>', 'bootbox');
+                    cresenity.message('error', 'File Size is more than ' + <?php echo $maxUploadSize; ?> + ' MB');
                 } else {
                     $('#container-<?php echo $id; ?> .fileupload-preview span').html(event.target.fileName);
                     $('#container-<?php echo $id; ?>').removeClass('fileupload-new');
