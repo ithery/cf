@@ -16,6 +16,7 @@
                     if (payload && payload.notification) {
                         cresenity.toast('info', payload.notification.title + '<br/>' + payload.notification.body);
                     }
+                    cresenity.dispatch('notification:message', {payload : payload});
                 });
 
                 // Send the registration token your application server, so that it can:
