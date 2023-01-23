@@ -253,7 +253,6 @@ trait CElement_Component_DataTable_Trait_JavascriptTrait {
             }
             $js->appendln('buttons:        ' . json_encode($this->buttons) . ',')->br();
 
-
             /*
               $js->append("
               initComplete : function() {
@@ -288,8 +287,6 @@ trait CElement_Component_DataTable_Trait_JavascriptTrait {
                     [' . $km . '],
                     [' . $vm . ']
 				],')->br();
-
-
 
             if ($this->dom == null) {
                 $this->dom = '<""l>t<"F"<".footer_action">frp>';

@@ -8,10 +8,10 @@ defined('SYSPATH') or die('No direct access allowed.');
  *
  * @see CModel
  *
- * @method static \CModel_Query<static> withTrashed(bool $withTrashed = true)
- * @method static \CModel_Query<static> onlyTrashed()
- * @method static \CModel_Query<static> withoutTrashed()
- * @method static bool                  restore()
+ * @method static \CModel_Query<static>|static withTrashed(bool $withTrashed = true)
+ * @method static \CModel_Query<static>|static onlyTrashed()
+ * @method static \CModel_Query<static>|static withoutTrashed()
+ * @method static bool                         restore()
  */
 trait CModel_SoftDelete_SoftDeleteTrait {
     /**

@@ -57,11 +57,11 @@ class CDatabase_Query_Grammar_Mysql extends CDatabase_Query_Grammar {
 
         $value = $this->parameter($where['value']);
 
-        $mode = ($where['options']['mode'] ?? []) === 'boolean'
+        $mode = (isset($where['options']['mode']) ? $where['options']['mode'] : []) === 'boolean'
             ? ' in boolean mode'
             : ' in natural language mode';
 
-        $expanded = ($where['options']['expanded'] ?? []) && ($where['options']['mode'] ?? []) !== 'boolean'
+        $expanded = (isset($where['options']['expanded']) ? $where['options']['expanded'] : []) && (isset($where['options']['mode']) ? $where['options']['mode'] : []) !== 'boolean'
             ? ' with query expansion'
             : '';
 

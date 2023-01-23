@@ -1,16 +1,9 @@
 <?php
 
-defined('SYSPATH') or die('No direct access allowed.');
-
-/**
- * @author Hery Kurniawan
- * @license Ittron Global Teknologi <ittron.co.id>
- *
- * @since Mar 28, 2019, 1:41:33 AM
- */
 use CManager_File_Connector_FileManager_FM as FM;
 
 class CElement_Component_FileManager extends CElement_Component {
+    //use CElement_Trait_UseViewTrait;
     protected $disk = null;
 
     protected $rootPath = null;
@@ -38,7 +31,7 @@ class CElement_Component_FileManager extends CElement_Component {
     }
 
     /**
-     * @param type $diskName
+     * @param string $diskName
      *
      * @return $this
      */
@@ -85,9 +78,13 @@ class CElement_Component_FileManager extends CElement_Component {
         CManager::instance()->asset()->module()->registerRunTimeModule('jquery-ui-1.12.1.custom');
         CManager::instance()->asset()->module()->registerRunTimeModule('dropzone');
         CManager::instance()->asset()->module()->registerRunTimeModule('cropper');
-        CManager::registerCss('element/filemanager/fm.css?v=2' . uniqid());
-        CManager::registerJs('element/filemanager/fm.js?v=1' . uniqid());
-        $this->addTemplate()->setTemplate('CElement/Component/FileManager/Index')->setVar('fm', $fm);
+        CManager::registerCss('element/filemanager/fm.css');
+        CManager::registerJs('element/filemanager/fm.js');
+        $this->addView(
+            'cresenity.element.component.file-manager.index',
+            ['fm' => $fm]
+        );
+        //$this->addTemplate()->setTemplate('CElement/Component/FileManager/Index')->setVar('fm', $fm);
     }
 
     protected function buildConfig() {

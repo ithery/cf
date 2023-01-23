@@ -26,7 +26,7 @@ class CImage_Chart_Builder {
 
     const CHT_PC = 'pc';
 
-    protected $engine = 'google';
+    protected $engine = 'default';
 
     protected $width;
 

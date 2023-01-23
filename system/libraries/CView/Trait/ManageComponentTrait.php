@@ -146,7 +146,7 @@ trait CView_Trait_ManageComponentTrait {
         }
 
         for ($i = $currentComponent - 1; $i >= 0; $i--) {
-            $data = $this->componentData[$i] ?? [];
+            $data = isset($this->componentData[$i]) && $this->componentData[$i] != null ? $this->componentData[$i] : [];
 
             if (array_key_exists($key, $data)) {
                 return $data[$key];

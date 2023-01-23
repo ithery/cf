@@ -8,8 +8,8 @@ defined('SYSPATH') or die('No direct access allowed.');
  *
  * @since Aug 12, 2019, 12:38:55 AM
  */
-use CManager_File_Connector_FileManager_FM as FM;
 use Intervention\Image\ImageManager;
+use CManager_File_Connector_FileManager_FM as FM;
 
 class CManager_File_Connector_FileManager_Controller_ResizeController extends CManager_File_Connector_FileManager_AbstractController {
     /**
@@ -45,15 +45,17 @@ class CManager_File_Connector_FileManager_Controller_ResizeController extends CM
             $scaled = true;
         }
 
-        $app->addTemplate()->setTemplate('CElement/Component/FileManager/Resizer')
-            ->setVar('fm', $fm)
-            ->setVar('img', $fm->path()->pretty($image))
-            ->setVar('height', number_format($height, 0))
-            ->setVar('width', $width)
-            ->setVar('original_height', $original_height)
-            ->setVar('original_width', $original_width)
-            ->setVar('scaled', $scaled)
-            ->setVar('ratio', $ratio);
+        $app->addView('cresenity.element.component.file-manager.resizer', [
+            'fm' => $fm,
+            'img' => $fm->path()->pretty($image),
+            'height' => number_format($height, 0),
+            'width' => $width,
+            'original_height' => $original_height,
+            'original_width' => $original_width,
+            'scaled' => $scaled,
+            'ratio' => $ratio,
+        ]);
+
         return $app;
     }
 }

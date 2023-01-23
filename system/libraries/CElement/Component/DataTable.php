@@ -139,6 +139,7 @@ class CElement_Component_DataTable extends CElement_Component {
     protected $widget_title;
 
     protected $fixedColumn;
+
     protected $fixedHeader;
 
     protected $colReorder;
@@ -149,10 +150,19 @@ class CElement_Component_DataTable extends CElement_Component {
 
     protected $dbResolver;
 
+    /**
+     * @var string
+     */
     protected $actionHeaderLabel = 'Actions';
 
+    /**
+     * @var array
+     */
     protected $labels = [];
 
+    /**
+     * @var array
+     */
     protected $buttons = [];
 
     public function __construct($id = '') {
@@ -420,7 +430,7 @@ class CElement_Component_DataTable extends CElement_Component {
     }
 
     /**
-     * @param int $column
+     * @param mixed $fixedHeader
      *
      * @return \CElement_Component_DataTable
      */

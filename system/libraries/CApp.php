@@ -15,6 +15,7 @@ defined('SYSPATH') or die('No direct access allowed.');
  * @method CElement_Component_DataTable          addTable($id=null)
  * @method CElement_Component_Form_Field         addField($id=null)
  * @method CElement_Element_Div                  addDiv($id=null)
+ * @method CElement_Element_Iframe               addIframe($id=null)
  * @method CElement_Element_A                    addA($id=null)
  * @method CElement_Element_H1                   addH1($id=null)
  * @method CElement_Element_H2                   addH2($id=null)
