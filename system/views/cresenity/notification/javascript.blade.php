@@ -14,7 +14,7 @@
                 messaging.onMessage((payload) => {
                     console.log('Message received. ', payload);
                     if (payload && payload.notification) {
-                        cresenity.toast('info', payload.notification.title);
+                        cresenity.toast('info', payload.notification.title + '<br/>' + payload.notification.body);
                     }
                 });
 
@@ -87,6 +87,8 @@
 
                                 }
                             }).catch((err) => {
+                                console.log('Error when get token');
+                                console.error(err);
                                 setTokenSentToServer(false);
                             });
 
