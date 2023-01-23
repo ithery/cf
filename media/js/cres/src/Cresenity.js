@@ -56,7 +56,8 @@ export default class Cresenity {
             'cresenity:jquery:loaded',
             'cresenity:loaded',
             'cresenity:js:loaded',
-            'cresenity:ui:start'
+            'cresenity:ui:start',
+            'cresenity:notification:message'
         ];
         this.modalElements = [];
         this.cresenityEventList = [
