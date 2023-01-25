@@ -11,6 +11,8 @@ defined('SYSPATH') or die('No direct access allowed.');
 use Symfony\Component\HttpFoundation\File\UploadedFile;
 
 class CManager_File_Connector_FileManager_FM_Item {
+    public $attributes = [];
+
     /**
      * @var CManager_File_Connector_FileManager_FM_Path
      */
@@ -19,8 +21,6 @@ class CManager_File_Connector_FileManager_FM_Item {
     private $helper;
 
     private $columns = ['name', 'url', 'time', 'icon', 'is_file', 'is_image', 'thumb_url'];
-
-    public $attributes = [];
 
     public function __construct(CManager_File_Connector_FileManager_FM_Path $fmPath, CManager_File_Connector_FileManager_FM $helper) {
         $this->fmPath = $fmPath->thumb(false);
@@ -32,6 +32,7 @@ class CManager_File_Connector_FileManager_FM_Item {
             $function_name = cstr::camel($var_name);
             $this->attributes[$var_name] = $this->$function_name();
         }
+
         return $this->attributes[$var_name];
     }
 
@@ -39,6 +40,7 @@ class CManager_File_Connector_FileManager_FM_Item {
         foreach ($this->columns as $column) {
             $this->__get($column);
         }
+
         return $this;
     }
 
@@ -67,6 +69,7 @@ class CManager_File_Connector_FileManager_FM_Item {
         if (!$this->isDirectory()) {
             return cstr::startsWith($this->mimeType(), 'image');
         }
+
         return false;
     }
 
@@ -91,6 +94,7 @@ class CManager_File_Connector_FileManager_FM_Item {
         if ($this->isDirectory()) {
             return $this->fmPath->path('working_dir');
         }
+
         return $this->fmPath->url();
     }
 
@@ -102,16 +106,18 @@ class CManager_File_Connector_FileManager_FM_Item {
         if (!$this->isDirectory()) {
             return $this->fmPath->lastModified();
         }
+
         return false;
     }
 
     public function thumbUrl() {
         if ($this->isDirectory()) {
-            return curl::httpbase() . 'modules/cresenity/media/img/filemanager/folder.png';
+            return curl::httpbase() . 'system/media/img/filemanager/folder.png';
         }
         if ($this->isImage()) {
             return $this->fmPath->thumb($this->hasThumb())->url(true);
         }
+
         return null;
     }
 
@@ -124,8 +130,10 @@ class CManager_File_Connector_FileManager_FM_Item {
             if ($this->isImage()) {
                 return 'fa-image';
             }
+
             return $this->extension();
         }
+
         return null;
     }
 
@@ -136,6 +144,7 @@ class CManager_File_Connector_FileManager_FM_Item {
         if ($this->isImage()) {
             return $this->mimeType();
         }
+
         return $this->helper->getFileType($this->extension());
     }
 
@@ -143,10 +152,11 @@ class CManager_File_Connector_FileManager_FM_Item {
         if (!$this->isImage()) {
             return false;
         }
-        $fmPath = clone($this->fmPath);
+        $fmPath = clone $this->fmPath;
         if (!$fmPath->thumb()->exists()) {
             return false;
         }
+
         return true;
     }
 
@@ -160,6 +170,7 @@ class CManager_File_Connector_FileManager_FM_Item {
         if (in_array($this->mimeType(), ['image/gif', 'image/svg+xml'])) {
             return false;
         }
+
         return true;
     }
 
@@ -178,6 +189,7 @@ class CManager_File_Connector_FileManager_FM_Item {
     public function humanFilesize($bytes, $decimals = 2) {
         $size = ['B', 'kB', 'MB', 'GB', 'TB', 'PB', 'EB', 'ZB', 'YB'];
         $factor = floor((strlen($bytes) - 1) / 3);
+
         return sprintf("%.{$decimals}f %s", $bytes / pow(1024, $factor), @$size[$factor]);
     }
 }
