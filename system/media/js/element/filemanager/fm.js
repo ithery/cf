@@ -561,7 +561,8 @@ var CFileManager = function (options) {
                         if (item.thumb_url) {
                             image = $('<div>').css('background-image', 'url("' + item.thumb_url + '?timestamp=' + item.time + '")');
                         } else {
-                            image = $('<div>').addClass('mime-icon ico ico-' + item.icon);
+                            let icon = $('<div>').addClass('ico');
+                            image = $('<div>').addClass('mime-icon ico-' + item.icon).append(icon);
                         }
 
 
