@@ -77,7 +77,7 @@ class CElement_Component_FileManager extends CElement_Component {
     public function build() {
         $config = $this->buildConfig();
 
-        $ajaxMethod = CAjax::createMethod()->setType('FileManager')->setData('config', $config);
+        $ajaxMethod = CAjax::createMethod()->setType(CAjax_Engine_FileManager::class)->setData('config', $config);
 
         $ajaxUrl = $ajaxMethod->makeUrl();
 
@@ -87,6 +87,7 @@ class CElement_Component_FileManager extends CElement_Component {
         CManager::instance()->asset()->module()->registerRunTimeModule('jquery-ui-1.12.1.custom');
         CManager::instance()->asset()->module()->registerRunTimeModule('dropzone');
         CManager::instance()->asset()->module()->registerRunTimeModule('cropper');
+        CManager::instance()->asset()->module()->registerRunTimeModule('mime-icons');
         CManager::registerCss('element/filemanager/fm.css');
         CManager::registerJs('element/filemanager/fm.js');
         $this->addView(

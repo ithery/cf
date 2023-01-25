@@ -267,7 +267,7 @@ var CFileManager = function (options) {
             if (item.thumb_url) {
                 carouselItem.find('.carousel-image').css('background-image', 'url(\'' + item.url + '?timestamp=' + item.time + '\')');
             } else {
-                carouselItem.find('.carousel-image').css('width', '50vh').append($('<div>').addClass('mime-icon ico-' + item.icon));
+                carouselItem.find('.carousel-image').css('width', '50vh').append($('<div>').addClass('mime-icon ico ico-' + item.icon));
             }
 
             carouselItem.find('.carousel-label').attr('target', '_blank').attr('href', item.url)
@@ -561,7 +561,7 @@ var CFileManager = function (options) {
                         if (item.thumb_url) {
                             image = $('<div>').css('background-image', 'url("' + item.thumb_url + '?timestamp=' + item.time + '")');
                         } else {
-                            image = $('<div>').addClass('mime-icon ico-' + item.icon);
+                            image = $('<div>').addClass('mime-icon ico ico-' + item.icon);
                         }
 
 

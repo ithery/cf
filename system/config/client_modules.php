@@ -791,5 +791,11 @@ return [
         ],
 
     ],
+    'mime-icons' => [
+        'css' => [
+            'plugins/mime-icons/mime-icons.min.css',
+        ],
+
+    ],
 
 ];
