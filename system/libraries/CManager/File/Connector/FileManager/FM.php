@@ -173,6 +173,7 @@ class CManager_File_Connector_FileManager_FM {
 
     public function getCategoryName() {
         $type = $this->currentFmType();
+
         $categoryName = $this->config('folder_categories.' . $type . '.folder_name', 'files');
         $rootPath = ltrim($this->config('root_path'), '/');
         if (strlen($rootPath) > 0) {

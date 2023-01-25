@@ -18,18 +18,18 @@
 </div> --}}
 
 <ul class="nav nav-pills flex-column">
-    <?php foreach ($rootFolders as $rootFolder): ?>
+    @foreach ($rootFolders as $rootFolder)
         <li class="nav-item">
-            <a class="nav-link" href="#" data-type="0" data-path="<?php echo $rootFolder->url; ?>">
-                <i class="fa fa-folder fa-fw"></i> <?php echo $rootFolder->name; ?>
+            <a class="nav-link" href="#" data-type="0" data-path="{{ $rootFolder->url }}">
+                <i class="fa fa-folder fa-fw"></i> {{ $rootFolder->name }}
             </a>
         </li>
-        <?php foreach ($rootFolder->children as $directory): ?>
+        @foreach($rootFolder->children as $directory)
             <li class="nav-item sub-item">
-                <a class="nav-link" href="#" data-type="0" data-path="<?php echo $directory->url; ?>">
-                    <i class="fa fa-folder fa-fw"></i> <?php echo $directory->name; ?>
+                <a class="nav-link" href="#" data-type="0" data-path="{{ $directory->url }}">
+                    <i class="fa fa-folder fa-fw"></i> {{ $directory->name }}
                 </a>
             </li>
-        <?php endforeach; ?>
-    <?php endforeach; ?>
+        @endforeach
+    @endforeach
 </ul>

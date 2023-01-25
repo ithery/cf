@@ -19,10 +19,13 @@ class CElement_Component_FileManager extends CElement_Component {
      */
     protected $controller = [];
 
+    protected $config;
+
     public function __construct($id = '') {
         parent::__construct($id);
 
         $this->tag = 'div';
+        $this->config = [];
     }
 
     public static function factory($id = '') {
@@ -65,6 +68,12 @@ class CElement_Component_FileManager extends CElement_Component {
         return $this;
     }
 
+    public function setConfig($key, $value) {
+        carr::set($this->config, $key, $value);
+
+        return $this;
+    }
+
     public function build() {
         $config = $this->buildConfig();
 
@@ -88,7 +97,7 @@ class CElement_Component_FileManager extends CElement_Component {
     }
 
     protected function buildConfig() {
-        $config = [];
+        $config = $this->config ?: [];
         if ($this->disk != null) {
             $config['disk'] = $this->disk;
         }
