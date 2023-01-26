@@ -80,7 +80,6 @@ HTML;
     }
 
     public function renderScripts($options = []) {
-        /** @var CApp $this */
         $viewData = $this->getViewData();
         $endClientScript = carr::get($viewData, 'end_client_script', '');
         $readyClientScript = carr::get($viewData, 'ready_client_script', '');
@@ -255,6 +254,10 @@ HTML;
             if ($this->rendered) {
                 throw new CApp_Exception('CApp already Rendered');
             }
+        }
+        /** @var CApp $this */
+        if (CDebug::bar()->isEnabled()) {
+            CDebug::bar()->populateAssets();
         }
         $this->rendered = true;
         $this->registerCoreModules();

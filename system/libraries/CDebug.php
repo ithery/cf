@@ -8,9 +8,6 @@ defined('SYSPATH') or die('No direct access allowed.');
  *
  * @since Aug 22, 2018, 1:03:54 PM
  */
-
-use OpenTracing\GlobalTracer;
-
 class CDebug {
     const COLLECTOR_TYPE_DEPRECATED = 'deprecated';
 
