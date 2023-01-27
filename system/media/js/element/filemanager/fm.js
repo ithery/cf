@@ -718,6 +718,7 @@ var CFileManager = function (options) {
         this.toggleMobileTree(false);
     });
 
+    // eslint-disable-next-line no-unused-vars
     $(document).on('click', '.capp-fm #content', (e) => {
         this.clearSelected();
     });

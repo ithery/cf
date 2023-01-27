@@ -94,11 +94,17 @@
         position: absolute;
         z-index: 999;
         left: 0;
-        transform: translateX(-100%);
+        transform: translateX(-150%);
         transition: 1s transform;
+        height: 100%;
+        max-width: 250px;
+        width: 100%;
     }
     .capp-fm #tree.in {
         transform: translateX(0);
+    }
+    .capp-fm #nav {
+        height: auto;
     }
 }
 .capp-fm #empty {
