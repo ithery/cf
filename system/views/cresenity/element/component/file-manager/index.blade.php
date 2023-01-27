@@ -12,7 +12,7 @@
         <div class="ml-auto px-2">
             <a class="navbar-link d-none" id="multi_selection_toggle">
                 <i class="fa fa-check-double fa-fw"></i>
-                <span class="d-none d-lg-inline">{{ $fm->getLabel('menu-multiple') }}></span>
+                <span class="d-none d-lg-inline">{{ $fm->getLabel('menu-multiple') }}</span>
             </a>
         </div>
         <a class="navbar-toggler collapsed border-0 px-1 py-2 m-0" data-toggle="collapse" data-target="#nav-buttons">

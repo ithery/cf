@@ -396,3 +396,6 @@
     white-space: nowrap;
     content: attr(data-label);
 }
+.capp-fm .bg-light {
+    background-color: #ccc !important;
+}
