@@ -47,20 +47,46 @@ class CQueue_CallQueuedHandler {
         try {
             $command = $this->setJobInstanceIfNecessary(
                 $job,
-                unserialize($data['command'])
+                $this->getCommand($data)
             );
         } catch (CModel_Exception_ModelNotFoundException $e) {
             return $this->handleModelNotFound($job, $e);
         }
+        if ($command instanceof CQueue_Contract_ShouldBeUniqueUntilProcessingInterface) {
+            $this->ensureUniqueJobLockIsReleased($command);
+        }
 
         $this->dispatchThroughMiddleware($job, $command);
 
+        if (! $job->isReleased() && ! $command instanceof CQueue_Contract_ShouldBeUniqueUntilProcessingInterface) {
+            $this->ensureUniqueJobLockIsReleased($command);
+        }
         if (!$job->hasFailed() && !$job->isReleased()) {
             $this->ensureNextJobInChainIsDispatched($command);
+            $this->ensureSuccessfulBatchJobIsRecorded($command);
         }
         if (!$job->isDeletedOrReleased()) {
             $job->delete();
         }
+    }
+
+    /**
+     * Get the command from the given payload.
+     *
+     * @param array $data
+     *
+     * @throws \RuntimeException
+     *
+     * @return mixed
+     */
+    protected function getCommand(array $data) {
+        if (cstr::startsWith($data['command'], 'O:')) {
+            return unserialize($data['command']);
+        }
+
+        return unserialize(CCrypt::encrypter()->decrypt($data['command']));
+
+        //throw new RuntimeException('Unable to extract job payload.');
     }
 
     /**
@@ -129,6 +155,41 @@ class CQueue_CallQueuedHandler {
     }
 
     /**
+     * Ensure the batch is notified of the successful job completion.
+     *
+     * @param mixed $command
+     *
+     * @return void
+     */
+    protected function ensureSuccessfulBatchJobIsRecorded($command) {
+        $uses = c::classUsesRecursive($command);
+
+        if (!in_array(CQueue_Trait_BatchableTrait::class, $uses)
+            || !in_array(CQueue_Trait_InteractsWithQueue::class, $uses)
+        ) {
+            return;
+        }
+
+        if ($batch = $command->batch()) {
+            $batch->recordSuccessfulJob($command->job->uuid());
+        }
+    }
+
+    /**
+     * Ensure the lock for a unique job is released.
+     *
+     * @param mixed $command
+     *
+     * @return void
+     */
+    protected function ensureUniqueJobLockIsReleased($command) {
+        if ($command instanceof CQueue_Contract_ShouldBeUniqueInterface) {
+            $lock = new CQueue_UniqueLock(c::cache()->driver());
+            $lock->release($command);
+        }
+    }
+
+    /**
      * Handle a model not found exception.
      *
      * @param CQueue_AbstractJob $job
@@ -160,13 +221,59 @@ class CQueue_CallQueuedHandler {
      *
      * @param array      $data
      * @param \Exception $e
+     * @param string     $uuid
      *
      * @return void
      */
-    public function failed(array $data, $e) {
-        $command = unserialize($data['command']);
+    public function failed(array $data, $e, $uuid) {
+        $command = $this->getCommand($data);
+
+        if (! $command instanceof CQueue_Contract_ShouldBeUniqueUntilProcessingInterface) {
+            $this->ensureUniqueJobLockIsReleased($command);
+        }
+
+        if ($command instanceof \__PHP_Incomplete_Class) {
+            return;
+        }
+
+        $this->ensureFailedBatchJobIsRecorded($uuid, $command, $e);
+        $this->ensureChainCatchCallbacksAreInvoked($uuid, $command, $e);
         if (method_exists($command, 'failed')) {
             $command->failed($e);
+        }
+    }
+
+    /**
+     * Ensure the batch is notified of the failed job.
+     *
+     * @param string     $uuid
+     * @param mixed      $command
+     * @param \Throwable $e
+     *
+     * @return void
+     */
+    protected function ensureFailedBatchJobIsRecorded($uuid, $command, $e) {
+        if (!in_array(CQueue_Trait_BatchableTrait::class, c::classUsesRecursive($command))) {
+            return;
+        }
+
+        if ($batch = $command->batch()) {
+            $batch->recordFailedJob($uuid, $e);
+        }
+    }
+
+    /**
+     * Ensure the chained job catch callbacks are invoked.
+     *
+     * @param string     $uuid
+     * @param mixed      $command
+     * @param \Throwable $e
+     *
+     * @return void
+     */
+    protected function ensureChainCatchCallbacksAreInvoked($uuid, $command, $e) {
+        if (method_exists($command, 'invokeChainCatchCallbacks')) {
+            $command->invokeChainCatchCallbacks($e);
         }
     }
 }

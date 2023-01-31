@@ -32,6 +32,7 @@ class CElement_FormInput_DateTime_ModalDateTime extends CElement_FormInput_DateT
         parent::build();
         $this->setAttr('data-field', 'datetime');
         $this->addClass('form-control');
+        $this->addClass('cres-control-modal-datetime');
         $this->after()->addDiv($this->id . '-dtbox');
     }
 

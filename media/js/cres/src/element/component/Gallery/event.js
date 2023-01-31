@@ -24,5 +24,5 @@ export const galleryEvent = {
     flipVertical: 'cres:gallery:flipVertical',
     autoplay: 'cres:gallery:autoplay',
     autoplayStart: 'cres:gallery:autoplayStart',
-    autoplayStop: 'cres:gallery:autoplayStop',
+    autoplayStop: 'cres:gallery:autoplayStop'
 };

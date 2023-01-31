@@ -2,7 +2,6 @@
 class CCache_Driver_DatabaseDriver extends CCache_DriverAbstract implements CCache_Contract_LockProviderDriverInterface {
     use CTrait_Helper_InteractsWithTime;
     use CCache_Trait_RetrievesMultipleKeys;
-
     /**
      * The database connection instance.
      *
@@ -60,7 +59,7 @@ class CCache_Driver_DatabaseDriver extends CCache_DriverAbstract implements CCac
         CDatabase $connection,
         $table,
         $prefix = '',
-        $lockTable = 'cache_locks',
+        $lockTable = 'cache_lock',
         $lockLottery = [2, 100]
     ) {
         $this->table = $table;

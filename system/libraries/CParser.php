@@ -12,4 +12,8 @@ class CParser {
     public static function cssToInlineStyles() {
         return new CParser_CssToInlineStyles();
     }
+
+    public static function createPhp() {
+        return new CParser_Php();
+    }
 }

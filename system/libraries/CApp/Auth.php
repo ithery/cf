@@ -32,6 +32,8 @@ class CApp_Auth {
 
     protected $confirmPasswordView;
 
+    protected $verifyEmailView;
+
     protected $requestPasswordResetLinkView;
 
     protected $features;
@@ -240,7 +242,7 @@ class CApp_Auth {
      */
     public function getRoleModelClass() {
         if ($this->resolvedRoleModelClass === null) {
-            $this->resolvedRoleModelClass = carr::get($this->getProviderConfig(), 'access.role.model', CApp_Model_Roles::class);
+            $this->resolvedRoleModelClass = carr::get($this->getProviderConfig(), 'access.role.model', CF::config('app.model.role', CApp_Model_Roles::class));
         }
 
         return $this->resolvedRoleModelClass;
@@ -253,7 +255,7 @@ class CApp_Auth {
      */
     public function getRolePermisionModelClass() {
         if ($this->resolvedRolePermissionModelClass === null) {
-            $this->resolvedRolePermissionModelClass = carr::get($this->getProviderConfig(), 'access.role_permission.model', CApp_Model_RolePermission::class);
+            $this->resolvedRolePermissionModelClass = carr::get($this->getProviderConfig(), 'access.role_permission.model', CF::config('app.model.role_permission', CApp_Model_RolePermission::class));
         }
 
         return $this->resolvedRolePermissionModelClass;
@@ -266,7 +268,7 @@ class CApp_Auth {
      */
     public function getRoleNavModelClass() {
         if ($this->resolvedRoleNavModelClass === null) {
-            $this->resolvedRoleNavModelClass = carr::get($this->getProviderConfig(), 'access.role_nav.model', CApp_Model_RoleNav::class);
+            $this->resolvedRoleNavModelClass = carr::get($this->getProviderConfig(), 'access.role_nav.model', CF::config('app.model.role_nav', CApp_Model_RoleNav::class));
         }
 
         return $this->resolvedRoleNavModelClass;

@@ -5,7 +5,7 @@
  *
  * @author Hery
  */
-class CView_Finder {
+class CView_Finder implements CView_Contract_ViewFinderInterface {
     /**
      * The array of active view paths.
      *

@@ -46,6 +46,12 @@ trait CApp_Model_Trait_Roles {
         return $this->hasMany(c::app()->auth()->getRolePermisionModelClass());
     }
 
+    public function scopeWhereHasPermission(CModel_Query $q, $permission) {
+        $q->whereHas('rolePermission', function ($q) use ($permission) {
+            $q->where('name', '=', $permission);
+        });
+    }
+
     public function getDescendantsTree($rootId = null, $orgId = null, $type = null) {
         /** @var CApp_Model_Roles $this */
         $root = $this;

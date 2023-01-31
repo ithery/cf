@@ -2,12 +2,6 @@
 
 defined('SYSPATH') or die('No direct access allowed.');
 
-/**
- * @author Hery Kurniawan
- * @license Ittron Global Teknologi <ittron.co.id>
- *
- * @since Aug 11, 2019, 2:04:32 AM
- */
 return [
     /*
       |--------------------------------------------------------------------------
@@ -48,6 +42,8 @@ return [
                 'image/pjpeg',
                 'image/png',
                 'image/gif',
+                'application/pdf',
+                'text/plain',
             ],
         ],
         'image' => [
@@ -59,8 +55,6 @@ return [
                 'image/pjpeg',
                 'image/png',
                 'image/gif',
-                'application/pdf',
-                'text/plain',
             ],
         ],
     ],

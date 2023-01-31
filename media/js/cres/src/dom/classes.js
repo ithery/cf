@@ -1,102 +1,98 @@
-import stripAndCollapse from "../core/stripAndCollapse";
-import rnothtmlwhite from "../core/var/rnothtmlwhite";
-import { attr } from "./attributes";
+import stripAndCollapse from '../core/stripAndCollapse';
+import rnothtmlwhite from '../core/var/rnothtmlwhite';
+import { attr } from './attributes';
 
 
-function classesToArray( value ) {
-	if ( Array.isArray( value ) ) {
-		return value;
-	}
-	if ( typeof value === "string" ) {
-		return value.match( rnothtmlwhite ) || [];
-	}
-	return [];
+function classesToArray(value) {
+    if (Array.isArray(value)) {
+        return value;
+    }
+    if (typeof value === 'string') {
+        return value.match(rnothtmlwhite) || [];
+    }
+    return [];
 }
-export const getClass = ( elem ) => {
-	return elem.getAttribute && elem.getAttribute( "class" ) || "";
-}
+export const getClass = (elem) => {
+    return elem.getAttribute && elem.getAttribute('class') || '';
+};
 
-export const addClass = (elem, value ) => {
-    var classNames, cur, curValue, className, i, finalValue;
+export const addClass = (elem, value) => {
+    let classNames, cur, curValue, className, i, finalValue;
 
-    if ( typeof value === "function" ) {
+    if (typeof value === 'function') {
         return addClass(elem.value.call());
     }
 
-    classNames = classesToArray( value );
+    classNames = classesToArray(value);
 
-    if ( classNames.length ) {
+    if (classNames.length) {
+        curValue = getClass(elem);
+        cur = elem.nodeType === 1 && (' ' + stripAndCollapse(curValue) + ' ');
 
-        curValue = getClass( elem );
-        cur = elem.nodeType === 1 && ( " " + stripAndCollapse( curValue ) + " " );
-
-        if ( cur ) {
-            for ( i = 0; i < classNames.length; i++ ) {
+        if (cur) {
+            for (i = 0; i < classNames.length; i++) {
                 className = classNames[ i ];
-                if ( cur.indexOf( " " + className + " " ) < 0 ) {
-                    cur += className + " ";
+                if (cur.indexOf(' ' + className + ' ') < 0) {
+                    cur += className + ' ';
                 }
             }
 
             // Only assign if different to avoid unneeded rendering.
-            finalValue = stripAndCollapse( cur );
-            if ( curValue !== finalValue ) {
-                elem.setAttribute( "class", finalValue );
+            finalValue = stripAndCollapse(cur);
+            if (curValue !== finalValue) {
+                elem.setAttribute('class', finalValue);
             }
         }
-
     }
 
     return elem;
 };
-export const removeClass = (elem, value ) => {
-    var classNames, cur, curValue, className, i, finalValue;
+export const removeClass = (elem, value) => {
+    let classNames, cur, curValue, className, i, finalValue;
 
-    if ( typeof value === "function" ) {
-        return removeClass(elem,value.call());
+    if (typeof value === 'function') {
+        return removeClass(elem, value.call());
     }
 
-    if ( typeof value === "undefined" ) {
-        attr( elem, "class", "" );
+    if (typeof value === 'undefined') {
+        attr(elem, 'class', '');
         return elem;
     }
 
-    classNames = classesToArray( value );
+    classNames = classesToArray(value);
 
-    if ( classNames.length ) {
-
-        curValue = getClass( elem );
+    if (classNames.length) {
+        curValue = getClass(elem);
 
         // This expression is here for better compressibility (see addClass)
-        cur = elem.nodeType === 1 && ( " " + stripAndCollapse( curValue ) + " " );
+        cur = elem.nodeType === 1 && (' ' + stripAndCollapse(curValue) + ' ');
 
-        if ( cur ) {
-            for ( i = 0; i < classNames.length; i++ ) {
+        if (cur) {
+            for (i = 0; i < classNames.length; i++) {
                 className = classNames[ i ];
 
                 // Remove *all* instances
-                while ( cur.indexOf( " " + className + " " ) > -1 ) {
-                    cur = cur.replace( " " + className + " ", " " );
+                while (cur.indexOf(' ' + className + ' ') > -1) {
+                    cur = cur.replace(' ' + className + ' ', ' ');
                 }
             }
 
             // Only assign if different to avoid unneeded rendering.
-            finalValue = stripAndCollapse( cur );
-            if ( curValue !== finalValue ) {
-                elem.setAttribute( "class", finalValue );
+            finalValue = stripAndCollapse(cur);
+            if (curValue !== finalValue) {
+                elem.setAttribute('class', finalValue);
             }
         }
-
     }
 
     return elem;
 };
 
-export const hasClass = ( elem,selector ) => {
-    const className = " " + selector + " ";
+export const hasClass = (elem, selector) => {
+    const className = ' ' + selector + ' ';
 
-    if ( elem.nodeType === 1 &&
-        ( " " + stripAndCollapse( getClass( elem ) ) + " " ).indexOf( className ) > -1 ) {
+    if (elem.nodeType === 1 &&
+        (' ' + stripAndCollapse(getClass(elem)) + ' ').indexOf(className) > -1) {
         return true;
     }
 

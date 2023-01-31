@@ -7,11 +7,11 @@ abstract class CExporter_Exportable implements CExporter_Concern_WithEvents {
 
     protected $orientation = \PhpOffice\PhpSpreadsheet\Worksheet\PageSetup::ORIENTATION_PORTRAIT;
 
-    protected function beforeSheet($callback) {
+    public function beforeSheet($callback) {
         $this->beforeSheets[] = $callback;
     }
 
-    protected function afterSheet($callback) {
+    public function afterSheet($callback) {
         $this->afterSheets[] = $callback;
     }
 

@@ -3,16 +3,15 @@ import { toggleDarkMode, toggleLightMode, toggleMode, toggleAutoDetectMode, enab
 
 export default class Theme {
     constructor() {
-        this.name = capp.theme?.name ?? 'cresenity';
-        this.modules = capp.theme?.data.client_modules ?? [],
-        this.css = capp.theme?.css ?? [];
-        this.js = capp.theme?.js ?? [];
-        this.js = capp.theme?.data ?? {};
-
+        this.name = window.capp.theme?.name ?? 'cresenity';
+        this.modules = window.capp.theme?.data.client_modules ?? [];
+        this.css = window.capp.theme?.css ?? [];
+        this.js = window.capp.theme?.js ?? [];
+        this.js = window.capp.theme?.data ?? {};
     }
 
     get slug() {
-        return slug(this.name, {delimiter:'-'});
+        return slug(this.name, {delimiter: '-'});
     }
     get localStorageKey() {
         return this.slug + '-cres-theme';
@@ -21,14 +20,13 @@ export default class Theme {
         toggleDarkMode(this.localStorageKey);
     }
 
-    toggleLightMode = () => {
+    toggleLightMode() {
         toggleLightMode(this.localStorageKey);
-
-    };
+    }
 
     enableAutoDetect() {
         enableAutoDetect(this.localStorageKey);
-    };
+    }
 
     toogleAutoDetectMode() {
         toggleAutoDetectMode(this.localStorageKey);
@@ -36,7 +34,4 @@ export default class Theme {
     toggleMode() {
         toggleMode(this.localStorageKey);
     }
-
-
-
 }

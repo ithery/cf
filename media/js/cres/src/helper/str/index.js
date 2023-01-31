@@ -1,7 +1,6 @@
-import slug from "./slug"
+import slug from './slug';
 
 
-
-export default  {
+export default {
     slug
-}
+};

@@ -14,8 +14,9 @@
                 messaging.onMessage((payload) => {
                     console.log('Message received. ', payload);
                     if (payload && payload.notification) {
-                        cresenity.toast('info', payload.notification.title);
+                        cresenity.toast('info', payload.notification.title + '<br/>' + payload.notification.body);
                     }
+                    cresenity.dispatch('notification:message', {payload : payload});
                 });
 
                 // Send the registration token your application server, so that it can:
@@ -87,6 +88,8 @@
 
                                 }
                             }).catch((err) => {
+                                console.log('Error when get token');
+                                console.error(err);
                                 setTokenSentToServer(false);
                             });
 

@@ -26,6 +26,11 @@ return [
         'uri' => 'demo/controls/datetime/index',
     ],
     [
+        'name' => 'controls.file',
+        'label' => c::__('File'),
+        'uri' => 'demo/controls/file/index',
+    ],
+    [
         'name' => 'controls.image',
         'label' => c::__('Image'),
         'uri' => 'demo/controls/image/index',

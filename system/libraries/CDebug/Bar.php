@@ -39,6 +39,10 @@ class CDebug_Bar extends CDebug_AbstractBar {
         return $this->enabled;
     }
 
+    public function disable() {
+        $this->enabled = false;
+    }
+
     public function enable() {
         $this->enabled = true;
         if (!$this->booted) {
@@ -98,12 +102,15 @@ class CDebug_Bar extends CDebug_AbstractBar {
         //$this->sendDataInHeaders(true);
         //}
 
-        $this->renderer->populateAssets();
-        $this->renderer->apply();
         //$this->renderer->setBindAjaxHandlerToXHR(true);
         //$renderer->setIncludeVendors($this->app['config']->get('debugbar.include_vendors', true));
         //$renderer->setBindAjaxHandlerToXHR($app['config']->get('debugbar.capture_ajax', true));
         $this->booted = true;
+    }
+
+    public function populateAssets() {
+        $this->renderer->populateAssets();
+        $this->renderer->apply();
     }
 
     /**

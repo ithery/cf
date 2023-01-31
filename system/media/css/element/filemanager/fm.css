@@ -10,11 +10,17 @@
 }
 .capp-fm #nav, .capp-fm #nav .dropdown-menu, .capp-fm .bg-main {
     background-color: #333844;
-    height: 40px;
     border-radius: 4px;
+    color: #fff;
+}
+.capp-fm #nav {
+    height: 40px;
 }
 .capp-fm #nav .dropdown-menu > a:hover {
-    color: #333844;
+    color: #fff;
+}
+.capp-fm .navbar-brand {
+    padding: 0;
 }
 .capp-fm #actions {
     display: flex;
@@ -51,6 +57,17 @@
     background: #fff;
     border-bottom: 1px solid #eee;
 }
+.capp-fm-body {
+    position: relative;
+}
+.capp-fm-tree .nav-item, .capp-fm-tree .nav-item .nav-link {
+    max-width: 100%;
+}
+.capp-fm-tree .nav-item .nav-link {
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
 
 @media screen and (min-width: 992px) {
 
@@ -77,11 +94,17 @@
         position: absolute;
         z-index: 999;
         left: 0;
-        transform: translateX(-100%);
+        transform: translateX(-150%);
         transition: 1s transform;
+        height: 100%;
+        max-width: 250px;
+        width: 100%;
     }
     .capp-fm #tree.in {
         transform: translateX(0);
+    }
+    .capp-fm #nav {
+        height: auto;
     }
 }
 .capp-fm #empty {
@@ -313,6 +336,13 @@
     top: calc(45% - 0.5rem);
     font-size: 1rem;
 }
+.capp-fm .mime-icon .ico {
+    height: 100%;
+    display: inline-flex;
+    align-items: center;
+    width: 100%;
+    justify-content: center;
+}
 
 /* Floating action buttons */
 
@@ -371,4 +401,7 @@
     font-size: 0.9rem;
     white-space: nowrap;
     content: attr(data-label);
+}
+.capp-fm .bg-light {
+    background-color: #ccc !important;
 }

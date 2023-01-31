@@ -12,7 +12,7 @@ class CNotification_Message_Firebase extends CNotification_MessageAbstract {
         $messaging = $firebase->createMessaging();
 
         $message = $messaging->createCloudMessage()
-            ->withNotification($messaging->createNotification($this->getOption('subject'), $this->getOption('message')));
+            ->withNotification($messaging->createNotification($this->getOption('subject'), $this->getOption('message'), $this->getOption('imageUrl')));
 
         if (is_array($data)) {
             $message = $message->withData($data);

@@ -65,7 +65,7 @@ export const galleryConfig = {
     mobileSettings: {
         controls: false,
         showCloseIcon: false,
-        download: false,
+        download: false
     },
     plugins: [],
     strings: {
@@ -74,6 +74,6 @@ export const galleryConfig = {
         previousSlide: 'Previous slide',
         nextSlide: 'Next slide',
         download: 'Download',
-        playVideo: 'Play video',
-    },
+        playVideo: 'Play video'
+    }
 };
