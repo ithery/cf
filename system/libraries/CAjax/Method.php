@@ -250,19 +250,17 @@ class CAjax_Method implements CInterface_Jsonable {
 
     protected function checkAuth() {
         if ($this->auth) {
-            $guard=null;
+            $guard = null;
             if (is_array($this->auth)) {
                 $guardName = carr::get($this->auth, 'guard');
                 $guard = c::auth($guardName);
             }
             if ($guard->check()) {
-
                 if (get_class($guard) == CAuth_Guard_SessionGuard::class) {
                     if (carr::get($this->auth, 'id') != $guard->id()) {
                         return false;
                     }
                 }
-
 
                 return true;
             }
