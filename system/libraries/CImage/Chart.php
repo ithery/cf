@@ -9,6 +9,13 @@ defined('SYSPATH') or die('No direct access allowed.');
  * @since Aug 30, 2019, 2:17:11 AM
  */
 class CImage_Chart {
+    /**
+     * @return CImage_Chart_Manager
+     */
+    public static function manager() {
+        return CImage_Chart_Manager::instance();
+    }
+
     public static function createData() {
         return new CImage_Chart_Data();
     }
@@ -23,5 +30,9 @@ class CImage_Chart {
 
     public static function createProcessor($options) {
         return new CImage_Chart_Processor($options);
+    }
+
+    public static function createBuilder($width = 500, $height = 500) {
+        return new CImage_Chart_Builder($width, $height);
     }
 }

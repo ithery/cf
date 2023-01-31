@@ -25,7 +25,7 @@ class CElement_Element_Img extends CElement_Element {
      * @return CElement_Element_Img
      */
     public static function factory($id = '') {
-        return CElement_Factory::create(static::class, $id);
+        return new CElement_Element_Img($id);
     }
 
     /**

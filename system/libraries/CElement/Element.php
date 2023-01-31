@@ -15,8 +15,8 @@ abstract class CElement_Element extends CElement {
 
     protected $haveIndent = true;
 
-    public function __construct($id = '', $tag = 'div') {
-        parent::__construct($id);
+    public function __construct($id = null, $tag = 'div') {
+        parent::__construct($id, $tag);
 
         $this->isBuilded = false;
         $this->isOneTag = false;
@@ -107,6 +107,7 @@ abstract class CElement_Element extends CElement {
             $indent = 0;
         }
         $html->setIndent($indent);
+
         $this->buildOnce();
         $appendMethod = $this->haveIndent ? 'appendln' : 'append';
         $html->appendln($this->beforeHtml($indent));

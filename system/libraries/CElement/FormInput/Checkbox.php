@@ -35,8 +35,9 @@ class CElement_FormInput_Checkbox extends CElement_FormInput {
         $this->applyjs = c::theme('js_checkbox', 'uniform');
     }
 
-    public static function factory($id) {
-        return new CElement_FormInput_Checkbox($id);
+    public static function factory($id = null) {
+        /** @phpstan-ignore-next-line */
+        return new static($id);
     }
 
     public function setChecked($bool) {

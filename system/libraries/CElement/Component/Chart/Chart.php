@@ -8,6 +8,35 @@ class CElement_Component_Chart_Chart extends CElement_Component_Chart {
         $this->options = [];
     }
 
+    public function setChart(CChart_ChartAbstract $chart) {
+        parent::setChart($chart);
+
+        //options
+        if ($chart->isShowLegend()) {
+            $this->setOption('legend.position', $this->normalizeChartPosition($chart));
+            $this->setOption('legend.align', 'center');
+        } else {
+            $this->setOption('legend.position', 'none');
+        }
+
+        if ($chart->getTitle()) {
+            $this->setOption('title.text', $chart->getTitle());
+        }
+
+        return $this;
+    }
+
+    private function normalizeChartPosition(CChart_ChartAbstract $chart) {
+        $posMap = [
+            CChart::POSITION_BOTTOM => 'bottom',
+            CChart::POSITION_TOP => 'top',
+            CChart::POSITION_LEFT => 'left',
+            CChart::POSITION_RIGHT => 'right',
+        ];
+
+        return carr::get($posMap, $chart->getLegendPosition(), 'bottom');
+    }
+
     protected function build() {
         parent::build();
         $this->addClass('cchart-container');

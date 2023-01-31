@@ -30,6 +30,10 @@ trait CExporter_Trait_HasEventBusTrait {
         }
     }
 
+    public function clearListeners() {
+        $this->events = [];
+    }
+
     /**
      * Register a global event listener.
      *

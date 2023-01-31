@@ -109,6 +109,16 @@ class CAjax_Engine_DataTable_Processor_DataProvider extends CAjax_Engine_DataTab
         };
     }
 
+    private function getColumnsByFieldName($columns, $fieldName) {
+        foreach ($columns as $column) {
+            if ($column->getFieldname() == $fieldName) {
+                return $column;
+            }
+        }
+
+        return null;
+    }
+
     protected function getSearchDataAnd() {
         $request = $this->engine->getInput();
         $table = $this->table;
@@ -135,7 +145,17 @@ class CAjax_Engine_DataTable_Processor_DataProvider extends CAjax_Engine_DataTab
                 }
 
                 $fieldName = str_replace('dt_table_qs-', '', $qsConditionValue['name']);
-                $searchData[$fieldName] = $value;
+                $column = $this->getColumnsByFieldName($columns, $fieldName);
+                if ($column && ($callback = $column->getSearchCallback())) {
+                    $table = $this->table();
+                    $query = $table->getQuery();
+                    if (!($query instanceof CManager_DataProvider_ModelDataProvider)) {
+                        throw new Exception('SearchCallback only running on ModelDataProvider');
+                    }
+                    $searchData[$fieldName] = $this->createSearchCallable($callback, $value);
+                } else {
+                    $searchData[$fieldName] = $value;
+                }
             }
         }
 

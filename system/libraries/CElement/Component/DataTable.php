@@ -15,7 +15,6 @@ class CElement_Component_DataTable extends CElement_Component {
         CElement_Component_DataTable_Trait_CheckboxTrait,
         CElement_Component_DataTable_Trait_SearchTrait,
         CElement_Component_DataTable_Trait_FooterTrait;
-
     const ACTION_LOCATION_FIRST = 'first';
 
     const ACTION_LOCATION_LAST = 'last';
@@ -140,6 +139,8 @@ class CElement_Component_DataTable extends CElement_Component {
     protected $widget_title;
 
     protected $fixedColumn;
+
+    protected $colReorder;
 
     protected $scrollX;
 
@@ -292,7 +293,8 @@ class CElement_Component_DataTable extends CElement_Component {
         return $legacy;
     }
 
-    public static function factory($id = '') {
+    public static function factory($id = null) {
+        // @phpstan-ignore-next-line
         return new static($id);
     }
 
@@ -395,6 +397,12 @@ class CElement_Component_DataTable extends CElement_Component {
         return $this;
     }
 
+    public function setColReorder($bool = true) {
+        $this->colReorder = $bool;
+
+        return $this;
+    }
+
     /**
      * @param int $column
      *
@@ -464,7 +472,7 @@ class CElement_Component_DataTable extends CElement_Component {
         return $this;
     }
 
-    public function setResponsive($bool) {
+    public function setResponsive($bool = true) {
         $this->responsive = $bool;
 
         return $this;
@@ -964,6 +972,16 @@ class CElement_Component_DataTable extends CElement_Component {
                 $r = $this->db()->query($this->query);
                 $this->data = $r->result(false);
             }
+        }
+        if ($this->colReorder) {
+            CManager::instance()->registerModule('jquery.datatable.colreorder');
+        }
+        if ($this->responsive) {
+            CManager::instance()->registerModule('jquery.datatable.responsive');
+
+            // if (CManager::isRegisteredModule('bootstrap-4') || CManager::isRegisteredModule('bootstrap-4-material')) {
+            //     CManager::instance()->registerModule('jquery.datatable.responsive.bs4');
+            // }
         }
     }
 

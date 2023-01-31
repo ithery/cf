@@ -50,6 +50,9 @@
         <!-- Including File -->
         <exclude name="PEAR.Files.IncludingFile.UseIncludeOnce"/>
         <exclude name="PEAR.Files.IncludingFile.UseInclude"/>
+        <!-- Ignore Braces -->
+        <exclude name="PEAR.Commenting.FunctionComment.WrongStyle"/>
+        <exclude name="PEAR.Commenting.InlineComment.WrongStyle"/>
 
         <!-- Ignore Braces -->
         <exclude name="PEAR.Classes.ClassDeclaration.OpenBraceNewLine"/>

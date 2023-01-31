@@ -59,4 +59,11 @@ class CDebug {
     public static function getVariables() {
         return static::$variables;
     }
+
+    /**
+     * @return CDebug_Dumper|CBase_ForwarderStaticClass
+     */
+    public static function dumper() {
+        return new CBase_ForwarderStaticClass(CDebug_Dumper::class);
+    }
 }

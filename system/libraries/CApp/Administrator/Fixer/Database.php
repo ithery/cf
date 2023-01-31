@@ -42,6 +42,7 @@ class CApp_Administrator_Fixer_Database {
             $sql = implode(";\n", $sqlArray);
             $sql .= ';';
         }
+
         return $sql;
     }
 
@@ -237,6 +238,7 @@ class CApp_Administrator_Fixer_Database {
             $sql = implode(";\n", $sqlArray);
             $sql .= ';';
         }
+
         return $sql;
     }
 
@@ -282,9 +284,11 @@ class CApp_Administrator_Fixer_Database {
                 }
 
                 //$targetColumnSchema = new CDatabase_Schema_Column($column, CDatabase_Type::getType(CDatabase_Type::BIGINT), $targetOptions);
+                /** @var CDatabase_Schema_Column $targetColumnSchema */
                 $targetColumnSchema = clone $columnSchema;
                 $targetColumnSchema->setType(CDatabase_Type::getType(CDatabase_Type::BIGINT));
                 $targetColumnSchema->setUnsigned(true);
+                $targetColumnSchema->setDefault(null);
 
                 // See if column has changed properties in table 2.
                 $changedProperties = $comparator->diffColumn($columnSchema, $targetColumnSchema);
@@ -303,6 +307,7 @@ class CApp_Administrator_Fixer_Database {
             $sql = implode(";\n", $sqlArray);
             $sql .= ';';
         }
+
         return $sql;
     }
 
@@ -366,6 +371,7 @@ class CApp_Administrator_Fixer_Database {
                             $changes++;
                         }
                         $haveForeign = true;
+
                         break;
                     }
                 }
@@ -385,6 +391,7 @@ class CApp_Administrator_Fixer_Database {
             $sql = implode(";\n", $sqlArray);
             $sql .= ';';
         }
+
         return $sql;
     }
 }

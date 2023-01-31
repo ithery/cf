@@ -1,14 +1,10 @@
 <?php
 
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
-
 use PhpOffice\PhpSpreadsheet\Cell\Cell;
 use PhpOffice\PhpSpreadsheet\IOFactory;
+use PhpOffice\PhpSpreadsheet\Style\Fill;
 use PhpOffice\PhpSpreadsheet\Spreadsheet;
+use PhpOffice\PhpSpreadsheet\Style\Color;
 
 class CExporter_Writer {
     use CExporter_Trait_DelegatedMacroableTrait;
@@ -90,11 +86,34 @@ class CExporter_Writer {
             Cell::setValueBinder($export);
         }
 
-        $this->raise(new CExporter_Event_BeforeExport($this, $this->exportable));
+        $this->handleDocumentProperties($export);
 
-        if ($export instanceof CExporter_Concern_WithTitle) {
-            $this->spreadsheet->getProperties()->setTitle($export->title());
+        if ($export instanceof CExporter_Concern_WithBackgroundColor) {
+            $defaultStyle = $this->spreadsheet->getDefaultStyle();
+            $backgroundColor = $export->backgroundColor();
+
+            if (is_string($backgroundColor)) {
+                $defaultStyle->getFill()->setFillType(Fill::FILL_SOLID)->getStartColor()->setRGB($backgroundColor);
+            }
+
+            if (is_array($backgroundColor)) {
+                $defaultStyle->applyFromArray(['fill' => $backgroundColor]);
+            }
+
+            if ($backgroundColor instanceof Color) {
+                $defaultStyle->getFill()->setFillType(Fill::FILL_SOLID)->setStartColor($backgroundColor);
+            }
         }
+
+        if ($export instanceof CExporter_Concern_WithDefaultStyles) {
+            $defaultStyle = $this->spreadsheet->getDefaultStyle();
+            $styles = $export->defaultStyles($defaultStyle);
+
+            if (is_array($styles)) {
+                $defaultStyle->applyFromArray($styles);
+            }
+        }
+        $this->raise(new CExporter_Event_BeforeExport($this, $this->exportable));
 
         return $this;
     }
@@ -143,8 +162,10 @@ class CExporter_Writer {
 
         if ($temporaryFile instanceof CExporter_File_RemoteTemporaryFile) {
             $temporaryFile->updateRemote();
+            $temporaryFile->deleteLocalCopy();
         }
 
+        $this->clearListeners();
         $this->spreadsheet->disconnectWorksheets();
         unset($this->spreadsheet);
 
@@ -196,5 +217,63 @@ class CExporter_Writer {
      */
     public function hasConcern($concern) {
         return $this->exportable instanceof $concern;
+    }
+
+    /**
+     * @param object $export
+     */
+    protected function handleDocumentProperties($export) {
+        $properties = CExporter::config()->get('exports.properties', []);
+
+        if ($export instanceof CExporter_Concern_WithProperties) {
+            $properties = array_merge($properties, $export->properties());
+        }
+
+        if ($export instanceof CExporter_Concern_WithTitle) {
+            $properties = array_merge($properties, ['title' => $export->title()]);
+        }
+
+        $props = $this->spreadsheet->getProperties();
+
+        foreach (array_filter($properties) as $property => $value) {
+            switch ($property) {
+                case 'title':
+                    $props->setTitle($value);
+
+                    break;
+                case 'description':
+                    $props->setDescription($value);
+
+                    break;
+                case 'creator':
+                    $props->setCreator($value);
+
+                    break;
+                case 'lastModifiedBy':
+                    $props->setLastModifiedBy($value);
+
+                    break;
+                case 'subject':
+                    $props->setSubject($value);
+
+                    break;
+                case 'keywords':
+                    $props->setKeywords($value);
+
+                    break;
+                case 'category':
+                    $props->setCategory($value);
+
+                    break;
+                case 'manager':
+                    $props->setManager($value);
+
+                    break;
+                case 'company':
+                    $props->setCompany($value);
+
+                    break;
+            }
+        }
     }
 }

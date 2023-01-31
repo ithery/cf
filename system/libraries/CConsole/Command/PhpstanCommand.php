@@ -22,7 +22,7 @@ class CConsole_Command_PhpstanCommand extends CConsole_Command {
         $format = $this->option('format');
         $debug = $this->option('debug');
         $noProgress = $this->option('no-progress');
-        $appDir = $isFramework ? DOCROOT . 'system/libraries/CHTTP' : c::appRoot();
+        $appDir = $isFramework ? DOCROOT . 'system/libraries/CElement' : c::appRoot();
         $file = $this->argument('file');
         $scanPath = $appDir;
         if ($file) {
@@ -34,7 +34,7 @@ class CConsole_Command_PhpstanCommand extends CConsole_Command {
         }
 
         chdir($isFramework ? DOCROOT : c::appRoot());
-        $command = [$this->phpBinary(), '-c', CQC::phpstan()->phpstanConfiguration(), '-d', 'memory_limit=1G', '-d', 'max_execution_time=0', $this->getPhpStanBinary(), 'analyze', '--error-format', $format, '--autoload-file', CQC::phpstan()->phpstanBootstrap()];
+        $command = [$this->phpBinary(), '-d', 'memory_limit=1G', '-d', 'max_execution_time=0', $this->getPhpStanBinary(), 'analyze', '-c', CQC::phpstan()->phpstanConfiguration(), '--error-format', $format, '--autoload-file', CQC::phpstan()->phpstanBootstrap()];
         if ($debug) {
             $command[] = '--debug';
         }

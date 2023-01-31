@@ -7,7 +7,7 @@ class CElement_Component_DataTable_Exporter {
     protected $dataTable;
 
     public function __construct(CElement_Component_DataTable $dataTable) {
-        $this->dataTable;
+        $this->dataTable = $dataTable;
     }
 
     public function createEngine($engine) {

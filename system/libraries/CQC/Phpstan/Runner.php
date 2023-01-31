@@ -69,7 +69,7 @@ class CQC_Phpstan_Runner {
         // $process = new \Symfony\Component\Process\Process($command, c::appRoot());
         // $process->start();
         $cfCli = CConsole::kernel()->cfCli();
-        $exitCode = $cfCli->call('phpstan --format=json');
+        $exitCode = $cfCli->call('phpstan --format=json --no-progress');
         $lines = $cfCli->output();
         $this->storeRun($lines);
         if (!$this->endRun()) {

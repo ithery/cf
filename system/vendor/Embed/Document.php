@@ -2,19 +2,21 @@
 
 namespace Embed;
 
-use DOMDocument;
 use DOMNode;
 use DOMXPath;
+use DOMDocument;
+use RuntimeException;
 use HtmlParser\Parser;
 use Psr\Http\Message\UriInterface;
-use RuntimeException;
 use Symfony\Component\CssSelector\CssSelectorConverter;
 
 class Document {
-
     private static $cssConverter;
+
     private $extractor;
+
     private $document;
+
     private $xpath;
 
     public function __construct(Extractor $extractor) {
@@ -56,7 +58,9 @@ class Document {
     }
 
     /**
-     * Helper to build xpath queries easily and case insensitive
+     * Helper to build xpath queries easily and case insensitive.
+     *
+     * @param mixed $startQuery
      */
     private static function buildQuery($startQuery, array $attributes) {
         $selector = [$startQuery];
@@ -69,7 +73,9 @@ class Document {
     }
 
     /**
-     * Select a element in the dom
+     * Select a element in the dom.
+     *
+     * @param mixed $query
      */
     public function select($query, array $attributes = null, DOMNode $context = null) {
         if (!empty($attributes)) {
@@ -80,14 +86,18 @@ class Document {
     }
 
     /**
-     * Select a element in the dom using a css selector
+     * Select a element in the dom using a css selector.
+     *
+     * @param mixed $query
      */
     public function selectCss($query, DOMNode $context = null) {
         return $this->select(self::cssToXpath($query), null, $context);
     }
 
     /**
-     * Shortcut to select a <link> element and return the href
+     * Shortcut to select a <link> element and return the href.
+     *
+     * @param mixed $rel
      */
     public function link($rel, array $extra = []) {
         return $this->select('.//link', ['rel' => $rel] + $extra)->url('href');
@@ -108,5 +118,4 @@ class Document {
 
         return self::$cssConverter->toXpath($selector);
     }
-
 }

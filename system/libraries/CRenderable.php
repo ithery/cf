@@ -20,7 +20,7 @@ class CRenderable extends CObject implements CApp_Interface_Renderable {
 
     protected $wrapper;
 
-    protected function __construct($id = '') {
+    protected function __construct($id = null) {
         parent::__construct($id);
 
         $this->renderable = new CCollection();

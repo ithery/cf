@@ -19,8 +19,8 @@ class CElement_Element_A extends CElement_Element {
      *
      * @return static
      */
-    public static function factory($id = '') {
-        return CElement_Factory::create(static::class, $id = '');
+    public static function factory($id = null) {
+        return CElement_Factory::create(static::class, $id);
     }
 
     /**

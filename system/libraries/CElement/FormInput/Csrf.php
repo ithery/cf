@@ -8,7 +8,7 @@ class CElement_FormInput_Csrf extends CElement_FormInput_Hidden {
         $this->name = '_token';
     }
 
-    public static function factory($id) {
-        return new static($id);
+    public static function factory($id = null) {
+        return new CElement_FormInput_Csrf($id);
     }
 }

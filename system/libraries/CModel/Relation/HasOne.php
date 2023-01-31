@@ -1,5 +1,4 @@
 <?php
-
 class CModel_Relation_HasOne extends CModel_Relation_HasOneOrMany {
     use CModel_Relation_Trait_ComparesRelatedModels,
         CModel_Relation_Trait_SupportsDefaultModels;
@@ -8,6 +7,8 @@ class CModel_Relation_HasOne extends CModel_Relation_HasOneOrMany {
      * Get the results of the relationship.
      *
      * @return mixed
+     *
+     * @phpstan-return ?TRelatedModel
      */
     public function getResults() {
         if (is_null($this->getParentKey())) {

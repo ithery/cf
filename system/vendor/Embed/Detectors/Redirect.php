@@ -7,7 +7,6 @@ namespace Embed\Detectors;
 use Psr\Http\Message\UriInterface;
 
 class Redirect extends Detector {
-
     public function detect() {
         $document = $this->extractor->getDocument();
         $value = $document->select('.//meta', ['http-equiv' => 'refresh'])->str('content');
@@ -17,10 +16,9 @@ class Redirect extends Detector {
 
     private function extract($value) {
         if (preg_match('/url=(.+)$/i', $value, $match)) {
-            return $this->extractor->resolveUri($match[1]);
+            return $this->extractor->resolveUri(trim($match[1], '\'"'));
         }
 
         return null;
     }
-
 }

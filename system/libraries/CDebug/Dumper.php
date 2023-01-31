@@ -10,7 +10,7 @@ class CDebug_Dumper {
      *
      * @return void
      */
-    public function dump($value) {
+    public static function dump($value) {
         if (class_exists(CliDumper::class)) {
             $dumper = 'cli' === PHP_SAPI ? new CliDumper() : new CDebug_HtmlDumper();
 
@@ -27,7 +27,7 @@ class CDebug_Dumper {
      *
      * @return void
      */
-    public function getDump($value) {
+    public static function getDump($value) {
         if (class_exists(CliDumper::class)) {
             $dumper = 'cli' === PHP_SAPI ? new CliDumper() : new CDebug_HtmlDumper();
 

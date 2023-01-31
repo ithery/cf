@@ -214,6 +214,10 @@ trait CModel_HasResource_HasResourceTrait {
         return $repository->getCollection($this, $collectionName, $filters);
     }
 
+    /**
+     * @param string $collectionName
+     * @param array  $filters
+     */
     public function getFirstResource($collectionName = 'default', array $filters = []) {
         $resource = $this->getResource($collectionName, $filters);
 

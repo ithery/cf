@@ -23,6 +23,7 @@ trait CTrait_Controller_Application_Log_Notification {
             });
         $table->addColumn('vendor')->setLabel('Vendor');
         $table->addColumn('channel')->setLabel('Channel');
+        $table->addColumn('message_class')->setLabel('Message Class');
         $table->addColumn('error')->setLabel('Status')->setCallback(function ($row, $value) {
             if ($value == null) {
                 return 'SUCCESS';
@@ -105,10 +106,17 @@ trait CTrait_Controller_Application_Log_Notification {
         $widget = $app->addWidget();
         $widget->setTitle('Message');
         $widget->setNoPadding();
+        $widget->addClass('mb-3');
         $widget->addIframe()->setSrc($this->controllerUrl() . 'iframe/' . $logNotificationId)
             ->customCss('width', '100%')
             ->customCss('border', 'none')
             ->customCss('height', '500px');
+
+        if ($logNotificationModel->error) {
+            $widget = $app->addWidget();
+            $widget->setTitle('Error');
+            $widget->addPre()->add($logNotificationModel->error);
+        }
 
         return $app;
     }
@@ -122,6 +130,20 @@ trait CTrait_Controller_Application_Log_Notification {
         $logNotificationModel = $this->logNotificationModel;
         $logNotificationModel = $logNotificationModel::findOrFail($logNotificationId);
 
-        return c::response($logNotificationModel->message);
+        $message = $logNotificationModel->message;
+        if (cstr::tolower($logNotificationModel->channel) == 'whatsapp') {
+            $style = <<<HTML
+                <style>
+                body {
+                    font-family: Segoe UI,Helvetica Neue,Helvetica,Lucida Grande,Arial,Ubuntu,Cantarell,Fira Sans,sans-serif;
+                }
+                </style>
+            HTML;
+
+            $message = nl2br($message);
+            $message = $style . $message;
+        }
+
+        return c::response($message);
     }
 }

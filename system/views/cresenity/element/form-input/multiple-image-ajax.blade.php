@@ -141,6 +141,7 @@
         $(function () {
             const errorMessageLimitFile = '@lang("element/image.errorMessageLimitFile",["limit"=>$limitFile])';
             const errorMessageMaxUploadSize = '@lang("element/image.errorMessageMaxUploadSize",["sizeMB"=>$maxUploadSize])';
+            const errorMessageImageOnly = '@lang("element/image.errorMessageImageOnly")';
             const removeLabel = "@lang('element/image.remove')";
             const elementId = "{{ $id }}";
             var haveCropper = <?php echo ($cropper != null) ? 'true' : 'false' ?>;
@@ -155,7 +156,11 @@
                         if (maxUploadSize && filesize > maxUploadSize) {
                             cresenity.showError(errorMessageMaxUploadSize);
                         } else {
-                            insertFile(reader, file, fileList, event);
+                            if (file.type.match("image.*")) {
+                                insertFile(reader, file, fileList, event);
+                            } else {
+                                cresenity.showError(errorMessageImageOnly);
+                            }
                         }
                     }
                 }, child, file, $("#" + elementId));

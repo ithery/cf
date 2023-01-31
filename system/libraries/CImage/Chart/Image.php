@@ -13,10 +13,10 @@ use CImage_Chart_Constant as Constant;
 
 class CImage_Chart_Image extends CImage_Chart_Draw {
     /**
-     * @param int     $xSize
-     * @param int     $ySize
-     * @param Data    $dataSet
-     * @param boolean $transparentBackground
+     * @param int  $xSize
+     * @param int  $ySize
+     * @param Data $dataSet
+     * @param bool $transparentBackground
      */
     public function __construct($xSize, $ySize, Data $dataSet = null, $transparentBackground = false) {
         parent::__construct();
@@ -46,10 +46,10 @@ class CImage_Chart_Image extends CImage_Chart_Draw {
     }
 
     /**
-     * Enable / Disable and set shadow properties
+     * Enable / Disable and set shadow properties.
      *
-     * @param boolean $enabled
-     * @param array   $format
+     * @param bool  $enabled
+     * @param array $format
      */
     public function setShadow($enabled = true, array $format = []) {
         $x = isset($format['x']) ? $format['x'] : 2;
@@ -68,14 +68,14 @@ class CImage_Chart_Image extends CImage_Chart_Draw {
     }
 
     /**
-     * Set the graph area position
+     * Set the graph area position.
      *
      * @param int $x1
      * @param int $y1
      * @param int $x2
      * @param int $y2
      *
-     * @return int|null
+     * @return null|int
      */
     public function setGraphArea($x1, $y1, $x2, $y2) {
         if ($x2 < $x1 || $x1 == $x2 || $y2 < $y1 || $y1 == $y2) {
@@ -92,7 +92,7 @@ class CImage_Chart_Image extends CImage_Chart_Draw {
     }
 
     /**
-     * Return the width of the picture
+     * Return the width of the picture.
      *
      * @return int
      */
@@ -101,7 +101,7 @@ class CImage_Chart_Image extends CImage_Chart_Draw {
     }
 
     /**
-     * Return the heigth of the picture
+     * Return the heigth of the picture.
      *
      * @return int
      */
@@ -110,7 +110,7 @@ class CImage_Chart_Image extends CImage_Chart_Draw {
     }
 
     /**
-     * Render the picture to a file
+     * Render the picture to a file.
      *
      * @param string $fileName
      */
@@ -122,14 +122,18 @@ class CImage_Chart_Image extends CImage_Chart_Draw {
         imagepng($this->picture, $fileName);
     }
 
-    public function __toString() {
+    public function toData() {
         if ($this->transparentBackground) {
             imagealphablending($this->picture, false);
             imagesavealpha($this->picture, true);
         }
         ob_start();
         imagepng($this->picture);
+
         return ob_get_clean();
+    }
+    public function __toString() {
+        return $this->toData();
     }
 
     public function toDataURI() {
@@ -137,9 +141,9 @@ class CImage_Chart_Image extends CImage_Chart_Draw {
     }
 
     /**
-     * Render the picture to a web browser stream
+     * Render the picture to a web browser stream.
      *
-     * @param boolean $browserExpire
+     * @param bool $browserExpire
      */
     public function stroke($browserExpire = false) {
         if ($this->transparentBackground) {
@@ -156,7 +160,7 @@ class CImage_Chart_Image extends CImage_Chart_Draw {
     }
 
     /**
-     * Automatic output method based on the calling interface
+     * Automatic output method based on the calling interface.
      *
      * @param string $fileName
      */
@@ -169,7 +173,7 @@ class CImage_Chart_Image extends CImage_Chart_Draw {
     }
 
     /**
-     * Attach a dataset to your pChart Object
+     * Attach a dataset to your pChart Object.
      *
      * @param Data $dataSet
      */
@@ -178,14 +182,14 @@ class CImage_Chart_Image extends CImage_Chart_Draw {
     }
 
     /**
-     * Print attached dataset contents to STDOUT
+     * Print attached dataset contents to STDOUT.
      */
     public function printDataSet() {
         print_r($this->dataSet);
     }
 
     /**
-     * Remove VOID values from an imagemap custom values array
+     * Remove VOID values from an imagemap custom values array.
      *
      * @param string $serieName
      * @param array  $values
@@ -202,11 +206,12 @@ class CImage_Chart_Image extends CImage_Chart_Draw {
                 $result[] = $values[$key];
             }
         }
+
         return $result;
     }
 
     /**
-     * Replace the title of one image map serie
+     * Replace the title of one image map serie.
      *
      * @param string       $oldTitle
      * @param string|array $newTitle
@@ -290,7 +295,7 @@ class CImage_Chart_Image extends CImage_Chart_Draw {
     }
 
     /**
-     * Replace the values of the image map contents
+     * Replace the values of the image map contents.
      *
      * @param string $Title
      * @param array  $values
@@ -359,7 +364,7 @@ class CImage_Chart_Image extends CImage_Chart_Draw {
     }
 
     /**
-     * Dump the image map
+     * Dump the image map.
      *
      * @param string $name
      * @param int    $storageMode
@@ -404,7 +409,7 @@ class CImage_Chart_Image extends CImage_Chart_Draw {
     }
 
     /**
-     * Mirror Effect
+     * Mirror Effect.
      *
      * @param int   $x
      * @param int   $y

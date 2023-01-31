@@ -2,13 +2,15 @@
 
 class CElement_Component_TableRow extends CElement_Component {
     use CTrait_Compat_Element_TableRow;
+
     protected $columns = [];
 
     public function __construct($id = '') {
         parent::__construct($id);
     }
 
-    public static function factory($id = '') {
+    public static function factory($id = null) {
+        // @phpstan-ignore-next-line
         return new static($id);
     }
 

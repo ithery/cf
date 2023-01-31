@@ -16,6 +16,11 @@ return [
         'uri' => 'demo/controls/select/index',
     ],
     [
+        'name' => 'controls.select.search',
+        'label' => c::__('Select Search'),
+        'uri' => 'demo/controls/select/search/index',
+    ],
+    [
         'name' => 'controls.datetime',
         'label' => c::__('Date Time'),
         'uri' => 'demo/controls/datetime/index',

@@ -51,8 +51,9 @@ trait CElement_FormInput_SelectSearch_Trait_Select2v23Trait {
                         $row = (array) $row;
                     }
                     if (isset($this->valueCallback) && is_callable($this->valueCallback)) {
+                        $valueCallback = $this->valueCallback;
                         foreach ($row as $k => $v) {
-                            $row[$k] = $this->valueCallback($row, $k, $v);
+                            $row[$k] = $valueCallback($row, $k, $v);
                         }
                     }
                     $selectedData[] = $row;
