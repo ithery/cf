@@ -1,24 +1,16 @@
 <?php
 
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
-
 /**
- * This class is used to construct a SandBoxMode object for the /mail/send API call
- *
- * @package SendGrid\Mail
+ * This class is used to construct a SandBoxMode object for the /mail/send API call.
  */
 class CVendor_SendGrid_Mail_SandBoxMode implements \JsonSerializable {
     // @var bool Indicates if this setting is enabled
     private $enable;
 
     /**
-     * Optional constructor
+     * Optional constructor.
      *
-     * @param bool|null $enable Indicates if this setting is enabled
+     * @param null|bool $enable Indicates if this setting is enabled
      */
     public function __construct($enable = null) {
         if (isset($enable)) {
@@ -27,7 +19,7 @@ class CVendor_SendGrid_Mail_SandBoxMode implements \JsonSerializable {
     }
 
     /**
-     * Update the enable setting on a SandBoxMode object
+     * Update the enable setting on a SandBoxMode object.
      *
      * @param bool $enable Indicates if this setting is enabled
      *
@@ -41,7 +33,7 @@ class CVendor_SendGrid_Mail_SandBoxMode implements \JsonSerializable {
     }
 
     /**
-     * Retrieve the enable setting on a SandBoxMode object
+     * Retrieve the enable setting on a SandBoxMode object.
      *
      * @return bool
      */
@@ -50,7 +42,7 @@ class CVendor_SendGrid_Mail_SandBoxMode implements \JsonSerializable {
     }
 
     /**
-     * Return an array representing a SandBoxMode object for the Twilio SendGrid API
+     * Return an array representing a SandBoxMode object for the Twilio SendGrid API.
      *
      * @return null|array
      */

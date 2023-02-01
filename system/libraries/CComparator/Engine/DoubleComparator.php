@@ -1,16 +1,9 @@
 <?php
 
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
-
 /**
  * Compares doubles for equality.
  */
 class CComparator_Engine_DoubleComparator extends CComparator_Engine_NumericComparator {
-
     /**
      * Smallest value available in PHP.
      *
@@ -47,5 +40,4 @@ class CComparator_Engine_DoubleComparator extends CComparator_Engine_NumericComp
         }
         parent::assertEquals($expected, $actual, $delta, $canonicalize, $ignoreCase);
     }
-
 }

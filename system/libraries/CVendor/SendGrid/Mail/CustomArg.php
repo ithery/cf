@@ -1,13 +1,7 @@
 <?php
 
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
-
 /**
- * This class is used to construct a CustomArg object for the /mail/send API call
+ * This class is used to construct a CustomArg object for the /mail/send API call.
  *
  * Values that are specific to the entire send that will be carried along with the
  * email and its activity data. Substitutions will not be made on custom arguments,
@@ -15,8 +9,6 @@
  * custom argument that you would like to be used. This parameter is overridden by
  * personalizations[x].custom_args if that parameter has been defined. Total custom
  * args size may not exceed 10,000 bytes.
- *
- * @package SendGrid\Mail
  */
 class CVendor_SendGrid_Mail_CustomArg implements \JsonSerializable {
     /**
@@ -30,10 +22,10 @@ class CVendor_SendGrid_Mail_CustomArg implements \JsonSerializable {
     private $value;
 
     /**
-     * Optional constructor
+     * Optional constructor.
      *
-     * @param string|null $key   Custom arg key
-     * @param string|null $value Custom arg value
+     * @param null|string $key   Custom arg key
+     * @param null|string $value Custom arg value
      */
     public function __construct($key = null, $value = null) {
         if (isset($key)) {
@@ -45,7 +37,7 @@ class CVendor_SendGrid_Mail_CustomArg implements \JsonSerializable {
     }
 
     /**
-     * Add a custom arg key on a CustomArg object
+     * Add a custom arg key on a CustomArg object.
      *
      * @param string $key Custom arg key
      *
@@ -59,7 +51,7 @@ class CVendor_SendGrid_Mail_CustomArg implements \JsonSerializable {
     }
 
     /**
-     * Retrieve a custom arg key on a CustomArg object
+     * Retrieve a custom arg key on a CustomArg object.
      *
      * @return string
      */
@@ -68,7 +60,7 @@ class CVendor_SendGrid_Mail_CustomArg implements \JsonSerializable {
     }
 
     /**
-     * Add a custom arg value on a CustomArg object
+     * Add a custom arg value on a CustomArg object.
      *
      * @param string $value Custom arg value
      *
@@ -82,7 +74,7 @@ class CVendor_SendGrid_Mail_CustomArg implements \JsonSerializable {
     }
 
     /**
-     * Retrieve a custom arg key on a CustomArg object
+     * Retrieve a custom arg key on a CustomArg object.
      *
      * @return string
      */
@@ -91,7 +83,7 @@ class CVendor_SendGrid_Mail_CustomArg implements \JsonSerializable {
     }
 
     /**
-     * Return an array representing a CustomArg object for the Twilio SendGrid API
+     * Return an array representing a CustomArg object for the Twilio SendGrid API.
      *
      * @return null|array
      */

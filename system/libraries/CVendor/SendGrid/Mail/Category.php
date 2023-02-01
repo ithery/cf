@@ -1,15 +1,7 @@
 <?php
 
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
-
 /**
- * This class is used to construct a Category object for the /mail/send API call
- *
- * @package SendGrid\Mail
+ * This class is used to construct a Category object for the /mail/send API call.
  */
 class CVendor_SendGrid_Mail_Category implements \JsonSerializable {
     /**
@@ -18,9 +10,9 @@ class CVendor_SendGrid_Mail_Category implements \JsonSerializable {
     private $category;
 
     /**
-     * Optional constructor
+     * Optional constructor.
      *
-     * @param string|null $category A category name for an email message.
+     * @param null|string $category A category name for an email message.
      *                              Each category name may not exceed 255
      *                              characters
      */
@@ -31,7 +23,7 @@ class CVendor_SendGrid_Mail_Category implements \JsonSerializable {
     }
 
     /**
-     * Add a category to a Category object
+     * Add a category to a Category object.
      *
      * @param string $category A category name for an email message.
      *                         Each category name may not exceed 255
@@ -47,7 +39,7 @@ class CVendor_SendGrid_Mail_Category implements \JsonSerializable {
     }
 
     /**
-     * Retrieve a category from a Category object
+     * Retrieve a category from a Category object.
      *
      * @return string
      */
@@ -56,7 +48,7 @@ class CVendor_SendGrid_Mail_Category implements \JsonSerializable {
     }
 
     /**
-     * Return an array representing a Category object for the Twilio SendGrid API
+     * Return an array representing a Category object for the Twilio SendGrid API.
      *
      * @return string
      */
