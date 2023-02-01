@@ -1,6 +1,7 @@
 <?php
 use CVendor_LiteSpeed_Info as Info;
 use CVendor_LiteSpeed_Node as Node;
+use CVendor_LiteSpeed_UIBase as UIBase;
 
 class CVendor_LiteSpeed_Page {
     private $_id;
@@ -25,21 +26,21 @@ class CVendor_LiteSpeed_Page {
         $this->_tblmap = $tblmap;
     }
 
-    public function GetID() {
+    public function getID() {
         return $this->_id;
     }
 
-    public function GetLabel() {
+    public function getLabel() {
         return $this->_label;
     }
 
-    public function GetTblMap() {
+    public function getTblMap() {
         return $this->_tblmap;
     }
 
-    public function PrintHtml($disp) {
-        $this->_disp_tid = $disp->Get(Info::FLD_TID);
-        $this->_disp_ref = $disp->Get(Info::FLD_REF);
+    public function printHtml($disp) {
+        $this->_disp_tid = $disp->get(Info::FLD_TID);
+        $this->_disp_ref = $disp->get(Info::FLD_REF);
 
         $this->_linked_tbls = null;
         $this->_extended = true;
@@ -49,18 +50,18 @@ class CVendor_LiteSpeed_Page {
             $this->_disp_tid = substr($this->_disp_tid, $last + 1);
         }
 
-        if (($topmesg = $disp->Get(Info::FLD_TOP_MSG)) != null) {
+        if (($topmesg = $disp->get(Info::FLD_TOP_MSG)) != null) {
             foreach ($topmesg as $tm) {
                 echo UIBase::message('', $tm, 'error');
             }
         }
 
-        $root = $disp->Get(Info::FLD_PG_DATA);
+        $root = $disp->get(Info::FLD_PG_DATA);
         if ($root == null) {
             return;
         }
 
-        if ($root->Get(Node::FLD_KEY) == Node::K_EXTRACTED) {
+        if ($root->get(Node::FLD_KEY) == Node::K_EXTRACTED) {
             $this->print_tbl($this->_disp_tid, $root, $disp);
         } else {
             $this->_printdone = false;
@@ -72,7 +73,7 @@ class CVendor_LiteSpeed_Page {
             $disp->SetPrintingLinked(true);
             foreach ($this->_linked_tbls as $lti) {
                 $this->_disp_tid = $lti;
-                $this->_disp_ref = $disp->Get(Info::FLD_REF);
+                $this->_disp_ref = $disp->get(Info::FLD_REF);
                 $this->_printdone = false;
                 $this->printMap($this->_tblmap, $root, $disp);
             }
@@ -113,10 +114,10 @@ class CVendor_LiteSpeed_Page {
     }
 
     private function print_tbl($tid, $dlayer, $disp) {
-        $tbl = DTblDef::getInstance()->GetTblDef($tid);
+        $tbl = CVendor_LiteSpeed_OWS_TblDef::getInstance()->getTblDef($tid);
         $tbl->PrintHtml($dlayer, $disp);
 
-        if (($linked = $tbl->Get(DTbl::FLD_LINKEDTBL)) != null) {
+        if (($linked = $tbl->get(CVendor_LiteSpeed_Tbl::FLD_LINKEDTBL)) != null) {
             if ($this->_linked_tbls == null) {
                 $this->_linked_tbls = $linked;
             } else {

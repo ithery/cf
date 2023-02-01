@@ -1,6 +1,7 @@
 <?php
 
 define('ASSETS_URL', 'res');
+use CVendor_LiteSpeed_Msg as Msg;
 
 class CVendor_LiteSpeed_UIBase {
     //array("Display Name" => "URL");
@@ -11,7 +12,7 @@ class CVendor_LiteSpeed_UIBase {
     }
 
     protected function confform_start() {
-        $formaction = $this->uiproperty->Get(UIProperty::FLD_FORM_ACTION);
+        $formaction = $this->uiproperty->get(UIProperty::FLD_FORM_ACTION);
         $buf = '
 		<!-- ========================== confform STARTS HERE ========================== -->
 		<form name="confform" id="confform" method="post" action="' . $formaction . '">
@@ -22,7 +23,7 @@ class CVendor_LiteSpeed_UIBase {
 
     protected function confform_end() {
         $buf = '';
-        $hiddenvars = $this->uiproperty->Get(UIProperty::FLD_FORM_HIDDENVARS);
+        $hiddenvars = $this->uiproperty->get(UIProperty::FLD_FORM_HIDDENVARS);
         foreach ($hiddenvars as $n => $v) {
             $buf .= '<input type="hidden" name="' . $n . '" value="' . $v . '">';
         }
@@ -34,12 +35,12 @@ class CVendor_LiteSpeed_UIBase {
     }
 
     protected function print_conf_page($disp, $page) {
-        $this->uiproperty->Set(UIProperty::FLD_FORM_ACTION, '#view/confMgr.php');
+        $this->uiproperty->set(UIProperty::FLD_FORM_ACTION, '#view/confMgr.php');
 
         $disp->InitUIProps($this->uiproperty);
 
-        $icontitle = $disp->Get(DInfo::FLD_ICONTITLE);
-        echo $this->content_header($icontitle[0], $icontitle[1], $page->GetLabel());
+        $icontitle = $disp->get(DInfo::FLD_ICONTITLE);
+        echo $this->contentHeader($icontitle[0], $icontitle[1], $page->GetLabel());
         echo $this->confform_start();
         echo $this->main_tabs();
         echo '<div class="tab-content margin-top-10 padding-10">';
@@ -51,7 +52,7 @@ class CVendor_LiteSpeed_UIBase {
     }
 
     protected function main_tabs() {
-        $tabs = $this->uiproperty->Get(UIProperty::FLD_TABS);
+        $tabs = $this->uiproperty->get(UIProperty::FLD_TABS);
 
         $buf = '<div><ul class="nav nav-tabs" role="tablist">';
 
@@ -69,7 +70,7 @@ class CVendor_LiteSpeed_UIBase {
         return $buf;
     }
 
-    public static function content_header($icon, $title, $subtitle = '') {
+    public static function contentHeader($icon, $title, $subtitle = '') {
         $serverload = implode(', ', sys_getloadavg());
         $pid = Service::ServiceData(SInfo::DATA_PID);
 
@@ -86,11 +87,11 @@ class CVendor_LiteSpeed_UIBase {
 				<ul id="sparks" class="">
 					<li class="sparks-info">
 						<h5>LSWS PID <span id="lst-pid" class="txt-color-blue"> ' . $pid . ' </span></h5>&nbsp;
-						<a class="btn btn-success" title="' . DMsg::UIStr('menu_restart') . '" href="javascript:lst_restart()"><i class="fa fa-lg fa-repeat"></i></a>
+						<a class="btn btn-success" title="' . Msg::UIStr('menu_restart') . '" href="javascript:lst_restart()"><i class="fa fa-lg fa-repeat"></i></a>
 					</li>
 					<li class="sparks-info">
-						<h5> ' . DMsg::UIStr('note_loadavg') . ' <span id="lst-load" class="txt-color-purple"> ' . $serverload . ' </span></h5>&nbsp;
-						<a class="btn btn-info" title="' . DMsg::UIStr('menu_rtstats') . '" href="#view/realtimestats.php"><i class="fa fa-lg fa-bar-chart-o"></i></a>
+						<h5> ' . Msg::UIStr('note_loadavg') . ' <span id="lst-load" class="txt-color-purple"> ' . $serverload . ' </span></h5>&nbsp;
+						<a class="btn btn-info" title="' . Msg::UIStr('menu_rtstats') . '" href="#view/realtimestats.php"><i class="fa fa-lg fa-bar-chart-o"></i></a>
 					</li>
 
 				</ul>
@@ -101,7 +102,7 @@ class CVendor_LiteSpeed_UIBase {
         return $buf;
     }
 
-    public static function GetActionButtons($actdata, $type) {
+    public static function getActionButtons($actdata, $type) {
         $buf = '<div ';
         if ($type == 'toolbar') {
             $buf .= 'class="jarviswidget-ctrls" role="menu">';
@@ -136,7 +137,7 @@ class CVendor_LiteSpeed_UIBase {
         return $buf;
     }
 
-    public static function GetTblTips($tips) {
+    public static function getTblTips($tips) {
         $buf = '<div class="alert alert-success fade in"><ul>';
         foreach ($tips as $tip) {
             if ($tip != '') {
@@ -180,10 +181,11 @@ class CVendor_LiteSpeed_UIBase {
                     $o .= '<option value="' . $key . '"';
 
                     if (($key == $selValue)
-                            && !($selValue === '' && $key === 0)
-                            && !($selValue === null && $key === 0)
-                            && !($selValue === '0' && $key === '')
-                            && !($selValue === 0 && $key === '')) {
+                        && !($selValue === '' && $key === 0)
+                        && !($selValue === null && $key === 0)
+                        && !($selValue === '0' && $key === '')
+                        && !($selValue === 0 && $key === '')
+                    ) {
                         $o .= ' selected="selected"';
                     }
                 }
@@ -197,7 +199,7 @@ class CVendor_LiteSpeed_UIBase {
     // for plot
     // tabstatus = 1: active, 0: not active, -1: not tab
 
-    public static function GenPlotTab($tab_id, $bottomdef, $plotdef, $tabstatus) {
+    public static function genPlotTab($tab_id, $bottomdef, $plotdef, $tabstatus) {
         $buf = '<div id="' . $tab_id . '"';
         if ($tabstatus != -1) {
             // is tabpane
@@ -258,7 +260,7 @@ class CVendor_LiteSpeed_UIBase {
     }
 
     public static function Get_LangDropdown() {
-        $langlist = DMsg::GetSupportedLang($curlang);
+        $langlist = Msg::GetSupportedLang($curlang);
 
         $buf = '<a href="#" class="dropdown-toggle" data-toggle="dropdown"><span>'
                 . $langlist[$curlang][0] . '</span> <i class="fa fa-angle-down"></i> </a>
@@ -276,7 +278,7 @@ class CVendor_LiteSpeed_UIBase {
         return $buf;
     }
 
-    public static function GrabInput($origin, $name, $type = '') {
+    public static function grabInput($origin, $name, $type = '') {
         if ($name == '' || $origin == '') {
             return null;
         }
@@ -285,24 +287,30 @@ class CVendor_LiteSpeed_UIBase {
 
         switch (strtoupper($origin)) {
             case 'REQUEST':
-            case 'ANY':	$temp = $_REQUEST;
+            case 'ANY':
+                $temp = $_REQUEST;
 
-            break;
-            case 'GET': $temp = $_GET;
+                break;
+            case 'GET':
+                $temp = $_GET;
 
-            break;
-            case 'POST': $temp = $_POST;
+                break;
+            case 'POST':
+                $temp = $_POST;
 
-            break;
-            case 'COOKIE': $temp = $_COOKIE;
+                break;
+            case 'COOKIE':
+                $temp = $_COOKIE;
 
-            break;
-            case 'FILE': $temp = $_FILES;
+                break;
+            case 'FILE':
+                $temp = $_FILES;
 
-            break;
-            case 'SERVER': $temp = $_SERVER;
+                break;
+            case 'SERVER':
+                $temp = $_SERVER;
 
-            break;
+                break;
             default:
                 die('input extract error.');
         }
@@ -314,18 +322,24 @@ class CVendor_LiteSpeed_UIBase {
         }
 
         switch ($type) {
-            case 'int': return (int) $temp;
-            case 'float': // filter_var($temp, FILTER_VALIDATE_FLOAT, FILTER_FLAG_ALLOW_THOUSAND); filter module not in admin_php
+            case 'int':
+                return (int) $temp;
+            case 'float':
+                // filter_var($temp, FILTER_VALIDATE_FLOAT, FILTER_FLAG_ALLOW_THOUSAND); filter module not in admin_php
                 return (float) str_replace(',', '', $temp);
-            case 'string': return trim((string) $temp);
-            case 'array': return is_array($temp) ? $temp : null;
-            case 'object': return is_object($temp) ? $temp : null;
-            default: return trim((string) $temp); //default string
+            case 'string':
+                return trim((string) $temp);
+            case 'array':
+                return is_array($temp) ? $temp : null;
+            case 'object':
+                return is_object($temp) ? $temp : null;
+            default:
+                return trim((string) $temp); //default string
         }
     }
 
-    public static function GrabGoodInput($origin, $name, $type = '') {
-        $val = self::GrabInput($origin, $name, $type);
+    public static function grabGoodInput($origin, $name, $type = '') {
+        $val = self::grabInput($origin, $name, $type);
         if ($val != null && strpos($val, '<') !== false) {
             $val = null;
         }
@@ -333,29 +347,35 @@ class CVendor_LiteSpeed_UIBase {
         return $val;
     }
 
-    public static function GrabGoodInputWithReset($origin, $name, $type = '') {
-        $val = self::GrabInput($origin, $name, $type);
+    public static function grabGoodInputWithReset($origin, $name, $type = '') {
+        $val = self::grabInput($origin, $name, $type);
         if ($val != null && strpos($val, '<') !== false) {
             switch (strtoupper($origin)) {
                 case 'REQUEST':
-                case 'ANY':	$_REQUEST[$name] = null;
+                case 'ANY':
+                    $_REQUEST[$name] = null;
 
-                break;
-                case 'GET': $_GET[$name] = null;
+                    break;
+                case 'GET':
+                    $_GET[$name] = null;
 
-                break;
-                case 'POST': $_POST[$name] = null;
+                    break;
+                case 'POST':
+                    $_POST[$name] = null;
 
-                break;
-                case 'COOKIE': $_COOKIE[$name] = null;
+                    break;
+                case 'COOKIE':
+                    $_COOKIE[$name] = null;
 
-                break;
-                case 'FILE': $_FILES[$name] = null;
+                    break;
+                case 'FILE':
+                    $_FILES[$name] = null;
 
-                break;
-                case 'SERVER': $_SERVER[$name] = null;
+                    break;
+                case 'SERVER':
+                    $_SERVER[$name] = null;
 
-                break;
+                    break;
             }
             $val = null;
         }

@@ -18,7 +18,7 @@ class CVendor_LiteSpeed_TblMap {
         $this->_extended_map = $extended_map;
     }
 
-    public function GetLoc($index = 0) {
+    public function getLoc($index = 0) {
         return is_array($this->_layer) ? $this->_layer[$index] : $this->_layer;
     }
 
@@ -54,16 +54,16 @@ class CVendor_LiteSpeed_TblMap {
         return null;
     }
 
-    public function Convert($srcloc_index, $srcnode, $dstloc_index, $dstnode) {
-        $srcloc = $this->GetLoc($srcloc_index);
-        $dstloc = $this->GetLoc($dstloc_index);
+    public function convert($srcloc_index, Node $srcnode, $dstloc_index, Node $dstnode) {
+        $srcloc = $this->getLoc($srcloc_index);
+        $dstloc = $this->getLoc($dstloc_index);
 
-        $srclayer = $srcnode->LocateLayer($srcloc);
+        $srclayer = $srcnode->locateLayer($srcloc);
         if ($srclayer == null) {
             return;
         }
 
-        $tonode = $dstnode->AllocateLayerNode($dstloc);
+        $tonode = $dstnode->allocateLayerNode($dstloc);
 
         $is_multi = (strpos($dstloc, '*') !== false);
         $map = $this->GetMaps(false);
@@ -92,27 +92,27 @@ class CVendor_LiteSpeed_TblMap {
 
             foreach ($srclayer as $fromnode) {
                 $child = new Node($key, null, $type); // value will be set later
-                $this->convert_map($map, $srcloc_index, $fromnode, $dstloc_index, $child);
-                $tonode->AddChild($child);
+                $this->convertMap($map, $srcloc_index, $fromnode, $dstloc_index, $child);
+                $tonode->addChild($child);
             }
         } else {
-            $this->convert_map($map, $srcloc_index, $srclayer, $dstloc_index, $tonode);
+            $this->convertMap($map, $srcloc_index, $srclayer, $dstloc_index, $tonode);
         }
     }
 
-    private function convert_map($map, $srcloc_index, $srcnode, $dstloc_index, $dstnode) {
+    private function convertMap($map, $srcloc_index, $srcnode, $dstloc_index, $dstnode) {
         foreach ($map as $m) {
             if ($m instanceof CVendor_LiteSpeed_TblMap) {
-                $m->Convert($srcloc_index, $srcnode, $dstloc_index, $dstnode);
+                $m->convert($srcloc_index, $srcnode, $dstloc_index, $dstnode);
             } else {
-                $this->convert_tbl($m, $srcnode, $dstnode);
+                $this->convertTbl($m, $srcnode, $dstnode);
             }
         }
     }
 
-    private function convert_tbl($tid, $srcnode, $dstnode) {
-        $tbl = TblDef::GetInstance()->GetTblDef($tid);
-        $attrs = $tbl->Get(Tbl::FLD_DATTRS);
+    private function convertTbl($tid, $srcnode, $dstnode) {
+        $tbl = TblDef::getInstance()->getTblDef($tid);
+        $attrs = $tbl->get(Tbl::FLD_DATTRS);
         $index = $tbl->Get(Tbl::FLD_INDEX);
 
         foreach ($attrs as $attr) {
@@ -149,11 +149,11 @@ class CVendor_LiteSpeed_TblMap {
 
             if (is_array($from)) {
                 foreach ($from as $fnode) {
-                    $fnode->Set(Node::FLD_PRINTKEY, $key);
+                    $fnode->set(Node::FLD_PRINTKEY, $key);
                     $dnode->AddChild($fnode);
                 }
             } else {
-                $from->Set(Node::FLD_PRINTKEY, $key);
+                $from->set(Node::FLD_PRINTKEY, $key);
                 $dnode->AddChild($from);
                 if ($key == $index) {
                     $from->AddFlag(Node::BM_IDX);
@@ -165,8 +165,8 @@ class CVendor_LiteSpeed_TblMap {
             }
         }
 
-        if (($subtid = $tbl->GetSubTid($dstnode)) != null) {
-            $this->convert_tbl($subtid, $srcnode, $dstnode);
+        if (($subtid = $tbl->getSubTid($dstnode)) != null) {
+            $this->convertTbl($subtid, $srcnode, $dstnode);
         }
 
         if (!$srcnode->HasDirectChildren()) {

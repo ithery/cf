@@ -1,9 +1,9 @@
 <?php
 use CVendor_LiteSpeed_Msg as Msg;
+use CVendor_LiteSpeed_Node as Node;
 
-/*
- * type: parse  _minVal = pattern, _maxVal = pattern tips
- *
+/**
+ * Type: parse  _minVal = pattern, _maxVal = pattern tips.
  */
 define('ATTR_VAL_NOT_SET', Msg::UIStr('o_notset'));
 define('ATTR_VAL_BOOL_YES', Msg::UIStr('o_yes'));
@@ -76,7 +76,7 @@ class CVendor_LiteSpeed_AttrBase {
         $this->_bitFlag |= $flag;
     }
 
-    public function IsFlagOn($flag) {
+    public function isFlagOn($flag) {
         return ($this->_bitFlag & $flag) == $flag;
     }
 
@@ -145,14 +145,15 @@ class CVendor_LiteSpeed_AttrBase {
         }
     }
 
-    protected function toHtmlContent($node, $refUrl = null) {
-        if ($node == null || !$node->HasVal()) {
+    protected function toHtmlContent($node = null, $refUrl = null) {
+        /** @var Node $node */
+        if ($node == null || !$node->hasVal()) {
             return '<span class="text-muted">' . ATTR_VAL_NOT_SET . '</span>';
         }
 
         $o = '';
-        $value = $node->Get(CNode::FLD_VAL);
-        $err = $node->Get(CNode::FLD_ERR);
+        $value = $node->get(Node::FLD_VAL);
+        $err = $node->get(Node::FLD_ERR);
 
         if ($this->_type == 'sel1' && $value != null && !array_key_exists($value, $this->_maxVal)) {
             $err = 'Invalid value - ' . htmlspecialchars($value, ENT_QUOTES);
@@ -265,7 +266,7 @@ class CVendor_LiteSpeed_AttrBase {
             if ($node->HasDirectChildren($key0)) {
                 $node = $node->GetChildren($key0);
             } else {
-                $child = new CNode($key0, '', CNode::T_KB);
+                $child = new Node($key0, '', Node::T_KB);
                 $node->AddChild($child);
                 $node = $child;
             }
@@ -274,15 +275,15 @@ class CVendor_LiteSpeed_AttrBase {
         if ($this->_multiInd == 2 && $value != null) {
             $v = preg_split("/\n+/", $value, -1, PREG_SPLIT_NO_EMPTY);
             foreach ($v as $vi) {
-                $node->AddChild(new CNode($key, trim($vi)));
+                $node->AddChild(new Node($key, trim($vi)));
             }
         } elseif ($this->_type == 'checkboxOr') {
-            $node->AddChild(new CNode($key, $value));
+            $node->AddChild(new Node($key, $value));
         } else {
             if ($this->_multiInd == 1 && $value != null) {
                 $this->extractSplitMultiple($value);
             }
-            $node->AddChild(new CNode($key, $value));
+            $node->AddChild(new Node($key, $value));
         }
 
         return true;
@@ -311,16 +312,16 @@ class CVendor_LiteSpeed_AttrBase {
         if (is_array($node)) {
             $value = [];
             foreach ($node as $d) {
-                $value[] = $d->Get(CNode::FLD_VAL);
-                $e1 = $d->Get(CNode::FLD_ERR);
+                $value[] = $d->get(Node::FLD_VAL);
+                $e1 = $d->get(Node::FLD_ERR);
                 if ($e1 != null) {
                     $err .= $e1 . '<br>';
                 }
             }
         } else {
             if ($node != null) {
-                $value = $node->Get(CNode::FLD_VAL);
-                $err = $node->Get(CNode::FLD_ERR);
+                $value = $node->get(Node::FLD_VAL);
+                $err = $node->get(Node::FLD_ERR);
             } else {
                 $value = null;
             }
@@ -330,7 +331,7 @@ class CVendor_LiteSpeed_AttrBase {
         if ($this->_label) {
             $buf .= '<label class="col-md-3 control-label">';
             $buf .= $this->_label;
-            if ($this->IsFlagOn(DAttr::BM_NOTNULL)) {
+            if ($this->isFlagOn(self::BM_NOTNULL)) {
                 $buf .= ' *';
             }
 
@@ -388,7 +389,7 @@ class CVendor_LiteSpeed_AttrBase {
                 $input .= $checked;
             }
             $input .= '> ' . ATTR_VAL_BOOL_NO . '</label>';
-            if (!$this->IsFlagOn(self::BM_NOTNULL)) {
+            if (!$this->isFlagOn(self::BM_NOTNULL)) {
                 $input .= '<label class="radio radio-inline">
 					<input type="radio" name="' . $name . '" ' . $inputAttr . ' value=""';
                 if ($value != '0' && $value != '1') {
@@ -448,10 +449,10 @@ class CVendor_LiteSpeed_AttrBase {
         return $input;
     }
 
-    public function SetDerivedSelOptions($derived) {
+    public function setDerivedSelOptions($derived) {
         $options = [];
-        if ($this->IsFlagOn(self::BM_NOTNULL)) {
-            $options['forcesel'] = '-- ' . DMsg::UIStr('note_select_option') . ' --';
+        if ($this->isFlagOn(self::BM_NOTNULL)) {
+            $options['forcesel'] = '-- ' . Msg::UIStr('note_select_option') . ' --';
         } else {
             $options[''] = '';
         }

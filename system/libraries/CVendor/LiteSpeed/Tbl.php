@@ -1,5 +1,9 @@
 <?php
+use CVendor_LiteSpeed_Msg as Msg;
+use CVendor_LiteSpeed_Info as Info;
 use CVendor_LiteSpeed_Node as Node;
+use CVendor_LiteSpeed_AttrBase as Attr;
+use CVendor_LiteSpeed_UIBase as UIBase;
 
 class CVendor_LiteSpeed_Tbl {
     const FLD_INDEX = 1;
@@ -72,7 +76,7 @@ class CVendor_LiteSpeed_Tbl {
         return $tbl;
     }
 
-    public static function NewTop($id, $title, $attrs, $index, $addTbl, $align = 0, $helpkey = null, $icon = null, $hasNote = false) {
+    public static function newTop($id, $title, $attrs, $index, $addTbl, $align = 0, $helpkey = null, $icon = null, $hasNote = false) {
         $tbl = new static($id, $title, $attrs, $helpkey);
         $cols = count($attrs);
         $tbl->_holderIndex = $index;
@@ -124,47 +128,57 @@ class CVendor_LiteSpeed_Tbl {
         return $d;
     }
 
-    public function Get($field) {
+    public function get($field) {
         switch ($field) {
-            case self::FLD_ID: return $this->_id;
-            case self::FLD_LINKEDTBL: return $this->_linkedTbls;
-            case self::FLD_INDEX: return $this->_holderIndex;
-            case self::FLD_DATTRS: return $this->_dattrs;
-            case self::FLD_DEFAULTEXTRACT: return $this->_defaultExtract;
-            case self::FLD_SUBTBLS: return $this->_subTbls;
+            case self::FLD_ID:
+                return $this->_id;
+            case self::FLD_LINKEDTBL:
+                return $this->_linkedTbls;
+            case self::FLD_INDEX:
+                return $this->_holderIndex;
+            case self::FLD_DATTRS:
+                return $this->_dattrs;
+            case self::FLD_DEFAULTEXTRACT:
+                return $this->_defaultExtract;
+            case self::FLD_SUBTBLS:
+                return $this->_subTbls;
         }
         die("DTbl field ${field} not supported");
     }
 
-    public function Set($field, $fieldval) {
+    public function set($field, $fieldval) {
         switch ($field) {
-            case self::FLD_SHOWPARENTREF: $this->_showParentRef = $fieldval;
+            case self::FLD_SHOWPARENTREF:
+                $this->_showParentRef = $fieldval;
 
                 break;
-            case self::FLD_LINKEDTBL: $this->_linkedTbls = $fieldval;
+            case self::FLD_LINKEDTBL:
+                $this->_linkedTbls = $fieldval;
 
                 break;
-            case self::FLD_DEFAULTEXTRACT: $this->_defaultExtract = $fieldval;
+            case self::FLD_DEFAULTEXTRACT:
+                $this->_defaultExtract = $fieldval;
 
                 break;
-            default: die("field ${field} not supported");
+            default:
+                die("field ${field} not supported");
         }
     }
 
-    public function ResetAttrEntry($index, $newAttr) {
+    public function resetAttrEntry($index, $newAttr) {
         $this->_dattrs[$index] = $newAttr;
     }
 
-    public function GetSubTid($node) {
+    public function getSubTid($node) {
         if ($this->_subTbls == '') {
             return null;
         }
 
-        $keynode = $node->GetChildren($this->_subTbls[0]);
+        $keynode = $node->getChildren($this->_subTbls[0]);
         if ($keynode == null) {
             return null;
         }
-        $newkey = $keynode->Get(Node::FLD_VAL);
+        $newkey = $keynode->get(Node::FLD_VAL);
         if (($newkey == '0') || !isset($this->_subTbls[$newkey])) {
             return $this->_subTbls[1]; // use default
         } else {
@@ -172,17 +186,17 @@ class CVendor_LiteSpeed_Tbl {
         }
     }
 
-    public function PrintHtml($dlayer, $disp) {
+    public function printHtml($dlayer, $disp) {
         if ($this->_holderIndex != null && $dlayer != null) {
             // populate missing index
             if (is_array($dlayer)) {
                 foreach ($dlayer as $key => $nd) {
                     if ($nd->GetChildren($this->_holderIndex) == null) {
-                        $nd->AddChild(new Node($this->_holderIndex, $nd->Get(Node::FLD_VAL)));
+                        $nd->AddChild(new Node($this->_holderIndex, $nd->get(Node::FLD_VAL)));
                     }
                 }
             } elseif ($dlayer->GetChildren($this->_holderIndex) == null) {
-                $dlayer->AddChild(new Node($this->_holderIndex, $dlayer->Get(Node::FLD_VAL)));
+                $dlayer->AddChild(new Node($this->_holderIndex, $dlayer->get(Node::FLD_VAL)));
             }
         }
 
@@ -193,19 +207,19 @@ class CVendor_LiteSpeed_Tbl {
         }
     }
 
-    private function get_print_header($disp, $actString, $isEdit = false, $hasSort = false) {
+    private function getPrintHeader($disp, $actString, $isEdit = false, $hasSort = false) {
         $buf = '<header role="heading">';
 
         // tooltip
         $table_help = ' ';
 
-        if ($this->_helpKey != null && ($dhelp_item = DMsg::GetAttrTip($this->_helpKey)) != null) {
+        if ($this->_helpKey != null && ($dhelp_item = Msg::getAttrTip($this->_helpKey)) != null) {
             $table_help = $dhelp_item->Render();
         } elseif (count($this->_dattrs) == 1 && $this->_cols == 1) {
             $av = array_values($this->_dattrs);
             $a0 = $av[0];
             if ($a0->_label == null || $a0->_label == $this->_title) {
-                if (($dhelp_item = DMsg::GetAttrTip($a0->_helpKey)) != null) {
+                if (($dhelp_item = Msg::getAttrTip($a0->_helpKey)) != null) {
                     $is_blocked = $a0->blockedVersion();
                     $version = $is_blocked ? $a0->_version : 0;
                     $table_help = $dhelp_item->Render($version);
@@ -216,7 +230,7 @@ class CVendor_LiteSpeed_Tbl {
         if ($isEdit) {
             $title = '<i class="fa fa-edit fa-lg"></i> ' . $title;
         }
-        $ref = $disp->Get(DInfo::FLD_REF);
+        $ref = $disp->get(Info::FLD_REF);
         if ($this->_showParentRef && $ref != null) {
             $pos = strpos($ref, '`');
             if ($pos !== false) {
@@ -241,7 +255,7 @@ class CVendor_LiteSpeed_Tbl {
 
         if ($actString != null) {
             $actdata = $disp->GetActionData($actString, $this->_id, '', $this->_addTbl);
-            $buf .= UI::GetActionButtons($actdata, 'toolbar');
+            $buf .= UIBase::getActionButtons($actdata, 'toolbar');
         }
         $buf .= '<h2>' . $title . '</h2><span class="lst-tooltip pull-left">' . $table_help . '</span></header>';
 
@@ -249,7 +263,7 @@ class CVendor_LiteSpeed_Tbl {
             $buf .= '<thead><tr>';
             if ($hasSort) {
                 $this->_sorted_tbl = false;
-                $sortval = $disp->Get(DInfo::FLD_SORT);
+                $sortval = $disp->get(Info::FLD_SORT);
                 if ($sortval != null) {
                     $pos = strpos($sortval, '`');
                     if ($this->_id == substr($sortval, 0, $pos)) {
@@ -259,12 +273,12 @@ class CVendor_LiteSpeed_Tbl {
                     }
                 }
             }
-            $url = $disp->Get(DInfo::FLD_CtrlUrl);
-            if ($disp->Get(DInfo::FLD_TID) != null) {
-                $url .= '&t=' . $disp->Get(DInfo::FLD_TID);
+            $url = $disp->get(Info::FLD_CTRL_URL);
+            if ($disp->get(Info::FLD_TID) != null) {
+                $url .= '&t=' . $disp->get(Info::FLD_TID);
             }
-            if ($disp->Get(DInfo::FLD_REF) != null) {
-                $url .= '&r=' . $disp->Get(DInfo::FLD_REF);
+            if ($disp->get(Info::FLD_REF) != null) {
+                $url .= '&r=' . $disp->get(Info::FLD_REF);
             }
 
             if ($this->_icon != null) {
@@ -273,7 +287,7 @@ class CVendor_LiteSpeed_Tbl {
 
             foreach ($keys as $i) {
                 $attr = $this->_dattrs[$i];
-                if ($attr->IsFlagOn(DAttr::BM_HIDE)) {
+                if ($attr->IsFlagOn(Attr::BM_HIDE)) {
                     continue;
                 }
 
@@ -309,15 +323,14 @@ class CVendor_LiteSpeed_Tbl {
 
     private function print_view($dlayer, $disp) {
         $buf = '<div class="jarviswidget jarviswidget-color-blue"><table class="table table-bordered table-condensed">' . "\n";
-        $ref = $disp->GetLast(DInfo::FLD_REF);
-        $disptid = $disp->Get(DInfo::FLD_TID);
+        $ref = $disp->GetLast(Info::FLD_REF);
+        $disptid = $disp->get(Info::FLD_TID);
         $hasB = ($disptid != '');
 
         if ($this->_isTop) {
             if ($this->_addTbl == null) {
                 $actString = 'E';
-            } //e';
-            elseif ($this->_addTbl != 'N') {
+            } elseif ($this->_addTbl != 'N') {
                 $actString = 'a';
             } else {
                 $actString = '';
@@ -328,12 +341,12 @@ class CVendor_LiteSpeed_Tbl {
             }
 
             $hasSort = ($dlayer != null && is_array($dlayer));
-            $buf .= $this->get_print_header($disp, $actString, false, $hasSort);
+            $buf .= $this->getPrintHeader($disp, $actString, false, $hasSort);
             $buf .= '<tbody>';
 
             if ($dlayer != null) {
                 if (!is_array($dlayer)) {
-                    $dlayer = [$dlayer->Get(Node::FLD_VAL) => $dlayer];
+                    $dlayer = [$dlayer->get(Node::FLD_VAL) => $dlayer];
                 }
 
                 if ($hasSort && $this->_sorted_tbl) {
@@ -362,7 +375,7 @@ class CVendor_LiteSpeed_Tbl {
                     if ($attr->_type == 'action') {
                         if ($reason = $attr->blockedVersion()) {
                             $attr->_maxVal = '';
-                        } elseif ($attr->IsFlagOn(DAttr::BM_NOTNULL) && strpos($attr->_maxVal, 'd') !== false && count($dlayer) == 1) {
+                        } elseif ($attr->IsFlagOn(Attr::BM_NOTNULL) && strpos($attr->_maxVal, 'd') !== false && count($dlayer) == 1) {
                             $attr->_maxVal = str_replace('d', '', $attr->_maxVal); // do not allow delete if only one left
                         }
                         $action_attr = $attr;
@@ -373,7 +386,7 @@ class CVendor_LiteSpeed_Tbl {
                 $index = 0;
                 foreach ($keys as $key) {
                     $nd = $dlayer[$key];
-                    $buf .= $this->get_print_line_multi($nd, $key, $index, $disp, $action_attr);
+                    $buf .= $this->getPrintLineMulti($nd, $key, $index, $disp, $action_attr);
                     $index++;
                 }
             }
@@ -386,11 +399,11 @@ class CVendor_LiteSpeed_Tbl {
                 $dlayer = $dlayer[$ref];
             }
 
-            $buf .= $this->get_print_header($disp, $actString);
+            $buf .= $this->getPrintHeader($disp, $actString);
             $buf .= '<tbody>';
 
             foreach ($this->_dattrs as $attr) {
-                $buf .= $this->get_print_line($dlayer, $disp, $attr);
+                $buf .= $this->getPrintLine($dlayer, $disp, $attr);
             }
         }
 
@@ -400,7 +413,7 @@ class CVendor_LiteSpeed_Tbl {
 
     private function print_edit($dlayer, $disp) {
         $buf = '';
-        $ref = $disp->GetLast(DInfo::FLD_REF);
+        $ref = $disp->GetLast(Info::FLD_REF);
 
         if ($ref != null && is_array($dlayer)) {
             $dlayer = $dlayer[$ref];
@@ -410,14 +423,14 @@ class CVendor_LiteSpeed_Tbl {
         foreach ($this->_dattrs as $attr) {
             $labels[] = $attr->_helpKey;
         }
-        if (($tips = DMsg::GetEditTips($labels)) != null) {
-            $buf .= UI::GetTblTips($tips);
+        if (($tips = Msg::getEditTips($labels)) != null) {
+            $buf .= UIBase::getTblTips($tips);
         }
 
         $buf .= '<div class="jarviswidget jarviswidget-color-teal">' . "\n";
 
         $actString = ((substr($this->_id, -3) == 'SEL') ? 'n' : 's') . 'B';
-        $buf .= $this->get_print_header($disp, $actString, true);
+        $buf .= $this->getPrintHeader($disp, $actString, true);
 
         $buf .= '<div role="content"><div class="widget-body form-horizontal"><fieldset>';
         foreach ($this->_dattrs as $attr) {
@@ -428,9 +441,9 @@ class CVendor_LiteSpeed_Tbl {
         echo "${buf} \n";
     }
 
-    private function get_print_line($node, $disp, $attr) {
+    private function getPrintLine($node, $disp, $attr) {
         $valwid = 0;
-        if ($attr == null || $attr->IsFlagOn(DAttr::BM_HIDE)) {
+        if ($attr == null || $attr->isFlagOn(Attr::BM_HIDE)) {
             return '';
         }
 
@@ -449,7 +462,7 @@ class CVendor_LiteSpeed_Tbl {
             }
             $buf .= $attr->_label;
 
-            $dhelp_item = DMsg::GetAttrTip($attr->_helpKey);
+            $dhelp_item = Msg::getAttrTip($attr->_helpKey);
             if ($this->_cols == 1) {
                 $buf .= '&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;';
             } else {
@@ -464,7 +477,6 @@ class CVendor_LiteSpeed_Tbl {
         }
 
         if ($this->_cols == 1) {
-
             //$buf .= '</tr><tr class="xtbl_value"><td';
             $buf .= '</tr><tr ><td';
         } else {
@@ -480,16 +492,16 @@ class CVendor_LiteSpeed_Tbl {
 
         if ($attr->_href) {
             //$link = $disp->_ctrlUrl . 'm=' . $disp->_mid . '&p=' . $disp->_pid;
-            $link = $disp->Get(DInfo::FLD_CtrlUrl);
-            if ($disp->Get(DInfo::FLD_TID) != null) {
-                $link .= '&t=' . $disp->Get(DInfo::FLD_TID);
+            $link = $disp->get(Info::FLD_CTRL_URL);
+            if ($disp->get(Info::FLD_TID) != null) {
+                $link .= '&t=' . $disp->get(Info::FLD_TID);
             }
-            if ($disp->Get(DInfo::FLD_REF) != null) {
-                $link .= '&r=' . $disp->Get(DInfo::FLD_REF);
+            if ($disp->get(Info::FLD_REF) != null) {
+                $link .= '&r=' . $disp->get(Info::FLD_REF);
             }
 
             $link .= $attr->_href;
-            $attr->_hrefLink = str_replace('$R', urlencode($disp->Get(DInfo::FLD_REF)), $link);
+            $attr->_hrefLink = str_replace('$R', urlencode($disp->get(Info::FLD_REF)), $link);
         }
 
         $buf .= ($attr->toHtml($node));
@@ -500,7 +512,7 @@ class CVendor_LiteSpeed_Tbl {
     }
 
     private function get_print_inputline($dlayer, $disp, $attr) {
-        if ($attr->IsFlagOn(DAttr::BM_NOEDIT)) {
+        if ($attr->isFlagOn(Attr::BM_NOEDIT)) {
             return '';
         }
 
@@ -511,7 +523,7 @@ class CVendor_LiteSpeed_Tbl {
         $is_blocked = $attr->blockedVersion();
         $helppop = '';
 
-        if (($dhelp_item = DMsg::GetAttrTip($attr->_helpKey)) != null) {
+        if (($dhelp_item = Msg::getAttrTip($attr->_helpKey)) != null) {
             $helppop = '<span class="lst-tooltip">' . $dhelp_item->Render($is_blocked ? $attr->_version : 0) . '</span>';
         }
 
@@ -520,7 +532,7 @@ class CVendor_LiteSpeed_Tbl {
         return $buf;
     }
 
-    private function get_print_line_multi($data, $key0, $htmlid, $disp, $action_attr) {
+    private function getPrintLineMulti($data, $key0, $htmlid, $disp, $action_attr) {
         $buf = '<tr>';
 
         $keys = array_keys($this->_dattrs);
@@ -543,13 +555,13 @@ class CVendor_LiteSpeed_Tbl {
             }
 
             $actdata = $disp->GetActionData($actString, $ti, $key0);
-            $actionLink = UI::GetActionButtons($actdata, 'icon');
+            $actionLink = UIBase::getActionButtons($actdata, 'icon');
             $indexActionLink = isset($actdata['v']) ? $actdata['v']['href'] : null;
         }
 
         foreach ($keys as $key) {
             $attr = $this->_dattrs[$key];
-            if ($attr->IsFlagOn(DAttr::BM_HIDE)) {
+            if ($attr->IsFlagOn(Attr::BM_HIDE)) {
                 continue;
             }
 
