@@ -64,6 +64,7 @@ trait CApp_Model_Trait_Roles {
         }
 
         $root = $root->descendants();
+        /** @var CModel_Nested_Relation_Descendants $root */
         if (strlen($orgId) > 0) {
             $root = $root->where(function ($query) use ($orgId) {
                 $query->where('org_id', '=', $orgId)->orWhereNull('org_id');

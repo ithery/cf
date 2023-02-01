@@ -1,15 +1,39 @@
-<div x-data="{ options: [{id: 1, text: 'Option 1'}, {id: 2, text: 'Option 2'}, {id: 3, text: 'Option 3'}], selectedOption: '' }">
-    <select class="your-select" x-model="selectedOption" @change="selectedOption = $event.target.value">
-      <option value="">Please select an option</option>
-      <template x-for="option in options" :key="option.id">
-        <option :value="option.id" x-text="option.text"></option>
-      </template>
-    </select>
-    <p>Selected value: <span x-text="selectedOption"></span></p>
-  </div>
+<div x-data="select2Data()">
+    @CAppElement(function() {
+        $selectSearch = new CElement_FormInput_SelectSearch('my-select2-input');
+        $selectSearch->setDataFromModel(\Cresenity\Demo\Model\Country::class);
+        $selectSearch->setKeyField('country_id');
+        $selectSearch->setSearchField('name');
+        $selectSearch->setFormat('<div>{name}</div><div><span class="badge badge-success">{code}</span></div>');
+        $selectSearch->setAutoSelect();
+        return $selectSearch;
+    })
 
-  <script>
 
-    $('.your-select').select2();
+    <p class="mt-3">Selected value: <span x-text="selectedOption"></span></p>
+</div>
 
-  </script>
+@CAppPushScript
+<script>
+
+function select2Data() {
+    return {
+        selectedOption:null,
+        init() {
+            $('#my-select2-input').select2().on('change',()=>{
+                this.updateSelection();
+            });
+
+            this.$nextTick(()=>{
+                this.updateSelection();
+            })
+
+        },
+        updateSelection() {
+            this.selectedOption = $('#my-select2-input').select2('val');
+        }
+    }
+}
+
+</script>
+@CAppEndPushScript
