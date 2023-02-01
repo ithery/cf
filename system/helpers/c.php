@@ -442,7 +442,7 @@ class c {
     /**
      * @param string $string
      *
-     * @return \cstr|CBase_String
+     * @return CBase_String|\cstr
      */
     public static function str($string = null) {
         if (is_null($string)) {
