@@ -23,7 +23,7 @@ return [
     ],
     [
         'name' => 'cresjs.alpine.select2',
-        'label' => c::__('Select2 [DEV]'),
+        'label' => c::__('Select2'),
         'uri' => 'demo/cresjs/alpine/select2/index',
     ],
 ];
