@@ -20,9 +20,9 @@ class CVendor_LiteSpeed_Msg {
         self::LANG_JAPANES => ['日本語', 'ja-JP']
     ];
 
-    private static $_curlang = '';
+    private static $curlang = '';
 
-    private static $_curtips = '';
+    private static $curtips = '';
 
     private static function init() {
         $lang = static::DEFAULT_LANG;
@@ -38,7 +38,7 @@ class CVendor_LiteSpeed_Msg {
         }
 
         $filecode = self::$supported[$lang][1];
-        self::$_curlang = $lang;
+        self::$curlang = $lang;
 
         $msgfile = CVendor_LiteSpeed::serverRoot() . self::LANG_DIR . 'en-US_msg.php';
         if (file_exists($msgfile)) {
@@ -52,25 +52,25 @@ class CVendor_LiteSpeed_Msg {
     }
 
     private static function initTips() {
-        if (self::$_curlang == '') {
+        if (self::$curlang == '') {
             self::init();
         }
 
-        if (self::$_curlang != self::DEFAULT_LANG) {
+        if (self::$curlang != self::DEFAULT_LANG) {
             $filecode = self::$supported[self::DEFAULT_LANG][1];
             include CVendor_LiteSpeed::serverRoot() . self::LANG_DIR . $filecode . '_tips.php';
         }
-        $filecode = self::$supported[self::$_curlang][1];
-        self::$_curtips = $filecode . '_tips.php';
-        include CVendor_LiteSpeed::serverRoot() . self::LANG_DIR . self::$_curtips;
+        $filecode = self::$supported[self::$curlang][1];
+        self::$curtips = $filecode . '_tips.php';
+        include CVendor_LiteSpeed::serverRoot() . self::LANG_DIR . self::$curtips;
     }
 
     public static function getSupportedLang(&$cur_lang) {
-        if (self::$_curlang == '') {
+        if (self::$curlang == '') {
             self::init();
         }
 
-        $cur_lang = self::$_curlang;
+        $cur_lang = self::$curlang;
 
         return self::$supported;
     }
@@ -78,8 +78,8 @@ class CVendor_LiteSpeed_Msg {
     public static function setLang($lang) {
         if (PHP_SAPI !== 'cli' && array_key_exists($lang, self::$supported)) {
             $_SESSION[static::_COOKIE_LANG_] = $lang;
-            self::$_curlang = '';
-            self::$_curtips = '';
+            self::$curlang = '';
+            self::$curtips = '';
             $domain = $_SERVER['HTTP_HOST'];
             if ($pos = strpos($domain, ':')) {
                 $domain = substr($domain, 0, $pos);
@@ -106,7 +106,7 @@ class CVendor_LiteSpeed_Msg {
 
         global $_tipsdb;
 
-        if (self::$_curtips == '') {
+        if (self::$curtips == '') {
             self::initTips();
         }
 
@@ -118,10 +118,10 @@ class CVendor_LiteSpeed_Msg {
         }
     }
 
-    public static function GetEditTips($labels) {
+    public static function getEditTips($labels) {
         global $_tipsdb;
 
-        if (self::$_curtips == '') {
+        if (self::$curtips == '') {
             self::initTips();
         }
 
@@ -145,7 +145,7 @@ class CVendor_LiteSpeed_Msg {
         }
 
         global $_gmsg;
-        if (self::$_curlang == '') {
+        if (self::$curlang == '') {
             static::init();
         }
 
@@ -162,18 +162,18 @@ class CVendor_LiteSpeed_Msg {
         return 'Unknown';
     }
 
-    public static function EchoUIStr($tag, $repl = '') {
+    public static function echoUIStr($tag, $repl = '') {
         echo static::UIStr($tag, $repl);
     }
 
-    public static function DocsUrl() {
-        if (self::$_curlang == '') {
+    public static function docsUrl() {
+        if (self::$curlang == '') {
             static::init();
         }
 
         $url = '/docs/';
-        if (self::$_curlang != self::DEFAULT_LANG) {
-            $url .= self::$supported[self::$_curlang][1] . '/';
+        if (self::$curlang != self::DEFAULT_LANG) {
+            $url .= self::$supported[self::$curlang][1] . '/';
         }
 
         return $url;
@@ -185,7 +185,7 @@ class CVendor_LiteSpeed_Msg {
         }
 
         global $_gmsg;
-        if (self::$_curlang == '') {
+        if (self::$curlang == '') {
             static::init();
         }
 
@@ -202,7 +202,7 @@ class CVendor_LiteSpeed_Msg {
         }
 
         global $_gmsg;
-        if (self::$_curlang == '') {
+        if (self::$curlang == '') {
             static::init();
         }
 
@@ -239,7 +239,7 @@ class CVendor_LiteSpeed_Msg {
         }
     }
 
-    public static function Util_SortMsg($lang, $option) {
+    public static function utilSortMsg($lang, $option) {
         if (!array_key_exists($lang, self::$supported)) {
             echo "language ${lang} not supported! \n"
             . 'Currently supported:' . print_r(array_keys(self::$supported), true);

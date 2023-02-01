@@ -6,43 +6,43 @@ use CVendor_LiteSpeed_OWS_Attr as Attr;
 use CVendor_LiteSpeed_OWS_TblDef as TblDef;
 
 class CVendor_LiteSpeed_TblMap {
-    private $_layer;
+    private $layer;
 
-    private $_map;  // array of  string: tid or submap
+    private $map;  // array of  string: tid or submap
 
-    private $_extended_map;
+    private $extendedMap;
 
-    public function __construct($layer, $map, $extended_map = null) {
-        $this->_layer = $layer;
-        $this->_map = $map;
-        $this->_extended_map = $extended_map;
+    public function __construct($layer, $map, $extendedMap = null) {
+        $this->layer = $layer;
+        $this->map = $map;
+        $this->extendedMap = $extendedMap;
     }
 
     public function getLoc($index = 0) {
-        return is_array($this->_layer) ? $this->_layer[$index] : $this->_layer;
+        return is_array($this->layer) ? $this->layer[$index] : $this->layer;
     }
 
-    public function GetMaps($extended) {
-        $maps = is_array($this->_map) ? $this->_map : [$this->_map];
+    public function getMaps($extended) {
+        $maps = is_array($this->map) ? $this->map : [$this->map];
 
-        if ($extended && $this->_extended_map != null) {
-            if (is_array($this->_extended_map)) {
-                $maps = array_merge($maps, $this->_extended_map);
+        if ($extended && $this->extendedMap != null) {
+            if (is_array($this->extendedMap)) {
+                $maps = array_merge($maps, $this->extendedMap);
             } else {
-                $maps[] = $this->_extended_map;
+                $maps[] = $this->extendedMap;
             }
         }
 
         return $maps;
     }
 
-    public function FindTblLoc($tid) {
-        $location = $this->_layer; // page data, layer is not array
-        $maps = $this->GetMaps(true);
+    public function findTblLoc($tid) {
+        $location = $this->layer; // page data, layer is not array
+        $maps = $this->getMaps(true);
 
         foreach ($maps as $m) {
             if ($m instanceof CVendor_LiteSpeed_TblMap) {
-                $nextloc = $m->FindTblLoc($tid);
+                $nextloc = $m->findTblLoc($tid);
                 if ($nextloc != null) {
                     return ($location == '') ? $nextloc : "{$location}:${nextloc}";
                 }
@@ -66,7 +66,7 @@ class CVendor_LiteSpeed_TblMap {
         $tonode = $dstnode->allocateLayerNode($dstloc);
 
         $is_multi = (strpos($dstloc, '*') !== false);
-        $map = $this->GetMaps(false);
+        $map = $this->getMaps(false);
 
         if ($is_multi) {
             // get last layer

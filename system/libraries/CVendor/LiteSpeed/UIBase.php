@@ -2,6 +2,8 @@
 
 define('ASSETS_URL', 'res');
 use CVendor_LiteSpeed_Msg as Msg;
+use CVendor_LiteSpeed_Info as Info;
+use CVendor_LiteSpeed_UIProperty as UIProperty;
 
 class CVendor_LiteSpeed_UIBase {
     //array("Display Name" => "URL");
@@ -11,7 +13,7 @@ class CVendor_LiteSpeed_UIBase {
         $this->uiproperty = new UIProperty();
     }
 
-    protected function confform_start() {
+    protected function confformStart() {
         $formaction = $this->uiproperty->get(UIProperty::FLD_FORM_ACTION);
         $buf = '
 		<!-- ========================== confform STARTS HERE ========================== -->
@@ -21,7 +23,7 @@ class CVendor_LiteSpeed_UIBase {
         return $buf;
     }
 
-    protected function confform_end() {
+    protected function confformEnd() {
         $buf = '';
         $hiddenvars = $this->uiproperty->get(UIProperty::FLD_FORM_HIDDENVARS);
         foreach ($hiddenvars as $n => $v) {
@@ -34,24 +36,24 @@ class CVendor_LiteSpeed_UIBase {
         return $buf;
     }
 
-    protected function print_conf_page($disp, $page) {
+    protected function printConfPage($disp, $page) {
         $this->uiproperty->set(UIProperty::FLD_FORM_ACTION, '#view/confMgr.php');
 
         $disp->InitUIProps($this->uiproperty);
 
-        $icontitle = $disp->get(DInfo::FLD_ICONTITLE);
+        $icontitle = $disp->get(Info::FLD_ICON_TITLE);
         echo $this->contentHeader($icontitle[0], $icontitle[1], $page->GetLabel());
-        echo $this->confform_start();
-        echo $this->main_tabs();
+        echo $this->confformStart();
+        echo $this->mainTabs();
         echo '<div class="tab-content margin-top-10 padding-10">';
 
         $page->PrintHtml($disp);
 
         echo "</div>\n";
-        echo $this->confform_end();
+        echo $this->confformEnd();
     }
 
-    protected function main_tabs() {
+    protected function mainTabs() {
         $tabs = $this->uiproperty->get(UIProperty::FLD_TABS);
 
         $buf = '<div><ul class="nav nav-tabs" role="tablist">';
@@ -153,15 +155,15 @@ class CVendor_LiteSpeed_UIBase {
         return '<div class="alert alert-danger">' . $msg . '</div>';
     }
 
-    public static function error_divmesg($msg) {
+    public static function errorDivmesg($msg) {
         return '<div class="alert alert-danger">' . $msg . '</div>';
     }
 
-    public static function info_divmesg($msg) {
+    public static function infoDivmesg($msg) {
         return '<div class="alert alert-info">' . $msg . '</div>';
     }
 
-    public static function warn_divmesg($msg) {
+    public static function warnDivmesg($msg) {
         return '<div class="alert alert-warning">' . $msg . '</div>';
     }
 
@@ -231,7 +233,7 @@ class CVendor_LiteSpeed_UIBase {
         foreach ($bottomdef as $btngroup) {
             $buf .= '<div class="col-xs-12 col-sm-3 col-md-3 col-lg-3">';
             foreach ($btngroup as $div) {
-                $buf .= self::stat_bottom_div($div[0], $div[1], $div[2], $div[3]);
+                $buf .= self::statBottomDiv($div[0], $div[1], $div[2], $div[3]);
             }
             $buf .= "</div>\n";
         }
@@ -244,7 +246,7 @@ class CVendor_LiteSpeed_UIBase {
         return $buf;
     }
 
-    private static function stat_bottom_div($seq, $label, $txtclr, $maxclr) {
+    private static function statBottomDiv($seq, $label, $txtclr, $maxclr) {
         $buf = '<div>' . $label . ': <span class="lst-stat-val';
         if ($txtclr != '') {
             $buf .= ' text-' . $txtclr;
@@ -259,8 +261,8 @@ class CVendor_LiteSpeed_UIBase {
         return $buf;
     }
 
-    public static function Get_LangDropdown() {
-        $langlist = Msg::GetSupportedLang($curlang);
+    public static function getLangDropdown() {
+        $langlist = Msg::getSupportedLang($curlang);
 
         $buf = '<a href="#" class="dropdown-toggle" data-toggle="dropdown"><span>'
                 . $langlist[$curlang][0] . '</span> <i class="fa fa-angle-down"></i> </a>

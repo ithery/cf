@@ -5,7 +5,7 @@ use CVendor_LiteSpeed_Node as Node;
 use CVendor_LiteSpeed_OWS_Attr as Attr;
 use CVendor_LiteSpeed_TblDefBase as TblDefBase;
 
-class CVendor_LiteSpeed_OWS_TblDef extends CVendor_LiteSpeed_TblDefBase {
+class CVendor_LiteSpeed_OWS_TblDef extends TblDefBase {
     private static $instance;
 
     public static function getInstance() {
@@ -84,7 +84,7 @@ class CVendor_LiteSpeed_OWS_TblDef extends CVendor_LiteSpeed_TblDefBase {
             self::newCustFlagAttr('group', null, (Attr::BM_HIDE | Attr::BM_NOEDIT), false),
             $this->_attrs['priority']->dup(null, null, 'serverPriority'),
             TblDefBase::newIntAttr('cpuAffinity', Msg::aLbl('l_cpuaffinity'), true, 0, 64),
-            TblDefBase::NewSelAttr(
+            TblDefBase::newSelAttr(
                 'enableLVE',
                 Msg::aLbl('l_enablelve'),
                 [0 => Msg::aLbl('o_disabled'), 1 => 'LVE', 2 => 'CageFS', 3 => Msg::aLbl('o_cagefswithoutsuexec')]
@@ -96,17 +96,18 @@ class CVendor_LiteSpeed_OWS_TblDef extends CVendor_LiteSpeed_TblDefBase {
             self::newIntAttr('gracefulRestartTimeout', Msg::aLbl('l_gracefulrestarttimeout'), true, -1, 2592000),
             self::newTextAttr('statDir', Msg::aLbl('l_statDir'), 'cust')
         ];
-        $this->_tblDef[$id] = Tbl::NewRegular($id, Msg::aLbl('l_serverprocess'), $attrs);
+        $this->_tblDef[$id] = Tbl::newRegular($id, Msg::aLbl('l_serverprocess'), $attrs);
     }
 
-    protected function add_S_GENERAL($id) { // keep
-        $attr_mime = self::NewPathAttr('mime', Msg::aLbl('l_mimesettings'), 'file', 2, 'rw', false);
+    protected function add_S_GENERAL($id) {
+        // keep
+        $attr_mime = self::newPathAttr('mime', Msg::aLbl('l_mimesettings'), 'file', 2, 'rw', false);
         $attr_mime->_href = '&t=S_MIME_TOP';
 
         $attrs = [
             $attr_mime,
             self::newBoolAttr('disableInitLogRotation', Msg::aLbl('l_disableinitlogrotation')),
-            self::NewSelAttr(
+            self::newSelAttr(
                 'showVersionNumber',
                 Msg::aLbl('l_serversig'),
                 [
@@ -117,7 +118,7 @@ class CVendor_LiteSpeed_OWS_TblDef extends CVendor_LiteSpeed_TblDefBase {
                 false
             ),
             $this->_attrs['enableIpGeo'],
-            self::NewSelAttr(
+            self::newSelAttr(
                 'useIpInProxyHeader',
                 Msg::aLbl('l_useipinproxyheader'),
                 [
@@ -130,14 +131,14 @@ class CVendor_LiteSpeed_OWS_TblDef extends CVendor_LiteSpeed_TblDefBase {
             ),
             $this->_attrs['adminEmails'],
         ];
-        $this->_tblDef[$id] = Tbl::NewRegular($id, Msg::aLbl('l_generalsettings'), $attrs);
+        $this->_tblDef[$id] = Tbl::newRegular($id, Msg::aLbl('l_generalsettings'), $attrs);
     }
 
     protected function add_S_AUTOLOADHTA($id) {
         $attrs = [
             self::newBoolAttr('autoLoadHtaccess', Msg::aLbl('l_autoLoadRewriteHtaccess')),
         ];
-        $this->_tblDef[$id] = Tbl::NewRegular($id, Msg::aLbl('l_rewritecontrol'), $attrs);
+        $this->_tblDef[$id] = Tbl::newRegular($id, Msg::aLbl('l_rewritecontrol'), $attrs);
     }
 
     protected function add_S_SEC_CGI($id) {
@@ -155,10 +156,10 @@ class CVendor_LiteSpeed_OWS_TblDef extends CVendor_LiteSpeed_TblDefBase {
             $this->_attrs['memHardLimit'],
             $this->_attrs['procSoftLimit'],
             $this->_attrs['procHardLimit'],
-            self::NewSelAttr('cgroups', Msg::aLbl('l_cgroups'), ['0' => Msg::aLbl('o_off'), '1' => Msg::aLbl('o_on'), '2' => Msg::aLbl('o_disabled')]),
+            self::newSelAttr('cgroups', Msg::aLbl('l_cgroups'), ['0' => Msg::aLbl('o_off'), '1' => Msg::aLbl('o_on'), '2' => Msg::aLbl('o_disabled')]),
         ];
 
-        $this->_tblDef[$id] = Tbl::NewRegular($id, Msg::aLbl('l_cgisettings'), $attrs, 'cgiResource');
+        $this->_tblDef[$id] = Tbl::newRegular($id, Msg::aLbl('l_cgisettings'), $attrs, 'cgiResource');
     }
 
     protected function add_VT_REWRITE_CTRL($id) {
@@ -167,7 +168,7 @@ class CVendor_LiteSpeed_OWS_TblDef extends CVendor_LiteSpeed_TblDefBase {
             self::newBoolAttr('autoLoadHtaccess', Msg::aLbl('l_autoLoadRewriteHtaccess')),
             self::newIntAttr('logLevel', Msg::aLbl('l_loglevel'), true, 0, 9, 'rewriteLogLevel')
         ];
-        $this->_tblDef[$id] = Tbl::NewRegular($id, Msg::aLbl('l_rewritecontrol'), $attrs);
+        $this->_tblDef[$id] = Tbl::newRegular($id, Msg::aLbl('l_rewritecontrol'), $attrs);
     }
 
     protected function add_VT_REWRITE_MAP_TOP($id) {
@@ -208,7 +209,7 @@ class CVendor_LiteSpeed_OWS_TblDef extends CVendor_LiteSpeed_TblDefBase {
         if (CVendor_LiteSpeed_PathTool::isCyberPanel()) {
             $label .= ' (Disabled by CyberPanel)';
         }
-        $this->_tblDef[$id] = Tbl::NewIndexed($id, $label, $attrs, 'name');
+        $this->_tblDef[$id] = Tbl::newIndexed($id, $label, $attrs, 'name');
     }
 
     protected function add_VT_REWRITE_RULE($id) {
@@ -221,25 +222,25 @@ class CVendor_LiteSpeed_OWS_TblDef extends CVendor_LiteSpeed_TblDefBase {
         if (CVendor_LiteSpeed_PathTool::isCyberPanel()) {
             $label .= ' (Disabled by CyberPanel)';
         }
-        $this->_tblDef[$id] = Tbl::NewRegular($id, $label, $attrs, 'rewriteRules', 1);
+        $this->_tblDef[$id] = Tbl::newRegular($id, $label, $attrs, 'rewriteRules', 1);
     }
 
     protected function add_S_FILEUPLOAD($id) {
         $attrs = [
-            self::NewPathAttr('uploadTmpDir', Msg::aLbl('l_uploadtmpdir'), 'path', 2),
+            self::newPathAttr('uploadTmpDir', Msg::aLbl('l_uploadtmpdir'), 'path', 2),
             self::newParseTextAttr('uploadTmpFilePermission', Msg::aLbl('l_uploadtmpfilepermission'), $this->_options['parseFormat']['filePermission3'], Msg::aLbl('parse_uploadtmpfilepermission')),
             self::newBoolAttr('uploadPassByPath', Msg::aLbl('l_uploadpassbypath'))
         ];
-        $this->_tblDef[$id] = Tbl::NewRegular($id, Msg::aLbl('l_uploadfile'), $attrs, 'fileUpload');
+        $this->_tblDef[$id] = Tbl::newRegular($id, Msg::aLbl('l_uploadfile'), $attrs, 'fileUpload');
     }
 
     protected function add_VT_FILEUPLOAD($id) {
         $attrs = [
-            self::NewPathAttr('uploadTmpDir', Msg::aLbl('l_uploadtmpdir'), 'path', 3),
+            self::newPathAttr('uploadTmpDir', Msg::aLbl('l_uploadtmpdir'), 'path', 3),
             self::newParseTextAttr('uploadTmpFilePermission', Msg::aLbl('l_uploadtmpfilepermission'), $this->_options['parseFormat']['filePermission3'], Msg::aLbl('parse_uploadtmpfilepermission')),
             self::newBoolAttr('uploadPassByPath', Msg::aLbl('l_uploadpassbypath'))
         ];
-        $this->_tblDef[$id] = Tbl::NewRegular($id, Msg::aLbl('l_uploadfile'), $attrs, 'fileUpload');
+        $this->_tblDef[$id] = Tbl::newRegular($id, Msg::aLbl('l_uploadfile'), $attrs, 'fileUpload');
     }
 
     protected function add_VT_PHPINIOVERRIDE($id) {
@@ -248,7 +249,7 @@ class CVendor_LiteSpeed_OWS_TblDef extends CVendor_LiteSpeed_TblDefBase {
         $attrs = [
             $override,
         ];
-        $this->_tblDef[$id] = Tbl::NewRegular($id, Msg::aLbl('l_phpinioverride'), $attrs, 'phpIniOverride', 1);
+        $this->_tblDef[$id] = Tbl::newRegular($id, Msg::aLbl('l_phpinioverride'), $attrs, 'phpIniOverride', 1);
     }
 
     protected function add_S_TUNING_OS($id) {
@@ -257,7 +258,7 @@ class CVendor_LiteSpeed_OWS_TblDef extends CVendor_LiteSpeed_TblDefBase {
             self::newTextAttr('shmDefaultDir', Msg::aLbl('l_shmDefaultDir'), 'cust'),
         ];
 
-        $this->_tblDef[$id] = Tbl::NewRegular($id, Msg::aLbl('l_tuningos'), $attrs);
+        $this->_tblDef[$id] = Tbl::newRegular($id, Msg::aLbl('l_tuningos'), $attrs);
     }
 
     protected function add_S_TUNING_STATIC($id) {
@@ -277,7 +278,7 @@ class CVendor_LiteSpeed_OWS_TblDef extends CVendor_LiteSpeed_TblDefBase {
             ),
         ];
 
-        $this->_tblDef[$id] = Tbl::NewRegular($id, Msg::aLbl('l_tuningstatic'), $attrs);
+        $this->_tblDef[$id] = Tbl::newRegular($id, Msg::aLbl('l_tuningstatic'), $attrs);
     }
 
     protected function add_S_TUNING_SSL($id) {
@@ -291,7 +292,7 @@ class CVendor_LiteSpeed_OWS_TblDef extends CVendor_LiteSpeed_TblDefBase {
             self::newIntAttr('sslSessionTicketLifetime', Msg::aLbl('l_sslSessionTicketLifetime'), true, 10, 1000000),
             self::newTextAttr('sslSessionTicketKeyFile', Msg::aLbl('l_sslSessionTicketKeyFile'), 'cust')
         ];
-        $this->_tblDef[$id] = Tbl::NewRegular($id, Msg::aLbl('l_tuningsslsettings'), $attrs, 'sslGlobal');
+        $this->_tblDef[$id] = Tbl::newRegular($id, Msg::aLbl('l_tuningsslsettings'), $attrs, 'sslGlobal');
     }
 
     protected function add_S_MOD_TOP($id) {
@@ -330,7 +331,7 @@ class CVendor_LiteSpeed_OWS_TblDef extends CVendor_LiteSpeed_TblDefBase {
         foreach ($tags as $tag) {
             $attrs[] = self::newIntAttr($tag, "${hook} ${tag} ${priority}", true, -6000, 6000);
         }
-        $this->_tblDef[$id] = Tbl::NewIndexed($id, Msg::aLbl('l_servermoduledef'), $attrs, 'name', 'servModules');
+        $this->_tblDef[$id] = Tbl::newIndexed($id, Msg::aLbl('l_servermoduledef'), $attrs, 'name', 'servModules');
     }
 
     protected function add_VT_MOD_TOP($id) {
@@ -345,13 +346,13 @@ class CVendor_LiteSpeed_OWS_TblDef extends CVendor_LiteSpeed_TblDefBase {
     }
 
     protected function add_VT_MOD($id) {
-        $attrs = [self::NewSelAttr('name', Msg::aLbl('l_module'), 'module', false, 'moduleNameSel'),
+        $attrs = [self::newSelAttr('name', Msg::aLbl('l_module'), 'module', false, 'moduleNameSel'),
             $this->_attrs['note'],
             $this->_attrs['mod_params'],
             $this->_attrs['mod_enabled']->dup(null, null, 'moduleEnabled_vh')
         ];
 
-        $this->_tblDef[$id] = Tbl::NewIndexed($id, Msg::aLbl('l_moduleconf'), $attrs, 'name', 'vhModules');
+        $this->_tblDef[$id] = Tbl::newIndexed($id, Msg::aLbl('l_moduleconf'), $attrs, 'name', 'vhModules');
         $this->_tblDef[$id]->set(Tbl::FLD_LINKEDTBL, ['VT_MOD_FILTERTOP']);
     }
 
@@ -372,7 +373,7 @@ class CVendor_LiteSpeed_OWS_TblDef extends CVendor_LiteSpeed_TblDefBase {
             $this->_attrs['mod_params'],
         ];
 
-        $this->_tblDef[$id] = Tbl::NewIndexed($id, Msg::aLbl('l_urlfilter'), $attrs, 'uri', 'vhModuleUrlFilters');
+        $this->_tblDef[$id] = Tbl::newIndexed($id, Msg::aLbl('l_urlfilter'), $attrs, 'uri', 'vhModuleUrlFilters');
         $this->_tblDef[$id]->set(Dtbl::FLD_SHOWPARENTREF, true);
     }
 
@@ -388,19 +389,19 @@ class CVendor_LiteSpeed_OWS_TblDef extends CVendor_LiteSpeed_TblDefBase {
     }
 
     protected function add_L_MOD($id) {
-        $attrs = [self::NewSelAttr('name', Msg::aLbl('l_module'), 'module', false, 'moduleNameSel'),
+        $attrs = [self::newSelAttr('name', Msg::aLbl('l_module'), 'module', false, 'moduleNameSel'),
             $this->_attrs['note'],
             $this->_attrs['mod_params'],
             $this->_attrs['mod_enabled']->dup(null, null, 'moduleEnabled_lst')
         ];
-        $this->_tblDef[$id] = Tbl::NewIndexed($id, Msg::aLbl('l_moduleconf'), $attrs, 'name', 'listenerModules');
+        $this->_tblDef[$id] = Tbl::newIndexed($id, Msg::aLbl('l_moduleconf'), $attrs, 'name', 'listenerModules');
     }
 
     protected function add_V_TOPD($id) {
         $attrs = [
             self::newTextAttr('name', Msg::aLbl('l_vhname'), 'vhname', false, 'vhName'),
             self::newTextAttr('vhRoot', Msg::aLbl('l_vhroot'), 'cust', false), //no validation, maybe suexec owner
-            self::NewPathAttr('configFile', Msg::aLbl('l_configfile'), 'filevh', 3, 'rwc', false),
+            self::newPathAttr('configFile', Msg::aLbl('l_configfile'), 'filevh', 3, 'rwc', false),
             $this->_attrs['note'],
             $this->_attrs['vh_allowSymbolLink'],
             $this->_attrs['vh_enableScript'],
@@ -414,7 +415,7 @@ class CVendor_LiteSpeed_OWS_TblDef extends CVendor_LiteSpeed_TblDefBase {
             $this->_attrs['outBandwidth'],
             $this->_attrs['inBandwidth'],
         ];
-        $this->_tblDef[$id] = Tbl::NewIndexed($id, Msg::aLbl('l_vhost'), $attrs, 'name');
+        $this->_tblDef[$id] = Tbl::newIndexed($id, Msg::aLbl('l_vhost'), $attrs, 'name');
     }
 
     protected function add_V_BASE_SEC($id) {
@@ -426,7 +427,7 @@ class CVendor_LiteSpeed_OWS_TblDef extends CVendor_LiteSpeed_TblDefBase {
             $this->_attrs['vh_suexec_user'],
             $this->_attrs['vh_suexec_group'],
         ];
-        $this->_tblDef[$id] = Tbl::NewIndexed($id, Msg::UIStr('tab_sec'), $attrs, 'name');
+        $this->_tblDef[$id] = Tbl::newIndexed($id, Msg::UIStr('tab_sec'), $attrs, 'name');
     }
 
     protected function add_V_GENERAL($id) {
@@ -437,9 +438,9 @@ class CVendor_LiteSpeed_OWS_TblDef extends CVendor_LiteSpeed_TblDefBase {
             $this->_attrs['adminEmails']->dup(null, null, 'vhadminEmails'),
             $this->_attrs['vh_enableGzip'],
             $this->_attrs['enableIpGeo'],
-            self::NewSelAttr('cgroups', Msg::aLbl('l_cgroups'), ['0' => Msg::aLbl('o_off'), '1' => Msg::aLbl('o_on')]),
+            self::newSelAttr('cgroups', Msg::aLbl('l_cgroups'), ['0' => Msg::aLbl('o_off'), '1' => Msg::aLbl('o_on')]),
         ];
-        $this->_tblDef[$id] = Tbl::NewRegular($id, Msg::UIStr('tab_g'), $attrs);
+        $this->_tblDef[$id] = Tbl::newRegular($id, Msg::UIStr('tab_g'), $attrs);
     }
 
     protected function add_T_GENERAL2($id) {
@@ -448,9 +449,9 @@ class CVendor_LiteSpeed_OWS_TblDef extends CVendor_LiteSpeed_TblDefBase {
             $this->_attrs['adminEmails']->dup(null, null, 'vhadminEmails'),
             $this->_attrs['vh_enableGzip'],
             $this->_attrs['enableIpGeo'],
-            self::NewSelAttr('cgroups', Msg::aLbl('l_cgroups'), ['0' => Msg::aLbl('o_off'), '1' => Msg::aLbl('o_on')]),
+            self::newSelAttr('cgroups', Msg::aLbl('l_cgroups'), ['0' => Msg::aLbl('o_off'), '1' => Msg::aLbl('o_on')]),
         ];
-        $this->_tblDef[$id] = Tbl::NewRegular($id, Msg::aLbl('l_base2'), $attrs);
+        $this->_tblDef[$id] = Tbl::newRegular($id, Msg::aLbl('l_base2'), $attrs);
     }
 
     protected function add_V_REALM_TOP($id) {
@@ -547,7 +548,7 @@ class CVendor_LiteSpeed_OWS_TblDef extends CVendor_LiteSpeed_TblDefBase {
             ]
         );
         $defaultExtract = ['type' => 'null'];
-        $this->_tblDef[$id] = Tbl::NewIndexed($id, Msg::aLbl('l_ctxg'), $attrs, 'uri', 'generalContext', $defaultExtract);
+        $this->_tblDef[$id] = Tbl::newIndexed($id, Msg::aLbl('l_ctxg'), $attrs, 'uri', 'generalContext', $defaultExtract);
     }
 
     protected function add_VT_CTXJ($id) {
@@ -567,7 +568,7 @@ class CVendor_LiteSpeed_OWS_TblDef extends CVendor_LiteSpeed_TblDefBase {
             $this->get_ctx_attrs('charset')
         );
         $defaultExtract = ['type' => 'webapp'];
-        $this->_tblDef[$id] = Tbl::NewIndexed($id, Msg::aLbl('l_ctxj'), $attrs, 'uri', 'javaWebAppContext', $defaultExtract);
+        $this->_tblDef[$id] = Tbl::newIndexed($id, Msg::aLbl('l_ctxj'), $attrs, 'uri', 'javaWebAppContext', $defaultExtract);
     }
 
     protected function add_VT_CTXAS($id) {
@@ -575,8 +576,8 @@ class CVendor_LiteSpeed_OWS_TblDef extends CVendor_LiteSpeed_TblDefBase {
             $this->get_ctx_attrs('uri'),
             [
                 self::newTextAttr('location', Msg::aLbl('l_location'), 'cust', false, 'as_location'),
-                self::NewPathAttr('binPath', Msg::aLbl('l_binpath'), 'file', 1, 'x'),
-                self::NewSelAttr(
+                self::newPathAttr('binPath', Msg::aLbl('l_binpath'), 'file', 1, 'x'),
+                self::newSelAttr(
                     'appType',
                     Msg::aLbl('l_apptype'),
                     ['' => '', 'rails' => 'Rails', 'wsgi' => 'WSGI', 'node' => 'Node']
@@ -596,7 +597,7 @@ class CVendor_LiteSpeed_OWS_TblDef extends CVendor_LiteSpeed_TblDefBase {
             $this->get_ctx_attrs('charset')
         );
         $defaultExtract = ['type' => 'appserver'];
-        $this->_tblDef[$id] = Tbl::NewIndexed($id, Msg::aLbl('l_ctxas'), $attrs, 'uri', 'appserverContext', $defaultExtract);
+        $this->_tblDef[$id] = Tbl::newIndexed($id, Msg::aLbl('l_ctxas'), $attrs, 'uri', 'appserverContext', $defaultExtract);
     }
 
     protected function add_VT_CTXS($id) {
@@ -610,42 +611,42 @@ class CVendor_LiteSpeed_OWS_TblDef extends CVendor_LiteSpeed_TblDefBase {
             $this->get_ctx_attrs('charset')
         );
         $defaultExtract = ['type' => 'servlet'];
-        $this->_tblDef[$id] = Tbl::NewIndexed($id, Msg::aLbl('l_ctxs'), $attrs, 'uri', 'servletContext', $defaultExtract);
+        $this->_tblDef[$id] = Tbl::newIndexed($id, Msg::aLbl('l_ctxs'), $attrs, 'uri', 'servletContext', $defaultExtract);
     }
 
     protected function add_VT_CTXF($id) {
         $attrs = array_merge(
             $this->get_ctx_attrs('uri'),
             [
-                self::NewSelAttr('handler', Msg::aLbl('l_fcgiapp'), 'extprocessor:fcgi', false, 'fcgiapp'),
+                self::newSelAttr('handler', Msg::aLbl('l_fcgiapp'), 'extprocessor:fcgi', false, 'fcgiapp'),
                 $this->_attrs['note'],
                 $this->_attrs['extraHeaders']],
             $this->get_ctx_attrs('auth'),
             $this->get_ctx_attrs('charset')
         );
         $defaultExtract = ['type' => 'fcgi'];
-        $this->_tblDef[$id] = Tbl::NewIndexed($id, Msg::aLbl('l_ctxf'), $attrs, 'uri', 'fcgiContext', $defaultExtract);
+        $this->_tblDef[$id] = Tbl::newIndexed($id, Msg::aLbl('l_ctxf'), $attrs, 'uri', 'fcgiContext', $defaultExtract);
     }
 
     protected function add_VT_CTXL($id) {
         $attrs = array_merge(
             $this->get_ctx_attrs('uri'),
             [
-                self::NewSelAttr('handler', Msg::aLbl('l_lsapiapp'), 'extprocessor:lsapi', false, 'lsapiapp'),
+                self::newSelAttr('handler', Msg::aLbl('l_lsapiapp'), 'extprocessor:lsapi', false, 'lsapiapp'),
                 $this->_attrs['note'],
                 $this->_attrs['extraHeaders']],
             $this->get_ctx_attrs('auth'),
             $this->get_ctx_attrs('charset')
         );
         $defaultExtract = ['type' => 'lsapi'];
-        $this->_tblDef[$id] = Tbl::NewIndexed($id, Msg::aLbl('l_ctxl'), $attrs, 'uri', 'lsapiContext', $defaultExtract);
+        $this->_tblDef[$id] = Tbl::newIndexed($id, Msg::aLbl('l_ctxl'), $attrs, 'uri', 'lsapiContext', $defaultExtract);
     }
 
     protected function add_VT_CTXMD($id) {
         $attrs = array_merge(
             $this->get_ctx_attrs('uri'),
             [
-                self::NewSelAttr('handler', Msg::aLbl('l_modulehandler'), 'module', false, 'moduleNameSel'),
+                self::newSelAttr('handler', Msg::aLbl('l_modulehandler'), 'module', false, 'moduleNameSel'),
                 $this->_attrs['note'],
                 $this->_attrs['mod_params'],
                 $this->_attrs['extraHeaders']],
@@ -653,35 +654,35 @@ class CVendor_LiteSpeed_OWS_TblDef extends CVendor_LiteSpeed_TblDefBase {
             $this->get_ctx_attrs('charset')
         );
         $defaultExtract = ['type' => 'module'];
-        $this->_tblDef[$id] = Tbl::NewIndexed($id, Msg::aLbl('l_ctxmd'), $attrs, 'uri', 'lmodContext', $defaultExtract);
+        $this->_tblDef[$id] = Tbl::newIndexed($id, Msg::aLbl('l_ctxmd'), $attrs, 'uri', 'lmodContext', $defaultExtract);
     }
 
     protected function add_VT_CTXB($id) {
         $attrs = array_merge(
             $this->get_ctx_attrs('uri'),
             [
-                self::NewSelAttr('handler', Msg::aLbl('l_loadbalancer'), 'extprocessor:loadbalancer', false, 'lbapp'),
+                self::newSelAttr('handler', Msg::aLbl('l_loadbalancer'), 'extprocessor:loadbalancer', false, 'lbapp'),
                 $this->_attrs['note'],
                 $this->_attrs['extraHeaders']],
             $this->get_ctx_attrs('auth'),
             $this->get_ctx_attrs('charset')
         );
         $defaultExtract = ['type' => 'loadbalancer'];
-        $this->_tblDef[$id] = Tbl::NewIndexed($id, Msg::aLbl('l_ctxb'), $attrs, 'uri', 'lbContext', $defaultExtract);
+        $this->_tblDef[$id] = Tbl::newIndexed($id, Msg::aLbl('l_ctxb'), $attrs, 'uri', 'lbContext', $defaultExtract);
     }
 
     protected function add_VT_CTXP($id) {
         $attrs = array_merge(
             $this->get_ctx_attrs('uri'),
             [
-                self::NewSelAttr('handler', Msg::aLbl('l_webserver'), 'extprocessor:proxy', false, 'proxyWebServer'),
+                self::newSelAttr('handler', Msg::aLbl('l_webserver'), 'extprocessor:proxy', false, 'proxyWebServer'),
                 $this->_attrs['note'],
                 $this->_attrs['extraHeaders']],
             $this->get_ctx_attrs('auth'),
             $this->get_ctx_attrs('charset')
         );
         $defaultExtract = ['type' => 'proxy'];
-        $this->_tblDef[$id] = Tbl::NewIndexed($id, Msg::aLbl('l_ctxp'), $attrs, 'uri', 'proxyContext', $defaultExtract);
+        $this->_tblDef[$id] = Tbl::newIndexed($id, Msg::aLbl('l_ctxp'), $attrs, 'uri', 'proxyContext', $defaultExtract);
     }
 
     protected function add_VT_CTXC($id) {
@@ -697,7 +698,7 @@ class CVendor_LiteSpeed_OWS_TblDef extends CVendor_LiteSpeed_TblDefBase {
             $this->get_ctx_attrs('charset')
         );
         $defaultExtract = ['type' => 'cgi'];
-        $this->_tblDef[$id] = Tbl::NewIndexed($id, Msg::aLbl('l_ctxc'), $attrs, 'uri', 'cgiContext', $defaultExtract);
+        $this->_tblDef[$id] = Tbl::newIndexed($id, Msg::aLbl('l_ctxc'), $attrs, 'uri', 'cgiContext', $defaultExtract);
     }
 
     protected function add_VT_CTXR($id) {
@@ -707,14 +708,14 @@ class CVendor_LiteSpeed_OWS_TblDef extends CVendor_LiteSpeed_TblDefBase {
             $this->get_ctx_attrs('uri'),
             [
                 self::newBoolAttr('externalRedirect', Msg::aLbl('l_externalredirect'), false, 'externalredirect'),
-                self::NewSelAttr('statusCode', Msg::aLbl('l_statuscode'), $options, true, 'statuscode'),
+                self::newSelAttr('statusCode', Msg::aLbl('l_statuscode'), $options, true, 'statuscode'),
                 self::newTextAttr('location', Msg::aLbl('l_desturi'), 'url', true, 'destinationuri'),
                 $this->_attrs['note'],
                 $this->_attrs['extraHeaders']],
             $this->get_ctx_attrs('auth')
         );
         $defaultExtract = ['type' => 'redirect'];
-        $this->_tblDef[$id] = Tbl::NewIndexed($id, Msg::aLbl('l_ctxr'), $attrs, 'uri', 'redirectContext', $defaultExtract);
+        $this->_tblDef[$id] = Tbl::newIndexed($id, Msg::aLbl('l_ctxr'), $attrs, 'uri', 'redirectContext', $defaultExtract);
     }
 
     protected function add_T_SEC_CGI($id) {
@@ -723,11 +724,11 @@ class CVendor_LiteSpeed_OWS_TblDef extends CVendor_LiteSpeed_TblDefBase {
             $this->_attrs['vh_suexec_user'],
             $this->_attrs['vh_suexec_group'],
         ];
-        $this->_tblDef[$id] = Tbl::NewRegular($id, Msg::aLbl('l_extappsec'), $attrs);
+        $this->_tblDef[$id] = Tbl::newRegular($id, Msg::aLbl('l_extappsec'), $attrs);
     }
 
     protected function add_L_GENERAL($id) {
-        $ip = self::NewSelAttr('ip', Msg::aLbl('l_ip'), $this->_options['ip'], false, 'listenerIP');
+        $ip = self::newSelAttr('ip', Msg::aLbl('l_ip'), $this->_options['ip'], false, 'listenerIP');
         $ip->SetFlag(Attr::BM_NOFILE);
         $port = self::newIntAttr('port', Msg::aLbl('l_port'), false, 0, 65535, 'listenerPort');
         $port->SetFlag(Attr::BM_NOFILE);
@@ -746,12 +747,12 @@ class CVendor_LiteSpeed_OWS_TblDef extends CVendor_LiteSpeed_TblDefBase {
             self::newBoolAttr('secure', Msg::aLbl('l_secure'), false, 'listenerSecure'),
             $this->_attrs['note'],
         ];
-        $this->_tblDef[$id] = Tbl::NewIndexed($id, Msg::aLbl('l_addresssettings'), $attrs, 'name');
+        $this->_tblDef[$id] = Tbl::newIndexed($id, Msg::aLbl('l_addresssettings'), $attrs, 'name');
     }
 
     protected function add_LVT_SSL_CLVERIFY($id) {
         $attrs = [
-            self::NewSelAttr(
+            self::newSelAttr(
                 'clientVerify',
                 Msg::aLbl('l_clientverify'),
                 ['0' => 'none', '1' => 'optional', '2' => 'require', '3' => 'optional_no_ca']
@@ -760,6 +761,6 @@ class CVendor_LiteSpeed_OWS_TblDef extends CVendor_LiteSpeed_TblDefBase {
             self::newTextAttr('crlPath', Msg::aLbl('l_crlpath'), 'cust'),
             self::newTextAttr('crlFile', Msg::aLbl('l_crlfile'), 'cust'),
         ];
-        $this->_tblDef[$id] = Tbl::NewRegular($id, Msg::aLbl('l_clientverify'), $attrs);
+        $this->_tblDef[$id] = Tbl::newRegular($id, Msg::aLbl('l_clientverify'), $attrs);
     }
 }

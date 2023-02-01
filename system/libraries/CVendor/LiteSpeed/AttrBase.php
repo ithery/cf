@@ -1,6 +1,7 @@
 <?php
 use CVendor_LiteSpeed_Msg as Msg;
 use CVendor_LiteSpeed_Node as Node;
+use CVendor_LiteSpeed_UIBase as UIBase;
 
 /**
  * Type: parse  _minVal = pattern, _maxVal = pattern tips.
@@ -22,88 +23,88 @@ class CVendor_LiteSpeed_AttrBase {
 
     const BM_RAWDATA = 16;
 
-    public $_helpKey;
+    public $helpKey;
 
-    public $_type;
+    public $type;
 
-    public $_minVal;
+    public $minVal;
 
-    public $_maxVal;
+    public $maxVal;
 
-    public $_label;
+    public $label;
 
-    public $_href;
+    public $href;
 
-    public $_hrefLink;
+    public $hrefLink;
 
-    public $_multiInd;
+    public $multiInd;
 
-    public $_note;
+    public $note;
 
-    public $_icon;
+    public $icon;
 
-    protected $_key;
+    protected $key;
 
-    protected $_keyalias;
+    protected $keyalias;
 
-    protected $_inputType;
+    protected $inputType;
 
-    protected $_inputAttr;
+    protected $inputAttr;
 
-    protected $_glue;
+    protected $glue;
 
-    protected $_bitFlag = 0;
+    protected $bitFlag = 0;
 
     public function __construct($key, $type, $label, $inputType = null, $allowNull = true, $min = null, $max = null, $inputAttr = null, $multiInd = 0, $helpKey = null) {
-        $this->_key = $key;
-        $this->_type = $type;
-        $this->_label = $label;
-        $this->_minVal = $min;
-        $this->_maxVal = $max;
-        $this->_inputType = $inputType;
-        $this->_inputAttr = $inputAttr;
-        $this->_multiInd = $multiInd;
-        $this->_helpKey = ($helpKey == null) ? $key : $helpKey;
+        $this->key = $key;
+        $this->type = $type;
+        $this->label = $label;
+        $this->minVal = $min;
+        $this->maxVal = $max;
+        $this->inputType = $inputType;
+        $this->inputAttr = $inputAttr;
+        $this->multiInd = $multiInd;
+        $this->helpKey = ($helpKey == null) ? $key : $helpKey;
 
-        $this->_bitFlag = $allowNull ? 0 : self::BM_NOTNULL;
+        $this->bitFlag = $allowNull ? 0 : self::BM_NOTNULL;
     }
 
-    public function SetGlue($glue) {
-        $this->_glue = $glue;
+    public function setGlue($glue) {
+        $this->glue = $glue;
     }
 
-    public function SetFlag($flag) {
-        $this->_bitFlag |= $flag;
+    public function setFlag($flag) {
+        $this->bitFlag |= $flag;
     }
 
     public function isFlagOn($flag) {
-        return ($this->_bitFlag & $flag) == $flag;
+        return ($this->bitFlag & $flag) == $flag;
     }
 
-    public function GetKey() {
-        return $this->_key;
+    public function getKey() {
+        return $this->key;
     }
 
     public function dup($key, $label, $helpkey) {
         $cname = get_class($this);
-        $d = new $cname($this->_key, $this->_type, $this->_label, $this->_inputType, true, $this->_minVal, $this->_maxVal, $this->_inputAttr, $this->_multiInd, $this->_helpKey);
+        $d = new $cname($this->key, $this->type, $this->label, $this->inputType, true, $this->minVal, $this->maxVal, $this->inputAttr, $this->multiInd, $this->helpKey);
 
-        $d->_glue = $this->_glue;
-        $d->_href = $this->_href;
-        $d->_hrefLink = $this->_hrefLink;
-        $d->_bitFlag = $this->_bitFlag;
-        $d->_note = $this->_note;
-        $d->_icon = $this->_icon;
+        $d->glue = $this->glue;
+        $d->href = $this->href;
+        $d->hrefLink = $this->hrefLink;
+        $d->bitFlag = $this->bitFlag;
+        $d->note = $this->note;
+        $d->icon = $this->icon;
 
         if ($key != null) {
-            $d->_key = $key;
+            $d->key = $key;
         }
         if ($label != null) {
-            $d->_label = $label;
+            $d->label = $label;
         }
 
         if ($helpkey != null) {
-            $d->_helpKey = $helpkey;
+            $d->helpKey = $helpkey;
         }
 
         return $d;
@@ -112,8 +113,8 @@ class CVendor_LiteSpeed_AttrBase {
     protected function extractCheckBoxOr() {
         $value = 0;
         $novalue = 1;
-        foreach ($this->_maxVal as $val => $disp) {
-            $name = $this->_key . $val;
+        foreach ($this->maxVal as $val => $disp) {
+            $name = $this->key . $val;
             if (isset($_POST[$name])) {
                 $novalue = 0;
                 $value = $value | $val;
@@ -124,7 +125,7 @@ class CVendor_LiteSpeed_AttrBase {
     }
 
     protected function extractSplitMultiple(&$value) {
-        if ($this->_glue == ' ') {
+        if ($this->glue == ' ') {
             $vals = preg_split('/[,; ]+/', $value, -1, PREG_SPLIT_NO_EMPTY);
         } else {
             $vals = preg_split('/[,;]+/', $value, -1, PREG_SPLIT_NO_EMPTY);
@@ -138,7 +139,7 @@ class CVendor_LiteSpeed_AttrBase {
             }
         }
 
-        if ($this->_glue == ' ') {
+        if ($this->glue == ' ') {
             $value = implode(' ', $vals1);
         } else {
             $value = implode(', ', $vals1);
@@ -155,10 +156,10 @@ class CVendor_LiteSpeed_AttrBase {
         $value = $node->get(Node::FLD_VAL);
         $err = $node->get(Node::FLD_ERR);
 
-        if ($this->_type == 'sel1' && $value != null && !array_key_exists($value, $this->_maxVal)) {
+        if ($this->type == 'sel1' && $value != null && !array_key_exists($value, $this->maxVal)) {
             $err = 'Invalid value - ' . htmlspecialchars($value, ENT_QUOTES);
         } elseif ($err != null) {
-            $type3 = substr($this->_type, 0, 3);
+            $type3 = substr($this->type, 0, 3);
             if ($type3 == 'fil' || $type3 == 'pat') {
                 $validator = new ConfValidation();
                 $validator->chkAttr_file_val($this, $value, $err);
@@ -170,8 +171,8 @@ class CVendor_LiteSpeed_AttrBase {
             $o .= '<span class="field_error">*' . $err . '</span><br>';
         }
 
-        if ($this->_href) {
-            $link = $this->_hrefLink;
+        if ($this->href) {
+            $link = $this->hrefLink;
             if (strpos($link, '$V')) {
                 $link = str_replace('$V', urlencode($value), $link);
             }
@@ -180,7 +181,7 @@ class CVendor_LiteSpeed_AttrBase {
             $o .= '<span class="field_refUrl"><a href="' . $refUrl . '">';
         }
 
-        if ($this->_type === 'bool') {
+        if ($this->type === 'bool') {
             if ($value === '1') {
                 $o .= ATTR_VAL_BOOL_YES;
             } elseif ($value === '0') {
@@ -188,27 +189,27 @@ class CVendor_LiteSpeed_AttrBase {
             } else {
                 $o .= '<span class="text-muted">' . ATTR_VAL_NOT_SET . '</span>';
             }
-        } elseif ($this->_type == 'ctxseq') {
+        } elseif ($this->type == 'ctxseq') {
             $o = $value;
             if (!defined('_CONF_READONLY_')) {
                 $o .= ' <a href="javascript:lst_ctxseq(' . $value
                     . ')" class="btn bg-color-blueLight btn-xs txt-color-white"><i class="fa fa-plus"></i></a> <a href="javascript:lst_ctxseq(-' . $value
                     . ')" class="btn bg-color-blueLight btn-xs txt-color-white"><i class="fa fa-minus"></i></a>';
             }
-        } elseif ($this->_key == 'note') {
+        } elseif ($this->key == 'note') {
             $o .= '<textarea readonly style="width:100%;height:auto">' . htmlspecialchars($value, ENT_QUOTES) . '</textarea>';
-        } elseif ($this->_type === 'sel' || $this->_type === 'sel1') {
-            if ($this->_maxVal != null && array_key_exists($value, $this->_maxVal)) {
-                $o .= $this->_maxVal[$value];
+        } elseif ($this->type === 'sel' || $this->type === 'sel1') {
+            if ($this->maxVal != null && array_key_exists($value, $this->maxVal)) {
+                $o .= $this->maxVal[$value];
             } else {
                 $o .= htmlspecialchars($value, ENT_QUOTES);
             }
-        } elseif ($this->_type === 'checkboxOr') {
-            if ($this->_minVal !== null && ($value === '' || $value === null)) {
+        } elseif ($this->type === 'checkboxOr') {
+            if ($this->minVal !== null && ($value === '' || $value === null)) {
                 // has default value, for "Not set", set default val
-                $value = $this->_minVal;
+                $value = $this->minVal;
             }
-            foreach ($this->_maxVal as $val => $name) {
+            foreach ($this->maxVal as $val => $name) {
                 if (($value & $val) || ($value === $val) || ($value === '0' && $val === 0)) {
                     $o .= '<i class="fa fa-check-square-o">';
                 } else {
@@ -217,15 +218,15 @@ class CVendor_LiteSpeed_AttrBase {
                 $o .= '</i> ';
                 $o .= $name . '&nbsp;&nbsp;&nbsp;&nbsp;';
             }
-        } elseif ($this->_inputType === 'textarea1') {
-            $o .= '<textarea readonly style="width:100%;"' . $this->_inputAttr . '>' . htmlspecialchars($value, ENT_QUOTES) . '</textarea>';
-        } elseif ($this->_inputType === 'text') {
+        } elseif ($this->inputType === 'textarea1') {
+            $o .= '<textarea readonly style="width:100%;"' . $this->inputAttr . '>' . htmlspecialchars($value, ENT_QUOTES) . '</textarea>';
+        } elseif ($this->inputType === 'text') {
             $o .= '<span class="field_text">' . htmlspecialchars($value, ENT_QUOTES) . '</span>';
         } else {
             $o .= htmlspecialchars($value);
         }
 
-        if ($this->_href || $refUrl != null) {
+        if ($this->href || $refUrl != null) {
             $o .= '</a></span>';
         }
 
@@ -233,14 +234,14 @@ class CVendor_LiteSpeed_AttrBase {
     }
 
     protected function getNote() {
-        if ($this->_note != null) {
-            return $this->_note;
+        if ($this->note != null) {
+            return $this->note;
         }
-        if ($this->_type == 'uint') {
-            if ($this->_maxVal) {
-                return ATTR_NOTE_NUM_RANGE . ': ' . $this->_minVal . ' - ' . $this->_maxVal;
-            } elseif ($this->_minVal !== null) {
-                return ATTR_NOTE_NUM_RANGE . ' >= ' . $this->_minVal;
+        if ($this->type == 'uint') {
+            if ($this->maxVal) {
+                return ATTR_NOTE_NUM_RANGE . ': ' . $this->minVal . ' - ' . $this->maxVal;
+            } elseif ($this->minVal !== null) {
+                return ATTR_NOTE_NUM_RANGE . ' >= ' . $this->minVal;
             }
         }
 
@@ -248,17 +249,17 @@ class CVendor_LiteSpeed_AttrBase {
     }
 
     public function extractPost($parent) {
-        if ($this->_type == 'checkboxOr') {
+        if ($this->type == 'checkboxOr') {
             $value = $this->extractCheckBoxOr();
         } else {
-            $value = UIBase::GrabInput('post', $this->_key);
+            $value = UIBase::grabInput('post', $this->key);
             if (get_magic_quotes_gpc()) {
                 $value = stripslashes($value);
             }
         }
         $value = str_replace("\r\n", "\n", $value);
 
-        $key = $this->_key;
+        $key = $this->key;
         $node = $parent;
         while (($pos = strpos($key, ':')) > 0) {
             $key0 = substr($key, 0, $pos);
@@ -272,15 +273,15 @@ class CVendor_LiteSpeed_AttrBase {
             }
         }
 
-        if ($this->_multiInd == 2 && $value != null) {
+        if ($this->multiInd == 2 && $value != null) {
             $v = preg_split("/\n+/", $value, -1, PREG_SPLIT_NO_EMPTY);
             foreach ($v as $vi) {
                 $node->AddChild(new Node($key, trim($vi)));
             }
-        } elseif ($this->_type == 'checkboxOr') {
+        } elseif ($this->type == 'checkboxOr') {
             $node->AddChild(new Node($key, $value));
         } else {
-            if ($this->_multiInd == 1 && $value != null) {
+            if ($this->multiInd == 1 && $value != null) {
                 $this->extractSplitMultiple($value);
             }
             $node->AddChild(new Node($key, $value));
@@ -290,7 +291,7 @@ class CVendor_LiteSpeed_AttrBase {
     }
 
     public function toHtml($pnode, $refUrl = null) {
-        $node = ($pnode == null) ? null : $pnode->GetChildren($this->_key);
+        $node = ($pnode == null) ? null : $pnode->GetChildren($this->key);
         $o = '';
         if (is_array($node)) {
             foreach ($node as $nd) {
@@ -305,7 +306,7 @@ class CVendor_LiteSpeed_AttrBase {
     }
 
     public function toInputGroup($pnode, $is_blocked, $helppop) {
-        $node = ($pnode == null) ? null : $pnode->GetChildren($this->_key);
+        $node = ($pnode == null) ? null : $pnode->GetChildren($this->key);
         $err = '';
         $value = '';
 
@@ -328,9 +329,9 @@ class CVendor_LiteSpeed_AttrBase {
         }
 
         $buf = '<div class="form-group' . ($err ? ' has-error">' : '">');
-        if ($this->_label) {
+        if ($this->label) {
             $buf .= '<label class="col-md-3 control-label">';
-            $buf .= $this->_label;
+            $buf .= $this->label;
             if ($this->isFlagOn(self::BM_NOTNULL)) {
                 $buf .= ' *';
             }
@@ -355,29 +356,29 @@ class CVendor_LiteSpeed_AttrBase {
         $input = '<div class="input-group">';
         $input .= '<span class="input-group-addon">' . $helppop . '</span>' . "\n"; // need this even empty, for alignment
 
-        if (is_array($value) && $this->_inputType != 'checkbox') {
-            if ($this->_multiInd == 1) {
+        if (is_array($value) && $this->inputType != 'checkbox') {
+            if ($this->multiInd == 1) {
                 $glue = ', ';
             } else {
                 $glue = "\n";
             }
             $value = implode($glue, $value);
         }
-        $name = $this->_key;
+        $name = $this->key;
 
-        $inputAttr = $this->_inputAttr;
+        $inputAttr = $this->inputAttr;
         if ($isDisabled) {
             $inputAttr .= ' disabled="disabled"';
         }
 
         $style = 'form-control';
-        if ($this->_inputType == 'text') {
+        if ($this->inputType == 'text') {
             $input .= '<input class="' . $style . '" type="text" name="' . $name . '" ' . $inputAttr . ' value="' . htmlspecialchars($value, ENT_QUOTES) . '">';
-        } elseif ($this->_inputType == 'password') {
+        } elseif ($this->inputType == 'password') {
             $input .= '<input class="' . $style . '" type="password" name="' . $name . '" ' . $inputAttr . ' value="' . $value . '">';
-        } elseif ($this->_inputType == 'textarea' || $this->_inputType == 'textarea1') {
+        } elseif ($this->inputType == 'textarea' || $this->inputType == 'textarea1') {
             $input .= '<textarea name="' . $name . '" class="' . $style . '" ' . $inputAttr . '>' . htmlspecialchars($value, ENT_QUOTES) . '</textarea>';
-        } elseif ($this->_inputType == 'radio' && $this->_type == 'bool') {
+        } elseif ($this->inputType == 'radio' && $this->type == 'bool') {
             $input .= '<div class="form-control"><div class="lst-radio-group"><label class="radio radio-inline">
 					<input type="radio" name="' . $name . '" ' . $inputAttr . ' value="1"';
             if ($value == '1') {
@@ -398,15 +399,15 @@ class CVendor_LiteSpeed_AttrBase {
                 $input .= '> ' . ATTR_VAL_NOT_SET . '</label>';
             }
             $input .= '</div></div>';
-        } elseif ($this->_inputType == 'checkboxgroup') {
+        } elseif ($this->inputType == 'checkboxgroup') {
             $input .= '<div class="form-control">';
-            if ($this->_minVal !== null && ($value === '' || $value === null)) {
+            if ($this->minVal !== null && ($value === '' || $value === null)) {
                 // has default value, for "Not set", set default val
-                $value = $this->_minVal;
+                $value = $this->minVal;
             }
             $js0 = $js1 = '';
-            if (array_key_exists('0', $this->_maxVal)) {
-                $chval = array_keys($this->_maxVal);
+            if (array_key_exists('0', $this->maxVal)) {
+                $chval = array_keys($this->maxVal);
                 foreach ($chval as $chv) {
                     if ($chv == '0') {
                         $js1 = "document.confform.${name}${chv}.checked=false;";
@@ -417,7 +418,7 @@ class CVendor_LiteSpeed_AttrBase {
                 $js1 = " onclick=\"${js1}\"";
                 $js0 = " onclick=\"${js0}\"";
             }
-            foreach ($this->_maxVal as $val => $disp) {
+            foreach ($this->maxVal as $val => $disp) {
                 $id = $name . $val;
                 $input .= "<input type=\"checkbox\" id=\"{$id}\" name=\"{$id}\" value=\"{$val}\"";
                 if (($value & $val) || ($value === $val) || ($value === '0' && $val === 0)) {
@@ -427,16 +428,16 @@ class CVendor_LiteSpeed_AttrBase {
                 $input .= "> <label for=\"{$id}\"> ${disp} </label> ${spacer}";
             }
             $input .= '</div>';
-        } elseif ($this->_inputType == 'select') {
+        } elseif ($this->inputType == 'select') {
             $input .= '<select class="form-control" name="' . $name . '" ' . $inputAttr . '>';
-            $input .= UIBase::genOptions($this->_maxVal, $value);
+            $input .= UIBase::genOptions($this->maxVal, $value);
             $input .= '</select>';
         }
 
         $input .= "</div>\n";
         if ($err != '') {
             $input .= '<span class="help-block"><i class="fa fa-warning"></i> ';
-            $type3 = substr($this->_type, 0, 3);
+            $type3 = substr($this->type, 0, 3);
             $input .= ($type3 == 'fil' || $type3 == 'pat') ? $err : htmlspecialchars($err, ENT_QUOTES);
             $input .= '</span>';
         }
@@ -459,6 +460,6 @@ class CVendor_LiteSpeed_AttrBase {
         if ($derived) {
             $options = array_merge($options, $derived);
         }
-        $this->_maxVal = $options;
+        $this->maxVal = $options;
     }
 }

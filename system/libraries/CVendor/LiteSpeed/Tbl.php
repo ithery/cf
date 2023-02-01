@@ -58,14 +58,14 @@ class CVendor_LiteSpeed_Tbl {
 
     private $_sort_key;
 
-    public static function NewRegular($id, $title, $attrs, $helpkey = null, $cols = null) {
+    public static function newRegular($id, $title, $attrs, $helpkey = null, $cols = null) {
         $tbl = new static($id, $title, $attrs, $helpkey);
         $tbl->_cols = ($cols > 0) ? $cols : 2;
 
         return $tbl;
     }
 
-    public static function NewIndexed($id, $title, $attrs, $index, $helpkey = null, $defaultExtract = null) {
+    public static function newIndexed($id, $title, $attrs, $index, $helpkey = null, $defaultExtract = null) {
         $tbl = new static($id, $title, $attrs, $helpkey);
         $tbl->_holderIndex = $index;
         $tbl->_cols = 2;
