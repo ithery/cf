@@ -378,6 +378,11 @@ export default class Cresenity {
         return this.cf.getConfig().debug ?? false;
     }
     confirm(options) {
+        if(typeof options == 'function') {
+            options = {
+                confirmCallback: options
+            };
+        }
         let settings = extend({
             // These are the defaults.
             method: 'get',
