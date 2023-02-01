@@ -18,7 +18,7 @@ class CDevSuite_Command_LinkCommand extends CDevSuite_CommandAbstract {
         CDevSuite::info('A [' . $name . '] symbolic link has been created in [' . $linkPath . '].');
 
         if ($secure) {
-            $cfCommand->call('devsuite:secure ' . $name);
+            $cfCommand->call('devsuite:secure', ['name' => $name]);
         }
     }
 }
