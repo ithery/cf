@@ -150,7 +150,6 @@ class CApp_Navigation_Helper {
 
     public static function havePermission($action, $nav = null, $roleId = null, $appId = null, $domain = null) {
         $app = CApp::instance();
-
         if ($roleId == null) {
             $role = $app->role();
             if ($role == null) {
@@ -169,7 +168,6 @@ class CApp_Navigation_Helper {
         if ($role == null) {
             return false;
         }
-
         if ($role != null && $role->parent_id == null) {
             return true;
         }
