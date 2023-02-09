@@ -10,6 +10,7 @@ class CDatabase {
     use CDatabase_Trait_DetectLostConnection;
     use CDatabase_Trait_DetectConcurrencyErrors;
     use CDatabase_Trait_ManageTransaction;
+
     /**
      * Database instances.
      *
@@ -929,7 +930,6 @@ class CDatabase {
     public function benchmarkQuery($query, $time = null, $rowsCount = null) {
         if ($this->isBenchmarkQuery()) {
             // Benchmark the query
-            //static::$benchmarks[] = array('query' => $query, 'time' => $time, 'rows' => $rowsCount, 'caller' => cdbg::getTraceString());
             static::$benchmarks[] = ['query' => $query, 'time' => $time, 'rows' => $rowsCount, 'caller' => cdbg::callerInfo()];
         }
     }
