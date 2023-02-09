@@ -3,16 +3,20 @@
 class CAjax_Engine_ImgUpload extends CAjax_Engine {
     const FOLDER = 'imgupload';
 
+    const FOLDER_INFO = 'imguploadinfo';
+
     public function execute() {
         $data = $this->ajaxMethod->getData();
         $inputName = carr::get($data, 'inputName');
         $allowedExtension = carr::get($data, 'allowedExtension', []);
         $validationCallback = carr::get($data, 'validationCallback');
+        $withInfo = carr::get($data, 'withInfo', false);
         $fileId = '';
         if (isset($_FILES[$inputName], $_FILES[$inputName]['name'])) {
             for ($i = 0; $i < count($_FILES[$inputName]['name']); $i++) {
+                $fileName = $_FILES[$inputName]['name'][$i];
+                //$fileSize = $_FILES[$inputName]['size'][$i];
                 $ext = pathinfo($_FILES[$inputName]['name'][$i], PATHINFO_EXTENSION);
-
                 if (in_array(strtolower($ext), ['php', 'sh', 'htm', 'pht'])) {
                     die('Not Allowed X_X');
                 }
@@ -33,10 +37,17 @@ class CAjax_Engine_ImgUpload extends CAjax_Engine {
                 $extension = '.' . $ext;
                 $fileId = date('Ymd') . cutils::randmd5() . $extension;
                 $disk = CTemporary::disk();
-                $fullfilename = CTemporary::getPath('imgupload', $fileId);
+                $fullfilename = CTemporary::getPath(static::FOLDER, $fileId);
 
                 if (!$disk->put($fullfilename, file_get_contents($_FILES[$inputName]['tmp_name'][$i]))) {
                     die('fail upload from ' . $_FILES[$inputName]['tmp_name'][$i] . ' to ' . $fullfilename);
+                }
+                if ($withInfo) {
+                    $infoData['filename'] = $fileName;
+                    $infoData['fileId'] = $fileId;
+                    $infoData['path'] = $fullfilename;
+                    $infoData['url'] = CTemporary::getUrl(static::FOLDER, $fileId);
+                    $fullfilenameinf = CTemporary::put(static::FOLDER_INFO, json_encode($infoData), $fileId);
                 }
                 $return[] = $fileId;
             }
@@ -53,8 +64,8 @@ class CAjax_Engine_ImgUpload extends CAjax_Engine {
                 $filenameArray = [$filenameArray];
             }
             foreach ($imageDataArray as $k => $imageData) {
-                $filename = carr::get($filenameArray, $k);
-                $ext = pathinfo($filename, PATHINFO_EXTENSION);
+                $fileName = carr::get($filenameArray, $k);
+                $ext = pathinfo($fileName, PATHINFO_EXTENSION);
 
                 if (in_array(strtolower($ext), ['php', 'sh', 'htm', 'pht'])) {
                     die('Not Allowed X_X');
@@ -69,7 +80,7 @@ class CAjax_Engine_ImgUpload extends CAjax_Engine {
                     }
                 }
                 if ($validationCallback && $validationCallback instanceof Opis\Closure\SerializableClosure) {
-                    $validationCallback->__invoke($filename, $imageData);
+                    $validationCallback->__invoke($fileName, $imageData);
                 }
 
                 $extension = '.' . $ext;
@@ -78,12 +89,19 @@ class CAjax_Engine_ImgUpload extends CAjax_Engine {
                 $fileId = date('Ymd') . cutils::randmd5() . $extension;
 
                 $fullfilename = CTemporary::put(static::FOLDER, $unencodedData, $fileId);
-
+                if ($withInfo) {
+                    $infoData['filename'] = $fileName;
+                    $infoData['fileId'] = $fileId;
+                    $infoData['path'] = $fullfilename;
+                    $infoData['url'] = CTemporary::getUrl(static::FOLDER, $fileId);
+                    $fullfilenameinf = CTemporary::put(static::FOLDER_INFO, json_encode($infoData), $fileId);
+                }
                 $return[] = $fileId;
             }
         }
         $return = [
             'fileId' => $fileId,
+            'fileName' => $fileName,
             'url' => CTemporary::getUrl(static::FOLDER, $fileId),
         ];
 

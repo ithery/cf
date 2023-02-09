@@ -71,4 +71,11 @@ class CAjax {
     public static function getDefaultExpiration() {
         return c::now()->addMinutes(CF::config('app.ajax.expiration', 60))->getTimestamp();
     }
+
+    /**
+     * @return CAjax_Info|CBase_ForwarderStaticClass
+     */
+    public static function info() {
+        return new CBase_ForwarderStaticClass(CAjax_Info::class);
+    }
 }
