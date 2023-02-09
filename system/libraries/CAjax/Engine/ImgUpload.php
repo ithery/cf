@@ -11,6 +11,7 @@ class CAjax_Engine_ImgUpload extends CAjax_Engine {
         $allowedExtension = carr::get($data, 'allowedExtension', []);
         $validationCallback = carr::get($data, 'validationCallback');
         $withInfo = carr::get($data, 'withInfo', false);
+        $diskName = carr::get($data, 'disk', CF::config('storage.temp'));
         $fileId = '';
         if (isset($_FILES[$inputName], $_FILES[$inputName]['name'])) {
             for ($i = 0; $i < count($_FILES[$inputName]['name']); $i++) {
@@ -36,6 +37,7 @@ class CAjax_Engine_ImgUpload extends CAjax_Engine {
 
                 $extension = '.' . $ext;
                 $fileId = date('Ymd') . cutils::randmd5() . $extension;
+
                 $disk = CTemporary::disk();
                 $fullfilename = CTemporary::getPath(static::FOLDER, $fileId);
 
@@ -45,7 +47,8 @@ class CAjax_Engine_ImgUpload extends CAjax_Engine {
                 if ($withInfo) {
                     $infoData['filename'] = $fileName;
                     $infoData['fileId'] = $fileId;
-                    $infoData['path'] = $fullfilename;
+                    $infoData['temporaryPath'] = $fullfilename;
+                    $infoData['temporaryDisk'] = $diskName;
                     $infoData['url'] = CTemporary::getUrl(static::FOLDER, $fileId);
                     $fullfilenameinf = CTemporary::put(static::FOLDER_INFO, json_encode($infoData), $fileId);
                 }
@@ -92,7 +95,8 @@ class CAjax_Engine_ImgUpload extends CAjax_Engine {
                 if ($withInfo) {
                     $infoData['filename'] = $fileName;
                     $infoData['fileId'] = $fileId;
-                    $infoData['path'] = $fullfilename;
+                    $infoData['temporaryPath'] = $fullfilename;
+                    $infoData['temporaryDisk'] = $diskName;
                     $infoData['url'] = CTemporary::getUrl(static::FOLDER, $fileId);
                     $fullfilenameinf = CTemporary::put(static::FOLDER_INFO, json_encode($infoData), $fileId);
                 }
