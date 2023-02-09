@@ -15,8 +15,7 @@ class CDatabase_Exception extends CException {
 
     public static function invalidPlatformSpecified() {
         return new self(
-            "Invalid 'platform' option specified, need to give an instance of "
-                . "\Doctrine\DBAL\Platforms\AbstractPlatform."
+            "Invalid 'platform' option specified, need to give an instance of AbstractPlatform."
         );
     }
 
@@ -73,7 +72,7 @@ class CDatabase_Exception extends CException {
     }
 
     /**
-     * @param string|null $url the URL that was provided in the connection parameters (if any)
+     * @param null|string $url the URL that was provided in the connection parameters (if any)
      *
      * @return CDatabase_Exception
      */
@@ -101,52 +100,6 @@ class CDatabase_Exception extends CException {
     public static function unknownDriver($unknownDriverName, array $knownDrivers) {
         return new self("The given 'driver' " . $unknownDriverName . ' is unknown, '
                 . 'Doctrine currently supports only the following drivers: ' . implode(', ', $knownDrivers));
-    }
-
-    /**
-     * @param \Doctrine\DBAL\Driver $driver
-     * @param \Exception            $driverEx
-     * @param string                $sql
-     * @param array                 $params
-     *
-     * @return CDatabase_Exception
-     */
-    public static function driverExceptionDuringQuery(Driver $driver, \Exception $driverEx, $sql, array $params = []) {
-        $msg = "An exception occurred while executing '" . $sql . "'";
-        if ($params) {
-            $msg .= ' with params ' . self::formatParameters($params);
-        }
-        $msg .= ":\n\n" . $driverEx->getMessage();
-
-        return static::wrapException($driver, $driverEx, $msg);
-    }
-
-    /**
-     * @param \Doctrine\DBAL\Driver $driver
-     * @param \Exception            $driverEx
-     *
-     * @return CDatabase_Exception
-     */
-    public static function driverException(Driver $driver, \Exception $driverEx) {
-        return static::wrapException($driver, $driverEx, 'An exception occurred in driver: ' . $driverEx->getMessage());
-    }
-
-    /**
-     * @param \Doctrine\DBAL\Driver $driver
-     * @param \Exception            $driverEx
-     * @param mixed                 $msg
-     *
-     * @return CDatabase_Exception
-     */
-    private static function wrapException(Driver $driver, \Exception $driverEx, $msg) {
-        if ($driverEx instanceof Exception\DriverException) {
-            return $driverEx;
-        }
-        if ($driver instanceof ExceptionConverterDriver && $driverEx instanceof Driver\DriverException) {
-            return $driver->convertException($msg, $driverEx);
-        }
-
-        return new self($msg, [], 0, $driverEx);
     }
 
     /**
@@ -234,15 +187,7 @@ class CDatabase_Exception extends CException {
      * @return CDatabase_Exception
      */
     public static function unknownColumnType($name) {
-        return new self(
-            'Unknown column type "' . $name . '" requested. Any Doctrine type that you use has '
-                . 'to be registered with \Doctrine\DBAL\Types\Type::addType(). You can get a list of all the '
-                . 'known types with \Doctrine\DBAL\Types\Type::getTypesMap(). If this error occurs during database '
-                . 'introspection then you might have forgotten to register all database types for a Doctrine Type. Use '
-                . 'AbstractPlatform#registerDoctrineTypeMapping() or have your custom types implement '
-                . 'Type#getMappedDatabaseTypes(). If the type name is empty you might '
-                . 'have a problem with the cache or forgot some mapping information.'
-        );
+        return new self('Unknown column type "' . $name . '" requested');
     }
 
     /**
@@ -251,6 +196,42 @@ class CDatabase_Exception extends CException {
      * @return CDatabase_Exception
      */
     public static function typeNotFound($name) {
-        return new self('Type to be overwritten ' . $name . ' does not exist.');
+        return new self(c::__('database.type_not_found', ['type' => $name]));
+    }
+
+    /**
+     * @param string $dsn
+     *
+     * @return CDatabase_Exception
+     */
+    public static function invalidDsn($dsn) {
+        return new self(c::__('database.invalid_dsn', ['dsn' => $dsn]));
+    }
+
+    /**
+     * @param string $table
+     *
+     * @return CDatabase_Exception
+     */
+    public static function tableNotFound($table) {
+        return new self(c::__('database.table_not_found', ['table' => $table]));
+    }
+
+    /**
+     * @param string $error
+     *
+     * @return CDatabase_Exception_QueryException
+     */
+    public static function queryException($error) {
+        return new CDatabase_Exception_QueryException(c::__('database.sql_error', ['error' => $error]));
+    }
+
+    /**
+     * @param string $error
+     *
+     * @return CDatabase_Exception_ConnectionException
+     */
+    public static function connectionException($error) {
+        return new CDatabase_Exception_ConnectionException(c::__('database.connection_error', ['error' => $error]));
     }
 }
