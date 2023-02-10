@@ -12,6 +12,9 @@ class CElement_FormInput_ImageAjax extends CElement_FormInput_Image {
 
     protected $validationCallback;
 
+    /**
+     * @var null|CElement_Helper_Cropper
+     */
     protected $cropper;
 
     protected $tempStorage;

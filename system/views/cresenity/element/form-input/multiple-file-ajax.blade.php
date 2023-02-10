@@ -100,7 +100,7 @@
     <input id="{{ $id }}_input_temp" type="file" accept="<?php echo $accept;?>" name="{{ $id }}_input_temp[]" class="multi-image-ajax-input-temp"  style="display:none;">
     <div id="{{ $id }}_message" class="row alert alert-danger fade in multi-image-ajax-message">
     </div>
-    <div id="{{ $id }}_description" class="multi-image-ajax-description">@lang('element/image.clickOrDropFilesOnBoxBelow')</div>
+    <div id="{{ $id }}_description" class="multi-image-ajax-description">@lang('element/file.clickOrDropFilesOnBoxBelow')</div>
     <div id="{{ $id }}" class="row control-fileupload multi-image-ajax">
         @foreach($files as $f)
             @php
@@ -133,22 +133,22 @@
                 @foreach ($customControl as $cc)
                     <?php
                     $control = carr::get($cc, 'control');
-                    $control_name = carr::get($cc, 'input_name');
-                    $control_label = carr::get($cc, 'input_label');
+                    $controlName = carr::get($cc, 'input_name');
+                    $controlLabel = carr::get($cc, 'input_label');
                     //get value
                     $control_value_array = carr::get($customControlValue, $input_name, []);
-                    $control_value = carr::get($control_value_array, $control_name);
+                    $control_value = carr::get($control_value_array, $controlName);
                     ?>
                     <div class="div-custom-control">
-                        <label><?php echo $control_label; ?>:</label><input type="{{ $control }}" name="{{ $name }}_custom_control[{{ $input_name }}][{{ $control_name }}]" value="{{ $control_value }}"  >
+                        <label><?php echo $controlLabel; ?>:</label><input type="{{ $control }}" name="{{ $name }}_custom_control[{{ $input_name }}][{{ $controlName }}]" value="{{ $control_value }}"  >
                     </div>
                 @endforeach
-                <a class="multi-image-ajax-remove">@lang('element/image.remove')</a>
+                <a class="multi-image-ajax-remove">@lang('element/file.remove')</a>
             </div>
         @endforeach
     </div>
     <div>
-        <div class="multi-image-ajax-btn-upload btn btn-success">@lang('element/image.uploadImage')</div>
+        <div class="multi-image-ajax-btn-upload btn btn-success">@lang('element/file.uploadFile')</div>
     </div>
 
 </div>
@@ -156,11 +156,11 @@
 
     (function ($) {
         $(function () {
-            const errorMessageLimitFile = '@lang("element/image.errorMessageLimitFile",["limit"=>$limitFile])';
-            const errorMessageMaxUploadSize = '@lang("element/image.errorMessageMaxUploadSize",["sizeMB"=>$maxUploadSize])';
-            const removeLabel = "@lang('element/image.remove')";
+            const errorMessageLimitFile = '@lang("element/file.errorMessageLimitFile",["limit" => $limitFile])';
+            const errorMessageMaxUploadSize = '@lang("element/file.errorMessageMaxUploadSize",["sizeMB" => $maxUploadSize])';
+            const removeLabel = "@lang('element/file.remove')";
             const elementId = "{{ $id }}";
-            var haveCropper = <?php echo ($cropper != null) ? 'true' : 'false' ?>;
+            var haveCropper = {{ ($cropper != null) ? 'true' : 'false'  }};
             const maxUploadSize = <?= $maxUploadSize ?> * 1024 * 1024;
             const readerOnLoadResolver = (child, file, reader) =>{
                 return $.proxy(function (file, fileList, event) {
@@ -178,12 +178,11 @@
                 }, child, file, $("#" + elementId));
             };
 
-
-<?php if ($cropper != null) : ?>
-            var cropperWidth = parseFloat('<?php echo $cropper->getCropperWidth(); ?>');
-            var cropperHeight = parseFloat('<?php echo $cropper->getCropperHeight(); ?>');
-            var cropBoxResizable = <?php echo json_encode($cropper->getCropperResizable()); ?>;
-<?php endif; ?>
+            @if($cropper != null)
+                var cropperWidth = parseFloat('<?php echo $cropper->getCropperWidth(); ?>');
+                var cropperHeight = parseFloat('<?php echo $cropper->getCropperHeight(); ?>');
+                var cropBoxResizable = <?php echo json_encode($cropper->getCropperResizable()); ?>;
+            @endif
             var index = 0;
             var descriptionElement = $("#container-<?php echo $id ?> .multi-image-ajax-description");
             $('#container-<?php echo $id ?> .multi-image-ajax-btn-upload').click(function () {
@@ -329,21 +328,21 @@
                 var div_cc;
                 var cc_label;
                 var cc;
-                <?php foreach ($customControl as $cc): ?>
-                    <?php
+                @foreach ($customControl as $cc)
+                    @php
                     $control = carr::get($cc, 'control');
-                    $control_name = carr::get($cc, 'input_name');
-                    $control_label = carr::get($cc, 'input_label');
-                    ?>
+                    $controlName = carr::get($cc, 'input_name');
+                    $controlLabel = carr::get($cc, 'input_label');
+                    @endphp
                     div_cc = $("<div>").addClass("div-custom-control");
-                    cc_label = $("<label>").html("<?php echo $control_label; ?> :");
-                    cc = $("<input type=\"<?php echo $control; ?>\" name=\"<?php echo $name; ?>_custom_control[" + index + "][<?php echo $control_name; ?>]\">");
+                    cc_label = $("<label>").html("{{ $controlLabel }} :");
+                    cc = $("<input type=\"{{ $control }}\" name=\"{{ $name }}_custom_control[" + index + "][{{  $controlName }}]\">");
                     div_cc.append(cc_label);
                     div_cc.append(cc);
                     div.append(div_cc);
-                <?php endforeach; ?>
+                @endforeach
                 @if($removeLink)
-                    var remove = $("<a>").addClass("multi-image-ajax-remove").html("@lang('element/image.remove')");
+                    var remove = $("<a>").addClass("multi-image-ajax-remove").html("@lang('element/file.remove')");
                     div.append(remove);
                 @endif
                 div.append("<img class=\"multi-image-ajax-loading\" src=\"<?php echo curl::base(); ?>media/img/ring.gif\" />");

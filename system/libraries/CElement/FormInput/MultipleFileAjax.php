@@ -24,6 +24,9 @@ class CElement_FormInput_MultipleFileAjax extends CElement_FormInput {
 
     protected $disabledUpload;
 
+    /**
+     * @var null|CElement_Helper_Cropper
+     */
     protected $cropper;
 
     protected $files;
