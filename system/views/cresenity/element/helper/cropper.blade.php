@@ -9,16 +9,16 @@
     <div class="modal-dialog"><div class="modal-content animated bounceInRight">
             <div class="modal-header">
 
-                <h3>Cropper</h3>
+                <h3>@lang('element/cropper.cropper')</h3>
 
                 <div class="btn-group btn-group-header-modal">
-                    <button type="button" class="btn btn-primary btn-zoom-in" data-method="zoom" data-option="0.1" title="Zoom In">
+                    <button type="button" class="btn btn-primary btn-zoom-in" data-method="zoom" data-option="0.1" title="@lang('element/cropper.zoomIn')">
                         <span class="docs-tooltip" data-toggle="tooltip" title="">
                             <span class="fa fa-search-plus"></span>
                         </span>
                     </button>
 
-                    <button type="button" class="btn btn-primary btn-zoom-out" data-method="zoom" data-option="-0.1" title="Zoom Out">
+                    <button type="button" class="btn btn-primary btn-zoom-out" data-method="zoom" data-option="-0.1" title="@lang('element/cropper.zoomOut')">
                         <span class="docs-tooltip" data-toggle="tooltip" title="">
                             <span class="fa fa-search-minus"></span>
                         </span>
@@ -56,9 +56,9 @@
 
                         <div class="btn-group">
 
-                            <button type="button" class="btn btn-primary btn-crop" data-method="crop" data-option="crop" title="Crop">
+                            <button type="button" class="btn btn-primary btn-crop" data-method="crop" data-option="crop" title="@lang('element/cropper.crop')">
                                 <span class="docs-tooltip" data-toggle="tooltip" title="">
-                                    <span class="fa fa-crop"></span> OK
+                                    <span class="fa fa-crop"></span> @lang('element/cropper.ok')
                                 </span>
                             </button>
                         </div>
