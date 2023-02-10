@@ -107,10 +107,27 @@
             $input_name = carr::get($f, 'input_name');
             $input_value = carr::get($f, 'input_value');
             $file_url = carr::get($f, 'file_url');
+            $isImage = false;
+            $pathParts = pathinfo($file_url);
+            $ext = carr::get($pathParts,'extension');
+            $imgExtensions = array("jpg", "jpeg", "png", "gif");
+
+            if (in_array($ext, $imgExtensions)) {
+                if (getimagesize($file_url)) {
+                    $isImage = true;
+                }
+            }
             @endphp
             <div class="multi-image-ajax-file container-file-upload">
                 <div class="div-img">
-                    <img src="{{ $file_url }}" />
+                    @if($isImage)
+
+                        <img src="{{ $file_url }}" />
+                    @else
+                        <div class="mime-icon ico-{{ $ext }}">
+                            <div class="ico"></div>
+                        </div>
+                    @endif
                     <input type="hidden" name="{{ $name }}[{{ $input_name }}]" value="{{ $input_value }}">
                 </div>
                 @foreach ($customControl as $cc)
