@@ -1,17 +1,17 @@
 <?php
 
 /**
- * Description of SecureCommand
+ * Description of SecureCommand.
  *
  * @author Hery
  */
 class CDevSuite_Command_SecureCommand extends CDevSuite_CommandAbstract {
     public function getSignatureArguments() {
-        return '{domain}';
+        return '{name?}';
     }
 
     public function run(CConsole_Command $cfCommand) {
-        $domain = $cfCommand->argument('domain');
+        $domain = $cfCommand->argument('name') ?: CF::appCode();
         $url = ($domain ?: CDevSuite::site()->host(getcwd())) . '.' . CDevSuite::configuration()->read()['tld'];
 
         CDevSuite::site()->secure($url);

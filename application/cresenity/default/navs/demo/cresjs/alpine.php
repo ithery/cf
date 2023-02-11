@@ -21,4 +21,9 @@ return [
         'label' => c::__('Kanban'),
         'uri' => 'demo/cresjs/alpine/kanban/index',
     ],
+    [
+        'name' => 'cresjs.alpine.select2',
+        'label' => c::__('Select2'),
+        'uri' => 'demo/cresjs/alpine/select2/index',
+    ],
 ];

@@ -16,6 +16,9 @@ anda tidak dapat bebas menentukan directory structure yang diinginkan kecuali be
 - tests
 - index.php
 
+
+directory `logs`, `resources` dan `temp` harus writeable
+
 ### Application Directory Structure
 - default
   - config

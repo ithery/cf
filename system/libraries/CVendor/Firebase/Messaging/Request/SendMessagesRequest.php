@@ -1,15 +1,10 @@
 <?php
 
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
-
 use Psr\Http\Message\RequestInterface;
 
 final class CVendor_Firebase_Messaging_Request_SendMessagesRequest implements CVendor_Firebase_Http_HasSubRequestsInterface, RequestInterface {
     use CVendor_Firebase_Trait_WrappedPsr7RequestTrait;
+
     const MAX_AMOUNT_OF_MESSAGES = 500;
 
     public function __construct($projectId, CVendor_Firebase_Messaging_Messages $messages, $validateOnly = false) {

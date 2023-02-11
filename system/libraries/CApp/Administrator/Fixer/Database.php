@@ -220,6 +220,7 @@ class CApp_Administrator_Fixer_Database {
         } else {
             $columnSchema = $tableSchema->getColumn('status');
             $targetColumnSchema = clone $columnSchema;
+            $targetColumnSchema->setType(CDatabase_Type::getType(CDatabase_Type::INTEGER));
             $targetColumnSchema->setDefault(1);
             $targetColumnSchema->setNotnull(true);
             $targetColumnSchema->setLength(1);

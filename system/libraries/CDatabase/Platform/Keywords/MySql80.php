@@ -5,14 +5,14 @@
  */
 class CDatabase_Platform_Keywords_MySql80 extends CDatabase_Platform_Keywords_MySql57 {
     /**
-     * {@inheritdoc}
+     * @inheritdoc
      */
     public function getName() {
         return 'MySQL80';
     }
 
     /**
-     * {@inheritdoc}
+     * @inheritdoc
      *
      * @link https://dev.mysql.com/doc/refman/8.0/en/keywords.html
      */

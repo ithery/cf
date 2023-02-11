@@ -19,10 +19,13 @@ class CElement_Component_FileManager extends CElement_Component {
      */
     protected $controller = [];
 
+    protected $config;
+
     public function __construct($id = '') {
         parent::__construct($id);
 
         $this->tag = 'div';
+        $this->config = [];
     }
 
     public static function factory($id = '') {
@@ -65,10 +68,16 @@ class CElement_Component_FileManager extends CElement_Component {
         return $this;
     }
 
+    public function setConfig($key, $value) {
+        carr::set($this->config, $key, $value);
+
+        return $this;
+    }
+
     public function build() {
         $config = $this->buildConfig();
 
-        $ajaxMethod = CAjax::createMethod()->setType('FileManager')->setData('config', $config);
+        $ajaxMethod = CAjax::createMethod()->setType(CAjax_Engine_FileManager::class)->setData('config', $config);
 
         $ajaxUrl = $ajaxMethod->makeUrl();
 
@@ -78,6 +87,7 @@ class CElement_Component_FileManager extends CElement_Component {
         CManager::instance()->asset()->module()->registerRunTimeModule('jquery-ui-1.12.1.custom');
         CManager::instance()->asset()->module()->registerRunTimeModule('dropzone');
         CManager::instance()->asset()->module()->registerRunTimeModule('cropper');
+        CManager::instance()->asset()->module()->registerRunTimeModule('mime-icons');
         CManager::registerCss('element/filemanager/fm.css');
         CManager::registerJs('element/filemanager/fm.js');
         $this->addView(
@@ -88,7 +98,7 @@ class CElement_Component_FileManager extends CElement_Component {
     }
 
     protected function buildConfig() {
-        $config = [];
+        $config = $this->config ?: [];
         if ($this->disk != null) {
             $config['disk'] = $this->disk;
         }

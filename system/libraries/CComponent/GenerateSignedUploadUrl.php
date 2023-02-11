@@ -1,10 +1,5 @@
 <?php
 
-/**
- * Description of GenerateSignedUploadUrl
- *
- * @author Hery
- */
 class CComponent_GenerateSignedUploadUrl {
     public static function forLocal() {
         // return c::url()->temporarySignedRoute(

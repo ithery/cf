@@ -321,11 +321,11 @@ class CConsole_Kernel implements CConsole_KernelInterface {
     /**
      * Report the exception to the exception handler.
      *
-     * @param \Exception $e
+     * @param \Exception|\Throwable $e
      *
      * @return void
      */
-    protected function reportException(Exception $e) {
+    protected function reportException($e) {
         CException::exceptionHandler()->report($e);
     }
 
@@ -333,11 +333,11 @@ class CConsole_Kernel implements CConsole_KernelInterface {
      * Report the exception to the exception handler.
      *
      * @param \Symfony\Component\Console\Output\OutputInterface $output
-     * @param \Exception                                        $e
+     * @param \Exception|\Throwable                             $e
      *
      * @return void
      */
-    protected function renderException($output, Exception $e) {
+    protected function renderException($output, $e) {
         CException::exceptionHandler()->renderForConsole($output, $e);
     }
 }

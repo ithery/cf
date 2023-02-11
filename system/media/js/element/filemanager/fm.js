@@ -267,7 +267,7 @@ var CFileManager = function (options) {
             if (item.thumb_url) {
                 carouselItem.find('.carousel-image').css('background-image', 'url(\'' + item.url + '?timestamp=' + item.time + '\')');
             } else {
-                carouselItem.find('.carousel-image').css('width', '50vh').append($('<div>').addClass('mime-icon ico-' + item.icon));
+                carouselItem.find('.carousel-image').css('width', '50vh').append($('<div>').addClass('mime-icon ico ico-' + item.icon));
             }
 
             carouselItem.find('.carousel-label').attr('target', '_blank').attr('href', item.url)
@@ -313,6 +313,7 @@ var CFileManager = function (options) {
     // ==========================
 
     this.toggleSelected = (e) => {
+        e.stopPropagation();
         if (!this.multiSelectionEnabled) {
             this.selected = [];
         }
@@ -561,7 +562,8 @@ var CFileManager = function (options) {
                         if (item.thumb_url) {
                             image = $('<div>').css('background-image', 'url("' + item.thumb_url + '?timestamp=' + item.time + '")');
                         } else {
-                            image = $('<div>').addClass('mime-icon ico-' + item.icon);
+                            let icon = $('<div>').addClass('ico');
+                            image = $('<div>').addClass('mime-icon ico-' + item.icon).append(icon);
                         }
 
 
@@ -698,22 +700,27 @@ var CFileManager = function (options) {
     $(document).on('click', '#add-folder', () => {
         this.dialog(this.settings.lang['message-name'], '', this.createFolder);
     });
-    $(document).on('click', '#upload', () => {
+    $(document).on('click', '.capp-fm #upload', () => {
         $('#uploadModal').modal('show');
     });
-    $(document).on('click', '[data-display]', (e) => {
+    $(document).on('click', '.capp-fm [data-display]', (e) => {
         let target = e.currentTarget;
         this.showList = $(target).data('display');
         this.loadItems();
     });
-    $(document).on('click', '[data-action]', (e) => {
+    $(document).on('click', '.capp-fm [data-action]', (e) => {
         let target = e.currentTarget;
         this.controllerMethod[$(target).data('action')]($(target).data('multiple') ? this.getSelectedItems() : this.getOneSelectedElement());
     });
 
-    $(document).on('click', '#tree a', (e) => {
+    $(document).on('click', '.capp-fm #tree a', (e) => {
         this.goTo($(e.target).closest('a').data('path'));
         this.toggleMobileTree(false);
+    });
+
+    // eslint-disable-next-line no-unused-vars
+    $(document).on('click', '.capp-fm #content', (e) => {
+        this.clearSelected();
     });
 
 

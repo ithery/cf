@@ -352,7 +352,7 @@ class c {
      *
      * @param null|\DateTimeZone|string $tz
      *
-     * @return CCarbon|\CarbonV3\Carbon
+     * @return CCarbon|\Carbon\Carbon|\CarbonV3\Carbon
      */
     public static function now($tz = null) {
         return CCarbon::now($tz);
@@ -442,7 +442,7 @@ class c {
     /**
      * @param string $string
      *
-     * @return \cstr|CBase_String
+     * @return CBase_String|\cstr
      */
     public static function str($string = null) {
         if (is_null($string)) {

@@ -17,7 +17,6 @@ class CDatabase_Connection {
     use CDatabase_Trait_DetectDeadlock;
     use CDatabase_Trait_DetectLostConnection;
     use CDatabase_Trait_ManageTransaction;
-
     public $domain;
 
     public $name;
@@ -160,7 +159,7 @@ class CDatabase_Connection {
         if (is_string($this->config['connection'])) {
             // Make sure the connection is valid
             if (strpos($this->config['connection'], '://') === false) {
-                throw new CDatabase_Exception('The DSN you supplied is not valid: :dsn', [':dsn' => $this->config['connection']]);
+                throw CDatabase_Exception::invalidDsn($this->config['connection']);
             }
             // Parse the DSN, creating an array to hold the connection parameters
             $db = [
@@ -244,7 +243,6 @@ class CDatabase_Connection {
         }
 
         $this->events = CEvent::dispatcher();
-        CModel::setEventDispatcher($this->events);
 
         // Validate the driver
         if (!($this->driver instanceof CDatabase_Driver)) {
@@ -290,7 +288,7 @@ class CDatabase_Connection {
         if (!is_resource($this->link) and !is_object($this->link)) {
             $this->link = $this->driver->connect();
             if (!is_resource($this->link) and !is_object($this->link)) {
-                throw new CDatabase_Exception('There was an error connecting to the database: :error', [':error' => $this->driver->showError()]);
+                throw new CDatabase_Exception(c::__('database.connection_error', [':error' => $this->driver->showError()]));
             }
             // Clear password after successful connect
             $this->config['connection']['pass'] = null;
@@ -395,25 +393,6 @@ class CDatabase_Connection {
     }
 
     /**
-     * Selects the like(s) for a database query.
-     *
-     * @param string|array $field field name or array of field => match pairs
-     * @param string       $match like value to match with field
-     *
-     * @return CDatabase this Database object
-     */
-    public function regex($field, $match = '') {
-        $fields = is_array($field) ? $field : [$field => $match];
-
-        foreach ($fields as $field => $match) {
-            $field = (strpos($field, '.') !== false) ? $this->config['table_prefix'] . $field : $field;
-            $this->where[] = $this->driver->regex($field, $match, 'AND ', count($this->where));
-        }
-
-        return $this;
-    }
-
-    /**
      * Compiles an insert string and runs the query.
      *
      * @param string $table table name
@@ -448,7 +427,7 @@ class CDatabase_Connection {
      */
     public function delete($table = '', $where = []) {
         if ($where == null || count($where) < 1) {
-            throw new CDatabase_Exception('You must set a WHERE clause for your query');
+            throw new CDatabase_Exception(c::__('database.must_use_where'));
         }
         $builder = $this->table($table);
 

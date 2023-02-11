@@ -197,11 +197,13 @@ class CDevSuite_Mac_Site extends CDevSuite_Site {
      * Secure the given host with TLS.
      *
      * @param string $url
-     * @param string $siteConf pregenerated Nginx config file contents
+     * @param string $siteConf                pregenerated Nginx config file contents
+     * @param mixed  $certificateExpireInDays
+     * @param mixed  $caExpireInYears
      *
      * @return void
      */
-    public function secure($url, $siteConf = null) {
+    public function secure($url, $siteConf = null, $certificateExpireInDays = 396, $caExpireInYears = 20) {
         $this->unsecure($url);
 
         $this->files->ensureDirExists($this->caPath(), CDevSuite::user());
@@ -210,22 +212,25 @@ class CDevSuite_Mac_Site extends CDevSuite_Site {
 
         $this->files->ensureDirExists($this->nginxPath(), CDevSuite::user());
 
-        $this->createCa();
+        $caExpireInDate = (new \DateTime())->diff(new \DateTime("+{$caExpireInYears} years"));
+        $this->createCa($caExpireInDate->format('%a'));
 
-        $this->createCertificate($url);
-
+        $this->createCertificate($url, $certificateExpireInDays);
+        $siteConf = $this->buildSecureNginxServer($url, $siteConf);
         $this->files->putAsUser(
             $this->nginxPath($url),
-            $this->buildSecureNginxServer($url, $siteConf)
+            $siteConf
         );
     }
 
     /**
      * If CA and root certificates are nonexistent, crete them and trust the root cert.
      *
+     * @param mixed $caExpireInDays
+     *
      * @return void
      */
-    public function createCa() {
+    public function createCa($caExpireInDays) {
         $caPemPath = $this->caPath('CFDevSuiteCASelfSigned.pem');
         $caKeyPath = $this->caPath('CFDevSuiteCASelfSigned.key');
 
@@ -249,7 +254,8 @@ class CDevSuite_Mac_Site extends CDevSuite_Site {
         ));
 
         $this->cli->runAsUser(sprintf(
-            'openssl req -new -newkey rsa:2048 -days 730 -nodes -x509 -subj "/C=/ST=/O=%s/localityName=/commonName=%s/organizationalUnitName=Developers/emailAddress=%s/" -keyout "%s" -out "%s"',
+            'openssl req -new -newkey rsa:2048 -days %s -nodes -x509 -subj "/C=/ST=/O=%s/localityName=/commonName=%s/organizationalUnitName=Developers/emailAddress=%s/" -keyout "%s" -out "%s"',
+            $caExpireInDays,
             $oName,
             $cName,
             'rootcertificate@cf.devsuite',
@@ -263,10 +269,11 @@ class CDevSuite_Mac_Site extends CDevSuite_Site {
      * Create and trust a certificate for the given URL.
      *
      * @param string $url
+     * @param string $caExpireInDays
      *
      * @return void
      */
-    public function createCertificate($url) {
+    public function createCertificate($url, $caExpireInDays) {
         $caPemPath = $this->caPath('CFDevSuiteCASelfSigned.pem');
         $caKeyPath = $this->caPath('CFDevSuiteCASelfSigned.key');
         $caSrlPath = $this->caPath('CFDevSuiteCASelfSigned.srl');
@@ -285,7 +292,8 @@ class CDevSuite_Mac_Site extends CDevSuite_Site {
         }
 
         $result = $this->cli->runAsUser(sprintf(
-            'openssl x509 -req -sha256 -days 730 -CA "%s" -CAkey "%s" %s -in "%s" -out "%s" -extensions v3_req -extfile "%s"',
+            'openssl x509 -req -sha256 -days %s -CA "%s" -CAkey "%s" %s -in "%s" -out "%s" -extensions v3_req -extfile "%s"',
+            $caExpireInDays,
             $caPemPath,
             $caKeyPath,
             $caSrlParam,
@@ -360,11 +368,12 @@ class CDevSuite_Mac_Site extends CDevSuite_Site {
     /**
      * Trust the given certificate file in the Mac Keychain.
      *
-     * @param string $crtPath
+     * @param string      $crtPath
+     * @param null|string $url
      *
      * @return void
      */
-    public function trustCertificate($crtPath) {
+    public function trustCertificate($crtPath, $url = null) {
         $this->cli->run(sprintf(
             'sudo security add-trusted-cert -d -r trustAsRoot -k /Library/Keychains/System.keychain "%s"',
             $crtPath

@@ -34,7 +34,7 @@ class CElement_FormInput extends CElement_Element {
 
     protected $readonly;
 
-    public function __construct($id = '') {
+    public function __construct($id = null) {
         parent::__construct($id);
 
         $this->type = 'text';

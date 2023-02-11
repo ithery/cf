@@ -1,5 +1,7 @@
 <?php
 
+use CModel_Console_PropertiesHelper as Helper;
+
 class CConsole_Command_Make_MakeModelCommand extends CConsole_Command_AppCommand {
     /**
      * The name and signature of the console command.
@@ -16,8 +18,8 @@ class CConsole_Command_Make_MakeModelCommand extends CConsole_Command_AppCommand
     protected $description = 'Create a new model class based on created table on database';
 
     public function handle() {
-        $model = $this->getModel();
         $table = $this->getTable();
+        $model = Helper::getModel($table);
         $this->info('Creating ' . $model . ' model...');
 
         $modelPath = c::fixPath(CF::appDir()) . 'default' . DS . 'libraries' . DS . $this->prefix . 'Model' . DS;
@@ -54,54 +56,70 @@ class CConsole_Command_Make_MakeModelCommand extends CConsole_Command_AppCommand
 
     private function getTable() {
         $table = $this->argument('table');
-        switch ($table) {
-            case 'user':
-                $table = 'users';
 
-                break;
-            case 'role':
-                $table = 'roles';
-
-                break;
-        }
-
-        return $table;
+        return Helper::getTable($table);
     }
 
-    private function getModel() {
-        $model = $table = $this->argument('table');
-        switch ($table) {
-            case 'users':
-                $model = 'user';
+    public function getFieldProperties($properties = []) {
+        $fields = Helper::getFields($this->getTable(), $this->prefix);
+        $currentPropertyFields = array_column($properties, 'field');
+        foreach ($fields as $field => $fieldProperty) {
+            $type = Helper::getGenericTypeForFieldProperty($fieldProperty);
+            $i = array_search($field, $currentPropertyFields);
+            if ($i === false) {
+                $properties[] = [
+                    'prop' => $this->getTable() . '_id' === $field ? '@property-read' : '@property',
+                    'type' => $type,
+                    'var' => '$' . $field,
+                    'field' => $field,
+                    'desc' => '',
+                ];
+            } else {
+                $prop = carr::get($properties, $i);
+                $propType = c::get($prop, 'type');
 
-                break;
-            case 'roles':
-                $model = 'role';
-
-                break;
+                if ($propType !== $type) {
+                    $properties[$i]['type'] = $type;
+                }
+            }
         }
 
-        $temp = explode('_', $model);
-        $model = '';
-        foreach ($temp as $val) {
-            $model .= ucfirst($val);
-        }
-
-        return $model;
+        return $properties;
     }
 
     private function getProperties() {
         $properties = [];
-        $fields = $this->getFields();
-        foreach ($fields as $field => $type) {
-            if (strpos($type, ' unsigned') !== false) {
-                $type = cstr::replace(' unsigned', '', $type);
+        $currentProperties = $this->getFieldProperties();
+        $propLength = 0;
+        $typeLength = 0;
+        $varLength = 0;
+
+        $propLength = 0;
+        $typeLength = 0;
+        $varLength = 0;
+
+        foreach ($currentProperties as $property) {
+            if ($propLength < strlen(carr::get($property, 'prop'))) {
+                $propLength = strlen(carr::get($property, 'prop'));
             }
-            if ($field == $this->getTable() . '_id') {
-                $properties[] = " * @property-read ${type} $${field}";
+            if ($typeLength < strlen(carr::get($property, 'type'))) {
+                $typeLength = strlen(carr::get($property, 'type'));
+            }
+            if ($varLength < strlen(carr::get($property, 'var'))) {
+                $varLength = strlen(carr::get($property, 'var'));
+            }
+        }
+        foreach ($currentProperties as $property) {
+            $prop = ' * ';
+            $prop .= cstr::padRight(carr::get($property, 'prop'), $propLength);
+            $prop .= ' ' . cstr::padRight(carr::get($property, 'type'), $typeLength);
+            if (carr::get($property, 'desc')) {
+                $prop .= ' ' . cstr::padRight(carr::get($property, 'var'), $varLength);
+                $prop .= ' ' . carr::get($property, 'desc');
             } else {
-                $properties[] = " * @property ${type} $${field}";
+                $prop .= ' ' . carr::get($property, 'var');
             }
+            $properties[] = $prop;
         }
 
         $result = implode("\n", $properties);
@@ -109,65 +127,19 @@ class CConsole_Command_Make_MakeModelCommand extends CConsole_Command_AppCommand
         return $result;
     }
 
-    private function getFields() {
-        $table = $this->getTable();
-        $excludedFields = ['created', 'createdby', 'updated', 'updatedby', 'deleted', 'deletedby', 'status'];
-        $db = c::db();
-
-        $result = $db->query("desc ${table}");
-        $properties = [];
-        foreach ($result as $value) {
-            $field = $value->Field;
-            $type = $value->Type;
-            $temp = explode('(', $type);
-            if ($temp) {
-                $type = c::get($temp, 0);
-            }
-            $type = $this->getType($type);
-            if (!in_array($field, $excludedFields)) {
-                $properties[$field] = $type;
+    private function getMissingPropertyIndex($properties) {
+        $fieldsKey = c::collect(Helper::getFields($this->getTable(), $this->prefix))->keys()->toArray();
+        $classMethods = get_class_methods($this->prefix . 'Model_' . Helper::getModel($this->getTable()));
+        foreach ($properties as $index => $property) {
+            $field = carr::get($property, 'field');
+            $i = array_search($field, $fieldsKey);
+            if ($i === false && !in_array($field, $classMethods)) {
+                if (!cstr::endsWith($field, '_count')) {
+                    return $index;
+                }
             }
         }
 
-        return $properties;
-    }
-
-    private function getType(string $type) {
-        $typeConvertion = [
-            'tinyint' => 'int',
-            'smallint' => 'int',
-            'mediumint' => 'int',
-            'bigint' => 'int',
-            'decimal' => 'int',
-            'float' => 'float',
-            'double' => 'double',
-            'bit' => 'int',
-            'char' => 'string',
-            'varchar' => 'string',
-            'binary' => 'string',
-            'varbinary' => 'string',
-            'tinyblob' => 'string',
-            'blob' => 'string',
-            'mediumblob' => 'string',
-            'longblob' => 'string',
-            'tinytext' => 'string',
-            'text' => 'string',
-            'mediumtext' => 'string',
-            'longtext' => 'string',
-            'enum' => 'string',
-            'set' => 'string',
-            'date' => 'CCarbon',
-            'time' => 'string',
-            'datetime' => 'CCarbon',
-            'timestamp' => 'string',
-            'year' => 'string',
-            'boolean' => 'bool',
-        ];
-
-        if ($result = c::get($typeConvertion, $type)) {
-            return $result;
-        }
-
-        return $type;
+        return false;
     }
 }

@@ -1,15 +1,7 @@
 <?php
 
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
-
 /**
- * This class is used to construct a Content object for the /mail/send API call
- *
- * @package SendGrid\Mail
+ * This class is used to construct a Content object for the /mail/send API call.
  */
 class CVendor_SendGrid_Mail_Content implements \JsonSerializable {
     /**
@@ -23,12 +15,12 @@ class CVendor_SendGrid_Mail_Content implements \JsonSerializable {
     private $value;
 
     /**
-     * Optional constructor
+     * Optional constructor.
      *
-     * @param string|null $type  The mime type of the content you are including
+     * @param null|string $type  The mime type of the content you are including
      *                           in your email. For example, “text/plain” or
      *                           “text/html”
-     * @param string|null $value The actual content of the specified mime type
+     * @param null|string $value The actual content of the specified mime type
      *                           that you are including in your email
      */
     public function __construct($type = null, $value = null) {
@@ -41,7 +33,7 @@ class CVendor_SendGrid_Mail_Content implements \JsonSerializable {
     }
 
     /**
-     * Add the mime type on a Content object
+     * Add the mime type on a Content object.
      *
      * @param string $type The mime type of the content you are including
      *                     in your email. For example, “text/plain” or
@@ -57,7 +49,7 @@ class CVendor_SendGrid_Mail_Content implements \JsonSerializable {
     }
 
     /**
-     * Retrieve the mime type on a Content object
+     * Retrieve the mime type on a Content object.
      *
      * @return string
      */
@@ -66,7 +58,7 @@ class CVendor_SendGrid_Mail_Content implements \JsonSerializable {
     }
 
     /**
-     * Add the content value to a Content object
+     * Add the content value to a Content object.
      *
      * @param string $value The actual content of the specified mime type
      *                      that you are including in your email
@@ -81,7 +73,7 @@ class CVendor_SendGrid_Mail_Content implements \JsonSerializable {
     }
 
     /**
-     * Retrieve the content value to a Content object
+     * Retrieve the content value to a Content object.
      *
      * @return string
      */
@@ -90,7 +82,7 @@ class CVendor_SendGrid_Mail_Content implements \JsonSerializable {
     }
 
     /**
-     * Return an array representing a Contact object for the Twilio SendGrid API
+     * Return an array representing a Contact object for the Twilio SendGrid API.
      *
      * @return null|array
      */
