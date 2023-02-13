@@ -53,7 +53,8 @@ class CElement_Component_Form_Field extends CElement_Component {
         $this->labelRequired = false;
     }
 
-    public static function factory($id = '') {
+    public static function factory($id = null) {
+        // @phpstan-ignore-next-line
         return new static($id);
     }
 

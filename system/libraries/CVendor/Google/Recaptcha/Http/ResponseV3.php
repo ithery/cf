@@ -1,26 +1,18 @@
 <?php
 
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
-
 /**
- * Class     ResponseV3
+ * Class     ResponseV3.
  *
- * @package  Arcanedev\NoCaptcha\Utilities
  * @author   ARCANEDEV <arcanedev.maroc@gmail.com>
  */
 class CVendor_Google_Recaptcha_Http_ResponseV3 extends CVendor_Google_Recaptcha_Http_AbstractResponse implements CVendor_Google_Recaptcha_Http_ResponseInterface {
-
     /**
-     * Invalid JSON received
+     * Invalid JSON received.
      */
     const E_INVALID_JSON = 'invalid-json';
 
     /**
-     * Could not connect to service
+     * Could not connect to service.
      */
     const E_CONNECTION_FAILED = 'connection-failed';
 
@@ -30,27 +22,27 @@ class CVendor_Google_Recaptcha_Http_ResponseV3 extends CVendor_Google_Recaptcha_
     const E_UNKNOWN_ERROR = 'unknown-error';
 
     /**
-     * Expected hostname did not match
+     * Expected hostname did not match.
      */
     const E_HOSTNAME_MISMATCH = 'hostname-mismatch';
 
     /**
-     * Expected APK package name did not match
+     * Expected APK package name did not match.
      */
     const E_APK_PACKAGE_NAME_MISMATCH = 'apk_package_name-mismatch';
 
     /**
-     * Expected action did not match
+     * Expected action did not match.
      */
     const E_ACTION_MISMATCH = 'action-mismatch';
 
     /**
-     * Score threshold not met
+     * Score threshold not met.
      */
     const E_SCORE_THRESHOLD_NOT_MET = 'score-threshold-not-met';
 
     /**
-     * Challenge timeout
+     * Challenge timeout.
      */
     const E_CHALLENGE_TIMEOUT = 'challenge-timeout';
 
@@ -60,14 +52,14 @@ class CVendor_Google_Recaptcha_Http_ResponseV3 extends CVendor_Google_Recaptcha_
      */
 
     /**
-     * Score assigned to the request
+     * Score assigned to the request.
      *
-     * @var float|null
+     * @var null|float
      */
     private $score;
 
     /**
-     * Action as specified by the page
+     * Action as specified by the page.
      *
      * @var string
      */
@@ -81,13 +73,13 @@ class CVendor_Google_Recaptcha_Http_ResponseV3 extends CVendor_Google_Recaptcha_
     /**
      * Response constructor.
      *
-     * @param  bool         $success
-     * @param  array        $errorCodes
-     * @param  string|null  $hostname
-     * @param  string|null  $challengeTs
-     * @param  string|null  $apkPackageName
-     * @param  float|null   $score
-     * @param  string|null  $action
+     * @param bool        $success
+     * @param array       $errorCodes
+     * @param null|string $hostname
+     * @param null|string $challengeTs
+     * @param null|string $apkPackageName
+     * @param null|float  $score
+     * @param null|string $action
      */
     public function __construct($success, array $errorCodes = [], $hostname = null, $challengeTs = null, $apkPackageName = null, $score = null, $action = null) {
         parent::__construct($success, $errorCodes, $hostname, $challengeTs, $apkPackageName);
@@ -102,7 +94,7 @@ class CVendor_Google_Recaptcha_Http_ResponseV3 extends CVendor_Google_Recaptcha_
      */
 
     /**
-     * Get score
+     * Get score.
      *
      * @return float
      */
@@ -111,7 +103,7 @@ class CVendor_Google_Recaptcha_Http_ResponseV3 extends CVendor_Google_Recaptcha_
     }
 
     /**
-     * Get action
+     * Get action.
      *
      * @return string
      */
@@ -127,7 +119,7 @@ class CVendor_Google_Recaptcha_Http_ResponseV3 extends CVendor_Google_Recaptcha_
     /**
      * Build the response from an array.
      *
-     * @param  array  $array
+     * @param array $array
      *
      * @return \Arcanedev\NoCaptcha\Utilities\ResponseV3|mixed
      */
@@ -138,11 +130,13 @@ class CVendor_Google_Recaptcha_Http_ResponseV3 extends CVendor_Google_Recaptcha_
         $score = isset($array['score']) ? floatval($array['score']) : null;
         $action = carr::get($array, 'action');
 
-        if (isset($array['success']) && $array['success'] == true)
+        if (isset($array['success']) && $array['success'] == true) {
             return new static(true, [], $hostname, $challengeTs, $apkPackageName, $score, $action);
+        }
 
-        if (!(isset($array['error-codes']) && is_array($array['error-codes'])))
+        if (!(isset($array['error-codes']) && is_array($array['error-codes']))) {
             $array['error-codes'] = [self::E_UNKNOWN_ERROR];
+        }
 
         return new static(false, $array['error-codes'], $hostname, $challengeTs, $apkPackageName, $score, $action);
     }
@@ -172,7 +166,7 @@ class CVendor_Google_Recaptcha_Http_ResponseV3 extends CVendor_Google_Recaptcha_
     /**
      * Check the score.
      *
-     * @param  float  $score
+     * @param float $score
      *
      * @return bool
      */
@@ -183,12 +177,11 @@ class CVendor_Google_Recaptcha_Http_ResponseV3 extends CVendor_Google_Recaptcha_
     /**
      * Check the action name.
      *
-     * @param  string  $action
+     * @param string $action
      *
      * @return bool
      */
     public function isAction($action) {
         return $this->getAction() === $action;
     }
-
 }

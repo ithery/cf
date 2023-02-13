@@ -23,31 +23,6 @@ if (isset($_SERVER['SERVER_NAME'])) {
 define('IN_PRODUCTION', false);
 
 /**
- * Website application directory. This directory should contain your application
- * configuration, controllers, models, views, and other resources.
- *
- * This path can be absolute or relative to this file.
- */
-$cf_application = 'application';
-
-/**
- * CF modules directory. This directory should contain all the modules used
- * by your application. Modules are enabled and disabled by the application
- * configuration file.
- *
- * This path can be absolute or relative to this file.
- */
-$cf_modules = 'modules';
-
-/**
- * CF system directory. This directory should contain the core/ directory,
- * and the resources you included in your download of CF.
- *
- * This path can be absolute or relative to this file.
- */
-$cf_system = 'system';
-
-/**
  * Test to make sure that CF is running on PHP 5.2 or newer. Once you are
  * sure that your environment is compatible with CF, you can comment this
  * line out. When running an application on a new server, uncomment this line

@@ -12,9 +12,16 @@ class CElement_FormInput_ImageAjax extends CElement_FormInput_Image {
 
     protected $validationCallback;
 
+    /**
+     * @var null|CElement_Helper_Cropper
+     */
     protected $cropper;
 
     protected $tempStorage;
+
+    protected $onExists;
+
+    protected $withInfo;
 
     public function __construct($id) {
         parent::__construct($id);
@@ -24,8 +31,10 @@ class CElement_FormInput_ImageAjax extends CElement_FormInput_Image {
         $this->maxWidth = '200';
         $this->maxHeight = '150';
         $this->maxUploadSize = 0;
+        $this->withInfo = false;
         $this->allowedExtension = [];
         $this->disabledUpload = false;
+        $this->onExists = false;
         $this->accept = 'image/*';
         $this->view = 'cresenity/element/form-input/image-ajax';
         $this->onBeforeParse(function (CView_View $view) {
@@ -33,9 +42,10 @@ class CElement_FormInput_ImageAjax extends CElement_FormInput_Image {
             $ajaxName = str_replace('[', '-', $ajaxName);
             $ajaxName = str_replace(']', '-', $ajaxName);
 
-            $ajaxUrl = CAjax::createMethod()->setType('ImgUpload')
+            $ajaxUrl = CAjax::createMethod()->setType(CAjax_Engine_ImgUpload::class)
                 ->setData('inputName', $ajaxName)
                 ->setData('allowedExtension', $this->allowedExtension)
+                ->setData('withInfo', $this->withInfo)
                 ->setData('validationCallback', $this->validationCallback)
                 ->makeUrl();
 
@@ -53,6 +63,7 @@ class CElement_FormInput_ImageAjax extends CElement_FormInput_Image {
             $view->with('ajaxUrl', $ajaxUrl);
             $view->with('cropper', $this->cropper);
             $view->with('accept', $this->accept);
+            $view->with('onExists', $this->onExists);
         });
     }
 
@@ -68,7 +79,7 @@ class CElement_FormInput_ImageAjax extends CElement_FormInput_Image {
     }
 
     /**
-     * @param int $ext
+     * @param int|array $ext
      *
      * @return $this
      */
@@ -78,6 +89,18 @@ class CElement_FormInput_ImageAjax extends CElement_FormInput_Image {
             $arr = [$ext];
         }
         $this->allowedExtension = $arr;
+
+        return $this;
+    }
+
+    public function setWithInfo($withInfo = true) {
+        $this->withInfo = $withInfo;
+
+        return $this;
+    }
+
+    public function setOnExists($bool) {
+        $this->onExists = $bool;
 
         return $this;
     }

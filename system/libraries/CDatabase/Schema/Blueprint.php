@@ -10,7 +10,6 @@ defined('SYSPATH') or die('No direct access allowed.');
  */
 class CDatabase_Schema_Blueprint {
     use CTrait_Macroable;
-
     /**
      * The storage engine that should be used for the table.
      *
@@ -139,7 +138,7 @@ class CDatabase_Schema_Blueprint {
      */
     protected function addFluentIndexes() {
         foreach ($this->columns as $column) {
-            foreach (['primary', 'unique', 'index', 'spatialIndex'] as $index) {
+            foreach (['primary', 'unique', 'index', 'fulltext', 'fullText', 'spatialIndex'] as $index) {
                 if ($column->{$index} === true) {
                     // If the index has been specified on the given column, but is simply equal
                     // to "true" (boolean), no name has been specified for this index so the
@@ -265,6 +264,17 @@ class CDatabase_Schema_Blueprint {
     }
 
     /**
+     * Indicate that the given fulltext index should be dropped.
+     *
+     * @param string|array $index
+     *
+     * @return \CBase_Fluent
+     */
+    public function dropFullText($index) {
+        return $this->dropIndexCommand('dropFullText', 'fulltext', $index);
+    }
+
+    /**
      * Indicate that the given spatial index should be dropped.
      *
      * @param string|array $index
@@ -375,10 +385,23 @@ class CDatabase_Schema_Blueprint {
      * @param string       $name
      * @param null|string  $algorithm
      *
-     * @return CBase_Fluent
+     * @return CDatabase_Schema_IndexDefinition
      */
     public function index($columns, $name = null, $algorithm = null) {
         return $this->indexCommand('index', $columns, $name, $algorithm);
+    }
+
+    /**
+     * Specify an fulltext for the table.
+     *
+     * @param string|array $columns
+     * @param null|string  $name
+     * @param null|string  $algorithm
+     *
+     * @return \CDatabase_Schema_IndexDefinition
+     */
+    public function fullText($columns, $name = null, $algorithm = null) {
+        return $this->indexCommand('fulltext', $columns, $name, $algorithm);
     }
 
     /**
@@ -387,10 +410,22 @@ class CDatabase_Schema_Blueprint {
      * @param string|array $columns
      * @param string       $name
      *
-     * @return CBase_Fluent
+     * @return CDatabase_Schema_IndexDefinition
      */
     public function spatialIndex($columns, $name = null) {
         return $this->indexCommand('spatialIndex', $columns, $name);
+    }
+
+    /**
+     * Specify a raw index for the table.
+     *
+     * @param string $expression
+     * @param string $name
+     *
+     * @return \CDatabase_Schema_IndexDefinition
+     */
+    public function rawIndex($expression, $name) {
+        return $this->index([new CDatabase_Query_Expression($expression)], $name);
     }
 
     /**
@@ -399,10 +434,16 @@ class CDatabase_Schema_Blueprint {
      * @param string|array $columns
      * @param string       $name
      *
-     * @return CBase_Fluent
+     * @return CDatabase_Schema_ForeignKeyDefinition
      */
     public function foreign($columns, $name = null) {
-        return $this->indexCommand('foreign', $columns, $name);
+        $command = new CDatabase_Schema_ForeignKeyDefinition(
+            $this->indexCommand('foreign', $columns, $name)->getAttributes()
+        );
+
+        $this->commands[count($this->commands) - 1] = $command;
+
+        return $command;
     }
 
     /**
@@ -836,9 +877,9 @@ class CDatabase_Schema_Blueprint {
      * @return void
      */
     public function timestamps($precision = 0) {
-        $this->timestamp('created_at', $precision)->nullable();
+        $this->timestamp('created', $precision)->nullable();
 
-        $this->timestamp('updated_at', $precision)->nullable();
+        $this->timestamp('updated', $precision)->nullable();
     }
 
     /**

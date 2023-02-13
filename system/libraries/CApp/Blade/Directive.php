@@ -42,6 +42,10 @@ class CApp_Blade_Directive {
         return '{!! CApp::instance()->renderContent() !!}';
     }
 
+    public static function react($expression) {
+        return '{!! CApp_React::render(' . $expression . ') !!}';
+    }
+
     public static function pushScript($expression) {
         return '<?php \CApp::instance()->startPush(\'capp-script\') ?>';
     }
@@ -98,7 +102,6 @@ class CApp_Blade_Directive {
 
         return (new CApp_PWA_MetaService($expression))->render();
     }
-
 
     public static function preloader($expression) {
         if (strlen($expression) == 0) {

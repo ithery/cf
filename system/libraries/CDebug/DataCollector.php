@@ -113,7 +113,7 @@ abstract class CDebug_DataCollector implements CDebug_Contract_DataCollectorInte
     /**
      * Returns the default variable dumper.
      *
-     * @return DebugBarVarDumper
+     * @return CDebug_DataFormatter_DebugBarVarDumper
      */
     public static function getDefaultVarDumper() {
         if (self::$defaultVarDumper === null) {
@@ -140,7 +140,7 @@ abstract class CDebug_DataCollector implements CDebug_Contract_DataCollectorInte
      * Gets the variable dumper instance used by this collector; note that collectors using this
      * instance need to be sure to return the static assets provided by the variable dumper.
      *
-     * @return DebugBarVarDumper
+     * @return CDebug_DataFormatter_DebugBarVarDumper
      */
     public function getVarDumper() {
         if ($this->varDumper === null) {

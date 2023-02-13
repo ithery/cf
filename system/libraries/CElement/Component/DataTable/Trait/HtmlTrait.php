@@ -5,7 +5,6 @@ trait CElement_Component_DataTable_Trait_HtmlTrait {
     }
 
     public function html($indent = 0) {
-
         /** @var CElement_Component_DataTable $this */
         $this->buildOnce();
         $html = new CStringBuilder();
@@ -24,7 +23,11 @@ trait CElement_Component_DataTable_Trait_HtmlTrait {
         $wrapped = $this->applyDataTable || $this->haveHeaderAction() || $this->haveFooterAction() || strlen($this->title) > 0;
         $classes = $this->classes;
         $tableClass = is_array($classes) ? implode(' ', $classes) : '';
-
+        $custom_css = $this->custom_css;
+        $custom_css = $this->renderStyle($custom_css);
+        if (strlen($custom_css) > 0) {
+            $custom_css = ' style="' . $custom_css . '"';
+        }
         if ($wrapped) {
             $widgetWrapperClass = c::theme('widget.class.wrapper', 'widget-box');
             $widgetHeaderClass = c::theme('widget.class.header', 'widget-title');
@@ -40,7 +43,7 @@ trait CElement_Component_DataTable_Trait_HtmlTrait {
             if ($this->haveDataTableViewAction) {
                 $mainClassTitle .= ' with-elements';
             }
-            $html->appendln('<div id="' . $this->id() . '-widget-box" class="' . $mainClass . ' widget-table">')->incIndent();
+            $html->appendln('<div id="' . $this->id() . '-widget-box" class="' . $mainClass . ' widget-table" ' . $custom_css . '>')->incIndent();
             $showTitle = (strlen($this->title) > 0) || $this->haveHeaderAction();
             if ($showTitle) {
                 $html->appendln('<div class="' . $mainClassTitle . '">')->incIndent();
@@ -125,6 +128,9 @@ trait CElement_Component_DataTable_Trait_HtmlTrait {
             }
             if (is_array($this->data) || $this->data instanceof Traversable || $this->data instanceof CInterface_Enumerable) {
                 foreach ($this->data as $row) {
+                    if ($row == null) {
+                        continue;
+                    }
                     if ($row instanceof CRenderable) {
                         $html->appendln($row->html());
 
@@ -157,6 +163,10 @@ trait CElement_Component_DataTable_Trait_HtmlTrait {
                         $js .= $this->drawActionAndGetJs($html, $dataRow, $key);
                     }
                     foreach ($this->columns as $col) {
+                        /** @var CElement_Component_DataTable_Column $col */
+                        if (!$col->isVisible()) {
+                            continue;
+                        }
                         $cell = new CElement_Component_DataTable_Cell($this, $col, $row);
 
                         $newValue = $cell->html();
@@ -279,7 +289,11 @@ trait CElement_Component_DataTable_Trait_HtmlTrait {
         if ($this->headerNoLineBreak) {
             $thClass = ' no-line-break';
         }
-        $htmlResponsiveOpen = '<div class="table-responsive">';
+        $defaultOverflow = 'auto';
+        if ($this->applyDataTable) {
+            $defaultOverflow = 'visible';
+        }
+        $htmlResponsiveOpen = '<div class="table-responsive" style="overflow: ' . $defaultOverflow . ';">';
         $htmlResponsiveClose = '</div>';
         if ($this->responsive) {
             $htmlResponsiveOpen = '<div class="span12" style="overflow: auto;margin-left: 0;">';
@@ -403,6 +417,7 @@ trait CElement_Component_DataTable_Trait_HtmlTrait {
 
     public function htmlTHead() {
         $thClass = '';
+        /** @var CElement_Component_DataTable $this */
         if ($this->headerNoLineBreak) {
             $thClass = ' no-line-break';
         }
@@ -435,6 +450,10 @@ trait CElement_Component_DataTable_Trait_HtmlTrait {
                 $html->appendln($this->htmlActionTh());
             }
             foreach ($this->columns as $col) {
+                /** @var CElement_Component_DataTable_Column $col */
+                if (!$col->isVisible()) {
+                    continue;
+                }
                 $html->appendln($col->renderHeaderHtml($this->export_pdf, $thClass, $html->getIndent()))->br();
             }
             if ($this->getActionLocation() == 'last') {

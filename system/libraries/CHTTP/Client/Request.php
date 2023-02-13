@@ -13,7 +13,7 @@ class CHTTP_Client_Request implements ArrayAccess {
     /**
      * The decoded payload for the request.
      *
-     * @var array
+     * @var null|array
      */
     protected $data;
 
@@ -153,7 +153,7 @@ class CHTTP_Client_Request implements ArrayAccess {
             return $this->json();
         }
 
-        return $this->data ?? [];
+        return $this->data ?: [];
     }
 
     /**

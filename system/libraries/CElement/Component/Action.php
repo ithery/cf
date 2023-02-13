@@ -12,7 +12,6 @@ class CElement_Component_Action extends CElement_Component {
     use CTrait_Compat_Element_Action,
         CTrait_Element_Property_Label,
         CTrait_Element_Property_Icon;
-
     protected $jsfunc;
 
     protected $disabled;
@@ -31,6 +30,8 @@ class CElement_Component_Action extends CElement_Component {
 
     protected $submitToTarget;
 
+    protected $submitValue;
+
     protected $jsparam;
 
     protected $confirm;
@@ -47,8 +48,14 @@ class CElement_Component_Action extends CElement_Component {
 
     protected $isActive = false;
 
+    /**
+     * @var string
+     */
+    protected $name;
+
     public function __construct($id) {
         parent::__construct($id);
+        $this->name = $this->id;
         $this->tag = 'a';
         $this->jsfunc = '';
         $this->type = 'jsfunc';
@@ -59,6 +66,7 @@ class CElement_Component_Action extends CElement_Component {
         $this->submit = false;
         $this->submitTo = false;
         $this->submitToTarget = false;
+        $this->submitValue = null;
         $this->label = '';
         $this->style = '';
         $this->disabled = false;
@@ -70,8 +78,9 @@ class CElement_Component_Action extends CElement_Component {
         $this->isActive = false;
     }
 
-    public static function factory($id = '') {
-        return new CElement_Component_Action($id);
+    public static function factory($id = null) {
+        // @phpstan-ignore-next-line
+        return new static($id);
     }
 
     /**
@@ -132,6 +141,34 @@ class CElement_Component_Action extends CElement_Component {
         return $this;
     }
 
+    /**
+     * @param string $value
+     *
+     * @return $this
+     */
+    public function setSubmitValue($value) {
+        $this->submitValue = $value;
+
+        return $this;
+    }
+
+    /**
+     * @param string $name
+     *
+     * @return $this
+     */
+    public function setName($name) {
+        $this->name = $name;
+
+        return $this;
+    }
+
+    /**
+     * @param string $url
+     * @param string $target
+     *
+     * @return $this
+     */
     public function setSubmitTo($url, $target = '') {
         $this->submitTo = $url;
 
@@ -142,6 +179,11 @@ class CElement_Component_Action extends CElement_Component {
         return $this;
     }
 
+    /**
+     * @param bool $bool
+     *
+     * @return $this
+     */
     public function setDisabled($bool = true) {
         $this->disabled = $bool;
 
@@ -214,6 +256,10 @@ class CElement_Component_Action extends CElement_Component {
         return $link;
     }
 
+    public function getSubmitValue() {
+        return $this->submitValue ?: $this->label;
+    }
+
     // protected function build() {
     //     parent::build();
     //     $this->reassignConfirm();
@@ -258,8 +304,7 @@ class CElement_Component_Action extends CElement_Component {
         if (strlen($classes) > 0) {
             $classes = ' ' . $classes;
         }
-        $custom_css = $this->custom_css;
-        $custom_css = $this->renderStyle($custom_css);
+        $custom_css = $this->renderStyle($this->custom_css);
         if (strlen($custom_css) > 0) {
             $custom_css = ' style="' . $custom_css . '"';
         }
@@ -300,11 +345,11 @@ class CElement_Component_Action extends CElement_Component {
                 $input_type = 'submit';
             }
             if ($this->button) {
-                $html->appendln('<button id="' . $this->id . '" name="' . $this->id . '" class="btn btn-primary' . $add_class . $classes . '" type="' . $input_type . '"' . $disabled . $add_attr . $addition_attribute . $custom_css . '>' . $this->label . '</button>');
+                $html->appendln('<button id="' . $this->id . '" name="' . $this->name . '" class="btn btn-primary' . $add_class . $classes . '" type="' . $input_type . '"' . $disabled . $add_attr . $addition_attribute . $custom_css . '>' . $this->label . '</button>');
                 $html->append($this->getIconHtml());
                 $html->appendln($this->label . '</button>');
             } else {
-                $html->appendln('<button type="submit" id="' . $this->id . '" name="' . $this->id . '" class="btn btn-primary' . $add_class . $classes . '" type="' . $input_type . '" ' . $disabled . $add_attr . $addition_attribute . $custom_css . ' value="' . $this->label . '">' . $this->label . '</button>');
+                $html->appendln('<button type="submit" id="' . $this->id . '" name="' . $this->name . '" class="btn btn-primary' . $add_class . $classes . '" type="' . $input_type . '" ' . $disabled . $add_attr . $addition_attribute . $custom_css . ' value="' . $this->getSubmitValue() . '">' . $this->label . '</button>');
             }
         } else {
             if ($this->type == 'jsfunc') {

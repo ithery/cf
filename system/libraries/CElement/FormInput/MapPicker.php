@@ -59,7 +59,7 @@ class CElement_FormInput_MapPicker extends CElement_FormInput {
         $this->markerInCenter = true;
 
         $this->geoCodingApiKey = CF::config('vendor.google.geocoding_api_key');
-        $this->rawJsOnChanged;
+        $this->rawJsOnChanged = '';
         if (strlen($this->geoCodingApiKey) == 0) {
             throw new Exception('no api key found in config vendor.google.geocoding_api_key');
         }

@@ -8,25 +8,36 @@ defined('SYSPATH') or die('No direct access allowed.');
  * @see CRenderable
  * @see CElement
  *
- * @method CElement_Component_Action       addAction($id=null)
- * @method CElement_Component_Alert        addAlert($id=null)
- * @method CElement_Component_FileManager  addFileManager($id=null)
- * @method CElement_Component_Form         addForm($id=null)
- * @method CElement_Component_DataTable    addTable($id=null)
- * @method CElement_Component_Form_Field   addField($id=null)
- * @method CElement_Element_Div            addDiv($id=null)
- * @method CElement_Element_A              addA($id=null)
- * @method CElement_Element_Span           addSpan($id=null)
- * @method CElement_Element_Pre            addPre($id=null)
- * @method CElement_List_ActionList        addActionList($id=null)
- * @method CElement_List_TabList           addTabList($id=null)
- * @method CElement_FormInput_Select       addSelectControl($id=null)
- * @method CElement_FormInput_SelectSearch addSelectSearchControl($id=null)
- * @method CElement_Template               addTemplate($id=null)
- * @method CElement_View                   addView($view = null, $data = null, $id = null)
- * @method CElement_Component_Widget       addWidget($id=null)
- * @method CElement_Component_Gallery      addGallery($id=null)
- * @method $this                           addJs($js)
+ * @method CElement_Component_Action             addAction($id=null)
+ * @method CElement_Component_Alert              addAlert($id=null)
+ * @method CElement_Component_FileManager        addFileManager($id=null)
+ * @method CElement_Component_Form               addForm($id=null)
+ * @method CElement_Component_DataTable          addTable($id=null)
+ * @method CElement_Component_Form_Field         addField($id=null)
+ * @method CElement_Element_Div                  addDiv($id=null)
+ * @method CElement_Element_Iframe               addIframe($id=null)
+ * @method CElement_Element_A                    addA($id=null)
+ * @method CElement_Element_H1                   addH1($id=null)
+ * @method CElement_Element_H2                   addH2($id=null)
+ * @method CElement_Element_H3                   addH3($id=null)
+ * @method CElement_Element_H4                   addH4($id=null)
+ * @method CElement_Element_H5                   addH5($id=null)
+ * @method CElement_Element_H6                   addH6($id=null)
+ * @method CElement_Element_Span                 addSpan($id=null)
+ * @method CElement_Element_Pre                  addPre($id=null)
+ * @method CElement_List_ActionList              addActionList($id=null)
+ * @method CElement_List_TabList                 addTabList($id=null)
+ * @method CElement_FormInput_Select             addSelectControl($id=null)
+ * @method CElement_FormInput_SelectSearch       addSelectSearchControl($id=null)
+ * @method CElement_Template                     addTemplate($id=null)
+ * @method CElement_View                         addView($view = null, $data = null, $id = null)
+ * @method CElement_Component_Widget             addWidget($id=null)
+ * @method CElement_Component_Gallery            addGallery($id=null)
+ * @method CElement_Element_Img                  addImg($id=null)
+ * @method CElement_Component_Image              addImage($id=null)
+ * @method CElement_Component_Chart              addChart($id=null)
+ * @method CElement_Component_Metric_ValueMetric addValueMetric($id=null)
+ * @method $this                                 addJs($js)
  */
 class CApp implements CInterface_Responsable, CInterface_Renderable, CInterface_Jsonable {
     use CTrait_Compat_App,
@@ -43,12 +54,13 @@ class CApp implements CInterface_Responsable, CInterface_Renderable, CInterface_
         CApp_Concern_AuthTrait,
         CApp_Concern_BootstrapTrait,
         CApp_Concern_TitleTrait;
-
     public static $instance = null;
 
     protected $renderer;
 
     protected $data = [];
+
+    protected $id = null;
 
     /**
      * @var CApp_PWA
@@ -625,6 +637,11 @@ class CApp implements CInterface_Responsable, CInterface_Renderable, CInterface_
         $this->pwa($group)->enable();
     }
 
+    /**
+     * @param string $group
+     *
+     * @return CApp_PWA
+     */
     public function pwa($group) {
         if ($this->pwa == null) {
             $this->pwa = [];
@@ -636,6 +653,9 @@ class CApp implements CInterface_Responsable, CInterface_Renderable, CInterface_
         return $this->pwa[$group];
     }
 
+    /**
+     * @return CApp_Notification
+     */
     public function notification() {
         return CApp_Notification::instance();
     }

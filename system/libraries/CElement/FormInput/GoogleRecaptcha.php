@@ -1,40 +1,29 @@
 <?php
 
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
-
 class CElement_FormInput_GoogleRecaptcha extends CElement_FormInput {
-
     /**
-     *
-     * @var CVendor_Google_Recaptcha_AbstractRecaptcha
+     * @var null|CVendor_Google_Recaptcha_AbstractRecaptcha
      */
     protected $recaptcha;
 
     /**
-     *
-     * @var string 
+     * @var string
      */
     protected $recaptchaType;
 
     /**
-     *
-     * @var string 
+     * @var string
      */
     protected $recaptchaLabel;
 
     /**
-     *
-     * @var string 
+     * @var string
      */
     protected $recaptchaInputName;
 
     public function __construct($id) {
         parent::__construct($id);
-        $this->type = "hidden";
+        $this->type = 'hidden';
         $this->recaptcha = null;
         $this->recaptchaType = 'simple';
         $this->recaptchaLabel = 'Send';
@@ -43,10 +32,6 @@ class CElement_FormInput_GoogleRecaptcha extends CElement_FormInput {
     }
 
     protected function build() {
-
-
-
-
         $this->setAttr('type', $this->type);
         $this->setAttr('value', $this->value);
         parent::build();
@@ -56,26 +41,31 @@ class CElement_FormInput_GoogleRecaptcha extends CElement_FormInput {
         if ($this->recaptcha == null) {
             $this->recaptcha = CVendor_Google::recaptchaV3();
         }
+
         return $this->recaptcha;
     }
 
     public function setRecaptcha(CVendor_Google_Recaptcha_AbstractRecaptcha $recaptcha) {
         $this->recaptcha = $recaptcha;
+
         return $this;
     }
 
     public function setRecaptchaType($type) {
         $this->recaptchaType = $type;
+
         return $this;
     }
 
     public function setRecaptchaLabel($label) {
         $this->recaptchaLabel = $label;
+
         return $this;
     }
 
     public function setRecaptchaInputName($name) {
         $this->recaptchaInputName = $name;
+
         return $this;
     }
 
@@ -100,6 +90,7 @@ class CElement_FormInput_GoogleRecaptcha extends CElement_FormInput {
         if ($recaptcha instanceof CVendor_Google_Recaptcha_RecaptchaV3) {
             $html = $recaptcha->input('g-recaptcha-response');
         }
+
         return $html;
     }
 
@@ -108,7 +99,7 @@ class CElement_FormInput_GoogleRecaptcha extends CElement_FormInput {
         $js = '';
         if ($recaptcha instanceof CVendor_Google_Recaptcha_RecaptchaV2) {
             if ($this->recaptchaType == 'button') {
-                $js .= "function " . $this->buttonCallbackName() . "(token) {
+                $js .= 'function ' . $this->buttonCallbackName() . "(token) {
                     console.log('#" . $this->id . "');
                     $('#" . $this->id . "').closest('form').submit();
                 }";
@@ -121,12 +112,12 @@ class CElement_FormInput_GoogleRecaptcha extends CElement_FormInput {
             $js .= "
                 grecaptcha.ready(function() {
                     window.noCaptcha.render('login', function (token) {
-                        document.querySelector('#".$this->recaptchaInputName."').value = token;
+                        document.querySelector('#" . $this->recaptchaInputName . "').value = token;
                     });
                 });
                 ";
         }
+
         return $js;
     }
-
 }

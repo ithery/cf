@@ -65,6 +65,15 @@ final class CF {
      */
     private static $sharedAppCode = [];
 
+    private static $forceAppCode = null;
+
+    /**
+     * The array of terminating callbacks.
+     *
+     * @var callable[]
+     */
+    private static $terminatingCallbacks = [];
+
     /**
      * Check CF is running on production.
      *
@@ -165,9 +174,6 @@ final class CF {
 
         // Restore error reporting
         error_reporting($ER);
-
-        // Send default text/html UTF-8 header
-        //header('Content-Type: text/html; charset=UTF-8');
 
         // Load locales
         $locale = self::config('app.locale');
@@ -374,10 +380,10 @@ final class CF {
 
             $modules = CF::modules($domain);
             //when this domain is org
-            if (strlen($orgCode) > 0) {
+            if ($orgCode != null && strlen($orgCode) > 0) {
                 $paths[] = APPPATH . $appCode . DS . $orgCode . DS;
             }
-            if (strlen($appCode) > 0) {
+            if ($appCode != null && strlen($appCode) > 0) {
                 //add theme path if theme exists
                 $paths[] = APPPATH . $appCode . DS . 'default' . DS;
             }
@@ -640,10 +646,10 @@ final class CF {
     /**
      * Detect CF is running on console or not.
      *
-     * @return type
+     * @return bool
      */
     public static function isCli() {
-        return PHP_SAPI === 'cli';
+        return php_sapi_name() === 'cli';
     }
 
     /**
@@ -884,6 +890,9 @@ final class CF {
      * @return string
      */
     public static function appCode($domain = null) {
+        if (static::$forceAppCode) {
+            return static::$forceAppCode;
+        }
         if (CF::isCFCli() || CF::isTesting()) {
             if (CF::cliAppCode()) {
                 return CF::cliAppCode();
@@ -1206,10 +1215,13 @@ final class CF {
         if (is_callable($callback)) {
             $domain = CF::domain();
             $originalAppCode = static::appCode();
+
             if ($originalAppCode) {
+                static::$forceAppCode = $appCode;
                 static::$data[$domain]['app_code'] = $appCode;
                 $callback();
                 static::$data[$domain]['app_code'] = $originalAppCode;
+                static::$forceAppCode = null;
             }
         }
     }
@@ -1242,6 +1254,32 @@ final class CF {
                     static::validateFileNamesArray($t);
                 }
             }
+        }
+    }
+
+    /**
+     * Register a terminating callback with the application.
+     *
+     * @param callable|string $callback
+     *
+     * @return $this
+     */
+    public static function terminating($callback) {
+        self::$terminatingCallbacks[] = $callback;
+    }
+
+    /**
+     * Terminate the application.
+     *
+     * @return void
+     */
+    public static function terminate() {
+        $index = 0;
+
+        while ($index < count(self::$terminatingCallbacks)) {
+            CContainer::getInstance()->call(self::$terminatingCallbacks[$index]);
+
+            $index++;
         }
     }
 }

@@ -7,7 +7,11 @@ defined('SYSPATH') or die('No direct access allowed.');
  * @license Ittron Global Teknologi <ittron.co.id>
  *
  * @see CModel
- * @since Mar 14, 2019, 7:00:37 PM
+ *
+ * @method static \CModel_Query<static>|static withTrashed(bool $withTrashed = true)
+ * @method static \CModel_Query<static>|static onlyTrashed()
+ * @method static \CModel_Query<static>|static withoutTrashed()
+ * @method static bool                         restore()
  */
 trait CModel_SoftDelete_SoftDeleteTrait {
     /**
@@ -120,7 +124,7 @@ trait CModel_SoftDelete_SoftDeleteTrait {
      * @return bool
      */
     public function trashed() {
-        return ($this->{$this->getStatusColumn()}) == 0;
+        return $this->{$this->getStatusColumn()} == 0;
     }
 
     /**

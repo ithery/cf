@@ -56,7 +56,7 @@ class CTemporary_File {
     }
 
     public function getPath() {
-        return $this->directory->getPath() . '/' . $this->filename;
+        return rtrim($this->directory->getPath(), '/') . '/' . $this->filename;
     }
 
     public function getUrl() {

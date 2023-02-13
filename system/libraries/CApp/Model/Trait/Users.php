@@ -3,11 +3,6 @@
 defined('SYSPATH') or die('No direct access allowed.');
 
 /**
- * @author Hery Kurniawan
- * @license Ittron Global Teknologi <ittron.co.id>
- *
- * @since Jun 19, 2018, 11:36:57 PM
- *
  * @property string  $createdby
  * @property string  $updatedby
  * @property CCarbon $created
@@ -30,7 +25,7 @@ trait CApp_Model_Trait_Users {
     }
 
     /**
-     * @return CModel_Relation_BelongsTo
+     * @return CModel_Relation_BelongsTo|CModel_Query
      */
     public function role() {
         return $this->belongsTo(c::app()->auth()->getRoleModelClass())->withTrashed();

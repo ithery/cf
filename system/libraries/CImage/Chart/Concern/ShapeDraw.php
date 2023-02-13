@@ -1,9 +1,10 @@
 <?php
+use CImage_Chart_Helper as Helper;
 use CImage_Chart_Constant as Constant;
 
 trait CImage_Chart_Concern_ShapeDraw {
     /**
-     * Draw a basic shape
+     * Draw a basic shape.
      *
      * @param int       $x
      * @param int       $y
@@ -178,7 +179,7 @@ trait CImage_Chart_Concern_ShapeDraw {
     }
 
     /**
-     * Draw a circle
+     * Draw a circle.
      *
      * @param int       $xc
      * @param int       $yc
@@ -267,7 +268,7 @@ trait CImage_Chart_Concern_ShapeDraw {
     }
 
     /**
-     * Draw a filled circle
+     * Draw a filled circle.
      *
      * @param int       $x
      * @param int       $y
@@ -352,7 +353,7 @@ trait CImage_Chart_Concern_ShapeDraw {
     }
 
     /**
-     * Draw a rectangle with rounded corners
+     * Draw a rectangle with rounded corners.
      *
      * @param int       $x1
      * @param int       $y1
@@ -361,7 +362,7 @@ trait CImage_Chart_Concern_ShapeDraw {
      * @param int|float $radius
      * @param array     $format
      *
-     * @return null|integer
+     * @return null|int
      */
     public function drawRoundedRectangle($x1, $y1, $x2, $y2, $radius, array $format = []) {
         $r = isset($format['r']) ? $format['r'] : 0;
@@ -378,6 +379,7 @@ trait CImage_Chart_Concern_ShapeDraw {
         $color = ['r' => $r, 'g' => $g, 'b' => $b, 'alpha' => $alpha, 'noBorder' => true];
         if ($radius <= 0) {
             $this->drawRectangle($x1, $y1, $x2, $y2, $color);
+
             return 0;
         }
         if ($this->antialias) {
@@ -410,7 +412,7 @@ trait CImage_Chart_Concern_ShapeDraw {
     }
 
     /**
-     * Draw a rectangle with rounded corners
+     * Draw a rectangle with rounded corners.
      *
      * @param int       $x1
      * @param int       $y1
@@ -419,7 +421,7 @@ trait CImage_Chart_Concern_ShapeDraw {
      * @param int|float $radius
      * @param array     $format
      *
-     * @return null|integer
+     * @return null|int
      */
     public function drawRoundedFilledRectangle($x1, $y1, $x2, $y2, $radius, array $format = []) {
         $r = isset($format['r']) ? $format['r'] : 0;
@@ -472,6 +474,7 @@ trait CImage_Chart_Concern_ShapeDraw {
         $color = ['r' => $r, 'g' => $g, 'b' => $b, 'alpha' => $alpha, 'noBorder' => true];
         if ($radius <= 0) {
             $this->drawFilledRectangle($x1, $y1, $x2, $y2, $color);
+
             return 0;
         }
         $yTop = $y1 + $radius;
@@ -526,12 +529,12 @@ trait CImage_Chart_Concern_ShapeDraw {
         $manualColor = $this->allocateColor($this->picture, $r, $g, $b, $alpha);
         foreach ($positions as $yp => $bounds) {
             $x1 = $bounds['x1'];
-            $x1Dec = $this->getFirstDecimal($x1);
+            $x1Dec = Helper::getFirstDecimal($x1);
             if ($x1Dec != 0) {
                 $x1 = floor($x1) + 1;
             }
             $x2 = $bounds['x2'];
-            $x2Dec = $this->getFirstDecimal($x2);
+            $x2Dec = Helper::getFirstDecimal($x2);
             if ($x2Dec != 0) {
                 $x2 = floor($x2) - 1;
             }
@@ -551,7 +554,7 @@ trait CImage_Chart_Concern_ShapeDraw {
     }
 
     /**
-     * Draw a rectangle
+     * Draw a rectangle.
      *
      * @param int   $x1
      * @param int   $y1
@@ -639,7 +642,7 @@ trait CImage_Chart_Concern_ShapeDraw {
     }
 
     /**
-     * Draw a filled rectangle
+     * Draw a filled rectangle.
      *
      * @param int   $x1
      * @param int   $y1
@@ -777,7 +780,7 @@ trait CImage_Chart_Concern_ShapeDraw {
     }
 
     /**
-     * Draw a rectangular marker of the specified size
+     * Draw a rectangular marker of the specified size.
      *
      * @param int   $x
      * @param int   $y

@@ -1,0 +1,21 @@
+includes:
+	- ../../phpstan.neon.dist
+
+parameters:
+    level: 4
+    paths:
+        - default
+    bootstrapFiles:
+        - phpstan-bootstrap.php
+    excludePaths:
+        analyseAndScan:
+            - default/tests/*
+            - default/data/*
+            - default/media/*
+            - default/i18n/*
+            - default/templates/*
+            - default/sessions/*
+            - default/logs/*
+            - *.blade.php
+        analyse:
+            - default/vendor

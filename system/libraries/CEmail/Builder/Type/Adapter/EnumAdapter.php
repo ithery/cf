@@ -2,6 +2,7 @@
 
 class CEmail_Builder_Type_Adapter_EnumAdapter extends CEmail_Builder_Type_AbstractAdapter {
     const MATCHER = '/^enum/im';
+
     const TYPE = 'enum';
 
     public function __construct($typeConfig, $value) {

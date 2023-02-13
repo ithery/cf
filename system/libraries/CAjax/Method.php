@@ -26,7 +26,15 @@ class CAjax_Method implements CInterface_Jsonable {
 
     public $args = [];
 
+    public $expiration;
+
+    /**
+     * @var bool|array
+     */
+    public $auth;
+
     public function __construct($options = []) {
+        $this->auth = false;
         if ($options == null) {
             $options = [];
         }
@@ -41,6 +49,29 @@ class CAjax_Method implements CInterface_Jsonable {
      */
     public function setData($key, $data) {
         $this->data[$key] = $data;
+
+        return $this;
+    }
+
+    public function enableAuth() {
+        $guard = c::app()->auth()->guard();
+        $auth = true;
+        if ($guard) {
+            $auth = [];
+            $auth['guard'] = c::app()->auth()->guardName();
+        }
+        if ($guard instanceof CAuth_Guard_SessionGuard) {
+            $auth['id'] = $guard->id();
+        }
+        $this->auth = $auth;
+
+        return $this;
+    }
+
+    public function setExpiration($expiration) {
+        $expiration = $expiration instanceof DateTimeInterface
+        ? $expiration->getTimestamp() : $expiration;
+        $this->expiration = $expiration;
 
         return $this;
     }
@@ -120,6 +151,7 @@ class CAjax_Method implements CInterface_Jsonable {
         $json = $this->toJson($jsonOption);
 
         //save this object to file.
+
         $ajaxMethod = date('Ymd') . cutils::randmd5();
         $disk = CTemporary::disk();
         $filename = $ajaxMethod . '.tmp';
@@ -132,13 +164,27 @@ class CAjax_Method implements CInterface_Jsonable {
         return $base_url . 'cresenity/ajax/' . $ajaxMethod;
     }
 
+    public function toArray() {
+        return [
+            'name' => $this->name,
+            'method' => $this->method,
+            'type' => $this->type,
+            'target' => $this->target,
+            'param' => $this->param,
+            'args' => $this->args,
+            'expiration' => $this->expiration,
+            'auth' => $this->auth,
+            'data' => $this->data,
+        ];
+    }
+
     /**
      * @param int $options
      *
      * @return string
      */
     public function toJson($options = 0) {
-        return json_encode($this, $options);
+        return json_encode($this->toArray(), $options);
     }
 
     /**
@@ -156,6 +202,11 @@ class CAjax_Method implements CInterface_Jsonable {
         $this->data = carr::get($array, 'data', []);
         $this->method = carr::get($array, 'method', 'GET');
         $this->type = carr::get($array, 'type');
+        $this->name = carr::get($array, 'name');
+        $this->args = carr::get($array, 'args');
+        $this->target = carr::get($array, 'target');
+        $this->expiration = carr::get($array, 'expiration');
+        $this->auth = carr::get($array, 'auth');
 
         return $this;
     }
@@ -185,7 +236,6 @@ class CAjax_Method implements CInterface_Jsonable {
             $type = CAjax::TYPE_SELECT_SEARCH;
         }
         $class = 'CAjax_Engine_' . $type;
-
         if (!class_exists($class)) {
             throw new CAjax_Exception(c::__('class ajax engine :class not found', [':class' => $class]));
         }
@@ -194,12 +244,48 @@ class CAjax_Method implements CInterface_Jsonable {
         return $engine;
     }
 
+    public function getExpiration() {
+        return $this->expiration;
+    }
+
+    protected function checkAuth() {
+        if ($this->auth) {
+            $guard = null;
+            if (is_array($this->auth)) {
+                $guardName = carr::get($this->auth, 'guard');
+                $guard = c::auth($guardName);
+            }
+            if ($guard->check()) {
+                if (get_class($guard) == CAuth_Guard_SessionGuard::class) {
+                    if (carr::get($this->auth, 'id') != $guard->id()) {
+                        return false;
+                    }
+                }
+
+                return true;
+            }
+
+            return false;
+        }
+
+        return true;
+    }
+
     /**
      * @param string $input
      *
      * @return string
      */
     public function executeEngine($input = null) {
+        $expiration = $this->getExpiration();
+
+        if ($expiration && CCarbon::now()->getTimestamp() > $expiration) {
+            throw new CAjax_Exception_ExpiredAjaxException('Expired Link');
+        }
+
+        if (!$this->checkAuth()) {
+            throw new CAjax_Exception_AuthAjaxException('Unauthenticated');
+        }
         $engine = self::createEngine($this, $input);
         $response = $engine->execute();
         if ($response != null && $response instanceof CHTTP_JsonResponse) {

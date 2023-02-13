@@ -3,17 +3,13 @@
 defined('SYSPATH') or die('No direct access allowed.');
 
 /**
- * @author Hery Kurniawan
- * @license Ittron Global Teknologi <ittron.co.id>
- *
- * @since Jun 19, 2018, 11:36:57 PM
- *
  * @property      string  $name
  * @property      string  $createdby
  * @property      string  $updatedby
  * @property      CCarbon $created
  * @property      CCarbon $updated
  * @property      int     $status
+ * @property      int     $depth
  * @property-read int     $role_id
  *
  * @method static CModel_Collection byAccess(string $permitWithoutWildcard)
@@ -35,14 +31,20 @@ trait CApp_Model_Trait_Roles {
     }
 
     /**
-     * @return CModel_Relation_BelongsTo
+     * @return CModel_Relation_BelongsTo|CModel_Query
      */
     public function org() {
-        return $this->belongsTo(CApp_Model_Org::class);
+        return $this->belongsTo(CApp_Model_Org::class)->withTrashed();
     }
 
     public function rolePermission() {
         return $this->hasMany(c::app()->auth()->getRolePermisionModelClass());
+    }
+
+    public function scopeWhereHasPermission(CModel_Query $q, $permission) {
+        $q->whereHas('rolePermission', function ($q) use ($permission) {
+            $q->where('name', '=', $permission);
+        });
     }
 
     public function getDescendantsTree($rootId = null, $orgId = null, $type = null) {
@@ -57,13 +59,20 @@ trait CApp_Model_Trait_Roles {
         }
 
         $root = $root->descendants();
+        /** @var CModel_Nested_Relation_Descendants $root */
         if (strlen($orgId) > 0) {
             $root = $root->where(function ($query) use ($orgId) {
                 $query->where('org_id', '=', $orgId)->orWhereNull('org_id');
             })->where('status', '>', 0);
         }
-        if (strlen($type) > 0) {
-            $root = $root->where('type', '=', $type);
+        if (is_array($type)) {
+            foreach ($type as $k => $v) {
+                $root = $root->where($k, '=', $v);
+            }
+        } else {
+            if (strlen($type) > 0) {
+                $root = $root->where('type', '=', $type);
+            }
         }
         $tree = $root->get()->toTree();
 

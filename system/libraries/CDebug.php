@@ -8,9 +8,6 @@ defined('SYSPATH') or die('No direct access allowed.');
  *
  * @since Aug 22, 2018, 1:03:54 PM
  */
-
-use OpenTracing\GlobalTracer;
-
 class CDebug {
     const COLLECTOR_TYPE_DEPRECATED = 'deprecated';
 
@@ -58,5 +55,12 @@ class CDebug {
 
     public static function getVariables() {
         return static::$variables;
+    }
+
+    /**
+     * @return CDebug_Dumper|CBase_ForwarderStaticClass
+     */
+    public static function dumper() {
+        return new CBase_ForwarderStaticClass(CDebug_Dumper::class);
     }
 }

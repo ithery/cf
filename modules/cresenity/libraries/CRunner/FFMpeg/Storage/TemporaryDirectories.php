@@ -9,7 +9,7 @@ class CRunner_FFMpeg_Storage_TemporaryDirectories {
     private $root;
 
     /**
-     * Array of all directories
+     * Array of all directories.
      *
      * @var array
      */

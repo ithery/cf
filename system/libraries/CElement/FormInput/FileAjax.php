@@ -17,11 +17,14 @@ class CElement_FormInput_FileAjax extends CElement_FormInput {
 
     protected $tempStorage;
 
+    protected $withInfo;
+
     public function __construct($id) {
         parent::__construct($id);
         $this->type = 'file';
         $this->tag = 'div';
         $this->fileName = '';
+        $this->withInfo = false;
         $this->acceptFile = '.doc,.docx,.xml,.pdf';
         $this->maxUploadSize = 0;
         $this->allowedExtension = [];
@@ -32,10 +35,11 @@ class CElement_FormInput_FileAjax extends CElement_FormInput {
             $ajaxName = str_replace('[', '-', $ajaxName);
             $ajaxName = str_replace(']', '-', $ajaxName);
 
-            $ajaxUrl = CAjax::createMethod()->setType('FileUpload')
+            $ajaxUrl = CAjax::createMethod()->setType(CAjax_Engine_FileUpload::class)
                 ->setData('inputName', $ajaxName)
                 ->setData('allowedExtension', $this->allowedExtension)
                 ->setData('validationCallback', $this->validationCallback)
+                ->setData('withInfo', $this->withInfo)
                 ->makeUrl();
 
             $view->with('id', $this->id);
@@ -66,6 +70,12 @@ class CElement_FormInput_FileAjax extends CElement_FormInput {
 
     public function setMaxUploadSize($size) {
         $this->maxUploadSize = $size;
+
+        return $this;
+    }
+
+    public function setWithInfo($withInfo = true) {
+        $this->withInfo = $withInfo;
 
         return $this;
     }

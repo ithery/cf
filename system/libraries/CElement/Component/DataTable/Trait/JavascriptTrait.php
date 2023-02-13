@@ -37,6 +37,9 @@ trait CElement_Component_DataTable_Trait_JavascriptTrait {
             $ajaxMethod->setData('isCallback', $this->isCallback);
             $ajaxMethod->setData('callbackRequire', $this->callbackRequire);
             $ajaxMethod->setData('callbackOptions', $this->callbackOptions);
+            if (c::app()->isAuthEnabled()) {
+                $ajaxMethod->enableAuth();
+            }
             $ajax_url = $ajaxMethod->makeUrl();
         }
 
@@ -123,6 +126,52 @@ trait CElement_Component_DataTable_Trait_JavascriptTrait {
             if (strlen($this->initialSearch) > 0) {
                 $js->appendln("'oSearch': {'sSearch': '" . $this->initialSearch . "'},")->br();
             }
+
+            if ($this->fixedHeader) {
+                $js->appendln('fixedHeader: true,')->br();
+            }
+            if ($this->scrollY) {
+                $scrollY = $this->scrollY;
+                if (is_bool($scrollY)) {
+                    $scrollY = 'true';
+                }
+                $js->appendln('scrollY :        ' . $scrollY . ',')->br();
+            }
+            if ($this->colReorder) {
+                $js->appendln('colReorder : true,')->br();
+            }
+
+            if ($this->fixedColumn) {
+                $scrollY = $this->scrollY;
+                if (is_bool($scrollY) || !is_numeric($scrollY)) {
+                    $scrollY = '300';
+                }
+
+                $js->appendln('scrollY : ' . $scrollY . ',')->br()
+                    ->appendln('scrollX : true,')->br()
+                    ->appendln('scrollCollapse : true,')->br();
+                $leftColumns = $this->fixedColumn;
+                if ($this->checkbox) {
+                    $leftColumns += 1;
+                }
+                $js->appendln('fixedColumns: {
+                    leftColumns: ' . $leftColumns . ',
+                    left: ' . $leftColumns . ',
+                },')->br();
+            }
+            //data table options
+            $js->appendln($this->options->toJsonRow('paging'))->br()
+                ->appendln($this->options->toJsonRow('pagingType'))->br()
+                ->appendln($this->options->toJsonRow('lengthChange'))->br()
+                ->appendln($this->options->toJsonRow('searching'))->br()
+                ->appendln($this->options->toJsonRow('info'))->br()
+                ->appendln($this->options->toJsonRow('deferRender'))->br()
+                ->appendln($this->options->toJsonRow('autoWidth'))->br()
+                ->appendln($this->options->toJsonRow('ordering'))->br()
+                ->appendln($this->options->toJsonRow('stateSave'))->br()
+                ->appendln($this->options->toJsonRow('scrollY'))->br()
+                ->appendln($this->fixedColumn ? '' : $this->options->toJsonRow('scrollX'))->br()
+                ->br();
             if ($this->ajax) {
                 $this->options->setOption('serverSide', true);
                 $js->append('')
@@ -203,31 +252,6 @@ trait CElement_Component_DataTable_Trait_JavascriptTrait {
                 $jqueryui = 'bJQueryUI: true,';
             }
             $js->appendln('buttons:        ' . json_encode($this->buttons) . ',')->br();
-            if ($this->scrollY) {
-                $scrollY = $this->scrollY;
-                if (is_bool($scrollY)) {
-                    $scrollY = 'true';
-                }
-                $js->appendln('scrollY:        ' . $scrollY . ',')->br();
-            }
-            if ($this->fixedColumn) {
-                $scrollY = $this->scrollY;
-                if (is_bool($scrollY) || !is_numeric($scrollY)) {
-                    $scrollY = '300';
-                }
-
-                $js->appendln('scrollY : ' . $scrollY . ',')->br()
-                    ->appendln('scrollX : true,')->br()
-                    ->appendln('scrollCollapse : true,')->br();
-                $leftColumns = $this->fixedColumn;
-                if ($this->checkbox) {
-                    $leftColumns += 1;
-                }
-                $js->appendln('fixedColumns: {
-                    leftColumns: ' . $leftColumns . ',
-                    left: ' . $leftColumns . ',
-                },')->br();
-            }
 
             /*
               $js->append("
@@ -263,19 +287,6 @@ trait CElement_Component_DataTable_Trait_JavascriptTrait {
                     [' . $km . '],
                     [' . $vm . ']
 				],')->br();
-
-            //data table options
-            $js->appendln($this->options->toJsonRow('paging'))->br()
-                ->appendln($this->options->toJsonRow('pagingType'))->br()
-                ->appendln($this->options->toJsonRow('lengthChange'))->br()
-                ->appendln($this->options->toJsonRow('searching'))->br()
-                ->appendln($this->options->toJsonRow('info'))->br()
-                ->appendln($this->options->toJsonRow('deferRender'))->br()
-                ->appendln($this->options->toJsonRow('autoWidth'))->br()
-                ->appendln($this->options->toJsonRow('ordering'))->br()
-                ->appendln($this->options->toJsonRow('stateSave'))->br()
-                ->appendln($this->fixedColumn ? '' : $this->options->toJsonRow('scrollX'))->br()
-                ->br();
 
             if ($this->dom == null) {
                 $this->dom = '<""l>t<"F"<".footer_action">frp>';
@@ -397,14 +408,17 @@ trait CElement_Component_DataTable_Trait_JavascriptTrait {
             $js->append(parent::js($indent))->br();
             if (is_array($this->data)) {
                 foreach ($this->data as $row) {
+                    if ($row == null) {
+                        continue;
+                    }
                     if ($row instanceof CRenderable) {
                         $js->appendln($row->js())->br();
 
                         continue;
                     }
-                    foreach ($row as $row_k => $row_v) {
-                        if ($row_v instanceof CRenderable) {
-                            $js->appendln($row_v->js())->br();
+                    foreach ($row as $rowV) {
+                        if ($rowV instanceof CRenderable) {
+                            $js->appendln($rowV->js())->br();
                         }
                     }
                 }

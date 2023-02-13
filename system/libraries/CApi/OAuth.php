@@ -733,8 +733,10 @@ class CApi_OAuth {
      * @return string
      */
     public static function tokenEncryptionKey(CCrypt_Encrypter $encrypter) {
-        return is_callable(static::$tokenEncryptionKeyCallback)
-            ? (static::$tokenEncryptionKeyCallback)($encrypter)
+        $tokenEncryptionKeyCallback = static::$tokenEncryptionKeyCallback;
+
+        return is_callable($tokenEncryptionKeyCallback)
+            ? $tokenEncryptionKeyCallback($encrypter)
             : $encrypter->getKey();
     }
 

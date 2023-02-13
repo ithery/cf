@@ -11,6 +11,8 @@ defined('SYSPATH') or die('No direct access allowed.');
 class CElement_Element_Img extends CElement_Element {
     use CTrait_Compat_Element_Img;
 
+    protected $progressiveImage = null;
+
     public function __construct($id = '') {
         parent::__construct($id);
         $this->isOneTag = true;
@@ -23,7 +25,7 @@ class CElement_Element_Img extends CElement_Element {
      * @return CElement_Element_Img
      */
     public static function factory($id = '') {
-        return CElement_Factory::create(static::class, $id);
+        return new CElement_Element_Img($id);
     }
 
     /**

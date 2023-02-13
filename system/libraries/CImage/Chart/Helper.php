@@ -1,9 +1,8 @@
 <?php
 
-
 class CImage_Chart_Helper {
     /**
-     * Returns the 1st decimal values (used to correct AA bugs)
+     * Returns the 1st decimal values (used to correct AA bugs).
      *
      * @param mixed $value
      *

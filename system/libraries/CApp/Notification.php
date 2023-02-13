@@ -36,7 +36,7 @@ class CApp_Notification {
         $this->driver = carr::get($this->config, 'driver');
         $this->startUrl = carr::get($this->config, 'startUrl', '');
         $this->sendTokenPath = carr::get($this->config, 'sendTokenPath', 'notification/token');
-        $this->tokenLocalStorageKey = carr::get($this->config, 'tokenLocalStorageKey', 'cres-'.$this->driver.'-token');
+        $this->tokenLocalStorageKey = carr::get($this->config, 'tokenLocalStorageKey', 'cres-' . $this->driver . '-token');
         $options = carr::get($this->config, 'options', []);
         if (is_string($options)) {
             $options = json_decode($options, true);
@@ -46,19 +46,27 @@ class CApp_Notification {
 
     public function enable() {
         if (!$this->enabled) {
-            c::router()->get($this->serviceWorkerUrl(), function () {
-                $options = [
-                    'driver' => $this->driver,
-                    'options' => $this->options,
+            $path = c::request()->path();
 
-                ];
-                $output = (new CApp_Notification_ServiceWorkerService())->generate($options);
+            if (cstr::startsWith($path, trim($this->startUrl, '/'))) {
+                c::router()->get($this->serviceWorkerUrl(), function () {
+                    //disable debug bar here
+                    if (CDebug::bar()->isEnabled()) {
+                        CDebug::bar()->disable();
+                    }
+                    $options = [
+                        'driver' => $this->driver,
+                        'options' => $this->options,
 
-                return c::response($output, 200, [
-                    'Content-Type' => 'text/javascript',
-                ]);
-            });
-            $this->enabled = true;
+                    ];
+                    $output = (new CApp_Notification_ServiceWorkerService())->generate($options);
+
+                    return c::response($output, 200, [
+                        'Content-Type' => 'text/javascript',
+                    ]);
+                });
+                $this->enabled = true;
+            }
         }
     }
 
@@ -71,6 +79,13 @@ class CApp_Notification {
         }
 
         return $this->startUrl . 'cresenity-messaging-sw.js';
+    }
+
+    /**
+     * @return string
+     */
+    public function serviceWorkerScope() {
+        return $this->startUrl;
     }
 
     /**
@@ -94,7 +109,6 @@ class CApp_Notification {
     public function getOptions() {
         return $this->options;
     }
-
 
     /**
      * @return bool

@@ -1,4 +1,5 @@
 <?php
+use CModel_Console_PropertiesHelper as Helper;
 
 class CConsole_Command_Model_ModelUpdateCommand extends CConsole_Command_AppCommand {
     /**
@@ -16,7 +17,7 @@ class CConsole_Command_Model_ModelUpdateCommand extends CConsole_Command_AppComm
     protected $description = 'Update model properties';
 
     public function handle() {
-        $model = $this->getModel();
+        $model = Helper::getModel($this->getTable());
         $this->info('Updating ' . $model . ' model...');
 
         $modelPath = c::fixPath(CF::appDir()) . 'default' . DS . 'libraries' . DS . $this->prefix . 'Model' . DS;
@@ -34,11 +35,7 @@ class CConsole_Command_Model_ModelUpdateCommand extends CConsole_Command_AppComm
         }
 
         $modelClass .= '_' . $model;
-        $stubFile = CF::findFile('stubs', 'model', true, 'stub');
-        if (!$stubFile) {
-            $this->error('model stub not found');
-            exit(1);
-        }
+
         $content = CFile::get($modelFile);
         $content = preg_replace('/.*@property.*/', '{properties}', $content);
         $content = preg_replace('/{properties}/', $this->getUpdatedProperties(), $content, 1);
@@ -46,50 +43,18 @@ class CConsole_Command_Model_ModelUpdateCommand extends CConsole_Command_AppComm
 
         CFile::put($modelFile, $content);
 
-        $this->info($model . 'Model updated');
+        $this->info($model . 'Model updated on ' . $modelFile);
     }
 
     private function getTable() {
         $table = $this->argument('table');
-        switch ($table) {
-            case 'user':
-                $table = 'users';
 
-                break;
-            case 'role':
-                $table = 'roles';
-
-                break;
-        }
-
-        return $table;
-    }
-
-    private function getModel() {
-        $model = $table = $this->argument('table');
-        switch ($table) {
-            case 'users':
-                $model = 'user';
-
-                break;
-            case 'roles':
-                $model = 'role';
-
-                break;
-        }
-
-        $temp = explode('_', $model);
-        $model = '';
-        foreach ($temp as $val) {
-            $model .= ucfirst($val);
-        }
-
-        return $model;
+        return Helper::getTable($table);
     }
 
     private function getCurrentProperties() {
         $modelPath = c::fixPath(CF::appDir()) . 'default' . DS . 'libraries' . DS . $this->prefix . 'Model' . DS;
-        $modelFile = $modelPath . $this->getModel() . EXT;
+        $modelFile = $modelPath . Helper::getModel($this->getTable()) . EXT;
         $content = CFile::get($modelFile);
         preg_match_all('/@property.*/', $content, $matches);
         $props = c::get($matches, 0);
@@ -97,143 +62,139 @@ class CConsole_Command_Model_ModelUpdateCommand extends CConsole_Command_AppComm
         foreach ($props as $prop) {
             $prop = preg_replace('/\s+/', ' ', $prop);
             $temp = explode(' ', $prop);
-            $var = c::get($temp, 2);
+            $var = carr::get($temp, 2);
+            $desc = carr::get($temp, 3);
+            if ($desc) {
+                $desc = implode(' ', array_slice($temp, 3));
+            }
             $result[] = [
                 'prop' => c::get($temp, 0),
                 'type' => c::get($temp, 1),
                 'var' => $var,
                 'field' => str_replace('$', '', $var),
+                'desc' => $desc
             ];
         }
 
         return $result;
     }
 
-    private function getFields() {
-        $table = $this->getTable();
-        $excludedFields = ['created', 'createdby', 'updated', 'updatedby', 'deleted', 'deletedby', 'status'];
-        $db = c::db();
+    public function updateFieldProperties($properties) {
+        $fields = Helper::getFields($this->getTable(), $this->prefix);
+        $currentPropertyFields = array_column($properties, 'field');
+        foreach ($fields as $field => $fieldProperty) {
+            $type = Helper::getGenericTypeForFieldProperty($fieldProperty);
+            $i = array_search($field, $currentPropertyFields);
+            if ($i === false) {
+                $properties[] = [
+                    'prop' => $this->getTable() . '_id' === $field ? '@property-read' : '@property',
+                    'type' => $type,
+                    'var' => '$' . $field,
+                    'field' => $field,
+                    'desc' => '',
+                ];
+            } else {
+                $prop = carr::get($properties, $i);
+                $propType = c::get($prop, 'type');
 
-        $result = $db->query("desc ${table}");
-        $properties = [];
-        foreach ($result as $value) {
-            $field = $value->Field;
-            $type = $value->Type;
-            $temp = explode('(', $type);
-            if ($temp) {
-                $type = c::get($temp, 0);
+                if ($propType !== $type) {
+                    $properties[$i]['type'] = $type;
+                }
             }
-            $type = $this->getType($type);
-            if (!in_array($field, $excludedFields)) {
-                $properties[$field] = $type;
+        }
+        while (true) {
+            $missingIndex = $this->getMissingPropertyIndex($properties, $fields);
+            if ($missingIndex !== false) {
+                unset($properties[$missingIndex]);
+            } else {
+                break;
             }
         }
 
         return $properties;
     }
 
-    private function getType(string $type) {
-        $typeConvertion = [
-            'tinyint' => 'int',
-            'smallint' => 'int',
-            'mediumint' => 'int',
-            'bigint' => 'int',
-            'decimal' => 'int',
-            'float' => 'float',
-            'double' => 'double',
-            'double unsigned' => 'double',
-            'bit' => 'int',
-            'char' => 'string',
-            'varchar' => 'string',
-            'binary' => 'string',
-            'varbinary' => 'string',
-            'tinyblob' => 'string',
-            'blob' => 'string',
-            'mediumblob' => 'string',
-            'longblob' => 'string',
-            'tinytext' => 'string',
-            'text' => 'string',
-            'mediumtext' => 'string',
-            'longtext' => 'string',
-            'enum' => 'string',
-            'set' => 'string',
-            'date' => 'CCarbon',
-            'time' => 'string',
-            'datetime' => 'CCarbon',
-            'timestamp' => 'string',
-            'year' => 'string',
-            'boolean' => 'bool',
-        ];
-
-        if ($result = c::get($typeConvertion, $type)) {
-            return $result;
-        }
-
-        return $type;
-    }
-
-    public function compareField() {
-        $compared = [];
-        $currentProperties = $this->getCurrentProperties();
-        $fileds = $this->getFields();
-        $currentPropertiyFields = array_column($currentProperties, 'field');
-        $classMethods = get_class_methods($this->prefix . 'Model_' . $this->getModel());
-
-        foreach ($fileds as $field => $type) {
-            $i = array_search($field, $currentPropertiyFields);
-            if ($i === false) {
-                $compared[$field] = 'add';
-            } else {
-                $prop = c::get($currentProperties, $i);
-                $propType = c::get($prop, 'type');
-
-                if ($propType !== $type) {
-                    $compared[$field] = 'update';
+    private function getMissingPropertyIndex($properties) {
+        $fieldsKey = c::collect(Helper::getFields($this->getTable(), $this->prefix))->keys()->toArray();
+        $classMethods = get_class_methods($this->prefix . 'Model_' . Helper::getModel($this->getTable()));
+        foreach ($properties as $index => $property) {
+            $field = carr::get($property, 'field');
+            $i = array_search($field, $fieldsKey);
+            if ($i === false && !in_array($field, $classMethods)) {
+                if (!cstr::endsWith($field, '_count')) {
+                    return $index;
                 }
             }
         }
 
-        foreach ($currentPropertiyFields as $field) {
-            $i = array_search($field, array_keys($fileds));
-            if ($i === false && !in_array($field, $classMethods)) {
-                $compared[$field] = 'delete';
+        return false;
+    }
+
+    public function updateFieldRelation($properties) {
+        $compared = [];
+
+        $methods = Helper::getRelationMethods(Helper::getModelClass($this->prefix, $this->getTable()));
+        $fields = carr::pluck($methods, 'method');
+        $currentPropertyFields = array_column($properties, 'field');
+
+        foreach ($methods as $methodIndex => $method) {
+            $field = carr::get($method, 'method');
+            $i = array_search($field, $currentPropertyFields);
+            if ($i === false) {
+                $properties[] = [
+                    'prop' => '@property-read',
+                    'type' => carr::get($method, 'type'),
+                    'var' => '$' . $field,
+                    'field' => $field,
+                    'isRelation' => true,
+                    'desc' => '',
+                ];
+            } else {
+                $prop = carr::get($properties, $i);
+                $propType = c::get($prop, 'type');
+
+                if ($propType !== carr::get($method, 'type')) {
+                    $properties[$i]['type'] = carr::get($method, 'type');
+                }
             }
         }
 
-        return $compared;
+        return $properties;
     }
 
     public function getUpdatedProperties() {
         $properties = [];
-        $fields = $this->getFields();
+
         $currentProperties = $this->getCurrentProperties();
-        $compare = $this->compareField();
+        $currentProperties = $this->updateFieldProperties($currentProperties);
+        $currentProperties = $this->updateFieldRelation($currentProperties);
 
-        foreach ($compare as $field => $status) {
-            $i = array_search($field, array_column($currentProperties, 'field'));
-            switch ($status) {
-                case 'add':
-                    $currentProperties[] = [
-                        'prop' => $this->getTable() . '_id' === $field ? '@property-read' : '@property',
-                        'type' => 'string',
-                        'var' => '$' . $field,
-                        'field' => $field
-                    ];
-
-                    break;
-                case 'delete':
-                    unset($currentProperties[$i]);
-
-                    break;
-                case 'update':
-                    $currentProperties[$i]['type'] = $fields[$field];
-
-                    break;
-            }
-        }
+        $propLength = 0;
+        $typeLength = 0;
+        $varLength = 0;
 
         foreach ($currentProperties as $property) {
-            $properties[] = ' * ' . c::get($property, 'prop') . ' ' . c::get($property, 'type') . ' ' . c::get($property, 'var');
+            if ($propLength < strlen(carr::get($property, 'prop'))) {
+                $propLength = strlen(carr::get($property, 'prop'));
+            }
+            if ($typeLength < strlen(carr::get($property, 'type'))) {
+                $typeLength = strlen(carr::get($property, 'type'));
+            }
+            if ($varLength < strlen(carr::get($property, 'var'))) {
+                $varLength = strlen(carr::get($property, 'var'));
+            }
+        }
+        foreach ($currentProperties as $property) {
+            $prop = ' * ';
+            $prop .= cstr::padRight(carr::get($property, 'prop'), $propLength);
+            $prop .= ' ' . cstr::padRight(carr::get($property, 'type'), $typeLength);
+            if (carr::get($property, 'desc')) {
+                $prop .= ' ' . cstr::padRight(carr::get($property, 'var'), $varLength);
+                $prop .= ' ' . carr::get($property, 'desc');
+            } else {
+                $prop .= ' ' . carr::get($property, 'var');
+            }
+            $properties[] = $prop;
         }
 
         $result = implode("\n", $properties);

@@ -147,7 +147,9 @@ class CQueue_Runner {
      * @return string
      */
     protected function getQueue($connection) {
-        return $this->getOption('queue') ?: CQueue::config("connections.{$connection}.queue", 'default');
+        $defaultQueue = is_array($connection) ? carr::get($connection, 'queue', 'default') : CQueue::config("connections.{$connection}.queue", 'default');
+
+        return $this->getOption('queue') ?: $defaultQueue;
     }
 
     /**

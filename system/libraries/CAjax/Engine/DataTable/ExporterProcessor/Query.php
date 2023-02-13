@@ -16,7 +16,7 @@ class CAjax_Engine_DataTable_ExporterProcessor_Query extends CAjax_Engine_DataTa
         $filename = $this->getData('exporter.filename', CExporter::randomFilename($writerType));
         $disk = $this->getData('exporter.disk', 'local-temp');
 
-        $response = '';
+        $response = null;
         if ($progress) {
             $args = $this->engine->getArgs();
             $fileId = carr::first($args);
@@ -55,7 +55,7 @@ class CAjax_Engine_DataTable_ExporterProcessor_Query extends CAjax_Engine_DataTa
                 'progressUrl' => $progressUrl,
             ];
 
-            $response = json_encode([
+            $response = c::response()->json([
                 'errCode' => 0,
                 'errMessage' => '',
                 'data' => $responseData,
@@ -72,7 +72,7 @@ class CAjax_Engine_DataTable_ExporterProcessor_Query extends CAjax_Engine_DataTa
                 $exportOptions['queued'] = $queued;
                 CExporter::store($exportable, $filename, $exportOptions);
             } else {
-                CExporter::download($exportable, $filename, $writerType);
+                return CExporter::toDownloadResponse($exportable, $filename, $writerType);
             }
         }
 

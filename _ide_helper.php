@@ -74,4 +74,13 @@ class CApp {
     public function addShowMore($id = null) {
         return $this->element->addShowMore($id);
     }
+
+    /**
+     * @param null|string $id
+     *
+     * @return CElement_Component_Image
+     */
+    public function addImage($id = null) {
+        return $this->element->addImage($id);
+    }
 }

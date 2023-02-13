@@ -56,7 +56,7 @@ class CElement_FormInput_SelectSearch extends CElement_FormInput {
 
     protected $perPage;
 
-    public function __construct($id) {
+    public function __construct($id = null) {
         parent::__construct($id);
         $this->dropdownClasses = [];
         $this->type = 'selectsearch';
@@ -85,6 +85,7 @@ class CElement_FormInput_SelectSearch extends CElement_FormInput {
     }
 
     public static function factory($id = null) {
+        /** @phpstan-ignore-next-line */
         return new static($id);
     }
 
@@ -273,8 +274,8 @@ class CElement_FormInput_SelectSearch extends CElement_FormInput {
     }
 
     /**
-     * @param CModel|CModel_Query $model
-     * @param null|mixed          $queryCallback
+     * @param CModel|CModel_Query|string $model
+     * @param null|mixed                 $queryCallback
      *
      * @return $this
      */
@@ -302,6 +303,9 @@ class CElement_FormInput_SelectSearch extends CElement_FormInput {
         $ajaxMethod->setData('formatResult', serialize($this->formatResult));
         $ajaxMethod->setData('dependsOn', serialize($this->dependsOn));
         $ajaxMethod->setData('prependData', serialize($this->prependData));
+        if (c::app()->isAuthEnabled()) {
+            $ajaxMethod->enableAuth();
+        }
 
         $ajaxUrl = $ajaxMethod->makeUrl();
 
@@ -309,7 +313,6 @@ class CElement_FormInput_SelectSearch extends CElement_FormInput {
     }
 
     private function generateSelect2Template($template) {
-
         //escape the character
         $template = str_replace("'", "\'", $template);
         preg_match_all("/{([\w]*)}/", $template, $matches, PREG_SET_ORDER);
@@ -328,10 +331,12 @@ class CElement_FormInput_SelectSearch extends CElement_FormInput {
     protected function getSelectedRow() {
         if ($this->autoSelect || $this->value != null) {
             $value = null;
+            if ($this->autoSelect && $this->value === null) {
+                $value = [null];
+            }
             if ($this->value !== null) {
                 $value = $this->value;
             }
-
             $values = carr::wrap($value);
             $result = c::collect($values)->map(function ($value) {
                 $db = c::db();
@@ -425,7 +430,6 @@ class CElement_FormInput_SelectSearch extends CElement_FormInput {
             }
         }
         $selectedRows = $this->getSelectedRow();
-
         $html->appendln('<select class="' . $classes . '" name="' . $this->name . '" id="' . $this->id . '" ' . $disabled . $custom_css . $multiple . $additionAttribute . '">');
 
         if ($selectedRows) {
@@ -462,9 +466,10 @@ class CElement_FormInput_SelectSearch extends CElement_FormInput {
                         $strSelection = str_replace($bStr, carr::get($row, $str), $strSelection);
                     }
 
-                    $valueTemp = is_array($this->value) ? $this->value[$index] : $this->value;
+                    $selectedValue = carr::get($row, $this->keyField, carr::get($row, 'id'));
+                    //$valueTemp = is_array($this->value) ? $this->value[$index] : $this->value;
 
-                    $html->appendln('<option data-multiple="' . ($this->multiple ? '1' : '0') . '" value="' . $valueTemp . '" data-content="' . c::e($strSelection) . '" selected="selected" >' . $strSelection . '</option>');
+                    $html->appendln('<option data-multiple="' . ($this->multiple ? '1' : '0') . '" value="' . $selectedValue . '" data-content="' . c::e($strSelection) . '" selected="selected" >' . $strSelection . '</option>');
                 }
             }
         }
@@ -527,6 +532,7 @@ class CElement_FormInput_SelectSearch extends CElement_FormInput {
         }
 
         $selectedRows = $this->getSelectedRow();
+
         $selectedData = [];
         if ($selectedRows) {
             foreach ($selectedRows as $index => $selectedRow) {

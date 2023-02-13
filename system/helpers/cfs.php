@@ -4,6 +4,15 @@ defined('SYSPATH') or die('No direct access allowed.');
 
 //@codingStandardsIgnoreStart
 class cfs {
+    /**
+     * @param string $dir
+     * @param array  $results
+     * @param array  $ignore_dir
+     *
+     * @deprecated use CFile
+     *
+     * @return array
+     */
     public static function list_files_in_dir($dir, &$results = [], $ignore_dir = []) {
         $files = scandir($dir);
 
@@ -20,6 +29,13 @@ class cfs {
         return $results;
     }
 
+    /**
+     * @param string $dir
+     *
+     * @deprecated use CFile
+     *
+     * @return array
+     */
     public static function list_files($dir) {
         $result = [];
         $dir = rtrim($dir, DS) . DS;
@@ -37,9 +53,17 @@ class cfs {
                 closedir($handle);
             }
         }
+
         return $result;
     }
 
+    /**
+     * @param string $dir
+     *
+     * @deprecated use CFile
+     *
+     * @return array
+     */
     public static function list_dir($dir) {
         $result = [];
         $dir = trim($dir, DS) . DS;
@@ -57,6 +81,7 @@ class cfs {
                 closedir($handle);
             }
         }
+
         return $result;
     }
 
@@ -76,6 +101,7 @@ class cfs {
             }
             closedir($handle);
             @rmdir($dir);
+
             return true;
         } else {
             return false;
@@ -88,17 +114,18 @@ class cfs {
 
     /**
      * Creates a folder if missing, or ensures that it is writable.
-     * this is a safe function to check dir already exists or will create dir recursively
+     * this is a safe function to check dir already exists or will create dir recursively.
      *
-     * @param string $dir The directory path.
+     * @param string $dir the directory path
      *
-     * @return bool TRUE if folder exists and is writable, otherwise FALSE.
+     * @return bool TRUE if folder exists and is writable, otherwise FALSE
      */
     public static function mkdir($dir) {
         // Test write-permissions for the folder and create/fix if necessary.
         if ((is_dir($dir) && is_writable($dir)) || (!is_dir($dir) && @mkdir($dir, 0755, true)) || chmod($dir, 0755)) {
             return true;
         }
+
         return false;
     }
 
@@ -116,6 +143,7 @@ class cfs {
         if (!cfs::is_file($value)) {
             return false;
         }
+
         return file_exists($value);
     }
 
@@ -130,6 +158,7 @@ class cfs {
         if (is_string($time)) {
             $time = strtotime($time);
         }
+
         return $time - cfs::mtime($file);
     }
 
@@ -140,13 +169,13 @@ class cfs {
      * If the script is killed before the write is complete, only the temporary
      * trash file will be corrupted.
      *
-     * @param string $filename      Filename to write the data to.
-     * @param string $data          Data to write to file.
-     * @param string $atomicSuffix  Lets you optionally provide a different
-     *                              suffix for the temporary file.
+     * @param string $filename      filename to write the data to
+     * @param string $data          data to write to file
+     * @param string $atomicSuffix  lets you optionally provide a different
+     *                              suffix for the temporary file
      * @param mixed  $atomic_suffix
      *
-     * @return mixed Number of bytes written on success, otherwise FALSE.
+     * @return mixed number of bytes written on success, otherwise FALSE
      */
     public static function atomic_write($filename, $data, $atomic_suffix = 'atomictmp') {
         // Perform an exclusive (locked) overwrite to a temporary file.

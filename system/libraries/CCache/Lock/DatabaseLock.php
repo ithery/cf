@@ -59,7 +59,7 @@ class CCache_Lock_DatabaseLock extends CCache_LockAbstract {
 
             $acquired = true;
         } catch (CDatabase_Exception_QueryException $e) {
-            $updated = $this->connection->table($this->table)
+            $updatedResult = $this->connection->table($this->table)
                 ->where('key', $this->name)
                 ->where(function ($query) {
                     return $query->where('owner', $this->owner)->orWhere('expiration', '<=', time());
@@ -67,7 +67,7 @@ class CCache_Lock_DatabaseLock extends CCache_LockAbstract {
                     'owner' => $this->owner,
                     'expiration' => $this->expiresAt(),
                 ]);
-
+            $updated = $updatedResult->count();
             $acquired = $updated >= 1;
         }
 

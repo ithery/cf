@@ -1,0 +1,15 @@
+includes:
+	- phpstan.neon.dist
+
+parameters:
+    level: 4
+    paths:
+        - system/libraries/CAuth
+    bootstrapFiles:
+        - system/core/BootstrapPhpstan.php
+    excludePaths:
+        analyseAndScan:
+            - modules/cresenity
+            - *.blade.php
+        analyse:
+            - system/vendor

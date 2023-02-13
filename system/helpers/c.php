@@ -352,10 +352,21 @@ class c {
      *
      * @param null|\DateTimeZone|string $tz
      *
-     * @return CCarbon
+     * @return CCarbon|\Carbon\Carbon|\CarbonV3\Carbon
      */
     public static function now($tz = null) {
         return CCarbon::now($tz);
+    }
+
+    /**
+     * Create a new Carbon instance for the current date.
+     *
+     * @param null|\DateTimeZone|string $tz
+     *
+     * @return CCarbon
+     */
+    public static function today($tz = null) {
+        return CCarbon::today($tz);
     }
 
     public static function hrtime($getAsNumber = false) {
@@ -372,8 +383,15 @@ class c {
         return [$s, ($mt - $s) * 1e+6];
     }
 
+    /**
+     * @param string $str
+     *
+     * @deprecated use c::e
+     *
+     * @return string
+     */
     public static function html($str) {
-        return chtml::specialchars($str);
+        return c::e($str);
     }
 
     public static function dirname($path, $count = 1) {
@@ -424,7 +442,7 @@ class c {
     /**
      * @param string $string
      *
-     * @return \cstr|CBase_String
+     * @return CBase_String|\cstr
      */
     public static function str($string = null) {
         if (is_null($string)) {
@@ -637,14 +655,17 @@ class c {
 
     public static function abort($code, $message = '', array $headers = []) {
         if ($code instanceof CHTTP_Response) {
-            throw new CHttp_Exception_ResponseException($code);
+            throw new CHTTP_Exception_ResponseException($code);
         }
         if ($code instanceof CInterface_Responsable) {
-            throw new CHttp_Exception_ResponseException($code->toResponse(CHTTP::request()));
+            throw new CHTTP_Exception_ResponseException($code->toResponse(CHTTP::request()));
         }
 
         if ($code == 404) {
             throw new CHTTP_Exception_NotFoundHttpException($message);
+        }
+        if ($code == 410) {
+            throw new CHTTP_Exception_GoneHttpException($message);
         }
 
         throw new CHTTP_Exception_HttpException($code, $message, null, $headers);
@@ -676,6 +697,8 @@ class c {
      * @param mixed             $default
      *
      * @return CHTTP_Request|string|array
+     *
+     * @phpstan-return ($key is null ? CHTTP_Request : string|array)
      */
     public static function request($key = null, $default = null) {
         if (is_null($key)) {
@@ -756,7 +779,9 @@ class c {
      * @param array       $headers
      * @param null|bool   $secure
      *
-     * @return CHTTP_Redirector|CHttp_RedirectResponse
+     * @return CHTTP_Redirector|CHTTP_RedirectResponse
+     *
+     * @phpstan-return ($to is null ? CHTTP_Redirector : CHTTP_RedirectResponse)
      */
     public static function redirect($to = null, $status = 302, $headers = [], $secure = null) {
         if ($to instanceof CController) {
@@ -972,6 +997,17 @@ class c {
      */
     public static function app() {
         return CApp::instance();
+    }
+
+    /**
+     * Create Div instance.
+     *
+     * @param null|string $id
+     *
+     * @return \CElement_Element_Div
+     */
+    public static function div($id = null) {
+        return CElement_Element_Div::factory($id);
     }
 
     /**
@@ -1289,14 +1325,17 @@ class c {
      * @param null|string|array $path
      * @param null|string       $appCode
      *
-     * @return string
+     * @return null|string
      */
     public static function appRoot($path = null, $appCode = null) {
         if ($appCode == null) {
             $appCode = CF::appCode();
         }
+        if ($appCode === null) {
+            return null;
+        }
         if (!in_array($appCode, CF::getAvailableAppCode())) {
-            throw new CBase_Exception_AppCodeNotFoundException('appCode ' . $appCode . ' doesn\'t exists');
+            return null;
         }
         if (is_array($path)) {
             $path = implode(DS, $path);
@@ -1534,6 +1573,10 @@ class c {
         return htmlspecialchars(c::json($data, $options, $depth), ENT_QUOTES, 'UTF-8');
     }
 
+    public static function escAttr($string) {
+        return htmlspecialchars($string, ENT_QUOTES, 'UTF-8');
+    }
+
     /**
      * @return CApp_Contract_BaseInterface
      */
@@ -1570,6 +1613,19 @@ class c {
         }
 
         return $callback;
+    }
+
+    /**
+     * @param callable|Closure|SerializableClosure $callback
+     *
+     * @return bool
+     */
+    public static function isCallable($callback) {
+        if ($callback instanceof SerializableClosure) {
+            return true;
+        }
+
+        return is_callable($callback);
     }
 
     public static function isHtml($string) {
@@ -1624,6 +1680,27 @@ class c {
     }
 
     public static function call($callback, array $args = []) {
+        if (is_string($callback)) {
+            $className = null;
+            $method = null;
+            if (strpos($callback, '::') !== false) {
+                list($className, $method) = explode('::', $callback);
+            }
+            if ($className == null && $method == null) {
+                if (strpos($callback, '@') !== false) {
+                    list($className, $method) = explode('@', $callback);
+                }
+            }
+            if ($className == null && $method == null) {
+                if (class_exists($callback)) {
+                    $className = $callback;
+                    $method == '__invoke';
+                }
+            }
+            if ($className != null && $method !== null) {
+                return call_user_func_array([$className, $method], $args);
+            }
+        }
         if (is_callable($callback)) {
             return call_user_func_array($callback, $args);
         }
@@ -1632,6 +1709,86 @@ class c {
         }
 
         throw new Exception('callback is not callable');
+    }
+
+    /**
+     * @param array $parts
+     *
+     * @return string
+     */
+    public static function makePath(array $parts) {
+        $path = implode(DIRECTORY_SEPARATOR, $parts);
+
+        while (strpos($path, DIRECTORY_SEPARATOR . DIRECTORY_SEPARATOR) !== false) {
+            $path = str_replace(DIRECTORY_SEPARATOR . DIRECTORY_SEPARATOR, DIRECTORY_SEPARATOR, $path);
+        }
+
+        return $path;
+    }
+
+    /**
+     * @param null|sting $locale
+     *
+     * @return array
+     */
+    public static function months($locale = null) {
+        if ($locale == null) {
+            $locale = CF::getLocale();
+        }
+        $format = function ($index) use ($locale) {
+            if (class_exists(IntlDateFormatter::class)) {
+                $formatter = new IntlDateFormatter($locale);
+                $formatter->setPattern('MMMM');
+
+                return ucfirst($formatter->format(mktime(0, 0, 0, $index)));
+            } else {
+                return static::withLocale($locale, function () use ($index) {
+                    return CCarbon::createFromTimestamp(mktime(0, 0, 0, $index, 1))->isoFormat('MMMM');
+                });
+            }
+        };
+
+        return array_combine(
+            range(1, 12),
+            array_map(function ($index) use ($format) {
+                return $format($index);
+            }, range(1, 12))
+        );
+    }
+
+    /**
+     * Run the callback with the given locale.
+     *
+     * @param string   $locale
+     * @param \Closure $callback
+     *
+     * @return mixed
+     */
+    public function withLocale($locale, $callback) {
+        if (!$locale) {
+            return $callback();
+        }
+
+        $original = CF::getLocale();
+
+        try {
+            CF::setLocale($locale);
+
+            return $callback();
+        } finally {
+            CF::setLocale($original);
+        }
+    }
+
+    /**
+     * @return CAuth_Access_Gate
+     */
+    public static function gate() {
+        return CAuth_Access_Gate::instance();
+    }
+
+    public static function resolveUserTimezone(CHTTP_Request $request) {
+        return $request->timezone;
     }
 }
 

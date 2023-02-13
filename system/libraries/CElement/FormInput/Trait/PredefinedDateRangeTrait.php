@@ -68,35 +68,23 @@ trait CElement_FormInput_Trait_PredefinedDateRangeTrait {
     }
 
     public function addRange7Days($label = 'element/date.daterange:lastNDays', $lang = true) {
-        $labelTranslated = $label;
-        if ($lang) {
-            $labelTranslated = c::__($label, ['n' => 7]);
-        }
-        $dateStart = Carbon::now()->subDay(7);
-        $dateEnd = Carbon::now();
-        $this->addRange($labelTranslated, $dateStart, $dateEnd);
-
-        return $this;
+        return $this->addRangeNDays(7, $label, $lang);
     }
 
     public function addRange14Days($label = 'element/date.daterange:lastNDays', $lang = true) {
-        $labelTranslated = $label;
-        if ($lang) {
-            $labelTranslated = c::__($label, ['n' => 14]);
-        }
-        $dateStart = Carbon::now()->subDay(14);
-        $dateEnd = Carbon::now();
-        $this->addRange($labelTranslated, $dateStart, $dateEnd);
-
-        return $this;
+        return $this->addRangeNDays(14, $label, $lang);
     }
 
     public function addRange30Days($label = 'element/date.daterange:lastNDays', $lang = true) {
+        return $this->addRangeNDays(30, $label, $lang);
+    }
+
+    public function addRangeNDays($n, $label = 'element/date.daterange:lastNDays', $lang = true) {
         $labelTranslated = $label;
         if ($lang) {
-            $labelTranslated = c::__($label, ['n' => 30]);
+            $labelTranslated = c::__($label, ['n' => $n]);
         }
-        $dateStart = Carbon::now()->subDay(30);
+        $dateStart = Carbon::now()->subDays($n);
         $dateEnd = Carbon::now();
         $this->addRange($labelTranslated, $dateStart, $dateEnd);
 

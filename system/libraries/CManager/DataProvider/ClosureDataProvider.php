@@ -2,7 +2,7 @@
 
 use Opis\Closure\SerializableClosure;
 
-class CManager_DataProvider_ClosureDataProvider extends CManager_DataProviderAbstract {
+class CManager_DataProvider_ClosureDataProvider extends CManager_DataProviderAbstract implements CManager_Contract_DataProviderInterface {
     protected $connection = '';
 
     /**
@@ -57,5 +57,19 @@ class CManager_DataProvider_ClosureDataProvider extends CManager_DataProviderAbs
             'path' => CPagination_Paginator::resolveCurrentPath(),
             'pageName' => $pageName,
         ]);
+    }
+
+    /**
+     * @param string $method
+     * @param string $column
+     *
+     * @return mixed
+     */
+    public function aggregate($method, $column) {
+        // if (!$this->isValidAggregateMethod($method)) {
+        //     throw new Exception($method . ': is not valid aggregate method');
+        // }
+
+        throw new Exception('Not implemented');
     }
 }

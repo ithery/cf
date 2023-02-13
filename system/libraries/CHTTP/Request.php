@@ -16,7 +16,6 @@ class CHTTP_Request extends SymfonyRequest implements CInterface_Arrayable, Arra
     use CHTTP_Trait_InteractsWithInput,
         CHTTP_Trait_InteractsWithContentTypes,
         CHTTP_Trait_InteractsWithFlashData;
-
     protected $browser;
 
     /**
@@ -36,14 +35,14 @@ class CHTTP_Request extends SymfonyRequest implements CInterface_Arrayable, Arra
     /**
      * The user resolver callback.
      *
-     * @var \Closure
+     * @var null|\Closure
      */
     protected $userResolver;
 
     /**
      * The route resolver callback.
      *
-     * @var \Closure
+     * @var null|\Closure
      */
     protected $routeResolver;
 
@@ -51,6 +50,8 @@ class CHTTP_Request extends SymfonyRequest implements CInterface_Arrayable, Arra
      * Create a new HTTP request from server variables.
      *
      * @return static
+     *
+     * @phpstan-return static(CHTTP_Request)
      */
     public static function capture() {
         static::enableHttpMethodParameterOverride();
@@ -83,6 +84,15 @@ class CHTTP_Request extends SymfonyRequest implements CInterface_Arrayable, Arra
      */
     public function root() {
         return rtrim($this->getSchemeAndHttpHost() . $this->getBaseUrl(), '/');
+    }
+
+    public function getHost() {
+        $host = parent::getHost();
+        if ($host == null) {
+            $host = CF::domain();
+        }
+
+        return $host;
     }
 
     /**
@@ -359,8 +369,11 @@ class CHTTP_Request extends SymfonyRequest implements CInterface_Arrayable, Arra
      * @param null|\CHTTP_Request $to
      *
      * @return static
+     *
+     * @phpstan-return CHTTP_Request
      */
     public static function createFrom(self $from, $to = null) {
+        //@phpstan-ignore-next-line
         $request = $to ?: new static();
 
         $files = $from->files->all();
@@ -394,8 +407,11 @@ class CHTTP_Request extends SymfonyRequest implements CInterface_Arrayable, Arra
      * @param \Symfony\Component\HttpFoundation\Request $request
      *
      * @return static
+     *
+     * @phpstan-return static(CHTTP_Request)
      */
     public static function createFromBase(SymfonyRequest $request) {
+        //@phpstan-ignore-next-line
         $newRequest = (new static())->duplicate(
             $request->query->all(),
             $request->request->all(),
@@ -475,6 +491,8 @@ class CHTTP_Request extends SymfonyRequest implements CInterface_Arrayable, Arra
      * @param mixed       $default
      *
      * @return null|\CRouting_Route|object|string
+     *
+     * @phpstan-return ($param is null ? CRouting_Route|null : object|string|null)
      */
     public function route($param = null, $default = null) {
         $route = call_user_func($this->getRouteResolver());
@@ -584,6 +602,7 @@ class CHTTP_Request extends SymfonyRequest implements CInterface_Arrayable, Arra
      *
      * @return bool
      */
+    #[\ReturnTypeWillChange]
     public function offsetExists($offset) {
         $routeParameters = $this->route() ? $this->route()->parameters() : [];
 
@@ -612,6 +631,7 @@ class CHTTP_Request extends SymfonyRequest implements CInterface_Arrayable, Arra
      *
      * @return void
      */
+    #[\ReturnTypeWillChange]
     public function offsetSet($offset, $value) {
         $this->getInputSource()->set($offset, $value);
     }
@@ -623,6 +643,7 @@ class CHTTP_Request extends SymfonyRequest implements CInterface_Arrayable, Arra
      *
      * @return void
      */
+    #[\ReturnTypeWillChange]
     public function offsetUnset($offset) {
         $this->getInputSource()->remove($offset);
     }
@@ -705,5 +726,9 @@ class CHTTP_Request extends SymfonyRequest implements CInterface_Arrayable, Arra
         }
 
         return isset($ref) ? $ref : $default;
+    }
+
+    public function isCresRequest() {
+        return $this->hasHeader('X-Cres-Version');
     }
 }

@@ -57,12 +57,19 @@ trait CApp_Concern_AuthTrait {
         return $this->setAuthEnable($bool);
     }
 
+    /**
+     * Alias of isAuthEnabled.
+     *
+     * @deprecated use isAuthEnabled
+     *
+     * @return bool
+     */
     public function isLoginRequired() {
         return $this->isAuthEnabled();
     }
 
     /**
-     * @return CModel|object
+     * @return null|CModel|object
      */
     public function user() {
         return $this->auth()->user();

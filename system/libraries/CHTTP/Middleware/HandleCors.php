@@ -69,22 +69,22 @@ class CHTTP_Middleware_HandleCors {
     /**
      * Determine if the request has a URI that should pass through the CORS flow.
      *
-     * @param \CHttp_Request $request
+     * @param \CHTTP_Request $request
      *
      * @return bool
      */
-    protected function shouldRun(CHttp_Request $request) {
+    protected function shouldRun(CHTTP_Request $request) {
         return $this->isMatchingPath($request);
     }
 
     /**
      * The the path from the config, to see if the CORS Service should run.
      *
-     * @param \CHttp_Request $request
+     * @param \CHTTP_Request $request
      *
      * @return bool
      */
-    protected function isMatchingPath(CHttp_Request $request) {
+    protected function isMatchingPath(CHTTP_Request $request) {
         // Get the paths from the config or the middleware
         $paths = $this->getPathsByHost($request->getHost());
 

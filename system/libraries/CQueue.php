@@ -77,7 +77,7 @@ final class CQueue {
         // foreach (['Null', 'Sync', 'Database', 'Redis', 'Beanstalkd', 'Sqs'] as $connector) {
         //     self::{"register{$connector}Connector"}($manager);
         // }
-        foreach (['Null', 'Sync', 'Database', 'Redis', 'AsyncRedis', 'Beanstalkd', 'Sqs'] as $connector) {
+        foreach (['Null', 'Sync', 'Database', 'Redis', 'AsyncRedis', 'Beanstalkd', 'Sqs', 'File'] as $connector) {
             self::{"register{$connector}Connector"}($manager);
         }
     }
@@ -92,6 +92,19 @@ final class CQueue {
     protected static function registerNullConnector($manager) {
         $manager->addConnector('null', function () {
             return new CQueue_Connector_NullConnector();
+        });
+    }
+
+    /**
+     * Register the File queue connector.
+     *
+     * @param CQueue_Manager $manager
+     *
+     * @return void
+     */
+    protected static function registerFileConnector($manager) {
+        $manager->addConnector('file', function () {
+            return new CQueue_Connector_FileConnector();
         });
     }
 
@@ -213,7 +226,6 @@ final class CQueue {
     public static function batchRepository() {
         if (static::$batchRepository == null) {
             static::$batchRepository = new CQueue_BatchRepository(
-                static::batchFactory(),
                 CDatabase::instance(CF::config('queue.batching.database')),
                 CF::config('queue.batching.table', 'queue_batch')
             );
@@ -298,5 +310,16 @@ final class CQueue {
             CF::config('app.name'),
             $config['table']
         );
+    }
+
+    /**
+     * Create a new batch of queueable jobs.
+     *
+     * @param \CCollection|array|mixed $jobs
+     *
+     * @return \CQueue_PendingBatch
+     */
+    public static function batch($jobs) {
+        return static::dispatcher()->batch($jobs);
     }
 }

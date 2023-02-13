@@ -1,7 +1,7 @@
 <?php
 
 /**
- * Description of OutputBufferTrait
+ * Description of OutputBufferTrait.
  *
  * @author Hery
  */

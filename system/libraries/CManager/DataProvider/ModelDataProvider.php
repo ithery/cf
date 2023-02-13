@@ -2,7 +2,7 @@
 
 use Opis\Closure\SerializableClosure;
 
-class CManager_DataProvider_ModelDataProvider extends CManager_DataProviderAbstract {
+class CManager_DataProvider_ModelDataProvider extends CManager_DataProviderAbstract implements CManager_Contract_DataProviderInterface {
     protected $modelClass;
 
     /**
@@ -46,7 +46,7 @@ class CManager_DataProvider_ModelDataProvider extends CManager_DataProviderAbstr
      *
      * @return CModel_Query
      */
-    protected function getModelQuery($callback = null) {
+    public function getModelQuery($callback = null) {
         $modelClass = $this->modelClass;
         $query = $modelClass::query();
         /** @var CModel_Query $query */
@@ -106,31 +106,39 @@ class CManager_DataProvider_ModelDataProvider extends CManager_DataProviderAbstr
             $dataSearch = $this->searchAnd;
             $query->where(function (CModel_Query $q) use ($dataSearch, $aggregateFields) {
                 foreach ($dataSearch as $fieldName => $value) {
-                    if (strpos($fieldName, '.') !== false) {
-                        $fields = explode('.', $fieldName);
-
-                        $field = array_pop($fields);
-                        $relation = implode('.', $fields);
-
-                        $q->whereHas($relation, function ($q2) use ($value, $field) {
-                            $q2->where($field, 'like', '%' . $value . '%');
+                    if ($this->isCallable(carr::get($dataSearch, $fieldName))) {
+                        $q->where(function ($q) use ($value) {
+                            $this->callCallable($value, [$q]);
                         });
                     } else {
-                        if (in_array($fieldName, $aggregateFields)) {
-                            //TODO apply search on aggregateFields
+                        if (strpos($fieldName, '.') !== false) {
+                            $fields = explode('.', $fieldName);
+
+                            $field = array_pop($fields);
+                            $relation = implode('.', $fields);
+
+                            $q->whereHas($relation, function ($q2) use ($value, $field) {
+                                $q2->where($field, 'like', '%' . $value . '%');
+                            });
                         } else {
-                            if (!$this->isRelationField($q, $fieldName)) {
-                                $q->where($fieldName, 'like', '%' . $value . '%');
+                            if (in_array($fieldName, $aggregateFields)) {
+                                //TODO apply search on aggregateFields
+                            } else {
+                                if (!$this->isRelationField($q, $fieldName)) {
+                                    $q->where($fieldName, 'like', '%' . $value . '%');
+                                }
                             }
                         }
                     }
                 }
             });
 
-            foreach ($dataSearch as $fieldName => $value) {
-                if (strpos($fieldName, '.') === false) {
-                    if (in_array($fieldName, $aggregateFields)) {
-                        $query->having($fieldName, 'like', '%' . $value . '%');
+            if (count($aggregateFields) > 0) {
+                foreach ($dataSearch as $fieldName => $value) {
+                    if (strpos($fieldName, '.') === false) {
+                        if (in_array($fieldName, $aggregateFields)) {
+                            $query->having($fieldName, 'like', '%' . $value . '%');
+                        }
                     }
                 }
             }
@@ -325,5 +333,20 @@ class CManager_DataProvider_ModelDataProvider extends CManager_DataProviderAbstr
         $query = $this->getModelQuery();
 
         return $query->get();
+    }
+
+    /**
+     * @param string $method
+     * @param string $column
+     *
+     * @return mixed
+     */
+    public function aggregate($method, $column) {
+        if (!$this->isValidAggregateMethod($method)) {
+            throw new Exception($method . ': is not valid aggregate method');
+        }
+        $query = $this->getModelQuery();
+
+        return $query->$method($column);
     }
 }

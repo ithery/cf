@@ -33,7 +33,7 @@ import { attachWaves } from './ui/waves';
 import formatter from './formatter';
 import { initCssDomVar } from './module/css-dom-var';
 import extend from './core/extend';
-import {hasClass,addClass, removeClass} from './dom/classes';
+import {hasClass, addClass, removeClass} from './dom/classes';
 import scrollTo from './animation/scrollTo';
 import setHeight from './animation/setHeight';
 import Theme from './cresenity/Theme';
@@ -41,6 +41,7 @@ import { initThemeMode } from './module/theme';
 import { initMenu } from './module/menu';
 import { formatCurrency, unformatCurrency } from './formatter/currency';
 import { cresQuery } from './module/CresQuery';
+import { isJson } from './util/helper';
 
 export default class Cresenity {
     constructor() {
@@ -55,7 +56,8 @@ export default class Cresenity {
             'cresenity:jquery:loaded',
             'cresenity:loaded',
             'cresenity:js:loaded',
-            'cresenity:ui:start'
+            'cresenity:ui:start',
+            'cresenity:notification:message'
         ];
         this.modalElements = [];
         this.cresenityEventList = [
@@ -91,6 +93,7 @@ export default class Cresenity {
         };
         this.theme = new Theme();
         this.$ = cresQuery;
+        this.version = '1.4.1';
     }
     loadJs(filename, callback) {
         let fileref = document.createElement('script');
@@ -175,9 +178,16 @@ export default class Cresenity {
     }
     handleAjaxError(xhr, status, error) {
         if (error !== 'abort') {
-            this.message('error', 'Error, please call administrator... (' + error + ')');
+            if(xhr.responseText && isJson(xhr.responseText)) {
+                let data = JSON.parse(xhr.responseText);
+                if(data && typeof data.errCode !== 'undefined') {
+                    this.message('error', data.errMessage);
+                }
+            } else {
+                this.message('error', 'Something went wrong... ' + (error ? ('(' + error + ')') : ''));
+            }
             if(xhr.status!=200) {
-                if(window.capp?.environment !== 'production') {
+                if(this.isDebug()) {
                     this.htmlModal(xhr.responseText);
                 }
             }
@@ -258,17 +268,32 @@ export default class Cresenity {
                 url: url,
                 dataType: 'json',
                 data: dataAddition,
+                headers: {
+                    Accept: 'application/json; charset=utf-8',
+                    'X-Cres-Version': this.version
+                },
                 success: (data) => {
                     let isError = false;
-                    if(typeof data.html === 'undefined') {
-                        //error
-                        this.htmlModal(data);
-                        isError = true;
+                    let errMessage = null;
+                    if(typeof data.errCode !== 'undefined') {
+                        isError = data.errCode != 0;
+                        if(isError) {
+                            this.message('error', data.errMessage);
+                            if(typeof data.data !== 'undefined' && data.data && this.isDebug()) {
+                                this.htmlModal(data);
+                            }
+                        }
+                    } else {
+                        if(typeof data.html === 'undefined') {
+                            if(this.isDebug()) {
+                                this.htmlModal(data);
+                            }
+                            isError = true;
+                        }
                     }
                     if(!isError) {
-
                         this.doCallback('onReloadSuccess', data);
-                        this.dispatch('reload:success',data);
+                        this.dispatch('reload:success', data);
                         this.handleResponse(data, () => {
                             switch (settings.reloadType) {
                                 case 'after':
@@ -307,8 +332,8 @@ export default class Cresenity {
                     }
                 },
                 error: (errorXhr, ajaxOptions, thrownError) => {
-                    this.dispatch('reload:error',{
-                        xhr:errorXhr, ajaxOptions, error:thrownError
+                    this.dispatch('reload:error', {
+                        xhr: errorXhr, ajaxOptions, error: thrownError
                     });
                     this.handleAjaxError(errorXhr, ajaxOptions, thrownError);
                 },
@@ -345,12 +370,24 @@ export default class Cresenity {
         options.reloadType = 'before';
         this.reload(options);
     }
+    isDebug() {
+        console.log(this.cf.getConfig().environment);
+        if(this.cf.getConfig().environment == 'production') {
+            return false;
+        }
+        return this.cf.getConfig().debug ?? false;
+    }
     confirm(options) {
+        if(typeof options == 'function') {
+            options = {
+                confirmCallback: options
+            };
+        }
         let settings = extend({
             // These are the defaults.
             method: 'get',
             dataAddition: {},
-            message: capp?.labels?.confirm?.areYouSure ?? 'Are you sure?',
+            message: window.capp?.labels?.confirm?.areYouSure ?? 'Are you sure?',
             onConfirmed: false,
             confirmCallback: false,
             owner: null
@@ -618,7 +655,7 @@ export default class Cresenity {
     }
 
     debug(message) {
-        if (this.cf.getConfig().debug) {
+        if (this.isDebug()) {
             window.console.log(message);
         }
     }
@@ -968,19 +1005,19 @@ export default class Cresenity {
 
     initWaves() {
         if($) {
-            const selector = window.capp?.waves?.selector ?? '.cres-waves-effect' ;
-            $(selector).each((index,item) => {
+            const selector = window.capp?.waves?.selector ?? '.cres-waves-effect';
+            $(selector).each((index, item) => {
                 if(!$(item).hasClass('cres-waves-effect')) {
-                    $(item).addClass('cres-waves-effect')
+                    $(item).addClass('cres-waves-effect');
                 }
-                attachWaves(item)
+                attachWaves(item);
             });
         }
     }
     applyDeferXData() {
-        const comp = document.querySelector("[defer-x-data]")
+        const comp = document.querySelector('[defer-x-data]');
         if(comp) {
-            comp.setAttribute('x-data', comp.getAttribute('defer-x-data'))
+            comp.setAttribute('x-data', comp.getAttribute('defer-x-data'));
             //window.Alpine.start();
         }
     }
@@ -995,7 +1032,6 @@ export default class Cresenity {
         this.ui.start();
         window.Alpine.start();
         this.alpine = new CresAlpine(window.Alpine);
-
     }
 
     initLiveReload() {
@@ -1008,14 +1044,13 @@ export default class Cresenity {
                     }
                 };
 
-                rsocket.onerror = function() {
-                   reject("couldn't connect")
-                }
-            }).catch(function(err) {
+                rsocket.onerror = function () {
+                    reject('couldn\'t connect');
+                };
+            }).catch(function (err) {
                 //do nothing
                 //console.log("Catch Live Reload handler sees: ", err)
             });
-
         }
     }
     init() {
@@ -1051,7 +1086,6 @@ export default class Cresenity {
                 dispatchWindowEvent('cresenity:loaded');
             });
             this.applyDeferXData();
-
         });
 
 
@@ -1275,7 +1309,6 @@ export default class Cresenity {
         );
     }
     tzDate(date = null) {
-
         // Get local time as ISO string with offset at the end
         let now = new Date();
         if(date!==null) {
@@ -1283,9 +1316,9 @@ export default class Cresenity {
         }
         const tzo = -now.getTimezoneOffset();
         const dif = tzo >= 0 ? '+' : '-';
-        const pad = function(num, ms) {
-            var norm = Math.floor(Math.abs(num));
-            if (ms) return (norm < 10 ? '00' : norm < 100 ? '0' : '') + norm;
+        const pad = function (num, ms) {
+            let norm = Math.floor(Math.abs(num));
+            if (ms) {return (norm < 10 ? '00' : norm < 100 ? '0' : '') + norm;}
             return (norm < 10 ? '0' : '') + norm;
         };
         return now.getFullYear()
@@ -1297,33 +1330,30 @@ export default class Cresenity {
             + '.' + pad(now.getMilliseconds(), true)
             + dif + pad(tzo / 60)
             + ':' + pad(tzo % 60);
-
     }
     randomGUID() {
-
-        var d = new Date().getTime();
-        if (typeof performance !== 'undefined' && typeof performance.now === 'function'){
+        let d = new Date().getTime();
+        if (typeof performance !== 'undefined' && typeof performance.now === 'function') {
             d += performance.now(); //use high-precision timer if available
         }
         return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function (c) {
-            var r = (d + Math.random() * 16) % 16 | 0;
+            let r = (d + Math.random() * 16) % 16 | 0;
             d = Math.floor(d / 16);
             return (c === 'x' ? r : (r & 0x3 | 0x8)).toString(16);
         });
-
     }
     getScrollParent(element, includeHidden = false) {
-        var style = getComputedStyle(element);
-        var excludeStaticParent = style.position === "absolute";
-        var overflowRegex = includeHidden ? /(auto|scroll|hidden)/ : /(auto|scroll)/;
+        let style = getComputedStyle(element);
+        let excludeStaticParent = style.position === 'absolute';
+        let overflowRegex = includeHidden ? /(auto|scroll|hidden)/ : /(auto|scroll)/;
 
-        if (style.position === "fixed") return document.body;
-        for (var parent = element; (parent = parent.parentElement);) {
+        if (style.position === 'fixed') {return document.body;}
+        for (let parent = element; (parent = parent.parentElement);) {
             style = getComputedStyle(parent);
-            if (excludeStaticParent && style.position === "static") {
+            if (excludeStaticParent && style.position === 'static') {
                 continue;
             }
-            if (overflowRegex.test(style.overflow + style.overflowY + style.overflowX)) return parent;
+            if (overflowRegex.test(style.overflow + style.overflowY + style.overflowX)) {return parent;}
         }
 
         return document.body;

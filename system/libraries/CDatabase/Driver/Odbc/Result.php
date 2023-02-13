@@ -33,7 +33,7 @@ class CDatabase_Driver_Odbc_Result extends CDatabase_Result {
         } elseif (is_bool($result)) {
             if ($result == false) {
                 // SQL error
-                throw new CDatabase_Exception('There was an SQL error: :error', [':error' => odbc_errormsg($link) . ' - ' . $sql]);
+                throw CDatabase_Exception::queryException(odbc_errormsg($link) . ' - ' . $sql);
             } else {
                 // Its an DELETE, INSERT, REPLACE, or UPDATE query
                 // NOTE: Cannot retrieve these in ODBC.
@@ -217,6 +217,7 @@ class CDatabase_Driver_Odbc_Result extends CDatabase_Result {
 
     // End Interface
     // Interface: Iterator
+
     /**
      * Retrieves the current result set row.
      *

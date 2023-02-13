@@ -3,9 +3,7 @@
 use Psr\Http\Message\ServerRequestInterface;
 
 /**
- * Class     AbstractNoCaptcha
- *
- * @package  Arcanedev\NoCaptcha
+ * Class     AbstractNoCaptcha.
  *
  * @author   ARCANEDEV <arcanedev.maroc@gmail.com>
  */
@@ -13,14 +11,21 @@ abstract class CVendor_Google_Recaptcha_AbstractRecaptcha implements CVendor_Goo
     const CAPTCHA_NAME = 'g-recaptcha-response';
 
     /**
-     * The shared key between your site and ReCAPTCHA
+     * Use the global domain.
+     *
+     * @var bool
+     */
+    public static $useGlobalDomain = false;
+
+    /**
+     * The shared key between your site and ReCAPTCHA.
      *
      * @var string
      */
     protected $secret;
 
     /**
-     * Your site key
+     * Your site key.
      *
      * @var string
      */
@@ -35,7 +40,7 @@ abstract class CVendor_Google_Recaptcha_AbstractRecaptcha implements CVendor_Goo
     protected $lang;
 
     /**
-     * HTTP Request Client
+     * HTTP Request Client.
      *
      * @var CVendor_Google_Recaptcha_Http_Request
      */
@@ -44,16 +49,9 @@ abstract class CVendor_Google_Recaptcha_AbstractRecaptcha implements CVendor_Goo
     /**
      * ReCaptcha's response.
      *
-     * @var CVendor_Google_Recaptcha_Http_ResponseV3|null
+     * @var null|CVendor_Google_Recaptcha_Http_ResponseV3
      */
     protected $response;
-
-    /**
-     * Use the global domain.
-     *
-     * @var bool
-     */
-    public static $useGlobalDomain = false;
 
     /* -----------------------------------------------------------------
       |  Constructor
@@ -65,7 +63,7 @@ abstract class CVendor_Google_Recaptcha_AbstractRecaptcha implements CVendor_Goo
      *
      * @param string      $secret
      * @param string      $siteKey
-     * @param string|null $lang
+     * @param null|string $lang
      */
     public function __construct($secret, $siteKey, $lang = null) {
         $this->setSecret($secret);
@@ -148,7 +146,7 @@ abstract class CVendor_Google_Recaptcha_AbstractRecaptcha implements CVendor_Goo
     /**
      * Get the last response.
      *
-     * @return CVendor_Google_Recaptcha_Http_AbstractResponse|null
+     * @return null|CVendor_Google_Recaptcha_Http_AbstractResponse
      */
     public function getLastResponse() {
         return $this->response;

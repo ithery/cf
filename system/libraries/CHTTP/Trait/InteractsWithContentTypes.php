@@ -92,7 +92,7 @@ trait CHTTP_Trait_InteractsWithContentTypes {
      *
      * @param string|array $contentTypes
      *
-     * @return string|null
+     * @return null|string
      */
     public function prefers($contentTypes) {
         $accepts = $this->getAcceptableContentTypes();
@@ -116,6 +116,8 @@ trait CHTTP_Trait_InteractsWithContentTypes {
                 }
             }
         }
+
+        return null;
     }
 
     /**

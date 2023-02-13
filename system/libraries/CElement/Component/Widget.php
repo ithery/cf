@@ -10,6 +10,7 @@ defined('SYSPATH') or die('No direct access allowed.');
  */
 class CElement_Component_Widget extends CElement_Component {
     use CTrait_Compat_Element_Widget;
+
     public $scroll;
 
     public $nopadding;
@@ -56,8 +57,9 @@ class CElement_Component_Widget extends CElement_Component {
         $this->js_collapse = true;
     }
 
-    public static function factory($id = '') {
-        return new CElement_Component_Widget($id);
+    public static function factory($id = null) {
+        /** @phpstan-ignore-next-line */
+        return new static($id);
     }
 
     /**
@@ -113,8 +115,8 @@ class CElement_Component_Widget extends CElement_Component {
     /**
      * Set the title of the widget.
      *
-     * @param string $title
-     * @param string $lang
+     * @param string     $title
+     * @param bool|array $lang
      *
      * @return $this
      */

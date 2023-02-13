@@ -129,7 +129,6 @@ class CRouting_RouteData {
 
     public function getRoutedUriFromUriRouting($uri) {
         $routes = CRouting_Manager::instance()->getUriRoutings();
-
         // Prepare variables
         $routedUri = $uri;
 

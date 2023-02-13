@@ -56,19 +56,17 @@ return [
     'channels' => [
         'stack' => [
             'driver' => 'stack',
-            'channels' => ['single'],
+            'channels' => ['daily'],
             'ignore_exceptions' => false,
         ],
 
         'single' => [
             'driver' => 'single',
-            'path' => DOCROOT . 'logs/cf.log',
             'level' => c::env('LOG_LEVEL', 'debug'),
         ],
 
         'daily' => [
             'driver' => 'daily',
-            'path' => DOCROOT . 'logs/cf.log',
             'level' => c::env('LOG_LEVEL', 'debug'),
             'days' => 14,
         ],

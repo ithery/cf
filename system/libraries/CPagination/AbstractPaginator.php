@@ -498,7 +498,9 @@ abstract class CPagination_AbstractPaginator implements CInterface_Htmlable {
      */
     public static function resolveQueryString($default = null) {
         if (isset(static::$queryStringResolver)) {
-            return (static::$queryStringResolver)();
+            $queryResolver = static::$queryStringResolver;
+
+            return $queryResolver();
         }
 
         return $default;
@@ -522,7 +524,6 @@ abstract class CPagination_AbstractPaginator implements CInterface_Htmlable {
      */
     public static function viewFactory() {
         return CView::factory();
-        //return call_user_func(static::$viewFactoryResolver);
     }
 
     /**
@@ -586,6 +587,26 @@ abstract class CPagination_AbstractPaginator implements CInterface_Htmlable {
     public static function useBootstrapThree() {
         static::defaultView('pagination.default');
         static::defaultSimpleView('pagination.simple-default');
+    }
+
+    /**
+     * Indicate that Bootstrap 4 styling should be used for generated links.
+     *
+     * @return void
+     */
+    public static function useBootstrapFour() {
+        static::defaultView('pagination.bootstrap-4');
+        static::defaultSimpleView('pagination.simple-bootstrap-4');
+    }
+
+    /**
+     * Indicate that Bootstrap 5 styling should be used for generated links.
+     *
+     * @return void
+     */
+    public static function useBootstrapFive() {
+        static::defaultView('pagination.bootstrap-5');
+        static::defaultSimpleView('pagination.simple-bootstrap-5');
     }
 
     /**

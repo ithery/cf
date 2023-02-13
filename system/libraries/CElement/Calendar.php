@@ -1,6 +1,8 @@
 <?php
 
 class CElement_Calendar extends CElement {
+    use CTrait_Compat_Element_FormInput_Calendar;
+
     protected $events = [];
 
     protected $ajax;
@@ -12,7 +14,7 @@ class CElement_Calendar extends CElement {
     public function __construct($id = '', $tag = 'div') {
         parent::__construct($id);
 
-        CManager::instance()->register_module('fullcalendar');
+        CManager::instance()->registerModule('fullcalendar');
         $this->ajax = true;
     }
 
@@ -24,8 +26,9 @@ class CElement_Calendar extends CElement {
      *
      * @return \CElement_Calendar
      */
-    public static function factory($id = '', $tag = 'div') {
-        return new CElement_Calendar($id);
+    public static function factory($id = null, $tag = 'div') {
+        /** @phpstan-ignore-next-line */
+        return new static($id, $tag);
     }
 
     public function html($indent = 0) {
@@ -61,15 +64,15 @@ class CElement_Calendar extends CElement {
         $data = [];
         $r = $db->query($query);
         foreach ($r as $k => $v) {
-            $start = date('Y-m-d H:i:s', strtotime(cobj::get($v, 'start')));
-            $end = date('Y-m-d H:i:s', strtotime(cobj::get($v, 'end')));
-            $url = cobj::get($v, 'url');
-            $background_color = cobj::get($v, 'background_color');
-            $border_color = cobj::get($v, 'border_color');
+            $start = date('Y-m-d H:i:s', strtotime(c::get($v, 'start')));
+            $end = date('Y-m-d H:i:s', strtotime(c::get($v, 'end')));
+            $url = c::get($v, 'url');
+            $background_color = c::get($v, 'background_color');
+            $border_color = c::get($v, 'border_color');
             $allDay = false;
             $arr_data = [
-                'id' => cobj::get($v, 'id'),
-                'title' => cobj::get($v, 'title'),
+                'id' => c::get($v, 'id'),
+                'title' => c::get($v, 'title'),
                 'start' => $start,
                 'end' => $end,
                 'allDay' => $allDay,
@@ -141,13 +144,13 @@ class CElement_Calendar extends CElement {
         return $js->text();
     }
 
-    public function set_events($events) {
+    public function setEvents($events) {
         $this->events = $events;
 
         return $this;
     }
 
-    public function set_query($query) {
+    public function setQuery($query) {
         $this->query = $query;
 
         return $this;

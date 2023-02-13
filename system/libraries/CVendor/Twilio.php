@@ -14,6 +14,11 @@ class CVendor_Twilio {
         $this->token = $token;
     }
 
+    /**
+     * Get Twilio Client.
+     *
+     * @return \Twilio\Rest\Client
+     */
     public function client() {
         if ($this->client == null) {
             $this->client = new Client($this->sid, $this->token);

@@ -6,4 +6,15 @@ return [
         'label' => c::__('Alpine'),
         'subnav' => include dirname(__FILE__) . '/cresjs/alpine.php',
     ],
+    [
+        'name' => 'cresjs.react',
+        'label' => c::__('React'),
+        'subnav' => include dirname(__FILE__) . '/cresjs/react.php',
+    ],
+
+    [
+        'name' => 'cresjs.progressive',
+        'label' => c::__('Progressive'),
+        'uri' => 'demo/cresjs/progressive/index',
+    ],
 ];

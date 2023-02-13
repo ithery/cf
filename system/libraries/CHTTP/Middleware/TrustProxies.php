@@ -32,7 +32,7 @@ class CHTTP_Middleware_TrustProxies {
     /**
      * Handle an incoming request.
      *
-     * @param \CHttp_Request $request
+     * @param \CHTTP_Request $request
      * @param \Closure       $next
      *
      * @throws \Symfony\Component\HttpKernel\Exception\HttpException
@@ -40,7 +40,7 @@ class CHTTP_Middleware_TrustProxies {
      * @return mixed
      */
     public function handle(CHTTP_Request $request, Closure $next) {
-        $request::setTrustedProxies([], $this->getTrustedHeaderNames()); // Reset trusted proxies between requests
+        $request->setTrustedProxies([], $this->getTrustedHeaderNames()); // Reset trusted proxies between requests
         $this->setTrustedProxyIpAddresses($request);
 
         return $next($request);
@@ -49,7 +49,7 @@ class CHTTP_Middleware_TrustProxies {
     /**
      * Sets the trusted proxies on the request to the value of trustedproxy.proxies.
      *
-     * @param \CHttp_Request $request
+     * @param \CHTTP_Request $request
      */
     protected function setTrustedProxyIpAddresses(CHTTP_Request $request) {
         $trustedIps = $this->proxies();
@@ -72,7 +72,7 @@ class CHTTP_Middleware_TrustProxies {
     /**
      * Specify the IP addresses to trust explicitly.
      *
-     * @param \CHttp_Request $request
+     * @param \CHTTP_Request $request
      * @param array          $trustedIps
      */
     private function setTrustedProxyIpAddressesToSpecificIps(CHTTP_Request $request, $trustedIps) {
@@ -82,7 +82,7 @@ class CHTTP_Middleware_TrustProxies {
     /**
      * Set the trusted proxy to be the IP address calling this servers.
      *
-     * @param \CHttp_Request $request
+     * @param \CHTTP_Request $request
      */
     private function setTrustedProxyIpAddressesToTheCallingIp(CHTTP_Request $request) {
         $request->setTrustedProxies([$request->server->get('REMOTE_ADDR')], $this->getTrustedHeaderNames());
@@ -99,33 +99,21 @@ class CHTTP_Middleware_TrustProxies {
             case 'HEADER_X_FORWARDED_AWS_ELB':
             case CHTTP_Request::HEADER_X_FORWARDED_AWS_ELB:
                 return CHTTP_Request::HEADER_X_FORWARDED_AWS_ELB;
-
-                break;
             case 'HEADER_FORWARDED':
             case CHTTP_Request::HEADER_FORWARDED:
                 return CHTTP_Request::HEADER_FORWARDED;
-
-                break;
             case 'HEADER_X_FORWARDED_FOR':
             case CHTTP_Request::HEADER_X_FORWARDED_FOR:
                 return CHTTP_Request::HEADER_X_FORWARDED_FOR;
-
-                break;
             case 'HEADER_X_FORWARDED_HOST':
             case CHTTP_Request::HEADER_X_FORWARDED_HOST:
                 return CHTTP_Request::HEADER_X_FORWARDED_HOST;
-
-                break;
             case 'HEADER_X_FORWARDED_PORT':
             case CHTTP_Request::HEADER_X_FORWARDED_PORT:
                 return CHTTP_Request::HEADER_X_FORWARDED_PORT;
-
-                break;
             case 'HEADER_X_FORWARDED_PROTO':
             case CHTTP_Request::HEADER_X_FORWARDED_PROTO:
                 return CHTTP_Request::HEADER_X_FORWARDED_PROTO;
-
-                break;
             default:
                 return CHTTP_Request::HEADER_X_FORWARDED_FOR | CHTTP_Request::HEADER_X_FORWARDED_HOST | CHTTP_Request::HEADER_X_FORWARDED_PORT | CHTTP_Request::HEADER_X_FORWARDED_PROTO | CHTTP_Request::HEADER_X_FORWARDED_AWS_ELB;
         }

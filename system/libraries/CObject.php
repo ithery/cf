@@ -10,9 +10,9 @@ class CObject {
 
     protected $domain = '';
 
-    protected function __construct($id = '') {
+    protected function __construct($id = null) {
         $observer = CObserver::instance();
-        if ($id == '') {
+        if ($id == null) {
             $id = spl_object_hash($this);
         }
 

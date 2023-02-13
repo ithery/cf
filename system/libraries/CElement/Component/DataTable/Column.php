@@ -1,8 +1,5 @@
 <?php
 
-use Twilio\Serialize;
-use SuperClosure\SerializableClosure;
-
 class CElement_Component_DataTable_Column extends CObject {
     use CTrait_Compat_Element_DataTable_Column;
     use CTrait_Element_Property_Label;
@@ -143,6 +140,13 @@ class CElement_Component_DataTable_Column extends CObject {
     }
 
     /**
+     * @return bool
+     */
+    public function isVisible() {
+        return $this->visible;
+    }
+
+    /**
      * Set sortable of column.
      *
      * @param bool $bool
@@ -203,6 +207,24 @@ class CElement_Component_DataTable_Column extends CObject {
         $this->align = $align;
 
         return $this;
+    }
+
+    /**
+     * Set align to right.
+     *
+     * @return $this
+     */
+    public function setAlignRight() {
+        return $this->setAlign('right');
+    }
+
+    /**
+     * Set align to center.
+     *
+     * @return $this
+     */
+    public function setAlignCenter() {
+        return $this->setAlign('center');
     }
 
     public function setCallback($callback, $require = '') {

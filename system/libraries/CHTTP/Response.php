@@ -1,14 +1,12 @@
 <?php
 
-
-use Symfony\Component\HttpFoundation\Response as SymfonyResponse;
 use Symfony\Component\HttpFoundation\ResponseHeaderBag;
+use Symfony\Component\HttpFoundation\Response as SymfonyResponse;
 
 class CHTTP_Response extends SymfonyResponse {
-    use CHTTP_Trait_ResponseTrait,
-    CTrait_Macroable {
+    use CHTTP_Trait_ResponseTrait;
+    use CTrait_Macroable {
         CTrait_Macroable::__call as macroCall;
-
     }
 
     /**
@@ -18,9 +16,9 @@ class CHTTP_Response extends SymfonyResponse {
      * @param int   $status
      * @param array $headers
      *
-     * @return void
-     *
      * @throws \InvalidArgumentException
+     *
+     * @return void
      */
     public function __construct($content = '', $status = 200, array $headers = []) {
         $this->headers = new ResponseHeaderBag($headers);

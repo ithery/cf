@@ -3,11 +3,6 @@
 defined('SYSPATH') or die('No direct access allowed.');
 
 /**
- * @author Hery Kurniawan
- * @license Ittron Global Teknologi <ittron.co.id>
- *
- * @since Jun 23, 2018, 1:33:26 AM
- *
  * @property string  $createdby
  * @property string  $updatedby
  * @property CCarbon $created
@@ -23,16 +18,16 @@ trait CApp_Model_Trait_RoleNav {
     }
 
     /**
-     * @return CModel_Relation_BelongsTo
+     * @return CModel_Relation_BelongsTo|CModel_Query
      */
     public function org() {
-        return $this->belongsTo(CApp_Model_Org::class);
+        return $this->belongsTo(CApp_Model_Org::class)->withTrashed();
     }
 
     /**
-     * @return CModel_Relation_BelongsTo
+     * @return CModel_Relation_BelongsTo|CModel_Query
      */
     public function roles() {
-        return $this->belongsTo(CApp_Model_Roles::class);
+        return $this->belongsTo(CApp_Model_Roles::class)->withTrashed();
     }
 }

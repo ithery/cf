@@ -1,11 +1,5 @@
 <?php
 
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
-
 class CVendor_Google_Recaptcha_Http_Request implements CVendor_Google_Recaptcha_Http_RequestInterface {
     /* -----------------------------------------------------------------
       |  Properties
@@ -27,7 +21,7 @@ class CVendor_Google_Recaptcha_Http_Request implements CVendor_Google_Recaptcha_
     /**
      * Set URL.
      *
-     * @param  string  $url
+     * @param string $url
      *
      * @return self
      */
@@ -65,8 +59,8 @@ class CVendor_Google_Recaptcha_Http_Request implements CVendor_Google_Recaptcha_
     /**
      * Run the request and get response.
      *
-     * @param  string  $url
-     * @param  bool    $curled
+     * @param string $url
+     * @param bool   $curled
      *
      * @return string
      */
@@ -86,23 +80,26 @@ class CVendor_Google_Recaptcha_Http_Request implements CVendor_Google_Recaptcha_
     /**
      * Check URL.
      *
-     * @param  string  $url
+     * @param string $url
      *
      * @throws CVendor_Google_Recaptcha_Exception_InvalidUrlException
      */
     private function checkUrl(&$url) {
-        if (!is_string($url))
+        if (!is_string($url)) {
             throw new CVendor_Google_Recaptcha_Exception_InvalidUrlException(
-            'The url must be a string value, ' . gettype($url) . ' given'
+                'The url must be a string value, ' . gettype($url) . ' given'
             );
+        }
 
         $url = trim($url);
 
-        if (empty($url))
+        if (empty($url)) {
             throw new CVendor_Google_Recaptcha_Exception_InvalidUrlException('The url must not be empty');
+        }
 
-        if (filter_var($url, FILTER_VALIDATE_URL) === false)
+        if (filter_var($url, FILTER_VALIDATE_URL) === false) {
             throw new CVendor_Google_Recaptcha_Exception_InvalidUrlException('The url [' . $url . '] is invalid');
+        }
     }
 
     /**
@@ -117,12 +114,11 @@ class CVendor_Google_Recaptcha_Http_Request implements CVendor_Google_Recaptcha_
     /**
      * Check Result.
      *
-     * @param  string  $result
+     * @param string $result
      *
      * @return bool
      */
     private function checkResult($result) {
         return is_string($result) && !empty($result);
     }
-
 }

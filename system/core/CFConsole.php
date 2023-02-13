@@ -32,6 +32,7 @@ class CFConsole {
         CConsole_Command_Cron_ScheduleTestCommand::class,
         CConsole_Command_Queue_ClearCommand::class,
         CConsole_Command_Queue_ListFailedCommand::class,
+        CConsole_Command_Queue_PruneBatchesCommand::class,
         CConsole_Command_DevSuite_DevSuiteInstallCommand::class,
         CConsole_Command_DevSuite_DevSuiteStartCommand::class,
         CConsole_Command_DevSuite_DevSuiteUninstallCommand::class,
@@ -75,6 +76,9 @@ class CFConsole {
         CConsole_Command_App_AppCodeCommand::class,
         CConsole_Command_TestInstallCommand::class,
         CConsole_Command_TestCommand::class,
+        CConsole_Command_PhpstanInstallCommand::class,
+        CConsole_Command_PhpstanCommand::class,
+        CConsole_Command_PhpstanClearCommand::class,
         CWebSocket_Console_Command_StartServer::class,
         CTesting_Console_ChromeDriverCommand::class,
     ];

@@ -26,4 +26,6 @@ interface CManager_Contract_DataProviderInterface {
      * @return CInterface_Enumerable
      */
     public function toEnumerable();
+
+    public function aggregate($method, $column);
 }

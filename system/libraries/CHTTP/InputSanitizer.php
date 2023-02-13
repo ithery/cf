@@ -1,6 +1,12 @@
 <?php
 
 class CHTTP_InputSanitizer {
+    protected $originalPost;
+
+    protected $originalGet;
+
+    protected $originalFiles;
+
     /**
      * Sanitizes global GET, POST and COOKIE data. Also takes care of
      * magic_quotes and register_globals, if they have been enabled.

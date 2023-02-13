@@ -62,12 +62,12 @@ trait CApp_Trait_BaseTrait {
     }
 
     /**
-     * @return int
+     * @return null|int
      */
     public static function orgId() {
         $orgId = CF::orgId();
         if ($orgId === null) {
-            $app = CApp::instance();
+            $app = c::app();
             if ($app->user() != null) {
                 if (strlen($app->user()->org_id) > 0) {
                     $orgId = $app->user()->org_id;
@@ -176,7 +176,7 @@ trait CApp_Trait_BaseTrait {
     }
 
     /**
-     * User dari session CApp.
+     * User from session.
      *
      * @return null|stdClass
      */
@@ -220,6 +220,9 @@ trait CApp_Trait_BaseTrait {
         return 'system';
     }
 
+    /**
+     * @return CApp_Model_Roles
+     */
     public static function role() {
         $app = CApp::instance();
         $role = $app->role();
@@ -411,10 +414,14 @@ trait CApp_Trait_BaseTrait {
         if (CF::isProduction()) {
             return false;
         }
+
         $domain = CF::domain();
         $pos = strpos($domain, 'app.ittron.co.id');
         if ($pos === false) {
             $pos = strpos($domain, 'dev.ittron.co.id');
+        }
+        if ($pos === false) {
+            $pos = strpos($domain, 'dev8.ittron.co.id');
         }
         if ($pos === false) {
             $pos = strpos($domain, 'staging.ittron.co.id');

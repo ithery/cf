@@ -10,7 +10,6 @@ defined('SYSPATH') or die('No direct access allowed.');
  */
 abstract class CQueue_AbstractJob implements CQueue_JobInterface {
     use CTrait_Helper_InteractsWithTime;
-
     /**
      * The job handler instance.
      *

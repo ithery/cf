@@ -105,8 +105,9 @@ class CElement_Component_Form extends CElement_Component {
         CManager::instance()->registerModule('validation');
     }
 
-    public static function factory($id = '') {
-        return new CElement_Component_Form($id);
+    public static function factory($id = null) {
+        /** @phpstan-ignore-next-line */
+        return new static($id);
     }
 
     public function onSubmitListener() {
@@ -203,6 +204,17 @@ class CElement_Component_Form extends CElement_Component {
      */
     public function setEncType($encType = 'multipart/form-data') {
         $this->enctype = $encType;
+
+        return $this;
+    }
+
+    /**
+     * Set enctype attribute value to multipart/form-data.
+     *
+     * @return CElement_Component_Form
+     */
+    public function setEncTypeMultiPartFormData() {
+        $this->enctype = 'multipart/form-data';
 
         return $this;
     }

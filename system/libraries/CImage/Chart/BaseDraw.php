@@ -12,84 +12,84 @@ use CImage_Chart_Constant as Constant;
 
 class CImage_Chart_BaseDraw {
     /**
-     * Width of the picture
+     * Width of the picture.
      *
      * @var int
      */
     public $xSize;
 
     /**
-     * Height of the picture
+     * Height of the picture.
      *
      * @var int
      */
     public $ySize;
 
     /**
-     * GD picture object
+     * GD picture object.
      *
-     * @var resource
+     * @var GdImage|resource
      */
     public $picture;
 
     /**
-     * Turn antialias on or off
+     * Turn antialias on or off.
      *
-     * @var boolean
+     * @var bool
      */
     public $antialias = true;
 
     /**
-     * Quality of the antialiasing implementation (0-1)
+     * Quality of the antialiasing implementation (0-1).
      *
      * @var int
      */
     public $antialiasQuality = 0;
 
     /**
-     * Already drawn pixels mask (Filled circle implementation)
+     * Already drawn pixels mask (Filled circle implementation).
      *
      * @var array
      */
     public $mask = [];
 
     /**
-     * Just to know if we need to flush the alpha channels when rendering
+     * Just to know if we need to flush the alpha channels when rendering.
      *
-     * @var boolean
+     * @var bool
      */
     public $transparentBackground = false;
 
     /**
-     * Graph area X origin
+     * Graph area X origin.
      *
      * @var int
      */
     public $graphAreaX1;
 
     /**
-     * Graph area Y origin
+     * Graph area Y origin.
      *
      * @var int
      */
     public $graphAreaY1;
 
     /**
-     * Graph area bottom right X position
+     * Graph area bottom right X position.
      *
      * @var int
      */
     public $graphAreaX2;
 
     /**
-     * Graph area bottom right Y position
+     * Graph area bottom right Y position.
      *
      * @var int
      */
     public $graphAreaY2;
 
     /**
-     * Minimum height for scale divs
+     * Minimum height for scale divs.
      *
      * @var int
      */
@@ -98,7 +98,7 @@ class CImage_Chart_BaseDraw {
     /**
      * @var string
      */
-    public $fontName = 'GeosansLight.ttf';
+    public $fontName = 'verdana.ttf';
 
     /**
      * @var int
@@ -106,7 +106,7 @@ class CImage_Chart_BaseDraw {
     public $fontSize = 12;
 
     /**
-     * Return the bounding box of the last written string
+     * Return the bounding box of the last written string.
      *
      * @var array
      */
@@ -133,92 +133,92 @@ class CImage_Chart_BaseDraw {
     public $fontColorA = 100;
 
     /**
-     * Turn shadows on or off
+     * Turn shadows on or off.
      *
-     * @var boolean
+     * @var bool
      */
     public $shadow = false;
 
     /**
-     * X Offset of the shadow
+     * X Offset of the shadow.
      *
      * @var int
      */
     public $shadowX;
 
     /**
-     * Y Offset of the shadow
+     * Y Offset of the shadow.
      *
      * @var int
      */
     public $shadowY;
 
     /**
-     * R component of the shadow
+     * R component of the shadow.
      *
      * @var int
      */
     public $shadowR;
 
     /**
-     * G component of the shadow
+     * G component of the shadow.
      *
      * @var int
      */
     public $shadowG;
 
     /**
-     * B component of the shadow
+     * B component of the shadow.
      *
      * @var int
      */
     public $shadowB;
 
     /**
-     * Alpha level of the shadow
+     * Alpha level of the shadow.
      *
      * @var int
      */
     public $shadowA;
 
     /**
-     * Array containing the image map
+     * Array containing the image map.
      *
      * @var array
      */
     public $imageMap = [];
 
     /**
-     * Name of the session array
+     * Name of the session array.
      *
      * @var int
      */
     public $imageMapIndex = 'pChart';
 
     /**
-     * Save the current imagemap storage mode
+     * Save the current imagemap storage mode.
      *
      * @var int
      */
     public $imageMapStorageMode;
 
     /**
-     * Automatic deletion of the image map temp files
+     * Automatic deletion of the image map temp files.
      *
-     * @var boolean
+     * @var bool
      */
     public $imageMapAutoDelete = true;
 
     /**
-     * Attached dataset
+     * Attached dataset.
      *
-     * @var Data
+     * @var CImage_Chart_Data
      */
     public $dataSet;
 
     /**
      * Last generated chart info
-     * Last layout : regular or stacked
+     * Last layout : regular or stacked.
      *
      * @var int
      */
@@ -230,7 +230,7 @@ class CImage_Chart_BaseDraw {
     private $resourcePath;
 
     public function __construct() {
-        $this->resourcePath = DOCROOT . 'modules/cresenity/media';
+        $this->resourcePath = DOCROOT . 'system/media';
         $this->fontName = $this->loadFont($this->fontName, 'font');
     }
 
@@ -258,9 +258,9 @@ class CImage_Chart_BaseDraw {
      * @param string $name
      * @param string $type
      *
-     * @return string
-     *
      * @throws Exception
+     *
+     * @return string
      */
     protected function loadFont($name, $type) {
         if (file_exists($name)) {
@@ -270,19 +270,20 @@ class CImage_Chart_BaseDraw {
         if (file_exists($path)) {
             return $path;
         }
+
         throw new Exception(
             sprintf('The requested resource %s (%s) has not been found!', $name, $type)
         );
     }
 
     /**
-     * Allocate a color with transparency
+     * Allocate a color with transparency.
      *
-     * @param resource $picture
-     * @param int      $r
-     * @param int      $g
-     * @param int      $b
-     * @param int      $alpha
+     * @param GdImage|resource $picture
+     * @param int              $r
+     * @param int              $g
+     * @param int              $b
+     * @param int              $alpha
      *
      * @return int
      */
@@ -312,15 +313,16 @@ class CImage_Chart_BaseDraw {
             $alpha = 100;
         }
         $alpha = $this->convertAlpha($alpha);
+
         return imagecolorallocatealpha($picture, $r, $g, $b, $alpha);
     }
 
     /**
-     * Convert apha to base 10
+     * Convert apha to base 10.
      *
      * @param int|float $alphaValue
      *
-     * @return integer
+     * @return int
      */
     public function convertAlpha($alphaValue) {
         return (127 / 100) * (100 - $alphaValue);
@@ -345,11 +347,12 @@ class CImage_Chart_BaseDraw {
         if ($type == 'image/jpeg ') {
             $type = 3;
         }
+
         return [$width, $height, $type];
     }
 
     /**
-     * Compute the scale, check for the best visual factors
+     * Compute the scale, check for the best visual factors.
      *
      * @param int   $xMin
      * @param int   $xMax
@@ -391,7 +394,7 @@ class CImage_Chart_BaseDraw {
     }
 
     /**
-     * Compute the best matching scale based on size & factors
+     * Compute the best matching scale based on size & factors.
      *
      * @param int   $xMin
      * @param int   $xMax
@@ -494,6 +497,7 @@ class CImage_Chart_BaseDraw {
             $scale['xMin'] = $xMin;
             $scale['xMax'] = $xMax;
         }
+
         return $scale;
     }
 
@@ -501,7 +505,7 @@ class CImage_Chart_BaseDraw {
      * @param int|float $value1
      * @param int|float $value2
      *
-     * @return double
+     * @return float
      */
     public function modulo($value1, $value2) {
         if (floor($value2) == 0) {
@@ -515,17 +519,18 @@ class CImage_Chart_BaseDraw {
         while (floor($minValue * $factor) == 0) {
             $factor = $factor * 10;
         }
+
         return ($value1 * $factor) % ($value2 * $factor);
     }
 
     /**
-     * @param mixed   $value
-     * @param mixed   $lastValue
-     * @param integer $labelingMethod
-     * @param integer $iD
-     * @param boolean $labelSkip
+     * @param mixed $value
+     * @param mixed $lastValue
+     * @param int   $labelingMethod
+     * @param int   $iD
+     * @param bool  $labelSkip
      *
-     * @return boolean
+     * @return bool
      */
     public function isValidLabel($value, $lastValue, $labelingMethod, $iD, $labelSkip) {
         if ($labelingMethod == Constant::LABELING_DIFFERENT && $value != $lastValue) {
@@ -540,11 +545,12 @@ class CImage_Chart_BaseDraw {
         if ($labelingMethod == Constant::LABELING_ALL && ($iD + $labelSkip) % ($labelSkip + 1) != 1) {
             return false;
         }
+
         return true;
     }
 
     /**
-     * Returns the number of drawable series
+     * Returns the number of drawable series.
      *
      * @return int
      */
@@ -556,25 +562,26 @@ class CImage_Chart_BaseDraw {
                 $count++;
             }
         }
+
         return $count;
     }
 
     /**
-     * Fix box coordinates
+     * Fix box coordinates.
      *
      * @param int $xa
      * @param int $ya
      * @param int $xb
      * @param int $yb
      *
-     * @return integer[]
+     * @return int[]
      */
     public function fixBoxCoordinates($xa, $ya, $xb, $yb) {
         return [min($xa, $xb), min($ya, $yb), max($xa, $xb), max($ya, $yb)];
     }
 
     /**
-     * Apply AALias correction to the rounded box boundaries
+     * Apply AALias correction to the rounded box boundaries.
      *
      * @param int|float $value
      * @param int       $mode
@@ -678,7 +685,7 @@ class CImage_Chart_BaseDraw {
     }
 
     /**
-     * Return the abscissa margin
+     * Return the abscissa margin.
      *
      * @param array $data
      *
@@ -690,11 +697,12 @@ class CImage_Chart_BaseDraw {
                 return $values['margin'];
             }
         }
+
         return 0;
     }
 
     /**
-     * Returns a random color
+     * Returns a random color.
      *
      * @param int $alpha
      *
@@ -710,7 +718,7 @@ class CImage_Chart_BaseDraw {
     }
 
     /**
-     * Validate a palette
+     * Validate a palette.
      *
      * @param mixed     $Colors
      * @param int|float $surrounding
@@ -770,13 +778,14 @@ class CImage_Chart_BaseDraw {
                 }
             }
         }
+
         return $result;
     }
 
     /**
-     * @param mixed   $values
-     * @param array   $option
-     * @param boolean $returnOnly0Height
+     * @param mixed $values
+     * @param array $option
+     * @param bool  $returnOnly0Height
      *
      * @return int|float|array
      */
@@ -796,7 +805,7 @@ class CImage_Chart_BaseDraw {
             $values[0] = $tmp;
         }
         $result = [];
-        if ($data['orientation'] == Constant::SCALE_POS_LEFTRIGHT) {
+        if (carr::get($data, 'orientation') == Constant::SCALE_POS_LEFTRIGHT) {
             $height = ($this->graphAreaY2 - $this->graphAreaY1) - $data['axis'][$axisID]['margin'] * 2;
             $scaleHeight = $data['axis'][$axisID]['scaleMax'] - $data['axis'][$axisID]['scaleMin'];
             $step = $height / $scaleHeight;
@@ -818,7 +827,7 @@ class CImage_Chart_BaseDraw {
                 }
             }
         } else {
-            $width = ($this->graphAreaX2 - $this->graphAreaX1) - $data['axis'][$axisID]['margin'] * 2;
+            $width = ($this->graphAreaX2 - $this->graphAreaX1) - (carr::get($data, 'axis.'.$axisID.'.margin', 0) * 2);
             $scaleWidth = $data['axis'][$axisID]['scaleMax'] - $data['axis'][$axisID]['scaleMin'];
             $step = $width / $scaleWidth;
             if ($returnOnly0Height) {
@@ -839,16 +848,17 @@ class CImage_Chart_BaseDraw {
                 }
             }
         }
+
         return count($result) == 1 ? reset($result) : $result;
     }
 
     /**
-     * Format the axis values
+     * Format the axis values.
      *
-     * @param mixed  $value
-     * @param int    $mode
-     * @param array  $format
-     * @param string $unit
+     * @param mixed          $value
+     * @param int            $mode
+     * @param null|array|int $format
+     * @param string         $unit
      *
      * @return string
      */
@@ -867,6 +877,7 @@ class CImage_Chart_BaseDraw {
                 $sign = '-';
             }
             $value = number_format($value / pow(1024, ($scale = floor(log($value, 1024)))), 2, ',', '.');
+
             return $sign . $value . ' ' . $units[$scale];
         }
         if ($mode == Constant::AXIS_FORMAT_CUSTOM) {
@@ -879,6 +890,7 @@ class CImage_Chart_BaseDraw {
             if ($format !== null) {
                 $pattern = $format;
             }
+
             return gmdate($pattern, $value);
         }
         if ($mode == Constant::AXIS_FORMAT_TIME) {
@@ -886,6 +898,7 @@ class CImage_Chart_BaseDraw {
             if ($format !== null) {
                 $pattern = $format;
             }
+
             return gmdate($pattern, $value);
         }
         if ($mode == Constant::AXIS_FORMAT_CURRENCY) {
@@ -901,11 +914,12 @@ class CImage_Chart_BaseDraw {
                 return round($value / 1000, $format) . 'k' . $unit;
             }
         }
+
         return $value . $unit;
     }
 
     /**
-     * @return array|null
+     * @return null|array
      */
     public function scaleGetXSettings() {
         $data = $this->dataSet->getData();
@@ -917,7 +931,7 @@ class CImage_Chart_BaseDraw {
     }
 
     /**
-     * Return the HTML converted color from the RGB composite values
+     * Return the HTML converted color from the RGB composite values.
      *
      * @param int $r
      * @param int $g
@@ -935,11 +949,12 @@ class CImage_Chart_BaseDraw {
         $Color = '#' . (strlen($r) < 2 ? '0' : '') . $r;
         $Color .= (strlen($g) < 2 ? '0' : '') . $g;
         $Color .= (strlen($b) < 2 ? '0' : '') . $b;
+
         return $Color;
     }
 
     /**
-     * Return the orientation of a line
+     * Return the orientation of a line.
      *
      * @param int $x1
      * @param int $y1
@@ -960,7 +975,7 @@ class CImage_Chart_BaseDraw {
     }
 
     /**
-     * Return the length between two points
+     * Return the length between two points.
      *
      * @param int $x1
      * @param int $y1
@@ -976,14 +991,14 @@ class CImage_Chart_BaseDraw {
     }
 
     /**
-     * Add a zone to the image map
+     * Add a zone to the image map.
      *
      * @param string      $Type
      * @param string      $Plots
-     * @param string|null $Color
+     * @param null|string $Color
      * @param string      $Title
      * @param string      $Message
-     * @param boolean     $hTMLEncode
+     * @param bool        $hTMLEncode
      */
     public function addToImageMap(
         $Type,
@@ -1043,7 +1058,7 @@ class CImage_Chart_BaseDraw {
     }
 
     /**
-     * Initialise the image map methods
+     * Initialise the image map methods.
      *
      * @param string $name
      * @param int    $storageMode
@@ -1074,7 +1089,7 @@ class CImage_Chart_BaseDraw {
     }
 
     /**
-     * Set current font properties
+     * Set current font properties.
      *
      * @param array $format
      */
@@ -1083,8 +1098,8 @@ class CImage_Chart_BaseDraw {
         $g = isset($format['g']) ? $format['g'] : -1;
         $b = isset($format['b']) ? $format['b'] : -1;
         $alpha = isset($format['alpha']) ? $format['alpha'] : 100;
-        $fontName = isset($format['FontName']) ? $format['FontName'] : null;
-        $fontSize = isset($format['FontSize']) ? $format['FontSize'] : null;
+        $fontName = isset($format['fontName']) ? $format['fontName'] : null;
+        $fontSize = isset($format['fontSize']) ? $format['fontSize'] : null;
         if ($r != -1) {
             $this->fontColorR = $r;
         }
@@ -1106,7 +1121,7 @@ class CImage_Chart_BaseDraw {
     }
 
     /**
-     * Reverse an array of points
+     * Reverse an array of points.
      *
      * @param array $Plots
      *
@@ -1118,6 +1133,7 @@ class CImage_Chart_BaseDraw {
             $result[] = $Plots[$i];
             $result[] = $Plots[$i + 1];
         }
+
         return $result;
     }
 }

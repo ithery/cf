@@ -10,6 +10,8 @@ class CNotification_Message_Database extends CNotification_MessageAbstract {
         $message = $this->getOption('message');
         $title = $this->getOption('title');
         $fields = $this->getOption('fields');
+        $refId = $this->getOption('refId');
+        $refType = $this->getOption('refType');
         if (!($model instanceof CModel)) {
             throw new Exception('recipient for database channel must instance of CModel');
         }
@@ -24,6 +26,7 @@ class CNotification_Message_Database extends CNotification_MessageAbstract {
             $notificationModelClass = CF::config('notification.database.model', CModel_Notification_NotificationModel::class);
 
             $notificationModel = new $notificationModelClass();
+            /** @var CModel_Notification_NotificationModel $notificationModel */
             $notificationModel->org_id = $this->getOption('orgId');
             $notificationModel->notifiable_id = $model->getKey();
             $notificationModel->notifiable_type = get_class($model);
@@ -33,6 +36,10 @@ class CNotification_Message_Database extends CNotification_MessageAbstract {
             $notificationModel->message = $message;
             $notificationModel->createdby = $this->getOption('createdby', c::base()->username());
             $notificationModel->updatedby = $this->getOption('updatedby', c::base()->username());
+            if ($refId && $refType) {
+                $notificationModel->ref_id = $refId;
+                $notificationModel->ref_type = $refType;
+            }
             if (is_array($fields)) {
                 foreach ($fields as $key => $value) {
                     $notificationModel->$key = $value;

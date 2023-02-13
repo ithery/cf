@@ -50,7 +50,7 @@ class CRunner_FFMpeg {
 
         $this->driver = $driver ?: new CRunner_FFMpeg_Driver_PHPFFMpeg();
 
-        $this->collection = $mediaCollection ?: new CRunner_FFMpeg_MediaCollection;
+        $this->collection = $mediaCollection ?: new CRunner_FFMpeg_MediaCollection();
     }
 
     public function doClone() {
@@ -145,7 +145,7 @@ class CRunner_FFMpeg {
     }
 
     public function cleanupTemporaryFiles() {
-        CRunner_FFMpeg_Storage_TemporaryDirectories::deleteAll();
+        (new CRunner_FFMpeg_Storage_TemporaryDirectories())->deleteAll();
 
         return $this;
     }

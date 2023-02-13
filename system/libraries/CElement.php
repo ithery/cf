@@ -22,7 +22,7 @@ abstract class CElement extends CObservable {
 
     protected $after;
 
-    public function __construct($id = '', $tag = 'div') {
+    public function __construct($id = null, $tag = 'div') {
         parent::__construct($id);
 
         $this->classes = [];
@@ -106,12 +106,30 @@ abstract class CElement extends CObservable {
         return $this->classes;
     }
 
-    public function deleteAttr($k) {
+    /**
+     * Remove attr.
+     *
+     * @param string $k
+     *
+     * @return $this
+     */
+    public function removeAttr($k) {
         if (isset($this->attr[$k])) {
             unset($this->attr[$k]);
         }
 
         return $this;
+    }
+
+    /**
+     * Alias for removeAttr.
+     *
+     * @param string $k
+     *
+     * @return $this
+     */
+    public function deleteAttr($k) {
+        return $this->removeAttr($k);
     }
 
     /**

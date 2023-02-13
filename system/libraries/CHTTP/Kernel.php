@@ -12,6 +12,12 @@ use Symfony\Component\HttpFoundation\Response as SymfonyResponse;
 class CHTTP_Kernel {
     use CHTTP_Trait_OutputBufferTrait,
         CHTTP_Concern_KernelRouting;
+    /**
+     * The application's middleware stack.
+     *
+     * @var array
+     */
+    protected $middleware = [];
 
     protected $isHandled = false;
 
@@ -148,7 +154,6 @@ class CHTTP_Kernel {
                 $response = $this->handleRequest($request);
             } catch (Exception $e) {
                 $this->reportException($e);
-
                 $response = $this->renderException($request, $e);
             } catch (Throwable $e) {
                 $this->reportException($e);
@@ -164,9 +169,72 @@ class CHTTP_Kernel {
     }
 
     public function terminate($request, $response) {
+        $this->terminateMiddleware($request, $response);
+        CF::terminate();
         if (!$this->terminated) {
             $this->terminated = true;
         }
+    }
+
+    /**
+     * Call the terminate method on any terminable middleware.
+     *
+     * @param \CHTTP_Request  $request
+     * @param \CHTTP_Response $response
+     *
+     * @return void
+     */
+    protected function terminateMiddleware($request, $response) {
+        $middlewares = CHTTP::shouldSkipMiddleware() ? [] : array_merge(
+            $this->gatherRouteMiddleware($request),
+            $this->middleware
+        );
+
+        foreach ($middlewares as $middleware) {
+            if (!is_string($middleware)) {
+                continue;
+            }
+
+            list($name) = $this->parseMiddleware($middleware);
+
+            $instance = c::container()->make($name);
+
+            if (method_exists($instance, 'terminate')) {
+                $instance->terminate($request, $response);
+            }
+        }
+    }
+
+    /**
+     * Gather the route middleware for the given request.
+     *
+     * @param \CHTTP_Request $request
+     *
+     * @return array
+     */
+    protected function gatherRouteMiddleware($request) {
+        if ($route = $request->route()) {
+            return CRouting::router()->gatherRouteMiddleware($route);
+        }
+
+        return [];
+    }
+
+    /**
+     * Parse a middleware string to get the name and parameters.
+     *
+     * @param string $middleware
+     *
+     * @return array
+     */
+    protected function parseMiddleware($middleware) {
+        list($name, $parameters) = array_pad(explode(':', $middleware, 2), 2, []);
+
+        if (is_string($parameters)) {
+            $parameters = explode(',', $parameters);
+        }
+
+        return [$name, $parameters];
     }
 
     public function isHandled() {

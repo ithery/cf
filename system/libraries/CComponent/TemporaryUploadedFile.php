@@ -2,16 +2,18 @@
 
 defined('SYSPATH') or die('No direct access allowed.');
 
-/**
- * @author Hery Kurniawan <hery@itton.co.id>
- * @license Ittron Global Teknologi
- *
- * @since Nov 30, 2020
- */
 class CComponent_TemporaryUploadedFile extends CHTTP_UploadedFile {
     protected $storage;
 
+    /**
+     * @var string
+     */
     protected $path;
+
+    /**
+     * @var string
+     */
+    protected $disk;
 
     public function __construct($path, $disk) {
         $this->disk = $disk;
@@ -27,6 +29,7 @@ class CComponent_TemporaryUploadedFile extends CHTTP_UploadedFile {
         return true;
     }
 
+    #[ReturnTypeWillChange]
     public function getSize() {
         if (CF::isTesting() && c::str($this->getfilename())->contains('-size=')) {
             return (int) c::str($this->getFilename())->between('-size=', '.')->__toString();
@@ -39,10 +42,12 @@ class CComponent_TemporaryUploadedFile extends CHTTP_UploadedFile {
         return $this->storage->mimeType($this->path);
     }
 
+    #[ReturnTypeWillChange]
     public function getFilename() {
         return $this->getName($this->path);
     }
 
+    #[ReturnTypeWillChange]
     public function getRealPath() {
         return $this->storage->path($this->path);
     }

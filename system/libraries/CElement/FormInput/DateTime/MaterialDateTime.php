@@ -17,6 +17,7 @@ class CElement_FormInput_DateTime_MaterialDateTime extends CElement_FormInput_Da
 
     protected $disableTime;
 
+    protected $isAmPmEnabled;
     public function __construct($id) {
         parent::__construct($id);
         CManager::instance()->registerModule('bootstrap-4-material-datepicker');
@@ -26,6 +27,7 @@ class CElement_FormInput_DateTime_MaterialDateTime extends CElement_FormInput_Da
         $this->disableTomorrow = false;
         $this->disableDate = false;
         $this->disableTime = false;
+        $this->isAmPmEnabled = true;
 
         $dateTimeFormat = c::formatter()->getDatetimeFormat();
         if ($dateTimeFormat != null) {
@@ -41,7 +43,7 @@ class CElement_FormInput_DateTime_MaterialDateTime extends CElement_FormInput_Da
     }
 
     public static function factory($id = null) {
-        return new static($id);
+        return new CElement_FormInput_DateTime_MaterialDateTime($id);
     }
 
     public function setDateTimeFormat($format) {
@@ -81,14 +83,20 @@ class CElement_FormInput_DateTime_MaterialDateTime extends CElement_FormInput_Da
         $this->addClass('form-control');
     }
 
+    public function disableAmPm() {
+        $this->isAmPmEnabled = false;
+        return $this;
+    }
+
     public function js($indent = 0) {
         $js = new CStringBuilder();
         $js->setIndent($indent);
         $js->append(parent::js($indent))->br();
 
+        $shortTimeValue = $this->isAmPmEnabled ? 'true' : 'false';
         $option = ' weekStart: 1';
         $option .= " ,format : '" . $this->dateTimeFormat . "'";
-        $option .= ' ,shortTime: true';
+        $option .= ' ,shortTime: '. $shortTimeValue;
 
         if ($this->disableDate) {
             $option .= ' ,date: false';

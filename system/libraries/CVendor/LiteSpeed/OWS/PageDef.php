@@ -31,24 +31,34 @@ class CVendor_LiteSpeed_OWS_PageDef {
     public static function getPage($dinfo) {
         $pagedef = static::instance();
         $type = $dinfo->get(Info::FLD_VIEW);
-        $pid = $dinfo->Get(Info::FLD_PID);
+        $pid = $dinfo->get(Info::FLD_PID);
 
         return $pagedef->pageDef[$type][$pid];
     }
 
     public function getFileMap($type) {
         if (!isset($this->fileDef[$type])) {
-            $funcname = 'add_FileMap_' . $type;
-            if (!method_exists($this, $funcname)) {
-                die("invalid func name ${funcname}");
+            if ($type == 'serv') {
+                $this->addFileMapServ();
+            } elseif ($type == 'vh_') {
+                $this->addFileMapVh();
+            } elseif ($type == 'tp_') {
+                $this->addFileMapTp();
+            } elseif ($type == 'admin') {
+                $this->addFileMapAdmin();
+            } else {
+                $funcname = 'add_FileMap_' . $type;
+                if (!method_exists($this, $funcname)) {
+                    die("invalid func name ${funcname}");
+                }
+                $this->$funcname();
             }
-            $this->$funcname();
         }
 
         return $this->fileDef[$type];
     }
 
-    private function add_FileMap_serv() {
+    private function addFileMapServ() {
         $map = new TblMap(
             ['httpServerConfig', ''],
             ['S_PROCESS',
@@ -86,7 +96,7 @@ class CVendor_LiteSpeed_OWS_PageDef {
         $this->fileDef['serv'] = $map;
     }
 
-    private function add_FileMap_vh_() {
+    private function addFileMapVh() {
         $map = new TblMap(
             ['virtualHostConfig', ''],
             [
@@ -130,7 +140,7 @@ class CVendor_LiteSpeed_OWS_PageDef {
         $this->fileDef['vh_'] = $map;
     }
 
-    private function add_FileMap_tp_() {
+    private function addFileMapTp() {
         $map = new TblMap(
             ['virtualHostTemplate', ''],
             [
@@ -183,7 +193,7 @@ class CVendor_LiteSpeed_OWS_PageDef {
         $this->fileDef['tp_'] = $map;
     }
 
-    private function add_FileMap_admin() {
+    private function addFileMapAdmin() {
         $map = new TblMap(
             ['adminConfig', ''],
             ['ADM_PHP',

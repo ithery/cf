@@ -1,4 +1,5 @@
 <?php
+use Defuse\Crypto\Crypto;
 
 trait CTrait_Controller_Application_OAuth_RefreshToken {
     protected function getTitle() {
@@ -13,7 +14,29 @@ trait CTrait_Controller_Application_OAuth_RefreshToken {
         $app = c::app();
         $app->title($this->getTitle());
         $oauth = CApi::oauth($this->getApiGroup());
+
+        $widget = $app->addWidget()->setTitle('Refresh Token Decoder')->setIcon('ti ti-layers')->addClass('mb-3');
+        $form = $widget->addForm();
+        $form->addField()->setLabel('Refresh Token')->addTextControl('refresh_token')->setValue(c::request()->refresh_token);
+        if (c::request()->method() == 'POST') {
+            $refreshToken = c::request()->refresh_token;
+            $appKey = c::env('APP_KEY');
+            $encKey = base64_decode(substr($appKey, 7));
+            $crypto = null;
+
+            try {
+                $crypto = Crypto::decryptWithPassword($refreshToken, $encKey);
+            } catch (Exception $exception) {
+                c::msg('error', $exception->getMessage());
+            }
+
+            $jsonDecrypted = json_encode(json_decode($crypto, true), JSON_PRETTY_PRINT);
+            $form->addPre()->addClass('my-3')->add($jsonDecrypted);
+        }
+
+        $form->addActionList()->addAction()->setLabel('Decode')->setSubmit();
         $table = $app->addTable();
+
         $table->setDataFromModel($oauth->refreshTokenModel(), function (CModel_Query $q) {
             $q->with(['oauthAccessToken', 'oauthAccessToken.oauthClient']);
             $q->whereHas('oauthAccessToken');

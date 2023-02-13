@@ -3,7 +3,7 @@ trait CModel_Notification_HasNotificationTrait {
     /**
      * Get the entity's notifications.
      *
-     * @return \CModel_RelationMorphMany
+     * @return \CModel_Relation_MorphMany|CModel_Query<CModel_Notification_NotificationModel>
      */
     public function notification() {
         $notificationModelClass = CF::config('notification.database.model', CModel_Notification_NotificationModel::class);

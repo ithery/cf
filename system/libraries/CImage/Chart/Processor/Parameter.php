@@ -2,11 +2,17 @@
 
 class CImage_Chart_Processor_Parameter {
     use CTrait_HasOptions;
+
     protected $width;
+
     protected $height;
+
     protected $haveLabel;
+
     protected $dataLabel;
+
     protected $defaultDataLabel;
+
     protected $dataSeries;
 
     public function __construct($options) {

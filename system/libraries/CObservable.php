@@ -20,7 +20,7 @@ abstract class CObservable extends CRenderable {
      */
     protected $javascript;
 
-    protected function __construct($id = '') {
+    protected function __construct($id = null) {
         parent::__construct($id);
         $this->listeners = [];
     }

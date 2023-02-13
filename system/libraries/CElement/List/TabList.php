@@ -62,8 +62,9 @@ class CElement_List_TabList extends CElement_List {
      *
      * @return \CElement_List_TabList
      */
-    public static function factory($id) {
-        return new CElement_List_TabList($id);
+    public static function factory($id = null) {
+        /** @phpstan-ignore-next-line */
+        return new static($id);
     }
 
     /**
@@ -137,7 +138,7 @@ class CElement_List_TabList extends CElement_List {
     }
 
     /**
-     * @param string $class
+     * @param string|array $class
      *
      * @return CElement_List_TabList
      */
