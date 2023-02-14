@@ -163,6 +163,10 @@ trait CElement_Component_DataTable_Trait_HtmlTrait {
                         $js .= $this->drawActionAndGetJs($html, $dataRow, $key);
                     }
                     foreach ($this->columns as $col) {
+                        /** @var CElement_Component_DataTable_Column $col */
+                        if (!$col->isVisible()) {
+                            continue;
+                        }
                         $cell = new CElement_Component_DataTable_Cell($this, $col, $row);
 
                         $newValue = $cell->html();
@@ -413,6 +417,7 @@ trait CElement_Component_DataTable_Trait_HtmlTrait {
 
     public function htmlTHead() {
         $thClass = '';
+        /** @var CElement_Component_DataTable $this */
         if ($this->headerNoLineBreak) {
             $thClass = ' no-line-break';
         }
@@ -445,6 +450,10 @@ trait CElement_Component_DataTable_Trait_HtmlTrait {
                 $html->appendln($this->htmlActionTh());
             }
             foreach ($this->columns as $col) {
+                /** @var CElement_Component_DataTable_Column $col */
+                if (!$col->isVisible()) {
+                    continue;
+                }
                 $html->appendln($col->renderHeaderHtml($this->export_pdf, $thClass, $html->getIndent()))->br();
             }
             if ($this->getActionLocation() == 'last') {

@@ -25,4 +25,7 @@ return [
         'versioning' => false,
         'interval' => 0, // in minutes
     ],
+    'scss' => [
+        'source_map' => !CF::isProduction(),
+    ]
 ];

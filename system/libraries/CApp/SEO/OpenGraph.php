@@ -700,6 +700,24 @@ class CApp_SEO_OpenGraph implements CApp_SEO_OpenGraphInterface {
     /**
      * @inheritdoc
      */
+    public function setImages(array $urls) {
+        $this->images = $urls;
+
+        return $this;
+    }
+
+    /**
+     * @inheritdoc
+     */
+    public function setImages(array $urls) {
+        $this->images = $urls;
+
+        return $this;
+    }
+
+    /**
+     * @inheritdoc
+     */
     public function addImages(array $urls) {
         array_push($this->images, $urls);
 
