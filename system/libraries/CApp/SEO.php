@@ -87,6 +87,14 @@ class CApp_SEO {
         return $this;
     }
 
+    public function setImages($urls) {
+        $this->opengraph()->setImages(carr::wrap($urls));
+        $this->twitter()->setImage($urls);
+        $this->jsonLd()->setImages($urls);
+
+        return $this;
+    }
+
     /**
      * @inheritdoc
      */
