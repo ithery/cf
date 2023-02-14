@@ -107,6 +107,7 @@
         "value-list-comma-space-after": "always-single-line",
         "value-list-comma-space-before": "never",
         "value-list-max-empty-lines": 0,
+        "no-invalid-double-slash-comments": true,
         "scss/at-extend-no-missing-placeholder": true,
         "scss/at-if-no-null": true,
         "scss/at-import-no-partial-leading-underscore": true,
