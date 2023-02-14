@@ -25,6 +25,7 @@ class CApp_PWA_ManifestService {
             'lang' => $this->getGroupConfig('manifest.lang'),
             'display_override' => $this->getGroupConfig('manifest.display_override', []),
             'categories' => $this->getGroupConfig('manifest.categories'),
+            'splash' => $this->getGroupConfig('manifest.splash'),
         ];
         foreach ($this->getGroupConfig('manifest.icons') as $size => $file) {
             $fileInfo = pathinfo($file['path']);
