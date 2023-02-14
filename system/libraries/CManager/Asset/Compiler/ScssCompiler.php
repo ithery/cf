@@ -55,10 +55,30 @@ class CManager_Asset_Compiler_ScssCompiler {
             }
 
             $stringSass = CFile::get($this->file);
-            $compiler = new CManager_Asset_SCSS_Compiler();
+            //$compiler = new CManager_Asset_SCSS_Compiler();
+            $compiler = new CManager_Asset_SCSS_ScssPhpCompiler();
             $compiler->setImportPaths(dirname($this->file));
-            $compiled = $compiler->compile($stringSass);
+            $sourceMap = CF::config('assets.scss.source_map', !CF::isProduction());
+            $sourceMapOptions = [
+                'outputSourceFiles' => $sourceMap,
+            ];
+            if ($sourceMap) {
+                $sourceMapOptions['sourceMapWriteTo'] = $this->outFile . '.map';
+                $sourceMapOptions['sourceMapURL'] = basename($this->outFile . '.map');
+                $sourceMapOptions['sourceMapBasepath'] = dirname($this->file);
+                $sourceMapOptions['sourceMapFilename'] = basename($this->outFile);
+            }
 
+            $compiled = $compiler->compile($stringSass, $sourceMapOptions, $this->file);
+            if ($compiled instanceof \ScssPhp\ScssPhp\CompilationResult) {
+                if ($sourceMap) {
+                    $sourceMap = $compiled->getSourceMap();
+
+                    CFile::put($this->outFile . '.map', $sourceMap);
+                }
+
+                $compiled = $compiled->getCss();
+            }
             CFile::put($this->outFile, $compiled);
         }
 
