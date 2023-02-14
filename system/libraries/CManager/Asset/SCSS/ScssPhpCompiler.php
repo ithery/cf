@@ -22,10 +22,9 @@ class CManager_Asset_SCSS_ScssPhpCompiler {
     /**
      * Compile scss.
      *
-     * @param string     $code
-     * @param string     $outputFile
-     * @param null|mixed $sourceMapOptions
-     * @param null|mixed $path
+     * @param string      $code
+     * @param null|array  $sourceMapOptions
+     * @param null|string $path
      *
      * @return string
      */
