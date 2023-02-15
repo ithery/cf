@@ -28,17 +28,17 @@ return [
     'web' => [
         'enable' => false,
         'debug' => !CF::isProduction(),
-        'startUrl' => '/',
+        'start_url' => '/',
         'driver' => 'firebase',
         'options' => c::env('GOOGLE_FIREBASE_WEB_JS_CONFIG'),
         // 'groups' => [
         //     'admin' => [
         //         'enable' => true,
-        //         'startUrl' => '/admin/',
+        //         'start_url' => '/admin/',
         //     ],
         //     'app' => [
         //         'enable' => true,
-        //         'startUrl' => '/app/',
+        //         'start_url' => '/app/',
         //     ],
         // ],
     ]
