@@ -164,7 +164,7 @@ trait CElement_Component_DataTable_Trait_HtmlTrait {
                     }
                     foreach ($this->columns as $col) {
                         /** @var CElement_Component_DataTable_Column $col */
-                        if (!$col->isVisible()) {
+                        if (!$this->applyDataTable && !$col->isVisible()) {
                             continue;
                         }
                         $cell = new CElement_Component_DataTable_Cell($this, $col, $row);
@@ -451,11 +451,13 @@ trait CElement_Component_DataTable_Trait_HtmlTrait {
             }
             foreach ($this->columns as $col) {
                 /** @var CElement_Component_DataTable_Column $col */
-                if (!$col->isVisible()) {
+                if (!$this->applyDataTable && !$col->isVisible()) {
                     continue;
                 }
+
                 $html->appendln($col->renderHeaderHtml($this->export_pdf, $thClass, $html->getIndent()))->br();
             }
+
             if ($this->getActionLocation() == 'last') {
                 $html->appendln($this->htmlActionTh());
             }
