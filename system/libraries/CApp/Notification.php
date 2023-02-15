@@ -19,6 +19,8 @@ class CApp_Notification {
 
     protected $tokenLocalStorageKey;
 
+    protected $group;
+
     private static $instance;
 
     public static function instance() {
@@ -30,13 +32,13 @@ class CApp_Notification {
     }
 
     private function __construct() {
+        $this->group = null;
         $this->config = CF::config('notification.web');
-
         $this->debug = carr::get($this->config, 'debug', false);
         $this->driver = carr::get($this->config, 'driver');
         $this->startUrl = carr::get($this->config, 'startUrl', '');
-        $this->sendTokenPath = carr::get($this->config, 'sendTokenPath', 'notification/token');
-        $this->tokenLocalStorageKey = carr::get($this->config, 'tokenLocalStorageKey', 'cres-' . $this->driver . '-token');
+        $this->sendTokenPath = carr::get($this->config, 'sendTokenPath', 'notification/token' . ($this->group ? '/' . $this->group : ''));
+        $this->tokenLocalStorageKey = carr::get($this->config, 'tokenLocalStorageKey', 'cres-' . $this->driver . '-token' . ($this->group ? '-' . $this->group : ''));
         $options = carr::get($this->config, 'options', []);
         if (is_string($options)) {
             $options = json_decode($options, true);
@@ -44,10 +46,22 @@ class CApp_Notification {
         $this->options = $options;
     }
 
-    public function enable() {
+    public function enable($group = null) {
         if (!$this->enabled) {
+            $this->group = $group;
             $path = c::request()->path();
-
+            if ($this->group) {
+                $groupConfig = CF::config('notification.web.groups.' . $this->group);
+                $this->config = array_merge($this->config, $groupConfig);
+                $this->debug = carr::get($this->config, 'debug', false);
+                $this->driver = carr::get($this->config, 'driver');
+                $this->startUrl = carr::get($this->config, 'startUrl', '');
+                $this->sendTokenPath = carr::get($this->config, 'sendTokenPath', 'notification/token' . ($this->group ? '/' . $this->group : ''));
+                $this->tokenLocalStorageKey = carr::get($this->config, 'tokenLocalStorageKey', 'cres-' . $this->driver . '-token' . ($this->group ? '-' . $this->group : ''));
+            }
+            if (isset($this->config['groups'])) {
+                unset($this->config['groups']);
+            }
             if (cstr::startsWith($path, trim($this->startUrl, '/'))) {
                 c::router()->get($this->serviceWorkerUrl(), function () {
                     //disable debug bar here
