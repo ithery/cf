@@ -25,4 +25,21 @@ return [
     'database' => [
         'model' => CModel_Notification_NotificationModel::class,
     ],
+    'web' => [
+        'enable' => false,
+        'debug' => !CF::isProduction(),
+        'startUrl' => '/',
+        'driver' => 'firebase',
+        'options' => c::env('GOOGLE_FIREBASE_WEB_JS_CONFIG'),
+        // 'groups' => [
+        //     'admin' => [
+        //         'enable' => true,
+        //         'startUrl' => '/admin/',
+        //     ],
+        //     'app' => [
+        //         'enable' => true,
+        //         'startUrl' => '/app/',
+        //     ],
+        // ],
+    ]
 ];
