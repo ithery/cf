@@ -37,7 +37,7 @@ class CApp_Notification {
         $this->debug = carr::get($this->config, 'debug', false);
         $this->driver = carr::get($this->config, 'driver');
         $this->startUrl = carr::get($this->config, 'startUrl', '');
-        $this->sendTokenPath = carr::get($this->config, 'sendTokenPath', 'notification/token' . ($this->group ? '/' . $this->group : ''));
+        $this->sendTokenPath = carr::get($this->config, 'sendTokenPath', 'notification/token');
         $this->tokenLocalStorageKey = carr::get($this->config, 'tokenLocalStorageKey', 'cres-' . $this->driver . '-token' . ($this->group ? '-' . $this->group : ''));
         $options = carr::get($this->config, 'options', []);
         if (is_string($options)) {
@@ -56,7 +56,7 @@ class CApp_Notification {
                 $this->debug = carr::get($this->config, 'debug', false);
                 $this->driver = carr::get($this->config, 'driver');
                 $this->startUrl = carr::get($this->config, 'startUrl', '');
-                $this->sendTokenPath = carr::get($this->config, 'sendTokenPath', 'notification/token' . ($this->group ? '/' . $this->group : ''));
+                $this->sendTokenPath = carr::get($this->config, 'sendTokenPath', 'notification/token');
                 $this->tokenLocalStorageKey = carr::get($this->config, 'tokenLocalStorageKey', 'cres-' . $this->driver . '-token' . ($this->group ? '-' . $this->group : ''));
             }
             if (isset($this->config['groups'])) {
