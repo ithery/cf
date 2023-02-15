@@ -36,7 +36,7 @@ class CApp_Notification {
         $this->config = CF::config('notification.web');
         $this->debug = carr::get($this->config, 'debug', false);
         $this->driver = carr::get($this->config, 'driver');
-        $this->startUrl = carr::get($this->config, 'startUrl', '');
+        $this->startUrl = carr::get($this->config, 'start_url', '');
         $this->sendTokenPath = carr::get($this->config, 'sendTokenPath', 'notification/token');
         $this->tokenLocalStorageKey = carr::get($this->config, 'tokenLocalStorageKey', 'cres-' . $this->driver . '-token' . ($this->group ? '-' . $this->group : ''));
         $options = carr::get($this->config, 'options', []);
@@ -55,7 +55,7 @@ class CApp_Notification {
                 $this->config = array_merge($this->config, $groupConfig);
                 $this->debug = carr::get($this->config, 'debug', false);
                 $this->driver = carr::get($this->config, 'driver');
-                $this->startUrl = carr::get($this->config, 'startUrl', '');
+                $this->startUrl = carr::get($this->config, 'start_url', '');
                 $this->sendTokenPath = carr::get($this->config, 'sendTokenPath', 'notification/token');
                 $this->tokenLocalStorageKey = carr::get($this->config, 'tokenLocalStorageKey', 'cres-' . $this->driver . '-token' . ($this->group ? '-' . $this->group : ''));
             }
