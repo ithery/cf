@@ -6,6 +6,11 @@ return [
         'subnav' => include dirname(__FILE__) . '/elements/table.php',
     ],
     [
+        'name' => 'elements.listgroup',
+        'label' => c::__('List Group'),
+        'subnav' => include dirname(__FILE__) . '/elements/listgroup.php',
+    ],
+    [
         'name' => 'elements.widget',
         'label' => c::__('Widget'),
         'uri' => 'demo/elements/widget/index',
