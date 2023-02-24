@@ -374,6 +374,34 @@ class CAuth_Guard_SessionGuard implements CAuth_Contract_StatefulGuardInterface,
     }
 
     /**
+     * Attempt to authenticate a user with credentials and additional callbacks.
+     *
+     * @param array               $credentials
+     * @param null|array|callable $callbacks
+     * @param bool                $remember
+     *
+     * @return bool
+     */
+    public function attemptWhen(array $credentials = [], $callbacks = null, $remember = false) {
+        $this->fireAttemptEvent($credentials, $remember);
+
+        $this->lastAttempted = $user = $this->provider->retrieveByCredentials($credentials);
+
+        // This method does the exact same thing as attempt, but also executes callbacks after
+        // the user is retrieved and validated. If one of the callbacks returns falsy we do
+        // not login the user. Instead, we will fail the specific authentication attempt.
+        if ($this->hasValidCredentials($user, $credentials) && $this->shouldLogin($callbacks, $user)) {
+            $this->login($user, $remember);
+
+            return true;
+        }
+
+        $this->fireFailedEvent($user, $credentials);
+
+        return false;
+    }
+
+    /**
      * Determine if the user matches the credentials.
      *
      * @param mixed $user
@@ -552,8 +580,9 @@ class CAuth_Guard_SessionGuard implements CAuth_Contract_StatefulGuardInterface,
     protected function clearUserDataFromStorage() {
         $this->session->remove($this->getName());
         if (!is_null($this->recaller())) {
-            $this->getCookieJar()->queue($this->getCookieJar()
-                ->forget($this->getRecallerName()));
+            $this->getCookieJar()->queue(
+                $this->getCookieJar()->forget($this->getRecallerName())
+            );
         }
     }
 
