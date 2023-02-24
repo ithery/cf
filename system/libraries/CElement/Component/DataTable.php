@@ -259,6 +259,7 @@ class CElement_Component_DataTable extends CElement_Component {
         $this->labels['show'] = CManager::theme()->getData('datatable.label.show', c::__('element/datatable.show'));
         $this->labels['entries'] = CManager::theme()->getData('datatable.label.entries', c::__('element/datatable.entries'));
         $this->loadTranslation();
+        $this->actionHeaderLabel = carr::get($this->labels, 'actionHeaderLabel', $this->actionHeaderLabel);
     }
 
     protected function loadTranslation() {

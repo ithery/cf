@@ -476,6 +476,9 @@ trait CElement_Component_DataTable_Trait_JavascriptTrait {
                 $js->appendln($domElement->js());
             }
         }
+        if ($this->applyDataTable) {
+            $js->appendln("$('#" . $this->id . "').data('cappDataTable'," . $varNameOTable . ');');
+        }
 
         return $js->text();
     }
