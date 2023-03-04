@@ -13,12 +13,12 @@ defined('SYSPATH') or die('No direct access allowed.');
     <div>
         @if(!$disabledUpload)
             <span class="btn btn-file btn-primary">
-                <span class="fileupload-new"><?php echo clang::__('Select File'); ?></span>
-                <span class="fileupload-change fileupload-exists"><?php echo clang::__('Change'); ?></span>
+                <span class="fileupload-new">@lang('element/file.selectFile')</span>
+                <span class="fileupload-change fileupload-exists">@lang('element/file.change')</span>
                 <input id="input-temp-{{ $id }}" type="file" name="input-temp-{{ $id }}" style="display:none;" accept="{{ $acceptFile }}"/>
                 <input type="hidden" id="{{ $id }}" name="{{ $name }}" value="<?php echo $value; ?>" />
             </span>
-            <a href="javascript:;" class="btn fileupload-remove fileupload-exists btn-danger" data-dismiss="fileupload"><?php echo clang::__('Remove'); ?></a>
+            <a href="javascript:;" class="btn fileupload-remove fileupload-exists btn-danger" data-dismiss="fileupload">@lang('element/file.remove')</a>
         @endif
     </div>
 </div>

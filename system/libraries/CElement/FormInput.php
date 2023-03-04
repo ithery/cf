@@ -122,13 +122,13 @@ class CElement_FormInput extends CElement_Element {
     }
 
     public function setOnText($text) {
-        $this->on_text = $text;
+        $this->onText = $text;
 
         return $this;
     }
 
     public function setOffText($text) {
-        $this->off_text = $text;
+        $this->offText = $text;
 
         return $this;
     }

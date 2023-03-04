@@ -20,7 +20,7 @@ export default class Password {
         const $el = $(this.element);
         const $eye = $('<i class="fas fa-eye" aria-hidden="true"></i>');
 
-        if ($el.parent("div.input-group").length == 0) {
+        if ($el.parent('div.input-group').length == 0) {
             $el.wrap('<div class="input-group"></div>');
         }
 
@@ -30,13 +30,13 @@ export default class Password {
             .wrap('<span class="input-group-btn"></span>')
             .wrap('<button type="button" class="btn btn-view" tabindex="-1"></button>');
 
-        $el.next('span.input-group-btn').find('button.btn').click(function(event) {
-            $eye.toggleClass("fa-eye-slash fa-eye");
+        $el.next('span.input-group-btn').find('button.btn').click(function (event) {
+            $eye.toggleClass('fa-eye-slash fa-eye');
 
-            if ($el.attr("type") === "password") {
-                $el.attr("type", "text");
+            if ($el.attr('type') === 'password') {
+                $el.attr('type', 'text');
             } else {
-                $el.attr("type", "password");
+                $el.attr('type', 'password');
             }
             event.stopPropagation();
             event.preventDefault();

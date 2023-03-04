@@ -990,6 +990,9 @@ body.mini-navbar #page-wrapper {
 .loading.spinner {
     position: relative;
     opacity: 1;
+    height: auto;
+    background: none;
+    width: auto;
 }
 .loading.spinner * {
     opacity: 0.8;
