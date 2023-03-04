@@ -35,15 +35,15 @@ if ($onExists) {
         @endif
     </div>
     <div>
-        <?php if (!$disabledUpload): ?>
+        @if(!$disabledUpload)
             <span class="btn btn-file btn-primary">
-                <span class="fileupload-new">{{ c::__('Select Image') }}</span>
-                <span class="fileupload-change fileupload-exists">{{ c::__('Change') }}</span>
+                <span class="fileupload-new">@lang('element/image.selectFile')</span>
+                <span class="fileupload-change fileupload-exists">@lang('element/image.change')</span>
                 <input id="input-temp-<?php echo $id; ?>" accept="<?php echo $accept; ?>" type="file" name="input-temp-<?php echo $id; ?>" style="display:none;" accept="image/*"/>
                 <input type="hidden" id="<?php echo $id; ?>" name="<?php echo $name; ?>" value="<?php echo $value; ?>" />
             </span>
-            <a href="javascript:;" class="btn fileupload-remove fileupload-exists btn-danger" data-dismiss="fileupload"><?php echo clang::__('Remove'); ?></a>
-        <?php endif; ?>
+            <a href="javascript:;" class="btn fileupload-remove fileupload-exists btn-danger" data-dismiss="fileupload">@lang('element/image.remove')</a>
+        @endif
     </div>
 </div>
 
