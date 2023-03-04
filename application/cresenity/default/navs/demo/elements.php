@@ -61,6 +61,11 @@ return [
         'uri' => 'demo/elements/showMore/index',
     ],
     [
+        'name' => 'elements.countDownTimer',
+        'label' => c::__('Count Down Timer'),
+        'uri' => 'demo/elements/countDownTimer/index',
+    ],
+    [
         'name' => 'elements.progressBar',
         'label' => c::__('Progress Bar'),
         'uri' => 'demo/elements/progressBar/index',
