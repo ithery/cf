@@ -22,6 +22,7 @@ final class CServer_Domain {
         if (static::isTopLevelDomain($domain)) {
             return $domain;
         }
+
         $domainParts = explode('.', $domain);
 
         while (count($domainParts) > 2) {
@@ -41,6 +42,7 @@ final class CServer_Domain {
 
     public static function isTopLevelDomain($domain) {
         $domainParts = explode('.', $domain);
+
         if (count($domainParts) == 1) {
             return false;
         }
@@ -87,7 +89,7 @@ final class CServer_Domain {
         static $mozillaTlds = [];
 
         if (empty($mozillaTlds)) {
-            $tldFile = CF::findFile('data', 'tldlist');
+            $tldFile = CF::findFile('data/server', 'tlds');
             $mozillaTlds = include $tldFile;
         }
 

@@ -312,25 +312,40 @@ class CServer_Domain_Whois {
         $domain_parts = explode('.', $domain);
         $tld = strtolower(array_pop($domain_parts));
 
-        $whoisserver = carr::get(static::$whoIsServers, $tld);
-        if (!$whoisserver) {
+        $whoIsServer = carr::get(static::$whoIsServers, $tld);
+        if (!$whoIsServer) {
             return "Error: No appropriate Whois server found for ${domain} domain!";
         }
-        $result = $this->queryWhoisServer($whoisserver, $domain);
+        $result = $this->queryWhoisServer($whoIsServer, $domain);
         if (!$result) {
-            return "Error: No results retrieved from ${whoisserver} server for ${domain} domain!";
+            return "Error: No results retrieved from ${whoIsServer} server for ${domain} domain!";
         } else {
-            while (strpos($result, 'Whois Server:') !== false) {
-                preg_match('/Whois Server: (.*)/', $result, $matches);
-                $secondary = $matches[1];
-                if ($secondary) {
-                    $result = $this->queryWhoisServer($secondary, $domain);
-                    $whoisserver = $secondary;
+            $results = [];
+            $whoIsServers = [];
+
+            while (strpos(cstr::lower($result), 'whois server:') !== false) {
+                if (preg_match('#whois server: (.*)#i', cstr::lower($result), $matches)) {
+                    $results[] = $result;
+                    $whoIsServers[] = $whoIsServer;
+                    $secondary = $matches[1];
+                    $isError = $secondary != null;
+
+                    if (!$isError) {
+                        $whoIsServer = $secondary;
+                        $result = $this->queryWhoisServer($whoIsServer, $domain);
+                        $isError = $result != null;
+                    }
+                    if ($isError) {
+                        $result = carr::last($results);
+                        $whoIsServer = carr::last($whoIsServers);
+
+                        break;
+                    }
                 }
             }
         }
 
-        return "${domain} domain lookup results from ${whoisserver} server:\n\n" . $result;
+        return "${domain} domain lookup results from ${whoIsServer} server:\n\n" . $result;
     }
 
     public function lookupIP($ip, $returnType = 'text') {
@@ -410,8 +425,9 @@ class CServer_Domain_Whois {
     }
 
     public function parse($result) {
-        if (preg_match('#(.+?) domain lookup results from .+? server#ims', $result, $matches)) {
+        if (preg_match('#(.+?) domain lookup results from (.+?) server#ims', $result, $matches)) {
             $domain = $matches[1];
+            $whoIsServer = $matches[2];
             $data = explode("\n", $result);
             $data = array_slice($data, 2);
             $domain = CServer_Domain::getTopLevelDomain($domain);
@@ -419,7 +435,7 @@ class CServer_Domain_Whois {
             $tld = strtolower(array_pop($domainParts));
             $parser = new CServer_Domain_WhoIs_Parser();
             $parsed = $parser->parseDomain($data, $domain, $tld);
-            cdbg::dd($parsed);
+            $parsed['whois'] = $whoIsServer;
 
             return $parsed;
         }
