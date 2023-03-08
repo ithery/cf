@@ -383,7 +383,10 @@ class CServer_Domain_Whois {
         $port = 43;
         $timeout = 10;
 
-        $fp = @fsockopen($whoisserver, $port, $errno, $errstr, $timeout) or die('Socket Error ' . $errno . ' - ' . $errstr);
+        $fp = @fsockopen($whoisserver, $port, $errno, $errstr, $timeout);
+        if (!$fp) {
+            return '';
+        }
         //if($whoisserver == "whois.verisign-grs.com") $domain = "=".$domain; // whois.verisign-grs.com requires the equals sign ("=") or it returns any result containing the searched string.
         fputs($fp, $domain . "\r\n");
         $out = '';
