@@ -166,7 +166,7 @@ trait CModel_Chartable_ChartableTrait {
         $newQuery->from($builder);
         $query = $newQuery->select(
             CDatabase::raw("${value} as value"),
-            CDatabase::raw("CONCAT(YEAR(${dateColumn}),LPAD(MONTH(${dateColumn}),2,'0'),'-W',WEEK(${dateColumn})) as label")
+            CDatabase::raw("CONCAT(YEAR(${dateColumn}),LPAD(MONTH(${dateColumn}),2,'0'),'-W',FLOOR((DayOfMonth(${dateColumn})-1)/7)+1) as label")
         )
             ->where($dateColumn, '>=', $startDate)
             ->where($dateColumn, '<=', $stopDate)
@@ -176,8 +176,9 @@ trait CModel_Chartable_ChartableTrait {
 
         $weeks = $startDate->diffInWeeks($stopDate) + 1;
 
-        return CModel_Chartable_TimeCollection::times($weeks, function () use ($startDate, $query) {
+        $result = CModel_Chartable_TimeCollection::times($weeks, function () use ($startDate, $query) {
             $weekOfMonth = ceil($startDate->format('j') / 7);
+
             $found = $query->firstWhere(
                 'label',
                 $startDate->format('Ym') . '-W' . $weekOfMonth,
@@ -192,6 +193,8 @@ trait CModel_Chartable_ChartableTrait {
 
             return $result;
         });
+
+        return $result;
     }
 
     /**
