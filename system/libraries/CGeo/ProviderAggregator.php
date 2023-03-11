@@ -75,10 +75,8 @@ class CGeo_ProviderAggregator implements CGeo_Interface_GeocoderInterface {
     public function geocode($value, $data = []) {
         $geocodeQuery = CGeo_Query_GeocodeQuery::create($value)
             ->withLimit($this->limit);
-        if (!empty($data)) {
-            foreach ($data as $key => $value) {
-                $geocodeQuery->withData($key, $value);
-            }
+        foreach ($data as $key => $value) {
+            $geocodeQuery->withData($key, $value);
         }
 
         return $this->geocodeQuery($geocodeQuery);
@@ -90,10 +88,8 @@ class CGeo_ProviderAggregator implements CGeo_Interface_GeocoderInterface {
     public function reverse($latitude, $longitude, $data = []) {
         $reverseQuery = CGeo_Query_ReverseQuery::create(new CGeo_Model_Coordinates($latitude, $longitude))
             ->withLimit($this->limit);
-        if (!empty($data)) {
-            foreach ($data as $key => $value) {
-                $reverseQuery->withData($key, $value);
-            }
+        foreach ($data as $key => $value) {
+            $reverseQuery->withData($key, $value);
         }
 
         return $this->reverseQuery($reverseQuery);
