@@ -156,8 +156,9 @@ final class CGeo_Provider_Nominatim extends CGeo_ProviderHttpAbstract implements
             'zoom' => $query->getData('zoom', 18),
         ];
         $apikey = $query->getData('apikey');
+
+        cdbg::dd($apikey);
         if ($apikey) {
-            cdbg::dd($apikey);
             $queries['apikey'] = $apikey;
         }
         $url = $this->rootUrl
