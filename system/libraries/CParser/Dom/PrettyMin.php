@@ -116,7 +116,7 @@ class CParser_Dom_PrettyMin {
     }
 
     /**
-     * nicely indent HTML code.
+     * Nicely indent HTML code.
      *
      * @return PrettyMin
      */
@@ -235,7 +235,7 @@ class CParser_Dom_PrettyMin {
     }
 
     /**
-     * originally based on http://stackoverflow.com/a/18260955.
+     * Originally based on http://stackoverflow.com/a/18260955.
      */
     protected function removeWhitespace() {
         // Retrieve all text nodes using XPath
@@ -278,7 +278,7 @@ class CParser_Dom_PrettyMin {
     }
 
     /**
-     * indent HTML code.
+     * Indent HTML code.
      *
      * originally based on http://stackoverflow.com/a/18260955
      *
