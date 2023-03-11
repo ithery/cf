@@ -157,7 +157,6 @@ final class CGeo_Provider_Nominatim extends CGeo_ProviderHttpAbstract implements
         ];
         $apikey = $query->getData('apikey');
 
-        cdbg::dd($apikey);
         if ($apikey) {
             $queries['apikey'] = $apikey;
         }
