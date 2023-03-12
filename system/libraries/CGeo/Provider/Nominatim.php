@@ -83,10 +83,6 @@ final class CGeo_Provider_Nominatim extends CGeo_ProviderHttpAbstract implements
             'extratags' => 1,
             'limit' => $query->getLimit(),
         ];
-        $apikey = $query->getData('apikey');
-        if ($apikey) {
-            $queries['apikey'] = $apikey;
-        }
         $key = $query->getData('key');
         if ($key) {
             $queries['key'] = $key;
@@ -159,11 +155,8 @@ final class CGeo_Provider_Nominatim extends CGeo_ProviderHttpAbstract implements
             'addressdetails' => 1,
             'zoom' => $query->getData('zoom', 18),
         ];
-        $apikey = $query->getData('apikey');
         $key = $query->getData('key');
-        if ($apikey) {
-            $queries['apikey'] = $apikey;
-        }
+
         if ($key) {
             $queries['key'] = $key;
         }
