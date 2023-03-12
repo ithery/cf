@@ -87,6 +87,10 @@ final class CGeo_Provider_Nominatim extends CGeo_ProviderHttpAbstract implements
         if ($apikey) {
             $queries['apikey'] = $apikey;
         }
+        $key = $query->getData('key');
+        if ($key) {
+            $queries['key'] = $key;
+        }
 
         $url = $this->rootUrl
             . '/search' . $this->getExtension() . '?'
@@ -156,9 +160,12 @@ final class CGeo_Provider_Nominatim extends CGeo_ProviderHttpAbstract implements
             'zoom' => $query->getData('zoom', 18),
         ];
         $apikey = $query->getData('apikey');
-
+        $key = $query->getData('key');
         if ($apikey) {
             $queries['apikey'] = $apikey;
+        }
+        if ($key) {
+            $queries['key'] = $key;
         }
         $url = $this->rootUrl
             . '/reverse' . $this->getExtension() . '?'
