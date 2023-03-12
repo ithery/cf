@@ -2,7 +2,7 @@
 
 trait CElement_Component_DataTable_Trait_JavascriptTrait {
     public function js($indent = 0) {
-        $quickSearchPlaceholder = $this->quickSearchPlaceholder ? "'" . $this->quickSearchPlaceholder . "'" : "'Search ' + title";
+        $quickSearchPlaceholder = $this->quickSearchPlaceholder ? "'" . $this->quickSearchPlaceholder . "'" : "'".c::__('element/datatable.search')." ' + title";
 
         /** @var CElement_Component_DataTable $this */
         $this->buildOnce();
