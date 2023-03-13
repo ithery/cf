@@ -158,9 +158,11 @@ class CRouting_RouteData {
 
                     if (preg_match('#' . $key . '#ims', $uri, $matches)) {
                         $matchesBracket = array_slice($matches, 1);
+                        $matchesBracket ? $callbackArgs = array_merge($callbackArgs, $matchesBracket) : $callbackArgs = array_merge($callbackArgs, $bracketKeys);
+                        $val = call_user_func_array($val, $callbackArgs);
+                    } else {
+                        $val = null;
                     }
-                    $matchesBracket ? $callbackArgs = array_merge($callbackArgs, $matchesBracket) : $callbackArgs = array_merge($callbackArgs, $bracketKeys);
-                    $val = call_user_func_array($val, $callbackArgs);
 
                     if ($val == null) {
                         continue;
