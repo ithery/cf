@@ -9,9 +9,9 @@ defined('SYSPATH') or die('No direct access allowed.');
 //@codingStandardsIgnoreStart
 trait CTrait_Compat_Element_FormInput_Date {
     /**
-     * @param type $placeholder
+     * @param string $placeholder
      *
-     * @return type
+     * @return $this
      *
      * @deprecated since version 1.2
      */
@@ -20,10 +20,10 @@ trait CTrait_Compat_Element_FormInput_Date {
     }
 
     /**
-     * @param type  $placeholder
-     * @param mixed $str
+     * @param string $placeholder
+     * @param mixed  $str
      *
-     * @return type
+     * @return $this
      *
      * @deprecated since version 1.2
      */

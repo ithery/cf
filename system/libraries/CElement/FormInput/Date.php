@@ -17,7 +17,7 @@ class CElement_FormInput_Date extends CElement_FormInput {
 
     protected $startDate;
 
-    protected $end_date;
+    protected $endDate;
 
     protected $disable_day;
 
@@ -39,7 +39,7 @@ class CElement_FormInput_Date extends CElement_FormInput {
 
         $this->have_button = false;
         $this->startDate = '';
-        $this->end_date = '';
+        $this->endDate = '';
         $this->disable_day = [];
         $this->inline = false;
         $this->addClass('form-control');
@@ -47,6 +47,12 @@ class CElement_FormInput_Date extends CElement_FormInput {
 
     public function setStartDate($str) {
         $this->startDate = $str;
+
+        return $this;
+    }
+
+    public function setEndDate($str) {
+        $this->endDate = $str;
 
         return $this;
     }
@@ -206,8 +212,8 @@ class CElement_FormInput_Date extends CElement_FormInput {
         if (strlen($this->startDate) > 0) {
             $jsOption .= ",startDate: '" . $this->startDate . "'";
         }
-        if (strlen($this->end_date) > 0) {
-            $jsOption .= ",endDate: '" . $this->end_date . "'";
+        if (strlen($this->endDate) > 0) {
+            $jsOption .= ",endDate: '" . $this->endDate . "'";
         }
         if (strlen($disable_day_str)) {
             $jsOption .= ",daysOfWeekDisabled: '" . $disable_day_str . "'";
