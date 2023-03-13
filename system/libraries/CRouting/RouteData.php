@@ -160,9 +160,6 @@ class CRouting_RouteData {
                         $matchesBracket = array_slice($matches, 1);
                         $matchesBracket ? $callbackArgs = array_merge($callbackArgs, $matchesBracket) : $callbackArgs = array_merge($callbackArgs, $bracketKeys);
                         $val = call_user_func_array($val, $callbackArgs);
-                        if ($val != null) {
-                            break;
-                        }
                     } else {
                         $val = null;
                     }
@@ -175,7 +172,6 @@ class CRouting_RouteData {
                 // Trim slashes
                 $key = trim($key, '/');
                 $val = trim($val, '/');
-
                 if (preg_match('#^' . $key . '#ims', $uri)) {
                     if (strpos($val, '$') !== false) {
                         // Use regex routing
