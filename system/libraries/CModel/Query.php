@@ -14,6 +14,7 @@ defined('SYSPATH') or die('No direct access allowed.');
  *
  * @template TModelClass of CModel
  *
+ * @method static TModelClass              create($attributes = [])                                                              Find a model by its primary key.
  * @method        mixed               value($column)                                                                           Get a single column's value from the first result of a query.
  * @method        mixed               pluck($column)                                                                           Get a single column's value from the first result of a query.
  * @method        void                chunk($count, callable $callback)                                                        Chunk the results of the query.

@@ -9,6 +9,7 @@ defined('SYSPATH') or die('No direct access allowed.');
 /**
  * Class CModel.
  *
+ * @method static                            static                                     create($attributes = [])                                                              Find a model by its primary key.
  * @method static                            static|null                                find($id, $columns = ['*'])                                                              Find a model by its primary key.
  * @method static                            CModel_Collection                          findMany($ids, $columns = ['*'])                                                         Find a model by its primary key.
  * @method static                            static                                     findOrFail($id, $columns = ['*'])                                                        Find a model by its primary key or throw an exception.
