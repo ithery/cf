@@ -16,6 +16,11 @@ return [
         'uri' => 'demo/module/color/index',
     ],
     [
+        'name' => 'module.broadcast',
+        'label' => c::__('Broadcast'),
+        'subnav' => include dirname(__FILE__) . '/module/broadcast.php',
+    ],
+    [
         'name' => 'module.bot',
         'label' => c::__('Chat Bot'),
         'uri' => 'demo/module/bot/index',

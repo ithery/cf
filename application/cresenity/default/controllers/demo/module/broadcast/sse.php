@@ -1,7 +1,7 @@
 <?php
 use React\EventLoop\Factory;
 
-class Controller_Demo_Module_Sse extends \Cresenity\Demo\Controller {
+class Controller_Demo_Module_Broadcast_Sse extends \Cresenity\Demo\Controller {
     protected $bot;
 
     public function __construct() {
@@ -12,7 +12,7 @@ class Controller_Demo_Module_Sse extends \Cresenity\Demo\Controller {
         $app = c::app();
         $app->setTitle('SSE');
 
-        $app->addView('demo.page.module.sse');
+        $app->addView('demo.page.module.broadcast.sse');
 
         return $app;
     }
