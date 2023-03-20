@@ -1,3 +1,6 @@
+<div>
+    <a href="#" class="btn btn-primary" id="btn-send">Send</a>
+</div>
 <div id="sse-event">
 </div>
 
@@ -10,16 +13,21 @@
                 broadcaster: 'sse',
             });
 
-            window.csocket.connector.connection.addEventListener('connected', () => {
-                console.log('connected with SSE');
+            // window.csocket.connector.connection.addEventListener('connected', () => {
+            //     console.log('connected with SSE');
+            // });
+            window.csocket.channel("event-stream").listen("NewEvent", (e) => {
+                cresenity.toast('success',e.message);
             });
-
-            window.csocket.channel("event-stream").listen("NewEvent", (e) =>
-                tweets.value.unshift(e)
-            );
 
         }
 
+    });
+    const btnSend = document.getElementById('btn-send');
+    btnSend.addEventListener('click', async () => {
+        let response = await fetch('/demo/module/broadcast/sse/send');
+        let json = await response.json();
+        console.log(json);
     });
 </script>
 @CAppEndPushScript

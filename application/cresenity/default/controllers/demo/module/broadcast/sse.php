@@ -1,5 +1,4 @@
 <?php
-use React\EventLoop\Factory;
 
 class Controller_Demo_Module_Broadcast_Sse extends \Cresenity\Demo\Controller {
     protected $bot;
@@ -17,6 +16,13 @@ class Controller_Demo_Module_Broadcast_Sse extends \Cresenity\Demo\Controller {
         return $app;
     }
 
-    public function event() {
+    public function send() {
+        CBroadcast::manager()->driver('sse')->broadcast(['event-stream'], 'NewEvent', [
+            'message' => 'Hello World',
+        ]);
+
+        return c::response()->json([
+            'status' => 'ok',
+        ]);
     }
 }

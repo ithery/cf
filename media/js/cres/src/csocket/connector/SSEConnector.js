@@ -9,7 +9,6 @@ import SSEPresenceChannel from './sse/sse-presence-channel';
 export class SSEConnector extends Connector {
     constructor(options) {
         super({ endpoint: '/cresenity/sse', ...options });
-        this.connection = null;
         this.channels = [];
     }
 

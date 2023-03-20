@@ -43,7 +43,7 @@ class CBroadcast_SSE_ServerSentEventStream implements CInterface_Responsable {
         $socket = CBroadcast::manager()->socket($request);
 
         return $this->responseFactory->stream(function () use ($request, $socket) {
-            (new CBroadcast_SSE_ServerSentEvent('connected', $socket, $request->hasHeader('Last-Event-ID') ? $request->header('Last-Event-ID') : 'wave'))();
+            (new CBroadcast_SSE_ServerSentEvent('connected', $socket, $request->hasHeader('Last-Event-ID') ? $request->header('Last-Event-ID') : 'cresenity-sse'))();
 
             $handler = $this->eventHandler($request, $socket);
 

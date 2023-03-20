@@ -2,10 +2,10 @@
 
 class CBroadcast_SSE_Subscriber_RedisSubscriber implements CBroadcast_SSE_Contract_ServerSentEventSubscriberInterface {
     public function start(Closure $onMessage, CHTTP_Request $request) {
-        $redisConnectionName = CF::config('broadcast.connections.redis.connection');
+        $redisConnectionName = CF::config('broadcast.connections.sse.connection');
 
         /** @var \CRedis_Connection_PhpRedisConnection|\CRedis_Connection_PredisConnection $connection */
-        $connection = CRedis::instance()->connection("{$redisConnectionName}-subscription");
+        $connection = CRedis::instance()->connection("{$redisConnectionName}");
 
         register_shutdown_function(function () use ($request, $connection) {
             if (connection_aborted()) {

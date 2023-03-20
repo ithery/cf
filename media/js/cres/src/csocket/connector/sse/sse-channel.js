@@ -45,7 +45,6 @@ export default class SSEChannel extends Channel {
         if (!this.events.find(e => e === event)) {
             this.events.push(event);
         }
-
         this.connection.subscribe(`${this.name}.${event}`, callback);
 
         return this;

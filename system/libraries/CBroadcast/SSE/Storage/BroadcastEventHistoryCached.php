@@ -1,10 +1,5 @@
 <?php
 
-use Illuminate\Support\Str;
-use Illuminate\Support\Collection;
-use Illuminate\Contracts\Cache\Repository;
-use Illuminate\Contracts\Config\Repository as ConfigRepository;
-
 class CBroadcast_SSE_Storage_BroadcastEventHistoryCached implements CBroadcast_SSE_Contract_BroadcastEventHistoryInterface {
     protected $lifetime;
 
@@ -15,7 +10,10 @@ class CBroadcast_SSE_Storage_BroadcastEventHistoryCached implements CBroadcast_S
 
     protected $config;
 
-    public function __construct($cache, $lifetime = 60) {
+    public function __construct($cache = null, $lifetime = 60) {
+        if ($cache === null) {
+            $cache = c::cache()->store();
+        }
         $this->cache = $cache;
         if ($lifetime == null) {
             $lifetime = CF::config('broadcast.sse.resume_lifetime', 60);
@@ -65,7 +63,9 @@ class CBroadcast_SSE_Storage_BroadcastEventHistoryCached implements CBroadcast_S
             'timestamp' => time(),
         ]);
 
-        $events = $events->filter(fn ($event) => time() - $event['timestamp'] < $this->lifetime)->values();
+        $events = $events->filter(function ($event) {
+            return time() - $event['timestamp'] < $this->lifetime;
+        })->values();
 
         $this->cache->put('broadcasted_events', $events, $this->lifetime);
 
