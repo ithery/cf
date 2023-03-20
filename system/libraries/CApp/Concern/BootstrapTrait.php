@@ -163,10 +163,10 @@ trait CApp_Concern_BootstrapTrait {
                 'quill' => CElement_FormInput_Textarea_Quill::class,
                 'file' => CElement_FormInput_File::class,
                 'ckeditor' => CFormInputCKEditor::class,
-                'filedrop' => CFormInputFileDrop::class,
-                'slider' => CFormInputSlider::class,
-                'tooltip' => CFormInputTooltip::class,
-                'fileupload' => CFormInputFileUpload::class,
+                //'filedrop' => CFormInputFileDrop::class,
+                //'slider' => CFormInputSlider::class,
+                //'tooltip' => CFormInputTooltip::class,
+                'fileupload' => CElement_FormInput_MultipleImageAjax::class,
                 'wysiwyg' => CFormInputWysiwyg::class,
             ]);
 
