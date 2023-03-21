@@ -68,6 +68,23 @@ class CModel_Relation_HasManyThrough extends CModel_Relation {
     }
 
     /**
+     * Convert the relationship to a "has one through" relationship.
+     *
+     * @return \CModel_Relation_HasOneThrough
+     */
+    public function one() {
+        return new CModel_Relation_HasOneThrough(
+            $this->getQuery(),
+            $this->farParent,
+            $this->throughParent,
+            $this->getFirstKeyName(),
+            $this->secondKey,
+            $this->getLocalKeyName(),
+            $this->getSecondLocalKeyName(),
+        );
+    }
+
+    /**
      * Set the base constraints on the relation query.
      *
      * @return void
