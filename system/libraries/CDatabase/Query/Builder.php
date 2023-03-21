@@ -2008,6 +2008,17 @@ class CDatabase_Query_Builder {
     }
 
     /**
+     * Get all of the query builder's columns in a text-only array with all expressions evaluated.
+     *
+     * @return array
+     */
+    public function getColumns() {
+        return !is_null($this->columns)
+                ? array_map(fn ($column) => $this->grammar->getValue($column), $this->columns)
+                : [];
+    }
+
+    /**
      * Create a raw database expression.
      *
      * @param mixed $value

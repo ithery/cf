@@ -376,6 +376,34 @@ trait CDatabase_Trait_Builder {
     }
 
     /**
+     * Get the original column name of the given column, without any aliasing.
+     *
+     * @param \CDatabase_Query_Builder|\CModel_Query $builder
+     * @param string                                 $parameter
+     *
+     * @return string
+     */
+    protected function getOriginalColumnNameForCursorPagination($builder, string $parameter) {
+        $columns = $builder instanceof CModel_Query ? $builder->getQuery()->getColumns() : $builder->getColumns();
+
+        if (!is_null($columns)) {
+            foreach ($columns as $column) {
+                if (($position = strripos($column, ' as ')) !== false) {
+                    $original = substr($column, 0, $position);
+
+                    $alias = substr($column, $position + 4);
+
+                    if ($parameter === $alias || $builder->getGrammar()->wrap($parameter) === $alias) {
+                        return $original;
+                    }
+                }
+            }
+        }
+
+        return $parameter;
+    }
+
+    /**
      * Create a new length-aware paginator instance.
      *
      * @param CCollection $items
