@@ -1253,6 +1253,43 @@ class CDatabase_Query_Builder {
     }
 
     /**
+     * Get a paginator only supporting simple next and previous links.
+     *
+     * This is more efficient on larger data-sets, etc.
+     *
+     * @param null|int                        $perPage
+     * @param array|string                    $columns
+     * @param string                          $cursorName
+     * @param null|\CPagination_Cursor|string $cursor
+     *
+     * @return \CPagination_CursorPaginatorInterface
+     */
+    public function cursorPaginate($perPage = 15, $columns = ['*'], $cursorName = 'cursor', $cursor = null) {
+        return $this->paginateUsingCursor($perPage, $columns, $cursorName, $cursor);
+    }
+
+    /**
+     * Ensure the proper order by required for cursor pagination.
+     *
+     * @param bool $shouldReverse
+     *
+     * @return \CCollection
+     */
+    protected function ensureOrderForCursorPagination($shouldReverse = false) {
+        $this->enforceOrderBy();
+
+        return c::collect($this->orders ?? $this->unionOrders ?? [])->filter(function ($order) {
+            return carr::has($order, 'direction');
+        })->when($shouldReverse, function (CCollection $orders) {
+            return $orders->map(function ($order) {
+                $order['direction'] = $order['direction'] === 'asc' ? 'desc' : 'asc';
+
+                return $order;
+            });
+        })->values();
+    }
+
+    /**
      * Get the count of the total records for the paginator.
      *
      * @param array $columns

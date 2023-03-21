@@ -14,7 +14,7 @@ defined('SYSPATH') or die('No direct access allowed.');
  *
  * @template TModelClass of CModel
  *
- * @method static TModelClass              create($attributes = [])                                                              Find a model by its primary key.
+ * @method static TModelClass         create($attributes = [])                                                                 Find a model by its primary key.
  * @method        mixed               value($column)                                                                           Get a single column's value from the first result of a query.
  * @method        mixed               pluck($column)                                                                           Get a single column's value from the first result of a query.
  * @method        void                chunk($count, callable $callback)                                                        Chunk the results of the query.
@@ -808,6 +808,49 @@ class CModel_Query {
             'path' => CPagination_Paginator::resolveCurrentPath(),
             'pageName' => $pageName,
         ]);
+    }
+
+    /**
+     * Paginate the given query into a cursor paginator.
+     *
+     * @param null|int                        $perPage
+     * @param array|string                    $columns
+     * @param string                          $cursorName
+     * @param null|\CPagination_Cursor|string $cursor
+     *
+     * @return \CPagination_CursorPaginatorInterface
+     */
+    public function cursorPaginate($perPage = null, $columns = ['*'], $cursorName = 'cursor', $cursor = null) {
+        $perPage = $perPage ?: $this->model->getPerPage();
+
+        return $this->paginateUsingCursor($perPage, $columns, $cursorName, $cursor);
+    }
+
+    /**
+     * Ensure the proper order by required for cursor pagination.
+     *
+     * @param bool $shouldReverse
+     *
+     * @return \CCollection
+     */
+    protected function ensureOrderForCursorPagination($shouldReverse = false) {
+        if (empty($this->query->orders) && empty($this->query->unionOrders)) {
+            $this->enforceOrderBy();
+        }
+
+        if ($shouldReverse) {
+            $this->query->orders = c::collect($this->query->orders)->map(function ($order) {
+                $order['direction'] = $order['direction'] === 'asc' ? 'desc' : 'asc';
+
+                return $order;
+            })->toArray();
+        }
+
+        if ($this->query->unionOrders) {
+            return c::collect($this->query->unionOrders);
+        }
+
+        return c::collect($this->query->orders);
     }
 
     /**

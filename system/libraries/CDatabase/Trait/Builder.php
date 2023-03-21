@@ -284,52 +284,95 @@ trait CDatabase_Trait_Builder {
     }
 
     /**
-     * Apply the callback's query changes if the given "value" is true.
+     * Paginate the given query using a cursor paginator.
      *
-     * @param mixed    $value
-     * @param callable $callback
-     * @param callable $default
+     * @param int                             $perPage
+     * @param array|string                    $columns
+     * @param string                          $cursorName
+     * @param null|\CPagination_Cursor|string $cursor
      *
-     * @return mixed|$this
+     * @return \CPagination_CursorPaginatorInterface
      */
-    public function when($value, $callback, $default = null) {
-        if ($value) {
-            return $callback($this, $value) ?: $this;
-        } elseif ($default) {
-            return $default($this, $value) ?: $this;
+    protected function paginateUsingCursor($perPage, $columns = ['*'], $cursorName = 'cursor', $cursor = null) {
+        if (!$cursor instanceof CPagination_Cursor) {
+            $cursor = is_string($cursor)
+                ? CPagination_Cursor::fromEncoded($cursor)
+                : CPagination_CursorPaginator::resolveCurrentCursor($cursorName, $cursor);
         }
 
-        return $this;
-    }
+        $orders = $this->ensureOrderForCursorPagination(!is_null($cursor) && $cursor->pointsToPreviousItems());
 
-    /**
-     * Pass the query to a given callback.
-     *
-     * @param \Closure $callback
-     *
-     * @return $this
-     */
-    public function tap($callback) {
-        return $this->when(true, $callback);
-    }
+        if (!is_null($cursor)) {
+            $addCursorConditions = function (self $builder, $previousColumn, $i) use (&$addCursorConditions, $cursor, $orders) {
+                $unionBuilders = isset($builder->unions) ? c::collect($builder->unions)->pluck('query') : c::collect();
 
-    /**
-     * Apply the callback's query changes if the given "value" is false.
-     *
-     * @param mixed    $value
-     * @param callable $callback
-     * @param callable $default
-     *
-     * @return mixed
-     */
-    public function unless($value, $callback, $default = null) {
-        if (!$value) {
-            return $callback($this, $value) ?: $this;
-        } elseif ($default) {
-            return $default($this, $value) ?: $this;
+                if (!is_null($previousColumn)) {
+                    $originalColumn = $this->getOriginalColumnNameForCursorPagination($this, $previousColumn);
+
+                    $builder->where(
+                        cstr::contains($originalColumn, ['(', ')']) ? new CDatabase_Query_Expression($originalColumn) : $originalColumn,
+                        '=',
+                        $cursor->parameter($previousColumn)
+                    );
+
+                    $unionBuilders->each(function ($unionBuilder) use ($previousColumn, $cursor) {
+                        $unionBuilder->where(
+                            $this->getOriginalColumnNameForCursorPagination($this, $previousColumn),
+                            '=',
+                            $cursor->parameter($previousColumn)
+                        );
+
+                        $this->addBinding($unionBuilder->getRawBindings()['where'], 'union');
+                    });
+                }
+
+                $builder->where(function (self $builder) use ($addCursorConditions, $cursor, $orders, $i, $unionBuilders) {
+                    list('column' => $column, 'direction' => $direction) = $orders[$i];
+
+                    $originalColumn = $this->getOriginalColumnNameForCursorPagination($this, $column);
+
+                    $builder->where(
+                        cstr::contains($originalColumn, ['(', ')']) ? new CDatabase_Query_Expression($originalColumn) : $originalColumn,
+                        $direction === 'asc' ? '>' : '<',
+                        $cursor->parameter($column)
+                    );
+
+                    if ($i < $orders->count() - 1) {
+                        $builder->orWhere(function (self $builder) use ($addCursorConditions, $column, $i) {
+                            $addCursorConditions($builder, $column, $i + 1);
+                        });
+                    }
+
+                    $unionBuilders->each(function ($unionBuilder) use ($column, $direction, $cursor, $i, $orders, $addCursorConditions) {
+                        $unionBuilder->where(function ($unionBuilder) use ($column, $direction, $cursor, $i, $orders, $addCursorConditions) {
+                            $unionBuilder->where(
+                                $this->getOriginalColumnNameForCursorPagination($this, $column),
+                                $direction === 'asc' ? '>' : '<',
+                                $cursor->parameter($column)
+                            );
+
+                            if ($i < $orders->count() - 1) {
+                                $unionBuilder->orWhere(function (self $builder) use ($addCursorConditions, $column, $i) {
+                                    $addCursorConditions($builder, $column, $i + 1);
+                                });
+                            }
+
+                            $this->addBinding($unionBuilder->getRawBindings()['where'], 'union');
+                        });
+                    });
+                });
+            };
+
+            $addCursorConditions($this, null, 0);
         }
 
-        return $this;
+        $this->limit($perPage + 1);
+
+        return $this->cursorPaginator($this->get($columns), $perPage, $cursor, [
+            'path' => CPagination_Paginator::resolveCurrentPath(),
+            'cursorName' => $cursorName,
+            'parameters' => $orders->pluck('column')->toArray(),
+        ]);
     }
 
     /**
@@ -370,5 +413,37 @@ trait CDatabase_Trait_Builder {
             'currentPage',
             'options'
         ));
+    }
+
+    /**
+     * Create a new cursor paginator instance.
+     *
+     * @param \CCollection        $items
+     * @param int                 $perPage
+     * @param \CPagination_Cursor $cursor
+     * @param array               $options
+     *
+     * @return \CPagination_CursorPaginator
+     */
+    protected function cursorPaginator($items, $perPage, $cursor, $options) {
+        return CContainer::getInstance()->makeWith(CPagination_CursorPaginator::class, compact(
+            'items',
+            'perPage',
+            'cursor',
+            'options'
+        ));
+    }
+
+    /**
+     * Pass the query to a given callback.
+     *
+     * @param callable $callback
+     *
+     * @return $this
+     */
+    public function tap($callback) {
+        $callback($this);
+
+        return $this;
     }
 }
