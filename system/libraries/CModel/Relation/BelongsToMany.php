@@ -990,6 +990,44 @@ class CModel_Relation_BelongsToMany extends CModel_Relation {
     }
 
     /**
+     * Query lazily, by chunks of the given size.
+     *
+     * @param int $chunkSize
+     *
+     * @return \CCollection_LazyCollection
+     */
+    public function lazy($chunkSize = 1000) {
+        return $this->prepareQueryBuilder()->lazy($chunkSize)->map(function ($model) {
+            $this->hydratePivotRelation([$model]);
+
+            return $model;
+        });
+    }
+
+    /**
+     * Query lazily, by chunking the results of a query by comparing IDs.
+     *
+     * @param int         $chunkSize
+     * @param null|string $column
+     * @param null|string $alias
+     *
+     * @return \CCollection_LazyCollection
+     */
+    public function lazyById($chunkSize = 1000, $column = null, $alias = null) {
+        $column ??= $this->getRelated()->qualifyColumn(
+            $this->getRelatedKeyName()
+        );
+
+        $alias ??= $this->getRelatedKeyName();
+
+        return $this->prepareQueryBuilder()->lazyById($chunkSize, $column, $alias)->map(function ($model) {
+            $this->hydratePivotRelation([$model]);
+
+            return $model;
+        });
+    }
+
+    /**
      * Get a lazy collection for the given query.
      *
      * @return CCollection_LazyCollection
@@ -1002,6 +1040,15 @@ class CModel_Relation_BelongsToMany extends CModel_Relation {
 
             return $model;
         });
+    }
+
+    /**
+     * Prepare the query builder for query execution.
+     *
+     * @return \CModel_Query
+     */
+    protected function prepareQueryBuilder() {
+        return $this->query->addSelect($this->shouldSelect());
     }
 
     /**

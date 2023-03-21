@@ -1,6 +1,8 @@
 <?php
 
 class CModel_Relation_HasManyThrough extends CModel_Relation {
+    use CModel_Relation_Trait_InteractsWithDictionary;
+
     /**
      * The "through" parent model instance.
      *
