@@ -77,6 +77,13 @@ abstract class CPagination_CursorPaginatorAbstract implements CInterface_Htmlabl
     protected static $currentCursorResolver;
 
     /**
+     * Indicates whether there are more items in the data source.
+     *
+     * @return bool
+     */
+    protected $hasMore;
+
+    /**
      * Get the URL for a given cursor.
      *
      * @param null|\CPagination_Cursor $cursor
