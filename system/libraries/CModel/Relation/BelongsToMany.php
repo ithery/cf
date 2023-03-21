@@ -906,6 +906,24 @@ class CModel_Relation_BelongsToMany extends CModel_Relation {
     }
 
     /**
+     * Paginate the given query into a cursor paginator.
+     *
+     * @param null|int    $perPage
+     * @param array       $columns
+     * @param string      $cursorName
+     * @param null|string $cursor
+     *
+     * @return \CPagination_CursorPaginatorInterface
+     */
+    public function cursorPaginate($perPage = null, $columns = ['*'], $cursorName = 'cursor', $cursor = null) {
+        $this->query->addSelect($this->shouldSelect($columns));
+
+        return c::tap($this->query->cursorPaginate($perPage, $columns, $cursorName, $cursor), function ($paginator) {
+            $this->hydratePivotRelation($paginator->items());
+        });
+    }
+
+    /**
      * Chunk the results of the query.
      *
      * @param int      $count
