@@ -12,6 +12,7 @@ class CElement_Component_Action extends CElement_Component {
     use CTrait_Compat_Element_Action,
         CTrait_Element_Property_Label,
         CTrait_Element_Property_Icon;
+
     protected $jsfunc;
 
     protected $disabled;
@@ -84,11 +85,15 @@ class CElement_Component_Action extends CElement_Component {
     }
 
     /**
-     * @param bool $bool
+     * @param bool|string $bool
      *
      * @return $this
      */
     public function setConfirm($bool = true) {
+        if (is_string($bool)) {
+            $this->setConfirmMessage($bool);
+            $this->confirm = true;
+        }
         $this->confirm = $bool;
 
         return $this;
