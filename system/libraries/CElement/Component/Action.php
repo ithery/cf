@@ -93,6 +93,8 @@ class CElement_Component_Action extends CElement_Component {
         if (is_string($bool)) {
             $this->setConfirmMessage($bool);
             $this->confirm = true;
+
+            return $this;
         }
         $this->confirm = $bool;
 
