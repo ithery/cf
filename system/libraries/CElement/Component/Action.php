@@ -15,6 +15,9 @@ class CElement_Component_Action extends CElement_Component {
 
     protected $jsfunc;
 
+    /**
+     * @var bool
+     */
     protected $disabled;
 
     protected $type;
@@ -35,10 +38,16 @@ class CElement_Component_Action extends CElement_Component {
 
     protected $jsparam;
 
+    /**
+     * @var bool
+     */
     protected $confirm;
 
     protected $style;
 
+    /**
+     * @var string
+     */
     protected $confirmMessage;
 
     protected $button;
@@ -47,6 +56,9 @@ class CElement_Component_Action extends CElement_Component {
 
     protected $value;
 
+    /**
+     * @var bool
+     */
     protected $isActive = false;
 
     /**
