@@ -142,8 +142,8 @@ trait CElement_Component_DataTable_Trait_HtmlTrait {
                     $no++;
                     $key = '';
 
-                    if (array_key_exists($this->keyField, $row)) {
-                        $key = $row[$this->keyField];
+                    if ($dataRow->exists($this->keyField)) {
+                        $key = $dataRow->getValue($this->keyField);
                     }
                     $html->appendln('<tr id="tr-' . $key . '">')->incIndent()->br();
 
