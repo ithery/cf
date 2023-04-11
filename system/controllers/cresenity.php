@@ -459,4 +459,12 @@ class Controller_Cresenity extends CController {
             return c::response()->json($response);
         }
     }
+
+    public function sse() {
+        $request = c::request();
+        $request->headers->set('X-Socket-Id', sprintf('%d.%d', random_int(1, 1_000_000_000), random_int(1, 1_000_000_000)));
+        $responseFactory = CBroadcast_SSE::createServerSentEventStream();
+
+        return $responseFactory->toResponse($request);
+    }
 }

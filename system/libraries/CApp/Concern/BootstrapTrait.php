@@ -115,6 +115,8 @@ trait CApp_Concern_BootstrapTrait {
             CView::blade()->directive('CAppMessage', [CApp_Blade_Directive::class, 'message']);
             CView::blade()->directive('CAppPWA', [CApp_Blade_Directive::class, 'pwa']);
             CView::blade()->directive('CAppReact', [CApp_Blade_Directive::class, 'react']);
+            CView::blade()->directive('CAppStartReact', [CApp_Blade_Directive::class, 'startReact']);
+            CView::blade()->directive('CAppEndReact', [CApp_Blade_Directive::class, 'endReact']);
             CView::blade()->directive('CAppPreloader', [CApp_Blade_Directive::class, 'preloader']);
             static::$registerBladeBooted = true;
         }
@@ -161,10 +163,10 @@ trait CApp_Concern_BootstrapTrait {
                 'quill' => CElement_FormInput_Textarea_Quill::class,
                 'file' => CElement_FormInput_File::class,
                 'ckeditor' => CFormInputCKEditor::class,
-                'filedrop' => CFormInputFileDrop::class,
-                'slider' => CFormInputSlider::class,
-                'tooltip' => CFormInputTooltip::class,
-                'fileupload' => CFormInputFileUpload::class,
+                //'filedrop' => CFormInputFileDrop::class,
+                //'slider' => CFormInputSlider::class,
+                //'tooltip' => CFormInputTooltip::class,
+                'fileupload' => CElement_FormInput_MultipleImageAjax::class,
                 'wysiwyg' => CFormInputWysiwyg::class,
             ]);
 

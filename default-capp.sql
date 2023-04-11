@@ -51,6 +51,7 @@ CREATE TABLE IF NOT EXISTS `roles` (
   `rgt` bigint(20) DEFAULT NULL,
   `is_base` tinyint(4) NOT NULL DEFAULT '0',
   `name` varchar(60) DEFAULT NULL COMMENT 'The name of an entity (record) is used as an default search option in addition to the search key. The name is up to 60 characters in length.',
+  `type` varchar(255) DEFAULT NULL,
   `description` varchar(255) DEFAULT NULL,
   `store_id` bigint(20) DEFAULT NULL,
   `role_level` int(11) DEFAULT '0',

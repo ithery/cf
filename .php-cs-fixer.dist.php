@@ -19,7 +19,7 @@ return $config->setRules([
         'strategy' => 'no_multi_line',
     ],
     'encoding' => true,
-    'explicit_string_variable' => true,
+    'explicit_string_variable' => false,
     'single_quote' => true,
     'constant_case' => true,
     'binary_operator_spaces' => [
