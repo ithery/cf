@@ -68,6 +68,7 @@ class CModel_Console_PropertiesHelper {
             CModel_Relation_HasManyThrough::class,
             CModel_Relation_HasManyDeep::class,
             CModel_Relation_MorphMany::class,
+            CModel_Relation_MorphOne::class,
             CModel_Relation_HasOne::class,
         ];
 
@@ -135,7 +136,7 @@ class CModel_Console_PropertiesHelper {
         ) {
             $relationType = 'CModel_Collection|' . $relationClass . '[]';
         }
-        if ($returnType == CModel_Relation_HasOne::class) {
+        if ($returnType == CModel_Relation_HasOne::class || $returnType == CModel_Relation_MorphOne::class) {
             $relationType = 'null|' . $relationClass;
         }
 
