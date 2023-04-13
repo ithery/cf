@@ -1153,7 +1153,9 @@ trait CModel_Nested_NestedTrait {
             $this->getParentIdName(),
             $this->getLftName(),
             $this->getRgtName(),
+            $this->getDepthName(),
         ];
+
         $except = $except ? array_unique(array_merge($except, $defaults)) : $defaults;
 
         return parent::replicate($except);
