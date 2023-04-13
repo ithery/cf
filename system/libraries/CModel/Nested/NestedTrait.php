@@ -3,6 +3,8 @@
 defined('SYSPATH') or die('No direct access allowed.');
 /**
  * @property static $getParent
+ *
+ * @see https://github.com/lazychaser/laravel-nestedset
  */
 trait CModel_Nested_NestedTrait {
     /**
