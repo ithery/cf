@@ -227,4 +227,15 @@ class CLogger {
     public static function logger() {
         return CLogger_Manager::instance();
     }
+
+    /**
+     * Get a log channel instance.
+     *
+     * @param null|string $channel
+     *
+     * @return \Psr\Log\LoggerInterface
+     */
+    public static function channel($channel = null) {
+        return CLogger_Manager::instance()->channel($channel);
+    }
 }
