@@ -43,6 +43,8 @@ class CLogger {
 
     protected $threshold;
 
+    protected $writers = [];
+
     /**
      * @var CLogger Singleton instance container
      */
@@ -85,7 +87,7 @@ class CLogger {
         }
 
         $writer = CLogger_Writer::factory($type, $options);
-        $this->_writers[$writer->__toString()] = [
+        $this->writers[$writer->__toString()] = [
             'object' => $writer,
             'levels' => $levels,
         ];
@@ -194,7 +196,7 @@ class CLogger {
         // Reset the messages array
         $this->messages = [];
 
-        foreach ($this->_writers as $writer) {
+        foreach ($this->writers as $writer) {
             if (empty($writer['levels'])) {
                 // Write all of the messages
                 $writer['object']->write($messages);
@@ -219,6 +221,9 @@ class CLogger {
         return static::$logLevels;
     }
 
+    /**
+     * @return CLogger_Manager
+     */
     public static function logger() {
         return CLogger_Manager::instance();
     }

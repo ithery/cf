@@ -24,6 +24,18 @@ class CCrypt_Encrypter implements CCrypt_EncrypterInterface {
     protected $cipher;
 
     /**
+     * The supported cipher algorithms and their properties.
+     *
+     * @var array
+     */
+    private static $supportedCiphers = [
+        'aes-128-cbc' => ['size' => 16, 'aead' => false],
+        'aes-256-cbc' => ['size' => 32, 'aead' => false],
+        'aes-128-gcm' => ['size' => 16, 'aead' => true],
+        'aes-256-gcm' => ['size' => 32, 'aead' => true],
+    ];
+
+    /**
      * Create a new encrypter instance.
      *
      * @param string $key
@@ -33,15 +45,15 @@ class CCrypt_Encrypter implements CCrypt_EncrypterInterface {
      *
      * @return void
      */
-    public function __construct($key, $cipher = 'AES-128-CBC') {
+    public function __construct($key, $cipher = 'aes-128-cbc') {
         $key = (string) $key;
+        if (!static::supported($key, $cipher)) {
+            $ciphers = implode(', ', array_keys(self::$supportedCiphers));
 
-        if (static::supported($key, $cipher)) {
-            $this->key = $key;
-            $this->cipher = $cipher;
-        } else {
-            throw new RuntimeException('The only supported ciphers are AES-128-CBC and AES-256-CBC with the correct key lengths.');
+            throw new RuntimeException("Unsupported cipher or incorrect key length. Supported ciphers are: {$ciphers}.");
         }
+        $this->key = $key;
+        $this->cipher = $cipher;
     }
 
     /**
@@ -53,10 +65,11 @@ class CCrypt_Encrypter implements CCrypt_EncrypterInterface {
      * @return bool
      */
     public static function supported($key, $cipher) {
-        $length = mb_strlen($key, '8bit');
+        if (!isset(self::$supportedCiphers[strtolower($cipher)])) {
+            return false;
+        }
 
-        return ($cipher === 'AES-128-CBC' && $length === 16)
-                || ($cipher === 'AES-256-CBC' && $length === 32);
+        return mb_strlen($key, '8bit') === self::$supportedCiphers[strtolower($cipher)]['size'];
     }
 
     /**
@@ -67,7 +80,12 @@ class CCrypt_Encrypter implements CCrypt_EncrypterInterface {
      * @return string
      */
     public static function generateKey($cipher) {
-        return random_bytes($cipher === 'AES-128-CBC' ? 16 : 32);
+        $size = 32;
+        if (isset(self::$supportedCiphers[strtolower($cipher)], self::$supportedCiphers[strtolower($cipher)]['size'])) {
+            $size = self::$supportedCiphers[strtolower($cipher)]['size'];
+        }
+
+        return random_bytes(self::$supportedCiphers[strtolower($cipher)]['size'] ?? 32);
     }
 
     /**
@@ -81,30 +99,31 @@ class CCrypt_Encrypter implements CCrypt_EncrypterInterface {
      * @return string
      */
     public function encrypt($value, $serialize = true) {
-        $iv = random_bytes(openssl_cipher_iv_length($this->cipher));
+        $iv = random_bytes(openssl_cipher_iv_length(strtolower($this->cipher)));
 
         // First we will encrypt the value using OpenSSL. After this is encrypted we
         // will proceed to calculating a MAC for the encrypted value so that this
         // value can be verified later as not having been changed by the users.
         $value = \openssl_encrypt(
             $serialize ? serialize($value) : $value,
-            $this->cipher,
+            strtolower($this->cipher),
             $this->key,
             0,
-            $iv
+            $iv,
+            $tag
         );
 
         if ($value === false) {
             throw new CCrypt_Exception_EncryptException('Could not encrypt the data.');
         }
+        $iv = base64_encode($iv);
+        $tag = base64_encode($tag ?: '');
 
-        // Once we get the encrypted value we'll go ahead and base64_encode the input
-        // vector and create the MAC for the encrypted value so we can then verify
-        // its authenticity. Then, we'll JSON the data into the "payload" array.
-        $mac = $this->hash($iv = base64_encode($iv), $value);
+        $mac = self::$supportedCiphers[strtolower($this->cipher)]['aead']
+            ? '' // For AEAD-algorithms, the tag / MAC is returned by openssl_encrypt...
+            : $this->hash($iv, $value);
 
-        $json = json_encode(compact('iv', 'value', 'mac'), JSON_UNESCAPED_SLASHES);
-
+        $json = json_encode(compact('iv', 'value', 'mac', 'tag'), JSON_UNESCAPED_SLASHES);
         if (json_last_error() !== JSON_ERROR_NONE) {
             throw new CCrypt_Exception_EncryptException('Could not encrypt the data.');
         }
@@ -139,7 +158,9 @@ class CCrypt_Encrypter implements CCrypt_EncrypterInterface {
         $payload = $this->getJsonPayload($payload);
 
         $iv = base64_decode($payload['iv']);
-
+        $this->ensureTagIsValid(
+            $tag = empty($payload['tag']) ? null : base64_decode($payload['tag'])
+        );
         // Here we will decrypt the value. If we are able to successfully decrypt it
         // we will then unserialize it and return it out to the caller. If we are
         // unable to decrypt this value we will throw out an exception message.
@@ -148,7 +169,8 @@ class CCrypt_Encrypter implements CCrypt_EncrypterInterface {
             $this->cipher,
             $this->key,
             0,
-            $iv
+            $iv,
+            $tag ?: ''
         );
 
         if ($decrypted === false) {
@@ -202,7 +224,7 @@ class CCrypt_Encrypter implements CCrypt_EncrypterInterface {
             throw new CCrypt_Exception_DecryptException('The payload is invalid.');
         }
 
-        if (!$this->validMac($payload)) {
+        if (!self::$supportedCiphers[strtolower($this->cipher)]['aead'] && !$this->validMac($payload)) {
             throw new CCrypt_Exception_DecryptException('The MAC is invalid.');
         }
 
@@ -217,8 +239,21 @@ class CCrypt_Encrypter implements CCrypt_EncrypterInterface {
      * @return bool
      */
     protected function validPayload($payload) {
-        return is_array($payload) && isset($payload['iv'], $payload['value'], $payload['mac'])
-                && strlen(base64_decode($payload['iv'], true)) === openssl_cipher_iv_length($this->cipher);
+        if (!is_array($payload)) {
+            return false;
+        }
+
+        foreach (['iv', 'value', 'mac'] as $item) {
+            if (!isset($payload[$item]) || !is_string($payload[$item])) {
+                return false;
+            }
+        }
+
+        if (isset($payload['tag']) && !is_string($payload['tag'])) {
+            return false;
+        }
+
+        return strlen(base64_decode($payload['iv'], true)) === openssl_cipher_iv_length(strtolower($this->cipher));
     }
 
     /**
@@ -233,6 +268,23 @@ class CCrypt_Encrypter implements CCrypt_EncrypterInterface {
             $this->hash($payload['iv'], $payload['value']),
             $payload['mac']
         );
+    }
+
+    /**
+     * Ensure the given tag is a valid tag given the selected cipher.
+     *
+     * @param string $tag
+     *
+     * @return void
+     */
+    protected function ensureTagIsValid($tag) {
+        if (self::$supportedCiphers[strtolower($this->cipher)]['aead'] && strlen($tag) !== 16) {
+            throw new CCrypt_Exception_DecryptException('Could not decrypt the data.');
+        }
+
+        if (!self::$supportedCiphers[strtolower($this->cipher)]['aead'] && is_string($tag)) {
+            throw new CCrypt_Exception_DecryptException('Unable to use tag because the cipher algorithm does not support AEAD.');
+        }
     }
 
     /**

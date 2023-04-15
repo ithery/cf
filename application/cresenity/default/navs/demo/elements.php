@@ -6,6 +6,11 @@ return [
         'subnav' => include dirname(__FILE__) . '/elements/table.php',
     ],
     [
+        'name' => 'elements.listgroup',
+        'label' => c::__('List Group'),
+        'subnav' => include dirname(__FILE__) . '/elements/listgroup.php',
+    ],
+    [
         'name' => 'elements.widget',
         'label' => c::__('Widget'),
         'uri' => 'demo/elements/widget/index',
@@ -54,6 +59,11 @@ return [
         'name' => 'elements.showMore',
         'label' => c::__('Show More'),
         'uri' => 'demo/elements/showMore/index',
+    ],
+    [
+        'name' => 'elements.countDownTimer',
+        'label' => c::__('Count Down Timer'),
+        'uri' => 'demo/elements/countDownTimer/index',
     ],
     [
         'name' => 'elements.progressBar',

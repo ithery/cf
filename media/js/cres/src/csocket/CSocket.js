@@ -1,4 +1,4 @@
-import { PusherConnector, NullConnector } from './connector';
+import { PusherConnector, NullConnector, SSEConnector } from './connector';
 /* global Vue,axios */
 
 /**
@@ -31,6 +31,8 @@ export default class CSocket {
     connect() {
         if (this.options.broadcaster == 'pusher') {
             this.connector = new PusherConnector(this.options);
+        } else if (this.options.broadcaster == 'sse') {
+            this.connector = new SSEConnector(this.options);
         } else if (this.options.broadcaster == 'null') {
             this.connector = new NullConnector(this.options);
         } else if (typeof this.options.broadcaster == 'function') {

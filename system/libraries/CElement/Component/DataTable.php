@@ -15,6 +15,7 @@ class CElement_Component_DataTable extends CElement_Component {
         CElement_Component_DataTable_Trait_CheckboxTrait,
         CElement_Component_DataTable_Trait_SearchTrait,
         CElement_Component_DataTable_Trait_FooterTrait;
+
     const ACTION_LOCATION_FIRST = 'first';
 
     const ACTION_LOCATION_LAST = 'last';
@@ -165,6 +166,8 @@ class CElement_Component_DataTable extends CElement_Component {
      */
     protected $buttons = [];
 
+    protected $domElements = [];
+
     public function __construct($id = '') {
         parent::__construct($id);
         $this->defaultPagingList['-1'] = c::__('ALL');
@@ -256,6 +259,7 @@ class CElement_Component_DataTable extends CElement_Component {
         $this->labels['show'] = CManager::theme()->getData('datatable.label.show', c::__('element/datatable.show'));
         $this->labels['entries'] = CManager::theme()->getData('datatable.label.entries', c::__('element/datatable.entries'));
         $this->loadTranslation();
+        $this->actionHeaderLabel = carr::get($this->labels, 'actionHeaderLabel', $this->actionHeaderLabel);
     }
 
     protected function loadTranslation() {
@@ -1032,5 +1036,14 @@ class CElement_Component_DataTable extends CElement_Component {
         }
 
         return null;
+    }
+
+    public function setDomElement($key, $value) {
+        if ($value instanceof Closure) {
+            $value = c::toSerializableClosure($value);
+        }
+        $this->domElements[$key] = $value;
+
+        return $this;
     }
 }

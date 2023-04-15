@@ -6,4 +6,6 @@ return  [
     'uploadFile' => 'Upload File',
     'errorMessageLimitFile' => 'Only :limit file can be uploaded',
     'errorMessageMaxUploadSize' => 'File Size is more than :sizeMB MB',
+    'selectFile' => 'Select File',
+    'change' => 'Change',
 ];

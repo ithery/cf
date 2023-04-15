@@ -89,6 +89,9 @@ class CModel_Console_PropertiesHelper {
                         foreach ($matches as $match) {
                             $returnTypes = explode('|', $match);
                             foreach ($returnTypes as $returnType) {
+                                if (cstr::startsWith($returnType, '\\')) {
+                                    $returnType = cstr::substr($returnType, 1);
+                                }
                                 if (in_array($returnType, $returnTypeClasses)) {
                                     list($relationClass, $isWithTrashed) = static::getRelationClass($method);
                                     if ($relationClass && $relationType = static::getRelationType($returnType, $relationClass, $isWithTrashed)) {

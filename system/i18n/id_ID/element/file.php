@@ -7,4 +7,7 @@ return  [
     'uploadFile' => 'Unggah File',
     'errorMessageLimitFile' => 'Hanya :limit file yang dapat diupload',
     'errorMessageMaxUploadSize' => 'Ukuran file melebihi :sizeMB MB',
+    'selectFile' => 'Pilih File',
+    'change' => 'Ubah',
+
 ];

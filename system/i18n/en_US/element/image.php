@@ -6,4 +6,6 @@ return  [
     'errorMessageLimitFile' => 'Only :limit image can be uploaded',
     'errorMessageMaxUploadSize' => 'Image Size is more than :sizeMB MB',
     'errorMessageImageOnly' => 'Only image type can be uploaded',
+    'selectFile' => 'Select File',
+    'change' => 'Change',
 ];

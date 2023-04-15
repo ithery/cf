@@ -50,17 +50,17 @@ use CarbonV3\Exceptions\BadFluentConstructorException;
  * @property      int    $microExcludeMilli Remaining microseconds without the milliseconds.
  * @property      int    $dayzExcludeWeeks  Total days remaining in the final week of the current instance (days % 7).
  * @property      int    $daysExcludeWeeks  alias of dayzExcludeWeeks
- * @property-read float  $totalYears Number of years equivalent to the interval.
- * @property-read float  $totalMonths Number of months equivalent to the interval.
- * @property-read float  $totalWeeks Number of weeks equivalent to the interval.
- * @property-read float  $totalDays Number of days equivalent to the interval.
- * @property-read float  $totalDayz Alias for totalDays.
- * @property-read float  $totalHours Number of hours equivalent to the interval.
- * @property-read float  $totalMinutes Number of minutes equivalent to the interval.
- * @property-read float  $totalSeconds Number of seconds equivalent to the interval.
+ * @property-read float  $totalYears        Number of years equivalent to the interval.
+ * @property-read float  $totalMonths       Number of months equivalent to the interval.
+ * @property-read float  $totalWeeks        Number of weeks equivalent to the interval.
+ * @property-read float  $totalDays         Number of days equivalent to the interval.
+ * @property-read float  $totalDayz         Alias for totalDays.
+ * @property-read float  $totalHours        Number of hours equivalent to the interval.
+ * @property-read float  $totalMinutes      Number of minutes equivalent to the interval.
+ * @property-read float  $totalSeconds      Number of seconds equivalent to the interval.
  * @property-read float  $totalMilliseconds Number of milliseconds equivalent to the interval.
  * @property-read float  $totalMicroseconds Number of microseconds equivalent to the interval.
- * @property-read string $locale locale of the current instance
+ * @property-read string $locale            locale of the current instance
  *
  * @method static CarbonInterval years($years = 1)                                                                                                                          Create instance specifying a number of years or modify the number of years if called on an instance.
  * @method static CarbonInterval year($years = 1) Alias for years()
@@ -83,102 +83,102 @@ use CarbonV3\Exceptions\BadFluentConstructorException;
  * @method static CarbonInterval millisecond($milliseconds = 1) Alias for milliseconds()
  * @method static CarbonInterval microseconds($microseconds = 1)                                                                                                            Create instance specifying a number of microseconds or modify the number of microseconds if called on an instance.
  * @method static CarbonInterval microsecond($microseconds = 1) Alias for microseconds()
- * @method $this  addYears(int $years)                                                                                                                                      Add given number of years to the current interval
- * @method $this  subYears(int $years)                                                                                                                                      Subtract given number of years to the current interval
- * @method $this  addMonths(int $months)                                                                                                                                    Add given number of months to the current interval
- * @method $this  subMonths(int $months)                                                                                                                                    Subtract given number of months to the current interval
- * @method $this  addWeeks(int|float $weeks)                                                                                                                                Add given number of weeks to the current interval
- * @method $this  subWeeks(int|float $weeks)                                                                                                                                Subtract given number of weeks to the current interval
- * @method $this  addDays(int|float $days)                                                                                                                                  Add given number of days to the current interval
- * @method $this  subDays(int|float $days)                                                                                                                                  Subtract given number of days to the current interval
- * @method $this  addHours(int|float $hours)                                                                                                                                Add given number of hours to the current interval
- * @method $this  subHours(int|float $hours)                                                                                                                                Subtract given number of hours to the current interval
- * @method $this  addMinutes(int|float $minutes)                                                                                                                            Add given number of minutes to the current interval
- * @method $this  subMinutes(int|float $minutes)                                                                                                                            Subtract given number of minutes to the current interval
- * @method $this  addSeconds(int|float $seconds)                                                                                                                            Add given number of seconds to the current interval
- * @method $this  subSeconds(int|float $seconds)                                                                                                                            Subtract given number of seconds to the current interval
- * @method $this  addMilliseconds(int|float $milliseconds)                                                                                                                  Add given number of milliseconds to the current interval
- * @method $this  subMilliseconds(int|float $milliseconds)                                                                                                                  Subtract given number of milliseconds to the current interval
- * @method $this  addMicroseconds(int|float $microseconds)                                                                                                                  Add given number of microseconds to the current interval
- * @method $this  subMicroseconds(int|float $microseconds)                                                                                                                  Subtract given number of microseconds to the current interval
- * @method $this  roundYear(int|float $precision = 1, string $function = "round")                                                                                           Round the current instance year with given precision using the given function.
- * @method $this  roundYears(int|float $precision = 1, string $function = "round")                                                                                          Round the current instance year with given precision using the given function.
- * @method $this  floorYear(int|float $precision = 1)                                                                                                                       Truncate the current instance year with given precision.
- * @method $this  floorYears(int|float $precision = 1)                                                                                                                      Truncate the current instance year with given precision.
- * @method $this  ceilYear(int|float $precision = 1)                                                                                                                        Ceil the current instance year with given precision.
- * @method $this  ceilYears(int|float $precision = 1)                                                                                                                       Ceil the current instance year with given precision.
- * @method $this  roundMonth(int|float $precision = 1, string $function = "round")                                                                                          Round the current instance month with given precision using the given function.
- * @method $this  roundMonths(int|float $precision = 1, string $function = "round")                                                                                         Round the current instance month with given precision using the given function.
- * @method $this  floorMonth(int|float $precision = 1)                                                                                                                      Truncate the current instance month with given precision.
- * @method $this  floorMonths(int|float $precision = 1)                                                                                                                     Truncate the current instance month with given precision.
- * @method $this  ceilMonth(int|float $precision = 1)                                                                                                                       Ceil the current instance month with given precision.
- * @method $this  ceilMonths(int|float $precision = 1)                                                                                                                      Ceil the current instance month with given precision.
- * @method $this  roundWeek(int|float $precision = 1, string $function = "round")                                                                                           Round the current instance day with given precision using the given function.
- * @method $this  roundWeeks(int|float $precision = 1, string $function = "round")                                                                                          Round the current instance day with given precision using the given function.
- * @method $this  floorWeek(int|float $precision = 1)                                                                                                                       Truncate the current instance day with given precision.
- * @method $this  floorWeeks(int|float $precision = 1)                                                                                                                      Truncate the current instance day with given precision.
- * @method $this  ceilWeek(int|float $precision = 1)                                                                                                                        Ceil the current instance day with given precision.
- * @method $this  ceilWeeks(int|float $precision = 1)                                                                                                                       Ceil the current instance day with given precision.
- * @method $this  roundDay(int|float $precision = 1, string $function = "round")                                                                                            Round the current instance day with given precision using the given function.
- * @method $this  roundDays(int|float $precision = 1, string $function = "round")                                                                                           Round the current instance day with given precision using the given function.
- * @method $this  floorDay(int|float $precision = 1)                                                                                                                        Truncate the current instance day with given precision.
- * @method $this  floorDays(int|float $precision = 1)                                                                                                                       Truncate the current instance day with given precision.
- * @method $this  ceilDay(int|float $precision = 1)                                                                                                                         Ceil the current instance day with given precision.
- * @method $this  ceilDays(int|float $precision = 1)                                                                                                                        Ceil the current instance day with given precision.
- * @method $this  roundHour(int|float $precision = 1, string $function = "round")                                                                                           Round the current instance hour with given precision using the given function.
- * @method $this  roundHours(int|float $precision = 1, string $function = "round")                                                                                          Round the current instance hour with given precision using the given function.
- * @method $this  floorHour(int|float $precision = 1)                                                                                                                       Truncate the current instance hour with given precision.
- * @method $this  floorHours(int|float $precision = 1)                                                                                                                      Truncate the current instance hour with given precision.
- * @method $this  ceilHour(int|float $precision = 1)                                                                                                                        Ceil the current instance hour with given precision.
- * @method $this  ceilHours(int|float $precision = 1)                                                                                                                       Ceil the current instance hour with given precision.
- * @method $this  roundMinute(int|float $precision = 1, string $function = "round")                                                                                         Round the current instance minute with given precision using the given function.
- * @method $this  roundMinutes(int|float $precision = 1, string $function = "round")                                                                                        Round the current instance minute with given precision using the given function.
- * @method $this  floorMinute(int|float $precision = 1)                                                                                                                     Truncate the current instance minute with given precision.
- * @method $this  floorMinutes(int|float $precision = 1)                                                                                                                    Truncate the current instance minute with given precision.
- * @method $this  ceilMinute(int|float $precision = 1)                                                                                                                      Ceil the current instance minute with given precision.
- * @method $this  ceilMinutes(int|float $precision = 1)                                                                                                                     Ceil the current instance minute with given precision.
- * @method $this  roundSecond(int|float $precision = 1, string $function = "round")                                                                                         Round the current instance second with given precision using the given function.
- * @method $this  roundSeconds(int|float $precision = 1, string $function = "round")                                                                                        Round the current instance second with given precision using the given function.
- * @method $this  floorSecond(int|float $precision = 1)                                                                                                                     Truncate the current instance second with given precision.
- * @method $this  floorSeconds(int|float $precision = 1)                                                                                                                    Truncate the current instance second with given precision.
- * @method $this  ceilSecond(int|float $precision = 1)                                                                                                                      Ceil the current instance second with given precision.
- * @method $this  ceilSeconds(int|float $precision = 1)                                                                                                                     Ceil the current instance second with given precision.
- * @method $this  roundMillennium(int|float $precision = 1, string $function = "round")                                                                                     Round the current instance millennium with given precision using the given function.
- * @method $this  roundMillennia(int|float $precision = 1, string $function = "round")                                                                                      Round the current instance millennium with given precision using the given function.
- * @method $this  floorMillennium(int|float $precision = 1)                                                                                                                 Truncate the current instance millennium with given precision.
- * @method $this  floorMillennia(int|float $precision = 1)                                                                                                                  Truncate the current instance millennium with given precision.
- * @method $this  ceilMillennium(int|float $precision = 1)                                                                                                                  Ceil the current instance millennium with given precision.
- * @method $this  ceilMillennia(int|float $precision = 1)                                                                                                                   Ceil the current instance millennium with given precision.
- * @method $this  roundCentury(int|float $precision = 1, string $function = "round")                                                                                        Round the current instance century with given precision using the given function.
- * @method $this  roundCenturies(int|float $precision = 1, string $function = "round")                                                                                      Round the current instance century with given precision using the given function.
- * @method $this  floorCentury(int|float $precision = 1)                                                                                                                    Truncate the current instance century with given precision.
- * @method $this  floorCenturies(int|float $precision = 1)                                                                                                                  Truncate the current instance century with given precision.
- * @method $this  ceilCentury(int|float $precision = 1)                                                                                                                     Ceil the current instance century with given precision.
- * @method $this  ceilCenturies(int|float $precision = 1)                                                                                                                   Ceil the current instance century with given precision.
- * @method $this  roundDecade(int|float $precision = 1, string $function = "round")                                                                                         Round the current instance decade with given precision using the given function.
- * @method $this  roundDecades(int|float $precision = 1, string $function = "round")                                                                                        Round the current instance decade with given precision using the given function.
- * @method $this  floorDecade(int|float $precision = 1)                                                                                                                     Truncate the current instance decade with given precision.
- * @method $this  floorDecades(int|float $precision = 1)                                                                                                                    Truncate the current instance decade with given precision.
- * @method $this  ceilDecade(int|float $precision = 1)                                                                                                                      Ceil the current instance decade with given precision.
- * @method $this  ceilDecades(int|float $precision = 1)                                                                                                                     Ceil the current instance decade with given precision.
- * @method $this  roundQuarter(int|float $precision = 1, string $function = "round")                                                                                        Round the current instance quarter with given precision using the given function.
- * @method $this  roundQuarters(int|float $precision = 1, string $function = "round")                                                                                       Round the current instance quarter with given precision using the given function.
- * @method $this  floorQuarter(int|float $precision = 1)                                                                                                                    Truncate the current instance quarter with given precision.
- * @method $this  floorQuarters(int|float $precision = 1)                                                                                                                   Truncate the current instance quarter with given precision.
- * @method $this  ceilQuarter(int|float $precision = 1)                                                                                                                     Ceil the current instance quarter with given precision.
- * @method $this  ceilQuarters(int|float $precision = 1)                                                                                                                    Ceil the current instance quarter with given precision.
- * @method $this  roundMillisecond(int|float $precision = 1, string $function = "round")                                                                                    Round the current instance millisecond with given precision using the given function.
- * @method $this  roundMilliseconds(int|float $precision = 1, string $function = "round")                                                                                   Round the current instance millisecond with given precision using the given function.
- * @method $this  floorMillisecond(int|float $precision = 1)                                                                                                                Truncate the current instance millisecond with given precision.
- * @method $this  floorMilliseconds(int|float $precision = 1)                                                                                                               Truncate the current instance millisecond with given precision.
- * @method $this  ceilMillisecond(int|float $precision = 1)                                                                                                                 Ceil the current instance millisecond with given precision.
- * @method $this  ceilMilliseconds(int|float $precision = 1)                                                                                                                Ceil the current instance millisecond with given precision.
- * @method $this  roundMicrosecond(int|float $precision = 1, string $function = "round")                                                                                    Round the current instance microsecond with given precision using the given function.
- * @method $this  roundMicroseconds(int|float $precision = 1, string $function = "round")                                                                                   Round the current instance microsecond with given precision using the given function.
- * @method $this  floorMicrosecond(int|float $precision = 1)                                                                                                                Truncate the current instance microsecond with given precision.
- * @method $this  floorMicroseconds(int|float $precision = 1)                                                                                                               Truncate the current instance microsecond with given precision.
- * @method $this  ceilMicrosecond(int|float $precision = 1)                                                                                                                 Ceil the current instance microsecond with given precision.
- * @method $this  ceilMicroseconds(int|float $precision = 1)                                                                                                                Ceil the current instance microsecond with given precision.
+ * @method        $this          addYears(int $years)                                                                                                                       Add given number of years to the current interval
+ * @method        $this          subYears(int $years)                                                                                                                       Subtract given number of years to the current interval
+ * @method        $this          addMonths(int $months)                                                                                                                     Add given number of months to the current interval
+ * @method        $this          subMonths(int $months)                                                                                                                     Subtract given number of months to the current interval
+ * @method        $this          addWeeks(int|float $weeks)                                                                                                                 Add given number of weeks to the current interval
+ * @method        $this          subWeeks(int|float $weeks)                                                                                                                 Subtract given number of weeks to the current interval
+ * @method        $this          addDays(int|float $days)                                                                                                                   Add given number of days to the current interval
+ * @method        $this          subDays(int|float $days)                                                                                                                   Subtract given number of days to the current interval
+ * @method        $this          addHours(int|float $hours)                                                                                                                 Add given number of hours to the current interval
+ * @method        $this          subHours(int|float $hours)                                                                                                                 Subtract given number of hours to the current interval
+ * @method        $this          addMinutes(int|float $minutes)                                                                                                             Add given number of minutes to the current interval
+ * @method        $this          subMinutes(int|float $minutes)                                                                                                             Subtract given number of minutes to the current interval
+ * @method        $this          addSeconds(int|float $seconds)                                                                                                             Add given number of seconds to the current interval
+ * @method        $this          subSeconds(int|float $seconds)                                                                                                             Subtract given number of seconds to the current interval
+ * @method        $this          addMilliseconds(int|float $milliseconds)                                                                                                   Add given number of milliseconds to the current interval
+ * @method        $this          subMilliseconds(int|float $milliseconds)                                                                                                   Subtract given number of milliseconds to the current interval
+ * @method        $this          addMicroseconds(int|float $microseconds)                                                                                                   Add given number of microseconds to the current interval
+ * @method        $this          subMicroseconds(int|float $microseconds)                                                                                                   Subtract given number of microseconds to the current interval
+ * @method        $this          roundYear(int|float $precision = 1, string $function = "round")                                                                            Round the current instance year with given precision using the given function.
+ * @method        $this          roundYears(int|float $precision = 1, string $function = "round")                                                                           Round the current instance year with given precision using the given function.
+ * @method        $this          floorYear(int|float $precision = 1)                                                                                                        Truncate the current instance year with given precision.
+ * @method        $this          floorYears(int|float $precision = 1)                                                                                                       Truncate the current instance year with given precision.
+ * @method        $this          ceilYear(int|float $precision = 1)                                                                                                         Ceil the current instance year with given precision.
+ * @method        $this          ceilYears(int|float $precision = 1)                                                                                                        Ceil the current instance year with given precision.
+ * @method        $this          roundMonth(int|float $precision = 1, string $function = "round")                                                                           Round the current instance month with given precision using the given function.
+ * @method        $this          roundMonths(int|float $precision = 1, string $function = "round")                                                                          Round the current instance month with given precision using the given function.
+ * @method        $this          floorMonth(int|float $precision = 1)                                                                                                       Truncate the current instance month with given precision.
+ * @method        $this          floorMonths(int|float $precision = 1)                                                                                                      Truncate the current instance month with given precision.
+ * @method        $this          ceilMonth(int|float $precision = 1)                                                                                                        Ceil the current instance month with given precision.
+ * @method        $this          ceilMonths(int|float $precision = 1)                                                                                                       Ceil the current instance month with given precision.
+ * @method        $this          roundWeek(int|float $precision = 1, string $function = "round")                                                                            Round the current instance day with given precision using the given function.
+ * @method        $this          roundWeeks(int|float $precision = 1, string $function = "round")                                                                           Round the current instance day with given precision using the given function.
+ * @method        $this          floorWeek(int|float $precision = 1)                                                                                                        Truncate the current instance day with given precision.
+ * @method        $this          floorWeeks(int|float $precision = 1)                                                                                                       Truncate the current instance day with given precision.
+ * @method        $this          ceilWeek(int|float $precision = 1)                                                                                                         Ceil the current instance day with given precision.
+ * @method        $this          ceilWeeks(int|float $precision = 1)                                                                                                        Ceil the current instance day with given precision.
+ * @method        $this          roundDay(int|float $precision = 1, string $function = "round")                                                                             Round the current instance day with given precision using the given function.
+ * @method        $this          roundDays(int|float $precision = 1, string $function = "round")                                                                            Round the current instance day with given precision using the given function.
+ * @method        $this          floorDay(int|float $precision = 1)                                                                                                         Truncate the current instance day with given precision.
+ * @method        $this          floorDays(int|float $precision = 1)                                                                                                        Truncate the current instance day with given precision.
+ * @method        $this          ceilDay(int|float $precision = 1)                                                                                                          Ceil the current instance day with given precision.
+ * @method        $this          ceilDays(int|float $precision = 1)                                                                                                         Ceil the current instance day with given precision.
+ * @method        $this          roundHour(int|float $precision = 1, string $function = "round")                                                                            Round the current instance hour with given precision using the given function.
+ * @method        $this          roundHours(int|float $precision = 1, string $function = "round")                                                                           Round the current instance hour with given precision using the given function.
+ * @method        $this          floorHour(int|float $precision = 1)                                                                                                        Truncate the current instance hour with given precision.
+ * @method        $this          floorHours(int|float $precision = 1)                                                                                                       Truncate the current instance hour with given precision.
+ * @method        $this          ceilHour(int|float $precision = 1)                                                                                                         Ceil the current instance hour with given precision.
+ * @method        $this          ceilHours(int|float $precision = 1)                                                                                                        Ceil the current instance hour with given precision.
+ * @method        $this          roundMinute(int|float $precision = 1, string $function = "round")                                                                          Round the current instance minute with given precision using the given function.
+ * @method        $this          roundMinutes(int|float $precision = 1, string $function = "round")                                                                         Round the current instance minute with given precision using the given function.
+ * @method        $this          floorMinute(int|float $precision = 1)                                                                                                      Truncate the current instance minute with given precision.
+ * @method        $this          floorMinutes(int|float $precision = 1)                                                                                                     Truncate the current instance minute with given precision.
+ * @method        $this          ceilMinute(int|float $precision = 1)                                                                                                       Ceil the current instance minute with given precision.
+ * @method        $this          ceilMinutes(int|float $precision = 1)                                                                                                      Ceil the current instance minute with given precision.
+ * @method        $this          roundSecond(int|float $precision = 1, string $function = "round")                                                                          Round the current instance second with given precision using the given function.
+ * @method        $this          roundSeconds(int|float $precision = 1, string $function = "round")                                                                         Round the current instance second with given precision using the given function.
+ * @method        $this          floorSecond(int|float $precision = 1)                                                                                                      Truncate the current instance second with given precision.
+ * @method        $this          floorSeconds(int|float $precision = 1)                                                                                                     Truncate the current instance second with given precision.
+ * @method        $this          ceilSecond(int|float $precision = 1)                                                                                                       Ceil the current instance second with given precision.
+ * @method        $this          ceilSeconds(int|float $precision = 1)                                                                                                      Ceil the current instance second with given precision.
+ * @method        $this          roundMillennium(int|float $precision = 1, string $function = "round")                                                                      Round the current instance millennium with given precision using the given function.
+ * @method        $this          roundMillennia(int|float $precision = 1, string $function = "round")                                                                       Round the current instance millennium with given precision using the given function.
+ * @method        $this          floorMillennium(int|float $precision = 1)                                                                                                  Truncate the current instance millennium with given precision.
+ * @method        $this          floorMillennia(int|float $precision = 1)                                                                                                   Truncate the current instance millennium with given precision.
+ * @method        $this          ceilMillennium(int|float $precision = 1)                                                                                                   Ceil the current instance millennium with given precision.
+ * @method        $this          ceilMillennia(int|float $precision = 1)                                                                                                    Ceil the current instance millennium with given precision.
+ * @method        $this          roundCentury(int|float $precision = 1, string $function = "round")                                                                         Round the current instance century with given precision using the given function.
+ * @method        $this          roundCenturies(int|float $precision = 1, string $function = "round")                                                                       Round the current instance century with given precision using the given function.
+ * @method        $this          floorCentury(int|float $precision = 1)                                                                                                     Truncate the current instance century with given precision.
+ * @method        $this          floorCenturies(int|float $precision = 1)                                                                                                   Truncate the current instance century with given precision.
+ * @method        $this          ceilCentury(int|float $precision = 1)                                                                                                      Ceil the current instance century with given precision.
+ * @method        $this          ceilCenturies(int|float $precision = 1)                                                                                                    Ceil the current instance century with given precision.
+ * @method        $this          roundDecade(int|float $precision = 1, string $function = "round")                                                                          Round the current instance decade with given precision using the given function.
+ * @method        $this          roundDecades(int|float $precision = 1, string $function = "round")                                                                         Round the current instance decade with given precision using the given function.
+ * @method        $this          floorDecade(int|float $precision = 1)                                                                                                      Truncate the current instance decade with given precision.
+ * @method        $this          floorDecades(int|float $precision = 1)                                                                                                     Truncate the current instance decade with given precision.
+ * @method        $this          ceilDecade(int|float $precision = 1)                                                                                                       Ceil the current instance decade with given precision.
+ * @method        $this          ceilDecades(int|float $precision = 1)                                                                                                      Ceil the current instance decade with given precision.
+ * @method        $this          roundQuarter(int|float $precision = 1, string $function = "round")                                                                         Round the current instance quarter with given precision using the given function.
+ * @method        $this          roundQuarters(int|float $precision = 1, string $function = "round")                                                                        Round the current instance quarter with given precision using the given function.
+ * @method        $this          floorQuarter(int|float $precision = 1)                                                                                                     Truncate the current instance quarter with given precision.
+ * @method        $this          floorQuarters(int|float $precision = 1)                                                                                                    Truncate the current instance quarter with given precision.
+ * @method        $this          ceilQuarter(int|float $precision = 1)                                                                                                      Ceil the current instance quarter with given precision.
+ * @method        $this          ceilQuarters(int|float $precision = 1)                                                                                                     Ceil the current instance quarter with given precision.
+ * @method        $this          roundMillisecond(int|float $precision = 1, string $function = "round")                                                                     Round the current instance millisecond with given precision using the given function.
+ * @method        $this          roundMilliseconds(int|float $precision = 1, string $function = "round")                                                                    Round the current instance millisecond with given precision using the given function.
+ * @method        $this          floorMillisecond(int|float $precision = 1)                                                                                                 Truncate the current instance millisecond with given precision.
+ * @method        $this          floorMilliseconds(int|float $precision = 1)                                                                                                Truncate the current instance millisecond with given precision.
+ * @method        $this          ceilMillisecond(int|float $precision = 1)                                                                                                  Ceil the current instance millisecond with given precision.
+ * @method        $this          ceilMilliseconds(int|float $precision = 1)                                                                                                 Ceil the current instance millisecond with given precision.
+ * @method        $this          roundMicrosecond(int|float $precision = 1, string $function = "round")                                                                     Round the current instance microsecond with given precision using the given function.
+ * @method        $this          roundMicroseconds(int|float $precision = 1, string $function = "round")                                                                    Round the current instance microsecond with given precision using the given function.
+ * @method        $this          floorMicrosecond(int|float $precision = 1)                                                                                                 Truncate the current instance microsecond with given precision.
+ * @method        $this          floorMicroseconds(int|float $precision = 1)                                                                                                Truncate the current instance microsecond with given precision.
+ * @method        $this          ceilMicrosecond(int|float $precision = 1)                                                                                                  Ceil the current instance microsecond with given precision.
+ * @method        $this          ceilMicroseconds(int|float $precision = 1)                                                                                                 Ceil the current instance microsecond with given precision.
  */
 class CarbonInterval extends DateInterval implements CarbonConverterInterface {
     use IntervalRounding;
@@ -319,7 +319,7 @@ class CarbonInterval extends DateInterval implements CarbonConverterInterface {
         if (!self::$flipCascadeFactors) {
             self::$flipCascadeFactors = [];
 
-            foreach (static::getCascadeFactors() as $to => [$factor, $from]) {
+            foreach (static::getCascadeFactors() as $to => list($factor, $from)) {
                 self::$flipCascadeFactors[self::standardizeUnit($from)] = [self::standardizeUnit($to), $factor];
             }
         }
@@ -582,7 +582,7 @@ class CarbonInterval extends DateInterval implements CarbonConverterInterface {
 
             if ($nextCharacter !== $expected) {
                 throw new ParseErrorException(
-                    "'${expected}'",
+                    "'{$expected}'",
                     $nextCharacter,
                     'Allowed substitutes for interval formats are ' . implode(', ', array_keys(static::$formats)) . "\n"
                     . 'See https://php.net/manual/en/function.date.php for their meaning'
@@ -869,7 +869,7 @@ class CarbonInterval extends DateInterval implements CarbonConverterInterface {
         $mainClass = DateInterval::class;
 
         if (!is_a($className, $mainClass, true)) {
-            throw new InvalidCastException("${className} is not a sub-class of ${mainClass}.");
+            throw new InvalidCastException("{$className} is not a sub-class of {$mainClass}.");
         }
 
         $microseconds = $interval->f;
@@ -939,7 +939,7 @@ class CarbonInterval extends DateInterval implements CarbonConverterInterface {
      */
     public static function make($interval, $unit = null) {
         if ($unit) {
-            $interval = "${interval} " . Carbon::pluralUnit($unit);
+            $interval = "{$interval} " . Carbon::pluralUnit($unit);
         }
 
         if ($interval instanceof DateInterval) {
@@ -1851,7 +1851,7 @@ class CarbonInterval extends DateInterval implements CarbonConverterInterface {
         }
 
         if (\is_string($unit) && !preg_match('/^\s*\d/', $unit)) {
-            $unit = "${value} ${unit}";
+            $unit = "$value $unit";
             $value = 1;
         }
 
@@ -1932,8 +1932,8 @@ class CarbonInterval extends DateInterval implements CarbonConverterInterface {
         $microseconds = 0
     ): self {
         return $this->add("
-            ${years} years ${months} months ${weeks} weeks ${days} days
-            ${hours} hours ${minutes} minutes ${seconds} seconds ${microseconds} microseconds
+            $years years $months months $weeks weeks $days days
+            $hours hours $minutes minutes $seconds seconds $microseconds microseconds
         ");
     }
 
@@ -1962,8 +1962,8 @@ class CarbonInterval extends DateInterval implements CarbonConverterInterface {
         $microseconds = 0
     ): self {
         return $this->sub("
-            ${years} years ${months} months ${weeks} weeks ${days} days
-            ${hours} hours ${minutes} minutes ${seconds} seconds ${microseconds} microseconds
+            $years years $months months $weeks weeks $days days
+            $hours hours $minutes minutes $seconds seconds $microseconds microseconds
         ");
     }
 
@@ -2165,7 +2165,7 @@ class CarbonInterval extends DateInterval implements CarbonConverterInterface {
         unset($originalData['days']);
         $newData = $originalData;
 
-        foreach (static::getFlipCascadeFactors() as $source => [$target, $factor]) {
+        foreach (static::getFlipCascadeFactors() as $source => list($target, $factor)) {
             foreach (['source', 'target'] as $key) {
                 if ($$key === 'dayz') {
                     $$key = 'daysExcludeWeeks';
@@ -2271,7 +2271,7 @@ class CarbonInterval extends DateInterval implements CarbonConverterInterface {
             $values['weeks'] = 0;
         }
 
-        foreach ($factors as $source => [$target, $factor]) {
+        foreach ($factors as $source => list($target, $factor)) {
             if ($source === $realUnit) {
                 $unitFound = true;
                 $value = $values[$source];
