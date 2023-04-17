@@ -187,6 +187,9 @@ class CApp_Formatter {
     }
 
     public function unformatDatetime($x, $fromFormat = null) {
+        if ($x instanceof DateTime) {
+            return $x->format('Y-m-d H:i:s');
+        }
         $datetimeFormat = $fromFormat ?: $this->datetimeFormat;
         $date = CCarbon::createFromLocaleFormat($datetimeFormat, CCarbon::getLocale(), $x);
 
