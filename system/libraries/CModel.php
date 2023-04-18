@@ -408,6 +408,58 @@ abstract class CModel implements ArrayAccess, CInterface_Arrayable, CInterface_J
     }
 
     /**
+     * Disables relationship model touching for the current class during given callback scope.
+     *
+     * @param callable $callback
+     *
+     * @return void
+     */
+    public static function withoutTouching($callback) {
+        static::withoutTouchingOn([static::class], $callback);
+    }
+
+    /**
+     * Disables relationship model touching for the given model classes during given callback scope.
+     *
+     * @param array    $models
+     * @param callable $callback
+     *
+     * @return void
+     */
+    public static function withoutTouchingOn(array $models, $callback) {
+        static::$ignoreOnTouch = array_values(array_merge(static::$ignoreOnTouch, $models));
+
+        try {
+            $callback();
+        } finally {
+            static::$ignoreOnTouch = array_values(array_diff(static::$ignoreOnTouch, $models));
+        }
+    }
+
+    /**
+     * Determine if the given model is ignoring touches.
+     *
+     * @param null|string $class
+     *
+     * @return bool
+     */
+    public static function isIgnoringTouch($class = null) {
+        $class = $class ?: static::class;
+
+        if (!get_class_vars($class)['timestamps'] || !$class::UPDATED_AT) {
+            return true;
+        }
+
+        foreach (static::$ignoreOnTouch as $ignoredClass) {
+            if ($class === $ignoredClass || is_subclass_of($class, $ignoredClass)) {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
+    /**
      * Remove the table name from a given key.
      *
      * @param string $key

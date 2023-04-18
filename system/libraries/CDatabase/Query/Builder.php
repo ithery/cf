@@ -168,6 +168,13 @@ class CDatabase_Query_Builder {
     public $lock;
 
     /**
+     * The callbacks that should be invoked before the query is executed.
+     *
+     * @var array
+     */
+    public $beforeQueryCallbacks = [];
+
+    /**
      * All of the available clause operators.
      *
      * @var array
@@ -1142,11 +1149,39 @@ class CDatabase_Query_Builder {
     }
 
     /**
+     * Register a closure to be invoked before the query is executed.
+     *
+     * @param callable $callback
+     *
+     * @return $this
+     */
+    public function beforeQuery(callable $callback) {
+        $this->beforeQueryCallbacks[] = $callback;
+
+        return $this;
+    }
+
+    /**
+     * Invoke the "before query" modification callbacks.
+     *
+     * @return void
+     */
+    public function applyBeforeQueryCallbacks() {
+        foreach ($this->beforeQueryCallbacks as $callback) {
+            $callback($this);
+        }
+
+        $this->beforeQueryCallbacks = [];
+    }
+
+    /**
      * Get the SQL representation of the query.
      *
      * @return string
      */
     public function toSql() {
+        $this->applyBeforeQueryCallbacks();
+
         return $this->grammar->compileSelect($this);
     }
 
@@ -1518,6 +1553,8 @@ class CDatabase_Query_Builder {
      * @return bool
      */
     public function exists() {
+        $this->applyBeforeQueryCallbacks();
+
         $results = $this->db->query(
             $this->grammar->compileExists($this),
             $this->getBindings(),
@@ -1751,6 +1788,8 @@ class CDatabase_Query_Builder {
             }
         }
 
+        $this->applyBeforeQueryCallbacks();
+
         // Finally, we will run this query against the database connection and return
         // the results. We will need to also flatten these bindings before running
         // the query so they are all in one huge, flattened array for execution.
@@ -1781,6 +1820,8 @@ class CDatabase_Query_Builder {
             }
         }
 
+        $this->applyBeforeQueryCallbacks();
+
         // return $this->connection->affectingStatement(
         //     $this->grammar->compileInsertOrIgnore($this, $values),
         //     $this->cleanBindings(carr::flatten($values, 1))
@@ -1800,6 +1841,8 @@ class CDatabase_Query_Builder {
      * @return int
      */
     public function insertGetId(array $values, $sequence = null) {
+        $this->applyBeforeQueryCallbacks();
+
         $sql = $this->grammar->compileInsertGetId($this, $values, $sequence);
 
         $values = $this->cleanBindings($values);
@@ -1816,6 +1859,8 @@ class CDatabase_Query_Builder {
      * @return int
      */
     public function insertUsing(array $columns, $query) {
+        $this->applyBeforeQueryCallbacks();
+
         list($sql, $bindings) = $this->createSub($query);
 
         return $this->db->query(
@@ -1836,6 +1881,8 @@ class CDatabase_Query_Builder {
      * @return CDatabase_Result
      */
     public function update(array $values) {
+        $this->applyBeforeQueryCallbacks();
+
         $sql = $this->grammar->compileUpdate($this, $values);
 
         return $this->db->query($sql, $this->cleanBindings(
@@ -1896,6 +1943,8 @@ class CDatabase_Query_Builder {
             $update = array_keys(reset($values));
         }
 
+        $this->applyBeforeQueryCallbacks();
+
         $bindings = $this->cleanBindings(array_merge(
             carr::flatten($values, 1),
             c::collect($update)->reject(function ($value, $key) {
@@ -1927,11 +1976,31 @@ class CDatabase_Query_Builder {
             throw new InvalidArgumentException('Non-numeric value passed to increment method.');
         }
 
-        $wrapped = $this->grammar->wrap($column);
+        return $this->incrementEach([$column => $amount], $extra);
+    }
 
-        $columns = array_merge([$column => $this->raw("${wrapped} + ${amount}")], $extra);
+    /**
+     * Increment the given column's values by the given amounts.
+     *
+     * @param array<string, float|int|numeric-string> $columns
+     * @param array<string, mixed>                    $extra
+     *
+     * @throws \InvalidArgumentException
+     *
+     * @return int
+     */
+    public function incrementEach(array $columns, array $extra = []) {
+        foreach ($columns as $column => $amount) {
+            if (!is_numeric($amount)) {
+                throw new InvalidArgumentException("Non-numeric value passed as increment amount for column: '$column'.");
+            } elseif (!is_string($column)) {
+                throw new InvalidArgumentException('Non-associative array passed to incrementEach method.');
+            }
 
-        return $this->update($columns);
+            $columns[$column] = $this->raw("{$this->grammar->wrap($column)} + $amount");
+        }
+
+        return $this->update(array_merge($columns, $extra));
     }
 
     /**
@@ -1948,11 +2017,31 @@ class CDatabase_Query_Builder {
             throw new InvalidArgumentException('Non-numeric value passed to decrement method.');
         }
 
-        $wrapped = $this->grammar->wrap($column);
+        return $this->decrementEach([$column => $amount], $extra);
+    }
 
-        $columns = array_merge([$column => $this->raw("${wrapped} - ${amount}")], $extra);
+    /**
+     * Decrement the given column's values by the given amounts.
+     *
+     * @param array<string, float|int|numeric-string> $columns
+     * @param array<string, mixed>                    $extra
+     *
+     * @throws \InvalidArgumentException
+     *
+     * @return int
+     */
+    public function decrementEach(array $columns, array $extra = []) {
+        foreach ($columns as $column => $amount) {
+            if (!is_numeric($amount)) {
+                throw new InvalidArgumentException("Non-numeric value passed as decrement amount for column: '$column'.");
+            } elseif (!is_string($column)) {
+                throw new InvalidArgumentException('Non-associative array passed to decrementEach method.');
+            }
 
-        return $this->update($columns);
+            $columns[$column] = $this->raw("{$this->grammar->wrap($column)} - $amount");
+        }
+
+        return $this->update(array_merge($columns, $extra));
     }
 
     /**
@@ -1970,6 +2059,8 @@ class CDatabase_Query_Builder {
             $this->where($this->from . '.id', '=', $id);
         }
 
+        $this->applyBeforeQueryCallbacks();
+
         return $this->db->query(
             $this->grammar->compileDelete($this),
             $this->cleanBindings(
@@ -1984,6 +2075,8 @@ class CDatabase_Query_Builder {
      * @return void
      */
     public function truncate() {
+        $this->applyBeforeQueryCallbacks();
+
         foreach ($this->grammar->compileTruncate($this) as $sql => $bindings) {
             $this->db->query($sql, $bindings);
         }
