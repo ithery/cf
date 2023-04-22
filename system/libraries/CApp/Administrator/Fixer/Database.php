@@ -5,7 +5,7 @@ class CApp_Administrator_Fixer_Database {
         if ($db == null) {
             $db = CDatabase::instance();
         }
-
+        /** @var CDatabase $db */
         $schemaManager = $db->getSchemaManager();
         $schema = $schemaManager->createSchema();
         $columnsData = $schemaManager->listTableColumns($table);
@@ -23,6 +23,11 @@ class CApp_Administrator_Fixer_Database {
                 $targetOptions = [
                     'unsigned' => true,
                 ];
+                $currentCollation = $columnSchema->getPlatformOption('collation');
+                if ($currentCollation == 'utf8mb4_bin' || $currentCollation == 'utf8mb4_unicode') {
+                    //continue, maybe it set to utf8mb4_bin or utf8mb4_unicode manually
+                    continue;
+                }
                 $targetColumnSchema = clone $columnSchema;
                 $targetColumnSchema->setPlatformOption('collation', 'utf8mb4_unicode_ci');
                 // See if column has changed properties in table 2.
