@@ -7,6 +7,8 @@ class CBase {
 
     const ENVIRONMENT_STAGING = 'staging';
 
+    const ENVIRONMENT_LOCAL = 'local';
+
     const ENVIRONMENT_TESTING = 'testing';
 
     /**
