@@ -425,7 +425,7 @@ trait CApp_Trait_BaseTrait {
      * @return bool
      */
     public static function isStaging() {
-        if (c::env('ENVIRONTMENT') == 'staging') {
+        if (c::env('ENVIRONTMENT') == CBase::ENVIRONMENT_STAGING) {
             return true;
         }
         $domain = CF::domain();
