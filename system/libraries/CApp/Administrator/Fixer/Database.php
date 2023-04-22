@@ -24,8 +24,8 @@ class CApp_Administrator_Fixer_Database {
                     'unsigned' => true,
                 ];
                 $currentCollation = $columnSchema->getPlatformOption('collation');
-                if ($currentCollation == 'utf8mb4_bin') {
-                    //continue, maybe it set to utf8mb4_bin manually
+                if ($currentCollation == 'utf8mb4_bin' || $currentCollation == 'utf8mb4_unicode') {
+                    //continue, maybe it set to utf8mb4_bin or utf8mb4_unicode manually
                     continue;
                 }
                 $targetColumnSchema = clone $columnSchema;
