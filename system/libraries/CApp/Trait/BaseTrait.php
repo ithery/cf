@@ -74,6 +74,9 @@ trait CApp_Trait_BaseTrait {
                 }
             }
         }
+        if ($orgId) {
+            $orgId = (int) $orgId;
+        }
 
         return $orgId;
     }
