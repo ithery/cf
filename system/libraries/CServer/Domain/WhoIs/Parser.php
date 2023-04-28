@@ -198,7 +198,7 @@ class CServer_Domain_WhoIs_Parser {
         $domainWordLen = strlen($domainWord);
 
         $res = [];
-
+        $keyword = null;
         foreach ($data as $d) {
             $d = trim($d);
 
