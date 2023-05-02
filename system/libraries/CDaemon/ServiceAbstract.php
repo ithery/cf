@@ -2,12 +2,6 @@
 
 defined('SYSPATH') or die('No direct access allowed.');
 
-/**
- * @author Hery Kurniawan
- * @license Ittron Global Teknologi <ittron.co.id>
- *
- * @since Mar 12, 2019, 3:23:13 PM
- */
 use Symfony\Component\Process\Process;
 
 abstract class CDaemon_ServiceAbstract implements CDaemon_ServiceInterface {
@@ -830,7 +824,7 @@ abstract class CDaemon_ServiceAbstract implements CDaemon_ServiceInterface {
         if ($this->idleProbability) {
             $probability = (1 / $this->idleProbability);
         }
-        $is_idle = function () use ($endTime, $probability) {
+        $isIdle = function () use ($endTime, $probability) {
             if ($endTime) {
                 return microtime(true) < $endTime;
             }
@@ -841,8 +835,8 @@ abstract class CDaemon_ServiceAbstract implements CDaemon_ServiceInterface {
             return false;
         };
         // If we have idle time, do any housekeeping tasks
-        if ($is_idle()) {
-            $this->dispatch([CDaemon_ServiceAbstract::ON_IDLE], [$is_idle]);
+        if ($isIdle()) {
+            $this->dispatch([CDaemon_ServiceAbstract::ON_IDLE], [$isIdle]);
         }
         $stats = [];
         $stats['duration'] = microtime(true) - $startTime;
@@ -922,6 +916,8 @@ abstract class CDaemon_ServiceAbstract implements CDaemon_ServiceInterface {
      * There are 2 paths to the daemon calling restart: The Auto Restart feature, and, also, if a fatal error
      * is encountered after it's been running for a while, it will attempt to re-start.
      *
+     * @param mixed $rotateLog
+     *
      * @return void;
      */
     public function restart($rotateLog = false) {
@@ -945,21 +941,19 @@ abstract class CDaemon_ServiceAbstract implements CDaemon_ServiceInterface {
             fclose(STDIN);
         }
 
-
         $class = get_class($this);
-        $runner =  CDaemon::createRunner($class);
+        $runner = CDaemon::createRunner($class);
         // Close the static log handle to prevent it being inherrited by the new process.
         if (is_resource(self::$logHandle)) {
-            if($rotateLog) {
+            if ($rotateLog) {
                 $this->log('Rotating Log...');
             }
             fclose(self::$logHandle);
-            if($rotateLog) {
+            if ($rotateLog) {
                 $runner->rotateLog();
             }
-
         }
-        $runner->run();   
+        $runner->run();
 
         // A new daemon process has been created. This one will stick around just long enough to clean up the worker processes.
         exit();
