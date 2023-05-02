@@ -20,6 +20,8 @@ class CEmail_Builder_Component {
 
     protected $children = [];
 
+    protected $attributes = [];
+
     protected $content = '';
 
     protected static $rawElement = false;
@@ -70,11 +72,11 @@ class CEmail_Builder_Component {
     public function add($element) {
         $rawElement = $element;
         if ($rawElement instanceof CEmail_Builder_Component) {
-            $this->childs[] = $rawElement;
+            $this->children[] = $rawElement;
         } else {
             $rawElement = new CEmail_Builder_Component_BodyComponent_Raw([]);
             $rawElement->setContent($element);
-            $this->childs[] = $rawElement;
+            $this->children[] = $rawElement;
         }
 
         return $rawElement;
@@ -121,7 +123,7 @@ class CEmail_Builder_Component {
     }
 
     public function setAttr($key, $value) {
-        $this->attrs[$key] = $value;
+        $this->attributes[$key] = $value;
 
         return $this;
     }
