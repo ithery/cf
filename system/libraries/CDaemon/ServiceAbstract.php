@@ -924,7 +924,7 @@ abstract class CDaemon_ServiceAbstract implements CDaemon_ServiceInterface {
      *
      * @return void;
      */
-    public function restart() {
+    public function restart($rotateLog = false) {
         if (!$this->parent) {
             return;
         }
@@ -944,13 +944,22 @@ abstract class CDaemon_ServiceAbstract implements CDaemon_ServiceInterface {
         if (is_resource(STDIN)) {
             fclose(STDIN);
         }
-        // Close the static log handle to prevent it being inherrited by the new process.
-        if (is_resource(self::$logHandle)) {
-            fclose(self::$logHandle);
-        }
+
 
         $class = get_class($this);
-        CDaemon::createRunner($class)->run();
+        $runner =  CDaemon::createRunner($class);
+        // Close the static log handle to prevent it being inherrited by the new process.
+        if (is_resource(self::$logHandle)) {
+            if($rotateLog) {
+                $this->log('Rotating Log...');
+            }
+            fclose(self::$logHandle);
+            if($rotateLog) {
+                $runner->rotateLog();
+            }
+
+        }
+        $runner->run();   
 
         // A new daemon process has been created. This one will stick around just long enough to clean up the worker processes.
         exit();
