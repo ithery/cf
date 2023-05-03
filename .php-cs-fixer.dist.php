@@ -2,7 +2,6 @@
 $config = new PhpCsFixer\Config();
 
 return $config->setRules([
-    '@PSR2' => true,
     'array_indentation' => true,
     'array_syntax' => ['syntax' => 'short'],
     'combine_consecutive_unsets' => true,
@@ -19,7 +18,7 @@ return $config->setRules([
         'strategy' => 'no_multi_line',
     ],
     'encoding' => true,
-    'explicit_string_variable' => true,
+    'explicit_string_variable' => false,
     'single_quote' => true,
     'constant_case' => true,
     'binary_operator_spaces' => [
@@ -36,6 +35,8 @@ return $config->setRules([
     'braces' => [
         'allow_single_line_closure' => true,
         'position_after_functions_and_oop_constructs' => 'same',
+        'position_after_anonymous_constructs' => 'same',
+        'position_after_control_structures' => 'same',
     ],
     'cast_spaces' => true,
     'class_definition' => [

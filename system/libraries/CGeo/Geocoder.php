@@ -1,8 +1,8 @@
 <?php
 
 /**
- * @method CGeo_Interface_CollectionInterface reverse(float $latitude, float $longitude)
- * @method CGeo_Interface_CollectionInterface geocode(string $value)
+ * @method CGeo_Interface_CollectionInterface reverse(float $latitude, float $longitude, array $data = [])
+ * @method CGeo_Interface_CollectionInterface geocode(string $value, array $data = [])
  */
 class CGeo_Geocoder {
     use CTrait_ForwardsCalls;

@@ -1737,7 +1737,7 @@ class c {
         }
         $format = function ($index) use ($locale) {
             if (class_exists(IntlDateFormatter::class)) {
-                $formatter = new IntlDateFormatter($locale);
+                $formatter = new IntlDateFormatter($locale, IntlDateFormatter::FULL, IntlDateFormatter::FULL);
                 $formatter->setPattern('MMMM');
 
                 return ucfirst($formatter->format(mktime(0, 0, 0, $index)));

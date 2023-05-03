@@ -1,6 +1,8 @@
 <?php
 
 class CModel_Relation_HasManyThrough extends CModel_Relation {
+    use CModel_Relation_Trait_InteractsWithDictionary;
+
     /**
      * The "through" parent model instance.
      *
@@ -65,6 +67,23 @@ class CModel_Relation_HasManyThrough extends CModel_Relation {
         $this->secondLocalKey = $secondLocalKey;
 
         parent::__construct($query, $throughParent);
+    }
+
+    /**
+     * Convert the relationship to a "has one through" relationship.
+     *
+     * @return \CModel_Relation_HasOneThrough
+     */
+    public function one() {
+        return new CModel_Relation_HasOneThrough(
+            $this->getQuery(),
+            $this->farParent,
+            $this->throughParent,
+            $this->getFirstKeyName(),
+            $this->secondKey,
+            $this->getLocalKeyName(),
+            $this->getSecondLocalKeyName(),
+        );
     }
 
     /**
@@ -289,6 +308,28 @@ class CModel_Relation_HasManyThrough extends CModel_Relation {
     }
 
     /**
+     * Execute the query and get the first result or call a callback.
+     *
+     * @param \Closure|array $columns
+     * @param null|\Closure  $callback
+     *
+     * @return \CModel|static|mixed
+     */
+    public function firstOr($columns = ['*'], Closure $callback = null) {
+        if ($columns instanceof Closure) {
+            $callback = $columns;
+
+            $columns = ['*'];
+        }
+
+        if (!is_null($model = $this->first($columns))) {
+            return $model;
+        }
+
+        return $callback();
+    }
+
+    /**
      * Find a related model by its primary key.
      *
      * @param mixed $id
@@ -354,6 +395,37 @@ class CModel_Relation_HasManyThrough extends CModel_Relation {
     }
 
     /**
+     * Find a related model by its primary key or call a callback.
+     *
+     * @param mixed          $id
+     * @param \Closure|array $columns
+     * @param null|\Closure  $callback
+     *
+     * @return \CModel|\CModel_Collection|mixed
+     */
+    public function findOr($id, $columns = ['*'], Closure $callback = null) {
+        if ($columns instanceof Closure) {
+            $callback = $columns;
+
+            $columns = ['*'];
+        }
+
+        $result = $this->find($id, $columns);
+
+        $id = $id instanceof CInterface_Arrayable ? $id->toArray() : $id;
+
+        if (is_array($id)) {
+            if (count($result) === count(array_unique($id))) {
+                return $result;
+            }
+        } elseif (!is_null($result)) {
+            return $result;
+        }
+
+        return $callback();
+    }
+
+    /**
      * Get the results of the relationship.
      *
      * @return mixed
@@ -416,6 +488,22 @@ class CModel_Relation_HasManyThrough extends CModel_Relation {
         $this->query->addSelect($this->shouldSelect($columns));
 
         return $this->query->simplePaginate($perPage, $columns, $pageName, $page);
+    }
+
+    /**
+     * Paginate the given query into a cursor paginator.
+     *
+     * @param null|int    $perPage
+     * @param array       $columns
+     * @param string      $cursorName
+     * @param null|string $cursor
+     *
+     * @return \CPagination_CursorPaginatorInterface
+     */
+    public function cursorPaginate($perPage = null, $columns = ['*'], $cursorName = 'cursor', $cursor = null) {
+        $this->query->addSelect($this->shouldSelect($columns));
+
+        return $this->query->cursorPaginate($perPage, $columns, $cursorName, $cursor);
     }
 
     /**
@@ -491,6 +579,37 @@ class CModel_Relation_HasManyThrough extends CModel_Relation {
                 }
             }
         });
+    }
+
+    /**
+     * Query lazily, by chunks of the given size.
+     *
+     * @param int $chunkSize
+     *
+     * @return \CCollection_LazyCollection
+     */
+    public function lazy($chunkSize = 1000) {
+        return $this->prepareQueryBuilder()->lazy($chunkSize);
+    }
+
+    /**
+     * Query lazily, by chunking the results of a query by comparing IDs.
+     *
+     * @param int         $chunkSize
+     * @param null|string $column
+     * @param null|string $alias
+     *
+     * @return \CCollection_LazyCollection
+     */
+    public function lazyById($chunkSize = 1000, $column = null, $alias = null) {
+        if ($column == null) {
+            $column = $this->getRelated()->getQualifiedKeyName();
+        }
+        if ($alias == null) {
+            $alias = $this->getRelated()->getKeyName();
+        }
+
+        return $this->prepareQueryBuilder()->lazyById($chunkSize, $column, $alias);
     }
 
     /**

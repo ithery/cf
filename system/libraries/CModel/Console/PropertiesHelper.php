@@ -68,6 +68,7 @@ class CModel_Console_PropertiesHelper {
             CModel_Relation_HasManyThrough::class,
             CModel_Relation_HasManyDeep::class,
             CModel_Relation_MorphMany::class,
+            CModel_Relation_MorphOne::class,
             CModel_Relation_HasOne::class,
         ];
 
@@ -89,6 +90,9 @@ class CModel_Console_PropertiesHelper {
                         foreach ($matches as $match) {
                             $returnTypes = explode('|', $match);
                             foreach ($returnTypes as $returnType) {
+                                if (cstr::startsWith($returnType, '\\')) {
+                                    $returnType = cstr::substr($returnType, 1);
+                                }
                                 if (in_array($returnType, $returnTypeClasses)) {
                                     list($relationClass, $isWithTrashed) = static::getRelationClass($method);
                                     if ($relationClass && $relationType = static::getRelationType($returnType, $relationClass, $isWithTrashed)) {
@@ -132,7 +136,7 @@ class CModel_Console_PropertiesHelper {
         ) {
             $relationType = 'CModel_Collection|' . $relationClass . '[]';
         }
-        if ($returnType == CModel_Relation_HasOne::class) {
+        if ($returnType == CModel_Relation_HasOne::class || $returnType == CModel_Relation_MorphOne::class) {
             $relationType = 'null|' . $relationClass;
         }
 

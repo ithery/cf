@@ -65,7 +65,9 @@ trait CApp_Model_Trait_Roles {
                 $query->where('org_id', '=', $orgId)->orWhereNull('org_id');
             })->where('status', '>', 0);
         }
-        if (is_array($type)) {
+        if (is_callable($type)) {
+            call_user_func_array($type, [$root]);
+        } elseif (is_array($type)) {
             foreach ($type as $k => $v) {
                 $root = $root->where($k, '=', $v);
             }
