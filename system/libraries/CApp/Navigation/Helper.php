@@ -18,15 +18,14 @@ class CApp_Navigation_Helper {
         $routeData = c::router()->getCurrentRoute()->getRouteData();
         // cdbg::dd($routeData);
         if ($controller == null) {
-            $controller = carr::get($routeData, 'controller');
+            $controller = $routeData->getController();
         }
         if ($method == null) {
-            $method = carr::get($routeData, 'method');
+            $method = $routeData->getMethod();
         }
         if ($path == null) {
-            $path = carr::get($routeData, 'controllerDir');
+            $path = $routeData->getControllerDir();
         }
-
         if ($nav == null) {
             $navs = CApp_Navigation_Data::get();
 
