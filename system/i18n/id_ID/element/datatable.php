@@ -5,12 +5,13 @@ return [
     'info' => 'Menampilkan _START_ sampai _END_ dari _TOTAL_ entri',
     'infoEmpty' => 'Menampilkan 0 sampai 0 dari 0 entri',
     'infoFiltered' => '(disaring dari _MAX_ entri keseluruhan)',
+    'infoThousands' => ',',
     'lengthMenu' => 'Tampilkan _MENU_ entri',
     'loadingRecords' => 'Sedang memuat...',
     'processing' => 'Sedang memproses...',
     'search' => 'Cari',
     'zeroRecords' => 'Tidak ditemukan data yang sesuai',
-    'thousands' => "'",
+    'thousands' => ',',
     'paginate' => [
         'first' => 'Pertama',
         'last' => 'Terakhir',
@@ -120,7 +121,6 @@ return [
         'emptyPanes' => 'Tidak Ada Panel Pencarian',
         'loadMessage' => 'Memuat Panel Pencarian'
     ],
-    'infoThousands' => ',',
     'select' => [
         'cells' => [
             '1 sel terpilih',
