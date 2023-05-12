@@ -8,7 +8,7 @@
 use Symfony\Component\Process\Process;
 use Symfony\Component\Process\PhpExecutableFinder;
 
-class CConsole_Command_PhpstanInstallCommand extends CConsole_Command {
+class CConsole_Command_Phpstan_InstallCommand extends CConsole_Command {
     /**
      * Command line options that should not be gathered dynamically.
      *

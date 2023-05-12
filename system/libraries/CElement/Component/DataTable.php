@@ -15,7 +15,6 @@ class CElement_Component_DataTable extends CElement_Component {
         CElement_Component_DataTable_Trait_CheckboxTrait,
         CElement_Component_DataTable_Trait_SearchTrait,
         CElement_Component_DataTable_Trait_FooterTrait;
-
     const ACTION_LOCATION_FIRST = 'first';
 
     const ACTION_LOCATION_LAST = 'last';
@@ -167,6 +166,8 @@ class CElement_Component_DataTable extends CElement_Component {
     protected $buttons = [];
 
     protected $domElements = [];
+
+    protected $rowClassCallbackFunction = null;
 
     public function __construct($id = '') {
         parent::__construct($id);
@@ -1045,5 +1046,29 @@ class CElement_Component_DataTable extends CElement_Component {
         $this->domElements[$key] = $value;
 
         return $this;
+    }
+
+    /**
+     * Set callback for table row class.
+     *
+     * @param callable|Closure $callback parameter: $row
+     * @param string           $require  File location of callable function to require
+     *
+     * @return $this
+     */
+    public function setRowClassCallback($callback, $require = '') {
+        $this->rowClassCallbackFunction = c::toSerializableClosure($callback);
+        if (strlen($require) > 0) {
+            $this->requires[] = $require;
+        }
+
+        return $this;
+    }
+
+    /**
+     * @return Closure|\Opis\SerializableClosure
+     */
+    public function getRowClassCallbackFunction() {
+        return $this->rowClassCallbackFunction;
     }
 }

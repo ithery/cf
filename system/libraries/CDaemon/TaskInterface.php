@@ -2,29 +2,23 @@
 
 defined('SYSPATH') or die('No direct access allowed.');
 
-/**
- * @author Hery Kurniawan
- * @license Ittron Global Teknologi <ittron.co.id>
- *
- * @since Mar 15, 2019, 12:18:48 PM
- */
 interface CDaemon_TaskInterface {
     /**
-     * Called on Construct or Init
+     * Called on Construct or Init.
      *
      * @return void
      */
     public function setup();
 
     /**
-     * Called on Destruct
+     * Called on Destruct.
      *
      * @return void
      */
     public function teardown();
 
     /**
-     * This is called after setup() returns
+     * This is called after setup() returns.
      *
      * @return void
      */

@@ -145,7 +145,18 @@ trait CElement_Component_DataTable_Trait_HtmlTrait {
                     if ($dataRow->exists($this->keyField)) {
                         $key = $dataRow->getValue($this->keyField);
                     }
-                    $html->appendln('<tr id="tr-' . $key . '">')->incIndent()->br();
+
+                    $trClass = '';
+                    if ($this->rowClassCallbackFunction != null) {
+                        $trClass = CFunction::factory($this->rowClassCallbackFunction)
+                            ->addArg($row)
+                            ->execute();
+                    }
+                    $attrId = '';
+                    if ($key) {
+                        $attrId = 'id="tr-' . $key . '"';
+                    }
+                    $html->appendln('<tr ' . $attrId . ($trClass ? ' class="' . $trClass . '"' : '') . '>')->incIndent()->br();
 
                     if ($this->numbering) {
                         $html->appendln('<td scope="row" class="align-right">' . $no . '</td>')->br();

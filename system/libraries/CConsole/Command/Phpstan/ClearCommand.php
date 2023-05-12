@@ -9,7 +9,7 @@ use Symfony\Component\Process\Process;
 use Symfony\Component\Process\PhpExecutableFinder;
 use Symfony\Component\Console\Formatter\OutputFormatterStyle;
 
-class CConsole_Command_PhpstanClearCommand extends CConsole_Command {
+class CConsole_Command_Phpstan_ClearCommand extends CConsole_Command {
     /**
      * The name and signature of the console command.
      *

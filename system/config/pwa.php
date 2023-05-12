@@ -6,6 +6,7 @@ return [
             'name' => 'CF PWA',
             'start_url' => '/',
             'theme' => 'cresenity',
+            'debug' => !CF::isProduction(),
             'manifest' => [
                 'name' => c::env('APP_NAME', 'CF PWA App'),
                 'short_name' => 'PWA',
