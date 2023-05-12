@@ -1,15 +1,7 @@
 <?php
 
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
-
 /**
- * This class is used to construct a Attachment object for the /mail/send API call
- *
- * @package SendGrid\Mail
+ * This class is used to construct a Attachment object for the /mail/send API call.
  */
 class CVendor_SendGrid_Mail_Attachment implements \JsonSerializable {
     /**
@@ -38,7 +30,7 @@ class CVendor_SendGrid_Mail_Attachment implements \JsonSerializable {
     private $content_id;
 
     /**
-     * Optional constructor
+     * Optional constructor.
      *
      * @param string $content     Base64 encoded content
      * @param string $type        Mime type of the attachment
@@ -73,7 +65,7 @@ class CVendor_SendGrid_Mail_Attachment implements \JsonSerializable {
     }
 
     /**
-     * Add the content to a Attachment object
+     * Add the content to a Attachment object.
      *
      * @param string $content Base64 encoded content
      *
@@ -91,7 +83,7 @@ class CVendor_SendGrid_Mail_Attachment implements \JsonSerializable {
     }
 
     /**
-     * Retrieve the content from a Attachment object
+     * Retrieve the content from a Attachment object.
      *
      * @return string
      */
@@ -100,7 +92,7 @@ class CVendor_SendGrid_Mail_Attachment implements \JsonSerializable {
     }
 
     /**
-     * Add the mime type to a Attachment object
+     * Add the mime type to a Attachment object.
      *
      * @param string $type Mime type of the attachment
      *
@@ -114,7 +106,7 @@ class CVendor_SendGrid_Mail_Attachment implements \JsonSerializable {
     }
 
     /**
-     * Retrieve the mime type from a Attachment object
+     * Retrieve the mime type from a Attachment object.
      *
      * @return string
      */
@@ -123,7 +115,7 @@ class CVendor_SendGrid_Mail_Attachment implements \JsonSerializable {
     }
 
     /**
-     * Add the file name to a Attachment object
+     * Add the file name to a Attachment object.
      *
      * @param string $filename File name of the attachment
      *
@@ -137,7 +129,7 @@ class CVendor_SendGrid_Mail_Attachment implements \JsonSerializable {
     }
 
     /**
-     * Retrieve the file name from a Attachment object
+     * Retrieve the file name from a Attachment object.
      *
      * @return string
      */
@@ -146,7 +138,7 @@ class CVendor_SendGrid_Mail_Attachment implements \JsonSerializable {
     }
 
     /**
-     * Add the disposition to a Attachment object
+     * Add the disposition to a Attachment object.
      *
      * @param string $disposition How the attachment should be displayed:
      *                            inline or attachment, default is attachment
@@ -161,7 +153,7 @@ class CVendor_SendGrid_Mail_Attachment implements \JsonSerializable {
     }
 
     /**
-     * Retrieve the disposition from a Attachment object
+     * Retrieve the disposition from a Attachment object.
      *
      * @return string
      */
@@ -170,7 +162,7 @@ class CVendor_SendGrid_Mail_Attachment implements \JsonSerializable {
     }
 
     /**
-     * Add the content id to a Attachment object
+     * Add the content id to a Attachment object.
      *
      * @param string $content_id Used when disposition is inline to diplay
      *                           the file within the body of the email
@@ -183,7 +175,7 @@ class CVendor_SendGrid_Mail_Attachment implements \JsonSerializable {
     }
 
     /**
-     * Retrieve the content id from a Attachment object
+     * Retrieve the content id from a Attachment object.
      *
      * @return string
      */
@@ -192,7 +184,7 @@ class CVendor_SendGrid_Mail_Attachment implements \JsonSerializable {
     }
 
     /**
-     *  Verifies whether or not the provided string is a valid base64 string
+     *  Verifies whether or not the provided string is a valid base64 string.
      *
      * @param $string string The string that has to be checked
      *
@@ -204,11 +196,12 @@ class CVendor_SendGrid_Mail_Attachment implements \JsonSerializable {
         if ($encoded_data != $string) {
             return false;
         }
+
         return true;
     }
 
     /**
-     * Return an array representing a Attachment object for the Twilio SendGrid API
+     * Return an array representing a Attachment object for the Twilio SendGrid API.
      *
      * @return null|array
      */

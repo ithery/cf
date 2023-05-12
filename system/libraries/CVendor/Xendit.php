@@ -15,6 +15,12 @@ class CVendor_Xendit {
 
     protected $libVersion;
 
+    protected $server_domain;
+
+    protected $secret_api_key;
+
+    protected $public_key;
+
     public function __construct($options) {
         $this->server_domain = 'https://api.xendit.co';
         $this->secret_api_key = $options['secret_api_key'];
@@ -756,6 +762,7 @@ class CVendor_Xendit {
             $data['limit'] = carr::get($options, 'limit');
         }
         $response = $this->requestToXendit($endPoint, 'GET', $data);
+
         return $response;
     }
 

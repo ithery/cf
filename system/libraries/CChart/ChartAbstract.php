@@ -47,6 +47,18 @@ class CChart_ChartAbstract {
     private $isShowLegend = true;
 
     private $legendPosition = CChart::POSITION_RIGHT;
+    /**
+     * X Axis.
+     *
+     * @var int
+     */
+    private $xAxis;
+    /**
+     * Y Axis.
+     *
+     * @var int
+     */
+    private $yAxis;
 
     public function __construct($width = 500, $height = 500) {
         $this->width = $width;

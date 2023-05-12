@@ -12,7 +12,6 @@ use Symfony\Component\HttpFoundation\Response as SymfonyResponse;
 class CHTTP_Kernel {
     use CHTTP_Trait_OutputBufferTrait,
         CHTTP_Concern_KernelRouting;
-
     /**
      * The application's middleware stack.
      *
@@ -155,7 +154,6 @@ class CHTTP_Kernel {
                 $response = $this->handleRequest($request);
             } catch (Exception $e) {
                 $this->reportException($e);
-
                 $response = $this->renderException($request, $e);
             } catch (Throwable $e) {
                 $this->reportException($e);
@@ -172,6 +170,7 @@ class CHTTP_Kernel {
 
     public function terminate($request, $response) {
         $this->terminateMiddleware($request, $response);
+        CF::terminate();
         if (!$this->terminated) {
             $this->terminated = true;
         }

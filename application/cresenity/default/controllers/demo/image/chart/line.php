@@ -12,13 +12,18 @@ class Controller_Demo_Image_Chart_Line extends \Cresenity\Demo\Controller {
 
         $lineChart->setDataLabels(['A', 'B', 'C', 'D', 'E', 'F']);
         $lineChart->setColors(['#ff0000', '#00ff00', '#0000ff']);
-        $lineChart->setLegendPosition(CChart::POSITION_BOTTOM);
+        $lineChart->setLegendPosition(CChart::POSITION_LEFT);
         $imageChart = CImage::chart(500, 200)->setMargin(50, 50, 50, 50);
 
         $imageChart->setChart($lineChart);
 
-        $app->addH5()->add('With Google Engine');
+        $app->addH5()->add('Default Engine');
+        $imageChart->setEngine('default');
+        $uri = $imageChart->toUri();
+        $app->addImg()->setSrc($uri);
 
+        $app->addH5()->add('With Google Engine');
+        $imageChart->setEngine('google');
         $uri = $imageChart->toUri();
         $app->addImg()->setSrc($uri);
 

@@ -9,6 +9,9 @@ defined('SYSPATH') or die('No direct access allowed.');
  */
 class CCache_Repository implements CCache_RepositoryInterface, ArrayAccess {
     use CTrait_Helper_InteractsWithTime;
+    use CTrait_Macroable {
+        __call as macroCall;
+    }
 
     /**
      * @var CCache_DriverAbstract
@@ -190,6 +193,10 @@ class CCache_Repository implements CCache_RepositoryInterface, ArrayAccess {
      * @return bool
      */
     public function put($key, $value, $ttl = null) {
+        if (is_array($key)) {
+            return $this->putMany($key, $value);
+        }
+
         if ($ttl === null) {
             return $this->forever($key, $value);
         }
@@ -198,6 +205,10 @@ class CCache_Repository implements CCache_RepositoryInterface, ArrayAccess {
             return $this->forget($key);
         }
         $result = $this->driver->put($this->itemKey($key), $value, $seconds);
+
+        if ($result) {
+            $this->event(new CCache_Event_KeyWritten($key, $value, $seconds));
+        }
 
         return $result;
     }
@@ -370,6 +381,8 @@ class CCache_Repository implements CCache_RepositoryInterface, ArrayAccess {
     /**
      * Get an item from the cache, or execute the given Closure and store the result forever.
      *
+     * @template TCacheValue
+     *
      * @param string   $key
      * @param \Closure $callback
      *
@@ -381,6 +394,8 @@ class CCache_Repository implements CCache_RepositoryInterface, ArrayAccess {
 
     /**
      * Get an item from the cache, or execute the given Closure and store the result forever.
+     *
+     * @template TCacheValue
      *
      * @param string   $key
      * @param \Closure $callback
@@ -456,13 +471,14 @@ class CCache_Repository implements CCache_RepositoryInterface, ArrayAccess {
      * @return CCache_TaggedCache
      */
     public function tags($names) {
+        if (!$this->supportsTags()) {
+            throw new BadMethodCallException('This cache store does not support tagging.');
+        }
+
         if ($this->driver instanceof CCache_DriverTaggableAbstract) {
             $cache = $this->driver->tags(is_array($names) ? $names : func_get_args());
 
             return $cache->setDefaultCacheTime($this->default);
-        }
-        if (!$this->supportsTags()) {
-            throw new BadMethodCallException('This cache store does not support tagging.');
         }
 
         return null;
@@ -477,6 +493,22 @@ class CCache_Repository implements CCache_RepositoryInterface, ArrayAccess {
      */
     protected function itemKey($key) {
         return $key;
+    }
+
+    /**
+     * Calculate the number of seconds for the given TTL.
+     *
+     * @param \DateTimeInterface|\DateInterval|int $ttl
+     *
+     * @return int
+     */
+    protected function getSeconds($ttl) {
+        $duration = $this->parseDateInterval($ttl);
+        if ($duration instanceof DateTimeInterface) {
+            $duration = CCarbon::now()->diffInRealSeconds($duration, false);
+        }
+
+        return (int) $duration > 0 ? $duration : 0;
     }
 
     /**
@@ -579,19 +611,19 @@ class CCache_Repository implements CCache_RepositoryInterface, ArrayAccess {
     }
 
     /**
-     * Calculate the number of seconds for the given TTL.
+     * Handle dynamic calls into macros or pass missing methods to the store.
      *
-     * @param \DateTimeInterface|\DateInterval|int $ttl
+     * @param string $method
+     * @param array  $parameters
      *
-     * @return int
+     * @return mixed
      */
-    protected function getSeconds($ttl) {
-        $duration = $this->parseDateInterval($ttl);
-        if ($duration instanceof DateTimeInterface) {
-            $duration = CCarbon::now()->diffInRealSeconds($duration, false);
+    public function __call($method, $parameters) {
+        if (static::hasMacro($method)) {
+            return $this->macroCall($method, $parameters);
         }
 
-        return (int) $duration > 0 ? $duration : 0;
+        return $this->driver->$method(...$parameters);
     }
 
     /**
@@ -601,44 +633,5 @@ class CCache_Repository implements CCache_RepositoryInterface, ArrayAccess {
      */
     public function __clone() {
         $this->driver = clone $this->driver;
-    }
-
-    /**
-     * Get a lock instance.
-     *
-     * @param string      $name
-     * @param int         $seconds
-     * @param null|string $owner
-     *
-     * @return CCache_LockInterface
-     *
-     * @see CCache_Driver_RedisDriver
-     */
-    public function lock($name, $seconds = 0, $owner = null) {
-        if ($this->driver instanceof CCache_Contract_LockProviderDriverInterface) {
-            return $this->driver->lock($name, $seconds, $owner);
-        } else {
-            throw new BadMethodCallException('This cache store does not support lock.');
-        }
-
-        return false;
-    }
-
-    /**
-     * Restore a lock instance using the owner identifier.
-     *
-     * @param string $name
-     * @param string $owner
-     *
-     * @return \TBCache_LockInterface
-     */
-    public function restoreLock($name, $owner) {
-        if ($this->driver instanceof CCache_Contract_LockProviderDriverInterface) {
-            return $this->driver->restoreLock($name, $owner);
-        } else {
-            throw new BadMethodCallException('This cache store does not support lock.');
-        }
-
-        return false;
     }
 }

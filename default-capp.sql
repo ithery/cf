@@ -51,6 +51,7 @@ CREATE TABLE IF NOT EXISTS `roles` (
   `rgt` bigint(20) DEFAULT NULL,
   `is_base` tinyint(4) NOT NULL DEFAULT '0',
   `name` varchar(60) DEFAULT NULL COMMENT 'The name of an entity (record) is used as an default search option in addition to the search key. The name is up to 60 characters in length.',
+  `type` varchar(255) DEFAULT NULL,
   `description` varchar(255) DEFAULT NULL,
   `store_id` bigint(20) DEFAULT NULL,
   `role_level` int(11) DEFAULT '0',
@@ -65,14 +66,12 @@ CREATE TABLE IF NOT EXISTS `roles` (
   UNIQUE KEY `roleid` (`role_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
--- Dumping data for table torsb2c.roles: ~6 rows (approximately)
 /*!40000 ALTER TABLE `roles` DISABLE KEYS */;
 INSERT INTO `roles` (`role_id`, `parent_id`, `depth`, `org_id`, `lft`, `rgt`, `is_base`, `name`, `description`, `store_id`, `created`, `createdby`, `updated`, `updatedby`, `status`, `role_level`) VALUES
 	(1, NULL, 0, NULL, 1, 2, 1, 'SUPERADMIN', NULL, NULL, NULL, NULL, NULL, NULL, 1, 0);
 /*!40000 ALTER TABLE `roles` ENABLE KEYS */;
 
 
--- Dumping structure for table torsb2c.role_nav
 DROP TABLE IF EXISTS `role_nav`;
 CREATE TABLE IF NOT EXISTS `role_nav` (
   `role_nav_id` bigint(20) unsigned NOT NULL AUTO_INCREMENT,
@@ -113,8 +112,6 @@ CREATE TABLE IF NOT EXISTS `role_permission` (
   UNIQUE KEY `role_permission_id` (`role_permission_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
-/*!40000 ALTER TABLE `role_permission` DISABLE KEYS */;
-/*!40000 ALTER TABLE `role_permission` ENABLE KEYS */;
 
 
 DROP TABLE IF EXISTS `sys_counter`;
@@ -316,7 +313,8 @@ CREATE TABLE `queue_batch` (
   `deletedby` varchar(255) DEFAULT NULL,
   `status` int(11) NOT NULL DEFAULT '1',
   PRIMARY KEY (`queue_batch_id`),
-  UNIQUE KEY `queue_batch_id` (`queue_batch_id`)
+  UNIQUE KEY `queue_batch_id` (`queue_batch_id`),
+  UNIQUE KEY `id` (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 
@@ -345,6 +343,8 @@ CREATE TABLE `notification` (
   `org_id` bigint(20) unsigned,
   `notifiable_type` varchar(255) NOT NULL,
   `notifiable_id` bigint(20) unsigned NOT NULL,
+  `ref_type` varchar(255) DEFAULT NULL,
+  `ref_id` bigint(20) unsigned DEFAULT NULL,
   `type` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
   `data` longtext CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
   `title` varchar(1000) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
@@ -440,6 +440,41 @@ CREATE TABLE `log_sse` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 
+DROP TABLE IF EXISTS `log_notification`;
+CREATE TABLE `log_notification` (
+  `log_notification_id` bigint(20) unsigned NOT NULL AUTO_INCREMENT,
+  `org_id` bigint(20) unsigned DEFAULT NULL,
+  `member_id` bigint(20) unsigned DEFAULT NULL,
+  `member_type` varchar(50) DEFAULT NULL,
+  `message_class` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `vendor` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `channel` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `notification_status` varchar(50) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `is_read` int(11) NOT NULL DEFAULT 0,
+  `recipient` text CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `subject` text CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `message` longtext CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `options` longtext CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `error` longtext DEFAULT NULL,
+  `vendor_response` longtext DEFAULT NULL,
+  `ref_id` bigint(20) unsigned DEFAULT NULL,
+  `ref_type` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `created` datetime DEFAULT NULL,
+  `createdby` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `createdip` varchar(50) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `updated` datetime DEFAULT NULL,
+  `updatedby` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `updatedip` varchar(50) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `status` tinyint(4) NOT NULL DEFAULT 1,
+  `deleted` datetime DEFAULT NULL,
+  `deletedby` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  PRIMARY KEY (`log_notification_id`),
+  UNIQUE KEY `log_notification_id` (`log_notification_id`),
+  KEY `org_id` (`org_id`),
+  KEY `member_id` (`member_id`),
+  CONSTRAINT `log_notification_ibfk_1` FOREIGN KEY (`org_id`) REFERENCES `org` (`org_id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
 DROP TABLE IF EXISTS `log_login`;
 CREATE TABLE IF NOT EXISTS `log_login` (
   `log_login_id` bigint(20) unsigned NOT NULL AUTO_INCREMENT,
@@ -527,10 +562,44 @@ CREATE TABLE `websocket_statistic` (
   `deleted` datetime DEFAULT NULL,
   `deletedby` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
   `status` int(11) NOT NULL DEFAULT 1,
-  PRIMARY KEY (`websocket_statistic_id`)
+  PRIMARY KEY (`websocket_statistic_id`),
+  UNIQUE KEY `websocket_statistic_id` (`websocket_statistic_id`)
 ) ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8mb4;
 
 
+CREATE TABLE `cache` (
+  `cache_id` bigint(20) unsigned NOT NULL AUTO_INCREMENT,
+  `key` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `value` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `expiration` bigint(20) DEFAULT NULL,
+  `created` datetime DEFAULT NULL,
+  `createdby` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `updated` datetime DEFAULT NULL,
+  `updatedby` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `deleted` datetime DEFAULT NULL,
+  `deletedby` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `status` int(11) NOT NULL DEFAULT 1,
+  PRIMARY KEY (`cache_id`),
+  UNIQUE KEY `cache_id` (`cache_id`),
+  UNIQUE KEY `key` (`key`)
+) ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8mb4;
+
+CREATE TABLE `cache_lock` (
+  `cache_lock_id` bigint(20) unsigned NOT NULL AUTO_INCREMENT,
+  `key` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `owner` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `expiration` bigint(20) DEFAULT NULL,
+  `created` datetime DEFAULT NULL,
+  `createdby` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `updated` datetime DEFAULT NULL,
+  `updatedby` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `deleted` datetime DEFAULT NULL,
+  `deletedby` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `status` int(11) NOT NULL DEFAULT 1,
+  PRIMARY KEY (`cache_lock_id`),
+  UNIQUE KEY `cache_lock_id` (`cache_lock_id`),
+  UNIQUE KEY `key` (`key`)
+) ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8mb4;
 
 /*!40101 SET SQL_MODE=IFNULL(@OLD_SQL_MODE, '') */;
 /*!40014 SET FOREIGN_KEY_CHECKS=IF(@OLD_FOREIGN_KEY_CHECKS IS NULL, 1, @OLD_FOREIGN_KEY_CHECKS) */;

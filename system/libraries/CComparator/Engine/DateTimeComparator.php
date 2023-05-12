@@ -1,16 +1,9 @@
 <?php
 
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
-
 /**
  * Compares DateTimeInterface instances for equality.
  */
 class CComparator_Engine_DateTimeComparator extends CComparator_Engine_ObjectComparator {
-
     /**
      * Returns whether the comparator can compare two values.
      *
@@ -20,8 +13,8 @@ class CComparator_Engine_DateTimeComparator extends CComparator_Engine_ObjectCom
      * @return bool
      */
     public function accepts($expected, $actual) {
-        return ($expected instanceof \DateTime || $expected instanceof \DateTimeInterface) &&
-                ($actual instanceof \DateTime || $actual instanceof \DateTimeInterface);
+        return ($expected instanceof \DateTime || $expected instanceof \DateTimeInterface)
+                && ($actual instanceof \DateTime || $actual instanceof \DateTimeInterface);
     }
 
     /**
@@ -35,7 +28,7 @@ class CComparator_Engine_DateTimeComparator extends CComparator_Engine_ObjectCom
      * @param array $processed    List of already processed elements (used to prevent infinite recursion)
      *
      * @throws \Exception
-     * @throws ComparisonFailure
+     * @throws CComparator_Exception_ComparisonFailureException
      */
     public function assertEquals($expected, $actual, $delta = 0.0, $canonicalize = false, $ignoreCase = false, array &$processed = []) {
         /** @var \DateTimeInterface $expected */
@@ -50,14 +43,19 @@ class CComparator_Engine_DateTimeComparator extends CComparator_Engine_ObjectCom
         $expectedLower = (clone $expected);
 
         $expectedLower->setTimezone(new \DateTimeZone('UTC'))
-                ->sub($delta);
+            ->sub($delta);
         $expectedUpper = (clone $expected);
 
         $expectedUpper->setTimezone(new \DateTimeZone('UTC'))
-                ->add($delta);
+            ->add($delta);
         if ($actualClone < $expectedLower || $actualClone > $expectedUpper) {
             throw new CComparator_Exception_ComparisonFailureException(
-            $expected, $actual, $this->dateTimeToString($expected), $this->dateTimeToString($actual), false, 'Failed asserting that two DateTime objects are equal.'
+                $expected,
+                $actual,
+                $this->dateTimeToString($expected),
+                $this->dateTimeToString($actual),
+                false,
+                'Failed asserting that two DateTime objects are equal.'
             );
         }
     }
@@ -67,9 +65,9 @@ class CComparator_Engine_DateTimeComparator extends CComparator_Engine_ObjectCom
      * 'Invalid DateTimeInterface object' if the provided DateTimeInterface was not properly
      * initialized.
      */
-    private function dateTimeToString(\DateTimeInterface $datetime) {
+    private function dateTimeToString(DateTimeInterface $datetime) {
         $string = $datetime->format('Y-m-d\TH:i:s.uO');
+
         return $string ?: 'Invalid DateTimeInterface object';
     }
-
 }

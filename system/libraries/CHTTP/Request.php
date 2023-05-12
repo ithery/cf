@@ -16,7 +16,6 @@ class CHTTP_Request extends SymfonyRequest implements CInterface_Arrayable, Arra
     use CHTTP_Trait_InteractsWithInput,
         CHTTP_Trait_InteractsWithContentTypes,
         CHTTP_Trait_InteractsWithFlashData;
-
     protected $browser;
 
     /**
@@ -85,6 +84,15 @@ class CHTTP_Request extends SymfonyRequest implements CInterface_Arrayable, Arra
      */
     public function root() {
         return rtrim($this->getSchemeAndHttpHost() . $this->getBaseUrl(), '/');
+    }
+
+    public function getHost() {
+        $host = parent::getHost();
+        if ($host == null) {
+            $host = CF::domain();
+        }
+
+        return $host;
     }
 
     /**
@@ -718,5 +726,9 @@ class CHTTP_Request extends SymfonyRequest implements CInterface_Arrayable, Arra
         }
 
         return isset($ref) ? $ref : $default;
+    }
+
+    public function isCresRequest() {
+        return $this->hasHeader('X-Cres-Version');
     }
 }

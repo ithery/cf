@@ -2,7 +2,7 @@
 
 use Opis\Closure\SerializableClosure;
 
-class CManager_DataProvider_ModelDataProvider extends CManager_DataProviderAbstract {
+class CManager_DataProvider_ModelDataProvider extends CManager_DataProviderAbstract implements CManager_Contract_DataProviderInterface {
     protected $modelClass;
 
     /**
@@ -46,7 +46,7 @@ class CManager_DataProvider_ModelDataProvider extends CManager_DataProviderAbstr
      *
      * @return CModel_Query
      */
-    protected function getModelQuery($callback = null) {
+    public function getModelQuery($callback = null) {
         $modelClass = $this->modelClass;
         $query = $modelClass::query();
         /** @var CModel_Query $query */
@@ -133,10 +133,12 @@ class CManager_DataProvider_ModelDataProvider extends CManager_DataProviderAbstr
                 }
             });
 
-            foreach ($dataSearch as $fieldName => $value) {
-                if (strpos($fieldName, '.') === false) {
-                    if (in_array($fieldName, $aggregateFields)) {
-                        $query->having($fieldName, 'like', '%' . $value . '%');
+            if (count($aggregateFields) > 0) {
+                foreach ($dataSearch as $fieldName => $value) {
+                    if (strpos($fieldName, '.') === false) {
+                        if (in_array($fieldName, $aggregateFields)) {
+                            $query->having($fieldName, 'like', '%' . $value . '%');
+                        }
                     }
                 }
             }

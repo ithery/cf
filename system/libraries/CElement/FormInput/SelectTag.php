@@ -10,9 +10,10 @@ defined('SYSPATH') or die('No direct access allowed.');
  */
 class CElement_FormInput_SelectTag extends CElement_FormInput {
     use CTrait_Compat_Element_FormInput_SelectTag;
+
     protected $multiple;
 
-    public function __construct($id) {
+    public function __construct($id = null) {
         parent::__construct($id);
         $this->multiple = true;
     }
@@ -52,7 +53,7 @@ class CElement_FormInput_SelectTag extends CElement_FormInput {
             foreach ($this->attr as $k => $v) {
                 $addition_attribute .= ' ' . $k . '="' . $v . '"';
             }
-            $html->appendln('<select name="' . $name . '" id="' . $this->id . '" class="form-control select' . $classes . $this->validation->validation_class() . '"' . $custom_css . $disabled . $readonly . $multiple . $addition_attribute . '>')
+            $html->appendln('<select name="' . $name . '" id="' . $this->id . '" class="form-control select' . $classes . $this->validation->validationClass() . '"' . $custom_css . $disabled . $readonly . $multiple . $addition_attribute . '>')
                 ->incIndent()->br();
 
             if ($this->list != null) {

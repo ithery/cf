@@ -98,7 +98,7 @@ class CImage_Chart_BaseDraw {
     /**
      * @var string
      */
-    public $fontName = 'GeosansLight.ttf';
+    public $fontName = 'verdana.ttf';
 
     /**
      * @var int
@@ -212,7 +212,7 @@ class CImage_Chart_BaseDraw {
     /**
      * Attached dataset.
      *
-     * @var Data
+     * @var CImage_Chart_Data
      */
     public $dataSet;
 
@@ -230,7 +230,7 @@ class CImage_Chart_BaseDraw {
     private $resourcePath;
 
     public function __construct() {
-        $this->resourcePath = DOCROOT . 'modules/cresenity/media';
+        $this->resourcePath = DOCROOT . 'system/media';
         $this->fontName = $this->loadFont($this->fontName, 'font');
     }
 
@@ -805,7 +805,7 @@ class CImage_Chart_BaseDraw {
             $values[0] = $tmp;
         }
         $result = [];
-        if ($data['orientation'] == Constant::SCALE_POS_LEFTRIGHT) {
+        if (carr::get($data, 'orientation') == Constant::SCALE_POS_LEFTRIGHT) {
             $height = ($this->graphAreaY2 - $this->graphAreaY1) - $data['axis'][$axisID]['margin'] * 2;
             $scaleHeight = $data['axis'][$axisID]['scaleMax'] - $data['axis'][$axisID]['scaleMin'];
             $step = $height / $scaleHeight;
@@ -827,7 +827,7 @@ class CImage_Chart_BaseDraw {
                 }
             }
         } else {
-            $width = ($this->graphAreaX2 - $this->graphAreaX1) - $data['axis'][$axisID]['margin'] * 2;
+            $width = ($this->graphAreaX2 - $this->graphAreaX1) - (carr::get($data, 'axis.'.$axisID.'.margin', 0) * 2);
             $scaleWidth = $data['axis'][$axisID]['scaleMax'] - $data['axis'][$axisID]['scaleMin'];
             $step = $width / $scaleWidth;
             if ($returnOnly0Height) {
@@ -1098,8 +1098,8 @@ class CImage_Chart_BaseDraw {
         $g = isset($format['g']) ? $format['g'] : -1;
         $b = isset($format['b']) ? $format['b'] : -1;
         $alpha = isset($format['alpha']) ? $format['alpha'] : 100;
-        $fontName = isset($format['FontName']) ? $format['FontName'] : null;
-        $fontSize = isset($format['FontSize']) ? $format['FontSize'] : null;
+        $fontName = isset($format['fontName']) ? $format['fontName'] : null;
+        $fontSize = isset($format['fontSize']) ? $format['fontSize'] : null;
         if ($r != -1) {
             $this->fontColorR = $r;
         }

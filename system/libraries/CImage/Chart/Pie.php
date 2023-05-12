@@ -4,7 +4,6 @@ use CImage_Chart_Constant as Constant;
 
 class CImage_Chart_Pie {
     use CImage_Chart_Concern_Pie_Draw;
-
     protected $chartObject;
 
     protected $dataObject;
@@ -141,10 +140,10 @@ class CImage_Chart_Pie {
         $b = isset($format['b']) ? $format['b'] : 0;
         $alpha = isset($format['alpha']) ? $format['alpha'] : 100;
 
-        $this->dataObject->Palette[$sliceID]['r'] = $r;
-        $this->dataObject->Palette[$sliceID]['g'] = $G;
-        $this->dataObject->Palette[$sliceID]['b'] = $b;
-        $this->dataObject->Palette[$sliceID]['alpha'] = $alpha;
+        $this->dataObject->palette[$sliceID]['r'] = $r;
+        $this->dataObject->palette[$sliceID]['g'] = $G;
+        $this->dataObject->palette[$sliceID]['b'] = $b;
+        $this->dataObject->palette[$sliceID]['alpha'] = $alpha;
     }
 
     /**

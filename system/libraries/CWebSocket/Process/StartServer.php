@@ -13,9 +13,11 @@ class CWebSocket_Process_StartServer {
 
     public $disableStatistic = false;
 
-    protected $statisticsInterval = 60;
+    protected $statisticInterval = 60;
 
     protected $debug = false;
+
+    protected $lastRestart;
 
     /**
      * Get the loop instance.
@@ -115,7 +117,7 @@ class CWebSocket_Process_StartServer {
      */
     protected function configureStatistics() {
         if (!$this->disableStatistic) {
-            $intervalInSeconds = $this->statisticsInterval ?: CF::config('websocket.statistics.interval_in_seconds', 3600);
+            $intervalInSeconds = $this->statisticInterval ?: CF::config('websocket.statistics.interval_in_seconds', 3600);
 
             $this->loop->addPeriodicTimer($intervalInSeconds, function () {
                 $this->writeLn('Saving statistics...');
@@ -263,11 +265,10 @@ class CWebSocket_Process_StartServer {
      * @return int
      */
     protected function getLastRestart() {
-        return 0;
-        // return Cache::get(
-        //     'cf:websockets:restart',
-        //     0
-        // );
+        return c::cache()->get(
+            'cf:websockets:restart',
+            0
+        );
     }
 
     /**

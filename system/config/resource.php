@@ -27,7 +27,7 @@ return [
     /*
      * The fully qualified class name of the media model.
      */
-    'resource_model' => 'CApp_Model_Resource',
+    'resource_model' => CApp_Model_Resource::class,
     's3' => [
         /*
         * The domain that should be prepended when generating urls.

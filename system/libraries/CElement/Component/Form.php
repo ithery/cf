@@ -209,6 +209,17 @@ class CElement_Component_Form extends CElement_Component {
     }
 
     /**
+     * Set enctype attribute value to multipart/form-data.
+     *
+     * @return CElement_Component_Form
+     */
+    public function setEncTypeMultiPartFormData() {
+        $this->enctype = 'multipart/form-data';
+
+        return $this;
+    }
+
+    /**
      * @param bool $bool
      *
      * @return $this
@@ -323,7 +334,7 @@ class CElement_Component_Form extends CElement_Component {
             $this->setAttr('target', $this->target);
         }
         if (strlen($this->method) > 0) {
-            $this->setAttr('method', $this->method);
+            $this->setAttr('method', cstr::upper($this->method));
         }
         if (strlen($this->action) > 0) {
             $this->setAttr('action', $this->action);

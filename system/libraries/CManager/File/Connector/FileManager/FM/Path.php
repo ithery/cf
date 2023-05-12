@@ -9,9 +9,9 @@ defined('SYSPATH') or die('No direct access allowed.');
  *
  * @license Ittron Global Teknologi <ittron.co.id>
  */
-use Intervention\Image\Facades\Image;
-// import the Intervention Image Manager Class
 use Intervention\Image\ImageManager;
+// import the Intervention Image Manager Class
+use Intervention\Image\Facades\Image;
 
 /**
  * @property-read CManager_File_Connector_FileManager_FM_StorageRepository $storage
@@ -23,15 +23,18 @@ class CManager_File_Connector_FileManager_FM_Path {
 
     private $is_thumb = false;
 
-    private $helper;
+    /**
+     * @var CManager_File_Connector_FileManager_FM
+     */
+    private $fm;
 
     public function __construct(CManager_File_Connector_FileManager_FM $fm = null) {
-        $this->helper = $fm;
+        $this->fm = $fm;
     }
 
     public function __get($var_name) {
         if ($var_name == 'storage') {
-            return $this->helper->getStorage($this->path('url'));
+            return $this->fm->getStorage($this->path('url'));
         }
     }
 
@@ -49,16 +52,19 @@ class CManager_File_Connector_FileManager_FM_Path {
 
     public function dir($working_dir) {
         $this->working_dir = $working_dir;
+
         return $this;
     }
 
     public function thumb($is_thumb = true) {
         $this->is_thumb = $is_thumb;
+
         return $this;
     }
 
     public function setName($item_name) {
         $this->item_name = $item_name;
+
         return $this;
     }
 
@@ -69,10 +75,11 @@ class CManager_File_Connector_FileManager_FM_Path {
     public function path($type = 'storage') {
         if ($type == 'working_dir') {
             // working directory: /{user_slug}
+
             return $this->translateToFmPath($this->normalizeWorkingDir());
         } elseif ($type == 'url') {
             // storage: files/{user_slug}
-            return $this->helper->getCategoryName() . $this->path('working_dir');
+            return $this->fm->getCategoryName() . $this->path('working_dir');
         } elseif ($type == 'storage') {
             // storage: files/{user_slug}
             // storage on windows: files\{user_slug}
@@ -86,11 +93,11 @@ class CManager_File_Connector_FileManager_FM_Path {
     }
 
     public function translateToFmPath($path) {
-        return str_replace($this->helper->ds(), DS, $path);
+        return str_replace($this->fm->ds(), DS, $path);
     }
 
     public function translateToOsPath($path) {
-        return str_replace(DS, $this->helper->ds(), $path);
+        return str_replace(DS, $this->fm->ds(), $path);
     }
 
     public function url() {
@@ -103,8 +110,9 @@ class CManager_File_Connector_FileManager_FM_Path {
         }, $this->storage->directories());
 
         $folders = array_filter($all_folders, function ($directory) {
-            return $directory->name !== $this->helper->getThumbFolderName();
+            return $directory->name !== $this->fm->getThumbFolderName();
         });
+
         return $this->sortByColumn($folders);
     }
 
@@ -112,15 +120,16 @@ class CManager_File_Connector_FileManager_FM_Path {
         $files = array_map(function ($file_path) {
             return $this->pretty($file_path);
         }, $this->storage->files());
+
         return $this->sortByColumn($files);
     }
 
     public function pretty($item_path) {
-        $cloned = clone($this);
+        $cloned = clone $this;
 
-        $cloned->setName($this->helper->getNameFromPath($item_path));
+        $cloned->setName($this->fm->getNameFromPath($item_path));
 
-        return new CManager_File_Connector_FileManager_FM_Item($cloned, $this->helper);
+        return new CManager_File_Connector_FileManager_FM_Item($cloned, $this->fm);
     }
 
     public function delete() {
@@ -142,13 +151,11 @@ class CManager_File_Connector_FileManager_FM_Path {
         }
         $this->storage->makeDirectory(0777, true, true);
 
-        $this->helper->dispatch(new CManager_File_Connector_FileManager_Event_FolderIsCreated($this->path()));
+        $this->fm->dispatch(new CManager_File_Connector_FileManager_Event_FolderIsCreated($this->path()));
     }
 
     public function isDirectory() {
         $working_dir = $this->path('working_dir');
-
-
 
         $parent_dir = substr($working_dir, 0, strrpos($working_dir, '/'));
         if (strlen($parent_dir) == 0) {
@@ -163,7 +170,7 @@ class CManager_File_Connector_FileManager_FM_Path {
     }
 
     public function createNewPathObject() {
-        return new static($this->helper);
+        return new static($this->fm);
     }
 
     /**
@@ -176,15 +183,16 @@ class CManager_File_Connector_FileManager_FM_Path {
     }
 
     public function normalizeWorkingDir() {
-        $path = $this->working_dir ?: $this->helper->input('working_dir') ?: $this->helper->getRootFolder();
+        $path = $this->working_dir ?: $this->fm->input('working_dir') ?: $this->fm->getRootFolder();
         if ($this->is_thumb) {
             // Prevent if working dir is "/" normalizeWorkingDir will add double "//" that breaks S3 functionality
-            $path = rtrim($path, DS) . DS . $this->helper->getThumbFolderName();
+            $path = rtrim($path, DS) . DS . $this->fm->getThumbFolderName();
         }
         if ($this->getName()) {
             // Prevent if working dir is "/" normalizeWorkingDir will add double "//" that breaks S3 functionality
             $path = rtrim($path, DS) . DS . $this->getName();
         }
+
         return $path;
     }
 
@@ -196,7 +204,7 @@ class CManager_File_Connector_FileManager_FM_Path {
      * @return array of object
      */
     public function sortByColumn($arr_items) {
-        $sortBy = $this->helper->input('sortType');
+        $sortBy = $this->fm->input('sortType');
         if (in_array($sortBy, ['name', 'time'])) {
             $keyToSort = $sortBy;
         } else {
@@ -205,15 +213,16 @@ class CManager_File_Connector_FileManager_FM_Path {
         uasort($arr_items, function ($a, $b) use ($keyToSort) {
             return strcmp($a->{$keyToSort}, $b->{$keyToSort});
         });
+
         return $arr_items;
     }
 
     public function error($error_type, $variables = []) {
-        return $this->helper->error($error_type, $variables);
+        return $this->fm->error($error_type, $variables);
     }
 
     /**
-     * Upload File
+     * Upload File.
      *
      * @param mixed $file
      *
@@ -224,13 +233,15 @@ class CManager_File_Connector_FileManager_FM_Path {
         $newFileName = $this->getNewName($file);
         $newFilePath = $this->setName($newFileName)->path('absolute');
 
-        $this->helper->dispatch(new CManager_File_Connector_FileManager_Event_FileIsUploading($newFilePath));
+        $this->fm->dispatch(new CManager_File_Connector_FileManager_Event_FileIsUploading($newFilePath));
+
         try {
             $newFileName = $this->saveFile($file, $newFileName);
         } catch (\Exception $e) {
             return $this->error($e->getMessage());
         }
-        $this->helper->dispatch(new CManager_File_Connector_FileManager_Event_FileWasUploaded($newFilePath));
+        $this->fm->dispatch(new CManager_File_Connector_FileManager_Event_FileWasUploaded($newFilePath));
+
         return $newFileName;
     }
 
@@ -245,43 +256,46 @@ class CManager_File_Connector_FileManager_FM_Path {
             throw new \Exception('File failed to upload. Error code: ' . $file->getError());
         }
         $newFileName = $this->getNewName($file);
-        if ($this->setName($newFileName)->exists() && !$this->helper->config('over_write_on_duplicate')) {
+        if ($this->setName($newFileName)->exists() && !$this->fm->config('over_write_on_duplicate')) {
             return $this->error('file-exist');
         }
-        if ($this->helper->config('should_validate_mime', false)) {
+        if ($this->fm->config('should_validate_mime', false)) {
             $mimetype = $file->getMimeType();
-            if (false === in_array($mimetype, $this->helper->availableMimeTypes())) {
+            if (false === in_array($mimetype, $this->fm->availableMimeTypes())) {
                 return $this->error('mime') . $mimetype;
             }
         }
-        if ($this->helper->config('should_validate_size', false)) {
+        if ($this->fm->config('should_validate_size', false)) {
             // size to kb unit is needed
             $file_size = $file->getSize() / 1000;
-            if ($file_size > $this->helper->maxUploadSize()) {
+            if ($file_size > $this->fm->maxUploadSize()) {
                 return $this->error('size') . $file_size;
             }
         }
+
         return 'pass';
     }
 
     private function getNewName($file) {
-        $newFileName = $this->helper
+        $newFileName = $this->fm
             ->translateFromUtf8(trim(pathinfo($file->getClientOriginalName(), PATHINFO_FILENAME)));
-        if ($this->helper->config('rename_file') === true) {
+        if ($this->fm->config('rename_file') === true) {
             $newFileName = uniqid();
-        } elseif ($this->helper->config('alphanumeric_filename') === true) {
+        } elseif ($this->fm->config('alphanumeric_filename') === true) {
             $newFileName = preg_replace('/[^A-Za-z0-9\-\']/', '_', $newFileName);
         }
         $extension = $file->getClientOriginalExtension();
         if ($extension) {
             $newFileName .= '.' . $extension;
         }
+
         return $newFileName;
     }
 
     private function saveFile($file, $newFileName) {
         $this->setName($newFileName)->storage->save($file);
         $this->makeThumbnail($newFileName);
+
         return $newFileName;
     }
 
@@ -297,7 +311,7 @@ class CManager_File_Connector_FileManager_FM_Path {
 
         $imageManager = new ImageManager();
         $image = $imageManager->make($original_image->get())
-            ->fit($this->helper->config('thumb_img_width', 200), $this->helper->config('thumb_img_height', 200));
+            ->fit($this->fm->config('thumb_img_width', 200), $this->fm->config('thumb_img_height', 200));
         $this->storage->put($image->stream()->detach());
     }
 }

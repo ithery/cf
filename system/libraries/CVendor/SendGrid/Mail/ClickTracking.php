@@ -1,15 +1,7 @@
 <?php
 
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
-
 /**
- * This class is used to construct a ClickTracking object for the /mail/send API call
- *
- * @package SendGrid\Mail
+ * This class is used to construct a ClickTracking object for the /mail/send API call.
  */
 class CVendor_SendGrid_Mail_ClickTracking implements \JsonSerializable {
     /**
@@ -21,10 +13,10 @@ class CVendor_SendGrid_Mail_ClickTracking implements \JsonSerializable {
     private $enable_text;
 
     /**
-     * Optional constructor
+     * Optional constructor.
      *
-     * @param bool|null $enable      Indicates if this setting is enabled
-     * @param bool|null $enable_text Indicates if this setting should be
+     * @param null|bool $enable      Indicates if this setting is enabled
+     * @param null|bool $enable_text Indicates if this setting should be
      *                               included in the text/plain portion of
      *                               your email
      */
@@ -38,7 +30,7 @@ class CVendor_SendGrid_Mail_ClickTracking implements \JsonSerializable {
     }
 
     /**
-     * Update the enable setting on a ClickTracking object
+     * Update the enable setting on a ClickTracking object.
      *
      * @param bool $enable Indicates if this setting is enabled
      *
@@ -52,7 +44,7 @@ class CVendor_SendGrid_Mail_ClickTracking implements \JsonSerializable {
     }
 
     /**
-     * Retrieve the enable setting on a ClickTracking object
+     * Retrieve the enable setting on a ClickTracking object.
      *
      * @return bool
      */
@@ -61,7 +53,7 @@ class CVendor_SendGrid_Mail_ClickTracking implements \JsonSerializable {
     }
 
     /**
-     * Update the enable text setting on a ClickTracking object
+     * Update the enable text setting on a ClickTracking object.
      *
      * @param bool $enable_text Indicates if this setting is enabled
      *
@@ -75,7 +67,7 @@ class CVendor_SendGrid_Mail_ClickTracking implements \JsonSerializable {
     }
 
     /**
-     * Retrieve the enable_text setting on a ClickTracking object
+     * Retrieve the enable_text setting on a ClickTracking object.
      *
      * @return bool
      */
@@ -84,7 +76,7 @@ class CVendor_SendGrid_Mail_ClickTracking implements \JsonSerializable {
     }
 
     /**
-     * Return an array representing a ClickTracking object for the Twilio SendGrid API
+     * Return an array representing a ClickTracking object for the Twilio SendGrid API.
      *
      * @return null|array
      */

@@ -30,6 +30,13 @@ class CAuth_Guard_SessionGuard implements CAuth_Contract_StatefulGuardInterface,
     protected $viaRemember = false;
 
     /**
+     * The number of minutes that the "remember me" cookie should be valid for.
+     *
+     * @var int
+     */
+    protected $rememberDuration = 576000;
+
+    /**
      * The session used by the guard.
      *
      * @var CSession_Store
@@ -367,6 +374,34 @@ class CAuth_Guard_SessionGuard implements CAuth_Contract_StatefulGuardInterface,
     }
 
     /**
+     * Attempt to authenticate a user with credentials and additional callbacks.
+     *
+     * @param array               $credentials
+     * @param null|array|callable $callbacks
+     * @param bool                $remember
+     *
+     * @return bool
+     */
+    public function attemptWhen(array $credentials = [], $callbacks = null, $remember = false) {
+        $this->fireAttemptEvent($credentials, $remember);
+
+        $this->lastAttempted = $user = $this->provider->retrieveByCredentials($credentials);
+
+        // This method does the exact same thing as attempt, but also executes callbacks after
+        // the user is retrieved and validated. If one of the callbacks returns falsy we do
+        // not login the user. Instead, we will fail the specific authentication attempt.
+        if ($this->hasValidCredentials($user, $credentials) && $this->shouldLogin($callbacks, $user)) {
+            $this->login($user, $remember);
+
+            return true;
+        }
+
+        $this->fireFailedEvent($user, $credentials);
+
+        return false;
+    }
+
+    /**
      * Determine if the user matches the credentials.
      *
      * @param mixed $user
@@ -479,7 +514,7 @@ class CAuth_Guard_SessionGuard implements CAuth_Contract_StatefulGuardInterface,
      * @return \Symfony\Component\HttpFoundation\Cookie
      */
     protected function createRecaller($value) {
-        return $this->getCookieJar()->forever($this->getRecallerName(), $value);
+        return $this->getCookieJar()->make($this->getRecallerName(), $value, $this->getRememberDuration());
     }
 
     /**
@@ -545,8 +580,9 @@ class CAuth_Guard_SessionGuard implements CAuth_Contract_StatefulGuardInterface,
     protected function clearUserDataFromStorage() {
         $this->session->remove($this->getName());
         if (!is_null($this->recaller())) {
-            $this->getCookieJar()->queue($this->getCookieJar()
-                ->forget($this->getRecallerName()));
+            $this->getCookieJar()->queue(
+                $this->getCookieJar()->forget($this->getRecallerName())
+            );
         }
     }
 
@@ -578,9 +614,7 @@ class CAuth_Guard_SessionGuard implements CAuth_Contract_StatefulGuardInterface,
             return null;
         }
 
-        $result = c::tap($this->user()->forceFill([
-            $attribute => c::hash()->make($password),
-        ]))->save();
+        $result = $this->rehashUserPassword($password, $attribute);
 
         if ($this->recaller()
             || $this->getCookieJar()->hasQueued($this->getRecallerName())
@@ -591,6 +625,26 @@ class CAuth_Guard_SessionGuard implements CAuth_Contract_StatefulGuardInterface,
         $this->fireOtherDeviceLogoutEvent($this->user());
 
         return $result;
+    }
+
+    /**
+     * Rehash the current user's password.
+     *
+     * @param string $password
+     * @param string $attribute
+     *
+     * @throws \InvalidArgumentException
+     *
+     * @return null|\CAuth_AuthenticatableInterface
+     */
+    protected function rehashUserPassword($password, $attribute) {
+        if (!$this->hasher()->check($password, $this->user()->{$attribute})) {
+            throw new InvalidArgumentException('The given password does not match the current password.');
+        }
+
+        return c::tap($this->user()->forceFill([
+            $attribute => $this->hasher()->make($password),
+        ]))->save();
     }
 
     /**
@@ -745,6 +799,28 @@ class CAuth_Guard_SessionGuard implements CAuth_Contract_StatefulGuardInterface,
      */
     public function viaRemember() {
         return $this->viaRemember;
+    }
+
+    /**
+     * Get the number of minutes the remember me cookie should be valid for.
+     *
+     * @return int
+     */
+    protected function getRememberDuration() {
+        return $this->rememberDuration;
+    }
+
+    /**
+     * Set the number of minutes the remember me cookie should be valid for.
+     *
+     * @param int $minutes
+     *
+     * @return $this
+     */
+    public function setRememberDuration($minutes) {
+        $this->rememberDuration = $minutes;
+
+        return $this;
     }
 
     /**

@@ -3,7 +3,7 @@
 use Symfony\Component\HttpKernel\Exception\AccessDeniedHttpException;
 
 class CBroadcast_Broadcaster_RedisBroadcaster extends CBroadcast_BroadcasterAbstract {
-    use CBroadcast_Trait_UsePusherChannelConventions;
+    use CBroadcast_Trait_UsePusherChannelConventionsTrait;
 
     /**
      * The Redis instance.

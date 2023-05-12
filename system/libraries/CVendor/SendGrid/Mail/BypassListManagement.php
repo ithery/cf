@@ -1,21 +1,13 @@
 <?php
 
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
-
 /**
  * This class is used to construct a BypassListManagement object for
- * the /mail/send API call
+ * the /mail/send API call.
  *
  * Allows you to bypass all unsubscribe groups and suppressions to
  * ensure that the email is delivered to every single recipient. This
  * should only be used in emergencies when it is absolutely necessary
  * that every recipient receives your email
- *
- * @package SendGrid\Mail
  */
 class CVendor_SendGrid_Mail_BypassListManagement implements \JsonSerializable {
     /**
@@ -24,9 +16,9 @@ class CVendor_SendGrid_Mail_BypassListManagement implements \JsonSerializable {
     private $enable;
 
     /**
-     * Optional constructor
+     * Optional constructor.
      *
-     * @param bool|null $enable Indicates if this setting is enabled
+     * @param null|bool $enable Indicates if this setting is enabled
      */
     public function __construct($enable = null) {
         if (isset($enable)) {
@@ -35,7 +27,7 @@ class CVendor_SendGrid_Mail_BypassListManagement implements \JsonSerializable {
     }
 
     /**
-     * Update the enable setting on a BypassListManagement object
+     * Update the enable setting on a BypassListManagement object.
      *
      * @param bool $enable Indicates if this setting is enabled
      *
@@ -49,7 +41,7 @@ class CVendor_SendGrid_Mail_BypassListManagement implements \JsonSerializable {
     }
 
     /**
-     * Retrieve the enable setting on a BypassListManagement object
+     * Retrieve the enable setting on a BypassListManagement object.
      *
      * @return bool
      */
@@ -59,7 +51,7 @@ class CVendor_SendGrid_Mail_BypassListManagement implements \JsonSerializable {
 
     /**
      * Return an array representing a BypassListManagement object for
-     * the SendGrid API
+     * the SendGrid API.
      *
      * @return null|array
      */

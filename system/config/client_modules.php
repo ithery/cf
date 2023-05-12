@@ -76,11 +76,13 @@ return [
     'jquery.datatable' => [
         'css' => [
             'plugins/datatable/datatables.css',
-            'plugins/datatable/fixedColumns.dataTables.min.css'
+            'plugins/datatable/fixedColumns.dataTables.min.css',
+            'plugins/datatable/fixedHeader.dataTables.min.css',
         ],
         'js' => [
             'plugins/datatable/datatables.js',
-            'plugins/datatable/dataTables.fixedColumns.min.js'
+            'plugins/datatable/dataTables.fixedColumns.min.js',
+            'plugins/datatable/dataTables.fixedHeader.min.js',
         ],
     ],
     'jquery.datatable.tabletools' => [
@@ -90,8 +92,29 @@ return [
         'requirements' => ['jquery.datatable'],
     ],
     'jquery.datatable.colreorder' => [
+        'css' => [
+            'plugins/datatable/colReorder.dataTables.min.css',
+        ],
         'js' => [
-            'plugins' . DS . 'datatable' . DS . 'ColReorder.min.js',
+            'plugins/datatable/dataTables.colReorder.min.js',
+        ],
+        'requirements' => ['jquery.datatable'],
+    ],
+    'jquery.datatable.responsive' => [
+        'css' => [
+            'plugins/datatable/responsive.dataTables.min.css',
+        ],
+        'js' => [
+            'plugins/datatable/dataTables.responsive.min.js',
+        ],
+        'requirements' => ['jquery.datatable'],
+    ],
+    'jquery.datatable.responsive.bs4' => [
+        'css' => [
+            'plugins/datatable/responsive.bootstrap4.min.css',
+        ],
+        'js' => [
+            'plugins/datatable/responsive.bootstrap4.min.js',
         ],
         'requirements' => ['jquery.datatable'],
     ],
@@ -765,6 +788,12 @@ return [
         ],
         'css' => [
             'plugins/datetimepicker/datetimepicker.min.css',
+        ],
+
+    ],
+    'mime-icons' => [
+        'css' => [
+            'plugins/mime-icons/mime-icons.min.css',
         ],
 
     ],

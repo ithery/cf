@@ -6,9 +6,9 @@ interface CCache_Contract_LockProviderDriverInterface {
      *
      * @param string      $name
      * @param int         $seconds
-     * @param string|null $owner
+     * @param null|string $owner
      *
-     * @return \TBCache_LockInterface
+     * @return \CCache_LockAbstract
      */
     public function lock($name, $seconds = 0, $owner = null);
 
@@ -18,7 +18,7 @@ interface CCache_Contract_LockProviderDriverInterface {
      * @param string $name
      * @param string $owner
      *
-     * @return \TBCache_LockInterface
+     * @return \CCache_LockAbstract
      */
     public function restoreLock($name, $owner);
 }

@@ -32,7 +32,7 @@ class CConsole_Command_Database_DbCommand extends CConsole_Command {
             $processCommand,
             null,
             $this->commandEnvironment($connection)
-        ))->setTimeout(null)->setTty(true)->mustRun(function ($type, $buffer) {
+        ))->setTimeout(null)->setTty(!CServer::os()->onWindows())->mustRun(function ($type, $buffer) {
             $this->output->write($buffer);
         });
 

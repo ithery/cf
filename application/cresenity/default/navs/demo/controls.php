@@ -21,9 +21,19 @@ return [
         'uri' => 'demo/controls/select/search/index',
     ],
     [
+        'name' => 'controls.date',
+        'label' => c::__('Date'),
+        'uri' => 'demo/controls/date/index',
+    ],
+    [
         'name' => 'controls.datetime',
         'label' => c::__('Date Time'),
         'uri' => 'demo/controls/datetime/index',
+    ],
+    [
+        'name' => 'controls.file',
+        'label' => c::__('File'),
+        'uri' => 'demo/controls/file/index',
     ],
     [
         'name' => 'controls.image',

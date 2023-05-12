@@ -7,6 +7,7 @@ class Controller_Demo_Cresjs_Alpine_MasterDetail extends \Cresenity\Demo\Control
     public function index() {
         c::manager()->registerModule('auto-numeric');
         $app = c::app();
+        $app->title('Alpine Master Detail');
         $items = [];
         $app->addView('demo.page.cresjs.alpine.master-detail', [
             'items' => $items

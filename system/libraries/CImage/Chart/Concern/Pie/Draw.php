@@ -33,7 +33,6 @@ trait CImage_Chart_Concern_Pie_Draw {
         /* Data Processing */
         $data = $this->dataObject->getData();
         $palette = $this->dataObject->getPalette();
-
         /* Do we have an abscissa serie defined? */
         if ($data['abscissa'] == '') {
             return Constant::PIE_NO_ABSCISSA;

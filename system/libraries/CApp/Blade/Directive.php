@@ -46,6 +46,14 @@ class CApp_Blade_Directive {
         return '{!! CApp_React::render(' . $expression . ') !!}';
     }
 
+    public static function startReact($expression) {
+        return '<?php \CApp::instance()->startPush(\'capp-react\') ?>';
+    }
+
+    public static function endReact($expression) {
+        return '<?php \CApp::instance()->stopPush(\'capp-react\') ?>' . '{!! CApp_React::render(' . $expression . ', CApp::instance()->yieldPushContent(\'capp-react\')) !!}';
+    }
+
     public static function pushScript($expression) {
         return '<?php \CApp::instance()->startPush(\'capp-script\') ?>';
     }

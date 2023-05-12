@@ -61,12 +61,12 @@
                 <div class="dropdown-menu dropdown-menu-right">
                     <li>
                         <a href="{{ c::url('demo/account/password/change') }}">
-                            <i class="fas fa-key"></i>&nbsp;&nbsp; @lang('Change Password')
+                            <i class="ti ti-key"></i>&nbsp;&nbsp; @lang('Change Password')
                         </a>
                     </li>
                     <li>
                         <a href="{{ c::url('/') }}">
-                            <i class="fas fa-sign-out-alt"></i>&nbsp;&nbsp;@lang('Logout')
+                            <i class="ti ti-power-off"></i>&nbsp;&nbsp;@lang('Logout')
                         </a>
                     </li>
                 </div>

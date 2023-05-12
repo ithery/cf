@@ -1,6 +1,10 @@
 <?php
 
 use Symfony\Component\Finder\Finder;
+use Symfony\Component\Console\ConsoleEvents;
+use Symfony\Component\EventDispatcher\EventDispatcher;
+use Symfony\Component\Console\Event\ConsoleCommandEvent;
+use Symfony\Component\Console\Event\ConsoleTerminateEvent;
 use Symfony\Component\Debug\Exception\FatalThrowableError;
 use Symfony\Component\Console\Application as ConsoleApplication;
 
@@ -11,6 +15,13 @@ class CConsole_Kernel implements CConsole_KernelInterface {
      * @var CEvents_DispatcherInterface
      */
     protected $events;
+
+    /**
+     * The Symfony event dispatcher implementation.
+     *
+     * @var null|\Symfony\Contracts\EventDispatcher\EventDispatcherInterface
+     */
+    protected $symfonyDispatcher;
 
     /**
      * The Artisan application instance.
@@ -34,6 +45,15 @@ class CConsole_Kernel implements CConsole_KernelInterface {
     protected $commandsLoaded = false;
 
     /**
+     * The bootstrap classes for the application.
+     *
+     * @var string[]
+     */
+    protected $bootstrappers = [
+
+    ];
+
+    /**
      * Create a new console kernel instance.
      *
      * @param CEvent_Dispatcher $events
@@ -51,10 +71,39 @@ class CConsole_Kernel implements CConsole_KernelInterface {
         $this->events = $events;
 
         CBootstrap::instance()->boot();
+        CF::booted(function () {
+            if (!CF::isTesting()) {
+                $this->rerouteSymfonyCommandEvents();
+            }
+            $this->defineConsoleSchedule();
+        });
+    }
 
-        //$this->app->booted(function () {
-        //    $this->defineConsoleSchedule();
-        //});
+    /**
+     * Re-route the Symfony command events to their Laravel counterparts.
+     *
+     * @internal
+     *
+     * @return $this
+     */
+    public function rerouteSymfonyCommandEvents() {
+        if (is_null($this->symfonyDispatcher)) {
+            $this->symfonyDispatcher = new EventDispatcher();
+
+            $this->symfonyDispatcher->addListener(ConsoleEvents::COMMAND, function (ConsoleCommandEvent $event) {
+                $this->events->dispatch(
+                    new CConsole_Event_CommandStarting($event->getCommand()->getName(), $event->getInput(), $event->getOutput())
+                );
+            });
+
+            $this->symfonyDispatcher->addListener(ConsoleEvents::TERMINATE, function (ConsoleTerminateEvent $event) {
+                $this->events->dispatch(
+                    new CConsole_Event_CommandFinished($event->getCommand()->getName(), $event->getInput(), $event->getOutput(), $event->getExitCode())
+                );
+            });
+        }
+
+        return $this;
     }
 
     /**
@@ -79,15 +128,13 @@ class CConsole_Kernel implements CConsole_KernelInterface {
             $this->bootstrap();
 
             return $this->getCFCli()->run($input, $output);
-        } catch (Exception $e) {
+        } catch (Throwable $e) {
             $this->reportException($e);
 
             $this->renderException($output, $e);
 
             return 1;
-        } catch (Throwable $e) {
-            $e = new FatalThrowableError($e);
-
+        } catch (Exception $e) {
             $this->reportException($e);
 
             $this->renderException($output, $e);
@@ -105,7 +152,7 @@ class CConsole_Kernel implements CConsole_KernelInterface {
      * @return void
      */
     public function terminate($input, $status) {
-        //$this->app->terminate();
+        CF::terminate();
     }
 
     /**
@@ -116,6 +163,15 @@ class CConsole_Kernel implements CConsole_KernelInterface {
      * @return void
      */
     protected function schedule(CCron_Schedule $schedule) {
+    }
+
+    /**
+     * Get the timezone that should be used by default for scheduled events.
+     *
+     * @return null|\DateTimeZone|string
+     */
+    protected function scheduleTimezone() {
+        return CF::config('app.schedule_timezone', CF::config('app.timezone'));
     }
 
     /**
@@ -267,7 +323,13 @@ class CConsole_Kernel implements CConsole_KernelInterface {
      */
     protected function getCFCli() {
         if (is_null($this->cfCli)) {
-            $this->cfCli = (new CConsole_Application())->resolveCommands($this->commands);
+            $this->cfCli = (new CConsole_Application())
+                ->resolveCommands($this->commands)
+                ->setContainerCommandLoader();
+
+            if ($this->symfonyDispatcher instanceof EventDispatcher) {
+                $this->cfCli->setDispatcher($this->symfonyDispatcher);
+            }
         }
 
         return $this->cfCli;
@@ -305,25 +367,23 @@ class CConsole_Kernel implements CConsole_KernelInterface {
     /**
      * Report the exception to the exception handler.
      *
-     * @param \Exception $e
+     * @param \Exception|\Throwable $e
      *
      * @return void
      */
-    protected function reportException(Exception $e) {
-        //$this->app[ExceptionHandler::class]->report($e);
+    protected function reportException($e) {
+        CException::exceptionHandler()->report($e);
     }
 
     /**
      * Report the exception to the exception handler.
      *
      * @param \Symfony\Component\Console\Output\OutputInterface $output
-     * @param \Exception                                        $e
+     * @param \Exception|\Throwable                             $e
      *
      * @return void
      */
-    protected function renderException($output, Exception $e) {
+    protected function renderException($output, $e) {
         CException::exceptionHandler()->renderForConsole($output, $e);
-        //$this->app[ExceptionHandler::class]->renderForConsole($output, $e);
-        //(new ConsoleApplication())->renderException($e, $output);
     }
 }

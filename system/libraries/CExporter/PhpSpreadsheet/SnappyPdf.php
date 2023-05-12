@@ -16,10 +16,10 @@ class CExporter_PhpSpreadsheet_SnappyPdf extends Pdf {
     /**
      * Save Spreadsheet to file.
      *
-     * @param string $pFilename Name of the file to save as
+     * @param resource|string $filename
      */
-    public function save($pFilename): void {
-        $fileHandle = parent::prepareForSave($pFilename);
+    public function save($filename, int $flags = 0): void {
+        $fileHandle = parent::prepareForSave($filename);
 
         //  Default PDF paper size
         $paperSize = 'LETTER'; //    Letter    (8.5 in. by 11 in.)
@@ -70,13 +70,9 @@ class CExporter_PhpSpreadsheet_SnappyPdf extends Pdf {
         );
 
         //  Write to file
-        fwrite($fileHandle, $pdf->getOutputFromHtml(
-            $this->generateHTMLHeader(false)
-            . $this->generateSheetData()
-            . $this->generateHTMLFooter()
-        ));
+        fwrite($fileHandle, $pdf->getOutputFromHtml($this->generateHTMLAll()));
 
-        parent::restoreStateAfterSave($fileHandle);
+        parent::restoreStateAfterSave();
     }
 
     /**

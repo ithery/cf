@@ -15,7 +15,6 @@ class CElement_Component_DataTable extends CElement_Component {
         CElement_Component_DataTable_Trait_CheckboxTrait,
         CElement_Component_DataTable_Trait_SearchTrait,
         CElement_Component_DataTable_Trait_FooterTrait;
-
     const ACTION_LOCATION_FIRST = 'first';
 
     const ACTION_LOCATION_LAST = 'last';
@@ -141,17 +140,34 @@ class CElement_Component_DataTable extends CElement_Component {
 
     protected $fixedColumn;
 
+    protected $fixedHeader;
+
+    protected $colReorder;
+
     protected $scrollX;
 
     protected $scrollY;
 
     protected $dbResolver;
 
+    /**
+     * @var string
+     */
     protected $actionHeaderLabel = 'Actions';
 
+    /**
+     * @var array
+     */
     protected $labels = [];
 
+    /**
+     * @var array
+     */
     protected $buttons = [];
+
+    protected $domElements = [];
+
+    protected $rowClassCallbackFunction = null;
 
     public function __construct($id = '') {
         parent::__construct($id);
@@ -219,11 +235,12 @@ class CElement_Component_DataTable extends CElement_Component {
         $this->dataTableView = CConstant::TABLE_VIEW_ROW;
         $this->dataTableViewColCount = 5;
         $this->fixedColumn = null;
+        $this->fixedHeader = null;
         $this->scrollX = false;
         $this->scrollY = false;
 
         $this->infoText = clang::__('Showing') . ' _START_ ' . clang::__('to') . ' _END_ ' . clang::__('of') . ' _TOTAL_ ' . clang::__('entries') . '';
-        CClientModules::instance()->registerModule('jquery.datatable');
+        c::manager()->registerModule('jquery.datatable');
 
         //read theme data
 
@@ -243,6 +260,7 @@ class CElement_Component_DataTable extends CElement_Component {
         $this->labels['show'] = CManager::theme()->getData('datatable.label.show', c::__('element/datatable.show'));
         $this->labels['entries'] = CManager::theme()->getData('datatable.label.entries', c::__('element/datatable.entries'));
         $this->loadTranslation();
+        $this->actionHeaderLabel = carr::get($this->labels, 'actionHeaderLabel', $this->actionHeaderLabel);
     }
 
     protected function loadTranslation() {
@@ -396,6 +414,12 @@ class CElement_Component_DataTable extends CElement_Component {
         return $this;
     }
 
+    public function setColReorder($bool = true) {
+        $this->colReorder = $bool;
+
+        return $this;
+    }
+
     /**
      * @param int $column
      *
@@ -406,6 +430,17 @@ class CElement_Component_DataTable extends CElement_Component {
             $column = $column ? 1 : null;
         }
         $this->fixedColumn = $column;
+
+        return $this;
+    }
+
+    /**
+     * @param mixed $fixedHeader
+     *
+     * @return \CElement_Component_DataTable
+     */
+    public function setFixedHeader($fixedHeader = true) {
+        $this->fixedHeader = $fixedHeader;
 
         return $this;
     }
@@ -465,7 +500,7 @@ class CElement_Component_DataTable extends CElement_Component {
         return $this;
     }
 
-    public function setResponsive($bool) {
+    public function setResponsive($bool = true) {
         $this->responsive = $bool;
 
         return $this;
@@ -774,6 +809,17 @@ class CElement_Component_DataTable extends CElement_Component {
     }
 
     /**
+     * @param CCollection $arr
+     *
+     * @return $this
+     */
+    public function setDataFromCollection(CCollection $collection) {
+        $this->query = CManager::createCollectionDataProvider($collection);
+
+        return $this;
+    }
+
+    /**
      * @return CDatabase
      */
     public function db() {
@@ -966,6 +1012,16 @@ class CElement_Component_DataTable extends CElement_Component {
                 $this->data = $r->result(false);
             }
         }
+        if ($this->colReorder) {
+            CManager::instance()->registerModule('jquery.datatable.colreorder');
+        }
+        if ($this->responsive) {
+            CManager::instance()->registerModule('jquery.datatable.responsive');
+
+            // if (CManager::isRegisteredModule('bootstrap-4') || CManager::isRegisteredModule('bootstrap-4-material')) {
+            //     CManager::instance()->registerModule('jquery.datatable.responsive.bs4');
+            // }
+        }
     }
 
     public function isUsingDataProvider() {
@@ -981,5 +1037,38 @@ class CElement_Component_DataTable extends CElement_Component {
         }
 
         return null;
+    }
+
+    public function setDomElement($key, $value) {
+        if ($value instanceof Closure) {
+            $value = c::toSerializableClosure($value);
+        }
+        $this->domElements[$key] = $value;
+
+        return $this;
+    }
+
+    /**
+     * Set callback for table row class.
+     *
+     * @param callable|Closure $callback parameter: $row
+     * @param string           $require  File location of callable function to require
+     *
+     * @return $this
+     */
+    public function setRowClassCallback($callback, $require = '') {
+        $this->rowClassCallbackFunction = c::toSerializableClosure($callback);
+        if (strlen($require) > 0) {
+            $this->requires[] = $require;
+        }
+
+        return $this;
+    }
+
+    /**
+     * @return Closure|\Opis\SerializableClosure
+     */
+    public function getRowClassCallbackFunction() {
+        return $this->rowClassCallbackFunction;
     }
 }

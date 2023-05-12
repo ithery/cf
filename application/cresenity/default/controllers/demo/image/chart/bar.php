@@ -13,18 +13,23 @@ class Controller_Demo_Image_Chart_Bar extends \Cresenity\Demo\Controller {
         $barChart->setTitle('Vertical Bar');
         $imageChart = CImage::chart(500, 200);
         $imageChart->setChart($barChart);
+        $app->addH5()->add('Default Engine');
+        $imageChart->setEngine('default');
+        $uri = $imageChart->toUri();
+        $app->addImg()->setSrc($uri)->addClass('mb-3');
 
         $app->addH5()->add('With Google Engine');
         $imageChart->setEngine('google');
+        $barChart->setDirection(CChart::DIRECTION_VERTICAL);
         $uri = $imageChart->toUri();
-        $app->addImg()->setSrc($uri);
+        $app->addImg()->setSrc($uri)->addClass('mb-3');
         $app->addBr();
         $app->addBr();
         $barChart->setDirection(CChart::DIRECTION_HORIZONTAL);
         $imageChart->setSize('500', '500');
         $barChart->setTitle('Horizontal Bar');
         $uri = $imageChart->toUri();
-        $app->addImg()->setSrc($uri);
+        $app->addImg()->setSrc($uri)->addClass('mb-3');
 
         return $app;
     }

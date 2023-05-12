@@ -11,17 +11,21 @@ defined('SYSPATH') or die('No direct access allowed.');
 class CApp_Navigation_Helper {
     protected static $role_navs = [];
 
+    /**
+     * @return array|bool
+     */
     public static function nav($nav = null, $controller = null, $method = null, $path = null) {
+        $routeData = c::router()->getCurrentRoute()->getRouteData();
+        // cdbg::dd($routeData);
         if ($controller == null) {
-            $controller = CFRouter::$controller;
+            $controller = $routeData->getController();
         }
         if ($method == null) {
-            $method = CFRouter::$method;
+            $method = $routeData->getMethod();
         }
         if ($path == null) {
-            $path = CFRouter::$controller_dir;
+            $path = $routeData->getControllerDir();
         }
-
         if ($nav == null) {
             $navs = CApp_Navigation_Data::get();
 
@@ -88,6 +92,9 @@ class CApp_Navigation_Helper {
         return false;
     }
 
+    /**
+     * @return bool
+     */
     public static function haveAccess($nav = null, $roleId = null, $appId = null, $domain = null) {
         $canAccess = static::protectedhaveAccess($nav, $roleId, $appId, $domain);
         $accessCallback = CApp_Navigation::getAccessCallback($domain);
@@ -98,6 +105,9 @@ class CApp_Navigation_Helper {
         return $canAccess;
     }
 
+    /**
+     * @return bool
+     */
     protected static function protectedhaveAccess($nav = null, $roleId = null, $appId = null, $domain = null) {
         $app = CApp::instance();
         if ($roleId == null) {
@@ -136,9 +146,9 @@ class CApp_Navigation_Helper {
                 self::$role_navs[$appId] = [];
             }
             if (!isset(self::$role_navs[$appId][$roleId])) {
-                $roleNavModel = CApp::model('RoleNav')->whereNull('role_id');
+                $roleNavModel = CApp_Model_RoleNav::whereNull('role_id');
                 if ($roleId != null) {
-                    $roleNavModel = CApp::model('RoleNav')->where('role_id', '=', $roleId);
+                    $roleNavModel = CApp_Model_RoleNav::where('role_id', '=', $roleId);
                 }
 
                 self::$role_navs[$appId][$roleId] = $roleNavModel->where('app_id', '=', $appId)->get()->pluck('nav')->toArray();
@@ -148,9 +158,11 @@ class CApp_Navigation_Helper {
         return in_array($nav['name'], self::$role_navs[$appId][$roleId]);
     }
 
+    /**
+     * @return bool
+     */
     public static function havePermission($action, $nav = null, $roleId = null, $appId = null, $domain = null) {
         $app = CApp::instance();
-
         if ($roleId == null) {
             $role = $app->role();
             if ($role == null) {
@@ -169,7 +181,6 @@ class CApp_Navigation_Helper {
         if ($role == null) {
             return false;
         }
-
         if ($role != null && $role->parent_id == null) {
             return true;
         }
@@ -223,6 +234,10 @@ class CApp_Navigation_Helper {
         return $result;
     }
 
+    /**
+     * @return bool
+     * @deprecated
+     */
     public static function isPublic($nav) {
         if (isset($nav['is_public']) && $nav['is_public']) {
             return true;
@@ -231,6 +246,9 @@ class CApp_Navigation_Helper {
         return false;
     }
 
+    /**
+     * @return int
+     */
     public static function childCount($nav) {
         if (isset($nav['subnav'])) {
             if (is_array($nav['subnav'])) {
@@ -241,14 +259,23 @@ class CApp_Navigation_Helper {
         return 0;
     }
 
+    /**
+     * @return bool
+     */
     public static function haveChild($nav) {
         return self::childCount($nav) > 0;
     }
 
+    /**
+     * @return bool
+     */
     public static function isLeaf($nav) {
         return isset($nav['subnav']) && is_array($nav['subnav']);
     }
 
+    /**
+     * @return bool
+     */
     public static function url($nav) {
         $controller = '';
         $method = '';
@@ -286,6 +313,9 @@ class CApp_Navigation_Helper {
         return $url;
     }
 
+    /**
+     * @return bool
+     */
     public static function accessAvailable($nav = null, $appId = '', $domain = '', $appRoleId = '') {
         if ($nav == null) {
             $nav = self::nav();

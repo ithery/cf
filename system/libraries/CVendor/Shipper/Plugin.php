@@ -1,18 +1,10 @@
 <?php
 
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
-
 class CVendor_Shipper_Plugin {
-
     use CTrait_HasOptions;
 
     /**
-     *
-     * @var CVendor_Shipper_Plugin_Client 
+     * @var CVendor_Shipper_Plugin_Client
      */
     protected $client;
 
@@ -21,7 +13,6 @@ class CVendor_Shipper_Plugin {
     }
 
     /**
-     * 
      * @return \CVendor_Shipper_Plugin_Client
      */
     protected function createClient() {
@@ -29,14 +20,13 @@ class CVendor_Shipper_Plugin {
     }
 
     /**
-     * 
      * @return CVendor_Shipper_Plugin_Client
      */
     public function client() {
         if ($this->client == null) {
             $this->client = $this->createClient();
         }
+
         return $this->client;
     }
-
 }

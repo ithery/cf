@@ -46,7 +46,7 @@ class CModel_Nested_Collection extends CModel_Collection {
      *
      * @param mixed $root
      *
-     * @return Collection
+     * @return CModel_Nested_Collection
      */
     public function toTree($root = false) {
         if ($this->isEmpty()) {
