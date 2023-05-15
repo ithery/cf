@@ -113,10 +113,10 @@ class CVendor_LiteSpeed_TblMap {
     private function convertTbl($tid, $srcnode, $dstnode) {
         $tbl = TblDef::getInstance()->getTblDef($tid);
         $attrs = $tbl->get(Tbl::FLD_DATTRS);
-        $index = $tbl->Get(Tbl::FLD_INDEX);
+        $index = $tbl->get(Tbl::FLD_INDEX);
 
         foreach ($attrs as $attr) {
-            if ($attr == null || $attr->_type == 'action' || $attr->IsFlagOn(Attr::BM_NOFILE)) {
+            if ($attr == null || $attr->type == 'action' || $attr->IsFlagOn(Attr::BM_NOFILE)) {
                 continue;
             }
 

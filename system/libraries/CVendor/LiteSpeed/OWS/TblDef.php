@@ -8,6 +8,9 @@ use CVendor_LiteSpeed_TblDefBase as TblDefBase;
 class CVendor_LiteSpeed_OWS_TblDef extends TblDefBase {
     private static $instance;
 
+    /**
+     * @return CVendor_LiteSpeed_OWS_TblDef
+     */
     public static function getInstance() {
         if (static::$instance == null) {
             static::$instance = new CVendor_LiteSpeed_OWS_TblDef();
