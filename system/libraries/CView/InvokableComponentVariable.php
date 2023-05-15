@@ -33,6 +33,7 @@ class CView_InvokableComponentVariable implements CBase_DeferringDisplayableValu
      *
      * @return \ArrayIterator
      */
+    #[ReturnTypeWillChange]
     public function getIterator() {
         $result = $this->__invoke();
 
