@@ -342,7 +342,7 @@ class c {
             return CLogger::instance();
         }
 
-        return CLogger::instance()->add(CLogger::DEBUG, $message, $context);
+        return CLogger::instance()->debug($message, $context);
     }
 
     //@codingStandardsIgnoreEnd

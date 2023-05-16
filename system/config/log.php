@@ -4,8 +4,6 @@ use Monolog\Handler\StreamHandler;
 use Monolog\Handler\SyslogUdpHandler;
 
 return [
-    'threshold' => CF::isProduction() ? LOG_WARNING : LOG_INFO, //LOG_WARNING ,4
-
     /*
     |--------------------------------------------------------------------------
     | Default Log Channel
@@ -59,12 +57,12 @@ return [
 
         'single' => [
             'driver' => 'single',
-            'level' => c::env('LOG_LEVEL', 'debug'),
+            'level' => c::env('LOG_LEVEL', 'info'),
         ],
 
         'daily' => [
             'driver' => 'daily',
-            'level' => c::env('LOG_LEVEL', 'debug'),
+            'level' => c::env('LOG_LEVEL', 'info'),
             'days' => 14,
             'replace_placeholders' => true,
         ],
@@ -116,5 +114,73 @@ return [
             'path' => DOCROOT . 'logs/cf.log',
         ],
     ],
+    'reader' => [
+        /*
+        |--------------------------------------------------------------------------
+        | Include file patterns
+        |--------------------------------------------------------------------------
+        |
+        */
 
+        'include_files' => [
+            '*.log',
+            '**/*.log',
+            // '/absolute/paths/supported',
+        ],
+        /*
+        |--------------------------------------------------------------------------
+        | Exclude file patterns.
+        |--------------------------------------------------------------------------
+        | This will take precedence over included files.
+        |
+        */
+
+        'exclude_files' => [
+            // 'my_secret.log'
+        ],
+        /*
+        |--------------------------------------------------------------------------
+        |  Shorter stack trace filters.
+        |--------------------------------------------------------------------------
+        | Lines containing any of these strings will be excluded from the full log.
+        | This setting is only active when the function is enabled via the user interface.
+        |
+        */
+
+        'shorter_stack_trace_excludes' => [
+            '/vendor/symfony/',
+            '/vendor/laravel/framework/',
+            '/vendor/barryvdh/laravel-debugbar/',
+        ],
+
+        'patterns' => [
+
+            'log_matching_regex' => '/^\[(\d{4}-\d{2}-\d{2}[T ]\d{2}:\d{2}:\d{2}\.?(\d{6}([\+-]\d\d:\d\d)?)?)\].*/',
+
+            /**
+             * This pattern, used for processing Laravel logs, returns these results:
+             * $matches[0] - the full log line being tested.
+             * $matches[1] - full timestamp between the square brackets (includes microseconds and timezone offset)
+             * $matches[2] - timestamp microseconds, if available
+             * $matches[3] - timestamp timezone offset, if available
+             * $matches[4] - contents between timestamp and the severity level
+             * $matches[5] - environment (local, production, etc)
+             * $matches[6] - log severity (info, debug, error, etc)
+             * $matches[7] - the log text, the rest of the text.
+             */
+            'log_parsing_regex' => '/^\[(\d{4}-\d{2}-\d{2}[T ]\d{2}:\d{2}:\d{2}\.?(\d{6}([\+-]\d\d:\d\d)?)?)\](.*?(\w+)\.|.*?)('
+                . implode('|', array_filter(CLogger_Level::caseValues()))
+                . ')?: (.*?)( in [\/].*?:[0-9]+)?$/is',
+
+        ],
+        /*
+        |--------------------------------------------------------------------------
+        | Chunk size when scanning log files lazily
+        |--------------------------------------------------------------------------
+        | The size in MB of files to scan before updating the progress bar when searching across all files.
+        |
+        */
+
+        'lazy_scan_chunk_size_in_mb' => 50,
+    ],
 ];

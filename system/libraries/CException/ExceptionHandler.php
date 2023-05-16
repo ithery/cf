@@ -232,16 +232,16 @@ class CException_ExceptionHandler implements CException_ExceptionHandlerInterfac
                 }
             }
         }
-        CLogger::instance()->add(CLogger::ERROR, $e->getMessage(), null, $this->context(), $e);
-        //        try {
-        //            CLogger::instance()->add($reportCallable, $message)
-        //            $logger = $this->container->make(LoggerInterface::class);
-        //        } catch (Exception $ex) {
-        //            throw $e;
-        //        }
-        //        $logger->error(
-        //                $e->getMessage(), array_merge($this->context(), ['exception' => $e]
-        //        ));
+
+        $logger = CLogger::logger();
+
+        $logger->error(
+            $e->getMessage(),
+            array_merge(
+                $this->context(),
+                ['exception' => $e]
+            )
+        );
     }
 
     /**
