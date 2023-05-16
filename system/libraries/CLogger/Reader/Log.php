@@ -114,8 +114,4 @@ class CLogger_Reader_Log {
     public function fullTextLengthFormatted(): string {
         return CLogger_Reader_Util_Utils::bytesForHumans($this->fullTextLength);
     }
-
-    public function url(): string {
-        return route('log-viewer.index', ['file' => $this->fileIdentifier, 'query' => 'log-index:' . $this->index]);
-    }
 }
