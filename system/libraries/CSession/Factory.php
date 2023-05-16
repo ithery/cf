@@ -41,7 +41,7 @@ class CSession_Factory {
         $driver = new CCache_Driver_RedisDriver($redis);
         $redisStore = new CCache_Repository($driver);
         $expirationSeconds = carr::get($this->config, 'expiration');
-        $handler = new CSession_Driver_Redis($redisStore, $expirationSeconds);
+        $handler = new CSession_Handler_RedisSessionHandler($redisStore, $expirationSeconds);
 
         return $handler;
     }

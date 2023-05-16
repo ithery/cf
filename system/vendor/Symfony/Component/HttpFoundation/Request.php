@@ -14,7 +14,7 @@ namespace Symfony\Component\HttpFoundation;
 use Symfony\Component\HttpFoundation\Session\SessionInterface;
 use Symfony\Component\HttpFoundation\Exception\ConflictingHeadersException;
 use Symfony\Component\HttpFoundation\Exception\SuspiciousOperationException;
-
+use Symfony\Component\HttpFoundation\Exception\SessionNotFoundException;
 /**
  * Request represents an HTTP request.
  *
@@ -806,7 +806,16 @@ class Request {
      * @return null|SessionInterface The session
      */
     public function getSession() {
-        return $this->session;
+        $session = $this->session;
+        if (!$session instanceof SessionInterface && null !== $session) {
+            $this->setSession($session = $session());
+        }
+
+        if (null === $session) {
+            throw new SessionNotFoundException('Session has not been set.');
+        }
+
+        return $session;
     }
 
     /**
