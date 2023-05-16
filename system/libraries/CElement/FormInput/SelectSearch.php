@@ -56,7 +56,7 @@ class CElement_FormInput_SelectSearch extends CElement_FormInput {
 
     protected $perPage;
 
-    public function __construct($id) {
+    public function __construct($id = null) {
         parent::__construct($id);
         $this->dropdownClasses = [];
         $this->type = 'selectsearch';
@@ -303,6 +303,9 @@ class CElement_FormInput_SelectSearch extends CElement_FormInput {
         $ajaxMethod->setData('formatResult', serialize($this->formatResult));
         $ajaxMethod->setData('dependsOn', serialize($this->dependsOn));
         $ajaxMethod->setData('prependData', serialize($this->prependData));
+        if (c::app()->isAuthEnabled()) {
+            $ajaxMethod->enableAuth();
+        }
 
         $ajaxUrl = $ajaxMethod->makeUrl();
 
@@ -328,10 +331,12 @@ class CElement_FormInput_SelectSearch extends CElement_FormInput {
     protected function getSelectedRow() {
         if ($this->autoSelect || $this->value != null) {
             $value = null;
+            if ($this->autoSelect && $this->value === null) {
+                $value = [null];
+            }
             if ($this->value !== null) {
                 $value = $this->value;
             }
-
             $values = carr::wrap($value);
             $result = c::collect($values)->map(function ($value) {
                 $db = c::db();
@@ -425,7 +430,6 @@ class CElement_FormInput_SelectSearch extends CElement_FormInput {
             }
         }
         $selectedRows = $this->getSelectedRow();
-
         $html->appendln('<select class="' . $classes . '" name="' . $this->name . '" id="' . $this->id . '" ' . $disabled . $custom_css . $multiple . $additionAttribute . '">');
 
         if ($selectedRows) {
@@ -444,6 +448,7 @@ class CElement_FormInput_SelectSearch extends CElement_FormInput {
                     }
 
                     $strSelection = $this->formatSelection;
+
                     if ($strSelection == null) {
                         $strSelection = '{' . carr::first($this->searchField) . '}';
                     }
@@ -451,20 +456,25 @@ class CElement_FormInput_SelectSearch extends CElement_FormInput {
                     if ($strSelection instanceof \Opis\Closure\SerializableClosure) {
                         $strSelection = $strSelection->__invoke($model ?: $row);
                     }
-                    $strSelection = c::value($strSelection);
-                    $strSelection = str_replace("'", "\'", $strSelection);
-                    preg_match_all("/{([\w]*)}/", $strSelection, $matches, PREG_SET_ORDER);
+                    if ($strSelection instanceof CRenderable) {
+                        $strSelection = $strSelection->html();
+                    } else {
+                        $strSelection = c::value($strSelection);
+                        $strSelection = str_replace("'", "\'", $strSelection);
+                        preg_match_all("/{([\w]*)}/", $strSelection, $matches, PREG_SET_ORDER);
 
-                    foreach ($matches as $val) {
-                        $str = $val[1]; //matches str without bracket {}
-                        $bStr = $val[0]; //matches str with bracket {}
+                        foreach ($matches as $val) {
+                            $str = $val[1]; //matches str without bracket {}
+                            $bStr = $val[0]; //matches str with bracket {}
 
-                        $strSelection = str_replace($bStr, carr::get($row, $str), $strSelection);
+                            $strSelection = str_replace($bStr, carr::get($row, $str), $strSelection);
+                        }
                     }
 
-                    $valueTemp = is_array($this->value) ? $this->value[$index] : $this->value;
+                    $selectedValue = carr::get($row, $this->keyField, carr::get($row, 'id'));
+                    //$valueTemp = is_array($this->value) ? $this->value[$index] : $this->value;
 
-                    $html->appendln('<option data-multiple="' . ($this->multiple ? '1' : '0') . '" value="' . $valueTemp . '" data-content="' . c::e($strSelection) . '" selected="selected" >' . $strSelection . '</option>');
+                    $html->appendln('<option data-multiple="' . ($this->multiple ? '1' : '0') . '" value="' . $selectedValue . '" data-content="' . c::e($strSelection) . '" selected="selected" >' . $strSelection . '</option>');
                 }
             }
         }
@@ -495,6 +505,7 @@ class CElement_FormInput_SelectSearch extends CElement_FormInput {
 
         //dont generate here when closure
         $strSelection = $this->generateSelect2Template($strSelection);
+
         if (strlen($strSelection) == 0) {
             $searchFieldText = c::value(carr::first($this->searchField));
             if (strlen($searchFieldText) > 0) {
@@ -527,6 +538,7 @@ class CElement_FormInput_SelectSearch extends CElement_FormInput {
         }
 
         $selectedRows = $this->getSelectedRow();
+
         $selectedData = [];
         if ($selectedRows) {
             foreach ($selectedRows as $index => $selectedRow) {
@@ -543,6 +555,17 @@ class CElement_FormInput_SelectSearch extends CElement_FormInput {
                     if (isset($this->valueCallback) && is_callable($this->valueCallback)) {
                         foreach ($row as $k => $v) {
                             $row[$k] = $this->valueCallback($row, $k, $v);
+                        }
+                    }
+                    $formatSelection = $this->formatSelection;
+                    if ($formatSelection instanceof \Opis\Closure\SerializableClosure) {
+                        $formatSelection = $formatSelection->__invoke($model ?: $row);
+                        if ($formatSelection instanceof CRenderable) {
+                            $row['cappFormatSelection'] = $formatSelection->html();
+                            $row['cappFormatSelectionIsHtml'] = true;
+                        } else {
+                            $row['cappFormatSelection'] = $formatSelection;
+                            $row['cappFormatSelectionIsHtml'] = c::isHtml($formatSelection);
                         }
                     }
                     $selectedData[] = $row;

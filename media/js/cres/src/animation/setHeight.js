@@ -1,14 +1,14 @@
 import * as mathFunction from './math';
 /* Animate height of an element */
 const setHeight = function (start, to, element, duration, cb, timeFunction) {
-    var change = to - start,
+    let change = to - start,
         currentTime = null;
 
-    var animateHeight = function (timestamp) {
-        if (!currentTime) currentTime = timestamp;
-        var progress = timestamp - currentTime;
-        if (progress > duration) progress = duration;
-        var val = parseInt((progress / duration) * change + start);
+    let animateHeight = function (timestamp) {
+        if (!currentTime) {currentTime = timestamp;}
+        let progress = timestamp - currentTime;
+        if (progress > duration) {progress = duration;}
+        let val = parseInt((progress / duration) * change + start);
         if (timeFunction) {
             val = mathFunction[timeFunction](progress, start, to - start, duration);
         }
@@ -16,7 +16,7 @@ const setHeight = function (start, to, element, duration, cb, timeFunction) {
         if (progress < duration) {
             window.requestAnimationFrame(animateHeight);
         } else {
-            if (cb) cb();
+            if (cb) {cb();}
         }
     };
 

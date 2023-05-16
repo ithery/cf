@@ -3,9 +3,9 @@ const initMenuProperties = () => {
         menu.style.display = 'block';
     });
     document.querySelectorAll('[cres-menu-effect="menu-reveal"]').forEach((menu) => {
-            menu.style.display = 'none';
+        menu.style.display = 'none';
     });
-    var menuLeftRight = document.querySelectorAll(
+    let menuLeftRight = document.querySelectorAll(
         '.cres-menu-box-left, .cres-menu-box-right'
     );
     menuLeftRight.forEach(function (menu) {
@@ -15,7 +15,7 @@ const initMenuProperties = () => {
             menu.style.width = menu.getAttribute('cres-menu-width') + 'px';
         }
     });
-    var menuBottomTopModal = document.querySelectorAll(
+    let menuBottomTopModal = document.querySelectorAll(
         '.cres-menu-box-bottom, .cres-menu-box-top, .cres-menu-box-modal'
     );
     menuBottomTopModal.forEach(function (menu) {
@@ -29,8 +29,8 @@ const initMenuProperties = () => {
     });
 };
 const applyMenuParallaxEffect = (menuElement, affectedSelector) => {
-    var menuWidth = menuElement.getAttribute('cres-menu-width');
-    var menuOffsetHeight = menuElement.offsetHeight;
+    let menuWidth = menuElement.getAttribute('cres-menu-width');
+    let menuOffsetHeight = menuElement.offsetHeight;
     const affectedContainers = document.querySelectorAll(affectedSelector);
     if (menuElement.classList.contains('cres-menu-box-left')) {
         for (let i = 0; i < affectedContainers.length; i++) {
@@ -58,8 +58,8 @@ const applyMenuParallaxEffect = (menuElement, affectedSelector) => {
     }
 };
 const applyMenuPushEffect = (menuElement, affectedSelector) => {
-    var menuWidth = menuElement.getAttribute('cres-menu-width');
-    var menuOffsetHeight = menuElement.offsetHeight;
+    let menuWidth = menuElement.getAttribute('cres-menu-width');
+    let menuOffsetHeight = menuElement.offsetHeight;
     const affectedContainers = document.querySelectorAll(affectedSelector);
     if (menuElement.classList.contains('cres-menu-box-left')) {
         for (let i = 0; i < affectedContainers.length; i++) {
@@ -87,7 +87,7 @@ const applyMenuPushEffect = (menuElement, affectedSelector) => {
     }
 };
 const initMenuTrigger = () => {
-    var menuTriggers = document.querySelectorAll('[cres-menu]');
+    let menuTriggers = document.querySelectorAll('[cres-menu]');
 
     menuTriggers.forEach((trigger) => {
         return trigger.addEventListener('click', (event) => {
@@ -96,17 +96,17 @@ const initMenuTrigger = () => {
             for (let i = 0; i < allActiveMenu.length; i++) {
                 allActiveMenu[i].classList.remove('cres-menu-active');
             }
-            var menuId = trigger.getAttribute('cres-menu');
+            let menuId = trigger.getAttribute('cres-menu');
 
             document.getElementById(menuId).classList.add('cres-menu-active');
             document
                 .getElementsByClassName('cres-menu-hider')[0]
                 .classList.add('cres-menu-active');
             const menuElement = document.getElementById(menuId);
-            var menuEffect = menuElement.getAttribute('cres-menu-effect');
+            let menuEffect = menuElement.getAttribute('cres-menu-effect');
 
             const affectedSelector = menuElement.getAttribute('cres-menu-effect-selector') ?? 'body';
-            var hiddenTimer = menuElement.getAttribute('cres-menu-hide');
+            let hiddenTimer = menuElement.getAttribute('cres-menu-hide');
             if (hiddenTimer) {
                 setTimeout(function () {
                     document
@@ -118,7 +118,6 @@ const initMenuTrigger = () => {
                 }, hiddenTimer);
             }
             if (menuEffect === 'menu-push') {
-
                 applyMenuPushEffect(menuElement, affectedSelector);
             }
             if (menuEffect === 'menu-parallax') {
@@ -129,11 +128,11 @@ const initMenuTrigger = () => {
 };
 const initMenuHider = () => {
     if (!document.querySelectorAll('.cres-menu-hider').length) {
-        let node = document.createElement("div");
+        let node = document.createElement('div');
         node.classList.add('cres-menu-hider');
         document.body.appendChild(node);
     }
-    var menuHider = document.querySelectorAll('.cres-menu-hider');
+    let menuHider = document.querySelectorAll('.cres-menu-hider');
 
     if (menuHider[0].classList.contains('cres-menu-active')) {
         menuHider[0].classList.add('disabled');
@@ -148,7 +147,7 @@ const initMenuHider = () => {
     );
     menuHiderTriggers.forEach((trigger) => {
         return trigger.addEventListener('click', (event) => {
-            var menuReveals = document.querySelectorAll(
+            let menuReveals = document.querySelectorAll(
                 '[cres-menu-effect="menu-reveal"]'
             );
             setTimeout(function () {
@@ -165,7 +164,6 @@ const initMenuHider = () => {
                 for (let j = 0; j < affectedContainers.length; j++) {
                     affectedContainers[j].style.transform = 'none';
                 }
-
             }
         });
     });

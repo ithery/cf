@@ -1,7 +1,8 @@
+/* eslint-disable no-underscore-dangle */
 import { CresQuery, cresQuery } from '../../../module/CresQuery';
 import { galleryConfig } from './config';
 import { galleryEvent } from './event';
-import { Thumbnail,Rotate,Zoom } from './plugins';
+import { Thumbnail, Rotate, Zoom } from './plugins';
 import utils from './utils';
 
 /**
@@ -51,6 +52,7 @@ export default class Gallery {
             this.config.dynamicEl !== undefined &&
             !Array.isArray(this.config.dynamicEl)
         ) {
+            // eslint-disable-next-line no-throw-literal
             throw 'When using dynamic mode, you must also define dynamicEl as an Array.';
         }
 
@@ -192,9 +194,8 @@ export default class Gallery {
                 this.config.getCaptionFromTitleOrAlt,
                 this.config.exThumbImage
             );
-        } else {
-            return this.config.dynamicEl || [];
         }
+        return this.config.dynamicEl || [];
     }
 
     buildStructure() {
@@ -210,17 +211,17 @@ export default class Gallery {
             controls = `<button type="button" id="${this.getIdName(
                 'cres-gallery-prev'
             )}" aria-label="${
-                this.config.strings['previousSlide']
+                this.config.strings.previousSlide
             }" class="cres-gallery-prev cres-gallery-icon"> ${
                 this.config.prevHtml
             } </button>
                 <button type="button" id="${this.getIdName(
-                    'cres-gallery-next'
-                )}" aria-label="${
-                this.config.strings['nextSlide']
-            }" class="cres-gallery-next cres-gallery-icon"> ${
-                this.config.nextHtml
-            } </button>`;
+        'cres-gallery-next'
+    )}" aria-label="${
+    this.config.strings.nextSlide
+}" class="cres-gallery-next cres-gallery-icon"> ${
+    this.config.nextHtml
+} </button>`;
         }
 
         if (this.config.appendSubHtmlTo !== '.cres-gallery-item') {
@@ -250,57 +251,57 @@ export default class Gallery {
         const closeIcon =
             this.config.closable && this.config.showCloseIcon
                 ? `<button type="button" aria-label="${
-                      this.config.strings['closeGallery']
-                  }" id="${this.getIdName(
-                      'cres-gallery-close'
-                  )}" class="cres-gallery-close cres-gallery-icon"></button>`
+                    this.config.strings.closeGallery
+                }" id="${this.getIdName(
+                    'cres-gallery-close'
+                )}" class="cres-gallery-close cres-gallery-icon"></button>`
                 : '';
         const maximizeIcon = this.config.showMaximizeIcon
             ? `<button type="button" aria-label="${
-                  this.config.strings['toggleMaximize']
-              }" id="${this.getIdName(
-                  'cres-gallery-maximize'
-              )}" class="cres-gallery-maximize cres-gallery-icon"></button>`
+                this.config.strings.toggleMaximize
+            }" id="${this.getIdName(
+                'cres-gallery-maximize'
+            )}" class="cres-gallery-maximize cres-gallery-icon"></button>`
             : '';
         const template = `
         <div class="${containerClassName}" id="${this.getIdName(
-            'cres-gallery-container'
-        )}" tabindex="-1" aria-modal="true" ${ariaLabelledby} ${ariaDescribedby} role="dialog"
+    'cres-gallery-container'
+)}" tabindex="-1" aria-modal="true" ${ariaLabelledby} ${ariaDescribedby} role="dialog"
         >
             <div id="${this.getIdName(
-                'cres-gallery-backdrop'
-            )}" class="cres-gallery-backdrop"></div>
+        'cres-gallery-backdrop'
+    )}" class="cres-gallery-backdrop"></div>
             <div id="${this.getIdName(
-                'cres-gallery-outer'
-            )}" class="cres-gallery-outer cres-gallery-use-css3 cres-gallery-css3 cres-gallery-hide-items ${addClasses} ">
+        'cres-gallery-outer'
+    )}" class="cres-gallery-outer cres-gallery-use-css3 cres-gallery-css3 cres-gallery-hide-items ${addClasses} ">
               <div id="${this.getIdName(
-                  'cres-gallery-content'
-              )}" class="cres-gallery-content">
+        'cres-gallery-content'
+    )}" class="cres-gallery-content">
                 <div id="${this.getIdName(
-                    'cres-gallery-inner'
-                )}" class="cres-gallery-inner">
+        'cres-gallery-inner'
+    )}" class="cres-gallery-inner">
                 </div>
                 ${controls}
               </div>
                 <div id="${this.getIdName(
-                    'cres-gallery-toolbar'
-                )}" class="cres-gallery-toolbar cres-gallery-group">
+        'cres-gallery-toolbar'
+    )}" class="cres-gallery-toolbar cres-gallery-group">
                     ${maximizeIcon}
                     ${closeIcon}
                     </div>
                     ${
-                        this.config.appendSubHtmlTo === '.cres-gallery-outer'
-                            ? subHtmlCont
-                            : ''
-                    }
+    this.config.appendSubHtmlTo === '.cres-gallery-outer'
+        ? subHtmlCont
+        : ''
+}
                 <div id="${this.getIdName(
-                    'cres-gallery-components'
-                )}" class="cres-gallery-components">
+        'cres-gallery-components'
+    )}" class="cres-gallery-components">
                     ${
-                        this.config.appendSubHtmlTo === '.cres-gallery-sub-html'
-                            ? subHtmlCont
-                            : ''
-                    }
+    this.config.appendSubHtmlTo === '.cres-gallery-sub-html'
+        ? subHtmlCont
+        : ''
+}
                 </div>
             </div>
         </div>
@@ -343,7 +344,7 @@ export default class Gallery {
                 `<a id="${this.getIdName(
                     'cres-gallery-download'
                 )}" target="_blank" rel="noopener" aria-label="${
-                    this.config.strings['download']
+                    this.config.strings.download
                 }" download class="cres-gallery-download cres-gallery-icon"></a>`
             );
         }
@@ -510,7 +511,7 @@ export default class Gallery {
     }
     openGallery(index = this.config.index, element) {
         // prevent accidental double execution
-        if (this.cresGalleryOpened) return;
+        if (this.cresGalleryOpened) {return;}
         this.cresGalleryOpened = true;
         this.outer.removeClass('cres-gallery-hide-items');
 
@@ -690,6 +691,7 @@ export default class Gallery {
     initPictureFill($img) {
         if (this.config.supportLegacyBrowser) {
             try {
+                // eslint-disable-next-line no-undef
                 picturefill({
                     elements: [$img.get()]
                 });
@@ -709,15 +711,15 @@ export default class Gallery {
         if (this.config.counter) {
             const counterHtml = `<div class="cres-gallery-counter" role="status" aria-live="polite">
                 <span id="${this.getIdName(
-                    'cres-gallery-counter-current'
-                )}" class="cres-gallery-counter-current">${
-                this.index + 1
-            } </span> /
+        'cres-gallery-counter-current'
+    )}" class="cres-gallery-counter-current">${
+    this.index + 1
+} </span> /
                 <span id="${this.getIdName(
-                    'cres-gallery-counter-all'
-                )}" class="cres-gallery-counter-all">${
-                this.galleryItems.length
-            } </span></div>`;
+        'cres-gallery-counter-all'
+    )}" class="cres-gallery-counter-all">${
+    this.galleryItems.length
+} </span></div>`;
             this.outer.find(this.config.appendCounterTo).append(counterHtml);
         }
     }
@@ -822,7 +824,7 @@ export default class Gallery {
      * @returns {string}
      */
     getDummyImgStyles(imageSize) {
-        if (!imageSize) return '';
+        if (!imageSize) {return '';}
         return `width:${imageSize.width}px;
                 margin-left: -${imageSize.width / 2}px;
                 margin-top: -${imageSize.height / 2}px;
@@ -835,7 +837,7 @@ export default class Gallery {
      * @returns {string}
      */
     getVideoContStyle(imageSize) {
-        if (!imageSize) return '';
+        if (!imageSize) {return '';}
         return `width:${imageSize.width}px;
                 height:${imageSize.height}px`;
     }
@@ -859,7 +861,7 @@ export default class Gallery {
             } else {
                 _dummyImgSrc = $currentItem.attr(this.config.exThumbImage);
             }
-            if (!_dummyImgSrc) return '';
+            if (!_dummyImgSrc) {return '';}
             const imgStyle = this.getDummyImgStyles(this.currentImageSize);
             const dummyImgContent = `<img ${alt} style="${imgStyle}" class="cres-gallery-dummy-img" src="${_dummyImgSrc}" />`;
 
@@ -1085,7 +1087,7 @@ export default class Gallery {
                     poster,
                     dummyImg || '',
                     cresGalleryVideoStyle,
-                    this.config.strings['playVideo'],
+                    this.config.strings.playVideo,
                     videoInfo
                 );
                 $currentSlide.prepend(markup);
@@ -1616,9 +1618,8 @@ export default class Gallery {
             return 'video';
         } else if (item.iframe) {
             return 'iframe';
-        } else {
-            return 'image';
         }
+        return 'image';
     }
 
     touchMove(startCoords, endCoords, e) {
@@ -1727,9 +1728,8 @@ export default class Gallery {
                 ) {
                     this.closeGallery();
                     return;
-                } else {
-                    this.$backdrop.css('opacity', 1);
                 }
+                this.$backdrop.css('opacity', 1);
             }
             this.outer.find('.cres-gallery-item').removeAttr('style');
 
@@ -2171,7 +2171,7 @@ export default class Gallery {
     }
 
     manageCloseGallery() {
-        if (!this.config.closable) return;
+        if (!this.config.closable) {return;}
         let mousedown = false;
         this.getElementById('cres-gallery-close').on('click.cres-gallery', () => {
             this.closeGallery();
@@ -2281,9 +2281,9 @@ export default class Gallery {
         const removeTimeout =
             this.zoomFromOrigin && transform
                 ? Math.max(
-                      this.config.startAnimationDuration,
-                      this.config.backdropDuration
-                  )
+                    this.config.startAnimationDuration,
+                    this.config.backdropDuration
+                )
                 : this.config.backdropDuration;
         this.$container.removeClass('cres-gallery-show-in');
 
@@ -2329,9 +2329,7 @@ export default class Gallery {
 
     initModules() {
         this.plugins.forEach((module) => {
-
             module.init();
-
         });
     }
 
@@ -2349,7 +2347,7 @@ export default class Gallery {
                 }
             } catch (err) {
                 console.warn(
-                    `cresGallery:- make sure cresGallery module is properly destroyed`
+                    'cresGallery:- make sure cresGallery module is properly destroyed'
                 );
             }
         });

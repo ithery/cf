@@ -46,6 +46,7 @@ class CollectionTest extends TestCase {
 
     /**
      * @param CCollection $collection
+     *
      * @dataProvider collectionClassProvider
      */
     public function testSliding($collection) {
@@ -105,6 +106,7 @@ class CollectionTest extends TestCase {
 
     /**
      * @param CCollection $collection
+     *
      * @dataProvider collectionClassProvider
      */
     public function testEmptyCollectionIsEmpty($collection) {
@@ -115,6 +117,7 @@ class CollectionTest extends TestCase {
 
     /**
      * @param CCollection $collection
+     *
      * @dataProvider collectionClassProvider
      */
     public function testEmptyCollectionIsNotEmpty($collection) {
@@ -126,6 +129,7 @@ class CollectionTest extends TestCase {
 
     /**
      * @param CCollection $collection
+     *
      * @dataProvider collectionClassProvider
      */
     public function testCollectionIsConstructed($collection) {
@@ -147,6 +151,7 @@ class CollectionTest extends TestCase {
 
     /**
      * @param CCollection $collection
+     *
      * @dataProvider collectionClassProvider
      */
     public function testCollectionShuffleWithSeed($collection) {
@@ -206,6 +211,7 @@ class CollectionTest extends TestCase {
 
     /**
      * @param CCollection $collection
+     *
      * @dataProvider collectionClassProvider
      */
     public function testCountable($collection) {
@@ -215,6 +221,7 @@ class CollectionTest extends TestCase {
 
     /**
      * @param CCollection $collection
+     *
      * @dataProvider collectionClassProvider
      */
     public function testCountByStandalone($collection) {
@@ -230,6 +237,7 @@ class CollectionTest extends TestCase {
 
     /**
      * @param CCollection $collection
+     *
      * @dataProvider collectionClassProvider
      */
     public function testCountByWithKey($collection) {
@@ -242,6 +250,7 @@ class CollectionTest extends TestCase {
 
     /**
      * @param CCollection $collection
+     *
      * @dataProvider collectionClassProvider
      */
     public function testCountableByWithCallback($collection) {
@@ -258,6 +267,7 @@ class CollectionTest extends TestCase {
 
     /**
      * @param CCollection $collection
+     *
      * @dataProvider collectionClassProvider
      */
     public function testContainsOneItem($collection) {
@@ -274,6 +284,7 @@ class CollectionTest extends TestCase {
 
     /**
      * @param CCollection $collection
+     *
      * @dataProvider collectionClassProvider
      */
     public function testCachingIterator($collection) {
@@ -283,6 +294,7 @@ class CollectionTest extends TestCase {
 
     /**
      * @param CCollection $collection
+     *
      * @dataProvider collectionClassProvider
      */
     public function testChunk($collection) {
@@ -298,6 +310,7 @@ class CollectionTest extends TestCase {
 
     /**
      * @param CCollection $collection
+     *
      * @dataProvider collectionClassProvider
      */
     public function testChunkWhenGivenZeroAsSize($collection) {
@@ -311,6 +324,7 @@ class CollectionTest extends TestCase {
 
     /**
      * @param CCollection $collection
+     *
      * @dataProvider collectionClassProvider
      */
     public function testChunkWhenGivenLessThanZero($collection) {
@@ -324,6 +338,7 @@ class CollectionTest extends TestCase {
 
     /**
      * @param CCollection $collection
+     *
      * @dataProvider collectionClassProvider
      */
     public function testSplitIn($collection) {
@@ -340,6 +355,7 @@ class CollectionTest extends TestCase {
 
     /**
      * @param CCollection $collection
+     *
      * @dataProvider collectionClassProvider
      */
     public function testChunkWhileOnEqualElements($collection) {
@@ -357,6 +373,7 @@ class CollectionTest extends TestCase {
 
     /**
      * @param CCollection $collection
+     *
      * @dataProvider collectionClassProvider
      */
     public function testChunkWhileOnContiguouslyIncreasingIntegers($collection) {
@@ -376,6 +393,7 @@ class CollectionTest extends TestCase {
 
     /**
      * @param CCollection $collection
+     *
      * @dataProvider collectionClassProvider
      */
     public function testEvery($collection) {
@@ -408,6 +426,7 @@ class CollectionTest extends TestCase {
 
     /**
      * @param CCollection $collection
+     *
      * @dataProvider collectionClassProvider
      */
     public function testExcept($collection) {
@@ -423,6 +442,7 @@ class CollectionTest extends TestCase {
 
     /**
      * @param CCollection $collection
+     *
      * @dataProvider collectionClassProvider
      */
     public function testExceptSelf($collection) {
@@ -432,6 +452,7 @@ class CollectionTest extends TestCase {
 
     /**
      * @param CCollection $collection
+     *
      * @dataProvider collectionClassProvider
      */
     public function testPluckWithArrayAndObjectValues($collection) {
@@ -442,6 +463,7 @@ class CollectionTest extends TestCase {
 
     /**
      * @param CCollection $collection
+     *
      * @dataProvider collectionClassProvider
      */
     public function testPluckWithArrayAccessValues($collection) {
@@ -456,6 +478,7 @@ class CollectionTest extends TestCase {
 
     /**
      * @param CCollection $collection
+     *
      * @dataProvider collectionClassProvider
      */
     public function testHas($collection) {
@@ -468,6 +491,7 @@ class CollectionTest extends TestCase {
 
     /**
      * @param CCollection $collection
+     *
      * @dataProvider collectionClassProvider
      */
     public function testHasAny($collection) {
@@ -482,6 +506,7 @@ class CollectionTest extends TestCase {
 
     /**
      * @param CCollection $collection
+     *
      * @dataProvider collectionClassProvider
      */
     public function testImplode($collection) {
@@ -507,6 +532,7 @@ class CollectionTest extends TestCase {
 
     /**
      * @param CCollection $collection
+     *
      * @dataProvider collectionClassProvider
      */
     public function testTake($collection) {
@@ -529,6 +555,7 @@ class CollectionTest extends TestCase {
 
     /**
      * @param CCollection $collection
+     *
      * @dataProvider collectionClassProvider
      */
     public function testRandom($collection) {
@@ -565,6 +592,7 @@ class CollectionTest extends TestCase {
 
     /**
      * @param CCollection $collection
+     *
      * @dataProvider collectionClassProvider
      */
     public function testRandomOnEmptyCollection($collection) {
@@ -581,6 +609,7 @@ class CollectionTest extends TestCase {
 
     /**
      * @param CCollection $collection
+     *
      * @dataProvider collectionClassProvider
      */
     public function testTakeLast($collection) {
@@ -591,6 +620,7 @@ class CollectionTest extends TestCase {
 
     /**
      * @param CCollection $collection
+     *
      * @dataProvider collectionClassProvider
      */
     public function testTakeUntilUsingValue($collection) {
@@ -603,6 +633,7 @@ class CollectionTest extends TestCase {
 
     /**
      * @param CCollection $collection
+     *
      * @dataProvider collectionClassProvider
      */
     public function testTakeUntilUsingCallback($collection) {
@@ -617,6 +648,7 @@ class CollectionTest extends TestCase {
 
     /**
      * @param CCollection $collection
+     *
      * @dataProvider collectionClassProvider
      */
     public function testTakeUntilReturnsAllItemsForUnmetValue($collection) {
@@ -635,6 +667,7 @@ class CollectionTest extends TestCase {
 
     /**
      * @param CCollection $collection
+     *
      * @dataProvider collectionClassProvider
      */
     public function testTakeUntilCanBeProxied($collection) {
@@ -653,6 +686,7 @@ class CollectionTest extends TestCase {
 
     /**
      * @param CCollection $collection
+     *
      * @dataProvider collectionClassProvider
      */
     public function testTakeWhileUsingValue($collection) {
@@ -665,6 +699,7 @@ class CollectionTest extends TestCase {
 
     /**
      * @param CCollection $collection
+     *
      * @dataProvider collectionClassProvider
      */
     public function testTakeWhileUsingCallback($collection) {
@@ -679,6 +714,7 @@ class CollectionTest extends TestCase {
 
     /**
      * @param CCollection $collection
+     *
      * @dataProvider collectionClassProvider
      */
     public function testTakeWhileReturnsNoItemsForUnmetValue($collection) {
@@ -697,6 +733,7 @@ class CollectionTest extends TestCase {
 
     /**
      * @param CCollection $collection
+     *
      * @dataProvider collectionClassProvider
      */
     public function testTakeWhileCanBeProxied($collection) {
@@ -716,6 +753,7 @@ class CollectionTest extends TestCase {
 
     /**
      * @param CCollection $collection
+     *
      * @dataProvider collectionClassProvider
      */
     public function testMacroable($collection) {
@@ -736,6 +774,7 @@ class CollectionTest extends TestCase {
 
     /**
      * @param CCollection $collection
+     *
      * @dataProvider collectionClassProvider
      */
     public function testCanAddMethodsToProxy($collection) {
@@ -755,6 +794,7 @@ class CollectionTest extends TestCase {
 
     /**
      * @param CCollection $collection
+     *
      * @dataProvider collectionClassProvider
      */
     public function testMakeMethod($collection) {
@@ -764,6 +804,7 @@ class CollectionTest extends TestCase {
 
     /**
      * @param CCollection $collection
+     *
      * @dataProvider collectionClassProvider
      */
     public function testMakeMethodFromNull($collection) {
@@ -776,6 +817,7 @@ class CollectionTest extends TestCase {
 
     /**
      * @param CCollection $collection
+     *
      * @dataProvider collectionClassProvider
      */
     public function testMakeMethodFromCollection($collection) {
@@ -786,6 +828,7 @@ class CollectionTest extends TestCase {
 
     /**
      * @param CCollection $collection
+     *
      * @dataProvider collectionClassProvider
      */
     public function testMakeMethodFromArray($collection) {
@@ -795,6 +838,7 @@ class CollectionTest extends TestCase {
 
     /**
      * @param CCollection $collection
+     *
      * @dataProvider collectionClassProvider
      */
     public function testWrapWithScalar($collection) {
@@ -804,6 +848,7 @@ class CollectionTest extends TestCase {
 
     /**
      * @param CCollection $collection
+     *
      * @dataProvider collectionClassProvider
      */
     public function testWrapWithArray($collection) {
@@ -813,6 +858,7 @@ class CollectionTest extends TestCase {
 
     /**
      * @param CCollection $collection
+     *
      * @dataProvider collectionClassProvider
      */
     public function testWrapWithArrayable($collection) {
@@ -822,6 +868,7 @@ class CollectionTest extends TestCase {
 
     /**
      * @param CCollection $collection
+     *
      * @dataProvider collectionClassProvider
      */
     public function testWrapWithJsonable($collection) {
@@ -831,6 +878,7 @@ class CollectionTest extends TestCase {
 
     /**
      * @param CCollection $collection
+     *
      * @dataProvider collectionClassProvider
      */
     public function testWrapWithJsonSerialize($collection) {
@@ -840,6 +888,7 @@ class CollectionTest extends TestCase {
 
     /**
      * @param CCollection $collection
+     *
      * @dataProvider collectionClassProvider
      */
     public function testWrapWithCollectionClass($collection) {
@@ -849,6 +898,7 @@ class CollectionTest extends TestCase {
 
     /**
      * @param CCollection $collection
+     *
      * @dataProvider collectionClassProvider
      */
     public function testWrapWithCollectionSubclass($collection) {
@@ -859,6 +909,7 @@ class CollectionTest extends TestCase {
 
     /**
      * @param CCollection $collection
+     *
      * @dataProvider collectionClassProvider
      */
     public function testUnwrapCollection($collection) {
@@ -868,6 +919,7 @@ class CollectionTest extends TestCase {
 
     /**
      * @param CCollection $collection
+     *
      * @dataProvider collectionClassProvider
      */
     public function testUnwrapCollectionWithArray($collection) {
@@ -876,6 +928,7 @@ class CollectionTest extends TestCase {
 
     /**
      * @param CCollection $collection
+     *
      * @dataProvider collectionClassProvider
      */
     public function testUnwrapCollectionWithScalar($collection) {
@@ -884,6 +937,7 @@ class CollectionTest extends TestCase {
 
     /**
      * @param CCollection $collection
+     *
      * @dataProvider collectionClassProvider
      */
     public function testEmptyMethod($collection) {
@@ -894,6 +948,7 @@ class CollectionTest extends TestCase {
 
     /**
      * @param CCollection $collection
+     *
      * @dataProvider collectionClassProvider
      */
     public function testTimesMethod($collection) {
@@ -919,6 +974,7 @@ class CollectionTest extends TestCase {
 
     /**
      * @param CCollection $collection
+     *
      * @dataProvider collectionClassProvider
      */
     public function testRangeMethod($collection) {
@@ -955,6 +1011,7 @@ class CollectionTest extends TestCase {
 
     /**
      * @param CCollection $collection
+     *
      * @dataProvider collectionClassProvider
      */
     public function testConstructMakeFromObject($collection) {
@@ -966,6 +1023,7 @@ class CollectionTest extends TestCase {
 
     /**
      * @param CCollection $collection
+     *
      * @dataProvider collectionClassProvider
      */
     public function testConstructMethod($collection) {
@@ -975,6 +1033,7 @@ class CollectionTest extends TestCase {
 
     /**
      * @param CCollection $collection
+     *
      * @dataProvider collectionClassProvider
      */
     public function testConstructMethodFromNull($collection) {
@@ -987,6 +1046,7 @@ class CollectionTest extends TestCase {
 
     /**
      * @param CCollection $collection
+     *
      * @dataProvider collectionClassProvider
      */
     public function testConstructMethodFromCollection($collection) {
@@ -997,6 +1057,7 @@ class CollectionTest extends TestCase {
 
     /**
      * @param CCollection $collection
+     *
      * @dataProvider collectionClassProvider
      */
     public function testConstructMethodFromArray($collection) {
@@ -1006,6 +1067,7 @@ class CollectionTest extends TestCase {
 
     /**
      * @param CCollection $collection
+     *
      * @dataProvider collectionClassProvider
      */
     public function testConstructMethodFromObject($collection) {
@@ -1044,6 +1106,7 @@ class CollectionTest extends TestCase {
 
     /**
      * @param CCollection $collection
+     *
      * @dataProvider collectionClassProvider
      */
     public function testGetPluckValueWithAccessors($collection) {
@@ -1064,6 +1127,7 @@ class CollectionTest extends TestCase {
 
     /**
      * @param CCollection $collection
+     *
      * @dataProvider collectionClassProvider
      */
     public function testKeyByAttribute($collection) {
@@ -1080,6 +1144,7 @@ class CollectionTest extends TestCase {
 
     /**
      * @param CCollection $collection
+     *
      * @dataProvider collectionClassProvider
      */
     public function testKeyByClosure($collection) {
@@ -1098,6 +1163,7 @@ class CollectionTest extends TestCase {
 
     /**
      * @param CCollection $collection
+     *
      * @dataProvider collectionClassProvider
      */
     public function testKeyByObject($collection) {
@@ -1116,6 +1182,7 @@ class CollectionTest extends TestCase {
 
     /**
      * @param CCollection $collection
+     *
      * @dataProvider collectionClassProvider
      */
     public function testValueRetrieverAcceptsDotNotation($collection) {
@@ -1147,6 +1214,7 @@ class CollectionTest extends TestCase {
 
     /**
      * @param CCollection $collection
+     *
      * @dataProvider collectionClassProvider
      */
     public function testRejectRemovesElementsPassingTruthTest($collection) {
@@ -1177,6 +1245,7 @@ class CollectionTest extends TestCase {
 
     /**
      * @param CCollection $collection
+     *
      * @dataProvider collectionClassProvider
      */
     public function testRejectWithoutAnArgumentRemovesTruthyValues($collection) {
@@ -1200,6 +1269,7 @@ class CollectionTest extends TestCase {
 
     /**
      * @param CCollection $collection
+     *
      * @dataProvider collectionClassProvider
      */
     public function testSearchReturnsIndexOfFirstFoundItem($collection) {
@@ -1218,6 +1288,7 @@ class CollectionTest extends TestCase {
 
     /**
      * @param CCollection $collection
+     *
      * @dataProvider collectionClassProvider
      */
     public function testSearchInStrictMode($collection) {
@@ -1233,6 +1304,7 @@ class CollectionTest extends TestCase {
 
     /**
      * @param CCollection $collection
+     *
      * @dataProvider collectionClassProvider
      */
     public function testSearchReturnsFalseWhenItemIsNotFound($collection) {
@@ -1250,6 +1322,7 @@ class CollectionTest extends TestCase {
 
     /**
      * @param CCollection $collection
+     *
      * @dataProvider collectionClassProvider
      */
     public function testKeys($collection) {
@@ -1259,6 +1332,7 @@ class CollectionTest extends TestCase {
 
     /**
      * @param CCollection $collection
+     *
      * @dataProvider collectionClassProvider
      */
     public function testPaginate($collection) {
@@ -1334,6 +1408,7 @@ class CollectionTest extends TestCase {
 
     /**
      * @param CCollection $collection
+     *
      * @dataProvider collectionClassProvider
      */
     public function testZip($collection) {
@@ -1365,6 +1440,7 @@ class CollectionTest extends TestCase {
 
     /**
      * @param CCollection $collection
+     *
      * @dataProvider collectionClassProvider
      */
     public function testPadPadsArrayWithValue($collection) {
@@ -1387,6 +1463,7 @@ class CollectionTest extends TestCase {
 
     /**
      * @param CCollection $collection
+     *
      * @dataProvider collectionClassProvider
      */
     public function testGettingMaxItemsFromCollection($collection) {
@@ -1410,6 +1487,7 @@ class CollectionTest extends TestCase {
 
     /**
      * @param CCollection $collection
+     *
      * @dataProvider collectionClassProvider
      */
     public function testGettingMinItemsFromCollection($collection) {
@@ -1443,6 +1521,7 @@ class CollectionTest extends TestCase {
 
     /**
      * @param CCollection $collection
+     *
      * @dataProvider collectionClassProvider
      */
     public function testOnly($collection) {
@@ -1460,6 +1539,7 @@ class CollectionTest extends TestCase {
 
     /**
      * @param CCollection $collection
+     *
      * @dataProvider collectionClassProvider
      */
     public function testCombineWithArray($collection) {
@@ -1477,6 +1557,7 @@ class CollectionTest extends TestCase {
 
     /**
      * @param CCollection $collection
+     *
      * @dataProvider collectionClassProvider
      */
     public function testCombineWithCollection($collection) {
@@ -1495,6 +1576,7 @@ class CollectionTest extends TestCase {
 
     /**
      * @param CCollection $collection
+     *
      * @dataProvider collectionClassProvider
      */
     public function testConcatWithArray($collection) {
@@ -1523,6 +1605,7 @@ class CollectionTest extends TestCase {
 
     /**
      * @param CCollection $collection
+     *
      * @dataProvider collectionClassProvider
      */
     public function testConcatWithCollection($collection) {
@@ -1553,6 +1636,7 @@ class CollectionTest extends TestCase {
 
     /**
      * @param CCollection $collection
+     *
      * @dataProvider collectionClassProvider
      */
     public function testDump($collection) {
@@ -1571,6 +1655,7 @@ class CollectionTest extends TestCase {
 
     /**
      * @param CCollection $collection
+     *
      * @dataProvider collectionClassProvider
      */
     public function testReduce($collection) {
@@ -1590,6 +1675,7 @@ class CollectionTest extends TestCase {
 
     /**
      * @param CCollection $collection
+     *
      * @dataProvider collectionClassProvider
      */
     public function testReduceWithKeys($collection) {
@@ -1604,6 +1690,7 @@ class CollectionTest extends TestCase {
 
     /**
      * @param CCollection $collection
+     *
      * @dataProvider collectionClassProvider
      */
     public function testReduceSpread($collection) {
@@ -1624,6 +1711,7 @@ class CollectionTest extends TestCase {
 
     /**
      * @param CCollection $collection
+     *
      * @dataProvider collectionClassProvider
      */
     public function testPipe($collection) {
@@ -1636,6 +1724,7 @@ class CollectionTest extends TestCase {
 
     /**
      * @param CCollection $collection
+     *
      * @dataProvider collectionClassProvider
      */
     public function testPipeInto($collection) {
@@ -1650,6 +1739,7 @@ class CollectionTest extends TestCase {
 
     /**
      * @param CCollection $collection
+     *
      * @dataProvider collectionClassProvider
      */
     public function testMedianValueWithArrayCollection($collection) {
@@ -1660,6 +1750,7 @@ class CollectionTest extends TestCase {
 
     /**
      * @param CCollection $collection
+     *
      * @dataProvider collectionClassProvider
      */
     public function testMedianValueByKey($collection) {
@@ -1674,6 +1765,7 @@ class CollectionTest extends TestCase {
 
     /**
      * @param CCollection $collection
+     *
      * @dataProvider collectionClassProvider
      */
     public function testMedianOnCollectionWithNull($collection) {
@@ -1688,6 +1780,7 @@ class CollectionTest extends TestCase {
 
     /**
      * @param CCollection $collection
+     *
      * @dataProvider collectionClassProvider
      */
     public function testEvenMedianCollection($collection) {
@@ -1700,6 +1793,7 @@ class CollectionTest extends TestCase {
 
     /**
      * @param CCollection $collection
+     *
      * @dataProvider collectionClassProvider
      */
     public function testMedianOutOfOrderCollection($collection) {
@@ -1713,6 +1807,7 @@ class CollectionTest extends TestCase {
 
     /**
      * @param CCollection $collection
+     *
      * @dataProvider collectionClassProvider
      */
     public function testMedianOnEmptyCollectionReturnsNull($collection) {
@@ -1722,6 +1817,7 @@ class CollectionTest extends TestCase {
 
     /**
      * @param CCollection $collection
+     *
      * @dataProvider collectionClassProvider
      */
     public function testModeOnNullCollection($collection) {
@@ -1731,6 +1827,7 @@ class CollectionTest extends TestCase {
 
     /**
      * @param CCollection $collection
+     *
      * @dataProvider collectionClassProvider
      */
     public function testMode($collection) {
@@ -1740,6 +1837,7 @@ class CollectionTest extends TestCase {
 
     /**
      * @param CCollection $collection
+     *
      * @dataProvider collectionClassProvider
      */
     public function testModeValueByKey($collection) {
@@ -1754,6 +1852,7 @@ class CollectionTest extends TestCase {
 
     /**
      * @param CCollection $collection
+     *
      * @dataProvider collectionClassProvider
      */
     public function testWithMultipleModeValues($collection) {
@@ -1763,6 +1862,7 @@ class CollectionTest extends TestCase {
 
     /**
      * @param CCollection $collection
+     *
      * @dataProvider collectionClassProvider
      */
     public function testHasReturnsValidResults($collection) {
@@ -1786,6 +1886,7 @@ class CollectionTest extends TestCase {
 
     /**
      * @param CCollection $collection
+     *
      * @dataProvider collectionClassProvider
      */
     public function testGetWithNullReturnsNull($collection) {
@@ -1795,6 +1896,7 @@ class CollectionTest extends TestCase {
 
     /**
      * @param CCollection $collection
+     *
      * @dataProvider collectionClassProvider
      */
     public function testCollect($collection) {
@@ -1815,6 +1917,7 @@ class CollectionTest extends TestCase {
 
     /**
      * @param CCollection $collection
+     *
      * @dataProvider collectionClassProvider
      */
     public function testUndot($collection) {
@@ -1916,6 +2019,7 @@ class TestArrayAccessImplementation implements ArrayAccess {
         $this->arr = $arr;
     }
 
+    #[\ReturnTypeWillChange]
     public function offsetExists($offset) {
         return isset($this->arr[$offset]);
     }
@@ -1924,10 +2028,12 @@ class TestArrayAccessImplementation implements ArrayAccess {
         return $this->arr[$offset];
     }
 
+    #[\ReturnTypeWillChange]
     public function offsetSet($offset, $value) {
         $this->arr[$offset] = $value;
     }
 
+    #[\ReturnTypeWillChange]
     public function offsetUnset($offset) {
         unset($this->arr[$offset]);
     }

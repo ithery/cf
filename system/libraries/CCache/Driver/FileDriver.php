@@ -8,10 +8,10 @@ defined('SYSPATH') or die('No direct access allowed.');
  *
  * @since Feb 16, 2019, 1:07:08 PM
  */
-class CCache_Driver_FileDriver extends CCache_DriverAbstract {
-    use CTrait_Helper_InteractsWithTime,
-        CCache_Trait_RetrievesMultipleKeys;
-
+class CCache_Driver_FileDriver extends CCache_DriverAbstract implements CCache_Contract_LockProviderDriverInterface {
+    use CTrait_Helper_InteractsWithTime;
+    use CCache_Trait_RetrievesMultipleKeys;
+    use CCache_Trait_HasCacheLockTrait;
     protected $engine;
 
     public function __construct($options) {
@@ -21,6 +21,69 @@ class CCache_Driver_FileDriver extends CCache_DriverAbstract {
 
         $engineClass = 'CCache_Driver_FileDriver_Engine_' . cstr::ucfirst($engineName) . 'Engine';
         $this->engine = new $engineClass($engineOptions);
+    }
+
+    /**
+     * Retrieve an item from the cache by key.
+     *
+     * @param string|array $key
+     *
+     * @return mixed
+     */
+    public function get($key) {
+        return isset($this->getPayload($key)['data']) ? $this->getPayload($key)['data'] : null;
+    }
+
+    /**
+     * Store an item in the cache for a given number of seconds.
+     *
+     * @param string $key
+     * @param mixed  $value
+     * @param int    $seconds
+     *
+     * @return bool
+     */
+    public function put($key, $value, $seconds) {
+        $result = $this->engine->put($key, $this->expiration($seconds) . serialize($value), true);
+
+        return $result !== false && $result > 0;
+    }
+
+    /**
+     * Store an item in the cache if the key doesn't exist.
+     *
+     * @param string $key
+     * @param mixed  $value
+     * @param int    $seconds
+     *
+     * @return bool
+     */
+    public function add($key, $value, $seconds) {
+        $path = $this->engine->path($key);
+        $file = new CStorage_LockableFile($path, 'c+');
+
+        try {
+            $file->getExclusiveLock();
+        } catch (CCache_Exception_LockTimeoutException $e) {
+            $file->close();
+
+            return false;
+        }
+        $expire = $file->read(10);
+
+        if (empty($expire) || $this->currentTime() >= $expire) {
+            $file->truncate()
+                ->write($this->expiration($seconds) . serialize($value))
+                ->close();
+
+            //$this->ensurePermissionsAreCorrect($path);
+
+            return true;
+        }
+
+        $file->close();
+
+        return false;
     }
 
     /**
@@ -72,17 +135,6 @@ class CCache_Driver_FileDriver extends CCache_DriverAbstract {
     }
 
     /**
-     * Retrieve an item from the cache by key.
-     *
-     * @param string|array $key
-     *
-     * @return mixed
-     */
-    public function get($key) {
-        return isset($this->getPayload($key)['data']) ? $this->getPayload($key)['data'] : null;
-    }
-
-    /**
      * Get the cache key prefix.
      *
      * @return string
@@ -105,21 +157,6 @@ class CCache_Driver_FileDriver extends CCache_DriverAbstract {
         return c::tap(((int) $raw['data']) + $value, function ($newValue) use ($key, $raw) {
             $this->put($key, $newValue, isset($raw['time']) ? $raw['time'] : 0);
         });
-    }
-
-    /**
-     * Store an item in the cache for a given number of seconds.
-     *
-     * @param string $key
-     * @param mixed  $value
-     * @param int    $seconds
-     *
-     * @return bool
-     */
-    public function put($key, $value, $seconds) {
-        $result = $this->engine->put($key, $this->expiration($seconds) . serialize($value), true);
-
-        return $result !== false && $result > 0;
     }
 
     /**

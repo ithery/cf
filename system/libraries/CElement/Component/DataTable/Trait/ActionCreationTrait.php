@@ -19,18 +19,31 @@ trait CElement_Component_DataTable_Trait_ActionCreationTrait {
         return $act;
     }
 
+    public function createDownloadUrl($options) {
+        /** @var CElement_Component_DataTable $this */
+        $exportable = $this->toExportable();
+        $ajaxMethod = CAjax::createMethod();
+        $ajaxMethod->setType(CAjax_Engine_Exporter::class);
+        $ajaxMethod->setData('exporter', serialize($exportable));
+        $ajaxMethod->setData('filename', carr::get($options, 'filename'));
+        $ajaxMethod->setData('writerType', carr::get($options, 'writerType'));
+        $ajaxMethod->setData('headers', carr::get($options, 'headers', []));
+        $ajaxMethod->setExpiration(carr::get($options, 'expiration', c::now()->addDays(1)->getTimestamp()));
+        if (carr::get($options, 'auth', c::app()->isAuthEnabled())) {
+            $ajaxMethod->enableAuth();
+        }
+
+        $downloadUrl = $ajaxMethod->makeUrl();
+
+        return $downloadUrl;
+    }
+
     public function createDownloadAction($options = []) {
         $id = carr::get($options, 'id');
 
         $options['action'] = CExporter::ACTION_DOWNLOAD;
         $act = CElement_Factory::createComponent('Action', $id)->setLabel('Export');
-
-        $ajaxMethod = CAjax::createMethod();
-        $ajaxMethod->setType('DataTableExporter');
-        $ajaxMethod->setData('table', serialize($this));
-        $ajaxMethod->setData('exporter', $options);
-        $downloadUrl = $ajaxMethod->makeUrl();
-
+        $downloadUrl = $this->createDownloadUrl($options);
         $act->setLink($downloadUrl)->setLinkTarget('_blank');
 
         return $act;

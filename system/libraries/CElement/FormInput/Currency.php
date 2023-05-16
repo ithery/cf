@@ -32,10 +32,10 @@ class CElement_FormInput_Currency extends CElement_FormInput {
         $js->append(parent::jsChild());
 
         $js->append("$('#" . $this->id . "').focus( function() {
-				$('#" . $this->id . "').val($.cresenity.unformat_currency($('#" . $this->id . "').val()))
+				$('#" . $this->id . "').val(cresenity.unformatCurrency($('#" . $this->id . "').val()))
 			});")->br();
         $js->append("$('#" . $this->id . "').blur(function() {
-				$('#" . $this->id . "').val($.cresenity.format_currency($('#" . $this->id . "').val()))
+				$('#" . $this->id . "').val(cresenity.formatCurrency($('#" . $this->id . "').val()))
 			});")->br();
 
         return $js->text();

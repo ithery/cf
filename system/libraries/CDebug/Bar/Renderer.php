@@ -119,6 +119,7 @@ class CDebug_Bar_Renderer {
      */
     public function renderHead() {
         $html = '';
+
         foreach ($this->cssFiles as $css) {
             $cssRoute = curl::base() . 'modules/cresenity/media/css/' . $css;
             $html .= "<link rel='stylesheet' type='text/css' property='stylesheet' href='{$cssRoute}'>" . PHP_EOL;

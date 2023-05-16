@@ -12,7 +12,6 @@
  */
 class CModel_Notification_NotificationModel extends CModel {
     use CModel_Notification_NotificationTrait;
-
     /**
      * The table associated with the model.
      *

@@ -87,6 +87,15 @@ class CHTTP_Request extends SymfonyRequest implements CInterface_Arrayable, Arra
         return rtrim($this->getSchemeAndHttpHost() . $this->getBaseUrl(), '/');
     }
 
+    public function getHost() {
+        $host = parent::getHost();
+        if ($host == null) {
+            $host = CF::domain();
+        }
+
+        return $host;
+    }
+
     /**
      * Get the URL (no query string) for the request.
      *
@@ -718,5 +727,26 @@ class CHTTP_Request extends SymfonyRequest implements CInterface_Arrayable, Arra
         }
 
         return isset($ref) ? $ref : $default;
+    }
+
+    public function isCresRequest() {
+        return $this->hasHeader('X-Cres-Version');
+    }
+
+    /**
+     * Sets a list of trusted proxies.
+     *
+     * You should only list the reverse proxies that you manage directly.
+     *
+     * @param array $proxies          A list of trusted proxies, the string 'REMOTE_ADDR' will be replaced with $_SERVER['REMOTE_ADDR']
+     * @param int   $trustedHeaderSet A bit field of Request::HEADER_*, to set which headers to trust from your proxies
+     *
+     * @return void
+     */
+    public static function setTrustedProxies(array $proxies, $trustedHeaderSet = null) {
+        if ($trustedHeaderSet === null) {
+            $trustedHeaderSet = CHTTP_Request::HEADER_X_FORWARDED_FOR | CHTTP_Request::HEADER_X_FORWARDED_HOST | CHTTP_Request::HEADER_X_FORWARDED_PORT | CHTTP_Request::HEADER_X_FORWARDED_PROTO | CHTTP_Request::HEADER_X_FORWARDED_PREFIX | CHTTP_Request::HEADER_X_FORWARDED_AWS_ELB;
+        }
+        parent::setTrustedProxies($proxies, $trustedHeaderSet);
     }
 }

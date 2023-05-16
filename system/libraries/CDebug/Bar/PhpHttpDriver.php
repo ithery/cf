@@ -3,13 +3,6 @@
 defined('SYSPATH') or die('No direct access allowed.');
 
 /**
- * @author Hery Kurniawan
- * @license Ittron Global Teknologi <ittron.co.id>
- *
- * @since Aug 22, 2018, 4:33:28 PM
- */
-
-/**
  * HTTP driver for native php.
  */
 class CDebug_Bar_PhpHttpDriver implements CDebug_Bar_Interface_HttpDriverInterface {
@@ -45,6 +38,10 @@ class CDebug_Bar_PhpHttpDriver implements CDebug_Bar_Interface_HttpDriverInterfa
      * @return bool
      */
     public function hasSessionValue($name) {
+        if ($_SESSION instanceof CSession_NativeAdapter) {
+            return $_SESSION->offsetExists($name);
+        }
+
         return array_key_exists($name, $_SESSION);
     }
 

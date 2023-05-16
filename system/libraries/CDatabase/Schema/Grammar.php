@@ -2,7 +2,6 @@
 
 abstract class CDatabase_Schema_Grammar extends CDatabase_Grammar {
     use CDatabase_Trait_CompileJsonPathTrait;
-
     /**
      * If this Grammar supports schema changes wrapped in a transaction.
      *

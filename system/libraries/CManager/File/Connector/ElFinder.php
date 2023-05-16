@@ -12,21 +12,21 @@ use CManager_File_Connector_ElFinder_Base as ElFinder;
 
 class CManager_File_Connector_ElFinder extends CManager_File_ConnectorAbstract {
     /**
-     * ElFinder instance
+     * ElFinder instance.
      *
      * @var elFinder
      * */
     protected $elFinder;
 
     /**
-     * Options
+     * Options.
      *
      * @var array
      * */
     protected $options = [];
 
     /**
-     * Must be use output($data) $data['header']
+     * Must be use output($data) $data['header'].
      *
      * @var string
      *
@@ -35,21 +35,21 @@ class CManager_File_Connector_ElFinder extends CManager_File_ConnectorAbstract {
     protected $header = '';
 
     /**
-     * HTTP request method
+     * HTTP request method.
      *
      * @var string
      */
     protected $reqMethod = '';
 
     /**
-     * Content type of output JSON
+     * Content type of output JSON.
      *
      * @var string
      */
     protected static $contentType = 'Content-Type: application/json; charset=utf-8';
 
     /**
-     * Constructor
+     * Constructor.
      *
      * @param      $elFinder
      * @param bool $debug
@@ -67,13 +67,13 @@ class CManager_File_Connector_ElFinder extends CManager_File_ConnectorAbstract {
     }
 
     /**
-     * Execute elFinder command and output result
+     * Execute elFinder command and output result.
      *
      * @param null|mixed $method
      *
-     * @return void
-     *
      * @throws Exception
+     *
+     * @return void
      */
     public function run($method = null) {
         $isPost = $this->reqMethod === 'POST';
@@ -102,8 +102,8 @@ class CManager_File_Connector_ElFinder extends CManager_File_ConnectorAbstract {
                         $src[$key] = rawurldecode($value);
                     }
                 }
-                $_POST = $this->input_filter($src);
-                $_REQUEST = $this->input_filter(array_merge_recursive($src, $_REQUEST));
+                $_POST = $this->inputFilter($src);
+                $_REQUEST = $this->inputFilter(array_merge_recursive($src, $_REQUEST));
             }
         }
 
@@ -157,7 +157,7 @@ class CManager_File_Connector_ElFinder extends CManager_File_ConnectorAbstract {
 
         $args['debug'] = isset($src['debug']) ? !!$src['debug'] : false;
 
-        $args = $this->input_filter($args);
+        $args = $this->inputFilter($args);
         if ($hasFiles) {
             $args['FILES'] = $_FILES;
         }
@@ -178,13 +178,13 @@ class CManager_File_Connector_ElFinder extends CManager_File_ConnectorAbstract {
     }
 
     /**
-     * Output json
+     * Output json.
      *
      * @param  array  data to output
      *
-     * @return void
-     *
      * @throws elFinderAbortException
+     *
+     * @return void
      *
      * @author Dmitry (dio) Levashov
      */
@@ -298,7 +298,7 @@ class CManager_File_Connector_ElFinder extends CManager_File_ConnectorAbstract {
     }
 
     /**
-     * Remove null & stripslashes applies on "magic_quotes_gpc"
+     * Remove null & stripslashes applies on "magic_quotes_gpc".
      *
      * @param mixed $args
      *
@@ -306,7 +306,7 @@ class CManager_File_Connector_ElFinder extends CManager_File_ConnectorAbstract {
      *
      * @author Naoki Sawada
      */
-    protected function input_filter($args) {
+    protected function inputFilter($args) {
         static $magic_quotes_gpc = null;
 
         if ($magic_quotes_gpc === null) {
@@ -322,11 +322,12 @@ class CManager_File_Connector_ElFinder extends CManager_File_ConnectorAbstract {
         }
         $res = str_replace("\0", '', $args);
         $magic_quotes_gpc && ($res = stripslashes($res));
+
         return $res;
     }
 
     /**
-     * Send HTTP header
+     * Send HTTP header.
      *
      * @param string|array $header optional header
      */
@@ -343,7 +344,7 @@ class CManager_File_Connector_ElFinder extends CManager_File_ConnectorAbstract {
     }
 
     /**
-     * Output JSON
+     * Output JSON.
      *
      * @param array $data
      */
@@ -357,7 +358,7 @@ class CManager_File_Connector_ElFinder extends CManager_File_ConnectorAbstract {
         if (!empty($data['raw']) && isset($data['error'])) {
             $out = $data['error'];
         } else {
-            if (isset($data['debug']) && isset($data['debug']['phpErrors'])) {
+            if (isset($data['debug'], $data['debug']['phpErrors'])) {
                 $data['debug']['phpErrors'] = array_merge($data['debug']['phpErrors'], elFinder::$phpErrors);
             }
             $out = json_encode($data);

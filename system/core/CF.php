@@ -75,6 +75,27 @@ final class CF {
     private static $terminatingCallbacks = [];
 
     /**
+     * The array of booting callbacks.
+     *
+     * @var callable[]
+     */
+    private static $bootingCallbacks = [];
+
+    /**
+     * The array of booted callbacks.
+     *
+     * @var callable[]
+     */
+    private static $bootedCallbacks = [];
+
+    /**
+     * Indicates if the application has "booted".
+     *
+     * @var bool
+     */
+    private static $booted = false;
+
+    /**
      * Check CF is running on production.
      *
      * @return bool
@@ -136,10 +157,8 @@ final class CF {
      * @return void
      */
     public static function setup() {
-        static $run;
-
         // This function can only be run once
-        if ($run === true) {
+        if (static::isBooted()) {
             return;
         }
         self::validateFileUpload();
@@ -175,9 +194,6 @@ final class CF {
         // Restore error reporting
         error_reporting($ER);
 
-        // Send default text/html UTF-8 header
-        //header('Content-Type: text/html; charset=UTF-8');
-
         // Load locales
         $locale = self::config('app.locale');
 
@@ -185,12 +201,13 @@ final class CF {
         self::$locale = setlocale(LC_ALL, $locale);
         // Set locale information
         self::$fallbackLocale = self::config('app.fallback_locale');
-
         CFBenchmark::stop(SYSTEM_BENCHMARK . '_environment_setup');
+        self::fireCallbacks(self::$bootingCallbacks);
         static::loadBootstrapFiles();
         // Setup is complete, prevent it from being run again
-        $run = true;
+        self::$booted = true;
         // Stop the environment setup routine
+        self::fireCallbacks(self::$bootedCallbacks);
     }
 
     /**
@@ -1218,14 +1235,16 @@ final class CF {
         if (is_callable($callback)) {
             $domain = CF::domain();
             $originalAppCode = static::appCode();
-
+            $result = null;
             if ($originalAppCode) {
                 static::$forceAppCode = $appCode;
                 static::$data[$domain]['app_code'] = $appCode;
-                $callback();
+                $result = $callback();
                 static::$data[$domain]['app_code'] = $originalAppCode;
                 static::$forceAppCode = null;
             }
+
+            return $result;
         }
     }
 
@@ -1281,6 +1300,58 @@ final class CF {
 
         while ($index < count(self::$terminatingCallbacks)) {
             CContainer::getInstance()->call(self::$terminatingCallbacks[$index]);
+
+            $index++;
+        }
+    }
+
+    /**
+     * Determine if the application has booted.
+     *
+     * @return bool
+     */
+    public static function isBooted() {
+        return self::$booted;
+    }
+
+    /**
+     * Register a new boot listener.
+     *
+     * @param callable $callback
+     *
+     * @return void
+     */
+    public static function booting($callback) {
+        self::$bootingCallbacks[] = $callback;
+    }
+
+    /**
+     * Register a new "booted" listener.
+     *
+     * @param callable $callback
+     *
+     * @return void
+     */
+    public static function booted($callback) {
+        self::$bootedCallbacks[] = $callback;
+
+        if (self::isBooted()) {
+            $callback();
+        }
+    }
+
+    /**
+     * Call the booting callbacks for the application.
+     *
+     * @param callable[] $callbacks
+     *
+     * @return void
+     */
+    protected static function fireCallbacks(array &$callbacks) {
+        $index = 0;
+
+        while ($index < count($callbacks)) {
+            $callbacks[$index]();
 
             $index++;
         }

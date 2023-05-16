@@ -150,7 +150,6 @@ class CQueue_PendingChain {
         $firstJob->chain($this->chain);
         $firstJob->chainCatchCallbacks = $this->catchCallbacks();
 
-        //return (new CQueue_PendingDispatch($firstJob))->chain($this->chain);
         return CQueue::dispatcher()->dispatch($firstJob);
     }
 }

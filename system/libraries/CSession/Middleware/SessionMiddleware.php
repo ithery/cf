@@ -66,8 +66,8 @@ class CSession_Middleware_SessionMiddleware {
         $lockFor = $request->route() && $request->route()->locksFor() ? $request->route()->locksFor() : 10;
 
         $cache = $this->cache(CSession::manager()->blockDriver());
-        $lock=null;
-        if ($cache instanceof CCache_LockProviderInterface) {
+        $lock = null;
+        if ($cache instanceof CCache_Contract_LockProviderDriverInterface) {
             $lock = $cache
                 ->lock('session:' . $session->getId(), $lockFor)
                 ->betweenBlockedAttemptsSleepFor(50);

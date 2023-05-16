@@ -237,5 +237,6 @@ return  [
             ],
             'button' => 'Create'
         ]
-    ]
+    ],
+    'actionHeaderLabel' => 'Actions'
 ];

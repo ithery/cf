@@ -27,44 +27,7 @@ return [
     [
         'name' => 'element',
         'label' => c::__('Elements'),
-        'subnav' => [
-            [
-                'name' => 'element.standard',
-                'label' => c::__('Standard Element'),
-                'uri' => 'docs/element/standard',
-            ],
-            [
-                'name' => 'element.table',
-                'label' => c::__('Table'),
-                'uri' => 'docs/element/table',
-            ],
-            [
-                'name' => 'element.form',
-                'label' => c::__('Form'),
-                'uri' => 'docs/element/form',
-            ],
-            [
-                'name' => 'element.tab',
-                'label' => c::__('Tab'),
-                'uri' => 'docs/element/tab',
-            ],
-            [
-                'name' => 'element.widget',
-                'label' => c::__('Widget'),
-                'uri' => 'docs/element/widget',
-            ],
-            [
-                'name' => 'element.showmore',
-                'label' => c::__('ShowMore'),
-                'uri' => 'docs/element/showmore',
-            ],
-            [
-                'name' => 'element.shimmer',
-                'label' => c::__('Shimmer'),
-                'uri' => 'docs/element/shimmer',
-            ],
-
-        ]
+        'subnav' => include dirname(__FILE__) . '/docs/element.php',
     ],
     [
         'name' => 'forminput',
@@ -86,112 +49,17 @@ return [
     [
         'name' => 'helper',
         'label' => c::__('Helpers'),
-        'subnav' => [
-            [
-                'name' => 'helper.c',
-                'label' => c::__('c'),
-                'uri' => 'docs/helper/c',
-            ],
-            [
-                'name' => 'helper.carr',
-                'label' => c::__('carr'),
-                'uri' => 'docs/helper/carr',
-            ],
-            [
-                'name' => 'helper.cstr',
-                'label' => c::__('cstr'),
-                'uri' => 'docs/helper/cstr',
-            ],
-            [
-                'name' => 'helper.curl',
-                'label' => c::__('curl'),
-                'uri' => 'docs/helper/curl',
-            ]
-
-        ]
+        'subnav' => include dirname(__FILE__) . '/docs/element.php',
     ],
     [
         'name' => 'module',
         'label' => c::__('Modules'),
-        'subnav' => [
-            [
-                'name' => 'module.queue',
-                'label' => c::__('CQueue'),
-                'uri' => 'docs/module/queue',
-            ],
-            [
-                'name' => 'module.daemon',
-                'label' => c::__('CDaemon'),
-                'uri' => 'docs/module/daemon',
-            ],
-            [
-                'name' => 'module.cron',
-                'label' => c::__('CCron'),
-                'uri' => 'docs/module/cron',
-            ],
-            [
-                'name' => 'module.period',
-                'label' => c::__('CPeriod'),
-                'uri' => 'docs/module/period',
-            ],
-        ]
+        'subnav' => include dirname(__FILE__) . '/docs/module.php',
     ],
     [
         'name' => 'cresjs',
         'label' => c::__('Cres JS'),
-        'subnav' => [
-            [
-                'name' => 'cresjs.introduction',
-                'label' => c::__('Introduction'),
-                'uri' => 'docs/cresjs/introduction',
-            ],
-            [
-                'name' => 'cresjs.basic',
-                'label' => c::__('Basic'),
-                'uri' => 'docs/cresjs/basic',
-            ],
-            [
-                'name' => 'cresjs.css',
-                'label' => c::__('Css'),
-                'uri' => 'docs/cresjs/css',
-            ],
-            [
-                'name' => 'cresjs.php',
-                'label' => c::__('PHPJS Function'),
-                'uri' => 'docs/cresjs/php',
-            ],
-            [
-                'name' => 'cresjs.reload',
-                'label' => c::__('Reload'),
-                'uri' => 'docs/cresjs/reload',
-            ],
-            [
-                'name' => 'cresjs.confirm',
-                'label' => c::__('Confirm'),
-                'uri' => 'docs/cresjs/confirm',
-            ],
-            [
-                'name' => 'cresjs.observer',
-                'label' => c::__('Observer'),
-                'uri' => 'docs/cresjs/observer',
-            ],
-            [
-                'name' => 'cresjs.ui',
-                'label' => c::__('UI'),
-                'uri' => 'docs/cresjs/ui',
-            ],
-            [
-                'name' => 'cresjs.helper',
-                'label' => c::__('Helper'),
-                'uri' => 'docs/cresjs/helper',
-            ],
-            [
-                'name' => 'cresjs.cssVar',
-                'label' => c::__('CSS Var'),
-                'uri' => 'docs/cresjs/cssVar',
-            ],
-
-        ]
+        'subnav' => include dirname(__FILE__) . '/docs/cresjs.php',
     ],
     [
         'name' => 'command',
@@ -212,23 +80,7 @@ return [
     [
         'name' => 'phpcf',
         'label' => c::__('PHP CF'),
-        'subnav' => [
-            [
-                'name' => 'phpcf.install',
-                'label' => c::__('Installation'),
-                'uri' => 'docs/phpcf/install',
-            ],
-            [
-                'name' => 'phpcf.testing',
-                'label' => c::__('Testing'),
-                'uri' => 'docs/phpcf/testing',
-            ],
-            [
-                'name' => 'phpcf.model',
-                'label' => c::__('Model'),
-                'uri' => 'docs/phpcf/model',
-            ],
-        ]
+        'subnav' => include dirname(__FILE__) . '/docs/phpcf.php',
     ],
     [
         'name' => 'other',
@@ -240,5 +92,10 @@ return [
                 'uri' => 'docs/other/maintenance',
             ],
         ]
+    ],
+    [
+        'name' => 'change',
+        'label' => c::__('Changes Log'),
+        'subnav' => include dirname(__FILE__) . '/docs/change.php',
     ],
 ];

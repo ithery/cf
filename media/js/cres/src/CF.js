@@ -19,6 +19,7 @@ class CF {
         }
         let defaultConfig = {
             baseUrl: '/',
+            domain: 'localhost',
             defaultJQueryUrl: 'https://ajax.googleapis.com/ajax/libs/jquery/3.6.0/jquery.min.js',
             haveScrollToTop: false,
             vscode: {
@@ -30,11 +31,29 @@ class CF {
                 }
             },
             requireJs: false,
-            CFVersion: '1.2',
+            environment: 'production',
+            CFVersion: '1.5',
             isProduction: false,
+            debug: false,
+            format: {
+                decimalSeparator: '.',
+                thousandSeparator: ',',
+                decimalDigit: 0,
+                date: 'Y-m-d',
+                datetime: 'Y-m-d H:i:s',
+                currencyDecimalDigit: null,
+                currencyPrefix: '',
+                currencySuffix: '',
+                currencyStripZeroDecimal: false
+            },
+            haveClock: false,
             react: {
                 enable: false
-            }
+            },
+            waves: {
+                selector: '.cres-waves-effect'
+            },
+            timezoneString: '+07:00'
 
         };
         this.config = mergeOptions(defaultConfig, cappConfig);
@@ -139,10 +158,10 @@ class CF {
                 if (typeof (callback) === 'function') {
                     el.addEventListener('load', ()=> {
                         dispatchWindowEvent('cresenity:js:loaded', {
-                            url:url,
+                            url: url
                         });
                         callback();
-                    })
+                    });
                 }
                 this.document.body.appendChild(el);
             }
@@ -272,7 +291,7 @@ class CF {
         let resolver = this.getConfig().react.enable
             ? (callback) => {
                 this.loadJQuery(()=>{
-                    this.loadReact(callback)
+                    this.loadReact(callback);
                 });
             }
             : (callback) => {

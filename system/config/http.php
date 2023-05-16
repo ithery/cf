@@ -58,7 +58,7 @@ return [
          *
          * @link https://symfony.com/doc/current/deployment/proxies.html
          */
-        'headers' => CHttp_Request::HEADER_X_FORWARDED_FOR | CHttp_Request::HEADER_X_FORWARDED_HOST | CHttp_Request::HEADER_X_FORWARDED_PORT | CHttp_Request::HEADER_X_FORWARDED_PROTO | CHttp_Request::HEADER_X_FORWARDED_AWS_ELB,
+        'headers' => CHTTP_Request::HEADER_X_FORWARDED_FOR | CHTTP_Request::HEADER_X_FORWARDED_HOST | CHTTP_Request::HEADER_X_FORWARDED_PORT | CHttp_Request::HEADER_X_FORWARDED_PROTO | CHTTP_Request::HEADER_X_FORWARDED_AWS_ELB,
 
     ],
     'cors' => [

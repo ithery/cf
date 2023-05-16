@@ -100,10 +100,24 @@ class CApp_Formatter {
         return $this;
     }
 
+    /**
+     * @return int
+     */
+    public function getCurrencyDecimalDigit() {
+        return $this->currencyDecimalDigit;
+    }
+
     public function setCurrencyStripZeroDecimal($isStriped = true) {
         $this->currencyStripZeroDecimal = $isStriped;
 
         return $this;
+    }
+
+    /**
+     * @return bool
+     */
+    public function getCurrencyStripZeroDecimal() {
+        return $this->currencyStripZeroDecimal;
     }
 
     public function setCurrencyPrefix($prefix) {
@@ -112,10 +126,24 @@ class CApp_Formatter {
         return $this;
     }
 
+    /**
+     * @return string
+     */
+    public function getCurrencyPrefix() {
+        return $this->currencyPrefix;
+    }
+
     public function setCurrencySuffix($suffix) {
         $this->currencySuffix = $suffix;
 
         return $this;
+    }
+
+    /**
+     * @return string
+     */
+    public function getCurrencySuffix() {
+        return $this->currencySuffix;
     }
 
     public function formatDate($x, $format = null) {
@@ -159,6 +187,9 @@ class CApp_Formatter {
     }
 
     public function unformatDatetime($x, $fromFormat = null) {
+        if ($x instanceof DateTime) {
+            return $x->format('Y-m-d H:i:s');
+        }
         $datetimeFormat = $fromFormat ?: $this->datetimeFormat;
         $date = CCarbon::createFromLocaleFormat($datetimeFormat, CCarbon::getLocale(), $x);
 
@@ -178,6 +209,9 @@ class CApp_Formatter {
             if (substr($x, ($decimalDigit + 1) * -1) === $decimalSeparator . cstr::repeat('0', $decimalDigit)) {
                 $x = substr($x, 0, ($decimalDigit + 1) * -1);
             }
+            if (strpos($x, $decimalSeparator) !== false) {
+                $x = rtrim($x, '0');
+            }
         }
 
         return $currencyPrefix . $x . $currencySuffix;
@@ -188,6 +222,8 @@ class CApp_Formatter {
     }
 
     public function formatDecimal($x, $decimalDigit = null, $decimalSeparator = null, $thousandSeparator = null, $stripZeroDecimal = false) {
+        $decimalDigit = $decimalDigit ?: $this->decimalDigit;
+
         return $this->formatCurrency($x, $decimalDigit, $decimalSeparator, $thousandSeparator, '', '', $stripZeroDecimal);
     }
 

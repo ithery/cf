@@ -6,16 +6,18 @@ namespace Embed\Http;
 
 use Composer\CaBundle\CaBundle;
 use Psr\Http\Message\RequestInterface;
-use Psr\Http\Message\ResponseFactoryInterface;
 use Psr\Http\Message\ResponseInterface;
+use Psr\Http\Message\ResponseFactoryInterface;
 
 /**
- * Class to fetch html pages
+ * Class to fetch html pages.
  */
 final class CurlDispatcher {
     private $request;
 
     private $curl;
+
+    private $result;
 
     private $headers = [];
 
@@ -33,6 +35,7 @@ final class CurlDispatcher {
     public static function fetch(array $settings, ResponseFactoryInterface $responseFactory, RequestInterface ...$requests) {
         if (count($requests) === 1) {
             $connection = new static($settings, $requests[0]);
+
             return [$connection->exec($responseFactory)];
         }
 
@@ -62,6 +65,7 @@ final class CurlDispatcher {
                 foreach ($connections as $connection) {
                     if ($connection->curl === $info['handle']) {
                         $connection->result = $info['result'];
+
                         break;
                     }
                 }
@@ -90,18 +94,18 @@ final class CurlDispatcher {
         curl_setopt_array($this->curl, [
             CURLOPT_HTTPHEADER => $this->getRequestHeaders(),
             CURLOPT_POST => strtoupper($request->getMethod()) === 'POST',
-            CURLOPT_MAXREDIRS => 10,
-            CURLOPT_CONNECTTIMEOUT => 10,
-            CURLOPT_TIMEOUT => 10,
+            CURLOPT_MAXREDIRS => isset($settings['max_redirs']) ? $settings['max_redirs'] : 10,
+            CURLOPT_CONNECTTIMEOUT => isset($settings['connect_timeout']) ? $settings['connect_timeout'] : 10,
+            CURLOPT_TIMEOUT => isset($settings['timeout']) ? $settings['timeout'] : 10,
             CURLOPT_RETURNTRANSFER => true,
-            CURLOPT_SSL_VERIFYHOST => 0,
-            CURLOPT_SSL_VERIFYPEER => false,
+            CURLOPT_SSL_VERIFYHOST => isset($settings['ssl_verify_host']) ? $settings['ssl_verify_host'] : 0,
+            CURLOPT_SSL_VERIFYPEER => isset($settings['ssl_verify_peer']) ? $settings['ssl_verify_peer'] : false,
             CURLOPT_ENCODING => '',
             CURLOPT_CAINFO => CaBundle::getSystemCaRootBundlePath(),
             CURLOPT_AUTOREFERER => true,
-            CURLOPT_FOLLOWLOCATION => true,
+            CURLOPT_FOLLOWLOCATION => isset($settings['follow_location']) ? $settings['follow_location'] : true,
             CURLOPT_IPRESOLVE => CURL_IPRESOLVE_V4,
-            CURLOPT_USERAGENT => $request->getHeaderLine('User-Agent'),
+            CURLOPT_USERAGENT => isset($settings['user_agent']) ? $settings['user_agent'] : $request->getHeaderLine('User-Agent'),
             CURLOPT_COOKIEJAR => $cookies,
             CURLOPT_COOKIEFILE => $cookies,
             CURLOPT_HEADERFUNCTION => [$this, 'writeHeader'],
@@ -132,8 +136,8 @@ final class CurlDispatcher {
         }
 
         $response = $response
-                ->withAddedHeader('Content-Location', $info['url'])
-                ->withAddedHeader('X-Request-Time', sprintf('%.3f ms', $info['total_time']));
+            ->withAddedHeader('Content-Location', $info['url'])
+            ->withAddedHeader('X-Request-Time', sprintf('%.3f ms', $info['total_time']));
 
         if ($this->body) {
             //5Mb max

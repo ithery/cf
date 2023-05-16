@@ -41,6 +41,7 @@ import { initThemeMode } from './module/theme';
 import { initMenu } from './module/menu';
 import { formatCurrency, unformatCurrency } from './formatter/currency';
 import { cresQuery } from './module/CresQuery';
+import { isJson } from './util/helper';
 
 export default class Cresenity {
     constructor() {
@@ -55,7 +56,8 @@ export default class Cresenity {
             'cresenity:jquery:loaded',
             'cresenity:loaded',
             'cresenity:js:loaded',
-            'cresenity:ui:start'
+            'cresenity:ui:start',
+            'cresenity:notification:message'
         ];
         this.modalElements = [];
         this.cresenityEventList = [
@@ -91,6 +93,8 @@ export default class Cresenity {
         };
         this.theme = new Theme();
         this.$ = cresQuery;
+        this.version = '1.4.1';
+        this.checkAuthenticationInterval = null;
     }
     loadJs(filename, callback) {
         let fileref = document.createElement('script');
@@ -175,9 +179,16 @@ export default class Cresenity {
     }
     handleAjaxError(xhr, status, error) {
         if (error !== 'abort') {
-            this.message('error', 'Error, please call administrator... (' + error + ')');
+            if(xhr.responseText && isJson(xhr.responseText)) {
+                let data = JSON.parse(xhr.responseText);
+                if(data && typeof data.errCode !== 'undefined') {
+                    this.message('error', data.errMessage);
+                }
+            } else {
+                this.message('error', 'Something went wrong... ' + (error ? ('(' + error + ')') : ''));
+            }
             if(xhr.status!=200) {
-                if(window.capp?.environment !== 'production') {
+                if(this.isDebug()) {
                     this.htmlModal(xhr.responseText);
                 }
             }
@@ -258,12 +269,28 @@ export default class Cresenity {
                 url: url,
                 dataType: 'json',
                 data: dataAddition,
+                headers: {
+                    Accept: 'application/json; charset=utf-8',
+                    'X-Cres-Version': this.version
+                },
                 success: (data) => {
                     let isError = false;
-                    if(typeof data.html === 'undefined') {
-                        //error
-                        this.htmlModal(data);
-                        isError = true;
+                    let errMessage = null;
+                    if(typeof data.errCode !== 'undefined') {
+                        isError = data.errCode != 0;
+                        if(isError) {
+                            this.message('error', data.errMessage);
+                            if(typeof data.data !== 'undefined' && data.data && this.isDebug()) {
+                                this.htmlModal(data);
+                            }
+                        }
+                    } else {
+                        if(typeof data.html === 'undefined') {
+                            if(this.isDebug()) {
+                                this.htmlModal(data);
+                            }
+                            isError = true;
+                        }
                     }
                     if(!isError) {
                         this.doCallback('onReloadSuccess', data);
@@ -344,7 +371,19 @@ export default class Cresenity {
         options.reloadType = 'before';
         this.reload(options);
     }
+    isDebug() {
+        console.log(this.cf.getConfig().environment);
+        if(this.cf.getConfig().environment == 'production') {
+            return false;
+        }
+        return this.cf.getConfig().debug ?? false;
+    }
     confirm(options) {
+        if(typeof options == 'function') {
+            options = {
+                confirmCallback: options
+            };
+        }
         let settings = extend({
             // These are the defaults.
             method: 'get',
@@ -617,7 +656,7 @@ export default class Cresenity {
     }
 
     debug(message) {
-        if (this.cf.getConfig().debug) {
+        if (this.isDebug()) {
             window.console.log(message);
         }
     }
@@ -1319,5 +1358,47 @@ export default class Cresenity {
         }
 
         return document.body;
+    }
+
+    startCheckAuthenticationInterval(intervalTime = 10000, callback) {
+        if(this.checkAuthenticationInterval) {
+            return;
+        }
+        this.checkAuthenticationInterval = setInterval(() => {
+            const baseUrl = window?.capp?.baseUrl ?? '/';
+            const sessionName = window?.capp?.sessionName ?? null;
+            let sid = null;
+            if(sessionName) {
+                if (typeof document !== 'undefined') {
+                    const match = document.cookie.match(new RegExp('(^|;\\s*)('+sessionName+')=([^;]*)'));
+                    sid = match ? decodeURIComponent(match[3]) : null;
+                }
+            }
+            let url = baseUrl + 'cresenity/auth/ping';
+            $.ajax({
+                type: 'get',
+                url: url,
+                dataType: 'json',
+                success: (responseAuth) => {
+                    this.handleJsonResponse(responseAuth, (dataAuth) => {
+                        callback(dataAuth);
+                    });
+                }
+            });
+        }, intervalTime);
+    }
+
+    stopCheckAuthenticationInterval() {
+        if(this.checkAuthenticationInterval) {
+            clearInterval(this.checkAuthenticationInterval);
+        }
+    }
+    onAuthExpired(callback, intervalTime = 1000) {
+        this.stopCheckAuthenticationInterval();
+        this.startCheckAuthenticationInterval(intervalTime, (data)=>{
+            if(data && !data.isLogin) {
+                callback(data);
+            }
+        });
     }
 }

@@ -140,6 +140,13 @@ class CElement_Component_DataTable_Column extends CObject {
     }
 
     /**
+     * @return bool
+     */
+    public function isVisible() {
+        return $this->visible;
+    }
+
+    /**
      * Set sortable of column.
      *
      * @param bool $bool

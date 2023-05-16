@@ -20,6 +20,7 @@ class CImage_GoogleChart_Chart {
      * API server URL.
      *
      * @var string
+     *
      * @usedby getUrl()
      */
     private $baseUrl = 'chart.apis.google.com/chart?';
@@ -444,6 +445,15 @@ class CImage_GoogleChart_Chart {
      */
     public function setLegend($labels) {
         $this->setProperty('chdl', urlencode($this->encodeData($this->getApplicableLabels($labels), '|')));
+    }
+
+    /**
+     * Sets the labels for the data.
+     *
+     * @param $labels Array
+     */
+    public function setLabels($labels) {
+        $this->setProperty('chl', urlencode($this->encodeData($labels, '|')));
     }
 
     /**

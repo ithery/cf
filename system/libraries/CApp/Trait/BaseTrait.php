@@ -67,12 +67,15 @@ trait CApp_Trait_BaseTrait {
     public static function orgId() {
         $orgId = CF::orgId();
         if ($orgId === null) {
-            $app = CApp::instance();
+            $app = c::app();
             if ($app->user() != null) {
                 if (strlen($app->user()->org_id) > 0) {
                     $orgId = $app->user()->org_id;
                 }
             }
+        }
+        if ($orgId) {
+            $orgId = (int) $orgId;
         }
 
         return $orgId;
@@ -415,22 +418,16 @@ trait CApp_Trait_BaseTrait {
             return false;
         }
 
-        $domain = CF::domain();
-        $pos = strpos($domain, 'app.ittron.co.id');
-        if ($pos === false) {
-            $pos = strpos($domain, 'dev.ittron.co.id');
-        }
-        if ($pos === false) {
-            $pos = strpos($domain, 'staging.ittron.co.id');
-        }
-
-        return $pos !== false;
+        return true;
     }
 
     /**
      * @return bool
      */
     public static function isStaging() {
+        if (c::env('ENVIRONTMENT') == CBase::ENVIRONMENT_STAGING) {
+            return true;
+        }
         $domain = CF::domain();
         $pos = strpos($domain, 'staging.ittron.co.id');
 

@@ -1,8 +1,7 @@
-import helper from "./utils/date-formatter-helper";
+import helper from './utils/date-formatter-helper';
 
 class DateFormatter {
     constructor(options) {
-
         const config = helper.merge(helper.defaults, options);
         this.dateSettings = config.dateSettings;
         this.separators = config.separators;
@@ -12,7 +11,6 @@ class DateFormatter {
         this.tzClip = config.tzClip;
     }
     getMonth(val) {
-
         let i = helper.getIndex(val, this.dateSettings.monthsShort) + 1;
         if (i === 0) {
             i = helper.getIndex(val, this.dateSettings.months) + 1;
@@ -20,10 +18,10 @@ class DateFormatter {
         return i;
     }
     parseDate(vDate, vFormat) {
-        const vSettings = this.dateSettings
+        const vSettings = this.dateSettings;
         let vDateFlag = false;
         let vTimeFlag = false;
-        let len,mer;
+        let len, mer;
 
 
         const out = {date: null, year: null, month: null, day: null, hour: 0, min: 0, sec: 0};
@@ -34,7 +32,7 @@ class DateFormatter {
             return vDate;
         }
         if (vFormat === 'U') {
-            i = helper.getInt(vDate);
+            let i = helper.getInt(vDate);
             return i ? new Date(i * 1000) : vDate;
         }
         switch (typeof vDate) {
@@ -100,6 +98,7 @@ class DateFormatter {
                     break;
                 case 'g':
                 case 'h':
+                    // eslint-disable-next-line no-case-declarations
                     const vMeriIndex = (vFormatParts.indexOf('a') > -1) ? vFormatParts.indexOf('a') :
                         ((vFormatParts.indexOf('A') > -1) ? vFormatParts.indexOf('A') : -1);
                     mer = vDateParts[vMeriIndex];
@@ -147,10 +146,12 @@ class DateFormatter {
                     }
                     vTimeFlag = true;
                     break;
+                default:
+                    break;
             }
         }
         if (vDateFlag === true) {
-            var varY = out.year || 0, varM = out.month ? out.month - 1 : 0, varD = out.day || 1;
+            let varY = out.year || 0, varM = out.month ? out.month - 1 : 0, varD = out.day || 1;
             out.date = new Date(varY, varM, varD, out.hour, out.min, out.sec, 0);
         } else {
             if (vTimeFlag !== true) {
@@ -167,8 +168,8 @@ class DateFormatter {
         const vParts = vDateStr.replace(this.separators, '\0').split('\0');
         const vPattern = /^[djmn]/g;
         const vFormatParts = vFormat.match(this.validParts);
-        let vDate = new Date()
-        let vDigit = 0
+        let vDate = new Date();
+        let vDigit = 0;
         let len, vYear, i, n, iPart, iSec;
 
         if (!vPattern.test(vFormatParts[0])) {
@@ -215,6 +216,8 @@ class DateFormatter {
                     break;
                 case 5:
                     vDate.setSeconds(iSec);
+                    break;
+                default:
                     break;
             }
             n = iPart.substr(vDigit);
@@ -282,7 +285,7 @@ class DateFormatter {
              * @return {number}
              */
             z: function () {
-                var a = new Date(fmt.Y(), fmt.n() - 1, fmt.j()), b = new Date(fmt.Y(), 0, 1);
+                let a = new Date(fmt.Y(), fmt.n() - 1, fmt.j()), b = new Date(fmt.Y(), 0, 1);
                 return Math.round((a - b) / helper.DAY);
             },
 
@@ -294,7 +297,7 @@ class DateFormatter {
              * @return {number}
              */
             W: function () {
-                var a = new Date(fmt.Y(), fmt.n() - 1, fmt.j() - fmt.N() + 3), b = new Date(a.getFullYear(), 0, 4);
+                let a = new Date(fmt.Y(), fmt.n() - 1, fmt.j() - fmt.N() + 3), b = new Date(a.getFullYear(), 0, 4);
                 return helper.lpad(1 + Math.round((a - b) / helper.DAY / 7), 2);
             },
 
@@ -345,7 +348,7 @@ class DateFormatter {
              * @return {number}
              */
             L: function () {
-                var Y = fmt.Y();
+                let Y = fmt.Y();
                 return (Y % 4 === 0 && Y % 100 !== 0 || Y % 400 === 0) ? 1 : 0;
             },
             /**
@@ -353,7 +356,7 @@ class DateFormatter {
              * @return {number}
              */
             o: function () {
-                var n = fmt.n(), W = fmt.W(), Y = fmt.Y();
+                let n = fmt.n(), W = fmt.W(), Y = fmt.Y();
                 return Y + (n === 12 && W < 9 ? 1 : n === 1 && W > 9 ? -1 : 0);
             },
             /**
@@ -386,7 +389,7 @@ class DateFormatter {
              * @return {string}
              */
             A: function () {
-                var n = fmt.G() < 12 ? 0 : 1;
+                let n = fmt.G() < 12 ? 0 : 1;
                 return vSettings.meridiem[n];
             },
             /**
@@ -394,7 +397,7 @@ class DateFormatter {
              * @return {string}
              */
             B: function () {
-                var H = vDate.getUTCHours() * helper.HOUR, i = vDate.getUTCMinutes() * 60, s = vDate.getUTCSeconds();
+                let H = vDate.getUTCHours() * helper.HOUR, i = vDate.getUTCMinutes() * 60, s = vDate.getUTCSeconds();
                 return helper.lpad(Math.floor((H + i + s + helper.HOUR) / 86.4) % 1000, 3);
             },
             /**
@@ -455,7 +458,7 @@ class DateFormatter {
              * @return {string}
              */
             e: function () {
-                var str = /\((.*)\)/.exec(String(vDate))[1];
+                let str = /\((.*)\)/.exec(String(vDate))[1];
                 return str || 'Coordinated Universal Time';
             },
             /**
@@ -463,7 +466,7 @@ class DateFormatter {
              * @return {number}
              */
             I: function () {
-                var a = new Date(fmt.Y(), 0), c = Date.UTC(fmt.Y(), 0),
+                let a = new Date(fmt.Y(), 0), c = Date.UTC(fmt.Y(), 0),
                     b = new Date(fmt.Y(), 6), d = Date.UTC(fmt.Y(), 6);
                 return ((a - c) !== (b - d)) ? 1 : 0;
             },
@@ -472,7 +475,7 @@ class DateFormatter {
              * @return {string}
              */
             O: function () {
-                var tzo = vDate.getTimezoneOffset(), a = Math.abs(tzo);
+                let tzo = vDate.getTimezoneOffset(), a = Math.abs(tzo);
                 return (tzo > 0 ? '-' : '+') + helper.lpad(Math.floor(a / 60) * 100 + a % 60, 4);
             },
             /**
@@ -480,7 +483,7 @@ class DateFormatter {
              * @return {string}
              */
             P: function () {
-                var O = fmt.O();
+                let O = fmt.O();
                 return (O.substr(0, 3) + ':' + O.substr(3, 2));
             },
             /**
@@ -488,7 +491,7 @@ class DateFormatter {
              * @return {string}
              */
             T: function () {
-                var str = (String(vDate).match(this.tzParts) || ['']).pop().replace(this.tzClip, '');
+                let str = (String(vDate).match(this.tzParts) || ['']).pop().replace(this.tzClip, '');
                 return str || 'UTC';
             },
             /**

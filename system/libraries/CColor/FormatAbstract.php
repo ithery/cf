@@ -34,6 +34,11 @@ abstract class CColor_FormatAbstract {
     abstract public function toHex();
 
     /**
+     * @return \CColor_Format_Hexa
+     */
+    abstract public function toHexa();
+
+    /**
      * @return \CColor_Format_Hsl
      */
     abstract public function toHsl();
@@ -152,18 +157,18 @@ abstract class CColor_FormatAbstract {
      *
      * @return bool
      */
-    public function isLight() {
+    public function isLight($constant = 0.5) {
         $color = $this->toRgb();
         $darkness = 1 - (0.299 * $color->red() + 0.587 * $color->green() + 0.114 * $color->blue()) / 255;
 
-        return $darkness < 0.5;
+        return $darkness < $constant;
     }
 
     /**
      * @return bool
      */
-    public function isDark() {
-        return !$this->isLight();
+    public function isDark($constant = 0.5) {
+        return !$this->isLight($constant);
     }
 
     /**

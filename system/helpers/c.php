@@ -352,7 +352,7 @@ class c {
      *
      * @param null|\DateTimeZone|string $tz
      *
-     * @return CCarbon
+     * @return CCarbon|\Carbon\Carbon|\CarbonV3\Carbon
      */
     public static function now($tz = null) {
         return CCarbon::now($tz);
@@ -442,7 +442,7 @@ class c {
     /**
      * @param string $string
      *
-     * @return \cstr|CBase_String
+     * @return CBase_String|\cstr
      */
     public static function str($string = null) {
         if (is_null($string)) {
@@ -655,14 +655,17 @@ class c {
 
     public static function abort($code, $message = '', array $headers = []) {
         if ($code instanceof CHTTP_Response) {
-            throw new CHttp_Exception_ResponseException($code);
+            throw new CHTTP_Exception_ResponseException($code);
         }
         if ($code instanceof CInterface_Responsable) {
-            throw new CHttp_Exception_ResponseException($code->toResponse(CHTTP::request()));
+            throw new CHTTP_Exception_ResponseException($code->toResponse(CHTTP::request()));
         }
 
         if ($code == 404) {
             throw new CHTTP_Exception_NotFoundHttpException($message);
+        }
+        if ($code == 410) {
+            throw new CHTTP_Exception_GoneHttpException($message);
         }
 
         throw new CHTTP_Exception_HttpException($code, $message, null, $headers);
@@ -1570,6 +1573,10 @@ class c {
         return htmlspecialchars(c::json($data, $options, $depth), ENT_QUOTES, 'UTF-8');
     }
 
+    public static function escAttr($string) {
+        return htmlspecialchars($string, ENT_QUOTES, 'UTF-8');
+    }
+
     /**
      * @return CApp_Contract_BaseInterface
      */
@@ -1730,7 +1737,7 @@ class c {
         }
         $format = function ($index) use ($locale) {
             if (class_exists(IntlDateFormatter::class)) {
-                $formatter = new IntlDateFormatter($locale);
+                $formatter = new IntlDateFormatter($locale, IntlDateFormatter::FULL, IntlDateFormatter::FULL);
                 $formatter->setPattern('MMMM');
 
                 return ucfirst($formatter->format(mktime(0, 0, 0, $index)));

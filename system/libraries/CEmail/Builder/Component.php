@@ -1,8 +1,14 @@
 <?php
 
 class CEmail_Builder_Component {
+    /**
+     * @var string
+     */
     protected $name;
 
+    /**
+     * @var array
+     */
     protected $props = [];
 
     /**
@@ -10,24 +16,59 @@ class CEmail_Builder_Component {
      */
     protected $context = null;
 
+    /**
+     * @var array
+     */
     protected $defaultAttributes = [];
 
+    /**
+     * @var array
+     */
     protected $allowedAttributes = [];
 
+    /**
+     * @var array
+     */
     protected $headStyle = [];
 
+    /**
+     * @var array
+     */
     protected $componentHeadStyle = [];
 
+    /**
+     * @var array
+     */
     protected $children = [];
 
+    /**
+     * @var array
+     */
+    protected $attributes = [];
+
+    /**
+     * @var string
+     */
     protected $content = '';
 
+    /**
+     * @var bool
+     */
     protected static $rawElement = false;
 
+    /**
+     * @var bool
+     */
     protected static $endingTag = false;
 
+    /**
+     * @var string
+     */
     protected static $tagName = '';
 
+    /**
+     * @param array $options
+     */
     public function __construct($options) {
         $defaultOptions = [];
         $defaultOptions['attributes'] = [];
@@ -51,18 +92,30 @@ class CEmail_Builder_Component {
         $this->context = carr::get($options, 'context');
     }
 
+    /**
+     * @return string
+     */
     public static function getTagName() {
         return static::$tagName;
     }
 
+    /**
+     * @return bool
+     */
     public static function isEndingTag() {
         return static::$endingTag;
     }
 
+    /**
+     * @return bool
+     */
     public static function isRawElement() {
         return !!static::$rawElement;
     }
 
+    /**
+     * @return null|CEmail_Builder_Context
+     */
     public function getChildContext() {
         return $this->context;
     }
@@ -70,28 +123,46 @@ class CEmail_Builder_Component {
     public function add($element) {
         $rawElement = $element;
         if ($rawElement instanceof CEmail_Builder_Component) {
-            $this->childs[] = $rawElement;
+            $this->children[] = $rawElement;
         } else {
             $rawElement = new CEmail_Builder_Component_BodyComponent_Raw([]);
             $rawElement->setContent($element);
-            $this->childs[] = $rawElement;
+            $this->children[] = $rawElement;
         }
 
         return $rawElement;
     }
 
+    /**
+     * @param string $name
+     *
+     * @return string
+     */
     public function getAttribute($name) {
         return carr::get($this->attributes, $name);
     }
 
+    /**
+     * @return string
+     */
     public function getContent() {
         return trim($this->content);
     }
 
+    /**
+     * @param string $content
+     *
+     * @return $this
+     */
     public function setContent($content) {
-        return $this->content = trim($content);
+        $this->content = trim($content);
+
+        return $this;
     }
 
+    /**
+     * @return CEmail_Builder_Component_BodyComponent_Body
+     */
     public function addBody() {
         $element = new CEmail_Builder_Component_BodyComponent_Body([]);
         $this->add($element);
@@ -99,6 +170,9 @@ class CEmail_Builder_Component {
         return $element;
     }
 
+    /**
+     * @return CEmail_Builder_Component_BodyComponent_Section
+     */
     public function addSection() {
         $element = new CEmail_Builder_Component_BodyComponent_Section([]);
         $this->add($element);
@@ -106,6 +180,9 @@ class CEmail_Builder_Component {
         return $element;
     }
 
+    /**
+     * @return CEmail_Builder_Component_BodyComponent_Column
+     */
     public function addColumn() {
         $element = new CEmail_Builder_Component_BodyComponent_Column([]);
         $this->add($element);
@@ -113,6 +190,9 @@ class CEmail_Builder_Component {
         return $element;
     }
 
+    /**
+     * @return CEmail_Builder_Component_BodyComponent_Image
+     */
     public function addImage() {
         $element = new CEmail_Builder_Component_BodyComponent_Image([]);
         $this->add($element);
@@ -121,7 +201,7 @@ class CEmail_Builder_Component {
     }
 
     public function setAttr($key, $value) {
-        $this->attrs[$key] = $value;
+        $this->attributes[$key] = $value;
 
         return $this;
     }

@@ -1,10 +1,10 @@
-import ProgressBar from "./ProgressBar";
-import "./index.scss";
+import ProgressBar from './ProgressBar';
+import './index.scss';
 const initProgressBar = (element) => {
-    new ProgressBar(element);
-}
+    return new ProgressBar(element);
+};
 
 export {
     ProgressBar,
     initProgressBar
-}
+};
