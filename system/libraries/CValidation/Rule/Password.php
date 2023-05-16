@@ -157,7 +157,7 @@ class Password implements CValidation_RuleInterface, CValidation_Contract_DataAw
     /**
      * Set the performing validator.
      *
-     * @param \Illuminate\Contracts\Validation\Validator $validator
+     * @param \CValidation_Contract_ValidatorInterface $validator
      *
      * @return $this
      */
@@ -274,7 +274,7 @@ class Password implements CValidation_RuleInterface, CValidation_Contract_DataAw
     public function passes($attribute, $value) {
         $this->messages = [];
 
-        $validator = Validator::make(
+        $validator = CValidation::createValidator(
             $this->data,
             [$attribute => array_merge(['string', 'min:' . $this->min], $this->customRules)],
             $this->validator->customMessages,
