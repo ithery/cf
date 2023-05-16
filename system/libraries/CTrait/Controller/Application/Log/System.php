@@ -107,6 +107,7 @@ trait CTrait_Controller_Application_Log_System {
             $logQuery = $logFile->logs();
             $keyword = carr::first($keywords);
             $logQuery->search($keyword);
+            $logQuery->setDirection(CLogger_Reader_Direction::BACKWARD);
 
             return $logQuery->paginate($perPage, $page, function (CLogger_Reader_Log $log) {
                 return [
