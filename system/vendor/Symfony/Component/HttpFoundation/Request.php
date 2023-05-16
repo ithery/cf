@@ -1998,7 +1998,7 @@ class Request {
             $forwardedValues = [];
             $param = self::$forwardedParams[$type];
             foreach ($parts as $subParts) {
-                if (null === $v = HeaderUtils::combine($subParts)[$param] ?? null) {
+                if (null === $v = (isset(HeaderUtils::combine($subParts)[$param]) ? HeaderUtils::combine($subParts)[$param] : null)) {
                     continue;
                 }
                 if (self::HEADER_X_FORWARDED_PORT === $type) {
