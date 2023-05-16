@@ -150,7 +150,8 @@ class CLogger_Manager implements LoggerInterface {
      * @return \CLogger_Logger
      */
     protected function tap($name, CLogger_Logger $logger) {
-        foreach ($this->configurationFor($name)['tap'] ?? [] as $tap) {
+        $taps = isset($this->configurationFor($name)['tap']) ? $this->configurationFor($name)['tap'] : [];
+        foreach ($taps as $tap) {
             list($class, $arguments) = $this->parseTap($tap);
 
             c::container($class)->__invoke($logger, ...explode(',', $arguments));
@@ -266,7 +267,7 @@ class CLogger_Manager implements LoggerInterface {
                 : $this->channel($channel)->getProcessors();
         })->all();
 
-        if ($config['ignore_exceptions'] ?? false) {
+        if ((isset($config['ignore_exceptions']) ? $config['ignore_exceptions'] : false)) {
             $handlers = [new WhatFailureGroupHandler($handlers)];
         }
 
@@ -286,9 +287,9 @@ class CLogger_Manager implements LoggerInterface {
                 new StreamHandler(
                     $config['path'],
                     $this->level($config),
-                    $config['bubble'] ?? true,
-                    $config['permission'] ?? null,
-                    $config['locking'] ?? false
+                    isset($config['bubble']) ? $config['bubble'] : true,
+                    isset($config['permission']) ? $config['permission'] : null,
+                    isset($config['locking']) ? $config['locking'] : false
                 ),
                 $config
             ),

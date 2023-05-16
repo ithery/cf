@@ -460,15 +460,10 @@ class CLogger_Reader_LogReader {
 
     /**
      * Alias for total().
+     *
+     * @return int
      */
-    public function count(): int {
-        return $this->total();
-    }
-
-    /**
-     * @deprecated Will be removed in v2.0.0
-     */
-    public function getTotalItemCount(): int {
+    public function count() {
         return $this->total();
     }
 
@@ -547,7 +542,10 @@ class CLogger_Reader_LogReader {
         return [$currentLogLevel, $currentLog, $position];
     }
 
-    public function numberOfNewBytes(): int {
+    /**
+     * @return int
+     */
+    public function numberOfNewBytes() {
         $lastScannedFilePosition = $this->file->getLastScannedFilePositionForQuery($this->query);
 
         if (is_null($lastScannedFilePosition)) {

@@ -81,7 +81,7 @@ trait CModel_Chartable_ChartableTrait {
         return CModel_Chartable_TimeCollection::times($years, function () use ($startDate, $query) {
             $found = $query->firstWhere(
                 'label',
-                $startDate->format('Y'),
+                $startDate->format('Y')
             );
 
             $result = [
@@ -130,7 +130,7 @@ trait CModel_Chartable_ChartableTrait {
         return CModel_Chartable_TimeCollection::times($months, function () use ($startDate, $query) {
             $found = $query->firstWhere(
                 'label',
-                $startDate->format('Ym'),
+                $startDate->format('Ym')
             );
 
             $result = [
@@ -181,7 +181,7 @@ trait CModel_Chartable_ChartableTrait {
 
             $found = $query->firstWhere(
                 'label',
-                $startDate->format('Ym') . '-W' . $weekOfMonth,
+                $startDate->format('Ym') . '-W' . $weekOfMonth
             );
 
             $result = [

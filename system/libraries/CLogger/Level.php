@@ -28,19 +28,19 @@ class CLogger_Level {
     /**
      * @var string
      */
-    public string $value;
+    public $value;
 
     /**
      * @param null|string $value
      */
     public function __construct($value = null) {
-        $this->value = $value ?? self::NONE;
+        $this->value = $value ?: self::NONE;
     }
 
     /**
      * @return array
      */
-    public static function cases(): array {
+    public static function cases() {
         return [
             self::DEBUG,
             self::INFO,
@@ -77,7 +77,7 @@ class CLogger_Level {
         return \ucfirst($this->value);
     }
 
-    public function getClass(): string {
+    public function getClass() {
         $mappingClass = [
             self::PROCESSED => 'success',
             self::DEBUG => 'info',
