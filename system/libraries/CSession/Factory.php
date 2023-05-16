@@ -101,7 +101,7 @@ class CSession_Factory {
         return new CSession_Handler_DatabaseSessionHandler(
             $this->getDatabaseConnection($this->config),
             carr::get($this->config, 'table', 'session'),
-            carr::get($this->config, 'expiration')
+            carr::get($this->config, 'expiration', 3600)
         );
     }
 
