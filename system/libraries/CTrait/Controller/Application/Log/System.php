@@ -90,6 +90,9 @@ trait CTrait_Controller_Application_Log_System {
         $path .= DS . $month;
         $path .= DS . $file;
         $table = $app->addTable();
+        $table->addHeaderAction()->setLabel('Download')
+            ->addClass('btn-primary')
+            ->setLink($this->currentUrl() . "systemTableDownload/${year}/${month}/${file}");
         $table->addColumn('time')->setLabel('Time');
         $table->addColumn('environment')->setLabel('Environment');
         $table->addColumn('level')->setLabel('Level')->setCallback(function ($row, $value) {
@@ -125,6 +128,19 @@ trait CTrait_Controller_Application_Log_System {
         $table->setAjax(true);
 
         return $app;
+    }
+
+    public function systemTableDownload($year, $month, $file) {
+        $app = c::app();
+        $path = DOCROOT . 'logs/' . CF::appCode();
+
+        $path .= DS . $year;
+
+        $path .= DS . $month;
+        $path .= DS . $file;
+        $logFile = CLogger::reader()->createLogFile($path);
+
+        return $logFile->download();
     }
 
     public function logSystem($year = null, $month = null) {
