@@ -52,6 +52,7 @@ class CExporter_File_TemporaryFileFactory {
         $temporaryPath = CExporter::config()->get('temporary.local_path', DOCROOT . 'temp');
         $temporaryPath .= DS . 'exporter';
         $temporaryPath .= DS . CF::appCode();
+        $temporaryPath .= DS . date('Ymd');
         if (!CFile::isDirectory($temporaryPath)) {
             CFile::makeDirectory($temporaryPath, 0755, true);
         }
