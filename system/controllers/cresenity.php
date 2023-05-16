@@ -467,4 +467,31 @@ class Controller_Cresenity extends CController {
 
         return $responseFactory->toResponse($request);
     }
+
+    public function auth($method) {
+        if ($method == 'ping') {
+            $appCode = c::request()->appCode;
+            $sid = c::request()->sid;
+
+            $user = c::app()->user();
+
+            $lastActivity = c::session()->get('_last_activity');
+            $diff = 0;
+            if ($lastActivity) {
+                $current = time();
+                $diff = $current - $lastActivity;
+            }
+
+            return c::response()->json([
+                'errCode' => 0,
+                'errMessage' => '',
+                'data' => [
+                    'isLogin' => $user != null,
+                    'elapsedInSeconds' => $diff,
+                ]
+            ]);
+        }
+
+        return c::abort(404);
+    }
 }
