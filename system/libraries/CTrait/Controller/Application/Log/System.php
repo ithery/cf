@@ -93,7 +93,9 @@ trait CTrait_Controller_Application_Log_System {
         $table->addColumn('level')->setLabel('Level')->setCallback(function ($row, $value) {
             return '<span class="badge badge-' . c::get($row, 'levelClass', 'secondary') . '">' . $value . '</span>';
         });
-        $table->addColumn('message')->setLabel('Message');
+        $table->addColumn('message')->setLabel('Message')->setCallback(function ($row, $value) {
+            return c::div()->addShowMore()->add($value);
+        });
         $table->setDataFromClosure(function (CManager_DataProviderParameter $parameter) use ($path) {
             $errCode = 0;
             $errMessage = '';

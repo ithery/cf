@@ -1,5 +1,7 @@
 <?php
-
+/**
+ * @see https://github.com/opcodesio/log-viewer
+ */
 class CLogger_Reader {
     const DEFAULT_MAX_LOG_SIZE_TO_DISPLAY = 131_072;    // 128 KB
 
