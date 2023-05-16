@@ -397,7 +397,7 @@ class CLogger_Manager implements LoggerInterface {
         );
 
         return new Monolog($this->parseChannel($config), [$this->prepareHandler(
-            $this->app->make($config['handler'], $with),
+            CContainer::getInstance()->make($config['handler'], $with),
             $config
         )]);
     }
@@ -430,10 +430,12 @@ class CLogger_Manager implements LoggerInterface {
             return $handler;
         }
 
-        if (!isset($config['formatter'])) {
-            $handler->setFormatter($this->formatter());
-        } elseif ($config['formatter'] !== 'default') {
-            $handler->setFormatter(c::container()->make($config['formatter'], isset($config['formatter_with']) ? $config['formatter_with'] : []));
+        if ($handler instanceof FormattableHandlerInterface) {
+            if (!isset($config['formatter'])) {
+                $handler->setFormatter($this->formatter());
+            } elseif ($config['formatter'] !== 'default') {
+                $handler->setFormatter(c::container()->make($config['formatter'], isset($config['formatter_with']) ? $config['formatter_with'] : []));
+            }
         }
 
         return $handler;
