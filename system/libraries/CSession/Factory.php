@@ -88,7 +88,7 @@ class CSession_Factory {
     public function createNativeDriver() {
         return new CSession_Handler_FileSessionHandler(
             carr::get($this->config, 'storage'),
-            carr::get($this->config, 'expiration')
+            carr::get($this->config, 'expiration', 3600)
         );
     }
 
@@ -137,7 +137,7 @@ class CSession_Factory {
 
         return new CSession_Handler_CacheBasedSessionHandler(
             clone c::cache()->store($store),
-            $this->config->get('session.lifetime')
+            carr::get($this->config, 'expiration', 3600)
         );
     }
 
