@@ -33,32 +33,7 @@ class CSession_Driver_Database implements CSession_Driver {
         // Load configuration
         $config = CF::config('session');
 
-        if (!empty($config['encryption'])) {
-            // Load encryption
-            $this->encrypt = Encrypt::instance();
-        }
-
-        if (isset($config['storage'])) {
-            // $domain = CF::domain();
-            // $file = CF::get_file('config', 'database', $domain);
-            // $allConfig = include $file;
-            // $dbConfig = $allConfig[$this->db];
-            // carr::set_path($dbConfig, 'connection.database', $config['storage']);
-            // $this->db = $dbConfig;
-
-            $this->db = $config['storage'];
-        }
-
-        // if (is_array($config['storage'])) {
-        //     if (!empty($config['storage']['group'])) {
-        //         // Set the group name
-        //         $this->db = $config['storage']['group'];
-        //     }
-        //     if (!empty($config['storage']['table'])) {
-        //         // Set the table name
-        //         $this->table = $config['storage']['table'];
-        //     }
-        // }
+        cdbg::dd($config);
         // Load database
         $this->db = CDatabase::instance($this->db, null, null);
     }
