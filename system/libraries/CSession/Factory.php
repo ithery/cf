@@ -59,7 +59,9 @@ class CSession_Factory {
      * @return \CSession_Handler_ArraySessionHandler
      */
     public function createArrayDriver() {
-        return new CSession_Handler_ArraySessionHandler(carr::get($this->config, 'expiration'));
+        return new CSession_Handler_ArraySessionHandler(
+            carr::get($this->config, 'expiration', 3600)
+        );
     }
 
     /**
@@ -68,7 +70,10 @@ class CSession_Factory {
      * @return \CSession_Handler_CookieSessionHandler
      */
     public function createCookieDriver() {
-        return new CSession_Handler_CookieSessionHandler(CHTTP::cookie(), carr::get($this->config, 'expiration'));
+        return new CSession_Handler_CookieSessionHandler(
+            CHTTP::cookie(),
+            carr::get($this->config, 'expiration', 3600)
+        );
     }
 
     /**
