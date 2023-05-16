@@ -125,14 +125,18 @@ class CSession_Handler_DatabaseSessionHandler implements SessionHandlerInterface
     /**
      * Perform an insert operation on the session ID.
      *
-     * @param string $sessionId
-     * @param string $payload
+     * @param string               $sessionId
+     * @param array<string, mixed> $payload
      *
      * @return null|bool
      */
     protected function performInsert($sessionId, $payload) {
         try {
-            return $this->getQuery()->insert(carr::set($payload, 'key', $sessionId));
+            carr::set($payload, 'key', $sessionId);
+            carr::set($payload, 'created', c::now());
+            carr::set($payload, 'updated', c::now());
+
+            return $this->getQuery()->insert($payload);
         } catch (CDatabase_Exception_QueryException $e) {
             throw $e;
             //$this->performUpdate($sessionId, $payload);
@@ -148,6 +152,8 @@ class CSession_Handler_DatabaseSessionHandler implements SessionHandlerInterface
      * @return int
      */
     protected function performUpdate($sessionId, $payload) {
+        carr::set($payload, 'updated', c::now());
+
         return $this->getQuery()->where('key', $sessionId)->update($payload);
     }
 

@@ -90,7 +90,7 @@ class CSession_Manager {
      */
     protected function buildEncryptedSession($handler) {
         return new CSession_StoreEncrypted(
-            $this->config->get('session.cookie'),
+            $this->config->get('name'),
             $handler,
             c::crypt()
         );
