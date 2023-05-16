@@ -57,12 +57,12 @@ return [
 
         'single' => [
             'driver' => 'single',
-            'level' => c::env('LOG_LEVEL', 'debug'),
+            'level' => c::env('LOG_LEVEL', CF::isProduction() ? 'info' : 'debug'),
         ],
 
         'daily' => [
             'driver' => 'daily',
-            'level' => c::env('LOG_LEVEL', 'debug'),
+            'level' => c::env('LOG_LEVEL', CF::isProduction() ? 'info' : 'debug'),
             'days' => 14,
             'replace_placeholders' => true,
         ],
@@ -77,7 +77,7 @@ return [
 
         'papertrail' => [
             'driver' => 'monolog',
-            'level' => c::env('LOG_LEVEL', 'debug'),
+            'level' => c::env('LOG_LEVEL', CF::isProduction() ? 'info' : 'debug'),
             'handler' => SyslogUdpHandler::class,
             'handler_with' => [
                 'host' => c::env('PAPERTRAIL_URL'),
@@ -87,7 +87,7 @@ return [
 
         'stderr' => [
             'driver' => 'monolog',
-            'level' => c::env('LOG_LEVEL', 'debug'),
+            'level' => c::env('LOG_LEVEL', CF::isProduction() ? 'info' : 'debug'),
             'handler' => StreamHandler::class,
             'formatter' => c::env('LOG_STDERR_FORMATTER'),
             'with' => [
@@ -97,7 +97,7 @@ return [
 
         'syslog' => [
             'driver' => 'syslog',
-            'level' => c::env('LOG_LEVEL', 'debug'),
+            'level' => c::env('LOG_LEVEL', CF::isProduction() ? 'info' : 'debug'),
         ],
 
         'errorlog' => [
