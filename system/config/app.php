@@ -108,6 +108,7 @@ return [
         'user' => CApp_Model_Users::class,
         'role' => CApp_Model_Roles::class,
         'role_nav' => CApp_Model_RoleNav::class,
+        'role_permission' => CApp_Model_RolePermission::class,
         'log_activity' => CApp_Model_LogActivity::class,
     ],
     'classes' => [

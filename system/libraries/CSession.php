@@ -46,7 +46,6 @@ class CSession {
      */
     private function __construct() {
         $this->initializeSession();
-        CF::log(CLogger::DEBUG, 'Session Library initialized');
     }
 
     /**

@@ -17,6 +17,7 @@ class CDatabase_Connection {
     use CDatabase_Trait_DetectDeadlock;
     use CDatabase_Trait_DetectLostConnection;
     use CDatabase_Trait_ManageTransaction;
+
     public $domain;
 
     public $name;
@@ -248,8 +249,6 @@ class CDatabase_Connection {
         if (!($this->driver instanceof CDatabase_Driver)) {
             throw new CDatabase_Exception('The :driver driver for the :class library must implement the :interface interface', [':driver' => $driver, ':class' => get_class($this), ':interface' => 'CDatabase_Driver']);
         }
-
-        CF::log(CLogger::DEBUG, 'Database Library initialized');
     }
 
     public function __destruct() {

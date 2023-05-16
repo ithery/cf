@@ -23,8 +23,6 @@ class CDatabase_Driver_Odbc extends CDatabase_Driver {
      */
     public function __construct($config) {
         $this->db_config = $config;
-
-        CF::log(CLogger::DEBUG, 'ODBC Database Driver Initialized');
     }
 
     /**

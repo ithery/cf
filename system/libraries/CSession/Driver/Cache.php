@@ -23,8 +23,6 @@ class CSession_Driver_Cache implements CSession_Driver {
         if (CF::config('session.encryption')) {
             $this->encrypt = new Encrypt();
         }
-
-        CF::log(CLogger::DEBUG, 'Session Cache Driver Initialized');
     }
 
     public function open($path, $name) {

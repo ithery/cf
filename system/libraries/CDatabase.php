@@ -277,7 +277,6 @@ class CDatabase {
         }
 
         $this->transactionManager = new CDatabase_TransactionManager();
-        CF::log(CLogger::DEBUG, 'Database Library initialized');
     }
 
     public function __destruct() {

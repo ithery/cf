@@ -57,12 +57,12 @@ return [
 
         'single' => [
             'driver' => 'single',
-            'level' => c::env('LOG_LEVEL', 'info'),
+            'level' => c::env('LOG_LEVEL', 'debug'),
         ],
 
         'daily' => [
             'driver' => 'daily',
-            'level' => c::env('LOG_LEVEL', 'info'),
+            'level' => c::env('LOG_LEVEL', 'debug'),
             'days' => 14,
             'replace_placeholders' => true,
         ],

@@ -61,8 +61,6 @@ class CSession_Driver_Database implements CSession_Driver {
         // }
         // Load database
         $this->db = CDatabase::instance($this->db, null, null);
-
-        CF::log(CLogger::DEBUG, 'Session Database Driver Initialized');
     }
 
     public function open($path, $name) {

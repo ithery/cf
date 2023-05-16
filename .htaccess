@@ -25,6 +25,7 @@ RewriteCond %{REQUEST_FILENAME} !-d
 RewriteRule .* index.php/$0 [PT,L]
 
 
+RewriteRule ^(.*/)?\.log - [R=404,L]
 RewriteRule ^(.*/)?\.git+ - [R=404,L]
 RewriteRule ^(.*/)?\.editorconfig - [R=404,L]
 RewriteRule ^(.*/)?\.htaccess.sample - [R=404,L]

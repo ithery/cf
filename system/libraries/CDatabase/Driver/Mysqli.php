@@ -7,6 +7,7 @@ defined('SYSPATH') or die('No direct access allowed.');
  */
 class CDatabase_Driver_Mysqli extends CDatabase_Driver_AbstractMysql {
     use CTrait_Compat_Database_Driver_Mysqli;
+
     /**
      * Database connection link.
      *
@@ -32,8 +33,6 @@ class CDatabase_Driver_Mysqli extends CDatabase_Driver_AbstractMysql {
     public function __construct(CDatabase $db, $config) {
         $this->db = $db;
         $this->dbConfig = $config;
-
-        CF::log(CLogger::DEBUG, 'MySQLi Database Driver Initialized');
     }
 
     public function close() {
