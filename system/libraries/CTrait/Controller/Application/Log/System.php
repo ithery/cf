@@ -63,7 +63,9 @@ trait CTrait_Controller_Application_Log_System {
         } catch (Exception $ex) {
         }
         $tabList = $app->addTabList();
-
+        $logFiles = c::collect($logFiles)->sort(function ($a, $b) {
+            return c::spaceshipOperator($b, $a);
+        })->toArray();
         foreach ($logFiles as $file) {
             $file = carr::get($file, 0);
 
