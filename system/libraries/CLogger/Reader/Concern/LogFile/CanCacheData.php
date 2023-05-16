@@ -16,11 +16,11 @@ trait CLogger_Reader_Concern_LogFile_CanCacheData {
         }
 
         foreach ($this->getRelatedCacheKeys() as $relatedCacheKey) {
-            c::cache()->forget($relatedCacheKey);
+            CLogger_Reader::cache()->forget($relatedCacheKey);
         }
 
-        c::cache()->forget($this->metadataCacheKey());
-        c::cache()->forget($this->relatedCacheKeysKey());
+        CLogger_Reader::cache()->forget($this->metadataCacheKey());
+        CLogger_Reader::cache()->forget($this->relatedCacheKeysKey());
 
         $this->index()->clearCache();
     }
@@ -45,7 +45,7 @@ trait CLogger_Reader_Concern_LogFile_CanCacheData {
     public function addRelatedCacheKey($key) {
         $keys = $this->getRelatedCacheKeys();
         $keys[] = $key;
-        c::cache()->put(
+        CLogger_Reader::cache()->put(
             $this->relatedCacheKeysKey(),
             array_unique($keys),
             $this->cacheTtl()
@@ -57,7 +57,7 @@ trait CLogger_Reader_Concern_LogFile_CanCacheData {
      */
     protected function getRelatedCacheKeys() {
         return array_merge(
-            c::cache()->get($this->relatedCacheKeysKey(), []),
+            CLogger_Reader::cache()->get($this->relatedCacheKeysKey(), []),
             [
                 $this->indexCacheKeyForQuery(),
                 $this->indexCacheKeyForQuery() . ':last-scan',
@@ -76,7 +76,7 @@ trait CLogger_Reader_Concern_LogFile_CanCacheData {
      * @return array
      */
     protected function loadMetadataFromCache() {
-        return c::cache()->get($this->metadataCacheKey(), []);
+        return CLogger_Reader::cache()->get($this->metadataCacheKey(), []);
     }
 
     /**
@@ -85,6 +85,6 @@ trait CLogger_Reader_Concern_LogFile_CanCacheData {
      * @return void
      */
     protected function saveMetadataToCache($data) {
-        c::cache()->put($this->metadataCacheKey(), $data, $this->cacheTtl());
+        CLogger_Reader::cache()->put($this->metadataCacheKey(), $data, $this->cacheTtl());
     }
 }

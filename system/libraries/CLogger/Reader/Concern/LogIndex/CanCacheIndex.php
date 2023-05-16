@@ -9,8 +9,8 @@ trait CLogger_Reader_Concern_LogIndex_CanCacheIndex {
     public function clearCache() {
         $this->clearChunksFromCache();
 
-        c::cache()->forget($this->metaCacheKey());
-        c::cache()->forget($this->cacheKey());
+        CLogger_Reader::cache()->forget($this->metaCacheKey());
+        CLogger_Reader::cache()->forget($this->cacheKey());
 
         // this will reset all properties to default, because it won't find any cached settings for this index
         $this->loadMetadata();
@@ -20,14 +20,14 @@ trait CLogger_Reader_Concern_LogIndex_CanCacheIndex {
      * @return void
      */
     protected function saveMetadataToCache() {
-        c::cache()->put($this->metaCacheKey(), $this->getMetadata(), $this->cacheTtl());
+        CLogger_Reader::cache()->put($this->metaCacheKey(), $this->getMetadata(), $this->cacheTtl());
     }
 
     /**
      * @return array
      */
     protected function getMetadataFromCache() {
-        return c::cache()->get($this->metaCacheKey(), []);
+        return CLogger_Reader::cache()->get($this->metaCacheKey(), []);
     }
 
     /**
@@ -36,7 +36,7 @@ trait CLogger_Reader_Concern_LogIndex_CanCacheIndex {
      * @return void
      */
     protected function saveChunkToCache(CLogger_Reader_LogIndexChunk $chunk) {
-        c::cache()->put(
+        CLogger_Reader::cache()->put(
             $this->chunkCacheKey($chunk->index),
             $chunk->data,
             $this->cacheTtl()
@@ -50,7 +50,7 @@ trait CLogger_Reader_Concern_LogIndex_CanCacheIndex {
      * @return null|array
      */
     protected function getChunkDataFromCache(int $index, $default = null): ?array {
-        return c::cache()->get($this->chunkCacheKey($index), $default);
+        return CLogger_Reader::cache()->get($this->chunkCacheKey($index), $default);
     }
 
     /**
@@ -58,7 +58,7 @@ trait CLogger_Reader_Concern_LogIndex_CanCacheIndex {
      */
     protected function clearChunksFromCache(): void {
         foreach ($this->getChunkDefinitions() as $chunkDefinition) {
-            c::cache()->forget($this->chunkCacheKey($chunkDefinition['index']));
+            CLogger_Reader::cache()->forget($this->chunkCacheKey($chunkDefinition['index']));
         }
     }
 

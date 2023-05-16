@@ -21,7 +21,12 @@ class CLogger_Reader {
     }
 
     public static function cache() {
-        return CCache::manager()->driver(CF::config('log.reader.cache_driver', CF::config('cache.default', 'file')));
+        $cacheDriver = CF::config('log.reader.cache_driver');
+        if (!$cacheDriver) {
+            $cacheDriver = CF::config('cache.default', 'file');
+        }
+
+        return CCache::manager()->driver($cacheDriver);
     }
 
     /**
