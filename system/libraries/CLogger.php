@@ -74,8 +74,8 @@ class CLogger {
      *
      *     $log->create_write('file');
      *
-     * @param type    $type    string
-     * @param options $options array of options for writers
+     * @param string $type    string
+     * @param array  $options array of options for writers
      *
      * @return CLogger
      */
@@ -356,6 +356,19 @@ class CLogger {
      * @return void
      */
     public function log($level, $message, array $context = []) {
+        if (!is_string($level)) {
+            $levelMap = [
+                CLogger::EMERGENCY => 'emergency',
+                CLogger::ALERT => 'alert',
+                CLogger::CRITICAL => 'critical',
+                CLogger::ERROR => 'error',
+                CLogger::WARNING => 'warning',
+                CLogger::NOTICE => 'notice',
+                CLogger::INFO => 'info',
+                CLogger::DEBUG => 'debug',
+            ];
+            $level = carr::get($levelMap, $level, 'critical');
+        }
         $this->channel()->log($level, $message, $context);
     }
 }

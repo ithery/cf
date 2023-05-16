@@ -462,7 +462,8 @@ final class CF {
      */
     public static function log($level, $message) {
         if (class_exists('CLogger')) {
-            CLogger::instance()->add($level, $message);
+            //CLogger::instance()->add($level, $message);
+            CLogger::instance()->log($level, $message);
         }
     }
 
