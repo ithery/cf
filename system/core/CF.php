@@ -1235,14 +1235,16 @@ final class CF {
         if (is_callable($callback)) {
             $domain = CF::domain();
             $originalAppCode = static::appCode();
-
+            $result = null;
             if ($originalAppCode) {
                 static::$forceAppCode = $appCode;
                 static::$data[$domain]['app_code'] = $appCode;
-                $callback();
+                $result = $callback();
                 static::$data[$domain]['app_code'] = $originalAppCode;
                 static::$forceAppCode = null;
             }
+
+            return $result;
         }
     }
 

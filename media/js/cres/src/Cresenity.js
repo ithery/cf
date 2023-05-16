@@ -94,6 +94,7 @@ export default class Cresenity {
         this.theme = new Theme();
         this.$ = cresQuery;
         this.version = '1.4.1';
+        this.checkAuthenticationInterval = null;
     }
     loadJs(filename, callback) {
         let fileref = document.createElement('script');
@@ -1357,5 +1358,47 @@ export default class Cresenity {
         }
 
         return document.body;
+    }
+
+    startCheckAuthenticationInterval(intervalTime = 10000, callback) {
+        if(this.checkAuthenticationInterval) {
+            return;
+        }
+        this.checkAuthenticationInterval = setInterval(() => {
+            const baseUrl = window?.capp?.baseUrl ?? '/';
+            const sessionName = window?.capp?.sessionName ?? null;
+            let sid = null;
+            if(sessionName) {
+                if (typeof document !== 'undefined') {
+                    const match = document.cookie.match(new RegExp('(^|;\\s*)('+sessionName+')=([^;]*)'));
+                    sid = match ? decodeURIComponent(match[3]) : null;
+                }
+            }
+            let url = baseUrl + 'cresenity/auth/ping';
+            $.ajax({
+                type: 'get',
+                url: url,
+                dataType: 'json',
+                success: (responseAuth) => {
+                    this.handleJsonResponse(responseAuth, (dataAuth) => {
+                        callback(dataAuth);
+                    });
+                }
+            });
+        }, intervalTime);
+    }
+
+    stopCheckAuthenticationInterval() {
+        if(this.checkAuthenticationInterval) {
+            clearInterval(this.checkAuthenticationInterval);
+        }
+    }
+    onAuthExpired(callback, intervalTime = 1000) {
+        this.stopCheckAuthenticationInterval();
+        this.startCheckAuthenticationInterval(intervalTime, (data)=>{
+            if(data && !data.isLogin) {
+                callback(data);
+            }
+        });
     }
 }
