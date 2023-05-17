@@ -457,13 +457,13 @@ final class CF {
      *
      * @param string $level
      * @param string $message
+     * @param mixed  $context
      *
      * @return void
      */
-    public static function log($level, $message) {
+    public static function log($level, $message, $context = []) {
         if (class_exists('CLogger')) {
-            //CLogger::instance()->add($level, $message);
-            CLogger::instance()->log($level, $message);
+            CLogger::instance()->log($level, $message, $context);
         }
     }
 
