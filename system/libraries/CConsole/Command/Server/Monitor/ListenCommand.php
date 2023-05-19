@@ -1,12 +1,5 @@
 <?php
 
-use MohsenAbrishami\Stethoscope\Services\Cpu;
-use MohsenAbrishami\Stethoscope\Services\Memory;
-use MohsenAbrishami\Stethoscope\Services\Network;
-use MohsenAbrishami\Stethoscope\Services\HardDisk;
-use MohsenAbrishami\Stethoscope\Services\WebServer;
-use MohsenAbrishami\Stethoscope\Traits\MessageCreatorTrait;
-
 class CConsole_Command_Server_Monitor_ListenCommand extends CConsole_Command {
     use CConsole_Command_Server_Monitor_Trait_MessageCreatorTrait;
 
