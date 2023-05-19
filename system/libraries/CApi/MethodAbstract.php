@@ -197,4 +197,12 @@ abstract class CApi_MethodAbstract implements CInterface_Arrayable {
         $validator = CValidation::createValidator($data, $rules, $messages);
         $validator->validate();
     }
+
+    protected function manager() {
+        return CApi_Manager::instance($this->group);
+    }
+
+    protected function auth() {
+        return $this->manager()->auth();
+    }
 }

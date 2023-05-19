@@ -66,6 +66,7 @@ class CApi_Auth {
         // Spin through each of the registered authentication providers and attempt to
         // authenticate through one of them. This allows a developer to implement
         // and allow a number of different authentication mechanisms.
+
         foreach ($this->filterProviders($providers) as $provider) {
             try {
                 $user = $provider->authenticate($this->router->getCurrentRequest(), $this->router->getCurrentRoute());

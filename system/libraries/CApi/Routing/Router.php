@@ -68,6 +68,8 @@ class CApi_Routing_Router {
      */
     protected $prefix;
 
+    protected $currentRequest;
+
     /**
      * Create a new router instance.
      *

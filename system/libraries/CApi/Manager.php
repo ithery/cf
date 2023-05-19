@@ -36,6 +36,8 @@ class CApi_Manager {
 
     private $resultFormatter;
 
+    private $methodResolver;
+
     /**
      * @param string $group
      *
