@@ -5,6 +5,9 @@ class CManager_Transform_Repository {
 
     private static $instance;
 
+    /**
+     * @return CManager_Transform_Repository
+     */
     public static function instance() {
         if (static::$instance == null) {
             static::$instance = new static();

@@ -60,7 +60,16 @@ class CManager_Transform_Transformer {
                     }
                 }
             } else {
-                $value = $this->transformMethod($method, $value, $data);
+                if ($this->shouldDelegateTransformer($value, $method)) {
+                    $method = ltrim($method, '->');
+
+                    list($method, $parameters) = CManager_Transform_Parser::parse($method);
+                    $arguments = CManager_Transform_Parser::getArguments($parameters, $data);
+
+                    return $value->{$method}(...$arguments);
+                } else {
+                    $value = $this->transformMethod($method, $value, $data);
+                }
                 if ($this->shouldStopTransforming($method, $value)) {
                     break;
                 }
@@ -125,5 +134,19 @@ class CManager_Transform_Transformer {
         }
 
         return true;
+    }
+
+    /**
+     * Check if the transformer method should be delegated to the underlying object.
+     *
+     * @param mixed $value
+     * @param mixed $method
+     */
+    protected function shouldDelegateTransformer($value, $method) {
+        if (!is_string($method)) {
+            return false;
+        }
+
+        return is_object($value) && cstr::startsWith(trim($method), '->');
     }
 }

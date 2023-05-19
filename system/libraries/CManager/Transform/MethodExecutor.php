@@ -175,6 +175,7 @@ class CManager_Transform_MethodExecutor {
         return c::manager()->editorJs()->generateHtmlOutput($data)->__toString();
     }
 
-    public static function transformLink($value, $url) {
+    public static function transformToCarbon($value) {
+        return new CCarbon($value);
     }
 }
