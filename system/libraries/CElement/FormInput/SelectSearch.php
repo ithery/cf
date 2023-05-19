@@ -365,6 +365,7 @@ class CElement_FormInput_SelectSearch extends CElement_FormInput {
                 }
 
                 $result = $db->query($q)->resultArray(false);
+
                 if (count($result) > 0) {
                     return carr::first($result);
                 }
