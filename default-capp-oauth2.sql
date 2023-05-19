@@ -1,10 +1,3 @@
-
-/**
- * Author:  Hery Kurniawan
- * Created: June 06, 2022
- */
-
-
 DROP TABLE IF EXISTS `oauth_auth_code`;
 CREATE TABLE `oauth_auth_code` (
   `oauth_code_id` bigint(20) unsigned NOT NULL AUTO_INCREMENT,
