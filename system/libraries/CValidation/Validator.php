@@ -169,40 +169,90 @@ class CValidation_Validator {
     /**
      * The validation rules that may be applied to files.
      *
-     * @var array
+     * @var string[]
      */
     protected $fileRules = [
-        'File', 'Image', 'Mimes', 'Mimetypes', 'Min',
-        'Max', 'Size', 'Between', 'Dimensions',
+        'Between',
+        'Dimensions',
+        'File',
+        'Image',
+        'Max',
+        'Mimes',
+        'Mimetypes',
+        'Min',
+        'Size',
     ];
 
     /**
      * The validation rules that imply the field is required.
      *
-     * @var array
+     * @var string[]
      */
     protected $implicitRules = [
-        'Required', 'Filled', 'RequiredWith', 'RequiredWithAll', 'RequiredWithout',
-        'RequiredWithoutAll', 'RequiredIf', 'RequiredUnless', 'Accepted', 'Present',
+        'Accepted',
+        'AcceptedIf',
+        'Declined',
+        'DeclinedIf',
+        'Filled',
+        'Missing',
+        'MissingIf',
+        'MissingUnless',
+        'MissingWith',
+        'MissingWithAll',
+        'Present',
+        'Required',
+        'RequiredIf',
+        'RequiredIfAccepted',
+        'RequiredUnless',
+        'RequiredWith',
+        'RequiredWithAll',
+        'RequiredWithout',
+        'RequiredWithoutAll',
     ];
 
     /**
      * The validation rules which depend on other fields as parameters.
      *
-     * @var array
+     * @var string[]
      */
     protected $dependentRules = [
-        'RequiredWith', 'RequiredWithAll', 'RequiredWithout', 'RequiredWithoutAll',
-        'RequiredIf', 'RequiredUnless', 'Confirmed', 'Same', 'Different', 'Unique',
-        'Before', 'After', 'BeforeOrEqual', 'AfterOrEqual', 'Gt', 'Lt', 'Gte', 'Lte',
+        'After',
+        'AfterOrEqual',
+        'Before',
+        'BeforeOrEqual',
+        'Confirmed',
+        'Different',
+        'ExcludeIf',
+        'ExcludeUnless',
+        'ExcludeWith',
+        'ExcludeWithout',
+        'Gt',
+        'Gte',
+        'Lt',
+        'Lte',
+        'AcceptedIf',
+        'DeclinedIf',
+        'RequiredIf',
+        'RequiredIfAccepted',
+        'RequiredUnless',
+        'RequiredWith',
+        'RequiredWithAll',
+        'RequiredWithout',
+        'RequiredWithoutAll',
+        'Prohibited',
+        'ProhibitedIf',
+        'ProhibitedUnless',
+        'Prohibits',
+        'Same',
+        'Unique',
     ];
 
     /**
      * The validation rules that can exclude an attribute.
      *
-     * @var array
+     * @var string[]
      */
-    protected $excludeRules = ['ExcludeIf', 'ExcludeUnless'];
+    protected $excludeRules = ['Exclude', 'ExcludeIf', 'ExcludeUnless', 'ExcludeWith', 'ExcludeWithout'];
 
     /**
      * The size related validation rules.

@@ -18,6 +18,7 @@ if (CF::isDevSuite()) {
     );
 }
 
+CF::setLocale('id_ID');
 CApp::component()->registerComponent('counter', \Cresenity\Component\Counter::class);
 
 CApp::component()->registerComponent('member-table', \Cresenity\Testing\MemberTableComponent::class);

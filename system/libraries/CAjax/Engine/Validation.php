@@ -33,9 +33,7 @@ class CAjax_Engine_Validation extends CAjax_Engine {
         $factory->extend(CJavascript_Validation_Remote_Validator::EXTENSION_NAME, $resolver->validatorClosure());
 
         $result = $factory->validate($data, $dataValidation);
-        // $remoteValidator = new CJavascript_Validation_Remote($data, $dataValidation);
-        // $result = $remoteValidator->validate();
 
-        echo json_encode($result);
+        return c::response()->json($result);
     }
 }

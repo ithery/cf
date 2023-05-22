@@ -5,14 +5,14 @@ class Controller_Demo_Module_Validation extends \Cresenity\Demo\Controller {
         $app = c::app();
 
         $name = '';
-        $select = '';
         $email = '';
-        $radio = 'radio1';
+        $password = '';
+        $passwordConfirm = '';
         $post = c::request()->post();
         $validationData = [
             'name' => ['required'],
             'email' => ['required', 'email'],
-            'password' => ['required', CValidation_Rule_Password::min(8)
+            'password' => ['required', 'confirmed', CValidation::rule()->password()->min(8)
                 ->mixedCase()
                 ->letters()
                 ->numbers()
@@ -30,6 +30,7 @@ class Controller_Demo_Module_Validation extends \Cresenity\Demo\Controller {
             $name = carr::get($post, 'name');
             $email = carr::get($post, 'email');
             $password = carr::get($post, 'password');
+            $passwordConfirm = carr::get($post, 'password_confirmation');
         }
 
         $app->setTitle('Form');
@@ -38,6 +39,7 @@ class Controller_Demo_Module_Validation extends \Cresenity\Demo\Controller {
         $form->addField()->setLabel('Name')->addTextControl('name')->setPlaceholder('Your name')->setValue($name);
         $form->addField()->setLabel('Email')->addEmailControl('email')->setPlaceholder('Input Email..')->setValue($email);
         $form->addField()->setLabel('Password')->addPasswordControl('password')->setPlaceholder('Input Password..')->setValue($password);
+        $form->addField()->setLabel('Retype Password')->addPasswordControl('password_confirmation')->setPlaceholder('Retype Password..')->setValue($passwordConfirm);
 
         $form->addActionList()->addAction()->setSubmit()->setLabel('Submit');
         $form->setValidation($validationData);
