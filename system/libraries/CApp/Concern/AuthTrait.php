@@ -50,6 +50,10 @@ trait CApp_Concern_AuthTrait {
     }
 
     public function isUserLogin() {
+        if (!$this->authEnabled) {
+            return false;
+        }
+
         return $this->user() != null;
     }
 
@@ -84,6 +88,9 @@ trait CApp_Concern_AuthTrait {
 
     protected function defaultRoleResolver() {
         return function () {
+            if (!CSession::sessionConfigured()) {
+                return null;
+            }
             $user = $this->user();
             if ($user) {
                 $modelClass = $this->auth()->getRoleModelClass();

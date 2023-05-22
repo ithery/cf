@@ -12,6 +12,11 @@ class CApp_Navigation_Helper {
     protected static $role_navs = [];
 
     /**
+     * @param null|mixed $nav
+     * @param null|mixed $controller
+     * @param null|mixed $method
+     * @param null|mixed $path
+     *
      * @return array|bool
      */
     public static function nav($nav = null, $controller = null, $method = null, $path = null) {
@@ -93,6 +98,11 @@ class CApp_Navigation_Helper {
     }
 
     /**
+     * @param null|mixed $nav
+     * @param null|mixed $roleId
+     * @param null|mixed $appId
+     * @param null|mixed $domain
+     *
      * @return bool
      */
     public static function haveAccess($nav = null, $roleId = null, $appId = null, $domain = null) {
@@ -106,6 +116,11 @@ class CApp_Navigation_Helper {
     }
 
     /**
+     * @param null|mixed $nav
+     * @param null|mixed $roleId
+     * @param null|mixed $appId
+     * @param null|mixed $domain
+     *
      * @return bool
      */
     protected static function protectedhaveAccess($nav = null, $roleId = null, $appId = null, $domain = null) {
@@ -159,6 +174,12 @@ class CApp_Navigation_Helper {
     }
 
     /**
+     * @param mixed      $action
+     * @param null|mixed $nav
+     * @param null|mixed $roleId
+     * @param null|mixed $appId
+     * @param null|mixed $domain
+     *
      * @return bool
      */
     public static function havePermission($action, $nav = null, $roleId = null, $appId = null, $domain = null) {
@@ -235,8 +256,11 @@ class CApp_Navigation_Helper {
     }
 
     /**
-     * @return bool
      * @deprecated
+     *
+     * @param mixed $nav
+     *
+     * @return bool
      */
     public static function isPublic($nav) {
         if (isset($nav['is_public']) && $nav['is_public']) {
@@ -247,6 +271,8 @@ class CApp_Navigation_Helper {
     }
 
     /**
+     * @param mixed $nav
+     *
      * @return int
      */
     public static function childCount($nav) {
@@ -260,6 +286,8 @@ class CApp_Navigation_Helper {
     }
 
     /**
+     * @param mixed $nav
+     *
      * @return bool
      */
     public static function haveChild($nav) {
@@ -267,6 +295,8 @@ class CApp_Navigation_Helper {
     }
 
     /**
+     * @param mixed $nav
+     *
      * @return bool
      */
     public static function isLeaf($nav) {
@@ -274,6 +304,8 @@ class CApp_Navigation_Helper {
     }
 
     /**
+     * @param mixed $nav
+     *
      * @return bool
      */
     public static function url($nav) {
@@ -314,6 +346,11 @@ class CApp_Navigation_Helper {
     }
 
     /**
+     * @param null|mixed $nav
+     * @param mixed      $appId
+     * @param mixed      $domain
+     * @param mixed      $appRoleId
+     *
      * @return bool
      */
     public static function accessAvailable($nav = null, $appId = '', $domain = '', $appRoleId = '') {
@@ -496,7 +533,7 @@ class CApp_Navigation_Helper {
                         $caret = '<b class="caret">';
                     }
 
-                    $elem = '<a class="' . $active_class . ' dropdown-toggle sidenav-link sidenav-toggle" href="javascript:;" data-toggle="dropdown">' . $icon_html . '<span>' . clang::__($label) . '</span>' . $caret . '</b>';
+                    $elem = '<a class="' . $active_class . ' dropdown-toggle sidenav-link sidenav-toggle" href="javascript:;" data-toggle="dropdown">' . $icon_html . '<span>' . c::__($label) . '</span>' . $caret . '</b>';
                     if ($child > 0) {
                         //$elem .= '<span class="label">'.$child.'</span>';
                     }
@@ -519,7 +556,7 @@ class CApp_Navigation_Helper {
                     if ($notif != null && $notif > 0) {
                         $strNotif = ' <span class="label label-info nav-notif nav-notif-count">' . $notif . '</span>';
                     }
-                    $elem = '<a class="' . $active_class . ' sidenav-link" href="' . $url . '"' . $target . '>' . $icon_html . '<span>' . clang::__($label) . '</span>' . $strNotif . "</a>\r\n";
+                    $elem = '<a class="' . $active_class . ' sidenav-link" href="' . $url . '"' . $target . '>' . $icon_html . '<span>' . c::__($label) . '</span>' . $strNotif . "</a>\r\n";
                 }
                 $html .= $elem;
                 $html .= $child_html;

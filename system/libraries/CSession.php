@@ -51,7 +51,7 @@ class CSession {
     /**
      * @return CSession_Store
      */
-    public function store() {
+    public static function store() {
         return CBase::session();
     }
 

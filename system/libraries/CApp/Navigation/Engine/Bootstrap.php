@@ -2,12 +2,6 @@
 
 defined('SYSPATH') or die('No direct access allowed.');
 
-/**
- * @author Hery Kurniawan
- * @license Ittron Global Teknologi <ittron.co.id>
- *
- * @since Jun 1, 2018, 11:57:16 AM
- */
 use CApp_Navigation_Helper as Helper;
 
 class CApp_Navigation_Engine_Bootstrap extends CApp_Navigation_Engine {
@@ -103,7 +97,7 @@ class CApp_Navigation_Engine_Bootstrap extends CApp_Navigation_Engine {
                         $caret = '<b class="caret">';
                     }
 
-                    $elem = '<a class="' . $active_class . ' dropdown-toggle sidenav-link sidenav-toggle" href="javascript:;" data-toggle="dropdown">' . $icon_html . '<span>' . clang::__($label) . '</span>' . $caret . '</b>';
+                    $elem = '<a class="' . $active_class . ' dropdown-toggle sidenav-link sidenav-toggle" href="javascript:;" data-toggle="dropdown">' . $icon_html . '<span>' . c::__($label) . '</span>' . $caret . '</b>';
                     if ($child > 0) {
                         //$elem .= '<span class="label">'.$child.'</span>';
                     }
@@ -127,7 +121,7 @@ class CApp_Navigation_Engine_Bootstrap extends CApp_Navigation_Engine {
                     if ($notif != null && $notif > 0) {
                         $strNotif = ' <span class="label label-info nav-notif nav-notif-count">' . $notif . '</span>';
                     }
-                    $elem = '<a class="' . $active_class . ' sidenav-link" href="' . $url . '"' . $target . '>' . $icon_html . '<span>' . clang::__($label) . '</span>' . $strNotif . "</a>\r\n";
+                    $elem = '<a class="' . $active_class . ' sidenav-link" href="' . $url . '"' . $target . '>' . $icon_html . '<span>' . c::__($label) . '</span>' . $strNotif . "</a>\r\n";
                 }
                 $html .= $elem;
                 $html .= $child_html;

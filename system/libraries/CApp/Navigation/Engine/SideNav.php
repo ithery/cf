@@ -105,7 +105,7 @@ class CApp_Navigation_Engine_SideNav extends CApp_Navigation_Engine {
                         $caret = '<b class="caret">';
                     }
 
-                    $elem = '<a class="' . $activeClass . ' sidenav-link sidenav-toggle" href="javascript:;" >' . $icon_html . '<span>' . clang::__($label) . '</span>' . $caret . '</b>';
+                    $elem = '<a class="' . $activeClass . ' sidenav-link sidenav-toggle" href="javascript:;" >' . $icon_html . '<span>' . c::__($label) . '</span>' . $caret . '</b>';
                     if ($child > 0) {
                         //$elem .= '<span class="label">'.$child.'</span>';
                     }
@@ -129,7 +129,7 @@ class CApp_Navigation_Engine_SideNav extends CApp_Navigation_Engine {
                     if ($notif != null && $notif > 0) {
                         $strNotif = ' <span class="label label-info nav-notif nav-notif-count">' . $notif . '</span>';
                     }
-                    $elem = '<a class="' . $activeClass . ' sidenav-link" href="' . $url . '"' . $target . '>' . $icon_html . '<span>' . clang::__($label) . '</span>' . $strNotif . "</a>\r\n";
+                    $elem = '<a class="' . $activeClass . ' sidenav-link" href="' . $url . '"' . $target . '>' . $icon_html . '<span>' . c::__($label) . '</span>' . $strNotif . "</a>\r\n";
                 }
                 $html .= $elem;
                 $html .= $childHtml;

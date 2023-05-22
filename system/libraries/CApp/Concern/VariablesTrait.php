@@ -43,7 +43,7 @@ trait CApp_Concern_VariablesTrait {
         $variables['appId'] = CF::appId();
         $variables['debug'] = CF::config('app.debug', false);
         $variables['environment'] = CF::environment();
-        $variables['csrfToken'] = c::csrfToken();
+        $variables['csrfToken'] = CSession::sessionConfigured() ? c::csrfToken() : null;
         $variables['vscode'] = [];
         $variables['vscode']['liveReload'] = carr::get($cresjsConfig, 'vscode.live_reload');
         $variables['react'] = [];

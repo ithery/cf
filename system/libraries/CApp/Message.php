@@ -2,15 +2,12 @@
 
 defined('SYSPATH') or die('No direct access allowed.');
 
-/**
- * @author Hery Kurniawan
- * @license Ittron Global Teknologi <ittron.co.id>
- *
- * @since Sep 8, 2018, 4:19:33 AM
- */
 class CApp_Message {
     public static function add($type, $message) {
-        $session = CSession::instance();
+        $session = CSession::store();
+        if ($session == null) {
+            return;
+        }
         $msgs = $session->get('cmsg_' . $type);
         if (!is_array($msgs)) {
             $msgs = [];
@@ -20,13 +17,19 @@ class CApp_Message {
     }
 
     public static function get($type) {
-        $session = CSession::instance();
+        $session = CSession::store();
+        if ($session == null) {
+            return;
+        }
 
         return $session->get('cmsg_' . $type);
     }
 
     public static function clear($type) {
-        $session = CSession::instance();
+        $session = CSession::store();
+        if ($session == null) {
+            return;
+        }
         $session->set('cmsg_' . $type, null);
     }
 

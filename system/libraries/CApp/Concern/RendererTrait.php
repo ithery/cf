@@ -1,13 +1,7 @@
 <?php
 
-defined('SYSPATH') or die('No direct access allowed.');
-
 /**
- * @author Hery Kurniawan
- * @license Ittron Global Teknologi <ittron.co.id>
- *
  * @see CApp
- * @since Jul 27, 2019, 10:23:46 PM
  */
 trait CApp_Concern_RendererTrait {
     protected $rendered = false;
@@ -267,11 +261,12 @@ HTML;
         if (c::request()->ajax()) {
             return $this->json();
         }
-
-        CView::factory()->share(
-            'errors',
-            c::session()->get('errors') ?: new CBase_ViewErrorBag()
-        );
+        if (CSession::sessionConfigured()) {
+            CView::factory()->share(
+                'errors',
+                c::session()->get('errors') ?: new CBase_ViewErrorBag()
+            );
+        }
 
         $viewData = $this->getViewData();
         $v = $this->getView();

@@ -9,6 +9,7 @@ class Controller_Demo_Module_Validation extends \Cresenity\Demo\Controller {
         $password = '';
         $passwordConfirm = '';
         $country = '';
+        $url = '';
         $post = c::request()->post();
         $validationData = [
             'name' => ['required'],
@@ -26,6 +27,7 @@ class Controller_Demo_Module_Validation extends \Cresenity\Demo\Controller {
                     $fail(c::e("{$attribute} {$value} tidak ditemukan."));
                 }
             })],
+            'url' => ['url'],
         ];
 
         if ($post) {
@@ -40,6 +42,7 @@ class Controller_Demo_Module_Validation extends \Cresenity\Demo\Controller {
             $password = carr::get($post, 'password');
             $passwordConfirm = carr::get($post, 'password_confirmation');
             $country = carr::get($post, 'country');
+            $url = carr::get($post, 'url');
         }
 
         $app->setTitle('Form');
@@ -50,6 +53,7 @@ class Controller_Demo_Module_Validation extends \Cresenity\Demo\Controller {
         $form->addField()->setLabel('Password')->addPasswordControl('password')->setPlaceholder('Input Password..')->setValue($password);
         $form->addField()->setLabel('Retype Password')->addPasswordControl('password_confirmation')->setPlaceholder('Retype Password..')->setValue($passwordConfirm);
         $form->addField()->setLabel('Country')->addTextControl('country')->setPlaceholder('Country')->setValue($country);
+        $form->addField()->setLabel('Url')->addTextControl('url')->setPlaceholder('Url')->setValue($url);
 
         $form->addActionList()->addAction()->setSubmit()->setLabel('Submit');
         $form->setValidation($validationData);

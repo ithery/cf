@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html class="no-js material-style layout-navbar-fixed layout-fixed" lang="<?php echo clang::getlang(); ?>" >
+<html class="no-js material-style layout-navbar-fixed layout-fixed" lang="{{ c::locale() }}" >
 <head>
     <meta charset="utf-8">
     <title>Demo - Cresenity Framework</title>
