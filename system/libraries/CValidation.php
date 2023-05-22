@@ -28,10 +28,10 @@ class CValidation {
     }
 
     /**
-     * @return CValidation_RuleFactory
+     * @return CValidation_Rule
      */
     public static function rule() {
-        return new CBase_ForwarderStaticClass(CValidation_RuleFactory::class);
+        return static::createRule();
     }
 
     /**

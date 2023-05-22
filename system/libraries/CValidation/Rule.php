@@ -84,4 +84,30 @@ class CValidation_Rule {
     public static function unique($table, $column = 'NULL') {
         return new CValidation_Rule_Unique($table, $column);
     }
+
+    /**
+     * Get a unique constraint builder instance.
+     *
+     * @param int $min
+     *
+     * @return \CValidation_Rule_Password
+     */
+    public static function password($min = 8) {
+        return new CValidation_Rule_Password($min);
+    }
+
+    /**
+     * Get a unique constraint builder instance.
+     *
+     * @param callable $callback
+     *
+     * @return \CValidation_ClosureValidationRule
+     */
+    public static function closure($callback) {
+        if ($callback instanceof Closure) {
+            $callback = new \Opis\Closure\SerializableClosure($callback);
+        }
+
+        return new CValidation_ClosureValidationRule($callback);
+    }
 }

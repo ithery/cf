@@ -8,6 +8,7 @@ class Controller_Demo_Module_Validation extends \Cresenity\Demo\Controller {
         $email = '';
         $password = '';
         $passwordConfirm = '';
+        $country = '';
         $post = c::request()->post();
         $validationData = [
             'name' => ['required'],
@@ -17,7 +18,14 @@ class Controller_Demo_Module_Validation extends \Cresenity\Demo\Controller {
                 ->letters()
                 ->numbers()
                 ->symbols()
-                ->uncompromised()]
+                ->uncompromised()],
+            'country' => ['required', CValidation::rule()->closure(function ($attribute, $value, Closure $fail) {
+                $country = \Cresenity\Demo\Model\Country::where('name', '=', $value)->first();
+
+                if ($country == null) {
+                    $fail(c::e("{$attribute} {$value} tidak ditemukan."));
+                }
+            })],
         ];
 
         if ($post) {
@@ -31,6 +39,7 @@ class Controller_Demo_Module_Validation extends \Cresenity\Demo\Controller {
             $email = carr::get($post, 'email');
             $password = carr::get($post, 'password');
             $passwordConfirm = carr::get($post, 'password_confirmation');
+            $country = carr::get($post, 'country');
         }
 
         $app->setTitle('Form');
@@ -40,6 +49,7 @@ class Controller_Demo_Module_Validation extends \Cresenity\Demo\Controller {
         $form->addField()->setLabel('Email')->addEmailControl('email')->setPlaceholder('Input Email..')->setValue($email);
         $form->addField()->setLabel('Password')->addPasswordControl('password')->setPlaceholder('Input Password..')->setValue($password);
         $form->addField()->setLabel('Retype Password')->addPasswordControl('password_confirmation')->setPlaceholder('Retype Password..')->setValue($passwordConfirm);
+        $form->addField()->setLabel('Country')->addTextControl('country')->setPlaceholder('Country')->setValue($country);
 
         $form->addActionList()->addAction()->setSubmit()->setLabel('Submit');
         $form->setValidation($validationData);
