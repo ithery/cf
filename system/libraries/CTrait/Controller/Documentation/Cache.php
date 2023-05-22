@@ -2,12 +2,6 @@
 
 defined('SYSPATH') or die('No direct access allowed.');
 
-/**
- * @author Hery Kurniawan
- * @license Ittron Global Teknologi <ittron.co.id>
- *
- * @since Aug 24, 2018, 7:57:23 PM
- */
 trait CTrait_Controller_Documentation_Cache {
     public function index() {
         $this->cache();

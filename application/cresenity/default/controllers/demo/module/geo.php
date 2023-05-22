@@ -1,10 +1,12 @@
 <?php
 
-defined('SYSPATH') or die('No direct access allowed.');
+class Controller_Demo_Module_Geo extends \Cresenity\Demo\Controller {
+    public function __construct() {
+        parent::__construct();
+    }
 
-trait CTrait_Controller_Documentation_Geo_Ip {
     public function index() {
-        $app = CApp::instance();
+        $app = c::app();
 
         $app->title('Geo IP Address');
 

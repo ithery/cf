@@ -1,21 +1,16 @@
 <?php
 
-defined('SYSPATH') OR die('No direct access allowed.');
+defined('SYSPATH') or die('No direct access allowed.');
 
-/**
- * @author Hery Kurniawan
- * @since Jul 14, 2019, 10:20:08 AM
- * @license Ittron Global Teknologi <ittron.co.id>
- */
 trait CTrait_Controller_Cloud_Server_Info {
-
     public function info() {
         $errCode = 0;
         $errMessage = '';
         $app = CApp::instance();
 
         $app->title('Server Information');
-        $cloudData = array();
+        $cloudData = [];
+
         try {
             $cloudData = CApp_Cloud::instance()->api('Server/GetInfo');
         } catch (Exception $ex) {
@@ -34,35 +29,33 @@ trait CTrait_Controller_Cloud_Server_Info {
             $usedStorage = carr::get($cloudData, 'storage.used');
             $freeStorage = carr::get($cloudData, 'storage.free');
             //load avg
-            $cardData = array();
+            $cardData = [];
             $cardData['title'] = 'Load Average';
 
-
-            $cardData['properties'] = array();
-            $cardData['properties'][] = array('label' => '01 Minute', 'value' => carr::get($loadAverageArray, 0));
-            $cardData['properties'][] = array('label' => '05 Minute', 'value' => carr::get($loadAverageArray, 1));
-            $cardData['properties'][] = array('label' => '15 Minute', 'value' => carr::get($loadAverageArray, 2));
-            $cardData['chart'] = array();
+            $cardData['properties'] = [];
+            $cardData['properties'][] = ['label' => '01 Minute', 'value' => carr::get($loadAverageArray, 0)];
+            $cardData['properties'][] = ['label' => '05 Minute', 'value' => carr::get($loadAverageArray, 1)];
+            $cardData['properties'][] = ['label' => '15 Minute', 'value' => carr::get($loadAverageArray, 2)];
+            $cardData['chart'] = [];
             $cardData['chart']['percent'] = $loadAveragePercent;
             $cardData['chart']['color'] = '#d9534f';
 
             $divCol = $divRow->addDiv()->addClass('col-md-4');
             $divCol->addTemplate()->setTemplate('CApp/Card/Info')->setData($cardData);
 
-
             //memory
-            $cardData = array();
+            $cardData = [];
             $cardData['title'] = 'Memory';
 
             $usedPercent = 0;
             if ($totalMemory > 0) {
-                $usedPercent = ceil(($usedMemory * 100 ) / $totalMemory);
+                $usedPercent = ceil(($usedMemory * 100) / $totalMemory);
             }
-            $cardData['properties'] = array();
-            $cardData['properties'][] = array('label' => 'Total', 'value' => CHelper::formatter()->formatSize($totalMemory));
-            $cardData['properties'][] = array('label' => 'Used', 'value' => CHelper::formatter()->formatSize($usedMemory));
-            $cardData['properties'][] = array('label' => 'Free', 'value' => CHelper::formatter()->formatSize($freeMemory));
-            $cardData['chart'] = array();
+            $cardData['properties'] = [];
+            $cardData['properties'][] = ['label' => 'Total', 'value' => CHelper::formatter()->formatSize($totalMemory)];
+            $cardData['properties'][] = ['label' => 'Used', 'value' => CHelper::formatter()->formatSize($usedMemory)];
+            $cardData['properties'][] = ['label' => 'Free', 'value' => CHelper::formatter()->formatSize($freeMemory)];
+            $cardData['chart'] = [];
             $cardData['chart']['percent'] = $usedPercent;
             $cardData['chart']['color'] = '#d9534f';
 
@@ -70,18 +63,18 @@ trait CTrait_Controller_Cloud_Server_Info {
             $divCol->addTemplate()->setTemplate('CApp/Card/Info')->setData($cardData);
 
             /* storage */
-            $cardData = array();
+            $cardData = [];
             $cardData['title'] = 'Storage';
 
             $usedPercent = 0;
             if ($totalStorage > 0) {
-                $usedPercent = ceil(($usedStorage * 100 ) / $totalStorage);
+                $usedPercent = ceil(($usedStorage * 100) / $totalStorage);
             }
-            $cardData['properties'] = array();
-            $cardData['properties'][] = array('label' => 'Total', 'value' => CHelper::formatter()->formatSize($totalStorage));
-            $cardData['properties'][] = array('label' => 'Used', 'value' => CHelper::formatter()->formatSize($usedStorage));
-            $cardData['properties'][] = array('label' => 'Free', 'value' => CHelper::formatter()->formatSize($freeStorage));
-            $cardData['chart'] = array();
+            $cardData['properties'] = [];
+            $cardData['properties'][] = ['label' => 'Total', 'value' => CHelper::formatter()->formatSize($totalStorage)];
+            $cardData['properties'][] = ['label' => 'Used', 'value' => CHelper::formatter()->formatSize($usedStorage)];
+            $cardData['properties'][] = ['label' => 'Free', 'value' => CHelper::formatter()->formatSize($freeStorage)];
+            $cardData['chart'] = [];
             $cardData['chart']['percent'] = $usedPercent;
             $cardData['chart']['color'] = '#d9534f';
 
@@ -106,7 +99,8 @@ trait CTrait_Controller_Cloud_Server_Info {
         $app = CApp::instance();
 
         $app->title('Server Storage Information');
-        $cloudData = array();
+        $cloudData = [];
+
         try {
             $cloudData = CApp_Cloud::instance()->api('Server/GetStorageInfo');
         } catch (Exception $ex) {
@@ -117,10 +111,10 @@ trait CTrait_Controller_Cloud_Server_Info {
         /* new row */
         $divRow = $app->addDiv()->addClass('row');
 
-        $cardData = array();
+        $cardData = [];
 
         $cardData['title'] = 'Storage Information';
-        $cardData['columns'] = array('Disk', 'Type', 'Mount Point', 'Usage', 'Free', 'Used', 'Size', 'INode (%)', 'Options');
+        $cardData['columns'] = ['Disk', 'Type', 'Mount Point', 'Usage', 'Free', 'Used', 'Size', 'INode (%)', 'Options'];
         $diskDevices = carr::get($cloudData, 'disks');
         foreach ($diskDevices as $device) {
             /* @var $device CServer_Device_Disk */
@@ -134,7 +128,7 @@ trait CTrait_Controller_Cloud_Server_Info {
             }
 
             $htmlProgress = '<div class="progress" style="height: 6px;min-width:100px;"><div class="progress-bar" style="width: ' . $usedPercent . '%;"></div></div>' . $usedPercent . '%';
-            $cardData['rows'][] = array(
+            $cardData['rows'][] = [
                 carr::get($device, 'name'),
                 carr::get($device, 'fsType'),
                 carr::get($device, 'mountPoint'),
@@ -144,15 +138,12 @@ trait CTrait_Controller_Cloud_Server_Info {
                 CHelper::formatter()->formatSize($totalDisk),
                 carr::get($device, 'inodesUsedPercent') . '%',
                 carr::get($device, 'options'),
-            );
+            ];
         }
-
-
 
         $divCol = $divRow->addDiv()->addClass('col-md-12');
         $divCol->addTemplate()->setTemplate('CApp/Card/Table')->setData($cardData);
 
-        echo $app->render();
+        return $app;
     }
-
 }

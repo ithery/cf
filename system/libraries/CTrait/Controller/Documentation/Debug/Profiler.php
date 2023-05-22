@@ -11,16 +11,17 @@ defined('SYSPATH') or die('No direct access allowed.');
 trait CTrait_Controller_Documentation_Debug_Profiler {
     public function index() {
         $app = CApp::instance();
-        $app->title(clang::__('Profiler in CApp'));
+        $app->title(c::__('Profiler in CApp'));
 
         CDebug::bar()->enable();
 
-        echo $app->render();
+        return $app;
     }
 
     public function demo() {
         $app = CApp::instance();
-        $app->title(clang::__('Profiler in CApp (Demo)'));
-        echo $app->render();
+        $app->title(c::__('Profiler in CApp (Demo)'));
+
+        return $app;
     }
 }

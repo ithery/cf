@@ -16,6 +16,11 @@ return [
         'uri' => 'demo/module/validation/index',
     ],
     [
+        'name' => 'module.geo',
+        'label' => c::__('Geo'),
+        'uri' => 'demo/module/geo/index',
+    ],
+    [
         'name' => 'module.color',
         'label' => c::__('Color'),
         'uri' => 'demo/module/color/index',

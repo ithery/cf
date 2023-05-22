@@ -11,7 +11,7 @@ defined('SYSPATH') or die('No direct access allowed.');
 trait CTrait_Controller_Documentation_Javascript {
     public function statement() {
         $app = CApp::instance();
-        $app->title(clang::__('Javascript Statement'));
+        $app->title(c::__('Javascript Statement'));
 
         $app->addH4('Raw Statement');
 

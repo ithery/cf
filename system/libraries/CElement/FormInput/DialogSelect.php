@@ -187,7 +187,7 @@ class CElement_FormInput_DialogSelect extends CElement_FormInput {
     }
 
     public function createAjaxUrl() {
-        return CAjaxMethod::factory()
+        return CAjax::createMethod()
             ->setType('DialogSelect')
             ->setData('format', $this->format)
             ->setData('fields', $this->fields)
