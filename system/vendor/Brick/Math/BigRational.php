@@ -61,7 +61,7 @@ final class BigRational extends BigNumber
      *
      * @psalm-pure
      */
-    public static function of(BigNumber|int|float|string $value) : BigRational
+    public static function of($value) : BigRational
     {
         return parent::of($value)->toBigRational();
     }
@@ -82,8 +82,8 @@ final class BigRational extends BigNumber
      * @psalm-pure
      */
     public static function nd(
-        BigNumber|int|float|string $numerator,
-        BigNumber|int|float|string $denominator,
+        $numerator,
+        $denominator
     ) : BigRational {
         $numerator   = BigInteger::of($numerator);
         $denominator = BigInteger::of($denominator);
@@ -194,7 +194,7 @@ final class BigRational extends BigNumber
      *
      * @throws MathException If the number is not valid.
      */
-    public function plus(BigNumber|int|float|string $that) : BigRational
+    public function plus($that) : BigRational
     {
         $that = BigRational::of($that);
 
@@ -212,7 +212,7 @@ final class BigRational extends BigNumber
      *
      * @throws MathException If the number is not valid.
      */
-    public function minus(BigNumber|int|float|string $that) : BigRational
+    public function minus($that) : BigRational
     {
         $that = BigRational::of($that);
 
@@ -230,7 +230,7 @@ final class BigRational extends BigNumber
      *
      * @throws MathException If the multiplier is not a valid number.
      */
-    public function multipliedBy(BigNumber|int|float|string $that) : BigRational
+    public function multipliedBy($that) : BigRational
     {
         $that = BigRational::of($that);
 
@@ -247,7 +247,7 @@ final class BigRational extends BigNumber
      *
      * @throws MathException If the divisor is not a valid number, or is zero.
      */
-    public function dividedBy(BigNumber|int|float|string $that) : BigRational
+    public function dividedBy($that) : BigRational
     {
         $that = BigRational::of($that);
 
@@ -322,7 +322,7 @@ final class BigRational extends BigNumber
         return new BigRational($numerator, $denominator, false);
     }
 
-    public function compareTo(BigNumber|int|float|string $that) : int
+    public function compareTo($that) : int
     {
         return $this->minus($that)->getSign();
     }
