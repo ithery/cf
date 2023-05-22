@@ -12,6 +12,12 @@ class Controller_Demo_Module_Validation extends \Cresenity\Demo\Controller {
         $validationData = [
             'name' => ['required'],
             'email' => ['required', 'email'],
+            'password' => ['required', CValidation_Rule_Password::min(8)
+                ->mixedCase()
+                ->letters()
+                ->numbers()
+                ->symbols()
+                ->uncompromised()]
         ];
 
         if ($post) {
@@ -20,6 +26,10 @@ class Controller_Demo_Module_Validation extends \Cresenity\Demo\Controller {
             if (!$validator->check()) {
                 c::msg('error', $validator->errors()->first());
             }
+            // set default value
+            $name = carr::get($post, 'name');
+            $email = carr::get($post, 'email');
+            $password = carr::get($post, 'password');
         }
 
         $app->setTitle('Form');
@@ -27,6 +37,7 @@ class Controller_Demo_Module_Validation extends \Cresenity\Demo\Controller {
         $form = $widget->addForm();
         $form->addField()->setLabel('Name')->addTextControl('name')->setPlaceholder('Your name')->setValue($name);
         $form->addField()->setLabel('Email')->addEmailControl('email')->setPlaceholder('Input Email..')->setValue($email);
+        $form->addField()->setLabel('Password')->addPasswordControl('password')->setPlaceholder('Input Password..')->setValue($password);
 
         $form->addActionList()->addAction()->setSubmit()->setLabel('Submit');
         $form->setValidation($validationData);

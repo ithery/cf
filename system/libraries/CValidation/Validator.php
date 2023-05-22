@@ -41,6 +41,13 @@ class CValidation_Validator {
     public $customValues = [];
 
     /**
+     * Indicates that unvalidated array keys should be excluded, even if the parent array was validated.
+     *
+     * @var bool
+     */
+    public $excludeUnvalidatedArrayKeys = false;
+
+    /**
      * All of the custom validator extensions.
      *
      * @var array
@@ -53,6 +60,13 @@ class CValidation_Validator {
      * @var array
      */
     public $replacers = [];
+
+    /**
+     * Indicates if the validator should stop on the first rule failure.
+     *
+     * @var bool
+     */
+    protected $stopOnFirstFailure = false;
 
     /**
      * The Translator implementation.
@@ -200,9 +214,23 @@ class CValidation_Validator {
     /**
      * The numeric related validation rules.
      *
-     * @var array
+     * @var string[]
      */
-    protected $numericRules = ['Numeric', 'Integer'];
+    protected $numericRules = ['Numeric', 'Integer', 'Decimal'];
+
+    /**
+     * The current placeholder for dots in rule keys.
+     *
+     * @var string
+     */
+    protected $dotPlaceholder;
+
+    /**
+     * The exception to throw upon failure.
+     *
+     * @var string
+     */
+    protected $exception = CValidation_Exception::class;
 
     /**
      * Create a new Validator instance.
@@ -215,6 +243,7 @@ class CValidation_Validator {
      * @return void
      */
     public function __construct(array $data, array $rules, array $messages = [], array $customAttributes = []) {
+        $this->dotPlaceholder = cstr::random();
         $this->initialRules = $rules;
         $this->customMessages = $messages;
         $this->data = $this->parseData($data);
@@ -237,11 +266,50 @@ class CValidation_Validator {
             if (is_array($value)) {
                 $value = $this->parseData($value);
             }
-            $key = str_replace(['.', '*'], ['->', '__asterisk__'], $key);
+            $key = str_replace(
+                ['.', '*'],
+                [$this->dotPlaceholder, '__asterisk__'],
+                $key
+            );
+
             $newData[$key] = $value;
         }
 
         return $newData;
+    }
+
+    /**
+     * Replace the placeholders used in data keys.
+     *
+     * @param array $data
+     *
+     * @return array
+     */
+    protected function replacePlaceholders($data) {
+        $originalData = [];
+
+        foreach ($data as $key => $value) {
+            $originalData[$this->replacePlaceholderInString($key)] = is_array($value)
+                        ? $this->replacePlaceholders($value)
+                        : $value;
+        }
+
+        return $originalData;
+    }
+
+    /**
+     * Replace the placeholders in the given string.
+     *
+     * @param string $value
+     *
+     * @return string
+     */
+    protected function replacePlaceholderInString(string $value) {
+        return str_replace(
+            [$this->dotPlaceholder, '__asterisk__'],
+            ['.', '*'],
+            $value
+        );
     }
 
     /**
@@ -268,18 +336,19 @@ class CValidation_Validator {
         $this->messages = new CBase_MessageBag();
         $this->distinctValues = [];
         $this->failedRules = [];
+
         // We'll spin through each rule, validating the attributes attached to that
         // rule. Any error messages will be added to the containers with each of
         // the other error messages, returning true if we don't have messages.
         foreach ($this->rules as $attribute => $rules) {
-            $attribute = str_replace('\.', '->', $attribute);
-
             if ($this->shouldBeExcluded($attribute)) {
                 $this->removeAttribute($attribute);
 
                 continue;
             }
-
+            if ($this->stopOnFirstFailure && $this->messages->isNotEmpty()) {
+                break;
+            }
             foreach ($rules as $rule) {
                 $this->validateAttribute($attribute, $rule);
 
@@ -340,7 +409,8 @@ class CValidation_Validator {
      * @return void
      */
     protected function removeAttribute($attribute) {
-        unset($this->data[$attribute], $this->rules[$attribute]);
+        carr::forget($this->data, $attribute);
+        carr::forget($this->rules, $attribute);
     }
 
     /**
@@ -351,24 +421,73 @@ class CValidation_Validator {
      * @return array
      */
     public function validate() {
-        if ($this->fails()) {
-            throw new CValidation_Exception($this);
-        }
+        c::throwIf($this->fails(), $this->exception, $this);
 
-        $data = c::collect($this->getData());
-
-        return $data->only(c::collect($this->getRules())->keys()->map(function ($rule) {
-            return explode('.', $rule)[0];
-        })->unique())->toArray();
+        return $this->validated();
     }
 
     /**
-     * Alias of method passes.
+     * Run the validator's rules against its data.
+     *
+     * @param string $errorBag
+     *
+     * @throws \CValidation_Exception
      *
      * @return array
      */
-    public function check() {
-        return $this->passes();
+    public function validateWithBag($errorBag) {
+        try {
+            return $this->validate();
+        } catch (CValidation_Exception $e) {
+            $e->errorBag = $errorBag;
+
+            throw $e;
+        }
+    }
+
+    /**
+     * Get a validated input container for the validated input.
+     *
+     * @param null|array $keys
+     *
+     * @return \CBase_ValidatedInput|array
+     */
+    public function safe(array $keys = null) {
+        return is_array($keys)
+                ? (new CBase_ValidatedInput($this->validated()))->only($keys)
+                : new CBase_ValidatedInput($this->validated());
+    }
+
+    /**
+     * Get the attributes and values that were validated.
+     *
+     * @throws \CValidation_Exception
+     *
+     * @return array
+     */
+    public function validated() {
+        c::throwIf($this->invalid(), $this->exception, $this);
+
+        $results = [];
+
+        $missingValue = new stdClass();
+
+        foreach ($this->getRules() as $key => $rules) {
+            if ($this->excludeUnvalidatedArrayKeys
+                && in_array('array', $rules)
+                && !empty(preg_grep('/^' . preg_quote($key, '/') . '\.+/', array_keys($this->getRules())))
+            ) {
+                continue;
+            }
+
+            $value = c::get($this->getData(), $key, $missingValue);
+
+            if ($value !== $missingValue) {
+                carr::set($results, $key, $value);
+            }
+        }
+
+        return $this->replacePlaceholders($results);
     }
 
     /**
@@ -391,8 +510,12 @@ class CValidation_Validator {
         // First we will get the correct keys for the given attribute in case the field is nested in
         // an array. Then we determine if the given rule accepts other field names as parameters.
         // If so, we will replace any asterisks found in the parameters with the correct keys.
-        if (($keys = $this->getExplicitKeys($attribute)) && $this->dependsOnOtherFields($rule)) {
-            $parameters = $this->replaceAsterisksInParameters($parameters, $keys);
+        if ($this->dependsOnOtherFields($rule)) {
+            $parameters = $this->replaceDotInParameters($parameters);
+
+            if ($keys = $this->getExplicitKeys($attribute)) {
+                $parameters = $this->replaceAsterisksInParameters($parameters, $keys);
+            }
         }
 
         $value = $this->getValue($attribute);
@@ -474,6 +597,19 @@ class CValidation_Validator {
     }
 
     /**
+     * Replace each field parameter which has an escaped dot with the dot placeholder.
+     *
+     * @param array $parameters
+     *
+     * @return array
+     */
+    protected function replaceDotInParameters(array $parameters) {
+        return array_map(function ($field) {
+            return str_replace('\.', $this->dotPlaceholder, $field);
+        }, $parameters);
+    }
+
+    /**
      * Replace each field parameter which has asterisks with the given keys.
      *
      * @param array $parameters
@@ -497,6 +633,10 @@ class CValidation_Validator {
      * @return bool
      */
     protected function isValidatable($rule, $attribute, $value) {
+        if (in_array($rule, $this->excludeRules)) {
+            return true;
+        }
+
         return $this->presentOrRuleIsImplicit($rule, $attribute, $value)
                 && $this->passesOptionalCheck($attribute)
                 && $this->isNotNullIfMarkedAsNullable($rule, $attribute)
@@ -590,15 +730,39 @@ class CValidation_Validator {
      * @return void
      */
     protected function validateUsingCustomRule($attribute, $value, $rule) {
-        if (!$rule->passes($attribute, $value)) {
-            $this->failedRules[$attribute][get_class($rule)] = [];
+        $attribute = $this->replacePlaceholderInString($attribute);
 
-            $this->messages->add($attribute, $this->makeReplacements(
-                $rule->message(),
-                $attribute,
-                get_class($rule),
-                []
-            ));
+        $value = is_array($value) ? $this->replacePlaceholders($value) : $value;
+
+        if ($rule instanceof CValidation_Contract_ValidatorAwareRuleInterface) {
+            $rule->setValidator($this);
+        }
+
+        if ($rule instanceof CValidation_Contract_DataAwareRuleInterface) {
+            $rule->setData($this->data);
+        }
+
+        if (!$rule->passes($attribute, $value)) {
+            $ruleClass = $rule instanceof CValidation_InvokableValidationRule
+                ? get_class($rule->invokable())
+                : get_class($rule);
+
+            $this->failedRules[$attribute][$ruleClass] = [];
+
+            $messages = $this->getFromLocalArray($attribute, $ruleClass) ?? $rule->message();
+
+            $messages = $messages ? (array) $messages : [$ruleClass];
+
+            foreach ($messages as $key => $message) {
+                $key = is_string($key) ? $key : $attribute;
+
+                $this->messages->add($key, $this->makeReplacements(
+                    $message,
+                    $key,
+                    $ruleClass,
+                    []
+                ));
+            }
         }
     }
 
@@ -610,22 +774,23 @@ class CValidation_Validator {
      * @return bool
      */
     protected function shouldStopValidating($attribute) {
+        $cleanedAttribute = $this->replacePlaceholderInString($attribute);
         if ($this->hasRule($attribute, ['Bail'])) {
-            return $this->messages->has($attribute);
+            return $this->messages->has($cleanedAttribute);
         }
 
-        if (isset($this->failedRules[$attribute])
-            && array_key_exists('uploaded', $this->failedRules[$attribute])
+        if (isset($this->failedRules[$cleanedAttribute])
+            && array_key_exists('uploaded', $this->failedRules[$cleanedAttribute])
         ) {
             return true;
         }
 
-        // In case the attribute has any rule that indicates that the field is required
+        /// In case the attribute has any rule that indicates that the field is required
         // and that rule already failed then we should stop validation at this point
         // as now there is no point in calling other rules with this field empty.
         return $this->hasRule($attribute, $this->implicitRules)
-                && isset($this->failedRules[$attribute])
-                && array_intersect(array_keys($this->failedRules[$attribute]), $this->implicitRules);
+            && isset($this->failedRules[$cleanedAttribute])
+            && array_intersect(array_keys($this->failedRules[$cleanedAttribute]), $this->implicitRules);
     }
 
     /**
@@ -641,12 +806,16 @@ class CValidation_Validator {
         if (!$this->messages) {
             $this->passes();
         }
-        $attribute = str_replace('__asterisk__', '*', $attribute);
+        $attributeWithPlaceholders = $attribute;
+
+        $attribute = $this->replacePlaceholderInString($attribute);
+
         if (in_array($rule, $this->excludeRules)) {
             return $this->excludeAttribute($attribute);
         }
+
         $this->messages->add($attribute, $this->makeReplacements(
-            $this->getMessage($attribute, $rule),
+            $this->getMessage($attributeWithPlaceholders, $rule),
             $attribute,
             $rule,
             $parameters
@@ -694,10 +863,20 @@ class CValidation_Validator {
             $this->passes();
         }
 
-        return array_intersect_key(
+        $invalid = array_intersect_key(
             $this->data,
             $this->attributesThatHaveMessages()
         );
+
+        $result = [];
+
+        $failed = carr::only(carr::dot($invalid), array_keys($this->failed()));
+
+        foreach ($failed as $key => $failure) {
+            carr::set($result, $key, $failure);
+        }
+
+        return $result;
     }
 
     /**
@@ -841,6 +1020,19 @@ class CValidation_Validator {
     }
 
     /**
+     * Get the validation rules with key placeholders removed.
+     *
+     * @return array
+     */
+    public function getRulesWithoutPlaceholders() {
+        return c::collect($this->rules)
+            ->mapWithKeys(fn ($value, $key) => [
+                str_replace($this->dotPlaceholder, '\\.', $key) => $value,
+            ])
+            ->all();
+    }
+
+    /**
      * Set the validation rules.
      *
      * @param array $rules
@@ -848,6 +1040,10 @@ class CValidation_Validator {
      * @return $this
      */
     public function setRules(array $rules) {
+        $rules = c::collect($rules)->mapWithKeys(function ($value, $key) {
+            return [str_replace('\.', $this->dotPlaceholder, $key) => $value];
+        })->toArray();
+
         $this->initialRules = $rules;
 
         $this->rules = [];
@@ -869,7 +1065,7 @@ class CValidation_Validator {
         // of the explicit rules needed for the given data. For example the rule
         // names.* would get expanded to names.0, names.1, etc. for this data.
         $response = (new CValidation_RuleParser($this->data))
-            ->explode($rules);
+            ->explode(CValidation_RuleParser::filterConditionalRules($rules, $this->data));
 
         $this->rules = array_merge_recursive(
             $this->rules,
@@ -894,11 +1090,50 @@ class CValidation_Validator {
     public function sometimes($attribute, $rules, callable $callback) {
         $payload = new CBase_Fluent($this->getData());
 
-        if (call_user_func($callback, $payload)) {
-            foreach ((array) $attribute as $key) {
-                $this->addRules([$key => $rules]);
+        foreach ((array) $attribute as $key) {
+            $response = (new CValidation_RuleParser($this->data))->explode([$key => $rules]);
+
+            $this->implicitAttributes = array_merge($response->implicitAttributes, $this->implicitAttributes);
+
+            foreach ($response->rules as $ruleKey => $ruleValue) {
+                if ($callback($payload, $this->dataForSometimesIteration($ruleKey, !cstr::endsWith($key, '.*')))) {
+                    $this->addRules([$ruleKey => $ruleValue]);
+                }
             }
         }
+
+        return $this;
+    }
+
+    /**
+     * Get the data that should be injected into the iteration of a wildcard "sometimes" callback.
+     *
+     * @param string $attribute
+     * @param mixed  $removeLastSegmentOfAttribute
+     *
+     * @return \CBase_Fluent|array|mixed
+     */
+    private function dataForSometimesIteration(string $attribute, $removeLastSegmentOfAttribute) {
+        $lastSegmentOfAttribute = strrchr($attribute, '.');
+
+        $attribute = $lastSegmentOfAttribute && $removeLastSegmentOfAttribute
+                    ? cstr::replaceLast($lastSegmentOfAttribute, '', $attribute)
+                    : $attribute;
+
+        return is_array($data = c::get($this->data, $attribute))
+            ? new CBase_Fluent($data)
+            : $data;
+    }
+
+    /**
+     * Instruct the validator to stop validating after the first rule failure.
+     *
+     * @param bool $stopOnFirstFailure
+     *
+     * @return $this
+     */
+    public function stopOnFirstFailure($stopOnFirstFailure = true) {
+        $this->stopOnFirstFailure = $stopOnFirstFailure;
 
         return $this;
     }
@@ -912,7 +1147,7 @@ class CValidation_Validator {
      */
     public function addExtensions(array $extensions) {
         if ($extensions) {
-            $keys = array_map('cstr::snake', array_keys($extensions));
+            $keys = array_map([cstr::class, 'snake'], array_keys($extensions));
 
             $extensions = array_combine($keys, array_values($extensions));
         }
@@ -999,7 +1234,7 @@ class CValidation_Validator {
      */
     public function addReplacers(array $replacers) {
         if ($replacers) {
-            $keys = array_map('cstr::snake', array_keys($replacers));
+            $keys = array_map([cstr::class, 'snake'], array_keys($replacers));
 
             $replacers = array_combine($keys, array_values($replacers));
         }
@@ -1151,6 +1386,27 @@ class CValidation_Validator {
     }
 
     /**
+     * Set the exception to throw upon failed validation.
+     *
+     * @param string $exception
+     *
+     * @throws \InvalidArgumentException
+     *
+     * @return $this
+     */
+    public function setException($exception) {
+        if (!is_a($exception, CValidation_Exception::class, true)) {
+            throw new InvalidArgumentException(
+                sprintf('Exception [%s] is invalid. It must extend [%s].', $exception, CValidation_Exception::class)
+            );
+        }
+
+        $this->exception = $exception;
+
+        return $this;
+    }
+
+    /**
      * Get the Translator implementation.
      *
      * @return CTranslation_Translator
@@ -1246,5 +1502,14 @@ class CValidation_Validator {
         $flattenMessages = carr::flatten($messages);
 
         return c::collect($flattenMessages)->implode(',');
+    }
+
+    /**
+     * Alias of method passes.
+     *
+     * @return array
+     */
+    public function check() {
+        return $this->passes();
     }
 }

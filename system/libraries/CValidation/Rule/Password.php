@@ -4,7 +4,7 @@ use Illuminate\Container\Container;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Contracts\Validation\UncompromisedVerifier;
 
-class Password implements CValidation_RuleInterface, CValidation_Contract_DataAwareRuleInterface, CValidation_Contract_ValidatorAwareRuleInterface {
+class CValidation_Rule_Password implements CValidation_RuleInterface, CValidation_Contract_DataAwareRuleInterface, CValidation_Contract_ValidatorAwareRuleInterface {
     use CTrait_Conditionable;
 
     /**
