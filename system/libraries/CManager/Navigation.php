@@ -2,12 +2,6 @@
 
 defined('SYSPATH') or die('No direct access allowed.');
 
-/**
- * @author Hery Kurniawan
- * @license Ittron Global Teknologi <ittron.co.id>
- *
- * @since Sep 3, 2018, 6:30:35 PM
- */
 class CManager_Navigation {
     public static function setNavigationCallback(callable $navigationCallback) {
         CApp_Navigation_Data::setNavigationCallback($navigationCallback);

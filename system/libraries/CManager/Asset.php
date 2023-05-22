@@ -143,19 +143,18 @@ class CManager_Asset {
         if ($documentReady) {
             $js = 'jQuery(document).ready(function(){' . $js . '});';
         }
-        $js .= "
-            if (typeof cappStartedEventInitilized === 'undefined') {
-                cappStartedEventInitilized=false;
-             }
-            if(!cappStartedEventInitilized) {
-                var evt = document.createEvent('Events');
-                evt.initEvent('capp-started', false, true, window, 0);
-                cappStartedEventInitilized=true;
-                document.dispatchEvent(evt);
-            }
+        // $js .= "
+        //     if (typeof cappStartedEventInitilized === 'undefined') {
+        //         cappStartedEventInitilized=false;
+        //      }
+        //     if(!cappStartedEventInitilized) {
+        //         var evt = document.createEvent('Events');
+        //         evt.initEvent('capp-started', false, true, window, 0);
+        //         cappStartedEventInitilized=true;
+        //         document.dispatchEvent(evt);
+        //     }
 
-
-        ";
+        // ";
 
         $js .= CJavascript::compile();
         $bar = CDebug::bar();
