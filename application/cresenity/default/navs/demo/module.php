@@ -11,6 +11,11 @@ return [
         'uri' => 'demo/module/transform/index',
     ],
     [
+        'name' => 'module.validation',
+        'label' => c::__('Validation'),
+        'uri' => 'demo/module/validation/index',
+    ],
+    [
         'name' => 'module.color',
         'label' => c::__('Color'),
         'uri' => 'demo/module/color/index',
