@@ -15,6 +15,7 @@ class CElement_Component_DataTable extends CElement_Component {
         CElement_Component_DataTable_Trait_CheckboxTrait,
         CElement_Component_DataTable_Trait_SearchTrait,
         CElement_Component_DataTable_Trait_FooterTrait;
+
     const ACTION_LOCATION_FIRST = 'first';
 
     const ACTION_LOCATION_LAST = 'last';
@@ -239,7 +240,7 @@ class CElement_Component_DataTable extends CElement_Component {
         $this->scrollX = false;
         $this->scrollY = false;
 
-        $this->infoText = clang::__('Showing') . ' _START_ ' . clang::__('to') . ' _END_ ' . clang::__('of') . ' _TOTAL_ ' . clang::__('entries') . '';
+        $this->infoText = c::__('Showing') . ' _START_ ' . c::__('to') . ' _END_ ' . c::__('of') . ' _TOTAL_ ' . c::__('entries') . '';
         c::manager()->registerModule('jquery.datatable');
 
         //read theme data

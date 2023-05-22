@@ -62,11 +62,11 @@ class CElement_FormInput_File extends CElement_FormInput {
             $html->appendln('<div class="fileupload ' . $add_class . '" data-provides="fileupload">');
             $html->appendln('	<div class="input-group">');
             $html->appendln('		<div class="uneditable-input span3"><i class="icon-file fileupload-exists"></i> <span class="fileupload-preview">' . $this->value . '</span></div>');
-            $html->appendln('		<span class="btn btn-file"><span class="fileupload-new">' . clang::__('Select file') . '</span><span class="fileupload-exists">' . clang::__('Change') . '</span>');
+            $html->appendln('		<span class="btn btn-file"><span class="fileupload-new">' . c::__('Select file') . '</span><span class="fileupload-exists">' . c::__('Change') . '</span>');
         }
         $html->appendln('			<input type="file" name="' . $name . '" id="' . $this->id . '" class="file' . $classes . $this->validation->validation_class() . '"' . $custom_css . $disabled . $multiple . ' />')->incIndent()->br();
         if ($this->applyjs == 'file-upload') {
-            $html->appendln('		</span><a href="#" class="btn remove fileupload-exists" data-dismiss="fileupload">' . clang::__('Remove') . '</a>');
+            $html->appendln('		</span><a href="#" class="btn remove fileupload-exists" data-dismiss="fileupload">' . c::__('Remove') . '</a>');
             $html->appendln('	</div>');
             $html->appendln('</div>');
         }
