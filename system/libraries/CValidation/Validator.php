@@ -7,7 +7,7 @@ defined('SYSPATH') or die('No direct access allowed.');
  */
 use Symfony\Component\HttpFoundation\File\UploadedFile;
 
-class CValidation_Validator {
+class CValidation_Validator implements CValidation_Contract_ValidatorInterface {
     use CTrait_Compat_Validation_Validator,
         CValidation_Trait_ValidateAttributeTrait,
         CValidation_Trait_FormatMessageTrait;

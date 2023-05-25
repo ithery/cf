@@ -17,6 +17,7 @@ class CElement_Component_CountDownTimer extends CElement_Component {
     protected $autoStart;
 
     protected $displayFormat;
+
     public function __construct($id = null) {
         parent::__construct($id);
         $this->expiredDate = c::now()->addHours(1);

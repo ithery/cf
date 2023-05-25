@@ -10,14 +10,39 @@ defined('SYSPATH') or die('No direct access allowed.');
  */
 class CValidation_Rule {
     /**
-     * Get a dimensions constraint builder instance.
+     * Create a new conditional rule set.
      *
-     * @param array $constraints
+     * @param callable|bool         $condition
+     * @param array|string|\Closure $rules
+     * @param array|string|\Closure $defaultRules
      *
-     * @return CValidation_Rule_Dimension
+     * @return \CValidation_ConditionalRules
      */
-    public static function dimensions(array $constraints = []) {
-        return new CValidation_Rule_Dimension($constraints);
+    public static function when($condition, $rules, $defaultRules = []) {
+        return new CValidation_ConditionalRules($condition, $rules, $defaultRules);
+    }
+
+    /**
+     * Create a new nested rule set.
+     *
+     * @param callable $callback
+     *
+     * @return \CValidation_NestedRules
+     */
+    public static function forEach($callback) {
+        return new CValidation_NestedRules($callback);
+    }
+
+    /**
+     * Get a unique constraint builder instance.
+     *
+     * @param string $table
+     * @param string $column
+     *
+     * @return CValidation_Rule_Unique
+     */
+    public static function unique($table, $column = 'NULL') {
+        return new CValidation_Rule_Unique($table, $column);
     }
 
     /**
@@ -74,15 +99,54 @@ class CValidation_Rule {
     }
 
     /**
-     * Get a unique constraint builder instance.
+     * Get a exclude_if constraint builder instance.
      *
-     * @param string $table
-     * @param string $column
+     * @param callable|bool $callback
      *
-     * @return CValidation_Rule_Unique
+     * @return CValidation_Rule_ExcludeIf
      */
-    public static function unique($table, $column = 'NULL') {
-        return new CValidation_Rule_Unique($table, $column);
+    public static function excludeIf($callback) {
+        return new CValidation_Rule_ExcludeIf($callback);
+    }
+
+    /**
+     * Get a prohibited_if constraint builder instance.
+     *
+     * @param callable|bool $callback
+     *
+     * @return \CValidation_Rule_ProhibitedIf
+     */
+    public static function prohibitedIf($callback) {
+        return new CValidation_Rule_ProhibitedIf($callback);
+    }
+
+    /**
+     * Get a file constraint builder instance.
+     *
+     * @return \CValidation_Rule_File
+     */
+    public static function file() {
+        return new CValidation_Rule_File();
+    }
+
+    /**
+     * Get an image file constraint builder instance.
+     *
+     * @return \CValidation_Rule_ImageFile
+     */
+    public static function imageFile() {
+        return new CValidation_Rule_ImageFile();
+    }
+
+    /**
+     * Get a dimensions constraint builder instance.
+     *
+     * @param array $constraints
+     *
+     * @return CValidation_Rule_Dimension
+     */
+    public static function dimensions(array $constraints = []) {
+        return new CValidation_Rule_Dimension($constraints);
     }
 
     /**
