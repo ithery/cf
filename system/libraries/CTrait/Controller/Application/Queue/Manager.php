@@ -1,7 +1,11 @@
 <?php
 
 trait CTrait_Controller_Application_Queue_Manager {
-    public function manager() {
+    public function manager($method = null, $arg = null) {
+        if ($method == 'purge') {
+            return $this->managerPurge($arg);
+        }
+
         $app = c::app();
 
         $configData = c::collect(CF::config('queue.connections'));
@@ -48,13 +52,13 @@ trait CTrait_Controller_Application_Queue_Manager {
             $canPurges = ['database'];
             $element->setVisibility(in_array(carr::get($row, 'driver'), $canPurges));
             $element->setLabel('Purge')->addClass('btn-primary');
-            $element->setLink($this->controllerUrl() . 'purge/{connection}')->setConfirm();
+            $element->setLink($this->controllerUrl() . 'manager/purge/{connection}')->setConfirm();
         });
 
         return $app;
     }
 
-    public function purge($key) {
+    public function managerPurge($key) {
         $configData = c::collect(CF::config('queue.connections'));
         $queueConfig = carr::get($configData, $key);
         if ($queueConfig) {
@@ -63,6 +67,7 @@ trait CTrait_Controller_Application_Queue_Manager {
 
             try {
                 c::db($connection)->table($table)->truncate();
+                c::msg('success', 'Succesfully Purge ' . $key);
             } catch (Exception $ex) {
             }
         }

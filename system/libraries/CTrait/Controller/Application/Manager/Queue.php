@@ -1,5 +1,8 @@
 <?php
-
+/**
+ * @see CTrait_Controller_Application_Queue_Manager
+ * @deprecated since 1.6, use CTrait_Controller_Application_Queue_Manager with method manager
+ */
 trait CTrait_Controller_Application_Manager_Queue {
     protected function getTitle() {
         return 'Service Manager';
