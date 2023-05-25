@@ -1,6 +1,6 @@
 <?php
 
-final class CAuth_Manager {
+final class CAuth_Manager implements CAuth_Contract_AuthFactory {
     use CAuth_Concern_CreateUserProvider;
 
     /**
