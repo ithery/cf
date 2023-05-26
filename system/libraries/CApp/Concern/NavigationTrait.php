@@ -43,7 +43,9 @@ trait CApp_Concern_NavigationTrait {
             if ($fileNav != null) {
                 $nav = include $fileNav;
             } else {
-                throw new Exception('nav ' . $nav . ' is not found');
+                if ($nav !== 'nav') {
+                    throw new Exception('nav ' . $nav . ' is not found');
+                }
             }
         }
         if ($this->resolvedNavName == null) {

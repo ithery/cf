@@ -11,9 +11,9 @@ defined('SYSPATH') or die('No direct access allowed.');
 trait CApp_Concern_ViewTrait {
     protected static $viewCallback;
 
-    private $viewName = 'capp/page';
+    private $viewName = 'cresenity/capp/page';
 
-    private $viewLoginName = 'capp/login';
+    private $viewLoginName = 'cresenity/capp/login';
 
     /**
      * View.
