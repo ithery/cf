@@ -3,14 +3,7 @@
 defined('SYSPATH') or die('No direct access allowed.');
 
 /**
- * @author Hery Kurniawan
- * @license Ittron Global Teknologi <ittron.co.id>
- *
- * @since Aug 22, 2018, 3:12:42 PM
- */
-
-/**
- * Indicates that a DataCollector provides some assets
+ * Indicates that a DataCollector provides some assets.
  */
 interface CDebug_DataCollector_AssetProviderInterface {
     /**
@@ -22,7 +15,7 @@ interface CDebug_DataCollector_AssetProviderInterface {
      *  - inline_css: an array map of content ID to inline CSS content (not including <style> tag)
      *  - inline_js: an array map of content ID to inline JS content (not including <script> tag)
      *  - inline_head: an array map of content ID to arbitrary inline HTML content (typically
-     *        <style>/<script> tags); it must be embedded within the <head> element
+     *        <style>/<script> tags); it must be embedded within the <head> element.
      *
      * All keys are optional.
      *

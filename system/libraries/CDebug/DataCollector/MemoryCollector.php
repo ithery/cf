@@ -3,17 +3,11 @@
 defined('SYSPATH') or die('No direct access allowed.');
 
 /**
- * @author Hery Kurniawan
- * @license Ittron Global Teknologi <ittron.co.id>
- *
- * @since Aug 22, 2018, 5:04:48 PM
- */
-
-/**
- * Collects info about memory usage
+ * Collects info about memory usage.
  */
 class CDebug_DataCollector_MemoryCollector extends CDebug_DataCollector implements CDebug_Bar_Interface_RenderableInterface {
     protected $realUsage = false;
+
     protected $peakUsage = 0;
 
     /**
@@ -37,16 +31,16 @@ class CDebug_DataCollector_MemoryCollector extends CDebug_DataCollector implemen
     }
 
     /**
-     * Returns the peak memory usage
+     * Returns the peak memory usage.
      *
-     * @return integer
+     * @return int
      */
     public function getPeakUsage() {
         return $this->peakUsage;
     }
 
     /**
-     * Updates the peak memory usage value
+     * Updates the peak memory usage value.
      */
     public function updatePeakUsage() {
         $this->peakUsage = memory_get_peak_usage($this->realUsage);
@@ -57,6 +51,7 @@ class CDebug_DataCollector_MemoryCollector extends CDebug_DataCollector implemen
      */
     public function collect() {
         $this->updatePeakUsage();
+
         return [
             'peak_usage' => $this->peakUsage,
             'peak_usage_str' => $this->getDataFormatter()->formatBytes($this->peakUsage)

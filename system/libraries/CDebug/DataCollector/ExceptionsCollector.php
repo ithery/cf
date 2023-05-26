@@ -2,23 +2,18 @@
 
 defined('SYSPATH') or die('No direct access allowed.');
 
-/**
- * @author Hery Kurniawan
- * @license Ittron Global Teknologi <ittron.co.id>
- *
- * @since Aug 22, 2018, 5:03:16 PM
- */
 use Symfony\Component\Debug\Exception\FatalThrowableError;
 
 /**
- * Collects info about exceptions
+ * Collects info about exceptions.
  */
 class CDebug_DataCollector_ExceptionsCollector extends CDebug_DataCollector implements CDebug_Bar_Interface_RenderableInterface {
     protected $exceptions = [];
+
     protected $chainExceptions = false;
 
     /**
-     * Adds an exception to be profiled in the debug bar
+     * Adds an exception to be profiled in the debug bar.
      *
      * @param Exception $e
      *
@@ -29,7 +24,7 @@ class CDebug_DataCollector_ExceptionsCollector extends CDebug_DataCollector impl
     }
 
     /**
-     * Adds a Throwable to be profiled in the debug bar
+     * Adds a Throwable to be profiled in the debug bar.
      *
      * @param \Throwable $e
      */
@@ -50,7 +45,7 @@ class CDebug_DataCollector_ExceptionsCollector extends CDebug_DataCollector impl
     }
 
     /**
-     * Returns the list of exceptions being profiled
+     * Returns the list of exceptions being profiled.
      *
      * @return array[\Throwable]
      */
@@ -66,7 +61,7 @@ class CDebug_DataCollector_ExceptionsCollector extends CDebug_DataCollector impl
     }
 
     /**
-     * Returns exception data as an array
+     * Returns exception data as an array.
      *
      * @param Exception $e
      *
@@ -79,7 +74,7 @@ class CDebug_DataCollector_ExceptionsCollector extends CDebug_DataCollector impl
     }
 
     /**
-     * Returns Throwable data as an array
+     * Returns Throwable data as an array.
      *
      * @param \Throwable $e
      *
@@ -94,6 +89,7 @@ class CDebug_DataCollector_ExceptionsCollector extends CDebug_DataCollector impl
         } else {
             $lines = ["Cannot open the file ($filePath) in which the exception occurred "];
         }
+
         return [
             'type' => get_class($e),
             'message' => $e->getMessage(),

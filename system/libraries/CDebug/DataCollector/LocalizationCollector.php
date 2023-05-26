@@ -3,18 +3,11 @@
 defined('SYSPATH') or die('No direct access allowed.');
 
 /**
- * @author Hery Kurniawan
- * @license Ittron Global Teknologi <ittron.co.id>
- *
- * @since Aug 22, 2018, 5:08:47 PM
- */
-
-/**
- * Collects info about the current localization state
+ * Collects info about the current localization state.
  */
 class CDebug_DataCollector_LocalizationCollector extends CDebug_DataCollector implements CDebug_Bar_Interface_RenderableInterface {
     /**
-     * Get the current locale
+     * Get the current locale.
      *
      * @return string
      */
@@ -23,7 +16,7 @@ class CDebug_DataCollector_LocalizationCollector extends CDebug_DataCollector im
     }
 
     /**
-     * Get the current domain
+     * Get the current domain.
      *
      * @return string
      */

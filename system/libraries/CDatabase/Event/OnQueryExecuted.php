@@ -30,6 +30,20 @@ class CDatabase_Event_OnQueryExecuted {
     public $rowsCount;
 
     /**
+     * The database connection instance.
+     *
+     * @var \CDatabase
+     */
+    public $connection;
+
+    /**
+     * The database connection name.
+     *
+     * @var string
+     */
+    public $connectionName;
+
+    /**
      * Create a new event instance.
      *
      * @param string    $sql

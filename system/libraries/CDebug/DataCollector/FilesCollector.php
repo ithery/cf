@@ -2,17 +2,11 @@
 
 defined('SYSPATH') or die('No direct access allowed.');
 
-/**
- * @author Hery Kurniawan
- * @license Ittron Global Teknologi <ittron.co.id>
- *
- * @since Aug 22, 2018, 4:18:26 PM
- */
 class CDebug_DataCollector_FilesCollector extends CDebug_DataCollector implements CDebug_Bar_Interface_RenderableInterface {
     const BASE_PATH = DOCROOT;
 
     /**
-     * {@inheritDoc}
+     * @inheritDoc
      */
     public function collect() {
         $files = $this->getIncludedFiles();
@@ -45,7 +39,7 @@ class CDebug_DataCollector_FilesCollector extends CDebug_DataCollector implement
     }
 
     /**
-     * Remove the basePath from the paths, so they are relative to the base
+     * Remove the basePath from the paths, so they are relative to the base.
      *
      * @param $path
      *
@@ -56,10 +50,11 @@ class CDebug_DataCollector_FilesCollector extends CDebug_DataCollector implement
     }
 
     /**
-     * {@inheritDoc}
+     * @inheritDoc
      */
     public function getWidgets() {
         $name = $this->getName();
+
         return [
             "$name" => [
                 'icon' => 'files-o',
@@ -75,7 +70,7 @@ class CDebug_DataCollector_FilesCollector extends CDebug_DataCollector implement
     }
 
     /**
-     * {@inheritDoc}
+     * @inheritDoc
      */
     public function getName() {
         return 'files';
