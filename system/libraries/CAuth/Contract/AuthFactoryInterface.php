@@ -1,6 +1,6 @@
 <?php
 
-interface CAuth_Contract_AuthFactory {
+interface CAuth_Contract_AuthFactoryInterface {
     /**
      * Get a guard instance by name.
      *
