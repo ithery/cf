@@ -339,10 +339,10 @@ class c {
      */
     public static function logger($message = null, array $context = []) {
         if (is_null($message)) {
-            return CLogger::instance();
+            return CLogger::logger();
         }
 
-        return CLogger::instance()->debug($message, $context);
+        return CLogger::logger()->debug($message, $context);
     }
 
     //@codingStandardsIgnoreEnd
