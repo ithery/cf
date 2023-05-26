@@ -1,5 +1,8 @@
 <?php
 //@codingStandardsIgnoreStart
+/**
+ * @deprecated since 1.6, use c::log()
+ */
 class clog {
     const EMERGENCY = LOG_EMERG;    // 0
 
@@ -212,56 +215,46 @@ class clog {
      * </pre>.
      *
      * @param array/string $options
+     * @param mixed $message
      *
      * @return bool
      */
-    public static function write($options) {
-        $clogger_instance = CLogger::instance();
+    public static function write($message) {
         $level = CLogger::INFO;
-        $message = $options;
-        $param = [];
-        if (is_array($options)) {
-            $message = carr::get($options, 'message');
-            $filename = carr::get($options, 'filename');
-            $level = carr::get($options, 'level');
-            $path = carr::get($options, 'path');
 
-            $param['path'] = $path;
-        }
-
-        return $clogger_instance->add($level, $message);
+        return CLogger::logger()->log($level, $message);
     }
 
     public static function emergency($message) {
-        return CLogger::instance()->add(CLogger::EMERGENCY, $message);
+        return CLogger::logger()->emergency($message);
     }
 
     public static function alert($message) {
-        return CLogger::instance()->add(CLogger::ALERT, $message);
+        return CLogger::logger()->alert($message);
     }
 
     public static function critical($message) {
-        return CLogger::instance()->add(CLogger::CRITICAL, $message);
+        return CLogger::logger()->critical($message);
     }
 
     public static function error($message) {
-        return CLogger::instance()->add(CLogger::ERROR, $message);
+        return CLogger::logger()->error($message);
     }
 
     public static function warning($message) {
-        return CLogger::instance()->add(CLogger::WARNING, $message);
+        return CLogger::logger()->warning($message);
     }
 
     public static function notice($message) {
-        return CLogger::instance()->add(CLogger::NOTICE, $message);
+        return CLogger::logger()->notice($message);
     }
 
     public static function info($message) {
-        return CLogger::instance()->add(CLogger::INFO, $message);
+        return CLogger::logger()->info($message);
     }
 
     public static function debug($message) {
-        return CLogger::instance()->add(CLogger::DEBUG, $message);
+        return CLogger::logger()->debug($message);
     }
 
     public static function login_fail($username, $password, $error_message) {

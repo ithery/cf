@@ -1,12 +1,6 @@
 <?php
 
-defined('SYSPATH') or die('No direct access allowed.');
-/**
- * @deprecated 1.6 use CParser_Sql
- */
-//@codingStandardsIgnoreStart
-class CSql_Formatter {
-    // Constants for token types
+class CParser_Sql_SqlFormatter {
     const TOKEN_TYPE_WHITESPACE = 0;
 
     const TOKEN_TYPE_WORD = 1;
@@ -214,11 +208,11 @@ class CSql_Formatter {
         arsort($reservedMap);
         self::$reserved = array_keys($reservedMap);
         // Set up regular expressions
-        self::$regex_boundaries = '(' . implode('|', array_map([__CLASS__, 'quote_regex'], self::$boundaries)) . ')';
-        self::$regex_reserved = '(' . implode('|', array_map([__CLASS__, 'quote_regex'], self::$reserved)) . ')';
-        self::$regex_reserved_toplevel = str_replace(' ', '\\s+', '(' . implode('|', array_map([__CLASS__, 'quote_regex'], self::$reserved_toplevel)) . ')');
-        self::$regex_reserved_newline = str_replace(' ', '\\s+', '(' . implode('|', array_map([__CLASS__, 'quote_regex'], self::$reserved_newline)) . ')');
-        self::$regex_function = '(' . implode('|', array_map([__CLASS__, 'quote_regex'], self::$functions)) . ')';
+        self::$regex_boundaries = '(' . implode('|', array_map([__CLASS__, 'quoteRegex'], self::$boundaries)) . ')';
+        self::$regex_reserved = '(' . implode('|', array_map([__CLASS__, 'quoteRegex'], self::$reserved)) . ')';
+        self::$regex_reserved_toplevel = str_replace(' ', '\\s+', '(' . implode('|', array_map([__CLASS__, 'quoteRegex'], self::$reserved_toplevel)) . ')');
+        self::$regex_reserved_newline = str_replace(' ', '\\s+', '(' . implode('|', array_map([__CLASS__, 'quoteRegex'], self::$reserved_newline)) . ')');
+        self::$regex_function = '(' . implode('|', array_map([__CLASS__, 'quoteRegex'], self::$functions)) . ')';
         self::$init = true;
     }
 
@@ -277,9 +271,8 @@ class CSql_Formatter {
             // If the variable name is quoted
             if ($string[1] === '"' || $string[1] === '\'' || $string[1] === '`') {
                 $ret[self::TOKEN_VALUE] = $string[0] . self::getQuotedString(substr($string, 1));
-            }
-            // Non-quoted variable name
-            else {
+            } else {
+                // Non-quoted variable name
                 preg_match('/^(' . $string[0] . '[a-zA-Z0-9\._\$]+)/', $string, $matches);
                 if ($matches) {
                     $ret[self::TOKEN_VALUE] = $matches[1];
@@ -563,9 +556,8 @@ class CSql_Formatter {
                     // Add a newline after the parentheses
                     $newline = true;
                 }
-            }
-            // Closing parentheses decrease the block indent level
-            elseif ($token[self::TOKEN_VALUE] === ')') {
+            } elseif ($token[self::TOKEN_VALUE] === ')') {
+                // Closing parentheses decrease the block indent level
                 // Remove whitespace before the closing parentheses
                 $return = rtrim($return, ' ');
                 $indent_level--;
@@ -590,9 +582,8 @@ class CSql_Formatter {
                 if (!$added_newline) {
                     $return .= "\n" . str_repeat($tab, $indent_level);
                 }
-            }
-            // Top level reserved words start a new line and increase the special indent level
-            elseif ($token[self::TOKEN_TYPE] === self::TOKEN_TYPE_RESERVED_TOPLEVEL) {
+            } elseif ($token[self::TOKEN_TYPE] === self::TOKEN_TYPE_RESERVED_TOPLEVEL) {
+                // Top level reserved words start a new line and increase the special indent level
                 $increase_special_indent = true;
                 // If the last indent type was 'special', decrease the special indent for this round
                 reset($indent_types);
@@ -605,9 +596,8 @@ class CSql_Formatter {
                 // Add a newline before the top level reserved word (if not already added)
                 if (!$added_newline) {
                     $return .= "\n" . str_repeat($tab, $indent_level);
-                }
-                // If we already added a newline, redo the indentation since it may be different now
-                else {
+                } else {
+                    // If we already added a newline, redo the indentation since it may be different now
                     $return = rtrim($return, $tab) . str_repeat($tab, $indent_level);
                 }
                 // If the token may have extra whitespace
@@ -618,25 +608,21 @@ class CSql_Formatter {
                 if ($token[self::TOKEN_VALUE] === 'LIMIT' && !$inline_parentheses) {
                     $clause_limit = true;
                 }
-            }
-            // Checks if we are out of the limit clause
-            elseif ($clause_limit && $token[self::TOKEN_VALUE] !== ',' && $token[self::TOKEN_TYPE] !== self::TOKEN_TYPE_NUMBER && $token[self::TOKEN_TYPE] !== self::TOKEN_TYPE_WHITESPACE) {
+            } elseif ($clause_limit && $token[self::TOKEN_VALUE] !== ',' && $token[self::TOKEN_TYPE] !== self::TOKEN_TYPE_NUMBER && $token[self::TOKEN_TYPE] !== self::TOKEN_TYPE_WHITESPACE) {
+                // Checks if we are out of the limit clause
                 $clause_limit = false;
-            }
-            // Commas start a new line (unless within inline parentheses or SQL 'LIMIT' clause)
-            elseif ($token[self::TOKEN_VALUE] === ',' && !$inline_parentheses) {
-                //If the previous TOKEN_VALUE is 'LIMIT', resets new line
+            } elseif ($token[self::TOKEN_VALUE] === ',' && !$inline_parentheses) {
+                // Commas start a new line (unless within inline parentheses or SQL 'LIMIT' clause)
+                // If the previous TOKEN_VALUE is 'LIMIT', resets new line
                 if ($clause_limit === true) {
                     $newline = false;
                     $clause_limit = false;
-                }
-                // All other cases of commas
-                else {
+                } else {
+                    // All other cases of commas
                     $newline = true;
                 }
-            }
-            // Newline reserved words start a new line
-            elseif ($token[self::TOKEN_TYPE] === self::TOKEN_TYPE_RESERVED_NEWLINE) {
+            } elseif ($token[self::TOKEN_TYPE] === self::TOKEN_TYPE_RESERVED_NEWLINE) {
+                // Newline reserved words start a new line
                 // Add a newline before the reserved word (if not already added)
                 if (!$added_newline) {
                     $return .= "\n" . str_repeat($tab, $indent_level);
@@ -645,9 +631,8 @@ class CSql_Formatter {
                 if (strpos($token[self::TOKEN_VALUE], ' ') !== false || strpos($token[self::TOKEN_VALUE], "\n") !== false || strpos($token[self::TOKEN_VALUE], "\t") !== false) {
                     $highlighted = preg_replace('/\s+/', ' ', $highlighted);
                 }
-            }
-            // Multiple boundary characters in a row should not have spaces between them (not including parentheses)
-            elseif ($token[self::TOKEN_TYPE] === self::TOKEN_TYPE_BOUNDARY) {
+            } elseif ($token[self::TOKEN_TYPE] === self::TOKEN_TYPE_BOUNDARY) {
+                // Multiple boundary characters in a row should not have spaces between them (not including parentheses)
                 if (isset($tokens[$i - 1]) && $tokens[$i - 1][self::TOKEN_TYPE] === self::TOKEN_TYPE_BOUNDARY) {
                     if (isset($original_tokens[$token['i'] - 1]) && $original_tokens[$token['i'] - 1][self::TOKEN_TYPE] !== self::TOKEN_TYPE_WHITESPACE) {
                         $return = rtrim($return, ' ');
@@ -776,9 +761,8 @@ class CSql_Formatter {
             // Skip comment tokens
             if ($token[self::TOKEN_TYPE] === self::TOKEN_TYPE_COMMENT || $token[self::TOKEN_TYPE] === self::TOKEN_TYPE_BLOCK_COMMENT) {
                 continue;
-            }
-            // Remove extra whitespace in reserved words (e.g "OUTER     JOIN" becomes "OUTER JOIN")
-            elseif ($token[self::TOKEN_TYPE] === self::TOKEN_TYPE_RESERVED || $token[self::TOKEN_TYPE] === self::TOKEN_TYPE_RESERVED_NEWLINE || $token[self::TOKEN_TYPE] === self::TOKEN_TYPE_RESERVED_TOPLEVEL) {
+            } elseif ($token[self::TOKEN_TYPE] === self::TOKEN_TYPE_RESERVED || $token[self::TOKEN_TYPE] === self::TOKEN_TYPE_RESERVED_NEWLINE || $token[self::TOKEN_TYPE] === self::TOKEN_TYPE_RESERVED_TOPLEVEL) {
+                // Remove extra whitespace in reserved words (e.g "OUTER     JOIN" becomes "OUTER JOIN")
                 $token[self::TOKEN_VALUE] = preg_replace('/\s+/', ' ', $token[self::TOKEN_VALUE]);
             }
             if ($token[self::TOKEN_TYPE] === self::TOKEN_TYPE_WHITESPACE) {
@@ -808,7 +792,7 @@ class CSql_Formatter {
      */
     protected static function highlightToken($token) {
         $type = $token[self::TOKEN_TYPE];
-        if (self::is_cli()) {
+        if (self::isCli()) {
             $token = $token[self::TOKEN_VALUE];
         } else {
             if (defined('ENT_IGNORE')) {
@@ -850,7 +834,7 @@ class CSql_Formatter {
      * @return string HTML code of the highlighted token
      */
     protected static function highlightQuote($value) {
-        if (self::is_cli()) {
+        if (self::isCli()) {
             return self::$cli_quote . $value . "\x1b[0m";
         } else {
             return '<span ' . self::$quote_attributes . '>' . $value . '</span>';
@@ -865,7 +849,7 @@ class CSql_Formatter {
      * @return string HTML code of the highlighted token
      */
     protected static function highlightBacktickQuote($value) {
-        if (self::is_cli()) {
+        if (self::isCli()) {
             return self::$cli_backtick_quote . $value . "\x1b[0m";
         } else {
             return '<span ' . self::$backtick_quote_attributes . '>' . $value . '</span>';
@@ -880,7 +864,7 @@ class CSql_Formatter {
      * @return string HTML code of the highlighted token
      */
     protected static function highlightReservedWord($value) {
-        if (self::is_cli()) {
+        if (self::isCli()) {
             return self::$cli_reserved . $value . "\x1b[0m";
         } else {
             return '<span ' . self::$reserved_attributes . '>' . $value . '</span>';
@@ -898,7 +882,7 @@ class CSql_Formatter {
         if ($value === '(' || $value === ')') {
             return $value;
         }
-        if (self::is_cli()) {
+        if (self::isCli()) {
             return self::$cli_boundary . $value . "\x1b[0m";
         } else {
             return '<span ' . self::$boundary_attributes . '>' . $value . '</span>';
@@ -913,7 +897,7 @@ class CSql_Formatter {
      * @return string HTML code of the highlighted token
      */
     protected static function highlightNumber($value) {
-        if (self::is_cli()) {
+        if (self::isCli()) {
             return self::$cli_number . $value . "\x1b[0m";
         } else {
             return '<span ' . self::$number_attributes . '>' . $value . '</span>';
@@ -928,7 +912,7 @@ class CSql_Formatter {
      * @return string HTML code of the highlighted token
      */
     protected static function highlightError($value) {
-        if (self::is_cli()) {
+        if (self::isCli()) {
             return self::$cli_error . $value . "\x1b[0m";
         } else {
             return '<span ' . self::$error_attributes . '>' . $value . '</span>';
@@ -943,7 +927,7 @@ class CSql_Formatter {
      * @return string HTML code of the highlighted token
      */
     protected static function highlightComment($value) {
-        if (self::is_cli()) {
+        if (self::isCli()) {
             return self::$cli_comment . $value . "\x1b[0m";
         } else {
             return '<span ' . self::$comment_attributes . '>' . $value . '</span>';
@@ -958,7 +942,7 @@ class CSql_Formatter {
      * @return string HTML code of the highlighted token
      */
     protected static function highlightWord($value) {
-        if (self::is_cli()) {
+        if (self::isCli()) {
             return self::$cli_word . $value . "\x1b[0m";
         } else {
             return '<span ' . self::$word_attributes . '>' . $value . '</span>';
@@ -973,7 +957,7 @@ class CSql_Formatter {
      * @return string HTML code of the highlighted token
      */
     protected static function highlightVariable($value) {
-        if (self::is_cli()) {
+        if (self::isCli()) {
             return self::$cli_variable . $value . "\x1b[0m";
         } else {
             return '<span ' . self::$variable_attributes . '>' . $value . '</span>';
@@ -987,7 +971,7 @@ class CSql_Formatter {
      *
      * @return string The quoted string
      */
-    private static function quote_regex($a) {
+    private static function quoteRegex($a) {
         return preg_quote($a, '/');
     }
 
@@ -999,7 +983,7 @@ class CSql_Formatter {
      * @return string The quoted string
      */
     private static function output($string) {
-        if (self::is_cli()) {
+        if (self::isCli()) {
             return $string . "\n";
         } else {
             $string = trim($string);
@@ -1011,7 +995,7 @@ class CSql_Formatter {
         }
     }
 
-    private static function is_cli() {
+    private static function isCli() {
         if (isset(self::$cli)) {
             return self::$cli;
         } else {
