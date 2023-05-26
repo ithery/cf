@@ -1,9 +1,20 @@
 <?php
 
 //@codingStandardsIgnoreStart
+/**
+ * @deprecated 1.6, use CEmail
+ */
 class cmailapi {
     /**
      * @deprecated since 1.2 use CEmail
+     *
+     * @param mixed $to
+     * @param mixed $subject
+     * @param mixed $message
+     * @param mixed $attachments
+     * @param mixed $cc
+     * @param mixed $bcc
+     * @param mixed $options
      */
     public static function sendgridv3($to, $subject, $message, $attachments = [], $cc = [], $bcc = [], $options = []) {
         $options['driver'] = 'sendgrid';
@@ -214,11 +225,20 @@ class cmailapi {
         if ($response->statusCode() > 400) {
             throw new Exception('Fail to send mail, API Response:(' . $response->statusCode() . ')' . $response->body());
         }
+
         return $response;
     }
 
     /**
      * @deprecated since 1.2 use CEmail
+     *
+     * @param mixed $to
+     * @param mixed $subject
+     * @param mixed $message
+     * @param mixed $attachments
+     * @param mixed $cc
+     * @param mixed $bcc
+     * @param mixed $options
      */
     public static function sendgrid($to, $subject, $message, $attachments = [], $cc = [], $bcc = [], $options = []) {
         $options['driver'] = 'sendgrid';
@@ -383,6 +403,7 @@ class cmailapi {
         if (strlen(carr::get($response_array, 'id')) == 0) {
             throw new Exception('Fail to send mail, API Response:' . $response);
         }
+
         return $response_array;
     }
 
@@ -455,6 +476,7 @@ class cmailapi {
         } catch (Exception $ex) {
             return $ex;
         }
+
         return true;
     }
 
@@ -533,6 +555,7 @@ class cmailapi {
         } catch (Exception $ex) {
             throw $ex;
         }
+
         return true;
     }
 }

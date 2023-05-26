@@ -1,6 +1,7 @@
 <?php
 
 //@codingStandardsIgnoreStart
+
 class cutils {
     public static function indent($n, $char = "\t") {
         $res = '';

@@ -1,6 +1,9 @@
 <?php
 
 //@codingStandardsIgnoreStart
+/**
+ * @deprecated 1.6, use c::__
+ */
 class clang {
     private static $lang = null;
 

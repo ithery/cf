@@ -3,6 +3,9 @@
 defined('SYSPATH') or die('No direct access allowed.');
 
 //@codingStandardsIgnoreStart
+/**
+ * @deprecated 1.6, use CEmail
+ */
 class cmail {
     /**
      * @param string|array $to          to email

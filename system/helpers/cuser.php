@@ -11,6 +11,7 @@ class cuser {
 
     public static function hit_count($user_id) {
         $db = CDatabase::instance();
+
         return cdbutils::get_value('select count(*) from log_request where user_id=' . $db->escape($user_id));
     }
 }

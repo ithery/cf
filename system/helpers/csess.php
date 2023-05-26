@@ -2,16 +2,18 @@
 
 //@codingStandardsIgnoreStart
 /**
- * @deprecated
+ * @deprecated 1.2, use c::session()
  */
 class csess {
     public static function get($key) {
         $session = c::session();
+
         return $session->get($key);
     }
 
     public static function set($key, $val) {
         $session = CSession::instance();
+
         return $session->set($key, $val);
     }
 
@@ -25,6 +27,7 @@ class csess {
 
     public static function session_id() {
         $session = CSession::instance();
+
         return $session->id();
     }
 }

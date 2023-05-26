@@ -256,21 +256,6 @@ class CApp_Navigation_Helper {
     }
 
     /**
-     * @deprecated
-     *
-     * @param mixed $nav
-     *
-     * @return bool
-     */
-    public static function isPublic($nav) {
-        if (isset($nav['is_public']) && $nav['is_public']) {
-            return true;
-        }
-
-        return false;
-    }
-
-    /**
      * @param mixed $nav
      *
      * @return int
