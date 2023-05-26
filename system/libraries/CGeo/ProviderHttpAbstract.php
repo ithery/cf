@@ -5,10 +5,6 @@ use Http\Message\MessageFactory;
 use Psr\Http\Message\RequestInterface;
 use Http\Discovery\MessageFactoryDiscovery;
 
-/**
- * @author William Durand <william.durand1@gmail.com>
- * @author Tobias Nyholm <tobias.nyholm@gmail.com>
- */
 abstract class CGeo_ProviderHttpAbstract extends CGeo_ProviderAbstract {
     /**
      * @var HttpClient

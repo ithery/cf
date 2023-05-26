@@ -2,12 +2,6 @@
 
 defined('SYSPATH') or die('No direct access allowed.');
 
-/**
- * @author Hery Kurniawan
- * @license Ittron Global Teknologi <ittron.co.id>
- *
- * @since Aug 18, 2018, 8:24:53 PM
- */
 class CGeo_ProviderAggregator implements CGeo_Interface_GeocoderInterface {
     /**
      * @var CGeo_Interface_ProviderInterface[]
