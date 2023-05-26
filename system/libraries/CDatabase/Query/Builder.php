@@ -198,13 +198,13 @@ class CDatabase_Query_Builder {
     /**
      * The current connection.
      *
-     * @var CDatabase
+     * @var CDatabase_Connection
      */
     protected $db;
 
-    public function __construct(CDatabase $db = null) {
+    public function __construct(CDatabase_Connection $db = null) {
         if ($db == null) {
-            $db = CDatabase::instance();
+            $db = CDatabase::instance()->connection();
         }
         $this->db = $db;
         //get driver

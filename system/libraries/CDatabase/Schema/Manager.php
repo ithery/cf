@@ -28,10 +28,10 @@ abstract class CDatabase_Schema_Manager {
     /**
      * Constructor. Accepts the Connection instance to manage the schema for.
      *
-     * @param CDatabase               $conn
+     * @param CDatabase_Connection    $conn
      * @param null|CDatabase_Platform $platform
      */
-    public function __construct(CDatabase $conn, CDatabase_Platform $platform = null) {
+    public function __construct(CDatabase_Connection $conn, CDatabase_Platform $platform = null) {
         $this->db = $conn;
         $this->platform = $platform ? $platform : $this->db->getDatabasePlatform();
     }

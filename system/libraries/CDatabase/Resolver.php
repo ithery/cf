@@ -3,21 +3,6 @@
 class CDatabase_Resolver implements CDatabase_ResolverInterface {
     protected static $instance;
 
-    public static function instance($domain = null) {
-        if ($domain == null) {
-            $domain = CF::domain();
-        }
-        if (static::$instance == null) {
-            static::$instance = [];
-        }
-        if (!isset(static::$instance[$domain])) {
-            $file = CF::getFile('config', 'database', $domain);
-            $allConfig = include $file;
-            static::$instance[$domain] = new static(array_keys($allConfig), $domain);
-        }
-        return static::$instance[$domain];
-    }
-
     /**
      * All of the registered connections.
      *
@@ -38,6 +23,22 @@ class CDatabase_Resolver implements CDatabase_ResolverInterface {
      * @var string
      */
     protected $default;
+
+    public static function instance($domain = null) {
+        if ($domain == null) {
+            $domain = CF::domain();
+        }
+        if (static::$instance == null) {
+            static::$instance = [];
+        }
+        if (!isset(static::$instance[$domain])) {
+            $file = CF::getFile('config', 'database', $domain);
+            $allConfig = include $file;
+            static::$instance[$domain] = new static(array_keys($allConfig), $domain);
+        }
+
+        return static::$instance[$domain];
+    }
 
     /**
      * Create a new connection resolver instance.
@@ -65,14 +66,14 @@ class CDatabase_Resolver implements CDatabase_ResolverInterface {
      *
      * @param string $name
      *
-     * @return CDatabase
+     * @return CDatabase_Connection
      */
     public function connection($name = null) {
         if (is_null($name)) {
             $name = $this->getDefaultConnection();
         }
 
-        return CDatabase::instance($name, null, $this->domain);
+        return CDatabase::instance($name, null, $this->domain)->connection();
     }
 
     /**

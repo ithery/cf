@@ -6,7 +6,7 @@ interface CDatabase_ResolverInterface {
      *
      * @param string $name
      *
-     * @return CDatabase
+     * @return CDatabase_Connection
      */
     public function connection($name = null);
 

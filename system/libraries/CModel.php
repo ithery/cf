@@ -1354,7 +1354,7 @@ abstract class CModel implements ArrayAccess, CInterface_Arrayable, CInterface_J
     /**
      * Get the database connection for the model.
      *
-     * @return CDatabase
+     * @return CDatabase_Connection
      */
     public function getConnection() {
         return static::resolveConnection($this->getConnectionName());

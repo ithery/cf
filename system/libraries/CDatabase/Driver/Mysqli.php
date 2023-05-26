@@ -30,7 +30,7 @@ class CDatabase_Driver_Mysqli extends CDatabase_Driver_AbstractMysql {
      * @param  array  database configuration
      * @param mixed $config
      */
-    public function __construct(CDatabase $db, $config) {
+    public function __construct(CDatabase_Connection $db, $config) {
         $this->db = $db;
         $this->dbConfig = $config;
     }
@@ -289,7 +289,7 @@ class CDatabase_Driver_Mysqli extends CDatabase_Driver_AbstractMysql {
      *
      * @return CDatabase_Schema_Manager_Mysql
      */
-    public function getSchemaManager(CDatabase $db) {
+    public function getSchemaManager(CDatabase_Connection $db) {
         return new CDatabase_Schema_Manager_Mysql($db);
     }
 

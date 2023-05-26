@@ -4,12 +4,16 @@ defined('SYSPATH') or die('No direct access allowed.');
 
 use Carbon\Carbon;
 
+/**
+ * @method string lastQuery() Returns the last query run.
+ */
 class CDatabase {
     use CTrait_Compat_Database;
     use CDatabase_Trait_DetectDeadlock;
     use CDatabase_Trait_DetectLostConnection;
     use CDatabase_Trait_DetectConcurrencyErrors;
     use CDatabase_Trait_ManageTransaction;
+    use CTrait_ForwardsCalls;
 
     /**
      * Database instances.
@@ -128,6 +132,8 @@ class CDatabase {
      */
     protected $transactionManager;
 
+    protected $connection;
+
     /**
      * Sets up the database configuration, loads the CDatabase_Driver.
      *
@@ -137,6 +143,9 @@ class CDatabase {
      * @throws CDatabase_Exception
      */
     public function __construct($config = [], $domain = null) {
+        $this->connection = new CDatabase_Connection($config, $domain);
+
+        return;
         if ($domain == null) {
             $domain = CF::domain();
         }
@@ -507,15 +516,6 @@ class CDatabase {
     }
 
     /**
-     * Returns the last query run.
-     *
-     * @return string SQL
-     */
-    public function lastQuery() {
-        return $this->last_query;
-    }
-
-    /**
      * Set the last query run.
      *
      * @param mixed $sql
@@ -807,7 +807,7 @@ class CDatabase {
      */
     public function getSchemaManager() {
         if (!$this->schemaManager) {
-            $this->schemaManager = $this->driver->getSchemaManager($this);
+            $this->schemaManager = $this->driver->getSchemaManager($this->connection);
         }
 
         return $this->schemaManager;
@@ -907,7 +907,7 @@ class CDatabase {
      * @return string
      */
     public function getDatabase() {
-        return $this->driver->getDatabase($this);
+        return $this->driver->getDatabase($this->connection);
     }
 
     public function isLogQuery() {
@@ -1096,7 +1096,7 @@ class CDatabase {
      * @return CDatabase_Query_Builder
      */
     public function newQuery() {
-        return new CDatabase_Query_Builder($this);
+        return new CDatabase_Query_Builder($this->connection);
     }
 
     /**
@@ -1203,6 +1203,12 @@ class CDatabase {
 
         return $this->queryGrammar;
     }
-}
 
-// End Database Class
+    public function connection($config = [], $domain = null) {
+        return $this->connection;
+    }
+
+    public function __call($name, $arguments) {
+        return $this->forwardCallTo($this->connection, $name, $arguments);
+    }
+}
