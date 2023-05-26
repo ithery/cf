@@ -1,6 +1,10 @@
 <?php
 
 class CDatabase_Manager implements CDatabase_Contract_ConnectionResolverInterface {
+    use CTrait_Macroable {
+        __call as macroCall;
+    }
+
     protected $defaultConnection;
 
     /**
@@ -9,6 +13,20 @@ class CDatabase_Manager implements CDatabase_Contract_ConnectionResolverInterfac
      * @var array<string, \CDatabase_Connection>
      */
     protected $connections = [];
+
+    /**
+     * The callback to be executed to reconnect to a database.
+     *
+     * @var callable
+     */
+    protected $reconnector;
+
+    /**
+     * The custom connection resolvers.
+     *
+     * @var array<string, callable>
+     */
+    protected $extensions = [];
 
     private static $instance;
 
@@ -130,7 +148,7 @@ class CDatabase_Manager implements CDatabase_Contract_ConnectionResolverInterfac
         // the connection, which will allow us to reconnect from the connections.
         $connection->setReconnector($this->reconnector);
 
-        $this->registerConfiguredDoctrineTypes($connection);
+        //$this->registerConfiguredDoctrineTypes($connection);
 
         return $connection;
     }
@@ -232,8 +250,8 @@ class CDatabase_Manager implements CDatabase_Contract_ConnectionResolverInterfac
         );
 
         return $this->connections[$name]
-            ->setPdo($fresh->getRawPdo())
-            ->setReadPdo($fresh->getRawReadPdo());
+            ->setDriver($fresh->getRawDriver())
+            ->setReadDriver($fresh->getRawReadDriver());
     }
 
     /**
@@ -318,6 +336,10 @@ class CDatabase_Manager implements CDatabase_Contract_ConnectionResolverInterfac
      * @return mixed
      */
     public function __call($method, $parameters) {
+        if (static::hasMacro($method)) {
+            return $this->macroCall($method, $parameters);
+        }
+
         return $this->connection()->$method(...$parameters);
     }
 }

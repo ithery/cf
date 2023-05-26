@@ -21,7 +21,7 @@ class CDatabase_Configuration {
      *
      * @var array
      */
-    protected $_attributes = [];
+    protected $attributes = [];
 
     /**
      * Sets the SQL logger to use. Defaults to NULL which means SQL logging is disabled.
@@ -31,7 +31,7 @@ class CDatabase_Configuration {
      * @return void
      */
     public function setSQLLogger(SQLLogger $logger = null) {
-        $this->_attributes['sqlLogger'] = $logger;
+        $this->attributes['sqlLogger'] = $logger;
     }
 
     /**
@@ -40,7 +40,7 @@ class CDatabase_Configuration {
      * @return null|\Doctrine\DBAL\Logging\SQLLogger
      */
     public function getSQLLogger() {
-        return isset($this->_attributes['sqlLogger']) ? $this->_attributes['sqlLogger'] : null;
+        return isset($this->attributes['sqlLogger']) ? $this->attributes['sqlLogger'] : null;
     }
 
     /**
@@ -49,7 +49,7 @@ class CDatabase_Configuration {
      * @return null|\Doctrine\Common\Cache\Cache
      */
     public function getResultCacheImpl() {
-        return isset($this->_attributes['resultCacheImpl']) ? $this->_attributes['resultCacheImpl'] : null;
+        return isset($this->attributes['resultCacheImpl']) ? $this->attributes['resultCacheImpl'] : null;
     }
 
     /**
@@ -60,7 +60,7 @@ class CDatabase_Configuration {
      * @return void
      */
     public function setResultCacheImpl(Cache $cacheImpl) {
-        $this->_attributes['resultCacheImpl'] = $cacheImpl;
+        $this->attributes['resultCacheImpl'] = $cacheImpl;
     }
 
     /**
@@ -75,7 +75,7 @@ class CDatabase_Configuration {
      * @return void
      */
     public function setFilterSchemaAssetsExpression($filterExpression) {
-        $this->_attributes['filterSchemaAssetsExpression'] = $filterExpression;
+        $this->attributes['filterSchemaAssetsExpression'] = $filterExpression;
     }
 
     /**
@@ -84,7 +84,7 @@ class CDatabase_Configuration {
      * @return null|string
      */
     public function getFilterSchemaAssetsExpression() {
-        return isset($this->_attributes['filterSchemaAssetsExpression']) ? $this->_attributes['filterSchemaAssetsExpression'] : null;
+        return isset($this->attributes['filterSchemaAssetsExpression']) ? $this->attributes['filterSchemaAssetsExpression'] : null;
     }
 
     /**
@@ -99,7 +99,7 @@ class CDatabase_Configuration {
      * @see   getAutoCommit
      */
     public function setAutoCommit($autoCommit) {
-        $this->_attributes['autoCommit'] = (boolean) $autoCommit;
+        $this->attributes['autoCommit'] = (boolean) $autoCommit;
     }
 
     /**
@@ -110,6 +110,6 @@ class CDatabase_Configuration {
      * @see    setAutoCommit
      */
     public function getAutoCommit() {
-        return isset($this->_attributes['autoCommit']) ? $this->_attributes['autoCommit'] : true;
+        return isset($this->attributes['autoCommit']) ? $this->attributes['autoCommit'] : true;
     }
 }

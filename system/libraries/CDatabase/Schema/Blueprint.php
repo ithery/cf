@@ -10,6 +10,7 @@ defined('SYSPATH') or die('No direct access allowed.');
  */
 class CDatabase_Schema_Blueprint {
     use CTrait_Macroable;
+
     /**
      * The storage engine that should be used for the table.
      *
@@ -74,12 +75,12 @@ class CDatabase_Schema_Blueprint {
     /**
      * Execute the blueprint against the database.
      *
-     * @param \CDatabase                $connection
+     * @param \CDatabase_Connection     $connection
      * @param \CDatabase_Schema_Grammar $grammar
      *
      * @return void
      */
-    public function build(CDatabase $connection, CDatabase_Schema_Grammar $grammar) {
+    public function build(CDatabase_Connection $connection, CDatabase_Schema_Grammar $grammar) {
         foreach ($this->toSql($connection, $grammar) as $statement) {
             $connection->query($statement);
         }
@@ -88,12 +89,12 @@ class CDatabase_Schema_Blueprint {
     /**
      * Get the raw SQL statements for the blueprint.
      *
-     * @param \CDatabase                $connection
+     * @param \CDatabase_Connection     $connection
      * @param \CDatabase_Schema_Grammar $grammar
      *
      * @return array
      */
-    public function toSql(CDatabase $connection, CDatabase_Schema_Grammar $grammar) {
+    public function toSql(CDatabase_Connection $connection, CDatabase_Schema_Grammar $grammar) {
         $this->addImpliedCommands();
 
         $statements = [];

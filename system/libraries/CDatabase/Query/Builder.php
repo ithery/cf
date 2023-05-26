@@ -204,7 +204,7 @@ class CDatabase_Query_Builder {
 
     public function __construct(CDatabase_Connection $db = null) {
         if ($db == null) {
-            $db = CDatabase::instance()->connection();
+            $db = CDatabase::instance()->getConnection();
         }
         $this->db = $db;
         //get driver

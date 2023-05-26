@@ -11,9 +11,14 @@ abstract class CDatabase_Driver {
     protected $query_cache;
 
     /**
-     * @var CDatabase
+     * @var array
      */
-    protected $db;
+    protected $dbConfig;
+
+    /**
+     * @var CDatabase_Connection
+     */
+    protected $connection;
 
     /**
      * Connect to our database.
@@ -500,10 +505,10 @@ abstract class CDatabase_Driver {
     }
 
     /**
-     * @return CDatabase
+     * @return CDatabase_Connection
      */
     public function db() {
-        return $this->db;
+        return $this->connection;
     }
 }
 

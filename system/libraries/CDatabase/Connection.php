@@ -2,25 +2,32 @@
 
 defined('SYSPATH') or die('No direct access allowed.');
 
-/**
- * @author Hery Kurniawan
- * @license Ittron Global Teknologi <ittron.co.id>
- *
- * @see CDatabase
- * @since Aug 18, 2018, 8:39:09 AM
- */
-
 use Carbon\Carbon;
 
+/**
+ * @see CDatabase
+ */
 class CDatabase_Connection {
     use CTrait_Compat_Database;
     use CDatabase_Trait_DetectDeadlock;
     use CDatabase_Trait_DetectLostConnection;
+    use CDatabase_Trait_DetectConcurrencyErrors;
     use CDatabase_Trait_ManageTransaction;
 
     public $domain;
 
     public $name;
+
+    protected $isPdo = false;
+
+    protected $isBenchmarkQuery;
+
+    /**
+     * The type of the connection.
+     *
+     * @var null|string
+     */
+    protected $readWriteType;
 
     /**
      * Default Database.
@@ -45,6 +52,11 @@ class CDatabase_Connection {
     protected $driverName;
 
     /**
+     * @var string
+     */
+    protected $driverClass;
+
+    /**
      * @var CDatabase_Configuration
      */
     protected $configuration;
@@ -67,6 +79,13 @@ class CDatabase_Connection {
      * @var CDatabase_Driver_Mysqli
      */
     protected $driver;
+
+    /**
+     * The active PDO connection used for reads.
+     *
+     * @var \CDatabase_Driver|\Closure
+     */
+    protected $readDriver;
 
     protected $driver_name;
 
@@ -98,11 +117,51 @@ class CDatabase_Connection {
     protected $queryGrammar;
 
     /**
+     * The schema grammar implementation.
+     *
+     * @var CDatabase_Schema_Grammar
+     */
+    protected $schemaGrammar;
+
+    /**
      * The query post processor implementation.
      *
      * @var CDatabase_Query_Grammar_Processor
      */
     protected $postProcessor;
+
+    /**
+     * @var CDatabase_TransactionManager
+     */
+    protected $transactionManager;
+
+    /**
+     * The connection resolvers.
+     *
+     * @var \Closure[]
+     */
+    protected static $resolvers = [];
+
+    /**
+     * The reconnector instance for the connection.
+     *
+     * @var callable
+     */
+    protected $reconnector;
+
+    /**
+     * Indicates if changes have been made to the database.
+     *
+     * @var bool
+     */
+    protected $recordsModified = false;
+
+    /**
+     * Indicates if the connection should use the "write" Driver connection.
+     *
+     * @var bool
+     */
+    protected $readOnWriteConnection = false;
 
     /**
      * Sets up the database configuration, loads the CDatabase_Driver.
@@ -113,8 +172,17 @@ class CDatabase_Connection {
      * @throws CDatabase_Exception
      */
     public function __construct($config = [], $domain = null) {
-        if ($domain == null) {
+        if ($config instanceof Closure) {
+            $args = func_get_args();
+            $driver = $args[0];
+            $database = $args[1];
+            $tablePrefix = $args[2];
+            $config = $args[3];
             $domain = CF::domain();
+        } else {
+            if ($domain == null) {
+                $domain = CF::domain();
+            }
         }
         $loadConfig = true;
 
@@ -155,12 +223,17 @@ class CDatabase_Connection {
 
         $this->name = $configName;
         // Merge the default config with the passed config
-        $this->config = array_merge($this->config, $config);
 
+        $this->config = array_merge($this->config, $config);
+        static $i = 0;
+        $i++;
+        if ($i > 3) {
+            cdbg::dd(cdbg::traceDump());
+        }
         if (is_string($this->config['connection'])) {
             // Make sure the connection is valid
             if (strpos($this->config['connection'], '://') === false) {
-                throw CDatabase_Exception::invalidDsn($this->config['connection']);
+                throw new CDatabase_Exception('The DSN you supplied is not valid: :dsn', [':dsn' => $this->config['connection']]);
             }
             // Parse the DSN, creating an array to hold the connection parameters
             $db = [
@@ -221,34 +294,38 @@ class CDatabase_Connection {
         // Set driver name
 
         $connectionType = $this->config['connection']['type'];
-        switch ($this->config['connection']['type']) {
-            case 'mongodb':
-                $this->driverName = 'MongoDB';
+        $this->isPdo = carr::get($this->config, 'connection.pdo');
+        $pdoDriverMap = [
+            'sqlite' => CDatabase_Driver_PDO_Sqlite::class
+        ];
+        $nativeDriverMap = [
+            'mysqli' => CDatabase_Driver_Mysqli::class,
+            'sqlsrv' => CDatabase_Driver_Sqlsrv::class,
+            'mongodb' => CDatabase_Driver_MongoDB::class,
+        ];
+        $driverMap = $this->isPdo ? $pdoDriverMap : $nativeDriverMap;
 
-                break;
-            default:
-                $this->driverName = ucfirst($this->config['connection']['type']);
-
-                break;
-        }
-
-        $driver = 'CDatabase_Driver_' . $this->driverName;
+        $this->driverName = c::classBasename(carr::get($driverMap, $connectionType, ucfirst($connectionType)));
+        $this->driverClass = carr::get($driverMap, $connectionType, 'CDatabase_Driver_' . $this->driverName);
 
         try {
             // Validation of the driver
-            $class = new ReflectionClass($driver);
+            $class = new ReflectionClass($this->driverClass);
             // Initialize the driver
             $this->driver = $class->newInstance($this, $this->config);
         } catch (ReflectionException $ex) {
-            throw new CDatabase_Exception('The :driver driver for the :class library could not be found', [':driver' => $driver, ':class' => get_class($this)]);
+            throw new CDatabase_Exception('The :driver driver for the :class library could not be found', [':driver' => $this->driverClass, ':class' => get_class($this)]);
         }
 
         $this->events = CEvent::dispatcher();
 
+        //$this->configuration = new CDatabase_Configuration();
         // Validate the driver
         if (!($this->driver instanceof CDatabase_Driver)) {
-            throw new CDatabase_Exception('The :driver driver for the :class library must implement the :interface interface', [':driver' => $driver, ':class' => get_class($this), ':interface' => 'CDatabase_Driver']);
+            throw new CDatabase_Exception('The :driver driver for the :class library must implement the :interface interface', [':driver' => $this->driverClass, ':class' => get_class($this), ':interface' => 'CDatabase_Driver']);
         }
+
+        $this->transactionManager = new CDatabase_TransactionManager();
     }
 
     public function __destruct() {
@@ -264,6 +341,10 @@ class CDatabase_Connection {
 
     public function config() {
         return $this->config;
+    }
+
+    public function getConfig($key, $default = null) {
+        return carr::get($this->config, $key, $default);
     }
 
     /**
@@ -518,7 +599,7 @@ class CDatabase_Connection {
      *
      * @return array
      */
-    public function fieldData($table = '') {
+    public function fieldData($table) {
         $this->link or $this->connect();
 
         return $this->driver->fieldData($this->config['table_prefix'] . $table);
@@ -573,12 +654,12 @@ class CDatabase_Connection {
     /**
      * Escapes a column name for a query.
      *
-     * @param string $table string to escape
+     * @param string $column string to escape
      *
      * @return string
      */
-    public function escapeColumn($table) {
-        return $this->driver->escapeColumn($table);
+    public function escapeColumn($column) {
+        return $this->driver->escapeColumn($column);
     }
 
     /**
@@ -725,6 +806,15 @@ class CDatabase_Connection {
      */
     public function setEventDispatcher(CEvent $events) {
         $this->events = $events;
+    }
+
+    /**
+     * @return CDatabase_Connection
+     */
+    public function unsetEventDispatcher() {
+        $this->events = null;
+
+        return $this;
     }
 
     /**
@@ -1025,6 +1115,8 @@ class CDatabase_Connection {
                 return $this->events->dispatch(new CDatabase_Event_Transaction_Beginning($this));
             case 'committed':
                 return $this->events->dispatch(new CDatabase_Event_Transaction_Committed($this));
+            case 'committing':
+                return $this->events->dispatch(new CDatabase_Event_Transaction_Committing($this));
             case 'rollingBack':
                 return $this->events->dispatch(new CDatabase_Event_Transaction_RolledBack($this));
         }
@@ -1058,6 +1150,9 @@ class CDatabase_Connection {
         return $this->driver;
     }
 
+    /**
+     * @return bool
+     */
     public function ping() {
         return $this->driver->ping();
     }
@@ -1090,5 +1185,170 @@ class CDatabase_Connection {
         $schema = $this->getSchemaManager();
 
         return $schema->listTableDetails($table)->getColumn($column);
+    }
+
+    /**
+     * Reconnect to the database if a PDO connection is missing.
+     *
+     * @return void
+     */
+    protected function reconnectIfMissingConnection() {
+        $this->driver->reconnect();
+    }
+
+    /**
+     * @return CDatabase_TransactionManager
+     */
+    public function getTransactionManager() {
+        return $this->transactionManager;
+    }
+
+    /**
+     * Get a schema builder instance for the connection.
+     *
+     * @return \CDatabase_Schema_Builder
+     */
+    public function getSchemaBuilder() {
+        return new CDatabase_Schema_Builder($this);
+    }
+
+    /**
+     * Get a schema builder instance for the connection.
+     *
+     * @return \CDatabase_Schema_Grammar
+     */
+    public function getSchemaGrammar() {
+        if ($this->schemaGrammar == null) {
+            $driverName = $this->driverName();
+            $grammarClass = 'CDatabase_Schema_Grammar_' . $driverName;
+            $this->schemaGrammar = new $grammarClass();
+        }
+
+        return $this->schemaGrammar;
+    }
+
+    /**
+     * Get the connection resolver for the given driver.
+     *
+     * @param string $driver
+     *
+     * @return mixed
+     */
+    public static function getResolver($driver) {
+        return static::$resolvers[$driver] ?? null;
+    }
+
+    /**
+     * Set the reconnect instance on the connection.
+     *
+     * @param callable $reconnector
+     *
+     * @return $this
+     */
+    public function setReconnector(callable $reconnector) {
+        $this->reconnector = $reconnector;
+
+        return $this;
+    }
+
+    /**
+     * Set the read / write type of the connection.
+     *
+     * @param null|string $readWriteType
+     *
+     * @return $this
+     */
+    public function setReadWriteType($readWriteType) {
+        $this->readWriteType = $readWriteType;
+
+        return $this;
+    }
+
+    public function getDriver() {
+        if ($this->driver instanceof Closure) {
+            return $this->driver = call_user_func($this->driver);
+        }
+
+        return $this->driver;
+    }
+
+    /**
+     * Get the current PDO connection parameter without executing any reconnect logic.
+     *
+     * @return null|\CDatabase_Driver|\Closure
+     */
+    public function getRawDriver() {
+        return $this->driver;
+    }
+
+    /**
+     * Get the current PDO connection used for reading.
+     *
+     * @return \CDatabase_Driver
+     */
+    public function getReadDriver() {
+        if ($this->transactions > 0) {
+            return $this->getDriver();
+        }
+
+        if ($this->readOnWriteConnection
+            || ($this->recordsModified && $this->getConfig('sticky'))
+        ) {
+            return $this->getDriver();
+        }
+
+        if ($this->readDriver instanceof Closure) {
+            return $this->readDriver = call_user_func($this->readDriver);
+        }
+
+        return $this->readDriver ?: $this->getDriver();
+    }
+
+    /**
+     * Get the current read PDO connection parameter without executing any reconnect logic.
+     *
+     * @return null|\CDatabase_Driver|\Closure
+     */
+    public function getRawReadDriver() {
+        return $this->readDriver;
+    }
+
+    /**
+     * Set the Driver connection.
+     *
+     * @param null|\CDatabase_Driver|\Closure $driver
+     *
+     * @return $this
+     */
+    public function setDriver($driver) {
+        $this->transactions = 0;
+
+        $this->driver = $driver;
+
+        return $this;
+    }
+
+    /**
+     * Set the Driver connection used for reading.
+     *
+     * @param null|\CDatabase_Driver|\Closure $driver
+     *
+     * @return $this
+     */
+    public function setReadDriver($driver) {
+        $this->readDriver = $driver;
+
+        return $this;
+    }
+
+    /**
+     * Disconnect from the underlying Driver connection.
+     *
+     * @return void
+     */
+    public function disconnect() {
+        $this->setDriver(null)->setReadDriver(null);
+
+        //$this->doctrineConnection = null;
     }
 }

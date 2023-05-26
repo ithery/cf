@@ -30,7 +30,7 @@ trait CTesting_Trait_RefreshDatabase {
      */
     public function beginDatabaseTransaction() {
         foreach ($this->connectionsToTransact() as $name) {
-            $connection = CDatabase::instance($name);
+            $connection = CDatabase::instance($name)->connection();
             $dispatcher = $connection->getEventDispatcher();
 
             $connection->unsetEventDispatcher();

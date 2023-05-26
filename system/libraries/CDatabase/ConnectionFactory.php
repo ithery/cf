@@ -84,7 +84,7 @@ class CDatabase_ConnectionFactory {
     protected function createReadWriteConnection(array $config) {
         $connection = $this->createSingleConnection($this->getWriteConfig($config));
 
-        return $connection->setReadPdo($this->createReadDriver($config));
+        return $connection->setReadDriver($this->createReadDriver($config));
     }
 
     /**
@@ -176,6 +176,7 @@ class CDatabase_ConnectionFactory {
      */
     protected function createDriverResolverWithHosts(array $config) {
         return function () use ($config) {
+            $e = null;
             foreach (carr::shuffle($hosts = $this->parseHosts($config)) as $key => $host) {
                 $config['host'] = $host;
 
@@ -200,7 +201,7 @@ class CDatabase_ConnectionFactory {
      * @return array
      */
     protected function parseHosts(array $config) {
-        $hosts = carr::wrap($config['host']);
+        $hosts = carr::wrap(carr::get($config, 'host'));
         if (empty($hosts)) {
             throw new InvalidArgumentException('Database hosts array is empty.');
         }
@@ -242,10 +243,10 @@ class CDatabase_ConnectionFactory {
         switch ($config['driver']) {
             case 'mysqli':
                 return new CDatabase_Connector_MySqliConnector();
-            case 'mongodb':
-                return new CDatabase_Connector_MongoDBConnector();
-            case 'pdo.mysql':
-                return new CDatabase_Connector_PDOConnector_MySqlConnector();
+            // case 'mongodb':
+            //     return new CDatabase_Connector_MongoDBConnector();
+            // case 'pdo.mysql':
+            //     return new CDatabase_Connector_PDOConnector_MySqlConnector();
         }
 
         throw new InvalidArgumentException("Unsupported driver [{$config['driver']}].");
@@ -272,10 +273,10 @@ class CDatabase_ConnectionFactory {
         switch ($driver) {
             case 'mysqli':
                 return new CDatabase_Connection_MySqliConnection($connection, $database, $prefix, $config);
-            case 'mongodb':
-                return new CDatabase_Connection_MongoDBConnection($connection, $database, $prefix, $config);
-            case 'pdo.mysql':
-                return new CDatabase_Connection_PDOConnection_MysqlConnection($connection, $database, $prefix, $config);
+            // case 'mongodb':
+            //     return new CDatabase_Connection_MongoDBConnection($connection, $database, $prefix, $config);
+            // case 'pdo.mysql':
+            //     return new CDatabase_Connection_PDOConnection_MysqlConnection($connection, $database, $prefix, $config);
         }
 
         throw new InvalidArgumentException("Unsupported driver [{$driver}].");

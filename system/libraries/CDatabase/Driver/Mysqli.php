@@ -20,8 +20,6 @@ class CDatabase_Driver_Mysqli extends CDatabase_Driver_AbstractMysql {
      */
     protected $pdo;
 
-    protected $dbConfig;
-
     protected $statements = [];
 
     /**
@@ -30,8 +28,8 @@ class CDatabase_Driver_Mysqli extends CDatabase_Driver_AbstractMysql {
      * @param  array  database configuration
      * @param mixed $config
      */
-    public function __construct(CDatabase_Connection $db, $config) {
-        $this->db = $db;
+    public function __construct(CDatabase_Connection $connection, $config) {
+        $this->connection = $connection;
         $this->dbConfig = $config;
     }
 
@@ -313,6 +311,9 @@ class CDatabase_Driver_Mysqli extends CDatabase_Driver_AbstractMysql {
         return false;
     }
 
+    /**
+     * @return bool
+     */
     public function ping() {
         if (!$this->link) {
             $this->connect();
