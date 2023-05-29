@@ -58,6 +58,12 @@ class CDatabase_Manager implements CDatabase_Contract_ConnectionResolverInterfac
      * @return \CDatabase_Connection
      */
     public function connection($name = null) {
+        if (is_array($name)) {
+            $config = $name;
+            $name = carr::hash($config);
+
+            return CDatabase_ConnectionFactory::instance()->make($config, $name);
+        }
         list($database, $type) = $this->parseConnectionName($name);
 
         $name = $name ?: $database;
@@ -98,7 +104,6 @@ class CDatabase_Manager implements CDatabase_Contract_ConnectionResolverInterfac
      */
     protected function makeConnection($name) {
         $config = $this->configuration($name);
-
         // First we will check by the connection name to see if an extension has been
         // registered specifically for that connection. If it has we will call the
         // Closure and pass it the config allowing it to resolve the connection.
@@ -141,7 +146,7 @@ class CDatabase_Manager implements CDatabase_Contract_ConnectionResolverInterfac
      * @return CDatabase_Connection
      */
     protected function configure(CDatabase_Connection $connection, $type) {
-        $connection = $this->setPdoForType($connection, $type)->setReadWriteType($type);
+        $connection = $this->setDriverForType($connection, $type)->setReadWriteType($type);
 
         // Here we'll set a reconnector callback. This reconnector can be any callable
         // so we will set a Closure to reconnect from this manager with the name of
@@ -161,7 +166,7 @@ class CDatabase_Manager implements CDatabase_Contract_ConnectionResolverInterfac
      *
      * @return \CDatabase_Connection
      */
-    protected function setPdoForType(CDatabase_Connection $connection, $type = null) {
+    protected function setDriverForType(CDatabase_Connection $connection, $type = null) {
         if ($type === 'read') {
             $connection->setDriver($connection->getReadDriver());
         } elseif ($type === 'write') {

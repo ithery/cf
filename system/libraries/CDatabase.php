@@ -86,10 +86,7 @@ class CDatabase {
      */
     protected static $defaultConnection = 'default';
 
-    /**
-     * @var CDatabase_Connection
-     */
-    protected $connection;
+    protected $name;
 
     /**
      * Returns a singleton instance of Database.
@@ -128,13 +125,13 @@ class CDatabase {
     /**
      * Sets up the database configuration, loads the CDatabase_Driver.
      *
-     * @param mixed      $config
-     * @param null|mixed $domain
+     * @param string|array $name
+     * @param null|mixed   $domain
      *
      * @throws CDatabase_Exception
      */
-    public function __construct($config = [], $domain = null) {
-        $this->connection = new CDatabase_Connection($config, $domain);
+    public function __construct($name = null, $domain = null) {
+        $this->name = $name;
     }
 
     /**
@@ -210,12 +207,12 @@ class CDatabase {
         return CDatabase_Manager::instance();
     }
 
-    public function connection($config = [], $domain = null) {
-        return $this->connection;
+    public function connection($name = null) {
+        return $this->manager()->connection($name ?: $this->name);
     }
 
     public function getConnection() {
-        return $this->connection;
+        return $this->connection();
     }
 
     /**
@@ -225,7 +222,7 @@ class CDatabase {
         return CDatabase_ConnectionFactory::instance();
     }
 
-    public function __call($name, $arguments) {
-        return $this->forwardCallTo($this->connection, $name, $arguments);
+    public function __call($method, $arguments) {
+        return $this->manager()->$method(...$arguments);
     }
 }
