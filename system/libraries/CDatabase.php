@@ -61,11 +61,6 @@ use Carbon\Carbon;
  */
 class CDatabase {
     use CTrait_Compat_Database;
-    use CDatabase_Trait_DetectDeadlock;
-    use CDatabase_Trait_DetectLostConnection;
-    use CDatabase_Trait_DetectConcurrencyErrors;
-    use CDatabase_Trait_ManageTransaction;
-    use CTrait_ForwardsCalls;
 
     /**
      * Database instances.
