@@ -61,6 +61,7 @@ use Carbon\Carbon;
  */
 class CDatabase {
     use CTrait_Compat_Database;
+    use CTrait_ForwardsCalls;
 
     /**
      * Database instances.
