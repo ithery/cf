@@ -1027,7 +1027,7 @@ class c {
      * @return \CDatabase
      */
     public static function db($name = null) {
-        return CDatabase::instance($name);
+        return CDatabase::manager()->connection($name);
     }
 
     public static function userAgent() {

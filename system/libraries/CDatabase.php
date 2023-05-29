@@ -96,6 +96,8 @@ class CDatabase {
      * @param null|mixed $domain
      *
      * @return CDatabase
+     *
+     * @deprecated 1.6 use c::db()
      */
     public static function &instance($name = null, $config = null, $domain = null) {
         if ($name == null) {
@@ -126,9 +128,7 @@ class CDatabase {
      * Sets up the database configuration, loads the CDatabase_Driver.
      *
      * @param string|array $name
-     * @param null|mixed   $domain
-     *
-     * @throws CDatabase_Exception
+     * @param null|mixed   $domain deprecated params
      */
     public function __construct($name = null, $domain = null) {
         $this->name = $name;
