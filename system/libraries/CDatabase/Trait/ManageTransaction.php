@@ -23,6 +23,7 @@ trait CDatabase_Trait_ManageTransaction {
      * @return mixed
      */
     public function transaction(Closure $callback, $attempts = 1) {
+        /** @var CDatabase_Connection $this */
         for ($currentAttempt = 1; $currentAttempt <= $attempts; $currentAttempt++) {
             $this->beginTransaction();
             // We'll simply execute the given callback within a try / catch block and if we
@@ -47,7 +48,8 @@ trait CDatabase_Trait_ManageTransaction {
 
             try {
                 if ($this->transactions == 1) {
-                    $this->commit();
+                    $this->fireConnectionEvent('committing');
+                    $this->getDriver()->commit();
                 }
 
                 $this->transactions = max(0, $this->transactions - 1);
@@ -127,7 +129,7 @@ trait CDatabase_Trait_ManageTransaction {
         $this->createTransaction();
 
         $this->transactions++;
-        /** @var CDatabase $this */
+        /** @var CDatabase_Connection $this */
         if ($this->transactionManager) {
             $this->transactionManager->begin(
                 $this->getName(),
@@ -159,7 +161,7 @@ trait CDatabase_Trait_ManageTransaction {
             $this->reconnectIfMissingConnection();
 
             try {
-                $this->driver->beginTransaction();
+                $this->getDriver()->beginTransaction();
             } catch (Throwable $e) {
                 $this->handleBeginTransactionException($e);
             }
@@ -203,8 +205,9 @@ trait CDatabase_Trait_ManageTransaction {
      * @return void
      */
     public function commit() {
-        /** @var CDatabase $this */
+        /** @var CDatabase_Connection $this */
         if ($this->transactions == 1) {
+            $this->fireConnectionEvent('committing');
             $this->driver->commit();
         }
         $this->transactions = max(0, $this->transactions - 1);
@@ -293,7 +296,7 @@ trait CDatabase_Trait_ManageTransaction {
      * @return void
      */
     protected function performRollBack($toLevel) {
-        /** @var CDatabase $this */
+        /** @var CDatabase_Connection $this */
         if ($toLevel == 0) {
             $this->driver->rollBack();
         } elseif ($this->getQueryGrammar()->supportsSavepoints()) {
