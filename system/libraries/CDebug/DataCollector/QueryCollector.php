@@ -34,7 +34,7 @@ class CDebug_DataCollector_QueryCollector extends CDebug_DataCollector implement
         $this->setDataFormatter(new CDebug_DataFormatter_QueryFormatter());
 
         try {
-            CEvent::dispatcher()->listen(CDatabase_Event_OnQueryExecuted::class, function (CDatabase_Event_OnQueryExecuted $query) {
+            CEvent::dispatcher()->listen(CDatabase_Event_QueryExecuted::class, function (CDatabase_Event_QueryExecuted $query) {
                 $bindings = $query->bindings;
                 $time = $query->time;
                 $connection = $query->connection;

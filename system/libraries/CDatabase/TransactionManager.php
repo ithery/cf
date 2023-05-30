@@ -50,6 +50,10 @@ class CDatabase_TransactionManager {
             return $transaction->connection == $connection
                    && $transaction->level > $level;
         })->values();
+
+        if ($this->transactions->isEmpty()) {
+            $this->callbacksShouldIgnore = null;
+        }
     }
 
     /**
@@ -69,6 +73,10 @@ class CDatabase_TransactionManager {
         $this->transactions = $forOtherConnections->values();
 
         $forThisConnection->map->executeCallbacks();
+
+        if ($this->transactions->isEmpty()) {
+            $this->callbacksShouldIgnore = null;
+        }
     }
 
     /**
@@ -79,7 +87,7 @@ class CDatabase_TransactionManager {
      * @return void
      */
     public function addCallback($callback) {
-        if ($current = $this->transactions->last()) {
+        if ($current = $this->callbackApplicableTransactions()->last()) {
             return $current->addCallback($callback);
         }
 
@@ -97,6 +105,17 @@ class CDatabase_TransactionManager {
         $this->callbacksShouldIgnore = $transaction;
 
         return $this;
+    }
+
+    /**
+     * Get the transactions that are applicable to callbacks.
+     *
+     * @return \CCollection
+     */
+    public function callbackApplicableTransactions() {
+        return $this->transactions->reject(function ($transaction) {
+            return $transaction === $this->callbacksShouldIgnore;
+        })->values();
     }
 
     /**

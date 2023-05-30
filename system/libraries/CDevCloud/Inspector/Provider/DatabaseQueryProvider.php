@@ -3,7 +3,7 @@
 class CDevCloud_Inspector_Provider_DatabaseQueryProvider extends CDevCloud_Inspector_ProviderAbstract {
     public function boot() {
         try {
-            CEvent::dispatcher()->listen(CDatabase_Event_OnQueryExecuted::class, function (CDatabase_Event_OnQueryExecuted $query) {
+            CEvent::dispatcher()->listen(CDatabase_Event_QueryExecuted::class, function (CDatabase_Event_QueryExecuted $query) {
                 $bindings = $query->bindings;
                 $time = $query->time;
                 $connection = $query->connection;

@@ -72,21 +72,21 @@ class CDatabase_Connection implements CDatabase_ConnectionInterface {
     /**
      * The schema grammar implementation.
      *
-     * @var \Illuminate\Database\Schema\Grammars\Grammar
+     * @var \CDatabase_Schema_Grammar
      */
     protected $schemaGrammar;
 
     /**
      * The query post processor implementation.
      *
-     * @var \Illuminate\Database\Query\Processors\Processor
+     * @var \CDatabase_Query_Processor
      */
     protected $postProcessor;
 
     /**
      * The event dispatcher instance.
      *
-     * @var \Illuminate\Contracts\Events\Dispatcher
+     * @var \CEvent_DispatcherInterface
      */
     protected $events;
 
@@ -342,7 +342,7 @@ class CDatabase_Connection implements CDatabase_ConnectionInterface {
      * @param array  $bindings
      * @param bool   $useReadPdo
      *
-     * @throws \Illuminate\Database\MultipleColumnsSelectedException
+     * @throws \CDatabase_Exception_MultipleColumnsSelectedException
      *
      * @return mixed
      */
@@ -754,7 +754,7 @@ class CDatabase_Connection implements CDatabase_ConnectionInterface {
      * @param array    $bindings
      * @param \Closure $callback
      *
-     * @throws \Illuminate\Database\QueryException
+     * @throws \CDatabase_Exception_QueryException
      *
      * @return mixed
      */
@@ -1444,7 +1444,7 @@ class CDatabase_Connection implements CDatabase_ConnectionInterface {
     /**
      * Get the schema grammar used by the connection.
      *
-     * @return \Illuminate\Database\Schema\Grammars\Grammar
+     * @return \CDatabase_Schema_Grammar
      */
     public function getSchemaGrammar() {
         return $this->schemaGrammar;
@@ -1519,7 +1519,7 @@ class CDatabase_Connection implements CDatabase_ConnectionInterface {
     /**
      * Set the transaction manager instance on the connection.
      *
-     * @param \Illuminate\Database\DatabaseTransactionsManager $manager
+     * @param \CDatabase_TransactionManager $manager
      *
      * @return $this
      */

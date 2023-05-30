@@ -41,22 +41,24 @@ trait CDatabase_Trait_ManageTransaction {
                     $attempts
                 );
             } catch (Throwable $e) {
-                $this->rollBack();
-
-                throw $e;
+                $this->handleTransactionException(
+                    $e,
+                    $currentAttempt,
+                    $attempts
+                );
             }
 
             try {
                 if ($this->transactions == 1) {
                     $this->fireConnectionEvent('committing');
-                    $this->getDriver()->commit();
+                    $this->getPdo()->commit();
                 }
 
                 $this->transactions = max(0, $this->transactions - 1);
 
-                if ($this->transactions == 0) {
-                    if ($this->transactionManager) {
-                        $this->transactionManager->commit($this->getName());
+                if ($this->afterCommitCallbacksShouldBeExecuted()) {
+                    if ($this->transactionsManager) {
+                        $this->transactionsManager->commit($this->getName());
                     }
                 }
             } catch (Exception $e) {
@@ -95,21 +97,30 @@ trait CDatabase_Trait_ManageTransaction {
      * @return void
      */
     protected function handleTransactionException($e, $currentAttempt, $maxAttempts) {
+        /** @var CDatabase_Connection $this */
         // On a deadlock, MySQL rolls back the entire transaction so we can't just
         // retry the query. We have to throw this exception all the way out and
         // let the developer handle it in another way. We will decrement too.
-        if ($this->causedByDeadlock($e)
+        if ($this->causedByConcurrencyError($e)
             && $this->transactions > 1
         ) {
             $this->transactions--;
+            if ($this->transactionsManager) {
+                $this->transactionsManager->rollback(
+                    $this->getName(),
+                    $this->transactions
+                );
+            }
 
-            throw $e;
+            throw new CDatabase_Exception_DeadlockException($e->getMessage(), is_int($e->getCode()) ? $e->getCode() : 0, $e);
         }
         // If there was an exception we will rollback this transaction and then we
         // can check if we have exceeded the maximum attempt count for this and
         // if we haven't we will return and try this query again in our loop.
         $this->rollBack();
-        if ($this->causedByDeadlock($e) && $currentAttempt < $maxAttempts) {
+        if ($this->causedByConcurrencyError($e)
+            && $currentAttempt < $maxAttempts
+        ) {
             return;
         }
 
@@ -119,19 +130,17 @@ trait CDatabase_Trait_ManageTransaction {
     /**
      * Start a new database transaction.
      *
-     * @param bool $isSavePoint
-     *
      * @throws \Exception
      *
      * @return void
      */
-    public function beginTransaction($isSavePoint = true) {
+    public function beginTransaction() {
         $this->createTransaction();
 
         $this->transactions++;
         /** @var CDatabase_Connection $this */
-        if ($this->transactionManager) {
-            $this->transactionManager->begin(
+        if ($this->transactionsManager) {
+            $this->transactionsManager->begin(
                 $this->getName(),
                 $this->transactions
             );
@@ -148,7 +157,7 @@ trait CDatabase_Trait_ManageTransaction {
      * @return void
      */
     public function begin() {
-        return $this->beginTransaction(false);
+        return $this->beginTransaction();
     }
 
     /**
@@ -161,7 +170,7 @@ trait CDatabase_Trait_ManageTransaction {
             $this->reconnectIfMissingConnection();
 
             try {
-                $this->getDriver()->beginTransaction();
+                $this->getPdo()->beginTransaction();
             } catch (Throwable $e) {
                 $this->handleBeginTransactionException($e);
             }
@@ -176,8 +185,8 @@ trait CDatabase_Trait_ManageTransaction {
      * @return void
      */
     protected function createSavepoint() {
-        $this->driver->query(
-            $this->getQueryGrammar()->compileSavepoint('trans' . ($this->transactions + 1))
+        $this->getPdo()->exec(
+            $this->queryGrammar->compileSavepoint('trans' . ($this->transactions + 1))
         );
     }
 
@@ -193,7 +202,8 @@ trait CDatabase_Trait_ManageTransaction {
     protected function handleBeginTransactionException($e) {
         if ($this->causedByLostConnection($e)) {
             $this->reconnect();
-            $this->driver->beginTransaction();
+
+            $this->getPdo()->beginTransaction();
         } else {
             throw $e;
         }
@@ -206,18 +216,31 @@ trait CDatabase_Trait_ManageTransaction {
      */
     public function commit() {
         /** @var CDatabase_Connection $this */
-        if ($this->transactions == 1) {
+        if ($this->transactionLevel() == 1) {
             $this->fireConnectionEvent('committing');
-            $this->driver->commit();
+            $this->getPdo()->commit();
         }
         $this->transactions = max(0, $this->transactions - 1);
 
-        if ($this->transactions == 0) {
-            if ($this->transactionManager) {
-                $this->transactionManager->commit($this->getName());
+        if ($this->afterCommitCallbacksShouldBeExecuted()) {
+            if ($this->transactionsManager) {
+                $this->transactionsManager->commit($this->getName());
             }
         }
+
         $this->fireConnectionEvent('committed');
+    }
+
+    /**
+     * Determine if after commit callbacks should be executed.
+     *
+     * @return bool
+     */
+    protected function afterCommitCallbacksShouldBeExecuted() {
+        /** @var CDatabase_Connection $this */
+        return $this->transactions == 0
+            || ($this->transactionsManager
+             && $this->transactionsManager->callbackApplicableTransactions()->count() === 1);
     }
 
     /**
@@ -298,10 +321,14 @@ trait CDatabase_Trait_ManageTransaction {
     protected function performRollBack($toLevel) {
         /** @var CDatabase_Connection $this */
         if ($toLevel == 0) {
-            $this->driver->rollBack();
-        } elseif ($this->getQueryGrammar()->supportsSavepoints()) {
-            $this->driver->query(
-                $this->getQueryGrammar()->compileSavepointRollBack('trans' . ($toLevel + 1))
+            $pdo = $this->getPdo();
+
+            if ($pdo->inTransaction()) {
+                $pdo->rollBack();
+            }
+        } elseif ($this->queryGrammar->supportsSavepoints()) {
+            $this->getPdo()->exec(
+                $this->queryGrammar->compileSavepointRollBack('trans' . ($toLevel + 1))
             );
         }
     }
