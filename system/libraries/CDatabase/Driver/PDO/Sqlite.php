@@ -15,6 +15,8 @@ class CDatabase_Driver_PDO_Sqlite extends CDatabase_Driver {
 
     protected $dbConfig;
 
+    protected $db;
+
     /**
      * Constructor: __construct
      *  Sets up the config for the class.
@@ -147,12 +149,7 @@ class CDatabase_Driver_PDO_Sqlite extends CDatabase_Driver {
             return $str;
         }
 
-        if (function_exists('sqlite_escape_string')) {
-            /** @intelephense-ignore-line  */
-            $res = sqlite_escape_string($str);
-        } else {
-            $res = str_replace("'", "''", $str);
-        }
+        $res = str_replace("'", "''", $str);
 
         return $res;
     }

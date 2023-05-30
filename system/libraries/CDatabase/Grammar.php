@@ -2,6 +2,13 @@
 
 abstract class CDatabase_Grammar {
     /**
+     * The connection used for escaping values.
+     *
+     * @var \CDatabase_Connection
+     */
+    protected $connection;
+
+    /**
      * The grammar table prefix.
      *
      * @var string
@@ -54,6 +61,13 @@ abstract class CDatabase_Grammar {
             return $this->wrapAliasedValue($value, $prefixAlias);
         }
 
+        // If the given value is a JSON selector we will wrap it differently than a
+        // traditional value. We will need to split this path and wrap each part
+        // wrapped, etc. Otherwise, we will simply wrap the value as a string.
+        if ($this->isJsonSelector($value)) {
+            return $this->wrapJsonSelector($value);
+        }
+
         return $this->wrapSegments(explode('.', $value));
     }
 
@@ -89,7 +103,9 @@ abstract class CDatabase_Grammar {
         $collection = c::collect($segments);
 
         return $collection->map(function ($segment, $key) use ($segments) {
-            return $key == 0 && count($segments) > 1 ? $this->wrapTable($segment) : $this->wrapValue($segment);
+            return $key == 0 && count($segments) > 1
+                ? $this->wrapTable($segment)
+                : $this->wrapValue($segment);
         })->implode('.');
     }
 
@@ -106,6 +122,19 @@ abstract class CDatabase_Grammar {
         }
 
         return $value;
+    }
+
+    /**
+     * Wrap the given JSON selector.
+     *
+     * @param string $value
+     *
+     * @throws \RuntimeException
+     *
+     * @return string
+     */
+    protected function wrapJsonSelector($value) {
+        throw new RuntimeException('This database engine does not support JSON operations.');
     }
 
     /**
@@ -168,6 +197,22 @@ abstract class CDatabase_Grammar {
     }
 
     /**
+     * Escapes a value for safe SQL embedding.
+     *
+     * @param null|string|float|int|bool $value
+     * @param bool                       $binary
+     *
+     * @return string
+     */
+    public function escape($value, $binary = false) {
+        if (is_null($this->connection)) {
+            throw new RuntimeException("The database driver's grammar implementation does not support escaping values.");
+        }
+
+        return $this->connection->escape($value, $binary);
+    }
+
+    /**
      * Determine if the given value is a raw expression.
      *
      * @param mixed $value
@@ -216,6 +261,19 @@ abstract class CDatabase_Grammar {
      */
     public function setTablePrefix($prefix) {
         $this->tablePrefix = $prefix;
+
+        return $this;
+    }
+
+    /**
+     * Set the grammar's database connection.
+     *
+     * @param \CDatabase_Connection $connection
+     *
+     * @return $this
+     */
+    public function setConnection($connection) {
+        $this->connection = $connection;
 
         return $this;
     }

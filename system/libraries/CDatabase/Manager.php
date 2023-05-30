@@ -28,6 +28,8 @@ class CDatabase_Manager implements CDatabase_Contract_ConnectionResolverInterfac
      */
     protected $extensions = [];
 
+    protected $config;
+
     private static $instance;
 
     public static function instance() {
@@ -48,6 +50,7 @@ class CDatabase_Manager implements CDatabase_Contract_ConnectionResolverInterfac
         $this->reconnector = function ($connection) {
             $this->reconnect($connection->getNameWithReadWriteType());
         };
+        $this->config = CF::config('database');
     }
 
     /**
@@ -330,6 +333,32 @@ class CDatabase_Manager implements CDatabase_Contract_ConnectionResolverInterfac
      */
     public function setReconnector(callable $reconnector) {
         $this->reconnector = $reconnector;
+    }
+
+    /**
+     * Register a connection with the manager.
+     *
+     * @param array  $config
+     * @param string $name
+     *
+     * @return void
+     */
+    public function addConnection(array $config, $name = 'default') {
+        $connections = carr::get($this->config, 'connections');
+
+        $connections[$name] = $config;
+
+        carr::set($this->config, 'connections', $connections);
+    }
+
+    /**
+     * @param string $key
+     * @param mixed  $default
+     *
+     * @return mixed
+     */
+    public function getConfig($key, $default = null) {
+        return carr::get($this->config, $key, $default);
     }
 
     /**

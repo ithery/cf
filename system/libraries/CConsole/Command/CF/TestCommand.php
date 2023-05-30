@@ -15,13 +15,13 @@ use Symfony\Component\Process\Exception\ProcessSignaledException;
 /**
  * @final
  */
-class CConsole_Command_TestCommand extends CConsole_Command {
+class CConsole_Command_CF_TestCommand extends CConsole_Command {
     /**
      * The name and signature of the console command.
      *
      * @var string
      */
-    protected $signature = 'test {phpunitArgs?*} {--without-tty : Disable output to TTY}';
+    protected $signature = 'cf:test {phpunitArgs?*} {--without-tty : Disable output to TTY}';
 
     /**
      * The console command description.

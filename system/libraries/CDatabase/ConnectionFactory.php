@@ -63,7 +63,7 @@ class CDatabase_ConnectionFactory {
      * @return CDatabase_Connection
      */
     protected function createSingleConnection(array $config) {
-        $driver = $this->createDriverResolver($config);
+        $driver = $this->createPdoResolver($config);
 
         return $this->createConnection(
             $config['driver'],
@@ -84,7 +84,7 @@ class CDatabase_ConnectionFactory {
     protected function createReadWriteConnection(array $config) {
         $connection = $this->createSingleConnection($this->getWriteConfig($config));
 
-        return $connection->setReadDriver($this->createReadDriver($config));
+        return $connection->setReadPdo($this->createReadPdo($config));
     }
 
     /**
@@ -94,8 +94,8 @@ class CDatabase_ConnectionFactory {
      *
      * @return \Closure
      */
-    protected function createReadDriver(array $config) {
-        return $this->createDriverResolver($this->getReadConfig($config));
+    protected function createReadPdo(array $config) {
+        return $this->createPdoResolver($this->getReadConfig($config));
     }
 
     /**
@@ -159,10 +159,10 @@ class CDatabase_ConnectionFactory {
      *
      * @return \Closure
      */
-    protected function createDriverResolver(array $config) {
+    protected function createPdoResolver(array $config) {
         return array_key_exists('host', $config)
-            ? $this->createDriverResolverWithHosts($config)
-            : $this->createDriverResolverWithoutHosts($config);
+            ? $this->createPdoResolverWithHosts($config)
+            : $this->createPdoResolverWithoutHosts($config);
     }
 
     /**
@@ -174,7 +174,7 @@ class CDatabase_ConnectionFactory {
      *
      * @return \Closure
      */
-    protected function createDriverResolverWithHosts(array $config) {
+    protected function createPdoResolverWithHosts(array $config) {
         return function () use ($config) {
             $e = null;
             foreach (carr::shuffle($hosts = $this->parseHosts($config)) as $key => $host) {
@@ -216,7 +216,7 @@ class CDatabase_ConnectionFactory {
      *
      * @return \Closure
      */
-    protected function createDriverResolverWithoutHosts(array $config) {
+    protected function createPdoResolverWithoutHosts(array $config) {
         return function () use ($config) {
             return $this->createConnector($config)->connect($config);
         };
@@ -242,8 +242,13 @@ class CDatabase_ConnectionFactory {
 
         switch ($config['driver']) {
             case 'mysqli':
-                return new CDatabase_Connector_MySqliConnector();
-            // case 'mongodb':
+            case 'mysql':
+            case 'pdo.mysql':
+                return new CDatabase_Connector_Pdo_MySqlConnector();
+            case 'sqlite':
+            case 'pdo.sqlite':
+                return new CDatabase_Connector_Pdo_SqliteConnector();
+                        // case 'mongodb':
             //     return new CDatabase_Connector_MongoDBConnector();
             // case 'pdo.mysql':
             //     return new CDatabase_Connector_PDOConnector_MySqlConnector();
@@ -273,7 +278,9 @@ class CDatabase_ConnectionFactory {
         switch ($driver) {
             case 'mysqli':
                 return new CDatabase_Connection_MySqliConnection($connection, $database, $prefix, $config);
-            // case 'mongodb':
+            case 'sqlite':
+                return new CDatabase_Connection_Pdo_SqliteConnection($connection, $database, $prefix, $config);
+                // case 'mongodb':
             //     return new CDatabase_Connection_MongoDBConnection($connection, $database, $prefix, $config);
             // case 'pdo.mysql':
             //     return new CDatabase_Connection_PDOConnection_MysqlConnection($connection, $database, $prefix, $config);

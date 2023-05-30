@@ -88,6 +88,8 @@ class CFConsole {
         CWebSocket_Console_Command_StartServer::class,
         CTesting_Console_ChromeDriverCommand::class,
         CConsole_Command_Server_Monitor_ListenCommand::class,
+        CConsole_Command_CF_TestCommand::class,
+
     ];
 
     public static function execute() {

@@ -5,7 +5,7 @@ interface CDatabase_ConnectionInterface {
      * Begin a fluent query against a database table.
      *
      * @param \Closure|CDatabase_Query_Builder|string $table
-     * @param string|null                             $as
+     * @param null|string                             $as
      *
      * @return \CDatabase_Query_Builder
      */
@@ -61,7 +61,17 @@ interface CDatabase_ConnectionInterface {
      *
      * @return bool
      */
-    public function insert($query, $bindings = []);
+    public function insertWithQuery($query, $bindings = []);
+
+    /**
+     * Compiles an insert string and runs the query.
+     *
+     * @param string $table table name
+     * @param array  $set   array of key/value pairs to insert
+     *
+     * @return bool
+     */
+    public function insert($table, $set);
 
     /**
      * Run an update statement against the database.
@@ -71,7 +81,18 @@ interface CDatabase_ConnectionInterface {
      *
      * @return int
      */
-    public function update($query, $bindings = []);
+    public function updateWithQuery($query, $bindings = []);
+
+    /**
+     * Compiles an update string and runs the query.
+     *
+     * @param string $table table name
+     * @param array  $set   associative array of update values
+     * @param array  $where where clause
+     *
+     * @return int
+     */
+    public function update($table = '', $set = null, $where = null);
 
     /**
      * Run a delete statement against the database.
@@ -81,7 +102,17 @@ interface CDatabase_ConnectionInterface {
      *
      * @return int
      */
-    public function delete($query, $bindings = []);
+    public function deleteWithQuery($query, $bindings = []);
+
+    /**
+     * Compiles a delete string and runs the query.
+     *
+     * @param string $table table name
+     * @param array  $where where clause
+     *
+     * @return int
+     */
+    public function delete($table = '', $where = []);
 
     /**
      * Execute an SQL statement and return the boolean result.
@@ -127,9 +158,9 @@ interface CDatabase_ConnectionInterface {
      * @param \Closure $callback
      * @param int      $attempts
      *
-     * @return mixed
-     *
      * @throws \Exception
+     *
+     * @return mixed
      */
     public function transaction(Closure $callback, $attempts = 1);
 
@@ -176,4 +207,14 @@ interface CDatabase_ConnectionInterface {
      * @return string
      */
     public function getDatabaseName();
+
+    /**
+     * Combine a SQL statement with the bind values. Used for safe queries.
+     *
+     * @param string $sql   query to bind to the values
+     * @param array  $binds array of values to bind to the query
+     *
+     * @return string
+     */
+    public function compileBinds($sql, array $binds = []);
 }

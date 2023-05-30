@@ -74,7 +74,7 @@ class clog {
             'app_id' => $app->appId(),
         ];
 
-        return CDatabase::instance()->insert('log_login_fail', $data);
+        return c::db()->insert('log_login_fail', $data);
     }
 
     public static function request($user_id = null) {
@@ -258,6 +258,6 @@ class clog {
     }
 
     public static function login_fail($username, $password, $error_message) {
-        return static::loginFail($username, $password, $error_message);
+        return self::loginFail($username, $password, $error_message);
     }
 }

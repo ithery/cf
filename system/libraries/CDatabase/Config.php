@@ -15,10 +15,10 @@ class CDatabase_Config {
                 $config = static::dsnToArray($name);
             } else {
                 //we will try to resolve the config name
-                $config = CF::config('database.connections.' . $name);
+                $config = CDatabase::manager()->getConfig('connections.' . $name);
                 if ($config === null) {
                     //we will try to resolve the first array of config
-                    $config = CF::config('database.' . $name);
+                    $config = CDatabase::manager()->getConfig($name);
                 }
                 if (!is_null($config)) {
                     if (is_string($config)) {
@@ -61,12 +61,15 @@ class CDatabase_Config {
         if (!isset($config['collation'])) {
             $config['collation'] = null;
         }
-
+        if (!isset($config['driver']) && isset($config['type'])) {
+            $config['driver'] = $config['type'];
+        }
         $defaultConfig = [
             'benchmark' => true,
             'persistent' => false,
             'connection' => '',
-            'charset' => 'utf8',
+            'charset' => 'utf8mb4',
+            'collation' => 'utf8mb4_unicode_ci',
             'prefix' => '',
             'object' => true,
             'cache' => false,

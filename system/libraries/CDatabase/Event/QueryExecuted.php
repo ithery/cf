@@ -1,9 +1,6 @@
 <?php
 
-/**
- * @deprecated 1.6 use CDatabase_Event_QueryExecuted
- */
-class CDatabase_Event_OnQueryExecuted {
+class CDatabase_Event_QueryExecuted {
     /**
      * The SQL query that was executed.
      *
@@ -26,16 +23,9 @@ class CDatabase_Event_OnQueryExecuted {
     public $time;
 
     /**
-     * The number of milliseconds it took to execute the query.
-     *
-     * @var int
-     */
-    public $rowsCount;
-
-    /**
      * The database connection instance.
      *
-     * @var \CDatabase
+     * @var \Illuminate\Database\Connection
      */
     public $connection;
 
@@ -49,20 +39,18 @@ class CDatabase_Event_OnQueryExecuted {
     /**
      * Create a new event instance.
      *
-     * @param string    $sql
-     * @param array     $bindings
-     * @param float     $time
-     * @param int       $rowsCount
-     * @param CDatabase $db
+     * @param string                $sql
+     * @param array                 $bindings
+     * @param null|float            $time
+     * @param \CDatabase_Connection $connection
      *
      * @return void
      */
-    public function __construct($sql, $bindings, $time, $rowsCount, $db) {
+    public function __construct($sql, $bindings, $time, $connection) {
         $this->sql = $sql;
         $this->time = $time;
         $this->bindings = $bindings;
-        $this->rowsCount = $rowsCount;
-        $this->connection = $db;
-        $this->connectionName = $db->getName();
+        $this->connection = $connection;
+        $this->connectionName = $connection->getName();
     }
 }

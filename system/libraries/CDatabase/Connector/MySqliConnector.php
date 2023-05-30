@@ -1,6 +1,6 @@
 <?php
 
-class CDatabase_Connector_MysqliConnector extends CDatabase_Connector implements CDatabase_ConnectorInterface {
+class CDatabase_Connector_MySqliConnector extends CDatabase_Connector implements CDatabase_ConnectorInterface {
     /**
      * @var array
      */

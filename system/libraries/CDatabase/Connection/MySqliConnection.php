@@ -1,4 +1,4 @@
 <?php
 
-class CDatabase_Connection_MySqliConnection extends CDatabase_Connection {
+class CDatabase_Connection_MySqliConnection extends CDatabase_Connection_MySqlConnection {
 }

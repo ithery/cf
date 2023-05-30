@@ -4,15 +4,16 @@
 class cdbutils {
     public static function table_exists($table, $db = null) {
         if ($db == null) {
-            $db = CDatabase::instance();
+            $db = c::db();
         }
         $q = 'SHOW TABLES LIKE ' . $db->escape($table) . '';
+
         return cdbutils::get_value($q, $db);
     }
 
     public static function empty_table($table, $db = null) {
         if ($db == null) {
-            $db = CDatabase::instance();
+            $db = c::db();
         }
         $db->query('delete from `' . $table . '`');
         $db->query('alter table `' . $table . '` AUTO_INCREMENT = 1;');
@@ -20,7 +21,7 @@ class cdbutils {
 
     public static function get_row_count_from_base_query($query, $db = null) {
         if ($db == null) {
-            $db = CDatabase::instance();
+            $db = c::db();
         }
         $qtotal = '';
         $qtotal .= 'select count(*) as cnt from (' . $query . ') as a';
@@ -29,57 +30,62 @@ class cdbutils {
         if ($r->count() > 0) {
             $cnt = $r[0]->cnt;
         }
+
         return $cnt;
     }
 
     public static function row_exists($table, $where = [], $db = null) {
         if ($db == null) {
-            $db = CDatabase::instance();
+            $db = c::db();
         }
         $q = 'select count(1) as cnt from ' . $db->escape_table($table) . ' where 1=1 ';
         foreach ($where as $k => $v) {
             $q .= ' and ' . $db->escape_column($k) . '=' . $db->escape($v);
         }
         $cnt = cdbutils::get_value($q, $db);
+
         return $cnt > 0;
     }
 
     public static function get_value($query, $db = null) {
         if ($db == null) {
-            $db = CDatabase::instance();
+            $db = c::db();
         }
-        $r = $db->query($query);
-        $result = $r->result(false);
-        $res = [];
+        $result = $db->query($query);
+
         $value = null;
         foreach ($result as $row) {
-            foreach ($row as $k => $v) {
+            foreach ($row as $v) {
                 $value = $v;
+
                 break;
             }
+
             break;
         }
+
         return $value;
     }
 
     public static function get_row($query, $db = null) {
         if ($db == null) {
-            $db = CDatabase::instance();
+            $db = c::db();
         }
-        $r = $db->query($query);
-        $result = null;
-        if ($r->count() > 0) {
-            $result = $r[0];
+        $result = $db->query($query);
+        if (count($result) > 0) {
+            $result = $result[0];
         }
+
         return $result;
     }
 
     public static function get_array($query, $db = null) {
         if ($db == null) {
-            $db = CDatabase::instance();
+            $db = c::db();
         }
-        $r = $db->query($query);
-        $result = $r->result(false);
+        /** @var CDatabase_Connection $db */
+        $result = $db->select($query);
+
         $res = [];
         foreach ($result as $row) {
             $cnt = 0;
@@ -95,12 +101,13 @@ class cdbutils {
             }
             $res[] = $arr_val;
         }
+
         return $res;
     }
 
     public static function get_list($query, $db = null) {
         if ($db == null) {
-            $db = CDatabase::instance();
+            $db = c::db();
         }
         $r = $db->query($query);
         $result = $r->result(false);
@@ -123,12 +130,13 @@ class cdbutils {
             }
             $res[$arr_key] = $arr_val;
         }
+
         return $res;
     }
 
     public static function get_table_list($db = null) {
         if ($db == null) {
-            $db = CDatabase::instance();
+            $db = c::db();
         }
         $tables = [];
         $array = cdbutils::get_array('SHOW TABLES');
@@ -163,17 +171,18 @@ class cdbutils {
 
     public static function get_table_count($db = null) {
         if ($db == null) {
-            $db = CDatabase::instance();
+            $db = c::db();
         }
         $q = 'SHOW table status';
 
         $res = cdbutils::get_array($q);
+
         return count($res);
     }
 
     public static function get_table_info($db = null) {
         if ($db == null) {
-            $db = CDatabase::instance();
+            $db = c::db();
         }
         $q = 'SHOW table status';
 
@@ -209,7 +218,7 @@ class cdbutils {
 
     public static function get_column_info($table, $db = null) {
         if ($db == null) {
-            $db = CDatabase::instance();
+            $db = c::db();
         }
         $q = 'SHOW FULL COLUMNS FROM ' . $db->escape_table($table);
 
@@ -288,7 +297,7 @@ class cdbutils {
 
     public static function convert_table_engine($engine = 'InnoDB', $db = null) {
         if ($db == null) {
-            $db = CDatabase::instance();
+            $db = c::db();
         }
         $tables = cdbutils::get_array('show tables');
         foreach ($tables as $table) {
@@ -298,7 +307,7 @@ class cdbutils {
 
     public static function convert_table_charset($charset = 'utf8', $collate = 'utf8_unicode_ci', $db = null) {
         if ($db == null) {
-            $db = CDatabase::instance();
+            $db = c::db();
         }
         $tables = cdbutils::get_array('show tables');
         foreach ($tables as $table) {
@@ -307,7 +316,7 @@ class cdbutils {
     }
 
     public static function load_sql($sql) {
-        $db = CDatabase::instance();
+        $db = c::db();
         //$sql = explode("\n", $sql);
         $sql = preg_split('/\r\n|\r|\n/', $sql);
 

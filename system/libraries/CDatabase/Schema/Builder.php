@@ -16,6 +16,13 @@ class CDatabase_Schema_Builder {
     public static $defaultMorphKeyType = 'int';
 
     /**
+     * Indicates whether Doctrine DBAL usage will be prevented if possible when dropping, renaming, and modifying columns.
+     *
+     * @var bool
+     */
+    public static $alwaysUsesNativeSchemaOperationsIfPossible = false;
+
+    /**
      * The database connection instance.
      *
      * @var \CDatabase_Connection
@@ -83,6 +90,26 @@ class CDatabase_Schema_Builder {
      */
     public static function morphUsingUuids() {
         return static::defaultMorphKeyType('uuid');
+    }
+
+    /**
+     * Set the default morph key type for migrations to ULIDs.
+     *
+     * @return void
+     */
+    public static function morphUsingUlids() {
+        return static::defaultMorphKeyType('ulid');
+    }
+
+    /**
+     * Attempt to use native schema operations for dropping, renaming, and modifying columns, even if Doctrine DBAL is installed.
+     *
+     * @param bool $value
+     *
+     * @return void
+     */
+    public static function useNativeSchemaOperationsIfPossible(bool $value = true) {
+        static::$alwaysUsesNativeSchemaOperationsIfPossible = $value;
     }
 
     /**

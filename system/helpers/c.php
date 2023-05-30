@@ -1024,7 +1024,7 @@ class c {
      *
      * @param null|string $name
      *
-     * @return \CDatabase
+     * @return \CDatabase_Connection
      */
     public static function db($name = null) {
         return CDatabase::manager()->connection($name);
