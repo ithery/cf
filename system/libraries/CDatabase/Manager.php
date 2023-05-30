@@ -74,6 +74,7 @@ class CDatabase_Manager implements CDatabase_Contract_ConnectionResolverInterfac
         // If we haven't created this connection, we'll create it based on the config
         // provided in the application. Once we've created the connections we will
         // set the "fetch mode" for PDO which determines the query return types.
+
         if (!isset($this->connections[$name])) {
             $this->connections[$name] = $this->configure(
                 $this->makeConnection($database),
@@ -82,6 +83,17 @@ class CDatabase_Manager implements CDatabase_Contract_ConnectionResolverInterfac
         }
 
         return $this->connections[$name];
+    }
+
+    /**
+     * Alias for connection.
+     *
+     * @param string $name
+     *
+     * @return CDatabase_Connection
+     */
+    public function getConnection($name = null) {
+        return $this->connection($name);
     }
 
     /**
@@ -107,6 +119,7 @@ class CDatabase_Manager implements CDatabase_Contract_ConnectionResolverInterfac
      */
     protected function makeConnection($name) {
         $config = $this->configuration($name);
+
         // First we will check by the connection name to see if an extension has been
         // registered specifically for that connection. If it has we will call the
         // Closure and pass it the config allowing it to resolve the connection.
@@ -135,7 +148,17 @@ class CDatabase_Manager implements CDatabase_Contract_ConnectionResolverInterfac
      */
     protected function configuration($name) {
         $name = $name ?: $this->getDefaultConnection();
-        $config = CDatabase_Config::resolve($name);
+        $connections = carr::get($this->config, 'connections');
+
+        $config = carr::get($connections, $name, carr::get($this->config, $name));
+        if (is_null($config)) {
+            throw new InvalidArgumentException("Database connection [{$name}] not configured.");
+        }
+
+        $config = (new CDatabase_ConfigurationUrlParser())
+            ->parseConfiguration($config);
+
+        $config = CDatabase_Config::flattenFormat($config);
 
         return $config;
     }
@@ -171,9 +194,9 @@ class CDatabase_Manager implements CDatabase_Contract_ConnectionResolverInterfac
      */
     protected function setDriverForType(CDatabase_Connection $connection, $type = null) {
         if ($type === 'read') {
-            $connection->setDriver($connection->getReadDriver());
+            $connection->setPdo($connection->getReadPdo());
         } elseif ($type === 'write') {
-            $connection->setReadDriver($connection->getDriver());
+            $connection->setReadPdo($connection->getPdo());
         }
 
         return $connection;
@@ -258,8 +281,8 @@ class CDatabase_Manager implements CDatabase_Contract_ConnectionResolverInterfac
         );
 
         return $this->connections[$name]
-            ->setDriver($fresh->getRawDriver())
-            ->setReadDriver($fresh->getRawReadDriver());
+            ->setPdo($fresh->getRawPdo())
+            ->setReadPdo($fresh->getRawReadPdo());
     }
 
     /**

@@ -52,6 +52,7 @@ class CDatabase_Schema_Builder {
      */
     public function __construct(CDatabase_Connection $connection) {
         $this->connection = $connection;
+
         $this->grammar = $connection->getSchemaGrammar();
     }
 

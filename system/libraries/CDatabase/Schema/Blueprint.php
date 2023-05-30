@@ -2,12 +2,6 @@
 
 defined('SYSPATH') or die('No direct access allowed.');
 
-/**
- * @author Hery Kurniawan
- * @license Ittron Global Teknologi <ittron.co.id>
- *
- * @since Aug 18, 2018, 10:19:43 AM
- */
 class CDatabase_Schema_Blueprint {
     use CTrait_Macroable;
 

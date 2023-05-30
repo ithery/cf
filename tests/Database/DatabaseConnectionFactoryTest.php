@@ -44,49 +44,38 @@ class DatabaseConnectionFactoryTest extends TestCase {
         $this->assertInstanceOf(PDO::class, $this->db->connection()->getReadPdo());
         $this->assertInstanceOf(PDO::class, $this->db->connection('read_write')->getPdo());
         $this->assertInstanceOf(PDO::class, $this->db->connection('read_write')->getReadPdo());
-        // $this->assertInstanceOf(PDO::class, $this->db->connection('url')->getDriver());
-        // $this->assertInstanceOf(PDO::class, $this->db->connection('url')->getReadDriver());
+        $this->assertInstanceOf(PDO::class, $this->db->connection('url')->getPdo());
+        $this->assertInstanceOf(PDO::class, $this->db->connection('url')->getReadPdo());
     }
 
-    // public function testConnectionFromUrlHasProperConfig() {
-    //     $this->db->addConnection([
-    //         'url' => 'mysql://root:pass@db/local?strict=true',
-    //         'unix_socket' => '',
-    //         'charset' => 'utf8mb4',
-    //         'collation' => 'utf8mb4_unicode_ci',
-    //         'prefix' => '',
-    //         'prefix_indexes' => true,
-    //         'strict' => false,
-    //         'engine' => null,
-    //     ], 'url-config');
+    public function testConnectionFromUrlHasProperConfig() {
+        $this->db->addConnection([
+            'url' => 'mysql://root:pass@db/local?strict=true',
+            'unix_socket' => '',
+            'charset' => 'utf8mb4',
+            'collation' => 'utf8mb4_unicode_ci',
+            'prefix' => '',
+            'prefix_indexes' => true,
+            'strict' => false,
+            'engine' => null,
+        ], 'url-config');
+        $this->assertEquals(carr::get($this->db->getConnection('url-config')->getConfig(), 'host'), 'db');
+        $this->assertEquals(carr::get($this->db->getConnection('url-config')->getConfig(), 'password'), 'pass');
+        $this->assertEquals(carr::get($this->db->getConnection('url-config')->getConfig(), 'username'), 'root');
+        $this->assertEquals(carr::get($this->db->getConnection('url-config')->getConfig(), 'database'), 'local');
+        $this->assertEquals(carr::get($this->db->getConnection('url-config')->getConfig(), 'strict'), true);
+    }
 
-    //     $this->assertEquals([
-    //         'name' => 'url-config',
-    //         'driver' => 'mysql',
-    //         'database' => 'local',
-    //         'host' => 'db',
-    //         'username' => 'root',
-    //         'password' => 'pass',
-    //         'unix_socket' => '',
-    //         'charset' => 'utf8mb4',
-    //         'collation' => 'utf8mb4_unicode_ci',
-    //         'prefix' => '',
-    //         'prefix_indexes' => true,
-    //         'strict' => true,
-    //         'engine' => null,
-    //     ], $this->db->getConnection('url-config')->getConfig());
-    // }
+    public function testSingleConnectionNotCreatedUntilNeeded() {
+        $connection = $this->db->getConnection();
+        $pdo = new ReflectionProperty(get_class($connection), 'pdo');
+        $pdo->setAccessible(true);
+        $readPdo = new ReflectionProperty(get_class($connection), 'readPdo');
+        $readPdo->setAccessible(true);
 
-    // public function testSingleConnectionNotCreatedUntilNeeded() {
-    //     $connection = $this->db->getConnection();
-    //     $pdo = new ReflectionProperty(get_class($connection), 'pdo');
-    //     $pdo->setAccessible(true);
-    //     $readPdo = new ReflectionProperty(get_class($connection), 'readPdo');
-    //     $readPdo->setAccessible(true);
-
-    //     $this->assertNotInstanceOf(PDO::class, $pdo->getValue($connection));
-    //     $this->assertNotInstanceOf(PDO::class, $readPdo->getValue($connection));
-    // }
+        $this->assertNotInstanceOf(PDO::class, $pdo->getValue($connection));
+        $this->assertNotInstanceOf(PDO::class, $readPdo->getValue($connection));
+    }
 
     // public function testReadWriteConnectionsNotCreatedUntilNeeded() {
     //     $connection = $this->db->getConnection('read_write');

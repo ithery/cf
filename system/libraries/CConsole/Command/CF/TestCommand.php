@@ -100,8 +100,8 @@ class CConsole_Command_CF_TestCommand extends CConsole_Command {
      */
     protected function binary() {
         $command = class_exists(\Pest\Laravel\PestServiceProvider::class)
-            ? c::fixPath(CF::appDir()) . 'vendor/pestphp/pest/bin/pest'
-            : c::fixPath(CF::appDir()) . 'vendor/phpunit/phpunit/phpunit';
+            ? c::fixPath(DOCROOT) . 'vendor/pestphp/pest/bin/pest'
+            : c::fixPath(DOCROOT) . 'vendor/phpunit/phpunit/phpunit';
 
         $command = DOCROOT . '.bin' . DS . 'phpunit' . DS . 'phpunit';
 
@@ -133,8 +133,8 @@ class CConsole_Command_CF_TestCommand extends CConsole_Command {
             return !cstr::startsWith($option, '--env=');
         }));
 
-        if (!file_exists($file = c::fixPath(CF::appDir()) . 'phpunit.xml')) {
-            $file = c::fixPath(CF::appDir()) . 'phpunit.xml.dist';
+        if (!file_exists($file = c::fixPath(DOCROOT) . 'phpunit.xml')) {
+            $file = c::fixPath(DOCROOT) . 'phpunit.xml.dist';
         }
         if (!file_exists($file)) {
             throw new Exception('File not found:' . $file);

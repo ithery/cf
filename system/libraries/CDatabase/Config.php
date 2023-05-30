@@ -41,7 +41,7 @@ class CDatabase_Config {
         return null;
     }
 
-    protected static function flattenFormat(array $config) {
+    public static function flattenFormat(array $config) {
         if (isset($config['connection'])) {
             $connection = $config['connection'];
             $formattedConnection = static::reformatConnectionFormat($connection);
@@ -64,6 +64,7 @@ class CDatabase_Config {
         if (!isset($config['driver']) && isset($config['type'])) {
             $config['driver'] = $config['type'];
         }
+
         $defaultConfig = [
             'benchmark' => true,
             'persistent' => false,
@@ -77,10 +78,13 @@ class CDatabase_Config {
         ];
 
         $config = array_merge($defaultConfig, $config);
+
         if (!isset($config['port']) || $config['port'] == false) {
-            $port = static::getDefaultPort($config['driver']);
-            if ($port !== null) {
-                $config['port'] = $port;
+            if (isset($config['driver'])) {
+                $port = static::getDefaultPort($config['driver']);
+                if ($port !== null) {
+                    $config['port'] = $port;
+                }
             }
         }
 

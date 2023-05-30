@@ -56,11 +56,11 @@ abstract class CDatabase_Schema_Grammar extends CDatabase_Grammar {
      *
      * @param \CDatabase_Schema_Blueprint $blueprint
      * @param \CBase_Fluent               $command
-     * @param \CDatabase                  $connection
+     * @param \CDatabase_Connection       $connection
      *
      * @return array
      */
-    public function compileRenameColumn(CDatabase_Schema_Blueprint $blueprint, CBase_Fluent $command, CDatabase $connection) {
+    public function compileRenameColumn(CDatabase_Schema_Blueprint $blueprint, CBase_Fluent $command, CDatabase_Connection $connection) {
         return CDatabase_Schema_Grammar_RenameColumn::compile($this, $blueprint, $command, $connection);
     }
 
@@ -360,79 +360,5 @@ abstract class CDatabase_Schema_Grammar extends CDatabase_Grammar {
      */
     public function compileDisableForeignKeyConstraints() {
         throw new LogicException('This database driver does not support disable foreign key constraints.');
-    }
-
-    /**
-     * Compile the SQL needed to enable a writable schema.
-     *
-     * @return string
-     */
-    public function compileEnableWriteableSchema() {
-        throw new LogicException('This database driver does not support enable writeable schema.');
-    }
-
-    /**
-     * Compile the SQL needed to drop all tables.
-     *
-     * @return string
-     */
-    public function compileDropAllTables() {
-        throw new LogicException('This database driver does not support drop all tables.');
-    }
-
-    /**
-     * Compile the SQL needed to disable a writable schema.
-     *
-     * @return string
-     */
-    public function compileDisableWriteableSchema() {
-        throw new LogicException('This database driver does not support disable writeable schema.');
-    }
-
-    /**
-     * Compile the SQL needed to rebuild the database.
-     *
-     * @return string
-     */
-    public function compileRebuild() {
-        throw new LogicException('This database driver does not support rebuild.');
-    }
-
-    /**
-     * Compile the SQL needed to drop all views.
-     *
-     * @return string
-     */
-    public function compileDropAllViews() {
-        throw new LogicException('This database driver does not support drop all views.');
-    }
-
-    /**
-     * Compile the SQL needed to retrieve all table names.
-     *
-     * @return string
-     */
-    public function compileGetAllTables() {
-        throw new LogicException('This database driver does not support get all tables.');
-    }
-
-    /**
-     * Compile the SQL needed to retrieve all view names.
-     *
-     * @return string
-     */
-    public function compileGetAllViews() {
-        throw new LogicException('This database driver does not support get all views.');
-    }
-
-    /**
-     * Compile the query to determine the list of columns.
-     *
-     * @param string $table
-     *
-     * @return string
-     */
-    public function compileColumnListing($table) {
-        throw new LogicException('This database driver does not support column listing.');
     }
 }

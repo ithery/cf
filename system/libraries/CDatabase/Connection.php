@@ -1784,4 +1784,16 @@ class CDatabase_Connection implements CDatabase_ConnectionInterface {
 
         return '`' . str_replace('.', '`.`', $table) . '`';
     }
+
+    public function disableBenchmark() {
+        return $this->disableQueryLog();
+    }
+
+    public function enableBenchmark() {
+        return $this->enableQueryLog();
+    }
+
+    public function getBenchmarks() {
+        return $this->getQueryLog();
+    }
 }

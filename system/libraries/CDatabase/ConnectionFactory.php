@@ -34,6 +34,7 @@ class CDatabase_ConnectionFactory {
      * @return CDatabase_Connection
      */
     public function make(array $config, $name = null) {
+        $config = CDatabase_Config::flattenFormat($config);
         $config = $this->parseConfig($config, $name);
 
         if (isset($config['read'])) {
@@ -160,7 +161,9 @@ class CDatabase_ConnectionFactory {
      * @return \Closure
      */
     protected function createPdoResolver(array $config) {
-        return array_key_exists('host', $config)
+        $host = carr::get($config, 'host');
+
+        return $host
             ? $this->createPdoResolverWithHosts($config)
             : $this->createPdoResolverWithoutHosts($config);
     }
@@ -276,8 +279,10 @@ class CDatabase_ConnectionFactory {
         }
 
         switch ($driver) {
+            case 'pdo.mysql':
             case 'mysqli':
-                return new CDatabase_Connection_MySqliConnection($connection, $database, $prefix, $config);
+            case 'mysql':
+                return new CDatabase_Connection_Pdo_MySqlConnection($connection, $database, $prefix, $config);
             case 'sqlite':
                 return new CDatabase_Connection_Pdo_SqliteConnection($connection, $database, $prefix, $config);
                 // case 'mongodb':

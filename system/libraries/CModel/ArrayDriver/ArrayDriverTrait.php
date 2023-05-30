@@ -86,7 +86,8 @@ trait CModel_ArrayDriver_ArrayDriverTrait {
             'database' => $database,
         ];
 
-        static::$arrayDriverConnection = CDatabase::instance(static::class, $config);
+        static::$arrayDriverConnection = CDatabase::connectionFactory()->make($config);
+        CDatabase::manager()->addConnection($config, static::class);
     }
 
     public function migrate() {

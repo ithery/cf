@@ -95,11 +95,7 @@ class CDatabase_Schema_Grammar_MySql extends CDatabase_Schema_Grammar {
         // Finally, we will append the engine configuration onto this SQL statement as
         // the final thing we do before returning this finished SQL. Once this gets
         // added the query will be ready to execute against the real connections.
-        return array_values(array_filter(array_merge([$this->compileCreateEngine(
-            $sql,
-            $connection,
-            $blueprint
-        )], $this->compileAutoIncrementStartingValues($blueprint))));
+        return $this->compileCreateEngine($sql, $connection, $blueprint);
     }
 
     /**
@@ -181,23 +177,43 @@ class CDatabase_Schema_Grammar_MySql extends CDatabase_Schema_Grammar {
     public function compileAdd(CDatabase_Schema_Blueprint $blueprint, CBase_Fluent $command) {
         $columns = $this->prefixArray('add', $this->getColumns($blueprint));
 
-        return array_values(array_merge(
-            ['alter table ' . $this->wrapTable($blueprint) . ' ' . implode(', ', $columns)],
-            $this->compileAutoIncrementStartingValues($blueprint)
-        ));
+        return 'alter table ' . $this->wrapTable($blueprint) . ' ' . implode(', ', $columns);
     }
 
     /**
      * Compile the auto-incrementing column starting values.
      *
      * @param \CDatabase_Schema_Blueprint $blueprint
+     * @param \CBase_Fluent               $command
      *
-     * @return array
+     * @return string
      */
-    public function compileAutoIncrementStartingValues(CDatabase_Schema_Blueprint $blueprint) {
-        return c::collect($blueprint->autoIncrementingStartingValues())->map(function ($value, $column) use ($blueprint) {
-            return 'alter table ' . $this->wrapTable($blueprint->getTable()) . ' auto_increment = ' . $value;
-        })->all();
+    public function compileAutoIncrementStartingValues(CDatabase_Schema_Blueprint $blueprint, CBase_Fluent $command) {
+        if ($command->column->autoIncrement
+            && $value = $command->column->get('startingValue', $command->column->get('from'))
+        ) {
+            return 'alter table ' . $this->wrapTable($blueprint) . ' auto_increment = ' . $value;
+        }
+    }
+
+    /**
+     * Compile a rename column command.
+     *
+     * @param \CDatabase_Schema_Blueprint $blueprint
+     * @param \CBase_Fluent               $command
+     * @param \CDatabase_Connection       $connection
+     *
+     * @return array|string
+     */
+    public function compileRenameColumn(CDatabase_Schema_Blueprint $blueprint, CBase_Fluent $command, CDatabase_Connection $connection) {
+        return $connection->usingNativeSchemaOperations()
+            ? sprintf(
+                'alter table %s rename column %s to %s',
+                $this->wrapTable($blueprint),
+                $this->wrap($command->from),
+                $this->wrap($command->to)
+            )
+            : parent::compileRenameColumn($blueprint, $command, $connection);
     }
 
     /**

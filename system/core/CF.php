@@ -679,7 +679,11 @@ final class CF {
      * @return string
      */
     public static function cliDomain() {
-        $domain = static::cliAppCode() . '.test';
+        $domain = null;
+        if (static::cliAppCode()) {
+            $domain = static::cliAppCode() . '.test';
+        }
+
         if (defined('CFCLI_APPCODE')) {
             return constant('CFCLI_APPCODE') . '.test';
         }
@@ -712,21 +716,8 @@ final class CF {
                 }
             }
         }
-        if (isset($_SERVER['argv']) && is_array($_SERVER['argv'])) {
-            foreach ($_SERVER['argv'] as $argv) {
-                if (is_string($argv)) {
-                    if (strncmp($argv, 'app:', strlen('app:')) === 0) {
-                        return substr($argv, 4);
-                    }
-                }
-            }
-        }
-        $domain = null;
-        if (file_exists(static::CFCLI_CURRENT_APPCODE_FILE)) {
-            $domain = trim(file_get_contents(static::CFCLI_CURRENT_APPCODE_FILE));
-        }
 
-        return $domain;
+        return null;
     }
 
     public static function domain() {
@@ -749,16 +740,8 @@ final class CF {
             if (defined('CFCLI_APPCODE')) {
                 return constant('CFCLI_APPCODE') . '.test';
             }
+
             if (static::isCFCli() || static::isTesting()) {
-                if (isset($_SERVER['argv']) && is_array($_SERVER['argv'])) {
-                    foreach ($_SERVER['argv'] as $argv) {
-                        if (is_string($argv)) {
-                            if (strncmp($argv, 'app:', strlen('app:')) === 0) {
-                                return substr($argv, 4) . '.local';
-                            }
-                        }
-                    }
-                }
                 $domain = static::cliDomain();
             } else {
                 if (isset($_SERVER['argv'][2])) {
@@ -878,6 +861,9 @@ final class CF {
     public static function data($domain = null) {
         $domain = $domain == null ? self::domain() : $domain;
 
+        if (is_null($domain)) {
+            return [];
+        }
         if (!isset(self::$data[$domain])) {
             self::$data[$domain] = CFData::domain($domain);
             if (self::$data[$domain] == null) {
@@ -914,6 +900,7 @@ final class CF {
         if (static::$forceAppCode) {
             return static::$forceAppCode;
         }
+
         if (CF::isCFCli() || CF::isTesting()) {
             if (CF::cliAppCode()) {
                 return CF::cliAppCode();
