@@ -39,6 +39,28 @@ class DatabaseConnectionFactoryTest extends TestCase {
         m::close();
     }
 
+    public function testSingleConnectionNotCreatedUntilNeeded() {
+        $connection = $this->db->getConnection();
+        $pdo = new ReflectionProperty(get_class($connection), 'pdo');
+        $pdo->setAccessible(true);
+        $readPdo = new ReflectionProperty(get_class($connection), 'readPdo');
+        $readPdo->setAccessible(true);
+
+        $this->assertNotInstanceOf(PDO::class, $pdo->getValue($connection));
+        $this->assertNotInstanceOf(PDO::class, $readPdo->getValue($connection));
+    }
+
+    public function testReadWriteConnectionsNotCreatedUntilNeeded() {
+        $connection = $this->db->getConnection('read_write');
+        $pdo = new ReflectionProperty(get_class($connection), 'pdo');
+        $pdo->setAccessible(true);
+        $readPdo = new ReflectionProperty(get_class($connection), 'readPdo');
+        $readPdo->setAccessible(true);
+
+        $this->assertNotInstanceOf(PDO::class, $pdo->getValue($connection));
+        $this->assertNotInstanceOf(PDO::class, $readPdo->getValue($connection));
+    }
+
     public function testConnectionCanBeCreated() {
         $this->assertInstanceOf(PDO::class, $this->db->connection()->getPdo());
         $this->assertInstanceOf(PDO::class, $this->db->connection()->getReadPdo());
@@ -66,60 +88,30 @@ class DatabaseConnectionFactoryTest extends TestCase {
         $this->assertEquals(carr::get($this->db->getConnection('url-config')->getConfig(), 'strict'), true);
     }
 
-    public function testSingleConnectionNotCreatedUntilNeeded() {
-        $connection = $this->db->getConnection();
-        $pdo = new ReflectionProperty(get_class($connection), 'pdo');
-        $pdo->setAccessible(true);
-        $readPdo = new ReflectionProperty(get_class($connection), 'readPdo');
-        $readPdo->setAccessible(true);
+    public function testIfDriverIsntSetExceptionIsThrown() {
+        $this->expectException(InvalidArgumentException::class);
+        $this->expectExceptionMessage('A driver must be specified.');
 
-        $this->assertNotInstanceOf(PDO::class, $pdo->getValue($connection));
-        $this->assertNotInstanceOf(PDO::class, $readPdo->getValue($connection));
+        $factory = CDatabase::connectionFactory();
+        $factory->createConnector(['foo']);
     }
 
-    // public function testReadWriteConnectionsNotCreatedUntilNeeded() {
-    //     $connection = $this->db->getConnection('read_write');
-    //     $pdo = new ReflectionProperty(get_class($connection), 'pdo');
-    //     $pdo->setAccessible(true);
-    //     $readPdo = new ReflectionProperty(get_class($connection), 'readPdo');
-    //     $readPdo->setAccessible(true);
+    public function testExceptionIsThrownOnUnsupportedDriver() {
+        $this->expectException(InvalidArgumentException::class);
+        $this->expectExceptionMessage('Unsupported driver [foo]');
 
-    //     $this->assertNotInstanceOf(PDO::class, $pdo->getValue($connection));
-    //     $this->assertNotInstanceOf(PDO::class, $readPdo->getValue($connection));
-    // }
+        $factory = CDatabase::connectionFactory();
+        //$container->shouldReceive('bound')->once()->andReturn(false);
+        $factory->createConnector(['driver' => 'foo']);
+    }
 
-    // public function testIfDriverIsntSetExceptionIsThrown() {
-    //     $this->expectException(InvalidArgumentException::class);
-    //     $this->expectExceptionMessage('A driver must be specified.');
+    public function testSqliteForeignKeyConstraints() {
+        $this->db->addConnection([
+            'url' => 'sqlite:///:memory:?foreign_key_constraints=true',
+        ], 'constraints_set');
 
-    //     $factory = new ConnectionFactory($container = m::mock(Container::class));
-    //     $factory->createConnector(['foo']);
-    // }
+        $this->assertEquals(0, $this->db->getConnection()->select('PRAGMA foreign_keys')[0]->foreign_keys);
 
-    // public function testExceptionIsThrownOnUnsupportedDriver() {
-    //     $this->expectException(InvalidArgumentException::class);
-    //     $this->expectExceptionMessage('Unsupported driver [foo]');
-
-    //     $factory = new ConnectionFactory($container = m::mock(Container::class));
-    //     $container->shouldReceive('bound')->once()->andReturn(false);
-    //     $factory->createConnector(['driver' => 'foo']);
-    // }
-
-    // public function testCustomConnectorsCanBeResolvedViaContainer() {
-    //     $factory = new ConnectionFactory($container = m::mock(Container::class));
-    //     $container->shouldReceive('bound')->once()->with('db.connector.foo')->andReturn(true);
-    //     $container->shouldReceive('make')->once()->with('db.connector.foo')->andReturn('connector');
-
-    //     $this->assertSame('connector', $factory->createConnector(['driver' => 'foo']));
-    // }
-
-    // public function testSqliteForeignKeyConstraints() {
-    //     $this->db->addConnection([
-    //         'url' => 'sqlite:///:memory:?foreign_key_constraints=true',
-    //     ], 'constraints_set');
-
-    //     $this->assertEquals(0, $this->db->getConnection()->select('PRAGMA foreign_keys')[0]->foreign_keys);
-
-    //     $this->assertEquals(1, $this->db->getConnection('constraints_set')->select('PRAGMA foreign_keys')[0]->foreign_keys);
-    // }
+        $this->assertEquals(1, $this->db->getConnection('constraints_set')->select('PRAGMA foreign_keys')[0]->foreign_keys);
+    }
 }
