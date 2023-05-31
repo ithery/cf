@@ -54,6 +54,18 @@ return [
             // 'encrypt' => env('DB_ENCRYPT', 'yes'),
             // 'trust_server_certificate' => c::env('DB_TRUST_SERVER_CERTIFICATE', 'false'),
         ],
+        'odbc' => [
+            'driver' => 'odbc',
+            'dsn' => c::env('ODBC_DSN'),
+            'host' => c::env('ODBC_HOST'),
+            'database' => c::env('ODBC_DB'),
+            'username' => c::env('ODBC_USERNAME'),
+            'password' => c::env('ODBC_PASSWORD'),
+            'grammar' => [
+                'query' => CDatabase_Query_Grammar_OdbcGrammar::class,
+                'schema' => CDatabase_Schema_Grammar_OdbcGrammar::class,
+            ]
+        ],
     ],
     'redis' => [
         'client' => c::env('REDIS_CLIENT', 'phpredis'),
