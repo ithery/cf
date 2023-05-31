@@ -33,7 +33,7 @@ trait CModel_Relation_Trait_HasEagerLimit {
 
             $grammar = $this->query->getQuery()->getGrammar();
 
-            if ($grammar instanceof CDatabase_Query_Grammar_Mysql && $grammar->useLegacyGroupLimit($this->query->getQuery())) {
+            if ($grammar instanceof CDatabase_Query_Grammar_MySqlGrammar && $grammar->useLegacyGroupLimit($this->query->getQuery())) {
                 $column = 'laravel_through_key';
             }
 

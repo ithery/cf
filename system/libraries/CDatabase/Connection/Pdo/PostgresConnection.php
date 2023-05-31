@@ -1,6 +1,6 @@
 <?php
 
-class CDatabase_Connection_MySqlConnection extends CDatabase_Connection {
+class CDatabase_Connection_Pdo_PostgresConnection extends CDatabase_Connection {
     /**
      * Escape a binary value for safe SQL embedding.
      *
@@ -11,16 +11,27 @@ class CDatabase_Connection_MySqlConnection extends CDatabase_Connection {
     protected function escapeBinary($value) {
         $hex = bin2hex($value);
 
-        return "x'{$hex}'";
+        return "'\x{$hex}'::bytea";
+    }
+
+    /**
+     * Escape a bool value for safe SQL embedding.
+     *
+     * @param bool $value
+     *
+     * @return string
+     */
+    protected function escapeBool($value) {
+        return $value ? 'true' : 'false';
     }
 
     /**
      * Get the default query grammar instance.
      *
-     * @return \CDatabase_Query_Grammar_MySql
+     * @return \CDatabase_Query_Grammar_PostgresGrammar
      */
     protected function getDefaultQueryGrammar() {
-        ($grammar = new CDatabase_Query_Grammar_MySql())->setConnection($this);
+        ($grammar = new CDatabase_Query_Grammar_PostgresGrammar())->setConnection($this);
 
         return $this->withTablePrefix($grammar);
     }
@@ -28,23 +39,23 @@ class CDatabase_Connection_MySqlConnection extends CDatabase_Connection {
     /**
      * Get a schema builder instance for the connection.
      *
-     * @return \CDatabase_Schema_Builder_MySqlBuilder
+     * @return \CDatabase_Schema_Builder_PostgresBuilder
      */
     public function getSchemaBuilder() {
         if (is_null($this->schemaGrammar)) {
             $this->useDefaultSchemaGrammar();
         }
 
-        return new CDatabase_Schema_Builder_MySqlBuilder($this);
+        return new CDatabase_Schema_Builder_PostgresBuilder($this);
     }
 
     /**
      * Get the default schema grammar instance.
      *
-     * @return \CDatabase_Schema_Grammar_MySql
+     * @return \CDatabase_Schema_Grammar_PostgresGrammar
      */
     protected function getDefaultSchemaGrammar() {
-        ($grammar = new CDatabase_Schema_Grammar_MySql())->setConnection($this);
+        ($grammar = new CDatabase_Schema_Grammar_PostgresGrammar())->setConnection($this);
 
         return $this->withTablePrefix($grammar);
     }
@@ -54,27 +65,27 @@ class CDatabase_Connection_MySqlConnection extends CDatabase_Connection {
      *
      * @param null|callable $processFactory
      *
-     * @return \Illuminate\Database\Schema\MySqlSchemaState
+     * @return \CDatabase_Schema_SchemaState_PostgresSchemaState
      */
     public function getSchemaState(callable $processFactory = null) {
-        //return new MySqlSchemaState($this, $files, $processFactory);
+        return new CDatabase_Schema_SchemaState_PostgresSchemaState($this, $processFactory);
     }
 
     /**
      * Get the default post processor instance.
      *
-     * @return \CDatabase_Query_Processor_MySql
+     * @return \CDatabase_Query_Processor_PostgresProcessor
      */
     protected function getDefaultPostProcessor() {
-        return new CDatabase_Query_Processor_MySql();
+        return new CDatabase_Query_Processor_PostgresProcessor();
     }
 
     /**
      * Get the Doctrine DBAL driver.
      *
-     * @return \Illuminate\Database\PDO\MySqlDriver
+     * @return \CDatabase_Doctrine_PostgresDriver
      */
     protected function getDoctrineDriver() {
-        //return new MySqlDriver;
+        return new CDatabase_Doctrine_Driver_PostgresDriver();
     }
 }

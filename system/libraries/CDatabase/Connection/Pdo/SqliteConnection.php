@@ -41,10 +41,10 @@ class CDatabase_Connection_Pdo_SqliteConnection extends CDatabase_Connection {
     /**
      * Get the default query grammar instance.
      *
-     * @return \CDatabase_Query_Grammar_Sqlite
+     * @return \CDatabase_Query_Grammar_SqliteGrammar
      */
     protected function getDefaultQueryGrammar() {
-        ($grammar = new CDatabase_Query_Grammar_Sqlite())->setConnection($this);
+        ($grammar = new CDatabase_Query_Grammar_SqliteGrammar())->setConnection($this);
 
         return $this->withTablePrefix($grammar);
     }
@@ -87,10 +87,10 @@ class CDatabase_Connection_Pdo_SqliteConnection extends CDatabase_Connection {
     /**
      * Get the default post processor instance.
      *
-     * @return \CDatabase_Query_Processor_Sqlite
+     * @return \CDatabase_Query_Processor_SqliteProcessor
      */
     protected function getDefaultPostProcessor() {
-        return new CDatabase_Query_Processor_Sqlite();
+        return new CDatabase_Query_Processor_SqliteProcessor();
     }
 
     /**

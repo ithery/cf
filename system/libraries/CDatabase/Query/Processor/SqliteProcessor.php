@@ -1,6 +1,5 @@
 <?php
-
-class CDatabase_Query_Processor_MySql extends CDatabase_Query_Processor {
+class CDatabase_Query_Processor_SqliteProcessor extends CDatabase_Query_Processor {
     /**
      * Process the results of a column listing query.
      *
@@ -10,9 +9,7 @@ class CDatabase_Query_Processor_MySql extends CDatabase_Query_Processor {
      */
     public function processColumnListing($results) {
         return array_map(function ($result) {
-            $obj = ((object) $result);
-
-            return $obj->column_name;
+            return ((object) $result)->name;
         }, $results);
     }
 }

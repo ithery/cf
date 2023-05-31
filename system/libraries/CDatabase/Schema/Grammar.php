@@ -75,7 +75,7 @@ abstract class CDatabase_Schema_Grammar extends CDatabase_Grammar {
      *
      * @return array
      */
-    public function compileChange(CDatabase_Schema_Blueprint $blueprint, CBase_Fluent $command, CDatabase $connection) {
+    public function compileChange(CDatabase_Schema_Blueprint $blueprint, CBase_Fluent $command, CDatabase_Connection $connection) {
         return CDatabase_Schema_Grammar_ChangeColumn::compile($this, $blueprint, $command, $connection);
     }
 

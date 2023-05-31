@@ -1,5 +1,5 @@
 <?php
-class CDatabase_Query_Grammar_Sqlite extends CDatabase_Query_Grammar {
+class CDatabase_Query_Grammar_SqliteGrammar extends CDatabase_Query_Grammar {
     /**
      * All of the available clause operators.
      *

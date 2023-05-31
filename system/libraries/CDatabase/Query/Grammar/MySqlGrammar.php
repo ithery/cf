@@ -1,6 +1,6 @@
 <?php
 
-class CDatabase_Query_Grammar_MySql extends CDatabase_Query_Grammar {
+class CDatabase_Query_Grammar_MySqlGrammar extends CDatabase_Query_Grammar {
     /**
      * The grammar specific operators.
      *

@@ -1,6 +1,6 @@
 <?php
 
-class CDatabase_Query_Grammar_Sqlsrv extends CDatabase_Query_Grammar {
+class CDatabase_Query_Grammar_SqlServerGrammar extends CDatabase_Query_Grammar {
     /**
      * All of the available clause operators.
      *
@@ -13,6 +13,26 @@ class CDatabase_Query_Grammar_Sqlsrv extends CDatabase_Query_Grammar {
     ];
 
     /**
+     * The components that make up a select clause.
+     *
+     * @var string[]
+     */
+    protected $selectComponents = [
+        'aggregate',
+        'columns',
+        'from',
+        'indexHint',
+        'joins',
+        'wheres',
+        'groups',
+        'havings',
+        'orders',
+        'offset',
+        'limit',
+        'lock',
+    ];
+
+    /**
      * Compile a select query into SQL.
      *
      * @param \CDatabase_Query_Builder $query
@@ -20,21 +40,12 @@ class CDatabase_Query_Grammar_Sqlsrv extends CDatabase_Query_Grammar {
      * @return string
      */
     public function compileSelect(CDatabase_Query_Builder $query) {
-        if (!$query->offset) {
-            return parent::compileSelect($query);
+        // An order by clause is required for SQL Server offset to function...
+        if ($query->offset && empty($query->orders)) {
+            $query->orders[] = ['sql' => '(SELECT 0)'];
         }
 
-        // If an offset is present on the query, we will need to wrap the query in
-        // a big "ANSI" offset syntax block. This is very nasty compared to the
-        // other database systems but is necessary for implementing features.
-        if (is_null($query->columns)) {
-            $query->columns = ['*'];
-        }
-
-        return $this->compileAnsiOffset(
-            $query,
-            $this->compileComponents($query)
-        );
+        return parent::compileSelect($query);
     }
 
     /**
@@ -82,6 +93,36 @@ class CDatabase_Query_Grammar_Sqlsrv extends CDatabase_Query_Grammar {
         }
 
         return $from;
+    }
+
+    /**
+     * Compile the index hints for the query.
+     *
+     * @param \CDatabase_Query_Builder   $query
+     * @param \CDatabase_Query_IndexHint $indexHint
+     *
+     * @return string
+     */
+    protected function compileIndexHint(CDatabase_Query_Builder $query, $indexHint) {
+        return $indexHint->type === 'force'
+                    ? "with (index({$indexHint->index}))"
+                    : '';
+    }
+
+    /**
+     * @inheritdoc
+     *
+     * @param \CDatabase_Query_Builder $query
+     * @param array                    $where
+     *
+     * @return string
+     */
+    protected function whereBitwise(CDatabase_Query_Builder $query, $where) {
+        $value = $this->parameter($where['value']);
+
+        $operator = str_replace('?', '??', $where['operator']);
+
+        return '(' . $this->wrap($where['column']) . ' ' . $operator . ' ' . $value . ') != 0';
     }
 
     /**
@@ -138,6 +179,31 @@ class CDatabase_Query_Grammar_Sqlsrv extends CDatabase_Query_Grammar {
     }
 
     /**
+     * Compile a "JSON contains key" statement into SQL.
+     *
+     * @param string $column
+     *
+     * @return string
+     */
+    protected function compileJsonContainsKey($column) {
+        $segments = explode('->', $column);
+
+        $lastSegment = array_pop($segments);
+
+        if (preg_match('/\[([0-9]+)\]$/', $lastSegment, $matches)) {
+            $segments[] = cstr::beforeLast($lastSegment, $matches[0]);
+
+            $key = $matches[1];
+        } else {
+            $key = "'" . str_replace("'", "''", $lastSegment) . "'";
+        }
+
+        list($field, $path) = $this->wrapJsonFieldAndPath(implode('->', $segments));
+
+        return $key . ' in (select [key] from openjson(' . $field . $path . '))';
+    }
+
+    /**
      * Compile a "JSON length" statement into SQL.
      *
      * @param string $column
@@ -153,66 +219,44 @@ class CDatabase_Query_Grammar_Sqlsrv extends CDatabase_Query_Grammar {
     }
 
     /**
-     * Create a full ANSI offset clause for the query.
+     * Compile a "JSON value cast" statement into SQL.
      *
-     * @param \CDatabase_Query_Builder $query
-     * @param array                    $components
-     *
-     * @return string
-     */
-    protected function compileAnsiOffset(CDatabase_Query_Builder $query, $components) {
-        // An ORDER BY clause is required to make this offset query work, so if one does
-        // not exist we'll just create a dummy clause to trick the database and so it
-        // does not complain about the queries for not having an "order by" clause.
-        if (empty($components['orders'])) {
-            $components['orders'] = 'order by (select 0)';
-        }
-
-        // We need to add the row number to the query so we can compare it to the offset
-        // and limit values given for the statements. So we will add an expression to
-        // the "select" that will give back the row numbers on each of the records.
-        $components['columns'] .= $this->compileOver($components['orders']);
-
-        unset($components['orders']);
-
-        if ($this->queryOrderContainsSubquery($query)) {
-            $query->bindings = $this->sortBindingsForSubqueryOrderBy($query);
-        }
-
-        // Next we need to calculate the constraints that should be placed on the query
-        // to get the right offset and limit from our query but if there is no limit
-        // set we will just handle the offset only since that is all that matters.
-        $sql = $this->concatenate($components);
-
-        return $this->compileTableExpression($sql, $query);
-    }
-
-    /**
-     * Compile the over statement for a table expression.
-     *
-     * @param string $orderings
+     * @param string $value
      *
      * @return string
      */
-    protected function compileOver($orderings) {
-        return ", row_number() over ({$orderings}) as row_num";
+    public function compileJsonValueCast($value) {
+        return 'json_query(' . $value . ')';
     }
 
     /**
-     * Determine if the query's order by clauses contain a subquery.
+     * Compile a single having clause.
      *
-     * @param \CDatabase_Query_Builder $query
+     * @param array $having
      *
-     * @return bool
+     * @return string
      */
-    protected function queryOrderContainsSubquery($query) {
-        if (!is_array($query->orders)) {
-            return false;
+    protected function compileHaving(array $having) {
+        if ($having['type'] === 'Bitwise') {
+            return $this->compileHavingBitwise($having);
         }
 
-        return carr::first($query->orders, function ($value) {
-            return $this->isExpression($value['column'] ?? null);
-        }, false) !== false;
+        return parent::compileHaving($having);
+    }
+
+    /**
+     * Compile a having clause involving a bitwise operator.
+     *
+     * @param array $having
+     *
+     * @return string
+     */
+    protected function compileHavingBitwise($having) {
+        $column = $this->wrap($having['column']);
+
+        $parameter = $this->parameter($having['value']);
+
+        return '(' . $column . ' ' . $having['operator'] . ' ' . $parameter . ') != 0';
     }
 
     /**
@@ -226,20 +270,6 @@ class CDatabase_Query_Grammar_Sqlsrv extends CDatabase_Query_Grammar {
         return carr::sort($query->bindings, function ($bindings, $key) {
             return array_search($key, ['select', 'order', 'from', 'join', 'where', 'groupBy', 'having', 'union', 'unionOrder']);
         });
-    }
-
-    /**
-     * Compile a common table expression for a query.
-     *
-     * @param string                   $sql
-     * @param \CDatabase_Query_Builder $query
-     *
-     * @return string
-     */
-    protected function compileTableExpression($sql, $query) {
-        $constraint = $this->compileRowConstraint($query);
-
-        return "select * from ({$sql}) as temp_table where row_num {$constraint} order by row_num";
     }
 
     /**
@@ -281,7 +311,7 @@ class CDatabase_Query_Grammar_Sqlsrv extends CDatabase_Query_Grammar {
     /**
      * Compile the random statement into SQL.
      *
-     * @param string $seed
+     * @param string|int $seed
      *
      * @return string
      */
@@ -298,6 +328,12 @@ class CDatabase_Query_Grammar_Sqlsrv extends CDatabase_Query_Grammar {
      * @return string
      */
     protected function compileLimit(CDatabase_Query_Builder $query, $limit) {
+        $limit = (int) $limit;
+
+        if ($limit && $query->offset > 0) {
+            return "fetch next {$limit} rows only";
+        }
+
         return '';
     }
 
@@ -310,6 +346,12 @@ class CDatabase_Query_Grammar_Sqlsrv extends CDatabase_Query_Grammar {
      * @return string
      */
     protected function compileOffset(CDatabase_Query_Builder $query, $offset) {
+        $offset = (int) $offset;
+
+        if ($offset) {
+            return "offset {$offset} rows";
+        }
+
         return '';
     }
 
@@ -496,7 +538,7 @@ class CDatabase_Query_Grammar_Sqlsrv extends CDatabase_Query_Grammar {
     /**
      * Wrap a table in keyword identifiers.
      *
-     * @param \CDatabase_Query_Expression|string $table
+     * @param \Illuminate\Contracts\Database\Query\Expression|string $table
      *
      * @return string
      */
