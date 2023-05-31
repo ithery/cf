@@ -73,7 +73,7 @@ class CDatabase_Resolver implements CDatabase_ResolverInterface {
             $name = $this->getDefaultConnection();
         }
 
-        return CDatabase::instance($name, null, $this->domain)->connection();
+        return CDatabase::manager()->connection($name);
     }
 
     /**

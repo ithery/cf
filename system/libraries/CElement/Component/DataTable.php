@@ -177,7 +177,7 @@ class CElement_Component_DataTable extends CElement_Component {
         $this->responsive = false;
         $this->labels = [];
 
-        $db = CDatabase::instance();
+        $db = c::db();
 
         $this->dbName = $db->getName();
         $this->dbConfig = strlen($db->getName()) == 0 ? $db->config() : [];

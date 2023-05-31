@@ -151,7 +151,7 @@ trait CTrait_Element_Property_TableData {
                 }
                 $r = $db->query($this->tableDataQuery);
 
-                return $r->result_array(false);
+                return $r->resultArray(false);
 
                 break;
             default:

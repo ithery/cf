@@ -313,6 +313,15 @@ class CDatabase_Connection implements CDatabase_ConnectionInterface {
             return new CDatabase_ResultData($this->select($query, $bindings));
         }
 
+        return $this->newQuery();
+    }
+
+    /**
+     * Get a new query builder instance.
+     *
+     * @return \CDatabase_Query_Builder
+     */
+    public function newQuery() {
         return new CDatabase_Query_Builder(
             $this,
             $this->getQueryGrammar(),

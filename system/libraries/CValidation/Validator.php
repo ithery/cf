@@ -1402,7 +1402,7 @@ class CValidation_Validator implements CValidation_Contract_ValidatorInterface {
      */
     public function getPresenceVerifier() {
         if (!isset($this->presenceVerifier)) {
-            $this->presenceVerifier = new CValidation_PresenceVerifier_Database(CDatabase::instance());
+            $this->presenceVerifier = new CValidation_PresenceVerifier_Database(c::db());
             //throw new RuntimeException('Presence verifier has not been set.');
         }
 

@@ -133,7 +133,7 @@ class CApp implements CInterface_Responsable, CInterface_Renderable, CInterface_
             if ($user != null) {
                 if (!is_array($user) && is_object($user)) {
                     //update last request
-                    $db = $this->db();
+                    $db = c::db();
                     $db->update('users', ['last_request' => date('Y-m-d H:i:s')], ['user_id' => $user->user_id]);
                 }
             }
@@ -262,10 +262,12 @@ class CApp implements CInterface_Responsable, CInterface_Renderable, CInterface_
      * @param null|mixed $domain
      * @param null|mixed $dbName
      *
-     * @return CDatabase
+     * @deprecated 1.6 use c::db
+     *
+     * @return CDatabase_Connection
      */
     public static function db($domain = null, $dbName = null) {
-        return CDatabase::instance($dbName, null, $domain);
+        return CDatabase::manager()->connection($dbName);
     }
 
     public function setAjaxData($key, $value = null) {

@@ -182,7 +182,6 @@ trait CTrait_Controller_Application_Manager_Daemon {
             return c::redirect($this->controllerUrl());
         }
         $app = CApp::instance();
-        $db = CDatabase::instance();
         $group = carr::get($_GET, 'group');
         $app->addBreadcrumb($this->getTitle(), static::controllerUrl());
         $app->title(CManager::daemon()->getServiceName($serviceClass));
@@ -212,7 +211,6 @@ trait CTrait_Controller_Application_Manager_Daemon {
 
     public function logFile($serviceClass = null, $filename = null) {
         $app = CApp::instance();
-        $db = CDatabase::instance();
         $logFile = CManager::daemon()->getLogFile($serviceClass, $filename);
 
         $divLog = $app->addDiv()->addClass('console');
@@ -231,8 +229,6 @@ trait CTrait_Controller_Application_Manager_Daemon {
             return c::redirect($this->controllerUrl() . 'log/index' . static::groupQueryString());
         }
         $group = carr::get($_GET, 'group');
-        $app = CApp::instance();
-        $db = CDatabase::instance();
 
         $errCode = 0;
         $errMessage = '';
@@ -269,7 +265,6 @@ trait CTrait_Controller_Application_Manager_Daemon {
         }
 
         $app = CApp::instance();
-        $db = CDatabase::instance();
 
         $errCode = 0;
         $errMessage = '';
@@ -303,7 +298,6 @@ trait CTrait_Controller_Application_Manager_Daemon {
             return c::redirect($this->controllerUrl());
         }
         $app = CApp::instance();
-        $db = CDatabase::instance();
         $group = carr::get($_GET, 'group');
         $app->addBreadcrumb($this->getTitle(), static::controllerUrl());
         $app->title(CManager::daemon()->getServiceName($serviceClass));

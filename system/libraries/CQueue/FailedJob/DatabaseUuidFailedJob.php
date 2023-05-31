@@ -18,12 +18,12 @@ class CQueue_FailedJob_DatabaseUuidFailedJob extends CQueue_AbstractFailedJob im
     /**
      * Create a new database failed job provider.
      *
-     * @param CDatabase $database
-     * @param string    $table
+     * @param CDatabase_Connection $database
+     * @param string               $table
      *
      * @return void
      */
-    public function __construct(CDatabase $database, $table) {
+    public function __construct(CDatabase_Connection $database, $table) {
         $this->table = $table;
         $this->database = $database;
     }

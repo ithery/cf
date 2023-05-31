@@ -8,8 +8,7 @@ trait CTrait_Controller_Application_Manager_Cron {
     }
 
     public function index() {
-        $app = CApp::instance();
-        $db = CDatabase::instance();
+        $app = c::app();
         $rows = [];
 
         foreach (c::cron()->events() as $event) {
@@ -132,7 +131,7 @@ trait CTrait_Controller_Application_Manager_Cron {
 
         $event->rotate();
 
-        return c::redirect(static::controllerUrl(). 'log/' . $eventId);
+        return c::redirect(static::controllerUrl() . 'log/' . $eventId);
     }
 
     private function getEvent($eventId) {

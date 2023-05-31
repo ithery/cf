@@ -40,8 +40,8 @@ trait CAjax_Engine_DataTable_Trait_ProcessorModelQueryTrait {
                 }
             });
 
-            // $sql = CDatabase::instance()->compileBinds($query->toSql(), $query->getBindings());
-                // cdbg::dd($sql);
+            // $sql = c::db()->compileBinds($query->toSql(), $query->getBindings());
+            // cdbg::dd($sql);
         }
         // Quick Search
         $qs_cond = [];

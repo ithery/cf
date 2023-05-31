@@ -10,7 +10,7 @@ defined('SYSPATH') or die('No direct access allowed.');
  */
 class CQueue_FailedJob_DatabaseFailedJob extends CQueue_AbstractFailedJob {
     /**
-     * The current connection
+     * The current connection.
      *
      * @var CDatabase
      */
@@ -26,12 +26,12 @@ class CQueue_FailedJob_DatabaseFailedJob extends CQueue_AbstractFailedJob {
     /**
      * Create a new database failed job provider.
      *
-     * @param CDatabase $database
-     * @param string    $table
+     * @param CDatabase_Connection $database
+     * @param string               $table
      *
      * @return void
      */
-    public function __construct(CDatabase $db, $table) {
+    public function __construct(CDatabase_Connection $db, $table) {
         $this->table = $table;
         $this->db = $db;
     }
@@ -44,11 +44,12 @@ class CQueue_FailedJob_DatabaseFailedJob extends CQueue_AbstractFailedJob {
      * @param string     $payload
      * @param \Exception $exception
      *
-     * @return int|null
+     * @return null|int
      */
     public function log($connection, $queue, $payload, $exception) {
         $failed_at = CApp_Base::now();
         $exception = (string) $exception;
+
         return $this->getTable()->insertGetId(compact(
             'connection',
             'queue',
@@ -72,7 +73,7 @@ class CQueue_FailedJob_DatabaseFailedJob extends CQueue_AbstractFailedJob {
      *
      * @param mixed $id
      *
-     * @return object|null
+     * @return null|object
      */
     public function find($id) {
         return $this->getTable()->find($id);

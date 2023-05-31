@@ -120,7 +120,7 @@ trait CElement_Component_DataTable_Trait_Legacy_ExportTrait {
         $no = 0;
         $data = $table->data;
         if (!is_resource($data)) {
-            $data = CDatabase::instance()->query($table->query);
+            $data = c::db()->query($table->query);
         }
         if (!is_resource($data)) {
             if (is_object($data)) {

@@ -2,14 +2,14 @@
 
 class CExporter_Transaction_Handler_DbHandler implements CExporter_Transaction_HandlerInterface {
     /**
-     * @var CDatabase
+     * @var CDatabase_Connection
      */
     private $connection;
 
     /**
-     * @param CDatabase $connection
+     * @param CDatabase_Connection $connection
      */
-    public function __construct(CDatabase $connection) {
+    public function __construct(CDatabase_Connection $connection) {
         $this->connection = $connection;
     }
 
