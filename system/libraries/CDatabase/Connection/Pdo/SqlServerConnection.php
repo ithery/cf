@@ -1,6 +1,6 @@
 <?php
 
-class CDatabase_Connection_SqlServerConnection extends CDatabase_Connection {
+class CDatabase_Connection_Pdo_SqlServerConnection extends CDatabase_Connection {
     /**
      * Execute a Closure within a transaction.
      *

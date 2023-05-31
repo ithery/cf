@@ -850,7 +850,12 @@ class CDatabase_Connection implements CDatabase_ConnectionInterface {
         $this->event(new CDatabase_Event_QueryExecuted($query, $bindings, $time, $this));
 
         if ($this->loggingQueries) {
-            $this->queryLog[] = compact('query', 'bindings', 'time');
+            $this->queryLog[] = [
+                'query' => $query,
+                'bindings' => $bindings,
+                'time' => $time,
+                'compiled' => $this->compileBinds($query, $bindings),
+            ];
         }
     }
 
@@ -1824,7 +1829,7 @@ class CDatabase_Connection implements CDatabase_ConnectionInterface {
     }
 
     public function lastQuery() {
-        return carr::get(carr::last($this->getQueryLog()), 'query');
+        return carr::get(carr::last($this->getQueryLog()), 'compiled');
     }
 
     public function getRow($query) {

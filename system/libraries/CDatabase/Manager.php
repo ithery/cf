@@ -138,6 +138,10 @@ class CDatabase_Manager implements CDatabase_Contract_ConnectionResolverInterfac
             return call_user_func($this->extensions[$driver], $config, $name);
         }
 
+        if ($driver == 'mongodb') {
+            return $this->createMongoDBConnection($config);
+        }
+
         return CDatabase_ConnectionFactory::instance()->make($config, $name);
     }
 
@@ -155,6 +159,7 @@ class CDatabase_Manager implements CDatabase_Contract_ConnectionResolverInterfac
         $connections = carr::get($this->config, 'connections');
 
         $config = carr::get($connections, $name, carr::get($this->config, $name));
+
         if (is_null($config)) {
             throw new InvalidArgumentException("Database connection [{$name}] not configured.");
         }
@@ -402,5 +407,9 @@ class CDatabase_Manager implements CDatabase_Contract_ConnectionResolverInterfac
         }
 
         return $this->connection()->$method(...$parameters);
+    }
+
+    public function createMongoDBConnection($config) {
+        return new CDatabase_Connection_MongoDBConnection($config);
     }
 }

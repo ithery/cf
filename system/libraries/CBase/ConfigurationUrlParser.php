@@ -29,6 +29,9 @@ class CBase_ConfigurationUrlParser {
         }
 
         $url = carr::pull($config, 'url');
+        if (!$url) {
+            $url = carr::pull($config, 'connection.dsn');
+        }
 
         if (!$url) {
             return $config;

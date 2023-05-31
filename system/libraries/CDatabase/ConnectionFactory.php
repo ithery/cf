@@ -239,22 +239,20 @@ class CDatabase_ConnectionFactory {
             throw new InvalidArgumentException('A driver must be specified.');
         }
 
-        if (c::container()->bound($key = "db.connector.{$config['driver']}")) {
+        $driver = carr::get($config, 'driver');
+        $driver = carr::get($this->getDriverMap(), $driver, $driver);
+        if (c::container()->bound($key = "db.connector.{$driver}")) {
             return c::container()->make($key);
         }
-
-        switch ($config['driver']) {
-            case 'mysqli':
+        switch ($driver) {
             case 'mysql':
-            case 'pdo.mysql':
                 return new CDatabase_Connector_Pdo_MySqlConnector();
             case 'sqlite':
-            case 'pdo.sqlite':
                 return new CDatabase_Connector_Pdo_SqliteConnector();
-                        // case 'mongodb':
-            //     return new CDatabase_Connector_MongoDBConnector();
-            // case 'pdo.mysql':
-            //     return new CDatabase_Connector_PDOConnector_MySqlConnector();
+            case 'sqlsrv':
+                return new CDatabase_Connector_Pdo_SqlServerConnector();
+            case 'pgsql':
+                return new CDatabase_Connector_Pdo_PostgresConnector();
         }
 
         throw new InvalidArgumentException("Unsupported driver [{$config['driver']}].");
@@ -278,19 +276,27 @@ class CDatabase_ConnectionFactory {
             return $resolver($connection, $database, $prefix, $config);
         }
 
+        $driver = carr::get($this->getDriverMap(), $driver, $driver);
         switch ($driver) {
-            case 'pdo.mysql':
-            case 'mysqli':
             case 'mysql':
                 return new CDatabase_Connection_Pdo_MySqlConnection($connection, $database, $prefix, $config);
             case 'sqlite':
                 return new CDatabase_Connection_Pdo_SqliteConnection($connection, $database, $prefix, $config);
-                // case 'mongodb':
-            //     return new CDatabase_Connection_MongoDBConnection($connection, $database, $prefix, $config);
-            // case 'pdo.mysql':
-            //     return new CDatabase_Connection_PDOConnection_MysqlConnection($connection, $database, $prefix, $config);
+            case 'pgsql':
+                return new CDatabase_Connection_Pdo_PostgresConnection($connection, $database, $prefix, $config);
+            case 'sqlsrv':
+                return new CDatabase_Connection_Pdo_SqlServerConnection($connection, $database, $prefix, $config);
         }
 
         throw new InvalidArgumentException("Unsupported driver [{$driver}].");
+    }
+
+    private function getDriverMap() {
+        return [
+            'mysqli' => 'mysql',
+            'pdo.mysql' => 'mysql',
+            'postgre' => 'pgsql',
+            'postgres' => 'pgsql',
+        ];
     }
 }
