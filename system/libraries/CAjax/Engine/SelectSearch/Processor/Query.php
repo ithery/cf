@@ -9,7 +9,7 @@ class CAjax_Engine_SelectSearch_Processor_Query extends CAjax_Engine_SelectSearc
 
         $searchField = $this->searchField();
 
-        $db = CDatabase::instance();
+        $db = c::db();
 
         $term = '';
         $limit = '';

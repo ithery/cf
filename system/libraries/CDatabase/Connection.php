@@ -1794,6 +1794,10 @@ class CDatabase_Connection implements CDatabase_ConnectionInterface {
         return '`' . str_replace('.', '`.`', $table) . '`';
     }
 
+    public function escapeLike($str) {
+        return $this->escape($str);
+    }
+
     public function disableBenchmark() {
         return $this->disableQueryLog();
     }
