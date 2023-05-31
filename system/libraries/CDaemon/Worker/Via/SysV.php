@@ -2,12 +2,6 @@
 
 defined('SYSPATH') or die('No direct access allowed.');
 
-/**
- * @author Hery Kurniawan
- * @license Ittron Global Teknologi <ittron.co.id>
- *
- * @since Mar 16, 2019, 4:04:42 AM
- */
 class CDaemon_Worker_Via_SysV implements CDaemon_Worker_ViaInterface, CDaemon_PluginInterface {
     /**
      * Each SHM block has a header with needed metadata.

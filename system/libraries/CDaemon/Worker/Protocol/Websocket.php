@@ -3,13 +3,6 @@
 defined('SYSPATH') or die('No direct access allowed.');
 
 /**
- * @author Hery Kurniawan
- * @license Ittron Global Teknologi <ittron.co.id>
- *
- * @since Mar 17, 2019, 4:39:55 PM
- */
-
-/**
  * WebSocket protocol.
  */
 class CDaemon_Worker_Protocol_Websocket extends CDaemon_Worker_ProtocolAbstract {
@@ -62,6 +55,7 @@ class CDaemon_Worker_Protocol_Websocket extends CDaemon_Worker_ProtocolAbstract 
             if (!$masked) {
                 Worker::safeEcho("frame not masked so close the connection\n");
                 $connection->close();
+
                 return 0;
             }
             $opcode = $firstbyte & 0xf;
@@ -91,6 +85,7 @@ class CDaemon_Worker_Protocol_Websocket extends CDaemon_Worker_ProtocolAbstract 
                     else {
                         $connection->close("\x88\x02\x27\x10", true);
                     }
+
                     return 0;
                 // Ping package.
                 case 0x9:
@@ -102,6 +97,7 @@ class CDaemon_Worker_Protocol_Websocket extends CDaemon_Worker_ProtocolAbstract 
                 default:
                     Worker::safeEcho("error opcode $opcode and close websocket connection. Buffer:" . bin2hex($buffer) . "\n");
                     $connection->close();
+
                     return 0;
             }
             // Calculate packet length.
@@ -128,6 +124,7 @@ class CDaemon_Worker_Protocol_Websocket extends CDaemon_Worker_ProtocolAbstract 
             if ($total_package_size > $connection->maxPackageSize) {
                 Worker::safeEcho("error package. package_length=$total_package_size\n");
                 $connection->close();
+
                 return 0;
             }
             if ($is_fin_frame) {
@@ -155,6 +152,7 @@ class CDaemon_Worker_Protocol_Websocket extends CDaemon_Worker_ProtocolAbstract 
                             return static::input(substr($buffer, $current_frame_length), $connection);
                         }
                     }
+
                     return 0;
                 } elseif ($opcode === 0xa) {
                     if ($recv_len >= $current_frame_length) {
@@ -179,8 +177,10 @@ class CDaemon_Worker_Protocol_Websocket extends CDaemon_Worker_ProtocolAbstract 
                             return static::input(substr($buffer, $current_frame_length), $connection);
                         }
                     }
+
                     return 0;
                 }
+
                 return $current_frame_length;
             } else {
                 $connection->websocketCurrentFrameLength = $current_frame_length;
@@ -191,6 +191,7 @@ class CDaemon_Worker_Protocol_Websocket extends CDaemon_Worker_ProtocolAbstract 
             static::decode($buffer, $connection);
             $connection->consumeRecvBuffer($connection->websocketCurrentFrameLength);
             $connection->websocketCurrentFrameLength = 0;
+
             return 0;
         } // The length of the received data is greater than the length of a frame.
         elseif ($connection->websocketCurrentFrameLength < $recv_len) {
@@ -250,6 +251,7 @@ class CDaemon_Worker_Protocol_Websocket extends CDaemon_Worker_ProtocolAbstract 
                         exit(250);
                     }
                 }
+
                 return '';
             }
             $connection->tmpWebsocketData .= $encode_buffer;
@@ -270,6 +272,7 @@ class CDaemon_Worker_Protocol_Websocket extends CDaemon_Worker_ProtocolAbstract 
             // Return empty string.
             return '';
         }
+
         return $encode_buffer;
     }
 
@@ -301,12 +304,14 @@ class CDaemon_Worker_Protocol_Websocket extends CDaemon_Worker_ProtocolAbstract 
         }
         if ($connection->websocketCurrentFrameLength) {
             $connection->websocketDataBuffer .= $decoded;
+
             return $connection->websocketDataBuffer;
         } else {
             if ($connection->websocketDataBuffer !== '') {
                 $decoded = $connection->websocketDataBuffer . $decoded;
                 $connection->websocketDataBuffer = '';
             }
+
             return $decoded;
         }
     }
@@ -335,6 +340,7 @@ class CDaemon_Worker_Protocol_Websocket extends CDaemon_Worker_ProtocolAbstract 
             } else {
                 $connection->send("HTTP/1.1 400 Bad Request\r\n\r\n<b>400 Bad Request</b><br>Sec-WebSocket-Key not found.<br>This is a WebSocket service and can not be accessed via HTTP.<br>See <a href=\"http://wiki.workerman.net/Error1\">http://wiki.workerman.net/Error1</a> for detail.", true);
                 $connection->close();
+
                 return 0;
             }
             // Calculation websocket key.
@@ -361,6 +367,7 @@ class CDaemon_Worker_Protocol_Websocket extends CDaemon_Worker_ProtocolAbstract 
             // Try to emit onWebSocketConnect callback.
             if (isset($connection->onWebSocketConnect) || isset($connection->worker->onWebSocketConnect)) {
                 static::parseHttpHeader($buffer);
+
                 try {
                     call_user_func(isset($connection->onWebSocketConnect) ? $connection->onWebSocketConnect : $connection->worker->onWebSocketConnect, $connection, $buffer);
                 } catch (\Exception $e) {
@@ -403,17 +410,20 @@ class CDaemon_Worker_Protocol_Websocket extends CDaemon_Worker_ProtocolAbstract 
             if (strlen($buffer) > $header_length) {
                 return static::input(substr($buffer, $header_length), $connection);
             }
+
             return 0;
         } // Is flash policy-file-request.
         elseif (0 === strpos($buffer, '<polic')) {
             $policy_xml = '<?xml version="1.0"?><cross-domain-policy><site-control permitted-cross-domain-policies="all"/><allow-access-from domain="*" to-ports="*"/></cross-domain-policy>' . "\0";
             $connection->send($policy_xml, true);
             $connection->consumeRecvBuffer(strlen($buffer));
+
             return 0;
         }
         // Bad websocket handshake request.
         $connection->send("HTTP/1.1 400 Bad Request\r\n\r\n<b>400 Bad Request</b><br>Invalid handshake data for websocket. <br> See <a href=\"http://wiki.workerman.net/Error1\">http://wiki.workerman.net/Error1</a> for detail.", true);
         $connection->close();
+
         return 0;
     }
 
@@ -450,10 +460,12 @@ class CDaemon_Worker_Protocol_Websocket extends CDaemon_Worker_ProtocolAbstract 
                     if (isset($tmp[1])) {
                         $_SERVER['SERVER_PORT'] = $tmp[1];
                     }
+
                     break;
                 // cookie
                 case 'COOKIE':
                     parse_str(str_replace('; ', '&', $_SERVER['HTTP_COOKIE']), $_COOKIE);
+
                     break;
             }
         }

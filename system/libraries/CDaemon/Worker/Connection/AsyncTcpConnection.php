@@ -3,20 +3,13 @@
 defined('SYSPATH') or die('No direct access allowed.');
 
 /**
- * @author Hery Kurniawan
- * @license Ittron Global Teknologi <ittron.co.id>
- *
- * @since Mar 16, 2019, 6:06:40 AM
- */
-
-/**
  * AsyncTcpConnection.
  */
 class CDaemon_Worker_Connection_AsyncTcpConnection extends CDaemon_Worker_Connection_TcpConnection {
     /**
      * Emitted when socket connection is successfully established.
      *
-     * @var callback
+     * @var callable
      */
     public $onConnect = null;
 
@@ -104,7 +97,7 @@ class CDaemon_Worker_Connection_AsyncTcpConnection extends CDaemon_Worker_Connec
         if (!$address_info) {
             list($scheme, $this->_remoteAddress) = explode(':', $remote_address, 2);
             if (!$this->_remoteAddress) {
-                Worker::safeEcho(new \Exception('bad remote_address'));
+                CDaemon_Worker::safeEcho(new \Exception('bad remote_address'));
             }
         } else {
             if (!isset($address_info['port'])) {
@@ -154,8 +147,10 @@ class CDaemon_Worker_Connection_AsyncTcpConnection extends CDaemon_Worker_Connec
      * @return void
      */
     public function connect() {
-        if ($this->status !== self::STATUS_INITIAL && $this->status !== self::STATUS_CLOSING
-                && $this->status !== self::STATUS_CLOSED) {
+        if ($this->status !== self::STATUS_INITIAL
+            && $this->status !== self::STATUS_CLOSING
+            && $this->status !== self::STATUS_CLOSED
+        ) {
             return;
         }
         $this->status = self::STATUS_CONNECTING;
@@ -180,6 +175,7 @@ class CDaemon_Worker_Connection_AsyncTcpConnection extends CDaemon_Worker_Connec
             if ($this->status === self::STATUS_CLOSED) {
                 $this->onConnect = null;
             }
+
             return;
         }
         // Add socket to global event loop waiting connection is successfully established or faild.
@@ -205,6 +201,7 @@ class CDaemon_Worker_Connection_AsyncTcpConnection extends CDaemon_Worker_Connec
         }
         if ($after > 0) {
             $this->_reconnectTimer = Timer::add($after, [$this, 'connect'], null, false);
+
             return;
         }
         $this->connect();
