@@ -7,23 +7,23 @@
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  */
+
 namespace PHPUnit\Framework\MockObject\Rule;
 
-use function count;
-use function get_class;
-use function sprintf;
 use Exception;
+use function count;
+use function sprintf;
+use function get_class;
 use PHPUnit\Framework\Constraint\Constraint;
 use PHPUnit\Framework\Constraint\IsAnything;
-use PHPUnit\Framework\Constraint\IsEqual;
-use PHPUnit\Framework\ExpectationFailedException;
+use PHPUnit\Framework\Constraint\Equality\IsEqual;
+use PHPUnit\Framework\Exception\ExpectationFailedException;
 use PHPUnit\Framework\MockObject\Invocation as BaseInvocation;
 
 /**
  * @internal This class is not covered by the backward compatibility promise for PHPUnit
  */
-final class Parameters implements ParametersRule
-{
+final class Parameters implements ParametersRule {
     /**
      * @var Constraint[]
      */
@@ -42,8 +42,7 @@ final class Parameters implements ParametersRule
     /**
      * @throws \PHPUnit\Framework\Exception
      */
-    public function __construct(array $parameters)
-    {
+    public function __construct(array $parameters) {
         foreach ($parameters as $parameter) {
             if (!($parameter instanceof Constraint)) {
                 $parameter = new IsEqual(
@@ -55,8 +54,7 @@ final class Parameters implements ParametersRule
         }
     }
 
-    public function toString()
-    {
+    public function toString() {
         $text = 'with parameter';
 
         foreach ($this->parameters as $index => $parameter) {
@@ -73,9 +71,8 @@ final class Parameters implements ParametersRule
     /**
      * @throws Exception
      */
-    public function apply(BaseInvocation $invocation)
-    {
-        $this->invocation                  = $invocation;
+    public function apply(BaseInvocation $invocation) {
+        $this->invocation = $invocation;
         $this->parameterVerificationResult = null;
 
         try {
@@ -95,8 +92,7 @@ final class Parameters implements ParametersRule
      * @throws ExpectationFailedException
      * @throws \SebastianBergmann\RecursionContext\InvalidArgumentException
      */
-    public function verify()
-    {
+    public function verify() {
         $this->doVerify();
     }
 
@@ -104,8 +100,7 @@ final class Parameters implements ParametersRule
      * @throws ExpectationFailedException
      * @throws \SebastianBergmann\RecursionContext\InvalidArgumentException
      */
-    private function doVerify()
-    {
+    private function doVerify() {
         if (isset($this->parameterVerificationResult)) {
             return $this->guardAgainstDuplicateEvaluationOfParameterConstraints();
         }
@@ -121,8 +116,8 @@ final class Parameters implements ParametersRule
             // `->withAnyParameters()`.
             //
             // @see https://github.com/sebastianbergmann/phpunit-mock-objects/issues/199
-            if (count($this->parameters) === 1 &&
-                get_class($this->parameters[0]) === IsAnything::class) {
+            if (count($this->parameters) === 1
+                && get_class($this->parameters[0]) === IsAnything::class) {
                 $message .= "\nTo allow 0 or more parameters with any value, omit ->with() or use ->withAnyParameters() instead.";
             }
 
@@ -135,8 +130,8 @@ final class Parameters implements ParametersRule
             $parameter->evaluate(
                 $this->invocation->getParameters()[$i],
                 sprintf(
-                    'Parameter %s for invocation %s does not match expected ' .
-                    'value.',
+                    'Parameter %s for invocation %s does not match expected '
+                    . 'value.',
                     $i,
                     $this->invocation->toString()
                 )
@@ -149,8 +144,7 @@ final class Parameters implements ParametersRule
     /**
      * @throws ExpectationFailedException
      */
-    private function guardAgainstDuplicateEvaluationOfParameterConstraints()
-    {
+    private function guardAgainstDuplicateEvaluationOfParameterConstraints() {
         if ($this->parameterVerificationResult instanceof ExpectationFailedException) {
             throw $this->parameterVerificationResult;
         }

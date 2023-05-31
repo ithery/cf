@@ -96,7 +96,7 @@ class cdbg {
     }
 
     public static function dumpLastQuery($db = null) {
-        cdbg::varDump(CDatabase::instance($db)->lastQuery());
+        cdbg::varDump(c::db($db)->lastQuery());
     }
 
     /**
@@ -761,7 +761,7 @@ class cdbg {
 
     public static function queryDump($db = null, $return = false) {
         if ($db == null) {
-            $db = CDatabase::instance();
+            $db = c::db();
         }
 
         return cdbg::varDump($db->lastQuery(), $return);

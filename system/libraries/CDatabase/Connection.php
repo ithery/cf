@@ -1796,4 +1796,8 @@ class CDatabase_Connection implements CDatabase_ConnectionInterface {
     public function getBenchmarks() {
         return $this->getQueryLog();
     }
+
+    public function lastQuery() {
+        return carr::get(carr::last($this->getQueryLog()), 'query');
+    }
 }

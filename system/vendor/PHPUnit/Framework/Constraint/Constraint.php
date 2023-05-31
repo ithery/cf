@@ -65,6 +65,7 @@ abstract class Constraint implements Countable, SelfDescribing {
     /**
      * Counts the number of constraint elements.
      */
+    #[\ReturnTypeWillChange]
     public function count() {
         return 1;
     }

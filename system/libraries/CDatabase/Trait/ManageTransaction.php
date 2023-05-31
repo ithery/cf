@@ -3,15 +3,9 @@
 defined('SYSPATH') or die('No direct access allowed.');
 
 /**
- * @author Hery Kurniawan
- * @license Ittron Global Teknologi <ittron.co.id>
- *
- * @see CDatabase
- * @since Jun 30, 2019, 7:10:21 PM
+ * @see CDatabase_Connection
  */
 trait CDatabase_Trait_ManageTransaction {
-    protected $isSavePoint = false;
-
     /**
      * Execute a Closure within a transaction.
      *
@@ -26,6 +20,7 @@ trait CDatabase_Trait_ManageTransaction {
         /** @var CDatabase_Connection $this */
         for ($currentAttempt = 1; $currentAttempt <= $attempts; $currentAttempt++) {
             $this->beginTransaction();
+            $callbackResult = null;
             // We'll simply execute the given callback within a try / catch block and if we
             // catch any exception we can rollback this transaction so that none of this
             // gets actually persisted to a database or stored in a permanent fashion.
@@ -40,12 +35,16 @@ trait CDatabase_Trait_ManageTransaction {
                     $currentAttempt,
                     $attempts
                 );
+
+                continue;
             } catch (Throwable $e) {
                 $this->handleTransactionException(
                     $e,
                     $currentAttempt,
                     $attempts
                 );
+
+                continue;
             }
 
             try {
@@ -280,6 +279,7 @@ trait CDatabase_Trait_ManageTransaction {
      * @return void
      */
     public function rollback($toLevel = null) {
+        /** @var CDatabase_Connection $this */
         // We allow developers to rollback to a certain transaction level. We will verify
         // that this given transaction level is valid before attempting to rollback to
         // that level. If it's not we will just return out and not attempt anything.
@@ -301,8 +301,8 @@ trait CDatabase_Trait_ManageTransaction {
 
         $this->transactions = $toLevel;
 
-        if ($this->transactionManager) {
-            $this->transactionManager->rollback(
+        if ($this->transactionsManager) {
+            $this->transactionsManager->rollback(
                 $this->getName(),
                 $this->transactions
             );
