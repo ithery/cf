@@ -211,8 +211,10 @@ final class CQueue {
         return CF::config('queue.' . $config, $default);
     }
 
-    public static function primaryKey($database, $table) {
-        return $database->driverName() == 'MongoDB' ? '_id' : $table . '_id';
+    public static function primaryKey(CDatabase_Connection $database, $table) {
+        $driverName = $database->getConfig('driver');
+
+        return (cstr::tolower($driverName) == 'mongodb' || cstr::tolower($driverName) == 'mongo') ? '_id' : $table . '_id';
     }
 
     public static function batchFactory() {

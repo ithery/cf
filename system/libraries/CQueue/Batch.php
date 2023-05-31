@@ -81,7 +81,7 @@ class CQueue_Batch implements CInterface_Arrayable, JsonSerializable {
     /**
      * The repository implementation.
      *
-     * @var \CQueue_Contract_BatchRepositoryInterface
+     * @var \CQueue_BatchRepository
      */
     protected $repository;
 

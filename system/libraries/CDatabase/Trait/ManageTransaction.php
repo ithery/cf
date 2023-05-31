@@ -29,7 +29,8 @@ trait CDatabase_Trait_ManageTransaction {
             } catch (Exception $e) {
                 // If we catch an exception we'll rollback this transaction and try again if we
                 // are not out of attempts. If we are out of attempts we will just throw the
-                // exception back out and let the developer handle an uncaught exceptions.
+                // exception back out and let the developer handle an uncaught exceptions.\
+
                 $this->handleTransactionException(
                     $e,
                     $currentAttempt,
@@ -54,7 +55,6 @@ trait CDatabase_Trait_ManageTransaction {
                 }
 
                 $this->transactions = max(0, $this->transactions - 1);
-
                 if ($this->afterCommitCallbacksShouldBeExecuted()) {
                     if ($this->transactionsManager) {
                         $this->transactionsManager->commit($this->getName());
