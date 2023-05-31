@@ -12,7 +12,7 @@ class CQueue_FailedJob_DatabaseFailedJob extends CQueue_AbstractFailedJob {
     /**
      * The current connection.
      *
-     * @var CDatabase
+     * @var CDatabase_Connection
      */
     protected $db;
 
@@ -47,7 +47,7 @@ class CQueue_FailedJob_DatabaseFailedJob extends CQueue_AbstractFailedJob {
      * @return null|int
      */
     public function log($connection, $queue, $payload, $exception) {
-        $failed_at = CApp_Base::now();
+        $failed_at = c::now();
         $exception = (string) $exception;
 
         return $this->getTable()->insertGetId(compact(
