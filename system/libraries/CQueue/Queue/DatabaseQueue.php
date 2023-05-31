@@ -2,17 +2,11 @@
 
 defined('SYSPATH') or die('No direct access allowed.');
 
-/**
- * @author Hery Kurniawan
- * @license Ittron Global Teknologi <ittron.co.id>
- *
- * @since Sep 8, 2019, 4:14:29 AM
- */
 class CQueue_Queue_DatabaseQueue extends CQueue_AbstractQueue {
     /**
      * The database connection instance.
      *
-     * @var CDatabase
+     * @var CDatabase_Connection
      */
     protected $database;
 
@@ -40,15 +34,15 @@ class CQueue_Queue_DatabaseQueue extends CQueue_AbstractQueue {
     /**
      * Create a new database queue instance.
      *
-     * @param CDatabase $database
-     * @param string    $table
-     * @param string    $default
-     * @param int       $retryAfter
-     * @param bool      $dispatchAfterCommit
+     * @param CDatabase_Connection $database
+     * @param string               $table
+     * @param string               $default
+     * @param int                  $retryAfter
+     * @param bool                 $dispatchAfterCommit
      *
      * @return void
      */
-    public function __construct(CDatabase $database, $table, $default = 'default', $retryAfter = 60, $dispatchAfterCommit = false) {
+    public function __construct(CDatabase_Connection $database, $table, $default = 'default', $retryAfter = 60, $dispatchAfterCommit = false) {
         $this->table = $table;
         $this->default = $default;
         $this->database = $database;
@@ -379,7 +373,7 @@ class CQueue_Queue_DatabaseQueue extends CQueue_AbstractQueue {
     /**
      * Get the underlying database instance.
      *
-     * @return CDatabase
+     * @return CDatabase_Connection
      */
     public function getDatabase() {
         return $this->database;

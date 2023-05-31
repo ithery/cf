@@ -13,7 +13,7 @@ class CQueue_BatchRepository implements CQueue_Contract_PrunableBatchRepositoryI
     /**
      * The database connection instance.
      *
-     * @var \CDatabase
+     * @var \CDatabase_Connection
      */
     protected $connection;
 
@@ -370,7 +370,7 @@ class CQueue_BatchRepository implements CQueue_Contract_PrunableBatchRepositoryI
     /**
      * Get the underlying database connection.
      *
-     * @return \CDatabase
+     * @return \CDatabase_Connection
      */
     public function getConnection() {
         return $this->connection;
@@ -379,11 +379,11 @@ class CQueue_BatchRepository implements CQueue_Contract_PrunableBatchRepositoryI
     /**
      * Set the underlying database connection.
      *
-     * @param \CDatabase $connection
+     * @param \CDatabase_Connection $connection
      *
      * @return void
      */
-    public function setConnection(CDatabase $connection) {
+    public function setConnection(CDatabase_Connection $connection) {
         $this->connection = $connection;
     }
 }

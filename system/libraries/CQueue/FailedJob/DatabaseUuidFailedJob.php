@@ -4,7 +4,7 @@ class CQueue_FailedJob_DatabaseUuidFailedJob extends CQueue_AbstractFailedJob im
     /**
      * The database connection name.
      *
-     * @var CDatabase
+     * @var CDatabase_Connection
      */
     protected $database;
 
