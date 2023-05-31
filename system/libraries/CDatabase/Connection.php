@@ -218,6 +218,9 @@ class CDatabase_Connection implements CDatabase_ConnectionInterface {
         $this->useDefaultQueryGrammar();
 
         $this->useDefaultPostProcessor();
+        if (carr::get($this->config, 'benchmark')) {
+            $this->enableQueryLog();
+        }
     }
 
     /**
@@ -306,7 +309,7 @@ class CDatabase_Connection implements CDatabase_ConnectionInterface {
      * @param null|string $query
      * @param array       $bindings
      *
-     * @return \CDatabase_Query_Builder
+     * @return \CDatabase_Query_Builder|CDatabase_ResultData
      */
     public function query($query = null, $bindings = []) {
         if ($query != null) {
@@ -1806,11 +1809,116 @@ class CDatabase_Connection implements CDatabase_ConnectionInterface {
         return $this->enableQueryLog();
     }
 
+    /**
+     * @return array
+     */
     public function getBenchmarks() {
         return $this->getQueryLog();
     }
 
+    /**
+     * @return void
+     */
+    public function clearBenchmarks() {
+        return $this->flushQueryLog();
+    }
+
     public function lastQuery() {
         return carr::get(carr::last($this->getQueryLog()), 'query');
+    }
+
+    public function getRow($query) {
+        $r = $this->query($query);
+        $result = null;
+        if ($r->count() > 0) {
+            $result = $r[0];
+        }
+
+        return $result;
+    }
+
+    public function getValue($query) {
+        $r = $this->query($query);
+        $result = $r->resultArray();
+        $res = [];
+        $value = null;
+        foreach ($result as $row) {
+            foreach ($row as $k => $v) {
+                $value = $v;
+
+                break;
+            }
+
+            break;
+        }
+
+        return $value;
+    }
+
+    public function getArray($query) {
+        $r = $this->query($query);
+        $result = $r->resultArray();
+        $res = [];
+        foreach ($result as $row) {
+            $cnt = 0;
+            $arr_val = '';
+            foreach ($row as $k => $v) {
+                if ($cnt == 0) {
+                    $arr_val = $v;
+                }
+                $cnt++;
+                if ($cnt > 0) {
+                    break;
+                }
+            }
+            $res[] = $arr_val;
+        }
+
+        return $res;
+    }
+
+    public function getList($query) {
+        $r = $this->query($query);
+        $result = $r->resultArray();
+        $res = [];
+        foreach ($result as $row) {
+            $cnt = 0;
+            $arr_key = '';
+            $arr_val = '';
+            foreach ($row as $k => $v) {
+                if ($cnt == 0) {
+                    $arr_key = $v;
+                }
+                if ($cnt == 1) {
+                    $arr_val = $v;
+                }
+                $cnt++;
+                if ($cnt > 1) {
+                    break;
+                }
+            }
+            $res[$arr_key] = $arr_val;
+        }
+
+        return $res;
+    }
+
+    protected function getDoctrineDriver() {
+        throw new Exception('Doctrine Driver is not implemented on this connection');
+    }
+
+    public function ping() {
+        $pdo = $this->getPdoForSelect();
+        if (!$pdo) {
+            return false;
+        }
+
+        try {
+            $pdo->query('SELECT 1');
+        } catch (PDOException $e) {
+            return false;
+        }
+
+        return true;
     }
 }

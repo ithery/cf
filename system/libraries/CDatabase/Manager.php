@@ -46,11 +46,15 @@ class CDatabase_Manager implements CDatabase_Contract_ConnectionResolverInterfac
      * @return void
      */
     public function __construct() {
-        $this->defaultConnection = 'default';
         $this->reconnector = function ($connection) {
             $this->reconnect($connection->getNameWithReadWriteType());
         };
         $this->config = CF::config('database');
+        $defaultConnection = carr::get($this->config, 'default');
+        if (is_array($defaultConnection)) {
+            $defaultConnection = 'default';
+        }
+        $this->defaultConnection = $defaultConnection;
     }
 
     /**
