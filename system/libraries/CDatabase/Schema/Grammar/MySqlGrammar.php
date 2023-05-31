@@ -1,6 +1,6 @@
 <?php
 
-class CDatabase_Schema_Grammar_MySql extends CDatabase_Schema_Grammar {
+class CDatabase_Schema_Grammar_MySqlGrammar extends CDatabase_Schema_Grammar {
     /**
      * The possible column modifiers.
      *

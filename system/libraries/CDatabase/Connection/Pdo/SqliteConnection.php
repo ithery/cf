@@ -65,10 +65,10 @@ class CDatabase_Connection_Pdo_SqliteConnection extends CDatabase_Connection {
     /**
      * Get the default schema grammar instance.
      *
-     * @return \CDatabase_Schema_Grammar_Sqlite
+     * @return \CDatabase_Schema_Grammar_SqliteGrammar
      */
     protected function getDefaultSchemaGrammar() {
-        ($grammar = new CDatabase_Schema_Grammar_Sqlite())->setConnection($this);
+        ($grammar = new CDatabase_Schema_Grammar_SqliteGrammar())->setConnection($this);
 
         return $this->withTablePrefix($grammar);
     }
@@ -81,7 +81,7 @@ class CDatabase_Connection_Pdo_SqliteConnection extends CDatabase_Connection {
      * @throws \RuntimeException
      */
     public function getSchemaState(callable $processFactory = null) {
-        //return new SqliteSchemaState($this, $files, $processFactory);
+        return new CDatabase_Schema_SchemaState_SqliteSchemaState($this, $processFactory);
     }
 
     /**
@@ -96,10 +96,10 @@ class CDatabase_Connection_Pdo_SqliteConnection extends CDatabase_Connection {
     /**
      * Get the Doctrine DBAL driver.
      *
-     * @return \Illuminate\Database\PDO\SQLiteDriver
+     * @return \CDatabase_Doctrine_Driver_SqliteDriver
      */
     protected function getDoctrineDriver() {
-        // return new SQLiteDriver();
+        return new CDatabase_Doctrine_Driver_SqliteDriver();
     }
 
     /**

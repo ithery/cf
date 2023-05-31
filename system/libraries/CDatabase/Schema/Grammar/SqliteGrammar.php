@@ -1,5 +1,5 @@
 <?php
-class CDatabase_Schema_Grammar_Sqlite extends CDatabase_Schema_Grammar {
+class CDatabase_Schema_Grammar_SqliteGrammar extends CDatabase_Schema_Grammar {
     /**
      * The possible column modifiers.
      *

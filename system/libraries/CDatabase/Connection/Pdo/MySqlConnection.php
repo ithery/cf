@@ -50,10 +50,10 @@ class CDatabase_Connection_Pdo_MySqlConnection extends CDatabase_Connection {
     /**
      * Get the default schema grammar instance.
      *
-     * @return \CDatabase_Schema_Grammar_MySql
+     * @return \CDatabase_Schema_Grammar_MySqlGrammar
      */
     protected function getDefaultSchemaGrammar() {
-        ($grammar = new CDatabase_Schema_Grammar_MySql())->setConnection($this);
+        ($grammar = new CDatabase_Schema_Grammar_MySqlGrammar())->setConnection($this);
 
         return $this->withTablePrefix($grammar);
     }
