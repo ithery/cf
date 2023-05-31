@@ -169,7 +169,7 @@ class DatabaseConnectionTest extends TestCase {
 
     public function testBeginTransactionMethodRetriesOnFailure() {
         $pdo = $this->createMock(DatabaseConnectionTestMockPDO::class);
-        /** @var \Mockery\MockInterface|DatabaseConnectionTestMockPDO $pdo */
+        /** @var \Mockery\MockInterface|\Mockery\Mock|DatabaseConnectionTestMockPDO $pdo */
         $pdo->method('beginTransaction')
             ->willReturnOnConsecutiveCalls($this->throwException(new ErrorException('server has gone away')), true);
         $connection = $this->getMockConnection(['reconnect'], $pdo);
