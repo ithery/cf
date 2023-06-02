@@ -5,6 +5,9 @@ use CarbonV3\CarbonInterval;
 use Doctrine\DBAL\Types\Type;
 use Doctrine\DBAL\Connection as DoctrineConnection;
 
+/**
+ * @see CDatabase
+ */
 class CDatabase_Connection implements CDatabase_ConnectionInterface {
     use CTrait_Compat_Database;
     use CDatabase_Trait_DetectDeadlock;
@@ -189,6 +192,18 @@ class CDatabase_Connection implements CDatabase_ConnectionInterface {
     protected static $resolvers = [];
 
     /**
+     * The schema manager.
+     *
+     * @var CDatabase_Schema_Manager
+     */
+    protected $schemaManager;
+
+    /**
+     * @var CDatabase_Platform
+     */
+    protected $platform;
+
+    /**
      * Create a new database connection instance.
      *
      * @param \PDO|\Closure $pdo
@@ -289,6 +304,16 @@ class CDatabase_Connection implements CDatabase_ConnectionInterface {
         }
 
         return new CDatabase_Schema_Builder($this);
+    }
+
+    /**
+     * Gets the SchemaManager that can be used to inspect or change the
+     * database schema through the connection.
+     *
+     * @return CDatabase_Schema_Manager
+     */
+    public function getSchemaManager() {
+        throw new Exception('This connection doesnt have schema manager');
     }
 
     /**
@@ -1925,5 +1950,82 @@ class CDatabase_Connection implements CDatabase_ConnectionInterface {
         }
 
         return true;
+    }
+
+    /**
+     * Gets the DatabasePlatform for the connection.
+     *
+     * @throws CDatabase_Exception
+     *
+     * @return CDatabase_Platform
+     */
+    public function getDatabasePlatform() {
+        if (null === $this->platform) {
+            $this->detectDatabasePlatform();
+        }
+
+        return $this->platform;
+    }
+
+    /**
+     * Detects and sets the database platform.
+     *
+     * Evaluates custom platform class and version in order to set the correct platform.
+     *
+     * @throws CDatabase_Exception if an invalid platform was specified for this connection
+     */
+    private function detectDatabasePlatform() {
+        $version = $this->getDatabasePlatformVersion();
+
+        if ($version !== null) {
+            assert($this instanceof CDatabase_Contract_VersionAwarePlatformInterface);
+
+            $this->platform = $this->createDatabasePlatformForVersion($version);
+        } else {
+            $this->platform = $this->getDatabasePlatform();
+        }
+
+        $this->platform->setEventManager($this->events);
+    }
+
+    /**
+     * Returns the version of the related platform if applicable.
+     *
+     * Returns null if either the driver is not capable to create version
+     * specific platform instances, no explicit server version was specified
+     * or the underlying driver connection cannot determine the platform
+     * version without having to query it (performance reasons).
+     *
+     * @throws Exception
+     *
+     * @return null|string
+     */
+    private function getDatabasePlatformVersion() {
+        // Driver does not support version specific platforms.
+
+        if (!($this instanceof CDatabase_Contract_VersionAwarePlatformInterface)) {
+            return null;
+        }
+
+        // Explicit platform version requested (supersedes auto-detection).
+        if (isset($this->config['serverVersion'])) {
+            return $this->config['serverVersion'];
+        }
+        if ($this instanceof CDatabase_Driver_ServerInfoAwareInterface && !$this->requiresQueryForServerVersion()) {
+            return $this->getServerVersion();
+        }
+
+        return null;
+    }
+
+    /**
+     * @inheritDoc
+     */
+    public function getServerVersion() {
+        return $this->getPdo()->getAttribute(PDO::ATTR_SERVER_VERSION);
+    }
+
+    public function fetchAll($query, $bindings = []) {
+        return $this->query($query, $bindings)->resultArray();
     }
 }
