@@ -180,7 +180,7 @@ class CElement_Component_DataTable extends CElement_Component {
         $db = c::db();
 
         $this->dbName = $db->getName();
-        $this->dbConfig = strlen($db->getName()) == 0 ? $db->config() : [];
+        $this->dbConfig = strlen($db->getName()) == 0 ? $db->getConfig() : [];
         $this->display_length = '10';
         $this->paging_list = $this->defaultPagingList;
         $this->options = new CElement_Component_DataTable_Options();
