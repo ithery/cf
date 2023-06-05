@@ -1827,6 +1827,11 @@ class CDatabase_Connection implements CDatabase_ConnectionInterface {
         return '`' . str_replace('.', '`.`', $table) . '`';
     }
 
+    /**
+     * @param string $str
+     *
+     * @return string
+     */
     public function escapeLike($str) {
         if (!empty($str) && is_string($str)) {
             return str_replace(['\\', "\0", "\n", "\r", "'", '"', "\x1a"], ['\\\\', '\\0', '\\n', '\\r', "\\'", '\\"', '\\Z'], $str);
