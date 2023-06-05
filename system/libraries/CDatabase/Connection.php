@@ -1130,7 +1130,7 @@ class CDatabase_Connection implements CDatabase_ConnectionInterface {
         } elseif (is_bool($value)) {
             return $this->escapeBool($value);
         } else {
-            if (str_contains($value, "\00")) {
+            if (cstr::contains($value, "\00")) {
                 throw new RuntimeException('Strings with null bytes cannot be escaped. Use the binary escape option.');
             }
 
@@ -1828,7 +1828,11 @@ class CDatabase_Connection implements CDatabase_ConnectionInterface {
     }
 
     public function escapeLike($str) {
-        return $this->escape($str);
+        if (!empty($str) && is_string($str)) {
+            return str_replace(['\\', "\0", "\n", "\r", "'", '"', "\x1a"], ['\\\\', '\\0', '\\n', '\\r', "\\'", '\\"', '\\Z'], $str);
+        }
+
+        return $str;
     }
 
     public function disableBenchmark() {
