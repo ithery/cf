@@ -2,9 +2,6 @@
 
 defined('SYSPATH') or die('No direct access allowed.');
 
-/**
- * @author Hery Kurniawan
- */
 use Carbon\Carbon as BaseCarbon;
 
 class CCarbon extends BaseCarbon implements JsonSerializable {
