@@ -84,10 +84,11 @@ trait CModel_Relation_Trait_AsPivot {
      *
      * @return CModel_Query
      */
-    protected function setKeysForSelectQuery(CModel_Query $query) {
+    protected function setKeysForSelectQuery($query) {
         if (isset($this->attributes[$this->getKeyName()])) {
-            return parent::setKeysForSaveQuery($query);
+            return parent::setKeysForSelectQuery($query);
         }
+
         $query->where($this->foreignKey, $this->getOriginal(
             $this->foreignKey,
             $this->getAttribute($this->foreignKey)
@@ -106,7 +107,7 @@ trait CModel_Relation_Trait_AsPivot {
      *
      * @return CModel_Query
      */
-    protected function setKeysForSaveQuery(CModel_Query $query) {
+    protected function setKeysForSaveQuery($query) {
         return $this->setKeysForSelectQuery($query);
     }
 
@@ -126,6 +127,7 @@ trait CModel_Relation_Trait_AsPivot {
 
         return c::tap($this->getDeleteQuery()->delete(), function () {
             $this->exists = false;
+
             $this->fireModelEvent('deleted', false);
         });
     }
