@@ -7,41 +7,91 @@
 namespace OpenApi\Processors;
 
 use OpenApi\Analysis;
-use OpenApi\Annotations\Schema as AnnotationSchema;
-use OpenApi\Attributes\Schema as AttributeSchema;
+use OpenApi\Annotations as OA;
 use OpenApi\Generator;
-use OpenApi\Util;
 
 /**
- * Look at all enums with a schema and:
- * - set the name `schema`
- * - set `enum` values.
+ * Expands PHP enums.
+ *
+ * Determines `schema`, `enum` and `type`.
  */
-class ExpandEnums
+class ExpandEnums implements ProcessorInterface
 {
+    use Concerns\TypesTrait;
+
     public function __invoke(Analysis $analysis)
     {
         if (!class_exists('\\ReflectionEnum')) {
             return;
         }
 
-        /** @var AnnotationSchema[] $schemas */
-        $schemas = $analysis->getAnnotationsOfType([AnnotationSchema::class, AttributeSchema::class], true);
+        $this->expandContextEnum($analysis);
+        $this->expandSchemaEnum($analysis);
+    }
+
+    protected function expandContextEnum(Analysis $analysis): void
+    {
+        /** @var OA\Schema[] $schemas */
+        $schemas = $analysis->getAnnotationsOfType(OA\Schema::class, true);
 
         foreach ($schemas as $schema) {
             if ($schema->_context->is('enum')) {
-                $source = $schema->_context->enum;
-                $re = new \ReflectionEnum($schema->_context->fullyQualifiedName($source));
+                $re = new \ReflectionEnum($schema->_context->fullyQualifiedName($schema->_context->enum));
                 $schema->schema = !Generator::isDefault($schema->schema) ? $schema->schema : $re->getShortName();
-                $schema->enum = array_map(function ($case) {
-                    return $case->name;
-                }, $re->getCases());
-                $type = 'string';
-                if ($re->isBacked() && ($backingType = $re->getBackingType())) {
-                    $type = !Generator::isDefault($schema->type) ? $schema->type : $backingType->getName();
+
+                $schemaType = $schema->type;
+                $enumType = null;
+                if ($re->isBacked() && ($backingType = $re->getBackingType()) && $backingType instanceof \ReflectionNamedType) {
+                    $enumType = $backingType->getName();
                 }
-                Util::mapNativeType($schema, $type);
+
+                // no (or invalid) schema type means name
+                $useName = Generator::isDefault($schemaType) || ($enumType && $this->native2spec($enumType) != $schemaType);
+
+                $schema->enum = array_map(function ($case) use ($useName) {
+                    return $useName ? $case->name : $case->getBackingValue();
+                }, $re->getCases());
+
+                $schema->type = $useName ? 'string' : $enumType;
+
+                $this->mapNativeType($schema, $schemaType);
             }
+        }
+    }
+
+    protected function expandSchemaEnum(Analysis $analysis): void
+    {
+        /** @var OA\Schema[] $schemas */
+        $schemas = $analysis->getAnnotationsOfType([OA\Schema::class, OA\ServerVariable::class]);
+
+        foreach ($schemas as $schema) {
+            if (Generator::isDefault($schema->enum)) {
+                continue;
+            }
+
+            if (is_string($schema->enum)) {
+                // might be enum class-string
+                if (is_a($schema->enum, \UnitEnum::class, true)) {
+                    $cases = $schema->enum::cases();
+                } else {
+                    throw new \InvalidArgumentException("Unexpected enum value, requires specifying the Enum class string: $schema->enum");
+                }
+            } else {
+                // might be an array of \UnitEnum::class, string, int, etc...
+                assert(is_array($schema->enum));
+                $cases = $schema->enum;
+            }
+
+            $enums = [];
+            foreach ($cases as $enum) {
+                if (is_a($enum, \UnitEnum::class)) {
+                    $enums[] = $enum->value ?? $enum->name;
+                } else {
+                    $enums[] = $enum;
+                }
+            }
+
+            $schema->enum = $enums;
         }
     }
 }

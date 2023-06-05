@@ -9,16 +9,18 @@ namespace OpenApi\Annotations;
 use OpenApi\Generator;
 
 /**
- * A Server Object https://github.com/OAI/OpenAPI-Specification/blob/main/versions/3.1.0.md#server-object.
+ * An object representing a server.
  *
- * An object representing a Server.
+ * @see [OAI Server Object](https://github.com/OAI/OpenAPI-Specification/blob/main/versions/3.1.0.md#server-object)
  *
  * @Annotation
  */
 class Server extends AbstractAnnotation
 {
     /**
-     * A URL to the target host. This URL supports Server Variables and may be relative,
+     * An URL to the target host.
+     *
+     * This URL supports Server Variables and may be relative,
      * to indicate that the host location is relative to the location where the OpenAPI document is being served.
      * Variable substitutions will be made when a variable is named in {brackets}.
      *
@@ -28,6 +30,7 @@ class Server extends AbstractAnnotation
 
     /**
      * An optional string describing the host designated by the URL.
+     *
      * CommonMark syntax may be used for rich text representation.
      *
      * @var string
@@ -36,9 +39,10 @@ class Server extends AbstractAnnotation
 
     /**
      * A map between a variable name and its value.
+     *
      * The value is used for substitution in the server's URL template.
      *
-     * @var array
+     * @var ServerVariable[]
      */
     public $variables = Generator::UNDEFINED;
 

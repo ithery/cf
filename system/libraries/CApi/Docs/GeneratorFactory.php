@@ -146,6 +146,12 @@ class CApi_Docs_GeneratorFactory {
         return $this;
     }
 
+    public function setSecuritySchemes($securitySchemes) {
+        $this->securitySchemes = $securitySchemes;
+
+        return $this;
+    }
+
     public function createGenerator() {
         $pathsConfig = [];
         $pathsConfig['annotations'] = $this->annotationDirs;

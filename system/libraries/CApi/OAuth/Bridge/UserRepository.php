@@ -58,7 +58,7 @@ class CApi_OAuth_Bridge_UserRepository implements UserRepositoryInterface {
     /**
      * @inheritdoc
      */
-    public function getUserEntityBySocialLogin($provider, $accessToken, $grantType, ClientEntityInterface $clientEntity) {
+    public function getUserEntityBySocialLogin($socialProvider, $accessToken, $grantType, ClientEntityInterface $clientEntity) {
         $guard = $this->oauth->getGuardName();
 
         $provider = $clientEntity->provider ?: CF::config('auth.guards.' . $guard . '.provider');
@@ -69,7 +69,7 @@ class CApi_OAuth_Bridge_UserRepository implements UserRepositoryInterface {
         $user = null;
         if (method_exists($model, 'findAndValidateForOAuthSocialLogin')) {
             try {
-                $user = (new $model())->findAndValidateForOAuthSocialLogin($provider, $accessToken);
+                $user = (new $model())->findAndValidateForOAuthSocialLogin($socialProvider, $accessToken);
             } catch (Throwable $e) {
                 throw OAuthServerException::serverError($e->getMessage(), $e);
             }
