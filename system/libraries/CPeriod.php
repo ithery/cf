@@ -2,14 +2,6 @@
 
 defined('SYSPATH') or die('No direct access allowed.');
 
-/**
- * @author Hery Kurniawan
- * @license Ittron Global Teknologi <ittron.co.id>
- *
- * @since Jun 23, 2019, 12:50:57 PM
- */
-use Carbon\Carbon;
-
 class CPeriod implements IteratorAggregate {
     use CPeriod_Trait_FactoryTrait;
     use CPeriod_Trait_OperationTrait;
@@ -23,12 +15,12 @@ class CPeriod implements IteratorAggregate {
     const INTERVAL_HOUR = 'hour';
 
     /**
-     * @var \CarbonV3\Carbon
+     * @var \CCarbon
      */
     public $startDate;
 
     /**
-     * @var \CarbonV3\Carbon
+     * @var \CCarbon
      */
     public $endDate;
 
@@ -67,10 +59,10 @@ class CPeriod implements IteratorAggregate {
             throw CPeriod_Exception_InvalidPeriodException::startDateCannotBeAfterEndDate($startDate, $endDate);
         }
         if ($startDate instanceof DateTime) {
-            $startDate = new Carbon($startDate->format('Y-m-d H:i:s.u'), $startDate->getTimezone());
+            $startDate = new CCarbon($startDate->format('Y-m-d H:i:s.u'), $startDate->getTimezone());
         }
         if ($endDate instanceof DateTime) {
-            $endDate = new Carbon($endDate->format('Y-m-d H:i:s.u'), $endDate->getTimezone());
+            $endDate = new CCarbon($endDate->format('Y-m-d H:i:s.u'), $endDate->getTimezone());
         }
         if ($precision == null) {
             $precision = CPeriod_Precision::DAY();
@@ -241,7 +233,7 @@ class CPeriod implements IteratorAggregate {
     public static function createFromInterval($interval = 'month', $count = 1, $start = '') {
         if (empty($start)) {
             $start = CCarbon::now();
-        } elseif (!$start instanceof Carbon) {
+        } elseif (!$start instanceof CCarbon) {
             $start = new CCarbon($start);
         } else {
             $start = $start;

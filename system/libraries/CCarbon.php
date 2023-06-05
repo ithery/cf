@@ -99,8 +99,4 @@ class CCarbon extends BaseCarbon implements JsonSerializable {
             );
         }
     }
-
-    public static function businessTime() {
-        return new CCarbon_BusinessTime();
-    }
 }

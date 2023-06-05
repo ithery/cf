@@ -1106,7 +1106,7 @@ class CBase_String implements Stringable {
      * @param null|string $format
      * @param null|string $tz
      *
-     * @throws \CarbonV3\Exceptions\InvalidFormatException
+     * @throws \Carbon\Exceptions\InvalidFormatException
      *
      * @return \CCarbon
      */

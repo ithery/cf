@@ -90,12 +90,12 @@ class CApp_Log_Activity {
             $beforeData = carr::get($record, 'before');
             $afterData = carr::get($record, 'after');
             foreach ($beforeData as $beforeIndex => $value) {
-                if ($value instanceof CCarbon || $value instanceof CarbonV3\Carbon || $value instanceof CarbonLegacy\Carbon) {
+                if ($value instanceof CCarbon || $value instanceof CarbonLegacy\Carbon) {
                     $data[$dataIndex]['before'][$beforeIndex] = (string) $value;
                 }
             }
             foreach ($afterData as $afterIndex => $value) {
-                if ($value instanceof CCarbon || $value instanceof CarbonV3\Carbon || $value instanceof CarbonLegacy\Carbon) {
+                if ($value instanceof CCarbon || $value instanceof CarbonLegacy\Carbon) {
                     $data[$dataIndex]['after'][$afterIndex] = (string) $value;
                 }
             }

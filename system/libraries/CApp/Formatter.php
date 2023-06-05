@@ -155,11 +155,8 @@ class CApp_Formatter {
             return $x;
         }
         $carbon = CCarbon::parse($x);
-        if ($carbon instanceof \CarbonV3\Carbon) {
-            return $carbon->translatedFormat($dateFormat);
-        }
 
-        return $carbon->format($dateFormat);
+        return $carbon->translatedFormat($dateFormat);
     }
 
     public function unformatDate($x, $fromFormat = null) {
@@ -179,11 +176,8 @@ class CApp_Formatter {
         }
 
         $carbon = CCarbon::parse($x);
-        if ($carbon instanceof \CarbonV3\Carbon) {
-            return $carbon->translatedFormat($datetimeFormat);
-        }
 
-        return $carbon->format($datetimeFormat);
+        return $carbon->translatedFormat($datetimeFormat);
     }
 
     public function unformatDatetime($x, $fromFormat = null) {
