@@ -17,15 +17,20 @@ class CModel_Casts_Json {
 
     /**
      * Encode the given value.
+     *
+     * @param mixed $value
      */
-    public static function encode(mixed $value): mixed {
+    public static function encode($value) {
         return isset(static::$encoder) ? (static::$encoder)($value) : json_encode($value);
     }
 
     /**
      * Decode the given value.
+     *
+     * @param mixed $value
+     * @param bool  $associative
      */
-    public static function decode(mixed $value, ?bool $associative = true): mixed {
+    public static function decode($value, $associative = true) {
         return isset(static::$decoder)
                 ? (static::$decoder)($value, $associative)
                 : json_decode($value, $associative);
@@ -33,15 +38,23 @@ class CModel_Casts_Json {
 
     /**
      * Encode all values using the given callable.
+     *
+     * @param null|callable $encoder
+     *
+     * @return void
      */
-    public static function encodeUsing(?callable $encoder): void {
+    public static function encodeUsing($encoder) {
         static::$encoder = $encoder;
     }
 
     /**
      * Decode all values using the given callable.
+     *
+     * @param null|callable $decoder
+     *
+     * @return void
      */
-    public static function decodeUsing(?callable $decoder): void {
+    public static function decodeUsing($decoder) {
         static::$decoder = $decoder;
     }
 }
