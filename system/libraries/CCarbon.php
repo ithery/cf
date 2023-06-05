@@ -2,101 +2,55 @@
 
 defined('SYSPATH') or die('No direct access allowed.');
 
+use Ramsey\Uuid\Uuid;
+use Symfony\Component\Uid\Ulid;
+
 use Carbon\Carbon as BaseCarbon;
+use Carbon\CarbonImmutable as BaseCarbonImmutable;
 
-class CCarbon extends BaseCarbon implements JsonSerializable {
-    /**
-     * The custom Carbon JSON serializer.
-     *
-     * @var null|callable
-     */
-    protected static $serializer;
+class CCarbon extends BaseCarbon {
+    use CTrait_Conditionable;
 
     /**
-     * Prepare the object for JSON serialization.
-     *
-     * @return array|string
+     * @inheritdoc
      */
-    public function jsonSerialize() {
-        if (static::$serializer) {
-            return call_user_func(static::$serializer, $this);
-        }
-
-        $carbon = $this;
-
-        return call_user_func(function () use ($carbon) {
-            return get_object_vars($carbon);
-        });
+    public static function setTestNow($testNow = null) {
+        BaseCarbon::setTestNow($testNow);
+        BaseCarbonImmutable::setTestNow($testNow);
     }
 
     /**
-     * JSON serialize all Carbon instances using the given callback.
+     * Create a Carbon instance from a given ordered UUID or ULID.
      *
-     * @param callable $callback
+     * @param \Ramsey\Uuid\Uuid|\Symfony\Component\Uid\Ulid|string $id
+     *
+     * @return \CCarbon
+     */
+    public static function createFromId($id) {
+        return Ulid::isValid($id)
+            ? static::createFromInterface(Ulid::fromString($id)->getDateTime())
+            : static::createFromInterface(Uuid::fromString($id)->getDateTime());
+    }
+
+    /**
+     * Dump the instance and end the script.
+     *
+     * @param mixed ...$args
      *
      * @return void
      */
-    public static function serializeUsing($callback) {
-        static::$serializer = $callback;
+    public function dd(...$args) {
+        cdbg::dd($this, ...$args);
     }
 
     /**
-     * Get the difference in seconds using timestamps.
+     * Dump the instance.
      *
-     * @param null|\Carbon\CarbonInterface|\DateTimeInterface|string $date
-     * @param bool                                                   $absolute Get the absolute of the difference
-     *
-     * @return int
+     * @return $this
      */
-    public function diffInRealSeconds($date = null, $absolute = true) {
-        /** @var Carbon\CarbonInterface $date */
-        $date = $this->resolveCarbon($date);
-        $value = $date->getTimestamp() - $this->getTimestamp();
+    public function dump() {
+        c::dump($this);
 
-        return $absolute ? abs($value) : $value;
-    }
-
-    /**
-     * Return the Carbon instance passed through, a now instance in the same timezone
-     * if null given or parse the input if string given.
-     *
-     * @param null|\Carbon\Carbon|\DateTimeInterface|string $date
-     *
-     * @return static
-     */
-    protected function resolveCarbon($date = null) {
-        if (!$date) {
-            return $this->nowWithSameTz();
-        }
-
-        if (is_string($date)) {
-            return static::parse($date, $this->getTimezone());
-        }
-
-        static::expectDateTime($date, ['null', 'string']);
-
-        return $date instanceof self ? $date : static::instance($date);
-    }
-
-    /**
-     * Throws an exception if the given object is not a DateTime and does not implement DateTimeInterface.
-     *
-     * @param mixed        $date
-     * @param string|array $other
-     *
-     * @throws \InvalidArgumentException
-     */
-    protected static function expectDateTime($date, $other = []) {
-        $message = 'Expected ';
-        foreach ((array) $other as $expect) {
-            $message .= $expect . ', ';
-        }
-
-        if (!$date instanceof DateTime && !$date instanceof DateTimeInterface) {
-            throw new InvalidArgumentException(
-                $message . 'DateTime or DateTimeInterface, '
-                . (is_object($date) ? get_class($date) : gettype($date)) . ' given'
-            );
-        }
+        return $this;
     }
 }
