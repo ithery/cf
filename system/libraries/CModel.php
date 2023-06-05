@@ -3,10 +3,6 @@
 defined('SYSPATH') or die('No direct access allowed.');
 
 /**
- * @author Hery Kurniawan
- */
-
-/**
  * Class CModel.
  *
  * @method static       static                                    create($attributes = [])                                                                  Find a model by its primary key.
@@ -157,6 +153,13 @@ abstract class CModel implements ArrayAccess, CInterface_Arrayable, CInterface_J
     public $wasRecentlyCreated = false;
 
     /**
+     * Indicates that the object's string representation should be escaped when __toString is invoked.
+     *
+     * @var bool
+     */
+    protected $escapeWhenCastingToString = false;
+
+    /**
      * The connection name for the model.
      *
      * @var string
@@ -191,7 +194,7 @@ abstract class CModel implements ArrayAccess, CInterface_Arrayable, CInterface_J
      *
      * @var string
      */
-    protected $keyType = 'bigint';
+    protected $keyType = 'int';
 
     /**
      * The relations to eager load on every query.
@@ -264,6 +267,41 @@ abstract class CModel implements ArrayAccess, CInterface_Arrayable, CInterface_J
     protected static $lazyLoadingViolationCallback;
 
     /**
+     * Indicates if an exception should be thrown instead of silently discarding non-fillable attributes.
+     *
+     * @var bool
+     */
+    protected static $modelsShouldPreventSilentlyDiscardingAttributes = false;
+
+    /**
+     * The callback that is responsible for handling discarded attribute violations.
+     *
+     * @var null|callable
+     */
+    protected static $discardedAttributeViolationCallback;
+
+    /**
+     * Indicates if an exception should be thrown when trying to access a missing attribute on a retrieved model.
+     *
+     * @var bool
+     */
+    protected static $modelsShouldPreventAccessingMissingAttributes = false;
+
+    /**
+     * The callback that is responsible for handling missing attribute violations.
+     *
+     * @var null|callable
+     */
+    protected static $missingAttributeViolationCallback;
+
+    /**
+     * Indicates if broadcasting is currently enabled.
+     *
+     * @var bool
+     */
+    protected static $isBroadcasting = true;
+
+    /**
      * The array of mapping model class.
      *
      * @var array
@@ -292,7 +330,7 @@ abstract class CModel implements ArrayAccess, CInterface_Arrayable, CInterface_J
         if (isset(self::$mappings[$tableName])) {
             return new self::$mappings[$tableName]();
         } else {
-            return CDatabase::instance()->table($tableName);
+            return c::db()->table($tableName);
         }
     }
 
@@ -446,7 +484,7 @@ abstract class CModel implements ArrayAccess, CInterface_Arrayable, CInterface_J
     public static function isIgnoringTouch($class = null) {
         $class = $class ?: static::class;
 
-        if (!get_class_vars($class)['timestamps'] || !$class::UPDATED_AT) {
+        if (!get_class_vars($class)['timestamps'] || !$class::UPDATED) {
             return true;
         }
 
@@ -457,6 +495,104 @@ abstract class CModel implements ArrayAccess, CInterface_Arrayable, CInterface_J
         }
 
         return false;
+    }
+
+    /**
+     * Indicate that models should prevent lazy loading, silently discarding attributes, and accessing missing attributes.
+     *
+     * @param bool $shouldBeStrict
+     *
+     * @return void
+     */
+    public static function shouldBeStrict(bool $shouldBeStrict = true) {
+        static::preventLazyLoading($shouldBeStrict);
+        static::preventSilentlyDiscardingAttributes($shouldBeStrict);
+        static::preventAccessingMissingAttributes($shouldBeStrict);
+    }
+
+    /**
+     * Prevent model relationships from being lazy loaded.
+     *
+     * @param bool $value
+     *
+     * @return void
+     */
+    public static function preventLazyLoading($value = true) {
+        static::$modelsShouldPreventLazyLoading = $value;
+    }
+
+    /**
+     * Register a callback that is responsible for handling lazy loading violations.
+     *
+     * @param null|callable $callback
+     *
+     * @return void
+     */
+    public static function handleLazyLoadingViolationUsing(?callable $callback) {
+        static::$lazyLoadingViolationCallback = $callback;
+    }
+
+    /**
+     * Prevent non-fillable attributes from being silently discarded.
+     *
+     * @param bool $value
+     *
+     * @return void
+     */
+    public static function preventSilentlyDiscardingAttributes($value = true) {
+        static::$modelsShouldPreventSilentlyDiscardingAttributes = $value;
+    }
+
+    /**
+     * Register a callback that is responsible for handling discarded attribute violations.
+     *
+     * @param null|callable $callback
+     *
+     * @return void
+     */
+    public static function handleDiscardedAttributeViolationUsing(?callable $callback) {
+        static::$discardedAttributeViolationCallback = $callback;
+    }
+
+    /**
+     * Prevent accessing missing attributes on retrieved models.
+     *
+     * @param bool $value
+     *
+     * @return void
+     */
+    public static function preventAccessingMissingAttributes($value = true) {
+        static::$modelsShouldPreventAccessingMissingAttributes = $value;
+    }
+
+    /**
+     * Register a callback that is responsible for handling missing attribute violations.
+     *
+     * @param null|callable $callback
+     *
+     * @return void
+     */
+    public static function handleMissingAttributeViolationUsing(?callable $callback) {
+        static::$missingAttributeViolationCallback = $callback;
+    }
+
+    /**
+     * Execute a callback without broadcasting any model events for all model types.
+     *
+     * @param callable $callback
+     *
+     * @return mixed
+     */
+    public static function withoutBroadcasting(callable $callback) {
+        $isBroadcasting = static::$isBroadcasting;
+
+        static::$isBroadcasting = false;
+
+        try {
+            return $callback();
+        } finally {
+            static::$isBroadcasting = $isBroadcasting;
+        }
     }
 
     /**
@@ -481,7 +617,10 @@ abstract class CModel implements ArrayAccess, CInterface_Arrayable, CInterface_J
      */
     public function fill(array $attributes) {
         $totallyGuarded = $this->totallyGuarded();
-        foreach ($this->fillableFromArray($attributes) as $key => $value) {
+
+        $fillable = $this->fillableFromArray($attributes);
+
+        foreach ($fillable as $key => $value) {
             $key = $this->removeTableFromKey($key);
 
             // The developers may choose to place some attributes in the "fillable" array
@@ -489,10 +628,29 @@ abstract class CModel implements ArrayAccess, CInterface_Arrayable, CInterface_J
             // the model, and all others will just get ignored for security reasons.
             if ($this->isFillable($key)) {
                 $this->setAttribute($key, $value);
-            } elseif ($totallyGuarded) {
+            } elseif ($totallyGuarded || static::preventsSilentlyDiscardingAttributes()) {
+                if (isset(static::$discardedAttributeViolationCallback)) {
+                    call_user_func(static::$discardedAttributeViolationCallback, $this, [$key]);
+                } else {
+                    throw new CModel_Exception_MassAssignmentException(sprintf(
+                        'Add [%s] to fillable property to allow mass assignment on [%s].',
+                        $key,
+                        get_class($this)
+                    ));
+                }
+            }
+        }
+        if (count($attributes) !== count($fillable)
+            && static::preventsSilentlyDiscardingAttributes()
+        ) {
+            $keys = array_diff(array_keys($attributes), array_keys($fillable));
+
+            if (isset(static::$discardedAttributeViolationCallback)) {
+                call_user_func(static::$discardedAttributeViolationCallback, $this, $keys);
+            } else {
                 throw new CModel_Exception_MassAssignmentException(sprintf(
-                    'Add [%s] to fillable property to allow mass assignment on [%s].',
-                    $key,
+                    'Add fillable property [%s] to allow mass assignment on [%s].',
+                    implode(', ', $keys),
                     get_class($this)
                 ));
             }
@@ -545,7 +703,7 @@ abstract class CModel implements ArrayAccess, CInterface_Arrayable, CInterface_J
         // This method just provides a convenient way for us to generate fresh model
         // instances of this current model. It is particularly useful during the
         // hydration of new objects via the Eloquent query builder instances.
-        $model = new static((array) $attributes);
+        $model = new static();
 
         $model->exists = $exists;
 
@@ -554,6 +712,8 @@ abstract class CModel implements ArrayAccess, CInterface_Arrayable, CInterface_J
         $model->setTable($this->getTable());
 
         $model->mergeCasts($this->casts);
+
+        $model->fill((array) $attributes);
 
         return $model;
     }
@@ -572,7 +732,9 @@ abstract class CModel implements ArrayAccess, CInterface_Arrayable, CInterface_J
         $model = $this->newInstance([], true);
 
         $model->setRawAttributes((array) $attributes, true);
+
         $model->setConnection($connection ?: $this->getConnectionName());
+
         $model->fireModelEvent('retrieved', false);
 
         return $model;
@@ -651,6 +813,26 @@ abstract class CModel implements ArrayAccess, CInterface_Arrayable, CInterface_J
     }
 
     /**
+     * Eager load relationships on the polymorphic relation of a model.
+     *
+     * @param string $relation
+     * @param array  $relations
+     *
+     * @return $this
+     */
+    public function loadMorph($relation, $relations) {
+        if (!$this->{$relation}) {
+            return $this;
+        }
+
+        $className = get_class($this->{$relation});
+
+        $this->{$relation}->load($relations[$className] ?? []);
+
+        return $this;
+    }
+
+    /**
      * Eager load relations on the model if they are not already eager loaded.
      *
      * @param array|string $relations
@@ -663,6 +845,179 @@ abstract class CModel implements ArrayAccess, CInterface_Arrayable, CInterface_J
         return $this->load(array_filter($relations, function ($relation) {
             return !$this->relationLoaded($relation);
         }));
+    }
+
+    /**
+     * Eager load relation's column aggregations on the model.
+     *
+     * @param array|string $relations
+     * @param string       $column
+     * @param string       $function
+     *
+     * @return $this
+     */
+    public function loadAggregate($relations, $column, $function = null) {
+        $this->newCollection([$this])->loadAggregate($relations, $column, $function);
+
+        return $this;
+    }
+
+    /**
+     * Eager load relation counts on the model.
+     *
+     * @param array|string $relations
+     *
+     * @return $this
+     */
+    public function loadCount($relations) {
+        $relations = is_string($relations) ? func_get_args() : $relations;
+
+        return $this->loadAggregate($relations, '*', 'count');
+    }
+
+    /**
+     * Eager load relation max column values on the model.
+     *
+     * @param array|string $relations
+     * @param string       $column
+     *
+     * @return $this
+     */
+    public function loadMax($relations, $column) {
+        return $this->loadAggregate($relations, $column, 'max');
+    }
+
+    /**
+     * Eager load relation min column values on the model.
+     *
+     * @param array|string $relations
+     * @param string       $column
+     *
+     * @return $this
+     */
+    public function loadMin($relations, $column) {
+        return $this->loadAggregate($relations, $column, 'min');
+    }
+
+    /**
+     * Eager load relation's column summations on the model.
+     *
+     * @param array|string $relations
+     * @param string       $column
+     *
+     * @return $this
+     */
+    public function loadSum($relations, $column) {
+        return $this->loadAggregate($relations, $column, 'sum');
+    }
+
+    /**
+     * Eager load relation average column values on the model.
+     *
+     * @param array|string $relations
+     * @param string       $column
+     *
+     * @return $this
+     */
+    public function loadAvg($relations, $column) {
+        return $this->loadAggregate($relations, $column, 'avg');
+    }
+
+    /**
+     * Eager load related model existence values on the model.
+     *
+     * @param array|string $relations
+     *
+     * @return $this
+     */
+    public function loadExists($relations) {
+        return $this->loadAggregate($relations, '*', 'exists');
+    }
+
+    /**
+     * Eager load relationship column aggregation on the polymorphic relation of a model.
+     *
+     * @param string $relation
+     * @param array  $relations
+     * @param string $column
+     * @param string $function
+     *
+     * @return $this
+     */
+    public function loadMorphAggregate($relation, $relations, $column, $function = null) {
+        if (!$this->{$relation}) {
+            return $this;
+        }
+
+        $className = get_class($this->{$relation});
+
+        $this->{$relation}->loadAggregate($relations[$className] ?? [], $column, $function);
+
+        return $this;
+    }
+
+    /**
+     * Eager load relationship counts on the polymorphic relation of a model.
+     *
+     * @param string $relation
+     * @param array  $relations
+     *
+     * @return $this
+     */
+    public function loadMorphCount($relation, $relations) {
+        return $this->loadMorphAggregate($relation, $relations, '*', 'count');
+    }
+
+    /**
+     * Eager load relationship max column values on the polymorphic relation of a model.
+     *
+     * @param string $relation
+     * @param array  $relations
+     * @param string $column
+     *
+     * @return $this
+     */
+    public function loadMorphMax($relation, $relations, $column) {
+        return $this->loadMorphAggregate($relation, $relations, $column, 'max');
+    }
+
+    /**
+     * Eager load relationship min column values on the polymorphic relation of a model.
+     *
+     * @param string $relation
+     * @param array  $relations
+     * @param string $column
+     *
+     * @return $this
+     */
+    public function loadMorphMin($relation, $relations, $column) {
+        return $this->loadMorphAggregate($relation, $relations, $column, 'min');
+    }
+
+    /**
+     * Eager load relationship column summations on the polymorphic relation of a model.
+     *
+     * @param string $relation
+     * @param array  $relations
+     * @param string $column
+     *
+     * @return $this
+     */
+    public function loadMorphSum($relation, $relations, $column) {
+        return $this->loadMorphAggregate($relation, $relations, $column, 'sum');
+    }
+
+    /**
+     * Eager load relationship average column values on the polymorphic relation of a model.
+     *
+     * @param string $relation
+     * @param array  $relations
+     * @param string $column
+     *
+     * @return $this
+     */
+    public function loadMorphAvg($relation, $relations, $column) {
+        return $this->loadMorphAggregate($relation, $relations, $column, 'avg');
     }
 
     /**
@@ -708,38 +1063,29 @@ abstract class CModel implements ArrayAccess, CInterface_Arrayable, CInterface_J
      * @return int
      */
     protected function incrementOrDecrement($column, $amount, $extra, $method) {
-        $query = $this->newQuery();
+        $query = $this->newQueryWithoutRelationships();
 
         if (!$this->exists) {
             return $query->{$method}($column, $amount, $extra);
         }
 
-        $this->incrementOrDecrementAttributeValue($column, $amount, $extra, $method);
-
-        return $query->where(
-            $this->getKeyName(),
-            $this->getKey()
-        )->{$method}($column, $amount, $extra);
-    }
-
-    /**
-     * Increment the underlying attribute value and sync with original.
-     *
-     * @param string $column
-     * @param int    $amount
-     * @param array  $extra
-     * @param string $method
-     *
-     * @throws CModel_Exception_MassAssignmentException
-     *
-     * @return void
-     */
-    protected function incrementOrDecrementAttributeValue($column, $amount, $extra, $method) {
-        $this->{$column} = $this->{$column} + ($method == 'increment' ? $amount : $amount * -1);
+        $this->{$column} = $this->isClassDeviable($column)
+            ? $this->deviateClassCastableAttribute($method, $column, $amount)
+            : $this->{$column} + ($method === 'increment' ? $amount : $amount * -1);
 
         $this->forceFill($extra);
 
-        $this->syncOriginalAttribute($column);
+        if ($this->fireModelEvent('updating') === false) {
+            return false;
+        }
+
+        return c::tap($this->setKeysForSaveQuery($query)->{$method}($column, $amount, $extra), function () use ($column) {
+            $this->syncChanges();
+
+            $this->fireModelEvent('updated', false);
+
+            $this->syncOriginalAttribute($column);
+        });
     }
 
     /**
@@ -758,6 +1104,70 @@ abstract class CModel implements ArrayAccess, CInterface_Arrayable, CInterface_J
         }
 
         return $this->fill($attributes)->save($options);
+    }
+
+    /**
+     * Update the model in the database within a transaction.
+     *
+     * @param array $attributes
+     * @param array $options
+     *
+     * @throws \Throwable
+     *
+     * @return bool
+     */
+    public function updateOrFail(array $attributes = [], array $options = []) {
+        if (!$this->exists) {
+            return false;
+        }
+
+        return $this->fill($attributes)->saveOrFail($options);
+    }
+
+    /**
+     * Update the model in the database without raising any events.
+     *
+     * @param array $attributes
+     * @param array $options
+     *
+     * @return bool
+     */
+    public function updateQuietly(array $attributes = [], array $options = []) {
+        if (!$this->exists) {
+            return false;
+        }
+
+        return $this->fill($attributes)->saveQuietly($options);
+    }
+
+    /**
+     * Increment a column's value by a given amount without raising any events.
+     *
+     * @param string    $column
+     * @param float|int $amount
+     * @param array     $extra
+     *
+     * @return int
+     */
+    protected function incrementQuietly($column, $amount = 1, array $extra = []) {
+        return static::withoutEvents(function () use ($column, $amount, $extra) {
+            return $this->incrementOrDecrement($column, $amount, $extra, 'increment');
+        });
+    }
+
+    /**
+     * Decrement a column's value by a given amount without raising any events.
+     *
+     * @param string    $column
+     * @param float|int $amount
+     * @param array     $extra
+     *
+     * @return int
+     */
+    protected function decrementQuietly($column, $amount = 1, array $extra = []) {
+        return static::withoutEvents(function () use ($column, $amount, $extra) {
+            return $this->incrementOrDecrement($column, $amount, $extra, 'decrement');
+        });
     }
 
     /**
@@ -787,6 +1197,17 @@ abstract class CModel implements ArrayAccess, CInterface_Arrayable, CInterface_J
     }
 
     /**
+     * Save the model and all of its relationships without raising any events to the parent model.
+     *
+     * @return bool
+     */
+    public function pushQuietly() {
+        return static::withoutEvents(function () {
+            return $this->push();
+        });
+    }
+
+    /**
      * Save the model to the database without raising any events.
      *
      * @param array $options
@@ -807,6 +1228,8 @@ abstract class CModel implements ArrayAccess, CInterface_Arrayable, CInterface_J
      * @return bool
      */
     public function save(array $options = []) {
+        $this->mergeAttributesFromCachedCasts();
+
         $query = $this->newModelQuery();
 
         // If the "saving" event returns false we'll bail out of the save and return
@@ -821,7 +1244,8 @@ abstract class CModel implements ArrayAccess, CInterface_Arrayable, CInterface_J
         // clause to only update this model. Otherwise, we'll just insert them.
         if ($this->exists) {
             $saved = $this->isDirty()
-                ? $this->performUpdate($query) : true;
+                ? $this->performUpdate($query)
+                : true;
         } else {
             // If the model is brand new, we'll insert it into our database and set the
             // ID attribute on the model to the value of the newly inserted row's ID
@@ -905,12 +1329,34 @@ abstract class CModel implements ArrayAccess, CInterface_Arrayable, CInterface_J
         if (count($dirty) > 0) {
             $this->setKeysForSaveQuery($query)->update($dirty);
 
-            $this->fireModelEvent('updated', false);
-
             $this->syncChanges();
+
+            $this->fireModelEvent('updated', false);
         }
 
         return true;
+    }
+
+    /**
+     * Set the keys for a select query.
+     *
+     * @param \CModel_Query $query
+     *
+     * @return \CModel_Query
+     */
+    protected function setKeysForSelectQuery($query) {
+        $query->where($this->getKeyName(), '=', $this->getKeyForSelectQuery());
+
+        return $query;
+    }
+
+    /**
+     * Get the primary key value for a select query.
+     *
+     * @return mixed
+     */
+    protected function getKeyForSelectQuery() {
+        return $this->original[$this->getKeyName()] ?? $this->getKey();
     }
 
     /**
@@ -957,7 +1403,7 @@ abstract class CModel implements ArrayAccess, CInterface_Arrayable, CInterface_J
         // If the model has an incrementing key, we can use the "insertGetId" method on
         // the query builder, which will give us back the final inserted ID for this
         // table from the database. Not all tables have to be incrementing though.
-        $attributes = $this->attributes;
+        $attributes = $this->getAttributesForInsert();
 
         if ($this->getIncrementing()) {
             $this->insertAndSetId($query, $attributes);
@@ -1001,23 +1447,31 @@ abstract class CModel implements ArrayAccess, CInterface_Arrayable, CInterface_J
     /**
      * Destroy the models for the given IDs.
      *
-     * @param array|int $ids
+     * @param \CCollection|array|int|string $ids
      *
      * @return int
      */
     public static function destroy($ids) {
-        // We'll initialize a count here so we will return the total number of deletes
-        // for the operation. The developers can then check this number as a boolean
-        // type value or get this total count of records deleted for logging, etc.
-        $count = 0;
+        if ($ids instanceof CModel_Collection) {
+            $ids = $ids->modelKeys();
+        }
+
+        if ($ids instanceof CCollection) {
+            $ids = $ids->all();
+        }
 
         $ids = is_array($ids) ? $ids : func_get_args();
+
+        if (count($ids) === 0) {
+            return 0;
+        }
 
         // We will actually pull the models from the database table and call delete on
         // each of them individually so that their events get fired properly with a
         // correct set of attributes in case the developers wants to check these.
-        $instance = new static();
-        $key = $instance->getKeyName();
+        $key = ($instance = new static())->getKeyName();
+
+        $count = 0;
 
         foreach ($instance->whereIn($key, $ids)->get() as $model) {
             if ($model->delete()) {
@@ -1036,8 +1490,10 @@ abstract class CModel implements ArrayAccess, CInterface_Arrayable, CInterface_J
      * @return null|bool
      */
     public function delete() {
+        $this->mergeAttributesFromCachedCasts();
+
         if (is_null($this->getKeyName())) {
-            throw new Exception('No primary key defined on model.');
+            throw new LogicException('No primary key defined on model.');
         }
 
         // If the model doesn't exist, there is nothing to delete so we'll just return
@@ -1064,6 +1520,34 @@ abstract class CModel implements ArrayAccess, CInterface_Arrayable, CInterface_J
         $this->fireModelEvent('deleted', false);
 
         return true;
+    }
+
+    /**
+     * Delete the model from the database without raising any events.
+     *
+     * @return bool
+     */
+    public function deleteQuietly() {
+        return static::withoutEvents(function () {
+            return $this->delete();
+        });
+    }
+
+    /**
+     * Delete the model from the database within a transaction.
+     *
+     * @throws \Throwable
+     *
+     * @return null|bool
+     */
+    public function deleteOrFail() {
+        if (!$this->exists) {
+            return false;
+        }
+
+        return $this->getConnection()->transaction(function () {
+            return $this->delete();
+        });
     }
 
     /**
@@ -1111,6 +1595,17 @@ abstract class CModel implements ArrayAccess, CInterface_Arrayable, CInterface_J
     }
 
     /**
+     * Get a new query builder that doesn't have any global scopes or eager loading.
+     *
+     * @return CModel_Query|static
+     */
+    public function newModelQuery() {
+        return $this->newModelBuilder(
+            $this->newBaseQueryBuilder()
+        )->setModel($this);
+    }
+
+    /**
      * Get a new query builder with no relationships loaded.
      *
      * @return CModel_Query
@@ -1153,9 +1648,7 @@ abstract class CModel implements ArrayAccess, CInterface_Arrayable, CInterface_J
      * @return CModel_Query
      */
     public function newQueryWithoutScope($scope) {
-        $builder = $this->newQuery();
-
-        return $builder->withoutGlobalScope($scope);
+        return $this->newQuery()->withoutGlobalScope($scope);
     }
 
     /**
@@ -1166,20 +1659,7 @@ abstract class CModel implements ArrayAccess, CInterface_Arrayable, CInterface_J
      * @return CModel_Query
      */
     public function newQueryForRestoration($ids) {
-        if (is_array($ids)) {
-            return $this->newQueryWithoutScopes()->whereIn($this->getQualifiedKeyName(), $ids);
-        } else {
-            return $this->newQueryWithoutScopes()->whereKey($ids);
-        }
-    }
-
-    /**
-     * Get a new query builder that doesn't have any global scopes or eager loading.
-     *
-     * @return CModel_Query|static
-     */
-    public function newModelQuery() {
-        return $this->newModelBuilder($this->newBaseQueryBuilder())->setModel($this);
+        return $this->newQueryWithoutScopes()->whereKey($ids);
     }
 
     /**
@@ -1199,7 +1679,7 @@ abstract class CModel implements ArrayAccess, CInterface_Arrayable, CInterface_J
      * @return CDatabase_Query_Builder
      */
     protected function newBaseQueryBuilder() {
-        return new CDatabase_Query_Builder($this->getConnection());
+        return $this->getConnection()->query();
     }
 
     /**
@@ -1225,7 +1705,32 @@ abstract class CModel implements ArrayAccess, CInterface_Arrayable, CInterface_J
      * @return CModel_Relation_Pivot
      */
     public function newPivot(CModel $parent, array $attributes, $table, $exists, $using = null) {
-        return $using ? $using::fromRawAttributes($parent, $attributes, $table, $exists) : CModel_Relation_Pivot::fromAttributes($parent, $attributes, $table, $exists);
+        return $using
+            ? $using::fromRawAttributes($parent, $attributes, $table, $exists)
+            : CModel_Relation_Pivot::fromAttributes($parent, $attributes, $table, $exists);
+    }
+
+    /**
+     * Determine if the model has a given scope.
+     *
+     * @param string $scope
+     *
+     * @return bool
+     */
+    public function hasNamedScope($scope) {
+        return method_exists($this, 'scope' . ucfirst($scope));
+    }
+
+    /**
+     * Apply the given named scope if possible.
+     *
+     * @param string $scope
+     * @param array  $parameters
+     *
+     * @return mixed
+     */
+    public function callNamedScope($scope, array $parameters = []) {
+        return $this->{'scope' . ucfirst($scope)}(...$parameters);
     }
 
     /**
@@ -1277,9 +1782,9 @@ abstract class CModel implements ArrayAccess, CInterface_Arrayable, CInterface_J
             return null;
         }
 
-        return $this->newQueryWithoutScopes()
+        return $this->setKeysForSelectQuery($this->newQueryWithoutScopes())
+            ->useWritePdo()
             ->with(is_string($with) ? func_get_args() : $with)
-            ->where($this->getKeyName(), $this->getKey())
             ->first();
     }
 
@@ -1292,10 +1797,18 @@ abstract class CModel implements ArrayAccess, CInterface_Arrayable, CInterface_J
         if (!$this->exists) {
             return $this;
         }
+        $this->setRawAttributes(
+            $this->setKeysForSelectQuery($this->newQueryWithoutScopes())
+                ->useWritePdo()
+                ->firstOrFail()
+                ->attributes
+        );
+        $this->load(c::collect($this->relations)->reject(function ($relation) {
+            return $relation instanceof CModel_Relation_Pivot
+                || (is_object($relation) && in_array(CModel_Relation_Trait_AsPivot::class, c::classUsesRecursive($relation), true));
+        })->keys()->all());
 
-        $this->load(array_keys($this->relations));
-
-        $this->setRawAttributes(static::findOrFail($this->getKey())->attributes);
+        $this->syncOriginal();
 
         return $this;
     }
@@ -1323,6 +1836,21 @@ abstract class CModel implements ArrayAccess, CInterface_Arrayable, CInterface_J
             $instance->setRawAttributes($attributes);
 
             $instance->setRelations($this->relations);
+
+            $instance->fireModelEvent('replicating', false);
+        });
+    }
+
+    /**
+     * Clone the model into a new, non-existing instance without raising any events.
+     *
+     * @param null|array $except
+     *
+     * @return static
+     */
+    public function replicateQuietly(array $except = null) {
+        return static::withoutEvents(function () use ($except) {
+            return $this->replicate($except);
         });
     }
 
@@ -1624,6 +2152,33 @@ abstract class CModel implements ArrayAccess, CInterface_Arrayable, CInterface_J
     }
 
     /**
+     * Determine if lazy loading is disabled.
+     *
+     * @return bool
+     */
+    public static function preventsLazyLoading() {
+        return static::$modelsShouldPreventLazyLoading;
+    }
+
+    /**
+     * Determine if discarding guarded attribute fills is disabled.
+     *
+     * @return bool
+     */
+    public static function preventsSilentlyDiscardingAttributes() {
+        return static::$modelsShouldPreventSilentlyDiscardingAttributes;
+    }
+
+    /**
+     * Determine if accessing missing attributes is disabled.
+     *
+     * @return bool
+     */
+    public static function preventsAccessingMissingAttributes() {
+        return static::$modelsShouldPreventAccessingMissingAttributes;
+    }
+
+    /**
      * Dynamically retrieve attributes on the model.
      *
      * @param string $key
@@ -1752,15 +2307,6 @@ abstract class CModel implements ArrayAccess, CInterface_Arrayable, CInterface_J
     }
 
     /**
-     * Convert the model to its string representation.
-     *
-     * @return string
-     */
-    public function __toString() {
-        return $this->toJson();
-    }
-
-    /**
      * @return bool
      */
     public static function usesSoftDelete() {
@@ -1788,6 +2334,30 @@ abstract class CModel implements ArrayAccess, CInterface_Arrayable, CInterface_J
         }
 
         return false;
+    }
+
+    /**
+     * Convert the model to its string representation.
+     *
+     * @return string
+     */
+    public function __toString() {
+        return $this->escapeWhenCastingToString
+            ? c::e($this->toJson())
+            : $this->toJson();
+    }
+
+    /**
+     * Indicate that the object's string representation should be escaped when __toString is invoked.
+     *
+     * @param bool $escape
+     *
+     * @return $this
+     */
+    public function escapeWhenCastingToString($escape = true) {
+        $this->escapeWhenCastingToString = $escape;
+
+        return $this;
     }
 
     /**

@@ -4,60 +4,60 @@
  *
  * @extends CModel_Relation<TRelatedModel>
  *
- * @method        mixed                          value($column)                                                                           Get a single column's value from the first result of a query.
- * @method        mixed                          pluck($column)                                                                           Get a single column's value from the first result of a query.
- * @method        void                           chunk($count, callable $callback)                                                        Chunk the results of the query.
- * @method        \CCollection                   lists($column, $key = null)                                                              Get an array with the values of a given column.
- * @method        void                           onDelete(Closure $callback)                                                              Register a replacement for the default delete function.
- * @method        CModel[]                       getModels($columns = ['*'])                                                              Get the hydrated models without eager loading.
- * @method        array                          eagerLoadRelations(array $models)                                                        Eager load the relationships for the models.
- * @method        array                          loadRelation(array $models, $name, Closure $constraints)                                 Eagerly load the relationship on a set of models.
- * @method static CModel_Query|static            where($column, $operator = null, $value = null, $boolean = 'and')                        Add a basic where clause to the query.
- * @method static CModel_Query|static            whereHas($relation, Closure $callback = null, $operator = '>=', $count = 1)              Add a relationship count / exists condition to the query with where clauses.
- * @method static CModel_Query|static            orWhere($column, $operator = null, $value = null)                                        Add an "or where" clause to the query.
- * @method static CModel_Query|static            has($relation, $operator = '>=', $count = 1, $boolean = 'and', Closure $callback = null) Add a relationship count condition to the query.
- * @method static CDatabase_Query_Builder|static whereRaw($sql, array $bindings = [])
- * @method static CDatabase_Query_Builder        whereBetween($column, array $values)
- * @method static CDatabase_Query_Builder        whereNotBetween($column, array $values)
- * @method static CDatabase_Query_Builder        whereNested(Closure $callback)
- * @method static CDatabase_Query_Builder        addNestedWhereQuery($query)
- * @method static CDatabase_Query_Builder        whereExists(Closure $callback)
- * @method static CDatabase_Query_Builder        whereNotExists(Closure $callback)
- * @method static CDatabase_Query_Builder        whereIn($column, $values)
- * @method static CDatabase_Query_Builder        whereNotIn($column, $values)
- * @method static CDatabase_Query_Builder        whereNull($column)
- * @method static CDatabase_Query_Builder        whereNotNull($column)
- * @method        CModel_Query|static            orWhereRaw($sql, array $bindings = [])
- * @method        CModel_Query|static            orWhereBetween($column, array $values)
- * @method        CModel_Query|static            orWhereNotBetween($column, array $values)
- * @method        CModel_Query|static            orWhereExists(Closure $callback)
- * @method        CModel_Query|static            orWhereNotExists(Closure $callback)
- * @method        CModel_Query|static            orWhereIn($column, $values)
- * @method        CModel_Query|static            orWhereNotIn($column, $values)
- * @method        CModel_Query|static            orWhereNull($column)
- * @method        CModel_Query|static            orWhereNotNull($column)
- * @method        CModel_Query|static            whereDate($column, $operator, $value)
- * @method        CModel_Query|static            whereDay($column, $operator, $value)
- * @method        CModel_Query|static            whereMonth($column, $operator, $value)
- * @method        CModel_Query|static            whereYear($column, $operator, $value)
- * @method        CModel_Query|static            join($table, $first, $operator = null, $second = null, $type = 'inner', $where = false)
- * @method        CModel_Query|static            select($columns = ['*'])
- * @method        CModel_Query|static            groupBy(...$groups)
- * @method        CModel_Query|static            newQuery()
- * @method        CModel_Query|static            withTrashed()
- * @method        CModel_Query|static            from($table)
- * @method        CModel_Query|static            leftJoinSub($query, $as, $first, $operator = null, $second = null)
- * @method        CModel_Query|static            addSelect($column)
- * @method        CModel_Query|static            selectRaw($expression, array $bindings = [])
- * @method        CModel_Query|static            orderBy($column, $direction = 'asc')
- * @method        CModel_Query|static            orderByDesc($column)
- * @method        CModel_Query|static            skip($value)
- * @method        CModel_Query|static            offset($value)
- * @method        CModel_Query|static            take($value)
- * @method        CModel_Query|static            limit($value)
- * @method        CModel_Query|static            lockForUpdate()                                                                          Lock the selected rows in the table for updating.
- * @method        bool                           exists()                                                                                 Determine if any rows exist for the current query
- * @method        mixed                          sum($column)                                                                             Retrieve the sum of the values of a given column..
+ * @method mixed               value($column)                                                                                                          Get a single column's value from the first result of a query.
+ * @method mixed               pluck($column)                                                                                                          Get a single column's value from the first result of a query.
+ * @method void                chunk($count, callable $callback)                                                                                       Chunk the results of the query.
+ * @method \CCollection        lists($column, $key = null)                                                                                             Get an array with the values of a given column.
+ * @method void                onDelete(Closure $callback)                                                                                             Register a replacement for the default delete function.
+ * @method CModel[]            getModels($columns = ['*'])                                                                                             Get the hydrated models without eager loading.
+ * @method array               eagerLoadRelations(array $models)                                                                                       Eager load the relationships for the models.
+ * @method array               loadRelation(array $models, $name, Closure $constraints)                                                                Eagerly load the relationship on a set of models.
+ * @method static              CModel_Query|static            where($column, $operator = null, $value = null, $boolean = 'and')                        Add a basic where clause to the query.
+ * @method static              CModel_Query|static            whereHas($relation, Closure $callback = null, $operator = '>=', $count = 1)              Add a relationship count / exists condition to the query with where clauses.
+ * @method static              CModel_Query|static            orWhere($column, $operator = null, $value = null)                                        Add an "or where" clause to the query.
+ * @method static              CModel_Query|static            has($relation, $operator = '>=', $count = 1, $boolean = 'and', Closure $callback = null) Add a relationship count condition to the query.
+ * @method static              CDatabase_Query_Builder|static whereRaw($sql, array $bindings = [])
+ * @method static              CDatabase_Query_Builder        whereBetween($column, array $values)
+ * @method static              CDatabase_Query_Builder        whereNotBetween($column, array $values)
+ * @method static              CDatabase_Query_Builder        whereNested(Closure $callback)
+ * @method static              CDatabase_Query_Builder        addNestedWhereQuery($query)
+ * @method static              CDatabase_Query_Builder        whereExists(Closure $callback)
+ * @method static              CDatabase_Query_Builder        whereNotExists(Closure $callback)
+ * @method static              CDatabase_Query_Builder        whereIn($column, $values)
+ * @method static              CDatabase_Query_Builder        whereNotIn($column, $values)
+ * @method static              CDatabase_Query_Builder        whereNull($column)
+ * @method static              CDatabase_Query_Builder        whereNotNull($column)
+ * @method CModel_Query|static orWhereRaw($sql, array $bindings = [])
+ * @method CModel_Query|static orWhereBetween($column, array $values)
+ * @method CModel_Query|static orWhereNotBetween($column, array $values)
+ * @method CModel_Query|static orWhereExists(Closure $callback)
+ * @method CModel_Query|static orWhereNotExists(Closure $callback)
+ * @method CModel_Query|static orWhereIn($column, $values)
+ * @method CModel_Query|static orWhereNotIn($column, $values)
+ * @method CModel_Query|static orWhereNull($column)
+ * @method CModel_Query|static orWhereNotNull($column)
+ * @method CModel_Query|static whereDate($column, $operator, $value)
+ * @method CModel_Query|static whereDay($column, $operator, $value)
+ * @method CModel_Query|static whereMonth($column, $operator, $value)
+ * @method CModel_Query|static whereYear($column, $operator, $value)
+ * @method CModel_Query|static join($table, $first, $operator = null, $second = null, $type = 'inner', $where = false)
+ * @method CModel_Query|static select($columns = ['*'])
+ * @method CModel_Query|static groupBy(...$groups)
+ * @method CModel_Query|static newQuery()
+ * @method CModel_Query|static withTrashed()
+ * @method CModel_Query|static from($table)
+ * @method CModel_Query|static leftJoinSub($query, $as, $first, $operator = null, $second = null)
+ * @method CModel_Query|static addSelect($column)
+ * @method CModel_Query|static selectRaw($expression, array $bindings = [])
+ * @method CModel_Query|static orderBy($column, $direction = 'asc')
+ * @method CModel_Query|static orderByDesc($column)
+ * @method CModel_Query|static skip($value)
+ * @method CModel_Query|static offset($value)
+ * @method CModel_Query|static take($value)
+ * @method CModel_Query|static limit($value)
+ * @method CModel_Query|static lockForUpdate()                                                                                                         Lock the selected rows in the table for updating.
+ * @method bool                exists()                                                                                                                Determine if any rows exist for the current query
+ * @method mixed               sum($column)                                                                                                            Retrieve the sum of the values of a given column..
  *
  * @see CModel_Query
  */
@@ -219,7 +219,7 @@ class CModel_Relation_BelongsToMany extends CModel_Relation {
             return $table;
         }
 
-        if (in_array(CModel_Relation_AsPivot::class, c::classUsesRecursive($model))) {
+        if (in_array(CModel_Relation_Trait_AsPivot::class, c::classUsesRecursive($model))) {
             $this->using($table);
         }
 
