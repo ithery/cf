@@ -1,6 +1,6 @@
 <?php
 
-use CarbonV3\CarbonInterface;
+use Carbon\CarbonInterface;
 
 class CLogger_Reader_LogIndex {
     use CLogger_Reader_Concern_LogIndex_HasMetadata;

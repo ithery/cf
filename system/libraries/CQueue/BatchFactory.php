@@ -1,6 +1,6 @@
 <?php
 
-use CarbonV3\CarbonImmutable;
+use Carbon\CarbonImmutable;
 
 class CQueue_BatchFactory {
     /**
@@ -32,9 +32,9 @@ class CQueue_BatchFactory {
      * @param int                                       $failedJobs
      * @param array                                     $failedJobIds
      * @param array                                     $options
-     * @param \CarbonV3\CarbonImmutable                 $createdAt
-     * @param null|\CarbonV3\CarbonImmutable            $cancelledAt
-     * @param null|\CarbonV3\CarbonImmutable            $finishedAt
+     * @param \Carbon\CarbonImmutable                   $createdAt
+     * @param null|\Carbon\CarbonImmutable              $cancelledAt
+     * @param null|\Carbon\CarbonImmutable              $finishedAt
      *
      * @return \CQueue_Batch
      */

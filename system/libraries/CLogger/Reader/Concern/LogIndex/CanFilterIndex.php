@@ -1,6 +1,6 @@
 <?php
 
-use CarbonV3\CarbonInterface;
+use Carbon\CarbonInterface;
 
 trait CLogger_Reader_Concern_LogIndex_CanFilterIndex {
     protected ?int $filterFrom = null;

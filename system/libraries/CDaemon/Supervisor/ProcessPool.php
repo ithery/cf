@@ -1,6 +1,6 @@
 <?php
 
-use CarbonV3\CarbonImmutable;
+use Carbon\CarbonImmutable;
 use Symfony\Component\Process\Process;
 
 class CDaemon_Supervisor_ProcessPool implements Countable {

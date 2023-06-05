@@ -1,7 +1,7 @@
 <?php
 
-use CarbonV3\Carbon;
-use CarbonV3\CarbonInterval;
+use Carbon\Carbon;
+use Carbon\CarbonInterval;
 use Doctrine\DBAL\Types\Type;
 use Doctrine\DBAL\Connection as DoctrineConnection;
 

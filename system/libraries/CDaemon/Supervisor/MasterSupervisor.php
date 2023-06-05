@@ -1,6 +1,6 @@
 <?php
 
-use CarbonV3\CarbonImmutable;
+use Carbon\CarbonImmutable;
 
 class CDaemon_Supervisor_MasterSupervisor implements CDaemon_Contract_PausableInterface, CDaemon_Contract_RestartableInterface, CDaemon_Contract_TerminableInterface {
     use CDaemon_Trait_ListenForSignals;

@@ -1,6 +1,6 @@
 <?php
 
-use CarbonV3\CarbonInterface;
+use Carbon\CarbonInterface;
 
 class CLogger_Reader_Log {
     public int $index;

@@ -1,7 +1,7 @@
 <?php
 
-use CarbonV3\CarbonImmutable;
-use CarbonV3\CarbonInterface;
+use Carbon\CarbonImmutable;
+use Carbon\CarbonInterface;
 
 trait CLogger_Reader_Concern_LogIndex_PreservesIndexingProgress {
     public function setLastScannedFilePosition(int $position): void {

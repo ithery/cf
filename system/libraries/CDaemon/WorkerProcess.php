@@ -1,6 +1,6 @@
 <?php
 
-use CarbonV3\CarbonImmutable;
+use Carbon\CarbonImmutable;
 use Symfony\Component\Process\Exception\ExceptionInterface;
 
 class CDaemon_WorkerProcess {
@@ -21,7 +21,7 @@ class CDaemon_WorkerProcess {
     /**
      * The time at which the cooldown period will be over.
      *
-     * @var \CarbonV3\CarbonImmutable
+     * @var \Carbon\CarbonImmutable
      */
     public $restartAgainAt;
 

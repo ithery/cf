@@ -1,6 +1,6 @@
 <?php
 
-use CarbonV3\CarbonImmutable;
+use Carbon\CarbonImmutable;
 
 class CQueue_BatchRepository implements CQueue_Contract_PrunableBatchRepositoryInterface {
     /**

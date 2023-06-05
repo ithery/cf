@@ -1,9 +1,6 @@
 <?php
 
-use CarbonV3\CarbonInterface;
-use Opcodes\LogViewer\Utils\Utils;
-use Opcodes\LogViewer\Facades\Cache;
-use Opcodes\LogViewer\Utils\GenerateCacheKey;
+use Carbon\CarbonInterface;
 
 trait CLogger_Reader_Concern_LogFile_CanCacheData {
     protected function indexCacheKeyForQuery(string $query = ''): string {

@@ -1,12 +1,19 @@
 <?php
 
-use CarbonV3\CarbonImmutable;
+use Carbon\CarbonImmutable;
 
 class CDaemon_Supervisor_Listener_MonitorWaitTimes {
     /**
+     * The metrics repository implementation.
+     *
+     * @var \CDaemon_Supervisor_Contract_MetricsRepositoryInterface
+     */
+    public $metrics;
+
+    /**
      * The time at which we last checked if monitoring was due.
      *
-     * @var \CarbonV3\CarbonImmutable
+     * @var \Carbon\CarbonImmutable
      */
     public $lastMonitored;
 

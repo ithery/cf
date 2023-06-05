@@ -1,6 +1,6 @@
 <?php
 
-use CarbonV3\CarbonImmutable;
+use Carbon\CarbonImmutable;
 
 class CDaemon_Supervisor_Supervisor implements CDaemon_Contract_PausableInterface, CDaemon_Contract_RestartableInterface, CDaemon_Contract_TerminableInterface {
     use CDaemon_Trait_ListenForSignals;
@@ -36,7 +36,7 @@ class CDaemon_Supervisor_Supervisor implements CDaemon_Contract_PausableInterfac
     /**
      * The time at which auto-scaling last ran for this supervisor.
      *
-     * @var \CarbonV3\CarbonImmutable
+     * @var \Carbon\CarbonImmutable
      */
     public $lastAutoScaled;
 
