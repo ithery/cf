@@ -38,7 +38,7 @@ class CManager_DataProvider_SqlDataProvider extends CManager_DataProviderAbstrac
     public function getDb() {
         $connection = $this->getConnection();
 
-        return $connection instanceof CDatabase ? $connection : c::db($connection);
+        return $connection instanceof CDatabase_Connection ? $connection : c::db($connection);
     }
 
     public function toEnumerable() {

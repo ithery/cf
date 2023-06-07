@@ -58,6 +58,8 @@ use Carbon\Carbon;
  * @method string                       escapeLike($str)
  * @method CDatabase_Configuration      getConfiguration()
  * @method array                        listFields($table)
+ *
+ * @see CDatabase_Connection
  */
 class CDatabase {
     use CTrait_Compat_Database;

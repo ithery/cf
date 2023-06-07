@@ -386,19 +386,17 @@ class CElement_Component_DataTable extends CElement_Component {
     }
 
     public function setDomain($domain) {
-        $this->setDatabase(CDatabase::instance(null, null, $domain));
-
         return $this;
     }
 
     /**
-     * @param CDatabase|string $db
-     * @param array            $dbConfig
+     * @param CDatabase_Connection|string $db
+     * @param array                       $dbConfig
      *
      * @return CElement_Component_DataTable
      */
     public function setDatabase($db, $dbConfig = null) {
-        if ($db instanceof CDatabase) {
+        if ($db instanceof CDatabase_Connection) {
             $this->dbName = $db->getName();
             $this->dbConfig = strlen($this->dbName) == 0 ? $db->config() : [];
         } else {
@@ -709,10 +707,10 @@ class CElement_Component_DataTable extends CElement_Component {
             }
 
             if (strlen($dbName) > 0) {
-                return CDatabase::instance($dbName);
+                return c::db($dbName);
             }
 
-            return CDatabase::instance($dbName, $dbConfig);
+            return c::db($dbName, $dbConfig);
         });
 
         return $this;
@@ -821,7 +819,7 @@ class CElement_Component_DataTable extends CElement_Component {
     }
 
     /**
-     * @return CDatabase
+     * @return CDatabase_Connection
      */
     public function db() {
         if ($this->dbResolver != null) {
@@ -829,10 +827,10 @@ class CElement_Component_DataTable extends CElement_Component {
         }
 
         if (strlen($this->dbName) > 0) {
-            return CDatabase::instance($this->dbName);
+            return c::db($this->dbName);
         }
 
-        return CDatabase::instance($this->dbName, $this->dbConfig);
+        return c::db($this->dbName, $this->dbConfig);
     }
 
     /**

@@ -110,6 +110,11 @@ class CDatabase_Manager implements CDatabase_Contract_ConnectionResolverInterfac
     protected function parseConnectionName($name) {
         $name = $name ?: $this->getDefaultConnection();
 
+        if (!is_string($name)) {
+            cdbg::traceDump();
+            cdbg::dd($name);
+        }
+
         return cstr::endsWith($name, ['::read', '::write'])
             ? explode('::', $name, 2) : [$name, null];
     }

@@ -2052,4 +2052,11 @@ class CDatabase_Connection implements CDatabase_ConnectionInterface {
     public function getConfiguration() {
         return $this->configuration;
     }
+
+    /**
+     * @return string
+     */
+    public function driverName() {
+        return carr::get($this->config, 'driver');
+    }
 }
