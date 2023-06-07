@@ -39,6 +39,7 @@ class CAjax_Engine_DataTable_Processor_DataProvider extends CAjax_Engine_DataTab
             $totalItem = $collections->count();
             $totalFilteredItem = $totalItem;
         }
+
         $output = [
             'sEcho' => intval(carr::get($request, 'sEcho')),
             'iTotalRecords' => $totalItem,
@@ -139,7 +140,7 @@ class CAjax_Engine_DataTable_Processor_DataProvider extends CAjax_Engine_DataTab
                     $transforms = json_decode($transforms, true);
                     if (is_array($transforms)) {
                         foreach ($transforms as $transforms_k => $transforms_v) {
-                            $value = ctransform::{$transforms_v['func']}($value, true);
+                            $value = CManager::transform()->call($transforms_v['func'], $value);
                         }
                     }
                 }

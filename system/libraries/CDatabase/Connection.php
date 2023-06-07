@@ -339,12 +339,35 @@ class CDatabase_Connection implements CDatabase_ConnectionInterface {
      *
      * @param null|string $query
      * @param array       $bindings
+     * @param mixed       $useReadPdo
      *
      * @return \CDatabase_Query_Builder|CDatabase_ResultData
      */
-    public function query($query = null, $bindings = []) {
+    public function query($query = null, $bindings = [], $useReadPdo = true) {
         if ($query != null) {
-            return new CDatabase_ResultData($this->select($query, $bindings));
+            return new CDatabase_ResultData($this->run($query, $bindings, function ($query, $bindings) use ($useReadPdo) {
+                if ($this->pretending()) {
+                    return [];
+                }
+
+                // First we will create a statement for the query. Then, we will set the fetch
+                // mode and prepare the bindings for the query. Once that's done we will be
+                // ready to execute the query against the database and return the cursor.
+                $statement = $this->prepared($this->getPdoForSelect($useReadPdo)
+                    ->prepare($query));
+
+                $this->bindValues(
+                    $statement,
+                    $this->prepareBindings($bindings)
+                );
+
+                // Next, we'll execute the query against the database and return the statement
+                // so we can return the cursor. The cursor will use a PHP generator to give
+                // back one row at a time without using a bunch of memory to render them.
+                $statement->execute();
+
+                return $statement;
+            }));
         }
 
         return $this->newQuery();
@@ -361,6 +384,17 @@ class CDatabase_Connection implements CDatabase_ConnectionInterface {
             $this->getQueryGrammar(),
             $this->getPostProcessor()
         );
+    }
+
+    /**
+     * Get a new query builder instance.
+     *
+     * @deprecated since 1.6, use newQuery()
+     *
+     * @return \CDatabase_Query_Builder
+     */
+    public function createQueryBuilder() {
+        return $this->newQuery();
     }
 
     /**
@@ -1890,8 +1924,8 @@ class CDatabase_Connection implements CDatabase_ConnectionInterface {
         return carr::get(carr::last($this->getQueryLog()), 'compiled');
     }
 
-    public function getRow($query) {
-        $r = $this->query($query);
+    public function getRow($query, $bindings = []) {
+        $r = $this->query($query, $bindings);
         $result = null;
         if ($r->count() > 0) {
             $result = $r[0];
@@ -1900,9 +1934,9 @@ class CDatabase_Connection implements CDatabase_ConnectionInterface {
         return $result;
     }
 
-    public function getValue($query) {
-        $r = $this->query($query);
-        $result = $r->resultArray();
+    public function getValue($query, $bindings = []) {
+        $r = $this->query($query, $bindings);
+        $result = $r->result(false);
         $res = [];
         $value = null;
         foreach ($result as $row) {
@@ -1918,9 +1952,9 @@ class CDatabase_Connection implements CDatabase_ConnectionInterface {
         return $value;
     }
 
-    public function getArray($query) {
-        $r = $this->query($query);
-        $result = $r->resultArray();
+    public function getArray($query, $bindings = []) {
+        $r = $this->query($query, $bindings);
+        $result = $r->result(false);
         $res = [];
         foreach ($result as $row) {
             $cnt = 0;
@@ -1940,9 +1974,9 @@ class CDatabase_Connection implements CDatabase_ConnectionInterface {
         return $res;
     }
 
-    public function getList($query) {
-        $r = $this->query($query);
-        $result = $r->resultArray();
+    public function getList($query, $bindings = []) {
+        $r = $this->query($query, $bindings);
+        $result = $r->result(false);
         $res = [];
         foreach ($result as $row) {
             $cnt = 0;
@@ -2059,7 +2093,7 @@ class CDatabase_Connection implements CDatabase_ConnectionInterface {
     }
 
     public function fetchAll($query, $bindings = []) {
-        return $this->query($query, $bindings)->resultArray();
+        return $this->query($query, $bindings)->fetchAll();
     }
 
     /**

@@ -60,13 +60,15 @@ class CManager_DataProvider_SqlDataProvider extends CManager_DataProviderAbstrac
             $query = $this->getQueryForPage($page, $perPage);
 
             $resultQ = $this->executeQuery($query);
-            $results = c::collect($resultQ->result(false));
+            $results = new CCollection_LazyCollection($resultQ->result(false));
         }
 
-        return c::paginator($results, $total, $perPage, $page, [
+        $paginator = c::paginator($results, $total, $perPage, $page, [
             'path' => CPagination_Paginator::resolveCurrentPath(),
             'pageName' => $pageName,
         ]);
+
+        return $paginator;
     }
 
     public function getCountForPagination() {

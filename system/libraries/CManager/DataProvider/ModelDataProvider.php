@@ -207,9 +207,8 @@ class CManager_DataProvider_ModelDataProvider extends CManager_DataProviderAbstr
 
         $relatedModel = $relation->getRelated();
         $relatedTable = $relatedModel->getTable();
-        $tableAndAlias = $relatedTable . ' AS ' . $tableAlias;
-        $newQuery = c::db()->createQueryBuilder()
-            ->from($tableAndAlias);
+        $newQuery = c::db()->newQuery()
+            ->from($relatedTable, $tableAlias);
 
         $currentModel = $relatedModel;
         $joinIndex = 0;

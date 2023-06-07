@@ -2,7 +2,7 @@
 
 class CDatabase_ResultData implements ArrayAccess, Iterator, Countable {
     /**
-     * @var array
+     * @var PDOStatement
      */
     protected $data;
 
@@ -10,29 +10,61 @@ class CDatabase_ResultData implements ArrayAccess, Iterator, Countable {
 
     protected $totalRows = 0;
 
-    public function __construct(array $data) {
+    protected $fetchType = PDO::FETCH_OBJ;
+
+    public function __construct(PDOStatement $data) {
         $this->data = $data;
+
         $this->currentRow = 0;
-        $this->totalRows = count($data);
+        $this->totalRows = $data->rowCount();
     }
 
-    public function resultArray() {
-        return $this->result(false);
+    public function resultArray($object = null, $type = 'stdClass') {
+        if (is_string($object)) {
+            $fetch = $object;
+        } elseif (is_bool($object)) {
+            if ($object === true) {
+                $fetch = PDO::FETCH_OBJ;
+
+                // NOTE - The class set by $type must be defined before fetching the result,
+                // autoloading is disabled to save a lot of stupid overhead.
+                $type = (is_string($type) and CF::autoLoad($type)) ? $type : 'stdClass';
+            } else {
+                $fetch = PDO::FETCH_ASSOC;
+            }
+        } else {
+            // Use the default config values
+            $fetch = $this->fetchType;
+
+            if ($fetch == PDO::FETCH_CLASS) {
+                $type = (is_string($type) and CF::autoLoad($type)) ? $type : 'stdClass';
+            }
+        }
+
+        if ($this->data->rowCount()) {
+            // Reset the pointer location to make sure things work properly
+            $this->seek(0);
+            if ($fetch == PDO::FETCH_CLASS) {
+                $this->data->fetchAll($fetch, $type);
+            }
+
+            $all = $this->data->fetchAll($fetch);
+
+            return $all;
+        }
+
+        return [];
     }
 
     public function result($object = true) {
-        if (!$object) {
-            return c::collect($this->data)->map(function ($item) {
-                return (array) $item;
-            })->all();
-        }
+        $this->fetchType = $object ? PDO::FETCH_OBJ : PDO::FETCH_ASSOC;
 
-        return $this->data;
+        return $this;
     }
 
     #[\ReturnTypeWillChange]
     public function count() {
-        return count($this->data);
+        return $this->totalRows;
     }
 
     /**
@@ -59,7 +91,23 @@ class CDatabase_ResultData implements ArrayAccess, Iterator, Countable {
      */
     #[\ReturnTypeWillChange]
     public function offsetGet($offset) {
-        return carr::get($this->data, $offset);
+        if (!$this->seek($offset)) {
+            return false;
+        }
+
+        // Return the row by calling the defined fetching callback
+        return $this->data->fetch($this->fetchType, PDO::FETCH_ORI_ABS, $offset);
+        //return carr::get($this->data, $offset);
+    }
+
+    public function seek($offset) {
+        if ($this->offsetExists($offset)) {
+            $this->currentRow = $offset;
+
+            return true;
+        }
+
+        return false;
     }
 
     /**
@@ -136,5 +184,19 @@ class CDatabase_ResultData implements ArrayAccess, Iterator, Countable {
     #[\ReturnTypeWillChange]
     public function valid() {
         return $this->offsetExists($this->currentRow);
+    }
+
+    public function fetchAll($fetchMode = null, $fetchArgument = null, $ctorArgs = null) {
+        return $this->resultArray(false);
+    }
+
+    public function listFields() {
+        $field_names = [];
+        cdbg::dd($this->data->fetchColumn());
+        while ($field = $this->data->fetchColumn()) {
+            $field_names[] = $field->name;
+        }
+
+        return $field_names;
     }
 }
