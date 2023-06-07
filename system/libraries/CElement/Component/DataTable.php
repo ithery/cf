@@ -398,7 +398,7 @@ class CElement_Component_DataTable extends CElement_Component {
     public function setDatabase($db, $dbConfig = null) {
         if ($db instanceof CDatabase_Connection) {
             $this->dbName = $db->getName();
-            $this->dbConfig = strlen($this->dbName) == 0 ? $db->config() : [];
+            $this->dbConfig = strlen($this->dbName) == 0 ? $db->getConfig() : [];
         } else {
             $this->dbName = $db;
             $this->dbConfig = $dbConfig;

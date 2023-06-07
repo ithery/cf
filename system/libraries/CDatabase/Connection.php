@@ -1459,6 +1459,15 @@ class CDatabase_Connection implements CDatabase_ConnectionInterface {
     }
 
     /**
+     * Get all configuration options.
+     *
+     * @return mixed
+     */
+    public function getConfigs() {
+        return $this->config;
+    }
+
+    /**
      * Get the PDO driver name.
      *
      * @return string
@@ -1839,6 +1848,15 @@ class CDatabase_Connection implements CDatabase_ConnectionInterface {
      * @return string
      */
     public function escapeLike($str) {
+        return $this->escapeStr($str);
+    }
+
+    /**
+     * @param string $str
+     *
+     * @return string
+     */
+    public function escapeStr($str) {
         if (!empty($str) && is_string($str)) {
             return str_replace(['\\', "\0", "\n", "\r", "'", '"', "\x1a"], ['\\\\', '\\0', '\\n', '\\r', "\\'", '\\"', '\\Z'], $str);
         }

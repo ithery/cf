@@ -4,6 +4,7 @@ defined('SYSPATH') or die('No direct access allowed.');
 
 final class CManager {
     use CTrait_Compat_Manager;
+
     protected $controls = [];
 
     protected $controlsCode = [];
