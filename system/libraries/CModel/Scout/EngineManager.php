@@ -19,7 +19,7 @@ class CModel_Scout_EngineManager extends CBase_ManagerAbstract {
         $config = CF::config('model.scout.tntsearch');
         $storage = carr::get($config, 'storage');
         if ($storage == null) {
-            $storage = DOCROOT.'temp/scout/tnt/'.CF::appCode().'/';
+            $storage = DOCROOT . 'temp/scout/tnt/' . CF::appCode() . '/';
             $config['storage'] = $storage;
         }
         if (!is_dir($storage)) {
@@ -62,6 +62,15 @@ class CModel_Scout_EngineManager extends CBase_ManagerAbstract {
         $tnt = $this->createTntsearchEngine();
 
         return new CModel_Scout_Engine_TNTSearchEngine($tnt);
+    }
+
+    /**
+     * Create a database engine instance.
+     *
+     * @return \CModel_Scout_Engine_DatabaseEngine
+     */
+    public function createDatabaseDriver() {
+        return new CModel_Scout_Engine_DatabaseEngine();
     }
 
     /**

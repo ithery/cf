@@ -73,10 +73,10 @@ class CVendor_Watzap_Adapter_GuzzleAdapter implements CVendor_Watzap_Contract_Ad
     protected function getDefaultOptions() {
         $options = [
             'headers' => [
-                'Accept' => 'application/json',
-                'Authorization' => 'Bearer ' . $this->token,
-                'Content-Type' => 'application/json',
-            ]
+
+                'accept' => 'application/json',
+            ],
+
         ];
 
         return $options;
@@ -88,9 +88,8 @@ class CVendor_Watzap_Adapter_GuzzleAdapter implements CVendor_Watzap_Contract_Ad
     public function post($url, $content = '', $headers = null) {
         $options = $this->getDefaultOptions();
         $content['api_key'] = $this->apiKey;
-        if ($this->numberKey) {
-            $options['json'] = $content;
-        }
+
+        $options['json'] = $content;
 
         try {
             $this->response = $this->client->post($url, $options);

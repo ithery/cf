@@ -40,16 +40,16 @@ class CQueue_BatchFactory {
      */
     public function make(
         CQueue_Contract_BatchRepositoryInterface $repository,
-        string $id,
-        string $name,
-        int $totalJobs,
-        int $pendingJobs,
-        int $failedJobs,
-        array $failedJobIds,
-        array $options,
-        CarbonImmutable $createdAt,
-        CarbonImmutable $cancelledAt = null,
-        CarbonImmutable $finishedAt = null
+        $id,
+        $name,
+        $totalJobs,
+        $pendingJobs,
+        $failedJobs,
+        $failedJobIds,
+        $options,
+        $createdAt,
+        $cancelledAt = null,
+        $finishedAt = null
     ) {
         return new CQueue_Batch($this->queue, $repository, $id, $name, $totalJobs, $pendingJobs, $failedJobs, $failedJobIds, $options, $createdAt, $cancelledAt, $finishedAt);
     }

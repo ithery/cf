@@ -352,7 +352,7 @@ class c {
      *
      * @param null|\DateTimeZone|string $tz
      *
-     * @return CCarbon
+     * @return CCarbon|\CarbonV3\Carbon
      */
     public static function now($tz = null) {
         return CCarbon::now($tz);
@@ -655,14 +655,17 @@ class c {
 
     public static function abort($code, $message = '', array $headers = []) {
         if ($code instanceof CHTTP_Response) {
-            throw new CHttp_Exception_ResponseException($code);
+            throw new CHTTP_Exception_ResponseException($code);
         }
         if ($code instanceof CInterface_Responsable) {
-            throw new CHttp_Exception_ResponseException($code->toResponse(CHTTP::request()));
+            throw new CHTTP_Exception_ResponseException($code->toResponse(CHTTP::request()));
         }
 
         if ($code == 404) {
             throw new CHTTP_Exception_NotFoundHttpException($message);
+        }
+        if ($code == 410) {
+            throw new CHTTP_Exception_GoneHttpException($message);
         }
 
         throw new CHTTP_Exception_HttpException($code, $message, null, $headers);
@@ -1568,6 +1571,10 @@ class c {
 
     public static function jsonAttr($data, $options = null, $depth = 512) {
         return htmlspecialchars(c::json($data, $options, $depth), ENT_QUOTES, 'UTF-8');
+    }
+
+    public static function escAttr($string) {
+        return htmlspecialchars($string, ENT_QUOTES, 'UTF-8');
     }
 
     /**

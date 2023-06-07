@@ -727,4 +727,8 @@ class CHTTP_Request extends SymfonyRequest implements CInterface_Arrayable, Arra
 
         return isset($ref) ? $ref : $default;
     }
+
+    public function isCresRequest() {
+        return $this->hasHeader('X-Cres-Version');
+    }
 }

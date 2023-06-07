@@ -10,9 +10,8 @@ const hideDelete = (element)=> {
             // deleteAction.setAttribute('data-display',displayBefore);
             deleteAction.style.display = 'none';
         }
-
     });
-}
+};
 
 const showDelete = (element) => {
     element.blocks.forEach((item)=>{
@@ -25,7 +24,7 @@ const showDelete = (element) => {
             deleteAction.style.display = 'block';
         }
     });
-}
+};
 
 export const updateUi = (element) =>{
     if(element.minItem >= element.blocks.length) {
@@ -33,4 +32,4 @@ export const updateUi = (element) =>{
     } else {
         showDelete(element);
     }
-}
+};

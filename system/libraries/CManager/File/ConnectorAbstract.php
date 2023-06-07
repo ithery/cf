@@ -21,4 +21,6 @@ abstract class CManager_File_ConnectorAbstract {
     public function getConfig($key = null, $default = null) {
         return $this->config->getConfig($key, $default);
     }
+
+    abstract public function run($method = null);
 }

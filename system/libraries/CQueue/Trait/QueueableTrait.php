@@ -38,6 +38,13 @@ trait CQueue_Trait_QueueableTrait {
     public $chainQueue;
 
     /**
+     * The callbacks to be executed on chain failure.
+     *
+     * @var null|array
+     */
+    public $chainCatchCallbacks;
+
+    /**
      * The number of seconds before the job should be made available.
      *
      * @var null|\DateTimeInterface|\DateInterval|int
@@ -173,7 +180,21 @@ trait CQueue_Trait_QueueableTrait {
                 $next->onQueue($next->queue ?: $this->chainQueue);
                 $next->chainConnection = $this->chainConnection;
                 $next->chainQueue = $this->chainQueue;
+                $next->chainCatchCallbacks = $this->chainCatchCallbacks;
             }));
         }
+    }
+
+    /**
+     * Invoke all of the chain's failed job callbacks.
+     *
+     * @param \Throwable $e
+     *
+     * @return void
+     */
+    public function invokeChainCatchCallbacks($e) {
+        c::collect($this->chainCatchCallbacks)->each(function ($callback) use ($e) {
+            $callback($e);
+        });
     }
 }

@@ -2,6 +2,11 @@
 
 return [
     [
+        'name' => 'basic.auto',
+        'label' => c::__('Auto Loading'),
+        'uri' => 'docs/basic/auto',
+    ],
+    [
         'name' => 'basic.bootstrap',
         'label' => c::__('Bootstrap'),
         'uri' => 'docs/basic/bootstrap',
@@ -25,5 +30,10 @@ return [
         'name' => 'basic.view',
         'label' => c::__('View'),
         'uri' => 'docs/basic/view',
+    ],
+    [
+        'name' => 'basic.base',
+        'label' => c::__('Base Class'),
+        'uri' => 'docs/basic/base',
     ],
 ];

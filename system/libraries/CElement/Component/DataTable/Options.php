@@ -127,7 +127,10 @@ class CElement_Component_DataTable_Options {
                 //dont draw this key for false falue
                 break;
             }
-
+            if ($key == 'scrollY' && $value == false) {
+                //dont draw this key for false falue
+                break;
+            }
             $key = (strpos($key, ' ') !== false || strpos($key, '-') !== false) ? "'" . $key . "'" : $key;
             $jsonRow .= ' ' . $key . ': ' . json_encode($value) . ',';
         }

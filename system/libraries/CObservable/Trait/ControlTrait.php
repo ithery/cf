@@ -263,6 +263,20 @@ trait CObservable_Trait_ControlTrait {
      *
      * @param null|string $id
      *
+     * @return CElement_FormInput_File
+     */
+    public function addFileControl($id = null) {
+        $control = new CElement_FormInput_File($id);
+        $this->wrapper->add($control);
+
+        return $control;
+    }
+
+    /**
+     * Create Image Control.
+     *
+     * @param null|string $id
+     *
      * @return CElement_FormInput_Image
      */
     public function addImageControl($id = null) {
@@ -309,6 +323,20 @@ trait CObservable_Trait_ControlTrait {
      */
     public function addMultipleImageAjaxControl($id = null) {
         $control = new CElement_FormInput_MultipleImageAjax($id);
+        $this->wrapper->add($control);
+
+        return $control;
+    }
+
+    /**
+     * Create Multiple Image Ajax Control.
+     *
+     * @param null|string $id
+     *
+     * @return CElement_FormInput_MultipleFileAjax
+     */
+    public function addMultipleFileAjaxControl($id = null) {
+        $control = new CElement_FormInput_MultipleFileAjax($id);
         $this->wrapper->add($control);
 
         return $control;

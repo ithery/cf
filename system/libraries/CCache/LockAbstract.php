@@ -1,13 +1,12 @@
 <?php
 
 /**
- * Description of LockAbstract
+ * Description of LockAbstract.
  *
  * @author Hery
  */
 abstract class CCache_LockAbstract implements CCache_LockInterface {
     use CTrait_Helper_InteractsWithTime;
-
     /**
      * The name of the lock.
      *
@@ -41,7 +40,7 @@ abstract class CCache_LockAbstract implements CCache_LockInterface {
      *
      * @param string      $name
      * @param int         $seconds
-     * @param string|null $owner
+     * @param null|string $owner
      *
      * @return void
      */
@@ -79,7 +78,7 @@ abstract class CCache_LockAbstract implements CCache_LockInterface {
     /**
      * Attempt to acquire the lock.
      *
-     * @param callable|null $callback
+     * @param null|callable $callback
      *
      * @return mixed
      */
@@ -101,11 +100,11 @@ abstract class CCache_LockAbstract implements CCache_LockInterface {
      * Attempt to acquire the lock for the given number of seconds.
      *
      * @param int           $seconds
-     * @param callable|null $callback
-     *
-     * @return bool
+     * @param null|callable $callback
      *
      * @throws \CCache_Exception_LockTimeoutException
+     *
+     * @return bool
      */
     public function block($seconds, $callback = null) {
         $starting = $this->currentTime();
@@ -114,7 +113,7 @@ abstract class CCache_LockAbstract implements CCache_LockInterface {
             usleep($this->sleepMilliseconds * 1000);
 
             if ($this->currentTime() - $seconds >= $starting) {
-                throw new CCache_Exception_LockTimeoutException;
+                throw new CCache_Exception_LockTimeoutException();
             }
         }
 

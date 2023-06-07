@@ -35,9 +35,10 @@ class CManager_File_Connector_FileManager_Controller_MoveController extends CMan
             ];
         }, $folder_types);
 
-        $app->addTemplate()->setTemplate('CElement/Component/FileManager/Move')->setVar('fm', $fm)
-            ->setVar('rootFolders', $rootFolders)
-            ->setVar('items', $items);
-        return $app;
+        $app->addView('cresenity.element.component.file-manager.move', [
+            'fm' => $fm,
+            'rootFolders' => $rootFolders,
+            'items' => $items
+        ]);
     }
 }

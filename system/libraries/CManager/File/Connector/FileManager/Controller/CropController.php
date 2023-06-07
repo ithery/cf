@@ -21,9 +21,13 @@ class CManager_File_Connector_FileManager_Controller_CropController extends CMan
         $app = CApp::instance();
 
         $workingdir = $fm->input('working_dir');
-        $app->addTemplate()->setTemplate('CElement/Component/FileManager/Cropper')->setVar('fm', $fm)
-            ->setVar('working_dir', $workingdir)
-            ->setVar('img', $fm->path()->pretty($fm->input('img')));
+
+        $app->addView('cresenity.element.component.file-manager.cropper', [
+            'fm' => $fm,
+            'working_dir' => $workingdir,
+            'img' => $fm->path()->pretty($fm->input('img'))
+        ]);
+
         return $app;
     }
 }

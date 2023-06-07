@@ -50,6 +50,10 @@ class CApp_Notification {
 
             if (cstr::startsWith($path, trim($this->startUrl, '/'))) {
                 c::router()->get($this->serviceWorkerUrl(), function () {
+                    //disable debug bar here
+                    if (CDebug::bar()->isEnabled()) {
+                        CDebug::bar()->disable();
+                    }
                     $options = [
                         'driver' => $this->driver,
                         'options' => $this->options,

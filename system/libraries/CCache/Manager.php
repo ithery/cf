@@ -111,7 +111,7 @@ class CCache_Manager implements CCache_Contract_FactoryInterface {
      * @return mixed
      */
     protected function callCustomCreator(array $config) {
-        return $this->customCreators[$config['driver']]($this->app, $config);
+        return $this->customCreators[$config['driver']]($config);
     }
 
     /**
@@ -159,7 +159,7 @@ class CCache_Manager implements CCache_Contract_FactoryInterface {
     protected function createMemcachedDriver(array $config) {
         $prefix = $this->getPrefix($config);
 
-        $memcached = $this->app['memcached.connector']->connect(
+        $memcached = CCache_MemcachedConnector::instance()->connect(
             $config['servers'],
             isset($config['persistent_id']) ? $config['persistent_id'] : null,
             isset($config['options']) ? $config['options'] : [],
@@ -211,7 +211,7 @@ class CCache_Manager implements CCache_Contract_FactoryInterface {
             $connection,
             $config['table'],
             $this->getPrefix($config),
-            isset($config['lock_table']) ? $config['lock_table'] : 'cache_locks',
+            isset($config['lock_table']) ? $config['lock_table'] : 'cache_lock',
             isset($config['lock_lottery']) ? $config['lock_lottery'] : [2, 100]
         );
 

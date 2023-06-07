@@ -77,10 +77,12 @@ return [
         'css' => [
             'plugins/datatable/datatables.css',
             'plugins/datatable/fixedColumns.dataTables.min.css',
+            'plugins/datatable/fixedHeader.dataTables.min.css',
         ],
         'js' => [
             'plugins/datatable/datatables.js',
             'plugins/datatable/dataTables.fixedColumns.min.js',
+            'plugins/datatable/dataTables.fixedHeader.min.js',
         ],
     ],
     'jquery.datatable.tabletools' => [
@@ -786,6 +788,12 @@ return [
         ],
         'css' => [
             'plugins/datetimepicker/datetimepicker.min.css',
+        ],
+
+    ],
+    'mime-icons' => [
+        'css' => [
+            'plugins/mime-icons/mime-icons.min.css',
         ],
 
     ],

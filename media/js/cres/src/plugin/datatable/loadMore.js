@@ -8,7 +8,7 @@ const initDatatableLoadMore = () => {
                 //
                 $.fn.dataTable.pageLoadMore = function (opts) {
                     // Configuration options
-                    var conf = $.extend(
+                    let conf = $.extend(
                         {
                             url: '', // script url
                             data: null, // function or object with parameters to send to the server
@@ -18,18 +18,18 @@ const initDatatableLoadMore = () => {
                         opts
                     );
 
-                    var cacheLastRequest = null;
-                    var cacheLastJson = null;
+                    let cacheLastRequest = null;
+                    let cacheLastJson = null;
 
                     return function (request, drawCallback, settings) {
                         if (!settings.pageLoadMore) {
-                            var api = new $.fn.dataTable.Api(settings);
-                            var info = api.page.info();
+                            let api = new $.fn.dataTable.Api(settings);
+                            let info = api.page.info();
 
                             settings.pageLoadMore = { pageLength: info.length };
                         }
 
-                        var pageResetMore = false;
+                        let pageResetMore = false;
 
                         if (cacheLastRequest) {
                             if (
@@ -61,7 +61,7 @@ const initDatatableLoadMore = () => {
                             // As a function it is executed with the data object as an arg
                             // for manipulation. If an object is returned, it is used as the
                             // data object to submit
-                            var d = conf.data(request);
+                            let d = conf.data(request);
                             if (d) {
                                 $.extend(request, d);
                             }
@@ -96,6 +96,7 @@ const initDatatableLoadMore = () => {
                 //
                 $.fn.dataTable.Api.register('page.resetMore()', function () {
                     return this.iterator('table', function (settings) {
+                        // eslint-disable-next-line no-undef
                         api.page.len(settings.pageLoadMore.pageLength);
                     });
                 });
@@ -104,8 +105,8 @@ const initDatatableLoadMore = () => {
                 // Determines whether there is more data available
                 //
                 $.fn.dataTable.Api.register('page.hasMore()', function () {
-                    var api = this;
-                    var info = api.page.info();
+                    let api = this;
+                    let info = api.page.info();
                     return info.pages > 1 ? true : false;
                 });
 
@@ -114,8 +115,8 @@ const initDatatableLoadMore = () => {
                 //
                 $.fn.dataTable.Api.register('page.loadMore()', function () {
                     return this.iterator('table', function (settings) {
-                        var api = this;
-                        var info = api.page.info();
+                        let api = this;
+                        let info = api.page.info();
 
                         if (info.pages > 1) {
                             if (!settings.pageLoadMore) {
@@ -134,7 +135,7 @@ const initDatatableLoadMore = () => {
                     });
                 });
             }
-        })(jQuery);
+        }(jQuery));
     }
 };
 

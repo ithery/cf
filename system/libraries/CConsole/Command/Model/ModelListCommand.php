@@ -10,10 +10,10 @@ class CConsole_Command_Model_ModelListCommand extends CConsole_Command_AppComman
 
     public function handle() {
         $modelPath = c::fixPath(CF::appDir()) . 'default' . DS . 'libraries' . DS . $this->prefix . 'Model' . DS;
-        $allFiles = cfs::list_files($modelPath);
+        $allFiles = CFile::allFiles($modelPath);
 
         $rows = c::collect($allFiles)->map(function ($file) {
-            $model = basename($file);
+            $model = basename((string) $file);
             if (substr($model, -4) == '.php') {
                 $model = substr($model, 0, strlen($model) - 4);
             }

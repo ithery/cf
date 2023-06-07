@@ -8,9 +8,8 @@ defined('SYSPATH') or die('No direct access allowed.');
  *
  * @since Jun 23, 2019, 4:58:43 AM
  */
-class CCache_Driver_MemcachedDriver extends CCache_DriverTaggableAbstract implements CCache_LockProviderInterface {
+class CCache_Driver_MemcachedDriver extends CCache_DriverTaggableAbstract implements CCache_Contract_LockProviderDriverInterface {
     use CTrait_Helper_InteractsWithTime;
-
     /**
      * The Memcached instance.
      *

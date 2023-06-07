@@ -16,7 +16,6 @@ class CElement_FormInput_SelectSearch extends CElement_FormInput {
     use CTrait_Element_Property_ApplyJs;
     use CTrait_Element_Property_DependsOn;
     use CTrait_Element_Property_Placeholder;
-
     protected $query;
 
     protected $formatSelection;
@@ -303,6 +302,9 @@ class CElement_FormInput_SelectSearch extends CElement_FormInput {
         $ajaxMethod->setData('formatResult', serialize($this->formatResult));
         $ajaxMethod->setData('dependsOn', serialize($this->dependsOn));
         $ajaxMethod->setData('prependData', serialize($this->prependData));
+        if (c::app()->isAuthEnabled()) {
+            $ajaxMethod->enableAuth();
+        }
 
         $ajaxUrl = $ajaxMethod->makeUrl();
 

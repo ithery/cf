@@ -1,3 +1,4 @@
+/* eslint-disable no-underscore-dangle */
 import {
     addRemoveClass,
     createElement,
@@ -19,7 +20,6 @@ export default class ShowMore {
      * @param {Object} object
      */
     constructor(className, { onMoreLess = () => {}, regex = {}, config } = {}) {
-
         // all html elements
         const elements = className instanceof Element ? [className] : [].slice.call(document.querySelectorAll(className));
 
@@ -53,7 +53,7 @@ export default class ShowMore {
      *
      * @param {Object} object
      */
-    _initial = () => {
+    _initial() {
         const { element, after, ellipsis, nobutton, limit, type } =
             this._object;
         // set default aria-expande to false
@@ -74,8 +74,7 @@ export default class ShowMore {
 
                 for (let key in this._regex) {
                     const { match, replace } = this._regex[key];
-                    if (key && match)
-                        orgTexReg = orgTexReg.replace(match, replace);
+                    if (key && match) {orgTexReg = orgTexReg.replace(match, replace);}
                 }
 
                 const truncatedText = htmlSubstr(orgTexReg, limit - 1).concat(
@@ -91,7 +90,7 @@ export default class ShowMore {
                     truncatedText
                 });
 
-                if (nobutton) return;
+                if (nobutton) {return;}
                 this._addBtn(this._object);
             }
         }
@@ -111,12 +110,12 @@ export default class ShowMore {
                     this._object
                 );
 
-                if (nobutton) return;
+                if (nobutton) {return;}
                 // add button to the list and table
                 this._addBtn(this._object);
             }
         }
-    };
+    }
 
     /**
      * Event click
@@ -124,8 +123,10 @@ export default class ShowMore {
      * @param {HTMLElement} element
      * @param {Object} object
      */
-    _clickEvent = (element, object) =>
-        element.addEventListener('click', this._handleEvent.bind(this, object));
+    _clickEvent(element, object) {
+        return element.addEventListener('click', this._handleEvent.bind(this, object));
+    }
+
 
     /**
      * Create button
@@ -133,7 +134,7 @@ export default class ShowMore {
      * @param {Object} object
      * @returns HTMLElement
      */
-    _createBtn = ({
+    _createBtn({
         element,
         number,
         less,
@@ -141,7 +142,7 @@ export default class ShowMore {
         type,
         btnClass,
         btnClassAppend
-    }) => {
+    }) {
         const typeAria = this._checkExp ? less || '' : more || '';
         const label = this._checkExp ? 'collapse' : 'expand';
         const expanded = this._checkExp ? true : false;
@@ -160,7 +161,7 @@ export default class ShowMore {
             number ? typeAria + getNumber(element, type) : typeAria
         );
         return button;
-    };
+    }
 
     /**
      * Event handler
@@ -168,7 +169,7 @@ export default class ShowMore {
      * @param {Object} object
      * @param {Event} event
      */
-    _handleEvent = (object, { target }) => {
+    _handleEvent(object, { target }) {
         const {
             element,
             type,
@@ -183,7 +184,7 @@ export default class ShowMore {
         // check if the button is clicked
         const checkContainsClass = target.classList.contains(btnClass);
 
-        if (!checkContainsClass) return;
+        if (!checkContainsClass) {return;}
 
         const ariaExpanded = element.getAttribute('aria-expanded');
         this._checkExp = ariaExpanded === 'false';
@@ -229,21 +230,21 @@ export default class ShowMore {
         if (type) {
             this._setExpand({ ...object, target });
         }
-    };
+    }
 
-    _getNumberCount = (element, type) => {
+    _getNumberCount(element, type) {
         return type === 'list' ? [].slice.call(element.children) : element.rows;
-    };
+    }
 
     /**
      * Add button
      *
      * @param {Object} object
      */
-    _addBtn = (object) => {
+    _addBtn(object) {
         const { type, element, more, typeElement } = object;
 
-        if (!more) return;
+        if (!more) {return;}
 
         if (type === 'table') {
             element.insertAdjacentElement('afterend', this._createBtn(object));
@@ -253,14 +254,14 @@ export default class ShowMore {
             el.appendChild(this._createBtn(object));
             element.appendChild(el);
         }
-    };
+    }
 
     /**
      * Set aria-expanded
      *
      * @param {Object} object
      */
-    _setExpand = (object) => {
+    _setExpand(object) {
         const { element, type, less, more, number, target } = object;
 
         const typeAria = this._checkExp ? less : more;
@@ -286,5 +287,5 @@ export default class ShowMore {
         } else if (type === 'list') {
             lastChild.parentNode.removeChild(lastChild);
         }
-    };
+    }
 }

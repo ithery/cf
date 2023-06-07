@@ -7,17 +7,17 @@
         params = params || {
             bubbles: false,
             cancelable: false,
-            detail: null,
+            detail: null
         };
         const evt = document.createEvent('CustomEvent');
         evt.initCustomEvent(
             event,
             params.bubbles,
             params.cancelable,
-            params.detail,
+            params.detail
         );
         return evt;
     }
 
     window.CustomEvent = CustomEvent;
-})();
+}());

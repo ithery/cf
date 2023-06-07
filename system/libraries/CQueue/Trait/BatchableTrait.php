@@ -11,11 +11,11 @@ trait CQueue_Trait_BatchableTrait {
     /**
      * Get the batch instance for the job, if applicable.
      *
-     * @return \CQueue_Batch|null
+     * @return null|\CQueue_Batch
      */
     public function batch() {
         if ($this->batchId) {
-            return CContainer::getInstance()->make(CQueue_BatchRepository::class)->find($this->batchId);
+            return CQueue::batchRepository()->find($this->batchId);
         }
     }
 
