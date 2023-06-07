@@ -25,7 +25,7 @@ class CDatabase_Schema_MongoDB_Blueprint extends CDatabase_Schema_Blueprint {
     /**
      * @inheritdoc
      */
-    public function __construct(CDatabase_Connection $connection, $collection) {
+    public function __construct(CDatabase_Connection_MongoDBConnection $connection, $collection) {
         $this->connection = $connection;
 
         $this->collection = $this->connection->getCollection($collection);

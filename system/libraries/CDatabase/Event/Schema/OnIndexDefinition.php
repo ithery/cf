@@ -3,13 +3,6 @@
 defined('SYSPATH') or die('No direct access allowed.');
 
 /**
- * @author Hery Kurniawan
- * @license Ittron Global Teknologi <ittron.co.id>
- *
- * @since Sep 1, 2018, 1:14:07 PM
- */
-
-/**
  * Event used when the portable index definition is generated inside CDatabase_Schema_Manager.
  */
 class CDatabase_Event_Schema_OnIndexDefinition extends CDatabase_Event_Schema {
