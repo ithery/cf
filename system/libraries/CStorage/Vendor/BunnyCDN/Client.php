@@ -21,7 +21,7 @@ class CStorage_Vendor_BunnyCDN_Client {
         $this->client = new Guzzle();
     }
 
-    private static function get_base_url($region) {
+    private static function getBaseUrl($region) {
         $mapRegionUrl = [
             CStorage_Vendor_BunnyCDN_Region::NEW_YORK => 'https://ny.storage.bunnycdn.com/',
             CStorage_Vendor_BunnyCDN_Region::LOS_ANGELES => 'https://la.storage.bunnycdn.com/',
@@ -45,7 +45,7 @@ class CStorage_Vendor_BunnyCDN_Client {
     private function request($path, $method = 'GET', array $options = []) {
         $response = $this->client->request(
             $method,
-            self::get_base_url($this->region) . CStorage_Vendor_BunnyCDN_Util::normalizePath('/' . $this->storage_zone_name . '/') . $path,
+            self::getBaseUrl($this->region) . CStorage_Vendor_BunnyCDN_Util::normalizePath('/' . $this->storage_zone_name . '/') . $path,
             array_merge_recursive([
                 'headers' => [
                     'Accept' => '*/*',
@@ -114,8 +114,8 @@ class CStorage_Vendor_BunnyCDN_Client {
     /**
      * @param string $path
      *
-     * @throws BunnyCDNException
-     * @throws NotFoundException
+     * @throws CStorage_Vendor_BunnyCDN_Exception
+     * @throws CStorage_Vendor_BunnyCDN_Exception_NotFoundException
      *
      * @return null|resource
      */
@@ -123,7 +123,7 @@ class CStorage_Vendor_BunnyCDN_Client {
         try {
             return $this->client->request(
                 'GET',
-                self::get_base_url($this->region) . CStorage_Vendor_BunnyCDN_Util::normalizePath('/' . $this->storage_zone_name . '/') . $path,
+                self::getBaseUrl($this->region) . CStorage_Vendor_BunnyCDN_Util::normalizePath('/' . $this->storage_zone_name . '/') . $path,
                 array_merge_recursive([
                     'stream' => true,
                     'headers' => [
@@ -147,7 +147,7 @@ class CStorage_Vendor_BunnyCDN_Client {
      * @param string $path
      * @param $contents
      *
-     * @throws BunnyCDNException
+     * @throws CStorage_Vendor_BunnyCDN_Exception
      *
      * @return mixed
      */
@@ -169,11 +169,11 @@ class CStorage_Vendor_BunnyCDN_Client {
     /**
      * @param string $path
      *
-     * @throws BunnyCDNException
+     * @throws CStorage_Vendor_BunnyCDN_Exception
      *
      * @return mixed
      */
-    public function make_directory($path) {
+    public function makeDirectory($path) {
         try {
             return $this->request(CStorage_Vendor_BunnyCDN_Util::normalizePath($path) . '/', 'PUT', [
                 'headers' => [
@@ -200,7 +200,7 @@ class CStorage_Vendor_BunnyCDN_Client {
      *
      * @return mixed
      */
-    public function delete(string $path): mixed {
+    public function delete(string $path) {
         try {
             return $this->request($path, 'DELETE');
             // @codeCoverageIgnoreStart

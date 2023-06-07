@@ -208,7 +208,7 @@ class Translator extends Translation\Translator {
         foreach ($this->getDirectories() as $directory) {
             $directory = rtrim($directory, '\\/');
 
-            foreach (glob("${directory}/${prefix}*.php") as $file) {
+            foreach (glob("{$directory}/{$prefix}*.php") as $file) {
                 $files[] = $file;
             }
         }
@@ -303,7 +303,7 @@ class Translator extends Translation\Translator {
             $upper = strtoupper($matches[1]);
 
             if ($upper === 'YUE' || $upper === 'ISO' || \strlen($upper) < 3) {
-                return "_${upper}";
+                return "_{$upper}";
             }
 
             return '_' . ucfirst($matches[1]);

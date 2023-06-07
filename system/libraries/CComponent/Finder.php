@@ -33,6 +33,7 @@ class CComponent_Finder {
         if (static::$instance == null) {
             static::$instance = new static();
         }
+
         return static::$instance;
     }
 
@@ -63,6 +64,7 @@ class CComponent_Finder {
         }
 
         $this->manifest = CFile::getRequire($this->manifestPath);
+
         return array_merge($this->manifest, $this->registry);
     }
 
@@ -88,10 +90,9 @@ class CComponent_Finder {
     public function getClassNames() {
         return c::collect(CFile::allFiles($this->path))
             ->map(function (SplFileInfo $file) {
-                return
-                        c::str($file->getPathname())
-                        ->after(CF::appDir() . '/')
-                        ->replace(['/', '.php'], ['\\', ''])->__toString();
+                return c::str($file->getPathname())
+                    ->after(CF::appDir() . '/')
+                    ->replace(['/', '.php'], ['\\', ''])->__toString();
             })
             ->filter(function ($class) {
                 return is_subclass_of($class, CComponent::class)

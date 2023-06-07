@@ -2,27 +2,21 @@
 
 defined('SYSPATH') or die('No direct access allowed.');
 
-/**
- * @author Hery Kurniawan <hery@itton.co.id>
- * @license Ittron Global Teknologi
- *
- * @since Nov 29, 2020
- */
 class CComponent_LifecycleManager {
-    protected static $hydrationMiddleware = [];
-
-    protected static $initialHydrationMiddleware = [];
-
-    protected static $initialDehydrationMiddleware = [];
-
     public $request;
 
     public $instance;
 
     public $response;
 
+    protected static $hydrationMiddleware = [];
+
+    protected static $initialHydrationMiddleware = [];
+
+    protected static $initialDehydrationMiddleware = [];
+
     public static function fromSubsequentRequest($payload) {
-        return c::tap(new static, function ($instance) use ($payload) {
+        return c::tap(new static(), function ($instance) use ($payload) {
             $instance->request = new CComponent_Request($payload);
             $instance->instance = CComponent_Manager::instance()->getInstance($instance->request->name(), $instance->request->id());
         });
@@ -35,7 +29,7 @@ class CComponent_LifecycleManager {
      * @return CComponent_LifecycleManager
      */
     public static function fromInitialRequest($name, $id) {
-        return c::tap(new static, function ($instance) use ($name, $id) {
+        return c::tap(new static(), function ($instance) use ($name, $id) {
             $instance->instance = CComponent_Manager::instance()->getInstance($name, $id);
             $instance->request = new CComponent_Request([
                 'fingerprint' => ['id' => $id, 'name' => $name, 'locale' => CF::getLocale()],
@@ -48,7 +42,7 @@ class CComponent_LifecycleManager {
     public static function fromInitialInstance($component) {
         $name = CComponent_Manager::instance()->getAlias(get_class($component), $component->getName());
 
-        return c::tap(new static, function ($instance) use ($component, $name) {
+        return c::tap(new static(), function ($instance) use ($component, $name) {
             $instance->instance = $component;
             $instance->request = new CComponent_Request([
                 'fingerprint' => ['id' => $component->id, 'name' => $name, 'locale' => CF::getLocale()],
@@ -97,9 +91,9 @@ class CComponent_LifecycleManager {
     public function mount($params = []) {
         // Assign all public component properties that have matching parameters.
         c::collect(array_intersect_key($params, $this->instance->getPublicPropertiesDefinedBySubClass()))
-                ->each(function ($value, $property) {
-                    $this->instance->{$property} = $value;
-                });
+            ->each(function ($value, $property) {
+                $this->instance->{$property} = $value;
+            });
 
         if (method_exists($this->instance, 'mount')) {
             try {

@@ -10,6 +10,7 @@ defined('SYSPATH') or die('No direct access allowed.');
  */
 abstract class CObservable_ListenerAbstract {
     use CObservable_Listener_Trait_HandlerTrait;
+
     protected $owner;
 
     protected $handlers;
@@ -112,7 +113,11 @@ abstract class CObservable_ListenerAbstract {
 
                     break;
                 default:
-                    throw new Exception('Handler : ' . $handlerName . ' not defined');
+                    if (class_exists($handler)) {
+                        $handler = new $handler($this);
+                    } else {
+                        throw new Exception('Handler : ' . $handlerName . ' not defined');
+                    }
 
                     break;
             }

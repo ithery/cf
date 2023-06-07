@@ -28,9 +28,8 @@ class CConsole_Command_StatusCommand extends CConsole_Command {
     public function handle() {
         $this->gatherApplicationInformation();
         c::collect(static::$data)
-            ->map(
-                fn ($items) => c::collect($items)
-                    ->map(function ($value) {
+            ->map(function ($items) {
+                    return c::collect($items)->map(function ($value) {
                         if (is_array($value)) {
                             return [$value];
                         }
@@ -40,12 +39,12 @@ class CConsole_Command_StatusCommand extends CConsole_Command {
                         }
 
                         return c::collect(c::container()->call($value))
-                            ->map(fn ($value, $key) => [$key, $value])
-                            ->values()
+                            ->map(function ($value, $key) {
+                                return [$key, $value];
+                            })->values()
                             ->all();
-                    })->flatten(1)
-            )
-            ->sortBy(function ($data, $key) {
+                    })->flatten(1);
+            })->sortBy(function ($data, $key) {
                 $index = array_search($key, ['Environment', 'Cache', 'Drivers']);
 
                 return $index === false ? 99 : $index;
@@ -53,7 +52,9 @@ class CConsole_Command_StatusCommand extends CConsole_Command {
             ->filter(function ($data, $key) {
                 return $this->option('only') ? in_array(cstr::of($key)->lower()->snake(), $this->sections()) : true;
             })
-            ->pipe(fn ($data) => $this->display($data));
+            ->pipe(function ($data) {
+                return $this->display($data);
+            });
 
         $this->newLine();
 
@@ -96,7 +97,9 @@ class CConsole_Command_StatusCommand extends CConsole_Command {
             $this->info('======================');
 
             $results = new CConsole_Result();
-            $data->pipe(fn ($data) => $section !== 'Environment' ? $data->sort() : $data)->each(function ($detail) use ($results) {
+            $data->pipe(function ($data) use ($section) {
+                return ($section !== 'Environment') ? $data->sort() : $data;
+            })->each(function ($detail) use ($results) {
                 list($label, $value) = $detail;
 
                 //$this->components->twoColumnDetail($label, c::value($value));
@@ -117,7 +120,9 @@ class CConsole_Command_StatusCommand extends CConsole_Command {
      */
     protected function displayJson($data) {
         $output = $data->flatMap(function ($data, $section) {
-            return [(string) cstr::of($section)->snake() => $data->mapWithKeys(fn ($item, $key) => [(string) cstr::of($item[0])->lower()->snake() => c::value($item[1])])];
+            return [(string) cstr::of($section)->snake() => $data->mapWithKeys(function ($item, $key) {
+                return [(string) cstr::of($item[0])->lower()->snake() => c::value($item[1])];
+            })];
         });
 
         $this->output->writeln(strip_tags(json_encode($output)));
@@ -150,17 +155,19 @@ class CConsole_Command_StatusCommand extends CConsole_Command {
      * @return void
      */
     protected function gatherApplicationInformation() {
-        static::addToSection('Environment', fn () => [
-            'Application Name' => CF::config('app.name'),
-            'Application Code' => CF::appCode(),
-            'CF Version' => CF::version(),
-            'PHP Version' => phpversion(),
-            'Composer Version' => (new CBase_Composer())->getVersion() ?? '<fg=yellow;options=bold>-</>',
-            'Environment' => CF::environment(),
-            'Debug Mode' => CF::config('app.debug') ? '<fg=yellow;options=bold>ENABLED</>' : 'OFF',
-            'URL' => cstr::of(CF::config('app.url'))->replace(['http://', 'https://'], ''),
-            'Maintenance Mode' => CF::isDownForMaintenance() ? '<fg=yellow;options=bold>ENABLED</>' : 'OFF',
-        ]);
+        static::addToSection('Environment', function () {
+            return [
+                'Application Name' => CF::config('app.name'),
+                'Application Code' => CF::appCode(),
+                'CF Version' => CF::version(),
+                'PHP Version' => phpversion(),
+                'Composer Version' => (new CBase_Composer())->getVersion() ?? '<fg=yellow;options=bold>-</>',
+                'Environment' => CF::environment(),
+                'Debug Mode' => CF::config('app.debug') ? '<fg=yellow;options=bold>ENABLED</>' : 'OFF',
+                'URL' => cstr::of(CF::config('app.url'))->replace(['http://', 'https://'], ''),
+                'Maintenance Mode' => CF::isDownForMaintenance() ? '<fg=yellow;options=bold>ENABLED</>' : 'OFF',
+            ];
+        });
 
         // static::addToSection('Cache', fn () => [
         //     'Config' => file_exists($this->laravel->bootstrapPath('cache/config.php')) ? '<fg=green;options=bold>CACHED</>' : '<fg=yellow;options=bold>NOT CACHED</>',
@@ -180,17 +187,19 @@ class CConsole_Command_StatusCommand extends CConsole_Command {
             $logs = $logChannel;
         }
 
-        static::addToSection('Drivers', fn () => array_filter([
-            'Broadcasting' => CF::config('broadcasting.default'),
-            'Cache' => CF::config('cache.default'),
-            'Database' => CF::config('database.default'),
-            'Logs' => $logs,
-            'Mail' => CF::config('mail.default'),
-            'Octane' => CF::config('octane.server'),
-            'Queue' => CF::config('queue.default'),
-            'Scout' => CF::config('model.scout.driver'),
-            'Session' => CF::config('session.driver'),
-        ]));
+        static::addToSection('Drivers', function () use ($logs) {
+            return array_filter([
+                'Broadcasting' => CF::config('broadcasting.default'),
+                'Cache' => CF::config('cache.default'),
+                'Database' => CF::config('database.default'),
+                'Logs' => $logs,
+                'Mail' => CF::config('mail.default'),
+                'Octane' => CF::config('octane.server'),
+                'Queue' => CF::config('queue.default'),
+                'Scout' => CF::config('model.scout.driver'),
+                'Session' => CF::config('session.driver'),
+            ]);
+        });
 
         c::collect(static::$customDataResolvers)->each->__invoke();
     }

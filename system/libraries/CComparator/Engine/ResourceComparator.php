@@ -1,16 +1,9 @@
 <?php
 
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
-
 /**
  * Compares resources for equality.
  */
 class CComparator_Engine_ResourceComparator extends CComparator_AbstractEngine {
-
     /**
      * Returns whether the comparator can compare two values.
      *
@@ -32,14 +25,16 @@ class CComparator_Engine_ResourceComparator extends CComparator_AbstractEngine {
      * @param bool  $canonicalize Arrays are sorted before comparison when set to true
      * @param bool  $ignoreCase   Case is ignored when set to true
      *
-     * @throws ComparisonFailure
+     * @throws CComparator_Exception_ComparisonFailureException
      */
     public function assertEquals($expected, $actual, $delta = 0.0, $canonicalize = false, $ignoreCase = false) {
         if ($actual != $expected) {
-            throw new ComparisonFailure(
-            $expected, $actual, $this->exporter->export($expected), $this->exporter->export($actual)
+            throw new CComparator_Exception_ComparisonFailureException(
+                $expected,
+                $actual,
+                $this->exporter->export($expected),
+                $this->exporter->export($actual)
             );
         }
     }
-
 }

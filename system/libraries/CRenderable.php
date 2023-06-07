@@ -48,6 +48,10 @@ class CRenderable extends CObject implements CApp_Interface_Renderable {
         $this->visibility = $bool;
     }
 
+    public function isVisible() {
+        return $this->visibility;
+    }
+
     /**
      * Apply call method or set property of all childs of this object.
      *

@@ -26,4 +26,10 @@ return [
         'label' => c::__('Table Export'),
         'uri' => 'demo/elements/table/export/index',
     ],
+
+    [
+        'name' => 'elements.table.view',
+        'label' => c::__('From View'),
+        'uri' => 'demo/elements/table/view/index',
+    ],
 ];

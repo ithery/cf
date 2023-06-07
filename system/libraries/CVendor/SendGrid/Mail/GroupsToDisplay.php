@@ -1,16 +1,8 @@
 <?php
 
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
-
 /**
  * This class is used to construct a GroupsToDisplay object for
- * the /mail/send API call
- *
- * @package SendGrid\Mail
+ * the /mail/send API call.
  */
 class CVendor_SendGrid_Mail_GroupsToDisplay implements \JsonSerializable {
     /**
@@ -19,9 +11,9 @@ class CVendor_SendGrid_Mail_GroupsToDisplay implements \JsonSerializable {
     private $groups_to_display;
 
     /**
-     * Optional constructor
+     * Optional constructor.
      *
-     * @param int[]|int|null $groups_to_display An array containing
+     * @param null|int[]|int $groups_to_display An array containing
      *                                          the unsubscribe groups
      *                                          that you would like to
      *                                          be displayed on the
@@ -35,7 +27,7 @@ class CVendor_SendGrid_Mail_GroupsToDisplay implements \JsonSerializable {
     }
 
     /**
-     * Add a group to display on a GroupsToDisplay object
+     * Add a group to display on a GroupsToDisplay object.
      *
      * @param int|int[] $groups_to_display The unsubscribe group(s)
      *                                     that you would like to be
@@ -58,7 +50,7 @@ class CVendor_SendGrid_Mail_GroupsToDisplay implements \JsonSerializable {
     }
 
     /**
-     * Return the group(s) to display on a GroupsToDisplay object
+     * Return the group(s) to display on a GroupsToDisplay object.
      *
      * @return int[]
      */
@@ -67,7 +59,7 @@ class CVendor_SendGrid_Mail_GroupsToDisplay implements \JsonSerializable {
     }
 
     /**
-     * Return an array representing a GroupsToDisplay object for the Twilio SendGrid API
+     * Return an array representing a GroupsToDisplay object for the Twilio SendGrid API.
      *
      * @return null|array
      */

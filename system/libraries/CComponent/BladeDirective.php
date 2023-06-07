@@ -13,6 +13,7 @@ class CComponent_BladeDirective {
         $lastArg = c::str(carr::last(explode(',', $expression)))->trim();
 
         if ($lastArg->startsWith('key(') && $lastArg->endsWith(')')) {
+            /** @var CBase_String $lastArg */
             $cachedKey = $lastArg->replaceFirst('key(', '')->replaceLast(')', '');
             $args = explode(',', $expression);
             array_pop($args);
@@ -25,15 +26,15 @@ class CComponent_BladeDirective {
 <?php
 if (! isset(\$_instance)) {
     \$html = CApp::component()->mount({$expression})->html();
-} elseif (\$_instance->childHasBeenRendered($cachedKey)) {
-    \$componentId = \$_instance->getRenderedChildComponentId($cachedKey);
-    \$componentTag = \$_instance->getRenderedChildComponentTagName($cachedKey);
+} elseif (\$_instance->childHasBeenRendered({$cachedKey})) {
+    \$componentId = \$_instance->getRenderedChildComponentId({$cachedKey});
+    \$componentTag = \$_instance->getRenderedChildComponentTagName({$cachedKey});
     \$html = CApp::component()->dummyMount(\$componentId, \$componentTag);
-    \$_instance->preserveRenderedChild($cachedKey);
+    \$_instance->preserveRenderedChild({$cachedKey});
 } else {
     \$response = CApp::component()->mount({$expression});
     \$html = \$response->html();
-    \$_instance->logRenderedChild($cachedKey, \$response->id(), CApp::component()->getRootElementTagName(\$html));
+    \$_instance->logRenderedChild({$cachedKey}, \$response->id(), CApp::component()->getRootElementTagName(\$html));
 }
 echo \$html;
 ?>

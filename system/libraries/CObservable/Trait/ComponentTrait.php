@@ -229,6 +229,17 @@ trait CObservable_Trait_ComponentTrait {
     /**
      * @param null|string $id
      *
+     * @return CElement_Component_CountDownTimer
+     */
+    public function addCountDownTimer($id = null) {
+        return c::tap(new CElement_Component_CountDownTimer($id), function (CElement_Component_CountDownTimer $el) {
+            $this->wrapper->add($el);
+        });
+    }
+
+    /**
+     * @param null|string $id
+     *
      * @return CElement_Component_Repeater
      */
     public function addRepeater($id = null) {

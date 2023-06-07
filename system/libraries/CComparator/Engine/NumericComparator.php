@@ -1,16 +1,9 @@
 <?php
 
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
-
 /**
  * Compares numerical values for equality.
  */
 class CComparator_Engine_NumericComparator extends CComparator_Engine_ScalarComparator {
-
     /**
      * Returns whether the comparator can compare two values.
      *
@@ -22,9 +15,9 @@ class CComparator_Engine_NumericComparator extends CComparator_Engine_ScalarComp
     public function accepts($expected, $actual) {
         // all numerical values, but not if one of them is a double
         // or both of them are strings
-        return \is_numeric($expected) && \is_numeric($actual) &&
-                !(\is_float($expected) || \is_float($actual)) &&
-                !(\is_string($expected) && \is_string($actual));
+        return \is_numeric($expected) && \is_numeric($actual)
+                && !(\is_float($expected) || \is_float($actual))
+                && !(\is_string($expected) && \is_string($actual));
     }
 
     /**
@@ -36,21 +29,28 @@ class CComparator_Engine_NumericComparator extends CComparator_Engine_ScalarComp
      * @param bool  $canonicalize Arrays are sorted before comparison when set to true
      * @param bool  $ignoreCase   Case is ignored when set to true
      *
-     * @throws ComparisonFailure
+     * @throws CComparator_Exception_ComparisonFailureException
      */
     public function assertEquals($expected, $actual, $delta = 0.0, $canonicalize = false, $ignoreCase = false) {
         if (\is_infinite($actual) && \is_infinite($expected)) {
             return;
         }
-        if ((\is_infinite($actual) xor \is_infinite($expected)) ||
-                (\is_nan($actual) || \is_nan($expected)) ||
-                \abs($actual - $expected) > $delta) {
-            throw new ComparisonFailure(
-            $expected, $actual, '', '', false, \sprintf(
-                    'Failed asserting that %s matches expected %s.', $this->exporter->export($actual), $this->exporter->export($expected)
-            )
+        if ((\is_infinite($actual) xor \is_infinite($expected))
+            || (\is_nan($actual) || \is_nan($expected))
+            || \abs($actual - $expected) > $delta
+        ) {
+            throw new CComparator_Exception_ComparisonFailureException(
+                $expected,
+                $actual,
+                '',
+                '',
+                false,
+                \sprintf(
+                    'Failed asserting that %s matches expected %s.',
+                    $this->exporter->export($actual),
+                    $this->exporter->export($expected)
+                )
             );
         }
     }
-
 }

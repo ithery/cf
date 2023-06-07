@@ -1,11 +1,5 @@
 <?php
 
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
-
 use CElement_Component_Blockly_BlockHelper as BlockHelper;
 use CElement_Component_Blockly_CategoryHelper as CategoryHelper;
 

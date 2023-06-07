@@ -1,16 +1,9 @@
 <?php
 
-/* 
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
-
 /**
  * Compares scalar or NULL values for equality.
  */
-class CComparator_Engine_ScalarComparator extends CComparator_AbstractEngine
-{
+class CComparator_Engine_ScalarComparator extends CComparator_AbstractEngine {
     /**
      * Returns whether the comparator can compare two values.
      *
@@ -21,14 +14,14 @@ class CComparator_Engine_ScalarComparator extends CComparator_AbstractEngine
      *
      * @since  Method available since Release 3.6.0
      */
-    public function accepts($expected, $actual)
-    {
-        return ((\is_scalar($expected) xor null === $expected) &&
-               (\is_scalar($actual) xor null === $actual))
+    public function accepts($expected, $actual) {
+        return ((\is_scalar($expected) xor null === $expected)
+               && (\is_scalar($actual) xor null === $actual))
                // allow comparison between strings and objects featuring __toString()
                || (\is_string($expected) && \is_object($actual) && \method_exists($actual, '__toString'))
                || (\is_object($expected) && \method_exists($expected, '__toString') && \is_string($actual));
     }
+
     /**
      * Asserts that two values are equal.
      *
@@ -40,18 +33,17 @@ class CComparator_Engine_ScalarComparator extends CComparator_AbstractEngine
      *
      * @throws ComparisonFailure
      */
-    public function assertEquals($expected, $actual, $delta = 0.0, $canonicalize = false, $ignoreCase = false)
-    {
+    public function assertEquals($expected, $actual, $delta = 0.0, $canonicalize = false, $ignoreCase = false) {
         $expectedToCompare = $expected;
-        $actualToCompare   = $actual;
+        $actualToCompare = $actual;
         // always compare as strings to avoid strange behaviour
         // otherwise 0 == 'Foobar'
         if (\is_string($expected) || \is_string($actual)) {
             $expectedToCompare = (string) $expectedToCompare;
-            $actualToCompare   = (string) $actualToCompare;
+            $actualToCompare = (string) $actualToCompare;
             if ($ignoreCase) {
                 $expectedToCompare = \strtolower($expectedToCompare);
-                $actualToCompare   = \strtolower($actualToCompare);
+                $actualToCompare = \strtolower($actualToCompare);
             }
         }
         if ($expectedToCompare !== $actualToCompare && \is_string($expected) && \is_string($actual)) {

@@ -2,13 +2,7 @@
 
 defined('SYSPATH') or die('No direct access allowed.');
 
-/**
- * @author Hery Kurniawan <hery@itton.co.id>
- * @license Ittron Global Teknologi
- *
- * @since Nov 30, 2020
- */
-use League\Flysystem\Util;
+use League\Flysystem\WhitespacePathNormalizer;
 
 class CComponent_FileUploadConfiguration {
     public static function storage() {
@@ -45,18 +39,22 @@ class CComponent_FileUploadConfiguration {
         return CF::config('storage.disks.' . strtolower($diskBeforeTestFake) . '.driver') === 's3';
     }
 
+    public static function normalizeRelativePath($path) {
+        return (new WhitespacePathNormalizer())->normalizePath($path);
+    }
+
     protected static function directory() {
-        return Util::normalizeRelativePath('component/upload');
+        return static::normalizeRelativePath('component/upload');
     }
 
     protected static function s3Root() {
-        return static::isUsingS3() && is_array(static::diskConfig()) && array_key_exists('root', static::diskConfig()) ? Util::normalizeRelativePath(static::diskConfig()['root']) : '';
+        return static::isUsingS3() && is_array(static::diskConfig()) && array_key_exists('root', static::diskConfig()) ? static::normalizeRelativePath(static::diskConfig()['root']) : '';
     }
 
     public static function path($path = '', $withS3Root = true) {
         $prefix = $withS3Root ? static::s3Root() : '';
         $directory = static::directory();
-        $path = Util::normalizeRelativePath($path);
+        $path = static::normalizeRelativePath($path);
 
         return $prefix . ($prefix ? '/' : '') . $directory . ($path ? '/' : '') . $path;
     }

@@ -29,7 +29,7 @@ abstract class CApp_Remote_Client_Engine {
         $this->options = $options;
         $protocol = carr::get($options, 'protocol', 'http');
         $port = carr::get($options, 'port', 80);
-        $this->baseUrl = $protocol . '://' . $this->domain . ':' . $port . '/cresenity/api/';
+        $this->baseApiUrl = $protocol . '://' . $this->domain . ':' . $port . '/cresenity/api/';
     }
 
     public function request($url, $post = []) {

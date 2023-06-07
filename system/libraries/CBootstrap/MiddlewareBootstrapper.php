@@ -12,7 +12,10 @@ class CBootstrap_MiddlewareBootstrapper extends CBootstrap_BootstrapperAbstract 
      * @return void
      */
     public function bootstrap() {
-        CMiddleware::manager()->pushMiddleware(CSession_Middleware_SessionMiddleware::class);
+        if (!c::request()->is('cresenity/auth/ping')) {
+            CMiddleware::manager()->pushMiddleware(CSession_Middleware_SessionMiddleware::class);
+        }
+
         CMiddleware::manager()->pushMiddleware(CHTTP_Cookie_Middleware_AddQueuedCookiesToResponse::class);
         CMiddleware::manager()->pushMiddleware(CHTTP_Middleware_CleanInput::class);
     }

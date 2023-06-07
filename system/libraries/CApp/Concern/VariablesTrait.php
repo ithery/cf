@@ -33,8 +33,8 @@ trait CApp_Concern_VariablesTrait {
         $variables['format']['datetime'] = static::formatter()->getDatetimeFormat();
         $variables['format']['currencyPrefix'] = static::formatter()->getCurrencyPrefix();
         $variables['format']['currencySuffix'] = static::formatter()->getCurrencySuffix();
-        $variables['format']['currencyStripZeroDecimal']=static::formatter()->getCurrencyStripZeroDecimal();
-        $variables['format']['currencyDecimalDigit']=static::formatter()->getCurrencyDecimalDigit();
+        $variables['format']['currencyStripZeroDecimal'] = static::formatter()->getCurrencyStripZeroDecimal();
+        $variables['format']['currencyDecimalDigit'] = static::formatter()->getCurrencyDecimalDigit();
         $variables['have_clock'] = $variables['haveClock'] = false;
         $variables['have_scroll_to_top'] = $variables['haveScrollToTop'] = carr::get($cresjsConfig, 'scroll_to_top');
         $variables['CFVersion'] = CF::version();
@@ -66,6 +66,7 @@ trait CApp_Concern_VariablesTrait {
 
         $variables['base_url'] = curl::base();
         $variables['baseUrl'] = curl::base();
+        $variables['sessionName'] = CF::config('session.name');
         $variables['label_confirm'] = c::__('Are you sure ?');
         $variables['labelConfirm'] = c::__('Are you sure ?');
         $variables['label_ok'] = c::__('OK');

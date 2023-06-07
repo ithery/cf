@@ -51,6 +51,7 @@ class CModel_SoftDelete_Scope implements CModel_Interface_Scope {
         if (count((array) $builder->getQuery()->joins) > 0) {
             return $builder->getModel()->getQualifiedStatusColumn();
         }
+
         return $builder->getModel()->getStatusColumn();
     }
 

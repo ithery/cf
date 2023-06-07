@@ -2,12 +2,6 @@
 
 defined('SYSPATH') or die('No direct access allowed.');
 
-/**
- * @author Hery Kurniawan <hery@itton.co.id>
- * @license Ittron Global Teknologi
- *
- * @since Nov 29, 2020
- */
 class CComponent_Response {
     public $request;
 
@@ -37,7 +31,7 @@ class CComponent_Response {
         if (!$html = carr::get($this->effects, 'html')) {
             return;
         }
-        $this->effects['html'] = (new CComponent_HydrationMiddleware_AddAttributesToRootTagOfHtml)->__invoke($html, [
+        $this->effects['html'] = (new CComponent_HydrationMiddleware_AddAttributesToRootTagOfHtml())->__invoke($html, [
             'initial-data' => $this->toArrayWithoutHtml(),
         ]);
     }
@@ -47,7 +41,7 @@ class CComponent_Response {
             return;
         }
 
-        $this->effects['html'] = (new CComponent_HydrationMiddleware_AddAttributesToRootTagOfHtml)->__invoke($html, [
+        $this->effects['html'] = (new CComponent_HydrationMiddleware_AddAttributesToRootTagOfHtml())->__invoke($html, [
             'id' => $this->fingerprint['id'],
         ]);
     }
@@ -93,7 +87,7 @@ class CComponent_Response {
         }
 
         // If 'data' is present in the response memo, diff it one level deep.
-        if (isset($dirtyMemo['data']) && isset($requestMemo['data'])) {
+        if (isset($dirtyMemo['data'], $requestMemo['data'])) {
             foreach ($dirtyMemo['data'] as $key => $value) {
                 if ($value === $requestMemo['data'][$key]) {
                     unset($dirtyMemo['data'][$key]);

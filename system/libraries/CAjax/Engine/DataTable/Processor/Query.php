@@ -22,7 +22,6 @@ class CAjax_Engine_DataTable_Processor_Query extends CAjax_Engine_DataTable_Proc
         $resultQ = $db->query($qProcess);
 
         $data = $resultQ->result(false);
-
         $output = [
             'sEcho' => intval(carr::get($request, 'sEcho')),
             'iTotalRecords' => $this->getTotalRecord(),

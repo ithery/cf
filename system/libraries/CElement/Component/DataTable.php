@@ -165,6 +165,10 @@ class CElement_Component_DataTable extends CElement_Component {
      */
     protected $buttons = [];
 
+    protected $domElements = [];
+
+    protected $rowClassCallbackFunction = null;
+
     public function __construct($id = '') {
         parent::__construct($id);
         $this->defaultPagingList['-1'] = c::__('ALL');
@@ -256,6 +260,7 @@ class CElement_Component_DataTable extends CElement_Component {
         $this->labels['show'] = CManager::theme()->getData('datatable.label.show', c::__('element/datatable.show'));
         $this->labels['entries'] = CManager::theme()->getData('datatable.label.entries', c::__('element/datatable.entries'));
         $this->loadTranslation();
+        $this->actionHeaderLabel = carr::get($this->labels, 'actionHeaderLabel', $this->actionHeaderLabel);
     }
 
     protected function loadTranslation() {
@@ -1032,5 +1037,38 @@ class CElement_Component_DataTable extends CElement_Component {
         }
 
         return null;
+    }
+
+    public function setDomElement($key, $value) {
+        if ($value instanceof Closure) {
+            $value = c::toSerializableClosure($value);
+        }
+        $this->domElements[$key] = $value;
+
+        return $this;
+    }
+
+    /**
+     * Set callback for table row class.
+     *
+     * @param callable|Closure $callback parameter: $row
+     * @param string           $require  File location of callable function to require
+     *
+     * @return $this
+     */
+    public function setRowClassCallback($callback, $require = '') {
+        $this->rowClassCallbackFunction = c::toSerializableClosure($callback);
+        if (strlen($require) > 0) {
+            $this->requires[] = $require;
+        }
+
+        return $this;
+    }
+
+    /**
+     * @return Closure|\Opis\SerializableClosure
+     */
+    public function getRowClassCallbackFunction() {
+        return $this->rowClassCallbackFunction;
     }
 }

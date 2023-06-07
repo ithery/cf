@@ -15,7 +15,10 @@ use PHPStan\Reflection\ParametersAcceptorSelector;
 use PHPStan\Type\DynamicMethodReturnTypeExtension;
 
 class CQC_Phpstan_Service_Type_RelationDynamicMethodReturnTypeExtension implements DynamicMethodReturnTypeExtension {
-    private ReflectionProvider $provider;
+    /**
+     * @var ReflectionProvider
+     */
+    private $provider;
 
     public function __construct(ReflectionProvider $provider) {
         $this->provider = $provider;

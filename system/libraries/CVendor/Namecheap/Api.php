@@ -1,21 +1,20 @@
 <?php
 
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
-
 class CVendor_Namecheap_Api {
-
     use CVendor_Namecheap_Trait_CommandTrait;
-    
+
     public $endPoint = 'https://api.namecheap.com/xml.response';
+
     public $apiUser;
+
     public $apiKey;
+
     public $userName;
+
     public $clientIp;
+
     public $curl_options;
+
     public $returnType = 'xml';
 
     public function __construct($options) {
@@ -23,9 +22,9 @@ class CVendor_Namecheap_Api {
         $this->apiKey = carr::get($options, 'apiKey');
         $this->userName = carr::get($options, 'username');
         $this->clientIp = carr::get($options, 'clientIp');
-        $this->returnType = carr::get($options, 'returnType','json');
+        $this->returnType = carr::get($options, 'returnType', 'json');
         $environment = carr::get($options, 'environment', 'production');
-        if($environment=='sandbox') {
+        if ($environment == 'sandbox') {
             $this->enableSandbox();
         }
     }
@@ -87,15 +86,17 @@ class CVendor_Namecheap_Api {
     protected function checkRequiredFields($dataArr, $requiredFields) {
         $reqFields = [];
         foreach ($requiredFields as $key => $f) {
-            if (empty($dataArr[$f]))
+            if (empty($dataArr[$f])) {
                 $reqFields[] = $f;
+            }
         }
+
         return $reqFields;
     }
 
     protected function request($command, array $data = [], $type = 'get') {
         if (!isset($this->apiUser) || !isset($this->apiKey) || !isset($this->clientIp)) {
-            throw new AuthenticationException('Authentication information must be provided.');
+            throw new CVendor_Namecheap_Exception_AuthenticationException('Authentication information must be provided.');
         }
         $url = $this->endPoint;
         $data['ApiUser'] = $this->apiUser;
@@ -124,11 +125,11 @@ class CVendor_Namecheap_Api {
         curl_setopt_array($ch, $curl_options);
         if (strtolower($type) === 'get') {
             $url .= '?' . http_build_query($data);
-        } else if (strtolower($type) === 'post') {
+        } elseif (strtolower($type) === 'post') {
             curl_setopt($ch, CURLOPT_POST, true);
             curl_setopt($ch, CURLOPT_POSTFIELDS, $data);
         } else {
-            throw new \Exception("Invalid request method", 1);
+            throw new \Exception('Invalid request method', 1);
         }
 
         curl_setopt($ch, CURLOPT_URL, $url);
@@ -137,7 +138,7 @@ class CVendor_Namecheap_Api {
         $information = curl_getinfo($ch);
         $http_code = curl_getinfo($ch, CURLINFO_HTTP_CODE);
         if (in_array($http_code, [401, 403])) {
-            throw new UnauthorizedException('No Permission to perform this request');
+            throw new CVendor_Namecheap_Exception_UnauthorizedException('No Permission to perform this request');
         }
         if (!empty($error)) {
             throw new \Exception($error);
@@ -145,10 +146,10 @@ class CVendor_Namecheap_Api {
 
         if ($this->returnType === 'json') {
             return json_encode(CVendor_Namecheap_Xml::createArray($xmlData));
-        } else if ($this->returnType === 'array') {
+        } elseif ($this->returnType === 'array') {
             return CVendor_Namecheap_Xml::createArray($xmlData);
         }
+
         return $xmlData;
     }
-
 }

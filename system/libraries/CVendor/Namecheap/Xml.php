@@ -1,17 +1,11 @@
 <?php
 
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
-
 /**
  * @Usage : $arr = Xml::createArray($xml);
  */
 class CVendor_Namecheap_Xml {
-
     private static $xml = null;
+
     private static $encoding = 'UTF-8';
 
     /**
@@ -51,6 +45,7 @@ class CVendor_Namecheap_Xml {
         }
         $array[$xml->documentElement->tagName] = self::convert($xml->documentElement);
         self::$xml = null;    // clear the xml node in the class for 2nd time use.
+
         return $array;
     }
 
@@ -66,9 +61,11 @@ class CVendor_Namecheap_Xml {
         switch ($node->nodeType) {
             case XML_CDATA_SECTION_NODE:
                 $output = trim($node->textContent);
+
                 break;
             case XML_TEXT_NODE:
                 $output = trim($node->textContent);
+
                 break;
             case XML_ELEMENT_NODE:
                 // for each child node, call the covert function recursively
@@ -121,8 +118,10 @@ class CVendor_Namecheap_Xml {
                         }
                     }
                 }
+
                 break;
         }
+
         return $output;
     }
 
@@ -135,7 +134,7 @@ class CVendor_Namecheap_Xml {
         if (empty(self::$xml)) {
             self::init();
         }
+
         return self::$xml;
     }
-
 }

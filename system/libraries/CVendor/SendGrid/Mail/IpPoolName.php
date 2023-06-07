@@ -1,15 +1,7 @@
 <?php
 
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
-
 /**
- * This class is used to construct a IpPoolName object for the /mail/send API call
- *
- * @package SendGrid\Mail
+ * This class is used to construct a IpPoolName object for the /mail/send API call.
  */
 class CVendor_SendGrid_Mail_IpPoolName implements \JsonSerializable {
     /**
@@ -18,9 +10,9 @@ class CVendor_SendGrid_Mail_IpPoolName implements \JsonSerializable {
     private $ip_pool_name;
 
     /**
-     * Optional constructor
+     * Optional constructor.
      *
-     * @param string|null $ip_pool_name The IP Pool that you would like to
+     * @param null|string $ip_pool_name The IP Pool that you would like to
      *                                  send this email from. Minimum length:
      *                                  2, Maximum Length: 64
      */
@@ -31,7 +23,7 @@ class CVendor_SendGrid_Mail_IpPoolName implements \JsonSerializable {
     }
 
     /**
-     * Set the ip pool name on a IpPoolName object
+     * Set the ip pool name on a IpPoolName object.
      *
      * @param string $ip_pool_name The IP Pool that you would like to
      *                             send this email from. Minimum length:
@@ -47,7 +39,7 @@ class CVendor_SendGrid_Mail_IpPoolName implements \JsonSerializable {
     }
 
     /**
-     * Retrieve the ip pool name from a IpPoolName object
+     * Retrieve the ip pool name from a IpPoolName object.
      *
      * @return string
      */
@@ -56,7 +48,7 @@ class CVendor_SendGrid_Mail_IpPoolName implements \JsonSerializable {
     }
 
     /**
-     * Return an array representing a IpPoolName object for the Twilio SendGrid API
+     * Return an array representing a IpPoolName object for the Twilio SendGrid API.
      *
      * @return string
      */

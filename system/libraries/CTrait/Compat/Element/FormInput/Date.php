@@ -9,9 +9,9 @@ defined('SYSPATH') or die('No direct access allowed.');
 //@codingStandardsIgnoreStart
 trait CTrait_Compat_Element_FormInput_Date {
     /**
-     * @param type $placeholder
+     * @param string $placeholder
      *
-     * @return type
+     * @return $this
      *
      * @deprecated since version 1.2
      */
@@ -20,10 +20,10 @@ trait CTrait_Compat_Element_FormInput_Date {
     }
 
     /**
-     * @param type  $placeholder
-     * @param mixed $str
+     * @param string $placeholder
+     * @param mixed  $str
      *
-     * @return type
+     * @return $this
      *
      * @deprecated since version 1.2
      */
@@ -48,9 +48,7 @@ trait CTrait_Compat_Element_FormInput_Date {
      * @deprecated since version 1.2
      */
     public function set_end_date($str) {
-        $this->end_date = $str;
-
-        return $this;
+        return $this->setEndDate($str);
     }
 
     /**
@@ -59,16 +57,7 @@ trait CTrait_Compat_Element_FormInput_Date {
      * @deprecated since version 1.2
      */
     public function add_disable_day($day) {
-        $day_array = explode(',', $day);
-        if (count($day_array) > 1) {
-            foreach ($day_array as $d) {
-                $this->disable_day[] = trim($d);
-            }
-        } else {
-            $this->disable_day[] = $day;
-        }
-
-        return $this;
+        return $this->addDisableDaysOfWeek($day);
     }
 }
 //@codingStandardsIgnoreEnd

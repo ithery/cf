@@ -62,7 +62,7 @@ class CConsole_Command_KeyGenerateCommand extends CConsole_Command {
      * @return bool
      */
     protected function setKeyInEnvironmentFile($key) {
-        $currentKey = $this->laravel['config']['app.key'];
+        $currentKey = CF::config('app.key');
 
         if (strlen($currentKey) !== 0 && (!$this->confirmToProceed())) {
             return false;
@@ -81,11 +81,11 @@ class CConsole_Command_KeyGenerateCommand extends CConsole_Command {
      * @return void
      */
     protected function writeNewEnvironmentFileWith($key) {
-        file_put_contents($this->laravel->environmentFilePath(), preg_replace(
-            $this->keyReplacementPattern(),
-            'APP_KEY=' . $key,
-            file_get_contents($this->laravel->environmentFilePath())
-        ));
+        // file_put_contents($this->laravel->environmentFilePath(), preg_replace(
+        //     $this->keyReplacementPattern(),
+        //     'APP_KEY=' . $key,
+        //     file_get_contents($this->laravel->environmentFilePath())
+        // ));
     }
 
     /**
@@ -94,7 +94,7 @@ class CConsole_Command_KeyGenerateCommand extends CConsole_Command {
      * @return string
      */
     protected function keyReplacementPattern() {
-        $escaped = preg_quote('=' . $this->laravel['config']['app.key'], '/');
+        $escaped = preg_quote('=' . CF::config('app.key'), '/');
 
         return "/^APP_KEY{$escaped}/m";
     }

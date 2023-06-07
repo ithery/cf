@@ -11,6 +11,13 @@ class Controller_Demo_Elements_Table_Cell extends \Cresenity\Demo\Controller {
         $table->setDataFromModel(Cresenity\Demo\Model\Country::class, function (CModel_Query $query) {
             $query->orderBy('name');
         });
+        $table->setRowClassCallback(function (Cresenity\Demo\Model\Country $row) {
+            if (cstr::lower($row->continent) == 'asia') {
+                return 'font-weight-bold';
+            }
+
+            return '';
+        });
         $table->addColumn('name')->setLabel('Name')->setCallback(function ($row, $value) {
             $icon = c::url('media/img/flags/' . cstr::tolower(carr::get($row, 'code')) . '.gif');
             $image = '<img src="' . $icon . '" />&nbsp;&nbsp;';
@@ -45,6 +52,8 @@ class Controller_Demo_Elements_Table_Cell extends \Cresenity\Demo\Controller {
             return $d;
         });
         $table->addColumn('isd')->setLabel('ISD')->setVisible(false);
+
+        $table->setAjax();
 
         return $app;
     }

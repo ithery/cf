@@ -1,16 +1,9 @@
 <?php
 
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
-
 /**
  * Compares PHPUnit_Framework_MockObject_MockObject instances for equality.
  */
 class CComparator_Engine_MockObjectComparator extends CComparator_Engine_ObjectComparator {
-
     /**
      * Returns whether the comparator can compare two values.
      *
@@ -20,8 +13,8 @@ class CComparator_Engine_MockObjectComparator extends CComparator_Engine_ObjectC
      * @return bool
      */
     public function accepts($expected, $actual) {
-        return ($expected instanceof \PHPUnit_Framework_MockObject_MockObject || $expected instanceof \PHPUnit\Framework\MockObject\MockObject) &&
-                ($actual instanceof \PHPUnit_Framework_MockObject_MockObject || $actual instanceof \PHPUnit\Framework\MockObject\MockObject);
+        return ($expected instanceof \PHPUnit_Framework_MockObject_MockObject || $expected instanceof \PHPUnit\Framework\MockObject\MockObject)
+                && ($actual instanceof \PHPUnit_Framework_MockObject_MockObject || $actual instanceof \PHPUnit\Framework\MockObject\MockObject);
     }
 
     /**
@@ -35,7 +28,7 @@ class CComparator_Engine_MockObjectComparator extends CComparator_Engine_ObjectC
     protected function toArray($object) {
         $array = parent::toArray($object);
         unset($array['__phpunit_invocationMocker']);
+
         return $array;
     }
-
 }

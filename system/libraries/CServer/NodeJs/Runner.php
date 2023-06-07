@@ -82,7 +82,7 @@ class CServer_NodeJs_Runner {
     public static function getDirectory() {
         $dir = DOCROOT . 'temp' . DS . 'nodejs' . DS . CF::appCode();
         if (!CFile::isDirectory($dir)) {
-            CFile::makeDirectory($dir);
+            CFile::makeDirectory($dir, 0755, true);
         }
 
         return $dir;

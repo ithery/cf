@@ -24,6 +24,7 @@ class CObservable_Listener_Handler_SubmitHandler extends CObservable_Listener_Ha
 
     public function setForm($formId) {
         $this->formId = $formId;
+
         return $this;
     }
 
@@ -32,7 +33,7 @@ class CObservable_Listener_Handler_SubmitHandler extends CObservable_Listener_Ha
         if (strlen($this->formId) == 0) {
             $js .= "$('#" . $this->owner . "').closest('form').submit();";
         } else {
-            $js .= "$('#" . $this->form_id . "').submit();";
+            $js .= "$('#" . $this->formId . "').submit();";
         }
 
         return $js;

@@ -1,8 +1,9 @@
 <?php
 
 class CModel_Relation_MorphOne extends CModel_Relation_MorphOneOrMany {
-    use CModel_Relation_Trait_ComparesRelatedModels,
-        CModel_Relation_Trait_SupportsDefaultModels;
+    use CModel_Relation_Trait_CanBeOneOfMany;
+    use CModel_Relation_Trait_ComparesRelatedModels;
+    use CModel_Relation_Trait_SupportsDefaultModels;
 
     /**
      * Get the results of the relationship.
@@ -44,6 +45,58 @@ class CModel_Relation_MorphOne extends CModel_Relation_MorphOneOrMany {
      */
     public function match(array $models, CModel_Collection $results, $relation) {
         return $this->matchOne($models, $results, $relation);
+    }
+
+    /**
+     * Get the relationship query.
+     *
+     * @param \CModel_Query $query
+     * @param \CModel_Query $parentQuery
+     * @param array|mixed   $columns
+     *
+     * @return \CModel_Query
+     */
+    public function getRelationExistenceQuery(CModel_Query $query, CModel_Query $parentQuery, $columns = ['*']) {
+        if ($this->isOneOfMany()) {
+            $this->mergeOneOfManyJoinsTo($query);
+        }
+
+        return parent::getRelationExistenceQuery($query, $parentQuery, $columns);
+    }
+
+    /**
+     * Add constraints for inner join subselect for one of many relationships.
+     *
+     * @param \CModel_Query $query
+     * @param null|string   $column
+     * @param null|string   $aggregate
+     *
+     * @return void
+     */
+    public function addOneOfManySubQueryConstraints(CModel_Query $query, $column = null, $aggregate = null) {
+        $query->addSelect($this->foreignKey, $this->morphType);
+    }
+
+    /**
+     * Get the columns that should be selected by the one of many subquery.
+     *
+     * @return array|string
+     */
+    public function getOneOfManySubQuerySelectColumns() {
+        return [$this->foreignKey, $this->morphType];
+    }
+
+    /**
+     * Add join query constraints for one of many relationships.
+     *
+     * @param \CDatabase_Query_JoinClause $join
+     *
+     * @return void
+     */
+    public function addOneOfManyJoinSubQueryConstraints(CDatabase_Query_JoinClause $join) {
+        $join
+            ->on($this->qualifySubSelectColumn($this->morphType), '=', $this->qualifyRelatedColumn($this->morphType))
+            ->on($this->qualifySubSelectColumn($this->foreignKey), '=', $this->qualifyRelatedColumn($this->foreignKey));
     }
 
     /**

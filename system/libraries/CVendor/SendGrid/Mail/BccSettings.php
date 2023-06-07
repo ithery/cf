@@ -1,15 +1,7 @@
 <?php
 
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
-
 /**
- * This class is used to construct a BccSettings object for the /mail/send API call
- *
- * @package SendGrid\Mail
+ * This class is used to construct a BccSettings object for the /mail/send API call.
  */
 class CVendor_SendGrid_Mail_BccSettings implements \JsonSerializable {
     /**
@@ -23,10 +15,10 @@ class CVendor_SendGrid_Mail_BccSettings implements \JsonSerializable {
     private $email;
 
     /**
-     * Optional constructor
+     * Optional constructor.
      *
-     * @param bool|null   $enable Indicates if this setting is enabled
-     * @param string|null $email  The email address that you would like
+     * @param null|bool   $enable Indicates if this setting is enabled
+     * @param null|string $email  The email address that you would like
      *                            to receive the BCC
      */
     public function __construct($enable = null, $email = null) {
@@ -39,7 +31,7 @@ class CVendor_SendGrid_Mail_BccSettings implements \JsonSerializable {
     }
 
     /**
-     * Update the enable setting on a CVendor_SendGrid_Mail_BccSettings object
+     * Update the enable setting on a CVendor_SendGrid_Mail_BccSettings object.
      *
      * @param bool $enable Indicates if this setting is enabled
      *
@@ -53,7 +45,7 @@ class CVendor_SendGrid_Mail_BccSettings implements \JsonSerializable {
     }
 
     /**
-     * Retrieve the enable setting on a BccSettings object
+     * Retrieve the enable setting on a BccSettings object.
      *
      * @return bool
      */
@@ -62,7 +54,7 @@ class CVendor_SendGrid_Mail_BccSettings implements \JsonSerializable {
     }
 
     /**
-     * Add the email setting on a CVendor_SendGrid_Mail_BccSettings object
+     * Add the email setting on a CVendor_SendGrid_Mail_BccSettings object.
      *
      * @param string $email The email address that you would like
      *                      to receive the BCC
@@ -81,7 +73,7 @@ class CVendor_SendGrid_Mail_BccSettings implements \JsonSerializable {
     }
 
     /**
-     * Retrieve the email setting on a CVendor_SendGrid_Mail_BccSettings object
+     * Retrieve the email setting on a CVendor_SendGrid_Mail_BccSettings object.
      *
      * @return string
      */
@@ -90,7 +82,7 @@ class CVendor_SendGrid_Mail_BccSettings implements \JsonSerializable {
     }
 
     /**
-     * Return an array representing a CVendor_SendGrid_Mail_BccSettings object for the Twilio SendGrid API
+     * Return an array representing a CVendor_SendGrid_Mail_BccSettings object for the Twilio SendGrid API.
      *
      * @return null|array
      */

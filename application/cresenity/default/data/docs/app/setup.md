@@ -30,3 +30,8 @@ Secara default CApp akan meload default views `page.blade.php`. anda dapat mengo
 </html>
 
 ```
+
+- `@CAppSeo` adalah konfigurasi seo `c::app()->seo()`
+- `@CAppStyles` adalah css yang diperlukan oleh CApp, ini dapat diset dari theme atau secara runtime menggunakan `c::manager()->registerCss`
+- `@CAppContent` adalah isi content yang digenerate oleh CApp
+- `@CAppScripts` adalah js yang diperlukan oleh CApp, ini dapat diset dari theme atau secara runtime menggunakan `c::manager()->registerJs`

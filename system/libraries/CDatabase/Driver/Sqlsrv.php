@@ -27,7 +27,7 @@ class CDatabase_Driver_Sqlsrv extends CDatabase_Driver {
         $this->db = $db;
         $this->dbConfig = $config;
 
-        CF::log(CLogger::DEBUG, 'MySQLi Database Driver Initialized');
+        CF::log(CLogger::DEBUG, 'SqlSrv Database Driver Initialized');
     }
 
     public function close() {
@@ -256,7 +256,7 @@ class CDatabase_Driver_Sqlsrv extends CDatabase_Driver {
         }
 
         if (!isset($result)) {
-            throw new CDatabase_Exception('Table :table does not exist in your database', [':table' => $table]);
+            throw CDatabase_Exception::tableNotFound($table);
         }
 
         return $result;

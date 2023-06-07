@@ -2,7 +2,7 @@
 
 trait CElement_Component_DataTable_Trait_JavascriptTrait {
     public function js($indent = 0) {
-        $quickSearchPlaceholder = $this->quickSearchPlaceholder ? "'" . $this->quickSearchPlaceholder . "'" : "'Search ' + title";
+        $quickSearchPlaceholder = $this->quickSearchPlaceholder ? "'" . $this->quickSearchPlaceholder . "'" : "'".c::__('element/datatable.search')." ' + title";
 
         /** @var CElement_Component_DataTable $this */
         $this->buildOnce();
@@ -460,6 +460,24 @@ trait CElement_Component_DataTable_Trait_JavascriptTrait {
 
                 ");
             }
+        }
+
+        //domElements
+        if (is_array($this->domElements)) {
+            foreach ($this->domElements as $classElement => $domElement) {
+                if (c::isCallable($domElement)) {
+                    $domElement = c::toCallable($domElement);
+                    $domElement = $domElement();
+                }
+                $js->appendln("
+                    jQuery('#" . $this->id . '_wrapper .' . $classElement . "').html(`" . addslashes($domElement->html()) . '`)
+                ');
+
+                $js->appendln($domElement->js());
+            }
+        }
+        if ($this->applyDataTable) {
+            $js->appendln("$('#" . $this->id . "').data('cappDataTable'," . $varNameOTable . ');');
         }
 
         return $js->text();

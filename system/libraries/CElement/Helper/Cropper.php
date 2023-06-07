@@ -8,7 +8,9 @@ defined('SYSPATH') or die('No direct access allowed.');
  * @author Hery
  */
 class CElement_Helper_Cropper extends CElement_Element {
-    use CElement_Trait_Template;
+    //use CElement_Trait_Template;
+    use CElement_Trait_UseViewTrait;
+
     protected $cropperWidth;
 
     protected $cropperHeight;
@@ -21,7 +23,8 @@ class CElement_Helper_Cropper extends CElement_Element {
 
     public function __construct($id = '', $tag = 'div') {
         parent::__construct($id, $tag);
-        $this->templateName = 'CElement/Helper/Cropper';
+        //$this->templateName = 'CElement/Helper/Cropper';
+        $this->view = 'cresenity/element/helper/cropper';
         $dataModule = [
             'css' => [
                 'plugins/cropper/cropper.css',
@@ -34,12 +37,12 @@ class CElement_Helper_Cropper extends CElement_Element {
 
         $this->cropperResizable = true;
 
-        $this->onBeforeParse(function () {
-            $this->setVar('id', $this->id);
-            $this->setVar('imgSrc', $this->imgSrc);
-            $this->setVar('cropperWidth', $this->cropperWidth);
-            $this->setVar('cropperHeight', $this->cropperHeight);
-            $this->setVar('cropperResizable', $this->cropperResizable);
+        $this->onBeforeParse(function (CView_View $view) {
+            $view->with('id', $this->id);
+            $view->with('imgSrc', $this->imgSrc);
+            $view->with('cropperWidth', $this->cropperWidth);
+            $view->with('cropperHeight', $this->cropperHeight);
+            $view->with('cropperResizable', $this->cropperResizable);
         });
     }
 
@@ -76,19 +79,5 @@ class CElement_Helper_Cropper extends CElement_Element {
 
     public function getCropperResizable() {
         return $this->cropperResizable;
-    }
-
-    public function html($indent = 0) {
-        $templateHtml = $this->getTemplateHtml();
-        $html = $templateHtml;
-
-        return $html;
-    }
-
-    public function js($indent = 0) {
-        $templateJs = $this->getTemplateJs();
-        $js = $templateJs;
-
-        return $js;
     }
 }

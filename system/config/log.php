@@ -3,12 +3,6 @@ use Monolog\Handler\NullHandler;
 use Monolog\Handler\StreamHandler;
 use Monolog\Handler\SyslogUdpHandler;
 
-/**
- * Description of log.
- *
- * @author Hery
- */
-
 return [
     'threshold' => CF::isProduction() ? LOG_WARNING : LOG_INFO, //LOG_WARNING ,4
 
@@ -36,7 +30,10 @@ return [
     |
     */
 
-    'deprecations' => c::env('LOG_DEPRECATIONS_CHANNEL', 'null'),
+    'deprecations' => [
+        'channel' => c::env('LOG_DEPRECATIONS_CHANNEL', 'null'),
+        'trace' => false,
+    ],
 
     /*
     |--------------------------------------------------------------------------
@@ -69,6 +66,7 @@ return [
             'driver' => 'daily',
             'level' => c::env('LOG_LEVEL', 'debug'),
             'days' => 14,
+            'replace_placeholders' => true,
         ],
 
         'slack' => [

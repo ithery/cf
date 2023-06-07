@@ -506,7 +506,7 @@ trait CModel_Metable_MetableTrait {
     public function setRelation($relation, $value) {
         if ($relation == 'meta') {
             // keep the meta relation indexed by key.
-            /** @var Collection $value */
+            /** @var CCollection $value */
             $this->indexedMetaCollection = $value->keyBy('key');
         }
 

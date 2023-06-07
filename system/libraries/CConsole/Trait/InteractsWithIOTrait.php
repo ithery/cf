@@ -285,7 +285,7 @@ trait CConsole_Trait_InteractsWithIOTrait {
      * @return void
      */
     public function line($string, $style = null, $verbosity = null) {
-        $styled = $style ? "<${style}>${string}</${style}>" : $string;
+        $styled = $style ? '<' . $style . '>' . $string . '</' . $style . '>' : $string;
 
         $this->output->writeln($styled, $this->parseVerbosity($verbosity));
     }

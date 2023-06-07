@@ -443,11 +443,12 @@ abstract class CDevSuite_Site {
     /**
      * Trust the given certificate file in the Mac Keychain.
      *
-     * @param string $crtPath
+     * @param string      $crtPath
+     * @param null|string $url
      *
      * @return void
      */
-    public function trustCertificate($crtPath) {
+    public function trustCertificate($crtPath, $url = null) {
         $this->cli->run(sprintf(
             'sudo security add-trusted-cert -d -r trustAsRoot -k /Library/Keychains/System.keychain "%s"',
             $crtPath

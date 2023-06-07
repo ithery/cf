@@ -74,8 +74,8 @@ class CElement_Component_Widget_Header extends CElement_Element {
         if ($this->actions != null) {
             $this->addClass('with-elements');
         }
-        if (strlen($this->icon) > 0) {
-            $this->titleWrapper->addSpan()->addClass('icon')->addIcon()->setIcon($this->icon);
+        if (strlen($this->originalIcon) > 0) {
+            $this->titleWrapper->addSpan()->addClass('icon')->addIcon()->setIcon($this->originalIcon);
         }
         $this->titleWrapper->addH5()->add($this->title);
     }

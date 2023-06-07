@@ -21,6 +21,10 @@ class CApp_PWA_ManifestService {
             'orientation' => $this->getGroupConfig('manifest.orientation'),
             'status_bar' => $this->getGroupConfig('manifest.status_bar'),
             'scope' => $this->getGroupConfig('manifest.scope'),
+            'dir' => $this->getGroupConfig('manifest.dir'),
+            'lang' => $this->getGroupConfig('manifest.lang'),
+            'display_override' => $this->getGroupConfig('manifest.display_override', []),
+            'categories' => $this->getGroupConfig('manifest.categories'),
             'splash' => $this->getGroupConfig('manifest.splash'),
         ];
         foreach ($this->getGroupConfig('manifest.icons') as $size => $file) {

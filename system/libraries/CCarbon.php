@@ -92,7 +92,7 @@ class CCarbon extends BaseCarbon implements JsonSerializable {
     protected static function expectDateTime($date, $other = []) {
         $message = 'Expected ';
         foreach ((array) $other as $expect) {
-            $message .= "${expect}, ";
+            $message .= $expect . ', ';
         }
 
         if (!$date instanceof DateTime && !$date instanceof DateTimeInterface) {

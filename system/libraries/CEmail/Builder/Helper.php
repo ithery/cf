@@ -62,6 +62,12 @@ class CEmail_Builder_Helper {
         return '<' . $tagName . $attributesString . '>' . $subNode . '</' . $tagName . '>';
     }
 
+    /**
+     * @param array $attributes
+     * @param array $allowedAttributes
+     *
+     * @return array
+     */
     public static function formatAttributes($attributes, $allowedAttributes) {
         return carr::reduce($attributes, function ($acc, $val, $attrName) use ($allowedAttributes) {
             if (is_array($allowedAttributes) && isset($allowedAttributes[$attrName])) {

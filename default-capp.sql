@@ -51,6 +51,7 @@ CREATE TABLE IF NOT EXISTS `roles` (
   `rgt` bigint(20) DEFAULT NULL,
   `is_base` tinyint(4) NOT NULL DEFAULT '0',
   `name` varchar(60) DEFAULT NULL COMMENT 'The name of an entity (record) is used as an default search option in addition to the search key. The name is up to 60 characters in length.',
+  `type` varchar(255) DEFAULT NULL,
   `description` varchar(255) DEFAULT NULL,
   `store_id` bigint(20) DEFAULT NULL,
   `role_level` int(11) DEFAULT '0',
@@ -65,14 +66,12 @@ CREATE TABLE IF NOT EXISTS `roles` (
   UNIQUE KEY `roleid` (`role_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
--- Dumping data for table torsb2c.roles: ~6 rows (approximately)
 /*!40000 ALTER TABLE `roles` DISABLE KEYS */;
 INSERT INTO `roles` (`role_id`, `parent_id`, `depth`, `org_id`, `lft`, `rgt`, `is_base`, `name`, `description`, `store_id`, `created`, `createdby`, `updated`, `updatedby`, `status`, `role_level`) VALUES
 	(1, NULL, 0, NULL, 1, 2, 1, 'SUPERADMIN', NULL, NULL, NULL, NULL, NULL, NULL, 1, 0);
 /*!40000 ALTER TABLE `roles` ENABLE KEYS */;
 
 
--- Dumping structure for table torsb2c.role_nav
 DROP TABLE IF EXISTS `role_nav`;
 CREATE TABLE IF NOT EXISTS `role_nav` (
   `role_nav_id` bigint(20) unsigned NOT NULL AUTO_INCREMENT,
@@ -113,8 +112,6 @@ CREATE TABLE IF NOT EXISTS `role_permission` (
   UNIQUE KEY `role_permission_id` (`role_permission_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
-/*!40000 ALTER TABLE `role_permission` DISABLE KEYS */;
-/*!40000 ALTER TABLE `role_permission` ENABLE KEYS */;
 
 
 DROP TABLE IF EXISTS `sys_counter`;

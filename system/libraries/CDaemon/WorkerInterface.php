@@ -2,12 +2,6 @@
 
 defined('SYSPATH') or die('No direct access allowed.');
 
-/**
- * @author Hery Kurniawan
- * @license Ittron Global Teknologi <ittron.co.id>
- *
- * @since Mar 15, 2019, 12:09:34 PM
- */
 interface CDaemon_WorkerInterface {
     /**
      * Interfaces cannot specify properties, but note that a reference to the Mediator object will be set as $this->mediator in your Worker
@@ -22,21 +16,21 @@ interface CDaemon_WorkerInterface {
     // public $mediator;
 
     /**
-     * Called on Construct or Init
+     * Called on Construct or Init.
      *
      * @return void
      */
     public function setup();
 
     /**
-     * Called on Destruct
+     * Called on Destruct.
      *
      * @return void
      */
     public function teardown();
 
     /**
-     * This is called during object construction to validate any dependencies
+     * This is called during object construction to validate any dependencies.
      *
      * @return array Return array of error messages (Think stuff like "GD Library Extension Required" or
      *               "Cannot open /tmp for Writing") or an empty array

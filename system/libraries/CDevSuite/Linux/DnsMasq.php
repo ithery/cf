@@ -12,11 +12,33 @@ class CDevSuite_Linux_DnsMasq extends CDevSuite_DnsMasq {
 
     public $rclocal;
 
+    /**
+     * @var string
+     */
     public $configPath;
 
+    /**
+     * @var string
+     */
     public $nmConfigPath;
 
-    public $resolvedConfig;
+    /**
+     * @var string
+     */
+    public $resolvedConfigPath;
+
+    /**
+     * @var string
+     */
+    public $dnsMasqConf;
+    /**
+     * @var string
+     */
+    public $dnsMasqOpts;
+    /**
+     * @var string
+     */
+    public $resolvConf;
 
     /**
      * Create a new DnsMasq instance.
@@ -28,10 +50,10 @@ class CDevSuite_Linux_DnsMasq extends CDevSuite_DnsMasq {
         $this->pm = CDevSuite::packageManager();
         $this->sm = CDevSuite::serviceManager();
         $this->rclocal = '/etc/rc.local';
-        $this->resolvconf = '/etc/resolv.conf';
-        $this->dnsmasqconf = '/etc/dnsmasq.conf';
+        $this->resolvConf = '/etc/resolv.conf';
+        $this->dnsMasqConf = '/etc/dnsmasq.conf';
         $this->configPath = '/etc/dnsmasq.d/devsuite';
-        $this->dnsmasqOpts = '/etc/dnsmasq.d/options';
+        $this->dnsMasqOpts = '/etc/dnsmasq.d/options';
         $this->nmConfigPath = '/etc/NetworkManager/conf.d/devsuite.conf';
         $this->resolvedConfigPath = '/etc/systemd/resolved.conf';
     }
@@ -46,9 +68,9 @@ class CDevSuite_Linux_DnsMasq extends CDevSuite_DnsMasq {
     private function lockResolvConf($lock = true) {
         $arg = $lock ? '+i' : '-i';
 
-        if (!$this->files->isLink($this->resolvconf)) {
+        if (!$this->files->isLink($this->resolvConf)) {
             $this->cli->run(
-                "chattr {$arg} {$this->resolvconf}",
+                "chattr {$arg} {$this->resolvConf}",
                 function ($code, $msg) {
                     CDevSuite::warning($msg);
                 }
@@ -79,9 +101,9 @@ class CDevSuite_Linux_DnsMasq extends CDevSuite_DnsMasq {
             $this->files->restore($this->rclocal);
         }
 
-        $this->files->backupAsRoot($this->resolvconf);
-        $this->files->unlinkAsRoot($this->resolvconf);
-        $this->files->symlinkAsRoot($script, $this->resolvconf);
+        $this->files->backupAsRoot($this->resolvConf);
+        $this->files->unlinkAsRoot($this->resolvConf);
+        $this->files->symlinkAsRoot($script, $this->resolvConf);
 
         return true;
     }
@@ -145,10 +167,10 @@ class CDevSuite_Linux_DnsMasq extends CDevSuite_DnsMasq {
         $this->mergeDns();
 
         $this->files->unlink('/etc/dnsmasq.d/network-manager');
-        $this->files->backupAsRoot($this->dnsmasqconf);
+        $this->files->backupAsRoot($this->dnsMasqConf);
 
-        $this->files->putAsRoot($this->dnsmasqconf, $this->files->get(CDevSuite::stubsPath() . 'dnsmasq.conf'));
-        $this->files->putAsRoot($this->dnsmasqOpts, $this->files->get(CDevSuite::stubsPath() . 'dnsmasq_options'));
+        $this->files->putAsRoot($this->dnsMasqConf, $this->files->get(CDevSuite::stubsPath() . 'dnsmasq.conf'));
+        $this->files->putAsRoot($this->dnsMasqOpts, $this->files->get(CDevSuite::stubsPath() . 'dnsmasq_options'));
         $this->files->putAsRoot($this->nmConfigPath, $this->files->get(CDevSuite::stubsPath() . 'networkmanager.conf'));
     }
 
@@ -176,14 +198,14 @@ class CDevSuite_Linux_DnsMasq extends CDevSuite_DnsMasq {
 
         $this->cli->passthru('sudo rm -rf /opt/devsuite-linux');
         $this->files->unlinkAsRoot($this->configPath);
-        $this->files->unlinkAsRoot($this->dnsmasqOpts);
+        $this->files->unlinkAsRoot($this->dnsMasqOpts);
         $this->files->unlinkAsRoot($this->nmConfigPath);
         $this->files->restore($this->resolvedConfigPath);
 
         $this->lockResolvConf(false);
         $this->files->restoreAsRoot($this->rclocal);
-        $this->files->restoreAsRoot($this->resolvconf);
-        $this->files->restoreAsRoot($this->dnsmasqconf);
+        $this->files->restoreAsRoot($this->resolvConf);
+        $this->files->restoreAsRoot($this->dnsMasqConf);
         $this->files->commentLine('IGNORE_RESOLVCONF', '/etc/default/dnsmasq');
 
         $this->pm->nmRestart($this->sm);

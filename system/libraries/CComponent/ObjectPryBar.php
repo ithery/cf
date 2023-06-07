@@ -2,14 +2,13 @@
 
 defined('SYSPATH') or die('No direct access allowed.');
 
-/**
- * @author Hery Kurniawan <hery@itton.co.id>
- * @license Ittron Global Teknologi
- *
- * @since Nov 30, 2020
- */
 class CComponent_ObjectPrybar {
     protected $obj;
+
+    /**
+     * @var ReflectionClass
+     */
+    protected $reflected;
 
     public function __construct($obj) {
         $this->obj = $obj;

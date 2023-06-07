@@ -1,15 +1,7 @@
 <?php
 
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
-
 /**
- * This class is used to construct a GroupId object for the /mail/send API call
- *
- * @package SendGrid\Mail
+ * This class is used to construct a GroupId object for the /mail/send API call.
  */
 class CVendor_SendGrid_Mail_GroupId implements \JsonSerializable {
     /**
@@ -18,9 +10,9 @@ class CVendor_SendGrid_Mail_GroupId implements \JsonSerializable {
     private $group_id;
 
     /**
-     * Optional constructor
+     * Optional constructor.
      *
-     * @param int|null $group_id The unsubscribe group to associate with this email
+     * @param null|int $group_id The unsubscribe group to associate with this email
      */
     public function __construct($group_id = null) {
         if (isset($group_id)) {
@@ -29,7 +21,7 @@ class CVendor_SendGrid_Mail_GroupId implements \JsonSerializable {
     }
 
     /**
-     * Add the group id to a GroupId object
+     * Add the group id to a GroupId object.
      *
      * @param int $group_id The unsubscribe group to associate with this email
      *
@@ -43,7 +35,7 @@ class CVendor_SendGrid_Mail_GroupId implements \JsonSerializable {
     }
 
     /**
-     * Retrieve the group id from a GroupId object
+     * Retrieve the group id from a GroupId object.
      *
      * @return int
      */
@@ -52,7 +44,7 @@ class CVendor_SendGrid_Mail_GroupId implements \JsonSerializable {
     }
 
     /**
-     * Return an array representing a GroupId object for the Twilio SendGrid API
+     * Return an array representing a GroupId object for the Twilio SendGrid API.
      *
      * @return int
      */

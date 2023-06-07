@@ -10,6 +10,7 @@ defined('SYSPATH') or die('No direct access allowed.');
  */
 class CView_ComponentAttributeBag implements ArrayAccess, CInterface_Htmlable, IteratorAggregate {
     use CTrait_Macroable;
+
     /**
      * The raw array of attributes.
      *
@@ -291,7 +292,7 @@ class CView_ComponentAttributeBag implements ArrayAccess, CInterface_Htmlable, I
      *
      * @return bool
      */
-    #[ReturnTypeWillChange]
+    #[\ReturnTypeWillChange]
     public function offsetExists($offset) {
         return isset($this->attributes[$offset]);
     }
@@ -315,7 +316,7 @@ class CView_ComponentAttributeBag implements ArrayAccess, CInterface_Htmlable, I
      *
      * @return void
      */
-    #[ReturnTypeWillChange]
+    #[\ReturnTypeWillChange]
     public function offsetSet($offset, $value) {
         $this->attributes[$offset] = $value;
     }
@@ -327,7 +328,7 @@ class CView_ComponentAttributeBag implements ArrayAccess, CInterface_Htmlable, I
      *
      * @return void
      */
-    #[ReturnTypeWillChange]
+    #[\ReturnTypeWillChange]
     public function offsetUnset($offset) {
         unset($this->attributes[$offset]);
     }
@@ -337,7 +338,7 @@ class CView_ComponentAttributeBag implements ArrayAccess, CInterface_Htmlable, I
      *
      * @return \ArrayIterator
      */
-    #[ReturnTypeWillChange]
+    #[\ReturnTypeWillChange]
     public function getIterator() {
         return new ArrayIterator($this->attributes);
     }

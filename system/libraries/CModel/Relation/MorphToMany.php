@@ -127,6 +127,19 @@ class CModel_Relation_MorphToMany extends CModel_Relation_BelongsToMany {
     }
 
     /**
+     * Get the pivot models that are currently attached.
+     *
+     * @return \CCollection
+     */
+    protected function getCurrentlyAttachedPivots() {
+        return parent::getCurrentlyAttachedPivots()->map(function ($record) {
+            return $record instanceof CModel_Relation_MorphPivot
+                ? $record->setMorphType($this->morphType)->setMorphClass($this->morphClass)
+                : $record;
+        });
+    }
+
+    /**
      * Create a new query builder for the pivot table.
      *
      * @return \CDatabase_Query_Builder

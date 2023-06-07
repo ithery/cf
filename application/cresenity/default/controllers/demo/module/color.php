@@ -39,6 +39,7 @@ class Controller_Demo_Module_Color extends \Cresenity\Demo\Controller {
     protected function createColorBadge(CColor_FormatAbstract $color) {
         $backgroundColor = '#' . implode('', $color->toHex()->values());
         $foregroundColor = $color->isDark() ? '#ffffff' : '#000000';
-        return '<span class="badge" style="color:'.$foregroundColor.'!important;background-color:'.$backgroundColor.'!important">'.$backgroundColor.'</span>';
+
+        return '<span class="badge" style="color:' . $foregroundColor . '!important;background-color:' . $backgroundColor . '!important">' . $backgroundColor . '</span>';
     }
 }

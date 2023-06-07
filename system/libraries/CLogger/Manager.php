@@ -38,6 +38,9 @@ class CLogger_Manager implements LoggerInterface {
 
     private static $instance;
 
+    /**
+     * @return CLogger_Manager
+     */
     public static function instance() {
         if (static::$instance == null) {
             static::$instance = new static();

@@ -10,6 +10,7 @@ class CDevSuite_Linux_Site extends CDevSuite_Site {
      */
     public function getCertificates($path = null) {
         $path = $path ?: $this->certificatesPath();
+
         return c::collect($this->files->scanDir($path))->filter(function ($value, $key) {
             return cstr::endsWith($value, '.crt');
         })->map(function ($cert) {
@@ -18,7 +19,7 @@ class CDevSuite_Linux_Site extends CDevSuite_Site {
     }
 
     /**
-     * Return http port suffix
+     * Return http port suffix.
      *
      * @return string
      */
@@ -29,7 +30,7 @@ class CDevSuite_Linux_Site extends CDevSuite_Site {
     }
 
     /**
-     * Return https port suffix
+     * Return https port suffix.
      *
      * @return string
      */
@@ -68,19 +69,23 @@ class CDevSuite_Linux_Site extends CDevSuite_Site {
      *
      * @param string     $url
      * @param null|mixed $siteConf
+     * @param mixed      $certificateExpireInDays
+     * @param mixed      $caExpireInYears
      *
      * @return void
      */
-    public function secure($url, $siteConf = null) {
+    public function secure($url, $siteConf = null, $certificateExpireInDays = 396, $caExpireInYears = 20) {
         $this->unsecure($url);
 
         $this->files->ensureDirExists($this->caPath(), CDevSuite::user());
 
         $this->files->ensureDirExists($this->certificatesPath(), CDevSuite::user());
 
-        $this->createCa();
+        $this->files->ensureDirExists($this->nginxPath(), CDevSuite::user());
+        $caExpireInDate = (new \DateTime())->diff(new \DateTime("+{$caExpireInYears} years"));
+        $this->createCa($caExpireInDate->format('%a'));
 
-        $this->createCertificate($url);
+        $this->createCertificate($url, $certificateExpireInDays);
 
         $this->createSecureNginxServer($url);
     }
@@ -88,9 +93,11 @@ class CDevSuite_Linux_Site extends CDevSuite_Site {
     /**
      * If CA and root certificates are nonexistent, create them and trust the root cert.
      *
+     * @param mixed $caExpireInDays
+     *
      * @return void
      */
-    public function createCa() {
+    public function createCa($caExpireInDays) {
         $caPemPath = $this->caPath('CFDevSuiteCASelfSigned.pem');
         $caKeyPath = $this->caPath('CFDevSuiteCASelfSigned.key');
 
@@ -100,7 +107,6 @@ class CDevSuite_Linux_Site extends CDevSuite_Site {
 
         $oName = 'CF DevSuite CA Self Signed Organization';
         $cName = 'CF DevSuite CA Self Signed CN';
-
         if ($this->files->exists($caKeyPath)) {
             $this->files->unlink($caKeyPath);
         }
@@ -108,23 +114,34 @@ class CDevSuite_Linux_Site extends CDevSuite_Site {
             $this->files->unlink($caPemPath);
         }
         $this->cli->runAsUser(sprintf(
-            'openssl req -new -newkey rsa:2048 -days 730 -nodes -x509 -subj "/O=%s/commonName=%s/organizationalUnitName=Developers/emailAddress=%s/" -keyout "%s" -out "%s"',
+            'openssl req -new -newkey rsa:2048 -days %s -nodes -x509 -subj "/O=%s/commonName=%s/organizationalUnitName=Developers/emailAddress=%s/" -keyout "%s" -out "%s"',
+            $caExpireInDays,
             $oName,
             $cName,
             'rootcertificate@cf.devsuite',
             $caKeyPath,
             $caPemPath
         ));
+        // $this->cli->runAsUser(sprintf(
+        //     'openssl genrsa -des3 -out %s 2048',
+        //     $caKeyPath
+        // ));
+        // $this->cli->runAsUser(sprintf(
+        //     'openssl req -x509 -new -nodes -key %s -sha256 -days 825 -out %s',
+        //     $caKeyPath,
+        //     $caPemPath
+        // ));
     }
 
     /**
      * Create and trust a certificate for the given URL.
      *
      * @param string $url
+     * @param mixed  $caExpireInDays
      *
      * @return void
      */
-    public function createCertificate($url) {
+    public function createCertificate($url, $caExpireInDays) {
         $caPemPath = $this->caPath() . '/CFDevSuiteCASelfSigned.pem';
         $caKeyPath = $this->caPath() . '/CFDevSuiteCASelfSigned.key';
         $caSrlPath = $this->caPath() . '/CFDevSuiteCASelfSigned.srl';
@@ -132,18 +149,18 @@ class CDevSuite_Linux_Site extends CDevSuite_Site {
         $csrPath = $this->certificatesPath() . '/' . $url . '.csr';
         $crtPath = $this->certificatesPath() . '/' . $url . '.crt';
         $confPath = $this->certificatesPath() . '/' . $url . '.conf';
-
         $this->buildCertificateConf($confPath, $url);
         $this->createPrivateKey($keyPath);
         $this->createSigningRequest($url, $keyPath, $csrPath, $confPath);
 
-        $caSrlParam = ' -CAcreateserial';
-        if ($this->files->exists($caSrlPath)) {
-            $caSrlParam = ' -CAserial ' . $caSrlPath;
+        $caSrlParam = '-CAserial "' . $caSrlPath . '"';
+        if (!$this->files->exists($caSrlPath)) {
+            $caSrlParam .= ' -CAcreateserial';
         }
 
         $commandOpenSSL = sprintf(
-            'openssl x509 -req -sha256 -days 365 -CA "%s" -CAkey "%s"%s -in "%s" -out "%s" -extensions v3_req -extfile "%s"',
+            'openssl x509 -req -sha256 -days %s -CA "%s" -CAkey "%s" %s -in "%s" -out "%s" -extensions v3_req -extfile "%s"',
+            $caExpireInDays,
             $caPemPath,
             $caKeyPath,
             $caSrlParam,
@@ -151,6 +168,7 @@ class CDevSuite_Linux_Site extends CDevSuite_Site {
             $crtPath,
             $confPath
         );
+
         $this->cli->runAsUser($commandOpenSSL);
 
         $this->trustCertificate($crtPath, $url);
@@ -271,7 +289,7 @@ class CDevSuite_Linux_Site extends CDevSuite_Site {
     }
 
     /**
-     * Regenerate all secured file configurations
+     * Regenerate all secured file configurations.
      *
      * @return void
      */
@@ -279,5 +297,27 @@ class CDevSuite_Linux_Site extends CDevSuite_Site {
         c::collect($this->secured())->each(function ($url) {
             $this->createSecureNginxServer($url);
         });
+    }
+
+    /**
+     * Trust the given certificate file in the Mac Keychain.
+     *
+     * @param string $crtPath
+     * @param mixed  $url
+     *
+     * @return void
+     */
+    public function trustCertificate($crtPath, $url = null) {
+        $this->cli->runAsUser(sprintf(
+            'certutil -d sql:$HOME/.pki/nssdb -A -t TC -n "%s" -i "%s"',
+            $url,
+            $crtPath
+        ));
+
+        $this->cli->run(sprintf(
+            'certutil -d $HOME/.mozilla/firefox/*.default -A -t TC -n "%s" -i "%s"',
+            $url,
+            $crtPath
+        ));
     }
 }

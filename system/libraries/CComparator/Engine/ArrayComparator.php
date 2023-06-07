@@ -1,11 +1,5 @@
 <?php
 
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
-
 /**
  * Compares arrays for equality.
  *
@@ -14,7 +8,6 @@
  * The types of key-value pairs do not matter.
  */
 class CComparator_Engine_ArrayComparator extends CComparator_AbstractEngine {
-
     /**
      * Returns whether the comparator can compare two values.
      *
@@ -37,7 +30,7 @@ class CComparator_Engine_ArrayComparator extends CComparator_AbstractEngine {
      * @param bool  $ignoreCase   Case is ignored when set to true
      * @param array $processed    List of already processed elements (used to prevent infinite recursion)
      *
-     * @throws ComparisonFailure
+     * @throws CComparator_Exception_ComparisonFailureException
      */
     public function assertEquals($expected, $actual, $delta = 0.0, $canonicalize = false, $ignoreCase = false, array &$processed = []) {
         if ($canonicalize) {
@@ -52,41 +45,60 @@ class CComparator_Engine_ArrayComparator extends CComparator_AbstractEngine {
             unset($remaining[$key]);
             if (!\array_key_exists($key, $actual)) {
                 $expectedAsString .= \sprintf(
-                        "    %s => %s\n", $this->exporter->export($key), $this->exporter->shortenedExport($value)
+                    "    %s => %s\n",
+                    $this->exporter->export($key),
+                    $this->exporter->shortenedExport($value)
                 );
                 $equal = false;
+
                 continue;
             }
+
             try {
                 $comparator = $this->factory->getComparatorFor($value, $actual[$key]);
                 $comparator->assertEquals($value, $actual[$key], $delta, $canonicalize, $ignoreCase, $processed);
                 $expectedAsString .= \sprintf(
-                        "    %s => %s\n", $this->exporter->export($key), $this->exporter->shortenedExport($value)
+                    "    %s => %s\n",
+                    $this->exporter->export($key),
+                    $this->exporter->shortenedExport($value)
                 );
                 $actualAsString .= \sprintf(
-                        "    %s => %s\n", $this->exporter->export($key), $this->exporter->shortenedExport($actual[$key])
+                    "    %s => %s\n",
+                    $this->exporter->export($key),
+                    $this->exporter->shortenedExport($actual[$key])
                 );
             } catch (CComparator_Exception_ComparisonFailureException $e) {
                 $expectedAsString .= \sprintf(
-                        "    %s => %s\n", $this->exporter->export($key), $e->getExpectedAsString() ? $this->indent($e->getExpectedAsString()) : $this->exporter->shortenedExport($e->getExpected())
+                    "    %s => %s\n",
+                    $this->exporter->export($key),
+                    $e->getExpectedAsString() ? $this->indent($e->getExpectedAsString()) : $this->exporter->shortenedExport($e->getExpected())
                 );
                 $actualAsString .= \sprintf(
-                        "    %s => %s\n", $this->exporter->export($key), $e->getActualAsString() ? $this->indent($e->getActualAsString()) : $this->exporter->shortenedExport($e->getActual())
+                    "    %s => %s\n",
+                    $this->exporter->export($key),
+                    $e->getActualAsString() ? $this->indent($e->getActualAsString()) : $this->exporter->shortenedExport($e->getActual())
                 );
                 $equal = false;
             }
         }
         foreach ($remaining as $key => $value) {
             $actualAsString .= \sprintf(
-                    "    %s => %s\n", $this->exporter->export($key), $this->exporter->shortenedExport($value)
+                "    %s => %s\n",
+                $this->exporter->export($key),
+                $this->exporter->shortenedExport($value)
             );
             $equal = false;
         }
         $expectedAsString .= ')';
         $actualAsString .= ')';
         if (!$equal) {
-            throw new ComparisonFailure(
-            $expected, $actual, $expectedAsString, $actualAsString, false, 'Failed asserting that two arrays are equal.'
+            throw new CComparator_Exception_ComparisonFailureException(
+                $expected,
+                $actual,
+                $expectedAsString,
+                $actualAsString,
+                false,
+                'Failed asserting that two arrays are equal.'
             );
         }
     }
@@ -94,5 +106,4 @@ class CComparator_Engine_ArrayComparator extends CComparator_AbstractEngine {
     protected function indent($lines) {
         return \trim(\str_replace("\n", "\n    ", $lines));
     }
-
 }

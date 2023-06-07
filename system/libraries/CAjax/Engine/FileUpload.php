@@ -1,16 +1,23 @@
 <?php
 
 class CAjax_Engine_FileUpload extends CAjax_Engine {
+    const FOLDER = 'fileupload';
+
+    const FOLDER_INFO = 'fileuploadinfo';
+
     public function execute() {
         $data = $this->ajaxMethod->getData();
         $inputName = carr::get($data, 'inputName');
         $allowedExtension = carr::get($data, 'allowedExtension', []);
         $validationCallback = carr::get($data, 'validationCallback');
+        $withInfo = carr::get($data, 'withInfo', false);
+        $diskName = carr::get($data, 'disk', CF::config('storage.temp'));
         $fileId = '';
         $fileName = '';
         if (isset($_FILES[$inputName], $_FILES[$inputName]['name'])) {
             for ($i = 0; $i < count($_FILES[$inputName]['name']); $i++) {
                 $fileName = $_FILES[$inputName]['name'][$i];
+                //$fileSize = $_FILES[$inputName]['size'][$i];
                 $ext = pathinfo($_FILES[$inputName]['name'][$i], PATHINFO_EXTENSION);
                 if (in_array($ext, ['php', 'sh', 'htm', 'pht'])) {
                     die('Not Allowed X_X');
@@ -36,6 +43,15 @@ class CAjax_Engine_FileUpload extends CAjax_Engine {
 
                 if (!$disk->put($fullfilename, file_get_contents($_FILES[$inputName]['tmp_name'][$i]))) {
                     die('fail upload from ' . $_FILES[$inputName]['tmp_name'][$i] . ' to ' . $fullfilename);
+                }
+
+                if ($withInfo) {
+                    $infoData['filename'] = $fileName;
+                    $infoData['fileId'] = $fileId;
+                    $infoData['temporaryPath'] = $fullfilename;
+                    $infoData['temporaryDisk'] = $diskName;
+                    $infoData['url'] = CTemporary::getUrl(static::FOLDER, $fileId);
+                    $fullfilenameinf = CTemporary::put(static::FOLDER_INFO, json_encode($infoData), $fileId);
                 }
                 $return[] = $fileId;
             }
@@ -77,17 +93,24 @@ class CAjax_Engine_FileUpload extends CAjax_Engine {
                 $filteredData = substr($fileData, strpos($fileData, ',') + 1);
                 $unencodedData = base64_decode($filteredData);
                 $fileId = date('Ymd') . cutils::randmd5() . $extension;
-                $fullfilename = CTemporary::getPath('fileupload', $fileId);
+                $fullfilename = CTemporary::getPath(static::FOLDER, $fileId);
                 $disk = CTemporary::disk();
                 $disk->put($fullfilename, $unencodedData);
-
+                if ($withInfo) {
+                    $infoData['filename'] = $fileName;
+                    $infoData['fileId'] = $fileId;
+                    $infoData['temporaryPath'] = $fullfilename;
+                    $infoData['temporaryDisk'] = $diskName;
+                    $infoData['url'] = CTemporary::getUrl(static::FOLDER, $fileId);
+                    $fullfilenameinf = CTemporary::put(static::FOLDER_INFO, json_encode($infoData), $fileId);
+                }
                 $return[] = $fileId;
             }
         }
         $return = [
             'fileId' => $fileId,
             'fileName' => $fileName,
-            'url' => CTemporary::getUrl('fileupload', $fileId),
+            'url' => CTemporary::getUrl(static::FOLDER, $fileId),
         ];
 
         return json_encode($return);

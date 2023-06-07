@@ -18,6 +18,13 @@ class CWebsocket_Channel {
     protected $connections = [];
 
     /**
+     * The channel name.
+     *
+     * @var CWebSocket_ChannelManager_LocalChannelManager
+     */
+    protected $channelManager;
+
+    /**
      * Create a new instance.
      *
      * @param string $name

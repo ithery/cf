@@ -2,20 +2,15 @@
 
 defined('SYSPATH') or die('No direct access allowed.');
 
-/**
- * @author Hery Kurniawan
- *
- * @since May 17, 2019, 4:23:10 AM
- *
- * @license Ittron Global Teknologi <ittron.co.id>
- */
 use PhpParser\Node;
-use PhpParser\NodeVisitorAbstract;
 use PhpParser\NodeTraverser;
+use PhpParser\NodeVisitorAbstract;
 
 class CConfig_Parser_CommentVisitor extends NodeVisitorAbstract {
     protected $configKey;
+
     protected $currentKeyParts;
+
     protected $comment;
 
     public function __construct($key) {
@@ -40,6 +35,7 @@ class CConfig_Parser_CommentVisitor extends NodeVisitorAbstract {
                     if (strlen($comments) > 0) {
                         $this->comment = $comments;
                     }
+
                     return NodeTraverser::STOP_TRAVERSAL;
                 }
             }
