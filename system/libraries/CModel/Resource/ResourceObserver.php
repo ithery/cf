@@ -16,6 +16,13 @@ class CModel_Resource_ResourceObserver {
         }
     }
 
+    /**
+     * @param CModel $resource
+     *
+     * @see CApp_Model_Resource
+     *
+     * @return void
+     */
     public function updated(CModel $resource) {
         if (is_null($resource->getOriginal('model_id'))) {
             return;
@@ -23,7 +30,9 @@ class CModel_Resource_ResourceObserver {
 
         $original = $resource->getOriginal('manipulations');
 
-        $original = json_decode($original, true);
+        if (is_string($original)) {
+            $original = json_decode($original, true);
+        }
 
         if ($resource->manipulations !== $original) {
             $eventDispatcher = CModel::getEventDispatcher();

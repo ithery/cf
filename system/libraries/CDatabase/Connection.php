@@ -204,6 +204,11 @@ class CDatabase_Connection implements CDatabase_ConnectionInterface {
     protected $platform;
 
     /**
+     * @var CDatabase_Configuration
+     */
+    protected $configuration;
+
+    /**
      * Create a new database connection instance.
      *
      * @param \PDO|\Closure $pdo
@@ -236,6 +241,7 @@ class CDatabase_Connection implements CDatabase_ConnectionInterface {
         if (carr::get($this->config, 'benchmark')) {
             $this->enableQueryLog();
         }
+        $this->configuration = new CDatabase_Configuration();
     }
 
     /**
@@ -2036,5 +2042,14 @@ class CDatabase_Connection implements CDatabase_ConnectionInterface {
 
     public function fetchAll($query, $bindings = []) {
         return $this->query($query, $bindings)->resultArray();
+    }
+
+    /**
+     * Gets the Configuration used by the Connection.
+     *
+     * @return CDatabase_Configuration
+     */
+    public function getConfiguration() {
+        return $this->configuration;
     }
 }
