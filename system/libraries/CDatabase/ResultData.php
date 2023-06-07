@@ -41,7 +41,7 @@ class CDatabase_ResultData implements ArrayAccess, Iterator, Countable {
             }
         }
 
-        if ($this->data->rowCount()) {
+        if ($this->totalRows) {
             // Reset the pointer location to make sure things work properly
             $this->seek(0);
             if ($fetch == PDO::FETCH_CLASS) {

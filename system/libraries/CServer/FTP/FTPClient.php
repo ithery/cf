@@ -1,21 +1,23 @@
 <?php
 
-class CFTP {
-
+class CServer_FTP_FTPClient {
     protected $ftp;
+
     protected $state;
 
-    protected function __construct($url = NULL) {
+    protected $lastResult;
+
+    protected function __construct($url = null) {
         if (!extension_loaded('ftp')) {
-            throw new Exception("PHP extension FTP is not loaded.");
+            throw new Exception('PHP extension FTP is not loaded.');
         }
-        $this->last_result = null;
-        $this->state = array();
+        $this->lastResult = null;
+        $this->state = [];
         if ($url != null) {
             $parts = parse_url($url);
-            $this->connect($parts['host'], empty($parts['port']) ? NULL : (int) $parts['port']);
+            $this->connect($parts['host'], empty($parts['port']) ? null : (int) $parts['port']);
             $this->login($parts['user'], $parts['pass']);
-            $this->pasv(TRUE);
+            $this->pasv(true);
             if (isset($parts['path'])) {
                 $this->chdir($parts['path']);
             }
@@ -28,21 +30,22 @@ class CFTP {
         } else {
             $this->ftp = ftp_connect($host, $port);
         }
-        $this->state['connect'] = array($host, $port, $ssl);
+        $this->state['connect'] = [$host, $port, $ssl];
+
         return $this->ftp;
     }
 
     public function login($username, $password) {
         $result = ftp_login($this->ftp, $username, $password);
-        $this->state['connect'] = array($username, $password);
+        $this->state['connect'] = [$username, $password];
     }
 
     public function __destruct() {
         return @ftp_close($this->ftp);
     }
 
-    public function factory($url = NULL) {
-        return new CFTP($url);
+    public function factory($url = null) {
+        return new CServer_FTP_FTPClient($url);
     }
 
     //get current directory
@@ -55,13 +58,15 @@ class CFTP {
     //return bool
     public function chdir($dir) {
         $result = ftp_chdir($this->ftp, $dir);
-        $this->state['chdir'] = array($this->pwd());
+        $this->state['chdir'] = [$dir];
+
         return $result;
     }
 
     public function cdup() {
         $result = ftp_cdup($this->ftp);
-        $this->state['chdir'] = array($this->pwd());
+        $this->state['cdup'] = [];
+
         return $result;
     }
 
@@ -89,36 +94,40 @@ class CFTP {
 
     //get file list of remote directory, not defined param dir return all files on currenct directory
     //return array
-    public function nlist($dir = ".") {
+    public function nlist($dir = '.') {
         return ftp_nlist($this->ftp, $dir);
     }
 
-    public function file_exists($file) {
+    public function exists($file) {
         return is_array($this->nlist($file));
     }
 
-    public function is_dir($dir) {
+    public function isDirectory($dir) {
         $current = $this->pwd();
-        $error++;
+        $error = 0;
+
         try {
             $this->chdir($dir);
         } catch (Exception $e) {
             $error++;
         }
         $this->chdir($current);
+
         return $error == 0;
     }
 
-    public function mkdir_recursive($dir) {
+    public function mkdirRecursive($dir) {
         $parts = explode('/', $dir);
         $path = '';
         while (!empty($parts)) {
             $path .= array_shift($parts);
+
             try {
-                if ($path !== '')
+                if ($path !== '') {
                     $this->mkdir($path);
+                }
             } catch (Exception $e) {
-                if (!$this->is_dir($path)) {
+                if (!$this->isDirectory($path)) {
                     throw new Exception("Cannot create directory '$path'.");
                 }
             }
@@ -126,7 +135,7 @@ class CFTP {
         }
     }
 
-    public function rmdir($dir) {
+    public function deleteDirectory($dir) {
         return ftp_rmdir($this->ftp, $dir);
     }
 
@@ -134,27 +143,25 @@ class CFTP {
         return ftp_delete($this->ftp, $file);
     }
 
-    public function delete_recursive($path) {
+    public function deleteRecursive($path) {
         if (!$this->delete($path)) {
             foreach ((array) $this->nlist($path) as $file) {
                 if ($file !== '.' && $file !== '..') {
-                    $this->delete_recursive(strpos($file, '/') === FALSE ? "$path/$file" : $file);
+                    $this->deleteRecursive(strpos($file, '/') === false ? "$path/$file" : $file);
                 }
             }
-            $this->rmdir($path);
+            $this->deleteDirectory($path);
         }
     }
 
     public function reconnect() {
-
         @ftp_close($this->ftp); // intentionally @
         foreach ($this->state as $name => $args) {
-            call_user_func_array(array($this, $name), $args);
+            call_user_func_array([$this, $name], $args);
         }
     }
 
     public function pasv($bool) {
         ftp_pasv($this->ftp, $bool);
     }
-
 }

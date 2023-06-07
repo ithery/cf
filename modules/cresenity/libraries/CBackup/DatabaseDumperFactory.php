@@ -6,7 +6,7 @@ class CBackup_DatabaseDumperFactory {
     public static function createFromConnection($dbConnectionName) {
         $dbConfig = $dbConnectionName;
         if (!is_array($dbConfig)) {
-            $dbConfig = CF::config('database.' . $dbConnectionName);
+            $dbConfig = CDatabase_Config::resolve($dbConfig);
         }
         if (!is_array($dbConfig)) {
             throw CBackup_Exception_CannotCreateDatabaseDumperException::unsupportedDriver($dbConnectionName);
@@ -18,13 +18,12 @@ class CBackup_DatabaseDumperFactory {
                 ['read', 'write']
             );
         }
-        $connection = carr::get($dbConfig, 'connection');
-        $driver = carr::get($connection, 'type');
-        $dbName = carr::get($connection, 'database');
-        $username = carr::get($connection, 'user');
-        $password = carr::get($connection, 'pass');
-        $port = carr::get($connection, 'port');
-        $host = carr::first(carr::wrap(carr::get($connection, 'host', '')));
+        $driver = carr::get($dbConfig, 'driver');
+        $dbName = carr::get($dbConfig, 'database');
+        $username = carr::get($dbConfig, 'username');
+        $password = carr::get($dbConfig, 'password');
+        $port = carr::get($dbConfig, 'port');
+        $host = carr::first(carr::wrap(carr::get($dbConfig, 'host', '')));
 
         $dbDumper = static::forDriver($driver)
             ->setHost($host)
@@ -32,7 +31,7 @@ class CBackup_DatabaseDumperFactory {
             ->setUserName($username)
             ->setPassword($password);
         if ($dbDumper instanceof CBackup_Database_Dumper_MySqlDumper) {
-            $dbDumper->setDefaultCharacterSet(carr::get($dbConfig, 'character_set', ''));
+            $dbDumper->setDefaultCharacterSet(carr::get($dbConfig, 'charset', ''));
         }
         if ($dbDumper instanceof CBackup_Database_Dumper_MongoDbDumper) {
             //$dsn = sprintf('mongodb://%s:%s@%s:%s',$username,$password,$host,$port);
@@ -45,6 +44,7 @@ class CBackup_DatabaseDumperFactory {
         if (isset($dbConfig['dump'])) {
             $dbDumper = static::processExtraDumpParameters($dbConfig['dump'], $dbDumper);
         }
+
         return $dbDumper;
     }
 
@@ -56,6 +56,7 @@ class CBackup_DatabaseDumperFactory {
         $driver = strtolower($dbDriver);
         if (isset(static::$custom[$driver])) {
             $customDriver = static::$custom[$driver];
+
             return $customDriver();
         }
         if ($driver === 'mysql' || $driver === 'mysqli' || $driver === 'mariadb') {
@@ -70,6 +71,7 @@ class CBackup_DatabaseDumperFactory {
         if ($driver === 'mongodb') {
             return new CBackup_Database_Dumper_MongoDbDumper();
         }
+
         throw CBackup_Exception_CannotCreateDatabaseDumperException::unsupportedDriver($driver);
     }
 
@@ -82,22 +84,25 @@ class CBackup_DatabaseDumperFactory {
                 static::callMethodOnDumper($dbDumper, $methodName, $methodValue);
             }
         });
+
         return $dbDumper;
     }
 
     protected static function callMethodOnDumper(CBackup_Database_AbstractDumper $dbDumper, $methodName, $methodValue) {
         if (!$methodValue) {
             $dbDumper->$methodName();
+
             return $dbDumper;
         }
         $dbDumper->$methodName($methodValue);
+
         return $dbDumper;
     }
 
     protected static function determineValidMethodName(CBackup_Database_AbstractDumper $dbDumper, $methodName) {
         return c::collect([$methodName, 'set' . ucfirst($methodName)])
-                        ->first(function ($methodName) use ($dbDumper) {
-                            return method_exists($dbDumper, $methodName);
-                        }, '');
+            ->first(function ($methodName) use ($dbDumper) {
+                return method_exists($dbDumper, $methodName);
+            }, '');
     }
 }
