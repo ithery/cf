@@ -3,6 +3,9 @@
 defined('SYSPATH') or die('No direct access allowed.');
 
 // @codingStandardsIgnoreStart
+/**
+ * @deprecated since 1.6 use c::response()->download()
+ */
 class cdownload {
     //@codingStandardsIgnoreEnd
 

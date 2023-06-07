@@ -252,9 +252,6 @@ class Controller_Cresenity extends CController {
     }
 
     public function upload($method = 'temp') {
-        $orgId = CApp_Base::orgId();
-        $db = CDatabase::instance();
-
         $filesInput = $_FILES;
         $fileId = '';
         $fileIdPreview = '';

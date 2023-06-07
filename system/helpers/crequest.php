@@ -2,11 +2,10 @@
 
 defined('SYSPATH') or die('No direct access allowed.');
 
-/**
- * Request helper class.
- */
-
 //@codingStandardsIgnoreStart
+/**
+ * @deprecated since 1.6 use c::request()
+ */
 class crequest {
     /**
      * Returns the HTTP referrer, or the default if the referrer is not set.

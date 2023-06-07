@@ -1020,7 +1020,7 @@ class c {
     }
 
     /**
-     * Get the CDatabase instance.
+     * Get the database connection instance.
      *
      * @param null|string $name
      *

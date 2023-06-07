@@ -30,7 +30,7 @@ class clog {
     public static function login($user_id) {
         $app = CApp::instance();
         $app_id = $app->appId();
-        $db = CDatabase::instance();
+        $db = c::db();
         $ip_address = CHTTP::request()->ip();
         $session_id = CSession::instance()->id();
         $browser = CHTTP::request()->browser()->getBrowser();
@@ -95,10 +95,9 @@ class clog {
         $data_before = json_encode($data_before);
         $data_after = json_encode($data_after);
 
-        $db = CDatabase::instance();
-        $app = CApp::instance();
+        $app = c::app();
         $app_id = $app->appId();
-        $db = CDatabase::instance();
+        $db = c::db();
         $app = CApp::instance();
         $ip_address = CHTTP::request()->ip();
         $session_id = CSession::instance()->id();
@@ -160,8 +159,8 @@ class clog {
     }
 
     public static function backup($user_id, $filename, $directory = '') {
-        $db = CDatabase::instance();
-        $app = CApp::instance();
+        $db = c::db();
+        $app = c::app();
         $org = $app->org();
         $org_id = null;
         if ($org != null) {
@@ -179,8 +178,8 @@ class clog {
     }
 
     public static function cleanup($user_id) {
-        $db = CDatabase::instance();
-        $app = CApp::instance();
+        $db = c::db();
+        $app = c::app();
         $org = $app->org();
         $org_id = null;
         $data = [
