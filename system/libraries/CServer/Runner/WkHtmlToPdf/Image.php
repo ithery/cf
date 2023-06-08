@@ -49,34 +49,34 @@ class CServer_Runner_WkHtmlToPdf_Image {
     /**
      * @var bool whether the PDF was created
      */
-    protected $_isCreated = false;
+    protected $isCreated = false;
 
     /**
-     * @var \mikehaertl\tmp\File|string the page input or a `File` instance for
-     *                                  HTML string inputs
+     * @var \CRunner_WkHtmlToPdf_TmpFile|string the page input or a `File` instance for
+     *                                          HTML string inputs
      */
-    protected $_page;
+    protected $page;
 
     /**
      * @var array options for `wkhtmltoimage` as `['--opt1', '--opt2' => 'val',
      *            ...]`
      */
-    protected $_options = [];
+    protected $options = [];
 
     /**
      * @var CRunner_WkHtmlToPdf_TmpFile the temporary image file
      */
-    protected $_tmpImageFile;
+    protected $tmpImageFile;
 
     /**
-     * @var Command the command instance that executes wkhtmltopdf
+     * @var CRunner_WkHtmlToPdf_Command the command instance that executes wkhtmltopdf
      */
-    protected $_command;
+    protected $command;
 
     /**
      * @var string the detailed error message. Empty string if none.
      */
-    protected $_error = '';
+    protected $error = '';
 
     /**
      * @param array|string $options global options for wkhtmltoimage, a page
@@ -98,7 +98,7 @@ class CServer_Runner_WkHtmlToPdf_Image {
      * @return static the Image instance for method chaining
      */
     public function setPage($page) {
-        $this->_page = preg_match(self::REGEX_HTML, $page) ? new File($page, '.html') : $page;
+        $this->page = preg_match(self::REGEX_HTML, $page) ? new File($page, '.html') : $page;
 
         return $this;
     }
@@ -111,12 +111,12 @@ class CServer_Runner_WkHtmlToPdf_Image {
      * @return bool whether image was created successfully
      */
     public function saveAs($filename) {
-        if (!$this->_isCreated && !$this->createImage()) {
+        if (!$this->isCreated && !$this->createImage()) {
             return false;
         }
-        if (!$this->_tmpImageFile->saveAs($filename)) {
-            $tmpFile = $this->_tmpImageFile->getFileName();
-            $this->_error = "Could not copy image from tmp location '$tmpFile' to '$filename'";
+        if (!$this->tmpImageFile->saveAs($filename)) {
+            $tmpFile = $this->tmpImageFile->getFileName();
+            $this->error = "Could not copy image from tmp location '$tmpFile' to '$filename'";
 
             return false;
         }
@@ -125,11 +125,11 @@ class CServer_Runner_WkHtmlToPdf_Image {
     }
 
     public function getTempFilename() {
-        if (!$this->_isCreated && !$this->createImage()) {
+        if (!$this->isCreated && !$this->createImage()) {
             return false;
         }
 
-        return $this->_tmpImageFile->getFileName();
+        return $this->tmpImageFile->getFileName();
     }
 
     /**
@@ -145,10 +145,10 @@ class CServer_Runner_WkHtmlToPdf_Image {
      * @return bool whether image was created successfully
      */
     public function send($filename = null, $inline = false) {
-        if (!$this->_isCreated && !$this->createImage()) {
+        if (!$this->isCreated && !$this->createImage()) {
             return false;
         }
-        $this->_tmpImageFile->send($filename, $this->getMimeType(), $inline);
+        $this->tmpImageFile->send($filename, $this->getMimeType(), $inline);
 
         return true;
     }
@@ -160,19 +160,19 @@ class CServer_Runner_WkHtmlToPdf_Image {
      *                     Image wasn't created successfully
      */
     public function toString() {
-        if (!$this->_isCreated && !$this->createImage()) {
+        if (!$this->isCreated && !$this->createImage()) {
             return false;
         }
 
-        return file_get_contents($this->_tmpImageFile->getFileName());
+        return file_get_contents($this->tmpImageFile->getFileName());
     }
 
     public function getTmpFilename() {
-        if (!$this->_isCreated && !$this->createImage()) {
+        if (!$this->isCreated && !$this->createImage()) {
             return false;
         }
 
-        return $this->_tmpImageFile->getFileName();
+        return $this->tmpImageFile->getFileName();
     }
 
     /**
@@ -185,11 +185,11 @@ class CServer_Runner_WkHtmlToPdf_Image {
     public function setOptions($options = []) {
         foreach ($options as $key => $val) {
             if (is_int($key)) {
-                $this->_options[] = $val;
+                $this->options[] = $val;
             } elseif ($key[0] !== '_' && property_exists($this, $key)) {
                 $this->$key = $val;
             } else {
-                $this->_options[$key] = $val;
+                $this->options[$key] = $val;
             }
         }
 
@@ -200,33 +200,33 @@ class CServer_Runner_WkHtmlToPdf_Image {
      * @return Command the command instance that executes wkhtmltopdf
      */
     public function getCommand() {
-        if ($this->_command === null) {
+        if ($this->command === null) {
             $options = $this->commandOptions;
             if (!isset($options['command'])) {
                 $options['command'] = $this->binary;
             }
-            $this->_command = new Command($options);
+            $this->command = new Command($options);
         }
 
-        return $this->_command;
+        return $this->command;
     }
 
     /**
      * @return string the detailed error message. Empty string if none.
      */
     public function getError() {
-        return $this->_error;
+        return $this->error;
     }
 
     /**
      * @return string the filename of the temporary image file
      */
     public function getImageFilename() {
-        if ($this->_tmpImageFile === null) {
-            $this->_tmpImageFile = new File('', '.' . $this->type, self::TMP_PREFIX);
+        if ($this->tmpImageFile === null) {
+            $this->tmpImageFile = new File('', '.' . $this->type, self::TMP_PREFIX);
         }
 
-        return $this->_tmpImageFile->getFileName();
+        return $this->tmpImageFile->getFileName();
     }
 
     /**
@@ -252,24 +252,24 @@ class CServer_Runner_WkHtmlToPdf_Image {
      * @return bool whether creation was successful
      */
     protected function createImage() {
-        if ($this->_isCreated) {
+        if ($this->isCreated) {
             return false;
         }
 
         $command = $this->getCommand();
         $fileName = $this->getImageFilename();
 
-        $command->addArgs($this->_options);
+        $command->addArgs($this->options);
         // Always escape input and output filename
-        $command->addArg((string) $this->_page, null, true);
+        $command->addArg((string) $this->page, null, true);
         $command->addArg($fileName, null, true);
         if (!$command->execute()) {
-            $this->_error = $command->getError();
+            $this->error = $command->getError();
             if (!(file_exists($fileName) && filesize($fileName) !== 0 && $this->ignoreWarnings)) {
                 return false;
             }
         }
-        $this->_isCreated = true;
+        $this->isCreated = true;
 
         return true;
     }

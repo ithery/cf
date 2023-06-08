@@ -3,14 +3,6 @@
 use CRunner_WkHtmlToPdf_TmpFile as File;
 use CRunner_WkHtmlToPdf_Command as Command;
 
-/**
- * Pdf.
- *
- * This class is a slim wrapper around wkhtmltopdf.
- *
- * @author Michael Härtl <haertl.mike@gmail.com>
- * @license http://www.opensource.org/licenses/MIT
- */
 class CServer_Runner_WkHtmlToPdf_Pdf {
     // Type hints for `addPage()` and `addCover()`
     const TYPE_HTML = 'html';
@@ -68,40 +60,40 @@ class CServer_Runner_WkHtmlToPdf_Pdf {
     /**
      * @var bool whether the PDF was created
      */
-    protected $_isCreated = false;
+    protected $isCreated = false;
 
     /**
      * @var array global options for `wkhtmltopdf` as `['--opt1', '--opt2' =>
      *            'val', ...]`
      */
-    protected $_options = [];
+    protected $options = [];
 
     /**
      * @var array list of wkhtmltopdf objects as arrays
      */
-    protected $_objects = [];
+    protected $objects = [];
 
     /**
-     * @var \mikehaertl\tmp\File the temporary PDF file
+     * @var \CRunner_WkHtmlToPdf_TmpFile the temporary PDF file
      */
-    protected $_tmpPdfFile;
+    protected $tmpPdfFile;
 
     /**
-     * @var \mikehaertl\tmp\File[] list of tmp file objects. This is here to
-     *                             keep a reference to `File` and thus avoid too early call of
-     *                             [[File::__destruct]] if the file is not referenced anymore.
+     * @var \CRunner_WkHtmlToPdf_TmpFile[] list of tmp file objects. This is here to
+     *                                     keep a reference to `File` and thus avoid too early call of
+     *                                     [[File::__destruct]] if the file is not referenced anymore.
      */
-    protected $_tmpFiles = [];
+    protected $tmpFiles = [];
 
     /**
-     * @var Command the command instance that executes wkhtmltopdf
+     * @var CRunner_WkHtmlToPdf_Command the command instance that executes wkhtmltopdf
      */
-    protected $_command;
+    protected $command;
 
     /**
      * @var string the detailed error message. Empty string if none.
      */
-    protected $_error = '';
+    protected $error = '';
 
     /**
      * @param array|string $options global options for wkhtmltopdf, a page URL,
@@ -128,7 +120,7 @@ class CServer_Runner_WkHtmlToPdf_Pdf {
      */
     public function addPage($input, $options = [], $type = null) {
         $options['inputArg'] = $this->ensureUrlOrFile($input, $type);
-        $this->_objects[] = $this->ensureUrlOrFileOptions($options);
+        $this->objects[] = $this->ensureUrlOrFileOptions($options);
 
         return $this;
     }
@@ -147,7 +139,7 @@ class CServer_Runner_WkHtmlToPdf_Pdf {
     public function addCover($input, $options = [], $type = null) {
         $options['input'] = ($this->version9 ? '--' : '') . 'cover';
         $options['inputArg'] = $this->ensureUrlOrFile($input, $type);
-        $this->_objects[] = $this->ensureUrlOrFileOptions($options);
+        $this->objects[] = $this->ensureUrlOrFileOptions($options);
 
         return $this;
     }
@@ -161,7 +153,7 @@ class CServer_Runner_WkHtmlToPdf_Pdf {
      */
     public function addToc($options = []) {
         $options['input'] = ($this->version9 ? '--' : '') . 'toc';
-        $this->_objects[] = $this->ensureUrlOrFileOptions($options);
+        $this->objects[] = $this->ensureUrlOrFileOptions($options);
 
         return $this;
     }
@@ -174,11 +166,11 @@ class CServer_Runner_WkHtmlToPdf_Pdf {
      * @return bool whether PDF was created successfully
      */
     public function saveAs($filename) {
-        if (!$this->_isCreated && !$this->createPdf()) {
+        if (!$this->isCreated && !$this->createPdf()) {
             return false;
         }
-        if (!$this->_tmpPdfFile->saveAs($filename)) {
-            $this->_error = "Could not save PDF as '$filename'";
+        if (!$this->tmpPdfFile->saveAs($filename)) {
+            $this->error = "Could not save PDF as '$filename'";
 
             return false;
         }
@@ -197,10 +189,10 @@ class CServer_Runner_WkHtmlToPdf_Pdf {
      * @return bool whether PDF was created successfully
      */
     public function send($filename = null, $inline = false) {
-        if (!$this->_isCreated && !$this->createPdf()) {
+        if (!$this->isCreated && !$this->createPdf()) {
             return false;
         }
-        $this->_tmpPdfFile->send($filename, 'application/pdf', $inline);
+        $this->tmpPdfFile->send($filename, 'application/pdf', $inline);
 
         return true;
     }
@@ -212,11 +204,11 @@ class CServer_Runner_WkHtmlToPdf_Pdf {
      *                     wasn't created successfully
      */
     public function toString() {
-        if (!$this->_isCreated && !$this->createPdf()) {
+        if (!$this->isCreated && !$this->createPdf()) {
             return false;
         }
 
-        return file_get_contents($this->_tmpPdfFile->getFileName());
+        return file_get_contents($this->tmpPdfFile->getFileName());
     }
 
     /**
@@ -235,11 +227,11 @@ class CServer_Runner_WkHtmlToPdf_Pdf {
         $options = $this->ensureUrlOrFileOptions($options);
         foreach ($options as $key => $val) {
             if (is_int($key)) {
-                $this->_options[] = $val;
+                $this->options[] = $val;
             } elseif ($key[0] !== '_' && property_exists($this, $key)) {
                 $this->$key = $val;
             } else {
-                $this->_options[$key] = $val;
+                $this->options[$key] = $val;
             }
         }
 
@@ -250,33 +242,33 @@ class CServer_Runner_WkHtmlToPdf_Pdf {
      * @return Command the command instance that executes wkhtmltopdf
      */
     public function getCommand() {
-        if ($this->_command === null) {
+        if ($this->command === null) {
             $options = $this->commandOptions;
             if (!isset($options['command'])) {
                 $options['command'] = $this->binary;
             }
-            $this->_command = new Command($options);
+            $this->command = new Command($options);
         }
 
-        return $this->_command;
+        return $this->command;
     }
 
     /**
      * @return string the detailed error message. Empty string if none.
      */
     public function getError() {
-        return $this->_error;
+        return $this->error;
     }
 
     /**
      * @return string the filename of the temporary PDF file
      */
     public function getPdfFilename() {
-        if ($this->_tmpPdfFile === null) {
-            $this->_tmpPdfFile = new File('', '.pdf', self::TMP_PREFIX, $this->tmpDir);
+        if ($this->tmpPdfFile === null) {
+            $this->tmpPdfFile = new File('', '.pdf', self::TMP_PREFIX, $this->tmpDir);
         }
 
-        return $this->_tmpPdfFile->getFileName();
+        return $this->tmpPdfFile->getFileName();
     }
 
     /**
@@ -285,24 +277,24 @@ class CServer_Runner_WkHtmlToPdf_Pdf {
      * @return bool whether creation was successful
      */
     protected function createPdf() {
-        if ($this->_isCreated) {
+        if ($this->isCreated) {
             return false;
         }
         $command = $this->getCommand();
         $fileName = $this->getPdfFilename();
 
-        $command->addArgs($this->_options);
-        foreach ($this->_objects as $object) {
+        $command->addArgs($this->options);
+        foreach ($this->objects as $object) {
             $command->addArgs($object);
         }
         $command->addArg($fileName, null, true);    // Always escape filename
         if (!$command->execute()) {
-            $this->_error = $command->getError();
+            $this->error = $command->getError();
             if (!(file_exists($fileName) && filesize($fileName) !== 0 && $this->ignoreWarnings)) {
                 return false;
             }
         }
-        $this->_isCreated = true;
+        $this->isCreated = true;
 
         return true;
     }
@@ -322,7 +314,7 @@ class CServer_Runner_WkHtmlToPdf_Pdf {
      */
     protected function ensureUrlOrFile($input, $type = null) {
         if ($input instanceof File) {
-            $this->_tmpFiles[] = $input;
+            $this->tmpFiles[] = $input;
 
             return $input;
         } elseif (preg_match(self::REGEX_URL, $input)) {
@@ -344,7 +336,7 @@ class CServer_Runner_WkHtmlToPdf_Pdf {
             $ext = '.html';
         }
         $file = new File($input, $ext, self::TMP_PREFIX, $this->tmpDir);
-        $this->_tmpFiles[] = $file;
+        $this->tmpFiles[] = $file;
 
         return $file;
     }
