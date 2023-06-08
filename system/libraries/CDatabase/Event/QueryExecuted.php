@@ -25,7 +25,7 @@ class CDatabase_Event_QueryExecuted {
     /**
      * The database connection instance.
      *
-     * @var \Illuminate\Database\Connection
+     * @var \CDatabase_Connection
      */
     public $connection;
 

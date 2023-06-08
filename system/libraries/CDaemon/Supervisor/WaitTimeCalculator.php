@@ -69,10 +69,10 @@ class CDaemon_Supervisor_WaitTimeCalculator {
     /**
      * Get all of the queue names.
      *
-     * @param \Illuminate\Support\Collection $supervisors
-     * @param null|string                    $queue
+     * @param \CCollection $supervisors
+     * @param null|string  $queue
      *
-     * @return \Illuminate\Support\Collection
+     * @return \CCollection
      */
     protected function queueNames($supervisors, $queue = null) {
         $queues = $supervisors->map(function ($supervisor) {

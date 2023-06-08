@@ -1,8 +1,5 @@
 <?php
 
-use Laravel\Horizon\Contracts\TagRepository;
-use Illuminate\Contracts\Redis\Factory as RedisFactory;
-
 class CDaemon_Supervisor_Repository_RedisTagRepository implements CDaemon_Supervisor_Contract_TagRepositoryInterface {
     /**
      * The Redis connection instance.

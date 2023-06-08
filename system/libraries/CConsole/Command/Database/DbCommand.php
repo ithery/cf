@@ -1,7 +1,6 @@
 <?php
 
 use Symfony\Component\Process\Process;
-use Illuminate\Support\ConfigurationUrlParser;
 
 class CConsole_Command_Database_DbCommand extends CConsole_Command {
     /**
