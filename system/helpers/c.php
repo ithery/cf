@@ -1790,6 +1790,10 @@ class c {
     public static function resolveUserTimezone(CHTTP_Request $request) {
         return $request->timezone;
     }
+
+    public static function queueable(Closure $closure) {
+        return new CEvent_QueuedClosure($closure);
+    }
 }
 
 // End c
