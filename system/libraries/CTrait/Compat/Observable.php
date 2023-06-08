@@ -410,22 +410,6 @@ trait CTrait_Compat_Observable {
     /**
      * Add TabStaticList.
      *
-     * @param string $tabs_id
-     *
-     * @return CTabStaticList
-     *
-     * @deprecated 1.2
-     */
-    public function addTabStaticList($tabs_id = '') {
-        $tabs = CTabStaticList::factory($tabs_id);
-        $this->add($tabs);
-
-        return $tabs;
-    }
-
-    /**
-     * Add TabStaticList.
-     *
      * @param string $id
      *
      * @return CBasicSpan
