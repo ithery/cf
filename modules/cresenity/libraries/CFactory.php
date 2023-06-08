@@ -50,26 +50,6 @@ class CFactory {
         return $tabs;
     }
 
-    public static function create_tab_static_list($tabs_id = '') {
-        $tabs = CTabStaticList::factory($tabs_id);
-
-        return $tabs;
-    }
-
-    public static function create_ajax() {
-        //$ajax = CAjaxObject::factory();
-
-        //return $ajax;
-        return null;
-    }
-
-    public static function create_elm($tag, $id = '') {
-        // $tag = CCustomElement::factory($tag, $id);
-
-        // return $tag;
-        return null;
-    }
-
     public static function create_div($id = '') {
         $div = CDivElement::factory($id);
 

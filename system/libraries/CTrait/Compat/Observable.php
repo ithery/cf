@@ -226,24 +226,12 @@ trait CTrait_Compat_Observable {
     /**
      * @param string $tabs_id
      *
-     * @return CTabList
+     * @return CElement_List_TabList
      *
      * @deprecated since 1.2
      */
     public function add_tab_list($tabs_id = '') {
         return $this->addTabList($tabs_id);
-    }
-
-    /**
-     * @param string $id
-     * @param mixed  $tabs_id
-     *
-     * @deprecated since 1.2
-     *
-     * @return $this
-     */
-    public function add_tab_static_list($tabs_id = '') {
-        return $this->addTabStaticList($tabs_id);
     }
 
     public function add_elm($tag, $id = '') {
