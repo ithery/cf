@@ -161,10 +161,4 @@ class CFactory {
 
         return $act;
     }
-
-    public static function create_pie_chart($id = '') {
-        $pie_chart = CPieChartElement::factory($id);
-
-        return $pie_chart;
-    }
 }

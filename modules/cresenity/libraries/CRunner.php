@@ -1,5 +1,7 @@
 <?php
-
+/**
+ * @deprecated since 1.6 use CServer_Runner
+ */
 class CRunner {
     /**
      * @param array $options

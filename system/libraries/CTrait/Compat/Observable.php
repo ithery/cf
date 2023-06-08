@@ -330,10 +330,6 @@ trait CTrait_Compat_Observable {
         return $this->addAction($id);
     }
 
-    public function add_pie_chart($id = '') {
-        return $this->addPieChart($id);
-    }
-
     /**
      * @deprecated since version 1.2, please use function addDashboard
      *
@@ -388,20 +384,6 @@ trait CTrait_Compat_Observable {
         $this->add($span);
 
         return $span;
-    }
-
-    /**
-     * @param string $id
-     *
-     * @return CPieChartElement
-     *
-     * @deprecated
-     */
-    public function addPieChart($id = '') {
-        $pie_chart = CPieChartElement::factory($id);
-        $this->add($pie_chart);
-
-        return $pie_chart;
     }
 
     /**
