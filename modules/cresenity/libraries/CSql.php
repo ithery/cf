@@ -7,10 +7,10 @@ defined('SYSPATH') or die('No direct access allowed.');
  */
 class CSql {
     public static function format($query) {
-        return CSql_Formatter::format($query, false);
+        return CParser_Sql::format($query);
     }
 
     public static function highlight($query) {
-        return CSql_Formatter::highlight($query);
+        return CParser_Sql::highlight($query);
     }
 }

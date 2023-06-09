@@ -179,7 +179,7 @@ class CDevSuite_Db {
         $formatted = false;
         foreach ($sqls as $sql) {
             if ($formatted) {
-                $sql = CSql::format($sql);
+                $sql = CParser_Sql::format($sql);
             }
             $sqlString .= PHP_EOL . ($sql . ';') . PHP_EOL;
         }
