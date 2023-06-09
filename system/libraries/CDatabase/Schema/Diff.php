@@ -79,7 +79,7 @@ class CDatabase_Schema_Diff {
      * @param CDatabase_Schema_Table[]     $newTables
      * @param CDatabase_Schema_TableDiff[] $changedTables
      * @param CDatabase_Schema_Table[]     $removedTables
-     * @param CDatabase_Schema|null        $fromSchema
+     * @param null|CDatabase_Schema        $fromSchema
      */
     public function __construct($newTables = [], $changedTables = [], $removedTables = [], CDatabase_Schema $fromSchema = null) {
         $this->newTables = $newTables;
@@ -89,7 +89,7 @@ class CDatabase_Schema_Diff {
     }
 
     /**
-     * The to save sql mode ensures that the following things don't happen:
+     * The to save sql mode ensures that the following things don't happen:.
      *
      * 1. Tables are deleted
      * 2. Sequences are deleted
@@ -120,7 +120,9 @@ class CDatabase_Schema_Diff {
      *
      * @return array
      */
+    //@codingStandardsIgnoreStart
     protected function _toSql(CDatabase_Platform $platform, $saveMode = false) {
+        //@codingStandardsIgnoreEnd
         $sql = [];
 
         if ($platform->supportsSchemas()) {

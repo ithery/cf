@@ -35,7 +35,7 @@ class CDatabase_Schema_Comparator {
      * @param CDatabase_Schema $fromSchema
      * @param CDatabase_Schema $toSchema
      *
-     * @return CDatabase_Schema_SchemaDiff
+     * @return CDatabase_Schema_Diff
      */
     public function compare(CDatabase_Schema $fromSchema, CDatabase_Schema $toSchema) {
         $diff = new CDatabase_Schema_Diff();
@@ -206,6 +206,7 @@ class CDatabase_Schema_Comparator {
             if (!$table2->hasColumn($columnName)) {
                 $tableDifferences->removedColumns[$columnName] = $column;
                 $changes++;
+
                 continue;
             }
 
@@ -241,6 +242,7 @@ class CDatabase_Schema_Comparator {
             if (($index->isPrimary() && !$table2->hasPrimaryKey()) || !$index->isPrimary() && !$table2->hasIndex($indexName)) {
                 $tableDifferences->removedIndexes[$indexName] = $index;
                 $changes++;
+
                 continue;
             }
 
@@ -490,7 +492,7 @@ class CDatabase_Schema_Comparator {
     }
 
     /**
-     * TODO: kill with fire on v3.0
+     * TODO: kill with fire on v3.0.
      *
      * @deprecated
      */

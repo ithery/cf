@@ -2011,6 +2011,17 @@ class CDatabase_Connection implements CDatabase_ConnectionInterface {
     }
 
     /**
+     * Gets the DatabasePlatform for the connection.
+     *
+     * @throws CDatabase_Exception
+     *
+     * @return CDatabase_Platform
+     */
+    public function getDefaultDatabasePlatform() {
+        throw new Exception('Default Database platform is not implemented on this connection');
+    }
+
+    /**
      * Detects and sets the database platform.
      *
      * Evaluates custom platform class and version in order to set the correct platform.
@@ -2025,7 +2036,7 @@ class CDatabase_Connection implements CDatabase_ConnectionInterface {
 
             $this->platform = $this->createDatabasePlatformForVersion($version);
         } else {
-            $this->platform = $this->getDatabasePlatform();
+            $this->platform = $this->getDefaultDatabasePlatform();
         }
 
         $this->platform->setEventManager($this->events);
@@ -2069,7 +2080,8 @@ class CDatabase_Connection implements CDatabase_ConnectionInterface {
     }
 
     public function fetchAll($query, $bindings = []) {
-        return $this->select($query, $bindings);
+        //dont change this to select because this method should return PDO::FETCH_ASSOC
+        return $this->query($query, $bindings)->fetchAll();
     }
 
     /**

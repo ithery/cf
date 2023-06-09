@@ -1,6 +1,6 @@
 <?php
 
-class CDatabase_Connection_Pdo_MySqlConnection extends CDatabase_Connection {
+class CDatabase_Connection_Pdo_MySqlConnection extends CDatabase_Connection implements CDatabase_Contract_VersionAwarePlatformInterface, CDatabase_Driver_ServerInfoAwareInterface {
     /**
      * Escape a binary value for safe SQL embedding.
      *
@@ -117,7 +117,7 @@ class CDatabase_Connection_Pdo_MySqlConnection extends CDatabase_Connection {
             }
         }
 
-        return $this->getDatabasePlatform();
+        return $this->getDefaultDatabasePlatform();
     }
 
     /**
@@ -179,7 +179,11 @@ class CDatabase_Connection_Pdo_MySqlConnection extends CDatabase_Connection {
      *
      * @return CDatabase_Platform_MySql
      */
-    public function getDatabasePlatform() {
+    public function getDefaultDatabasePlatform() {
         return new CDatabase_Platform_MySql();
+    }
+
+    public function requiresQueryForServerVersion() {
+        return false;
     }
 }
