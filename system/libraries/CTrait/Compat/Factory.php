@@ -45,19 +45,6 @@ trait CTrait_Compat_Factory {
     }
 
     /**
-     * @param string $calendarId
-     *
-     * @deprecated since version 1.2, dont use this anymore
-     *
-     * @return CCalendar
-     */
-    public static function create_calendar($calendarId = '') {
-        $calendar = CCalendar::factory($calendarId);
-
-        return $calendar;
-    }
-
-    /**
      * @param string $id
      *
      * @deprecated since version 1.2, please use createNestable
