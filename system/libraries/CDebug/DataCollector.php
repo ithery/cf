@@ -260,7 +260,7 @@ abstract class CDebug_DataCollector implements CDebug_Contract_DataCollectorInte
         $excludedPaths = [
             '/system/core/',
             '/system/libraries/',
-            '/modules/cresenity/libraries/CDebug/',
+            '/system/vendor/',
         ];
         $normalizedPath = str_replace('\\', '/', $file);
         foreach ($excludedPaths as $excludedPath) {

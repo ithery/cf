@@ -183,7 +183,7 @@ class CApp_Navigation_Helper {
      * @return bool
      */
     public static function havePermission($action, $nav = null, $roleId = null, $appId = null, $domain = null) {
-        $app = CApp::instance();
+        $app = c::app();
         if ($roleId == null) {
             $role = $app->role();
             if ($role == null) {
@@ -195,18 +195,16 @@ class CApp_Navigation_Helper {
             $appId = $app->appId();
         }
 
-        $db = CDatabase::instance(null, null, $domain);
-
+        if ($role == null) {
+            $role = CApp_Auth_Role::getModel($roleId);
+        }
         /** @var CApp_Model_Roles $role */
-        $role = CApp_Auth_Role::getModel($roleId);
         if ($role == null) {
             return false;
         }
         if ($role != null && $role->parent_id == null) {
             return true;
         }
-
-        $db = CDatabase::instance(null, null, $domain);
 
         return $role->rolePermission()->where('name', '=', $action)->where('app_id', '=', $appId)->count() > 0;
     }
