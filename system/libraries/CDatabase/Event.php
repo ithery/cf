@@ -28,18 +28,13 @@ class CDatabase_Event {
     /**
      * Create a new event instance.
      *
-     * @param CDatabase_Connection $db
-     * @param mixed                $connection
+     * @param CDatabase_Connection $connection
      *
      * @return void
      */
     public function __construct($connection) {
         $this->connection = $connection;
         $this->connectionName = $connection->getName();
-    }
-
-    public static function createOnQueryExecutedEvent($sql, $bindings, $time, $rowsCount, $db) {
-        return new CDatabase_Event_QueryExecuted($sql, $bindings, $time, $rowsCount, $db);
     }
 
     public static function dispatch(...$args) {

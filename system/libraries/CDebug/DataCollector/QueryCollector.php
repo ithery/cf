@@ -96,10 +96,10 @@ class CDebug_DataCollector_QueryCollector extends CDebug_DataCollector implement
     }
 
     /**
-     * @param string    $query
-     * @param array     $bindings
-     * @param float     $time
-     * @param CDatabase $db
+     * @param string               $query
+     * @param array                $bindings
+     * @param float                $time
+     * @param CDatabase_Connection $db
      */
     public function addQuery($query, $bindings, $time, $db) {
         $explainResults = [];
@@ -109,11 +109,14 @@ class CDebug_DataCollector_QueryCollector extends CDebug_DataCollector implement
         $hints = $this->performQueryAnalysis($query);
         $bindings = $db->prepareBindings($bindings);
         // Run EXPLAIN on this query (if needed)
-        if ($this->explainQuery && preg_match('/^(' . implode($this->explainTypes) . ') /i', $query)) {
-            $result = $db->query('EXPLAIN ' . $query, $bindings);
-
-            //$statement->execute($bindings);
-            $explainResults = $result->resultArray();
+        $explainQuery = $this->explainQuery || c::request()->cookie('capp-debugbar-explain-query');
+        if ($explainQuery && preg_match('/^(' . implode($this->explainTypes) . ') /i', $query)) {
+            $pdo = $db->getPdo();
+            if ($pdo) {
+                $statement = $pdo->prepare('EXPLAIN ' . $query);
+                $statement->execute($bindings);
+                $explainResults = $statement->fetchAll(\PDO::FETCH_CLASS);
+            }
         }
         $bindings = $this->getDataFormatter()->checkBindings($bindings);
         if (!empty($bindings) && $this->renderSqlWithParams) {
@@ -139,14 +142,16 @@ class CDebug_DataCollector_QueryCollector extends CDebug_DataCollector implement
             'source' => $source,
             'explain' => $explainResults,
             'connection' => $db->getDatabaseName(),
+            'driver' => $db->getConfig('driver'),
             'hints' => $this->showHints ? $hints : null,
             'show_copy' => $this->showCopyButton,
         ];
+
         if ($this->timeCollector !== null) {
-            $plainQuery = $query;
+            $plainQuery = trim($query);
             $plainQuery = str_replace("\n", '', $plainQuery);
             $plainQuery = str_replace("\r", '', $plainQuery);
-            $this->timeCollector->addMeasure($plainQuery, $startTime, $endTime);
+            $this->timeCollector->addMeasure(cstr::limit($plainQuery, 100), $startTime, $endTime);
         }
     }
 

@@ -15,7 +15,6 @@ use Carbon\Carbon;
  * @method string                       getTablePrefix()
  * @method array                        fetchAll($sql, array $params = [])
  * @method bool                         ping()
- * @method CDatabase_DriverInterface    driver()
  * @method CDatabase_Query_Processor    getPostProcessor()
  * @method CDatabase_Query_Builder      newQuery()
  * @method CDatabase_Query_Builder      createQueryBuilder()
