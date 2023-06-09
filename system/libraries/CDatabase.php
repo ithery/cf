@@ -223,6 +223,13 @@ class CDatabase {
         return CDatabase_ConnectionFactory::instance();
     }
 
+    /**
+     * @return CDatabase_Analysis
+     */
+    public static function analysis() {
+        return CDatabase_Analysis::instance();
+    }
+
     public function __call($method, $arguments) {
         return $this->manager()->$method(...$arguments);
     }
