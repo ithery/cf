@@ -23,24 +23,23 @@ class CQC_Runner_DatabaseCheckerRunner extends CQC_RunnerAbstract {
         }
 
         if ($errCode == 0) {
-            $result = $db->query($sql);
-            if ($result->count() > 0) {
-                foreach ($result as $row) {
-                    $messageRow = 'data mismatch with data:' . json_encode($row);
-                    if ($message != null) {
-                        $messageRow = $message;
-                        preg_match_all("/{([\w]*)}/", $messageRow, $matches, PREG_SET_ORDER);
+            $result = $db->select($sql);
 
-                        foreach ($matches as $val) {
-                            $str = $val[1]; //matches str without bracket {}
-                            $bStr = $val[0]; //matches str with bracket {}
-                            $val = isset($row->$str) ? $row->$str : $bStr;
+            foreach ($result as $row) {
+                $messageRow = 'data mismatch with data:' . json_encode($row);
+                if ($message != null) {
+                    $messageRow = $message;
+                    preg_match_all("/{([\w]*)}/", $messageRow, $matches, PREG_SET_ORDER);
 
-                            $messageRow = str_replace($bStr, $val, $messageRow);
-                        }
+                    foreach ($matches as $val) {
+                        $str = $val[1]; //matches str without bracket {}
+                        $bStr = $val[0]; //matches str with bracket {}
+                        $val = isset($row->$str) ? $row->$str : $bStr;
+
+                        $messageRow = str_replace($bStr, $val, $messageRow);
                     }
-                    $data[] = $messageRow;
                 }
+                $data[] = $messageRow;
             }
         }
 

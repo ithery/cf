@@ -39,13 +39,13 @@ class CSession_Handler_DatabaseSessionHandler implements SessionHandlerInterface
     /**
      * Create a new database session handler instance.
      *
-     * @param \CDatabase $connection
-     * @param string     $table
-     * @param int        $seconds
+     * @param \CDatabase_Connection $connection
+     * @param string                $table
+     * @param int                   $seconds
      *
      * @return void
      */
-    public function __construct(CDatabase $connection, $table, $seconds) {
+    public function __construct(CDatabase_Connection $connection, $table, $seconds) {
         $this->table = $table;
         $this->seconds = $seconds;
         $this->connection = $connection;

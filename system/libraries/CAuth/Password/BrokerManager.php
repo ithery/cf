@@ -68,7 +68,7 @@ class CAuth_Password_BrokerManager implements CAuth_Contract_PasswordBrokerFacto
         $connection = isset($config['connection']) ? $config['connection'] : null;
 
         return new CAuth_Password_DatabaseTokenRepository(
-            CDatabase::instance($connection),
+            c::db($connection),
             c::hash()->driver(),
             $config['table'],
             $key,

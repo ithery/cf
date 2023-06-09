@@ -1623,6 +1623,15 @@ class CDatabase_Connection implements CDatabase_ConnectionInterface {
     }
 
     /**
+     * Get  current transaction manager instance on the connection.
+     *
+     * @return CDatabase_TransactionManager
+     */
+    public function getTransactionManager() {
+        return $this->transactionsManager;
+    }
+
+    /**
      * Unset the transaction manager for this connection.
      *
      * @return void

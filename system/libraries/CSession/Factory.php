@@ -113,10 +113,10 @@ class CSession_Factory {
     /**
      * Get the database connection for the database driver.
      *
-     * @return CDatabase
+     * @return CDatabase_Connection
      */
     public function getDatabaseConnection() {
-        return CDatabase::instance(carr::get($this->config, 'storage', 'default'));
+        return c::db(carr::get($this->config, 'storage', 'default'));
     }
 
     /**
