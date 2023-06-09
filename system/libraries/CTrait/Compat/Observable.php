@@ -391,23 +391,6 @@ trait CTrait_Compat_Observable {
     }
 
     /**
-     * Add Calendar.
-     *
-     * @param string $id
-     * @param mixed  $calendar_id
-     *
-     * @return CCalendar
-     *
-     * @deprecated 1.2
-     */
-    public function addCalendar($calendar_id = '') {
-        $calendar = CCalendar::factory($calendar_id);
-        $this->add($calendar);
-
-        return $calendar;
-    }
-
-    /**
      * Add TabStaticList.
      *
      * @param string $id

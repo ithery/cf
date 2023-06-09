@@ -12,6 +12,11 @@ class CDatabase_ResultData implements ArrayAccess, Iterator, Countable {
 
     protected $fetchType = PDO::FETCH_OBJ;
 
+    protected $rows = [
+        PDO::FETCH_OBJ => [],
+        PDO::FETCH_ASSOC => [],
+    ];
+
     public function __construct(PDOStatement $data) {
         $this->data = $data;
 
@@ -74,11 +79,8 @@ class CDatabase_ResultData implements ArrayAccess, Iterator, Countable {
      */
     #[\ReturnTypeWillChange]
     public function offsetExists($offset) {
-        if ($this->totalRows > 0) {
-            $min = 0;
-            $max = $this->totalRows - 1;
-
-            return !($offset < $min or $offset > $max);
+        if ($offset >= 0 && $this->totalRows > 0) {
+            return $offset < $this->totalRows;
         }
 
         return false;
@@ -94,9 +96,13 @@ class CDatabase_ResultData implements ArrayAccess, Iterator, Countable {
         if (!$this->seek($offset)) {
             return false;
         }
-
+        if (isset($this->rows[$this->fetchType][$offset])) {
+            return $this->rows[$this->fetchType][$offset];
+        }
         // Return the row by calling the defined fetching callback
-        return $this->data->fetch($this->fetchType, PDO::FETCH_ORI_ABS, $offset);
+        $this->rows[$this->fetchType][$offset] = $this->data->fetch($this->fetchType, PDO::FETCH_ORI_ABS, $offset);
+
+        return $this->rows[$this->fetchType][$offset];
         //return carr::get($this->data, $offset);
     }
 
