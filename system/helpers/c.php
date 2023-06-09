@@ -280,19 +280,16 @@ class c {
     /**
      * Report an exception.
      *
-     * @param \Throwable $exception
+     * @param \Throwable|string $exception
      *
      * @return void
      */
     public static function report($exception) {
-        if ($exception instanceof Throwable
-            && !$exception instanceof Exception
-        ) {
-            $exception = new FatalThrowableError($exception);
+        if (is_string($exception)) {
+            $exception = new Exception($exception);
         }
 
-        $exceptionHandler = CException::exceptionHandler();
-        $exceptionHandler->report($exception);
+        CException::exceptionHandler()->report($exception);
     }
 
     /**

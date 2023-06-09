@@ -2,6 +2,7 @@
 
 defined('SYSPATH') or die('No direct access allowed.');
 
+use Psr\Log\LogLevel;
 use Whoops\Run as Whoops;
 use Whoops\Handler\HandlerInterface;
 use Symfony\Component\HttpKernel\Exception\HttpException;
@@ -222,9 +223,7 @@ class CException_ExceptionHandler implements CException_ExceptionHandlerInterfac
         ) {
             return;
         }
-        if (is_callable($reportCallable = [$e, 'report'])) {
-            return $this->container->call($reportCallable);
-        }
+
         foreach ($this->reportCallbacks as $reportCallback) {
             if ($reportCallback->handles($e)) {
                 if ($reportCallback($e) === false) {
@@ -234,13 +233,17 @@ class CException_ExceptionHandler implements CException_ExceptionHandlerInterfac
         }
 
         $logger = CLogger::logger();
-
+        // $level = carr::first(
+        //     $this->levels,
+        //     function ($level, $type) use ($e) {
+        //         return $e instanceof $type;
+        //     },
+        //     LogLevel::ERROR
+        // );
+        $context = $this->buildExceptionContext($e);
         $logger->error(
             $e->getMessage(),
-            array_merge(
-                $this->context(),
-                ['exception' => $e]
-            )
+            $context,
         );
     }
 
@@ -271,6 +274,57 @@ class CException_ExceptionHandler implements CException_ExceptionHandlerInterfac
     }
 
     /**
+     * Remove the given exception class from the list of exceptions that should be ignored.
+     *
+     * @param string $exception
+     *
+     * @return $this
+     */
+    public function stopIgnoring(string $exception) {
+        $this->dontReport = c::collect($this->dontReport)
+            ->reject(function ($ignored) use ($exception) {
+                return $ignored === $exception;
+            })->values()->all();
+
+        $this->internalDontReport = c::collect($this->internalDontReport)
+            ->reject(function ($ignored) use ($exception) {
+                return $ignored === $exception;
+            })->values()->all();
+
+        return $this;
+    }
+
+    /**
+     * Create the context array for logging the given exception.
+     *
+     * @param \Throwable $e
+     *
+     * @return array
+     */
+    protected function buildExceptionContext(Throwable $e) {
+        return array_merge(
+            $this->exceptionContext($e),
+            $this->context(),
+            ['exception' => $e]
+        );
+    }
+
+    /**
+     * Get the default exception context variables for logging.
+     *
+     * @param \Throwable $e
+     *
+     * @return array
+     */
+    protected function exceptionContext(Throwable $e) {
+        if (method_exists($e, 'context')) {
+            return $e->context();
+        }
+
+        return [];
+    }
+
+    /**
      * Get the default context variables for logging.
      *
      * @return array
@@ -283,8 +337,9 @@ class CException_ExceptionHandler implements CException_ExceptionHandlerInterfac
                 'appId' => CF::appId(),
                 'orgCode' => CF::orgCode(),
                 'orgId' => CF::orgId(),
+                'userId' => c::auth()->id(),
             ]);
-        } catch (Exception $e) {
+        } catch (Throwable $e) {
             return [];
         }
     }
