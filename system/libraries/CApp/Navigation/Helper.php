@@ -124,7 +124,8 @@ class CApp_Navigation_Helper {
      * @return bool
      */
     protected static function protectedhaveAccess($nav = null, $roleId = null, $appId = null, $domain = null) {
-        $app = CApp::instance();
+        $app = c::app();
+        $role = null;
         if ($roleId == null) {
             $role = $app->role();
             if ($role != null) {
@@ -144,12 +145,12 @@ class CApp_Navigation_Helper {
         if (CApp::isAdministrator()) {
             return true;
         }
-        $db = CDatabase::instance(null, null, $domain);
         if ($roleId == 'PUBLIC') {
             $roleId = null;
         }
-
-        $role = c::app()->getRole($roleId);
+        if ($role == null) {
+            $role = c::app()->getRole($roleId);
+        }
 
         if ($role != null && $role->parent_id == null) {
             //is is superadmin
@@ -184,6 +185,7 @@ class CApp_Navigation_Helper {
      */
     public static function havePermission($action, $nav = null, $roleId = null, $appId = null, $domain = null) {
         $app = c::app();
+        $role = null;
         if ($roleId == null) {
             $role = $app->role();
             if ($role == null) {

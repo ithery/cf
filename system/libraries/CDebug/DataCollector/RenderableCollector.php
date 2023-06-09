@@ -13,7 +13,7 @@ class CDebug_DataCollector_RenderableCollector extends CDebug_DataCollector impl
 
     public function __construct() {
         $this->setDataFormatter(new CDebug_DataFormatter_SimpleFormatter());
-        $db = CDatabase::instance();
+
         try {
             CApp::instance()->listenOnRenderableAdded(function (CApp_Event_OnRenderableAdded $eventArgs) {
                 $this->addRenderable($eventArgs);
@@ -59,10 +59,11 @@ class CDebug_DataCollector_RenderableCollector extends CDebug_DataCollector impl
     }
 
     /**
-     * {@inheritDoc}
+     * @inheritDoc
      */
     public function getWidgets() {
         $name = $this->getName();
+
         return [
             "$name" => [
                 'icon' => 'files-o',
@@ -78,7 +79,7 @@ class CDebug_DataCollector_RenderableCollector extends CDebug_DataCollector impl
     }
 
     /**
-     * {@inheritDoc}
+     * @inheritDoc
      */
     public function getName() {
         return 'renderable';

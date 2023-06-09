@@ -12,15 +12,14 @@ use CApp_Base as Base;
 
 class CApp_Log_Request {
     public static function populate($data = []) {
-        $app = CApp::instance();
-        $db = CDatabase::instance();
+        $db = c::db();
         $appId = Base::appId();
         $orgId = Base::orgId();
         $userId = Base::userId();
         $browser = new CBrowser();
 
         //no need to log ajax request
-        if (CApp::isAjax()) {
+        if (c::request()->ajax()) {
             return false;
         }
         //no need to log on administrator page
@@ -56,9 +55,7 @@ class CApp_Log_Request {
                 }
             }
         }
-        $db = CDatabase::instance();
         $ip_address = Base::remoteAddress();
-        $session_id = CSession::instance()->id();
 
         $platform_version = crequest::platform_version();
         $description = CF::domain();

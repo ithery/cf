@@ -145,7 +145,7 @@ trait CApp_Trait_BaseTrait {
      * @return stdClass of org
      */
     public static function org($org_id = null) {
-        $db = CDatabase::instance();
+        $db = c::db();
 
         if ($org_id == null) {
             $org_id = self::orgId();

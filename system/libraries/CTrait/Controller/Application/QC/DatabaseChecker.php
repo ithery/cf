@@ -15,7 +15,7 @@ trait CTrait_Controller_Application_QC_DatabaseChecker {
 
     public function index() {
         $app = CApp::instance();
-        $db = CDatabase::instance();
+        $db = c::db();
 
         $app->title($this->getTitle());
         $actionContainer = $app->addDiv()->addClass('action-container mb-3');
@@ -44,7 +44,7 @@ trait CTrait_Controller_Application_QC_DatabaseChecker {
         if ($request == null) {
             $request = CApp_Base::getRequest();
         }
-        $db = CDatabase::instance();
+        $db = c::db();
         $listChecker = $qcManager->databaseCheckers();
         $dataChecker = [];
         $groupTab = carr::get($_GET, 'group');
@@ -84,7 +84,7 @@ trait CTrait_Controller_Application_QC_DatabaseChecker {
         if ($request == null) {
             $request = CApp_Base::getRequest();
         }
-        $db = CDatabase::instance();
+        $db = c::db();
         $group = carr::get($request, 'group');
         $listChecker = $qcManager->databaseCheckers($group);
         $dataChecker = [];
@@ -106,6 +106,7 @@ trait CTrait_Controller_Application_QC_DatabaseChecker {
         $errCode = 0;
         $errMessage = '';
         $data = [];
+
         try {
             $data = $runner->run();
         } catch (Exception $ex) {

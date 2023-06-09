@@ -1,23 +1,15 @@
 <?php
 
-defined('SYSPATH') OR die('No direct access allowed.');
+defined('SYSPATH') or die('No direct access allowed.');
 
-/**
- * @author Hery Kurniawan <hery@itton.co.id>
- * @since Oct 7, 2020 
- * @license Ittron Global Teknologi
- */
 class CQC_Runner_DatabaseCheckerRunner extends CQC_RunnerAbstract {
-
     public function run() {
         $className = $this->className;
         $checker = new $className();
 
-
-
         $errCode = 0;
         $errMessage = '';
-        $db = CDatabase::instance();
+        $db = c::db();
         $data = [];
 
         if ($errCode == 0) {
@@ -30,11 +22,7 @@ class CQC_Runner_DatabaseCheckerRunner extends CQC_RunnerAbstract {
             }
         }
 
-
-
-
         if ($errCode == 0) {
-
             $result = $db->query($sql);
             if ($result->count() > 0) {
                 foreach ($result as $row) {
@@ -49,7 +37,6 @@ class CQC_Runner_DatabaseCheckerRunner extends CQC_RunnerAbstract {
                             $val = isset($row->$str) ? $row->$str : $bStr;
 
                             $messageRow = str_replace($bStr, $val, $messageRow);
-              
                         }
                     }
                     $data[] = $messageRow;
@@ -60,7 +47,7 @@ class CQC_Runner_DatabaseCheckerRunner extends CQC_RunnerAbstract {
         if ($errCode > 0) {
             throw new Exception($errMessage);
         }
+
         return $data;
     }
-
 }

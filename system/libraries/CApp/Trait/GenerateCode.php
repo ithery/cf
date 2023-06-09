@@ -12,7 +12,7 @@ defined('SYSPATH') or die('No direct access allowed.');
  //@codingStandardsIgnoreStart
 trait CApp_Trait_GenerateCode {
     public static function _get_next_counter($key_counter) {
-        $db = CDatabase::instance();
+        $db = c::db();
         $next_counter = 1;
         $is_insert = 1;
         $app = CApp::instance();
@@ -40,6 +40,7 @@ trait CApp_Trait_GenerateCode {
             $next_counter = $r[0]->next_counter;
             $is_insert = 0;
         }
+
         return $next_counter;
     }
 
@@ -53,21 +54,27 @@ trait CApp_Trait_GenerateCode {
             switch ($str) {
                 case 'yyyy':
                     $result = str_replace('{yyyy}', date('Y'), $result);
+
                     break;
                 case 'yy':
                     $result = str_replace('{yy}', date('y'), $result);
+
                     break;
                 case 'mm':
                     $result = str_replace('{mm}', date('m'), $result);
+
                     break;
                 case 'dd':
                     $result = str_replace('{dd}', date('d'), $result);
+
                     break;
                 case 'MM':
                     $result = str_replace('{MM}', cutils::month_romawi(date('m')), $result);
+
                     break;
             }
         }
+
         return $result;
     }
 
@@ -78,7 +85,7 @@ trait CApp_Trait_GenerateCode {
     }
 
     protected static function get_format($key) {
-        $db = CDatabase::instance();
+        $db = c::db();
         $ukey = strtoupper($key);
         $q = "select `format` from sys_format_auto_code where `key`='" . $ukey . "'";
         $r = $db->query($q);
@@ -88,11 +95,12 @@ trait CApp_Trait_GenerateCode {
         } else {
             throw new Exception('No Format available for this key[' . $key . ']');
         }
+
         return $result;
     }
 
     public static function _get_next_code_from_format($key_format) {
-        $db = CDatabase::instance();
+        $db = c::db();
         $key_counter = self::_get_key_counter($key_format);
         $result = $key_counter;
         $counter = self::_get_next_counter($key_counter);
@@ -104,6 +112,7 @@ trait CApp_Trait_GenerateCode {
             $pad_counter = str_pad($counter, $len_counter, '0', STR_PAD_LEFT);
             $result = str_replace($b_str, $pad_counter, $result);
         }
+
         return $result;
     }
 }

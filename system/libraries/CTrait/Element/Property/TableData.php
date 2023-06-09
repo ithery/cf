@@ -145,7 +145,7 @@ trait CTrait_Element_Property_TableData {
     public function getTableData() {
         switch ($this->tableDataType) {
             case 'query':
-                $db = CDatabase::instance();
+                $db = c::db();
                 if ($this->isUseTrait('CTrait_Element_Property_Database')) {
                     $db = $this->db();
                 }
