@@ -299,12 +299,17 @@ class CDebug_Bar_Renderer {
         return ($response instanceof StreamedResponse) || ($response instanceof BinaryFileResponse);
     }
 
+    protected function modifyContentJson($json) {
+        $json = array_merge($json, $this->debugBar->getDataAsHeaders('phpdebugbar', 4096, PHP_INT_MAX));
+
+        return $json;
+    }
+
     protected function modifyContent($output) {
-        $jsonHelper = CHelper::json();
         $isJson = false;
         $isJsonp = false;
 
-        if (CApp::isAjax()) {
+        if (c::request()->ajax()) {
             $jsonpRegex = '#^/\*\*/(.+?)\((.+?)\);$#ims';
             $jsonCallback = null;
             $jsonOutput = $output;
@@ -313,14 +318,14 @@ class CDebug_Bar_Renderer {
                 $jsonOutput = carr::get($matches, 2);
                 $jsonCallback = carr::get($matches, 1);
             }
-            if (cstr::startsWith(trim($jsonOutput), '{') && CApp::isAjax()) {
+            if (cstr::startsWith(trim($jsonOutput), '{') && c::request()->ajax()) {
                 $json = null;
 
                 try {
-                    $json = $jsonHelper->parse($jsonOutput);
-                    $json = array_merge($json, $this->debugBar->getDataAsHeaders('phpdebugbar', 4096, PHP_INT_MAX));
+                    $json = json_decode($jsonOutput, true);
+                    $json = $this->modifyContentJson($json);
 
-                    $jsonOutput = $jsonHelper->stringify($json);
+                    $jsonOutput = json_encode($json);
                     $isJson = true;
                 } catch (Exception $ex) {
                 }
@@ -345,12 +350,12 @@ class CDebug_Bar_Renderer {
 
             if (!$renderer->isFileResponse($response)) {
                 if ($response instanceof CHTTP_JsonResponse) {
-                    $output = $response->getContent();
+                    $output = $response->getData(true);
 
                     try {
-                        $output = $this->modifyContent($output);
+                        $output = $this->modifyContentJson($output);
 
-                        $response->setContent($output);
+                        $response->setData($output);
                     } catch (Exception $ex) {
                     }
                 } else {
@@ -370,7 +375,7 @@ class CDebug_Bar_Renderer {
                         $response->original = $original;
                     }
                 }
-                if (CApp::isAjax()) {
+                if (c::request()->ajax()) {
                     $response->headers->set('phpdebugbar-body', 1);
                 }
             }

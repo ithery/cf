@@ -106,6 +106,8 @@ class CApp implements CInterface_Responsable, CInterface_Renderable, CInterface_
 
     private static $haveScrollToTop = null;
 
+    private $coreModuleIsRegistered = false;
+
     public function __construct($domain = null) {
         $this->element = new CApp_Element();
 
@@ -393,37 +395,37 @@ class CApp implements CInterface_Responsable, CInterface_Renderable, CInterface_
         return $this;
     }
 
-    public function registerCoreModules() {
-        $manager = CManager::instance();
-        $theme = CManager::theme()->getCurrentTheme();
-        $themeFile = CF::getFile('themes', $theme);
-        if (file_exists($themeFile)) {
-            $themeData = include $themeFile;
-            $moduleArray = carr::get($themeData, 'client_modules');
-            $cssArray = carr::get($themeData, 'css');
-            $jsArray = carr::get($themeData, 'js');
-            $cs = CClientScript::instance();
-            if ($moduleArray != null) {
-                foreach ($moduleArray as $module) {
-                    $manager->registerThemeModule($module);
-                }
-            }
-            if (ccfg::get('have_clock')) {
-                $manager->registerModule('servertime');
-            }
-            if ($cssArray != null) {
-                foreach ($cssArray as $css) {
-                    $manager->asset()->theme()->registerCssFile($css);
-                }
-            }
-            if ($jsArray != null) {
-                foreach ($jsArray as $js) {
-                    $manager->asset()->theme()->registerJsFiles($js);
-                }
-            }
-        }
+    public function registerCoreModules($force = false) {
+        if ($force || !$this->coreModuleIsRegistered) {
+            $manager = CManager::instance();
+            $theme = CManager::theme()->getCurrentTheme();
+            $themeFile = CF::getFile('themes', $theme);
+            if (file_exists($themeFile)) {
+                $themeData = include $themeFile;
+                $moduleArray = carr::get($themeData, 'client_modules');
+                $cssArray = carr::get($themeData, 'css');
+                $jsArray = carr::get($themeData, 'js');
 
-        $manager->registerModule('block-ui');
+                if ($moduleArray != null) {
+                    foreach ($moduleArray as $module) {
+                        $manager->registerThemeModule($module);
+                    }
+                }
+
+                if ($cssArray != null) {
+                    foreach ($cssArray as $css) {
+                        $manager->asset()->theme()->registerCssFile($css);
+                    }
+                }
+                if ($jsArray != null) {
+                    foreach ($jsArray as $js) {
+                        $manager->asset()->theme()->registerJsFiles($js);
+                    }
+                }
+            }
+
+            $manager->registerModule('block-ui');
+        }
     }
 
     public function reset() {
@@ -596,7 +598,14 @@ class CApp implements CInterface_Responsable, CInterface_Renderable, CInterface_
      */
     public function toResponse($request) {
         if (c::request()->ajax()) {
-            return c::response()->json($this);
+            /** @var CApp $this */
+            if (CDebug::bar()->isEnabled()) {
+                CDebug::bar()->populateAssets();
+            }
+            CFEvent::run('CApp.beforeRender');
+            $this->registerCoreModules();
+
+            return c::response()->json($this->toArray());
         }
 
         return CHTTP::createResponse($this->render());

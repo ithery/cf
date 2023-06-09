@@ -259,7 +259,7 @@ HTML;
         $this->registerCoreModules();
 
         if (c::request()->ajax()) {
-            return $this->json();
+            return $this->toJson();
         }
 
         if (CSession::sessionConfigured()) {
