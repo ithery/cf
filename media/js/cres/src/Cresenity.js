@@ -313,7 +313,6 @@ export default class Cresenity {
                                     $(element).html(data.html);
                                     break;
                             }
-
                             if (data.js && data.js.length > 0) {
                                 let script = this.base64.decode(data.js);
                                 eval(script);
@@ -372,7 +371,6 @@ export default class Cresenity {
         this.reload(options);
     }
     isDebug() {
-        console.log(this.cf.getConfig().environment);
         if(this.cf.getConfig().environment == 'production') {
             return false;
         }

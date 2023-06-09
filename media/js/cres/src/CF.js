@@ -188,9 +188,10 @@ class CF {
 
         if (t == 'js') {
             this.requireJs(toPush, callback);
-        }
-        if (t == 'css') {
+        }else if (t == 'css') {
             this.requireCss(toPush, callback);
+        } else {
+            callback();
         }
     }
     isProduction() {
