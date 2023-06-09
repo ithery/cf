@@ -192,7 +192,7 @@ class CManager_Asset {
                 $i++;
             }
         }
-        $jsBefore = CApp::isAjax() ? '' : $this->varJs();
+        $jsBefore = c::request()->ajax() ? '' : $this->varJs();
 
         return $jsBefore . $this->wrapJs($jsOpen . $js . $jsClose);
     }

@@ -331,7 +331,7 @@ class CDatabase_Connection implements CDatabase_ConnectionInterface {
      * @return \CDatabase_Query_Builder
      */
     public function table($table, $as = null) {
-        return $this->query()->from($table, $as);
+        return $this->newQuery()->from($table, $as);
     }
 
     /**
@@ -340,6 +340,8 @@ class CDatabase_Connection implements CDatabase_ConnectionInterface {
      * @param null|string $query
      * @param array       $bindings
      * @param mixed       $useReadPdo
+     *
+     * @deprecated please use select
      *
      * @return \CDatabase_Query_Builder|CDatabase_ResultData
      */
@@ -1924,77 +1926,42 @@ class CDatabase_Connection implements CDatabase_ConnectionInterface {
         return carr::get(carr::last($this->getQueryLog()), 'compiled');
     }
 
-    public function getRow($query, $bindings = []) {
-        $r = $this->query($query, $bindings);
-        $result = null;
-        if ($r->count() > 0) {
-            $result = $r[0];
+    public function getRow($query, $bindings = [], $useReadPdo = true) {
+        $r = $this->select($query, $bindings, $useReadPdo);
+        if (is_array($r) && count($r) > 0) {
+            return $r[0];
         }
 
-        return $result;
+        return null;
     }
 
     public function getValue($query, $bindings = []) {
-        $r = $this->query($query, $bindings);
-        $result = $r->result(false);
-        $res = [];
+        $row = $this->getRow($query, $bindings);
         $value = null;
-        foreach ($result as $row) {
-            foreach ($row as $k => $v) {
-                $value = $v;
+        if ($row) {
+            $row = (array) $row;
 
-                break;
-            }
-
-            break;
+            return carr::first($row);
         }
 
         return $value;
     }
 
     public function getArray($query, $bindings = []) {
-        $r = $this->query($query, $bindings);
-        $result = $r->result(false);
+        $r = $this->select($query, $bindings);
         $res = [];
-        foreach ($result as $row) {
-            $cnt = 0;
-            $arr_val = '';
-            foreach ($row as $k => $v) {
-                if ($cnt == 0) {
-                    $arr_val = $v;
-                }
-                $cnt++;
-                if ($cnt > 0) {
-                    break;
-                }
-            }
-            $res[] = $arr_val;
+        foreach ($r as $row) {
+            $res[] = carr::first((array) $row);
         }
 
         return $res;
     }
 
     public function getList($query, $bindings = []) {
-        $r = $this->query($query, $bindings);
-        $result = $r->result(false);
-        $res = [];
-        foreach ($result as $row) {
-            $cnt = 0;
-            $arr_key = '';
-            $arr_val = '';
-            foreach ($row as $k => $v) {
-                if ($cnt == 0) {
-                    $arr_key = $v;
-                }
-                if ($cnt == 1) {
-                    $arr_val = $v;
-                }
-                $cnt++;
-                if ($cnt > 1) {
-                    break;
-                }
-            }
-            $res[$arr_key] = $arr_val;
+        $r = $this->select($query, $bindings);
+        foreach ($r as $row) {
+            $row = array_values((array) $row);
+            $res[carr::get($row, 0)] = carr::get($row, 1);
         }
 
         return $res;
@@ -2093,7 +2060,7 @@ class CDatabase_Connection implements CDatabase_ConnectionInterface {
     }
 
     public function fetchAll($query, $bindings = []) {
-        return $this->query($query, $bindings)->fetchAll();
+        return $this->select($query, $bindings);
     }
 
     /**

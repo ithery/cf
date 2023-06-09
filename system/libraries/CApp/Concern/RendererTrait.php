@@ -254,13 +254,14 @@ HTML;
             CDebug::bar()->populateAssets();
         }
         $this->rendered = true;
-        $this->registerCoreModules();
 
         CFEvent::run('CApp.beforeRender');
+        $this->registerCoreModules();
 
         if (c::request()->ajax()) {
             return $this->json();
         }
+
         if (CSession::sessionConfigured()) {
             CView::factory()->share(
                 'errors',
