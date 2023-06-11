@@ -74,14 +74,15 @@ trait CTrait_Controller_Application_Log_System {
                 $tab = $tabList->addTab()
                     ->setLabel($basename)
                     ->addClass('p-0')
-                    ->setAjaxUrl($this->currentUrl() . "systemTable/${year}/${month}/${basename}");
+                    ->setAjaxUrl($this->currentUrl() . "systemTable/${year}/${month}?file=" . urlencode($basename));
             }
         }
 
         return $app;
     }
 
-    public function systemTable($year, $month, $file) {
+    public function systemTable($year, $month) {
+        $file = c::request()->file;
         $app = c::app();
         $path = DOCROOT . 'logs/' . CF::appCode();
 
@@ -141,110 +142,5 @@ trait CTrait_Controller_Application_Log_System {
         $logFile = CLogger::reader()->createLogFile($path);
 
         return $logFile->download();
-    }
-
-    public function logSystem($year = null, $month = null) {
-        $app = c::app();
-        $path = DOCROOT . 'logs/' . cf::appCode();
-        if ($year) {
-            $path .= DS . $year;
-
-            if ($month) {
-                $path .= DS . $month;
-            }
-        }
-        $phpFiles = [];
-
-        try {
-            $directory = new RecursiveDirectoryIterator($path);
-            $iterator = new RecursiveIteratorIterator($directory);
-            $phpFiles = new RegexIterator($iterator, '/^.+[\.php|\.log]$/i', RecursiveRegexIterator::GET_MATCH);
-        } catch (Exception $ex) {
-        }
-
-        $files = [];
-        $report = [];
-        foreach ($phpFiles as $file) {
-            $files[] = carr::get($file, '0');
-        }
-        $files = c::collect($files)->sort()->toArray();
-        foreach ($files as $file) {
-            if (CFile::isDirectory($file)) {
-                continue;
-            }
-            $extension = cstr::substr($file, -3);
-            if ($extension == 'php') {
-                $this->parseFromPhp($file, $report);
-            }
-            if ($extension == 'log') {
-                $this->parseFromLog($file, $report);
-            }
-        }
-
-        $report = array_reverse($report);
-        $table = $app->addTable()->setDataFromArray($report);
-        $table->addColumn('time')->setLabel('Time');
-        $table->addColumn('domain')->setLabel('Domain');
-        $table->addColumn('status')->setLabel('Status');
-        $table->addColumn('message')->setLabel('Message');
-        $table->addRowAction()->setLabel('View Raw')->addClass('btn-primary')->setLink($this->controllerUrl() . 'systemRaw/{filename}');
-        //$table->addHeaderAction()->setLabel('View Raw')->addClass('btn-primary')->setLink($this->controllerUrl() . 'systemRaw/' . $year . '/' . $month);
-
-        return $app;
-    }
-
-    private function parseFromPhp($file, &$report) {
-        $fileContent = file_get_contents($file);
-        $lines = explode("\n", $fileContent);
-
-        foreach ($lines as $line) {
-            //[2023-05-16 20:27:41] development.DEBUG: MySQLi Database Driver Initialized
-            preg_match('#^(.*?) (.*?):(.*?) (.*?)$#ims', $line, $matches);
-
-            if ($matches) {
-                $time = carr::get($matches, 1);
-                $time = trim(str_replace(['[', ']'], '', $time));
-                $domain = '';
-                $status = carr::get($matches, 3);
-                $message = carr::get($matches, 4);
-                $filename = str_replace('.php', '', basename($file));
-                $report[] = [
-                    'time' => $time,
-                    'domain' => $domain,
-                    'status' => $status,
-                    'message' => $message,
-                    'filename' => $filename,
-                ];
-            }
-        }
-    }
-
-    private function parseFromLog($file, &$report) {
-        $logFile = CLogger::reader()->createLogFile($file);
-        $logQuery = $logFile->logs();
-        $query = '';
-        $logQuery->search($query);
-        $perPage = 10;
-        $logs = $logQuery->paginate($perPage);
-        cdbg::dd($logs);
-    }
-
-    public function systemRaw($file) {
-        $app = c::app();
-        $path = DOCROOT . 'logs/' . CF::appCode();
-        $year = substr($file, 0, 4);
-        $month = substr($file, 4, 2);
-        if ($year) {
-            $path .= DS . $year;
-
-            if ($month) {
-                $path .= DS . $month;
-            }
-        }
-        $file = $path . DS . $file . '.php';
-        $content = file_get_contents($file);
-        $app->addPre()->add($content);
-
-        return $app;
     }
 }
