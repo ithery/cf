@@ -127,6 +127,20 @@ class CElement_List_TabList extends CElement_List {
     }
 
     /**
+     * @return CElement_List_TabList
+     */
+    public function setTabPositionLeft() {
+        return $this->setTabPosition('left');
+    }
+
+    /**
+     * @return CElement_List_TabList
+     */
+    public function setTabPositionTop() {
+        return $this->setTabPosition('top');
+    }
+
+    /**
      * @param array $paramRequest
      *
      * @return CElement_List_TabList
