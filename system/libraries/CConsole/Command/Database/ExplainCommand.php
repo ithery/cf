@@ -6,7 +6,7 @@ class CConsole_Command_Database_ExplainCommand extends CConsole_Command {
      *
      * @var string
      */
-    protected $signature = 'db:explain {query : The query to explain}
+    protected $signature = 'db:explain
                {--connection : Connection Name}';
 
     /**
@@ -23,8 +23,8 @@ class CConsole_Command_Database_ExplainCommand extends CConsole_Command {
      */
     public function handle() {
         $db = $this->getConnection();
-        $query = $this->argument('query');
-
+        //$query = $this->argument('query');
+        $query = $this->ask('Please type query');
         $analysis = CDatabase::analysis();
         $explainer = $analysis->setConnection($db)->getExplainer($query);
 
