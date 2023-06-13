@@ -2290,6 +2290,14 @@ abstract class CModel implements ArrayAccess, CInterface_Arrayable, CInterface_J
         if (in_array($method, ['increment', 'decrement'])) {
             return $this->$method(...$parameters);
         }
+        if ($resolver = ($this->relationResolver(static::class, $method))) {
+            return $resolver($this);
+        }
+        if (cstr::startsWith($method, 'through')
+            && method_exists($this, $relationMethod = cstr::of($method)->after('through')->lcfirst()->toString())
+        ) {
+            return $this->through($relationMethod);
+        }
 
         return $this->forwardCallTo($this->newQuery(), $method, $parameters);
     }
