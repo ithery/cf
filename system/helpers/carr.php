@@ -773,6 +773,19 @@ class carr {
     }
 
     /**
+     * Filter items where the value is not null.
+     *
+     * @param array $array
+     *
+     * @return array
+     */
+    public static function whereNotNull($array) {
+        return static::where($array, function ($value) {
+            return !is_null($value);
+        });
+    }
+
+    /**
      * Get all of the given array except for a specified array of keys.
      *
      * @param array        $array
