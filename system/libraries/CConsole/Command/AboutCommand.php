@@ -1,14 +1,13 @@
 <?php
 
-use Symfony\Component\Console\Formatter\OutputFormatterStyle;
 
-class CConsole_Command_StatusCommand extends CConsole_Command {
+class CConsole_Command_AboutCommand extends CConsole_Command {
     /**
      * The name and signature of the console command.
      *
      * @var string
      */
-    protected $signature = 'status {--only= : The section to display}
+    protected $signature = 'about {--only= : The section to display}
     {--json : Output the information as JSON}';
 
     /**
