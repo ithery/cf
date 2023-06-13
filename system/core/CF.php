@@ -104,12 +104,22 @@ final class CF {
         return static::environment() === CBase::ENVIRONMENT_PRODUCTION;
     }
 
-    public static function environment() {
+    public static function getEnvironment() {
         if (defined('IN_PRODUCTION') && IN_PRODUCTION) {
             return CBase::ENVIRONMENT_PRODUCTION;
         }
 
         return c::env('ENVIRONMENT', CBase::ENVIRONMENT_DEVELOPMENT);
+    }
+
+    public static function environment(...$environments) {
+        if (count($environments) > 0) {
+            $patterns = is_array($environments[0]) ? $environments[0] : $environments;
+
+            return cstr::is($patterns, self::getEnvironment());
+        }
+
+        return self::getEnvironment();
     }
 
     /**
