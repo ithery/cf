@@ -2,12 +2,6 @@
 
 defined('SYSPATH') or die('No direct access allowed.');
 
-/**
- * @author Hery Kurniawan
- * @license Ittron Global Teknologi <ittron.co.id>
- *
- * @since Nov 4, 2019, 4:59:02 PM
- */
 class CQueue_CallQueuedHandler {
     /**
      * The bus dispatcher implementation.
@@ -58,7 +52,7 @@ class CQueue_CallQueuedHandler {
 
         $this->dispatchThroughMiddleware($job, $command);
 
-        if (! $job->isReleased() && ! $command instanceof CQueue_Contract_ShouldBeUniqueUntilProcessingInterface) {
+        if (!$job->isReleased() && !$command instanceof CQueue_Contract_ShouldBeUniqueUntilProcessingInterface) {
             $this->ensureUniqueJobLockIsReleased($command);
         }
         if (!$job->hasFailed() && !$job->isReleased()) {
@@ -228,7 +222,7 @@ class CQueue_CallQueuedHandler {
     public function failed(array $data, $e, $uuid) {
         $command = $this->getCommand($data);
 
-        if (! $command instanceof CQueue_Contract_ShouldBeUniqueUntilProcessingInterface) {
+        if (!$command instanceof CQueue_Contract_ShouldBeUniqueUntilProcessingInterface) {
             $this->ensureUniqueJobLockIsReleased($command);
         }
 

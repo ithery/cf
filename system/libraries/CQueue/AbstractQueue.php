@@ -2,12 +2,6 @@
 
 defined('SYSPATH') or die('No direct access allowed.');
 
-/**
- * @author Hery Kurniawan
- * @license Ittron Global Teknologi <ittron.co.id>
- *
- * @since Sep 8, 2019, 4:31:49 AM
- */
 abstract class CQueue_AbstractQueue implements CQueue_QueueInterface {
     use CTrait_Helper_InteractsWithTime;
 
