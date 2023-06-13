@@ -43,7 +43,7 @@ class CQueue_Runner {
 
     public function run($connection = null, $queue = null) {
         if ($connection == null) {
-            $connection = CQueue::config('default');
+            $connection = CQueue::queuer()->getDefaultDriver();
         }
 
         if ($this->downForMaintenance() && $this->getOption('once')) {

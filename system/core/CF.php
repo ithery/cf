@@ -26,7 +26,7 @@ final class CF {
     /**
      * Logger Instance.
      *
-     * @var CLogger logging object
+     * @var CLogger_Logger logging object
      */
     public static $logger;
 
@@ -188,7 +188,7 @@ final class CF {
         spl_autoload_register(['CF', 'autoLoad']);
 
         // Set and test the logger instance, we need to know whats wrong when CF Fail
-        self::$logger = CLogger::instance();
+        self::$logger = CLogger::logger();
 
         // Disable notices and "strict" errors
         $ER = error_reporting(~E_NOTICE & ~E_STRICT);
