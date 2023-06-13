@@ -1,6 +1,8 @@
 <?php
+
 use Predis\Pipeline\Pipeline;
 use Predis\Collection\Iterator\Keyspace;
+use League\Flysystem\Cached\Storage\Predis;
 
 class CRedis_Manager {
     /**
@@ -102,7 +104,7 @@ class CRedis_Manager {
      */
     public function getConnections() {
         return c::collect(CF::config('database.redis'))->filter(function ($conn) {
-            return is_array($conn);
+            return is_array($conn) && isset($conn['host']) && !empty($conn['host']);
         });
     }
 
@@ -121,7 +123,6 @@ class CRedis_Manager {
         $redis = CRedis::instance();
         $currentDriver = $redis->getDriver();
         $redis->setDriver('predis');
-
         $connection = $redis->resolve($this->connection);
 
         $redis->setDriver($currentDriver);
@@ -161,6 +162,9 @@ class CRedis_Manager {
         $client = $this->getConnection();
         $keys = [];
 
+        $predisClient = $client->client();
+        /** @var \Predis\Client $predisClient */
+        $prefix = (string) $predisClient->getOptions()->prefix;
         foreach (new Keyspace($client->client(), $pattern) as $item) {
             $keys[] = $item;
 
@@ -175,19 +179,18 @@ class CRedis_Manager {
         return {KEYS[1], type, ttl}
 LUA;
 
-        $keys = $client->pipeline(function (Pipeline $pipe) use ($keys, $script) {
+        // $result = $client->command('eval', [$script, 1, $keys[0]]);
+        // cdbg::dd($keys[0], $result);
+        $keys = $predisClient->pipeline(function (Pipeline $pipe) use ($keys, $script, $prefix) {
             foreach ($keys as $key) {
-                $pipe->doEval($script, 1, $key);
+                if ($prefix && cstr::startsWith($key, $prefix) && strlen($key) > strlen($prefix)) {
+                    $key = cstr::substr($key, strlen($prefix));
+                }
+                $pipe->eval($script, 1, $key);
             }
         });
 
-        return c::collect($keys)->map(function ($key) {
-            return [
-                'key' => $key[0],
-                'type' => (string) $key[1],
-                'ttl' => $key[2],
-            ];
-        });
+        return $keys;
     }
 
     /**
@@ -198,11 +201,18 @@ LUA;
      * @return array
      */
     public function fetch($key) {
-        if (!$this->getConnection()->exists($key)) {
+        $client = $this->getConnection();
+        $predisClient = $client->client();
+        /** @var \Predis\Client $predisClient */
+        $prefix = (string) $predisClient->getOptions()->prefix;
+        if ($prefix && cstr::startsWith($key, $prefix) && strlen($key) > strlen($prefix)) {
+            $key = cstr::substr($key, strlen($prefix));
+        }
+        if (!$client->exists($key)) {
             return [];
         }
 
-        $type = $this->getConnection()->type($key)->__toString();
+        $type = $client->type($key)->__toString();
 
         /** @var DataType $class */
         $class = $this->{$type}();

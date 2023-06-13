@@ -436,8 +436,8 @@ class cstr {
     /**
      * Determine if a given string starts with a given substring.
      *
-     * @param string       $haystack
-     * @param string|array $needles
+     * @param string       $haystack string to search
+     * @param string|array $needles  substring
      *
      * @return bool
      */
@@ -454,8 +454,8 @@ class cstr {
     /**
      * Determine if a given string ends with a given substring.
      *
-     * @param string       $haystack
-     * @param string|array $needles
+     * @param string       $haystack string to search
+     * @param string|array $needles  substring
      *
      * @return bool
      */

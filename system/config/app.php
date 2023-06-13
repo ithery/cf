@@ -6,7 +6,7 @@ return [
     /**
      * Your app name, it will used for display app identifier when running on framework.
      */
-    'title' => 'CRESENITY',
+    'title' => c::env('APP_NAME', 'CRESENITY'),
     /**
      * Base path of the web site. If this includes a domain, eg: localhost/cresenity/
      * then a full URL will be used, eg: http://localhost/cresenity/. If it only includes

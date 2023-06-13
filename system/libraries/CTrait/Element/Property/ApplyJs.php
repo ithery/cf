@@ -25,6 +25,14 @@ trait CTrait_Element_Property_ApplyJs {
     }
 
     /**
+     * @return $this
+     */
+    public function setApplyJsSelect2() {
+        return $this->setApplyJs('select2');
+    }
+
+
+    /**
      * @return string
      */
     public function getApplyJs() {

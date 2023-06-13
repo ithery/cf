@@ -73,12 +73,22 @@ return [
             'cluster' => c::env('REDIS_CLUSTER', 'redis'),
             'prefix' => c::env('REDIS_PREFIX', cstr::slug(c::env('APP_NAME', 'cf'), '_') . '_database_'),
         ],
-        'cluster' => false,
-        'supervisor' => [
-            'host' => c::env('REDIS_SUPERVISOR_HOST'),
-            'password' => c::env('REDIS_SUPERVISOR_PASSWORD'),
-            'port' => 6379,
-            'database' => 0,
+        'default' => [
+            'url' => c::env('REDIS_URL'),
+            'host' => c::env('REDIS_HOST', '127.0.0.1'),
+            'username' => c::env('REDIS_USERNAME'),
+            'password' => c::env('REDIS_PASSWORD'),
+            'port' => c::env('REDIS_PORT', '6379'),
+            'database' => c::env('REDIS_DB', '0'),
+        ],
+
+        'cache' => [
+            'url' => c::env('REDIS_URL'),
+            'host' => c::env('REDIS_HOST', '127.0.0.1'),
+            'username' => c::env('REDIS_USERNAME'),
+            'password' => c::env('REDIS_PASSWORD'),
+            'port' => c::env('REDIS_PORT', '6379'),
+            'database' => c::env('REDIS_CACHE_DB', '1'),
         ],
 
     ],

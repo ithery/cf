@@ -1,18 +1,11 @@
 <?php
 
-/**
- * Description of Textarea
- *
- * @author Hery Kurniawan
- * @license Ittron Global Teknologi <ittron.co.id>
- *
- * @since Jan 28, 2018, 9:50:24 PM
- */
 class CElement_FormInput_Textarea extends CElement_FormInput {
     use CTrait_Compat_Element_FormInput_Textarea;
     use CTrait_Element_Property_Placeholder;
 
     protected $col;
+
     protected $row;
 
     public function __construct($id) {
@@ -63,11 +56,13 @@ class CElement_FormInput_Textarea extends CElement_FormInput {
 
     public function setCol($col) {
         $this->col = $col;
+
         return $this;
     }
 
     public function setRow($row) {
         $this->row = $row;
+
         return $this;
     }
 }

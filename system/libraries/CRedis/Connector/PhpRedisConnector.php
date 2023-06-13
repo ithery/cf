@@ -32,6 +32,7 @@ class CRedis_Connector_PhpRedisConnector extends CRedis_AbstractConnector {
      */
     public function connectToCluster(array $config, array $clusterOptions, array $options) {
         $options = array_merge($options, $clusterOptions, carr::pull($config, 'options', []));
+
         return new CRedis_Connection_PhpRedisClusterConnection($this->createRedisClusterInstance(
             array_map([$this, 'buildClusterConnectionString'], $config),
             $options
@@ -56,12 +57,12 @@ class CRedis_Connector_PhpRedisConnector extends CRedis_AbstractConnector {
      *
      * @param array $config
      *
-     * @return \Redis
-     *
      * @throws \LogicException
+     *
+     * @return \Redis
      */
     protected function createClient(array $config) {
-        return c::tap(new Redis, function ($client) use ($config) {
+        return c::tap(new Redis(), function ($client) use ($config) {
             $this->establishConnection($client, $config);
             if (!empty($config['password'])) {
                 $client->auth($config['password']);
@@ -120,6 +121,7 @@ class CRedis_Connector_PhpRedisConnector extends CRedis_AbstractConnector {
         if (version_compare(phpversion('redis'), '4.3.0', '>=')) {
             $parameters[] = isset($options['password']) ? $options['password'] : null;
         }
+
         return c::tap(new RedisCluster(...$parameters), function ($client) use ($options) {
             if (!empty($options['prefix'])) {
                 $client->setOption(RedisCluster::OPT_PREFIX, $options['prefix']);

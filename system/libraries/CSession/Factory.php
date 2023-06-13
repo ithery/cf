@@ -7,7 +7,7 @@ class CSession_Factory {
     private static $instance;
 
     /**
-     * @var CConfig
+     * @var array
      */
     private $config;
 
@@ -138,7 +138,7 @@ class CSession_Factory {
      * @return CSession_Handler_CacheBasedSessionHandler
      */
     protected function createCacheHandler($driver) {
-        $store = $this->config->get('session.store') ?: $driver;
+        $store = carr::get($this->config, 'storage') ?: $driver;
 
         return new CSession_Handler_CacheBasedSessionHandler(
             clone c::cache()->store($store),
