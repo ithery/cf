@@ -416,6 +416,17 @@ class CBase_String implements Stringable, ArrayAccess {
     }
 
     /**
+     * Determine if a given string matches a given pattern.
+     *
+     * @param string|iterable<string> $pattern
+     *
+     * @return bool
+     */
+    public function isMatch($pattern) {
+        return cstr::isMatch($pattern, $this->value);
+    }
+
+    /**
      * Get the string matching the given pattern.
      *
      * @param string $pattern
