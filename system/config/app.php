@@ -94,14 +94,7 @@ return [
         'limiters' => [
             'login' => null,
         ],
-        'features' => [
-            CApp_Auth_Features::registration(),
-            CApp_Auth_Features::resetPasswords(),
-            CApp_Auth_Features::emailVerification(),
-            CApp_Auth_Features::updateProfileInformation(),
-            CApp_Auth_Features::updatePasswords(),
-            //CApp_Auth_Features::twoFactorAuthentication(),
-        ],
+
     ],
     'model' => [
         'org' => CApp_Model_Org::class,
