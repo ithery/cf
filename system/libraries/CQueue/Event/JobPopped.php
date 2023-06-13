@@ -1,8 +1,6 @@
 <?php
 
-defined('SYSPATH') or die('No direct access allowed.');
-
-class CQueue_Event_JobProcessed {
+class CQueue_Event_JobPopped {
     /**
      * The connection name.
      *
@@ -13,20 +11,20 @@ class CQueue_Event_JobProcessed {
     /**
      * The job instance.
      *
-     * @var CQueue_AbstractJob
+     * @var null|CQueue_AbstractJob
      */
     public $job;
 
     /**
      * Create a new event instance.
      *
-     * @param string              $connectionName
-     * @param CQueue_JobInterface $job
+     * @param string                   $connectionName
+     * @param null|CQueue_JobInterface $job
      *
      * @return void
      */
     public function __construct($connectionName, $job) {
-        $this->job = $job;
         $this->connectionName = $connectionName;
+        $this->job = $job;
     }
 }
