@@ -1430,11 +1430,11 @@ class CCollection implements ArrayAccess, CInterface_Enumerable, CBase_Contract_
     /**
      * Transform each item in the collection using a callback.
      *
-     * @param callable $callback
+     * @param callable|string $callback
      *
      * @return $this
      */
-    public function transform(callable $callback) {
+    public function transform($callback) {
         $this->items = $this->map($callback)->all();
 
         return $this;
