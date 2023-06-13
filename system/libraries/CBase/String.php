@@ -94,6 +94,17 @@ class CBase_String implements Stringable, ArrayAccess {
     }
 
     /**
+     * Get the character at the specified index.
+     *
+     * @param int $index
+     *
+     * @return string|false
+     */
+    public function charAt($index) {
+        return cstr::charAt($this->value, $index);
+    }
+
+    /**
      * Get the basename of the class path.
      *
      * @return static
