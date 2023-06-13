@@ -32,6 +32,7 @@ class CApi_OAuth_ClientRepository {
      */
     public function __construct(CApi_OAuth $oauth, $personalAccessClientId = null, $personalAccessClientSecret = null) {
         $this->oauth = $oauth;
+
         $this->personalAccessClientId = $personalAccessClientId;
         $this->personalAccessClientSecret = $personalAccessClientSecret;
     }

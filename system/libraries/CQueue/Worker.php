@@ -351,6 +351,9 @@ class CQueue_Worker {
             }
         } catch (Throwable $e) {
             $this->exceptions->report($e);
+            if (CDaemon::isDaemon()) {
+                CDaemon::handleException($e);
+            }
             $this->stopWorkerIfLostConnection($e);
             $this->sleep(1);
         } catch (Exception $e) {

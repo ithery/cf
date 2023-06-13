@@ -78,6 +78,10 @@ class CDaemon {
         }
     }
 
+    public static function handleException($e) {
+        CDaemon_ErrorHandler::daemonException($e);
+    }
+
     /**
      * @param string      $serviceClass
      * @param null|string $domain
