@@ -1,10 +1,12 @@
 <?php
-
+/**
+ * @see CFunction
+ */
 class CFunction_SerializableClosure {
     /**
      * The closure's serializable.
      *
-     * @var \CFunction_SerializableClosure_Contract_Serializable
+     * @var \CFunction_SerializableClosure_Contract_SerializableInterface
      */
     protected $serializable;
 

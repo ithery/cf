@@ -1,8 +1,6 @@
 <?php
 
-use Laravel\SerializableClosure\Exceptions\MissingSecretKeyException;
-
-class CFunction_SerializableClosure_Serializer_SignedSerializer implements CFunction_SerializableClosure_Contract_Serializable {
+class CFunction_SerializableClosure_Serializer_SignedSerializer implements CFunction_SerializableClosure_Contract_SerializableInterface {
     /**
      * The signer that will sign and verify the closure's signature.
      *

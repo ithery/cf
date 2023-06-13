@@ -1,12 +1,6 @@
 <?php
 
-use Laravel\SerializableClosure\SerializableClosure;
-use Laravel\SerializableClosure\Support\ClosureStream;
-use Laravel\SerializableClosure\Support\SelfReference;
-use Laravel\SerializableClosure\Support\ReflectionClosure;
-use Laravel\SerializableClosure\UnsignedSerializableClosure;
-
-class CFunction_SerializableClosure_Serializer_NativeSerializer implements CFunction_SerializableClosure_Contract_Serializable {
+class CFunction_SerializableClosure_Serializer_NativeSerializer implements CFunction_SerializableClosure_Contract_SerializableInterface {
     /**
      * The "key" that marks an array as recursive.
      */

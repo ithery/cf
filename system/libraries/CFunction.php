@@ -158,4 +158,8 @@ class CFunction {
 
         return 'ERROR ON CFUNCTION';
     }
+
+    public static function serializeClosure(Closure $func) {
+        return new CFunction_SerializableClosure($func);
+    }
 }

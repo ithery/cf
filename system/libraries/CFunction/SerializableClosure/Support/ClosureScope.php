@@ -1,7 +1,5 @@
 <?php
 
-use SplObjectStorage;
-
 class CFunction_SerializableClosure_Support_ClosureScope extends SplObjectStorage {
     /**
      * The number of serializations in current scope.

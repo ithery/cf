@@ -1,6 +1,6 @@
 <?php
 
-interface CFunction_SerializableClosure_Contract_Serializable {
+interface CFunction_SerializableClosure_Contract_SerializableInterface {
     /**
      * Resolve the closure with the given arguments.
      *
