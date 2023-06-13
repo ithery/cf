@@ -1441,6 +1441,15 @@ class CCollection implements ArrayAccess, CInterface_Enumerable, CBase_Contract_
     }
 
     /**
+     * Flatten a multi-dimensional associative array with dots.
+     *
+     * @return static
+     */
+    public function dot() {
+        return new static(carr::dot($this->all()));
+    }
+
+    /**
      * Convert a flatten "dot" notation array into an expanded array.
      *
      * @return static
