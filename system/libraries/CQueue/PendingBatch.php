@@ -240,7 +240,7 @@ class CQueue_PendingBatch {
         try {
             $batch = $repository->store($this);
             $batch = $batch->add($this->jobs);
-        } catch (Exception $e) {
+        } catch (Throwable $e) {
             if (isset($batch)) {
                 $repository->delete($batch->id);
             }

@@ -2,12 +2,6 @@
 
 defined('SYSPATH') or die('No direct access allowed.');
 
-/**
- * @author Hery Kurniawan
- * @license Ittron Global Teknologi <ittron.co.id>
- *
- * @since Sep 8, 2019, 4:53:31 AM
- */
 class CQueue_Runner {
     /**
      * The queue worker instance.
@@ -63,7 +57,10 @@ class CQueue_Runner {
         // We need to get the right queue for the connection which is set in the queue
         // configuration file for the application. We will pull it based on the set
         // connection being run for the queue operation currently being executed.
-        $queue = $this->getQueue($connection);
+        if ($queue == null) {
+            $queue = $this->getQueue($connection);
+        }
+
         $this->runWorker(
             $connection,
             $queue
@@ -99,7 +96,7 @@ class CQueue_Runner {
             $this->getOption('memory'),
             $this->getOption('timeout'),
             $this->getOption('sleep'),
-            $this->getOption('maxTries'),
+            $this->getOption('tries'),
             $this->getOption('force'),
             $this->getOption('stopWhenEmpty'),
             $this->getOption('maxJobs'),
@@ -130,6 +127,9 @@ class CQueue_Runner {
             });
             CEvent::dispatcher()->listen(CQueue_Event_JobProcessed::class, function ($event) {
                 $this->writeOutput($event->job, 'success');
+            });
+            CEvent::dispatcher()->listen(CQueue_Event_JobReleasedAfterException::class, function ($event) {
+                $this->writeOutput($event->job, 'released_after_exception');
             });
             CEvent::dispatcher()->listen(CQueue_Event_JobFailed::class, function ($event) {
                 $this->writeOutput($event->job, 'failed');

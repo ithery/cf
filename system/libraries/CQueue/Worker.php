@@ -444,20 +444,9 @@ class CQueue_Worker {
 
             $this->raiseAfterJobEvent($connectionName, $job);
         } catch (Throwable $e) {
+            $this->handleJobException($connectionName, $job, $options, $e);
             if (CDaemon::getRunningService() != null) {
-                CDaemon::log('Run Job Fire Exception');
-                CDaemon::log($e->getMessage());
-                CDaemon::log($e->getTraceAsString());
-            } else {
-                $this->handleJobException($connectionName, $job, $options, $e);
-            }
-        } catch (Exception $e) {
-            if (CDaemon::getRunningService() != null) {
-                CDaemon::log('Run Job Fire Throwable');
-                CDaemon::log($e->getMessage());
-                CDaemon::log($e->getTraceAsString());
-            } else {
-                $this->handleJobException($connectionName, $job, $options, $e);
+                CDaemon::handleException($e);
             }
         }
     }
@@ -504,6 +493,10 @@ class CQueue_Worker {
             if (!$job->isDeleted() && !$job->isReleased() && !$job->hasFailed()) {
                 $job->release($this->calculateBackoff($job, $options));
             }
+            CEvent::dispatcher()->dispatch(new CQueue_Event_JobReleasedAfterException(
+                $connectionName,
+                $job
+            ));
         }
 
         throw $e;

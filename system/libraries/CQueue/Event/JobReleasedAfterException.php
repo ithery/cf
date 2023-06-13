@@ -1,8 +1,6 @@
 <?php
 
-defined('SYSPATH') or die('No direct access allowed.');
-
-class CQueue_Event_JobProcessing {
+class CQueue_Event_JobReleasedAfterException {
     /**
      * The connection name.
      *
@@ -13,15 +11,15 @@ class CQueue_Event_JobProcessing {
     /**
      * The job instance.
      *
-     * @var CQueue_AbstractJob
+     * @var \CQueue_AbstractJob
      */
     public $job;
 
     /**
      * Create a new event instance.
      *
-     * @param string              $connectionName
-     * @param CQueue_JobInterface $job
+     * @param string               $connectionName
+     * @param \CQueue_JobInterface $job
      *
      * @return void
      */

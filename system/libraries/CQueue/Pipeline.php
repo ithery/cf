@@ -1,14 +1,7 @@
 <?php
 
 defined('SYSPATH') or die('No direct access allowed.');
-use Symfony\Component\Debug\Exception\FatalThrowableError;
 
-/**
- * @author Hery Kurniawan
- * @license Ittron Global Teknologi <ittron.co.id>
- *
- * @since Sep 8, 2019, 2:51:59 AM
- */
 class CQueue_Pipeline implements CQueue_PipelineInterface {
     /**
      * The container implementation.
@@ -127,8 +120,6 @@ class CQueue_Pipeline implements CQueue_PipelineInterface {
         return function ($passable) use ($destination) {
             try {
                 return $destination($passable);
-            } catch (Exception $e) {
-                return $this->handleException($passable, $e);
             } catch (Throwable $e) {
                 return $this->handleException($passable, $e);
             }

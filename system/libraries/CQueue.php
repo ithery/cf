@@ -195,8 +195,13 @@ final class CQueue {
     }
 
     public static function run($connection = null, array $options = []) {
+        $queue = null;
+        if (isset($options['queue'])) {
+            $queue = $options['queue'];
+            unset($options['queue']);
+        }
         static::$runner = new CQueue_Runner(CQueue::worker(), null, $options);
-        static::$runner->run($connection);
+        static::$runner->run($connection, $queue);
         static::$runner = null;
     }
 
