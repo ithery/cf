@@ -60,7 +60,7 @@ trait CModel_Relation_Trait_CanBeOneOfMany {
      *
      * @return $this
      */
-    public function ofMany($column = 'id', $aggregate = 'MAX', $relation = null) {
+    public function ofMany($column = null, $aggregate = 'MAX', $relation = null) {
         $this->isOneOfMany = true;
 
         $this->relationName = $relation ?: $this->getDefaultOneOfManyJoinAlias(
@@ -68,6 +68,10 @@ trait CModel_Relation_Trait_CanBeOneOfMany {
         );
 
         $keyName = $this->query->getModel()->getKeyName();
+
+        if (empty($column)) {
+            $column = $keyName;
+        }
 
         $columns = is_string($columns = $column) ? [
             $column => $aggregate,
@@ -134,7 +138,7 @@ trait CModel_Relation_Trait_CanBeOneOfMany {
      *
      * @return $this
      */
-    public function latestOfMany($column = 'id', $relation = null) {
+    public function latestOfMany($column = null, $relation = null) {
         return $this->ofMany(c::collect(carr::wrap($column))->mapWithKeys(function ($column) {
             return [$column => 'MAX'];
         })->all(), 'MAX', $relation);
@@ -148,7 +152,7 @@ trait CModel_Relation_Trait_CanBeOneOfMany {
      *
      * @return $this
      */
-    public function oldestOfMany($column = 'id', $relation = null) {
+    public function oldestOfMany($column = null, $relation = null) {
         return $this->ofMany(c::collect(carr::wrap($column))->mapWithKeys(function ($column) {
             return [$column => 'MIN'];
         })->all(), 'MIN', $relation);
