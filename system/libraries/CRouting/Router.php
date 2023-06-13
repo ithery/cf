@@ -635,16 +635,34 @@ class CRouting_Router {
      * @return array
      */
     public function gatherRouteMiddleware(CRouting_Route $route) {
-        $excluded = c::collect($route->excludedMiddleware())->map(function ($name) {
-            return (array) CMiddleware_MiddlewareNameResolver::resolve($name, $this->middleware, $this->middlewareGroups);
+        return $this->resolveMiddleware($route->gatherMiddleware(), $route->excludedMiddleware());
+    }
+
+    /**
+     * Resolve a flat array of middleware classes from the provided array.
+     *
+     * @param array $middleware
+     * @param array $excluded
+     *
+     * @return array
+     */
+    public function resolveMiddleware(array $middleware, array $excluded = []) {
+        $excluded = c::collect($excluded)->map(function ($name) {
+            return (array) CRouting_MiddlewareNameResolver::resolve($name, $this->middleware, $this->middlewareGroups);
         })->flatten()->values()->all();
 
-        $middleware = c::collect($route->gatherMiddleware())->map(function ($name) {
-            return (array) CMiddleware_MiddlewareNameResolver::resolve($name, $this->middleware, $this->middlewareGroups);
+        $middleware = c::collect($middleware)->map(function ($name) {
+            return (array) CRouting_MiddlewareNameResolver::resolve($name, $this->middleware, $this->middlewareGroups);
         })->flatten()->reject(function ($name) use ($excluded) {
             if (empty($excluded)) {
                 return false;
-            } elseif (in_array($name, $excluded, true)) {
+            }
+
+            if ($name instanceof Closure) {
+                return false;
+            }
+
+            if (in_array($name, $excluded, true)) {
                 return true;
             }
 
@@ -654,9 +672,11 @@ class CRouting_Router {
 
             $reflection = new ReflectionClass($name);
 
-            return c::collect($excluded)->contains(function ($exclude) use ($reflection) {
-                return class_exists($exclude) && $reflection->isSubclassOf($exclude);
-            });
+            return c::collect($excluded)->contains(
+                function ($exclude) use ($reflection) {
+                    return class_exists($exclude) && $reflection->isSubclassOf($exclude);
+                }
+            );
         })->values();
 
         return $this->sortMiddleware($middleware);
@@ -682,7 +702,11 @@ class CRouting_Router {
      * @return \Symfony\Component\HttpFoundation\Response
      */
     public function prepareResponse($request, $response) {
-        return static::toResponse($request, $response);
+        $this->events->dispatch(new CRouting_Event_PreparingResponse($request, $response));
+
+        return c::tap(static::toResponse($request, $response), function ($response) use ($request) {
+            $this->events->dispatch(new CRouting_Event_ResponsePrepared($request, $response));
+        });
     }
 
     /**

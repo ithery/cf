@@ -341,8 +341,6 @@ class CDatabase_Connection implements CDatabase_ConnectionInterface {
      * @param array       $bindings
      * @param mixed       $useReadPdo
      *
-     * @deprecated please use select
-     *
      * @return \CDatabase_Query_Builder|CDatabase_ResultData
      */
     public function query($query = null, $bindings = [], $useReadPdo = true) {
