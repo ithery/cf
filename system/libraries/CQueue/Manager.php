@@ -3,13 +3,6 @@
 defined('SYSPATH') or die('No direct access allowed.');
 
 /**
- * @author Hery Kurniawan
- * @license Ittron Global Teknologi <ittron.co.id>
- *
- * @since Sep 8, 2019, 4:03:10 AM
- */
-
-/**
  * @mixin CQueue_QueueInterface
  */
 class CQueue_Manager implements CQueue_FactoryInterface, CQueue_Contract_MonitorInterface {
