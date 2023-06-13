@@ -4,7 +4,7 @@ defined('SYSPATH') or die('No direct access allowed.');
 
 use Symfony\Component\VarDumper\VarDumper;
 
-class CBase_String implements Stringable {
+class CBase_String implements Stringable, ArrayAccess {
     use CTrait_Macroable;
     use CTrait_Conditionable;
     use CTrait_Tappable;
@@ -1113,6 +1113,63 @@ class CBase_String implements Stringable {
     }
 
     /**
+     * Convert the object to a string when JSON encoded.
+     *
+     * @return string
+     */
+    public function jsonSerialize() {
+        return $this->__toString();
+    }
+
+    /**
+     * Determine if the given offset exists.
+     *
+     * @param mixed $offset
+     *
+     * @return bool
+     */
+    #[ReturnTypeWillChange]
+    public function offsetExists($offset) {
+        return isset($this->value[$offset]);
+    }
+
+    /**
+     * Get the value at the given offset.
+     *
+     * @param mixed $offset
+     *
+     * @return string
+     */
+    public function offsetGet($offset) {
+        return $this->value[$offset];
+    }
+
+    /**
+     * Set the value at the given offset.
+     *
+     * @param mixed $offset
+     * @param mixed $value
+     *
+     * @return void
+     */
+    #[ReturnTypeWillChange]
+    public function offsetSet($offset, $value) {
+        $this->value[$offset] = $value;
+    }
+
+    /**
+     * Unset the value at the given offset.
+     *
+     * @param mixed $offset
+     *
+     * @return void
+     */
+    #[ReturnTypeWillChange]
+    public function offsetUnset($offset) {
+        unset($this->value[$offset]);
+    }
+
+    /**
      * Proxy dynamic properties onto methods.
      *
      * @param string $key
@@ -1121,15 +1178,6 @@ class CBase_String implements Stringable {
      */
     public function __get($key) {
         return $this->{$key}();
-    }
-
-    /**
-     * Convert the object to a string when JSON encoded.
-     *
-     * @return string
-     */
-    public function jsonSerialize() {
-        return $this->__toString();
     }
 
     /**
