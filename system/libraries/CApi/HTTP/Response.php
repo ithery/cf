@@ -1,10 +1,5 @@
 <?php
 
-use Illuminate\Http\JsonResponse;
-use Dingo\Api\Event\ResponseIsMorphing;
-use Dingo\Api\Event\ResponseWasMorphed;
-use Dingo\Api\Transformer\Factory as TransformerFactory;
-use Illuminate\Contracts\Events\Dispatcher as EventDispatcher;
 use Symfony\Component\HttpKernel\Exception\NotAcceptableHttpException;
 
 class CApi_HTTP_Response extends CHTTP_Response {
@@ -94,7 +89,7 @@ class CApi_HTTP_Response extends CHTTP_Response {
     }
 
     /**
-     * Make an API response from an existing Illuminate response.
+     * Make an API response from an existing HTTP response.
      *
      * @param \CHTTP_Response $old
      *

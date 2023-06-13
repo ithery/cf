@@ -1,16 +1,13 @@
 <?php
 
-use Illuminate\Support\Str;
 use Illuminate\Support\HtmlString;
 use Symfony\Component\Mime\Address;
 use PHPUnit\Framework\Assert as PHPUnit;
-use Illuminate\Contracts\Mail\Attachable;
-use Illuminate\Testing\Constraints\SeeInOrder;
+
 use Symfony\Component\Mailer\Header\TagHeader;
 use Symfony\Component\Mailer\Header\MetadataHeader;
-use CEmail_Contract_MailableInterface as MailableContract;
 
-class CEmail_Mailable implements MailableContract, CInterface_Renderable {
+class CEmail_Mailable implements CEmail_Contract_MailableInterface, CInterface_Renderable {
     use CTrait_Conditionable, CTrait_ForwardsCalls, CTrait_Localizable, CTrait_Macroable {
         __call as macroCall;
     }
@@ -279,7 +276,7 @@ class CEmail_Mailable implements MailableContract, CInterface_Renderable {
     protected function buildView() {
         if (isset($this->html)) {
             return array_filter([
-                'html' => new HtmlString($this->html),
+                'html' => new CBase_HtmlString($this->html),
                 'text' => $this->textView ?? null,
             ]);
         }

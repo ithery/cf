@@ -538,7 +538,7 @@ class CDatabase_Query_Grammar_SqlServerGrammar extends CDatabase_Query_Grammar {
     /**
      * Wrap a table in keyword identifiers.
      *
-     * @param \Illuminate\Contracts\Database\Query\Expression|string $table
+     * @param \CDatabase_Query_Expression|string $table
      *
      * @return string
      */

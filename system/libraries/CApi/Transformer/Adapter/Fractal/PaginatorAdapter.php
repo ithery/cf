@@ -6,12 +6,12 @@ class CApi_Transformer_Adapter_Fractal_PaginatorAdapter implements PaginatorInte
     /**
      * The paginator instance.
      *
-     * @var \CPagination_LengthAwarePaginatorInterface
+     * @var \CPagination_LengthAwarePaginatorInterface|CPagination_Paginator
      */
     protected $paginator;
 
     /**
-     * Create a new illuminate pagination adapter.
+     * Create a new  pagination adapter.
      *
      * @param \CPagination_LengthAwarePaginatorInterface $paginator
      *

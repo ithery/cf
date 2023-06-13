@@ -15,7 +15,7 @@ class CApi_HTTP_Request extends CHTTP_Request implements CApi_Contract_HTTP_Requ
     protected $sessionResolver;
 
     /**
-     * Create a new Dingo request instance from an Illuminate request instance.
+     * Create a new Api request instance from an HTTP request instance.
      *
      * @param \CHTTP_Request $old
      *

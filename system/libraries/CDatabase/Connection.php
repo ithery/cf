@@ -1047,7 +1047,7 @@ class CDatabase_Connection implements CDatabase_ConnectionInterface {
     /**
      * Reconnect to the database.
      *
-     * @throws \Illuminate\Database\LostConnectionException
+     * @throws \CDatabase_Exception_LostConnectionException
      *
      * @return mixed|false
      */

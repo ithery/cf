@@ -35,7 +35,7 @@ class CApi_ExceptionHandler implements CApi_Contract_ExceptionHandlerInterface, 
     protected $replacements = [];
 
     /**
-     * The parent Illuminate exception handler instance.
+     * The parent exception handler instance.
      *
      * @var CException_ExceptionHandlerInterface
      */
@@ -147,7 +147,7 @@ class CApi_ExceptionHandler implements CApi_Contract_ExceptionHandlerInterface, 
                 if (!$response instanceof BaseResponse) {
                     $response = new CHTTP_Response($response, $this->getExceptionStatusCode($exception));
                 }
-
+                /** @var CHTTP_Response $response */
                 return $response->withException($exception);
             }
         }
@@ -345,6 +345,7 @@ class CApi_ExceptionHandler implements CApi_Contract_ExceptionHandlerInterface, 
         if ($exception instanceof CAuth_Exception_AuthenticationException) {
             return 401;
         }
+
         return ($exception instanceof HttpExceptionInterface) ? $exception->getStatusCode() : $defaultStatusCode;
     }
 
