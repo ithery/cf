@@ -6,7 +6,7 @@ class CVendor_Xendit_Balance extends CVendor_Xendit_Base {
     }
 
     /**
-     * Instantiate required params for Create
+     * Instantiate required params for Create.
      *
      * @return array
      */
@@ -15,7 +15,7 @@ class CVendor_Xendit_Balance extends CVendor_Xendit_Base {
     }
 
     /**
-     * Instantiate required params for Update
+     * Instantiate required params for Update.
      *
      * @return array
      */
@@ -24,7 +24,7 @@ class CVendor_Xendit_Balance extends CVendor_Xendit_Base {
     }
 
     /**
-     * Available account type
+     * Available account type.
      *
      * @return array
      */
@@ -33,33 +33,66 @@ class CVendor_Xendit_Balance extends CVendor_Xendit_Base {
     }
 
     /**
-     * Validation for account type
+     * Available currency.
      *
-     * @param string $account_type Account type
+     * @return array
+     */
+    public static function currency() {
+        return ['IDR', 'PHP', 'USD'];
+    }
+
+    /**
+     * Validation for account type.
+     *
+     * @param string $accountType Account type
      *
      * @return void
      */
-    public static function validateAccountType($account_type = null) {
-        if (!in_array($account_type, self::accountType())) {
+    public static function validateAccountType($accountType = null) {
+        if (!in_array($accountType, self::accountType())) {
             $msg = 'Account type is invalid. Available types: CASH, TAX, HOLDING';
+
             throw new InvalidArgumentException($msg);
         }
     }
 
     /**
-     * Send GET request to retrieve data
+     * Validation for account type.
      *
-     * @param string $accountType account type (CASH|HOLDING|TAX)
+     * @param string $currency
+     *
+     * @return void
+     */
+    public static function validateCurrency($currency = null) {
+        if (!in_array($currency, self::currency())) {
+            $msg = 'Currency is invalid. Available currency: ' . carr::implodes(',', self::currency());
+
+            throw new InvalidArgumentException($msg);
+        }
+    }
+
+    /**
+     * Send GET request to retrieve data.
+     *
+     * @param string     $accountType account type (CASH|HOLDING|TAX)
+     * @param null|mixed $currency
+     *
+     * @throws CVendor_Xendit_Exception_ApiException
      *
      * @return array[
      *                'balance' => int
      *                ]
-     *
-     * @throws CVendor_Xendit_Exception_ApiException
      */
-    public function getBalance($accountType = null) {
+    public function getBalance($accountType = null, $currency = null) {
         self::validateAccountType($accountType);
-        $url = $this->classUrl() . '?account_type=' . $accountType;
+        self::validateCurrency($currency);
+        $query = carr::query([
+            'account_type' => $accountType,
+            'currency' => $currency
+        ]);
+
+        $url = $this->classUrl() . '?' . $query;
+
         return $this->request('GET', $url);
     }
 }

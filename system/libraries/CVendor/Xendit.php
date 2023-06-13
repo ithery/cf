@@ -242,6 +242,7 @@ class CVendor_Xendit {
      * Send GET request to retrieve data.
      *
      * @param string $accountType account type (CASH|HOLDING|TAX)
+     * @param string $currency    (IDR|PHP|USD)
      *
      * @throws CVendor_Xendit_Exception_ApiException
      *
@@ -249,8 +250,8 @@ class CVendor_Xendit {
      *                'balance' => int
      *                ]
      */
-    public function getBalance($accountType = 'CASH') {
-        return $this->factory()->balance()->getBalance($accountType);
+    public function getBalance($accountType = 'CASH', $currency = 'IDR') {
+        return $this->factory()->balance()->getBalance($accountType, $currency);
     }
 
     public function captureCreditCardPayment($external_id, $token_id, $amount, $capture_options = null) {

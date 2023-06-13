@@ -157,11 +157,11 @@ class CVendor {
      * @return \CVendor_SendGrid
      */
     public static function sendGrid($apiKey = null, $options = []) {
-        if (strlen($apiKey) == 0) {
-            $apiKey = ccfg::get('smtp_password');
-        }
-        if (strlen($apiKey) == 0) {
+        if ($apiKey == null) {
             $apiKey = CF::config('vendor.sendgrid.apiKey');
+        }
+        if ($apiKey == null) {
+            $apiKey = CF::config('app.smtp_password');
         }
 
         return new CVendor_SendGrid($apiKey, $options);
