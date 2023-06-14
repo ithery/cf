@@ -71,7 +71,7 @@ return [
         'client' => c::env('REDIS_CLIENT', 'phpredis'),
         'options' => [
             'cluster' => c::env('REDIS_CLUSTER', 'redis'),
-            'prefix' => c::env('REDIS_PREFIX', cstr::slug(c::env('APP_NAME', 'cf'), '_') . '_database_'),
+            'prefix' => c::env('REDIS_PREFIX', cstr::slug(CF::appCode(), '_') . '_database_'),
         ],
         'default' => [
             'url' => c::env('REDIS_URL'),

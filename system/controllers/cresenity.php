@@ -11,10 +11,6 @@ class Controller_Cresenity extends CController {
         CCron::run();
     }
 
-    public function task() {
-        CJob::cliRunner();
-    }
-
     /**
      * @return void
      */
@@ -25,6 +21,22 @@ class Controller_Cresenity extends CController {
     public function daemon() {
         try {
             CDaemon::cliRunner();
+        } catch (CDaemon_Exception_AlreadyRunningException $ex) {
+            //do nothing when exception is already running
+        }
+    }
+
+    public function supervisor() {
+        try {
+            CDaemon::cliSupervisorRunner();
+        } catch (CDaemon_Exception_AlreadyRunningException $ex) {
+            //do nothing when exception is already running
+        }
+    }
+
+    public function worker() {
+        try {
+            CDaemon::cliWorkerRunner();
         } catch (CDaemon_Exception_AlreadyRunningException $ex) {
             //do nothing when exception is already running
         }

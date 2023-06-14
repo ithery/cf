@@ -441,7 +441,7 @@ class CRedis_Connection_PhpRedisConnection extends CRedis_AbstractConnection {
      *
      * @return mixed
      */
-    public function doEval($script, $numberOfKeys, ...$arguments) {
+    public function eval($script, $numberOfKeys, ...$arguments) {
         return $this->command('eval', [$script, $arguments, $numberOfKeys]);
     }
 

@@ -2,11 +2,26 @@
 use Symfony\Component\Process\Process;
 use Symfony\Component\Process\PhpExecutableFinder;
 
-class CDaemon_Runner {
+class CDaemon_Supervisor_Runner {
+    /**
+     * @var CDaemon_Supervisor_MasterSupervisor
+     */
+    protected $master;
+
     /**
      * @var string
      */
-    protected $serviceClass;
+    protected $name;
+
+    /**
+     * @var string
+     */
+    protected $masterDaemonClass;
+
+    /**
+     * @var string
+     */
+    protected $alias;
 
     /**
      * @var string
@@ -18,9 +33,18 @@ class CDaemon_Runner {
      */
     protected $debug = false;
 
-    public function __construct($serviceClass, $domain = null) {
-        $this->serviceClass = $serviceClass;
+    /**
+     * @var CDaemon_Supervisor_SupervisorOptions
+     */
+    protected $options;
+
+    public function __construct(CDaemon_Supervisor_MasterSupervisor $master, CDaemon_Supervisor_SupervisorOptions $options, $domain = null) {
+        $this->master = $master;
+        $this->options = $options;
         $this->domain = $domain ?: CF::domain();
+        $this->name = $options->name;
+        $this->masterDaemonClass = $master->getDaemonClass();
+        $this->alias = $this->masterDaemonClass ? $this->masterDaemonClass . '-' . $this->name : $this->name;
     }
 
     public function setDebug($bool = true) {
@@ -42,9 +66,6 @@ class CDaemon_Runner {
             throw new Exception('posix extension is required');
         }
 
-        if ($this->isRunning()) {
-            throw new CDaemon_Exception_AlreadyRunningException('daemon is running');
-        }
         if ($isUnix) {
             return $this->runUnix();
         } else {
@@ -52,34 +73,14 @@ class CDaemon_Runner {
         }
     }
 
-    public function isRunning() {
-        if ($pid = $this->getPid()) {
-            $pid = trim($pid);
-
-            return CDaemon_Utils::daemonIsRunningWithPid($pid, $this->serviceClass);
-        }
-
-        return false;
-    }
-
     /**
      * @return string
      */
-    public function getServiceClass() {
-        return $this->serviceClass;
+    public function getName() {
+        return $this->name;
     }
 
-    public function getPid() {
-        $pidFile = CDaemon_Helper::getPidFile($this->serviceClass);
-
-        if ($pidFile && file_exists($pidFile)) {
-            return file_get_contents($pidFile);
-        }
-
-        return false;
-    }
-
-    protected function getCommandToExecuteOnUnix($background = true) {
+    protected function getCommandToExecuteOnUnix($background = false) {
         $command = $this->getExecutableCommand();
         $binary = $this->getPhpBinary();
         $output = $this->debug ? $this->debugOutput() : '/dev/null';
@@ -116,15 +117,15 @@ class CDaemon_Runner {
         return $this->getCommandToExecuteOnWindows($background);
     }
 
+    /**
+     * @return Symfony\Component\Process\Process
+     */
     protected function runUnix() {
         $commandToExecute = $this->getCommandToExecuteOnUnix();
 
-        $process = new Process($commandToExecute);
-        $process->setWorkingDirectory(DOCROOT);
-        $process->run();
-        $result = $process->getExitCode();
-
-        return $result == 0;
+        return Process::fromShellCommandline($commandToExecute, $this->options->directory ?? DOCROOT)
+            ->setTimeout(null)
+            ->disableOutput();
     }
 
     // @codeCoverageIgnoreStart
@@ -156,18 +157,18 @@ class CDaemon_Runner {
      * @return string
      */
     protected function getExecutableCommand() {
-        $params = [
-            'serviceClass' => $this->serviceClass,
-            'command' => 'start',
-        ];
-        $cmd = sprintf('"%s" "%s" "%s" "%s"', 'index.php', 'cresenity/daemon', $this->domain, http_build_query($params));
+        $params = $this->options->toArray();
+        $params['masterDaemonClass'] = $this->masterDaemonClass;
+        $params['alias'] = $this->alias;
+
+        $cmd = sprintf('"%s" "%s" "%s" "%s"', 'index.php', 'cresenity/supervisor', $this->domain, http_build_query($params));
 
         return $cmd;
     }
 
     protected function debugOutput() {
-        $serviceClass = $this->serviceClass;
-        $output = DOCROOT . 'temp' . DS . 'daemon' . DS . CF::appCode() . '/' . $serviceClass . '.log';
+        $serviceClass = $this->master->getDaemonClass();
+        $output = DOCROOT . 'temp' . DS . 'daemon' . DS . CF::appCode() . '/' . $serviceClass . DS . $this->name . '.log';
         $dir = dirname($output);
         if (!CFile::isDirectory($dir)) {
             CFile::makeDirectory($dir, 0755, true);
@@ -185,37 +186,9 @@ class CDaemon_Runner {
         return null;
     }
 
-    /**
-     * @return void
-     */
-    public function logDump() {
-        $pid = $this->getPid();
-        if ($pid) {
-            exec("kill -10 ${pid}");
-        }
-    }
-
-    /**
-     * @param bool $exit
-     *
-     * @return string
-     */
-    public function stop($exit = true) {
-        $pid = $this->getPid();
-        $command = 'kill -2 ' . $pid;
-        if (defined('CFCLI')) {
-            $process = new Process($command);
-            $process->run();
-            $result = $process->getOutput();
-        } else {
-            $result = shell_exec($command);
-        }
-
-        return $result;
-    }
-
     public function getLogFile() {
-        return CDaemon_Helper::getLogFile($this->serviceClass);
+        return '';
+        //return CDaemon_Helper::getLogFile($this->serviceClass);
     }
 
     public function getLog() {
@@ -235,11 +208,5 @@ class CDaemon_Runner {
 
             $rotator->forceRotate();
         }
-    }
-
-    public function status() {
-        $labelStatus = $this->isRunning() ? 'Running' : 'Stopped';
-
-        return $labelStatus;
     }
 }

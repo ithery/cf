@@ -50,6 +50,7 @@ class CDatabase_Manager implements CDatabase_Contract_ConnectionResolverInterfac
             $this->reconnect($connection->getNameWithReadWriteType());
         };
         $this->config = CF::config('database');
+
         $defaultConnection = carr::get($this->config, 'default');
         if (is_array($defaultConnection)) {
             $defaultConnection = 'default';
@@ -386,6 +387,27 @@ class CDatabase_Manager implements CDatabase_Contract_ConnectionResolverInterfac
         $connections[$name] = $config;
 
         carr::set($this->config, 'connections', $connections);
+    }
+
+    /**
+     * Register a connection with the manager.
+     *
+     * @param array  $config
+     * @param string $name
+     *
+     * @return void
+     */
+    public function addRedisConnection(array $config, $name = 'default') {
+        $redisConnections = carr::get($this->config, 'redis');
+
+        //blacklist name for client and options
+        $invalidNames = ['client', ' options'];
+        if (in_array($name, $invalidNames)) {
+            throw new Exception(sprintf('invalid name for name %s when add redis connection', $name));
+        }
+        $redisConnections[$name] = $config;
+
+        carr::set($this->config, 'redis', $redisConnections);
     }
 
     /**

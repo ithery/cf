@@ -7,6 +7,7 @@ defined('SYSPATH') or die('No direct access allowed.');
  * @license Ittron Global Teknologi <ittron.co.id>
  *
  * @see CDaemon_Runner
+ * @see CDaemon_Supervisor_Runner
  * @since Mar 12, 2019, 3:17:44 PM
  */
 class CDaemon {
@@ -51,6 +52,56 @@ class CDaemon {
         self::$runningService->start();
     }
 
+    public static function cliSupervisorRunner($parameter = null) {
+        $argv = carr::get($_SERVER, 'argv');
+        if ($parameter == null) {
+            $parameter = $argv[3];
+        }
+        parse_str($parameter, $config);
+        $name = carr::get($config, 'name');
+        $masterDaemonClass = carr::get($config, 'masterDaemonClass');
+        $supervisor = CDaemon_Manager::createSupervisor($name, $config);
+
+        try {
+            $supervisor->ensureNoDuplicateSupervisors();
+        } catch (Exception $e) {
+            throw new Exception(sprintf('A supervisor with this name is already running. (%s)', $name));
+
+            return 13;
+        }
+
+        if ($supervisor->options->nice) {
+            proc_nice($supervisor->options->nice);
+        }
+
+        if ($masterDaemonClass) {
+            $supervisor->setMasterDaemonClass($masterDaemonClass);
+        }
+        $output = new Symfony\Component\Console\Output\ConsoleOutput();
+        $supervisor->handleOutputUsing(function ($type, $line) use ($output) {
+            $output->writeln($type . ':' . $line);
+        });
+
+        $supervisor->working = !carr::get($config, 'paused');
+
+        $supervisor->scale(max(
+            0,
+            carr::get($config, 'max-processes') - $supervisor->totalSystemProcessCount()
+        ));
+
+        $supervisor->monitor();
+    }
+
+    public static function cliWorkerRunner($parameter = null) {
+        $argv = carr::get($_SERVER, 'argv');
+        if ($parameter == null) {
+            $parameter = $argv[3];
+        }
+        parse_str($parameter, $config);
+        $connection = carr::get($config, 'connection');
+        CDaemon_Manager::runWorker($connection, $config);
+    }
+
     /**
      * @return CDaemon_ServiceAbstract
      */
@@ -92,6 +143,28 @@ class CDaemon {
         return new CDaemon_Runner($serviceClass, $domain);
     }
 
+    /**
+     * @param CDaemon_Supervisor_MasterSupervisor  $master
+     * @param CDaemon_Supervisor_SupervisorOptions $options
+     * @param null|string                          $domain
+     *
+     * @return CDaemon_Supervisor_Runner
+     */
+    public static function createSupervisorRunner(CDaemon_Supervisor_MasterSupervisor $master, CDaemon_Supervisor_SupervisorOptions $options, $domain = null) {
+        return new CDaemon_Supervisor_Runner($master, $options, $domain);
+    }
+
+    /**
+     * @param CDaemon_Supervisor_SupervisorOptions $options
+     * @param null|string                          $domain
+     * @param string                               $masterDaemonClass
+     *
+     * @return CDaemon_Supervisor_WorkerRunner
+     */
+    public static function createWorkerRunner(CDaemon_Supervisor_SupervisorOptions $options, $masterDaemonClass, $domain = null) {
+        return new CDaemon_Supervisor_WorkerRunner($options, $masterDaemonClass, $domain);
+    }
+
     public static function isDaemon() {
         return self::getRunningService() != null;
     }
@@ -101,5 +174,9 @@ class CDaemon {
      */
     public static function supervisor() {
         return new CBase_ForwarderStaticClass(CDaemon_Supervisor::class);
+    }
+
+    public static function bootSupervisor() {
+        CDaemon_Supervisor_Bootstrap::boot();
     }
 }

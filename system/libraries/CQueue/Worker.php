@@ -385,14 +385,6 @@ class CQueue_Worker {
                 $this->exceptions->report($e);
             }
             $this->stopWorkerIfLostConnection($e);
-        } catch (Exception $e) {
-            $this->currentJobName = null;
-            if (CDaemon::getRunningService() != null) {
-                CDaemon::log('Run Job Exception');
-            } else {
-                $this->exceptions->report($e);
-            }
-            $this->stopWorkerIfLostConnection($e);
         } finally {
             $this->currentJobName = null;
         }
@@ -439,7 +431,6 @@ class CQueue_Worker {
             // Here we will fire off the job and let it process. We will catch any exceptions so
             // they can be reported to the developers logs, etc. Once the job is finished the
             // proper events will be fired to let any listeners know this job has finished.
-
             $job->fire();
 
             $this->raiseAfterJobEvent($connectionName, $job);
@@ -790,10 +781,12 @@ class CQueue_Worker {
      *
      * @param CCache_Repository $cache
      *
-     * @return void
+     * @return $this
      */
     public function setCache(CCache_Repository $cache = null) {
         $this->cache = $cache;
+
+        return $this;
     }
 
     /**

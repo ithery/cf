@@ -10,6 +10,13 @@ class CDaemon_Supervisor_MasterSupervisor implements CDaemon_Contract_PausableIn
      *
      * @var string
      */
+    public $daemonClass;
+
+    /**
+     * The name of the master supervisor.
+     *
+     * @var string
+     */
     public $name;
 
     /**
@@ -43,16 +50,23 @@ class CDaemon_Supervisor_MasterSupervisor implements CDaemon_Contract_PausableIn
     /**
      * Create a new master supervisor instance.
      *
+     * @param null|string $daemonClass
+     *
      * @return void
      */
-    public function __construct() {
-        $this->name = static::name();
+    public function __construct($daemonClass = null) {
+        $this->daemonClass = $daemonClass;
+        $this->name = $daemonClass ?: static::name();
         $this->supervisors = c::collect();
 
         $this->output = function () {
         };
 
         CDaemon_Supervisor::supervisorCommandQueue()->flush($this->commandQueue());
+    }
+
+    public function getDaemonClass() {
+        return $this->daemonClass;
     }
 
     /**
@@ -230,6 +244,7 @@ class CDaemon_Supervisor_MasterSupervisor implements CDaemon_Contract_PausableIn
     protected function processPendingCommands() {
         foreach (CDaemon_Supervisor::supervisorCommandQueue()->pending($this->commandQueue()) as $command) {
             CDaemon::log('Get Pending Command:' . $command->command);
+            /** @see CDaemon_Supervisor_MasterSupervisorCommand_AddSupervisor */
             c::container($command->command)->process($this, $command->options);
         }
     }

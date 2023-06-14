@@ -1,6 +1,6 @@
 <?php
 
-class CDaemon_Supervisor_Listener_MarkJobAsFailed {
+class CDaemon_Supervisor_Listener_MarkJobAsReleased {
     /**
      * The job repository implementation.
      *

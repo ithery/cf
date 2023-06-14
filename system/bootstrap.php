@@ -55,6 +55,9 @@ if (CF::isTesting()) {
 //CView::blade()->component('dynamic-component', CView_Component_DynamicComponent::class);
 CView::blade()->component('icon', \CView_Component_IconComponent::class);
 c::manager()->icon()->registerIconDirectory('orchid', DOCROOT . 'media/img/icons/orchid/');
-if (CF::config('devcloud.inspector.enabled', true)) {
+if (CF::config('devcloud.inspector.enabled', false)) {
     CDevCloud::bootInspector();
+}
+if (CF::config('daemon.supervisor.enabled', false)) {
+    CDaemon::bootSupervisor();
 }

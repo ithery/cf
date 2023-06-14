@@ -166,7 +166,7 @@ class CDaemon_Supervisor_Repository_RedisMetricsRepository implements CDaemon_Su
      * @return void
      */
     public function incrementJob($job, $runtime) {
-        $this->connection()->doEval(
+        $this->connection()->eval(
             CDaemon_Supervisor_LuaScripts::updateMetrics(),
             2,
             'job:' . $job,
@@ -184,7 +184,7 @@ class CDaemon_Supervisor_Repository_RedisMetricsRepository implements CDaemon_Su
      * @return void
      */
     public function incrementQueue($queue, $runtime) {
-        $this->connection()->doEval(
+        $this->connection()->eval(
             CDaemon_Supervisor_LuaScripts::updateMetrics(),
             2,
             'queue:' . $queue,

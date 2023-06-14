@@ -40,18 +40,27 @@ class CDaemon_Supervisor_ProcessPool implements Countable {
     public $output;
 
     /**
+     * The master daemon class name.
+     *
+     * @var null|string
+     */
+    public $masterDaemonClass;
+
+    /**
      * Create a new process pool instance.
      *
      * @param \CDaemon_Supervisor_SupervisorOptions $options
      * @param null|\Closure                         $output
+     * @param null|mixed                            $masterDaemonClass
      *
      * @return void
      */
-    public function __construct(CDaemon_Supervisor_SupervisorOptions $options, Closure $output = null) {
+    public function __construct(CDaemon_Supervisor_SupervisorOptions $options, Closure $output = null, $masterDaemonClass = null) {
         $this->options = $options;
 
         $this->output = $output ?: function () {
         };
+        $this->masterDaemonClass = $masterDaemonClass;
     }
 
     /**
@@ -169,14 +178,20 @@ class CDaemon_Supervisor_ProcessPool implements Countable {
      * @return \CDaemon_WorkerProcess
      */
     protected function createProcess() {
-        $class = CF::config('daemon.supervisor.fast_termination')
-                    ? CDaemon_BackgroundProcess::class
-                    : Process::class;
+        $runner = CDaemon::createWorkerRunner($this->options, $this->masterDaemonClass);
+        $process = $runner->run();
+        call_user_func($this->output, 'info', 'spawn process worker:' . $process->getCommandLine());
 
-        return new CDaemon_WorkerProcess($class::fromShellCommandline(
-            $this->options->toWorkerCommand(),
-            $this->options->directory
-        )->setTimeout(null)->disableOutput());
+        return new CDaemon_WorkerProcess($process);
+
+        // $class = CF::config('daemon.supervisor.fast_termination')
+        //             ? CDaemon_BackgroundProcess::class
+        //             : Process::class;
+
+        // return new CDaemon_WorkerProcess($class::fromShellCommandline(
+        //     $this->options->toWorkerCommand(),
+        //     $this->options->directory
+        // )->setTimeout(null)->disableOutput());
     }
 
     /**

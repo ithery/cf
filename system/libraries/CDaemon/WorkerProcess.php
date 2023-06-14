@@ -47,7 +47,6 @@ class CDaemon_WorkerProcess {
         $this->output = $callback;
 
         $this->cooldown();
-
         $this->process->start($callback);
 
         return $this;
