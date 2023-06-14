@@ -91,7 +91,7 @@ class CRedis_Limiter_DurationLimiter {
      * @return bool
      */
     public function acquire() {
-        $results = $this->redis->doEval(
+        $results = $this->redis->eval(
             $this->luaScript(),
             1,
             $this->name,
@@ -112,7 +112,7 @@ class CRedis_Limiter_DurationLimiter {
      * @return bool
      */
     public function tooManyAttempts() {
-        list($this->decaysAt, $this->remaining) = $this->redis->doEval(
+        list($this->decaysAt, $this->remaining) = $this->redis->eval(
             $this->tooManyAttemptsLuaScript(),
             1,
             $this->name,

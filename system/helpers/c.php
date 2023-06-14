@@ -1791,6 +1791,29 @@ class c {
     public static function queueable(Closure $closure) {
         return new CEvent_QueuedClosure($closure);
     }
+
+    /**
+     * Backward compatibility like array_is_list on php 8.1.
+     *
+     * @param array $array
+     *
+     * @return bool
+     */
+    public static function arrayIsList(array $array): bool {
+        if ([] === $array || $array === array_values($array)) {
+            return true;
+        }
+
+        $nextKey = -1;
+
+        foreach ($array as $k => $v) {
+            if ($k !== ++$nextKey) {
+                return false;
+            }
+        }
+
+        return true;
+    }
 }
 
 // End c

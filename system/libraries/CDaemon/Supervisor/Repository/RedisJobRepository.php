@@ -610,6 +610,7 @@ class CDaemon_Supervisor_Repository_RedisJobRepository implements CDaemon_Superv
             $this->removeJobReference($pipe, 'pending_jobs', $payload);
             $this->removeJobReference($pipe, 'completed_jobs', $payload);
 
+            $context = 'context';
             $pipe->hmset(
                 $payload->id(),
                 [
@@ -620,8 +621,8 @@ class CDaemon_Supervisor_Repository_RedisJobRepository implements CDaemon_Superv
                     'status' => 'failed',
                     'payload' => $payload->value,
                     'exception' => (string) $exception,
-                    'context' => method_exists($exception, 'context')
-                        ? json_encode($exception->context())
+                    'context' => method_exists($exception, $context)
+                        ? json_encode($exception->$context())
                         : null,
                     'failed_at' => str_replace(',', '.', microtime(true)),
                 ]
@@ -701,7 +702,7 @@ class CDaemon_Supervisor_Repository_RedisJobRepository implements CDaemon_Superv
      * @return int
      */
     public function purge($queue) {
-        return $this->connection()->doEval(
+        return $this->connection()->eval(
             CDaemon_Supervisor_LuaScripts::purge(),
             2,
             'recent_jobs',

@@ -1,7 +1,7 @@
 <?php
 
 /**
- * Description of RedisLock
+ * Description of RedisLock.
  *
  * @author Hery
  */
@@ -19,7 +19,7 @@ class CCache_Lock_RedisLock extends CCache_LockAbstract {
      * @param CRedis_AbstractConnection $redis
      * @param string                    $name
      * @param int                       $seconds
-     * @param string|null               $owner
+     * @param null|string               $owner
      *
      * @return void
      */
@@ -48,7 +48,7 @@ class CCache_Lock_RedisLock extends CCache_LockAbstract {
      * @return bool
      */
     public function release() {
-        return (bool) $this->redis->doEval(CCache_LuaScripts::releaseLock(), 1, $this->name, $this->owner);
+        return (bool) $this->redis->eval(CCache_LuaScripts::releaseLock(), 1, $this->name, $this->owner);
     }
 
     /**

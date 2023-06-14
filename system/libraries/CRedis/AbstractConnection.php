@@ -1,6 +1,10 @@
 <?php
 
 abstract class CRedis_AbstractConnection implements CRedis_ConnectionInterface {
+    use CTrait_Macroable {
+        __call as macroCall;
+    }
+
     /**
      * The Redis client.
      *
@@ -100,7 +104,9 @@ abstract class CRedis_AbstractConnection implements CRedis_ConnectionInterface {
         $start = microtime(true);
 
         $result = $this->client->{$method}(...$parameters);
+
         $time = round((microtime(true) - $start) * 1000, 2);
+
         if (isset($this->events)) {
             $this->event(new CRedis_Event_CommandExecuted($method, $parameters, $time, $this));
         }
@@ -116,7 +122,7 @@ abstract class CRedis_AbstractConnection implements CRedis_ConnectionInterface {
      * @return void
      */
     protected function event($event) {
-        if (isset($this->events)) {
+        if ($this->events) {
             $this->events->dispatch($event);
         }
     }
@@ -129,7 +135,7 @@ abstract class CRedis_AbstractConnection implements CRedis_ConnectionInterface {
      * @return void
      */
     public function listen(Closure $callback) {
-        if (isset($this->events)) {
+        if ($this->events) {
             $this->events->listen(CommandExecuted::class, $callback);
         }
     }
@@ -194,6 +200,10 @@ abstract class CRedis_AbstractConnection implements CRedis_ConnectionInterface {
      * @return mixed
      */
     public function __call($method, $parameters) {
+        if (static::hasMacro($method)) {
+            return $this->macroCall($method, $parameters);
+        }
+
         return $this->command($method, $parameters);
     }
 }

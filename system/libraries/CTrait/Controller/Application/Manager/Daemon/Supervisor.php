@@ -46,8 +46,8 @@ trait CTrait_Controller_Application_Manager_Daemon_Supervisor {
             $app->addBr();
             $app->add('wait:' . json_encode($wait));
             $app->addBr();
-        } catch(Exception $ex) {
-            $app->addAlert()->setType('error')->add($ex->getMessage());
+        } catch (Exception $ex) {
+            $app->addAlert()->setType('error')->add($ex->getMessage() . $ex->getTraceAsString());
         }
 
         return $app;

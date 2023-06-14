@@ -4,11 +4,11 @@ return [
     'supervisor' => [
         /*
         |--------------------------------------------------------------------------
-        | Horizon Domain
+        | Supervisor Domain
         |--------------------------------------------------------------------------
         |
-        | This is the subdomain where Horizon will be accessible from. If this
-        | setting is null, Horizon will reside under the same domain as the
+        | This is the subdomain where Supervisor will be accessible from. If this
+        | setting is null, Supervisor will reside under the same domain as the
         | application. Otherwise, this value will serve as the subdomain.
         |
         */
@@ -17,10 +17,10 @@ return [
 
         /*
         |--------------------------------------------------------------------------
-        | Horizon Path
+        | Supervisor Path
         |--------------------------------------------------------------------------
         |
-        | This is the URI path where Horizon will be accessible from. Feel free
+        | This is the URI path where Supervisor will be accessible from. Feel free
         | to change this path to anything you like. Note that the URI will not
         | affect the paths of its internal API that aren't exposed to users.
         |
@@ -30,10 +30,10 @@ return [
 
         /*
         |--------------------------------------------------------------------------
-        | Horizon Redis Connection
+        | Supervisor Redis Connection
         |--------------------------------------------------------------------------
         |
-        | This is the name of the Redis connection where Horizon will store the
+        | This is the name of the Redis connection where Supervisor will store the
         | meta information required for it to function. It includes the list
         | of supervisors, failed jobs, job metrics, and other information.
         |
@@ -43,12 +43,12 @@ return [
 
         /*
         |--------------------------------------------------------------------------
-        | Horizon Redis Prefix
+        | Supervisor Redis Prefix
         |--------------------------------------------------------------------------
         |
-        | This prefix will be used when storing all Horizon data in Redis. You
+        | This prefix will be used when storing all Supervisor data in Redis. You
         | may modify the prefix when you are running multiple installations
-        | of Horizon on the same server so that they don't have problems.
+        | of Supervisor on the same server so that they don't have problems.
         |
         */
 
@@ -59,10 +59,10 @@ return [
 
         /*
         |--------------------------------------------------------------------------
-        | Horizon Route Middleware
+        | Supervisor Route Middleware
         |--------------------------------------------------------------------------
         |
-        | These middleware will get attached onto each Horizon route, giving you
+        | These middleware will get attached onto each Supervisor route, giving you
         | the chance to add your own middleware to this list or change any of
         | the existing middleware. Or, you can simply stick with this list.
         |
@@ -90,7 +90,7 @@ return [
         | Job Trimming Times
         |--------------------------------------------------------------------------
         |
-        | Here you can configure for how long (in minutes) you desire Horizon to
+        | Here you can configure for how long (in minutes) you desire Supervisor to
         | persist the recent and failed jobs. Typically, recent jobs are kept
         | for one hour while all failed jobs are stored for an entire week.
         |
@@ -111,7 +111,7 @@ return [
         |--------------------------------------------------------------------------
         |
         | Here you can configure how many snapshots should be kept to display in
-        | the metrics graph. This will get used in combination with Horizon's
+        | the metrics graph. This will get used in combination with Supervisor's
         | `horizon:snapshot` schedule to define how long to retain metrics.
         |
         */
@@ -128,10 +128,10 @@ return [
         | Fast Termination
         |--------------------------------------------------------------------------
         |
-        | When this option is enabled, Horizon's "terminate" command will not
+        | When this option is enabled, Supervisor's "terminate" command will not
         | wait on all of the workers to terminate unless the --wait option
         | is provided. Fast termination can shorten deployment delay by
-        | allowing a new instance of Horizon to start while the last
+        | allowing a new instance of Supervisor to start while the last
         | instance will continue to terminate each of its workers.
         |
         */
@@ -143,7 +143,7 @@ return [
         | Memory Limit (MB)
         |--------------------------------------------------------------------------
         |
-        | This value describes the maximum amount of memory the Horizon master
+        | This value describes the maximum amount of memory the Supervisor master
         | supervisor may consume before it is terminated and restarted. For
         | configuring these limits on your workers, see the next section.
         |
@@ -158,7 +158,7 @@ return [
         |
         | Here you may define the queue worker settings used by your application
         | in all environments. These supervisors and settings handle all your
-        | queued jobs and will be provisioned by Horizon during deployment.
+        | queued jobs and will be provisioned by Supervisor during deployment.
         |
         */
 
