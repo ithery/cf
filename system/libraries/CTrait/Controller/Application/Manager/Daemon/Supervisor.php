@@ -106,7 +106,7 @@ trait CTrait_Controller_Application_Manager_Daemon_Supervisor {
         $supervisors = c::collect(CDaemon::supervisor()->supervisorRepository()->all())->sortBy('name')->groupBy('master');
 
         $data = $masters->each(function ($master, $name) use ($supervisors) {
-            $master->supervisors = (array) $supervisors->get($name);
+            $master->supervisors = $supervisors->get($name, []);
         });
 
         return c::response()->json([

@@ -80,6 +80,7 @@ class CDaemon_ErrorHandler {
 
         if (!$runningService->isDaemonContinueOnFatalError()) {
             if ($isFatal) {
+                $runningService->log('Fatal Error Occured, Stopping Daemon...');
                 exit(1);
             }
         }

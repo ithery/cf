@@ -56,7 +56,7 @@ class CDaemon_Supervisor_MasterSupervisor implements CDaemon_Contract_PausableIn
      */
     public function __construct($daemonClass = null) {
         $this->daemonClass = $daemonClass;
-        $this->name = $daemonClass ?: static::name();
+        $this->name = static::name();
         $this->supervisors = c::collect();
 
         $this->output = function () {
@@ -229,7 +229,6 @@ class CDaemon_Supervisor_MasterSupervisor implements CDaemon_Contract_PausableIn
             }
 
             $this->persist();
-            CDaemon::log('Master Supervisor Looped');
             c::event(new CDaemon_Supervisor_Event_MasterSupervisorLooped($this));
         } catch (Throwable $e) {
             CException::exceptionHandler()->report($e);

@@ -285,7 +285,6 @@ class CDaemon_Supervisor_Supervisor implements CDaemon_Contract_PausableInterfac
             // the current number of worker processes per queue for easy load monitoring.
             $this->persist();
 
-            $this->output('info', 'Supervisor ' . $this->name . ' Looped');
             c::event(new CDaemon_Supervisor_Event_SupervisorLooped($this));
         } catch (Throwable $e) {
             CException::exceptionHandler()->report($e);

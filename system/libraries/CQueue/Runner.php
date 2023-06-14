@@ -135,6 +135,10 @@ class CQueue_Runner {
                 $this->writeOutput($event->job, 'failed');
                 $this->logFailedJob($event);
             });
+            CEvent::dispatcher()->listen(CQueue_Event_JobExceptionOccurred::class, function (CQueue_Event_JobExceptionOccurred $event) {
+                $this->writeOutput($event->job, 'error', $event->exception);
+            });
+
             static::$listenedForEvents = true;
         }
     }
@@ -157,17 +161,22 @@ class CQueue_Runner {
      *
      * @param CQueue_AbstractJob $job
      * @param string             $status
+     * @param null|mixed         $exception
      *
      * @return void
      */
-    protected function writeOutput(CQueue_AbstractJob $job, $status) {
+    protected function writeOutput(CQueue_AbstractJob $job, $status, $exception = null) {
         switch ($status) {
+            case 'released_after_exception':
+                return $this->writeStatus($job, 'Released', 'comment');
             case 'starting':
                 return $this->writeStatus($job, 'Processing', 'comment');
             case 'success':
                 return $this->writeStatus($job, 'Processed', 'info');
             case 'failed':
                 return $this->writeStatus($job, 'Failed', 'error');
+            case 'error':
+                return $this->writeStatus($job, 'Error', 'error', $exception);
         }
     }
 
@@ -177,20 +186,21 @@ class CQueue_Runner {
      * @param CQueue_AbstractJob $job
      * @param string             $status
      * @param string             $type
+     * @param null|mixed         $exception
      *
      * @return void
      */
-    protected function writeStatus(CQueue_AbstractJob $job, $status, $type) {
+    protected function writeStatus(CQueue_AbstractJob $job, $status, $type, $exception = null) {
         //        $this->output->writeln(sprintf(
         //                        "<{$type}>[%s][%s] %s</{$type}> %s", Carbon::now()->format('Y-m-d H:i:s'), $job->getJobId(), str_pad("{$status}:", 11), $job->resolveName()
         //        ));
 
         $message = sprintf(
-            "<{$type}>[%s][%s] %s</{$type}> %s",
-            CCarbon::now()->format('Y-m-d H:i:s'),
+            "<{$type}>[%s] %s</{$type}> %s %s",
             $job->getJobId(),
             str_pad("{$status}:", 11),
-            $job->resolveName()
+            $job->resolveName() . ($status == 'Released' ? ' Attempts:' . $job->attempts() : ''),
+            $exception ? $exception->getMessage() : ''
         );
         if (CDaemon::getRunningService() != null) {
             CDaemon::log($message);
@@ -242,7 +252,7 @@ class CQueue_Runner {
         //Number of seconds to sleep when no job is available
         $defaultOptions['sleep'] = 3;
         //Number of times to attempt a job before logging it failed
-        $defaultOptions['maxTries'] = 1;
+        $defaultOptions['tries'] = 1;
         //Stop when the queue is empty
         $defaultOptions['stopWhenEmpty'] = false;
         //Only process the next job on the queue

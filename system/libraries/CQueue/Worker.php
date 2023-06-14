@@ -2,14 +2,6 @@
 
 defined('SYSPATH') or die('No direct access allowed.');
 
-/**
- * @author Hery Kurniawan
- * @license Ittron Global Teknologi <ittron.co.id>
- *
- * @since Sep 8, 2019, 4:51:15 AM
- */
-use Symfony\Component\Debug\Exception\FatalThrowableError;
-
 class CQueue_Worker {
     use CDatabase_Trait_DetectLostConnection;
 
@@ -356,10 +348,6 @@ class CQueue_Worker {
             }
             $this->stopWorkerIfLostConnection($e);
             $this->sleep(1);
-        } catch (Exception $e) {
-            $this->exceptions->report($e);
-            $this->stopWorkerIfLostConnection($e);
-            $this->sleep(1);
         }
     }
 
@@ -380,7 +368,7 @@ class CQueue_Worker {
         } catch (Throwable $e) {
             $this->currentJobName = null;
             if (CDaemon::getRunningService() != null) {
-                CDaemon::log('Run Job Exception');
+                CDaemon::log('Run Job Exception :' . $e->getMessage());
             } else {
                 $this->exceptions->report($e);
             }
@@ -436,9 +424,6 @@ class CQueue_Worker {
             $this->raiseAfterJobEvent($connectionName, $job);
         } catch (Throwable $e) {
             $this->handleJobException($connectionName, $job, $options, $e);
-            if (CDaemon::getRunningService() != null) {
-                CDaemon::handleException($e);
-            }
         }
     }
 
@@ -459,6 +444,7 @@ class CQueue_Worker {
             // First, we will go ahead and mark the job as failed if it will exceed the maximum
             // attempts it is allowed to run the next time we process it. If so we will just
             // go ahead and mark it as failed now so we do not have to release this again.
+
             if (!$job->hasFailed()) {
                 $this->markJobAsFailedIfWillExceedMaxAttempts(
                     $connectionName,

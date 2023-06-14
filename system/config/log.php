@@ -94,7 +94,11 @@ return [
                 'stream' => 'php://stderr',
             ],
         ],
-
+        'stdout' => [
+            'driver' => 'single',
+            'path' => 'php://stdout',
+            'level' => c::env('LOG_LEVEL', 'info'),
+        ],
         'syslog' => [
             'driver' => 'syslog',
             'level' => c::env('LOG_LEVEL', CF::isProduction() ? 'info' : 'debug'),
