@@ -1,7 +1,6 @@
 <?php
 /**
  * @see CDaemon_Supervisor
- * @see CDaemon_Supervisor_Bootstrap
  */
 class CDaemon_Supervisor_Manager {
     private static $instance;

@@ -27,6 +27,10 @@ class CDaemon_Supervisor_Bootstrap {
             });
             static::listenForEvents();
 
+            if (CF::config('daemon.supervisor.metrics.cron.enabled', false)) {
+                $cronExpression = CF::config('daemon.supervisor.metrics.cron.expression', '*/5 * * * *');
+                c::cron()->job(new CDaemon_Supervisor_TaskQueue_SupervisorSnapshot())->cron($cronExpression);
+            }
             static::$booted = true;
         }
     }

@@ -85,5 +85,7 @@ svg.icon {
 .info-icon {
     fill: #d1d5db;
 }
-
+.table th {
+    background-color: #f3f4f6
+}
 </style>

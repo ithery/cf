@@ -118,10 +118,16 @@ return [
         */
 
         'metrics' => [
+            'cron' => [
+                'enabled' => true,
+                'expression' => '*/5 * * * *'
+            ],
+            'snapshot_lock' => 300,
             'trim_snapshots' => [
                 'job' => 24,
                 'queue' => 24,
             ],
+
         ],
 
         /*

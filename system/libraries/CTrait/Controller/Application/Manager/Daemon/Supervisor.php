@@ -14,6 +14,8 @@ trait CTrait_Controller_Application_Manager_Daemon_Supervisor {
         $app->title($this->getTitle());
 
         $tabs = $app->addTabList()->setTabPositionLeft();
+        $tabs->addTab()->setLabel('Metrics')->setAjaxUrl($this->controllerUrl() . 'tab/metrics')
+            ->setNoPadding();
         $tabs->addTab()->setLabel('Failed Jobs')->setAjaxUrl($this->controllerUrl() . 'tab/failed')
             ->setNoPadding();
 
@@ -22,8 +24,7 @@ trait CTrait_Controller_Application_Manager_Daemon_Supervisor {
 
         $tabs->addTab()->setLabel('Monitoring')->setAjaxUrl($this->controllerUrl() . 'tab/monitoring')
             ->setNoPadding();
-        // $tabs->addTab()->setLabel('Metrics')->setAjaxUrl($this->controllerUrl() . 'tab/metrics')
-        //     ->setNoPadding();
+
         $tabs->addTab()->setLabel('Batches')->setAjaxUrl($this->controllerUrl() . 'tab/batches')
             ->setNoPadding();
 
@@ -51,6 +52,9 @@ trait CTrait_Controller_Application_Manager_Daemon_Supervisor {
         if ($method == 'batches') {
             return $this->tabBatches();
         }
+        if ($method == 'metrics') {
+            return $this->tabMetrics($submethod);
+        }
     }
 
     public function ajax($method, $submethod = null) {
@@ -76,6 +80,9 @@ trait CTrait_Controller_Application_Manager_Daemon_Supervisor {
         if ($method == 'batches') {
             return $this->ajaxBatches();
         }
+        if ($method == 'metrics') {
+            return $this->ajaxMetrics($submethod);
+        }
     }
 
     public function modal($method, $submethod = null) {
@@ -84,6 +91,9 @@ trait CTrait_Controller_Application_Manager_Daemon_Supervisor {
         }
         if ($method == 'failed') {
             return $this->modalFailed($submethod);
+        }
+        if ($method == 'metrics') {
+            return $this->modalMetrics($submethod);
         }
     }
 
@@ -116,6 +126,20 @@ trait CTrait_Controller_Application_Manager_Daemon_Supervisor {
             'ajaxFailedRetryUrl' => $ajaxFailedRetryUrl,
             'modalFailedUrl' => $modalFailedUrl,
             'job' => $job,
+        ]);
+
+        return $app;
+    }
+
+    protected function modalMetrics($type) {
+        $app = c::app();
+        $slug = c::request()->slug;
+
+        $ajaxMetricsUrl = $this->controllerUrl() . 'ajax/metrics/' . $type;
+        $app->addView('cresenity.daemon.supervisor.modal.modal-metrics', [
+            'ajaxMetricsUrl' => $ajaxMetricsUrl,
+            'type' => $type,
+            'slug' => $slug,
         ]);
 
         return $app;
@@ -318,6 +342,35 @@ trait CTrait_Controller_Application_Manager_Daemon_Supervisor {
         ]);
     }
 
+    protected function ajaxMetrics($type) {
+        $data = [];
+        $request = c::request();
+
+        if ($type == 'job') {
+            $data = c::collect(CDaemon::supervisor()->metricsRepository()->snapshotsForJob($request->slug))->map(function ($record) {
+                $record->runtime = round($record->runtime / 1000, 3);
+                $record->throughput = (int) $record->throughput;
+
+                return $record;
+            });
+        }
+
+        if ($type == 'queue') {
+            $data = c::collect(CDaemon::supervisor()->metricsRepository()->snapshotsForQueue($request->slug))->map(function ($record) {
+                $record->runtime = round($record->runtime / 1000, 3);
+                $record->throughput = (int) $record->throughput;
+
+                return $record;
+            });
+        }
+
+        return c::response()->json([
+            'errCode' => 0,
+            'errMessage' => '',
+            'data' => $data,
+        ]);
+    }
+
     protected function ajaxWorkers() {
         $masters = c::collect(CDaemon::supervisor()->masterSupervisorRepository()->all())->keyBy('name')->sortBy('name');
 
@@ -416,6 +469,40 @@ trait CTrait_Controller_Application_Manager_Daemon_Supervisor {
         $app->addView('cresenity.daemon.supervisor.batches', [
             'ajaxBatchesUrl' => $ajaxBatchesUrl,
         ]);
+
+        return $app;
+    }
+
+    protected function tabMetrics($type) {
+        $app = c::app();
+
+        if ($type == 'job') {
+            $jobs = CDaemon::supervisor()->metricsRepository()->measuredJobs();
+
+            $modalMetricJobUrl = $this->controllerUrl() . 'modal/metrics/job';
+            $app->addView('cresenity.daemon.supervisor.metrics.job', [
+                'modalMetricJobUrl' => $modalMetricJobUrl,
+                'jobs' => $jobs,
+            ]);
+
+            return $app;
+        }
+        if ($type == 'queue') {
+            $queues = CDaemon::supervisor()->metricsRepository()->measuredQueues();
+
+            $modalMetricQueueUrl = $this->controllerUrl() . 'modal/metrics/queue';
+            $app->addView('cresenity.daemon.supervisor.metrics.queue', [
+                'modalMetricQueueUrl' => $modalMetricQueueUrl,
+                'queues' => $queues,
+            ]);
+
+            return $app;
+        }
+        $tabs = $app->addTabList()->setTabPositionTop();
+        $tabs->addTab()->setLabel('Job')->setAjaxUrl($this->controllerUrl() . 'tab/metrics/job')
+            ->setNoPadding();
+        $tabs->addTab()->setLabel('Queues')->setAjaxUrl($this->controllerUrl() . 'tab/metrics/queue')
+            ->setNoPadding();
 
         return $app;
     }

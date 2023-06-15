@@ -245,8 +245,4 @@ class CDaemon_Supervisor {
     public static function manager() {
         return CDaemon_Supervisor_Manager::instance();
     }
-
-    public static function boot() {
-        CDaemon_Supervisor_Bootstrap::boot();
-    }
 }
