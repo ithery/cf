@@ -150,6 +150,17 @@ class CDaemon_Supervisor_Repository_RedisJobRepository implements CDaemon_Superv
     }
 
     /**
+     * Get a chunk of silenced jobs.
+     *
+     * @param null|string $afterIndex
+     *
+     * @return \CCollection
+     */
+    public function getSilenced($afterIndex = null) {
+        return $this->getJobsByType('silenced_jobs', $afterIndex);
+    }
+
+    /**
      * Get the count of recent jobs.
      *
      * @return int
@@ -183,6 +194,15 @@ class CDaemon_Supervisor_Repository_RedisJobRepository implements CDaemon_Superv
      */
     public function countCompleted() {
         return $this->countJobsByType('completed_jobs');
+    }
+
+    /**
+     * Get the count of silenced jobs.
+     *
+     * @return int
+     */
+    public function countSilenced() {
+        return $this->countJobsByType('silenced_jobs');
     }
 
     /**
@@ -245,6 +265,8 @@ class CDaemon_Supervisor_Repository_RedisJobRepository implements CDaemon_Superv
             case 'pending_jobs':
                 return $this->pendingJobExpires;
             case 'completed_jobs':
+                return $this->completedJobExpires;
+            case 'silenced_jobs':
                 return $this->completedJobExpires;
             default:
                 return $this->recentJobExpires;

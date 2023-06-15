@@ -1,3 +1,4 @@
+@include('cresenity.daemon.supervisor-style')
 <div id="cf-supervisor-dashboard" x-data="supervisorDashboard()" x-show="ready" x-on:beforeunload="destroyed()">
     <div class="card overflow-hidden">
         <div class="card-header d-flex align-items-center justify-content-between">

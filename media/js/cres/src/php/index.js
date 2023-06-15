@@ -9,6 +9,8 @@ import str_replace from 'locutus/php/strings/str_replace';
 import number_format from 'locutus/php/strings/number_format';
 import date from 'locutus/php/datetime/date';
 import preg_replace from 'locutus/php/pcre/preg_replace';
+import serialize from 'locutus/php/var/serialize';
+import unserialize from 'locutus/php/var/unserialize';
 
 export default {
     echo,
@@ -21,5 +23,7 @@ export default {
     str_replace,
     number_format,
     date,
-    preg_replace
+    preg_replace,
+    serialize,
+    unserialize
 };
