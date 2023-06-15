@@ -1,5 +1,5 @@
 @include('cresenity.daemon.supervisor-style')
-<div id="cf-supervisor-failed" x-data="supervisorFailed()" x-on:beforeunload="destroyed()">
+<div id="cf-supervisor-failed" x-data="supervisorFailed()" x-destroy="destroyed()">
     <div>
         <div class="card overflow-hidden">
             <div class="card-header d-flex align-items-center justify-content-between">
@@ -53,14 +53,14 @@
                     <template x-for="job in jobs" x-key="job.id">
                         <tr>
                             <td>
-                                <a x-bind:title="job.name" x-text="jobBaseName(job.name)"></a>
-                                <template x-if="wasRetried(job)">
-                                    <small class="ml-1 badge badge-secondary badge-sm"
-                                        x-tooltip="retriedJobTooltip(job)"
-                                    >
-                                        Retried
-                                    </small>
-                                </template>
+                                <a x-bind:title="job.name" x-on:click="handleModalFailed(job.id)" x-text="jobBaseName(job.name)"></a>
+                                    <template x-if="wasRetried(job)">
+                                        <small class="ml-1 badge badge-secondary badge-sm"
+                                            x-tooltip="retriedJobTooltip(job)"
+                                        >
+                                            Retried
+                                        </small>
+                                    </template>
                                 <br>
 
                                 <small class="text-muted">
@@ -125,7 +125,8 @@
             jobs: [],
             retryingJobs: [],
             ajaxFailedUrl: '{{ $ajaxFailedUrl }}',
-            ajaxRetryUrl: '{{ $ajaxRetryUrl }}',
+            ajaxFailedRetryUrl: '{{ $ajaxFailedRetryUrl }}',
+            modalFailedUrl: '{{ $modalFailedUrl }}',
             init() {
                 document.title = "Supervisor - Failed Jobs";
                 this.loadJobs();
@@ -141,6 +142,17 @@
                     }, 500);
                 });
 
+            },
+            handleModalFailed(jobId) {
+                const modalFailedUrl = this.modalFailedUrl + '?jobId=' + jobId;
+
+                cresenity.modal({
+                    reload : {
+                        url:modalFailedUrl
+                    },
+                    isSidebar:true,
+                    title:'Detail Jobs ' +jobId
+                });
             },
             loadJobs(starting = -1, refreshing = false) {
                 if (!refreshing) {
@@ -180,7 +192,7 @@
 
                 this.retryingJobs.push(id);
 
-                this.httpGet(this.ajaxRetryUrl + '?id=' + id)
+                this.httpGet(this.ajaxFailedRetryUrl + '?jobId=' + id)
                     .then((data) => {
                         setTimeout(() => {
                             this.retryingJobs = this.retryingJobs.filter(job => job != id);

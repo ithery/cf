@@ -1,5 +1,5 @@
 @include('cresenity.daemon.supervisor-style')
-<div id="cf-supervisor-monitoring" x-data="supervisorMonitoring()" x-on:beforeunload="destroyed()">
+<div id="cf-supervisor-monitoring" x-data="supervisorMonitoring()" x-destroy="destroyed()">
     <div class="card overflow-hidden">
         <div class="card-header d-flex align-items-center justify-content-between">
             <h2 class="h6 m-0">Monitoring</h2>

@@ -1027,6 +1027,10 @@ export default class Cresenity {
         Alpine.plugin(AlpineCleave);
         Alpine.plugin(AlpineAutoNumeric);
         Alpine.plugin(AlpineTippy);
+        Alpine.directive('destroy', (el, { expression }, { evaluateLater, cleanup }) => {
+            const clean = evaluateLater(expression);
+            cleanup(() => clean());
+        });
         window.Alpine = Alpine;
         this.ui.start();
         window.Alpine.start();

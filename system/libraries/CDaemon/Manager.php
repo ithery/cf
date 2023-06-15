@@ -64,6 +64,8 @@ class CDaemon_Manager {
 
         $balance = carr::get($config, 'balance');
 
+        $tries = carr::get($config, 'tries', carr::get($config, 'maxTries', 1));
+
         $autoScalingStrategy = $balance === 'auto' ? carr::get($config, 'autoScalingStrategy') : null;
 
         $supervisorOptions = new CDaemon_Supervisor_SupervisorOptions(
@@ -80,7 +82,7 @@ class CDaemon_Manager {
             carr::get($config, 'memory'),
             carr::get($config, 'timeout'),
             carr::get($config, 'sleep'),
-            carr::get($config, 'tries'),
+            $tries,
             carr::get($config, 'force'),
             carr::get($config, 'nice'),
             carr::get($config, 'balanceCooldown'),
@@ -90,6 +92,7 @@ class CDaemon_Manager {
             $autoScalingStrategy
         );
         $supervisor = CDaemon_Supervisor_SupervisorFactory::make($supervisorOptions);
+
         return $supervisor;
     }
 
@@ -106,14 +109,14 @@ class CDaemon_Manager {
         $queue = carr::get($config, 'queue', CF::config('queue.connections.' . $connection . '.queue', 'default'));
 
         $backoff = carr::get($config, 'backoff', carr::get($config, 'delay'));
-
+        $tries = carr::get($config, 'tries', carr::get($config, 'maxTries', 1));
         $workerOptions = new CQueue_WorkerOptions(
             $name,
             $backoff,
             carr::get($config, 'memory'),
             carr::get($config, 'timeout'),
             carr::get($config, 'sleep'),
-            carr::get($config, 'tries'),
+            $tries,
             carr::get($config, 'force'),
             carr::get($config, 'stopWhenEmpty'),
             carr::get($config, 'maxJobs'),
@@ -142,47 +145,15 @@ class CDaemon_Manager {
             );
         };
 
-        $writeOutput = function (CQueue_AbstractJob $job, $status) use ($output, $formatRunTime, &$latestStartedAt) {
-            // $terminalWidth = 40;
-            // $output->write(sprintf(
-            //     '  <fg=gray>%s</> %s%s',
-            //     c::now()->format('Y-m-d H:i:s'),
-            //     $job->resolveName(),
-            //     $output->isVerbose()
-            //     ? sprintf(' <fg=gray>%s</>', $job->getJobId())
-            //     : ''
-            // ));
-
-            // if ($status == 'starting') {
-            //     $latestStartedAt = microtime(true);
-
-            //     $dots = max($terminalWidth - mb_strlen($job->resolveName()) - (
-            //         $output->isVerbose() ? (mb_strlen($job->getJobId()) + 1) : 0
-            //     ) - 33, 0);
-
-            //     $output->write(' ' . str_repeat('<fg=gray>.</>', $dots));
-
-            //     return $output->writeln(' <fg=yellow;options=bold>RUNNING</>');
-            // }
-
-            // $runTime = $formatRunTime($latestStartedAt);
-
-            // $dots = max($terminalWidth - mb_strlen($job->resolveName()) - (
-            //     $output->isVerbose() ? (mb_strlen($job->getJobId()) + 1) : 0
-            // ) - mb_strlen($runTime) - 31, 0);
-
-            // $output->write(' ' . str_repeat('<fg=gray>.</>', $dots));
-            // $output->write(" <fg=gray>$runTime</>");
-
-            // $output->writeln($status == 'success' ? ' <fg=green;options=bold>DONE</>' : ($status == 'released_after_exception' ? ' <fg=yellow;options=bold>FAIL</>' : ' <fg=red;options=bold>FAIL</>'));
-
-            $type =$status == 'success' || $status == 'starting'? 'success' : ($status == 'released_after_exception' ? 'warn' : 'error');
+        $writeOutput = function (CQueue_AbstractJob $job, $status, $exception = null) use ($output, $formatRunTime, &$latestStartedAt) {
+            $type = $status == 'success' || $status == 'starting' ? 'success' : ($status == 'released_after_exception' ? 'warn' : 'error');
             $message = sprintf(
-                "<{$type}>[%s][%s] %s</{$type}> %s",
+                "<{$type}>[%s][%s] %s</{$type}> %s %s",
                 CCarbon::now()->format('Y-m-d H:i:s'),
                 $job->getJobId(),
                 str_pad("{$status}:", 11),
-                $job->resolveName()
+                $job->resolveName() . ($status == 'released_after_exception' ? ' Attempts:' . $job->attempts() : ''),
+                $exception ? $exception->getMessage() : ''
             );
             $output->writeln($message);
         };
@@ -204,7 +175,9 @@ class CDaemon_Manager {
 
             $logFailedJob($event);
         });
-
+        CEvent::dispatcher()->listen(CQueue_Event_JobExceptionOccurred::class, function (CQueue_Event_JobExceptionOccurred $event) use ($writeOutput) {
+            $writeOutput($event->job, 'error', $event->exception);
+        });
         $worker->setName($name)
             ->setCache(null)
             ->daemon($connection, $queue, $workerOptions);

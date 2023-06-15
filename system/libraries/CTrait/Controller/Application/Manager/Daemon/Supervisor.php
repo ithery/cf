@@ -1,5 +1,9 @@
 <?php
 trait CTrait_Controller_Application_Manager_Daemon_Supervisor {
+    protected function bootSupervisor() {
+        CView::blade()->component(\CDaemon_Supervisor_View_Component_StackTraceComponent::class, 'stack-trace');
+    }
+
     protected function getTitle() {
         return 'Supervisor Manager';
     }
@@ -10,6 +14,8 @@ trait CTrait_Controller_Application_Manager_Daemon_Supervisor {
         $app->title($this->getTitle());
 
         $tabs = $app->addTabList()->setTabPositionLeft();
+        $tabs->addTab()->setLabel('Failed Jobs')->setAjaxUrl($this->controllerUrl() . 'tab/failed')
+            ->setNoPadding();
 
         $tabs->addTab()->setLabel('Dashboard')->setAjaxUrl($this->controllerUrl() . 'tab/dashboard')
             ->setNoPadding();
@@ -22,8 +28,6 @@ trait CTrait_Controller_Application_Manager_Daemon_Supervisor {
             ->setNoPadding();
 
         $tabs->addTab()->setLabel('Jobs')->setAjaxUrl($this->controllerUrl() . 'tab/jobs')
-            ->setNoPadding();
-        $tabs->addTab()->setLabel('Failed Jobs')->setAjaxUrl($this->controllerUrl() . 'tab/failed')
             ->setNoPadding();
 
         CManager::registerModule('moment');
@@ -67,10 +71,7 @@ trait CTrait_Controller_Application_Manager_Daemon_Supervisor {
             return $this->ajaxJobs($submethod);
         }
         if ($method == 'failed') {
-            return $this->ajaxFailed();
-        }
-        if ($method == 'retry') {
-            return $this->ajaxRetry();
+            return $this->ajaxFailed($submethod);
         }
         if ($method == 'batches') {
             return $this->ajaxBatches();
@@ -80,6 +81,9 @@ trait CTrait_Controller_Application_Manager_Daemon_Supervisor {
     public function modal($method, $submethod = null) {
         if ($method == 'jobs') {
             return $this->modalJobs($submethod);
+        }
+        if ($method == 'failed') {
+            return $this->modalFailed($submethod);
         }
     }
 
@@ -97,14 +101,47 @@ trait CTrait_Controller_Application_Manager_Daemon_Supervisor {
         return $app;
     }
 
-    protected function ajaxRetry() {
-        $id = c::request()->id;
-        c::dispatch(new CDaemon_Supervisor_TaskQueue_RetryFailedJob($id));
+    protected function modalFailed() {
+        $app = c::app();
+        $jobId = c::request()->jobId;
+        $job = (array) CDaemon::supervisor()->jobRepository()->getJobs([$jobId])->map(function ($job) {
+            return $this->decodeFailedJob($job);
+        })->first();
+
+        $ajaxFailedDetailUrl = $this->controllerUrl() . 'ajax/failed/detail';
+        $ajaxFailedRetryUrl = $this->controllerUrl() . 'ajax/failed/retry';
+        $modalFailedUrl = $this->controllerUrl() . 'modal/failed';
+        $app->addView('cresenity.daemon.supervisor.modal.modal-failed', [
+            'ajaxFailedDetailUrl' => $ajaxFailedDetailUrl,
+            'ajaxFailedRetryUrl' => $ajaxFailedRetryUrl,
+            'modalFailedUrl' => $modalFailedUrl,
+            'job' => $job,
+        ]);
+
+        return $app;
+    }
+
+    protected function ajaxFailedRetry() {
+        $jobId = c::request()->jobId;
+        c::dispatch(new CDaemon_Supervisor_TaskQueue_RetryFailedJob($jobId));
 
         return c::response()->json([
             'errCode' => 0,
             'errMessage' => '',
             'data' => []
+        ]);
+    }
+
+    protected function ajaxFailedDetail() {
+        $jobId = c::request()->jobId;
+        $data = (array) CDaemon::supervisor()->jobRepository()->getJobs([$jobId])->map(function ($job) {
+            return $this->decodeFailedJob($job);
+        })->first();
+
+        return c::response()->json([
+            'errCode' => 0,
+            'errMessage' => '',
+            'data' => $data
         ]);
     }
 
@@ -217,7 +254,13 @@ trait CTrait_Controller_Application_Manager_Daemon_Supervisor {
         ]);
     }
 
-    protected function ajaxFailed() {
+    protected function ajaxFailed($submethod = null) {
+        if ($submethod == 'retry') {
+            return $this->ajaxFailedRetry();
+        }
+        if ($submethod == 'detail') {
+            return $this->ajaxFailedDetail();
+        }
         $data = [];
         $request = c::request();
         $jobs = [];
@@ -355,10 +398,12 @@ trait CTrait_Controller_Application_Manager_Daemon_Supervisor {
         $app = c::app();
 
         $ajaxFailedUrl = $this->controllerUrl() . 'ajax/failed';
-        $ajaxRetryUrl = $this->controllerUrl() . 'ajax/retry';
+        $ajaxFailedRetryUrl = $this->controllerUrl() . 'ajax/failed/retry';
+        $modalFailedUrl = $this->controllerUrl() . 'modal/failed';
         $app->addView('cresenity.daemon.supervisor.failed', [
             'ajaxFailedUrl' => $ajaxFailedUrl,
-            'ajaxRetryUrl' => $ajaxRetryUrl,
+            'ajaxFailedRetryUrl' => $ajaxFailedRetryUrl,
+            'modalFailedUrl' => $modalFailedUrl,
         ]);
 
         return $app;

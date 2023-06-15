@@ -186,6 +186,7 @@ LUA;
                 if ($prefix && cstr::startsWith($key, $prefix) && strlen($key) > strlen($prefix)) {
                     $key = cstr::substr($key, strlen($prefix));
                 }
+                $key = '87712a67-d939-444c-ac14-c5c93fc59fc9';
                 $pipe->eval($script, 1, $key);
             }
         });

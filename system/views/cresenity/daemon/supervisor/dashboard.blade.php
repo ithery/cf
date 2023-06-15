@@ -1,5 +1,6 @@
 @include('cresenity.daemon.supervisor-style')
-<div id="cf-supervisor-dashboard" x-data="supervisorDashboard()" x-show="ready" x-on:beforeunload="destroyed()">
+
+<div id="cf-supervisor-dashboard" x-data="supervisorDashboard()" x-show="ready" x-destroy="destroyed()">
     <div class="card overflow-hidden">
         <div class="card-header d-flex align-items-center justify-content-between">
             <h2 class="h6 m-0">Overview</h2>
@@ -388,6 +389,7 @@ window.supervisorDashboard = function() {
             return periodString;
         },
         destroyed() {
+            console.log('destroyed');
             clearTimeout(this.timeout);
         },
 

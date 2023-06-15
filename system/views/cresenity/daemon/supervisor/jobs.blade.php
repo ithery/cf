@@ -1,5 +1,5 @@
 @include('cresenity.daemon.supervisor-style')
-<div id="cf-supervisor-jobs" x-data="supervisorJobs()" x-on:beforeunload="destroyed()">
+<div id="cf-supervisor-jobs" x-data="supervisorJobs()" x-destroy="destroyed()">
     <div>
 
         <div x-show="!ready">
@@ -48,7 +48,7 @@
                     <template x-for="job in jobs" x-key="job.id">
                         <tr>
                             <td>
-                                <a href="#" x-bind:title="job.name" x-on:click="handleModalJob(job)" x-text="jobBaseName(job.name)">
+                                <a href="#" x-bind:title="job.name" x-on:click="handleModalJob(job.id)" x-text="jobBaseName(job.name)">
                                 </a>
 
                                 <small class="ml-1 badge badge-secondary badge-sm"
@@ -127,8 +127,8 @@ window.supervisorJobs = function() {
 
             this.refreshJobsPeriodically();
         },
-        handleModalJob(job) {
-            const modalJobsUrl = this.modalJobsUrl + '?jobId=' + job.id;
+        handleModalJob(jobId) {
+            const modalJobsUrl = this.modalJobsUrl + '?jobId=' + jobId;
 
             cresenity.modal({
                 reload : {

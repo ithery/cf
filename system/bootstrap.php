@@ -61,3 +61,7 @@ if (CF::config('devcloud.inspector.enabled', false)) {
 if (CF::config('daemon.supervisor.enabled', false)) {
     CDaemon::bootSupervisor();
 }
+
+CF::terminating(function () {
+    CView_ComponentAbstract::flushCache();
+});

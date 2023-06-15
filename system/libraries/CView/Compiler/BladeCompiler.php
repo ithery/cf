@@ -12,16 +12,19 @@ class CView_Compiler_BladeCompiler extends CView_CompilerAbstract implements CVi
         CView_Compiler_BladeCompiler_CompileComponentTrait,
         CView_Compiler_BladeCompiler_CompileConditionalTrait,
         CView_Compiler_BladeCompiler_CompileEchoTrait,
+        CView_Compiler_BladeCompiler_CompileFragmentTrait,
         CView_Compiler_BladeCompiler_CompileErrorTrait,
         CView_Compiler_BladeCompiler_CompileHelperTrait,
         CView_Compiler_BladeCompiler_CompileIncludeTrait,
         CView_Compiler_BladeCompiler_CompileInjectionTrait,
         CView_Compiler_BladeCompiler_CompileJsonTrait,
+        CView_Compiler_BladeCompiler_CompileJsTrait,
         CView_Compiler_BladeCompiler_CompileLayoutTrait,
         CView_Compiler_BladeCompiler_CompileLoopTrait,
         CView_Compiler_BladeCompiler_CompileRawPhpTrait,
         CView_Compiler_BladeCompiler_CompileStackTrait,
-        CView_Compiler_BladeCompiler_CompileTranslationTrait;
+        CView_Compiler_BladeCompiler_CompileTranslationTrait,
+        CTrait_ReflectsClosureTrait;
 
     /**
      * All of the registered extensions.
@@ -113,6 +116,20 @@ class CView_Compiler_BladeCompiler extends CView_CompilerAbstract implements CVi
     protected $rawBlocks = [];
 
     /**
+     * The array of anonymous component paths to search for components in.
+     *
+     * @var array
+     */
+    protected $anonymousComponentPaths = [];
+
+    /**
+     * The array of anonymous component namespaces to autoload from.
+     *
+     * @var array
+     */
+    protected $anonymousComponentNamespaces = [];
+
+    /**
      * The array of class component aliases and their class names.
      *
      * @var array
@@ -167,11 +184,10 @@ class CView_Compiler_BladeCompiler extends CView_CompilerAbstract implements CVi
             if (!empty($this->getPath())) {
                 $contents = $this->appendFilePath($contents);
             }
-
-            CFile::put(
-                $this->getCompiledPath($this->getPath()),
-                $contents
+            $this->ensureCompiledDirectoryExists(
+                $compiledPath = $this->getCompiledPath($this->getPath())
             );
+            CFile::put($compiledPath, $contents);
         }
     }
 
@@ -266,7 +282,15 @@ class CView_Compiler_BladeCompiler extends CView_CompilerAbstract implements CVi
             $result = $this->addFooters($result);
         }
 
-        return $result;
+        if (!empty($this->echoHandlers)) {
+            $result = $this->addBladeCompilerVariable($result);
+        }
+
+        return str_replace(
+            ['##BEGIN-COMPONENT-CLASS##', '##END-COMPONENT-CLASS##'],
+            '',
+            $result
+        );
     }
 
     /**
@@ -465,18 +489,112 @@ class CView_Compiler_BladeCompiler extends CView_CompilerAbstract implements CVi
     /**
      * Compile Blade statements that start with "@".
      *
-     * @param string $value
+     * @param string $template
      *
      * @return string
      */
-    protected function compileStatements($value) {
-        return preg_replace_callback(
-            '/\B@(@?\w+(?:::\w+)?)([ \t]*)(\( ( (?>[^()]+) | (?3) )* \))?/x',
-            function ($match) {
-                return $this->compileStatement($match);
-            },
-            $value
-        );
+    protected function compileStatements($template) {
+        preg_match_all('/\B@(@?\w+(?:::\w+)?)([ \t]*)(\( ( [\S\s]*? ) \))?/x', $template, $matches);
+
+        $offset = 0;
+
+        for ($i = 0; isset($matches[0][$i]); $i++) {
+            $match = [
+                $matches[0][$i],
+                $matches[1][$i],
+                $matches[2][$i],
+                $matches[3][$i] ?: null,
+                $matches[4][$i] ?: null,
+            ];
+
+            // Here we check to see if we have properly found the closing parenthesis by
+            // regex pattern or not, and will recursively continue on to the next ")"
+            // then check again until the tokenizer confirms we find the right one.
+            while (isset($match[4])
+                   && cstr::endsWith($match[0], ')')
+                   && !$this->hasEvenNumberOfParentheses($match[0])) {
+                if (($after = cstr::after($template, $match[0])) === $template) {
+                    break;
+                }
+
+                $rest = cstr::before($after, ')');
+
+                if (isset($matches[0][$i + 1]) && cstr::contains($rest . ')', $matches[0][$i + 1])) {
+                    unset($matches[0][$i + 1]);
+                    $i++;
+                }
+
+                $match[0] = $match[0] . $rest . ')';
+                $match[3] = $match[3] . $rest . ')';
+                $match[4] = $match[4] . $rest;
+            }
+
+            list($template, $offset) = $this->replaceFirstStatement(
+                $match[0],
+                $this->compileStatement($match),
+                $template,
+                $offset
+            );
+        }
+
+        return $template;
+    }
+
+    /**
+     * Replace the first match for a statement compilation operation.
+     *
+     * @param string $search
+     * @param string $replace
+     * @param string $subject
+     * @param int    $offset
+     *
+     * @return array
+     */
+    protected function replaceFirstStatement($search, $replace, $subject, $offset) {
+        $search = (string) $search;
+
+        if ($search === '') {
+            return $subject;
+        }
+
+        $position = strpos($subject, $search, $offset);
+
+        if ($position !== false) {
+            return [
+                substr_replace($subject, $replace, $position, strlen($search)),
+                $position + strlen($replace),
+            ];
+        }
+
+        return [$subject, 0];
+    }
+
+    /**
+     * Determine if the given expression has the same number of opening and closing parentheses.
+     *
+     * @param string $expression
+     *
+     * @return bool
+     */
+    protected function hasEvenNumberOfParentheses(string $expression) {
+        $tokens = token_get_all('<?php ' . $expression);
+
+        if (carr::last($tokens) !== ')') {
+            return false;
+        }
+
+        $opening = 0;
+        $closing = 0;
+
+        foreach ($tokens as $token) {
+            if ($token == ')') {
+                $closing++;
+            } elseif ($token == '(') {
+                $opening++;
+            }
+        }
+
+        return $opening === $closing;
     }
 
     /**
@@ -493,6 +611,8 @@ class CView_Compiler_BladeCompiler extends CView_CompilerAbstract implements CVi
             $match[0] = $this->callCustomDirective($match[1], carr::get($match, 3));
         } elseif (method_exists($this, $method = 'compile' . ucfirst($match[1]))) {
             $match[0] = $this->$method(carr::get($match, 3));
+        } else {
+            return $match[0];
         }
 
         return isset($match[3]) ? $match[0] : $match[0] . $match[2];
@@ -507,6 +627,7 @@ class CView_Compiler_BladeCompiler extends CView_CompilerAbstract implements CVi
      * @return string
      */
     protected function callCustomDirective($name, $value) {
+        $value ??= '';
         if (cstr::startsWith($value, '(') && cstr::endsWith($value, ')')) {
             $value = cstr::substr($value, 1, -1);
         }
@@ -599,7 +720,7 @@ class CView_Compiler_BladeCompiler extends CView_CompilerAbstract implements CVi
      * @return void
      */
     public function component($class, $alias = null, $prefix = '') {
-        if (!is_null($alias) && cstr::contains($alias, '\\')) {
+        if (!is_null($alias) && (cstr::contains($alias, '\\'))) {
             list($class, $alias) = [$alias, $class];
         }
 
@@ -653,6 +774,24 @@ class CView_Compiler_BladeCompiler extends CView_CompilerAbstract implements CVi
      */
     public function componentNamespace($namespace, $prefix) {
         $this->classComponentNamespaces[$prefix] = $namespace;
+    }
+
+    /**
+     * Get the registered anonymous component paths.
+     *
+     * @return array
+     */
+    public function getAnonymousComponentPaths() {
+        return $this->anonymousComponentPaths;
+    }
+
+    /**
+     * Get the registered anonymous component namespaces.
+     *
+     * @return array
+     */
+    public function getAnonymousComponentNamespaces() {
+        return $this->anonymousComponentNamespaces;
     }
 
     /**

@@ -68,4 +68,22 @@ svg.icon {
     font-size: 0.875rem;
     border-radius: 9999px;
 }
+
+.card-bg-secondary {
+    background: #f3f4f6;
+}
+
+
+.control-action svg {
+    fill: #d1d5db;
+    width: 1.2rem;
+    height: 1.2rem;
+}
+.control-action svg:hover {
+    fill: #7c3aed;
+}
+.info-icon {
+    fill: #d1d5db;
+}
+
 </style>

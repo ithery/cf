@@ -198,10 +198,12 @@ class CFile {
         if (static::isFile($path)) {
             $__path = $path;
             $__data = $data;
+
             $function = static function () use ($__path, $__data) {
                 extract($__data, EXTR_SKIP);
 
                 return require $__path;
+
             };
 
             return $function();

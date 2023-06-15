@@ -6,12 +6,14 @@
  * @author Hery
  */
 class CView_Factory {
-    use CView_Trait_ManageEventTrait,
+    use CView_Trait_ManageComponentTrait,
+        CView_Trait_ManageEventTrait,
+        CView_Trait_ManageFragmentTrait,
         CView_Trait_ManageLayoutTrait,
         CView_Trait_ManageLoopTrait,
-        CView_Trait_ManageTranslationTrait,
-        CView_Trait_ManageComponentTrait,
-        CView_Trait_ManageStackTrait;
+        CView_Trait_ManageStackTrait,
+        CView_Trait_ManageTranslationTrait;
+
     /**
      * The extension to engine bindings.
      *
@@ -23,6 +25,13 @@ class CView_Factory {
         'css' => 'file',
         'html' => 'file',
     ];
+
+    /**
+     * The view finder implementation.
+     *
+     * @var \CView_Contract_ViewFinderInterface
+     */
+    protected $finder;
 
     /**
      * The event dispatcher instance.
@@ -161,6 +170,20 @@ class CView_Factory {
         }
 
         return $this->make($view, $this->parseData($data), $mergeData)->render();
+    }
+
+    /**
+     * Get the rendered content of the view based on the negation of a given condition.
+     *
+     * @param bool                        $condition
+     * @param string                      $view
+     * @param \CInterface_Arrayable|array $data
+     * @param array                       $mergeData
+     *
+     * @return string
+     */
+    public function renderUnless($condition, $view, $data = [], $mergeData = []) {
+        return $this->renderWhen(!$condition, $view, $data, $mergeData);
     }
 
     /**
@@ -434,6 +457,8 @@ class CView_Factory {
 
         $this->flushSections();
         $this->flushStacks();
+        $this->flushComponents();
+        $this->flushFragments();
     }
 
     /**
