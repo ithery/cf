@@ -1,6 +1,7 @@
 <?php
 
 defined('SYSPATH') or die('No direct access allowed.');
+use DebugBar\DataFormatter\DataFormatter;
 
 /**
  * Simple DataFormatter based on the deprecated Symfony ValueExporter.
@@ -8,7 +9,7 @@ defined('SYSPATH') or die('No direct access allowed.');
  * @see https://github.com/symfony/symfony/blob/v3.4.4/src/Symfony/Component/HttpKernel/DataCollector/Util/ValueExporter.php
  */
 #[\AllowDynamicProperties]
-class CDebug_DataFormatter_SimpleFormatter extends CDebug_DataFormatter {
+class CDebug_DataFormatter_SimpleFormatter extends DataFormatter {
     /**
      * @param $data
      *
