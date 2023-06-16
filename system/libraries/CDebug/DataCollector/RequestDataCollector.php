@@ -1,11 +1,11 @@
 <?php
 
-defined('SYSPATH') or die('No direct access allowed.');
+use DebugBar\DataCollector\Renderable;
 
 /**
  * Collects info about the current request.
  */
-class CDebug_DataCollector_RequestDataCollector extends CDebug_DataCollector implements CDebug_Bar_Interface_RenderableInterface, CDebug_DataCollector_AssetProviderInterface {
+class CDebug_DataCollector_RequestDataCollector extends CDebug_DataCollector implements Renderable, CDebug_DataCollector_AssetProviderInterface {
     // The HTML var dumper requires debug bar users to support the new inline assets, which not all
     // may support yet - so return false by default for now.
     protected $useHtmlVarDumper = true;

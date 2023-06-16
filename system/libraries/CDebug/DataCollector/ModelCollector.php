@@ -1,9 +1,10 @@
 <?php
+use DebugBar\DataCollector\Renderable;
 
 /**
  * Collector for Models.
  */
-class CDebug_DataCollector_ModelCollector extends CDebug_DataCollector implements CDebug_Bar_Interface_RenderableInterface {
+class CDebug_DataCollector_ModelCollector extends CDebug_DataCollector implements Renderable {
     public $models = [];
 
     public $count = 0;

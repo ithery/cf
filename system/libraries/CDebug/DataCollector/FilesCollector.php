@@ -1,8 +1,8 @@
 <?php
 
-defined('SYSPATH') or die('No direct access allowed.');
+use DebugBar\DataCollector\Renderable;
 
-class CDebug_DataCollector_FilesCollector extends CDebug_DataCollector implements CDebug_Bar_Interface_RenderableInterface {
+class CDebug_DataCollector_FilesCollector extends CDebug_DataCollector implements Renderable {
     const BASE_PATH = DOCROOT;
 
     /**

@@ -4,6 +4,7 @@ defined('SYSPATH') or die('No direct access allowed.');
 
 use Psr\Log\AbstractLogger;
 
+use DebugBar\DataCollector\Renderable;
 use DebugBar\DataCollector\DataCollectorInterface;
 use DebugBar\DataFormatter\DataFormatterInterface;
 use DebugBar\DataCollector\MessagesAggregateInterface;
@@ -11,7 +12,7 @@ use DebugBar\DataCollector\MessagesAggregateInterface;
 /**
  * Provides a way to log messages.
  */
-class CDebug_DataCollector_MessagesCollector extends AbstractLogger implements DataCollectorInterface, MessagesAggregateInterface, CDebug_Bar_Interface_RenderableInterface, CDebug_DataCollector_AssetProviderInterface {
+class CDebug_DataCollector_MessagesCollector extends AbstractLogger implements DataCollectorInterface, MessagesAggregateInterface, Renderable, CDebug_DataCollector_AssetProviderInterface {
     protected $name;
 
     protected $messages = [];

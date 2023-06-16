@@ -2,12 +2,7 @@
 
 defined('SYSPATH') or die('No direct access allowed.');
 
-/**
- * @author Hery Kurniawan
- * @license Ittron Global Teknologi <ittron.co.id>
- *
- * @since Aug 22, 2018, 1:20:44 PM
- */
+use DebugBar\DataCollector\Renderable;
 
 use Symfony\Component\HttpFoundation\StreamedResponse;
 use Symfony\Component\HttpFoundation\BinaryFileResponse;
@@ -246,7 +241,7 @@ class CDebug_Bar_Renderer {
         // finds controls provided by collectors
         $widgets = [];
         foreach ($this->debugBar->getCollectors() as $collector) {
-            if (($collector instanceof CDebug_Bar_Interface_RenderableInterface) && !in_array($collector->getName(), $this->ignoredCollectors)) {
+            if (($collector instanceof Renderable) && !in_array($collector->getName(), $this->ignoredCollectors)) {
                 if ($w = $collector->getWidgets()) {
                     $widgets = array_merge($widgets, $w);
                 }

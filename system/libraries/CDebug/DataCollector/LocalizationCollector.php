@@ -1,11 +1,12 @@
 <?php
 
 defined('SYSPATH') or die('No direct access allowed.');
+use DebugBar\DataCollector\Renderable;
 
 /**
  * Collects info about the current localization state.
  */
-class CDebug_DataCollector_LocalizationCollector extends CDebug_DataCollector implements CDebug_Bar_Interface_RenderableInterface {
+class CDebug_DataCollector_LocalizationCollector extends CDebug_DataCollector implements Renderable {
     /**
      * Get the current locale.
      *

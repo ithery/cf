@@ -2,12 +2,12 @@
 
 defined('SYSPATH') or die('No direct access allowed.');
 
-use Symfony\Component\Debug\Exception\FatalThrowableError;
+use DebugBar\DataCollector\Renderable;
 
 /**
  * Collects info about exceptions.
  */
-class CDebug_DataCollector_ExceptionsCollector extends CDebug_DataCollector implements CDebug_Bar_Interface_RenderableInterface {
+class CDebug_DataCollector_ExceptionsCollector extends CDebug_DataCollector implements Renderable {
     protected $exceptions = [];
 
     protected $chainExceptions = false;

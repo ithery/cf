@@ -1,11 +1,11 @@
 <?php
 
-defined('SYSPATH') or die('No direct access allowed.');
+use DebugBar\DataCollector\Renderable;
 
 /**
  * Collects info about PHP.
  */
-class CDebug_DataCollector_PhpInfoCollector extends CDebug_DataCollector implements CDebug_Bar_Interface_RenderableInterface {
+class CDebug_DataCollector_PhpInfoCollector extends CDebug_DataCollector implements Renderable {
     /**
      * @return string
      */

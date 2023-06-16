@@ -1,11 +1,12 @@
 <?php
 
 defined('SYSPATH') or die('No direct access allowed.');
+use DebugBar\DataCollector\Renderable;
 
 /**
  * Collects info about memory usage.
  */
-class CDebug_DataCollector_MemoryCollector extends CDebug_DataCollector implements CDebug_Bar_Interface_RenderableInterface {
+class CDebug_DataCollector_MemoryCollector extends CDebug_DataCollector implements Renderable {
     protected $realUsage = false;
 
     protected $peakUsage = 0;
