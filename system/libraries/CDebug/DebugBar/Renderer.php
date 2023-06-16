@@ -7,13 +7,13 @@ use DebugBar\DataCollector\Renderable;
 use Symfony\Component\HttpFoundation\StreamedResponse;
 use Symfony\Component\HttpFoundation\BinaryFileResponse;
 
-class CDebug_Bar_Renderer {
+class CDebug_DebugBar_Renderer {
     const REPLACEABLE_TAG = '<!-- CAPP-DEBUGBAR-CODE -->';
 
     const REPLACEABLE_JS_TAG = '/* CAPP-DEBUGBAR-CODE */';
 
     /**
-     * @var CDebug_Bar
+     * @var CDebug_DebugBar
      */
     protected $debugBar;
 
@@ -59,7 +59,7 @@ class CDebug_Bar_Renderer {
         'debug/debugbar/highlightjs/highlight.pack.js',
     ];
 
-    public function __construct(CDebug_Bar $bar) {
+    public function __construct(CDebug_DebugBar $bar) {
         $this->debugBar = $bar;
     }
 

@@ -2,7 +2,12 @@
 
 use DebugBar\DataCollector\TimeDataCollector;
 
-class CDebug_Bar extends CDebug_AbstractBar {
+/**
+ * @see CDebug
+ */
+class CDebug_DebugBar extends CDebug_AbstractBar {
+    use CDebug_DebugBar_DebugBarTrait_PhpInfoCollectorTrait;
+
     /**
      * True when booted.
      *

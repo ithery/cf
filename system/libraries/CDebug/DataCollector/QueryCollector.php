@@ -1,10 +1,9 @@
 <?php
 
 defined('SYSPATH') or die('No direct access allowed.');
+
 use DebugBar\DataCollector\Renderable;
-
 use DebugBar\DataCollector\DataCollector;
-
 use DebugBar\DataCollector\TimeDataCollector;
 
 /**
@@ -23,15 +22,17 @@ class CDebug_DataCollector_QueryCollector extends DataCollector implements Rende
 
     protected $middleware = [];
 
+    protected $durationBackground = true;
+
     protected $explainQuery = false;
 
     protected $explainTypes = ['SELECT']; // ['SELECT', 'INSERT', 'UPDATE', 'DELETE']; for MySQL 5.6.3+
 
     protected $showHints = true;
 
-    protected $reflection = [];
-
     protected $showCopyButton = true;
+
+    protected $reflection = [];
 
     /**
      * @param TimeDataCollector $timeCollector
@@ -327,6 +328,28 @@ class CDebug_DataCollector_QueryCollector extends DataCollector implements Rende
                 ];
             }
         }
+
+        if ($this->durationBackground) {
+            if ($totalTime > 0) {
+                // For showing background measure on Queries tab
+                $start_percent = 0;
+
+                foreach ($statements as $i => $statement) {
+                    if (!isset($statement['duration'])) {
+                        continue;
+                    }
+
+                    $width_percent = $statement['duration'] / $totalTime * 100;
+
+                    $statements[$i] = array_merge($statement, [
+                        'start_percent' => round($start_percent, 3),
+                        'width_percent' => round($width_percent, 3),
+                    ]);
+
+                    $start_percent += $width_percent;
+                }
+            }
+        }
         $nb_statements = array_filter($queries, function ($query) {
             return $query['type'] == 'query';
         });
@@ -334,7 +357,7 @@ class CDebug_DataCollector_QueryCollector extends DataCollector implements Rende
             'nb_statements' => count($nb_statements),
             'nb_failed_statements' => 0,
             'accumulated_duration' => $totalTime,
-            'accumulated_duration_str' => $this->formatDuration($totalTime),
+            'accumulated_duration_str' => $this->getDataFormatter()->formatDuration($totalTime),
             'statements' => $statements
         ];
 
@@ -374,7 +397,11 @@ class CDebug_DataCollector_QueryCollector extends DataCollector implements Rende
     }
 
     /**
-     * @return CDebug_DataFormatter_QueryFormatter
+     * Get data formatter
+     * Dont remove this method
+     * IDE must know return of this object must CDebug_DataFormatter_QueryFormatter object.
+     *
+     * @return CDebug_DataFormatter_QueryFormatter;
      */
     public function getDataFormatter() {
         return parent::getDataFormatter();

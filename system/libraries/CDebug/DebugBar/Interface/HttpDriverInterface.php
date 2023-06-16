@@ -13,7 +13,7 @@ defined('SYSPATH') or die('No direct access allowed.');
  * Provides an abstraction of PHP native features for easier integration
  * in third party frameworks.
  */
-interface CDebug_Bar_Interface_HttpDriverInterface {
+interface CDebug_DebugBar_Interface_HttpDriverInterface {
     /**
      * Sets HTTP headers.
      *

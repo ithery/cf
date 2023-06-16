@@ -5,17 +5,17 @@ defined('SYSPATH') or die('No direct access allowed.');
 /**
  * Handler to list and open saved dataset.
  */
-class CDebug_Bar_OpenHandler {
+class CDebug_DebugBar_OpenHandler {
     protected $debugBar;
 
     /**
-     * @param CDebug_Bar $debugBar
+     * @param CDebug_DebugBar $debugBar
      *
-     * @throws CDebug_Bar_Exception
+     * @throws CDebug_DebugBar_Exception
      */
-    public function __construct(CDebug_Bar $debugBar) {
+    public function __construct(CDebug_DebugBar $debugBar) {
         if (!$debugBar->isDataPersisted()) {
-            throw new CDebug_Bar_Exception('DebugBar must have a storage backend to use OpenHandler');
+            throw new CDebug_DebugBar_Exception('DebugBar must have a storage backend to use OpenHandler');
         }
         $this->debugBar = $debugBar;
     }
@@ -27,7 +27,7 @@ class CDebug_Bar_OpenHandler {
      * @param bool  $echo
      * @param bool  $sendHeader
      *
-     * @throws CDebug_Bar_Exception
+     * @throws CDebug_DebugBar_Exception
      *
      * @return string
      */
@@ -39,7 +39,7 @@ class CDebug_Bar_OpenHandler {
         if (isset($request['op'])) {
             $op = $request['op'];
             if (!in_array($op, ['find', 'get', 'clear'])) {
-                throw new CDebug_Bar_Exception("Invalid operation '{$request['op']}'");
+                throw new CDebug_DebugBar_Exception("Invalid operation '{$request['op']}'");
             }
         }
         if ($sendHeader) {
@@ -86,13 +86,13 @@ class CDebug_Bar_OpenHandler {
      *
      * @param $request
      *
-     * @throws CDebug_Bar_Exception
+     * @throws CDebug_DebugBar_Exception
      *
      * @return array
      */
     protected function get($request) {
         if (!isset($request['id'])) {
-            throw new CDebug_Bar_Exception("Missing 'id' parameter in 'get' operation");
+            throw new CDebug_DebugBar_Exception("Missing 'id' parameter in 'get' operation");
         }
 
         return $this->debugBar->getStorage()->get($request['id']);

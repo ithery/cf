@@ -2,7 +2,7 @@
 
 defined('SYSPATH') or die('No direct access allowed.');
 
-class CDebug_Bar_Config {
+class CDebug_DebugBar_Config {
     protected $config = [];
 
     public function __construct(array $config = []) {

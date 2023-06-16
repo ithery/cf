@@ -19,7 +19,7 @@ class CDebug_AbstractBar implements ArrayAccess {
     /**
      * Config of this bar.
      *
-     * @var CDebug_Bar_Config
+     * @var CDebug_DebugBar_Config
      */
     protected $config;
 
@@ -33,7 +33,7 @@ class CDebug_AbstractBar implements ArrayAccess {
     protected $storage;
 
     /**
-     * @var CDebug_Bar_Interface_HttpDriverInterface
+     * @var CDebug_DebugBar_Interface_HttpDriverInterface
      */
     protected $httpDriver;
 
@@ -42,13 +42,13 @@ class CDebug_AbstractBar implements ArrayAccess {
     protected $stackAlwaysUseSessionStorage = false;
 
     /**
-     * @var CDebug_Bar_Renderer
+     * @var CDebug_DebugBar_Renderer
      */
     protected $renderer;
 
     public function __construct(array $options = []) {
-        $this->config = new CDebug_Bar_Config($options);
-        $this->renderer = new CDebug_Bar_Renderer($this);
+        $this->config = new CDebug_DebugBar_Config($options);
+        $this->renderer = new CDebug_DebugBar_Renderer($this);
     }
 
     /**
@@ -67,16 +67,16 @@ class CDebug_AbstractBar implements ArrayAccess {
      *
      * @param DataCollectorInterface $collector
      *
-     * @throws CDebug_Bar_Exception
+     * @throws CDebug_DebugBar_Exception
      *
      * @return $this
      */
     public function addCollector(DataCollectorInterface $collector) {
         if ($collector->getName() === '__meta') {
-            throw new CDebug_Bar_Exception("'__meta' is a reserved name and cannot be used as a collector name");
+            throw new CDebug_DebugBar_Exception("'__meta' is a reserved name and cannot be used as a collector name");
         }
         if (isset($this->collectors[$collector->getName()])) {
-            throw new CDebug_Bar_Exception("'{$collector->getName()}' is already a registered collector");
+            throw new CDebug_DebugBar_Exception("'{$collector->getName()}' is already a registered collector");
         }
         $this->collectors[$collector->getName()] = $collector;
 
@@ -88,13 +88,13 @@ class CDebug_AbstractBar implements ArrayAccess {
      *
      * @param string $name
      *
-     * @throws CDebug_Bar_Exception
+     * @throws CDebug_DebugBar_Exception
      *
      * @return DataCollectorInterface
      */
     public function getCollector($name) {
         if (!isset($this->collectors[$name])) {
-            throw new CDebug_Bar_Exception("'${name}' is not a registered collector");
+            throw new CDebug_DebugBar_Exception("'${name}' is not a registered collector");
         }
 
         return $this->collectors[$name];
@@ -273,7 +273,7 @@ class CDebug_AbstractBar implements ArrayAccess {
     public function hasStackedData() {
         try {
             $http = $this->initStackSession();
-        } catch (CDebug_Bar_Exception $e) {
+        } catch (CDebug_DebugBar_Exception $e) {
             return false;
         }
 
@@ -383,7 +383,7 @@ class CDebug_AbstractBar implements ArrayAccess {
      */
     public function getHttpDriver() {
         if ($this->httpDriver === null) {
-            $this->httpDriver = new CDebug_Bar_PhpHttpDriver();
+            $this->httpDriver = new CDebug_DebugBar_PhpHttpDriver();
         }
 
         return $this->httpDriver;
@@ -457,7 +457,7 @@ class CDebug_AbstractBar implements ArrayAccess {
 
     #[ReturnTypeWillChange]
     public function offsetSet($key, $value) {
-        throw new CDebug_Bar_Exception('DebugBar[] is read-only');
+        throw new CDebug_DebugBar_Exception('DebugBar[] is read-only');
     }
 
     public function offsetGet($key) {
@@ -471,6 +471,6 @@ class CDebug_AbstractBar implements ArrayAccess {
 
     #[ReturnTypeWillChange]
     public function offsetUnset($key) {
-        throw new CDebug_Bar_Exception('DebugBar[] is read-only');
+        throw new CDebug_DebugBar_Exception('DebugBar[] is read-only');
     }
 }
