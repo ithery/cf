@@ -14,9 +14,7 @@ trait CTrait_Controller_Application_Manager_Daemon_Supervisor {
         $app->title($this->getTitle());
 
         $tabs = $app->addTabList()->setTabPositionLeft();
-        $tabs->addTab()->setLabel('Metrics')->setAjaxUrl($this->controllerUrl() . 'tab/metrics')
-            ->setNoPadding();
-        $tabs->addTab()->setLabel('Failed Jobs')->setAjaxUrl($this->controllerUrl() . 'tab/failed')
+        $tabs->addTab()->setLabel('Batches')->setAjaxUrl($this->controllerUrl() . 'tab/batches')
             ->setNoPadding();
 
         $tabs->addTab()->setLabel('Dashboard')->setAjaxUrl($this->controllerUrl() . 'tab/dashboard')
@@ -24,11 +22,12 @@ trait CTrait_Controller_Application_Manager_Daemon_Supervisor {
 
         $tabs->addTab()->setLabel('Monitoring')->setAjaxUrl($this->controllerUrl() . 'tab/monitoring')
             ->setNoPadding();
-
-        $tabs->addTab()->setLabel('Batches')->setAjaxUrl($this->controllerUrl() . 'tab/batches')
+        $tabs->addTab()->setLabel('Metrics')->setAjaxUrl($this->controllerUrl() . 'tab/metrics')
             ->setNoPadding();
 
         $tabs->addTab()->setLabel('Jobs')->setAjaxUrl($this->controllerUrl() . 'tab/jobs')
+            ->setNoPadding();
+        $tabs->addTab()->setLabel('Failed Jobs')->setAjaxUrl($this->controllerUrl() . 'tab/failed')
             ->setNoPadding();
 
         CManager::registerModule('moment');
@@ -78,7 +77,7 @@ trait CTrait_Controller_Application_Manager_Daemon_Supervisor {
             return $this->ajaxFailed($submethod);
         }
         if ($method == 'batches') {
-            return $this->ajaxBatches();
+            return $this->ajaxBatches($submethod);
         }
         if ($method == 'metrics') {
             return $this->ajaxMetrics($submethod);
@@ -94,6 +93,9 @@ trait CTrait_Controller_Application_Manager_Daemon_Supervisor {
         }
         if ($method == 'metrics') {
             return $this->modalMetrics($submethod);
+        }
+        if ($method == 'batches') {
+            return $this->modalBatches();
         }
     }
 
@@ -140,6 +142,20 @@ trait CTrait_Controller_Application_Manager_Daemon_Supervisor {
             'ajaxMetricsUrl' => $ajaxMetricsUrl,
             'type' => $type,
             'slug' => $slug,
+        ]);
+
+        return $app;
+    }
+
+    protected function modalBatches() {
+        $app = c::app();
+        $batchId = c::request()->batchId;
+        $ajaxBatchesRetryUrl = $this->controllerUrl() . 'ajax/batches/retry?batchId=' . $batchId;
+        $ajaxBatchesDetailUrl = $this->controllerUrl() . 'ajax/batches/detail?batchId=' . $batchId;
+        $app->addView('cresenity.daemon.supervisor.modal.modal-batches', [
+            'ajaxBatchesRetryUrl' => $ajaxBatchesRetryUrl,
+            'ajaxBatchesDetailUrl' => $ajaxBatchesDetailUrl,
+
         ]);
 
         return $app;
@@ -320,20 +336,31 @@ trait CTrait_Controller_Application_Manager_Daemon_Supervisor {
         ]);
     }
 
-    protected function ajaxBatches() {
+    protected function ajaxBatches($submethod = null) {
         $data = [];
         $request = c::request();
-        $batches = [];
+        if ($submethod == 'detail') {
+            $batchId = c::request()->batchId;
+            $batch = CQueue::batchRepository()->find($batchId);
+            $failedJobs = CDaemon::supervisor()->jobRepository()->getJobs($batch->failedJobIds);
+            $data = [
+                'batch' => $batch,
+                'failedJobs' => $failedJobs,
 
-        try {
-            $batches = CQueue::batchRepository()->get(50, $request->query('before_id') ?: null);
-        } catch (CDatabase_Exception_QueryException $e) {
+            ];
+        } else {
             $batches = [];
-        }
 
-        $data = [
-            'batches' => $batches,
-        ];
+            try {
+                $batches = CQueue::batchRepository()->get(50, $request->query('before_id') ?: null);
+            } catch (CDatabase_Exception_QueryException $e) {
+                $batches = [];
+            }
+
+            $data = [
+                'batches' => $batches,
+            ];
+        }
 
         return c::response()->json([
             'errCode' => 0,
@@ -466,8 +493,10 @@ trait CTrait_Controller_Application_Manager_Daemon_Supervisor {
         $app = c::app();
 
         $ajaxBatchesUrl = $this->controllerUrl() . 'ajax/batches';
+        $modalBatchDetailUrl = $this->controllerUrl() . 'modal/batches';
         $app->addView('cresenity.daemon.supervisor.batches', [
             'ajaxBatchesUrl' => $ajaxBatchesUrl,
+            'modalBatchDetailUrl' => $modalBatchDetailUrl,
         ]);
 
         return $app;

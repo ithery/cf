@@ -47,7 +47,7 @@
                         <template x-for="batch in batches" x-key="batch.id">
                             <tr>
                                 <td>
-                                    <a x-bind:title="batch.id" x-text="batch . name || batch . id">
+                                    <a x-bind:title="batch.id" x-on:click.prevent="handleModalBatchDetail(batch.id)" x-text="batch.name || batch.id">
                                     </a>
                                 </td>
                                 <td>
@@ -63,7 +63,7 @@
                                         x-show="!batch.cancelledAt && batch.pendingJobs > 0 && !batch.failedJobs">
                                         Pending
                                     </small>
-                                    <small class="badge badge-warning badge-sm" v-if="batch.cancelledAt">
+                                    <small class="badge badge-warning badge-sm" x-show="batch.cancelledAt">
                                         Cancelled
                                     </small>
                                 </td>
@@ -101,6 +101,7 @@
             previousFirstId: null,
             batches: [],
             ajaxBatchesUrl: '{{ $ajaxBatchesUrl }}',
+            modalBatchDetailUrl: '{{ $modalBatchDetailUrl }}',
             init() {
                 document.title = "Supervisor - Batches";
                 this.loadBatches();
@@ -108,6 +109,17 @@
                 this.refreshBatchesPeriodically();
 
 
+            },
+            handleModalBatchDetail(batchId) {
+                const modalBatchDetailUrl = this.modalBatchDetailUrl + '?batchId=' + batchId;
+
+                cresenity.modal({
+                    reload : {
+                        url:modalBatchDetailUrl
+                    },
+                    isSidebar:true,
+                    title:'Detail Batch ' + batchId
+                });
             },
             loadBatches(beforeId = '', refreshing = false) {
                 if (!refreshing) {
