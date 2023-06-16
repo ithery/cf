@@ -2,23 +2,14 @@
 
 defined('SYSPATH') or die('No direct access allowed.');
 
-/**
- * @author Hery Kurniawan
- * @license Ittron Global Teknologi <ittron.co.id>
- *
- * @since Aug 22, 2018, 2:34:59 PM
- * This file is part of the DebugBar package.
- *
- * (c) 2013 Maxime Bouroumeau-Fuseau
- *
- * For the full copyright and license information, please view the LICENSE
- * file that was distributed with this source code.
- */
+use DebugBar\DataFormatter\DataFormatter;
+use DebugBar\DataCollector\DataCollectorInterface;
+use DebugBar\DataFormatter\DataFormatterInterface;
 
 /**
  * Abstract class for data collectors.
  */
-abstract class CDebug_DataCollector implements CDebug_Contract_DataCollectorInterface {
+abstract class CDebug_DataCollector implements DataCollectorInterface {
     protected $dataFormater;
 
     protected $varDumper;
@@ -36,20 +27,20 @@ abstract class CDebug_DataCollector implements CDebug_Contract_DataCollectorInte
     /**
      * Sets the default data formater instance used by all collectors subclassing this class.
      *
-     * @param CDebug_Contract_DataFormatterInterface $formater
+     * @param DataFormatterInterface $formater
      */
-    public static function setDefaultDataFormatter(CDebug_Contract_DataFormatterInterface $formater) {
+    public static function setDefaultDataFormatter(DataFormatterInterface $formater) {
         self::$defaultDataFormatter = $formater;
     }
 
     /**
      * Returns the default data formater.
      *
-     * @return CDebug_Contract_DataFormatterInterface
+     * @return DataFormatterInterface
      */
     public static function getDefaultDataFormatter() {
         if (self::$defaultDataFormatter === null) {
-            self::$defaultDataFormatter = new CDebug_DataFormatter();
+            self::$defaultDataFormatter = new DataFormatter();
         }
 
         return self::$defaultDataFormatter;
@@ -58,18 +49,18 @@ abstract class CDebug_DataCollector implements CDebug_Contract_DataCollectorInte
     /**
      * Sets the data formater instance used by this collector.
      *
-     * @param CDebug_Contract_DataFormatterInterface $formater
+     * @param DataFormatterInterface $formater
      *
      * @return $this
      */
-    public function setDataFormatter(CDebug_Contract_DataFormatterInterface $formater) {
+    public function setDataFormatter(DataFormatterInterface $formater) {
         $this->dataFormater = $formater;
 
         return $this;
     }
 
     /**
-     * @return CDebug_Contract_DataFormatterInterface
+     * @return DataFormatterInterface
      */
     public function getDataFormatter() {
         if ($this->dataFormater === null) {

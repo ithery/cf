@@ -2,12 +2,6 @@
 
 defined('SYSPATH') or die('No direct access allowed.');
 
-/**
- * @author Hery Kurniawan
- * @license Ittron Global Teknologi <ittron.co.id>
- *
- * @since Aug 22, 2018, 1:04:27 PM
- */
 class CDebug_Bar extends CDebug_AbstractBar {
     /**
      * True when booted.

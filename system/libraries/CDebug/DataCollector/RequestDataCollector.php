@@ -3,14 +3,7 @@
 defined('SYSPATH') or die('No direct access allowed.');
 
 /**
- * @author Hery Kurniawan
- * @license Ittron Global Teknologi <ittron.co.id>
- *
- * @since Aug 22, 2018, 5:20:27 PM
- */
-
-/**
- * Collects info about the current request
+ * Collects info about the current request.
  */
 class CDebug_DataCollector_RequestDataCollector extends CDebug_DataCollector implements CDebug_Bar_Interface_RenderableInterface, CDebug_DataCollector_AssetProviderInterface {
     // The HTML var dumper requires debug bar users to support the new inline assets, which not all
@@ -27,6 +20,7 @@ class CDebug_DataCollector_RequestDataCollector extends CDebug_DataCollector imp
      */
     public function useHtmlVarDumper($value = true) {
         $this->useHtmlVarDumper = $value;
+
         return $this;
     }
 
@@ -56,6 +50,7 @@ class CDebug_DataCollector_RequestDataCollector extends CDebug_DataCollector imp
                 }
             }
         }
+
         return $data;
     }
 
@@ -78,6 +73,7 @@ class CDebug_DataCollector_RequestDataCollector extends CDebug_DataCollector imp
      */
     public function getWidgets() {
         $widget = $this->isHtmlVarDumperUsed() ? 'PhpDebugBar.Widgets.HtmlVariableListWidget' : 'PhpDebugBar.Widgets.VariableListWidget';
+
         return [
             'request' => [
                 'icon' => 'tags',

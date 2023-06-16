@@ -4,10 +4,13 @@ defined('SYSPATH') or die('No direct access allowed.');
 
 use Psr\Log\AbstractLogger;
 
+use DebugBar\DataCollector\DataCollectorInterface;
+use DebugBar\DataFormatter\DataFormatterInterface;
+
 /**
  * Provides a way to log messages.
  */
-class CDebug_DataCollector_MessagesCollector extends AbstractLogger implements CDebug_Contract_DataCollectorInterface, CDebug_DataCollector_MessagesAggregateInterface, CDebug_Bar_Interface_RenderableInterface, CDebug_DataCollector_AssetProviderInterface {
+class CDebug_DataCollector_MessagesCollector extends AbstractLogger implements DataCollectorInterface, CDebug_DataCollector_MessagesAggregateInterface, CDebug_Bar_Interface_RenderableInterface, CDebug_DataCollector_AssetProviderInterface {
     protected $name;
 
     protected $messages = [];
@@ -32,18 +35,18 @@ class CDebug_DataCollector_MessagesCollector extends AbstractLogger implements C
     /**
      * Sets the data formater instance used by this collector.
      *
-     * @param CDebug_Contract_DataFormatterInterface $formater
+     * @param DataFormatterInterface $formater
      *
      * @return $this
      */
-    public function setDataFormatter(CDebug_Contract_DataFormatterInterface $formater) {
+    public function setDataFormatter(DataFormatterInterface $formater) {
         $this->dataFormater = $formater;
 
         return $this;
     }
 
     /**
-     * @return CDebug_Contract_DataFormatterInterface
+     * @return DataFormatterInterface
      */
     public function getDataFormatter() {
         if ($this->dataFormater === null) {

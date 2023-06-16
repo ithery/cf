@@ -2,19 +2,15 @@
 
 defined('SYSPATH') or die('No direct access allowed.');
 
-/**
- * @author Hery Kurniawan
- * @license Ittron Global Teknologi <ittron.co.id>
- *
- * @since Aug 22, 2018, 3:13:50 PM
- */
+use DebugBar\DataCollector\DataCollectorInterface;
+
 class CDebug_AbstractBar implements ArrayAccess {
     public static $useOpenHandlerWhenSendingDataHeaders = false;
 
     protected $data;
 
     /**
-     * @var CDebug_Contract_DataCollectorInterface[]
+     * @var DataCollectorInterface[]
      */
     protected $collectors = [];
 
@@ -67,13 +63,13 @@ class CDebug_AbstractBar implements ArrayAccess {
     /**
      * Adds a data collector.
      *
-     * @param CDebug_Contract_DataCollectorInterface $collector
+     * @param DataCollectorInterface $collector
      *
      * @throws CDebug_Bar_Exception
      *
      * @return $this
      */
-    public function addCollector(CDebug_Contract_DataCollectorInterface $collector) {
+    public function addCollector(DataCollectorInterface $collector) {
         if ($collector->getName() === '__meta') {
             throw new CDebug_Bar_Exception("'__meta' is a reserved name and cannot be used as a collector name");
         }
@@ -92,7 +88,7 @@ class CDebug_AbstractBar implements ArrayAccess {
      *
      * @throws CDebug_Bar_Exception
      *
-     * @return CDebug_Contract_DataCollectorInterface
+     * @return DataCollectorInterface
      */
     public function getCollector($name) {
         if (!isset($this->collectors[$name])) {
@@ -105,7 +101,7 @@ class CDebug_AbstractBar implements ArrayAccess {
     /**
      * Returns an array of all data collectors.
      *
-     * @return CDebug_Contract_DataCollectorInterface[]
+     * @return DataCollectorInterface[]
      */
     public function getCollectors() {
         return $this->collectors;
@@ -457,6 +453,7 @@ class CDebug_AbstractBar implements ArrayAccess {
         return $this->data;
     }
 
+    #[ReturnTypeWillChange]
     public function offsetSet($key, $value) {
         throw new CDebug_Bar_Exception('DebugBar[] is read-only');
     }
@@ -465,10 +462,12 @@ class CDebug_AbstractBar implements ArrayAccess {
         return $this->getCollector($key);
     }
 
+    #[ReturnTypeWillChange]
     public function offsetExists($key) {
         return $this->hasCollector($key);
     }
 
+    #[ReturnTypeWillChange]
     public function offsetUnset($key) {
         throw new CDebug_Bar_Exception('DebugBar[] is read-only');
     }
