@@ -66,11 +66,25 @@ class CEvent_Dispatcher implements CEvent_DispatcherInterface {
      * @return void
      */
     public function listen($events, $listener) {
+        if ($events instanceof Closure) {
+            return c::collect($this->firstClosureParameterTypes($events))
+                ->each(function ($event) use ($events) {
+                    $this->listen($event, $events);
+                });
+        } elseif ($events instanceof CEvent_QueuedClosure) {
+            return c::collect($this->firstClosureParameterTypes($events->closure))
+                ->each(function ($event) use ($events) {
+                    $this->listen($event, $events->resolve());
+                });
+        } elseif ($listener instanceof CEvent_QueuedClosure) {
+            $listener = $listener->resolve();
+        }
+
         foreach ((array) $events as $event) {
             if (cstr::contains($event, '*')) {
                 $this->setupWildcardListen($event, $listener);
             } else {
-                $this->listeners[$event][] = $this->makeListener($listener);
+                $this->listeners[$event][] = $listener;
             }
         }
     }
@@ -85,6 +99,7 @@ class CEvent_Dispatcher implements CEvent_DispatcherInterface {
      */
     protected function setupWildcardListen($event, $listener) {
         $this->wildcards[$event][] = $this->makeListener($listener, true);
+
         $this->wildcardsCache = [];
     }
 
@@ -97,6 +112,23 @@ class CEvent_Dispatcher implements CEvent_DispatcherInterface {
      */
     public function hasListeners($eventName) {
         return isset($this->listeners[$eventName]) || isset($this->wildcards[$eventName]);
+    }
+
+    /**
+     * Determine if the given event has any wildcard listeners.
+     *
+     * @param string $eventName
+     *
+     * @return bool
+     */
+    public function hasWildcardListeners($eventName) {
+        foreach ($this->wildcards as $key => $listeners) {
+            if (cstr::is($key, $eventName)) {
+                return true;
+            }
+        }
+
+        return false;
     }
 
     /**
@@ -133,7 +165,22 @@ class CEvent_Dispatcher implements CEvent_DispatcherInterface {
      */
     public function subscribe($subscriber) {
         $subscriber = $this->resolveSubscriber($subscriber);
-        $subscriber->subscribe($this);
+
+        $events = $subscriber->subscribe($this);
+
+        if (is_array($events)) {
+            foreach ($events as $event => $listeners) {
+                foreach (carr::wrap($listeners) as $listener) {
+                    if (is_string($listener) && method_exists($subscriber, $listener)) {
+                        $this->listen($event, [get_class($subscriber), $listener]);
+
+                        continue;
+                    }
+
+                    $this->listen($event, $listener);
+                }
+            }
+        }
     }
 
     /**
@@ -189,26 +236,34 @@ class CEvent_Dispatcher implements CEvent_DispatcherInterface {
         // When the given "event" is actually an object we will assume it is an event
         // object and use the class as the event name and this event itself as the
         // payload to the handler, which makes object based events quite simple.
-        list($event, $payload) = $this->parseEventAndPayload($event, $payload);
+        list($event, $payload) = $this->parseEventAndPayload(
+            $event,
+            $payload
+        );
+
         if ($this->shouldBroadcast($payload)) {
             $this->broadcastEvent($payload[0]);
         }
 
         $responses = [];
+
         foreach ($this->getListeners($event) as $listener) {
             $response = $listener($event, $payload);
+
             // If a response is returned from the listener and event halting is enabled
             // we will just return this response, and not call the rest of the event
             // listeners. Otherwise we will add the response on the response list.
             if ($halt && !is_null($response)) {
                 return $response;
             }
+
             // If a boolean false is returned from a listener, we will stop propagating
             // the event to any further listeners down in the chain, else we keep on
             // looping through the listeners and firing every one in our sequence.
             if ($response === false) {
                 break;
             }
+
             $responses[] = $response;
         }
 
@@ -274,16 +329,14 @@ class CEvent_Dispatcher implements CEvent_DispatcherInterface {
      * @return array
      */
     public function getListeners($eventName) {
-        if (is_array($eventName) || strlen($eventName) == 0) {
-            throw new Exception('Invalid Event Name, ' . (is_array($eventName) ? json_encode($eventName) : ', Empty Session Name'));
-        }
-        $listeners = isset($this->listeners[$eventName]) ? $this->listeners[$eventName] : [];
         $listeners = array_merge(
-            $listeners,
-            isset($this->wildcardsCache[$eventName]) ? $this->wildcardsCache[$eventName] : $this->getWildcardListeners($eventName)
+            $this->prepareListeners($eventName),
+            $this->wildcardsCache[$eventName] ?? $this->getWildcardListeners($eventName)
         );
 
-        return class_exists($eventName, false) ? $this->addInterfaceListeners($eventName, $listeners) : $listeners;
+        return class_exists($eventName, false)
+                    ? $this->addInterfaceListeners($eventName, $listeners)
+                    : $listeners;
     }
 
     /**
@@ -295,9 +348,12 @@ class CEvent_Dispatcher implements CEvent_DispatcherInterface {
      */
     protected function getWildcardListeners($eventName) {
         $wildcards = [];
+
         foreach ($this->wildcards as $key => $listeners) {
             if (cstr::is($key, $eventName)) {
-                $wildcards = array_merge($wildcards, $listeners);
+                foreach ($listeners as $listener) {
+                    $wildcards[] = $this->makeListener($listener, true);
+                }
             }
         }
 
@@ -315,7 +371,7 @@ class CEvent_Dispatcher implements CEvent_DispatcherInterface {
     protected function addInterfaceListeners($eventName, array $listeners = []) {
         foreach (class_implements($eventName) as $interface) {
             if (isset($this->listeners[$interface])) {
-                foreach ($this->listeners[$interface] as $names) {
+                foreach ($this->prepareListeners($interface) as $names) {
                     $listeners = array_merge($listeners, (array) $names);
                 }
             }
