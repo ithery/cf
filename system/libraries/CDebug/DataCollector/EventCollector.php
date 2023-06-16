@@ -2,16 +2,9 @@
 
 defined('SYSPATH') or die('No direct access allowed.');
 
-/**
- * @author Hery Kurniawan
- * @license Ittron Global Teknologi <ittron.co.id>
- *
- * @since Aug 22, 2018, 4:53:08 PM
- */
-
-use Symfony\Component\VarDumper\Cloner\VarCloner;
-
 class CDebug_DataCollector_EventCollector extends CDebug_DataCollector_TimeDataCollector {
+    use CDebug_DataCollector_Trait_FileHelperTrait;
+
     /**
      * @var CEvent_Dispatcher
      */
