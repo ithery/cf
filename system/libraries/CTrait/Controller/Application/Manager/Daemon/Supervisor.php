@@ -31,6 +31,7 @@ trait CTrait_Controller_Application_Manager_Daemon_Supervisor {
             ->setNoPadding();
 
         CManager::registerModule('moment');
+        CManager::registerModule('chartjs');
 
         return $app;
     }
