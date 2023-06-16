@@ -3,6 +3,7 @@
 defined('SYSPATH') or die('No direct access allowed.');
 
 use DebugBar\DataCollector\Renderable;
+use DebugBar\DataCollector\AssetProvider;
 
 use Symfony\Component\HttpFoundation\StreamedResponse;
 use Symfony\Component\HttpFoundation\BinaryFileResponse;
@@ -69,10 +70,10 @@ class CDebug_DebugBar_Renderer {
         $inlineCss = [];
         $inlineJs = [];
         $inlineHead = [];
-
+        $additionalAssets = [];
         // finds assets provided by collectors
         foreach ($this->debugBar->getCollectors() as $collector) {
-            if (($collector instanceof CDebug_DataCollector_AssetProviderInterface) && !in_array($collector->getName(), $this->ignoredCollectors)) {
+            if (($collector instanceof AssetProvider) && !in_array($collector->getName(), $this->ignoredCollectors)) {
                 $additionalAssets[] = $collector->getAssets();
             }
         }
@@ -127,7 +128,7 @@ class CDebug_DebugBar_Renderer {
         }
         // finds assets provided by collectors
         foreach ($this->debugBar->getCollectors() as $collector) {
-            if (($collector instanceof CDebug_DataCollector_AssetProviderInterface) && !in_array($collector->getName(), $this->ignoredCollectors)) {
+            if (($collector instanceof AssetProvider) && !in_array($collector->getName(), $this->ignoredCollectors)) {
                 $assets = $collector->getAssets();
                 foreach (carr::get($assets, 'css', []) as $css) {
                     $cssRoute = curl::base() . 'modules/cresenity/media/css/' . $css;

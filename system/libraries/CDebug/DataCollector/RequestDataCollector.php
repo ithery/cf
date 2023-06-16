@@ -1,13 +1,13 @@
 <?php
 
 use DebugBar\DataCollector\Renderable;
-
 use DebugBar\DataCollector\DataCollector;
+use DebugBar\DataCollector\AssetProvider;
 
 /**
  * Collects info about the current request.
  */
-class CDebug_DataCollector_RequestDataCollector extends DataCollector implements Renderable, CDebug_DataCollector_AssetProviderInterface {
+class CDebug_DataCollector_RequestDataCollector extends DataCollector implements Renderable, AssetProvider {
     // The HTML var dumper requires debug bar users to support the new inline assets, which not all
     // may support yet - so return false by default for now.
     protected $useHtmlVarDumper = true;

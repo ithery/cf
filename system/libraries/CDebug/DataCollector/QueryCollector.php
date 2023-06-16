@@ -5,11 +5,12 @@ defined('SYSPATH') or die('No direct access allowed.');
 use DebugBar\DataCollector\Renderable;
 use DebugBar\DataCollector\DataCollector;
 use DebugBar\DataCollector\TimeDataCollector;
+use DebugBar\DataCollector\AssetProvider;
 
 /**
  * Collects data about SQL statements executed with PDO.
  */
-class CDebug_DataCollector_QueryCollector extends DataCollector implements Renderable, CDebug_DataCollector_AssetProviderInterface {
+class CDebug_DataCollector_QueryCollector extends DataCollector implements Renderable, AssetProvider {
     use CDebug_DataCollector_Trait_FileHelperTrait;
 
     protected $timeCollector;
@@ -39,7 +40,7 @@ class CDebug_DataCollector_QueryCollector extends DataCollector implements Rende
      */
     public function __construct(TimeDataCollector $timeCollector = null) {
         $this->timeCollector = $timeCollector;
-        $this->setDataFormatter(new CDebug_DataFormatter_QueryFormatter());
+        $this->setDataFormatter(new CDebug_DebugBar_DataFormatter_QueryFormatter());
 
         try {
             CEvent::dispatcher()->listen(CDatabase_Event_QueryExecuted::class, function (CDatabase_Event_QueryExecuted $query) {
@@ -399,9 +400,9 @@ class CDebug_DataCollector_QueryCollector extends DataCollector implements Rende
     /**
      * Get data formatter
      * Dont remove this method
-     * IDE must know return of this object must CDebug_DataFormatter_QueryFormatter object.
+     * IDE must know return of this object must CDebug_DebugBar_DataFormatter_QueryFormatter object.
      *
-     * @return CDebug_DataFormatter_QueryFormatter;
+     * @return CDebug_DebugBar_DataFormatter_QueryFormatter;
      */
     public function getDataFormatter() {
         return parent::getDataFormatter();

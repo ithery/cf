@@ -4,7 +4,7 @@ defined('SYSPATH') or die('No direct access allowed.');
 use DebugBar\DataFormatter\DataFormatter;
 
 #[\AllowDynamicProperties]
-class CDebug_DataFormatter_QueryFormatter extends DataFormatter {
+class CDebug_DebugBar_DataFormatter_QueryFormatter extends DataFormatter {
     /**
      * Removes extra spaces at the beginning and end of the SQL query and its lines.
      *

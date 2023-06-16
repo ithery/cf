@@ -8,7 +8,7 @@ class CDebug_DataCollector_RenderableCollector extends DataCollector implements 
     protected $renderable = [];
 
     public function __construct() {
-        $this->setDataFormatter(new CDebug_DataFormatter_SimpleFormatter());
+        $this->setDataFormatter(new CDebug_DebugBar_DataFormatter_SimpleFormatter());
 
         try {
             CApp::instance()->listenOnRenderableAdded(function (CApp_Event_OnRenderableAdded $eventArgs) {

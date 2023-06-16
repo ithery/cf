@@ -5,16 +5,17 @@ defined('SYSPATH') or die('No direct access allowed.');
 use Psr\Log\AbstractLogger;
 
 use DebugBar\DataCollector\Renderable;
+use DebugBar\DataCollector\AssetProvider;
 use DebugBar\DataCollector\DataCollector;
+use DebugBar\DataFormatter\DebugBarVarDumper;
 use DebugBar\DataCollector\DataCollectorInterface;
 use DebugBar\DataFormatter\DataFormatterInterface;
-
 use DebugBar\DataCollector\MessagesAggregateInterface;
 
 /**
  * Provides a way to log messages.
  */
-class CDebug_DataCollector_MessagesCollector extends AbstractLogger implements DataCollectorInterface, MessagesAggregateInterface, Renderable, CDebug_DataCollector_AssetProviderInterface {
+class CDebug_DataCollector_MessagesCollector extends AbstractLogger implements DataCollectorInterface, MessagesAggregateInterface, Renderable, AssetProvider {
     protected $name;
 
     protected $messages = [];
@@ -63,11 +64,11 @@ class CDebug_DataCollector_MessagesCollector extends AbstractLogger implements D
     /**
      * Sets the variable dumper instance used by this collector.
      *
-     * @param CDebug_DataFormatter_DebugBarVarDumper $varDumper
+     * @param \DebugBar\DataFormatter\DebugBarVarDumper $varDumper
      *
      * @return $this
      */
-    public function setVarDumper(CDebug_DataFormatter_DebugBarVarDumper $varDumper) {
+    public function setVarDumper(DebugBarVarDumper $varDumper) {
         $this->varDumper = $varDumper;
 
         return $this;
@@ -76,7 +77,7 @@ class CDebug_DataCollector_MessagesCollector extends AbstractLogger implements D
     /**
      * Gets the variable dumper instance used by this collector.
      *
-     * @return CDebug_DataFormatter_DebugBarVarDumper
+     * @return \DebugBar\DataFormatter\DebugBarVarDumper
      */
     public function getVarDumper() {
         if ($this->varDumper === null) {
