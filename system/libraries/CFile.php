@@ -203,7 +203,6 @@ class CFile {
                 extract($__data, EXTR_SKIP);
 
                 return require $__path;
-
             };
 
             return $function();

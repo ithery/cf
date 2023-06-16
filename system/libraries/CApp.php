@@ -38,6 +38,9 @@ defined('SYSPATH') or die('No direct access allowed.');
  * @method CElement_Component_Image              addImage($id=null)
  * @method CElement_Component_Chart              addChart($id=null)
  * @method CElement_Component_Metric_ValueMetric addValueMetric($id=null)
+ * @method CApp                                  addBr()
+ * @method CApp                                  addHr()
+ * @method CApp                                  add(mixed $renderable)
  * @method $this                                 addJs($js)
  */
 class CApp implements CInterface_Responsable, CInterface_Renderable, CInterface_Jsonable {

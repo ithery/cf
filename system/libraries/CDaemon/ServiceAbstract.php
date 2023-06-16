@@ -65,7 +65,7 @@ abstract class CDaemon_ServiceAbstract implements CDaemon_ServiceInterface {
 
     protected $terminateLimit = 20;
 
-    protected $sizeToRotate = '500KB';
+    protected $sizeToRotate = 500 * 1024;
 
     /**
      * The frequency of the event loop. In seconds.
@@ -184,6 +184,7 @@ abstract class CDaemon_ServiceAbstract implements CDaemon_ServiceInterface {
         $this->config = $config;
         $this->stdout = carr::get($config, 'stdout', false);
         $this->pidFile = $this->getConfig('pidFile');
+        $this->sizeToRotate = CF::config('daemon.logs.rotation.size', 500 * 1024);
         CDaemon_ErrorHandler::init();
         //$this->getopt();
     }
@@ -559,13 +560,6 @@ abstract class CDaemon_ServiceAbstract implements CDaemon_ServiceInterface {
     /**
      * Log the $message to the filename returned by CDaemon_ServiceAbstract::logFile() and/or optionally print to stdout.
      * Multi-Line messages will be handled nicely.
-     *
-     * Note: Your logFile() method will be called every 5 minutes (at even increments, eg 00:05, 00:10, 00:15, etc) to
-     * allow you to rotate the filename based on time (one log file per month, day, hour, whatever) if you wish.
-     *
-     * Note: You may find value in overloading this method in your app in favor of a more fully-featured logging tool
-     * like log4php or Zend_Log. There are fantastic logging libraries available, and this simplistic home-grown option
-     * was chosen specifically to avoid forcing another dependency on you.
      *
      * @param string $message
      * @param string $label   Truncated at 12 chars
