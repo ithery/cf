@@ -60,7 +60,7 @@ class CDebug_Bar extends CDebug_AbstractBar {
 
         $this->addCollector(new CDebug_DataCollector_PhpInfoCollector());
         $this->addCollector(new CDebug_DataCollector_MemoryCollector());
-        $this->addCollector(new CDebug_DataCollector_LocalizationCollector());
+        $this->addCollector(new CDebug_DataCollector_CFCollector());
         $this->addCollector(new CDebug_DataCollector_MessagesCollector());
         $this->addCollector(new CDebug_DataCollector_EventCollector());
         $this->addCollector(new CDebug_DataCollector_RequestDataCollector());
