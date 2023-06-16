@@ -325,6 +325,23 @@ class CEvent_Dispatcher implements CEvent_DispatcherInterface {
     }
 
     /**
+     * Prepare the listeners for a given event.
+     *
+     * @param string $eventName
+     *
+     * @return \Closure[]
+     */
+    protected function prepareListeners(string $eventName) {
+        $listeners = [];
+
+        foreach ($this->listeners[$eventName] ?? [] as $listener) {
+            $listeners[] = $this->makeListener($listener);
+        }
+
+        return $listeners;
+    }
+
+    /**
      * Register an event listener with the dispatcher.
      *
      * @param \Closure|string $listener
@@ -337,12 +354,16 @@ class CEvent_Dispatcher implements CEvent_DispatcherInterface {
             return $this->createClassListener($listener, $wildcard);
         }
 
+        if (is_array($listener) && isset($listener[0]) && is_string($listener[0])) {
+            return $this->createClassListener($listener, $wildcard);
+        }
+
         return function ($event, $payload) use ($listener, $wildcard) {
             if ($wildcard) {
                 return $listener($event, $payload);
             }
 
-            return call_user_func_array($listener, array_values($payload));
+            return $listener(...array_values($payload));
         };
     }
 
@@ -360,10 +381,9 @@ class CEvent_Dispatcher implements CEvent_DispatcherInterface {
                 return call_user_func($this->createClassCallable($listener), $event, $payload);
             }
 
-            return call_user_func_array(
-                $this->createClassCallable($listener),
-                $payload
-            );
+            $callable = $this->createClassCallable($listener);
+
+            return $callable(...array_values($payload));
         };
     }
 
@@ -375,12 +395,23 @@ class CEvent_Dispatcher implements CEvent_DispatcherInterface {
      * @return callable
      */
     protected function createClassCallable($listener) {
-        list($class, $method) = $this->parseClassCallable($listener);
+        list($class, $method) = is_array($listener)
+                            ? $listener
+                            : $this->parseClassCallable($listener);
+
+        if (!method_exists($class, $method)) {
+            $method = '__invoke';
+        }
+
         if ($this->handlerShouldBeQueued($class)) {
             return $this->createQueuedHandlerCallable($class, $method);
         }
 
-        return [$this->container->make($class), $method];
+        $listener = $this->container->make($class);
+
+        return $this->handlerShouldBeDispatchedAfterDatabaseTransactions($listener)
+                    ? $this->createCallbackForListenerRunningAfterCommits($listener, $method)
+                    : [$listener, $method];
     }
 
     /**
@@ -424,6 +455,7 @@ class CEvent_Dispatcher implements CEvent_DispatcherInterface {
             $arguments = array_map(function ($a) {
                 return is_object($a) ? clone $a : $a;
             }, func_get_args());
+
             if ($this->handlerWantsToBeQueued($class, $arguments)) {
                 $this->queueHandler($class, $method, $arguments);
             }
