@@ -14,8 +14,6 @@ trait CTrait_Controller_Application_Manager_Daemon_Supervisor {
         $app->title($this->getTitle());
 
         $tabs = $app->addTabList()->setTabPositionLeft();
-        $tabs->addTab()->setLabel('Batches')->setAjaxUrl($this->controllerUrl() . 'tab/batches')
-            ->setNoPadding();
 
         $tabs->addTab()->setLabel('Dashboard')->setAjaxUrl($this->controllerUrl() . 'tab/dashboard')
             ->setNoPadding();
@@ -23,6 +21,8 @@ trait CTrait_Controller_Application_Manager_Daemon_Supervisor {
         $tabs->addTab()->setLabel('Monitoring')->setAjaxUrl($this->controllerUrl() . 'tab/monitoring')
             ->setNoPadding();
         $tabs->addTab()->setLabel('Metrics')->setAjaxUrl($this->controllerUrl() . 'tab/metrics')
+            ->setNoPadding();
+        $tabs->addTab()->setLabel('Batches')->setAjaxUrl($this->controllerUrl() . 'tab/batches')
             ->setNoPadding();
 
         $tabs->addTab()->setLabel('Jobs')->setAjaxUrl($this->controllerUrl() . 'tab/jobs')
