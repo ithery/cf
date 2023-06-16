@@ -3,14 +3,7 @@
 defined('SYSPATH') or die('No direct access allowed.');
 
 /**
- * @author Hery Kurniawan
- * @license Ittron Global Teknologi <ittron.co.id>
- *
- * @since Aug 23, 2018, 1:39:40 AM
- */
-
-/**
- * Handler to list and open saved dataset
+ * Handler to list and open saved dataset.
  */
 class CDebug_Bar_OpenHandler {
     protected $debugBar;
@@ -28,15 +21,15 @@ class CDebug_Bar_OpenHandler {
     }
 
     /**
-     * Handles the current request
+     * Handles the current request.
      *
      * @param array $request    Request data
      * @param bool  $echo
      * @param bool  $sendHeader
      *
-     * @return string
-     *
      * @throws CDebug_Bar_Exception
+     *
+     * @return string
      */
     public function handle($request = null, $echo = true, $sendHeader = true) {
         if ($request === null) {
@@ -58,11 +51,12 @@ class CDebug_Bar_OpenHandler {
         if ($echo) {
             echo $response;
         }
+
         return $response;
     }
 
     /**
-     * Find operation
+     * Find operation.
      *
      * @param $request
      *
@@ -83,32 +77,35 @@ class CDebug_Bar_OpenHandler {
                 $filters[$key] = $request[$key];
             }
         }
+
         return $this->debugBar->getStorage()->find($filters, $max, $offset);
     }
 
     /**
-     * Get operation
+     * Get operation.
      *
      * @param $request
      *
-     * @return array
-     *
      * @throws CDebug_Bar_Exception
+     *
+     * @return array
      */
     protected function get($request) {
         if (!isset($request['id'])) {
             throw new CDebug_Bar_Exception("Missing 'id' parameter in 'get' operation");
         }
+
         return $this->debugBar->getStorage()->get($request['id']);
     }
 
     /**
-     * Clear operation
+     * Clear operation.
      *
      * @param mixed $request
      */
     protected function clear($request) {
         $this->debugBar->getStorage()->clear();
+
         return ['success' => true];
     }
 }

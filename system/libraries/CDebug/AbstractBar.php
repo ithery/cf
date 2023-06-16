@@ -2,6 +2,8 @@
 
 defined('SYSPATH') or die('No direct access allowed.');
 
+use DebugBar\RequestIdGenerator;
+use DebugBar\RequestIdGeneratorInterface;
 use DebugBar\DataCollector\DataCollectorInterface;
 
 class CDebug_AbstractBar implements ArrayAccess {
@@ -22,7 +24,7 @@ class CDebug_AbstractBar implements ArrayAccess {
     protected $config;
 
     /**
-     * @var CDebug_Contract_RequestIdGeneratorInterface
+     * @var RequestIdGeneratorInterface
      */
     protected $requestIdGenerator;
 
@@ -121,22 +123,22 @@ class CDebug_AbstractBar implements ArrayAccess {
     /**
      * Sets the request id generator.
      *
-     * @param CDebug_Contract_RequestIdGeneratorInterface $generator
+     * @param RequestIdGeneratorInterface $generator
      *
      * @return $this
      */
-    public function setRequestIdGenerator(CDebug_Contract_RequestIdGeneratorInterface $generator) {
+    public function setRequestIdGenerator(RequestIdGeneratorInterface $generator) {
         $this->requestIdGenerator = $generator;
 
         return $this;
     }
 
     /**
-     * @return CDebug_Contract_RequestIdGeneratorInterface
+     * @return RequestIdGeneratorInterface
      */
     public function getRequestIdGenerator() {
         if ($this->requestIdGenerator === null) {
-            $this->requestIdGenerator = new CDebug_Bar_RequestIdGenerator();
+            $this->requestIdGenerator = new RequestIdGenerator();
         }
 
         return $this->requestIdGenerator;
