@@ -10,17 +10,7 @@ trait CTrait_Controller_Application_Manager_Daemon_Supervisor {
 
     public function index() {
         $app = c::app();
-        $db = c::db();
-        $db->begin();
-        $model = new WPModel_LogDebug();
-        $model->message = 'testing';
-        $model->save();
 
-        c::db()->afterCommit(function () use ($app) {
-            $app->add('After Commit');
-        });
-        $app->add('Before Commit');
-        $db->commit();
         $app->title($this->getTitle());
 
         $tabs = $app->addTabList()->setTabPositionLeft();

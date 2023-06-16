@@ -2,12 +2,6 @@
 
 defined('SYSPATH') or die('No direct access allowed.');
 
-/**
- * @author Hery Kurniawan
- * @license Ittron Global Teknologi <ittron.co.id>
- *
- * @since Sep 8, 2019, 2:46:55 AM
- */
 trait CQueue_Trait_DispatchableTrait {
     /**
      * Dispatch the job with the given arguments.
