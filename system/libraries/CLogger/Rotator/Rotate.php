@@ -22,9 +22,13 @@ class CLogger_Rotator_Rotate extends CLogger_Rotator_AbstractRotate {
      * Set the number of old copies to keep.
      *
      * @param $number
+     *
+     * @return CLogger_Rotator_Rotate
      */
     public function keep($number) {
         $this->keepNumber = $number;
+
+        return $this;
     }
 
     /**

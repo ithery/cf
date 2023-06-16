@@ -230,10 +230,19 @@ class CDaemon_Runner {
     public function rotateLog() {
         $logFile = $this->getLogFile();
 
-        if (strlen($logFile) > 0 && file_exists($logFile)) {
+        if (strlen($logFile) > 0 && CFile::isFile($logFile)) {
             $rotator = CLogger_Rotator::createRotate($logFile);
-
             $rotator->forceRotate();
+        }
+    }
+
+    public function autoRotateLog($size = null, $keep = null) {
+        $logFile = $this->getLogFile();
+        $size = $size ?: CF::config('daemon.logs.rotation.size', 500 * 1024);
+        $keep = $keep ?: CF::config('daemon.logs.rotation.keep', 10);
+        if (strlen($logFile) > 0 && CFile::isFile($logFile) && CFile::size($logFile) > $size) {
+            $rotator = CLogger_Rotator::createRotate($logFile);
+            $rotator->size($size)->keep($keep)->run();
         }
     }
 

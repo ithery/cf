@@ -67,6 +67,13 @@ abstract class CDaemon_ServiceAbstract implements CDaemon_ServiceInterface {
 
     protected $logSizeToRotate = 500 * 1024;
 
+    protected $logKeepToRotate = 10;
+
+    /**
+     * @var CDaemon_Runner
+     */
+    protected $runner = null;
+
     /**
      * The frequency of the event loop. In seconds.
      *
@@ -185,6 +192,7 @@ abstract class CDaemon_ServiceAbstract implements CDaemon_ServiceInterface {
         $this->stdout = carr::get($config, 'stdout', false);
         $this->pidFile = $this->getConfig('pidFile');
         $this->logSizeToRotate = CF::config('daemon.logs.rotation.size', 500 * 1024);
+        $this->logKeepToRotate = CF::config('daemon.logs.rotation.keep', 10);
         CDaemon_ErrorHandler::init();
         //$this->getopt();
     }
@@ -572,11 +580,8 @@ abstract class CDaemon_ServiceAbstract implements CDaemon_ServiceInterface {
         $label = str_pad(substr($label, 0, 12), 13, ' ', STR_PAD_RIGHT);
         $prefix = "[${date}] ${pid} ${label}" . str_repeat("\t", $indent);
         $logFile = $this->logFile();
-        if ($logFile && file_exists($logFile) && CFile::size($logFile) > $this->logSizeToRotate) {
-            $rotator = CLogger_Rotator::createRotate($logFile);
 
-            $rotator->size($this->logSizeToRotate)->run();
-        }
+        $this->runner()->autoRotateLog($this->logSizeToRotate, $this->logKeepToRotate);
         if (!CFile::exists($logFile)) {
             CFile::put($logFile, $header);
             if ($this->stdout) {
@@ -918,9 +923,7 @@ abstract class CDaemon_ServiceAbstract implements CDaemon_ServiceInterface {
             fclose(STDIN);
         }
 
-        $class = get_class($this);
-
-        $runner = CDaemon::createRunner($class);
+        $runner = $this->runner();
 
         if ($rotateLog) {
             $this->log('Rotating Log...');
@@ -1261,5 +1264,13 @@ abstract class CDaemon_ServiceAbstract implements CDaemon_ServiceInterface {
 
     public function isShutdown() {
         return $this->shutdown;
+    }
+
+    public function runner() {
+        if ($this->runner == null) {
+            $this->runner = CDaemon::createRunner(get_class($this));
+        }
+
+        return $this->runner;
     }
 }

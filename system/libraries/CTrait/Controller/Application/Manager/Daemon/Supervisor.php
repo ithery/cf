@@ -10,23 +10,6 @@ trait CTrait_Controller_Application_Manager_Daemon_Supervisor {
 
     public function index() {
         $app = c::app();
-        $file = DOCROOT . 'temp/logs/test.log';
-        if (!CFile::isDirectory(CFile::dirname($file))) {
-            CFile::makeDirectory(CFile::dirname($file), 0755, true);
-        }
-
-        CFile::append($file, str_repeat('test', 20000) . PHP_EOL);
-        $rotator = CLogger_Rotator::createRotate($file);
-
-        $rotated = $rotator->size(1024)->run();
-
-        $app->add(json_encode($rotated));
-        $app->addBr();
-        if (CFile::exists($file)) {
-            $app->add(nl2br(CFile::get($file)));
-        } else {
-            $app->add('not found rotated');
-        }
 
         $app->title($this->getTitle());
 

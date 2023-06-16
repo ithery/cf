@@ -208,7 +208,7 @@ return [
     'logs' => [
         'rotation' => [
             'size' => 500 * 1024,
-            'length' => 10,
+            'keep' => 10,
         ]
     ]
 ];
