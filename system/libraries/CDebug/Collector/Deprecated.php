@@ -1,6 +1,10 @@
 <?php
 
 class CDebug_Collector_Deprecated extends CDebug_Collector_Exception {
+    /**
+     * @param string $message
+     * @return void
+     */
     public function collect($message = '') {
         if (!CF::config('collector.deprecated')) {
             return null;
@@ -37,6 +41,9 @@ class CDebug_Collector_Deprecated extends CDebug_Collector_Exception {
         }
     }
 
+    /**
+     * @return string
+     */
     public function getType() {
         return CDebug::COLLECTOR_TYPE_DEPRECATED;
     }

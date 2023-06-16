@@ -3,11 +3,6 @@
 defined('SYSPATH') or die('No direct access allowed.');
 
 /**
- * @author Hery Kurniawan
- * @license Ittron Global Teknologi <ittron.co.id>
- */
-
-/**
  * Formats data to be outputed as string.
  */
 interface CDebug_Contract_DataFormatterInterface {
