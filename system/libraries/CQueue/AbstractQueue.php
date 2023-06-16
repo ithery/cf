@@ -294,7 +294,7 @@ abstract class CQueue_AbstractQueue implements CQueue_QueueInterface {
      */
     protected function enqueueUsing($job, $payload, $queue, $delay, $callback) {
         if ($this->shouldDispatchAfterCommit($job)) {
-            $transactionManager = c::db()->getTransactionManager();
+            $transactionManager = CDatabase::transactionManager();
 
             return $transactionManager->addCallback(
                 function () use ($payload, $queue, $delay, $callback, $job) {

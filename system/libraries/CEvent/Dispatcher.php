@@ -431,6 +431,37 @@ class CEvent_Dispatcher implements CEvent_DispatcherInterface {
     }
 
     /**
+     * Determine if the given event handler should be dispatched after all database transactions have committed.
+     *
+     * @param object|mixed $listener
+     *
+     * @return bool
+     */
+    protected function handlerShouldBeDispatchedAfterDatabaseTransactions($listener) {
+        return ($listener->afterCommit ?? null) && $this->container->bound('db.transactions');
+    }
+
+    /**
+     * Create a callable for dispatching a listener after database transactions.
+     *
+     * @param mixed  $listener
+     * @param string $method
+     *
+     * @return \Closure
+     */
+    protected function createCallbackForListenerRunningAfterCommits($listener, $method) {
+        return function () use ($method, $listener) {
+            $payload = func_get_args();
+
+            CDatabase::transactionManager()->addCallback(
+                function () use ($listener, $method, $payload) {
+                    $listener->$method(...$payload);
+                }
+            );
+        };
+    }
+
+    /**
      * Determine if the event handler wants to be queued.
      *
      * @param string $class
