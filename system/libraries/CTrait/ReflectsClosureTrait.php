@@ -1,32 +1,6 @@
 <?php
 
-/**
- * Description of ReflectsClosureTrait
- *
- * @author Hery
- */
 trait CTrait_ReflectsClosureTrait {
-    /**
-     * Get the class names / types of the parameters of the given Closure.
-     *
-     * @param \Closure $closure
-     *
-     * @throws \ReflectionException
-     *
-     * @return array
-     */
-    protected function closureParameterTypes(Closure $closure) {
-        $reflection = new ReflectionFunction($closure);
-
-        return c::collect($reflection->getParameters())->mapWithKeys(function ($parameter) {
-            if ($parameter->isVariadic()) {
-                return [$parameter->getName() => null];
-            }
-
-            return [$parameter->getName() => $parameter->getClass()->getName()];
-        })->all();
-    }
-
     /**
      * Get the class name of the first parameter of the given Closure.
      *
@@ -48,5 +22,26 @@ trait CTrait_ReflectsClosureTrait {
         }
 
         return $types[0];
+    }
+
+    /**
+     * Get the class names / types of the parameters of the given Closure.
+     *
+     * @param \Closure $closure
+     *
+     * @throws \ReflectionException
+     *
+     * @return array
+     */
+    protected function closureParameterTypes(Closure $closure) {
+        $reflection = new ReflectionFunction($closure);
+
+        return c::collect($reflection->getParameters())->mapWithKeys(function ($parameter) {
+            if ($parameter->isVariadic()) {
+                return [$parameter->getName() => null];
+            }
+
+            return [$parameter->getName() => $parameter->getClass()->getName()];
+        })->all();
     }
 }

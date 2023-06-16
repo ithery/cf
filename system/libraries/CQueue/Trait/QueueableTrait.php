@@ -2,12 +2,6 @@
 
 defined('SYSPATH') or die('No direct access allowed.');
 
-/**
- * @author Hery Kurniawan
- * @license Ittron Global Teknologi <ittron.co.id>
- *
- * @since Sep 8, 2019, 3:04:00 AM
- */
 trait CQueue_Trait_QueueableTrait {
     /**
      * The name of the connection the job should be sent to.
@@ -47,9 +41,16 @@ trait CQueue_Trait_QueueableTrait {
     /**
      * The number of seconds before the job should be made available.
      *
-     * @var null|\DateTimeInterface|\DateInterval|int
+     * @var \DateTimeInterface|\DateInterval|array|int
      */
     public $delay;
+
+    /**
+     * Indicates whether the job should be dispatched after all database transactions have committed.
+     *
+     * @var null|bool
+     */
+    public $afterCommit;
 
     /**
      * The middleware the job should be dispatched through.
@@ -131,6 +132,28 @@ trait CQueue_Trait_QueueableTrait {
     }
 
     /**
+     * Indicate that the job should be dispatched after all database transactions have committed.
+     *
+     * @return $this
+     */
+    public function afterCommit() {
+        $this->afterCommit = true;
+
+        return $this;
+    }
+
+    /**
+     * Indicate that the job should not wait until database transactions have been committed before dispatching.
+     *
+     * @return $this
+     */
+    public function beforeCommit() {
+        $this->afterCommit = false;
+
+        return $this;
+    }
+
+    /**
      * Get the middleware the job should be dispatched through.
      *
      * @return array
@@ -168,6 +191,49 @@ trait CQueue_Trait_QueueableTrait {
     }
 
     /**
+     * Prepend a job to the current chain so that it is run after the currently running job.
+     *
+     * @param mixed $job
+     *
+     * @return $this
+     */
+    public function prependToChain($job) {
+        $this->chained = carr::prepend($this->chained, $this->serializeJob($job));
+
+        return $this;
+    }
+
+    /**
+     * Append a job to the end of the current chain.
+     *
+     * @param mixed $job
+     *
+     * @return $this
+     */
+    public function appendToChain($job) {
+        $this->chained = array_merge($this->chained, [$this->serializeJob($job)]);
+
+        return $this;
+    }
+
+    /**
+     * Serialize a job for queuing.
+     *
+     * @param mixed $job
+     *
+     * @throws \RuntimeException
+     *
+     * @return string
+     */
+    protected function serializeJob($job) {
+        if ($job instanceof Closure) {
+            $job = CQueue_CallQueuedClosure::create($job);
+        }
+
+        return serialize($job);
+    }
+
+    /**
      * Dispatch the next job on the chain.
      *
      * @return void
@@ -176,8 +242,10 @@ trait CQueue_Trait_QueueableTrait {
         if (!empty($this->chained)) {
             new CQueue_PendingDispatch(c::tap(unserialize(array_shift($this->chained)), function ($next) {
                 $next->chained = $this->chained;
+
                 $next->onConnection($next->connection ?: $this->chainConnection);
                 $next->onQueue($next->queue ?: $this->chainQueue);
+
                 $next->chainConnection = $this->chainConnection;
                 $next->chainQueue = $this->chainQueue;
                 $next->chainCatchCallbacks = $this->chainCatchCallbacks;

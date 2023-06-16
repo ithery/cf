@@ -242,6 +242,8 @@ class CDatabase_Connection implements CDatabase_ConnectionInterface {
             $this->enableQueryLog();
         }
         $this->configuration = new CDatabase_Configuration();
+
+        $this->transactionsManager = CDatabase::transactionManager();
     }
 
     /**

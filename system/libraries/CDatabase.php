@@ -87,6 +87,11 @@ class CDatabase {
      */
     protected static $defaultConnection = 'default';
 
+    /**
+     * @var CDatabase_TransactionManager
+     */
+    protected static $transactionManager;
+
     protected $name;
 
     /**
@@ -232,5 +237,13 @@ class CDatabase {
 
     public function __call($method, $arguments) {
         return $this->manager()->$method(...$arguments);
+    }
+
+    public static function transactionManager() {
+        if (self::$transactionManager == null) {
+            self::$transactionManager = new CDatabase_TransactionManager();
+        }
+
+        return self::$transactionManager;
     }
 }

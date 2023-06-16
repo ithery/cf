@@ -1,5 +1,7 @@
 <?php
 
+use Doctrine\DBAL\Types\Type;
+
 class CDatabase_Manager implements CDatabase_Contract_ConnectionResolverInterface {
     use CTrait_Macroable {
         __call as macroCall;
@@ -22,14 +24,27 @@ class CDatabase_Manager implements CDatabase_Contract_ConnectionResolverInterfac
     protected $reconnector;
 
     /**
+     * The custom Doctrine column types.
+     *
+     * @var array<string, array>
+     */
+    protected $doctrineTypes = [];
+
+    /**
      * The custom connection resolvers.
      *
      * @var array<string, callable>
      */
     protected $extensions = [];
 
+    /**
+     * @var array
+     */
     protected $config;
 
+    /**
+     * @var CDatabase_Manager
+     */
     private static $instance;
 
     public static function instance() {
@@ -187,14 +202,15 @@ class CDatabase_Manager implements CDatabase_Contract_ConnectionResolverInterfac
      * @return CDatabase_Connection
      */
     protected function configure(CDatabase_Connection $connection, $type) {
-        $connection = $this->setDriverForType($connection, $type)->setReadWriteType($type);
-
+        $connection = $this->setPdoForType($connection, $type)->setReadWriteType($type);
         // Here we'll set a reconnector callback. This reconnector can be any callable
         // so we will set a Closure to reconnect from this manager with the name of
         // the connection, which will allow us to reconnect from the connections.
+        $connection->setEventDispatcher(CEvent::dispatcher());
+        $connection->setTransactionManager(CDatabase::transactionManager());
         $connection->setReconnector($this->reconnector);
 
-        //$this->registerConfiguredDoctrineTypes($connection);
+        $this->registerConfiguredDoctrineTypes($connection);
 
         return $connection;
     }
@@ -207,7 +223,7 @@ class CDatabase_Manager implements CDatabase_Contract_ConnectionResolverInterfac
      *
      * @return \CDatabase_Connection
      */
-    protected function setDriverForType(CDatabase_Connection $connection, $type = null) {
+    protected function setPdoForType(CDatabase_Connection $connection, $type = null) {
         if ($type === 'read') {
             $connection->setPdo($connection->getReadPdo());
         } elseif ($type === 'write') {
@@ -215,6 +231,49 @@ class CDatabase_Manager implements CDatabase_Contract_ConnectionResolverInterfac
         }
 
         return $connection;
+    }
+
+    /**
+     * Register custom Doctrine types with the connection.
+     *
+     * @param \CDatabase_Connection $connection
+     *
+     * @return void
+     */
+    protected function registerConfiguredDoctrineTypes(CDatabase_Connection $connection) {
+        foreach (CF::config('database.dbal.types', []) as $name => $class) {
+            $this->registerDoctrineType($class, $name, $name);
+        }
+
+        foreach ($this->doctrineTypes as $name => [$type, $class]) {
+            $connection->registerDoctrineType($class, $name, $type);
+        }
+    }
+
+    /**
+     * Register a custom Doctrine type.
+     *
+     * @param string $class
+     * @param string $name
+     * @param string $type
+     *
+     * @throws \Doctrine\DBAL\Exception
+     * @throws \RuntimeException
+     *
+     * @return void
+     */
+    public function registerDoctrineType(string $class, string $name, string $type): void {
+        if (!class_exists('Doctrine\DBAL\Connection')) {
+            throw new RuntimeException(
+                'Registering a custom Doctrine type requires Doctrine DBAL (doctrine/dbal).'
+            );
+        }
+
+        if (!Type::hasType($name)) {
+            Type::addType($name, $class);
+        }
+
+        $this->doctrineTypes[$name] = [$type, $class];
     }
 
     /**

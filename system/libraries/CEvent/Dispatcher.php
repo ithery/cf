@@ -6,6 +6,8 @@ defined('SYSPATH') or die('No direct access allowed.');
  * @author Hery Kurniawan
  */
 class CEvent_Dispatcher implements CEvent_DispatcherInterface {
+    use CTrait_ReflectsClosureTrait;
+
     /**
      * The IoC container instance.
      *
@@ -50,6 +52,9 @@ class CEvent_Dispatcher implements CEvent_DispatcherInterface {
      */
     public function __construct(CContainer_ContainerInterface $container = null) {
         $this->container = $container ?: CContainer::createContainer();
+        $this->queueResolver = function () {
+            return CQueue::queuer();
+        };
     }
 
     /**
@@ -452,10 +457,17 @@ class CEvent_Dispatcher implements CEvent_DispatcherInterface {
      */
     protected function queueHandler($class, $method, $arguments) {
         list($listener, $job) = $this->createListenerAndJob($class, $method, $arguments);
+
         $connection = $this->resolveQueue()->connection(
-            isset($listener->connection) ? $listener->connection : null
+            method_exists($listener, 'viaConnection')
+                    ? (isset($arguments[0]) ? $listener->viaConnection($arguments[0]) : $listener->viaConnection())
+                    : $listener->connection ?? null
         );
-        $queue = isset($listener->queue) ? $listener->queue : null;
+
+        $queue = method_exists($listener, 'viaQueue')
+            ? (isset($arguments[0]) ? $listener->viaQueue($arguments[0]) : $listener->viaQueue())
+            : $listener->queue ?? null;
+
         isset($listener->delay) ? $connection->laterOn($queue, $listener->delay, $job) : $connection->pushOn($queue, $job);
     }
 
@@ -480,16 +492,27 @@ class CEvent_Dispatcher implements CEvent_DispatcherInterface {
     /**
      * Propagate listener options to the job.
      *
-     * @param mixed $listener
-     * @param mixed $job
+     * @param mixed                     $listener
+     * @param CEvent_CallQueuedListener $job
      *
      * @return mixed
      */
     protected function propagateListenerOptions($listener, $job) {
         return c::tap($job, function ($job) use ($listener) {
-            $job->tries = isset($listener->tries) ? $listener->tries : null;
-            $job->timeout = isset($listener->timeout) ? $listener->timeout : null;
-            $job->timeoutAt = method_exists($listener, 'retryUntil') ? $listener->retryUntil() : null;
+            $data = array_values($job->data);
+
+            $job->afterCommit = property_exists($listener, 'afterCommit') ? $listener->afterCommit : null;
+            $job->backoff = method_exists($listener, 'backoff') ? $listener->backoff(...$data) : ($listener->backoff ?? null);
+            $job->maxExceptions = $listener->maxExceptions ?? null;
+            $job->retryUntil = method_exists($listener, 'retryUntil') ? $listener->retryUntil(...$data) : null;
+            $job->shouldBeEncrypted = $listener instanceof CQueue_Contract_ShouldBeEncryptedInterface;
+            $job->timeout = $listener->timeout ?? null;
+            $job->tries = $listener->tries ?? null;
+
+            $job->through(array_merge(
+                method_exists($listener, 'middleware') ? $listener->middleware(...$data) : [],
+                $listener->middleware ?? []
+            ));
         });
     }
 
@@ -505,6 +528,11 @@ class CEvent_Dispatcher implements CEvent_DispatcherInterface {
             unset($this->wildcards[$event]);
         } else {
             unset($this->listeners[$event]);
+        }
+        foreach ($this->wildcardsCache as $key => $listeners) {
+            if (cstr::is($event, $key)) {
+                unset($this->wildcardsCache[$key]);
+            }
         }
     }
 
@@ -524,7 +552,7 @@ class CEvent_Dispatcher implements CEvent_DispatcherInterface {
     /**
      * Get the queue implementation from the resolver.
      *
-     * @return \CQueue_QueueInterface
+     * @return \CQueue_Manager
      */
     protected function resolveQueue() {
         return call_user_func($this->queueResolver);
@@ -541,5 +569,14 @@ class CEvent_Dispatcher implements CEvent_DispatcherInterface {
         $this->queueResolver = $resolver;
 
         return $this;
+    }
+
+    /**
+     * Gets the raw, unprepared listeners.
+     *
+     * @return array
+     */
+    public function getRawListeners() {
+        return $this->listeners;
     }
 }
