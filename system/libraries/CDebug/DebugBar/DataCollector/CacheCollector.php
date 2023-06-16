@@ -78,7 +78,7 @@ class CDebug_DebugBar_DataCollector_CacheCollector extends TimeDataCollector imp
         return [
             'cache' => [
                 'icon' => 'clipboard',
-                'widget' => 'PhpDebugBar.Widgets.CacheWidget',
+                'widget' => 'PhpDebugBar.Widgets.CFCacheWidget',
                 'map' => 'cache',
                 'default' => '{}',
             ],
