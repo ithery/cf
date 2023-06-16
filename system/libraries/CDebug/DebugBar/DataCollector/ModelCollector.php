@@ -6,7 +6,7 @@ use DebugBar\DataCollector\DataCollector;
 /**
  * Collector for Models.
  */
-class CDebug_DataCollector_ModelCollector extends DataCollector implements Renderable {
+class CDebug_DebugBar_DataCollector_ModelCollector extends DataCollector implements Renderable {
     public $models = [];
 
     public $count = 0;

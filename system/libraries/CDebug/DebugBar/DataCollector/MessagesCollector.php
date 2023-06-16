@@ -15,7 +15,7 @@ use DebugBar\DataCollector\MessagesAggregateInterface;
 /**
  * Provides a way to log messages.
  */
-class CDebug_DataCollector_MessagesCollector extends AbstractLogger implements DataCollectorInterface, MessagesAggregateInterface, Renderable, AssetProvider {
+class CDebug_DebugBar_DataCollector_MessagesCollector extends AbstractLogger implements DataCollectorInterface, MessagesAggregateInterface, Renderable, AssetProvider {
     protected $name;
 
     protected $messages = [];

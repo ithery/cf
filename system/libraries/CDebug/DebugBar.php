@@ -63,26 +63,26 @@ class CDebug_DebugBar extends CDebug_AbstractBar {
 
         $timeDataCollector = new TimeDataCollector();
 
-        $this->addCollector(new CDebug_DataCollector_PhpInfoCollector());
-        $this->addCollector(new CDebug_DataCollector_MemoryCollector());
-        $this->addCollector(new CDebug_DataCollector_CFCollector());
-        $this->addCollector(new CDebug_DataCollector_MessagesCollector());
-        $this->addCollector(new CDebug_DataCollector_EventCollector());
-        $this->addCollector(new CDebug_DataCollector_RequestDataCollector());
+        $this->addCollector(new CDebug_DebugBar_DataCollector_PhpInfoCollector());
+        $this->addCollector(new CDebug_DebugBar_DataCollector_MemoryCollector());
+        $this->addCollector(new CDebug_DebugBar_DataCollector_CFCollector());
+        $this->addCollector(new CDebug_DebugBar_DataCollector_MessagesCollector());
+        $this->addCollector(new CDebug_DebugBar_DataCollector_EventCollector());
+        $this->addCollector(new CDebug_DebugBar_DataCollector_RequestDataCollector());
         $this->addCollector($timeDataCollector);
-        $this->addCollector(new CDebug_DataCollector_FilesCollector());
-        $this->addCollector(new CDebug_DataCollector_RenderableCollector());
+        $this->addCollector(new CDebug_DebugBar_DataCollector_FilesCollector());
+        $this->addCollector(new CDebug_DebugBar_DataCollector_RenderableCollector());
 
-        $queryCollector = new CDebug_DataCollector_QueryCollector($timeDataCollector);
+        $queryCollector = new CDebug_DebugBar_DataCollector_QueryCollector($timeDataCollector);
 
         $queryCollector->setRenderSqlWithParams(true);
         $this->addCollector($queryCollector);
 
-        $this->addCollector(new CDebug_DataCollector_ExceptionsCollector());
-        $this->addCollector(new CDebug_DataCollector_ModelCollector());
+        $this->addCollector(new CDebug_DebugBar_DataCollector_ExceptionsCollector());
+        $this->addCollector(new CDebug_DebugBar_DataCollector_ModelCollector());
 
         if ($this->shouldCollect('cache')) {
-            $cacheCollector = new CDebug_DataCollector_CacheCollector();
+            $cacheCollector = new CDebug_DebugBar_DataCollector_CacheCollector();
             CEvent::dispatcher()->subscribe($cacheCollector);
             $this->addCollector($cacheCollector);
         }
@@ -120,7 +120,7 @@ class CDebug_DebugBar extends CDebug_AbstractBar {
      */
     public function startMeasure($name, $label = null) {
         if ($this->hasCollector('time')) {
-            /** @var CDebug_DataCollector_TimeDataCollector $collector */
+            /** @var CDebug_DebugBar_DataCollector_TimeDataCollector $collector */
             $collector = $this->getCollector('time');
             $collector->startMeasure($name, $label);
         }
@@ -144,7 +144,7 @@ class CDebug_DebugBar extends CDebug_AbstractBar {
      */
     public function addThrowable($e) {
         if ($this->hasCollector('exceptions')) {
-            /** @var CDebug_DataCollector_ExceptionsCollector $collector */
+            /** @var CDebug_DebugBar_DataCollector_ExceptionsCollector $collector */
             $collector = $this->getCollector('exceptions');
             $collector->addThrowable($e);
         }

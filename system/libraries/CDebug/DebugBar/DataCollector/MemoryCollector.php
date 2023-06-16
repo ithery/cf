@@ -7,7 +7,7 @@ use DebugBar\DataCollector\DataCollector;
 /**
  * Collects info about memory usage.
  */
-class CDebug_DataCollector_MemoryCollector extends DataCollector implements Renderable {
+class CDebug_DebugBar_DataCollector_MemoryCollector extends DataCollector implements Renderable {
     protected $realUsage = false;
 
     protected $peakUsage = 0;

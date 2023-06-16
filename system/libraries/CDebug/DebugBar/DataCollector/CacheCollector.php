@@ -3,7 +3,7 @@
 use DebugBar\DataCollector\AssetProvider;
 use DebugBar\DataCollector\TimeDataCollector;
 
-class CDebug_DataCollector_CacheCollector extends TimeDataCollector implements AssetProvider {
+class CDebug_DebugBar_DataCollector_CacheCollector extends TimeDataCollector implements AssetProvider {
     /**
      * @var bool
      */
@@ -33,7 +33,7 @@ class CDebug_DataCollector_CacheCollector extends TimeDataCollector implements A
 
         if (isset($params['value'])) {
             if ($this->collectValues) {
-                $params['value'] = htmlspecialchars($this->getDataFormatter()->formatVar($event->value));
+                $params['value'] = htmlspecialchars($this->getDataFormatter()->formatVar(c::optional($event)->value));
             } else {
                 unset($params['value']);
             }

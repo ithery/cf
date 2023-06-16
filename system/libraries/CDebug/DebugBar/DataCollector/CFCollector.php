@@ -3,7 +3,7 @@
 use DebugBar\DataCollector\Renderable;
 use DebugBar\DataCollector\DataCollector;
 
-class CDebug_DataCollector_CFCollector extends DataCollector implements Renderable {
+class CDebug_DebugBar_DataCollector_CFCollector extends DataCollector implements Renderable {
     /**
      * @inheritDoc
      */

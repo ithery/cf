@@ -2,8 +2,8 @@
 
 use DebugBar\DataCollector\TimeDataCollector;
 
-class CDebug_DataCollector_EventCollector extends TimeDataCollector {
-    use CDebug_DataCollector_Trait_FileHelperTrait;
+class CDebug_DebugBar_DataCollector_EventCollector extends TimeDataCollector {
+    use CDebug_DebugBar_DataCollector_Trait_FileHelperTrait;
 
     /**
      * @var CEvent_Dispatcher

@@ -4,7 +4,7 @@ defined('SYSPATH') or die('No direct access allowed.');
 use DebugBar\DataCollector\Renderable;
 use DebugBar\DataCollector\DataCollector;
 
-class CDebug_DataCollector_RenderableCollector extends DataCollector implements Renderable {
+class CDebug_DebugBar_DataCollector_RenderableCollector extends DataCollector implements Renderable {
     protected $renderable = [];
 
     public function __construct() {

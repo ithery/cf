@@ -1,6 +1,6 @@
 <?php
 
-trait CDebug_DataCollector_Trait_FileHelperTrait {
+trait CDebug_DebugBar_DataCollector_Trait_FileHelperTrait {
     /**
      * Check if the given file is to be excluded from analysis.
      *

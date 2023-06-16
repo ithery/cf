@@ -5,7 +5,7 @@ defined('SYSPATH') or die('No direct access allowed.');
 /**
  * Indicates that a DataCollector provides some assets.
  */
-interface CDebug_DataCollector_AssetProviderInterface {
+interface CDebug_DebugBar_DataCollector_AssetProviderInterface {
     /**
      * Returns an array with the following keys:
      *  - base_path
