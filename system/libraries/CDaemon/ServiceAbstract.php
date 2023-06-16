@@ -65,7 +65,7 @@ abstract class CDaemon_ServiceAbstract implements CDaemon_ServiceInterface {
 
     protected $terminateLimit = 20;
 
-    protected $sizeToRotate = 500 * 1024;
+    protected $logSizeToRotate = 500 * 1024;
 
     /**
      * The frequency of the event loop. In seconds.
@@ -184,7 +184,7 @@ abstract class CDaemon_ServiceAbstract implements CDaemon_ServiceInterface {
         $this->config = $config;
         $this->stdout = carr::get($config, 'stdout', false);
         $this->pidFile = $this->getConfig('pidFile');
-        $this->sizeToRotate = CF::config('daemon.logs.rotation.size', 500 * 1024);
+        $this->logSizeToRotate = CF::config('daemon.logs.rotation.size', 500 * 1024);
         CDaemon_ErrorHandler::init();
         //$this->getopt();
     }
@@ -566,44 +566,27 @@ abstract class CDaemon_ServiceAbstract implements CDaemon_ServiceInterface {
      * @param mixed  $indent
      */
     public function log($message, $label = '', $indent = 0) {
-        static $logFile = '';
-        static $logFileCheckAt = 0;
-        static $logFileError = false;
-        $header = "\nDate                  PID   Label         Message\n";
+        $header = "\nDate                  PID   Label         Message" . PHP_EOL;
         $date = date('Y-m-d H:i:s');
         $pid = str_pad($this->pid, 5, ' ', STR_PAD_LEFT);
         $label = str_pad(substr($label, 0, 12), 13, ' ', STR_PAD_RIGHT);
         $prefix = "[${date}] ${pid} ${label}" . str_repeat("\t", $indent);
-        if (time() >= $logFileCheckAt && $this->logFile() != $logFile) {
-            $logFile = $this->logFile();
-            $logFileCheckAt = mktime(date('H'), (date('i') - (date('i') % 5)) + 5, null);
-            @fclose(self::$logHandle);
-            self::$logHandle = $logFileError = false;
-        }
-        if (self::$logHandle === false) {
-            if (strlen($logFile) > 0 && file_exists($logFile)) {
-                $rotator = CLogger_Rotator::createRotate($logFile);
+        $logFile = $this->logFile();
+        if ($logFile && file_exists($logFile) && CFile::size($logFile) > $this->logSizeToRotate) {
+            $rotator = CLogger_Rotator::createRotate($logFile);
 
-                $rotator->size($this->sizeToRotate)->run();
-            }
-            if (strlen($logFile) > 0 && self::$logHandle = @fopen($logFile, 'a+')) {
-                if ($this->parent) {
-                    fwrite(self::$logHandle, $header);
-                    if ($this->stdout) {
-                        echo $header;
-                    }
-                }
-            } elseif (!$logFileError) {
-                $logFileError = true;
-                trigger_error(__CLASS__ . 'Error: Could not write to logfile ' . $logFile, E_USER_WARNING);
+            $rotator->size($this->logSizeToRotate)->run();
+        }
+        if (!CFile::exists($logFile)) {
+            CFile::put($logFile, $header);
+            if ($this->stdout) {
+                echo $header;
             }
         }
-        $message = $prefix . ' ' . str_replace("\n", "\n${prefix} ", trim($message)) . "\n";
-        if (self::$logHandle) {
-            fwrite(self::$logHandle, $message);
-        }
+        $line = $prefix . ' ' . str_replace(PHP_EOL, PHP_EOL . $prefix, trim($message)) . PHP_EOL;
+        CFile::append($logFile, $line);
         if ($this->stdout) {
-            echo $message;
+            echo $line;
         }
     }
 
@@ -936,16 +919,12 @@ abstract class CDaemon_ServiceAbstract implements CDaemon_ServiceInterface {
         }
 
         $class = get_class($this);
+
         $runner = CDaemon::createRunner($class);
-        // Close the static log handle to prevent it being inherrited by the new process.
-        if (is_resource(self::$logHandle)) {
-            if ($rotateLog) {
-                $this->log('Rotating Log...');
-            }
-            fclose(self::$logHandle);
-            if ($rotateLog) {
-                $runner->rotateLog();
-            }
+
+        if ($rotateLog) {
+            $this->log('Rotating Log...');
+            $runner->rotateLog();
         }
         $runner->run();
 
