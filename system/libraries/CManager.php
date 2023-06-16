@@ -84,6 +84,8 @@ final class CManager {
 
     /**
      * @return CClientModule
+     *
+     * @deprecated since 1.6 dont use this anymore, use c::manager()->assets->module
      */
     public static function clientModule() {
         return CClientModules::instance();
@@ -107,10 +109,10 @@ final class CManager {
      */
     public static function registerModule($module, $data = []) {
         if (!empty($data)) {
-            CClientModules::instance()->defineModule($module, $data);
+            CManager::asset()->module()->defineModule($module, $data);
         }
-        if (!CClientModules::instance()->isRegisteredModule($module)) {
-            return CClientModules::instance()->registerModule($module);
+        if (!CManager::asset()->module()->isRegisteredModule($module)) {
+            return CManager::asset()->module()->registerRunTimeModule($module);
         }
 
         return false;
@@ -118,18 +120,18 @@ final class CManager {
 
     public static function registerThemeModule($module, $data = []) {
         if (!empty($data)) {
-            CClientModules::instance()->defineModule($module, $data);
+            CManager::asset()->module()->defineModule($module, $data);
         }
 
-        return CClientModules::instance()->registerThemeModule($module);
+        return CManager::asset()->module()->registerThemeModule($module);
     }
 
     public static function isRegisteredModule($module) {
-        return CClientModules::instance()->isRegisteredModule($module);
+        return CManager::asset()->module()->isRegisteredModule($module);
     }
 
     public static function getRegisteredModule() {
-        return CClientModules::instance()->getRegisteredModule();
+        return CManager::asset()->module()->getRegisteredModule();
     }
 
     /**
@@ -138,7 +140,7 @@ final class CManager {
      * @return bool
      */
     public static function unregisterModule($module) {
-        return CClientModules::instance()->unregisterModule($module);
+        return CManager::asset()->module()->unregisterRunTimeModule($module);
     }
 
     public function registerControls($controls) {

@@ -11,21 +11,21 @@ defined('SYSPATH') or die('No direct access allowed.');
 //@codingStandardsIgnoreStart
 trait CTrait_Compat_App {
     /**
-     * @var stdClass|null
+     * @var null|stdClass
      *
      * @deprecated
      */
     private $_store = null;
 
     /**
-     * @var stdClass|null
+     * @var null|stdClass
      *
      * @deprecated
      */
     private $_admin = null;
 
     /**
-     * @var stdClass|null
+     * @var null|stdClass
      *
      * @deprecated
      */
@@ -160,7 +160,7 @@ trait CTrait_Compat_App {
     }
 
     /**
-     * @return type
+     * @return mixed
      *
      * @deprecated
      */
@@ -212,7 +212,7 @@ trait CTrait_Compat_App {
     }
 
     /**
-     * Undocumented function
+     * Undocumented function.
      *
      * @param [type] $str
      *
@@ -225,7 +225,7 @@ trait CTrait_Compat_App {
     }
 
     /**
-     * Undocumented function
+     * Undocumented function.
      *
      * @return void
      *

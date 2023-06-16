@@ -85,4 +85,10 @@ class CConsole {
 
         return static::$kernel;
     }
+
+    public static function stdout($output, $force = false) {
+        if ($force || CF::isCli()) {
+            fwrite(STDOUT, $output);
+        }
+    }
 }

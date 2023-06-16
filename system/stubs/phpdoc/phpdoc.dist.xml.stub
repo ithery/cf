@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<phpdocumentor
+        configVersion="3"
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xmlns="https://www.phpdoc.org"
+        xsi:noNamespaceSchemaLocation="data/xsd/phpdoc.xsd"
+>
+    <title>##APP_TITLE##</title>
+
+    <version number="latest">
+        <folder>.</folder>
+        <api format="php">
+            <source dsn=".">
+                <path>.</path>
+            </source>
+            <ignore hidden="true" symlinks="true">
+                <path>tests/**/*</path>
+                <path>build/**/*</path>
+                <path>var/**/*</path>
+                <path>docs/**/*</path>
+                <path>vendor/**/*</path>
+            </ignore>
+            <extensions>
+                <!--1 or more repetitions:-->
+                <extension>php</extension>
+            </extensions>
+
+            <include-source>true</include-source>
+            <markers>
+                <!--1 or more repetitions:-->
+                <marker>TODO</marker>
+                <marker>FIXME</marker>
+            </markers>
+        </api>
+
+    </version>
+</phpdocumentor>
