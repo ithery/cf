@@ -3,6 +3,8 @@
 defined('SYSPATH') or die('No direct access allowed.');
 use DebugBar\DataCollector\Renderable;
 
+use DebugBar\DataCollector\TimeDataCollector;
+
 /**
  * Collects data about SQL statements executed with PDO.
  */
@@ -28,9 +30,9 @@ class CDebug_DataCollector_QueryCollector extends CDebug_DataCollector implement
     protected $showCopyButton = true;
 
     /**
-     * @param CDebug_DataCollector_TimeDataCollector $timeCollector
+     * @param TimeDataCollector $timeCollector
      */
-    public function __construct(CDebug_DataCollector_TimeDataCollector $timeCollector = null) {
+    public function __construct(TimeDataCollector $timeCollector = null) {
         $this->timeCollector = $timeCollector;
         $this->setDataFormatter(new CDebug_DataFormatter_QueryFormatter());
 

@@ -1,6 +1,8 @@
 <?php
 
-class CDebug_DataCollector_CacheCollector extends CDebug_DataCollector_TimeDataCollector implements CDebug_DataCollector_AssetProviderInterface {
+use DebugBar\DataCollector\TimeDataCollector;
+
+class CDebug_DataCollector_CacheCollector extends TimeDataCollector implements CDebug_DataCollector_AssetProviderInterface {
     /**
      * @var bool
      */

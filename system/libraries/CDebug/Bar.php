@@ -1,6 +1,6 @@
 <?php
 
-defined('SYSPATH') or die('No direct access allowed.');
+use DebugBar\DataCollector\TimeDataCollector;
 
 class CDebug_Bar extends CDebug_AbstractBar {
     /**
@@ -56,7 +56,7 @@ class CDebug_Bar extends CDebug_AbstractBar {
             return;
         }
 
-        $timeDataCollector = new CDebug_DataCollector_TimeDataCollector();
+        $timeDataCollector = new TimeDataCollector();
 
         $this->addCollector(new CDebug_DataCollector_PhpInfoCollector());
         $this->addCollector(new CDebug_DataCollector_MemoryCollector());

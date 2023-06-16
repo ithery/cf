@@ -1,8 +1,8 @@
 <?php
 
-defined('SYSPATH') or die('No direct access allowed.');
+use DebugBar\DataCollector\TimeDataCollector;
 
-class CDebug_DataCollector_EventCollector extends CDebug_DataCollector_TimeDataCollector {
+class CDebug_DataCollector_EventCollector extends TimeDataCollector {
     use CDebug_DataCollector_Trait_FileHelperTrait;
 
     /**
