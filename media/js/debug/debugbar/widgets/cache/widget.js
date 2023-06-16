@@ -19,6 +19,7 @@
                 $.ajax({
                     url: $(el).attr('data-url'),
                     type: 'DELETE',
+                    // eslint-disable-next-line no-unused-vars
                     success: function (result) {
                         $(el).fadeOut(200);
                     }
@@ -26,6 +27,7 @@
             },
 
             render: function () {
+                // eslint-disable-next-line no-underscore-dangle
                 window.CFCacheWidget.__super__.render.apply(this);
 
                 this.bindAttr('data', function (data) {

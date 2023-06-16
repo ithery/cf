@@ -12,6 +12,9 @@ class CDebug_DebugBar extends CDebug_AbstractBar {
     use CDebug_DebugBar_DebugBarTrait_MemoryCollectorTrait;
     use CDebug_DebugBar_DebugBarTrait_ExceptionsCollectorTrait;
     use CDebug_DebugBar_DebugBarTrait_CFCollectorTrait;
+    use CDebug_DebugBar_DebugBarTrait_RequestDataCollectorTrait;
+    use CDebug_DebugBar_DebugBarTrait_EventCollectorTrait;
+    use CDebug_DebugBar_DebugBarTrait_ViewCollectorTrait;
 
     /**
      * True when booted.
@@ -71,8 +74,9 @@ class CDebug_DebugBar extends CDebug_AbstractBar {
         $this->setupMemoryCollector();
         $this->setupExceptionsCollector();
         $this->setupCFCollector();
-        $this->addCollector(new CDebug_DebugBar_DataCollector_EventCollector());
-        $this->addCollector(new CDebug_DebugBar_DataCollector_RequestDataCollector());
+        $this->setupRequestDataCollector();
+        $this->setupEventCollector();
+        $this->setupViewCollector();
 
         $this->addCollector(new CDebug_DebugBar_DataCollector_FilesCollector());
         $this->addCollector(new CDebug_DebugBar_DataCollector_RenderableCollector());

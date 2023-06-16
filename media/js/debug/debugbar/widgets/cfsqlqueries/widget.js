@@ -33,8 +33,13 @@
                     try {
                         document.execCommand('copy');
 
-                        // eslint-disable-next-line no-alert
-                        alert('Query copied to the clipboard');
+
+                        if(window.cresenity) {
+                            window.cresenity.toast('success', 'Query copied to the clipboard');
+                        } else {
+                            // eslint-disable-next-line no-alert
+                            alert('Query copied to the clipboard');
+                        }
                     } catch (err) {
                         console.log('Oops, unable to copy');
                     }

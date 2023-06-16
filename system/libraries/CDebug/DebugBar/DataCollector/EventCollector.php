@@ -19,7 +19,6 @@ class CDebug_DebugBar_DataCollector_EventCollector extends TimeDataCollector {
         parent::__construct($requestStartTime);
         $this->previousTime = microtime(true);
         $this->setDataFormatter(new CDebug_DebugBar_DataFormatter_SimpleFormatter());
-        $this->subscribe(CEvent::dispatcher());
     }
 
     public function onWildcardEvent($name = null, $data = []) {

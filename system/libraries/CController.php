@@ -36,8 +36,12 @@ abstract class CController {
         foreach (c::classUsesRecursive($class) as $trait) {
             $method = 'boot' . c::classBasename($trait);
             $classMethod = $class . $method;
-            if (method_exists($class, $method) && !in_array($classMethod, $booted)) {
-                forward_static_call([$class, $method]);
+            $reflectionClass = new ReflectionClass($class);
+
+            if ($reflectionClass->hasMethod($method) && !in_array($classMethod, $booted)) {
+                if ($reflectionClass->getMethod($method)->isStatic()) {
+                    forward_static_call([$class, $method]);
+                }
             }
         }
     }
