@@ -4,10 +4,12 @@ defined('SYSPATH') or die('No direct access allowed.');
 
 use DebugBar\DataCollector\Renderable;
 
+use DebugBar\DataCollector\DataCollector;
+
 /**
  * Collects info about exceptions.
  */
-class CDebug_DataCollector_ExceptionsCollector extends CDebug_DataCollector implements Renderable {
+class CDebug_DataCollector_ExceptionsCollector extends DataCollector implements Renderable {
     protected $exceptions = [];
 
     protected $chainExceptions = false;

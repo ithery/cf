@@ -2,7 +2,9 @@
 
 use DebugBar\DataCollector\Renderable;
 
-class CDebug_DataCollector_FilesCollector extends CDebug_DataCollector implements Renderable {
+use DebugBar\DataCollector\DataCollector;
+
+class CDebug_DataCollector_FilesCollector extends DataCollector implements Renderable {
     const BASE_PATH = DOCROOT;
 
     /**

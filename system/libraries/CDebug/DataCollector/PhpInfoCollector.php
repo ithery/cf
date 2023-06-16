@@ -2,10 +2,12 @@
 
 use DebugBar\DataCollector\Renderable;
 
+use DebugBar\DataCollector\DataCollector;
+
 /**
  * Collects info about PHP.
  */
-class CDebug_DataCollector_PhpInfoCollector extends CDebug_DataCollector implements Renderable {
+class CDebug_DataCollector_PhpInfoCollector extends DataCollector implements Renderable {
     /**
      * @return string
      */

@@ -3,12 +3,16 @@
 defined('SYSPATH') or die('No direct access allowed.');
 use DebugBar\DataCollector\Renderable;
 
+use DebugBar\DataCollector\DataCollector;
+
 use DebugBar\DataCollector\TimeDataCollector;
 
 /**
  * Collects data about SQL statements executed with PDO.
  */
-class CDebug_DataCollector_QueryCollector extends CDebug_DataCollector implements Renderable, CDebug_DataCollector_AssetProviderInterface {
+class CDebug_DataCollector_QueryCollector extends DataCollector implements Renderable, CDebug_DataCollector_AssetProviderInterface {
+    use CDebug_DataCollector_Trait_FileHelperTrait;
+
     protected $timeCollector;
 
     protected $queries = [];

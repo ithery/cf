@@ -3,10 +3,12 @@
 defined('SYSPATH') or die('No direct access allowed.');
 use DebugBar\DataCollector\Renderable;
 
+use DebugBar\DataCollector\DataCollector;
+
 /**
  * Collects info about the current localization state.
  */
-class CDebug_DataCollector_LocalizationCollector extends CDebug_DataCollector implements Renderable {
+class CDebug_DataCollector_LocalizationCollector extends DataCollector implements Renderable {
     /**
      * Get the current locale.
      *

@@ -5,8 +5,10 @@ defined('SYSPATH') or die('No direct access allowed.');
 use Psr\Log\AbstractLogger;
 
 use DebugBar\DataCollector\Renderable;
+use DebugBar\DataCollector\DataCollector;
 use DebugBar\DataCollector\DataCollectorInterface;
 use DebugBar\DataFormatter\DataFormatterInterface;
+
 use DebugBar\DataCollector\MessagesAggregateInterface;
 
 /**
@@ -52,7 +54,7 @@ class CDebug_DataCollector_MessagesCollector extends AbstractLogger implements D
      */
     public function getDataFormatter() {
         if ($this->dataFormater === null) {
-            $this->dataFormater = CDebug_DataCollector::getDefaultDataFormatter();
+            $this->dataFormater = DataCollector::getDefaultDataFormatter();
         }
 
         return $this->dataFormater;
@@ -78,7 +80,7 @@ class CDebug_DataCollector_MessagesCollector extends AbstractLogger implements D
      */
     public function getVarDumper() {
         if ($this->varDumper === null) {
-            $this->varDumper = CDebug_DataCollector::getDefaultVarDumper();
+            $this->varDumper = DataCollector::getDefaultVarDumper();
         }
 
         return $this->varDumper;
