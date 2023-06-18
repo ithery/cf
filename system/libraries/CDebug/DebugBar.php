@@ -15,6 +15,7 @@ class CDebug_DebugBar extends CDebug_AbstractBar {
     use CDebug_DebugBar_DebugBarTrait_RequestDataCollectorTrait;
     use CDebug_DebugBar_DebugBarTrait_EventCollectorTrait;
     use CDebug_DebugBar_DebugBarTrait_ViewCollectorTrait;
+    use CDebug_DebugBar_DebugBarTrait_FilesCollectorTrait;
 
     /**
      * True when booted.
@@ -77,8 +78,7 @@ class CDebug_DebugBar extends CDebug_AbstractBar {
         $this->setupRequestDataCollector();
         $this->setupEventCollector();
         $this->setupViewCollector();
-
-        $this->addCollector(new CDebug_DebugBar_DataCollector_FilesCollector());
+        $this->setupFilesCollector();
         $this->addCollector(new CDebug_DebugBar_DataCollector_RenderableCollector());
 
         $queryCollector = new CDebug_DebugBar_DataCollector_QueryCollector($this->getCollector('time'));
