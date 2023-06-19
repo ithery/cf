@@ -26,7 +26,7 @@ final class CF {
     /**
      * Logger Instance.
      *
-     * @var CLogger_Logger logging object
+     * @var CLogger_Manager logging object
      */
     public static $logger;
 

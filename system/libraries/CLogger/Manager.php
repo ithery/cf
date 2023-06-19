@@ -9,6 +9,7 @@ use Monolog\Handler\ErrorLogHandler;
 use Monolog\Handler\HandlerInterface;
 use Monolog\Handler\RotatingFileHandler;
 use Monolog\Handler\SlackWebhookHandler;
+use Monolog\Handler\FingersCrossedHandler;
 use Monolog\Handler\WhatFailureGroupHandler;
 use Monolog\Handler\FormattableHandlerInterface;
 
@@ -21,6 +22,13 @@ class CLogger_Manager implements LoggerInterface {
      * @var array
      */
     protected $channels = [];
+
+    /**
+     * The context shared across channels and stacks.
+     *
+     * @var array
+     */
+    protected $sharedContext = [];
 
     /**
      * The registered custom driver creators.
@@ -123,8 +131,8 @@ class CLogger_Manager implements LoggerInterface {
         }
 
         try {
-            return c::with($this->resolve($name, $config), function ($logger) use ($name) {
-                return $this->channels[$name] = $this->tap($name, new CLogger_Logger($logger, CEvent::dispatcher()));
+            return $this->channels[$name] ?? c::with($this->resolve($name, $config), function ($logger) use ($name) {
+                return $this->channels[$name] = $this->tap($name, new CLogger_Logger($logger, CEvent::dispatcher()))->withContext($this->sharedContext);
             });
         } catch (Throwable $e) {
             return c::tap($this->createEmergencyLogger(), function ($logger) use ($e) {
@@ -426,10 +434,19 @@ class CLogger_Manager implements LoggerInterface {
      * @return \Monolog\Handler\HandlerInterface
      */
     protected function prepareHandler(HandlerInterface $handler, array $config = []) {
-        if (Monolog::API !== 1 && (Monolog::API !== 2 || !$handler instanceof FormattableHandlerInterface)) {
-            return $handler;
+        if (isset($config['action_level'])) {
+            $handler = new FingersCrossedHandler(
+                $handler,
+                $this->actionLevel($config),
+                0,
+                true,
+                $config['stop_buffering'] ?? true
+            );
         }
 
+        if (!$handler instanceof FormattableHandlerInterface) {
+            return $handler;
+        }
         if ($handler instanceof FormattableHandlerInterface) {
             if (!isset($config['formatter'])) {
                 $handler->setFormatter($this->formatter());
@@ -450,6 +467,43 @@ class CLogger_Manager implements LoggerInterface {
         return c::tap(new LineFormatter(null, $this->dateFormat, true, true), function ($formatter) {
             $formatter->includeStacktraces();
         });
+    }
+
+    /**
+     * Share context across channels and stacks.
+     *
+     * @param array $context
+     *
+     * @return $this
+     */
+    public function shareContext(array $context) {
+        foreach ($this->channels as $channel) {
+            $channel->withContext($context);
+        }
+
+        $this->sharedContext = array_merge($this->sharedContext, $context);
+
+        return $this;
+    }
+
+    /**
+     * The context shared across channels and stacks.
+     *
+     * @return array
+     */
+    public function sharedContext() {
+        return $this->sharedContext;
+    }
+
+    /**
+     * Flush the shared context.
+     *
+     * @return $this
+     */
+    public function flushSharedContext() {
+        $this->sharedContext = [];
+
+        return $this;
     }
 
     /**
