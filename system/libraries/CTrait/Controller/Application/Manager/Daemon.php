@@ -211,8 +211,8 @@ trait CTrait_Controller_Application_Manager_Daemon {
 
     public function logFile($serviceClass = null, $filename = null) {
         $app = CApp::instance();
-        $logFile = CManager::daemon()->getLogFile($serviceClass, $filename);
         $filename = $filename ?: c::request()->f;
+        $logFile = CManager::daemon()->getLogFile($serviceClass, $filename);
         $divLog = $app->addDiv()->addClass('console');
         $log = '';
         if (file_exists($logFile)) {
