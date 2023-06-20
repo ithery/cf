@@ -10,6 +10,7 @@ use PhpOffice\PhpSpreadsheet\Style\NumberFormat;
 
 class CExporter_Exportable_DataTable extends CExporter_Exportable implements CExporter_Concern_ShouldAutoSize, CExporter_Concern_FromDataTable, CExporter_Concern_WithHeadings, CExporter_Concern_WithMapping, CExporter_Concern_WithColumnFormatting {
     use CExporter_Exportable_Trait_UseColorTrait;
+
     /**
      * @var CElement_Component_DataTable
      */
@@ -76,8 +77,9 @@ class CExporter_Exportable_DataTable extends CExporter_Exportable implements CEx
         $detectedDataType = null;
         $transformMaps = [
             'format_currency' => CExporter::DATA_TYPE_CURRENCY,
-            'formatCurrency' => 'currency',
-            'thousand_separator' => 'float',
+            'formatCurrency' => CExporter::DATA_TYPE_CURRENCY,
+            'thousand_separator' => CExporter::DATA_TYPE_NUMBER,
+            'formatNumber' => CExporter::DATA_TYPE_NUMBER,
             'formatDatetime' => 'datetime',
             'formatDate' => 'date',
 
@@ -149,7 +151,7 @@ class CExporter_Exportable_DataTable extends CExporter_Exportable implements CEx
             $columnIndex = Coordinate::stringFromColumnIndex($columnIntIndex + 1);
             $this->columnFormats[$columnIndex] = static::dataTypeToColumnFormat($dataType);
 
-            $newRow[$column->getFieldname()] = static::convertToDataType($value, $dataType);
+            $newRow[] = static::convertToDataType($value, $dataType);
             $columnIntIndex++;
         }
 
@@ -190,6 +192,9 @@ class CExporter_Exportable_DataTable extends CExporter_Exportable implements CEx
         if ($dataType == 'currency') {
             return (double) $value;
         }
+        if ($dataType == CExporter::DATA_TYPE_NUMBER || $dataType == CExporter::DATA_TYPE_INTEGER) {
+            return (double) $value;
+        }
         if ($dataType == 'datetime') {
             if (!($value instanceof DateTimeInterface)) {
                 $value = CCarbon::parse($value);
@@ -218,6 +223,15 @@ class CExporter_Exportable_DataTable extends CExporter_Exportable implements CEx
         }
         if ($dataType == CExporter::DATA_TYPE_INTEGER || $dataType == CExporter::DATA_TYPE_NUMBER) {
             return NumberFormat::FORMAT_NUMBER;
+        }
+        if ($dataType == CExporter::DATA_TYPE_PERCENTAGE) {
+            return NumberFormat::FORMAT_PERCENTAGE;
+        }
+        if ($dataType == CExporter::DATA_TYPE_PERCENTAGE_0) {
+            return NumberFormat::FORMAT_PERCENTAGE_0;
+        }
+        if ($dataType == CExporter::DATA_TYPE_PERCENTAGE_00) {
+            return NumberFormat::FORMAT_PERCENTAGE_00;
         }
         if ($dataType == CExporter::DATA_TYPE_STRING) {
             return DataType::TYPE_STRING;

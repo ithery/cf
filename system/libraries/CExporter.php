@@ -45,6 +45,9 @@ class CExporter {
     const DATA_TYPE_CURRENCY = 'currency';
     const DATA_TYPE_INTEGER = 'integer';
     const DATA_TYPE_NUMBER = 'number';
+    const DATA_TYPE_PERCENTAGE = 'percentage';
+    const DATA_TYPE_PERCENTAGE_0 = 'percentage0';
+    const DATA_TYPE_PERCENTAGE_00 = 'percentage00';
 
     protected static $externalWriter = [
         self::SNAPPYPDF => CExporter_PhpSpreadsheet_SnappyPdf::class,
