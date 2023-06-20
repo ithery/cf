@@ -155,19 +155,19 @@ trait CTrait_Controller_Application_Manager_Daemon {
 
         switch ($method) {
             case 'index':
-                return call_user_func_array([$this, 'logIndex'], $logArgs);
+                return $this->logIndex(...$logArgs);
 
                 break;
             case 'file':
-                return call_user_func_array([$this, 'logFile'], $logArgs);
+                return $this->logFile(...$logArgs);
 
                 break;
             case 'restart':
-                return call_user_func_array([$this, 'logRestart'], $logArgs);
+                return $this->logRestart(...$logArgs);
 
                 break;
             case 'dump':
-                return call_user_func_array([$this, 'logDump'], $logArgs);
+                return $this->logDump(...$logArgs);
 
                 break;
             case 'back':
