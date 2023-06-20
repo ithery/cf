@@ -196,13 +196,13 @@ trait CTrait_Controller_Application_Manager_Daemon {
         $logFile = CManager::daemon()->getLogFile($serviceClass);
         $basename = basename($logFile);
         if (file_exists($logFile)) {
-            $tabList->addTab()->setLabel('Current')->setAjaxUrl(static::controllerUrl() . 'log/file/' . $serviceClass . '/' . $basename);
+            $tabList->addTab()->setLabel('Current')->setAjaxUrl(static::controllerUrl() . 'log/file/' . $serviceClass . '?f=' . $basename);
         }
         for ($i = 1; $i <= 10; $i++) {
             $logFileRotate = $logFile . '.' . $i;
             if (file_exists($logFileRotate)) {
                 $basename = basename($logFileRotate);
-                $tabList->addTab()->setLabel('Rotate:' . $i)->setAjaxUrl(static::controllerUrl() . 'log/file/' . $serviceClass . '/' . $basename);
+                $tabList->addTab()->setLabel('Rotate:' . $i)->setAjaxUrl(static::controllerUrl() . 'log/file/' . $serviceClass . '?f=' . $basename);
             }
         }
 
@@ -212,7 +212,7 @@ trait CTrait_Controller_Application_Manager_Daemon {
     public function logFile($serviceClass = null, $filename = null) {
         $app = CApp::instance();
         $logFile = CManager::daemon()->getLogFile($serviceClass, $filename);
-
+        $filename = $filename ?: c::request()->f;
         $divLog = $app->addDiv()->addClass('console');
         $log = '';
         if (file_exists($logFile)) {
