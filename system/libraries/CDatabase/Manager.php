@@ -81,12 +81,6 @@ class CDatabase_Manager implements CDatabase_Contract_ConnectionResolverInterfac
      * @return \CDatabase_Connection
      */
     public function connection($name = null) {
-        if (is_array($name)) {
-            $config = $name;
-            $name = carr::hash($config);
-
-            return CDatabase_ConnectionFactory::instance()->make($config, $name);
-        }
         list($database, $type) = $this->parseConnectionName($name);
 
         $name = $name ?: $database;
@@ -125,11 +119,6 @@ class CDatabase_Manager implements CDatabase_Contract_ConnectionResolverInterfac
      */
     protected function parseConnectionName($name) {
         $name = $name ?: $this->getDefaultConnection();
-
-        if (!is_string($name)) {
-            cdbg::traceDump();
-            cdbg::dd($name);
-        }
 
         return cstr::endsWith($name, ['::read', '::write'])
             ? explode('::', $name, 2) : [$name, null];

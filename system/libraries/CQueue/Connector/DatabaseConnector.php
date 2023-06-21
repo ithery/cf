@@ -2,30 +2,24 @@
 
 defined('SYSPATH') or die('No direct access allowed.');
 
-/**
- * @author Hery Kurniawan
- * @license Ittron Global Teknologi <ittron.co.id>
- *
- * @since Sep 8, 2019, 4:11:18 AM
- */
 class CQueue_Connector_DatabaseConnector extends CQueue_AbstractConnector {
     /**
      * Database connections.
      *
-     * @var CDatabase_ResolverInterface
+     * @var CDatabase_Manager
      */
     protected $connections;
 
     /**
      * Create a new connector instance.
      *
-     * @param CDatabase_ResolverInterface $db
+     * @param CDatabase_Contract_ConnectionResolverInterface $connections
      *
      * @return void
      */
-    public function __construct(CDatabase_ResolverInterface $connections = null) {
+    public function __construct(CDatabase_Contract_ConnectionResolverInterface $connections = null) {
         if ($connections == null) {
-            $connections = CDatabase_Resolver::instance();
+            $connections = CDatabase_Manager::instance();
         }
         $this->connections = $connections;
     }

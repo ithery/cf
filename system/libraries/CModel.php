@@ -220,7 +220,7 @@ abstract class CModel implements ArrayAccess, CInterface_Arrayable, CInterface_J
     /**
      * The connection resolver instance.
      *
-     * @var CDatabase_ResolverInterface
+     * @var CDatabase_Contract_ConnectionResolverInterface
      */
     protected static $resolver;
 
@@ -1924,16 +1924,10 @@ abstract class CModel implements ArrayAccess, CInterface_Arrayable, CInterface_J
     /**
      * Get the connection resolver instance.
      *
-     * @param null|mixed $domain
-     *
-     * @return CDatabase_ResolverInterface
+     * @return CDatabase_Contract_ConnectionResolverInterface
      */
-    public static function getConnectionResolver($domain = null) {
-        if ($domain == null) {
-            $domain = CF::domain();
-        }
-
-        return CDatabase_Resolver::instance($domain);
+    public static function getConnectionResolver() {
+        return CDatabase_Manager::instance();
     }
 
     /**
