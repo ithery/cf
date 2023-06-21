@@ -169,6 +169,7 @@ class CDatabase_Manager implements CDatabase_Contract_ConnectionResolverInterfac
         $connections = carr::get($this->config, 'connections');
 
         $config = carr::get($connections, $name, carr::get($this->config, $name));
+        CDaemon::log(json_encode($config));
 
         if (is_null($config)) {
             throw new InvalidArgumentException("Database connection [{$name}] not configured.");
@@ -176,7 +177,7 @@ class CDatabase_Manager implements CDatabase_Contract_ConnectionResolverInterfac
 
         $config = (new CDatabase_ConfigurationUrlParser())
             ->parseConfiguration($config);
-
+        CDaemon::log('After parse', json_encode($config));
         $config = CDatabase_Config::flattenFormat($config);
 
         return $config;
