@@ -72,7 +72,9 @@ svg.icon {
 .card-bg-secondary {
     background: #f3f4f6;
 }
-
+.theme-dark .card-bg-secondary {
+    background: #191c24;
+}
 
 .control-action svg {
     fill: #d1d5db;
