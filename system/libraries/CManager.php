@@ -431,4 +431,11 @@ final class CManager {
     public static function editorJs() {
         return CManager_EditorJs::instance();
     }
+
+    /**
+     * @return CManager_Factory
+     */
+    public static function factory() {
+        return new CBase_ForwarderStaticClass(CManager_Factory::class);
+    }
 }
