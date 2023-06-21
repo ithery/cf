@@ -177,7 +177,7 @@ class CDatabase_Manager implements CDatabase_Contract_ConnectionResolverInterfac
 
         $config = (new CDatabase_ConfigurationUrlParser())
             ->parseConfiguration($config);
-        CDaemon::log('After parse', json_encode($config));
+        CDaemon::log('After parse' . json_encode($config));
         $config = CDatabase_Config::flattenFormat($config);
 
         return $config;
