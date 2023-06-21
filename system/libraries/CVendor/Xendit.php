@@ -53,6 +53,7 @@ class CVendor_Xendit {
     }
 
     public function createInvoice($external_id, $amount, $payer_email, $description, $invoiceOptions = []) {
+        $data = $invoiceOptions;
         $data['external_id'] = $external_id;
         $data['amount'] = (int) $amount;
         $data['payer_email'] = $payer_email;
