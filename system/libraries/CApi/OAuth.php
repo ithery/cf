@@ -177,6 +177,7 @@ class CApi_OAuth {
         $this->apiGroup = $apiGroup;
         $this->routeManager = new CApi_OAuth_RouteManager();
         $this->viewManager = new CApi_OAuth_ViewManager();
+        $this->clientModel = CF::config('api.groups.' . $apiGroup . '.model.client', CApi_OAuth_Model_OAuthClient::class);
     }
 
     /**
