@@ -236,7 +236,7 @@ class CDatabase {
     }
 
     public function __call($method, $arguments) {
-        return $this->manager()->$method(...$arguments);
+        return $this->manager()->connection($this->name)->$method(...$arguments);
     }
 
     public static function transactionManager() {
