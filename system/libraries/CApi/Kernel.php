@@ -4,6 +4,8 @@ use Symfony\Component\HttpFoundation\Response as SymfonyResponse;
 class CApi_Kernel {
     use CApi_Trait_HasGroupPropertyTrait;
 
+    protected $isHandled = false;
+
     public function __construct($group) {
         $this->group = $group;
     }
@@ -55,7 +57,23 @@ class CApi_Kernel {
     protected function dispatchMethod(CApi_MethodAbstract $method) {
         return function ($request) use ($method) {
             CEvent::dispatch(new CApi_Event_BeforeDispatch($method));
-            $response = $method->execute();
+            $response = null;
+            $post = 'post';
+            $get = 'get';
+            $put = 'put';
+            $delete = 'delete';
+            if ($request->isMethod('post') && method_exists($method, $post)) {
+                $response = $method->$post();
+            } elseif ($request->isMethod('get') && method_exists($method, $get)) {
+                $response = $method->$get();
+            } elseif ($request->isMethod('put') && method_exists($method, $put)) {
+                $response = $method->$put();
+            } elseif ($request->isMethod('delete') && method_exists($method, $delete)) {
+                $response = $method->$delete();
+            } else {
+                $response = $method->execute();
+            }
+
             $isResponse = $response instanceof SymfonyResponse;
 
             if (!$isResponse) {
