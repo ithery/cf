@@ -27,8 +27,13 @@ class CApi_OAuth_Bridge_UserRepository implements UserRepositoryInterface {
         }
         $hasher = c::hash(CF::config('auth.providers.' . $provider . '.hasher', 'md5'));
         if (method_exists($model, 'findAndValidateForOAuth')) {
-            $user = (new $model())->findAndValidateForOAuth($username, $password);
-
+            try {
+                $user = (new $model())->findAndValidateForOAuth($username, $password);
+            } catch (CAuth_Exception_AuthorizationException $ex) {
+                throw new OAuthServerException($ex->getMessage(), 9, 'access_denied', 401, $ex->getMessage(), null, $ex);
+            } catch (Throwable $e) {
+                throw OAuthServerException::serverError($e->getMessage(), $e);
+            }
             if (!$user) {
                 return;
             }
@@ -70,6 +75,8 @@ class CApi_OAuth_Bridge_UserRepository implements UserRepositoryInterface {
         if (method_exists($model, 'findAndValidateForOAuthSocialLogin')) {
             try {
                 $user = (new $model())->findAndValidateForOAuthSocialLogin($socialProvider, $accessToken);
+            } catch (CAuth_Exception_AuthorizationException $ex) {
+                throw new OAuthServerException($ex->getMessage(), 9, 'access_denied', 401, $ex->getMessage(), null, $ex);
             } catch (Throwable $e) {
                 throw OAuthServerException::serverError($e->getMessage(), $e);
             }
