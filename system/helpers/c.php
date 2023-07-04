@@ -135,7 +135,7 @@ class c {
                 }
 
                 if (\is_string($path) && $path[0] !== '[' && $path[strlen($path) - 1] !== ']') {
-                    $path = "[${path}]";
+                    $path = '[' . $path . ']';
                 }
             }
 

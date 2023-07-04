@@ -159,6 +159,7 @@ class CConfig implements CInterface_Arrayable, ArrayAccess {
         return $this->has($key);
     }
 
+    #[\ReturnTypeWillChange]
     public function offsetGet($key) {
         return $this->get($key);
     }
