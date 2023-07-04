@@ -5,7 +5,6 @@
 class CElement_FormInput_EditorJs extends CElement_FormInput {
     use CTrait_Element_Property_Placeholder;
     use CElement_FormInput_EditorJs_Trait_EditorJsToolTrait;
-
     protected $editor;
 
     /**
@@ -80,7 +79,7 @@ class CElement_FormInput_EditorJs extends CElement_FormInput {
         $divHolder->setAttr('data-input-id', $this->id);
         $this->addClass('cres:element:control:EditorJs');
         $this->setAttr('cres-element', 'control:EditorJs');
-        $this->setAttr('cres-config', c::jsonAttr($this->buildControlConfig()));
+        $this->setAttr('cres-config', c::json($this->buildControlConfig()));
 
         $this->setAttr('data-holder-id', $this->holderId());
         $this->setAttr('type', $this->type);

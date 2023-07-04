@@ -62,7 +62,7 @@ class CElement_Component_ProgressBar extends CElement_Component {
             'updateMethod' => 'cres_update_progressbar_' . $this->id,
             'id' => $this->id,
         ];
-        $this->setAttr('cres-config', htmlspecialchars(json_encode($config), ENT_QUOTES, 'UTF-8'));
+        $this->setAttr('cres-config', c::json($config));
         if ($this->process != null) {
             $this->add($this->process->createIframeProcess($config));
         }

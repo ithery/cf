@@ -32,6 +32,6 @@ class CElement_Component_Gallery extends CElement_Component {
             'thumbnail' => true,
         ];
 
-        $this->setAttr('cres-config', htmlspecialchars(json_encode($config), ENT_QUOTES, 'UTF-8'));
+        $this->setAttr('cres-config', c::json($config));
     }
 }
