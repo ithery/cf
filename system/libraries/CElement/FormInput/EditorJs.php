@@ -95,7 +95,7 @@ class CElement_FormInput_EditorJs extends CElement_FormInput {
                 $value = [];
             }
         }
-        $this->setAttr('value', c::jsonAttr($value));
+        $this->setAttr('value', c::json($value));
         $manager = c::manager();
         $manager->registerJs('https://cdn.jsdelivr.net/npm/@editorjs/editorjs@latest');
         $manager->registerJs('https://cdn.jsdelivr.net/npm/@editorjs/simple-image@latest');
