@@ -56,8 +56,11 @@ class CVendor_Xendit {
         $data = $invoiceOptions;
         $data['external_id'] = $external_id;
         $data['amount'] = (int) $amount;
-        $data['payer_email'] = $payer_email;
         $data['description'] = $description;
+
+        if (strlen($payer_email) > 0) {
+            $data['payer_email'] = $payer_email;
+        }
 
         if (!isset($invoiceOptions['callback_virtual_account_id']) && !empty($invoiceOptions['callback_virtual_account_id'])) {
             $data['callback_virtual_account_id'] = $invoiceOptions['callback_virtual_account_id'];

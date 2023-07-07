@@ -20,7 +20,7 @@ class CVendor_Xendit_Invoice extends CVendor_Xendit_Base {
      * @return array
      */
     protected function createReqParams() {
-        return ['external_id', 'payer_email', 'description', 'amount'];
+        return ['external_id', 'description', 'amount'];
     }
 
     /**
