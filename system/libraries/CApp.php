@@ -518,6 +518,7 @@ class CApp implements CInterface_Responsable, CInterface_Renderable, CInterface_
         $asset = CManager::asset();
         $html = $this->element->html();
         $js = $this->element->js();
+
         if (CF::config('app.javascript.minify')) {
             $js = $this->minifyJavascript($js);
         }

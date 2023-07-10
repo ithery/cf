@@ -84,10 +84,11 @@ class CElement_Component_FileManager extends CElement_Component {
         $config['connector_url'] = $ajaxUrl;
 
         $fm = new FM($config);
-        CManager::instance()->asset()->module()->registerRunTimeModule('jquery-ui-1.12.1.custom');
+        // CManager::instance()->asset()->module()->registerRunTimeModule('jquery-ui-1.12.1.custom');
         CManager::instance()->asset()->module()->registerRunTimeModule('dropzone');
         CManager::instance()->asset()->module()->registerRunTimeModule('cropper');
         CManager::instance()->asset()->module()->registerRunTimeModule('mime-icons');
+
         CManager::registerCss('element/filemanager/fm.css');
         CManager::registerJs('element/filemanager/fm.js');
         $this->addView(

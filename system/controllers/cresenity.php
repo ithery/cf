@@ -68,7 +68,6 @@ class Controller_Cresenity extends CController {
             //throw new Exception(c::__('failed to get temporary file :filename', ['filename' => $file]));
         }
         $json = $disk->get($file);
-
         $ajaxMethod = CAjax::createMethod($json)->setArgs($args);
 
         $response = $ajaxMethod->executeEngine();

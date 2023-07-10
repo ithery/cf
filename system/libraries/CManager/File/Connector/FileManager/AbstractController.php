@@ -16,13 +16,10 @@ class CManager_File_Connector_FileManager_AbstractController {
         $this->fileManager = $fileManager;
         $app = CApp::instance();
         $app->setLoginRequired(false);
-        $filemanagerTheme = $this->fm()->config('theme', 'cresenity-filemanager');
+        $filemanagerTheme = $this->fm()->config('theme', 'null');
         CManager::theme()->setThemeCallback(function ($theme) use ($filemanagerTheme) {
             return $filemanagerTheme;
         });
-
-        //do this with facade
-        //Facade::setFacadeApplication(CContainer::getInstance());
     }
 
     /**
@@ -32,6 +29,7 @@ class CManager_File_Connector_FileManager_AbstractController {
         if ($this->fm == null) {
             $this->fm = new FM($this->fileManager->getConfig());
         }
+
         return $this->fm;
     }
 

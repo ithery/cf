@@ -63,7 +63,7 @@ return [
       | Upload / Validation
       |--------------------------------------------------------------------------
      */
-    'theme' => 'cresenity-filemanager',
+    'theme' => 'null',
     'disk' => 'public',
     'root_path' => false,
     'rename_file' => false,

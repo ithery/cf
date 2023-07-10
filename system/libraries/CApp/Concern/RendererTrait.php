@@ -170,7 +170,6 @@ HTML;
             $jsScriptFile = '';
             $jsScriptFile = PHP_EOL . '<script>' . $asset->varJs() . '</script>';
             $jsScriptFile .= PHP_EOL . '<script>if(typeof define === "function") define=undefined;</script>';
-            //$jsScriptFile .= '<script src="/media/js/capp.js?v='.uniqid().'"></script>';
             $jsScriptFile .= PHP_EOL . $asset->render(CManager_Asset::POS_END, CManager_Asset::TYPE_JS_FILE);
 
             $js = $asset->wrapJs($js, true);

@@ -31,7 +31,7 @@ class CManager_Theme {
     public static function getCurrentTheme() {
         $theme = self::getDefaultTheme();
         if ($theme == null) {
-            $theme = 'cresenity';
+            $theme = 'null';
         }
 
         if (self::$themeCallback != null && is_callable(self::$themeCallback)) {
