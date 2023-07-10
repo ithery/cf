@@ -32,9 +32,11 @@ class CQueue_Connector_DatabaseConnector extends CQueue_AbstractConnector {
      * @return CQueue_AbstractQueue
      */
     public function connect(array $config) {
-        //todo read from config
+        $isLegacy = is_array(CF::config('database.default'));
+        $connection = $isLegacy ? 'default' : $this->connections->connection(carr::get($config, 'connection'));
+
         return new CQueue_Queue_DatabaseQueue(
-            $this->connections->connection(carr::get($config, 'connection')),
+            $connection,
             carr::get($config, 'table'),
             carr::get($config, 'queue'),
             carr::get($config, 'retry_after', 60)

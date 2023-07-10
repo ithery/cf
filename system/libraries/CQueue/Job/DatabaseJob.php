@@ -2,12 +2,6 @@
 
 defined('SYSPATH') or die('No direct access allowed.');
 
-/**
- * @author Hery Kurniawan
- * @license Ittron Global Teknologi <ittron.co.id>
- *
- * @since Sep 8, 2019, 6:02:05 AM
- */
 class CQueue_Job_DatabaseJob extends CQueue_AbstractJob implements CQueue_JobInterface {
     /**
      * The database queue instance.
