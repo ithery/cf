@@ -5,28 +5,41 @@
  *
  * PHP version 5 and 7
  *
+ * @category  Crypt
+ * @package   EC
  * @author    Jim Wigginton <terrafrost@php.net>
  * @copyright 2017 Jim Wigginton
  * @license   http://www.opensource.org/licenses/mit-license.html  MIT License
  * @link      http://pear.php.net/package/Math_BigInteger
  */
 
-declare(strict_types=1);
-
 namespace phpseclib3\Crypt\EC\BaseCurves;
 
-use phpseclib3\Exception\RangeException;
-use phpseclib3\Exception\RuntimeException;
 use phpseclib3\Math\BigInteger;
-use phpseclib3\Math\FiniteField\Integer;
 
 /**
  * Base
  *
+ * @package Prime
  * @author  Jim Wigginton <terrafrost@php.net>
+ * @access  public
  */
 abstract class Base
 {
+    /**
+     * Doubles
+     *
+     * @var object[]
+     */
+    protected $doubles;
+
+    /**
+     * NAF Points
+     *
+     * @var int[]
+     */
+    private $naf;
+
     /**
      * The Order
      *
@@ -37,7 +50,7 @@ abstract class Base
     /**
      * Finite Field Integer factory
      *
-     * @var Integer
+     * @var \phpseclib3\Math\FiniteField\Integer
      */
     protected $factory;
 
@@ -66,7 +79,7 @@ abstract class Base
      *
      * @return integer
      */
-    public function getLengthInBytes(): int
+    public function getLengthInBytes()
     {
         return $this->factory->getLengthInBytes();
     }
@@ -76,7 +89,7 @@ abstract class Base
      *
      * @return integer
      */
-    public function getLength(): int
+    public function getLength()
     {
         return $this->factory->getLength();
     }
@@ -88,8 +101,10 @@ abstract class Base
      *
      * https://en.wikipedia.org/wiki/Elliptic_curve_point_multiplication#Montgomery_ladder
      * https://github.com/phpecc/phpecc/issues/16#issuecomment-59176772
+     *
+     * @return array
      */
-    public function multiplyPoint(array $p, BigInteger $d): array
+    public function multiplyPoint(array $p, BigInteger $d)
     {
         $alreadyInternal = isset($p[2]);
         $r = $alreadyInternal ?
@@ -108,8 +123,10 @@ abstract class Base
 
     /**
      * Creates a random scalar multiplier
+     *
+     * @return BigInteger
      */
-    public function createRandomMultiplier(): BigInteger
+    public function createRandomMultiplier()
     {
         static $one;
         if (!isset($one)) {
@@ -122,7 +139,7 @@ abstract class Base
     /**
      * Performs range check
      */
-    public function rangeCheck(BigInteger $x): void
+    public function rangeCheck(BigInteger $x)
     {
         static $zero;
         if (!isset($zero)) {
@@ -130,25 +147,27 @@ abstract class Base
         }
 
         if (!isset($this->order)) {
-            throw new RuntimeException('setOrder needs to be called before this method');
+            throw new \RuntimeException('setOrder needs to be called before this method');
         }
         if ($x->compare($this->order) > 0 || $x->compare($zero) <= 0) {
-            throw new RangeException('x must be between 1 and the order of the curve');
+            throw new \RangeException('x must be between 1 and the order of the curve');
         }
     }
 
     /**
      * Sets the Order
      */
-    public function setOrder(BigInteger $order): void
+    public function setOrder(BigInteger $order)
     {
         $this->order = $order;
     }
 
     /**
      * Returns the Order
+     *
+     * @return \phpseclib3\Math\BigInteger
      */
-    public function getOrder(): BigInteger
+    public function getOrder()
     {
         return $this->order;
     }
@@ -168,7 +187,7 @@ abstract class Base
      *
      * @return object[]
      */
-    public function convertToAffine(array $p): array
+    public function convertToAffine(array $p)
     {
         return $p;
     }
@@ -178,7 +197,7 @@ abstract class Base
      *
      * @return object[]
      */
-    public function convertToInternal(array $p): array
+    public function convertToInternal(array $p)
     {
         return $p;
     }
@@ -188,11 +207,11 @@ abstract class Base
      *
      * @return object[]
      */
-    public function negatePoint(array $p): array
+    public function negatePoint(array $p)
     {
         $temp = [
             $p[0],
-            $p[1]->negate(),
+            $p[1]->negate()
         ];
         if (isset($p[2])) {
             $temp[] = $p[2];
@@ -205,7 +224,7 @@ abstract class Base
      *
      * @return int[]
      */
-    public function multiplyAddPoints(array $points, array $scalars): array
+    public function multiplyAddPoints(array $points, array $scalars)
     {
         $p1 = $this->convertToInternal($points[0]);
         $p2 = $this->convertToInternal($points[1]);

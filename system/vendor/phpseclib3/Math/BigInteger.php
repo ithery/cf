@@ -20,24 +20,25 @@
  * ?>
  * </code>
  *
+ * @category  Math
+ * @package   BigInteger
  * @author    Jim Wigginton <terrafrost@php.net>
  * @copyright 2017 Jim Wigginton
  * @license   http://www.opensource.org/licenses/mit-license.html  MIT License
  */
 
-declare(strict_types=1);
-
 namespace phpseclib3\Math;
 
 use phpseclib3\Exception\BadConfigurationException;
-use phpseclib3\Exception\InvalidArgumentException;
 use phpseclib3\Math\BigInteger\Engines\Engine;
 
 /**
  * Pure-PHP arbitrary precision integer arithmetic library. Supports base-2, base-10, base-16, and base-256
  * numbers.
  *
+ * @package BigInteger
  * @author  Jim Wigginton <terrafrost@php.net>
+ * @access  public
  */
 class BigInteger implements \JsonSerializable
 {
@@ -85,21 +86,27 @@ class BigInteger implements \JsonSerializable
      *
      * Throws an exception if the type is invalid
      *
+     * @param string $main
      * @param list<string> $modexps optional
+     * @return void
      */
-    public static function setEngine(string $main, array $modexps = ['DefaultEngine']): void
+    public static function setEngine($main, array $modexps = ['DefaultEngine'])
     {
         self::$engines = [];
 
         $fqmain = 'phpseclib3\\Math\\BigInteger\\Engines\\' . $main;
         if (!class_exists($fqmain) || !method_exists($fqmain, 'isValidEngine')) {
-            throw new InvalidArgumentException("$main is not a valid engine");
+            throw new \InvalidArgumentException("$main is not a valid engine");
         }
         if (!$fqmain::isValidEngine()) {
             throw new BadConfigurationException("$main is not setup correctly on this system");
         }
         /** @var class-string<Engine> $fqmain */
         self::$mainEngine = $fqmain;
+
+        if (!in_array('Default', $modexps)) {
+            $modexps[] = 'DefaultEngine';
+        }
 
         $found = false;
         foreach ($modexps as $modexp) {
@@ -123,7 +130,7 @@ class BigInteger implements \JsonSerializable
      *
      * @return string[]
      */
-    public static function getEngine(): array
+    public static function getEngine()
     {
         self::initialize_static_variables();
 
@@ -133,20 +140,18 @@ class BigInteger implements \JsonSerializable
     /**
      * Initialize static variables
      */
-    private static function initialize_static_variables(): void
+    private static function initialize_static_variables()
     {
         if (!isset(self::$mainEngine)) {
             $engines = [
                 ['GMP'],
                 ['PHP64', ['OpenSSL']],
                 ['BCMath', ['OpenSSL']],
-                ['PHP32', ['OpenSSL']],
-                ['PHP64', ['DefaultEngine']],
-                ['PHP32', ['DefaultEngine']],
+                ['PHP32', ['OpenSSL']]
             ];
             foreach ($engines as $engine) {
                 try {
-                    self::setEngine($engine[0], $engine[1] ?? []);
+                    self::setEngine($engine[0], isset($engine[1]) ? $engine[1] : []);
                     break;
                 } catch (\Exception $e) {
                 }
@@ -161,8 +166,9 @@ class BigInteger implements \JsonSerializable
      * two's compliment.  The sole exception to this is -10, which is treated the same as 10 is.
      *
      * @param string|int|BigInteger\Engines\Engine $x Base-10 number or base-$base number if $base set.
+     * @param int $base
      */
-    public function __construct($x = 0, int $base = 10)
+    public function __construct($x = 0, $base = 10)
     {
         self::initialize_static_variables();
 
@@ -178,8 +184,10 @@ class BigInteger implements \JsonSerializable
 
     /**
      * Converts a BigInteger to a base-10 number.
+     *
+     * @return string
      */
-    public function toString(): string
+    public function toString()
     {
         return $this->value->toString();
     }
@@ -204,16 +212,22 @@ class BigInteger implements \JsonSerializable
 
     /**
      * Converts a BigInteger to a byte string (eg. base-256).
+     *
+     * @param bool $twos_compliment
+     * @return string
      */
-    public function toBytes(bool $twos_compliment = false): string
+    public function toBytes($twos_compliment = false)
     {
         return $this->value->toBytes($twos_compliment);
     }
 
     /**
      * Converts a BigInteger to a hex string (eg. base-16).
+     *
+     * @param bool $twos_compliment
+     * @return string
      */
-    public function toHex(bool $twos_compliment = false): string
+    public function toHex($twos_compliment = false)
     {
         return $this->value->toHex($twos_compliment);
     }
@@ -223,32 +237,44 @@ class BigInteger implements \JsonSerializable
      *
      * Negative numbers are saved as positive numbers, unless $twos_compliment is set to true, at which point, they're
      * saved as two's compliment.
+     *
+     * @param bool $twos_compliment
+     * @return string
      */
-    public function toBits(bool $twos_compliment = false): string
+    public function toBits($twos_compliment = false)
     {
         return $this->value->toBits($twos_compliment);
     }
 
     /**
      * Adds two BigIntegers.
+     *
+     * @param BigInteger $y
+     * @return BigInteger
      */
-    public function add(BigInteger $y): BigInteger
+    public function add(BigInteger $y)
     {
         return new static($this->value->add($y->value));
     }
 
     /**
      * Subtracts two BigIntegers.
+     *
+     * @param BigInteger $y
+     * @return BigInteger
      */
-    public function subtract(BigInteger $y): BigInteger
+    public function subtract(BigInteger $y)
     {
         return new static($this->value->subtract($y->value));
     }
 
     /**
      * Multiplies two BigIntegers
+     *
+     * @param BigInteger $x
+     * @return BigInteger
      */
-    public function multiply(BigInteger $x): BigInteger
+    public function multiply(BigInteger $x)
     {
         return new static($this->value->multiply($x->value));
     }
@@ -275,14 +301,15 @@ class BigInteger implements \JsonSerializable
      * ?>
      * </code>
      *
+     * @param BigInteger $y
      * @return BigInteger[]
      */
-    public function divide(BigInteger $y): array
+    public function divide(BigInteger $y)
     {
-        [$q, $r] = $this->value->divide($y->value);
+        list($q, $r) = $this->value->divide($y->value);
         return [
             new static($q),
-            new static($r),
+            new static($r)
         ];
     }
 
@@ -290,8 +317,11 @@ class BigInteger implements \JsonSerializable
      * Calculates modular inverses.
      *
      * Say you have (30 mod 17 * x mod 17) mod 17 == 1.  x can be found using modular inverses.
+     *
+     * @param BigInteger $n
+     * @return BigInteger
      */
-    public function modInverse(BigInteger $n): BigInteger
+    public function modInverse(BigInteger $n)
     {
         return new static($this->value->modInverse($n->value));
     }
@@ -301,9 +331,10 @@ class BigInteger implements \JsonSerializable
      *
      * Say you have (30 mod 17 * x mod 17) mod 17 == 1.  x can be found using modular inverses.
      *
+     * @param BigInteger $n
      * @return BigInteger[]
      */
-    public function extendedGCD(BigInteger $n): array
+    public function extendedGCD(BigInteger $n)
     {
         extract($this->value->extendedGCD($n->value));
         /**
@@ -314,7 +345,7 @@ class BigInteger implements \JsonSerializable
         return [
             'gcd' => new static($gcd),
             'x' => new static($x),
-            'y' => new static($y),
+            'y' => new static($y)
         ];
     }
 
@@ -322,16 +353,22 @@ class BigInteger implements \JsonSerializable
      * Calculates the greatest common divisor
      *
      * Say you have 693 and 609.  The GCD is 21.
+     *
+     * @param BigInteger $n
+     * @return BigInteger
      */
-    public function gcd(BigInteger $n): BigInteger
+    public function gcd(BigInteger $n)
     {
         return new static($this->value->gcd($n->value));
     }
 
     /**
      * Absolute value.
+     *
+     * @return BigInteger
+     * @access public
      */
-    public function abs(): BigInteger
+    public function abs()
     {
         return new static($this->value->abs());
     }
@@ -341,8 +378,10 @@ class BigInteger implements \JsonSerializable
      *
      * Some bitwise operations give different results depending on the precision being used.  Examples include left
      * shift, not, and rotates.
+     *
+     * @param int $bits
      */
-    public function setPrecision(int $bits): void
+    public function setPrecision($bits)
     {
         $this->value->setPrecision($bits);
     }
@@ -389,7 +428,7 @@ class BigInteger implements \JsonSerializable
      *
      * Will be called, automatically, when unserialize() is called on a BigInteger object.
      */
-    public function __wakeup(): void
+    public function __wakeup()
     {
         $temp = new static($this->hex, -16);
         $this->value = $temp->value;
@@ -403,11 +442,9 @@ class BigInteger implements \JsonSerializable
      * JSON Serialize
      *
      * Will be called, automatically, when json_encode() is called on a BigInteger object.
-     *
-     * @return array{hex: string, precision?: int]
      */
     #[\ReturnTypeWillChange]
-    public function jsonSerialize(): array
+    public function jsonSerialize()
     {
         $result = ['hex' => $this->toHex(true)];
         if ($this->precision > 0) {
@@ -418,16 +455,24 @@ class BigInteger implements \JsonSerializable
 
     /**
      * Performs modular exponentiation.
+     *
+     * @param BigInteger $e
+     * @param BigInteger $n
+     * @return BigInteger
      */
-    public function powMod(BigInteger $e, BigInteger $n): BigInteger
+    public function powMod(BigInteger $e, BigInteger $n)
     {
         return new static($this->value->powMod($e->value, $n->value));
     }
 
     /**
      * Performs modular exponentiation.
+     *
+     * @param BigInteger $e
+     * @param BigInteger $n
+     * @return BigInteger
      */
-    public function modPow(BigInteger $e, BigInteger $n): BigInteger
+    public function modPow(BigInteger $e, BigInteger $n)
     {
         return new static($this->value->modPow($e->value, $n->value));
     }
@@ -446,10 +491,12 @@ class BigInteger implements \JsonSerializable
      *
      * {@internal Could return $this->subtract($x), but that's not as fast as what we do do.}
      *
+     * @param BigInteger $y
      * @return int in case < 0 if $this is less than $y; > 0 if $this is greater than $y, and 0 if they are equal.
+     * @access public
      * @see self::equals()
      */
-    public function compare(BigInteger $y): int
+    public function compare(BigInteger $y)
     {
         return $this->value->compare($y->value);
     }
@@ -458,40 +505,54 @@ class BigInteger implements \JsonSerializable
      * Tests the equality of two numbers.
      *
      * If you need to see if one number is greater than or less than another number, use BigInteger::compare()
+     *
+     * @param BigInteger $x
+     * @return bool
      */
-    public function equals(BigInteger $x): bool
+    public function equals(BigInteger $x)
     {
         return $this->value->equals($x->value);
     }
 
     /**
      * Logical Not
+     *
+     * @return BigInteger
      */
-    public function bitwise_not(): BigInteger
+    public function bitwise_not()
     {
         return new static($this->value->bitwise_not());
     }
 
     /**
      * Logical And
+     *
+     * @param BigInteger $x
+     * @return BigInteger
      */
-    public function bitwise_and(BigInteger $x): BigInteger
+    public function bitwise_and(BigInteger $x)
     {
         return new static($this->value->bitwise_and($x->value));
     }
 
     /**
      * Logical Or
+     *
+     * @param BigInteger $x
+     * @return BigInteger
      */
-    public function bitwise_or(BigInteger $x): BigInteger
+    public function bitwise_or(BigInteger $x)
     {
         return new static($this->value->bitwise_or($x->value));
     }
 
     /**
      * Logical Exclusive Or
+     *
+     * @param BigInteger $x
+     * @return BigInteger
      */
-    public function bitwise_xor(BigInteger $x): BigInteger
+    public function bitwise_xor(BigInteger $x)
     {
         return new static($this->value->bitwise_xor($x->value));
     }
@@ -500,8 +561,11 @@ class BigInteger implements \JsonSerializable
      * Logical Right Shift
      *
      * Shifts BigInteger's by $shift bits, effectively dividing by 2**$shift.
+     *
+     * @param int $shift
+     * @return BigInteger
      */
-    public function bitwise_rightShift(int $shift): BigInteger
+    public function bitwise_rightShift($shift)
     {
         return new static($this->value->bitwise_rightShift($shift));
     }
@@ -510,8 +574,11 @@ class BigInteger implements \JsonSerializable
      * Logical Left Shift
      *
      * Shifts BigInteger's by $shift bits, effectively multiplying by 2**$shift.
+     *
+     * @param int $shift
+     * @return BigInteger
      */
-    public function bitwise_leftShift(int $shift): BigInteger
+    public function bitwise_leftShift($shift)
     {
         return new static($this->value->bitwise_leftShift($shift));
     }
@@ -520,8 +587,11 @@ class BigInteger implements \JsonSerializable
      * Logical Left Rotate
      *
      * Instead of the top x bits being dropped they're appended to the shifted bit string.
+     *
+     * @param int $shift
+     * @return BigInteger
      */
-    public function bitwise_leftRotate(int $shift): BigInteger
+    public function bitwise_leftRotate($shift)
     {
         return new static($this->value->bitwise_leftRotate($shift));
     }
@@ -530,8 +600,11 @@ class BigInteger implements \JsonSerializable
      * Logical Right Rotate
      *
      * Instead of the bottom x bits being dropped they're prepended to the shifted bit string.
+     *
+     * @param int $shift
+     * @return BigInteger
      */
-    public function bitwise_rightRotate(int $shift): BigInteger
+    public function bitwise_rightRotate($shift)
     {
         return new static($this->value->bitwise_rightRotate($shift));
     }
@@ -539,9 +612,10 @@ class BigInteger implements \JsonSerializable
     /**
      * Returns the smallest and largest n-bit number
      *
+     * @param int $bits
      * @return BigInteger[]
      */
-    public static function minMaxBits(int $bits): array
+    public static function minMaxBits($bits)
     {
         self::initialize_static_variables();
 
@@ -552,22 +626,26 @@ class BigInteger implements \JsonSerializable
          */
         return [
             'min' => new static($min),
-            'max' => new static($max),
+            'max' => new static($max)
         ];
     }
 
     /**
      * Return the size of a BigInteger in bits
+     *
+     * @return int
      */
-    public function getLength(): int
+    public function getLength()
     {
         return $this->value->getLength();
     }
 
     /**
      * Return the size of a BigInteger in bytes
+     *
+     * @return int
      */
-    public function getLengthInBytes(): int
+    public function getLengthInBytes()
     {
         return $this->value->getLengthInBytes();
     }
@@ -576,8 +654,11 @@ class BigInteger implements \JsonSerializable
      * Generates a random number of a certain size
      *
      * Bit length is equal to $size
+     *
+     * @param int $size
+     * @return BigInteger
      */
-    public static function random(int $size): BigInteger
+    public static function random($size)
     {
         self::initialize_static_variables();
 
@@ -589,8 +670,11 @@ class BigInteger implements \JsonSerializable
      * Generates a random prime number of a certain size
      *
      * Bit length is equal to $size
+     *
+     * @param int $size
+     * @return BigInteger
      */
-    public static function randomPrime(int $size): BigInteger
+    public static function randomPrime($size)
     {
         self::initialize_static_variables();
 
@@ -603,6 +687,8 @@ class BigInteger implements \JsonSerializable
      *
      * If there's not a prime within the given range, false will be returned.
      *
+     * @param BigInteger $min
+     * @param BigInteger $max
      * @return false|BigInteger
      */
     public static function randomRangePrime(BigInteger $min, BigInteger $max)
@@ -619,8 +705,12 @@ class BigInteger implements \JsonSerializable
      *
      * BigInteger::randomRange($min, $max)
      * BigInteger::randomRange($max, $min)
+     *
+     * @param BigInteger $min
+     * @param BigInteger $max
+     * @return BigInteger
      */
-    public static function randomRange(BigInteger $min, BigInteger $max): BigInteger
+    public static function randomRange(BigInteger $min, BigInteger $max)
     {
         $class = self::$mainEngine;
         return new static($class::randomRange($min->value, $max->value));
@@ -634,8 +724,9 @@ class BigInteger implements \JsonSerializable
      * on a website instead of just one.
      *
      * @param int|bool $t
+     * @return bool
      */
-    public function isPrime($t = false): bool
+    public function isPrime($t = false)
     {
         return $this->value->isPrime($t);
     }
@@ -646,44 +737,62 @@ class BigInteger implements \JsonSerializable
      * Returns the nth root of a positive biginteger, where n defaults to 2
      *
      * @param int $n optional
+     * @return BigInteger
      */
-    public function root(int $n = 2): BigInteger
+    public function root($n = 2)
     {
         return new static($this->value->root($n));
     }
 
     /**
      * Performs exponentiation.
+     *
+     * @param BigInteger $n
+     * @return BigInteger
      */
-    public function pow(BigInteger $n): BigInteger
+    public function pow(BigInteger $n)
     {
         return new static($this->value->pow($n->value));
     }
 
     /**
      * Return the minimum BigInteger between an arbitrary number of BigIntegers.
+     *
+     * @param BigInteger ...$nums
+     * @return BigInteger
      */
-    public static function min(BigInteger ...$nums): BigInteger
+    public static function min(BigInteger ...$nums)
     {
         $class = self::$mainEngine;
-        $nums = array_map(fn ($num) => $num->value, $nums);
+        $nums = array_map(function ($num) {
+            return $num->value;
+        }, $nums);
         return new static($class::min(...$nums));
     }
 
     /**
      * Return the maximum BigInteger between an arbitrary number of BigIntegers.
+     *
+     * @param BigInteger ...$nums
+     * @return BigInteger
      */
-    public static function max(BigInteger ...$nums): BigInteger
+    public static function max(BigInteger ...$nums)
     {
         $class = self::$mainEngine;
-        $nums = array_map(fn ($num) => $num->value, $nums);
+        $nums = array_map(function ($num) {
+            return $num->value;
+        }, $nums);
         return new static($class::max(...$nums));
     }
 
     /**
      * Tests BigInteger to see if it is between two integers, inclusive
+     *
+     * @param BigInteger $min
+     * @param BigInteger $max
+     * @return bool
      */
-    public function between(BigInteger $min, BigInteger $max): bool
+    public function between(BigInteger $min, BigInteger $max)
     {
         return $this->value->between($min->value, $max->value);
     }
@@ -698,24 +807,31 @@ class BigInteger implements \JsonSerializable
 
     /**
      * Is Odd?
+     *
+     * @return bool
      */
-    public function isOdd(): bool
+    public function isOdd()
     {
         return $this->value->isOdd();
     }
 
     /**
      * Tests if a bit is set
+     *
+     * @param int $x
+     * @return bool
      */
-    public function testBit(int $x): bool
+    public function testBit($x)
     {
         return $this->value->testBit($x);
     }
 
     /**
      * Is Negative?
+     *
+     * @return bool
      */
-    public function isNegative(): bool
+    public function isNegative()
     {
         return $this->value->isNegative();
     }
@@ -724,8 +840,10 @@ class BigInteger implements \JsonSerializable
      * Negate
      *
      * Given $k, returns -$k
+     *
+     * @return BigInteger
      */
-    public function negate(): BigInteger
+    public function negate()
     {
         return new static($this->value->negate());
     }
@@ -734,8 +852,11 @@ class BigInteger implements \JsonSerializable
      * Scan for 1 and right shift by that amount
      *
      * ie. $s = gmp_scan1($n, 0) and $r = gmp_div_q($n, gmp_pow(gmp_init('2'), $s));
+     *
+     * @param BigInteger $r
+     * @return int
      */
-    public static function scan1divide(BigInteger $r): int
+    public static function scan1divide(BigInteger $r)
     {
         $class = self::$mainEngine;
         return $class::scan1divide($r->value);
@@ -752,7 +873,9 @@ class BigInteger implements \JsonSerializable
     public function createRecurringModuloFunction()
     {
         $func = $this->value->createRecurringModuloFunction();
-        return fn (BigInteger $x) => new static($func($x->value));
+        return function (BigInteger $x) use ($func) {
+            return new static($func($x->value));
+        };
     }
 
     /**
@@ -760,10 +883,13 @@ class BigInteger implements \JsonSerializable
      *
      * Splits BigInteger's into chunks of $split bits
      *
+     * @param int $split
      * @return BigInteger[]
      */
-    public function bitwise_split(int $split): array
+    public function bitwise_split($split)
     {
-        return array_map(fn ($val) => new static($val), $this->value->bitwise_split($split));
+        return array_map(function ($val) {
+            return new static($val);
+        }, $this->value->bitwise_split($split));
     }
 }

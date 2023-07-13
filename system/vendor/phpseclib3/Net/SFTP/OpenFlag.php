@@ -1,7 +1,5 @@
 <?php
 
-declare(strict_types=1);
-
 namespace phpseclib3\Net\SFTP;
 
 /**
@@ -11,13 +9,18 @@ namespace phpseclib3\Net\SFTP;
  *
  * @internal
  */
-abstract class OpenFlag
-{
-    public const READ = 0x00000001;
-    public const WRITE = 0x00000002;
-    public const APPEND = 0x00000004;
-    public const CREATE = 0x00000008;
-    public const TRUNCATE = 0x00000010;
-    public const EXCL = 0x00000020;
-    public const TEXT = 0x00000040; // defined in SFTPv4
+abstract class OpenFlag {
+    const READ = 0x00000001;
+
+    const WRITE = 0x00000002;
+
+    const APPEND = 0x00000004;
+
+    const CREATE = 0x00000008;
+
+    const TRUNCATE = 0x00000010;
+
+    const EXCL = 0x00000020;
+
+    const TEXT = 0x00000040; // defined in SFTPv4
 }

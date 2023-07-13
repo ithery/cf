@@ -5,13 +5,13 @@
  *
  * PHP version 5 and 7
  *
+ * @category  Math
+ * @package   BigInteger
  * @author    Jim Wigginton <terrafrost@php.net>
  * @copyright 2017 Jim Wigginton
  * @license   http://www.opensource.org/licenses/mit-license.html  MIT License
  * @link      http://pear.php.net/package/Math_BigInteger
  */
-
-declare(strict_types=1);
 
 namespace phpseclib3\Math\BigInteger\Engines\PHP;
 
@@ -22,14 +22,18 @@ use phpseclib3\Math\BigInteger\Engines\PHP\Reductions\PowerOfTwo;
 /**
  * PHP Montgomery Modular Exponentiation Engine
  *
+ * @package PHP
  * @author  Jim Wigginton <terrafrost@php.net>
+ * @access  public
  */
 abstract class Montgomery extends Base
 {
     /**
      * Test for engine validity
+     *
+     * @return bool
      */
-    public static function isValidEngine(): bool
+    public static function isValidEngine()
     {
         return static::class != __CLASS__;
     }
@@ -38,10 +42,13 @@ abstract class Montgomery extends Base
      * Performs modular exponentiation.
      *
      * @template T of Engine
+     * @param Engine $x
+     * @param Engine $e
+     * @param Engine $n
      * @param class-string<T> $class
      * @return T
      */
-    protected static function slidingWindow(Engine $x, Engine $e, Engine $n, string $class)
+    protected static function slidingWindow(Engine $x, Engine $e, Engine $n, $class)
     {
         // is the modulo odd?
         if ($n->value[0] & 1) {
@@ -79,7 +86,7 @@ abstract class Montgomery extends Base
         $temp = $temp->multiply($y2);
 
         $result = $result->add($temp);
-        [, $result] = $result->divide($n);
+        list(, $result) = $result->divide($n);
 
         return $result;
     }

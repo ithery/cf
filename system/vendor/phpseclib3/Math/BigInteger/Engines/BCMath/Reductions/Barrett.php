@@ -5,13 +5,13 @@
  *
  * PHP version 5 and 7
  *
+ * @category  Math
+ * @package   BigInteger
  * @author    Jim Wigginton <terrafrost@php.net>
  * @copyright 2017 Jim Wigginton
  * @license   http://www.opensource.org/licenses/mit-license.html  MIT License
  * @link      http://pear.php.net/package/Math_BigInteger
  */
-
-declare(strict_types=1);
 
 namespace phpseclib3\Math\BigInteger\Engines\BCMath\Reductions;
 
@@ -20,7 +20,9 @@ use phpseclib3\Math\BigInteger\Engines\BCMath\Base;
 /**
  * PHP Barrett Modular Exponentiation Engine
  *
+ * @package PHP
  * @author  Jim Wigginton <terrafrost@php.net>
+ * @access  public
  */
 abstract class Barrett extends Base
 {
@@ -28,12 +30,16 @@ abstract class Barrett extends Base
      * Cache constants
      *
      * $cache[self::VARIABLE] tells us whether or not the cached data is still valid.
+     *
+     * @access private
      */
-    public const VARIABLE = 0;
+    const VARIABLE = 0;
     /**
      * $cache[self::DATA] contains the cached data.
+     *
+     * @access private
      */
-    public const DATA = 1;
+    const DATA = 1;
 
     /**
      * Barrett Modular Reduction
@@ -52,12 +58,16 @@ abstract class Barrett extends Base
      * radix points, it only works when there are an even number of digits in the denominator.  The reason for (2) is that
      * (x >> 1) + (x >> 1) != x / 2 + x / 2.  If x is even, they're the same, but if x is odd, they're not.  See the in-line
      * comments for details.
+     *
+     * @param string $n
+     * @param string $m
+     * @return string
      */
-    protected static function reduce(string $n, string $m): string
+    protected static function reduce($n, $m)
     {
         static $cache = [
             self::VARIABLE => [],
-            self::DATA => [],
+            self::DATA => []
         ];
 
         $m_length = strlen($m);
@@ -82,7 +92,7 @@ abstract class Barrett extends Base
 
             $cache[self::DATA][] = [
                 'u' => $u, // m.length >> 1 (technically (m.length >> 1) + 1)
-                'm1' => $m1, // m.length
+                'm1' => $m1 // m.length
             ];
         } else {
             extract($cache[self::DATA][$key]);
@@ -135,12 +145,16 @@ abstract class Barrett extends Base
      *
      * For numbers with more than four digits BigInteger::_barrett() is faster.  The difference between that and this
      * is that this function does not fold the denominator into a smaller form.
+     *
+     * @param string $x
+     * @param string $n
+     * @return string
      */
-    private static function regularBarrett(string $x, string $n): string
+    private static function regularBarrett($x, $n)
     {
         static $cache = [
             self::VARIABLE => [],
-            self::DATA => [],
+            self::DATA => []
         ];
 
         $n_length = strlen($n);

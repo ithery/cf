@@ -5,13 +5,13 @@
  *
  * PHP version 5 and 7
  *
+ * @category  Math
+ * @package   BigInteger
  * @author    Jim Wigginton <terrafrost@php.net>
  * @copyright 2017 Jim Wigginton
  * @license   http://www.opensource.org/licenses/mit-license.html  MIT License
  * @link      http://pear.php.net/package/Math_BigInteger
  */
-
-declare(strict_types=1);
 
 namespace phpseclib3\Math\BigInteger\Engines\PHP\Reductions;
 
@@ -20,7 +20,9 @@ use phpseclib3\Math\BigInteger\Engines\PHP;
 /**
  * PHP Montgomery Modular Exponentiation Engine with interleaved multiplication
  *
+ * @package PHP
  * @author  Jim Wigginton <terrafrost@php.net>
+ * @access  public
  */
 abstract class MontgomeryMult extends Montgomery
 {
@@ -30,11 +32,16 @@ abstract class MontgomeryMult extends Montgomery
      * Interleaves the montgomery reduction and long multiplication algorithms together as described in
      * {@link http://www.cacr.math.uwaterloo.ca/hac/about/chap14.pdf#page=13 HAC 14.36}
      *
-     * @param class-string<PHP> $class
      * @see self::_prepMontgomery()
-          * @see self::_montgomery()
+     * @see self::_montgomery()
+     * @access private
+     * @param array $x
+     * @param array $y
+     * @param array $m
+     * @param class-string<PHP> $class
+     * @return array
      */
-    public static function multiplyReduce(array $x, array $y, array $m, string $class): array
+    public static function multiplyReduce(array $x, array $y, array $m, $class)
     {
         // the following code, although not callable, can be run independently of the above code
         // although the above code performed better in my benchmarks the following could might
@@ -43,7 +50,7 @@ abstract class MontgomeryMult extends Montgomery
 
         static $cache = [
             self::VARIABLE => [],
-            self::DATA => [],
+            self::DATA => []
         ];
 
         if (($key = array_search($m, $cache[self::VARIABLE])) === false) {
