@@ -72,7 +72,9 @@ class CVendor_Wago_Device {
         }
         $errCode = (int) carr::get($response, 'errCode');
         if ($errCode != 0) {
-            throw new CVendor_Wago_Exception_ApiException(carr::get($response, 'errMessage'));
+            $errMessage = carr::get($response, 'errMessage');
+
+            throw new CVendor_Wago_Exception_ApiException($errMessage);
         }
 
         return carr::get($response, 'data', []);
