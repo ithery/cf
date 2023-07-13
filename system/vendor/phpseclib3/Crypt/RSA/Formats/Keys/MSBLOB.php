@@ -9,94 +9,76 @@
  *
  * PHP version 5
  *
- * @category  Crypt
- * @package   RSA
  * @author    Jim Wigginton <terrafrost@php.net>
  * @copyright 2015 Jim Wigginton
  * @license   http://www.opensource.org/licenses/mit-license.html  MIT License
  * @link      http://phpseclib.sourceforge.net
  */
 
+declare(strict_types=1);
+
 namespace phpseclib3\Crypt\RSA\Formats\Keys;
 
-use ParagonIE\ConstantTime\Base64;
 use phpseclib3\Common\Functions\Strings;
+use phpseclib3\Exception\InvalidArgumentException;
+use phpseclib3\Exception\UnexpectedValueException;
 use phpseclib3\Exception\UnsupportedFormatException;
 use phpseclib3\Math\BigInteger;
 
 /**
  * Microsoft BLOB Formatted RSA Key Handler
  *
- * @package RSA
  * @author  Jim Wigginton <terrafrost@php.net>
- * @access  public
  */
 abstract class MSBLOB
 {
     /**
      * Public/Private Key Pair
-     *
-     * @access private
      */
-    const PRIVATEKEYBLOB = 0x7;
+    public const PRIVATEKEYBLOB = 0x7;
     /**
      * Public Key
-     *
-     * @access private
      */
-    const PUBLICKEYBLOB = 0x6;
+    public const PUBLICKEYBLOB = 0x6;
     /**
      * Public Key
-     *
-     * @access private
      */
-    const PUBLICKEYBLOBEX = 0xA;
+    public const PUBLICKEYBLOBEX = 0xA;
     /**
      * RSA public key exchange algorithm
-     *
-     * @access private
      */
-    const CALG_RSA_KEYX = 0x0000A400;
+    public const CALG_RSA_KEYX = 0x0000A400;
     /**
      * RSA public key exchange algorithm
-     *
-     * @access private
      */
-    const CALG_RSA_SIGN = 0x00002400;
+    public const CALG_RSA_SIGN = 0x00002400;
     /**
      * Public Key
-     *
-     * @access private
      */
-    const RSA1 = 0x31415352;
+    public const RSA1 = 0x31415352;
     /**
      * Private Key
-     *
-     * @access private
      */
-    const RSA2 = 0x32415352;
+    public const RSA2 = 0x32415352;
 
     /**
      * Break a public or private key down into its constituent components
      *
-     * @access public
-     * @param string $key
-     * @param string $password optional
-     * @return array
+     * @param string|array $key
      */
-    public static function load($key, $password = '')
+    public static function load($key, ?string $password = null): array
     {
         if (!Strings::is_stringable($key)) {
-            throw new \UnexpectedValueException('Key should be a string - not a ' . gettype($key));
+            throw new UnexpectedValueException('Key should be a string - not a ' . gettype($key));
         }
 
-        $key = Base64::decode($key);
+        $key = Strings::base64_decode($key);
 
         if (!is_string($key)) {
-            throw new \UnexpectedValueException('Base64 decoding produced an error');
+            throw new UnexpectedValueException('Base64 decoding produced an error');
         }
         if (strlen($key) < 20) {
-            throw new \UnexpectedValueException('Key appears to be malformed');
+            throw new UnexpectedValueException('Key appears to be malformed');
         }
 
         // PUBLICKEYSTRUC  publickeystruc
@@ -117,7 +99,7 @@ abstract class MSBLOB
                 $publickey = false;
                 break;
             default:
-                throw new \UnexpectedValueException('Key appears to be malformed');
+                throw new UnexpectedValueException('Key appears to be malformed');
         }
 
         $components = ['isPublicKey' => $publickey];
@@ -128,7 +110,7 @@ abstract class MSBLOB
             case self::CALG_RSA_SIGN:
                 break;
             default:
-                throw new \UnexpectedValueException('Key appears to be malformed');
+                throw new UnexpectedValueException('Key appears to be malformed');
         }
 
         // RSAPUBKEY rsapubkey
@@ -147,12 +129,12 @@ abstract class MSBLOB
             case self::RSA1:
                 break;
             default:
-                throw new \UnexpectedValueException('Key appears to be malformed');
+                throw new UnexpectedValueException('Key appears to be malformed');
         }
 
         $baseLength = $bitlen / 16;
         if (strlen($key) != 2 * $baseLength && strlen($key) != 9 * $baseLength) {
-            throw new \UnexpectedValueException('Key appears to be malformed');
+            throw new UnexpectedValueException('Key appears to be malformed');
         }
 
         $components[$components['isPublicKey'] ? 'publicExponent' : 'privateExponent'] = new BigInteger(strrev($pubexp), 256);
@@ -186,21 +168,11 @@ abstract class MSBLOB
 
     /**
      * Convert a private key to the appropriate format.
-     *
-     * @access public
-     * @param \phpseclib3\Math\BigInteger $n
-     * @param \phpseclib3\Math\BigInteger $e
-     * @param \phpseclib3\Math\BigInteger $d
-     * @param array $primes
-     * @param array $exponents
-     * @param array $coefficients
-     * @param string $password optional
-     * @return string
      */
-    public static function savePrivateKey(BigInteger $n, BigInteger $e, BigInteger $d, array $primes, array $exponents, array $coefficients, $password = '')
+    public static function savePrivateKey(BigInteger $n, BigInteger $e, BigInteger $d, array $primes, array $exponents, array $coefficients, ?string $password = null): string
     {
         if (count($primes) != 2) {
-            throw new \InvalidArgumentException('MSBLOB does not support multi-prime RSA keys');
+            throw new InvalidArgumentException('MSBLOB does not support multi-prime RSA keys');
         }
 
         if (!empty($password) && is_string($password)) {
@@ -219,18 +191,13 @@ abstract class MSBLOB
         $key .= strrev($coefficients[2]->toBytes());
         $key .= strrev($d->toBytes());
 
-        return Base64::encode($key);
+        return Strings::base64_encode($key);
     }
 
     /**
      * Convert a public key to the appropriate format
-     *
-     * @access public
-     * @param \phpseclib3\Math\BigInteger $n
-     * @param \phpseclib3\Math\BigInteger $e
-     * @return string
      */
-    public static function savePublicKey(BigInteger $n, BigInteger $e)
+    public static function savePublicKey(BigInteger $n, BigInteger $e): string
     {
         $n = strrev($n->toBytes());
         $e = str_pad(strrev($e->toBytes()), 4, "\0");
@@ -238,6 +205,6 @@ abstract class MSBLOB
         $key .= pack('VVa*', self::RSA1, 8 * strlen($n), $e);
         $key .= $n;
 
-        return Base64::encode($key);
+        return Strings::base64_encode($key);
     }
 }

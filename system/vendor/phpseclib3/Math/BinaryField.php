@@ -7,12 +7,12 @@
  *
  * PHP version 5 and 7
  *
- * @category  Math
- * @package   BigInteger
  * @author    Jim Wigginton <terrafrost@php.net>
  * @copyright 2017 Jim Wigginton
  * @license   http://www.opensource.org/licenses/mit-license.html  MIT License
  */
+
+declare(strict_types=1);
 
 namespace phpseclib3\Math;
 
@@ -23,9 +23,7 @@ use phpseclib3\Math\Common\FiniteField;
 /**
  * Binary Finite Fields
  *
- * @package Math
  * @author  Jim Wigginton <terrafrost@php.net>
- * @access  public
  */
 class BinaryField extends FiniteField
 {
@@ -59,13 +57,13 @@ class BinaryField extends FiniteField
         $modulo = static::base2ToBase256(strrev($val));
 
         $mStart = 2 * $m - 2;
-        $t = ceil($m / 8);
+        $t = (int) ceil($m / 8);
         $finalMask = chr((1 << ($m % 8)) - 1);
         if ($finalMask == "\0") {
             $finalMask = "\xFF";
         }
         $bitLen = $mStart + 1;
-        $pad = ceil($bitLen / 8);
+        $pad = (int) ceil($bitLen / 8);
         $h = $bitLen & 7;
         $h = $h ? 8 - $h : 0;
 
@@ -115,20 +113,17 @@ class BinaryField extends FiniteField
     /**
      * Returns an instance of a dynamically generated PrimeFieldInteger class
      *
-     * @param string $num
-     * @return Integer
+     * @param BigInteger|string $num
      */
-    public function newInteger($num)
+    public function newInteger($num): Integer
     {
         return new Integer($this->instanceID, $num instanceof BigInteger ? $num->toBytes() : $num);
     }
 
     /**
      * Returns an integer on the finite field between one and the prime modulo
-     *
-     * @return Integer
      */
-    public function randomInteger()
+    public function randomInteger(): Integer
     {
         static $one;
         if (!isset($one)) {
@@ -140,32 +135,24 @@ class BinaryField extends FiniteField
 
     /**
      * Returns the length of the modulo in bytes
-     *
-     * @return int
      */
-    public function getLengthInBytes()
+    public function getLengthInBytes(): int
     {
         return strlen(Integer::getModulo($this->instanceID));
     }
 
     /**
      * Returns the length of the modulo in bits
-     *
-     * @return int
      */
-    public function getLength()
+    public function getLength(): int
     {
         return strlen(Integer::getModulo($this->instanceID)) << 3;
     }
 
     /**
      * Converts a base-2 string to a base-256 string
-     *
-     * @param string $x
-     * @param int|null $size
-     * @return string
      */
-    public static function base2ToBase256($x, $size = null)
+    public static function base2ToBase256(string $x, int $size = null): string
     {
         $str = Strings::bits2bin($x);
 
@@ -183,11 +170,8 @@ class BinaryField extends FiniteField
 
     /**
      * Converts a base-256 string to a base-2 string
-     *
-     * @param string $x
-     * @return string
      */
-    public static function base256ToBase2($x)
+    public static function base256ToBase2(string $x): string
     {
         if (function_exists('gmp_import')) {
             return gmp_strval(gmp_import($x), 2);
