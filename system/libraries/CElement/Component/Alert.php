@@ -34,28 +34,57 @@ class CElement_Component_Alert extends CElement_Component {
         $this->isDismissable = false;
     }
 
+    /**
+     * @param string $type
+     *
+     * @return $this
+     */
     public function setType($type) {
         $this->type = $type;
 
         return $this;
     }
 
+    /**
+     * @return $this
+     */
     public function setTypeDanger() {
-        return $this->setType('danger');
+        return $this->setType('error');
     }
 
+    /**
+     * @return $this
+     */
+    public function setTypeError() {
+        return $this->setType('error');
+    }
+
+    /**
+     * @return $this
+     */
     public function setTypeSuccess() {
         return $this->setType('success');
     }
 
+    /**
+     * @return $this
+     */
     public function setTypeWarning() {
         return $this->setType('warning');
     }
 
+    /**
+     * @return $this
+     */
     public function setTypeInfo() {
         return $this->setType('info');
     }
 
+    /**
+     * @param bool $bool
+     *
+     * @return $this
+     */
     public function setDismissable($bool = true) {
         $this->isDismissable = $bool;
 
