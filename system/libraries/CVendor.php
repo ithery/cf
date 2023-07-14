@@ -240,4 +240,11 @@ class CVendor {
     public static function tugasHarian() {
         return new CBase_ForwarderStaticClass(CVendor_TugasHarian::class);
     }
+
+    /**
+     * @return \CVendor_BCA
+     */
+    public static function bca() {
+        return new CBase_ForwarderStaticClass(CVendor_BCA::class);
+    }
 }
