@@ -44,9 +44,15 @@ class CElement_FormInput_AutoNumeric extends CElement_FormInput {
     protected function build() {
         $this->setAttr('type', $this->type);
         $this->setAttr('value', $this->value);
-        $this->setAttr('data-m-dec', $this->decimalDigit);
-        $this->setAttr('data-a-sep', $this->thousandSeparator);
-        $this->setAttr('data-a-dec', $this->decimalSeparator);
+        if (!isset($this->attr['data-m-dec'])) {
+            $this->setAttr('data-m-dec', $this->decimalDigit);
+        }
+        if (!isset($this->attr['data-a-sep'])) {
+            $this->setAttr('data-a-sep', $this->thousandSeparator);
+        }
+        if (!isset($this->attr['data-a-dec'])) {
+            $this->setAttr('data-a-dec', $this->decimalSeparator);
+        }
         if ($this->placeholder) {
             $this->setAttr('placeholder', $this->placeholder);
         }
