@@ -18,6 +18,15 @@ class CDaemon_Supervisor_Listener_MonitorWaitTimes {
     public $lastMonitored;
 
     /**
+     * Create a new listener instance.
+     *
+     * @return void
+     */
+    public function __construct() {
+        $this->metrics = CDaemon::supervisor()->metricsRepository();
+    }
+
+    /**
      * Handle the event.
      *
      * @param \CDaemon_Supervisor_Event_SupervisorLooped $event
