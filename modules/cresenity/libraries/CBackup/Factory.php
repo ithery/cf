@@ -18,7 +18,9 @@ class CBackup_Factory {
         return c::collect($dbConnectionNames)->mapWithKeys(function ($dbConnectionName) {
             $name = $dbConnectionName;
             if (is_array($name)) {
-                $name = carr::get($dbConnectionName, 'connection', carr::get($dbConnectionName, 'connection.database')) . '-' . uniqid();
+                $name = carr::get($dbConnectionName, 'database', carr::get($dbConnectionName, 'connection.database'));
+
+                $name = $name . '-' . uniqid();
             }
 
             return [$name => CBackup_DatabaseDumperFactory::createFromConnection($dbConnectionName)];

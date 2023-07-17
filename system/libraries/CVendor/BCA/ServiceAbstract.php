@@ -81,7 +81,11 @@ abstract class CVendor_BCA_ServiceAbstract {
     }
 
     public function handleResponse(CVendor_BCA_Response $response) {
-        $body = (string) $response->toPsrResponse()->getBody();
+        $psrResponse = $response->toPsrResponse();
+        $body = (string) $psrResponse->getBody();
+        if ($psrResponse->getStatusCode() != 200) {
+            throw new CVendor_BCA_Exception_HttpClientException($psrResponse->getReasonPhrase(), $psrResponse->getStatusCode());
+        }
         $json = json_decode($body, true);
 
         return $json;

@@ -155,6 +155,15 @@ class CVendor_BCA_Api {
     }
 
     /**
+     * @param mixed $token
+     *
+     * @return CVendor_BCA_Service_BusinessBankingService
+     */
+    public function businessBanking($token) {
+        return $this->service('BusinessBanking', $token);
+    }
+
+    /**
      * Dynamiclly bind class.
      *
      * @param string     $serviceName
