@@ -45,8 +45,8 @@ class CDatabase_Config {
         if (isset($config['connection'])) {
             $connection = $config['connection'];
             $formattedConnection = static::reformatConnectionFormat($connection);
-            //this is old format, we will reformat this to new format
 
+            //this is old format, we will reformat this to new format
             $config = array_merge($formattedConnection, $config);
         }
 
@@ -134,7 +134,8 @@ class CDatabase_Config {
 
     protected static function normalizeDriver($driver) {
         $mappedDriver = [
-            'mysqli' => 'mysql'
+            'mysqli' => 'mysql',
+            'mariadb' => 'mysql'
         ];
 
         return carr::get($mappedDriver, $driver, $driver);

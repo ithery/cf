@@ -7,11 +7,15 @@ class CBackup_DatabaseDumperFactory {
         $dbConfig = $dbConnectionName;
         if (!is_array($dbConfig)) {
             $dbConfig = CDatabase_Config::resolve($dbConfig);
+        } else {
+            $dbConfig = CDatabase_Config::flattenFormat($dbConfig);
         }
         if (!is_array($dbConfig)) {
             throw CBackup_Exception_CannotCreateDatabaseDumperException::unsupportedDriver($dbConnectionName);
         }
-
+        if ($dbConfig == null) {
+            throw new Exception('Failed to dump because db config is cannot be resolved');
+        }
         if (isset($dbConfig['read'])) {
             $dbConfig = carr::except(
                 array_merge($dbConfig, $dbConfig['read']),
