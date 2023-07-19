@@ -16,6 +16,7 @@ class CBackup {
         if ($config != null) {
             CBackup_Config::instance()->setConfig($config);
         }
+
         return CBackup_Factory::createJob();
     }
 
@@ -35,6 +36,7 @@ class CBackup {
         $rows = $backupDestinationStatuses->map(function (CBackup_Monitor $backupDestinationStatus) {
             return static::convertToRow($backupDestinationStatus);
         });
+
         return $rows;
     }
 
@@ -52,6 +54,7 @@ class CBackup {
                     $backupDestinationStatus->getHealthCheckFailure()->exception()->getMessage(),
                 ];
             });
+
         return $failed;
     }
 
@@ -74,6 +77,7 @@ class CBackup {
         if ($backupDestinationStatus->getHealthCheckFailure() !== null) {
             $row['disk'] = '<error>' . $row['disk'] . '</error>';
         }
+
         return $row;
     }
 
@@ -110,6 +114,7 @@ class CBackup {
             }
         }
         $output = CBackup::output()->getAndClearOutput();
+
         return $output;
     }
 }
