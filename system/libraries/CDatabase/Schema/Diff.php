@@ -3,13 +3,6 @@
 defined('SYSPATH') or die('No direct access allowed.');
 
 /**
- * @author Hery Kurniawan
- * @license Ittron Global Teknologi <ittron.co.id>
- *
- * @since Aug 18, 2018, 12:14:30 PM
- */
-
-/**
  * Schema Diff.
  */
 class CDatabase_Schema_Diff {

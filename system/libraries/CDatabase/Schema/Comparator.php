@@ -3,13 +3,6 @@
 defined('SYSPATH') or die('No direct access allowed.');
 
 /**
- * @author Hery Kurniawan
- * @license Ittron Global Teknologi <ittron.co.id>
- *
- * @since Aug 18, 2018, 12:11:17 PM
- */
-
-/**
  * Compares two Schemas and return an instance of SchemaDiff.
  */
 class CDatabase_Schema_Comparator {

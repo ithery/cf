@@ -2,12 +2,6 @@
 
 defined('SYSPATH') or die('No direct access allowed.');
 
-/**
- * @author Hery Kurniawan
- * @license Ittron Global Teknologi <ittron.co.id>
- *
- * @since Jun 30, 2019, 7:33:23 PM
- */
 trait CDatabase_Trait_DetectLostConnection {
     /**
      * Determine if the given exception was caused by a lost connection.

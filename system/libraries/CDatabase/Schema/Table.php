@@ -2,12 +2,6 @@
 
 defined('SYSPATH') or die('No direct access allowed.');
 
-/**
- * @author Hery Kurniawan
- * @license Ittron Global Teknologi <ittron.co.id>
- *
- * @since Aug 18, 2018, 11:59:54 AM
- */
 class CDatabase_Schema_Table extends CDatabase_AbstractAsset {
     /**
      * @var string

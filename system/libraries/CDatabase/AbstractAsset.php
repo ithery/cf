@@ -3,13 +3,6 @@
 defined('SYSPATH') or die('No direct access allowed.');
 
 /**
- * @author Hery Kurniawan
- * @license Ittron Global Teknologi <ittron.co.id>
- *
- * @since Aug 18, 2018, 10:32:11 AM
- */
-
-/**
  * The abstract asset allows to reset the name of all assets without publishing this to the public userland.
  *
  * This encapsulation hack is necessary to keep a consistent state of the database schema. Say we have a list of tables
@@ -24,7 +17,7 @@ abstract class CDatabase_AbstractAsset {
     /**
      * Namespace of the asset. If none isset the default namespace is assumed.
      *
-     * @var string|null
+     * @var null|string
      */
     protected $namespace = null;
 
@@ -71,7 +64,7 @@ abstract class CDatabase_AbstractAsset {
      *
      * If NULL is returned this means the default namespace is used.
      *
-     * @return string|null
+     * @return null|string
      */
     public function getNamespaceName() {
         return $this->namespace;
@@ -133,7 +126,7 @@ abstract class CDatabase_AbstractAsset {
      * @return bool
      */
     protected function isIdentifierQuoted($identifier) {
-        return (isset($identifier[0]) && ($identifier[0] == '`' || $identifier[0] == '"' || $identifier[0] == '['));
+        return isset($identifier[0]) && ($identifier[0] == '`' || $identifier[0] == '"' || $identifier[0] == '[');
     }
 
     /**

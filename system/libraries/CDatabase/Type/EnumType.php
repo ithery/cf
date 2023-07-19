@@ -3,13 +3,6 @@
 defined('SYSPATH') or die('No direct access allowed.');
 
 /**
- * @author Hery Kurniawan
- * @license Ittron Global Teknologi <ittron.co.id>
- *
- * @since Aug 18, 2018, 3:07:42 PM
- */
-
-/**
  * Type that maps an SQL DECIMAL to a PHP string.
  */
 class CDatabase_Type_EnumType extends CDatabase_Type {
@@ -30,8 +23,8 @@ class CDatabase_Type_EnumType extends CDatabase_Type {
     /**
      * Gets the SQL declaration snippet for a field of this type.
      *
-     * @param array            $fieldDeclaration The field declaration.
-     * @param AbstractPlatform $platform         The currently used database platform.
+     * @param array            $fieldDeclaration the field declaration
+     * @param AbstractPlatform $platform         the currently used database platform
      *
      * @return string
      */
@@ -40,12 +33,12 @@ class CDatabase_Type_EnumType extends CDatabase_Type {
     }
 
     /**
-     * @param string|null      $value
+     * @param null|string      $value
      * @param AbstractPlatform $platform
      *
-     * @return mixed
-     *
      * @throws InvalidArgumentException
+     *
+     * @return mixed
      */
     public function convertToPHPValue($value, CDatabase_Platform $platform) {
         if ($value === null) {
@@ -64,6 +57,7 @@ class CDatabase_Type_EnumType extends CDatabase_Type {
         if (!$isValid) {
             /** @var callable $toArray */
             $toArray = [$this->enumClass, 'toArray'];
+
             throw new InvalidArgumentException(\sprintf(
                 'The value "%s" is not valid for the enum "%s". Expected one of ["%s"]',
                 $value,
@@ -71,6 +65,7 @@ class CDatabase_Type_EnumType extends CDatabase_Type {
                 \implode('", "', $toArray())
             ));
         }
+
         return new $this->enumClass($value);
     }
 
@@ -82,6 +77,7 @@ class CDatabase_Type_EnumType extends CDatabase_Type {
         if (\method_exists($this->enumClass, 'castValueOut')) {
             /** @var callable $castValueOut */
             $castValueOut = [$this->enumClass, 'castValueOut'];
+
             return $castValueOut($value);
         }
         // Otherwise, cast to string
@@ -90,7 +86,7 @@ class CDatabase_Type_EnumType extends CDatabase_Type {
 
     /**
      * @param string      $typeNameOrEnumClass
-     * @param string|null $enumClass
+     * @param null|string $enumClass
      *
      * @throws InvalidArgumentException
      * @throws DBALException
