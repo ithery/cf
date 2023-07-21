@@ -167,7 +167,12 @@ class CDatabase_Manager implements CDatabase_Contract_ConnectionResolverInterfac
     protected function configuration($name) {
         $name = $name ?: $this->getDefaultConnection();
         $connections = carr::get($this->config, 'connections');
-
+        if ($name == 'default') {
+            $defaultValue = carr::get($this->config, 'default');
+            if (is_string($defaultValue)) {
+                $name = $defaultValue;
+            }
+        }
         $config = carr::get($connections, $name, carr::get($this->config, $name));
 
         if (is_null($config)) {
