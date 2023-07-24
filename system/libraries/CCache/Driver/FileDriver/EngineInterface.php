@@ -2,12 +2,6 @@
 
 defined('SYSPATH') or die('No direct access allowed.');
 
-/**
- * @author Hery Kurniawan
- * @license Ittron Global Teknologi <ittron.co.id>
- *
- * @since Feb 16, 2019, 3:49:34 PM
- */
 interface CCache_Driver_FileDriver_EngineInterface {
     /**
      * Retrieve an content from the file by key.
@@ -20,7 +14,7 @@ interface CCache_Driver_FileDriver_EngineInterface {
     public function get($key, $lock = false);
 
     /**
-     * Get the content in the file by key
+     * Get the content in the file by key.
      *
      * @param string $key
      * @param mixed  $content
@@ -31,7 +25,7 @@ interface CCache_Driver_FileDriver_EngineInterface {
     public function put($key, $content, $lock = false);
 
     /**
-     * Check file exists by key
+     * Check file exists by key.
      *
      * @param string $key
      *
@@ -40,7 +34,7 @@ interface CCache_Driver_FileDriver_EngineInterface {
     public function exists($key);
 
     /**
-     * Delete file exists by key
+     * Delete file exists by key.
      *
      * @param string $key
      *
@@ -49,7 +43,7 @@ interface CCache_Driver_FileDriver_EngineInterface {
     public function delete($key);
 
     /**
-     * Delete all files
+     * Delete all files.
      */
     public function deleteDirectory();
 }
