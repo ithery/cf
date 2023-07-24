@@ -97,13 +97,12 @@ class CDebug_DebugBar_Renderer {
         // Deduplicate files
         $cssFiles = array_unique($cssFiles);
         $jsFiles = array_unique($jsFiles);
-        $clientScript = CClientScript::instance();
-
-        $clientScript->registerCssFiles($cssFiles);
-        $clientScript->registerJsFiles($jsFiles);
-        $clientScript->registerCssInlines($inlineCss);
-        $clientScript->registerJsInlines($inlineJs);
-        $clientScript->registerPlains($inlineHead);
+        $assetManager = CManager::asset();
+        $assetManager->runTime()->registerCssFiles($cssFiles);
+        $assetManager->runTime()->registerJsFiles($jsFiles);
+        $assetManager->runTime()->registerCssInlines($inlineCss);
+        $assetManager->runTime()->registerJsInlines($inlineJs);
+        $assetManager->runTime()->registerPlains($inlineHead);
     }
 
     public function getJavascriptReplaceCode() {

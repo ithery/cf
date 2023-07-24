@@ -314,12 +314,24 @@ final class CManager {
         return false;
     }
 
-    public static function registerCss($file, $pos = CClientScript::POS_HEAD) {
-        $cs = CClientScript::instance()->registerCssFile($file, $pos);
+    /**
+     * @param string $file
+     * @param string $pos
+     *
+     * @return CManager_Asset_Container
+     */
+    public static function registerCss($file, $pos = CManager_Asset::POS_HEAD) {
+        return CManager::asset()->runTime()->registerCssFile($file, $pos);
     }
 
-    public static function registerJs($file, $pos = CClientScript::POS_END) {
-        $cs = CClientScript::instance()->registerJsFile($file, $pos);
+    /**
+     * @param string $file
+     * @param string $pos
+     *
+     * @return CManager_Asset_Container
+     */
+    public static function registerJs($file, $pos = CManager_Asset::POS_END) {
+        return CManager::asset()->runTime()->registerJsFile($file, $pos);
     }
 
     /**

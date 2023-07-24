@@ -2,33 +2,44 @@
 
 defined('SYSPATH') or die('No direct access allowed.');
 
+/**
+ * @deprecated since 1.6
+ */
 class CClientScript extends CObject {
     use CTrait_Compat_ClientScript;
 
-    protected static $instance;
-
     /**
-     * POS CONST
+     * POS CONST.
      */
     const POS_HEAD = CManager_Asset::POS_HEAD;
+
     const POS_BEGIN = CManager_Asset::POS_BEGIN;
+
     const POS_END = CManager_Asset::POS_END;
+
     const POS_READY = CManager_Asset::POS_READY;
+
     const POS_LOAD = CManager_Asset::POS_LOAD;
 
     /**
-     * TYPE CONST
+     * TYPE CONST.
      */
     const TYPE_JS_FILE = CManager_Asset::TYPE_JS_FILE;
+
     const TYPE_JS = CManager_Asset::TYPE_JS;
+
     const TYPE_CSS_FILE = CManager_Asset::TYPE_CSS_FILE;
+
     const TYPE_CSS = CManager_Asset::TYPE_CSS;
+
     const TYPE_META = CManager_Asset::TYPE_META;
+
     const TYPE_LINK = CManager_Asset::TYPE_LINK;
+
     const TYPE_PLAIN = CManager_Asset::TYPE_PLAIN;
 
     /**
-     * Array of all type script
+     * Array of all type script.
      *
      * @var array
      */
@@ -43,12 +54,14 @@ class CClientScript extends CObject {
         self::TYPE_PLAIN,
     ];
 
+    protected static $instance;
+
     public static function allAvailablePos() {
-        return [self::POS_HEAD, self::POS_BEGIN, self::POS_END, self::POS_LOAD, self::POS_READY];
+        return CManager::asset()->allAvailablePos();
     }
 
     public static function allAvailableType() {
-        return [self::TYPE_JS_FILE, self::TYPE_JS, self::TYPE_CSS_FILE, self::TYPE_CSS, self::TYPE_META, self::TYPE_LINK, self::TYPE_PLAIN];
+        return CManager::asset()->allAvailableType();
     }
 
     /**
@@ -58,6 +71,7 @@ class CClientScript extends CObject {
         if (static::$instance == null) {
             static::$instance = new CClientScript();
         }
+
         return static::$instance;
     }
 
@@ -97,27 +111,31 @@ class CClientScript extends CObject {
         return CManager::asset()->runTime()->jsFiles();
     }
 
-    public function registerJsInlines($jsArray, $pos = self::POS_HEAD) {
+    public function cssFiles() {
+        return CManager::asset()->runTime()->cssFiles();
+    }
+
+    public function registerJsInlines($jsArray, $pos = CManager_Asset::POS_HEAD) {
         return CManager::asset()->runTime()->registerJsInlines($jsArray, $pos);
     }
 
-    public function registerJsInline($js, $pos = self::POS_HEAD) {
+    public function registerJsInline($js, $pos = CManager_Asset::POS_HEAD) {
         return CManager::asset()->runTime()->registerJsInline($js, $pos);
     }
 
-    public function registerCssInlines($cssArray, $pos = self::POS_HEAD) {
+    public function registerCssInlines($cssArray, $pos = CManager_Asset::POS_HEAD) {
         return CManager::asset()->runTime()->registerCssInlines($cssArray, $pos);
     }
 
-    public function registerCssInline($css, $pos = self::POS_HEAD) {
+    public function registerCssInline($css, $pos = CManager_Asset::POS_HEAD) {
         return CManager::asset()->runTime()->registerCssInline($css, $pos);
     }
 
-    public function registerPlains($plains, $pos = self::POS_HEAD) {
+    public function registerPlains($plains, $pos = CManager_Asset::POS_HEAD) {
         return CManager::asset()->runTime()->registerPlains($plains, $pos);
     }
 
-    public function registerPlain($plain, $pos = self::POS_HEAD) {
+    public function registerPlain($plain, $pos = CManager_Asset::POS_HEAD) {
         return CManager::asset()->runTime()->registerPlain($plain, $pos);
     }
 
@@ -127,16 +145,6 @@ class CClientScript extends CObject {
 
     public function urlCssFile() {
         return CManager::asset()->getAllCssFileUrl();
-    }
-
-    public function cssFiles() {
-        $cssFileArray = [];
-        foreach ($this->scripts as $script) {
-            foreach ($script['css_file'] as $k) {
-                $cssFileArray[] = $k;
-            }
-        }
-        return $cssFileArray;
     }
 
     public function manifest() {
@@ -178,6 +186,7 @@ class CClientScript extends CObject {
             $manifest['files'][] = $arr;
         }
         $manifest['version'] = $lastFilemtime;
+
         return $manifest;
     }
 
