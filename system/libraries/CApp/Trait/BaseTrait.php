@@ -2,12 +2,6 @@
 
 defined('SYSPATH') or die('No direct access allowed.');
 
-/**
- * @author Hery Kurniawan
- * @license Ittron Global Teknologi <ittron.co.id>
- *
- * @since Dec 30, 2017, 3:11:24 AM
- */
 trait CApp_Trait_BaseTrait {
     private static $org = null;
 
@@ -163,10 +157,10 @@ trait CApp_Trait_BaseTrait {
     /**
      * Get current CSession object.
      *
-     * @return CSession
+     * @return CSession_Store
      */
     public static function session() {
-        return CSession::instance();
+        return c::session();
     }
 
     /**

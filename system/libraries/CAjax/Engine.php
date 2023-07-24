@@ -2,12 +2,6 @@
 
 defined('SYSPATH') or die('No direct access allowed.');
 
-/**
- * @author Hery Kurniawan
- * @license Ittron Global Teknologi <ittron.co.id>
- *
- * @since Feb 16, 2018, 10:58:20 PM
- */
 use Opis\Closure\SerializableClosure;
 
 abstract class CAjax_Engine implements CAjax_EngineInterface {

@@ -2,12 +2,6 @@
 
 defined('SYSPATH') or die('No direct access allowed.');
 
-/**
- * @author Hery Kurniawan
- * @license Ittron Global Teknologi <ittron.co.id>
- *
- * @since Aug 12, 2019, 3:49:01 AM
- */
 class CApp_Project_Generator_ModelGenerator extends CApp_Project_AbstractGenerator {
     public $fieldsFillable;
 

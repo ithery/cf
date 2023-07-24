@@ -15,7 +15,7 @@ class CApp_Administrator {
     }
 
     public static function isLogin() {
-        $session = CSession::instance();
+        $session = c::session();
         $admin = $session->get(self::ADMIN_SESSSION_KEY);
 
         return $admin != null;
@@ -30,7 +30,7 @@ class CApp_Administrator {
                 'login_time' => date('Y-m-d H:i:s'),
             ];
 
-            $session = CSession::instance();
+            $session = c::session();
             $admin = $session->set(self::ADMIN_SESSSION_KEY, $adminData);
 
             return true;
@@ -40,7 +40,7 @@ class CApp_Administrator {
     }
 
     public static function logout() {
-        $session = CSession::instance();
+        $session = c::session();
         $session->delete(self::ADMIN_SESSSION_KEY);
     }
 

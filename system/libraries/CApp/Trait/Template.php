@@ -3,10 +3,7 @@
 defined('SYSPATH') or die('No direct access allowed.');
 
 /**
- * @author Hery Kurniawan
- * @license Ittron Global Teknologi <ittron.co.id>
- *
- * @since Apr 10, 2019, 12:34:27 AM
+ * @deprecated since 1.6 Apr 10, 2019, 12:34:27 AM
  */
 trait CApp_Trait_Template {
     protected $templateName;

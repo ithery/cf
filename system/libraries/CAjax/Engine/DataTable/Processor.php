@@ -2,12 +2,6 @@
 
 defined('SYSPATH') or die('No direct access allowed.');
 
-/**
- * @author Hery Kurniawan
- * @license Ittron Global Teknologi <ittron.co.id>
- *
- * @since Jul 8, 2018, 3:01:36 AM
- */
 abstract class CAjax_Engine_DataTable_Processor implements CAjax_Engine_DataTable_ProcessorInterface {
     /**
      * @var CAjax_Engine

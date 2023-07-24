@@ -2,12 +2,6 @@
 
 defined('SYSPATH') or die('No direct access allowed.');
 
-/**
- * @author Hery Kurniawan
- * @license Ittron Global Teknologi <ittron.co.id>
- *
- * @since Jun 13, 2018, 10:51:31 AM
- */
 final class CHelper {
     /**
      * @return \CHelper_File

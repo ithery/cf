@@ -2,12 +2,6 @@
 
 defined('SYSPATH') or die('No direct access allowed.');
 
-/**
- * @author Hery Kurniawan
- * @license Ittron Global Teknologi <ittron.co.id>
- *
- * @since Mar 16, 2019, 2:20:52 AM
- */
 trait CApp_Trait_LogActivity {
     public static function start($message, $listener = null) {
         if ($listener == null) {

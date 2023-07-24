@@ -2,12 +2,6 @@
 
 defined('SYSPATH') or die('No direct access allowed.');
 
-/**
- * @author Hery Kurniawan
- * @license Ittron Global Teknologi <ittron.co.id>
- *
- * @since Jun 1, 2018, 12:57:45 PM
- */
 class CApp_Navigation_Data {
     protected static $navigationCallback = [];
 

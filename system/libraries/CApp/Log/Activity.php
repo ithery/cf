@@ -2,13 +2,6 @@
 
 defined('SYSPATH') or die('No direct access allowed.');
 
-/**
- * @author Hery Kurniawan
- * @license Ittron Global Teknologi <ittron.co.id>
- *
- * @since Mar 16, 2019, 2:40:46 AM
- */
-
 use CApp_Base as Base;
 
 class CApp_Log_Activity {
@@ -58,7 +51,7 @@ class CApp_Log_Activity {
         $model->fill([
             'org_id' => $orgId,
             'app_id' => $appId,
-            'session_id' => CSession::instance()->id(),
+            'session_id' => c::session()->getId(),
             'remote_addr' => CHTTP::request()->ip(),
             'user_agent' => CHTTP::request()->userAgent(),
             'browser' => CApp::browserName(),

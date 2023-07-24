@@ -2,17 +2,12 @@
 
 defined('SYSPATH') or die('No direct access allowed.');
 
-/**
- * @author Hery Kurniawan
- * @license Ittron Global Teknologi <ittron.co.id>
- *
- * @since Jun 23, 2019, 1:07:59 AM
- */
 class CTracker {
     /**
      * @var CTracker_Bootstrap
      */
     protected static $bootstrap;
+
     protected static $isBooted = false;
 
     public static function visitor() {
@@ -64,7 +59,7 @@ class CTracker {
     }
 
     /**
-     * Check CTracker already booted
+     * Check CTracker already booted.
      *
      * @return type
      */

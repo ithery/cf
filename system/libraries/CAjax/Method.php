@@ -2,12 +2,6 @@
 
 defined('SYSPATH') or die('No direct access allowed.');
 
-/**
- * @author Hery Kurniawan
- * @license Ittron Global Teknologi <ittron.co.id>
- *
- * @since Feb 16, 2018, 9:59:28 PM
- */
 class CAjax_Method implements CInterface_Jsonable {
     public $name = '';
 

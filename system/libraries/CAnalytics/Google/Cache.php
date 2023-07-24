@@ -2,12 +2,6 @@
 
 defined('SYSPATH') or die('No direct access allowed.');
 
-/**
- * @author Hery Kurniawan
- * @license Ittron Global Teknologi <ittron.co.id>
- *
- * @since Jun 23, 2019, 12:54:00 PM
- */
 class CAnalytics_Google_Cache extends CCache_Repository {
     protected $config;
 
@@ -51,8 +45,10 @@ class CAnalytics_Google_Cache extends CCache_Repository {
         }
         if (!is_array($keys)) {
             $keys = (array) $keys;
+
             return $keys;
         }
+
         return $keys;
     }
 
@@ -77,6 +73,7 @@ class CAnalytics_Google_Cache extends CCache_Repository {
             return;
         }
         $key = $this->makeCacheKey($attributes, $keys, $identifier);
+
         return [
             $this->findCachedWithKey($key),
             $key,
@@ -92,6 +89,7 @@ class CAnalytics_Google_Cache extends CCache_Repository {
                 $cacheKey .= "$key=$attributes[$key];";
             }
         }
+
         return sha1($cacheKey);
     }
 

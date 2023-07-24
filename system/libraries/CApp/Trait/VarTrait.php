@@ -2,12 +2,6 @@
 
 defined('SYSPATH') or die('No direct access allowed.');
 
-/**
- * @author Hery Kurniawan
- * @license Ittron Global Teknologi <ittron.co.id>
- *
- * @since Jun 15, 2019, 12:02:21 PM
- */
 trait CApp_Trait_VarTrait {
     protected static $globalVars;
 

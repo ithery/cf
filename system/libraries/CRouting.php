@@ -2,12 +2,6 @@
 
 defined('SYSPATH') or die('No direct access allowed.');
 
-/**
- * @author Hery Kurniawan
- * @license Ittron Global Teknologi <ittron.co.id>
- *
- * @since Jun 19, 2019, 6:58:10 PM
- */
 class CRouting {
     /**
      * @return CRouting_UrlGenerator

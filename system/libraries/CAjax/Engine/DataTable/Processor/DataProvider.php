@@ -3,13 +3,9 @@
 defined('SYSPATH') or die('No direct access allowed.');
 
 /**
- * @author Hery Kurniawan
- * @license Ittron Global Teknologi <ittron.co.id>
- *
  * @see CManager_DataProvider_SqlDataProvider
  * @see CManager_DataProvider_ModelDataProvider
  * @see CManager_DataProvider_ClosureDataProvider
- * @since Jul 8, 2018, 2:58:18 AM
  */
 class CAjax_Engine_DataTable_Processor_DataProvider extends CAjax_Engine_DataTable_Processor {
     use CAjax_Engine_DataTable_Trait_ProcessorTrait;

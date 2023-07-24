@@ -31,6 +31,8 @@ class CSession {
      * Singleton instance of Session.
      *
      * @return CSession
+     *
+     * @deprecated since 1.6, use c::session()
      */
     public static function instance() {
         if (self::$instance == null) {

@@ -2,20 +2,12 @@
 
 defined('SYSPATH') or die('No direct access allowed.');
 
-/**
- * @author Hery Kurniawan
- * @license Ittron Global Teknologi <ittron.co.id>
- *
- * @since Jan 5, 2018, 2:04:35 AM
- */
-
  //@codingStandardsIgnoreStart
 trait CApp_Trait_GenerateCode {
     public static function _get_next_counter($key_counter) {
         $db = c::db();
         $next_counter = 1;
         $is_insert = 1;
-        $app = CApp::instance();
         $q = 'select case when counter is null then 1 else counter+1 end as next_counter from sys_counter where `key`=' . $db->escape($key_counter) . ' for update';
 
         $r = $db->query($q);
