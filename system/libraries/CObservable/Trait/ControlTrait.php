@@ -357,7 +357,7 @@ trait CObservable_Trait_ControlTrait {
     }
 
     /**
-     * Create Text Control.
+     * Create Radio Control.
      *
      * @param null|string $id
      *
@@ -365,6 +365,20 @@ trait CObservable_Trait_ControlTrait {
      */
     public function addRadioControl($id = null) {
         $control = new CElement_FormInput_Radio($id);
+        $this->wrapper->add($control);
+
+        return $control;
+    }
+
+    /**
+     * Create Radio List Control.
+     *
+     * @param null|string $id
+     *
+     * @return CElement_FormInput_RadioList
+     */
+    public function addRadioListControl($id = null) {
+        $control = new CElement_FormInput_RadioList($id);
         $this->wrapper->add($control);
 
         return $control;
@@ -379,6 +393,20 @@ trait CObservable_Trait_ControlTrait {
      */
     public function addCheckboxControl($id = null) {
         $control = new CElement_FormInput_Checkbox($id);
+        $this->wrapper->add($control);
+
+        return $control;
+    }
+
+    /**
+     * Create Checkbox List Control.
+     *
+     * @param null|string $id
+     *
+     * @return CElement_FormInput_CheckboxList
+     */
+    public function addCheckboxListControl($id = null) {
+        $control = new CElement_FormInput_CheckboxList($id);
         $this->wrapper->add($control);
 
         return $control;

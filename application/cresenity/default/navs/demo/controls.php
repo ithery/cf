@@ -21,6 +21,16 @@ return [
         'uri' => 'demo/controls/select/search/index',
     ],
     [
+        'name' => 'controls.checkbox',
+        'label' => c::__('Checkbox'),
+        'uri' => 'demo/controls/checkbox/index',
+    ],
+    [
+        'name' => 'controls.radio',
+        'label' => c::__('Radio'),
+        'uri' => 'demo/controls/radio/index',
+    ],
+    [
         'name' => 'controls.date',
         'label' => c::__('Date'),
         'uri' => 'demo/controls/date/index',
