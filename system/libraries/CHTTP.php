@@ -2,9 +2,6 @@
 
 defined('SYSPATH') or die('No direct access allowed.');
 
-/**
- * @author Hery Kurniawan
- */
 class CHTTP {
     protected static $middlewareEnabled = true;
 

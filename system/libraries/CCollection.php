@@ -2,12 +2,6 @@
 
 defined('SYSPATH') or die('No direct access allowed.');
 
-/**
- * @author Hery Kurniawan
- * @license Ittron Global Teknologi <ittron.co.id>
- *
- * @since Dec 17, 2017, 9:20:23 PM
- */
 class CCollection implements ArrayAccess, CInterface_Enumerable, CBase_Contract_CanBeEscapedWhenCastToStringInterface {
     use CCollection_Concern_EnumeratesValuesTrait;
     use CTrait_Macroable;

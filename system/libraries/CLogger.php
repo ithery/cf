@@ -1,8 +1,5 @@
 <?php
 
-/**
- * @author Hery Kurniawan
- */
 class CLogger {
     const __EXT = '.log';
 

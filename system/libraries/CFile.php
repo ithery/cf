@@ -2,9 +2,6 @@
 
 defined('SYSPATH') or die('No direct access allowed.');
 
-/**
- * @author Hery Kurniawan
- */
 use Symfony\Component\Finder\Finder;
 use Symfony\Component\Mime\MimeTypes;
 use Symfony\Component\Filesystem\Filesystem as SymfonyFilesystem;

@@ -1,11 +1,5 @@
 <?php
 
-/**
- * @author Hery Kurniawan
- * @license Ittron Global Teknologi <ittron.co.id>
- *
- * @since Sep 2, 2018, 5:09:28 PM
- */
 abstract class CObservable extends CRenderable {
     use CTrait_Compat_Observable,
         CObservable_Trait_ElementTrait,

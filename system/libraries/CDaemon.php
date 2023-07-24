@@ -3,12 +3,8 @@
 defined('SYSPATH') or die('No direct access allowed.');
 
 /**
- * @author Hery Kurniawan
- * @license Ittron Global Teknologi <ittron.co.id>
- *
  * @see CDaemon_Runner
  * @see CDaemon_Supervisor_Runner
- * @since Mar 12, 2019, 3:17:44 PM
  */
 class CDaemon {
     const COMMAND_START = 'start';
