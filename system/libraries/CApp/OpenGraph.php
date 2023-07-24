@@ -253,9 +253,9 @@ class CApp_OpenGraph {
         if ($this->validate and !$imageFile) {
             throw new Exception('Open Graph: Invalid image URL (empty)');
         }
-        if (strpos($imageFile, '://') === false and function_exists('asset')) {
-            $imageFile = asset($imageFile);
-        }
+        // if (strpos($imageFile, '://') === false and function_exists('asset')) {
+        //     $imageFile = asset($imageFile);
+        // }
         if ($this->validate and !filter_var($imageFile, FILTER_VALIDATE_URL)) {
             throw new Exception("Open Graph: Invalid image URL '{$imageFile}'");
         }
@@ -422,9 +422,9 @@ class CApp_OpenGraph {
         if ($this->validate and !$audioFile) {
             throw new Exception('Open Graph: Invalid audio URL (empty)');
         }
-        if (strpos($audioFile, '://') === false and function_exists('asset')) {
-            $audioFile = asset($audioFile);
-        }
+        // if (strpos($audioFile, '://') === false and function_exists('asset')) {
+        //     $audioFile = asset($audioFile);
+        // }
         if ($this->validate and !filter_var($audioFile, FILTER_VALIDATE_URL)) {
             throw new Exception("Open Graph: Invalid audio URL '{$audioFile}'");
         }
@@ -487,9 +487,9 @@ class CApp_OpenGraph {
         if ($this->validate and !$videoFile) {
             throw new Exception('Open Graph: Invalid video URL (empty)');
         }
-        if (strpos($videoFile, '://') === false and function_exists('asset')) {
-            $videoFile = asset($videoFile);
-        }
+        // if (strpos($videoFile, '://') === false and function_exists('asset')) {
+        //     $videoFile = asset($videoFile);
+        // }
         if ($this->validate and !filter_var($videoFile, FILTER_VALIDATE_URL)) {
             throw new Exception("Open Graph: Invalid video URL '{$videoFile}'");
         }

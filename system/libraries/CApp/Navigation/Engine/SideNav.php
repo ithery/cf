@@ -2,12 +2,6 @@
 
 defined('SYSPATH') or die('No direct access allowed.');
 
-/**
- * @author Hery Kurniawan
- * @license Ittron Global Teknologi <ittron.co.id>
- *
- * @since Jun 1, 2018, 11:57:16 AM
- */
 use CApp_Navigation_Helper as Helper;
 
 class CApp_Navigation_Engine_SideNav extends CApp_Navigation_Engine {
@@ -54,7 +48,7 @@ class CApp_Navigation_Engine_SideNav extends CApp_Navigation_Engine {
                     continue;
                 }
                 if (isset($d['controller']) && $d['controller'] != '') {
-                    if (!$is_admin && ccfg::get('have_user_access')) {
+                    if (!$is_admin && CF::config('app.have_user_access')) {
                         if (!Helper::haveAccess($d)) {
                             continue;
                         }

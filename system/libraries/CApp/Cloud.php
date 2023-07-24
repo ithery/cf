@@ -2,12 +2,6 @@
 
 defined('SYSPATH') or die('No direct access allowed.');
 
-/**
- * @author Hery Kurniawan
- * @license Ittron Global Teknologi <ittron.co.id>
- *
- * @since Mar 10, 2019, 6:35:39 AM
- */
 class CApp_Cloud {
     /**
      * @var CApp_Cloud_AdapterInterface

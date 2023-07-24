@@ -2,12 +2,6 @@
 
 defined('SYSPATH') or die('No direct access allowed.');
 
-/**
- * @author Hery Kurniawan
- * @license Ittron Global Teknologi <ittron.co.id>
- *
- * @since Aug 12, 2019, 3:29:17 AM
- */
 class CApp_Project {
     /**
      * @param type $type
@@ -16,7 +10,8 @@ class CApp_Project {
      */
     private static function generator($type) {
         $className = 'CApp_Project_Generator_' . $type . 'Generator';
-        return new $className;
+
+        return new $className();
     }
 
     /**

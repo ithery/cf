@@ -2,9 +2,6 @@
 
 defined('SYSPATH') or die('No direct access allowed.');
 
-/**
- * @author Hery Kurniawan
- */
 abstract class CCache_DriverAbstract implements CCache_DriverInterface {
     protected $options = [];
 
