@@ -2,12 +2,6 @@
 
 defined('SYSPATH') or die('No direct access allowed.');
 
-/**
- * @author Hery Kurniawan <hery@itton.co.id>
- * @license Ittron Global Teknologi
- *
- * @since Dec 7, 2020
- */
 trait CApp_Concern_ViewElementTrait {
     /**
      * Get the string contents of a push section.

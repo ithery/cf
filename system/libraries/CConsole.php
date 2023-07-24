@@ -1,9 +1,5 @@
 <?php
 
-/**
- * @author Hery Kurniawan
- * @license Ittron Global Teknologi <ittron.co.id>
- */
 class CConsole {
     const SUCCESS_EXIT = 0;
 

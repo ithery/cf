@@ -4,12 +4,6 @@ use Opis\Closure\SerializableClosure;
 
 defined('SYSPATH') or die('No direct access allowed.');
 
-/**
- * @author Hery Kurniawan
- * @license Ittron Global Teknologi <ittron.co.id>
- *
- * @since Jul 27, 2019, 10:18:47 PM
- */
 trait CApp_Concern_BreadcrumbTrait {
     /**
      * @var bool
