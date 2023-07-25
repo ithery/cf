@@ -33,6 +33,11 @@ return [
         'subnav' => include dirname(__FILE__) . '/demo/model.php',
     ],
     [
+        'name' => 'view',
+        'label' => c::__('View'),
+        'subnav' => include dirname(__FILE__) . '/demo/view.php',
+    ],
+    [
         'name' => 'image',
         'label' => c::__('Image'),
         'subnav' => include dirname(__FILE__) . '/demo/image.php',

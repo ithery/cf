@@ -1,6 +1,12 @@
 <?php
 
 class CApp_Administrator_Fixer_Database {
+    /**
+     * @param string               $table
+     * @param CDatabase_Connection $db
+     *
+     * @return array
+     */
     public static function sqlCollation($table, $db = null) {
         if ($db == null) {
             $db = c::db();
@@ -41,16 +47,20 @@ class CApp_Administrator_Fixer_Database {
                 }
             }
         }
-        $sql = null;
+        $sqlArray = [];
         if ($changes) {
             $sqlArray = $dbPlatform->getAlterTableSQL($tableDifferences);
-            $sql = implode(";\n", $sqlArray);
-            $sql .= ';';
         }
 
-        return $sql;
+        return $sqlArray;
     }
 
+    /**
+     * @param string               $table
+     * @param CDatabase_Connection $db
+     *
+     * @return array
+     */
     public static function sqlColumn($table, $db = null) {
         if ($db == null) {
             $db = c::db();
@@ -238,16 +248,20 @@ class CApp_Administrator_Fixer_Database {
                 $changes++;
             }
         }
-        $sql = null;
+        $sqlArray = [];
         if ($changes) {
             $sqlArray = $dbPlatform->getAlterTableSQL($tableDifferences);
-            $sql = implode(";\n", $sqlArray);
-            $sql .= ';';
         }
 
-        return $sql;
+        return $sqlArray;
     }
 
+    /**
+     * @param string               $table
+     * @param CDatabase_Connection $db
+     *
+     * @return array
+     */
     public static function sqlDataType($table, $db = null) {
         if ($db == null) {
             $db = c::db();
@@ -307,16 +321,20 @@ class CApp_Administrator_Fixer_Database {
                 }
             }
         }
-        $sql = null;
+        $sqlArray = [];
         if ($changes) {
             $sqlArray = $dbPlatform->getAlterTableSQL($tableDifferences);
-            $sql = implode(";\n", $sqlArray);
-            $sql .= ';';
         }
 
-        return $sql;
+        return $sqlArray;
     }
 
+    /**
+     * @param string               $table
+     * @param CDatabase_Connection $db
+     *
+     * @return array
+     */
     public static function sqlRelationship($table, $db = null) {
         if ($db == null) {
             $db = c::db();
@@ -391,13 +409,11 @@ class CApp_Administrator_Fixer_Database {
                 $changes++;
             }
         }
-        $sql = null;
+        $sqlArray = [];
         if ($changes) {
             $sqlArray = $dbPlatform->getAlterTableSQL($tableDifferences);
-            $sql = implode(";\n", $sqlArray);
-            $sql .= ';';
         }
 
-        return $sql;
+        return $sqlArray;
     }
 }
