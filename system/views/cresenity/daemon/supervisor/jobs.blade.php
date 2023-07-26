@@ -48,7 +48,7 @@
                     <template x-for="job in jobs" x-key="job.id">
                         <tr>
                             <td>
-                                <a href="#" x-bind:title="job.name" x-on:click="handleModalJob(job.id)" x-text="jobBaseName(job.name)">
+                                <a href="#" x-bind:title="job.name" x-on:click="handleModalJob(job)" x-text="jobBaseName(job.name)">
                                 </a>
 
                                 <small class="ml-1 badge badge-secondary badge-sm"
@@ -127,8 +127,8 @@ window.supervisorJobs = function() {
 
             this.refreshJobsPeriodically();
         },
-        handleModalJob(jobId) {
-            const modalJobsUrl = this.modalJobsUrl + '?jobId=' + jobId;
+        handleModalJob(job) {
+            const modalJobsUrl = this.modalJobsUrl + '?jobId=' + job.id;
 
             cresenity.modal({
                 reload : {
