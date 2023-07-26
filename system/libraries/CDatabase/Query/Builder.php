@@ -2,12 +2,6 @@
 
 defined('SYSPATH') or die('No direct access allowed.');
 
-/**
- * @author Hery Kurniawan
- * @license Ittron Global Teknologi <ittron.co.id>
- *
- * @since Dec 17, 2017, 1:21:50 PM
- */
 class CDatabase_Query_Builder {
     use CDatabase_Trait_Builder,
         CDatabase_Trait_ExplainQueries,

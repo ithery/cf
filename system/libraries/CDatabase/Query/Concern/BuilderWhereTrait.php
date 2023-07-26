@@ -129,7 +129,7 @@ trait CDatabase_Query_Concern_BuilderWhereTrait {
      *
      * @return array
      */
-    protected function prepareValueAndOperator($value, $operator, $useDefault = false) {
+    public function prepareValueAndOperator($value, $operator, $useDefault = false) {
         if ($useDefault) {
             return [$operator, '='];
         } elseif ($this->invalidOperatorAndValue($operator, $value)) {
