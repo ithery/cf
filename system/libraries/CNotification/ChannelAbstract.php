@@ -23,10 +23,10 @@ abstract class CNotification_ChannelAbstract implements CNotification_ChannelInt
      *
      * @return CQueue_AbstractTask
      */
-    public function send($className, array $options = []) {
+    public function send($className, array $options = [], array $config = []) {
         $notificationSenderJobClass = CF::config('notification.task_queue.notification_sender', CNotification_TaskQueue_NotificationSender::class);
 
-        $isQueued = $this->getChannelConfig('queue.queued');
+        $isQueued = carr::get($config, 'queue.queued', $this->getChannelConfig('queue.queued'));
 
         $options = [
             'channel' => $this->channelName,
@@ -35,12 +35,14 @@ abstract class CNotification_ChannelAbstract implements CNotification_ChannelInt
         ];
 
         if ($isQueued) {
+            $queueConnection = carr::get($config, 'queue.connection', $this->getChannelConfig('queue.connection'));
+            $queueName = carr::get($config, 'queue.name', $this->getChannelConfig('queue.name'));
             $taskQueue = call_user_func([$notificationSenderJobClass, 'dispatch'], $options);
-            if ($customConnection = $this->getChannelConfig('queue.connection')) {
-                $taskQueue->onConnection($customConnection);
+            if ($queueConnection) {
+                $taskQueue->onConnection($queueConnection);
             }
-            if ($customQueue = $this->getChannelConfig('queue.name')) {
-                $taskQueue->onQueue($customQueue);
+            if ($queueName) {
+                $taskQueue->onQueue($queueName);
             }
         } else {
             $taskQueue = call_user_func([$notificationSenderJobClass, 'dispatchNow'], $options);

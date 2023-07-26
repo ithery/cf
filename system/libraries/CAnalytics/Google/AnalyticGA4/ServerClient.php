@@ -61,6 +61,27 @@ class CAnalytics_Google_AnalyticGA4_ServerClient {
         return $this;
     }
 
+    public function event($eventCategory, $eventAction, $eventLabel = null, $eventValue = null) {
+        $url = 'https://www.google-analytics.com/collect';
+        $data = array(
+            'v' => '1', // Versi API (wajib)
+            'tid' => $this->measurementId, // Kode pelacakan (wajib)
+            'cid' => $this->clientId, // ID unik pengguna atau sesi (wajib)
+            't' => 'event', // Jenis hit (event)
+            'ec' => $eventCategory, // Kategori event (wajib)
+            'ea' => $eventAction, // Aksi event (wajib)
+            'el' => $eventLabel, // Label event (opsional)
+            'ev' => $eventValue, // Nilai event (opsional)
+        );
+        $response = CHTTP::client()->withOptions([
+            'query' => [
+                'measurement_id' => $this->measurementId,
+                'api_secret' => $this->apiSecret,
+            ],
+        ])->post($this->getRequestUrl(), $data);
+        return $response->json();
+    }
+
     /**
      * @param array $eventData
      *
@@ -86,13 +107,8 @@ class CAnalytics_Google_AnalyticGA4_ServerClient {
             ],
         ])->post($this->getRequestUrl(), $payload);
 
-        if ($this->debugging) {
-            return $response->json();
-        }
 
-        return [
-            'status' => $response->successful()
-        ];
+        return $response->json();
     }
 
     private function getRequestUrl() {

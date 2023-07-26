@@ -9,6 +9,8 @@ use Symfony\Component\Console\Output\ConsoleOutput;
 use Symfony\Component\Console\Output\BufferedOutput;
 
 class CRemote_SSH {
+    protected $name;
+
     protected $config;
 
     /**
