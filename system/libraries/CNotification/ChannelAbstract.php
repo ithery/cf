@@ -114,7 +114,7 @@ abstract class CNotification_ChannelAbstract implements CNotification_ChannelInt
 
                     $logNotificationModel->vendor_response = $vendorResponse;
 
-                    CDaemon::log('vendor response:' . $vendorResponse);
+                    //CDaemon::log('vendor response:' . $vendorResponse);
                 } catch (Exception $ex) {
                     //throw $ex;
                     $errCode++;
