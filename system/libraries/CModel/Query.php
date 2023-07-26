@@ -3,13 +3,6 @@
 defined('SYSPATH') or die('No direct access allowed.');
 
 /**
- * @author Hery Kurniawan
- * @license Ittron Global Teknologi <ittron.co.id>
- *
- * @since Dec 26, 2017, 2:22:28 AM
- */
-
-/**
  * Class CModel_Query.
  *
  * @template TModelClass of CModel
@@ -296,15 +289,35 @@ class CModel_Query {
     }
 
     /**
+     * Add a basic where clause to the query, and return the first result.
+     *
+     * @param \Closure|string|array|\CDatabase_Query_Expression $column
+     * @param mixed                                             $operator
+     * @param mixed                                             $value
+     * @param string                                            $boolean
+     *
+     * @return null|\CModel|static
+     */
+    public function firstWhere($column, $operator = null, $value = null, $boolean = 'and') {
+        return $this->where(...func_get_args())->first();
+    }
+
+    /**
      * Add an "or where" clause to the query.
      *
-     * @param \Closure|array|string $column
-     * @param string                $operator
-     * @param mixed                 $value
+     * @param \Closure|array|string|\CDatabase_Query_Expression $column
+     * @param string                                            $operator
+     * @param mixed                                             $value
      *
      * @return CModel_Query|static
      */
     public function orWhere($column, $operator = null, $value = null) {
+        list($value, $operator) = $this->query->prepareValueAndOperator(
+            $value,
+            $operator,
+            func_num_args() === 2
+        );
+
         return $this->where($column, $operator, $value, 'or');
     }
 
