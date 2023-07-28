@@ -35,9 +35,21 @@ class CVendor_Wago_Device {
             'message' => $message,
         ];
         $imageUrl = carr::get($options, 'imageUrl');
+        $documentUrl = carr::get($options, 'documentUrl');
+        $mimeType = carr::get($options, 'mimeType');
+        $fileName = carr::get($options, 'fileName');
         $scheduleAt = carr::get($options, 'scheduleAt');
         if ($imageUrl) {
             $request['imageUrl'] = $imageUrl;
+        }
+        if ($documentUrl) {
+            $options['documentUrl'] = $documentUrl;
+        }
+        if ($mimeType) {
+            $options['mimeType'] = $mimeType;
+        }
+        if ($fileName) {
+            $options['fileName'] = $fileName;
         }
         if ($scheduleAt) {
             $request['scheduleAt'] = $scheduleAt;
