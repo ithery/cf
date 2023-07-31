@@ -133,10 +133,14 @@ class CElement_Component_DataTable_Column extends CObject {
         return $this->dataType;
     }
 
-    public function setVisible($bool) {
+    public function setVisible($bool = true) {
         $this->visible = $bool;
 
         return $this;
+    }
+
+    public function setInvisible() {
+        return $this->setVisible(false);
     }
 
     /**

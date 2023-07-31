@@ -156,7 +156,9 @@ class CManager_DataProvider_ModelDataProvider extends CManager_DataProviderAbstr
                     $relationPath = implode('.', $fields);
 
                     $alias = $this->withSelectRelationColumn($query, $relationPath, $field, $sortIndex);
-                    $query->orderBy($alias, $sortDirection);
+                    if ($alias) {
+                        $query->orderBy($alias, $sortDirection);
+                    }
                 } else {
                     if (!$this->isRelationField($query, $fieldName)) {
                         $query->orderBy($fieldName, $sortDirection);
@@ -174,6 +176,9 @@ class CManager_DataProvider_ModelDataProvider extends CManager_DataProviderAbstr
 
         $relations = explode('.', $relationPath);
         $firstRelation = array_shift($relations);
+        if (!method_exists($query->getModel(), $firstRelation)) {
+            return null;
+        }
         $relation = $query->getModel()->$firstRelation();
 
         $selectQuery = $this->createSelectJoinQuery($query, $relation, $relations, $column);

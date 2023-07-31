@@ -187,7 +187,7 @@ abstract class CModel implements ArrayAccess, CInterface_Arrayable, CInterface_J
      *
      * @var string
      */
-    protected $primaryKey = 'id';
+    protected $primaryKey = null;
 
     /**
      * The "type" of the auto-incrementing ID.
@@ -344,7 +344,10 @@ abstract class CModel implements ArrayAccess, CInterface_Arrayable, CInterface_J
      * @return void
      */
     public function __construct(array $attributes = []) {
-        $this->primaryKey = $this->table ? $this->table . '_id' : 'id';
+        if ($this->primaryKey == null) {
+            $this->primaryKey = $this->table ? $this->table . '_id' : 'id';
+        }
+
         $this->bootIfNotBooted();
 
         $this->initializeTraits();
