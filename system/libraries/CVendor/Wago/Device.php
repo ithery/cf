@@ -43,13 +43,13 @@ class CVendor_Wago_Device {
             $request['imageUrl'] = $imageUrl;
         }
         if ($documentUrl) {
-            $options['documentUrl'] = $documentUrl;
+            $request['documentUrl'] = $documentUrl;
         }
         if ($mimeType) {
-            $options['mimeType'] = $mimeType;
+            $request['mimeType'] = $mimeType;
         }
         if ($fileName) {
-            $options['fileName'] = $fileName;
+            $request['fileName'] = $fileName;
         }
         if ($scheduleAt) {
             $request['scheduleAt'] = $scheduleAt;
