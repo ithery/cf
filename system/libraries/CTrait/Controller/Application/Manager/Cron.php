@@ -61,7 +61,7 @@ trait CTrait_Controller_Application_Manager_Cron {
         $app->addBreadcrumb('Cron', static::controllerUrl());
         $actionContainer = $app->addDiv()->addClass('action-container mb-3');
         $rotateAction = $actionContainer->addAction()
-            ->setLabel('Dump Status')
+            ->setLabel('Rotate Log')
             ->addClass('btn-primary')
             ->setIcon('fas fa-sync')
             ->setLink(static::controllerUrl() . 'rotateLog/' . $eventId)
