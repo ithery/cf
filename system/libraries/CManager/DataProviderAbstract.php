@@ -12,6 +12,8 @@ abstract class CManager_DataProviderAbstract {
      */
     protected $callbacks = [];
 
+    abstract public function paginate($perPage = null, $columns = ['*'], $pageName = 'page', $page = null, $callback = null);
+
     public function searchAnd(array $search) {
         $this->searchAnd = $search;
     }

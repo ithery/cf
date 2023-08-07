@@ -34,11 +34,11 @@ class CAjax_Engine_SelectSearch_Processor_DataProvider extends CAjax_Engine_Sele
             $data = $model;
             if ($model instanceof CModel) {
                 $data = $model->toArray();
-                if ($this->keyField() && !isset($data['id'])) {
+                if ($this->keyField() && $model->{$this->keyField()}) {
                     $data['id'] = $model->{$this->keyField()};
                 }
             } else {
-                if ($this->keyField() && !isset($data['id'])) {
+                if ($this->keyField() && !isset($data[$this->keyField()])) {
                     $data['id'] = carr::get($data, $this->keyField());
                 }
             }

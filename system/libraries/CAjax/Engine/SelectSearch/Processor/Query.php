@@ -134,7 +134,7 @@ class CAjax_Engine_SelectSearch_Processor_Query extends CAjax_Engine_SelectSearc
                 }
                 $p[$k] = ($v == null) ? '' : $v;
             }
-            if (strlen($keyField) > 0 && !isset($p['id'])) {
+            if (strlen($keyField) > 0 && isset($p[$keyField])) {
                 $p['id'] = carr::get($row, $keyField);
             }
 
