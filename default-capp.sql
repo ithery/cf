@@ -243,7 +243,8 @@ CREATE TABLE `resource` (
   `deletedby` varchar(255) DEFAULT NULL,
   `is_active` int(11) DEFAULT '1',
   `status` int(11) NOT NULL DEFAULT '1',
-  PRIMARY KEY (`resource_id`)
+  PRIMARY KEY (`resource_id`),
+  KEY `resource__model_id_model_type_index` (`model_id`,`model_type`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 
