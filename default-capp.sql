@@ -63,7 +63,8 @@ CREATE TABLE IF NOT EXISTS `roles` (
   `deletedby` varchar(255) DEFAULT NULL,
   `status` int(11) NOT NULL DEFAULT '1',
   PRIMARY KEY (`role_id`),
-  UNIQUE KEY `roleid` (`role_id`)
+  UNIQUE KEY `roleid` (`role_id`),
+  CONSTRAINT `roles_ibfk_1` FOREIGN KEY (`org_id`) REFERENCES `org` (`org_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 /*!40000 ALTER TABLE `roles` DISABLE KEYS */;
@@ -88,7 +89,9 @@ CREATE TABLE IF NOT EXISTS `role_nav` (
   `deletedby` varchar(255) DEFAULT NULL,
   `status` int(11) NOT NULL DEFAULT '1',
   PRIMARY KEY (`role_nav_id`),
-  UNIQUE KEY `role_nav_id` (`role_nav_id`)
+  UNIQUE KEY `role_nav_id` (`role_nav_id`),
+  CONSTRAINT `role_nav_ibfk_1` FOREIGN KEY (`org_id`) REFERENCES `org` (`org_id`),
+  CONSTRAINT `role_nav_ibfk_2` FOREIGN KEY (`role_id`) REFERENCES `roles` (`role_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 
@@ -109,7 +112,9 @@ CREATE TABLE IF NOT EXISTS `role_permission` (
   `deletedby` varchar(255) DEFAULT NULL,
   `status` int(11) NOT NULL DEFAULT '1',
   PRIMARY KEY (`role_permission_id`),
-  UNIQUE KEY `role_permission_id` (`role_permission_id`)
+  UNIQUE KEY `role_permission_id` (`role_permission_id`),
+  CONSTRAINT `role_permission_ibfk_1` FOREIGN KEY (`org_id`) REFERENCES `org` (`org_id`),
+  CONSTRAINT `role_permission_ibfk_2` FOREIGN KEY (`role_id`) REFERENCES `roles` (`role_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 
@@ -128,7 +133,8 @@ CREATE TABLE IF NOT EXISTS `sys_counter` (
   `deletedby` varchar(255) DEFAULT NULL,
   `status` int(11) NOT NULL DEFAULT '1',
   PRIMARY KEY (`sys_counter_id`),
-  UNIQUE KEY `counter_id` (`sys_counter_id`)
+  UNIQUE KEY `counter_id` (`sys_counter_id`),
+  CONSTRAINT `sys_counter_ibfk_1` FOREIGN KEY (`org_id`) REFERENCES `org` (`org_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 DROP TABLE IF EXISTS `users`;
@@ -136,7 +142,6 @@ CREATE TABLE IF NOT EXISTS `users` (
   `user_id` bigint(20) unsigned NOT NULL AUTO_INCREMENT,
   `role_id` bigint(20) unsigned NOT NULL,
   `org_id` bigint(20) unsigned DEFAULT NULL,
-  `store_id` bigint(20) unsigned DEFAULT NULL,
   `username` varchar(255) DEFAULT NULL,
   `user_photo` varchar(255) DEFAULT NULL,
   `name` varchar(255) DEFAULT NULL,
@@ -167,7 +172,8 @@ CREATE TABLE IF NOT EXISTS `users` (
   `status` int(11) NOT NULL DEFAULT '1',
   PRIMARY KEY (`user_id`),
   UNIQUE KEY `user_id` (`user_id`),
-  KEY `fk_users_roles` (`role_id`)
+  KEY `fk_users_roles` (`role_id`),
+  CONSTRAINT `users_ibfk_1` FOREIGN KEY (`org_id`) REFERENCES `org` (`org_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 /*!40000 ALTER TABLE `users` DISABLE KEYS */;
@@ -194,7 +200,8 @@ CREATE TABLE IF NOT EXISTS `var` (
   `deletedby` varchar(255) DEFAULT NULL,
   `status` int(11) NOT NULL DEFAULT '1',
   PRIMARY KEY (`var_id`),
-  UNIQUE KEY `var_id` (`var_id`)
+  UNIQUE KEY `var_id` (`var_id`),
+  CONSTRAINT `var_ibfk_1` FOREIGN KEY (`org_id`) REFERENCES `org` (`org_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 /*!40000 ALTER TABLE `var` DISABLE KEYS */;
@@ -216,7 +223,8 @@ CREATE TABLE IF NOT EXISTS `var_user` (
   `deletedby` varchar(255) DEFAULT NULL,
   `status` int(11) NOT NULL DEFAULT '1',
   PRIMARY KEY (`var_user_id`),
-  UNIQUE KEY `var_user_id` (`var_user_id`)
+  UNIQUE KEY `var_user_id` (`var_user_id`),
+  CONSTRAINT `var_user_ibfk_1` FOREIGN KEY (`org_id`) REFERENCES `org` (`org_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 DROP TABLE IF EXISTS `resource`;
@@ -244,6 +252,7 @@ CREATE TABLE `resource` (
   `is_active` int(11) DEFAULT '1',
   `status` int(11) NOT NULL DEFAULT '1',
   PRIMARY KEY (`resource_id`),
+  CONSTRAINT `resource_ibfk_1` FOREIGN KEY (`org_id`) REFERENCES `org` (`org_id`),
   KEY `resource__model_id_model_type_index` (`model_id`,`model_type`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
@@ -269,7 +278,8 @@ CREATE TABLE `queue` (
   `deletedby` varchar(255) DEFAULT NULL,
   `status` int(11) NOT NULL DEFAULT '1',
   PRIMARY KEY (`queue_id`),
-  UNIQUE KEY `queue_id` (`queue_id`)
+  UNIQUE KEY `queue_id` (`queue_id`),
+  CONSTRAINT `queue_ibfk_1` FOREIGN KEY (`org_id`) REFERENCES `org` (`org_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 
@@ -315,13 +325,15 @@ CREATE TABLE `queue_batch` (
   `status` int(11) NOT NULL DEFAULT '1',
   PRIMARY KEY (`queue_batch_id`),
   UNIQUE KEY `queue_batch_id` (`queue_batch_id`),
-  UNIQUE KEY `id` (`id`)
+  UNIQUE KEY `id` (`id`),
+  CONSTRAINT `queue_batch_ibfk_1` FOREIGN KEY (`org_id`) REFERENCES `org` (`org_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 
 
 CREATE TABLE `meta` (
   `meta_id` bigint(20) unsigned NOT NULL AUTO_INCREMENT,
+  `org_id` bigint(20) unsigned DEFAULT NULL,
   `metable_type` varchar(255) NOT NULL,
   `metable_id` bigint(20) unsigned NOT NULL,
   `type` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
@@ -335,13 +347,15 @@ CREATE TABLE `meta` (
   `deleted` datetime DEFAULT NULL,
   `deletedby` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
   PRIMARY KEY (`meta_id`),
-  UNIQUE KEY `meta_id` (`meta_id`)
+  UNIQUE KEY `meta_id` (`meta_id`),
+  CONSTRAINT `meta_ibfk_1` FOREIGN KEY (`org_id`) REFERENCES `org` (`org_id`),
+  KEY `meta__metable_id_metable_type_index` (`metable_id`,`metable_type`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE utf8mb4_unicode_ci;
 
 
 CREATE TABLE `notification` (
   `notification_id` bigint(20) unsigned NOT NULL AUTO_INCREMENT,
-  `org_id` bigint(20) unsigned,
+  `org_id` bigint(20) unsigned DEFAULT NULL,
   `notifiable_type` varchar(255) NOT NULL,
   `notifiable_id` bigint(20) unsigned NOT NULL,
   `ref_type` varchar(255) DEFAULT NULL,
@@ -359,7 +373,10 @@ CREATE TABLE `notification` (
   `deletedby` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
   `status` int(11) NOT NULL DEFAULT 1,
   PRIMARY KEY (`notification_id`),
-  UNIQUE KEY `notification_id` (`notification_id`)
+  UNIQUE KEY `notification_id` (`notification_id`),
+  CONSTRAINT `notification_ibfk_1` FOREIGN KEY (`org_id`) REFERENCES `org` (`org_id`),
+  KEY `notification__notifiable_id_notifiable_type_index` (`notifiable_id`,`notifiable_type`),
+  KEY `notification__ref_id_ref_type_index` (`ref_id`,`ref_type`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE utf8mb4_unicode_ci;
 
 
@@ -378,7 +395,9 @@ CREATE TABLE `translation` (
   `deletedby` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
   `status` int(11) NOT NULL DEFAULT 1,
   PRIMARY KEY (`translation_id`),
-  UNIQUE KEY `translation_id` (`translation_id`)
+  UNIQUE KEY `translation_id` (`translation_id`),
+  CONSTRAINT `translation_ibfk_1` FOREIGN KEY (`org_id`) REFERENCES `org` (`org_id`),
+  KEY `translation__translatable_id_translatable_type_index` (`translatable_id`,`translatable_type`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE utf8mb4_unicode_ci;
 
 DROP TABLE IF EXISTS `log_activity`;
@@ -437,7 +456,8 @@ CREATE TABLE `log_sse` (
   `deletedby` varchar(255) DEFAULT NULL,
   `status` int(11) NOT NULL DEFAULT '1',
   PRIMARY KEY (`log_sse_id`),
-  UNIQUE KEY `log_sse_id` (`log_sse_id`)
+  UNIQUE KEY `log_sse_id` (`log_sse_id`),
+  CONSTRAINT `log_sse_ibfk_1` FOREIGN KEY (`org_id`) REFERENCES `org` (`org_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 
