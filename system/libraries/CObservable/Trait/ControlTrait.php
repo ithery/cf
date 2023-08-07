@@ -77,6 +77,20 @@ trait CObservable_Trait_ControlTrait {
     }
 
     /**
+     * Create Text Control.
+     *
+     * @param null|string $id
+     *
+     * @return CElement_FormInput_Textarea_Summernote
+     */
+    public function addSummerNoteControl($id = null) {
+        $control = new CElement_FormInput_Textarea_Summernote($id);
+        $this->wrapper->add($control);
+
+        return $control;
+    }
+
+    /**
      * Create Hidden Control.
      *
      * @param null|string $id
