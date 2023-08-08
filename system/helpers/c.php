@@ -547,13 +547,13 @@ class c {
      */
     public static function session($key = null, $default = null) {
         if ($key === null) {
-            return CSession::instance()->store();
+            return CSession::store();
         }
         if (is_array($key)) {
-            return CSession::instance()->store()->put($key);
+            return CSession::store()->put($key);
         }
 
-        return CSession::instance()->store()->get($key, $default);
+        return CSession::store()->get($key, $default);
     }
 
     /**
