@@ -445,6 +445,10 @@ final class CManager {
         return CManager_EditorJs::instance();
     }
 
+    public static function onBoarding() {
+        return CManager_OnBoarding_Steps::instance();
+    }
+
     /**
      * @return CManager_Factory
      */
