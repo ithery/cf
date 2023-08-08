@@ -195,7 +195,7 @@ class CManager_File_Connector_FileManager_FM {
         if (class_exists($config)) {
             // return app()->make($config)->userField();
         }
-        $app = CApp::instance();
+        $app = c::app();
         $user = $app->user();
 
         return $user ? $user->username : '';
@@ -224,7 +224,7 @@ class CManager_File_Connector_FileManager_FM {
      * @return string
      */
     public function error($errorType, array $variables = []) {
-        throw new \Exception(clang::__('filemanager.error-' . $errorType, $variables));
+        throw new \Exception(c::__('filemanager.error-' . $errorType, $variables));
     }
 
     /**

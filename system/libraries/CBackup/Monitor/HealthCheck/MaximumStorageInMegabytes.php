@@ -14,7 +14,7 @@ class CBackup_Monitor_HealthCheck_MaximumStorageInMegabytes extends CBackup_Moni
         $usageInBytes = $backupDestination->usedStorage();
         $this->failIf(
             $this->exceedsAllowance($usageInBytes),
-            clang::__('backup.unhealthy_backup_found_full', [
+            c::__('backup.unhealthy_backup_found_full', [
                 ':disk_usage' => $this->humanReadableSize($usageInBytes),
                 ':disk_limit' => $this->humanReadableSize($this->bytes($this->maximumSizeInMegaBytes)),
             ])
