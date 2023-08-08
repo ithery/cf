@@ -4,7 +4,6 @@ defined('SYSPATH') or die('No direct access allowed.');
 
 final class CManager {
     use CTrait_Compat_Manager;
-
     protected $controls = [];
 
     protected $controlsCode = [];
@@ -77,6 +76,8 @@ final class CManager {
 
     /**
      * @return CClientScript
+     *
+     * @deprecated since 1.6 use CManager::asset()->runTime()
      */
     public static function clientScript() {
         return CClientScript::instance();
