@@ -51,4 +51,8 @@ class CManager_Transform {
 
         return $transformer->transform($item, $args);
     }
+
+    public function __call($name, $arguments) {
+        return $this->call($name, carr::get($arguments, 0), carr::get($arguments, 1));
+    }
 }
