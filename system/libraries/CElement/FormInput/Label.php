@@ -25,7 +25,17 @@ class CElement_FormInput_Label extends CElement_FormInput {
             $value = $this->value;
         }
         $value = $this->applyTransform($value);
-        $this->value = (string) $value;
+        $html = (string) $value;
+        $js = '';
+        if ($value instanceof CRenderable) {
+            $html = $value->html();
+            $js = $value->js();
+        }
+        $this->value = $html;
+        if ($js) {
+            $this->addJs($js);
+        }
+
         $this->addJs($this->getDependsOnContentJavascript());
         $this->addClass('label');
         $this->setAttr('name', $this->name);
