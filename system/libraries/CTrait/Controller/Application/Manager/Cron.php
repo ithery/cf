@@ -129,7 +129,7 @@ trait CTrait_Controller_Application_Manager_Cron {
             return c::redirect(static::controllerUrl());
         }
 
-        $event->rotate();
+        $event->rotateLog();
 
         return c::redirect(static::controllerUrl() . 'log/' . $eventId);
     }
