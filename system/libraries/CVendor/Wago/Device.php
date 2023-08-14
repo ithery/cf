@@ -91,4 +91,8 @@ class CVendor_Wago_Device {
 
         return carr::get($response, 'data', []);
     }
+
+    public function getClient() {
+        return $this->client;
+    }
 }

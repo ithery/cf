@@ -2,8 +2,9 @@
 
 class CVendor_Wago {
     /**
-     * @param string|null $token
-     * @param array $options
+     * @param null|string $token
+     * @param array       $options
+     *
      * @return CVendor_Wago_Device
      */
     public static function device($token = null, $options = []) {

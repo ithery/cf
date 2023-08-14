@@ -606,6 +606,18 @@ class CDatabase_Connection implements CDatabase_ConnectionInterface {
     }
 
     /**
+     * Insert a new record and get the value of the primary key.
+     *
+     * @param string $table table name
+     * @param array  $set   array of key/value pairs to insert
+     *
+     * @return int
+     */
+    public function insertGetId($table, $set) {
+        return $this->table($table)->insertGetId($set);
+    }
+
+    /**
      * Run an update statement against the database.
      *
      * @param string $query
