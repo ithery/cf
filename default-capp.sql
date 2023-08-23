@@ -161,7 +161,6 @@ CREATE TABLE IF NOT EXISTS `users` (
   `have_notification` int(11) DEFAULT '0',
   `is_base` tinyint(1) NOT NULL DEFAULT '0',
   `is_disabled` tinyint(1) NOT NULL DEFAULT '0',
-  `have_issued` tinyint(1) NOT NULL DEFAULT '1',
   `remember_token` varchar(100) DEFAULT NULL,
   `created` datetime DEFAULT NULL,
   `createdby` varchar(255) DEFAULT NULL,
