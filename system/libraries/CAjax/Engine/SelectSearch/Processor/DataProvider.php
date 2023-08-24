@@ -15,6 +15,7 @@ class CAjax_Engine_SelectSearch_Processor_DataProvider extends CAjax_Engine_Sele
         $dataProvider->sort($this->getSortData());
         $page = $this->parameter->page();
         $prependData = [];
+        $prependDataCount = count($this->prependData());
         if ($page == 1) {
             $prependData = $this->prependData();
         }
@@ -38,7 +39,7 @@ class CAjax_Engine_SelectSearch_Processor_DataProvider extends CAjax_Engine_Sele
                     $data['id'] = $model->{$this->keyField()};
                 }
             } else {
-                if ($this->keyField() && !isset($data[$this->keyField()])) {
+                if ($this->keyField() && !isset($data['id'])) {
                     $data['id'] = carr::get($data, $this->keyField());
                 }
             }
@@ -67,7 +68,7 @@ class CAjax_Engine_SelectSearch_Processor_DataProvider extends CAjax_Engine_Sele
 
             return $data;
         });
-        $total = $paginationResult->total();
+        $total = $paginationResult->total() + $prependDataCount;
 
         return c::response()->jsonp($this->callback(), [
             'data' => $data,
