@@ -514,6 +514,9 @@ class c {
         if ($key === null) {
             return CTranslation::translator();
         }
+        if ($replace === null) {
+            $replace = [];
+        }
 
         return CTranslation::translator()->trans($key, $replace, $locale);
     }
