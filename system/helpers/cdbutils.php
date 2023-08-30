@@ -34,19 +34,37 @@ class cdbutils {
         return $cnt;
     }
 
+    /**
+     * @param string               $query
+     * @param array                $where
+     * @param CDatabase_Connection $db
+     * @param mixed                $table
+     *
+     * @deprecated 1.6 dont use this anymore
+     *
+     * @return mixed
+     */
     public static function row_exists($table, $where = [], $db = null) {
         if ($db == null) {
             $db = c::db();
         }
-        $q = 'select count(1) as cnt from ' . $db->escape_table($table) . ' where 1=1 ';
+        $q = 'select count(1) as cnt from ' . $db->escapeTable($table) . ' where 1=1 ';
         foreach ($where as $k => $v) {
-            $q .= ' and ' . $db->escape_column($k) . '=' . $db->escape($v);
+            $q .= ' and ' . $db->escapeColumn($k) . '=' . $db->escape($v);
         }
         $cnt = cdbutils::get_value($q, $db);
 
         return $cnt > 0;
     }
 
+    /**
+     * @param string               $query
+     * @param CDatabase_Connection $db
+     *
+     * @deprecated 1.6 use c::db()->getValue
+     *
+     * @return mixed
+     */
     public static function get_value($query, $db = null) {
         if ($db == null) {
             $db = c::db();
@@ -67,6 +85,14 @@ class cdbutils {
         return $value;
     }
 
+    /**
+     * @param string               $query
+     * @param CDatabase_Connection $db
+     *
+     * @deprecated 1.6 use c::db()->getRow
+     *
+     * @return object
+     */
     public static function get_row($query, $db = null) {
         if ($db == null) {
             $db = c::db();
