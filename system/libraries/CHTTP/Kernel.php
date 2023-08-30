@@ -12,6 +12,7 @@ use Symfony\Component\HttpFoundation\Response as SymfonyResponse;
 class CHTTP_Kernel {
     use CHTTP_Trait_OutputBufferTrait,
         CHTTP_Concern_KernelRouting;
+
     /**
      * The application's middleware stack.
      *
