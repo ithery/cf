@@ -7,6 +7,8 @@ class CNotification_Manager {
 
     protected static $instance;
 
+    protected $messageHandlers;
+
     /**
      * @return CNotification_Manager
      */
@@ -20,6 +22,24 @@ class CNotification_Manager {
 
     private function __construct() {
         $this->channels = [];
+    }
+
+    protected function registerMessageHandler($vendor, $messageHandler) {
+        $this->messageHandlers[$vendor] = $messageHandler;
+    }
+
+    protected function getDefaultChannelClass($channel) {
+        $channelClassMap = [
+            'email' => CNotification_Channel_EmailChannel::class,
+            'sms' => CNotification_Channel_SmsChannel::class,
+            'whatsapp' => CNotification_Channel_WhatsappChannel::class,
+            'database' => CNotification_Channel_DatabaseChannel::class,
+            'pushnotification' => CNotification_Channel_PushNotificationChannel::class,
+
+        ];
+        $channelClass = carr::get($channelClassMap, strtolower($channel));
+
+        return $channelClass;
     }
 
     public function registerChannel($channel, $config = null) {
@@ -42,7 +62,13 @@ class CNotification_Manager {
      */
     public function channel($channel, $config = null) {
         if (!isset($this->channels[$channel])) {
-            return $this->registerChannel($channel, $config);
+            $channelClass = $this->getDefaultChannelClass($channel);
+            if ($channelClass) {
+                $channelObject = new $channelClass($config);
+                $this->channels[$channel] = $channelObject;
+            } else {
+                throw new Exception('Channel ' . $channel . ' is not available');
+            }
         }
 
         return $this->channels[$channel];
@@ -85,6 +111,30 @@ class CNotification_Manager {
         }
 
         return ucfirst(cstr::camel($vendor));
+    }
+
+    protected function getMessageHandlerClass($vendor) {
+        $messageClass = carr::get($this->messageHandlers, $vendor);
+        if ($messageClass == null) {
+            $messageClass = $this->getDefaultMessageHandlerClass($vendor);
+        }
+
+        return $messageClass;
+    }
+
+    protected function getDefaultMessageHandlerClass($vendor) {
+        $classMap = [
+            'sendgrid' => CNotification_Message_SendGrid::class,
+            'zenziva' => CNotification_Message_Zenziva::class,
+            'watzap' => CNotification_Message_Watzap::class,
+            'wago' => CNotification_Message_Wago::class,
+        ];
+        $messageClass = carr::get($classMap, $vendor);
+        if ($messageClass == null) {
+            $messageClass = 'CNotification_Message_' . ucfirst(cstr::camel($vendor));
+        }
+
+        return $messageClass;
     }
 
     /**

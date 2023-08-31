@@ -5,9 +5,28 @@ abstract class CNotification_ChannelAbstract implements CNotification_ChannelInt
 
     protected $config;
 
+    /**
+     * @var \Opis\Closure\SerializableClosure|string
+     */
+    protected $messageHandler = null;
+
     public function __construct($config = []) {
         $this->config = $config;
         $this->channelName = 'Custom';
+    }
+
+    /**
+     * @param Closure $messageHandler
+     *
+     * @return $this
+     */
+    public function setMessageHandler($messageHandler) {
+        if ($messageHandler instanceof Closure) {
+            $messageHandler = new \Opis\Closure\SerializableClosure($messageHandler);
+        }
+        $this->messageHandler = $messageHandler;
+
+        return $this;
     }
 
     public function getChannelConfig($key) {
@@ -75,7 +94,11 @@ abstract class CNotification_ChannelAbstract implements CNotification_ChannelInt
 
             if ($errCode == 0) {
                 try {
-                    $result = $this->handleMessage($value, $logNotificationModel);
+                    if ($this->messageHandler != null) {
+                        $result = $this->messageHandler->__invoke($value, $logNotificationModel);
+                    } else {
+                        $result = $this->handleMessage($value, $logNotificationModel);
+                    }
 
                     $vendorResponse = $result;
                     if ($vendorResponse instanceof CVendor_SendGrid_Response) {
