@@ -62,6 +62,7 @@ class CApi_Kernel {
             $get = 'get';
             $put = 'put';
             $delete = 'delete';
+            $patch = 'patch';
             if ($request->isMethod('post') && method_exists($method, $post)) {
                 $response = $method->$post();
             } elseif ($request->isMethod('get') && method_exists($method, $get)) {
@@ -70,6 +71,8 @@ class CApi_Kernel {
                 $response = $method->$put();
             } elseif ($request->isMethod('delete') && method_exists($method, $delete)) {
                 $response = $method->$delete();
+            } elseif ($request->isMethod('patch') && method_exists($method, $patch)) {
+                $response = $method->$patch();
             } else {
                 $response = $method->execute();
             }

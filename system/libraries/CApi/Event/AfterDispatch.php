@@ -1,26 +1,22 @@
 <?php
 
-/**
- * Description of RequestHandled.
- *
- * @author Hery
- */
+
 class CApi_Event_AfterDispatch {
     /**
      * The method response instance.
      *
-     * @var CApi_MethodResponse
+     * @var Symfony\Component\HttpFoundation\Response
      */
-    public $methodResponse;
+    public $response;
 
     /**
      * Create a new event instance.
      *
-     * @param CApi_MethodResponse $methodResponse
+     * @param \Symfony\Component\HttpFoundation\Response $response
      *
      * @return void
      */
-    public function __construct($methodResponse) {
-        $this->methodResponse = $methodResponse;
+    public function __construct($response) {
+        $this->response = $response;
     }
 }
