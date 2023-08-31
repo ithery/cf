@@ -85,6 +85,13 @@ abstract class CApi_MethodAbstract implements CInterface_Arrayable {
         return $this;
     }
 
+    /**
+     * @return string
+     */
+    public function getGroup() {
+        return $this->group;
+    }
+
     public function getApiRequest() {
         return $this->apiRequest;
     }
