@@ -16,7 +16,7 @@ class CElement_FormInput_EditorJs_Tool_ChecklistTool extends CElement_FormInput_
     public function getConfig() {
         return [
             'enabled' => (bool) $this->enabled,
-            'inlineToolbar' => (string) $this->inlineToolbar,
+            'inlineToolbar' => $this->inlineToolbar,
             'shortcut' => (string) $this->shortcut,
         ];
     }

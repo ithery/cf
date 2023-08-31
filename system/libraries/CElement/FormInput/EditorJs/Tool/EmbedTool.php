@@ -17,7 +17,7 @@ class CElement_FormInput_EditorJs_Tool_EmbedTool extends CElement_FormInput_Edit
     public function getConfig() {
         return [
             'enabled' => (bool) $this->enabled,
-            'inlineToolbar' => (bool) $this->inlineToolbar,
+            'inlineToolbar' => $this->inlineToolbar,
             'services' => c::collect($this->services)->map(function ($val) {
                 return (bool) $val;
             })->toArray()

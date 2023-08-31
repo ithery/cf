@@ -13,7 +13,7 @@ class CElement_FormInput_EditorJs_Tool_TableTool extends CElement_FormInput_Edit
     public function getConfig() {
         return [
             'enabled' => (bool) $this->enabled,
-            'inlineToolbar' => (string) $this->inlineToolbar,
+            'inlineToolbar' => $this->inlineToolbar,
         ];
     }
 }
