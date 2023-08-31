@@ -55,10 +55,19 @@ abstract class CApi_MethodAbstract implements CInterface_Arrayable {
         'expiration' => null,
     ];
 
+    /**
+     * @var int
+     */
     protected $orgId;
 
+    /**
+     * @var string
+     */
     protected $sessionIdParameter = 'sessionId';
 
+    /**
+     * @var string
+     */
     protected $group;
 
     public function __construct($orgId = null, $sessionId = null, $request = null) {
