@@ -94,15 +94,14 @@ class cdbutils {
      * @return object
      */
     public static function get_row($query, $db = null) {
+        return null;
         if ($db == null) {
             $db = c::db();
         }
-        $result = $db->query($query);
-        if (count($result) > 0) {
-            $result = $result[0];
+        $r = $db->select($query);
+        if (is_array($r) && count($r) > 0) {
+            return $r[0];
         }
-
-        return $result;
     }
 
     public static function get_array($query, $db = null) {
