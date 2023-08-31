@@ -42,16 +42,8 @@ class CNotification_Manager {
         return $channelClass;
     }
 
-    public function registerChannel($channel, $config = null) {
-        $className = 'CNotification_Channel_' . $channel . 'Channel';
-        if ($config != null) {
-            return new $className($config);
-        }
-        if (!isset($this->channels[$channel])) {
-            return new $className();
-        }
-
-        return $this->channels[$channel];
+    public function registerChannel($channelName, $channel) {
+        return $this->channels[$channelName] = $channel;
     }
 
     /**
@@ -65,7 +57,7 @@ class CNotification_Manager {
             $channelClass = $this->getDefaultChannelClass($channel);
             if ($channelClass) {
                 $channelObject = new $channelClass($config);
-                $this->channels[$channel] = $channelObject;
+                $this->registerChannel($channel, $channelObject);
             } else {
                 throw new Exception('Channel ' . $channel . ' is not available');
             }
