@@ -143,7 +143,6 @@ class CDatabase_Schema_Manager_Mysql extends CDatabase_Schema_Manager {
 
                 break;
         }
-        $columnDefault = $this->getMariaDb1027ColumnDefault($this->platform, $tableColumn['default']);
         if ($this->platform instanceof CDatabase_Platform_MariaDb1027) {
             $columnDefault = $this->getMariaDb1027ColumnDefault($this->platform, $tableColumn['default']);
         } else {
