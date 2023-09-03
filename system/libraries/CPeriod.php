@@ -202,8 +202,8 @@ class CPeriod implements IteratorAggregate {
     }
 
     public static function thisYear() {
-        $startDate = CCarbon::now()->modify('first day of this year');
-        $endDate = CCarbon::now()->modify('last day of this year');
+        $startDate = CCarbon::now()->startOfYear();
+        $endDate = CCarbon::now()->endOfYear();
 
         $startDate->hour = 0;
         $startDate->minute = 0;
