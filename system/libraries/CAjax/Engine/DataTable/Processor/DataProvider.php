@@ -6,6 +6,7 @@ defined('SYSPATH') or die('No direct access allowed.');
  * @see CManager_DataProvider_SqlDataProvider
  * @see CManager_DataProvider_ModelDataProvider
  * @see CManager_DataProvider_ClosureDataProvider
+ * @see CManager_DataProvider_CollectionDataProvider
  */
 class CAjax_Engine_DataTable_Processor_DataProvider extends CAjax_Engine_DataTable_Processor {
     use CAjax_Engine_DataTable_Trait_ProcessorTrait;
@@ -33,6 +34,9 @@ class CAjax_Engine_DataTable_Processor_DataProvider extends CAjax_Engine_DataTab
         } else {
             $collections = $query->toEnumerable();
             $totalItem = $collections->count();
+            $paginationResult = $query->paginate($totalItem, ['*'], 'page', $this->parameter->page());
+            $collections = $paginationResult->items();
+            $totalItem = $paginationResult->total();
             $totalFilteredItem = $totalItem;
         }
 
