@@ -207,12 +207,12 @@ class CManager_DataProvider_ModelDataProvider extends CManager_DataProviderAbstr
         return $key;
     }
 
-    protected function createSelectJoinQuery($query, $relation, array $joinRelations, $column) {
+    protected function createSelectJoinQuery(CModel_Query $query, CModel_Relation $relation, array $joinRelations, $column) {
         $tableAlias = 'mdp_join_main';
-
         $relatedModel = $relation->getRelated();
         $relatedTable = $relatedModel->getTable();
-        $newQuery = c::db()->newQuery()
+        $relatedConnection = $relatedModel->getConnection();
+        $newQuery = $relatedConnection->newQuery()
             ->from($relatedTable, $tableAlias);
 
         $currentModel = $relatedModel;

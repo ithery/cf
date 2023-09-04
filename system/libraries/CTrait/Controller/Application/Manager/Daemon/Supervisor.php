@@ -10,12 +10,14 @@ trait CTrait_Controller_Application_Manager_Daemon_Supervisor {
 
     public function index() {
         $app = c::app();
+
+        $app->title($this->getTitle());
+
         if (!CF::config('daemon.supervisor.enabled')) {
             $app->addAlert()->setTypeDanger()->add('Daemon Supervisor is not enabled, please enabled it through config daemon.supervisor.enabled');
 
             return $app;
         }
-        $app->title($this->getTitle());
 
         $tabs = $app->addTabList()->setTabPositionLeft();
 
