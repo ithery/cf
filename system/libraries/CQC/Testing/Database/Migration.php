@@ -11,6 +11,7 @@ class CQC_Testing_Database_Migration {
         if (CFile::exists($this->file)) {
             CFile::delete($this->file);
         }
+        CFile::put($this->file, '');
         $config = [
             'pdo' => true,
             'type' => 'sqlite',
