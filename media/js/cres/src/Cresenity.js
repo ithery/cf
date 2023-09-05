@@ -541,11 +541,15 @@ export default class Cresenity {
             method: 'post'
         }, options);
         let dataAddition = settings.dataAddition;
+        let requestData = settings.data;
+        if (typeof requestData === 'undefined') {
+            requestData = {};
+        }
+        if(dataAddition) {
+            requestData = extend(requestData, dataAddition);
+        }
         let url = settings.url;
         url = this.url.replaceParam(url);
-        if (typeof dataAddition === 'undefined') {
-            dataAddition = {};
-        }
         if (settings.block) {
             this.blockPage();
         }
@@ -554,7 +558,7 @@ export default class Cresenity {
         let ajaxOptions = {
             url: url,
             dataType: 'json',
-            data: dataAddition,
+            data: requestData,
             type: settings.method,
 
             success: (response) => {
@@ -578,6 +582,11 @@ export default class Cresenity {
                 }
             },
             error: (xhr, errorAjaxOptions, thrownError) => {
+                if(xhr.readyState == 4) {
+                    if(xhr.status==404) {
+                        this.showError('Not Found');
+                    }
+                }
                 if (thrownError !== 'abort') {
                     this.showError(thrownError);
                 }
