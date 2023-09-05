@@ -42,6 +42,7 @@ import { initMenu } from './module/menu';
 import { formatCurrency, unformatCurrency } from './formatter/currency';
 import { cresQuery } from './module/CresQuery';
 import { isJson } from './util/helper';
+import CresenityHistory from './history';
 
 export default class Cresenity {
     constructor() {
@@ -1023,6 +1024,12 @@ export default class Cresenity {
     initCssDomVar() {
         initCssDomVar();
     }
+    initHistory() {
+        this.history = CresenityHistory;
+        if (!this.history.options || !this.history.options.delayInit) {
+            this.history.init();
+        }
+    }
     initAlpineAndUi() {
         Alpine.plugin(AlpineCleave);
         Alpine.plugin(AlpineAutoNumeric);
@@ -1074,6 +1081,7 @@ export default class Cresenity {
             this.initWaves();
             this.initAlpineAndUi();
             this.initCssDomVar();
+            this.initHistory();
 
             this.initLiveReload();
             initProgressive();
