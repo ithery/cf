@@ -337,6 +337,9 @@ class CElement_FormInput_SelectSearch extends CElement_FormInput {
             if ($this->value !== null) {
                 $value = $this->value;
             }
+            if ($value instanceof CCollection) {
+                $value = $value->toArray();
+            }
             $values = carr::wrap($value);
             $result = c::collect($values)->map(function ($value) {
                 $db = c::db();
