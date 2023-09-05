@@ -561,6 +561,17 @@ class CElement_FormInput_SelectSearch extends CElement_FormInput {
                             $row[$k] = $this->valueCallback($row, $k, $v);
                         }
                     }
+                    $formatResult = $this->formatResult;
+                    if ($formatResult instanceof \Opis\Closure\SerializableClosure) {
+                        $formatResult = $formatResult->__invoke($model ?: $row);
+                        if ($formatResult instanceof CRenderable) {
+                            $data['cappFormatResult'] = $formatResult->html();
+                            $data['cappFormatResultIsHtml'] = true;
+                        } else {
+                            $data['cappFormatResult'] = $formatResult;
+                            $data['cappFormatResultIsHtml'] = c::isHtml($formatResult);
+                        }
+                    }
                     $formatSelection = $this->formatSelection;
                     if ($formatSelection instanceof \Opis\Closure\SerializableClosure) {
                         $formatSelection = $formatSelection->__invoke($model ?: $row);
@@ -673,8 +684,7 @@ class CElement_FormInput_SelectSearch extends CElement_FormInput {
                     return $('<div>" . $strResult . "</div>');
                 },
                 templateSelection: function(item) {
-
-                    if(item.selected && item.element) {
+                    if(item.element) {
                         let dataMultiple = $(item.element).attr('data-multiple');
                         if(dataMultiple == '0') {
                             let dataContent = $(item.element).attr('data-content');
@@ -686,6 +696,14 @@ class CElement_FormInput_SelectSearch extends CElement_FormInput {
                                 return dataContent;
                             }
                         } else {
+                            let dataContent = $(item.element).attr('data-content');
+
+                            if(dataContent) {
+                                if(/<\/?[a-z][\s\S]*>/i.test(dataContent)) {
+                                    return $(dataContent);
+                                }
+                                return dataContent;
+                            }
                             if(item.text){
                                 return item.text;
                             }
