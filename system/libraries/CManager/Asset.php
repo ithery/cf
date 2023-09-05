@@ -126,7 +126,7 @@ class CManager_Asset {
     }
 
     public function varJs() {
-        $varJs = 'window.capp = ' . json_encode(CApp::variables()) . ';';
+        $varJs = 'window.capp = ' . json_encode(c::app()->variables()) . ';';
 
         return $varJs;
     }
