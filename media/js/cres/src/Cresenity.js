@@ -58,7 +58,8 @@ export default class Cresenity {
             'cresenity:loaded',
             'cresenity:js:loaded',
             'cresenity:ui:start',
-            'cresenity:notification:message'
+            'cresenity:notification:message',
+            'cresenity:history:statechange'
         ];
         this.modalElements = [];
         this.cresenityEventList = [
@@ -1028,6 +1029,9 @@ export default class Cresenity {
         this.history = CresenityHistory;
         if (!this.history.options || !this.history.options.delayInit) {
             this.history.init();
+            this.history.Adapter.bind(window, 'statechange', function () { // Note: We are using statechange instead of popstate
+                dispatchWindowEvent('cresenity:history:statechange');
+            });
         }
     }
     initAlpineAndUi() {
