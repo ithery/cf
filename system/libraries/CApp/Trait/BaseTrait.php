@@ -134,24 +134,24 @@ trait CApp_Trait_BaseTrait {
     //@codingStandardsIgnoreEnd
 
     /**
-     * @param int $org_id optional, default using return values of SM::org_id()
+     * @param int $orgId optional, default using return values of self::orgId()
      *
      * @return stdClass of org
      */
-    public static function org($org_id = null) {
+    public static function org($orgId = null) {
         $db = c::db();
 
-        if ($org_id == null) {
-            $org_id = self::orgId();
+        if ($orgId == null) {
+            $orgId = self::orgId();
         }
         if (self::$org == null) {
             self::$org = [];
         }
-        if (!isset(self::$org[$org_id])) {
-            self::$org[$org_id] = cdbutils::get_row('select * from org where org_id = ' . $db->escape($org_id));
+        if (!isset(self::$org[$orgId])) {
+            self::$org[$orgId] = $db->table('org')->find($orgId);
         }
 
-        return self::$org[$org_id];
+        return self::$org[$orgId];
     }
 
     /**

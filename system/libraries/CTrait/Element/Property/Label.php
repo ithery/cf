@@ -30,6 +30,9 @@ trait CTrait_Element_Property_Label {
      * @return $this
      */
     public function setLabel($label, $lang = true) {
+        if (!is_string($label)) {
+            $label = '';
+        }
         $this->rawLabel = $label;
         if ($lang !== false) {
             $label = c::__($label, is_array($lang) ? $lang : []);
