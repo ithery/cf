@@ -44,6 +44,8 @@ import { cresQuery } from './module/CresQuery';
 import { isJson } from './util/helper';
 import parse from 'date-fns/parse';
 import differenceInMinutes from 'date-fns/differenceInMinutes';
+import getHours from 'date-fns/getHours';
+import getMinutes from 'date-fns/getMinutes';
 import CresenityHistory from './history';
 
 export default class Cresenity {
@@ -101,7 +103,9 @@ export default class Cresenity {
         this.checkAuthenticationInterval = null;
         this.dateFns = {
             parse,
-            differenceInMinutes
+            differenceInMinutes,
+            getHours,
+            getMinutes
         };
     }
     loadJs(filename, callback) {
