@@ -42,6 +42,8 @@ import { initMenu } from './module/menu';
 import { formatCurrency, unformatCurrency } from './formatter/currency';
 import { cresQuery } from './module/CresQuery';
 import { isJson } from './util/helper';
+import parse from 'date-fns/parse';
+import differenceInMinutes from 'date-fns/differenceInMinutes';
 import CresenityHistory from './history';
 
 export default class Cresenity {
@@ -97,6 +99,10 @@ export default class Cresenity {
         this.$ = cresQuery;
         this.version = '1.4.1';
         this.checkAuthenticationInterval = null;
+        this.dateFns = {
+            parse,
+            differenceInMinutes
+        };
     }
     loadJs(filename, callback) {
         let fileref = document.createElement('script');
