@@ -10,7 +10,7 @@ class CAjax_Engine_AjaxHandler extends CAjax_Engine {
         $json = carr::get($data, 'json');
 
         if ($callback != null) {
-            $app = CApp::instance();
+            $app = c::app();
             $parameters = [$app];
 
             return c::value($callback, ...$parameters);

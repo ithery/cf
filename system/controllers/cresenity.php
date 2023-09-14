@@ -71,6 +71,9 @@ class Controller_Cresenity extends CController {
         $ajaxMethod = CAjax::createMethod($json)->setArgs($args);
 
         $response = $ajaxMethod->executeEngine();
+        if (!($response instanceof Symfony\Component\HttpFoundation\Response)) {
+            $response = c::response($response);
+        }
 
         return $response;
     }
@@ -107,8 +110,8 @@ class Controller_Cresenity extends CController {
         $rand_string = rand(1000, 9999);
         imagestring($my_image, 5, $x, $y, $rand_string, 0x000000);
 
-        $session = CSession::instance();
-        $session->set('captcha', md5($rand_string) . 'a4xn');
+        $session = c::session();
+        $session->set('capp-captcha', md5($rand_string) . 'a4xn');
 
         imagejpeg($my_image);
         imagedestroy($my_image);

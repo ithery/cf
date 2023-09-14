@@ -30,19 +30,25 @@ class CImage_Avatar_Api_Initials {
         return $this;
     }
 
+    public function setRounded($rounded = true) {
+        $this->input->setRounded((bool) $rounded);
+
+        return $this;
+    }
+
     public function getImageObject() {
         $input = $this->input;
 
         $image = $this->engine->name($input->getName())
             ->length($input->length)
-            ->fontSize($input->fontSize)
-            ->size($input->size)
-            ->background($input->background)
-            ->color($input->color)
+            ->fontSize($input->getFontSize())
+            ->size($input->getSize())
+            ->background($input->getBackground())
+            ->color($input->getColor())
             ->smooth()
             ->autoFont()
-            ->keepCase(!$input->uppercase)
-            ->rounded($input->rounded)
+            ->keepCase(!$input->getUppercase())
+            ->rounded($input->getRounded())
             ->generate();
 
         return $image;
@@ -57,5 +63,55 @@ class CImage_Avatar_Api_Initials {
      */
     public function toBase64() {
         return (string) $this->getImageObject()->encode('data-url');
+    }
+
+    /**
+     * @return string
+     */
+    public function toSvg() {
+        $input = $this->input;
+        $size = $inputWidth = $inputHeight = $input->getSize();
+        $borderSize = $input->getBorderSize();
+        $x = $y = $borderSize / 2;
+        $width = $height = $inputWidth - $borderSize;
+        $radius = ($inputWidth - $borderSize) / 2;
+        $center = $inputWidth / 2;
+        $borderColor = $input->getBorderColor();
+        $borderRadius = $input->getBorderRadius();
+        $background = $input->getBackground();
+
+        $svg = '<svg xmlns="http://www.w3.org/2000/svg" width="' . $width . '" height="' . $height . '" viewBox="0 0 ' . $inputWidth . ' ' . $inputHeight . '">';
+        $shape = $input->getRounded() ? 'circle' : 'square';
+        if ($shape == 'square') {
+            $svg .= '<rect x="' . $x
+                . '" y="' . $y
+                . '" width="' . $width . '" height="' . $height
+                . '" stroke="' . $borderColor
+                . '" stroke-width="' . $borderSize
+                . '" rx="' . $borderRadius
+                . '" fill="' . $background . '" />';
+        } elseif ($shape == 'circle') {
+            $svg .= '<circle cx="' . $center
+                . '" cy="' . $center
+                . '" r="' . $radius
+                . '" stroke="' . $borderColor
+                . '" stroke-width="' . $borderSize
+                . '" fill="' . $background . '" />';
+        }
+        $fontSize = $input->getFontSize() * $size;
+
+        $svg .= '<text font-size="' . $fontSize;
+        $fontFamily = $input->getFontFamily();
+        if ($fontFamily) {
+            $svg .= '" font-family="' . $fontFamily;
+        }
+        $foreground = $input->getColor();
+        $svg .= '" fill="' . $foreground . '" x="50%" y="50%" dy=".1em" style="line-height:1" alignment-baseline="middle" text-anchor="middle" dominant-baseline="central">';
+        $svg .= $input->getInitials();
+        $svg .= '</text>';
+
+        $svg .= '</svg>';
+
+        return $svg;
     }
 }

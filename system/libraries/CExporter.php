@@ -4,6 +4,7 @@ use PhpOffice\PhpSpreadsheet\IOFactory;
 
 class CExporter {
     use CExporter_Trait_RegistersCustomConcernsTrait;
+
     const ACTION_STORE = 'store';
 
     const ACTION_DOWNLOAD = 'download';
@@ -41,12 +42,19 @@ class CExporter {
     const DATA_TYPE_STRING = 'string';
 
     const DATA_TYPE_DATETIME = 'datetime';
+
     const DATA_TYPE_DATE = 'date';
+
     const DATA_TYPE_CURRENCY = 'currency';
+
     const DATA_TYPE_INTEGER = 'integer';
+
     const DATA_TYPE_NUMBER = 'number';
+
     const DATA_TYPE_PERCENTAGE = 'percentage';
+
     const DATA_TYPE_PERCENTAGE_0 = 'percentage0';
+
     const DATA_TYPE_PERCENTAGE_00 = 'percentage00';
 
     protected static $externalWriter = [
@@ -107,6 +115,8 @@ class CExporter {
      * @throws \PhpOffice\PhpSpreadsheet\Exception
      * @throws \PhpOffice\PhpSpreadsheet\Writer\Exception
      *
+     * @deprecated 1.6 use download which return response object
+     *
      * @return void
      */
     public static function forceDownload($export, $fileName, $writerType = null, array $headers = []) {
@@ -124,7 +134,7 @@ class CExporter {
      * @throws \PhpOffice\PhpSpreadsheet\Exception
      * @throws \PhpOffice\PhpSpreadsheet\Writer\Exception
      *
-     * @return void
+     * @return \Symfony\Component\HttpFoundation\BinaryFileResponse
      */
     public static function download($export, $fileName, $writerType = null, array $headers = []) {
         return c::response()->download(
