@@ -23,4 +23,11 @@ class CImage_Avatar {
 
         return new $className();
     }
+
+    /**
+     * @return CImage_Avatar_Api_Initials
+     */
+    public function createInitials() {
+        return new CImage_Avatar_Api_Initials();
+    }
 }

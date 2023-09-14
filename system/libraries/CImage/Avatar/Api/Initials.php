@@ -9,14 +9,31 @@ defined('SYSPATH') or die('No direct access allowed.');
  * @since Feb 16, 2019, 2:25:13 AM
  */
 class CImage_Avatar_Api_Initials {
-    public static function render() {
-        $avatarEngine = new CImage_Avatar_Engine_Initials();
+    protected $engine;
 
-        header('Expires: ' . gmdate('D, d M Y H:i:s \G\M\T', time() + 172800));
+    protected $input;
 
-        $input = new CImage_Avatar_Input_Initials();
+    public function __construct() {
+        $this->engine = new CImage_Avatar_Engine_Initials();
+        $this->input = new CImage_Avatar_Input_Initials();
+    }
 
-        $image = $avatarEngine->name($input->name)
+    public function setName($name) {
+        $this->input->setName($name);
+
+        return $this;
+    }
+
+    public function setSize($size) {
+        $this->input->size = $size;
+
+        return $this;
+    }
+
+    public function getImageObject() {
+        $input = $this->input;
+
+        $image = $this->engine->name($input->getName())
             ->length($input->length)
             ->fontSize($input->fontSize)
             ->size($input->size)
@@ -28,6 +45,17 @@ class CImage_Avatar_Api_Initials {
             ->rounded($input->rounded)
             ->generate();
 
-        return $image->stream('png', 100);
+        return $image;
+    }
+
+    public function render() {
+        return $this->getImageObject()->stream('png', 100);
+    }
+
+    /**
+     * @return string
+     */
+    public function toBase64() {
+        return (string) $this->getImageObject()->encode('data-url');
     }
 }

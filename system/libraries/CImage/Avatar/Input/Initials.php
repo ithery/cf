@@ -9,8 +9,6 @@ defined('SYSPATH') or die('No direct access allowed.');
  * @since Feb 16, 2019, 2:25:18 AM
  */
 class CImage_Avatar_Input_Initials {
-    public $name;
-
     public $length;
 
     public $size;
@@ -30,6 +28,8 @@ class CImage_Avatar_Input_Initials {
     public $initials;
 
     public $request;
+
+    private $name;
 
     private $hasQueryParameters = false;
 
@@ -60,6 +60,15 @@ class CImage_Avatar_Input_Initials {
         $this->initials = $this->getInitials();
         $this->cacheKey = $this->generateCacheKey();
         $this->fixInvalidInput();
+    }
+
+    public function setName($name) {
+        $this->name = $name;
+        $this->background = $this->getRequest('background', CColor::fromString($this->name, ['luminosity' => 'dark'])->toHex());
+    }
+
+    public function getName() {
+        return $this->name;
     }
 
     private function getRounded() {
