@@ -155,6 +155,11 @@ class CDebug_DebugBar_DataCollector_QueryCollector extends DataCollector impleme
             $additionalHint = $this->queryN1Detector->logQuery($query, $backtrace, $source);
             if ($additionalHint) {
                 $hints[] = $additionalHint;
+                if (CDebug::bar()->hasCollector('messages')) {
+                    $messagesCollector = CDebug::bar()->getCollector('messages');
+                    /** @var \DebugBar\DataCollector\MessagesCollector $messagesCollector */
+                    $messagesCollector->addMessage($additionalHint, 'warning');
+                }
             }
         }
 
