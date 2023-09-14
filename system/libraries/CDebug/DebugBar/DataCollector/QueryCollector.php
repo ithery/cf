@@ -122,16 +122,20 @@ class CDebug_DebugBar_DataCollector_QueryCollector extends PDOCollector implemen
         $endTime = microtime(true);
         $startTime = $endTime - $time;
         $hints = $this->performQueryAnalysis($sql);
+        $pdo = null;
+
+        try {
+            $pdo = $connection->getPdo();
+        } catch (\Throwable $e) {
+            // ignore error for non-pdo laravel drivers
+        }
         $bindings = $connection->prepareBindings($bindings);
         // Run EXPLAIN on this query (if needed)
         $explainQuery = $this->explainQuery || c::request()->cookie('capp-debugbar-explain-query');
-        if ($explainQuery && preg_match('/^(' . implode($this->explainTypes) . ') /i', $sql)) {
-            $pdo = $connection->getPdo();
-            if ($pdo) {
-                $statement = $pdo->prepare('EXPLAIN ' . $sql);
-                $statement->execute($bindings);
-                $explainResults = $statement->fetchAll(\PDO::FETCH_CLASS);
-            }
+        if ($explainQuery && $pdo && preg_match('/^(' . implode($this->explainTypes) . ') /i', $sql)) {
+            $statement = $pdo->prepare('EXPLAIN ' . $sql);
+            $statement->execute($bindings);
+            $explainResults = $statement->fetchAll(\PDO::FETCH_CLASS);
         }
         $bindings = $this->getDataFormatter()->checkBindings($bindings);
         if (!empty($bindings) && $this->renderSqlWithParams) {
