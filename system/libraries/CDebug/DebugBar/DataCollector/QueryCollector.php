@@ -15,7 +15,14 @@ class CDebug_DebugBar_DataCollector_QueryCollector extends DataCollector impleme
 
     protected $timeCollector;
 
+    /**
+     * @var CDebug_DebugBar_QueryN1Detector
+     */
+    protected $queryN1Detector;
+
     protected $queries = [];
+
+    protected $modelQueries = [];
 
     protected $renderSqlWithParams = false;
 
@@ -40,15 +47,13 @@ class CDebug_DebugBar_DataCollector_QueryCollector extends DataCollector impleme
      */
     public function __construct(TimeDataCollector $timeCollector = null) {
         $this->timeCollector = $timeCollector;
+        $this->queryN1Detector = new CDebug_DebugBar_QueryN1Detector();
         $this->setDataFormatter(new CDebug_DebugBar_DataFormatter_QueryFormatter());
 
         try {
             CEvent::dispatcher()->listen(CDatabase_Event_QueryExecuted::class, function (CDatabase_Event_QueryExecuted $query) {
-                $bindings = $query->bindings;
-                $time = $query->time;
-                $connection = $query->connection;
-                $sql = $query->sql;
-                $this->addQuery($sql, $bindings, $time, $connection);
+                $backtrace = c::collect(debug_backtrace(DEBUG_BACKTRACE_PROVIDE_OBJECT, 50));
+                $this->addQuery($query, $backtrace);
             });
         } catch (\Exception $e) {
             CDebug::bar()->addThrowable(
@@ -105,24 +110,27 @@ class CDebug_DebugBar_DataCollector_QueryCollector extends DataCollector impleme
     }
 
     /**
-     * @param string               $query
-     * @param array                $bindings
-     * @param float                $time
-     * @param CDatabase_Connection $db
+     * @param CDatabase_Event_QueryExecuted $query
+     * @param CCollection                   $backtrace
      */
-    public function addQuery($query, $bindings, $time, $db) {
+    public function addQuery(CDatabase_Event_QueryExecuted $query, $backtrace) {
+        $bindings = $query->bindings;
+        $time = $query->time;
+        $db = $query->connection;
+        $sql = $query->sql;
+
         $explainResults = [];
         $time = $time / 1000;
         $endTime = microtime(true);
         $startTime = $endTime - $time;
-        $hints = $this->performQueryAnalysis($query);
+        $hints = $this->performQueryAnalysis($sql);
         $bindings = $db->prepareBindings($bindings);
         // Run EXPLAIN on this query (if needed)
         $explainQuery = $this->explainQuery || c::request()->cookie('capp-debugbar-explain-query');
-        if ($explainQuery && preg_match('/^(' . implode($this->explainTypes) . ') /i', $query)) {
+        if ($explainQuery && preg_match('/^(' . implode($this->explainTypes) . ') /i', $sql)) {
             $pdo = $db->getPdo();
             if ($pdo) {
-                $statement = $pdo->prepare('EXPLAIN ' . $query);
+                $statement = $pdo->prepare('EXPLAIN ' . $sql);
                 $statement->execute($bindings);
                 $explainResults = $statement->fetchAll(\PDO::FETCH_CLASS);
             }
@@ -134,7 +142,7 @@ class CDebug_DebugBar_DataCollector_QueryCollector extends DataCollector impleme
                 // nested in quotes, while we iterate through the bindings
                 // and substitute placeholders by suitable values.
                 $regex = is_numeric($key) ? "/\?(?=(?:[^'\\\']*'[^'\\\']*')*[^'\\\']*$)/" : "/:{$key}(?=(?:[^'\\\']*'[^'\\\']*')*[^'\\\']*$)/";
-                $query = preg_replace($regex, $db->escape($binding), $query, 1);
+                $sql = preg_replace($regex, $db->escape($binding), $sql, 1);
             }
         }
         $source = [];
@@ -143,8 +151,15 @@ class CDebug_DebugBar_DataCollector_QueryCollector extends DataCollector impleme
             $source = $this->findSource();
         } catch (\Exception $e) {
         }
+        if ($this->queryN1Detector) {
+            $additionalHint = $this->queryN1Detector->logQuery($query, $backtrace, $source);
+            if ($additionalHint) {
+                $hints[] = $additionalHint;
+            }
+        }
+
         $this->queries[] = [
-            'query' => $query,
+            'query' => $sql,
             'type' => 'query',
             'bindings' => $this->getDataFormatter()->escapeBindings($bindings),
             'time' => $time,
@@ -157,7 +172,7 @@ class CDebug_DebugBar_DataCollector_QueryCollector extends DataCollector impleme
         ];
 
         if ($this->timeCollector !== null) {
-            $plainQuery = trim($query);
+            $plainQuery = trim($sql);
             $plainQuery = str_replace("\n", '', $plainQuery);
             $plainQuery = str_replace("\r", '', $plainQuery);
             $this->timeCollector->addMeasure(cstr::limit($plainQuery, 100), $startTime, $endTime);
