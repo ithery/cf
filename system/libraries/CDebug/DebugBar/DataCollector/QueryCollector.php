@@ -4,13 +4,13 @@ defined('SYSPATH') or die('No direct access allowed.');
 
 use DebugBar\DataCollector\Renderable;
 use DebugBar\DataCollector\AssetProvider;
-use DebugBar\DataCollector\DataCollector;
+use DebugBar\DataCollector\PDO\PDOCollector;
 use DebugBar\DataCollector\TimeDataCollector;
 
 /**
  * Collects data about SQL statements executed with PDO.
  */
-class CDebug_DebugBar_DataCollector_QueryCollector extends DataCollector implements Renderable, AssetProvider {
+class CDebug_DebugBar_DataCollector_QueryCollector extends PDOCollector implements Renderable, AssetProvider {
     use CDebug_DebugBar_DataCollector_Trait_FileHelperTrait;
 
     protected $timeCollector;
@@ -21,8 +21,6 @@ class CDebug_DebugBar_DataCollector_QueryCollector extends DataCollector impleme
     protected $queryN1Detector;
 
     protected $queries = [];
-
-    protected $modelQueries = [];
 
     protected $renderSqlWithParams = false;
 
@@ -116,7 +114,7 @@ class CDebug_DebugBar_DataCollector_QueryCollector extends DataCollector impleme
     public function addQuery(CDatabase_Event_QueryExecuted $query, $backtrace) {
         $bindings = $query->bindings;
         $time = $query->time;
-        $db = $query->connection;
+        $connection = $query->connection;
         $sql = $query->sql;
 
         $explainResults = [];
@@ -124,11 +122,11 @@ class CDebug_DebugBar_DataCollector_QueryCollector extends DataCollector impleme
         $endTime = microtime(true);
         $startTime = $endTime - $time;
         $hints = $this->performQueryAnalysis($sql);
-        $bindings = $db->prepareBindings($bindings);
+        $bindings = $connection->prepareBindings($bindings);
         // Run EXPLAIN on this query (if needed)
         $explainQuery = $this->explainQuery || c::request()->cookie('capp-debugbar-explain-query');
         if ($explainQuery && preg_match('/^(' . implode($this->explainTypes) . ') /i', $sql)) {
-            $pdo = $db->getPdo();
+            $pdo = $connection->getPdo();
             if ($pdo) {
                 $statement = $pdo->prepare('EXPLAIN ' . $sql);
                 $statement->execute($bindings);
@@ -141,8 +139,23 @@ class CDebug_DebugBar_DataCollector_QueryCollector extends DataCollector impleme
                 // This regex matches placeholders only, not the question marks,
                 // nested in quotes, while we iterate through the bindings
                 // and substitute placeholders by suitable values.
-                $regex = is_numeric($key) ? "/\?(?=(?:[^'\\\']*'[^'\\\']*')*[^'\\\']*$)/" : "/:{$key}(?=(?:[^'\\\']*'[^'\\\']*')*[^'\\\']*$)/";
-                $sql = preg_replace($regex, $db->escape($binding), $sql, 1);
+                $regex = is_numeric($key)
+                    ? "/\?(?=(?:[^'\\\']*'[^'\\\']*')*[^'\\\']*$)/"
+                    : "/:{$key}(?=(?:[^'\\\']*'[^'\\\']*')*[^'\\\']*$)/";
+                // Mimic bindValue and only quote non-integer and non-float data types
+                if (!is_int($binding) && !is_float($binding)) {
+                    if ($pdo) {
+                        try {
+                            $binding = $pdo->quote((string) $binding);
+                        } catch (\Exception $e) {
+                            $binding = $this->emulateQuote($binding);
+                        }
+                    } else {
+                        $binding = $this->emulateQuote($binding);
+                    }
+                }
+
+                $sql = preg_replace($regex, addcslashes($binding, '$'), $sql, 1);
             }
         }
         $source = [];
@@ -170,8 +183,8 @@ class CDebug_DebugBar_DataCollector_QueryCollector extends DataCollector impleme
             'time' => $time,
             'source' => $source,
             'explain' => $explainResults,
-            'connection' => $db->getDatabaseName(),
-            'driver' => $db->getConfig('driver'),
+            'connection' => $connection->getDatabaseName(),
+            'driver' => $connection->getConfig('driver'),
             'hints' => $this->showHints ? $hints : null,
             'show_copy' => $this->showCopyButton,
         ];
@@ -182,6 +195,20 @@ class CDebug_DebugBar_DataCollector_QueryCollector extends DataCollector impleme
             $plainQuery = str_replace("\r", '', $plainQuery);
             $this->timeCollector->addMeasure(cstr::limit($plainQuery, 100), $startTime, $endTime);
         }
+    }
+
+    /**
+     * Mimic mysql_real_escape_string.
+     *
+     * @param string $value
+     *
+     * @return string
+     */
+    protected function emulateQuote($value) {
+        $search = ['\\',  "\x00", "\n",  "\r",  "'",  '"', "\x1a"];
+        $replace = ['\\\\', '\\0', '\\n', '\\r', "\'", '\"', '\\Z'];
+
+        return "'" . str_replace($search, $replace, (string) $value) . "'";
     }
 
     /**

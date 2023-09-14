@@ -94,6 +94,7 @@ class CDatabase_Manager implements CDatabase_Contract_ConnectionResolverInterfac
                 $this->makeConnection($database),
                 $type
             );
+            CEvent::dispatcher()->dispatch(new CDatabase_Event_ConnectionCreated($this->connections[$name]));
         }
 
         return $this->connections[$name];
