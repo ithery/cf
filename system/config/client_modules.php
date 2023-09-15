@@ -614,6 +614,12 @@ return [
             'plugins/chartjs/chartjs.js',
         ],
     ],
+    'chartjs-4.4.0' => [
+        'js' => [
+            'plugins/chartjs/4.4.0/chart.umd.js',
+        ],
+    ],
+
     'chartist' => [
         'css' => [
             'plugins/chartist/chartist.css',
