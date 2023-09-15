@@ -1,5 +1,6 @@
 <?php
 
+use GuzzleHttp\HandlerStack;
 use DebugBar\DataCollector\TimeDataCollector;
 
 /**
@@ -145,5 +146,13 @@ class CDebug_DebugBar extends CDebug_AbstractBar {
             $collector = $this->getCollector('exceptions');
             $collector->addThrowable($e);
         }
+    }
+
+    public function configureGuzzleStack(HandlerStack $stack) {
+        if ($this->isEnabled()) {
+            return CDebug_DebugBar_GuzzleManager::configureStack($stack);
+        }
+
+        return $stack;
     }
 }
