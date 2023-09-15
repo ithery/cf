@@ -171,6 +171,33 @@ class CPeriod implements IteratorAggregate {
         return new static($startDate, $endDate);
     }
 
+    public static function last7Days() {
+        return self::lastNDays(7);
+    }
+
+    public static function last14Days() {
+        return self::lastNDays(14);
+    }
+
+    public static function last30Days() {
+        return self::lastNDays(30);
+    }
+
+    public static function lastNDays($n) {
+        $startDate = CCarbon::now()->modify('-' . ($n - 1) . ' days');
+        $endDate = CCarbon::now();
+
+        $startDate->hour = 0;
+        $startDate->minute = 0;
+        $startDate->second = 0;
+
+        $endDate->hour = 23;
+        $endDate->minute = 59;
+        $endDate->second = 59;
+
+        return new static($startDate, $endDate);
+    }
+
     public static function thisMonth() {
         $startDate = CCarbon::now()->modify('first day of this month');
         $endDate = CCarbon::now()->modify('last day of this month');
