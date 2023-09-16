@@ -349,7 +349,7 @@ class c {
      *
      * @param null|\DateTimeZone|string $tz
      *
-     * @return CCarbon|\Carbon\Carbon|\CarbonV3\Carbon
+     * @return CCarbon|\Carbon\Carbon
      */
     public static function now($tz = null) {
         return CCarbon::now($tz);

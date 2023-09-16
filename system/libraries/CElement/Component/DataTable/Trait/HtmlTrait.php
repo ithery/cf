@@ -280,7 +280,7 @@ trait CElement_Component_DataTable_Trait_HtmlTrait {
                     $action->setVisibility($visibility);
                 }
                 if ($action instanceof CElement_Component_ActionRow) {
-                    $action->applyRowCallback($row->toArray());
+                    $action->applyRowCallback($row->getRow());
                 }
                 $actionNeedRender = $actionNeedRender || $action->isVisible();
             }
