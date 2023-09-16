@@ -30,7 +30,7 @@ class CManager_DataProvider_CollectionDataProvider extends CManager_DataProvider
                     if ($this->isCallable($value)) {
                         $value = $this->callCallable($value);
                     }
-                    $result = $result || (strpos(carr::get($row, $fieldName), $value) !== false);
+                    $result = $result || (strpos(cstr::lower(carr::get($row, $fieldName)), cstr::lower($value)) !== false);
                 }
 
                 return $result;
@@ -46,7 +46,7 @@ class CManager_DataProvider_CollectionDataProvider extends CManager_DataProvider
                     if ($this->isCallable($value)) {
                         $value = $this->callCallable($value);
                     }
-                    $result = $result && (strpos(carr::get($row, $fieldName), $value) !== false);
+                    $result = $result && (strpos(cstr::lower(carr::get($row, $fieldName)), cstr::lower($value)) !== false);
                 }
 
                 return $result;
