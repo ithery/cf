@@ -6,21 +6,26 @@
  * @method static CModel_Chartable_TimeCollection  countByWeeks($startDate = null, $stopDate = null, $dateColumn = 'created')
  * @method static CModel_Chartable_TimeCollection  countByMonths($startDate = null, $stopDate = null, $dateColumn = 'created')
  * @method static CModel_Chartable_TimeCollection  countByYears($startDate = null, $stopDate = null, $dateColumn = 'created')
+ * @method static CModel_Chartable_TimeCollection  countGroupBy($groupBy, $startDate = null, $stopDate = null, $dateColumn = 'created')
  * @method static CModel_Chartable_TimeCollection  valuesByHours($value, $startDate = null, $stopDate = null, $dateColumn = 'created')
  * @method static CModel_Chartable_TimeCollection  valuesByDays($value, $startDate = null, $stopDate = null, $dateColumn = 'created')
  * @method static CModel_Chartable_TimeCollection  valuesByWeeks($value, $startDate = null, $stopDate = null, $dateColumn = 'created')
  * @method static CModel_Chartable_TimeCollection  valuesByMonths($value, $startDate = null, $stopDate = null, $dateColumn = 'created')
  * @method static CModel_Chartable_TimeCollection  valuesByYears($value, $startDate = null, $stopDate = null, $dateColumn = 'created')
+ * @method static CModel_Chartable_TimeCollection  valuesGroupBy($groupBy, $value, $startDate = null, $stopDate = null, $dateColumn = 'created')
  * @method static CModel_Chartable_TimeCollection  sumByHours($value, $startDate = null, $stopDate = null, $dateColumn = 'created')
  * @method static CModel_Chartable_TimeCollection  sumByDays($value, $startDate = null, $stopDate = null, $dateColumn = 'created')
  * @method static CModel_Chartable_TimeCollection  sumByWeeks($value, $startDate = null, $stopDate = null, $dateColumn = 'created')
  * @method static CModel_Chartable_TimeCollection  sumByMonths($value, $startDate = null, $stopDate = null, $dateColumn = 'created')
  * @method static CModel_Chartable_TimeCollection  sumByYears($value, $startDate = null, $stopDate = null, $dateColumn = 'created')
+ * @method static CModel_Chartable_TimeCollection  sumGroupBy($groupBy, $value, $startDate = null, $stopDate = null, $dateColumn = 'created')
  * @method static CModel_Chartable_TimeCollection  avgByHours($value, $startDate = null, $stopDate = null, $dateColumn = 'created')
  * @method static CModel_Chartable_TimeCollection  avgByDays($value, $startDate = null, $stopDate = null, $dateColumn = 'created')
  * @method static CModel_Chartable_TimeCollection  avgByWeeks($value, $startDate = null, $stopDate = null, $dateColumn = 'created')
  * @method static CModel_Chartable_TimeCollection  avgByMonths($value, $startDate = null, $stopDate = null, $dateColumn = 'created')
  * @method static CModel_Chartable_TimeCollection  avgByYears($value, $startDate = null, $stopDate = null, $dateColumn = 'created')
+ * @method static CModel_Chartable_TimeCollection  avgGroupBy($groupBy, $value, $startDate = null, $stopDate = null, $dateColumn = 'created')
+ * @method static CModel_Chartable_TimeCollection  aggregateGroupBy($method, $groupBy, $value, $startDate = null, $stopDate = null, $dateColumn = 'created')
  */
 trait CModel_Chartable_ChartableTrait {
     /**
@@ -364,6 +369,21 @@ trait CModel_Chartable_ChartableTrait {
     }
 
     /**
+     * Get total models grouped by `created` years.
+     *
+     * @param CModel_Query                  $builder
+     * @param string                        $groupBy
+     * @param null|string|DateTimeInterface $startDate
+     * @param null|string|DateTimeInterface $stopDate
+     * @param string                        $dateColumn
+     *
+     * @return CModel_Chartable_TimeCollection
+     */
+    public function scopeCountGroupBy(CModel_Query $builder, $groupBy, $startDate = null, $stopDate = null, $dateColumn = 'created') {
+        return $this->scopeAggregateGroupBy($builder, 'count', $groupBy, 'count(*)', $startDate, $stopDate, $dateColumn);
+    }
+
+    /**
      * Get values models grouped by `created` hours.
      *
      * @param CModel_Query                  $builder
@@ -436,6 +456,22 @@ trait CModel_Chartable_ChartableTrait {
      */
     public function scopeValuesByYears(CModel_Query $builder, $value, $startDate = null, $stopDate = null, $dateColumn = 'created') {
         return $this->groupByYears($builder, $value, $startDate, $stopDate, $dateColumn);
+    }
+
+    /**
+     * Get values models grouped by `created` years.
+     *
+     * @param CModel_Query                  $builder
+     * @param string                        $groupBy
+     * @param string                        $value
+     * @param null|string|DateTimeInterface $startDate
+     * @param null|string|DateTimeInterface $stopDate
+     * @param string                        $dateColumn
+     *
+     * @return CModel_Chartable_TimeCollection
+     */
+    public function scopeValuesGroupBy(CModel_Query $builder, $groupBy, $value, $startDate = null, $stopDate = null, $dateColumn = 'created') {
+        return $this->scopeAggregateGroupBy($builder, 'values', $groupBy, $value, $startDate, $stopDate, $dateColumn);
     }
 
     /**
@@ -514,6 +550,22 @@ trait CModel_Chartable_ChartableTrait {
     }
 
     /**
+     * Get sum values models grouped by `created` years.
+     *
+     * @param CModel_Query                  $builder
+     * @param string                        $groupBy
+     * @param string                        $value
+     * @param null|string|DateTimeInterface $startDate
+     * @param null|string|DateTimeInterface $stopDate
+     * @param string                        $dateColumn
+     *
+     * @return CModel_Chartable_TimeCollection
+     */
+    public function scopeSumGroupBy(CModel_Query $builder, $groupBy, $value, $startDate = null, $stopDate = null, $dateColumn = 'created') {
+        return $this->scopeAggregateGroupBy($builder, $groupBy, $value, $startDate, $stopDate, $dateColumn);
+    }
+
+    /**
      * Get sum values models grouped by `created` hours.
      *
      * @param CModel_Query                  $builder
@@ -586,5 +638,58 @@ trait CModel_Chartable_ChartableTrait {
      */
     public function scopeAvgByYears(CModel_Query $builder, $value, $startDate = null, $stopDate = null, $dateColumn = 'created') {
         return $this->groupByYears($builder, "AVG(${value})", $startDate, $stopDate, $dateColumn);
+    }
+
+    /**
+     * Get sum values models grouped by `created` years.
+     *
+     * @param CModel_Query                  $builder
+     * @param string                        $groupBy
+     * @param string                        $value
+     * @param null|string|DateTimeInterface $startDate
+     * @param null|string|DateTimeInterface $stopDate
+     * @param string                        $dateColumn
+     *
+     * @return CModel_Chartable_TimeCollection
+     */
+    public function scopeAvgGroupBy(CModel_Query $builder, $groupBy, $value, $startDate = null, $stopDate = null, $dateColumn = 'created') {
+        return $this->scopeAggregateGroupBy($builder, 'avg', $groupBy, $value, $startDate, $stopDate, $dateColumn);
+    }
+
+    /**
+     * Get sum values models grouped by `created` years.
+     *
+     * @param CModel_Query                  $builder
+     * @param string                        $groupBy
+     * @param string                        $value
+     * @param null|string|DateTimeInterface $startDate
+     * @param null|string|DateTimeInterface $stopDate
+     * @param string                        $dateColumn
+     * @param mixed                         $method
+     *
+     * @return CModel_Chartable_TimeCollection
+     */
+    public function scopeAggregateGroupBy(CModel_Query $builder, $method, $groupBy, $value, $startDate = null, $stopDate = null, $dateColumn = 'created') {
+        $val = $value;
+        if ($method == 'sum') {
+            $val = "SUM(${value})";
+        }
+        if ($method == 'avg') {
+            $val = "AVG(${value})";
+        }
+        if ($groupBy == 'month') {
+            return $this->groupByMonths($builder, $val, $startDate, $stopDate, $dateColumn);
+        }
+        if ($groupBy == 'week') {
+            return $this->groupByWeeks($builder, $val, $startDate, $stopDate, $dateColumn);
+        }
+        if ($groupBy == 'day') {
+            return $this->groupByDays($builder, $val, $startDate, $stopDate, $dateColumn);
+        }
+        if ($groupBy == 'hour') {
+            return $this->groupByHours($builder, $val, $startDate, $stopDate, $dateColumn);
+        }
+
+        return $this->groupByYears($builder, $val, $startDate, $stopDate, $dateColumn);
     }
 }
