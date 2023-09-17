@@ -55,14 +55,14 @@ class CPeriod implements IteratorAggregate {
     protected $includedEnd;
 
     public function __construct($startDate, $endDate, CPeriod_Precision $precision = null, CPeriod_Boundaries $boundaries = null) {
-        if ($startDate > $endDate) {
-            throw CPeriod_Exception_InvalidPeriodException::startDateCannotBeAfterEndDate($startDate, $endDate);
-        }
         if ($startDate instanceof DateTime) {
             $startDate = new CCarbon($startDate->format('Y-m-d H:i:s.u'), $startDate->getTimezone());
         }
         if ($endDate instanceof DateTime) {
             $endDate = new CCarbon($endDate->format('Y-m-d H:i:s.u'), $endDate->getTimezone());
+        }
+        if ($startDate > $endDate) {
+            throw CPeriod_Exception_InvalidPeriodException::startDateCannotBeAfterEndDate($startDate, $endDate);
         }
         if ($precision == null) {
             $precision = CPeriod_Precision::DAY();
@@ -81,6 +81,12 @@ class CPeriod implements IteratorAggregate {
         $this->duration = new CPeriod_Duration($this);
     }
 
+    /**
+     * @param string|DateTime $startDate
+     * @param string|DateTime $endDate
+     *
+     * @return void
+     */
     public static function create($startDate, $endDate) {
         return new static($startDate, $endDate);
     }
@@ -100,7 +106,7 @@ class CPeriod implements IteratorAggregate {
     }
 
     public static function days($numberOfDays) {
-        $endDate = CCarbon::today();
+        $endDate = CCarbon::today()->endOfDay();
         $startDate = CCarbon::today()->subDays($numberOfDays)->startOfDay();
 
         return new static($startDate, $endDate);
@@ -121,14 +127,14 @@ class CPeriod implements IteratorAggregate {
     }
 
     public static function months($numberOfMonths) {
-        $endDate = CCarbon::today();
+        $endDate = CCarbon::today()->endOfDay();
         $startDate = CCarbon::today()->subMonths($numberOfMonths)->startOfDay();
 
         return new static($startDate, $endDate);
     }
 
     public static function years($numberOfYears) {
-        $endDate = CCarbon::today();
+        $endDate = CCarbon::today()->endOfDay();
         $startDate = CCarbon::today()->subYears($numberOfYears)->startOfDay();
 
         return new static($startDate, $endDate);
@@ -142,117 +148,59 @@ class CPeriod implements IteratorAggregate {
     }
 
     public static function thisWeek() {
-        $startDate = CCarbon::now()->modify('this week');
-        $endDate = CCarbon::now()->modify('this week +6 days');
-
-        $startDate->hour = 0;
-        $startDate->minute = 0;
-        $startDate->second = 0;
-
-        $endDate->hour = 23;
-        $endDate->minute = 59;
-        $endDate->second = 59;
+        $startDate = CCarbon::now()->modify('this week')->startOfDay();
+        $endDate = CCarbon::now()->modify('this week +6 days')->endOfDay();
 
         return new static($startDate, $endDate);
     }
 
     public static function lastWeek() {
-        $startDate = CCarbon::now()->modify('last week');
-        $endDate = CCarbon::now()->modify('last week +6 days');
-
-        $startDate->hour = 0;
-        $startDate->minute = 0;
-        $startDate->second = 0;
-
-        $endDate->hour = 23;
-        $endDate->minute = 59;
-        $endDate->second = 59;
+        $startDate = CCarbon::now()->modify('last week')->startOfDay();
+        $endDate = CCarbon::now()->modify('last week +6 days')->endOfDay();
 
         return new static($startDate, $endDate);
     }
 
     public static function last7Days() {
-        return self::lastNDays(7);
+        return self::days(6);
     }
 
     public static function last14Days() {
-        return self::lastNDays(14);
+        return self::days(13);
     }
 
     public static function last30Days() {
-        return self::lastNDays(30);
-    }
-
-    public static function lastNDays($n) {
-        $startDate = CCarbon::now()->modify('-' . ($n - 1) . ' days');
-        $endDate = CCarbon::now();
-
-        $startDate->hour = 0;
-        $startDate->minute = 0;
-        $startDate->second = 0;
-
-        $endDate->hour = 23;
-        $endDate->minute = 59;
-        $endDate->second = 59;
-
-        return new static($startDate, $endDate);
+        return self::days(29);
     }
 
     public static function thisMonth() {
-        $startDate = CCarbon::now()->modify('first day of this month');
-        $endDate = CCarbon::now()->modify('last day of this month');
-
-        $startDate->hour = 0;
-        $startDate->minute = 0;
-        $startDate->second = 0;
-
-        $endDate->hour = 23;
-        $endDate->minute = 59;
-        $endDate->second = 59;
+        $startDate = CCarbon::now()->modify('first day of this month')->startOfDay();
+        $endDate = CCarbon::now()->modify('last day of this month')->endOfDay();
 
         return new static($startDate, $endDate);
     }
 
     public static function lastMonth() {
-        $startDate = CCarbon::now()->modify('first day of last month');
-        $endDate = CCarbon::now()->modify('last day of last month');
-
-        $startDate->hour = 0;
-        $startDate->minute = 0;
-        $startDate->second = 0;
-
-        $endDate->hour = 23;
-        $endDate->minute = 59;
-        $endDate->second = 59;
+        $startDate = CCarbon::now()->modify('first day of last month')->startOfDay();
+        $endDate = CCarbon::now()->modify('last day of last month')->endOfDay();
 
         return new static($startDate, $endDate);
     }
 
+    public static function last3Month() {
+        return static::months(3);
+    }
+
     public static function thisYear() {
-        $startDate = CCarbon::now()->startOfYear();
-        $endDate = CCarbon::now()->endOfYear();
-
-        $startDate->hour = 0;
-        $startDate->minute = 0;
-        $startDate->second = 0;
-
-        $endDate->hour = 23;
-        $endDate->minute = 59;
-        $endDate->second = 59;
+        $startDate = CCarbon::now()->startOfYear()->startOfDay();
+        $endDate = CCarbon::now()->endOfYear()->endOfDay();
 
         return new static($startDate, $endDate);
     }
 
     public static function untilDateNow() {
-        $startDate = CCarbon::createFromTimestamp(0);
-        $endDate = CCarbon::now();
-        $startDate->hour = 0;
-        $startDate->minute = 0;
-        $startDate->second = 0;
-
-        $endDate->hour = 23;
-        $endDate->minute = 59;
-        $endDate->second = 59;
+        $startDate = CCarbon::createFromTimestamp(0)->startOfDay();
+        $endDate = CCarbon::now()->endOfDay();
 
         return new static($startDate, $endDate);
     }
