@@ -562,7 +562,7 @@ trait CModel_Chartable_ChartableTrait {
      * @return CModel_Chartable_TimeCollection
      */
     public function scopeSumGroupBy(CModel_Query $builder, $groupBy, $value, $startDate = null, $stopDate = null, $dateColumn = 'created') {
-        return $this->scopeAggregateGroupBy($builder, $groupBy, $value, $startDate, $stopDate, $dateColumn);
+        return $this->scopeAggregateGroupBy($builder, 'sum', $groupBy, $value, $startDate, $stopDate, $dateColumn);
     }
 
     /**
