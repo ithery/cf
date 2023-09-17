@@ -4,12 +4,12 @@ class CVendor_BCA_Service_BusinessBankingService extends CVendor_BCA_ServiceAbst
     /**
      * BalanceInformation.
      *
-     * @param string $AccountNumber
+     * @param string $accountNumber
      *
      * @return array
      */
-    public function balanceInformation(string $AccountNumber) {
-        $requestUrl = "/banking/v3/corporates/{$this->api->getCorporateId()}/accounts/{$AccountNumber}";
+    public function balanceInformation(string $accountNumber) {
+        $requestUrl = "/banking/v3/corporates/{$this->api->getCorporateId()}/accounts/{$accountNumber}";
 
         return $this->sendRequest('GET', $requestUrl);
     }
@@ -17,14 +17,14 @@ class CVendor_BCA_Service_BusinessBankingService extends CVendor_BCA_ServiceAbst
     /**
      * AccountStatement.
      *
-     * @param string $AccountNumber
+     * @param string $accountNumber
      * @param string $startDate
      * @param string $endDate
      *
      * @return array
      */
-    public function accountStatement(string $AccountNumber, string $startDate, string $endDate) {
-        $requestUrl = "/banking/v3/corporates/{$this->api->getCorporateId()}/accounts/{$AccountNumber}/statements?StartDate={$startDate}&EndDate={$endDate}";
+    public function accountStatement(string $accountNumber, string $startDate, string $endDate) {
+        $requestUrl = "/banking/v3/corporates/{$this->api->getCorporateId()}/accounts/{$accountNumber}/statements?StartDate={$startDate}&EndDate={$endDate}";
 
         return $this->sendRequest('GET', $requestUrl);
     }
