@@ -421,7 +421,7 @@ export default class Cresenity {
             settings.headerText = settings.title;
         }
 
-        let modalContainer = jQuery('<div>').addClass('modal');
+        let modalContainer = jQuery('<div>').addClass('modal cres-modal').attr('role', 'dialog');
 
         if (settings.modalClass) {
             modalContainer.addClass(settings.modalClass);
@@ -434,7 +434,7 @@ export default class Cresenity {
         if (settings.isFull) {
             modalContainer.addClass('sidebar full');
         }
-        let modalDialog = jQuery('<div>').addClass('modal-dialog modal-xl');
+        let modalDialog = jQuery('<div>').addClass('modal-dialog modal-xl').attr('role', 'document');
         let modalContent = jQuery('<div>').addClass('modal-content');
 
         let modalHeader = jQuery('<div>').addClass('modal-header');
@@ -451,6 +451,9 @@ export default class Cresenity {
             modalTitle.html(settings.headerText);
             modalHeader.append(modalTitle).append(modalButtonClose);
             modalContent.append(modalHeader);
+            if(typeof modalTitle == 'string') {
+                modalContainer.attr('aria-labelledby', modalTitle);
+            }
         }
         modalDialog.append(modalContent);
         if (settings.haveFooter) {
