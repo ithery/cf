@@ -44,7 +44,7 @@ trait CTrait_Element_Property_DependsOn {
             $optionsJson .= "method:'" . 'post' . "',";
             $optionsJson .= !$dependOn->getBlock() ? 'block: false,' : '';
 
-            $optionsJson .= "dataAddition: { value: $('" . $dependsOnSelector . "').val() },";
+            $optionsJson .= "dataAddition: { value: $('" . $dependsOnSelector . "').is(':checkbox') ? $('" . $dependsOnSelector . ":checked').val() : $('" . $dependsOnSelector . "').val() },";
             $optionsJson .= "onSuccess: (data) => {
                 let jQueryTarget = $('" . $targetSelector . "');
                 jQueryTarget.empty();
