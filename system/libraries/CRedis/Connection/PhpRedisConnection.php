@@ -31,8 +31,8 @@ class CRedis_Connection_PhpRedisConnection extends CRedis_AbstractConnection {
      */
     public function __construct($client, $connector = null, array $config = []) {
         $this->client = $client;
-        $this->connector = $connector;
         $this->config = $config;
+        $this->connector = $connector;
     }
 
     /**

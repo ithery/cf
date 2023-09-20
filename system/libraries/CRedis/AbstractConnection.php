@@ -102,11 +102,7 @@ abstract class CRedis_AbstractConnection implements CRedis_ConnectionInterface {
      */
     public function command($method, array $parameters = []) {
         $start = microtime(true);
-        if ($method == 'eval') {
-            if (count($parameters) == 6) {
-                CDaemon::log(cdbg::getTraceString());
-            }
-        }
+
         $result = $this->client->{$method}(...$parameters);
 
         $time = round((microtime(true) - $start) * 1000, 2);
