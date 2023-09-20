@@ -46,7 +46,7 @@ class CApp_Navigation_Engine_Bootstrap extends CApp_Navigation_Engine {
                     continue;
                 }
                 if (isset($d['controller']) && $d['controller'] != '') {
-                    if (!$is_admin && ccfg::get('have_user_access')) {
+                    if (!$is_admin && CF::config('app.have_user_access')) {
                         if (!Helper::haveAccess($d)) {
                             continue;
                         }
