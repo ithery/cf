@@ -4,6 +4,7 @@ defined('SYSPATH') or die('No direct access allowed.');
 
 final class CManager {
     use CTrait_Compat_Manager;
+
     protected $controls = [];
 
     protected $controlsCode = [];
@@ -454,5 +455,19 @@ final class CManager {
      */
     public static function factory() {
         return new CBase_ForwarderStaticClass(CManager_Factory::class);
+    }
+
+    /**
+     * @return CManager_FileProvider_FileProvider
+     */
+    public static function createFileProvider() {
+        return new CManager_FileProvider_FileProvider();
+    }
+
+    /**
+     * @return CManager_FileProvider_ImageFileProvider
+     */
+    public static function createImageFileProvider() {
+        return new CManager_FileProvider_ImageFileProvider();
     }
 }

@@ -98,7 +98,7 @@ export default class CSocket {
 
     /**
      * Register 3rd party request interceptiors. These are used to automatically
-     * send a connections socket id to a Laravel app with a X-Socket-Id header.
+     * send a connections socket id to a CF app with a X-Socket-Id header.
      */
     registerInterceptors() {
         if (typeof Vue === 'function' && Vue.http) {

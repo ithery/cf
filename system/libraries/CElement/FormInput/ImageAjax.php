@@ -23,6 +23,8 @@ class CElement_FormInput_ImageAjax extends CElement_FormInput_Image {
 
     protected $withInfo;
 
+    protected $fileProvider;
+
     public function __construct($id) {
         parent::__construct($id);
         $this->type = 'image';
@@ -47,6 +49,7 @@ class CElement_FormInput_ImageAjax extends CElement_FormInput_Image {
                 ->setData('allowedExtension', $this->allowedExtension)
                 ->setData('withInfo', $this->withInfo)
                 ->setData('validationCallback', $this->validationCallback)
+                ->setData('fileProvider', $this->fileProvider)
                 ->makeUrl();
 
             $view->with('id', $this->id);
@@ -149,6 +152,17 @@ class CElement_FormInput_ImageAjax extends CElement_FormInput_Image {
         }
 
         return $this->cropper;
+    }
+
+    /**
+     * @return CManager_FileProvider_ImageFileProvider
+     */
+    public function withFileProvider() {
+        if ($this->fileProvider == null) {
+            $this->fileProvider = c::manager()->createImageFileProvider();
+        }
+
+        return $this->fileProvider;
     }
 
     public function setTempStorage($tempStorage) {
