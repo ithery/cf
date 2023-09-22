@@ -22,6 +22,9 @@ window.Cresenity = Cresenity;
 if (!window.cresenity) {
     window.cresenity = new Cresenity();
 }
+if (!window.cres) {
+    window.cres = window.cresenity;
+}
 window.document.addEventListener('DOMContentLoaded', function () {
     window.cresenity.init();
 });

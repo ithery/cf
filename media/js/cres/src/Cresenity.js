@@ -44,6 +44,7 @@ import { cresQuery } from './module/CresQuery';
 import { isJson } from './util/helper';
 import * as dateFns from 'date-fns';
 import CresenityHistory from './history';
+import clsx from './module/clsx';
 
 export default class Cresenity {
     constructor() {
@@ -99,6 +100,7 @@ export default class Cresenity {
         this.version = '1.4.1';
         this.checkAuthenticationInterval = null;
         this.dateFns = dateFns;
+        this.clsx = clsx;
     }
     loadJs(filename, callback) {
         let fileref = document.createElement('script');

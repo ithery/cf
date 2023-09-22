@@ -53,6 +53,11 @@ return [
         'subnav' => include dirname(__FILE__) . '/demo/module.php',
     ],
     [
+        'name' => 'utils',
+        'label' => c::__('Utils'),
+        'subnav' => include dirname(__FILE__) . '/demo/utils.php',
+    ],
+    [
         'name' => 'system',
         'label' => c::__('System'),
         'subnav' => include dirname(__FILE__) . '/demo/system.php',
