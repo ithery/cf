@@ -90,6 +90,16 @@ trait CObservable_Listener_Trait_HandlerTrait {
     }
 
     /**
+     * @return \CObservable_Listener_Handler_CloseAllDialogHandler
+     */
+    public function addCloseAllDialogHandler() {
+        $handler = new CObservable_Listener_Handler_CloseAllDialogHandler($this);
+        $this->handlers[] = $handler;
+
+        return $handler;
+    }
+
+    /**
      * @return \CObservable_Listener_Handler_AjaxSubmitHandler
      */
     public function addAjaxSubmitHandler() {

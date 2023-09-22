@@ -536,6 +536,14 @@ export default class Cresenity {
             lastModal.modal('hide');
         }
     }
+    closeAllDialog() {
+        if (this.modalElements.length > 0) {
+            for(let i = this.modalElements.length-1; i>=0; i--) {
+                const modal = this.modalElements[i];
+                modal.modal('hide');
+            }
+        }
+    }
     closeDialog() {
         this.closeLastModal();
     }
