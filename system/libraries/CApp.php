@@ -615,6 +615,11 @@ class CApp implements CInterface_Responsable, CInterface_Renderable, CInterface_
         return CHTTP::createResponse($this->render());
     }
 
+    /**
+     * @deprecated 1.6, dont use this anymore
+     *
+     * @return bool
+     */
     public static function isAdministrator() {
         return carr::first(explode('/', trim(curl::current(), '/'))) == 'administrator';
     }

@@ -90,4 +90,37 @@ class CBase_HtmlBuilder {
 
         return $safe;
     }
+
+    /**
+     * Convert an HTML string to entities.
+     *
+     * @param string $value
+     *
+     * @return string
+     */
+    public static function entities($value) {
+        return htmlentities($value, ENT_QUOTES, 'UTF-8', false);
+    }
+
+    /**
+     * Convert entities to HTML characters.
+     *
+     * @param string $value
+     *
+     * @return string
+     */
+    public static function decode($value) {
+        return html_entity_decode($value, ENT_QUOTES, 'UTF-8');
+    }
+
+    /**
+     * Transform the string to an Html serializable object.
+     *
+     * @param $html
+     *
+     * @return \CBase_HtmlString
+     */
+    public function toHtmlString($html) {
+        return new CBase_HtmlString($html);
+    }
 }

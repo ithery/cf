@@ -7,7 +7,7 @@ use CApp_Navigation_Helper as Helper;
 class CApp_Navigation_Engine_SideNav extends CApp_Navigation_Engine {
     public function render($navs = null, $level = 0, &$child = 0) {
         $domain = CF::domain();
-        $is_admin = CApp::isAdministrator();
+
         if ($navs == null && $level == 0) {
             $navs = $this->navs;
         }
@@ -29,7 +29,10 @@ class CApp_Navigation_Engine_SideNav extends CApp_Navigation_Engine {
             $translate = carr::get($d, 'translate', true);
             $icon = carr::get($d, 'icon');
             $class = carr::get($d, 'class');
-
+            $badge = carr::get($d, 'badge');
+            if ($badge!=null) {
+                $badge = c::value($badge);
+            }
             $childHtml = '';
 
             if (isset($d['subnav']) && is_array($d['subnav'])) {
@@ -49,7 +52,7 @@ class CApp_Navigation_Engine_SideNav extends CApp_Navigation_Engine {
                     continue;
                 }
                 if (isset($d['controller']) && $d['controller'] != '') {
-                    if (!$is_admin && CF::config('app.have_user_access')) {
+                    if (CF::config('app.have_user_access')) {
                         if (!Helper::haveAccess($d)) {
                             continue;
                         }
@@ -99,8 +102,11 @@ class CApp_Navigation_Engine_SideNav extends CApp_Navigation_Engine {
                     if ($level == 0) {
                         $caret = '<b class="caret">';
                     }
-
-                    $elem = '<a class="' . $activeClass . ' sidenav-link sidenav-toggle" href="javascript:;" >' . $icon_html . '<span>' . ($translate ? c::__($label) : $label) . '</span>' . $caret . '</b>';
+                    $strBadge = '';
+                    if ($badge != null) {
+                        $strBadge = ' <span class="badge badge-info capp-nav-badge cres-nav-badge">' . $badge . '</span>';
+                    }
+                    $elem = '<a class="' . $activeClass . ' sidenav-link sidenav-toggle" href="javascript:;" >' . $icon_html . '<span>' . ($translate ? c::__($label) : $label) . '</span>' . $strBadge . $caret . '</b>';
                     if ($child > 0) {
                         //$elem .= '<span class="label">'.$child.'</span>';
                     }
@@ -124,7 +130,11 @@ class CApp_Navigation_Engine_SideNav extends CApp_Navigation_Engine {
                     if ($notif != null && $notif > 0) {
                         $strNotif = ' <span class="label label-info nav-notif nav-notif-count">' . $notif . '</span>';
                     }
-                    $elem = '<a class="' . $activeClass . ' sidenav-link" href="' . $url . '"' . $target . '>' . $icon_html . '<span>' . ($translate ? c::__($label) : $label) . '</span>' . $strNotif . "</a>\r\n";
+                    $strBadge = '';
+                    if ($badge != null) {
+                        $strBadge = ' <span class="badge badge-info capp-nav-badge cres-nav-badge">' . $badge . '</span>';
+                    }
+                    $elem = '<a class="' . $activeClass . ' sidenav-link" href="' . $url . '"' . $target . '>' . $icon_html . '<span>' . ($translate ? c::__($label) : $label) . '</span>' . $strNotif . $strBadge . "</a>\r\n";
                 }
                 $html .= $elem;
                 $html .= $childHtml;

@@ -56,6 +56,7 @@ return [
         'name' => 'utils',
         'label' => c::__('Utils'),
         'subnav' => include dirname(__FILE__) . '/demo/utils.php',
+        'badge' => 'new',
     ],
     [
         'name' => 'system',

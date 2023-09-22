@@ -266,6 +266,20 @@ class CRouting_UrlGenerator {
 
     /**
      * Generate the URL to an asset from a custom root domain such as CDN, etc.
+     * Alias of assetFrom.
+     *
+     * @param string    $root
+     * @param string    $path
+     * @param null|bool $secure
+     *
+     * @return string
+     */
+    public function mediaFrom($root, $path, $secure = null) {
+        return $this->assetFrom($root, $path, $secure);
+    }
+
+    /**
+     * Generate the URL to an asset from a custom root domain such as CDN, etc.
      *
      * @param string    $root
      * @param string    $path

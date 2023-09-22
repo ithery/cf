@@ -1862,6 +1862,7 @@ class c {
 
     public static function clsx() {
         $args = func_get_args();
+
         return CBase_CClsx::clsx(...$args);
     }
 }

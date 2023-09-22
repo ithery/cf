@@ -7,7 +7,6 @@ class Controller_Demo_Utils_Html extends \Cresenity\Demo\Controller {
 
     public function index() {
         $app = c::app();
-
         // c::manager()->registerJs([
         //     'script' => 'https://cdn.tailwindcss.com',
         //     'attributes' => [
