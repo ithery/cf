@@ -3,11 +3,14 @@
 class CManager_Asset_File_CssFile extends CManager_Asset_FileAbstract {
     protected $media;
 
+    protected $attributes;
+
     public function __construct(array $options) {
         parent::__construct($options);
         $this->type = 'css';
 
         $this->media = carr::get($options, 'media');
+        $this->attributes = carr::get($options, 'attributes', []);
     }
 
     public function getUrl($withHttp = false) {
@@ -59,10 +62,16 @@ class CManager_Asset_File_CssFile extends CManager_Asset_FileAbstract {
     }
 
     public function render($withHttp = false) {
-        $attrMedia = $this->media ? ' media="' . $this->media . '"' : '';
         $url = $this->getUrl($withHttp);
 
-        $script = '<link href="' . $url . '"' . $attrMedia . ' rel="stylesheet" />';
+        $attributes = $this->attributes;
+        if ($this->media) {
+            $attributes['media'] = $this->media;
+        }
+        if (!isset($attributes['rel'])) {
+            $attributes['rel'] = 'stylesheet';
+        }
+        $script = '<link href="' . $url . '"' . CBase_HtmlBuilder::attributes($attributes) . ' />';
 
         return $script;
     }

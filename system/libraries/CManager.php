@@ -327,8 +327,8 @@ final class CManager {
     }
 
     /**
-     * @param string $file
-     * @param string $pos
+     * @param string|array $file
+     * @param string       $pos
      *
      * @return CManager_Asset_Container
      */

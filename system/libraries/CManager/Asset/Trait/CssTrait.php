@@ -42,7 +42,6 @@ trait CManager_Asset_Trait_CssTrait {
      * @return CManager_Asset_Container
      */
     public function registerCssFile($file, $pos = CManager_Asset::POS_HEAD) {
-        $originalFile = $file;
         $fileOptions = $file;
         if (!is_array($fileOptions)) {
             $fileOptions = [

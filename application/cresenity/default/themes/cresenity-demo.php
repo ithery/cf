@@ -33,11 +33,11 @@ return [
     ],
     'css' => [
         'cresenity.css',
-        'cresenity/cresenity.bs4.css?v=' . uniqid(),
+        'cresenity/cresenity.bs4.css',
         'uikit.css',
         'spinkit.css',
         'cresenity/cresenity.main.bs4.css',
-        'administrator/theme-material/theme-material.css?v=' . uniqid(),
+        'administrator/theme-material/theme-material.css',
         'cresenity-demo.css',
     ],
     'scss' => [

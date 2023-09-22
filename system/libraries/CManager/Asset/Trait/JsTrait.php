@@ -50,13 +50,14 @@ trait CManager_Asset_Trait_JsTrait {
     }
 
     /**
-     * @param string $file
-     * @param string $pos
+     * @param array|string $file
+     * @param string       $pos
      *
      * @return CManager_Asset_Container
      */
     public function registerJsFile($file, $pos = CManager_Asset::POS_END) {
         $fileOptions = $file;
+
         if (!is_array($fileOptions)) {
             $fileOptions = [
                 'script' => $file,

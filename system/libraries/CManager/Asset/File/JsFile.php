@@ -3,16 +3,21 @@
 class CManager_Asset_File_JsFile extends CManager_Asset_FileAbstract {
     protected $load;
 
+    protected $attributes;
+
     public function __construct(array $options) {
         parent::__construct($options);
+
         $this->type = 'js';
         $this->load = carr::get($options, 'load');
+        $this->attributes = carr::get($options, 'attributes', []);
     }
 
     public function getUrl($withHttp = false) {
         if ($this->isRemote) {
             return $this->script;
         }
+
         $file = $this->getPath();
         $path = $file;
         $path = carr::first(explode('?', $file));
@@ -59,10 +64,14 @@ class CManager_Asset_File_JsFile extends CManager_Asset_FileAbstract {
     }
 
     public function render($withHttp = false) {
-        $attrDefer = $this->load == 'defer' ? ' defer' : '';
         $url = $this->getUrl($withHttp);
 
-        $script = '<script src="' . $url . '"' . $attrDefer . '></script>';
+        $attributes = $this->attributes;
+        if ($this->load == 'defer') {
+            $attributes['defer'] = 'defer';
+        }
+
+        $script = '<script src="' . $url . '"' . CBase_HtmlBuilder::attributes($attributes) . '></script>';
 
         return $script;
     }

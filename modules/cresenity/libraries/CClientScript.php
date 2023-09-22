@@ -79,6 +79,12 @@ class CClientScript extends CObject {
         return CManager::asset()->runTime()->registerJsFiles($files, $pos);
     }
 
+    /**
+     * @param string|array $file
+     * @param string       $pos
+     *
+     * @return void
+     */
     public function registerJsFile($file, $pos = CManager_Asset::POS_END) {
         return CManager::asset()->runTime()->registerJsFile($file, $pos);
     }

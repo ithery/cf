@@ -8,8 +8,17 @@ class Controller_Demo_Utils_Html extends \Cresenity\Demo\Controller {
     public function index() {
         $app = c::app();
 
+        // c::manager()->registerJs([
+        //     'script' => 'https://cdn.tailwindcss.com',
+        //     'attributes' => [
+        //         'defer' => 'defer'
+        //     ]
+        // ]);
+        // $app->addDiv()->addClass('text-3xl font-bold underline')->add(CBase_HtmlBuilder::obfuscate('Hello World!'));
+
         $app->title('Html');
         $app->addH4()->add('c::clsx()');
+
         $divGroup = $app->addDiv()->addClass('mb-3');
         $divGroup->addDiv()->addClass('text-muted')->add(c::e('// Strings (variadic)'));
         $divGroup->addDiv()->add(c::e("c::clsx('foo', true ? 'bar' : false, 'baz');"));
