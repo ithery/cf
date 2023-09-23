@@ -77,7 +77,7 @@ class CNavigation_Renderer_SidenavRenderer extends CNavigation_RendererAbstract 
                     }
                 }
 
-                $li_class = 'sidenav-item ';
+                $li_class = 'sidenav-item cres-sidenav-item ';
 
                 $addition_style = '';
                 if ($border == 'top') {

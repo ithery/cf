@@ -136,10 +136,10 @@ class CApp implements CInterface_Responsable, CInterface_Renderable, CInterface_
             $user = $this->user();
 
             if ($user != null) {
-                if (!is_array($user) && is_object($user)) {
+                if (!is_array($user) && is_object($user) && $user->user_id) {
                     //update last request
                     $db = c::db();
-                    $db->table('users')->where('user_id', '=', 1)->update(['last_request' => date('Y-m-d H:i:s')]);
+                    $db->table('users')->where('user_id', '=', $user->user_id)->update(['last_request' => date('Y-m-d H:i:s')]);
                 }
             }
         }
