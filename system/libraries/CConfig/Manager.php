@@ -18,4 +18,16 @@ class CConfig_Manager {
     private function __construct() {
         $this->repository = new CConfig_Repository([]);
     }
+
+    public function load($group) {
+        $items = CConfig_Loader::load($group);
+        $this->repository->set($group, $items);
+    }
+
+    /**
+     * @return CConfig_Repository
+     */
+    public function repository() {
+        return $this->repository;
+    }
 }

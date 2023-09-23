@@ -8,7 +8,6 @@ class CConfig_Loader {
         $files = CF::findFile('config', $configName, $required = false, $ext = false, $refresh = true);
 
         //add backward compatibility
-        //TODO: remove folder config in DOCROOT
         if (!is_array($files)) {
             $files = [];
         }
