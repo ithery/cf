@@ -56,8 +56,8 @@ class CApp_Navigation {
     }
 
     /**
-     * @param callable $navigationCallback
-     * @param string   $domain             optional
+     * @param callable $activeCallback
+     * @param string   $domain         optional
      */
     public static function setActiveCallback(callable $activeCallback, $domain = null) {
         if ($domain == null) {

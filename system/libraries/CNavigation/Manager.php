@@ -8,6 +8,8 @@ class CNavigation_Manager {
 
     protected static $instance;
 
+    protected $activeCallback = [];
+
     public static function instance() {
         if (self::$instance == null) {
             self::$instance = new self();
@@ -101,7 +103,7 @@ class CNavigation_Manager {
         }
 
         if ($renderer instanceof Closure || is_callable($renderer)) {
-            $engine = new CApp_Navigation_Engine_Closure();
+            $engine = new CNavigation_Renderer_ClosureRenderer();
             $engine->setClosure($renderer);
             $renderer = $engine;
         }
@@ -111,5 +113,18 @@ class CNavigation_Manager {
         }
 
         return $renderer;
+    }
+
+    /**
+     * @param mixed $activeCallback
+     */
+    public function setActiveCallback($activeCallback) {
+        $this->activeCallback = $activeCallback;
+
+        return $this;
+    }
+
+    public function getActiveCallback() {
+        return $this->activeCallback;
     }
 }
