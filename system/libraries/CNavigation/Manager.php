@@ -77,4 +77,39 @@ class CNavigation_Manager {
 
         return md5($reflection->getFileName() . $reflection->getStartLine() . $reflection->getEndLine());
     }
+
+    /**
+     * Resolve Nav Renderer.
+     *
+     * @param mixed $renderer
+     *
+     * @return CNavigation_RendererInterface
+     */
+    public function resolveRenderer($renderer = null) {
+        if ($renderer == null) {
+            $renderer = CF::config('app.navs.renderer', CNavigation_Renderer_SidenavRenderer::class);
+        }
+        if (is_array($renderer)) {
+            $engine = carr::get($renderer, 'engine', 'Bootstrap');
+            $layout = carr::get($renderer, 'layout', 'horizontal');
+
+            $engineClassName = 'CApp_Navigation_Engine_' . $engine;
+            $renderer = c::container($engineClassName);
+        }
+        if (is_string($renderer) && class_exists($renderer)) {
+            $renderer = c::container($renderer);
+        }
+
+        if ($renderer instanceof Closure || is_callable($renderer)) {
+            $engine = new CApp_Navigation_Engine_Closure();
+            $engine->setClosure($renderer);
+            $renderer = $engine;
+        }
+
+        if (!($renderer instanceof CNavigation_RendererAbstract)) {
+            throw new Exception('Renderer must extends CNavigation_RendererAbstract');
+        }
+
+        return $renderer;
+    }
 }

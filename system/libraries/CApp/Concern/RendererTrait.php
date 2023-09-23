@@ -17,26 +17,23 @@ trait CApp_Concern_RendererTrait {
 
     public function renderNavigation($nav = null, $renderer = null) {
         /** @var CApp $this */
-        // if ($expression != null) {
-        //     $expression = str_replace(['(', ')'], '', $expression);
-        //     $expression = str_replace(['"', '\''], '', $expression);
-        //     $expression = str_replace(',', ' ', $expression);
-        // }
-
         if ($nav == null) {
             $nav = $this->nav;
         }
 
-        /** @var CApp $this */
-        $nav = $this->resolveNav($nav);
-
+        if (!$nav instanceof CNavigation_Nav) {
+            /** @var CApp $this */
+            $nav = $this->resolveNav($nav);
+        }
+        /** @var CNavigation_Nav $nav */
         if ($renderer != null) {
             $this->setNavRenderer($renderer);
         }
 
-        $renderer = $this->resolveNavRenderer();
+        $renderer = $this->getNavRenderer();
+        $renderer = CNavigation::manager()->resolveRenderer($renderer);
 
-        return $renderer->render($nav);
+        return $renderer->render($nav->getData());
     }
 
     public function renderStyles($options = []) {

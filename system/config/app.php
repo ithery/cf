@@ -81,7 +81,10 @@ return [
                 ]
             ]
         ],
-
+        'navs' => [
+            'name' => 'nav',
+            'renderer' => CNavigation_Renderer_SidenavRenderer::class
+        ],
         'middleware' => ['web'],
         'passwords' => 'users',
         'username' => 'username',

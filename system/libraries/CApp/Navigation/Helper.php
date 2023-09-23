@@ -213,7 +213,7 @@ class CApp_Navigation_Helper {
 
     public static function asUserRightsArray($appId, $roleId, $navs = null, $appRoleId = '', $domain = '', $level = 0) {
         if ($navs == null) {
-            $navs = CNavigation::instance()->navs();
+            $navs = CApp_Navigation::instance()->navs();
         }
 
         $result = [];
@@ -414,7 +414,7 @@ class CApp_Navigation_Helper {
     public static function render($navs = null, $level = 0, &$child = 0) {
         $isAdministrator = CApp::instance()->isAdministrator();
         if ($navs == null) {
-            $navs = CNavigation::instance()->navs();
+            $navs = CApp_Navigation::instance()->navs();
         }
 
         if ($navs == null) {

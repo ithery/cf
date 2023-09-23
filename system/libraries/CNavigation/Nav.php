@@ -17,7 +17,11 @@ class CNavigation_Nav implements CInterface_Arrayable {
     public function getData() {
         return $this->data;
     }
+
     public function toArray() {
         return $this->getData();
+    }
+
+    public function render($renderer = null) {
     }
 }
