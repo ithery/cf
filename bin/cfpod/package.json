@@ -1,5 +1,5 @@
 {
-    "name": "cfpod",
+    "name": "@cresenity/cfpod",
     "version": "1.0.0",
     "description": "The power of cf with webpack",
     "main": "src/index.js",
@@ -16,21 +16,21 @@
         }
     },
     "bin": {
-        "mix": "./bin/cli.js",
-        "laravel-mix": "./bin/cli.js"
+        "pod": "./bin/cli.js",
+        "cf-pod": "./bin/cli.js"
     },
-    "repository": "JeffreyWay/laravel-mix",
+    "repository": "cresenity/cresenity-pod",
     "bugs": {
-        "url": "https://github.com/JeffreyWay/laravel-mix/issues"
+        "url": "https://github.com/cresenity/cresenity-pod/issues"
     },
-    "homepage": "https://github.com/JeffreyWay/laravel-mix#readme",
+    "homepage": "https://github.com/cresenity/cresenity-pod#readme",
     "keywords": [
-        "laravel",
+        "cresenity",
+        "cf",
         "webpack",
-        "laravel elixir",
-        "laravel mix"
+        "cf pod"
     ],
-    "author": "Jeffrey Way",
+    "author": "Hery Kurniawan",
     "license": "MIT",
     "files": [
         "icons",

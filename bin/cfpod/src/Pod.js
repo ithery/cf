@@ -7,13 +7,24 @@ class Pod {
      * Create a new instance.
      */
     constructor() {
-
+        this.registrar = new ComponentRegistrar(this);
     }
     /**
      * @internal
      */
     static get primary() {
         return Pod._primary || (Pod._primary = new Pod());
+    }
+    get api() {
+        if (!this._api) {
+            this._api = this.registrar.installAll();
+
+            // @ts-ignore
+            this._api.inProduction = () => this.config.production;
+        }
+
+        // @ts-ignore
+        return this._api;
     }
      /**
      * @internal

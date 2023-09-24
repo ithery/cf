@@ -22,14 +22,19 @@ class CConsole_Command_NpmCommand extends CConsole_Command {
         $isFramework = CF::appCode() == null;
         $debug = $this->option('debug');
         $appDir = $isFramework ? DOCROOT : c::appRoot();
+        $podConfig = null;
+        if (CFile::exists($appDir . 'webpack.pod.js')) {
+            $podConfig = $appDir . 'webpack.pod.js';
+        }
 
         $npmArgs = carr::get($this->input->getArguments(), 'npmArgs');
         $commands = array_merge(
-            ['npm'],
-            $npmArgs
+            ['npm', 'run', 'development'],
+            $podConfig ? ['--config=' . $podConfig] : [],
+            //$npmArgs
         );
         //$this->clearEnv();
-        $process = (new Process($commands, $appDir))->setTimeout(null);
+        $process = (new Process($commands, DOCROOT))->setTimeout(null);
 
         try {
             $process->setTty(!$this->option('without-tty'));

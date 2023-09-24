@@ -231,7 +231,7 @@ class CQueue_Queue_DatabaseQueue extends CQueue_AbstractQueue {
      */
     protected function getNextAvailableJob($queue) {
         $job = $this->database->table($this->table)
-            ->lockForUpdate()
+            ->lock($this->getLockForPopping())
             ->where('name', $this->getQueue($queue))
             ->where(function ($query) {
                 $this->isAvailable($query);
@@ -381,5 +381,36 @@ class CQueue_Queue_DatabaseQueue extends CQueue_AbstractQueue {
 
     public function primaryKey() {
         return CQueue::primaryKey($this->database, $this->table);
+    }
+
+    /**
+     * Get the lock required for popping the next job.
+     *
+     * @return string|bool
+     */
+    protected function getLockForPopping() {
+        $databaseEngine = $this->database->getPdo()->getAttribute(PDO::ATTR_DRIVER_NAME);
+        $databaseVersion = $this->database->getConfig('version') ?? $this->database->getPdo()->getAttribute(PDO::ATTR_SERVER_VERSION);
+
+        if (cstr::of($databaseVersion)->contains('MariaDB')) {
+            $databaseEngine = 'mariadb';
+            $databaseVersion = cstr::before(cstr::after($databaseVersion, '5.5.5-'), '-');
+        } elseif (cstr::of($databaseVersion)->contains(['vitess', 'PlanetScale'])) {
+            $databaseEngine = 'vitess';
+            $databaseVersion = cstr::before($databaseVersion, '-');
+        }
+
+        if (($databaseEngine === 'mysql' && version_compare($databaseVersion, '8.0.1', '>='))
+            || ($databaseEngine === 'mariadb' && version_compare($databaseVersion, '10.6.0', '>='))
+            || ($databaseEngine === 'pgsql' && version_compare($databaseVersion, '9.5', '>='))
+        ) {
+            return 'FOR UPDATE SKIP LOCKED';
+        }
+
+        if ($databaseEngine === 'sqlsrv') {
+            return 'with(rowlock,updlock,readpast)';
+        }
+
+        return true;
     }
 }
