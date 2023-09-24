@@ -53,6 +53,7 @@
     },
     "dependencies": {
         "cleave.js": "^1.6.0",
+        "collect.js": "^4.36.1",
         "date-fns": "^2.28.0",
         "event-source-polyfill": "^1.0.25",
         "locutus": "^2.0.15",
