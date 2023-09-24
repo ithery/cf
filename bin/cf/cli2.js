@@ -4,24 +4,21 @@ const path = require('path');
 const pkg = require('../../package.json');
 
 const argv = process.argv;
+console.log("CF NPM Version:" + pkg.version);
 if(argv.length<=2) {
-    console.log("CF NPM Version:" + pkg.version);
     process.exit();
 }
 
 let appCode = argv[2];
 
 let appPath = path.resolve('./application/'+appCode);
-
 if(argv.length>3) {
     let parameters = argv.slice(3);
-
     let command = [
         'npm',
         ...parameters
     ].join(' ');
-    console.log("Directory:"+appPath);
-    console.log("Command:"+command);
+    console.log("Running " + command + " on " + appPath);
     let appProcess = exec(command, {cwd:appPath});
     appProcess.stdout.on('data', function (data) {
         process.stdout.write(data);

@@ -78,6 +78,7 @@ class CFConsole {
         CConsole_Command_App_AppCodeCommand::class,
         CConsole_Command_TestInstallCommand::class,
         CConsole_Command_TestCommand::class,
+        CConsole_Command_NpmCommand::class,
         CConsole_Command_Phpstan_InstallCommand::class,
         CConsole_Command_PhpstanCommand::class,
         CConsole_Command_Phpstan_ClearCommand::class,
