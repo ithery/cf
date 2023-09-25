@@ -215,7 +215,9 @@ class CApp_Navigation_Helper {
         if ($navs == null) {
             $navs = CApp_Navigation::instance()->navs();
         }
-
+        if ($navs instanceof CNavigation_Nav) {
+            $navs = $navs->getData();
+        }
         $result = [];
 
         foreach ($navs as $d) {

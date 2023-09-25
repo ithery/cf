@@ -4,7 +4,7 @@
     "scripts": {
         "cf": "node ./bin/cf/cli2.js",
         "dev": "npm run development",
-        "development": "cross-env NODE_ENV=development node_modules/webpack/bin/webpack.js --progress",
+        "development": "npm run cf",
         "watch": "npm run cf watch",
         "watch-poll": "npm run cf watch -- --watch-options-poll=1000",
         "hot": "npm run cf watch --hot",
