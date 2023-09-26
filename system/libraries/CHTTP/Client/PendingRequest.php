@@ -1144,4 +1144,8 @@ class CHTTP_Client_PendingRequest {
     public function getOptions() {
         return $this->options;
     }
+
+    public function getBodyFormat() {
+        return $this->bodyFormat;
+    }
 }
