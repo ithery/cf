@@ -30,6 +30,7 @@ class CElement_Component_Gallery extends CElement_Component {
         $this->setAttr('cres-element', 'component:Gallery');
         $config = [
             'thumbnail' => true,
+            'selector' => '#' . $this->id . ' .cres-gallery-item',
         ];
 
         $this->setAttr('cres-config', c::json($config));

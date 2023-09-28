@@ -52,7 +52,7 @@ class CElement_FormInput_MapPicker extends CElement_FormInput {
         $this->haveSearch = true;
         $this->searchPlaceholder = 'Search Location';
 
-        $this->radius = 300;
+        $this->radius = 0;
         $this->draggable = true;
         $this->scrollwheel = true;
         $this->markerDraggable = true;
