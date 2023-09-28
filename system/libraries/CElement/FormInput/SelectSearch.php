@@ -620,12 +620,12 @@ class CElement_FormInput_SelectSearch extends CElement_FormInput {
         }
         $additionalRequestDataJs = '';
         foreach ($this->dependsOn as $index => $dependOn) {
-            $dependsOnSelector = $dependOn->getSelector();
+            $dependsOnSelector = $dependOn->getSelector()->getQuerySelector();
             $variableUniqueKey = 'dependsOn_' . $index;
-
+            $valueScript = $dependOn->getSelector()->getScriptForValue();
             $additionalRequestDataJs .= "
-                result['" . $variableUniqueKey . "']= $('" . $dependsOnSelector . "').val();
-            ";
+                result['" . $variableUniqueKey . "']= " . $valueScript . ';
+            ';
         }
         $str = "
 
@@ -769,7 +769,7 @@ class CElement_FormInput_SelectSearch extends CElement_FormInput {
         $js->append($str)->br();
 
         foreach ($this->dependsOn as $index => $dependOn) {
-            $dependsOnSelector = $dependOn->getSelector();
+            $dependsOnSelector = $dependOn->getSelector()->getQuerySelector();
             $targetSelector = '#' . $this->id();
             $throttle = $dependOn->getThrottle();
             $dependsOnFunctionName = 'dependsOnFunction' . uniqid();

@@ -30,7 +30,7 @@ trait CTrait_Element_Property_DependsOn {
         foreach ($this->dependsOn as $dependOn) {
             //we create ajax method
 
-            $dependsOnSelector = $dependOn->getSelector();
+            $dependsOnSelector = $dependOn->getSelector()->getQuerySelector();
             $targetSelector = '#' . $this->id();
             $ajaxMethod = CAjax::createMethod();
             $ajaxMethod->setType('DependsOn');
@@ -43,8 +43,8 @@ trait CTrait_Element_Property_DependsOn {
             $optionsJson .= "url:'" . $ajaxUrl . "',";
             $optionsJson .= "method:'" . 'post' . "',";
             $optionsJson .= !$dependOn->getBlock() ? 'block: false,' : '';
-
-            $optionsJson .= "dataAddition: { value: $('" . $dependsOnSelector . "').is(':checkbox') ? $('" . $dependsOnSelector . ":checked').val() : $('" . $dependsOnSelector . "').val() },";
+            $valueScript = $dependOn->getSelector()->getScriptForValue();
+            $optionsJson .= 'dataAddition: { value: ' . $valueScript . ' },';
             $optionsJson .= "onSuccess: (data) => {
                 let jQueryTarget = $('" . $targetSelector . "');
                 jQueryTarget.empty();

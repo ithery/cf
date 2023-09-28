@@ -277,7 +277,7 @@ class CElement_FormInput_Select extends CElement_FormInput {
         foreach ($this->dependsOn as $dependOn) {
             //we create ajax method
 
-            $dependsOnSelector = $dependOn->getSelector();
+            $dependsOnSelector = $dependOn->getSelector()->getQuerySelector();
             $targetSelector = '#' . $this->id();
             $ajaxMethod = CAjax::createMethod();
             $ajaxMethod->setType('DependsOn');
@@ -290,8 +290,8 @@ class CElement_FormInput_Select extends CElement_FormInput {
             $optionsJson .= "url:'" . $ajaxUrl . "',";
             $optionsJson .= "method:'" . 'post' . "',";
             $optionsJson .= !$dependOn->getBlock() ? 'block: false,' : '';
-
-            $optionsJson .= "dataAddition: { value: $('" . $dependsOnSelector . "').val() },";
+            $valueScript = $dependOn->getSelector()->getScriptForValue();
+            $optionsJson .= 'dataAddition: { value: ' . $valueScript . ' },';
             $optionsJson .= "onSuccess: (data) => {
                  let jQuerySelect = $('" . $targetSelector . "');
                  jQuerySelect.empty();
