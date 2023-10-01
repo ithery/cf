@@ -38,7 +38,7 @@ class CNavigation_Manager {
 
     public function resolveNav($nav) {
         if ($nav === null) {
-            return [];
+            $nav = 'nav';
         }
         if ($nav instanceof CNavigation_Nav) {
             return $nav;

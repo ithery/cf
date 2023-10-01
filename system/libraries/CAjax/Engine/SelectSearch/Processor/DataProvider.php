@@ -33,6 +33,12 @@ class CAjax_Engine_SelectSearch_Processor_DataProvider extends CAjax_Engine_Sele
 
         $data = $items->map(function ($model) {
             $data = $model;
+            if (is_string($data)) {
+                $str = $data;
+                $data = [
+                    'id' => $str
+                ];
+            }
             if ($model instanceof CModel) {
                 $data = $model->toArray();
                 if ($this->keyField() && $model->{$this->keyField()}) {

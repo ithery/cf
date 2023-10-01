@@ -285,6 +285,17 @@ class CElement_FormInput_SelectSearch extends CElement_FormInput {
         return $this;
     }
 
+    /**
+     * @param Closure $closure
+     *
+     * @return $this
+     */
+    public function setDataFromClosure($closure) {
+        $this->dataProvider = CManager::createClosureDataProvider($closure);
+
+        return $this;
+    }
+
     public function setAllowClear($bool = true) {
         $this->allowClear = $bool;
 

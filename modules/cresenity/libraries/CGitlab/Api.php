@@ -3,7 +3,7 @@
 defined('SYSPATH') or die('No direct access allowed.');
 
 /**
- * Abstract class for Api classes
+ * Abstract class for Api classes.
  *
  * @author Hery Kurniawan
  * @license Ittron Global Teknologi <ittron.co.id>
@@ -12,12 +12,12 @@ defined('SYSPATH') or die('No direct access allowed.');
  */
 abstract class CGitlab_Api implements CGitlab_ApiInterface {
     /**
-     * Default entries per page
+     * Default entries per page.
      */
     const PER_PAGE = 100;
 
     /**
-     * The client
+     * The client.
      *
      * @var CGitlab_Client
      */
@@ -47,6 +47,7 @@ abstract class CGitlab_Api implements CGitlab_ApiInterface {
      */
     protected function get($path, array $parameters = [], $requestHeaders = []) {
         $response = $this->client->get($path, $parameters, $requestHeaders);
+
         return $response;
     }
 
@@ -60,6 +61,7 @@ abstract class CGitlab_Api implements CGitlab_ApiInterface {
      */
     protected function post($path, array $parameters = [], $requestHeaders = [], array $files = []) {
         $response = $this->client->post($path, $parameters, $requestHeaders, $files);
+
         return $response;
     }
 
@@ -72,6 +74,7 @@ abstract class CGitlab_Api implements CGitlab_ApiInterface {
      */
     protected function patch($path, array $parameters = [], $requestHeaders = []) {
         $response = $this->client->patch($path, $parameters, $requestHeaders);
+
         return $response;
     }
 
@@ -84,6 +87,7 @@ abstract class CGitlab_Api implements CGitlab_ApiInterface {
      */
     protected function put($path, array $parameters = [], $requestHeaders = []) {
         $response = $this->client->put($path, $parameters, $requestHeaders);
+
         return $response;
     }
 
@@ -96,6 +100,7 @@ abstract class CGitlab_Api implements CGitlab_ApiInterface {
      */
     protected function delete($path, array $parameters = [], $requestHeaders = []) {
         $response = $this->client->delete($path, $parameters, $requestHeaders);
+
         return $response;
     }
 
@@ -116,6 +121,7 @@ abstract class CGitlab_Api implements CGitlab_ApiInterface {
      */
     protected function encodePath($path) {
         $path = rawurlencode($path);
+
         return str_replace('.', '%2E', $path);
     }
 }

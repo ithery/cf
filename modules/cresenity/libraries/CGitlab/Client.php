@@ -28,14 +28,6 @@ class CGitlab_Client {
     const AUTH_OAUTH_TOKEN = 'oauth_token';
 
     /**
-     * @var array
-     */
-    private $options = [
-        'user_agent' => 'php-gitlab-api',
-        'timeout' => 60
-    ];
-
-    /**
      * @var string
      */
     protected $gitUrl;
@@ -51,6 +43,14 @@ class CGitlab_Client {
 
     protected $sudo;
 
+    /**
+     * @var array
+     */
+    private $options = [
+        'user_agent' => 'php-gitlab-api',
+        'timeout' => 60
+    ];
+
     public function __construct($gitUrl) {
         $this->gitUrl = $gitUrl;
         $this->curl = CCurl::factory($this->gitUrl);
@@ -62,6 +62,7 @@ class CGitlab_Client {
         $this->token = $token;
         $this->authMethod = $authMethod;
         $this->sudo = $sudo;
+
         return $this;
     }
 
@@ -71,51 +72,63 @@ class CGitlab_Client {
         switch ($name) {
             case 'deploy_keys':
                 $className = $version . '_DeployKeys';
+
                 break;
             case 'groups':
                 $className = $version . '_Groups';
+
                 break;
             case 'issues':
                 $className = $version . '_Issues';
+
                 break;
             case 'mr':
             case 'merge_requests':
                 $className = $version . '_MergeRequests';
+
                 break;
             case 'milestones':
             case 'ms':
                 $className = $version . '_Milestones';
+
                 break;
             case 'namespaces':
             case 'ns':
                 $className = $version . '_ProjectNamespaces';
+
                 break;
             case 'projects':
                 $className = $version . '_Projects';
+
                 break;
             case 'repo':
             case 'repositories':
                 $className = $version . '_Repositories';
+
                 break;
             case 'snippets':
                 $className = $version . '_Snippets';
+
                 break;
             case 'hooks':
             case 'system_hooks':
                 $className = $version . '_SystemHooks';
+
                 break;
             case 'users':
                 $className = $version . '_Users';
+
                 break;
             default:
                 throw new InvalidArgumentException('Invalid endpoint: "' . $name . '"');
         }
         $api = new $className($this);
+
         return $api;
     }
 
     /**
-     * {@inheritDoc}
+     * @inheritDoc
      */
     protected function request($path, array $parameters = [], $httpMethod = 'GET', array $headers = [], array $files = []) {
         $path = trim($this->gitUrl . $path, '/');
@@ -132,6 +145,7 @@ class CGitlab_Client {
                 if (!is_null($this->sudo)) {
                     $headers[] = 'SUDO: ' . $this->sudo;
                 }
+
                 break;
             case self::AUTH_URL_TOKEN:
                 $url = $path;
@@ -143,6 +157,7 @@ class CGitlab_Client {
                 }
                 $url .= (false === strpos($url, '?') ? '?' : '&') . utf8_encode(http_build_query($query, '', '&'));
                 $path = $url;
+
                 break;
             case self::AUTH_OAUTH_TOKEN:
                 $headers[] = 'Authorization: Bearer ' . $this->token;
@@ -163,40 +178,48 @@ class CGitlab_Client {
     }
 
     /**
-     * {@inheritDoc}
+     * @inheritDoc
      */
     public function get($path, array $parameters = [], array $headers = []) {
         if (0 < count($parameters)) {
             $path .= (false === strpos($path, '?') ? '?' : '&') . http_build_query($parameters, '', '&');
         }
+
         return $this->request($path, [], 'GET', $headers);
     }
 
     /**
-     * {@inheritDoc}
+     * @inheritDoc
      */
     public function post($path, array $parameters = [], array $headers = [], array $files = []) {
         return $this->request($path, $parameters, 'POST', $headers, $files);
     }
 
     /**
-     * {@inheritDoc}
+     * @inheritDoc
      */
     public function patch($path, array $parameters = [], array $headers = []) {
         return $this->request($path, $parameters, 'PATCH', $headers);
     }
 
     /**
-     * {@inheritDoc}
+     * @inheritDoc
      */
     public function delete($path, array $parameters = [], array $headers = []) {
         return $this->request($path, $parameters, 'DELETE', $headers);
     }
 
     /**
-     * {@inheritDoc}
+     * @inheritDoc
      */
     public function put($path, array $parameters = [], array $headers = []) {
         return $this->request($path, $parameters, 'PUT', $headers);
+    }
+
+    /**
+     * @return string
+     */
+    public function getGitUrl() {
+        return $this->gitUrl;
     }
 }

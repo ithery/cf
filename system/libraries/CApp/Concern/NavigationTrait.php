@@ -11,7 +11,7 @@ trait CApp_Concern_NavigationTrait {
      */
     protected $nav = null;
 
-    protected $navRenderer = CApp_Navigation_Engine_SideNav::class;
+    protected $navRenderer = CNavigation_Renderer_SidenavRenderer::class;
 
     public function setNav($nav) {
         $this->nav = $this->resolveNav($nav);
