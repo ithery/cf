@@ -8,7 +8,6 @@ defined('SYSPATH') or die('No direct access allowed.');
  */
 final class CF {
     use CFDeprecatedTrait;
-
     const CFCLI_CURRENT_DOMAIN_FILE = DOCROOT . 'data' . DS . 'current-domain';
 
     const CFCLI_CURRENT_APPCODE_FILE = DOCROOT . 'data' . DS . 'current-app';
@@ -920,7 +919,7 @@ final class CF {
         $data = self::data($domain);
 
         $appCode = isset($data['app_code']) ? $data['app_code'] : null;
-        if ($appCode == null) {
+        if ($appCode == null && CF::domain()) {
             if (substr(CF::domain(), -5) === '.test') {
                 $appCode = substr(CF::domain(), 0, -5);
             }

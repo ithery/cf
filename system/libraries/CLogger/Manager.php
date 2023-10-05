@@ -15,7 +15,6 @@ use Monolog\Handler\FormattableHandlerInterface;
 
 class CLogger_Manager implements LoggerInterface {
     use CLogger_Concern_ParseLogConfigurationTrait;
-
     /**
      * The array of resolved channels.
      *
