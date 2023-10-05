@@ -62,6 +62,13 @@ class CVendor_Wago_Device {
         return $this->handleResponse($this->client->get('info'));
     }
 
+    /**
+     * @return array
+     */
+    public function getStatus() {
+        return $this->handleResponse($this->client->get('status'));
+    }
+
     public function getWebhook() {
         return $this->handleResponse($this->client->get('webhook/get'));
     }
@@ -78,6 +85,10 @@ class CVendor_Wago_Device {
         return $this->handleResponse($this->client->post('webhook/set', $options));
     }
 
+    /**
+     * @param mixed $response
+     * @return array
+     */
     public function handleResponse($response) {
         if (is_string($response)) {
             $response = json_decode($response, true);
