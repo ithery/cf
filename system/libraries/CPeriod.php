@@ -7,7 +7,6 @@ class CPeriod implements IteratorAggregate {
     use CPeriod_Trait_OperationTrait;
     use CPeriod_Trait_ComparisonTrait;
     use CPeriod_Trait_GetterTrait;
-
     const INTERVAL_MONTH = 'month';
 
     const INTERVAL_DAY = 'day';
@@ -85,7 +84,7 @@ class CPeriod implements IteratorAggregate {
      * @param string|DateTime $startDate
      * @param string|DateTime $endDate
      *
-     * @return void
+     * @return CPeriod
      */
     public static function create($startDate, $endDate) {
         return new static($startDate, $endDate);
