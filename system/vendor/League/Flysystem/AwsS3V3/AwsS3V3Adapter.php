@@ -49,6 +49,7 @@ class AwsS3V3Adapter implements FilesystemAdapter, PublicUrlGenerator, ChecksumP
         'ContentEncoding',
         'ContentLength',
         'ContentType',
+        'ContentMD5',
         'Expires',
         'GrantFullControl',
         'GrantRead',
@@ -65,6 +66,7 @@ class AwsS3V3Adapter implements FilesystemAdapter, PublicUrlGenerator, ChecksumP
         'StorageClass',
         'Tagging',
         'WebsiteRedirectLocation',
+        'ChecksumAlgorithm',
     ];
 
     /**
@@ -123,6 +125,21 @@ class AwsS3V3Adapter implements FilesystemAdapter, PublicUrlGenerator, ChecksumP
      */
     private $streamReads;
 
+    /**
+     * @var array
+     */
+    private $forwardedOptions;
+
+    /**
+     * @var array
+     */
+    private $metadataFields;
+
+    /**
+     * @var array
+     */
+    private $multipartUploadOptions;
+
     public function __construct(
         S3ClientInterface $client,
         string $bucket,
@@ -130,7 +147,10 @@ class AwsS3V3Adapter implements FilesystemAdapter, PublicUrlGenerator, ChecksumP
         VisibilityConverter $visibility = null,
         MimeTypeDetector $mimeTypeDetector = null,
         array $options = [],
-        bool $streamReads = true
+        bool $streamReads = true,
+        array $forwardedOptions = self::AVAILABLE_OPTIONS,
+        array $metadataFields = self::EXTRA_METADATA_FIELDS,
+        array $multipartUploadOptions = self::MUP_AVAILABLE_OPTIONS
     ) {
         $this->client = $client;
         $this->prefixer = new PathPrefixer($prefix);
@@ -139,6 +159,9 @@ class AwsS3V3Adapter implements FilesystemAdapter, PublicUrlGenerator, ChecksumP
         $this->mimeTypeDetector = $mimeTypeDetector ?: new FinfoMimeTypeDetector();
         $this->options = $options;
         $this->streamReads = $streamReads;
+        $this->forwardedOptions = $forwardedOptions;
+        $this->metadataFields = $metadataFields;
+        $this->multipartUploadOptions = $multipartUploadOptions;
     }
 
     /**
@@ -148,7 +171,8 @@ class AwsS3V3Adapter implements FilesystemAdapter, PublicUrlGenerator, ChecksumP
      */
     public function fileExists($path) {
         try {
-            return $this->client->doesObjectExist($this->bucket, $this->prefixer->prefixPath($path), $this->options);
+            return $this->client->doesObjectExistV2($this->bucket, $this->prefixer->prefixPath($path), false, $this->options);
+            //return $this->client->doesObjectExist($this->bucket, $this->prefixer->prefixPath($path), $this->options);
         } catch (Throwable $exception) {
             throw UnableToCheckFileExistence::forLocation($path, $exception);
         }
@@ -163,7 +187,7 @@ class AwsS3V3Adapter implements FilesystemAdapter, PublicUrlGenerator, ChecksumP
         try {
             $prefix = $this->prefixer->prefixDirectoryPath($path);
             $options = ['Bucket' => $this->bucket, 'Prefix' => $prefix, 'MaxKeys' => 1, 'Delimiter' => '/'];
-            $command = $this->client->getCommand('ListObjects', $options);
+            $command = $this->client->getCommand('ListObjectsV2', $options);
             $result = $this->client->execute($command);
 
             return $result->hasKey('Contents') || $result->hasKey('CommonPrefixes');
@@ -194,7 +218,7 @@ class AwsS3V3Adapter implements FilesystemAdapter, PublicUrlGenerator, ChecksumP
         $key = $this->prefixer->prefixPath($path);
         $options = $this->createOptionsFromConfig($config);
         $acl = $options['params']['ACL'] ?? $this->determineAcl($config);
-        $shouldDetermineMimetype = $body !== '' && !array_key_exists('ContentType', $options['params']);
+        $shouldDetermineMimetype = !array_key_exists('ContentType', $options['params']);
 
         if ($shouldDetermineMimetype && $mimeType = $this->mimeTypeDetector->detectMimeType($key, $body)) {
             $options['params']['ContentType'] = $mimeType;
@@ -231,7 +255,7 @@ class AwsS3V3Adapter implements FilesystemAdapter, PublicUrlGenerator, ChecksumP
             $options['params']['ContentType'] = $mimetype;
         }
 
-        foreach (static::AVAILABLE_OPTIONS as $option) {
+        foreach ($this->forwardedOptions as $option) {
             $value = $config->get($option, '__NOT_SET__');
 
             if ($value !== '__NOT_SET__') {
@@ -239,7 +263,7 @@ class AwsS3V3Adapter implements FilesystemAdapter, PublicUrlGenerator, ChecksumP
             }
         }
 
-        foreach (static::MUP_AVAILABLE_OPTIONS as $option) {
+        foreach ($this->multipartUploadOptions as $option) {
             $value = $config->get($option, '__NOT_SET__');
 
             if ($value !== '__NOT_SET__') {
@@ -517,7 +541,7 @@ class AwsS3V3Adapter implements FilesystemAdapter, PublicUrlGenerator, ChecksumP
      * @return Generator
      */
     private function retrievePaginatedListing(array $options) {
-        $resultPaginator = $this->client->getPaginator('ListObjects', $options + $this->options);
+        $resultPaginator = $this->client->getPaginator('ListObjectsV2', $options + $this->options);
 
         foreach ($resultPaginator as $result) {
             yield from ($result->get('CommonPrefixes') ?: []);
@@ -551,7 +575,7 @@ class AwsS3V3Adapter implements FilesystemAdapter, PublicUrlGenerator, ChecksumP
     public function copy($source, $destination, Config $config) {
         try {
             /** @var string $visibility */
-            $visibility = $this->visibility($source)->visibility();
+            $visibility = $config->get(Config::OPTION_VISIBILITY) ?: $this->visibility($source)->visibility();
         } catch (Throwable $exception) {
             throw UnableToCopyFile::fromLocationTo(
                 $source,
