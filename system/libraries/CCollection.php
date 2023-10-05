@@ -5,7 +5,6 @@ defined('SYSPATH') or die('No direct access allowed.');
 class CCollection implements ArrayAccess, CInterface_Enumerable, CBase_Contract_CanBeEscapedWhenCastToStringInterface {
     use CCollection_Concern_EnumeratesValuesTrait;
     use CTrait_Macroable;
-
     /**
      * The items contained in the collection.
      *
@@ -1592,6 +1591,7 @@ class CCollection implements ArrayAccess, CInterface_Enumerable, CBase_Contract_
      *
      * @return mixed
      */
+    #[\ReturnTypeWillChange]
     public function offsetGet($key) {
         return $this->items[$key];
     }

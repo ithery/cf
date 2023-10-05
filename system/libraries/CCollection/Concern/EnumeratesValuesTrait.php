@@ -839,6 +839,7 @@ trait CCollection_Concern_EnumeratesValuesTrait {
      *
      * @return array
      */
+    #[\ReturnTypeWillChange]
     public function jsonSerialize() {
         return array_map(function ($value) {
             if ($value instanceof JsonSerializable) {

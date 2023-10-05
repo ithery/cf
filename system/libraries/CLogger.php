@@ -93,8 +93,8 @@ class CLogger {
      *
      * @return void
      */
-    public function emergency($message, array $context = []) {
-        $this->channel()->emergency($message, $context);
+    public static function emergency($message, array $context = []) {
+        self::channel()->emergency($message, $context);
     }
 
     /**
@@ -108,8 +108,8 @@ class CLogger {
      *
      * @return void
      */
-    public function alert($message, array $context = []) {
-        $this->channel()->alert($message, $context);
+    public static function alert($message, array $context = []) {
+        self::channel()->alert($message, $context);
     }
 
     /**
@@ -122,8 +122,8 @@ class CLogger {
      *
      * @return void
      */
-    public function critical($message, array $context = []) {
-        $this->channel()->critical($message, $context);
+    public static function critical($message, array $context = []) {
+        self::channel()->critical($message, $context);
     }
 
     /**
@@ -135,8 +135,8 @@ class CLogger {
      *
      * @return void
      */
-    public function error($message, array $context = []) {
-        $this->channel()->error($message, $context);
+    public static function error($message, array $context = []) {
+        self::channel()->error($message, $context);
     }
 
     /**
@@ -150,8 +150,8 @@ class CLogger {
      *
      * @return void
      */
-    public function warning($message, array $context = []) {
-        $this->channel()->warning($message, $context);
+    public static function warning($message, array $context = []) {
+        self::warning($message, $context);
     }
 
     /**
@@ -163,7 +163,7 @@ class CLogger {
      * @return void
      */
     public function notice($message, array $context = []) {
-        $this->channel()->notice($message, $context);
+        self::channel()->notice($message, $context);
     }
 
     /**
@@ -176,8 +176,8 @@ class CLogger {
      *
      * @return void
      */
-    public function info($message, array $context = []) {
-        $this->channel()->info($message, $context);
+    public static function info($message, array $context = []) {
+        self::channel()->info($message, $context);
     }
 
     /**
@@ -188,8 +188,8 @@ class CLogger {
      *
      * @return void
      */
-    public function debug($message, array $context = []) {
-        $this->channel()->debug($message, $context);
+    public static function debug($message, array $context = []) {
+        self::channel()->debug($message, $context);
     }
 
     /**
@@ -201,7 +201,7 @@ class CLogger {
      *
      * @return void
      */
-    public function log($level, $message, array $context = []) {
+    public static function log($level, $message, array $context = []) {
         if (!is_string($level)) {
             $levelMap = [
                 CLogger::EMERGENCY => 'emergency',
@@ -215,7 +215,7 @@ class CLogger {
             ];
             $level = carr::get($levelMap, $level, 'critical');
         }
-        $this->channel()->log($level, $message, $context);
+        self::channel()->log($level, $message, $context);
     }
 
     /**
