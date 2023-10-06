@@ -7,6 +7,7 @@ namespace League\Flysystem\AwsS3V3;
 use Generator;
 use Throwable;
 use function trim;
+use DateTimeInterface;
 use Aws\Api\DateTimeResult;
 use League\Flysystem\Config;
 use Aws\S3\S3ClientInterface;
@@ -14,6 +15,7 @@ use League\Flysystem\Visibility;
 use League\Flysystem\PathPrefixer;
 use League\Flysystem\FileAttributes;
 use Psr\Http\Message\StreamInterface;
+use League\Flysystem\ChecksumProvider;
 use League\Flysystem\UnableToCopyFile;
 use League\Flysystem\UnableToMoveFile;
 use League\Flysystem\UnableToReadFile;
@@ -24,15 +26,19 @@ use League\Flysystem\UnableToDeleteFile;
 use League\Flysystem\DirectoryAttributes;
 use League\Flysystem\UnableToSetVisibility;
 use League\Flysystem\UnableToCreateDirectory;
+use League\Flysystem\UnableToProvideChecksum;
 use League\Flysystem\UnableToRetrieveMetadata;
 use League\MimeTypeDetection\MimeTypeDetector;
 use League\Flysystem\FilesystemOperationFailed;
+use League\Flysystem\UnableToGeneratePublicUrl;
+use League\Flysystem\ChecksumAlgoIsNotSupported;
 use League\Flysystem\UnableToCheckFileExistence;
+use League\Flysystem\UnableToGenerateTemporaryUrl;
 use League\MimeTypeDetection\FinfoMimeTypeDetector;
-
 use League\Flysystem\UnableToCheckDirectoryExistence;
+use League\Flysystem\UrlGeneration\PublicUrlGenerator;
 
-class AwsS3V3Adapter implements FilesystemAdapter {
+class AwsS3V3Adapter implements FilesystemAdapter, PublicUrlGenerator, ChecksumProvider {
     /**
      * @var string[]
      */
@@ -43,6 +49,7 @@ class AwsS3V3Adapter implements FilesystemAdapter {
         'ContentEncoding',
         'ContentLength',
         'ContentType',
+        'ContentMD5',
         'Expires',
         'GrantFullControl',
         'GrantRead',
@@ -59,6 +66,7 @@ class AwsS3V3Adapter implements FilesystemAdapter {
         'StorageClass',
         'Tagging',
         'WebsiteRedirectLocation',
+        'ChecksumAlgorithm',
     ];
 
     /**
@@ -117,6 +125,21 @@ class AwsS3V3Adapter implements FilesystemAdapter {
      */
     private $streamReads;
 
+    /**
+     * @var array
+     */
+    private $forwardedOptions;
+
+    /**
+     * @var array
+     */
+    private $metadataFields;
+
+    /**
+     * @var array
+     */
+    private $multipartUploadOptions;
+
     public function __construct(
         S3ClientInterface $client,
         string $bucket,
@@ -124,7 +147,10 @@ class AwsS3V3Adapter implements FilesystemAdapter {
         VisibilityConverter $visibility = null,
         MimeTypeDetector $mimeTypeDetector = null,
         array $options = [],
-        bool $streamReads = true
+        bool $streamReads = true,
+        array $forwardedOptions = self::AVAILABLE_OPTIONS,
+        array $metadataFields = self::EXTRA_METADATA_FIELDS,
+        array $multipartUploadOptions = self::MUP_AVAILABLE_OPTIONS
     ) {
         $this->client = $client;
         $this->prefixer = new PathPrefixer($prefix);
@@ -133,6 +159,9 @@ class AwsS3V3Adapter implements FilesystemAdapter {
         $this->mimeTypeDetector = $mimeTypeDetector ?: new FinfoMimeTypeDetector();
         $this->options = $options;
         $this->streamReads = $streamReads;
+        $this->forwardedOptions = $forwardedOptions;
+        $this->metadataFields = $metadataFields;
+        $this->multipartUploadOptions = $multipartUploadOptions;
     }
 
     /**
@@ -142,7 +171,8 @@ class AwsS3V3Adapter implements FilesystemAdapter {
      */
     public function fileExists($path) {
         try {
-            return $this->client->doesObjectExist($this->bucket, $this->prefixer->prefixPath($path), $this->options);
+            return $this->client->doesObjectExistV2($this->bucket, $this->prefixer->prefixPath($path), false, $this->options);
+            //return $this->client->doesObjectExist($this->bucket, $this->prefixer->prefixPath($path), $this->options);
         } catch (Throwable $exception) {
             throw UnableToCheckFileExistence::forLocation($path, $exception);
         }
@@ -157,7 +187,7 @@ class AwsS3V3Adapter implements FilesystemAdapter {
         try {
             $prefix = $this->prefixer->prefixDirectoryPath($path);
             $options = ['Bucket' => $this->bucket, 'Prefix' => $prefix, 'MaxKeys' => 1, 'Delimiter' => '/'];
-            $command = $this->client->getCommand('ListObjects', $options);
+            $command = $this->client->getCommand('ListObjectsV2', $options);
             $result = $this->client->execute($command);
 
             return $result->hasKey('Contents') || $result->hasKey('CommonPrefixes');
@@ -188,7 +218,7 @@ class AwsS3V3Adapter implements FilesystemAdapter {
         $key = $this->prefixer->prefixPath($path);
         $options = $this->createOptionsFromConfig($config);
         $acl = $options['params']['ACL'] ?? $this->determineAcl($config);
-        $shouldDetermineMimetype = $body !== '' && !array_key_exists('ContentType', $options['params']);
+        $shouldDetermineMimetype = !array_key_exists('ContentType', $options['params']);
 
         if ($shouldDetermineMimetype && $mimeType = $this->mimeTypeDetector->detectMimeType($key, $body)) {
             $options['params']['ContentType'] = $mimeType;
@@ -225,7 +255,7 @@ class AwsS3V3Adapter implements FilesystemAdapter {
             $options['params']['ContentType'] = $mimetype;
         }
 
-        foreach (static::AVAILABLE_OPTIONS as $option) {
+        foreach ($this->forwardedOptions as $option) {
             $value = $config->get($option, '__NOT_SET__');
 
             if ($value !== '__NOT_SET__') {
@@ -233,7 +263,7 @@ class AwsS3V3Adapter implements FilesystemAdapter {
             }
         }
 
-        foreach (static::MUP_AVAILABLE_OPTIONS as $option) {
+        foreach ($this->multipartUploadOptions as $option) {
             $value = $config->get($option, '__NOT_SET__');
 
             if ($value !== '__NOT_SET__') {
@@ -511,7 +541,7 @@ class AwsS3V3Adapter implements FilesystemAdapter {
      * @return Generator
      */
     private function retrievePaginatedListing(array $options) {
-        $resultPaginator = $this->client->getPaginator('ListObjects', $options + $this->options);
+        $resultPaginator = $this->client->getPaginator('ListObjectsV2', $options + $this->options);
 
         foreach ($resultPaginator as $result) {
             yield from ($result->get('CommonPrefixes') ?: []);
@@ -545,7 +575,7 @@ class AwsS3V3Adapter implements FilesystemAdapter {
     public function copy($source, $destination, Config $config) {
         try {
             /** @var string $visibility */
-            $visibility = $this->visibility($source)->visibility();
+            $visibility = $config->get(Config::OPTION_VISIBILITY) ?: $this->visibility($source)->visibility();
         } catch (Throwable $exception) {
             throw UnableToCopyFile::fromLocationTo(
                 $source,
@@ -587,6 +617,65 @@ class AwsS3V3Adapter implements FilesystemAdapter {
             return $this->client->execute($command)->get('Body');
         } catch (Throwable $exception) {
             throw UnableToReadFile::fromLocation($path, '', $exception);
+        }
+    }
+
+    /**
+     * @param string $path
+     * @param Config $config
+     *
+     * @return string
+     */
+    public function publicUrl($path, $config) {
+        $location = $this->prefixer->prefixPath($path);
+
+        try {
+            return $this->client->getObjectUrl($this->bucket, $location);
+        } catch (Throwable $exception) {
+            throw UnableToGeneratePublicUrl::dueToError($path, $exception);
+        }
+    }
+
+    /**
+     * @param string $path
+     * @param Config $config
+     *
+     * @return string
+     */
+    public function checksum($path, $config) {
+        $algo = $config->get('checksum_algo', 'etag');
+
+        if ($algo !== 'etag') {
+            throw new ChecksumAlgoIsNotSupported();
+        }
+
+        try {
+            $metadata = $this->fetchFileMetadata($path, 'checksum')->extraMetadata();
+        } catch (UnableToRetrieveMetadata $exception) {
+            throw new UnableToProvideChecksum($exception->reason(), $path, $exception);
+        }
+
+        if (!isset($metadata['ETag'])) {
+            throw new UnableToProvideChecksum('ETag header not available.', $path);
+        }
+
+        return trim($metadata['ETag'], '"');
+    }
+
+    public function temporaryUrl(string $path, DateTimeInterface $expiresAt, Config $config): string {
+        try {
+            $options = $config->get('get_object_options', []);
+            $command = $this->client->getCommand('GetObject', [
+                'Bucket' => $this->bucket,
+                'Key' => $this->prefixer->prefixPath($path),
+            ] + $options);
+
+            $presignedRequestOptions = $config->get('presigned_request_options', []);
+            $request = $this->client->createPresignedRequest($command, $expiresAt, $presignedRequestOptions);
+
+            return (string) $request->getUri();
+        } catch (Throwable $exception) {
+            throw UnableToGenerateTemporaryUrl::dueToError($path, $exception);
         }
     }
 }
