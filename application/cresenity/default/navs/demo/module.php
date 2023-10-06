@@ -31,6 +31,12 @@ return [
         'subnav' => include dirname(__FILE__) . '/module/broadcast.php',
     ],
     [
+        'name' => 'module.ml',
+        'label' => c::__('ML'),
+        'uri' => 'demo/module/ml/index',
+        'badge'=> 'DEV',
+    ],
+    [
         'name' => 'module.bot',
         'label' => c::__('Chat Bot'),
         'uri' => 'demo/module/bot/index',
