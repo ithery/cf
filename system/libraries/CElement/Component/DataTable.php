@@ -15,7 +15,6 @@ class CElement_Component_DataTable extends CElement_Component {
         CElement_Component_DataTable_Trait_CheckboxTrait,
         CElement_Component_DataTable_Trait_SearchTrait,
         CElement_Component_DataTable_Trait_FooterTrait;
-
     const ACTION_LOCATION_FIRST = 'first';
 
     const ACTION_LOCATION_LAST = 'last';
@@ -994,10 +993,19 @@ class CElement_Component_DataTable extends CElement_Component {
         return CExporter::queue($this->toExportable(), $filePath, $disk, $writerType, $diskOptions);
     }
 
-    protected function build() {
-        if ($this->headerActionList != null) {
+    /**
+     * @return CElement_List_ActionList
+     */
+    public function getHeaderActionList() {
+        if ($this->headerActionList == null) {
+            $this->headerActionList = CElement_Factory::createList('ActionList');
             $this->headerActionList->setStyle('widget-action');
         }
+
+        return $this->headerActionList;
+    }
+
+    protected function build() {
         if ($this->footerActionList != null) {
             $this->footerActionList->setStyle('btn-list');
         }

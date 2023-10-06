@@ -10,7 +10,6 @@ class CElement_List_ActionList extends CElement_List {
     use CTrait_Compat_Element_ActionList,
         CTrait_Element_Property_Label,
         CTrait_Element_Property_Icon;
-
     public $actions = [];
 
     protected $style;
@@ -41,10 +40,11 @@ class CElement_List_ActionList extends CElement_List {
      * @return $this
      */
     public function setStyle($style) {
-        if (in_array($style, ['form-action', 'btn-group', 'btn-group-toggle', 'btn-group-toggle-checkbox', 'btn-group-toggle-radio', 'btn-icon-group', 'btn-list', 'icon-segment', 'btn-dropdown', 'widget-action', 'table-header-action'])) {
+        $availableStyles = ['form-action', 'btn-group', 'btn-group-toggle', 'btn-group-toggle-checkbox', 'btn-group-toggle-radio', 'btn-icon-group', 'btn-list', 'icon-segment', 'btn-dropdown', 'widget-action', 'table-header-action'];
+        if (in_array($style, $availableStyles)) {
             $this->style = $style;
         } else {
-            trigger_error('style is not defined');
+            throw new Exception('style ' . $style . 'is not defined, available styles:[' . implode(',' . $availableStyles) . ']');
         }
 
         return $this;

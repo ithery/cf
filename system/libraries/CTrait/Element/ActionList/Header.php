@@ -6,6 +6,7 @@ defined('SYSPATH') or die('No direct access allowed.');
  * @author Hery Kurniawan
  * @license Ittron Global Teknologi <ittron.co.id>
  *
+ * @see CElement_Component_DataTable
  * @since Feb 16, 2018, 5:55:30 AM
  */
 trait CTrait_Element_ActionList_Header {
@@ -40,7 +41,7 @@ trait CTrait_Element_ActionList_Header {
     public function addHeaderAction($id = null) {
         $rowAct = $id;
         if (!($id instanceof CElement_Component_Action)) {
-            $rowAct = CElement_Factory::createComponent('Action', $id);
+            $rowAct = new CElement_Component_Action($id);
         }
         $this->getHeaderActionList()->add($rowAct);
 
