@@ -11,7 +11,6 @@ use GuzzleHttp\Exception\TransferException;
 
 class CHTTP_Client_PendingRequest {
     use CTrait_Conditionable, CTrait_Macroable;
-
     /**
      * The factory instance.
      *
