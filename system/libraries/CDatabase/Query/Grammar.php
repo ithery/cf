@@ -722,7 +722,7 @@ class CDatabase_Query_Grammar extends CDatabase_Grammar {
         // without doing any more processing on it. Otherwise, we will compile the
         // clause into SQL based on the components that make it up from builder.
         if ($having['type'] === 'Raw') {
-            return $having['boolean'] . ' ' . $having['sql'];
+            return $having['sql'];
         } elseif ($having['type'] === 'between') {
             return $this->compileHavingBetween($having);
         } elseif ($having['type'] === 'Null') {
