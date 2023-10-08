@@ -26,7 +26,7 @@ class CManager_DataProvider_ModelDataProvider extends CManager_DataProviderAbstr
         if ($columns !== null) {
             foreach ($columns as $col) {
                 if ($col instanceof CDatabase_Query_Expression) {
-                    $statement = $col->getValue();
+                    $statement = $col->getValue($query->getGrammar());
                     //$regex = '/([\w]++)`?+(?:\s++as\s++[^,\s]++)?+\s*+(?:FROM\s*+|$)/i';
                     // $regex = '/([\w]++)`?+\s*+(?:FROM\s*+|$)/i';
                     $regex = '/([\w]++)`?+\s*+$/i';
