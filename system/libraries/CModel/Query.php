@@ -119,11 +119,37 @@ class CModel_Query {
     /**
      * The methods that should be returned from query builder.
      *
-     * @var array
+     * @var string[]
      */
     protected $passthru = [
-        'insert', 'insertGetId', 'getBindings', 'toSql', 'toCompiledSql', 'dump', 'dd',
-        'exists', 'count', 'min', 'max', 'avg', 'sum', 'getConnection', 'raw',
+        'aggregate',
+        'average',
+        'avg',
+        'count',
+        'dd',
+        'ddRawSql',
+        'doesntExist',
+        'doesntExistOr',
+        'dump',
+        'dumpRawSql',
+        'exists',
+        'existsOr',
+        'explain',
+        'getBindings',
+        'getConnection',
+        'getGrammar',
+        'implode',
+        'insert',
+        'insertGetId',
+        'insertOrIgnore',
+        'insertUsing',
+        'max',
+        'min',
+        'raw',
+        'rawValue',
+        'sum',
+        'toSql',
+        'toRawSql',
     ];
 
     /**
