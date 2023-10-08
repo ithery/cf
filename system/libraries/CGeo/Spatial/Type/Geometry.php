@@ -2,16 +2,9 @@
 
 use WKB as geoPHPWkb;
 use Illuminate\Support\Facades\DB;
-use MatanYadaev\EloquentSpatial\Factory;
-use Illuminate\Contracts\Support\Jsonable;
-use MatanYadaev\EloquentSpatial\AxisOrder;
-use Illuminate\Contracts\Support\Arrayable;
-use MatanYadaev\EloquentSpatial\GeometryCast;
-use Illuminate\Contracts\Database\Query\Expression as ExpressionContract;
 
-abstract class CGeo_Spatial_Type_Geometry implements CModel_Contract_CastableInterface, Arrayable, Jsonable, JsonSerializable, Stringable {
+abstract class CGeo_Spatial_Type_Geometry implements CModel_Contract_CastableInterface, CInterface_Arrayable, CInterface_Jsonable, JsonSerializable, Stringable {
     use CTrait_Macroable;
-
     public $srid = 0;
 
     abstract public function toWkt(): string;
@@ -61,7 +54,7 @@ abstract class CGeo_Spatial_Type_Geometry implements CModel_Contract_CastableInt
 
         $wkb = substr($wkb, 4);
 
-        $geometry = Factory::parse($wkb);
+        $geometry = CGeo_Spatial_Factory::parse($wkb);
         $geometry->srid = $srid;
 
         if (!($geometry instanceof CGeo_Spatial_Type_Geometry)) {
@@ -80,7 +73,7 @@ abstract class CGeo_Spatial_Type_Geometry implements CModel_Contract_CastableInt
      * @return static
      */
     public static function fromWkt($wkt, $srid = 0) {
-        $geometry = Factory::parse($wkt);
+        $geometry = CGeo_Spatial_Factory::parse($wkt);
         $geometry->srid = $srid;
 
         if (!($geometry instanceof CGeo_Spatial_Type_Geometry)) {
@@ -93,15 +86,15 @@ abstract class CGeo_Spatial_Type_Geometry implements CModel_Contract_CastableInt
     }
 
     /**
-     * @param string $geoJson
-     * @param int    $srid
+     * @param string|\GeoJson\GeoJson $geoJson
+     * @param int                     $srid
      *
      * @throws InvalidArgumentException
      *
      * @return static
      */
-    public static function fromJson(string $geoJson, int $srid = 0) {
-        $geometry = Factory::parse($geoJson);
+    public static function fromJson($geoJson, int $srid = 0) {
+        $geometry = CGeo_Spatial_Factory::parse($geoJson);
         $geometry->srid = $srid;
 
         if (!($geometry instanceof static)) {
@@ -138,7 +131,7 @@ abstract class CGeo_Spatial_Type_Geometry implements CModel_Contract_CastableInt
      */
     public function toArray(): array {
         return [
-            'type' => class_basename(static::class),
+            'type' => c::classBasename(static::class),
             'coordinates' => $this->getCoordinates(),
         ];
     }
@@ -149,11 +142,11 @@ abstract class CGeo_Spatial_Type_Geometry implements CModel_Contract_CastableInt
      * @return string
      */
     public function toFeatureCollectionJson(): string {
-        if (static::class === GeometryCollection::class) {
-            /** @var GeometryCollection $this */
+        if (static::class === CGeo_Spatial_Type_GeometryCollection::class) {
+            /** @var CGeo_Spatial_Type_GeometryCollection $this */
             $geometries = $this->geometries;
         } else {
-            $geometries = collect([$this]);
+            $geometries = c::collect([$this]);
         }
 
         $features = $geometries->map(static function (self $geometry): array {
@@ -184,23 +177,23 @@ abstract class CGeo_Spatial_Type_Geometry implements CModel_Contract_CastableInt
      * @return CModel_Contract_CastsAttributesInterface
      */
     public static function castUsing(array $arguments) {
-        return new GeometryCast(static::class);
+        return new CGeo_Spatial_GeometryCast(static::class);
     }
 
     /**
-     * @param ConnectionInterface $connection
+     * @param CDatabase_Connection $connection
      *
-     * @return ExpressionContract
+     * @return CDatabase_Query_Expression
      */
-    public function toSqlExpression(CDatabase_Contract_ConnectionInterface $connection): ExpressionContract {
+    public function toSqlExpression(CDatabase_Connection $connection) {
         $wkt = $this->toWkt();
 
-        if (!(new AxisOrder())->supported($connection)) {
+        if (!(new CGeo_Spatial_AxisOrder())->supported($connection)) {
             // @codeCoverageIgnoreStart
-            return DB::raw("ST_GeomFromText('{$wkt}', {$this->srid})");
+            return c::db()->raw("ST_GeomFromText('{$wkt}', {$this->srid})");
             // @codeCoverageIgnoreEnd
         }
 
-        return DB::raw("ST_GeomFromText('{$wkt}', {$this->srid}, 'axis-order=long-lat')");
+        return c::db()->raw("ST_GeomFromText('{$wkt}', {$this->srid}, 'axis-order=long-lat')");
     }
 }

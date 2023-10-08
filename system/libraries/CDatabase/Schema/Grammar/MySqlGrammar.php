@@ -1078,6 +1078,20 @@ class CDatabase_Schema_Grammar_MySqlGrammar extends CDatabase_Schema_Grammar {
     }
 
     /**
+     * Get the SQL for an "on update" column modifier.
+     *
+     * @param \CDatabase_Schema_Blueprint $blueprint
+     * @param \CBase_Fluent               $column
+     *
+     * @return null|string
+     */
+    protected function modifyOnUpdate(CDatabase_Schema_Blueprint $blueprint, CBase_Fluent $column) {
+        if (!is_null($column->onUpdate)) {
+            return ' on update ' . $this->getValue($column->onUpdate);
+        }
+    }
+
+    /**
      * Get the SQL for an auto-increment column modifier.
      *
      * @param \CDatabase_Schema_Blueprint $blueprint

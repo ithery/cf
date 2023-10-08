@@ -2,7 +2,6 @@
 
 abstract class CDatabase_Schema_Grammar extends CDatabase_Grammar {
     use CDatabase_Trait_CompileJsonPathTrait;
-
     /**
      * The possible column modifiers.
      *
@@ -292,8 +291,8 @@ abstract class CDatabase_Schema_Grammar extends CDatabase_Grammar {
      * @return string
      */
     protected function getDefaultValue($value) {
-        if ($value instanceof CDatabase_Query_Expression) {
-            return $value;
+        if ($value instanceof CDatabase_Contract_Query_ExpressionInterface) {
+            return $this->getValue($value);
         }
 
         return is_bool($value)

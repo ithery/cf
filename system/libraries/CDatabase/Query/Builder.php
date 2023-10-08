@@ -771,7 +771,7 @@ class CDatabase_Query_Builder {
 
         $this->havings[] = compact('type', 'column', 'operator', 'value', 'boolean');
 
-        if (!$value instanceof CDatabase_Query_Expression) {
+        if (!$value instanceof CDatabase_Contract_Query_ExpressionInterface) {
             $this->addBinding($this->flattenValue($value), 'having');
         }
 
@@ -1484,9 +1484,13 @@ class CDatabase_Query_Builder {
             return $column;
         }
 
-        $separator = strpos(strtolower($column), ' as ') !== false ? ' as ' : '\.';
+        $columnString = $column instanceof CDatabase_Contract_Query_ExpressionInterface
+            ? $this->grammar->getValue($column)
+            : $column;
 
-        return c::last(preg_split('~' . $separator . '~i', $column));
+        $separator = cstr::contains(strtolower($columnString), ' as ') ? ' as ' : '\.';
+
+        return c::last(preg_split('~' . $separator . '~i', $columnString));
     }
 
     /**
@@ -2106,7 +2110,7 @@ class CDatabase_Query_Builder {
      *
      * @param mixed $value
      *
-     * @return \CDatabase_Query_Expression
+     * @return \CDatabase_Contract_Query_ExpressionInterface
      */
     public function raw($value) {
         return CDatabase::raw($value);
@@ -2196,7 +2200,7 @@ class CDatabase_Query_Builder {
      */
     protected function cleanBindings(array $bindings) {
         return array_values(array_filter($bindings, function ($binding) {
-            return !$binding instanceof CDatabase_Query_Expression;
+            return !$binding instanceof CDatabase_Contract_Query_ExpressionInterface;
         }));
     }
 

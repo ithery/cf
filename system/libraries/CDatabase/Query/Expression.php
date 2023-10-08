@@ -26,7 +26,7 @@ class CDatabase_Query_Expression implements CDatabase_Contract_Query_ExpressionI
      *
      * @return mixed
      */
-    public function getValue(CDatabase_Query_Grammar $grammar) {
+    public function getValue(CDatabase_Grammar $grammar) {
         return $this->value;
     }
 }

@@ -4,7 +4,7 @@ class CGeo_Spatial_AxisOrder {
     public function __construct() {
     }
 
-    public function supported(CDatabase_Connection $connection) {
+    public function supported(CDatabase_Connection $connection): bool {
         /** @var CDatabase_Connection_Pdo_MySqlConnection $connection */
         if ($this->isMariaDb($connection)) {
             // @codeCoverageIgnoreStart
@@ -21,11 +21,11 @@ class CGeo_Spatial_AxisOrder {
         return true;
     }
 
-    private function isMariaDb(CDatabase_Connection_Pdo_MySqlConnection $connection) {
+    private function isMariaDb(CDatabase_Connection_Pdo_MySqlConnection $connection): bool {
         return $connection->isMaria();
     }
 
-    private function isMySql57(CDatabase_Connection_Pdo_MySqlConnection $connection) {
+    private function isMySql57(CDatabase_Connection_Pdo_MySqlConnection $connection): bool {
         /** @var string $version */
         $version = $connection->getPdo()->getAttribute(PDO::ATTR_SERVER_VERSION);
 

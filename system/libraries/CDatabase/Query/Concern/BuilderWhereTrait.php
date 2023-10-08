@@ -12,6 +12,7 @@ trait CDatabase_Query_Concern_BuilderWhereTrait {
      * @return $this
      */
     public function where($column, $operator = null, $value = null, $boolean = 'and') {
+        /** @var CDatabase_Query_Builder $this */
         // If the column is an array, we will assume it is an array of key-value pairs
         // and can add them each as a where clause. We will maintain the boolean we
         // received when the method was called and pass it into the nested where.
@@ -68,14 +69,20 @@ trait CDatabase_Query_Concern_BuilderWhereTrait {
 
         $type = 'Basic';
 
+        $columnString = ($column instanceof CDatabase_Contract_Query_ExpressionInterface)
+            ? $this->grammar->getValue($column)
+            : $column;
         // If the column is making a JSON reference we'll check to see if the value
         // is a boolean. If it is, we'll add the raw boolean string as an actual
         // value to the query to ensure this is properly handled by the query.
-        if (cstr::contains($column, '->') && is_bool($value)) {
+        if (cstr::contains($columnString, '->') && is_bool($value)) {
             $value = new CDatabase_Query_Expression($value ? 'true' : 'false');
             if (is_string($column)) {
                 $type = 'JsonBoolean';
             }
+        }
+        if ($this->isBitwiseOperator($operator)) {
+            $type = 'Bitwise';
         }
 
         // Now that we are working with just a simple query we can put the elements
@@ -90,7 +97,7 @@ trait CDatabase_Query_Concern_BuilderWhereTrait {
             'boolean'
         );
 
-        if (!$value instanceof CDatabase_Query_Expression) {
+        if (!$value instanceof CDatabase_Contract_Query_ExpressionInterface) {
             $this->addBinding($value, 'where');
         }
 
@@ -164,6 +171,18 @@ trait CDatabase_Query_Concern_BuilderWhereTrait {
     protected function invalidOperator($operator) {
         return !in_array(strtolower($operator), $this->operators, true)
                 && !in_array(strtolower($operator), $this->grammar->getOperators(), true);
+    }
+
+    /**
+     * Determine if the operator is a bitwise operator.
+     *
+     * @param string $operator
+     *
+     * @return bool
+     */
+    protected function isBitwiseOperator($operator) {
+        return in_array(strtolower($operator), $this->bitwiseOperators, true)
+               || in_array(strtolower($operator), $this->grammar->getBitwiseOperators(), true);
     }
 
     /**

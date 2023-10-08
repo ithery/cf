@@ -29,7 +29,7 @@ abstract class CDatabase_Grammar {
     /**
      * Wrap a table in keyword identifiers.
      *
-     * @param CDatabase_Query_Expression|string $table
+     * @param CDatabase_Contract_Query_ExpressionInterface|string $table
      *
      * @return string
      */
@@ -44,8 +44,8 @@ abstract class CDatabase_Grammar {
     /**
      * Wrap a value in keyword identifiers.
      *
-     * @param CDatabase_Query_Expression|string $value
-     * @param bool                              $prefixAlias
+     * @param CDatabase_Contract_Query_ExpressionInterface|string $value
+     * @param bool                                                $prefixAlias
      *
      * @return string
      */
@@ -220,18 +220,22 @@ abstract class CDatabase_Grammar {
      * @return bool
      */
     public function isExpression($value) {
-        return $value instanceof CDatabase_Query_Expression;
+        return $value instanceof CDatabase_Contract_Query_ExpressionInterface;
     }
 
     /**
      * Get the value of a raw expression.
      *
-     * @param CDatabase_Query_Expression $expression
+     * @param CDatabase_Contract_Query_ExpressionInterface $expression
      *
      * @return string
      */
     public function getValue($expression) {
-        return $expression->getValue();
+        if ($this->isExpression($expression)) {
+            return $this->getValue($expression->getValue($this));
+        }
+
+        return $expression;
     }
 
     /**

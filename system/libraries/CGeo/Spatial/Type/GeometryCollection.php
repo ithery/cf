@@ -21,7 +21,7 @@ class CGeo_Spatial_Type_GeometryCollection extends CGeo_Spatial_Type_Geometry im
      */
     public function __construct($geometries, int $srid = 0) {
         if (is_array($geometries)) {
-            $geometries = collect($geometries);
+            $geometries = c::collect($geometries);
         }
 
         $this->geometries = $geometries;
@@ -39,9 +39,9 @@ class CGeo_Spatial_Type_GeometryCollection extends CGeo_Spatial_Type_Geometry im
 
     public function getWktData(): string {
         return $this->geometries
-            ->map(static function (Geometry $geometry): string {
-          return $geometry->toWkt();
-      })
+            ->map(static function (CGeo_Spatial_Type_Geometry $geometry): string {
+                return $geometry->toWkt();
+            })
             ->join(', ');
     }
 
@@ -50,9 +50,9 @@ class CGeo_Spatial_Type_GeometryCollection extends CGeo_Spatial_Type_Geometry im
      */
     public function getCoordinates(): array {
         return $this->geometries
-            ->map(static function (Geometry $geometry): array {
-          return $geometry->getCoordinates();
-      })
+            ->map(static function (CGeo_Spatial_Type_Geometry $geometry): array {
+                return $geometry->getCoordinates();
+            })
             ->all();
     }
 
@@ -65,18 +65,18 @@ class CGeo_Spatial_Type_GeometryCollection extends CGeo_Spatial_Type_Geometry im
         }
 
         return [
-            'type' => class_basename(static::class),
-            'geometries' => $this->geometries->map(static function (Geometry $geometry): array {
+            'type' => c::classBasename(static::class),
+            'geometries' => $this->geometries->map(static function (CGeo_Spatial_Type_Geometry $geometry): array {
                 return $geometry->toArray();
             }),
         ];
     }
 
     /**
-     * @return Collection<int, Geometry>
+     * @return CCollection<int, Geometry>
      */
-    public function getGeometries(): Collection {
-        return new Collection($this->geometries->all());
+    public function getGeometries(): CCollection {
+        return new CCollection($this->geometries->all());
     }
 
     /**
@@ -123,11 +123,11 @@ class CGeo_Spatial_Type_GeometryCollection extends CGeo_Spatial_Type_Geometry im
         if ($geometriesCount < $this->minimumGeometries) {
             throw new InvalidArgumentException(
                 sprintf(
-            '%s must contain at least %s %s',
-            static::class,
-            $this->minimumGeometries,
-            Str::plural('entries', $geometriesCount)
-        )
+                    '%s must contain at least %s %s',
+                    static::class,
+                    $this->minimumGeometries,
+                    cstr::plural('entries', $geometriesCount)
+                )
             );
         }
     }
@@ -136,7 +136,7 @@ class CGeo_Spatial_Type_GeometryCollection extends CGeo_Spatial_Type_Geometry im
      * @throws InvalidArgumentException
      */
     protected function validateGeometriesType(): void {
-        $this->geometries->each(function (mixed $geometry): void {
+        $this->geometries->each(function ($geometry): void {
             /** @var mixed $geometry */
             if (!is_object($geometry) || !($geometry instanceof $this->collectionOf)) {
                 throw new InvalidArgumentException(

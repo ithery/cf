@@ -74,7 +74,6 @@ class CModel_Query {
     use CDatabase_Trait_Builder,
         CModel_Trait_QueriesRelationships,
         CTrait_ForwardsCalls;
-
     /**
      * The base query builder instance.
      *
@@ -529,8 +528,41 @@ class CModel_Query {
      */
     public function value($column) {
         if ($result = $this->first([$column])) {
-            return $result->{$column};
+            $column = $column instanceof CDatabase_Contract_Query_ExpressionInterface ? $column->getValue($this->getGrammar()) : $column;
+
+            return $result->{cstr::afterLast($column, '.')};
         }
+    }
+
+    /**
+     * Get a single column's value from the first result of a query if it's the sole matching record.
+     *
+     * @param string|\CDatabase_Contract_Query_ExpressionInterface $column
+     *
+     * @throws \CModel_Exception_ModelNotFoundException<\CModel>
+     * @throws \CDatabase_Exception_MultipleRecordsFoundException
+     *
+     * @return mixed
+     */
+    public function soleValue($column) {
+        $column = $column instanceof CDatabase_Contract_Query_ExpressionInterface ? $column->getValue($this->getGrammar()) : $column;
+
+        return $this->sole([$column])->{cstr::afterLast($column, '.')};
+    }
+
+    /**
+     * Get a single column's value from the first result of the query or throw an exception.
+     *
+     * @param string|\CDatabase_Contract_Query_ExpressionInterface $column
+     *
+     * @throws \CModel_Exception_ModelNotFoundException<\CModel>
+     *
+     * @return mixed
+     */
+    public function valueOrFail($column) {
+        $column = $column instanceof CDatabase_Contract_Query_ExpressionInterface ? $column->getValue($this->getGrammar()) : $column;
+
+        return $this->firstOrFail([$column])->{cstr::afterLast($column, '.')};
     }
 
     /**
@@ -756,6 +788,8 @@ class CModel_Query {
      */
     public function pluck($column, $key = null) {
         $results = $this->toBase()->pluck($column, $key);
+
+        $column = $column instanceof CDatabase_Contract_Query_ExpressionInterface ? $column->getValue($this->getGrammar()) : $column;
 
         // If the model has a mutator for the requested column, we will spin through
         // the results and mutate the values so that the mutated version of these
@@ -1357,12 +1391,25 @@ class CModel_Query {
     /**
      * Qualify the given column name by the model's table.
      *
-     * @param string|CDatabase_Query_Expression $column
+     * @param string|CDatabase_Contract_Query_ExpressionInterface $column
      *
      * @return string
      */
     public function qualifyColumn($column) {
+        $column = $column instanceof CDatabase_Contract_Query_ExpressionInterface ? $column->getValue($this->getGrammar()) : $column;
+
         return $this->model->qualifyColumn($column);
+    }
+
+    /**
+     * Qualify the given columns with the model's table.
+     *
+     * @param array|\CDatabase_Contract_Query_ExpressionInterface $columns
+     *
+     * @return array
+     */
+    public function qualifyColumns($columns) {
+        return $this->model->qualifyColumns($columns);
     }
 
     /**
