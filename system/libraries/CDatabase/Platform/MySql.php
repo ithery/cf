@@ -1006,6 +1006,8 @@ SQL
             'varbinary' => 'binary',
             'varchar' => 'string',
             'year' => 'date',
+            'polygon' => 'polygon',
+            'multipolygon' => 'multipolygon',
 
         ];
     }

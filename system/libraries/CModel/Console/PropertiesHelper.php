@@ -185,7 +185,6 @@ class CModel_Console_PropertiesHelper {
     public static function getFields($table, $prefix = '') {
         $excludedFields = ['created', 'createdby', 'updated', 'updatedby', 'status'];
         $db = c::db();
-
         $result = $db->getSchemaManager()->listTableColumns($table);
 
         if (empty($result)) {

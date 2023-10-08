@@ -81,7 +81,6 @@ class CDatabase_Schema_Manager_Mysql extends CDatabase_Schema_Manager {
 
         $scale = null;
         $precision = null;
-
         $type = $this->platform->getDoctrineTypeMapping($dbType);
 
         // In cases where not connected to a database DESCRIBE $table does not return 'Comment'

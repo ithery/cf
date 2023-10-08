@@ -1,196 +1,157 @@
 <?php
 
-use Countable;
-use ArrayAccess;
-use ArrayIterator;
-use GeoJson\GeoJson;
-use IteratorAggregate;
-use InvalidArgumentException;
-use GeoJson\Feature\FeatureCollection;
-use Illuminate\Contracts\Support\Arrayable;
-
-class CGeo_Spatial_Type_GeometryCollection extends CGeo_Spatial_Type_Geometry implements IteratorAggregate, ArrayAccess, Arrayable, Countable {
+class CGeo_Spatial_Type_GeometryCollection extends CGeo_Spatial_Type_Geometry implements ArrayAccess {
     /**
-     * The minimum number of items required to create this collection.
-     *
-     * @var int
+     * @var CCollection<int, Geometry>
      */
-    protected $minimumCollectionItems = 0;
+    protected CCollection $geometries;
 
     /**
-     * The class of the items in the collection.
-     *
      * @var string
      */
-    protected $collectionItemType = CGeo_Spatial_Contract_GeometryInterface::class;
+    protected string $collectionOf = CGeo_Spatial_Type_Geometry::class;
+
+    protected int $minimumGeometries = 0;
 
     /**
-     * The items contained in the spatial collection.
-     *
-     * @var GeometryInterface[]
-     */
-    protected $items = [];
-
-    /**
-     * @param GeometryInterface[] $geometries
-     * @param int                 $srid
+     * @param Collection<int, Geometry>|array<int, Geometry> $geometries
+     * @param int                                            $srid
      *
      * @throws InvalidArgumentException
      */
-    public function __construct(array $geometries, $srid = 0) {
-        parent::__construct($srid);
-
-        $this->validateItems($geometries);
-
-        $this->items = $geometries;
-    }
-
-    public function getGeometries() {
-        return $this->items;
-    }
-
-    public function toWKT() {
-        return sprintf('GEOMETRYCOLLECTION(%s)', (string) $this);
-    }
-
-    public function __toString() {
-        return implode(',', array_map(function (CGeo_Spatial_Contract_GeometryInterface $geometry) {
-            return $geometry->toWKT();
-        }, $this->items));
-    }
-
-    public static function fromString($wktArgument, $srid = 0) {
-        if (empty($wktArgument)) {
-            return new static([]);
+    public function __construct($geometries, int $srid = 0) {
+        if (is_array($geometries)) {
+            $geometries = collect($geometries);
         }
 
-        $geometry_strings = preg_split('/,\s*(?=[A-Za-z])/', $wktArgument);
+        $this->geometries = $geometries;
+        $this->srid = $srid;
 
-        return new static(array_map(function ($geometry_string) {
-            $klass = CGeo_Spatial_Type_Geometry::getWKTClass($geometry_string);
-
-            return call_user_func($klass . '::fromWKT', $geometry_string);
-        }, $geometry_strings), $srid);
+        $this->validateGeometriesType();
+        $this->validateGeometriesCount();
     }
 
-    public function toArray() {
-        return $this->items;
+    public function toWkt(): string {
+        $wktData = $this->getWktData();
+
+        return "GEOMETRYCOLLECTION({$wktData})";
     }
 
-    #[\ReturnTypeWillChange]
-    public function getIterator() {
-        return new ArrayIterator($this->items);
-    }
-
-    #[\ReturnTypeWillChange]
-    public function offsetExists($offset) {
-        return isset($this->items[$offset]);
-    }
-
-    #[\ReturnTypeWillChange]
-    public function offsetGet($offset) {
-        return $this->offsetExists($offset) ? $this->items[$offset] : null;
-    }
-
-    #[\ReturnTypeWillChange]
-    public function offsetSet($offset, $value) {
-        $this->validateItemType($value);
-
-        if (is_null($offset)) {
-            $this->items[] = $value;
-        } else {
-            $this->items[$offset] = $value;
-        }
-    }
-
-    #[\ReturnTypeWillChange]
-    public function offsetUnset($offset) {
-        unset($this->items[$offset]);
-    }
-
-    #[\ReturnTypeWillChange]
-    public function count() {
-        return count($this->items);
-    }
-
-    public static function fromJson($geoJson) {
-        if (is_string($geoJson)) {
-            $geoJson = GeoJson::jsonUnserialize(json_decode($geoJson));
-        }
-
-        if (!is_a($geoJson, FeatureCollection::class)) {
-            throw new CGeo_Spatial_Exception_InvalidGeoJsonException('Expected ' . FeatureCollection::class . ', got ' . get_class($geoJson));
-        }
-
-        $set = [];
-        foreach ($geoJson->getFeatures() as $feature) {
-            $set[] = parent::fromJson($feature);
-        }
-
-        return new self($set);
+    public function getWktData(): string {
+        return $this->geometries
+            ->map(static function (Geometry $geometry): string {
+          return $geometry->toWkt();
+      })
+            ->join(', ');
     }
 
     /**
-     * Convert to GeoJson GeometryCollection that is jsonable to GeoJSON.
-     *
-     * @return \GeoJson\Geometry\GeometryCollection
+     * @return array<mixed>
      */
-    public function jsonSerialize() {
-        $geometries = [];
-        foreach ($this->items as $geometry) {
-            $geometries[] = $geometry->jsonSerialize();
-        }
-
-        return new \GeoJson\Geometry\GeometryCollection($geometries);
+    public function getCoordinates(): array {
+        return $this->geometries
+            ->map(static function (Geometry $geometry): array {
+          return $geometry->getCoordinates();
+      })
+            ->all();
     }
 
     /**
-     * Checks whether the items are valid to create this collection.
-     *
-     * @param array $items
+     * @return array<mixed>
      */
-    protected function validateItems(array $items) {
-        $this->validateItemCount($items);
+    public function toArray(): array {
+        if ($this->isExtended()) {
+            return parent::toArray();
+        }
 
-        foreach ($items as $item) {
-            $this->validateItemType($item);
+        return [
+            'type' => class_basename(static::class),
+            'geometries' => $this->geometries->map(static function (Geometry $geometry): array {
+                return $geometry->toArray();
+            }),
+        ];
+    }
+
+    /**
+     * @return Collection<int, Geometry>
+     */
+    public function getGeometries(): Collection {
+        return new Collection($this->geometries->all());
+    }
+
+    /**
+     * @param int $offset
+     *
+     * @return bool
+     */
+    public function offsetExists($offset): bool {
+        return isset($this->geometries[$offset]);
+    }
+
+    /**
+     * @param int $offset
+     *
+     * @return Geometry
+     */
+    public function offsetGet($offset): Geometry {
+        // @phpstan-ignore-next-line
+        return $this->geometries[$offset];
+    }
+
+    /**
+     * @param int      $offset
+     * @param Geometry $value
+     */
+    public function offsetSet($offset, $value): void {
+        $this->geometries[$offset] = $value;
+        $this->validateGeometriesType();
+    }
+
+    /**
+     * @param int $offset
+     */
+    public function offsetUnset($offset): void {
+        $this->geometries->splice($offset, 1);
+        $this->validateGeometriesCount();
+    }
+
+    /**
+     * @throws InvalidArgumentException
+     */
+    protected function validateGeometriesCount(): void {
+        $geometriesCount = $this->geometries->count();
+        if ($geometriesCount < $this->minimumGeometries) {
+            throw new InvalidArgumentException(
+                sprintf(
+            '%s must contain at least %s %s',
+            static::class,
+            $this->minimumGeometries,
+            Str::plural('entries', $geometriesCount)
+        )
+            );
         }
     }
 
     /**
-     * Checks whether the array has enough items to generate a valid WKT.
-     *
-     * @param array $items
-     *
-     * @see $minimumCollectionItems
+     * @throws InvalidArgumentException
      */
-    protected function validateItemCount(array $items) {
-        if (count($items) < $this->minimumCollectionItems) {
-            $entries = $this->minimumCollectionItems === 1 ? 'entry' : 'entries';
-
-            throw new InvalidArgumentException(sprintf(
-                '%s must contain at least %d %s',
-                get_class($this),
-                $this->minimumCollectionItems,
-                $entries
-            ));
-        }
+    protected function validateGeometriesType(): void {
+        $this->geometries->each(function (mixed $geometry): void {
+            /** @var mixed $geometry */
+            if (!is_object($geometry) || !($geometry instanceof $this->collectionOf)) {
+                throw new InvalidArgumentException(
+                    sprintf('%s must be a collection of %s', static::class, $this->collectionOf)
+                );
+            }
+        });
     }
 
     /**
-     * Checks the type of the items in the array.
+     * Checks whether the class is used directly or via a sub-class.
      *
-     * @param $item
-     *
-     * @see $collectionItemType
+     * @return bool
      */
-    protected function validateItemType($item) {
-        if (!$item instanceof $this->collectionItemType) {
-            throw new InvalidArgumentException(sprintf(
-                '%s must be a collection of %s',
-                get_class($this),
-                $this->collectionItemType
-            ));
-        }
+    private function isExtended(): bool {
+        return is_subclass_of(static::class, self::class);
     }
 }

@@ -61,6 +61,10 @@ abstract class CDatabase_Type {
 
     const ENUM = 'enum';
 
+    const POLYGON = 'polygon';
+
+    const MULTI_POLYGON = 'multipolygon';
+
     /**
      * Map of already instantiated type objects. One instance per type (flyweight).
      *
@@ -100,6 +104,8 @@ abstract class CDatabase_Type {
         self::GUID => CDatabase_Type_GuidType::class,
         self::DATEINTERVAL => CDatabase_Type_DateIntervalType::class,
         self::ENUM => CDatabase_Type_EnumType::class,
+        self::POLYGON => CDatabase_Type_PolygonType::class,
+        self::MULTI_POLYGON => CDatabase_Type_MultiPolygonType::class,
     ];
 
     /**

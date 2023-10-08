@@ -1,5 +1,4 @@
 <?php
 
-class CGeo_Spatial_Exception_UnknownWKTTypeException extends \RuntimeException
-{
+class CGeo_Spatial_Exception_UnknownWKTTypeException extends \RuntimeException {
 }

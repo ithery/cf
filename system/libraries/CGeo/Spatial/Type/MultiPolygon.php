@@ -2,7 +2,6 @@
 
 use GeoJson\GeoJson;
 use GeoJson\Geometry\MultiPolygon as GeoJsonMultiPolygon;
-use Grimzy\LaravelMysqlSpatial\Exceptions\InvalidGeoJsonException;
 
 class CGeo_Spatial_Type_MultiPolygon extends CGeo_Spatial_Type_GeometryCollection {
     /**

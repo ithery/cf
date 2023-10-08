@@ -2,7 +2,7 @@
 
 defined('SYSPATH') or die('No direct access allowed.');
 
-class CDatabase_Query_Expression {
+class CDatabase_Query_Expression implements CDatabase_Contract_Query_ExpressionInterface {
     /**
      * The value of the expression.
      *
@@ -26,16 +26,7 @@ class CDatabase_Query_Expression {
      *
      * @return mixed
      */
-    public function getValue() {
+    public function getValue(CDatabase_Query_Grammar $grammar) {
         return $this->value;
-    }
-
-    /**
-     * Get the value of the expression.
-     *
-     * @return string
-     */
-    public function __toString() {
-        return (string) $this->getValue();
     }
 }

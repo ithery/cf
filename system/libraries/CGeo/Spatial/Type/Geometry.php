@@ -1,108 +1,206 @@
 <?php
 
-use GeoJson\GeoJson;
-use GeoIO\WKB\Parser\Parser;
+use WKB as geoPHPWkb;
+use Illuminate\Support\Facades\DB;
+use MatanYadaev\EloquentSpatial\Factory;
 use Illuminate\Contracts\Support\Jsonable;
-use Grimzy\LaravelMysqlSpatial\Exceptions\UnknownWKTTypeException;
+use MatanYadaev\EloquentSpatial\AxisOrder;
+use Illuminate\Contracts\Support\Arrayable;
+use MatanYadaev\EloquentSpatial\GeometryCast;
+use Illuminate\Contracts\Database\Query\Expression as ExpressionContract;
 
-abstract class CGeo_Spatial_Type_Geometry implements CGeo_Spatial_Contract_GeometryInterface, Jsonable, \JsonSerializable {
-    protected static $wkb_types = [
-        1 => CGeo_Spatial_Type_Point::class,
-        2 => CGeo_Spatial_Type_LineString::class,
-        3 => CGeo_Spatial_Type_Polygon::class,
-        4 => CGeo_Spatial_Type_MultiPoint::class,
-        5 => CGeo_Spatial_Type_MultiLineString::class,
-        6 => CGeo_Spatial_Type_MultiPolygon::class,
-        7 => CGeo_Spatial_Type_GeometryCollection::class,
-    ];
+abstract class CGeo_Spatial_Type_Geometry implements CModel_Contract_CastableInterface, Arrayable, Jsonable, JsonSerializable, Stringable {
+    use CTrait_Macroable;
 
-    protected $srid;
+    public $srid = 0;
 
-    public function __construct($srid = 0) {
-        $this->srid = (int) $srid;
+    abstract public function toWkt(): string;
+
+    abstract public function getWktData(): string;
+
+    /**
+     * @return string
+     */
+    public function __toString() {
+        return $this->toWkt();
     }
 
-    public function getSrid() {
-        return $this->srid;
+    /**
+     * @param int $options
+     *
+     * @throws JsonException
+     *
+     * @return string
+     */
+    public function toJson($options = 0) {
+        return json_encode($this, $options | JSON_THROW_ON_ERROR);
     }
 
-    public function setSrid($srid) {
-        $this->srid = (int) $srid;
+    public function toWkb() {
+        $geoPHPGeometry = geoPHP::load($this->toJson());
+
+        $sridInBinary = pack('L', $this->srid);
+
+        // @phpstan-ignore-next-line
+        $wkbWithoutSrid = (new geoPHPWkb())->write($geoPHPGeometry);
+
+        return $sridInBinary . $wkbWithoutSrid;
     }
 
-    public static function getWKTArgument($value) {
-        $left = strpos($value, '(');
-        $right = strrpos($value, ')');
-
-        return substr($value, $left + 1, $right - $left - 1);
-    }
-
-    public static function getWKTClass($value) {
-        $left = strpos($value, '(');
-        $type = trim(substr($value, 0, $left));
-
-        switch (strtoupper($type)) {
-            case 'POINT':
-                return CGeo_Spatial_Type_Point::class;
-            case 'LINESTRING':
-                return CGeo_Spatial_Type_LineString::class;
-            case 'POLYGON':
-                return CGeo_Spatial_Type_Polygon::class;
-            case 'MULTIPOINT':
-                return CGeo_Spatial_Type_MultiPoint::class;
-            case 'MULTILINESTRING':
-                return CGeo_Spatial_Type_MultiLineString::class;
-            case 'MULTIPOLYGON':
-                return CGeo_Spatial_Type_MultiPolygon::class;
-            case 'GEOMETRYCOLLECTION':
-                return CGeo_Spatial_Type_GeometryCollection::class;
-            default:
-                throw new CGeo_Spatial_Exception_UnknownWKTTypeException('Type was ' . $type);
-        }
-    }
-
-    public static function fromWKB($wkb) {
+    /**
+     * @param string $wkb
+     *
+     * @throws InvalidArgumentException
+     *
+     * @return static
+     */
+    public static function fromWkb(string $wkb) {
         $srid = substr($wkb, 0, 4);
+        // @phpstan-ignore-next-line
         $srid = unpack('L', $srid)[1];
 
         $wkb = substr($wkb, 4);
-        $parser = new Parser(new CGeo_Spatial_Type_Factory());
 
-        /** @var Geometry $parsed */
-        $parsed = $parser->parse($wkb);
+        $geometry = Factory::parse($wkb);
+        $geometry->srid = $srid;
 
-        if ($srid > 0) {
-            $parsed->setSrid($srid);
+        if (!($geometry instanceof CGeo_Spatial_Type_Geometry)) {
+            throw new InvalidArgumentException(sprintf('Expected %s, %s given.', static::class, get_class($geometry)));
         }
 
-        return $parsed;
+        return $geometry;
     }
 
-    public static function fromWKT($wkt, $srid = null) {
-        $wktArgument = static::getWKTArgument($wkt);
+    /**
+     * @param string $wkt
+     * @param int    $srid
+     *
+     * @throws InvalidArgumentException
+     *
+     * @return static
+     */
+    public static function fromWkt($wkt, $srid = 0) {
+        $geometry = Factory::parse($wkt);
+        $geometry->srid = $srid;
 
-        return static::fromString($wktArgument, $srid);
+        if (!($geometry instanceof CGeo_Spatial_Type_Geometry)) {
+            throw new InvalidArgumentException(
+                sprintf('Expected %s, %s given.', static::class, get_class($geometry))
+            );
+        }
+
+        return $geometry;
     }
 
-    public static function fromJson($geoJson) {
-        if (is_string($geoJson)) {
-            $geoJson = GeoJson::jsonUnserialize(json_decode($geoJson));
+    /**
+     * @param string $geoJson
+     * @param int    $srid
+     *
+     * @throws InvalidArgumentException
+     *
+     * @return static
+     */
+    public static function fromJson(string $geoJson, int $srid = 0) {
+        $geometry = Factory::parse($geoJson);
+        $geometry->srid = $srid;
+
+        if (!($geometry instanceof static)) {
+            throw new InvalidArgumentException(
+                sprintf('Expected %s, %s given.', static::class, get_class($geometry))
+            );
         }
 
-        if ($geoJson->getType() === 'FeatureCollection') {
-            return CGeo_Spatial_Type_GeometryCollection::fromJson($geoJson);
-        }
-
-        if ($geoJson->getType() === 'Feature') {
-            $geoJson = $geoJson->getGeometry();
-        }
-
-        $type = '\Grimzy\LaravelMysqlSpatial\Types\\' . $geoJson->getType();
-
-        return $type::fromJson($geoJson);
+        return $geometry;
     }
 
-    public function toJson($options = 0) {
-        return json_encode($this, $options);
+    /**
+     * @param array<mixed> $geometry
+     *
+     * @throws JsonException
+     *
+     * @return static
+     */
+    public static function fromArray(array $geometry) {
+        $geoJson = json_encode($geometry, JSON_THROW_ON_ERROR);
+
+        return static::fromJson($geoJson);
+    }
+
+    /**
+     * @return array<mixed>
+     */
+    public function jsonSerialize(): array {
+        return $this->toArray();
+    }
+
+    /**
+     * @return array{type: string, coordinates: array<mixed>}
+     */
+    public function toArray(): array {
+        return [
+            'type' => class_basename(static::class),
+            'coordinates' => $this->getCoordinates(),
+        ];
+    }
+
+    /**
+     * @throws JsonException
+     *
+     * @return string
+     */
+    public function toFeatureCollectionJson(): string {
+        if (static::class === GeometryCollection::class) {
+            /** @var GeometryCollection $this */
+            $geometries = $this->geometries;
+        } else {
+            $geometries = collect([$this]);
+        }
+
+        $features = $geometries->map(static function (self $geometry): array {
+            return [
+                'type' => 'Feature',
+                'properties' => [],
+                'geometry' => $geometry->toArray(),
+            ];
+        });
+
+        return json_encode(
+            [
+                'type' => 'FeatureCollection',
+                'features' => $features,
+            ],
+            JSON_THROW_ON_ERROR
+        );
+    }
+
+    /**
+     * @return array<mixed>
+     */
+    abstract public function getCoordinates(): array;
+
+    /**
+     * @param array<string> $arguments
+     *
+     * @return CModel_Contract_CastsAttributesInterface
+     */
+    public static function castUsing(array $arguments) {
+        return new GeometryCast(static::class);
+    }
+
+    /**
+     * @param ConnectionInterface $connection
+     *
+     * @return ExpressionContract
+     */
+    public function toSqlExpression(CDatabase_Contract_ConnectionInterface $connection): ExpressionContract {
+        $wkt = $this->toWkt();
+
+        if (!(new AxisOrder())->supported($connection)) {
+            // @codeCoverageIgnoreStart
+            return DB::raw("ST_GeomFromText('{$wkt}', {$this->srid})");
+            // @codeCoverageIgnoreEnd
+        }
+
+        return DB::raw("ST_GeomFromText('{$wkt}', {$this->srid}, 'axis-order=long-lat')");
     }
 }

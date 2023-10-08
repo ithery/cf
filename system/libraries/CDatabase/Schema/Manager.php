@@ -736,6 +736,7 @@ abstract class CDatabase_Schema_Manager {
             if (!$defaultPrevented) {
                 $column = $this->getPortableTableColumnDefinition($tableColumn);
             }
+
             if ($column) {
                 $name = strtolower($column->getQuotedName($this->platform));
                 $list[$name] = $column;
