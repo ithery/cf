@@ -3,8 +3,12 @@
  * @see https://github.com/grimzy/laravel-mysql-spatial/
  */
 class CGeo_Spatial {
-    public static function point($geojson) {
-        return CGeo_Spatial_Type_Point::fromJson($geojson);
+    public static function point($lat, $long = null) {
+        if (count(func_get_args()) == 1) {
+            return CGeo_Spatial_Type_Point::fromJson($lat);
+        }
+
+        return new CGeo_Spatial_Type_Point($lat, $long);
     }
 
     public static function multiPoint($geojson) {

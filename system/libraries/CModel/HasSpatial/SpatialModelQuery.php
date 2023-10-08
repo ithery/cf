@@ -81,11 +81,7 @@ class CModel_HasSpatial_SpatialModelQuery extends CModel_Query {
      *
      * @return self
      */
-    public function withDistanceSphere(
-        $column,
-        $geometryOrColumn,
-        string $alias = 'distance'
-    ) {
+    public function withDistanceSphere($column, $geometryOrColumn, string $alias = 'distance') {
         if (!$this->getQuery()->columns) {
             $this->select('*');
         }
@@ -110,12 +106,7 @@ class CModel_HasSpatial_SpatialModelQuery extends CModel_Query {
      *
      * @return self
      */
-    public function whereDistanceSphere(
-        $column,
-        $geometryOrColumn,
-        string $operator,
-        $value
-    ): self {
+    public function whereDistanceSphere($column, $geometryOrColumn, string $operator, $value) {
         $this->whereRaw(
             sprintf(
                 'ST_DISTANCE_SPHERE(%s, %s) %s ?',
@@ -136,11 +127,7 @@ class CModel_HasSpatial_SpatialModelQuery extends CModel_Query {
      *
      * @return self
      */
-    public function orderByDistanceSphere(
-        $column,
-        $geometryOrColumn,
-        string $direction = 'asc'
-    ) {
+    public function orderByDistanceSphere($column, $geometryOrColumn, string $direction = 'asc') {
         $this->orderByRaw(
             sprintf(
                 'ST_DISTANCE_SPHERE(%s, %s) %s',
@@ -159,10 +146,7 @@ class CModel_HasSpatial_SpatialModelQuery extends CModel_Query {
      *
      * @return self
      */
-    public function whereWithin(
-        $column,
-        $geometryOrColumn
-    ) {
+    public function whereWithin($column, $geometryOrColumn) {
         $this->whereRaw(
             sprintf(
                 'ST_WITHIN(%s, %s)',
@@ -180,10 +164,7 @@ class CModel_HasSpatial_SpatialModelQuery extends CModel_Query {
      *
      * @return self
      */
-    public function whereNotWithin(
-        $column,
-        $geometryOrColumn
-    ) {
+    public function whereNotWithin($column, $geometryOrColumn) {
         $this->whereRaw(
             sprintf(
                 'ST_WITHIN(%s, %s) = 0',
@@ -201,10 +182,7 @@ class CModel_HasSpatial_SpatialModelQuery extends CModel_Query {
      *
      * @return self
      */
-    public function whereContains(
-        $column,
-        $geometryOrColumn
-    ) {
+    public function whereContains($column, $geometryOrColumn) {
         $this->whereRaw(
             sprintf(
                 'ST_CONTAINS(%s, %s)',
@@ -222,10 +200,7 @@ class CModel_HasSpatial_SpatialModelQuery extends CModel_Query {
      *
      * @return self
      */
-    public function whereNotContains(
-        $column,
-        $geometryOrColumn
-    ) {
+    public function whereNotContains($column, $geometryOrColumn) {
         $this->whereRaw(
             sprintf(
                 'ST_CONTAINS(%s, %s) = 0',
@@ -415,7 +390,7 @@ class CModel_HasSpatial_SpatialModelQuery extends CModel_Query {
 
         if ($geometryOrColumnOrExpression instanceof CDatabase_Contract_Query_ExpressionInterface) {
             $expression = $geometryOrColumnOrExpression;
-        } elseif ($geometryOrColumnOrExpression instanceof Geometry) {
+        } elseif ($geometryOrColumnOrExpression instanceof CGeo_Spatial_Type_Geometry) {
             $expression = $geometryOrColumnOrExpression->toSqlExpression($this->getConnection());
         } else {
             $expression = c::db()->raw($grammar->wrap($geometryOrColumnOrExpression));
