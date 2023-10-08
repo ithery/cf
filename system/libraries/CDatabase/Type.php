@@ -75,6 +75,8 @@ abstract class CDatabase_Type {
 
     const GEOMETRY_COLLECTION = 'geometrycollection';
 
+    const GEOMETRY = 'geometry';
+
     /**
      * Map of already instantiated type objects. One instance per type (flyweight).
      *
@@ -120,6 +122,7 @@ abstract class CDatabase_Type {
         self::POLYGON => CDatabase_Type_PolygonType::class,
         self::MULTI_LINE_STRING => CDatabase_Type_MultiLineStringType::class,
         self::MULTI_POLYGON => CDatabase_Type_MultiPolygonType::class,
+        self::GEOMETRY => CDatabase_Type_GeometryType::class,
         self::GEOMETRY_COLLECTION => CDatabase_Type_GeometryCollectionType::class,
     ];
 

@@ -30,4 +30,8 @@ class CGeo_Spatial {
     public static function multiPolygon($geojson) {
         return CGeo_Spatial_Type_MultiPolygon::fromJson($geojson);
     }
+
+    public static function geometryCollection($geojson) {
+        return CGeo_Spatial_Type_GeometryCollection::fromJson($geojson);
+    }
 }

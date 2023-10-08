@@ -1012,6 +1012,7 @@ SQL
             'polygon' => 'polygon',
             'multilinestring' => 'multilinestring',
             'multipolygon' => 'multipolygon',
+            'geometry' => 'geometry',
             'geometrycollection' => 'geometrycollection',
             'geomcollection' => 'geometrycollection',
         ];
