@@ -30,6 +30,12 @@ class CImage_Avatar_Api_Initials {
         return $this;
     }
 
+    public function setBackground($background) {
+        $this->input->background = $background;
+
+        return $this;
+    }
+
     public function setRounded($rounded = true) {
         $this->input->setRounded((bool) $rounded);
 
