@@ -4,9 +4,9 @@ use Rubix\ML\Estimator;
 use Rubix\ML\Datasets\Unlabeled;
 use Rubix\ML\AnomalyDetectors\Scoring;
 
-class CML_ResultFiller_AnomalyFiller implements CML_Contract_ResultFillerInterface {
-    public static function predict(array $data, Estimator $estimator): array {
-        $anomalies = CML_Rubix::predict($data);
+class CML_Rubix_ResultFiller_AnomalyFiller implements CML_Contract_ResultFillerInterface {
+    public static function predict($modelPath, array $data, Estimator $estimator): array {
+        $anomalies = CML_Adapter_RubixAdapter::predict($modelPath, $data);
 
         if ($estimator instanceof Scoring) {
             $scores = $estimator->score(Unlabeled::build($data));

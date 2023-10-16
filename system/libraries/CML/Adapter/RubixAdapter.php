@@ -4,7 +4,6 @@ use Rubix\ML\Pipeline;
 use Rubix\ML\Estimator;
 use Rubix\ML\Extractors\CSV;
 
-use Rubix\ML\Loggers\Screen;
 use Rubix\ML\PersistentModel;
 use Rubix\ML\Datasets\Labeled;
 use Rubix\ML\Datasets\Unlabeled;
@@ -22,7 +21,9 @@ use Rubix\ML\Transformers\NumericStringConverter;
 use Rubix\ML\CrossValidation\Metrics\Informedness;
 use Rubix\ML\CrossValidation\Reports\ErrorAnalysis;
 
-class CML_Adapter_RubixAdapter {
+require_once DOCROOT . 'system/vendor/Rubix/ML/functions.php';
+require_once DOCROOT . 'system/vendor/Rubix/ML/constants.php';
+class CML_Adapter_RubixAdapter extends CML_AdapterAbstract {
     /**
      * @var CML_Rubix
      */
@@ -37,12 +38,12 @@ class CML_Adapter_RubixAdapter {
     }
 
     public static function train(
+        $modelFilename,
         array $data,
         mixed $data_index_w_label = null,
         Estimator $estimator_algorithm = null,
         array $transformers = null,
-        $model_filename = 'model_trained.rbx',
-        float $train_part_size = 0.7
+        float $trainPartSize = 1
     ) {
         $is_testable = false;
         if (is_null($estimator_algorithm)) {
@@ -66,24 +67,24 @@ class CML_Adapter_RubixAdapter {
 
             shuffle($data);
 
-            $train_size = ceil($data_size * $train_part_size);
+            $train_size = ceil($data_size * $trainPartSize);
 
             $train_data = array_slice($data, 0, $train_size);
             $test_data = array_slice($data, $train_size, sizeof($data) - 1);
 
-            static::trainWithoutTest($train_data, $data_index_w_label, $estimator_algorithm, $transformers, $model_filename);
+            static::trainWithoutTest($modelFilename, $train_data, $data_index_w_label, $estimator_algorithm, $transformers);
 
-            $report = static::getErrorAnalysis($test_data, $data_index_w_label, $model_filename);
+            $report = static::getErrorAnalysis($modelFilename, $test_data, $data_index_w_label);
 
             return $report;
         } else {
             //clusterer or anomaly estimator, returning data that is enriched with scores, clusters, and anomality rating
             $return_data = static::trainWithoutTest(
+                $modelFilename,
                 $data,
                 $data_index_w_label,
                 $estimator_algorithm,
                 $transformers,
-                $model_filename
             );
 
             return $return_data;
@@ -95,20 +96,20 @@ class CML_Adapter_RubixAdapter {
      * @param null|Estimator     $estimator_algorithm
      * @param null|Transformer[] $transformers
      * @param mixed              $data_index_w_label  the number/string of the index of the data to be trained
-     * @param mixed              $model_filename
+     * @param mixed              $modelFilename
      *
      * @return bool|array[] typically boolean whether the training was successful, otherwise in case of cluster returns $data with extra entry 'cluster_nr'
      */
     public static function trainWithoutTest(
+        $modelFilename,
         array $data,
         mixed $data_index_w_label = null,
         Estimator $estimator_algorithm = null,
-        array $transformers = null,
-        $model_filename = 'model_trained.rbx'
+        array $transformers = null
     ) {
         ini_set('memory_limit', '-1');
 
-        $logger = new Screen('TrainData');
+        $logger = new CML_Rubix_Logger('TrainData');
 
         $logger->info('Starting to train');
 
@@ -167,30 +168,26 @@ class CML_Adapter_RubixAdapter {
                 ]
             );
         }
-
-        $output_path = rubixai_getconfig()['ai_model_path_output'];
-        CML_Utils::createIfNotExistsFolder($output_path);
-
+        CML_Utils::createIfNotExistsFolder(dirname($modelFilename));
         $estimator = new PersistentModel(
             new Pipeline(
                 $transformers,
                 $estimator_algorithm
             ),
-            new Filesystem($output_path . $model_filename)
+            new Filesystem($modelFilename)
         );
 
         $estimator->train($dataset);
 
         $estimator->save();
         $logger->info('Finished training');
-
         $estimatorType = CML_Utils::getEstimatorType($estimator);
         if ($estimatorType === CML_Utils::CLUSTERER) {
-            $data = ClustererFiller::predict($data, $estimator);
+            $data = CML_Rubix_ResultFiller_ClustererFiller::predict($modelFilename, $data, $estimator);
 
             return $data;
         } elseif ($estimatorType === CML_Utils::ANOMALITY) {
-            $data = AnomalyFiller::predict($data, $estimator);
+            $data = CML_Rubix_ResultFiller_AnomalyFiller::predict($modelFilename, $data, $estimator);
 
             return $data;
         }
@@ -204,9 +201,9 @@ class CML_Adapter_RubixAdapter {
      * @return array|int
      */
     public static function predict(
+        string $modelFilename,
         array $input_data,
-        Estimator $estimator = null,
-        string $model_filename = 'model_trained.rbx'
+        Estimator $estimator = null
     ) {
         $is_single_dimensional_array = false;
         if (is_array($input_data) && !is_array($input_data[0] ?? null)) {
@@ -214,14 +211,14 @@ class CML_Adapter_RubixAdapter {
             $is_single_dimensional_array = true;
         }
 
-        $logger = new Screen('Predict Data');
+        $logger = new CML_Rubix_Logger('Predict Data');
 
         $logger->info('Starting prediction');
 
         $input_data = new Unlabeled($input_data);
 
         if (is_null($estimator)) {
-            $estimator = static::getEstimatorFromFilesystem($model_filename);
+            $estimator = static::getEstimatorFromFilesystem($modelFilename);
         }
 
         $prediction = $estimator->predict($input_data);
@@ -234,17 +231,17 @@ class CML_Adapter_RubixAdapter {
     }
 
     public static function getErrorAnalysis(
+        $modelFilename,
         array $samples_w_labels,
-        $key_for_labels,
-        $model_filename = 'model_trained.rbx'
+        $key_for_labels
     ) {
         list($samples, $labels) = CML_Utils::getLabelsFromSamples($samples_w_labels, $key_for_labels);
 
-        $logger = new Screen('ErrorAnalysis');
+        $logger = new CML_Rubix_Logger('ErrorAnalysis');
 
         $dataset = new Unlabeled($samples);
 
-        $estimator = static::getEstimatorFromFilesystem($model_filename);
+        $estimator = static::getEstimatorFromFilesystem($modelFilename);
 
         $logger->info('Starting Error Analysis');
 
@@ -269,8 +266,8 @@ class CML_Adapter_RubixAdapter {
         return $results;
     }
 
-    public static function getEstimatorFromFilesystem(string $model_filename = 'model_trained.rbx'): Estimator {
-        return PersistentModel::load(new Filesystem(rubixai_getconfig('ai_model_path_output') . $model_filename));
+    public static function getEstimatorFromFilesystem(string $modelFilename): Estimator {
+        return PersistentModel::load(new Filesystem($modelFilename));
     }
 
     public static function fromCsv(string $filename, ?array $columns = null) {
@@ -280,22 +277,21 @@ class CML_Adapter_RubixAdapter {
 
         if (is_array($columns)) {
             $data = new ColumnPicker(
-                new CSV(rubixai_getconfig('csv_path_input'), true),
+                new CSV($filename, true),
                 $columns
             );
         } else {
-            $data = new CSV(rubixai_getconfig('csv_path_input'), true);
+            $data = new CSV($filename, true);
         }
 
         return iterator_to_array($data);
     }
 
-    public static function toCsv(array $data, string $filename) {
+    public static function toCsv($path, array $data, string $filename) {
         if (!$filename) {
             throw new Exception('Filename cannot be null or empty or fasly');
         }
 
-        $path = rubixai_getconfig('csv_path_output');
         CML_Utils::createIfNotExistsFolder($path);
         $csv = new CSV($path . $filename, true);
         $csv->export(new \ArrayObject($data));

@@ -13,6 +13,7 @@ use Rubix\ML\Persisters\Filesystem;
 use Rubix\ML\Classifiers\KDNeighbors;
 use Rubix\ML\Extractors\ColumnPicker;
 use Rubix\ML\Transformers\Transformer;
+use Rubix\ML\Kernels\Distance\Manhattan;
 use Rubix\ML\Transformers\OneHotEncoder;
 use Rubix\ML\CrossValidation\Metrics\MCC;
 use Rubix\ML\CrossValidation\Metrics\FBeta;
@@ -32,13 +33,40 @@ class CML_Rubix {
         ];
     }
 
+    public static function getDefaultParameters() {
+        return [
+            'clusterer' => [
+                'kmeans' => [
+                    'k' => 5,
+                    'batchSize' => 128,
+                    'epochs' => 1000,
+                    'minChange' => 1e-4,
+                    'window' => 5,
+                    'kernel' => new Manhattan(),
+                    'seeder' => null
+                ]
+            ]
+        ];
+    }
+
     /**
      * @param string $estimator
      * @param array  $parameters
      *
-     * @return \Rubix\ML\Estimator;
+     * @return \Rubix\ML\Estimator
      */
     public static function createEstimator($estimator, $parameters = []) {
-        return c::container()->make($estimator, $parameters);
+        $estimatorClass = carr::get(self::getEstimatorClassMaps(), $estimator);
+        if (!$estimatorClass) {
+            throw new Exception('Estimator ' . $estimator . ' not found');
+        }
+        $params = carr::get(self::getDefaultParameters(), $estimator);
+        foreach ($params as $k => $v) {
+            if (isset($parameters[$k])) {
+                $params[$k] = $parameters[$k];
+            }
+        }
+
+        return c::container()->make($estimatorClass, $params);
     }
 }
