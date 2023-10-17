@@ -83,7 +83,7 @@ class CVendor_Xendit_Balance extends CVendor_Xendit_Base {
      *                'balance' => int
      *                ]
      */
-    public function getBalance($accountType = null, $currency = null) {
+    public function getBalance($accountType = null, $currency = 'IDR') {
         self::validateAccountType($accountType);
         self::validateCurrency($currency);
         $query = carr::query([
