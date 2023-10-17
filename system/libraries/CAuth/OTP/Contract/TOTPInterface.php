@@ -11,9 +11,9 @@ interface CAuth_OTP_Contract_TOTPInterface extends CAuth_OTP_Contract_OTPInterfa
      * If the secret is null, a random 64 bytes secret will be generated.
      *
      * @param null|string      $secret
-     * @param positive-int     $period
+     * @param int              $period
      * @param non-empty-string $digest
-     * @param positive-int     $digits
+     * @param int              $digits
      *
      * @deprecated Deprecated since v11.1, use ::createFromSecret or ::generate instead
      */

@@ -1,9 +1,6 @@
 <?php
 
-
-
-interface CAuth_OTP_Contract_OTPInterface
-{
+interface CAuth_OTP_Contract_OTPInterface {
     public const DEFAULT_DIGITS = 6;
 
     public const DEFAULT_DIGEST = 'sha1';
@@ -41,7 +38,7 @@ interface CAuth_OTP_Contract_OTPInterface
      * Verify that the OTP is valid with the specified input. If no input is provided, the input is set to a default
      * value or false is returned.
      *
-     * @param string $otp
+     * @param string   $otp
      * @param null|int $input
      * @param null|int $window
      */
@@ -58,12 +55,12 @@ interface CAuth_OTP_Contract_OTPInterface
     public function setLabel(string $label): void;
 
     /**
-     * @return non-empty-string|null The label of the OTP
+     * @return null|non-empty-string The label of the OTP
      */
     public function getLabel(): ?string;
 
     /**
-     * @return non-empty-string|null The issuer
+     * @return null|non-empty-string The issuer
      */
     public function getIssuer(): ?string;
 
@@ -80,7 +77,7 @@ interface CAuth_OTP_Contract_OTPInterface
     public function setIssuerIncludedAsParameter(bool $issuer_included_as_parameter): void;
 
     /**
-     * @return positive-int Number of digits in the OTP
+     * @return int Number of digits in the OTP
      */
     public function getDigits(): int;
 
