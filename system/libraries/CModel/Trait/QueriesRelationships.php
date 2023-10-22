@@ -381,16 +381,15 @@ trait CModel_Trait_QueriesRelationships {
 
             if ($function) {
                 if ($column instanceof CDatabase_Query_Expression) {
-                    $expression = $column->getValue($this->getQuery()->getGrammar());
+                    $wrappedColumn = $column->getValue($this->getQuery()->getGrammar());
                 } else {
                     $hashedColumn = $this->getRelationHashedColumn($column, $relation);
 
                     $wrappedColumn = $this->getQuery()->getGrammar()->wrap(
                         $column === '*' ? $column : $relation->getRelated()->qualifyColumn($hashedColumn)
                     );
-
-                    $expression = $function === 'exists' ? $wrappedColumn : sprintf('%s(%s)', $function, $wrappedColumn);
                 }
+                $expression = $function === 'exists' ? $wrappedColumn : sprintf('%s(%s)', $function, $wrappedColumn);
             } else {
                 $expression = $column;
             }
