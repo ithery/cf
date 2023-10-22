@@ -380,13 +380,13 @@ trait CModel_Trait_QueriesRelationships {
             $relation = $this->getRelationWithoutConstraints($name);
 
             if ($function) {
-                $hashedColumn = $this->getQuery()->from === $relation->getQuery()->getQuery()->from
-                                            ? "{$relation->getRelationCountHash(false)}.${column}"
-                                            : $column;
+                $hashedColumn = $this->getRelationHashedColumn($column, $relation);
 
-                $expression = sprintf('%s(%s)', $function, $this->getQuery()->getGrammar()->wrap(
+                $wrappedColumn = $this->getQuery()->getGrammar()->wrap(
                     $column === '*' ? $column : $relation->getRelated()->qualifyColumn($hashedColumn)
-                ));
+                );
+
+                $expression = $function === 'exists' ? $wrappedColumn : sprintf('%s(%s)', $function, $wrappedColumn);
             } else {
                 $expression = $column;
             }
@@ -422,10 +422,17 @@ trait CModel_Trait_QueriesRelationships {
                 preg_replace('/[^[:alnum:][:space:]_]/u', '', "${name} ${function} ${column}")
             );
 
-            $this->selectSub(
-                $function ? $query : $query->limit(1),
-                $alias
-            );
+            if ($function === 'exists') {
+                $this->selectRaw(
+                    sprintf('exists(%s) as %s', $query->toSql(), $this->getQuery()->grammar->wrap($alias)),
+                    $query->getBindings()
+                )->withCasts([$alias => 'bool']);
+            } else {
+                $this->selectSub(
+                    $function ? $query : $query->limit(1),
+                    $alias
+                );
+            }
         }
 
         return $this;
@@ -586,6 +593,24 @@ trait CModel_Trait_QueriesRelationships {
      */
     public function orWhereBelongsTo($related, $relationshipName = null) {
         return $this->whereBelongsTo($related, $relationshipName, 'or');
+    }
+
+    /**
+     * Get the relation hashed column name for the given column and relation.
+     *
+     * @param string           $column
+     * @param \CModel_Relation $relation
+     *
+     * @return string
+     */
+    protected function getRelationHashedColumn($column, $relation) {
+        if (cstr::contains($column, '.')) {
+            return $column;
+        }
+
+        return $this->getQuery()->from === $relation->getQuery()->getQuery()->from
+            ? "{$relation->getRelationCountHash(false)}.$column"
+            : $column;
     }
 
     /**
