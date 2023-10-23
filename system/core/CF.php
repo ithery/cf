@@ -8,6 +8,7 @@ defined('SYSPATH') or die('No direct access allowed.');
  */
 final class CF {
     use CFDeprecatedTrait;
+
     const CFCLI_CURRENT_DOMAIN_FILE = DOCROOT . 'data' . DS . 'current-domain';
 
     const CFCLI_CURRENT_APPCODE_FILE = DOCROOT . 'data' . DS . 'current-app';
@@ -1096,8 +1097,8 @@ final class CF {
      * @return void
      */
     public function setFallbackLocale($fallbackLocale) {
-        // static::$fallbackLocale = $fallbackLocale;
-        // CTranslation::translator()->setFallback($locale);
+        static::$fallbackLocale = $fallbackLocale;
+        CTranslation::translator()->setFallback($fallbackLocale);
     }
 
     /**
@@ -1121,7 +1122,7 @@ final class CF {
      * @return bool
      */
     public static function isDevSuite() {
-        return substr(CF::domain(), -strlen('.test')) === '.test';
+        return substr(CF::domain(), strlen('.test') * -1) === '.test';
     }
 
     /**
@@ -1131,7 +1132,7 @@ final class CF {
      */
     public static function isTesting() {
         if (defined('CFTesting')
-            || (is_array($_SERVER) && isset($_SERVER['APP_ENV']) && $_SERVER['APP_ENV'] == 'testing')
+            || (is_array($_SERVER) && isset($_SERVER['APP_ENV']) && $_SERVER['APP_ENV'] === 'testing')
         ) {
             return true;
         }
