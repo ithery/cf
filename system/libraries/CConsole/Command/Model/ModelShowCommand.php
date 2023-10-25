@@ -452,12 +452,12 @@ class CConsole_Command_Model_ModelShowCommand extends CConsole_Command_AppComman
     protected function getColumnDefault($column, $model) {
         $attributeDefault = $model->getAttributes()[$column->getName()] ?? null;
 
-        if ($attributeDefault instanceof BackedEnum) {
-            return $attributeDefault->value;
-        }
-        if ($attributeDefault instanceof UnitEnum) {
-            return $attributeDefault->name;
-        }
+        // if ($attributeDefault instanceof BackedEnum) {
+        //     return $attributeDefault->value;
+        // }
+        // if ($attributeDefault instanceof UnitEnum) {
+        //     return $attributeDefault->name;
+        // }
 
         return $attributeDefault ?? $column->getDefault();
     }
