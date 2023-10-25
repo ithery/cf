@@ -14,7 +14,7 @@ defined('SYSPATH') or die('No direct access allowed.');
  * @method static       CModel|CModel_Query|static                firstOrNew(array $attributes, array $values = [])                                         Get the first record matching the attributes or instantiate it.
  * @method static       CModel_Collection|CModel_Query[]|static[] get($columns = ['*'])                                                                     Execute the query as a "select" statement.
  * @method mixed        value($column)                                                                                                                      Get a single column's value from the first result of a query.
- * @method static       mixed        pluck($column)                                                                                                         Get a single column's value from the first result of a query.
+ * @method static       CCollection        pluck($column)                                                                                                   Get a single column's value from the first result of a query.
  * @method void         chunk($count, callable $callback)                                                                                                   Chunk the results of the query.
  * @method \CCollection lists($column, $key = null)                                                                                                         Get an array with the values of a given column.
  * @method static       \CPagination_LengthAwarePaginator         paginate($perPage = null, $columns = ['*'], $pageName = 'page', $page = null)             Paginate the given query.
@@ -81,6 +81,7 @@ abstract class CModel implements ArrayAccess, CInterface_Arrayable, CInterface_J
         CModel_Trait_HidesAttributes,
         CModel_Trait_Timestamps,
         CTrait_ForwardsCalls;
+
     /**
      * The name of the "created" column.
      *
