@@ -3,7 +3,7 @@
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Input\InputArgument;
 
-trait CConsole_Trait_HasParameters {
+trait CConsole_Trait_HasParametersTrait {
     /**
      * Specify the arguments and options on the command.
      *

@@ -70,6 +70,7 @@ class CFConsole {
         CConsole_Command_Make_MakeThemeCommand::class,
         CConsole_Command_Make_MakeTestCommand::class,
         CConsole_Command_Model_ModelListCommand::class,
+        CConsole_Command_Model_ModelShowCommand::class,
         CConsole_Command_Model_ModelTablesCommand::class,
         CConsole_Command_Model_ModelUpdateCommand::class,
         CConsole_Command_App_AppCreateCommand::class,

@@ -39,14 +39,8 @@ class CVendor_WhatsApp_Api {
         if (is_string($response)) {
             $response = json_decode($response, true);
         }
-        $errCode = (int) carr::get($response, 'errCode');
-        if ($errCode != 0) {
-            $errMessage = carr::get($response, 'errMessage');
 
-            throw new CVendor_WhatsApp_Exception_ApiException($errMessage);
-        }
-
-        return carr::get($response, 'data', []);
+        return $response;
     }
 
     public function getClient() {
@@ -78,8 +72,9 @@ class CVendor_WhatsApp_Api {
     public function getTemplate($name) {
         $params = ['name' => $name];
         $result = $this->getTemplates($params);
-        if (is_array($result) && count($result) > 0) {
-            return carr::first($result);
+        $data = carr::get($result, 'data');
+        if (is_array($data) && count($data) > 0) {
+            return carr::first($data);
         }
 
         return null;
