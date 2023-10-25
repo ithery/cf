@@ -444,8 +444,8 @@ class CConsole_Command_Model_ModelShowCommand extends CConsole_Command_AppComman
     /**
      * Get the default value for the given column.
      *
-     * @param \Doctrine\DBAL\Schema\Column        $column
-     * @param \CModel $model
+     * @param \Doctrine\DBAL\Schema\Column $column
+     * @param \CModel                      $model
      *
      * @return null|mixed
      */
@@ -513,7 +513,11 @@ class CConsole_Command_Model_ModelShowCommand extends CConsole_Command_AppComman
         if (cstr::contains($model, '\\') && class_exists($model)) {
             return $model;
         }
-
+        $temp = explode('_', $model);
+        $model = '';
+        foreach ($temp as $val) {
+            $model .= ucfirst($val);
+        }
         $modelPrefix = $this->prefix . 'Model';
         if (!cstr::startsWith($model, $modelPrefix)) {
             $model = $modelPrefix . '_' . $model;

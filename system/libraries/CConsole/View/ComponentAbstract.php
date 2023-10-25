@@ -1,6 +1,4 @@
 <?php
-require_once DOCROOT . 'system/vendor/Termwind/Functions.php';
-
 use function Termwind\render;
 use function Termwind\renderUsing;
 

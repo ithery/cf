@@ -1,4 +1,5 @@
 <?php
+require_once DOCROOT . 'system/vendor/Termwind/Functions.php';
 
 class CConsole {
     const SUCCESS_EXIT = 0;
