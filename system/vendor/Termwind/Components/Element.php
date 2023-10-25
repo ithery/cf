@@ -29,8 +29,16 @@ abstract class Element
 {
     /** @var string[] */
     protected static array $defaultStyles = [];
+    protected OutputInterface $output;
+    /**
+     * @var array|sring
+     */
+    protected $content;
 
-    protected Styles $styles;
+    /**
+     * @var Styles
+     */
+    protected $styles;
 
     /**
      * Creates an element instance.
@@ -38,11 +46,17 @@ abstract class Element
      * @param  array<int, Element|string>|string  $content
      */
     final public function __construct(
-        protected OutputInterface $output,
-        protected array|string $content,
-        Styles|null $styles = null
+        OutputInterface $output,
+        $content,
+        Styles $styles = null
     ) {
-        $this->styles = $styles ?? new Styles(defaultStyles: static::$defaultStyles);
+        $this->output = $output;
+        $this->content = $content;
+        $this->styles = $styles ?? new Styles([
+            'colors' => [],
+            'options' => [],
+            'isFirstChild' => false,
+        ],[],[],static::$defaultStyles);
         $this->styles->setElement($this);
     }
 
@@ -52,7 +66,7 @@ abstract class Element
      * @param  array<int, Element|string>|string  $content
      * @param  array<string, mixed>  $properties
      */
-    final public static function fromStyles(OutputInterface $output, array|string $content, string $styles = '', array $properties = []): static
+    final public static function fromStyles(OutputInterface $output, $content, string $styles = '', array $properties = [])
     {
         $element = new static($output, $content);
         if ($properties !== []) {
@@ -80,7 +94,7 @@ abstract class Element
     /**
      * @param  array<int, mixed>  $arguments
      */
-    public function __call(string $name, array $arguments): mixed
+    public function __call(string $name, array $arguments)
     {
         if (method_exists($this->styles, $name)) {
             $result = $this->styles->{$name}(...$arguments);
@@ -98,7 +112,7 @@ abstract class Element
      *
      * @param  array<int, Element|string>|string  $content
      */
-    final public function setContent(array|string $content): static
+    final public function setContent($content)
     {
         return new static($this->output, $content, $this->styles);
     }

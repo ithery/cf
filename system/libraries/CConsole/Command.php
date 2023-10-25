@@ -138,6 +138,7 @@ class CConsole_Command extends SymfonyCommand {
             CConsole_OutputStyle::class,
             ['input' => $input, 'output' => $output]
         );
+        $this->components = c::container()->make(CConsole_View_ComponentFactory::class, ['output' => $this->output]);
 
         try {
             return parent::run(

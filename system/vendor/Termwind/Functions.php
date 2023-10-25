@@ -13,8 +13,11 @@ use Termwind\ValueObjects\Styles;
 if (! function_exists('Termwind\renderUsing')) {
     /**
      * Sets the renderer implementation.
+     *
+     * @param OutputInterface|null $renderer
+     * @return void
      */
-    function renderUsing(OutputInterface|null $renderer): void
+    function renderUsing(OutputInterface $renderer = null): void
     {
         Termwind::renderUsing($renderer);
     }

@@ -33,6 +33,14 @@ final class Styles
 
     private ?Element $element = null;
 
+    private array $properties = [];
+
+    private array $textModifiers = [];
+
+    private array $styleModifiers = [];
+
+    private array $defaultStyles = [];
+
     /**
      * Creates a Style formatter instance.
      *
@@ -42,15 +50,19 @@ final class Styles
      * @param  string[]  $defaultStyles
      */
     final public function __construct(
-        private array $properties = [
+        array $properties = [
             'colors' => [],
             'options' => [],
             'isFirstChild' => false,
         ],
-        private array $textModifiers = [],
-        private array $styleModifiers = [],
-        private array $defaultStyles = []
+        array $textModifiers = [],
+        array $styleModifiers = [],
+        array $defaultStyles = []
     ) {
+        $this->properties = $properties;
+        $this->textModifiers = $textModifiers;
+        $this->styleModifiers = $styleModifiers;
+        $this->defaultStyles = $defaultStyles;
     }
 
     /**
@@ -289,7 +301,7 @@ final class Styles
     /**
      * Adds the given padding left to the element.
      */
-    final public function pl(int $padding): static
+    final public function pl(int $padding)
     {
         return $this->with(['styles' => [
             'pl' => $padding,
@@ -299,7 +311,7 @@ final class Styles
     /**
      * Adds the given padding right.
      */
-    final public function pr(int $padding): static
+    final public function pr(int $padding)
     {
         return $this->with(['styles' => [
             'pr' => $padding,
@@ -317,7 +329,7 @@ final class Styles
     /**
      * Adds the given padding top.
      */
-    final public function pt(int $padding): static
+    final public function pt(int $padding)
     {
         return $this->with(['styles' => [
             'pt' => $padding,
@@ -327,7 +339,7 @@ final class Styles
     /**
      * Adds the given padding bottom.
      */
-    final public function pb(int $padding): static
+    final public function pb(int $padding)
     {
         return $this->with(['styles' => [
             'pb' => $padding,
@@ -448,7 +460,7 @@ final class Styles
     /**
      * Forces the width of the element.
      */
-    final public function w(int|string $width): static
+    final public function w($width)
     {
         return $this->with(['styles' => [
             'width' => $width,
@@ -458,7 +470,7 @@ final class Styles
     /**
      * Forces the element width to the full width of the terminal.
      */
-    final public function wFull(): static
+    final public function wFull()
     {
         return $this->w('1/1');
     }
@@ -466,7 +478,7 @@ final class Styles
     /**
      * Removes the width set on the element.
      */
-    final public function wAuto(): static
+    final public function wAuto()
     {
         return $this->with(['styles' => [
             'width' => null,
@@ -476,7 +488,7 @@ final class Styles
     /**
      * Defines a minimum width of an element.
      */
-    final public function minW(int|string $width): static
+    final public function minW($width)
     {
         return $this->with(['styles' => [
             'minWidth' => $width,
@@ -486,7 +498,7 @@ final class Styles
     /**
      * Defines a maximum width of an element.
      */
-    final public function maxW(int|string $width): static
+    final public function maxW($width)
     {
         return $this->with(['styles' => [
             'maxWidth' => $width,
@@ -679,20 +691,23 @@ final class Styles
         if (! $this->element instanceof Ul && ! $this->element instanceof Ol && ! $this->element instanceof Li) {
             throw new InvalidStyle(sprintf(
                 'Style list-none cannot be used with %s',
-                $this->element !== null ? $this->element::class : 'unknown element'
+                $this->element !== null ? get_class($this->element) : 'unknown element'
             ));
         }
 
         if (! $this->element instanceof Li) {
             return $this;
         }
-
-        return match ($type) {
-            'square' => $this->prepend('▪ '),
-            'disc' => $this->prepend('• '),
-            'decimal' => $this->prepend(sprintf('%d. ', $index)),
-            default => $this,
-        };
+        if($type=='square') {
+            return $this->prepend('▪ ');
+        }
+        if($type=='disc') {
+            return $this->prepend('• ');
+        }
+        if($type=='decimal') {
+            return $this->prepend(sprintf('%d. ', $index));
+        }
+        return $this;
     }
 
     /**
@@ -860,11 +875,22 @@ final class Styles
         if ($length <= $width) {
             $space = $width - $length;
 
-            return match ($styles['text-align'] ?? '') {
-                'right' => str_repeat(' ', $space).$content,
-                'center' => str_repeat(' ', (int) floor($space / 2)).$content.str_repeat(' ', (int) ceil($space / 2)),
-                default => $content.str_repeat(' ', $space),
-            };
+            $textAlign = $styles['text-align'] ?? '';
+
+            switch ($textAlign) {
+                case 'right':
+                    $result = str_repeat(' ', $space) . $content;
+                    break;
+                case 'center':
+                    $leftSpace = (int) floor($space / 2);
+                    $rightSpace = (int) ceil($space / 2);
+                    $result = str_repeat(' ', $leftSpace) . $content . str_repeat(' ', $rightSpace);
+                    break;
+                default:
+                    $result = $content . str_repeat(' ', $space);
+                    break;
+            }
+            return $result;
         }
 
         return self::trimText($content, $width);
@@ -945,7 +971,7 @@ final class Styles
         return mb_strlen(preg_replace(
             self::STYLING_REGEX,
             '',
-            $text ?? $this->element?->toString() ?? ''
+            $text ?? ($this->element ? $this->element->toString() : '')
         ) ?? '', 'UTF-8');
     }
 

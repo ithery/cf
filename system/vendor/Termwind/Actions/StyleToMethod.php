@@ -30,14 +30,17 @@ final class StyleToMethod
         '2xl' => 153,
     ];
 
+    private Styles $styles;
+    private string $style;
     /**
      * Creates a new action instance.
      */
     public function __construct(
-        private Styles $styles,
-        private string $style,
+        Styles $styles,
+        string $style
     ) {
-        // ..
+        $this->styles = $styles;
+        $this->style = $style;
     }
 
     /**
@@ -60,7 +63,7 @@ final class StyleToMethod
     /**
      * Converts the given style to a method name.
      */
-    public function __invoke(string|int ...$arguments): Styles
+    public function __invoke(...$arguments): Styles
     {
         if (StyleRepository::has($this->style)) {
             return StyleRepository::get($this->style)($this->styles, ...$arguments);

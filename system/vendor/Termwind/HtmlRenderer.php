@@ -52,7 +52,7 @@ final class HtmlRenderer
     /**
      * Convert a tree of DOM nodes to a tree of termwind elements.
      */
-    private function convert(Node $node): Components\Element|string
+    private function convert(Node $node)
     {
         $children = [];
 
@@ -78,7 +78,7 @@ final class HtmlRenderer
      *
      * @param  array<int, Components\Element|string>  $children
      */
-    private function toElement(Node $node, array $children): Components\Element|string
+    private function toElement(Node $node, array $children)
     {
         if ($node->isText() || $node->isComment()) {
             return (string) $node;
@@ -91,26 +91,67 @@ final class HtmlRenderer
 
         $styles = $node->getClassAttribute();
 
-        return match ($node->getName()) {
-            'body' => $children[0], // Pick only the first element from the body node
-            'div' => Termwind::div($children, $styles, $properties),
-            'p' => Termwind::paragraph($children, $styles, $properties),
-            'ul' => Termwind::ul($children, $styles, $properties),
-            'ol' => Termwind::ol($children, $styles, $properties),
-            'li' => Termwind::li($children, $styles, $properties),
-            'dl' => Termwind::dl($children, $styles, $properties),
-            'dt' => Termwind::dt($children, $styles, $properties),
-            'dd' => Termwind::dd($children, $styles, $properties),
-            'span' => Termwind::span($children, $styles, $properties),
-            'br' => Termwind::breakLine($styles, $properties),
-            'strong' => Termwind::span($children, $styles, $properties)->strong(),
-            'b' => Termwind::span($children, $styles, $properties)->fontBold(),
-            'em', 'i' => Termwind::span($children, $styles, $properties)->italic(),
-            'u' => Termwind::span($children, $styles, $properties)->underline(),
-            's' => Termwind::span($children, $styles, $properties)->lineThrough(),
-            'a' => Termwind::anchor($children, $styles, $properties)->href($node->getAttribute('href')),
-            'hr' => Termwind::hr($styles, $properties),
-            default => Termwind::div($children, $styles, $properties),
-        };
+        $nodeName = $node->getName();
+        switch ($nodeName) {
+            case 'body':
+                $result = $children[0]; // Pick only the first element from the body node
+                break;
+            case 'div':
+                $result = Termwind::div($children, $styles, $properties);
+                break;
+            case 'p':
+                $result = Termwind::paragraph($children, $styles, $properties);
+                break;
+            case 'ul':
+                $result = Termwind::ul($children, $styles, $properties);
+                break;
+            case 'ol':
+                $result = Termwind::ol($children, $styles, $properties);
+                break;
+            case 'li':
+                $result = Termwind::li($children, $styles, $properties);
+                break;
+            case 'dl':
+                $result = Termwind::dl($children, $styles, $properties);
+                break;
+            case 'dt':
+                $result = Termwind::dt($children, $styles, $properties);
+                break;
+            case 'dd':
+                $result = Termwind::dd($children, $styles, $properties);
+                break;
+            case 'span':
+                $result = Termwind::span($children, $styles, $properties);
+                break;
+            case 'br':
+                $result = Termwind::breakLine($styles, $properties);
+                break;
+            case 'strong':
+                $result = Termwind::span($children, $styles, $properties)->strong();
+                break;
+            case 'b':
+                $result = Termwind::span($children, $styles, $properties)->fontBold();
+                break;
+            case 'em':
+            case 'i':
+                $result = Termwind::span($children, $styles, $properties)->italic();
+                break;
+            case 'u':
+                $result = Termwind::span($children, $styles, $properties)->underline();
+                break;
+            case 's':
+                $result = Termwind::span($children, $styles, $properties)->lineThrough();
+                break;
+            case 'a':
+                $result = Termwind::anchor($children, $styles, $properties)->href($node->getAttribute('href'));
+                break;
+            case 'hr':
+                $result = Termwind::hr($styles, $properties);
+                break;
+            default:
+                $result = Termwind::div($children, $styles, $properties);
+                break;
+        }
+        return $result;
     }
 }

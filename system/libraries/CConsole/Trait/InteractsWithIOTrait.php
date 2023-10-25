@@ -14,6 +14,15 @@ use Symfony\Component\Console\Formatter\OutputFormatterStyle;
 
 trait CConsole_Trait_InteractsWithIOTrait {
     /**
+     * The console components factory.
+     *
+     * @var \CConsole_View_ComponentFactory
+     *
+     * @internal this property is not meant to be used or overwritten outside the framework
+     */
+    protected $components;
+
+    /**
      * The input interface implementation.
      *
      * @var \Symfony\Component\Console\Input\InputInterface

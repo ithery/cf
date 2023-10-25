@@ -17,13 +17,18 @@ final class Termwind
 {
     /**
      * The implementation of the output.
+     *
+     * @var OutputInterface|null
      */
-    private static OutputInterface|null $renderer;
+    private static $renderer = null;
 
     /**
-     * Sets the renderer implementation.
+     *  Sets the renderer implementation.
+     *
+     * @param OutputInterface|null $renderer
+     * @return void
      */
-    public static function renderUsing(OutputInterface|null $renderer): void
+    public static function renderUsing(OutputInterface $renderer = null): void
     {
         self::$renderer = $renderer ?? new ConsoleOutput();
     }
@@ -34,7 +39,7 @@ final class Termwind
      * @param  array<int, Element|string>|string  $content
      * @param  array<string, mixed>  $properties
      */
-    public static function div(array|string $content = '', string $styles = '', array $properties = []): Components\Div
+    public static function div($content = '', string $styles = '', array $properties = []): Components\Div
     {
         $content = self::prepareElements($content, $styles);
 
@@ -49,7 +54,7 @@ final class Termwind
      * @param  array<int, Element|string>|string  $content
      * @param  array<string, mixed>  $properties
      */
-    public static function paragraph(array|string $content = '', string $styles = '', array $properties = []): Components\Paragraph
+    public static function paragraph($content = '', string $styles = '', array $properties = []): Components\Paragraph
     {
         $content = self::prepareElements($content, $styles);
 
@@ -64,7 +69,7 @@ final class Termwind
      * @param  array<int, Element|string>|string  $content
      * @param  array<string, mixed>  $properties
      */
-    public static function span(array|string $content = '', string $styles = '', array $properties = []): Components\Span
+    public static function span($content = '', string $styles = '', array $properties = []): Components\Span
     {
         $content = self::prepareElements($content, $styles);
 
@@ -78,7 +83,7 @@ final class Termwind
      *
      * @param  array<int, Element|string>|string  $content
      */
-    public static function raw(array|string $content = ''): Components\Raw
+    public static function raw($content = ''): Components\Raw
     {
         return Components\Raw::fromStyles(
             self::getRenderer(), $content
@@ -91,7 +96,7 @@ final class Termwind
      * @param  array<int, Element|string>|string  $content
      * @param  array<string, mixed>  $properties
      */
-    public static function anchor(array|string $content = '', string $styles = '', array $properties = []): Components\Anchor
+    public static function anchor($content = '', string $styles = '', array $properties = []): Components\Anchor
     {
         $content = self::prepareElements($content, $styles);
 
@@ -115,7 +120,7 @@ final class Termwind
         $content = self::prepareElements(
             $content,
             $styles,
-            static function ($li) use ($ul): string|Element {
+            static function ($li) use ($ul) {
                 if (is_string($li)) {
                     return $li;
                 }
@@ -124,13 +129,19 @@ final class Termwind
                     throw new InvalidChild('Unordered lists only accept `li` as child');
                 }
 
-                return match (true) {
-                    $li->hasStyle('list-none') => $li,
-                    $ul->hasStyle('list-none') => $li->addStyle('list-none'),
-                    $ul->hasStyle('list-square') => $li->addStyle('list-square'),
-                    $ul->hasStyle('list-disc') => $li->addStyle('list-disc'),
-                    default => $li->addStyle('list-none'),
-                };
+                if($li->hasStyle('list-none')) {
+                    return $li;
+                }
+                if($ul->hasStyle('list-none')) {
+                    return $li->addStyle('list-none');
+                }
+                if($ul->hasStyle('list-square')) {
+                    return $li->addStyle('list-square');
+                }
+                if($ul->hasStyle('list-disc')) {
+                    return $li->addStyle('list-disc');
+                }
+                return $li->addStyle('list-none');
             }
         );
 
@@ -154,7 +165,7 @@ final class Termwind
         $content = self::prepareElements(
             $content,
             $styles,
-            static function ($li) use ($ol, &$index): string|Element {
+            static function ($li) use ($ol, &$index) {
                 if (is_string($li)) {
                     return $li;
                 }
@@ -163,12 +174,16 @@ final class Termwind
                     throw new InvalidChild('Ordered lists only accept `li` as child');
                 }
 
-                return match (true) {
-                    $li->hasStyle('list-none') => $li->addStyle('list-none'),
-                    $ol->hasStyle('list-none') => $li->addStyle('list-none'),
-                    $ol->hasStyle('list-decimal') => $li->addStyle('list-decimal-'.(++$index)),
-                    default => $li->addStyle('list-none'),
-                };
+                if ($li->hasStyle('list-none')) {
+                    return $li->addStyle('list-none');
+                }
+                if ($ol->hasStyle('list-none')) {
+                    $li->addStyle('list-none');
+                }
+                if ($ol->hasStyle('list-decimal')) {
+                    $li->addStyle('list-decimal-'.(++$index));
+                }
+                return  $li->addStyle('list-none');
             }
         );
 
@@ -181,7 +196,7 @@ final class Termwind
      * @param  array<int, Element|string>|string  $content
      * @param  array<string, mixed>  $properties
      */
-    public static function li(array|string $content = '', string $styles = '', array $properties = []): Components\Li
+    public static function li($content = '', string $styles = '', array $properties = []): Components\Li
     {
         $content = self::prepareElements($content, $styles);
 
@@ -201,7 +216,7 @@ final class Termwind
         $content = self::prepareElements(
             $content,
             $styles,
-            static function ($element): string|Element {
+            static function ($element) {
                 if (is_string($element)) {
                     return $element;
                 }
@@ -225,7 +240,7 @@ final class Termwind
      * @param  array<int, Element|string>|string  $content
      * @param  array<string, mixed>  $properties
      */
-    public static function dt(array|string $content = '', string $styles = '', array $properties = []): Components\Dt
+    public static function dt($content = '', string $styles = '', array $properties = []): Components\Dt
     {
         $content = self::prepareElements($content, $styles);
 
@@ -240,7 +255,7 @@ final class Termwind
      * @param  array<int, Element|string>|string  $content
      * @param  array<string, mixed>  $properties
      */
-    public static function dd(array|string $content = '', string $styles = '', array $properties = []): Components\Dd
+    public static function dd($content = '', string $styles = '', array $properties = []): Components\Dd
     {
         $content = self::prepareElements($content, $styles);
 
@@ -287,10 +302,12 @@ final class Termwind
      * @param  array<int, string|Element>|string  $elements
      * @return array<int, string|Element>
      */
-    private static function prepareElements($elements, string $styles = '', Closure|null $callback = null): array
+    private static function prepareElements($elements, string $styles = '', Closure $callback = null): array
     {
         if ($callback === null) {
-            $callback = static fn ($element): string|Element => $element;
+            $callback = static function ($element) {
+                return $element;
+            };
         }
 
         $elements = is_array($elements) ? $elements : [$elements];

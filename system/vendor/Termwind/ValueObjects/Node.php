@@ -11,11 +11,13 @@ use Generator;
  */
 final class Node
 {
+    private \DOMNode $node;
     /**
      * A value object with helper methods for working with DOM node.
      */
-    public function __construct(private \DOMNode $node)
+    public function __construct(\DOMNode $node)
     {
+        $this->node = $node;
     }
 
     /**
@@ -101,7 +103,7 @@ final class Node
     /**
      * Gets the previous sibling from the node.
      */
-    public function getPreviousSibling(): static|null
+    public function getPreviousSibling()
     {
         $node = $this->node;
 
@@ -127,7 +129,7 @@ final class Node
     /**
      * Gets the next sibling from the node.
      */
-    public function getNextSibling(): static|null
+    public function getNextSibling()
     {
         $node = $this->node;
 

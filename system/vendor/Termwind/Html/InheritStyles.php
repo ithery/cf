@@ -36,13 +36,34 @@ final class InheritStyles
             $elements = $this->applyFlex($elements);
         }
 
-        return match ($styles->getProperties()['styles']['justifyContent'] ?? false) {
-            'between' => $this->applyJustifyBetween($elements),
-            'evenly' => $this->applyJustifyEvenly($elements),
-            'around' => $this->applyJustifyAround($elements),
-            'center' => $this->applyJustifyCenter($elements),
-            default => $elements,
-        };
+        // return match ($styles->getProperties()['styles']['justifyContent'] ?? false) {
+        //     'between' => $this->applyJustifyBetween($elements),
+        //     'evenly' => $this->applyJustifyEvenly($elements),
+        //     'around' => $this->applyJustifyAround($elements),
+        //     'center' => $this->applyJustifyCenter($elements),
+        //     default => $elements,
+        // };
+        $justifyContent = $styles->getProperties()['styles']['justifyContent'] ?? false;
+
+        switch ($justifyContent) {
+            case 'between':
+                $result = $this->applyJustifyBetween($elements);
+                break;
+            case 'evenly':
+                $result = $this->applyJustifyEvenly($elements);
+                break;
+            case 'around':
+                $result = $this->applyJustifyAround($elements);
+                break;
+            case 'center':
+                $result = $this->applyJustifyCenter($elements);
+                break;
+            default:
+                $result = $elements;
+                break;
+        }
+
+        return $result;
     }
 
     /**
