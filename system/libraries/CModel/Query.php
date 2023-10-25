@@ -74,6 +74,7 @@ class CModel_Query {
     use CDatabase_Trait_Builder,
         CModel_Trait_QueriesRelationships,
         CTrait_ForwardsCalls;
+
     /**
      * The base query builder instance.
      *
@@ -483,7 +484,7 @@ class CModel_Query {
      * @return CModel
      */
     public function firstOrCreate(array $attributes, array $values = []) {
-        if (!is_null($instance = $this->where($attributes)->first())) {
+        if (!is_null($instance = (clone $this)->where($attributes)->first())) {
             return $instance;
         }
 
@@ -1274,28 +1275,105 @@ class CModel_Query {
      * @return array
      */
     protected function parseWithRelations(array $relations) {
+        if ($relations === []) {
+            return [];
+        }
+
         $results = [];
 
-        foreach ($relations as $name => $constraints) {
-            // If the "relation" value is actually a numeric key, we can assume that no
-            // constraints have been specified for the eager load and we'll just put
-            // an empty Closure with the loader so that we can treat all the same.
-            if (is_numeric($name)) {
-                $name = $constraints;
-
-                list($name, $constraints) = cstr::contains($name, ':') ? $this->createSelectWithConstraint($name) : [$name, function () {
-                }];
-            }
-
-            // We need to separate out any nested includes. Which allows the developers
+        foreach ($this->prepareNestedWithRelationships($relations) as $name => $constraints) {
+            // We need to separate out any nested includes, which allows the developers
             // to load deep relationships using "dots" without stating each level of
-            // the relationship with its own key in the array of eager load names.
+            // the relationship with its own key in the array of eager-load names.
             $results = $this->addNestedWiths($name, $results);
 
             $results[$name] = $constraints;
         }
 
         return $results;
+    }
+
+    /**
+     * Prepare nested with relationships.
+     *
+     * @param array  $relations
+     * @param string $prefix
+     *
+     * @return array
+     */
+    protected function prepareNestedWithRelationships($relations, $prefix = '') {
+        $preparedRelationships = [];
+
+        if ($prefix !== '') {
+            $prefix .= '.';
+        }
+
+        // If any of the relationships are formatted with the [$attribute => array()]
+        // syntax, we shall loop over the nested relations and prepend each key of
+        // this array while flattening into the traditional dot notation format.
+        foreach ($relations as $key => $value) {
+            if (!is_string($key) || !is_array($value)) {
+                continue;
+            }
+
+            list($attribute, $attributeSelectConstraint) = $this->parseNameAndAttributeSelectionConstraint($key);
+
+            $preparedRelationships = array_merge(
+                $preparedRelationships,
+                ["{$prefix}{$attribute}" => $attributeSelectConstraint],
+                $this->prepareNestedWithRelationships($value, "{$prefix}{$attribute}"),
+            );
+
+            unset($relations[$key]);
+        }
+
+        // We now know that the remaining relationships are in a dot notation format
+        // and may be a string or Closure. We'll loop over them and ensure all of
+        // the present Closures are merged + strings are made into constraints.
+        foreach ($relations as $key => $value) {
+            if (is_numeric($key) && is_string($value)) {
+                list($key, $value) = $this->parseNameAndAttributeSelectionConstraint($value);
+            }
+
+            $preparedRelationships[$prefix . $key] = $this->combineConstraints([
+                $value,
+                $preparedRelationships[$prefix . $key] ?? static function () {
+                },
+            ]);
+        }
+
+        return $preparedRelationships;
+    }
+
+    /**
+     * Combine an array of constraints into a single constraint.
+     *
+     * @param array $constraints
+     *
+     * @return \Closure
+     */
+    protected function combineConstraints(array $constraints) {
+        return function ($builder) use ($constraints) {
+            foreach ($constraints as $constraint) {
+                $builder = $constraint($builder) ?? $builder;
+            }
+
+            return $builder;
+        };
+    }
+
+    /**
+     * Parse the attribute select constraints from the name.
+     *
+     * @param string $name
+     *
+     * @return array
+     */
+    protected function parseNameAndAttributeSelectionConstraint($name) {
+        return cstr::contains($name, ':')
+            ? $this->createSelectWithConstraint($name)
+            : [$name, static function () {
+            }];
     }
 
     /**
@@ -1335,6 +1413,34 @@ class CModel_Query {
         }
 
         return $results;
+    }
+
+    /**
+     * Apply query-time casts to the model instance.
+     *
+     * @param array $casts
+     *
+     * @return $this
+     */
+    public function withCasts($casts) {
+        $this->model->mergeCasts($casts);
+
+        return $this;
+    }
+
+    /**
+     * Execute the given Closure within a transaction savepoint if needed.
+     *
+     * @template TModelValue
+     *
+     * @param  \Closure(): TModelValue  $scope
+     *
+     * @return TModelValue
+     */
+    public function withSavepointIfNeeded($scope) {
+        return $this->getQuery()->getConnection()->transactionLevel() > 0
+            ? $this->getQuery()->getConnection()->transaction($scope)
+            : $scope();
     }
 
     /**
