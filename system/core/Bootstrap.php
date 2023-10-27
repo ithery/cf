@@ -53,9 +53,9 @@ if (!defined('IN_PRODUCTION')) {
 //try to load data domain
 
 //end of constant from index
-
 define('CF_VERSION', '1.6');
 define('CF_CODENAME', 'CF1.6');
+define('CF_START', microtime(true));
 
 // Test of CF is running in Windows
 define('CF_IS_WIN', DIRECTORY_SEPARATOR === '\\');

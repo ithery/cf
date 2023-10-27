@@ -1865,6 +1865,10 @@ class c {
 
         return CBase_CClsx::clsx(...$args);
     }
+
+    public static function elapsed() {
+        return microtime(true) - CF_START;
+    }
 }
 
 // End c
