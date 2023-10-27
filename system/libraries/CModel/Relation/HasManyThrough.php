@@ -275,7 +275,10 @@ class CModel_Relation_HasManyThrough extends CModel_Relation {
                 return $this->create(array_merge($attributes, $values));
             });
         } catch (CDatabase_Exception_UniqueConstraintViolationException $exception) {
-            return $this->where($attributes)->first() ?? throw $exception;
+            if ($result = $this->where($attributes)->first()) {
+                return $result;
+            }
+            throw $exception;
         }
     }
     /**
