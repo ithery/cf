@@ -1,5 +1,5 @@
 <?php
-/** @mixin Period */
+/** @mixin CPeriod */
 trait CPeriod_Trait_OperationTrait {
     /**
      * @param CPeriod $period

@@ -171,9 +171,9 @@ class CAnalytics_Google_Analytic {
     /**
      * Call the query method on the authenticated client.
      *
-     * @param Period $period
-     * @param string $metrics
-     * @param array  $others
+     * @param CPeriod $period
+     * @param string  $metrics
+     * @param array   $others
      *
      * @return null|array
      */
