@@ -281,6 +281,7 @@ class CModel_Relation_HasManyThrough extends CModel_Relation {
             throw $exception;
         }
     }
+
     /**
      * Create or update a related record matching the attributes, and fill it with values.
      *
