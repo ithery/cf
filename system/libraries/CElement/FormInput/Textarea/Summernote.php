@@ -11,6 +11,8 @@
 class CElement_FormInput_Textarea_Summernote extends CElement_FormInput_Textarea {
     protected $toolbarType = 'default';
 
+    protected $customToolbarJson = "[]";
+
     protected $haveDragDrop = false;
 
     protected $uploadUrl;
@@ -28,6 +30,12 @@ class CElement_FormInput_Textarea_Summernote extends CElement_FormInput_Textarea
 
     public function setToolbarType($toolbarType) {
         $this->toolbarType = $toolbarType;
+
+        return $this;
+    }
+
+    public function setCustomToolbarJson($json) {
+        $this->customToolbarJson = $json;
 
         return $this;
     }
@@ -148,12 +156,20 @@ class CElement_FormInput_Textarea_Summernote extends CElement_FormInput_Textarea
                 ";
 
                 break;
+            case 'custom':
+                $json = $this->customToolbarJson;
+                break;
         }
 
         return $json;
     }
 
     public function js($indent = 0) {
+        $placeholder = '';
+        if ($this->placeholder) {
+            $placeholder = 'placeholder: "' . $this->placeholder . '",';
+        }
+
         $additionalOptions = 'disableDragAndDrop: true,';
         if ($this->haveDragDrop) {
             $additionalOptions = 'disableDragAndDrop: false,';
@@ -214,6 +230,7 @@ class CElement_FormInput_Textarea_Summernote extends CElement_FormInput_Textarea
             height: '300px',
             codeviewFilter: true,
 			codeviewIframeFilter: true,
+            " . $placeholder . "
             // shortcuts: false,
             " . $additionalOptions . '
             maximumImageFileSize:1024*1024, // 1 MB
