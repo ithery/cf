@@ -232,13 +232,19 @@ class CElement_FormInput_Textarea_Summernote extends CElement_FormInput_Textarea
 			codeviewIframeFilter: true,
             " . $placeholder . "
             // shortcuts: false,
-            " . $additionalOptions . '
+            " . $additionalOptions . "
             maximumImageFileSize:1024*1024, // 1 MB
             onCreateLink: function(originalLink) {
                 return originalLink; // return originalLink
             },
             callbacks: {
-                ' . $additionalCallbackOptions . "
+                onInit: function (e, layoutInfo) {
+                    // to prevent error in validation.js in cres.js, to be able to get form input name
+                    if (e.editable[0]) {
+                        e.editable[0].setAttribute('name', '" . $this->name .  "');
+                    }
+                },
+                " . $additionalCallbackOptions . "
                 onImageUploadError: function(msg){
                     alert('Oops, something went wrong with image url');
                 },
