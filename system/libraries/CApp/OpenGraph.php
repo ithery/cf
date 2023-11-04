@@ -306,7 +306,7 @@ class CApp_OpenGraph {
         return curl::httpbase();
         if (!$url) {
             $url = null;
-            $httpHost = getenv('APP_URL'); // Has to start with a protocol - for example "http://"!
+            $httpHost = c::env('APP_URL', false); // Has to start with a protocol - for example "http://"!
             if ($httpHost === false) {
                 $url = 'http';
                 // Quick and dirty
