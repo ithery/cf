@@ -83,9 +83,10 @@ class CManager_DataProvider_ModelDataProvider extends CManager_DataProviderAbstr
 
                             $field = array_pop($fields);
                             $relation = implode('.', $fields);
-
                             $q->orWhereHas($relation, function ($q2) use ($value, $field) {
-                                $q2->where($field, 'like', '%' . $value . '%');
+                                $table = $q2->getModel()->getTable();
+
+                                $q2->where($table . '.' . $field, 'like', '%' . $value . '%');
                             });
                         } else {
                             //check this is aggregate field where or not
