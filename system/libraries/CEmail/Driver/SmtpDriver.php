@@ -65,8 +65,9 @@ class CEmail_Driver_SmtpDriver extends CEmail_DriverAbstract {
             $smtpOptions = $this->config->getOption('stream');
         }
 
-        $smtpPort = carr::get($options, 'host', $this->config->getOption('port', 25));
-        $smtpHost = carr::get($options, 'port', $this->config->getOption('host'));
+        $smtpPort = carr::get($options, 'port', $this->config->getOption('port', 25));
+
+        $smtpHost = carr::get($options, 'host', $this->config->getOption('host'));
 
         if (empty($smtpHost)) {
             throw new Exception('Must supply a SMTP host and port, none given.');
@@ -143,10 +144,14 @@ class CEmail_Driver_SmtpDriver extends CEmail_DriverAbstract {
         if (!empty($this->smtpConnection)) {
             return;
         }
-
+        $protocol = 'tcp';
+        $secure = $this->config->getSecure();
+        if ($secure == 'tls') {
+            $protocol = 'tls';
+        }
         // add a transport if not given
         if (strpos($smtpHost, '://') === false) {
-            $smtpHost = 'tcp://' . $smtpHost;
+            $smtpHost = $protocol . '://' . $smtpHost;
         }
 
         $context = stream_context_create();
@@ -182,28 +187,28 @@ class CEmail_Driver_SmtpDriver extends CEmail_DriverAbstract {
         }
 
         // Enable TLS encryption if needed, and we're connecting using TCP
-        $secure = $this->config->getSecure();
-        if ($secure == 'tls') {
-            try {
-                $this->debug('STARTTLS');
-                $this->debug($this->smtpSend('STARTTLS', 220));
-                if (!stream_socket_enable_crypto($this->smtpConnection, true, STREAM_CRYPTO_METHOD_TLS_CLIENT | STREAM_CRYPTO_METHOD_TLSv1_0_CLIENT | STREAM_CRYPTO_METHOD_TLSv1_1_CLIENT | STREAM_CRYPTO_METHOD_TLSv1_2_CLIENT)) {
-                    throw new CEmail_Exception_SmtpConnectionException('STARTTLS failed, Crypto client can not be enabled.');
-                }
-            } catch (CEmail_Exception_SmtpCommandFailureException $e) {
-                throw new CEmail_Exception_SmtpConnectionException('STARTTLS failed, invalid return code received from server.');
-            }
 
-            // Say hello again, the service list might be updated (see RFC 3207 section 4.2)
-            try {
-                $this->debug('EHLO' . ' ' . c::request()->server('SERVER_NAME', 'localhost.local'));
-                $this->debug($this->smtpSend('EHLO' . ' ' . $this->getServerName(), 250));
-            } catch (CEmail_Exception_SmtpCommandFailureException $e) {
-                // Didn't work? Try HELO
-                $this->debug('HELO' . ' ' . c::request()->server('SERVER_NAME', 'localhost.local'));
-                $this->debug($this->smtpSend('HELO' . ' ' . $this->getServerName(), 250));
-            }
-        }
+        // if ($secure == 'tls') {
+        //     try {
+        //         $this->debug('STARTTLS');
+        //         $this->debug($this->smtpSend('STARTTLS', 220));
+        //         if (!stream_socket_enable_crypto($this->smtpConnection, true, STREAM_CRYPTO_METHOD_TLS_CLIENT | STREAM_CRYPTO_METHOD_TLSv1_0_CLIENT | STREAM_CRYPTO_METHOD_TLSv1_1_CLIENT | STREAM_CRYPTO_METHOD_TLSv1_2_CLIENT)) {
+        //             throw new CEmail_Exception_SmtpConnectionException('STARTTLS failed, Crypto client can not be enabled.');
+        //         }
+        //     } catch (CEmail_Exception_SmtpCommandFailureException $e) {
+        //         throw new CEmail_Exception_SmtpConnectionException('STARTTLS failed, invalid return code received from server.');
+        //     }
+
+        //     // Say hello again, the service list might be updated (see RFC 3207 section 4.2)
+        //     try {
+        //         $this->debug('EHLO' . ' ' . c::request()->server('SERVER_NAME', 'localhost.local'));
+        //         $this->debug($this->smtpSend('EHLO' . ' ' . $this->getServerName(), 250));
+        //     } catch (CEmail_Exception_SmtpCommandFailureException $e) {
+        //         // Didn't work? Try HELO
+        //         $this->debug('HELO' . ' ' . c::request()->server('SERVER_NAME', 'localhost.local'));
+        //         $this->debug($this->smtpSend('HELO' . ' ' . $this->getServerName(), 250));
+        //     }
+        // }
 
         try {
             $this->debug('HELP');
