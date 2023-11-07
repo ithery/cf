@@ -36,6 +36,11 @@ class CEmail_Config {
     /**
      * @var string
      */
+    protected $protocol;
+
+    /**
+     * @var string
+     */
     protected $from;
 
     /**
@@ -61,6 +66,7 @@ class CEmail_Config {
         $this->host = carr::get($options, 'host');
         $this->port = carr::get($options, 'port');
         $this->secure = carr::get($options, 'secure');
+        $this->protocol = carr::get($options, 'protocol', 'tcp');
     }
 
     public function reformatOptions($config) {
@@ -145,6 +151,10 @@ class CEmail_Config {
 
     public function getSecure() {
         return $this->secure;
+    }
+
+    public function getProtocol() {
+        return $this->protocol;
     }
 
     public function getFrom() {
