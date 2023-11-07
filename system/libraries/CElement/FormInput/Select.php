@@ -45,6 +45,11 @@ class CElement_FormInput_Select extends CElement_FormInput {
         $this->addClass('form-control select');
     }
 
+    public static function factory($id = null) {
+        /** @phpstan-ignore-next-line */
+        return new static($id);
+    }
+
     public function setMultiple($bool = true) {
         $this->multiple = $bool;
 
