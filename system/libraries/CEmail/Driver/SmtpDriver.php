@@ -102,7 +102,6 @@ class CEmail_Driver_SmtpDriver extends CEmail_DriverAbstract {
         // Prepare for data sending
         $this->debug('DATA');
         $this->smtpSend('DATA', 354);
-
         $newLine = $this->newline();
 
         $headers = [];
@@ -173,12 +172,12 @@ class CEmail_Driver_SmtpDriver extends CEmail_DriverAbstract {
         // Just say hello!
         try {
             $this->debug('EHLO' . ' ' . c::request()->server('SERVER_NAME', 'localhost.local'));
-            $this->debug($this->smtpSend('EHLO' . ' ' . c::request()->server('SERVER_NAME', 'localhost.local'), 250));
+            $this->debug($this->smtpSend('EHLO' . ' ' . $this->getServerName(), 250));
             //$this->smtpSend('EHLO' . ' ' . 'localhost.local', 250);
         } catch (CEmail_Exception_SmtpCommandFailureException $e) {
             // Didn't work? Try HELO
             $this->debug('HELO' . ' ' . c::request()->server('SERVER_NAME', 'localhost.local'));
-            $this->debug($this->smtpSend('HELO' . ' ' . c::request()->server('SERVER_NAME', 'localhost.local'), 250));
+            $this->debug($this->smtpSend('HELO' . ' ' . $this->getServerName(), 250));
             //$this->smtpSend('HELO' . ' ' . 'localhost.local', 250);
         }
 
@@ -198,11 +197,11 @@ class CEmail_Driver_SmtpDriver extends CEmail_DriverAbstract {
             // Say hello again, the service list might be updated (see RFC 3207 section 4.2)
             try {
                 $this->debug('EHLO' . ' ' . c::request()->server('SERVER_NAME', 'localhost.local'));
-                $this->debug($this->smtpSend('EHLO' . ' ' . c::request()->server('SERVER_NAME', 'localhost.local'), 250));
+                $this->debug($this->smtpSend('EHLO' . ' ' . $this->getServerName(), 250));
             } catch (CEmail_Exception_SmtpCommandFailureException $e) {
                 // Didn't work? Try HELO
                 $this->debug('HELO' . ' ' . c::request()->server('SERVER_NAME', 'localhost.local'));
-                $this->debug($this->smtpSend('HELO' . ' ' . c::request()->server('SERVER_NAME', 'localhost.local'), 250));
+                $this->debug($this->smtpSend('HELO' . ' ' . $this->getServerName(), 250));
             }
         }
 
@@ -221,7 +220,13 @@ class CEmail_Driver_SmtpDriver extends CEmail_DriverAbstract {
      */
     protected function smtpDisconnect() {
         $this->debug('QUIT');
-        $this->debug($this->smtpSend('QUIT', false));
+
+        try {
+            $this->debug($this->smtpSend('QUIT', false));
+        } catch (Exception $ex) {
+            $this->debug('Error on Disconnect:' . $ex->getMessage());
+        }
+
         fclose($this->smtpConnection);
         $this->smtpConnection = null;
     }
@@ -299,6 +304,12 @@ class CEmail_Driver_SmtpDriver extends CEmail_DriverAbstract {
         return $response;
     }
 
+    protected function getServerName() {
+        $serverName = $this->config->getOption('domain', c::request()->server('SERVER_NAME', 'localhost.local'));
+
+        return $serverName;
+    }
+
     protected function getTimeout() {
         return $this->config->getOption('timeout', 5);
     }
@@ -338,7 +349,7 @@ class CEmail_Driver_SmtpDriver extends CEmail_DriverAbstract {
 
     public function debug($message) {
         if ($this->debug) {
-            cdbg::d($message);
+            CLogger::debug($message);
         }
     }
 }
