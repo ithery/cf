@@ -22,6 +22,16 @@ return [
         'uri' => 'demo/cresjs/alpine/kanban/index',
     ],
     [
+        'name' => 'cresjs.alpine.component',
+        'label' => c::__('Component'),
+        'uri' => 'demo/cresjs/alpine/component/index',
+    ],
+    [
+        'name' => 'cresjs.alpine.control',
+        'label' => c::__('Controls'),
+        'uri' => 'demo/cresjs/alpine/control/index',
+    ],
+    [
         'name' => 'cresjs.alpine.select2',
         'label' => c::__('Select2'),
         'uri' => 'demo/cresjs/alpine/select2/index',

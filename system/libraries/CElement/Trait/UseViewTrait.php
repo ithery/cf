@@ -71,13 +71,14 @@ trait CElement_Trait_UseViewTrait {
             $js = '';
             if ($view != null) {
                 $output = $view->render();
+                $pattern = '/<script>(.*?)<\/script>(?![^<]*<\/template>)/s';
                 //parse the output of view
-                preg_match_all('#<script>(.*?)</script>#ims', $output, $matches);
+                preg_match_all($pattern, $output, $matches);
 
                 foreach ($matches[1] as $value) {
                     $js .= $value;
                 }
-                $html = preg_replace('#<script>(.*?)</script>#is', '', $output);
+                $html = preg_replace($pattern, '', $output);
             }
 
             $htmlJs = [

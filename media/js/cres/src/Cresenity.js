@@ -26,9 +26,6 @@ import initProgressive from './module/progressive';
 import cresToast from './module/toast';
 import CresAlpine from './module/CresAlpine';
 import SSE from './cresenity/SSE';
-import AlpineCleave from './alpine/cleave';
-import AlpineAutoNumeric from './alpine/autonumeric';
-import AlpineTippy from './alpine/tippy';
 import { attachWaves } from './ui/waves';
 import formatter from './formatter';
 import { initCssDomVar } from './module/css-dom-var';
@@ -1061,17 +1058,10 @@ export default class Cresenity {
         }
     }
     initAlpineAndUi() {
-        Alpine.plugin(AlpineCleave);
-        Alpine.plugin(AlpineAutoNumeric);
-        Alpine.plugin(AlpineTippy);
-        Alpine.directive('destroy', (el, { expression }, { evaluateLater, cleanup }) => {
-            const clean = evaluateLater(expression);
-            cleanup(() => clean());
-        });
         window.Alpine = Alpine;
+        this.alpine = new CresAlpine(window.Alpine);
         this.ui.start();
         window.Alpine.start();
-        this.alpine = new CresAlpine(window.Alpine);
     }
 
     initLiveReload() {

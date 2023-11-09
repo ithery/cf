@@ -74,7 +74,7 @@ trait CApp_Concern_VariablesTrait {
         $variables['label_cancel'] = c::__('Cancel');
         $variables['labelCancel'] = c::__('Cancel');
         $variables['isAuthEnabled'] = c::app()->isAuthEnabled();
-
+        $variables['alpine'] = carr::get($cresjsConfig, 'alpine');
         $labels = [
             'confirm' => [
                 'areYouSure' => c::__('app.confirm:areYouSure'),
