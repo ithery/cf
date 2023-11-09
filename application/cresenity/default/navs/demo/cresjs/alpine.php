@@ -32,6 +32,11 @@ return [
         'uri' => 'demo/cresjs/alpine/control/index',
     ],
     [
+        'name' => 'cresjs.alpine.reload',
+        'label' => c::__('Reload'),
+        'uri' => 'demo/cresjs/alpine/reload/index',
+    ],
+    [
         'name' => 'cresjs.alpine.select2',
         'label' => c::__('Select2'),
         'uri' => 'demo/cresjs/alpine/select2/index',

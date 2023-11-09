@@ -10,7 +10,7 @@ trait CApp_Trait_VarTrait {
     public static function getGlobalVar($key, $default = null) {
         if (!isset(self::$globalVars[$key])) {
             $db = c::db();
-            $value = cdbutils::get_value('select `value` from var where org_id is null and `key`= ' . $db->escape($key));
+            $value = $db->getValue('select `value` from var where org_id is null and `key`= ' . $db->escape($key));
             if ($value == null) {
                 $value = $default;
             }
@@ -22,7 +22,7 @@ trait CApp_Trait_VarTrait {
 
     public static function setGlobalVar($key, $val) {
         $db = c::db();
-        $row = cdbutils::get_row('select * from var where org_id is null and `key` = ' . $db->escape($key));
+        $row = $db->getRow('select * from var where org_id is null and `key` = ' . $db->escape($key));
         $data['value'] = $val;
         if ($row == null) {
             $data['key'] = $key;
@@ -51,7 +51,7 @@ trait CApp_Trait_VarTrait {
         if (!isset(self::$vars[$orgId][$key])) {
             $db = c::db();
 
-            $value = cdbutils::get_value('select `value` from var where org_id = ' . $db->escape($orgId) . ' and `key`= ' . $db->escape($key));
+            $value = $db->getValue('select `value` from var where org_id = ' . $db->escape($orgId) . ' and `key`= ' . $db->escape($key));
 
             if ($value == null) {
                 $value = $default;
@@ -69,7 +69,7 @@ trait CApp_Trait_VarTrait {
         }
         $db = c::db();
 
-        $row = cdbutils::get_row('select * from var where org_id = ' . $db->escape($orgId) . ' and `key` = ' . $db->escape($key));
+        $row = $db->getRow('select * from var where org_id = ' . $db->escape($orgId) . ' and `key` = ' . $db->escape($key));
 
         $data['value'] = $val;
         if (!isset(self::$vars[$orgId])) {
