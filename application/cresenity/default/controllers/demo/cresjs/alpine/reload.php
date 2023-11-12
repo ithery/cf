@@ -15,6 +15,7 @@ class Controller_Demo_Cresjs_Alpine_Reload extends \Cresenity\Demo\Controller {
     }
 
     public function reload($value) {
+        $value = urldecode($value);
         $app = c::app();
         $app->addDiv()->add('Value:' . $value);
 
