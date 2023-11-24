@@ -52,7 +52,7 @@ class CElement_FormInput_Image extends CElement_FormInput {
     /**
      * @param string $imgsrc
      *
-     * @return $this'
+     * @return $this
      */
     public function setImgSrc($imgsrc) {
         $this->imgSrc = $imgsrc;
