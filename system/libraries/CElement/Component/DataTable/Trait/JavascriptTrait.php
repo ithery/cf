@@ -2,7 +2,7 @@
 
 trait CElement_Component_DataTable_Trait_JavascriptTrait {
     public function js($indent = 0) {
-        $quickSearchPlaceholder = $this->quickSearchPlaceholder ? "'" . $this->quickSearchPlaceholder . "'" : "'".c::__('element/datatable.search')." ' + title";
+        $quickSearchPlaceholder = $this->quickSearchPlaceholder ? "'" . $this->quickSearchPlaceholder . "'" : "'" . c::__('element/datatable.search') . " ' + title";
 
         /** @var CElement_Component_DataTable $this */
         $this->buildOnce();
@@ -478,6 +478,11 @@ trait CElement_Component_DataTable_Trait_JavascriptTrait {
         }
         if ($this->applyDataTable) {
             $js->appendln("$('#" . $this->id . "').data('cappDataTable'," . $varNameOTable . ');');
+            if ($this->autoRefreshInterval) {
+                $js->appendln("setInterval( function () {
+                    $('#" . $this->id . "').DataTable().ajax.reload(null, false);
+                }, " . ((int) $this->autoRefreshInterval) . ' * 1000);');
+            }
         }
 
         return $js->text();

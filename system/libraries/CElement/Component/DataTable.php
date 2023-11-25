@@ -170,6 +170,8 @@ class CElement_Component_DataTable extends CElement_Component {
 
     protected $rowClassCallbackFunction = null;
 
+    protected $autoRefreshInterval = 0;
+
     public function __construct($id = '') {
         parent::__construct($id);
         $this->defaultPagingList['-1'] = c::__('ALL');
@@ -1078,5 +1080,20 @@ class CElement_Component_DataTable extends CElement_Component {
      */
     public function getRowClassCallbackFunction() {
         return $this->rowClassCallbackFunction;
+    }
+
+    /**
+     * @param int $interval interval in seconds
+     *
+     * @return $this
+     */
+    public function setAutoRefresh($interval = 5) {
+        if (!$interval) {
+            $this->autoRefreshInterval = 0;
+        } else {
+            $this->autoRefreshInterval = $interval;
+        }
+
+        return $this;
     }
 }
