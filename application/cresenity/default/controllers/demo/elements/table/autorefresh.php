@@ -6,7 +6,9 @@ class Controller_Demo_Elements_Table_Autorefresh extends \Cresenity\Demo\Control
 
         $app->setTitle('Table Auto Refresh');
 
-        $table = $app->addTable();
+        $divAction = $app->addDiv();
+        $divTable = $app->addDiv();
+        $table = $divTable->addTable();
 
         $table->setDataFromModel(Cresenity\Demo\Model\Country::class, function (CModel_Query $query) {
             $query->whereIn('continent', ['Asia', 'Europe', 'Africa']);
@@ -32,7 +34,14 @@ class Controller_Demo_Elements_Table_Autorefresh extends \Cresenity\Demo\Control
         })->setSearchable(false)->setSortable(false);
         $table->setAjax(true);
         $table->setOption('processing', false);
-        $table->setAutoRefresh(2);
+        // $table->setAutoRefresh(2);
+        $divAction->add($table->createAutoRefreshToogleAction([
+            'label' => [
+                'start' => '<i class="ti ti-control-play"></i> Start Live',
+                'stop' => '<i class="ti ti-control-stop"></i> Stop Live',
+            ],
+            'interval' => 2,
+        ])->addClass('btn-primary'));
 
         return $app;
     }
