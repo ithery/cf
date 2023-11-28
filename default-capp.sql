@@ -432,7 +432,8 @@ CREATE TABLE `log_activity` (
   `deletedby` varchar(255) DEFAULT NULL,
   `status` int(11) NOT NULL DEFAULT '1',
   PRIMARY KEY (`log_activity_id`),
-  UNIQUE KEY `log_activity_id` (`log_activity_id`)
+  UNIQUE KEY `log_activity_id` (`log_activity_id`),
+  KEY `log_activity_created_index` (`created`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 
