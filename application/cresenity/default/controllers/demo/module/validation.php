@@ -33,6 +33,7 @@ class Controller_Demo_Module_Validation extends \Cresenity\Demo\Controller {
         if ($post) {
             c::msg('success', 'Form Submitted with data:<br/><pre>' . json_encode($post, JSON_PRETTY_PRINT) . '</pre>');
             $validator = c::validator($post, $validationData);
+
             if (!$validator->check()) {
                 c::msg('error', $validator->errors()->first());
             }
