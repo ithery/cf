@@ -12,6 +12,7 @@ class CElement_FormInput_Select extends CElement_FormInput {
     use CTrait_Compat_Element_FormInput_Select;
     use CTrait_Element_Property_ApplyJs;
     use CTrait_Element_Property_DependsOn;
+    use CTrait_Element_Property_Placeholder;
 
     protected $group_list = [];
 
@@ -22,8 +23,6 @@ class CElement_FormInput_Select extends CElement_FormInput {
     protected $hide_search;
 
     protected $maximumSelectionLength;
-
-    protected $placeholder;
 
     protected $select2Version;
 
@@ -58,12 +57,6 @@ class CElement_FormInput_Select extends CElement_FormInput {
 
     public function setMaximumSelectionLength($length) {
         $this->maximumSelectionLength = $length;
-
-        return $this;
-    }
-
-    public function setPlaceholder($placeholder) {
-        $this->placeholder = $placeholder;
 
         return $this;
     }

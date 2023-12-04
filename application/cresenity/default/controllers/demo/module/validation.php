@@ -46,7 +46,15 @@ class Controller_Demo_Module_Validation extends \Cresenity\Demo\Controller {
             $url = carr::get($post, 'url');
         }
 
-        $app->setTitle('Form');
+        $app->setTitle('Validation');
+        // $widget = $app->addWidget()->addClass('mb-3')->setTitle('Simply Validation');
+        // $email = 'absd.com';
+        // $widget->addDiv()->add('Email: ' . $email);
+        // $widget->addDiv()->add('Is Email: ' . (c::validate($email, 'email') ? 'True' : 'False'));
+        // $email = 'absd@dd.com';
+        // $widget->addDiv()->add('Email: ' . $email);
+        // $widget->addDiv()->add('Is Email: ' . (c::validate($email, 'email') ? 'True' : 'False'));
+
         $widget = $app->addWidget()->setTitle('Form Demo');
         $form = $widget->addForm();
         $form->addField()->setLabel('Name')->addTextControl('name')->setPlaceholder('Your name')->setValue($name);
