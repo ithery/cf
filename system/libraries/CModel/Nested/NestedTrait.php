@@ -2,9 +2,15 @@
 
 defined('SYSPATH') or die('No direct access allowed.');
 /**
- * @property static $getParent
- *
  * @see https://github.com/lazychaser/laravel-nestedset
+ *
+ * @property static                    $getParent
+ * @property CModel_Collection<static> $getChildren
+ * @property CModel_Collection<static> $descendants
+ * @property CModel_Collection<static> $ancestors
+ *
+ * @method static bool isBroken()                                    Get whether the tree is broken.
+ * @method static int fixTree(null|CModel_Nested_Trait|CModel $root) Fixes the tree based on parentage info. Nodes with invalid parent are saved as roots.
  */
 trait CModel_Nested_NestedTrait {
     /**
@@ -142,7 +148,7 @@ trait CModel_Nested_NestedTrait {
     /**
      * Apply parent model.
      *
-     * @param null|Model $value
+     * @param null|CModel $value
      *
      * @return $this
      */
