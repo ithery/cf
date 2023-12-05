@@ -7,6 +7,10 @@ class CEmail_Driver_Smtp_Message {
 
     protected $extraHeaders;
 
+    protected $config;
+
+    protected $options;
+
     public function __construct($to, $body, $subject, CEmail_Config $config, $options) {
         $this->config = $config;
         $this->options = $options;
