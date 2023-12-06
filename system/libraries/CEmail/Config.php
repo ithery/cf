@@ -154,4 +154,8 @@ class CEmail_Config {
     public function getFromName() {
         return $this->fromName;
     }
+
+    public function get($key, $default = null) {
+        return carr::get($this->options, $key, $default);
+    }
 }
