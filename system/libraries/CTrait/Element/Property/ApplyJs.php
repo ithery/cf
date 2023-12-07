@@ -21,6 +21,7 @@ trait CTrait_Element_Property_ApplyJs {
      */
     public function setApplyJs($applyJs) {
         $this->applyJs = $applyJs;
+
         return $this;
     }
 
@@ -30,7 +31,6 @@ trait CTrait_Element_Property_ApplyJs {
     public function setApplyJsSelect2() {
         return $this->setApplyJs('select2');
     }
-
 
     /**
      * @return string
