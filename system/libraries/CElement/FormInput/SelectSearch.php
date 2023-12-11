@@ -364,9 +364,14 @@ class CElement_FormInput_SelectSearch extends CElement_FormInput {
                     $query = clone $this->dataProvider;
 
                     if ($value !== null) {
-                        $query->queryCallback(function ($q) use ($value) {
-                            $q->where($this->keyField, '=', $value);
-                        });
+                        // new, get query from setDataFromModel
+                        $query = $query->getModelQuery();
+                        $query->where($this->keyField, '=', $value);
+
+                        // old
+                        // $query->queryCallback(function ($q) use ($value) {
+                        //     $q->where($this->keyField, '=', $value);
+                        // });
                     }
                     $model = $query->first();
 
@@ -458,7 +463,7 @@ class CElement_FormInput_SelectSearch extends CElement_FormInput {
                     }
                     if (isset($this->valueCallback) && is_callable($this->valueCallback)) {
                         foreach ($row as $k => $v) {
-                            $row[$k] = $this->valueCallback($row, $k, $v);
+                            $row[$k] = ($this->valueCallback)($row, $k, $v);
                         }
                     }
 
@@ -569,7 +574,7 @@ class CElement_FormInput_SelectSearch extends CElement_FormInput {
                     }
                     if (isset($this->valueCallback) && is_callable($this->valueCallback)) {
                         foreach ($row as $k => $v) {
-                            $row[$k] = $this->valueCallback($row, $k, $v);
+                            $row[$k] = ($this->valueCallback)($row, $k, $v);
                         }
                     }
                     $formatResult = $this->formatResult;
