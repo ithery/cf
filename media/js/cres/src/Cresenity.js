@@ -43,6 +43,7 @@ import * as dateFns from 'date-fns';
 import CresenityHistory from './history';
 import clsx from './module/clsx';
 import collect from 'collect.js';
+import emitter from './cresenity/emitter';
 
 export default class Cresenity {
     constructor() {
@@ -100,6 +101,7 @@ export default class Cresenity {
         this.dateFns = dateFns;
         this.clsx = clsx;
         this.collect = collect;
+        this.emitter = emitter;
     }
     loadJs(filename, callback) {
         let fileref = document.createElement('script');
