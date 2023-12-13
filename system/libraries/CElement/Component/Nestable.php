@@ -218,7 +218,14 @@ class CElement_Component_Nestable extends CElement_Component {
                         ->setRequire($this->requires)
                         ->execute();
                 }
-                $html->appendln($newV);
+
+                if ($newV instanceof CRenderable) {
+                    $html->appendln($newV->html());
+                    $this->js_cell .= $newV->js();
+                } else {
+                    $html->appendln($newV);
+                }
+
                 $html->decIndent()->appendln('</div>');
                 if ($this->haveRowAction()) {
                     $this->js_cell .= $this->drawActionAndGetJs($html, $d, $this->idKey);
