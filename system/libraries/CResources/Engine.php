@@ -224,7 +224,7 @@ abstract class CResources_Engine implements CResources_EngineInterface {
 
         $dir .= date('YmdHis', strtotime($date_now)) . DS;
 
-        cfs::mkdir($dir);
+        CFile::makeDirectory($dir);
 
         $temp_file_name = $org_code . '_' . $this->resourceType . '_' . $this->type . '_' . date('YmdHis', strtotime($date_now)) . '_' . $file_name;
         $path = $dir . $temp_file_name;

@@ -19,7 +19,7 @@ class CResources_Encode {
             $result .= $file_name[$i] ^ $salt[$i % self::DIGIT];
         }
         $result = base64_encode($salt . $result);
+
         return str_replace('/', '_', $result);
-        ;
     }
 }

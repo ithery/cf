@@ -178,10 +178,10 @@ class CResources {
                 'app_code' => $appCode,
             ];
         }
-        $root_directory = DOCROOT . 'application' . DS . $appCode . DS . 'default' . DS . 'resources';
+        $rootDirectory = DOCROOT . 'application' . DS . $appCode . DS . 'default' . DS . 'resources';
 
         //        if(CResources::isS3()) {
-        //             $root_directory = 'resources';
+        //             $rootDirectory = 'resources';
         //        }
         //try to get file_info
         $filepath = CResources::getPath($resource_type);
@@ -207,7 +207,8 @@ class CResources {
 
         $class = 'CResources_Engine_' . $resource_type;
         $object = new $class($type, $options);
-        $object->set_root_directory($root_directory);
+        /** @var CResources_Engine $object */
+        $object->setRootDirectory($rootDirectory);
 
         return $object;
     }

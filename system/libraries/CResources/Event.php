@@ -8,6 +8,5 @@ defined('SYSPATH') or die('No direct access allowed.');
  *
  * @since May 2, 2019, 2:08:18 AM
  */
-
 class CResources_Event {
 }
