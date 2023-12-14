@@ -18,7 +18,7 @@ abstract class CResources_Engine implements CResources_EngineInterface {
     protected $rootDirectory;
 
     public function __construct($resourceType, $type, $options = []) {
-        $this->resource_type = strtolower($resourceType);
+        $this->resourceType = strtolower($resourceType);
         $this->type = $type;
 
         $this->orgCode = carr::get($options, 'org_code');
@@ -80,13 +80,13 @@ abstract class CResources_Engine implements CResources_EngineInterface {
         }
         $dir .= $org_code . DS;
 
-        $dir .= $this->resource_type . DS;
+        $dir .= $this->resourceType . DS;
 
         $dir .= $this->type . DS;
 
         $dir .= date('YmdHis', strtotime($date_now)) . DS;
 
-        $temp_file_name = $org_code . '_' . $this->resource_type . '_' . $this->type . '_' . date('YmdHis', strtotime($date_now)) . '_' . $file_name;
+        $temp_file_name = $org_code . '_' . $this->resourceType . '_' . $this->type . '_' . date('YmdHis', strtotime($date_now)) . '_' . $file_name;
         $path = $dir . $temp_file_name;
 
         if (cstr::startsWith($path, DOCROOT)) {
@@ -114,13 +114,13 @@ abstract class CResources_Engine implements CResources_EngineInterface {
         }
         $dir .= $org_code . DS;
 
-        $dir .= $this->resource_type . DS;
+        $dir .= $this->resourceType . DS;
 
         $dir .= $this->type . DS;
 
         $dir .= date('YmdHis', strtotime($date_now)) . DS;
 
-        $temp_file_name = $org_code . '_' . $this->resource_type . '_' . $this->type . '_' . date('YmdHis', strtotime($date_now)) . '_' . $file_name;
+        $temp_file_name = $org_code . '_' . $this->resourceType . '_' . $this->type . '_' . date('YmdHis', strtotime($date_now)) . '_' . $file_name;
         $path = $dir . $temp_file_name;
 
         if (cstr::startsWith($path, DOCROOT)) {
@@ -150,7 +150,7 @@ abstract class CResources_Engine implements CResources_EngineInterface {
 
         $tempDisk = CStorage::instance()->temp();
         $tempPath = CTemporary::getPath($folder, $fileId);
-        $dir .= $this->resource_type . DS;
+        $dir .= $this->resourceType . DS;
 
         $dir .= $this->type . DS;
 
@@ -158,7 +158,7 @@ abstract class CResources_Engine implements CResources_EngineInterface {
 
         //cfs::mkdir($dir);
 
-        $tempFileName = $orgCode . '_' . $this->resource_type . '_' . $this->type . '_' . date('YmdHis', strtotime($dateNow)) . '_' . $filename;
+        $tempFileName = $orgCode . '_' . $this->resourceType . '_' . $this->type . '_' . date('YmdHis', strtotime($dateNow)) . '_' . $filename;
         $path = $dir . $tempFileName;
 
         if (cstr::startsWith($path, DOCROOT)) {
@@ -187,15 +187,15 @@ abstract class CResources_Engine implements CResources_EngineInterface {
         }
         $dir .= $org_code . DS;
 
-        $dir .= $this->resource_type . DS;
+        $dir .= $this->resourceType . DS;
 
         $dir .= $this->type . DS;
 
         $dir .= date('YmdHis', strtotime($date_now)) . DS;
 
-        cfs::mkdir($dir);
+        CFile::makeDirectory($dir);
 
-        $temp_file_name = $org_code . '_' . $this->resource_type . '_' . $this->type . '_' . date('YmdHis', strtotime($date_now)) . '_' . $file_name;
+        $temp_file_name = $org_code . '_' . $this->resourceType . '_' . $this->type . '_' . date('YmdHis', strtotime($date_now)) . '_' . $file_name;
         $path = $dir . $temp_file_name;
         $written = copy($tempPath, $path);
 
@@ -218,7 +218,7 @@ abstract class CResources_Engine implements CResources_EngineInterface {
         }
         $dir .= $org_code . DS;
 
-        $dir .= $this->resource_type . DS;
+        $dir .= $this->resourceType . DS;
 
         $dir .= $this->type . DS;
 
@@ -226,7 +226,7 @@ abstract class CResources_Engine implements CResources_EngineInterface {
 
         cfs::mkdir($dir);
 
-        $temp_file_name = $org_code . '_' . $this->resource_type . '_' . $this->type . '_' . date('YmdHis', strtotime($date_now)) . '_' . $file_name;
+        $temp_file_name = $org_code . '_' . $this->resourceType . '_' . $this->type . '_' . date('YmdHis', strtotime($date_now)) . '_' . $file_name;
         $path = $dir . $temp_file_name;
 
         $written = rename($file_request, $path);
@@ -243,7 +243,7 @@ abstract class CResources_Engine implements CResources_EngineInterface {
         if ($filename == null) {
             $filename = $this->filename;
         }
-        if ($this->resource_type == 'image') {
+        if ($this->resourceType == 'image') {
             $options = [
                 'app_code' => $this->appCode,
             ];
@@ -254,7 +254,7 @@ abstract class CResources_Engine implements CResources_EngineInterface {
 
             return $imageLoader->getUrl();
         }
-        if ($this->resource_type == 'file' || $this->resource_type == 'pdf') {
+        if ($this->resourceType == 'file' || $this->resourceType == 'pdf') {
             $options = [
                 'app_code' => $this->appCode,
             ];
