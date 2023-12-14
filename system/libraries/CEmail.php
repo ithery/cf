@@ -34,7 +34,14 @@ class CEmail {
      * @return CEmail_Contract_MailerInterface
      */
     public static function mailer($name = '') {
-        return CEmail_MailManager::instance()->mailer($name);
+        return self::manager()->mailer($name);
+    }
+
+    /**
+     * @return CEmail_MailManager
+     */
+    public static function manager() {
+        return CEmail_MailManager::instance();
     }
 
     /**
@@ -42,5 +49,12 @@ class CEmail {
      */
     public static function client() {
         return new CEmail_Client();
+    }
+
+    public static function markdown() {
+        return new CEmail_Markdown([
+            'theme' => CF::config('email.markdown.theme', 'default'),
+            'paths' => CF::config('email.markdown.paths', []),
+        ]);
     }
 }

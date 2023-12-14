@@ -1,12 +1,15 @@
 <?php
-use Symfony\Component\Mailer\Bridge\Mailgun\Transport\MailgunTransportFactory;
-use Symfony\Component\Mailer\Bridge\Postmark\Transport\PostmarkTransportFactory;
+use Aws\Ses\SesClient;
+use Aws\SesV2\SesV2Client;
+// use Psr\Log\LoggerInterface;
 use Symfony\Component\Mailer\Transport\Dsn;
 use Symfony\Component\Mailer\Transport\FailoverTransport;
 use Symfony\Component\Mailer\Transport\SendmailTransport;
 use Symfony\Component\Mailer\Transport\Smtp\EsmtpTransport;
-use Symfony\Component\Mailer\Transport\Smtp\EsmtpTransportFactory;
 use Symfony\Component\Mailer\Transport\Smtp\Stream\SocketStream;
+use Symfony\Component\Mailer\Transport\Smtp\EsmtpTransportFactory;
+use Symfony\Component\Mailer\Bridge\Mailgun\Transport\MailgunTransportFactory;
+use Symfony\Component\Mailer\Bridge\Postmark\Transport\PostmarkTransportFactory;
 
 /**
  * @mixin \CEmail_Mailer
@@ -29,6 +32,9 @@ class CEmail_MailManager implements CEmail_Contract_FactoryInterface {
 
     private static $instance;
 
+    /**
+     * @return CEmail_MailManager
+     */
     public static function instance() {
         if (static::$instance == null) {
             static::$instance = new static();
@@ -43,7 +49,6 @@ class CEmail_MailManager implements CEmail_Contract_FactoryInterface {
      * @return void
      */
     public function __construct() {
-
     }
 
     /**
@@ -105,9 +110,10 @@ class CEmail_MailManager implements CEmail_Contract_FactoryInterface {
             $this->createSymfonyTransport($config),
         );
 
-        if ($this->app->bound('queue')) {
-            $mailer->setQueue($this->app['queue']);
-        }
+        // if ($this->app->bound('queue')) {
+        //     $mailer->setQueue($this->app['queue']);
+        // }
+        $mailer->setQueue(CQueue::queuer());
 
         // Next we will set all of the global addresses on this mailer, which allows
         // for easy unification of all "from" addresses as well as easy debugging
@@ -132,7 +138,7 @@ class CEmail_MailManager implements CEmail_Contract_FactoryInterface {
         // Here we will check if the "transport" key exists and if it doesn't we will
         // assume an application is still using the legacy mail configuration file
         // format and use the "mail.driver" configuration option instead for BC.
-        $transport = $config['transport'] ?? $this->app['config']['mail.driver'];
+        $transport = carr::get($config, 'transport', CF::config('email.driver'));
 
         if (isset($this->customCreators[$transport])) {
             return call_user_func($this->customCreators[$transport], $config);
@@ -200,7 +206,7 @@ class CEmail_MailManager implements CEmail_Contract_FactoryInterface {
      */
     protected function createSendmailTransport(array $config) {
         return new SendmailTransport(
-            $config['path'] ?? $this->app['config']->get('mail.sendmail')
+            $config['path'] ?? CF::config('email.sendmail')
         );
     }
 
@@ -209,19 +215,41 @@ class CEmail_MailManager implements CEmail_Contract_FactoryInterface {
      *
      * @param array $config
      *
-     * @return \Symfony\Component\Mailer\Bridge\Amazon\Transport\SesApiAsyncAwsTransport
+     * @return \CEmail_Transport_SesTransport
      */
     protected function createSesTransport(array $config) {
         $config = array_merge(
-            $this->app['config']->get('services.ses', []),
+            CF::config('vendor.ses', []),
             ['version' => 'latest', 'service' => 'email'],
             $config
         );
 
         $config = carr::except($config, ['transport']);
 
-        return new SesTransport(
+        return new CEmail_Transport_SesTransport(
             new SesClient($this->addSesCredentials($config)),
+            $config['options'] ?? []
+        );
+    }
+
+    /**
+     * Create an instance of the Symfony Amazon SES V2 Transport driver.
+     *
+     * @param array $config
+     *
+     * @return \CEMail_Transport_SesV2Transport
+     */
+    protected function createSesV2Transport(array $config) {
+        $config = array_merge(
+            CF::config('vendor.ses', []),
+            ['version' => 'latest'],
+            $config
+        );
+
+        $config = carr::except($config, ['transport']);
+
+        return new CEmail_Transport_SesV2Transport(
+            new SesV2Client($this->addSesCredentials($config)),
             $config['options'] ?? []
         );
     }
@@ -261,7 +289,7 @@ class CEmail_MailManager implements CEmail_Contract_FactoryInterface {
         $factory = new MailgunTransportFactory();
 
         if (!isset($config['secret'])) {
-            $config = $this->app['config']->get('services.mailgun', []);
+            $config = CF::config('vendor.mailgun', []);
         }
 
         return $factory->create(new Dsn(
@@ -289,7 +317,7 @@ class CEmail_MailManager implements CEmail_Contract_FactoryInterface {
         return $factory->create(new Dsn(
             'postmark+api',
             'default',
-            $config['token'] ?? $this->app['config']->get('services.postmark.token'),
+            $config['token'] ?? CF::config('vendor.postmark.token'),
             null,
             null,
             $options
@@ -316,7 +344,7 @@ class CEmail_MailManager implements CEmail_Contract_FactoryInterface {
             // Now, we will check if the "driver" key exists and if it does we will set
             // the transport configuration parameter in order to offer compatibility
             // with any Laravel <= 6.x application style mail configuration files.
-            $transports[] = $this->app['config']['mail.driver']
+            $transports[] = CF::config('email.driver')
                 ? $this->createSymfonyTransport(array_merge($config, ['transport' => $name]))
                 : $this->createSymfonyTransport($config);
         }
@@ -329,35 +357,36 @@ class CEmail_MailManager implements CEmail_Contract_FactoryInterface {
      *
      * @param array $config
      *
-     * @return \Illuminate\Mail\Transport\LogTransport
+     * @return \CEmail_Transport_LogTransport
      */
     protected function createLogTransport(array $config) {
-        $logger = $this->app->make(LoggerInterface::class);
+        // $logger = CContainer::getInstance()->make(LoggerInterface::class);
+        $logger = CLogger_Manager::instance();
 
-        if ($logger instanceof LogManager) {
+        if ($logger instanceof CLogger_Manager) {
             $logger = $logger->channel(
-                $config['channel'] ?? $this->app['config']->get('mail.log_channel')
+                $config['channel'] ?? CF::config('email.log_channel')
             );
         }
 
-        return new LogTransport($logger);
+        return new CEmail_Transport_LogTransport($logger);
     }
 
     /**
      * Create an instance of the Array Transport Driver.
      *
-     * @return \Illuminate\Mail\Transport\ArrayTransport
+     * @return \CEmail_Transport_ArrayTransport
      */
     protected function createArrayTransport() {
-        return new ArrayTransport();
+        return new CEmail_Transport_ArrayTransport();
     }
 
     /**
      * Set a global address on the mailer by type.
      *
      * @param \CEmail_Mailer $mailer
-     * @param array                   $config
-     * @param string                  $type
+     * @param array          $config
+     * @param string         $type
      *
      * @return void
      */
@@ -380,9 +409,7 @@ class CEmail_MailManager implements CEmail_Contract_FactoryInterface {
         // Here we will check if the "driver" key exists and if it does we will use
         // the entire mail configuration file as the "driver" config in order to
         // provide "BC" for any Laravel <= 6.x style mail configuration files.
-        return $this->app['config']['mail.driver']
-            ? $this->app['config']['mail']
-            : $this->app['config']["mail.mailers.{$name}"];
+        return CF::config('email.driver') ? CF::config('email') : CF::config("mail.mailers.{$name}");
     }
 
     /**
@@ -394,8 +421,7 @@ class CEmail_MailManager implements CEmail_Contract_FactoryInterface {
         // Here we will check if the "driver" key exists and if it does we will use
         // that as the default driver in order to provide support for old styles
         // of the Laravel mail configuration file for backwards compatibility.
-        return $this->app['config']['mail.driver']
-            ?? $this->app['config']['mail.default'];
+        return CF::config('email.driver', CF::config('email.default'));
     }
 
     /**
@@ -436,28 +462,6 @@ class CEmail_MailManager implements CEmail_Contract_FactoryInterface {
      */
     public function extend($driver, Closure $callback) {
         $this->customCreators[$driver] = $callback;
-
-        return $this;
-    }
-
-    /**
-     * Get the application instance used by the manager.
-     *
-     * @return \Illuminate\Contracts\Foundation\Application
-     */
-    public function getApplication() {
-        return $this->app;
-    }
-
-    /**
-     * Set the application instance used by the manager.
-     *
-     * @param \Illuminate\Contracts\Foundation\Application $app
-     *
-     * @return $this
-     */
-    public function setApplication($app) {
-        $this->app = $app;
 
         return $this;
     }

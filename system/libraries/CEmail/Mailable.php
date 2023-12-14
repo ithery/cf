@@ -1,6 +1,5 @@
 <?php
 
-use Illuminate\Support\HtmlString;
 use Symfony\Component\Mime\Address;
 use PHPUnit\Framework\Assert as PHPUnit;
 
@@ -167,6 +166,16 @@ class CEmail_Mailable implements CEmail_Contract_MailableInterface, CInterface_R
     protected $assertionableRenderStrings;
 
     /**
+     * @var int
+     */
+    protected $delay = 0;
+
+    /**
+     * @var int
+     */
+    protected $connection = null;
+
+    /**
      * Send the message using the given mailer.
      *
      * @param \CEmail_Contract_FactoryInterface|\Illuminate\Contracts\Mail\Mailer $mailer
@@ -201,7 +210,7 @@ class CEmail_Mailable implements CEmail_Contract_MailableInterface, CInterface_R
      * @return mixed
      */
     public function queue(CQueue_FactoryInterface $queue) {
-        if (isset($this->delay)) {
+        if (isset($this->delay) && $this->delay > 0) {
             return $this->later($this->delay, $queue);
         }
 
@@ -302,7 +311,7 @@ class CEmail_Mailable implements CEmail_Contract_MailableInterface, CInterface_R
      * @return array
      */
     protected function buildMarkdownView() {
-        $markdown = CContainer::getInstance()->make(Markdown::class);
+        $markdown = CContainer::getInstance()->make(CEmail_Markdown::class);
 
         if (isset($this->theme)) {
             $markdown->theme($this->theme);
