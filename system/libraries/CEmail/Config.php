@@ -54,6 +54,7 @@ class CEmail_Config {
         'smtp.elasticemail.com' => 'elasticemail',
         'smtp25.elasticemail.com' => 'elasticemail',
         'smtp.postmarkapp.com' => 'postmarkapp',
+        'smtp.amazonaws.com' => 'ses',
     ];
 
     public function __construct($options = []) {
@@ -75,11 +76,13 @@ class CEmail_Config {
         $isLegacyOptions = !carr::get($config, 'driver');
 
         $newConfig = $config;
+
         if ($isLegacyOptions) {
             $smtpHost = carr::get($config, 'host', carr::get($config, 'smtp_host'));
             if ($smtpHost == null) {
                 throw new Exception('SMTP Host is null');
             }
+
             $driver = carr::get(static::$smtpHostToDriverMap, $smtpHost, 'smtp');
 
             $newConfig = [];
@@ -163,5 +166,9 @@ class CEmail_Config {
 
     public function getFromName() {
         return $this->fromName;
+    }
+
+    public function get($key, $default = null) {
+        return carr::get($this->options, $key, $default);
     }
 }

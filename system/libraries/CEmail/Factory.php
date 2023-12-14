@@ -6,6 +6,8 @@ class CEmail_Factory {
         'mailgun' => CEmail_Driver_MailgunDriver::class,
         'mail' => CEmail_Driver_MailDriver::class,
         'kirimemail' => CEmail_Driver_KirimEmailDriver::class,
+        'ses' => CEmail_Driver_SesDriver::class,
+        'sesV2' => CEmail_Driver_SesV2Driver::class,
     ];
 
     /**
