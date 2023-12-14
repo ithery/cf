@@ -7,30 +7,30 @@ defined('SYSPATH') or die('No direct access allowed.');
  *
  * @template TModelClass of CModel
  *
- * @method static              TModelClass         create($attributes = [])                                                                 Find a model by its primary key.
- * @method mixed               value($column)                                                                                               Get a single column's value from the first result of a query.
- * @method mixed               pluck($column)                                                                                               Get a single column's value from the first result of a query.
- * @method void                chunk($count, callable $callback)                                                                            Chunk the results of the query.
- * @method \CCollection        lists($column, $key = null)                                                                                  Get an array with the values of a given column.
- * @method void                onDelete(Closure $callback)                                                                                  Register a replacement for the default delete function.
- * @method CModel[]            getModels($columns = ['*'])                                                                                  Get the hydrated models without eager loading.
- * @method array               eagerLoadRelations(array $models)                                                                            Eager load the relationships for the models.
- * @method array               loadRelation(array $models, $name, Closure $constraints)                                                     Eagerly load the relationship on a set of models.
- * @method static              CModel_Query|static where($column, $operator = null, $value = null, $boolean = 'and')                        Add a basic where clause to the query.
- * @method static              CModel_Query|static whereHas($relation, Closure $callback = null, $operator = '>=', $count = 1)              Add a relationship count / exists condition to the query with where clauses.
- * @method static              CModel_Query|static orWhere($column, $operator = null, $value = null)                                        Add an "or where" clause to the query.
- * @method static              CModel_Query|static has($relation, $operator = '>=', $count = 1, $boolean = 'and', Closure $callback = null) Add a relationship count condition to the query.
- * @method static              CModel_Query|static whereRaw($sql, array $bindings = [])
- * @method static              CModel_Query|static whereBetween($column, array $values)
- * @method static              CModel_Query|static whereNotBetween($column, array $values)
- * @method static              CModel_Query|static whereNested(Closure $callback)
- * @method static              CModel_Query|static addNestedWhereQuery($query)
- * @method static              CModel_Query|static whereExists(Closure $callback)
- * @method static              CModel_Query|static whereNotExists(Closure $callback)
- * @method static              CModel_Query|static whereIn($column, $values)
- * @method static              CModel_Query|static whereNotIn($column, $values)
- * @method static              CModel_Query|static whereNull($column)
- * @method static              CModel_Query|static whereNotNull($column)
+ * @method static              TModelClass         create($attributes = [])                                             Find a model by its primary key.
+ * @method mixed               value($column)                                                                           Get a single column's value from the first result of a query.
+ * @method mixed               pluck($column)                                                                           Get a single column's value from the first result of a query.
+ * @method void                chunk($count, callable $callback)                                                        Chunk the results of the query.
+ * @method \CCollection        lists($column, $key = null)                                                              Get an array with the values of a given column.
+ * @method void                onDelete(Closure $callback)                                                              Register a replacement for the default delete function.
+ * @method CModel[]            getModels($columns = ['*'])                                                              Get the hydrated models without eager loading.
+ * @method array               eagerLoadRelations(array $models)                                                        Eager load the relationships for the models.
+ * @method array               loadRelation(array $models, $name, Closure $constraints)                                 Eagerly load the relationship on a set of models.
+ * @method CModel_Query|static where($column, $operator = null, $value = null, $boolean = 'and')                        Add a basic where clause to the query.
+ * @method CModel_Query|static whereHas($relation, Closure $callback = null, $operator = '>=', $count = 1)              Add a relationship count / exists condition to the query with where clauses.
+ * @method CModel_Query|static orWhere($column, $operator = null, $value = null)                                        Add an "or where" clause to the query.
+ * @method CModel_Query|static has($relation, $operator = '>=', $count = 1, $boolean = 'and', Closure $callback = null) Add a relationship count condition to the query.
+ * @method CModel_Query|static whereRaw($sql, array $bindings = [])
+ * @method CModel_Query|static whereBetween($column, array $values)
+ * @method CModel_Query|static whereNotBetween($column, array $values)
+ * @method CModel_Query|static whereNested(Closure $callback)
+ * @method CModel_Query|static addNestedWhereQuery($query)
+ * @method CModel_Query|static whereExists(Closure $callback)
+ * @method CModel_Query|static whereNotExists(Closure $callback)
+ * @method CModel_Query|static whereIn($column, $values)
+ * @method CModel_Query|static whereNotIn($column, $values)
+ * @method CModel_Query|static whereNull($column)
+ * @method CModel_Query|static whereNotNull($column)
  * @method CModel_Query|static orWhereRaw($sql, array $bindings = [])
  * @method CModel_Query|static orWhereBetween($column, array $values)
  * @method CModel_Query|static orWhereNotBetween($column, array $values)
@@ -59,9 +59,10 @@ defined('SYSPATH') or die('No direct access allowed.');
  * @method CModel_Query|static offset($value)
  * @method CModel_Query|static take($value)
  * @method CModel_Query|static limit($value)
- * @method CModel_Query|static lockForUpdate()                                                                                              Lock the selected rows in the table for updating.
- * @method bool                exists()                                                                                                     Determine if any rows exist for the current query
- * @method mixed               sum($column)                                                                                                 Retrieve the sum of the values of a given column..
+ * @method CModel_Query|static lockForUpdate()                                                                          Lock the selected rows in the table for updating.
+ * @method bool                exists()                                                                                 Determine if any rows exist for the current query
+ * @method mixed               sum($column)                                                                             Retrieve the sum of the values of a given column..
+ * @method static              void                                      truncate()                                     Run a truncate statement on the table.
  *
  * @property-read CModel_HigherOrderBuilderProxy $orWhere
  * @property-read CModel_HigherOrderBuilderProxy $whereNot
