@@ -503,7 +503,7 @@ class CEmail_Mailer implements MailerContract, MailQueueContract {
      * @return bool
      */
     protected function shouldSendMessage($message, $data = []) {
-        CEvent::dispatcher()->until(new CEmail_Event_MessageSending($message, $data)) !== false;
+        return CEvent::dispatcher()->until(new CEmail_Event_MessageSending($message, $data)) !== false;
     }
 
     /**

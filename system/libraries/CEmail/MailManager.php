@@ -211,6 +211,29 @@ class CEmail_MailManager implements CEmail_Contract_FactoryInterface {
     }
 
     /**
+     * Create an instance of the Sendgrid Transport driver.
+     *
+     * @param array $config
+     *
+     * @return \CEmail_Transport_Sendgrid
+     */
+    protected function createSendgridTransport(array $config) {
+        $config = array_merge(
+            CF::config('vendor.sendgrid', []),
+            $config
+        );
+
+        $config = carr::except($config, ['transport']);
+        $apiKey = carr::get($config, 'key');
+        $sendgrid = new CVendor_SendGrid($apiKey);
+
+        return new CEmail_Transport_SendgridTransport(
+            $sendgrid,
+            $config['options'] ?? []
+        );
+    }
+
+    /**
      * Create an instance of the Symfony Amazon SES Transport driver.
      *
      * @param array $config
@@ -391,7 +414,7 @@ class CEmail_MailManager implements CEmail_Contract_FactoryInterface {
      * @return void
      */
     protected function setGlobalAddress($mailer, array $config, string $type) {
-        $address = carr::get($config, $type, $this->app['config']['mail.' . $type]);
+        $address = carr::get($config, $type, CF::config('email.' . $type));
 
         if (is_array($address) && isset($address['address'])) {
             $mailer->{'always' . cstr::studly($type)}($address['address'], $address['name']);
@@ -409,7 +432,8 @@ class CEmail_MailManager implements CEmail_Contract_FactoryInterface {
         // Here we will check if the "driver" key exists and if it does we will use
         // the entire mail configuration file as the "driver" config in order to
         // provide "BC" for any Laravel <= 6.x style mail configuration files.
-        return CF::config('email.driver') ? CF::config('email') : CF::config("mail.mailers.{$name}");
+
+        return CF::config('email.driver') ? CF::config('email') : CF::config("email.mailers.{$name}");
     }
 
     /**

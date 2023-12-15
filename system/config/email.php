@@ -20,10 +20,26 @@ return [
         ],
         'ses' => [
             'transport' => 'ses',
+            'key' => c::env('AWS_ACCESS_KEY_ID'),
+            'secret' => c::env('AWS_SECRET_ACCESS_KEY'),
+            'region' => c::env('AWS_DEFAULT_REGION', 'us-east-1'),
+            'token' => c::env('AWS_SESSION_TOKEN'),
+            // 'options' => [
+            //     'ConfigurationSetName' => 'MyConfigurationSet',
+            //     'EmailTags' => [
+            //         ['Name' => 'foo', 'Value' => 'bar'],
+            //     ],
+            // ],
         ],
-
+        'sendgrid' => [
+            'transport' => 'sendgrid',
+            // 'key' => c::env('SENDGRID_API_KEY'),
+        ],
         'mailgun' => [
             'transport' => 'mailgun',
+            'domain' => c::env('MAILGUN_DOMAIN'),
+            'secret' => c::env('MAILGUN_SECRET'),
+            // 'endpoint' => c::env('MAILGUN_ENDPOINT', 'api.eu.mailgun.net'),
             // 'client' => [
             //     'timeout' => 5,
             // ],
@@ -31,7 +47,8 @@ return [
 
         'postmark' => [
             'transport' => 'postmark',
-            // 'message_stream_id' => null,
+            'token' => c::env('POSTMARK_TOKEN'),
+            'message_stream_id' => c::env('POSTMARK_MESSAGE_STREAM_ID', null),
             // 'client' => [
             //     'timeout' => 5,
             // ],
@@ -60,8 +77,8 @@ return [
         ],
     ],
     'from' => [
-        'address' => 'noreply@capp.core',
-        'name' => 'CF App',
+        'address' => c::env('MAIL_FROM_ADDRESS', 'noreply@capp.core'),
+        'name' => c::env('MAIL_FROM_NAME', 'CF App'),
     ],
     /*
     |--------------------------------------------------------------------------

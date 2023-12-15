@@ -31,7 +31,7 @@ class CEmail {
     /**
      * @param string $name
      *
-     * @return CEmail_Contract_MailerInterface
+     * @return CEmail_Mailer
      */
     public static function mailer($name = '') {
         return self::manager()->mailer($name);
@@ -56,5 +56,9 @@ class CEmail {
             'theme' => CF::config('email.markdown.theme', 'default'),
             'paths' => CF::config('email.markdown.paths', []),
         ]);
+    }
+
+    public static function send($view, array $data = [], $callback = null) {
+        return self::mailer()->send($view, $data, $callback);
     }
 }
