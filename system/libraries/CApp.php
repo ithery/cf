@@ -24,6 +24,7 @@ defined('SYSPATH') or die('No direct access allowed.');
  * @method CElement_Element_H4                   addH4($id=null)
  * @method CElement_Element_H5                   addH5($id=null)
  * @method CElement_Element_H6                   addH6($id=null)
+ * @method CElement_Element_H6                   addP($id=null)
  * @method CElement_Element_Span                 addSpan($id=null)
  * @method CElement_Element_Pre                  addPre($id=null)
  * @method CElement_List_ActionList              addActionList($id=null)

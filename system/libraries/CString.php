@@ -33,4 +33,11 @@ class CString {
     public static function formatter() {
         return new CBase_ForwarderStaticClass(CString_Formatter::class);
     }
+
+    /**
+     * @return CString_Regex
+     */
+    public static function regex() {
+        return new CBase_ForwarderStaticClass(CString_Regex::class);
+    }
 }

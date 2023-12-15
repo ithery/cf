@@ -1665,6 +1665,34 @@ class carr {
     public static function mirror(array $array) {
         return array_combine($array, $array);
     }
+
+    /**
+     * @param array $array
+     *
+     * @return array
+     */
+    public static function transpose(array $array): array {
+        if (count($array) === 1) {
+            $array = static::first($array);
+
+            return array_map(function ($element) {
+                return [$element];
+            }, $array);
+        }
+
+        $numHits = count($array[0]);
+        $groups = array_keys($array);
+        $result = [];
+        for ($hit = 0; $hit < $numHits; $hit++) {
+            $group = [];
+            foreach ($groups as $groupName) {
+                $group[$groupName] = $array[$groupName][$hit];
+            }
+            $result[] = $group;
+        }
+
+        return $result;
+    }
 }
 
 // End carr

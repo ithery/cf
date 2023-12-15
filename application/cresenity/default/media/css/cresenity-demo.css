@@ -28,3 +28,6 @@
         width: 100vw;
     }
 }
+code {
+    white-space: pre;;
+}

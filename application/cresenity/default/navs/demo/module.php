@@ -1,6 +1,11 @@
 <?php
 return [
     [
+        'name' => 'module.string',
+        'label' => c::__('String'),
+        'subnav' => include dirname(__FILE__) . '/module/string.php',
+    ],
+    [
         'name' => 'module.formatter',
         'label' => c::__('Formatter'),
         'uri' => 'demo/module/formatter/index',
@@ -34,7 +39,7 @@ return [
         'name' => 'module.ml',
         'label' => c::__('ML'),
         'uri' => 'demo/module/ml/index',
-        'badge'=> 'DEV',
+        'badge' => 'DEV',
     ],
     [
         'name' => 'module.bot',
