@@ -429,6 +429,13 @@ class CStorage {
     }
 
     /**
+     * @return CStorage_Tus|CBase_ForwarderStaticClass
+     */
+    public static function tus() {
+        return new CBase_ForwarderStaticClass(CStorage_Tus::class);
+    }
+
+    /**
      * Dynamically call the default driver instance.
      *
      * @param string $method

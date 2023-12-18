@@ -505,4 +505,16 @@ class Controller_Cresenity extends CController {
 
         return c::abort(404);
     }
+
+    public function tus() {
+        $server = CStorage::tus()->createServer();
+        // $entityBody = file_get_contents('php://input');
+        // print_r(c::request()->headers);
+        // die;
+
+        $server->setApiPath('/cresenity/tus');
+        $response = $server->serve(); // return an TusPhpS3\Http\Response
+
+        return $response;
+    }
 }
