@@ -162,7 +162,7 @@ class CEmail_Driver_SesDriver extends CEmail_DriverAbstract {
             $options['Source'] = $source;
             $options['Destination'] = $destinations;
             $options['Message'] = $content;
-            if (isset($configurationSetName)) {
+            if (strlen($configurationSetName) > 0) {
                 $options['ConfigurationSetName'] = $configurationSetName;
             }
 
