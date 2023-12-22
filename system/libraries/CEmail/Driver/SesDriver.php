@@ -64,6 +64,7 @@ class CEmail_Driver_SesDriver extends CEmail_DriverAbstract {
         $replyTo = carr::get($options, 'replyTo', '');
         $cc = carr::get($options, 'cc', []);
         $bcc = carr::get($options, 'bcc', []);
+        $configurationSetName = c::geT($options, 'configurationSetName', '');
         $result = null;
         $options = [];
         // $options['Tags'][] = ['Name' => 'subject', 'Value' => $subject];
@@ -161,6 +162,9 @@ class CEmail_Driver_SesDriver extends CEmail_DriverAbstract {
             $options['Source'] = $source;
             $options['Destination'] = $destinations;
             $options['Message'] = $content;
+            if (isset($configurationSetName)) {
+                $options['ConfigurationSetName'] = $configurationSetName;
+            }
 
             if ($replyTo) {
                 $options['ReplyToAddresses'] = [$replyTo];
