@@ -907,7 +907,7 @@ class CElement_Component_DataTable extends CElement_Component {
     }
 
     /**
-     * @return string
+     * @return mixed
      */
     public function getQuery() {
         return $this->query;
