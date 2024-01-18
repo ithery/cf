@@ -604,7 +604,7 @@ export default class Cresenity {
                     }
                 }
                 if (thrownError !== 'abort') {
-                    this.showError(thrownError);
+                    this.showError('Something when wrong' + thrownError);
                 }
             },
 
