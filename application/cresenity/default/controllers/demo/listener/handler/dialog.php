@@ -1,6 +1,6 @@
 <?php
 
-class Controller_Demo_Handler_Dialog extends \Cresenity\Demo\Controller {
+class Controller_Demo_Listener_Handler_Dialog extends \Cresenity\Demo\Controller {
     public function index() {
         $app = c::app();
         $app->setTitle('Toggle Active');

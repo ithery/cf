@@ -23,9 +23,9 @@ return [
         'subnav' => include dirname(__FILE__) . '/demo/controls.php',
     ],
     [
-        'name' => 'handler',
-        'label' => c::__('Handler'),
-        'subnav' => include dirname(__FILE__) . '/demo/handler.php',
+        'name' => 'listener',
+        'label' => c::__('Listener'),
+        'subnav' => include dirname(__FILE__) . '/demo/listener.php',
     ],
     [
         'name' => 'model',
