@@ -42,6 +42,10 @@ class CImage_Chart_Builder {
 
     protected $bottomMargin = 50;
 
+    /**
+     * @param int $width
+     * @param int $height
+     */
     public function __construct($width, $height) {
         $this->width = $width;
         $this->height = $height;
@@ -50,8 +54,13 @@ class CImage_Chart_Builder {
 
     public function setChart(CChart_ChartAbstract $chart) {
         $this->chart = $chart;
+
+        return $this;
     }
 
+    /**
+     * @return null|CChart_ChartAbstract
+     */
     public function getChart() {
         return $this->chart;
     }
