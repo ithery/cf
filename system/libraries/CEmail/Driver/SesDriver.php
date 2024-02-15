@@ -276,7 +276,7 @@ class CEmail_Driver_SesDriver extends CEmail_DriverAbstract {
             // Ganti ini dengan Content-Type yang sesuai dengan lampiran
             $message .= 'Content-Type: ' . $attachment['type'] . '; name="' . $attachment['filename'] . '"';
             $message .= "\n";
-            $message .= 'Content-Description: test.pdf';
+            $message .= 'Content-Description: ' . $attachment['filename'] . '';
             $message .= "\n";
             $message .= 'Content-Disposition: attachment; filename="' . $attachment['filename'] . '"';
             $message .= "\n";
