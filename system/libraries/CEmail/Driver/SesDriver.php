@@ -195,7 +195,7 @@ class CEmail_Driver_SesDriver extends CEmail_DriverAbstract {
         if (is_array($to)) {
             $to = implode(',', $to);
         }
-        $rawMessage = $this->generateRawMessageData($fromName, $to, $subject, $body, $attachments, $options);
+        $rawMessage = $this->generateRawMessageData($from, $to, $subject, $body, $attachments, $options);
         $options = [];
 
         try {
