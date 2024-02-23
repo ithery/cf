@@ -16,13 +16,13 @@ trait CTrait_Controller_Application_Server_Beanstalkd {
 
         try {
             $beanstalkd = $this->getBeanstalkd();
+            $tubesData = $beanstalkd->getTubesStats();
         } catch (\Pheanstalk\Exception\ConnectionException $ex) {
             $app->addAlert()->setType('error')->add('Cannot connect beanstalkd service, please check your connection configuration or the beanstalkd service status');
 
             return $app;
         }
 
-        $tubesData = $beanstalkd->getTubesStats();
         $tableData = [];
 
         foreach ($tubesData as $tubeData) {
