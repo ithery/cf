@@ -9,6 +9,10 @@ class CAjax_Engine_Callback extends CAjax_Engine {
         $requires = carr::get($data, 'requires');
         $result = CFunction::factory($callable)->addArg($data)->setRequire($requires)->execute();
 
+        if (CF::domain() == 'maxpage.staging.ittron.co.id') {
+            cdbg::dd($result);
+        }
+
         return $result;
     }
 }

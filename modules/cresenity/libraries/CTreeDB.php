@@ -5,6 +5,9 @@ defined('SYSPATH') or die('No direct access allowed.');
 class CTreeDB {
     use CTrait_Compat_TreeDb;
 
+    /**
+     * @var CDatabase_Connection
+     */
     protected $db = null;
 
     protected $pk_column = '';
@@ -24,7 +27,7 @@ class CTreeDB {
             $domain = CF::domain();
         }
         if ($db == null) {
-            $db = CDatabase::instance(null, null, $domain);
+            $db = c::db();
         }
         $this->org_id = '';
 
