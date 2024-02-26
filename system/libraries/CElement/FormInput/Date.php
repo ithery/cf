@@ -45,6 +45,11 @@ class CElement_FormInput_Date extends CElement_FormInput {
         $this->addClass('form-control');
     }
 
+    public static function factory($id = null) {
+        /** @phpstan-ignore-next-line */
+        return new static($id);
+    }
+
     public function setStartDate($str) {
         $this->startDate = $str;
 
