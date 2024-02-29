@@ -17,7 +17,7 @@ class CEmail_Driver_SesV2Driver extends CEmail_DriverAbstract {
         $secret = $this->config->get('secret', CF::config('vendor.ses.secret')) ?: $this->config->getPassword();
         $region = $this->config->get('region', $this->config->get('ses_region', CF::config('vendor.ses.secret'))) ?: 'ap-southeast-1';
         $sesConfig = [
-            'credentials'=> [
+            'credentials' => [
                 'key' => $key,
                 'secret' => $secret,
 
@@ -38,32 +38,54 @@ class CEmail_Driver_SesV2Driver extends CEmail_DriverAbstract {
         $replyTo = carr::get($options, 'replyTo', '');
         $cc = carr::get($options, 'cc', []);
         $bcc = carr::get($options, 'bcc', []);
+        $configurationSetName = c::get($options, 'configurationSetName');
         $result = null;
         $options = [];
         // $options['Tags'][] = ['Name' => 'subject', 'Value' => $subject];
         // $options['Tags'][] = ['Name' => 'From', 'Value' => $from];
+        $destinations['ToAddresses'] = [];
+        foreach ($to as $toItem) {
+            $toName = '';
+            $toEmail = $toItem;
+            if (is_array($toItem)) {
+                $toName = carr::get($toItem, 'toName');
+                $toEmail = carr::get($toItem, 'toEmail');
+            }
+            $toAddress = $toEmail;
+            if ($toName) {
+                $toAddress = $toName . ' <' . $toEmail . '>';
+            }
+            $destinations['ToAddresses'][] = $toAddress;
+        }
 
-        $destinations = [
-            'ToAddresses'=>$to,
-        ];
+        if ($cc && count($cc) > 0) {
+            $destinations['CcAddresses'] = $cc;
+        }
+        if ($bcc && count($bcc) > 0) {
+            $destinations['BccAddresses'] = $bcc;
+        }
+
+        if (is_array($to)) {
+            $to = implode(',', $to);
+        }
+        $rawMessage = $this->generateRawMessageData($from, $to, $subject, $body, $attachments, $options);
+
         $content = [
-            'Simple'=>[
-                'Subject'=>[
-                    'Data'=>$subject,
-                ],
-                'Body' => [
-                    'Text' => [
-                        'Data' => $body,
-                    ],
-                ],
-
-            ]
+            'Raw' => [
+                'Data' => $rawMessage,
+            ],
         ];
 
         try {
-            $options['Source'] = $from;
+            if (strlen($configurationSetName) > 0) {
+                $options['ConfigurationSetName'] = $configurationSetName;
+            }
+            $options['FromEmailAddress'] = $from;
             $options['Destinations'] = $destinations;
             $options['Content'] = $content;
+            if ($replyTo) {
+                $options['ReplyToAddresses'] = [$replyTo];
+            }
 
             $result = $this->ses->sendEmail($options);
         } catch (AwsException $e) {
@@ -75,9 +97,76 @@ class CEmail_Driver_SesV2Driver extends CEmail_DriverAbstract {
                 $e
             );
         }
-        cdbg::dd($result);
-        $messageId = $result->get('MessageId');
 
         return $result;
+    }
+
+    public function generateRawMessageData($from, $to, $subject, $body, $attachments, $options) {
+        $replyTo = carr::get($options, 'replyTo', '');
+        $cc = carr::get($options, 'cc', []);
+        $bcc = carr::get($options, 'bcc', []);
+        $boundary = md5(time());
+
+        $message = "To: $to\n";
+        $message .= "From: $from\n";
+
+        // Tambahkan Cc
+        if (!empty($cc)) {
+            $message .= 'Cc: ' . implode(',', $cc) . "\n";
+        }
+
+        // Tambahkan Bcc
+        if (!empty($bcc)) {
+            $message .= 'Bcc: ' . implode(',', $bcc) . "\n";
+        }
+
+        // Tambahkan Reply-To
+        if (!empty($replyTo)) {
+            $message .= "Reply-To: $replyTo\n";
+        }
+
+        $message .= "Subject: $subject\n";
+        $message .= 'Content-Type: multipart/mixed; boundary="' . $boundary . '"';
+        $message .= "\n\n";
+
+        // // Bagian teks
+        $message .= "--$boundary\n";
+        $message .= 'Content-Type: multipart/alternative; boundary="alternative_boundary"';
+        $message .= "\n\n";
+
+        $message .= "--alternative_boundary\n";
+        $message .= 'Content-Type: text/plain; charset=us-ascii';
+        $message .= "\n";
+        $message .= "\n";
+
+        $message .= "--alternative_boundary\n";
+        $message .= 'Content-Type: text/html; charset=us-ascii';
+        $message .= "\n";
+        $message .= "\n";
+        $message .= "$body\n";
+
+        $message .= "--alternative_boundary--\n\n";
+
+        // Bagian lampiran
+        foreach ($attachments as $attachment) {
+            $message .= "--$boundary\n";
+
+            // Ganti ini dengan Content-Type yang sesuai dengan lampiran
+            $message .= 'Content-Type: ' . $attachment['type'] . '; name="' . $attachment['filename'] . '"';
+            $message .= "\n";
+            $message .= 'Content-Description: ' . $attachment['filename'] . '';
+            $message .= "\n";
+            $message .= 'Content-Disposition: attachment; filename="' . $attachment['filename'] . '"';
+            $message .= "\n";
+            $message .= 'Content-Transfer-Encoding: base64';
+            $message .= "\n";
+            $message .= "\n";
+            $message .= base64_encode(file_get_contents($attachment['path']));
+            $message .= "\n";
+        }
+
+        $message .= "--$boundary--\n";
+
+        return $message;
     }
 }
