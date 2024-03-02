@@ -87,7 +87,8 @@
                                     <h2 class="h6 m-0">Exception</h2>
                                 </div>
                                 <div>
-                                    <x-stack-trace :trace="explode(PHP_EOL,carr::get($job,'exception'))"></x-stack-trace>
+                                    @include('cresenity.daemon.supervisor.component.stack-trace', ['trace'=>explode(PHP_EOL,carr::get($job,'exception'))])
+                                    {{-- <x-stack-trace :trace="explode(PHP_EOL,carr::get($job,'exception'))"></x-stack-trace> --}}
                                 </div>
                             </div>
                             <div class="card overflow-hidden mt-4">

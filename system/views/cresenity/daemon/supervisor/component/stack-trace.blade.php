@@ -1,3 +1,6 @@
+@php
+    $uniqid = uniqid();
+@endphp
 <div id="{{ $uniqid }}" x-data="supervisorStackTrace{{ $uniqid }}(@js($trace))">
     <table class="table mb-0">
         <tbody>
