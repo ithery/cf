@@ -1302,7 +1302,17 @@ trait CModel_Trait_Attributes {
      * @return string
      */
     protected function castAttributeAsHashedString($key, $value) {
-        return $value !== null && !CCrypt::hasher()->isHashed($value) ? CCrypt::hasher()->make($value) : $value;
+        if ($value === null) {
+            return null;
+        }
+        if (!CCrypt::hasher()->isHashed($value)) {
+            return CCrypt::hasher()->make($value);
+        }
+        // if (!CCrypt::hasher()->verifyConfiguration($value)) {
+        //     throw new RuntimeException("Could not verify the hashed value's configuration.");
+        // }
+
+        return $value;
     }
 
     /**

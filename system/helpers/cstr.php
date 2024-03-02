@@ -473,15 +473,64 @@ class cstr {
      * @return string
      */
     public static function headline($value) {
-        $parts = explode('_', static::replace(' ', '_', $value));
+        $parts = explode(' ', $value);
 
-        if (count($parts) > 1) {
-            $parts = array_map([static::class, 'title'], $parts);
+        $parts = count($parts) > 1
+            ? array_map([static::class, 'title'], $parts)
+            : array_map([static::class, 'title'], static::ucsplit(implode('_', $parts)));
+
+        $collapsed = static::replace(['-', '_', ' '], '_', implode('_', $parts));
+
+        return implode(' ', array_filter(explode('_', $collapsed)));
+    }
+
+    /**
+     * Convert the given string to APA-style title case.
+     *
+     * See: https://apastyle.apa.org/style-grammar-guidelines/capitalization/title-case
+     *
+     * @param string $value
+     *
+     * @return string
+     */
+    public static function apa($value) {
+        if (trim($value) === '') {
+            return $value;
         }
 
-        $studly = static::studly(implode($parts));
+        $minorWords = [
+            'and', 'as', 'but', 'for', 'if', 'nor', 'or', 'so', 'yet', 'a', 'an',
+            'the', 'at', 'by', 'for', 'in', 'of', 'off', 'on', 'per', 'to', 'up', 'via',
+        ];
 
-        $words = preg_split('/(?=[A-Z])/', $studly, -1, PREG_SPLIT_NO_EMPTY);
+        $endPunctuation = ['.', '!', '?', ':', '—', ','];
+
+        $words = preg_split('/\s+/', $value, -1, PREG_SPLIT_NO_EMPTY);
+
+        $words[0] = ucfirst(mb_strtolower($words[0]));
+
+        for ($i = 0; $i < count($words); $i++) {
+            $lowercaseWord = mb_strtolower($words[$i]);
+
+            if (str_contains($lowercaseWord, '-')) {
+                $hyphenatedWords = explode('-', $lowercaseWord);
+
+                $hyphenatedWords = array_map(function ($part) use ($minorWords) {
+                    return (in_array($part, $minorWords) && mb_strlen($part) <= 3) ? $part : ucfirst($part);
+                }, $hyphenatedWords);
+
+                $words[$i] = implode('-', $hyphenatedWords);
+            } else {
+                if (in_array($lowercaseWord, $minorWords)
+                    && mb_strlen($lowercaseWord) <= 3
+                    && !($i === 0 || in_array(mb_substr($words[$i - 1], -1), $endPunctuation))
+                ) {
+                    $words[$i] = $lowercaseWord;
+                } else {
+                    $words[$i] = ucfirst($lowercaseWord);
+                }
+            }
+        }
 
         return implode(' ', $words);
     }
