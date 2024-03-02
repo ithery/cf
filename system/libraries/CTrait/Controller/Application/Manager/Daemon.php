@@ -62,7 +62,7 @@ trait CTrait_Controller_Application_Manager_Daemon {
 
         $request = array_merge(CApp_Base::getRequest(), $options);
         $group = carr::get($request, 'group');
-        $groupQueryString = '';
+        $groupQueryString = '?group=';
         if (strlen($group) > 0) {
             $groupQueryString = '?group=' . $group;
         }
@@ -100,6 +100,9 @@ trait CTrait_Controller_Application_Manager_Daemon {
         $actStop = $table->addRowAction();
         $actStop->setIcon('fas fa-stop')->setLabel('Stop');
         $actStop->setLink(static::controllerUrl() . 'stop/{service_class}' . $groupQueryString)->setConfirm();
+        $actForceStop = $table->addRowAction();
+        $actForceStop->setIcon('fas fa-stop')->setLabel('Force Stop');
+        $actForceStop->setLink(static::controllerUrl() . 'stop/{service_class}' . $groupQueryString . '&force=1')->setConfirm();
         $actDebug = $table->addRowAction();
         $actDebug->setIcon('fas fa-life-ring')->setLabel('Debug');
         $actDebug->setLink(static::controllerUrl() . 'debug/{service_class}' . $groupQueryString);
@@ -132,9 +135,10 @@ trait CTrait_Controller_Application_Manager_Daemon {
         $errCode = 0;
         $errMessage = '';
         $group = carr::get($_GET, 'group');
+        $force = (bool) carr::get($_GET, 'force');
 
         try {
-            $started = CManager::daemon()->stop($serviceClass);
+            $started = CManager::daemon()->stop($serviceClass, $force);
         } catch (Exception $ex) {
             $errCode++;
             $errMessage = $ex->getMessage();

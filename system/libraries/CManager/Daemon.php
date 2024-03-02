@@ -68,8 +68,8 @@ final class CManager_Daemon {
         return CDaemon::createRunner($className)->run();
     }
 
-    public function stop($className) {
-        return CDaemon::createRunner($className)->stop();
+    public function stop($className, $force = false) {
+        return CDaemon::createRunner($className)->stop($force);
     }
 
     public function isRunning($className) {
