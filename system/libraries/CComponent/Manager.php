@@ -50,9 +50,12 @@ class CComponent_Manager {
     }
 
     public function getClass($alias) {
+        $class = null;
         $finder = CComponent_Finder::instance();
 
-        $class = carr::get($this->componentAliases, $alias);
+        if ($alias) {
+            $class = carr::get($this->componentAliases, $alias);
+        }
 
         if (!$class) {
             $class = $finder->find($alias);
@@ -71,7 +74,6 @@ class CComponent_Manager {
 
     public function getInstance($component, $id) {
         $componentClass = $this->getClass($component);
-
         c::throwUnless(class_exists($componentClass), new CComponent_Exception_ComponentNotFoundException(
             "Component [{$component}] class not found: [{$componentClass}]"
         ));
@@ -309,6 +311,7 @@ HTML;
         if (is_array($args) && count($args) > 0) {
             $method = carr::get($args, 0);
             $args = array_slice($args, 1);
+
             $handler = new CComponent_ControllerHandler($method);
 
             return $handler->execute($method);
