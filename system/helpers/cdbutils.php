@@ -104,6 +104,14 @@ class cdbutils {
         }
     }
 
+    /**
+     * @param string               $query
+     * @param CDatabase_Connection $db
+     *
+     * @deprecated 1.6 use c::db()->getArray
+     *
+     * @return array
+     */
     public static function get_array($query, $db = null) {
         if ($db == null) {
             $db = c::db();
@@ -130,6 +138,14 @@ class cdbutils {
         return $res;
     }
 
+    /**
+     * @param string               $query
+     * @param CDatabase_Connection $db
+     *
+     * @deprecated 1.6 use c::db()->getList
+     *
+     * @return array
+     */
     public static function get_list($query, $db = null) {
         if ($db == null) {
             $db = c::db();

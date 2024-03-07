@@ -105,9 +105,9 @@ class CTreeDB {
         $db = $this->db;
         foreach ($this->filters as $k => $v) {
             if ($v === null) {
-                $where .= ' AND ' . $db->escape_column($k) . ' is null';
+                $where .= ' AND ' . $db->escapeColumn($k) . ' is null';
             } else {
-                $where .= ' AND ' . $db->escape_column($k) . ' = ' . $db->escape($v);
+                $where .= ' AND ' . $db->escapeColumn($k) . ' = ' . $db->escape($v);
             }
         }
         //if(strlen($where)>0) $where = substr($where,5);
@@ -118,8 +118,8 @@ class CTreeDB {
         $db = $this->db;
 
         $q = '
-			SELECT ' . $db->escape_column($this->pk_column) . ' , CONCAT( REPEAT(' . $db->escape($indent) . ', depth), node.name) AS name
-			FROM ' . $db->escape_table($this->table_name) . ' AS node
+			SELECT ' . $db->escapeColumn($this->pk_column) . ' , CONCAT( REPEAT(' . $db->escape($indent) . ', depth), node.name) AS name
+			FROM ' . $db->escapeTable($this->table_name) . ' AS node
 			WHERE status>0 ';
 
         if (strlen($this->org_id) > 0) {
@@ -130,37 +130,37 @@ class CTreeDB {
 			ORDER BY node.lft
 		';
 
-        return cdbutils::get_list($q);
+        return $db->getList($q);
     }
 
     public function insert($data, $parent_id = null) {
         $db = $this->db;
         if ($parent_id != null) {
-            $q = 'select rgt from ' . $db->escape_table($this->table_name) . ' where  ' . $db->escape_column($this->pk_column) . ' = ' . $db->escape($parent_id);
+            $q = 'select rgt from ' . $db->escapeTable($this->table_name) . ' where  ' . $db->escapeColumn($this->pk_column) . ' = ' . $db->escape($parent_id);
             if (strlen($this->org_id) > 0) {
                 $q .= ' and (org_id=' . $db->escape($this->org_id) . ' or org_id is null)';
             }
-            $rgt = cdbutils::get_value($q);
+            $rgt = $db->getValue($q);
 
-            $q = 'select lft from ' . $db->escape_table($this->table_name) . ' where ' . $db->escape_column($this->pk_column) . ' = ' . $db->escape($parent_id);
+            $q = 'select lft from ' . $db->escapeTable($this->table_name) . ' where ' . $db->escapeColumn($this->pk_column) . ' = ' . $db->escape($parent_id);
             if (strlen($this->org_id) > 0) {
                 $q .= ' and org_id=' . $db->escape($this->org_id) . ' or org_id is null';
             }
-            $lft = cdbutils::get_value($q);
+            $lft = $db->getValue($q);
 
-            $q = 'select depth from ' . $db->escape_table($this->table_name) . ' where ' . $db->escape_column($this->pk_column) . ' = ' . $db->escape($parent_id);
+            $q = 'select depth from ' . $db->escapeTable($this->table_name) . ' where ' . $db->escapeColumn($this->pk_column) . ' = ' . $db->escape($parent_id);
             if (strlen($this->org_id) > 0) {
                 $q .= ' and org_id=' . $db->escape($this->org_id) . ' or org_id is null';
             }
-            $depth = cdbutils::get_value($q);
+            $depth = $db->getValue($q);
 
-            $q = 'update ' . $db->escape_table($this->table_name) . ' set lft=lft+2 where status>0 and  lft>' . $db->escape($rgt - 1);
+            $q = 'update ' . $db->escapeTable($this->table_name) . ' set lft=lft+2 where status>0 and  lft>' . $db->escape($rgt - 1);
             if (strlen($this->org_id) > 0) {
                 $q .= ' and org_id=' . $db->escape($this->org_id) . ' or org_id is null';
             }
             $db->query($q);
 
-            $q = 'update ' . $db->escape_table($this->table_name) . ' set rgt=rgt+2 where status>0 and  rgt>' . $db->escape($rgt - 1);
+            $q = 'update ' . $db->escapeTable($this->table_name) . ' set rgt=rgt+2 where status>0 and  rgt>' . $db->escape($rgt - 1);
             if (strlen($this->org_id) > 0) {
                 $q .= ' and org_id=' . $db->escape($this->org_id) . ' or org_id is null';
             }
@@ -176,7 +176,7 @@ class CTreeDB {
                 select
                     max(rgt)
                 from
-                    ' . $db->escape_table($this->table_name) . '
+                    ' . $db->escapeTable($this->table_name) . '
                 where
                     1=1
             ';
@@ -184,7 +184,7 @@ class CTreeDB {
                 $q .= ' and org_id=' . $db->escape($this->org_id) . ' or org_id is null';
             }
 
-            $rgt = cdbutils::get_value($q);
+            $rgt = $db->getValue($q);
 
             if ($rgt == null) {
                 $rgt = 0;
@@ -194,9 +194,9 @@ class CTreeDB {
             $data['depth'] = 0;
         }
 
-        $r = $db->insert($this->table_name, $data);
+        $inserted = $db->table($this->table_name)->insert($data);
 
-        return $r->insert_id();
+        return $inserted ? $db->getPdo()->lastInsertId() : null;
     }
 
     public function delete($id) {
@@ -205,18 +205,18 @@ class CTreeDB {
 
         $db = $this->db;
 
-        $qrgt = 'select rgt from ' . $db->escape_table($this->table_name) . ' where ' . $db->escape_column($this->pk_column) . ' = ' . $db->escape($id) . '';
+        $qrgt = 'select rgt from ' . $db->escapeTable($this->table_name) . ' where ' . $db->escapeColumn($this->pk_column) . ' = ' . $db->escape($id) . '';
         if (strlen($this->org_id) > 0) {
             $qrgt .= ' and org_id=' . $db->escape($this->org_id) . '';
         }
-        $qlft = 'select lft from ' . $db->escape_table($this->table_name) . ' where  ' . $db->escape_column($this->pk_column) . ' = ' . $db->escape($id) . '';
+        $qlft = 'select lft from ' . $db->escapeTable($this->table_name) . ' where  ' . $db->escapeColumn($this->pk_column) . ' = ' . $db->escape($id) . '';
         if (strlen($this->org_id) > 0) {
             $qlft .= ' and org_id=' . $db->escape($this->org_id) . '';
         }
-        $rgt = cdbutils::get_value($qrgt);
-        $lft = cdbutils::get_value($qlft);
+        $rgt = $db->getValue($qrgt);
+        $lft = $db->getValue($qlft);
         $width = ($rgt - $lft) + 1;
-        $q = 'update ' . $db->escape_table($this->table_name) . ' set status=0, updated=' . $db->escape(date('Y-m-d H:i:s')) . ',updatedby=' . $db->escape($user->username) . ' where lft between ' . $db->escape($lft) . ' and ' . $db->escape($rgt) . ' ';
+        $q = 'update ' . $db->escapeTable($this->table_name) . ' set status=0, updated=' . $db->escape(date('Y-m-d H:i:s')) . ',updatedby=' . $db->escape($user->username) . ' where lft between ' . $db->escape($lft) . ' and ' . $db->escape($rgt) . ' ';
         if (strlen($this->org_id) > 0) {
             $q .= ' and org_id=' . $db->escape($this->org_id) . '';
         }
@@ -227,19 +227,19 @@ class CTreeDB {
             $child_list = $this->getChildrenList($id);
             if (is_array($child_list) && count($child_list) > 0) {
                 foreach ($child_list as $child_list_k => $child_list_v) {
-                    $q = 'update ' . $db->escape_table($this->table_name) . ' set status=0, updated=' . $db->escape(date('Y-m-d H:i:s')) . ',updatedby=' . $db->escape($user->username) . ' where ' . $this->pk_column . '=' . $db->escape($child_list_k);
+                    $q = 'update ' . $db->escapeTable($this->table_name) . ' set status=0, updated=' . $db->escape(date('Y-m-d H:i:s')) . ',updatedby=' . $db->escape($user->username) . ' where ' . $this->pk_column . '=' . $db->escape($child_list_k);
                     $db->query($q);
                 }
             }
         }
 
-        $q = 'update ' . $db->escape_table($this->table_name) . ' set rgt=rgt-' . $db->escape($width) . ' where status>0 and rgt>' . $db->escape($rgt);
+        $q = 'update ' . $db->escapeTable($this->table_name) . ' set rgt=rgt-' . $db->escape($width) . ' where status>0 and rgt>' . $db->escape($rgt);
         if (strlen($this->org_id) > 0) {
             $q .= ' and org_id=' . $db->escape($this->org_id) . '';
         }
 
         $db->query($q);
-        $q = 'update ' . $db->escape_table($this->table_name) . ' set lft=lft-' . $db->escape($width) . ' where status>0 and  lft>' . $db->escape($rgt);
+        $q = 'update ' . $db->escapeTable($this->table_name) . ' set lft=lft-' . $db->escape($width) . ' where status>0 and  lft>' . $db->escape($rgt);
         if (strlen($this->org_id) > 0) {
             $q .= ' and org_id=' . $db->escape($this->org_id) . '';
         }
@@ -262,13 +262,13 @@ class CTreeDB {
         $db = $this->db;
 
         $q = 'SELECT rgt,lft
-                FROM ' . $db->escape_table($this->table_name) . '
-                WHERE ' . $db->escape_column($this->pk_column) . ' = ' . $db->escape($parent_id);
-        $row = cdbutils::get_row($q);
+                FROM ' . $db->escapeTable($this->table_name) . '
+                WHERE ' . $db->escapeColumn($this->pk_column) . ' = ' . $db->escape($parent_id);
+        $row = $db->getRow($q);
         $rgt = c::get($row, 'rgt');
         $lft = c::get($row, 'lft');
 
-        $q = ' select * from ' . $db->escape_table($this->table_name) . ' where  status>0 and lft<' . $db->escape($lft) . ' and rgt>' . $db->escape($rgt) . ' ';
+        $q = ' select * from ' . $db->escapeTable($this->table_name) . ' where  status>0 and lft<' . $db->escape($lft) . ' and rgt>' . $db->escape($rgt) . ' ';
         if (strlen($this->org_id) > 0) {
             $q .= ' and org_id=' . $db->escape($this->org_id) . ' ';
         }
@@ -283,20 +283,20 @@ class CTreeDB {
     public function getFirstParent($parent_id) {
         $db = $this->db;
         $q = 'SELECT rgt,lft
-                FROM ' . $db->escape_table($this->table_name) . '
-                WHERE ' . $db->escape_column($this->pk_column) . ' = ' . $db->escape($parent_id);
-        $row = cdbutils::get_row($q);
+                FROM ' . $db->escapeTable($this->table_name) . '
+                WHERE ' . $db->escapeColumn($this->pk_column) . ' = ' . $db->escape($parent_id);
+        $row = $db->getRow($q);
         $rgt = c::get($row, 'rgt');
         $lft = c::get($row, 'lft');
 
-        $q = ' select * from ' . $db->escape_table($this->table_name) . ' where  status>0 and lft<' . $db->escape($lft) . ' and rgt>' . $db->escape($rgt) . ' ';
+        $q = ' select * from ' . $db->escapeTable($this->table_name) . ' where  status>0 and lft<' . $db->escape($lft) . ' and rgt>' . $db->escape($rgt) . ' ';
         if (strlen($this->org_id) > 0) {
             $q .= ' and org_id=' . $db->escape($this->org_id) . ' or org_id is null';
         }
         $q .= $this->filter_where();
         $q .= ' order by lft asc limit 1';
 
-        $r = cdbutils::get_row($q);
+        $r = $db->getRow($q);
 
         return $r;
     }
@@ -305,8 +305,8 @@ class CTreeDB {
         $db = $this->db;
 
         $q = '
-			SELECT ' . $db->escape_column($this->pk_column) . ' , CONCAT( REPEAT(' . $db->escape($indent) . ', depth), node.name) AS name
-			FROM ' . $db->escape_table($this->table_name) . ' AS node
+			SELECT ' . $db->escapeColumn($this->pk_column) . ' , CONCAT( REPEAT(' . $db->escape($indent) . ', depth), node.name) AS name
+			FROM ' . $db->escapeTable($this->table_name) . ' AS node
 			WHERE status>0
 
 		' . $this->filter_where();
@@ -317,20 +317,20 @@ class CTreeDB {
         $q .= ' ORDER BY node.lft';
 
         if ($id != null) {
-            $qrgt = 'select rgt from ' . $db->escape_table($this->table_name) . ' where ' . $db->escape_column($this->pk_column) . ' = ' . $db->escape($id) . '';
+            $qrgt = 'select rgt from ' . $db->escapeTable($this->table_name) . ' where ' . $db->escapeColumn($this->pk_column) . ' = ' . $db->escape($id) . '';
             if (strlen($this->org_id) > 0) {
                 $qrgt .= ' and org_id=' . $db->escape($this->org_id) . '';
             }
-            $qlft = 'select lft from ' . $db->escape_table($this->table_name) . ' where  ' . $db->escape_column($this->pk_column) . ' = ' . $db->escape($id) . '';
+            $qlft = 'select lft from ' . $db->escapeTable($this->table_name) . ' where  ' . $db->escapeColumn($this->pk_column) . ' = ' . $db->escape($id) . '';
             if (strlen($this->org_id) > 0) {
                 $qlft .= ' and org_id=' . $db->escape($this->org_id) . '';
             }
-            $rgt = cdbutils::get_value($qrgt);
-            $lft = cdbutils::get_value($qlft);
+            $rgt = $db->getValue($qrgt);
+            $lft = $db->getValue($qlft);
 
             $q = '
-				SELECT ' . $db->escape_column($this->pk_column) . ' , CONCAT( REPEAT(' . $db->escape($indent) . ', depth), node.name) AS name
-				FROM ' . $db->escape_table($this->table_name) . ' AS node
+				SELECT ' . $db->escapeColumn($this->pk_column) . ' , CONCAT( REPEAT(' . $db->escape($indent) . ', depth), node.name) AS name
+				FROM ' . $db->escapeTable($this->table_name) . ' AS node
 				WHERE
 					status>0
 					and lft>' . $db->escape($lft) . ' and rgt<' . $db->escape($rgt) . '
@@ -342,15 +342,15 @@ class CTreeDB {
             $q .= ' ORDER BY node.lft';
         }
 
-        return cdbutils::get_list($q);
+        return $db->getList($q);
     }
 
     public function getChildrenLeafList($id = null) {
         $db = $this->db;
 
         $q = '
-			SELECT ' . $db->escape_column($this->pk_column) . ' ,node.name
-			FROM ' . $db->escape_table($this->table_name) . ' AS node
+			SELECT ' . $db->escapeColumn($this->pk_column) . ' ,node.name
+			FROM ' . $db->escapeTable($this->table_name) . ' AS node
 			WHERE status>0  and rgt=lft+1
 
 		';
@@ -362,20 +362,20 @@ class CTreeDB {
         $q .= ' ORDER BY node.lft';
 
         if ($id != null) {
-            $qrgt = 'select rgt from ' . $db->escape_table($this->table_name) . ' where ' . $db->escape_column($this->pk_column) . ' = ' . $db->escape($id) . '';
+            $qrgt = 'select rgt from ' . $db->escapeTable($this->table_name) . ' where ' . $db->escapeColumn($this->pk_column) . ' = ' . $db->escape($id) . '';
             if (strlen($this->org_id) > 0) {
                 $qrgt .= ' and org_id=' . $db->escape($this->org_id) . '';
             }
-            $qlft = 'select lft from ' . $db->escape_table($this->table_name) . ' where  ' . $db->escape_column($this->pk_column) . ' = ' . $db->escape($id) . '';
+            $qlft = 'select lft from ' . $db->escapeTable($this->table_name) . ' where  ' . $db->escapeColumn($this->pk_column) . ' = ' . $db->escape($id) . '';
             if (strlen($this->org_id) > 0) {
                 $qlft .= ' and org_id=' . $db->escape($this->org_id) . '';
             }
-            $rgt = cdbutils::get_value($qrgt);
-            $lft = cdbutils::get_value($qlft);
+            $rgt = $db->getValue($qrgt);
+            $lft = $db->getValue($qlft);
 
             $q = '
-				SELECT ' . $db->escape_column($this->pk_column) . ' , node.name
-				FROM ' . $db->escape_table($this->table_name) . ' AS node
+				SELECT ' . $db->escapeColumn($this->pk_column) . ' , node.name
+				FROM ' . $db->escapeTable($this->table_name) . ' AS node
 				WHERE
 					status>0
 					and lft>' . $db->escape($lft) . ' and rgt<' . $db->escape($rgt) . ' and rgt=lft+1
@@ -386,14 +386,14 @@ class CTreeDB {
             }
             $q .= ' ORDER BY node.lft';
         }
-        $list = cdbutils::get_list($q);
+        $list = $db->getList($q);
 
         return $list;
     }
 
     public function getChildrenData($id = null) {
         $db = $this->db;
-        $q = 'select * from ' . $db->escape_table($this->table_name) . ' where status>0 ' . $this->filter_where();
+        $q = 'select * from ' . $db->escapeTable($this->table_name) . ' where status>0 ' . $this->filter_where();
         if (strlen($this->org_id) > 0 && $this->org_id != 'ALL' && $this->org_id != 'NONE') {
             $q .= ' and org_id=' . $db->escape($this->org_id) . '';
         } elseif (strlen($this->org_id) > 0 && $this->org_id == 'NONE') {
@@ -402,13 +402,13 @@ class CTreeDB {
 
         $q .= ' order by lft asc';
         if ($id != null) {
-            $qrgt = 'select rgt from ' . $db->escape_table($this->table_name) . ' where ' . $db->escape_column($this->pk_column) . ' = ' . $db->escape($id) . '';
+            $qrgt = 'select rgt from ' . $db->escapeTable($this->table_name) . ' where ' . $db->escapeColumn($this->pk_column) . ' = ' . $db->escape($id) . '';
 
-            $qlft = 'select lft from ' . $db->escape_table($this->table_name) . ' where  ' . $db->escape_column($this->pk_column) . ' = ' . $db->escape($id) . '';
+            $qlft = 'select lft from ' . $db->escapeTable($this->table_name) . ' where  ' . $db->escapeColumn($this->pk_column) . ' = ' . $db->escape($id) . '';
 
-            $rgt = cdbutils::get_value($qrgt);
-            $lft = cdbutils::get_value($qlft);
-            $q = 'select * from ' . $db->escape_table($this->table_name) . ' where status>0 and lft>' . $db->escape($lft) . ' and rgt<' . $db->escape($rgt) . ' ' . $this->filter_where() . ' ';
+            $rgt = $db->getValue($qrgt);
+            $lft = $db->getValue($qlft);
+            $q = 'select * from ' . $db->escapeTable($this->table_name) . ' where status>0 and lft>' . $db->escape($lft) . ' and rgt<' . $db->escape($rgt) . ' ' . $this->filter_where() . ' ';
             if (strlen($this->org_id) > 0) {
                 $q .= ' and org_id=' . $db->escape($this->org_id) . '';
             }
@@ -426,7 +426,7 @@ class CTreeDB {
             }
         }
         $db = $this->db;
-        $q = 'select ' . $db->escape_column($this->pk_column) . ' from ' . $db->escape_table($this->table_name) . ' where status>0';
+        $q = 'select ' . $db->escapeColumn($this->pk_column) . ' from ' . $db->escapeTable($this->table_name) . ' where status>0';
         if (strlen($this->org_id) > 0) {
             if ($this->org_id == 'NONE') {
                 $q .= ' and org_id is null';
@@ -435,15 +435,15 @@ class CTreeDB {
             }
         }
 
-        $q .= ' and parent_id is null order by lft,' . $db->escape_column($this->pk_column) . ' asc';
+        $q .= ' and parent_id is null order by lft,' . $db->escapeColumn($this->pk_column) . ' asc';
         $r = $db->query($q)->result(false);
         $left = 1;
 
         foreach ($r as $row) {
             $pk = $this->pk_column;
             $this->rebuildTree($row[$pk], $left);
-            //$qleft="select rgt from " . $db->escape_table($this->table_name) . " where org_id=" . $db->escape($this->org_id) . " and status>0 and " . $db->escape_column($this->pk_column) . "=" . $db->escape($row[$pk]);
-            $qleft = 'select rgt from ' . $db->escape_table($this->table_name) . ' where status>0 and ' . $db->escape_column($this->pk_column) . '=' . $db->escape($row[$pk]);
+            //$qleft="select rgt from " . $db->escapeTable($this->table_name) . " where org_id=" . $db->escape($this->org_id) . " and status>0 and " . $db->escapeColumn($this->pk_column) . "=" . $db->escape($row[$pk]);
+            $qleft = 'select rgt from ' . $db->escapeTable($this->table_name) . ' where status>0 and ' . $db->escapeColumn($this->pk_column) . '=' . $db->escape($row[$pk]);
             if (strlen($this->org_id) > 0) {
                 if ($this->org_id == 'NONE') {
                     $qleft .= ' and org_id is null';
@@ -451,13 +451,13 @@ class CTreeDB {
                     $qleft .= ' and org_id=' . $db->escape($this->org_id) . '';
                 }
             }
-            $left = cdbutils::get_value($qleft) + 1;
+            $left = $db->getValue($qleft) + 1;
         }
     }
 
     public function rebuildTreeAllIgnoreStatus() {
         $db = $this->db;
-        $q = 'select ' . $db->escape_column($this->pk_column) . ' from ' . $db->escape_table($this->table_name) . ' where 1=1 ';
+        $q = 'select ' . $db->escapeColumn($this->pk_column) . ' from ' . $db->escapeTable($this->table_name) . ' where 1=1 ';
         if (strlen($this->org_id) > 0) {
             $q .= ' and org_id=' . $db->escape($this->org_id) . '';
         }
@@ -468,12 +468,12 @@ class CTreeDB {
         foreach ($r as $row) {
             $pk = $this->pk_column;
             $this->rebuild_tree_ignore_status($row[$pk], $left);
-            //$qleft="select rgt from " . $db->escape_table($this->table_name) . " where org_id=" . $db->escape($this->org_id) . " and status>0 and " . $db->escape_column($this->pk_column) . "=" . $db->escape($row[$pk]);
-            $qleft = 'select rgt from ' . $db->escape_table($this->table_name) . ' where 1=1 and ' . $db->escape_column($this->pk_column) . '=' . $db->escape($row[$pk]);
+            //$qleft="select rgt from " . $db->escapeTable($this->table_name) . " where org_id=" . $db->escape($this->org_id) . " and status>0 and " . $db->escapeColumn($this->pk_column) . "=" . $db->escape($row[$pk]);
+            $qleft = 'select rgt from ' . $db->escapeTable($this->table_name) . ' where 1=1 and ' . $db->escapeColumn($this->pk_column) . '=' . $db->escape($row[$pk]);
             if (strlen($this->org_id) > 0) {
                 $qleft .= ' and org_id=' . $db->escape($this->org_id) . '';
             }
-            $left = cdbutils::get_value($qleft) + 1;
+            $left = $db->getValue($qleft) + 1;
         }
     }
 
@@ -482,7 +482,7 @@ class CTreeDB {
         $db = $this->db;
         $right = $left + 1;
         // get all children of this node
-        $q = 'select ' . $db->escape_column($this->pk_column) . ' from ' . $db->escape_table($this->table_name) . ' where  status>0';
+        $q = 'select ' . $db->escapeColumn($this->pk_column) . ' from ' . $db->escapeTable($this->table_name) . ' where  status>0';
         if (strlen($this->org_id) > 0) {
             if ($this->org_id == 'NONE') {
                 $q .= ' and org_id is null';
@@ -500,7 +500,7 @@ class CTreeDB {
         if ($this->have_priority) {
             $q .= ' ORDER BY priority';
         } else {
-            $q .= ' ORDER BY lft,' . $db->escape_column($this->pk_column) . ' asc';
+            $q .= ' ORDER BY lft,' . $db->escapeColumn($this->pk_column) . ' asc';
         }
 
         $r = $db->query($q)->result(false);
@@ -531,7 +531,7 @@ class CTreeDB {
         $db = $this->db;
         $right = $left + 1;
         // get all children of this node
-        $q = 'select ' . $db->escape_column($this->pk_column) . ' from ' . $db->escape_table($this->table_name) . ' where 1=1 ';
+        $q = 'select ' . $db->escapeColumn($this->pk_column) . ' from ' . $db->escapeTable($this->table_name) . ' where 1=1 ';
         if (strlen($this->org_id) > 0) {
             $q .= ' and org_id=' . $db->escape($this->org_id) . '';
         }
