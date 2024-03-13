@@ -138,6 +138,17 @@ class CRemote_SSH_Gateway implements CRemote_SSH_GatewayInterface {
     }
 
     /**
+     * Get the contents of a remote file.
+     *
+     * @param string $remote
+     *
+     * @return string
+     */
+    public function getFilesize($remote) {
+        return $this->getConnection()->filesize($remote);
+    }
+
+    /**
      * Upload a local file to the server.
      *
      * @param string $local
