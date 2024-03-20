@@ -91,7 +91,8 @@ class CException extends Exception {
      */
     public static function exceptionHandler() {
         if (static::$exceptionHandler == null) {
-            static::$exceptionHandler = new CException_ExceptionHandler();
+            $exceptionHandlerClass = CF::config('app.classes.exception_handler', CException_ExceptionHandler::class);
+            static::$exceptionHandler = new $exceptionHandlerClass();
         }
 
         return static::$exceptionHandler;

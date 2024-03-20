@@ -122,7 +122,7 @@ class CDynFunction {
                 $functionName = 'Unknown';
             }
 
-            throw new CException('function :function is not callable', [':function' => $functionName]);
+            throw new Exception(c::__('function :function is not callable', ['function' => $functionName]));
         }
         //last return this name of function
         return $this->func;

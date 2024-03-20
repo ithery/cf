@@ -12,6 +12,7 @@ use ONGR\ElasticsearchDSL\Search as DSLQuery;
 
 class CElastic {
     use CTrait_Compat_Elastic;
+
     // Elastic instances
     public static $instances = [];
 
@@ -91,7 +92,7 @@ class CElastic {
             }
 
             if ($found == false) {
-                throw new CException('Config :config_name Not Found', [':config_name' => $configName]);
+                throw new Exception(c::__('Config :config_name Not Found', [':config_name' => $configName]));
             }
         }
 

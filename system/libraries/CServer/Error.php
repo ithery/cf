@@ -59,7 +59,7 @@ class CServer_Error {
      * @return void
      */
     public function __clone() {
-        throw new CException("Can't be cloned", [], E_USER_ERROR);
+        throw new Exception("Can't be cloned", E_USER_ERROR);
     }
 
     /**

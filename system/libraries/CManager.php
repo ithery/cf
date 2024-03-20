@@ -157,7 +157,7 @@ final class CManager {
      * @param string $class
      * @param string $codePath
      *
-     * @throws CException
+     * @throws Exception
      *
      * @return bool
      */
@@ -168,7 +168,7 @@ final class CManager {
             if (file_exists($codePath)) {
                 include $codePath;
             } else {
-                throw new CException('File :code_path not exists', [':code_path' => $code_path]);
+                throw new Exception(c::__('File :code_path not exists', [':code_path' => $code_path]));
             }
         }
 
@@ -180,7 +180,7 @@ final class CManager {
      * @param string $class
      * @param string $code_path optional
      *
-     * @throws CException
+     * @throws Exception
      *
      * @return bool true if no error
      */
@@ -191,7 +191,7 @@ final class CManager {
             if (file_exists($code_path)) {
                 include $code_path;
             } else {
-                throw new CException('File :code_path not exists', [':code_path' => $code_path]);
+                throw new Exception(c::__('File :code_path not exists', [':code_path' => $code_path]));
             }
         }
 
@@ -258,13 +258,13 @@ final class CManager {
      * @param string $id
      * @param string $type
      *
-     * @throws CException
+     * @throws Exception
      *
      * @return CElement_Element
      */
     public function createElement($id, $type) {
         if (!isset($this->elements[$type])) {
-            throw new CException('Type of element :type not registered', [':type' => $type]);
+            throw new Exception(c::__('Type of element :type not registered', [':type' => $type]));
         }
         $class = $this->elements[$type];
 
