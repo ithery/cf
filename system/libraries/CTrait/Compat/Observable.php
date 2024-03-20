@@ -238,16 +238,8 @@ trait CTrait_Compat_Observable {
         return $this->addElm($tag, $id);
     }
 
-    public function add_row_fluid($id = '') {
-        return $this->addRowFluid($id);
-    }
-
     public function add_img($id = '') {
         return $this->addImg($id);
-    }
-
-    public function add_basic_span($id = '') {
-        return $this->addBasicSpan($id);
     }
 
     /**
@@ -388,38 +380,6 @@ trait CTrait_Compat_Observable {
         $this->add($row);
 
         return $row;
-    }
-
-    /**
-     * Add TabStaticList.
-     *
-     * @param string $id
-     *
-     * @return CBasicSpan
-     *
-     * @deprecated 1.2
-     */
-    public function addBasicSpan($id = '') {
-        $span = CBasicSpan::factory($id);
-        $this->add($span);
-
-        return $span;
-    }
-
-    /**
-     * Add TabStaticList.
-     *
-     * @param string $id
-     *
-     * @return CRowFluid
-     *
-     * @deprecated 1.2
-     */
-    public function addRowFluid($id = '') {
-        $rowf = CRowFluid::factory($id);
-        $this->add($rowf);
-
-        return $rowf;
     }
 }
 //@codingStandardsIgnoreEnd
