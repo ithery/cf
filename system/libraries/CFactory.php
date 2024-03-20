@@ -5,7 +5,6 @@
  *
  * @deprecated  since 1.2 use CElement_Factory
  */
-//@codingStandardsIgnoreStart
 class CFactory {
     use CTrait_Compat_Factory;
 
@@ -22,8 +21,7 @@ class CFactory {
     }
 
     /**
-     * @param string $fieldId
-     * @param mixed  $id
+     * @param string $id
      *
      * @return CElement_Component_Form_Field
      */
@@ -37,23 +35,41 @@ class CFactory {
      * @return CElement_Component_DataTable
      */
     public static function createTable($id = '') {
-        return CElement_Factory::createComponent('DataTable', $id);
+        return CElement_Factory::create(CElement_Component_DataTable::class, $id);
     }
 
+    /**
+     * @param string $id
+     *
+     * @return CElement_Component_TableRow
+     */
     public static function createTableRow($id = '') {
         return CElement_Factory::createComponent(CElement_Component_TableRow::class, $id);
     }
 
-    public static function create_tab_list($tabs_id = '') {
-        $tabs = CTabList::factory($tabs_id);
-
-        return $tabs;
+    /**
+     * @param string $id
+     *
+     * @return CElement_List_TabList
+     */
+    public static function createTabList($id = '') {
+        return CElement_Factory::create(CElement_List_TabList::class, $id);
     }
 
+    /**
+     * @param string $id
+     *
+     * @return CElement_Element_Div
+     */
     public static function createDiv($id = '') {
         return CElement_Factory::create(CElement_Element_Div::class, $id);
     }
 
+    /**
+     * @param string $id
+     *
+     * @return CElement_Element_Span
+     */
     public static function createSpan($id = '') {
         return CElement_Factory::create(CElement_Element_Span::class, $id);
     }
@@ -96,44 +112,39 @@ class CFactory {
         return CElement_Factory::createElement('br', $id);
     }
 
-    public static function create_element($type, $id = '') {
-        $element = null;
-        if (CManager::instance()->isRegisteredElement($type)) {
-            $element = CManager::instance()->createElement($id, $type);
-        } else {
-            trigger_error('Unknown element type ' . $type);
-        }
-
-        return $element;
+    /**
+     * @param string $id
+     *
+     * @return CElement_Element_Img
+     */
+    public static function createImg($id = '') {
+        return CElement_Factory::create(CElement_Element_Img::class, $id);
     }
 
-    public static function create_img($id = '') {
-        $img = CImgElement::factory($id);
-
-        return $img;
+    /**
+     * @param string $id
+     *
+     * @return CElement_Component_Widget
+     */
+    public static function createWidget($id = '') {
+        return CElement_Factory::create(CElement_Component_Widget::class, $id);
     }
 
-    public static function create_basic_span($id = '') {
-        $span = CBasicSpan::factory($id);
-
-        return $span;
+    /**
+     * @param string $id
+     *
+     * @return CElement_List_ActionList
+     */
+    public static function createActionList($id = '') {
+        return CElement_Factory::create(CElement_List_ActionList::class, $id);
     }
 
-    public static function create_widget($id = '') {
-        $widget = CWidget::factory($id);
-
-        return $widget;
-    }
-
-    public static function create_action_list($id = '') {
-        $actlist = CActionList::factory($id);
-
-        return $actlist;
-    }
-
-    public static function create_action($id = '') {
-        $act = CAction::factory($id);
-
-        return $act;
+    /**
+     * @param string $id
+     *
+     * @return CElement_Component_Action
+     */
+    public static function createAction($id = '') {
+        return CElement_Factory::create(CElement_Component_Action::class, $id);
     }
 }
