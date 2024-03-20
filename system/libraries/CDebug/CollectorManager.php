@@ -47,10 +47,20 @@ class CDebug_CollectorManager {
         return [CDebug::COLLECTOR_TYPE_DEPRECATED, CDebug::COLLECTOR_TYPE_EXCEPTION, CDebug::COLLECTOR_TYPE_PROFILER];
     }
 
+    /**
+     * @param Throwable $ex
+     *
+     * @return void
+     */
     public function collectException($ex) {
         return $this->exception()->collect($ex);
     }
 
+    /**
+     * @param string $message
+     *
+     * @return void
+     */
     public function collectDeprecated($message = '') {
         return $this->deprecated()->collect($message);
     }
