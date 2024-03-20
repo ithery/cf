@@ -51,6 +51,11 @@ class CElement_Component_Nestable extends CElement_Component {
         $this->js_cell = '';
     }
 
+    /**
+     * @param string $id
+     *
+     * @return CElement_Component_Nestable
+     */
     public static function factory($id) {
         /** @phpstan-ignore-next-line */
         return new static($id);

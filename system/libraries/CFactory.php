@@ -50,51 +50,28 @@ class CFactory {
         return $tabs;
     }
 
-    public static function create_div($id = '') {
-        $div = CDivElement::factory($id);
-
-        return $div;
-    }
-
-    public static function create_row_fluid($id = '') {
-        $rowf = CRowFluid::factory($id);
-
-        return $rowf;
+    public static function createDiv($id = '') {
+        return CElement_Factory::create(CElement_Element_Div::class, $id);
     }
 
     public static function createSpan($id = '') {
         return CElement_Factory::create(CElement_Element_Span::class, $id);
     }
 
-    public static function create_img($id = '') {
-        $img = CImgElement::factory($id);
-
-        return $img;
-    }
-
-    public static function create_basic_span($id = '') {
-        $span = CBasicSpan::factory($id);
-
-        return $span;
-    }
-
-    public static function create_widget($id = '') {
-        $widget = CWidget::factory($id);
-
-        return $widget;
+    /**
+     * @param string $id
+     *
+     * @return CElement_Component_Form
+     */
+    public static function createForm($id = '') {
+        return CElement_Factory::createComponent(CElement_Component_Form::class, $id);
     }
 
     /**
      * @param string $id
      *
-     * @return CForm
+     * @return CElement_Component_Nestable
      */
-    public static function create_form($id = '') {
-        $form = CForm::factory($id);
-
-        return $form;
-    }
-
     public static function createNestable($id = '') {
         $nestable = CElement_Component_Nestable::factory($id);
 
@@ -128,6 +105,24 @@ class CFactory {
         }
 
         return $element;
+    }
+
+    public static function create_img($id = '') {
+        $img = CImgElement::factory($id);
+
+        return $img;
+    }
+
+    public static function create_basic_span($id = '') {
+        $span = CBasicSpan::factory($id);
+
+        return $span;
+    }
+
+    public static function create_widget($id = '') {
+        $widget = CWidget::factory($id);
+
+        return $widget;
     }
 
     public static function create_action_list($id = '') {
