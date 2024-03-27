@@ -25,6 +25,53 @@ class CPrinter_EscPos_Renderer_HtmlRenderer extends CPrinter_EscPos_RendererAbst
         //replace mode
         $allModes = CPrinter_EscPos::MODE_FONT_B | CPrinter_EscPos::MODE_EMPHASIZED | CPrinter_EscPos::MODE_DOUBLE_HEIGHT | CPrinter_EscPos::MODE_DOUBLE_WIDTH | CPrinter_EscPos::MODE_UNDERLINE;
 
+        $data = $this->handleBarcode($data);
+
+        return $data;
+    }
+
+    protected function handleBarcode($data) {
+        $regexNotSupportsBarcodeB = '#' . CPrinter_EscPos::GS . 'k(.)(.+?)\x00#ims';
+
+        $barcodeTypeMap = [
+            CPrinter_EscPos::BARCODE_CODE39 => Picqer\Barcode\BarcodeGenerator::TYPE_CODE_39
+        ];
+        preg_match_all($regexNotSupportsBarcodeB, $data, $matches);
+        $fulls = carr::get($matches, 0);
+        foreach ($fulls as $index => $full) {
+            $type = ord(carr::get($matches, '1.' . $index)) + 65;
+            $content = carr::get($matches, '2.' . $index);
+            $generator = new Picqer\Barcode\BarcodeGeneratorHTML();
+            $pos = strpos($data, $full);
+
+            $barcode = $generator->getBarcode($content, carr::get($barcodeTypeMap, $type), 2, 50);
+            $data = str_replace($full, $barcode, $data);
+        }
+        $regexSupportsBarcodeB = '#' . CPrinter_EscPos::GS . 'k(.)(.)#ims';
+        preg_match_all($regexSupportsBarcodeB, $data, $matches);
+        $fulls = carr::get($matches, 0);
+        foreach ($fulls as $index => $full) {
+            $type = ord(carr::get($matches, '1.' . $index));
+            $contentLength = ord(carr::get($matches, '2.' . $index));
+            $generator = new Picqer\Barcode\BarcodeGeneratorHTML();
+            $pos = strpos($data, $full);
+            $content = substr($data, $pos + strlen($full), $contentLength);
+            // cdbg::dd($content);
+            // $black = [0, 0, 0];
+            $fullWithContent = $full . $content;
+            $barcode = $generator->getBarcode($content, carr::get($barcodeTypeMap, $type), 2, 50);
+            $data = str_replace($fullWithContent, $barcode, $data);
+        }
+
+        // if (!$this->profile->getSupportsBarcodeB()) {
+        //     // A simpler barcode command which supports fewer codes
+
+        //     $this->connector->write(CPrinter_EscPos::GS . 'k' . chr($type - 65) . $content . CPrinter_EscPos::NUL);
+
+        //     return;
+        // }
+        // // More advanced function B, used in preference
+        // $this->connector->write(CPrinter_EscPos::GS . 'k' . chr($type) . chr(strlen($content)) . $content);
         return $data;
     }
 
