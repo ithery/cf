@@ -385,8 +385,8 @@ trait CApp_Trait_BaseTrait {
     }
 
     public static function checkPermission($permissionName) {
-        if (!self::havePermission($permissionName)) {
-            self::notAccessible();
+        if (!static::havePermission($permissionName)) {
+            static::notAccessible();
 
             return false;
         }
