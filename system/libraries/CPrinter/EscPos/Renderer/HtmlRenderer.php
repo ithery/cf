@@ -71,15 +71,6 @@ class CPrinter_EscPos_Renderer_HtmlRenderer extends CPrinter_EscPos_RendererAbst
             $data = str_replace($fullWithContent, $barcode, $data);
         }
 
-        // if (!$this->profile->getSupportsBarcodeB()) {
-        //     // A simpler barcode command which supports fewer codes
-
-        //     $this->connector->write(CPrinter_EscPos::GS . 'k' . chr($type - 65) . $content . CPrinter_EscPos::NUL);
-
-        //     return;
-        // }
-        // // More advanced function B, used in preference
-        // $this->connector->write(CPrinter_EscPos::GS . 'k' . chr($type) . chr(strlen($content)) . $content);
         return $data;
     }
 
