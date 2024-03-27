@@ -3,7 +3,7 @@
 /**
  * Store compatibility information about one printer.
  */
-class CPrinter_RawPrint_CapabilityProfile {
+class CPrinter_EscPos_CapabilityProfile {
     /**
      * @var string
      *             Hash of the code page data structure, to identify it for caching
@@ -100,7 +100,7 @@ class CPrinter_RawPrint_CapabilityProfile {
         $this->codePages = [];
         $this->codePageCacheKey = md5(json_encode($profileData['codePages']));
         foreach ($profileData['codePages'] as $k => $v) {
-            $this->codePages[$k] = new CPrinter_RawPrint_CodePage($v, self::$encodings[$v]);
+            $this->codePages[$k] = new CPrinter_EscPos_CodePage($v, self::$encodings[$v]);
         }
     }
 
@@ -239,7 +239,7 @@ class CPrinter_RawPrint_CapabilityProfile {
             throw new InvalidArgumentException("The CapabilityProfile '$profileName' does not exist. Try one that does exist, such as $suggestionsStr.");
         }
 
-        return new CPrinter_RawPrint_CapabilityProfile($profileName, self::$profiles[$profileName]);
+        return new CPrinter_EscPos_CapabilityProfile($profileName, self::$profiles[$profileName]);
     }
 
     /**

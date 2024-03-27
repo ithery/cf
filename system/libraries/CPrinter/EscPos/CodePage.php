@@ -6,7 +6,7 @@
  *
  * Also computes map between UTF-8 and this encoding if necessary, using the intl library.
  */
-class CPrinter_RawPrint_CodePage {
+class CPrinter_EscPos_CodePage {
     /**
      * Value to use when no character is set. This is a space in ASCII.
      */
