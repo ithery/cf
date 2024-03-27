@@ -5,7 +5,7 @@
  * can be interchanged for an image-bassed buffer (ImagePrintBuffer) if you can't
  * get it operating properly on your machine.
  */
-class CPrint_PrintBuffer_EscposPrintBuffer implements CPrint_Contract_PrintBuffer {
+class CPrinter_EscPos_PrintBuffer_EscposPrintBuffer implements CPrinter_EscPos_Contract_PrintBufferInterface {
     /**
      *  True to cache output as .z, false to leave un-compressed (useful for debugging).
      */
@@ -52,7 +52,7 @@ class CPrint_PrintBuffer_EscposPrintBuffer implements CPrint_Contract_PrintBuffe
         return $this->printer;
     }
 
-    public function setPrinter(CPrint_Printer $printer = null) {
+    public function setPrinter(CPrinter_EscPos_Printer $printer = null) {
         $this->printer = $printer;
         if ($printer != null) {
             $this->loadAvailableCharacters();
@@ -180,7 +180,7 @@ class CPrint_PrintBuffer_EscposPrintBuffer implements CPrint_Contract_PrintBuffe
             $encodeMap = [];
             for ($char = 128; $char <= 255; $char++) {
                 $codePoint = $map[$char - 128];
-                if ($codePoint == CPrint_CodePage::MISSING_CHAR_CODE) { // Skip placeholders
+                if ($codePoint == CPrinter_EscPos_CodePage::MISSING_CHAR_CODE) { // Skip placeholders
                     continue;
                 }
                 $encodeMap[$codePoint] = $char;

@@ -2,7 +2,7 @@
 /**
  * Implementation of EscposImage using the Imagick PHP plugin.
  */
-class CPrint_EscposImage_ImagickEscposImage extends CPrint_EscposImage {
+class CPrinter_EscPos_EscposImage_ImagickEscposImage extends CPrinter_EscPos_EscposImageAbstract {
     /**
      * Load actual image pixels from Imagick object.
      *
@@ -229,7 +229,7 @@ class CPrint_EscposImage_ImagickEscposImage extends CPrint_EscposImage {
             $ret = [];
             for ($i = 0; $i < $pages; $i++) {
                 $image->setIteratorIndex($i);
-                $ep = new CPrint_EscposImage_ImagickEscposImage();
+                $ep = new CPrinter_EscPos_EscposImage_ImagickEscposImage();
                 $ep->readImageFromImagick($image);
                 $ret[] = $ep;
             }

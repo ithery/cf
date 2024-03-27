@@ -3,7 +3,7 @@
 /**
  * Implementation of EscposImage using the GD PHP plugin.
  */
-class CPrint_EscposImage_GdEscposImage extends CPrint_EscposImage {
+class CPrinter_EscPos_EscposImage_GdEscposImage extends CPrinter_EscPos_EscposImageAbstract {
     /**
      * Load an image from disk, into memory, using GD.
      *
@@ -41,14 +41,14 @@ class CPrint_EscposImage_GdEscposImage extends CPrint_EscposImage {
     /**
      * Load actual image pixels from GD resource.
      *
-     * @param resource $im GD resource to use
+     * @param resource|\GdImage $im GD resource to use
      *
      * @throws Exception where the image can't be read
      */
     public function readImageFromGdResource($im) {
         if (!is_resource($im) && !$im instanceof \GdImage) {
             throw new Exception('Failed to load image.');
-        } elseif (!EscposImage::isGdLoaded()) {
+        } elseif (!CPrinter_EscPos_EscposImageAbstract::isGdLoaded()) {
             throw new Exception(__FUNCTION__ . " requires 'gd' extension.");
         }
         /* Make a string of 1's and 0's */
