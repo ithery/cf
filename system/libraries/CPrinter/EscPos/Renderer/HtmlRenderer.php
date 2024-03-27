@@ -34,7 +34,15 @@ class CPrinter_EscPos_Renderer_HtmlRenderer extends CPrinter_EscPos_RendererAbst
         $regexNotSupportsBarcodeB = '#' . CPrinter_EscPos::GS . 'k(.)(.+?)\x00#ims';
 
         $barcodeTypeMap = [
-            CPrinter_EscPos::BARCODE_CODE39 => Picqer\Barcode\BarcodeGenerator::TYPE_CODE_39
+            CPrinter_EscPos::BARCODE_CODE39 => \Picqer\Barcode\BarcodeGenerator::TYPE_CODE_39,
+            CPrinter_EscPos::BARCODE_CODE128 => \Picqer\Barcode\BarcodeGenerator::TYPE_CODE_128,
+            CPrinter_EscPos::BARCODE_CODE93 => \Picqer\Barcode\BarcodeGenerator::TYPE_CODE_93,
+            CPrinter_EscPos::BARCODE_CODABAR => \Picqer\Barcode\BarcodeGenerator::TYPE_CODABAR,
+            CPrinter_EscPos::BARCODE_ITF => \Picqer\Barcode\BarcodeGenerator::TYPE_ITF_14,
+            CPrinter_EscPos::BARCODE_UPCA => \Picqer\Barcode\BarcodeGenerator::TYPE_UPC_A,
+            CPrinter_EscPos::BARCODE_UPCE => \Picqer\Barcode\BarcodeGenerator::TYPE_UPC_E,
+            CPrinter_EscPos::BARCODE_JAN13 => \Picqer\Barcode\BarcodeGenerator::TYPE_EAN_13,
+            CPrinter_EscPos::BARCODE_JAN8 => \Picqer\Barcode\BarcodeGenerator::TYPE_EAN_8,
         ];
         preg_match_all($regexNotSupportsBarcodeB, $data, $matches);
         $fulls = carr::get($matches, 0);
