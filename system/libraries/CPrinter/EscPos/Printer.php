@@ -1,330 +1,24 @@
 <?php
-/**
- * @see https://github.com/mike42/escpos-php
- */
 
 /**
  * Main class for ESC/POS code generation.
  */
-class CPrint_Printer {
+class CPrinter_EscPos_Printer {
     /**
-     * ASCII null control character.
-     */
-    const NUL = "\x00";
-
-    /**
-     * ASCII linefeed control character.
-     */
-    const LF = "\x0a";
-
-    /**
-     * ASCII escape control character.
-     */
-    const ESC = "\x1b";
-
-    /**
-     * ASCII form separator control character.
-     */
-    const FS = "\x1c";
-
-    /**
-     * ASCII form feed control character.
-     */
-    const FF = "\x0c";
-
-    /**
-     * ASCII group separator control character.
-     */
-    const GS = "\x1d";
-
-    /**
-     * ASCII data link escape control character.
-     */
-    const DLE = "\x10";
-
-    /**
-     * ASCII end of transmission control character.
-     */
-    const EOT = "\x04";
-
-    /**
-     * Indicates UPC-A barcode when used with Printer::barcode.
-     */
-    const BARCODE_UPCA = 65;
-
-    /**
-     * Indicates UPC-E barcode when used with Printer::barcode.
-     */
-    const BARCODE_UPCE = 66;
-
-    /**
-     * Indicates JAN13 barcode when used with Printer::barcode.
-     */
-    const BARCODE_JAN13 = 67;
-
-    /**
-     * Indicates JAN8 barcode when used with Printer::barcode.
-     */
-    const BARCODE_JAN8 = 68;
-
-    /**
-     * Indicates CODE39 barcode when used with Printer::barcode.
-     */
-    const BARCODE_CODE39 = 69;
-
-    /**
-     * Indicates ITF barcode when used with Printer::barcode.
-     */
-    const BARCODE_ITF = 70;
-
-    /**
-     * Indicates CODABAR barcode when used with Printer::barcode.
-     */
-    const BARCODE_CODABAR = 71;
-
-    /**
-     * Indicates CODE93 barcode when used with Printer::barcode.
-     */
-    const BARCODE_CODE93 = 72;
-
-    /**
-     * Indicates CODE128 barcode when used with Printer::barcode.
-     */
-    const BARCODE_CODE128 = 73;
-
-    /**
-     * Indicates that HRI (human-readable interpretation) text should not be
-     * printed, when used with Printer::setBarcodeTextPosition.
-     */
-    const BARCODE_TEXT_NONE = 0;
-
-    /**
-     * Indicates that HRI (human-readable interpretation) text should be printed
-     * above a barcode, when used with Printer::setBarcodeTextPosition.
-     */
-    const BARCODE_TEXT_ABOVE = 1;
-
-    /**
-     * Indicates that HRI (human-readable interpretation) text should be printed
-     * below a barcode, when used with Printer::setBarcodeTextPosition.
-     */
-    const BARCODE_TEXT_BELOW = 2;
-
-    /**
-     * Use the first color (usually black), when used with Printer::setColor.
-     */
-    const COLOR_1 = 0;
-
-    /**
-     * Use the second color (usually red or blue), when used with Printer::setColor.
-     */
-    const COLOR_2 = 1;
-
-    /**
-     * Make a full cut, when used with Printer::cut.
-     */
-    const CUT_FULL = 65;
-
-    /**
-     * Make a partial cut, when used with Printer::cut.
-     */
-    const CUT_PARTIAL = 66;
-
-    /**
-     * Use Font A, when used with Printer::setFont.
-     */
-    const FONT_A = 0;
-
-    /**
-     * Use Font B, when used with Printer::setFont.
-     */
-    const FONT_B = 1;
-
-    /**
-     * Use Font C, when used with Printer::setFont.
-     */
-    const FONT_C = 2;
-
-    /**
-     * Use default (high density) image size, when used with Printer::graphics,
-     * Printer::bitImage or Printer::bitImageColumnFormat.
-     */
-    const IMG_DEFAULT = 0;
-
-    /**
-     * Use lower horizontal density for image printing, when used with Printer::graphics,
-     * Printer::bitImage or Printer::bitImageColumnFormat.
-     */
-    const IMG_DOUBLE_WIDTH = 1;
-
-    /**
-     * Use lower vertical density for image printing, when used with Printer::graphics,
-     * Printer::bitImage or Printer::bitImageColumnFormat.
-     */
-    const IMG_DOUBLE_HEIGHT = 2;
-
-    /**
-     * Align text to the left, when used with Printer::setJustification.
-     */
-    const JUSTIFY_LEFT = 0;
-
-    /**
-     * Center text, when used with Printer::setJustification.
-     */
-    const JUSTIFY_CENTER = 1;
-
-    /**
-     * Align text to the right, when used with Printer::setJustification.
-     */
-    const JUSTIFY_RIGHT = 2;
-
-    /**
-     * Use Font A, when used with Printer::selectPrintMode.
-     */
-    const MODE_FONT_A = 0;
-
-    /**
-     * Use Font B, when used with Printer::selectPrintMode.
-     */
-    const MODE_FONT_B = 1;
-
-    /**
-     * Use text emphasis, when used with Printer::selectPrintMode.
-     */
-    const MODE_EMPHASIZED = 8;
-
-    /**
-     * Use double height text, when used with Printer::selectPrintMode.
-     */
-    const MODE_DOUBLE_HEIGHT = 16;
-
-    /**
-     * Use double width text, when used with Printer::selectPrintMode.
-     */
-    const MODE_DOUBLE_WIDTH = 32;
-
-    /**
-     * Underline text, when used with Printer::selectPrintMode.
-     */
-    const MODE_UNDERLINE = 128;
-
-    /**
-     * Indicates standard PDF417 code.
-     */
-    const PDF417_STANDARD = 0;
-
-    /**
-     * Indicates truncated PDF417 code.
-     */
-    const PDF417_TRUNCATED = 1;
-
-    /**
-     * Indicates error correction level L when used with Printer::qrCode.
-     */
-    const QR_ECLEVEL_L = 0;
-
-    /**
-     * Indicates error correction level M when used with Printer::qrCode.
-     */
-    const QR_ECLEVEL_M = 1;
-
-    /**
-     * Indicates error correction level Q when used with Printer::qrCode.
-     */
-    const QR_ECLEVEL_Q = 2;
-
-    /**
-     * Indicates error correction level H when used with Printer::qrCode.
-     */
-    const QR_ECLEVEL_H = 3;
-
-    /**
-     * Indicates QR model 1 when used with Printer::qrCode.
-     */
-    const QR_MODEL_1 = 1;
-
-    /**
-     * Indicates QR model 2 when used with Printer::qrCode.
-     */
-    const QR_MODEL_2 = 2;
-
-    /**
-     * Indicates micro QR code when used with Printer::qrCode.
-     */
-    const QR_MICRO = 3;
-
-    /**
-     * Indicates a request for printer status when used with
-     * Printer::getPrinterStatus (experimental).
-     */
-    const STATUS_PRINTER = 1;
-
-    /**
-     * Indicates a request for printer offline cause when used with
-     * Printer::getPrinterStatus (experimental).
-     */
-    const STATUS_OFFLINE_CAUSE = 2;
-
-    /**
-     * Indicates a request for error cause when used with Printer::getPrinterStatus
-     * (experimental).
-     */
-    const STATUS_ERROR_CAUSE = 3;
-
-    /**
-     * Indicates a request for error cause when used with Printer::getPrinterStatus
-     * (experimental).
-     */
-    const STATUS_PAPER_ROLL = 4;
-
-    /**
-     * Indicates a request for ink A status when used with Printer::getPrinterStatus
-     * (experimental).
-     */
-    const STATUS_INK_A = 7;
-
-    /**
-     * Indicates a request for ink B status when used with Printer::getPrinterStatus
-     * (experimental).
-     */
-    const STATUS_INK_B = 6;
-
-    /**
-     * Indicates a request for peeler status when used with Printer::getPrinterStatus
-     * (experimental).
-     */
-    const STATUS_PEELER = 8;
-
-    /**
-     * Indicates no underline when used with Printer::setUnderline.
-     */
-    const UNDERLINE_NONE = 0;
-
-    /**
-     * Indicates single underline when used with Printer::setUnderline.
-     */
-    const UNDERLINE_SINGLE = 1;
-
-    /**
-     * Indicates double underline when used with Printer::setUnderline.
-     */
-    const UNDERLINE_DOUBLE = 2;
-
-    /**
-     * @var null|printBuffer
-     *                       The printer's output buffer
+     * @var null|CPrinter_EscPos_Contract_PrintBufferInterface
+     *                                                         The printer's output buffer
      */
     protected $buffer;
 
     /**
-     * @var PrintConnector
-     *                     Connector showing how to print to this printer
+     * @var CPrinter_EscPos_Contract_PrintConnectorInterface
+     *                                                       Connector showing how to print to this printer
      */
     protected $connector;
 
     /**
-     * @var CapabilityProfile
-     *                        Profile showing supported features for this printer
+     * @var CPrinter_EscPos_CapabilityProfile
+     *                                        Profile showing supported features for this printer
      */
     protected $profile;
 
@@ -337,22 +31,22 @@ class CPrint_Printer {
     /**
      * Construct a new print object.
      *
-     * @param PrintConnector         $connector The PrintConnector to send data to. If not set, output is sent to standard output.
-     * @param null|CapabilityProfile $profile   Supported features of this printer. If not set, the "default" CapabilityProfile will be used, which is suitable for Epson printers.
+     * @param CPrinter_EscPos_Contract_PrintConnectorInterface $connector The PrintConnector to send data to. If not set, output is sent to standard output.
+     * @param null|CPrinter_EscPos_CapabilityProfile           $profile   Supported features of this printer. If not set, the "default" CapabilityProfile will be used, which is suitable for Epson printers.
      *
      * @throws InvalidArgumentException
      */
-    public function __construct(PrintConnector $connector, CPrint_CapabilityProfile $profile = null) {
+    public function __construct(CPrinter_EscPos_Contract_PrintConnectorInterface $connector, CPrinter_EscPos_CapabilityProfile $profile = null) {
         /* Set connector */
         $this->connector = $connector;
 
         /* Set capability profile */
         if ($profile === null) {
-            $profile = CPrint_CapabilityProfile::load('default');
+            $profile = CPrinter_EscPos_CapabilityProfile::load('default');
         }
         $this->profile = $profile;
         /* Set buffer */
-        $buffer = new CPrint_PrintBuffer_EscposPrintBuffer();
+        $buffer = new CPrinter_EscPos_PrintBuffer_EscposPrintBuffer();
         $this->buffer = null;
         $this->setPrintBuffer($buffer);
         $this->initialize();
@@ -372,52 +66,52 @@ class CPrint_Printer {
      *
      * @throws InvalidArgumentException where the length or characters used in $content is invalid for the requested barcode format
      */
-    public function barcode(string $content, int $type = CPrint_Printer::BARCODE_CODE39) {
+    public function barcode(string $content, int $type = CPrinter_EscPos::BARCODE_CODE39) {
         /* Validate input */
         self::validateInteger($type, 65, 73, __FUNCTION__, 'Barcode type');
         $len = strlen($content);
         switch ($type) {
-            case self::BARCODE_UPCA:
+            case CPrinter_EscPos::BARCODE_UPCA:
                 self::validateInteger($len, 11, 12, __FUNCTION__, 'UPCA barcode content length');
                 self::validateStringRegex($content, __FUNCTION__, '/^[0-9]{11,12}$/', 'UPCA barcode content');
 
                 break;
-            case self::BARCODE_UPCE:
+            case CPrinter_EscPos::BARCODE_UPCE:
                 self::validateIntegerMulti($len, [[6, 8], [11, 12]], __FUNCTION__, 'UPCE barcode content length');
                 self::validateStringRegex($content, __FUNCTION__, '/^([0-9]{6,8}|[0-9]{11,12})$/', 'UPCE barcode content');
 
                 break;
-            case self::BARCODE_JAN13:
+            case CPrinter_EscPos::BARCODE_JAN13:
                 self::validateInteger($len, 12, 13, __FUNCTION__, 'JAN13 barcode content length');
                 self::validateStringRegex($content, __FUNCTION__, '/^[0-9]{12,13}$/', 'JAN13 barcode content');
 
                 break;
-            case self::BARCODE_JAN8:
+            case CPrinter_EscPos::BARCODE_JAN8:
                 self::validateInteger($len, 7, 8, __FUNCTION__, 'JAN8 barcode content length');
                 self::validateStringRegex($content, __FUNCTION__, '/^[0-9]{7,8}$/', 'JAN8 barcode content');
 
                 break;
-            case self::BARCODE_CODE39:
+            case CPrinter_EscPos::BARCODE_CODE39:
                 self::validateInteger($len, 1, 255, __FUNCTION__, 'CODE39 barcode content length'); // 255 is a limitation of the "function b" command, not the barcode format.
                 self::validateStringRegex($content, __FUNCTION__, "/^([0-9A-Z \$\%\+\-\.\/]+|\*[0-9A-Z \$\%\+\-\.\/]+\*)$/", 'CODE39 barcode content');
 
                 break;
-            case self::BARCODE_ITF:
+            case CPrinter_EscPos::BARCODE_ITF:
                 self::validateInteger($len, 2, 255, __FUNCTION__, 'ITF barcode content length'); // 255 is a limitation of the "function b" command, not the barcode format.
                 self::validateStringRegex($content, __FUNCTION__, '/^([0-9]{2})+$/', 'ITF barcode content');
 
                 break;
-            case self::BARCODE_CODABAR:
+            case CPrinter_EscPos::BARCODE_CODABAR:
                 self::validateInteger($len, 1, 255, __FUNCTION__, 'Codabar barcode content length'); // 255 is a limitation of the "function b" command, not the barcode format.
                 self::validateStringRegex($content, __FUNCTION__, "/^[A-Da-d][0-9\$\+\-\.\/\:]+[A-Da-d]$/", 'Codabar barcode content');
 
                 break;
-            case self::BARCODE_CODE93:
+            case CPrinter_EscPos::BARCODE_CODE93:
                 self::validateInteger($len, 1, 255, __FUNCTION__, 'Code93 barcode content length'); // 255 is a limitation of the "function b" command, not the barcode format.
                 self::validateStringRegex($content, __FUNCTION__, '/^[\\x00-\\x7F]+$/', 'Code93 barcode content');
 
                 break;
-            case self::BARCODE_CODE128:
+            case CPrinter_EscPos::BARCODE_CODE128:
                 self::validateInteger($len, 1, 255, __FUNCTION__, 'Code128 barcode content length'); // 255 is a limitation of the "function b" command, not the barcode format.
                 // The CODE128 encoder is quite complex, so only a very basic header-check is applied here.
                 self::validateStringRegex($content, __FUNCTION__, "/^\{[A-C][\\x00-\\x7F]+$/", 'Code128 barcode content');
@@ -427,12 +121,12 @@ class CPrint_Printer {
         if (!$this->profile->getSupportsBarcodeB()) {
             // A simpler barcode command which supports fewer codes
             self::validateInteger($type, 65, 71, __FUNCTION__);
-            $this->connector->write(self::GS . 'k' . chr($type - 65) . $content . self::NUL);
+            $this->connector->write(CPrinter_EscPos::GS . 'k' . chr($type - 65) . $content . CPrinter_EscPos::NUL);
 
             return;
         }
         // More advanced function B, used in preference
-        $this->connector->write(self::GS . 'k' . chr($type) . chr(strlen($content)) . $content);
+        $this->connector->write(CPrinter_EscPos::GS . 'k' . chr($type) . chr(strlen($content)) . $content);
     }
 
     /**
@@ -442,16 +136,16 @@ class CPrint_Printer {
      * Should only be used if your printer does not support the graphics() command.
      * See also bitImageColumnFormat().
      *
-     * @param EscposImage $img  The image to print
-     * @param int         $size Size modifier for the image. Must be either `Printer::IMG_DEFAULT`
-     *                          (default), or any combination of the `Printer::IMG_DOUBLE_HEIGHT` and
-     *                          `Printer::IMG_DOUBLE_WIDTH` flags.
+     * @param CPrinter_EscPos_EscposImageAbstract $img  The image to print
+     * @param int                                 $size Size modifier for the image. Must be either `Printer::IMG_DEFAULT`
+     *                                                  (default), or any combination of the `Printer::IMG_DOUBLE_HEIGHT` and
+     *                                                  `Printer::IMG_DOUBLE_WIDTH` flags.
      */
-    public function bitImage(CPrint_EscposImage $img, int $size = CPrint_Printer::IMG_DEFAULT) {
+    public function bitImage(CPrinter_EscPos_EscposImageAbstract $img, int $size = CPrinter_EscPos::IMG_DEFAULT) {
         self::validateInteger($size, 0, 3, __FUNCTION__);
         $rasterData = $img->toRasterFormat();
-        $header = CPrint_Printer::dataHeader([$img->getWidthBytes(), $img->getHeight()], true);
-        $this->connector->write(self::GS . 'v0' . chr($size) . $header);
+        $header = CPrinter_EscPos_Printer::dataHeader([$img->getWidthBytes(), $img->getHeight()], true);
+        $this->connector->write(CPrinter_EscPos::GS . 'v0' . chr($size) . $header);
         $this->connector->write($rasterData);
     }
 
@@ -461,24 +155,24 @@ class CPrint_Printer {
      * Should only be used if your printer does not support the graphics() or
      * bitImage() commands.
      *
-     * @param EscposImage $img  The image to print
-     * @param int         $size Size modifier for the image. Must be either `Printer::IMG_DEFAULT`
-     *                          (default), or any combination of the `Printer::IMG_DOUBLE_HEIGHT` and
-     *                          `Printer::IMG_DOUBLE_WIDTH` flags.
+     * @param CPrinter_EscPos_EscposImageAbstract $img  The image to print
+     * @param int                                 $size Size modifier for the image. Must be either `Printer::IMG_DEFAULT`
+     *                                                  (default), or any combination of the `Printer::IMG_DOUBLE_HEIGHT` and
+     *                                                  `Printer::IMG_DOUBLE_WIDTH` flags.
      */
-    public function bitImageColumnFormat(CPrint_EscposImage $img, int $size = CPrint_Printer::IMG_DEFAULT) {
-        $highDensityVertical = !(($size & self::IMG_DOUBLE_HEIGHT) == CPrint_Printer::IMG_DOUBLE_HEIGHT);
-        $highDensityHorizontal = !(($size & self::IMG_DOUBLE_WIDTH) == CPrint_Printer::IMG_DOUBLE_WIDTH);
+    public function bitImageColumnFormat(CPrinter_EscPos_EscposImageAbstract $img, int $size = CPrinter_EscPos::IMG_DEFAULT) {
+        $highDensityVertical = !(($size & CPrinter_EscPos::IMG_DOUBLE_HEIGHT) == CPrinter_EscPos::IMG_DOUBLE_HEIGHT);
+        $highDensityHorizontal = !(($size & CPrinter_EscPos::IMG_DOUBLE_WIDTH) == CPrinter_EscPos::IMG_DOUBLE_WIDTH);
         // Experimental column format printing
         // This feature is not yet complete and may produce unpredictable results.
         $this->setLineSpacing(16); // 16-dot line spacing. This is the correct value on both TM-T20 and TM-U220
         // Header and density code (0, 1, 32, 33) re-used for every line
         $densityCode = ($highDensityHorizontal ? 1 : 0) + ($highDensityVertical ? 32 : 0);
         $colFormatData = $img->toColumnFormat($highDensityVertical);
-        $header = CPrint_Printer::dataHeader([$img->getWidth()], true);
+        $header = CPrinter_EscPos_Printer::dataHeader([$img->getWidth()], true);
         foreach ($colFormatData as $line) {
             // Print each line, double density etc for printing are set here also
-            $this->connector->write(self::ESC . '*' . chr($densityCode) . $header . $line);
+            $this->connector->write(CPrinter_EscPos::ESC . '*' . chr($densityCode) . $header . $line);
             $this->feed();
             // sleep(0.1); // Reduces the amount of trouble that a TM-U220 has keeping up with large images
         }
@@ -499,38 +193,50 @@ class CPrint_Printer {
      * @param int $mode  Cut mode, either Printer::CUT_FULL or Printer::CUT_PARTIAL. If not specified, `Printer::CUT_FULL` will be used.
      * @param int $lines Number of lines to feed
      */
-    public function cut(int $mode = CPrint_Printer::CUT_FULL, int $lines = 3) {
+    public function cut(int $mode = CPrinter_EscPos::CUT_FULL, int $lines = 3) {
         // TODO validation on cut() inputs
-        $this->connector->write(self::GS . 'V' . chr($mode) . chr($lines));
+        $this->connector->write(CPrinter_EscPos::GS . 'V' . chr($mode) . chr($lines));
     }
 
     /**
      * Print and feed line / Print and feed n lines.
      *
      * @param int $lines Number of lines to feed
+     *
+     * @return $this
      */
     public function feed(int $lines = 1) {
         self::validateInteger($lines, 1, 255, __FUNCTION__);
         if ($lines <= 1) {
-            $this->connector->write(self::LF);
+            $this->connector->write(CPrinter_EscPos::LF);
         } else {
-            $this->connector->write(self::ESC . 'd' . chr($lines));
+            $this->connector->write(CPrinter_EscPos::ESC . 'd' . chr($lines));
         }
+
+        return $this;
     }
 
     /**
      * Some printers require a form feed to release the paper. On most printers, this
      * command is only useful in page mode, which is not implemented in this driver.
+     *
+     * @return $this
      */
     public function feedForm() {
-        $this->connector->write(self::FF);
+        $this->connector->write(CPrinter_EscPos::FF);
+
+        return $this;
     }
 
     /**
      * Some slip printers require `ESC q` sequence to release the paper.
+     *
+     * @return $this
      */
     public function release() {
-        $this->connector->write(self::ESC . chr(113));
+        $this->connector->write(CPrinter_EscPos::ESC . chr(113));
+
+        return $this;
     }
 
     /**
@@ -540,7 +246,7 @@ class CPrint_Printer {
      */
     public function feedReverse(int $lines = 1) {
         self::validateInteger($lines, 1, 255, __FUNCTION__);
-        $this->connector->write(self::ESC . 'e' . chr($lines));
+        $this->connector->write(CPrinter_EscPos::ESC . 'e' . chr($lines));
     }
 
     /**
@@ -558,14 +264,14 @@ class CPrint_Printer {
     }
 
     /**
-     * @return PrintConnector
+     * @return CPrinter_EscPos_Contract_PrintConnectorInterface
      */
     public function getPrintConnector() {
         return $this->connector;
     }
 
     /**
-     * @return CapabilityProfile
+     * @return CPrinter_EscPos_CapabilityProfile
      */
     public function getPrinterCapabilityProfile() {
         return $this->profile;
@@ -585,30 +291,36 @@ class CPrint_Printer {
      * parameters, and can be used if your printer doesn't support the newer
      * graphics commands.
      *
-     * @param EscposImage $img  the image to print
-     * @param int         $size Size modifier for the image. Must be either `Printer::IMG_DEFAULT`
-     *                          (default), or any combination of the `Printer::IMG_DOUBLE_HEIGHT` and
-     *                          `Printer::IMG_DOUBLE_WIDTH` flags.
+     * @param CPrinter_EscPos_EscposImageAbstract $img  the image to print
+     * @param int                                 $size Size modifier for the image. Must be either `Printer::IMG_DEFAULT`
+     *                                                  (default), or any combination of the `Printer::IMG_DOUBLE_HEIGHT` and
+     *                                                  `CPrinter_EscPos::IMG_DOUBLE_WIDTH` flags.
+     *
+     * @return $this
      */
-    public function graphics(CPrint_EscposImage $img, int $size = CPrint_Printer::IMG_DEFAULT) {
+    public function graphics(CPrinter_EscPos_EscposImageAbstract $img, int $size = CPrinter_EscPos::IMG_DEFAULT) {
         self::validateInteger($size, 0, 3, __FUNCTION__);
         $rasterData = $img->toRasterFormat();
-        $imgHeader = CPrint_Printer::dataHeader([$img->getWidth(), $img->getHeight()], true);
+        $imgHeader = CPrinter_EscPos_Printer::dataHeader([$img->getWidth(), $img->getHeight()], true);
         $tone = '0';
         $colors = '1';
-        $xm = (($size & self::IMG_DOUBLE_WIDTH) == CPrint_Printer::IMG_DOUBLE_WIDTH) ? chr(2) : chr(1);
-        $ym = (($size & self::IMG_DOUBLE_HEIGHT) == CPrint_Printer::IMG_DOUBLE_HEIGHT) ? chr(2) : chr(1);
+        $xm = (($size & CPrinter_EscPos::IMG_DOUBLE_WIDTH) == CPrinter_EscPos::IMG_DOUBLE_WIDTH) ? chr(2) : chr(1);
+        $ym = (($size & CPrinter_EscPos::IMG_DOUBLE_HEIGHT) == CPrinter_EscPos::IMG_DOUBLE_HEIGHT) ? chr(2) : chr(1);
         $header = $tone . $xm . $ym . $colors . $imgHeader;
         $this->wrapperSendGraphicsData('0', 'p', $header . $rasterData);
         $this->wrapperSendGraphicsData('0', '2');
+
+        return $this;
     }
 
     /**
      * Initialize printer. This resets formatting back to the defaults.
      */
     public function initialize() {
-        $this->connector->write(self::ESC . '@');
+        $this->connector->write(CPrinter_EscPos::ESC . '@');
         $this->characterTable = 0;
+
+        return $this;
     }
 
     /**
@@ -628,7 +340,7 @@ class CPrint_Printer {
      *
      * @throws Exception If this profile indicates that PDF417 code is not supported
      */
-    public function pdf417Code(string $content, int $width = 3, int $heightMultiplier = 3, int $dataColumnCount = 0, float $ec = 0.10, int $options = CPrint_Printer::PDF417_STANDARD) {
+    public function pdf417Code(string $content, int $width = 3, int $heightMultiplier = 3, int $dataColumnCount = 0, float $ec = 0.10, int $options = CPrinter_EscPos::PDF417_STANDARD) {
         self::validateInteger($width, 2, 8, __FUNCTION__, 'width');
         self::validateInteger($heightMultiplier, 2, 8, __FUNCTION__, 'heightMultiplier');
         self::validateInteger($dataColumnCount, 0, 30, __FUNCTION__, 'dataColumnCount');
@@ -664,6 +376,8 @@ class CPrint_Printer {
      * @param int $pin    0 or 1, for pin 2 or pin 5 kick-out connector respectively
      * @param int $on_ms  pulse ON time, in milliseconds
      * @param int $off_ms pulse OFF time, in milliseconds
+     *
+     * @return $this
      */
     public function pulse(int $pin = 0, int $on_ms = 120, int $off_ms = 240) {
         self::validateInteger($pin, 0, 1, __FUNCTION__);
@@ -672,7 +386,9 @@ class CPrint_Printer {
         $pin_value = $pin + 48; // Character '0' or '1'.
         $on_value = intdiv($on_ms, 2);
         $off_value = intdiv($off_ms, 2);
-        $this->connector->write(self::ESC . 'p' . chr($pin_value) . chr($on_value) . chr($off_value));
+        $this->connector->write(CPrinter_EscPos::ESC . 'p' . chr($pin_value) . chr($on_value) . chr($off_value));
+
+        return $this;
     }
 
     /**
@@ -682,8 +398,10 @@ class CPrint_Printer {
      * @param int    $ec      Error-correction level to use. One of Printer::QR_ECLEVEL_L (default), Printer::QR_ECLEVEL_M, Printer::QR_ECLEVEL_Q or Printer::QR_ECLEVEL_H. Higher error correction results in a less compact code.
      * @param int    $size    Pixel size to use. Must be 1-16 (default 3)
      * @param int    $model   QR code model to use. Must be one of Printer::QR_MODEL_1, Printer::QR_MODEL_2 (default) or Printer::QR_MICRO (not supported by all printers).
+     *
+     * @return $this
      */
-    public function qrCode(string $content, int $ec = CPrint_Printer::QR_ECLEVEL_L, int $size = 3, int $model = CPrint_Printer::QR_MODEL_2) {
+    public function qrCode(string $content, int $ec = CPrinter_EscPos::QR_ECLEVEL_L, int $size = 3, int $model = CPrinter_EscPos::QR_MODEL_2) {
         self::validateInteger($ec, 0, 3, __FUNCTION__);
         self::validateInteger($size, 1, 16, __FUNCTION__);
         self::validateInteger($model, 1, 3, __FUNCTION__);
@@ -704,6 +422,8 @@ class CPrint_Printer {
         // Send content & print
         $this->wrapperSend2dCodeData(chr(80), $cn, $content, '0');
         $this->wrapperSend2dCodeData(chr(81), $cn, '', '0');
+
+        return $this;
     }
 
     /**
@@ -721,11 +441,11 @@ class CPrint_Printer {
         $this->characterTable = $table;
         if ($this->profile->getSupportsStarCommands()) {
             /* Not an ESC/POS command: STAR printers stash all the extra code pages under a different command. */
-            $this->connector->write(self::ESC . self::GS . 't' . chr($table));
+            $this->connector->write(CPrinter_EscPos::ESC . CPrinter_EscPos::GS . 't' . chr($table));
 
             return;
         }
-        $this->connector->write(self::ESC . 't' . chr($table));
+        $this->connector->write(CPrinter_EscPos::ESC . 't' . chr($table));
     }
 
     /**
@@ -741,13 +461,13 @@ class CPrint_Printer {
      *
      * @param int $mode The mode to use. Default is Printer::MODE_FONT_A, with no special formatting. This has a similar effect to running initialize().
      */
-    public function selectPrintMode(int $mode = CPrint_Printer::MODE_FONT_A) {
-        $allModes = CPrint_Printer::MODE_FONT_B | self::MODE_EMPHASIZED | self::MODE_DOUBLE_HEIGHT | self::MODE_DOUBLE_WIDTH | self::MODE_UNDERLINE;
+    public function selectPrintMode(int $mode = CPrinter_EscPos::MODE_FONT_A) {
+        $allModes = CPrinter_EscPos::MODE_FONT_B | CPrinter_EscPos::MODE_EMPHASIZED | CPrinter_EscPos::MODE_DOUBLE_HEIGHT | CPrinter_EscPos::MODE_DOUBLE_WIDTH | CPrinter_EscPos::MODE_UNDERLINE;
         if (!is_integer($mode) || $mode < 0 || ($mode & $allModes) != $mode) {
             throw new InvalidArgumentException('Invalid mode');
         }
 
-        $this->connector->write(self::ESC . '!' . chr($mode));
+        $this->connector->write(CPrinter_EscPos::ESC . '!' . chr($mode));
     }
 
     /**
@@ -756,7 +476,7 @@ class CPrint_Printer {
      * @param bool $on true to enable user-defined character set, false to use built-in characters sets
      */
     public function selectUserDefinedCharacterSet($on = true) {
-        $this->connector->write(self::ESC . '%' . ($on ? chr(1) : chr(0)));
+        $this->connector->write(CPrinter_EscPos::ESC . '%' . ($on ? chr(1) : chr(0)));
     }
 
     /**
@@ -766,7 +486,7 @@ class CPrint_Printer {
      */
     public function setBarcodeHeight(int $height = 8) {
         self::validateInteger($height, 1, 255, __FUNCTION__);
-        $this->connector->write(self::GS . 'h' . chr($height));
+        $this->connector->write(CPrinter_EscPos::GS . 'h' . chr($height));
     }
 
     /**
@@ -777,7 +497,7 @@ class CPrint_Printer {
      */
     public function setBarcodeWidth(int $width = 3) {
         self::validateInteger($width, 1, 255, __FUNCTION__);
-        $this->connector->write(self::GS . 'w' . chr($width));
+        $this->connector->write(CPrinter_EscPos::GS . 'w' . chr($width));
     }
 
     /**
@@ -787,9 +507,9 @@ class CPrint_Printer {
      *                       or any combination of Printer::BARCODE_TEXT_ABOVE and Printer::BARCODE_TEXT_BELOW
      *                       flags to display the text.
      */
-    public function setBarcodeTextPosition(int $position = CPrint_Printer::BARCODE_TEXT_NONE) {
+    public function setBarcodeTextPosition(int $position = CPrinter_EscPos::BARCODE_TEXT_NONE) {
         self::validateInteger($position, 0, 3, __FUNCTION__, 'Barcode text position');
-        $this->connector->write(self::GS . 'H' . chr($position));
+        $this->connector->write(CPrinter_EscPos::GS . 'H' . chr($position));
     }
 
     /**
@@ -799,7 +519,7 @@ class CPrint_Printer {
      */
     public function setDoubleStrike(bool $on = true) {
         self::validateBoolean($on, __FUNCTION__);
-        $this->connector->write(self::ESC . 'G' . ($on ? chr(1) : chr(0)));
+        $this->connector->write(CPrinter_EscPos::ESC . 'G' . ($on ? chr(1) : chr(0)));
     }
 
     /**
@@ -807,9 +527,9 @@ class CPrint_Printer {
      *
      * @param int $color Color to use. Must be either Printer::COLOR_1 (default), or Printer::COLOR_2.
      */
-    public function setColor(int $color = CPrint_Printer::COLOR_1) {
+    public function setColor(int $color = CPrinter_EscPos::COLOR_1) {
         self::validateInteger($color, 0, 1, __FUNCTION__, 'Color');
-        $this->connector->write(self::ESC . 'r' . chr($color));
+        $this->connector->write(CPrinter_EscPos::ESC . 'r' . chr($color));
     }
 
     /**
@@ -819,7 +539,7 @@ class CPrint_Printer {
      */
     public function setEmphasis(bool $on = true) {
         self::validateBoolean($on, __FUNCTION__);
-        $this->connector->write(self::ESC . 'E' . ($on ? chr(1) : chr(0)));
+        $this->connector->write(CPrinter_EscPos::ESC . 'E' . ($on ? chr(1) : chr(0)));
     }
 
     /**
@@ -827,9 +547,9 @@ class CPrint_Printer {
      *
      * @param int $font The font to use. Must be either Printer::FONT_A, Printer::FONT_B, or Printer::FONT_C.
      */
-    public function setFont(int $font = CPrint_Printer::FONT_A) {
+    public function setFont(int $font = CPrinter_EscPos::FONT_A) {
         self::validateInteger($font, 0, 2, __FUNCTION__);
-        $this->connector->write(self::ESC . 'M' . chr($font));
+        $this->connector->write(CPrinter_EscPos::ESC . 'M' . chr($font));
     }
 
     /**
@@ -837,9 +557,9 @@ class CPrint_Printer {
      *
      * @param int $justification one of Printer::JUSTIFY_LEFT, Printer::JUSTIFY_CENTER, or Printer::JUSTIFY_RIGHT
      */
-    public function setJustification(int $justification = CPrint_Printer::JUSTIFY_LEFT) {
+    public function setJustification(int $justification = CPrinter_EscPos::JUSTIFY_LEFT) {
         self::validateInteger($justification, 0, 2, __FUNCTION__);
-        $this->connector->write(self::ESC . 'a' . chr($justification));
+        $this->connector->write(CPrinter_EscPos::ESC . 'a' . chr($justification));
     }
 
     /**
@@ -853,12 +573,12 @@ class CPrint_Printer {
     public function setLineSpacing(int $height = null) {
         if ($height === null) {
             // Reset to default
-            $this->connector->write(self::ESC . '2'); // Revert to default line spacing
+            $this->connector->write(CPrinter_EscPos::ESC . '2'); // Revert to default line spacing
 
             return;
         }
         self::validateInteger($height, 1, 255, __FUNCTION__);
-        $this->connector->write(self::ESC . '3' . chr($height));
+        $this->connector->write(CPrinter_EscPos::ESC . '3' . chr($height));
     }
 
     /**
@@ -868,7 +588,7 @@ class CPrint_Printer {
      */
     public function setPrintLeftMargin(int $margin = 0) {
         self::validateInteger($margin, 0, 65535, __FUNCTION__);
-        $this->connector->write(CPrint_Printer::GS . 'L' . self::intLowHigh($margin, 2));
+        $this->connector->write(CPrinter_EscPos::GS . 'L' . self::intLowHigh($margin, 2));
     }
 
     /**
@@ -879,17 +599,17 @@ class CPrint_Printer {
      */
     public function setPrintWidth(int $width = 512) {
         self::validateInteger($width, 1, 65535, __FUNCTION__);
-        $this->connector->write(CPrint_Printer::GS . 'W' . self::intLowHigh($width, 2));
+        $this->connector->write(CPrinter_EscPos::GS . 'W' . self::intLowHigh($width, 2));
     }
 
     /**
      * Attach a different print buffer to the printer. Buffers are responsible for handling text output to the printer.
      *
-     * @param CPrint_Contract_PrintBuffer $buffer the buffer to use
+     * @param CPrinter_EscPos_Contract_PrintBufferInterface $buffer the buffer to use
      *
      * @throws InvalidArgumentException where the buffer is already attached to a different printer
      */
-    public function setPrintBuffer(CPrint_Contract_PrintBuffer $buffer) {
+    public function setPrintBuffer(CPrinter_EscPos_Contract_PrintBufferInterface $buffer) {
         if ($buffer === $this->buffer) {
             return;
         }
@@ -910,7 +630,7 @@ class CPrint_Printer {
      */
     public function setReverseColors(bool $on = true) {
         self::validateBoolean($on, __FUNCTION__);
-        $this->connector->write(self::GS . 'B' . ($on ? chr(1) : chr(0)));
+        $this->connector->write(CPrinter_EscPos::GS . 'B' . ($on ? chr(1) : chr(0)));
     }
 
     /**
@@ -923,7 +643,7 @@ class CPrint_Printer {
         self::validateInteger($widthMultiplier, 1, 8, __FUNCTION__);
         self::validateInteger($heightMultiplier, 1, 8, __FUNCTION__);
         $c = (2 << 3) * ($widthMultiplier - 1) + ($heightMultiplier - 1);
-        $this->connector->write(self::GS . '!' . chr($c));
+        $this->connector->write(CPrinter_EscPos::GS . '!' . chr($c));
     }
 
     /**
@@ -931,10 +651,10 @@ class CPrint_Printer {
      *
      * @param int $underline Either true/false, or one of Printer::UNDERLINE_NONE, Printer::UNDERLINE_SINGLE or Printer::UNDERLINE_DOUBLE. Defaults to Printer::UNDERLINE_SINGLE.
      */
-    public function setUnderline(int $underline = CPrint_Printer::UNDERLINE_SINGLE) {
+    public function setUnderline(int $underline = CPrinter_EscPos::UNDERLINE_SINGLE) {
         /* Set the underline */
         self::validateInteger($underline, 0, 2, __FUNCTION__);
-        $this->connector->write(self::ESC . '-' . chr($underline));
+        $this->connector->write(CPrinter_EscPos::ESC . '-' . chr($underline));
     }
 
     /**
@@ -943,7 +663,7 @@ class CPrint_Printer {
      * @param bool $on true to enable, false to disable
      */
     public function setUpsideDown(bool $on = true) {
-        $this->connector->write(self::ESC . '{' . ($on ? chr(1) : chr(0)));
+        $this->connector->write(CPrinter_EscPos::ESC . '{' . ($on ? chr(1) : chr(0)));
     }
 
     /**
@@ -967,10 +687,10 @@ class CPrint_Printer {
      * @param string $str Text to print, as UTF-8
      */
     public function textChinese(string $str = '') {
-        $this->connector->write(self::FS . '&');
+        $this->connector->write(CPrinter_EscPos::FS . '&');
         $str = \UConverter::transcode($str, 'GBK', 'UTF-8');
         $this->buffer->writeTextRaw((string) $str);
-        $this->connector->write(self::FS . '.');
+        $this->connector->write(CPrinter_EscPos::FS . '.');
     }
 
     /**
@@ -1000,7 +720,7 @@ class CPrint_Printer {
             throw new InvalidArgumentException('wrapperSend2dCodeData: cn and fn must be one character each.');
         }
         $header = $this->intLowHigh(strlen($data) + strlen($m) + 2, 2);
-        $this->connector->write(self::GS . '(k' . $header . $cn . $fn . $m . $data);
+        $this->connector->write(CPrinter_EscPos::GS . '(k' . $header . $cn . $fn . $m . $data);
     }
 
     /**
@@ -1017,7 +737,7 @@ class CPrint_Printer {
             throw new InvalidArgumentException('wrapperSendGraphicsData: m and fn must be one character each.');
         }
         $header = $this->intLowHigh(strlen($data) + 2, 2);
-        $this->connector->write(self::GS . '(L' . $header . $m . $fn . $data);
+        $this->connector->write(CPrinter_EscPos::GS . '(L' . $header . $m . $fn . $data);
     }
 
     /**
@@ -1032,7 +752,7 @@ class CPrint_Printer {
         $outp = [];
         foreach ($inputs as $input) {
             if ($long) {
-                $outp[] = CPrint_Printer::intLowHigh($input, 2);
+                $outp[] = CPrinter_EscPos_Printer::intLowHigh($input, 2);
             } else {
                 self::validateInteger($input, 0, 255, __FUNCTION__);
                 $outp[] = chr($input);

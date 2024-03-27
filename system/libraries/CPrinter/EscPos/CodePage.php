@@ -129,7 +129,54 @@ class CPrinter_EscPos_CodePage {
      *
      * @return array 128-entry array of code points
      */
+    protected static function generateEncodingArrayNative(string $encodingName): array {
+        // Loop through 128 code points
+        $intArray = array_fill(0, 128, self::MISSING_CHAR_CODE);
+
+        for ($char = 128; $char <= 255; $char++) {
+            $encodingChar = chr($char);
+            $utf8 = false;
+
+            try {
+                $utf8 = iconv($encodingName, 'UTF-8', $encodingChar);
+            } catch (Exception $e) {
+                //do nothing
+            }
+
+            if ($utf8 === false) {
+                continue; // Cannot be mapped to Unicode
+            }
+
+            // Ensure the length of UTF-8 character is 1 (single byte)
+            if (strlen($utf8) !== 1) {
+                continue; // Skip multi-byte characters
+            }
+
+            // Get the Unicode code point of the UTF-8 character
+            $codePoints = unpack('C*', $utf8);
+            $unicodeCodePoint = reset($codePoints);
+
+            // Replace space with the correct character if we found it
+            $intArray[$char - 128] = $unicodeCodePoint;
+        }
+
+        assert(count($intArray) == 128);
+
+        return $intArray;
+    }
+
+    /**
+     * Given an ICU encoding name, generate a 128-entry array, with the unicode code points
+     * for the character at positions 128-255 in this code page.
+     *
+     * @param string $encodingName Name of the encoding
+     *
+     * @return array 128-entry array of code points
+     */
     protected static function generateEncodingArray(string $encodingName) : array {
+        if (!class_exists(\UConverter::class)) {
+            return self::generateEncodingArrayNative($encodingName);
+        }
         // Set up converter for encoding
         $missingChar = chr(self::MISSING_CHAR_CODE);
         // Throws a lot of warnings for ambiguous code pages, but fallbacks seem fine.
@@ -158,7 +205,23 @@ class CPrinter_EscPos_CodePage {
         return $intArray;
     }
 
+    private static function encodingArrayFromDataNative(array $data): array {
+        $text = implode('', $data); // Join lines
+        $ret = array_fill(0, 128, self::MISSING_CHAR_CODE);
+        $length = mb_strlen($text, 'UTF-8');
+        for ($i = 0; $i < $length && $i < 128; $i++) {
+            $codePoint = mb_ord(mb_substr($text, $i, 1), 'UTF-8');
+            $ret[$i] = $codePoint;
+        }
+        assert(count($ret) == 128);
+
+        return $ret;
+    }
+
     private static function encodingArrayFromData(array $data) : array {
+        if (!class_exists(\IntlBreakIterator::class)) {
+            return self::encodingArrayFromDataNative($data);
+        }
         $text = implode('', $data); // Join lines
         $codePointIterator = \IntlBreakIterator::createCodePointInstance();
         $codePointIterator->setText($text);

@@ -38,4 +38,34 @@ class CServer_Process {
             'command' => $process[7],
         ];
     }
+
+    protected function procOpen($cmd) {
+        $descriptors = [
+            1 => [
+                'pipe',
+                'w'
+            ],
+            2 => [
+                'pipe',
+                'w'
+            ]
+        ];
+        $process = proc_open($cmd, $descriptors, $fd);
+        if (!is_resource($process)) {
+            throw new Exception("Command '$cmd' failed to start.");
+        }
+        /* Read stdout */
+        $outputStr = stream_get_contents($fd[1]);
+        fclose($fd[1]);
+        /* Read stderr */
+        $errorStr = stream_get_contents($fd[2]);
+        fclose($fd[2]);
+        /* Finish up */
+        $retval = proc_close($process);
+        if ($retval != 0) {
+            throw new Exception("Command $cmd failed: $errorStr");
+        }
+
+        return $outputStr;
+    }
 }

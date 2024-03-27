@@ -13,7 +13,7 @@
  * - If your use case fits outside these, then a further speed/flexibility trade-off
  *   can be made by printing directly from generated HTML or PDF.
  */
-interface CPrint_Contract_PrintBuffer {
+interface CPrinter_EscPos_Contract_PrintBufferInterface {
     /**
      * Cause the buffer to send any partial input and wait on a newline.
      * If the printer is already on a new line, this does nothing.
@@ -28,9 +28,9 @@ interface CPrint_Contract_PrintBuffer {
     /**
      * Used by Escpos to hook up one-to-one link between buffers and printers.
      *
-     * @param null|CPrint_Printer $printer New printer
+     * @param null|CPrinter_EscPos_Printer $printer New printer
      */
-    public function setPrinter(CPrint_Printer $printer = null);
+    public function setPrinter(CPrinter_EscPos_Printer $printer = null);
 
     /**
      * Accept UTF-8 text for printing.

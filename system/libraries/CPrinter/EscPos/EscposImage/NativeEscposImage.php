@@ -1,11 +1,11 @@
 <?php
 
-//use Mike42\GfxPhp\Image;
+use Mike42\GfxPhp\Image;
 
 /**
  * Implementation of EscposImage using only native PHP.
  */
-class CPrint_EscposImage_NativeEscposImage extends CPrint_EscposImage {
+class CPrinter_EscPos_EscposImage_NativeEscposImage extends CPrinter_EscPos_EscposImageAbstract {
     protected function loadImageData(string $filename = null) {
         $image = Image::fromFile($filename)->toRgb()->toBlackAndWhite();
         $imgHeight = $image->getHeight();

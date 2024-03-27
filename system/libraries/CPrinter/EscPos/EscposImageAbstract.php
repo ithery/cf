@@ -20,7 +20,7 @@
  *    also not complex to add, and is a likely future feature.
  *  - Support for native use of the BMP format is a goal, for maximum compatibility with target environments.
  */
-abstract class CPrint_EscposImage {
+abstract class CPrinter_EscPos_EscposImageAbstract {
     /**
      * @var int
      *          height of the image
@@ -238,7 +238,7 @@ abstract class CPrint_EscposImage {
     /**
      * Get column fromat from loaded image pixels, line by line.
      *
-     * @throws exception
+     * @throws Exception
      *                   Where wrong number of bytes has been generated
      *
      * @return string
@@ -419,21 +419,21 @@ abstract class CPrint_EscposImage {
                     continue;
                 }
 
-                return new CPrint_EscposImage_ImagickEscposImage($filename, $allowOptimisations);
+                return new CPrinter_EscPos_EscposImage_ImagickEscposImage($filename, $allowOptimisations);
             } elseif ($implementation === 'gd') {
                 if (!self::isGdLoaded()) {
                     // Skip option if GD not loaded
                     continue;
                 }
 
-                return new CPrint_EscposImage_GdEscposImage($filename, $allowOptimisations);
+                return new CPrinter_EscPos_EscposImage_GdEscposImage($filename, $allowOptimisations);
             } elseif ($implementation === 'native') {
                 if (!in_array($ext, ['bmp', 'gif', 'pbm', 'png', 'ppm', 'pgm', 'wbmp'])) {
                     // Pure PHP may also be fastest way to generate raster output from wbmp and pbm formats.
                     continue;
                 }
 
-                return new CPrint_EscposImage_NativeEscposImage($filename, $allowOptimisations);
+                return new CPrinter_EscPos_EscposImage_NativeEscposImage($filename, $allowOptimisations);
             } else {
                 // Something else on the 'preferred' list.
                 throw new InvalidArgumentException("'$implementation' is not a known EscposImage implementation");
