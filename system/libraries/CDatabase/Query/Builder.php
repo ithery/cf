@@ -120,6 +120,13 @@ class CDatabase_Query_Builder {
     public $orders;
 
     /**
+     * The maximum number of records to return per group.
+     *
+     * @var array
+     */
+    public $groupLimit;
+
+    /**
      * The maximum number of records to return.
      *
      * @var int
@@ -990,6 +997,22 @@ class CDatabase_Query_Builder {
     }
 
     /**
+     * Add a "group limit" clause to the query.
+     *
+     * @param int    $value
+     * @param string $column
+     *
+     * @return $this
+     */
+    public function groupLimit($value, $column) {
+        if ($value >= 0) {
+            $this->groupLimit = compact('value', 'column');
+        }
+
+        return $this;
+    }
+
+    /**
      * Set the limit and offset for a given page.
      *
      * @param int $page
@@ -1226,9 +1249,13 @@ class CDatabase_Query_Builder {
      * @return \CCollection
      */
     public function get($columns = ['*']) {
-        return c::collect($this->onceWithColumns(carr::wrap($columns), function () {
+        $items = c::collect($this->onceWithColumns(carr::wrap($columns), function () {
             return $this->processor->processSelect($this, $this->runSelect());
         }));
+
+        return isset($this->groupLimit)
+            ? $this->withoutGroupLimitKeys($items)
+            : $items;
     }
 
     /**
@@ -1242,6 +1269,32 @@ class CDatabase_Query_Builder {
             $this->getBindings(),
             !$this->useWritePdo
         );
+    }
+
+    /**
+     * Remove the group limit keys from the results in the collection.
+     *
+     * @param \CCollection $items
+     *
+     * @return \CCollection
+     */
+    protected function withoutGroupLimitKeys($items) {
+        $keysToRemove = ['cf_row'];
+
+        if (is_string($this->groupLimit['column'])) {
+            $column = c::last(explode('.', $this->groupLimit['column']));
+
+            $keysToRemove[] = '@cf_group := ' . $this->grammar->wrap($column);
+            $keysToRemove[] = '@cf_group := ' . $this->grammar->wrap('pivot_' . $column);
+        }
+
+        $items->each(function ($item) use ($keysToRemove) {
+            foreach ($keysToRemove as $key) {
+                unset($item->$key);
+            }
+        });
+
+        return $items;
     }
 
     /**

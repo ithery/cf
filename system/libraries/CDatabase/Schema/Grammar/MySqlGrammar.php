@@ -27,11 +27,20 @@ class CDatabase_Schema_Grammar_MySqlGrammar extends CDatabase_Schema_Grammar {
      * @return string
      */
     public function compileCreateDatabase($name, $connection) {
+        $charset = $connection->getConfig('charset');
+        $collation = $connection->getConfig('collation');
+        if (!$charset || !$collation) {
+            return sprintf(
+                'create database %s',
+                $this->wrapValue($name),
+            );
+        }
+
         return sprintf(
             'create database %s default character set %s default collate %s',
             $this->wrapValue($name),
-            $this->wrapValue($connection->getConfig('charset')),
-            $this->wrapValue($connection->getConfig('collation')),
+            $this->wrapValue($charset),
+            $this->wrapValue($collation),
         );
     }
 
@@ -50,21 +59,102 @@ class CDatabase_Schema_Grammar_MySqlGrammar extends CDatabase_Schema_Grammar {
     }
 
     /**
-     * Compile the query to determine the list of tables.
+     * Compile the query to determine the tables.
+     *
+     * @param string $database
      *
      * @return string
      */
-    public function compileTableExists() {
-        return "select * from information_schema.tables where table_schema = ? and table_name = ? and table_type = 'BASE TABLE'";
+    public function compileTables($database) {
+        return sprintf(
+            'select table_name as `name`, (data_length + index_length) as `size`, '
+            . 'table_comment as `comment`, engine as `engine`, table_collation as `collation` '
+            . "from information_schema.tables where table_schema = %s and table_type in ('BASE TABLE', 'SYSTEM VERSIONED') "
+            . 'order by table_name',
+            $this->quoteString($database)
+        );
     }
 
     /**
-     * Compile the query to determine the list of columns.
+     * Compile the query to determine the views.
+     *
+     * @param string $database
      *
      * @return string
      */
-    public function compileColumnListing() {
-        return 'select column_name as `column_name` from information_schema.columns where table_schema = ? and table_name = ?';
+    public function compileViews($database) {
+        return sprintf(
+            'select table_name as `name`, view_definition as `definition` '
+            . 'from information_schema.views where table_schema = %s '
+            . 'order by table_name',
+            $this->quoteString($database)
+        );
+    }
+
+    /**
+     * Compile the query to determine the columns.
+     *
+     * @param string $database
+     * @param string $table
+     *
+     * @return string
+     */
+    public function compileColumns($database, $table) {
+        return sprintf(
+            'select column_name as `name`, data_type as `type_name`, column_type as `type`, '
+            . 'collation_name as `collation`, is_nullable as `nullable`, '
+            . 'column_default as `default`, column_comment as `comment`, '
+            . 'generation_expression as `expression`, extra as `extra` '
+            . 'from information_schema.columns where table_schema = %s and table_name = %s '
+            . 'order by ordinal_position asc',
+            $this->quoteString($database),
+            $this->quoteString($table)
+        );
+    }
+
+    /**
+     * Compile the query to determine the indexes.
+     *
+     * @param string $database
+     * @param string $table
+     *
+     * @return string
+     */
+    public function compileIndexes($database, $table) {
+        return sprintf(
+            'select index_name as `name`, group_concat(column_name order by seq_in_index) as `columns`, '
+            . 'index_type as `type`, not non_unique as `unique` '
+            . 'from information_schema.statistics where table_schema = %s and table_name = %s '
+            . 'group by index_name, index_type, non_unique',
+            $this->quoteString($database),
+            $this->quoteString($table)
+        );
+    }
+
+    /**
+     * Compile the query to determine the foreign keys.
+     *
+     * @param string $database
+     * @param string $table
+     *
+     * @return string
+     */
+    public function compileForeignKeys($database, $table) {
+        return sprintf(
+            'select kc.constraint_name as `name`, '
+            . 'group_concat(kc.column_name order by kc.ordinal_position) as `columns`, '
+            . 'kc.referenced_table_schema as `foreign_schema`, '
+            . 'kc.referenced_table_name as `foreign_table`, '
+            . 'group_concat(kc.referenced_column_name order by kc.ordinal_position) as `foreign_columns`, '
+            . 'rc.update_rule as `on_update`, '
+            . 'rc.delete_rule as `on_delete` '
+            . 'from information_schema.key_column_usage kc join information_schema.referential_constraints rc '
+            . 'on kc.constraint_schema = rc.constraint_schema and kc.constraint_name = rc.constraint_name '
+            . 'where kc.table_schema = %s and kc.table_name = %s and kc.referenced_table_name is not null '
+            . 'group by kc.constraint_name, kc.referenced_table_schema, kc.referenced_table_name, rc.update_rule, rc.delete_rule',
+            $this->quoteString($database),
+            $this->quoteString($table)
+        );
     }
 
     /**
@@ -108,12 +198,24 @@ class CDatabase_Schema_Grammar_MySqlGrammar extends CDatabase_Schema_Grammar {
      * @return array
      */
     protected function compileCreateTable($blueprint, $command, $connection) {
-        return trim(sprintf(
+        $tableStructure = $this->getColumns($blueprint);
+
+        if ($primaryKey = $this->getCommandByName($blueprint, 'primary')) {
+            $tableStructure[] = sprintf(
+                'primary key %s(%s)',
+                $primaryKey->algorithm ? 'using ' . $primaryKey->algorithm : '',
+                $this->columnize($primaryKey->columns)
+            );
+
+            $primaryKey->shouldBeSkipped = true;
+        }
+
+        return sprintf(
             '%s table %s (%s)',
             $blueprint->temporary ? 'create temporary' : 'create',
             $this->wrapTable($blueprint),
-            implode(', ', $this->getColumns($blueprint))
-        ));
+            implode(', ', $tableStructure)
+        );
     }
 
     /**
@@ -867,8 +969,23 @@ class CDatabase_Schema_Grammar_MySqlGrammar extends CDatabase_Schema_Grammar {
      *
      * @return string
      */
-    public function typeGeometry(CBase_Fluent $column) {
-        return 'geometry';
+    protected function typeGeometry(CBase_Fluent $column) {
+        $subtype = $column->subtype ? strtolower($column->subtype) : null;
+        if (!in_array($subtype, ['point', 'linestring', 'polygon', 'geometrycollection', 'multipoint', 'multilinestring', 'multipolygon'])) {
+            $subtype = null;
+        }
+        $srid = '';
+        if ($column->srid && c::optional($this->connection)->isMaria()) {
+            $srid = ' ref_system_id=' . $column->srid;
+        } elseif ((bool) $column->srid) {
+            $srid = ' srid ' . $column->srid;
+        }
+
+        return sprintf(
+            '%s%s',
+            $subtype ?? 'geometry',
+            $srid
+        );
     }
 
     /**

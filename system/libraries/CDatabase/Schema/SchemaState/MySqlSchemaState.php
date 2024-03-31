@@ -31,10 +31,10 @@ class CDatabase_Schema_SchemaState_MySqlSchemaState extends CDatabase_Schema_Sch
      * @return void
      */
     protected function removeAutoIncrementingState(string $path) {
-        $this->files->put($path, preg_replace(
+        CFile::put($path, preg_replace(
             '/\s+AUTO_INCREMENT=[0-9]+/iu',
             '',
-            $this->files->get($path)
+            CFile::get($path)
         ));
     }
 
@@ -52,7 +52,7 @@ class CDatabase_Schema_SchemaState_MySqlSchemaState extends CDatabase_Schema_Sch
 
         ]));
 
-        $this->files->append($path, $process->getOutput());
+        CFile::append($path, $process->getOutput());
     }
 
     /**
@@ -63,12 +63,12 @@ class CDatabase_Schema_SchemaState_MySqlSchemaState extends CDatabase_Schema_Sch
      * @return void
      */
     public function load($path) {
-        $command = 'mysql ' . $this->connectionString() . ' --database="${:LARAVEL_LOAD_DATABASE}" < "${:LARAVEL_LOAD_PATH}"';
+        $command = 'mysql ' . $this->connectionString() . ' --database="${:CF_LOAD_DATABASE}" < "${:CF_LOAD_PATH}"';
 
         $process = $this->makeProcess($command)->setTimeout(null);
 
         $process->mustRun(null, array_merge($this->baseVariables($this->connection->getConfig()), [
-            'LARAVEL_LOAD_PATH' => $path,
+            'CF_LOAD_PATH' => $path,
         ]));
     }
 
@@ -80,7 +80,9 @@ class CDatabase_Schema_SchemaState_MySqlSchemaState extends CDatabase_Schema_Sch
     protected function baseDumpCommand() {
         $command = 'mysqldump ' . $this->connectionString() . ' --no-tablespaces --skip-add-locks --skip-comments --skip-set-charset --tz-utc --column-statistics=0';
 
-        if (!$this->connection->isMaria()) {
+        $connection = $this->connection;
+        /** @var CDatabase_Connection_Pdo_MySqlConnection $connection */
+        if (!$connection->isMaria()) {
             $command .= ' --set-gtid-purged=OFF';
         }
 
