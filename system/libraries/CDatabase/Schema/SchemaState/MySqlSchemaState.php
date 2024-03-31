@@ -13,9 +13,9 @@ class CDatabase_Schema_SchemaState_MySqlSchemaState extends CDatabase_Schema_Sch
      */
     public function dump(CDatabase_Connection $connection, $path) {
         $this->executeDumpProcess($this->makeProcess(
-            $this->baseDumpCommand() . ' --routines --result-file="${:LARAVEL_LOAD_PATH}" --no-data'
+            $this->baseDumpCommand() . ' --routines --result-file="${:CF_LOAD_PATH}" --no-data'
         ), $this->output, array_merge($this->baseVariables($this->connection->getConfig()), [
-            'LARAVEL_LOAD_PATH' => $path,
+            'CF_LOAD_PATH' => $path,
         ]));
 
         $this->removeAutoIncrementingState($path);
@@ -86,7 +86,7 @@ class CDatabase_Schema_SchemaState_MySqlSchemaState extends CDatabase_Schema_Sch
             $command .= ' --set-gtid-purged=OFF';
         }
 
-        return $command . ' "${:LARAVEL_LOAD_DATABASE}"';
+        return $command . ' "${:CF_LOAD_DATABASE}"';
     }
 
     /**
@@ -95,16 +95,16 @@ class CDatabase_Schema_SchemaState_MySqlSchemaState extends CDatabase_Schema_Sch
      * @return string
      */
     protected function connectionString() {
-        $value = ' --user="${:LARAVEL_LOAD_USER}" --password="${:LARAVEL_LOAD_PASSWORD}"';
+        $value = ' --user="${:CF_LOAD_USER}" --password="${:CF_LOAD_PASSWORD}"';
 
         $config = $this->connection->getConfig();
 
         $value .= $config['unix_socket'] ?? false
-                        ? ' --socket="${:LARAVEL_LOAD_SOCKET}"'
-                        : ' --host="${:LARAVEL_LOAD_HOST}" --port="${:LARAVEL_LOAD_PORT}"';
+                        ? ' --socket="${:CF_LOAD_SOCKET}"'
+                        : ' --host="${:CF_LOAD_HOST}" --port="${:CF_LOAD_PORT}"';
 
         if (isset($config['options'][\PDO::MYSQL_ATTR_SSL_CA])) {
-            $value .= ' --ssl-ca="${:LARAVEL_LOAD_SSL_CA}"';
+            $value .= ' --ssl-ca="${:CF_LOAD_SSL_CA}"';
         }
 
         return $value;
@@ -121,13 +121,13 @@ class CDatabase_Schema_SchemaState_MySqlSchemaState extends CDatabase_Schema_Sch
         $config['host'] ??= '';
 
         return [
-            'LARAVEL_LOAD_SOCKET' => $config['unix_socket'] ?? '',
-            'LARAVEL_LOAD_HOST' => is_array($config['host']) ? $config['host'][0] : $config['host'],
-            'LARAVEL_LOAD_PORT' => $config['port'] ?? '',
-            'LARAVEL_LOAD_USER' => $config['username'],
-            'LARAVEL_LOAD_PASSWORD' => $config['password'] ?? '',
-            'LARAVEL_LOAD_DATABASE' => $config['database'],
-            'LARAVEL_LOAD_SSL_CA' => $config['options'][\PDO::MYSQL_ATTR_SSL_CA] ?? '',
+            'CF_LOAD_SOCKET' => $config['unix_socket'] ?? '',
+            'CF_LOAD_HOST' => is_array($config['host']) ? $config['host'][0] : $config['host'],
+            'CF_LOAD_PORT' => $config['port'] ?? '',
+            'CF_LOAD_USER' => $config['username'],
+            'CF_LOAD_PASSWORD' => $config['password'] ?? '',
+            'CF_LOAD_DATABASE' => $config['database'],
+            'CF_LOAD_SSL_CA' => $config['options'][\PDO::MYSQL_ATTR_SSL_CA] ?? '',
         ];
     }
 
