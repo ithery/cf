@@ -23,7 +23,9 @@ class CDatabase_Schema_Builder_MongoDBBuilder extends CDatabase_Schema_Builder {
      * @return bool
      */
     public function hasCollection($name) {
-        $db = $this->connection->getMongoDB();
+        $connection = $this->connection;
+        /** @var CDatabase_Connection_MongoDBConnection $connection */
+        $db = $connection->getMongoDB();
 
         $collections = iterator_to_array($db->listCollections([
             'filter' => [
@@ -121,7 +123,9 @@ class CDatabase_Schema_Builder_MongoDBBuilder extends CDatabase_Schema_Builder {
      * @return bool|\MongoDB\Model\CollectionInfo
      */
     public function getCollection($name) {
-        $db = $this->connection->getMongoDB();
+        $connection = $this->connection;
+        /** @var CDatabase_Connection_MongoDBConnection $connection */
+        $db = $connection->getMongoDB();
 
         $collections = iterator_to_array($db->listCollections([
             'filter' => [
@@ -139,7 +143,9 @@ class CDatabase_Schema_Builder_MongoDBBuilder extends CDatabase_Schema_Builder {
      */
     protected function getAllCollections() {
         $collections = [];
-        foreach ($this->connection->getMongoDB()->listCollections() as $collection) {
+        $connection = $this->connection;
+        /** @var CDatabase_Connection_MongoDBConnection $connection */
+        foreach ($connection->getMongoDB()->listCollections() as $collection) {
             $collections[] = $collection->getName();
         }
 
