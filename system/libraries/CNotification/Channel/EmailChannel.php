@@ -7,6 +7,7 @@ class CNotification_Channel_EmailChannel extends CNotification_ChannelAbstract {
     }
 
     protected function handleMessage($data, $logNotificationModel) {
+        $mailer = carr::get($data, 'mailer');
         $to = carr::get($data, 'recipient');
         $subject = carr::get($data, 'subject');
         $message = carr::get($data, 'message');
@@ -31,8 +32,11 @@ class CNotification_Channel_EmailChannel extends CNotification_ChannelAbstract {
                 //         $senderOptions['password'] = $password;
                 //     }
                 // }
-
-                $sender = CEmail::sender($senderOptions);
+                if ($mailer) {
+                    $mailer = CEmail::mailer($mailer);
+                } else {
+                    $sender = CEmail::sender($senderOptions);
+                }
 
                 $response = $sender->send($to, $subject, $message, $options);
             } catch (Exception $ex) {
