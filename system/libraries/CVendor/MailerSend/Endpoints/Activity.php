@@ -1,19 +1,16 @@
 <?php
 
-
 use Assert\Assertion;
 
-class CVendor_MailerSend_Endpoints_Activity extends CVendor_MailerSend_Endpoints_AbstractEndpoint
-{
+class CVendor_MailerSend_Endpoints_Activity extends CVendor_MailerSend_Endpoints_AbstractEndpoint {
     protected string $endpoint = 'activity';
 
     /**
      * @throws \JsonException
-     * @throws \MailerSend\Exceptions\MailerSendAssertException
+     * @throws \CVendor_MailerSend_Exceptions_MailerSendAssertException
      * @throws \Psr\Http\Client\ClientExceptionInterface
      */
-    public function getAll(string $domainId, CVendor_MailerSend_Helpers_Builder_ActivityParams $activityParams): array
-    {
+    public function getAll(string $domainId, CVendor_MailerSend_Helpers_Builder_ActivityParams $activityParams): array {
         CVendor_MailerSend_Helpers_GeneralHelpers::assert(
             fn () => Assertion::minLength($domainId, 1, 'Domain id is required.')
         );
@@ -42,17 +39,15 @@ class CVendor_MailerSend_Endpoints_Activity extends CVendor_MailerSend_Endpoints
             );
         }
 
-
         return $this->httpLayer->get($this->url("$this->endpoint/$domainId", $activityParams->toArray()));
     }
 
     /**
      * @throws \Psr\Http\Client\ClientExceptionInterface
      * @throws \JsonException
-     * @throws \MailerSend\Exceptions\MailerSendAssertException
+     * @throws \CVendor_MailerSend_Exceptions_MailerSendAssertException
      */
-    public function find(string $activityId): array
-    {
+    public function find(string $activityId): array {
         CVendor_MailerSend_Helpers_GeneralHelpers::assert(
             fn () => Assertion::minLength($activityId, 1, 'Activity id is required.')
         );

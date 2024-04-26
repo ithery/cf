@@ -1,23 +1,20 @@
 <?php
 
-
 use Assert\Assertion;
 
-class CVendor_MailerSend_Endpoints_Analytics extends CVendor_MailerSend_Endpoints_AbstractEndpoint
-{
+class CVendor_MailerSend_Endpoints_Analytics extends CVendor_MailerSend_Endpoints_AbstractEndpoint {
     protected string $endpoint = 'analytics';
 
     /**
      * @throws \Psr\Http\Client\ClientExceptionInterface
-     * @throws \MailerSend\Exceptions\MailerSendAssertException
+     * @throws \CVendor_MailerSend_Exceptions_MailerSendAssertException
      * @throws \JsonException
      */
-    public function activityDataByDate(CVendor_MailerSend_Helpers_Builder_ActivityAnalyticsParams $activityAnalyticsParams): array
-    {
+    public function activityDataByDate(CVendor_MailerSend_Helpers_Builder_ActivityAnalyticsParams $activityAnalyticsParams): array {
         CVendor_MailerSend_Helpers_GeneralHelpers::assert(
             fn () => Assertion::notEmpty(
                 array_filter(
-                    [ $activityAnalyticsParams->getEvent()],
+                    [$activityAnalyticsParams->getEvent()],
                     fn ($v) => $v !== null && $v !== []
                 ),
                 'The event[] is a required parameter.'
@@ -47,28 +44,24 @@ class CVendor_MailerSend_Endpoints_Analytics extends CVendor_MailerSend_Endpoint
         );
     }
 
-    public function opensByCountry(CVendor_MailerSend_Helpers_Builder_OpensAnalyticsParams $opensAnalyticsParams): array
-    {
+    public function opensByCountry(CVendor_MailerSend_Helpers_Builder_OpensAnalyticsParams $opensAnalyticsParams): array {
         return $this->callOpensEndpoint("$this->endpoint/country", $opensAnalyticsParams);
     }
 
-    public function opensByUserAgentName(CVendor_MailerSend_Helpers_Builder_OpensAnalyticsParams $opensAnalyticsParams): array
-    {
+    public function opensByUserAgentName(CVendor_MailerSend_Helpers_Builder_OpensAnalyticsParams $opensAnalyticsParams): array {
         return $this->callOpensEndpoint("$this->endpoint/ua-name", $opensAnalyticsParams);
     }
 
-    public function opensByReadingEnvironment(CVendor_MailerSend_Helpers_Builder_OpensAnalyticsParams $opensAnalyticsParams): array
-    {
+    public function opensByReadingEnvironment(CVendor_MailerSend_Helpers_Builder_OpensAnalyticsParams $opensAnalyticsParams): array {
         return $this->callOpensEndpoint("$this->endpoint/ua-type", $opensAnalyticsParams);
     }
 
     /**
      * @throws \Psr\Http\Client\ClientExceptionInterface
-     * @throws \MailerSend\Exceptions\MailerSendAssertException
+     * @throws \CVendor_MailerSend_Exceptions_MailerSendAssertException
      * @throws \JsonException
      */
-    protected function callOpensEndpoint(string $path, CVendor_MailerSend_Helpers_Builder_OpensAnalyticsParams $opensAnalyticsParams): array
-    {
+    protected function callOpensEndpoint(string $path, CVendor_MailerSend_Helpers_Builder_OpensAnalyticsParams $opensAnalyticsParams): array {
         CVendor_MailerSend_Helpers_GeneralHelpers::assert(
             fn () => Assertion::greaterThan(
                 $opensAnalyticsParams->getDateTo(),

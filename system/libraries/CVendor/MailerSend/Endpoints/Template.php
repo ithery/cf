@@ -1,10 +1,8 @@
 <?php
 
-
 use Assert\Assertion;
 
-class CVendor_MailerSend_Endpoints_Template extends CVendor_MailerSend_Endpoints_AbstractEndpoint
-{
+class CVendor_MailerSend_Endpoints_Template extends CVendor_MailerSend_Endpoints_AbstractEndpoint {
     protected string $endpoint = 'templates';
 
     /**
@@ -12,15 +10,14 @@ class CVendor_MailerSend_Endpoints_Template extends CVendor_MailerSend_Endpoints
      * @throws CVendor_MailerSend_Exceptions_MailerSendAssertException
      * @throws \JsonException
      */
-    public function getAll(?string $domainId = null, ?int $page = null, ?int $limit = CVendor_MailerSend_Common_Constants::DEFAULT_LIMIT): array
-    {
+    public function getAll(?string $domainId = null, ?int $page = null, ?int $limit = CVendor_MailerSend_Common_Constants::DEFAULT_LIMIT): array {
         if ($limit) {
             CVendor_MailerSend_Helpers_GeneralHelpers::assert(
                 fn () => Assertion::range(
                     $limit,
                     CVendor_MailerSend_Common_Constants::MIN_LIMIT,
                     CVendor_MailerSend_Common_Constants::MAX_LIMIT,
-                    'Limit is supposed to be between ' . CVendor_MailerSend_Common_Constants::MIN_LIMIT . ' and ' . CVendor_MailerSend_Common_Constants::MAX_LIMIT .  '.'
+                    'Limit is supposed to be between ' . CVendor_MailerSend_Common_Constants::MIN_LIMIT . ' and ' . CVendor_MailerSend_Common_Constants::MAX_LIMIT . '.'
                 )
             );
         }
@@ -39,8 +36,7 @@ class CVendor_MailerSend_Endpoints_Template extends CVendor_MailerSend_Endpoints
      * @throws \JsonException
      * @throws CVendor_MailerSend_Exceptions_MailerSendAssertException
      */
-    public function find(string $templateId): array
-    {
+    public function find(string $templateId): array {
         CVendor_MailerSend_Helpers_GeneralHelpers::assert(
             fn () => Assertion::minLength($templateId, 1, 'Template id is required.')
         );
@@ -55,8 +51,7 @@ class CVendor_MailerSend_Endpoints_Template extends CVendor_MailerSend_Endpoints
      * @throws \JsonException
      * @throws CVendor_MailerSend_Exceptions_MailerSendAssertException
      */
-    public function delete(string $templateId): array
-    {
+    public function delete(string $templateId): array {
         CVendor_MailerSend_Helpers_GeneralHelpers::assert(
             fn () => Assertion::minLength($templateId, 1, 'Template id is required.')
         );

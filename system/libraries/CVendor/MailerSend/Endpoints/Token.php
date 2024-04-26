@@ -1,26 +1,24 @@
 <?php
 
-
 use Assert\Assertion;
 
-class CVendor_MailerSend_Endpoints_Token extends CVendor_MailerSend_Endpoints_AbstractEndpoint
-{
+class CVendor_MailerSend_Endpoints_Token extends CVendor_MailerSend_Endpoints_AbstractEndpoint {
     protected string $endpoint = 'token';
-
 
     /**
      * @param TokenParams $tokenParams
-     * @return array
+     *
      * @throws JsonException
      * @throws CVendor_MailerSend_Exceptions_MailerSendAssertException
      * @throws \Psr\Http\Client\ClientExceptionInterface
+     *
+     * @return array
      */
-    public function create(CVendor_MailerSend_Helpers_Builder_TokenParams $tokenParams): array
-    {
+    public function create(CVendor_MailerSend_Helpers_Builder_TokenParams $tokenParams): array {
         CVendor_MailerSend_Helpers_GeneralHelpers::assert(
-            fn () => Assertion::minLength($tokenParams->getName(), 1, 'Token name is required.') &&
-                Assertion::minLength($tokenParams->getDomainId(), 1, 'Token domain id is required.') &&
-                Assertion::minCount($tokenParams->getScopes(), 1, 'Token scopes are required.')
+            fn () => Assertion::minLength($tokenParams->getName(), 1, 'Token name is required.')
+                && Assertion::minLength($tokenParams->getDomainId(), 1, 'Token domain id is required.')
+                && Assertion::minCount($tokenParams->getScopes(), 1, 'Token scopes are required.')
         );
 
         return $this->httpLayer->post(
@@ -38,16 +36,17 @@ class CVendor_MailerSend_Endpoints_Token extends CVendor_MailerSend_Endpoints_Ab
     /**
      * @param string $id
      * @param string $status
-     * @return array
+     *
      * @throws \Psr\Http\Client\ClientExceptionInterface
      * @throws JsonException
      * @throws CVendor_MailerSend_Exceptions_MailerSendAssertException
+     *
+     * @return array
      */
-    public function update(string $id, string $status): array
-    {
+    public function update(string $id, string $status): array {
         CVendor_MailerSend_Helpers_GeneralHelpers::assert(
-            fn () => Assertion::notEmpty($id, 'Token id is required.') &&
-                Assertion::inArray($status, CVendor_MailerSend_Helpers_Builder_TokenParams::STATUS_ALL)
+            fn () => Assertion::notEmpty($id, 'Token id is required.')
+                && Assertion::inArray($status, CVendor_MailerSend_Helpers_Builder_TokenParams::STATUS_ALL)
         );
 
         return $this->httpLayer->put(
@@ -62,13 +61,14 @@ class CVendor_MailerSend_Endpoints_Token extends CVendor_MailerSend_Endpoints_Ab
 
     /**
      * @param string $id
-     * @return array
+     *
      * @throws \Psr\Http\Client\ClientExceptionInterface
      * @throws JsonException
      * @throws CVendor_MailerSend_Exceptions_MailerSendAssertException
+     *
+     * @return array
      */
-    public function delete(string $id): array
-    {
+    public function delete(string $id): array {
         CVendor_MailerSend_Helpers_GeneralHelpers::assert(
             fn () => Assertion::notEmpty($id, 'Token id is required.')
         );

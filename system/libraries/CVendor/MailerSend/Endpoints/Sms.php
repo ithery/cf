@@ -1,7 +1,6 @@
 <?php
 
-class CVendor_MailerSend_Endpoints_Sms extends CVendor_MailerSend_Endpoints_AbstractEndpoint
-{
+class CVendor_MailerSend_Endpoints_Sms extends CVendor_MailerSend_Endpoints_AbstractEndpoint {
     protected string $endpoint = 'sms';
 
     /**
@@ -9,8 +8,7 @@ class CVendor_MailerSend_Endpoints_Sms extends CVendor_MailerSend_Endpoints_Abst
      * @throws CVendor_MailerSend_Exceptions_MailerSendAssertException
      * @throws \Psr\Http\Client\ClientExceptionInterface
      */
-    public function send(CVendor_MailerSend_Helpers_Builder_SmsParams $params): array
-    {
+    public function send(CVendor_MailerSend_Helpers_Builder_SmsParams $params): array {
         CVendor_MailerSend_Helpers_GeneralHelpers::validateSmsParams($params);
 
         $personalization_mapped = CVendor_MailerSend_Helpers_GeneralHelpers::mapToArray($params->getPersonalization(), CVendor_MailerSend_Helpers_Builder_SmsPersonalization::class);

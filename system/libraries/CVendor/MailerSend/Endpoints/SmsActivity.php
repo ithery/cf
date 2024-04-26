@@ -1,10 +1,8 @@
 <?php
 
-
 use Assert\Assertion;
 
-class CVendor_MailerSend_Endpoints_SmsActivity extends CVendor_MailerSend_Endpoints_AbstractEndpoint
-{
+class CVendor_MailerSend_Endpoints_SmsActivity extends CVendor_MailerSend_Endpoints_AbstractEndpoint {
     protected string $endpoint = 'sms-activity';
 
     /**
@@ -12,14 +10,12 @@ class CVendor_MailerSend_Endpoints_SmsActivity extends CVendor_MailerSend_Endpoi
      * @throws CVendor_MailerSend_Exceptions_MailerSendAssertException
      * @throws \Psr\Http\Client\ClientExceptionInterface
      */
-    public function getAll(CVendor_MailerSend_Helpers_Builder_SmsActivityParams $smsActivityParams): array
-    {
+    public function getAll(CVendor_MailerSend_Helpers_Builder_SmsActivityParams $smsActivityParams): array {
         if ($smsActivityParams->getSmsNumberId()) {
             CVendor_MailerSend_Helpers_GeneralHelpers::assert(
                 fn () => Assertion::minLength($smsActivityParams->getSmsNumberId(), 1, 'Sms number id is wrong.')
             );
         }
-
 
         if ($smsActivityParams->getLimit()) {
             CVendor_MailerSend_Helpers_GeneralHelpers::assert(
