@@ -31,7 +31,6 @@ class CNotification_Channel_EmailChannel extends CNotification_ChannelAbstract {
                 //         $senderOptions['password'] = $password;
                 //     }
                 // }
-
                 $sender = CEmail::sender($senderOptions);
 
                 $response = $sender->send($to, $subject, $message, $options);

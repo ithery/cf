@@ -55,6 +55,7 @@ class CEmail_Config {
         'smtp25.elasticemail.com' => 'elasticemail',
         'smtp.postmarkapp.com' => 'postmarkapp',
         'smtp.amazonaws.com' => 'ses',
+        'smtp.mailersend.com' => 'mailersend',
     ];
 
     public function __construct($options = []) {
@@ -97,7 +98,6 @@ class CEmail_Config {
                 $newConfig['port'] = carr::get($config, 'port', carr::get($config, 'smtp_port'));
             }
         }
-
         return $newConfig;
     }
 

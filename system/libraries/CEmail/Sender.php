@@ -12,7 +12,6 @@ class CEmail_Sender {
         if (!($config instanceof CEmail_Config)) {
             $config = new CEmail_Config($config);
         }
-
         $this->driver = CEmail_Factory::createDriver($config);
     }
 
