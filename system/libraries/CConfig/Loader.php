@@ -24,7 +24,7 @@ class CConfig_Loader {
             }
             if (!is_array($cfg)) {
                 //there is an invalid format
-                throw new CException('Invalid config format in :file', [':file' => $file]);
+                throw new Exception(c::__('Invalid config format in :file', ['file' => $file]));
             }
             $items = carr::merge($items, $cfg);
         }
@@ -63,7 +63,7 @@ class CConfig_Loader {
             }
             if (!is_array($cfg)) {
                 //there is an invalid format
-                throw new CException('Invalid config format in :file', [':file' => $file]);
+                throw new Exception(c::__('Invalid config format in :file', ['file' => $file]));
             }
             $cfgFiles = $cfg;
             foreach ($cfgFiles as $key => $val) {

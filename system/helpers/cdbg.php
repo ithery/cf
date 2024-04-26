@@ -655,47 +655,7 @@ class cdbg {
     }
 
     public static function deprecated($message = '', $email = '') {
-        //run just once to make this performance good
-
-        if (self::$deprecated_has_run) {
-            return true;
-        }
-        if (!self::$deprecated_has_run) {
-            self::$deprecated_has_run = true;
-        }
-        $subject = 'CApp Deprecated on ' . CF::domain() . ' ' . date('Y-m-d H:i:s');
-
-        try {
-            throw new Exception($message);
-        } catch (Exception $ex) {
-            $body = '<p>' . $ex->getMessage() . '</p>';
-            $body .= '<br/><br/>';
-            $body .= '<h4>CApp Deprecated on trace:<h4>';
-            $body .= nl2br($ex->getTraceAsString());
-        }
-
-        $body .= '<br/><br/>';
-        $body .= 'Domain:' . CF::domain() . '<br/>';
-        $body .= 'App Code:' . CF::appCode() . '<br/>';
-        $body .= 'Org Code:' . CF::orgCode() . '<br/>';
-        $body .= 'User Agent:' . CHTTP::request()->userAgent() . '<br/>';
-        $body .= 'Remote Address:' . CHTTP::request()->ip() . '<br/>';
-        $body .= 'Browser:' . crequest::browser() . '<br/>';
-        $body .= '<br/><br/>';
-
-        try {
-            if (strlen($email) == 0) {
-                $email = 'hery@ittron.co.id';
-            }
-
-            //return CEmail::sender()->send($email, $subject, $message, []);
-        } catch (Exception $ex) {
-            if (!CF::isProduction()) {
-                throw $ex;
-            }
-        }
-
-        return true;
+        return CDebug::collector()->collectDeprecated($message);
     }
 
     /**

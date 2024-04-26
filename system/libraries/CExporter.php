@@ -270,7 +270,7 @@ class CExporter {
         $file = CTemporary::getPath('ajax', $filename);
         $disk = CTemporary::disk();
         if (!$disk->exists($file)) {
-            throw new CException('failed to get temporary file :filename', [':filename' => $file]);
+            throw new Exception(c::__('failed to get temporary file :filename', ['filename' => $file]));
         }
         $json = $disk->get($file);
 

@@ -43,12 +43,12 @@ class CElement_Component_PrismCode extends CElement_Component {
     }
 
     protected function build() {
-        $cs = CManager::clientScript();
-        $cs->registerJsFile('plugins/prism/prism.min.js');
-        $cs->registerJsFile('plugins/prism/plugins/prism-toolbar.js');
-        $cs->registerJsFile('plugins/prism/components/prism-' . $this->prismLanguage . '.js');
-        $cs->registerCssFile('plugins/prism/themes/prism-' . $this->prismTheme . '.css');
-        $cs->registerCssFile('plugins/prism/plugins/prism-toolbar.css');
+        c::manager()->registerJs('plugins/prism/prism.min.js');
+        c::manager()->registerJs('plugins/prism/prism.min.js');
+        c::manager()->registerJs('plugins/prism/plugins/prism-toolbar.js');
+        c::manager()->registerJs('plugins/prism/components/prism-' . $this->prismLanguage . '.js');
+        c::manager()->registerCss('plugins/prism/themes/prism-' . $this->prismTheme . '.css');
+        c::manager()->registerCss('plugins/prism/plugins/prism-toolbar.css');
         $this->codeElement->addClass('language-' . $this->prismLanguage);
         if ($this->isWrap) {
             $this->codeElement->customCss('white-space', 'pre-wrap');

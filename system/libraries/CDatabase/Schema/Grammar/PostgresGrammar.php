@@ -57,25 +57,120 @@ class CDatabase_Schema_Grammar_PostgresGrammar extends CDatabase_Schema_Grammar 
             $this->wrapValue($name)
         );
     }
-
     /**
-     * Compile the query to determine if a table exists.
+     * Compile the query to determine the tables.
      *
      * @return string
      */
-    public function compileTableExists() {
-        return "select * from information_schema.tables where table_catalog = ? and table_schema = ? and table_name = ? and table_type = 'BASE TABLE'";
+    public function compileTables()
+    {
+        return 'select c.relname as name, n.nspname as schema, pg_total_relation_size(c.oid) as size, '
+            ."obj_description(c.oid, 'pg_class') as comment from pg_class c, pg_namespace n "
+            ."where c.relkind in ('r', 'p') and n.oid = c.relnamespace and n.nspname not in ('pg_catalog', 'information_schema') "
+            .'order by c.relname';
     }
-
     /**
-     * Compile the query to determine the list of columns.
+     * Compile the query to determine the views.
      *
      * @return string
      */
-    public function compileColumnListing() {
-        return 'select column_name from information_schema.columns where table_catalog = ? and table_schema = ? and table_name = ?';
+    public function compileViews() {
+        return "select viewname as name, schemaname as schema, definition from pg_views where schemaname not in ('pg_catalog', 'information_schema') order by viewname";
     }
 
+    /**
+     * Compile the query to determine the user-defined types.
+     *
+     * @return string
+     */
+    public function compileTypes() {
+        return 'select t.typname as name, n.nspname as schema, t.typtype as type, t.typcategory as category, '
+            ."((t.typinput = 'array_in'::regproc and t.typoutput = 'array_out'::regproc) or t.typtype = 'm') as implicit "
+            .'from pg_type t join pg_namespace n on n.oid = t.typnamespace '
+            .'left join pg_class c on c.oid = t.typrelid '
+            .'left join pg_type el on el.oid = t.typelem '
+            .'left join pg_class ce on ce.oid = el.typrelid '
+            ."where ((t.typrelid = 0 and (ce.relkind = 'c' or ce.relkind is null)) or c.relkind = 'c') "
+            ."and not exists (select 1 from pg_depend d where d.objid in (t.oid, t.typelem) and d.deptype = 'e') "
+            ."and n.nspname not in ('pg_catalog', 'information_schema')";
+    }
+
+    /**
+     * Compile the query to determine the columns.
+     *
+     * @param  string  $schema
+     * @param  string  $table
+     * @return string
+     */
+    public function compileColumns($schema, $table)
+    {
+        return sprintf(
+            'select a.attname as name, t.typname as type_name, format_type(a.atttypid, a.atttypmod) as type, '
+            .'(select tc.collcollate from pg_catalog.pg_collation tc where tc.oid = a.attcollation) as collation, '
+            .'not a.attnotnull as nullable, '
+            .'(select pg_get_expr(adbin, adrelid) from pg_attrdef where c.oid = pg_attrdef.adrelid and pg_attrdef.adnum = a.attnum) as default, '
+            .(version_compare(c::optional($this->connection)->getServerVersion(), '12.0', '<') ? "'' as generated, " : 'a.attgenerated as generated, ')
+            .'col_description(c.oid, a.attnum) as comment '
+            .'from pg_attribute a, pg_class c, pg_type t, pg_namespace n '
+            .'where c.relname = %s and n.nspname = %s and a.attnum > 0 and a.attrelid = c.oid and a.atttypid = t.oid and n.oid = c.relnamespace '
+            .'order by a.attnum',
+            $this->quoteString($table),
+            $this->quoteString($schema)
+        );
+    }
+
+    /**
+     * Compile the query to determine the indexes.
+     *
+     * @param  string  $schema
+     * @param  string  $table
+     * @return string
+     */
+    public function compileIndexes($schema, $table) {
+        return sprintf(
+            "select ic.relname as name, string_agg(a.attname, ',' order by indseq.ord) as columns, "
+            .'am.amname as "type", i.indisunique as "unique", i.indisprimary as "primary" '
+            .'from pg_index i '
+            .'join pg_class tc on tc.oid = i.indrelid '
+            .'join pg_namespace tn on tn.oid = tc.relnamespace '
+            .'join pg_class ic on ic.oid = i.indexrelid '
+            .'join pg_am am on am.oid = ic.relam '
+            .'join lateral unnest(i.indkey) with ordinality as indseq(num, ord) on true '
+            .'left join pg_attribute a on a.attrelid = i.indrelid and a.attnum = indseq.num '
+            .'where tc.relname = %s and tn.nspname = %s '
+            .'group by ic.relname, am.amname, i.indisunique, i.indisprimary',
+            $this->quoteString($table),
+            $this->quoteString($schema)
+        );
+    }
+    /**
+     * Compile the query to determine the foreign keys.
+     *
+     * @param  string  $schema
+     * @param  string  $table
+     * @return string
+     */
+    public function compileForeignKeys($schema, $table) {
+        return sprintf(
+            'select c.conname as name, '
+            ."string_agg(la.attname, ',' order by conseq.ord) as columns, "
+            .'fn.nspname as foreign_schema, fc.relname as foreign_table, '
+            ."string_agg(fa.attname, ',' order by conseq.ord) as foreign_columns, "
+            .'c.confupdtype as on_update, c.confdeltype as on_delete '
+            .'from pg_constraint c '
+            .'join pg_class tc on c.conrelid = tc.oid '
+            .'join pg_namespace tn on tn.oid = tc.relnamespace '
+            .'join pg_class fc on c.confrelid = fc.oid '
+            .'join pg_namespace fn on fn.oid = fc.relnamespace '
+            .'join lateral unnest(c.conkey) with ordinality as conseq(num, ord) on true '
+            .'join pg_attribute la on la.attrelid = c.conrelid and la.attnum = conseq.num '
+            .'join pg_attribute fa on fa.attrelid = c.confrelid and fa.attnum = c.confkey[conseq.ord] '
+            ."where c.contype = 'f' and tc.relname = %s and tn.nspname = %s "
+            .'group by c.conname, fn.nspname, fc.relname, c.confupdtype, c.confdeltype',
+            $this->quoteString($table),
+            $this->quoteString($schema)
+        );
+    }
     /**
      * Compile a create table command.
      *
@@ -91,7 +186,6 @@ class CDatabase_Schema_Grammar_PostgresGrammar extends CDatabase_Schema_Grammar 
             implode(', ', $this->getColumns($blueprint))
         );
     }
-
     /**
      * Compile a column addition command.
      *
@@ -927,117 +1021,33 @@ class CDatabase_Schema_Grammar_PostgresGrammar extends CDatabase_Schema_Grammar 
      * @param  \CBase_Fluent  $column
      * @return string
      */
-    protected function typeGeometry(CBase_Fluent $column)
-    {
-        return $this->formatPostGisType('geometry', $column);
-    }
-
-    /**
-     * Create the column definition for a spatial Point type.
-     *
-     * @param  \CBase_Fluent  $column
-     * @return string
-     */
-    protected function typePoint(CBase_Fluent $column)
-    {
-        return $this->formatPostGisType('point', $column);
-    }
-
-    /**
-     * Create the column definition for a spatial LineString type.
-     *
-     * @param  \CBase_Fluent  $column
-     * @return string
-     */
-    protected function typeLineString(CBase_Fluent $column)
-    {
-        return $this->formatPostGisType('linestring', $column);
-    }
-
-    /**
-     * Create the column definition for a spatial Polygon type.
-     *
-     * @param  \CBase_Fluent  $column
-     * @return string
-     */
-    protected function typePolygon(CBase_Fluent $column)
-    {
-        return $this->formatPostGisType('polygon', $column);
-    }
-
-    /**
-     * Create the column definition for a spatial GeometryCollection type.
-     *
-     * @param  \CBase_Fluent  $column
-     * @return string
-     */
-    protected function typeGeometryCollection(CBase_Fluent $column)
-    {
-        return $this->formatPostGisType('geometrycollection', $column);
-    }
-
-    /**
-     * Create the column definition for a spatial MultiPoint type.
-     *
-     * @param  \CBase_Fluent  $column
-     * @return string
-     */
-    protected function typeMultiPoint(CBase_Fluent $column)
-    {
-        return $this->formatPostGisType('multipoint', $column);
-    }
-
-    /**
-     * Create the column definition for a spatial MultiLineString type.
-     *
-     * @param  \CBase_Fluent  $column
-     * @return string
-     */
-    public function typeMultiLineString(CBase_Fluent $column)
-    {
-        return $this->formatPostGisType('multilinestring', $column);
-    }
-
-    /**
-     * Create the column definition for a spatial MultiPolygon type.
-     *
-     * @param  \CBase_Fluent  $column
-     * @return string
-     */
-    protected function typeMultiPolygon(CBase_Fluent $column)
-    {
-        return $this->formatPostGisType('multipolygon', $column);
-    }
-
-    /**
-     * Create the column definition for a spatial MultiPolygonZ type.
-     *
-     * @param  \CBase_Fluent  $column
-     * @return string
-     */
-    protected function typeMultiPolygonZ(CBase_Fluent $column)
-    {
-        return $this->formatPostGisType('multipolygonz', $column);
-    }
-
-    /**
-     * Format the column definition for a PostGIS spatial type.
-     *
-     * @param  string  $type
-     * @param  \CBase_Fluent  $column
-     * @return string
-     */
-    private function formatPostGisType($type, CBase_Fluent $column)
-    {
-        if ($column->isGeometry === null) {
-            return sprintf('geography(%s, %s)', $type, $column->projection ?? '4326');
+    protected function typeGeometry(CBase_Fluent $column) {
+        if ($column->subtype) {
+            return sprintf(
+                'geometry(%s%s)',
+                strtolower($column->subtype),
+                $column->srid ? ','.$column->srid : ''
+            );
         }
 
-        if ($column->projection !== null) {
-            return sprintf('geometry(%s, %s)', $type, $column->projection);
+        return 'geometry';
+    }
+    /**
+     * Create the column definition for a spatial Geography type.
+     *
+     * @param  \CBase_Fluent  $column
+     * @return string
+     */
+    protected function typeGeography(CBase_Fluent $column) {
+        if ($column->subtype) {
+            return sprintf(
+                'geography(%s%s)',
+                strtolower($column->subtype),
+                $column->srid ? ','.$column->srid : ''
+            );
         }
 
-        return "geometry({$type})";
+        return 'geography';
     }
 
     /**

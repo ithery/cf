@@ -14,13 +14,13 @@ class CConfig implements CInterface_Arrayable, ArrayAccess {
     /**
      * @param string $group
      *
-     * @throws CException
+     * @throws Exception
      *
      * @return CConfig
      */
     public static function &instance($group = 'app') {
         if (!is_string($group)) {
-            throw new CException('Config group must be a string');
+            throw new Exception('Config group must be a string');
         }
         if (!isset(CConfig::$instances[$group])) {
             // Create a new instance

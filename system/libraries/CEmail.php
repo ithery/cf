@@ -14,6 +14,7 @@ class CEmail {
      * @return CEmail_Sender
      */
     public static function sender(array $config = []) {
+
         return new CEmail_Sender($config);
     }
 

@@ -69,6 +69,102 @@ class CDatabase_Query_Grammar_MySqlGrammar extends CDatabase_Query_Grammar {
     }
 
     /**
+     * Compile the index hints for the query.
+     *
+     * @param CDatabase_Query_Builder   $query
+     * @param CDatabase_Query_IndexHint $indexHint
+     *
+     * @return string
+     */
+    protected function compileIndexHint(CDatabase_Query_Builder $query, $indexHint) {
+        if ($indexHint->type == 'hint') {
+            return "use index ({$indexHint->index})";
+        }
+        if ($indexHint->type == 'force') {
+            return "force index ({$indexHint->index})";
+        }
+
+        return "ignore index ({$indexHint->index})";
+    }
+
+    /**
+     * Compile a group limit clause.
+     *
+     * @param \CDatabase_Query_Builder $query
+     *
+     * @return string
+     */
+    protected function compileGroupLimit(CDatabase_Query_Builder $query) {
+        return $this->useLegacyGroupLimit($query)
+            ? $this->compileLegacyGroupLimit($query)
+            : parent::compileGroupLimit($query);
+    }
+
+    /**
+     * Determine whether to use a legacy group limit clause for MySQL < 8.0.
+     *
+     * @param \CDatabase_Query_Builder $query
+     *
+     * @return bool
+     */
+    public function useLegacyGroupLimit(CDatabase_Query_Builder $query) {
+        $version = $query->getConnection()->getServerVersion();
+        $connection = $query->getConnection();
+        /** @var CDatabase_Connection_Pdo_MySqlConnection $connection */
+        return !$connection->isMaria() && version_compare($version, '8.0.11') < 0;
+    }
+
+    /**
+     * Compile a group limit clause for MySQL < 8.0.
+     *
+     * Derived from https://softonsofa.com/tweaking-eloquent-relations-how-to-get-n-related-models-per-parent/.
+     *
+     * @param \CDatabase_Query_Builder $query
+     *
+     * @return string
+     */
+    protected function compileLegacyGroupLimit(CDatabase_Query_Builder $query) {
+        $limit = (int) $query->groupLimit['value'];
+        $offset = $query->offset;
+
+        if (isset($offset)) {
+            $offset = (int) $offset;
+            $limit += $offset;
+
+            $query->offset = null;
+        }
+
+        $column = c::last(explode('.', $query->groupLimit['column']));
+        $column = $this->wrap($column);
+
+        $partition = ', @cf_row := if(@cf_group = ' . $column . ', @cf_row + 1, 1) as `cf_row`';
+        $partition .= ', @cf_group := ' . $column;
+
+        $orders = (array) $query->orders;
+
+        array_unshift($orders, [
+            'column' => $query->groupLimit['column'],
+            'direction' => 'asc',
+        ]);
+
+        $query->orders = $orders;
+
+        $components = $this->compileComponents($query);
+
+        $sql = $this->concatenate($components);
+
+        $from = '(select @cf_row := 0, @cf_group := 0) as `cf_vars`, (' . $sql . ') as `cf_table`';
+
+        $sql = 'select `cf_table`.*' . $partition . ' from ' . $from . ' having `cf_row` <= ' . $limit;
+
+        if (isset($offset)) {
+            $sql .= ' and `cf_row` > ' . $offset;
+        }
+
+        return $sql . ' order by `cf_row`';
+    }
+
+    /**
      * Compile an insert ignore statement into SQL.
      *
      * @param \CDatabase_Query_Builder $query
@@ -190,6 +286,18 @@ class CDatabase_Query_Grammar_MySqlGrammar extends CDatabase_Query_Grammar {
         })->implode(', ');
 
         return $sql . $columns;
+    }
+
+    /**
+     * Compile a "lateral join" clause.
+     *
+     * @param \CDatabase_Query_JoinLateralClause $join
+     * @param string                             $expression
+     *
+     * @return string
+     */
+    public function compileJoinLateral(CDatabase_Query_JoinLateralClause $join, $expression) {
+        return trim("{$join->type} join lateral {$expression} on true");
     }
 
     /**

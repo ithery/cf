@@ -109,6 +109,7 @@ return [
     ],
     'classes' => [
         'base' => CApp_Base::class,
+        'exception_handler' => CException_ExceptionHandler::class,
     ],
     'javascript' => [
         'minify' => false,

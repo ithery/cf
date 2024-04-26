@@ -8,5 +8,5 @@ defined('SYSPATH') or die('No direct access allowed.');
  *
  * @since Jun 15, 2018, 3:08:56 PM
  */
-class CServer_Exception extends CException {
+class CServer_Exception extends Exception {
 }

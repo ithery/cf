@@ -2,6 +2,7 @@
 
 class CHandler extends CObject {
     use CTrait_Compat_Handler;
+
     const TYPE_REMOVE = 'remove';
 
     const TYPE_RELOAD = 'reload';
@@ -33,7 +34,7 @@ class CHandler extends CObject {
             require_once dirname(__FILE__) . '/drivers/CHandler' . EXT;
         }
         if (!file_exists($driver_file)) {
-            throw new CException('core.driver_not_found', $this->name, get_class($this));
+            throw new Exception(c::__('core.driver_not_found', ['driver' => $this->name, 'library' => get_class($this)]));
         } else {
             if (!class_exists($driver)) {
                 require_once $driver_file;

@@ -202,7 +202,7 @@ class CManager_Asset_Module {
     }
 
     /**
-     * @return CClientModules
+     * @return CManager_Asset_Module
      */
     public static function instance() {
         if (self::$instance == null) {

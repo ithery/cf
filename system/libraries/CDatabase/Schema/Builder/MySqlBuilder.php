@@ -28,37 +28,90 @@ class CDatabase_Schema_Builder_MySqlBuilder extends CDatabase_Schema_Builder {
     }
 
     /**
-     * Determine if the given table exists.
+     * Get the tables for the database.
      *
-     * @param string $table
-     *
-     * @return bool
+     * @return array
      */
-    public function hasTable($table) {
-        $table = $this->connection->getTablePrefix() . $table;
-
-        return count($this->connection->selectFromWriteConnection(
-            $this->grammar->compileTableExists(),
-            [$this->connection->getDatabaseName(), $table]
-        )) > 0;
+    public function getTables() {
+        $grammar = $this->grammar;
+        /** @var CDatabase_Schema_Grammar_MySqlGrammar $grammar */
+        return $this->connection->getPostProcessor()->processTables(
+            $this->connection->selectFromWriteConnection(
+                $grammar->compileTables($this->connection->getDatabaseName())
+            )
+        );
     }
 
     /**
-     * Get the column listing for a given table.
+     * Get the views for the database.
+     *
+     * @return array
+     */
+    public function getViews() {
+        $grammar = $this->grammar;
+        /** @var CDatabase_Schema_Grammar_MySqlGrammar $grammar */
+        return $this->connection->getPostProcessor()->processViews(
+            $this->connection->selectFromWriteConnection(
+                $grammar->compileViews($this->connection->getDatabaseName())
+            )
+        );
+    }
+
+    /**
+     * Get the columns for a given table.
      *
      * @param string $table
      *
      * @return array
      */
-    public function getColumnListing($table) {
+    public function getColumns($table) {
+        $grammar = $this->grammar;
+        /** @var CDatabase_Schema_Grammar_MySqlGrammar $grammar */
         $table = $this->connection->getTablePrefix() . $table;
 
         $results = $this->connection->selectFromWriteConnection(
-            $this->grammar->compileColumnListing(),
-            [$this->connection->getDatabaseName(), $table]
+            $grammar->compileColumns($this->connection->getDatabaseName(), $table)
         );
 
-        return $this->connection->getPostProcessor()->processColumnListing($results);
+        return $this->connection->getPostProcessor()->processColumns($results);
+    }
+
+    /**
+     * Get the indexes for a given table.
+     *
+     * @param string $table
+     *
+     * @return array
+     */
+    public function getIndexes($table) {
+        $grammar = $this->grammar;
+        /** @var CDatabase_Schema_Grammar_MySqlGrammar $grammar */
+        $table = $this->connection->getTablePrefix() . $table;
+
+        return $this->connection->getPostProcessor()->processIndexes(
+            $this->connection->selectFromWriteConnection(
+                $grammar->compileIndexes($this->connection->getDatabaseName(), $table)
+            )
+        );
+    }
+
+    /**
+     * Get the foreign keys for a given table.
+     *
+     * @param string $table
+     *
+     * @return array
+     */
+    public function getForeignKeys($table) {
+        $grammar = $this->grammar;
+        /** @var CDatabase_Schema_Grammar_MySqlGrammar $grammar */
+        $table = $this->connection->getTablePrefix() . $table;
+
+        return $this->connection->getPostProcessor()->processForeignKeys(
+            $this->connection->selectFromWriteConnection(
+                $grammar->compileForeignKeys($this->connection->getDatabaseName(), $table)
+            )
+        );
     }
 
     /**
@@ -80,9 +133,10 @@ class CDatabase_Schema_Builder_MySqlBuilder extends CDatabase_Schema_Builder {
         }
 
         $this->disableForeignKeyConstraints();
-
+        $grammar = $this->grammar;
+        /** @var CDatabase_Schema_Grammar_MySqlGrammar $grammar */
         $this->connection->statement(
-            $this->grammar->compileDropAllTables($tables)
+            $grammar->compileDropAllTables($tables)
         );
 
         $this->enableForeignKeyConstraints();
@@ -105,9 +159,10 @@ class CDatabase_Schema_Builder_MySqlBuilder extends CDatabase_Schema_Builder {
         if (empty($views)) {
             return;
         }
-
+        $grammar = $this->grammar;
+        /** @var CDatabase_Schema_Grammar_MySqlGrammar $grammar */
         $this->connection->statement(
-            $this->grammar->compileDropAllViews($views)
+            $grammar->compileDropAllViews($views)
         );
     }
 
@@ -117,8 +172,10 @@ class CDatabase_Schema_Builder_MySqlBuilder extends CDatabase_Schema_Builder {
      * @return array
      */
     public function getAllTables() {
+        $grammar = $this->grammar;
+        /** @var CDatabase_Schema_Grammar_MySqlGrammar $grammar */
         return $this->connection->select(
-            $this->grammar->compileGetAllTables()
+            $grammar->compileGetAllTables()
         );
     }
 
@@ -128,8 +185,10 @@ class CDatabase_Schema_Builder_MySqlBuilder extends CDatabase_Schema_Builder {
      * @return array
      */
     public function getAllViews() {
+        $grammar = $this->grammar;
+        /** @var CDatabase_Schema_Grammar_MySqlGrammar $grammar */
         return $this->connection->select(
-            $this->grammar->compileGetAllViews()
+            $grammar->compileGetAllViews()
         );
     }
 }

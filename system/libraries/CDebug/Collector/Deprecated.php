@@ -3,6 +3,7 @@
 class CDebug_Collector_Deprecated extends CDebug_Collector_Exception {
     /**
      * @param string $message
+     *
      * @return void
      */
     public function collect($message = '') {

@@ -105,6 +105,9 @@ class CAjax_Engine_DataTable_Processor_DataProvider extends CAjax_Engine_DataTab
             if ($callback instanceof \Opis\Closure\SerializableClosure) {
                 return $callback->__invoke(...$args);
             }
+            if ($callback instanceof \CFunction_SerializableClosure) {
+                return $callback->__invoke(...$args);
+            }
 
             throw new Exception('callback is not callable on ' . __CLASS__);
         };

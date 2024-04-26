@@ -233,7 +233,7 @@ HTML;
     /**
      * Render the html of this.
      *
-     * @throws CException
+     * @throws Exception
      * @throws CApp_Exception
      *
      * @return string

@@ -45,6 +45,17 @@ class CDatabase_Query_Grammar extends CDatabase_Grammar {
         if (($query->unions || $query->havings) && $query->aggregate) {
             return $this->compileUnionAggregate($query);
         }
+        // If a "group limit" is in place, we will need to compile the SQL to use a
+        // different syntax. This primarily supports limits on eager loads using
+        // Eloquent. We'll also set the columns if they have not been defined.
+        if (isset($query->groupLimit)) {
+            if (is_null($query->columns)) {
+                $query->columns = ['*'];
+            }
+
+            return $this->compileGroupLimit($query);
+        }
+
         // If the query does not have any columns set, we'll set the columns to the
         // * character to just get all of the columns from the database. Then we
         // can build the query and concatenate all the pieces together as one.
@@ -888,6 +899,66 @@ class CDatabase_Query_Grammar extends CDatabase_Grammar {
      */
     protected function compileLimit(CDatabase_Query_Builder $query, $limit) {
         return 'limit ' . (int) $limit;
+    }
+
+    /**
+     * Compile a group limit clause.
+     *
+     * @param \CDatabase_Query_Builder $query
+     *
+     * @return string
+     */
+    protected function compileGroupLimit(CDatabase_Query_Builder $query) {
+        $selectBindings = array_merge($query->getRawBindings()['select'], $query->getRawBindings()['order']);
+
+        $query->setBindings($selectBindings, 'select');
+        $query->setBindings([], 'order');
+
+        $limit = (int) $query->groupLimit['value'];
+        $offset = $query->offset;
+
+        if (isset($offset)) {
+            $offset = (int) $offset;
+            $limit += $offset;
+
+            $query->offset = null;
+        }
+
+        $components = $this->compileComponents($query);
+
+        $components['columns'] .= $this->compileRowNumber(
+            $query->groupLimit['column'],
+            $components['orders'] ?? ''
+        );
+
+        unset($components['orders']);
+
+        $table = $this->wrap('cf_table');
+        $row = $this->wrap('cf_row');
+
+        $sql = $this->concatenate($components);
+
+        $sql = 'select * from (' . $sql . ') as ' . $table . ' where ' . $row . ' <= ' . $limit;
+
+        if (isset($offset)) {
+            $sql .= ' and ' . $row . ' > ' . $offset;
+        }
+
+        return $sql . ' order by ' . $row;
+    }
+
+    /**
+     * Compile a row number clause.
+     *
+     * @param string $partition
+     * @param string $orders
+     *
+     * @return string
+     */
+    protected function compileRowNumber($partition, $orders) {
+        $over = trim('partition by ' . $this->wrap($partition) . ' ' . $orders);
+
+        return ', row_number() over (' . $over . ') as ' . $this->wrap('cf_row');
     }
 
     /**

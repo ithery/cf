@@ -17,7 +17,7 @@ class CDatabase_Schema_SchemaState_PostgresSchemaState extends CDatabase_Schema_
 
         $commands->map(function ($command, $path) {
             $this->makeProcess($command)->mustRun($this->output, array_merge($this->baseVariables($this->connection->getConfig()), [
-                'LARAVEL_LOAD_PATH' => $path,
+                'CF_LOAD_PATH' => $path,
             ]));
         });
     }
@@ -30,16 +30,16 @@ class CDatabase_Schema_SchemaState_PostgresSchemaState extends CDatabase_Schema_
      * @return void
      */
     public function load($path) {
-        $command = 'pg_restore --no-owner --no-acl --clean --if-exists --host="${:LARAVEL_LOAD_HOST}" --port="${:LARAVEL_LOAD_PORT}" --username="${:LARAVEL_LOAD_USER}" --dbname="${:LARAVEL_LOAD_DATABASE}" "${:LARAVEL_LOAD_PATH}"';
+        $command = 'pg_restore --no-owner --no-acl --clean --if-exists --host="${:CF_LOAD_HOST}" --port="${:CF_LOAD_PORT}" --username="${:CF_LOAD_USER}" --dbname="${:CF_LOAD_DATABASE}" "${:CF_LOAD_PATH}"';
 
         if (str_ends_with($path, '.sql')) {
-            $command = 'psql --file="${:LARAVEL_LOAD_PATH}" --host="${:LARAVEL_LOAD_HOST}" --port="${:LARAVEL_LOAD_PORT}" --username="${:LARAVEL_LOAD_USER}" --dbname="${:LARAVEL_LOAD_DATABASE}"';
+            $command = 'psql --file="${:CF_LOAD_PATH}" --host="${:CF_LOAD_HOST}" --port="${:CF_LOAD_PORT}" --username="${:CF_LOAD_USER}" --dbname="${:CF_LOAD_DATABASE}"';
         }
 
         $process = $this->makeProcess($command);
 
         $process->mustRun(null, array_merge($this->baseVariables($this->connection->getConfig()), [
-            'LARAVEL_LOAD_PATH' => $path,
+            'CF_LOAD_PATH' => $path,
         ]));
     }
 
@@ -49,7 +49,7 @@ class CDatabase_Schema_SchemaState_PostgresSchemaState extends CDatabase_Schema_
      * @return string
      */
     protected function baseDumpCommand() {
-        return 'pg_dump --no-owner --no-acl --host="${:LARAVEL_LOAD_HOST}" --port="${:LARAVEL_LOAD_PORT}" --username="${:LARAVEL_LOAD_USER}" --dbname="${:LARAVEL_LOAD_DATABASE}"';
+        return 'pg_dump --no-owner --no-acl --host="${:CF_LOAD_HOST}" --port="${:CF_LOAD_PORT}" --username="${:CF_LOAD_USER}" --dbname="${:CF_LOAD_DATABASE}"';
     }
 
     /**
@@ -65,11 +65,11 @@ class CDatabase_Schema_SchemaState_PostgresSchemaState extends CDatabase_Schema_
         }
 
         return [
-            'LARAVEL_LOAD_HOST' => is_array($config['host']) ? $config['host'][0] : $config['host'],
-            'LARAVEL_LOAD_PORT' => $config['port'],
-            'LARAVEL_LOAD_USER' => $config['username'],
+            'CF_LOAD_HOST' => is_array($config['host']) ? $config['host'][0] : $config['host'],
+            'CF_LOAD_PORT' => $config['port'],
+            'CF_LOAD_USER' => $config['username'],
             'PGPASSWORD' => $config['password'],
-            'LARAVEL_LOAD_DATABASE' => $config['database'],
+            'CF_LOAD_DATABASE' => $config['database'],
         ];
     }
 }

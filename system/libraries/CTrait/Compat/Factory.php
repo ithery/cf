@@ -65,4 +65,26 @@ trait CTrait_Compat_Factory {
     public static function create_row($id = '') {
         return static::createTableRow($id);
     }
+
+    /**
+     * @param string $id
+     *
+     * @deprecated since version 1.7, please use createDiv
+     *
+     * @return CElement_Element_Div
+     */
+    public static function create_div($id = '') {
+        return self::createDiv($id);
+    }
+
+    /**
+     * @param string $id
+     *
+     * @deprecated since version 1.7, please use createAction
+     *
+     * @return CElement_Component_Action
+     */
+    public static function create_action($id = '') {
+        return self::createAction($id);
+    }
 }

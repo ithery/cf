@@ -13,9 +13,9 @@ class CDatabase_Schema_SchemaState_MySqlSchemaState extends CDatabase_Schema_Sch
      */
     public function dump(CDatabase_Connection $connection, $path) {
         $this->executeDumpProcess($this->makeProcess(
-            $this->baseDumpCommand() . ' --routines --result-file="${:LARAVEL_LOAD_PATH}" --no-data'
+            $this->baseDumpCommand() . ' --routines --result-file="${:CF_LOAD_PATH}" --no-data'
         ), $this->output, array_merge($this->baseVariables($this->connection->getConfig()), [
-            'LARAVEL_LOAD_PATH' => $path,
+            'CF_LOAD_PATH' => $path,
         ]));
 
         $this->removeAutoIncrementingState($path);
@@ -31,10 +31,10 @@ class CDatabase_Schema_SchemaState_MySqlSchemaState extends CDatabase_Schema_Sch
      * @return void
      */
     protected function removeAutoIncrementingState(string $path) {
-        $this->files->put($path, preg_replace(
+        CFile::put($path, preg_replace(
             '/\s+AUTO_INCREMENT=[0-9]+/iu',
             '',
-            $this->files->get($path)
+            CFile::get($path)
         ));
     }
 
@@ -52,7 +52,7 @@ class CDatabase_Schema_SchemaState_MySqlSchemaState extends CDatabase_Schema_Sch
 
         ]));
 
-        $this->files->append($path, $process->getOutput());
+        CFile::append($path, $process->getOutput());
     }
 
     /**
@@ -63,12 +63,12 @@ class CDatabase_Schema_SchemaState_MySqlSchemaState extends CDatabase_Schema_Sch
      * @return void
      */
     public function load($path) {
-        $command = 'mysql ' . $this->connectionString() . ' --database="${:LARAVEL_LOAD_DATABASE}" < "${:LARAVEL_LOAD_PATH}"';
+        $command = 'mysql ' . $this->connectionString() . ' --database="${:CF_LOAD_DATABASE}" < "${:CF_LOAD_PATH}"';
 
         $process = $this->makeProcess($command)->setTimeout(null);
 
         $process->mustRun(null, array_merge($this->baseVariables($this->connection->getConfig()), [
-            'LARAVEL_LOAD_PATH' => $path,
+            'CF_LOAD_PATH' => $path,
         ]));
     }
 
@@ -80,11 +80,13 @@ class CDatabase_Schema_SchemaState_MySqlSchemaState extends CDatabase_Schema_Sch
     protected function baseDumpCommand() {
         $command = 'mysqldump ' . $this->connectionString() . ' --no-tablespaces --skip-add-locks --skip-comments --skip-set-charset --tz-utc --column-statistics=0';
 
-        if (!$this->connection->isMaria()) {
+        $connection = $this->connection;
+        /** @var CDatabase_Connection_Pdo_MySqlConnection $connection */
+        if (!$connection->isMaria()) {
             $command .= ' --set-gtid-purged=OFF';
         }
 
-        return $command . ' "${:LARAVEL_LOAD_DATABASE}"';
+        return $command . ' "${:CF_LOAD_DATABASE}"';
     }
 
     /**
@@ -93,16 +95,16 @@ class CDatabase_Schema_SchemaState_MySqlSchemaState extends CDatabase_Schema_Sch
      * @return string
      */
     protected function connectionString() {
-        $value = ' --user="${:LARAVEL_LOAD_USER}" --password="${:LARAVEL_LOAD_PASSWORD}"';
+        $value = ' --user="${:CF_LOAD_USER}" --password="${:CF_LOAD_PASSWORD}"';
 
         $config = $this->connection->getConfig();
 
         $value .= $config['unix_socket'] ?? false
-                        ? ' --socket="${:LARAVEL_LOAD_SOCKET}"'
-                        : ' --host="${:LARAVEL_LOAD_HOST}" --port="${:LARAVEL_LOAD_PORT}"';
+                        ? ' --socket="${:CF_LOAD_SOCKET}"'
+                        : ' --host="${:CF_LOAD_HOST}" --port="${:CF_LOAD_PORT}"';
 
         if (isset($config['options'][\PDO::MYSQL_ATTR_SSL_CA])) {
-            $value .= ' --ssl-ca="${:LARAVEL_LOAD_SSL_CA}"';
+            $value .= ' --ssl-ca="${:CF_LOAD_SSL_CA}"';
         }
 
         return $value;
@@ -119,13 +121,13 @@ class CDatabase_Schema_SchemaState_MySqlSchemaState extends CDatabase_Schema_Sch
         $config['host'] ??= '';
 
         return [
-            'LARAVEL_LOAD_SOCKET' => $config['unix_socket'] ?? '',
-            'LARAVEL_LOAD_HOST' => is_array($config['host']) ? $config['host'][0] : $config['host'],
-            'LARAVEL_LOAD_PORT' => $config['port'] ?? '',
-            'LARAVEL_LOAD_USER' => $config['username'],
-            'LARAVEL_LOAD_PASSWORD' => $config['password'] ?? '',
-            'LARAVEL_LOAD_DATABASE' => $config['database'],
-            'LARAVEL_LOAD_SSL_CA' => $config['options'][\PDO::MYSQL_ATTR_SSL_CA] ?? '',
+            'CF_LOAD_SOCKET' => $config['unix_socket'] ?? '',
+            'CF_LOAD_HOST' => is_array($config['host']) ? $config['host'][0] : $config['host'],
+            'CF_LOAD_PORT' => $config['port'] ?? '',
+            'CF_LOAD_USER' => $config['username'],
+            'CF_LOAD_PASSWORD' => $config['password'] ?? '',
+            'CF_LOAD_DATABASE' => $config['database'],
+            'CF_LOAD_SSL_CA' => $config['options'][\PDO::MYSQL_ATTR_SSL_CA] ?? '',
         ];
     }
 

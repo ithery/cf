@@ -62,10 +62,10 @@ class CDatabase_Schema_SchemaState_SqliteSchemaState extends CDatabase_Schema_Sc
             return;
         }
 
-        $process = $this->makeProcess($this->baseCommand() . ' < "${:LARAVEL_LOAD_PATH}"');
+        $process = $this->makeProcess($this->baseCommand() . ' < "${:CF_LOAD_PATH}"');
 
         $process->mustRun(null, array_merge($this->baseVariables($this->connection->getConfig()), [
-            'LARAVEL_LOAD_PATH' => $path,
+            'CF_LOAD_PATH' => $path,
         ]));
     }
 
@@ -75,7 +75,7 @@ class CDatabase_Schema_SchemaState_SqliteSchemaState extends CDatabase_Schema_Sc
      * @return string
      */
     protected function baseCommand() {
-        return 'sqlite3 "${:LARAVEL_LOAD_DATABASE}"';
+        return 'sqlite3 "${:CF_LOAD_DATABASE}"';
     }
 
     /**
@@ -87,7 +87,7 @@ class CDatabase_Schema_SchemaState_SqliteSchemaState extends CDatabase_Schema_Sc
      */
     protected function baseVariables(array $config) {
         return [
-            'LARAVEL_LOAD_DATABASE' => $config['database'],
+            'CF_LOAD_DATABASE' => $config['database'],
         ];
     }
 }
