@@ -1,19 +1,16 @@
 <?php
 
-
 use Assert\Assertion;
 
-class CVendor_MailerSend_Endpoints_BulkEmail extends CVendor_MailerSend_Endpoints_AbstractEndpoint
-{
+class CVendor_MailerSend_Endpoints_BulkEmail extends CVendor_MailerSend_Endpoints_AbstractEndpoint {
     protected string $endpoint = 'bulk-email';
 
     /**
-     * @throws \JsonException
+     * @throws JsonException
      * @throws CVendor_MailerSend_Exceptions_MailerSendAssertException
-     * @throws \Psr\Http\Client\ClientExceptionInterface
+     * @throws Psr\Http\Client\ClientExceptionInterface
      */
-    public function send(array $bulkParams): array
-    {
+    public function send(array $bulkParams): array {
         CVendor_MailerSend_Helpers_GeneralHelpers::assert(fn () => Assertion::minCount($bulkParams, 1, 'Bulk params should contain at least 1 email'));
 
         $requestData = [];
@@ -65,12 +62,13 @@ class CVendor_MailerSend_Endpoints_BulkEmail extends CVendor_MailerSend_Endpoint
 
     /**
      * @param string $bulkEmailId
+     *
+     * @throws JsonException
+     * @throws Psr\Http\Client\ClientExceptionInterface
+     *
      * @return array
-     * @throws \JsonException
-     * @throws \Psr\Http\Client\ClientExceptionInterface
      */
-    public function getStatus(string $bulkEmailId): array
-    {
+    public function getStatus(string $bulkEmailId): array {
         CVendor_MailerSend_Helpers_GeneralHelpers::assert(
             fn () => Assertion::minLength($bulkEmailId, 1, 'Bulk email id is required.')
         );

@@ -7,9 +7,8 @@ class CEmail_Driver_MailersendDriver extends CEmail_DriverAbstract {
         $from = carr::get($options, 'from', $this->config->getFrom());
         $fromName = carr::get($options, 'from_name', $this->config->getFromName());
 
-        $mailersend = new CVendor_MailerSend(['api_key'=>$apiKey]);
+        $mailersend = new CVendor_MailerSend(['api_key' => $apiKey]);
         $bulkEmailParams = [];
-
         foreach ($to as $t) {
             $bulkEmailParams[] = (new CVendor_MailerSend_Helpers_Builder_EmailParams())
                 ->setFrom($from)
@@ -21,10 +20,12 @@ class CEmail_Driver_MailersendDriver extends CEmail_DriverAbstract {
                 ->setHtml($body);
         }
         $response = $mailersend->bulkEmail->send($bulkEmailParams);
-        cdbg::dd($response);
-        // if ($response->statusCode() > 400) {
-        //     throw new Exception('Fail to send mail, API Response:(' . $response->statusCode() . ')' . $response->body());
-        // }
+        $statusCode = carr::get($response, 'status_code');
+        if ($statusCode != 202) {
+            $responseBody = carr::get($response, 'body', []);
+
+            throw new Exception('Fail to send mail, API Response:(' . $statusCode . ')' . json_encode($responseBody));
+        }
 
         return $response;
     }
