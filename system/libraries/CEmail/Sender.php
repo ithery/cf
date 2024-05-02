@@ -42,7 +42,7 @@ class CEmail_Sender {
             $options['domain'] = carr::get($options, 'smtp_domain', CF::config('app.smtp_domain'));
         }
 
-        if (!isset($options['from'])) {
+        if (!isset($options['from_name'])) {
             $options['from_name'] = carr::get($options, 'smtp_from_name', CF::config('app.email.from_name', CF::config('app.smtp_from_name')));
         }
 
