@@ -1,10 +1,8 @@
 <?php
 
-
 use Assert\Assertion;
 
-class CVendor_MailerSend_Endpoints_Inbound extends CVendor_MailerSend_Endpoints_AbstractEndpoint
-{
+class CVendor_MailerSend_Endpoints_Inbound extends CVendor_MailerSend_Endpoints_AbstractEndpoint {
     protected string $endpoint = 'inbound';
 
     /**
@@ -12,15 +10,14 @@ class CVendor_MailerSend_Endpoints_Inbound extends CVendor_MailerSend_Endpoints_
      * @throws \JsonException
      * @throws CVendor_MailerSend_Exceptions_MailerSendAssertException
      */
-    public function getAll(?string $domainId = null, ?int $page = null, ?int $limit = CVendor_MailerSend_Common_Constants::DEFAULT_LIMIT): array
-    {
+    public function getAll(?string $domainId = null, ?int $page = null, ?int $limit = CVendor_MailerSend_Common_Constants::DEFAULT_LIMIT): array {
         if ($limit) {
             CVendor_MailerSend_Helpers_GeneralHelpers::assert(
                 fn () => Assertion::range(
                     $limit,
                     CVendor_MailerSend_Common_Constants::MIN_LIMIT,
                     CVendor_MailerSend_Common_Constants::MAX_LIMIT,
-                    'Limit is supposed to be between ' . CVendor_MailerSend_Common_Constants::MIN_LIMIT . ' and ' . CVendor_MailerSend_Common_Constants::MAX_LIMIT .  '.'
+                    'Limit is supposed to be between ' . CVendor_MailerSend_Common_Constants::MIN_LIMIT . ' and ' . CVendor_MailerSend_Common_Constants::MAX_LIMIT . '.'
                 )
             );
         }
@@ -39,8 +36,7 @@ class CVendor_MailerSend_Endpoints_Inbound extends CVendor_MailerSend_Endpoints_
      * @throws \JsonException
      * @throws CVendor_MailerSend_Exceptions_MailerSendAssertException
      */
-    public function find(string $inboundId): array
-    {
+    public function find(string $inboundId): array {
         CVendor_MailerSend_Helpers_GeneralHelpers::assert(
             fn () => Assertion::minLength($inboundId, 1, 'Inbound id is required.')
         );
@@ -54,8 +50,7 @@ class CVendor_MailerSend_Endpoints_Inbound extends CVendor_MailerSend_Endpoints_
      * @throws \Psr\Http\Client\ClientExceptionInterface
      * @throws \JsonException
      */
-    public function create(CVendor_MailerSend_Helpers_Builder_Inbound $params): array
-    {
+    public function create(CVendor_MailerSend_Helpers_Builder_Inbound $params): array {
         return $this->httpLayer->post(
             $this->buildUri($this->endpoint),
             $params->toArray(),
@@ -66,8 +61,7 @@ class CVendor_MailerSend_Endpoints_Inbound extends CVendor_MailerSend_Endpoints_
      * @throws \Psr\Http\Client\ClientExceptionInterface
      * @throws \JsonException
      */
-    public function update(string $inboundId, CVendor_MailerSend_Helpers_Builder_Inbound $params): array
-    {
+    public function update(string $inboundId, CVendor_MailerSend_Helpers_Builder_Inbound $params): array {
         return $this->httpLayer->put(
             $this->buildUri("$this->endpoint/$inboundId"),
             $params->toArray(),
@@ -79,8 +73,7 @@ class CVendor_MailerSend_Endpoints_Inbound extends CVendor_MailerSend_Endpoints_
      * @throws \JsonException
      * @throws CVendor_MailerSend_Exceptions_MailerSendAssertException
      */
-    public function delete(string $inboundId): array
-    {
+    public function delete(string $inboundId): array {
         CVendor_MailerSend_Helpers_GeneralHelpers::assert(
             fn () => Assertion::minLength($inboundId, 1, 'Inbound id is required.')
         );
