@@ -30,7 +30,9 @@ class CManager_DataProvider_ModelDataProvider extends CManager_DataProviderAbstr
                     //$regex = '/([\w]++)`?+(?:\s++as\s++[^,\s]++)?+\s*+(?:FROM\s*+|$)/i';
                     // $regex = '/([\w]++)`?+\s*+(?:FROM\s*+|$)/i';
                     $regex = '/([\w]++)`?+\s*+$/i';
-
+                    if (!is_string($statement)) {
+                        cdbg::dd($statement);
+                    }
                     if (preg_match($regex, $statement, $match)) {
                         $fields[] = $match[1]; // field stored in $match[1]
                     }
