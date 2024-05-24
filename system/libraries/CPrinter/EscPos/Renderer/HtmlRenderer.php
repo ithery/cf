@@ -24,8 +24,89 @@ class CPrinter_EscPos_Renderer_HtmlRenderer extends CPrinter_EscPos_RendererAbst
 
         //replace mode
         $allModes = CPrinter_EscPos::MODE_FONT_B | CPrinter_EscPos::MODE_EMPHASIZED | CPrinter_EscPos::MODE_DOUBLE_HEIGHT | CPrinter_EscPos::MODE_DOUBLE_WIDTH | CPrinter_EscPos::MODE_UNDERLINE;
+        $data = $this->handlePrintMode($data);
+        $data = $this->handleJustification($data);
 
         $data = $this->handleBarcode($data);
+
+        return $data;
+    }
+
+    protected function handleJustification($data) {
+        $openJustification = CPrinter_EscPos::ESC . 'a(.)';
+        $regexOpenJustification = '#' . $openJustification . '#ims';
+        $totalSpan = 0;
+        if (preg_match_all($regexOpenJustification, $data, $matches)) {
+            $matchChars = $matches[1];
+            foreach ($matchChars as $index => $matchChar) {
+                if ((ord($matchChar) & CPrinter_EscPos::JUSTIFY_CENTER) == CPrinter_EscPos::JUSTIFY_CENTER) {
+                    $match = carr::get($matches, '0.' . $index);
+
+                    $data = str_replace($match, '<span style="display:inline-block;text-align:center">', $data);
+                    $totalSpan++;
+                }
+                if ((ord($matchChar) & CPrinter_EscPos::JUSTIFY_RIGHT) == CPrinter_EscPos::JUSTIFY_RIGHT) {
+                    $match = carr::get($matches, '0.' . $index);
+
+                    $data = str_replace($match, '<span style="text-align:right">', $data);
+                    $totalSpan++;
+                }
+                if (ord($matchChar) == 0) {
+                    $match = carr::get($matches, '0.' . $index);
+                    $spans = '';
+                    for ($i = 0; $i < $totalSpan; $i++) {
+                        $spans .= '</span>';
+                    }
+
+                    $data = str_replace($match, $spans, $data);
+                    $totalSpan = 0;
+                }
+            }
+        }
+        if ($totalSpan > 0) {
+            $this->appendCloseSpan($data, $totalSpan);
+            $totalSpan = 0;
+        }
+
+        return $data;
+    }
+
+    protected function handlePrintMode($data) {
+        $openPrintMode = CPrinter_EscPos::ESC . '!(.)';
+        $regexOpenPrintMode = '#' . $openPrintMode . '#ims';
+        $totalSpan = 0;
+        if (preg_match_all($regexOpenPrintMode, $data, $matches)) {
+            $matchChars = $matches[1];
+            foreach ($matchChars as $index => $matchChar) {
+                if ((ord($matchChar) & CPrinter_EscPos::MODE_DOUBLE_HEIGHT) == CPrinter_EscPos::MODE_DOUBLE_HEIGHT) {
+                    $match = carr::get($matches, '0.' . $index);
+
+                    $data = str_replace($match, '<span style="font-size:120%">', $data);
+                    $totalSpan++;
+                }
+                if ((ord($matchChar) & CPrinter_EscPos::MODE_DOUBLE_WIDTH) == CPrinter_EscPos::MODE_DOUBLE_WIDTH) {
+                    $match = carr::get($matches, '0.' . $index);
+
+                    $data = str_replace($match, '<span style="font-size:120%">', $data);
+                    $totalSpan++;
+                }
+
+                if (ord($matchChar) == 0) {
+                    $match = carr::get($matches, '0.' . $index);
+                    $spans = '';
+                    for ($i = 0; $i < $totalSpan; $i++) {
+                        $spans .= '</span>';
+                    }
+
+                    $data = str_replace($match, $spans, $data);
+                    $totalSpan = 0;
+                }
+            }
+        }
+        if ($totalSpan > 0) {
+            $this->appendCloseSpan($data, $totalSpan);
+            $totalSpan = 0;
+        }
 
         return $data;
     }
@@ -72,6 +153,17 @@ class CPrinter_EscPos_Renderer_HtmlRenderer extends CPrinter_EscPos_RendererAbst
         }
 
         return $data;
+    }
+
+    private function appendCloseSpan($string, $count) {
+        $spans = '';
+        for ($i = 0; $i < $count; $i++) {
+            $spans .= '</span>';
+        }
+
+        $string .= $spans;
+
+        return $string;
     }
 
     private function replaceWithSpan($string, $open, $close, $style = '') {
