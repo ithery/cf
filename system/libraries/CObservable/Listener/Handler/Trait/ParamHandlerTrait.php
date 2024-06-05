@@ -19,6 +19,7 @@ trait CObservable_Listener_Handler_Trait_ParamHandlerTrait {
             $selector = $input;
             if ($input instanceof CRenderable) {
                 $selector = '#' . $input->id();
+                $input = $input->id();
             }
             if (strlen($selector) > 0 && preg_match('/^[a-zA-Z0-9]/', $selector)) {
                 $selector = '#' . $selector;
