@@ -13,20 +13,28 @@ trait CObservable_Listener_Handler_Trait_ParamHandlerTrait {
         if (!is_array($inputs)) {
             $inputs = [$inputs];
         }
+        $isAssoc = carr::isAssoc($inputs);
 
-        return c::collect($inputs)->map(function ($input) {
+        return c::collect($inputs)->mapWithKeys(function ($input, $key) use ($isAssoc) {
+            $selector = $input;
             if ($input instanceof CRenderable) {
-                return $input->id();
+                $selector = '#' . $input->id();
+            }
+            if (strlen($selector) > 0 && preg_match('/^[a-zA-Z0-9]/', $selector)) {
+                $selector = '#' . $selector;
+            }
+            if (!$isAssoc) {
+                $key = $input;
             }
 
-            return $input;
+            return [$key => $selector];
         })->toArray();
     }
 
     public function addParamInput($inputs) {
         $inputs = $this->normalizeParamInput($inputs);
-        foreach ($inputs as $inp) {
-            $this->paramInputs[] = $inp;
+        foreach ($inputs as $key => $inp) {
+            $this->paramInputs[$key] = $inp;
         }
 
         return $this;
@@ -34,8 +42,8 @@ trait CObservable_Listener_Handler_Trait_ParamHandlerTrait {
 
     public function addParamInputMultiple($inputs) {
         $inputs = $this->normalizeParamInput($inputs);
-        foreach ($inputs as $inp) {
-            $this->paramInputsMultiple[] = $inp;
+        foreach ($inputs as $key => $inp) {
+            $this->paramInputsMultiple[$key] = $inp;
         }
 
         return $this;
@@ -81,7 +89,7 @@ trait CObservable_Listener_Handler_Trait_ParamHandlerTrait {
             }
         }
         if (is_array($this->paramInputsMultiple)) {
-            foreach ($this->paramInputsMultiple as $inp) {
+            foreach ($this->paramInputsMultiple as $k => $inp) {
                 if (strlen($dataAddition) > 0) {
                     $dataAddition .= ',';
                 }
@@ -89,11 +97,11 @@ trait CObservable_Listener_Handler_Trait_ParamHandlerTrait {
                 if (strlen($selector) > 0 && preg_match('/^[a-zA-Z0-9]/', $selector)) {
                     $selector = '#' . $selector;
                 }
-                $dataAddition .= "'" . $inp . "':cresenity.arrayValue('" . $selector . "')";
+                $dataAddition .= "'" . $k . "':cresenity.arrayValue('" . $selector . "')";
             }
         }
         if (is_array($this->paramInputs)) {
-            foreach ($this->paramInputs as $inp) {
+            foreach ($this->paramInputs as $k => $inp) {
                 if (strlen($dataAddition) > 0) {
                     $dataAddition .= ',';
                 }
@@ -101,7 +109,7 @@ trait CObservable_Listener_Handler_Trait_ParamHandlerTrait {
                 if (strlen($selector) > 0 && preg_match('/^[a-zA-Z0-9]/', $selector)) {
                     $selector = '#' . $selector;
                 }
-                $dataAddition .= "'" . $inp . "':cresenity.value('" . $selector . "')";
+                $dataAddition .= "'" . $k . "':cresenity.value('" . $selector . "')";
             }
         }
         if (is_array($this->paramInputsByName)) {
