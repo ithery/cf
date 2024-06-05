@@ -953,7 +953,15 @@ export default class Cresenity {
     unblockElement(selector) {
         $(selector).unblock();
     }
-
+    arrayValue(elms) {
+        elms = $(elms);
+        if (elms.length === 0) {
+            return [];
+        }
+        return elms.map((index, elm) => {
+            return this.value(elm);
+        }).get();
+    }
     value(elm) {
         elm = $(elm);
         if (elm.length === 0) {
