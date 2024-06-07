@@ -87,6 +87,7 @@ class CVendor_Wago_Device {
 
     /**
      * @param mixed $response
+     *
      * @return array
      */
     public function handleResponse($response) {

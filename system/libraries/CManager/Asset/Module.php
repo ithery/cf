@@ -158,7 +158,7 @@ class CManager_Asset_Module {
         $allModules = $this->allModules();
         if (!in_array($module, $this->modules[$type])) {
             if (!isset($allModules[$module])) {
-                throw new CManager_Exception('Module :module not defined', [':module' => $module]);
+                throw new CManager_Exception(c::__('Module :module not defined', [':module' => $module]));
             }
             //array
             $mod = $allModules[$module];
