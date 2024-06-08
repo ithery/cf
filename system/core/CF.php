@@ -896,9 +896,14 @@ final class CF {
         return strpos($relativeIndex, 'application/') !== false;
     }
 
-    public static function publicPath() {
+    public static function publicPath($path = null) {
         if (self::isIndexInApp()) {
-            return dirname(CFINDEX);
+            $publicPath = dirname(CFINDEX);
+            if ($path) {
+                $publicPath .= $path;
+            }
+
+            return $publicPath;
         }
 
         return null;
