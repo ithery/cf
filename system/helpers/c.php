@@ -889,6 +889,13 @@ class c {
      */
     public static function retry($times, callable $callback, $sleepMilliseconds = 0, $when = null) {
         $attempts = 0;
+        $backoff = [];
+
+        if (is_array($times)) {
+            $backoff = $times;
+
+            $times = count($times) + 1;
+        }
 
         beginning:
         $attempts++;
@@ -900,9 +907,9 @@ class c {
             if ($times < 1 || ($when && !$when($e))) {
                 throw $e;
             }
-
+            $sleepMilliseconds = $backoff[$attempts - 1] ?? $sleepMilliseconds;
             if ($sleepMilliseconds) {
-                usleep(c::value($sleepMilliseconds, $attempts) * 1000);
+                CBase_Sleep::usleep(c::value($sleepMilliseconds, $attempts, $e) * 1000);
             }
 
             goto beginning;
@@ -1060,7 +1067,7 @@ class c {
             if ($segment === '*') {
                 if ($target instanceof CCollection) {
                     $target = $target->all();
-                } elseif (!is_array($target)) {
+                } elseif (!is_iterable($target)) {
                     return c::value($default);
                 }
 
@@ -1072,6 +1079,14 @@ class c {
 
                 return in_array('*', $key) ? carr::collapse($result) : $result;
             }
+            $segmentMap = [
+                '\*' => '*',
+                '\{first}' => '{first}',
+                '{first}' => array_key_first(is_array($target) ? $target : c::collect($target)->all()),
+                '\{last}' => '{last}',
+                '{last}' => array_key_last(is_array($target) ? $target : c::collect($target)->all()),
+            ];
+            $segment = carr::get($segmentMap, $segment, $segment);
 
             if (carr::accessible($target) && carr::exists($target, $segment)) {
                 $target = $target[$segment];
@@ -1139,6 +1154,32 @@ class c {
                 static::set($target[$segment], $segments, $value, $overwrite);
             } elseif ($overwrite) {
                 $target[$segment] = $value;
+            }
+        }
+
+        return $target;
+    }
+
+    public static function forget(&$target, $key) {
+        $segments = is_array($key) ? $key : explode('.', $key);
+
+        if (($segment = array_shift($segments)) === '*' && carr::accessible($target)) {
+            if ($segments) {
+                foreach ($target as &$inner) {
+                    self::forget($inner, $segments);
+                }
+            }
+        } elseif (carr::accessible($target)) {
+            if ($segments && carr::exists($target, $segment)) {
+                self::forget($target[$segment], $segments);
+            } else {
+                carr::forget($target, $segment);
+            }
+        } elseif (is_object($target)) {
+            if ($segments && isset($target->{$segment})) {
+                self::forget($target->{$segment}, $segments);
+            } elseif (isset($target->{$segment})) {
+                unset($target->{$segment});
             }
         }
 

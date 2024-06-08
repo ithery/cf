@@ -5,6 +5,7 @@ defined('SYSPATH') or die('No direct access allowed.');
 class CCollection implements ArrayAccess, CInterface_Enumerable, CBase_Contract_CanBeEscapedWhenCastToStringInterface {
     use CCollection_Concern_EnumeratesValuesTrait;
     use CTrait_Macroable;
+
     /**
      * The items contained in the collection.
      *
@@ -1139,7 +1140,7 @@ class CCollection implements ArrayAccess, CInterface_Enumerable, CBase_Contract_
             ? $this->operatorForWhere(...func_get_args())
             : $key;
 
-        $items = $this->when($filter)->filter($filter);
+        $items = $this->unless($filter == null)->filter($filter);
 
         if ($items->isEmpty()) {
             throw new CCollection_Exception_ItemNotFoundException();
