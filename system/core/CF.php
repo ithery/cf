@@ -900,7 +900,7 @@ final class CF {
         if (self::isIndexInApp()) {
             $publicPath = dirname(CFINDEX);
             if ($path) {
-                $publicPath .= $path;
+                $publicPath .= '/' . ltrim($path, '/');
             }
 
             return $publicPath;

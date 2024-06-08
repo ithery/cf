@@ -632,7 +632,6 @@ class CBase_Vite implements CInterface_Htmlable {
      */
     public function asset($asset, $buildDirectory = null) {
         $buildDirectory ??= $this->buildDirectory;
-
         if ($this->isRunningHot()) {
             return $this->hotAsset($asset);
         }
