@@ -34,7 +34,7 @@ class GuzzleAdapter implements AdapterInterface {
     protected $logPath;
 
     /**
-     * @param mixed $options
+     * @param array $options
      */
     public function __construct(array $options = []) {
         $this->isLog = $options['logging'] ?? false;
@@ -69,6 +69,9 @@ class GuzzleAdapter implements AdapterInterface {
         $this->client = $client;
     }
 
+    /**
+     * @return array
+     */
     protected function getDefaultOptions() {
         $options = [
             'headers' => [
@@ -174,13 +177,13 @@ class GuzzleAdapter implements AdapterInterface {
     }
 
     /**
-     * @param mixed $e
+     * @param \Throwable $e
      *
      * @throws \Cresenity\Vendor\Wago\Exception\HttpException
      * @throws \Cresenity\Vendor\Wago\Exception\ApiException
      * @throws \Cresenity\Vendor\Wago\Exception\InvalidTokenException
      */
-    protected function handleError($e) {
+    protected function handleError(\Throwable $e) {
         if ($this->response == null) {
             throw $e;
         }
