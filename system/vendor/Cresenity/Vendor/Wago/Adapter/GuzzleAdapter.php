@@ -1,6 +1,6 @@
 <?php
 
-defined('SYSPATH') or die('No direct access allowed.');
+namespace Cresenity\Vendor\Wago\Adapter;
 
 use Monolog\Logger;
 use GuzzleHttp\Client;
@@ -11,11 +11,12 @@ use GuzzleHttp\ClientInterface;
 use GuzzleHttp\MessageFormatter;
 use Monolog\Handler\RotatingFileHandler;
 use GuzzleHttp\Exception\RequestException;
+use Cresenity\Vendor\Wago\AdapterInterface;
+use Cresenity\Vendor\Wago\Exception\ApiException;
+use Cresenity\Vendor\Wago\Exception\HttpException;
+use Cresenity\Vendor\Wago\Exception\InvalidTokenException;
 
-/**
- * @deprecated since 1.7 use \Cresenity\Vendor\Wago\Adapter\GuzzleAdapter
- */
-class CVendor_Wago_Adapter_GuzzleAdapter implements CVendor_Wago_Contract_AdapterInterface {
+class GuzzleAdapter implements AdapterInterface {
     /**
      * @var Client
      */
@@ -30,12 +31,15 @@ class CVendor_Wago_Adapter_GuzzleAdapter implements CVendor_Wago_Contract_Adapte
 
     protected $isLog;
 
+    protected $logPath;
+
     /**
      * @param mixed $options
      */
     public function __construct(array $options = []) {
-        $this->isLog = carr::get($options, 'logging', false);
-        $this->token = carr::get($options, 'token');
+        $this->isLog = $options['logging'] ?? false;
+        $this->logPath = $options['logPath'] ?? null;
+        $this->token = $options['token'] ?? null;
         $options = [];
 
         if ($this->isLog) {
@@ -45,18 +49,19 @@ class CVendor_Wago_Adapter_GuzzleAdapter implements CVendor_Wago_Contract_Adapte
             ];
 
             $stack = HandlerStack::create();
-
-            c::collect($messageFormats)->each(function ($messageFormat) use ($stack) {
+            foreach ($messageFormats as $messageFormat) {
+                $logger = new Logger('guzzle-log');
                 // We'll use unshift instead of push, to add the middleware to the bottom of the stack, not the top
                 $stack->unshift(
                     Middleware::log(
-                        c::with(new Logger('guzzle-log'))->pushHandler(
-                            new RotatingFileHandler(DOCROOT . 'temp/logs/vendor/' . CF::appCode() . '/wago/guzzle-log.log')
+                        $logger->pushHandler(
+                            new RotatingFileHandler($this->logPath)
                         ),
                         new MessageFormatter($messageFormat)
                     )
                 );
-            });
+            }
+
             $options['handler'] = $stack;
         }
         $client = new Client($options);
@@ -171,8 +176,9 @@ class CVendor_Wago_Adapter_GuzzleAdapter implements CVendor_Wago_Contract_Adapte
     /**
      * @param mixed $e
      *
-     * @throws CVendor_Wago_Exception_HttpException
-     * @throws CVendor_Wago_Exception_ApiException
+     * @throws \Cresenity\Vendor\Wago\Exception\HttpException
+     * @throws \Cresenity\Vendor\Wago\Exception\ApiException
+     * @throws \Cresenity\Vendor\Wago\Exception\InvalidTokenException
      */
     protected function handleError($e) {
         if ($this->response == null) {
@@ -183,16 +189,16 @@ class CVendor_Wago_Adapter_GuzzleAdapter implements CVendor_Wago_Contract_Adapte
         if ($code != 200) {
             if ($code == 401) {
                 $content = json_decode($body, true);
-                $errMessage = carr::get($content, 'errMessage');
+                $errMessage = $content['errMessage'] ?? null;
                 if ($errMessage == 'Token Not Found or Invalid Token') {
-                    throw new CVendor_Wago_Exception_InvalidTokenException($errMessage);
+                    throw new InvalidTokenException($errMessage);
                 }
             }
 
-            throw new CVendor_Wago_Exception_HttpException(isset($body) ? $body : 'Request not processed.', $code);
+            throw new HttpException(isset($body) ? $body : 'Request not processed.', $code);
         }
         $content = json_decode($body);
 
-        throw new CVendor_Wago_Exception_ApiException(isset($content->message) ? $content->message : 'Request not processed.', $code);
+        throw new ApiException(isset($content->message) ? $content->message : 'Request not processed.', $code);
     }
 }

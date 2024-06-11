@@ -1,11 +1,13 @@
 <?php
 
+use Cresenity\Vendor\Wago\Wago;
+
 class CVendor_Wago {
     /**
      * @param null|string $token
      * @param array       $options
      *
-     * @return CVendor_Wago_Device
+     * @return \Cresenity\Vendor\Wago\Device
      */
     public static function device($token = null, $options = []) {
         if ($token == null) {
@@ -16,6 +18,14 @@ class CVendor_Wago {
             $options['sandbox'] = CF::config('vendor.wago.sandbox', false);
         }
 
-        return new CVendor_Wago_Device($token, $options);
+        if ($options['sandbox']) {
+            $options['baseUri'] = 'https://wapro.dev.ittron.co.id/api/device/';
+        }
+
+        if (isset($options['logging']) && $options['logging']) {
+            $options['logPath'] = DOCROOT . 'temp/logs/vendor/' . CF::appCode() . '/wago/guzzle-log.log';
+        }
+
+        return Wago::device($token, $options);
     }
 }
