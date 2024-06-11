@@ -1221,6 +1221,10 @@ class CDatabase_Query_Grammar extends CDatabase_Grammar {
     public function prepareBindingsForUpdate(array $bindings, array $values) {
         $cleanBindings = carr::except($bindings, ['join', 'select']);
 
+        $values = carr::flatten(array_map(function ($value) {
+            return c::value($value);
+        }, $values));
+
         return array_values(
             array_merge($bindings['join'], $values, carr::flatten($cleanBindings))
         );

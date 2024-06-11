@@ -1339,18 +1339,34 @@ class c {
         return static::manager()->theme();
     }
 
+    /**
+     * @return string
+     */
     public static function locale() {
         return str_replace('_', '-', CF::getLocale());
     }
 
+    /**
+     * @param mixed $obj
+     * @return boolean
+     */
     public static function isIterable($obj) {
         return is_array($obj) || (is_object($obj) && ($obj instanceof \Traversable));
     }
 
+    /**
+     * @param string $type
+     * @param string $message
+     * @return void
+     */
     public static function msg($type, $message) {
-        return CApp_Message::add($type, $message);
+        CApp_Message::add($type, $message);
     }
 
+    /**
+     * @param string $path
+     * @return string
+     */
     public static function docRoot($path = null) {
         $docRoot = rtrim(DOCROOT, DS);
         if ($path != null) {
@@ -1391,10 +1407,18 @@ class c {
         return c::untrailingslashit($appRoot) . DS;
     }
 
+    /**
+     * @param string|null $name
+     * @return CStorage_Adapter
+     */
     public static function disk($name = null) {
         return CStorage::instance()->disk($name);
     }
 
+    /**
+     * @param callable $callable
+     * @return Closure
+     */
     public static function closureFromCallable($callable) {
         if (method_exists(Closure::class, 'fromCallable')) {
             return Closure::fromCallable($callable);
@@ -1405,10 +1429,17 @@ class c {
         };
     }
 
+    /**
+     * @param null|mixed $event
+     * @return CBroadcast_PendingBroadcast
+     */
     public static function broadcast($event = null) {
         return CBroadcast::manager()->event($event);
     }
 
+    /**
+     * @return string
+     */
     public static function environment() {
         if (CF::isProduction()) {
             return 'production';
