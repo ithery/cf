@@ -254,4 +254,11 @@ class CVendor {
     public static function whatsApp() {
         return new CBase_ForwarderStaticClass(CVendor_WhatsApp::class);
     }
+
+    /**
+     * @return \CVendor_Figma|CBase_ForwarderStaticClass
+     */
+    public static function figma() {
+        return new CBase_ForwarderStaticClass(CVendor_Figma::class);
+    }
 }
