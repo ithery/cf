@@ -138,7 +138,7 @@ trait CCollection_Concern_EnumeratesValuesTrait {
         }
 
         return static::range(1, $number)
-            ->when($callback)
+            ->unless($callback == null)
             ->map($callback);
     }
 
