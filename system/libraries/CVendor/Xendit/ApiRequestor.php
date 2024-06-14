@@ -2,6 +2,8 @@
 class CVendor_Xendit_ApiRequestor {
     protected $httpClient;
 
+    protected $libVersion;
+
     public function __construct($secretApiKey, $baseUri, $libVersion = null) {
         $this->httpClient = new CVendor_Xendit_HttpClient_GuzzleClient($secretApiKey, $baseUri);
         if ($libVersion == null) {
@@ -18,7 +20,7 @@ class CVendor_Xendit_ApiRequestor {
      * @param array  $params  user's params
      * @param array  $headers user's additional headers
      *
-     * @throws Exceptions\ApiException
+     * @throws CVendor_Xendit_Exception_ApiException
      *
      * @return array
      */
