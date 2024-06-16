@@ -1,15 +1,16 @@
 <?php
 
 /**
- * Common String Functions
+ * Common String Functions.
  *
  * PHP version 5
  *
  * @category  Common
- * @package   Functions\Strings
+ *
  * @author    Jim Wigginton <terrafrost@php.net>
  * @copyright 2016 Jim Wigginton
  * @license   http://www.opensource.org/licenses/mit-license.html  MIT License
+ *
  * @link      http://phpseclib.sourceforge.net
  */
 
@@ -19,49 +20,47 @@ use phpseclib3\Math\BigInteger;
 use phpseclib3\Math\Common\FiniteField;
 
 /**
- * Common String Functions
+ * Common String Functions.
  *
- * @package Functions\Strings
  * @author  Jim Wigginton <terrafrost@php.net>
  */
-abstract class Strings
-{
+abstract class Strings {
     /**
-     * String Shift
+     * String Shift.
      *
      * Inspired by array_shift
      *
      * @param string $string
-     * @param int $index
-     * @access public
+     * @param int    $index
+     *
      * @return string
      */
-    public static function shift(&$string, $index = 1)
-    {
+    public static function shift(&$string, $index = 1) {
         $substr = substr($string, 0, $index);
         $string = substr($string, $index);
+
         return $substr;
     }
 
     /**
-     * String Pop
+     * String Pop.
      *
      * Inspired by array_pop
      *
      * @param string $string
-     * @param int $index
-     * @access public
+     * @param int    $index
+     *
      * @return string
      */
-    public static function pop(&$string, $index = 1)
-    {
+    public static function pop(&$string, $index = 1) {
         $substr = substr($string, -$index);
         $string = substr($string, 0, -$index);
+
         return $substr;
     }
 
     /**
-     * Parse SSH2-style string
+     * Parse SSH2-style string.
      *
      * Returns either an array or a boolean if $data is malformed.
      *
@@ -79,10 +78,10 @@ abstract class Strings
      *
      * @param string $format
      * @param string $data
+     *
      * @return mixed
      */
-    public static function unpackSSH2($format, &$data)
-    {
+    public static function unpackSSH2($format, &$data) {
         $format = self::formatPack($format);
         $result = [];
         for ($i = 0; $i < strlen($format); $i++) {
@@ -92,6 +91,7 @@ abstract class Strings
                     if (!strlen($data)) {
                         throw new \LengthException('At least one byte needs to be present for successful C / b decodes');
                     }
+
                     break;
                 case 'N':
                 case 'i':
@@ -100,11 +100,13 @@ abstract class Strings
                     if (strlen($data) < 4) {
                         throw new \LengthException('At least four byte needs to be present for successful N / i / s / L decodes');
                     }
+
                     break;
                 case 'Q':
                     if (strlen($data) < 8) {
                         throw new \LengthException('At least eight byte needs to be present for successful N / i / s / L decodes');
                     }
+
                     break;
 
                 default:
@@ -113,13 +115,16 @@ abstract class Strings
             switch ($format[$i]) {
                 case 'C':
                     $result[] = ord(self::shift($data));
+
                     continue 2;
                 case 'b':
                     $result[] = ord(self::shift($data)) != 0;
+
                     continue 2;
                 case 'N':
                     list(, $temp) = unpack('N', self::shift($data, 4));
                     $result[] = $temp;
+
                     continue 2;
                 case 'Q':
                     // pack() added support for Q in PHP 5.6.3 and PHP 5.6 is phpseclib 3's minimum version
@@ -133,6 +138,7 @@ abstract class Strings
                     $temp += $lower < 0 ? ($lower & 0x7FFFFFFFF) + 0x80000000 : $lower;
                     // $temp = hexdec(bin2hex(self::shift($data, 8)));
                     $result[] = $temp;
+
                     continue 2;
             }
             list(, $length) = unpack('N', self::shift($data, 4));
@@ -143,9 +149,11 @@ abstract class Strings
             switch ($format[$i]) {
                 case 'i':
                     $result[] = new BigInteger($temp, -256);
+
                     break;
                 case 's':
                     $result[] = $temp;
+
                     break;
                 case 'L':
                     $result[] = explode(',', $temp);
@@ -156,15 +164,14 @@ abstract class Strings
     }
 
     /**
-     * Create SSH2-style string
+     * Create SSH2-style string.
      *
-     * @param string $format
+     * @param string                      $format
      * @param string|int|float|array|bool ...$elements
-     * @access public
+     *
      * @return string
      */
-    public static function packSSH2($format, ...$elements)
-    {
+    public static function packSSH2($format, ...$elements) {
         $format = self::formatPack($format);
         if (strlen($format) != count($elements)) {
             throw new \InvalidArgumentException('There must be as many arguments as there are characters in the $format string');
@@ -178,12 +185,14 @@ abstract class Strings
                         throw new \InvalidArgumentException('Bytes must be represented as an integer between 0 and 255, inclusive.');
                     }
                     $result .= pack('C', $element);
+
                     break;
                 case 'b':
                     if (!is_bool($element)) {
                         throw new \InvalidArgumentException('A boolean parameter was expected.');
                     }
                     $result .= $element ? "\1" : "\0";
+
                     break;
                 case 'Q':
                     if (!is_int($element) && !is_float($element)) {
@@ -191,6 +200,7 @@ abstract class Strings
                     }
                     // 4294967296 == 1 << 32
                     $result .= pack('NN', $element / 4294967296, $element);
+
                     break;
                 case 'N':
                     if (is_float($element)) {
@@ -200,12 +210,14 @@ abstract class Strings
                         throw new \InvalidArgumentException('An integer was expected.');
                     }
                     $result .= pack('N', $element);
+
                     break;
                 case 's':
                     if (!self::is_stringable($element)) {
                         throw new \InvalidArgumentException('A string was expected.');
                     }
                     $result .= pack('Na*', strlen($element), $element);
+
                     break;
                 case 'i':
                     if (!$element instanceof BigInteger && !$element instanceof FiniteField\Integer) {
@@ -213,6 +225,7 @@ abstract class Strings
                     }
                     $element = $element->toBytes(true);
                     $result .= pack('Na*', strlen($element), $element);
+
                     break;
                 case 'L':
                     if (!is_array($element)) {
@@ -220,25 +233,26 @@ abstract class Strings
                     }
                     $element = implode(',', $element);
                     $result .= pack('Na*', strlen($element), $element);
+
                     break;
                 default:
                     throw new \InvalidArgumentException('$format contains an invalid character');
             }
         }
+
         return $result;
     }
 
     /**
-     * Expand a pack string
+     * Expand a pack string.
      *
      * Converts C5 to CCCCC, for example.
      *
-     * @access private
      * @param string $format
+     *
      * @return string
      */
-    private static function formatPack($format)
-    {
+    private static function formatPack($format) {
         $parts = preg_split('#(\d+)#', $format, -1, PREG_SPLIT_DELIM_CAPTURE);
         $format = '';
         for ($i = 1; $i < count($parts); $i += 2) {
@@ -250,19 +264,18 @@ abstract class Strings
     }
 
     /**
-     * Convert binary data into bits
+     * Convert binary data into bits.
      *
      * bin2hex / hex2bin refer to base-256 encoded data as binary, whilst
      * decbin / bindec refer to base-2 encoded data as binary. For the purposes
      * of this function, bin refers to base-256 encoded data whilst bits refers
      * to base-2 encoded data
      *
-     * @access public
      * @param string $x
+     *
      * @return string
      */
-    public static function bits2bin($x)
-    {
+    public static function bits2bin($x) {
         /*
         // the pure-PHP approach is faster than the GMP approach
         if (function_exists('gmp_export')) {
@@ -298,18 +311,19 @@ abstract class Strings
                 $xor ^ eval('return 0b' . $part . ';')
             );
         }
+
         return ltrim($str, "\0");
     }
 
     /**
-     * Convert bits to binary data
+     * Convert bits to binary data.
      *
-     * @access public
      * @param string $x
+     * @param mixed  $trim
+     *
      * @return string
      */
-    public static function bin2bits($x, $trim = true)
-    {
+    public static function bin2bits($x, $trim = true) {
         /*
         // the pure-PHP approach is slower than the GMP approach BUT
         // i want to the pure-PHP version to be easily unit tested as well
@@ -341,14 +355,13 @@ abstract class Strings
     }
 
     /**
-     * Switch Endianness Bit Order
+     * Switch Endianness Bit Order.
      *
-     * @access public
      * @param string $x
+     *
      * @return string
      */
-    public static function switchEndianness($x)
-    {
+    public static function switchEndianness($x) {
         $r = '';
         for ($i = strlen($x) - 1; $i >= 0; $i--) {
             $b = ord($x[$i]);
@@ -366,22 +379,23 @@ abstract class Strings
                 );
             }
         }
+
         return $r;
     }
 
     /**
-     * Increment the current string
+     * Increment the current string.
      *
      * @param string $var
+     *
      * @return string
-     * @access public
      */
-    public static function increment_str(&$var)
-    {
+    public static function increment_str(&$var) {
         if (function_exists('sodium_increment')) {
             $var = strrev($var);
             sodium_increment($var);
             $var = strrev($var);
+
             return $var;
         }
 
@@ -390,13 +404,16 @@ abstract class Strings
             switch ($temp) {
                 case "\xFF\xFF\xFF\xFF":
                     $var = substr_replace($var, "\x00\x00\x00\x00", -$i, 4);
+
                     break;
                 case "\x7F\xFF\xFF\xFF":
                     $var = substr_replace($var, "\x80\x00\x00\x00", -$i, 4);
+
                     return $var;
                 default:
                     $temp = unpack('Nnum', $temp);
                     $var = substr_replace($var, pack('N', $temp['num'] + 1), -$i, 4);
+
                     return $var;
             }
         }
@@ -415,14 +432,14 @@ abstract class Strings
     }
 
     /**
-     * Find whether the type of a variable is string (or could be converted to one)
+     * Find whether the type of a variable is string (or could be converted to one).
      *
      * @param mixed $var
+     *
      * @return bool
      * @psalm-assert-if-true string|\Stringable $var
      */
-    public static function is_stringable($var)
-    {
+    public static function is_stringable($var) {
         return is_string($var) || (is_object($var) && method_exists($var, '__toString'));
     }
 }
