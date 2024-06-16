@@ -1,7 +1,7 @@
 <?php
 
 /**
- * XML Formatted DSA Key Handler
+ * XML Formatted DSA Key Handler.
  *
  * While XKMS defines a private key format for RSA it does not do so for DSA. Quoting that standard:
  *
@@ -12,39 +12,36 @@
  * PHP version 5
  *
  * @category  Crypt
- * @package   DSA
+ *
  * @author    Jim Wigginton <terrafrost@php.net>
  * @copyright 2015 Jim Wigginton
  * @license   http://www.opensource.org/licenses/mit-license.html  MIT License
+ *
  * @link      http://phpseclib.sourceforge.net
  */
 
 namespace phpseclib3\Crypt\DSA\Formats\Keys;
 
+use phpseclib3\Math\BigInteger;
 use ParagonIE\ConstantTime\Base64;
 use phpseclib3\Common\Functions\Strings;
 use phpseclib3\Exception\BadConfigurationException;
-use phpseclib3\Math\BigInteger;
 
 /**
- * XML Formatted DSA Key Handler
+ * XML Formatted DSA Key Handler.
  *
- * @package DSA
  * @author  Jim Wigginton <terrafrost@php.net>
- * @access  public
  */
-abstract class XML
-{
+abstract class XML {
     /**
-     * Break a public or private key down into its constituent components
+     * Break a public or private key down into its constituent components.
      *
-     * @access public
      * @param string $key
      * @param string $password optional
+     *
      * @return array
      */
-    public static function load($key, $password = '')
-    {
+    public static function load($key, $password = '') {
         if (!Strings::is_stringable($key)) {
             throw new \UnexpectedValueException('Key should be a string - not a ' . gettype($key));
         }
@@ -61,6 +58,7 @@ abstract class XML
         }
         if (!$dom->loadXML($key)) {
             libxml_use_internal_errors($use_errors);
+
             throw new \UnexpectedValueException('Key does not appear to contain XML');
         }
         $xpath = new \DOMXPath($dom);
@@ -78,16 +76,20 @@ abstract class XML
                     // from application context. As such, they are optional but P and Q must either both appear
                     // or both be absent
                     $components['p'] = $value;
+
                     break;
                 case 'q': // an integer in the range 2**159 < Q < 2**160 which is a prime divisor of P-1
                     $components['q'] = $value;
+
                     break;
                 case 'g': // an integer with certain properties with respect to P and Q
                     $components['g'] = $value;
+
                     break;
                 case 'y': // G**X mod P (where X is part of the private key and not made public)
                     $components['y'] = $value;
                     // the remaining options do not do anything
+                    // no break
                 case 'j': // (P - 1) / Q
                     // Parameter J is available for inclusion solely for efficiency as it is calculatable from
                     // P and Q
@@ -116,24 +118,23 @@ abstract class XML
     }
 
     /**
-     * Convert a public key to the appropriate format
+     * Convert a public key to the appropriate format.
      *
      * See https://www.w3.org/TR/xmldsig-core/#sec-DSAKeyValue
      *
-     * @access public
      * @param \phpseclib3\Math\BigInteger $p
      * @param \phpseclib3\Math\BigInteger $q
      * @param \phpseclib3\Math\BigInteger $g
      * @param \phpseclib3\Math\BigInteger $y
+     *
      * @return string
      */
-    public static function savePublicKey(BigInteger $p, BigInteger $q, BigInteger $g, BigInteger $y)
-    {
-        return "<DSAKeyValue>\r\n" .
-               '  <P>' . Base64::encode($p->toBytes()) . "</P>\r\n" .
-               '  <Q>' . Base64::encode($q->toBytes()) . "</Q>\r\n" .
-               '  <G>' . Base64::encode($g->toBytes()) . "</G>\r\n" .
-               '  <Y>' . Base64::encode($y->toBytes()) . "</Y>\r\n" .
-               '</DSAKeyValue>';
+    public static function savePublicKey(BigInteger $p, BigInteger $q, BigInteger $g, BigInteger $y) {
+        return "<DSAKeyValue>\r\n"
+               . '  <P>' . Base64::encode($p->toBytes()) . "</P>\r\n"
+               . '  <Q>' . Base64::encode($q->toBytes()) . "</Q>\r\n"
+               . '  <G>' . Base64::encode($g->toBytes()) . "</G>\r\n"
+               . '  <Y>' . Base64::encode($y->toBytes()) . "</Y>\r\n"
+               . '</DSAKeyValue>';
     }
 }

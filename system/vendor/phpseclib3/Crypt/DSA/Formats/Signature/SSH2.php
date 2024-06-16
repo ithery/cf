@@ -1,43 +1,40 @@
 <?php
 
 /**
- * SSH2 Signature Handler
+ * SSH2 Signature Handler.
  *
  * PHP version 5
  *
  * Handles signatures in the format used by SSH2
  *
  * @category  Crypt
- * @package   Common
+ *
  * @author    Jim Wigginton <terrafrost@php.net>
  * @copyright 2016 Jim Wigginton
  * @license   http://www.opensource.org/licenses/mit-license.html  MIT License
+ *
  * @link      http://phpseclib.sourceforge.net
  */
 
 namespace phpseclib3\Crypt\DSA\Formats\Signature;
 
-use phpseclib3\Common\Functions\Strings;
 use phpseclib3\Math\BigInteger;
+use phpseclib3\Common\Functions\Strings;
 
 /**
- * SSH2 Signature Handler
+ * SSH2 Signature Handler.
  *
- * @package Common
  * @author  Jim Wigginton <terrafrost@php.net>
- * @access  public
  */
-abstract class SSH2
-{
+abstract class SSH2 {
     /**
-     * Loads a signature
+     * Loads a signature.
      *
-     * @access public
      * @param string $sig
+     *
      * @return mixed
      */
-    public static function load($sig)
-    {
+    public static function load($sig) {
         if (!is_string($sig)) {
             return false;
         }
@@ -58,23 +55,23 @@ abstract class SSH2
     }
 
     /**
-     * Returns a signature in the appropriate format
+     * Returns a signature in the appropriate format.
      *
-     * @access public
      * @param \phpseclib3\Math\BigInteger $r
      * @param \phpseclib3\Math\BigInteger $s
+     *
      * @return string
      */
-    public static function save(BigInteger $r, BigInteger $s)
-    {
+    public static function save(BigInteger $r, BigInteger $s) {
         if ($r->getLength() > 160 || $s->getLength() > 160) {
             return false;
         }
+
         return Strings::packSSH2(
             'ss',
             'ssh-dss',
-            str_pad($r->toBytes(), 20, "\0", STR_PAD_LEFT) .
-            str_pad($s->toBytes(), 20, "\0", STR_PAD_LEFT)
+            str_pad($r->toBytes(), 20, "\0", STR_PAD_LEFT)
+            . str_pad($s->toBytes(), 20, "\0", STR_PAD_LEFT)
         );
     }
 }

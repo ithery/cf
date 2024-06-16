@@ -1,52 +1,49 @@
 <?php
 
 /**
- * OpenSSH Formatted DSA Key Handler
+ * OpenSSH Formatted DSA Key Handler.
  *
  * PHP version 5
  *
  * Place in $HOME/.ssh/authorized_keys
  *
  * @category  Crypt
- * @package   DSA
+ *
  * @author    Jim Wigginton <terrafrost@php.net>
  * @copyright 2015 Jim Wigginton
  * @license   http://www.opensource.org/licenses/mit-license.html  MIT License
+ *
  * @link      http://phpseclib.sourceforge.net
  */
 
 namespace phpseclib3\Crypt\DSA\Formats\Keys;
 
+use phpseclib3\Math\BigInteger;
 use phpseclib3\Common\Functions\Strings;
 use phpseclib3\Crypt\Common\Formats\Keys\OpenSSH as Progenitor;
-use phpseclib3\Math\BigInteger;
 
 /**
- * OpenSSH Formatted DSA Key Handler
+ * OpenSSH Formatted DSA Key Handler.
  *
- * @package DSA
  * @author  Jim Wigginton <terrafrost@php.net>
- * @access  public
  */
-abstract class OpenSSH extends Progenitor
-{
+abstract class OpenSSH extends Progenitor {
     /**
-     * Supported Key Types
+     * Supported Key Types.
      *
      * @var array
      */
     protected static $types = ['ssh-dss'];
 
     /**
-     * Break a public or private key down into its constituent components
+     * Break a public or private key down into its constituent components.
      *
-     * @access public
      * @param string $key
      * @param string $password optional
+     *
      * @return array
      */
-    public static function load($key, $password = '')
-    {
+    public static function load($key, $password = '') {
         $parsed = parent::load($key, $password);
 
         if (isset($parsed['paddedKey'])) {
@@ -68,18 +65,17 @@ abstract class OpenSSH extends Progenitor
     }
 
     /**
-     * Convert a public key to the appropriate format
+     * Convert a public key to the appropriate format.
      *
-     * @access public
      * @param \phpseclib3\Math\BigInteger $p
      * @param \phpseclib3\Math\BigInteger $q
      * @param \phpseclib3\Math\BigInteger $g
      * @param \phpseclib3\Math\BigInteger $y
-     * @param array $options optional
+     * @param array                       $options optional
+     *
      * @return string
      */
-    public static function savePublicKey(BigInteger $p, BigInteger $q, BigInteger $g, BigInteger $y, array $options = [])
-    {
+    public static function savePublicKey(BigInteger $p, BigInteger $q, BigInteger $g, BigInteger $y, array $options = []) {
         if ($q->getLength() != 160) {
             throw new \InvalidArgumentException('SSH only supports keys with an N (length of Group Order q) of 160');
         }
@@ -105,18 +101,17 @@ abstract class OpenSSH extends Progenitor
     /**
      * Convert a private key to the appropriate format.
      *
-     * @access public
      * @param \phpseclib3\Math\BigInteger $p
      * @param \phpseclib3\Math\BigInteger $q
      * @param \phpseclib3\Math\BigInteger $g
      * @param \phpseclib3\Math\BigInteger $y
      * @param \phpseclib3\Math\BigInteger $x
-     * @param string $password optional
-     * @param array $options optional
+     * @param string                      $password optional
+     * @param array                       $options  optional
+     *
      * @return string
      */
-    public static function savePrivateKey(BigInteger $p, BigInteger $q, BigInteger $g, BigInteger $y, BigInteger $x, $password = '', array $options = [])
-    {
+    public static function savePrivateKey(BigInteger $p, BigInteger $q, BigInteger $g, BigInteger $y, BigInteger $x, $password = '', array $options = []) {
         $publicKey = self::savePublicKey($p, $q, $g, $y, ['binary' => true]);
         $privateKey = Strings::packSSH2('si5', 'ssh-dss', $p, $q, $g, $y, $x);
 

@@ -1,7 +1,7 @@
 <?php
 
 /**
- * PKCS#1 Formatted DSA Key Handler
+ * PKCS#1 Formatted DSA Key Handler.
  *
  * PHP version 5
  *
@@ -20,40 +20,37 @@
  * we're just re-using that as the name.
  *
  * @category  Crypt
- * @package   DSA
+ *
  * @author    Jim Wigginton <terrafrost@php.net>
  * @copyright 2015 Jim Wigginton
  * @license   http://www.opensource.org/licenses/mit-license.html  MIT License
+ *
  * @link      http://phpseclib.sourceforge.net
  */
 
 namespace phpseclib3\Crypt\DSA\Formats\Keys;
 
-use ParagonIE\ConstantTime\Base64;
-use phpseclib3\Crypt\Common\Formats\Keys\PKCS1 as Progenitor;
 use phpseclib3\File\ASN1;
 use phpseclib3\File\ASN1\Maps;
 use phpseclib3\Math\BigInteger;
+use ParagonIE\ConstantTime\Base64;
+use phpseclib3\Crypt\Common\Formats\Keys\PKCS1 as Progenitor;
 
 /**
- * PKCS#1 Formatted DSA Key Handler
+ * PKCS#1 Formatted DSA Key Handler.
  *
- * @package RSA
  * @author  Jim Wigginton <terrafrost@php.net>
- * @access  public
  */
-abstract class PKCS1 extends Progenitor
-{
+abstract class PKCS1 extends Progenitor {
     /**
-     * Break a public or private key down into its constituent components
+     * Break a public or private key down into its constituent components.
      *
-     * @access public
      * @param string $key
      * @param string $password optional
+     *
      * @return array
      */
-    public static function load($key, $password = '')
-    {
+    public static function load($key, $password = '') {
         $key = parent::load($key, $password);
 
         $decoded = ASN1::decodeBER($key);
@@ -80,16 +77,15 @@ abstract class PKCS1 extends Progenitor
     }
 
     /**
-     * Convert DSA parameters to the appropriate format
+     * Convert DSA parameters to the appropriate format.
      *
-     * @access public
      * @param \phpseclib3\Math\BigInteger $p
      * @param \phpseclib3\Math\BigInteger $q
      * @param \phpseclib3\Math\BigInteger $g
+     *
      * @return string
      */
-    public static function saveParameters(BigInteger $p, BigInteger $q, BigInteger $g)
-    {
+    public static function saveParameters(BigInteger $p, BigInteger $q, BigInteger $g) {
         $key = [
             'p' => $p,
             'q' => $q,
@@ -98,26 +94,25 @@ abstract class PKCS1 extends Progenitor
 
         $key = ASN1::encodeDER($key, Maps\DSAParams::MAP);
 
-        return "-----BEGIN DSA PARAMETERS-----\r\n" .
-               chunk_split(Base64::encode($key), 64) .
-               "-----END DSA PARAMETERS-----\r\n";
+        return "-----BEGIN DSA PARAMETERS-----\r\n"
+               . chunk_split(Base64::encode($key), 64)
+               . "-----END DSA PARAMETERS-----\r\n";
     }
 
     /**
      * Convert a private key to the appropriate format.
      *
-     * @access public
      * @param \phpseclib3\Math\BigInteger $p
      * @param \phpseclib3\Math\BigInteger $q
      * @param \phpseclib3\Math\BigInteger $g
      * @param \phpseclib3\Math\BigInteger $y
      * @param \phpseclib3\Math\BigInteger $x
-     * @param string $password optional
-     * @param array $options optional
+     * @param string                      $password optional
+     * @param array                       $options  optional
+     *
      * @return string
      */
-    public static function savePrivateKey(BigInteger $p, BigInteger $q, BigInteger $g, BigInteger $y, BigInteger $x, $password = '', array $options = [])
-    {
+    public static function savePrivateKey(BigInteger $p, BigInteger $q, BigInteger $g, BigInteger $y, BigInteger $x, $password = '', array $options = []) {
         $key = [
             'version' => 0,
             'p' => $p,
@@ -133,17 +128,16 @@ abstract class PKCS1 extends Progenitor
     }
 
     /**
-     * Convert a public key to the appropriate format
+     * Convert a public key to the appropriate format.
      *
-     * @access public
      * @param \phpseclib3\Math\BigInteger $p
      * @param \phpseclib3\Math\BigInteger $q
      * @param \phpseclib3\Math\BigInteger $g
      * @param \phpseclib3\Math\BigInteger $y
+     *
      * @return string
      */
-    public static function savePublicKey(BigInteger $p, BigInteger $q, BigInteger $g, BigInteger $y)
-    {
+    public static function savePublicKey(BigInteger $p, BigInteger $q, BigInteger $g, BigInteger $y) {
         $key = ASN1::encodeDER($y, Maps\DSAPublicKey::MAP);
 
         return self::wrapPublicKey($key, 'DSA');

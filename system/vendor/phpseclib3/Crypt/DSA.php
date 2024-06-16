@@ -22,99 +22,89 @@
  * </code>
  *
  * @category  Crypt
- * @package   DSA
+ *
  * @author    Jim Wigginton <terrafrost@php.net>
  * @copyright 2016 Jim Wigginton
  * @license   http://www.opensource.org/licenses/mit-license.html  MIT License
+ *
  * @link      http://phpseclib.sourceforge.net
  */
 
 namespace phpseclib3\Crypt;
 
-use phpseclib3\Crypt\Common\AsymmetricKey;
+use phpseclib3\Math\BigInteger;
+use phpseclib3\Crypt\DSA\PublicKey;
 use phpseclib3\Crypt\DSA\Parameters;
 use phpseclib3\Crypt\DSA\PrivateKey;
-use phpseclib3\Crypt\DSA\PublicKey;
+use phpseclib3\Crypt\Common\AsymmetricKey;
 use phpseclib3\Exception\InsufficientSetupException;
-use phpseclib3\Math\BigInteger;
 
 /**
  * Pure-PHP FIPS 186-4 compliant implementation of DSA.
  *
- * @package DSA
  * @author  Jim Wigginton <terrafrost@php.net>
- * @access  public
  */
-abstract class DSA extends AsymmetricKey
-{
+abstract class DSA extends AsymmetricKey {
     /**
-     * Algorithm Name
+     * Algorithm Name.
      *
      * @var string
-     * @access private
      */
     const ALGORITHM = 'DSA';
 
     /**
-     * DSA Prime P
+     * DSA Prime P.
      *
      * @var \phpseclib3\Math\BigInteger
-     * @access private
      */
     protected $p;
 
     /**
-     * DSA Group Order q
+     * DSA Group Order q.
      *
      * Prime divisor of p-1
      *
      * @var \phpseclib3\Math\BigInteger
-     * @access private
      */
     protected $q;
 
     /**
-     * DSA Group Generator G
+     * DSA Group Generator G.
      *
      * @var \phpseclib3\Math\BigInteger
-     * @access private
      */
     protected $g;
 
     /**
-     * DSA public key value y
+     * DSA public key value y.
      *
      * @var \phpseclib3\Math\BigInteger
-     * @access private
      */
     protected $y;
 
     /**
-     * Signature Format
+     * Signature Format.
      *
      * @var string
-     * @access private
      */
     protected $sigFormat;
 
     /**
-     * Signature Format (Short)
+     * Signature Format (Short).
      *
      * @var string
-     * @access private
      */
     protected $shortFormat;
 
     /**
-     * Create DSA parameters
+     * Create DSA parameters.
      *
-     * @access public
      * @param int $L
      * @param int $N
+     *
      * @return \phpseclib3\Crypt\DSA|bool
      */
-    public static function createParameters($L = 2048, $N = 224)
-    {
+    public static function createParameters($L = 2048, $N = 224) {
         self::initialize_static_variables();
 
         if (!isset(self::$engines['PHP'])) {
@@ -186,11 +176,10 @@ abstract class DSA extends AsymmetricKey
      * Returns the private key, from which the publickey can be extracted
      *
      * @param int[] ...$args
-     * @access public
+     *
      * @return DSA\PrivateKey
      */
-    public static function createKey(...$args)
-    {
+    public static function createKey(...$args) {
         self::initialize_static_variables();
 
         if (!isset(self::$engines['PHP'])) {
@@ -224,14 +213,13 @@ abstract class DSA extends AsymmetricKey
     }
 
     /**
-     * OnLoad Handler
+     * OnLoad Handler.
+     *
+     * @param array $components
      *
      * @return bool
-     * @access protected
-     * @param array $components
      */
-    protected static function onLoad($components)
-    {
+    protected static function onLoad($components) {
         if (!isset(self::$engines['PHP'])) {
             self::useBestEngine();
         }
@@ -257,12 +245,11 @@ abstract class DSA extends AsymmetricKey
     }
 
     /**
-     * Constructor
+     * Constructor.
      *
      * PublicKey and PrivateKey objects can only be created from abstract RSA class
      */
-    protected function __construct()
-    {
+    protected function __construct() {
         $this->sigFormat = self::validatePlugin('Signature', 'ASN1');
         $this->shortFormat = 'ASN1';
 
@@ -270,78 +257,72 @@ abstract class DSA extends AsymmetricKey
     }
 
     /**
-     * Returns the key size
+     * Returns the key size.
      *
      * More specifically, this L (the length of DSA Prime P) and N (the length of DSA Group Order q)
      *
-     * @access public
      * @return array
      */
-    public function getLength()
-    {
+    public function getLength() {
         return ['L' => $this->p->getLength(), 'N' => $this->q->getLength()];
     }
 
     /**
-     * Returns the current engine being used
+     * Returns the current engine being used.
      *
      * @see self::useInternalEngine()
      * @see self::useBestEngine()
-     * @access public
+     *
      * @return string
      */
-    public function getEngine()
-    {
+    public function getEngine() {
         if (!isset(self::$engines['PHP'])) {
             self::useBestEngine();
         }
-        return self::$engines['OpenSSL'] && in_array($this->hash->getHash(), openssl_get_md_methods()) ?
-            'OpenSSL' : 'PHP';
+
+        return self::$engines['OpenSSL'] && in_array($this->hash->getHash(), openssl_get_md_methods())
+            ? 'OpenSSL' : 'PHP';
     }
 
     /**
-     * Returns the parameters
+     * Returns the parameters.
      *
      * A public / private key is only returned if the currently loaded "key" contains an x or y
      * value.
      *
      * @see self::getPublicKey()
-     * @access public
+     *
      * @return mixed
      */
-    public function getParameters()
-    {
+    public function getParameters() {
         $type = self::validatePlugin('Keys', 'PKCS1', 'saveParameters');
 
         $key = $type::saveParameters($this->p, $this->q, $this->g);
+
         return DSA::load($key, 'PKCS1')
             ->withHash($this->hash->getHash())
             ->withSignatureFormat($this->shortFormat);
     }
 
     /**
-     * Determines the signature padding mode
+     * Determines the signature padding mode.
      *
      * Valid values are: ASN1, SSH2, Raw
      *
-     * @access public
      * @param string $format
      */
-    public function withSignatureFormat($format)
-    {
+    public function withSignatureFormat($format) {
         $new = clone $this;
         $new->shortFormat = $format;
         $new->sigFormat = self::validatePlugin('Signature', $format);
+
         return $new;
     }
 
     /**
-     * Returns the signature format currently being used
-     *
-     * @access public
+     * Returns the signature format currently being used.
      */
-    public function getSignatureFormat()
-    {
+    public function getSignatureFormat() {
         return $this->shortFormat;
     }
 }

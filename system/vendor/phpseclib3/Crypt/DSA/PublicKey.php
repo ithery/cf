@@ -1,44 +1,42 @@
 <?php
 
 /**
- * DSA Public Key
+ * DSA Public Key.
  *
  * @category  Crypt
- * @package   DSA
+ *
  * @author    Jim Wigginton <terrafrost@php.net>
  * @copyright 2015 Jim Wigginton
  * @license   http://www.opensource.org/licenses/mit-license.html  MIT License
+ *
  * @link      http://phpseclib.sourceforge.net
  */
 
 namespace phpseclib3\Crypt\DSA;
 
-use phpseclib3\Crypt\Common;
 use phpseclib3\Crypt\DSA;
+use phpseclib3\Crypt\Common;
 use phpseclib3\Crypt\DSA\Formats\Signature\ASN1 as ASN1Signature;
 
 /**
- * DSA Public Key
+ * DSA Public Key.
  *
- * @package DSA
  * @author  Jim Wigginton <terrafrost@php.net>
- * @access  public
  */
-class PublicKey extends DSA implements Common\PublicKey
-{
+class PublicKey extends DSA implements Common\PublicKey {
     use Common\Traits\Fingerprint;
 
     /**
-     * Verify a signature
+     * Verify a signature.
      *
      * @see self::verify()
-     * @access public
+     *
      * @param string $message
      * @param string $signature
+     *
      * @return mixed
      */
-    public function verify($message, $signature)
-    {
+    public function verify($message, $signature) {
         $format = $this->sigFormat;
 
         $params = $format::load($signature);
@@ -76,14 +74,14 @@ class PublicKey extends DSA implements Common\PublicKey
     }
 
     /**
-     * Returns the public key
+     * Returns the public key.
      *
      * @param string $type
-     * @param array $options optional
+     * @param array  $options optional
+     *
      * @return string
      */
-    public function toString($type, array $options = [])
-    {
+    public function toString($type, array $options = []) {
         $type = self::validatePlugin('Keys', $type, 'savePublicKey');
 
         return $type::savePublicKey($this->p, $this->q, $this->g, $this->y, $options);

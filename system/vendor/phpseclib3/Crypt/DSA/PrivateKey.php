@@ -1,44 +1,41 @@
 <?php
 
 /**
- * DSA Private Key
+ * DSA Private Key.
  *
  * @category  Crypt
- * @package   DSA
+ *
  * @author    Jim Wigginton <terrafrost@php.net>
  * @copyright 2015 Jim Wigginton
  * @license   http://www.opensource.org/licenses/mit-license.html  MIT License
+ *
  * @link      http://phpseclib.sourceforge.net
  */
 
 namespace phpseclib3\Crypt\DSA;
 
-use phpseclib3\Crypt\Common;
 use phpseclib3\Crypt\DSA;
-use phpseclib3\Crypt\DSA\Formats\Signature\ASN1 as ASN1Signature;
+use phpseclib3\Crypt\Common;
 use phpseclib3\Math\BigInteger;
+use phpseclib3\Crypt\DSA\Formats\Signature\ASN1 as ASN1Signature;
 
 /**
- * DSA Private Key
+ * DSA Private Key.
  *
- * @package DSA
  * @author  Jim Wigginton <terrafrost@php.net>
- * @access  public
  */
-class PrivateKey extends DSA implements Common\PrivateKey
-{
+class PrivateKey extends DSA implements Common\PrivateKey {
     use Common\Traits\PasswordProtected;
 
     /**
-     * DSA secret exponent x
+     * DSA secret exponent x.
      *
      * @var \phpseclib3\Math\BigInteger
-     * @access private
      */
     protected $x;
 
     /**
-     * Returns the public key
+     * Returns the public key.
      *
      * If you do "openssl rsa -in private.rsa -pubout -outform PEM" you get a PKCS8 formatted key
      * that contains a publicKeyAlgorithm AlgorithmIdentifier and a publicKey BIT STRING.
@@ -56,11 +53,10 @@ class PrivateKey extends DSA implements Common\PrivateKey
      * without the parameters and the PKCS1 DSA public key format does not include the parameters.
      *
      * @see self::getPrivateKey()
-     * @access public
+     *
      * @return mixed
      */
-    public function getPublicKey()
-    {
+    public function getPublicKey() {
         $type = self::validatePlugin('Keys', 'PKCS8', 'savePublicKey');
 
         if (!isset($this->y)) {
@@ -75,15 +71,15 @@ class PrivateKey extends DSA implements Common\PrivateKey
     }
 
     /**
-     * Create a signature
+     * Create a signature.
      *
      * @see self::verify()
-     * @access public
+     *
      * @param string $message
+     *
      * @return mixed
      */
-    public function sign($message)
-    {
+    public function sign($message) {
         $format = $this->sigFormat;
 
         if (self::$engines['OpenSSL'] && in_array($this->hash->getHash(), openssl_get_md_methods())) {
@@ -140,14 +136,14 @@ class PrivateKey extends DSA implements Common\PrivateKey
     }
 
     /**
-     * Returns the private key
+     * Returns the private key.
      *
      * @param string $type
-     * @param array $options optional
+     * @param array  $options optional
+     *
      * @return string
      */
-    public function toString($type, array $options = [])
-    {
+    public function toString($type, array $options = []) {
         $type = self::validatePlugin('Keys', $type, 'savePrivateKey');
 
         if (!isset($this->y)) {

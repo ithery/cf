@@ -1,15 +1,16 @@
 <?php
 
 /**
- * Curve methods common to all curves
+ * Curve methods common to all curves.
  *
  * PHP version 5 and 7
  *
  * @category  Crypt
- * @package   EC
+ *
  * @author    Jim Wigginton <terrafrost@php.net>
  * @copyright 2017 Jim Wigginton
  * @license   http://www.opensource.org/licenses/mit-license.html  MIT License
+ *
  * @link      http://pear.php.net/package/Math_BigInteger
  */
 
@@ -18,84 +19,77 @@ namespace phpseclib3\Crypt\EC\BaseCurves;
 use phpseclib3\Math\BigInteger;
 
 /**
- * Base
+ * Base.
  *
- * @package Prime
  * @author  Jim Wigginton <terrafrost@php.net>
- * @access  public
  */
-abstract class Base
-{
+abstract class Base {
     /**
-     * Doubles
+     * Doubles.
      *
      * @var object[]
      */
     protected $doubles;
 
     /**
-     * NAF Points
-     *
-     * @var int[]
-     */
-    private $naf;
-
-    /**
-     * The Order
+     * The Order.
      *
      * @var BigInteger
      */
     protected $order;
 
     /**
-     * Finite Field Integer factory
+     * Finite Field Integer factory.
      *
      * @var \phpseclib3\Math\FiniteField\Integer
      */
     protected $factory;
 
     /**
-     * Returns a random integer
+     * NAF Points.
+     *
+     * @var int[]
+     */
+    private $naf;
+
+    /**
+     * Returns a random integer.
      *
      * @return object
      */
-    public function randomInteger()
-    {
+    public function randomInteger() {
         return $this->factory->randomInteger();
     }
 
     /**
-     * Converts a BigInteger to a \phpseclib3\Math\FiniteField\Integer integer
+     * Converts a BigInteger to a \phpseclib3\Math\FiniteField\Integer integer.
      *
      * @return object
      */
-    public function convertInteger(BigInteger $x)
-    {
+    public function convertInteger(BigInteger $x) {
         return $this->factory->newInteger($x);
     }
 
     /**
-     * Returns the length, in bytes, of the modulo
+     * Returns the length, in bytes, of the modulo.
      *
-     * @return integer
+     * @return int
      */
-    public function getLengthInBytes()
-    {
+    public function getLengthInBytes() {
         return $this->factory->getLengthInBytes();
     }
 
     /**
-     * Returns the length, in bits, of the modulo
+     * Returns the length, in bits, of the modulo.
      *
-     * @return integer
+     * @return int
      */
-    public function getLength()
-    {
+    public function getLength() {
         return $this->factory->getLength();
     }
 
     /**
-     * Multiply a point on the curve by a scalar
+     * Multiply a point on the curve by a scalar.
      *
      * Uses the montgomery ladder technique as described here:
      *
@@ -104,12 +98,11 @@ abstract class Base
      *
      * @return array
      */
-    public function multiplyPoint(array $p, BigInteger $d)
-    {
+    public function multiplyPoint(array $p, BigInteger $d) {
         $alreadyInternal = isset($p[2]);
-        $r = $alreadyInternal ?
-            [[], $p] :
-            [[], $this->convertToInternal($p)];
+        $r = $alreadyInternal
+            ? [[], $p]
+            : [[], $this->convertToInternal($p)];
 
         $d = $d->toBits();
         for ($i = 0; $i < strlen($d); $i++) {
@@ -122,12 +115,11 @@ abstract class Base
     }
 
     /**
-     * Creates a random scalar multiplier
+     * Creates a random scalar multiplier.
      *
      * @return BigInteger
      */
-    public function createRandomMultiplier()
-    {
+    public function createRandomMultiplier() {
         static $one;
         if (!isset($one)) {
             $one = new BigInteger(1);
@@ -137,10 +129,9 @@ abstract class Base
     }
 
     /**
-     * Performs range check
+     * Performs range check.
      */
-    public function rangeCheck(BigInteger $x)
-    {
+    public function rangeCheck(BigInteger $x) {
         static $zero;
         if (!isset($zero)) {
             $zero = new BigInteger();
@@ -155,60 +146,54 @@ abstract class Base
     }
 
     /**
-     * Sets the Order
+     * Sets the Order.
      */
-    public function setOrder(BigInteger $order)
-    {
+    public function setOrder(BigInteger $order) {
         $this->order = $order;
     }
 
     /**
-     * Returns the Order
+     * Returns the Order.
      *
      * @return \phpseclib3\Math\BigInteger
      */
-    public function getOrder()
-    {
+    public function getOrder() {
         return $this->order;
     }
 
     /**
-     * Use a custom defined modular reduction function
+     * Use a custom defined modular reduction function.
      *
      * @return object
      */
-    public function setReduction(callable $func)
-    {
+    public function setReduction(callable $func) {
         $this->factory->setReduction($func);
     }
 
     /**
-     * Returns the affine point
+     * Returns the affine point.
      *
      * @return object[]
      */
-    public function convertToAffine(array $p)
-    {
+    public function convertToAffine(array $p) {
         return $p;
     }
 
     /**
-     * Converts an affine point to a jacobian coordinate
+     * Converts an affine point to a jacobian coordinate.
      *
      * @return object[]
      */
-    public function convertToInternal(array $p)
-    {
+    public function convertToInternal(array $p) {
         return $p;
     }
 
     /**
-     * Negates a point
+     * Negates a point.
      *
      * @return object[]
      */
-    public function negatePoint(array $p)
-    {
+    public function negatePoint(array $p) {
         $temp = [
             $p[0],
             $p[1]->negate()
@@ -216,21 +201,22 @@ abstract class Base
         if (isset($p[2])) {
             $temp[] = $p[2];
         }
+
         return $temp;
     }
 
     /**
-     * Multiply and Add Points
+     * Multiply and Add Points.
      *
      * @return int[]
      */
-    public function multiplyAddPoints(array $points, array $scalars)
-    {
+    public function multiplyAddPoints(array $points, array $scalars) {
         $p1 = $this->convertToInternal($points[0]);
         $p2 = $this->convertToInternal($points[1]);
         $p1 = $this->multiplyPoint($p1, $scalars[0]);
         $p2 = $this->multiplyPoint($p2, $scalars[1]);
         $r = $this->addPoint($p1, $p2);
+
         return $this->convertToAffine($r);
     }
 }

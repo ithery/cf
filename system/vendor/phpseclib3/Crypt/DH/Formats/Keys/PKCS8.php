@@ -1,7 +1,7 @@
 <?php
 
 /**
- * PKCS#8 Formatted DH Key Handler
+ * PKCS#8 Formatted DH Key Handler.
  *
  * PHP version 5
  *
@@ -12,64 +12,58 @@
  * -----BEGIN PUBLIC KEY-----
  *
  * @category  Crypt
- * @package   DH
+ *
  * @author    Jim Wigginton <terrafrost@php.net>
  * @copyright 2015 Jim Wigginton
  * @license   http://www.opensource.org/licenses/mit-license.html  MIT License
+ *
  * @link      http://phpseclib.sourceforge.net
  */
 
 namespace phpseclib3\Crypt\DH\Formats\Keys;
 
-use phpseclib3\Common\Functions\Strings;
-use phpseclib3\Crypt\Common\Formats\Keys\PKCS8 as Progenitor;
 use phpseclib3\File\ASN1;
 use phpseclib3\File\ASN1\Maps;
 use phpseclib3\Math\BigInteger;
+use phpseclib3\Common\Functions\Strings;
+use phpseclib3\Crypt\Common\Formats\Keys\PKCS8 as Progenitor;
 
 /**
- * PKCS#8 Formatted DH Key Handler
+ * PKCS#8 Formatted DH Key Handler.
  *
- * @package DH
  * @author  Jim Wigginton <terrafrost@php.net>
- * @access  public
  */
-abstract class PKCS8 extends Progenitor
-{
+abstract class PKCS8 extends Progenitor {
     /**
-     * OID Name
+     * OID Name.
      *
      * @var string
-     * @access private
      */
     const OID_NAME = 'dhKeyAgreement';
 
     /**
-     * OID Value
+     * OID Value.
      *
      * @var string
-     * @access private
      */
     const OID_VALUE = '1.2.840.113549.1.3.1';
 
     /**
-     * Child OIDs loaded
+     * Child OIDs loaded.
      *
      * @var bool
-     * @access private
      */
     protected static $childOIDsLoaded = false;
 
     /**
-     * Break a public or private key down into its constituent components
+     * Break a public or private key down into its constituent components.
      *
-     * @access public
      * @param string $key
      * @param string $password optional
+     *
      * @return array
      */
-    public static function load($key, $password = '')
-    {
+    public static function load($key, $password = '') {
         if (!Strings::is_stringable($key)) {
             throw new \UnexpectedValueException('Key should be a string - not a ' . gettype($key));
         }
@@ -112,17 +106,16 @@ abstract class PKCS8 extends Progenitor
     /**
      * Convert a private key to the appropriate format.
      *
-     * @access public
      * @param \phpseclib3\Math\BigInteger $prime
      * @param \phpseclib3\Math\BigInteger $base
      * @param \phpseclib3\Math\BigInteger $privateKey
      * @param \phpseclib3\Math\BigInteger $publicKey
-     * @param string $password optional
-     * @param array $options optional
+     * @param string                      $password   optional
+     * @param array                       $options    optional
+     *
      * @return string
      */
-    public static function savePrivateKey(BigInteger $prime, BigInteger $base, BigInteger $privateKey, BigInteger $publicKey, $password = '', array $options = [])
-    {
+    public static function savePrivateKey(BigInteger $prime, BigInteger $base, BigInteger $privateKey, BigInteger $publicKey, $password = '', array $options = []) {
         $params = [
             'prime' => $prime,
             'base' => $base
@@ -130,21 +123,21 @@ abstract class PKCS8 extends Progenitor
         $params = ASN1::encodeDER($params, Maps\DHParameter::MAP);
         $params = new ASN1\Element($params);
         $key = ASN1::encodeDER($privateKey, ['type' => ASN1::TYPE_INTEGER]);
+
         return self::wrapPrivateKey($key, [], $params, $password, null, '', $options);
     }
 
     /**
-     * Convert a public key to the appropriate format
+     * Convert a public key to the appropriate format.
      *
-     * @access public
      * @param \phpseclib3\Math\BigInteger $prime
      * @param \phpseclib3\Math\BigInteger $base
      * @param \phpseclib3\Math\BigInteger $publicKey
-     * @param array $options optional
+     * @param array                       $options   optional
+     *
      * @return string
      */
-    public static function savePublicKey(BigInteger $prime, BigInteger $base, BigInteger $publicKey, array $options = [])
-    {
+    public static function savePublicKey(BigInteger $prime, BigInteger $base, BigInteger $publicKey, array $options = []) {
         $params = [
             'prime' => $prime,
             'base' => $base
@@ -152,6 +145,7 @@ abstract class PKCS8 extends Progenitor
         $params = ASN1::encodeDER($params, Maps\DHParameter::MAP);
         $params = new ASN1\Element($params);
         $key = ASN1::encodeDER($publicKey, ['type' => ASN1::TYPE_INTEGER]);
+
         return self::wrapPublicKey($key, $params);
     }
 }
