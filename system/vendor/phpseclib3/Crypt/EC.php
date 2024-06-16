@@ -21,119 +21,131 @@
  * ?>
  * </code>
  *
- * @category  Crypt
- *
  * @author    Jim Wigginton <terrafrost@php.net>
  * @copyright 2016 Jim Wigginton
  * @license   http://www.opensource.org/licenses/mit-license.html  MIT License
- *
  * @link      http://phpseclib.sourceforge.net
  */
 
+declare(strict_types=1);
+
 namespace phpseclib3\Crypt;
 
-use phpseclib3\File\ASN1;
-use phpseclib3\Math\BigInteger;
-use phpseclib3\Crypt\EC\PublicKey;
-use phpseclib3\Crypt\EC\Parameters;
-use phpseclib3\Crypt\EC\PrivateKey;
-use phpseclib3\Crypt\EC\Curves\Ed448;
-use phpseclib3\Crypt\EC\Curves\Ed25519;
 use phpseclib3\Crypt\Common\AsymmetricKey;
-use phpseclib3\Crypt\EC\Curves\Curve25519;
-use phpseclib3\Crypt\EC\Formats\Keys\PKCS1;
-use phpseclib3\File\ASN1\Maps\ECParameters;
-use phpseclib3\Exception\UnsupportedCurveException;
-use phpseclib3\Exception\UnsupportedAlgorithmException;
-use phpseclib3\Exception\UnsupportedOperationException;
+use phpseclib3\Crypt\EC\BaseCurves\Base;
 use phpseclib3\Crypt\EC\BaseCurves\Montgomery as MontgomeryCurve;
 use phpseclib3\Crypt\EC\BaseCurves\TwistedEdwards as TwistedEdwardsCurve;
+use phpseclib3\Crypt\EC\Curves\Curve25519;
+use phpseclib3\Crypt\EC\Curves\Ed25519;
+use phpseclib3\Crypt\EC\Curves\Ed448;
+use phpseclib3\Crypt\EC\Formats\Keys\PKCS1;
+use phpseclib3\Crypt\EC\Parameters;
+use phpseclib3\Crypt\EC\PrivateKey;
+use phpseclib3\Crypt\EC\PublicKey;
+use phpseclib3\Exception\InvalidArgumentException;
+use phpseclib3\Exception\LengthException;
+use phpseclib3\Exception\UnsupportedAlgorithmException;
+use phpseclib3\Exception\UnsupportedCurveException;
+use phpseclib3\Exception\UnsupportedOperationException;
+use phpseclib3\File\ASN1;
+use phpseclib3\File\ASN1\Maps\ECParameters;
+use phpseclib3\Math\BigInteger;
 
 /**
  * Pure-PHP implementation of EC.
  *
  * @author  Jim Wigginton <terrafrost@php.net>
  */
-abstract class EC extends AsymmetricKey {
+abstract class EC extends AsymmetricKey
+{
     /**
-     * Algorithm Name.
+     * Algorithm Name
      *
      * @var string
      */
-    const ALGORITHM = 'EC';
+    public const ALGORITHM = 'EC';
 
     /**
-     * Public Key QA.
+     * Public Key QA
      *
      * @var object[]
      */
     protected $QA;
 
     /**
-     * Curve.
+     * Curve
      *
-     * @var \phpseclib3\Crypt\EC\BaseCurves\Base
+     * @var Base
      */
     protected $curve;
 
     /**
-     * Signature Format.
+     * Signature Format
      *
      * @var string
      */
     protected $format;
 
     /**
-     * Signature Format (Short).
+     * Signature Format (Short)
      *
      * @var string
      */
     protected $shortFormat;
 
     /**
-     * Curve Order.
-     *
-     * Used for deterministic ECDSA
-     *
-     * @var \phpseclib3\Math\BigInteger
-     */
-    protected $q;
-
-    /**
-     * Alias for the private key.
-     *
-     * Used for deterministic ECDSA. AsymmetricKey expects $x. I don't like x because
-     * with x you have x * the base point yielding an (x, y)-coordinate that is the
-     * public key. But the x is different depending on which side of the equal sign
-     * you're on. It's less ambiguous if you do dA * base point = (x, y)-coordinate.
-     *
-     * @var \phpseclib3\Math\BigInteger
-     */
-    protected $x;
-
-    /**
-     * Context.
-     *
-     * @var string
-     */
-    protected $context;
-
-    /**
-     * Curve Name.
+     * Curve Name
      *
      * @var string
      */
     private $curveName;
 
     /**
-     * Create public / private key pair.
+     * Curve Order
      *
-     * @param string $curve
+     * Used for deterministic ECDSA
      *
-     * @return \phpseclib3\Crypt\EC\PrivateKey
+     * @var BigInteger
      */
-    public static function createKey($curve) {
+    protected $q;
+
+    /**
+     * Alias for the private key
+     *
+     * Used for deterministic ECDSA. AsymmetricKey expects $x. I don't like x because
+     * with x you have x * the base point yielding an (x, y)-coordinate that is the
+     * public key. But the x is different depending on which side of the equal sign
+     * you're on. It's less ambiguous if you do dA * base point = (x, y)-coordinate.
+     *
+     * @var BigInteger
+     */
+    protected $x;
+
+    /**
+     * Context
+     *
+     * @var string
+     */
+    protected $context;
+
+    /**
+     * Signature Format
+     *
+     * @var string
+     */
+    protected $sigFormat;
+
+    /**
+     * Create public / private key pair.
+     */
+    public static function createKey(string $curve): PrivateKey
+    {
         self::initialize_static_variables();
+
+        $class = new \ReflectionClass(static::class);
+        if ($class->isFinal()) {
+            throw new \RuntimeException('createKey() should not be called from final classes (' . static::class . ')');
+        }
 
         if (!isset(self::$engines['PHP'])) {
             self::useBestEngine();
@@ -167,12 +179,18 @@ abstract class EC extends AsymmetricKey {
         }
 
         $reflect = new \ReflectionClass($curve);
-        $curveName = $reflect->isFinal()
-            ? $reflect->getParentClass()->getShortName()
-            : $reflect->getShortName();
+        $curveName = $reflect->isFinal() ?
+            $reflect->getParentClass()->getShortName() :
+            $reflect->getShortName();
 
         $curve = new $curve();
-        $privatekey->dA = $dA = $curve->createRandomMultiplier();
+        if ($curve instanceof TwistedEdwardsCurve) {
+            $arr = $curve->extractSecret(Random::string($curve instanceof Ed448 ? 57 : 32));
+            $privatekey->dA = $dA = $arr['dA'];
+            $privatekey->secret = $arr['secret'];
+        } else {
+            $privatekey->dA = $dA = $curve->createRandomMultiplier();
+        }
         if ($curve instanceof Curve25519 && self::$engines['libsodium']) {
             //$r = pack('H*', '0900000000000000000000000000000000000000000000000000000000000000');
             //$QA = sodium_crypto_scalarmult($dA->toBytes(), $r);
@@ -198,13 +216,12 @@ abstract class EC extends AsymmetricKey {
     }
 
     /**
-     * OnLoad Handler.
+     * OnLoad Handler
      *
-     * @param array $components
-     *
-     * @return bool
+     * @return AsymmetricKey|Parameters|PrivateKey|PublicKey
      */
-    protected static function onLoad($components) {
+    protected static function onLoad(array $components)
+    {
         if (!isset(self::$engines['PHP'])) {
             self::useBestEngine();
         }
@@ -212,18 +229,18 @@ abstract class EC extends AsymmetricKey {
         if (!isset($components['dA']) && !isset($components['QA'])) {
             $new = new Parameters();
             $new->curve = $components['curve'];
-
             return $new;
         }
 
-        $new = isset($components['dA'])
-            ? new PrivateKey()
-            : new PublicKey();
+        $new = isset($components['dA']) ?
+            new PrivateKey() :
+            new PublicKey();
         $new->curve = $components['curve'];
         $new->QA = $components['QA'];
 
         if (isset($components['dA'])) {
             $new->dA = $components['dA'];
+            $new->secret = $components['secret'];
         }
 
         if ($new->curve instanceof TwistedEdwardsCurve) {
@@ -234,11 +251,12 @@ abstract class EC extends AsymmetricKey {
     }
 
     /**
-     * Constructor.
+     * Constructor
      *
      * PublicKey and PrivateKey objects can only be created from abstract RSA class
      */
-    protected function __construct() {
+    protected function __construct()
+    {
         $this->sigFormat = self::validatePlugin('Signature', 'ASN1');
         $this->shortFormat = 'ASN1';
 
@@ -246,26 +264,25 @@ abstract class EC extends AsymmetricKey {
     }
 
     /**
-     * Returns the curve.
+     * Returns the curve
      *
      * Returns a string if it's a named curve, an array if not
      *
      * @return string|array
      */
-    public function getCurve() {
+    public function getCurve()
+    {
         if ($this->curveName) {
             return $this->curveName;
         }
 
         if ($this->curve instanceof MontgomeryCurve) {
             $this->curveName = $this->curve instanceof Curve25519 ? 'Curve25519' : 'Curve448';
-
             return $this->curveName;
         }
 
         if ($this->curve instanceof TwistedEdwardsCurve) {
             $this->curveName = $this->curve instanceof Ed25519 ? 'Ed25519' : 'Ed448';
-
             return $this->curveName;
         }
 
@@ -275,7 +292,6 @@ abstract class EC extends AsymmetricKey {
         $decoded = ASN1::asn1map($decoded[0], ECParameters::MAP);
         if (isset($decoded['namedCurve'])) {
             $this->curveName = $decoded['namedCurve'];
-
             return $decoded['namedCurve'];
         }
 
@@ -287,7 +303,7 @@ abstract class EC extends AsymmetricKey {
     }
 
     /**
-     * Returns the key size.
+     * Returns the key size
      *
      * Quoting https://tools.ietf.org/html/rfc5656#section-2,
      *
@@ -298,62 +314,56 @@ abstract class EC extends AsymmetricKey {
      *  representation of the field, commonly denoted by m.  A set of
      *  elliptic curve domain parameters defines a group of order n generated
      *  by a base point P"
-     *
-     * @return int
      */
-    public function getLength() {
+    public function getLength(): int
+    {
         return $this->curve->getLength();
     }
 
     /**
-     * Returns the current engine being used.
+     * Returns the current engine being used
      *
      * @see self::useInternalEngine()
      * @see self::useBestEngine()
-     *
-     * @return string
      */
-    public function getEngine() {
+    public function getEngine(): string
+    {
         if (!isset(self::$engines['PHP'])) {
             self::useBestEngine();
         }
         if ($this->curve instanceof TwistedEdwardsCurve) {
-            return $this->curve instanceof Ed25519 && self::$engines['libsodium'] && !isset($this->context)
-                ? 'libsodium' : 'PHP';
+            return $this->curve instanceof Ed25519 && self::$engines['libsodium'] && !isset($this->context) ?
+                'libsodium' : 'PHP';
         }
 
-        return self::$engines['OpenSSL'] && in_array($this->hash->getHash(), openssl_get_md_methods())
-            ? 'OpenSSL' : 'PHP';
+        return self::$engines['OpenSSL'] && in_array($this->hash->getHash(), openssl_get_md_methods()) ?
+            'OpenSSL' : 'PHP';
     }
 
     /**
-     * Returns the public key coordinates as a string.
+     * Returns the public key coordinates as a string
      *
      * Used by ECDH
-     *
-     * @return string
      */
-    public function getEncodedCoordinates() {
+    public function getEncodedCoordinates(): string
+    {
         if ($this->curve instanceof MontgomeryCurve) {
             return strrev($this->QA[0]->toBytes(true));
         }
         if ($this->curve instanceof TwistedEdwardsCurve) {
             return $this->curve->encodePoint($this->QA);
         }
-
         return "\4" . $this->QA[0]->toBytes(true) . $this->QA[1]->toBytes(true);
     }
 
     /**
-     * Returns the parameters.
-     *
-     * @see self::getPublicKey()
+     * Returns the parameters
      *
      * @param string $type optional
-     *
-     * @return mixed
+     * @see self::getPublicKey()
      */
-    public function getParameters($type = 'PKCS1') {
+    public function getParameters(string $type = 'PKCS1')
+    {
         $type = self::validatePlugin('Keys', $type, 'saveParameters');
 
         $key = $type::saveParameters($this->curve);
@@ -364,13 +374,12 @@ abstract class EC extends AsymmetricKey {
     }
 
     /**
-     * Determines the signature padding mode.
+     * Determines the signature padding mode
      *
      * Valid values are: ASN1, SSH2, Raw
-     *
-     * @param string $format
      */
-    public function withSignatureFormat($format) {
+    public function withSignatureFormat(string $format): EC
+    {
         if ($this->curve instanceof MontgomeryCurve) {
             throw new UnsupportedOperationException('Montgomery Curves cannot be used to create signatures');
         }
@@ -378,28 +387,28 @@ abstract class EC extends AsymmetricKey {
         $new = clone $this;
         $new->shortFormat = $format;
         $new->sigFormat = self::validatePlugin('Signature', $format);
-
         return $new;
     }
 
     /**
-     * Returns the signature format currently being used.
+     * Returns the signature format currently being used
      */
-    public function getSignatureFormat() {
+    public function getSignatureFormat(): string
+    {
         return $this->shortFormat;
     }
 
     /**
-     * Sets the context.
+     * Sets the context
      *
      * Used by Ed25519 / Ed448.
      *
-     * @see self::sign()
+     * @param string|null $context optional
      * @see self::verify()
-     *
-     * @param string $context optional
+          * @see self::sign()
      */
-    public function withContext($context = null) {
+    public function withContext(?string $context = null): EC
+    {
         if (!$this->curve instanceof TwistedEdwardsCurve) {
             throw new UnsupportedCurveException('Only Ed25519 and Ed448 support contexts');
         }
@@ -407,33 +416,31 @@ abstract class EC extends AsymmetricKey {
         $new = clone $this;
         if (!isset($context)) {
             $new->context = null;
-
             return $new;
         }
         if (!is_string($context)) {
-            throw new \InvalidArgumentException('setContext expects a string');
+            throw new InvalidArgumentException('setContext expects a string');
         }
         if (strlen($context) > 255) {
-            throw new \LengthException('The context is supposed to be, at most, 255 bytes long');
+            throw new LengthException('The context is supposed to be, at most, 255 bytes long');
         }
         $new->context = $context;
-
         return $new;
     }
 
     /**
-     * Returns the signature format currently being used.
+     * Returns the signature format currently being used
      */
-    public function getContext() {
+    public function getContext(): string
+    {
         return $this->context;
     }
 
     /**
-     * Determines which hashing function should be used.
-     *
-     * @param string $hash
+     * Determines which hashing function should be used
      */
-    public function withHash($hash) {
+    public function withHash(string $hash): AsymmetricKey
+    {
         if ($this->curve instanceof MontgomeryCurve) {
             throw new UnsupportedOperationException('Montgomery Curves cannot be used to create signatures');
         }
@@ -448,11 +455,12 @@ abstract class EC extends AsymmetricKey {
     }
 
     /**
-     * __toString() magic method.
+     * __toString() magic method
      *
      * @return string
      */
-    public function __toString() {
+    public function __toString()
+    {
         if ($this->curve instanceof MontgomeryCurve) {
             return '';
         }

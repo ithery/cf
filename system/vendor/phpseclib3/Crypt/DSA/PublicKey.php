@@ -1,42 +1,40 @@
 <?php
 
 /**
- * DSA Public Key.
- *
- * @category  Crypt
+ * DSA Public Key
  *
  * @author    Jim Wigginton <terrafrost@php.net>
  * @copyright 2015 Jim Wigginton
  * @license   http://www.opensource.org/licenses/mit-license.html  MIT License
- *
  * @link      http://phpseclib.sourceforge.net
  */
 
+declare(strict_types=1);
+
 namespace phpseclib3\Crypt\DSA;
 
-use phpseclib3\Crypt\DSA;
 use phpseclib3\Crypt\Common;
+use phpseclib3\Crypt\DSA;
 use phpseclib3\Crypt\DSA\Formats\Signature\ASN1 as ASN1Signature;
 
 /**
- * DSA Public Key.
+ * DSA Public Key
  *
  * @author  Jim Wigginton <terrafrost@php.net>
  */
-class PublicKey extends DSA implements Common\PublicKey {
+final class PublicKey extends DSA implements Common\PublicKey
+{
     use Common\Traits\Fingerprint;
 
     /**
-     * Verify a signature.
+     * Verify a signature
      *
      * @see self::verify()
-     *
      * @param string $message
      * @param string $signature
-     *
-     * @return mixed
      */
-    public function verify($message, $signature) {
+    public function verify($message, $signature): bool
+    {
         $format = $this->sigFormat;
 
         $params = $format::load($signature);
@@ -63,25 +61,23 @@ class PublicKey extends DSA implements Common\PublicKey {
         $w = $s->modInverse($this->q);
         $h = $this->hash->hash($message);
         $h = $this->bits2int($h);
-        list(, $u1) = $h->multiply($w)->divide($this->q);
-        list(, $u2) = $r->multiply($w)->divide($this->q);
+        [, $u1] = $h->multiply($w)->divide($this->q);
+        [, $u2] = $r->multiply($w)->divide($this->q);
         $v1 = $this->g->powMod($u1, $this->p);
         $v2 = $this->y->powMod($u2, $this->p);
-        list(, $v) = $v1->multiply($v2)->divide($this->p);
-        list(, $v) = $v->divide($this->q);
+        [, $v] = $v1->multiply($v2)->divide($this->p);
+        [, $v] = $v->divide($this->q);
 
         return $v->equals($r);
     }
 
     /**
-     * Returns the public key.
+     * Returns the public key
      *
-     * @param string $type
-     * @param array  $options optional
-     *
-     * @return string
+     * @param array $options optional
      */
-    public function toString($type, array $options = []) {
+    public function toString(string $type, array $options = []): string
+    {
         $type = self::validatePlugin('Keys', $type, 'savePublicKey');
 
         return $type::savePublicKey($this->p, $this->q, $this->g, $this->y, $options);

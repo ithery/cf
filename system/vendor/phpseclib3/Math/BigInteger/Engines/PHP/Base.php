@@ -5,13 +5,13 @@
  *
  * PHP version 5 and 7
  *
- * @category  Math
- * @package   BigInteger
  * @author    Jim Wigginton <terrafrost@php.net>
  * @copyright 2017 Jim Wigginton
  * @license   http://www.opensource.org/licenses/mit-license.html  MIT License
  * @link      http://pear.php.net/package/Math_BigInteger
  */
+
+declare(strict_types=1);
 
 namespace phpseclib3\Math\BigInteger\Engines\PHP;
 
@@ -20,9 +20,7 @@ use phpseclib3\Math\BigInteger\Engines\PHP;
 /**
  * PHP Modular Exponentiation Engine
  *
- * @package PHP
  * @author  Jim Wigginton <terrafrost@php.net>
- * @access  public
  */
 abstract class Base extends PHP
 {
@@ -30,23 +28,17 @@ abstract class Base extends PHP
      * Cache constants
      *
      * $cache[self::VARIABLE] tells us whether or not the cached data is still valid.
-     *
-     * @access private
      */
-    const VARIABLE = 0;
+    public const VARIABLE = 0;
     /**
      * $cache[self::DATA] contains the cached data.
-     *
-     * @access private
      */
-    const DATA = 1;
+    public const DATA = 1;
 
     /**
      * Test for engine validity
-     *
-     * @return bool
      */
-    public static function isValidEngine()
+    public static function isValidEngine(): bool
     {
         return static::class != __CLASS__;
     }
@@ -73,14 +65,8 @@ abstract class Base extends PHP
      * uses a trick involving the Chinese Remainder Theorem to factor the even modulo into two numbers - one odd and
      * the other, a power of two - and recombine them, later.  This is the method that this modPow function uses.
      * {@link http://islab.oregonstate.edu/papers/j34monex.pdf Montgomery Reduction with Even Modulus} elaborates.
-     *
-     * @param PHP $x
-     * @param PHP $e
-     * @param PHP $n
-     * @param string $class
-     * @return PHP
      */
-    protected static function powModHelper(PHP $x, PHP $e, PHP $n, $class)
+    protected static function powModHelper(PHP $x, PHP $e, PHP $n, string $class): PHP
     {
         if (empty($e->value)) {
             $temp = new $class();
@@ -89,14 +75,14 @@ abstract class Base extends PHP
         }
 
         if ($e->value == [1]) {
-            list(, $temp) = $x->divide($n);
+            [, $temp] = $x->divide($n);
             return $x->normalize($temp);
         }
 
         if ($e->value == [2]) {
             $temp = new $class();
             $temp->value = $class::square($x->value);
-            list(, $temp) = $temp->divide($n);
+            [, $temp] = $temp->divide($n);
             return $x->normalize($temp);
         }
 
@@ -106,13 +92,9 @@ abstract class Base extends PHP
     /**
      * Modular reduction preparation
      *
-     * @param array $x
-     * @param array $n
-     * @param string $class
      * @see self::slidingWindow()
-     * @return array
      */
-    protected static function prepareReduce(array $x, array $n, $class)
+    protected static function prepareReduce(array $x, array $n, string $class): array
     {
         return static::reduce($x, $n, $class);
     }
@@ -120,14 +102,9 @@ abstract class Base extends PHP
     /**
      * Modular multiply
      *
-     * @param array $x
-     * @param array $y
-     * @param array $n
-     * @param string $class
      * @see self::slidingWindow()
-     * @return array
      */
-    protected static function multiplyReduce(array $x, array $y, array $n, $class)
+    protected static function multiplyReduce(array $x, array $y, array $n, string $class): array
     {
         $temp = $class::multiplyHelper($x, false, $y, false);
         return static::reduce($temp[self::VALUE], $n, $class);
@@ -136,13 +113,9 @@ abstract class Base extends PHP
     /**
      * Modular square
      *
-     * @param array $x
-     * @param array $n
-     * @param string $class
      * @see self::slidingWindow()
-     * @return array
      */
-    protected static function squareReduce(array $x, array $n, $class)
+    protected static function squareReduce(array $x, array $n, string $class): array
     {
         return static::reduce($class::square($x), $n, $class);
     }
