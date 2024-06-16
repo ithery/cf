@@ -1,7 +1,7 @@
 <?php
 
 /**
- * Random Number Generator
+ * Random Number Generator.
  *
  * PHP version 5
  *
@@ -15,24 +15,22 @@
  * </code>
  *
  * @category  Crypt
- * @package   Random
+ *
  * @author    Jim Wigginton <terrafrost@php.net>
  * @copyright 2007 Jim Wigginton
  * @license   http://www.opensource.org/licenses/mit-license.html  MIT License
+ *
  * @link      http://phpseclib.sourceforge.net
  */
 
 namespace phpseclib3\Crypt;
 
 /**
- * Pure-PHP Random Number Generator
+ * Pure-PHP Random Number Generator.
  *
- * @package Random
  * @author  Jim Wigginton <terrafrost@php.net>
- * @access  public
  */
-abstract class Random
-{
+abstract class Random {
     /**
      * Generate a random string.
      *
@@ -41,11 +39,12 @@ abstract class Random
      * eg. for RSA key generation.
      *
      * @param int $length
+     *
      * @throws \RuntimeException if a symmetric cipher is needed but not loaded
+     *
      * @return string
      */
-    public static function string($length)
-    {
+    public static function string($length) {
         if (!$length) {
             return '';
         }
@@ -97,13 +96,13 @@ abstract class Random
             session_cache_limiter('');
             session_start();
 
-            $v = (isset($_SERVER) ? self::safe_serialize($_SERVER) : '') .
-                 (isset($_POST) ? self::safe_serialize($_POST) : '') .
-                 (isset($_GET) ? self::safe_serialize($_GET) : '') .
-                 (isset($_COOKIE) ? self::safe_serialize($_COOKIE) : '') .
-                 self::safe_serialize($GLOBALS) .
-                 self::safe_serialize($_SESSION) .
-                 self::safe_serialize($_OLD_SESSION);
+            $v = (isset($_SERVER) ? self::safe_serialize($_SERVER) : '')
+                 . (isset($_POST) ? self::safe_serialize($_POST) : '')
+                 . (isset($_GET) ? self::safe_serialize($_GET) : '')
+                 . (isset($_COOKIE) ? self::safe_serialize($_COOKIE) : '')
+                 . self::safe_serialize($GLOBALS)
+                 . self::safe_serialize($_SESSION)
+                 . self::safe_serialize($_OLD_SESSION);
             $v = $seed = $_SESSION['seed'] = sha1($v, true);
             if (!isset($_SESSION['count'])) {
                 $_SESSION['count'] = 0;
@@ -144,21 +143,27 @@ abstract class Random
             switch (true) {
                 case class_exists('\phpseclib3\Crypt\AES'):
                     $crypto = new AES('ctr');
+
                     break;
                 case class_exists('\phpseclib3\Crypt\Twofish'):
                     $crypto = new Twofish('ctr');
+
                     break;
                 case class_exists('\phpseclib3\Crypt\Blowfish'):
                     $crypto = new Blowfish('ctr');
+
                     break;
                 case class_exists('\phpseclib3\Crypt\TripleDES'):
                     $crypto = new TripleDES('ctr');
+
                     break;
                 case class_exists('\phpseclib3\Crypt\DES'):
                     $crypto = new DES('ctr');
+
                     break;
                 case class_exists('\phpseclib3\Crypt\RC4'):
                     $crypto = new RC4();
+
                     break;
                 default:
                     throw new \RuntimeException(__CLASS__ . ' requires at least one symmetric cipher be loaded');
@@ -191,14 +196,15 @@ abstract class Random
     }
 
     /**
-     * Safely serialize variables
+     * Safely serialize variables.
      *
      * If a class has a private __sleep() it'll emit a warning
-     * @return mixed
+     *
      * @param mixed $arr
+     *
+     * @return mixed
      */
-    private static function safe_serialize(&$arr)
-    {
+    private static function safe_serialize(&$arr) {
         if (is_object($arr)) {
             return '';
         }
@@ -218,6 +224,7 @@ abstract class Random
             }
         }
         unset($arr['__phpseclib_marker']);
+
         return serialize($safearr);
     }
 }

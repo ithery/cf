@@ -40,10 +40,11 @@
  * </code>
  *
  * @category  Crypt
- * @package   AES
+ *
  * @author    Jim Wigginton <terrafrost@php.net>
  * @copyright 2008 Jim Wigginton
  * @license   http://www.opensource.org/licenses/mit-license.html  MIT License
+ *
  * @link      http://phpseclib.sourceforge.net
  */
 
@@ -52,39 +53,36 @@ namespace phpseclib3\Crypt;
 /**
  * Pure-PHP implementation of AES.
  *
- * @package AES
  * @author  Jim Wigginton <terrafrost@php.net>
- * @access  public
  */
-class AES extends Rijndael
-{
+class AES extends Rijndael {
     /**
-     * Dummy function
+     * Dummy function.
      *
      * Since \phpseclib3\Crypt\AES extends \phpseclib3\Crypt\Rijndael, this function is, technically, available, but it doesn't do anything.
      *
      * @see \phpseclib3\Crypt\Rijndael::setBlockLength()
-     * @access public
+     *
      * @param int $length
+     *
      * @throws \BadMethodCallException anytime it's called
      */
-    public function setBlockLength($length)
-    {
+    public function setBlockLength($length) {
         throw new \BadMethodCallException('The block length cannot be set for AES.');
     }
 
     /**
-     * Sets the key length
+     * Sets the key length.
      *
      * Valid key lengths are 128, 192, and 256.  Set the link to bool(false) to disable a fixed key length
      *
      * @see \phpseclib3\Crypt\Rijndael:setKeyLength()
-     * @access public
+     *
      * @param int $length
+     *
      * @throws \LengthException if the key length isn't supported
      */
-    public function setKeyLength($length)
-    {
+    public function setKeyLength($length) {
         switch ($length) {
             case 128:
             case 192:
@@ -103,12 +101,12 @@ class AES extends Rijndael
      *
      * @see \phpseclib3\Crypt\Rijndael:setKey()
      * @see setKeyLength()
-     * @access public
+     *
      * @param string $key
+     *
      * @throws \LengthException if the key length isn't supported
      */
-    public function setKey($key)
-    {
+    public function setKey($key) {
         switch (strlen($key)) {
             case 16:
             case 24:

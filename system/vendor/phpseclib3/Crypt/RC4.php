@@ -35,10 +35,11 @@
  * </code>
  *
  * @category  Crypt
- * @package   RC4
+ *
  * @author    Jim Wigginton <terrafrost@php.net>
  * @copyright 2007 Jim Wigginton
  * @license   http://www.opensource.org/licenses/mit-license.html  MIT License
+ *
  * @link      http://phpseclib.sourceforge.net
  */
 
@@ -49,72 +50,67 @@ use phpseclib3\Crypt\Common\StreamCipher;
 /**
  * Pure-PHP implementation of RC4.
  *
- * @package RC4
  * @author  Jim Wigginton <terrafrost@php.net>
- * @access  public
  */
-class RC4 extends StreamCipher
-{
+class RC4 extends StreamCipher {
     /**
-     * @access private
      * @see \phpseclib3\Crypt\RC4::_crypt()
      */
     const ENCRYPT = 0;
 
     /**
-     * @access private
      * @see \phpseclib3\Crypt\RC4::_crypt()
      */
     const DECRYPT = 1;
 
     /**
-     * Key Length (in bytes)
+     * Key Length (in bytes).
      *
      * @see \phpseclib3\Crypt\RC4::setKeyLength()
+     *
      * @var int
-     * @access private
      */
     protected $key_length = 128; // = 1024 bits
 
     /**
-     * The mcrypt specific name of the cipher
+     * The mcrypt specific name of the cipher.
      *
      * @see \phpseclib3\Crypt\Common\SymmetricKey::cipher_name_mcrypt
+     *
      * @var string
-     * @access private
      */
     protected $cipher_name_mcrypt = 'arcfour';
 
     /**
-     * The Key
+     * The Key.
      *
      * @see self::setKey()
+     *
      * @var string
-     * @access private
      */
     protected $key;
 
     /**
-     * The Key Stream for decryption and encryption
+     * The Key Stream for decryption and encryption.
      *
      * @see self::setKey()
+     *
      * @var array
-     * @access private
      */
     private $stream;
 
     /**
-     * Test for engine validity
+     * Test for engine validity.
      *
      * This is mainly just a wrapper to set things up for \phpseclib3\Crypt\Common\SymmetricKey::isValidEngine()
      *
      * @see \phpseclib3\Crypt\Common\SymmetricKey::__construct()
+     *
      * @param int $engine
-     * @access protected
+     *
      * @return bool
      */
-    protected function isValidEngineHelper($engine)
-    {
+    protected function isValidEngineHelper($engine) {
         if ($engine == self::ENGINE_OPENSSL) {
             if ($this->continuousBuffer) {
                 return false;
@@ -125,12 +121,15 @@ class RC4 extends StreamCipher
                 switch (strlen($this->key)) {
                     case 5:
                         $this->cipher_name_openssl = 'rc4-40';
+
                         break;
                     case 8:
                         $this->cipher_name_openssl = 'rc4-64';
+
                         break;
                     case 16:
                         $this->cipher_name_openssl = 'rc4';
+
                         break;
                     default:
                         return false;
@@ -142,16 +141,15 @@ class RC4 extends StreamCipher
     }
 
     /**
-     * Sets the key length
+     * Sets the key length.
      *
      * Keys can be between 1 and 256 bytes long.
      *
-     * @access public
      * @param int $length
+     *
      * @throws \LengthException if the key length is invalid
      */
-    public function setKeyLength($length)
-    {
+    public function setKeyLength($length) {
         if ($length < 8 || $length > 2048) {
             throw new \LengthException('Key size of ' . $length . ' bits is not supported by this algorithm. Only keys between 1 and 256 bytes are supported');
         }
@@ -162,15 +160,13 @@ class RC4 extends StreamCipher
     }
 
     /**
-     * Sets the key length
+     * Sets the key length.
      *
      * Keys can be between 1 and 256 bytes long.
      *
-     * @access public
      * @param string $key
      */
-    public function setKey($key)
-    {
+    public function setKey($key) {
         $length = strlen($key);
         if ($length < 1 || $length > 256) {
             throw new \LengthException('Key size of ' . $length . ' bytes is not supported by RC4. Keys must be between 1 and 256 bytes long');
@@ -184,15 +180,16 @@ class RC4 extends StreamCipher
      *
      * @see \phpseclib3\Crypt\Common\SymmetricKey::decrypt()
      * @see self::crypt()
-     * @access public
+     *
      * @param string $plaintext
+     *
      * @return string $ciphertext
      */
-    public function encrypt($plaintext)
-    {
+    public function encrypt($plaintext) {
         if ($this->engine != self::ENGINE_INTERNAL) {
             return parent::encrypt($plaintext);
         }
+
         return $this->crypt($plaintext, self::ENCRYPT);
     }
 
@@ -204,48 +201,43 @@ class RC4 extends StreamCipher
      *
      * @see \phpseclib3\Crypt\Common\SymmetricKey::encrypt()
      * @see self::crypt()
-     * @access public
+     *
      * @param string $ciphertext
+     *
      * @return string $plaintext
      */
-    public function decrypt($ciphertext)
-    {
+    public function decrypt($ciphertext) {
         if ($this->engine != self::ENGINE_INTERNAL) {
             return parent::decrypt($ciphertext);
         }
+
         return $this->crypt($ciphertext, self::DECRYPT);
     }
 
     /**
-     * Encrypts a block
+     * Encrypts a block.
      *
-     * @access private
      * @param string $in
      */
-    protected function encryptBlock($in)
-    {
+    protected function encryptBlock($in) {
         // RC4 does not utilize this method
     }
 
     /**
-     * Decrypts a block
+     * Decrypts a block.
      *
-     * @access private
      * @param string $in
      */
-    protected function decryptBlock($in)
-    {
+    protected function decryptBlock($in) {
         // RC4 does not utilize this method
     }
 
     /**
-     * Setup the key (expansion)
+     * Setup the key (expansion).
      *
      * @see \phpseclib3\Crypt\Common\SymmetricKey::_setupKey()
-     * @access private
      */
-    protected function setupKey()
-    {
+    protected function setupKey() {
         $key = $this->key;
         $keyLength = strlen($key);
         $keyStream = range(0, 255);
@@ -270,13 +262,13 @@ class RC4 extends StreamCipher
      *
      * @see self::encrypt()
      * @see self::decrypt()
-     * @access private
+     *
      * @param string $text
-     * @param int $mode
+     * @param int    $mode
+     *
      * @return string $text
      */
-    private function crypt($text, $mode)
-    {
+    private function crypt($text, $mode) {
         if ($this->changed) {
             $this->setup();
         }
