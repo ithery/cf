@@ -21,91 +21,95 @@
  * ?>
  * </code>
  *
- * @category  Crypt
- *
  * @author    Jim Wigginton <terrafrost@php.net>
  * @copyright 2016 Jim Wigginton
  * @license   http://www.opensource.org/licenses/mit-license.html  MIT License
- *
  * @link      http://phpseclib.sourceforge.net
  */
 
+declare(strict_types=1);
+
 namespace phpseclib3\Crypt;
 
-use phpseclib3\Math\BigInteger;
-use phpseclib3\Crypt\DSA\PublicKey;
+use phpseclib3\Crypt\Common\AsymmetricKey;
 use phpseclib3\Crypt\DSA\Parameters;
 use phpseclib3\Crypt\DSA\PrivateKey;
-use phpseclib3\Crypt\Common\AsymmetricKey;
+use phpseclib3\Crypt\DSA\PublicKey;
 use phpseclib3\Exception\InsufficientSetupException;
+use phpseclib3\Exception\InvalidArgumentException;
+use phpseclib3\Math\BigInteger;
 
 /**
  * Pure-PHP FIPS 186-4 compliant implementation of DSA.
  *
  * @author  Jim Wigginton <terrafrost@php.net>
  */
-abstract class DSA extends AsymmetricKey {
+abstract class DSA extends AsymmetricKey
+{
     /**
-     * Algorithm Name.
+     * Algorithm Name
      *
      * @var string
      */
-    const ALGORITHM = 'DSA';
+    public const ALGORITHM = 'DSA';
 
     /**
-     * DSA Prime P.
+     * DSA Prime P
      *
-     * @var \phpseclib3\Math\BigInteger
+     * @var BigInteger
      */
     protected $p;
 
     /**
-     * DSA Group Order q.
+     * DSA Group Order q
      *
      * Prime divisor of p-1
      *
-     * @var \phpseclib3\Math\BigInteger
+     * @var BigInteger
      */
     protected $q;
 
     /**
-     * DSA Group Generator G.
+     * DSA Group Generator G
      *
-     * @var \phpseclib3\Math\BigInteger
+     * @var BigInteger
      */
     protected $g;
 
     /**
-     * DSA public key value y.
+     * DSA public key value y
      *
-     * @var \phpseclib3\Math\BigInteger
+     * @var BigInteger
      */
     protected $y;
 
     /**
-     * Signature Format.
+     * Signature Format
      *
      * @var string
      */
     protected $sigFormat;
 
     /**
-     * Signature Format (Short).
+     * Signature Format (Short)
      *
      * @var string
      */
     protected $shortFormat;
 
     /**
-     * Create DSA parameters.
+     * Create DSA parameters
      *
-     * @param int $L
-     * @param int $N
-     *
-     * @return \phpseclib3\Crypt\DSA|bool
+     * @return DSA|bool
      */
-    public static function createParameters($L = 2048, $N = 224) {
+    public static function createParameters(int $L = 2048, int $N = 224)
+    {
         self::initialize_static_variables();
+
+        $class = new \ReflectionClass(static::class);
+        if ($class->isFinal()) {
+            throw new \RuntimeException('createParameters() should not be called from final classes (' . static::class . ')');
+        }
 
         if (!isset(self::$engines['PHP'])) {
             self::useBestEngine();
@@ -129,7 +133,7 @@ abstract class DSA extends AsymmetricKey {
             case $L == 3072 && $N == 256:
                 break;
             default:
-                throw new \InvalidArgumentException('Invalid values for N and L');
+                throw new InvalidArgumentException('Invalid values for N and L');
         }
 
         $two = new BigInteger(2);
@@ -139,12 +143,12 @@ abstract class DSA extends AsymmetricKey {
 
         do {
             $x = BigInteger::random($L);
-            list(, $c) = $x->divide($divisor);
+            [, $c] = $x->divide($divisor);
             $p = $x->subtract($c->subtract(self::$one));
         } while ($p->getLength() != $L || !$p->isPrime());
 
         $p_1 = $p->subtract(self::$one);
-        list($e) = $p_1->divide($q);
+        [$e] = $p_1->divide($q);
 
         // quoting http://nvlpubs.nist.gov/nistpubs/FIPS/NIST.FIPS.186-4.pdf#page=50 ,
         // "h could be obtained from a random number generator or from a counter that
@@ -176,11 +180,15 @@ abstract class DSA extends AsymmetricKey {
      * Returns the private key, from which the publickey can be extracted
      *
      * @param int[] ...$args
-     *
-     * @return DSA\PrivateKey
      */
-    public static function createKey(...$args) {
+    public static function createKey(...$args): PrivateKey
+    {
         self::initialize_static_variables();
+
+        $class = new \ReflectionClass(static::class);
+        if ($class->isFinal()) {
+            throw new \RuntimeException('createKey() should not be called from final classes (' . static::class . ')');
+        }
 
         if (!isset(self::$engines['PHP'])) {
             self::useBestEngine();
@@ -213,13 +221,12 @@ abstract class DSA extends AsymmetricKey {
     }
 
     /**
-     * OnLoad Handler.
+     * OnLoad Handler
      *
-     * @param array $components
-     *
-     * @return bool
+     * @return Parameters|PrivateKey|PublicKey
      */
-    protected static function onLoad($components) {
+    protected static function onLoad(array $components)
+    {
         if (!isset(self::$engines['PHP'])) {
             self::useBestEngine();
         }
@@ -245,11 +252,12 @@ abstract class DSA extends AsymmetricKey {
     }
 
     /**
-     * Constructor.
+     * Constructor
      *
      * PublicKey and PrivateKey objects can only be created from abstract RSA class
      */
-    protected function __construct() {
+    protected function __construct()
+    {
         $this->sigFormat = self::validatePlugin('Signature', 'ASN1');
         $this->shortFormat = 'ASN1';
 
@@ -257,72 +265,66 @@ abstract class DSA extends AsymmetricKey {
     }
 
     /**
-     * Returns the key size.
+     * Returns the key size
      *
      * More specifically, this L (the length of DSA Prime P) and N (the length of DSA Group Order q)
-     *
-     * @return array
      */
-    public function getLength() {
+    public function getLength(): array
+    {
         return ['L' => $this->p->getLength(), 'N' => $this->q->getLength()];
     }
 
     /**
-     * Returns the current engine being used.
+     * Returns the current engine being used
      *
      * @see self::useInternalEngine()
      * @see self::useBestEngine()
-     *
-     * @return string
      */
-    public function getEngine() {
+    public function getEngine(): string
+    {
         if (!isset(self::$engines['PHP'])) {
             self::useBestEngine();
         }
-
-        return self::$engines['OpenSSL'] && in_array($this->hash->getHash(), openssl_get_md_methods())
-            ? 'OpenSSL' : 'PHP';
+        return self::$engines['OpenSSL'] && in_array($this->hash->getHash(), openssl_get_md_methods()) ?
+            'OpenSSL' : 'PHP';
     }
 
     /**
-     * Returns the parameters.
+     * Returns the parameters
      *
      * A public / private key is only returned if the currently loaded "key" contains an x or y
      * value.
      *
      * @see self::getPublicKey()
-     *
-     * @return mixed
      */
-    public function getParameters() {
+    public function getParameters()
+    {
         $type = self::validatePlugin('Keys', 'PKCS1', 'saveParameters');
 
         $key = $type::saveParameters($this->p, $this->q, $this->g);
-
         return DSA::load($key, 'PKCS1')
             ->withHash($this->hash->getHash())
             ->withSignatureFormat($this->shortFormat);
     }
 
     /**
-     * Determines the signature padding mode.
+     * Determines the signature padding mode
      *
      * Valid values are: ASN1, SSH2, Raw
-     *
-     * @param string $format
      */
-    public function withSignatureFormat($format) {
+    public function withSignatureFormat(string $format): DSA
+    {
         $new = clone $this;
         $new->shortFormat = $format;
         $new->sigFormat = self::validatePlugin('Signature', $format);
-
         return $new;
     }
 
     /**
-     * Returns the signature format currently being used.
+     * Returns the signature format currently being used
      */
-    public function getSignatureFormat() {
+    public function getSignatureFormat(): string
+    {
         return $this->shortFormat;
     }
 }

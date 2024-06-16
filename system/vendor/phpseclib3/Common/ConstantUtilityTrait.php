@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace phpseclib3\Common;
 
 use phpseclib3\Exception\InvalidArgumentException;
@@ -7,16 +9,16 @@ use phpseclib3\Exception\InvalidArgumentException;
 /**
  * @internal
  */
-trait ConstantUtilityTrait {
-    /**
-     * @var null|string[]
-     */
+trait ConstantUtilityTrait
+{
+    /** @var string[]|null */
     private static $valueToConstantNameMap = null;
 
     /**
      * @param string|int $value
      */
-    public static function findConstantNameByValue($value): ?string {
+    public static function findConstantNameByValue($value): ?string
+    {
         if (!self::$valueToConstantNameMap) {
             $reflectionClass = new \ReflectionClass(static::class);
             $constantNameToValueMap = $reflectionClass->getConstants();
@@ -25,19 +27,18 @@ trait ConstantUtilityTrait {
         if (isset(self::$valueToConstantNameMap[$value])) {
             return self::$valueToConstantNameMap[$value];
         }
-
         return null;
     }
 
     /**
      * @param string|int $value
      */
-    public static function getConstantNameByValue($value): string {
+    public static function getConstantNameByValue($value): string
+    {
         $constantName = static::findConstantNameByValue($value);
         if ($constantName === null) {
             throw new InvalidArgumentException(sprintf('"%s" does not have constant with value "%s".', static::class, $value));
         }
-
         return $constantName;
     }
 }

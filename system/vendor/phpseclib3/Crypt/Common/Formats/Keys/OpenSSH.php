@@ -1,126 +1,118 @@
 <?php
 
 /**
- * OpenSSH Key Handler.
+ * OpenSSH Key Handler
  *
  * PHP version 5
  *
  * Place in $HOME/.ssh/authorized_keys
  *
- * @category  Crypt
- *
  * @author    Jim Wigginton <terrafrost@php.net>
  * @copyright 2015 Jim Wigginton
  * @license   http://www.opensource.org/licenses/mit-license.html  MIT License
- *
  * @link      http://phpseclib.sourceforge.net
  */
 
+declare(strict_types=1);
+
 namespace phpseclib3\Crypt\Common\Formats\Keys;
 
-use phpseclib3\Crypt\Random;
-use ParagonIE\ConstantTime\Base64;
 use phpseclib3\Common\Functions\Strings;
-use phpseclib3\Exception\UnsupportedFormatException;
+use phpseclib3\Crypt\AES;
+use phpseclib3\Crypt\Random;
+use phpseclib3\Exception\BadDecryptionException;
+use phpseclib3\Exception\RuntimeException;
+use phpseclib3\Exception\UnexpectedValueException;
 
 /**
- * OpenSSH Formatted RSA Key Handler.
+ * OpenSSH Formatted RSA Key Handler
  *
  * @author  Jim Wigginton <terrafrost@php.net>
  */
-abstract class OpenSSH {
+abstract class OpenSSH
+{
     /**
-     * Default comment.
+     * Default comment
      *
      * @var string
      */
     protected static $comment = 'phpseclib-generated-key';
 
     /**
-     * Binary key flag.
+     * Binary key flag
      *
      * @var bool
      */
     protected static $binary = false;
 
     /**
-     * Sets the default comment.
-     *
-     * @param string $comment
+     * Sets the default comment
      */
-    public static function setComment($comment) {
+    public static function setComment(string $comment): void
+    {
         self::$comment = str_replace(["\r", "\n"], '', $comment);
     }
 
     /**
-     * Break a public or private key down into its constituent components.
+     * Break a public or private key down into its constituent components
      *
      * $type can be either ssh-dss or ssh-rsa
      *
-     * @param string $key
-     * @param string $password
-     *
-     * @return array
+     * @param string|array $key
      */
-    public static function load($key, $password = '') {
+    public static function load($key, ?string $password = null): array
+    {
         if (!Strings::is_stringable($key)) {
-            throw new \UnexpectedValueException('Key should be a string - not a ' . gettype($key));
+            throw new UnexpectedValueException('Key should be a string - not a ' . gettype($key));
         }
 
         // key format is described here:
         // https://cvsweb.openbsd.org/cgi-bin/cvsweb/src/usr.bin/ssh/PROTOCOL.key?annotate=HEAD
 
-        if (strpos($key, 'BEGIN OPENSSH PRIVATE KEY') !== false) {
+        if (str_contains($key, 'BEGIN OPENSSH PRIVATE KEY')) {
             $key = preg_replace('#(?:^-.*?-[\r\n]*$)|\s#ms', '', $key);
-            $key = Base64::decode($key);
+            $key = Strings::base64_decode($key);
             $magic = Strings::shift($key, 15);
             if ($magic != "openssh-key-v1\0") {
-                throw new \RuntimeException('Expected openssh-key-v1');
+                throw new RuntimeException('Expected openssh-key-v1');
             }
-            list($ciphername, $kdfname, $kdfoptions, $numKeys) = Strings::unpackSSH2('sssN', $key);
+            [$ciphername, $kdfname, $kdfoptions, $numKeys] = Strings::unpackSSH2('sssN', $key);
             if ($numKeys != 1) {
                 // if we wanted to support multiple keys we could update PublicKeyLoader to preview what the # of keys
                 // would be; it'd then call Common\Keys\OpenSSH.php::load() and get the paddedKey. it'd then pass
                 // that to the appropriate key loading parser $numKey times or something
-                throw new \RuntimeException('Although the OpenSSH private key format supports multiple keys phpseclib does not');
-            }
-            if (strlen($kdfoptions) || $kdfname != 'none' || $ciphername != 'none') {
-                /*
-                  OpenSSH private keys use a customized version of bcrypt. specifically, instead of encrypting
-                  OrpheanBeholderScryDoubt 64 times OpenSSH's bcrypt variant encrypts
-                  OxychromaticBlowfishSwatDynamite 64 times. so we can't use crypt().
-
-                  bcrypt is basically Blowfish with an altered key expansion. whereas Blowfish just runs the
-                  key through the key expansion bcrypt interleaves the key expansion with the salt and
-                  password. this renders openssl / mcrypt unusuable. this forces us to use a pure-PHP implementation
-                  of bcrypt. the problem with that is that pure-PHP is too slow to be practically useful.
-
-                  in addition to encrypting a different string 64 times the OpenSSH implementation also performs bcrypt
-                  from scratch $rounds times. calling crypt() 64x with bcrypt takes 0.7s. PHP is going to be naturally
-                  slower. pure-PHP is 215x slower than OpenSSL for AES and pure-PHP is 43x slower for bcrypt.
-                  43 * 0.7 = 30s. no one wants to wait 30s to load a private key.
-
-                  another way to think about this..  according to wikipedia's article on Blowfish,
-                  "Each new key requires pre-processing equivalent to encrypting about 4 kilobytes of text".
-                  key expansion is done (9+64*2)*160 times. multiply that by 4 and it turns out that Blowfish,
-                  OpenSSH style, is the equivalent of encrypting ~80mb of text.
-
-                  more supporting evidence: sodium_compat does not implement Argon2 (another password hashing
-                  algorithm) because "It's not feasible to polyfill scrypt or Argon2 into PHP and get reasonable
-                  performance. Users would feel motivated to select parameters that downgrade security to avoid
-                  denial of service (DoS) attacks. The only winning move is not to play"
-                    -- https://github.com/paragonie/sodium_compat/blob/master/README.md
-                */
-                throw new \RuntimeException('Encrypted OpenSSH private keys are not supported');
-                //list($salt, $rounds) = Strings::unpackSSH2('sN', $kdfoptions);
+                throw new RuntimeException('Although the OpenSSH private key format supports multiple keys phpseclib does not');
             }
 
-            list($publicKey, $paddedKey) = Strings::unpackSSH2('ss', $key);
-            list($type) = Strings::unpackSSH2('s', $publicKey);
-            list($checkint1, $checkint2) = Strings::unpackSSH2('NN', $paddedKey);
+            switch ($ciphername) {
+                case 'none':
+                    break;
+                case 'aes256-ctr':
+                    if ($kdfname != 'bcrypt') {
+                        throw new RuntimeException('Only the bcrypt kdf is supported (' . $kdfname . ' encountered)');
+                    }
+                    [$salt, $rounds] = Strings::unpackSSH2('sN', $kdfoptions);
+                    $crypto = new AES('ctr');
+                    //$crypto->setKeyLength(256);
+                    //$crypto->disablePadding();
+                    $crypto->setPassword($password, 'bcrypt', $salt, $rounds, 32);
+                    break;
+                default:
+                    throw new RuntimeException('The only supported ciphers are: none, aes256-ctr (' . $ciphername . ' is being used)');
+            }
+
+            [$publicKey, $paddedKey] = Strings::unpackSSH2('ss', $key);
+            [$type] = Strings::unpackSSH2('s', $publicKey);
+            if (isset($crypto)) {
+                $paddedKey = $crypto->decrypt($paddedKey);
+            }
+            [$checkint1, $checkint2] = Strings::unpackSSH2('NN', $paddedKey);
             // any leftover bytes in $paddedKey are for padding? but they should be sequential bytes. eg. 1, 2, 3, etc.
             if ($checkint1 != $checkint2) {
-                throw new \RuntimeException('The two checkints do not match');
+                if (isset($crypto)) {
+                    throw new BadDecryptionException('Unable to decrypt key - please verify the password you are using');
+                }
+                throw new RuntimeException("The two checkints do not match ($checkint1 vs. $checkint2)");
             }
             self::checkType($type);
 
@@ -131,24 +123,24 @@ abstract class OpenSSH {
 
         if (!isset($parts[1])) {
             $key = base64_decode($parts[0]);
-            $comment = isset($parts[1]) ? $parts[1] : false;
+            $comment = false;
         } else {
             $asciiType = $parts[0];
             self::checkType($parts[0]);
             $key = base64_decode($parts[1]);
-            $comment = isset($parts[2]) ? $parts[2] : false;
+            $comment = $parts[2] ?? false;
         }
         if ($key === false) {
-            throw new \UnexpectedValueException('Key should be a string - not a ' . gettype($key));
+            throw new UnexpectedValueException('Key should be a string - not a ' . gettype($key));
         }
 
-        list($type) = Strings::unpackSSH2('s', $key);
+        [$type] = Strings::unpackSSH2('s', $key);
         self::checkType($type);
         if (isset($asciiType) && $asciiType != $type) {
-            throw new \RuntimeException('Two different types of keys are claimed: ' . $asciiType . ' and ' . $type);
+            throw new RuntimeException('Two different types of keys are claimed: ' . $asciiType . ' and ' . $type);
         }
         if (strlen($key) <= 4) {
-            throw new \UnexpectedValueException('Key appears to be malformed');
+            throw new UnexpectedValueException('Key appears to be malformed');
         }
 
         $publicKey = $key;
@@ -157,49 +149,41 @@ abstract class OpenSSH {
     }
 
     /**
-     * Toggle between binary and printable keys.
+     * Toggle between binary and printable keys
      *
      * Printable keys are what are generated by default. These are the ones that go in
      * $HOME/.ssh/authorized_key.
-     *
-     * @param bool $enabled
      */
-    public static function setBinaryOutput($enabled) {
+    public static function setBinaryOutput(bool $enabled): void
+    {
         self::$binary = $enabled;
     }
 
     /**
-     * Checks to see if the type is valid.
-     *
-     * @param string $candidate
+     * Checks to see if the type is valid
      */
-    private static function checkType($candidate) {
+    private static function checkType(string $candidate): void
+    {
         if (!in_array($candidate, static::$types)) {
-            throw new \RuntimeException("The key type ($candidate) is not equal to: " . implode(',', static::$types));
+            throw new RuntimeException("The key type ($candidate) is not equal to: " . implode(',', static::$types));
         }
     }
 
     /**
-     * Wrap a private key appropriately.
+     * Wrap a private key appropriately
      *
-     * @param string $publicKey
-     * @param string $privateKey
-     * @param string $password
-     * @param array  $options
-     *
-     * @return string
+     * @param string|false $password
      */
-    protected static function wrapPrivateKey($publicKey, $privateKey, $password, $options) {
-        if (!empty($password) && is_string($password)) {
-            throw new UnsupportedFormatException('Encrypted OpenSSH private keys are not supported');
-        }
+    protected static function wrapPrivateKey(string $publicKey, string $privateKey, $password, array $options): string
+    {
+        [, $checkint] = unpack('N', Random::string(4));
 
-        list(, $checkint) = unpack('N', Random::string(4));
+        $comment = $options['comment'] ?? self::$comment;
+        $paddedKey = Strings::packSSH2('NN', $checkint, $checkint) .
+                     $privateKey .
+                     Strings::packSSH2('s', $comment);
 
-        $comment = isset($options['comment']) ? $options['comment'] : self::$comment;
-        $paddedKey = Strings::packSSH2('NN', $checkint, $checkint)
-                     . $privateKey
-                     . Strings::packSSH2('s', $comment);
+        $usesEncryption = !empty($password) && is_string($password);
 
         /*
            from http://tools.ietf.org/html/rfc4253#section-6 :
@@ -208,15 +192,26 @@ abstract class OpenSSH {
            'padding_length', 'payload', and 'random padding' MUST be a multiple
            of the cipher block size or 8, whichever is larger.
          */
-        $paddingLength = (7 * strlen($paddedKey)) % 8;
+        $blockSize = $usesEncryption ? 16 : 8;
+        $paddingLength = (($blockSize - 1) * strlen($paddedKey)) % $blockSize;
         for ($i = 1; $i <= $paddingLength; $i++) {
             $paddedKey .= chr($i);
         }
-        $key = Strings::packSSH2('sssNss', 'none', 'none', '', 1, $publicKey, $paddedKey);
+        if (!$usesEncryption) {
+            $key = Strings::packSSH2('sssNss', 'none', 'none', '', 1, $publicKey, $paddedKey);
+        } else {
+            $rounds = $options['rounds'] ?? 16;
+            $salt = Random::string(16);
+            $kdfoptions = Strings::packSSH2('sN', $salt, $rounds);
+            $crypto = new AES('ctr');
+            $crypto->setPassword($password, 'bcrypt', $salt, $rounds, 32);
+            $paddedKey = $crypto->encrypt($paddedKey);
+            $key = Strings::packSSH2('sssNss', 'aes256-ctr', 'bcrypt', $kdfoptions, 1, $publicKey, $paddedKey);
+        }
         $key = "openssh-key-v1\0$key";
 
-        return "-----BEGIN OPENSSH PRIVATE KEY-----\n"
-               . chunk_split(Base64::encode($key), 70, "\n")
-               . "-----END OPENSSH PRIVATE KEY-----\n";
+        return "-----BEGIN OPENSSH PRIVATE KEY-----\n" .
+               chunk_split(Strings::base64_encode($key), 70, "\n") .
+               "-----END OPENSSH PRIVATE KEY-----\n";
     }
 }

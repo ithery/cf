@@ -18,16 +18,18 @@
  *
  * PHP version 5 and 7
  *
- * @category  Crypt
- * @package   EC
  * @author    Jim Wigginton <terrafrost@php.net>
  * @copyright 2017 Jim Wigginton
  * @license   http://www.opensource.org/licenses/mit-license.html  MIT License
  * @link      http://pear.php.net/package/Math_BigInteger
  */
 
+declare(strict_types=1);
+
 namespace phpseclib3\Crypt\EC\BaseCurves;
 
+use phpseclib3\Exception\RuntimeException;
+use phpseclib3\Exception\UnexpectedValueException;
 use phpseclib3\Math\BigInteger;
 use phpseclib3\Math\PrimeField;
 use phpseclib3\Math\PrimeField\Integer as PrimeInteger;
@@ -35,9 +37,7 @@ use phpseclib3\Math\PrimeField\Integer as PrimeInteger;
 /**
  * Curves over a*x^2 + y^2 = 1 + d*x^2*y^2
  *
- * @package Prime
  * @author  Jim Wigginton <terrafrost@php.net>
- * @access  public
  */
 class TwistedEdwards extends Base
 {
@@ -93,7 +93,7 @@ class TwistedEdwards extends Base
     /**
      * Sets the modulo
      */
-    public function setModulo(BigInteger $modulo)
+    public function setModulo(BigInteger $modulo): void
     {
         $this->modulo = $modulo;
         $this->factory = new PrimeField($modulo);
@@ -105,10 +105,10 @@ class TwistedEdwards extends Base
     /**
      * Set coefficients a and b
      */
-    public function setCoefficients(BigInteger $a, BigInteger $d)
+    public function setCoefficients(BigInteger $a, BigInteger $d): void
     {
         if (!isset($this->factory)) {
-            throw new \RuntimeException('setModulo needs to be called before this method');
+            throw new RuntimeException('setModulo needs to be called before this method');
         }
         $this->a = $this->factory->newInteger($a);
         $this->d = $this->factory->newInteger($d);
@@ -117,27 +117,27 @@ class TwistedEdwards extends Base
     /**
      * Set x and y coordinates for the base point
      */
-    public function setBasePoint($x, $y)
+    public function setBasePoint($x, $y): void
     {
         switch (true) {
             case !$x instanceof BigInteger && !$x instanceof PrimeInteger:
-                throw new \UnexpectedValueException('Argument 1 passed to Prime::setBasePoint() must be an instance of either BigInteger or PrimeField\Integer');
+                throw new UnexpectedValueException('Argument 1 passed to Prime::setBasePoint() must be an instance of either BigInteger or PrimeField\Integer');
             case !$y instanceof BigInteger && !$y instanceof PrimeInteger:
-                throw new \UnexpectedValueException('Argument 2 passed to Prime::setBasePoint() must be an instance of either BigInteger or PrimeField\Integer');
+                throw new UnexpectedValueException('Argument 2 passed to Prime::setBasePoint() must be an instance of either BigInteger or PrimeField\Integer');
         }
         if (!isset($this->factory)) {
-            throw new \RuntimeException('setModulo needs to be called before this method');
+            throw new RuntimeException('setModulo needs to be called before this method');
         }
         $this->p = [
             $x instanceof BigInteger ? $this->factory->newInteger($x) : $x,
-            $y instanceof BigInteger ? $this->factory->newInteger($y) : $y
+            $y instanceof BigInteger ? $this->factory->newInteger($y) : $y,
         ];
     }
 
     /**
      * Returns the a coefficient
      *
-     * @return \phpseclib3\Math\PrimeField\Integer
+     * @return PrimeInteger
      */
     public function getA()
     {
@@ -147,7 +147,7 @@ class TwistedEdwards extends Base
     /**
      * Returns the a coefficient
      *
-     * @return \phpseclib3\Math\PrimeField\Integer
+     * @return PrimeInteger
      */
     public function getD()
     {
@@ -156,17 +156,15 @@ class TwistedEdwards extends Base
 
     /**
      * Retrieve the base point as an array
-     *
-     * @return array
      */
-    public function getBasePoint()
+    public function getBasePoint(): array
     {
         if (!isset($this->factory)) {
-            throw new \RuntimeException('setModulo needs to be called before this method');
+            throw new RuntimeException('setModulo needs to be called before this method');
         }
         /*
         if (!isset($this->p)) {
-            throw new \RuntimeException('setBasePoint needs to be called before this method');
+            throw new \phpseclib3\Exception\RuntimeException('setBasePoint needs to be called before this method');
         }
         */
         return $this->p;
@@ -175,27 +173,25 @@ class TwistedEdwards extends Base
     /**
      * Returns the affine point
      *
-     * @return \phpseclib3\Math\PrimeField\Integer[]
+     * @return PrimeInteger[]
      */
-    public function convertToAffine(array $p)
+    public function convertToAffine(array $p): array
     {
         if (!isset($p[2])) {
             return $p;
         }
-        list($x, $y, $z) = $p;
+        [$x, $y, $z] = $p;
         $z = $this->one->divide($z);
         return [
             $x->multiply($z),
-            $y->multiply($z)
+            $y->multiply($z),
         ];
     }
 
     /**
      * Returns the modulo
-     *
-     * @return \phpseclib3\Math\BigInteger
      */
-    public function getModulo()
+    public function getModulo(): BigInteger
     {
         return $this->modulo;
     }
@@ -205,9 +201,9 @@ class TwistedEdwards extends Base
      *
      * @return boolean
      */
-    public function verifyPoint(array $p)
+    public function verifyPoint(array $p): bool
     {
-        list($x, $y) = $p;
+        [$x, $y] = $p;
         $x2 = $x->multiply($x);
         $y2 = $y->multiply($y);
 
