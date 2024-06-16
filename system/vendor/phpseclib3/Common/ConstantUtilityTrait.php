@@ -2,6 +2,8 @@
 
 namespace phpseclib3\Common;
 
+use phpseclib3\Exception\InvalidArgumentException;
+
 /**
  * @internal
  */
@@ -13,10 +15,8 @@ trait ConstantUtilityTrait {
 
     /**
      * @param string|int $value
-     *
-     * @return null|string
      */
-    public static function findConstantNameByValue($value) {
+    public static function findConstantNameByValue($value): ?string {
         if (!self::$valueToConstantNameMap) {
             $reflectionClass = new \ReflectionClass(static::class);
             $constantNameToValueMap = $reflectionClass->getConstants();
@@ -31,13 +31,11 @@ trait ConstantUtilityTrait {
 
     /**
      * @param string|int $value
-     *
-     * @return string
      */
-    public static function getConstantNameByValue($value) {
+    public static function getConstantNameByValue($value): string {
         $constantName = static::findConstantNameByValue($value);
         if ($constantName === null) {
-            throw new \InvalidArgumentException(sprintf('"%s" does not have constant with value "%s".', static::class, $value));
+            throw new InvalidArgumentException(sprintf('"%s" does not have constant with value "%s".', static::class, $value));
         }
 
         return $constantName;
