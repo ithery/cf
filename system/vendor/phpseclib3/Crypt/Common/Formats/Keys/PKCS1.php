@@ -1,68 +1,63 @@
 <?php
 
 /**
- * PKCS1 Formatted Key Handler
+ * PKCS1 Formatted Key Handler.
  *
  * PHP version 5
  *
  * @category  Crypt
- * @package   Common
+ *
  * @author    Jim Wigginton <terrafrost@php.net>
  * @copyright 2015 Jim Wigginton
  * @license   http://www.opensource.org/licenses/mit-license.html  MIT License
+ *
  * @link      http://phpseclib.sourceforge.net
  */
 
 namespace phpseclib3\Crypt\Common\Formats\Keys;
 
-use ParagonIE\ConstantTime\Base64;
-use ParagonIE\ConstantTime\Hex;
-use phpseclib3\Common\Functions\Strings;
 use phpseclib3\Crypt\AES;
 use phpseclib3\Crypt\DES;
-use phpseclib3\Crypt\Random;
-use phpseclib3\Crypt\TripleDES;
-use phpseclib3\Exception\UnsupportedAlgorithmException;
 use phpseclib3\File\ASN1;
+use phpseclib3\Crypt\Random;
+use ParagonIE\ConstantTime\Hex;
+use phpseclib3\Crypt\TripleDES;
+use ParagonIE\ConstantTime\Base64;
+use phpseclib3\Common\Functions\Strings;
+use phpseclib3\Exception\UnsupportedAlgorithmException;
 
 /**
- * PKCS1 Formatted Key Handler
+ * PKCS1 Formatted Key Handler.
  *
- * @package RSA
  * @author  Jim Wigginton <terrafrost@php.net>
- * @access  public
  */
-abstract class PKCS1 extends PKCS
-{
+abstract class PKCS1 extends PKCS {
     /**
-     * Default encryption algorithm
+     * Default encryption algorithm.
      *
      * @var string
-     * @access private
      */
     private static $defaultEncryptionAlgorithm = 'AES-128-CBC';
 
     /**
-     * Sets the default encryption algorithm
+     * Sets the default encryption algorithm.
      *
-     * @access public
      * @param string $algo
      */
-    public static function setEncryptionAlgorithm($algo)
-    {
+    public static function setEncryptionAlgorithm($algo) {
         self::$defaultEncryptionAlgorithm = $algo;
     }
 
     /**
-     * Returns the mode constant corresponding to the mode string
+     * Returns the mode constant corresponding to the mode string.
      *
-     * @access public
      * @param string $mode
-     * @return int
+     *
      * @throws \UnexpectedValueException if the block cipher mode is unsupported
+     *
+     * @return int
      */
-    private static function getEncryptionMode($mode)
-    {
+    private static function getEncryptionMode($mode) {
         switch ($mode) {
             case 'CBC':
             case 'ECB':
@@ -71,24 +66,26 @@ abstract class PKCS1 extends PKCS
             case 'CTR':
                 return $mode;
         }
+
         throw new \UnexpectedValueException('Unsupported block cipher mode of operation');
     }
 
     /**
-     * Returns a cipher object corresponding to a string
+     * Returns a cipher object corresponding to a string.
      *
-     * @access public
      * @param string $algo
-     * @return string
+     *
      * @throws \UnexpectedValueException if the encryption algorithm is unsupported
+     *
+     * @return string
      */
-    private static function getEncryptionObject($algo)
-    {
+    private static function getEncryptionObject($algo) {
         $modes = '(CBC|ECB|CFB|OFB|CTR)';
         switch (true) {
             case preg_match("#^AES-(128|192|256)-$modes$#", $algo, $matches):
                 $cipher = new AES(self::getEncryptionMode($matches[2]));
                 $cipher->setKeyLength($matches[1]);
+
                 return $cipher;
             case preg_match("#^DES-EDE3-$modes$#", $algo, $matches):
                 return new TripleDES(self::getEncryptionMode($matches[1]));
@@ -100,34 +97,33 @@ abstract class PKCS1 extends PKCS
     }
 
     /**
-     * Generate a symmetric key for PKCS#1 keys
+     * Generate a symmetric key for PKCS#1 keys.
      *
-     * @access private
      * @param string $password
      * @param string $iv
-     * @param int $length
+     * @param int    $length
+     *
      * @return string
      */
-    private static function generateSymmetricKey($password, $iv, $length)
-    {
+    private static function generateSymmetricKey($password, $iv, $length) {
         $symkey = '';
         $iv = substr($iv, 0, 8);
         while (strlen($symkey) < $length) {
             $symkey .= md5($symkey . $password . $iv, true);
         }
+
         return substr($symkey, 0, $length);
     }
 
     /**
-     * Break a public or private key down into its constituent components
+     * Break a public or private key down into its constituent components.
      *
-     * @access public
      * @param string $key
      * @param string $password optional
+     *
      * @return array
      */
-    protected static function load($key, $password)
-    {
+    protected static function load($key, $password) {
         if (!Strings::is_stringable($key)) {
             throw new \UnexpectedValueException('Key should be a string - not a ' . gettype($key));
         }
@@ -174,21 +170,20 @@ abstract class PKCS1 extends PKCS
     }
 
     /**
-     * Wrap a private key appropriately
+     * Wrap a private key appropriately.
      *
-     * @access public
      * @param string $key
      * @param string $type
      * @param string $password
-     * @param array $options optional
+     * @param array  $options  optional
+     *
      * @return string
      */
-    protected static function wrapPrivateKey($key, $type, $password, array $options = [])
-    {
+    protected static function wrapPrivateKey($key, $type, $password, array $options = []) {
         if (empty($password) || !is_string($password)) {
-            return "-----BEGIN $type PRIVATE KEY-----\r\n" .
-                   chunk_split(Base64::encode($key), 64) .
-                   "-----END $type PRIVATE KEY-----";
+            return "-----BEGIN $type PRIVATE KEY-----\r\n"
+                   . chunk_split(Base64::encode($key), 64)
+                   . "-----END $type PRIVATE KEY-----";
         }
 
         $encryptionAlgorithm = isset($options['encryptionAlgorithm']) ? $options['encryptionAlgorithm'] : self::$defaultEncryptionAlgorithm;
@@ -198,26 +193,26 @@ abstract class PKCS1 extends PKCS
         $cipher->setKey(self::generateSymmetricKey($password, $iv, $cipher->getKeyLength() >> 3));
         $cipher->setIV($iv);
         $iv = strtoupper(Hex::encode($iv));
-        return "-----BEGIN $type PRIVATE KEY-----\r\n" .
-               "Proc-Type: 4,ENCRYPTED\r\n" .
-               "DEK-Info: " . $encryptionAlgorithm . ",$iv\r\n" .
-               "\r\n" .
-               chunk_split(Base64::encode($cipher->encrypt($key)), 64) .
-               "-----END $type PRIVATE KEY-----";
+
+        return "-----BEGIN $type PRIVATE KEY-----\r\n"
+               . "Proc-Type: 4,ENCRYPTED\r\n"
+               . 'DEK-Info: ' . $encryptionAlgorithm . ",$iv\r\n"
+               . "\r\n"
+               . chunk_split(Base64::encode($cipher->encrypt($key)), 64)
+               . "-----END $type PRIVATE KEY-----";
     }
 
     /**
-     * Wrap a public key appropriately
+     * Wrap a public key appropriately.
      *
-     * @access public
      * @param string $key
      * @param string $type
+     *
      * @return string
      */
-    protected static function wrapPublicKey($key, $type)
-    {
-        return "-----BEGIN $type PUBLIC KEY-----\r\n" .
-               chunk_split(Base64::encode($key), 64) .
-               "-----END $type PUBLIC KEY-----";
+    protected static function wrapPublicKey($key, $type) {
+        return "-----BEGIN $type PUBLIC KEY-----\r\n"
+               . chunk_split(Base64::encode($key), 64)
+               . "-----END $type PUBLIC KEY-----";
     }
 }

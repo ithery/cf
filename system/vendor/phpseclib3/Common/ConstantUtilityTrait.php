@@ -5,17 +5,18 @@ namespace phpseclib3\Common;
 /**
  * @internal
  */
-trait ConstantUtilityTrait
-{
-    /** @var string[]|null */
+trait ConstantUtilityTrait {
+    /**
+     * @var null|string[]
+     */
     private static $valueToConstantNameMap = null;
 
     /**
      * @param string|int $value
-     * @return string|null
+     *
+     * @return null|string
      */
-    public static function findConstantNameByValue($value)
-    {
+    public static function findConstantNameByValue($value) {
         if (!self::$valueToConstantNameMap) {
             $reflectionClass = new \ReflectionClass(static::class);
             $constantNameToValueMap = $reflectionClass->getConstants();
@@ -24,19 +25,21 @@ trait ConstantUtilityTrait
         if (isset(self::$valueToConstantNameMap[$value])) {
             return self::$valueToConstantNameMap[$value];
         }
+
         return null;
     }
 
     /**
      * @param string|int $value
+     *
      * @return string
      */
-    public static function getConstantNameByValue($value)
-    {
+    public static function getConstantNameByValue($value) {
         $constantName = static::findConstantNameByValue($value);
         if ($constantName === null) {
             throw new \InvalidArgumentException(sprintf('"%s" does not have constant with value "%s".', static::class, $value));
         }
+
         return $constantName;
     }
 }
