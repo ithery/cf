@@ -1,7 +1,7 @@
 <?php
 
 /**
- * PKCS#8 Formatted DSA Key Handler
+ * PKCS#8 Formatted DSA Key Handler.
  *
  * PHP version 5
  *
@@ -16,64 +16,58 @@
  * for keys. This just extends that same concept to public keys (much like ssh-keygen)
  *
  * @category  Crypt
- * @package   DSA
+ *
  * @author    Jim Wigginton <terrafrost@php.net>
  * @copyright 2015 Jim Wigginton
  * @license   http://www.opensource.org/licenses/mit-license.html  MIT License
+ *
  * @link      http://phpseclib.sourceforge.net
  */
 
 namespace phpseclib3\Crypt\DSA\Formats\Keys;
 
-use phpseclib3\Common\Functions\Strings;
-use phpseclib3\Crypt\Common\Formats\Keys\PKCS8 as Progenitor;
 use phpseclib3\File\ASN1;
 use phpseclib3\File\ASN1\Maps;
 use phpseclib3\Math\BigInteger;
+use phpseclib3\Common\Functions\Strings;
+use phpseclib3\Crypt\Common\Formats\Keys\PKCS8 as Progenitor;
 
 /**
- * PKCS#8 Formatted DSA Key Handler
+ * PKCS#8 Formatted DSA Key Handler.
  *
- * @package DSA
  * @author  Jim Wigginton <terrafrost@php.net>
- * @access  public
  */
-abstract class PKCS8 extends Progenitor
-{
+abstract class PKCS8 extends Progenitor {
     /**
-     * OID Name
+     * OID Name.
      *
      * @var string
-     * @access private
      */
     const OID_NAME = 'id-dsa';
 
     /**
-     * OID Value
+     * OID Value.
      *
      * @var string
-     * @access private
      */
     const OID_VALUE = '1.2.840.10040.4.1';
 
     /**
-     * Child OIDs loaded
+     * Child OIDs loaded.
      *
      * @var bool
-     * @access private
      */
     protected static $childOIDsLoaded = false;
 
     /**
-     * Break a public or private key down into its constituent components
+     * Break a public or private key down into its constituent components.
      *
-     * @access public
      * @param string $key
      * @param string $password optional
+     *
      * @return array
      */
-    public static function load($key, $password = '')
-    {
+    public static function load($key, $password = '') {
         if (!Strings::is_stringable($key)) {
             throw new \UnexpectedValueException('Key should be a string - not a ' . gettype($key));
         }
@@ -121,18 +115,17 @@ abstract class PKCS8 extends Progenitor
     /**
      * Convert a private key to the appropriate format.
      *
-     * @access public
      * @param \phpseclib3\Math\BigInteger $p
      * @param \phpseclib3\Math\BigInteger $q
      * @param \phpseclib3\Math\BigInteger $g
      * @param \phpseclib3\Math\BigInteger $y
      * @param \phpseclib3\Math\BigInteger $x
-     * @param string $password optional
-     * @param array $options optional
+     * @param string                      $password optional
+     * @param array                       $options  optional
+     *
      * @return string
      */
-    public static function savePrivateKey(BigInteger $p, BigInteger $q, BigInteger $g, BigInteger $y, BigInteger $x, $password = '', array $options = [])
-    {
+    public static function savePrivateKey(BigInteger $p, BigInteger $q, BigInteger $g, BigInteger $y, BigInteger $x, $password = '', array $options = []) {
         $params = [
             'p' => $p,
             'q' => $q,
@@ -141,22 +134,22 @@ abstract class PKCS8 extends Progenitor
         $params = ASN1::encodeDER($params, Maps\DSAParams::MAP);
         $params = new ASN1\Element($params);
         $key = ASN1::encodeDER($x, Maps\DSAPublicKey::MAP);
+
         return self::wrapPrivateKey($key, [], $params, $password, null, '', $options);
     }
 
     /**
-     * Convert a public key to the appropriate format
+     * Convert a public key to the appropriate format.
      *
-     * @access public
      * @param \phpseclib3\Math\BigInteger $p
      * @param \phpseclib3\Math\BigInteger $q
      * @param \phpseclib3\Math\BigInteger $g
      * @param \phpseclib3\Math\BigInteger $y
-     * @param array $options optional
+     * @param array                       $options optional
+     *
      * @return string
      */
-    public static function savePublicKey(BigInteger $p, BigInteger $q, BigInteger $g, BigInteger $y, array $options = [])
-    {
+    public static function savePublicKey(BigInteger $p, BigInteger $q, BigInteger $g, BigInteger $y, array $options = []) {
         $params = [
             'p' => $p,
             'q' => $q,
@@ -165,6 +158,7 @@ abstract class PKCS8 extends Progenitor
         $params = ASN1::encodeDER($params, Maps\DSAParams::MAP);
         $params = new ASN1\Element($params);
         $key = ASN1::encodeDER($y, Maps\DSAPublicKey::MAP);
+
         return self::wrapPublicKey($key, $params);
     }
 }

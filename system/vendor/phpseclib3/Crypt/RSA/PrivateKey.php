@@ -1,110 +1,104 @@
 <?php
 
 /**
- * RSA Private Key
+ * RSA Private Key.
  *
  * @category  Crypt
- * @package   RSA
+ *
  * @author    Jim Wigginton <terrafrost@php.net>
  * @copyright 2015 Jim Wigginton
  * @license   http://www.opensource.org/licenses/mit-license.html  MIT License
+ *
  * @link      http://phpseclib.sourceforge.net
  */
 
 namespace phpseclib3\Crypt\RSA;
 
+use phpseclib3\Crypt\RSA;
 use phpseclib3\Crypt\Common;
 use phpseclib3\Crypt\Random;
-use phpseclib3\Crypt\RSA;
+use phpseclib3\Math\BigInteger;
 use phpseclib3\Crypt\RSA\Formats\Keys\PSS;
 use phpseclib3\Exception\UnsupportedFormatException;
-use phpseclib3\Math\BigInteger;
 
 /**
- * Raw RSA Key Handler
+ * Raw RSA Key Handler.
  *
- * @package RSA
  * @author  Jim Wigginton <terrafrost@php.net>
- * @access  public
  */
-class PrivateKey extends RSA implements Common\PrivateKey
-{
+class PrivateKey extends RSA implements Common\PrivateKey {
     use Common\Traits\PasswordProtected;
 
     /**
-     * Primes for Chinese Remainder Theorem (ie. p and q)
+     * Primes for Chinese Remainder Theorem (ie. p and q).
      *
      * @var array
-     * @access private
      */
     protected $primes;
 
     /**
-     * Exponents for Chinese Remainder Theorem (ie. dP and dQ)
+     * Exponents for Chinese Remainder Theorem (ie. dP and dQ).
      *
      * @var array
-     * @access private
      */
     protected $exponents;
 
     /**
-     * Coefficients for Chinese Remainder Theorem (ie. qInv)
+     * Coefficients for Chinese Remainder Theorem (ie. qInv).
      *
      * @var array
-     * @access private
      */
     protected $coefficients;
 
     /**
-     * Public Exponent
+     * Public Exponent.
      *
      * @var mixed
-     * @access private
      */
     protected $publicExponent = false;
 
     /**
-     * RSADP
+     * RSADP.
      *
      * See {@link http://tools.ietf.org/html/rfc3447#section-5.1.2 RFC3447#section-5.1.2}.
      *
-     * @access private
      * @param \phpseclib3\Math\BigInteger $c
+     *
      * @return bool|\phpseclib3\Math\BigInteger
      */
-    private function rsadp($c)
-    {
+    private function rsadp($c) {
         if ($c->compare(self::$zero) < 0 || $c->compare($this->modulus) > 0) {
             throw new \OutOfRangeException('Ciphertext representative out of range');
         }
+
         return $this->exponentiate($c);
     }
 
     /**
-     * RSASP1
+     * RSASP1.
      *
      * See {@link http://tools.ietf.org/html/rfc3447#section-5.2.1 RFC3447#section-5.2.1}.
      *
-     * @access private
      * @param \phpseclib3\Math\BigInteger $m
+     *
      * @return bool|\phpseclib3\Math\BigInteger
      */
-    private function rsasp1($m)
-    {
+    private function rsasp1($m) {
         if ($m->compare(self::$zero) < 0 || $m->compare($this->modulus) > 0) {
             throw new \OutOfRangeException('Signature representative out of range');
         }
+
         return $this->exponentiate($m);
     }
 
     /**
-     * Exponentiate
+     * Exponentiate.
      *
      * @param \phpseclib3\Math\BigInteger $x
+     *
      * @return \phpseclib3\Math\BigInteger
      */
-    protected function exponentiate(BigInteger $x)
-    {
+    protected function exponentiate(BigInteger $x) {
         switch (true) {
             case empty($this->primes):
             case $this->primes[1]->equals(self::$zero):
@@ -176,19 +170,18 @@ class PrivateKey extends RSA implements Common\PrivateKey
     }
 
     /**
-     * Performs RSA Blinding
+     * Performs RSA Blinding.
      *
      * Protects against timing attacks by employing RSA Blinding.
      * Returns $x->modPow($this->exponents[$i], $this->primes[$i])
      *
-     * @access private
      * @param \phpseclib3\Math\BigInteger $x
      * @param \phpseclib3\Math\BigInteger $r
-     * @param int $i
+     * @param int                         $i
+     *
      * @return \phpseclib3\Math\BigInteger
      */
-    private function blind($x, $r, $i)
-    {
+    private function blind($x, $r, $i) {
         $x = $x->multiply($r->modPow($this->publicExponent, $this->primes[$i]));
         $x = $x->modPow($this->exponents[$i], $this->primes[$i]);
 
@@ -200,18 +193,18 @@ class PrivateKey extends RSA implements Common\PrivateKey
     }
 
     /**
-     * EMSA-PSS-ENCODE
+     * EMSA-PSS-ENCODE.
      *
      * See {@link http://tools.ietf.org/html/rfc3447#section-9.1.1 RFC3447#section-9.1.1}.
      *
-     * @return string
-     * @access private
      * @param string $m
+     * @param int    $emBits
+     *
      * @throws \RuntimeException on encoding error
-     * @param int $emBits
+     *
+     * @return string
      */
-    private function emsa_pss_encode($m, $emBits)
-    {
+    private function emsa_pss_encode($m, $emBits) {
         // if $m is larger than two million terrabytes and you're using sha1, PKCS#1 suggests a "Label too long" error
         // be output.
 
@@ -237,16 +230,15 @@ class PrivateKey extends RSA implements Common\PrivateKey
     }
 
     /**
-     * RSASSA-PSS-SIGN
+     * RSASSA-PSS-SIGN.
      *
      * See {@link http://tools.ietf.org/html/rfc3447#section-8.1.1 RFC3447#section-8.1.1}.
      *
-     * @access private
      * @param string $m
+     *
      * @return bool|string
      */
-    private function rsassa_pss_sign($m)
-    {
+    private function rsassa_pss_sign($m) {
         // EMSA-PSS encoding
 
         $em = $this->emsa_pss_encode($m, 8 * $this->k - 1);
@@ -263,17 +255,17 @@ class PrivateKey extends RSA implements Common\PrivateKey
     }
 
     /**
-     * RSASSA-PKCS1-V1_5-SIGN
+     * RSASSA-PKCS1-V1_5-SIGN.
      *
      * See {@link http://tools.ietf.org/html/rfc3447#section-8.2.1 RFC3447#section-8.2.1}.
      *
-     * @access private
      * @param string $m
+     *
      * @throws \LengthException if the RSA modulus is too short
+     *
      * @return bool|string
      */
-    private function rsassa_pkcs1_v1_5_sign($m)
-    {
+    private function rsassa_pkcs1_v1_5_sign($m) {
         // EMSA-PKCS1-v1_5 encoding
 
         // If the encoding operation outputs "intended encoded message length too short," output "RSA modulus
@@ -296,15 +288,15 @@ class PrivateKey extends RSA implements Common\PrivateKey
     }
 
     /**
-     * Create a signature
+     * Create a signature.
      *
      * @see self::verify()
-     * @access public
+     *
      * @param string $message
+     *
      * @return string
      */
-    public function sign($message)
-    {
+    public function sign($message) {
         switch ($this->signaturePadding) {
             case self::SIGNATURE_PKCS1:
             case self::SIGNATURE_RELAXED_PKCS1:
@@ -316,16 +308,15 @@ class PrivateKey extends RSA implements Common\PrivateKey
     }
 
     /**
-     * RSAES-PKCS1-V1_5-DECRYPT
+     * RSAES-PKCS1-V1_5-DECRYPT.
      *
      * See {@link http://tools.ietf.org/html/rfc3447#section-7.2.2 RFC3447#section-7.2.2}.
      *
-     * @access private
      * @param string $c
+     *
      * @return bool|string
      */
-    private function rsaes_pkcs1_v1_5_decrypt($c)
-    {
+    private function rsaes_pkcs1_v1_5_decrypt($c) {
         // Length checking
 
         if (strlen($c) != $this->k) { // or if k < 11
@@ -357,7 +348,7 @@ class PrivateKey extends RSA implements Common\PrivateKey
     }
 
     /**
-     * RSAES-OAEP-DECRYPT
+     * RSAES-OAEP-DECRYPT.
      *
      * See {@link http://tools.ietf.org/html/rfc3447#section-7.1.2 RFC3447#section-7.1.2}.  The fact that the error
      * messages aren't distinguishable from one another hinders debugging, but, to quote from RFC3447#section-7.1.2:
@@ -370,12 +361,11 @@ class PrivateKey extends RSA implements Common\PrivateKey
      *    ciphertext C, leading to a chosen-ciphertext attack such as the one
      *    observed by Manger [36].
      *
-     * @access private
      * @param string $c
+     *
      * @return bool|string
      */
-    private function rsaes_oaep_decrypt($c)
-    {
+    private function rsaes_oaep_decrypt($c) {
         // Length checking
 
         // if $l is larger than two million terrabytes and you're using sha1, PKCS#1 suggests a "Label too long" error
@@ -425,36 +415,37 @@ class PrivateKey extends RSA implements Common\PrivateKey
     }
 
     /**
-     * Raw Encryption / Decryption
+     * Raw Encryption / Decryption.
      *
      * Doesn't use padding and is not recommended.
      *
-     * @access private
      * @param string $m
-     * @return bool|string
+     *
      * @throws \LengthException if strlen($m) > $this->k
+     *
+     * @return bool|string
      */
-    private function raw_encrypt($m)
-    {
+    private function raw_encrypt($m) {
         if (strlen($m) > $this->k) {
             throw new \LengthException('Ciphertext representative too long');
         }
 
         $temp = $this->os2ip($m);
         $temp = $this->rsadp($temp);
+
         return  $this->i2osp($temp, $this->k);
     }
 
     /**
-     * Decryption
+     * Decryption.
      *
      * @see self::encrypt()
-     * @access public
+     *
      * @param string $ciphertext
+     *
      * @return bool|string
      */
-    public function decrypt($ciphertext)
-    {
+    public function decrypt($ciphertext) {
         switch ($this->encryptionPadding) {
             case self::ENCRYPTION_NONE:
                 return $this->raw_encrypt($ciphertext);
@@ -467,19 +458,18 @@ class PrivateKey extends RSA implements Common\PrivateKey
     }
 
     /**
-     * Returns the public key
+     * Returns the public key.
      *
-     * @access public
      * @return mixed
      */
-    public function getPublicKey()
-    {
+    public function getPublicKey() {
         $type = self::validatePlugin('Keys', 'PKCS8', 'savePublicKey');
         if (empty($this->modulus) || empty($this->publicExponent)) {
             throw new \RuntimeException('Public key components not found');
         }
 
         $key = $type::savePublicKey($this->modulus, $this->publicExponent);
+
         return RSA::loadFormat('PKCS8', $key)
             ->withHash($this->hash->getHash())
             ->withMGFHash($this->mgfHash->getHash())
@@ -489,14 +479,14 @@ class PrivateKey extends RSA implements Common\PrivateKey
     }
 
     /**
-     * Returns the private key
+     * Returns the private key.
      *
      * @param string $type
-     * @param array $options optional
+     * @param array  $options optional
+     *
      * @return string
      */
-    public function toString($type, array $options = [])
-    {
+    public function toString($type, array $options = []) {
         $type = self::validatePlugin(
             'Keys',
             $type,
