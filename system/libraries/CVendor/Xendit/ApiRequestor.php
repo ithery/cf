@@ -64,6 +64,9 @@ class CVendor_Xendit_ApiRequestor {
     private function requestRaw($method, $url, $params, $headers) {
         $defaultHeaders = $this->setDefaultHeaders($headers);
 
+        if (cstr::upper($method) == 'GET') {
+            $url .= '?' . curl::asPostString($params);
+        }
         $response = $this->httpClient()->sendRequest(
             $method,
             $url,

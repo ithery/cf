@@ -8,6 +8,13 @@ class CVendor_Xendit_Factory {
     }
 
     /**
+     * @return CVendor_Xendit_Account
+     */
+    public function account() {
+        return new CVendor_Xendit_Account($this->apiRequestor);
+    }
+
+    /**
      * @return CVendor_Xendit_Customers
      */
     public function customers() {
