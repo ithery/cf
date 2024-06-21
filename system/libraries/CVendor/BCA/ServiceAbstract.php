@@ -84,6 +84,15 @@ abstract class CVendor_BCA_ServiceAbstract {
         $psrResponse = $response->toPsrResponse();
         $body = (string) $psrResponse->getBody();
         if ($psrResponse->getStatusCode() != 200) {
+            $json = json_decode($body, false);
+            if (is_array($json) && isset($json['ErrorCode'])) {
+                $errorMessage = carr::get($json, 'ErrorMessage.Indonesian');
+
+                throw new CVendor_BCA_Exception_HttpClientException($errorMessage, $psrResponse->getStatusCode());
+            }
+
+            //throw new CVendor_BCA_Exception_HttpClientException($body, $psrResponse->getStatusCode());
+
             throw new CVendor_BCA_Exception_HttpClientException($psrResponse->getReasonPhrase(), $psrResponse->getStatusCode());
         }
         $json = json_decode($body, true);
