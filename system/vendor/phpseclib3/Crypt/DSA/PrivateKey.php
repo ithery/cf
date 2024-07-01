@@ -3,13 +3,13 @@
 /**
  * DSA Private Key
  *
+ * @category  Crypt
+ * @package   DSA
  * @author    Jim Wigginton <terrafrost@php.net>
  * @copyright 2015 Jim Wigginton
  * @license   http://www.opensource.org/licenses/mit-license.html  MIT License
  * @link      http://phpseclib.sourceforge.net
  */
-
-declare(strict_types=1);
 
 namespace phpseclib3\Crypt\DSA;
 
@@ -21,16 +21,19 @@ use phpseclib3\Math\BigInteger;
 /**
  * DSA Private Key
  *
+ * @package DSA
  * @author  Jim Wigginton <terrafrost@php.net>
+ * @access  public
  */
-final class PrivateKey extends DSA implements Common\PrivateKey
+class PrivateKey extends DSA implements Common\PrivateKey
 {
     use Common\Traits\PasswordProtected;
 
     /**
      * DSA secret exponent x
      *
-     * @var BigInteger
+     * @var \phpseclib3\Math\BigInteger
+     * @access private
      */
     protected $x;
 
@@ -53,6 +56,8 @@ final class PrivateKey extends DSA implements Common\PrivateKey
      * without the parameters and the PKCS1 DSA public key format does not include the parameters.
      *
      * @see self::getPrivateKey()
+     * @access public
+     * @return mixed
      */
     public function getPublicKey()
     {
@@ -73,9 +78,11 @@ final class PrivateKey extends DSA implements Common\PrivateKey
      * Create a signature
      *
      * @see self::verify()
+     * @access public
      * @param string $message
+     * @return mixed
      */
-    public function sign($message): string
+    public function sign($message)
     {
         $format = $this->sigFormat;
 
@@ -100,14 +107,14 @@ final class PrivateKey extends DSA implements Common\PrivateKey
         while (true) {
             $k = BigInteger::randomRange(self::$one, $this->q->subtract(self::$one));
             $r = $this->g->powMod($k, $this->p);
-            [, $r] = $r->divide($this->q);
+            list(, $r) = $r->divide($this->q);
             if ($r->equals(self::$zero)) {
                 continue;
             }
             $kinv = $k->modInverse($this->q);
             $temp = $h->add($this->x->multiply($r));
             $temp = $kinv->multiply($temp);
-            [, $s] = $temp->divide($this->q);
+            list(, $s) = $temp->divide($this->q);
             if (!$s->equals(self::$zero)) {
                 break;
             }
@@ -135,9 +142,11 @@ final class PrivateKey extends DSA implements Common\PrivateKey
     /**
      * Returns the private key
      *
+     * @param string $type
      * @param array $options optional
+     * @return string
      */
-    public function toString(string $type, array $options = []): string
+    public function toString($type, array $options = [])
     {
         $type = self::validatePlugin('Keys', $type, 'savePrivateKey');
 

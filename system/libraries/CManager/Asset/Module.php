@@ -47,10 +47,6 @@ class CManager_Asset_Module {
             //$this->all_modules = include DOCROOT."config".DS."client_modules".DS."client_modules.php";
             $clientModulesFiles = array_reverse($clientModulesFiles);
 
-            $systemModulesFile = DOCROOT . 'system' . DS . 'data' . DS . 'assets-module.php';
-            $systemModules = include $systemModulesFile;
-            $this->allModules = array_merge($this->allModules, $systemModules);
-
             foreach ($clientModulesFiles as $file) {
                 $appModules = include $file;
                 if (!is_array($appModules)) {
@@ -58,10 +54,6 @@ class CManager_Asset_Module {
                 }
 
                 $this->allModules = array_merge($this->allModules, $appModules);
-            }
-            $assetModules = CF::config('assets.modules');
-            if ($assetModules) {
-                $this->allModules = array_merge($this->allModules, $assetModules);
             }
         }
 
@@ -166,7 +158,7 @@ class CManager_Asset_Module {
         $allModules = $this->allModules();
         if (!in_array($module, $this->modules[$type])) {
             if (!isset($allModules[$module])) {
-                throw new CManager_Exception(c::__('Module :module not defined', [':module' => $module]));
+                throw new CManager_Exception('Module :module not defined', [':module' => $module]);
             }
             //array
             $mod = $allModules[$module];

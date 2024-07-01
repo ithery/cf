@@ -20,12 +20,17 @@ if (!defined('EXT')) {
 if (!defined('DOCROOT')) {
     $docroot = realpath(dirname(__FILE__) . DS . '..' . DS . '..' . DS);
     define('DOCROOT', $docroot . DS);
+
+    define('CFINDEX', DOCROOT . 'index.php');
+
+    // If the front controller is a symlink, change to the real docroot
+    is_link(CFINDEX) and chdir(dirname(realpath(__FILE__)));
 }
 
 if (!defined('CFINDEX')) {
     define('CFINDEX', DOCROOT . 'index.php');
 }
-is_link(CFINDEX) and chdir(dirname(realpath(__FILE__)));
+
 if (!defined('SYSPATH')) {
     $sysPath = realpath(DOCROOT . 'system');
     define('SYSPATH', $sysPath . DS);
@@ -48,8 +53,8 @@ if (!defined('IN_PRODUCTION')) {
 //try to load data domain
 
 //end of constant from index
-define('CF_VERSION', '1.7');
-define('CF_CODENAME', 'CF1.7');
+define('CF_VERSION', '1.6');
+define('CF_CODENAME', 'CF1.6');
 define('CF_START', microtime(true));
 
 // Test of CF is running in Windows

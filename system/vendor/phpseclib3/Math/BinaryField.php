@@ -7,24 +7,25 @@
  *
  * PHP version 5 and 7
  *
+ * @category  Math
+ * @package   BigInteger
  * @author    Jim Wigginton <terrafrost@php.net>
  * @copyright 2017 Jim Wigginton
  * @license   http://www.opensource.org/licenses/mit-license.html  MIT License
  */
 
-declare(strict_types=1);
-
 namespace phpseclib3\Math;
 
 use phpseclib3\Common\Functions\Strings;
-use phpseclib3\Exception\OutOfBoundsException;
 use phpseclib3\Math\BinaryField\Integer;
 use phpseclib3\Math\Common\FiniteField;
 
 /**
  * Binary Finite Fields
  *
+ * @package Math
  * @author  Jim Wigginton <terrafrost@php.net>
+ * @access  public
  */
 class BinaryField extends FiniteField
 {
@@ -51,15 +52,6 @@ class BinaryField extends FiniteField
     public function __construct(...$indices)
     {
         $m = array_shift($indices);
-        if ($m > 571) {
-            /* sect571r1 and sect571k1 are the largest binary curves that https://www.secg.org/sec2-v2.pdf defines
-               altho theoretically there may be legit reasons to use binary finite fields with larger degrees
-               imposing a limit on the maximum size is both reasonable and precedented. in particular,
-               http://tools.ietf.org/html/rfc4253#section-6.1 (The Secure Shell (SSH) Transport Layer Protocol) says
-               "implementations SHOULD check that the packet length is reasonable in order for the implementation to
-                avoid denial of service and/or buffer overflow attacks" */
-            throw new OutOfBoundsException('Degrees larger than 571 are not supported');
-        }
         $val = str_repeat('0', $m) . '1';
         foreach ($indices as $index) {
             $val[$index] = '1';
@@ -67,13 +59,13 @@ class BinaryField extends FiniteField
         $modulo = static::base2ToBase256(strrev($val));
 
         $mStart = 2 * $m - 2;
-        $t = (int) ceil($m / 8);
+        $t = ceil($m / 8);
         $finalMask = chr((1 << ($m % 8)) - 1);
         if ($finalMask == "\0") {
             $finalMask = "\xFF";
         }
         $bitLen = $mStart + 1;
-        $pad = (int) ceil($bitLen / 8);
+        $pad = ceil($bitLen / 8);
         $h = $bitLen & 7;
         $h = $h ? 8 - $h : 0;
 
@@ -123,17 +115,20 @@ class BinaryField extends FiniteField
     /**
      * Returns an instance of a dynamically generated PrimeFieldInteger class
      *
-     * @param BigInteger|string $num
+     * @param string $num
+     * @return Integer
      */
-    public function newInteger($num): Integer
+    public function newInteger($num)
     {
         return new Integer($this->instanceID, $num instanceof BigInteger ? $num->toBytes() : $num);
     }
 
     /**
      * Returns an integer on the finite field between one and the prime modulo
+     *
+     * @return Integer
      */
-    public function randomInteger(): Integer
+    public function randomInteger()
     {
         static $one;
         if (!isset($one)) {
@@ -145,24 +140,32 @@ class BinaryField extends FiniteField
 
     /**
      * Returns the length of the modulo in bytes
+     *
+     * @return int
      */
-    public function getLengthInBytes(): int
+    public function getLengthInBytes()
     {
         return strlen(Integer::getModulo($this->instanceID));
     }
 
     /**
      * Returns the length of the modulo in bits
+     *
+     * @return int
      */
-    public function getLength(): int
+    public function getLength()
     {
         return strlen(Integer::getModulo($this->instanceID)) << 3;
     }
 
     /**
      * Converts a base-2 string to a base-256 string
+     *
+     * @param string $x
+     * @param int|null $size
+     * @return string
      */
-    public static function base2ToBase256(string $x, ?int $size = null): string
+    public static function base2ToBase256($x, $size = null)
     {
         $str = Strings::bits2bin($x);
 
@@ -180,8 +183,11 @@ class BinaryField extends FiniteField
 
     /**
      * Converts a base-256 string to a base-2 string
+     *
+     * @param string $x
+     * @return string
      */
-    public static function base256ToBase2(string $x): string
+    public static function base256ToBase2($x)
     {
         if (function_exists('gmp_import')) {
             return gmp_strval(gmp_import($x), 2);

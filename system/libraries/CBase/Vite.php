@@ -154,7 +154,7 @@ class CBase_Vite implements CInterface_Htmlable {
      * @return string
      */
     public function hotFile() {
-        return $this->hotFile ?? CF::publicPath('/hot');
+        return $this->hotFile ?? public_path('/hot');
     }
 
     /**
@@ -632,6 +632,7 @@ class CBase_Vite implements CInterface_Htmlable {
      */
     public function asset($asset, $buildDirectory = null) {
         $buildDirectory ??= $this->buildDirectory;
+
         if ($this->isRunningHot()) {
             return $this->hotAsset($asset);
         }
@@ -656,7 +657,7 @@ class CBase_Vite implements CInterface_Htmlable {
 
         $chunk = $this->chunk($this->manifest($buildDirectory), $asset);
 
-        $path = CF::publicPath($buildDirectory . '/' . $chunk['file']);
+        $path = public_path($buildDirectory . '/' . $chunk['file']);
 
         if (!is_file($path) || !file_exists($path)) {
             throw new Exception("Unable to locate file from Vite manifest: {$path}.");
@@ -674,7 +675,7 @@ class CBase_Vite implements CInterface_Htmlable {
      * @return string
      */
     protected function assetPath($path, $secure = null) {
-        return c::media($path, $secure);
+        return asset($path, $secure);
     }
 
     /**
@@ -708,7 +709,7 @@ class CBase_Vite implements CInterface_Htmlable {
      * @return string
      */
     protected function manifestPath($buildDirectory) {
-        return CF::publicPath($buildDirectory . '/' . $this->manifestFilename);
+        return public_path($buildDirectory . '/' . $this->manifestFilename);
     }
 
     /**

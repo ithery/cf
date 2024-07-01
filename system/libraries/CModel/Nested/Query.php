@@ -549,6 +549,7 @@ class CModel_Nested_Query extends CModel_Query {
         foreach ([$this->model->getLftName(), $this->model->getRgtName()] as $col) {
             $columns[$col] = $this->columnPatch($grammar->wrap($col), $params);
         }
+
         return $columns;
     }
 

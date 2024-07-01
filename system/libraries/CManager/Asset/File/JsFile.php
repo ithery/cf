@@ -21,7 +21,7 @@ class CManager_Asset_File_JsFile extends CManager_Asset_FileAbstract {
         $file = $this->getPath();
         $path = $file;
         $path = carr::first(explode('?', $file));
-        $docroot = str_replace(DS, '/', CF::publicPath() ? CF::publicPath() . '/' : DOCROOT);
+        $docroot = str_replace(DS, '/', DOCROOT);
         $file = str_replace(DS, '/', $file);
         $base_url = curl::base();
         if ($withHttp) {
@@ -29,8 +29,6 @@ class CManager_Asset_File_JsFile extends CManager_Asset_FileAbstract {
         }
 
         $file = str_replace($docroot, $base_url, $file);
-
-        $file = str_replace(str_replace(DS, '/', DOCROOT), $base_url, $file);
 
         if (CF::config('assets.js.versioning')) {
             $separator = parse_url($file, PHP_URL_QUERY) ? '&' : '?';
@@ -43,7 +41,14 @@ class CManager_Asset_File_JsFile extends CManager_Asset_FileAbstract {
     }
 
     protected function fullpath($file) {
-        $dirs = $this->getMediaPaths();
+        foreach ($this->mediaPaths as $dir) {
+            $path = $dir . 'js' . DS . $file;
+            if (file_exists($path)) {
+                return $path;
+            }
+        }
+        $dirs = CF::getDirs('media');
+        $dirs = array_merge($this->mediaPaths, $dirs);
 
         foreach ($dirs as $dir) {
             $path = $dir . 'js' . DS . $file;

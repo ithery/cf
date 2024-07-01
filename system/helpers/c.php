@@ -889,13 +889,6 @@ class c {
      */
     public static function retry($times, callable $callback, $sleepMilliseconds = 0, $when = null) {
         $attempts = 0;
-        $backoff = [];
-
-        if (is_array($times)) {
-            $backoff = $times;
-
-            $times = count($times) + 1;
-        }
 
         beginning:
         $attempts++;
@@ -907,9 +900,9 @@ class c {
             if ($times < 1 || ($when && !$when($e))) {
                 throw $e;
             }
-            $sleepMilliseconds = $backoff[$attempts - 1] ?? $sleepMilliseconds;
+
             if ($sleepMilliseconds) {
-                CBase_Sleep::usleep(c::value($sleepMilliseconds, $attempts, $e) * 1000);
+                usleep(c::value($sleepMilliseconds, $attempts) * 1000);
             }
 
             goto beginning;
@@ -1067,7 +1060,7 @@ class c {
             if ($segment === '*') {
                 if ($target instanceof CCollection) {
                     $target = $target->all();
-                } elseif (!is_iterable($target)) {
+                } elseif (!is_array($target)) {
                     return c::value($default);
                 }
 
@@ -1079,14 +1072,6 @@ class c {
 
                 return in_array('*', $key) ? carr::collapse($result) : $result;
             }
-            $segmentMap = [
-                '\*' => '*',
-                '\{first}' => '{first}',
-                '{first}' => array_key_first(is_array($target) ? $target : c::collect($target)->all()),
-                '\{last}' => '{last}',
-                '{last}' => array_key_last(is_array($target) ? $target : c::collect($target)->all()),
-            ];
-            $segment = carr::get($segmentMap, $segment, $segment);
 
             if (carr::accessible($target) && carr::exists($target, $segment)) {
                 $target = $target[$segment];
@@ -1154,32 +1139,6 @@ class c {
                 static::set($target[$segment], $segments, $value, $overwrite);
             } elseif ($overwrite) {
                 $target[$segment] = $value;
-            }
-        }
-
-        return $target;
-    }
-
-    public static function forget(&$target, $key) {
-        $segments = is_array($key) ? $key : explode('.', $key);
-
-        if (($segment = array_shift($segments)) === '*' && carr::accessible($target)) {
-            if ($segments) {
-                foreach ($target as &$inner) {
-                    self::forget($inner, $segments);
-                }
-            }
-        } elseif (carr::accessible($target)) {
-            if ($segments && carr::exists($target, $segment)) {
-                self::forget($target[$segment], $segments);
-            } else {
-                carr::forget($target, $segment);
-            }
-        } elseif (is_object($target)) {
-            if ($segments && isset($target->{$segment})) {
-                self::forget($target->{$segment}, $segments);
-            } elseif (isset($target->{$segment})) {
-                unset($target->{$segment});
             }
         }
 
@@ -1339,34 +1298,18 @@ class c {
         return static::manager()->theme();
     }
 
-    /**
-     * @return string
-     */
     public static function locale() {
         return str_replace('_', '-', CF::getLocale());
     }
 
-    /**
-     * @param mixed $obj
-     * @return boolean
-     */
     public static function isIterable($obj) {
         return is_array($obj) || (is_object($obj) && ($obj instanceof \Traversable));
     }
 
-    /**
-     * @param string $type
-     * @param string $message
-     * @return void
-     */
     public static function msg($type, $message) {
-        CApp_Message::add($type, $message);
+        return CApp_Message::add($type, $message);
     }
 
-    /**
-     * @param string $path
-     * @return string
-     */
     public static function docRoot($path = null) {
         $docRoot = rtrim(DOCROOT, DS);
         if ($path != null) {
@@ -1407,18 +1350,10 @@ class c {
         return c::untrailingslashit($appRoot) . DS;
     }
 
-    /**
-     * @param string|null $name
-     * @return CStorage_Adapter
-     */
     public static function disk($name = null) {
         return CStorage::instance()->disk($name);
     }
 
-    /**
-     * @param callable $callable
-     * @return Closure
-     */
     public static function closureFromCallable($callable) {
         if (method_exists(Closure::class, 'fromCallable')) {
             return Closure::fromCallable($callable);
@@ -1429,17 +1364,10 @@ class c {
         };
     }
 
-    /**
-     * @param null|mixed $event
-     * @return CBroadcast_PendingBroadcast
-     */
     public static function broadcast($event = null) {
         return CBroadcast::manager()->event($event);
     }
 
-    /**
-     * @return string
-     */
     public static function environment() {
         if (CF::isProduction()) {
             return 'production';

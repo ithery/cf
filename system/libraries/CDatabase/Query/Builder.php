@@ -1934,26 +1934,11 @@ class CDatabase_Query_Builder {
      */
     public function update(array $values) {
         $this->applyBeforeQueryCallbacks();
-        $values = c::collect($values)->map(function ($value) {
-            if (!$value instanceof CDatabase_Query_Builder) {
-                return ['value' => $value, 'bindings' => $value];
-            }
 
-            list($query, $bindings) = $this->parseSub($value);
-
-            return ['value' => new CDatabase_Query_Expression("({$query})"), 'bindings' => function () use ($bindings) {
-                return $bindings;
-            }];
-        });
-
-        $sql = $this->grammar->compileUpdate($this, $values->map(function ($value) {
-            return $value['value'];
-        })->all());
+        $sql = $this->grammar->compileUpdate($this, $values);
 
         return $this->connection->updateWithQuery($sql, $this->cleanBindings(
-            $this->grammar->prepareBindingsForUpdate($this->bindings, $values->map(function ($value) {
-                return $value['value'];
-            })->all())
+            $this->grammar->prepareBindingsForUpdate($this->bindings, $values)
         ));
     }
 

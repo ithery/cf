@@ -39,7 +39,7 @@ class CManager_Asset_Compiler_ScssCompiler {
      */
     protected function determineOutFile() {
         $ymd = date('Ymd', filemtime($this->file));
-        $basePath = CF::publicPath() ? CF::publicPath() . '/' : DOCROOT;
+        $basePath = defined('CFPUBLIC') ? DOCROOT . 'public' . DS : DOCROOT;
         $this->outFile = $basePath . 'compiled/asset/scss/' . $ymd . '/' . md5($this->file) . '.css';
     }
 

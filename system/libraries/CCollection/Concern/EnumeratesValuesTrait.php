@@ -6,7 +6,6 @@ use Symfony\Component\VarDumper\VarDumper;
  * @property-read CBase_HigherOrderCollectionProxy $average
  * @property-read CBase_HigherOrderCollectionProxy $avg
  * @property-read CBase_HigherOrderCollectionProxy $contains
- * @property-read CBase_HigherOrderCollectionProxy $doesntContain
  * @property-read CBase_HigherOrderCollectionProxy $each
  * @property-read CBase_HigherOrderCollectionProxy $every
  * @property-read CBase_HigherOrderCollectionProxy $filter
@@ -18,24 +17,19 @@ use Symfony\Component\VarDumper\VarDumper;
  * @property-read CBase_HigherOrderCollectionProxy $max
  * @property-read CBase_HigherOrderCollectionProxy $min
  * @property-read CBase_HigherOrderCollectionProxy $partition
- * @property-read CBase_HigherOrderCollectionProxy $percentage
  * @property-read CBase_HigherOrderCollectionProxy $reject
- * @property-read CBase_HigherOrderCollectionProxy $skipUntil
- * @property-read CBase_HigherOrderCollectionProxy $skipWhile
  * @property-read CBase_HigherOrderCollectionProxy $some
  * @property-read CBase_HigherOrderCollectionProxy $sortBy
  * @property-read CBase_HigherOrderCollectionProxy $sortByDesc
+ * @property-read CBase_HigherOrderCollectionProxy $skipUntil
+ * @property-read CBase_HigherOrderCollectionProxy $skipWhile
  * @property-read CBase_HigherOrderCollectionProxy $sum
  * @property-read CBase_HigherOrderCollectionProxy $takeUntil
  * @property-read CBase_HigherOrderCollectionProxy $takeWhile
  * @property-read CBase_HigherOrderCollectionProxy $unique
- * @property-read CBase_HigherOrderCollectionProxy $unless
  * @property-read CBase_HigherOrderCollectionProxy $until
- * @property-read CBase_HigherOrderCollectionProxy $when
  */
 trait CCollection_Concern_EnumeratesValuesTrait {
-    use CTrait_Conditionable;
-
     /**
      * Indicates that the object's string representation should be escaped when __toString is invoked.
      *
@@ -46,13 +40,12 @@ trait CCollection_Concern_EnumeratesValuesTrait {
     /**
      * The methods that can be proxied.
      *
-     * @var array<int, string>
+     * @var string[]
      */
     protected static $proxies = [
         'average',
         'avg',
         'contains',
-        'doesntContain',
         'each',
         'every',
         'filter',
@@ -64,7 +57,6 @@ trait CCollection_Concern_EnumeratesValuesTrait {
         'max',
         'min',
         'partition',
-        'percentage',
         'reject',
         'skipUntil',
         'skipWhile',
@@ -75,9 +67,7 @@ trait CCollection_Concern_EnumeratesValuesTrait {
         'takeUntil',
         'takeWhile',
         'unique',
-        'unless',
         'until',
-        'when',
     ];
 
     /**
@@ -138,7 +128,7 @@ trait CCollection_Concern_EnumeratesValuesTrait {
         }
 
         return static::range(1, $number)
-            ->unless($callback == null)
+            ->when($callback)
             ->map($callback);
     }
 
@@ -453,6 +443,30 @@ trait CCollection_Concern_EnumeratesValuesTrait {
     }
 
     /**
+     * Apply the callback if the value is truthy.
+     *
+     * @param bool|mixed    $value
+     * @param null|callable $callback
+     * @param null|callable $default
+     *
+     * @return static|mixed
+     */
+    public function when($value, callable $callback = null, callable $default = null) {
+        if (!$callback) {
+            return new CBase_HigherOrderWhenProxy($this, $value);
+        }
+
+        if ($value) {
+            return $callback($this, $value);
+        }
+        if ($default) {
+            return $default($this, $value);
+        }
+
+        return $this;
+    }
+
+    /**
      * Apply the callback if the collection is empty.
      *
      * @param callable      $callback
@@ -474,6 +488,19 @@ trait CCollection_Concern_EnumeratesValuesTrait {
      */
     public function whenNotEmpty(callable $callback, callable $default = null) {
         return $this->when($this->isNotEmpty(), $callback, $default);
+    }
+
+    /**
+     * Apply the callback if the value is falsy.
+     *
+     * @param bool          $value
+     * @param callable      $callback
+     * @param null|callable $default
+     *
+     * @return static|mixed
+     */
+    public function unless($value, callable $callback, callable $default = null) {
+        return $this->when(!$value, $callback, $default);
     }
 
     /**

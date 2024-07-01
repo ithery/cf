@@ -21,23 +21,23 @@ use Symfony\Component\Cache\CacheItem;
  */
 interface AdapterInterface extends CacheItemPoolInterface {
     /**
-     * @inheritdoc
+     * {@inheritdoc}
      *
      * @return CacheItem
      */
     public function getItem($key);
 
     /**
-     * @inheritdoc
+     * {@inheritdoc}
      *
      * @return \Traversable|CacheItem[]
      */
     public function getItems(array $keys = []);
 
     /**
-     * @inheritdoc
+     * {@inheritdoc}
      *
      * @return bool
      */
-    public function clear(string $prefix = '');
+    public function clear($prefix = '');
 }

@@ -5,18 +5,17 @@
  *
  * PHP version 5 and 7
  *
+ * @category  Crypt
+ * @package   EC
  * @author    Jim Wigginton <terrafrost@php.net>
  * @copyright 2019 Jim Wigginton
  * @license   http://www.opensource.org/licenses/mit-license.html  MIT License
  * @link      http://pear.php.net/package/Math_BigInteger
  */
 
-declare(strict_types=1);
-
 namespace phpseclib3\Crypt\EC\Curves;
 
 use phpseclib3\Crypt\EC\BaseCurves\Montgomery;
-use phpseclib3\Exception\RangeException;
 use phpseclib3\Math\BigInteger;
 
 class Curve448 extends Montgomery
@@ -56,8 +55,10 @@ class Curve448 extends Montgomery
      * Multiply a point on the curve by a scalar
      *
      * Modifies the scalar as described at https://tools.ietf.org/html/rfc7748#page-8
+     *
+     * @return array
      */
-    public function multiplyPoint(array $p, BigInteger $d): array
+    public function multiplyPoint(array $p, BigInteger $d)
     {
         //$r = strrev(sodium_crypto_scalarmult($d->toBytes(), strrev($p[0]->toBytes())));
         //return [$this->factory->newInteger(new BigInteger($r, 256))];
@@ -73,8 +74,10 @@ class Curve448 extends Montgomery
 
     /**
      * Creates a random scalar multiplier
+     *
+     * @return BigInteger
      */
-    public function createRandomMultiplier(): BigInteger
+    public function createRandomMultiplier()
     {
         return BigInteger::random(446);
     }
@@ -82,10 +85,10 @@ class Curve448 extends Montgomery
     /**
      * Performs range check
      */
-    public function rangeCheck(BigInteger $x): void
+    public function rangeCheck(BigInteger $x)
     {
         if ($x->getLength() > 448 || $x->isNegative()) {
-            throw new RangeException('x must be a positive integer less than 446 bytes in length');
+            throw new \RangeException('x must be a positive integer less than 446 bytes in length');
         }
     }
 }

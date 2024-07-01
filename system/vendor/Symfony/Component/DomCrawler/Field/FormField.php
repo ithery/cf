@@ -18,12 +18,30 @@ namespace Symfony\Component\DomCrawler\Field;
  */
 abstract class FormField
 {
-    protected \DOMElement $node;
-    protected string $name;
-    protected string|array|null $value = null;
-    protected \DOMDocument $document;
-    protected \DOMXPath $xpath;
-    protected bool $disabled = false;
+    /**
+     * @var \DOMElement
+     */
+    protected $node;
+    /**
+     * @var string
+     */
+    protected $name;
+    /**
+     * @var string
+     */
+    protected $value;
+    /**
+     * @var \DOMDocument
+     */
+    protected $document;
+    /**
+     * @var \DOMXPath
+     */
+    protected $xpath;
+    /**
+     * @var bool
+     */
+    protected $disabled;
 
     /**
      * @param \DOMElement $node The node associated with this field
@@ -39,8 +57,10 @@ abstract class FormField
 
     /**
      * Returns the label tag associated to the field or null if none.
+     *
+     * @return \DOMElement|null
      */
-    public function getLabel(): ?\DOMElement
+    public function getLabel()
     {
         $xpath = new \DOMXPath($this->node->ownerDocument);
 
@@ -58,16 +78,20 @@ abstract class FormField
 
     /**
      * Returns the name of the field.
+     *
+     * @return string The name of the field
      */
-    public function getName(): string
+    public function getName()
     {
         return $this->name;
     }
 
     /**
      * Gets the value of the field.
+     *
+     * @return string|array The value of the field
      */
-    public function getValue(): string|array|null
+    public function getValue()
     {
         return $this->value;
     }
@@ -75,23 +99,27 @@ abstract class FormField
     /**
      * Sets the value of the field.
      */
-    public function setValue(?string $value): void
+    public function setValue(?string $value)
     {
         $this->value = $value ?? '';
     }
 
     /**
      * Returns true if the field should be included in the submitted values.
+     *
+     * @return bool true if the field should be included in the submitted values, false otherwise
      */
-    public function hasValue(): bool
+    public function hasValue()
     {
         return true;
     }
 
     /**
      * Check if the current field is disabled.
+     *
+     * @return bool
      */
-    public function isDisabled(): bool
+    public function isDisabled()
     {
         return $this->node->hasAttribute('disabled');
     }
@@ -99,5 +127,5 @@ abstract class FormField
     /**
      * Initializes the form field.
      */
-    abstract protected function initialize(): void;
+    abstract protected function initialize();
 }

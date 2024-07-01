@@ -20,13 +20,14 @@ use Symfony\Component\DomCrawler\Field\FormField;
  */
 class FormFieldRegistry
 {
-    private array $fields = [];
-    private string $base = '';
+    private $fields = [];
+
+    private $base = '';
 
     /**
      * Adds a field to the registry.
      */
-    public function add(FormField $field): void
+    public function add(FormField $field)
     {
         $segments = $this->getSegments($field->getName());
 
@@ -46,9 +47,9 @@ class FormFieldRegistry
     }
 
     /**
-     * Removes a field based on the fully qualified name and its children from the registry.
+     * Removes a field based on the fully qualifed name and its children from the registry.
      */
-    public function remove(string $name): void
+    public function remove(string $name)
     {
         $segments = $this->getSegments($name);
         $target = &$this->fields;
@@ -63,13 +64,13 @@ class FormFieldRegistry
     }
 
     /**
-     * Returns the value of the field based on the fully qualified name and its children.
+     * Returns the value of the field based on the fully qualifed name and its children.
      *
-     * @return FormField|FormField[]|FormField[][]
+     * @return FormField|FormField[]|FormField[][] The value of the field
      *
      * @throws \InvalidArgumentException if the field does not exist
      */
-    public function &get(string $name): FormField|array
+    public function &get(string $name)
     {
         $segments = $this->getSegments($name);
         $target = &$this->fields;
@@ -86,6 +87,8 @@ class FormFieldRegistry
 
     /**
      * Tests whether the form has the given field based on the fully qualified name.
+     *
+     * @return bool Whether the form has the given field
      */
     public function has(string $name): bool
     {
@@ -93,7 +96,7 @@ class FormFieldRegistry
             $this->get($name);
 
             return true;
-        } catch (\InvalidArgumentException) {
+        } catch (\InvalidArgumentException $e) {
             return false;
         }
     }
@@ -101,12 +104,14 @@ class FormFieldRegistry
     /**
      * Set the value of a field based on the fully qualified name and its children.
      *
+     * @param mixed $value The value
+     *
      * @throws \InvalidArgumentException if the field does not exist
      */
-    public function set(string $name, mixed $value): void
+    public function set(string $name, $value)
     {
         $target = &$this->get($name);
-        if ((!\is_array($value) && $target instanceof FormField) || $target instanceof Field\ChoiceFormField) {
+        if ((!\is_array($value) && $target instanceof Field\FormField) || $target instanceof Field\ChoiceFormField) {
             $target->setValue($value);
         } elseif (\is_array($value)) {
             $registry = new static();
@@ -136,7 +141,7 @@ class FormFieldRegistry
     private function walk(array $array, ?string $base = '', array &$output = []): array
     {
         foreach ($array as $k => $v) {
-            $path = $base ? sprintf('%s[%s]', $base, $k) : $k;
+            $path = empty($base) ? $k : sprintf('%s[%s]', $base, $k);
             if (\is_array($v)) {
                 $this->walk($v, $path, $output);
             } else {
@@ -152,7 +157,7 @@ class FormFieldRegistry
      *
      *     getSegments('base[foo][3][]') = ['base', 'foo, '3', ''];
      *
-     * @return string[]
+     * @return string[] The list of segments
      */
     private function getSegments(string $name): array
     {

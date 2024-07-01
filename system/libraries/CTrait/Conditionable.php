@@ -4,24 +4,22 @@ trait CTrait_Conditionable {
      * Apply the callback if the given "value" is truthy.
      *
      * @param mixed         $value
-     * @param null|callable $callback
+     * @param callable      $callback
      * @param null|callable $default
      *
      * @return $this|mixed
      */
-    public function when($value, $callback = null, $default = null) {
+    public function when($value, $callback, $default = null) {
         $value = $value instanceof Closure ? $value($this) : $value;
-        if (func_num_args() === 0) {
-            return new CBase_HigherOrderWhenProxy($this);
-        }
-        if (func_num_args() === 1) {
-            return (new CBase_HigherOrderWhenProxy($this))->condition($value);
+
+        if (!$callback) {
+            return new CBase_HigherOrderWhenProxy($this, $value);
         }
 
         if ($value) {
-            return $callback($this, $value) ?? $this;
+            return $callback($this, $value) ?: $this;
         } elseif ($default) {
-            return $default($this, $value) ?? $this;
+            return $default($this, $value) ?: $this;
         }
 
         return $this;
@@ -31,20 +29,16 @@ trait CTrait_Conditionable {
      * Apply the callback if the given "value" is falsy.
      *
      * @param mixed         $value
-     * @param null|callable $callback
+     * @param callable      $callback
      * @param null|callable $default
      *
      * @return $this|mixed
      */
-    public function unless($value, $callback = null, $default = null) {
+    public function unless($value, $callback, $default = null) {
         $value = $value instanceof Closure ? $value($this) : $value;
 
-        if (func_num_args() === 0) {
-            return (new CBase_HigherOrderWhenProxy($this))->negateConditionOnCapture();
-        }
-
-        if (func_num_args() === 1) {
-            return (new CBase_HigherOrderWhenProxy($this))->condition(!$value);
+        if (!$callback) {
+            return new CBase_HigherOrderWhenProxy($this, !$value);
         }
 
         if (!$value) {

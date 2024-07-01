@@ -5,13 +5,13 @@
  *
  * PHP version 5
  *
+ * @category  File
+ * @package   ASN1
  * @author    Jim Wigginton <terrafrost@php.net>
  * @copyright 2016 Jim Wigginton
  * @license   http://www.opensource.org/licenses/mit-license.html  MIT License
  * @link      http://phpseclib.sourceforge.net
  */
-
-declare(strict_types=1);
 
 namespace phpseclib3\File\ASN1\Maps;
 
@@ -20,12 +20,14 @@ use phpseclib3\File\ASN1;
 /**
  * TBSCertificate
  *
+ * @package ASN1
  * @author  Jim Wigginton <terrafrost@php.net>
+ * @access  public
  */
 abstract class TBSCertificate
 {
     // assert($TBSCertificate['children']['signature'] == $Certificate['children']['signatureAlgorithm'])
-    public const MAP = [
+    const MAP = [
         'type' => ASN1::TYPE_SEQUENCE,
         'children' => [
             // technically, default implies optional, but we'll define it as being optional, none-the-less, just to
@@ -36,7 +38,7 @@ abstract class TBSCertificate
                 'optional' => true,
                 'explicit' => true,
                 'mapping' => ['v1', 'v2', 'v3'],
-                'default' => 'v1',
+                'default' => 'v1'
             ],
             'serialNumber' => CertificateSerialNumber::MAP,
             'signature' => AlgorithmIdentifier::MAP,
@@ -48,20 +50,20 @@ abstract class TBSCertificate
             'issuerUniqueID' => [
                 'constant' => 1,
                 'optional' => true,
-                'implicit' => true,
+                'implicit' => true
             ] + UniqueIdentifier::MAP,
             'subjectUniqueID' => [
                 'constant' => 2,
                 'optional' => true,
-                'implicit' => true,
+                'implicit' => true
             ] + UniqueIdentifier::MAP,
             // <http://tools.ietf.org/html/rfc2459#page-74> doesn't use the EXPLICIT keyword but if
             // it's not IMPLICIT, it's EXPLICIT
             'extensions' => [
                 'constant' => 3,
                 'optional' => true,
-                'explicit' => true,
-            ] + Extensions::MAP,
-        ],
+                'explicit' => true
+            ] + Extensions::MAP
+        ]
     ];
 }

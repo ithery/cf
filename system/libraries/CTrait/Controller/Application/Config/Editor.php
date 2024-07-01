@@ -38,7 +38,6 @@ trait CTrait_Controller_Application_Config_Editor {
         if ($title == '') {
             $title = ucfirst($this->getConfigGroup()) . ' Setting';
         }
-
         return $title;
     }
 
@@ -76,14 +75,13 @@ trait CTrait_Controller_Application_Config_Editor {
             curl::redirect($this->baseUri());
         }
         $config = CConfig::instance($this->getConfigGroup());
-        $appConfigFile = CF::appPath() . '/default/config/' . $this->getConfigGroup() . EXT;
+        $appConfigFile = CF::appPath() . 'default/config/' . $this->getConfigGroup() . EXT;
         //find record for this key
         $configRecord = [];
 
         foreach ($config->getConfigData() as $d) {
             if (carr::get($d, 'key') == $key) {
                 $configRecord = $d;
-
                 break;
             }
         }
