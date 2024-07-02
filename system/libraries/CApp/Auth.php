@@ -234,9 +234,11 @@ class CApp_Auth {
     public function hasher() {
         return $this->guard()->hasher();
     }
+
     public function check() {
         return $this->guard()->check();
     }
+
     public function id() {
         return $this->guard()->id();
     }
