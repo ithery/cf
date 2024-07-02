@@ -478,6 +478,15 @@ class CAuth_Guard_SessionGuard implements CAuth_Contract_StatefulGuardInterface,
      */
     protected function updateSession($id) {
         $this->session->put($this->getName(), $id);
+        //get the provider for this guart
+        $providerSessionName = CF::config('auth.guards.' . $this->name . '.providerSessionName', 'user_provider');
+        $provider = CF::config('auth.guards.' . $this->name . '.provider');
+
+        if ($providerSessionName && $provider) {
+            $this->session->put($providerSessionName, $provider);
+        }
+
+        //$this->session->put($this->provider->getName(), $id);
     }
 
     /**
