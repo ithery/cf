@@ -45,9 +45,20 @@ class CReport_Jasper_Element {
         return substr($value, 0, 1);
     }
 
+    public function getChildsByClassName($childClassName) {
+        $childs = [];
+        foreach ($this->children as $child) {
+            if (get_class($child) == 'CReport_Jasper_Element_' . $childClassName) {
+                $childs[] = $child;
+            }
+        }
+
+        return $childs;
+    }
+
     public function getChildByClassName($childClassName) {
         foreach ($this->children as $child) {
-            if (get_class($child) == 'CReport_Jasper_' . $childClassName) {
+            if (get_class($child) == 'CReport_Jasper_Element_' . $childClassName) {
                 return $child;
             }
         }

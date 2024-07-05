@@ -43,11 +43,12 @@ class CReport_Jasper_Element_StaticText extends CReport_Jasper_Element {
         }
         $box = [];
         if (isset($data->box)) {
-            $border = StaticText::formatBox($data->box);
-            $box = $data->box;
+            $border = CReport_Jasper_Element_StaticText::formatBoxToBorder($data->box);
+            $box = CReport_Jasper_Element_StaticText::formatBoxToBox($data->box);
         }
+
         if (isset($data->textElement['textAlignment'])) {
-            $align = $this->get_first_value($data->textElement['textAlignment']);
+            $align = $this->getFirstValue($data->textElement['textAlignment']);
         }
         if (isset($data->textElement['verticalAlignment'])) {
             $valign = 'T';
@@ -84,31 +85,32 @@ class CReport_Jasper_Element_StaticText extends CReport_Jasper_Element {
         }
         $lineHeightRatio = 1;
         if (isset($data->textElement->paragraph['lineSpacing'])) {
-            switch ($data->textElement->paragraph['lineSpacing']) {
-                case '1_1_2':
+            $lineSpacing = $data->textElement->paragraph['lineSpacing'];
+            if ($lineSpacing) {
+                if ((float) $lineSpacing) {
+                    $lineHeightRatio = (float) $lineSpacing;
+                }
+                if ($lineSpacing == '1_1_2') {
                     $lineHeightRatio = 1.5;
-
-                    break;
-                case 'Double':
+                }
+                if ($lineSpacing == 'Double') {
                     $lineHeightRatio = 1.5;
-
-                    break;
-                case 'Proportional':
+                }
+                if ($lineSpacing == 'Proportional') {
                     $lineHeightRatio = $data->textElement->paragraph['lineSpacingSize'];
-
-                    break;
+                }
             }
         }
 
-        JasperPHP\Instructions::addInstruction([
+        CReport_Jasper_Instructions::addInstruction([
             'type' => 'setCellHeightRatio',
             'ratio' => $lineHeightRatio
         ]);
-        JasperPHP\Instructions::addInstruction(['type' => 'SetXY', 'x' => $data->reportElement['x'] + 0, 'y' => $data->reportElement['y'] + 0, 'hidden_type' => 'SetXY']);
-        JasperPHP\Instructions::addInstruction(['type' => 'SetTextColor', 'forecolor' => $data->reportElement['forecolor'] . '', 'r' => $textcolor['r'], 'g' => $textcolor['g'], 'b' => $textcolor['b'], 'hidden_type' => 'textcolor']);
-        JasperPHP\Instructions::addInstruction(['type' => 'SetDrawColor', 'r' => $drawcolor['r'], 'g' => $drawcolor['g'], 'b' => $drawcolor['b'], 'hidden_type' => 'drawcolor']);
-        JasperPHP\Instructions::addInstruction(['type' => 'SetFillColor', 'backcolor' => $data->reportElement['backcolor'] . '', 'r' => $fillcolor['r'], 'g' => $fillcolor['g'], 'b' => $fillcolor['b'], 'hidden_type' => 'fillcolor']);
-        JasperPHP\Instructions::addInstruction(['type' => 'SetFont', 'font' => $font, 'pdfFontName' => $data->textElement->font ? $data->textElement->font['pdfFontName'] : '', 'fontstyle' => $fontstyle, 'fontsize' => $fontsize, 'hidden_type' => 'font']);
+        CReport_Jasper_Instructions::addInstruction(['type' => 'SetXY', 'x' => $data->reportElement['x'] + 0, 'y' => $data->reportElement['y'] + 0, 'hidden_type' => 'SetXY']);
+        CReport_Jasper_Instructions::addInstruction(['type' => 'SetTextColor', 'forecolor' => $data->reportElement['forecolor'] . '', 'r' => $textcolor['r'], 'g' => $textcolor['g'], 'b' => $textcolor['b'], 'hidden_type' => 'textcolor']);
+        CReport_Jasper_Instructions::addInstruction(['type' => 'SetDrawColor', 'r' => $drawcolor['r'], 'g' => $drawcolor['g'], 'b' => $drawcolor['b'], 'hidden_type' => 'drawcolor']);
+        CReport_Jasper_Instructions::addInstruction(['type' => 'SetFillColor', 'backcolor' => $data->reportElement['backcolor'] . '', 'r' => $fillcolor['r'], 'g' => $fillcolor['g'], 'b' => $fillcolor['b'], 'hidden_type' => 'fillcolor']);
+        CReport_Jasper_Instructions::addInstruction(['type' => 'SetFont', 'font' => $font, 'pdfFontName' => $data->textElement->font ? $data->textElement->font['pdfFontName'] : '', 'fontstyle' => $fontstyle, 'fontsize' => $fontsize, 'hidden_type' => 'font']);
         //"height"=>$data->reportElement["height"]
         //### UTF-8 characters, a must for me.
         $txtEnc = $data->text;
@@ -124,7 +126,7 @@ class CReport_Jasper_Element_StaticText extends CReport_Jasper_Element {
             $print_expression_result = true;
         }
         if ($print_expression_result == true) {
-            JasperPHP\Instructions::addInstruction(['type' => 'MultiCell', 'width' => $data->reportElement['width'], 'height' => $height,
+            CReport_Jasper_Instructions::addInstruction(['type' => 'multiCell', 'width' => $data->reportElement['width'], 'height' => $height,
                 'txt' => $txtEnc, 'border' => $border, 'align' => $align, 'fill' => $fill, 'hidden_type' => 'statictext',
                 'printWhenExpression' => $printWhenExpression . '',
                 'multiCell' => false,
@@ -182,7 +184,7 @@ class CReport_Jasper_Element_StaticText extends CReport_Jasper_Element {
      *
      * @return array[]
      */
-    public static function formatBox($box) {
+    public static function formatBoxToBorder($box) {
         $border = [];
         $borderset = '';
         if ($box->topPen['lineWidth'] > 0.0) {
@@ -199,5 +201,25 @@ class CReport_Jasper_Element_StaticText extends CReport_Jasper_Element {
         }
 
         return $border;
+    }
+
+    public static function formatBoxToBox($box) {
+        $boxArray = [];
+        if ($box->padding) {
+            if ($box->padding['left']) {
+                $boxArray['leftPadding'] = $box->padding['left'];
+            }
+            if ($box->padding['top']) {
+                $boxArray['topPadding'] = $box->padding['top'];
+            }
+            if ($box->padding['right']) {
+                $boxArray['rightPadding'] = $box->padding['right'];
+            }
+            if ($box->padding['bottom']) {
+                $boxArray['bottomPadding'] = $box->padding['bottom'];
+            }
+        }
+
+        return $boxArray;
     }
 }

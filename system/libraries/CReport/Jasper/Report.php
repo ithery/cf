@@ -13,7 +13,7 @@ class CReport_Jasper_Report extends CReport_Jasper_Element {
 
     public static $proccessintructionsTime = 'after'; // after : process intructions after generate all intrucions / inline : process intrucions after gerenate each detail
 
-    public $dbData;
+    public $data;
 
     public $pageChanged;
 
@@ -90,6 +90,12 @@ class CReport_Jasper_Report extends CReport_Jasper_Element {
         $this->pageSetting($objElement);
         $this->queryStringHandler($objElement);
         $this->groupHandler($objElement);
+    }
+
+    public function setData($data) {
+        $this->data = $data;
+
+        return $this;
     }
 
     public function getDbData() {
@@ -189,7 +195,8 @@ class CReport_Jasper_Report extends CReport_Jasper_Element {
         $this->arrayVariable = [];
         foreach ($xml_path->variable as $variable) {
             $varName = (string) $variable['name'];
-            $this->arrayVariable[$varName] = ['calculation' => $variable['calculation'] . '',
+            $this->arrayVariable[$varName] = [
+                'calculation' => $variable['calculation'] . '',
                 'target' => $variable->variableExpression,
                 'class' => $variable['class'] . '',
                 'resetType' => $variable['resetType'] . '',
@@ -254,7 +261,7 @@ class CReport_Jasper_Report extends CReport_Jasper_Element {
         }
     }
 
-    public function variablesCalculation($obj, $row = 'StdClass') {
+    public function variablesCalculation($obj, $row) {
         if ($this->arrayVariable) {
             foreach ($this->arrayVariable as $k => $out) {
                 $this->variableCalculation($k, $out, $row);
@@ -301,28 +308,64 @@ class CReport_Jasper_Report extends CReport_Jasper_Element {
             }
         }
 
+        $originalText = $text;
         preg_match_all("/V{(\w+)}/", $text, $matchesV);
         if ($matchesV) {
-            foreach ($matchesV[1] as $macthV) {
-                $text = $this->getValOfVariable($macthV, $text, $writeHTML, $element);
+            foreach ($matchesV[1] as $matchV) {
+                $text = $this->getValOfVariable($matchV, $text, $writeHTML, $element);
             }
         }
 
         preg_match_all('/F{[^}]*}/', $text, $matchesF);
         if ($matchesF) {
             //var_dump($matchesF);
-            foreach ($matchesF[0] as $macthF) {
-                $macth = str_ireplace(['F{', '}'], '', $macthF);
-                $text = $this->getValOfField($macth, $row, $text, $writeHTML);
+            foreach ($matchesF[0] as $matchF) {
+                $match = str_ireplace(['F{', '}'], '', $matchF);
+                $text = $this->getValOfField($match, $row, $text, $writeHTML);
             }
+        }
+
+        // Regex pattern to capture the entire expression
+        $ternaryPattern = '/(.*?)\?(.*?)\:(.*)/';
+
+        if (preg_match($ternaryPattern, $text, $matchesTernary) > 0) {
+            // Extract the components
+
+            $condition = trim($matchesTernary[1]);
+            $valueIfTrue = trim($matchesTernary[2]);
+            $valueIfFalse = trim($matchesTernary[3]);
+            $text = $this->evaluateCondition($condition) ? $valueIfTrue : $valueIfFalse;
+            // $mathValue = eval('return (' . $out['target'] . ');');
+
+             // error_reporting(5);
         }
 
         return $text;
     }
 
+    public function evaluateCondition($condition) {
+        // Handle basic condition evaluation
+        // Handle basic condition evaluation
+        if (preg_match('/(.*?)==(.*?)$/', $condition, $condMatches)) {
+            $leftOperand = trim(trim($condMatches[1], "\n\r\t\b\0\"' "));
+            $rightOperand = trim(trim($condMatches[2], "\n\r\t\b\0\"' "));
+
+            return $leftOperand == $rightOperand;
+        }
+        // Add more condition checks as needed (e.g., !=, <, >, etc.)
+
+        return false;
+    }
+
     public function getValOfVariable($variable, $text, $htmlentities = false, $element = null) {
         $val = array_key_exists($variable, $this->arrayVariable) ? $this->arrayVariable[$variable] : [];
-        $ans = array_key_exists('ans', $val) ? $val['ans'] : '';
+        $ans = array_key_exists('ans', $val)
+            ? $val['ans']
+            : (
+                array_key_exists('initialValue', $val)
+                ? $val['initialValue']
+                : ''
+            );
         if (preg_match_all('/V{' . $variable . "}\.toString/", $text, $matchesV) > 0) {
             //$ans = $ans+0;
             $ans = ($ans) ? number_format($ans, 2, ',', '.') : $ans;
@@ -365,11 +408,16 @@ class CReport_Jasper_Report extends CReport_Jasper_Element {
                     $objCounter = $matArray[0][1];
                     $obj = $obj->$objArrayName;
                     $obj = $obj[$objCounter];
-                } elseif (is_array($obj)) {
-                    if (array_key_exists($part, $obj)) {
-                        $obj = $obj[$part];
+                } elseif (is_array($obj) || $obj instanceof CCollection) {
+                    if ($obj instanceof CCollection) {
+                        cdbg::dd($obj, $part, cdbg::getTraceString());
+                        $obj = $obj->get($part);
                     } else {
-                        $obj = '';
+                        if (array_key_exists($part, $obj)) {
+                            $obj = $obj[$part];
+                        } else {
+                            $obj = '';
+                        }
                     }
                 } elseif (is_object($obj)) {
                     preg_match_all("/(\w+)\(\)/", $part, $matchMethod);
@@ -384,7 +432,6 @@ class CReport_Jasper_Report extends CReport_Jasper_Element {
                 }
             }
         }
-
         $val = $obj;
         error_reporting(5);
         $fieldRegExp = str_ireplace('[', "\[", $field);
@@ -419,6 +466,54 @@ class CReport_Jasper_Report extends CReport_Jasper_Element {
         }
     }
 
+    public function calculateMathExpression($expression) {
+        // Remove any unwanted characters (for security)
+        $expression = preg_replace('/[^0-9\.\+\-\*\/\s]/', '', $expression);
+
+        // Split the expression into tokens (numbers and operators)
+        $tokens = preg_split('/\s*([\+\-\*\/])\s*/', $expression, -1, PREG_SPLIT_DELIM_CAPTURE | PREG_SPLIT_NO_EMPTY);
+
+        // Initialize the result with the first number
+        $result = array_shift($tokens);
+
+        // Ensure the initial result is a float
+        $result = floatval($result);
+
+        // Iterate through the tokens and perform the calculations
+        while (!empty($tokens)) {
+            $operator = array_shift($tokens);
+            $number = array_shift($tokens);
+
+            // Ensure the number is a float
+            $number = floatval($number);
+
+            // Perform the calculation based on the operator
+            switch ($operator) {
+                case '+':
+                    $result += $number;
+
+                    break;
+                case '-':
+                    $result -= $number;
+
+                    break;
+                case '*':
+                    $result *= $number;
+
+                    break;
+                case '/':
+                    if ($number == 0) {
+                        throw new Exception('Division by zero');
+                    }
+                    $result /= $number;
+
+                    break;
+            }
+        }
+
+        return $result;
+    }
+
     public function variableCalculation($k, $out, $row) {
         preg_match_all("/P{(\w+)}/", $out['target'], $matchesP);
         if ($matchesP) {
@@ -430,25 +525,41 @@ class CReport_Jasper_Report extends CReport_Jasper_Element {
         if ($matchesV) {
             foreach ($matchesV[1] as $macthV) {
                 if (is_array($this->arrayVariable[$macthV])) {
-                    $ans = array_key_exists('ans', $this->arrayVariable[$macthV]) ? $this->arrayVariable[$macthV]['ans'] : '';
+                    $ans = array_key_exists('ans', $this->arrayVariable[$macthV])
+                        ? $this->arrayVariable[$macthV]['ans']
+                        : (
+                            array_key_exists('initialValue', $this->arrayVariable[$macthV])
+                            ? $this->arrayVariable[$macthV]['initialValue']
+                            : ''
+                        );
                 } else {
                     $ans = '';
                 }
                 $defVal = $ans != '' ? $ans : $this->arrayVariable[$macthV]['initialValue'];
+
                 $out['target'] = str_ireplace(['$V{' . $macthV . '}'], [$ans], $out['target']);
             }
         }
+
         preg_match_all("/F{(\w+)}/", $out['target'], $matchesF);
         if ($matchesF) {
-            foreach ($matchesF[1] as $macthF) {
-                $out['target'] = $this->getValOfField($macthF, $row, $out['target']); //str_ireplace(array('$F{'.$macthF.'}'),array(utf8_encode($row->$macthF)),$out['target']);
+            foreach ($matchesF[1] as $matchF) {
+                $out['target'] = $this->getValOfField($matchF, $row, $out['target']); //str_ireplace(array('$F{'.$macthF.'}'),array(utf8_encode($row->$macthF)),$out['target']);
+                // $ans = $this->getValOfField($matchF, $row, $out['target']);
+                // cdbg::dd($ans);
+                // if($ans) {
+                //     str_ireplace(['$F{' . $matchF . '}'], [$ans], $out['target']);
+                // }
             }
         }
+
         $htmlData = array_key_exists('htmlData', $this->arrayVariable) ? $this->arrayVariable['htmlData']['class'] : '';
         if (preg_match('/(\d+)(?:\s*)([\+\-\*\/])(?:\s*)/', $out['target'], $matchesMath) > 0 && $htmlData != 'HTMLDATA') {
-            error_reporting(0);
-            $mathValue = eval('return (' . $out['target'] . ');');
-            error_reporting(5);
+            // error_reporting(0);
+            $mathValue = $this->calculateMathExpression($out['target']);
+            // $mathValue = eval('return (' . $out['target'] . ');');
+
+            // error_reporting(5);
         }
 
         $value = (array_key_exists('ans', $this->arrayVariable[$k])) ? $this->arrayVariable[$k]['ans'] : null;
@@ -504,6 +615,7 @@ class CReport_Jasper_Report extends CReport_Jasper_Element {
 
                 break;
             case '':
+            case 'System':
                 $value = $newValue;
 
                 break;
@@ -519,7 +631,6 @@ class CReport_Jasper_Report extends CReport_Jasper_Element {
                 $value = $newValue;
             }
         }
-
         $this->arrayVariable[$k]['ans'] = $value;
     }
 
@@ -713,9 +824,7 @@ class CReport_Jasper_Report extends CReport_Jasper_Element {
         //$this->variable_handler($this->objElement);
         //$this->queryString_handler($this->objElement);
         //var_dump($this->objElement);
-        if (strlen(trim($this->sql)) > 0) {
-            $this->dbData = $this->getDbData();
-        }
+
         // exibe a tag
         $instructions = CReport_Jasper_Instructions::setJasperObj($obj ? $obj : $this);
         parent::generate($this);

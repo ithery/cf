@@ -18,7 +18,7 @@ class CReport_Jasper_Element_Image extends CReport_Jasper_Element {
         // echo $text;
 
         $arraydata = [
-            'type' => 'Image',
+            'type' => 'image',
             'path' => $text,
             'x' => $data->reportElement['x'] + 0,
             'y' => $data->reportElement['y'] + 0,
@@ -32,7 +32,7 @@ class CReport_Jasper_Element_Image extends CReport_Jasper_Element {
             'fitbox' => false
         ];
         if (isset($data->box)) {
-            $arraydata['border'] = CReport_Jasper_Element_StaticText::formatBox($data->box);
+            $arraydata['border'] = CReport_Jasper_Element_StaticText::formatBoxToBorder($data->box);
         }
         switch ($data['scaleImage']) {
             case 'FillFrame':

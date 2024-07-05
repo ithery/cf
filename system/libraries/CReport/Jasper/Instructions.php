@@ -29,6 +29,16 @@ final class CReport_Jasper_Instructions {
     private function __construct() {
     }
 
+    /**
+     * @return CReport_Jasper_Processor_PdfProcessor
+     */
+    public static function getProcessor() {
+        $JasperObj = self::$JasperObj;
+        $instruction = new self::$instructionProcessor($JasperObj);
+
+        return $instruction;
+    }
+
     public static function setProcessor($instructionProcessor) {
         self::$instructionProcessor = $instructionProcessor;
     }
