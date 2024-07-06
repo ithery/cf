@@ -1,10 +1,8 @@
 <?php
 
 class CReport_Jasper_Element_StaticText extends CReport_Jasper_Element {
-    public function generate($obj = null) {
-        $row = is_array($obj) ? $obj[1] : null;
-        $data = $this->objElement;
-        $obj = is_array($obj) ? $obj[0] : $obj;
+    public function generate(CReport_Jasper_Report $report) {
+        $row = $report->getCurrentRow();
         $data = $this->objElement;
         $align = 'L';
         $fill = 0;
@@ -101,7 +99,7 @@ class CReport_Jasper_Element_StaticText extends CReport_Jasper_Element {
         $print_expression_result = false;
         $printWhenExpression = (string) $data->reportElement->printWhenExpression;
         if ($printWhenExpression != '') {
-            $printWhenExpression = $obj->getExpression($printWhenExpression, $row);
+            $printWhenExpression = $report->getExpression($printWhenExpression, $row);
 
             //echo    'if('.$printWhenExpression.'){$print_expression_result=true;}';
             eval('if(' . $printWhenExpression . '){$print_expression_result=true;}');

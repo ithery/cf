@@ -1,15 +1,14 @@
 <?php
 
 class CReport_Jasper_Element_Image extends CReport_Jasper_Element {
-    public function generate($obj = null) {
-        $row = is_array($obj) ? $obj[1] : null;
+    public function generate(CReport_Jasper_Report $report) {
+        $row = $report->getCurrentRow();
         $data = $this->objElement;
-        $obj = is_array($obj) ? $obj[0] : $obj;
         $text = $data->imageExpression;
         //echo $imagepath;
         //echo $imagepath;
         //$text= substr($data->imageExpression, 1, -1);
-        $text = $obj->getExpression($text, $row);
+        $text = $report->getExpression($text, $row);
         $text = str_ireplace(['"+', '" +', '+"', '+ "', '"'], ['', '', ''], $text);
 
         $imagetype = substr($text, -3);
@@ -32,7 +31,7 @@ class CReport_Jasper_Element_Image extends CReport_Jasper_Element {
             'fitbox' => false
         ];
         if (isset($data->box)) {
-            $arraydata['border'] = CReport_Jasper_Element_StaticText::formatBoxToBorder($data->box);
+            $arraydata['border'] = CReport_Jasper_Utils_ElementUtils::formatBorder($data->box);
         }
         switch ($data['scaleImage']) {
             case 'FillFrame':

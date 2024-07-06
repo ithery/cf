@@ -83,11 +83,11 @@ class CReport_Jasper_Element {
     /**
      * @param null|mixed $obj
      */
-    public function generate($obj = null) {
+    public function generate(CReport_Jasper_Report $report) {
         if ($this->children) {
             foreach ($this->children as $child) {
                 if (is_object($child)) {
-                    $child->generate($obj);
+                    $child->generate($report);
                 }
             }
         }

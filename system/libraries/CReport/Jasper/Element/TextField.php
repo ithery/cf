@@ -9,11 +9,10 @@ class CReport_Jasper_Element_TextField extends CReport_Jasper_Element {
         return $this;
     }
 
-    public function getInstructionDataMultiCell($obj) {
-        $rowData = is_array($obj) ? $obj[1] : null;
+    public function getInstructionDataMultiCell(CReport_Jasper_Report $report) {
+        $rowData = $report->getCurrentRow();
 
         $data = $this->objElement;
-        $obj = is_array($obj) ? $obj[0] : $obj;
         /** @var CReport_Jasper_Report $obj */
         $border = 0;
         $align = 'L';
@@ -66,13 +65,13 @@ class CReport_Jasper_Element_TextField extends CReport_Jasper_Element {
         }
         $printWhenExpression = '';
         if ($data->reportElement->printWhenExpression) {
-            $printWhenExpression = $obj->getExpression($data->reportElement->printWhenExpression, $rowData);
+            $printWhenExpression = $report->getExpression($data->reportElement->printWhenExpression, $rowData);
         }
 
         if ($data->textFieldExpression == 'new java.util.Date()') {
             $text = date('Y-m-d H:i:s');
         } else {
-            $text = $obj->getExpression($text, $rowData, $writeHTML, $this);
+            $text = $report->getExpression($text, $rowData, $writeHTML, $this);
         }
         if ($printoverflow == 'true' || $stretchoverflow == 'true') {
             $text = str_ireplace(['+', '+', '"'], ['', '', ''], $text);
@@ -121,12 +120,10 @@ class CReport_Jasper_Element_TextField extends CReport_Jasper_Element {
         return $result;
     }
 
-    public function generate($obj = null) {
-        $orginalObj = $obj;
-        $rowData = is_array($obj) ? $obj[1] : null;
-
+    public function generate(CReport_Jasper_Report $report) {
+        $orginalObj = $report;
         $data = $this->objElement;
-        $obj = is_array($obj) ? $obj[0] : $obj;
+        $rowData = $report->getCurrentRow();
 
         $font = 'helvetica';
         $fill = 0;
@@ -137,7 +134,7 @@ class CReport_Jasper_Element_TextField extends CReport_Jasper_Element {
         $drawcolor = ['r' => 0, 'g' => 0, 'b' => 0];
 
         if (isset($data->hyperlinkReferenceExpression)) {
-            $data->hyperlinkReferenceExpression = $obj->getExpression($data->hyperlinkReferenceExpression, $rowData, false, $this);
+            $data->hyperlinkReferenceExpression = $report->getExpression($data->hyperlinkReferenceExpression, $rowData, false, $this);
         }
 
         //SimpleXML object (1 item) [0] // ->codeExpression[0] ->attributes('xsi', true) ->schemaLocation ->attributes('', true) ->type ->drawText ->checksumRequired barbecue:
@@ -147,7 +144,7 @@ class CReport_Jasper_Element_TextField extends CReport_Jasper_Element {
         //apply style formatting
         if (isset($data->reportElement['style'])) {
             $name = $data->reportElement['style'];
-            $obj->applyStyle($name, $data->reportElement, $rowData);
+            $report->applyStyle($name, $data->reportElement, $rowData);
         }
 
         if (isset($data->reportElement['forecolor'])) {
@@ -235,6 +232,6 @@ class CReport_Jasper_Element_TextField extends CReport_Jasper_Element {
 
         //$this->checkoverflow($pointer);
 
-        parent::generate($obj);
+        parent::generate($report);
     }
 }

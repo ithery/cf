@@ -1,14 +1,15 @@
 <?php
 
 class CReport_Jasper_Element_Detail extends CReport_Jasper_Element {
-    public function generate($obj = null) {
-        $data = $obj->data;
-        /** @var CReport_Jasper_Report $obj */
+    public function generate(CReport_Jasper_Report $report) {
+        $data = $report->getData();
+
         if ($this->children) {
             $totalRows = $data->count();
-
+            $lastRow = null;
             // $obj->variablesCalculation($obj, $data);
             foreach ($data as $rowIndex => $row) {
+                /** @var CReport_Jasper_Report_DataRow $row */
                 if (CReport_Jasper_Report::$proccessintructionsTime == 'inline') {
                     CReport_Jasper_Instructions::runInstructions();
                 }
@@ -16,64 +17,46 @@ class CReport_Jasper_Element_Detail extends CReport_Jasper_Element {
                 // if (!is_object($row) && is_array($row)) {
                 //     $row = (object) $row;
                 // }
-                $obj->rowData = $row;
+                //$obj->rowData = $row;
 
                 // $row->rowIndex = $rowIndex;
 
-                $obj->arrayVariable['REPORT_COUNT']['ans'] = $rowIndex;
-                $obj->arrayVariable['REPORT_COUNT']['target'] = $rowIndex;
-                $obj->arrayVariable['REPORT_COUNT']['calculation'] = null;
-                $obj->arrayVariable['totalRows']['ans'] = $totalRows;
-                $obj->arrayVariable['totalRows']['target'] = $totalRows;
-                $obj->arrayVariable['totalRows']['calculation'] = null;
+                $report->arrayVariable['REPORT_COUNT']['ans'] = $rowIndex;
+                $report->arrayVariable['REPORT_COUNT']['target'] = $rowIndex;
+                $report->arrayVariable['REPORT_COUNT']['calculation'] = null;
+                $report->arrayVariable['totalRows']['ans'] = $totalRows;
+                $report->arrayVariable['totalRows']['target'] = $totalRows;
+                $report->arrayVariable['totalRows']['calculation'] = null;
                 // $row->totalRows = $totalRows;
-                if (count($obj->arrayGroup) > 0) {
-                    foreach ($obj->arrayGroup as $group) {
+                if (count($report->arrayGroup) > 0) {
+                    foreach ($report->arrayGroup as $group) {
                         preg_match_all("/F{(\w+)}/", $group->groupExpression, $matchesF);
                         $groupExpression = $matchesF[1][0];
                         $shouldRender = false;
-                        if ($obj->lastRowData) {
-                            $lastGroupValue = null;
-                            $groupValue = null;
-
-                            if (is_object($obj->lastRowData)) {
-                                if ($obj->lastRowData instanceof CCollection) {
-                                    $lastGroupValue = $obj->lastRowData->get($groupExpression);
-                                    $groupValue = $obj->rowData->get($groupExpression);
-                                } else {
-                                    $lastGroupValue = $obj->lastRowData->$groupExpression;
-                                    $groupValue = $obj->rowData->$groupExpression;
-                                }
-
-                                if ($lastGroupValue != $groupValue) {
-                                    $shouldRender = true;
-                                }
-                            } elseif (is_array($obj->lastRowData)) {
-                                $lastGroupValue = carr::get($obj->lastRowData, $groupExpression);
-                                $groupValue = carr::get($obj->rowData, $groupExpression);
-
-                                if ($lastGroupValue != $groupValue) {
-                                    $shouldRender = true;
-                                }
+                        if ($lastRow) {
+                            $lastGroupValue = carr::get($lastRow, $groupExpression);
+                            $groupValue = carr::get($row, $groupExpression);
+                            if ($lastGroupValue != $groupValue) {
+                                $shouldRender = true;
                             }
                         }
                         if (($group->resetVariables == 'true' || $shouldRender) && ($group->groupFooter && $rowIndex > 0)) {
                             $groupFooter = new CReport_Jasper_Element_GroupFooter($group->groupFooter);
-                            $groupFooter->generate([$obj, $row]);
+                            $groupFooter->generate($report);
                             $group->resetVariables = 'false';
                         }
 
                         if (($rowIndex == 0 || $group->resetVariables == 'true' || $shouldRender) && ($group->groupHeader)) {
                             $groupHeader = new CReport_Jasper_Element_GroupHeader($group->groupHeader);
-                            $groupHeader->generate([$obj, $row]);
+                            $groupHeader->generate($report);
                             $group->resetVariables = 'false';
                         }
                     }
                 }
-                $background = $obj->getChildByClassName('Background');
+                $background = $report->getChildByClassName('Background');
 
                 if ($background) {
-                    $background->generate($obj);
+                    $background->generate($report);
                 }
 
                 // armazena no array $results;
@@ -83,7 +66,7 @@ class CReport_Jasper_Element_Detail extends CReport_Jasper_Element {
                         $print_expression_result = false;
                         $printWhenExpression = (string) $child->objElement->printWhenExpression;
                         if ($printWhenExpression != '') {
-                            $printWhenExpression = $obj->getExpression($printWhenExpression, $row);
+                            $printWhenExpression = $report->getExpression($printWhenExpression, $row);
 
                             //echo    'if('.$printWhenExpression.'){$print_expression_result=true;}';
                             eval('if(' . $printWhenExpression . '){$print_expression_result=true;}');
@@ -106,7 +89,7 @@ class CReport_Jasper_Element_Detail extends CReport_Jasper_Element {
                                 $maxHeight = 0;
                                 foreach ($textFields as $textField) {
                                     if ($textField instanceof CReport_Jasper_Element_TextField) {
-                                        $multiCellOptions = $textField->getInstructionDataMultiCell([$obj, $row]);
+                                        $multiCellOptions = $textField->getInstructionDataMultiCell($report);
 
                                         //cdbg::d($multiCellOptions);
                                         $processor = CReport_Jasper_Instructions::getProcessor();
@@ -130,16 +113,16 @@ class CReport_Jasper_Element_Detail extends CReport_Jasper_Element {
                             if (CReport_Jasper_Report::$proccessintructionsTime == 'inline') {
                                 CReport_Jasper_Instructions::runInstructions();
                             }
-                            $child->generate([$obj, $row]);
+                            $child->generate($report);
                             if ($child->objElement['splitType'] == 'Stretch' || $child->objElement['splitType'] == 'Prevent') {
                                 CReport_Jasper_Instructions::addInstruction(['type' => 'setYAxis', 'y_axis' => $height]);
                             }
                             if (CReport_Jasper_Report::$proccessintructionsTime == 'inline') {
                                 CReport_Jasper_Instructions::runInstructions();
                             }
-                            if ($obj->arrayPageSetting['columnCount'] > 1) {
+                            if ($report->arrayPageSetting['columnCount'] > 1) {
                                 CReport_Jasper_Instructions::addInstruction(['type' => 'changeColumn']);
-                                if (is_int($rowIndex / $obj->arrayPageSetting['columnCount'])) {
+                                if (is_int($rowIndex / $report->arrayPageSetting['columnCount'])) {
                                     CReport_Jasper_Instructions::addInstruction(['type' => 'setYAxis', 'y_axis' => $height]);
                                 }
                             }
@@ -147,17 +130,17 @@ class CReport_Jasper_Element_Detail extends CReport_Jasper_Element {
                     }
                 }
 
-                $arrayVariable = ($obj->arrayVariable) ? $obj->arrayVariable : [];
-                $recordObject = array_key_exists('recordObj', $arrayVariable) ? $obj->arrayVariable['recordObj']['initialValue'] : 'stdClass';
+                $arrayVariable = ($report->arrayVariable) ? $report->arrayVariable : [];
+                $recordObject = array_key_exists('recordObj', $arrayVariable) ? $report->arrayVariable['recordObj']['initialValue'] : 'stdClass';
 
-                $obj->lastRowData = $row;
-                $obj->variablesCalculation($obj, $row);
+                $lastRow = $row;
+                $report->variablesCalculation($row);
             }
-            if (count($obj->arrayGroup) > 0 && $totalRows > 0) {
-                foreach ($obj->arrayGroup as $group) {
+            if (count($report->arrayGroup) > 0 && $totalRows > 0) {
+                foreach ($report->arrayGroup as $group) {
                     if (($group->groupFooter)) {
                         $groupFooter = new CReport_Jasper_Element_GroupFooter($group->groupFooter);
-                        $groupFooter->generate([$obj, $row]);
+                        $groupFooter->generate($report);
                         $group->resetVariables = 'false';
                     }
                 }

@@ -114,7 +114,7 @@ class CReport_Jasper_Element_Table extends CReport_Jasper_Element {
         return $objColumn;
     }
 
-    public function variable_handler($xml_variables) {
+    public function variableHandler($xml_variables) {
         $this->arrayVariable = [];
         foreach ($xml_variables as $variable) {
             $varName = (string) $variable['name'];
@@ -154,7 +154,7 @@ class CReport_Jasper_Element_Table extends CReport_Jasper_Element {
             //is dataSet of table?
             if ($name == $subDataset_name) {
                 //get variables dataSet
-                $obj->arrayVariable = $this->variable_handler($dataSet->variable);
+                $obj->arrayVariable = $this->variableHandler($dataSet->variable);
                 //prepare newParameters and send query table
                 if (is_array($rowData)) {
                     $rowArray = $rowData;
@@ -197,18 +197,18 @@ class CReport_Jasper_Element_Table extends CReport_Jasper_Element {
             $columns[$i] = $objColumn;
             $i++;
         }//end each column
-        JasperPHP\Instructions::addInstruction(['type' => 'Table', 'obj' => $obj, 'x' => $x, 'y' => $y, 'column' => $columns, 'data' => $dataRowTable]);
+        CReport_Jasper_Instructions::addInstruction(['type' => 'Table', 'obj' => $obj, 'x' => $x, 'y' => $y, 'column' => $columns, 'data' => $dataRowTable]);
     }
 
     public static function process($arraydata) {
         $jasperObj = $arraydata['obj'];
-        $pdf = JasperPHP\Instructions::get();
+        $pdf = CReport_Jasper_Instructions::get();
         $dimensions = $pdf->getPageDimensions();
-        $topMargin = JasperPHP\Instructions::$arrayPageSetting['topMargin'];
+        $topMargin = CReport_Jasper_Instructions::$arrayPageSetting['topMargin'];
         $dbData = $arraydata['data'];
         $columns = $arraydata['column'];
         $pdf->Ln(0);
-        self::SetY_axis($arraydata['y']);
+        self::setYAxis($arraydata['y']);
 
         $showColumnHeader = true;
         //after font definition
@@ -222,7 +222,7 @@ class CReport_Jasper_Element_Table extends CReport_Jasper_Element {
         //each row data
         $rowIndex = 0;
         foreach ($dbData as $row) {
-            self::$page = JasperPHP\Instructions::$currrentPage;
+            self::$page = CReport_Jasper_Instructions::$currrentPage;
             $borders = 'LRBT';//default
             $rowIndex++;
             //variables dataset================================
@@ -236,7 +236,7 @@ class CReport_Jasper_Element_Table extends CReport_Jasper_Element {
             $jasperObj->variables_calculation($jasperObj, $row);
             //endVariables
 
-            $marginLeft = JasperPHP\Instructions::$arrayPageSetting['leftMargin'];
+            $marginLeft = CReport_Jasper_Instructions::$arrayPageSetting['leftMargin'];
             //get height header and detail
             $height_header = 0;
             $height_detail = 0;
@@ -262,8 +262,8 @@ class CReport_Jasper_Element_Table extends CReport_Jasper_Element {
                     $text = $jasperObj->get_expression($field->objElement->text, $row);
                     //change font for height row
                     $font = $field->objElement->textElement->font->attributes();
-                    JasperPHP\Instructions::addInstruction(['type' => 'SetFont', 'font' => $font->fontName, 'fontstyle' => (isset($font->isBold) ? 'B' : ''), 'fontsize' => $font->size]);
-                    JasperPHP\Instructions::runInstructions();
+                    CReport_Jasper_Instructions::addInstruction(['type' => 'SetFont', 'font' => $font->fontName, 'fontstyle' => (isset($font->isBold) ? 'B' : ''), 'fontsize' => $font->size]);
+                    CReport_Jasper_Instructions::runInstructions();
                     $height_new = $pdf->getStringHeight($width_column, $text) * 1.5;
                     //return default font
                     //$this->SetFont($fontDefault);
@@ -287,8 +287,8 @@ class CReport_Jasper_Element_Table extends CReport_Jasper_Element {
                     //change font for height row
                     $font = $field->objElement->textElement->font->attributes();
                     //$this->SetFont(array("font"=> $font->fontName, "fontstyle"=> (isset($font->isBold)?"B":""), "fontsize"=>$font->size));
-                    JasperPHP\Instructions::addInstruction(['type' => 'SetFont', 'font' => $font->fontName, 'fontstyle' => (isset($font->isBold) ? 'B' : ''), 'fontsize' => $font->size]);
-                    JasperPHP\Instructions::runInstructions();
+                    CReport_Jasper_Instructions::addInstruction(['type' => 'SetFont', 'font' => $font->fontName, 'fontstyle' => (isset($font->isBold) ? 'B' : ''), 'fontsize' => $font->size]);
+                    CReport_Jasper_Instructions::runInstructions();
                     $height_new = $pdf->getStringHeight($width_column, $text) * $lineHeightRatio;
                     //return default font
                     //$this->SetFont($fontDefault);
@@ -299,18 +299,18 @@ class CReport_Jasper_Element_Table extends CReport_Jasper_Element {
             }//end get height row header and detail
 
             //check new page
-            JasperPHP\Instructions::addInstruction(['type' => 'PreventY_axis', 'y_axis' => $height_detail]);
-            JasperPHP\Instructions::runInstructions();
+            CReport_Jasper_Instructions::addInstruction(['type' => 'PreventY_axis', 'y_axis' => $height_detail]);
+            CReport_Jasper_Instructions::runInstructions();
             //new page?
-            if (self::$page != JasperPHP\Instructions::$currrentPage) {
+            if (self::$page != CReport_Jasper_Instructions::$currrentPage) {
                 $showColumnHeader = true;//repeat columnHeader
                 $pdf->Ln(0);
-                $y = JasperPHP\Instructions::$y_axis;
+                $y = CReport_Jasper_Instructions::$yAxis;
             }
 
             //posições iniciais
             $startX = $pdf->GetX();
-            $startY = JasperPHP\Instructions::$y_axis;
+            $startY = CReport_Jasper_Instructions::$yAxis;
             $y = $startY;
             $x = $startX;
 
@@ -327,7 +327,7 @@ class CReport_Jasper_Element_Table extends CReport_Jasper_Element {
                         $field->objElement->reportElement['height'] = $cell['h'];
                         //$field->objElement->reportElement["y"]=$y;
                         $field->generate([$jasperObj, $row]);
-                        JasperPHP\Instructions::runInstructions();
+                        CReport_Jasper_Instructions::runInstructions();
                     }
                     $pdf->SetX($x);
                     //border column
@@ -344,7 +344,7 @@ class CReport_Jasper_Element_Table extends CReport_Jasper_Element {
                 $x = $startX;
                 $y = $y + $cell['h'];
                 $pdf->SetX($x);
-                self::SetY_axis($cell['h']);
+                self::setYAxis($cell['h']);
             }//end tableHeader
 
             //design columnHeader table ===================
@@ -360,7 +360,7 @@ class CReport_Jasper_Element_Table extends CReport_Jasper_Element {
                         $field->objElement->reportElement['height'] = $height_header;
                         //$field->objElement->reportElement["y"]=$y;
                         $field->generate([$jasperObj, $row]);
-                        JasperPHP\Instructions::runInstructions();
+                        CReport_Jasper_Instructions::runInstructions();
                     }
                     $pdf->SetX($x);
                     //border column
@@ -377,7 +377,7 @@ class CReport_Jasper_Element_Table extends CReport_Jasper_Element {
                 $x = $startX;
                 $y = $y + $height_header;
                 $pdf->SetX($x);
-                self::SetY_axis($height_header);
+                self::setYAxis($height_header);
 
                 $showColumnHeader = false;
             }//final header table
@@ -393,7 +393,7 @@ class CReport_Jasper_Element_Table extends CReport_Jasper_Element {
                     $field->objElement->reportElement['height'] = $height_detail;
                     //$field->objElement->reportElement["y"]=$y;
                     $field->generate([$jasperObj, $row]);
-                    JasperPHP\Instructions::runInstructions();
+                    CReport_Jasper_Instructions::runInstructions();
                 }
                 $pdf->SetX($x);
                 //border column
@@ -409,20 +409,20 @@ class CReport_Jasper_Element_Table extends CReport_Jasper_Element {
             $x = $startX;
             $y = $y + $height_detail;
             $pdf->SetX($x);
-            self::SetY_axis($height_detail);
+            self::setYAxis($height_detail);
             $pdf->Ln(0);
         }//end data each
 
         //check new page
         if ($height_columnFooter > 0) {
             //check new page
-            JasperPHP\Instructions::addInstruction(['type' => 'PreventY_axis', 'y_axis' => $height_columnFooter]);
-            JasperPHP\Instructions::runInstructions();
+            CReport_Jasper_Instructions::addInstruction(['type' => 'PreventY_axis', 'y_axis' => $height_columnFooter]);
+            CReport_Jasper_Instructions::runInstructions();
             //new page?
-            if (self::$page != JasperPHP\Instructions::$currrentPage) {
-                self::$page = JasperPHP\Instructions::$currrentPage;
+            if (self::$page != CReport_Jasper_Instructions::$currrentPage) {
+                self::$page = CReport_Jasper_Instructions::$currrentPage;
                 $pdf->Ln(0);
-                $y = JasperPHP\Instructions::$y_axis;
+                $y = CReport_Jasper_Instructions::$yAxis;
             }
         }
 
@@ -440,7 +440,7 @@ class CReport_Jasper_Element_Table extends CReport_Jasper_Element {
                     $field->objElement->reportElement['height'] = $height_columnFooter;
                     //$field->objElement->reportElement["y"]=$y;
                     $field->generate([$jasperObj, null]);
-                    JasperPHP\Instructions::runInstructions();
+                    CReport_Jasper_Instructions::runInstructions();
                 }
 
                 $pdf->SetX($x);
@@ -459,18 +459,18 @@ class CReport_Jasper_Element_Table extends CReport_Jasper_Element {
         $y = $y + $height_columnFooter;
         $x = $startX;
         $pdf->SetX($x);
-        self::SetY_axis($height_columnFooter);
+        self::setYAxis($height_columnFooter);
 
         //check new page
         if ($height_tableFooter > 0) {
             //check new page
-            JasperPHP\Instructions::addInstruction(['type' => 'PreventY_axis', 'y_axis' => $height_tableFooter]);
-            JasperPHP\Instructions::runInstructions();
+            CReport_Jasper_Instructions::addInstruction(['type' => 'preventYAxis', 'y_axis' => $height_tableFooter]);
+            CReport_Jasper_Instructions::runInstructions();
             //new page?
-            if (self::$page != JasperPHP\Instructions::$currrentPage) {
-                self::$page = JasperPHP\Instructions::$currrentPage;
+            if (self::$page != CReport_Jasper_Instructions::$currrentPage) {
+                self::$page = CReport_Jasper_Instructions::$currrentPage;
                 $pdf->Ln(0);
-                $y = JasperPHP\Instructions::$y_axis;
+                $y = CReport_Jasper_Instructions::$yAxis;
             }
         }
 
@@ -488,7 +488,7 @@ class CReport_Jasper_Element_Table extends CReport_Jasper_Element {
                     $field->objElement->reportElement['height'] = $height_tableFooter;
                     //$field->objElement->reportElement["y"]=$y;
                     $field->generate([$jasperObj, null]);
-                    JasperPHP\Instructions::runInstructions();
+                    CReport_Jasper_Instructions::runInstructions();
                 }
 
                 $pdf->SetX($x);
@@ -506,11 +506,11 @@ class CReport_Jasper_Element_Table extends CReport_Jasper_Element {
         $y = $y + $height_tableFooter;
         $x = $startX;
         $pdf->SetX($x);
-        self::SetY_axis($height_tableFooter + 10);
+        self::setYAxis($height_tableFooter + 10);
     }
 
-    static function SetY_axis($addY_axis) {
-        JasperPHP\Instructions::addInstruction(['type' => 'SetY_axis', 'y_axis' => $addY_axis]);
-        JasperPHP\Instructions::runInstructions();
+    public static function setYAxis($addY_axis) {
+        CReport_Jasper_Instructions::addInstruction(['type' => 'setYAxis', 'y_axis' => $addY_axis]);
+        CReport_Jasper_Instructions::runInstructions();
     }
 }

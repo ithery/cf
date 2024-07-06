@@ -16,11 +16,6 @@ class CReport_Jasper_Report extends CReport_Jasper_Element {
      */
     public static $proccessintructionsTime = 'after';
 
-    /**
-     * @var CCollection
-     */
-    public $data;
-
     public $pageChanged;
 
     public $arrayVariable;
@@ -55,6 +50,11 @@ class CReport_Jasper_Report extends CReport_Jasper_Element {
      * @var CReport_Jasper_Element_Root
      */
     protected $root;
+
+    /**
+     * @var CReport_Jasper_Report_DataIterator
+     */
+    private $data;
 
     public function __construct($xmlFile, $param) {
         $keyword = '<queryString>
@@ -103,10 +103,29 @@ class CReport_Jasper_Report extends CReport_Jasper_Element {
         $this->groupHandler($objElement);
     }
 
+    /**
+     * @param CCollection $data
+     *
+     * @return CReport_Jasper_Report
+     */
     public function setData(CCollection $data) {
-        $this->data = $data;
+        $this->data = new CReport_Jasper_Report_DataIterator($data);
 
         return $this;
+    }
+
+    /**
+     * @return CReport_Jasper_Report_DataIterator
+     */
+    public function getData() {
+        return $this->data;
+    }
+
+    /**
+     * @return CReport_Jasper_Report_DataRow
+     */
+    public function getCurrentRow() {
+        return $this->data->current();
     }
 
     public function pageSetting($xml_path) {
@@ -229,7 +248,7 @@ class CReport_Jasper_Report extends CReport_Jasper_Element {
         }
     }
 
-    public function variablesCalculation($obj, $row) {
+    public function variablesCalculation($row) {
         if ($this->arrayVariable) {
             foreach ($this->arrayVariable as $k => $out) {
                 $this->variableCalculation($k, $out, $row);
