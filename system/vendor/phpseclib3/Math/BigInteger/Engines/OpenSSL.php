@@ -1,51 +1,47 @@
 <?php
 
 /**
- * OpenSSL Modular Exponentiation Engine.
+ * OpenSSL Modular Exponentiation Engine
  *
  * PHP version 5 and 7
- *
- * @category  Math
  *
  * @author    Jim Wigginton <terrafrost@php.net>
  * @copyright 2017 Jim Wigginton
  * @license   http://www.opensource.org/licenses/mit-license.html  MIT License
- *
  * @link      http://pear.php.net/package/Math_BigInteger
  */
 
+declare(strict_types=1);
+
 namespace phpseclib3\Math\BigInteger\Engines;
 
-use phpseclib3\Math\BigInteger;
 use phpseclib3\Crypt\RSA\Formats\Keys\PKCS8;
+use phpseclib3\Exception\OutOfRangeException;
+use phpseclib3\Exception\UnexpectedValueException;
+use phpseclib3\Math\BigInteger;
 
 /**
- * OpenSSL Modular Exponentiation Engine.
+ * OpenSSL Modular Exponentiation Engine
  *
  * @author  Jim Wigginton <terrafrost@php.net>
  */
-abstract class OpenSSL {
+abstract class OpenSSL
+{
     /**
-     * Test for engine validity.
-     *
-     * @return bool
+     * Test for engine validity
      */
-    public static function isValidEngine() {
+    public static function isValidEngine(): bool
+    {
         return extension_loaded('openssl') && static::class != __CLASS__;
     }
 
     /**
      * Performs modular exponentiation.
-     *
-     * @param Engine $x
-     * @param Engine $e
-     * @param Engine $n
-     *
-     * @return Engine
      */
-    public static function powModHelper(Engine $x, Engine $e, Engine $n) {
+    public static function powModHelper(Engine $x, Engine $e, Engine $n): Engine
+    {
         if ($n->getLengthInBytes() < 31 || $n->getLengthInBytes() > 16384) {
-            throw new \OutOfRangeException('Only modulo between 31 and 16384 bits are accepted');
+            throw new OutOfRangeException('Only modulo between 31 and 16384 bits are accepted');
         }
 
         $key = PKCS8::savePublicKey(
@@ -60,11 +56,10 @@ abstract class OpenSSL {
         // error. i suppose, for even numbers, we could do what PHP\Montgomery.php does, but then what
         // about odd numbers divisible by 3, by 5, etc?
         if (!openssl_public_encrypt($plaintext, $result, $key, OPENSSL_NO_PADDING)) {
-            throw new \UnexpectedValueException(openssl_error_string());
+            throw new UnexpectedValueException(openssl_error_string());
         }
 
-        $class = get_class($x);
-
+        $class = \get_class($x);
         return new $class($result, 256);
     }
 }

@@ -7,13 +7,13 @@
  *
  * Handles signatures as arrays
  *
- * @category  Crypt
- * @package   Common
  * @author    Jim Wigginton <terrafrost@php.net>
  * @copyright 2016 Jim Wigginton
  * @license   http://www.opensource.org/licenses/mit-license.html  MIT License
  * @link      http://phpseclib.sourceforge.net
  */
+
+declare(strict_types=1);
 
 namespace phpseclib3\Crypt\Common\Formats\Signature;
 
@@ -22,20 +22,16 @@ use phpseclib3\Math\BigInteger;
 /**
  * Raw Signature Handler
  *
- * @package Common
  * @author  Jim Wigginton <terrafrost@php.net>
- * @access  public
  */
 abstract class Raw
 {
     /**
      * Loads a signature
      *
-     * @access public
-     * @param array $sig
      * @return array|bool
      */
-    public static function load($sig)
+    public static function load(array $sig)
     {
         switch (true) {
             case !is_array($sig):
@@ -47,19 +43,14 @@ abstract class Raw
 
         return [
             'r' => $sig['r'],
-            's' => $sig['s']
+            's' => $sig['s'],
         ];
     }
 
     /**
      * Returns a signature in the appropriate format
-     *
-     * @access public
-     * @param \phpseclib3\Math\BigInteger $r
-     * @param \phpseclib3\Math\BigInteger $s
-     * @return string
      */
-    public static function save(BigInteger $r, BigInteger $s)
+    public static function save(BigInteger $r, BigInteger $s): string
     {
         return compact('r', 's');
     }

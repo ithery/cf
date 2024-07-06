@@ -2,12 +2,6 @@
 
 defined('SYSPATH') or die('No direct access allowed.');
 
-/**
- * @author Hery Kurniawan
- * @license Ittron Global Teknologi <ittron.co.id>
- *
- * @since Mar 10, 2019, 7:07:06 AM
- */
 use Monolog\Logger;
 use GuzzleHttp\Client;
 use GuzzleHttp\Middleware;
@@ -18,6 +12,9 @@ use GuzzleHttp\MessageFormatter;
 use Monolog\Handler\RotatingFileHandler;
 use GuzzleHttp\Exception\RequestException;
 
+/**
+ * @deprecated since 1.7 use \Cresenity\Vendor\Wago\Adapter\GuzzleAdapter
+ */
 class CVendor_Wago_Adapter_GuzzleAdapter implements CVendor_Wago_Contract_AdapterInterface {
     /**
      * @var Client

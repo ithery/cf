@@ -175,15 +175,6 @@ final class CF {
         // Start the environment setup benchmark
         CFBenchmark::start(SYSTEM_BENCHMARK . '_environment_setup');
 
-        // Define CF error constant
-        define('E_CF', 42);
-
-        // Define 404 error constant
-        define('E_PAGE_NOT_FOUND', 43);
-
-        // Define database error constant
-        define('E_DATABASE_ERROR', 44);
-
         // Set autoloader
         spl_autoload_register(['CF', 'autoLoad']);
 
@@ -899,6 +890,25 @@ final class CF {
         return isset($data['app_id']) ? $data['app_id'] : null;
     }
 
+    public static function isIndexInApp() {
+        $relativeIndex = str_replace(DOCROOT, '', CFINDEX);
+
+        return strpos($relativeIndex, 'application/') !== false;
+    }
+
+    public static function publicPath($path = null) {
+        if (self::isIndexInApp()) {
+            $publicPath = dirname(CFINDEX);
+            if ($path) {
+                $publicPath .= '/' . ltrim($path, '/');
+            }
+
+            return $publicPath;
+        }
+
+        return null;
+    }
+
     /**
      * Get application code for domain.
      *
@@ -909,6 +919,13 @@ final class CF {
     public static function appCode($domain = null) {
         if (static::$forceAppCode) {
             return static::$forceAppCode;
+        }
+        if (self::isIndexInApp()) {
+            $relativeIndex = str_replace(DOCROOT, '', CFINDEX);
+            $paths = explode('/', $relativeIndex);
+            if ($paths[0] == 'application') {
+                return $paths[1];
+            }
         }
 
         if (CF::isCFCli() || CF::isTesting()) {
@@ -1036,7 +1053,7 @@ final class CF {
     public static function appPath($domain = null) {
         $appCode = static::appCode($domain);
 
-        return DOCROOT . 'application/' . $appCode . '/';
+        return DOCROOT . 'application' . DS . $appCode;
     }
 
     /**

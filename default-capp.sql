@@ -176,8 +176,8 @@ CREATE TABLE IF NOT EXISTS `users` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 /*!40000 ALTER TABLE `users` DISABLE KEYS */;
-INSERT INTO `users` (`user_id`, `role_id`, `org_id`, `store_id`, `username`, `user_photo`, `first_name`, `last_name`, `password`, `email`, `last_login`, `last_request`, `login_count`, `description`, `activation_code`, `activation_date`, `have_notification`, `is_base`, `is_disabled`, `have_issued`, `created`, `createdby`, `updated`, `updatedby`, `status`) VALUES
-	(1, 1, NULL, NULL, 'superadmin', NULL, NULL, NULL, '21232f297a57a5a743894a0e4a801fc3', NULL, '2016-01-13 21:13:17', '2016-01-13 22:07:39', 195, NULL, NULL, NULL, 0, 0, 0, 1, '2015-07-24 11:10:49', NULL, NULL, NULL, 1);
+INSERT INTO `users` (`user_id`, `role_id`, `org_id`, `username`, `user_photo`, `first_name`, `last_name`, `password`, `email`, `last_login`, `last_request`, `login_count`, `description`, `activation_code`, `activation_date`, `have_notification`, `is_base`, `is_disabled`, `created`, `createdby`, `updated`, `updatedby`, `status`) VALUES
+	(1, 1, NULL, 'superadmin', NULL, NULL, NULL, '21232f297a57a5a743894a0e4a801fc3', NULL, '2016-01-13 21:13:17', '2016-01-13 22:07:39', 195, NULL, NULL, NULL, 0, 0, 0, '2015-07-24 11:10:49', NULL, NULL, NULL, 1);
 /*!40000 ALTER TABLE `users` ENABLE KEYS */;
 
 

@@ -107,6 +107,15 @@ class CVendor {
     /**
      * @param array $options
      *
+     * @return \CVendor_OneBrick
+     */
+    public static function oneBrick($options = []) {
+        return new CVendor_OneBrick($options);
+    }
+
+    /**
+     * @param array $options
+     *
      * @return \CVendor_Midtrans
      */
     public static function midtrans($options) {
@@ -253,5 +262,12 @@ class CVendor {
      */
     public static function whatsApp() {
         return new CBase_ForwarderStaticClass(CVendor_WhatsApp::class);
+    }
+
+    /**
+     * @return \CVendor_Figma|CBase_ForwarderStaticClass
+     */
+    public static function figma() {
+        return new CBase_ForwarderStaticClass(CVendor_Figma::class);
     }
 }

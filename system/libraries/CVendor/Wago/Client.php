@@ -1,5 +1,7 @@
 <?php
-
+/**
+ * @deprecated since 1.7 use \Cresenity\Vendor\Wago\Client
+ */
 class CVendor_Wago_Client {
     /**
      * @var CVendor_Wago_Contract_AdapterInterface

@@ -18,8 +18,8 @@ namespace Symfony\Component\DomCrawler;
  * @author Fabien Potencier <fabien@symfony.com>
  * @author Grégoire Pineau <lyrixx@lyrixx.info>
  */
-class UriResolver {
-
+class UriResolver
+{
     /**
      * Resolves a URI according to a base URI.
      *
@@ -28,11 +28,12 @@ class UriResolver {
      *
      * If the $uri is not absolute you must pass an absolute $baseUri
      */
-    public static function resolve($uri, $baseUri) {
+    public static function resolve(string $uri, ?string $baseUri): string
+    {
         $uri = trim($uri);
 
         // absolute URL?
-        if (null !== parse_url($uri, PHP_URL_SCHEME)) {
+        if (null !== parse_url($uri, \PHP_URL_SCHEME)) {
             return $uri;
         }
 
@@ -47,43 +48,44 @@ class UriResolver {
 
         // an anchor
         if ('#' === $uri[0]) {
-            return self::cleanupAnchor($baseUri) . $uri;
+            return self::cleanupAnchor($baseUri).$uri;
         }
 
         $baseUriCleaned = self::cleanupUri($baseUri);
 
         if ('?' === $uri[0]) {
-            return $baseUriCleaned . $uri;
+            return $baseUriCleaned.$uri;
         }
 
         // absolute URL with relative schema
-        if (0 === strpos($uri, '//')) {
-            return preg_replace('#^([^/]*)//.*$#', '$1', $baseUriCleaned) . $uri;
+        if (str_starts_with($uri, '//')) {
+            return preg_replace('#^([^/]*)//.*$#', '$1', $baseUriCleaned).$uri;
         }
 
         $baseUriCleaned = preg_replace('#^(.*?//[^/]*)(?:\/.*)?$#', '$1', $baseUriCleaned);
 
         // absolute path
         if ('/' === $uri[0]) {
-            return $baseUriCleaned . $uri;
+            return $baseUriCleaned.$uri;
         }
 
         // relative path
-        $path = parse_url(substr($baseUri, \strlen($baseUriCleaned)), PHP_URL_PATH);
-        $path = self::canonicalizePath(substr($path, 0, strrpos($path, '/')) . '/' . $uri);
+        $path = parse_url(substr($baseUri, \strlen($baseUriCleaned)), \PHP_URL_PATH) ?? '';
+        $path = self::canonicalizePath(substr($path, 0, strrpos($path, '/')).'/'.$uri);
 
-        return $baseUriCleaned . ('' === $path || '/' !== $path[0] ? '/' : '') . $path;
+        return $baseUriCleaned.('' === $path || '/' !== $path[0] ? '/' : '').$path;
     }
 
     /**
      * Returns the canonicalized URI path (see RFC 3986, section 5.2.4).
      */
-    private static function canonicalizePath($path) {
+    private static function canonicalizePath(string $path): string
+    {
         if ('' === $path || '/' === $path) {
             return $path;
         }
 
-        if ('.' === substr($path, -1)) {
+        if (str_ends_with($path, '.')) {
             $path .= '/';
         }
 
@@ -103,14 +105,16 @@ class UriResolver {
     /**
      * Removes the query string and the anchor from the given uri.
      */
-    private static function cleanupUri($uri) {
+    private static function cleanupUri(string $uri): string
+    {
         return self::cleanupQuery(self::cleanupAnchor($uri));
     }
 
     /**
      * Removes the query string from the uri.
      */
-    private static function cleanupQuery($uri) {
+    private static function cleanupQuery(string $uri): string
+    {
         if (false !== $pos = strpos($uri, '?')) {
             return substr($uri, 0, $pos);
         }
@@ -121,12 +125,12 @@ class UriResolver {
     /**
      * Removes the anchor from the uri.
      */
-    private static function cleanupAnchor($uri) {
+    private static function cleanupAnchor(string $uri): string
+    {
         if (false !== $pos = strpos($uri, '#')) {
             return substr($uri, 0, $pos);
         }
 
         return $uri;
     }
-
 }

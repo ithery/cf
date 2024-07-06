@@ -294,7 +294,7 @@ interface CInterface_Enumerable extends CInterface_Arrayable, Countable, Iterato
      *
      * @return static|mixed
      */
-    public function when($value, callable $callback, callable $default = null);
+    public function when($value, callable $callback = null, callable $default = null);
 
     /**
      * Apply the callback if the collection is empty.
@@ -325,7 +325,7 @@ interface CInterface_Enumerable extends CInterface_Arrayable, Countable, Iterato
      *
      * @return static|mixed
      */
-    public function unless($value, callable $callback, callable $default = null);
+    public function unless($value, callable $callback = null, callable $default = null);
 
     /**
      * Apply the callback unless the collection is empty.

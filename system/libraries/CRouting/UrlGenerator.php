@@ -244,10 +244,21 @@ class CRouting_UrlGenerator {
         $dirname = pathinfo($path, PATHINFO_DIRNAME);
         $path = $dirname . DS . $filename;
         $root = $this->formatRoot($this->formatScheme($secure));
-        $path = CF::findFile('media', $path, false, $extension);
+        if (CF::publicPath()) {
+            $path = CF::publicPath() . DS . 'media' . DS . $path . '.' . $extension;
+        } else {
+            $path = CF::findFile('media', $path, false, $extension);
+        }
+
         $count = 1;
-        if (cstr::startsWith($path, DOCROOT)) {
-            $path = str_replace(DOCROOT, '', $path, $count);
+        if (CF::publicPath()) {
+            if (cstr::startsWith($path, CF::publicPath())) {
+                $path = str_replace(CF::publicPath() . '/', '', $path, $count);
+            }
+        } else {
+            if (cstr::startsWith($path, DOCROOT)) {
+                $path = str_replace(DOCROOT, '', $path, $count);
+            }
         }
 
         return $this->removeIndex($root) . '/' . trim($path, '/');
