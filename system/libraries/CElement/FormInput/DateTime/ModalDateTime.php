@@ -107,6 +107,7 @@ class CElement_FormInput_DateTime_ModalDateTime extends CElement_FormInput_DateT
         $options .= 'shortMonthNames:' . $this->getShortMonthNames() . ',';
         $options .= 'fullMonthNames:' . $this->getFullMonthNames() . ',';
         $options .= "clearButtonContent:'" . $this->getTranslation('clear') . "',";
+        $options .= "parentElement: '#" . $this->id . "',";
 
         $options .= 'isPopup:true,';
         $options .= '}';
