@@ -14,7 +14,12 @@ class CReport_Jasper {
         $this->report = new CReport_Jasper_Report($jrxml, $param);
     }
 
-    public function exportPdf($filename = null) {
+    /**
+     * @param null|string $filename
+     *
+     * @return \Symfony\Component\HttpFoundation\StreamedResponse
+     */
+    public function downloadPdf($filename = null) {
         if ($filename == null) {
             $filename = 'report-' . date('YmdHis') . '-' . uniqid() . '.pdf';
         }
@@ -27,8 +32,10 @@ class CReport_Jasper {
         $this->report->out();
 
         $pdf = CReport_Jasper_Instructions::get();
-        // cdbg::dd($pdf);
-        $pdf->Output($filename, 'I');
+
+        return c::response()->streamDownload(function () use ($pdf, $filename) {
+            $pdf->Output($filename, 'I');
+        }, $filename);
     }
 
     /**
