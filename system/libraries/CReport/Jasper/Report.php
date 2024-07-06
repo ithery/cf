@@ -55,6 +55,11 @@ class CReport_Jasper_Report {
      */
     private $processor;
 
+    /**
+     * @var CReport_Jasper_InstructionRepository
+     */
+    private $instructionRepository;
+
     public function __construct($xmlFile, $param) {
         $keyword = '<queryString>
         <![CDATA[';
@@ -62,6 +67,7 @@ class CReport_Jasper_Report {
         $xmlElement = simplexml_load_string($xmlFile, null, LIBXML_NOCDATA);
         $this->param = $param;
         $this->root = new CReport_Jasper_Element_Root($xmlElement);
+        $this->instructionRepository = new CReport_Jasper_InstructionRepository();
         // $this->name = get_class($this);
 
         // atribui o conteúdo do label
@@ -95,6 +101,13 @@ class CReport_Jasper_Report {
      */
     public function getData() {
         return $this->data;
+    }
+
+    /**
+     * @return CReport_Jasper_InstructionRepository
+     */
+    public function getInstructions() {
+        return $this->instructionRepository;
     }
 
     /**

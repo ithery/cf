@@ -25,20 +25,14 @@ final class CReport_Jasper_Instructions {
     private function __construct() {
     }
 
-    public static function addInstruction($instruction) {
-        self::$intructions[] = $instruction;
+    public static function addInstruction(array $instruction) {
+        $type = $instruction['type'];
+        CReport_Jasper_Manager::instance()->getGenerator()->getReport()->getInstructions()->addInstruction($type, $instruction);
+        //self::$intructions[] = $instruction;
     }
 
     public static function get() {
         return self::$objOutPut;
-    }
-
-    public static function getInstructions() {
-        return self::$intructions;
-    }
-
-    public static function clearInstructrions() {
-        self::$intructions = [];
     }
 
     public static function getPageNo() {
@@ -47,21 +41,24 @@ final class CReport_Jasper_Instructions {
 
     public static function runInstructions() {
         $report = CReport_Jasper_Manager::instance()->getGenerator()->getReport();
-        $instructions = self::$intructions;
-        //var_dump($instructions);
-        self::$intructions = [];
-        //$maxheight = null;
-        foreach ($instructions as $arraydata) {
-            $methodName = $arraydata['type'];
-            $methodName = $methodName == 'break' ? 'breaker' : $methodName;
+        $processor = $report->getProcessor();
+        // cdbg::dd($report->getInstructions()->all());
+        $report->getInstructions()->run($processor);
+        // $instructions = self::$intructions;
+        // //var_dump($instructions);
+        // self::$intructions = [];
+        // //$maxheight = null;
+        // foreach ($instructions as $arraydata) {
+        //     $methodName = $arraydata['type'];
+        //     $methodName = $methodName == 'break' ? 'breaker' : $methodName;
 
-            //$instructionProcessorClass = '\JasperPHP\/' + ;
-            $processor = $report->getProcessor();
-            if (method_exists($processor, $methodName)) {
-                $processor->$methodName($arraydata);
-            } else {
-                throw new Exception('Method name ' . $methodName . 'is not exists on ' . get_class($processor));
-            }
-        }
+        //     //$instructionProcessorClass = '\JasperPHP\/' + ;
+
+        //     if (method_exists($processor, $methodName)) {
+        //         $processor->$methodName($arraydata);
+        //     } else {
+        //         throw new Exception('Method name ' . $methodName . 'is not exists on ' . get_class($processor));
+        //     }
+        // }
     }
 }
