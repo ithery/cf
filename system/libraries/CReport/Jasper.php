@@ -14,7 +14,10 @@ class CReport_Jasper {
         $this->report = new CReport_Jasper_Report($jrxml, $param);
     }
 
-    public function exportPdf() {
+    public function exportPdf($filename = null) {
+        if ($filename == null) {
+            $filename = 'report-' . date('YmdHis') . '-' . uniqid() . '.pdf';
+        }
         if ($this->dataProvider) {
             $data = $this->dataProvider->toEnumerable();
             $this->report->setData($data);
@@ -25,7 +28,7 @@ class CReport_Jasper {
 
         $pdf = CReport_Jasper_Instructions::get();
         // cdbg::dd($pdf);
-        $pdf->Output('report.pdf', 'I');
+        $pdf->Output($filename, 'I');
     }
 
     /**
