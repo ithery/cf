@@ -15,14 +15,9 @@ class CReport_Jasper {
     }
 
     /**
-     * @param null|string $filename
-     *
-     * @return \Symfony\Component\HttpFoundation\StreamedResponse
+     * @return \TCPDF
      */
-    public function downloadPdf($filename = null) {
-        if ($filename == null) {
-            $filename = 'report-' . date('YmdHis') . '-' . uniqid() . '.pdf';
-        }
+    public function getPdf() {
         if ($this->dataProvider) {
             $data = $this->dataProvider->toEnumerable();
             $this->report->setData($data);
@@ -32,6 +27,20 @@ class CReport_Jasper {
         $this->report->out();
 
         $pdf = CReport_Jasper_Instructions::get();
+
+        return $pdf;
+    }
+
+    /**
+     * @param null|string $filename
+     *
+     * @return \Symfony\Component\HttpFoundation\StreamedResponse
+     */
+    public function downloadPdf($filename = null) {
+        if ($filename == null) {
+            $filename = 'report-' . date('YmdHis') . '-' . uniqid() . '.pdf';
+        }
+        $pdf = $this->getPdf();
 
         return c::response()->streamDownload(function () use ($pdf, $filename) {
             $pdf->Output($filename, 'I');
