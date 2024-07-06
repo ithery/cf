@@ -3,6 +3,9 @@
  * @see CElement_Component_DataTable
  */
 class CReport_Jasper {
+    /**
+     * @var CReport_Jasper_Report
+     */
     protected $report;
 
     /**
@@ -22,6 +25,25 @@ class CReport_Jasper {
             $data = $this->dataProvider->toEnumerable();
             $this->report->setData($data);
         }
+        CReport_Jasper_Instructions::prepare($this->report);
+        $this->report->generate();
+        $this->report->out();
+
+        $pdf = CReport_Jasper_Instructions::get();
+
+        return $pdf;
+    }
+
+    /**
+     * @return CReport_Pdf_Adapter_TCPDF
+     */
+    public function getSpreadsheet() {
+        if ($this->dataProvider) {
+            $data = $this->dataProvider->toEnumerable();
+            $this->report->setData($data);
+        }
+
+        // $this->report()->setProcessor($this->manager()->createPdfProcessor());
         CReport_Jasper_Instructions::prepare($this->report);
         $this->report->generate();
         $this->report->out();
@@ -68,5 +90,9 @@ class CReport_Jasper {
         $this->dataProvider = CManager::createCollectionDataProvider($collection);
 
         return $this;
+    }
+
+    public function manager() {
+        return CReport_Jasper_Manager::instance();
     }
 }

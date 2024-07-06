@@ -245,7 +245,7 @@ class CReport_Jasper_Processor_PdfProcessor {
                 }
 
                 $pattern = (array_key_exists('pattern', $arraydata)) ? $arraydata['pattern'] : '';
-                $text = $pattern != '' ? $JasperObj->formatText($txt, $pattern) : $txt;
+                $text = $pattern != '' ? CReport_Jasper_Utils_FormatUtils::formatPattern($txt, $pattern) : $txt;
                 $cellHeightRatio = $pdf->getCellHeightRatio();
                 $pdf->setCellHeightRatio(1);
                 $height = $pdf->getStringHeight(
@@ -269,18 +269,18 @@ class CReport_Jasper_Processor_PdfProcessor {
                 $yAfter = $pdf->GetY();
                 $maxheight = array_key_exists('maxheight', $arraydata) ? $arraydata['maxheight'] : 0;
                 //if($arraydata["link"])   echo $arraydata["linktarget"].",".$arraydata["link"]."<br/><br/>";
-                //$pdf->MultiCell($w, $h, $JasperObj->formatText($txt, $arraydata['pattern']), $arraydata['border'], $arraydata['align'], $arraydata['fill'], 1, $x, $y, true, 0, false, true, $maxheight); //,$arraydata["valign"]);
+                //$pdf->MultiCell($w, $h, CReport_Jasper_Utils_FormatUtils::formatPattern($txt, $arraydata['pattern']), $arraydata['border'], $arraydata['align'], $arraydata['fill'], 1, $x, $y, true, 0, false, true, $maxheight); //,$arraydata["valign"]);
                 //getStringHeight(float $w, string $txt[, bool $reseth = false ][, bool $autopadding = true ][, array<string|int, mixed>|null $cellpadding = null ][, mixed $border = 0 ])
                 $cellHeightRatio = $pdf->getCellHeightRatio();
                 $pdf->setCellHeightRatio(1);
-                $height = $pdf->getStringHeight($w, $JasperObj->formatText($txt, $arraydata['pattern'], false));
+                $height = $pdf->getStringHeight($w, CReport_Jasper_Utils_FormatUtils::formatPattern($txt, $arraydata['pattern'], false));
                 $pdf->setCellHeightRatio($cellHeightRatio);
 
                 return $height;
             } else {
                 $cellHeightRatio = $pdf->getCellHeightRatio();
                 $pdf->setCellHeightRatio(1);
-                $height = $pdf->getStringHeight($w, $JasperObj->formatText($txt, $arraydata['pattern'], false));
+                $height = $pdf->getStringHeight($w, CReport_Jasper_Utils_FormatUtils::formatPattern($txt, $arraydata['pattern'], false));
                 $pdf->setCellHeightRatio($cellHeightRatio);
 
                 return $height;
@@ -537,8 +537,8 @@ class CReport_Jasper_Processor_PdfProcessor {
             case 'DATAMATRIX':
                 //$this->pdf->Cell( $width,10,$code);
                 //echo $this->left($code,3);
-                if ($this->left($code, 3) == 'QR:') {
-                    $code = $this->right($code, strlen($code) - 3);
+                if (cstr::substr($code, 0, 3) == 'QR:') {
+                    $code = cstr::substr($code, 3);
 
                     $pdf->write2DBarcode($code, 'QRCODE', $x, $y, $width, $height, $style, 'N');
                 } else {
@@ -683,7 +683,7 @@ class CReport_Jasper_Processor_PdfProcessor {
                 }
 
                 $pattern = (array_key_exists('pattern', $arraydata)) ? $arraydata['pattern'] : '';
-                $text = $pattern != '' ? $JasperObj->formatText($txt, $pattern) : $txt;
+                $text = $pattern != '' ? CReport_Jasper_Utils_FormatUtils::formatPattern($txt, $pattern) : $txt;
                 $pdf->MultiCell(
                     $w,
                     $h,
@@ -716,12 +716,12 @@ class CReport_Jasper_Processor_PdfProcessor {
                 $yAfter = $pdf->GetY();
                 $maxheight = array_key_exists('maxheight', $arraydata) ? $arraydata['maxheight'] : 0;
                 //if($arraydata["link"])   echo $arraydata["linktarget"].",".$arraydata["link"]."<br/><br/>";
-                $pdf->MultiCell($w, $h, $JasperObj->formatText($txt, $arraydata['pattern']), $arraydata['border'], $arraydata['align'], $arraydata['fill'], 1, $x, $y, true, 0, false, true, $maxheight); //,$arraydata["valign"]);
+                $pdf->MultiCell($w, $h, CReport_Jasper_Utils_FormatUtils::formatPattern($txt, $arraydata['pattern']), $arraydata['border'], $arraydata['align'], $arraydata['fill'], 1, $x, $y, true, 0, false, true, $maxheight); //,$arraydata["valign"]);
                 if (($yAfter + $arraydata['height']) <= CReport_Jasper_Instructions::$arrayPageSetting['pageHeight']) {
                     CReport_Jasper_Instructions::$yAxis = $pdf->GetY() - 20;
                 }
             } else {
-                $pdf->MultiCell($w, $h, $JasperObj->formatText($txt, $arraydata['pattern']), $arraydata['border'], $arraydata['align'], $arraydata['fill'], 1, $x, $y, true, 0, true, true);
+                $pdf->MultiCell($w, $h, CReport_Jasper_Utils_FormatUtils::formatPattern($txt, $arraydata['pattern']), $arraydata['border'], $arraydata['align'], $arraydata['fill'], 1, $x, $y, true, 0, true, true);
             }
             $pdf->StopTransform();
         }

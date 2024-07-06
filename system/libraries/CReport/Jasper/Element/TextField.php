@@ -58,8 +58,8 @@ class CReport_Jasper_Element_TextField extends CReport_Jasper_Element {
             $rotation = $data->textElement['rotation'];
         }
         if (isset($data->box)) {
-            $border = CReport_Jasper_Element_StaticText::formatBoxToBorder($data->box);
-            $box = CReport_Jasper_Element_StaticText::formatBoxToBox($data->box);
+            $border = CReport_Jasper_Utils_ElementUtils::formatBorder($data->box);
+            $box = CReport_Jasper_Utils_ElementUtils::formatBox($data->box);
         }
         if (isset($data->reportElement['key']) && !empty($data->reportElement['key'])) {
             $height = $fontsize;
@@ -185,25 +185,7 @@ class CReport_Jasper_Element_TextField extends CReport_Jasper_Element {
         if ($data->reportElement['mode'] == 'Opaque') {
             $fill = 1;
         }
-        $lineHeightRatio = 1;
-
-        if (isset($data->textElement->paragraph['lineSpacing'])) {
-            $lineSpacing = $data->textElement->paragraph['lineSpacing'];
-            if ($lineSpacing) {
-                if ((float) $lineSpacing) {
-                    $lineHeightRatio = (float) $lineSpacing;
-                }
-                if ($lineSpacing == '1_1_2') {
-                    $lineHeightRatio = 1.5;
-                }
-                if ($lineSpacing == 'Double') {
-                    $lineHeightRatio = 1.5;
-                }
-                if ($lineSpacing == 'Proportional') {
-                    $lineHeightRatio = $data->textElement->paragraph['lineSpacingSize'];
-                }
-            }
-        }
+        $lineHeightRatio = CReport_Jasper_Utils_ElementUtils::getLineHeightRatio($data->textElement, 1);
 
         CReport_Jasper_Instructions::addInstruction([
             'type' => 'setCellHeightRatio',

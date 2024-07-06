@@ -43,8 +43,8 @@ class CReport_Jasper_Element_StaticText extends CReport_Jasper_Element {
         }
         $box = [];
         if (isset($data->box)) {
-            $border = CReport_Jasper_Element_StaticText::formatBoxToBorder($data->box);
-            $box = CReport_Jasper_Element_StaticText::formatBoxToBox($data->box);
+            $border = CReport_Jasper_Utils_ElementUtils::formatBorder($data->box);
+            $box = CReport_Jasper_Utils_ElementUtils::formatBox($data->box);
         }
 
         if (isset($data->textElement['textAlignment'])) {
@@ -80,37 +80,20 @@ class CReport_Jasper_Element_StaticText extends CReport_Jasper_Element {
         if (isset($data->textElement->font['isUnderline']) && $data->textElement->font['isUnderline'] == 'true') {
             $fontstyle = $fontstyle . 'U';
         }
-        if (isset($data->reportElement['key']) && !empty($data->reportElement['key'])) {
-            $height = $fontsize * $this->adjust;
-        }
-        $lineHeightRatio = 1;
-        if (isset($data->textElement->paragraph['lineSpacing'])) {
-            $lineSpacing = $data->textElement->paragraph['lineSpacing'];
-            if ($lineSpacing) {
-                if ((float) $lineSpacing) {
-                    $lineHeightRatio = (float) $lineSpacing;
-                }
-                if ($lineSpacing == '1_1_2') {
-                    $lineHeightRatio = 1.5;
-                }
-                if ($lineSpacing == 'Double') {
-                    $lineHeightRatio = 1.5;
-                }
-                if ($lineSpacing == 'Proportional') {
-                    $lineHeightRatio = $data->textElement->paragraph['lineSpacingSize'];
-                }
-            }
-        }
+        // if (isset($data->reportElement['key']) && !empty($data->reportElement['key'])) {
+        //     $height = $fontsize * $this->adjust;
+        // }
+        $lineHeightRatio = CReport_Jasper_Utils_ElementUtils::getLineHeightRatio($data->textElement, 1);
 
         CReport_Jasper_Instructions::addInstruction([
             'type' => 'setCellHeightRatio',
             'ratio' => $lineHeightRatio
         ]);
-        CReport_Jasper_Instructions::addInstruction(['type' => 'SetXY', 'x' => $data->reportElement['x'] + 0, 'y' => $data->reportElement['y'] + 0, 'hidden_type' => 'SetXY']);
-        CReport_Jasper_Instructions::addInstruction(['type' => 'SetTextColor', 'forecolor' => $data->reportElement['forecolor'] . '', 'r' => $textcolor['r'], 'g' => $textcolor['g'], 'b' => $textcolor['b'], 'hidden_type' => 'textcolor']);
-        CReport_Jasper_Instructions::addInstruction(['type' => 'SetDrawColor', 'r' => $drawcolor['r'], 'g' => $drawcolor['g'], 'b' => $drawcolor['b'], 'hidden_type' => 'drawcolor']);
-        CReport_Jasper_Instructions::addInstruction(['type' => 'SetFillColor', 'backcolor' => $data->reportElement['backcolor'] . '', 'r' => $fillcolor['r'], 'g' => $fillcolor['g'], 'b' => $fillcolor['b'], 'hidden_type' => 'fillcolor']);
-        CReport_Jasper_Instructions::addInstruction(['type' => 'SetFont', 'font' => $font, 'pdfFontName' => $data->textElement->font ? $data->textElement->font['pdfFontName'] : '', 'fontstyle' => $fontstyle, 'fontsize' => $fontsize, 'hidden_type' => 'font']);
+        CReport_Jasper_Instructions::addInstruction(['type' => 'setXY', 'x' => $data->reportElement['x'] + 0, 'y' => $data->reportElement['y'] + 0, 'hidden_type' => 'SetXY']);
+        CReport_Jasper_Instructions::addInstruction(['type' => 'setTextColor', 'forecolor' => $data->reportElement['forecolor'] . '', 'r' => $textcolor['r'], 'g' => $textcolor['g'], 'b' => $textcolor['b'], 'hidden_type' => 'textcolor']);
+        CReport_Jasper_Instructions::addInstruction(['type' => 'setDrawColor', 'r' => $drawcolor['r'], 'g' => $drawcolor['g'], 'b' => $drawcolor['b'], 'hidden_type' => 'drawcolor']);
+        CReport_Jasper_Instructions::addInstruction(['type' => 'setFillColor', 'backcolor' => $data->reportElement['backcolor'] . '', 'r' => $fillcolor['r'], 'g' => $fillcolor['g'], 'b' => $fillcolor['b'], 'hidden_type' => 'fillcolor']);
+        CReport_Jasper_Instructions::addInstruction(['type' => 'setFont', 'font' => $font, 'pdfFontName' => $data->textElement->font ? $data->textElement->font['pdfFontName'] : '', 'fontstyle' => $fontstyle, 'fontsize' => $fontsize, 'hidden_type' => 'font']);
         //"height"=>$data->reportElement["height"]
         //### UTF-8 characters, a must for me.
         $txtEnc = $data->text;
@@ -138,88 +121,5 @@ class CReport_Jasper_Element_StaticText extends CReport_Jasper_Element {
         //### End of modification, below is the original line
         //        $pointer=array("type"=>"MultiCell","width"=>$data->reportElement["width"],"height"=>$height,"txt"=>$data->text,"border"=>$border,"align"=>$align,"fill"=>$fill,"hidden_type"=>"statictext","soverflow"=>$stretchoverflow,"poverflow"=>$printoverflow,"rotation"=>$rotation);
         //$this->checkoverflow($pointer);
-    }
-
-    /**
-     * Return format for a component of a box.
-     *
-     * @param unknown $pen
-     *
-     * @return number[]|string[]|number[][]
-     */
-    public static function formatPen($pen) {
-        if (isset($pen['lineColor'])) {
-            $drawcolor = [
-                'r' => hexdec(substr($pen['lineColor'], 1, 2)),
-                'g' => hexdec(substr($pen['lineColor'], 3, 2)),
-                'b' => hexdec(substr($pen['lineColor'], 5, 2))
-            ];
-        }
-
-        $dash = '';
-        if (isset($pen['lineStyle'])) {
-            if ($pen['lineStyle'] == 'Dotted') {
-                $dash = '1,1';
-            } elseif ($pen['lineStyle'] == 'Dashed') {
-                $dash = '4,2';
-            }
-
-            // Dotted Dashed
-        }
-
-        return [
-            'width' => $pen['lineWidth'] + 0,
-            'cap' => 'butt',
-            'join' => 'miter',
-            'dash' => $dash,
-            'phase' => 0,
-            'color' => $drawcolor
-        ];
-    }
-
-    /**
-     * Returns patterns for all borders of a box.
-     *
-     * @param unknown $box
-     *
-     * @return array[]
-     */
-    public static function formatBoxToBorder($box) {
-        $border = [];
-        $borderset = '';
-        if ($box->topPen['lineWidth'] > 0.0) {
-            $border['T'] = CReport_Jasper_Element_StaticText::formatPen($box->topPen);
-        }
-        if ($box->leftPen['lineWidth'] > 0.0) {
-            $border['L'] = CReport_Jasper_Element_StaticText::formatPen($box->leftPen);
-        }
-        if ($box->bottomPen['lineWidth'] > 0.0) {
-            $border['B'] = CReport_Jasper_Element_StaticText::formatPen($box->bottomPen);
-        }
-        if ($box->rightPen['lineWidth'] > 0.0) {
-            $border['R'] = CReport_Jasper_Element_StaticText::formatPen($box->rightPen);
-        }
-
-        return $border;
-    }
-
-    public static function formatBoxToBox($box) {
-        $boxArray = [];
-        if ($box->padding) {
-            if ($box->padding['left']) {
-                $boxArray['leftPadding'] = $box->padding['left'];
-            }
-            if ($box->padding['top']) {
-                $boxArray['topPadding'] = $box->padding['top'];
-            }
-            if ($box->padding['right']) {
-                $boxArray['rightPadding'] = $box->padding['right'];
-            }
-            if ($box->padding['bottom']) {
-                $boxArray['bottomPadding'] = $box->padding['bottom'];
-            }
-        }
-
-        return $boxArray;
     }
 }

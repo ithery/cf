@@ -13,12 +13,12 @@ class CReport_Jasper_Element_Detail extends CReport_Jasper_Element {
                     CReport_Jasper_Instructions::runInstructions();
                 }
                 // convert array to object
-                if (!is_object($row) && is_array($row)) {
-                    $row = (object) $row;
-                }
+                // if (!is_object($row) && is_array($row)) {
+                //     $row = (object) $row;
+                // }
                 $obj->rowData = $row;
 
-                $row->rowIndex = $rowIndex;
+                // $row->rowIndex = $rowIndex;
 
                 $obj->arrayVariable['REPORT_COUNT']['ans'] = $rowIndex;
                 $obj->arrayVariable['REPORT_COUNT']['target'] = $rowIndex;
@@ -26,7 +26,7 @@ class CReport_Jasper_Element_Detail extends CReport_Jasper_Element {
                 $obj->arrayVariable['totalRows']['ans'] = $totalRows;
                 $obj->arrayVariable['totalRows']['target'] = $totalRows;
                 $obj->arrayVariable['totalRows']['calculation'] = null;
-                $row->totalRows = $totalRows;
+                // $row->totalRows = $totalRows;
                 if (count($obj->arrayGroup) > 0) {
                     foreach ($obj->arrayGroup as $group) {
                         preg_match_all("/F{(\w+)}/", $group->groupExpression, $matchesF);

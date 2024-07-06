@@ -86,6 +86,8 @@ final class CReport_Jasper_Instructions {
             $instruction = new self::$instructionProcessor($JasperObj);
             if (method_exists($instruction, $methodName)) {
                 $instruction->$methodName($arraydata);
+            } else {
+                throw new Exception('Method name ' . $methodName . 'is not exists on ' . get_class($instruction));
             }
         }
     }

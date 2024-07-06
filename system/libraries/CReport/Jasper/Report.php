@@ -5,14 +5,20 @@ class CReport_Jasper_Report extends CReport_Jasper_Element {
 
     public static $locale = 'en_us';
 
-    public static $dec_point = '.';
-
-    public static $thousands_sep = ',';
-
     public static $columnHeaderRepeat = false;
 
-    public static $proccessintructionsTime = 'after'; // after : process intructions after generate all intrucions / inline : process intrucions after gerenate each detail
+    /**
+     * Type of instruction generation
+     * value after : process intructions after generate all intrucions
+     * value inline : process intrucions after gerenate each detail.
+     *
+     * @var string
+     */
+    public static $proccessintructionsTime = 'after';
 
+    /**
+     * @var CCollection
+     */
     public $data;
 
     public $pageChanged;
@@ -44,6 +50,11 @@ class CReport_Jasper_Report extends CReport_Jasper_Element {
     public $arrayStyles;
 
     protected $param;
+
+    /**
+     * @var CReport_Jasper_Element_Root
+     */
+    protected $root;
 
     public function __construct($xmlFile, $param) {
         $keyword = '<queryString>
@@ -92,53 +103,10 @@ class CReport_Jasper_Report extends CReport_Jasper_Element {
         $this->groupHandler($objElement);
     }
 
-    public function setData($data) {
+    public function setData(CCollection $data) {
         $this->data = $data;
 
         return $this;
-    }
-
-    public function getDbData() {
-        if (array_key_exists('net.sf.jasperreports.data.adapter', $this->arrayProperty)) {
-            $connectionName = explode('.', $this->arrayProperty['net.sf.jasperreports.data.adapter'])[1];
-            $connection = c::db($connectionName);
-        }
-        if ($connection == null) {
-            $connectionName = carr::get($this->param, 'connection');
-            if ($connectionName) {
-                $connection = c::db($connectionName);
-            }
-        }
-        if ($connection) {
-            $result = $connection->select($this->sql);
-            $arrayVariable = isset($this->arrayVariable) ? $this->arrayVariable : [];
-            $recordObject = array_key_exists('recordObj', $arrayVariable) ? $this->arrayVariable['recordObj']['initialValue'] : 'stdClass';
-            if ($recordObject != 'stdClass') {
-                $result = $recordObject::hydrate($result);
-            }
-            $this->rowData = $result[0];
-
-            return $result;
-        } else {
-            // se não tiver transação, retorna uma exceção
-            throw new Exception('No connection!!');
-        }
-    }
-
-    public function getDbDataQuery($sql) {
-        if ($conn = JasperPHP\ado\TTransaction::get()) {
-            // registra mensagem de log
-            JasperPHP\ado\TTransaction::log($sql);
-
-            // executa instrução de SELECT
-            $result = $conn->Query($sql);
-            $rowData = $result->fetchAll(\PDO::FETCH_CLASS);
-
-            return $rowData;
-        } else {
-            // se não tiver transação, retorna uma exceção
-            throw new Exception('No transaction!!');
-        }
     }
 
     public function pageSetting($xml_path) {
@@ -157,7 +125,7 @@ class CReport_Jasper_Report extends CReport_Jasper_Element {
         $this->arrayPageSetting['defaultLeftMargin'] = $xml_path['leftMargin'];
         $this->arrayPageSetting['rightMargin'] = $xml_path['rightMargin'];
         $this->arrayPageSetting['topMargin'] = $xml_path['topMargin'];
-        $this->yAxis = $xml_path['topMargin'];
+        // $this->yAxis = $xml_path['topMargin'];
         $this->arrayPageSetting['bottomMargin'] = $xml_path['bottomMargin'];
     }
 
@@ -591,7 +559,7 @@ class CReport_Jasper_Report extends CReport_Jasper_Element {
             case 'DistinctCount':
                 break;
             case 'Lowest':
-                foreach ($this->dbData as $rowData) {
+                foreach ($this->data as $rowData) {
                     $lowest = $rowData->$out['target'];
                     if ($rowData->$out['target'] < $lowest) {
                         $lowest = $rowData->$out['target'];
@@ -602,7 +570,7 @@ class CReport_Jasper_Report extends CReport_Jasper_Element {
                 break;
             case 'Highest':
                 $out['ans'] = 0;
-                foreach ($this->arraysqltable as $table) {
+                foreach ($this->data as $rowData) {
                     if ($rowData->$out['target'] > $out['ans']) {
                         $value = $rowData->$out['target'];
                     }
@@ -661,101 +629,6 @@ class CReport_Jasper_Report extends CReport_Jasper_Element {
     }
 
     public static function formatText($txt, $pattern) {
-        if ($txt != '') {
-            $nome_meses = ['Janeiro', 'Janeiro', 'Fevereiro', 'Marco', 'Abril', 'Maio', 'Junho', 'Julho', 'Agosto', 'Setembro', 'Outubro', 'Novembro', 'Dezembro'];
-            if (substr($pattern, 0, 1) === '%') {
-                return sprintf($pattern, $txt);
-            } elseif ($pattern == '###0') {
-                return number_format($txt, 0, '', '');
-            } elseif ($pattern == '#.##0') {
-                return number_format($txt, 0, self::$dec_point, self::$thousands_sep);
-            } elseif ($pattern == '###0.0') {
-                return number_format($txt, 1, self::$dec_point, '');
-            } elseif ($pattern == '#,##0.0' || $pattern == '#,##0.0;-#,##0.0') {
-                return number_format($txt, 1, self::$dec_point, self::$thousands_sep);
-            } elseif ($pattern == '###0.00' || $pattern == '###0.00;-###0.00') {
-                return number_format($txt, 2, self::$dec_point, '');
-            } elseif ($pattern == '#,##0.00' || $pattern == '#,##0.00;-#,##0.00') {
-                return number_format($txt, 2, self::$dec_point, self::$thousands_sep);
-            } elseif ($pattern == '###0.00;(###0.00)') {
-                return $txt < 0 ? '(' . number_format(abs($txt), 2, self::$dec_point, '') . ')' : number_format($txt, 2, self::$dec_point, '');
-            } elseif ($pattern == '#,##0.00;(#,##0.00)') {
-                return $txt < 0 ? '(' . number_format(abs($txt), 2, self::$dec_point, self::$thousands_sep) . ')' : number_format($txt, 2, self::$dec_point, self::$thousands_sep);
-            } elseif ($pattern == '#,##0.00;(-#,##0.00)') {
-                return $txt < 0 ? '(' . number_format($txt, 2, self::$dec_point, self::$thousands_sep) . ')' : number_format($txt, 2, self::$dec_point, self::$thousands_sep);
-            } elseif ($pattern == '###0.000') {
-                return number_format($txt, 3, self::$dec_point, '');
-            } elseif ($pattern == '#,##0.000') {
-                return number_format($txt, 3, self::$dec_point, self::$thousands_sep);
-            } elseif ($pattern == '#,##0.0000') {
-                return number_format($txt, 4, self::$dec_point, self::$thousands_sep);
-            } elseif ($pattern == '###0.0000') {
-                return number_format($txt, 4, self::$dec_point, '');
-            } elseif ($pattern == '#,##0') {
-                // start latin formats
-                return number_format($txt, 0, '.', ',');
-            } elseif ($pattern == '###0,0') {
-                return number_format($txt, 1, ',', '');
-            } elseif ($pattern == '#.##0,0' || $pattern == '#.##0,0;-#.##0,0') {
-                return number_format($txt, 1, ',', '.');
-            } elseif ($pattern == '###0,00' || $pattern == '###0,00;-###0,00') {
-                return number_format($txt, 2, ',', '');
-            } elseif ($pattern == '#.##0,00' || $pattern == '#.##0,00;-#.##0,00') {
-                return number_format($txt, 2, ',', '.');
-            } elseif ($pattern == '###0,00;(###0,00)') {
-                return $txt < 0 ? '(' . number_format(abs($txt), 2, ',', '') . ')' : number_format($txt, 2, ',', '');
-            } elseif ($pattern == '#.##0,00;(#.##0,00)') {
-                return $txt < 0 ? '(' . number_format(abs($txt), 2, ',', '.') . ')' : number_format($txt, 2, ',', '.');
-            } elseif ($pattern == '#.##0,00;(-#.##0,00)') {
-                return $txt < 0 ? '(' . number_format($txt, 2, ',', '.') . ')' : number_format($txt, 2, ',', '.');
-            } elseif ($pattern == '###0,000') {
-                return number_format($txt, 3, ',', '');
-            } elseif ($pattern == '#.##0,000') {
-                return number_format($txt, 3, ',', '.');
-            } elseif ($pattern == '#.##0,0000') {
-                return number_format($txt, 4, ',', '.');
-            } elseif ($pattern == '###0,0000') {
-                return number_format($txt, 4, ',', '');
-            } elseif ($pattern == 'xx/xx' && $txt != '') {
-                return mb_substr($txt, 0, 2) . '/' . mb_substr($txt, 2, 2);
-            } elseif ($pattern == 'xx.xx' && $txt != '') {
-                return mb_substr($txt, 0, 2) . '.' . mb_substr($txt, 2, 2);
-            } elseif (($pattern == 'dd/MM/yyyy' || $pattern == 'ddMMyyyy') && $txt != '') {
-                return date('d/m/Y', strtotime($txt));
-            } elseif ($pattern == 'MM/dd/yyyy' && $txt != '') {
-                return date('m/d/Y', strtotime($txt));
-            } elseif ($pattern == 'dd/MM/yy' && $txt != '') {
-                return date('d/m/y', strtotime($txt));
-            } elseif ($pattern == 'yyyy/MM/dd' && $txt != '') {
-                return date('Y/m/d', strtotime($txt));
-            } elseif ($pattern == 'dd-MMM-yy' && $txt != '') {
-                return date('d-M-Y', strtotime($txt));
-            } elseif ($pattern == 'dd-MMM-yy' && $txt != '') {
-                return date('d-M-Y', strtotime($txt));
-            } elseif ($pattern == 'dd/MM/yyyy h.mm a' && $txt != '') {
-                return date('d/m/Y h:i a', strtotime($txt));
-            } elseif ($pattern == 'dd/MM/yyyy HH.mm.ss' && $txt != '') {
-                return date('d-m-Y H:i:s', strtotime($txt));
-            } elseif (($pattern == 'dd/MM/yyyy HH:mm' || $pattern == 'dd/MM/yyyy HH.mm' || $pattern == 'dd/MM/yyyy H:m') && $txt != '') {
-                return date('d/m/Y H:i', strtotime($txt));
-            } elseif ($pattern == 'H:m:s' && $txt != '') {
-                return date('H:i:s', strtotime($txt));
-            } elseif (($pattern == 'H:m' || $pattern == 'HH:mm' || $pattern == 'H.m' || $pattern == 'HH.mm') && $txt != '') {
-                return date('H:i', strtotime($txt));
-            } elseif (($pattern == 'dFyyyy') && $txt != '') {
-                return date('d ', strtotime($txt)) . ' de ' . $nome_meses[date('n', strtotime($txt))] . ' de ' . date('Y', strtotime($txt));
-            } elseif (($pattern == 'dFbyyyy') && $txt != '') {
-                return date('d', strtotime($txt)) . '/' . $nome_meses[date('n', strtotime($txt))] . '/' . date('Y', strtotime($txt));
-            } elseif (($pattern == 'dFByyyy') && $txt != '') {
-                return date('d', strtotime($txt)) . '/' . mb_strtoupper($nome_meses[date('n', strtotime($txt))]) . '/' . date('Y', strtotime($txt));
-            } elseif ($pattern != '' && $txt != '') {
-                return date($pattern, strtotime($txt));
-            } else {
-                return $txt;
-            }
-        } else {
-            return $txt;
-        }
     }
 
     public function numberToText($valor = 0, $maiusculas = false, $money = true) {

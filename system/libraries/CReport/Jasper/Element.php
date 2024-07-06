@@ -7,29 +7,27 @@ class CReport_Jasper_Element {
 
     protected $name;
 
-    private $properties;    // propriedades da TAG
+    private $properties;
 
     public function __construct($objElement) {
-        if (isset($objElement)) {
-            $this->name = get_class($this);
-            $this->objElement = $objElement;
-            // atribui o conteúdo do label
-            $attributes = $objElement->attributes();
-            foreach ($attributes as $att => $value) {
-                $this->$att = $value;
-            }
-            foreach ($objElement as $obj => $value) {
-                $obj = ($obj == 'break') ? 'Breaker' : $obj;
+        $this->name = get_class($this);
+        $this->objElement = $objElement;
+        // atribui o conteúdo do label
+        $attributes = $objElement->attributes();
+        foreach ($attributes as $att => $value) {
+            $this->$att = $value;
+        }
+        foreach ($objElement as $obj => $value) {
+            $obj = ($obj == 'break') ? 'Breaker' : $obj;
 
-                $className = CReport_Jasper_ElementFactory::getClassName($obj);
-                if ($className == null) {
-                    if (!CReport_Jasper_ElementFactory::isIgnore($obj)) {
-                        throw new Exception('Element ' . $obj . ' unknown');
-                    }
+            $className = CReport_Jasper_ElementFactory::getClassName($obj);
+            if ($className == null) {
+                if (!CReport_Jasper_ElementFactory::isIgnore($obj)) {
+                    throw new Exception('Element ' . $obj . ' unknown');
                 }
-                if ($className) {
-                    $this->add(new $className($value));
-                }
+            }
+            if ($className) {
+                $this->add(new $className($value));
             }
         }
     }
@@ -86,11 +84,8 @@ class CReport_Jasper_Element {
      * @param null|mixed $obj
      */
     public function generate($obj = null) {
-        // se possui conteúdo
         if ($this->children) {
-            // percorre todos objetos filhos
             foreach ($this->children as $child) {
-                // se for objeto
                 if (is_object($child)) {
                     $child->generate($obj);
                 }
