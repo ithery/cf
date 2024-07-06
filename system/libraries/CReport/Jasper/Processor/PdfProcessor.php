@@ -12,9 +12,9 @@ class CReport_Jasper_Processor_PdfProcessor {
     public static function prepare($report) {
         CReport_Jasper_Instructions::$arrayPageSetting = $report->arrayPageSetting;
         if ($report->arrayPageSetting['orientation'] == 'Landscape') {
-            CReport_Jasper_Instructions::$objOutPut = new TCPDF($report->arrayPageSetting['orientation'], 'pt', [intval($report->arrayPageSetting['pageHeight']), intval($report->arrayPageSetting['pageWidth'])], true);
+            CReport_Jasper_Instructions::$objOutPut = new CReport_Pdf_Adapter_TCPDF($report->arrayPageSetting['orientation'], 'pt', [intval($report->arrayPageSetting['pageHeight']), intval($report->arrayPageSetting['pageWidth'])], true);
         } else {
-            CReport_Jasper_Instructions::$objOutPut = new TCPDF($report->arrayPageSetting['orientation'], 'pt', [intval($report->arrayPageSetting['pageWidth']), intval($report->arrayPageSetting['pageHeight'])], true);
+            CReport_Jasper_Instructions::$objOutPut = new CReport_Pdf_Adapter_TCPDF($report->arrayPageSetting['orientation'], 'pt', [intval($report->arrayPageSetting['pageWidth']), intval($report->arrayPageSetting['pageHeight'])], true);
         }
         CReport_Jasper_Instructions::$objOutPut->SetLeftMargin((int) $report->arrayPageSetting['leftMargin']);
         CReport_Jasper_Instructions::$objOutPut->SetRightMargin((int) $report->arrayPageSetting['rightMargin']);
@@ -256,7 +256,6 @@ class CReport_Jasper_Processor_PdfProcessor {
 
                 $pdf->setCellHeightRatio($cellHeightRatio);
 
-
                 return $height;
             } elseif ($arraydata['poverflow'] == 'true' || $arraydata['soverflow'] == 'true') {
                 if ($arraydata['valign'] == 'C') {
@@ -283,6 +282,7 @@ class CReport_Jasper_Processor_PdfProcessor {
                 $pdf->setCellHeightRatio(1);
                 $height = $pdf->getStringHeight($w, $JasperObj->formatText($txt, $arraydata['pattern'], false));
                 $pdf->setCellHeightRatio($cellHeightRatio);
+
                 return $height;
             }
             $pdf->StopTransform();

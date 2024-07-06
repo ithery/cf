@@ -15,7 +15,7 @@ class CReport_Jasper {
     }
 
     /**
-     * @return \TCPDF
+     * @return CReport_Pdf_Adapter_TCPDF
      */
     public function getPdf() {
         if ($this->dataProvider) {
