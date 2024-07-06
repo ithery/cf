@@ -9,6 +9,8 @@ defined('SYSPATH') or die('No direct access allowed.');
  * @see https://github.com/nehakadam/DateTimePicker
  */
 class CElement_FormInput_DateTime_ModalDateTime extends CElement_FormInput_DateTime {
+
+    protected $container;
     public function __construct($id) {
         parent::__construct($id);
         c::manager()->registerModule('datetimepicker');
@@ -25,6 +27,9 @@ class CElement_FormInput_DateTime_ModalDateTime extends CElement_FormInput_DateT
             $dateTimeFormat = str_replace('s', 'ss', $dateTimeFormat);
             $this->dateTimeFormat = $dateTimeFormat;
         }
+
+        $this->container = $this->addSpan($this->id.'-container');
+        $this->wrapper = $this->container;
     }
 
     protected function build() {
@@ -107,7 +112,7 @@ class CElement_FormInput_DateTime_ModalDateTime extends CElement_FormInput_DateT
         $options .= 'shortMonthNames:' . $this->getShortMonthNames() . ',';
         $options .= 'fullMonthNames:' . $this->getFullMonthNames() . ',';
         $options .= "clearButtonContent:'" . $this->getTranslation('clear') . "',";
-        $options .= "parentElement: '#" . $this->id . "',";
+        $options .= "parentElement: '#" . $this->id . "-container',";
 
         $options .= 'isPopup:true,';
         $options .= '}';
