@@ -153,7 +153,7 @@ class CReport_Jasper_Element_Detail extends CReport_Jasper_Element {
                 $obj->lastRowData = $row;
                 $obj->variablesCalculation($obj, $row);
             }
-            if (count($obj->arrayGroup) > 0) {
+            if (count($obj->arrayGroup) > 0 && $totalRows > 0) {
                 foreach ($obj->arrayGroup as $group) {
                     if (($group->groupFooter)) {
                         $groupFooter = new CReport_Jasper_Element_GroupFooter($group->groupFooter);
