@@ -1,6 +1,6 @@
 <?php
 
-class CReport_Jasper_Report extends CReport_Jasper_Element {
+class CReport_Jasper_Report {
     public static $defaultFolder = 'app.jrxml';
 
     public static $locale = 'en_us';
@@ -36,12 +36,6 @@ class CReport_Jasper_Report extends CReport_Jasper_Element {
 
     public $returnedValues = [];
 
-    public $objElement;
-
-    public $rowData;
-
-    public $lastRowData;
-
     public $arrayStyles;
 
     protected $param;
@@ -56,51 +50,33 @@ class CReport_Jasper_Report extends CReport_Jasper_Element {
      */
     private $data;
 
+    /**
+     * @var CReport_Jasper_ProcessorAbstract
+     */
+    private $processor;
+
     public function __construct($xmlFile, $param) {
         $keyword = '<queryString>
         <![CDATA[';
         $xmlFile = str_replace($keyword, '<queryString><![CDATA[', $xmlFile);
-        $xml = simplexml_load_string($xmlFile, null, LIBXML_NOCDATA);
+        $xmlElement = simplexml_load_string($xmlFile, null, LIBXML_NOCDATA);
         $this->param = $param;
-        $this->charge($xml, $param);
-        //$this->objElement = $xml;
-    }
-
-    public function charge($objElement, $param) {
-        $this->name = get_class($this);
-        $this->objElement = $objElement;
+        $this->root = new CReport_Jasper_Element_Root($xmlElement);
+        // $this->name = get_class($this);
 
         // atribui o conteúdo do label
-        $attributes = $objElement->attributes;
-        //var_dump($attributes);
-        foreach ($attributes as $att => $value) {
-            $this->$att = $value;
-        }
-        foreach ($objElement as $obj => $value) {
-            $obj = ($obj == 'break') ? 'Breaker' : $obj;
-
-            // echo $className."|";
+        foreach ($xmlElement as $obj => $value) {
             if (ucfirst($obj) == 'Style') {
                 $this->addStyle($value);
-            } else {
-                $className = CReport_Jasper_ElementFactory::getClassName($obj);
-                if ($className == null) {
-                    if (!CReport_Jasper_ElementFactory::isIgnore($obj)) {
-                        throw new Exception('Element ' . $obj . ' unknown');
-                    }
-                }
-                if ($className) {
-                    $this->add(new $className($value));
-                }
             }
         }
-        $this->parameterHandler($objElement, $param);
-        $this->propertyHandler($objElement, $param);
-        $this->fieldHandler($objElement);
-        $this->variableHandler($objElement);
-        $this->pageSetting($objElement);
-        $this->queryStringHandler($objElement);
-        $this->groupHandler($objElement);
+        $this->parameterHandler($xmlElement, $param);
+        $this->propertyHandler($xmlElement, $param);
+        $this->fieldHandler($xmlElement);
+        $this->variableHandler($xmlElement);
+        $this->pageSetting($xmlElement);
+        $this->queryStringHandler($xmlElement);
+        $this->groupHandler($xmlElement);
     }
 
     /**
@@ -119,6 +95,13 @@ class CReport_Jasper_Report extends CReport_Jasper_Element {
      */
     public function getData() {
         return $this->data;
+    }
+
+    /**
+     * @return null|CReport_Jasper_ProcessorAbstract
+     */
+    public function getProcessor() {
+        return $this->processor;
     }
 
     /**
@@ -287,7 +270,7 @@ class CReport_Jasper_Report extends CReport_Jasper_Element {
         }
     }
 
-    public function getExpression($text, $row, $writeHTML = null, $element = null) {
+    public function getExpression($text, CReport_Jasper_Report_DataRow $row = null, $writeHTML = null, $element = null) {
         preg_match_all("/P{(\w+)}/", $text, $matchesP);
         if ($matchesP) {
             foreach ($matchesP[1] as $macthP) {
@@ -303,12 +286,14 @@ class CReport_Jasper_Report extends CReport_Jasper_Element {
             }
         }
 
-        preg_match_all('/F{[^}]*}/', $text, $matchesF);
-        if ($matchesF) {
-            //var_dump($matchesF);
-            foreach ($matchesF[0] as $matchF) {
-                $match = str_ireplace(['F{', '}'], '', $matchF);
-                $text = $this->getValOfField($match, $row, $text, $writeHTML);
+        if ($row) {
+            preg_match_all('/F{[^}]*}/', $text, $matchesF);
+            if ($matchesF) {
+                //var_dump($matchesF);
+                foreach ($matchesF[0] as $matchF) {
+                    $match = str_ireplace(['F{', '}'], '', $matchF);
+                    $text = $this->getValOfField($match, $row, $text, $writeHTML);
+                }
             }
         }
 
@@ -382,7 +367,7 @@ class CReport_Jasper_Report extends CReport_Jasper_Element {
         }
     }
 
-    public function getValOfField($field, $row, $text, $htmlentities = false) {
+    public function getValOfField($field, CReport_Jasper_Report_DataRow $row, $text, $htmlentities = false) {
         error_reporting(0);
         $fieldParts = strpos($field, '->') ? explode('->', $field) : explode('-&gt;', $field);
         $obj = $row;
@@ -556,10 +541,10 @@ class CReport_Jasper_Report extends CReport_Jasper_Element {
         switch ($out['calculation']) {
             case 'Sum':
                 if (isset($this->arrayVariable[$k]['class']) && $this->arrayVariable[$k]['class'] == 'java.sql.Time') {
-                    $value = $this->time_to_sec($value);
+                    $value = CReport_Jasper_Utils_TimeUtils::timeToSecond($value);
 
-                    $value += $this->time_to_sec($newValue);
-                    $value = $this->sec_to_time($value);
+                    $value += CReport_Jasper_Utils_TimeUtils::timeToSecond($newValue);
+                    $value = CReport_Jasper_Utils_TimeUtils::secondToTime($value);
                 } else {
                     $value += is_numeric($newValue) ? $newValue : 0;
                 }
@@ -567,9 +552,10 @@ class CReport_Jasper_Report extends CReport_Jasper_Element {
                 break;
             case 'Average':
                 if (isset($this->arrayVariable[$k]['class']) && $this->arrayVariable[$k]['class'] == 'java.sql.Time') {
-                    $value = $this->time_to_sec($value);
-                    $value += $this->time_to_sec($newValue);
-                    $value = $this->sec_to_time($value);
+                    $value = CReport_Jasper_Utils_TimeUtils::timeToSecond($value);
+
+                    $value += CReport_Jasper_Utils_TimeUtils::timeToSecond($newValue);
+                    $value = CReport_Jasper_Utils_TimeUtils::secondToTime($value);
                 } else {
                     $value = ($value * ($this->report_count - 1) + $newValue) / $this->report_count;
                 }
@@ -711,23 +697,18 @@ class CReport_Jasper_Report extends CReport_Jasper_Element {
         }
     }
 
-    public function generate($obj = null) {
-        //$this->parameter_handler($this->objElement, $param);
-        //$this->variable_handler($this->objElement);
-        //$this->queryString_handler($this->objElement);
-        //var_dump($this->objElement);
-
-        // exibe a tag
-        $instructions = CReport_Jasper_Instructions::setJasperObj($obj ? $obj : $this);
-        parent::generate($this);
-        //CReport_Jasper_Instructions::runInstructions();
-        //CReport_Jasper_Instructions::clearInstructrions();
-        return $this->arrayVariable;
+    /**
+     * @return null|CReport_Jasper_Report_Generator
+     */
+    public function generator() {
+        return CReport_Jasper_Manager::instance()->getGenerator();
     }
 
-    public function out() {
-        CReport_Jasper_Instructions::runInstructions();
-        //$this->runInstructions($instructions);
+    /**
+     * @return CReport_Jasper_Element_Root
+     */
+    public function getRoot() {
+        return $this->root;
     }
 
     public function addStyle($style) {
@@ -777,5 +758,31 @@ class CReport_Jasper_Report extends CReport_Jasper_Element {
                 }
             }
         }
+    }
+
+    public function getPdf() {
+        // $this->report()->setProcessor($this->manager()->createPdfProcessor());
+        $this->processor = new CReport_Jasper_Processor_PdfProcessor($this);
+
+        $generator = new CReport_Jasper_Report_Generator($this);
+        CReport_Jasper_Manager::instance()->setGenerator($generator);
+        //$this->parameter_handler($this->xmlElement, $param);
+        //$this->variable_handler($this->xmlElement);
+        //$this->queryString_handler($this->xmlElement);
+        //var_dump($this->xmlElement);
+
+        // exibe a tag
+        // CReport_Jasper_Instructions::setJasperObj($this);
+        $this->root->generate($this);
+        //CReport_Jasper_Instructions::runInstructions();
+        //CReport_Jasper_Instructions::clearInstructrions();
+
+        CReport_Jasper_Instructions::runInstructions();
+        //$this->runInstructions($instructions);
+
+        $pdf = CReport_Jasper_Instructions::get();
+        CReport_Jasper_Manager::instance()->unsetGenerator();
+
+        return $pdf;
     }
 }

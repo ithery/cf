@@ -25,11 +25,8 @@ class CReport_Jasper {
             $data = $this->dataProvider->toEnumerable();
             $this->report->setData($data);
         }
-        CReport_Jasper_Instructions::prepare($this->report);
-        $this->report->generate();
-        $this->report->out();
 
-        $pdf = CReport_Jasper_Instructions::get();
+        $pdf = $this->report->getPdf();
 
         return $pdf;
     }
@@ -43,12 +40,7 @@ class CReport_Jasper {
             $this->report->setData($data);
         }
 
-        // $this->report()->setProcessor($this->manager()->createPdfProcessor());
-        CReport_Jasper_Instructions::prepare($this->report);
-        $this->report->generate();
-        $this->report->out();
-
-        $pdf = CReport_Jasper_Instructions::get();
+        $pdf = $this->report->getPdf();
 
         return $pdf;
     }
@@ -92,7 +84,7 @@ class CReport_Jasper {
         return $this;
     }
 
-    public function manager() {
+    public static function manager() {
         return CReport_Jasper_Manager::instance();
     }
 }

@@ -53,7 +53,7 @@ class CReport_Jasper_Element_Detail extends CReport_Jasper_Element {
                         }
                     }
                 }
-                $background = $report->getChildByClassName('Background');
+                $background = $report->getRoot()->getChildByClassName('Background');
 
                 if ($background) {
                     $background->generate($report);
@@ -64,7 +64,7 @@ class CReport_Jasper_Element_Detail extends CReport_Jasper_Element {
                     // se for objeto
                     if (is_object($child)) {
                         $print_expression_result = false;
-                        $printWhenExpression = (string) $child->objElement->printWhenExpression;
+                        $printWhenExpression = (string) $child->xmlElement->printWhenExpression;
                         if ($printWhenExpression != '') {
                             $printWhenExpression = $report->getExpression($printWhenExpression, $row);
 
@@ -73,13 +73,16 @@ class CReport_Jasper_Element_Detail extends CReport_Jasper_Element {
                         } else {
                             $print_expression_result = true;
                         }
-                        $height = (string) $child->objElement['height'];
+                        $height = (string) $child->xmlElement['height'];
                         //getHeightMultiCell
-                        if (CReport_Jasper_Instructions::$objOutPut instanceof \TCPDF) {
+                        $processor = $report->getProcessor();
+
+                        if ($processor instanceof CReport_Jasper_Processor_PdfProcessor) {
                             $textFields = $child->getChildsByClassName('TextField');
                             $haveStretchOverflow = false;
                             foreach ($textFields as $textField) {
-                                if (isset($textField->isStretchWithOverflow) && $textField->isStretchWithOverflow == 'true') {
+                                /** @var CReport_Jasper_Element_TextField $textField */
+                                if ($textField->getProperty('isStretchWithOverflow') == 'true') {
                                     $haveStretchOverflow = true;
 
                                     break;
@@ -92,7 +95,6 @@ class CReport_Jasper_Element_Detail extends CReport_Jasper_Element {
                                         $multiCellOptions = $textField->getInstructionDataMultiCell($report);
 
                                         //cdbg::d($multiCellOptions);
-                                        $processor = CReport_Jasper_Instructions::getProcessor();
                                         $cellHeight = $processor->getHeightMultiCell($multiCellOptions);
                                         // $cellHeight = 62;
                                         if ($cellHeight > $maxHeight) {
@@ -107,14 +109,14 @@ class CReport_Jasper_Element_Detail extends CReport_Jasper_Element {
                             }
                         }
                         if ($print_expression_result == true) {
-                            if ($child->objElement['splitType'] == 'Stretch' || $child->objElement['splitType'] == 'Prevent') {
+                            if ($child->xmlElement['splitType'] == 'Stretch' || $child->xmlElement['splitType'] == 'Prevent') {
                                 CReport_Jasper_Instructions::addInstruction(['type' => 'preventYAxis', 'y_axis' => $height]);
                             }
                             if (CReport_Jasper_Report::$proccessintructionsTime == 'inline') {
                                 CReport_Jasper_Instructions::runInstructions();
                             }
                             $child->generate($report);
-                            if ($child->objElement['splitType'] == 'Stretch' || $child->objElement['splitType'] == 'Prevent') {
+                            if ($child->xmlElement['splitType'] == 'Stretch' || $child->xmlElement['splitType'] == 'Prevent') {
                                 CReport_Jasper_Instructions::addInstruction(['type' => 'setYAxis', 'y_axis' => $height]);
                             }
                             if (CReport_Jasper_Report::$proccessintructionsTime == 'inline') {

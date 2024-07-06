@@ -1,7 +1,7 @@
 <?php
 use PhpOffice\PhpSpreadsheet\Spreadsheet;
 
-class CReport_Jasper_Processor_ExcelProcessor {
+class CReport_Jasper_Processor_ExcelProcessor extends CReport_Jasper_ProcessorAbstract {
     public $wb;
 
     /**
@@ -24,13 +24,13 @@ class CReport_Jasper_Processor_ExcelProcessor {
     private static $rowpos = 1;
 
     public function __construct(CReport_Jasper_Report $jasperObj) {
-        $this->jasperObj = $jasperObj;
         $wb = CReport_Jasper_Instructions::$objOutPut;
         /** @var Spreadsheet $wb */
         $this->ws = $wb->getActiveSheet(0);
+        parent::__construct($jasperObj);
     }
 
-    public static function prepare() {
+    protected function prepare() {
         $wb = new Spreadsheet();
         CReport_Jasper_Instructions::$objOutPut = $wb;
     }

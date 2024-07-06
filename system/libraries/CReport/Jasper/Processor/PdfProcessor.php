@@ -1,31 +1,25 @@
 <?php
 
-class CReport_Jasper_Processor_PdfProcessor {
-    private $jasperObj;
-
+class CReport_Jasper_Processor_PdfProcessor extends CReport_Jasper_ProcessorAbstract {
     private $print_expression_result;
 
-    public function __construct(CReport_Jasper_Report $jasperObj) {
-        $this->jasperObj = $jasperObj;
-    }
-
-    public static function prepare($report) {
-        CReport_Jasper_Instructions::$arrayPageSetting = $report->arrayPageSetting;
-        if ($report->arrayPageSetting['orientation'] == 'Landscape') {
-            CReport_Jasper_Instructions::$objOutPut = new CReport_Pdf_Adapter_TCPDF($report->arrayPageSetting['orientation'], 'pt', [intval($report->arrayPageSetting['pageHeight']), intval($report->arrayPageSetting['pageWidth'])], true);
+    protected function prepare() {
+        CReport_Jasper_Instructions::$arrayPageSetting = $this->jasperReport->arrayPageSetting;
+        if ($this->jasperReport->arrayPageSetting['orientation'] == 'Landscape') {
+            CReport_Jasper_Instructions::$objOutPut = new CReport_Pdf_Adapter_TCPDF($this->jasperReport->arrayPageSetting['orientation'], 'pt', [intval($this->jasperReport->arrayPageSetting['pageHeight']), intval($this->jasperReport->arrayPageSetting['pageWidth'])], true);
         } else {
-            CReport_Jasper_Instructions::$objOutPut = new CReport_Pdf_Adapter_TCPDF($report->arrayPageSetting['orientation'], 'pt', [intval($report->arrayPageSetting['pageWidth']), intval($report->arrayPageSetting['pageHeight'])], true);
+            CReport_Jasper_Instructions::$objOutPut = new CReport_Pdf_Adapter_TCPDF($this->jasperReport->arrayPageSetting['orientation'], 'pt', [intval($this->jasperReport->arrayPageSetting['pageWidth']), intval($this->jasperReport->arrayPageSetting['pageHeight'])], true);
         }
-        CReport_Jasper_Instructions::$objOutPut->SetLeftMargin((int) $report->arrayPageSetting['leftMargin']);
-        CReport_Jasper_Instructions::$objOutPut->SetRightMargin((int) $report->arrayPageSetting['rightMargin']);
-        CReport_Jasper_Instructions::$objOutPut->SetTopMargin((int) $report->arrayPageSetting['topMargin']);
-        CReport_Jasper_Instructions::$objOutPut->SetAutoPageBreak(true, (int) $report->arrayPageSetting['bottomMargin'] / 2);
+        CReport_Jasper_Instructions::$objOutPut->SetLeftMargin((int) $this->jasperReport->arrayPageSetting['leftMargin']);
+        CReport_Jasper_Instructions::$objOutPut->SetRightMargin((int) $this->jasperReport->arrayPageSetting['rightMargin']);
+        CReport_Jasper_Instructions::$objOutPut->SetTopMargin((int) $this->jasperReport->arrayPageSetting['topMargin']);
+        CReport_Jasper_Instructions::$objOutPut->SetAutoPageBreak(true, (int) $this->jasperReport->arrayPageSetting['bottomMargin'] / 2);
         //self::$pdfOutPut->AliasNumPage();
         CReport_Jasper_Instructions::$objOutPut->setPrintHeader(false);
         CReport_Jasper_Instructions::$objOutPut->setPrintFooter(false);
         CReport_Jasper_Instructions::$objOutPut->AddPage();
         CReport_Jasper_Instructions::$objOutPut->setPage(1, true);
-        CReport_Jasper_Instructions::$yAxis = (int) $report->arrayPageSetting['topMargin'];
+        CReport_Jasper_Instructions::$yAxis = (int) $this->jasperReport->arrayPageSetting['topMargin'];
 
         if (CReport_Jasper_Instructions::$fontdir == '') {
             CReport_Jasper_Instructions::$fontdir = dirname(__FILE__) . '/tcpdf/fonts';
@@ -44,7 +38,7 @@ class CReport_Jasper_Processor_PdfProcessor {
         //$pdf = \JasperPHP\Pdf;
         $preventY_axis = CReport_Jasper_Instructions ::$yAxis + $arraydata['y_axis'];
         $pageheight = CReport_Jasper_Instructions::$arrayPageSetting['pageHeight'];
-        $pageFooter = $this->jasperObj->getChildByClassName('PageFooter');
+        $pageFooter = $this->jasperReport->getRoot()->getChildByClassName('PageFooter');
         $pageFooterHeigth = ($pageFooter) ? $pageFooter->children[0]->height : 0;
         $topMargin = CReport_Jasper_Instructions::$arrayPageSetting['topMargin'];
         $bottomMargin = CReport_Jasper_Instructions::$arrayPageSetting['bottomMargin'];
@@ -55,22 +49,22 @@ class CReport_Jasper_Processor_PdfProcessor {
         if ($preventY_axis >= $discount) {
             if ($pageFooter) {
                 CReport_Jasper_Instructions::$lastPageFooter = false;
-                $pageFooter->generate($this->jasperObj);
+                $pageFooter->generate($this->jasperReport);
             }
             CReport_Jasper_Instructions::addInstruction(['type' => 'resetYAxis']);
             CReport_Jasper_Instructions::$currrentPage++;
             CReport_Jasper_Instructions::addInstruction(['type' => 'AddPage']);
             CReport_Jasper_Instructions::addInstruction(['type' => 'setPage', 'value' => CReport_Jasper_Instructions::$currrentPage, 'resetMargins' => false]);
             CReport_Jasper_Instructions::runInstructions();
-            $pageHeader = $this->jasperObj->getChildByClassName('PageHeader');
+            $pageHeader = $this->jasperReport->getRoot()->getChildByClassName('PageHeader');
             if ($pageHeader) {
-                $pageHeader->generate($this->jasperObj);
+                $pageHeader->generate($this->jasperReport);
             }
             //repeat column header?
-            if ($this->jasperObj::$columnHeaderRepeat) {
-                $columnHeader = $this->jasperObj->getChildByClassName('ColumnHeader');
+            if ($this->jasperReport::$columnHeaderRepeat) {
+                $columnHeader = $this->jasperReport->getRoot()->getChildByClassName('ColumnHeader');
                 if ($columnHeader) {
-                    $columnHeader->generate($this->jasperObj);
+                    $columnHeader->generate($this->jasperReport);
                 }
             }
             CReport_Jasper_Instructions::runInstructions();
@@ -98,7 +92,7 @@ class CReport_Jasper_Processor_PdfProcessor {
     }
 
     public function addPage($arraydata) {
-        $this->jasperObj->pageChanged = true;
+        $this->jasperReport->pageChanged = true;
 
         // $pdf = JasperPHP\Pdf;
         CReport_Jasper_Instructions::$objOutPut->AddPage();
@@ -113,7 +107,7 @@ class CReport_Jasper_Processor_PdfProcessor {
         $arraydata['font'] = strtolower($arraydata['font']);
 
         $fontfile = CReport_Jasper_Instructions::$fontdir . '/' . $arraydata['font'] . '.php';
-        // if(file_exists($fontfile) || $this->jasperObj->bypassnofont==false){
+        // if(file_exists($fontfile) || $this->jasperReport->bypassnofont==false){
 
         $fontfile = CReport_Jasper_Instructions::$fontdir . '/' . $arraydata['font'] . '.php';
 
@@ -149,7 +143,7 @@ class CReport_Jasper_Processor_PdfProcessor {
     public function getHeightMultiCell($obj) {
         /** @var \TCPDF $pdf */
         $pdf = clone CReport_Jasper_Instructions::$objOutPut;
-        $JasperObj = $this->jasperObj;
+        $JasperObj = $this->jasperReport;
         // var_dump($obj->children);
         $txt = (string) $obj['txt'];
         //$newfont = $JasperObj->recommendFont($txt, null, null);
@@ -305,7 +299,7 @@ class CReport_Jasper_Processor_PdfProcessor {
     public function cell($arraydata) {
         //                print_r($arraydata);
         //              echo "<br/>";
-        //JasperPHP\Pdf::$pdfOutPut->Cell($arraydata["width"], $arraydata["height"], $this->jasperObj->updatePageNo($arraydata["txt"]), $arraydata["border"], $arraydata["ln"], $arraydata["align"], $arraydata["fill"], $arraydata["link"] . "", 0, true, "T", $arraydata["valign"]);
+        //JasperPHP\Pdf::$pdfOutPut->Cell($arraydata["width"], $arraydata["height"], $this->jasperReport->updatePageNo($arraydata["txt"]), $arraydata["border"], $arraydata["ln"], $arraydata["align"], $arraydata["fill"], $arraydata["link"] . "", 0, true, "T", $arraydata["valign"]);
     }
 
     public function rect($arraydata) {
@@ -379,7 +373,7 @@ class CReport_Jasper_Processor_PdfProcessor {
 
     public function setTextColor($arraydata) {
 
-        //if($this->jasperObj->hideheader==true && $this->jasperObj->currentband=='pageHeader')
+        //if($this->jasperReport->hideheader==true && $this->jasperReport->currentband=='pageHeader')
         //    JasperPHP\Pdf::$pdfOutPut->SetTextColor(100,33,30);
         //else
         CReport_Jasper_Instructions::$objOutPut->SetTextColor($arraydata['r'], $arraydata['g'], $arraydata['b']);
@@ -395,19 +389,19 @@ class CReport_Jasper_Processor_PdfProcessor {
 
     public function breaker($arraydata) {
         $this->printExpression($arraydata);
-        $pageFooter = $this->jasperObj->getChildByClassName('PageFooter');
+        $pageFooter = $this->jasperReport->getRoot()->getChildByClassName('PageFooter');
         if ($this->print_expression_result == true) {
             if ($pageFooter) {
-                $pageFooter->generate($this->jasperObj);
+                $pageFooter->generate($this->jasperReport);
             }
             CReport_Jasper_Instructions::addInstruction(['type' => 'resetYAxis']);
             CReport_Jasper_Instructions::$currrentPage++;
             CReport_Jasper_Instructions::addInstruction(['type' => 'AddPage']);
             CReport_Jasper_Instructions::addInstruction(['type' => 'setPage', 'value' => CReport_Jasper_Instructions::$currrentPage, 'resetMargins' => false]);
-            $pageHeader = $this->jasperObj->getChildByClassName('PageHeader');
+            $pageHeader = $this->jasperReport->getRoot()->getChildByClassName('PageHeader');
             //if (JasperPHP\Pdf::$print_expression_result == true) {
             if ($pageHeader) {
-                $pageHeader->generate($this->jasperObj);
+                $pageHeader->generate($this->jasperReport);
             }
             //}
             CReport_Jasper_Instructions::runInstructions();
@@ -587,7 +581,7 @@ class CReport_Jasper_Processor_PdfProcessor {
     public function checkoverflow($obj) {
         /** @var \TCPDF $pdf */
         $pdf = CReport_Jasper_Instructions::$objOutPut;
-        $JasperObj = $this->jasperObj;
+        $JasperObj = $this->jasperReport;
         // var_dump($obj->children);
         $txt = (string) $obj['txt'];
         //$newfont = $JasperObj->recommendFont($txt, null, null);

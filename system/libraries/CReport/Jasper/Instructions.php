@@ -8,8 +8,6 @@ final class CReport_Jasper_Instructions {
 
     public static $fontdir;
 
-    public static $JasperObj;
-
     public static $currrentPage = 1;
 
     public static $yAxis;
@@ -22,37 +20,13 @@ final class CReport_Jasper_Instructions {
 
     public static $processingPageFooter = false;
 
-    private static $intructions = [];
-
-    private static $instructionProcessor = 'CReport_Jasper_Processor_PdfProcessor';
+    public static $intructions = [];
 
     private function __construct() {
     }
 
-    /**
-     * @return CReport_Jasper_Processor_PdfProcessor
-     */
-    public static function getProcessor() {
-        $JasperObj = self::$JasperObj;
-        $instruction = new self::$instructionProcessor($JasperObj);
-
-        return $instruction;
-    }
-
-    public static function setProcessor($instructionProcessor) {
-        self::$instructionProcessor = $instructionProcessor;
-    }
-
-    public static function prepare($report) {
-        self::$instructionProcessor::prepare($report);
-    }
-
     public static function addInstruction($instruction) {
         self::$intructions[] = $instruction;
-    }
-
-    public static function setJasperObj(CReport_Jasper_Element $JasperObj) {
-        self::$JasperObj = $JasperObj;
     }
 
     public static function get() {
@@ -72,8 +46,7 @@ final class CReport_Jasper_Instructions {
     }
 
     public static function runInstructions() {
-        $pdf = self::$objOutPut;
-        $JasperObj = self::$JasperObj;
+        $report = CReport_Jasper_Manager::instance()->getGenerator()->getReport();
         $instructions = self::$intructions;
         //var_dump($instructions);
         self::$intructions = [];
@@ -83,11 +56,11 @@ final class CReport_Jasper_Instructions {
             $methodName = $methodName == 'break' ? 'breaker' : $methodName;
 
             //$instructionProcessorClass = '\JasperPHP\/' + ;
-            $instruction = new self::$instructionProcessor($JasperObj);
-            if (method_exists($instruction, $methodName)) {
-                $instruction->$methodName($arraydata);
+            $processor = $report->getProcessor();
+            if (method_exists($processor, $methodName)) {
+                $processor->$methodName($arraydata);
             } else {
-                throw new Exception('Method name ' . $methodName . 'is not exists on ' . get_class($instruction));
+                throw new Exception('Method name ' . $methodName . 'is not exists on ' . get_class($processor));
             }
         }
     }

@@ -4,9 +4,9 @@ class CReport_Jasper_Element_PageHeader extends CReport_Jasper_Element {
     public function generate(CReport_Jasper_Report $report) {
         $row = $report->getCurrentRow();
         $band = $this->children['0'];
-        $height = (string) $band->objElement['height'];
+        $height = (string) $band->xmlElement['height'];
         $print_expression_result = false;
-        $printWhenExpression = (string) $band->objElement->printWhenExpression;
+        $printWhenExpression = (string) $band->xmlElement->printWhenExpression;
 
         if ($printWhenExpression != '') {
             $printWhenExpression = $report->getExpression($printWhenExpression, $row);

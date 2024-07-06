@@ -3,7 +3,7 @@
 class CReport_Jasper_Element_Image extends CReport_Jasper_Element {
     public function generate(CReport_Jasper_Report $report) {
         $row = $report->getCurrentRow();
-        $data = $this->objElement;
+        $data = $this->xmlElement;
         $text = $data->imageExpression;
         //echo $imagepath;
         //echo $imagepath;
@@ -12,8 +12,10 @@ class CReport_Jasper_Element_Image extends CReport_Jasper_Element {
         $text = str_ireplace(['"+', '" +', '+"', '+ "', '"'], ['', '', ''], $text);
 
         $imagetype = substr($text, -3);
-        //$data->hyperlinkReferenceExpression=$this->analyse_expression($data->hyperlinkReferenceExpression);
-        $data->hyperlinkReferenceExpression = trim(str_replace(['"', ''], '', $data->hyperlinkReferenceExpression));
+        $hyperlinkReferenceExpression = $data->hyperlinkReferenceExpression;
+        if ($hyperlinkReferenceExpression) {
+            $hyperlinkReferenceExpression = trim(str_replace(['"', ''], '', $data->hyperlinkReferenceExpression));
+        }
         // echo $text;
 
         $arraydata = [
@@ -24,7 +26,7 @@ class CReport_Jasper_Element_Image extends CReport_Jasper_Element {
             'width' => $data->reportElement['width'] + 0,
             'height' => $data->reportElement['height'] + 0,
             'imgtype' => $imagetype,
-            'link' => $data->hyperlinkReferenceExpression,
+            'link' => $hyperlinkReferenceExpression,
             'hidden_type' => 'image',
             'linktarget' => $data['hyperlinkTarget'] . '',
             'border' => 0,

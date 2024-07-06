@@ -1,7 +1,10 @@
 <?php
 
 class CReport_Jasper_Element {
-    public $objElement;
+    /**
+     * @var SimpleXMLElement
+     */
+    public $xmlElement;
 
     public $children;
 
@@ -9,15 +12,17 @@ class CReport_Jasper_Element {
 
     private $properties;
 
-    public function __construct($objElement) {
+    public function __construct($xmlElement) {
         $this->name = get_class($this);
-        $this->objElement = $objElement;
+        $this->xmlElement = $xmlElement;
         // atribui o conteúdo do label
-        $attributes = $objElement->attributes();
+        $attributes = $xmlElement->attributes();
+
         foreach ($attributes as $att => $value) {
-            $this->$att = $value;
+            $this->properties[(string) $att] = (string) $value;
+            // $this->$att = $value;
         }
-        foreach ($objElement as $obj => $value) {
+        foreach ($xmlElement as $obj => $value) {
             $obj = ($obj == 'break') ? 'Breaker' : $obj;
 
             $className = CReport_Jasper_ElementFactory::getClassName($obj);
@@ -30,6 +35,10 @@ class CReport_Jasper_Element {
                 $this->add(new $className($value));
             }
         }
+    }
+
+    public function getProperty($key, $default = null) {
+        return carr::get($this->properties, $key, $default);
     }
 
     /**

@@ -3,7 +3,7 @@
 class CReport_Jasper_Element_StaticText extends CReport_Jasper_Element {
     public function generate(CReport_Jasper_Report $report) {
         $row = $report->getCurrentRow();
-        $data = $this->objElement;
+        $data = $this->xmlElement;
         $align = 'L';
         $fill = 0;
         $border = 0;

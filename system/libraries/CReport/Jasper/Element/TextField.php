@@ -12,7 +12,7 @@ class CReport_Jasper_Element_TextField extends CReport_Jasper_Element {
     public function getInstructionDataMultiCell(CReport_Jasper_Report $report) {
         $rowData = $report->getCurrentRow();
 
-        $data = $this->objElement;
+        $data = $this->xmlElement;
         /** @var CReport_Jasper_Report $obj */
         $border = 0;
         $align = 'L';
@@ -33,7 +33,12 @@ class CReport_Jasper_Element_TextField extends CReport_Jasper_Element {
             $fill = 1;
         }
 
-        if ((isset($this->textAdjust) && $this->textAdjust == 'StretchHeight') || (isset($this->isStretchWithOverflow) && $this->isStretchWithOverflow == 'true')) {
+        $hyperlinkReferenceExpression = $data->hyperlinkReferenceExpression;
+        if ($hyperlinkReferenceExpression) {
+            $hyperlinkReferenceExpression = $report->getExpression($hyperlinkReferenceExpression, $rowData, false, $this);
+        }
+
+        if ($this->getProperty('textAdjust') == 'StretchHeight' || $this->getProperty('isStretchWithOverflow') == 'true') {
             $stretchoverflow = 'true';
         }
         if (isset($data->reportElement['isPrintWhenDetailOverflows']) && $data->reportElement['isPrintWhenDetailOverflows'] == 'true') {
@@ -77,7 +82,7 @@ class CReport_Jasper_Element_TextField extends CReport_Jasper_Element {
             $text = str_ireplace(['+', '+', '"'], ['', '', ''], $text);
         }
 
-        $patternExpression = $this->objElement->patternExpression;
+        $patternExpression = $this->xmlElement->patternExpression;
         $writeHTML = false;
 
         if ($data->textElement['markup'] == 'html') {
@@ -105,7 +110,7 @@ class CReport_Jasper_Element_TextField extends CReport_Jasper_Element {
             'border' => $border, 'align' => $align, 'fill' => $fill,
             'hidden_type' => 'field', 'soverflow' => $stretchoverflow, 'poverflow' => $printoverflow,
             'printWhenExpression' => $printWhenExpression . '',
-            'link' => $data->hyperlinkReferenceExpression . '',
+            'link' => $hyperlinkReferenceExpression . '',
             'pattern' => $data->pattern,
             'linktarget' => $data['hyperlinkTarget'] . '',
             'writeHTML' => $writeHTML,
@@ -122,7 +127,7 @@ class CReport_Jasper_Element_TextField extends CReport_Jasper_Element {
 
     public function generate(CReport_Jasper_Report $report) {
         $orginalObj = $report;
-        $data = $this->objElement;
+        $data = $this->xmlElement;
         $rowData = $report->getCurrentRow();
 
         $font = 'helvetica';
@@ -132,10 +137,6 @@ class CReport_Jasper_Element_TextField extends CReport_Jasper_Element {
         $fillcolor = ['r' => 255, 'g' => 255, 'b' => 255];
 
         $drawcolor = ['r' => 0, 'g' => 0, 'b' => 0];
-
-        if (isset($data->hyperlinkReferenceExpression)) {
-            $data->hyperlinkReferenceExpression = $report->getExpression($data->hyperlinkReferenceExpression, $rowData, false, $this);
-        }
 
         //SimpleXML object (1 item) [0] // ->codeExpression[0] ->attributes('xsi', true) ->schemaLocation ->attributes('', true) ->type ->drawText ->checksumRequired barbecue:
         //SimpleXMLElement Object ( [@attributes] => Array ( [hyperlinkType] => Reference [hyperlinkTarget] => Blank ) [reportElement] => SimpleX

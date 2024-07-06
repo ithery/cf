@@ -132,7 +132,7 @@ class CReport_Jasper_Element_Table extends CReport_Jasper_Element {
     }
 
     public function generate($obj = null) {
-        $data = $this->objElement;
+        $data = $this->xmlElement;
         //ComponentElement
         $reportElement = $obj[2];
         $rowData = is_array($obj) ? $obj[1] : null;
@@ -149,7 +149,7 @@ class CReport_Jasper_Element_Table extends CReport_Jasper_Element {
         $datasetRun = $table->children();
         $subDataset_name = trim($datasetRun->datasetRun->attributes()['subDataset']);
         //subDataset
-        foreach ($obj->objElement->subDataset as $dataSet) {
+        foreach ($obj->xmlElement->subDataset as $dataSet) {
             $name = trim($dataSet->attributes()['name']);
             //is dataSet of table?
             if ($name == $subDataset_name) {
@@ -259,9 +259,9 @@ class CReport_Jasper_Element_Table extends CReport_Jasper_Element {
                 //get max height
                 if (isset($column['columnHeader']['field'])) {
                     $field = $column['columnHeader']['field'];
-                    $text = $jasperObj->get_expression($field->objElement->text, $row);
+                    $text = $jasperObj->get_expression($field->xmlElement->text, $row);
                     //change font for height row
-                    $font = $field->objElement->textElement->font->attributes();
+                    $font = $field->xmlElement->textElement->font->attributes();
                     CReport_Jasper_Instructions::addInstruction(['type' => 'SetFont', 'font' => $font->fontName, 'fontstyle' => (isset($font->isBold) ? 'B' : ''), 'fontsize' => $font->size]);
                     CReport_Jasper_Instructions::runInstructions();
                     $height_new = $pdf->getStringHeight($width_column, $text) * 1.5;
@@ -281,11 +281,11 @@ class CReport_Jasper_Element_Table extends CReport_Jasper_Element {
                 if (isset($column['detailCell']['field'])) {
                     $field = $column['detailCell']['field'];
                     //get line spacing
-                    $lineHeightRatio = CReport_Jasper_Utils_ElementUtils::getLineHeightRatio($field->objElement->textElement, 1.1);
+                    $lineHeightRatio = CReport_Jasper_Utils_ElementUtils::getLineHeightRatio($field->xmlElement->textElement, 1.1);
 
-                    $text = $jasperObj->get_expression($field->objElement->textFieldExpression, $row);
+                    $text = $jasperObj->get_expression($field->xmlElement->textFieldExpression, $row);
                     //change font for height row
-                    $font = $field->objElement->textElement->font->attributes();
+                    $font = $field->xmlElement->textElement->font->attributes();
                     //$this->SetFont(array("font"=> $font->fontName, "fontstyle"=> (isset($font->isBold)?"B":""), "fontsize"=>$font->size));
                     CReport_Jasper_Instructions::addInstruction(['type' => 'SetFont', 'font' => $font->fontName, 'fontstyle' => (isset($font->isBold) ? 'B' : ''), 'fontsize' => $font->size]);
                     CReport_Jasper_Instructions::runInstructions();
@@ -322,10 +322,10 @@ class CReport_Jasper_Element_Table extends CReport_Jasper_Element {
                     $borders = $cell['borders'];
                     if (isset($cell['field'])) {
                         $field = $cell['field'];
-                        $field->objElement->reportElement['x'] = $x - $marginLeft;
-                        //$y = $startY+$field->objElement->reportElement["y"];
-                        $field->objElement->reportElement['height'] = $cell['h'];
-                        //$field->objElement->reportElement["y"]=$y;
+                        $field->xmlElement->reportElement['x'] = $x - $marginLeft;
+                        //$y = $startY+$field->xmlElement->reportElement["y"];
+                        $field->xmlElement->reportElement['height'] = $cell['h'];
+                        //$field->xmlElement->reportElement["y"]=$y;
                         $field->generate([$jasperObj, $row]);
                         CReport_Jasper_Instructions::runInstructions();
                     }
@@ -355,10 +355,10 @@ class CReport_Jasper_Element_Table extends CReport_Jasper_Element {
                     $borders = $cell['borders'];
                     if (isset($cell['field'])) {
                         $field = $cell['field'];
-                        $field->objElement->reportElement['x'] = $x - $marginLeft;
-                        //$y = $startY+$field->objElement->reportElement["y"];
-                        $field->objElement->reportElement['height'] = $height_header;
-                        //$field->objElement->reportElement["y"]=$y;
+                        $field->xmlElement->reportElement['x'] = $x - $marginLeft;
+                        //$y = $startY+$field->xmlElement->reportElement["y"];
+                        $field->xmlElement->reportElement['height'] = $height_header;
+                        //$field->xmlElement->reportElement["y"]=$y;
                         $field->generate([$jasperObj, $row]);
                         CReport_Jasper_Instructions::runInstructions();
                     }
@@ -389,9 +389,9 @@ class CReport_Jasper_Element_Table extends CReport_Jasper_Element {
                 $borders = $cell['borders'];
                 if (isset($cell['field'])) {
                     $field = $cell['field'];
-                    $field->objElement->reportElement['x'] = $x - $marginLeft;
-                    $field->objElement->reportElement['height'] = $height_detail;
-                    //$field->objElement->reportElement["y"]=$y;
+                    $field->xmlElement->reportElement['x'] = $x - $marginLeft;
+                    $field->xmlElement->reportElement['height'] = $height_detail;
+                    //$field->xmlElement->reportElement["y"]=$y;
                     $field->generate([$jasperObj, $row]);
                     CReport_Jasper_Instructions::runInstructions();
                 }
@@ -436,9 +436,9 @@ class CReport_Jasper_Element_Table extends CReport_Jasper_Element {
                 //echo $height."<br/>";
                 if (isset($cell['field'])) {
                     $field = $cell['field'];
-                    $field->objElement->reportElement['x'] = $x - $marginLeft;
-                    $field->objElement->reportElement['height'] = $height_columnFooter;
-                    //$field->objElement->reportElement["y"]=$y;
+                    $field->xmlElement->reportElement['x'] = $x - $marginLeft;
+                    $field->xmlElement->reportElement['height'] = $height_columnFooter;
+                    //$field->xmlElement->reportElement["y"]=$y;
                     $field->generate([$jasperObj, null]);
                     CReport_Jasper_Instructions::runInstructions();
                 }
@@ -484,9 +484,9 @@ class CReport_Jasper_Element_Table extends CReport_Jasper_Element {
                 //echo $height."<br/>";
                 if (isset($cell['field'])) {
                     $field = $cell['field'];
-                    $field->objElement->reportElement['x'] = $x - $marginLeft;
-                    $field->objElement->reportElement['height'] = $height_tableFooter;
-                    //$field->objElement->reportElement["y"]=$y;
+                    $field->xmlElement->reportElement['x'] = $x - $marginLeft;
+                    $field->xmlElement->reportElement['height'] = $height_tableFooter;
+                    //$field->xmlElement->reportElement["y"]=$y;
                     $field->generate([$jasperObj, null]);
                     CReport_Jasper_Instructions::runInstructions();
                 }

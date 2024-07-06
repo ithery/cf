@@ -5,5 +5,8 @@ abstract class CReport_Jasper_ProcessorAbstract {
 
     public function __construct(CReport_Jasper_Report $jasperReport) {
         $this->jasperReport = $jasperReport;
+        $this->prepare();
     }
+
+    abstract protected function prepare();
 }
