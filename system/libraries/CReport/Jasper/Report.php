@@ -635,13 +635,13 @@ class CReport_Jasper_Report {
             }
         }
         $this->arrayVariable[$k]['lastValue'] = $newValue;
-        if ($resetType == 'Group') {
-            $group = $this->getGroupCollection()->find($out['resetGroup']);
-            if ($group && $group->isResetVariable()) {
-                $value = 0;
-                $group->unsetResetVariable();
-            }
-        }
+        // if ($resetType == 'Group') {
+        //     $group = $this->getGroupCollection()->find($out['resetGroup']);
+        //     if ($group && $group->isResetVariable()) {
+        //         $value = 0;
+        //         $group->unsetResetVariable();
+        //     }
+        // }
         $this->arrayVariable[$k]['ans'] = $value;
     }
 

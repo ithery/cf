@@ -147,7 +147,12 @@ class CReport_Jasper_Element_Detail extends CReport_Jasper_Element {
                     }
 
                     if ($shouldRender) {
-                        $group->setResetVariable();
+                        //reset variable group here
+                        foreach ($report->arrayVariable as $varName => $variable) {
+                            if ($variable['resetType'] == 'Group' && $variable['resetGroup'] == $group->getName()) {
+                                $report->arrayVariable[$varName]['ans'] = 0;
+                            }
+                        }
                     }
                 }
 

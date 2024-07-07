@@ -21,17 +21,11 @@ class CReport_Jasper_Report_Group {
      */
     protected $groupHeader;
 
-    /**
-     * @var bool
-     */
-    protected $resetVariable;
-
     public function __construct($name, SimpleXMLElement $xmlElement) {
         $this->name = $name;
         $this->xmlElement = $xmlElement;
         $this->groupFooter = $xmlElement->groupFooter;
         $this->groupHeader = $xmlElement->groupHeader;
-        $this->resetVariable = false;
     }
 
     /**
@@ -74,30 +68,5 @@ class CReport_Jasper_Report_Group {
      */
     public function hasGroupHeader() {
         return (bool) $this->groupHeader;
-    }
-
-    /**
-     * @return bool
-     */
-    public function isResetVariable() {
-        return $this->resetVariable;
-    }
-
-    /**
-     * @return CReport_Jasper_Report_Group
-     */
-    public function setResetVariable() {
-        $this->resetVariable = true;
-
-        return $this;
-    }
-
-    /**
-     * @return CReport_Jasper_Report_Group
-     */
-    public function unsetResetVariable() {
-        $this->resetVariable = false;
-
-        return $this;
     }
 }
