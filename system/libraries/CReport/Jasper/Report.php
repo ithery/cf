@@ -197,8 +197,8 @@ class CReport_Jasper_Report {
                 'calculation' => $variable['calculation'] . '',
                 'target' => $variable->variableExpression,
                 'class' => $variable['class'] . '',
-                'resetType' => $variable['resetType'] . '',
-                'resetGroup' => $variable['resetGroup'] . '',
+                'resetType' => (string) c::get($variable, 'resetType') . '',
+                'resetGroup' => (string) c::get($variable, 'resetGroup') . '',
                 'initialValue' => (string) $variable->initialValueExpression . '',
                 'incrementType' => $variable['incrementType']
             ];
@@ -628,8 +628,9 @@ class CReport_Jasper_Report {
         }
         $this->arrayVariable[$k]['lastValue'] = $newValue;
         if ($resetType == 'Group') {
-            if ($this->arrayGroup[$out['resetGroup']]->resetVariables == 'true') {
+            if ($this->arrayGroup[$out['resetGroup']]['resetVariables'] == 'true') {
                 $value = $newValue;
+                $this->arrayGroup[$out['resetGroup']]['resetVariables'] = 'false';
             }
         }
         $this->arrayVariable[$k]['ans'] = $value;
@@ -811,7 +812,6 @@ class CReport_Jasper_Report {
         $pdf = CReport_Jasper_Instructions::get();
         CReport_Jasper_Manager::instance()->unsetGenerator();
 
-        // cdbg::dd('A');
 
         return $pdf;
     }

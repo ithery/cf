@@ -42,16 +42,19 @@ class CReport_Jasper_Element_Detail extends CReport_Jasper_Element {
                                 $shouldRender = true;
                             }
                         }
-                        if (($group->resetVariables == 'true' || $shouldRender) && ($group->groupFooter && $rowIndex > 0)) {
+                        if ($shouldRender && ($group->groupFooter && $rowIndex > 0)) {
+                            // cdbg::dd($group);
                             $groupFooter = new CReport_Jasper_Element_GroupFooter($group->groupFooter);
                             $groupFooter->generate($report);
-                            $group->resetVariables = 'false';
+
                         }
 
-                        if (($rowIndex == 0 || $group->resetVariables == 'true' || $shouldRender) && ($group->groupHeader)) {
+                        if (($rowIndex == 0 || $shouldRender) && ($group->groupHeader)) {
                             $groupHeader = new CReport_Jasper_Element_GroupHeader($group->groupHeader);
                             $groupHeader->generate($report);
-                            $group->resetVariables = 'false';
+                        }
+                        if($shouldRender) {
+                            $group['resetVariables'] = 'true';
                         }
                     }
                 }
@@ -145,7 +148,6 @@ class CReport_Jasper_Element_Detail extends CReport_Jasper_Element {
                     if (($group->groupFooter)) {
                         $groupFooter = new CReport_Jasper_Element_GroupFooter($group->groupFooter);
                         $groupFooter->generate($report);
-                        $group->resetVariables = 'false';
                     }
                 }
             }
