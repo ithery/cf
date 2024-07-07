@@ -27,12 +27,17 @@ class CReport_Jasper_Utils_ElementUtils {
     /**
      * Return format for a component of a box.
      *
-     * @param SimpleXMLElement $pen
+     * @param SimpleXMLElement      $pen
+     * @param null|SimpleXMLElement $box
      *
      * @return int[]|string[]|int[][]
      */
-    public static function formatPen(SimpleXMLElement $pen) {
-        if (isset($pen['lineColor'])) {
+    public static function formatPen(SimpleXMLElement $pen, SimpleXMLElement $box = null) {
+        $lineColor = $pen['lineColor'];
+        if (!$lineColor && $box && $box->pen) {
+            $lineColor = $box->pen['lineColor'];
+        }//get default box
+        if ($lineColor) {
             $drawcolor = [
                 'r' => hexdec(substr($pen['lineColor'], 1, 2)),
                 'g' => hexdec(substr($pen['lineColor'], 3, 2)),

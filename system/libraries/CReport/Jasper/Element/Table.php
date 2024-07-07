@@ -5,80 +5,16 @@ class CReport_Jasper_Element_Table extends CReport_Jasper_Element {
 
     private static $page = 0;
 
+    private $reportElement = null;
+
+    public function setReportElement($reportElement) {
+        $this->reportElement = $reportElement;
+    }
+
     public function getColorFill($data) {
         if (isset($data['backcolor'])) {
             return ['backcolor' => $data['backcolor'], 'r' => hexdec(substr($data['backcolor'], 1, 2)), 'g' => hexdec(substr($data['backcolor'], 3, 2)), 'b' => hexdec(substr($data['backcolor'], 5, 2))];
         }
-    }
-
-    public function formatPen($box, $pen) {
-        if (!isset($pen['lineColor'])) {
-            $pen['lineColor'] = $box->pen['lineColor'];
-        }//get default box
-
-        //default
-        if (isset($pen['lineColor'])) {
-            $drawcolor = [
-                'r' => hexdec(substr($pen['lineColor'], 1, 2)),
-                'g' => hexdec(substr($pen['lineColor'], 3, 2)),
-                'b' => hexdec(substr($pen['lineColor'], 5, 2))
-            ];
-        }
-
-        $dash = '';
-        if (isset($pen['lineStyle'])) {
-            if ($pen['lineStyle'] == 'Dotted') {
-                $dash = '1,1';
-            } elseif ($pen['lineStyle'] == 'Dashed') {
-                $dash = '4,2';
-            }
-
-            // Dotted Dashed
-        }
-
-        return [
-            'width' => $pen['lineWidth'] + 0,
-            'cap' => 'butt',
-            'join' => 'miter',
-            'dash' => $dash,
-            'phase' => 0,
-            'color' => $drawcolor
-        ];
-    }
-
-    public function formatBox($box) {
-        $border = [];
-        /*
-        <topPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
-        <leftPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
-        <bottomPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
-        <rightPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
-        $border = array(
-           'T' => array('width' => 1, 'color' => array(0,255,0), 'dash' => 4, 'cap' => 'butt'),
-           'R' => array('width' => 2, 'color' => array(255,0,255), 'dash' => '1,3', 'cap' => 'round'),
-           'B' => array('width' => 3, 'color' => array(0,0,255), 'dash' => 0, 'cap' => 'square'),
-           'L' => array('width' => 4, 'color' => array(255,0,255), 'dash' => '3,1,0.5,2', 'cap' => 'butt'),
-        );
-        */
-
-        //top border cell
-        if (isset($box->topPen['lineWidth']) && $box->topPen['lineWidth'] > 0.0) {
-            $border['T'] = $this->formatPen($box, $box->topPen);
-        }
-        //leftPen border cell
-        if (isset($box->leftPen['lineWidth']) && $box->leftPen['lineWidth'] > 0.0) {
-            $border['L'] = $this->formatPen($box, $box->leftPen);
-        }
-        //bottomPen border cell
-        if (isset($box->bottomPen['lineWidth']) && $box->bottomPen['lineWidth'] > 0.0) {
-            $border['B'] = $this->formatPen($box, $box->bottomPen);
-        }
-        //rightPen border cell
-        if (isset($box->rightPen['lineWidth']) && $box->rightPen['lineWidth'] > 0.0) {
-            $border['R'] = $this->formatPen($box, $box->rightPen);
-        }
-
-        return $border;
     }
 
     public function prepareColumn($column, $obj) {
@@ -100,7 +36,7 @@ class CReport_Jasper_Element_Table extends CReport_Jasper_Element {
         if ($column->children()->box) {
             $box = (object) array_merge((array) $box, (array) $column->children()->box);
         }
-        $borders = $this->formatBox($box);
+        $borders = CReport_Jasper_Utils_ElementUtils::formatBox($box);
         $objColumn['borders'] = $borders;//default
         $objColumn['h'] = $attributes['height'];
         foreach ($column->children() as $k => $v) {

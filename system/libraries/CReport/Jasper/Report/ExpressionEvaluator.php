@@ -68,4 +68,42 @@ class CReport_Jasper_Report_ExpressionEvaluator {
 
         return false;
     }
+
+    public function getVariableValue($variable, $text, $htmlentities = false, $element = null) {
+        $val = array_key_exists($variable, $this->arrayVariable) ? $this->arrayVariable[$variable] : [];
+        $ans = array_key_exists('ans', $val)
+            ? $val['ans']
+            : (
+                array_key_exists('initialValue', $val)
+                ? $val['initialValue']
+                : ''
+            );
+        if (preg_match_all('/V{' . $variable . "}\.toString/", $text, $matchesV) > 0) {
+            //$ans = $ans+0;
+            $ans = ($ans) ? number_format($ans, 2, ',', '.') : $ans;
+
+            return str_ireplace(['$V{' . $variable . '}.toString()'], [$ans], $text);
+        } elseif (preg_match_all('/V{' . $variable . "}\.numberToText/", $text, $matchesV) > 0) {
+            return str_ireplace(['$V{' . $variable . '}.numberToText()'], [CReport_Jasper_Utils_FormatUtils::numberToText($ans, false)], $text);
+        } elseif (preg_match_all('/V{' . $variable . "}\.(\w+)/", $text, $matchesV) > 0) {
+            $funcName = $matchesV[1][0];
+            if (method_exists($this, $funcName)) {
+                return str_ireplace(['$V{' . $variable . '}'], [call_user_func_array([$this, $funcName], [$ans, true])], $text);
+            } else {
+                return str_ireplace(['$V{' . $variable . '}'], [call_user_func($funcName, $ans)], $text);
+            }
+        } elseif ($variable == 'MASTER_TOTAL_PAGES') {
+            return str_ireplace(['$V{MASTER_TOTAL_PAGES}'], ['{:ptp:}'], $text);
+        } elseif ($variable == 'PAGE_NUMBER' || $variable == 'MASTER_CURRENT_PAGE' || $variable == 'CURRENT_PAGE_NUMBER') {
+            if ((CReport_Jasper_Instructions::$processingPageFooter && CReport_Jasper_Instructions::$lastPageFooter)
+               || (isset($element->evaluationTime) && $element->evaluationTime == 'Report')
+            ) {
+                return str_ireplace(['$V{' . $variable . '}'], ['{:ptp:}'], $text);
+            }
+
+            return str_ireplace(['$V{' . $variable . '}'], [CReport_Jasper_Instructions::$currrentPage], $text);
+        } else {
+            return str_ireplace(['$V{' . $variable . '}'], [$ans], $text);
+        }
+    }
 }

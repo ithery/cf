@@ -399,7 +399,7 @@ class CReport_Jasper_Processor_PdfProcessor extends CReport_Jasper_ProcessorAbst
             }
             CReport_Jasper_Instructions::addInstruction(['type' => 'resetYAxis']);
             CReport_Jasper_Instructions::$currrentPage++;
-            CReport_Jasper_Instructions::addInstruction(['type' => 'AddPage']);
+            CReport_Jasper_Instructions::addInstruction(['type' => 'addPage']);
             CReport_Jasper_Instructions::addInstruction(['type' => 'setPage', 'value' => CReport_Jasper_Instructions::$currrentPage, 'resetMargins' => false]);
             $pageHeader = $this->jasperReport->getRoot()->getChildByClassName('PageHeader');
             //if (JasperPHP\Pdf::$print_expression_result == true) {

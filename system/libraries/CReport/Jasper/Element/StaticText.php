@@ -22,7 +22,11 @@ class CReport_Jasper_Element_StaticText extends CReport_Jasper_Element {
         $isPrintRepeatedValues = '';
         $valign = '';
         //$data->hyperlinkReferenceExpression=$this->analyse_expression($data->hyperlinkReferenceExpression);
-        $data->hyperlinkReferenceExpression = trim(str_replace([' ', '"'], '', $data->hyperlinkReferenceExpression));
+        $hyperlinkReferenceExpression = $data->hyperlinkReferenceExpression;
+        if ($hyperlinkReferenceExpression) {
+            $hyperlinkReferenceExpression = trim(str_replace([' ', '"'], '', $hyperlinkReferenceExpression));
+        }
+        // $data->hyperlinkReferenceExpression = trim(str_replace([' ', '"'], '', $data->hyperlinkReferenceExpression));
         if (isset($data->reportElement['forecolor'])) {
             $textcolor = ['forecolor' => $data->reportElement['forecolor'], 'r' => hexdec(substr($data->reportElement['forecolor'], 1, 2)), 'g' => hexdec(substr($data->reportElement['forecolor'], 3, 2)), 'b' => hexdec(substr($data->reportElement['forecolor'], 5, 2))];
         }
@@ -83,12 +87,21 @@ class CReport_Jasper_Element_StaticText extends CReport_Jasper_Element {
         // }
         $lineHeightRatio = CReport_Jasper_Utils_ElementUtils::getLineHeightRatio($data->textElement, 1);
 
-        CReport_Jasper_Instructions::addInstruction([
-            'type' => 'setCellHeightRatio',
+        $report->getInstructions()->addInstruction(CReport_Jasper_Instruction::TYPE_SET_CELL_HEIGHT_RATIO, [
             'ratio' => $lineHeightRatio
         ]);
-        CReport_Jasper_Instructions::addInstruction(['type' => 'setXY', 'x' => $data->reportElement['x'] + 0, 'y' => $data->reportElement['y'] + 0, 'hidden_type' => 'SetXY']);
-        CReport_Jasper_Instructions::addInstruction(['type' => 'setTextColor', 'forecolor' => $data->reportElement['forecolor'] . '', 'r' => $textcolor['r'], 'g' => $textcolor['g'], 'b' => $textcolor['b'], 'hidden_type' => 'textcolor']);
+        $report->getInstructions()->addInstruction(CReport_Jasper_Instruction::TYPE_SET_XY, [
+            'x' => $data->reportElement['x'] + 0,
+            'y' => $data->reportElement['y'] + 0,
+            'hidden_type' => 'setXY'
+        ]);
+        $report->getInstructions()->addInstruction(CReport_Jasper_Instruction::TYPE_SET_TEXT_COLOR, [
+            'forecolor' => $data->reportElement['forecolor'] . '',
+            'r' => $textcolor['r'],
+            'g' => $textcolor['g'],
+            'b' => $textcolor['b'],
+            'hidden_type' => 'textcolor'
+        ]);
         CReport_Jasper_Instructions::addInstruction(['type' => 'setDrawColor', 'r' => $drawcolor['r'], 'g' => $drawcolor['g'], 'b' => $drawcolor['b'], 'hidden_type' => 'drawcolor']);
         CReport_Jasper_Instructions::addInstruction(['type' => 'setFillColor', 'backcolor' => $data->reportElement['backcolor'] . '', 'r' => $fillcolor['r'], 'g' => $fillcolor['g'], 'b' => $fillcolor['b'], 'hidden_type' => 'fillcolor']);
         CReport_Jasper_Instructions::addInstruction(['type' => 'setFont', 'font' => $font, 'pdfFontName' => $data->textElement->font ? $data->textElement->font['pdfFontName'] : '', 'fontstyle' => $fontstyle, 'fontsize' => $fontsize, 'hidden_type' => 'font']);

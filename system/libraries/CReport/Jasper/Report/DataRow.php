@@ -74,4 +74,21 @@ class CReport_Jasper_Report_DataRow implements ArrayAccess {
 
         return null;
     }
+
+    /**
+     * @return array
+     */
+    public function toArray() {
+        if ($this->row instanceof CMOdel) {
+            return $this->row->getAttributes();
+        }
+        if ($this->row instanceof CCollection) {
+            return $this->row->toArray();
+        }
+        if (is_array($this->row)) {
+            return $this->row;
+        }
+
+        return [];
+    }
 }
