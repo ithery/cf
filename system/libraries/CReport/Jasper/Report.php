@@ -22,8 +22,6 @@ class CReport_Jasper_Report {
 
     public $arrayfield;
 
-    public $arrayParameter;
-
     public $arrayProperty;
 
     public $arrayPageSetting;
@@ -64,12 +62,17 @@ class CReport_Jasper_Report {
     private $currentRow;
 
     /**
-     * @var null|CReport_Jasper_Report_GroupCollection
+     * @var CReport_Jasper_Report_GroupCollection
      */
     private $groupCollection;
 
     /**
-     * @var null|CReport_Jasper_Report_VariableCollection
+     * @var CReport_Jasper_Report_ParameterCollection
+     */
+    private $parameterCollection;
+
+    /**
+     * @var CReport_Jasper_Report_VariableCollection
      */
     private $variableCollection;
 
@@ -82,6 +85,7 @@ class CReport_Jasper_Report {
         $this->root = new CReport_Jasper_Element_Root($xmlElement);
         $this->instructionRepository = new CReport_Jasper_InstructionRepository();
         $this->groupCollection = new CReport_Jasper_Report_GroupCollection();
+        $this->parameterCollection = new CReport_Jasper_Report_ParameterCollection();
         $this->variableCollection = new CReport_Jasper_Report_VariableCollection();
         // $this->name = get_class($this);
 
@@ -152,6 +156,20 @@ class CReport_Jasper_Report {
     }
 
     /**
+     * @return CReport_Jasper_Report_ParameterCollection
+     */
+    public function getParameterCollection() {
+        return $this->parameterCollection;
+    }
+
+    /**
+     * @return CReport_Jasper_Report_VariableCollection
+     */
+    public function getVariableCollection() {
+        return $this->variableCollection;
+    }
+
+    /**
      * @param mixed $currentRow
      *
      * @return CReport_Jasper_Report_DataRow
@@ -186,15 +204,12 @@ class CReport_Jasper_Report {
         }
     }
 
-    public function parameterHandler($xml_path, $param) {
-        $this->arrayParameter = [];
-        if ($xml_path->parameter) {
-            foreach ($xml_path->parameter as $parameter) {
-                $paraName = (string) $parameter['name'];
-                $this->arrayParameter[$paraName] = array_key_exists($paraName, $param) ? $param[$paraName] : '';
+    public function parameterHandler(SimpleXMLElement $xmlElement, $param) {
+        if ($xmlElement->parameter) {
+            foreach ($xmlElement->parameter as $parameter) {
+                $name = (string) $parameter['name'];
+                $this->parameterCollection->push(new CReport_Jasper_Report_Parameter($name, carr::get($param, $name), $parameter));
             }
-        } else {
-            $this->arrayParameter = [];
         }
     }
 
@@ -275,9 +290,7 @@ class CReport_Jasper_Report {
         //var_dump($xml_path);
         $this->sql = (string) $xml_path->queryString;
         if (strlen(trim($xml_path->queryString)) > 0) {
-            if (isset($this->arrayParameter)) {
-                $this->sql = $this->prepareSql($this->sql, $this->arrayParameter);
-            }
+            $this->sql = $this->prepareSql($this->sql, $this->parameterCollection->getList());
         }
     }
 
@@ -324,7 +337,7 @@ class CReport_Jasper_Report {
         preg_match_all("/P{(\w+)}/", $text, $matchesP);
         if ($matchesP) {
             foreach ($matchesP[1] as $macthP) {
-                $text = str_ireplace(['$P{' . $macthP . '}', '"'], [$this->arrayParameter[$macthP], ''], $text);
+                $text = str_ireplace(['$P{' . $macthP . '}', '"'], [$this->parameterCollection->getValue($macthP), ''], $text);
             }
         }
 
@@ -526,7 +539,7 @@ class CReport_Jasper_Report {
         preg_match_all("/P{(\w+)}/", $out['target'], $matchesP);
         if ($matchesP) {
             foreach ($matchesP[1] as $macthP) {
-                $out['target'] = str_ireplace(['$P{' . $macthP . '}'], [$this->arrayParameter[$macthP]], $out['target']);
+                $out['target'] = str_ireplace(['$P{' . $macthP . '}'], [$this->parameterCollection->getValue($macthP)], $out['target']);
             }
         }
         preg_match_all("/V{(\w+)}/", $out['target'], $matchesV);
