@@ -13,7 +13,7 @@ class CReport_Jasper {
      */
     protected $dataProvider;
 
-    public function __construct($jrxml, $param = []) {
+    public function __construct($jrxml, array $param = []) {
         $this->report = new CReport_Jasper_Report($jrxml, $param);
     }
 

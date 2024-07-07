@@ -83,6 +83,7 @@ class CReport_Jasper_Report {
         $keyword = '<queryString>
         <![CDATA[';
         $xmlFile = str_replace($keyword, '<queryString><![CDATA[', $xmlFile);
+
         $xmlElement = simplexml_load_string($xmlFile, null, LIBXML_NOCDATA);
         $this->param = $param;
         $this->root = new CReport_Jasper_Element_Root($xmlElement);
