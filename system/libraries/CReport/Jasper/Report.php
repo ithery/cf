@@ -22,8 +22,6 @@ class CReport_Jasper_Report {
 
     public $arrayfield;
 
-    public $arrayProperty;
-
     public $arrayPageSetting;
 
     public $sql;
@@ -76,6 +74,11 @@ class CReport_Jasper_Report {
      */
     private $variableCollection;
 
+    /**
+     * @var CCollection
+     */
+    private $propertyCollection;
+
     public function __construct($xmlFile, $param) {
         $keyword = '<queryString>
         <![CDATA[';
@@ -87,6 +90,7 @@ class CReport_Jasper_Report {
         $this->groupCollection = new CReport_Jasper_Report_GroupCollection();
         $this->parameterCollection = new CReport_Jasper_Report_ParameterCollection();
         $this->variableCollection = new CReport_Jasper_Report_VariableCollection();
+        $this->propertyCollection = new CCollection();
         // $this->name = get_class($this);
 
         // atribui o conteúdo do label
@@ -213,15 +217,12 @@ class CReport_Jasper_Report {
         }
     }
 
-    public function propertyHandler($xml_path, $param) {
-        $this->arrayProperty = [];
-        if ($xml_path->property) {
-            foreach ($xml_path->property as $property) {
-                $paraName = (string) $property['name'];
-                $this->arrayProperty[$paraName] = (string) $property['value'];
+    public function propertyHandler($xmlElement) {
+        if ($xmlElement->property) {
+            foreach ($xmlElement->property as $property) {
+                $name = (string) $property['name'];
+                $this->propertyCollection->offsetSet($name, (string) $property['value']);
             }
-        } else {
-            $this->arrayProperty = [];
         }
     }
 
@@ -251,7 +252,7 @@ class CReport_Jasper_Report {
         }
     }
 
-    public function prepareSql($sql, $arrayParameter = []) {
+    protected function prepareSql($sql, $arrayParameter = []) {
         if (isset($arrayParameter) && !empty($arrayParameter)) {
             foreach ($arrayParameter as $v => $a) {
                 if (is_array($a)) {
@@ -286,10 +287,10 @@ class CReport_Jasper_Report {
         return $sql;
     }
 
-    public function queryStringHandler($xml_path) {
+    public function queryStringHandler($xmlElement) {
         //var_dump($xml_path);
-        $this->sql = (string) $xml_path->queryString;
-        if (strlen(trim($xml_path->queryString)) > 0) {
+        $this->sql = (string) $xmlElement->queryString;
+        if (strlen(trim($xmlElement->queryString)) > 0) {
             $this->sql = $this->prepareSql($this->sql, $this->parameterCollection->getList());
         }
     }
