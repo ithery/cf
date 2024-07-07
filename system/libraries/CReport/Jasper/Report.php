@@ -28,8 +28,6 @@ class CReport_Jasper_Report {
 
     public $arrayPageSetting;
 
-    public $arrayGroup;
-
     public $sql;
 
     public $print_expression_result;
@@ -60,7 +58,15 @@ class CReport_Jasper_Report {
      */
     private $instructionRepository;
 
+    /**
+     * @var null|CReport_Jasper_Report_DataRow
+     */
     private $currentRow;
+
+    /**
+     * @var null|CReport_Jasper_Report_GroupCollection
+     */
+    private $groupCollection;
 
     public function __construct($xmlFile, $param) {
         $keyword = '<queryString>
@@ -70,6 +76,7 @@ class CReport_Jasper_Report {
         $this->param = $param;
         $this->root = new CReport_Jasper_Element_Root($xmlElement);
         $this->instructionRepository = new CReport_Jasper_InstructionRepository();
+        $this->groupCollection = new CReport_Jasper_Report_GroupCollection();
         // $this->name = get_class($this);
 
         // atribui o conteúdo do label
@@ -128,6 +135,13 @@ class CReport_Jasper_Report {
         }
 
         return $this->data->current();
+    }
+
+    /**
+     * @return CReport_Jasper_Report_GroupCollection
+     */
+    public function getGroupCollection() {
+        return $this->groupCollection;
     }
 
     /**
@@ -205,12 +219,10 @@ class CReport_Jasper_Report {
         }
     }
 
-    public function groupHandler($xml_path) {
-        $this->arrayGroup = [];
-        foreach ($xml_path->group as $group) {
+    public function groupHandler(SimpleXMLElement $xmlElement) {
+        foreach ($xmlElement->group as $group) {
             $groupName = (string) $group['name'];
-            $this->arrayGroup[$groupName] = $group;
-            $group->addAttribute('resetVariables', 'false');
+            $this->groupCollection->push(new CReport_Jasper_Report_Group($groupName, $group));
         }
     }
 
@@ -433,7 +445,6 @@ class CReport_Jasper_Report {
             }
         }
         $val = $obj;
-        error_reporting(5);
         $fieldRegExp = str_ireplace('[', "\[", $field);
         if (preg_match_all('/F{' . $fieldRegExp . "}\.toString/", $text, $matchesV) > 0) {
             //$val = ($val)?$val:0;
@@ -628,9 +639,10 @@ class CReport_Jasper_Report {
         }
         $this->arrayVariable[$k]['lastValue'] = $newValue;
         if ($resetType == 'Group') {
-            if ($this->arrayGroup[$out['resetGroup']]['resetVariables'] == 'true') {
+            $group = $this->getGroupCollection()->find($out['resetGroup']);
+            if ($group && $group->isResetVariable()) {
                 $value = $newValue;
-                $this->arrayGroup[$out['resetGroup']]['resetVariables'] = 'false';
+                $group->unsetResetVariable();
             }
         }
         $this->arrayVariable[$k]['ans'] = $value;
@@ -811,7 +823,6 @@ class CReport_Jasper_Report {
 
         $pdf = CReport_Jasper_Instructions::get();
         CReport_Jasper_Manager::instance()->unsetGenerator();
-
 
         return $pdf;
     }

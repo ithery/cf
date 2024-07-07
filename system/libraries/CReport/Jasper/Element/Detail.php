@@ -30,34 +30,26 @@ class CReport_Jasper_Element_Detail extends CReport_Jasper_Element {
                 $report->arrayVariable['totalRows']['target'] = $totalRows;
                 $report->arrayVariable['totalRows']['calculation'] = null;
                 // $row->totalRows = $totalRows;
-                if (count($report->arrayGroup) > 0) {
-                    foreach ($report->arrayGroup as $group) {
-                        preg_match_all("/F{(\w+)}/", $group->groupExpression, $matchesF);
-                        $groupExpression = $matchesF[1][0];
-                        $shouldRender = false;
-                        if ($lastRow) {
-                            $lastGroupValue = carr::get($lastRow, $groupExpression);
-                            $groupValue = carr::get($row, $groupExpression);
-                            if ($lastGroupValue != $groupValue) {
-                                $shouldRender = true;
-                            }
-                        }
-                        if ($shouldRender && ($group->groupFooter && $rowIndex > 0)) {
-                            // cdbg::dd($group);
-                            $groupFooter = new CReport_Jasper_Element_GroupFooter($group->groupFooter);
-                            $groupFooter->generate($report);
 
-                        }
-
-                        if (($rowIndex == 0 || $shouldRender) && ($group->groupHeader)) {
-                            $groupHeader = new CReport_Jasper_Element_GroupHeader($group->groupHeader);
-                            $groupHeader->generate($report);
-                        }
-                        if($shouldRender) {
-                            $group['resetVariables'] = 'true';
+                foreach ($report->getGroupCollection() as $group) {
+                    /** @var CReport_Jasper_Report_Group $group */
+                    preg_match_all("/F{(\w+)}/", $group->getGroupExpression(), $matchesF);
+                    $groupExpression = $matchesF[1][0];
+                    $shouldRender = false;
+                    if ($lastRow) {
+                        $lastGroupValue = carr::get($lastRow, $groupExpression);
+                        $groupValue = carr::get($row, $groupExpression);
+                        if ($lastGroupValue != $groupValue) {
+                            $shouldRender = true;
                         }
                     }
+
+                    if (($rowIndex == 0 || $shouldRender) && ($group->hasGroupHeader())) {
+                        $groupHeader = new CReport_Jasper_Element_GroupHeader($group->getGroupHeader());
+                        $groupHeader->generate($report);
+                    }
                 }
+
                 $background = $report->getRoot()->getChildByClassName('Background');
 
                 if ($background) {
@@ -137,19 +129,34 @@ class CReport_Jasper_Element_Detail extends CReport_Jasper_Element {
                     }
                 }
 
-                $arrayVariable = ($report->arrayVariable) ? $report->arrayVariable : [];
-                $recordObject = array_key_exists('recordObj', $arrayVariable) ? $report->arrayVariable['recordObj']['initialValue'] : 'stdClass';
-
-                $lastRow = $row;
+                // $arrayVariable = ($report->arrayVariable) ? $report->arrayVariable : [];
+                // $recordObject = array_key_exists('recordObj', $arrayVariable) ? $report->arrayVariable['recordObj']['initialValue'] : 'stdClass';
                 $report->variablesCalculation($row);
-            }
-            if (count($report->arrayGroup) > 0 && $totalRows > 0) {
-                foreach ($report->arrayGroup as $group) {
-                    if (($group->groupFooter)) {
-                        $groupFooter = new CReport_Jasper_Element_GroupFooter($group->groupFooter);
+                $nextRow = carr::get($data, $rowIndex + 1);
+                foreach ($report->getGroupCollection() as $group) {
+                    /** @var CReport_Jasper_Report_Group $group */
+                    preg_match_all("/F{(\w+)}/", $group->getGroupExpression(), $matchesF);
+                    $groupExpression = $matchesF[1][0];
+                    $shouldRender = false;
+                    if ($nextRow) {
+                        $nextGroupValue = carr::get($nextRow, $groupExpression);
+                        $groupValue = carr::get($row, $groupExpression);
+                        if ($nextGroupValue != $groupValue) {
+                            $shouldRender = true;
+                        }
+                    }
+                    if ($shouldRender && ($group->hasGroupFooter() && $rowIndex > 0)) {
+                        // cdbg::dd($group);
+                        $groupFooter = new CReport_Jasper_Element_GroupFooter($group->getGroupFooter());
                         $groupFooter->generate($report);
                     }
+
+                    if ($shouldRender) {
+                        $group->setResetVariable();
+                    }
                 }
+
+                $lastRow = $row;
             }
 
             //$this->close();

@@ -12,7 +12,7 @@ class CReport_Jasper_Element {
 
     private $properties;
 
-    public function __construct($xmlElement) {
+    public function __construct(SimpleXMLElement $xmlElement) {
         $this->name = get_class($this);
         $this->xmlElement = $xmlElement;
         // atribui o conteúdo do label
