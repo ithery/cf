@@ -12,9 +12,6 @@ class CReport_Jasper_Element_Detail extends CReport_Jasper_Element {
                 /** @var CReport_Jasper_Report_DataRow $row */
                 $report->setCurrentRow($row);
 
-                if (CReport_Jasper_Report::$proccessintructionsTime == 'inline') {
-                    CReport_Jasper_Instructions::runInstructions();
-                }
                 // convert array to object
                 // if (!is_object($row) && is_array($row)) {
                 //     $row = (object) $row;
@@ -109,16 +106,12 @@ class CReport_Jasper_Element_Detail extends CReport_Jasper_Element {
                             if ($child->xmlElement['splitType'] == 'Stretch' || $child->xmlElement['splitType'] == 'Prevent') {
                                 CReport_Jasper_Instructions::addInstruction(['type' => 'preventYAxis', 'y_axis' => $height]);
                             }
-                            if (CReport_Jasper_Report::$proccessintructionsTime == 'inline') {
-                                CReport_Jasper_Instructions::runInstructions();
-                            }
+
                             $child->generate($report);
                             if ($child->xmlElement['splitType'] == 'Stretch' || $child->xmlElement['splitType'] == 'Prevent') {
                                 CReport_Jasper_Instructions::addInstruction(['type' => 'setYAxis', 'y_axis' => $height]);
                             }
-                            if (CReport_Jasper_Report::$proccessintructionsTime == 'inline') {
-                                CReport_Jasper_Instructions::runInstructions();
-                            }
+
                             if ($report->arrayPageSetting['columnCount'] > 1) {
                                 CReport_Jasper_Instructions::addInstruction(['type' => 'changeColumn']);
                                 if (is_int($rowIndex / $report->arrayPageSetting['columnCount'])) {

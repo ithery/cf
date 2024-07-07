@@ -8,6 +8,9 @@ class CReport_Jasper_Manager {
 
     private static $instance;
 
+    /**
+     * @return CReport_Jasper_Manager
+     */
     public static function instance() {
         if (self::$instance == null) {
             self::$instance = new self();

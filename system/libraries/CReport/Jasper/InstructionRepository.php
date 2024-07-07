@@ -17,6 +17,10 @@ class CReport_Jasper_InstructionRepository {
             $instruction = new CReport_Jasper_Instruction($type, $param);
         }
         $this->instructions[] = $instruction;
+        // $generator = CReport_Jasper_Manager::instance()->getGenerator();
+        // if ($generator) {
+        //     $this->run($generator->getReport()->getProcessor());
+        // }
 
         return $this;
     }

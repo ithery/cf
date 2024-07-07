@@ -68,6 +68,11 @@ class CReport_Jasper_Report {
      */
     private $groupCollection;
 
+    /**
+     * @var null|CReport_Jasper_Report_VariableCollection
+     */
+    private $variableCollection;
+
     public function __construct($xmlFile, $param) {
         $keyword = '<queryString>
         <![CDATA[';
@@ -77,6 +82,7 @@ class CReport_Jasper_Report {
         $this->root = new CReport_Jasper_Element_Root($xmlElement);
         $this->instructionRepository = new CReport_Jasper_InstructionRepository();
         $this->groupCollection = new CReport_Jasper_Report_GroupCollection();
+        $this->variableCollection = new CReport_Jasper_Report_VariableCollection();
         // $this->name = get_class($this);
 
         // atribui o conteúdo do label
@@ -101,6 +107,7 @@ class CReport_Jasper_Report {
      */
     public function setData(CCollection $data) {
         $this->data = new CReport_Jasper_Report_DataIterator($data);
+        $this->variableCollection->find('totalRows')->setValue($this->data->count());
 
         return $this;
     }
@@ -205,8 +212,11 @@ class CReport_Jasper_Report {
 
     public function variableHandler($xml_path) {
         $this->arrayVariable = [];
+        $this->variableCollection->push(new CReport_Jasper_Report_Variable('REPORT_COUNT'));
+        $this->variableCollection->push(new CReport_Jasper_Report_Variable('totalRows'));
         foreach ($xml_path->variable as $variable) {
             $varName = (string) $variable['name'];
+            $this->variableCollection->push(new CReport_Jasper_Report_Variable($varName, $variable));
             $this->arrayVariable[$varName] = [
                 'calculation' => $variable['calculation'] . '',
                 'target' => $variable->variableExpression,
@@ -384,7 +394,7 @@ class CReport_Jasper_Report {
 
             return str_ireplace(['$V{' . $variable . '}.toString()'], [$ans], $text);
         } elseif (preg_match_all('/V{' . $variable . "}\.numberToText/", $text, $matchesV) > 0) {
-            return str_ireplace(['$V{' . $variable . '}.numberToText()'], [$this->numberToText($ans, false)], $text);
+            return str_ireplace(['$V{' . $variable . '}.numberToText()'], [CReport_Jasper_Utils_FormatUtils::numberToText($ans, false)], $text);
         } elseif (preg_match_all('/V{' . $variable . "}\.(\w+)/", $text, $matchesV) > 0) {
             $funcName = $matchesV[1][0];
             if (method_exists($this, $funcName)) {
@@ -420,24 +430,11 @@ class CReport_Jasper_Report {
                     $objCounter = $matArray[0][1];
                     $obj = $obj->$objArrayName;
                     $obj = $obj[$objCounter];
-                } elseif (is_array($obj) || $obj instanceof CCollection) {
-                    if ($obj instanceof CCollection) {
-                        cdbg::dd($obj, $part, cdbg::getTraceString());
-                        $obj = $obj->get($part);
+                } elseif ($obj instanceof CReport_Jasper_Report_DataRow) {
+                    if ($obj->offsetExists($part)) {
+                        $obj = $obj[$part];
                     } else {
-                        if (array_key_exists($part, $obj)) {
-                            $obj = $obj[$part];
-                        } else {
-                            $obj = '';
-                        }
-                    }
-                } elseif (is_object($obj)) {
-                    preg_match_all("/(\w+)\(\)/", $part, $matchMethod);
-                    if ($matchMethod && array_key_exists(0, $matchMethod[1])) {
-                        $method = $matchMethod[1][0];
-                        $obj = $obj->$method();
-                    } else {
-                        $obj = $obj->$part;
+                        $obj = '';
                     }
                 } else {
                     $obj = '';
@@ -452,7 +449,7 @@ class CReport_Jasper_Report {
 
             return str_ireplace(['$F{' . $field . '}.toString()'], [$val], $text);
         } elseif (preg_match_all('/F{' . $fieldRegExp . "}\.numberToText/", $text, $matchesV) > 0) {
-            return str_ireplace(['$F{' . $field . '}.numberToText()'], [$this->numberToText($val, false)], $text);
+            return str_ireplace(['$F{' . $field . '}.numberToText()'], [CReport_Jasper_Utils_FormatUtils::numberToText($val, false)], $text);
         } elseif (preg_match_all('/F{' . $fieldRegExp . "}\.(\w+)\((\w+)\)/", $text, $matchesV) > 0) {
             $funcName = $matchesV[1][0];
             //return str_ireplace(array('$'.$matchesV[0][0]),array(call_user_func_array(array($this,$funcName),array($val,$matchesV[2][0]))),$text);
@@ -675,67 +672,6 @@ class CReport_Jasper_Report {
     }
 
     public static function formatText($txt, $pattern) {
-    }
-
-    public function numberToText($valor = 0, $maiusculas = false, $money = true) {
-        $singular = [' centavo', '', ' mil', 'milhão', 'bilhão', 'trilhão', 'quatrilhão'];
-        $plural = [' centavos', '', ' mil', 'milhões', 'bilhões', 'trilhões',
-            'quatrilhões'];
-
-        $c = ['', 'cem', 'duzentos', 'trezentos', 'quatrocentos',
-            'quinhentos', 'seiscentos', 'setecentos', 'oitocentos', 'novecentos'];
-        $d = ['', 'dez', 'vinte', 'trinta', 'quarenta', 'cinquenta',
-            'sessenta', 'setenta', 'oitenta', 'noventa'];
-        $d10 = ['dez', 'onze', 'doze', 'treze', 'quatorze', 'quinze',
-            'dezesseis', 'dezesete', 'dezoito', 'dezenove'];
-        $u = ['', 'um', 'dois', 'tres', 'quatro', 'cinco', 'seis',
-            'sete', 'oito', 'nove'];
-
-        $z = 0;
-        $rt = '';
-        $valor = ($valor) ? $valor : 0;
-        $valor = (strpos($valor, ',') == false) ? number_format($valor, 2, '.', '.') : number_format(str_replace(',', '.', str_replace('.', '', $valor)), 2, '.', '.');
-        $inteiro = explode('.', $valor);
-        for ($i = 0; $i < count($inteiro); $i++) {
-            for ($ii = strlen($inteiro[$i]); $ii < 3; $ii++) {
-                $inteiro[$i] = '0' . $inteiro[$i];
-            }
-        }
-
-        $fim = count($inteiro) - ($inteiro[count($inteiro) - 1] > 0 ? 1 : 2);
-        for ($i = 0; $i < count($inteiro); $i++) {
-            $valor = $inteiro[$i];
-            $rc = (($valor > 100) && ($valor < 200)) ? 'cento' : $c[$valor[0]];
-            $rd = ($valor[1] < 2) ? '' : $d[$valor[1]];
-            $ru = ($valor > 0) ? (($valor[1] == 1) ? $d10[$valor[2]] : $u[$valor[2]]) : '';
-
-            $r = $rc . (($rc && ($rd || $ru)) ? ' e ' : '') . $rd . (($rd
-                    && $ru) ? ' e ' : '') . $ru;
-            $t = count($inteiro) - 1 - $i;
-            $r .= $r ? ($valor > 1 ? $plural[$t] : $singular[$t]) : '';
-            if ($valor == '000') {
-                $z++;
-            } elseif ($z > 0) {
-                $z--;
-            }
-            if (($t == 1) && ($z > 0) && ($inteiro[0] > 0)) {
-                $r .= (($z > 1) ? ' de ' : '') . $plural[$t];
-            }
-            if ($r) {
-                $rt = $rt . ((($i > 0) && ($i <= $fim)
-                        && ($inteiro[0] > 0) && ($z < 1)) ? (($i < $fim) ? ', ' : ' e ') : '') . $r;
-            }
-        }
-
-        if (!$maiusculas) {
-            return $rt ? $rt : 'zero';
-        } else {
-            if ($rt) {
-                $rt = str_ireplace(' E ', ' e ', ucwords($rt));
-            }
-
-            return ($rt) ? ($rt) : 'Zero';
-        }
     }
 
     /**
