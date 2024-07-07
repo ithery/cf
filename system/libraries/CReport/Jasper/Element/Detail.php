@@ -10,6 +10,8 @@ class CReport_Jasper_Element_Detail extends CReport_Jasper_Element {
             // $obj->variablesCalculation($obj, $data);
             foreach ($data as $rowIndex => $row) {
                 /** @var CReport_Jasper_Report_DataRow $row */
+                $report->setCurrentRow($row);
+
                 if (CReport_Jasper_Report::$proccessintructionsTime == 'inline') {
                     CReport_Jasper_Instructions::runInstructions();
                 }

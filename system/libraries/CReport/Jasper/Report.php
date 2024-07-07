@@ -60,6 +60,8 @@ class CReport_Jasper_Report {
      */
     private $instructionRepository;
 
+    private $currentRow;
+
     public function __construct($xmlFile, $param) {
         $keyword = '<queryString>
         <![CDATA[';
@@ -121,7 +123,20 @@ class CReport_Jasper_Report {
      * @return CReport_Jasper_Report_DataRow
      */
     public function getCurrentRow() {
+        if ($this->currentRow != null) {
+            return $this->currentRow;
+        }
+
         return $this->data->current();
+    }
+
+    /**
+     * @param mixed $currentRow
+     *
+     * @return CReport_Jasper_Report_DataRow
+     */
+    public function setCurrentRow($currentRow) {
+        return $this->currentRow = $currentRow;
     }
 
     public function pageSetting($xml_path) {
@@ -795,6 +810,8 @@ class CReport_Jasper_Report {
 
         $pdf = CReport_Jasper_Instructions::get();
         CReport_Jasper_Manager::instance()->unsetGenerator();
+
+        // cdbg::dd('A');
 
         return $pdf;
     }

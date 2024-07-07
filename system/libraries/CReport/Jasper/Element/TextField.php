@@ -191,10 +191,10 @@ class CReport_Jasper_Element_TextField extends CReport_Jasper_Element {
         ]);
 
         CReport_Jasper_Instructions::addInstruction([
-            'type' => 'SetXY',
+            'type' => 'setXY',
             'x' => $data->reportElement['x'] + 0,
             'y' => $data->reportElement['y'] + 0,
-            'hidden_type' => 'SetXY'
+            'hidden_type' => 'setXY'
         ]);
         CReport_Jasper_Instructions::addInstruction([
             'type' => 'setTextColor',

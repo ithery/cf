@@ -36,26 +36,29 @@ class CReport_Jasper_Processor_PdfProcessor extends CReport_Jasper_ProcessorAbst
 
     public function preventYAxis($arraydata) {
         //$pdf = \JasperPHP\Pdf;
-        $preventY_axis = CReport_Jasper_Instructions ::$yAxis + $arraydata['y_axis'];
-        $pageheight = CReport_Jasper_Instructions::$arrayPageSetting['pageHeight'];
+        $preventYAxis = CReport_Jasper_Instructions ::$yAxis + $arraydata['y_axis'];
+        $pageheight = (float) CReport_Jasper_Instructions::$arrayPageSetting['pageHeight'];
         $pageFooter = $this->jasperReport->getRoot()->getChildByClassName('PageFooter');
         $pageFooterHeigth = ($pageFooter) ? $pageFooter->children[0]->height : 0;
-        $topMargin = CReport_Jasper_Instructions::$arrayPageSetting['topMargin'];
-        $bottomMargin = CReport_Jasper_Instructions::$arrayPageSetting['bottomMargin'];
+        $topMargin = (float) CReport_Jasper_Instructions::$arrayPageSetting['topMargin'];
+        $bottomMargin = (float) CReport_Jasper_Instructions::$arrayPageSetting['bottomMargin'];
         $discount = $pageheight - $pageFooterHeigth - $topMargin - $bottomMargin; //dicount heights of page parts;
         // var_dump($pageFooter);
         //exit;
 
-        if ($preventY_axis >= $discount) {
+        if ($preventYAxis >= $discount) {
+            // cdbg::dd($preventYAxis, $discount, $pageheight, $pageFooterHeigth, $topMargin, $bottomMargin);
+
             if ($pageFooter) {
                 CReport_Jasper_Instructions::$lastPageFooter = false;
                 $pageFooter->generate($this->jasperReport);
             }
             CReport_Jasper_Instructions::addInstruction(['type' => 'resetYAxis']);
             CReport_Jasper_Instructions::$currrentPage++;
-            CReport_Jasper_Instructions::addInstruction(['type' => 'AddPage']);
+            CReport_Jasper_Instructions::addInstruction(['type' => 'addPage']);
             CReport_Jasper_Instructions::addInstruction(['type' => 'setPage', 'value' => CReport_Jasper_Instructions::$currrentPage, 'resetMargins' => false]);
             CReport_Jasper_Instructions::runInstructions();
+
             $pageHeader = $this->jasperReport->getRoot()->getChildByClassName('PageHeader');
             if ($pageHeader) {
                 $pageHeader->generate($this->jasperReport);
