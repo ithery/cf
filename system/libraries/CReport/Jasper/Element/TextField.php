@@ -104,7 +104,14 @@ class CReport_Jasper_Element_TextField extends CReport_Jasper_Element {
             $height = $this->forceHeight;
             $stretchoverflow = 'false';
         }
+        // if ($printWhenExpression) {
+        //     if (cstr::startsWith($text, 'Closing')) {
+        //         // if ($this->print_expression_result) {
 
+        //         cdbg::dd($data->reportElement->printWhenExpression, $printWhenExpression, $report->arrayVariable, $obj);
+        //         // }
+        //     }
+        // }
         $result = ['type' => 'multiCell', 'width' => $data->reportElement['width'] + 0, 'height' => $height + 0,
             'txt' => $text . '',
             'border' => $border, 'align' => $align, 'fill' => $fill,

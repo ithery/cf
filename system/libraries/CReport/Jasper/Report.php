@@ -641,7 +641,7 @@ class CReport_Jasper_Report {
         if ($resetType == 'Group') {
             $group = $this->getGroupCollection()->find($out['resetGroup']);
             if ($group && $group->isResetVariable()) {
-                $value = $newValue;
+                $value = 0;
                 $group->unsetResetVariable();
             }
         }

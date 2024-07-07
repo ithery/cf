@@ -590,6 +590,15 @@ class CReport_Jasper_Processor_PdfProcessor extends CReport_Jasper_ProcessorAbst
         //$newfont = $JasperObj->recommendFont($txt, null, null);
         //$pdf->SetFont($newfont,$pdf->getFontStyle(),$this->defaultFontSize);
         $this->printExpression($obj);
+        // if ($obj['printWhenExpression']) {
+        //     $text = $obj['txt'];
+        //     if (cstr::startsWith($text, 'Closing')) {
+        //         // if ($this->print_expression_result) {
+
+        //         cdbg::dd($obj['printWhenExpression'], $JasperObj->arrayVariable, $obj, $this->print_expression_result);
+        //         // }
+        //     }
+        // }
         $arraydata = $obj;
 
         $pdf->SetXY($arraydata['x'] + CReport_Jasper_Instructions::$arrayPageSetting['leftMargin'], $arraydata['y'] + CReport_Jasper_Instructions::$yAxis);

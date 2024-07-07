@@ -144,6 +144,8 @@ class CReport_Jasper_Element_Detail extends CReport_Jasper_Element {
                         if ($nextGroupValue != $groupValue) {
                             $shouldRender = true;
                         }
+                    } else {
+                        $shouldRender = true;
                     }
                     if ($shouldRender && ($group->hasGroupFooter() && $rowIndex > 0)) {
                         // cdbg::dd($group);
