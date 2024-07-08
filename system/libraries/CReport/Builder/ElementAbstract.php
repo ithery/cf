@@ -1,6 +1,6 @@
 <?php
 
-abstract class CReport_Builder_ElementAbstract {
+abstract class CReport_Builder_ElementAbstract implements CReport_Builder_Contract_JrXmlElementInterface {
     use CReport_Builder_Trait_HasChildrenElementTrait;
     protected $children;
 

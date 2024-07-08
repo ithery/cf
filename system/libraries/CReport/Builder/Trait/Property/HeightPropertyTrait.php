@@ -1,6 +1,9 @@
 <?php
 
 trait CReport_Builder_Trait_Property_HeightPropertyTrait {
+    /**
+     * @var float
+     */
     protected $height;
 
     public function getHeight() {

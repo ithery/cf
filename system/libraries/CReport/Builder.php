@@ -4,6 +4,8 @@
  * @method CReport_Builder_Element_Band       addBand()       Add Band Element
  * @method CReport_Builder_Element_Image      addImage()      Add Image Element
  * @method CReport_Builder_Element_PageHeader addPageHeader() Add PageHeader Element
+ * @method CReport_Builder_Element_Frame      addFrame()      Add Frame Element
+ * @method CReport_Builder_Element_StaticText addStaticText() Add StaticText Element
  */
 class CReport_Builder {
     use CTrait_ForwardsCalls;
@@ -38,7 +40,7 @@ class CReport_Builder {
      */
     public function getPdf() {
         $jrxml = $this->report->toJrXml();
-        // cdbg::dd($jrxml);
+        cdbg::dd($jrxml);
         $report = CReport::jasper($jrxml, []);
 
         $pdf = $report->getPdf();

@@ -50,4 +50,14 @@ trait CReport_Builder_Trait_HasChildrenElementTrait {
 
         return $frame;
     }
+
+    /**
+     * @return CReport_Builder_Element_StaticText
+     */
+    public function addStaticText() {
+        $frame = new CReport_Builder_Element_StaticText();
+        $this->children[] = $frame;
+
+        return $frame;
+    }
 }
