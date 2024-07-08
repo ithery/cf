@@ -83,6 +83,22 @@ class CReport_Builder {
     }
 
     /**
+     * @param null|string $filename
+     *
+     * @return \Symfony\Component\HttpFoundation\StreamedResponse
+     */
+    public function downloadPdf($filename = null) {
+        if ($filename == null) {
+            $filename = 'report-' . date('YmdHis') . '-' . uniqid() . '.pdf';
+        }
+        $pdf = $this->getPdf();
+
+        return c::response()->streamDownload(function () use ($pdf, $filename) {
+            $pdf->Output($filename, 'I');
+        }, $filename);
+    }
+
+    /**
      * @param string $method
      * @param array  $parameters
      *
