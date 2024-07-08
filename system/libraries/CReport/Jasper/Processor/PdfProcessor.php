@@ -149,6 +149,9 @@ class CReport_Jasper_Processor_PdfProcessor extends CReport_Jasper_ProcessorAbst
         $JasperObj = $this->jasperReport;
         // var_dump($obj->children);
         $txt = (string) $obj['txt'];
+        $lineSpacing = $obj['lineSpacing'];
+        $debug = carr::get($obj, 'debug', false);
+        $fontSize = carr::get($obj, 'fontSize', null);
         //$newfont = $JasperObj->recommendFont($txt, null, null);
         //$pdf->SetFont($newfont,$pdf->getFontStyle(),$this->defaultFontSize);
         $this->printExpression($obj);
@@ -162,6 +165,7 @@ class CReport_Jasper_Processor_PdfProcessor extends CReport_Jasper_ProcessorAbst
         $pTop = 0;
         $pRight = 1;
         $pBottom = 0;
+        $multiCellHeight = 0;
         //suport padding cells
         if (isset($obj['box']) && !empty($obj['box'])) {
             if (isset($obj['box']['leftPadding'])) {
@@ -243,17 +247,37 @@ class CReport_Jasper_Processor_PdfProcessor extends CReport_Jasper_ProcessorAbst
 
                 $pattern = (array_key_exists('pattern', $arraydata)) ? $arraydata['pattern'] : '';
                 $text = $pattern != '' ? CReport_Jasper_Utils_FormatUtils::formatPattern($txt, $pattern) : $txt;
-                $cellHeightRatio = $pdf->getCellHeightRatio();
-                $pdf->setCellHeightRatio(1);
-                $height = $pdf->getStringHeight(
+
+                $tempCellHeightRatio = null;
+                if ($lineSpacing) {
+                    $tempCellHeightRatio = $pdf->getCellHeightRatio();
+                    $pdf->setCellHeightRatio($lineSpacing);
+                }
+
+                $autopadding = false;
+                $cellpadding = ['T' => 0, 'R' => 0, 'B' => 0, 'L' => 0];
+                $border = 0;
+                $reseth = false;
+                $tempFontSize = null;
+                if ($fontSize) {
+                    $tempFontSize = $pdf->getFontSize();
+                    $pdf->setFontSize($fontSize);
+                }
+                $multiCellHeight = $pdf->getStringHeight(
                     $w,
                     $text,
-                    false
+                    $reseth,
+                    $autopadding,
+                    $cellpadding,
+                    $border
                 );
 
-                $pdf->setCellHeightRatio($cellHeightRatio);
-
-                return $height;
+                if ($tempFontSize) {
+                    $pdf->setFontSize($tempFontSize);
+                }
+                if ($tempCellHeightRatio) {
+                    $pdf->setCellHeightRatio($tempCellHeightRatio);
+                }
             } elseif ($arraydata['poverflow'] == 'true' || $arraydata['soverflow'] == 'true') {
                 if ($arraydata['valign'] == 'C') {
                     $arraydata['valign'] = 'M';
@@ -268,24 +292,85 @@ class CReport_Jasper_Processor_PdfProcessor extends CReport_Jasper_ProcessorAbst
                 //if($arraydata["link"])   echo $arraydata["linktarget"].",".$arraydata["link"]."<br/><br/>";
                 //$pdf->MultiCell($w, $h, CReport_Jasper_Utils_FormatUtils::formatPattern($txt, $arraydata['pattern']), $arraydata['border'], $arraydata['align'], $arraydata['fill'], 1, $x, $y, true, 0, false, true, $maxheight); //,$arraydata["valign"]);
                 //getStringHeight(float $w, string $txt[, bool $reseth = false ][, bool $autopadding = true ][, array<string|int, mixed>|null $cellpadding = null ][, mixed $border = 0 ])
-                $cellHeightRatio = $pdf->getCellHeightRatio();
-                $pdf->setCellHeightRatio(1);
-                $height = $pdf->getStringHeight($w, CReport_Jasper_Utils_FormatUtils::formatPattern($txt, $arraydata['pattern'], false));
-                $pdf->setCellHeightRatio($cellHeightRatio);
+                $tempCellHeightRatio = null;
+                if ($lineSpacing) {
+                    $tempCellHeightRatio = $pdf->getCellHeightRatio();
+                    $pdf->setCellHeightRatio($lineSpacing);
+                }
 
-                return $height;
+                $autopadding = false;
+                $cellpadding = ['T' => 0, 'R' => 0, 'B' => 0, 'L' => 0];
+                $border = 0;
+                $reseth = false;
+                $autopadding = false;
+                $tempFontSize = null;
+                if ($fontSize) {
+                    $tempFontSize = $pdf->getFontSize();
+                    $pdf->setFontSize($fontSize);
+                }
+                $pattern = (array_key_exists('pattern', $arraydata)) ? $arraydata['pattern'] : '';
+                $text = $pattern != '' ? CReport_Jasper_Utils_FormatUtils::formatPattern($txt, $pattern) : $txt;
+
+                $multiCellHeight = $pdf->getStringHeight(
+                    $w,
+                    $text,
+                    $reseth,
+                    $autopadding,
+                    $cellpadding,
+                    $border
+                );
+                // if ($debug) {
+                //     cdbg::dd(
+                //         $lineSpacing,
+                //         $multiCellHeight,
+                //         $txt,
+                //         $pdf->getNumLines($txt, $w, $reseth, $autopadding, $cellpadding, $border),
+                //         $pdf->getCellPaddings(),
+                //         $pdf->getFontSize(),
+                //         $pdf->getCellHeightRatio(),
+                //     );
+                // }
+                if ($tempFontSize) {
+                    $pdf->setFontSize($tempFontSize);
+                }
+                if ($tempCellHeightRatio) {
+                    $pdf->setCellHeightRatio($tempCellHeightRatio);
+                }
             } else {
-                $cellHeightRatio = $pdf->getCellHeightRatio();
-                $pdf->setCellHeightRatio(1);
-                $height = $pdf->getStringHeight($w, CReport_Jasper_Utils_FormatUtils::formatPattern($txt, $arraydata['pattern'], false));
-                $pdf->setCellHeightRatio($cellHeightRatio);
+                $tempCellHeightRatio = null;
+                if ($lineSpacing) {
+                    $tempCellHeightRatio = $pdf->getCellHeightRatio();
+                    $pdf->setCellHeightRatio($lineSpacing);
+                }
 
-                return $height;
+                $autopadding = false;
+                $cellpadding = ['T' => 0, 'R' => 0, 'B' => 0, 'L' => 0];
+                $border = 0;
+                $reseth = false;
+                $tempFontSize = null;
+                if ($fontSize) {
+                    $tempFontSize = $pdf->getFontSize();
+                    $pdf->setFontSize($fontSize);
+                }
+                $multiCellHeight = $pdf->getStringHeight(
+                    $w,
+                    CReport_Jasper_Utils_FormatUtils::formatPattern($txt, $arraydata['pattern']),
+                    $reseth,
+                    $autopadding,
+                    $cellpadding,
+                    $border
+                );
+                if ($tempFontSize) {
+                    $pdf->setFontSize($tempFontSize);
+                }
+                if ($tempCellHeightRatio) {
+                    $pdf->setCellHeightRatio($tempCellHeightRatio);
+                }
             }
             $pdf->StopTransform();
         }
 
-        return 0;
+        return $multiCellHeight;
     }
 
     public function multiCell($arraydata) {

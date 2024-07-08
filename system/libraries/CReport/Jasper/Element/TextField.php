@@ -3,11 +3,32 @@
 class CReport_Jasper_Element_TextField extends CReport_Jasper_Element {
     protected $forceHeight;
 
+    protected function getLineSpacing() {
+        $lineSpacing = CReport_Jasper_Utils_ElementUtils::getLineHeightRatio($this->xmlElement->textElement, 1);
+
+        return $lineSpacing;
+    }
+    protected function getFontSize() {
+        $fontSize = null;
+        if (isset($this->xmlElement->textElement) && isset($this->xmlElement->textElement->font['size'])) {
+            $fontSize = $this->xmlElement->textElement->font['size'];
+        }
+        return $fontSize;
+    }
     public function forceHeight($height) {
         $this->forceHeight = $height;
 
         return $this;
     }
+
+    // public function calculateHeight() {
+    //     $generator = $this->getGenerator();
+    //     if ($generator) {
+    //         $processor = $generator->getReport()->getProcessor();
+
+    //         return $processor->getHeightMultiCell()
+    //     }
+    // }
 
     public function getInstructionDataMultiCell(CReport_Jasper_Report $report) {
         $rowData = $report->getCurrentRow();
@@ -122,6 +143,8 @@ class CReport_Jasper_Element_TextField extends CReport_Jasper_Element {
             'linktarget' => $data['hyperlinkTarget'] . '',
             'writeHTML' => $writeHTML,
             'multiCell' => $multiCell,
+            'fontSize' => $this->getFontSize(),
+            'lineSpacing' => $this->getLineSpacing(),
             'isPrintRepeatedValues' => $isPrintRepeatedValues,
             'rotation' => $rotation,
             'valign' => $valign,

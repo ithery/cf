@@ -101,4 +101,11 @@ class CReport_Jasper_Element {
             }
         }
     }
+
+    /**
+     * @return CReport_Jasper_Report_Generator
+     */
+    public function getGenerator() {
+        return CReport_Jasper_Manager::instance()->getGenerator();
+    }
 }

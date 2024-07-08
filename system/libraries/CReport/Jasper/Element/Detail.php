@@ -84,12 +84,18 @@ class CReport_Jasper_Element_Detail extends CReport_Jasper_Element {
                             }
                             if ($haveStretchOverflow) {
                                 $maxHeight = 0;
-                                foreach ($textFields as $textField) {
+                                foreach ($textFields as $textFieldIndex => $textField) {
                                     if ($textField instanceof CReport_Jasper_Element_TextField) {
                                         $multiCellOptions = $textField->getInstructionDataMultiCell($report);
+                                        // if ($textFieldIndex == 7 && $rowIndex == 0) {
+                                        //     // cdbg::dd($multiCellOptions, $cellHeight);
+                                        //     // cdbg::dd($multiCellOptions);
+                                        //     $multiCellOptions['debug'] = true;
+                                        // }
 
                                         //cdbg::d($multiCellOptions);
                                         $cellHeight = $processor->getHeightMultiCell($multiCellOptions);
+
                                         // $cellHeight = 62;
                                         if ($cellHeight > $maxHeight) {
                                             $maxHeight = $cellHeight;

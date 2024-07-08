@@ -101,16 +101,16 @@ class CReport_Jasper_Utils_ElementUtils {
         $boxArray = [];
         if ($box->padding) {
             if ($box->padding['left']) {
-                $boxArray['leftPadding'] = $box->padding['left'];
+                $boxArray['leftPadding'] = (float) $box->padding['left'];
             }
             if ($box->padding['top']) {
-                $boxArray['topPadding'] = $box->padding['top'];
+                $boxArray['topPadding'] = (float) $box->padding['top'];
             }
             if ($box->padding['right']) {
-                $boxArray['rightPadding'] = $box->padding['right'];
+                $boxArray['rightPadding'] = (float) $box->padding['right'];
             }
             if ($box->padding['bottom']) {
-                $boxArray['bottomPadding'] = $box->padding['bottom'];
+                $boxArray['bottomPadding'] = (float) $box->padding['bottom'];
             }
         }
 
