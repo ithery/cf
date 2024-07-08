@@ -1,6 +1,10 @@
 <?php
 
 class CReport_Builder {
+    use CTrait_ForwardsCalls;
+    /**
+     * @var CReport_Builder_Report
+     */
     protected $report;
 
     public function __construct() {
@@ -24,6 +28,9 @@ class CReport_Builder {
         $this->report->setOrientation(cstr::lower($orientation) == CReport_Paper::ORIENTATION_LANDSCAPE ? CReport_Paper::ORIENTATION_LANDSCAPE : CReport_Paper::ORIENTATION_PORTRAIT);
     }
 
+    /**
+     * @return CReport_Pdf_Adapter_TCPDF
+     */
     public function getPdf() {
         $jrxml = $this->report->toJrXml();
 
@@ -32,5 +39,16 @@ class CReport_Builder {
         $pdf = $report->getPdf();
 
         return $pdf;
+    }
+
+    /**
+     * @param string $name
+     * @param array  $arguments
+     *
+     * @see CModel
+     *
+     * @return void
+     */
+    public function __call($name, $arguments) {
     }
 }

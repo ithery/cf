@@ -1,6 +1,6 @@
 <?php
 
-class CReport_BUilder_Report {
+class CReport_Builder_Report {
     protected $name;
 
     protected $pageWidth;
