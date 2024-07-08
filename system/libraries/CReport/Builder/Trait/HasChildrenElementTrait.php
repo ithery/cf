@@ -70,4 +70,24 @@ trait CReport_Builder_Trait_HasChildrenElementTrait {
 
         return $frame;
     }
+
+    /**
+     * @return CReport_Builder_Element_Detail
+     */
+    public function addDetail() {
+        $frame = new CReport_Builder_Element_Detail();
+        $this->children[] = $frame;
+
+        return $frame;
+    }
+
+    /**
+     * @return CReport_Builder_Element_TextField
+     */
+    public function addTextField() {
+        $frame = new CReport_Builder_Element_TextField();
+        $this->children[] = $frame;
+
+        return $frame;
+    }
 }

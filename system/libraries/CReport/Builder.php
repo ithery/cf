@@ -7,6 +7,8 @@
  * @method CReport_Builder_Element_Frame        addFrame()        Add Frame Element
  * @method CReport_Builder_Element_StaticText   addStaticText()   Add StaticText Element
  * @method CReport_Builder_Element_ColumnHeader addColumnHeader() Add ColumnHeader Element
+ * @method CReport_Builder_Element_Detail       addDetail()       Add Detail Element
+ * @method CReport_Builder_Element_TextField    addTextField()    Add TextField Element
  */
 class CReport_Builder {
     use CTrait_ForwardsCalls;
