@@ -96,6 +96,10 @@ class CReport_Jasper_Element_Detail extends CReport_Jasper_Element {
                                         //cdbg::d($multiCellOptions);
                                         $cellHeight = $processor->getHeightMultiCell($multiCellOptions);
 
+                                        $originalHeight = $textField->getHeight();
+                                        if($cellHeight<$originalHeight) {
+                                            $cellHeight = $originalHeight;
+                                        }
                                         // $cellHeight = 62;
                                         if ($cellHeight > $maxHeight) {
                                             $maxHeight = $cellHeight;

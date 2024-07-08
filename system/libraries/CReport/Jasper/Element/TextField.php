@@ -3,18 +3,27 @@
 class CReport_Jasper_Element_TextField extends CReport_Jasper_Element {
     protected $forceHeight;
 
+    public function getHeight() {
+        $height = (float) $this->xmlElement->reportElement['height'];
+
+        return $height;
+    }
+
     protected function getLineSpacing() {
         $lineSpacing = CReport_Jasper_Utils_ElementUtils::getLineHeightRatio($this->xmlElement->textElement, 1);
 
         return $lineSpacing;
     }
+
     protected function getFontSize() {
         $fontSize = null;
-        if (isset($this->xmlElement->textElement) && isset($this->xmlElement->textElement->font['size'])) {
+        if (isset($this->xmlElement->textElement, $this->xmlElement->textElement->font['size'])) {
             $fontSize = (float) $this->xmlElement->textElement->font['size'];
         }
+
         return $fontSize;
     }
+
     public function forceHeight($height) {
         $this->forceHeight = $height;
 
