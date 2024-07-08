@@ -25,6 +25,12 @@ class CReport {
 
     const LINE_STYLE_DOUBLE = 'double';
 
+    const SPLIT_TYPE_IMMEDIATE = 'immediate';
+
+    const SPLIT_TYPE_PREVENT = 'prevent';
+
+    const SPLIT_TYPE_STRETCH = 'stretch';
+
     /**
      * @param string $jrxml
      * @param array  $param

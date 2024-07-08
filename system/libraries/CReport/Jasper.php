@@ -84,6 +84,12 @@ class CReport_Jasper {
         return $this;
     }
 
+    public function setDataProvider(CManager_Contract_DataProviderInterface $dataProvider) {
+        $this->dataProvider = $dataProvider;
+
+        return $this;
+    }
+
     public static function manager() {
         return CReport_Jasper_Manager::instance();
     }

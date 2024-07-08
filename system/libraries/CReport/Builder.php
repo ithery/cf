@@ -17,6 +17,11 @@ class CReport_Builder {
      */
     protected $report;
 
+    /**
+     * @var CManager_Contract_DataProviderInterface
+     */
+    protected $dataProvider;
+
     public function __construct() {
         $this->report = new CReport_Builder_Report();
     }
@@ -34,6 +39,29 @@ class CReport_Builder {
         return $this;
     }
 
+    /**
+     * @param CModel|CModel_Query|string $model
+     * @param null|mixed                 $queryCallback
+     *
+     * @return $this
+     */
+    public function setDataFromModel($model, $queryCallback = null) {
+        $this->dataProvider = CManager::createModelDataProvider($model, $queryCallback);
+
+        return $this;
+    }
+
+    /**
+     * @param CCollection $collection
+     *
+     * @return $this
+     */
+    public function setDataFromCollection(CCollection $collection) {
+        $this->dataProvider = CManager::createCollectionDataProvider($collection);
+
+        return $this;
+    }
+
     public function setOrientation($orientation) {
         $this->report->setOrientation(cstr::lower($orientation) == CReport_Paper::ORIENTATION_LANDSCAPE ? CReport_Paper::ORIENTATION_LANDSCAPE : CReport_Paper::ORIENTATION_PORTRAIT);
     }
@@ -45,6 +73,9 @@ class CReport_Builder {
         $jrxml = $this->report->toJrXml();
         // cdbg::dd($jrxml);
         $report = CReport::jasper($jrxml, []);
+        if ($this->dataProvider) {
+            $report->setDataProvider($this->dataProvider);
+        }
 
         $pdf = $report->getPdf();
 

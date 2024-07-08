@@ -17,6 +17,17 @@ class CReport_Builder_JrXmlEnum {
         return carr::get($enumMap, $lineStyle);
     }
 
+    public static function getSplitTypeEnum(string $splitType) {
+        $enumMap = [
+            CReport::SPLIT_TYPE_IMMEDIATE => 'Immediate',
+            CReport::SPLIT_TYPE_PREVENT => 'Prevent',
+            CReport::SPLIT_TYPE_STRETCH => 'Stretch',
+
+        ];
+
+        return carr::get($enumMap, $splitType);
+    }
+
     public static function getBoolEnum(mixed $bool) {
         if (is_bool($bool)) {
             return $bool ? self::BOOL_TRUE : self::BOOL_FALSE;

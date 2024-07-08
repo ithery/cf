@@ -14,6 +14,7 @@ class CReport_Builder_Element_TextField extends CReport_Builder_ElementAbstract 
     use CReport_Builder_Trait_Property_TextAlignmentPropertyTrait;
     use CReport_Builder_Trait_Property_VerticalAlignmentPropertyTrait;
     use CReport_Builder_Trait_Property_IsStretchWithOverflowPropertyTrait;
+    use CReport_Builder_Trait_Property_PatternPropertyTrait;
     /**
      * @var string
      */
@@ -77,12 +78,17 @@ class CReport_Builder_Element_TextField extends CReport_Builder_ElementAbstract 
         ' . $this->font->toJrXml() . '
         ' . $this->paragraph->toJrXml() . '
         </textElement>';
-        $text = '<textFieldExpression><![CDATA[' . $this->textFieldExpression . ']]></textFieldExpression>' . PHP_EOL;
+        $textFieldExpression = '<textFieldExpression><![CDATA[' . $this->textFieldExpression . ']]></textFieldExpression>' . PHP_EOL;
+        $pattern = '';
+        if ($this->pattern) {
+            $pattern = '<pattern>' . $this->pattern . '</pattern>';
+        }
         $body = '';
         $body .= $reportElement . PHP_EOL;
         $body .= $this->box->toJrXml() . PHP_EOL;
         $body .= $textElement . PHP_EOL;
-        $body .= $text . PHP_EOL;
+        $body .= $textFieldExpression . PHP_EOL;
+        $body .= $pattern;
         $body .= $this->getChildrenJrXml();
         $closeTag = '</textField>';
 
