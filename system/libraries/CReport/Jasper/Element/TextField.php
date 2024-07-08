@@ -11,7 +11,7 @@ class CReport_Jasper_Element_TextField extends CReport_Jasper_Element {
     protected function getFontSize() {
         $fontSize = null;
         if (isset($this->xmlElement->textElement) && isset($this->xmlElement->textElement->font['size'])) {
-            $fontSize = $this->xmlElement->textElement->font['size'];
+            $fontSize = (float) $this->xmlElement->textElement->font['size'];
         }
         return $fontSize;
     }

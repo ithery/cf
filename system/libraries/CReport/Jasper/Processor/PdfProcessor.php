@@ -152,6 +152,7 @@ class CReport_Jasper_Processor_PdfProcessor extends CReport_Jasper_ProcessorAbst
         $lineSpacing = $obj['lineSpacing'];
         $debug = carr::get($obj, 'debug', false);
         $fontSize = carr::get($obj, 'fontSize', null);
+
         //$newfont = $JasperObj->recommendFont($txt, null, null);
         //$pdf->SetFont($newfont,$pdf->getFontStyle(),$this->defaultFontSize);
         $this->printExpression($obj);
@@ -181,7 +182,22 @@ class CReport_Jasper_Processor_PdfProcessor extends CReport_Jasper_ProcessorAbst
                 $pBottom = $obj['box']['bottomPadding'];
             }
         }
-        $pdf->setCellPaddings($pLeft, $pTop, $pRight, $pBottom);
+        $cellpadding = [
+            'T' => $pTop,
+            'R' => $pRight,
+            'L' => $pLeft,
+            'B' => $pBottom,
+        ];
+        $borders = carr::get($obj, 'border', 0);
+        if (is_array($borders)) {
+            foreach ($borders as $bs => $border) {
+                $width = carr::get($border, 'width');
+                if ($width) {
+                    $cellpadding[$bs] += $width;
+                }
+            }
+        }
+        // $pdf->setCellPaddings($pLeft, $pTop, $pRight, $pBottom);
         $w = $arraydata['width'];
         $h = $arraydata['height'];
         $pdf->StartTransform();
@@ -227,7 +243,9 @@ class CReport_Jasper_Processor_PdfProcessor extends CReport_Jasper_ProcessorAbst
                 //$this->debughyperlink=false;
             }
             //print_r($arraydata);
-
+            $autopadding = true;
+            $reseth = true;
+            $pdfBorder = 0;
             if ($arraydata['writeHTML'] == true) {
                 //echo  ($txt);
                 $pdf->writeHTML($txt, true, 0, true, true);
@@ -241,9 +259,9 @@ class CReport_Jasper_Processor_PdfProcessor extends CReport_Jasper_ProcessorAbst
                 }
 
                 // clip width & height
-                if (!$rotated) {
-                    $pdf->Rect($clipx, $clipy, $clipw, $cliph, 'CNZ');
-                }
+                // if (!$rotated) {
+                //     $pdf->Rect($clipx, $clipy, $clipw, $cliph, 'CNZ');
+                // }
 
                 $pattern = (array_key_exists('pattern', $arraydata)) ? $arraydata['pattern'] : '';
                 $text = $pattern != '' ? CReport_Jasper_Utils_FormatUtils::formatPattern($txt, $pattern) : $txt;
@@ -254,22 +272,19 @@ class CReport_Jasper_Processor_PdfProcessor extends CReport_Jasper_ProcessorAbst
                     $pdf->setCellHeightRatio($lineSpacing);
                 }
 
-                $autopadding = false;
-                $cellpadding = ['T' => 0, 'R' => 0, 'B' => 0, 'L' => 0];
-                $border = 0;
-                $reseth = false;
                 $tempFontSize = null;
                 if ($fontSize) {
                     $tempFontSize = $pdf->getFontSize();
                     $pdf->setFontSize($fontSize);
                 }
+
                 $multiCellHeight = $pdf->getStringHeight(
                     $w,
                     $text,
                     $reseth,
                     $autopadding,
                     $cellpadding,
-                    $border
+                    $pdfBorder
                 );
 
                 if ($tempFontSize) {
@@ -278,6 +293,8 @@ class CReport_Jasper_Processor_PdfProcessor extends CReport_Jasper_ProcessorAbst
                 if ($tempCellHeightRatio) {
                     $pdf->setCellHeightRatio($tempCellHeightRatio);
                 }
+
+                return $multiCellHeight;
             } elseif ($arraydata['poverflow'] == 'true' || $arraydata['soverflow'] == 'true') {
                 if ($arraydata['valign'] == 'C') {
                     $arraydata['valign'] = 'M';
@@ -298,11 +315,6 @@ class CReport_Jasper_Processor_PdfProcessor extends CReport_Jasper_ProcessorAbst
                     $pdf->setCellHeightRatio($lineSpacing);
                 }
 
-                $autopadding = false;
-                $cellpadding = ['T' => 0, 'R' => 0, 'B' => 0, 'L' => 0];
-                $border = 0;
-                $reseth = false;
-                $autopadding = false;
                 $tempFontSize = null;
                 if ($fontSize) {
                     $tempFontSize = $pdf->getFontSize();
@@ -317,8 +329,29 @@ class CReport_Jasper_Processor_PdfProcessor extends CReport_Jasper_ProcessorAbst
                     $reseth,
                     $autopadding,
                     $cellpadding,
-                    $border
+                    $pdfBorder
                 );
+                if (strlen($text) > 20) {
+                    return 71;
+                    // cdbg::dd(
+                    //     $text,
+                    //     $border,
+                    //     $cellpadding,
+                    //     $tempFontSize,
+                    //     $fontSize,
+                    //     $multiCellHeight,
+                    //     $pdf->getNumLines(
+                    //         $text,
+                    //         $w,
+                    //         $reseth,
+                    //         $autopadding,
+                    //         $cellpadding,
+                    //         $border
+                    //     ),
+                    //     $pdf->getCellHeight($fontSize)
+                    // );
+                }
+
                 // if ($debug) {
                 //     cdbg::dd(
                 //         $lineSpacing,
@@ -336,6 +369,8 @@ class CReport_Jasper_Processor_PdfProcessor extends CReport_Jasper_ProcessorAbst
                 if ($tempCellHeightRatio) {
                     $pdf->setCellHeightRatio($tempCellHeightRatio);
                 }
+
+                return $multiCellHeight;
             } else {
                 $tempCellHeightRatio = null;
                 if ($lineSpacing) {
@@ -343,10 +378,6 @@ class CReport_Jasper_Processor_PdfProcessor extends CReport_Jasper_ProcessorAbst
                     $pdf->setCellHeightRatio($lineSpacing);
                 }
 
-                $autopadding = false;
-                $cellpadding = ['T' => 0, 'R' => 0, 'B' => 0, 'L' => 0];
-                $border = 0;
-                $reseth = false;
                 $tempFontSize = null;
                 if ($fontSize) {
                     $tempFontSize = $pdf->getFontSize();
@@ -358,7 +389,7 @@ class CReport_Jasper_Processor_PdfProcessor extends CReport_Jasper_ProcessorAbst
                     $reseth,
                     $autopadding,
                     $cellpadding,
-                    $border
+                    $pdfBorder
                 );
                 if ($tempFontSize) {
                     $pdf->setFontSize($tempFontSize);
@@ -366,6 +397,8 @@ class CReport_Jasper_Processor_PdfProcessor extends CReport_Jasper_ProcessorAbst
                 if ($tempCellHeightRatio) {
                     $pdf->setCellHeightRatio($tempCellHeightRatio);
                 }
+
+                return $multiCellHeight;
             }
             $pdf->StopTransform();
         }

@@ -6273,12 +6273,12 @@ class TCPDF {
 
 		$length = count($chars);
 		$lastSeparator = -1;
-        // $string = [];
+        $string = [];
 
 		for ($i = 0; $i < $length; ++$i) {
 			$c = $chars[$i];
 			$charWidth = $charsWidth[$i];
-            // $string[$lines].=chr($c);
+            $string[$lines].=chr($c);
 			if (($c != 160)
 					AND (($c == 173)
 						OR preg_match($this->re_spaces, TCPDF_FONTS::unichr($c, $this->isunicode))
