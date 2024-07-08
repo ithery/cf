@@ -97,7 +97,7 @@ class CReport_Jasper_Element_Detail extends CReport_Jasper_Element {
                                         $cellHeight = $processor->getHeightMultiCell($multiCellOptions);
 
                                         $originalHeight = $textField->getHeight();
-                                        if($cellHeight<$originalHeight) {
+                                        if ($cellHeight < $originalHeight) {
                                             $cellHeight = $originalHeight;
                                         }
                                         // $cellHeight = 62;
