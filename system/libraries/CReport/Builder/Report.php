@@ -2,6 +2,7 @@
 
 class CReport_Builder_Report implements CReport_Builder_Contract_JrXmlElementInterface {
     use CReport_Builder_Trait_HasChildrenElementTrait;
+    use CReport_Builder_Trait_Property_FontPropertyTrait;
     protected $name;
 
     protected $pageWidth;
@@ -23,7 +24,7 @@ class CReport_Builder_Report implements CReport_Builder_Contract_JrXmlElementInt
     protected $orientation;
 
     public function __construct($name = null) {
-        $this->name = $name ?: 'Report';
+        $this->name = $name ?: 'CReport';
         $paperSize = CReport_Paper::$pageFormats['A4'];
         $this->children = [];
         $this->pageWidth = $paperSize[0];
@@ -33,16 +34,82 @@ class CReport_Builder_Report implements CReport_Builder_Contract_JrXmlElementInt
         $this->bottomMargin = 20;
         $this->leftMargin = 20;
         $this->rightMargin = 20;
+        $this->font = new CReport_Builder_Object_Font();
     }
 
+    /**
+     * @param float $width
+     *
+     * @return $this
+     */
     public function setPageWidth($width) {
         $this->pageWidth = $width;
 
         return $this;
     }
 
+    /**
+     * @param float $height
+     *
+     * @return $this
+     */
     public function setPageHeight($height) {
         $this->pageHeight = $height;
+
+        return $this;
+    }
+
+    /**
+     * @param float $topMargin
+     *
+     * @return $this
+     */
+    public function setTopMargin($topMargin) {
+        $this->topMargin = $topMargin;
+
+        return $this;
+    }
+
+    /**
+     * @param float $bottomMargin
+     *
+     * @return $this
+     */
+    public function setBottomMargin($bottomMargin) {
+        $this->bottomMargin = $bottomMargin;
+
+        return $this;
+    }
+
+    /**
+     * @param float $rightMargin
+     *
+     * @return $this
+     */
+    public function setRightMargin($rightMargin) {
+        $this->rightMargin = $rightMargin;
+
+        return $this;
+    }
+
+    /**
+     * @param float $leftMargin
+     *
+     * @return $this
+     */
+    public function setLeftMargin($leftMargin) {
+        $this->leftMargin = $leftMargin;
+
+        return $this;
+    }
+
+    /**
+     * @param float $columnWidth
+     *
+     * @return $this
+     */
+    public function setColumnWidth($columnWidth) {
+        $this->columnWidth = $columnWidth;
 
         return $this;
     }
@@ -51,6 +118,17 @@ class CReport_Builder_Report implements CReport_Builder_Contract_JrXmlElementInt
         $this->orientation = $orientation;
 
         return $this;
+    }
+
+    protected function getDefaultFontTag() {
+        return '<defaultFont '
+        . ' name="' . $this->getFontName() . '"'
+        . ' size="' . $this->getFontSize() . '"'
+        . ' isBold="' . CReport_Builder_JrXmlEnum::getBoolEnum($this->fontIsBold()) . '"'
+        . ' isItalic="' . CReport_Builder_JrXmlEnum::getBoolEnum($this->fontIsItalic()) . '"'
+        . ' isUnderline="' . CReport_Builder_JrXmlEnum::getBoolEnum($this->fontIsUnderline()) . '"'
+        . ' isStrikeThrough="' . CReport_Builder_JrXmlEnum::getBoolEnum($this->fontIsStrikeThrough()) . '"'
+        . '/>';
     }
 
     public function toJrXml() {
@@ -69,6 +147,7 @@ class CReport_Builder_Report implements CReport_Builder_Contract_JrXmlElementInt
         $openTag .= 'orientation="' . ($this->orientation == CReport_Paper::ORIENTATION_LANDSCAPE ? 'Landscape' : 'Portrait') . '"' . PHP_EOL;
         $openTag .= '>';
         $body = '';
+        $body .= $this->getDefaultFontTag();
         foreach ($this->children as $child) {
             $body .= $child->toJrXml();
         }

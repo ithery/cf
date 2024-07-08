@@ -31,7 +31,7 @@ class CReport_Builder_Element_Frame extends CReport_Builder_ElementAbstract {
             $reportElement .= ' height="' . $this->height . '"';
         }
         if ($this->backgroundColor !== null) {
-            $reportElement .= ' backColor="' . $this->backgroundColor . '" mode="Opaque"';
+            $reportElement .= ' backcolor="' . $this->backgroundColor . '" mode="Opaque"';
         }
         $reportElement .= '>' . PHP_EOL;
         // $xml = '';

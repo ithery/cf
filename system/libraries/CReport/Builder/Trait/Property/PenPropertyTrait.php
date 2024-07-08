@@ -18,7 +18,7 @@ trait CReport_Builder_Trait_Property_PenPropertyTrait {
      *
      * @return $this
      */
-    public function setPadding(CReport_Builder_Object_Pen $pen) {
+    public function setPen(CReport_Builder_Object_Pen $pen) {
         $this->pen = $pen;
 
         return $this;
@@ -74,7 +74,7 @@ trait CReport_Builder_Trait_Property_PenPropertyTrait {
     /**
      * @return string
      */
-    public function getLineColor() {
+    public function getPenLineColor() {
         return $this->pen->getLineColor();
     }
 }

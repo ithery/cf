@@ -60,4 +60,14 @@ trait CReport_Builder_Trait_HasChildrenElementTrait {
 
         return $frame;
     }
+
+    /**
+     * @return CReport_Builder_Element_ColumnHeader
+     */
+    public function addColumnHeader() {
+        $frame = new CReport_Builder_Element_ColumnHeader();
+        $this->children[] = $frame;
+
+        return $frame;
+    }
 }
