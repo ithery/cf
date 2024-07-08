@@ -5,6 +5,10 @@ class CReport_Jasper_Instruction {
 
     const TYPE_SET_CELL_HEIGHT_RATIO = 'setCellHeightRatio';
 
+    const TYPE_PREVENT_Y_AXIS = 'preventYAxis';
+
+    const TYPE_SET_Y_AXIS = 'setYAxis';
+
     const TYPE_SET_XY = 'setXY';
 
     const TYPE_SET_TEXT_COLOR = 'setTextColor';

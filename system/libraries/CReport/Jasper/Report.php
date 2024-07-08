@@ -149,8 +149,11 @@ class CReport_Jasper_Report {
         if ($this->currentRow != null) {
             return $this->currentRow;
         }
+        if ($this->data) {
+            return $this->data->current();
+        }
 
-        return $this->data->current();
+        return null;
     }
 
     /**

@@ -2,22 +2,30 @@
 
 class CReport_Jasper_Element_PageHeader extends CReport_Jasper_Element {
     public function generate(CReport_Jasper_Report $report) {
-        $row = $report->getCurrentRow();
-        $band = $this->children['0'];
-        $height = (string) $band->xmlElement['height'];
+        $band = carr::get($this->children, 0);
+        $height = '';
         $print_expression_result = false;
-        $printWhenExpression = (string) $band->xmlElement->printWhenExpression;
+        if ($band) {
+            $height = (string) $band->xmlElement['height'];
+            $printWhenExpression = (string) $band->xmlElement->printWhenExpression;
 
-        if ($printWhenExpression != '') {
-            $printWhenExpression = $report->getExpression($printWhenExpression, $row);
-            eval('if(' . $printWhenExpression . '){$print_expression_result=true;}');
-        } else {
-            $print_expression_result = true;
+            if ($printWhenExpression != '') {
+                $row = $report->getCurrentRow();
+
+                $printWhenExpression = $report->getExpression($printWhenExpression, $row);
+                eval('if(' . $printWhenExpression . '){$print_expression_result=true;}');
+            } else {
+                $print_expression_result = true;
+            }
         }
 
         if ($print_expression_result == true) {
             parent::generate($report);
-            CReport_Jasper_Instructions::addInstruction(['type' => 'setYAxis', 'y_axis' => $height]);
+            if ($height) {
+                $report->getInstructions()->addInstruction(CReport_Jasper_Instruction::TYPE_SET_Y_AXIS, [
+                    'y_axis' => $height
+                ]);
+            }
         }
     }
 }

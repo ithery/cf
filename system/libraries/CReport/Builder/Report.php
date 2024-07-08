@@ -1,6 +1,7 @@
 <?php
 
 class CReport_Builder_Report {
+    use CReport_Builder_Trait_HasChildrenElementTrait;
     protected $name;
 
     protected $pageWidth;

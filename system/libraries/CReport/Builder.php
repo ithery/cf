@@ -1,5 +1,10 @@
 <?php
-
+/**
+ * @method CReport_Builder_Element_Title      addTitle()      Add Title Element
+ * @method CReport_Builder_Element_Band       addBand()       Add Band Element
+ * @method CReport_Builder_Element_Image      addImage()      Add Image Element
+ * @method CReport_Builder_Element_PageHeader addPageHeader() Add PageHeader Element
+ */
 class CReport_Builder {
     use CTrait_ForwardsCalls;
     /**
@@ -33,7 +38,7 @@ class CReport_Builder {
      */
     public function getPdf() {
         $jrxml = $this->report->toJrXml();
-
+        // cdbg::dd($jrxml);
         $report = CReport::jasper($jrxml, []);
 
         $pdf = $report->getPdf();
@@ -42,13 +47,14 @@ class CReport_Builder {
     }
 
     /**
-     * @param string $name
-     * @param array  $arguments
+     * @param string $method
+     * @param array  $parameters
      *
      * @see CModel
      *
-     * @return void
+     * @return mixed
      */
-    public function __call($name, $arguments) {
+    public function __call($method, $parameters) {
+        return $this->forwardCallTo($this->report, $method, $parameters);
     }
 }
