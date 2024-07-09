@@ -9,6 +9,17 @@ trait CReport_Builder_Trait_Property_BottomPenPropertyTrait {
     /**
      * @return CReport_Builder_Object_Pen
      */
+    private function createBottomPenWhenNull() {
+        if ($this->bottomPen == null) {
+            $this->bottomPen = new CReport_Builder_Object_Pen();
+        }
+
+        return $this->bottomPen;
+    }
+
+    /**
+     * @return CReport_Builder_Object_Pen
+     */
     public function getBottomPen() {
         return $this->bottomPen;
     }
@@ -30,7 +41,7 @@ trait CReport_Builder_Trait_Property_BottomPenPropertyTrait {
      * @return $this
      */
     public function setBottomPenLineStyle($lineStyle) {
-        $this->bottomPen->setLineStyle($lineStyle);
+        $this->createBottomPenWhenNull()->setLineStyle($lineStyle);
 
         return $this;
     }
@@ -41,7 +52,7 @@ trait CReport_Builder_Trait_Property_BottomPenPropertyTrait {
      * @return $this
      */
     public function setBottomPenLineWidth($lineWidth) {
-        $this->bottomPen->setLineWidth($lineWidth);
+        $this->createBottomPenWhenNull()->setLineWidth($lineWidth);
 
         return $this;
     }
@@ -52,7 +63,7 @@ trait CReport_Builder_Trait_Property_BottomPenPropertyTrait {
      * @return $this
      */
     public function setBottomPenLineColor(string $color) {
-        $this->bottomPen->setLineColor($color);
+        $this->createBottomPenWhenNull()->setLineColor($color);
 
         return $this;
     }
@@ -61,20 +72,20 @@ trait CReport_Builder_Trait_Property_BottomPenPropertyTrait {
      * @return string
      */
     public function getBottomPenLineStyle() {
-        return $this->bottomPen->getLineStyle();
+        return c::optional($this->bottomPen)->getLineStyle();
     }
 
     /**
      * @return float
      */
     public function getBottomPenLineWidth() {
-        return $this->bottomPen->getLineWidth();
+        return c::optional($this->bottomPen)->getLineWidth();
     }
 
     /**
      * @return string
      */
     public function getBottomPenLineColor() {
-        return $this->bottomPen->getLineColor();
+        return c::optional($this->bottomPen)->getLineColor();
     }
 }

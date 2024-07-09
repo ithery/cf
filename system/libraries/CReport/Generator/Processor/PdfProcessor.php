@@ -5,6 +5,10 @@ class CReport_Generator_Processor_PdfProcessor extends CReport_Generator_Process
 
     protected $currentY;
 
+    protected $pageHeight;
+
+    protected $pageWidth;
+
     protected $currentX;
 
     protected $offsetX;
@@ -22,6 +26,8 @@ class CReport_Generator_Processor_PdfProcessor extends CReport_Generator_Process
             $diskcache = false,
             $pdfa = false
         );
+        $this->pageHeight = $report->getOrientation() == CReport::ORIENTATION_LANDSCAPE ? $report->getPageWidth() : $report->getPageHeight();
+        $this->pageWidth = $report->getOrientation() == CReport::ORIENTATION_LANDSCAPE ? $report->getPageHeight() : $report->getPageWidth();
         $this->tcpdf->setPrintHeader(false);
         $this->tcpdf->setPrintFooter(false);
         $this->tcpdf->SetLeftMargin($report->getLeftMargin());
@@ -32,8 +38,8 @@ class CReport_Generator_Processor_PdfProcessor extends CReport_Generator_Process
         $this->tcpdf->setPage(1, true);
         $this->offsetY = $report->getTopMargin();
         $this->offsetX = $report->getLeftMargin();
-        $this->currentY = $report->getTopMargin();
-        $this->currentX = $report->getLeftMargin();
+        $this->currentY = $this->offsetY;
+        $this->currentX = $this->offsetX;
     }
 
     protected function prepare() {
@@ -75,14 +81,17 @@ class CReport_Generator_Processor_PdfProcessor extends CReport_Generator_Process
         return carr::get($alignmentMap, $alignment, 'L');
     }
 
-    private function getColor($color) {
-        $rgb = [
-            'r' => hexdec(substr($color, 1, 2)),
-            'g' => hexdec(substr($color, 3, 2)),
-            'b' => hexdec(substr($color, 5, 2)),
-        ];
+    /**
+     * @param float $height
+     *
+     * @return flaot
+     */
+    public function addY($height) {
+        if ($this->currentY + $height <= $this->pageHeight) {
+            $this->currentY += $height;
+        }
 
-        return $rgb;
+        return $this->currentY;
     }
 
     public function font(CReport_Builder_Object_Font $font) {
@@ -126,14 +135,11 @@ class CReport_Generator_Processor_PdfProcessor extends CReport_Generator_Process
         $backgroundColor = carr::get($options, 'backgroundColor');
         $x = carr::get($options, 'x');
         $y = carr::get($options, 'y');
+        $x = $this->offsetX + $x;
+        $y = $this->currentY + $y;
+        $box = carr::get($options, 'box');
+        $lineSpacing = carr::get($options, 'lineSpacing');
 
-        if($x) {
-            $x = $this->offsetX + $x;
-        }
-        if($y) {
-            $y = $this->currentY + $y;
-        }
-        $border = carr::get($options, 'border');
         $textAlignment = $this->getAlign(carr::get($options, 'textAlignment'));
         $fill = 0;
         // if ($x != null) {
@@ -143,12 +149,17 @@ class CReport_Generator_Processor_PdfProcessor extends CReport_Generator_Process
         //     $this->tcpdf->setY($y);
         // }
         // CReport_Jasper_Instructions::$objOutPut->SetXY($arraydata['x'] + CReport_Jasper_Instructions::$arrayPageSetting['leftMargin'], $arraydata['y'] + CReport_Jasper_Instructions::$yAxis);
+        if ($box && $box instanceof CReport_Builder_Object_Box) {
+            $padding = $box->getPadding();
+            $this->tcpdf->setCellPaddings($padding->getPaddingLeft(), $padding->getPaddingTop(), $padding->getPaddingRight(), $padding->getPaddingBottom());
+        }
         if ($backgroundColor) {
             $fill = 1;
             $color = CColor::create($backgroundColor);
             $color = $color->toRgb();
             $this->tcpdf->SetFillColor($color->red(), $color->green(), $color->blue());
         }
+        $this->tcpdf->setCellHeightRatio($lineSpacing);
 
         if ($font != null) {
             $this->font($font);
@@ -171,6 +182,57 @@ class CReport_Generator_Processor_PdfProcessor extends CReport_Generator_Process
             $valign = 'T',
             $fitcell = false
         );
+    }
+
+    public function image(array $options) {
+        $src = carr::get($options, 'src');
+        $x = carr::get($options, 'x');
+        $y = carr::get($options, 'y');
+        $width = carr::get($options, 'width');
+        $height = carr::get($options, 'height');
+        $verticalAlignment = carr::get($options, 'verticalAlignment');
+        $horizontalAlignment = carr::get($options, 'horizontalAlignment');
+        $scaleImage = carr::get($options, 'scaleImage');
+        $fitbox = false;
+        if ($scaleImage != CReport::SCALE_IMAGE_FILL_FRAME) {
+            //check the alignment
+            $hAlignMap = [
+                CREPORT::HORIZONTAL_ALIGNMENT_LEFT => 'L',
+                CREPORT::HORIZONTAL_ALIGNMENT_RIGHT => 'R',
+                CREPORT::HORIZONTAL_ALIGNMENT_CENTER => 'C',
+            ];
+            $vAlignMap = [
+                CREPORT::VERTICAL_ALIGNMENT_TOP => 'T',
+                CREPORT::VERTICAL_ALIGNMENT_MIDDLE => 'M',
+                CREPORT::VERTICAL_ALIGNMENT_BOTTOM => 'B',
+            ];
+            $fitbox = carr::get($hAlignMap, $horizontalAlignment, 'L') . carr::get($vAlignMap, $verticalAlignment, 'T');
+        }
+        $x = $this->offsetX + $x;
+        $y = $this->currentY + $y;
+        if (CFile::exists($src)) {
+            $this->tcpdf->Image(
+                $src,
+                $x,
+                $y,
+                $width,
+                $height,
+                $type = '',
+                $link = '',
+                $align = '',
+                $resize = false,
+                $dpi = 300,
+                $palign = '',
+                $ismask = false,
+                $imgmask = false,
+                $border = 0,
+                $fitbox,
+                $hidden = false,
+                $fitonpage = false,
+                $alt = false,
+                $altimgs = []
+            );
+        }
     }
 
     /**

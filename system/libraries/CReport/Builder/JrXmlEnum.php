@@ -28,6 +28,33 @@ class CReport_Builder_JrXmlEnum {
         return carr::get($enumMap, $splitType);
     }
 
+    /**
+     * @param string $horizontalAlignment
+     *
+     * @return string
+     */
+    public static function getHorizontalAlignmentEnum(string $horizontalAlignment) {
+        return ucfirst($horizontalAlignment);
+    }
+
+    /**
+     * @param string $verticalAlignment
+     *
+     * @return string
+     */
+    public static function getVerticalAlignmentEnum(string $verticalAlignment) {
+        return ucfirst($verticalAlignment);
+    }
+
+    /**
+     * @param string $scaleImage
+     *
+     * @return string
+     */
+    public static function getScaleImageEnum(string $scaleImage) {
+        return ucfirst($scaleImage);
+    }
+
     public static function getBoolEnum(mixed $bool) {
         if (is_bool($bool)) {
             return $bool ? self::BOOL_TRUE : self::BOOL_FALSE;

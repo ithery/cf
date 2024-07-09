@@ -9,6 +9,17 @@ trait CReport_Builder_Trait_Property_PenPropertyTrait {
     /**
      * @return CReport_Builder_Object_Pen
      */
+    private function createPenWhenNull() {
+        if ($this->pen == null) {
+            $this->pen = new CReport_Builder_Object_Pen();
+        }
+
+        return $this->pen;
+    }
+
+    /**
+     * @return CReport_Builder_Object_Pen
+     */
     public function getPen() {
         return $this->pen;
     }
@@ -30,7 +41,7 @@ trait CReport_Builder_Trait_Property_PenPropertyTrait {
      * @return $this
      */
     public function setPenLineStyle($lineStyle) {
-        $this->pen->setLineStyle($lineStyle);
+        $this->createPenWhenNull()->setLineStyle($lineStyle);
 
         return $this;
     }
@@ -41,7 +52,7 @@ trait CReport_Builder_Trait_Property_PenPropertyTrait {
      * @return $this
      */
     public function setPenLineWidth($lineWidth) {
-        $this->pen->setLineWidth($lineWidth);
+        $this->createPenWhenNull()->setLineWidth($lineWidth);
 
         return $this;
     }
@@ -52,7 +63,7 @@ trait CReport_Builder_Trait_Property_PenPropertyTrait {
      * @return $this
      */
     public function setPenLineColor(string $color) {
-        $this->pen->setLineColor($color);
+        $this->createPenWhenNull()->setLineColor($color);
 
         return $this;
     }
@@ -61,20 +72,20 @@ trait CReport_Builder_Trait_Property_PenPropertyTrait {
      * @return string
      */
     public function getPenLineStyle() {
-        return $this->pen->getLineStyle();
+        return c::optional($this->pen)->getLineStyle();
     }
 
     /**
      * @return float
      */
     public function getPenLineWidth() {
-        return $this->pen->getLineWidth();
+        return c::optional($this->pen)->getLineWidth();
     }
 
     /**
      * @return string
      */
     public function getPenLineColor() {
-        return $this->pen->getLineColor();
+        return c::optional($this->pen)->getLineColor();
     }
 }

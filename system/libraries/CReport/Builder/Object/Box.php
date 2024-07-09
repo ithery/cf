@@ -10,41 +10,31 @@ class CReport_Builder_Object_Box implements CReport_Builder_Contract_JrXmlElemen
 
     public function __construct() {
         $this->padding = new CReport_Builder_Object_Padding();
-        $this->pen = new CReport_Builder_Object_Pen();
-        $this->topPen = new CReport_Builder_Object_Pen();
-        $this->leftPen = new CReport_Builder_Object_Pen();
-        $this->rightPen = new CReport_Builder_Object_Pen();
-        $this->bottomPen = new CReport_Builder_Object_Pen();
+        $this->pen = null;
+        $this->topPen = null;
+        $this->leftPen = null;
+        $this->rightPen = null;
+        $this->bottomPen = null;
     }
 
     public function toJrXml() {
         $xml = '';
         $xml .= '<box>' . PHP_EOL;
-        $xml .= '<pen
-            lineWidth="' . $this->pen->getLineWidth() . '"
-            lineColor="' . $this->pen->getLineColor() . '"
-            lineStyle="' . CReport_Builder_JrXmlEnum::getLineStyleEnum($this->pen->getLineStyle()) . '"
-        />' . PHP_EOL;
-        $xml .= '<topPen
-            lineWidth="' . $this->topPen->getLineWidth() . '"
-            lineColor="' . $this->topPen->getLineColor() . '"
-            lineStyle="' . CReport_Builder_JrXmlEnum::getLineStyleEnum($this->topPen->getLineStyle()) . '"
-        />' . PHP_EOL;
-        $xml .= '<rightPen
-            lineWidth="' . $this->rightPen->getLineWidth() . '"
-            lineColor="' . $this->rightPen->getLineColor() . '"
-            lineStyle="' . CReport_Builder_JrXmlEnum::getLineStyleEnum($this->rightPen->getLineStyle()) . '"
-        />' . PHP_EOL;
-        $xml .= '<bottomPen
-            lineWidth="' . $this->bottomPen->getLineWidth() . '"
-            lineColor="' . $this->bottomPen->getLineColor() . '"
-            lineStyle="' . CReport_Builder_JrXmlEnum::getLineStyleEnum($this->bottomPen->getLineStyle()) . '"
-        />' . PHP_EOL;
-        $xml .= '<leftPen
-            lineWidth="' . $this->leftPen->getLineWidth() . '"
-            lineColor="' . $this->leftPen->getLineColor() . '"
-            lineStyle="' . CReport_Builder_JrXmlEnum::getLineStyleEnum($this->leftPen->getLineStyle()) . '"
-        />' . PHP_EOL;
+        if ($this->pen) {
+            $xml .= $this->pen->toJrXml();
+        }
+        if ($this->topPen) {
+            $xml .= $this->topPen->toJrXml('topPen');
+        }
+        if ($this->rightPen) {
+            $xml .= $this->rightPen->toJrXml('rightPen');
+        }
+        if ($this->bottomPen) {
+            $xml .= $this->bottomPen->toJrXml('bottomPen');
+        }
+        if ($this->leftPen) {
+            $xml .= $this->leftPen->toJrXml('bottomPen');
+        }
         $xml .= $this->padding->toJrXml();
 
         $xml .= '</box>' . PHP_EOL;

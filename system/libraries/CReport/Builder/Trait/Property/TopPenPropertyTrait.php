@@ -9,6 +9,17 @@ trait CReport_Builder_Trait_Property_TopPenPropertyTrait {
     /**
      * @return CReport_Builder_Object_Pen
      */
+    private function createTopPenWhenNull() {
+        if ($this->topPen == null) {
+            $this->topPen = new CReport_Builder_Object_Pen();
+        }
+
+        return $this->topPen;
+    }
+
+    /**
+     * @return CReport_Builder_Object_Pen
+     */
     public function getTopPen() {
         return $this->topPen;
     }
@@ -30,7 +41,7 @@ trait CReport_Builder_Trait_Property_TopPenPropertyTrait {
      * @return $this
      */
     public function setTopPenLineStyle($lineStyle) {
-        $this->topPen->setLineStyle($lineStyle);
+        $this->createTopPenWhenNull()->setLineStyle($lineStyle);
 
         return $this;
     }
@@ -41,7 +52,7 @@ trait CReport_Builder_Trait_Property_TopPenPropertyTrait {
      * @return $this
      */
     public function setTopPenLineWidth($lineWidth) {
-        $this->topPen->setLineWidth($lineWidth);
+        $this->createTopPenWhenNull()->setLineWidth($lineWidth);
 
         return $this;
     }
@@ -52,7 +63,7 @@ trait CReport_Builder_Trait_Property_TopPenPropertyTrait {
      * @return $this
      */
     public function setTopPenLineColor(string $color) {
-        $this->topPen->setLineColor($color);
+        $this->createTopPenWhenNull()->setLineColor($color);
 
         return $this;
     }
@@ -61,20 +72,20 @@ trait CReport_Builder_Trait_Property_TopPenPropertyTrait {
      * @return string
      */
     public function getTopPenLineStyle() {
-        return $this->topPen->getLineStyle();
+        return c::optional($this->topPen)->getLineStyle();
     }
 
     /**
      * @return float
      */
     public function getTopPenLineWidth() {
-        return $this->topPen->getLineWidth();
+        return c::optional($this->topPen)->getLineWidth();
     }
 
     /**
      * @return string
      */
     public function getTopPenLineColor() {
-        return $this->topPen->getLineColor();
+        return c::optional($this->topPen)->getLineColor();
     }
 }

@@ -9,6 +9,17 @@ trait CReport_Builder_Trait_Property_RightPenPropertyTrait {
     /**
      * @return CReport_Builder_Object_Pen
      */
+    private function createRightPenWhenNull() {
+        if ($this->rightPen == null) {
+            $this->rightPen = new CReport_Builder_Object_Pen();
+        }
+
+        return $this->rightPen;
+    }
+
+    /**
+     * @return CReport_Builder_Object_Pen
+     */
     public function getRightPen() {
         return $this->rightPen;
     }
@@ -30,7 +41,7 @@ trait CReport_Builder_Trait_Property_RightPenPropertyTrait {
      * @return $this
      */
     public function setRightPenLineStyle($lineStyle) {
-        $this->rightPen->setLineStyle($lineStyle);
+        $this->createRightPenWhenNull()->setLineStyle($lineStyle);
 
         return $this;
     }
@@ -41,7 +52,7 @@ trait CReport_Builder_Trait_Property_RightPenPropertyTrait {
      * @return $this
      */
     public function setRightPenLineWidth($lineWidth) {
-        $this->rightPen->setLineWidth($lineWidth);
+        $this->createRightPenWhenNull()->setLineWidth($lineWidth);
 
         return $this;
     }
@@ -52,7 +63,7 @@ trait CReport_Builder_Trait_Property_RightPenPropertyTrait {
      * @return $this
      */
     public function setRightPenLineColor(string $color) {
-        $this->rightPen->setLineColor($color);
+        $this->createRightPenWhenNull()->setLineColor($color);
 
         return $this;
     }
@@ -61,20 +72,20 @@ trait CReport_Builder_Trait_Property_RightPenPropertyTrait {
      * @return string
      */
     public function getRightPenLineStyle() {
-        return $this->rightPen->getLineStyle();
+        return c::optional($this->rightPen)->getLineStyle();
     }
 
     /**
      * @return float
      */
     public function getRightPenLineWidth() {
-        return $this->rightPen->getLineWidth();
+        return c::optional($this->rightPen)->getLineWidth();
     }
 
     /**
      * @return string
      */
     public function getRightPenLineColor() {
-        return $this->rightPen->getLineColor();
+        return c::optional($this->rightPen)->getLineColor();
     }
 }

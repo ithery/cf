@@ -9,6 +9,17 @@ trait CReport_Builder_Trait_Property_LeftPenPropertyTrait {
     /**
      * @return CReport_Builder_Object_Pen
      */
+    private function createLeftPenWhenNull() {
+        if ($this->leftPen == null) {
+            $this->leftPen = new CReport_Builder_Object_Pen();
+        }
+
+        return $this->leftPen;
+    }
+
+    /**
+     * @return CReport_Builder_Object_Pen
+     */
     public function getLeftPen() {
         return $this->leftPen;
     }
@@ -30,7 +41,7 @@ trait CReport_Builder_Trait_Property_LeftPenPropertyTrait {
      * @return $this
      */
     public function setLeftPenLineStyle($lineStyle) {
-        $this->leftPen->setLineStyle($lineStyle);
+        $this->createLeftPenWhenNull()->setLineStyle($lineStyle);
 
         return $this;
     }
@@ -41,7 +52,7 @@ trait CReport_Builder_Trait_Property_LeftPenPropertyTrait {
      * @return $this
      */
     public function setLeftPenLineWidth($lineWidth) {
-        $this->leftPen->setLineWidth($lineWidth);
+        $this->createLeftPenWhenNull()->setLineWidth($lineWidth);
 
         return $this;
     }
@@ -52,7 +63,7 @@ trait CReport_Builder_Trait_Property_LeftPenPropertyTrait {
      * @return $this
      */
     public function setLeftPenLineColor(string $color) {
-        $this->leftPen->setLineColor($color);
+        $this->createLeftPenWhenNull()->setLineColor($color);
 
         return $this;
     }
@@ -61,14 +72,14 @@ trait CReport_Builder_Trait_Property_LeftPenPropertyTrait {
      * @return string
      */
     public function getLeftPenLineStyle() {
-        return $this->leftPen->getLineStyle();
+        return c::optional($this->leftPen)->getLineStyle();
     }
 
     /**
      * @return float
      */
     public function getLeftPenLineWidth() {
-        return $this->leftPen->getLineWidth();
+        return c::optional($this->leftPen)->getLineWidth();
     }
 
     /**

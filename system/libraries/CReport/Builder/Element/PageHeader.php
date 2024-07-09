@@ -16,6 +16,6 @@ class CReport_Builder_Element_PageHeader extends CReport_Builder_ElementAbstract
     }
 
     public function generate(CReport_Generator_ProcessorAbstract $processor) {
-
+        parent::generate($processor);
     }
 }
