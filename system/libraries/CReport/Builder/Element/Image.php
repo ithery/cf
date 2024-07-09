@@ -42,4 +42,8 @@ class CReport_Builder_Element_Image extends CReport_Builder_ElementAbstract {
 
         return $openTag . PHP_EOL . $reportElement . PHP_EOL . $imageExpression . PHP_EOL . $body . PHP_EOL . $closeTag;
     }
+
+    public function generate(CReport_Generator_ProcessorAbstract $processor) {
+
+    }
 }

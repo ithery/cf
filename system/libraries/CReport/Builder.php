@@ -72,6 +72,19 @@ class CReport_Builder {
     public function getPdf() {
         $jrxml = $this->report->toJrXml();
         // cdbg::dd($jrxml);
+        $generator = new CReport_Generator($this->report, $this->dataProvider);
+
+        $pdf = $generator->getPdf();
+
+        return $pdf;
+    }
+
+    /**
+     * @return CReport_Pdf_Adapter_TCPDF
+     */
+    public function getJasperPdf() {
+        $jrxml = $this->report->toJrXml();
+        // cdbg::dd($jrxml);
         $report = CReport::jasper($jrxml, []);
         if ($this->dataProvider) {
             $report->setDataProvider($this->dataProvider);
@@ -80,6 +93,22 @@ class CReport_Builder {
         $pdf = $report->getPdf();
 
         return $pdf;
+    }
+
+    /**
+     * @param null|string $filename
+     *
+     * @return \Symfony\Component\HttpFoundation\StreamedResponse
+     */
+    public function downloadJasperPdf($filename = null) {
+        if ($filename == null) {
+            $filename = 'report-' . date('YmdHis') . '-' . uniqid() . '.pdf';
+        }
+        $pdf = $this->getJasperPdf();
+
+        return c::response()->streamDownload(function () use ($pdf, $filename) {
+            $pdf->Output($filename, 'I');
+        }, $filename);
     }
 
     /**

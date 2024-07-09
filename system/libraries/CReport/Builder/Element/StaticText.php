@@ -63,4 +63,17 @@ class CReport_Builder_Element_StaticText extends CReport_Builder_ElementAbstract
 
         return $openTag . PHP_EOL . $body . PHP_EOL . $closeTag;
     }
+
+    public function generate(CReport_Generator_ProcessorAbstract $processor) {
+        $options = [];
+        $options['x'] = $this->getX();
+        $options['y'] = $this->getY();
+        $options['width'] = $this->getWidth();
+        $options['height'] = $this->getHeight();
+        $options['text'] = $this->getText();
+        $options['textAlignment'] = $this->getTextAlignment();
+        $options['font'] = $this->getFont();
+        $options['backgroundColor'] = $this->getBackgroundColor();
+        $processor->cell($options);
+    }
 }

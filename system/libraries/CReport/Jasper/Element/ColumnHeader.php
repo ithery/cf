@@ -2,6 +2,7 @@
 
 class CReport_Jasper_Element_ColumnHeader extends CReport_Jasper_Element {
     public function generate(CReport_Jasper_Report $report) {
+        // cdbg::dd((string) $this->xmlElement->asXML());
         $row = $report->getCurrentRow();
         $print_expression_result = false;
         //var_dump((string)$child->xmlElement->printWhenExpression);

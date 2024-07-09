@@ -2,7 +2,7 @@
 
 class CReport_Jasper_Manager {
     /**
-     * @var CReport_Jasper_Report_Generator
+     * @var CReport_Jasper_Manager_Generator
      */
     protected $generator;
 
@@ -19,22 +19,28 @@ class CReport_Jasper_Manager {
         return self::$instance;
     }
 
-    public function setGenerator(CReport_Jasper_Report_Generator $generator) {
-        $this->generator = $generator;
-
-        return $this;
+    private function __construct() {
+        $this->generator = new CReport_Jasper_Manager_Generator();
     }
 
     /**
-     * @return null|CReport_Jasper_Report_Generator
+     * @return null|CReport_Jasper_Manager_Generator
      */
     public function getGenerator() {
         return $this->generator;
     }
 
-    public function unsetGenerator() {
-        $this->generator = null;
+    /**
+     * @return null|CReport_Jasper_ProcessorAbstract
+     */
+    public function getProcessor() {
+        return $this->generator->getProcessor();
+    }
 
-        return $this;
+    /**
+     * @return null|CReport_Jasper_Report
+     */
+    public function getReport() {
+        return $this->generator->getReport();
     }
 }

@@ -16,4 +16,10 @@ abstract class CReport_Builder_ElementAbstract implements CReport_Builder_Contra
 
         return $xml;
     }
+
+    public function generate(CReport_Generator_ProcessorAbstract $processor) {
+        foreach ($this->children as $child) {
+            $child->generate($processor);
+        }
+    }
 }

@@ -21,7 +21,7 @@ class CReport_Builder_Object_Padding implements CReport_Builder_Contract_JrXmlEl
      */
     protected $bottom;
 
-    public function __construct($top = 0, $right = 0, $bottom = 0, $left = 0) {
+    public function __construct($top = 0, $right = 1, $bottom = 0, $left = 1) {
         $this->top = $top;
         $this->right = $right;
         $this->bottom = $bottom;

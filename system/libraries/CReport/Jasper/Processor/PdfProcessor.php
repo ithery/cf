@@ -54,9 +54,9 @@ class CReport_Jasper_Processor_PdfProcessor extends CReport_Jasper_ProcessorAbst
                 $pageFooter->generate($this->jasperReport);
             }
             CReport_Jasper_Instructions::addInstruction(['type' => 'resetYAxis']);
-            CReport_Jasper_Instructions::$currrentPage++;
+            CReport_Jasper_Instructions::$currentPage++;
             CReport_Jasper_Instructions::addInstruction(['type' => 'addPage']);
-            CReport_Jasper_Instructions::addInstruction(['type' => 'setPage', 'value' => CReport_Jasper_Instructions::$currrentPage, 'resetMargins' => false]);
+            CReport_Jasper_Instructions::addInstruction(['type' => 'setPage', 'value' => CReport_Jasper_Instructions::$currentPage, 'resetMargins' => false]);
             CReport_Jasper_Instructions::runInstructions();
 
             $pageHeader = $this->jasperReport->getRoot()->getChildByClassName('PageHeader');
@@ -450,6 +450,7 @@ class CReport_Jasper_Processor_PdfProcessor extends CReport_Jasper_ProcessorAbst
                 $pBottom = $obj['box']['bottomPadding'];
             }
         }
+
         $pdf->setCellPaddings($pLeft, $pTop, $pRight, $pBottom);
         $w = $arraydata['width'];
         $h = $arraydata['height'];
@@ -662,9 +663,9 @@ class CReport_Jasper_Processor_PdfProcessor extends CReport_Jasper_ProcessorAbst
                 $pageFooter->generate($this->jasperReport);
             }
             CReport_Jasper_Instructions::addInstruction(['type' => 'resetYAxis']);
-            CReport_Jasper_Instructions::$currrentPage++;
+            CReport_Jasper_Instructions::$currentPage++;
             CReport_Jasper_Instructions::addInstruction(['type' => 'addPage']);
-            CReport_Jasper_Instructions::addInstruction(['type' => 'setPage', 'value' => CReport_Jasper_Instructions::$currrentPage, 'resetMargins' => false]);
+            CReport_Jasper_Instructions::addInstruction(['type' => 'setPage', 'value' => CReport_Jasper_Instructions::$currentPage, 'resetMargins' => false]);
             $pageHeader = $this->jasperReport->getRoot()->getChildByClassName('PageHeader');
             //if (JasperPHP\Pdf::$print_expression_result == true) {
             if ($pageHeader) {

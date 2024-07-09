@@ -120,6 +120,55 @@ class CReport_Builder_Report implements CReport_Builder_Contract_JrXmlElementInt
         return $this;
     }
 
+    /**
+     * @return flaot
+     */
+    public function getPageWidth() {
+        return $this->pageWidth;
+    }
+
+    /**
+     * @return flaot
+     */
+    public function getPageHeight() {
+        return $this->pageHeight;
+    }
+
+    /**
+     * @return string
+     */
+    public function getOrientation() {
+        return $this->orientation;
+    }
+
+    /**
+     * @return flaot
+     */
+    public function getLeftMargin() {
+        return $this->leftMargin;
+    }
+
+    /**
+     * @return flaot
+     */
+    public function getTopMargin() {
+        return $this->topMargin;
+    }
+
+    /**
+     * @return flaot
+     */
+    public function getRightMargin() {
+        return $this->rightMargin;
+    }
+
+    /**
+     * @return flaot
+     */
+    public function getBottomMargin() {
+        return $this->bottomMargin;
+    }
+
     protected function getDefaultFontTag() {
         return '<defaultFont '
         . ' name="' . $this->getFontName() . '"'
@@ -157,5 +206,11 @@ class CReport_Builder_Report implements CReport_Builder_Contract_JrXmlElementInt
     }
 
     public function toJson() {
+    }
+
+    public function generate(CReport_Generator_ProcessorAbstract $processor) {
+        foreach ($this->children as $child) {
+            $child->generate($processor);
+        }
     }
 }

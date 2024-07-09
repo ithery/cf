@@ -27,9 +27,12 @@ class CReport_Jasper_Instruction {
 
     protected $params;
 
-    public function __construct($type, $params) {
+    protected $callerInfo;
+
+    public function __construct($type, $params, $callerInfo = null) {
         $this->type = $type;
         $this->params = $params;
+        $this->callerInfo = $callerInfo;
     }
 
     public function method() {

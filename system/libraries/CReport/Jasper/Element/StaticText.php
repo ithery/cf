@@ -1,6 +1,13 @@
 <?php
 
 class CReport_Jasper_Element_StaticText extends CReport_Jasper_Element {
+    use CReport_Jasper_Trait_Element_HasReportElementTrait;
+
+    public function __construct(SimpleXMLElement $xmlElement) {
+        parent::__construct($xmlElement);
+        $this->reportElement = new CReport_Jasper_Object_ReportElement($xmlElement->reportElement);
+    }
+
     public function generate(CReport_Jasper_Report $report) {
         $row = $report->getCurrentRow();
         $data = $this->xmlElement;
@@ -15,7 +22,7 @@ class CReport_Jasper_Element_StaticText extends CReport_Jasper_Element {
         $txt = '';
         $rotation = '';
         $drawcolor = ['r' => 0, 'g' => 0, 'b' => 0];
-        $height = $data->reportElement['height'];
+        $height = $this->reportElement->getHeight();
         $stretchoverflow = 'false';
         $printoverflow = 'false';
         $writeHTML = false;
@@ -120,14 +127,16 @@ class CReport_Jasper_Element_StaticText extends CReport_Jasper_Element {
             $print_expression_result = true;
         }
         if ($print_expression_result == true) {
-            CReport_Jasper_Instructions::addInstruction(['type' => 'multiCell', 'width' => $data->reportElement['width'], 'height' => $height,
-                'txt' => $txtEnc, 'border' => $border, 'align' => $align, 'fill' => $fill, 'hidden_type' => 'statictext',
-                'printWhenExpression' => $printWhenExpression . '',
-                'multiCell' => false,
-                'soverflow' => $stretchoverflow, 'poverflow' => $printoverflow, 'rotation' => $rotation, 'valign' => $valign, 'link' => null,
-                'x' => $data->reportElement['x'] + 0, 'y' => $data->reportElement['y'] + 0,
-                'box' => $box,
-                'writeHTML' => $writeHTML]);
+            $options = ['type' => 'multiCell', 'width' => $data->reportElement['width'], 'height' => $height,
+            'txt' => $txtEnc, 'border' => $border, 'align' => $align, 'fill' => $fill, 'hidden_type' => 'statictext',
+            'printWhenExpression' => $printWhenExpression . '',
+            'multiCell' => false,
+            'soverflow' => $stretchoverflow, 'poverflow' => $printoverflow, 'rotation' => $rotation, 'valign' => $valign, 'link' => null,
+            'x' => $data->reportElement['x'] + 0, 'y' => $data->reportElement['y'] + 0,
+            'box' => $box,
+            'writeHTML' => $writeHTML];
+
+            CReport_Jasper_Instructions::addInstruction($options);
         }
         //### End of modification, below is the original line
         //        $pointer=array("type"=>"MultiCell","width"=>$data->reportElement["width"],"height"=>$height,"txt"=>$data->text,"border"=>$border,"align"=>$align,"fill"=>$fill,"hidden_type"=>"statictext","soverflow"=>$stretchoverflow,"poverflow"=>$printoverflow,"rotation"=>$rotation);

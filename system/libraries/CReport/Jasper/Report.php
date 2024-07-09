@@ -85,6 +85,7 @@ class CReport_Jasper_Report {
         $xmlFile = str_replace($keyword, '<queryString><![CDATA[', $xmlFile);
 
         $xmlElement = simplexml_load_string($xmlFile, null, LIBXML_NOCDATA);
+
         $this->param = $param;
         $this->root = new CReport_Jasper_Element_Root($xmlElement);
         $this->instructionRepository = new CReport_Jasper_InstructionRepository();
@@ -381,6 +382,18 @@ class CReport_Jasper_Report {
         }
 
         return $text;
+    }
+
+    public function evaluateExpression(string $expression, CReport_Jasper_Report_DataRow $row = null) {
+        $printExpressionResult = true;
+        if ($expression != '') {
+            $expression = $this->getExpression($expression, $row);
+
+            //echo    'if('.$printWhenExpression.'){$print_expression_result=true;}';
+            eval('if(' . $expression . '){$printExpressionResult=true;}');
+        }
+
+        return $printExpressionResult;
     }
 
     public function evaluateCondition($condition) {
@@ -759,24 +772,11 @@ class CReport_Jasper_Report {
         // $this->report()->setProcessor($this->manager()->createPdfProcessor());
         $this->processor = new CReport_Jasper_Processor_PdfProcessor($this);
 
-        $generator = new CReport_Jasper_Report_Generator($this);
-        CReport_Jasper_Manager::instance()->setGenerator($generator);
-        //$this->parameter_handler($this->xmlElement, $param);
-        //$this->variable_handler($this->xmlElement);
-        //$this->queryString_handler($this->xmlElement);
-        //var_dump($this->xmlElement);
+        CReport_Jasper_Manager::instance()->getGenerator()->generateReport($this);
 
-        // exibe a tag
-        // CReport_Jasper_Instructions::setJasperObj($this);
-        $this->root->generate($this);
-        //CReport_Jasper_Instructions::runInstructions();
-        //CReport_Jasper_Instructions::clearInstructrions();
-
-        CReport_Jasper_Instructions::runInstructions();
         //$this->runInstructions($instructions);
 
         $pdf = CReport_Jasper_Instructions::get();
-        CReport_Jasper_Manager::instance()->unsetGenerator();
 
         return $pdf;
     }

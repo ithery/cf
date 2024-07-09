@@ -10,11 +10,14 @@ class CReport_Jasper_InstructionRepository {
         $this->instructions = [];
     }
 
-    public function addInstruction($type, $param = []) {
+    public function addInstruction($type, $param = [], $callerInfo = null) {
+        if ($callerInfo == null) {
+            $callerInfo = cdbg::callerInfo();
+        }
         if ($type instanceof CReport_Jasper_Instruction) {
             $instruction = $type;
         } else {
-            $instruction = new CReport_Jasper_Instruction($type, $param);
+            $instruction = new CReport_Jasper_Instruction($type, $param, $callerInfo);
         }
         $this->instructions[] = $instruction;
         // $generator = CReport_Jasper_Manager::instance()->getGenerator();
