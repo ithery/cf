@@ -107,7 +107,7 @@ class CReport_Jasper_Element_StaticText extends CReport_Jasper_Element {
         CReport_Jasper_Instructions::addInstruction(['type' => 'setFont', 'font' => $font, 'pdfFontName' => $data->textElement->font ? $data->textElement->font['pdfFontName'] : '', 'fontstyle' => $fontstyle, 'fontsize' => $fontsize, 'hidden_type' => 'font']);
         //"height"=>$data->reportElement["height"]
         //### UTF-8 characters, a must for me.
-        $txtEnc = $data->text;
+        $txtEnc = (string) $data->text;
 
         $print_expression_result = false;
         $printWhenExpression = (string) $data->reportElement->printWhenExpression;

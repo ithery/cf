@@ -12,16 +12,6 @@ trait CReport_Builder_Trait_HasChildrenElementTrait {
     }
 
     /**
-     * @return CReport_Builder_Element_Band
-     */
-    public function addBand() {
-        $band = new CReport_Builder_Element_Band();
-        $this->children[] = $band;
-
-        return $band;
-    }
-
-    /**
      * @return CReport_Builder_Element_Image
      */
     public function addImage() {

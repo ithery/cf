@@ -406,11 +406,157 @@ class CReport_Jasper_Processor_PdfProcessor extends CReport_Jasper_ProcessorAbst
         return $multiCellHeight;
     }
 
-    public function multiCell($arraydata) {
+    public function multiCell($obj) {
 
-        //if($fielddata==true) {
-        $this->checkoverflow($arraydata, $arraydata['txt'], null);
-        //}
+        /** @var \TCPDF $pdf */
+        $pdf = CReport_Jasper_Instructions::$objOutPut;
+        $JasperObj = $this->jasperReport;
+        // var_dump($obj->children);
+        $txt = (string) $obj['txt'];
+        //$newfont = $JasperObj->recommendFont($txt, null, null);
+        //$pdf->SetFont($newfont,$pdf->getFontStyle(),$this->defaultFontSize);
+        $this->printExpression($obj);
+        // if ($obj['printWhenExpression']) {
+        //     $text = $obj['txt'];
+        //     if (cstr::startsWith($text, 'Closing')) {
+        //         // if ($this->print_expression_result) {
+
+        //         cdbg::dd($obj['printWhenExpression'], $JasperObj->arrayVariable, $obj, $this->print_expression_result);
+        //         // }
+        //     }
+        // }
+        $arraydata = $obj;
+
+        $pdf->SetXY($arraydata['x'] + CReport_Jasper_Instructions::$arrayPageSetting['leftMargin'], $arraydata['y'] + CReport_Jasper_Instructions::$yAxis);
+        $x = $pdf->GetX();
+        $y = $pdf->GetY();
+        //default
+        $pLeft = 1;
+        $pTop = 0;
+        $pRight = 1;
+        $pBottom = 0;
+        //suport padding cells
+        if (isset($obj['box']) && !empty($obj['box'])) {
+            if (isset($obj['box']['leftPadding'])) {
+                $pLeft = $obj['box']['leftPadding'];
+            }
+            if (isset($obj['box']['topPadding'])) {
+                $pTop = $obj['box']['topPadding'];
+            }
+            if (isset($obj['box']['rightPadding'])) {
+                $pRight = $obj['box']['rightPadding'];
+            }
+            if (isset($obj['box']['bottomPadding'])) {
+                $pBottom = $obj['box']['bottomPadding'];
+            }
+        }
+        $pdf->setCellPaddings($pLeft, $pTop, $pRight, $pBottom);
+        $w = $arraydata['width'];
+        $h = $arraydata['height'];
+        $pdf->StartTransform();
+
+        $clipx = $arraydata['x'] + CReport_Jasper_Instructions::$arrayPageSetting['leftMargin'];
+        $clipy = $arraydata['y'] + CReport_Jasper_Instructions::$yAxis;
+        $clipw = $arraydata['width'];
+        $cliph = $arraydata['height'];
+
+        $rotated = false;
+        if ($this->print_expression_result == true) {
+            $angle = $this->rotate($arraydata);
+            if ($angle != 0) {
+                $pdf->Rect($clipx, $clipy, $clipw, $cliph, 'CNZ');
+                $pdf->Rotate($angle);
+                $rotated = true;
+                switch ($angle) {
+                  case 90:
+                      $x = $x - $arraydata['height'];
+                      $h = $arraydata['width'];
+                      $w = $arraydata['height'];
+
+                      break;
+                  case 180:
+                      $x = $x - $arraydata['width'];
+                      $y = $y - $arraydata['height'];
+
+                      break;
+                  case 270:
+                      $y = $y - $arraydata['width'];
+                      $h = $arraydata['width'];
+                      $w = $arraydata['height'];
+
+                      break;
+              }
+            }
+            // echo $arraydata["link"];
+            if ($arraydata['link']) {
+                //print_r($arraydata);
+              //$this->debughyperlink=true;
+              //  echo $arraydata["link"].",print:".$this->print_expression_result;
+              //$arraydata["link"] = $JasperObj->analyse_expression($arraydata["link"], "");
+              //$this->debughyperlink=false;
+            }
+            //print_r($arraydata);
+
+            if ($arraydata['writeHTML'] == true) {
+                //echo  ($txt);
+                $pdf->writeHTML($txt, true, 0, true, true);
+                $pdf->Ln();
+            } elseif ($arraydata['poverflow'] == 'false' && $arraydata['soverflow'] == 'false') {
+                if ($arraydata['valign'] == 'C') {
+                    $arraydata['valign'] = 'M';
+                }
+                if ($arraydata['valign'] == '') {
+                    $arraydata['valign'] = 'T';
+                }
+
+                // clip width & height
+                if (!$rotated) {
+                    $pdf->Rect($clipx, $clipy, $clipw, $cliph, 'CNZ');
+                }
+
+                $pattern = (array_key_exists('pattern', $arraydata)) ? $arraydata['pattern'] : '';
+                $text = $pattern != '' ? CReport_Jasper_Utils_FormatUtils::formatPattern($txt, $pattern) : $txt;
+                $pdf->MultiCell(
+                    $w,
+                    $h,
+                    $text,
+                    $arraydata['border'],
+                    $arraydata['align'],
+                    $arraydata['fill'],
+                    0,
+                    $x,
+                    $y,
+                    true,
+                    0,
+                    false,
+                    true,
+                    $h,
+                    $arraydata['valign']
+                );
+                if (isset($arraydata['link']) && !empty($arraydata['link'])) {
+                    $pdf->Link($x, $y, $arraydata['width'], $arraydata['height'], $arraydata['link']);
+                }
+            } elseif ($arraydata['poverflow'] == 'true' || $arraydata['soverflow'] == 'true') {
+                if ($arraydata['valign'] == 'C') {
+                    $arraydata['valign'] = 'M';
+                }
+                if ($arraydata['valign'] == '') {
+                    $arraydata['valign'] = 'T';
+                }
+
+                $x = $pdf->GetX();
+                $yAfter = $pdf->GetY();
+                $maxheight = array_key_exists('maxheight', $arraydata) ? $arraydata['maxheight'] : 0;
+                //if($arraydata["link"])   echo $arraydata["linktarget"].",".$arraydata["link"]."<br/><br/>";
+              $pdf->MultiCell($w, $h, CReport_Jasper_Utils_FormatUtils::formatPattern($txt, $arraydata['pattern']), $arraydata['border'], $arraydata['align'], $arraydata['fill'], 1, $x, $y, true, 0, false, true, $maxheight); //,$arraydata["valign"]);
+              if (($yAfter + $arraydata['height']) <= CReport_Jasper_Instructions::$arrayPageSetting['pageHeight']) {
+                  CReport_Jasper_Instructions::$yAxis = $pdf->GetY() - 20;
+              }
+            } else {
+                $pdf->MultiCell($w, $h, CReport_Jasper_Utils_FormatUtils::formatPattern($txt, $arraydata['pattern']), $arraydata['border'], $arraydata['align'], $arraydata['fill'], 1, $x, $y, true, 0, true, true);
+            }
+            $pdf->StopTransform();
+        }
     }
 
     public function setXY($arraydata) {
@@ -699,160 +845,8 @@ class CReport_Jasper_Processor_PdfProcessor extends CReport_Jasper_ProcessorAbst
         }
     }
 
-    public function checkoverflow($obj) {
-        /** @var \TCPDF $pdf */
-        $pdf = CReport_Jasper_Instructions::$objOutPut;
-        $JasperObj = $this->jasperReport;
-        // var_dump($obj->children);
-        $txt = (string) $obj['txt'];
-        //$newfont = $JasperObj->recommendFont($txt, null, null);
-        //$pdf->SetFont($newfont,$pdf->getFontStyle(),$this->defaultFontSize);
-        $this->printExpression($obj);
-        // if ($obj['printWhenExpression']) {
-        //     $text = $obj['txt'];
-        //     if (cstr::startsWith($text, 'Closing')) {
-        //         // if ($this->print_expression_result) {
-
-        //         cdbg::dd($obj['printWhenExpression'], $JasperObj->arrayVariable, $obj, $this->print_expression_result);
-        //         // }
-        //     }
-        // }
-        $arraydata = $obj;
-
-        $pdf->SetXY($arraydata['x'] + CReport_Jasper_Instructions::$arrayPageSetting['leftMargin'], $arraydata['y'] + CReport_Jasper_Instructions::$yAxis);
-        $x = $pdf->GetX();
-        $y = $pdf->GetY();
-        //default
-        $pLeft = 1;
-        $pTop = 0;
-        $pRight = 1;
-        $pBottom = 0;
-        //suport padding cells
-        if (isset($obj['box']) && !empty($obj['box'])) {
-            if (isset($obj['box']['leftPadding'])) {
-                $pLeft = $obj['box']['leftPadding'];
-            }
-            if (isset($obj['box']['topPadding'])) {
-                $pTop = $obj['box']['topPadding'];
-            }
-            if (isset($obj['box']['rightPadding'])) {
-                $pRight = $obj['box']['rightPadding'];
-            }
-            if (isset($obj['box']['bottomPadding'])) {
-                $pBottom = $obj['box']['bottomPadding'];
-            }
-        }
-        $pdf->setCellPaddings($pLeft, $pTop, $pRight, $pBottom);
-        $w = $arraydata['width'];
-        $h = $arraydata['height'];
-        $pdf->StartTransform();
-
-        $clipx = $arraydata['x'] + CReport_Jasper_Instructions::$arrayPageSetting['leftMargin'];
-        $clipy = $arraydata['y'] + CReport_Jasper_Instructions::$yAxis;
-        $clipw = $arraydata['width'];
-        $cliph = $arraydata['height'];
-
-        $rotated = false;
-        if ($this->print_expression_result == true) {
-            $angle = $this->rotate($arraydata);
-            if ($angle != 0) {
-                $pdf->Rect($clipx, $clipy, $clipw, $cliph, 'CNZ');
-                $pdf->Rotate($angle);
-                $rotated = true;
-                switch ($angle) {
-                    case 90:
-                        $x = $x - $arraydata['height'];
-                        $h = $arraydata['width'];
-                        $w = $arraydata['height'];
-
-                        break;
-                    case 180:
-                        $x = $x - $arraydata['width'];
-                        $y = $y - $arraydata['height'];
-
-                        break;
-                    case 270:
-                        $y = $y - $arraydata['width'];
-                        $h = $arraydata['width'];
-                        $w = $arraydata['height'];
-
-                        break;
-                }
-            }
-            // echo $arraydata["link"];
-            if ($arraydata['link']) {
-                //print_r($arraydata);
-                //$this->debughyperlink=true;
-                //  echo $arraydata["link"].",print:".$this->print_expression_result;
-                //$arraydata["link"] = $JasperObj->analyse_expression($arraydata["link"], "");
-                //$this->debughyperlink=false;
-            }
-            //print_r($arraydata);
-
-            if ($arraydata['writeHTML'] == true) {
-                //echo  ($txt);
-                $pdf->writeHTML($txt, true, 0, true, true);
-                $pdf->Ln();
-            } elseif ($arraydata['poverflow'] == 'false' && $arraydata['soverflow'] == 'false') {
-                if ($arraydata['valign'] == 'C') {
-                    $arraydata['valign'] = 'M';
-                }
-                if ($arraydata['valign'] == '') {
-                    $arraydata['valign'] = 'T';
-                }
-
-                // clip width & height
-                if (!$rotated) {
-                    $pdf->Rect($clipx, $clipy, $clipw, $cliph, 'CNZ');
-                }
-
-                $pattern = (array_key_exists('pattern', $arraydata)) ? $arraydata['pattern'] : '';
-                $text = $pattern != '' ? CReport_Jasper_Utils_FormatUtils::formatPattern($txt, $pattern) : $txt;
-                $pdf->MultiCell(
-                    $w,
-                    $h,
-                    $text,
-                    $arraydata['border'],
-                    $arraydata['align'],
-                    $arraydata['fill'],
-                    0,
-                    $x,
-                    $y,
-                    true,
-                    0,
-                    false,
-                    true,
-                    $h,
-                    $arraydata['valign']
-                );
-                if (isset($arraydata['link']) && !empty($arraydata['link'])) {
-                    $pdf->Link($x, $y, $arraydata['width'], $arraydata['height'], $arraydata['link']);
-                }
-            } elseif ($arraydata['poverflow'] == 'true' || $arraydata['soverflow'] == 'true') {
-                if ($arraydata['valign'] == 'C') {
-                    $arraydata['valign'] = 'M';
-                }
-                if ($arraydata['valign'] == '') {
-                    $arraydata['valign'] = 'T';
-                }
-
-                $x = $pdf->GetX();
-                $yAfter = $pdf->GetY();
-                $maxheight = array_key_exists('maxheight', $arraydata) ? $arraydata['maxheight'] : 0;
-                //if($arraydata["link"])   echo $arraydata["linktarget"].",".$arraydata["link"]."<br/><br/>";
-                $pdf->MultiCell($w, $h, CReport_Jasper_Utils_FormatUtils::formatPattern($txt, $arraydata['pattern']), $arraydata['border'], $arraydata['align'], $arraydata['fill'], 1, $x, $y, true, 0, false, true, $maxheight); //,$arraydata["valign"]);
-                if (($yAfter + $arraydata['height']) <= CReport_Jasper_Instructions::$arrayPageSetting['pageHeight']) {
-                    CReport_Jasper_Instructions::$yAxis = $pdf->GetY() - 20;
-                }
-            } else {
-                $pdf->MultiCell($w, $h, CReport_Jasper_Utils_FormatUtils::formatPattern($txt, $arraydata['pattern']), $arraydata['border'], $arraydata['align'], $arraydata['fill'], 1, $x, $y, true, 0, true, true);
-            }
-            $pdf->StopTransform();
-        }
-    }
-
     public function printExpression($data) {
-        $expression = $data['printWhenExpression'];
+        $expression = carr::get($data, 'printWhenExpression', '');
         $this->print_expression_result = false;
         if ($expression != '') {
             //echo      'if('.$expression.'){$this->print_expression_result=true;}';
