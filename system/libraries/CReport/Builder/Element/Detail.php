@@ -14,7 +14,21 @@ class CReport_Builder_Element_Detail extends CReport_Builder_ElementAbstract {
 
         return $openTag . PHP_EOL . $body . PHP_EOL . $closeTag;
     }
-    public function generate(CReport_Generator_ProcessorAbstract $processor) {
 
+    public function generate(CReport_Generator $generator, CReport_Generator_ProcessorAbstract $processor) {
+        $data = $generator->getData();
+        if (count($this->children) > 0) {
+            foreach ($data as $rowIndex => $row) {
+                /** @var CReport_Builder_Row $row */
+                $generator->setCurrentRow($row);
+                foreach ($this->children as $child) {
+                    $child->generate($generator, $processor);
+                }
+                if ($this->getSplitType() == CREPORT::SPLIT_TYPE_STRETCH || $this->getSplitType() == CREPORT::SPLIT_TYPE_PREVENT) {
+                    $height = $this->getHeight();
+                    $processor->addY($height);
+                }
+            }
+        }
     }
 }

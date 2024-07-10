@@ -47,6 +47,15 @@ class CReport_Builder_JrXmlEnum {
     }
 
     /**
+     * @param string $textAlignment
+     *
+     * @return string
+     */
+    public static function getTextAlignmentEnum(string $textAlignment) {
+        return ucfirst($textAlignment);
+    }
+
+    /**
      * @param string $scaleImage
      *
      * @return string

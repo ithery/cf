@@ -3,6 +3,7 @@
 class CReport_Builder_Report implements CReport_Builder_Contract_JrXmlElementInterface {
     use CReport_Builder_Trait_HasChildrenElementTrait;
     use CReport_Builder_Trait_Property_FontPropertyTrait;
+
     protected $name;
 
     protected $pageWidth;
@@ -208,9 +209,12 @@ class CReport_Builder_Report implements CReport_Builder_Contract_JrXmlElementInt
     public function toJson() {
     }
 
-    public function generate(CReport_Generator_ProcessorAbstract $processor) {
+    public function generate(CReport_Generator $generator, CReport_Generator_ProcessorAbstract $processor) {
         foreach ($this->children as $child) {
-            $child->generate($processor);
+            if ($child instanceof CReport_Builder_Element_Group) {
+                continue;
+            }
+            $child->generate($generator, $processor);
         }
     }
 }

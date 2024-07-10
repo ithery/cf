@@ -5,6 +5,7 @@ class CReport_Builder_Element_Image extends CReport_Builder_ElementAbstract {
     use CReport_Builder_Trait_Property_SrcPropertyTrait;
     use CReport_Builder_Trait_Property_HorizontalAlignmentPropertyTrait;
     use CReport_Builder_Trait_Property_VerticalAlignmentPropertyTrait;
+
     protected $scaleImage;
 
     public function __construct() {
@@ -61,7 +62,7 @@ class CReport_Builder_Element_Image extends CReport_Builder_ElementAbstract {
         return $tag;
     }
 
-    public function generate(CReport_Generator_ProcessorAbstract $processor) {
+    public function generate(CReport_Generator $generator, CReport_Generator_ProcessorAbstract $processor) {
         $options = [];
         $options['x'] = $this->getX();
         $options['y'] = $this->getY();

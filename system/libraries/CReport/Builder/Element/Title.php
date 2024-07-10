@@ -15,8 +15,8 @@ class CReport_Builder_Element_Title extends CReport_Builder_ElementAbstract {
         return $openTag . PHP_EOL . $body . PHP_EOL . $closeTag;
     }
 
-    public function generate(CReport_Generator_ProcessorAbstract $processor) {
-        parent::generate($processor);
+    public function generate(CReport_Generator $generator, CReport_Generator_ProcessorAbstract $processor) {
+        parent::generate($generator, $processor);
         // CReport_Jasper_Instructions::addInstruction(['type' => 'setYAxis', 'y_axis' => $height]);
         $height = $this->getHeight();
         $processor->addY($height);

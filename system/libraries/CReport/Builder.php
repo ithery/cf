@@ -12,10 +12,16 @@
  */
 class CReport_Builder {
     use CTrait_ForwardsCalls;
+
     /**
      * @var CReport_Builder_Report
      */
     protected $report;
+
+    /**
+     * @var CReport_Builder_Dictionary
+     */
+    protected $dictionary;
 
     /**
      * @var CManager_Contract_DataProviderInterface
@@ -24,6 +30,7 @@ class CReport_Builder {
 
     public function __construct() {
         $this->report = new CReport_Builder_Report();
+        $this->dictionary = new CReport_Builder_Dictionary();
     }
 
     public function setPaperSize($size) {
@@ -72,7 +79,7 @@ class CReport_Builder {
     public function getPdf() {
         $jrxml = $this->report->toJrXml();
         // cdbg::dd($jrxml);
-        $generator = new CReport_Generator($this->report, $this->dataProvider);
+        $generator = new CReport_Generator($this->report, $this->dictionary, $this->dataProvider);
 
         $pdf = $generator->getPdf();
 

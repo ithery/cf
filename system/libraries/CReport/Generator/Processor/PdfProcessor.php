@@ -42,7 +42,7 @@ class CReport_Generator_Processor_PdfProcessor extends CReport_Generator_Process
         $this->currentX = $this->offsetX;
     }
 
-    private function getAlign($alignment) {
+    private function getPdfTextAlignment($alignment) {
         $alignmentMap = [
             CREPORT::TEXT_ALIGNMENT_CENTER => 'C',
             CREPORT::TEXT_ALIGNMENT_LEFT => 'L',
@@ -51,6 +51,86 @@ class CReport_Generator_Processor_PdfProcessor extends CReport_Generator_Process
         ];
 
         return carr::get($alignmentMap, $alignment, 'L');
+    }
+
+    private function getPdfVerticalAlignment($alignment) {
+        $alignmentMap = [
+            CREPORT::VERTICAL_ALIGNMENT_BOTTOM => 'B',
+            CREPORT::VERTICAL_ALIGNMENT_MIDDLE => 'M',
+            CREPORT::VERTICAL_ALIGNMENT_TOP => 'T',
+        ];
+
+        return carr::get($alignmentMap, $alignment, 'T');
+    }
+
+    /**
+     * Return format for a component of a box.
+     *
+     * @param CReport_Builder_Object_Pen      $pen
+     * @param null|CReport_Builder_Object_Box $box
+     *
+     * @return int[]|string[]|int[][]
+     */
+    public static function getPdfPen(CReport_Builder_Object_Pen $pen, CReport_Builder_Object_Box $box = null) {
+        $lineColor = $pen->getLineColor();
+        if ($lineColor) {
+            $lineColorRgb = CColor::create($lineColor)->toRgb();
+            $drawcolor = [
+                'r' => $lineColorRgb->red(),
+                'g' => $lineColorRgb->green(),
+                'b' => $lineColorRgb->blue()
+            ];
+        }
+
+        $dash = '';
+        $lineStyle = $pen->getLineStyle();
+        if ($lineStyle) {
+            // Dotted Dashed
+            if ($lineStyle == CReport::LINE_STYLE_DOTTED) {
+                $dash = '1,1';
+            } elseif ($lineStyle == CReport::LINE_STYLE_DASHED) {
+                $dash = '4,2';
+            }
+        }
+
+        return [
+            'width' => $pen->getLineWidth(),
+            'cap' => 'butt',
+            'join' => 'miter',
+            'dash' => $dash,
+            'phase' => 0,
+            'color' => $drawcolor
+        ];
+    }
+
+    /**
+     * Returns patterns for all borders of a box.
+     *
+     * @param CReport_Builder_Object_Box $box
+     *
+     * @return array[]
+     */
+    private function getPdfBorder(CReport_Builder_Object_Box $box) {
+        $border = [];
+        $pen = $box->getPen();
+        $topPen = $box->getTopPen() ?: $pen;
+        $leftPen = $box->getLeftPen() ?: $pen;
+        $bottomPen = $box->getLeftPen() ?: $pen;
+        $rightPen = $box->getLeftPen() ?: $pen;
+        if ($topPen && $topPen->getLineWidth() > 0.0) {
+            $border['T'] = $this->getPdfPen($topPen);
+        }
+        if ($leftPen && $leftPen->getLineWidth() > 0.0) {
+            $border['L'] = $this->getPdfPen($leftPen);
+        }
+        if ($bottomPen && $bottomPen->getLineWidth() > 0.0) {
+            $border['L'] = $this->getPdfPen($bottomPen);
+        }
+        if ($rightPen && $rightPen->getLineWidth() > 0.0) {
+            $border['L'] = $this->getPdfPen($rightPen);
+        }
+
+        return $border;
     }
 
     /**
@@ -107,12 +187,13 @@ class CReport_Generator_Processor_PdfProcessor extends CReport_Generator_Process
         $backgroundColor = carr::get($options, 'backgroundColor');
         $x = carr::get($options, 'x');
         $y = carr::get($options, 'y');
-        $x = $this->offsetX + $x;
-        $y = $this->currentY + $y;
+        $pdfX = $this->offsetX + $x;
+        $pdfY = $this->currentY + $y;
         $box = carr::get($options, 'box');
         $lineSpacing = carr::get($options, 'lineSpacing');
 
-        $textAlignment = $this->getAlign(carr::get($options, 'textAlignment'));
+        $pdfTextAlignment = $this->getPdfTextAlignment(carr::get($options, 'textAlignment'));
+        $pdfVerticalAlignment = $this->getPdfVerticalAlignment(carr::get($options, 'verticalAlignment'));
         $fill = 0;
         // if ($x != null) {
         //     $this->tcpdf->setX($x);
@@ -121,8 +202,10 @@ class CReport_Generator_Processor_PdfProcessor extends CReport_Generator_Process
         //     $this->tcpdf->setY($y);
         // }
         // CReport_Jasper_Instructions::$objOutPut->SetXY($arraydata['x'] + CReport_Jasper_Instructions::$arrayPageSetting['leftMargin'], $arraydata['y'] + CReport_Jasper_Instructions::$yAxis);
+        $pdfBorder = 0;
         if ($box && $box instanceof CReport_Builder_Object_Box) {
             $padding = $box->getPadding();
+            $pdfBorder = $this->getPdfBorder($box);
             $this->tcpdf->setCellPaddings($padding->getPaddingLeft(), $padding->getPaddingTop(), $padding->getPaddingRight(), $padding->getPaddingBottom());
         }
         if ($backgroundColor) {
@@ -136,22 +219,24 @@ class CReport_Generator_Processor_PdfProcessor extends CReport_Generator_Process
         if ($font != null) {
             $this->font($font);
         }
+
+        $maxHeight = $height;
         $this->tcpdf->MultiCell(
             $width,
             $height,
             $text,
-            $border = 0,
-            $textAlignment,
+            $pdfBorder,
+            $pdfTextAlignment,
             $fill,
             $ln = 1,
-            $x,
-            $y,
+            $pdfX,
+            $pdfY,
             $reseth = true,
             $stretch = 0,
             $ishtml = false,
             $autopadding = true,
-            $maxh = 0,
-            $valign = 'T',
+            $maxHeight,
+            $pdfVerticalAlignment,
             $fitcell = false
         );
     }

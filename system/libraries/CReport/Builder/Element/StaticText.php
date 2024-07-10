@@ -2,12 +2,9 @@
 
 class CReport_Builder_Element_StaticText extends CReport_Builder_ElementAbstract {
     use CReport_Builder_Trait_HasReportElementTrait;
+    use CReport_Builder_Trait_HasTextElementTrait;
     use CReport_Builder_Trait_Property_TextPropertyTrait;
     use CReport_Builder_Trait_Property_BoxPropertyTrait;
-    use CReport_Builder_Trait_Property_FontPropertyTrait;
-    use CReport_Builder_Trait_Property_ParagraphPropertyTrait;
-    use CReport_Builder_Trait_Property_TextAlignmentPropertyTrait;
-    use CReport_Builder_Trait_Property_VerticalAlignmentPropertyTrait;
 
     public function __construct() {
         parent::__construct();
@@ -23,10 +20,7 @@ class CReport_Builder_Element_StaticText extends CReport_Builder_ElementAbstract
         $openTag = '<staticText>';
 
         $reportElement = $this->getReportElementJrXml();
-        $textElement = '<textElement textAlignment="' . $this->textAlignment . '" verticalAlignment="' . $this->verticalAlignment . '">
-        ' . $this->font->toJrXml() . '
-        ' . $this->paragraph->toJrXml() . '
-        </textElement>';
+        $textElement = $this->getTextElementJrXml();
         $text = '<text><![CDATA[' . $this->text . ']]></text>' . PHP_EOL;
         $body = '';
         $body .= $reportElement . PHP_EOL;
@@ -39,7 +33,7 @@ class CReport_Builder_Element_StaticText extends CReport_Builder_ElementAbstract
         return $openTag . PHP_EOL . $body . PHP_EOL . $closeTag;
     }
 
-    public function generate(CReport_Generator_ProcessorAbstract $processor) {
+    public function generate(CReport_Generator $generator, CReport_Generator_ProcessorAbstract $processor) {
         $options = [];
         $options['x'] = $this->getX();
         $options['y'] = $this->getY();

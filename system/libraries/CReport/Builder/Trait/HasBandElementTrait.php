@@ -6,11 +6,11 @@ trait CReport_Builder_Trait_HasBandElementTrait {
 
     public function jrXmlWrapWithBand(string $body) {
         $openTag = '<band';
-        if($this->height) {
+        if ($this->height) {
             $openTag .= $this->height !== null ? ' height="' . $this->height . '"' : '';
         }
 
-        if($this->splitType) {
+        if ($this->splitType) {
             $openTag .= $this->splitType !== null ? ' splitType="' . CReport_Builder_JrXmlEnum::getSplitTypeEnum($this->splitType) . '"' : '';
         }
         $openTag .= '>';

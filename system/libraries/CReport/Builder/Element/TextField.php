@@ -2,13 +2,9 @@
 
 class CReport_Builder_Element_TextField extends CReport_Builder_ElementAbstract {
     use CReport_Builder_Trait_HasReportElementTrait;
+    use CReport_Builder_Trait_HasTextElementTrait;
     use CReport_Builder_Trait_Property_TextPropertyTrait;
     use CReport_Builder_Trait_Property_BoxPropertyTrait;
-    use CReport_Builder_Trait_Property_FontPropertyTrait;
-    use CReport_Builder_Trait_Property_ParagraphPropertyTrait;
-    use CReport_Builder_Trait_Property_PrintWhenExpressionPropertyTrait;
-    use CReport_Builder_Trait_Property_TextAlignmentPropertyTrait;
-    use CReport_Builder_Trait_Property_VerticalAlignmentPropertyTrait;
     use CReport_Builder_Trait_Property_IsStretchWithOverflowPropertyTrait;
     use CReport_Builder_Trait_Property_PatternPropertyTrait;
 
@@ -52,10 +48,7 @@ class CReport_Builder_Element_TextField extends CReport_Builder_ElementAbstract 
 
         $reportElement = $this->getReportElementJrXml();
 
-        $textElement = '<textElement textAlignment="' . $this->textAlignment . '" verticalAlignment="' . $this->verticalAlignment . '">
-        ' . $this->font->toJrXml() . '
-        ' . $this->paragraph->toJrXml() . '
-        </textElement>';
+        $textElement = $this->getTextElementJrXml();
         $textFieldExpression = '<textFieldExpression><![CDATA[' . $this->textFieldExpression . ']]></textFieldExpression>' . PHP_EOL;
         $pattern = '';
         if ($this->pattern) {
@@ -73,13 +66,19 @@ class CReport_Builder_Element_TextField extends CReport_Builder_ElementAbstract 
         return $openTag . PHP_EOL . $body . PHP_EOL . $closeTag;
     }
 
-    public function generate(CReport_Generator_ProcessorAbstract $processor) {
+    public function generate(CReport_Generator $generator, CReport_Generator_ProcessorAbstract $processor) {
+        $text = $this->getTextFieldExpression();
+        if ($text) {
+            $text = $generator->getExpression($text);
+        } else {
+            $text = $this->getText();
+        }
         $options = [];
         $options['x'] = $this->getX();
         $options['y'] = $this->getY();
         $options['width'] = $this->getWidth();
         $options['height'] = $this->getHeight();
-        $options['text'] = $this->getText();
+        $options['text'] = $text;
         $options['textAlignment'] = $this->getTextAlignment();
         $options['verticalAlignment'] = $this->getVerticalAlignment();
         $options['font'] = $this->getFont();
