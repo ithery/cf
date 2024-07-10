@@ -49,24 +49,21 @@ class CManager_Asset_Module {
             $clientModulesFiles = array_reverse($clientModulesFiles);
             $assetsFiles = array_reverse($assetsFiles);
 
+            $systemModulesFile = DOCROOT . 'system' . DS . 'data' . DS . 'assets-module.php';
+            $systemModules = include $systemModulesFile;
+            $this->allModules = array_merge($this->allModules, $systemModules);
+
             foreach ($clientModulesFiles as $file) {
                 $appModules = include $file;
                 if (!is_array($appModules)) {
-                    throw new CManager_Exception('Invalid client modules config format on :file', [':file', $file]);
+                    throw new CManager_Exception(c::__('Invalid client modules config format on :file', ['file' => $file]));
                 }
 
                 $this->allModules = array_merge($this->allModules, $appModules);
             }
-
-            foreach ($assetsFiles as $assetsFiles) {
-                $assetsConfig = include $file;
-                if (!is_array($assetsConfig)) {
-                    throw new CManager_Exception('Invalid assets config format on :file', [':file', $file]);
-                }
-                $appModules = carr::get($assetsConfig, 'modules');
-                if (is_array($appModules)) {
-                    $this->allModules = array_merge($this->allModules, $appModules);
-                }
+            $assetModules = CF::config('assets.modules');
+            if ($assetModules) {
+                $this->allModules = array_merge($this->allModules, $assetModules);
             }
         }
 
