@@ -81,6 +81,7 @@ class CReport_Builder_Element_TextField extends CReport_Builder_ElementAbstract 
         $options['height'] = $this->getHeight();
         $options['text'] = $this->getText();
         $options['textAlignment'] = $this->getTextAlignment();
+        $options['verticalAlignment'] = $this->getVerticalAlignment();
         $options['font'] = $this->getFont();
         $options['backgroundColor'] = $this->getBackgroundColor();
         $options['box'] = $this->getBox();

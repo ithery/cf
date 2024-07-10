@@ -442,7 +442,7 @@ class CReport_Jasper_Report {
                 return str_ireplace(['$V{' . $variable . '}'], ['{:ptp:}'], $text);
             }
 
-            return str_ireplace(['$V{' . $variable . '}'], [CReport_Jasper_Instructions::$currrentPage], $text);
+            return str_ireplace(['$V{' . $variable . '}'], [CReport_Jasper_Instructions::$currentPage], $text);
         } else {
             return str_ireplace(['$V{' . $variable . '}'], [$ans], $text);
         }
