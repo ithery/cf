@@ -42,34 +42,6 @@ class CReport_Generator_Processor_PdfProcessor extends CReport_Generator_Process
         $this->currentX = $this->offsetX;
     }
 
-    protected function prepare() {
-        CReport_Jasper_Instructions::$arrayPageSetting = $this->jasperReport->arrayPageSetting;
-        if ($this->jasperReport->arrayPageSetting['orientation'] == 'Landscape') {
-            CReport_Jasper_Instructions::$objOutPut = new CReport_Pdf_Adapter_TCPDF(
-                $this->jasperReport->arrayPageSetting['orientation'],
-                'pt',
-                [intval($this->jasperReport->arrayPageSetting['pageHeight']), intval($this->jasperReport->arrayPageSetting['pageWidth'])],
-                true
-            );
-        } else {
-            CReport_Jasper_Instructions::$objOutPut = new CReport_Pdf_Adapter_TCPDF($this->jasperReport->arrayPageSetting['orientation'], 'pt', [intval($this->jasperReport->arrayPageSetting['pageWidth']), intval($this->jasperReport->arrayPageSetting['pageHeight'])], true);
-        }
-        CReport_Jasper_Instructions::$objOutPut->SetLeftMargin((int) $this->jasperReport->arrayPageSetting['leftMargin']);
-        CReport_Jasper_Instructions::$objOutPut->SetRightMargin((int) $this->jasperReport->arrayPageSetting['rightMargin']);
-        CReport_Jasper_Instructions::$objOutPut->SetTopMargin((int) $this->jasperReport->arrayPageSetting['topMargin']);
-        CReport_Jasper_Instructions::$objOutPut->SetAutoPageBreak(true, (int) $this->jasperReport->arrayPageSetting['bottomMargin'] / 2);
-        //self::$pdfOutPut->AliasNumPage();
-        CReport_Jasper_Instructions::$objOutPut->setPrintHeader(false);
-        CReport_Jasper_Instructions::$objOutPut->setPrintFooter(false);
-        CReport_Jasper_Instructions::$objOutPut->AddPage();
-        CReport_Jasper_Instructions::$objOutPut->setPage(1, true);
-        CReport_Jasper_Instructions::$yAxis = (int) $this->jasperReport->arrayPageSetting['topMargin'];
-
-        if (CReport_Jasper_Instructions::$fontdir == '') {
-            CReport_Jasper_Instructions::$fontdir = dirname(__FILE__) . '/tcpdf/fonts';
-        }
-    }
-
     private function getAlign($alignment) {
         $alignmentMap = [
             CREPORT::TEXT_ALIGNMENT_CENTER => 'C',

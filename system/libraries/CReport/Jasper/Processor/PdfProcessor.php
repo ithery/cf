@@ -469,32 +469,32 @@ class CReport_Jasper_Processor_PdfProcessor extends CReport_Jasper_ProcessorAbst
                 $pdf->Rotate($angle);
                 $rotated = true;
                 switch ($angle) {
-                  case 90:
-                      $x = $x - $arraydata['height'];
-                      $h = $arraydata['width'];
-                      $w = $arraydata['height'];
+                    case 90:
+                        $x = $x - $arraydata['height'];
+                        $h = $arraydata['width'];
+                        $w = $arraydata['height'];
 
-                      break;
-                  case 180:
-                      $x = $x - $arraydata['width'];
-                      $y = $y - $arraydata['height'];
+                        break;
+                    case 180:
+                        $x = $x - $arraydata['width'];
+                        $y = $y - $arraydata['height'];
 
-                      break;
-                  case 270:
-                      $y = $y - $arraydata['width'];
-                      $h = $arraydata['width'];
-                      $w = $arraydata['height'];
+                        break;
+                    case 270:
+                        $y = $y - $arraydata['width'];
+                        $h = $arraydata['width'];
+                        $w = $arraydata['height'];
 
-                      break;
-              }
+                        break;
+                }
             }
             // echo $arraydata["link"];
             if ($arraydata['link']) {
                 //print_r($arraydata);
-              //$this->debughyperlink=true;
-              //  echo $arraydata["link"].",print:".$this->print_expression_result;
-              //$arraydata["link"] = $JasperObj->analyse_expression($arraydata["link"], "");
-              //$this->debughyperlink=false;
+                // $this->debughyperlink=true;
+                // echo $arraydata["link"].",print:".$this->print_expression_result;
+                // $arraydata["link"] = $JasperObj->analyse_expression($arraydata["link"], "");
+                // $this->debughyperlink=false;
             }
             //print_r($arraydata);
 
@@ -549,10 +549,10 @@ class CReport_Jasper_Processor_PdfProcessor extends CReport_Jasper_ProcessorAbst
                 $yAfter = $pdf->GetY();
                 $maxheight = array_key_exists('maxheight', $arraydata) ? $arraydata['maxheight'] : 0;
                 //if($arraydata["link"])   echo $arraydata["linktarget"].",".$arraydata["link"]."<br/><br/>";
-              $pdf->MultiCell($w, $h, CReport_Jasper_Utils_FormatUtils::formatPattern($txt, $arraydata['pattern']), $arraydata['border'], $arraydata['align'], $arraydata['fill'], 1, $x, $y, true, 0, false, true, $maxheight); //,$arraydata["valign"]);
-              if (($yAfter + $arraydata['height']) <= CReport_Jasper_Instructions::$arrayPageSetting['pageHeight']) {
-                  CReport_Jasper_Instructions::$yAxis = $pdf->GetY() - 20;
-              }
+                $pdf->MultiCell($w, $h, CReport_Jasper_Utils_FormatUtils::formatPattern($txt, $arraydata['pattern']), $arraydata['border'], $arraydata['align'], $arraydata['fill'], 1, $x, $y, true, 0, false, true, $maxheight); //,$arraydata["valign"]);
+                if (($yAfter + $arraydata['height']) <= CReport_Jasper_Instructions::$arrayPageSetting['pageHeight']) {
+                    CReport_Jasper_Instructions::$yAxis = $pdf->GetY() - 20;
+                }
             } else {
                 $pdf->MultiCell($w, $h, CReport_Jasper_Utils_FormatUtils::formatPattern($txt, $arraydata['pattern']), $arraydata['border'], $arraydata['align'], $arraydata['fill'], 1, $x, $y, true, 0, true, true);
             }

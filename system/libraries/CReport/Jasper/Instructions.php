@@ -8,7 +8,7 @@ final class CReport_Jasper_Instructions {
 
     public static $fontdir;
 
-    public static $currrentPage = 1;
+    public static $currentPage = 1;
 
     public static $yAxis;
 

@@ -11,6 +11,7 @@ class CReport_Builder_Element_TextField extends CReport_Builder_ElementAbstract 
     use CReport_Builder_Trait_Property_VerticalAlignmentPropertyTrait;
     use CReport_Builder_Trait_Property_IsStretchWithOverflowPropertyTrait;
     use CReport_Builder_Trait_Property_PatternPropertyTrait;
+
     /**
      * @var string
      */
@@ -73,5 +74,17 @@ class CReport_Builder_Element_TextField extends CReport_Builder_ElementAbstract 
     }
 
     public function generate(CReport_Generator_ProcessorAbstract $processor) {
+        $options = [];
+        $options['x'] = $this->getX();
+        $options['y'] = $this->getY();
+        $options['width'] = $this->getWidth();
+        $options['height'] = $this->getHeight();
+        $options['text'] = $this->getText();
+        $options['textAlignment'] = $this->getTextAlignment();
+        $options['font'] = $this->getFont();
+        $options['backgroundColor'] = $this->getBackgroundColor();
+        $options['box'] = $this->getBox();
+        $options['lineSpacing'] = $this->getLineSpacing();
+        $processor->cell($options);
     }
 }
