@@ -817,6 +817,7 @@ final class CF {
                     if (static::isFile($path . $search)) {
                         // A matching file has been found
                         $found = $path . $search;
+
                         // Stop searching
                         break;
                     }
