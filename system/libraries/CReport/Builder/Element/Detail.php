@@ -19,15 +19,17 @@ class CReport_Builder_Element_Detail extends CReport_Builder_ElementAbstract {
         $data = $generator->getData();
         if (count($this->children) > 0) {
             foreach ($data as $rowIndex => $row) {
+                $height = $this->getHeight();
                 /** @var CReport_Builder_Row $row */
                 $generator->setCurrentRow($row);
+                $processor->preventYOverflow($generator, $height);
                 foreach ($this->children as $child) {
                     $child->generate($generator, $processor);
                 }
-                if ($this->getSplitType() == CREPORT::SPLIT_TYPE_STRETCH || $this->getSplitType() == CREPORT::SPLIT_TYPE_PREVENT) {
-                    $height = $this->getHeight();
+                //if ($this->getSplitType() == CREPORT::SPLIT_TYPE_STRETCH || $this->getSplitType() == CREPORT::SPLIT_TYPE_PREVENT) {
+
                     $processor->addY($height);
-                }
+                //}
             }
         }
     }

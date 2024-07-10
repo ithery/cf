@@ -64,7 +64,7 @@ class CReport_Builder_JrXmlEnum {
         return ucfirst($scaleImage);
     }
 
-    public static function getBoolEnum(mixed $bool) {
+    public static function getBoolEnum($bool) {
         if (is_bool($bool)) {
             return $bool ? self::BOOL_TRUE : self::BOOL_FALSE;
         }

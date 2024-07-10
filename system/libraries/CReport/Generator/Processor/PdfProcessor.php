@@ -9,11 +9,16 @@ class CReport_Generator_Processor_PdfProcessor extends CReport_Generator_Process
 
     protected $pageWidth;
 
+    protected $topMargin;
+
+    protected $leftMargin;
+
+    protected $rightMargin;
+
+    protected $bottomMargin;
+
     protected $currentX;
 
-    protected $offsetX;
-
-    protected $offsetY;
 
     public function __construct(CReport_Builder_Report $report) {
         parent::__construct($report);
@@ -36,10 +41,12 @@ class CReport_Generator_Processor_PdfProcessor extends CReport_Generator_Process
         $this->tcpdf->SetAutoPageBreak(true, $report->getBottomMargin() > 0 ? $report->getBottomMargin() / 2 : 0);
         $this->tcpdf->AddPage();
         $this->tcpdf->setPage(1, true);
-        $this->offsetY = $report->getTopMargin();
-        $this->offsetX = $report->getLeftMargin();
-        $this->currentY = $this->offsetY;
-        $this->currentX = $this->offsetX;
+        $this->topMargin = $report->getTopMargin();
+        $this->bottomMargin = $report->getBottomMargin();
+        $this->leftMargin = $report->getLeftMargin();
+        $this->rightMargin = $report->getRightMargin();
+        $this->currentY = $this->topMargin;
+        $this->currentX = $this->leftMargin;
     }
 
     private function getPdfTextAlignment($alignment) {
@@ -133,10 +140,53 @@ class CReport_Generator_Processor_PdfProcessor extends CReport_Generator_Process
         return $border;
     }
 
+
+    public function preventYOverflow(CReport_Generator $generator, $height) {
+        $preventYAxis = $this->currentY + $height;
+        $pageHeight = $this->pageHeight;
+        //$pageFooter = $this->jasperReport->getRoot()->getChildByClassName('PageFooter');
+        $pageFooter = null;
+        $pageFooterHeight = 0;
+        $topMargin = $this->topMargin;
+        $bottomMargin = $this->bottomMargin;
+        $discount = $pageHeight - $pageFooterHeight - $topMargin - $bottomMargin; //dicount heights of page parts;
+        // var_dump($pageFooter);
+        //exit;
+
+        if ($preventYAxis >= $discount) {
+            // cdbg::dd($preventYAxis, $discount, $pageheight, $pageFooterHeigth, $topMargin, $bottomMargin);
+
+            if ($pageFooter) {
+                // CReport_Jasper_Instructions::$lastPageFooter = false;
+                // $pageFooter->generate($this->jasperReport);
+            }
+            $this->resetY();
+            $generator->incrementPageNumber();
+            $this->tcpdf->AddPage();
+            $this->tcpdf->setPage($generator->getPageNumber(), $resetMargin = false);
+
+            // $pageHeader = $this->jasperReport->getRoot()->getChildByClassName('PageHeader');
+            // if ($pageHeader) {
+            //     $pageHeader->generate($this->jasperReport);
+            // }
+            // //repeat column header?
+            // if ($this->jasperReport::$columnHeaderRepeat) {
+            //     $columnHeader = $this->jasperReport->getRoot()->getChildByClassName('ColumnHeader');
+            //     if ($columnHeader) {
+            //         $columnHeader->generate($this->jasperReport);
+            //     }
+            // }
+            // CReport_Jasper_Instructions::runInstructions();
+        }
+    }
+
+    public function resetY() {
+        $this->currentY = $this->topMargin;
+    }
     /**
      * @param float $height
      *
-     * @return flaot
+     * @return float
      */
     public function addY($height) {
         if ($this->currentY + $height <= $this->pageHeight) {
@@ -187,7 +237,7 @@ class CReport_Generator_Processor_PdfProcessor extends CReport_Generator_Process
         $backgroundColor = carr::get($options, 'backgroundColor');
         $x = carr::get($options, 'x');
         $y = carr::get($options, 'y');
-        $pdfX = $this->offsetX + $x;
+        $pdfX = $this->leftMargin + $x;
         $pdfY = $this->currentY + $y;
         $box = carr::get($options, 'box');
         $lineSpacing = carr::get($options, 'lineSpacing');

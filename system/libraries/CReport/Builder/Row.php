@@ -21,7 +21,7 @@ class CReport_Builder_Row implements ArrayAccess {
             return $this->row->has($offset);
         }
         if ($this->row instanceof CModel) {
-            return isset($this->row->getAttributes()[$offset]);
+            return $this->row->$offset !== null;
         }
 
         return false;
@@ -33,6 +33,9 @@ class CReport_Builder_Row implements ArrayAccess {
      * @param mixed $offset
      */
     public function offsetGet($offset) {
+        if ($this->row instanceof CModel) {
+            return $this->row->$offset;
+        }
         return carr::get($this->row, $offset);
     }
 

@@ -31,18 +31,29 @@ class CReport_Generator {
      */
     protected $currentRow;
 
+    protected $pageNumber;
+
     public function __construct(CReport_Builder_Report $report, CReport_Builder_Dictionary $dictionary, CManager_Contract_DataProviderInterface $dataProvider = null) {
         $this->report = $report;
         $this->dictionary = $dictionary;
         $this->dataProvider = $dataProvider;
-
-        $this->data = new CReport_Builder_Data($this->dataProvider->toEnumerable());
+        $this->data = $this->dataProvider ? new CReport_Builder_Data($this->dataProvider->toEnumerable()) : new CReport_Builder_Data(c::collect());
         $this->currentRow = carr::first($this->data);
+
         $this->evaluator = new CReport_Generator_Evaluator($this);
     }
 
     public function getFieldValue($field, $default = null) {
-        return carr::get($this->currentRow, $field, $default);
+        $fields = explode('.', $field);
+        $value = $this->currentRow;
+        foreach ($fields as $field) {
+            if ($value instanceof CModel) {
+                $value = $value->$field;
+            } else {
+                $value = carr::get($value, $field);
+            }
+        }
+        return $value;
     }
 
     public function getExpression(string $expression) {
@@ -80,15 +91,24 @@ class CReport_Generator {
     }
 
     protected function generate(CReport_Generator_ProcessorAbstract $processor) {
+        $this->pageNumber = 1;
+
         $this->report->generate($this, $processor);
+
+
     }
 
+    public function incrementPageNumber() {
+        $this->pageNumber++;
+        return $this;
+    }
+
+    public function getPageNumber() {
+        return $this->pageNumber;
+    }
     public function getPdf() {
-        // $this->report()->setProcessor($this->manager()->createPdfProcessor());
         $processor = new CReport_Generator_Processor_PdfProcessor($this->report);
-        // $instructions = $this->generateInstructions
-        // CReport_Jasper_Manager::instance()->getGenerator()->generateReport($this);
-        $this->report->generate($this, $processor);
+        $this->generate($processor);
         $pdf = $processor->getOutput();
 
         // $pdf = CReport_Jasper_Instructions::get();

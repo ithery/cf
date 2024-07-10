@@ -122,14 +122,14 @@ class CReport_Builder_Report implements CReport_Builder_Contract_JrXmlElementInt
     }
 
     /**
-     * @return flaot
+     * @return float
      */
     public function getPageWidth() {
         return $this->pageWidth;
     }
 
     /**
-     * @return flaot
+     * @return float
      */
     public function getPageHeight() {
         return $this->pageHeight;
@@ -143,28 +143,28 @@ class CReport_Builder_Report implements CReport_Builder_Contract_JrXmlElementInt
     }
 
     /**
-     * @return flaot
+     * @return float
      */
     public function getLeftMargin() {
         return $this->leftMargin;
     }
 
     /**
-     * @return flaot
+     * @return float
      */
     public function getTopMargin() {
         return $this->topMargin;
     }
 
     /**
-     * @return flaot
+     * @return float
      */
     public function getRightMargin() {
         return $this->rightMargin;
     }
 
     /**
-     * @return flaot
+     * @return float
      */
     public function getBottomMargin() {
         return $this->bottomMargin;

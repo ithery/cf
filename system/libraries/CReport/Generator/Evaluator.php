@@ -24,7 +24,7 @@ class CReport_Generator_Evaluator {
 
         if ($this->generator->getCurrentRow() != null) {
             // preg_match_all('/F{[^}]*}/', $expression, $matchesF);
-            preg_match_all("/F{(\w+)}/", $expression, $matchesF);
+            preg_match_all("/F{(.+?)}/", $expression, $matchesF);
             if ($matchesF) {
                 //var_dump($matchesF);
                 foreach ($matchesF[1] as $matchF) {
