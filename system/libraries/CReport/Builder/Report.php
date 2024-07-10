@@ -170,6 +170,26 @@ class CReport_Builder_Report implements CReport_Builder_Contract_JrXmlElementInt
         return $this->bottomMargin;
     }
 
+    /**
+     * @return CReport_Builder_Element_Group
+     */
+    public function addGroup() {
+        $group = new CReport_Builder_Element_Group();
+        $this->children[] = $group;
+
+        return $group;
+    }
+
+    /**
+     * @return CReport_Builder_Element_Group
+     */
+    public function addVariable() {
+        $group = new CReport_Builder_Element_Variable();
+        $this->children[] = $group;
+
+        return $group;
+    }
+
     protected function getDefaultFontTag() {
         return '<defaultFont '
         . ' name="' . $this->getFontName() . '"'

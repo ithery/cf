@@ -3,9 +3,22 @@
 class CReport_Builder_Element_Group extends CReport_Builder_ElementAbstract {
     use CReport_Builder_Trait_Property_NamePropertyTrait;
 
+    protected $groupExpression;
+
     public function __construct() {
         parent::__construct();
         $this->name = null;
+        $this->groupExpression = '';
+    }
+
+    public function setGroupExpression($groupExpression) {
+        $this->groupExpression = $groupExpression;
+
+        return $this;
+    }
+
+    public function getGroupExpression() {
+        return $this->groupExpression;
     }
 
     /**
