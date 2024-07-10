@@ -53,14 +53,28 @@ class CReport {
      * A scale image type that instructs the engine to stretch the image height to fit the actual height of the image.
      */
     const SCALE_IMAGE_REAL_HEIGHT = 'realHeight';
+
     /**
      * A scale image type that instructs the engine to stretch the image height to fit the actual height of the image.
      */
     const SCALE_IMAGE_REAL_SIZE = 'realSize';
+
     /**
      * A constant value specifying that if the actual image does not fit into the image element, it can be adapted to those dimensions without needing to change its original proportions.
      */
     const SCALE_IMAGE_RETAIN_SHAPE = 'retainShape';
+
+    const DATA_TYPE_FLOAT = 'float';
+
+    const DATA_TYPE_STRING = 'string';
+
+    const DATA_TYPE_INT = 'int';
+
+    const CALCULATION_SYSTEM = 'system';
+
+    const CALCULATION_SUM = 'sum';
+
+    const CALCULATION_AVG = 'avg';
 
     /**
      * @param string $jrxml
