@@ -18,18 +18,66 @@ class CReport_Builder_Element_Detail extends CReport_Builder_ElementAbstract {
     public function generate(CReport_Generator $generator, CReport_Generator_ProcessorAbstract $processor) {
         $data = $generator->getData();
         if (count($this->children) > 0) {
+            $lastRow = null;
             foreach ($data as $rowIndex => $row) {
                 $height = $this->getHeight();
                 /** @var CReport_Builder_Row $row */
                 $generator->setCurrentRow($row);
+
+                foreach ($generator->getReport()->getGroupElements() as $group) {
+                    /** @var CReport_Builder_Element_Group $group */
+                    preg_match_all("/F{(\w+)}/", $group->getGroupExpression(), $matchesF);
+                    $groupExpression = $matchesF[1][0];
+                    $shouldRender = false;
+                    if ($lastRow) {
+                        $lastGroupValue = carr::get($lastRow, $groupExpression);
+                        $groupValue = carr::get($row, $groupExpression);
+                        if ($lastGroupValue != $groupValue) {
+                            $shouldRender = true;
+                        }
+                    }
+
+                    if (($rowIndex == 0 || $shouldRender) && ($group->hasGroupHeader())) {
+                        $groupHeader = $group->getGroupHeaderElement();
+                        $groupHeader->generate($generator, $processor);
+                    }
+                }
+
                 $processor->preventYOverflow($generator, $height);
                 foreach ($this->children as $child) {
                     $child->generate($generator, $processor);
                 }
+                $generator->variablesCalculation();
+                $nextRow = carr::get($data, $rowIndex + 1);
+                foreach ($generator->getReport()->getGroupElements() as $group) {
+                    /** @var CReport_Builder_Element_Group $group */
+                    preg_match_all("/F{(\w+)}/", $group->getGroupExpression(), $matchesF);
+                    $groupExpression = $matchesF[1][0];
+                    $shouldRender = false;
+                    if ($nextRow) {
+                        $nextGroupValue = carr::get($nextRow, $groupExpression);
+                        $groupValue = carr::get($row, $groupExpression);
+                        if ($nextGroupValue != $groupValue) {
+                            $shouldRender = true;
+                        }
+                    } else {
+                        $shouldRender = true;
+                    }
+                    if ($shouldRender && ($group->hasGroupFooter() && $rowIndex > 0)) {
+                        // cdbg::dd($group);
+                        $groupFooter = $group->getGroupFooterElement();
+                        $groupFooter->generate($generator, $processor);
+                    }
+
+                    if ($shouldRender) {
+                        //reset variable group here
+                        $generator->getDictionary()->resetVariableForGroup($group->getName());
+                    }
+                }
                 //if ($this->getSplitType() == CREPORT::SPLIT_TYPE_STRETCH || $this->getSplitType() == CREPORT::SPLIT_TYPE_PREVENT) {
 
-                    $processor->addY($height);
-                //}
+                $processor->addY($height);
+                $lastRow = $row;
             }
         }
     }

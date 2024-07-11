@@ -72,13 +72,64 @@ class CReport {
 
     const DATA_TYPE_BOOL = 'bool';
 
+    const DATA_TYPE_MIXED = 'mixed';
+
     const DATA_TYPE_DATETIME = 'datetime';
 
+    /**
+     * The value is not calculated by JasperReports.
+     */
     const CALCULATION_SYSTEM = 'system';
 
+    /**
+     * The value is calculated by summing up the values returned by the variable's expression.
+     */
     const CALCULATION_SUM = 'sum';
 
-    const CALCULATION_AVG = 'avg';
+    /**
+     * The value is obtained by calculating the average for the series of values obtained by evaluating the variable's expression for each record in the data source.
+     */
+    const CALCULATION_AVERAGE = 'average';
+
+    /**
+     * The value is calculated by counting the non-null values of the variable expression with every iteration in the data source.
+     */
+    const CALCULATION_COUNT = 'count';
+
+    /**
+     * The value is calculated by counting the distinct non-null values of the variable expression with every iteration in the data source.
+     */
+    const CALCULATION_DISTINCT_COUNT = 'distinctCount';
+
+    /**
+     * The variable keeps the first value and does not increment it on subsequent iterations.
+     */
+    const CALCULATION_FIRST = 'first';
+
+    /**
+     * The value of the variable represents the highest in the series of values obtained by evaluating the variable's expression for each data source record.
+     */
+    const CALCULATION_HIGHEST = 'highest';
+
+    /**
+     * The value of the variable represents the lowest in the series of values obtained by evaluating the variable's expression for each data source record.
+     */
+    const CALCULATION_LOWEST = 'lowest';
+
+    /**
+     * The value is calculated by simply evaluating the variable expression.
+     */
+    const CALCULATION_NOTHING = 'nothing';
+
+    /**
+     * The value is obtained by calculating the standard deviation for the series of values returned by evaluating the variable's expression.
+     */
+    const CALCULATION_STANDARD_DEVIATION = 'standardDeviation';
+
+    /**
+     * The value is obtained by calculating the variance for the series of values returned by evaluating the variable's expression.
+     */
+    const CALCULATION_VARIANCE = 'variance';
 
     /**
      * The variable is reinitialized at the beginning of each new column.

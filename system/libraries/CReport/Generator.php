@@ -22,6 +22,11 @@ class CReport_Generator {
     protected $evaluator;
 
     /**
+     * @var CReport_Generator_Calculator
+     */
+    protected $calculator;
+
+    /**
      * @var CReport_Generator_Formatter
      */
     protected $formatter;
@@ -46,6 +51,7 @@ class CReport_Generator {
         $this->currentRow = carr::first($this->data);
 
         $this->evaluator = new CReport_Generator_Evaluator($this);
+        $this->calculator = new CReport_Generator_Calculator($this);
         $this->formatter = new CReport_Generator_Formatter();
     }
 
@@ -116,6 +122,10 @@ class CReport_Generator {
 
     public function getPageNumber() {
         return $this->pageNumber;
+    }
+
+    public function variablesCalculation() {
+        return $this->calculator->variablesCalculation($this->currentRow);
     }
 
     protected function generate(CReport_Generator_ProcessorAbstract $processor) {

@@ -83,6 +83,7 @@ class CReport_Builder_JrXmlEnum {
      */
     public function getPhpDataTypeEnum(string $javaDataType, $default = 'mixed') {
         $javaToPHPTypeMap = [
+            'java.lang.Object' => CReport::DATA_TYPE_MIXED,
             'java.lang.String' => CReport::DATA_TYPE_STRING,
             'java.lang.Integer' => CReport::DATA_TYPE_INT,
             'java.lang.Long' => CReport::DATA_TYPE_INT,
@@ -111,6 +112,7 @@ class CReport_Builder_JrXmlEnum {
             CReport::DATA_TYPE_FLOAT => 'java.lang.Double', // Assuming using Double for float, can be adjusted
             CReport::DATA_TYPE_BOOL => 'java.lang.Boolean',
             CReport::DATA_TYPE_DATETIME => 'java.util.Date',
+            CReport::DATA_TYPE_MIXED => 'java.lang.Object',
             // Add other mappings as needed
         ];
 

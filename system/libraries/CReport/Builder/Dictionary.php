@@ -23,6 +23,16 @@ class CReport_Builder_Dictionary {
         return $this->parameters;
     }
 
+    public function resetVariableForGroup($groupName) {
+        $variables = $this->variables->filter(function (CReport_Builder_Dictionary_Variable $variable) use ($groupName) {
+            return $variable->getResetType() == CReport::RESET_TYPE_GROUP && $variable->getResetGroup() == $groupName;
+        });
+        foreach ($variables as $variable) {
+            /** @var CReport_Builder_Dictionary_Variable $variable */
+            $variable->unsetValue();
+        }
+    }
+
     /**
      * @return CReport_Builder_Dictionary_VariableCollection
      */
