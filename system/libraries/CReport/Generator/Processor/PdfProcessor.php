@@ -19,7 +19,6 @@ class CReport_Generator_Processor_PdfProcessor extends CReport_Generator_Process
 
     protected $currentX;
 
-
     public function __construct(CReport_Builder_Report $report) {
         parent::__construct($report);
         $this->tcpdf = new CReport_Pdf_Adapter_TCPDF(
@@ -140,7 +139,6 @@ class CReport_Generator_Processor_PdfProcessor extends CReport_Generator_Process
         return $border;
     }
 
-
     public function preventYOverflow(CReport_Generator $generator, $height) {
         $preventYAxis = $this->currentY + $height;
         $pageHeight = $this->pageHeight;
@@ -183,6 +181,7 @@ class CReport_Generator_Processor_PdfProcessor extends CReport_Generator_Process
     public function resetY() {
         $this->currentY = $this->topMargin;
     }
+
     /**
      * @param float $height
      *
@@ -315,7 +314,7 @@ class CReport_Generator_Processor_PdfProcessor extends CReport_Generator_Process
             ];
             $fitbox = carr::get($hAlignMap, $horizontalAlignment, 'L') . carr::get($vAlignMap, $verticalAlignment, 'T');
         }
-        $x = $this->offsetX + $x;
+        $x = $this->topMargin + $x;
         $y = $this->currentY + $y;
         if (CFile::exists($src)) {
             $this->tcpdf->Image(

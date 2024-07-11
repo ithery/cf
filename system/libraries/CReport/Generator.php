@@ -22,6 +22,11 @@ class CReport_Generator {
     protected $evaluator;
 
     /**
+     * @var CReport_Generator_Formatter
+     */
+    protected $formatter;
+
+    /**
      * @var CReport_Builder_Data
      */
     protected $data;
@@ -41,6 +46,7 @@ class CReport_Generator {
         $this->currentRow = carr::first($this->data);
 
         $this->evaluator = new CReport_Generator_Evaluator($this);
+        $this->formatter = new CReport_Generator_Formatter();
     }
 
     public function getFieldValue($field, $default = null) {
@@ -53,6 +59,7 @@ class CReport_Generator {
                 $value = carr::get($value, $field);
             }
         }
+
         return $value;
     }
 
@@ -60,11 +67,22 @@ class CReport_Generator {
         return $this->evaluator->getExpression($expression);
     }
 
+    public function formatPattern(string $text, string $pattern) {
+        return $this->formatter->formatPattern($text, $pattern);
+    }
+
     /**
      * @return CReport_Builder_Dictionary
      */
     public function getDictionary() {
         return $this->dictionary;
+    }
+
+    /**
+     * @return CReport_Builder_Report
+     */
+    public function getReport() {
+        return $this->report;
     }
 
     /**
@@ -90,22 +108,22 @@ class CReport_Generator {
         return $this;
     }
 
-    protected function generate(CReport_Generator_ProcessorAbstract $processor) {
-        $this->pageNumber = 1;
-
-        $this->report->generate($this, $processor);
-
-
-    }
-
     public function incrementPageNumber() {
         $this->pageNumber++;
+
         return $this;
     }
 
     public function getPageNumber() {
         return $this->pageNumber;
     }
+
+    protected function generate(CReport_Generator_ProcessorAbstract $processor) {
+        $this->pageNumber = 1;
+        $this->dictionary->fillVariables($this->report->getVariableElements());
+        $this->report->generate($this, $processor);
+    }
+
     public function getPdf() {
         $processor = new CReport_Generator_Processor_PdfProcessor($this->report);
         $this->generate($processor);

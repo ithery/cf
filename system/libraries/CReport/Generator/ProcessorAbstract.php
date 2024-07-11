@@ -32,4 +32,12 @@ abstract class CReport_Generator_ProcessorAbstract {
      * @return mixed
      */
     abstract public function getOutput();
+
+    /**
+     * @param CReport_Generator $generator
+     * @param float             $height
+     *
+     * @return float
+     */
+    abstract public function preventYOverflow(CReport_Generator $generator, $height);
 }

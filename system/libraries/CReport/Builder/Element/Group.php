@@ -41,6 +41,52 @@ class CReport_Builder_Element_Group extends CReport_Builder_ElementAbstract {
         return $groupFooter;
     }
 
+    /**
+     * @return CCollection|CReport_Builder_Element_GroupHeader[]
+     */
+    public function getGroupHeaderElements() {
+        return c::collect($this->children)->filter(function ($value) {
+            return $value instanceof CReport_Builder_Element_GroupHeader;
+        });
+    }
+
+    /**
+     * @return CCollection|CReport_Builder_Element_GroupFooter[]
+     */
+    public function getGroupFooterElements() {
+        return c::collect($this->children)->filter(function ($value) {
+            return $value instanceof CReport_Builder_Element_GroupFooter;
+        });
+    }
+
+    /**
+     * @return bool
+     */
+    public function hasGroupHeader() {
+        return $this->getGroupHeaderElements()->count() > 0;
+    }
+
+    /**
+     * @return bool
+     */
+    public function hasGroupFooter() {
+        return $this->getGroupFooterElements()->count() > 0;
+    }
+
+    /**
+     * @return null|CReport_Builder_Element_GroupHeader
+     */
+    public function getGroupHeaderElement() {
+        return $this->getGroupHeaderElements()->first();
+    }
+
+    /**
+     * @return null|CReport_Builder_Element_GroupFooter
+     */
+    public function getGroupFooterElement() {
+        return $this->getGroupFooterElements()->first();
+    }
+
     public function toJrXml() {
         // <reportElement x="20" y="0" width="779" height="100"/>
         //         <imageExpression><![CDATA["' . $headerImagePath . '"]]></imageExpression>

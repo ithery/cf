@@ -74,4 +74,46 @@ class CReport_Builder_JrXmlEnum {
 
         return (bool) $bool ? self::BOOL_TRUE : self::BOOL_FALSE;
     }
+
+    /**
+     * @param string      $javaDataType
+     * @param null|string $default
+     *
+     * @return string
+     */
+    public function getPhpDataTypeEnum(string $javaDataType, $default = 'mixed') {
+        $javaToPHPTypeMap = [
+            'java.lang.String' => CReport::DATA_TYPE_STRING,
+            'java.lang.Integer' => CReport::DATA_TYPE_INT,
+            'java.lang.Long' => CReport::DATA_TYPE_INT,
+            'java.lang.Short' => CReport::DATA_TYPE_INT,
+            'java.lang.Double' => CReport::DATA_TYPE_FLOAT,
+            'java.lang.Float' => CReport::DATA_TYPE_FLOAT,
+            'java.lang.Boolean' => CReport::DATA_TYPE_FLOAT,
+            'java.util.Date' => CReport::DATA_TYPE_DATETIME,
+            'java.sql.Timestamp' => CReport::DATA_TYPE_DATETIME,
+            'java.sql.Time' => CReport::DATA_TYPE_DATETIME,
+        ];
+
+        return carr::get($javaToPHPTypeMap, $javaDataType, $default);
+    }
+
+    /**
+     * @param string      $phpDataType
+     * @param null|string $default
+     *
+     * @return string
+     */
+    public function getJavaDataTypeEnum(string $phpDataType, $default = 'java.lang.Object') {
+        $phpToJavaTypeMap = [
+            CReport::DATA_TYPE_STRING => 'java.lang.String',
+            CReport::DATA_TYPE_INT => 'java.lang.Integer',
+            CReport::DATA_TYPE_FLOAT => 'java.lang.Double', // Assuming using Double for float, can be adjusted
+            CReport::DATA_TYPE_BOOL => 'java.lang.Boolean',
+            CReport::DATA_TYPE_DATETIME => 'java.util.Date',
+            // Add other mappings as needed
+        ];
+
+        return carr::get($phpToJavaTypeMap, $phpDataType, $default);
+    }
 }

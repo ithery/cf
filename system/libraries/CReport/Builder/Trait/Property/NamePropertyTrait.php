@@ -3,7 +3,7 @@
 trait CReport_Builder_Trait_Property_NamePropertyTrait {
     protected $name;
 
-    public function getSplitType() {
+    public function getName() {
         return $this->name;
     }
 

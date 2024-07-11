@@ -13,14 +13,24 @@ class CReport_Builder_Element_Variable extends CReport_Builder_ElementAbstract {
 
     protected $dataType;
 
+    protected $resetType;
+
+    protected $resetGroup;
+
     public function __construct() {
         parent::__construct();
         $this->name = null;
         $this->variableExpression = '';
         $this->calculation = CReport::CALCULATION_SYSTEM;
         $this->dataType = CReport::DATA_TYPE_FLOAT;
+        $this->resetType = CReport::RESET_TYPE_REPORT;
     }
 
+    /**
+     * @param string $variableExpression
+     *
+     * @return $this
+     */
     public function setVariableExpression($variableExpression) {
         $this->variableExpression = $variableExpression;
 
@@ -67,6 +77,26 @@ class CReport_Builder_Element_Variable extends CReport_Builder_ElementAbstract {
 
     public function setincrementType($incrementType) {
         $this->incrementType = $incrementType;
+
+        return $this;
+    }
+
+    public function getResetType() {
+        return $this->resetType;
+    }
+
+    public function setResetType($resetType) {
+        $this->resetType = $resetType;
+
+        return $this;
+    }
+
+    public function getResetGroup() {
+        return $this->resetGroup;
+    }
+
+    public function setResetGroup($resetGroup) {
+        $this->resetGroup = $resetGroup;
 
         return $this;
     }

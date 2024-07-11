@@ -171,6 +171,20 @@ class CReport_Builder_Report implements CReport_Builder_Contract_JrXmlElementInt
     }
 
     /**
+     * @return float
+     */
+    public function getContainerWidth() {
+        return $this->pageWidth - ($this->leftMargin + $this->rightMargin);
+    }
+
+    /**
+     * @return float
+     */
+    public function getContainerHeight() {
+        return $this->pageHeight - ($this->topMargin + $this->bottomMargin);
+    }
+
+    /**
      * @return CReport_Builder_Element_Group
      */
     public function addGroup() {
@@ -236,5 +250,23 @@ class CReport_Builder_Report implements CReport_Builder_Contract_JrXmlElementInt
             }
             $child->generate($generator, $processor);
         }
+    }
+
+    /**
+     * @return CCollection|CReport_Builder_Element_Group[]
+     */
+    public function getGroupElements() {
+        return c::collect($this->children)->filter(function ($value) {
+            return $value instanceof CReport_Builder_Element_Group;
+        });
+    }
+
+    /**
+     * @return CCollection|CReport_Builder_Element_Variable[]
+     */
+    public function getVariableElements() {
+        return c::collect($this->children)->filter(function ($value) {
+            return $value instanceof CReport_Builder_Element_Variable;
+        });
     }
 }

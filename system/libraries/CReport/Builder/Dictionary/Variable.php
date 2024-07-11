@@ -39,7 +39,7 @@ class CReport_Builder_Dictionary_Variable {
     /**
      * @var string
      */
-    protected $class;
+    protected $dataType;
 
     /**
      * @var string
@@ -56,15 +56,15 @@ class CReport_Builder_Dictionary_Variable {
      */
     protected $isValueSet;
 
-    public function __construct($name) {
-        $this->name = $name;
-        $this->calculation = 'system';
-        $this->variableExpression = '';
-        $this->class = '';
-        $this->resetType = '';
-        $this->resetGroup = '';
-        $this->initialValueExpression = '';
-        $this->incrementType = '';
+    public function __construct(CReport_Builder_Element_Variable $var) {
+        $this->name = $var->getName();
+        $this->calculation = $var->getCalculation();
+        $this->variableExpression = $var->getVariableExpression();
+        $this->dataType = $var->getDataType();
+        $this->resetType = $var->getResetType();
+        $this->resetGroup = $var->getResetGroup();
+        $this->initialValueExpression = $var->getInitialValueExpression();
+        $this->incrementType = $var->getIncrementType();
         $this->isValueSet = false;
         $this->value = null;
     }
@@ -115,8 +115,8 @@ class CReport_Builder_Dictionary_Variable {
     /**
      * @return string
      */
-    public function getClass() {
-        return $this->class;
+    public function getDataType() {
+        return $this->dataType;
     }
 
     /**

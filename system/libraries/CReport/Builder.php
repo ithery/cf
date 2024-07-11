@@ -9,6 +9,8 @@
  * @method CReport_Builder_Element_ColumnHeader addColumnHeader() Add ColumnHeader Element
  * @method CReport_Builder_Element_Detail       addDetail()       Add Detail Element
  * @method CReport_Builder_Element_TextField    addTextField()    Add TextField Element
+ * @method CReport_Builder_Element_Group        addGroup()        Add Group Element
+ * @method CReport_Builder_Element_Variable     addVariable()     Add Variable Element
  */
 class CReport_Builder {
     use CTrait_ForwardsCalls;

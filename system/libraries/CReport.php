@@ -70,11 +70,45 @@ class CReport {
 
     const DATA_TYPE_INT = 'int';
 
+    const DATA_TYPE_BOOL = 'bool';
+
+    const DATA_TYPE_DATETIME = 'datetime';
+
     const CALCULATION_SYSTEM = 'system';
 
     const CALCULATION_SUM = 'sum';
 
     const CALCULATION_AVG = 'avg';
+
+    /**
+     * The variable is reinitialized at the beginning of each new column.
+     */
+    const RESET_TYPE_COLUMN = 'column';
+
+    /**
+     * The variable is reinitialized every time the group breaks.
+     */
+    const RESET_TYPE_GROUP = 'group';
+
+    /**
+     * Used internally by the master report page variables to allow the variables to be used in text fields with Auto evaluation time.
+     */
+    const RESET_TYPE_MASTER = 'master';
+
+    /**
+     * The variable will never be initialized using its initial value expression and will only contain values obtained by evaluating the variable's expression.
+     */
+    const RESET_TYPE_NONE = 'none';
+
+    /**
+     * The variable is reinitialized at the beginning of each new page.
+     */
+    const RESET_TYPE_PAGE = 'page';
+
+    /**
+     * The variable is initialized only once, at the beginning of the report filling process, with the value returned by the variable's initial value expression.
+     */
+    const RESET_TYPE_REPORT = 'report';
 
     /**
      * @param string $jrxml

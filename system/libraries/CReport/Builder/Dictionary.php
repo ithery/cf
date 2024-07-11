@@ -1,16 +1,19 @@
 <?php
 
 class CReport_Builder_Dictionary {
-    protected $groups;
-
     protected $variables;
 
     protected $parameters;
 
     public function __construct() {
         $this->variables = new CReport_Builder_Dictionary_VariableCollection();
-        $this->groups = new CReport_Builder_Dictionary_GroupCollection();
         $this->parameters = new CCollection();
+    }
+
+    public function fillVariables(CCollection $variableElements) {
+        foreach ($variableElements as $variable) {
+            $this->variables->push(new CReport_Builder_Dictionary_Variable($variable));
+        }
     }
 
     /**
@@ -18,13 +21,6 @@ class CReport_Builder_Dictionary {
      */
     public function getParameters() {
         return $this->parameters;
-    }
-
-    /**
-     * @return CReport_Builder_Dictionary_GroupCollection
-     */
-    public function getGroups() {
-        return $this->groups;
     }
 
     /**

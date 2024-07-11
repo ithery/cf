@@ -73,6 +73,10 @@ class CReport_Builder_Element_TextField extends CReport_Builder_ElementAbstract 
         } else {
             $text = $this->getText();
         }
+        $pattern = $this->getPattern();
+        if ($pattern) {
+            $text = $generator->formatPattern($text, $pattern);
+        }
         $options = [];
         $options['x'] = $this->getX();
         $options['y'] = $this->getY();
