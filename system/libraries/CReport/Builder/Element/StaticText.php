@@ -34,18 +34,20 @@ class CReport_Builder_Element_StaticText extends CReport_Builder_ElementAbstract
     }
 
     public function generate(CReport_Generator $generator, CReport_Generator_ProcessorAbstract $processor) {
-        $options = [];
-        $options['x'] = $this->getX();
-        $options['y'] = $this->getY();
-        $options['width'] = $this->getWidth();
-        $options['height'] = $this->getHeight();
-        $options['text'] = $this->getText();
-        $options['textAlignment'] = $this->getTextAlignment();
-        $options['verticalAlignment'] = $this->getVerticalAlignment();
-        $options['font'] = $this->getFont();
-        $options['backgroundColor'] = $this->getBackgroundColor();
-        $options['box'] = $this->getBox();
-        $options['lineSpacing'] = $this->getLineSpacing();
-        $processor->cell($options);
+        if ($generator->evaluatePrintWhenExpression($this->printWhenExpression)) {
+            $options = [];
+            $options['x'] = $this->getX();
+            $options['y'] = $this->getY();
+            $options['width'] = $this->getWidth();
+            $options['height'] = $this->getHeight();
+            $options['text'] = $this->getText();
+            $options['textAlignment'] = $this->getTextAlignment();
+            $options['verticalAlignment'] = $this->getVerticalAlignment();
+            $options['font'] = $this->getFont();
+            $options['backgroundColor'] = $this->getBackgroundColor();
+            $options['box'] = $this->getBox();
+            $options['lineSpacing'] = $this->getLineSpacing();
+            $processor->cell($options);
+        }
     }
 }

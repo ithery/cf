@@ -63,15 +63,17 @@ class CReport_Builder_Element_Image extends CReport_Builder_ElementAbstract {
     }
 
     public function generate(CReport_Generator $generator, CReport_Generator_ProcessorAbstract $processor) {
-        $options = [];
-        $options['x'] = $this->getX();
-        $options['y'] = $this->getY();
-        $options['width'] = $this->getWidth();
-        $options['height'] = $this->getHeight();
-        $options['scaleImage'] = $this->getScaleImage();
-        $options['horizontalAlignment'] = $this->getHorizontalAlignment();
-        $options['verticalAlignment'] = $this->getVerticalAlignment();
-        $options['src'] = $this->getSrc();
-        $processor->image($options);
+        if ($generator->evaluatePrintWhenExpression($this->printWhenExpression)) {
+            $options = [];
+            $options['x'] = $this->getX();
+            $options['y'] = $this->getY();
+            $options['width'] = $this->getWidth();
+            $options['height'] = $this->getHeight();
+            $options['scaleImage'] = $this->getScaleImage();
+            $options['horizontalAlignment'] = $this->getHorizontalAlignment();
+            $options['verticalAlignment'] = $this->getVerticalAlignment();
+            $options['src'] = $this->getSrc();
+            $processor->image($options);
+        }
     }
 }

@@ -20,6 +20,8 @@ class CReport_Builder_Element_Frame extends CReport_Builder_ElementAbstract {
     }
 
     public function generate(CReport_Generator $generator, CReport_Generator_ProcessorAbstract $processor) {
-        parent::generate($generator, $processor);
+        if ($generator->evaluatePrintWhenExpression($this->printWhenExpression)) {
+            parent::generate($generator, $processor);
+        }
     }
 }
