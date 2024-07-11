@@ -163,17 +163,16 @@ class CReport_Generator_Processor_PdfProcessor extends CReport_Generator_Process
             $this->tcpdf->AddPage();
             $this->tcpdf->setPage($generator->getPageNumber(), $resetMargin = false);
 
-            // $pageHeader = $this->jasperReport->getRoot()->getChildByClassName('PageHeader');
-            // if ($pageHeader) {
-            //     $pageHeader->generate($this->jasperReport);
-            // }
-            // //repeat column header?
-            // if ($this->jasperReport::$columnHeaderRepeat) {
-            //     $columnHeader = $this->jasperReport->getRoot()->getChildByClassName('ColumnHeader');
-            //     if ($columnHeader) {
-            //         $columnHeader->generate($this->jasperReport);
-            //     }
-            // }
+            $pageHeader = $generator->getPageHeader();
+            if ($pageHeader) {
+                $pageHeader->generate($generator, $this);
+            }
+
+            $columnHeader = $generator->getColumnHeader();
+            if ($columnHeader) {
+                $columnHeader->generate($generator, $this);
+            }
+
             // CReport_Jasper_Instructions::runInstructions();
         }
     }

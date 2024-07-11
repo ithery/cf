@@ -269,4 +269,36 @@ class CReport_Builder_Report implements CReport_Builder_Contract_JrXmlElementInt
             return $value instanceof CReport_Builder_Element_Variable;
         });
     }
+
+    /**
+     * @return CCollection|CReport_Builder_Element_ColumnHeader[]
+     */
+    public function getColumnHeaderElements() {
+        return c::collect($this->children)->filter(function ($value) {
+            return $value instanceof CReport_Builder_Element_ColumnHeader;
+        });
+    }
+
+    /**
+     * @return null|CReport_Builder_Element_ColumnHeader
+     */
+    public function getColumnHeaderElement() {
+        return $this->getColumnHeaderElements()->first();
+    }
+
+    /**
+     * @return CCollection|CReport_Builder_Element_PageHeader[]
+     */
+    public function getPageHeaderElements() {
+        return c::collect($this->children)->filter(function ($value) {
+            return $value instanceof CReport_Builder_Element_PageHeader;
+        });
+    }
+
+    /**
+     * @return null|CReport_Builder_Element_PageHeader
+     */
+    public function getPageHeaderElement() {
+        return $this->getPageHeaderElements()->first();
+    }
 }

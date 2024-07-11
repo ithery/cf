@@ -145,6 +145,20 @@ class CReport_Generator {
         return $this->columnNumber;
     }
 
+    /**
+     * @return null|CReport_Builder_Element_PageHeader
+     */
+    public function getPageHeader() {
+        return $this->report->getPageHeaderElement();
+    }
+
+    /**
+     * @return null|CReport_Builder_Element_ColumnHeader
+     */
+    public function getColumnHeader() {
+        return $this->report->getColumnHeaderElement();
+    }
+
     public function setColumnNumber($columnNumber) {
         $this->columnNumber = $columnNumber;
 
