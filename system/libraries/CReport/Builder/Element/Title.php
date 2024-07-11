@@ -7,6 +7,19 @@ class CReport_Builder_Element_Title extends CReport_Builder_ElementAbstract {
         parent::__construct();
     }
 
+    public static function fromXml(SimpleXMLElement $xml) {
+        $element = new self();
+
+        foreach ($xml as $tag => $bandElement) {
+            if ($tag == 'band') {
+                $element->setBandPropertyFromXml($bandElement);
+                $element->addChildrenFromXml($bandElement);
+            }
+        }
+
+        return $element;
+    }
+
     public function toJrXml() {
         $openTag = '<title>';
         $body = $this->jrXmlWrapWithBand($this->getChildrenJrXml());

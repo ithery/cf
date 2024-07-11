@@ -16,6 +16,30 @@ class CReport_Builder_Element_Image extends CReport_Builder_ElementAbstract {
         $this->scaleImage = CREPORT::SCALE_IMAGE_RETAIN_SHAPE;
     }
 
+    public static function fromXml(SimpleXMLElement $xml) {
+        $element = new self();
+
+        foreach ($xml as $tag => $xmlElement) {
+            if ($tag == 'reportElement') {
+                $element->setReportElementPropertyFromXml($xmlElement);
+            }
+            if ($tag == 'imageExpression') {
+                $element->setSrc((string) $xmlElement);
+            }
+        }
+        if ($xml['hAlign']) {
+            $element->setHorizontalAlignment(CReport_Builder_JrXmlToPhpEnum::getHorizontalAlignmentEnum((string) $xml['hAlign']));
+        }
+        if ($xml['vAlign']) {
+            $element->setVerticalAlignment(CReport_Builder_JrXmlToPhpEnum::getVerticalAlignmentEnum((string) $xml['vAlign']));
+        }
+        if ($xml['scaleImage']) {
+            $element->setVerticalAlignment(CReport_Builder_JrXmlToPhpEnum::getScaleImageEnum((string) $xml['scaleImage']));
+        }
+
+        return $element;
+    }
+
     /**
      * @see CReport
      *
@@ -41,13 +65,13 @@ class CReport_Builder_Element_Image extends CReport_Builder_ElementAbstract {
         //         <imageExpression><![CDATA["' . $headerImagePath . '"]]></imageExpression>
         $openTag = '<image';
         if ($this->horizontalAlignment) {
-            $openTag .= ' hAlign="' . CReport_Builder_JrXmlEnum::getHorizontalAlignmentEnum($this->horizontalAlignment) . '"';
+            $openTag .= ' hAlign="' . CReport_Builder_PhpToJrXmlEnum::getHorizontalAlignmentEnum($this->horizontalAlignment) . '"';
         }
         if ($this->verticalAlignment) {
-            $openTag .= ' vAlign="' . CReport_Builder_JrXmlEnum::getHorizontalAlignmentEnum($this->verticalAlignment) . '"';
+            $openTag .= ' vAlign="' . CReport_Builder_PhpToJrXmlEnum::getHorizontalAlignmentEnum($this->verticalAlignment) . '"';
         }
         if ($this->scaleImage) {
-            $openTag .= ' scaleImage="' . CReport_Builder_JrXmlEnum::getScaleImageEnum($this->verticalAlignment) . '"';
+            $openTag .= ' scaleImage="' . CReport_Builder_PhpToJrXmlEnum::getScaleImageEnum($this->verticalAlignment) . '"';
         }
         $openTag .= '>';
 

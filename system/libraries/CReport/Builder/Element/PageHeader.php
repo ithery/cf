@@ -7,6 +7,18 @@ class CReport_Builder_Element_PageHeader extends CReport_Builder_ElementAbstract
         parent::__construct();
     }
 
+    public static function fromXml(SimpleXMLElement $xml) {
+        $element = new self();
+
+        $band = $xml->band;
+        if ($band) {
+            $element->setBandPropertyFromXml($band);
+            $element->addChildrenFromXml($band);
+        }
+
+        return $element;
+    }
+
     public function toJrXml() {
         $openTag = '<pageHeader>';
         $body = $this->jrXmlWrapWithBand($this->getChildrenJrXml());

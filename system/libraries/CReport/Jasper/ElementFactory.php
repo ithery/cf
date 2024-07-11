@@ -13,6 +13,7 @@ class CReport_Jasper_ElementFactory {
         'textField' => CReport_Jasper_Element_TextField::class,
         'groupFooter' => CReport_Jasper_Element_GroupFooter::class,
         'groupHeader' => CReport_Jasper_Element_GroupHeader::class,
+        'summary' => CReport_Jasper_Element_Summary::class,
 
     ];
 

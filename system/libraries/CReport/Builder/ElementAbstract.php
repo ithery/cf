@@ -9,6 +9,22 @@ abstract class CReport_Builder_ElementAbstract implements CReport_Builder_Contra
         $this->children = [];
     }
 
+    public function addChildrenFromXml(SimpleXMLElement $xml) {
+        foreach ($xml as $tag => $xmlElement) {
+            if (!CReport_Builder_ElementFactory::isIgnore($tag)) {
+                $this->addChildren(CReport_Builder_ElementFactory::createElementFromXml($tag, $xmlElement));
+            }
+        }
+
+        return $this;
+    }
+
+    public function addChildren(CReport_Builder_ElementAbstract $element) {
+        $this->children[] = $element;
+
+        return $this;
+    }
+
     protected function getChildrenJrXml() {
         $xml = '';
         foreach ($this->children as $child) {

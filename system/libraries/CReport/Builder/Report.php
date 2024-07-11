@@ -38,12 +38,53 @@ class CReport_Builder_Report implements CReport_Builder_Contract_JrXmlElementInt
         $this->font = new CReport_Builder_Object_Font();
     }
 
+    public static function fromXml(SimpleXMLElement $xml) {
+        $report = new self($xml['name']);
+        if ($xml['pageWidth']) {
+            $report->setPageWidth((float) $xml['pageWidth']);
+        }
+        if ($xml['pageHeight']) {
+            $report->setPageHeight((float) $xml['pageHeight']);
+        }
+        if ($xml['leftMargin']) {
+            $report->setLeftMargin((float) $xml['leftMargin']);
+        }
+        if ($xml['rightMargin']) {
+            $report->setRightMargin((float) $xml['leftMargin']);
+        }
+        if ($xml['topMargin']) {
+            $report->setTopMargin((float) $xml['topMargin']);
+        }
+        if ($xml['bottomMargin']) {
+            $report->setBottomMargin((float) $xml['bottomMargin']);
+        }
+        $report->addChildrenFromXml($xml);
+
+        return $report;
+    }
+
+    public function addChildrenFromXml(SimpleXMLElement $xml) {
+        foreach ($xml as $tag => $xmlElement) {
+            if (!CReport_Builder_ElementFactory::isIgnore($tag)) {
+                $this->addChildren(CReport_Builder_ElementFactory::createElementFromXml($tag, $xmlElement));
+            }
+        }
+
+        return $this;
+    }
+
+    public function addChildren(CReport_Builder_ElementAbstract $element) {
+        $this->children[] = $element;
+
+        return $this;
+    }
+
     /**
      * @param float $width
      *
      * @return $this
      */
-    public function setPageWidth($width) {
+    public function setPageWidth(float $width) {
         $this->pageWidth = $width;
 
         return $this;
@@ -54,7 +95,7 @@ class CReport_Builder_Report implements CReport_Builder_Contract_JrXmlElementInt
      *
      * @return $this
      */
-    public function setPageHeight($height) {
+    public function setPageHeight(float $height) {
         $this->pageHeight = $height;
 
         return $this;
@@ -65,7 +106,7 @@ class CReport_Builder_Report implements CReport_Builder_Contract_JrXmlElementInt
      *
      * @return $this
      */
-    public function setTopMargin($topMargin) {
+    public function setTopMargin(float $topMargin) {
         $this->topMargin = $topMargin;
 
         return $this;
@@ -76,7 +117,7 @@ class CReport_Builder_Report implements CReport_Builder_Contract_JrXmlElementInt
      *
      * @return $this
      */
-    public function setBottomMargin($bottomMargin) {
+    public function setBottomMargin(float $bottomMargin) {
         $this->bottomMargin = $bottomMargin;
 
         return $this;
@@ -87,7 +128,7 @@ class CReport_Builder_Report implements CReport_Builder_Contract_JrXmlElementInt
      *
      * @return $this
      */
-    public function setRightMargin($rightMargin) {
+    public function setRightMargin(float $rightMargin) {
         $this->rightMargin = $rightMargin;
 
         return $this;
@@ -208,10 +249,10 @@ class CReport_Builder_Report implements CReport_Builder_Contract_JrXmlElementInt
         return '<defaultFont '
         . ' name="' . $this->getFontName() . '"'
         . ' size="' . $this->getFontSize() . '"'
-        . ' isBold="' . CReport_Builder_JrXmlEnum::getBoolEnum($this->fontIsBold()) . '"'
-        . ' isItalic="' . CReport_Builder_JrXmlEnum::getBoolEnum($this->fontIsItalic()) . '"'
-        . ' isUnderline="' . CReport_Builder_JrXmlEnum::getBoolEnum($this->fontIsUnderline()) . '"'
-        . ' isStrikeThrough="' . CReport_Builder_JrXmlEnum::getBoolEnum($this->fontIsStrikeThrough()) . '"'
+        . ' isBold="' . CReport_Builder_PhpToJrXmlEnum::getBoolEnum($this->fontIsBold()) . '"'
+        . ' isItalic="' . CReport_Builder_PhpToJrXmlEnum::getBoolEnum($this->fontIsItalic()) . '"'
+        . ' isUnderline="' . CReport_Builder_PhpToJrXmlEnum::getBoolEnum($this->fontIsUnderline()) . '"'
+        . ' isStrikeThrough="' . CReport_Builder_PhpToJrXmlEnum::getBoolEnum($this->fontIsStrikeThrough()) . '"'
         . '/>';
     }
 

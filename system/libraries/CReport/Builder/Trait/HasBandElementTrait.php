@@ -11,11 +11,17 @@ trait CReport_Builder_Trait_HasBandElementTrait {
         }
 
         if ($this->splitType) {
-            $openTag .= $this->splitType !== null ? ' splitType="' . CReport_Builder_JrXmlEnum::getSplitTypeEnum($this->splitType) . '"' : '';
+            $openTag .= $this->splitType !== null ? ' splitType="' . CReport_Builder_PhpToJrXmlEnum::getSplitTypeEnum($this->splitType) . '"' : '';
         }
         $openTag .= '>';
         $closeTag = '</band>';
 
         return $openTag . $body . $closeTag;
+    }
+
+    public function setBandPropertyFromXml(SimpleXMLElement $band) {
+        if ($band['height']) {
+            $this->setHeight((float) $band['height']);
+        }
     }
 }

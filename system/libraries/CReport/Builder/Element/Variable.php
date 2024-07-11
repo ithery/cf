@@ -109,10 +109,10 @@ class CReport_Builder_Element_Variable extends CReport_Builder_ElementAbstract {
             $openTag .= ' name="' . $this->name . '"';
         }
         if ($this->dataType) {
-            $openTag .= ' class="' . CReport_Builder_JrXmlEnum::getJavaDataTypeEnum($this->dataType) . '"';
+            $openTag .= ' class="' . CReport_Builder_PhpToJrXmlEnum::getJavaDataTypeEnum($this->dataType) . '"';
         }
         if ($this->calculation) {
-            $openTag .= ' calculation="' . CReport_Builder_JrXmlEnum::getCalculationEnum($this->calculation) . '"';
+            $openTag .= ' calculation="' . CReport_Builder_PhpToJrXmlEnum::getCalculationEnum($this->calculation) . '"';
         }
         $openTag .= '>';
 
@@ -124,7 +124,7 @@ class CReport_Builder_Element_Variable extends CReport_Builder_ElementAbstract {
             $body .= '<initialValueExpression><![CDATA[' . $this->initialValueExpression . ']]></initialValueExpression>' . PHP_EOL;
         }
         if ($this->resetType) {
-            $body .= '<resetType>' . CReport_Builder_JrXmlEnum::getResetTypeEnum($this->resetType) . '</resetType>' . PHP_EOL;
+            $body .= '<resetType>' . CReport_Builder_PhpToJrXmlEnum::getResetTypeEnum($this->resetType) . '</resetType>' . PHP_EOL;
         }
         if ($this->resetGroup) {
             $body .= '<resetGroup>' . $this->resetGroup . '</resetGroup>' . PHP_EOL;

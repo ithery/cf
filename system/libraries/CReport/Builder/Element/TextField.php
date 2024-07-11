@@ -58,7 +58,7 @@ class CReport_Builder_Element_TextField extends CReport_Builder_ElementAbstract 
     }
 
     public function toJrXml() {
-        $openTag = '<textField isStretchWithOverflow="' . CReport_Builder_JrXmlEnum::getBoolEnum($this->isStretchWithOverflow) . '">';
+        $openTag = '<textField isStretchWithOverflow="' . CReport_Builder_PhpToJrXmlEnum::getBoolEnum($this->isStretchWithOverflow) . '">';
 
         $reportElement = $this->getReportElementJrXml();
 

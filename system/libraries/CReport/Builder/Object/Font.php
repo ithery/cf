@@ -158,10 +158,10 @@ class CReport_Builder_Object_Font implements CReport_Builder_Contract_JrXmlEleme
             $tag .= ' size="' . $this->fontSize . '"';
         }
 
-        $tag .= ' isBold="' . CReport_Builder_JrXmlEnum::getBoolEnum($this->isBold) . '"';
-        $tag .= ' isUnderline="' . CReport_Builder_JrXmlEnum::getBoolEnum($this->isUnderline) . '"';
-        $tag .= ' isStrikeThrough="' . CReport_Builder_JrXmlEnum::getBoolEnum($this->isStrikeThrough) . '"';
-        $tag .= ' isItalic="' . CReport_Builder_JrXmlEnum::getBoolEnum($this->isItalic) . '"';
+        $tag .= ' isBold="' . CReport_Builder_PhpToJrXmlEnum::getBoolEnum($this->isBold) . '"';
+        $tag .= ' isUnderline="' . CReport_Builder_PhpToJrXmlEnum::getBoolEnum($this->isUnderline) . '"';
+        $tag .= ' isStrikeThrough="' . CReport_Builder_PhpToJrXmlEnum::getBoolEnum($this->isStrikeThrough) . '"';
+        $tag .= ' isItalic="' . CReport_Builder_PhpToJrXmlEnum::getBoolEnum($this->isItalic) . '"';
         $tag .= '/>';
 
         return $tag;

@@ -14,7 +14,7 @@ class CReport_Builder_Object_Pen implements CReport_Builder_Contract_JrXmlElemen
     public function toJrXml($tag = 'pen') {
         $xml = '<' . $tag . '';
         $xml .= ' lineWidth="' . $this->lineWidth . '"';
-        $xml .= ' lineStyle="' . CReport_Builder_JrXmlEnum::getLineStyleEnum($this->lineStyle) . '"';
+        $xml .= ' lineStyle="' . CReport_Builder_PhpToJrXmlEnum::getLineStyleEnum($this->lineStyle) . '"';
         $xml .= ' lineColor="' . $this->lineColor . '"';
         $xml .= '/>';
 

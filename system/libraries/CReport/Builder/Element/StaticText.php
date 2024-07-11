@@ -16,6 +16,21 @@ class CReport_Builder_Element_StaticText extends CReport_Builder_ElementAbstract
         $this->verticalAlignment = CReport::VERTICAL_ALIGNMENT_TOP;
     }
 
+    public static function fromXml(SimpleXMLElement $xml) {
+        $element = new self();
+
+        foreach ($xml as $tag => $xmlElement) {
+            if ($tag == 'reportElement') {
+                $element->setReportElementPropertyFromXml($xmlElement);
+            }
+            if ($tag == 'text') {
+                $element->setText((string) $xmlElement);
+            }
+        }
+
+        return $element;
+    }
+
     public function toJrXml() {
         $openTag = '<staticText>';
 

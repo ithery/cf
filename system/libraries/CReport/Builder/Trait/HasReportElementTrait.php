@@ -33,4 +33,22 @@ trait CReport_Builder_Trait_HasReportElementTrait {
 
         return $reportElement;
     }
+
+    public function setReportElementPropertyFromXml(SimpleXMLElement $reportElement) {
+        if ($reportElement['x']) {
+            $this->setX((float) $reportElement['x']);
+        }
+        if ($reportElement['y']) {
+            $this->setY((float) $reportElement['y']);
+        }
+        if ($reportElement['width']) {
+            $this->setWidth((float) $reportElement['width']);
+        }
+        if ($reportElement['height']) {
+            $this->setHeight((float) $reportElement['height']);
+        }
+        if ($reportElement['backcolor']) {
+            $this->setBackgroundColor((string) $reportElement['backcolor']);
+        }
+    }
 }

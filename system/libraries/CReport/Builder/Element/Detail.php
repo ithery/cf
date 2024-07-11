@@ -15,6 +15,18 @@ class CReport_Builder_Element_Detail extends CReport_Builder_ElementAbstract {
         return $openTag . PHP_EOL . $body . PHP_EOL . $closeTag;
     }
 
+    public static function fromXml(SimpleXMLElement $xml) {
+        $element = new self();
+
+        $band = $xml->band;
+        if ($band) {
+            $element->setBandPropertyFromXml($band);
+            $element->addChildrenFromXml($band);
+        }
+
+        return $element;
+    }
+
     protected function generaterGroupHeaders(CReport_Generator $generator, CReport_Generator_ProcessorAbstract $processor, $rowIndex, $row, $lastRow) {
         foreach ($generator->getGroups() as $group) {
             /** @var CReport_Builder_Element_Group $group */

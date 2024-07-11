@@ -1,6 +1,6 @@
 <?php
 
-class CReport_Builder_JrXmlEnum {
+class CReport_Builder_PhpToJrXmlEnum {
     const BOOL_TRUE = 'true';
 
     const BOOL_FALSE = 'false';

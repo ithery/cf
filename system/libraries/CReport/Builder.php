@@ -35,6 +35,18 @@ class CReport_Builder {
         $this->dictionary = new CReport_Builder_Dictionary();
     }
 
+    /**
+     * @param string $xml
+     *
+     * @return $this
+     */
+    public function fromXml(string $xml) {
+        $xml = simplexml_load_string($xml, null, LIBXML_NOCDATA);
+        $this->report = CReport_Builder_Report::fromXml($xml);
+
+        return $this;
+    }
+
     public function setPaperSize($size) {
         $size = cstr::upper($size);
         $sizes = carr::get(CReport_Paper::$pageFormats, $size);
