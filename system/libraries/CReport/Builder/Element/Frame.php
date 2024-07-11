@@ -8,6 +8,19 @@ class CReport_Builder_Element_Frame extends CReport_Builder_ElementAbstract {
         $this->height = null;
     }
 
+    public static function fromXml(SimpleXMLElement $xml) {
+        $element = new self();
+
+        foreach ($xml as $tag => $xmlElement) {
+            if ($tag == 'reportElement') {
+                $element->setReportElementPropertyFromXml($xmlElement);
+            }
+            $element->addChildrenFromXml($xmlElement);
+        }
+
+        return $element;
+    }
+
     public function toJrXml() {
         $openTag = '<frame>';
 

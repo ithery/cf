@@ -10,10 +10,11 @@ class CReport_Builder_Element_ColumnHeader extends CReport_Builder_ElementAbstra
     public static function fromXml(SimpleXMLElement $xml) {
         $element = new self();
 
-        $band = $xml->band;
-        if ($band) {
-            $element->setBandPropertyFromXml($band);
-            $element->addChildrenFromXml($band);
+        foreach ($xml as $tag => $bandElement) {
+            if ($tag == 'band') {
+                $element->setBandPropertyFromXml($bandElement);
+                $element->addChildrenFromXml($bandElement);
+            }
         }
 
         return $element;
