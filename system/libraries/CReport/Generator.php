@@ -41,7 +41,20 @@ class CReport_Generator {
      */
     protected $currentRow;
 
+    /**
+     * @var int
+     */
     protected $pageNumber;
+
+    /**
+     * @var int
+     */
+    protected $reportCount;
+
+    /**
+     * @var int
+     */
+    protected $columnNumber;
 
     public function __construct(CReport_Builder_Report $report, CReport_Builder_Dictionary $dictionary, CManager_Contract_DataProviderInterface $dataProvider = null) {
         $this->report = $report;
@@ -124,8 +137,51 @@ class CReport_Generator {
         return $this->pageNumber;
     }
 
+    public function getTotalRows() {
+        return $this->data->count();
+    }
+
+    public function getColumnNumber() {
+        return $this->columnNumber;
+    }
+
+    public function setColumnNumber($columnNumber) {
+        $this->columnNumber = $columnNumber;
+
+        return $this;
+    }
+
+    public function getReportCount() {
+        return $this->reportCount;
+    }
+
+    public function setReportCount($reportCount) {
+        $this->reportCount = $reportCount;
+
+        return $this;
+    }
+
     public function variablesCalculation() {
         return $this->calculator->variablesCalculation($this->currentRow);
+    }
+
+    public function getParameterValue($name, $default = null) {
+        return $this->dictionary->getParameterValue($name, $default);
+    }
+
+    public function getVariableValue($name, $default = null) {
+        //get the global variables
+        $globalVariables = [
+            'REPORT_COUNT' => $this->getReportCount(),
+            'COLUMN_NUMBER' => $this->getColumnNumber(),
+            'PAGE_NUMBER' => $this->getPageNumber(),
+            'totalRows' => $this->getTotalRows(),
+        ];
+        if (array_key_exists($name, $globalVariables)) {
+            return $globalVariables[$name];
+        }
+
+        return $this->dictionary->getVariableValue($name, $default);
     }
 
     protected function generate(CReport_Generator_ProcessorAbstract $processor) {

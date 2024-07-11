@@ -13,6 +13,8 @@ class CReport_Builder_Element_TextField extends CReport_Builder_ElementAbstract 
      */
     protected $textFieldExpression;
 
+    protected $forceHeight;
+
     public function __construct() {
         parent::__construct();
         $this->height = null;
@@ -23,6 +25,14 @@ class CReport_Builder_Element_TextField extends CReport_Builder_ElementAbstract 
         $this->verticalAlignment = CReport::VERTICAL_ALIGNMENT_TOP;
         $this->isStretchWithOverflow = false;
         $this->textFieldExpression = '';
+    }
+
+    public function forceHeight($height) {
+        $this->forceHeight = $height;
+    }
+
+    public function unforceHeight() {
+        $this->forceHeight = null;
     }
 
     /**
@@ -41,6 +51,10 @@ class CReport_Builder_Element_TextField extends CReport_Builder_ElementAbstract 
      */
     public function getTextFieldExpression() {
         return $this->textFieldExpression;
+    }
+
+    public function getHeightForGenerate() {
+        return $this->forceHeight !== null ? $this->forceHeight : $this->height;
     }
 
     public function toJrXml() {
@@ -66,7 +80,7 @@ class CReport_Builder_Element_TextField extends CReport_Builder_ElementAbstract 
         return $openTag . PHP_EOL . $body . PHP_EOL . $closeTag;
     }
 
-    public function generate(CReport_Generator $generator, CReport_Generator_ProcessorAbstract $processor) {
+    private function getTextAfterExpression(CReport_Generator $generator) {
         $text = $this->getTextFieldExpression();
         if ($text) {
             $text = $generator->getExpression($text);
@@ -77,6 +91,30 @@ class CReport_Builder_Element_TextField extends CReport_Builder_ElementAbstract 
         if ($pattern) {
             $text = $generator->formatPattern($text, $pattern);
         }
+
+        return $text;
+    }
+
+    public function generate(CReport_Generator $generator, CReport_Generator_ProcessorAbstract $processor) {
+        $text = $this->getTextAfterExpression($generator);
+        $options = [];
+        $options['x'] = $this->getX();
+        $options['y'] = $this->getY();
+        $options['width'] = $this->getWidth();
+        $options['height'] = $this->getHeightForGenerate();
+        $options['text'] = $text;
+        $options['textAlignment'] = $this->getTextAlignment();
+        $options['verticalAlignment'] = $this->getVerticalAlignment();
+        $options['font'] = $this->getFont();
+        $options['backgroundColor'] = $this->getBackgroundColor();
+        $options['box'] = $this->getBox();
+        $options['lineSpacing'] = $this->getLineSpacing();
+
+        $processor->cell($options);
+    }
+
+    public function getCellHeight(CReport_Generator $generator, CReport_Generator_ProcessorAbstract $processor) {
+        $text = $this->getTextAfterExpression($generator);
         $options = [];
         $options['x'] = $this->getX();
         $options['y'] = $this->getY();
@@ -89,6 +127,7 @@ class CReport_Builder_Element_TextField extends CReport_Builder_ElementAbstract 
         $options['backgroundColor'] = $this->getBackgroundColor();
         $options['box'] = $this->getBox();
         $options['lineSpacing'] = $this->getLineSpacing();
-        $processor->cell($options);
+
+        return $processor->cellHeight($options);
     }
 }

@@ -19,6 +19,13 @@ abstract class CReport_Generator_ProcessorAbstract {
      *
      * @return void
      */
+    abstract public function cellHeight(array $options);
+
+    /**
+     * @param array $options
+     *
+     * @return void
+     */
     abstract public function image(array $options);
 
     /**

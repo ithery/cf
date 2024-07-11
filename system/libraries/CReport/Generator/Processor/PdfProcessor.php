@@ -228,6 +228,46 @@ class CReport_Generator_Processor_PdfProcessor extends CReport_Generator_Process
         );
     }
 
+    public function cellHeight(array $options) {
+        $text = carr::get($options, 'text');
+        $width = carr::get($options, 'width');
+        $font = carr::get($options, 'font');
+        $box = carr::get($options, 'box');
+        $lineSpacing = carr::get($options, 'lineSpacing');
+
+        $pdfBorder = 0;
+        $pdfPadding = null;
+        if ($box && $box instanceof CReport_Builder_Object_Box) {
+            $padding = $box->getPadding();
+            $pdfPadding = [
+                'T' => $padding->getPaddingTop(),
+                'R' => $padding->getPaddingRight(),
+                'L' => $padding->getPaddingLeft(),
+                'B' => $padding->getPaddingBottom(),
+            ];
+            $pdfBorder = $this->getPdfBorder($box);
+            // $this->tcpdf->setCellPaddings($padding->getPaddingLeft(), $padding->getPaddingTop(), $padding->getPaddingRight(), $padding->getPaddingBottom());
+        }
+
+        $reseth = true;
+        $autopadding = true;
+
+        if ($font != null) {
+            $this->font($font);
+        }
+        $this->tcpdf->setCellHeightRatio($lineSpacing);
+        $cellHeight = $this->tcpdf->getStringHeight(
+            $width,
+            $text,
+            $reseth,
+            $autopadding,
+            $pdfPadding,
+            $pdfBorder
+        );
+
+        return $cellHeight;
+    }
+
     public function cell(array $options) {
         $text = carr::get($options, 'text');
         $width = carr::get($options, 'width');
@@ -254,6 +294,7 @@ class CReport_Generator_Processor_PdfProcessor extends CReport_Generator_Process
         $pdfBorder = 0;
         if ($box && $box instanceof CReport_Builder_Object_Box) {
             $padding = $box->getPadding();
+
             $pdfBorder = $this->getPdfBorder($box);
             $this->tcpdf->setCellPaddings($padding->getPaddingLeft(), $padding->getPaddingTop(), $padding->getPaddingRight(), $padding->getPaddingBottom());
         }

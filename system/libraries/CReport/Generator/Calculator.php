@@ -7,6 +7,54 @@ class CReport_Generator_Calculator {
         $this->generator = $generator;
     }
 
+    public function calculateMathExpression($expression) {
+        // Remove any unwanted characters (for security)
+        $expression = preg_replace('/[^0-9\.\+\-\*\/\s]/', '', $expression);
+
+        // Split the expression into tokens (numbers and operators)
+        $tokens = preg_split('/\s*([\+\-\*\/])\s*/', $expression, -1, PREG_SPLIT_DELIM_CAPTURE | PREG_SPLIT_NO_EMPTY);
+
+        // Initialize the result with the first number
+        $result = array_shift($tokens);
+
+        // Ensure the initial result is a float
+        $result = floatval($result);
+
+        // Iterate through the tokens and perform the calculations
+        while (!empty($tokens)) {
+            $operator = array_shift($tokens);
+            $number = array_shift($tokens);
+
+            // Ensure the number is a float
+            $number = floatval($number);
+
+            // Perform the calculation based on the operator
+            switch ($operator) {
+                case '+':
+                    $result += $number;
+
+                    break;
+                case '-':
+                    $result -= $number;
+
+                    break;
+                case '*':
+                    $result *= $number;
+
+                    break;
+                case '/':
+                    if ($number == 0) {
+                        throw new Exception('Division by zero');
+                    }
+                    $result /= $number;
+
+                    break;
+            }
+        }
+
+        return $result;
+    }
+
     /**
      * @param string $calculation
      *
@@ -36,7 +84,7 @@ class CReport_Generator_Calculator {
     public function variableCalculation(CReport_Builder_Dictionary_Variable $variable, CReport_Builder_Row $row) {
         $orginalExpression = $variable->getVariableExpression();
         $expression = $this->generator->getExpression($orginalExpression);
-
+        $expression = $this->calculateMathExpression($expression);
         // $htmlData = array_key_exists('htmlData', $this->arrayVariable) ? $this->arrayVariable['htmlData']['class'] : '';
         // if (preg_match('/(\d+)(?:\s*)([\+\-\*\/])(?:\s*)/', $out['target'], $matchesMath) > 0 && $htmlData != 'HTMLDATA') {
         //     // error_reporting(0);

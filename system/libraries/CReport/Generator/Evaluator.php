@@ -11,20 +11,20 @@ class CReport_Generator_Evaluator {
         preg_match_all("/P{(\w+)}/", $expression, $matchesP);
         if ($matchesP) {
             foreach ($matchesP[1] as $matchP) {
-                $expression = str_ireplace(['$P{' . $matchP . '}', '"'], [$this->generator->getDictionary()->getParameterValue($matchP), ''], $expression);
+                $expression = str_ireplace(['$P{' . $matchP . '}', '"'], [$this->generator->getParameterValue($matchP), ''], $expression);
             }
         }
 
         preg_match_all("/V{(\w+)}/", $expression, $matchesV);
         if ($matchesV) {
             foreach ($matchesV[1] as $matchV) {
-                $expression = str_ireplace(['$V{' . $matchV . '}', '"'], [$this->generator->getDictionary()->getVariableValue($matchV), ''], $expression);
+                $expression = str_ireplace(['$V{' . $matchV . '}', '"'], [$this->generator->getVariableValue($matchV), ''], $expression);
             }
         }
 
         if ($this->generator->getCurrentRow() != null) {
             // preg_match_all('/F{[^}]*}/', $expression, $matchesF);
-            preg_match_all("/F{(.+?)}/", $expression, $matchesF);
+            preg_match_all('/F{(.+?)}/', $expression, $matchesF);
             if ($matchesF) {
                 //var_dump($matchesF);
                 foreach ($matchesF[1] as $matchF) {

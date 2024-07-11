@@ -1,8 +1,14 @@
 <?php
 
 class CReport_Builder_Dictionary {
+    /**
+     * @var CReport_Builder_Dictionary_VariableCollection
+     */
     protected $variables;
 
+    /**
+     * @var CCollection
+     */
     protected $parameters;
 
     public function __construct() {

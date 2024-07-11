@@ -23,7 +23,7 @@ class CReport_Builder_Element_Detail extends CReport_Builder_ElementAbstract {
                 $height = $this->getHeight();
                 /** @var CReport_Builder_Row $row */
                 $generator->setCurrentRow($row);
-
+                $generator->setReportCount($rowIndex);
                 foreach ($generator->getReport()->getGroupElements() as $group) {
                     /** @var CReport_Builder_Element_Group $group */
                     preg_match_all("/F{(\w+)}/", $group->getGroupExpression(), $matchesF);
@@ -43,10 +43,51 @@ class CReport_Builder_Element_Detail extends CReport_Builder_ElementAbstract {
                     }
                 }
 
+                //calculate column height
+                if ($processor instanceof CReport_Generator_Processor_PdfProcessor) {
+                    $haveStretchOverflow = false;
+                    $maxHeight = 0;
+                    foreach ($this->children as $child) {
+                        if ($child instanceof CReport_Builder_Element_TextField) {
+                            if ($child->isStretchWithOverflow()) {
+                                $haveStretchOverflow = true;
+                            }
+                        }
+                    }
+                    if ($haveStretchOverflow) {
+                        foreach ($this->children as $child) {
+                            if ($child instanceof CReport_Builder_Element_TextField) {
+                                $cellHeight = $child->getCellHeight($generator, $processor);
+
+                                $originalHeight = $child->getHeight();
+                                if ($cellHeight < $originalHeight) {
+                                    $cellHeight = $originalHeight;
+                                }
+                                // $cellHeight = 62;
+                                if ($cellHeight > $maxHeight) {
+                                    $maxHeight = $cellHeight;
+                                }
+                            }
+                        }
+
+                        $height = $maxHeight;
+                    }
+                }
+
                 $processor->preventYOverflow($generator, $height);
-                foreach ($this->children as $child) {
+                $generator->setColumnNumber(0);
+                foreach ($this->children as $columnIndex => $child) {
+                    $generator->setColumnNumber($columnIndex);
+                    if ($child instanceof CReport_Builder_Element_TextField) {
+                        $child->unforceHeight();
+                        if ($child->isStretchWithOverflow()) {
+                            $child->forceHeight($height);
+                        }
+                    }
                     $child->generate($generator, $processor);
                 }
+
+                $processor->addY($height);
                 $generator->variablesCalculation();
                 $nextRow = carr::get($data, $rowIndex + 1);
                 foreach ($generator->getReport()->getGroupElements() as $group) {
@@ -76,7 +117,6 @@ class CReport_Builder_Element_Detail extends CReport_Builder_ElementAbstract {
                 }
                 //if ($this->getSplitType() == CREPORT::SPLIT_TYPE_STRETCH || $this->getSplitType() == CREPORT::SPLIT_TYPE_PREVENT) {
 
-                $processor->addY($height);
                 $lastRow = $row;
             }
         }
