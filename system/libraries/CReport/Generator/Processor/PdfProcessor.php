@@ -121,8 +121,8 @@ class CReport_Generator_Processor_PdfProcessor extends CReport_Generator_Process
         $pen = $box->getPen();
         $topPen = $box->getTopPen() ?: $pen;
         $leftPen = $box->getLeftPen() ?: $pen;
-        $bottomPen = $box->getLeftPen() ?: $pen;
-        $rightPen = $box->getLeftPen() ?: $pen;
+        $bottomPen = $box->getBottomPen() ?: $pen;
+        $rightPen = $box->getRightPen() ?: $pen;
         if ($topPen && $topPen->getLineWidth() > 0.0) {
             $border['T'] = $this->getPdfPen($topPen);
         }
@@ -130,10 +130,10 @@ class CReport_Generator_Processor_PdfProcessor extends CReport_Generator_Process
             $border['L'] = $this->getPdfPen($leftPen);
         }
         if ($bottomPen && $bottomPen->getLineWidth() > 0.0) {
-            $border['L'] = $this->getPdfPen($bottomPen);
+            $border['B'] = $this->getPdfPen($bottomPen);
         }
         if ($rightPen && $rightPen->getLineWidth() > 0.0) {
-            $border['L'] = $this->getPdfPen($rightPen);
+            $border['R'] = $this->getPdfPen($rightPen);
         }
 
         return $border;
@@ -270,6 +270,8 @@ class CReport_Generator_Processor_PdfProcessor extends CReport_Generator_Process
         }
 
         $maxHeight = $height;
+        $ln = 0;
+
         $this->tcpdf->MultiCell(
             $width,
             $height,
@@ -277,7 +279,7 @@ class CReport_Generator_Processor_PdfProcessor extends CReport_Generator_Process
             $pdfBorder,
             $pdfTextAlignment,
             $fill,
-            $ln = 1,
+            $ln,
             $pdfX,
             $pdfY,
             $reseth = true,
@@ -314,7 +316,7 @@ class CReport_Generator_Processor_PdfProcessor extends CReport_Generator_Process
             ];
             $fitbox = carr::get($hAlignMap, $horizontalAlignment, 'L') . carr::get($vAlignMap, $verticalAlignment, 'T');
         }
-        $x = $this->topMargin + $x;
+        $x = $this->leftMargin + $x;
         $y = $this->currentY + $y;
         if (CFile::exists($src)) {
             $this->tcpdf->Image(

@@ -33,7 +33,7 @@ class CReport_Builder_Object_Box implements CReport_Builder_Contract_JrXmlElemen
             $xml .= $this->bottomPen->toJrXml('bottomPen');
         }
         if ($this->leftPen) {
-            $xml .= $this->leftPen->toJrXml('bottomPen');
+            $xml .= $this->leftPen->toJrXml('leftPen');
         }
         $xml .= $this->padding->toJrXml();
 
