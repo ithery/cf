@@ -151,7 +151,7 @@ class CReport_Builder_Dictionary_Variable {
      * @return mixed
      */
     public function getValue() {
-        return $this->isValueSet ? $this->getInitialValue() : $this->value;
+        return $this->isValueSet ? $this->value : $this->getInitialValue();
     }
 
     /**
@@ -180,6 +180,16 @@ class CReport_Builder_Dictionary_Variable {
      * @return mixed
      */
     public function getInitialValue() {
-        return $this->initialValueExpression;
+        $initialValue = $this->initialValueExpression;
+        if ($initialValue == null) {
+            if ($this->dataType == CReport::DATA_TYPE_INT || $this->dataType == CReport::DATA_TYPE_FLOAT) {
+                $initialValue = 0;
+            }
+            if ($this->dataType == CReport::DATA_TYPE_STRING) {
+                $initialValue = '';
+            }
+        }
+
+        return $initialValue;
     }
 }

@@ -108,9 +108,28 @@ class CReport_Builder_Element_Variable extends CReport_Builder_ElementAbstract {
         if ($this->name) {
             $openTag .= ' name="' . $this->name . '"';
         }
+        if ($this->dataType) {
+            $openTag .= ' class="' . CReport_Builder_JrXmlEnum::getJavaDataTypeEnum($this->dataType) . '"';
+        }
+        if ($this->calculation) {
+            $openTag .= ' calculation="' . CReport_Builder_JrXmlEnum::getCalculationEnum($this->calculation) . '"';
+        }
         $openTag .= '>';
 
         $body = '';
+        if ($this->variableExpression) {
+            $body .= '<variableExpression><![CDATA[' . $this->variableExpression . ']]></variableExpression>' . PHP_EOL;
+        }
+        if ($this->initialValueExpression) {
+            $body .= '<initialValueExpression><![CDATA[' . $this->initialValueExpression . ']]></initialValueExpression>' . PHP_EOL;
+        }
+        if ($this->resetType) {
+            $body .= '<resetType>' . CReport_Builder_JrXmlEnum::getResetTypeEnum($this->resetType) . '</resetType>' . PHP_EOL;
+        }
+        if ($this->resetGroup) {
+            $body .= '<resetGroup>' . $this->resetGroup . '</resetGroup>' . PHP_EOL;
+        }
+
         $closeTag = '</variable>';
 
         return $openTag . PHP_EOL . $body . PHP_EOL . $closeTag;

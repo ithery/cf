@@ -34,9 +34,8 @@ class CReport_Generator_Calculator {
     }
 
     public function variableCalculation(CReport_Builder_Dictionary_Variable $variable, CReport_Builder_Row $row) {
-        $varName = $variable->getName();
-        $expression = $variable->getVariableExpression();
-        $expression = $this->generator->getExpression($expression);
+        $orginalExpression = $variable->getVariableExpression();
+        $expression = $this->generator->getExpression($orginalExpression);
 
         // $htmlData = array_key_exists('htmlData', $this->arrayVariable) ? $this->arrayVariable['htmlData']['class'] : '';
         // if (preg_match('/(\d+)(?:\s*)([\+\-\*\/])(?:\s*)/', $out['target'], $matchesMath) > 0 && $htmlData != 'HTMLDATA') {

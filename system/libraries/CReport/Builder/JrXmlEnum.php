@@ -64,6 +64,24 @@ class CReport_Builder_JrXmlEnum {
         return ucfirst($scaleImage);
     }
 
+    /**
+     * @param string $scaleImage
+     *
+     * @return string
+     */
+    public static function getResetTypeEnum(string $resetType) {
+        return ucfirst($resetType);
+    }
+
+    /**
+     * @param string $scaleImage
+     *
+     * @return string
+     */
+    public static function getCalculationEnum(string $calculation) {
+        return ucfirst($calculation);
+    }
+
     public static function getBoolEnum($bool) {
         if (is_bool($bool)) {
             return $bool ? self::BOOL_TRUE : self::BOOL_FALSE;
@@ -81,7 +99,7 @@ class CReport_Builder_JrXmlEnum {
      *
      * @return string
      */
-    public function getPhpDataTypeEnum(string $javaDataType, $default = 'mixed') {
+    public static function getPhpDataTypeEnum(string $javaDataType, $default = 'mixed') {
         $javaToPHPTypeMap = [
             'java.lang.Object' => CReport::DATA_TYPE_MIXED,
             'java.lang.String' => CReport::DATA_TYPE_STRING,
@@ -105,7 +123,7 @@ class CReport_Builder_JrXmlEnum {
      *
      * @return string
      */
-    public function getJavaDataTypeEnum(string $phpDataType, $default = 'java.lang.Object') {
+    public static function getJavaDataTypeEnum(string $phpDataType, $default = 'java.lang.Object') {
         $phpToJavaTypeMap = [
             CReport::DATA_TYPE_STRING => 'java.lang.String',
             CReport::DATA_TYPE_INT => 'java.lang.Integer',

@@ -58,6 +58,7 @@ class CReport_Builder_Dictionary {
      */
     public function getVariableValue($name, $default = null) {
         $variable = $this->variables->find($name);
+
         if ($variable) {
             return $variable->getValue();
         }

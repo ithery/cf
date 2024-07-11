@@ -96,7 +96,11 @@ class CReport_Builder_Element_Group extends CReport_Builder_ElementAbstract {
         }
         $openTag .= '>';
 
-        $body = $this->getChildrenJrXml();
+        $body = '';
+        if ($this->groupExpression) {
+            $body .= '<groupExpression><![CDATA[' . $this->groupExpression . ']]></groupExpression>' . PHP_EOL;
+        }
+        $body .= $this->getChildrenJrXml();
         $closeTag = '</group>';
 
         return $openTag . PHP_EOL . $body . PHP_EOL . $closeTag;
