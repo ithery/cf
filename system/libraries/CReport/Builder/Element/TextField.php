@@ -99,24 +99,29 @@ class CReport_Builder_Element_TextField extends CReport_Builder_ElementAbstract 
     }
 
     public function generate(CReport_Generator $generator, CReport_Generator_ProcessorAbstract $processor) {
-        $text = $this->getTextAfterExpression($generator);
-        $options = [];
-        $options['x'] = $this->getX();
-        $options['y'] = $this->getY();
-        $options['width'] = $this->getWidth();
-        $options['height'] = $this->getHeightForGenerate();
-        $options['text'] = $text;
-        $options['textAlignment'] = $this->getTextAlignment();
-        $options['verticalAlignment'] = $this->getVerticalAlignment();
-        $options['font'] = $this->getFont();
-        $options['backgroundColor'] = $this->getBackgroundColor();
-        $options['box'] = $this->getBox();
-        $options['lineSpacing'] = $this->getLineSpacing();
+        if ($generator->evaluatePrintWhenExpression($this->printWhenExpression)) {
+            $text = $this->getTextAfterExpression($generator);
+            $options = [];
+            $options['x'] = $this->getX();
+            $options['y'] = $this->getY();
+            $options['width'] = $this->getWidth();
+            $options['height'] = $this->getHeightForGenerate();
+            $options['text'] = $text;
+            $options['textAlignment'] = $this->getTextAlignment();
+            $options['verticalAlignment'] = $this->getVerticalAlignment();
+            $options['font'] = $this->getFont();
+            $options['backgroundColor'] = $this->getBackgroundColor();
+            $options['box'] = $this->getBox();
+            $options['lineSpacing'] = $this->getLineSpacing();
 
-        $processor->cell($options);
+            $processor->cell($options);
+        }
     }
 
     public function getCellHeight(CReport_Generator $generator, CReport_Generator_ProcessorAbstract $processor) {
+        if (!$generator->evaluatePrintWhenExpression($this->printWhenExpression)) {
+            return 0;
+        }
         $text = $this->getTextAfterExpression($generator);
         $options = [];
         $options['x'] = $this->getX();

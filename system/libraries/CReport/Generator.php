@@ -145,6 +145,17 @@ class CReport_Generator {
         return $this->columnNumber;
     }
 
+    public function evaluatePrintWhenExpression(string $expression = null) {
+        return $this->evaluator->evaluatePrintWhenExpression($expression, $this->currentRow);
+    }
+
+    /**
+     * @return CCollection|CReport_Builder_Element_Groups[]
+     */
+    public function getGroups() {
+        return $this->report->getGroupElements();
+    }
+
     /**
      * @return null|CReport_Builder_Element_PageHeader
      */

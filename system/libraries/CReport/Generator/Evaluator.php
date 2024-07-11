@@ -7,6 +7,19 @@ class CReport_Generator_Evaluator {
         $this->generator = $generator;
     }
 
+    public function evaluatePrintWhenExpression(string $expression = null, CReport_Builder_Row $row = null) {
+        $printExpressionResult = true;
+        if ($expression != '') {
+            $printExpressionResult = false;
+            $expression = $this->getExpression($expression, $row);
+
+            //echo    'if('.$printWhenExpression.'){$print_expression_result=true;}';
+            eval('if(' . $expression . '){$printExpressionResult=true;}');
+        }
+
+        return $printExpressionResult;
+    }
+
     public function getExpression($expression) {
         preg_match_all("/P{(\w+)}/", $expression, $matchesP);
         if ($matchesP) {
