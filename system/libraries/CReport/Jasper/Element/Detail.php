@@ -150,7 +150,8 @@ class CReport_Jasper_Element_Detail extends CReport_Jasper_Element {
                     } else {
                         $shouldRender = true;
                     }
-                    if ($shouldRender && ($group->hasGroupFooter() && $rowIndex > 0)) {
+                    if ($shouldRender && ($group->hasGroupFooter())) {
+
                         // cdbg::dd($group);
                         $groupFooter = new CReport_Jasper_Element_GroupFooter($group->getGroupFooter());
                         $groupFooter->generate($report);

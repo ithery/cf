@@ -104,7 +104,7 @@ class CReport_Builder_Element_Detail extends CReport_Builder_ElementAbstract {
                     } else {
                         $shouldRender = true;
                     }
-                    if ($shouldRender && ($group->hasGroupFooter() && $rowIndex > 0)) {
+                    if ($shouldRender && ($group->hasGroupFooter())) {
                         // cdbg::dd($group);
                         $groupFooter = $group->getGroupFooterElement();
                         $groupFooter->generate($generator, $processor);

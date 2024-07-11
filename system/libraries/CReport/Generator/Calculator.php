@@ -96,6 +96,7 @@ class CReport_Generator_Calculator {
 
         $originalValue = $variable->getValue();
         $newValue = $expression;
+
         // $resetType = $variable->getResetType();
         $calculation = $variable->getCalculation();
         $value = $originalValue;

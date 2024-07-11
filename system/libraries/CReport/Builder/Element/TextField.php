@@ -77,11 +77,14 @@ class CReport_Builder_Element_TextField extends CReport_Builder_ElementAbstract 
         $body .= $this->getChildrenJrXml();
         $closeTag = '</textField>';
 
-        return $openTag . PHP_EOL . $body . PHP_EOL . $closeTag;
+        $xml = $openTag . PHP_EOL . $body . PHP_EOL . $closeTag;
+
+        return $xml;
     }
 
     private function getTextAfterExpression(CReport_Generator $generator) {
         $text = $this->getTextFieldExpression();
+
         if ($text) {
             $text = $generator->getExpression($text);
         } else {

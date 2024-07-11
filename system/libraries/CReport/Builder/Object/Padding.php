@@ -101,7 +101,7 @@ class CReport_Builder_Object_Padding implements CReport_Builder_Contract_JrXmlEl
     }
 
     public function toJrXml() {
-        $tag = '<padding ';
+        $tag = '<padding';
         $tag .= ' top="' . $this->top . '"';
         $tag .= ' right="' . $this->right . '"';
         $tag .= ' bottom="' . $this->bottom . '"';
