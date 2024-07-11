@@ -14,4 +14,18 @@ trait CReport_Builder_Trait_HasTextElementTrait {
 
         return $textElement;
     }
+
+    public function setTextElementPropertyFromXml(SimpleXMLElement $textElement) {
+        if ($textElement['textAlignment']) {
+            $this->setTextAlignment(CReport_Builder_JrXmlToPhpEnum::getTextAlignmentEnum((string) $textElement['textAlignment']));
+        }
+        if ($textElement['verticalAlignment']) {
+            $this->setVerticalAlignment(CReport_Builder_JrXmlToPhpEnum::getVerticalAlignmentEnum((string) $textElement['verticalAlignment']));
+        }
+        foreach ($textElement as $tag => $xmlElement) {
+            if ($tag == 'font') {
+                $this->font = CReport_Builder_Object_Font::fromXml($xmlElement);
+            }
+        }
+    }
 }

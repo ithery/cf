@@ -166,4 +166,13 @@ class CReport_Builder_Object_Font implements CReport_Builder_Contract_JrXmlEleme
 
         return $tag;
     }
+
+    public static function fromXml(SimpleXMLElement $xml) {
+        $font = new self();
+        if ($xml['size']) {
+            $font->setFontSize((float) $xml['size']);
+        }
+
+        return $font;
+    }
 }
