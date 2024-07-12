@@ -56,14 +56,20 @@ class CReport_Builder_Dictionary_Variable {
      */
     protected $isValueSet;
 
-    public function __construct(CReport_Builder_Element_Variable $var) {
+    /**
+     * @var CReport_Generator
+     */
+    protected $generator;
+
+    public function __construct(CReport_Builder_Element_Variable $var, CReport_Generator $generator) {
+        $this->generator = $generator;
         $this->name = $var->getName();
         $this->calculation = $var->getCalculation();
         $this->variableExpression = $var->getVariableExpression();
         $this->dataType = $var->getDataType();
         $this->resetType = $var->getResetType();
         $this->resetGroup = $var->getResetGroup();
-        $this->initialValueExpression = $var->getInitialValueExpression();
+        $this->initialValueExpression = $this->generator->getExpression($var->getInitialValueExpression());
         $this->incrementType = $var->getIncrementType();
         $this->isValueSet = false;
         $this->value = null;

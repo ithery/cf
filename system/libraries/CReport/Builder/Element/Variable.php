@@ -120,7 +120,7 @@ class CReport_Builder_Element_Variable extends CReport_Builder_ElementAbstract {
                 $element->setInitialValueExpression((string) $xmlElement);
             }
             if ($tag == 'resetType') {
-                $element->setResetType((string) $xmlElement);
+                $element->setResetType(CReport_Builder_JrXmlToPhpEnum::getResetTypeEnum((string) $xmlElement));
             }
             if ($tag == 'resetGroup') {
                 $element->setResetGroup((string) $xmlElement);

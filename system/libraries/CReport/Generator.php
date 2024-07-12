@@ -240,7 +240,7 @@ class CReport_Generator {
 
     protected function generate(CReport_Generator_ProcessorAbstract $processor) {
         $this->pageNumber = 1;
-        $this->dictionary->fillVariables($this->report->getVariableElements());
+        $this->dictionary->fillVariables($this->report->getVariableElements(), $this);
         $this->report->generate($this, $processor);
     }
 

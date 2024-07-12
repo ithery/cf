@@ -16,9 +16,9 @@ class CReport_Builder_Dictionary {
         $this->parameters = new CCollection();
     }
 
-    public function fillVariables(CCollection $variableElements) {
+    public function fillVariables(CCollection $variableElements, CReport_Generator $generator) {
         foreach ($variableElements as $variable) {
-            $this->variables->push(new CReport_Builder_Dictionary_Variable($variable));
+            $this->variables->push(new CReport_Builder_Dictionary_Variable($variable, $generator));
         }
     }
 
@@ -33,6 +33,7 @@ class CReport_Builder_Dictionary {
         $variables = $this->variables->filter(function (CReport_Builder_Dictionary_Variable $variable) use ($groupName) {
             return $variable->getResetType() == CReport::RESET_TYPE_GROUP && $variable->getResetGroup() == $groupName;
         });
+
         foreach ($variables as $variable) {
             /** @var CReport_Builder_Dictionary_Variable $variable */
             $variable->unsetValue();

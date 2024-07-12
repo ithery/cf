@@ -11,6 +11,7 @@ class CReport_Generator_Evaluator {
         $originalExpression = $expression;
         if ($expression != '') {
             $expression = $this->getExpression($expression, $row);
+
             if (!is_bool($expression)) {
                 throw new Exception('error on evaluate expression ' . $originalExpression);
             }
@@ -40,7 +41,9 @@ class CReport_Generator_Evaluator {
                 if (is_string($variableValue)) {
                     $variableValue = '"' . $variableValue . '"';
                 }
-
+                // if ($originalExpression == '$V{groupNumber} == 1') {
+                //     cdbg::dd($originalExpression, $expression, $variableValue);
+                // }
                 $expression = str_ireplace(['$V{' . $matchV . '}'], [$variableValue], $expression);
             }
         }
