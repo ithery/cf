@@ -56,6 +56,11 @@ class CReport_Generator {
      */
     protected $columnNumber;
 
+    /**
+     * @var bool
+     */
+    protected $isProcessingPageFooter;
+
     public function __construct(CReport_Builder_Report $report, CReport_Builder_Dictionary $dictionary, CManager_Contract_DataProviderInterface $dataProvider = null) {
         $this->report = $report;
         $this->dictionary = $dictionary;
@@ -66,6 +71,23 @@ class CReport_Generator {
         $this->evaluator = new CReport_Generator_Evaluator($this);
         $this->calculator = new CReport_Generator_Calculator($this);
         $this->formatter = new CReport_Generator_Formatter();
+        $this->isProcessingPageFooter = false;
+    }
+
+    public function setProcessingPageFooter($bool) {
+        $this->isProcessingPageFooter = $bool;
+
+        return $this;
+    }
+
+    public function isProcessingPageFooter() {
+        return $this->isProcessingPageFooter;
+    }
+
+    public function setDataProvider(CManager_Contract_DataProviderInterface $dataProvider) {
+        $this->dataProvider = $dataProvider;
+        $this->data = $this->dataProvider ? new CReport_Builder_Data($this->dataProvider->toEnumerable()) : new CReport_Builder_Data(c::collect());
+        $this->currentRow = carr::first($this->data);
     }
 
     public function getFieldValue($field, $default = null) {
@@ -161,6 +183,13 @@ class CReport_Generator {
      */
     public function getPageHeader() {
         return $this->report->getPageHeaderElement();
+    }
+
+    /**
+     * @return null|CReport_Builder_Element_PageFooter
+     */
+    public function getPageFooter() {
+        return $this->report->getPageFooterElement();
     }
 
     /**

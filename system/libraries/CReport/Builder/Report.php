@@ -342,4 +342,20 @@ class CReport_Builder_Report implements CReport_Builder_Contract_JrXmlElementInt
     public function getPageHeaderElement() {
         return $this->getPageHeaderElements()->first();
     }
+
+    /**
+     * @return CCollection|CReport_Builder_Element_PageFooter[]
+     */
+    public function getPageFooterElements() {
+        return c::collect($this->children)->filter(function ($value) {
+            return $value instanceof CReport_Builder_Element_PageFooter;
+        });
+    }
+
+    /**
+     * @return null|CReport_Builder_Element_PageFooter
+     */
+    public function getPageFooterElement() {
+        return $this->getPageFooterElements()->first();
+    }
 }

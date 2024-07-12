@@ -56,6 +56,10 @@ class CReport_Builder_Dictionary {
         return carr::get($this->parameters, $key, $default);
     }
 
+    public function setParameterValue($key, $value) {
+        $this->parameters->offsetSet($key, $value);
+    }
+
     /**
      * @param string $name
      * @param mixed  $default

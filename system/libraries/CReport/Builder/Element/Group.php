@@ -5,16 +5,29 @@ class CReport_Builder_Element_Group extends CReport_Builder_ElementAbstract {
 
     protected $groupExpression;
 
+    protected $isReprintHeaderOnEachPage;
+
     public function __construct() {
         parent::__construct();
         $this->name = null;
         $this->groupExpression = '';
+        $this->isReprintHeaderOnEachPage = false;
     }
 
     public function setGroupExpression($groupExpression) {
         $this->groupExpression = $groupExpression;
 
         return $this;
+    }
+
+    public function setReprintHeaderOnEachPage($isReprintHeaderOnEachPage) {
+        $this->isReprintHeaderOnEachPage = $isReprintHeaderOnEachPage;
+
+        return $this;
+    }
+
+    public function isReprintHeaderOnEachPage() {
+        return $this->isReprintHeaderOnEachPage;
     }
 
     public function getGroupExpression() {
@@ -93,6 +106,9 @@ class CReport_Builder_Element_Group extends CReport_Builder_ElementAbstract {
         if ($xml['name']) {
             $element->setName((string) $xml['name']);
         }
+        if ($xml['isReprintHeaderOnEachPage']) {
+            $element->setReprintHeaderOnEachPage(CReport_Builder_JrXmlToPhpEnum::getBoolEnum((string) $xml['isReprintHeaderOnEachPage']));
+        }
         foreach ($xml as $tag => $xmlElement) {
             if ($tag == 'groupExpression') {
                 $element->setGroupExpression((string) $xmlElement);
@@ -110,6 +126,7 @@ class CReport_Builder_Element_Group extends CReport_Builder_ElementAbstract {
         if ($this->name) {
             $openTag .= ' name="' . $this->name . '"';
         }
+        $openTag .= ' isReprintHeaderOnEachPage="' . CReport_Builder_PhpToJrXmlEnum::getBoolEnum($this->isReprintHeaderOnEachPage) . '"';
         $openTag .= '>';
 
         $body = '';

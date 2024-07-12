@@ -6,6 +6,7 @@ class CReport_Builder_ElementFactory {
         'image' => CReport_Builder_Element_Image::class,
         'staticText' => CReport_Builder_Element_StaticText::class,
         'pageHeader' => CReport_Builder_Element_PageHeader::class,
+        'pageFooter' => CReport_Builder_Element_PageFooter::class,
         'frame' => CReport_Builder_Element_Frame::class,
         'columnHeader' => CReport_Builder_Element_ColumnHeader::class,
         'detail' => CReport_Builder_Element_Detail::class,
@@ -15,6 +16,8 @@ class CReport_Builder_ElementFactory {
         'groupHeader' => CReport_Builder_Element_GroupHeader::class,
         'summary' => CReport_Builder_Element_Summary::class,
         'variable' => CReport_Builder_Element_Variable::class,
+        'queryString' => CReport_Builder_Element_QueryString::class,
+        'line' => CReport_Builder_Element_Line::class,
 
     ];
 

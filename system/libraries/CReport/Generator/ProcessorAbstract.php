@@ -29,11 +29,30 @@ abstract class CReport_Generator_ProcessorAbstract {
     abstract public function image(array $options);
 
     /**
+     * @param array $options
+     *
+     * @return void
+     */
+    abstract public function line(array $options);
+
+    /**
      * @param float $height
      *
      * @return float
      */
     abstract public function addY($height);
+
+    /**
+     * @return float
+     */
+    abstract public function resetY();
+
+    /**
+     * @param float $y
+     *
+     * @return float
+     */
+    abstract public function setY($y);
 
     /**
      * @return mixed

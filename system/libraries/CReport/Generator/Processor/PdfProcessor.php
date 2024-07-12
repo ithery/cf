@@ -142,9 +142,11 @@ class CReport_Generator_Processor_PdfProcessor extends CReport_Generator_Process
     public function preventYOverflow(CReport_Generator $generator, $height) {
         $preventYAxis = $this->currentY + $height;
         $pageHeight = $this->pageHeight;
-        //$pageFooter = $this->jasperReport->getRoot()->getChildByClassName('PageFooter');
-        $pageFooter = null;
+        $pageFooter = $generator->getPageFooter();
         $pageFooterHeight = 0;
+        if ($pageFooter) {
+            $pageFooterHeight = $pageFooter->getHeight();
+        }
         $topMargin = $this->topMargin;
         $bottomMargin = $this->bottomMargin;
         $discount = $pageHeight - $pageFooterHeight - $topMargin - $bottomMargin; //dicount heights of page parts;
@@ -155,8 +157,7 @@ class CReport_Generator_Processor_PdfProcessor extends CReport_Generator_Process
             // cdbg::dd($preventYAxis, $discount, $pageheight, $pageFooterHeigth, $topMargin, $bottomMargin);
 
             if ($pageFooter) {
-                // CReport_Jasper_Instructions::$lastPageFooter = false;
-                // $pageFooter->generate($this->jasperReport);
+                $pageFooter->generate($generator, $this);
             }
             $this->resetY();
             $generator->incrementPageNumber();
@@ -171,6 +172,13 @@ class CReport_Generator_Processor_PdfProcessor extends CReport_Generator_Process
             $columnHeader = $generator->getColumnHeader();
             if ($columnHeader) {
                 $columnHeader->generate($generator, $this);
+            }
+            $groups = $generator->getGroups();
+            foreach ($groups as $group) {
+                if ($group->isReprintHeaderOnEachPage() && $group->hasGroupHeader()) {
+                    $groupHeader = $group->getGroupHeaderElement();
+                    $groupHeader->generate($generator, $this);
+                }
             }
 
             // CReport_Jasper_Instructions::runInstructions();
@@ -192,6 +200,15 @@ class CReport_Generator_Processor_PdfProcessor extends CReport_Generator_Process
         }
 
         return $this->currentY;
+    }
+
+    /**
+     * @param float $y
+     *
+     * @return float
+     */
+    public function setY($y) {
+        return $this->currentY = $y;
     }
 
     public function font(CReport_Builder_Object_Font $font) {
@@ -329,6 +346,30 @@ class CReport_Generator_Processor_PdfProcessor extends CReport_Generator_Process
             $maxHeight,
             $pdfVerticalAlignment,
             $fitcell = false
+        );
+    }
+
+    public function line(array $options) {
+        $x = carr::get($options, 'x');
+        $y = carr::get($options, 'y');
+        $x1 = $x;
+        $y1 = $y;
+        $width = carr::get($options, 'width');
+        $height = carr::get($options, 'height');
+        $x2 = $x1 + $width;
+        $y2 = $y1 + $height;
+        $pen = carr::get($options, 'pen');
+        $style = [];
+        if ($pen != null && $pen instanceof CReport_Builder_Object_Pen) {
+            $style = $this->getPdfPen($pen);
+        }
+
+        $this->tcpdf->Line(
+            $x1,
+            $y1,
+            $x2,
+            $y2,
+            $style
         );
     }
 

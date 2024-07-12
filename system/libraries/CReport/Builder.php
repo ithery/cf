@@ -47,6 +47,10 @@ class CReport_Builder {
         return $this;
     }
 
+    public function setParameter($key, $value) {
+        return $this->dictionary->setParameterValue($key, $value);
+    }
+
     public function setPaperSize($size) {
         $size = cstr::upper($size);
         $sizes = carr::get(CReport_Paper::$pageFormats, $size);
@@ -68,6 +72,18 @@ class CReport_Builder {
      */
     public function setDataFromModel($model, $queryCallback = null) {
         $this->dataProvider = CManager::createModelDataProvider($model, $queryCallback);
+
+        return $this;
+    }
+
+    /**
+     * @param string     $sql
+     * @param null|array $bindings
+     *
+     * @return $this
+     */
+    public function setDataFromSql($sql, array $bindings = []) {
+        $this->dataProvider = CManager::createSqlDataProvider($sql, $bindings);
 
         return $this;
     }

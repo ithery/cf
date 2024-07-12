@@ -7,6 +7,35 @@ class CReport_Generator_Expression {
         $this->expression = $expression;
     }
 
+    private function removeQuotes($input) {
+        $output = '';
+        $quoteType = ''; // Menyimpan tipe quote saat ini (', " atau kosong jika di luar quote)
+        $escaped = false; // Menyimpan status karakter escape
+
+        $length = strlen($input);
+        for ($i = 0; $i < $length; $i++) {
+            $char = $input[$i];
+            if ($quoteType === '') {
+                if ($char === '"' || $char === "'") {
+                    $quoteType = $char;
+                } else {
+                    $output .= $char;
+                }
+            } else {
+                if ($char === '\\' && !$escaped) {
+                    $escaped = true;
+                } elseif ($char === $quoteType && !$escaped) {
+                    $quoteType = '';
+                } else {
+                    $output .= $char;
+                    $escaped = false;
+                }
+            }
+        }
+
+        return $output;
+    }
+
     public function hasOperator() {
         // Regex untuk mencocokkan operator matematika atau perbandingan
         $regex = '/[+\-*\/<>!=]=?/';
@@ -20,19 +49,24 @@ class CReport_Generator_Expression {
     }
 
     public function evaluate() {
-        if ($this->expression == '') {
+        $expression = $this->expression;
+        if ($expression == '') {
             return '';
         }
         if (!$this->hasOperator()) {
-            return $this->expression;
+            if (is_string($expression)) {
+                $expression = $this->removeQuotes($expression);
+            }
+
+            return $expression;
         }
-        $lexer = new CReport_Generator_Expression_Lexer($this->expression);
+        $lexer = new CReport_Generator_Expression_Lexer($expression);
         $parser = new CReport_Generator_Expression_Parser($lexer);
 
         try {
             $result = $parser->parse();
         } catch (CReport_Generator_Exception_ExpressionException $e) {
-            $result = $this->expression;
+            $result = $expression;
         }
 
         return $result;

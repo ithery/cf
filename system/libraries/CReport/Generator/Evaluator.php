@@ -29,14 +29,19 @@ class CReport_Generator_Evaluator {
         preg_match_all("/P{(\w+)}/", $expression, $matchesP);
         if ($matchesP) {
             foreach ($matchesP[1] as $matchP) {
-                $expression = str_ireplace(['$P{' . $matchP . '}', '"'], [$this->generator->getParameterValue($matchP), ''], $expression);
+                $expression = str_ireplace(['$P{' . $matchP . '}'], [$this->generator->getParameterValue($matchP)], $expression);
             }
         }
 
         preg_match_all("/V{(\w+)}/", $expression, $matchesV);
         if ($matchesV) {
             foreach ($matchesV[1] as $matchV) {
-                $expression = str_ireplace(['$V{' . $matchV . '}', '"'], [$this->generator->getVariableValue($matchV), ''], $expression);
+                $variableValue = $this->generator->getVariableValue($matchV);
+                if (is_string($variableValue)) {
+                    $variableValue = '"' . $variableValue . '"';
+                }
+
+                $expression = str_ireplace(['$V{' . $matchV . '}'], [$variableValue], $expression);
             }
         }
 
@@ -44,9 +49,13 @@ class CReport_Generator_Evaluator {
             // preg_match_all('/F{[^}]*}/', $expression, $matchesF);
             preg_match_all('/F{(.+?)}/', $expression, $matchesF);
             if ($matchesF) {
-                //var_dump($matchesF);
                 foreach ($matchesF[1] as $matchF) {
-                    $expression = str_ireplace(['$F{' . $matchF . '}', '"'], [$this->generator->getFieldValue($matchF), ''], $expression);
+                    $fieldValue = $this->generator->getFieldValue($matchF);
+                    if (is_string($fieldValue)) {
+                        $fieldValue = '"' . $fieldValue . '"';
+                    }
+
+                    $expression = str_ireplace(['$F{' . $matchF . '}'], [$fieldValue], $expression);
                 }
             }
         }
@@ -66,9 +75,6 @@ class CReport_Generator_Evaluator {
              // error_reporting(5);
         }
 
-        if (is_string($expression)) {
-            $expression = $this->removeQuotes($expression);
-        }
         $expressionEvaluator = new CReport_Generator_Expression($expression);
         $result = $expressionEvaluator->evaluate();
 
@@ -99,34 +105,5 @@ class CReport_Generator_Evaluator {
         // Add more condition checks as needed (e.g., !=, <, >, etc.)
 
         return false;
-    }
-
-    private function removeQuotes($input) {
-        $output = '';
-        $quoteType = ''; // Menyimpan tipe quote saat ini (', " atau kosong jika di luar quote)
-        $escaped = false; // Menyimpan status karakter escape
-
-        $length = strlen($input);
-        for ($i = 0; $i < $length; $i++) {
-            $char = $input[$i];
-            if ($quoteType === '') {
-                if ($char === '"' || $char === "'") {
-                    $quoteType = $char;
-                } else {
-                    $output .= $char;
-                }
-            } else {
-                if ($char === '\\' && !$escaped) {
-                    $escaped = true;
-                } elseif ($char === $quoteType && !$escaped) {
-                    $quoteType = '';
-                } else {
-                    $output .= $char;
-                    $escaped = false;
-                }
-            }
-        }
-
-        return $output;
     }
 }
