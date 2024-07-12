@@ -10,6 +10,8 @@ class CReport_Generator_Expression_Lexer {
 
     const TOKEN_UNKNOWN = 'UNKNOWN';
 
+    const TOKEN_PAREN = 'PAREN';
+
     private $input;
 
     private $position;
@@ -54,6 +56,8 @@ class CReport_Generator_Expression_Lexer {
             if (($this->currentChar === '=' && $this->input[$this->position + 1] === '=')
                 || ($this->currentChar === '!' && $this->input[$this->position + 1] === '=')
                 || ($this->currentChar === '<' && $this->input[$this->position + 1] === '>')
+                || ($this->currentChar === '>' && $this->input[$this->position + 1] === '=')
+                || ($this->currentChar === '<' && $this->input[$this->position + 1] === '=')
             ) {
                 $operator = $this->currentChar . $this->input[$this->position + 1];
                 $this->advance();
@@ -67,6 +71,12 @@ class CReport_Generator_Expression_Lexer {
                 $this->advance();
 
                 return ['type' => self::TOKEN_OPERATOR, 'value' => $char];
+            }
+            if (in_array($this->currentChar, ['(', ')'])) {
+                $char = $this->currentChar;
+                $this->advance();
+
+                return ['type' => self::TOKEN_PAREN, 'value' => $char];
             }
 
             return ['type' => self::TOKEN_UNKNOWN, 'value' => $this->currentChar];

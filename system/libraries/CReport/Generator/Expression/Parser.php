@@ -18,16 +18,16 @@ class CReport_Generator_Expression_Parser {
     }
 
     public function parse() {
-        $left = $this->expression();
+        $result = $this->expression();
         if ($this->currentToken !== null && $this->currentToken['type'] === CReport_Generator_Expression_Lexer::TOKEN_OPERATOR) {
             $operator = $this->currentToken['value'];
             $this->eat(CReport_Generator_Expression_Lexer::TOKEN_OPERATOR);
             $right = $this->expression();
 
-            return $this->evaluate($left, $operator, $right);
+            return $this->evaluate($result, $operator, $right);
         }
 
-        return $left;
+        return $result;
     }
 
     private function expression() {
@@ -57,6 +57,18 @@ class CReport_Generator_Expression_Parser {
     }
 
     private function factor() {
+        if ($this->currentToken['type'] === CReport_Generator_Expression_Lexer::TOKEN_PAREN && $this->currentToken['value'] === '(') {
+            $this->eat(CReport_Generator_Expression_Lexer::TOKEN_PAREN);
+            $result = $this->expression();
+            $this->eat(CReport_Generator_Expression_Lexer::TOKEN_PAREN); // Eat closing ')'
+
+            return $result;
+        } else {
+            return $this->primary();
+        }
+    }
+
+    private function primary() {
         $token = $this->currentToken;
         if ($token['type'] === CReport_Generator_Expression_Lexer::TOKEN_STRING) {
             $this->eat(CReport_Generator_Expression_Lexer::TOKEN_STRING);
@@ -77,6 +89,10 @@ class CReport_Generator_Expression_Parser {
                 return $left == $right;
             case '!=':
                 return $left != $right;
+            case '<=':
+                return $left <= $right;
+            case '>=':
+                return $left >= $right;
             case '<>':
                 return $left != $right;
             case '+':
