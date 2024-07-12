@@ -94,30 +94,6 @@ class CReport_Builder_PhpToJrXmlEnum {
     }
 
     /**
-     * @param string      $javaDataType
-     * @param null|string $default
-     *
-     * @return string
-     */
-    public static function getPhpDataTypeEnum(string $javaDataType, $default = 'mixed') {
-        $javaToPHPTypeMap = [
-            'java.lang.Object' => CReport::DATA_TYPE_MIXED,
-            'java.lang.String' => CReport::DATA_TYPE_STRING,
-            'java.lang.Integer' => CReport::DATA_TYPE_INT,
-            'java.lang.Long' => CReport::DATA_TYPE_INT,
-            'java.lang.Short' => CReport::DATA_TYPE_INT,
-            'java.lang.Double' => CReport::DATA_TYPE_FLOAT,
-            'java.lang.Float' => CReport::DATA_TYPE_FLOAT,
-            'java.lang.Boolean' => CReport::DATA_TYPE_FLOAT,
-            'java.util.Date' => CReport::DATA_TYPE_DATETIME,
-            'java.sql.Timestamp' => CReport::DATA_TYPE_DATETIME,
-            'java.sql.Time' => CReport::DATA_TYPE_DATETIME,
-        ];
-
-        return carr::get($javaToPHPTypeMap, $javaDataType, $default);
-    }
-
-    /**
      * @param string      $phpDataType
      * @param null|string $default
      *

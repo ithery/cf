@@ -75,7 +75,7 @@ class CReport_Builder_Element_Variable extends CReport_Builder_ElementAbstract {
         return $this->incrementType;
     }
 
-    public function setincrementType($incrementType) {
+    public function setIncrementType($incrementType) {
         $this->incrementType = $incrementType;
 
         return $this;
@@ -99,6 +99,35 @@ class CReport_Builder_Element_Variable extends CReport_Builder_ElementAbstract {
         $this->resetGroup = $resetGroup;
 
         return $this;
+    }
+
+    public static function fromXml(SimpleXMLElement $xml) {
+        $element = new self();
+        if ($xml['name']) {
+            $element->setName((string) $xml['name']);
+        }
+        if ($xml['class']) {
+            $element->setDataType(CReport_Builder_JrXmlToPhpEnum::getPhpDataTypeEnum((string) $xml['class']));
+        }
+        if ($xml['calculation']) {
+            $element->setCalculation(CReport_Builder_JrXmlToPhpEnum::getCalculationEnum((string) $xml['calculation']));
+        }
+        foreach ($xml as $tag => $xmlElement) {
+            if ($tag == 'variableExpression') {
+                $element->setVariableExpression((string) $xmlElement);
+            }
+            if ($tag == 'initialValueExpression') {
+                $element->setInitialValueExpression((string) $xmlElement);
+            }
+            if ($tag == 'resetType') {
+                $element->setResetType((string) $xmlElement);
+            }
+            if ($tag == 'resetGroup') {
+                $element->setResetGroup((string) $xmlElement);
+            }
+        }
+
+        return $element;
     }
 
     public function toJrXml() {

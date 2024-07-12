@@ -78,6 +78,9 @@ class CReport_Builder_Element_TextField extends CReport_Builder_ElementAbstract 
             if ($tag == 'textFieldExpression') {
                 $element->setTextFieldExpression((string) $xmlElement);
             }
+            if ($tag == 'pattern') {
+                $element->setPattern((string) $xmlElement);
+            }
         }
 
         return $element;

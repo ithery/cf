@@ -10,9 +10,11 @@ class CReport_Builder_ElementFactory {
         'columnHeader' => CReport_Builder_Element_ColumnHeader::class,
         'detail' => CReport_Builder_Element_Detail::class,
         'textField' => CReport_Builder_Element_TextField::class,
+        'group' => CReport_Builder_Element_Group::class,
         'groupFooter' => CReport_Builder_Element_GroupFooter::class,
         'groupHeader' => CReport_Builder_Element_GroupHeader::class,
         'summary' => CReport_Builder_Element_Summary::class,
+        'variable' => CReport_Builder_Element_Variable::class,
 
     ];
 
@@ -26,11 +28,10 @@ class CReport_Builder_ElementFactory {
         'textFieldExpression',
         'pattern',
         'parameter',
-        'variable',
         'variableExpression',
         'initialValueExpression',
-        'group',
         'band',
+        'groupExpression',
     ];
 
     public static function getClassName($obj) {
@@ -44,7 +45,7 @@ class CReport_Builder_ElementFactory {
     public static function createElementFromXml($tag, SimpleXMLElement $xml) {
         $className = carr::get(self::$classMap, $tag);
         if ($className == null) {
-            throw new Exception('Class for ' . $tag . 'is not found in builder');
+            throw new Exception('Class for ' . $tag . ' is not found in builder');
         }
 
         return $className::fromXml($xml);

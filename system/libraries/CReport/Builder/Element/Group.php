@@ -87,6 +87,22 @@ class CReport_Builder_Element_Group extends CReport_Builder_ElementAbstract {
         return $this->getGroupFooterElements()->first();
     }
 
+    public static function fromXml(SimpleXMLElement $xml) {
+        $element = new self();
+
+        if ($xml['name']) {
+            $element->setName((string) $xml['name']);
+        }
+        foreach ($xml as $tag => $xmlElement) {
+            if ($tag == 'groupExpression') {
+                $element->setGroupExpression((string) $xmlElement);
+            }
+        }
+        $element->addChildrenFromXml($xml);
+
+        return $element;
+    }
+
     public function toJrXml() {
         // <reportElement x="20" y="0" width="779" height="100"/>
         //         <imageExpression><![CDATA["' . $headerImagePath . '"]]></imageExpression>

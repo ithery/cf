@@ -8,19 +8,24 @@ class CReport_Generator_Evaluator {
     }
 
     public function evaluatePrintWhenExpression(string $expression = null, CReport_Builder_Row $row = null) {
-        $printExpressionResult = true;
+        $originalExpression = $expression;
         if ($expression != '') {
-            $printExpressionResult = false;
             $expression = $this->getExpression($expression, $row);
+            if (!is_bool($expression)) {
+                throw new Exception('error on evaluate expression ' . $originalExpression);
+            }
+
+            return $expression;
 
             //echo    'if('.$printWhenExpression.'){$print_expression_result=true;}';
-            eval('if(' . $expression . '){$printExpressionResult=true;}');
+            //eval('if(' . $expression . '){$printExpressionResult=true;}');
         }
 
-        return $printExpressionResult;
+        return true;
     }
 
     public function getExpression($expression) {
+        $originalExpression = $expression;
         preg_match_all("/P{(\w+)}/", $expression, $matchesP);
         if ($matchesP) {
             foreach ($matchesP[1] as $matchP) {
@@ -61,7 +66,10 @@ class CReport_Generator_Evaluator {
              // error_reporting(5);
         }
 
-        return $expression;
+        $expressionEvaluator = new CReport_Generator_Expression($expression);
+        $result = $expressionEvaluator->evaluate();
+
+        return $result;
     }
 
     public function evaluateExpression(string $expression, CReport_Jasper_Report_DataRow $row = null) {

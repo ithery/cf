@@ -37,7 +37,7 @@ class CReport_Builder_JrXmlToPhpEnum {
      * @return string
      */
     public static function getTextAlignmentEnum(string $textAlignment) {
-        return ucfirst($textAlignment);
+        return lcfirst($textAlignment);
     }
 
     /**
@@ -93,25 +93,5 @@ class CReport_Builder_JrXmlToPhpEnum {
         ];
 
         return carr::get($javaToPHPTypeMap, $javaDataType, $default);
-    }
-
-    /**
-     * @param string      $phpDataType
-     * @param null|string $default
-     *
-     * @return string
-     */
-    public static function getJavaDataTypeEnum(string $phpDataType, $default = 'java.lang.Object') {
-        $phpToJavaTypeMap = [
-            CReport::DATA_TYPE_STRING => 'java.lang.String',
-            CReport::DATA_TYPE_INT => 'java.lang.Integer',
-            CReport::DATA_TYPE_FLOAT => 'java.lang.Double', // Assuming using Double for float, can be adjusted
-            CReport::DATA_TYPE_BOOL => 'java.lang.Boolean',
-            CReport::DATA_TYPE_DATETIME => 'java.util.Date',
-            CReport::DATA_TYPE_MIXED => 'java.lang.Object',
-            // Add other mappings as needed
-        ];
-
-        return carr::get($phpToJavaTypeMap, $phpDataType, $default);
     }
 }

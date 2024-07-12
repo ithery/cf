@@ -50,5 +50,10 @@ trait CReport_Builder_Trait_HasReportElementTrait {
         if ($reportElement['backcolor']) {
             $this->setBackgroundColor((string) $reportElement['backcolor']);
         }
+        foreach ($reportElement as $tag => $xmlElement) {
+            if ($tag == 'printWhenExpression') {
+                $this->setPrintWhenExpression((string) $xmlElement);
+            }
+        }
     }
 }
