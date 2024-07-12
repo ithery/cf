@@ -41,4 +41,35 @@ class CReport_Builder_Object_Box implements CReport_Builder_Contract_JrXmlElemen
 
         return $xml;
     }
+
+    /**
+     * @param SimpleXMLElement $xml
+     *
+     * @return CReport_Builder_Object_Box
+     */
+    public static function fromXml(SimpleXMLElement $xml) {
+        $box = new self();
+        foreach ($xml as $tag => $xmlElement) {
+            if ($tag == 'pen') {
+                $box->setPen(CReport_Builder_Object_Pen::fromXml($xmlElement));
+            }
+            if ($tag == 'topPen') {
+                $box->setTopPen(CReport_Builder_Object_Pen::fromXml($xmlElement));
+            }
+            if ($tag == 'rightPen') {
+                $box->setRightPen(CReport_Builder_Object_Pen::fromXml($xmlElement));
+            }
+            if ($tag == 'bottomPen') {
+                $box->setBottomPen(CReport_Builder_Object_Pen::fromXml($xmlElement));
+            }
+            if ($tag == 'leftPen') {
+                $box->setLeftPen(CReport_Builder_Object_Pen::fromXml($xmlElement));
+            }
+            if ($tag == 'padding') {
+                $box->setPadding(CReport_Builder_Object_Padding::fromXml($xmlElement));
+            }
+        }
+
+        return $box;
+    }
 }

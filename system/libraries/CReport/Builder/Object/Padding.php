@@ -110,4 +110,22 @@ class CReport_Builder_Object_Padding implements CReport_Builder_Contract_JrXmlEl
 
         return $tag;
     }
+
+    public static function fromXml(SimpleXMLElement $xml) {
+        $font = new self();
+        if ($xml['top']) {
+            $font->setPaddingTop((float) $xml['top']);
+        }
+        if ($xml['right']) {
+            $font->setPaddingRight((float) $xml['right']);
+        }
+        if ($xml['bottom']) {
+            $font->setPaddingBottom((float) $xml['bottom']);
+        }
+        if ($xml['left']) {
+            $font->setPaddingLeft((float) $xml['left']);
+        }
+
+        return $font;
+    }
 }

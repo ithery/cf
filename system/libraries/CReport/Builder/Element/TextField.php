@@ -57,6 +57,32 @@ class CReport_Builder_Element_TextField extends CReport_Builder_ElementAbstract 
         return $this->forceHeight !== null ? $this->forceHeight : $this->height;
     }
 
+    public static function fromXml(SimpleXMLElement $xml) {
+        $element = new self();
+        if ($xml['isStretchWithOverflow']) {
+            $element->setStretchWithOverflow(CReport_Builder_JrXmlToPhpEnum::getBoolEnum((string) $xml['isStretchWithOverflow']));
+        }
+        foreach ($xml as $tag => $xmlElement) {
+            if ($tag == 'reportElement') {
+                $element->setReportElementPropertyFromXml($xmlElement);
+            }
+            if ($tag == 'textElement') {
+                $element->setTextElementPropertyFromXml($xmlElement);
+            }
+            if ($tag == 'box') {
+                $element->setBox(CReport_Builder_Object_Box::fromXml($xmlElement));
+            }
+            if ($tag == 'text') {
+                $element->setText((string) $xmlElement);
+            }
+            if ($tag == 'textFieldExpression') {
+                $element->setTextFieldExpression((string) $xmlElement);
+            }
+        }
+
+        return $element;
+    }
+
     public function toJrXml() {
         $openTag = '<textField isStretchWithOverflow="' . CReport_Builder_PhpToJrXmlEnum::getBoolEnum($this->isStretchWithOverflow) . '">';
 

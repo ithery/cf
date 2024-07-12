@@ -17,7 +17,7 @@ trait CReport_Builder_Trait_Property_BoxPropertyTrait {
      * @return $this
      */
     public function setBox(CReport_Builder_Object_Box $box) {
-        $this->box;
+        $this->box = $box;
 
         return $this;
     }

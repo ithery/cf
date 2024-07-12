@@ -68,7 +68,7 @@ class CReport_Builder_JrXmlToPhpEnum {
     }
 
     public static function getBoolEnum($bool) {
-        return self::BOOL_TRUE ? true : false;
+        return $bool == self::BOOL_TRUE ? true : false;
     }
 
     /**

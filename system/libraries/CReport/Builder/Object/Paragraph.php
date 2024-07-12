@@ -38,4 +38,18 @@ class CReport_Builder_Object_Paragraph implements CReport_Builder_Contract_JrXml
 
         return $tag;
     }
+
+    /**
+     * @param SimpleXMLElement $xml
+     *
+     * @return CReport_Builder_Object_Paragraph
+     */
+    public static function fromXml(SimpleXMLElement $xml) {
+        $font = new self();
+        if ($xml['lineSpacing']) {
+            $font->setLineSpacing((float) $xml['lineSpacing']);
+        }
+
+        return $font;
+    }
 }

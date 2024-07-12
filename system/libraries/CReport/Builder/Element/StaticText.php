@@ -24,7 +24,10 @@ class CReport_Builder_Element_StaticText extends CReport_Builder_ElementAbstract
                 $element->setReportElementPropertyFromXml($xmlElement);
             }
             if ($tag == 'textElement') {
-                $element->settextElementPropertyFromXml($xmlElement);
+                $element->setTextElementPropertyFromXml($xmlElement);
+            }
+            if ($tag == 'box') {
+                $element->setBox(CReport_Builder_Object_Box::fromXml($xmlElement));
             }
             if ($tag == 'text') {
                 $element->setText((string) $xmlElement);

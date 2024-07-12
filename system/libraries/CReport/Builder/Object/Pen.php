@@ -20,4 +20,19 @@ class CReport_Builder_Object_Pen implements CReport_Builder_Contract_JrXmlElemen
 
         return $xml;
     }
+
+    public static function fromXml(SimpleXMLElement $xml) {
+        $font = new self();
+        if ($xml['lineWidth']) {
+            $font->setLineWidth((float) $xml['lineWidth']);
+        }
+        if ($xml['lineStyle']) {
+            $font->setLineStyle(CReport_Builder_JrXmlToPhpEnum::getLineStyleEnum((string) $xml['lineStype']));
+        }
+        if ($xml['lineColor']) {
+            $font->setLineColor((string) $xml['lineColor']);
+        }
+
+        return $font;
+    }
 }

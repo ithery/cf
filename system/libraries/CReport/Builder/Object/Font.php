@@ -172,6 +172,21 @@ class CReport_Builder_Object_Font implements CReport_Builder_Contract_JrXmlEleme
         if ($xml['size']) {
             $font->setFontSize((float) $xml['size']);
         }
+        if ($xml['name']) {
+            $font->setFontName((string) $xml['name']);
+        }
+        if ($xml['isBold']) {
+            $font->setBold(CReport_Builder_JrXmlToPhpEnum::getBoolEnum((string) $xml['isBold']));
+        }
+        if ($xml['isUnderline']) {
+            $font->setUnderline(CReport_Builder_JrXmlToPhpEnum::getBoolEnum((string) $xml['isUnderline']));
+        }
+        if ($xml['isItalic']) {
+            $font->setItalic(CReport_Builder_JrXmlToPhpEnum::getBoolEnum((string) $xml['isItalic']));
+        }
+        if ($xml['isStrikeThrough']) {
+            $font->setStrikeThrough(CReport_Builder_JrXmlToPhpEnum::getBoolEnum((string) $xml['isStrikeThrough']));
+        }
 
         return $font;
     }

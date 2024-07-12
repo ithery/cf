@@ -26,6 +26,9 @@ trait CReport_Builder_Trait_HasTextElementTrait {
             if ($tag == 'font') {
                 $this->font = CReport_Builder_Object_Font::fromXml($xmlElement);
             }
+            if ($tag == 'paragraph') {
+                $this->paragraph = CReport_Builder_Object_Paragraph::fromXml($xmlElement);
+            }
         }
     }
 }
