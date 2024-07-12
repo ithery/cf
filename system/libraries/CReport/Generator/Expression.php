@@ -7,9 +7,24 @@ class CReport_Generator_Expression {
         $this->expression = $expression;
     }
 
+    public function hasOperator() {
+        // Regex untuk mencocokkan operator matematika atau perbandingan
+        $regex = '/[+\-*\/<>!=]=?/';
+
+        // Menggunakan preg_match untuk mencari operator dalam ekspresi
+        if (preg_match($regex, $this->expression)) {
+            return true;
+        }
+
+        return false;
+    }
+
     public function evaluate() {
         if ($this->expression == '') {
             return '';
+        }
+        if (!$this->hasOperator()) {
+            return $this->expression;
         }
         $lexer = new CReport_Generator_Expression_Lexer($this->expression);
         $parser = new CReport_Generator_Expression_Parser($lexer);

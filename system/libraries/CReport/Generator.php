@@ -87,7 +87,7 @@ class CReport_Generator {
     }
 
     public function formatPattern(string $text, string $pattern) {
-        return $this->formatter->formatPattern($text, $pattern);
+        return $this->formatter->formatPattern((float) $text, $pattern);
     }
 
     /**

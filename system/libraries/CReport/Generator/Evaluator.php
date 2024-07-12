@@ -66,6 +66,9 @@ class CReport_Generator_Evaluator {
              // error_reporting(5);
         }
 
+        if (is_string($expression)) {
+            $expression = $this->removeQuotes($expression);
+        }
         $expressionEvaluator = new CReport_Generator_Expression($expression);
         $result = $expressionEvaluator->evaluate();
 
@@ -96,5 +99,34 @@ class CReport_Generator_Evaluator {
         // Add more condition checks as needed (e.g., !=, <, >, etc.)
 
         return false;
+    }
+
+    private function removeQuotes($input) {
+        $output = '';
+        $quoteType = ''; // Menyimpan tipe quote saat ini (', " atau kosong jika di luar quote)
+        $escaped = false; // Menyimpan status karakter escape
+
+        $length = strlen($input);
+        for ($i = 0; $i < $length; $i++) {
+            $char = $input[$i];
+            if ($quoteType === '') {
+                if ($char === '"' || $char === "'") {
+                    $quoteType = $char;
+                } else {
+                    $output .= $char;
+                }
+            } else {
+                if ($char === '\\' && !$escaped) {
+                    $escaped = true;
+                } elseif ($char === $quoteType && !$escaped) {
+                    $quoteType = '';
+                } else {
+                    $output .= $char;
+                    $escaped = false;
+                }
+            }
+        }
+
+        return $output;
     }
 }
