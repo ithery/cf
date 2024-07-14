@@ -123,7 +123,7 @@ class CReport_Builder_Element_TextField extends CReport_Builder_ElementAbstract 
         if ($pattern) {
             $originalText = $text;
             $text = $generator->formatPattern($text, $pattern);
-            if ($pattern && cstr::substr($text, -3) != '.00') {
+            if ($pattern && cstr::substr($text, -3, 1) != '.') {
                 cdbg::dd($text, $originalText, $pattern);
             }
         }
