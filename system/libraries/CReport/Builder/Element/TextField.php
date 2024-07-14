@@ -126,6 +126,9 @@ class CReport_Builder_Element_TextField extends CReport_Builder_ElementAbstract 
                 $textToFormat = 0;
             }
             $text = $generator->formatPattern($textToFormat, $pattern);
+            if ($this->getTextFieldExpression() == '$F{debit}') {
+                cdbg::dd($text, $pattern, $textToFormat);
+            }
         }
 
         return $text;
