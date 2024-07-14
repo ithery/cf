@@ -1,11 +1,14 @@
 <?php
 class CReport_Generator_Expression_Parser {
+    /**
+     * @var CReport_Generator_Expression_Lexer
+     */
     private $lexer;
 
     private $currentToken;
 
-    public function __construct($lexer) {
-        $this->lexer = $lexer;
+    public function __construct($expression) {
+        $this->lexer = new CReport_Generator_Expression_Lexer($expression);
         $this->currentToken = $this->lexer->getNextToken();
     }
 
@@ -45,7 +48,6 @@ class CReport_Generator_Expression_Parser {
 
     private function term() {
         $result = $this->factor();
-
         while ($this->currentToken !== null && in_array($this->currentToken['value'], ['*', '/'])) {
             $operator = $this->currentToken['value'];
             $this->eat(CReport_Generator_Expression_Lexer::TOKEN_OPERATOR);
@@ -70,6 +72,7 @@ class CReport_Generator_Expression_Parser {
 
     private function primary() {
         $token = $this->currentToken;
+
         if ($token['type'] === CReport_Generator_Expression_Lexer::TOKEN_STRING) {
             $this->eat(CReport_Generator_Expression_Lexer::TOKEN_STRING);
 
@@ -78,6 +81,10 @@ class CReport_Generator_Expression_Parser {
             $this->eat(CReport_Generator_Expression_Lexer::TOKEN_NUMBER);
 
             return intval($token['value']);
+        } elseif ($token['type'] === CReport_Generator_Expression_Lexer::TOKEN_FLOAT) {
+            $this->eat(CReport_Generator_Expression_Lexer::TOKEN_FLOAT);
+
+            return floatval($token['value']);
         } else {
             throw new CReport_Generator_Exception_ExpressionException('Syntax error: Unexpected token ' . $token['value']);
         }

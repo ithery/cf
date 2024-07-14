@@ -4,6 +4,8 @@ class CReport_Generator_Expression_Lexer {
 
     const TOKEN_NUMBER = 'NUMBER';
 
+    const TOKEN_FLOAT = 'FLOAT';
+
     const TOKEN_OPERATOR = 'OPERATOR';
 
     const TOKEN_WHITESPACE = 'WHITESPACE';
@@ -44,7 +46,6 @@ class CReport_Generator_Expression_Lexer {
 
                 continue;
             }
-
             if ($this->match('/\d/')) {
                 return $this->number();
             }
@@ -93,12 +94,17 @@ class CReport_Generator_Expression_Lexer {
 
     private function number() {
         $result = '';
-        while ($this->currentChar !== null && $this->match('/\d/')) {
+        while ($this->currentChar !== null && preg_match('/[\d\.]/', $this->currentChar)) {
             $result .= $this->currentChar;
             $this->advance();
         }
 
-        return ['type' => self::TOKEN_NUMBER, 'value' => $result];
+        $type = self::TOKEN_NUMBER;
+        if (preg_match('/^\d+\.\d+$/', $result)) {
+            $type = self::TOKEN_FLOAT;
+        }
+
+        return ['type' => $type, 'value' => $result];
     }
 
     private function string() {
