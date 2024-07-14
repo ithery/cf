@@ -41,7 +41,7 @@ class CReport_Builder {
      * @return $this
      */
     public function fromXml(string $xml) {
-        $xml = simplexml_load_string($xml, null, LIBXML_NOCDATA);
+        $xml = simplexml_load_string($xml);
         $this->report = CReport_Builder_Report::fromXml($xml);
 
         return $this;

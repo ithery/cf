@@ -61,6 +61,11 @@ class CReport_Generator {
      */
     protected $isProcessingPageFooter;
 
+    /**
+     * @var bool
+     */
+    protected $isProcessingDetail;
+
     public function __construct(CReport_Builder_Report $report, CReport_Builder_Dictionary $dictionary, CManager_Contract_DataProviderInterface $dataProvider = null) {
         $this->report = $report;
         $this->dictionary = $dictionary;
@@ -72,6 +77,7 @@ class CReport_Generator {
         $this->calculator = new CReport_Generator_Calculator($this);
         $this->formatter = new CReport_Generator_Formatter();
         $this->isProcessingPageFooter = false;
+        $this->isProcessingDetail = false;
     }
 
     public function setProcessingPageFooter($bool) {
@@ -82,6 +88,16 @@ class CReport_Generator {
 
     public function isProcessingPageFooter() {
         return $this->isProcessingPageFooter;
+    }
+
+    public function setProcessingDetail($bool) {
+        $this->isProcessingDetail = $bool;
+
+        return $this;
+    }
+
+    public function isProcessingDetail() {
+        return $this->isProcessingDetail;
     }
 
     public function setDataProvider(CManager_Contract_DataProviderInterface $dataProvider) {

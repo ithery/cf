@@ -154,8 +154,6 @@ class CReport_Generator_Processor_PdfProcessor extends CReport_Generator_Process
         //exit;
 
         if ($preventYAxis >= $discount) {
-            // cdbg::dd($preventYAxis, $discount, $pageheight, $pageFooterHeigth, $topMargin, $bottomMargin);
-
             if ($pageFooter) {
                 $pageFooter->generate($generator, $this);
             }
@@ -168,16 +166,17 @@ class CReport_Generator_Processor_PdfProcessor extends CReport_Generator_Process
             if ($pageHeader) {
                 $pageHeader->generate($generator, $this);
             }
-
-            $columnHeader = $generator->getColumnHeader();
-            if ($columnHeader) {
-                $columnHeader->generate($generator, $this);
-            }
-            $groups = $generator->getGroups();
-            foreach ($groups as $group) {
-                if ($group->isReprintHeaderOnEachPage() && $group->hasGroupHeader()) {
-                    $groupHeader = $group->getGroupHeaderElement();
-                    $groupHeader->generate($generator, $this);
+            if ($generator->isProcessingDetail()) {
+                $columnHeader = $generator->getColumnHeader();
+                if ($columnHeader) {
+                    $columnHeader->generate($generator, $this);
+                }
+                $groups = $generator->getGroups();
+                foreach ($groups as $group) {
+                    if ($group->isReprintHeaderOnEachPage() && $group->hasGroupHeader()) {
+                        $groupHeader = $group->getGroupHeaderElement();
+                        $groupHeader->generate($generator, $this);
+                    }
                 }
             }
 

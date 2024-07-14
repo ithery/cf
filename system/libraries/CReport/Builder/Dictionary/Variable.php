@@ -69,7 +69,7 @@ class CReport_Builder_Dictionary_Variable {
         $this->dataType = $var->getDataType();
         $this->resetType = $var->getResetType();
         $this->resetGroup = $var->getResetGroup();
-        $this->initialValueExpression = $this->generator->getExpression($var->getInitialValueExpression());
+        $this->initialValueExpression = $var->getInitialValueExpression() ? $this->generator->getExpression($var->getInitialValueExpression()) : null;
         $this->incrementType = $var->getIncrementType();
         $this->isValueSet = false;
         $this->value = null;

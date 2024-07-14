@@ -114,6 +114,7 @@ class CReport_Builder_Element_Detail extends CReport_Builder_ElementAbstract {
 
     public function generate(CReport_Generator $generator, CReport_Generator_ProcessorAbstract $processor) {
         $data = $generator->getData();
+        $generator->setProcessingDetail(true);
         if (count($this->children) > 0) {
             $lastRow = null;
             foreach ($data as $rowIndex => $row) {
@@ -150,5 +151,6 @@ class CReport_Builder_Element_Detail extends CReport_Builder_ElementAbstract {
                 $lastRow = $row;
             }
         }
+        $generator->setProcessingDetail(false);
     }
 }
