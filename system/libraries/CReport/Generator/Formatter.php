@@ -17,6 +17,10 @@ class CReport_Generator_Formatter {
             } elseif ($pattern == '###0.0') {
                 return number_format($txt, 1, self::$decimalSeparator, '');
             } elseif ($pattern == '#,##0.0' || $pattern == '#,##0.0;-#,##0.0') {
+                if (!is_numeric($txt)) {
+                    $txt = 0;
+                }
+
                 return number_format($txt, 1, self::$decimalSeparator, self::$thousandSeparator);
             } elseif ($pattern == '###0.00' || $pattern == '###0.00;-###0.00') {
                 return number_format($txt, 2, self::$decimalSeparator, '');
