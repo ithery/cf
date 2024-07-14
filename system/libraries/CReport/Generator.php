@@ -124,8 +124,8 @@ class CReport_Generator {
         return $this->evaluator->getExpression($expression);
     }
 
-    public function formatPattern(string $text, string $pattern) {
-        return $this->formatter->formatPattern((float) $text, $pattern);
+    public function formatPattern($text, string $pattern) {
+        return $this->formatter->formatPattern($text, $pattern);
     }
 
     /**
