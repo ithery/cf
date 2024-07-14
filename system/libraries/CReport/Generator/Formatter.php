@@ -29,7 +29,7 @@ class CReport_Generator_Formatter {
                     $txt = 0;
                 }
                 $result = number_format($txt, 2, self::$decimalSeparator, self::$thousandSeparator);
-                if ($result == '0') {
+                if ($txt == 0 && $result != '0.00') {
                     cdbg::dd($pattern, $txt, $result);
                 }
 
