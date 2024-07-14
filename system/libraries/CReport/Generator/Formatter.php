@@ -6,7 +6,7 @@ class CReport_Generator_Formatter {
     public static $thousandSeparator = ',';
 
     public static function formatPattern($txt, $pattern) {
-        if ($txt != '') {
+        if ($txt !== '') {
             $nome_meses = ['Janeiro', 'Janeiro', 'Fevereiro', 'Marco', 'Abril', 'Maio', 'Junho', 'Julho', 'Agosto', 'Setembro', 'Outubro', 'Novembro', 'Dezembro'];
             if (substr($pattern, 0, 1) === '%') {
                 return sprintf($pattern, $txt);
@@ -29,7 +29,6 @@ class CReport_Generator_Formatter {
                     $txt = 0;
                 }
                 $result = number_format($txt, 2, self::$decimalSeparator, self::$thousandSeparator);
-                cdbg::d($txt, $result);
 
                 return $result;
             } elseif ($pattern == '###0.00;(###0.00)') {
