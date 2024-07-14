@@ -58,6 +58,11 @@ class CReport_Builder_Report implements CReport_Builder_Contract_JrXmlElementInt
         if ($xml['bottomMargin']) {
             $report->setBottomMargin((float) $xml['bottomMargin']);
         }
+        foreach ($xml as $tag => $xmlElement) {
+            if ($tag == 'defaultFont') {
+                $report->setFont(CReport_Builder_Object_Font::fromXml($xmlElement));
+            }
+        }
         $report->addChildrenFromXml($xml);
 
         return $report;
