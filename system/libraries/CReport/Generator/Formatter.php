@@ -21,11 +21,7 @@ class CReport_Generator_Formatter {
             } elseif ($pattern == '###0.00' || $pattern == '###0.00;-###0.00') {
                 return number_format($txt, 2, self::$decimalSeparator, '');
             } elseif ($pattern == '#,##0.00' || $pattern == '#,##0.00;-#,##0.00') {
-                if ($pattern && $txt == '0') {
-                    cdbg::dd($txt, $pattern, number_format($txt, 2, self::$decimalSeparator, self::$thousandSeparator));
-                }
-
-                return number_format($txt, 2, self::$decimalSeparator, self::$thousandSeparator);
+                return number_format((float) $txt, 2, self::$decimalSeparator, self::$thousandSeparator);
             } elseif ($pattern == '###0.00;(###0.00)') {
                 return $txt < 0 ? '(' . number_format(abs($txt), 2, self::$decimalSeparator, '') . ')' : number_format($txt, 2, self::$decimalSeparator, '');
             } elseif ($pattern == '#,##0.00;(#,##0.00)') {
