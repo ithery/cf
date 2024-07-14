@@ -126,9 +126,6 @@ class CReport_Builder_Element_TextField extends CReport_Builder_ElementAbstract 
                 $textToFormat = 0;
             }
             $text = $generator->formatPattern($textToFormat, $pattern);
-            if ($pattern && $text == '0') {
-                cdbg::dd($text, $textToFormat, $pattern);
-            }
         }
 
         return $text;
