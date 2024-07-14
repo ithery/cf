@@ -98,6 +98,10 @@ class CReport_Generator_Expression_Parser {
             case '+':
                 return is_numeric($left) && is_numeric($right) ? $left + $right : $left . $right;
             case '-':
+                if (!is_numeric($left) && !is_numeric($right)) {
+                    throw new Exception('left and right must numeric for operator -, got left:' . $left . ', right:.' . $right);
+                }
+
                 return $left - $right;
             case '*':
                 return $left * $right;
