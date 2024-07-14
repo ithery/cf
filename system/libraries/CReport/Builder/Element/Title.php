@@ -29,9 +29,9 @@ class CReport_Builder_Element_Title extends CReport_Builder_ElementAbstract {
     }
 
     public function generate(CReport_Generator $generator, CReport_Generator_ProcessorAbstract $processor) {
-        parent::generate($generator, $processor);
-        // CReport_Jasper_Instructions::addInstruction(['type' => 'setYAxis', 'y_axis' => $height]);
         $height = $this->getHeight();
+        $processor->preventYOverflow($generator, $height);
+        parent::generate($generator, $processor);
         $processor->addY($height);
     }
 }

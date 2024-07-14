@@ -29,8 +29,10 @@ class CReport_Builder_Element_ColumnHeader extends CReport_Builder_ElementAbstra
     }
 
     public function generate(CReport_Generator $generator, CReport_Generator_ProcessorAbstract $processor) {
-        parent::generate($generator, $processor);
         $height = $this->getHeight();
+        $processor->preventYOverflow($generator, $height);
+
+        parent::generate($generator, $processor);
         $processor->addY($height);
     }
 }
