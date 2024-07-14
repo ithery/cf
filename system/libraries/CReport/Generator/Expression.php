@@ -60,16 +60,15 @@ class CReport_Generator_Expression {
 
             return $expression;
         }
-        CF::log('info', 'evaluate expression ' . $expression);
-        $lexer = new CReport_Generator_Expression_Lexer($expression);
-        $parser = new CReport_Generator_Expression_Parser($lexer);
+        // CF::log('info', 'evaluate expression ' . $expression);
+        $parser = new CReport_Generator_Expression_Parser($expression);
 
         try {
             $result = $parser->parse();
         } catch (CReport_Generator_Exception_ExpressionException $e) {
             $result = $expression;
         }
-        CF::log('info', 'result evaluate expression ' . $expression . ' : ' . $result);
+        // CF::log('info', 'result evaluate expression ' . $expression . ' : ' . $result);
 
         return $result;
     }
