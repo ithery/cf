@@ -28,8 +28,12 @@ class CReport_Generator_Formatter {
                 if (!is_numeric($txt)) {
                     $txt = 0;
                 }
+                $result = number_format($txt, 2, self::$decimalSeparator, self::$thousandSeparator);
+                if ($result == '0') {
+                    cdbg::dd($pattern, $txt, $result);
+                }
 
-                return number_format($txt, 2, self::$decimalSeparator, self::$thousandSeparator);
+                return $result;
             } elseif ($pattern == '###0.00;(###0.00)') {
                 return $txt < 0 ? '(' . number_format(abs($txt), 2, self::$decimalSeparator, '') . ')' : number_format($txt, 2, self::$decimalSeparator, '');
             } elseif ($pattern == '#,##0.00;(#,##0.00)') {
