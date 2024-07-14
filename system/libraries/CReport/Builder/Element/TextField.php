@@ -121,11 +121,14 @@ class CReport_Builder_Element_TextField extends CReport_Builder_ElementAbstract 
         }
         $pattern = $this->getPattern();
         if ($pattern) {
-            $originalText = $text;
-            $text = $generator->formatPattern($text, $pattern);
-            if ($pattern && cstr::substr($text, -3, 1) != '.') {
-                cdbg::dd($text, $originalText, $pattern);
+            $textToFormat = $text;
+            if ($textToFormat == '0') {
+                $textToFormat = 0;
             }
+            $text = $generator->formatPattern($textToFormat, $pattern);
+            // if ($pattern && cstr::substr($text, -3, 1) != '.') {
+            //     cdbg::dd($text, $originalText, $pattern);
+            // }
         }
 
         return $text;
