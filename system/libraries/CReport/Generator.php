@@ -269,4 +269,14 @@ class CReport_Generator {
 
         return $pdf;
     }
+
+    public function getExcel() {
+        $processor = new CReport_Generator_Processor_ExcelProcessor($this->report);
+        $this->generate($processor);
+        $excel = $processor->getOutput();
+
+        // $pdf = CReport_Jasper_Instructions::get();
+
+        return $excel;
+    }
 }

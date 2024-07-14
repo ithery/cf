@@ -1,7 +1,7 @@
 <?php
 
 //@codingStandardsIgnoreStart
-class CReport_Pdf_Adapter_TCPDF extends \TCPDF {
+class CReport_Adapter_Pdf_TCPDF extends \TCPDF {
     protected $producer;
 
     protected $isXmpEnabled = true;

@@ -107,13 +107,26 @@ class CReport_Builder {
      * @return CReport_Pdf_Adapter_TCPDF
      */
     public function getPdf() {
-        $jrxml = $this->report->toJrXml();
+        // $jrxml = $this->report->toJrXml();
         // cdbg::dd($jrxml);
         $generator = new CReport_Generator($this->report, $this->dictionary, $this->dataProvider);
 
         $pdf = $generator->getPdf();
 
         return $pdf;
+    }
+
+    /**
+     * @return CReport_Adapter_Excel_PhpSpreadsheet
+     */
+    public function getExcel() {
+        // $jrxml = $this->report->toJrXml();
+        // cdbg::dd($jrxml);
+        $generator = new CReport_Generator($this->report, $this->dictionary, $this->dataProvider);
+
+        $excel = $generator->getExcel();
+
+        return $excel;
     }
 
     /**

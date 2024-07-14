@@ -3,25 +3,9 @@
 class CReport_Generator_Processor_PdfProcessor extends CReport_Generator_ProcessorAbstract {
     protected $tcpdf;
 
-    protected $currentY;
-
-    protected $pageHeight;
-
-    protected $pageWidth;
-
-    protected $topMargin;
-
-    protected $leftMargin;
-
-    protected $rightMargin;
-
-    protected $bottomMargin;
-
-    protected $currentX;
-
     public function __construct(CReport_Builder_Report $report) {
         parent::__construct($report);
-        $this->tcpdf = new CReport_Pdf_Adapter_TCPDF(
+        $this->tcpdf = new CReport_Adapter_Pdf_TCPDF(
             $report->getOrientation() == CReport::ORIENTATION_LANDSCAPE ? 'L' : 'P',
             'pt',
             [$report->getPageWidth(), $report->getPageHeight()],
@@ -30,8 +14,6 @@ class CReport_Generator_Processor_PdfProcessor extends CReport_Generator_Process
             $diskcache = false,
             $pdfa = false
         );
-        $this->pageHeight = $report->getOrientation() == CReport::ORIENTATION_LANDSCAPE ? $report->getPageWidth() : $report->getPageHeight();
-        $this->pageWidth = $report->getOrientation() == CReport::ORIENTATION_LANDSCAPE ? $report->getPageHeight() : $report->getPageWidth();
         $this->tcpdf->setPrintHeader(false);
         $this->tcpdf->setPrintFooter(false);
         $this->tcpdf->SetLeftMargin($report->getLeftMargin());
@@ -40,12 +22,6 @@ class CReport_Generator_Processor_PdfProcessor extends CReport_Generator_Process
         $this->tcpdf->SetAutoPageBreak(true, $report->getBottomMargin() > 0 ? $report->getBottomMargin() / 2 : 0);
         $this->tcpdf->AddPage();
         $this->tcpdf->setPage(1, true);
-        $this->topMargin = $report->getTopMargin();
-        $this->bottomMargin = $report->getBottomMargin();
-        $this->leftMargin = $report->getLeftMargin();
-        $this->rightMargin = $report->getRightMargin();
-        $this->currentY = $this->topMargin;
-        $this->currentX = $this->leftMargin;
     }
 
     private function getPdfTextAlignment($alignment) {
@@ -424,7 +400,7 @@ class CReport_Generator_Processor_PdfProcessor extends CReport_Generator_Process
     }
 
     /**
-     * @return CReport_Pdf_Adapter_TCPDF
+     * @return CReport_Adapter_Pdf_TCPDF
      */
     public function getOutput() {
         return $this->tcpdf;
