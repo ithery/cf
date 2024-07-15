@@ -2,7 +2,7 @@
 
 final class CReport_Jasper_Instructions {
     /**
-     * @var null|CReport_Pdf_Adapter_TCPDF
+     * @var null|CReport_Adapter_Pdf_TCPDF
      */
     public static $objOutPut;
 

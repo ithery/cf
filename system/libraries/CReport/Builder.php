@@ -104,7 +104,7 @@ class CReport_Builder {
     }
 
     /**
-     * @return CReport_Pdf_Adapter_TCPDF
+     * @return CReport_Adapter_Pdf_TCPDF
      */
     public function getPdf() {
         // $jrxml = $this->report->toJrXml();
@@ -130,7 +130,7 @@ class CReport_Builder {
     }
 
     /**
-     * @return CReport_Pdf_Adapter_TCPDF
+     * @return CReport_Adapter_Pdf_TCPDF
      */
     public function getJasperPdf() {
         $jrxml = $this->report->toJrXml();

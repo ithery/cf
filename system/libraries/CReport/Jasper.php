@@ -18,7 +18,7 @@ class CReport_Jasper {
     }
 
     /**
-     * @return CReport_Pdf_Adapter_TCPDF
+     * @return CReport_Adapter_Pdf_TCPDF
      */
     public function getPdf() {
         if ($this->dataProvider) {
@@ -32,7 +32,7 @@ class CReport_Jasper {
     }
 
     /**
-     * @return CReport_Pdf_Adapter_TCPDF
+     * @return CReport_Adapter_Pdf_TCPDF
      */
     public function getSpreadsheet() {
         if ($this->dataProvider) {

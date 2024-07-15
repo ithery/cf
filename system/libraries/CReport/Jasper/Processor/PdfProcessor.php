@@ -6,9 +6,9 @@ class CReport_Jasper_Processor_PdfProcessor extends CReport_Jasper_ProcessorAbst
     protected function prepare() {
         CReport_Jasper_Instructions::$arrayPageSetting = $this->jasperReport->arrayPageSetting;
         if ($this->jasperReport->arrayPageSetting['orientation'] == 'Landscape') {
-            CReport_Jasper_Instructions::$objOutPut = new CReport_Pdf_Adapter_TCPDF($this->jasperReport->arrayPageSetting['orientation'], 'pt', [intval($this->jasperReport->arrayPageSetting['pageHeight']), intval($this->jasperReport->arrayPageSetting['pageWidth'])], true);
+            CReport_Jasper_Instructions::$objOutPut = new CReport_Adapter_Pdf_TCPDF($this->jasperReport->arrayPageSetting['orientation'], 'pt', [intval($this->jasperReport->arrayPageSetting['pageHeight']), intval($this->jasperReport->arrayPageSetting['pageWidth'])], true);
         } else {
-            CReport_Jasper_Instructions::$objOutPut = new CReport_Pdf_Adapter_TCPDF($this->jasperReport->arrayPageSetting['orientation'], 'pt', [intval($this->jasperReport->arrayPageSetting['pageWidth']), intval($this->jasperReport->arrayPageSetting['pageHeight'])], true);
+            CReport_Jasper_Instructions::$objOutPut = new CReport_Adapter_Pdf_TCPDF($this->jasperReport->arrayPageSetting['orientation'], 'pt', [intval($this->jasperReport->arrayPageSetting['pageWidth']), intval($this->jasperReport->arrayPageSetting['pageHeight'])], true);
         }
         CReport_Jasper_Instructions::$objOutPut->SetLeftMargin((int) $this->jasperReport->arrayPageSetting['leftMargin']);
         CReport_Jasper_Instructions::$objOutPut->SetRightMargin((int) $this->jasperReport->arrayPageSetting['rightMargin']);
