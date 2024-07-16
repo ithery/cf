@@ -6,6 +6,8 @@ trait CReport_Builder_Trait_HasReportElementTrait {
     use CReport_Builder_Trait_Property_XPropertyTrait;
     use CReport_Builder_Trait_Property_YPropertyTrait;
     use CReport_Builder_Trait_Property_BackgroundColorPropertyTrait;
+    use CReport_Builder_Trait_Property_ForegroundColorPropertyTrait;
+    use CReport_Builder_Trait_Property_ModePropertyTrait;
     use CReport_Builder_Trait_Property_PrintWhenExpressionPropertyTrait;
 
     public function getReportElementJrXml() {
@@ -22,8 +24,14 @@ trait CReport_Builder_Trait_HasReportElementTrait {
         if ($this->height !== null) {
             $reportElement .= ' height="' . $this->height . '"';
         }
+        if ($this->foregroundColor !== null) {
+            $reportElement .= ' forecolor="' . $this->foregroundColor . '"';
+        }
         if ($this->backgroundColor !== null) {
-            $reportElement .= ' backcolor="' . $this->backgroundColor . '" mode="Opaque"';
+            $reportElement .= ' backcolor="' . $this->backgroundColor . '"';
+        }
+        if ($this->mode !== null) {
+            $reportElement .= ' mode="' . CReport_Builder_PhpToJrXmlEnum::getModeEnum($this->mode) . '"';
         }
         $reportElement .= '>' . PHP_EOL;
         if ($this->printWhenExpression) {
@@ -49,6 +57,12 @@ trait CReport_Builder_Trait_HasReportElementTrait {
         }
         if ($reportElement['backcolor']) {
             $this->setBackgroundColor((string) $reportElement['backcolor']);
+        }
+        if ($reportElement['forecolor']) {
+            $this->setForegroundColor((string) $reportElement['forecolor']);
+        }
+        if ($reportElement['mode']) {
+            $this->setMode(CReport_Builder_JrXmlToPhpEnum::getModeEnum((string) $reportElement['mode']));
         }
         foreach ($reportElement as $tag => $xmlElement) {
             if ($tag == 'printWhenExpression') {

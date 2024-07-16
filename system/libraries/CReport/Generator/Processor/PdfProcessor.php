@@ -265,6 +265,7 @@ class CReport_Generator_Processor_PdfProcessor extends CReport_Generator_Process
         $height = carr::get($options, 'height');
         $font = carr::get($options, 'font');
         $backgroundColor = carr::get($options, 'backgroundColor');
+        $foregroundColor = carr::get($options, 'foregroundColor');
         $x = carr::get($options, 'x');
         $y = carr::get($options, 'y');
         $pdfX = $this->leftMargin + $x;
@@ -295,6 +296,12 @@ class CReport_Generator_Processor_PdfProcessor extends CReport_Generator_Process
             $color = $color->toRgb();
             $this->tcpdf->SetFillColor($color->red(), $color->green(), $color->blue());
         }
+
+        if ($foregroundColor) {
+            $color = CColor::create($foregroundColor);
+            $color = $color->toRgb();
+            $this->tcpdf->setTextColor($color->red(), $color->green(), $color->blue());
+        }
         $this->tcpdf->setCellHeightRatio($lineSpacing);
 
         if ($font != null) {
@@ -322,6 +329,7 @@ class CReport_Generator_Processor_PdfProcessor extends CReport_Generator_Process
             $pdfVerticalAlignment,
             $fitcell = false
         );
+        $this->resetTextColor();
     }
 
     public function line(array $options) {
@@ -404,5 +412,9 @@ class CReport_Generator_Processor_PdfProcessor extends CReport_Generator_Process
      */
     public function getOutput() {
         return $this->tcpdf;
+    }
+
+    public function resetTextColor() {
+        $this->tcpdf->setTextColor(0, 0, 0);
     }
 }

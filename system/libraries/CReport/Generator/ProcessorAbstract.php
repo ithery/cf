@@ -73,6 +73,11 @@ abstract class CReport_Generator_ProcessorAbstract {
     abstract public function resetY();
 
     /**
+     * @return void
+     */
+    abstract public function resetTextColor();
+
+    /**
      * @param float $y
      *
      * @return float

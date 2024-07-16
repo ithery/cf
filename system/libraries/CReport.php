@@ -162,6 +162,16 @@ class CReport {
     const RESET_TYPE_REPORT = 'report';
 
     /**
+     * Specifies that the element is opaque.
+     */
+    const MODE_OPAQUE = 'opaque';
+
+    /**
+     * Specifies that the element is transparent.
+     */
+    const MODEL_TRANSPARENT = 'transparent';
+
+    /**
      * @param string $jrxml
      * @param array  $param
      *

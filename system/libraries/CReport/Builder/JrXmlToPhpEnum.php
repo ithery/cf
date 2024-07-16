@@ -59,12 +59,21 @@ class CReport_Builder_JrXmlToPhpEnum {
     }
 
     /**
-     * @param string $scaleImage
+     * @param string $calculation
      *
      * @return string
      */
     public static function getCalculationEnum(string $calculation) {
         return lcfirst($calculation);
+    }
+
+    /**
+     * @param string $mode
+     *
+     * @return string
+     */
+    public static function getModeEnum(string $mode) {
+        return lcfirst($mode);
     }
 
     public static function getBoolEnum($bool) {

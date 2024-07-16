@@ -23,6 +23,7 @@ class CReport_Builder_Element_TextField extends CReport_Builder_ElementAbstract 
         $this->paragraph = new CReport_Builder_Object_Paragraph();
         $this->textAlignment = CReport::TEXT_ALIGNMENT_LEFT;
         $this->verticalAlignment = CReport::VERTICAL_ALIGNMENT_TOP;
+        $this->mode = CReport::MODE_OPAQUE;
         $this->isStretchWithOverflow = false;
         $this->textFieldExpression = '';
     }
@@ -144,8 +145,10 @@ class CReport_Builder_Element_TextField extends CReport_Builder_ElementAbstract 
             $options['verticalAlignment'] = $this->getVerticalAlignment();
             $options['font'] = $this->getFont();
             $options['backgroundColor'] = $this->getBackgroundColor();
+            $options['foregroundColor'] = $this->getForegroundColor();
             $options['box'] = $this->getBox();
             $options['lineSpacing'] = $this->getLineSpacing();
+            $options['mode'] = $this->getMode();
 
             $processor->cell($options);
         }

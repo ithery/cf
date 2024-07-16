@@ -109,4 +109,7 @@ class CReport_Generator_Processor_ExcelProcessor extends CReport_Generator_Proce
     public function getOutput() {
         return $this->spreadsheet;
     }
+
+    public function resetTextColor() {
+    }
 }
