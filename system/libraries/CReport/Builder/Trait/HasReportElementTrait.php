@@ -9,6 +9,7 @@ trait CReport_Builder_Trait_HasReportElementTrait {
     use CReport_Builder_Trait_Property_ForegroundColorPropertyTrait;
     use CReport_Builder_Trait_Property_ModePropertyTrait;
     use CReport_Builder_Trait_Property_PrintWhenExpressionPropertyTrait;
+    use CReport_Builder_Trait_Property_StylePropertyTrait;
 
     public function getReportElementJrXml() {
         $reportElement = '<reportElement';
@@ -32,6 +33,9 @@ trait CReport_Builder_Trait_HasReportElementTrait {
         }
         if ($this->mode !== null) {
             $reportElement .= ' mode="' . CReport_Builder_PhpToJrXmlEnum::getModeEnum($this->mode) . '"';
+        }
+        if ($this->style !== null) {
+            $reportElement .= ' style="' . $this->style . '"';
         }
         $reportElement .= '>' . PHP_EOL;
         if ($this->printWhenExpression) {
@@ -63,6 +67,9 @@ trait CReport_Builder_Trait_HasReportElementTrait {
         }
         if ($reportElement['mode']) {
             $this->setMode(CReport_Builder_JrXmlToPhpEnum::getModeEnum((string) $reportElement['mode']));
+        }
+        if ($reportElement['style']) {
+            $this->setStyle((string) $reportElement['style']);
         }
         foreach ($reportElement as $tag => $xmlElement) {
             if ($tag == 'printWhenExpression') {

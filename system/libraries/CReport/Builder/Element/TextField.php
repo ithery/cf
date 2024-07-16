@@ -135,6 +135,9 @@ class CReport_Builder_Element_TextField extends CReport_Builder_ElementAbstract 
     public function generate(CReport_Generator $generator, CReport_Generator_ProcessorAbstract $processor) {
         if ($generator->evaluatePrintWhenExpression($this->printWhenExpression)) {
             $text = $this->getTextAfterExpression($generator);
+            if ($this->style) {
+                $this->applyStyle($generator);
+            }
             $options = [];
             $options['x'] = $this->getX();
             $options['y'] = $this->getY();

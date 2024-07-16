@@ -209,6 +209,15 @@ class CReport_Generator {
     }
 
     /**
+     * @return null|CReport_Builder_Element_Style
+     */
+    public function getStyle(string $styleName) {
+        return $this->report->getStyleElements()->filter(function (CReport_Builder_Element_Style $style) use ($styleName) {
+            return $style->getName() == $styleName;
+        })->first();
+    }
+
+    /**
      * @return null|CReport_Builder_Element_ColumnHeader
      */
     public function getColumnHeader() {
