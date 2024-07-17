@@ -46,4 +46,9 @@ return [
         'label' => c::__('Chat Bot'),
         'uri' => 'demo/module/bot/index',
     ],
+    [
+        'name' => 'module.report',
+        'label' => c::__('Report'),
+        'subnav' => include dirname(__FILE__) . '/module/report.php',
+    ],
 ];
