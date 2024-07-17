@@ -16,6 +16,9 @@ class CAjax_Engine_Validation extends CAjax_Engine {
                     if ($ruleValue instanceof \Opis\Closure\SerializableClosure) {
                         $dataValidation[$key][$ruleIndex] = $ruleValue->getClosure();
                     }
+                    if ($ruleValue instanceof CFunction_SerializableClosure) {
+                        $dataValidation[$key][$ruleIndex] = $ruleValue->getClosure();
+                    }
                 }
             }
         }
