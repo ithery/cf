@@ -1,7 +1,5 @@
 <?php
 
-use Opis\Closure\SerializableClosure;
-
 defined('SYSPATH') or die('No direct access allowed.');
 
 /**
@@ -90,7 +88,7 @@ class CElement_FormInput_SelectSearch extends CElement_FormInput {
     }
 
     public function setQueryResolver(Closure $resolver) {
-        $this->queryResolver = new SerializableClosure($resolver);
+        $this->queryResolver = CFunction::serializeClosure($resolver);
     }
 
     public function query() {
@@ -242,7 +240,7 @@ class CElement_FormInput_SelectSearch extends CElement_FormInput {
      */
     public function setFormatResult($fmt) {
         if ($fmt instanceof Closure) {
-            $fmt = new \Opis\Closure\SerializableClosure($fmt);
+            $fmt = CFunction::serializeClosure($fmt);
         }
         $this->formatResult = $fmt;
 
@@ -256,7 +254,7 @@ class CElement_FormInput_SelectSearch extends CElement_FormInput {
      */
     public function setFormatSelection($fmt) {
         if ($fmt instanceof Closure) {
-            $fmt = new \Opis\Closure\SerializableClosure($fmt);
+            $fmt = CFunction::serializeClosure($fmt);
         }
         $this->formatSelection = $fmt;
 
@@ -473,7 +471,7 @@ class CElement_FormInput_SelectSearch extends CElement_FormInput {
                         $strSelection = '{' . carr::first($this->searchField) . '}';
                     }
 
-                    if ($strSelection instanceof \Opis\Closure\SerializableClosure) {
+                    if ($strSelection instanceof CFunction_SerializableClosure) {
                         $strSelection = $strSelection->__invoke($model ?: $row);
                     }
                     if ($strSelection instanceof CRenderable) {
@@ -515,11 +513,11 @@ class CElement_FormInput_SelectSearch extends CElement_FormInput {
         $strSelection = $this->formatSelection;
         $strResult = $this->formatResult;
 
-        if ($strSelection instanceof \Opis\Closure\SerializableClosure) {
+        if ($strSelection instanceof CFunction_SerializableClosure) {
             $strSelection = '';
         }
 
-        if ($strResult instanceof \Opis\Closure\SerializableClosure) {
+        if ($strResult instanceof CFunction_SerializableClosure) {
             $strResult = '';
         }
 
@@ -578,7 +576,7 @@ class CElement_FormInput_SelectSearch extends CElement_FormInput {
                         }
                     }
                     $formatResult = $this->formatResult;
-                    if ($formatResult instanceof \Opis\Closure\SerializableClosure) {
+                    if ($formatResult instanceof CFunction_SerializableClosure) {
                         $formatResult = $formatResult->__invoke($model ?: $row);
                         if ($formatResult instanceof CRenderable) {
                             $data['cappFormatResult'] = $formatResult->html();
@@ -589,7 +587,7 @@ class CElement_FormInput_SelectSearch extends CElement_FormInput {
                         }
                     }
                     $formatSelection = $this->formatSelection;
-                    if ($formatSelection instanceof \Opis\Closure\SerializableClosure) {
+                    if ($formatSelection instanceof CFunction_SerializableClosure) {
                         $formatSelection = $formatSelection->__invoke($model ?: $row);
                         if ($formatSelection instanceof CRenderable) {
                             $row['cappFormatSelection'] = $formatSelection->html();

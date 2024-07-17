@@ -29,7 +29,15 @@ class Controller_Demo_Controls_Select_Search extends \Cresenity\Demo\Controller 
         $selectSearch->setKeyField('name');
         $selectSearch->setSearchField('name');
         $selectSearch->setMultiple();
-        $selectSearch->setFormat('<div>{name}</div><div><span class="badge badge-success">{code}</span></div>');
+        $selectSearch->setFormat(function (Cresenity\Demo\Model\Country $country) {
+            $div = c::div();
+            $div->addDiv()->add($country->name);
+            $divDesc = $div->addDiv();
+            $divDesc->addSpan()->addClass('badge badge-success mr-1')->add($country->code);
+            $divDesc->addSpan()->addClass('badge badge-info mr-1')->add($country->continent);
+
+            return $div;
+        });
 
         $form->addActionList()->addAction()->setLabel('Submit')->setSubmit();
 

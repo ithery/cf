@@ -50,7 +50,7 @@ class CAjax_Engine_SelectSearch_Processor_DataProvider extends CAjax_Engine_Sele
                 }
             }
             $formatResult = $this->formatResult();
-            if ($formatResult instanceof \Opis\Closure\SerializableClosure) {
+            if ($formatResult instanceof CFunction_SerializableClosure) {
                 $formatResult = $formatResult->__invoke($model);
                 if ($formatResult instanceof CRenderable) {
                     $data['cappFormatResult'] = $formatResult->html();
@@ -61,7 +61,7 @@ class CAjax_Engine_SelectSearch_Processor_DataProvider extends CAjax_Engine_Sele
                 }
             }
             $formatSelection = $this->formatSelection();
-            if ($formatSelection instanceof \Opis\Closure\SerializableClosure) {
+            if ($formatSelection instanceof CFunction_SerializableClosure) {
                 $formatSelection = $formatSelection->__invoke($model);
                 if ($formatSelection instanceof CRenderable) {
                     $data['cappFormatSelection'] = $formatSelection->html();

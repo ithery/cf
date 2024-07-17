@@ -93,6 +93,9 @@ abstract class CAjax_Engine implements CAjax_EngineInterface {
         if ($callback instanceof SerializableClosure) {
             return $callback->__invoke(...$args);
         }
+        if ($callback instanceof CFunction_SerializableClosure) {
+            return $callback->__invoke(...$args);
+        }
 
         return call_user_func_array($callback, $args);
     }
