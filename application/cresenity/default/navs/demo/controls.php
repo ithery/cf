@@ -60,4 +60,9 @@ return [
         'label' => c::__('Query Builder'),
         'uri' => 'demo/controls/querybuilder/index',
     ],
+    [
+        'name' => 'controls.color',
+        'label' => c::__('Color Picker'),
+        'uri' => 'demo/controls/color/index',
+    ],
 ];
