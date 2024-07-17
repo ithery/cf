@@ -21,7 +21,7 @@ class Controller_Demo_Controls_Select_Search extends \Cresenity\Demo\Controller 
         $selectSearch->setKeyField('id');
         $selectSearch->setSearchField('name');
         $selectSearch->setFormat('<div>{name}</div><div><span class="badge badge-success">{code}</span></div>');
-        $selectSearch->setValue(c::optional(\Cresenity\Demo\Model\Country::where('code','=','ID')->first())->id);
+        $selectSearch->setValue(c::optional(\Cresenity\Demo\Model\Country::where('code', '=', 'ID')->first())->id);
         $div = $form->addDiv()->addClass('border-1 p-3 mb-3');
         $div->addH5()->add('Select Search Multiple with key name');
         $selectSearch = $div->addSelectSearchControl('select_multiple_with_name')
