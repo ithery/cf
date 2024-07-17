@@ -1,5 +1,5 @@
-import svgEyeSlash from '../../../svg/icon/eye-slash.svg';
-import svgEye from '../../../svg/icon/eye.svg';
+import svgEyeSlash from '../../../svg/icon/outline/eye-slash.svg';
+import svgEye from '../../../svg/icon/outline/eye.svg';
 
 export default class Password {
     constructor(className, config = {}) {
