@@ -21,9 +21,9 @@ class Controller_Demo_Controls_Radio extends \Cresenity\Demo\Controller {
         $div->addH5()->add('Radio List');
         $div->addRadioListControl()->setName('my-radio-list')->setList($checkOptions);
 
-        $div = $app->addDiv()->addClass('border-1 p-3 mb-3');
-        $div->addH5()->add('Radio Buttons');
-        $div->addRadioListControl()->setName('my-radio-list')->setList($checkOptions);
+        // $div = $app->addDiv()->addClass('border-1 p-3 mb-3');
+        // $div->addH5()->add('Radio Buttons');
+        // $div->addRadioListControl()->setName('my-radio-list')->setList($checkOptions);
 
         return $app;
     }
