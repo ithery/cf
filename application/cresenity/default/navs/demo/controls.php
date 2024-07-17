@@ -11,6 +11,11 @@ return [
         'uri' => 'demo/controls/password/index',
     ],
     [
+        'name' => 'controls.autonumeric',
+        'label' => c::__('Auto Numeric'),
+        'uri' => 'demo/controls/autonumeric/index',
+    ],
+    [
         'name' => 'controls.select',
         'label' => c::__('Select'),
         'uri' => 'demo/controls/select/index',
