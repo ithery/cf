@@ -30,7 +30,7 @@ abstract class CTracker_AbstractRepository implements CTracker_RepositoryInterfa
     protected $cache;
 
     public function __construct() {
-        $this->connection = CDatabase::instance(CTracker::config()->get('database'));
+        $this->connection = c::db(CTracker::config()->get('database'));
         $this->cache = new CTracker_Cache();
     }
 
