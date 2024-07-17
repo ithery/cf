@@ -98,7 +98,7 @@ class CElement_FormInput_Radio extends CElement_FormInput {
             $html->append('<div class="switch">');
         }
 
-        $html->append('<input type="radio" name="' . $this->name . '" id="' . $this->id . '" class="input-unstyled' . $this->validation->validation_class() . '" ' . $addition_attribute . ' value="' . $this->value . '"' . $disabled . $checked . '>');
+        $html->append('<input type="radio" name="' . $this->name . '" id="' . $this->id . '" class="input-unstyled' . $this->validation->validationClass() . '" ' . $addition_attribute . ' value="' . $this->value . '"' . $disabled . $checked . '>');
         if (strlen($this->label) > 0) {
             $html->appendln('&nbsp;' . $this->label);
         }
