@@ -1,5 +1,6 @@
 import { initEditorJs, EditorJs } from "./EditorJs";
 import { initPassword, Password } from "./Password";
+import { initColorPicker, ColorPicker } from "./ColorPicker";
 
 const initControl = (control) => {
     const controlName  = control.getAttribute('cres-element');
@@ -9,10 +10,14 @@ const initControl = (control) => {
     if(controlName == 'control:Password') {
         initPassword(control);
     }
+    if(controlName == 'control:ColorPicker') {
+        initColorPicker(control);
+    }
 }
 const control = {
     EditorJs,
-    Password
+    Password,
+    ColorPicker
 }
 export {
     control,
