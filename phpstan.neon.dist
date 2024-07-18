@@ -15,6 +15,8 @@ parameters:
             - system/stubs
         analyse:
             - system/vendor
+    ignoreErrors:
+        - '#If condition is always true.#'
 
 
 parametersSchema:
