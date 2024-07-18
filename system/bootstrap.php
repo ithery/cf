@@ -5,6 +5,7 @@ defined('SYSPATH') or die('No direct access allowed.');
 CPolyfill::php74();
 CPolyfill::php80();
 CPolyfill::php81();
+CFConfig::bootstrap();
 
 CPagination_Paginator::useBootstrap();
 CBootstrap::instance()->addBootstrapper([
@@ -61,7 +62,7 @@ if (CF::config('devcloud.inspector.enabled', false)) {
 if (CF::config('daemon.supervisor.enabled', false)) {
     CDaemon::bootSupervisor();
 }
-
+CBootstrap::instance()->boot();
 CF::terminating(function () {
     CView_ComponentAbstract::flushCache();
 });

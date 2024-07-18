@@ -76,6 +76,7 @@ require SYSPATH . 'core/CFConsole' . EXT;
 require SYSPATH . 'core/CFHTTP' . EXT;
 require SYSPATH . 'core/CFDeprecatedTrait' . EXT;
 require SYSPATH . 'core/CF' . EXT;
+require SYSPATH . 'core/CFConfig' . EXT;
 
 // Prepare the environment
 CF::setup();

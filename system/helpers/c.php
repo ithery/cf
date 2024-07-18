@@ -998,6 +998,20 @@ class c {
     }
 
     /**
+     * @param null|string $key
+     * @param mixed       $default
+     *
+     * @return CConfig_Repository|mixed
+     */
+    public static function config($key = null, $default = null) {
+        if ($key == null) {
+            return CConfig::repository();
+        }
+
+        return CConfig::repository()->get($key, $default);
+    }
+
+    /**
      * Get the CApp instance.
      *
      * @return \CApp

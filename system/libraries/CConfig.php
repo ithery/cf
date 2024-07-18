@@ -32,7 +32,6 @@ class CConfig implements CInterface_Arrayable, ArrayAccess {
 
     protected function __construct($group) {
         $this->group = $group;
-        $this->refresh();
     }
 
     public function addAppCode($appCode) {
@@ -77,10 +76,6 @@ class CConfig implements CInterface_Arrayable, ArrayAccess {
         }
 
         return $this;
-    }
-
-    public function refresh() {
-        self::manager()->load($this->group);
     }
 
     /**
@@ -168,6 +163,9 @@ class CConfig implements CInterface_Arrayable, ArrayAccess {
         $this->set($key, null);
     }
 
+    /**
+     * @return CConfig_Manager
+     */
     public static function manager() {
         return CConfig_Manager::instance();
     }

@@ -1,7 +1,5 @@
 <?php
 
-use Symfony\Component\Finder\Finder;
-
 class CConfig_Manager {
     protected $repository;
 
@@ -22,6 +20,17 @@ class CConfig_Manager {
     public function load($group) {
         $items = CConfig_Loader::load($group);
         $this->repository->set($group, $items);
+    }
+
+    /**
+     * @param array $items
+     *
+     * @return CConfig_Repository
+     */
+    public function newRepository(array $items) {
+        $this->repository = new CConfig_Repository($items);
+
+        return $this->repository;
     }
 
     /**

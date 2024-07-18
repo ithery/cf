@@ -3,7 +3,15 @@
  * @see CConfig
  */
 class CConfig_Loader {
+    /**
+     * @param string $configName
+     *
+     * @return void
+     *
+     * @deprecated since 1.7 Config is loaded all from bootstrap
+     */
     public static function load($configName) {
+        cdbg::dd(cdbg::getTraceString());
         $items = [];
         $files = CF::findFile('config', $configName, $required = false, $ext = false, $refresh = true);
 
@@ -35,8 +43,6 @@ class CConfig_Loader {
     public static function data($configName) {
         $files = CF::findFile('config', $configName);
 
-        //add backward compatibility
-        //TODO: remove folder config in DOCROOT
         if (!is_array($files)) {
             $files = [];
         }

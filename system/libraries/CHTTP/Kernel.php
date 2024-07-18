@@ -141,7 +141,6 @@ class CHTTP_Kernel {
 
     public function handle(CHTTP_Request $request) {
         CHTTP::setRequest($request);
-        CBootstrap::instance()->boot();
         $response = null;
 
         if ($response = CF::isDownForMaintenance()) {
