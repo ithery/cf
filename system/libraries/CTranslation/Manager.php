@@ -1,6 +1,16 @@
 <?php
 
 class CTranslation_Manager {
+    /**
+     * @var array
+     */
+    protected $config;
+
+    /**
+     * @var CTranslation_Scanner
+     */
+    protected $scanner;
+
     private static $instance;
 
     public static function instance() {
@@ -13,6 +23,7 @@ class CTranslation_Manager {
 
     public function __construct() {
         $config = CF::config('translation');
+
         $this->config = $config;
         $this->scanner = new CTranslation_Scanner(carr::get($config, 'scan_paths'), carr::get($config, 'translation_methods'));
     }
