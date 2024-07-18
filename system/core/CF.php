@@ -928,6 +928,9 @@ final class CF {
                 return $paths[1];
             }
         }
+        if (defined('CF_APPCODE')) {
+            return CF_APPCODE;
+        }
 
         if (CF::isCFCli() || CF::isTesting()) {
             if (CF::cliAppCode()) {
