@@ -17,6 +17,7 @@ parameters:
             - system/vendor
     ignoreErrors:
         - '#If condition is always true.#'
+        - '#Negated boolean expression is always true.#'
 
 
 parametersSchema:
