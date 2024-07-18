@@ -42,6 +42,7 @@ import { isJson } from './util/helper';
 import * as dateFns from 'date-fns';
 import CresenityHistory from './history';
 import clsx from './module/clsx';
+import stylex from './module/stylex';
 import collect from 'collect.js';
 import emitter from './cresenity/emitter';
 
@@ -100,6 +101,7 @@ export default class Cresenity {
         this.checkAuthenticationInterval = null;
         this.dateFns = dateFns;
         this.clsx = clsx;
+        this.stylex = stylex;
         this.collect = collect;
         this.emitter = emitter;
     }

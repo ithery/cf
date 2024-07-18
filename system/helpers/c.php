@@ -1348,7 +1348,8 @@ class c {
 
     /**
      * @param mixed $obj
-     * @return boolean
+     *
+     * @return bool
      */
     public static function isIterable($obj) {
         return is_array($obj) || (is_object($obj) && ($obj instanceof \Traversable));
@@ -1357,6 +1358,7 @@ class c {
     /**
      * @param string $type
      * @param string $message
+     *
      * @return void
      */
     public static function msg($type, $message) {
@@ -1365,6 +1367,7 @@ class c {
 
     /**
      * @param string $path
+     *
      * @return string
      */
     public static function docRoot($path = null) {
@@ -1408,7 +1411,8 @@ class c {
     }
 
     /**
-     * @param string|null $name
+     * @param null|string $name
+     *
      * @return CStorage_Adapter
      */
     public static function disk($name = null) {
@@ -1417,6 +1421,7 @@ class c {
 
     /**
      * @param callable $callable
+     *
      * @return Closure
      */
     public static function closureFromCallable($callable) {
@@ -1431,6 +1436,7 @@ class c {
 
     /**
      * @param null|mixed $event
+     *
      * @return CBroadcast_PendingBroadcast
      */
     public static function broadcast($event = null) {
@@ -1936,6 +1942,53 @@ class c {
         $args = func_get_args();
 
         return CBase_CClsx::clsx(...$args);
+    }
+
+    /**
+     * Generate CSS style string from an associative array.
+     *
+     * @param array $styles Styles array
+     *
+     * @return string
+     */
+    public static function stylex($styles) {
+        if (!is_array($styles) || empty($styles)) {
+            return '';
+        }
+
+        if (array_values($styles) === $styles) { // Check if it's an indexed array
+            return implode(';', $styles) . ';';
+        }
+
+        $styleNames = '';
+        foreach ($styles as $key => $value) {
+            $cssPropertyName = cstr::kebabCase($key);
+            if (is_string($value)) {
+                $styleNames .= "{$cssPropertyName}:{$value};";
+
+                continue;
+            }
+
+            if (is_bool($value)) {
+                $styleNames .= $cssPropertyName;
+
+                continue;
+            }
+
+            if (!is_array($value) || empty($value)) {
+                continue;
+            }
+
+            foreach ($value as $condValue => $condition) {
+                if ((is_callable($condition) && $condition()) || $condition) {
+                    $styleNames .= "{$cssPropertyName}:{$condValue};";
+
+                    break;
+                }
+            }
+        }
+
+        return $styleNames;
     }
 
     public static function elapsed() {
