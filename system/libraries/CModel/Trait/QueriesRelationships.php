@@ -609,6 +609,18 @@ trait CModel_Trait_QueriesRelationships {
     }
 
     /**
+     * Add a not morph-to relationship condition to the query with an "or where" clause.
+     *
+     * @param \CModel_Relation_MorphTo<*, *>|string $relation
+     * @param null|\CModel|string $model
+     *
+     * @return \CModel_Query|static
+     */
+    public function orWhereNotMorphedTo($relation, $model) {
+        return $this->whereNotMorphedTo($relation, $model, 'or');
+    }
+
+    /**
      * Add a "belongs to" relationship where clause to the query.
      *
      * @param \CModel|\CModel_Collection<int, \CModel> $related
