@@ -24,7 +24,7 @@ class CFConfig {
 
         // Load locales
         $locale = $repository->get('app.locale');
-        $fallbackLocale = $repository->get('app.locale');
+        $fallbackLocale = $repository->get('app.fallback_locale');
 
         CF::setLocale($locale);
         CF::setFallbackLocale($fallbackLocale);
@@ -58,6 +58,9 @@ class CFConfig {
     public static function getConfigurationFiles() {
         $files = [];
         $paths = array_reverse(CF::paths());
+        // if (CF::domain() == 'tribeliopage.dev.ittron.co.id') {
+        //     cdbg::dd($paths, CF::getSharedApp());
+        // }
         foreach ($paths as $path) {
             $configPath = $path . 'config' . DS;
             if (is_dir($configPath)) {
