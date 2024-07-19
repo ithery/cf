@@ -43,8 +43,11 @@ class CFConfig {
         $configs = [];
         foreach ($files as $path) {
             $config = require $path;
-
-            $configs = array_merge($configs, $config);
+            if (!is_array($config)) {
+                throw new Exception(c::__('Invalid config format in :file', ['file' => $file]));
+            } else {
+                $configs = array_merge($configs, $config);
+            }
         }
         $repository->set($configKey, $configs);
     }
