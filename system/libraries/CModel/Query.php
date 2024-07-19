@@ -5,9 +5,15 @@ defined('SYSPATH') or die('No direct access allowed.');
 /**
  * Class CModel_Query.
  *
- * @template TModelClass of CModel
+ * @template TModel of CModel
  *
- * @method static              TModelClass         create($attributes = [])                                             Find a model by its primary key.
+ * @property-read CModel_HigherOrderBuilderProxy $orWhere
+ * @property-read CModel_HigherOrderBuilderProxy $whereNot
+ * @property-read CModel_HigherOrderBuilderProxy $orWhereNot
+ *
+ * @mixin CDatabase_Query_Builder
+ *
+ * @method static              TModel         create($attributes = [])                                                  Find a model by its primary key.
  * @method mixed               value($column)                                                                           Get a single column's value from the first result of a query.
  * @method mixed               pluck($column)                                                                           Get a single column's value from the first result of a query.
  * @method void                chunk($count, callable $callback)                                                        Chunk the results of the query.
@@ -385,7 +391,7 @@ class CModel_Query {
      *
      * @return null|static|CModel|CModel_Collection|static[]
      *
-     * @phpstan-return ($id is (\CInterface_Arrayable<array-key, mixed>|array<mixed>) ? \CModel_Collection<int, TModelClass> : TModelClass)|null
+     * @phpstan-return ($id is (\CInterface_Arrayable<array-key, mixed>|array<mixed>) ? \CModel_Collection<int, TModel> : TModel)|null
      */
     public function find($id, $columns = ['*']) {
         if (is_array($id) || $id instanceof CInterface_Arrayable) {
@@ -421,7 +427,7 @@ class CModel_Query {
      *
      * @return CModel|CModel_Collection
      *
-     * @phpstan-return ($id is (\CInterface_Arrayable<array-key, mixed>|array<mixed>) ? \CModel_Collection<int, TModelClass> : TModelClass)
+     * @phpstan-return ($id is (\CInterface_Arrayable<array-key, mixed>|array<mixed>) ? \CModel_Collection<int, TModel> : TModel)
      */
     public function findOrFail($id, $columns = ['*']) {
         $result = $this->find($id, $columns);
@@ -448,7 +454,7 @@ class CModel_Query {
      *
      * @return CModel
      *
-     * @phpstan-return TModelClass
+     * @phpstan-return TModel
      */
     public function findOrNew($id, $columns = ['*']) {
         if (!is_null($model = $this->find($id, $columns))) {
@@ -466,7 +472,7 @@ class CModel_Query {
      *
      * @return CModel
      *
-     * @phpstan-return TModelClass
+     * @phpstan-return TModel
      */
     public function firstOrNew(array $attributes, array $values = []) {
         if (!is_null($instance = $this->where($attributes)->first())) {
