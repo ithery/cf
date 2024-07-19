@@ -107,6 +107,8 @@ class CBot_Bot {
      */
     protected $runsOnSocket = false;
 
+    protected $matches;
+
     /**
      * @var CCache_Repository
      */

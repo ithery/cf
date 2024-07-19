@@ -83,6 +83,9 @@ abstract class CModel implements ArrayAccess, CInterface_Arrayable, CInterface_J
         CModel_Trait_Timestamps,
         CTrait_ForwardsCalls;
 
+    /** @use CModel_Trait_HasCollection<CModel_Collection<array-key, static>> */
+    use CModel_Trait_HasCollection;
+
     /**
      * The name of the "created" column.
      *

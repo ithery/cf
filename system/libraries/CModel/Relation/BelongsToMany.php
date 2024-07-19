@@ -1,8 +1,9 @@
 <?php
 /**
- * @template TRelatedModel of \CModel
+ * @template TRelatedModel of \Model
+ * @template TDeclaringModel of \Model
  *
- * @extends CModel_Relation<TRelatedModel>
+ * @extends \CModel_Relation<TRelatedModel, TDeclaringModel, \CModel_Collection<int, TRelatedModel>>
  *
  * @method mixed               value($column)                                                                                                          Get a single column's value from the first result of a query.
  * @method mixed               pluck($column)                                                                                                          Get a single column's value from the first result of a query.
