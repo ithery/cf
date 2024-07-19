@@ -52,9 +52,6 @@ class CFConfig {
         $repository->set($configKey, $configs);
     }
 
-    public static function loadConfigurationFile($configKey, CConfig_Repository $repository) {
-    }
-
     public static function getConfigurationFiles() {
         $files = [];
         $paths = array_reverse(CF::paths());
