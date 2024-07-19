@@ -25,7 +25,7 @@ class CDatabase_Driver_MongoDB_Result extends CDatabase_Result {
      * @param bool              $object        return objects or arrays
      * @param string            $sql           SQL query that was run
      */
-    public function __construct(\MongoDB\Client $mongoClient, \MongoDB\Database $mongoDatabase, $object, $sql) {
+    public function __construct(MongoDB\Client $mongoClient, MongoDB\Database $mongoDatabase, $object, $sql) {
         $this->mongoClient = $mongoClient;
         $this->mongoDatabase = $mongoDatabase;
 
@@ -81,6 +81,7 @@ class CDatabase_Driver_MongoDB_Result extends CDatabase_Result {
             $this->result->setTypeMap($this->getTypeMap());
             $this->cursorArray = $this->result->toArray();
         }
+
         return $this->cursorArray;
     }
 
@@ -93,6 +94,7 @@ class CDatabase_Driver_MongoDB_Result extends CDatabase_Result {
         if ($this->fetchType == 'object' && $this->returnType != stdClass::class) {
             $options = ['root' => $this->returnType, 'document' => $this->returnType];
         }
+
         return $options;
     }
 
@@ -129,11 +131,12 @@ class CDatabase_Driver_MongoDB_Result extends CDatabase_Result {
         if ($this->fetchType == 'array' && !is_array($record)) {
             $record = json_decode(json_encode($record), true);
         }
+
         return $record;
     }
 
     /**
-     * {@inheritdoc}
+     * @inheritdoc
      */
     public function fetchAll($fetchMode = null, $fetchArgument = null, $ctorArgs = null) {
         return $this->resultArray(false);
@@ -179,6 +182,7 @@ class CDatabase_Driver_MongoDB_Result extends CDatabase_Result {
         if ($cursor == null) {
             throw new Exception('You have exception on mongo query:' . (is_string($rawSql) ? $rawSql : json_encode($rawSql)));
         }
+
         return $cursor;
     }
 
@@ -222,17 +226,19 @@ class CDatabase_Driver_MongoDB_Result extends CDatabase_Result {
     }
 
     /**
-     * Countable: count
+     * Countable: count.
      */
+    #[\ReturnTypeWillChange]
     public function count() {
         return count($this->getCursorArray());
     }
 
     /**
-     * ArrayAccess: offsetExists
+     * ArrayAccess: offsetExists.
      *
      * @param mixed $offset
      */
+    #[\ReturnTypeWillChange]
     public function offsetExists($offset) {
         if ($this->count() > 0) {
             $min = 0;

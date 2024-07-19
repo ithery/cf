@@ -18,6 +18,7 @@ parameters:
     ignoreErrors:
         - '#If condition is always true.#'
         - '#Negated boolean expression is always true.#'
+        - '#Right side of && is always true.#'
 
 
 parametersSchema:
