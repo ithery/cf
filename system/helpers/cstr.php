@@ -1402,19 +1402,6 @@ class cstr {
     }
 
     /**
-     * Generate a UUID (version 7).
-     *
-     * @param null|\DateTimeInterface $time
-     *
-     * @return \Ramsey\Uuid\UuidInterface
-     */
-    public static function uuid7($time = null) {
-        return static::$uuidFactory
-                    ? call_user_func(static::$uuidFactory)
-                    : Uuid::uuid7($time);
-    }
-
-    /**
      * Generate a time-ordered UUID (version 4).
      *
      * @return \Ramsey\Uuid\UuidInterface

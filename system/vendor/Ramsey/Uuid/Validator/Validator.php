@@ -15,16 +15,32 @@
 
 namespace Ramsey\Uuid\Validator;
 
+use Ramsey\Uuid\Uuid;
+
 /**
- * Outlines common behavior of UUID validators
+ * Default validation behavior
  */
-interface ValidatorInterface
+class Validator implements ValidatorInterface
 {
+    /**
+     * Regular expression pattern for matching a valid UUID of any variant.
+     */
+    const VALID_PATTERN = '^[0-9A-Fa-f]{8}-[0-9A-Fa-f]{4}-[0-9A-Fa-f]{4}-[0-9A-Fa-f]{4}-[0-9A-Fa-f]{12}$';
+
     /**
      * Validate that a string represents a UUID
      *
      * @param string $uuid
      * @return bool Returns TRUE if the string was validated as a valid UUID or FALSE on failure
      */
-    public function validate($uuid);
+    public function validate($uuid)
+    {
+        $uuid = str_replace(['urn:', 'uuid:', '{', '}'], '', $uuid);
+
+        if ($uuid === Uuid::NIL || preg_match('/' . self::VALID_PATTERN . '/D', $uuid)) {
+            return true;
+        }
+
+        return false;
+    }
 }

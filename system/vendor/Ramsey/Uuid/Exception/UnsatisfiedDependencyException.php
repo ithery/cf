@@ -1,5 +1,4 @@
 <?php
-
 /**
  * This file is part of the ramsey/uuid library
  *
@@ -8,17 +7,17 @@
  *
  * @copyright Copyright (c) Ben Ramsey <ben@benramsey.com>
  * @license http://opensource.org/licenses/MIT MIT
+ * @link https://benramsey.com/projects/ramsey-uuid/ Documentation
+ * @link https://packagist.org/packages/ramsey/uuid Packagist
+ * @link https://github.com/ramsey/uuid GitHub
  */
-
-declare(strict_types=1);
 
 namespace Ramsey\Uuid\Exception;
 
-use RuntimeException as PhpRuntimeException;
-
 /**
- * Thrown to indicate that attempting to fetch or create a node ID encountered an error
+ * Thrown to indicate that the requested operation has dependencies that have not
+ * been satisfied.
  */
-class NodeException extends PhpRuntimeException implements UuidExceptionInterface
+class UnsatisfiedDependencyException extends \RuntimeException
 {
 }

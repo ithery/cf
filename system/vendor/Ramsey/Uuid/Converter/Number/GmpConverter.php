@@ -14,41 +14,37 @@
 
 namespace Ramsey\Uuid\Converter\Number;
 
-use Moontoast\Math\BigNumber;
 use Ramsey\Uuid\Converter\NumberConverterInterface;
 
 /**
- * BigNumberConverter converts UUIDs from hexadecimal characters into
- * moontoast/math `BigNumber` representations of integers and vice versa
+ * BigNumberConverter converts UUIDs from hexadecimal to decimal string representations and from
+ * decimal string representations or integers to hexadecimal string representations
  */
-class BigNumberConverter implements NumberConverterInterface
+class GmpConverter implements NumberConverterInterface
 {
     /**
-     * Converts a hexadecimal number into a `Moontoast\Math\BigNumber` representation
+     * Converts a hexadecimal string representation into a decimal string representation
      *
      * @param string $hex The hexadecimal string representation to convert
-     * @return BigNumber
+     * @return string Decimal string
      */
     public function fromHex($hex)
     {
-        $number = BigNumber::convertToBase10($hex, 16);
+        $number = gmp_init('0x'.$hex);
 
-        return new BigNumber($number);
+        return gmp_strval($number);
     }
 
     /**
-     * Converts an integer or `Moontoast\Math\BigNumber` integer representation
-     * into a hexadecimal string representation
+     * Converts an integer or a decimal string representation into a hexadecimal string representation
      *
-     * @param int|string|BigNumber $integer An integer or `Moontoast\Math\BigNumber`
+     * @param int|string $integer An integer or decimal string representation
      * @return string Hexadecimal string
      */
     public function toHex($integer)
     {
-        if (!$integer instanceof BigNumber) {
-            $integer = new BigNumber($integer);
-        }
+        $number = gmp_init($integer);
 
-        return BigNumber::convertFromBase10($integer, 16);
+        return gmp_strval($number, 16);
     }
 }
