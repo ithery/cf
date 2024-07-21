@@ -20,7 +20,6 @@ parameters:
         - '#Negated boolean expression is always true.#'
         - '#Right side of && is always true.#'
         - '#Left side of && is always true.#'
-        - '#Left side of || is always true.#'
 
 
 parametersSchema:
