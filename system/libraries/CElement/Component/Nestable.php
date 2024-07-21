@@ -36,6 +36,8 @@ class CElement_Component_Nestable extends CElement_Component {
 
     protected $isCollapsed = false;
 
+    protected $query;
+
     public function __construct($id) {
         parent::__construct($id);
         CManager::registerModule('jquery.nestable');
@@ -96,13 +98,18 @@ class CElement_Component_Nestable extends CElement_Component {
         return $this;
     }
 
-    public function setDataFromModel(CModel $root) {
+    public function setDataFromModel($model, $queryCallback = null) {
+        if (is_string($model)) {
+            $this->query = CManager::createModelDataProvider($model, $queryCallback);
+
+            return $this;
+        }
         /**
          * NOT DONE.
          */
         $orgId = CApp_Base::orgId();
 
-        $root = $root->descendants();
+        $root = $model->descendants();
         if (strlen($orgId) > 0) {
             $root = $root->where(function ($query) use ($orgId) {
                 $query->where('org_id', '=', $orgId)->orWhereNull('org_id');
@@ -183,7 +190,32 @@ class CElement_Component_Nestable extends CElement_Component {
         return $this;
     }
 
+    protected function getDataFromQuery() {
+        $models = $this->query->toEnumerable();
+        $childArray = [];
+        if ($models instanceof CModel_Nested_Collection) {
+            $tree = $models->toTree();
+
+            $traverse = function ($nodes) use (&$traverse, &$childArray) {
+                foreach ($nodes as $node) {
+                    if ($node->status == 0) {
+                        continue;
+                    }
+                    $childArray[] = $node->toArray();
+                    $traverse($node->getChildren);
+                }
+            };
+
+            $traverse($tree);
+        }
+
+        $this->data = $childArray;
+    }
+
     public function html($indent = 0) {
+        if ($this->query != null) {
+            $this->getDataFromQuery();
+        }
         $html = new CStringBuilder();
         $html->setIndent($indent);
         $styles = $this->disable_dnd ? 'pointer-events: none;' : '';
