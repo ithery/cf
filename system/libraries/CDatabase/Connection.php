@@ -1980,6 +1980,7 @@ class CDatabase_Connection implements CDatabase_ConnectionInterface {
 
     public function getList($query, $bindings = []) {
         $r = $this->select($query, $bindings);
+        $res = [];
         foreach ($r as $row) {
             $row = array_values((array) $row);
             $res[carr::get($row, 0)] = carr::get($row, 1);
