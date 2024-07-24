@@ -70,20 +70,19 @@ class CConsole_Command_Phpcsfixer_InstallCommand extends CConsole_Command {
 
                 return false;
             }
+        } else {
+            $this->info($pharPath . ' is already installed');
         }
 
         return true;
     }
 
-
-
-
     protected function setupPhpcsfixerConfig() {
         $configFile = CQC::phpcsfixer()->phpcsfixerConfiguration();
         if (!CFile::exists($configFile)) {
-            $stubFile = DOCROOT.'.php-cs-fixer.dist.php';
+            $stubFile = DOCROOT . '.php-cs-fixer.dist.php';
             if (!$stubFile) {
-                $this->error('.php-cs-fixer.dist.php not found on '.$stubFile);
+                $this->error('.php-cs-fixer.dist.php not found on ' . $stubFile);
                 exit(1);
             }
             $content = CFile::get($stubFile);

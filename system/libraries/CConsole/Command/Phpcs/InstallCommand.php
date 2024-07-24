@@ -72,12 +72,12 @@ class CConsole_Command_Phpcs_InstallCommand extends CConsole_Command {
 
                 return false;
             }
+        } else {
+            $this->info($pharPath . ' is already installed');
         }
 
         return true;
     }
-
-
 
     protected function downloadPhpcbfPharOnBinPath() {
         $pharPath = CQC::phpcs()->phpcbfPhar();
@@ -102,18 +102,19 @@ class CConsole_Command_Phpcs_InstallCommand extends CConsole_Command {
 
                 return false;
             }
+        } else {
+            $this->info($pharPath . ' is already installed');
         }
 
         return true;
     }
 
-
     protected function setupPhpcsConfig() {
         $configFile = CQC::phpcs()->phpcsConfiguration();
         if (!CFile::exists($configFile)) {
-            $stubFile = DOCROOT.'phpcs.xml';
+            $stubFile = DOCROOT . 'phpcs.xml';
             if (!$stubFile) {
-                $this->error('phpcs.xml not found on '.$stubFile);
+                $this->error('phpcs.xml not found on ' . $stubFile);
                 exit(1);
             }
             $content = CFile::get($stubFile);
