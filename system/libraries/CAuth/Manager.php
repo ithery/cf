@@ -140,8 +140,9 @@ final class CAuth_Manager implements CAuth_Contract_AuthFactoryInterface {
      * @return \CAuth_Guard_SessionGuard
      */
     public function createSessionDriver($name, $config) {
-        $providerSessionName = carr::get($config, 'providerSessionName');
+        $providerSessionName = carr::get($config, 'providerSessionName', 'user_provider');
         $provider = null;
+
         if ($providerSessionName) {
             $provider = c::session()->get($providerSessionName);
         }
