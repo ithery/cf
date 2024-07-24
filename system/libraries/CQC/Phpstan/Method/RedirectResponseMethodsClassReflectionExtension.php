@@ -2,7 +2,7 @@
 
 use PHPStan\Reflection;
 
-class CQC_Phpstan_Service_Method_RedirectResponseMethodsClassReflectionExtension implements Reflection\MethodsClassReflectionExtension {
+class CQC_Phpstan_Method_RedirectResponseMethodsClassReflectionExtension implements Reflection\MethodsClassReflectionExtension {
     public function hasMethod(Reflection\ClassReflection $classReflection, string $methodName): bool {
         if ($classReflection->getName() !== 'Illuminate\Http\RedirectResponse') {
             return false;

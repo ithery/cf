@@ -9,7 +9,7 @@ use PHPStan\Reflection\MethodsClassReflectionExtension;
 /**
  * @internal
  */
-final class CQC_Phpstan_Service_Method_Extension implements MethodsClassReflectionExtension {
+final class CQC_Phpstan_Method_Extension implements MethodsClassReflectionExtension {
     /**
      * @var Kernel
      */
@@ -20,8 +20,8 @@ final class CQC_Phpstan_Service_Method_Extension implements MethodsClassReflecti
      */
     private $methodReflections = [];
 
-    public function __construct(PhpMethodReflectionFactory $methodReflectionFactory, ReflectionProvider $reflectionProvider, CQC_Phpstan_Service_Method_Kernel $kernel = null) {
-        $this->kernel = $kernel ?? new CQC_Phpstan_Service_Method_Kernel($methodReflectionFactory, $reflectionProvider);
+    public function __construct(PhpMethodReflectionFactory $methodReflectionFactory, ReflectionProvider $reflectionProvider, CQC_Phpstan_Method_Kernel $kernel = null) {
+        $this->kernel = $kernel ?? new CQC_Phpstan_Method_Kernel($methodReflectionFactory, $reflectionProvider);
     }
 
     public function hasMethod(ClassReflection $classReflection, string $methodName): bool {

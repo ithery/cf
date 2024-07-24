@@ -3,7 +3,7 @@
 /**
  * @internal
  */
-final class CQC_Phpstan_Service_Method_Pipe_SelfClass implements CQC_Phpstan_Contract_Method_PipeInterface {
+final class CQC_Phpstan_Method_Pipe_SelfClass implements CQC_Phpstan_Contract_Method_PipeInterface {
     /**
      * @inheritdoc
      */

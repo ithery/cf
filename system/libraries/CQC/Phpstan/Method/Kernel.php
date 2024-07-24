@@ -8,7 +8,7 @@ use NunoMaduro\Larastan\Contracts\Methods\PassableContract;
 /**
  * @internal
  */
-final class CQC_Phpstan_Service_Method_Kernel {
+final class CQC_Phpstan_Method_Kernel {
     use CQC_Phpstan_Concern_HasContainer;
 
     /**
@@ -43,12 +43,12 @@ final class CQC_Phpstan_Service_Method_Kernel {
     public function handle(ClassReflection $classReflection, string $methodName): CQC_Phpstan_Contract_Method_PassableInterface {
         $pipeline = new CBase_Pipeline($this->getContainer());
 
-        $passable = new CQC_Phpstan_Service_Method_Passable($this->methodReflectionFactory, $this->reflectionProvider, $pipeline, $classReflection, $methodName);
+        $passable = new CQC_Phpstan_Method_Passable($this->methodReflectionFactory, $this->reflectionProvider, $pipeline, $classReflection, $methodName);
 
         $pipeline->send($passable)
             ->through(
                 [
-                    CQC_Phpstan_Service_Method_Pipe_SelfClass::class,
+                    CQC_Phpstan_Method_Pipe_SelfClass::class,
                 ]
             )
             ->then(

@@ -9,7 +9,7 @@ use PHPStan\Reflection\Php\PhpMethodReflectionFactory;
 /**
  * @internal
  */
-final class CQC_Phpstan_Service_Method_Passable implements CQC_Phpstan_Contract_Method_PassableInterface {
+final class CQC_Phpstan_Method_Passable implements CQC_Phpstan_Contract_Method_PassableInterface {
     use CQC_Phpstan_Concern_HasContainer;
 
     /**

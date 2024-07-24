@@ -20,7 +20,7 @@ use PHPStan\Reflection\ParametersAcceptorSelector;
 use PHPStan\Reflection\MethodsClassReflectionExtension;
 use PHPStan\Reflection\MissingMethodFromReflectionException;
 
-final class CQC_Phpstan_Service_Method_ModelForwardsCallsExtension implements MethodsClassReflectionExtension {
+final class CQC_Phpstan_Method_ModelForwardsCallsExtension implements MethodsClassReflectionExtension {
     /**
      * @var CQC_Phpstan_Service_BuilderHelper
      */
@@ -32,7 +32,7 @@ final class CQC_Phpstan_Service_Method_ModelForwardsCallsExtension implements Me
     private $reflectionProvider;
 
     /**
-     * @var CQC_Phpstan_Service_Method_ModelQueryForwardsCallsExtension
+     * @var CQC_Phpstan_Method_ModelQueryForwardsCallsExtension
      */
     private $modelQueryForwardsCallsExtension;
 
@@ -41,7 +41,7 @@ final class CQC_Phpstan_Service_Method_ModelForwardsCallsExtension implements Me
      */
     private $cache = [];
 
-    public function __construct(CQC_Phpstan_Service_BuilderHelper $builderHelper, ReflectionProvider $reflectionProvider, CQC_Phpstan_Service_Method_ModelQueryForwardsCallsExtension $modelQueryForwardsCallsExtension) {
+    public function __construct(CQC_Phpstan_Service_BuilderHelper $builderHelper, ReflectionProvider $reflectionProvider, CQC_Phpstan_Method_ModelQueryForwardsCallsExtension $modelQueryForwardsCallsExtension) {
         $this->builderHelper = $builderHelper;
         $this->reflectionProvider = $reflectionProvider;
         $this->modelQueryForwardsCallsExtension = $modelQueryForwardsCallsExtension;

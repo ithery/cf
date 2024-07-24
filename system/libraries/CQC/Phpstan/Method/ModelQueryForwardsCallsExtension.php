@@ -15,7 +15,7 @@ use PHPStan\Reflection\ParametersAcceptorSelector;
 use PHPStan\Reflection\MethodsClassReflectionExtension;
 use PHPStan\Reflection\MissingMethodFromReflectionException;
 
-final class CQC_Phpstan_Service_Method_ModelQueryForwardsCallsExtension implements MethodsClassReflectionExtension {
+final class CQC_Phpstan_Method_ModelQueryForwardsCallsExtension implements MethodsClassReflectionExtension {
     /**
      * @var array<string, MethodReflection>
      */
