@@ -89,6 +89,7 @@ class CFConsole {
         CConsole_Command_Phpcs_InstallCommand::class,
         CConsole_Command_PhpcsCommand::class,
         CConsole_Command_Phpcs_FixCommand::class,
+        CConsole_Command_Phpcs_ConfigCommand::class,
         CConsole_Command_Phpcsfixer_InstallCommand::class,
         CConsole_Command_PhpcsfixerCommand::class,
         CWebSocket_Console_Command_StartServer::class,

@@ -27,11 +27,23 @@ class CQC_Phpcs {
         return DOCROOT . '.bin' . DS . 'phpcs' . DS . 'phpcbf.phar';
     }
 
-    public static function phpcsConfiguration() {
+    public static function phpcsAppConfiguration() {
         if (CF::appCode() == null) {
-            //do nothing CF already have phpcs.xml
+            return null;
         }
 
-        return c::appRoot() . 'phpcs.xml';
+        $appConfiguration = c::appRoot() . 'phpcs.xml';
+
+        return $appConfiguration;
+    }
+
+    public static function phpcsConfiguration() {
+        $cfConfiguration = DOCROOT . 'phpcs.xml';
+        if (CF::appCode() == null) {
+            return $cfConfiguration;
+        }
+        $appConfiguration = self::phpcsAppConfiguration();
+
+        return CFile::exists($appConfiguration) ? $appConfiguration : $cfConfiguration;
     }
 }
