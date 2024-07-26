@@ -433,7 +433,7 @@ class c {
             return $value->toHtml();
         }
 
-        return htmlspecialchars($value, ENT_QUOTES, 'UTF-8', $doubleEncode);
+        return htmlspecialchars($value ?? '', ENT_QUOTES | ENT_SUBSTITUTE, 'UTF-8', $doubleEncode);
     }
 
     /**
@@ -815,6 +815,30 @@ class c {
      */
     public static function router() {
         return CRouting_Router::instance();
+    }
+
+    /**
+     * Create an Fluent object from the given value.
+     *
+     * @param object|array $value
+     *
+     * @return \CBase_Fluent
+     */
+    public static function fluent($value) {
+        return new CBase_Fluent($value);
+    }
+
+    /**
+     * Return a new literal or anonymous object using named arguments.
+     *
+     * @return \stdClass
+     */
+    public static function literal(...$arguments) {
+        if (count($arguments) === 1 && array_is_list($arguments)) {
+            return $arguments[0];
+        }
+
+        return (object) $arguments;
     }
 
     /**
