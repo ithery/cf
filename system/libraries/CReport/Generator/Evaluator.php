@@ -7,10 +7,10 @@ class CReport_Generator_Evaluator {
         $this->generator = $generator;
     }
 
-    public function evaluatePrintWhenExpression(string $expression = null, CReport_Builder_Row $row = null) {
+    public function evaluatePrintWhenExpression(string $expression = null, string $evaluationTime = CREPORT::EVALUATION_TIME_REPORT) {
         $originalExpression = $expression;
         if ($expression != '') {
-            $expression = $this->getExpression($expression, $row);
+            $expression = $this->getExpression($expression, $evaluationTime);
 
             if (!is_bool($expression)) {
                 throw new Exception('error on evaluate expression ' . $originalExpression);
@@ -25,7 +25,7 @@ class CReport_Generator_Evaluator {
         return true;
     }
 
-    public function getExpression($expression) {
+    public function getExpression($expression, string $evaluationTime = CReport::EVALUATION_TIME_NOW) {
         $originalExpression = $expression;
         preg_match_all("/P{(\w+)}/", $expression, $matchesP);
         if ($matchesP) {
@@ -37,6 +37,9 @@ class CReport_Generator_Evaluator {
         preg_match_all("/V{(\w+)}/", $expression, $matchesV);
         if ($matchesV) {
             foreach ($matchesV[1] as $matchV) {
+                if ($evaluationTime == CReport::EVALUATION_TIME_NOW && $matchV == 'PAGE_COUNT') {
+                    continue;
+                }
                 $variableValue = $this->generator->getVariableValue($matchV);
                 if (is_string($variableValue)) {
                     $variableValue = '"' . $variableValue . '"';
@@ -84,10 +87,10 @@ class CReport_Generator_Evaluator {
         return $result;
     }
 
-    public function evaluateExpression(string $expression, CReport_Jasper_Report_DataRow $row = null) {
+    public function evaluateExpression(string $expression, string $evaluationTime = CReport::EVALUATION_TIME_NOW) {
         $printExpressionResult = true;
         if ($expression != '') {
-            $expression = $this->getExpression($expression, $row);
+            $expression = $this->getExpression($expression, $evaluationTime);
 
             //echo    'if('.$printWhenExpression.'){$print_expression_result=true;}';
             eval('if(' . $expression . '){$printExpressionResult=true;}');

@@ -66,6 +66,11 @@ class CReport_Generator {
      */
     protected $isProcessingDetail;
 
+    /**
+     * @var CReport_Generator_Instruction[]
+     */
+    protected $instructions;
+
     public function __construct(CReport_Builder_Report $report, CReport_Builder_Dictionary $dictionary, CManager_Contract_DataProviderInterface $dataProvider = null) {
         $this->report = $report;
         $this->dictionary = $dictionary;
@@ -78,12 +83,17 @@ class CReport_Generator {
         $this->formatter = new CReport_Generator_Formatter();
         $this->isProcessingPageFooter = false;
         $this->isProcessingDetail = false;
+        $this->instructions = [];
     }
 
     public function setProcessingPageFooter($bool) {
         $this->isProcessingPageFooter = $bool;
 
         return $this;
+    }
+
+    public function addInstruction(CReport_Generator_ProcessorAbstract $processor, Closure $closure) {
+        $this->instructions[] = new CReport_Generator_Instruction($processor->getY(), $this->getPageNumber(), $closure);
     }
 
     public function isProcessingPageFooter() {
@@ -120,8 +130,8 @@ class CReport_Generator {
         return $value;
     }
 
-    public function getExpression(string $expression) {
-        return $this->evaluator->getExpression($expression);
+    public function getExpression(string $expression, string $evaluationTime = CReport::EVALUATION_TIME_NOW) {
+        return $this->evaluator->getExpression($expression, $evaluationTime);
     }
 
     public function formatPattern($text, string $pattern) {
@@ -184,7 +194,7 @@ class CReport_Generator {
     }
 
     public function evaluatePrintWhenExpression(string $expression = null) {
-        return $this->evaluator->evaluatePrintWhenExpression($expression, $this->currentRow);
+        return $this->evaluator->evaluatePrintWhenExpression($expression);
     }
 
     /**
@@ -254,6 +264,7 @@ class CReport_Generator {
             'REPORT_COUNT' => $this->getReportCount(),
             'COLUMN_NUMBER' => $this->getColumnNumber(),
             'PAGE_NUMBER' => $this->getPageNumber(),
+            'PAGE_COUNT' => $this->getPageNumber(),
             'totalRows' => $this->getTotalRows(),
         ];
         if (array_key_exists($name, $globalVariables)) {
@@ -267,6 +278,9 @@ class CReport_Generator {
         $this->pageNumber = 1;
         $this->dictionary->fillVariables($this->report->getVariableElements(), $this);
         $this->report->generate($this, $processor);
+        foreach ($this->instructions as $instruction) {
+            $instruction->run($processor);
+        }
     }
 
     public function getPdf() {

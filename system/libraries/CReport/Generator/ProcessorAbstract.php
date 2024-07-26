@@ -85,6 +85,11 @@ abstract class CReport_Generator_ProcessorAbstract {
     abstract public function setY($y);
 
     /**
+     * @return float
+     */
+    abstract public function getY();
+
+    /**
      * @return mixed
      */
     abstract public function getOutput();
@@ -96,4 +101,11 @@ abstract class CReport_Generator_ProcessorAbstract {
      * @return float
      */
     abstract public function preventYOverflow(CReport_Generator $generator, $height);
+
+    /**
+     * @param int $page
+     *
+     * @return void
+     */
+    abstract public function setPage($page);
 }

@@ -24,6 +24,10 @@ class CReport_Generator_Processor_PdfProcessor extends CReport_Generator_Process
         $this->tcpdf->setPage(1, true);
     }
 
+    public function setPage($page) {
+        $this->tcpdf->setPage($page);
+    }
+
     private function getPdfTextAlignment($alignment) {
         $alignmentMap = [
             CREPORT::TEXT_ALIGNMENT_CENTER => 'C',
@@ -416,5 +420,9 @@ class CReport_Generator_Processor_PdfProcessor extends CReport_Generator_Process
 
     public function resetTextColor() {
         $this->tcpdf->setTextColor(0, 0, 0);
+    }
+
+    public function getY() {
+        return $this->currentY;
     }
 }

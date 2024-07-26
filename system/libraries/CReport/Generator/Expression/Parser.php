@@ -38,6 +38,7 @@ class CReport_Generator_Expression_Parser {
 
         while ($this->currentToken !== null && in_array($this->currentToken['value'], ['+', '-'])) {
             $operator = $this->currentToken['value'];
+            $beforeToken = $this->currentToken;
             $this->eat(CReport_Generator_Expression_Lexer::TOKEN_OPERATOR);
             $right = $this->term();
             $result = $this->evaluate($result, $operator, $right);
@@ -51,6 +52,7 @@ class CReport_Generator_Expression_Parser {
         while ($this->currentToken !== null && in_array($this->currentToken['value'], ['*', '/'])) {
             $operator = $this->currentToken['value'];
             $this->eat(CReport_Generator_Expression_Lexer::TOKEN_OPERATOR);
+
             $right = $this->factor();
             $result = $this->evaluate($result, $operator, $right);
         }

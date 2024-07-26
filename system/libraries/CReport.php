@@ -171,6 +171,10 @@ class CReport {
      */
     const MODEL_TRANSPARENT = 'transparent';
 
+    const EVALUATION_TIME_REPORT = 'report';
+
+    const EVALUATION_TIME_NOW = 'now';
+
     /**
      * @param string $jrxml
      * @param array  $param

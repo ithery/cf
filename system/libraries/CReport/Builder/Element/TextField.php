@@ -152,8 +152,15 @@ class CReport_Builder_Element_TextField extends CReport_Builder_ElementAbstract 
             $options['box'] = $this->getBox();
             $options['lineSpacing'] = $this->getLineSpacing();
             $options['mode'] = $this->getMode();
-
-            $processor->cell($options);
+            if (strpos($text, '$V{PAGE_COUNT}') !== false) {
+                $generator->addInstruction($processor, function (CReport_Generator_ProcessorAbstract $processor) use ($generator, $text, $options) {
+                    $text = $generator->getExpression($text, CREPORT::EVALUATION_TIME_REPORT);
+                    $options['text'] = $text;
+                    $processor->cell($options);
+                });
+            } else {
+                $processor->cell($options);
+            }
         }
     }
 

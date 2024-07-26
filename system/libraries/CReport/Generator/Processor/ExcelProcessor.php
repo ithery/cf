@@ -26,6 +26,10 @@ class CReport_Generator_Processor_ExcelProcessor extends CReport_Generator_Proce
         $this->currentRow = 1;
     }
 
+    public function setPage($page) {
+        //do nothing
+    }
+
     public function setText($x, $y, $txt, $align = '', $pattern = '') {
         $myformat = '';
 
@@ -111,5 +115,9 @@ class CReport_Generator_Processor_ExcelProcessor extends CReport_Generator_Proce
     }
 
     public function resetTextColor() {
+    }
+
+    public function getY() {
+        return $this->currentY;
     }
 }
