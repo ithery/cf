@@ -39,6 +39,7 @@ class CReport_Builder_ElementFactory {
         'initialValueExpression',
         'band',
         'groupExpression',
+        'printWhenExpression',
     ];
 
     public static function getClassName($obj) {

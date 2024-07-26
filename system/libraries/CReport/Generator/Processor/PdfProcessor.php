@@ -345,8 +345,9 @@ class CReport_Generator_Processor_PdfProcessor extends CReport_Generator_Process
     public function line(array $options) {
         $x = carr::get($options, 'x');
         $y = carr::get($options, 'y');
-        $x1 = $x;
-        $y1 = $y;
+        $x1 = $this->leftMargin + $x;
+        $y1 = $this->currentY + $y;
+
         $width = carr::get($options, 'width');
         $height = carr::get($options, 'height');
         $x2 = $x1 + $width;
