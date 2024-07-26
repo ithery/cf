@@ -756,6 +756,9 @@ class c {
         if ($value instanceof Countable) {
             return count($value) === 0;
         }
+        if ($value instanceof CBase_String) {
+            return trim((string) $value) === '';
+        }
 
         return empty($value);
     }
