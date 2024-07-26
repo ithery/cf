@@ -157,6 +157,7 @@ final class CGeo_Provider_Nominatim extends CGeo_ProviderHttpAbstract implements
             $queries['key'] = $key;
         }
 
+        CLogger::info('asPostString', ['asPostString'=>curl::asPostString($queries)]);
         $url = $this->rootUrl
             . '/reverse' . $this->getExtension() . '?'
             . curl::asPostString($queries);
