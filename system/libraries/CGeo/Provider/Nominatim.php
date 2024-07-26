@@ -156,7 +156,7 @@ final class CGeo_Provider_Nominatim extends CGeo_ProviderHttpAbstract implements
         if ($key) {
             $queries['key'] = $key;
         }
-        CLogger::info('PHP_QUERY_RFC3986', ['queries'=>$queries]);
+        CLogger::info('queries', ['queries'=>$queries]);
 
         CLogger::info('PHP_QUERY_RFC3986', ['query'=>http_build_query($queries, '', '&', PHP_QUERY_RFC3986)]);
         CLogger::info('PHP_QUERY_RFC1738', ['query'=>http_build_query($queries, '', '&', PHP_QUERY_RFC1738)]);
