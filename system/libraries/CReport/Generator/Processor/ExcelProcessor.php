@@ -93,6 +93,9 @@ class CReport_Generator_Processor_ExcelProcessor extends CReport_Generator_Proce
     public function line(array $options) {
     }
 
+    public function rectangle(array $options) {
+    }
+
     public function addY($height) {
         $yAddition = intval(($height) / $this->rowHeightPixel);
         $this->currentRow += $yAddition;

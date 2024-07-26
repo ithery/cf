@@ -18,6 +18,7 @@ class CReport_Builder_ElementFactory {
         'variable' => CReport_Builder_Element_Variable::class,
         'queryString' => CReport_Builder_Element_QueryString::class,
         'line' => CReport_Builder_Element_Line::class,
+        'rectangle' => CReport_Builder_Element_Rectangle::class,
         'style' => CReport_Builder_Element_Style::class,
         'styles' => CReport_Builder_Element_Style::class,
 

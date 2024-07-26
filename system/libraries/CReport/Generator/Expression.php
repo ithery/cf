@@ -53,6 +53,7 @@ class CReport_Generator_Expression {
         if ($expression == '') {
             return '';
         }
+        $expression = str_replace('\\n', PHP_EOL, $expression);
         if (!$this->hasOperator()) {
             if (is_string($expression)) {
                 $expression = $this->removeQuotes($expression);

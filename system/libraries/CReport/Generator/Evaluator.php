@@ -80,7 +80,6 @@ class CReport_Generator_Evaluator {
 
              // error_reporting(5);
         }
-
         $expressionEvaluator = new CReport_Generator_Expression($expression);
         $result = $expressionEvaluator->evaluate();
 

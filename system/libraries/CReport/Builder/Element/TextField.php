@@ -120,6 +120,7 @@ class CReport_Builder_Element_TextField extends CReport_Builder_ElementAbstract 
         } else {
             $text = $this->getText();
         }
+
         $pattern = $this->getPattern();
         if ($pattern) {
             $textToFormat = $text;

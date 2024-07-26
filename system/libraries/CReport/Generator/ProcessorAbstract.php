@@ -61,6 +61,13 @@ abstract class CReport_Generator_ProcessorAbstract {
     abstract public function line(array $options);
 
     /**
+     * @param array $options
+     *
+     * @return void
+     */
+    abstract public function rectangle(array $options);
+
+    /**
      * @param float $height
      *
      * @return float

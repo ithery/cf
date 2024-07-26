@@ -360,6 +360,40 @@ class CReport_Generator_Processor_PdfProcessor extends CReport_Generator_Process
         );
     }
 
+    public function rectangle(array $options) {
+        $x = carr::get($options, 'x');
+        $y = carr::get($options, 'y');
+        $radius = carr::get($options, 'radius');
+        $x1 = $x;
+        $y1 = $y;
+        $width = carr::get($options, 'width');
+        $height = carr::get($options, 'height');
+        $x2 = $x1 + $width;
+        $y2 = $y1 + $height;
+        $pen = carr::get($options, 'pen');
+        $style = [];
+        $borderStyle = [];
+        if ($pen != null && $pen instanceof CReport_Builder_Object_Pen) {
+            $borderStyle = $this->getPdfPen($pen);
+        }
+        $style = '';
+        $roundCorner = '1111';
+
+        $fillColor = [];
+
+        $this->tcpdf->RoundedRect(
+            $x1,
+            $y1,
+            $x2,
+            $y2,
+            $radius,
+            $roundCorner,
+            $style,
+            $borderStyle,
+            $fillColor,
+        );
+    }
+
     public function image(array $options) {
         $src = carr::get($options, 'src');
         $x = carr::get($options, 'x');
