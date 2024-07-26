@@ -115,4 +115,12 @@ abstract class CReport_Generator_ProcessorAbstract {
      * @return void
      */
     abstract public function setPage($page);
+
+    /**
+     * @param string $fontName
+     * @param string $fontPath
+     *
+     * @return void
+     */
+    abstract public function addFont($fontName, $fontPath);
 }

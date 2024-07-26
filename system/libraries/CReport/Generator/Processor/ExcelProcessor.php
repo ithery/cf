@@ -123,4 +123,13 @@ class CReport_Generator_Processor_ExcelProcessor extends CReport_Generator_Proce
     public function getY() {
         return $this->currentY;
     }
+
+    /**
+     * @param string $fontName
+     * @param string $fontPath
+     *
+     * @return void
+     */
+    public function addFont($fontName, $fontPath) {
+    }
 }

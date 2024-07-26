@@ -21,6 +21,7 @@ class CReport_Builder_ElementFactory {
         'rectangle' => CReport_Builder_Element_Rectangle::class,
         'style' => CReport_Builder_Element_Style::class,
         'styles' => CReport_Builder_Element_Style::class,
+        'font' => CReport_Builder_Element_Font::class,
 
     ];
 

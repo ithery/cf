@@ -372,4 +372,13 @@ class CReport_Builder_Report implements CReport_Builder_Contract_JrXmlElementInt
             return $value instanceof CReport_Builder_Element_Style;
         });
     }
+
+    /**
+     * @return CCollection|CReport_Builder_Element_Font[]
+     */
+    public function getFontElements() {
+        return c::collect($this->children)->filter(function ($value) {
+            return $value instanceof CReport_Builder_Element_Font;
+        });
+    }
 }

@@ -151,7 +151,7 @@ class CReport_Builder_Object_Font implements CReport_Builder_Contract_JrXmlEleme
     public function toJrXml() {
         $tag = '<font';
         if ($this->fontName) {
-            $tag .= ' name="' . $this->fontName . '"';
+            $tag .= ' fontName="' . $this->fontName . '"';
         }
 
         if ($this->fontSize) {
@@ -172,8 +172,8 @@ class CReport_Builder_Object_Font implements CReport_Builder_Contract_JrXmlEleme
         if ($xml['size']) {
             $font->setFontSize((float) $xml['size']);
         }
-        if ($xml['name']) {
-            $font->setFontName((string) $xml['name']);
+        if ($xml['fontName']) {
+            $font->setFontName((string) $xml['fontName']);
         }
         if ($xml['isBold']) {
             $font->setBold(CReport_Builder_JrXmlToPhpEnum::getBoolEnum((string) $xml['isBold']));
@@ -189,5 +189,9 @@ class CReport_Builder_Object_Font implements CReport_Builder_Contract_JrXmlEleme
         }
 
         return $font;
+    }
+
+    public function getFontFile() {
+        return CReport_Pdf_FontManager::instance()->getFontFile($this->fontName);
     }
 }

@@ -193,6 +193,7 @@ class CReport_Generator_Processor_PdfProcessor extends CReport_Generator_Process
     public function font(CReport_Builder_Object_Font $font) {
         $fontName = $font->getFontName();
         $fontSize = $font->getFontSize();
+        $fontFile = $font->getFontFile();
         // $fontfile = CReport_Jasper_Instructions::$fontdir . '/' . $arraydata['font'] . '.php';
         // if(file_exists($fontfile) || $this->jasperReport->bypassnofont==false){
 
@@ -212,12 +213,17 @@ class CReport_Generator_Processor_PdfProcessor extends CReport_Generator_Process
         if ($font->isStrikeThrough()) {
             $fontStyle .= 'S';
         }
+        // if ($fontName == 'pckktqlucidasanstypewriterb') {
+        //     cdbg::dd(CFile::exists('/home/dev/public_html/application/aidnity/default/data/fonts/pckktqlucidasanstypewriterb/pckktqlucidasanstypewriterb.php'));
+        //     cdbg::dd(CReport_Pdf_FontManager::instance()->all());
+        //     cdbg::dd($fontFile);
+        // }
         //TODO FOR Strike Through
         $this->tcpdf->setFont(
             $fontName,
             $fontStyle,
             $fontSize,
-            $fontfile = '',
+            $fontFile,
             $subset = 'default',
             $out = true
         );
@@ -363,13 +369,13 @@ class CReport_Generator_Processor_PdfProcessor extends CReport_Generator_Process
     public function rectangle(array $options) {
         $x = carr::get($options, 'x');
         $y = carr::get($options, 'y');
+
+        $pdfX = $this->leftMargin + $x;
+        $pdfY = $this->currentY + $y;
         $radius = carr::get($options, 'radius');
-        $x1 = $x;
-        $y1 = $y;
+
         $width = carr::get($options, 'width');
         $height = carr::get($options, 'height');
-        $x2 = $x1 + $width;
-        $y2 = $y1 + $height;
         $pen = carr::get($options, 'pen');
         $style = [];
         $borderStyle = [];
@@ -382,10 +388,10 @@ class CReport_Generator_Processor_PdfProcessor extends CReport_Generator_Process
         $fillColor = [];
 
         $this->tcpdf->RoundedRect(
-            $x1,
-            $y1,
-            $x2,
-            $y2,
+            $pdfX,
+            $pdfY,
+            $width,
+            $height,
             $radius,
             $roundCorner,
             $style,
@@ -458,5 +464,17 @@ class CReport_Generator_Processor_PdfProcessor extends CReport_Generator_Process
 
     public function getY() {
         return $this->currentY;
+    }
+
+    /**
+     * @param string $fontName
+     * @param string $fontPath
+     *
+     * @return void
+     */
+    public function addFont($fontName, $fontPath) {
+        $style = '';
+        $subset = 'default';
+        $this->tcpdf->AddFont($fontName, $style, $fontPath, $subset);
     }
 }
