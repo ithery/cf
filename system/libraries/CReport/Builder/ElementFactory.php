@@ -9,6 +9,7 @@ class CReport_Builder_ElementFactory {
         'pageFooter' => CReport_Builder_Element_PageFooter::class,
         'frame' => CReport_Builder_Element_Frame::class,
         'columnHeader' => CReport_Builder_Element_ColumnHeader::class,
+        'columnFooter' => CReport_Builder_Element_ColumnFooter::class,
         'detail' => CReport_Builder_Element_Detail::class,
         'textField' => CReport_Builder_Element_TextField::class,
         'group' => CReport_Builder_Element_Group::class,

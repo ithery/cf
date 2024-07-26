@@ -365,6 +365,21 @@ class CReport_Builder_Report implements CReport_Builder_Contract_JrXmlElementInt
     }
 
     /**
+     * @return CCollection|CReport_Builder_Element_ColumnFooter[]
+     */
+    public function getColumnFooterElements() {
+        return c::collect($this->children)->filter(function ($value) {
+            return $value instanceof CReport_Builder_Element_ColumnFooter;
+        });
+    }
+    /**
+     * @return null|CReport_Builder_Element_ColumnFooter
+     */
+    public function getColumnFooterElement() {
+        return $this->getColumnFooterElements()->first();
+    }
+
+    /**
      * @return CCollection|CReport_Builder_Element_Style[]
      */
     public function getStyleElements() {

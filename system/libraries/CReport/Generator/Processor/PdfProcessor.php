@@ -123,17 +123,26 @@ class CReport_Generator_Processor_PdfProcessor extends CReport_Generator_Process
         $preventYAxis = $this->currentY + $height;
         $pageHeight = $this->pageHeight;
         $pageFooter = $generator->getPageFooter();
+        $columnFooter = $generator->getColumnFooter();
         $pageFooterHeight = 0;
+        $columnFooterHeight = 0;
         if ($pageFooter) {
             $pageFooterHeight = $pageFooter->getHeight();
         }
+        if ($columnFooter) {
+            $columnFooterHeight = $columnFooter->getHeight();
+        }
         $topMargin = $this->topMargin;
         $bottomMargin = $this->bottomMargin;
-        $discount = $pageHeight - $pageFooterHeight - $topMargin - $bottomMargin; //dicount heights of page parts;
+        $discount = $pageHeight - $pageFooterHeight -$columnFooterHeight- $topMargin - $bottomMargin; //dicount heights of page parts;
         // var_dump($pageFooter);
         //exit;
 
         if ($preventYAxis >= $discount) {
+            if ($columnFooter) {
+                $columnFooter->generate($generator, $this);
+            }
+
             if ($pageFooter) {
                 $pageFooter->generate($generator, $this);
             }

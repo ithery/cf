@@ -35,9 +35,11 @@ class CReport_Generator_Evaluator {
         }
 
         preg_match_all("/V{(\w+)}/", $expression, $matchesV);
+        $evaluateNow = true;
         if ($matchesV) {
             foreach ($matchesV[1] as $matchV) {
                 if ($evaluationTime == CReport::EVALUATION_TIME_NOW && $matchV == 'PAGE_COUNT') {
+                    $evaluateNow = false;
                     continue;
                 }
                 $variableValue = $this->generator->getVariableValue($matchV);
@@ -65,24 +67,25 @@ class CReport_Generator_Evaluator {
                 }
             }
         }
+        $result = $expression;
+        if ($evaluateNow) {
+            // Regex pattern to capture the entire expression
+            $ternaryPattern = '/(.*?)\?(.*?)\:(.*)/';
 
-        // Regex pattern to capture the entire expression
-        $ternaryPattern = '/(.*?)\?(.*?)\:(.*)/';
+            if (preg_match($ternaryPattern, $expression, $matchesTernary) > 0) {
+                // Extract the components
 
-        if (preg_match($ternaryPattern, $expression, $matchesTernary) > 0) {
-            // Extract the components
+                $condition = trim($matchesTernary[1]);
+                $valueIfTrue = trim($matchesTernary[2]);
+                $valueIfFalse = trim($matchesTernary[3]);
+                $expression = $this->evaluateCondition($condition) ? $valueIfTrue : $valueIfFalse;
+                // $mathValue = eval('return (' . $out['target'] . ');');
 
-            $condition = trim($matchesTernary[1]);
-            $valueIfTrue = trim($matchesTernary[2]);
-            $valueIfFalse = trim($matchesTernary[3]);
-            $expression = $this->evaluateCondition($condition) ? $valueIfTrue : $valueIfFalse;
-            // $mathValue = eval('return (' . $out['target'] . ');');
-
-             // error_reporting(5);
+                // error_reporting(5);
+            }
+            $expressionEvaluator = new CReport_Generator_Expression($expression);
+            $result = $expressionEvaluator->evaluate();
         }
-        $expressionEvaluator = new CReport_Generator_Expression($expression);
-        $result = $expressionEvaluator->evaluate();
-
         return $result;
     }
 

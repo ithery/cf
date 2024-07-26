@@ -219,6 +219,13 @@ class CReport_Generator {
     }
 
     /**
+     * @return null|CReport_Builder_Element_ColumnFooter
+     */
+    public function getColumnFooter() {
+        return $this->report->getColumnFooterElement();
+    }
+
+    /**
      * @return CReport_Builder_Element_Font[]
      */
     public function getFonts() {
