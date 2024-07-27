@@ -5,6 +5,9 @@ defined('SYSPATH') or die('No direct access allowed.');
 CPolyfill::php74();
 CPolyfill::php80();
 CPolyfill::php81();
+CPolyfill::php82();
+CPolyfill::php83();
+CPolyfill::php84();
 CFConfig::bootstrap();
 
 CPagination_Paginator::useBootstrap();
