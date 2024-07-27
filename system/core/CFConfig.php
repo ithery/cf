@@ -26,8 +26,8 @@ class CFConfig {
         $locale = $repository->get('app.locale');
         $fallbackLocale = $repository->get('app.fallback_locale');
 
-        CF::setLocale($locale);
-        CF::setFallbackLocale($fallbackLocale);
+        // CF::setLocale($locale);
+        // CF::setFallbackLocale($fallbackLocale);
 
         mb_internal_encoding('UTF-8');
     }
