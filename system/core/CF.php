@@ -1074,7 +1074,7 @@ final class CF {
      */
     public static function setLocale($locale) {
         static::$locale = $locale;
-        setlocale(LC_ALL, $locale);
+        // setlocale(LC_ALL, $locale);
         CTranslation::translator()->setLocale($locale);
         CCarbon::setLocale($locale);
         CEvent::dispatch('cf.locale.updated');
