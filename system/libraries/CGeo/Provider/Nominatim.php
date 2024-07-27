@@ -146,8 +146,8 @@ final class CGeo_Provider_Nominatim extends CGeo_ProviderHttpAbstract implements
 
         $queries = [
             'format' => 'jsonv2',
-            'lat' => (string) $latitude,
-            'lon' => (string) $longitude,
+            'lat' => $latitude,
+            'lon' => $longitude,
             'addressdetails' => 1,
             'zoom' => $query->getData('zoom', 18),
         ];
@@ -159,7 +159,7 @@ final class CGeo_Provider_Nominatim extends CGeo_ProviderHttpAbstract implements
 
         $url = $this->rootUrl
             . '/reverse' . $this->getExtension() . '?'
-            . curl::asPostString($queries, '', '&', PHP_QUERY_RFC3986);
+            . http_build_query($queries, '', '&', PHP_QUERY_RFC3986);
 
         $content = $this->executeQuery($url, $query->getLocale());
         $json = json_decode($content);
