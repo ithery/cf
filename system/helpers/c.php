@@ -2035,6 +2035,26 @@ class c {
     public static function elapsed() {
         return microtime(true) - CF_START;
     }
+
+    /**
+     * Join the given paths together.
+     *
+     * @param null|string $basePath
+     * @param string      ...$paths
+     *
+     * @return string
+     */
+    public static function joinPaths($basePath, ...$paths) {
+        foreach ($paths as $index => $path) {
+            if (empty($path) && $path !== '0') {
+                unset($paths[$index]);
+            } else {
+                $paths[$index] = DIRECTORY_SEPARATOR . ltrim($path, DIRECTORY_SEPARATOR);
+            }
+        }
+
+        return $basePath . implode('', $paths);
+    }
 }
 
 // End c
