@@ -108,9 +108,9 @@ class CF {
 
                 let string = '<link rel=\'stylesheet\' type=\'text/css\' href=\'' + url + '\' />';
 
-                // if(this.config.debug) {
-                //     console.log('Css Require:' + url + ', readyState:' + document.readyState);
-                // }
+                if(this.config.debug) {
+                    console.log('Css Require:' + url + ', readyState:' + document.readyState);
+                }
                 if ((document.readyState === 'loading' /* || mwd.readyState === 'interactive'*/) && !!window.CanvasRenderingContext2D && self === parent) {
                     document.write(string);
                     resolve(url);
@@ -125,9 +125,9 @@ class CF {
                         dispatchWindowEvent('cresenity:css:loaded', {
                             url: url
                         });
-                        // if(this.config.debug) {
-                        //     console.log('Css Loaded:' + url + '');
-                        // }
+                        if(this.config.debug) {
+                            console.log('Css Loaded:' + url + '');
+                        }
                         resolve(url);
                     });
 
@@ -151,9 +151,9 @@ class CF {
             if (!loaded) {
                 this.required.push(url);
                 let string = '<script type=\'text/javascript\'  src=\'' + url + '\'></script>';
-                // if(this.config.debug) {
-                //     console.log('JS Require:' + url + ', readyState:' + document.readyState);
-                // }
+                if(this.config.debug) {
+                    console.log('JS Require:' + url + ', readyState:' + document.readyState);
+                }
 
                 if ((document.readyState === 'loading' /* || mwd.readyState === 'interactive'*/) && !!window.CanvasRenderingContext2D && self === parent) {
                     document.write(string);
@@ -172,9 +172,9 @@ class CF {
                         dispatchWindowEvent('cresenity:js:loaded', {
                             url: url
                         });
-                        // if(this.config.debug) {
-                        //     console.log('JS Loaded:' + url + '');
-                        // }
+                        if(this.config.debug) {
+                            console.log('JS Loaded:' + url + '');
+                        }
                         resolve(url);
                     });
 
