@@ -46,9 +46,28 @@
     </button>
 
 
-    <div class="navbar-collapse collapse" id="layout-navbar-collapse">
+    <div class="navbar-collapse collapse justify-content-end" id="layout-navbar-collapse">
 
-        <div class="navbar-nav align-items-lg-center ml-auto">
+        <div class="navbar-nav align-items-lg-center">
+
+            <div class="navbar-user nav-item dropdown dropdown-pull-right">
+                <a href="#" class="nav-link dropdown-toggle" data-toggle="dropdown">
+                    {{ \Cresenity\Demo\DemoVariable::themeLabel() }}
+                </a>
+
+                <ul class="dropdown-menu dropdown-menu-right">
+                    @foreach( \Cresenity\Demo\DemoVariable::themeData() as $themeKey => $themeLabel)
+                    <li>
+                        <a href="{{ c::url('demo/account/theme/change/' . $themeKey) }}">
+                            {{ $themeLabel }}
+                        </a>
+                    </li>
+                    @endforeach
+
+                </ul>
+            </div>
+        </div>
+        <div class="navbar-nav align-items-lg-center">
 
             <div class="navbar-user nav-item dropdown dropdown-pull-right">
                 <a href="#" class="nav-link dropdown-toggle" data-toggle="dropdown">
@@ -58,7 +77,7 @@
                     </span>
                 </a>
 
-                <div class="dropdown-menu dropdown-menu-right">
+                <ul class="dropdown-menu dropdown-menu-right">
                     <li>
                         <a href="{{ c::url('demo/account/password/change') }}">
                             <i class="ti ti-key"></i>&nbsp;&nbsp; @lang('Change Password')
@@ -69,11 +88,12 @@
                             <i class="ti ti-power-off"></i>&nbsp;&nbsp;@lang('Logout')
                         </a>
                     </li>
-                </div>
+                </ul>
             </div>
         </div>
         <div class="navbar-nav align-items-center ml-3">
-            <a id="btn-demo-show-code" class="btn btn-info text-white btn-demo-show-code" data-uri="{{ c::request()->path() }}">Show Codes</a>
+            <a id="btn-demo-show-code" class="btn btn-info text-white btn-demo-show-code"
+                data-uri="{{ c::request()->path() }}">Show Codes</a>
         </div>
 
     </div>
