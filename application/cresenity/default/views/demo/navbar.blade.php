@@ -51,7 +51,7 @@
         <div class="navbar-nav align-items-lg-center">
 
             <div class="navbar-user nav-item dropdown dropdown-pull-right">
-                <a href="#" class="nav-link dropdown-toggle" data-toggle="dropdown">
+                <a href="#" class="nav-link dropdown-toggle" data-toggle="dropdown" data-bs-toggle="dropdown">
                     {{ \Cresenity\Demo\DemoVariable::themeLabel() }}
                 </a>
 
@@ -70,7 +70,7 @@
         <div class="navbar-nav align-items-lg-center">
 
             <div class="navbar-user nav-item dropdown dropdown-pull-right">
-                <a href="#" class="nav-link dropdown-toggle" data-toggle="dropdown">
+                <a href="#" class="nav-link dropdown-toggle" data-toggle="dropdown" data-bs-toggle="dropdown">
                     <span class="d-inline-flex flex-lg-row-reverse align-items-center align-middle">
                         <i class="ti ti-user text-xl"></i>
                         <span class="px-1 mr-lg-2 ml-2 ml-lg-0">{{ \Cresenity\Demo\DemoVariable::username() }}</span>

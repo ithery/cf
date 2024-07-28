@@ -8,12 +8,12 @@ return [
         'theme-material',
     ],
     'js' => [
+        'cresenity-demo.js',
     ],
     'css' => [
-
-    ],
-    'scss' => [
-
+        // 'cresenity-demo-bs5.css',
+        // 'cresenity-demo-bs5-theme.css',
+        'cresenity-demo.css',
     ],
     'data' => [
         'table' => [
