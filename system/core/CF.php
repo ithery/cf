@@ -898,7 +898,7 @@ final class CF {
             }
         }
         if (defined('CF_APPCODE')) {
-            return CF_APPCODE;
+            return constant('CF_APPCODE');
         }
 
         if (CF::isCFCli() || CF::isTesting()) {
