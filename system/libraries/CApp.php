@@ -524,7 +524,7 @@ class CApp implements CInterface_Responsable, CInterface_Renderable, CInterface_
             $js = $this->minifyJavascript($js);
         }
 
-        $js = $asset->renderJsRequire($js, 'cresenity.cf.requireJs');
+        //$js = $asset->renderJsRequire($js, 'cresenity.cf.requireJs');
 
         $cappScript = $this->yieldPushContent('capp-script');
         //strip cappScript from <script>
@@ -536,13 +536,17 @@ class CApp implements CInterface_Responsable, CInterface_Renderable, CInterface_
         // }
 
         //$js .= $cappScript;
+        $assetData = [];
+        $assetData['js'] = $asset->getAllJsFileUrl();
+        $assetData['css'] = $asset->getAllCssFileUrl();
+        $data['assets'] = $assetData;
         $data['html'] = $message . $html . $cappScript;
         $data['js'] = base64_encode($js);
         if (CF::config('app.debug')) {
             $data['jsRaw'] = $js;
         }
 
-        $data['css_require'] = $asset->getAllCssFileUrl();
+        //$data['css_require'] = $asset->getAllCssFileUrl();
         $data['message'] = $messageOrig;
         $data['ajaxData'] = $this->ajaxData;
         $data['html'] = mb_convert_encoding($data['html'], 'UTF-8', 'UTF-8');

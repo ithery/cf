@@ -165,21 +165,25 @@ export default class Cresenity {
     on(eventName, cb) {
         window.addEventListener('cresenity:' + eventName, cb);
     }
-
+    async handleResponseAsync(data) {
+        return new Promise(async (resolve, reject) => {
+            if(data.assets) {
+                if(data.assets.css) {
+                    for (let i = 0; i < data.assets.css.length; i++) {
+                        await this.cf.requireCssAsync(data.assets.css[i]);
+                    }
+                }
+                if(data.assets.js) {
+                    for (let i = 0; i < data.assets.js.length; i++) {
+                        await this.cf.requireJsAsync(data.assets.js[i]);
+                    }
+                }
+            }
+            resolve(data);
+        });
+    }
     handleResponse(data, callback) {
-        if (data.cssRequire && data.cssRequire.length > 0) {
-            for (let i = 0; i < data.cssRequire.length; i++) {
-                this.cf.require(data.cssRequire[i], 'css');
-            }
-        }
-
-        if (data.css_require && data.css_require.length > 0) {
-            for (let i = 0; i < data.css_require.length; i++) {
-                this.cf.require(data.css_require[i], 'css');
-            }
-        }
-
-        callback();
+        this.handleResponseAsync(data).then(callback);
     }
     htmlModal(html) {
         showHtmlModal(html);
