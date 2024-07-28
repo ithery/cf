@@ -505,6 +505,12 @@ return [
             'css/icon/linearicons'
         ],
     ],
+    'materialdesignicons' => [
+        'css' => ['icon/materialdesignicons.css'],
+        'files' => [
+            'css/icon/materialdesignicons'
+        ],
+    ],
     'themify-icons' => [
         'css' => ['icon/themify-icons.css'],
         'files' => [
