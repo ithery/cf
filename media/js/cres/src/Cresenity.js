@@ -45,6 +45,7 @@ import clsx from './module/clsx';
 import stylex from './module/stylex';
 import collect from 'collect.js';
 import emitter from './cresenity/emitter';
+import bootstrapHelper from './module/BootstrapHelper';
 
 export default class Cresenity {
     constructor() {
@@ -526,10 +527,17 @@ export default class Cresenity {
             reloadOptions.selector = modalBody;
             this.reload(reloadOptions);
         }
+        if(bootstrapHelper.isBootstrap5()) {
+            let modal = new window.bootstrap.Modal(modalContainer[0], {
+                backdrop: settings.backdrop
+            });
+            modal.show();
+        } else {
+            modalContainer.modal({
+                backdrop: settings.backdrop
+            });
 
-        modalContainer.modal({
-            backdrop: settings.backdrop
-        });
+        }
 
         return modalContainer;
     }
@@ -987,6 +995,12 @@ export default class Cresenity {
         }
         return elm.html();
     }
+    isUsingBootstrap() {
+        bootstrapHelper.isBootstrap();
+    }
+    initDependency() {
+        bootstrapHelper.check();
+    }
     initConfirm() {
         elementRendered('a.confirm, button.confirm, input[type=submit].confirm', (el)=>{
             $(el).click((e)=>{
@@ -1105,6 +1119,7 @@ export default class Cresenity {
                     this.scrollToTop.init();
                 }
             }
+            this.initDependency();
             this.initElement();
             this.initConfirm();
             this.initReload();

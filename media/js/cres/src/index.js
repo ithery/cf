@@ -14,7 +14,6 @@ String.prototype.toNumber = function () {
     return 0;
 };
 
-
 import './index.scss';
 import Cresenity from './Cresenity';
 
@@ -25,6 +24,19 @@ if (!window.cresenity) {
 if (!window.cres) {
     window.cres = window.cresenity;
 }
-window.document.addEventListener('DOMContentLoaded', function () {
-    window.cresenity.init();
-});
+
+// init cresenity after page load
+if (window.document.readyState === 'complete') {
+    window.cres.init();
+} else {
+    window.document.addEventListener(
+        'DOMContentLoaded',
+        function onContentLoaded() {
+            window.cres.init();
+            window.document.removeEventListener(
+                'DOMContentLoaded',
+                onContentLoaded
+            );
+        }
+    );
+}

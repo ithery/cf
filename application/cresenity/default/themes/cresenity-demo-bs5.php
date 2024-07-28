@@ -31,6 +31,11 @@ return [
         'cresenity-demo.js',
     ],
     'css' => [
+        'cresenity.css',
+        'cresenity/cresenity.bs4.css',
+        'uikit.css',
+        'spinkit.css',
+        'cresenity/cresenity.main.bs4.css',
         // 'cresenity-demo-bs5.css',
         // 'cresenity-demo-bs5-theme.css',
         'cresenity-demo.css',
