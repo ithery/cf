@@ -1,6 +1,6 @@
 <?php
 
-class CAI_ServiceAbstract {
+abstract class CAI_ServiceAbstract {
     /**
      * LLM model.
      */
@@ -88,14 +88,10 @@ class CAI_ServiceAbstract {
     /**
      * Set LLM prompt text.
      */
-    public function ask(): string {
-        return $this->getModelInstance()->ask();
-    }
+    abstract public function ask();
 
     /**
      * Generate Images.
      */
-    public function images(array $options): array {
-        return $this->getModelInstance()->images($options);
-    }
+    abstract public function images(array $options);
 }

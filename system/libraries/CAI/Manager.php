@@ -11,7 +11,8 @@ class CAI_Manager {
         return self::$instance;
     }
 
-    public function createOpenAIService() {
+    public function createOpenAIService($options = []) {
+        return new CAI_Service_OpenAIService($options);
     }
 
     public function createOllamaService() {
