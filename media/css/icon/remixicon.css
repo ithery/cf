@@ -43,8 +43,8 @@
 
 @font-face {
     font-family: "remixicon";
-    src: url("remixicon.eot?t=1708865856766");
-    src: url("remixicon.eot?t=1708865856766#iefix") format("embedded-opentype"), url("remixicon.woff2?t=1708865856766") format("woff2"), url("remixicon.woff?t=1708865856766") format("woff"), url("remixicon.ttf?t=1708865856766") format("truetype"), url("remixicon.svg?t=1708865856766#remixicon") format("svg");
+    src: url("remixicon/remixicon.eot?t=1708865856766");
+    src: url("remixicon/remixicon.eot?t=1708865856766#iefix") format("embedded-opentype"), url("remixicon/remixicon.woff2?t=1708865856766") format("woff2"), url("remixicon/remixicon.woff?t=1708865856766") format("woff"), url("remixicon/remixicon.ttf?t=1708865856766") format("truetype"), url("remixicon/remixicon.svg?t=1708865856766#remixicon") format("svg");
     font-display: swap;
 }
 [class^=ri-],[class*=" ri-"] { font-family: "remixicon" !important; font-style: normal; -webkit-font-smoothing: antialiased; -moz-osx-font-smoothing: grayscale; }
