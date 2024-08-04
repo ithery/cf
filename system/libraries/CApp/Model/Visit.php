@@ -7,7 +7,7 @@ class CApp_Model_Visit extends CModel {
      * @var array
      */
     protected $fillable = [
-        'method', 'request', 'url', 'referer',
+        'org_id', 'method', 'request', 'url', 'referer',
         'languages', 'useragent', 'headers',
         'device', 'platform', 'browser', 'ip',
         'visitor_id', 'visitor_type',

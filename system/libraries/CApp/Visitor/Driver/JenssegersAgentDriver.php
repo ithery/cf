@@ -54,6 +54,9 @@ class CApp_Visitor_Driver_JenssegersAgentDriver implements CApp_Visitor_Contract
      */
     protected function initParser(): CApp_Visitor_Agent {
         $parser = new CApp_Visitor_Agent();
+         // if($userAgent==null) {
+        //     \cdbg::dd(\cdbg::getTraceString());
+        // }
 
         $parser->setUserAgent($this->request->userAgent());
         $parser->setHttpHeaders((array) $this->request->headers);

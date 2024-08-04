@@ -53,7 +53,7 @@ class CApp_Visitor {
     public function __construct($config) {
         $this->request = c::request();
         $this->config = $config;
-        $this->except = $config['except'];
+        $this->except = carr::get($config, 'except', []);
         $this->via($this->config['default']);
         $this->setVisitor($this->request->user());
     }
@@ -266,7 +266,9 @@ class CApp_Visitor {
      * @return array
      */
     protected function prepareLog() : array {
+
         return [
+            'org_id' => c::app()->base()->orgId(),
             'method' => $this->method(),
             'request' => $this->request(),
             'url' => $this->url(),
@@ -310,7 +312,7 @@ class CApp_Visitor {
 
         $driverClass = $this->config['drivers'][$this->driver];
 
-        return c::container($driverClass);
+        return new $driverClass($this->request);
     }
 
     /**
@@ -331,7 +333,7 @@ class CApp_Visitor {
 
         $reflect = new \ReflectionClass($driverClass);
 
-        if (!$reflect->implementsInterface(UserAgentParser::class)) {
+        if (!$reflect->implementsInterface(CApp_Visitor_Contract_UserAgentParserInterface::class)) {
             throw new \Exception("Driver must be an instance of Contracts\Driver.");
         }
     }
