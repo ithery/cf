@@ -137,7 +137,10 @@ return [
             //except save request or route names
             'except' => ['login', 'register'],
             //name of the table which visit records should save in
-            'table_name' => 'shetabit_visits',
+            'table_name' => 'visit',
+            'model' => [
+                'visit' => CApp_Model_Visit::class,
+            ],
             'drivers' => [
                 'jenssegers' => \CApp_Visitor_Driver_JenssegersAgentDriver::class,
                 'UAParser' => \CApp_Visitor_Driver_UAParserDriver::class,

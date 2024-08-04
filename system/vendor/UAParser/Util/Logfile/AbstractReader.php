@@ -6,6 +6,7 @@
  *
  * Released under the MIT license
  */
+
 namespace UAParser\Util\Logfile;
 
 use UAParser\Exception\ReaderException;
@@ -13,22 +14,20 @@ use UAParser\Exception\ReaderException;
 abstract class AbstractReader implements ReaderInterface
 {
     /** @var ReaderInterface[] */
-    private static $readers = array();
+    private static $readers = [];
 
-    /**
-     * @param string $line
-     * @return ReaderInterface
-     */
-    public static function factory($line)
+    public static function factory(string $line): ReaderInterface
     {
         foreach (static::getReaders() as $reader) {
             if ($reader->test($line)) {
                 return $reader;
             }
         }
+
+        throw ReaderException::readerNotFound($line);
     }
 
-    private static function getReaders()
+    private static function getReaders(): array
     {
         if (static::$readers) {
             return static::$readers;
@@ -39,14 +38,14 @@ abstract class AbstractReader implements ReaderInterface
         return static::$readers;
     }
 
-    public function test($line)
+    public function test(string $line): bool
     {
         $matches = $this->match($line);
 
         return isset($matches['userAgentString']);
     }
 
-    public function read($line)
+    public function read(string $line): string
     {
         $matches = $this->match($line);
 
@@ -57,13 +56,13 @@ abstract class AbstractReader implements ReaderInterface
         return $matches['userAgentString'];
     }
 
-    protected function match($line)
+    protected function match(string $line): array
     {
         if (preg_match($this->getRegex(), $line, $matches)) {
             return $matches;
         }
 
-        return array();
+        return [];
     }
 
     abstract protected function getRegex();
