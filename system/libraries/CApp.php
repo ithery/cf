@@ -59,7 +59,6 @@ class CApp implements CInterface_Responsable, CInterface_Renderable, CInterface_
         CApp_Concern_AuthTrait,
         CApp_Concern_BootstrapTrait,
         CApp_Concern_TitleTrait;
-
     public static $instance = null;
 
     protected $renderer;
@@ -111,6 +110,8 @@ class CApp implements CInterface_Responsable, CInterface_Renderable, CInterface_
     private static $haveScrollToTop = null;
 
     private $coreModuleIsRegistered = false;
+
+    private $visitor;
 
     public function __construct($domain = null) {
         $this->element = new CApp_Element();
@@ -685,5 +686,16 @@ class CApp implements CInterface_Responsable, CInterface_Renderable, CInterface_
      */
     public function notification() {
         return CApp_Notification::instance();
+    }
+
+    /**
+     * @return CApp_Visitor
+     */
+    public function visitor() {
+        if ($this->visitor == null) {
+            $this->visitor = new CApp_Visitor(CF::config('app.visitor'));
+        }
+
+        return $this->visitor;
     }
 }

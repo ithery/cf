@@ -2055,6 +2055,13 @@ class c {
 
         return $basePath . implode('', $paths);
     }
+
+    /**
+     * @return CApp_Visitor
+     */
+    public static function visitor() {
+        return c::app()->visitor();
+    }
 }
 
 // End c

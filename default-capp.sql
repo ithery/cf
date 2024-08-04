@@ -328,8 +328,6 @@ CREATE TABLE `queue_batch` (
   CONSTRAINT `queue_batch_ibfk_1` FOREIGN KEY (`org_id`) REFERENCES `org` (`org_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
-
-
 CREATE TABLE `meta` (
   `meta_id` bigint(20) unsigned NOT NULL AUTO_INCREMENT,
   `org_id` bigint(20) unsigned DEFAULT NULL,
@@ -349,6 +347,38 @@ CREATE TABLE `meta` (
   UNIQUE KEY `meta_id` (`meta_id`),
   CONSTRAINT `meta_ibfk_1` FOREIGN KEY (`org_id`) REFERENCES `org` (`org_id`),
   KEY `meta__metable_id_metable_type_index` (`metable_id`,`metable_type`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE utf8mb4_unicode_ci;
+
+CREATE TABLE `visit` (
+  `visit_id` bigint(20) unsigned NOT NULL AUTO_INCREMENT,
+  `org_id` bigint(20) unsigned DEFAULT NULL,
+  `method` varchar(255) DEFAULT NULL,
+  `request` MEDIUMTEXT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `url` MEDIUMTEXT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `referer` MEDIUMTEXT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `languages` text CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `useragent` text CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `headers` text CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `device` text CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `platform` text CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `browser` text CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `ip` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `visitable_type` varchar(255) NOT NULL,
+  `visitable_id` bigint(20) unsigned NOT NULL,
+  `visitor_type` varchar(255) NOT NULL,
+  `visitor_id` bigint(20) unsigned NOT NULL,
+  `created` datetime DEFAULT NULL,
+  `updated` datetime DEFAULT NULL,
+  `status` int(11) NOT NULL DEFAULT 1,
+  `createdby` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `updatedby` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `deleted` datetime DEFAULT NULL,
+  `deletedby` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  PRIMARY KEY (`visit_id`),
+  UNIQUE KEY `visit_id` (`visit_id`),
+  CONSTRAINT `visit_ibfk_1` FOREIGN KEY (`org_id`) REFERENCES `org` (`org_id`),
+  KEY `visit__visitable_id_visitable_type_index` (`visitable_id`,`visitable_type`),
+  KEY `visit__visitor_id_visitor_type_index` (`visitor_id`,`visitor_type`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE utf8mb4_unicode_ci;
 
 
