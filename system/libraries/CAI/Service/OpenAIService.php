@@ -1,17 +1,18 @@
 <?php
 
 use OpenAI\OpenAI;
+
 class CAI_Service_OpenAIService extends CAI_ServiceAbstract {
     protected $apiKey;
+
     protected $organization;
 
     /**
-     * @var \OpenAI\OpenAI
+     * @var \OpenAI\Client
      */
     protected $openAI;
 
-    public function __construct($options=[])
-    {
+    public function __construct($options = []) {
         $this->apiKey = carr::get($options, 'api_key');
         $this->organization = carr::get($options, 'organization');
         $project = carr::get($options, 'project');
@@ -27,21 +28,20 @@ class CAI_Service_OpenAIService extends CAI_ServiceAbstract {
 
     public function ask() {
         $result = $this->openAI->chat()->create([
-            'model'       => $this->model,
+            'model' => $this->model,
             'temperature' => $this->temperature,
-            'messages'    => [
+            'messages' => [
                 [
-                    'role'    => 'user',
+                    'role' => 'user',
                     'content' => $this->prompt,
                 ],
             ],
         ]);
 
-        return $result->choices[0]->message->content;
+        return c::optional($result)->choices[0]->message->content;
     }
 
     public function images(array $options) {
-
     }
 
     public function getOpenAI() {

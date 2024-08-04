@@ -11,6 +11,11 @@ class CAI_Manager {
         return self::$instance;
     }
 
+    /**
+     * @param array $options
+     *
+     * @return CAI_Service_OpenAIServicevoid
+     */
     public function createOpenAIService($options = []) {
         return new CAI_Service_OpenAIService($options);
     }
