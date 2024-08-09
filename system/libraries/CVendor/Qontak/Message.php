@@ -74,14 +74,14 @@ final class CVendor_Qontak_Message {
         return $this;
     }
 
-    public function setLanguage(string $to, string $name) {
-        $this->language = new CVendor_Qontak_Message_Language($to, $name);
+    public function setLanguage(string $code) {
+        $this->language = new CVendor_Qontak_Message_Language($code);
 
         return $this;
     }
 
-    public function addBody(string $code) {
-        $this->body[] = new CVendor_Qontak_Message_Body($code);
+    public function addBody(string $value) {
+        $this->body[] = new CVendor_Qontak_Message_Body($value);
 
         return $this;
     }
