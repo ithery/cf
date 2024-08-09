@@ -270,4 +270,11 @@ class CVendor {
     public static function figma() {
         return new CBase_ForwarderStaticClass(CVendor_Figma::class);
     }
+
+    /**
+     * @return \CVendor_Qontak|CBase_ForwarderStaticClass
+     */
+    public static function qontak() {
+        return new CBase_ForwarderStaticClass(CVendor_Qontak::class);
+    }
 }

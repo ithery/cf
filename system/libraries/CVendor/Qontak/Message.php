@@ -28,7 +28,7 @@ final class CVendor_Qontak_Message {
      */
     private $buttons;
 
-    public function __construct(CVendor_Qontak_Message_Receiver $receiver, ?CVendor_Qontak_Message_Language $language = null, array $body = [], ?CVendor_Qontak_Message_Header $header = null, array $buttons = []) {
+    public function __construct(?CVendor_Qontak_Message_Receiver $receiver = null, ?CVendor_Qontak_Message_Language $language = null, array $body = [], ?CVendor_Qontak_Message_Header $header = null, array $buttons = []) {
         $this->receiver = $receiver;
 
         $this->language = $language ?? new CVendor_Qontak_Message_Language('id');
@@ -66,5 +66,35 @@ final class CVendor_Qontak_Message {
      */
     public function getButtons(): array {
         return $this->buttons;
+    }
+
+    public function setReceiver(string $to, string $name) {
+        $this->receiver = new CVendor_Qontak_Message_Receiver($to, $name);
+
+        return $this;
+    }
+
+    public function setLanguage(string $to, string $name) {
+        $this->language = new CVendor_Qontak_Message_Language($to, $name);
+
+        return $this;
+    }
+
+    public function addBody(string $code) {
+        $this->body[] = new CVendor_Qontak_Message_Body($code);
+
+        return $this;
+    }
+
+    public function setHeader(string $format, string $url, string $filename) {
+        $this->header = new CVendor_Qontak_Message_Header($format, $url, $filename);
+
+        return $this;
+    }
+
+    public function addButton(string $type, string $value) {
+        $this->buttons[] = new CVendor_Qontak_Message_Button($type, $value);
+
+        return $this;
     }
 }
