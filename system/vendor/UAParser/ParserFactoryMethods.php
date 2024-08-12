@@ -63,6 +63,6 @@ trait ParserFactoryMethods
 
     protected static function getDefaultFile(): string
     {
-        return self::$defaultFile ?: dirname(__DIR__).'/resources'.DIRECTORY_SEPARATOR.'regexes.php';
+        return self::$defaultFile ?: dirname(__DIR__).'/UAParser'.DIRECTORY_SEPARATOR.'regexes.php';
     }
 }
