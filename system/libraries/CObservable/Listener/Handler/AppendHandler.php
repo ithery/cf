@@ -32,7 +32,7 @@ class CObservable_Listener_Handler_AppendHandler extends CObservable_Listener_Ha
         $this->paramInputsByName = [];
         $this->paramRequest = [];
         $this->url = '';
-        $this->urlParam = [];
+        // $this->urlParam = [];
     }
 
     public function content() {
