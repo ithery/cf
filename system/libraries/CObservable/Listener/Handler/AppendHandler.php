@@ -27,7 +27,7 @@ class CObservable_Listener_Handler_AppendHandler extends CObservable_Listener_Ha
         $this->name = 'Append';
         $this->method = 'get';
         $this->target = '';
-        $this->content = CHandlerElement::factory();
+        $this->content = CObservable_HandlerElement::factory();
         $this->paramInputs = [];
         $this->paramInputsByName = [];
         $this->paramRequest = [];
