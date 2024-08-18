@@ -35,7 +35,7 @@ abstract class CManager_DataProviderAbstract {
             return false;
         }
 
-        return is_callable($callable) || ($callable instanceof \Opis\Closure\SerializableClosure);
+        return is_callable($callable) || ($callable instanceof \Opis\Closure\SerializableClosure) || ($callable instanceof CFunction_SerializableClosure);
     }
 
     protected function callCallable($callable, array $args = []) {
@@ -43,6 +43,9 @@ abstract class CManager_DataProviderAbstract {
             return call_user_func_array($callable, $args);
         }
         if ($callable instanceof \Opis\Closure\SerializableClosure) {
+            return $callable->__invoke(...$args);
+        }
+        if ($callable instanceof \CFunction_SerializableClosure) {
             return $callable->__invoke(...$args);
         }
 
