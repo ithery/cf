@@ -238,6 +238,7 @@ class CManager_DataProvider_ModelDataProvider extends CManager_DataProviderAbstr
             $currentModel = $joinModel;
             $joinIndex++;
             $columnAlias = $joinAlias;
+            $beforeAlias = $joinAlias;
         }
 
         if ($relation instanceof CModel_Relation_BelongsTo) {
