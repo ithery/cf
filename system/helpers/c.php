@@ -2062,6 +2062,13 @@ class c {
     public static function visitor() {
         return c::app()->visitor();
     }
+
+    public static function randmd5() {
+        $rand = rand(0, 9999);
+        $base = date('YmdHis') . $rand;
+
+        return md5($rand);
+    }
 }
 
 // End c

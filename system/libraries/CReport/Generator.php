@@ -71,6 +71,8 @@ class CReport_Generator {
      */
     protected $instructions;
 
+    private $columnFooterDrawn;
+
     public function __construct(CReport_Builder_Report $report, CReport_Builder_Dictionary $dictionary, CManager_Contract_DataProviderInterface $dataProvider = null) {
         $this->report = $report;
         $this->dictionary = $dictionary;
@@ -84,6 +86,7 @@ class CReport_Generator {
         $this->isProcessingPageFooter = false;
         $this->isProcessingDetail = false;
         $this->instructions = [];
+        $this->columnFooterDrawn = false;
     }
 
     public function setProcessingPageFooter($bool) {
@@ -177,8 +180,19 @@ class CReport_Generator {
 
     public function incrementPageNumber() {
         $this->pageNumber++;
+        $this->columnFooterDrawn = false;
 
         return $this;
+    }
+
+    public function setColumnFooterDrawn($bool = true) {
+        $this->columnFooterDrawn = $bool;
+
+        return $this;
+    }
+
+    public function isColumnFooterDrawn() {
+        return $this->columnFooterDrawn;
     }
 
     public function getPageNumber() {
