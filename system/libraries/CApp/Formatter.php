@@ -161,7 +161,12 @@ class CApp_Formatter {
 
     public function unformatDate($x, $fromFormat = null) {
         $dateFormat = $fromFormat ?: $this->dateFormat;
-        $date = CCarbon::createFromLocaleFormat($dateFormat, CCarbon::getLocale(), $x);
+
+        try {
+            $date = CCarbon::createFromLocaleFormat($dateFormat, CCarbon::getLocale(), $x);
+        } catch (Exception $ex) {
+            $date = CCarbon::parse($x);
+        }
 
         return $date->format('Y-m-d');
     }
