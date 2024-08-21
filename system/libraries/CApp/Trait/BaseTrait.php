@@ -175,7 +175,7 @@ trait CApp_Trait_BaseTrait {
     /**
      * User from session.
      *
-     * @return null|stdClass
+     * @return null|stdClass|CModel
      */
     public static function user() {
         return c::app()->user();
