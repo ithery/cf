@@ -115,7 +115,6 @@ final class CVendor_Qontak_Client implements CVendor_Qontak_ClientInterface {
 
             /** @var array<array-key, string> $body */
             $body = \json_decode((string) $response->getBody(), true);
-            cdbg::dd($body);
             Assert::keyExists($body, 'access_token');
 
             $this->accessToken = $body['access_token'];
