@@ -208,10 +208,10 @@ trait CApp_Trait_BaseTrait {
      * @return string
      */
     public static function username() {
-        $app = CApp::instance();
+        $app = c::app();
         $user = $app->user();
         if ($user != null) {
-            return $user->username;
+            return $user->username ?: $user->email;
         }
 
         return 'system';
@@ -221,7 +221,7 @@ trait CApp_Trait_BaseTrait {
      * @return CApp_Model_Roles
      */
     public static function role() {
-        $app = CApp::instance();
+        $app = c::app();
         $role = $app->role();
 
         return $role;
