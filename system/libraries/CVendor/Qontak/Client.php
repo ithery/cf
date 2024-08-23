@@ -34,6 +34,79 @@ final class CVendor_Qontak_Client implements CVendor_Qontak_ClientInterface {
         $this->credential = $credential;
     }
 
+    public function getChannelIntegrationList($targetChannel = null) {
+        $this->getAccessToken();
+        $url = 'https://chat-service.qontak.com/api/open/v1/integrations';
+        if ($targetChannel) {
+            $url .= '?target_channel=' . $targetChannel;
+        }
+        $response = $this->httpClient->get(
+            $url,
+            [
+                'content-type' => 'application/json',
+                'Authorization' => \sprintf('Bearer %s', $this->accessToken ?? ''),
+            ]
+        );
+
+        if ($response->getStatusCode() >= 200 && $response->getStatusCode() < 300) {
+            /** @var array $responseBody */
+            $responseBody = \json_decode((string) $response->getBody(), true);
+
+            return $responseBody;
+        }
+
+        throw CVendor_Qontak_Exception_ClientSendingException::make($response);
+    }
+
+    /**
+     * @param mixed $templateId
+     *
+     * @return array
+     */
+    public function getWhatsAppTemplate($templateId) {
+        $this->getAccessToken();
+
+        $response = $this->httpClient->get(
+            'https://chat-service.qontak.com/api/open/v1/templates/' . $templateId . '/whatsapp',
+            [
+                'content-type' => 'application/json',
+                'Authorization' => \sprintf('Bearer %s', $this->accessToken ?? ''),
+            ]
+        );
+        if ($response->getStatusCode() >= 200 && $response->getStatusCode() < 300) {
+            /** @var array $responseBody */
+            $responseBody = \json_decode((string) $response->getBody(), true);
+
+            return $responseBody;
+        }
+
+        throw CVendor_Qontak_Exception_ClientSendingException::make($response);
+    }
+
+    /**
+     * @return array
+     */
+    public function getWhatsAppTemplateList() {
+        $this->getAccessToken();
+
+        $response = $this->httpClient->get(
+            'https://service-chat.qontak.com/api/open/v1/templates/whatsapp?query=&offset=1&limit=10&cursor_direction=after&order_by=created_at&order_direction=desc&status=Approved&hsm_chat=true&is_counted=true',
+            [
+                'content-type' => 'application/json',
+                'Authorization' => \sprintf('Bearer %s', $this->accessToken ?? ''),
+            ]
+        );
+
+        if ($response->getStatusCode() >= 200 && $response->getStatusCode() < 300) {
+            /** @var array $responseBody */
+            $responseBody = \json_decode((string) $response->getBody(), true);
+
+            return $responseBody;
+        }
+
+        throw CVendor_Qontak_Exception_ClientSendingException::make($response);
+    }
+
     public function getContactList($channelIntegrationId, $phoneNumbers = []) {
         $this->getAccessToken();
 
@@ -49,7 +122,6 @@ final class CVendor_Qontak_Client implements CVendor_Qontak_ClientInterface {
             ])
         );
 
-        cdbg::dd($response);
         if ($response->getStatusCode() >= 200 && $response->getStatusCode() < 300) {
             /** @var array $responseBody */
             $responseBody = \json_decode((string) $response->getBody(), true);
@@ -115,7 +187,6 @@ final class CVendor_Qontak_Client implements CVendor_Qontak_ClientInterface {
 
             /** @var array<array-key, string> $body */
             $body = \json_decode((string) $response->getBody(), true);
-            cdbg::dd($body);
             Assert::keyExists($body, 'access_token');
 
             $this->accessToken = $body['access_token'];
