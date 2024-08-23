@@ -107,33 +107,48 @@ final class CVendor_Qontak_Client implements CVendor_Qontak_ClientInterface {
         throw CVendor_Qontak_Exception_ClientSendingException::make($response);
     }
 
-    public function getContactList($channelIntegrationId, $phoneNumbers = []) {
+    public function getRoomList() {
         $this->getAccessToken();
-
-        $response = $this->httpClient->post(
-            'https://service-chat.qontak.com/api/open/v1/contacts/contact_list',
+        // $url = 'https://service-chat.qontak.com/api/open/v1/contacts/contact_lists?limit=5&offset=1&is_counted=true&query=&cursor=x&cursor_direction=after&order_by=created_at&order_direction=desc&finished=true';
+        // $url = 'https://service-chat.qontak.com/api/open/v1/contacts/contact_lists';
+        $url = 'https://service-chat.qontak.com/api/open/v1/rooms?status=unassigned&offset=1&limit=10';
+        $url = 'https://service-chat.qontak.com/api/open/v1/rooms';
+        $response = $this->httpClient->get(
+            $url,
             [
                 'content-type' => 'application/json',
                 'Authorization' => \sprintf('Bearer %s', $this->accessToken ?? ''),
-            ],
-            \json_encode([
-                'channel_integration_id' => $channelIntegrationId,
-                'phone_numbers' => $phoneNumbers,
-            ])
+            ]
         );
 
         if ($response->getStatusCode() >= 200 && $response->getStatusCode() < 300) {
             /** @var array $responseBody */
             $responseBody = \json_decode((string) $response->getBody(), true);
 
-            Assert::keyExists($responseBody, 'data');
+            return $responseBody;
+        }
 
-            /** @var array<string, string|int> $responseData */
-            $responseData = $responseBody['data'];
-            Assert::keyExists($responseData, 'id');
-            Assert::keyExists($responseData, 'name');
+        throw CVendor_Qontak_Exception_ClientSendingException::make($response);
+    }
 
-            return new CVendor_Qontak_Response((string) $responseData['id'], (string) $responseData['name'], $responseData);
+    public function getContactList() {
+        $this->getAccessToken();
+        // $url = 'https://service-chat.qontak.com/api/open/v1/contacts/contact_lists?limit=5&offset=1&is_counted=true&query=&cursor=x&cursor_direction=after&order_by=created_at&order_direction=desc&finished=true';
+        // $url = 'https://service-chat.qontak.com/api/open/v1/contacts/contact_lists';
+        $url = 'https://service-chat.qontak.com/api/open/v1/contacts/contact_lists';
+        $response = $this->httpClient->get(
+            $url,
+            [
+                'content-type' => 'application/json',
+                'Authorization' => \sprintf('Bearer %s', $this->accessToken ?? ''),
+            ]
+        );
+
+        if ($response->getStatusCode() >= 200 && $response->getStatusCode() < 300) {
+            /** @var array $responseBody */
+            $responseBody = \json_decode((string) $response->getBody(), true);
+
+            return $responseBody;
         }
 
         throw CVendor_Qontak_Exception_ClientSendingException::make($response);
