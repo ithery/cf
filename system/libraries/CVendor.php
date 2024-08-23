@@ -78,12 +78,10 @@ class CVendor {
     }
 
     /**
-     * @param array $options
-     *
      * @return \CVendor_Namecheap
      */
-    public static function namecheap($options) {
-        return new CVendor_Namecheap($options);
+    public static function namecheap() {
+        return new CVendor_Namecheap();
     }
 
     /**
