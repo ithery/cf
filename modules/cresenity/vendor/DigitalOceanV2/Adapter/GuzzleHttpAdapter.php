@@ -2,22 +2,21 @@
 
 namespace DigitalOceanV2\Adapter;
 
-use DigitalOceanV2\Exception\HttpException;
 use GuzzleHttp\Client;
-use GuzzleHttp\ClientInterface;
-use GuzzleHttp\Exception\RequestException;
-use GuzzleHttp\Message\ResponseInterface;
 use GuzzleHttp\Psr7\Response;
+use GuzzleHttp\ClientInterface;
+use GuzzleHttp\Message\ResponseInterface;
+use GuzzleHttp\Exception\RequestException;
+use DigitalOceanV2\Exception\HttpException;
 
 /**
  * @author Marcos Sigueros <alrik11es@gmail.com>
  * @author Chris Fidao <fideloper@gmail.com>
  * @author Graham Campbell <graham@alt-three.com>
  */
-class GuzzleHttpAdapter implements AdapterInterface
-{
+class GuzzleHttpAdapter implements AdapterInterface {
     /**
-     * @var ClientInterface
+     * @var Client
      */
     protected $client;
 
@@ -28,24 +27,16 @@ class GuzzleHttpAdapter implements AdapterInterface
 
     /**
      * @param string               $token
-     * @param ClientInterface|null $client
+     * @param null|ClientInterface $client
      */
-    public function __construct($token, ClientInterface $client = null)
-    {
-        if (version_compare(ClientInterface::VERSION, '6') === 1) {
-            $this->client = $client ?: new Client(['headers' => ['Authorization' => sprintf('Bearer %s', $token)]]);
-        } else {
-            $this->client = $client ?: new Client();
-
-            $this->client->setDefaultOption('headers/Authorization', sprintf('Bearer %s', $token));
-        }
+    public function __construct($token, ClientInterface $client = null) {
+        $this->client = $client ?: new Client(['headers' => ['Authorization' => sprintf('Bearer %s', $token)]]);
     }
 
     /**
-     * {@inheritdoc}
+     * @inheritdoc
      */
-    public function get($url)
-    {
+    public function get($url) {
         try {
             $this->response = $this->client->get($url);
         } catch (RequestException $e) {
@@ -57,10 +48,9 @@ class GuzzleHttpAdapter implements AdapterInterface
     }
 
     /**
-     * {@inheritdoc}
+     * @inheritdoc
      */
-    public function delete($url)
-    {
+    public function delete($url) {
         try {
             $this->response = $this->client->delete($url);
         } catch (RequestException $e) {
@@ -72,10 +62,9 @@ class GuzzleHttpAdapter implements AdapterInterface
     }
 
     /**
-     * {@inheritdoc}
+     * @inheritdoc
      */
-    public function put($url, $content = '')
-    {
+    public function put($url, $content = '') {
         $options = [];
 
         $options[is_array($content) ? 'json' : 'body'] = $content;
@@ -91,10 +80,9 @@ class GuzzleHttpAdapter implements AdapterInterface
     }
 
     /**
-     * {@inheritdoc}
+     * @inheritdoc
      */
-    public function post($url, $content = '')
-    {
+    public function post($url, $content = '') {
         $options = [];
 
         $options[is_array($content) ? 'json' : 'body'] = $content;
@@ -110,10 +98,9 @@ class GuzzleHttpAdapter implements AdapterInterface
     }
 
     /**
-     * {@inheritdoc}
+     * @inheritdoc
      */
-    public function getLatestResponseHeaders()
-    {
+    public function getLatestResponseHeaders() {
         if (null === $this->response) {
             return;
         }
@@ -128,8 +115,7 @@ class GuzzleHttpAdapter implements AdapterInterface
     /**
      * @throws HttpException
      */
-    protected function handleError()
-    {
+    protected function handleError() {
         $body = (string) $this->response->getBody();
         $code = (int) $this->response->getStatusCode();
 
