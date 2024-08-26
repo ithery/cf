@@ -249,4 +249,11 @@ class CVendor {
     public static function tugasHarian() {
         return new CBase_ForwarderStaticClass(CVendor_TugasHarian::class);
     }
+
+    /**
+     * @return \CVendor_Qontak|CBase_ForwarderStaticClass
+     */
+    public static function qontak() {
+        return new CBase_ForwarderStaticClass(CVendor_Qontak::class);
+    }
 }
