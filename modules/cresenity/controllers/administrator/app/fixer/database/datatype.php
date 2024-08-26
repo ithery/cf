@@ -27,14 +27,15 @@ class Controller_Administrator_App_Fixer_Database_Datatype extends CApp_Administ
     public function check() {
         $app = CApp::instance();
 
-        $db = CDatabase::instance();
+        $db = c::db();
         $schemaManager = $db->getSchemaManager();
         $tables = $schemaManager->listTableNames();
         $haveChanged = false;
         foreach ($tables as $table) {
-            $sql = DatabaseFixer::sqlDataType($table);
+            $sqls = DatabaseFixer::sqlDataType($table);
 
-            if (strlen($sql) > 0) {
+            if (count($sqls) > 0) {
+                $sql = implode(";\n", $sqls);
                 $template = $app->addTemplate()
                     ->setTemplate('CApp/Administrator/Fixer/Database/DataType/Result')
                     ->setVar('table', $table)
@@ -56,9 +57,10 @@ class Controller_Administrator_App_Fixer_Database_Datatype extends CApp_Administ
 
     public function execute($table) {
         $sql = DatabaseFixer::sqlDataType($table);
-        $db = CDatabase::instance();
+        $db = c::db();
         $errCode = 0;
         $errMessage = '';
+
         try {
             $db->query($sql);
         } catch (Exception $ex) {
