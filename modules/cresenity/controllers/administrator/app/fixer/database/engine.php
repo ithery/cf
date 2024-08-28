@@ -25,9 +25,9 @@ class Controller_Administrator_App_Fixer_Database_Engine extends CApp_Administra
     }
 
     public function check() {
-        $app = CApp::instance();
+        $app = c::app();
 
-        $db = CDatabase::instance();
+        $db = c::db();
         $schemaManager = $db->getSchemaManager();
         $tables = $schemaManager->listTableNames();
         $haveChanged = false;
@@ -56,9 +56,10 @@ class Controller_Administrator_App_Fixer_Database_Engine extends CApp_Administra
 
     public function execute($table) {
         $sql = $this->getSqlResult($table);
-        $db = CDatabase::instance();
+        $db = c::db();
         $errCode = 0;
         $errMessage = '';
+
         try {
             $db->query($sql);
         } catch (Exception $ex) {
@@ -69,7 +70,7 @@ class Controller_Administrator_App_Fixer_Database_Engine extends CApp_Administra
     }
 
     private function getSqlResult($table) {
-        $db = CDatabase::instance();
+        $db = c::db();
         $schemaManager = $db->getSchemaManager();
         $schema = $schemaManager->createSchema();
         $columnsData = $schemaManager->listTableColumns($table);
@@ -106,6 +107,7 @@ class Controller_Administrator_App_Fixer_Database_Engine extends CApp_Administra
             $sql = implode(";\n", $sqlArray);
             $sql .= ';';
         }
+
         return $sql;
     }
 }
