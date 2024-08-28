@@ -19,7 +19,7 @@ class CEmail_Driver_SmtpDriver extends CEmail_DriverAbstract {
             $this->debug = carr::get($options, 'debug');
 
             return $this->sendEmail($to, $subject, $body, $options);
-        } catch (\Exception $e) {
+        } catch (Exception $e) {
             // something failed
             // disconnect if needed
             if ($this->smtpConnection) {
@@ -86,7 +86,7 @@ class CEmail_Driver_SmtpDriver extends CEmail_DriverAbstract {
         }
 
         // Set return path
-        $returnPath = carr::get($options, 'returnPath', carr::get($options, 'from'));
+        $returnPath = carr::get($options, 'returnPath', $this->config->getFrom());
         $this->debug('MAIL FROM:<' . $returnPath . '>');
         $this->debug($this->smtpSend('MAIL FROM:<' . $returnPath . '>', 250));
 
@@ -114,13 +114,63 @@ class CEmail_Driver_SmtpDriver extends CEmail_DriverAbstract {
 
         $lines = explode($this->newline(), $message['header'] . preg_replace('/^\./m', '..$1', $message['body']));
 
-        foreach ($lines as $line) {
-            if (substr($line, 0, 1) === '.') {
-                $line = '.' . $line;
-            }
-            $this->debug(($line . $newLine));
-            fputs($this->smtpConnection, $line . $newLine);
+        $field = substr($lines[0], 0, strpos($lines[0], ':'));
+        $in_headers = false;
+        if (!empty($field) && strpos($field, ' ') === false) {
+            $in_headers = true;
         }
+
+        $MAX_LINE_LENGTH = 998;
+
+        foreach ($lines as $line) {
+            $lines_out = [];
+            if ($in_headers && $line === '') {
+                $in_headers = false;
+            }
+            //Break this line up into several smaller lines if it's too long
+            //Micro-optimisation: isset($str[$len]) is faster than (strlen($str) > $len),
+            while (isset($line[$MAX_LINE_LENGTH])) {
+                //Working backwards, try to find a space within the last MAX_LINE_LENGTH chars of the line to break on
+                //so as to avoid breaking in the middle of a word
+                $pos = strrpos(substr($line, 0, $MAX_LINE_LENGTH), ' ');
+                //Deliberately matches both false and 0
+                if (!$pos) {
+                    //No nice break found, add a hard break
+                    $pos = $MAX_LINE_LENGTH - 1;
+                    $lines_out[] = substr($line, 0, $pos);
+                    $line = substr($line, $pos);
+                } else {
+                    //Break at the found point
+                    $lines_out[] = substr($line, 0, $pos);
+                    //Move along by the amount we dealt with
+                    $line = substr($line, $pos + 1);
+                }
+                //If processing headers add a LWSP-char to the front of new line RFC822 section 3.1.1
+                if ($in_headers) {
+                    $line = "\t" . $line;
+                }
+            }
+            $lines_out[] = $line;
+
+            //Send the lines to the server
+            foreach ($lines_out as $line_out) {
+                //Dot-stuffing as per RFC5321 section 4.5.2
+                //https://tools.ietf.org/html/rfc5321#section-4.5.2
+                if (!empty($line_out) && $line_out[0] === '.') {
+                    $line_out = '.' . $line_out;
+                }
+                $this->debug(($line_out . "\r\n"));
+                fwrite($this->smtpConnection, $line_out . "\r\n");
+            }
+        }
+
+        // foreach ($lines as $line) {
+        //     if (substr($line, 0, 1) === '.') {
+        //         $line = '.' . $line;
+        //     }
+        //     $this->debug(($line . $newLine));
+        //     fwrite($this->smtpConnection, $line . $newLine);
+        // }
 
         // Finish the message
         $this->debug('.');
@@ -148,9 +198,9 @@ class CEmail_Driver_SmtpDriver extends CEmail_DriverAbstract {
         $secure = $this->config->getSecure();
         $protocol = $this->config->getProtocol();
         // add a transport if not given
-        if (strpos($smtpHost, '://') === false) {
-            $smtpHost = $protocol . '://' . $smtpHost;
-        }
+        // if (strpos($smtpHost, '://') === false) {
+        //     $smtpHost = $protocol . '://' . $smtpHost;
+        // }
 
         $context = stream_context_create();
         if (is_array($smtpOptions) and !empty($smtpOptions)) {
@@ -172,6 +222,7 @@ class CEmail_Driver_SmtpDriver extends CEmail_DriverAbstract {
 
         // Clear the smtp response
         $this->debug($this->smtpGetResponse());
+
         // Just say hello!
         try {
             $this->debug('EHLO' . ' ' . c::request()->server('SERVER_NAME', 'localhost.local'));
@@ -269,15 +320,15 @@ class CEmail_Driver_SmtpDriver extends CEmail_DriverAbstract {
      * @param string|bool|string $expecting    The expected response
      * @param bool               $returnNumber Set to true to return the status number
      *
-     * @throws \CEmail_Exception_SmtpCommandFailureException when the command failed an expecting is not set to false
-     * @throws \CEmail_Exception_SmtpTimeoutException        SMTP connection timed out
+     * @throws CEmail_Exception_SmtpCommandFailureException when the command failed an expecting is not set to false
+     * @throws CEmail_Exception_SmtpTimeoutException        SMTP connection timed out
      *
      * @return mixed Result or result number, false when expecting is false
      */
     protected function smtpSend($data, $expecting, $returnNumber = false) {
         !is_array($expecting) and $expecting !== false and $expecting = [$expecting];
         stream_set_timeout($this->smtpConnection, $this->getTimeout());
-        if (!fputs($this->smtpConnection, $data . $this->newline())) {
+        if (!fwrite($this->smtpConnection, $data . "\r\n")) {
             if ($expecting === false) {
                 return false;
             }
@@ -320,7 +371,7 @@ class CEmail_Driver_SmtpDriver extends CEmail_DriverAbstract {
     /**
      * Get SMTP response.
      *
-     * @throws \CEmail_Exception_SmtpTimeoutException
+     * @throws CEmail_Exception_SmtpTimeoutException
      *
      * @return string SMTP response
      */
@@ -347,7 +398,7 @@ class CEmail_Driver_SmtpDriver extends CEmail_DriverAbstract {
     }
 
     public function newline() {
-        return $this->config->getOption('newline', PHP_EOL);
+        return $this->config->getOption('newline', "\r\n");
     }
 
     public function debug($message) {
