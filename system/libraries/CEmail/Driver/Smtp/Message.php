@@ -11,14 +11,26 @@ class CEmail_Driver_Smtp_Message {
 
     protected $options;
 
+    protected $type;
+
+    protected $boundaries;
+
+    protected $alt_body;
+
     public function __construct($to, $body, $subject, CEmail_Config $config, $options) {
         $this->config = $config;
         $this->options = $options;
         $this->body = $body;
         $this->headers = [];
         $this->extraHeaders = [];
+
+        $from = $this->config->getFrom();
+        if ($this->config->getFromName()) {
+            $from = $this->config->getFromName() . ' <' . $this->config->getFrom() . '>';
+        }
+
         $this->setHeader('Subject', $subject);
-        $this->setHeader('From', $this->config->getOption('username'));
+        $this->setHeader('From', $from);
         $this->setHeader('To', CEmail_DriverAbstract::formatAddresses($to));
 
         foreach (['cc' => 'Cc', 'bcc' => 'Bcc', 'reply_to' => 'Reply-To'] as $key => $header) {
@@ -187,7 +199,6 @@ class CEmail_Driver_Smtp_Message {
      * @return string Mimeheader encoded string
      */
     protected function encodeMimeheader($header) {
-
         // determine the transfer encoding to be used
         $transferEncoding = ($this->encoding() === 'quoted-printable') ? 'Q' : 'B';
 
@@ -234,7 +245,7 @@ class CEmail_Driver_Smtp_Message {
     }
 
     public function newline() {
-        return $this->config->getOption('newline', PHP_EOL);
+        return $this->config->getOption('newline', "\r\n");
     }
 
     /**

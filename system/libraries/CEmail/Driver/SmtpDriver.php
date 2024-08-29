@@ -91,12 +91,10 @@ class CEmail_Driver_SmtpDriver extends CEmail_DriverAbstract {
         $this->debug($this->smtpSend('MAIL FROM:<' . $returnPath . '>', 250));
 
         foreach ([$this->arrayAddresses($to), carr::get($options, 'cc', []), carr::get($options, 'bcc', [])] as $addresses) {
-            if (is_string($addresses)) {
-                $addresses = $this->arrayAddresses(carr::get($options, $addresses, []), true);
-            }
-            foreach ($addresses as $recipient) {
-                $this->debug('RCPT TO:<' . $recipient . '>');
-                $this->debug($this->smtpSend('RCPT TO:<' . $recipient . '>', [250, 251]));
+            $rcpt = $this->formatAddresses($addresses);
+            if (strlen($rcpt) > 0) {
+                $this->debug('RCPT TO:<' . $rcpt . '>');
+                $this->debug($this->smtpSend('RCPT TO:<' . $rcpt . '>', [250, 251]));
             }
         }
 
@@ -198,9 +196,9 @@ class CEmail_Driver_SmtpDriver extends CEmail_DriverAbstract {
         $secure = $this->config->getSecure();
         $protocol = $this->config->getProtocol();
         // add a transport if not given
-        // if (strpos($smtpHost, '://') === false) {
-        //     $smtpHost = $protocol . '://' . $smtpHost;
-        // }
+        if (strpos($smtpHost, '://') === false) {
+            $smtpHost = $protocol . '://' . $smtpHost;
+        }
 
         $context = stream_context_create();
         if (is_array($smtpOptions) and !empty($smtpOptions)) {
