@@ -105,6 +105,42 @@ class CManager_DataProvider_ModelDataProvider extends CManager_DataProviderAbstr
             });
         }
 
+        if (count($this->searchFullTextOr) > 0) {
+            $dataSearch = $this->searchFullTextOr;
+            $query->where(function (CModel_Query $q) use ($dataSearch, $aggregateFields) {
+                foreach ($dataSearch as $fieldName => $value) {
+                    if ($this->isCallable($value)) {
+                        $q->orWhere(function ($q) use ($value) {
+                            $this->callCallable($value, [$q]);
+                        });
+                    } else {
+                        if (strpos($fieldName, '.') !== false) {
+                            $fields = explode('.', $fieldName);
+
+                            $field = array_pop($fields);
+                            $relation = implode('.', $fields);
+                            $q->orWhereHas($relation, function ($q2) use ($value, $field) {
+                                $table = $q2->getModel()->getTable();
+
+                                // $q2->where($table . '.' . $field, 'like', '%' . $value . '%');
+                                $q2->whereFullText($table . '.' . $field, $value);
+                            });
+                        } else {
+                            //check this is aggregate field where or not
+                            if (in_array($fieldName, $aggregateFields)) {
+                                //TODO apply search on aggregateFields
+                            } else {
+                                if (!$this->isRelationField($q, $fieldName)) {
+                                    // $q->orWhere($fieldName, 'like', '%' . $value . '%');
+                                    $q->orWhereFullText($fieldName, $value);
+                                }
+                            }
+                        }
+                    }
+                }
+            });
+        }
+
         if (count($this->searchAnd) > 0) {
             $dataSearch = $this->searchAnd;
             $query->where(function (CModel_Query $q) use ($dataSearch, $aggregateFields) {

@@ -64,6 +64,13 @@ abstract class CAjax_Engine_SelectSearch_Processor implements CAjax_Engine_Selec
         return carr::wrap(carr::get($this->data, 'searchField', carr::get($this->data, 'search_field')));
     }
 
+    /**
+     * @return array
+     */
+    public function searchFullTextField() {
+        return carr::wrap(carr::get($this->data, 'searchFullTextField'));
+    }
+
     public function pageSize() {
         return $this->parameter->pageSize();
     }

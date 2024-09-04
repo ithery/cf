@@ -28,6 +28,11 @@ class CElement_FormInput_SelectSearch extends CElement_FormInput {
      */
     protected $searchField = [];
 
+    /**
+     * @var array
+     */
+    protected $searchFullTextField = [];
+
     protected $multiple;
 
     protected $autoSelect;
@@ -203,6 +208,26 @@ class CElement_FormInput_SelectSearch extends CElement_FormInput {
         return $this;
     }
 
+    /**
+     * @param string|array $setSearchFullTextField
+     * @param mixed        $searchField
+     *
+     * @return $this
+     */
+    public function setSearchFullTextField($searchField) {
+        $searchField = carr::wrap($searchField);
+        $this->searchFullTextField = $searchField;
+
+        if ($this->formatSelection == null) {
+            $this->formatSelection = '{' . carr::first($searchField) . '}';
+        }
+        if ($this->formatResult == null) {
+            $this->formatResult = '{' . carr::first($searchField) . '}';
+        }
+
+        return $this;
+    }
+
     public function setPrependData(array $data) {
         $this->prependData = $data;
 
@@ -307,6 +332,7 @@ class CElement_FormInput_SelectSearch extends CElement_FormInput {
         $ajaxMethod->setData('dataProvider', serialize($this->dataProvider));
         $ajaxMethod->setData('keyField', $this->keyField);
         $ajaxMethod->setData('searchField', $this->searchField);
+        $ajaxMethod->setData('searchFullTextField', $this->searchFullTextField);
         $ajaxMethod->setData('valueCallback', $this->valueCallback);
         $ajaxMethod->setData('formatSelection', serialize($this->formatSelection));
         $ajaxMethod->setData('formatResult', serialize($this->formatResult));

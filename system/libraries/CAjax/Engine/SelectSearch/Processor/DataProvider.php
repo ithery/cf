@@ -12,6 +12,7 @@ class CAjax_Engine_SelectSearch_Processor_DataProvider extends CAjax_Engine_Sele
 
         /** @var CManager_Contract_DataProviderInterface $query */
         $dataProvider->searchOr($this->getSearchDataOr());
+        $dataProvider->searchFullTextOr($this->getSearchFullTextDataOr());
         $dataProvider->sort($this->getSortData());
         $page = $this->parameter->page();
         $prependData = [];
@@ -87,6 +88,20 @@ class CAjax_Engine_SelectSearch_Processor_DataProvider extends CAjax_Engine_Sele
         $searchTerm = $this->searchTerm();
         if (strlen($searchTerm) > 0) {
             foreach ($this->searchField() as $field) {
+                if (strlen($field) > 0) {
+                    $searchData[$field] = $this->searchTerm();
+                }
+            }
+        }
+
+        return $searchData;
+    }
+
+    protected function getSearchFullTextDataOr() {
+        $searchData = [];
+        $searchTerm = $this->searchTerm();
+        if (strlen($searchTerm) > 0) {
+            foreach ($this->searchFullTextField() as $field) {
                 if (strlen($field) > 0) {
                     $searchData[$field] = $this->searchTerm();
                 }
