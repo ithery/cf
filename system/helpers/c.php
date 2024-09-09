@@ -332,7 +332,7 @@ class c {
      * @param null|string $message
      * @param array       $context
      *
-     * @return null|\CLogger
+     * @return null|\CLogger_Manager
      */
     public static function logger($message = null, array $context = []) {
         if (is_null($message)) {
