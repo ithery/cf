@@ -12,6 +12,8 @@ class CElement_Component_FileManager extends CElement_Component {
 
     protected $asPicker = false;
 
+    protected $enableAuth = false;
+
     /**
      * Overrides controllers for filemanager.
      *
@@ -74,10 +76,18 @@ class CElement_Component_FileManager extends CElement_Component {
         return $this;
     }
 
+    public function setEnableAuth($bool = true){
+        $this->enableAuth = $bool;
+        return $this;
+    }
+
     public function build() {
         $config = $this->buildConfig();
 
         $ajaxMethod = CAjax::createMethod()->setType(CAjax_Engine_FileManager::class)->setData('config', $config);
+        if (c::app()->isAuthEnabled() || $this->enableAuth) {
+            $ajaxMethod->enableAuth();
+        }
 
         $ajaxUrl = $ajaxMethod->makeUrl();
 
