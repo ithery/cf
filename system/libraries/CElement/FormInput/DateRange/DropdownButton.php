@@ -17,6 +17,10 @@ class CElement_FormInput_DateRange_DropdownButton extends CElement_FormInput_Dat
 
     protected $end;
 
+    protected $disableYesterday;
+
+    protected $disableTomorrow;
+
     protected $openDirection = 'left';
 
     protected $disableCustomRange = false;
@@ -30,6 +34,8 @@ class CElement_FormInput_DateRange_DropdownButton extends CElement_FormInput_Dat
     public function __construct($id) {
         parent::__construct($id);
         $this->tag = 'button';
+        $this->disableYesterday = false;
+        $this->disableTomorrow = false;
         $this->openDirection = 'left';
         $this->setAttr('capp-input', 'daterange-dropdownbutton');
         $this->addDefaultRange();
@@ -45,6 +51,18 @@ class CElement_FormInput_DateRange_DropdownButton extends CElement_FormInput_Dat
     public function setPreviewFormat($format) {
         $this->previewFormat = $format;
         $this->previewMomentFormat = $this->convertPHPToMomentFormat($this->previewFormat);
+
+        return $this;
+    }
+
+    public function setDisableYesterday($bool = true) {
+        $this->disableYesterday = $bool;
+
+        return $this;
+    }
+
+    public function setDisableTomorrow($bool = true) {
+        $this->disableTomorrow = $bool;
 
         return $this;
     }
@@ -96,6 +114,25 @@ class CElement_FormInput_DateRange_DropdownButton extends CElement_FormInput_Dat
             }
         }
 
+        $jsDisableDate = '';
+        $jsDisableYesterday = '';
+        if ($this->disableYesterday) {
+            if (is_bool($this->disableYesterday)) {
+                $jsDisableYesterday = 'minDate: moment(),';
+            } else {
+                $jsDisableYesterday = 'minDate: moment("' . $this->disableYesterday . '"),';
+            }
+        }
+        $jsDisableTomorrow = '';
+        if ($this->disableTomorrow) {
+            if (is_bool($this->disableTomorrow)) {
+                $jsDisableTomorrow = 'maxDate: moment(),';
+            } else {
+                $jsDisableTomorrow = 'maxDate: moment("' . $this->disableTomorrow . '"),';
+            }
+        }
+        $jsDisableDate = $jsDisableYesterday . $jsDisableTomorrow;
+
         $jsCustomRange = '';
         if ($this->disableCustomRange) {
             $jsCustomRange = 'showCustomRangeLabel: false,';
@@ -135,6 +172,7 @@ class CElement_FormInput_DateRange_DropdownButton extends CElement_FormInput_Dat
             $('#" . $this->id . "').daterangepicker({
                 startDate: moment('" . $this->dateStart . "'),
                 endDate: moment('" . $this->dateEnd . "'),
+                " . $jsDisableDate . "
                 " . $jsRangeProperty . '
                 ' . $jsCustomRange . '
                 ' . $jsSpan . "
