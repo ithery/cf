@@ -449,6 +449,11 @@ class CAuth_Guard_SessionGuard implements CAuth_Contract_StatefulGuardInterface,
      * @return void
      */
     public function login(CAuth_AuthenticatableInterface $user, $remember = false) {
+        $authManager = CAuth::impersonateManager();
+        if ($authManager->isImpersonating()) {
+            $authManager->stop();
+        }
+
         $this->updateSession($user->getAuthIdentifier());
 
         // If the user should be permanently "remembered" by the application we will
