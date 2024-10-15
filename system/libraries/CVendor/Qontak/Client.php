@@ -88,7 +88,6 @@ final class CVendor_Qontak_Client implements CVendor_Qontak_ClientInterface {
      */
     public function getWhatsAppTemplateList() {
         $this->getAccessToken();
-
         $response = $this->httpClient->get(
             'https://service-chat.qontak.com/api/open/v1/templates/whatsapp?query=&offset=1&limit=10&cursor_direction=after&order_by=created_at&order_direction=desc&status=Approved&hsm_chat=true&is_counted=true',
             [
@@ -199,7 +198,7 @@ final class CVendor_Qontak_Client implements CVendor_Qontak_ClientInterface {
                 ],
                 \json_encode($this->credential->getOAuthCredential())
             );
-
+            // cdbg::dd($response->getBody()->getContents());
             /** @var array<array-key, string> $body */
             $body = \json_decode((string) $response->getBody(), true);
             Assert::keyExists($body, 'access_token');
