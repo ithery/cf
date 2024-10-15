@@ -148,6 +148,7 @@ class CNavigation_Renderer_SidenavRenderer extends CNavigation_RendererAbstract 
                 }
             }
         }
+
         if (strlen($html) > 0) {
             if ($level == 0) {
                 $html = "  <ul class=\"sidenav-inner \">\r\n" . $html . "  </ul>\r\n";

@@ -136,6 +136,10 @@ class CApp_Navigation_Helper {
         if ($nav === false) {
             return false;
         }
+        $app = c::app();
+        if (!$app->isAuthEnabled()) {
+            return true;
+        }
         if (CApp::isAdministrator()) {
             return true;
         }
@@ -343,6 +347,9 @@ class CApp_Navigation_Helper {
         }
         $navname = carr::get($nav, 'name');
         $app = CApp::instance();
+        if (!$app->isAuthEnabled()) {
+            return true;
+        }
 
         $appRole = null;
         if (strlen($appRoleId) == 0) {
