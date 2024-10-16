@@ -43,19 +43,22 @@ class CEmail_Driver_SesV2Driver extends CEmail_DriverAbstract {
         $options = [];
         // $options['Tags'][] = ['Name' => 'subject', 'Value' => $subject];
         // $options['Tags'][] = ['Name' => 'From', 'Value' => $from];
+        CDebug::variable('originalTo', $to);
         $destinations['ToAddresses'] = [];
-        foreach ($to as $toItem) {
-            $toName = '';
-            $toEmail = $toItem;
-            if (is_array($toItem)) {
-                $toName = carr::get($toItem, 'toName');
-                $toEmail = carr::get($toItem, 'toEmail');
+        if (is_array($to) && count($to) > 0) {
+            foreach ($to as $toItem) {
+                $toName = '';
+                $toEmail = $toItem;
+                if (is_array($toItem)) {
+                    $toName = carr::get($toItem, 'toName');
+                    $toEmail = carr::get($toItem, 'toEmail');
+                }
+                $toAddress = $toEmail;
+                if ($toName) {
+                    $toAddress = $toName . ' <' . $toEmail . '>';
+                }
+                $destinations['ToAddresses'][] = $toAddress;
             }
-            $toAddress = $toEmail;
-            if ($toName) {
-                $toAddress = $toName . ' <' . $toEmail . '>';
-            }
-            $destinations['ToAddresses'][] = $toAddress;
         }
 
         if ($cc && count($cc) > 0) {
@@ -65,10 +68,15 @@ class CEmail_Driver_SesV2Driver extends CEmail_DriverAbstract {
             $destinations['BccAddresses'] = $bcc;
         }
 
-        CDebug::variable('to', $to);
-        if (is_array($to)) {
-            $to = implode(',', $to);
+        // if (is_array($to)) {
+        //     $to = implode(',', $to);
+        // }
+        $toAddresses = carr::get($destinations, 'ToAddresses');
+        if (is_array($toAddresses) && count($toAddresses) > 0) {
+            $to = implode(',', $toAddresses);
         }
+        CDebug::variable('manipulatedTo', $to);
+
         $rawMessage = $this->generateRawMessageData($from, $to, $subject, $body, $attachments, $options);
 
         $content = [
