@@ -65,6 +65,7 @@ class CEmail_Driver_SesV2Driver extends CEmail_DriverAbstract {
             $destinations['BccAddresses'] = $bcc;
         }
 
+        CDebug::variable('to', $to);
         if (is_array($to)) {
             $to = implode(',', $to);
         }
