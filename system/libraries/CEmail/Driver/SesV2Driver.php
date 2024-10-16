@@ -31,7 +31,7 @@ class CEmail_Driver_SesV2Driver extends CEmail_DriverAbstract {
         return $sesClient;
     }
 
-    public function send(array $to, $subject, $body, $options = []) {
+    public function send($to, $subject, $body, $options = []) {
         $from = carr::get($options, 'from', $this->config->getFrom());
         $fromName = carr::get($options, 'from_name', $this->config->getFromName());
         $attachments = carr::get($options, 'attachments', []);
