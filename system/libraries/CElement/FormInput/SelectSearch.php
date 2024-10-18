@@ -209,8 +209,7 @@ class CElement_FormInput_SelectSearch extends CElement_FormInput {
     }
 
     /**
-     * @param string|array $setSearchFullTextField
-     * @param mixed        $searchField
+     * @param string|array $searchField
      *
      * @return $this
      */
@@ -338,6 +337,7 @@ class CElement_FormInput_SelectSearch extends CElement_FormInput {
         $ajaxMethod->setData('formatResult', serialize($this->formatResult));
         $ajaxMethod->setData('dependsOn', serialize($this->dependsOn));
         $ajaxMethod->setData('prependData', serialize($this->prependData));
+
         if (c::app()->isAuthEnabled()) {
             $ajaxMethod->enableAuth();
         }
@@ -535,7 +535,6 @@ class CElement_FormInput_SelectSearch extends CElement_FormInput {
         }
 
         $ajaxUrl = $this->createAjaxUrl();
-
         $strSelection = $this->formatSelection;
         $strResult = $this->formatResult;
 
