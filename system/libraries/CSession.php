@@ -31,6 +31,8 @@ class CSession {
      * Singleton instance of Session.
      *
      * @return CSession
+     *
+     * @deprecated since 1.6, use c::session()
      */
     public static function instance() {
         if (self::$instance == null) {
@@ -46,13 +48,12 @@ class CSession {
      */
     private function __construct() {
         $this->initializeSession();
-        CF::log(CLogger::DEBUG, 'Session Library initialized');
     }
 
     /**
      * @return CSession_Store
      */
-    public function store() {
+    public static function store() {
         return CBase::session();
     }
 

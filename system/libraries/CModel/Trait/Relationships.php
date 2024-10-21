@@ -10,7 +10,6 @@ defined('SYSPATH') or die('No direct access allowed.');
  */
 trait CModel_Trait_Relationships {
     use CModel_Trait_Relationships_ConcatenatesRelationships;
-
     /**
      * The many to many relationship methods.
      *
@@ -41,6 +40,26 @@ trait CModel_Trait_Relationships {
      * @var array
      */
     protected static $relationResolvers = [];
+
+    /**
+     * Get the dynamic relation resolver if defined or inherited, or return null.
+     *
+     * @param string $class
+     * @param string $key
+     *
+     * @return mixed
+     */
+    public function relationResolver($class, $key) {
+        if ($resolver = static::$relationResolvers[$class][$key] ?? null) {
+            return $resolver;
+        }
+
+        if ($parent = get_parent_class($class)) {
+            return $this->relationResolver($parent, $key);
+        }
+
+        return null;
+    }
 
     /**
      * Define a dynamic relation resolver.
@@ -293,6 +312,29 @@ trait CModel_Trait_Relationships {
         list($one, $two, $caller) = debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS, 3);
 
         return $caller['function'];
+    }
+
+    /**
+     * Create a pending has-many-through or has-one-through relationship.
+     *
+     * @template TIntermediateModel of \CModel
+     *
+     * // @param  string|\CModel_Relation_HasMany<TIntermediateModel, covariant $this>|\CModel_Relation_HasOne<TIntermediateModel, covariant $this>  $relationship
+     *
+     * @param mixed $relationship
+     *
+     * @return (
+     *     $relationship is string
+     *     ? \CModel_PendingHasThroughRelationship<\CModel, $this>
+     *     : \CModel_PendingHasThroughRelationship<TIntermediateModel, $this>
+     * )
+     */
+    public function through($relationship) {
+        if (is_string($relationship)) {
+            $relationship = $this->{$relationship}();
+        }
+
+        return new CModel_PendingHasThroughRelationship($this, $relationship);
     }
 
     /**

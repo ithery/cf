@@ -88,7 +88,7 @@ class CFormInputModal extends CFormInput {
     }
 
     public function add_footer($id = '') {
-        $this->footer = CDivElement::factory($id);
+        $this->footer = c::div($id);
 
         return $this->footer;
     }

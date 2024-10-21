@@ -63,7 +63,7 @@ trait CAuth_Concern_CreateUserProvider {
      * @return \CAuth_UserProvider_DatabaseUserProvider
      */
     protected function createDatabaseProvider($config) {
-        $connection = CDatabase::instance(carr::get($config, 'connection', null));
+        $connection = c::db(carr::get($config, 'connection', null));
 
         return new \CAuth_UserProvider_DatabaseUserProvider($connection, c::hash(carr::get($config, 'hasher')), $config['table']);
     }

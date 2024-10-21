@@ -58,12 +58,11 @@ class CConsole_Command_TestCommand extends CConsole_Command {
      */
     public function handle() {
         if ((int) \PHPUnit\Runner\Version::id()[0] < 9) {
-            throw new RuntimeException('Running Collision ^5.0 artisan test command requires PHPUnit ^9.0.');
+            throw new RuntimeException('Running Collision ^5.0 cf test command requires PHPUnit ^9.0.');
         }
         //$options = array_slice(isset($_SERVER['argv']) ? $_SERVER['argv'] : [], $this->option('without-tty') ? 3 : 2);
         $options = [];
         $phpunitArgs = carr::get($this->input->getArguments(), 'phpunitArgs');
-
 
         $commands = array_merge(
             $this->binary(),

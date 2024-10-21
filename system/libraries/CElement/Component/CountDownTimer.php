@@ -17,12 +17,16 @@ class CElement_Component_CountDownTimer extends CElement_Component {
     protected $autoStart;
 
     protected $displayFormat;
+
+    protected $countUp;
+
     public function __construct($id = null) {
         parent::__construct($id);
         $this->expiredDate = c::now()->addHours(1);
         $this->autoStart = true;
         $this->expiredText = 'Expired';
         $this->displayFormat = '%DD:%HH:%mm:%ss'; //moment format with % prefix
+        $this->countUp = false;
     }
 
     public static function factory($id = null) {
@@ -58,15 +62,22 @@ class CElement_Component_CountDownTimer extends CElement_Component {
         return $this;
     }
 
+    public function setCountUp() {
+        $this->countUp = true;
+
+        return $this;
+    }
+
     protected function build() {
         $this->addClass('cres:element:component:CountDownTimer');
         $config = [
             'expiredText' => $this->expiredText,
             'timestamp' => (int) $this->expiredDate->getTimestamp() * 1000,
             'displayFormat' => $this->displayFormat,
+            'countUp' => $this->countUp,
         ];
 
         $this->setAttr('cres-element', 'component:CountDownTimer');
-        $this->setAttr('cres-config', htmlspecialchars(json_encode($config), ENT_QUOTES, 'UTF-8'));
+        $this->setAttr('cres-config', c::json($config));
     }
 }

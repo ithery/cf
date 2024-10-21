@@ -4,12 +4,6 @@ defined('SYSPATH') or die('No direct access allowed.');
 
 use Aws\DynamoDb\DynamoDbClient;
 
-/**
- * @author Hery Kurniawan
- * @license Ittron Global Teknologi <ittron.co.id>
- *
- * @since Sep 8, 2019, 2:18:08 AM
- */
 final class CQueue {
     protected static $isUsingRedisSupervisor = false;
 
@@ -195,8 +189,13 @@ final class CQueue {
     }
 
     public static function run($connection = null, array $options = []) {
+        $queue = null;
+        if (isset($options['queue'])) {
+            $queue = $options['queue'];
+            unset($options['queue']);
+        }
         static::$runner = new CQueue_Runner(CQueue::worker(), null, $options);
-        static::$runner->run($connection);
+        static::$runner->run($connection, $queue);
         static::$runner = null;
     }
 
@@ -211,8 +210,10 @@ final class CQueue {
         return CF::config('queue.' . $config, $default);
     }
 
-    public static function primaryKey($database, $table) {
-        return $database->driverName() == 'MongoDB' ? '_id' : $table . '_id';
+    public static function primaryKey(CDatabase_Connection $database, $table) {
+        $driverName = $database->getConfig('driver');
+
+        return (cstr::tolower($driverName) == 'mongodb' || cstr::tolower($driverName) == 'mongo') ? '_id' : $table . '_id';
     }
 
     public static function batchFactory() {
@@ -226,7 +227,7 @@ final class CQueue {
     public static function batchRepository() {
         if (static::$batchRepository == null) {
             static::$batchRepository = new CQueue_BatchRepository(
-                CDatabase::instance(CF::config('queue.batching.database')),
+                c::db(CF::config('queue.batching.database')),
                 CF::config('queue.batching.table', 'queue_batch')
             );
         }

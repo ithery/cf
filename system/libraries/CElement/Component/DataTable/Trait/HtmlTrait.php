@@ -49,7 +49,8 @@ trait CElement_Component_DataTable_Trait_HtmlTrait {
                 $html->appendln('<div class="' . $mainClassTitle . '">')->incIndent();
                 if (strlen($this->icon) > 0) {
                     $html->appendln('<span class="icon">')->incIndent();
-                    $html->appendln('<i class="icon-' . $this->icon . '"></i>');
+                    $html->append($this->getIconHtml());
+                    // $html->appendln('<i class="icon-' . $this->icon . '"></i>');
                     $html->decIndent()->appendln('</span');
                 }
                 $html->appendln('<h5>' . $this->title . '</h5>');
@@ -145,7 +146,18 @@ trait CElement_Component_DataTable_Trait_HtmlTrait {
                     if ($dataRow->exists($this->keyField)) {
                         $key = $dataRow->getValue($this->keyField);
                     }
-                    $html->appendln('<tr id="tr-' . $key . '">')->incIndent()->br();
+
+                    $trClass = '';
+                    if ($this->rowClassCallbackFunction != null) {
+                        $trClass = CFunction::factory($this->rowClassCallbackFunction)
+                            ->addArg($row)
+                            ->execute();
+                    }
+                    $attrId = '';
+                    if ($key) {
+                        $attrId = 'id="tr-' . $key . '"';
+                    }
+                    $html->appendln('<tr ' . $attrId . ($trClass ? ' class="' . $trClass . '"' : '') . '>')->incIndent()->br();
 
                     if ($this->numbering) {
                         $html->appendln('<td scope="row" class="align-right">' . $no . '</td>')->br();
@@ -269,7 +281,7 @@ trait CElement_Component_DataTable_Trait_HtmlTrait {
                     $action->setVisibility($visibility);
                 }
                 if ($action instanceof CElement_Component_ActionRow) {
-                    $action->applyRowCallback($row->toArray());
+                    $action->applyRowCallback($row->getRow());
                 }
                 $actionNeedRender = $actionNeedRender || $action->isVisible();
             }

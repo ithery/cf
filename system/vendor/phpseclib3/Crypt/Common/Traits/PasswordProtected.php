@@ -5,31 +5,27 @@
  *
  * PHP version 5
  *
- * @category  Crypt
- * @package   Common
  * @author    Jim Wigginton <terrafrost@php.net>
  * @copyright 2015 Jim Wigginton
  * @license   http://www.opensource.org/licenses/mit-license.html  MIT License
  * @link      http://phpseclib.sourceforge.net
  */
 
+declare(strict_types=1);
+
 namespace phpseclib3\Crypt\Common\Traits;
 
 /**
  * Password Protected Trait for Private Keys
  *
- * @package Common
  * @author  Jim Wigginton <terrafrost@php.net>
- * @access  public
  */
 trait PasswordProtected
 {
     /**
-     * Password
-     *
-     * @var string|bool
+     * @var string|null
      */
-    private $password = false;
+    private $password = null;
 
     /**
      * Sets the password
@@ -39,10 +35,10 @@ trait PasswordProtected
      *
      * @see self::createKey()
      * @see self::load()
-     * @access public
-     * @param string|bool $password
+     *
+     * @return static
      */
-    public function withPassword($password = false)
+    public function withPassword(?string $password = null): self
     {
         $new = clone $this;
         $new->password = $password;

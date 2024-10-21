@@ -251,6 +251,13 @@ class CElement_Component_Form extends CElement_Component {
                         if ($ruleValue instanceof Closure) {
                             $validationData[$key][$ruleIndex] = new \Opis\Closure\SerializableClosure($ruleValue);
                         }
+
+                        if (is_object($ruleValue) && property_exists($ruleValue, 'condition')) {
+                            if ($ruleValue->condition instanceof Closure) {
+                                $ruleValue->condition = new \Opis\Closure\SerializableClosure($ruleValue->condition);
+                                $validationData[$key][$ruleIndex] = $ruleValue;
+                            }
+                        }
                     }
                 }
             }
@@ -334,7 +341,7 @@ class CElement_Component_Form extends CElement_Component {
             $this->setAttr('target', $this->target);
         }
         if (strlen($this->method) > 0) {
-            $this->setAttr('method', $this->method);
+            $this->setAttr('method', cstr::upper($this->method));
         }
         if (strlen($this->action) > 0) {
             $this->setAttr('action', $this->action);

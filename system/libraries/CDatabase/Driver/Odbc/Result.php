@@ -159,6 +159,7 @@ class CDatabase_Driver_Odbc_Result extends CDatabase_Result {
      *
      * @return int
      */
+    #[\ReturnTypeWillChange]
     public function count() {
         return $this->total_rows;
     }
@@ -170,6 +171,7 @@ class CDatabase_Driver_Odbc_Result extends CDatabase_Result {
      *
      * @return bool
      */
+    #[\ReturnTypeWillChange]
     public function offsetExists($offset) {
         if ($this->total_rows > 0) {
             $min = 0;
@@ -200,6 +202,7 @@ class CDatabase_Driver_Odbc_Result extends CDatabase_Result {
      *
      * @throws CDatabase_Exception
      */
+    #[\ReturnTypeWillChange]
     public function offsetSet($offset, $value) {
         throw new CDatabase_Exception('Query results are read only');
     }
@@ -211,6 +214,7 @@ class CDatabase_Driver_Odbc_Result extends CDatabase_Result {
      *
      * @throws CDatabase_Exception
      */
+    #[\ReturnTypeWillChange]
     public function offsetUnset($offset) {
         throw new CDatabase_Exception('Query results are read only');
     }
@@ -241,6 +245,7 @@ class CDatabase_Driver_Odbc_Result extends CDatabase_Result {
      *
      * @return int
      */
+    #[\ReturnTypeWillChange]
     public function next() {
         return ++$this->current_row;
     }
@@ -259,6 +264,7 @@ class CDatabase_Driver_Odbc_Result extends CDatabase_Result {
      *
      * @return int
      */
+    #[\ReturnTypeWillChange]
     public function rewind() {
         return $this->current_row = 0;
     }
@@ -268,6 +274,7 @@ class CDatabase_Driver_Odbc_Result extends CDatabase_Result {
      *
      * @return bool
      */
+    #[\ReturnTypeWillChange]
     public function valid() {
         return $this->offsetExists($this->current_row);
     }

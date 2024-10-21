@@ -2,14 +2,17 @@
 
 /**
  * Description of CBoostrap.
- *
- * @author Hery <hery@ittron.co.id>
  */
 class CBootstrap {
     /**
      * @var CBootstrap
      */
     protected static $instance = null;
+
+    /**
+     * @var CBootstrap_BootstrapperAbstract[]
+     */
+    protected $bootsrapper = [];
 
     /**
      * @var string[]

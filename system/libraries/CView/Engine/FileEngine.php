@@ -1,11 +1,10 @@
 <?php
 
 /**
- * Description of FileEngine
+ * Description of FileEngine.
  *
  * @author Hery
  */
-
 class CView_Engine_FileEngine implements CView_EngineAbstract {
     /**
      * Create a new file engine instance.
@@ -24,6 +23,6 @@ class CView_Engine_FileEngine implements CView_EngineAbstract {
      * @return string
      */
     public function get($path, array $data = []) {
-        return $this->files->get($path);
+        return CFile::get($path);
     }
 }

@@ -6,6 +6,7 @@ class CSession_Handler_NullSessionHandler implements SessionHandlerInterface {
      *
      * @return bool
      */
+    #[\ReturnTypeWillChange]
     public function open($savePath, $sessionName) {
         return true;
     }
@@ -15,6 +16,7 @@ class CSession_Handler_NullSessionHandler implements SessionHandlerInterface {
      *
      * @return bool
      */
+    #[\ReturnTypeWillChange]
     public function close() {
         return true;
     }
@@ -24,6 +26,7 @@ class CSession_Handler_NullSessionHandler implements SessionHandlerInterface {
      *
      * @return string|false
      */
+    #[\ReturnTypeWillChange]
     public function read($sessionId) {
         return '';
     }
@@ -33,6 +36,7 @@ class CSession_Handler_NullSessionHandler implements SessionHandlerInterface {
      *
      * @return bool
      */
+    #[\ReturnTypeWillChange]
     public function write($sessionId, $data) {
         return true;
     }
@@ -42,6 +46,7 @@ class CSession_Handler_NullSessionHandler implements SessionHandlerInterface {
      *
      * @return bool
      */
+    #[\ReturnTypeWillChange]
     public function destroy($sessionId) {
         return true;
     }
@@ -51,6 +56,7 @@ class CSession_Handler_NullSessionHandler implements SessionHandlerInterface {
      *
      * @return int|false
      */
+    #[\ReturnTypeWillChange]
     public function gc($lifetime) {
         return true;
     }

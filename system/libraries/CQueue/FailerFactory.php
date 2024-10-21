@@ -32,7 +32,7 @@ class CQueue_FailerFactory {
      * @return \CQueue_FailedJob_DatabaseFailedJob
      */
     protected static function databaseFailedJobProvider($config) {
-        $db = CDatabase::instance(carr::get($config, 'database'));
+        $db = c::db(carr::get($config, 'database'));
 
         return new CQueue_FailedJob_DatabaseFailedJob(
             $db,

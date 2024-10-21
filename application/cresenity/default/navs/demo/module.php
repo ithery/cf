@@ -1,6 +1,11 @@
 <?php
 return [
     [
+        'name' => 'module.string',
+        'label' => c::__('String'),
+        'subnav' => include dirname(__FILE__) . '/module/string.php',
+    ],
+    [
         'name' => 'module.formatter',
         'label' => c::__('Formatter'),
         'uri' => 'demo/module/formatter/index',
@@ -9,6 +14,16 @@ return [
         'name' => 'module.transform',
         'label' => c::__('Transform'),
         'uri' => 'demo/module/transform/index',
+    ],
+    [
+        'name' => 'module.validation',
+        'label' => c::__('Validation'),
+        'uri' => 'demo/module/validation/index',
+    ],
+    [
+        'name' => 'module.geo',
+        'label' => c::__('Geo'),
+        'uri' => 'demo/module/geo/index',
     ],
     [
         'name' => 'module.color',
@@ -21,8 +36,19 @@ return [
         'subnav' => include dirname(__FILE__) . '/module/broadcast.php',
     ],
     [
+        'name' => 'module.ml',
+        'label' => c::__('ML'),
+        'uri' => 'demo/module/ml/index',
+        'badge' => 'DEV',
+    ],
+    [
         'name' => 'module.bot',
         'label' => c::__('Chat Bot'),
         'uri' => 'demo/module/bot/index',
+    ],
+    [
+        'name' => 'module.report',
+        'label' => c::__('Report'),
+        'subnav' => include dirname(__FILE__) . '/module/report.php',
     ],
 ];

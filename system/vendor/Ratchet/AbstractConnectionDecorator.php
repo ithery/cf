@@ -1,9 +1,11 @@
 <?php
+
 namespace Ratchet;
 
 /**
  * Wraps ConnectionInterface objects via the decorator pattern but allows
- * parameters to bubble through with magic methods
+ * parameters to bubble through with magic methods.
+ *
  * @todo It sure would be nice if I could make most of this a trait...
  */
 abstract class AbstractConnectionDecorator implements ConnectionInterface {

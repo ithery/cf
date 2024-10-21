@@ -137,19 +137,22 @@ class CDevSuite_Db {
 
     /**
      * @param mixed $key
+     *
+     * @return CDatabase_Connection
      */
     public function getDatabase($key) {
         $config = $this->toDbConfig($key);
         $host = carr::get($config, 'connection.host');
         $database = carr::get($config, 'connection.database');
+        CDatabase::manager()->addConnection($config, $host . '-' . $database);
 
-        return CDatabase::instance($host . '-' . $database, $config, CF::domain());
+        return c::db($host . '-' . $database);
     }
 
     public function isCanConnect($key) {
         try {
             $db = $this->getDatabase($key);
-            $db->connect();
+            $db->getPdo();
         } catch (Exception $ex) {
             $errMessage = $ex->getMessage();
             CDevSuite::info($ex->getMessage());
@@ -164,9 +167,6 @@ class CDevSuite_Db {
         $fromDB = $this->getDatabase($from);
         $toDB = $this->getDatabase($to);
 
-        $fromDB->connect();
-        $toDB->connect();
-
         $fromSchemaManager = $fromDB->getSchemaManager();
         $toSchemaManager = $toDB->getSchemaManager();
 
@@ -179,7 +179,7 @@ class CDevSuite_Db {
         $formatted = false;
         foreach ($sqls as $sql) {
             if ($formatted) {
-                $sql = CSql::format($sql);
+                $sql = CParser_Sql::format($sql);
             }
             $sqlString .= PHP_EOL . ($sql . ';') . PHP_EOL;
         }
@@ -193,9 +193,6 @@ class CDevSuite_Db {
     public function sync($from, $to) {
         $fromDB = $this->getDatabase($from);
         $toDB = $this->getDatabase($to);
-
-        $fromDB->connect();
-        $toDB->connect();
 
         $fromSchemaManager = $fromDB->getSchemaManager();
         $toSchemaManager = $toDB->getSchemaManager();

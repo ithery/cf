@@ -26,11 +26,13 @@ class CManager_DataProvider_ModelDataProvider extends CManager_DataProviderAbstr
         if ($columns !== null) {
             foreach ($columns as $col) {
                 if ($col instanceof CDatabase_Query_Expression) {
-                    $statement = $col->getValue();
+                    $statement = $col->getValue($query->getGrammar());
                     //$regex = '/([\w]++)`?+(?:\s++as\s++[^,\s]++)?+\s*+(?:FROM\s*+|$)/i';
                     // $regex = '/([\w]++)`?+\s*+(?:FROM\s*+|$)/i';
                     $regex = '/([\w]++)`?+\s*+$/i';
-
+                    if ($statement instanceof CDatabase_Query_Expression) {
+                        $statement = $statement->getValue($query->getGrammar());
+                    }
                     if (preg_match($regex, $statement, $match)) {
                         $fields[] = $match[1]; // field stored in $match[1]
                     }
@@ -67,7 +69,7 @@ class CManager_DataProvider_ModelDataProvider extends CManager_DataProviderAbstr
         }
 
         $aggregateFields = $this->getAggregateFieldFromQuery($query);
-
+        
         //process search
         if (count($this->searchOr) > 0) {
             $dataSearch = $this->searchOr;
@@ -83,9 +85,9 @@ class CManager_DataProvider_ModelDataProvider extends CManager_DataProviderAbstr
 
                             $field = array_pop($fields);
                             $relation = implode('.', $fields);
-
                             $q->orWhereHas($relation, function ($q2) use ($value, $field) {
-                                $q2->where($field, 'like', '%' . $value . '%');
+                                $table = $q2->getModel()->getTable();
+                                $q2->where($table . '.' . $field, 'like', '%' . $value . '%');
                             });
                         } else {
                             //check this is aggregate field where or not
@@ -93,7 +95,48 @@ class CManager_DataProvider_ModelDataProvider extends CManager_DataProviderAbstr
                                 //TODO apply search on aggregateFields
                             } else {
                                 if (!$this->isRelationField($q, $fieldName)) {
-                                    $q->orWhere($fieldName, 'like', '%' . $value . '%');
+                                    $connectionType = $q->getConnection()->getDriverName();
+                                    if ($connectionType == 'pgsql') {
+                                        $q->orWhere($fieldName, 'ilike', '%' . $value . '%');
+                                    } else {
+                                        $q->orWhere($fieldName, 'like', '%' . $value . '%');
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            });
+        }
+
+        if (count($this->searchFullTextOr) > 0) {
+            $dataSearch = $this->searchFullTextOr;
+            $query->where(function (CModel_Query $q) use ($dataSearch, $aggregateFields) {
+                foreach ($dataSearch as $fieldName => $value) {
+                    if ($this->isCallable($value)) {
+                        $q->orWhere(function ($q) use ($value) {
+                            $this->callCallable($value, [$q]);
+                        });
+                    } else {
+                        if (strpos($fieldName, '.') !== false) {
+                            $fields = explode('.', $fieldName);
+
+                            $field = array_pop($fields);
+                            $relation = implode('.', $fields);
+                            $q->orWhereHas($relation, function ($q2) use ($value, $field) {
+                                $table = $q2->getModel()->getTable();
+
+                                // $q2->where($table . '.' . $field, 'like', '%' . $value . '%');
+                                $q2->whereFullText($table . '.' . $field, $value);
+                            });
+                        } else {
+                            //check this is aggregate field where or not
+                            if (in_array($fieldName, $aggregateFields)) {
+                                //TODO apply search on aggregateFields
+                            } else {
+                                if (!$this->isRelationField($q, $fieldName)) {
+                                    // $q->orWhere($fieldName, 'like', '%' . $value . '%');
+                                    $q->orWhereFullText($fieldName, $value);
                                 }
                             }
                         }
@@ -125,7 +168,12 @@ class CManager_DataProvider_ModelDataProvider extends CManager_DataProviderAbstr
                                 //TODO apply search on aggregateFields
                             } else {
                                 if (!$this->isRelationField($q, $fieldName)) {
-                                    $q->where($fieldName, 'like', '%' . $value . '%');
+                                    $connectionType = $q->getConnection()->getDriverName();
+                                    if ($connectionType == 'pgsql') {
+                                        $q->where($fieldName, 'ilike', '%' . $value . '%');
+                                    } else {
+                                        $q->where($fieldName, 'like', '%' . $value . '%');
+                                    }
                                 }
                             }
                         }
@@ -156,7 +204,9 @@ class CManager_DataProvider_ModelDataProvider extends CManager_DataProviderAbstr
                     $relationPath = implode('.', $fields);
 
                     $alias = $this->withSelectRelationColumn($query, $relationPath, $field, $sortIndex);
-                    $query->orderBy($alias, $sortDirection);
+                    if ($alias) {
+                        $query->orderBy($alias, $sortDirection);
+                    }
                 } else {
                     if (!$this->isRelationField($query, $fieldName)) {
                         $query->orderBy($fieldName, $sortDirection);
@@ -174,6 +224,9 @@ class CManager_DataProvider_ModelDataProvider extends CManager_DataProviderAbstr
 
         $relations = explode('.', $relationPath);
         $firstRelation = array_shift($relations);
+        if (!method_exists($query->getModel(), $firstRelation)) {
+            return null;
+        }
         $relation = $query->getModel()->$firstRelation();
 
         $selectQuery = $this->createSelectJoinQuery($query, $relation, $relations, $column);
@@ -202,14 +255,13 @@ class CManager_DataProvider_ModelDataProvider extends CManager_DataProviderAbstr
         return $key;
     }
 
-    protected function createSelectJoinQuery($query, $relation, array $joinRelations, $column) {
+    protected function createSelectJoinQuery(CModel_Query $query, CModel_Relation $relation, array $joinRelations, $column) {
         $tableAlias = 'mdp_join_main';
-
         $relatedModel = $relation->getRelated();
         $relatedTable = $relatedModel->getTable();
-        $tableAndAlias = $relatedTable . ' AS ' . $tableAlias;
-        $newQuery = c::db()->createQueryBuilder()
-            ->from($tableAndAlias);
+        $relatedConnection = $relatedModel->getConnection();
+        $newQuery = $relatedConnection->newQuery()
+            ->from($relatedTable, $tableAlias);
 
         $currentModel = $relatedModel;
         $joinIndex = 0;
@@ -231,6 +283,7 @@ class CManager_DataProvider_ModelDataProvider extends CManager_DataProviderAbstr
             $currentModel = $joinModel;
             $joinIndex++;
             $columnAlias = $joinAlias;
+            $beforeAlias = $joinAlias;
         }
 
         if ($relation instanceof CModel_Relation_BelongsTo) {

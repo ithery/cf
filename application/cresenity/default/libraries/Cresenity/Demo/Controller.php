@@ -7,7 +7,8 @@ class Controller extends \CController {
         parent::__construct();
         $app = \c::app();
         $app->setLoginRequired(false);
-        $app->setTheme('cresenity-demo');
+        $theme = \c::session()->get('theme', 'cresenity-demo');
+        $app->setTheme($theme);
         $app->setView('demo');
         $app->setNav('demo');
     }

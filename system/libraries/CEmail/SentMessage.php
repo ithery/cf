@@ -46,4 +46,33 @@ class CEmail_SentMessage {
     public function __call($method, $parameters) {
         return $this->forwardCallTo($this->sentMessage, $method, $parameters);
     }
+
+    /**
+     * Get the serializable representation of the object.
+     *
+     * @return array
+     */
+    public function __serialize() {
+        $originalMessage = $this->sentMessage->getOriginalMessage();
+        /** @var \Symfony\Component\Mime\Email $originalMessage */
+        $hasAttachments = c::collect($originalMessage->getAttachments())->isNotEmpty();
+
+        return [
+            'hasAttachments' => $hasAttachments,
+            'sentMessage' => $hasAttachments ? base64_encode(serialize($this->sentMessage)) : $this->sentMessage,
+        ];
+    }
+
+    /**
+     * Marshal the object from its serialized data.
+     *
+     * @param array $data
+     *
+     * @return void
+     */
+    public function __unserialize(array $data) {
+        $hasAttachments = ($data['hasAttachments'] ?? false) === true;
+
+        $this->sentMessage = $hasAttachments ? unserialize(base64_decode($data['sentMessage'])) : $data['sentMessage'];
+    }
 }

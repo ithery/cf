@@ -2,12 +2,6 @@
 
 defined('SYSPATH') or die('No direct access allowed.');
 
-/**
- * @author Hery Kurniawan <hery@itton.co.id>
- * @license Ittron Global Teknologi
- *
- * @since Nov 28, 2020
- */
 class CElement_View extends CElement {
     use CElement_Trait_UseViewTrait;
 

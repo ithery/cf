@@ -1006,7 +1006,15 @@ SQL
             'varbinary' => 'binary',
             'varchar' => 'string',
             'year' => 'date',
-
+            'point' => 'point',
+            'linestring' => 'linestring',
+            'multipoint' => 'multipoint',
+            'polygon' => 'polygon',
+            'multilinestring' => 'multilinestring',
+            'multipolygon' => 'multipolygon',
+            'geometry' => 'geometry',
+            'geometrycollection' => 'geometrycollection',
+            'geomcollection' => 'geometrycollection',
         ];
     }
 

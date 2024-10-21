@@ -11,13 +11,15 @@ class CQC_Testing_Database_Migration {
         if (CFile::exists($this->file)) {
             CFile::delete($this->file);
         }
+        CFile::put($this->file, '');
         $config = [
             'pdo' => true,
             'type' => 'sqlite',
             'database' => $this->file,
         ];
 
-        $connection = CDatabase::instance(static::class, $config);
+        CDatabase::manager()->addConnection($config, static::class);
+        $connection = c::db(static::class);
         /** @var \CDatabase_Schema_Builder $schemaBuilder */
         $schema = $connection->getSchemaBuilder();
         $this->createSuiteTable($schema);

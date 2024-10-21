@@ -17,15 +17,14 @@ namespace Symfony\Component\Finder\Iterator;
  * @author Fabien Potencier  <fabien@symfony.com>
  * @author Włodzimierz Gajda <gajdaw@gajdaw.pl>
  */
-class PathFilterIterator extends MultiplePcreFilterIterator
-{
+class PathFilterIterator extends MultiplePcreFilterIterator {
     /**
      * Filters the iterator values.
      *
      * @return bool true if the value should be kept, false otherwise
      */
-    public function accept()
-    {
+    #[\ReturnTypeWillChange]
+    public function accept() {
         $filename = $this->current()->getRelativePathname();
 
         if ('\\' === DIRECTORY_SEPARATOR) {
@@ -49,8 +48,7 @@ class PathFilterIterator extends MultiplePcreFilterIterator
      *
      * @return string regexp corresponding to a given string or regexp
      */
-    protected function toRegex($str)
-    {
-        return $this->isRegex($str) ? $str : '/'.preg_quote($str, '/').'/';
+    protected function toRegex($str) {
+        return $this->isRegex($str) ? $str : '/' . preg_quote($str, '/') . '/';
     }
 }

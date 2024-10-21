@@ -1,7 +1,7 @@
 <?php
 
 /**
- * File
+ * File.
  *
  * A convenience class for temporary files.
  */
@@ -18,7 +18,7 @@ class CTemporary_LocalFile {
     protected $fileName;
 
     /**
-     * Constructor
+     * Constructor.
      *
      * @param mixed      $content
      * @param null|mixed $folder
@@ -41,7 +41,7 @@ class CTemporary_LocalFile {
     }
 
     /**
-     * Delete tmp file on shutdown if `$delete` is `true`
+     * Delete tmp file on shutdown if `$delete` is `true`.
      */
     public function __destruct() {
         if ($this->delete) {
@@ -50,9 +50,9 @@ class CTemporary_LocalFile {
     }
 
     /**
-     * Send tmp file to client, either inline or as download
+     * Send tmp file to client, either inline or as download.
      *
-     * @param string|null $filename    the filename to send. If empty, the file is
+     * @param null|string $filename    the filename to send. If empty, the file is
      *                                 streamed inline.
      * @param string      $contentType the Content-Type header
      * @param bool        $inline      whether to force inline display of the file, even if
@@ -92,6 +92,7 @@ class CTemporary_LocalFile {
      */
     public function getFileName() {
         $filename = CTemporary::local()->getDriver()->getAdapter()->getPathPrefix() . $this->fileName;
+
         return $filename;
     }
 
@@ -107,6 +108,7 @@ class CTemporary_LocalFile {
         if (file_exists($filename)) {
             return @unlink($filename);
         }
+
         return false;
     }
 }

@@ -2,22 +2,16 @@
 
 defined('SYSPATH') or die('No direct access allowed.');
 
-/**
- * @author Hery Kurniawan
- * @license Ittron Global Teknologi <ittron.co.id>
- *
- * @since Aug 18, 2018, 11:06:44 AM
- */
 class CDatabase_Type_JsonType extends CDatabase_Type {
     /**
-     * {@inheritdoc}
+     * @inheritdoc
      */
     public function getSQLDeclaration(array $fieldDeclaration, CDatabase_Platform $platform) {
         return $platform->getJsonTypeDeclarationSQL($fieldDeclaration);
     }
 
     /**
-     * {@inheritdoc}
+     * @inheritdoc
      */
     public function convertToDatabaseValue($value, CDatabase_Platform $platform) {
         if (null === $value) {
@@ -27,14 +21,14 @@ class CDatabase_Type_JsonType extends CDatabase_Type {
         $encoded = json_encode($value);
 
         if (JSON_ERROR_NONE !== json_last_error()) {
-            throw ConversionException::conversionFailedSerialization($value, 'json', json_last_error_msg());
+            throw CDatabase_Schema_Exception_ConversionException::conversionFailedSerialization($value, 'json', json_last_error_msg());
         }
 
         return $encoded;
     }
 
     /**
-     * {@inheritdoc}
+     * @inheritdoc
      */
     public function convertToPHPValue($value, CDatabase_Platform $platform) {
         if ($value === null || $value === '') {
@@ -48,21 +42,21 @@ class CDatabase_Type_JsonType extends CDatabase_Type {
         $val = json_decode($value, true);
 
         if (json_last_error() !== JSON_ERROR_NONE) {
-            throw ConversionException::conversionFailed($value, $this->getName());
+            throw CDatabase_Schema_Exception_ConversionException::conversionFailed($value, $this->getName());
         }
 
         return $val;
     }
 
     /**
-     * {@inheritdoc}
+     * @inheritdoc
      */
     public function getName() {
         return CDatabase_Type::JSON;
     }
 
     /**
-     * {@inheritdoc}
+     * @inheritdoc
      */
     public function requiresSQLCommentHint(CDatabase_Platform $platform) {
         return !$platform->hasNativeJsonType();

@@ -9,8 +9,6 @@ defined('SYSPATH') or die('No direct access allowed.');
  * @since Feb 16, 2019, 2:25:18 AM
  */
 class CImage_Avatar_Input_Initials {
-    public $name;
-
     public $length;
 
     public $size;
@@ -31,7 +29,13 @@ class CImage_Avatar_Input_Initials {
 
     public $request;
 
+    private $fontFamily;
+
+    private $name;
+
     private $hasQueryParameters = false;
+
+    private $isBackgroundAuto = true;
 
     private static $indexes = [
         'name',
@@ -55,22 +59,73 @@ class CImage_Avatar_Input_Initials {
         $this->color = $this->getRequest('color', '#fff');
         $this->length = (int) $this->getRequest('length', 2);
         $this->fontSize = (double) $this->getRequest('font-size', 0.5);
-        $this->rounded = $this->getRounded();
-        $this->uppercase = $this->getUppercase();
+        $this->rounded = filter_var($this->getRequest('rounded', false), FILTER_VALIDATE_BOOLEAN);
+        $this->uppercase = filter_var($this->getRequest('uppercase', true), FILTER_VALIDATE_BOOLEAN);
         $this->initials = $this->getInitials();
         $this->cacheKey = $this->generateCacheKey();
         $this->fixInvalidInput();
     }
 
-    private function getRounded() {
-        return filter_var($this->getRequest('rounded', false), FILTER_VALIDATE_BOOLEAN);
+    public function setName($name) {
+        $this->name = $name;
+        if ($this->isBackgroundAuto) {
+            $this->background = $this->getRequest('background', CColor::fromString($this->name, ['luminosity' => 'dark'])->toHex());
+        }
+
+        return $this;
     }
 
-    private function getUppercase() {
-        return filter_var($this->getRequest('uppercase', true), FILTER_VALIDATE_BOOLEAN);
+    public function setRounded($rounded) {
+        $this->rounded = (bool) $rounded;
+
+        return $this;
     }
 
-    private function getInitials() {
+    public function getName() {
+        return $this->name;
+    }
+
+    public function getSize() {
+        return $this->size;
+    }
+
+    public function getBorderSize() {
+        return 0;
+    }
+
+    public function getBorderColor() {
+        return '';
+    }
+
+    public function getBorderRadius() {
+        return 0;
+    }
+
+    public function getBackground() {
+        return $this->background;
+    }
+
+    public function getRounded() {
+        return $this->rounded;
+    }
+
+    public function getUppercase() {
+        return $this->uppercase;
+    }
+
+    public function getFontFamily() {
+        return $this->fontFamily;
+    }
+
+    public function getFontSize() {
+        return $this->fontSize;
+    }
+
+    public function getColor() {
+        return $this->color;
+    }
+
+    public function getInitials() {
         return ( new CString_Initials())->length($this->length)->keepCase(!$this->uppercase)->generate($this->name);
     }
 

@@ -122,8 +122,11 @@ class CElement_Component_Form_Validation {
      * @return null|string
      */
     protected function getSessionToken() {
-        $token = CSession::instance()->id();
+        $session = CSession::store();
+        if (!$session) {
+            return null;
+        }
 
-        return $token;
+        return $session->getId();
     }
 }

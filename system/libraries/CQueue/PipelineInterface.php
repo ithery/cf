@@ -2,12 +2,6 @@
 
 defined('SYSPATH') or die('No direct access allowed.');
 
-/**
- * @author Hery Kurniawan
- * @license Ittron Global Teknologi <ittron.co.id>
- *
- * @since Sep 8, 2019, 2:53:13 AM
- */
 interface CQueue_PipelineInterface {
     /**
      * Set the traveler object being sent on the pipeline.

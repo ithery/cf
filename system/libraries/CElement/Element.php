@@ -49,7 +49,7 @@ abstract class CElement_Element extends CElement {
         $customCss = $this->custom_css;
         $customCss = static::renderStyle($customCss);
         if (strlen($customCss) > 0) {
-            $customCss = ' style="' . $customCss . '"';
+            $customCss = ' style="' . c::e($customCss) . '"';
         }
         $additionAttribute = '';
         $haveClass = false;
@@ -57,7 +57,7 @@ abstract class CElement_Element extends CElement {
             if (is_array($v)) {
                 $v = implode(',', $v);
             }
-            $additionAttribute .= ' ' . $k . '="' . $v . '"';
+            $additionAttribute .= ' ' . $k . '="' . c::e($v) . '"';
             if ($k == 'class') {
                 $haveClass = true;
             }
@@ -66,7 +66,7 @@ abstract class CElement_Element extends CElement {
         if (!$haveClass) {
             $classes = $this->classes;
             $classes = implode(' ', $classes);
-            $classAttr = ' class="' . $classes . '"';
+            $classAttr = ' class="' . c::e($classes) . '"';
         }
         $htmlAttr = 'id="' . $this->id . '" ' . $classAttr . $customCss . $additionAttribute;
 

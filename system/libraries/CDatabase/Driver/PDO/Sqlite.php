@@ -15,6 +15,8 @@ class CDatabase_Driver_PDO_Sqlite extends CDatabase_Driver {
 
     protected $dbConfig;
 
+    protected $db;
+
     /**
      * Constructor: __construct
      *  Sets up the config for the class.
@@ -27,8 +29,6 @@ class CDatabase_Driver_PDO_Sqlite extends CDatabase_Driver {
     public function __construct(CDatabase $db, $config) {
         $this->db = $db;
         $this->dbConfig = $config;
-
-        CF::log(CLogger::DEBUG, 'PDO:Sqlite Database Driver Initialized');
     }
 
     public function connect() {
@@ -137,6 +137,7 @@ class CDatabase_Driver_PDO_Sqlite extends CDatabase_Driver {
     /**
      * @param int $limit
      * @param int $offset
+     *
      * @return string
      */
     public function limit($limit, $offset = 0) {
@@ -148,12 +149,7 @@ class CDatabase_Driver_PDO_Sqlite extends CDatabase_Driver {
             return $str;
         }
 
-        if (function_exists('sqlite_escape_string')) {
-            /** @intelephense-ignore-line  */
-            $res = sqlite_escape_string($str);
-        } else {
-            $res = str_replace("'", "''", $str);
-        }
+        $res = str_replace("'", "''", $str);
 
         return $res;
     }

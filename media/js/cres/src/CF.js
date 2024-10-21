@@ -97,77 +97,98 @@ class CF {
     CFVersion() {
         return this.getConfig().CFVersion;
     }
-    requireCss(url, callback) {
-        if (!~this.cssRequired.indexOf(url)) {
-            this.cssRequired.push(url);
-            if (document.querySelector('link[href="' + url + '"],script[src="' + url + '"]') !== null) {
-                return;
+    requireCssAsync(url) {
+        return new Promise((resolve, reject)=> {
+            let loaded = ~this.cssRequired.indexOf(url);
+            if(!loaded) {
+                loaded = document.querySelector('link[href="' + url + '"]') !== null;
             }
-            let string = '<link rel=\'stylesheet\' type=\'text/css\' href=\'' + url + '\' />';
-            if ((document.readyState === 'loading' /* || mwd.readyState === 'interactive'*/) && !!window.CanvasRenderingContext2D && self === parent) {
-                document.write(string);
-            } else {
-                let el;
-                el = this.document.createElement('link');
-                el.rel = 'stylesheet';
-                el.type = 'text/css';
-                el.href = url;
-                // IE 6 & 7
-                if (typeof (callback) === 'function') {
-                    el.onload = callback;
-                    el.onreadystatechange = () => {
-                        if (this.readyState == 'complete') {
-                            callback();
-                        }
-                    };
+            if (!loaded) {
+                this.cssRequired.push(url);
+
+                let string = '<link rel=\'stylesheet\' type=\'text/css\' href=\'' + url + '\' />';
+
+                // if(this.config.debug) {
+                //     console.log('Css Require:' + url + ', readyState:' + document.readyState);
+                // }
+                if ((document.readyState === 'loading' /* || mwd.readyState === 'interactive'*/) && !!window.CanvasRenderingContext2D && self === parent) {
+                    document.write(string);
+                    resolve(url);
+                } else {
+                    let el;
+                    el = this.document.createElement('link');
+                    el.rel = 'stylesheet';
+                    el.type = 'text/css';
+                    el.href = url;
+                    // IE 6 & 7
+                    el.addEventListener('load', ()=> {
+                        dispatchWindowEvent('cresenity:css:loaded', {
+                            url: url
+                        });
+                        // if(this.config.debug) {
+                        //     console.log('Css Loaded:' + url + '');
+                        // }
+                        resolve(url);
+                    });
+
+
+                    this.head.appendChild(el);
                 }
-                this.head.appendChild(el);
-            }
-        } else if (typeof (callback) === 'function') {
-            callback();
-        }
-    }
-    requireJs(url, callback) {
-        if (typeof url != 'string') {
-            url = url[0];
-        }
-
-        if (!url) {
-            if (typeof (callback) === 'function') {
-                callback();
-            }
-            return;
-        }
-
-        let loaded = ~this.required.indexOf(url);
-        if(!loaded) {
-            loaded = document.querySelector('link[href="' + url + '"],script[src="' + url + '"]') !== null;
-        }
-        if (!loaded) {
-            this.required.push(url);
-            let string = '<script type=\'text/javascript\'  src=\'' + url + '\'></script>';
-            if ((document.readyState === 'loading' /* || mwd.readyState === 'interactive'*/) && !!window.CanvasRenderingContext2D && self === parent) {
-                document.write(string);
-                callback();
             } else {
-                let el;
-                el = this.document.createElement('script');
-                el.src = url;
-                el.setAttribute('type', 'text/javascript');
-                // IE 6 & 7
-                if (typeof (callback) === 'function') {
+                resolve(url);
+            }
+        });
+    }
+    requireCss(url, callback) {
+        this.requireCssAsync(url).then(callback);
+    }
+    requireJsAsync(url) {
+        return new Promise((resolve, reject)=> {
+            let loaded = ~this.required.indexOf(url);
+            if(!loaded) {
+                loaded = document.querySelector('link[href="' + url + '"],script[src="' + url + '"]') !== null;
+            }
+            if (!loaded) {
+                this.required.push(url);
+                let string = '<script type=\'text/javascript\'  src=\'' + url + '\'></script>';
+                // if(this.config.debug) {
+                //     console.log('JS Require:' + url + ', readyState:' + document.readyState);
+                // }
+
+                if ((document.readyState === 'loading' /* || mwd.readyState === 'interactive'*/) && !!window.CanvasRenderingContext2D && self === parent) {
+                    document.write(string);
+                    if(this.config.debug) {
+                        console.log('JS Loaded:' + url + '');
+                    }
+                    resolve(url);
+                } else {
+                    let el;
+                    el = this.document.createElement('script');
+                    el.src = url;
+                    el.setAttribute('type', 'text/javascript');
+                    // IE 6 & 7
+
                     el.addEventListener('load', ()=> {
                         dispatchWindowEvent('cresenity:js:loaded', {
                             url: url
                         });
-                        callback();
+                        // if(this.config.debug) {
+                        //     console.log('JS Loaded:' + url + '');
+                        // }
+                        resolve(url);
                     });
+
+                    this.document.body.appendChild(el);
                 }
-                this.document.body.appendChild(el);
+            } else {
+                resolve(url)
             }
-        } else if (typeof (callback) === 'function') {
-            callback();
-        }
+
+
+        });
+    }
+    requireJs(url, callback) {
+        this.requireJsAsync(url).then(callback);
     }
     require(url, callback) {
         if (typeof url != 'string') {
@@ -188,9 +209,10 @@ class CF {
 
         if (t == 'js') {
             this.requireJs(toPush, callback);
-        }
-        if (t == 'css') {
+        }else if (t == 'css') {
             this.requireCss(toPush, callback);
+        } else {
+            callback();
         }
     }
     isProduction() {

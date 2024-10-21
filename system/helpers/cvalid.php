@@ -2,9 +2,12 @@
 defined('SYSPATH') or die('No direct access allowed.');
 
 //@codingStandardsIgnoreStart
+/**
+ * @deprecated 1.6 use CValidation
+ */
 class cvalid {
     /**
-     * Validate email, commonly used characters only
+     * Validate email, commonly used characters only.
      *
      * @param   string   email address
      * @param mixed $email
@@ -68,7 +71,7 @@ class cvalid {
     }
 
     /**
-     * Validate URL
+     * Validate URL.
      *
      * @param   string   URL
      * @param mixed $url
@@ -80,7 +83,7 @@ class cvalid {
     }
 
     /**
-     * Validate IP
+     * Validate IP.
      *
      * @param   string   IP address
      * @param   bool  allow IPv6 addresses
@@ -181,7 +184,7 @@ class cvalid {
         }
 
         // If the checksum is a multiple of 10, the number is valid
-        return ($checksum % 10 === 0);
+        return $checksum % 10 === 0;
     }
 
     /**
@@ -214,7 +217,7 @@ class cvalid {
      * @return bool
      */
     public static function date($str) {
-        return (strtotime($str) !== false);
+        return strtotime($str) !== false;
     }
 
     /**
@@ -295,6 +298,7 @@ class cvalid {
     public static function numeric($str) {
         // Use localeconv to set the decimal_point value: Usually a comma or period.
         $locale = localeconv();
+
         return (bool) preg_match('/^-?[0-9' . $locale['decimal_point'] . ']++$/D', (string) $str);
     }
 
@@ -355,6 +359,7 @@ class cvalid {
         if (preg_match("/^\d{10}$|^\d{12}$/", $passport) === 0) {
             return false;
         }
+
         return true;
     }
 
@@ -363,6 +368,7 @@ class cvalid {
         if (preg_match('/^[0-9]{4}-[0-9]{1,2}-[0-9]{1,2}$/', $date) === 0) {
             return false;
         }
+
         return true;
     }
 } // End valid

@@ -97,6 +97,7 @@ class CCron_Runner {
         $event->log();
         $event->log(str_repeat('#', 64));
         $event->log('# Error : ' . $exception->getMessage() . "\n# " . $exception->getFile() . ' (' . $exception->getLine() . ')');
+        $event->log($exception->getTraceAsString());
         $event->log(str_repeat('#', 64));
         $event->log();
     }

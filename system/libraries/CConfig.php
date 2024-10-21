@@ -9,20 +9,18 @@ class CConfig implements CInterface_Arrayable, ArrayAccess {
 
     protected $appCode;
 
-    protected $items;
-
     protected static $repository;
 
     /**
      * @param string $group
      *
-     * @throws CException
+     * @throws Exception
      *
      * @return CConfig
      */
     public static function &instance($group = 'app') {
         if (!is_string($group)) {
-            throw new CException('Config group must be a string');
+            throw new Exception('Config group must be a string');
         }
         if (!isset(CConfig::$instances[$group])) {
             // Create a new instance
@@ -34,7 +32,6 @@ class CConfig implements CInterface_Arrayable, ArrayAccess {
 
     protected function __construct($group) {
         $this->group = $group;
-        $this->refresh();
     }
 
     public function addAppCode($appCode) {
@@ -44,14 +41,9 @@ class CConfig implements CInterface_Arrayable, ArrayAccess {
     }
 
     public function get($key = null, $default = null) {
-        if ($key == null) {
-            return $this->all();
-        }
-        if (is_array($key)) {
-            return $this->getMany($key);
-        }
+        $configKey = $key ? $this->group . '.' . $key : $this->group;
 
-        return carr::get($this->items, $key, $default);
+        return $this->repository()->get($configKey, $default);
     }
 
     /**
@@ -68,8 +60,8 @@ class CConfig implements CInterface_Arrayable, ArrayAccess {
             if (is_numeric($key)) {
                 list($key, $default) = [$default, null];
             }
-
-            $config[$key] = carr::get($this->items, $key, $default);
+            $configKey = $key ? $this->group . '.' . $key : $this->group;
+            $config[$key] = $this->repository()->get($configKey, $default);
         }
 
         return $config;
@@ -79,14 +71,11 @@ class CConfig implements CInterface_Arrayable, ArrayAccess {
         $keys = is_array($key) ? $key : [$key => $value];
 
         foreach ($keys as $key => $value) {
-            carr::set($this->items, $key, $value);
+            $configKey = $key ? $this->group . '.' . $key : $this->group;
+            $this->repository()->set($configKey, $value);
         }
 
         return $this;
-    }
-
-    public function refresh() {
-        $this->items = CConfig_Loader::load($this->group);
     }
 
     /**
@@ -136,7 +125,7 @@ class CConfig implements CInterface_Arrayable, ArrayAccess {
      * @return array
      */
     public function all() {
-        return $this->items;
+        return $this->repository()->get($this->group);
     }
 
     public function toArray() {
@@ -151,7 +140,7 @@ class CConfig implements CInterface_Arrayable, ArrayAccess {
      * @return bool
      */
     public function has($key) {
-        return carr::has($this->items, $key);
+        return $this->repository()->has($key);
     }
 
     #[\ReturnTypeWillChange]
@@ -159,6 +148,7 @@ class CConfig implements CInterface_Arrayable, ArrayAccess {
         return $this->has($key);
     }
 
+    #[\ReturnTypeWillChange]
     public function offsetGet($key) {
         return $this->get($key);
     }
@@ -171,5 +161,19 @@ class CConfig implements CInterface_Arrayable, ArrayAccess {
     #[\ReturnTypeWillChange]
     public function offsetUnset($key) {
         $this->set($key, null);
+    }
+
+    /**
+     * @return CConfig_Manager
+     */
+    public static function manager() {
+        return CConfig_Manager::instance();
+    }
+
+    /**
+     * @return CConfig_Repository
+     */
+    public static function repository() {
+        return self::manager()->repository();
     }
 }

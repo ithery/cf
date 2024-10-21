@@ -10,17 +10,18 @@ defined('SYSPATH') or die('No direct access allowed.');
  */
 trait CTrait_Element_Property_Database {
     /**
-     * @var CDatabase
+     * @var CDatabase_Connection
      */
     protected $db;
 
     /**
-     * @param CDatabase $db
+     * @param CDatabase_Connection $db
      *
      * @return $this
      */
-    public function setDatabase(CDatabase $db) {
+    public function setDatabase(CDatabase_Connection $db) {
         $this->db = $db;
+
         return $this;
     }
 
@@ -29,8 +30,9 @@ trait CTrait_Element_Property_Database {
      */
     public function db() {
         if ($this->db == null) {
-            return CDatabase::instance();
+            return c::db();
         }
+
         return $this->db;
     }
 }

@@ -86,7 +86,7 @@ class CModel_Relation_BelongsToThrough extends CModel_Relation {
             $query->join($model->getTable(), $first, '=', $second);
 
             if ($this->hasSoftDeletes($model)) {
-                $this->query->whereNull($model->getQualifiedDeletedAtColumn());
+                $this->query->where($model->getQualifiedStatusColumn(), '<>', 0);
             }
         }
     }

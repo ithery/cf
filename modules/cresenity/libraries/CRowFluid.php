@@ -11,7 +11,7 @@ class CRowFluid extends CElement_Element {
     }
 
     public static function factory($id) {
-        cdbg::deprecated('CRowFluid is deprecated');
+        CDebug::collector()->collectDeprecated('CRowFluid is deprecated');
 
         return new CRowFluid($id);
     }

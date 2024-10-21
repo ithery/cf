@@ -5,11 +5,6 @@ defined('SYSPATH') or die('No direct access allowed.');
 /**
  * PSR-6 cache implementation that connects to Laravel's cache Repository.
  * adapted from https://github.com/madewithlove/illuminate-psr-cache-bridge.
- *
- * @author Hery Kurniawan
- * @license Ittron Global Teknologi <ittron.co.id>
- *
- * @since Jun 23, 2019, 1:01:05 PM
  */
 use Psr\Cache\CacheItemInterface;
 use Psr\Cache\CacheItemPoolInterface;

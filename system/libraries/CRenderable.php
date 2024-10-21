@@ -4,7 +4,6 @@ defined('SYSPATH') or die('No direct access allowed.');
 
 class CRenderable extends CObject implements CApp_Interface_Renderable {
     use CTrait_Compat_Renderable;
-
     /**
      * Renderable Child Array.
      *
@@ -46,6 +45,8 @@ class CRenderable extends CObject implements CApp_Interface_Renderable {
 
     public function setVisibility($bool) {
         $this->visibility = $bool;
+
+        return $this;
     }
 
     public function isVisible() {

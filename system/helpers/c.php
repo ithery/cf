@@ -135,7 +135,7 @@ class c {
                 }
 
                 if (\is_string($path) && $path[0] !== '[' && $path[strlen($path) - 1] !== ']') {
-                    $path = "[${path}]";
+                    $path = '[' . $path . ']';
                 }
             }
 
@@ -280,19 +280,16 @@ class c {
     /**
      * Report an exception.
      *
-     * @param \Throwable $exception
+     * @param \Throwable|string $exception
      *
      * @return void
      */
     public static function report($exception) {
-        if ($exception instanceof Throwable
-            && !$exception instanceof Exception
-        ) {
-            $exception = new FatalThrowableError($exception);
+        if (is_string($exception)) {
+            $exception = new Exception($exception);
         }
 
-        $exceptionHandler = CException::exceptionHandler();
-        $exceptionHandler->report($exception);
+        CException::exceptionHandler()->report($exception);
     }
 
     /**
@@ -335,14 +332,14 @@ class c {
      * @param null|string $message
      * @param array       $context
      *
-     * @return null|\CLogger
+     * @return null|\CLogger_Manager
      */
     public static function logger($message = null, array $context = []) {
         if (is_null($message)) {
-            return CLogger::instance();
+            return CLogger::logger();
         }
 
-        return CLogger::instance()->add(CLogger::DEBUG, $message, $context);
+        return CLogger::logger()->debug($message, $context);
     }
 
     //@codingStandardsIgnoreEnd
@@ -352,7 +349,7 @@ class c {
      *
      * @param null|\DateTimeZone|string $tz
      *
-     * @return CCarbon|\Carbon\Carbon|\CarbonV3\Carbon
+     * @return CCarbon|\Carbon\Carbon
      */
     public static function now($tz = null) {
         return CCarbon::now($tz);
@@ -436,7 +433,7 @@ class c {
             return $value->toHtml();
         }
 
-        return htmlspecialchars($value, ENT_QUOTES, 'UTF-8', $doubleEncode);
+        return htmlspecialchars($value ?? '', ENT_QUOTES | ENT_SUBSTITUTE, 'UTF-8', $doubleEncode);
     }
 
     /**
@@ -517,6 +514,9 @@ class c {
         if ($key === null) {
             return CTranslation::translator();
         }
+        if ($replace === null) {
+            $replace = [];
+        }
 
         return CTranslation::translator()->trans($key, $replace, $locale);
     }
@@ -550,13 +550,13 @@ class c {
      */
     public static function session($key = null, $default = null) {
         if ($key === null) {
-            return CSession::instance()->store();
+            return CSession::store();
         }
         if (is_array($key)) {
-            return CSession::instance()->store()->put($key);
+            return CSession::store()->put($key);
         }
 
-        return CSession::instance()->store()->get($key, $default);
+        return CSession::store()->get($key, $default);
     }
 
     /**
@@ -756,6 +756,9 @@ class c {
         if ($value instanceof Countable) {
             return count($value) === 0;
         }
+        if ($value instanceof CBase_String) {
+            return trim((string) $value) === '';
+        }
 
         return empty($value);
     }
@@ -812,6 +815,30 @@ class c {
      */
     public static function router() {
         return CRouting_Router::instance();
+    }
+
+    /**
+     * Create an Fluent object from the given value.
+     *
+     * @param object|array $value
+     *
+     * @return \CBase_Fluent
+     */
+    public static function fluent($value) {
+        return new CBase_Fluent($value);
+    }
+
+    /**
+     * Return a new literal or anonymous object using named arguments.
+     *
+     * @return \stdClass
+     */
+    public static function literal(...$arguments) {
+        if (count($arguments) === 1 && array_is_list($arguments)) {
+            return $arguments[0];
+        }
+
+        return (object) $arguments;
     }
 
     /**
@@ -889,6 +916,13 @@ class c {
      */
     public static function retry($times, callable $callback, $sleepMilliseconds = 0, $when = null) {
         $attempts = 0;
+        $backoff = [];
+
+        if (is_array($times)) {
+            $backoff = $times;
+
+            $times = count($times) + 1;
+        }
 
         beginning:
         $attempts++;
@@ -900,9 +934,9 @@ class c {
             if ($times < 1 || ($when && !$when($e))) {
                 throw $e;
             }
-
+            $sleepMilliseconds = $backoff[$attempts - 1] ?? $sleepMilliseconds;
             if ($sleepMilliseconds) {
-                usleep(c::value($sleepMilliseconds, $attempts) * 1000);
+                CBase_Sleep::usleep(c::value($sleepMilliseconds, $attempts, $e) * 1000);
             }
 
             goto beginning;
@@ -991,6 +1025,20 @@ class c {
     }
 
     /**
+     * @param null|string $key
+     * @param mixed       $default
+     *
+     * @return CConfig_Repository|mixed
+     */
+    public static function config($key = null, $default = null) {
+        if ($key == null) {
+            return CConfig::repository();
+        }
+
+        return CConfig::repository()->get($key, $default);
+    }
+
+    /**
      * Get the CApp instance.
      *
      * @return \CApp
@@ -1020,14 +1068,14 @@ class c {
     }
 
     /**
-     * Get the CDatabase instance.
+     * Get the database connection instance.
      *
      * @param null|string $name
      *
-     * @return \CDatabase
+     * @return \CDatabase_Connection
      */
     public static function db($name = null) {
-        return CDatabase::instance($name);
+        return CDatabase::manager()->connection($name);
     }
 
     public static function userAgent() {
@@ -1060,7 +1108,7 @@ class c {
             if ($segment === '*') {
                 if ($target instanceof CCollection) {
                     $target = $target->all();
-                } elseif (!is_array($target)) {
+                } elseif (!is_iterable($target)) {
                     return c::value($default);
                 }
 
@@ -1072,6 +1120,14 @@ class c {
 
                 return in_array('*', $key) ? carr::collapse($result) : $result;
             }
+            $segmentMap = [
+                '\*' => '*',
+                '\{first}' => '{first}',
+                '{first}' => array_key_first(is_array($target) ? $target : c::collect($target)->all()),
+                '\{last}' => '{last}',
+                '{last}' => array_key_last(is_array($target) ? $target : c::collect($target)->all()),
+            ];
+            $segment = carr::get($segmentMap, $segment, $segment);
 
             if (carr::accessible($target) && carr::exists($target, $segment)) {
                 $target = $target[$segment];
@@ -1139,6 +1195,32 @@ class c {
                 static::set($target[$segment], $segments, $value, $overwrite);
             } elseif ($overwrite) {
                 $target[$segment] = $value;
+            }
+        }
+
+        return $target;
+    }
+
+    public static function forget(&$target, $key) {
+        $segments = is_array($key) ? $key : explode('.', $key);
+
+        if (($segment = array_shift($segments)) === '*' && carr::accessible($target)) {
+            if ($segments) {
+                foreach ($target as &$inner) {
+                    self::forget($inner, $segments);
+                }
+            }
+        } elseif (carr::accessible($target)) {
+            if ($segments && carr::exists($target, $segment)) {
+                self::forget($target[$segment], $segments);
+            } else {
+                carr::forget($target, $segment);
+            }
+        } elseif (is_object($target)) {
+            if ($segments && isset($target->{$segment})) {
+                self::forget($target->{$segment}, $segments);
+            } elseif (isset($target->{$segment})) {
+                unset($target->{$segment});
             }
         }
 
@@ -1298,18 +1380,37 @@ class c {
         return static::manager()->theme();
     }
 
+    /**
+     * @return string
+     */
     public static function locale() {
         return str_replace('_', '-', CF::getLocale());
     }
 
+    /**
+     * @param mixed $obj
+     *
+     * @return bool
+     */
     public static function isIterable($obj) {
         return is_array($obj) || (is_object($obj) && ($obj instanceof \Traversable));
     }
 
+    /**
+     * @param string $type
+     * @param string $message
+     *
+     * @return void
+     */
     public static function msg($type, $message) {
-        return CApp_Message::add($type, $message);
+        CApp_Message::add($type, $message);
     }
 
+    /**
+     * @param string $path
+     *
+     * @return string
+     */
     public static function docRoot($path = null) {
         $docRoot = rtrim(DOCROOT, DS);
         if ($path != null) {
@@ -1350,10 +1451,20 @@ class c {
         return c::untrailingslashit($appRoot) . DS;
     }
 
+    /**
+     * @param null|string $name
+     *
+     * @return CStorage_Adapter
+     */
     public static function disk($name = null) {
         return CStorage::instance()->disk($name);
     }
 
+    /**
+     * @param callable $callable
+     *
+     * @return Closure
+     */
     public static function closureFromCallable($callable) {
         if (method_exists(Closure::class, 'fromCallable')) {
             return Closure::fromCallable($callable);
@@ -1364,10 +1475,18 @@ class c {
         };
     }
 
+    /**
+     * @param null|mixed $event
+     *
+     * @return CBroadcast_PendingBroadcast
+     */
     public static function broadcast($event = null) {
         return CBroadcast::manager()->event($event);
     }
 
+    /**
+     * @return string
+     */
     public static function environment() {
         if (CF::isProduction()) {
             return 'production';
@@ -1789,6 +1908,166 @@ class c {
 
     public static function resolveUserTimezone(CHTTP_Request $request) {
         return $request->timezone;
+    }
+
+    public static function queueable(Closure $closure) {
+        return new CEvent_QueuedClosure($closure);
+    }
+
+    /**
+     * Backward compatibility like array_is_list on php 8.1.
+     *
+     * @param array $array
+     *
+     * @return bool
+     */
+    public static function arrayIsList(array $array): bool {
+        if ([] === $array || $array === array_values($array)) {
+            return true;
+        }
+
+        $nextKey = -1;
+
+        foreach ($array as $k => $v) {
+            if ($k !== ++$nextKey) {
+                return false;
+            }
+        }
+
+        return true;
+    }
+
+    /**
+     * @template T
+     *
+     * @param (callable(): T) $callback
+     *
+     * @return T
+     */
+    public static function once(callable $callback) {
+        $trace = debug_backtrace(
+            DEBUG_BACKTRACE_PROVIDE_OBJECT,
+            2
+        );
+
+        $backtrace = new CBase_Once_Backtrace($trace);
+
+        if ($backtrace->getFunctionName() === 'eval') {
+            return call_user_func($callback);
+        }
+
+        $object = $backtrace->getObject();
+
+        $hash = $backtrace->getHash();
+
+        $cache = CBase_Once_Cache::instance();
+
+        if (is_string($object)) {
+            $object = $cache;
+        }
+
+        if (!$cache->isEnabled()) {
+            return call_user_func($callback, $backtrace->getArguments());
+        }
+
+        if (!$cache->has($object, $hash)) {
+            $result = call_user_func($callback, $backtrace->getArguments());
+
+            $cache->set($object, $hash, $result);
+        }
+
+        return $cache->get($object, $hash);
+    }
+
+    public static function clsx() {
+        $args = func_get_args();
+
+        return CBase_CClsx::clsx(...$args);
+    }
+
+    /**
+     * Generate CSS style string from an associative array.
+     *
+     * @param array $styles Styles array
+     *
+     * @return string
+     */
+    public static function stylex($styles) {
+        if (!is_array($styles) || empty($styles)) {
+            return '';
+        }
+
+        if (array_values($styles) === $styles) { // Check if it's an indexed array
+            return implode(';', $styles) . ';';
+        }
+
+        $styleNames = '';
+        foreach ($styles as $key => $value) {
+            $cssPropertyName = cstr::kebabCase($key);
+            if (is_string($value)) {
+                $styleNames .= "{$cssPropertyName}:{$value};";
+
+                continue;
+            }
+
+            if (is_bool($value)) {
+                $styleNames .= $cssPropertyName;
+
+                continue;
+            }
+
+            if (!is_array($value) || empty($value)) {
+                continue;
+            }
+
+            foreach ($value as $condValue => $condition) {
+                if ((is_callable($condition) && $condition()) || $condition) {
+                    $styleNames .= "{$cssPropertyName}:{$condValue};";
+
+                    break;
+                }
+            }
+        }
+
+        return $styleNames;
+    }
+
+    public static function elapsed() {
+        return microtime(true) - CF_START;
+    }
+
+    /**
+     * Join the given paths together.
+     *
+     * @param null|string $basePath
+     * @param string      ...$paths
+     *
+     * @return string
+     */
+    public static function joinPaths($basePath, ...$paths) {
+        foreach ($paths as $index => $path) {
+            if (empty($path) && $path !== '0') {
+                unset($paths[$index]);
+            } else {
+                $paths[$index] = DIRECTORY_SEPARATOR . ltrim($path, DIRECTORY_SEPARATOR);
+            }
+        }
+
+        return $basePath . implode('', $paths);
+    }
+
+    /**
+     * @return CApp_Visitor
+     */
+    public static function visitor() {
+        return c::app()->visitor();
+    }
+
+    public static function randmd5() {
+        $rand = rand(0, 9999);
+        $base = date('YmdHis') . $rand;
+
+        return md5($rand);
     }
 }
 

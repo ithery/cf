@@ -169,7 +169,7 @@ class CElement_FormInput_EditorJs_DefaultConfig {
                         'data' => [
                             '-' => [
                                 'type' => 'string',
-                                'allowedTags' => 'i,b,u',
+                                'allowedTags' => 'i,b,u,a[href]',
                             ],
                         ],
                     ],

@@ -11,8 +11,8 @@
 
 namespace Symfony\Component\Finder\Iterator;
 
-use Symfony\Component\Finder\Exception\AccessDeniedException;
 use Symfony\Component\Finder\SplFileInfo;
+use Symfony\Component\Finder\Exception\AccessDeniedException;
 
 /**
  * Extends the \RecursiveDirectoryIterator to support relative paths.
@@ -20,7 +20,6 @@ use Symfony\Component\Finder\SplFileInfo;
  * @author Victor Berchet <victor@suumit.com>
  */
 class RecursiveDirectoryIterator extends \RecursiveDirectoryIterator {
-
     /**
      * @var bool
      */
@@ -30,12 +29,19 @@ class RecursiveDirectoryIterator extends \RecursiveDirectoryIterator {
      * @var bool
      */
     private $rewindable;
+
     // these 3 properties take part of the performance optimization to avoid redoing the same work in all iterations
     private $rootPath;
+
     private $subPath;
+
     private $directorySeparator = '/';
 
     /**
+     * @param mixed $path
+     * @param mixed $flags
+     * @param mixed $ignoreUnreadableDirs
+     *
      * @throws \RuntimeException
      */
     public function __construct($path, $flags, $ignoreUnreadableDirs = false) {
@@ -56,6 +62,7 @@ class RecursiveDirectoryIterator extends \RecursiveDirectoryIterator {
      *
      * @return SplFileInfo File information
      */
+    #[\ReturnTypeWillChange]
     public function current() {
         // the logic here avoids redoing the same work in all iterations
 
@@ -71,10 +78,11 @@ class RecursiveDirectoryIterator extends \RecursiveDirectoryIterator {
     }
 
     /**
-     * @return \RecursiveIterator
-     *
      * @throws AccessDeniedException
+     *
+     * @return \RecursiveIterator
      */
+    #[\ReturnTypeWillChange]
     public function getChildren() {
         try {
             $children = parent::getChildren();
@@ -92,7 +100,7 @@ class RecursiveDirectoryIterator extends \RecursiveDirectoryIterator {
         } catch (\UnexpectedValueException $e) {
             if ($this->ignoreUnreadableDirs) {
                 // If directory is unreadable and finder is set to ignore it, a fake empty content is returned.
-                return new \RecursiveArrayIterator(array());
+                return new \RecursiveArrayIterator([]);
             } else {
                 throw new AccessDeniedException($e->getMessage(), $e->getCode(), $e);
             }
@@ -102,6 +110,7 @@ class RecursiveDirectoryIterator extends \RecursiveDirectoryIterator {
     /**
      * Do nothing for non rewindable stream.
      */
+    #[\ReturnTypeWillChange]
     public function rewind() {
         if (false === $this->isRewindable()) {
             return;
@@ -131,5 +140,4 @@ class RecursiveDirectoryIterator extends \RecursiveDirectoryIterator {
 
         return $this->rewindable = false;
     }
-
 }

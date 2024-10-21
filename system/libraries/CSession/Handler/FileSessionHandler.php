@@ -1,7 +1,7 @@
 <?php
 
 /**
- * Description of FileSessionHandler
+ * Description of FileSessionHandler.
  *
  * @author Hery
  */
@@ -9,6 +9,13 @@
 use Symfony\Component\Finder\Finder;
 
 class CSession_Handler_FileSessionHandler implements SessionHandlerInterface {
+    /**
+     * The filesystem instance.
+     *
+     * @var \CFile
+     */
+    protected $files;
+
     /**
      * The path where sessions should be stored.
      *
@@ -21,45 +28,48 @@ class CSession_Handler_FileSessionHandler implements SessionHandlerInterface {
      *
      * @var int
      */
-    protected $minutes;
+    protected $seconds;
 
     /**
      * Create a new file driven handler instance.
      *
      * @param string $path
-     * @param int    $minutes
+     * @param int    $seconds
      *
      * @return void
      */
-    public function __construct($path, $minutes) {
+    public function __construct($path, $seconds) {
         $this->files = new CFile();
         $this->path = DOCROOT . 'temp' . DS . 'session';
         if (!is_dir($this->path)) {
             CFile::makeDirectory($this->path, 0755, true);
         }
-        $this->minutes = $minutes;
+        $this->seconds = $seconds;
     }
 
     /**
-     * {@inheritdoc}
+     * @inheritdoc
      */
+    #[\ReturnTypeWillChange]
     public function open($savePath, $sessionName) {
         return true;
     }
 
     /**
-     * {@inheritdoc}
+     * @inheritdoc
      */
+    #[\ReturnTypeWillChange]
     public function close() {
         return true;
     }
 
     /**
-     * {@inheritdoc}
+     * @inheritdoc
      */
+    #[\ReturnTypeWillChange]
     public function read($sessionId) {
         if ($this->files->isFile($path = $this->path . '/' . $sessionId)) {
-            if ($this->files->lastModified($path) >= CCarbon::now()->subMinutes($this->minutes)->getTimestamp()) {
+            if ($this->files->lastModified($path) >= CCarbon::now()->subSeconds($this->seconds)->getTimestamp()) {
                 return $this->files->sharedGet($path);
             }
         }
@@ -68,16 +78,19 @@ class CSession_Handler_FileSessionHandler implements SessionHandlerInterface {
     }
 
     /**
-     * {@inheritdoc}
+     * @inheritdoc
      */
+    #[\ReturnTypeWillChange]
     public function write($sessionId, $data) {
         $this->files->put($this->path . '/' . $sessionId, $data, true);
+
         return true;
     }
 
     /**
-     * {@inheritdoc}
+     * @inheritdoc
      */
+    #[\ReturnTypeWillChange]
     public function destroy($sessionId) {
         $this->files->delete($this->path . '/' . $sessionId);
 
@@ -85,8 +98,9 @@ class CSession_Handler_FileSessionHandler implements SessionHandlerInterface {
     }
 
     /**
-     * {@inheritdoc}
+     * @inheritdoc
      */
+    #[\ReturnTypeWillChange]
     public function gc($lifetime) {
         $files = Finder::create()
             ->in($this->path)

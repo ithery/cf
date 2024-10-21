@@ -2,18 +2,12 @@
 
 defined('SYSPATH') or die('No direct access allowed.');
 
-/**
- * @author Hery Kurniawan <hery@itton.co.id>
- * @license Ittron Global Teknologi
- *
- * @since Nov 29, 2020
- */
 trait CApp_Concern_ViewTrait {
     protected static $viewCallback;
 
-    private $viewName = 'capp/page';
+    private $viewName = 'cresenity/capp/page';
 
-    private $viewLoginName = 'capp/login';
+    private $viewLoginName = 'cresenity/capp/login';
 
     /**
      * View.

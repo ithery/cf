@@ -167,7 +167,7 @@ export default class Gallery {
         this.items = [];
         if (!this.config.dynamic) {
             if (this.config.selector === 'this') {
-                this.items.push(this.el);
+                this.items.push(this.element);
             } else if (this.config.selector) {
                 if (typeof this.config.selector === 'string') {
                     if (this.config.selectWithin) {
@@ -178,7 +178,7 @@ export default class Gallery {
                             .find(this.config.selector)
                             .get();
                     } else {
-                        this.items = this.el.querySelectorAll(
+                        this.items = this.element.querySelectorAll(
                             this.config.selector
                         );
                     }

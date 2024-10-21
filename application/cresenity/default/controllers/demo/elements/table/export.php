@@ -26,7 +26,7 @@ class Controller_Demo_Elements_Table_Export extends \Cresenity\Demo\Controller {
 
         // export table here
         if ($isExport) {
-            $table->downloadexcel('export-data-' . date('Ymdhis') . '.xls');
+            return $table->downloadexcel('export-data-' . date('Ymdhis') . '.xls');
         }
 
         return $app;

@@ -6,7 +6,7 @@ class CVendor_Xendit_Invoice extends CVendor_Xendit_Base {
     use CVendor_Xendit_ApiOperation_RetrieveAll;
 
     /**
-     * Instantiate base URL
+     * Instantiate base URL.
      *
      * @return string
      */
@@ -15,16 +15,16 @@ class CVendor_Xendit_Invoice extends CVendor_Xendit_Base {
     }
 
     /**
-     * Instantiate required params for Create
+     * Instantiate required params for Create.
      *
      * @return array
      */
     protected function createReqParams() {
-        return ['external_id', 'payer_email', 'description', 'amount'];
+        return ['external_id', 'description', 'amount'];
     }
 
     /**
-     * Instantiate required params for Update
+     * Instantiate required params for Update.
      *
      * @return array
      */
@@ -33,9 +33,11 @@ class CVendor_Xendit_Invoice extends CVendor_Xendit_Base {
     }
 
     /**
-     * Expire Invoice
+     * Expire Invoice.
      *
      * @param string $id Invoice ID
+     *
+     * @throws CVendor_Xendit_Exception_ApiException
      *
      * @return array[
      *                'id'=> string,
@@ -55,8 +57,6 @@ class CVendor_Xendit_Invoice extends CVendor_Xendit_Base {
      *                'created'=> string,
      *                'updated'=> string
      *                ]
-     *
-     * @throws CVendor_Xendit_Exception_ApiException
      */
     public function expireInvoice($id) {
         $url = '/invoices/' . $id . '/expire!';

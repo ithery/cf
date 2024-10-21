@@ -28,7 +28,14 @@ class CValidation {
     }
 
     /**
-     * Return validation factory or validator given by the parameter
+     * @return CValidation_Rule
+     */
+    public static function rule() {
+        return static::createRule();
+    }
+
+    /**
+     * Return validation factory or validator given by the parameter.
      *
      * @param array $data             | optional
      * @param array $rules
@@ -41,6 +48,7 @@ class CValidation {
         if ($data != null) {
             return CValidation_Factory::instance()->make($data, $rules, $messages, $customAttributes);
         }
+
         return CValidation_Factory::instance();
     }
 }

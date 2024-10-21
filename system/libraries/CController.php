@@ -30,6 +30,20 @@ abstract class CController {
 
         // Input should always be available
         $this->input = CController_Input::instance();
+        //boot trait
+        $class = static::class;
+        $booted = [];
+        foreach (c::classUsesRecursive($class) as $trait) {
+            $method = 'boot' . c::classBasename($trait);
+            $classMethod = $class . $method;
+            $reflectionClass = new ReflectionClass($class);
+
+            if ($reflectionClass->hasMethod($method) && !in_array($classMethod, $booted)) {
+                if ($reflectionClass->getMethod($method)->isStatic()) {
+                    forward_static_call([$class, $method]);
+                }
+            }
+        }
     }
 
     /**

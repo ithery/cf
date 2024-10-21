@@ -18,7 +18,7 @@ class CElement_FormInput_EditorJs_Tool_ParagraphTool extends CElement_FormInput_
     public function getConfig() {
         return [
             'enabled' => (bool) $this->enabled,
-            'inlineToolbar' => (bool) $this->inlineToolbar,
+            'inlineToolbar' => $this->inlineToolbar,
             'placeholder' => (string) $this->placeholder,
         ];
     }

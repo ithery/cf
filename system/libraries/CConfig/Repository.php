@@ -143,6 +143,7 @@ class CConfig_Repository implements ArrayAccess, CConfig_Contract_RepositoryInte
      *
      * @return mixed
      */
+    #[\ReturnTypeWillChange]
     public function offsetGet($key) {
         return $this->get($key);
     }

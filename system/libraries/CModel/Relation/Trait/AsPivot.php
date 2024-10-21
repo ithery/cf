@@ -2,12 +2,6 @@
 
 defined('SYSPATH') or die('No direct access allowed.');
 
-/**
- * @author Hery Kurniawan
- * @license Ittron Global Teknologi <ittron.co.id>
- *
- * @since Jul 28, 2019, 3:10:38 AM
- */
 trait CModel_Relation_Trait_AsPivot {
     /**
      * The parent model of the relationship.
@@ -41,7 +35,7 @@ trait CModel_Relation_Trait_AsPivot {
      * @return static
      */
     public static function fromAttributes(CModel $parent, $attributes, $table, $exists = false) {
-        $instance = new static;
+        $instance = new static();
 
         $instance->timestamps = $instance->hasTimestampAttributes($attributes);
 
@@ -90,14 +84,16 @@ trait CModel_Relation_Trait_AsPivot {
      *
      * @return CModel_Query
      */
-    protected function setKeysForSelectQuery(CModel_Query $query) {
+    protected function setKeysForSelectQuery($query) {
         if (isset($this->attributes[$this->getKeyName()])) {
-            return parent::setKeysForSaveQuery($query);
+            return parent::setKeysForSelectQuery($query);
         }
+
         $query->where($this->foreignKey, $this->getOriginal(
             $this->foreignKey,
             $this->getAttribute($this->foreignKey)
         ));
+
         return $query->where($this->relatedKey, $this->getOriginal(
             $this->relatedKey,
             $this->getAttribute($this->relatedKey)
@@ -111,7 +107,7 @@ trait CModel_Relation_Trait_AsPivot {
      *
      * @return CModel_Query
      */
-    protected function setKeysForSaveQuery(CModel_Query $query) {
+    protected function setKeysForSaveQuery($query) {
         return $this->setKeysForSelectQuery($query);
     }
 
@@ -128,8 +124,10 @@ trait CModel_Relation_Trait_AsPivot {
             return 0;
         }
         $this->touchOwners();
+
         return c::tap($this->getDeleteQuery()->delete(), function () {
             $this->exists = false;
+
             $this->fireModelEvent('deleted', false);
         });
     }
@@ -159,6 +157,7 @@ trait CModel_Relation_Trait_AsPivot {
                 cstr::snake(cstr::singular(c::classBasename($this)))
             ));
         }
+
         return $this->table;
     }
 
@@ -200,13 +199,14 @@ trait CModel_Relation_Trait_AsPivot {
     public function setPivotKeys($foreignKey, $relatedKey) {
         $this->foreignKey = $foreignKey;
         $this->relatedKey = $relatedKey;
+
         return $this;
     }
 
     /**
      * Determine if the pivot model or given attributes has timestamp attributes.
      *
-     * @param  $attributes  array|null
+     * @param $attributes array|null
      *
      * @return bool
      */
@@ -241,6 +241,7 @@ trait CModel_Relation_Trait_AsPivot {
         if (isset($this->attributes[$this->getKeyName()])) {
             return $this->getKey();
         }
+
         return sprintf(
             '%s:%s:%s:%s',
             $this->foreignKey,
@@ -265,6 +266,7 @@ trait CModel_Relation_Trait_AsPivot {
             return parent::newQueryForRestoration($ids);
         }
         $segments = explode(':', $ids);
+
         return $this->newQueryWithoutScopes()
             ->where($segments[0], $segments[1])
             ->where($segments[2], $segments[3]);
@@ -290,6 +292,7 @@ trait CModel_Relation_Trait_AsPivot {
                     ->where($segments[2], $segments[3]);
             });
         }
+
         return $query;
     }
 

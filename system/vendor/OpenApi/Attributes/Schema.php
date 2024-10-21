@@ -8,14 +8,22 @@ namespace OpenApi\Attributes;
 
 use OpenApi\Generator;
 
-#[\Attribute(\Attribute::TARGET_CLASS | \Attribute::TARGET_METHOD | \Attribute::TARGET_PROPERTY)]
+#[\Attribute(\Attribute::TARGET_CLASS | \Attribute::TARGET_METHOD | \Attribute::TARGET_PROPERTY | \Attribute::IS_REPEATABLE)]
 class Schema extends \OpenApi\Annotations\Schema
 {
     /**
-     * @param string[]                  $required
-     * @param string[]                  $enum
-     * @param array<string,string>|null $x
-     * @param Attachable[]|null         $attachables
+     * @param string|class-string|object|null                 $ref
+     * @param string[]                                        $required
+     * @param Property[]                                      $properties
+     * @param int|float                                       $maximum
+     * @param int|float                                       $minimum
+     * @param string[]|int[]|float[]|\UnitEnum[]|class-string $enum
+     * @param array<Schema|\OpenApi\Annotations\Schema>       $allOf
+     * @param array<Schema|\OpenApi\Annotations\Schema>       $anyOf
+     * @param array<Schema|\OpenApi\Annotations\Schema>       $oneOf
+     * @param mixed                                           $const
+     * @param array<string,mixed>|null                        $x
+     * @param Attachable[]|null                               $attachables
      */
     public function __construct(
         // schema
@@ -23,13 +31,15 @@ class Schema extends \OpenApi\Annotations\Schema
         ?string $schema = null,
         ?string $title = null,
         ?string $description = null,
+        ?int $maxProperties = null,
+        ?int $minProperties = null,
         ?array $required = null,
         ?array $properties = null,
         ?string $type = null,
         ?string $format = null,
         ?Items $items = null,
         ?string $collectionFormat = null,
-        $default = null,
+        mixed $default = Generator::UNDEFINED,
         $maximum = null,
         ?bool $exclusiveMaximum = null,
         $minimum = null,
@@ -40,19 +50,20 @@ class Schema extends \OpenApi\Annotations\Schema
         ?int $minItems = null,
         ?bool $uniqueItems = null,
         ?string $pattern = null,
-        ?array $enum = null,
+        array|string|null $enum = null,
         ?Discriminator $discriminator = null,
         ?bool $readOnly = null,
         ?bool $writeOnly = null,
         ?Xml $xml = null,
         ?ExternalDocumentation $externalDocs = null,
-        $example = null,
+        mixed $example = Generator::UNDEFINED,
         ?bool $nullable = null,
         ?bool $deprecated = null,
         ?array $allOf = null,
         ?array $anyOf = null,
         ?array $oneOf = null,
         AdditionalProperties|bool|null $additionalProperties = null,
+        $const = Generator::UNDEFINED,
         // annotation
         ?array $x = null,
         ?array $attachables = null
@@ -62,12 +73,14 @@ class Schema extends \OpenApi\Annotations\Schema
             'schema' => $schema ?? Generator::UNDEFINED,
             'title' => $title ?? Generator::UNDEFINED,
             'description' => $description ?? Generator::UNDEFINED,
+            'maxProperties' => $maxProperties ?? Generator::UNDEFINED,
+            'minProperties' => $minProperties ?? Generator::UNDEFINED,
             'required' => $required ?? Generator::UNDEFINED,
             'properties' => $properties ?? Generator::UNDEFINED,
             'type' => $type ?? Generator::UNDEFINED,
             'format' => $format ?? Generator::UNDEFINED,
             'collectionFormat' => $collectionFormat ?? Generator::UNDEFINED,
-            'default' => $default ?? Generator::UNDEFINED,
+            'default' => $default,
             'maximum' => $maximum ?? Generator::UNDEFINED,
             'exclusiveMaximum' => $exclusiveMaximum ?? Generator::UNDEFINED,
             'minimum' => $minimum ?? Generator::UNDEFINED,
@@ -82,13 +95,14 @@ class Schema extends \OpenApi\Annotations\Schema
             'readOnly' => $readOnly ?? Generator::UNDEFINED,
             'writeOnly' => $writeOnly ?? Generator::UNDEFINED,
             'xml' => $xml ?? Generator::UNDEFINED,
-            'example' => $example ?? Generator::UNDEFINED,
+            'example' => $example,
             'nullable' => $nullable ?? Generator::UNDEFINED,
             'deprecated' => $deprecated ?? Generator::UNDEFINED,
             'allOf' => $allOf ?? Generator::UNDEFINED,
             'anyOf' => $anyOf ?? Generator::UNDEFINED,
             'oneOf' => $oneOf ?? Generator::UNDEFINED,
             'additionalProperties' => $additionalProperties ?? Generator::UNDEFINED,
+            'const' => $const,
             'x' => $x ?? Generator::UNDEFINED,
             'attachables' => $attachables ?? Generator::UNDEFINED,
             'value' => $this->combine($items, $discriminator, $externalDocs, $attachables),

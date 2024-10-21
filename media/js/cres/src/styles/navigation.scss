@@ -1,0 +1,20 @@
+.cres-nav-badge {
+    display: inline-block;
+    padding: 0.25em 0.417em;
+    font-size: .858em;
+    font-weight: 500;
+    line-height: 1;
+    text-align: center;
+    white-space: nowrap;
+    vertical-align: baseline;
+    border-radius: 0.125rem;
+    position: absolute;
+    right: 3rem;
+    top: 50%;
+    transform: translateY(-50%);
+}
+
+.cres-nav-badge-info {
+    background-color: #28c3d7;
+    color: #fff;
+}

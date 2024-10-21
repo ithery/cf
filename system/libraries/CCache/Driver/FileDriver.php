@@ -2,16 +2,11 @@
 
 defined('SYSPATH') or die('No direct access allowed.');
 
-/**
- * @author Hery Kurniawan
- * @license Ittron Global Teknologi <ittron.co.id>
- *
- * @since Feb 16, 2019, 1:07:08 PM
- */
 class CCache_Driver_FileDriver extends CCache_DriverAbstract implements CCache_Contract_LockProviderDriverInterface {
     use CTrait_Helper_InteractsWithTime;
     use CCache_Trait_RetrievesMultipleKeys;
     use CCache_Trait_HasCacheLockTrait;
+
     protected $engine;
 
     public function __construct($options) {

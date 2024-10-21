@@ -2,7 +2,7 @@
 
 trait CElement_Component_DataTable_Trait_JavascriptTrait {
     public function js($indent = 0) {
-        $quickSearchPlaceholder = $this->quickSearchPlaceholder ? "'" . $this->quickSearchPlaceholder . "'" : "'".c::__('element/datatable.search')." ' + title";
+        $quickSearchPlaceholder = $this->quickSearchPlaceholder ? "'" . $this->quickSearchPlaceholder . "'" : "'" . c::__('element/datatable.search') . " ' + title";
 
         /** @var CElement_Component_DataTable $this */
         $this->buildOnce();
@@ -248,7 +248,8 @@ trait CElement_Component_DataTable_Trait_JavascriptTrait {
             }
 
             $jqueryui = 'bJQueryUI: false,';
-            if (CClientModules::instance()->isRegisteredModule('jquery.ui') || CClientModules::instance()->isRegisteredModule('jquery-ui-1.12.1.custom')) {
+
+            if (c::manager()->asset()->module()->isRegisteredModule('jquery.ui') || c::manager()->asset()->module()->isRegisteredModule('jquery-ui-1.12.1.custom')) {
                 $jqueryui = 'bJQueryUI: true,';
             }
             $js->appendln('buttons:        ' . json_encode($this->buttons) . ',')->br();
@@ -478,6 +479,11 @@ trait CElement_Component_DataTable_Trait_JavascriptTrait {
         }
         if ($this->applyDataTable) {
             $js->appendln("$('#" . $this->id . "').data('cappDataTable'," . $varNameOTable . ');');
+            if ($this->autoRefreshInterval) {
+                $js->appendln("$('#" . $this->id . "').data('cappDataTableAutoRefreshHandler', setInterval( function () {
+                    $('#" . $this->id . "').DataTable().ajax.reload(null, false);
+                }, " . ((int) $this->autoRefreshInterval) . ' * 1000));');
+            }
         }
 
         return $js->text();

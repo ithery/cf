@@ -1,6 +1,5 @@
-(function($) {
-
-    var csscls = PhpDebugBar.utils.makecsscls('phpdebugbar-widgets-');
+(function ($) {
+    var csscls = window.PhpDebugBar.utils.makecsscls('phpdebugbar-widgets-');
 
     /**
      * Widget for the displaying templates data
@@ -8,14 +7,14 @@
      * Options:
      *  - data
      */
-    var TemplatesWidget = PhpDebugBar.Widgets.TemplatesWidget = PhpDebugBar.Widget.extend({
+    window.TemplatesWidget = window.PhpDebugBar.Widgets.TemplatesWidget = window.PhpDebugBar.Widget.extend({
 
         className: csscls('templates'),
 
-        render: function() {
+        render: function () {
             this.$status = $('<div />').addClass(csscls('status')).appendTo(this.$el);
 
-            this.$list = new  PhpDebugBar.Widgets.ListWidget({ itemRenderer: function(li, tpl) {
+            this.$list = new window.PhpDebugBar.Widgets.ListWidget({ itemRenderer: function (li, tpl) {
                 $('<span />').addClass(csscls('name')).text(tpl.name).appendTo(li);
 
                 if (typeof tpl.xdebug_link !== 'undefined' && tpl.xdebug_link !== null) {
@@ -33,21 +32,24 @@
                 if (tpl.memory_str) {
                     $('<span title="Memory usage" />').addClass(csscls('memory')).text(tpl.memory_str).appendTo(li);
                 }
-                if (typeof(tpl.param_count) != 'undefined') {
+                if (typeof (tpl.param_count) != 'undefined') {
                     $('<span title="Parameter count" />').addClass(csscls('param-count')).text(tpl.param_count).appendTo(li);
                 }
-                if (typeof(tpl.type) != 'undefined' && tpl.type) {
+                if (typeof (tpl.type) != 'undefined' && tpl.type) {
                     $('<span title="Type" />').addClass(csscls('type')).text(tpl.type).appendTo(li);
+                }
+                if (typeof (tpl.editorLink) != 'undefined' && tpl.editorLink) {
+                    $('<a href="'+ tpl.editorLink +'" />').addClass(csscls('editor-link')).text('file').appendTo(li);
                 }
                 if (tpl.params && !$.isEmptyObject(tpl.params)) {
                     var table = $('<table><tr><th colspan="2">Params</th></tr></table>').addClass(csscls('params')).appendTo(li);
                     for (var key in tpl.params) {
                         if (typeof tpl.params[key] !== 'function') {
                             table.append('<tr><td class="' + csscls('name') + '">' + key + '</td><td class="' + csscls('value') +
-                            '"><pre><code>' + tpl.params[key] + '</code></pre></td></tr>');
+                            '"><pre><code>' + encodeURIComponent(tpl.params[key]) + '</code></pre></td></tr>');
                         }
                     }
-                    li.css('cursor', 'pointer').click(function() {
+                    li.css('cursor', 'pointer').click(function () {
                         if (table.is(':visible')) {
                             table.hide();
                         } else {
@@ -59,13 +61,13 @@
             this.$list.$el.appendTo(this.$el);
             this.$callgraph = $('<div />').addClass(csscls('callgraph')).appendTo(this.$el);
 
-            this.bindAttr('data', function(data) {
+            this.bindAttr('data', function (data) {
                 this.$list.set('data', data.templates);
                 this.$status.empty();
                 this.$callgraph.empty();
 
-                var sentence = data.sentence || "templates were rendered";
-                $('<span />').text(data.nb_templates + " " + sentence).appendTo(this.$status);
+                var sentence = data.sentence || 'templates were rendered';
+                $('<span />').text(data.nb_templates + ' ' + sentence).appendTo(this.$status);
 
                 if (data.accumulated_render_time_str) {
                     this.$status.append($('<span title="Accumulated render time" />').addClass(csscls('render-time')).text(data.accumulated_render_time_str));
@@ -74,10 +76,10 @@
                     this.$status.append($('<span title="Memory usage" />').addClass(csscls('memory')).text(data.memory_usage_str));
                 }
                 if (data.nb_blocks > 0) {
-                    $('<div />').text(data.nb_blocks + " blocks were rendered").appendTo(this.$status);
+                    $('<div />').text(data.nb_blocks + ' blocks were rendered').appendTo(this.$status);
                 }
                 if (data.nb_macros > 0) {
-                    $('<div />').text(data.nb_macros + " macros were rendered").appendTo(this.$status);
+                    $('<div />').text(data.nb_macros + ' macros were rendered').appendTo(this.$status);
                 }
                 if (typeof data.callgraph !== 'undefined') {
                     this.$callgraph.html(data.callgraph);
@@ -86,5 +88,4 @@
         }
 
     });
-
-})(PhpDebugBar.$);
+}(window.PhpDebugBar.$));

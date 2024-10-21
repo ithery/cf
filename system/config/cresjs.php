@@ -28,4 +28,9 @@ return [
 
         ]
     ],
+    'alpine' => [
+        'ui' => [
+            'debug' => true
+        ]
+    ],
 ];

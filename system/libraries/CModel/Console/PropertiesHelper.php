@@ -35,9 +35,9 @@ class CModel_Console_PropertiesHelper {
             'longtext' => 'string',
             'enum' => 'string',
             'set' => 'string',
-            'date' => 'CCarbon|\Carbon\Carbon|\CarbonV3\Carbon',
+            'date' => 'CCarbon|\Carbon\Carbon',
             'time' => 'string',
-            'datetime' => 'CCarbon|\Carbon\Carbon|\CarbonV3\Carbon',
+            'datetime' => 'CCarbon|\Carbon\Carbon',
             'timestamp' => 'string',
             'year' => 'string',
             'boolean' => 'bool',
@@ -68,6 +68,7 @@ class CModel_Console_PropertiesHelper {
             CModel_Relation_HasManyThrough::class,
             CModel_Relation_HasManyDeep::class,
             CModel_Relation_MorphMany::class,
+            CModel_Relation_MorphOne::class,
             CModel_Relation_HasOne::class,
         ];
 
@@ -135,7 +136,7 @@ class CModel_Console_PropertiesHelper {
         ) {
             $relationType = 'CModel_Collection|' . $relationClass . '[]';
         }
-        if ($returnType == CModel_Relation_HasOne::class) {
+        if ($returnType == CModel_Relation_HasOne::class || $returnType == CModel_Relation_MorphOne::class) {
             $relationType = 'null|' . $relationClass;
         }
 
@@ -184,7 +185,6 @@ class CModel_Console_PropertiesHelper {
     public static function getFields($table, $prefix = '') {
         $excludedFields = ['created', 'createdby', 'updated', 'updatedby', 'status'];
         $db = c::db();
-
         $result = $db->getSchemaManager()->listTableColumns($table);
 
         if (empty($result)) {

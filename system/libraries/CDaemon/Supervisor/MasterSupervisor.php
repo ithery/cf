@@ -1,9 +1,16 @@
 <?php
 
-use CarbonV3\CarbonImmutable;
+use Carbon\CarbonImmutable;
 
 class CDaemon_Supervisor_MasterSupervisor implements CDaemon_Contract_PausableInterface, CDaemon_Contract_RestartableInterface, CDaemon_Contract_TerminableInterface {
     use CDaemon_Trait_ListenForSignals;
+
+    /**
+     * The name of the master supervisor.
+     *
+     * @var string
+     */
+    public $daemonClass;
 
     /**
      * The name of the master supervisor.
@@ -43,9 +50,12 @@ class CDaemon_Supervisor_MasterSupervisor implements CDaemon_Contract_PausableIn
     /**
      * Create a new master supervisor instance.
      *
+     * @param null|string $daemonClass
+     *
      * @return void
      */
-    public function __construct() {
+    public function __construct($daemonClass = null) {
+        $this->daemonClass = $daemonClass;
         $this->name = static::name();
         $this->supervisors = c::collect();
 
@@ -53,6 +63,10 @@ class CDaemon_Supervisor_MasterSupervisor implements CDaemon_Contract_PausableIn
         };
 
         CDaemon_Supervisor::supervisorCommandQueue()->flush($this->commandQueue());
+    }
+
+    public function getDaemonClass() {
+        return $this->daemonClass;
     }
 
     /**
@@ -215,7 +229,6 @@ class CDaemon_Supervisor_MasterSupervisor implements CDaemon_Contract_PausableIn
             }
 
             $this->persist();
-            CDaemon::log('Master Supervisor Looped');
             c::event(new CDaemon_Supervisor_Event_MasterSupervisorLooped($this));
         } catch (Throwable $e) {
             CException::exceptionHandler()->report($e);
@@ -230,6 +243,7 @@ class CDaemon_Supervisor_MasterSupervisor implements CDaemon_Contract_PausableIn
     protected function processPendingCommands() {
         foreach (CDaemon_Supervisor::supervisorCommandQueue()->pending($this->commandQueue()) as $command) {
             CDaemon::log('Get Pending Command:' . $command->command);
+            /** @see CDaemon_Supervisor_MasterSupervisorCommand_AddSupervisor */
             c::container($command->command)->process($this, $command->options);
         }
     }

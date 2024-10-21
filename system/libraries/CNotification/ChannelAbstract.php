@@ -5,9 +5,28 @@ abstract class CNotification_ChannelAbstract implements CNotification_ChannelInt
 
     protected $config;
 
+    /**
+     * @var \Opis\Closure\SerializableClosure|string
+     */
+    protected $messageHandler = null;
+
     public function __construct($config = []) {
         $this->config = $config;
         $this->channelName = 'Custom';
+    }
+
+    /**
+     * @param Closure $messageHandler
+     *
+     * @return $this
+     */
+    public function setMessageHandler($messageHandler) {
+        if ($messageHandler instanceof Closure) {
+            $messageHandler = new \Opis\Closure\SerializableClosure($messageHandler);
+        }
+        $this->messageHandler = $messageHandler;
+
+        return $this;
     }
 
     public function getChannelConfig($key) {
@@ -23,10 +42,10 @@ abstract class CNotification_ChannelAbstract implements CNotification_ChannelInt
      *
      * @return CQueue_AbstractTask
      */
-    public function send($className, array $options = []) {
+    public function send($className, array $options = [], array $config = []) {
         $notificationSenderJobClass = CF::config('notification.task_queue.notification_sender', CNotification_TaskQueue_NotificationSender::class);
 
-        $isQueued = $this->getChannelConfig('queue.queued');
+        $isQueued = carr::get($config, 'queue.queued', $this->getChannelConfig('queue.queued'));
 
         $options = [
             'channel' => $this->channelName,
@@ -35,12 +54,14 @@ abstract class CNotification_ChannelAbstract implements CNotification_ChannelInt
         ];
 
         if ($isQueued) {
+            $queueConnection = carr::get($config, 'queue.connection', $this->getChannelConfig('queue.connection'));
+            $queueName = carr::get($config, 'queue.name', $this->getChannelConfig('queue.name'));
             $taskQueue = call_user_func([$notificationSenderJobClass, 'dispatch'], $options);
-            if ($customConnection = $this->getChannelConfig('queue.connection')) {
-                $taskQueue->onConnection($customConnection);
+            if ($queueConnection) {
+                $taskQueue->onConnection($queueConnection);
             }
-            if ($customQueue = $this->getChannelConfig('queue.name')) {
-                $taskQueue->onQueue($customQueue);
+            if ($queueName) {
+                $taskQueue->onQueue($queueName);
             }
         } else {
             $taskQueue = call_user_func([$notificationSenderJobClass, 'dispatchNow'], $options);
@@ -73,7 +94,11 @@ abstract class CNotification_ChannelAbstract implements CNotification_ChannelInt
 
             if ($errCode == 0) {
                 try {
-                    $result = $this->handleMessage($value, $logNotificationModel);
+                    if ($this->messageHandler != null) {
+                        $result = $this->messageHandler->__invoke($value, $logNotificationModel);
+                    } else {
+                        $result = $this->handleMessage($value, $logNotificationModel);
+                    }
 
                     $vendorResponse = $result;
                     if ($vendorResponse instanceof CVendor_SendGrid_Response) {
@@ -112,7 +137,7 @@ abstract class CNotification_ChannelAbstract implements CNotification_ChannelInt
 
                     $logNotificationModel->vendor_response = $vendorResponse;
 
-                    CDaemon::log('vendor response:' . $vendorResponse);
+                    //CDaemon::log('vendor response:' . $vendorResponse);
                 } catch (Exception $ex) {
                     //throw $ex;
                     $errCode++;

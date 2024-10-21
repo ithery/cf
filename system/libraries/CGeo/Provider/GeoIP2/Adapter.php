@@ -2,12 +2,6 @@
 
 defined('SYSPATH') or die('No direct access allowed.');
 
-/**
- * @author Hery Kurniawan
- * @license Ittron Global Teknologi <ittron.co.id>
- *
- * @since Aug 18, 2018, 7:49:11 PM
- */
 use GeoIp2\ProviderInterface;
 
 class CGeo_Provider_GeoIP2_Adapter {

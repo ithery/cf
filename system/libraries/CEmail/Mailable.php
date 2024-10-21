@@ -1,16 +1,12 @@
 <?php
 
-use Illuminate\Support\Str;
-use Illuminate\Support\HtmlString;
 use Symfony\Component\Mime\Address;
 use PHPUnit\Framework\Assert as PHPUnit;
-use Illuminate\Contracts\Mail\Attachable;
-use Illuminate\Testing\Constraints\SeeInOrder;
+
 use Symfony\Component\Mailer\Header\TagHeader;
 use Symfony\Component\Mailer\Header\MetadataHeader;
-use CEmail_Contract_MailableInterface as MailableContract;
 
-class CEmail_Mailable implements MailableContract, CInterface_Renderable {
+class CEmail_Mailable implements CEmail_Contract_MailableInterface, CInterface_Renderable {
     use CTrait_Conditionable, CTrait_ForwardsCalls, CTrait_Localizable, CTrait_Macroable {
         __call as macroCall;
     }
@@ -170,6 +166,16 @@ class CEmail_Mailable implements MailableContract, CInterface_Renderable {
     protected $assertionableRenderStrings;
 
     /**
+     * @var int
+     */
+    protected $delay = 0;
+
+    /**
+     * @var int
+     */
+    protected $connection = null;
+
+    /**
      * Send the message using the given mailer.
      *
      * @param \CEmail_Contract_FactoryInterface|\Illuminate\Contracts\Mail\Mailer $mailer
@@ -204,7 +210,7 @@ class CEmail_Mailable implements MailableContract, CInterface_Renderable {
      * @return mixed
      */
     public function queue(CQueue_FactoryInterface $queue) {
-        if (isset($this->delay)) {
+        if (isset($this->delay) && $this->delay > 0) {
             return $this->later($this->delay, $queue);
         }
 
@@ -279,7 +285,7 @@ class CEmail_Mailable implements MailableContract, CInterface_Renderable {
     protected function buildView() {
         if (isset($this->html)) {
             return array_filter([
-                'html' => new HtmlString($this->html),
+                'html' => new CBase_HtmlString($this->html),
                 'text' => $this->textView ?? null,
             ]);
         }
@@ -305,7 +311,7 @@ class CEmail_Mailable implements MailableContract, CInterface_Renderable {
      * @return array
      */
     protected function buildMarkdownView() {
-        $markdown = CContainer::getInstance()->make(Markdown::class);
+        $markdown = CContainer::getInstance()->make(CEmail_Markdown::class);
 
         if (isset($this->theme)) {
             $markdown->theme($this->theme);

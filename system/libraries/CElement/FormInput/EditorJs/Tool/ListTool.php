@@ -16,7 +16,7 @@ class CElement_FormInput_EditorJs_Tool_ListTool extends CElement_FormInput_Edito
     public function getConfig() {
         return [
             'enabled' => (bool) $this->enabled,
-            'inlineToolbar' => (string) $this->inlineToolbar,
+            'inlineToolbar' => $this->inlineToolbar,
             'shortcut' => (string) $this->shortcut,
         ];
     }

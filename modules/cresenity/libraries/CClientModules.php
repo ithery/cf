@@ -1,7 +1,9 @@
 <?php
 
 defined('SYSPATH') or die('No direct access allowed.');
-
+/**
+ * @deprecated sinze 1.6, use CManager or CManager::asset()->module()
+ */
 final class CClientModules {
     use CTrait_Compat_ClientModules;
 

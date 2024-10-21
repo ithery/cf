@@ -168,6 +168,10 @@ class CElement_Component_DataTable extends CElement_Component {
 
     protected $domElements = [];
 
+    protected $rowClassCallbackFunction = null;
+
+    protected $autoRefreshInterval = 0;
+
     public function __construct($id = '') {
         parent::__construct($id);
         $this->defaultPagingList['-1'] = c::__('ALL');
@@ -175,10 +179,10 @@ class CElement_Component_DataTable extends CElement_Component {
         $this->responsive = false;
         $this->labels = [];
 
-        $db = CDatabase::instance();
+        $db = c::db();
 
         $this->dbName = $db->getName();
-        $this->dbConfig = strlen($db->getName()) == 0 ? $db->config() : [];
+        $this->dbConfig = strlen($db->getName()) == 0 ? $db->getConfig() : [];
         $this->display_length = '10';
         $this->paging_list = $this->defaultPagingList;
         $this->options = new CElement_Component_DataTable_Options();
@@ -238,7 +242,7 @@ class CElement_Component_DataTable extends CElement_Component {
         $this->scrollX = false;
         $this->scrollY = false;
 
-        $this->infoText = clang::__('Showing') . ' _START_ ' . clang::__('to') . ' _END_ ' . clang::__('of') . ' _TOTAL_ ' . clang::__('entries') . '';
+        $this->infoText = c::__('Showing') . ' _START_ ' . c::__('to') . ' _END_ ' . c::__('of') . ' _TOTAL_ ' . c::__('entries') . '';
         c::manager()->registerModule('jquery.datatable');
 
         //read theme data
@@ -384,21 +388,19 @@ class CElement_Component_DataTable extends CElement_Component {
     }
 
     public function setDomain($domain) {
-        $this->setDatabase(CDatabase::instance(null, null, $domain));
-
         return $this;
     }
 
     /**
-     * @param CDatabase|string $db
-     * @param array            $dbConfig
+     * @param CDatabase_Connection|string $db
+     * @param array                       $dbConfig
      *
      * @return CElement_Component_DataTable
      */
     public function setDatabase($db, $dbConfig = null) {
-        if ($db instanceof CDatabase) {
+        if ($db instanceof CDatabase_Connection) {
             $this->dbName = $db->getName();
-            $this->dbConfig = strlen($this->dbName) == 0 ? $db->config() : [];
+            $this->dbConfig = strlen($this->dbName) == 0 ? $db->getConfig() : [];
         } else {
             $this->dbName = $db;
             $this->dbConfig = $dbConfig;
@@ -707,10 +709,10 @@ class CElement_Component_DataTable extends CElement_Component {
             }
 
             if (strlen($dbName) > 0) {
-                return CDatabase::instance($dbName);
+                return c::db($dbName);
             }
 
-            return CDatabase::instance($dbName, $dbConfig);
+            return c::db($dbName, $dbConfig);
         });
 
         return $this;
@@ -819,7 +821,7 @@ class CElement_Component_DataTable extends CElement_Component {
     }
 
     /**
-     * @return CDatabase
+     * @return CDatabase_Connection
      */
     public function db() {
         if ($this->dbResolver != null) {
@@ -827,10 +829,10 @@ class CElement_Component_DataTable extends CElement_Component {
         }
 
         if (strlen($this->dbName) > 0) {
-            return CDatabase::instance($this->dbName);
+            return c::db($this->dbName);
         }
 
-        return CDatabase::instance($this->dbName, $this->dbConfig);
+        return c::db($this->dbName, $this->dbConfig);
     }
 
     /**
@@ -905,7 +907,7 @@ class CElement_Component_DataTable extends CElement_Component {
     }
 
     /**
-     * @return string
+     * @return mixed
      */
     public function getQuery() {
         return $this->query;
@@ -994,10 +996,19 @@ class CElement_Component_DataTable extends CElement_Component {
         return CExporter::queue($this->toExportable(), $filePath, $disk, $writerType, $diskOptions);
     }
 
-    protected function build() {
-        if ($this->headerActionList != null) {
+    /**
+     * @return CElement_List_ActionList
+     */
+    public function getHeaderActionList() {
+        if ($this->headerActionList == null) {
+            $this->headerActionList = CElement_Factory::createList('ActionList');
             $this->headerActionList->setStyle('widget-action');
         }
+
+        return $this->headerActionList;
+    }
+
+    protected function build() {
         if ($this->footerActionList != null) {
             $this->footerActionList->setStyle('btn-list');
         }
@@ -1043,6 +1054,45 @@ class CElement_Component_DataTable extends CElement_Component {
             $value = c::toSerializableClosure($value);
         }
         $this->domElements[$key] = $value;
+
+        return $this;
+    }
+
+    /**
+     * Set callback for table row class.
+     *
+     * @param callable|Closure $callback parameter: $row
+     * @param string           $require  File location of callable function to require
+     *
+     * @return $this
+     */
+    public function setRowClassCallback($callback, $require = '') {
+        $this->rowClassCallbackFunction = c::toSerializableClosure($callback);
+        if (strlen($require) > 0) {
+            $this->requires[] = $require;
+        }
+
+        return $this;
+    }
+
+    /**
+     * @return Closure|\Opis\SerializableClosure
+     */
+    public function getRowClassCallbackFunction() {
+        return $this->rowClassCallbackFunction;
+    }
+
+    /**
+     * @param int $interval interval in seconds
+     *
+     * @return $this
+     */
+    public function setAutoRefresh($interval = 5) {
+        if (!$interval) {
+            $this->autoRefreshInterval = 0;
+        } else {
+            $this->autoRefreshInterval = $interval;
+        }
 
         return $this;
     }

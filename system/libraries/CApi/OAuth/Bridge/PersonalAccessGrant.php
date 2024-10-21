@@ -16,15 +16,21 @@ class CApi_OAuth_Bridge_PersonalAccessGrant extends AbstractGrant {
         // Validate request
         $client = $this->validateClient($request);
         $scopes = $this->validateScopes($this->getRequestParameter('scope', $request));
+        $userIdentifier = $this->getRequestParameter('user_id', $request);
 
         // Finalize the requested scopes
-        $scopes = $this->scopeRepository->finalizeScopes($scopes, $this->getIdentifier(), $client);
+        $scopes = $this->scopeRepository->finalizeScopes(
+            $scopes,
+            $this->getIdentifier(),
+            $client,
+            $userIdentifier
+        );
 
         // Issue and persist access token
         $accessToken = $this->issueAccessToken(
             $accessTokenTTL,
             $client,
-            $this->getRequestParameter('user_id', $request),
+            $userIdentifier,
             $scopes
         );
 

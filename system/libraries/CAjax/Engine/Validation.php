@@ -2,12 +2,6 @@
 
 defined('SYSPATH') or die('No direct access allowed.');
 
-/**
- * @author Hery Kurniawan
- * @license Ittron Global Teknologi <ittron.co.id>
- *
- * @since Apr 14, 2019, 12:52:52 PM
- */
 class CAjax_Engine_Validation extends CAjax_Engine {
     public function execute() {
         $data = $this->ajaxMethod->getData();
@@ -22,6 +16,9 @@ class CAjax_Engine_Validation extends CAjax_Engine {
                     if ($ruleValue instanceof \Opis\Closure\SerializableClosure) {
                         $dataValidation[$key][$ruleIndex] = $ruleValue->getClosure();
                     }
+                    if ($ruleValue instanceof CFunction_SerializableClosure) {
+                        $dataValidation[$key][$ruleIndex] = $ruleValue->getClosure();
+                    }
                 }
             }
         }
@@ -33,9 +30,7 @@ class CAjax_Engine_Validation extends CAjax_Engine {
         $factory->extend(CJavascript_Validation_Remote_Validator::EXTENSION_NAME, $resolver->validatorClosure());
 
         $result = $factory->validate($data, $dataValidation);
-        // $remoteValidator = new CJavascript_Validation_Remote($data, $dataValidation);
-        // $result = $remoteValidator->validate();
 
-        echo json_encode($result);
+        return c::response()->json($result);
     }
 }

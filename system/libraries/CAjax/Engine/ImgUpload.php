@@ -14,6 +14,7 @@ class CAjax_Engine_ImgUpload extends CAjax_Engine {
         $diskName = carr::get($data, 'disk', CF::config('storage.temp'));
         $fileId = '';
         $fileName = '';
+
         if (isset($_FILES[$inputName], $_FILES[$inputName]['name'])) {
             for ($i = 0; $i < count($_FILES[$inputName]['name']); $i++) {
                 $fileName = $_FILES[$inputName]['name'][$i];
@@ -41,7 +42,9 @@ class CAjax_Engine_ImgUpload extends CAjax_Engine {
 
                 $disk = CTemporary::disk();
                 $fullfilename = CTemporary::getPath(static::FOLDER, $fileId);
-
+                if (!isset($_FILES[$inputName]['tmp_name'][$i]) || empty($_FILES[$inputName]['tmp_name'][$i])) {
+                    CLogger::channel()->error('Error on ImgUpload', (array) $_FILES);
+                }
                 if (!$disk->put($fullfilename, file_get_contents($_FILES[$inputName]['tmp_name'][$i]))) {
                     die('fail upload from ' . $_FILES[$inputName]['tmp_name'][$i] . ' to ' . $fullfilename);
                 }

@@ -1,6 +1,6 @@
 <?php
 
-use CarbonV3\CarbonImmutable;
+use Carbon\CarbonImmutable;
 
 class CDaemon_Supervisor_Repository_RedisJobRepository implements CDaemon_Supervisor_Contract_JobRepositoryInterface {
     /**
@@ -150,6 +150,17 @@ class CDaemon_Supervisor_Repository_RedisJobRepository implements CDaemon_Superv
     }
 
     /**
+     * Get a chunk of silenced jobs.
+     *
+     * @param null|string $afterIndex
+     *
+     * @return \CCollection
+     */
+    public function getSilenced($afterIndex = null) {
+        return $this->getJobsByType('silenced_jobs', $afterIndex);
+    }
+
+    /**
      * Get the count of recent jobs.
      *
      * @return int
@@ -183,6 +194,15 @@ class CDaemon_Supervisor_Repository_RedisJobRepository implements CDaemon_Superv
      */
     public function countCompleted() {
         return $this->countJobsByType('completed_jobs');
+    }
+
+    /**
+     * Get the count of silenced jobs.
+     *
+     * @return int
+     */
+    public function countSilenced() {
+        return $this->countJobsByType('silenced_jobs');
     }
 
     /**
@@ -245,6 +265,8 @@ class CDaemon_Supervisor_Repository_RedisJobRepository implements CDaemon_Superv
             case 'pending_jobs':
                 return $this->pendingJobExpires;
             case 'completed_jobs':
+                return $this->completedJobExpires;
+            case 'silenced_jobs':
                 return $this->completedJobExpires;
             default:
                 return $this->recentJobExpires;
@@ -610,6 +632,7 @@ class CDaemon_Supervisor_Repository_RedisJobRepository implements CDaemon_Superv
             $this->removeJobReference($pipe, 'pending_jobs', $payload);
             $this->removeJobReference($pipe, 'completed_jobs', $payload);
 
+            $context = 'context';
             $pipe->hmset(
                 $payload->id(),
                 [
@@ -620,8 +643,8 @@ class CDaemon_Supervisor_Repository_RedisJobRepository implements CDaemon_Superv
                     'status' => 'failed',
                     'payload' => $payload->value,
                     'exception' => (string) $exception,
-                    'context' => method_exists($exception, 'context')
-                        ? json_encode($exception->context())
+                    'context' => method_exists($exception, $context)
+                        ? json_encode($exception->$context())
                         : null,
                     'failed_at' => str_replace(',', '.', microtime(true)),
                 ]
@@ -701,7 +724,7 @@ class CDaemon_Supervisor_Repository_RedisJobRepository implements CDaemon_Superv
      * @return int
      */
     public function purge($queue) {
-        return $this->connection()->doEval(
+        return $this->connection()->eval(
             CDaemon_Supervisor_LuaScripts::purge(),
             2,
             'recent_jobs',

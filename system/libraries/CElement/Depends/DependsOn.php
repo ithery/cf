@@ -1,9 +1,17 @@
 <?php
 use Opis\Closure\SerializableClosure;
 
+/**
+ * @see CElement_Element_Div
+ * @see CElement_FormInput_Select
+ * @see CElement_FormInput_SelectSearch
+ */
 class CElement_Depends_DependsOn {
     use CTrait_HasOptions;
 
+    /**
+     * @var CElement_Depends_Selector
+     */
     protected $selector;
 
     protected $resolver;
@@ -12,14 +20,17 @@ class CElement_Depends_DependsOn {
         $this->options = $options;
 
         $this->setResolver($resolver);
-        $this->setSelector($selector);
+        $this->selector = new CElement_Depends_Selector(carr::wrap($selector));
+    }
+
+    public function addSelector($selector) {
+        $this->selector->addSelector($selector);
+
+        return $this;
     }
 
     public function setSelector($selector) {
-        if ($selector instanceof CRenderable) {
-            $selector = '#' . $selector->id();
-        }
-        $this->selector = $selector;
+        $this->selector->setSelectors($selector);
 
         return $this;
     }

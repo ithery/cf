@@ -3,7 +3,7 @@
 trait CTrait_Controller_Application_Log_Notification {
     public function notification() {
         if (!isset($this->logNotificationModel)) {
-            $this->logNotificationModel = CNotification_Model_LogNotification::class;
+            $this->logNotificationModel = CF::config('notification.log_notification_model', CNotification_Model_LogNotification::class);
         }
         $app = c::app();
 

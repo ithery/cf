@@ -1,25 +1,19 @@
 <?php
 
-defined('SYSPATH') OR die('No direct access allowed.');
+defined('SYSPATH') or die('No direct access allowed.');
 
-/**
- * @author Hery Kurniawan
- * @since Nov 4, 2019, 5:17:07 PM
- * @license Ittron Global Teknologi <ittron.co.id>
- */
 class CQueue_FailedJob_NullFailedJob extends CQueue_AbstractFailedJob {
-
     /**
      * Log a failed job into storage.
      *
-     * @param  string  $connection
-     * @param  string  $queue
-     * @param  string  $payload
-     * @param  \Exception  $exception
-     * @return int|null
+     * @param string     $connection
+     * @param string     $queue
+     * @param string     $payload
+     * @param \Exception $exception
+     *
+     * @return null|int
      */
     public function log($connection, $queue, $payload, $exception) {
-        //
     }
 
     /**
@@ -34,17 +28,18 @@ class CQueue_FailedJob_NullFailedJob extends CQueue_AbstractFailedJob {
     /**
      * Get a single failed job.
      *
-     * @param  mixed  $id
-     * @return object|null
+     * @param mixed $id
+     *
+     * @return null|object
      */
     public function find($id) {
-        //
     }
 
     /**
      * Delete a single failed job from storage.
      *
-     * @param  mixed  $id
+     * @param mixed $id
+     *
      * @return bool
      */
     public function forget($id) {
@@ -57,7 +52,5 @@ class CQueue_FailedJob_NullFailedJob extends CQueue_AbstractFailedJob {
      * @return void
      */
     public function flush() {
-        //
     }
-
 }

@@ -3,13 +3,6 @@
 defined('SYSPATH') or die('No direct access allowed.');
 
 /**
- * @author Hery Kurniawan
- * @license Ittron Global Teknologi <ittron.co.id>
- *
- * @since Sep 1, 2018, 1:05:06 PM
- */
-
-/**
  * Event used when the SQL query for dropping tables are generated inside CDatabase_Platform.
  */
 class CDatabase_Event_Schema_OnDropTable extends CDatabase_Event_Schema {
@@ -24,7 +17,7 @@ class CDatabase_Event_Schema_OnDropTable extends CDatabase_Event_Schema {
     private $platform;
 
     /**
-     * @var string|null
+     * @var null|string
      */
     private $sql = null;
 
@@ -63,11 +56,12 @@ class CDatabase_Event_Schema_OnDropTable extends CDatabase_Event_Schema {
      */
     public function setSql($sql) {
         $this->sql = $sql;
+
         return $this;
     }
 
     /**
-     * @return string|null
+     * @return null|string
      */
     public function getSql() {
         return $this->sql;

@@ -3,13 +3,6 @@
 defined('SYSPATH') or die('No direct access allowed.');
 
 /**
- * @author Hery Kurniawan
- * @license Ittron Global Teknologi <ittron.co.id>
- *
- * @since Aug 18, 2018, 11:41:09 AM
- */
-
-/**
  * Object representation of a database column.
  */
 class CDatabase_Schema_Column extends CDatabase_AbstractAsset {
@@ -19,7 +12,7 @@ class CDatabase_Schema_Column extends CDatabase_AbstractAsset {
     protected $type;
 
     /**
-     * @var int|null
+     * @var null|int
      */
     protected $length = null;
 
@@ -49,7 +42,7 @@ class CDatabase_Schema_Column extends CDatabase_AbstractAsset {
     protected $notnull = true;
 
     /**
-     * @var string|null
+     * @var null|string
      */
     protected $default = null;
 
@@ -64,12 +57,12 @@ class CDatabase_Schema_Column extends CDatabase_AbstractAsset {
     protected $platformOptions = [];
 
     /**
-     * @var string|null
+     * @var null|string
      */
     protected $columnDefinition = null;
 
     /**
-     * @var string|null
+     * @var null|string
      */
     protected $comment = null;
 
@@ -127,7 +120,7 @@ class CDatabase_Schema_Column extends CDatabase_AbstractAsset {
     }
 
     /**
-     * @param int|null $length
+     * @param null|int $length
      *
      * @return CDatabase_Schema_Column
      */
@@ -257,7 +250,7 @@ class CDatabase_Schema_Column extends CDatabase_AbstractAsset {
     }
 
     /**
-     * @return int|null
+     * @return null|int
      */
     public function getLength() {
         return $this->length;
@@ -299,7 +292,7 @@ class CDatabase_Schema_Column extends CDatabase_AbstractAsset {
     }
 
     /**
-     * @return string|null
+     * @return null|string
      */
     public function getDefault() {
         return $this->default;
@@ -331,7 +324,7 @@ class CDatabase_Schema_Column extends CDatabase_AbstractAsset {
     }
 
     /**
-     * @return string|null
+     * @return null|string
      */
     public function getColumnDefinition() {
         return $this->columnDefinition;
@@ -367,7 +360,7 @@ class CDatabase_Schema_Column extends CDatabase_AbstractAsset {
     }
 
     /**
-     * @return string|null
+     * @return null|string
      */
     public function getComment() {
         return $this->comment;

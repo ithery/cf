@@ -2,6 +2,7 @@
 
 defined('SYSPATH') or die('No direct access allowed.');
 
+use Psr\Log\LogLevel;
 use Whoops\Run as Whoops;
 use Whoops\Handler\HandlerInterface;
 use Symfony\Component\HttpKernel\Exception\HttpException;
@@ -222,9 +223,7 @@ class CException_ExceptionHandler implements CException_ExceptionHandlerInterfac
         ) {
             return;
         }
-        if (is_callable($reportCallable = [$e, 'report'])) {
-            return $this->container->call($reportCallable);
-        }
+
         foreach ($this->reportCallbacks as $reportCallback) {
             if ($reportCallback->handles($e)) {
                 if ($reportCallback($e) === false) {
@@ -232,16 +231,20 @@ class CException_ExceptionHandler implements CException_ExceptionHandlerInterfac
                 }
             }
         }
-        CLogger::instance()->add(CLogger::ERROR, $e->getMessage(), null, $this->context(), $e);
-        //        try {
-        //            CLogger::instance()->add($reportCallable, $message)
-        //            $logger = $this->container->make(LoggerInterface::class);
-        //        } catch (Exception $ex) {
-        //            throw $e;
-        //        }
-        //        $logger->error(
-        //                $e->getMessage(), array_merge($this->context(), ['exception' => $e]
-        //        ));
+
+        $logger = CLogger::logger();
+        // $level = carr::first(
+        //     $this->levels,
+        //     function ($level, $type) use ($e) {
+        //         return $e instanceof $type;
+        //     },
+        //     LogLevel::ERROR
+        // );
+        $context = $this->buildExceptionContext($e);
+        $logger->error(
+            $e->getMessage(),
+            $context,
+        );
     }
 
     /**
@@ -271,6 +274,57 @@ class CException_ExceptionHandler implements CException_ExceptionHandlerInterfac
     }
 
     /**
+     * Remove the given exception class from the list of exceptions that should be ignored.
+     *
+     * @param string $exception
+     *
+     * @return $this
+     */
+    public function stopIgnoring(string $exception) {
+        $this->dontReport = c::collect($this->dontReport)
+            ->reject(function ($ignored) use ($exception) {
+                return $ignored === $exception;
+            })->values()->all();
+
+        $this->internalDontReport = c::collect($this->internalDontReport)
+            ->reject(function ($ignored) use ($exception) {
+                return $ignored === $exception;
+            })->values()->all();
+
+        return $this;
+    }
+
+    /**
+     * Create the context array for logging the given exception.
+     *
+     * @param \Throwable $e
+     *
+     * @return array
+     */
+    protected function buildExceptionContext(Throwable $e) {
+        return array_merge(
+            $this->exceptionContext($e),
+            $this->context(),
+            ['exception' => $e]
+        );
+    }
+
+    /**
+     * Get the default exception context variables for logging.
+     *
+     * @param \Throwable $e
+     *
+     * @return array
+     */
+    protected function exceptionContext(Throwable $e) {
+        if (method_exists($e, 'context')) {
+            return $e->context();
+        }
+
+        return [];
+    }
+
+    /**
      * Get the default context variables for logging.
      *
      * @return array
@@ -283,8 +337,9 @@ class CException_ExceptionHandler implements CException_ExceptionHandlerInterfac
                 'appId' => CF::appId(),
                 'orgCode' => CF::orgCode(),
                 'orgId' => CF::orgId(),
+                'userId' => c::auth()->id(),
             ]);
-        } catch (Exception $e) {
+        } catch (Throwable $e) {
             return [];
         }
     }
@@ -508,6 +563,10 @@ class CException_ExceptionHandler implements CException_ExceptionHandlerInterfac
      * @return string
      */
     protected function renderExceptionContent($e) {
+        if (CF::isCli()) {
+            return $this->renderForConsole(new Symfony\Component\Console\Output\ConsoleOutput(), $e);
+        }
+
         try {
             return CException_LegacyExceptionHandler::getContent($e);
             if (CF::isProduction()) {
@@ -595,19 +654,21 @@ class CException_ExceptionHandler implements CException_ExceptionHandlerInterfac
      */
     protected function renderHttpException(Exception $e) {
         $this->registerErrorViewPaths();
-        $viewName = 'errors/exception';
-        if (CView::exists('errors/http/' . $e->getStatusCode())) {
-            $viewName = 'errors/http/' . $e->getStatusCode();
+
+        if ($view = $this->getHttpExceptionView($e)) {
+            try {
+                return c::response()->view($view, [
+                    'errors' => new CBase_ViewErrorBag(),
+                    'exception' => $e,
+                ], $e->getStatusCode(), $e->getHeaders());
+            } catch (Throwable $t) {
+                if (CF::config('app.debug')) {
+                    throw $t;
+                }
+
+                $this->report($t);
+            }
         }
-        /*
-          if (view()->exists($view = "errors::{$e->getStatusCode()}")) {
-          return response()->view($view, [
-          'errors' => new ViewErrorBag,
-          'exception' => $e,
-          ], $e->getStatusCode(), $e->getHeaders());
-          }
-         *
-         */
         return $this->convertExceptionToResponse($e);
     }
 
@@ -626,7 +687,27 @@ class CException_ExceptionHandler implements CException_ExceptionHandlerInterfac
             return "{$path}/errors";
         })->push(__DIR__ . '/views')->all());
     }
+    /**
+     * Get the view used to render HTTP exceptions.
+     *
+     * @param  \Symfony\Component\HttpKernel\Exception\HttpExceptionInterface  $e
+     * @return string|null
+     */
+    protected function getHttpExceptionView(HttpExceptionInterface $e) {
+        $view = 'errors/http/'.$e->getStatusCode();
 
+        if (c::view()->exists($view)) {
+            return $view;
+        }
+
+        $view = substr($view, 0, -2).'xx';
+
+        if (c::view()->exists($view)) {
+            return $view;
+        }
+
+        return null;
+    }
     /**
      * Map the given exception into an http response.
      *

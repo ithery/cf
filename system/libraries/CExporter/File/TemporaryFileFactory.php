@@ -50,12 +50,18 @@ class CExporter_File_TemporaryFileFactory {
      */
     public function makeLocal($fileName = null, $fileExtension = null) {
         $temporaryPath = CExporter::config()->get('temporary.local_path', DOCROOT . 'temp');
-        if (!file_exists($temporaryPath) && !mkdir($concurrentDirectory = $temporaryPath) && !is_dir($concurrentDirectory)) {
-            throw new \RuntimeException(sprintf('Directory "%s" was not created', $concurrentDirectory));
+        $temporaryPath .= DS . 'exporter';
+        $temporaryPath .= DS . CF::appCode();
+        $temporaryPath .= DS . date('Ymd');
+        if (!CFile::isDirectory($temporaryPath)) {
+            CFile::makeDirectory($temporaryPath, 0755, true);
+        }
+        if (!CFile::isDirectory($temporaryPath)) {
+            throw new \RuntimeException(sprintf('Directory "%s" was not created', $temporaryPath));
         }
 
         return new CExporter_File_LocalTemporaryFile(
-            $this->temporaryPath . DIRECTORY_SEPARATOR . ($fileName ?: $this->generateFilename($fileExtension))
+            $temporaryPath . DIRECTORY_SEPARATOR . ($fileName ?: $this->generateFilename($fileExtension))
         );
     }
 

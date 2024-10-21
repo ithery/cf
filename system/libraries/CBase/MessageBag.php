@@ -337,6 +337,7 @@ class CBase_MessageBag implements CInterface_Arrayable, Countable, CInterface_Js
      *
      * @return int
      */
+    #[\ReturnTypeWillChange]
     public function count() {
         return count($this->messages, COUNT_RECURSIVE) - count($this->messages);
     }

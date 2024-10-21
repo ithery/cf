@@ -15,7 +15,7 @@ trait CTrait_Controller_Documentation_Forms {
 
     public function form() {
         $app = CApp::instance();
-        $app->title(clang::__('Forms in CApp'));
+        $app->title(c::__('Forms in CApp'));
         $app->addForm();
         echo $app->render();
     }

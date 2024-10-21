@@ -2,14 +2,6 @@
 
 defined('SYSPATH') or die('No direct access allowed.');
 
-/**
- * @author Hery Kurniawan
- * @license Ittron Global Teknologi <ittron.co.id>
- *
- * @since Sep 8, 2019, 4:51:15 AM
- */
-use Symfony\Component\Debug\Exception\FatalThrowableError;
-
 class CQueue_Worker {
     use CDatabase_Trait_DetectLostConnection;
 
@@ -351,10 +343,9 @@ class CQueue_Worker {
             }
         } catch (Throwable $e) {
             $this->exceptions->report($e);
-            $this->stopWorkerIfLostConnection($e);
-            $this->sleep(1);
-        } catch (Exception $e) {
-            $this->exceptions->report($e);
+            if (CDaemon::isDaemon()) {
+                CDaemon::handleException($e);
+            }
             $this->stopWorkerIfLostConnection($e);
             $this->sleep(1);
         }
@@ -377,15 +368,7 @@ class CQueue_Worker {
         } catch (Throwable $e) {
             $this->currentJobName = null;
             if (CDaemon::getRunningService() != null) {
-                CDaemon::log('Run Job Exception');
-            } else {
-                $this->exceptions->report($e);
-            }
-            $this->stopWorkerIfLostConnection($e);
-        } catch (Exception $e) {
-            $this->currentJobName = null;
-            if (CDaemon::getRunningService() != null) {
-                CDaemon::log('Run Job Exception');
+                CDaemon::log('Run Job Exception :' . $e->getMessage());
             } else {
                 $this->exceptions->report($e);
             }
@@ -436,26 +419,11 @@ class CQueue_Worker {
             // Here we will fire off the job and let it process. We will catch any exceptions so
             // they can be reported to the developers logs, etc. Once the job is finished the
             // proper events will be fired to let any listeners know this job has finished.
-
             $job->fire();
 
             $this->raiseAfterJobEvent($connectionName, $job);
         } catch (Throwable $e) {
-            if (CDaemon::getRunningService() != null) {
-                CDaemon::log('Run Job Fire Exception');
-                CDaemon::log($e->getMessage());
-                CDaemon::log($e->getTraceAsString());
-            } else {
-                $this->handleJobException($connectionName, $job, $options, $e);
-            }
-        } catch (Exception $e) {
-            if (CDaemon::getRunningService() != null) {
-                CDaemon::log('Run Job Fire Throwable');
-                CDaemon::log($e->getMessage());
-                CDaemon::log($e->getTraceAsString());
-            } else {
-                $this->handleJobException($connectionName, $job, $options, $e);
-            }
+            $this->handleJobException($connectionName, $job, $options, $e);
         }
     }
 
@@ -476,6 +444,7 @@ class CQueue_Worker {
             // First, we will go ahead and mark the job as failed if it will exceed the maximum
             // attempts it is allowed to run the next time we process it. If so we will just
             // go ahead and mark it as failed now so we do not have to release this again.
+
             if (!$job->hasFailed()) {
                 $this->markJobAsFailedIfWillExceedMaxAttempts(
                     $connectionName,
@@ -501,6 +470,10 @@ class CQueue_Worker {
             if (!$job->isDeleted() && !$job->isReleased() && !$job->hasFailed()) {
                 $job->release($this->calculateBackoff($job, $options));
             }
+            CEvent::dispatcher()->dispatch(new CQueue_Event_JobReleasedAfterException(
+                $connectionName,
+                $job
+            ));
         }
 
         throw $e;
@@ -794,10 +767,12 @@ class CQueue_Worker {
      *
      * @param CCache_Repository $cache
      *
-     * @return void
+     * @return $this
      */
     public function setCache(CCache_Repository $cache = null) {
         $this->cache = $cache;
+
+        return $this;
     }
 
     /**

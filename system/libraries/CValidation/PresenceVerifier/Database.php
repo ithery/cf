@@ -12,19 +12,19 @@ class CValidation_PresenceVerifier_Database implements CValidation_PresenceVerif
     /**
      * The database connection instance.
      *
-     * @var CDatabase
+     * @var CDatabase_Connection
      */
-    protected $db;
+    protected $connection;
 
     /**
      * Create a new database presence verifier.
      *
-     * @param CDatabase $db
+     * @param string|null $connection
      *
      * @return void
      */
-    public function __construct(CDatabase $db) {
-        $this->db = $db;
+    public function __construct($connection = null) {
+        $this->connection = $connection;
     }
 
     /**
@@ -33,8 +33,8 @@ class CValidation_PresenceVerifier_Database implements CValidation_PresenceVerif
      * @param string      $collection
      * @param string      $column
      * @param string      $value
-     * @param int|null    $excludeId
-     * @param string|null $idColumn
+     * @param null|int    $excludeId
+     * @param null|string $idColumn
      * @param array       $extra
      *
      * @return int
@@ -116,7 +116,7 @@ class CValidation_PresenceVerifier_Database implements CValidation_PresenceVerif
      * @return CDatabase_Query_Builder
      */
     protected function table($table) {
-        return $this->db->table($table);
+        return c::db($this->connection)->table($table)->useWritePdo();
     }
 
     /**

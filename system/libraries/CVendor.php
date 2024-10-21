@@ -78,12 +78,10 @@ class CVendor {
     }
 
     /**
-     * @param array $options
-     *
      * @return \CVendor_Namecheap
      */
-    public static function namecheap($options) {
-        return new CVendor_Namecheap($options);
+    public static function namecheap() {
+        return new CVendor_Namecheap();
     }
 
     /**
@@ -102,6 +100,15 @@ class CVendor {
      */
     public static function xendit($options) {
         return new CVendor_Xendit($options);
+    }
+
+    /**
+     * @param array $options
+     *
+     * @return \CVendor_OneBrick
+     */
+    public static function oneBrick($options = []) {
+        return new CVendor_OneBrick($options);
     }
 
     /**
@@ -157,11 +164,11 @@ class CVendor {
      * @return \CVendor_SendGrid
      */
     public static function sendGrid($apiKey = null, $options = []) {
-        if (strlen($apiKey) == 0) {
-            $apiKey = ccfg::get('smtp_password');
-        }
-        if (strlen($apiKey) == 0) {
+        if ($apiKey == null) {
             $apiKey = CF::config('vendor.sendgrid.apiKey');
+        }
+        if ($apiKey == null) {
+            $apiKey = CF::config('app.smtp_password');
         }
 
         return new CVendor_SendGrid($apiKey, $options);
@@ -239,5 +246,33 @@ class CVendor {
      */
     public static function tugasHarian() {
         return new CBase_ForwarderStaticClass(CVendor_TugasHarian::class);
+    }
+
+    /**
+     * @return \CVendor_BCA
+     */
+    public static function bca() {
+        return new CBase_ForwarderStaticClass(CVendor_BCA::class);
+    }
+
+    /**
+     * @return \CVendor_WhatsApp|CBase_ForwarderStaticClass
+     */
+    public static function whatsApp() {
+        return new CBase_ForwarderStaticClass(CVendor_WhatsApp::class);
+    }
+
+    /**
+     * @return \CVendor_Figma|CBase_ForwarderStaticClass
+     */
+    public static function figma() {
+        return new CBase_ForwarderStaticClass(CVendor_Figma::class);
+    }
+
+    /**
+     * @return \CVendor_Qontak|CBase_ForwarderStaticClass
+     */
+    public static function qontak() {
+        return new CBase_ForwarderStaticClass(CVendor_Qontak::class);
     }
 }

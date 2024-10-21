@@ -2,30 +2,24 @@
 
 defined('SYSPATH') or die('No direct access allowed.');
 
-/**
- * @author Hery Kurniawan
- * @license Ittron Global Teknologi <ittron.co.id>
- *
- * @since Feb 16, 2018, 5:40:40 AM
- */
 //@codingStandardsIgnoreStart
 trait CTrait_Compat_App {
     /**
-     * @var stdClass|null
+     * @var null|stdClass
      *
      * @deprecated
      */
     private $_store = null;
 
     /**
-     * @var stdClass|null
+     * @var null|stdClass
      *
      * @deprecated
      */
     private $_admin = null;
 
     /**
-     * @var stdClass|null
+     * @var null|stdClass
      *
      * @deprecated
      */
@@ -160,7 +154,7 @@ trait CTrait_Compat_App {
     }
 
     /**
-     * @return type
+     * @return mixed
      *
      * @deprecated
      */
@@ -178,11 +172,13 @@ trait CTrait_Compat_App {
     }
 
     /**
-     * @return deprecated
+     * @deprecated 1.6
+     *
+     * @return object
      */
     public function member() {
         if ($this->_member = null) {
-            $session = CSession::instance();
+            $session = c::session();
             $member = $session->get('member');
             if (!$member) {
                 $member = null;
@@ -212,7 +208,7 @@ trait CTrait_Compat_App {
     }
 
     /**
-     * Undocumented function
+     * Undocumented function.
      *
      * @param [type] $str
      *
@@ -222,32 +218,6 @@ trait CTrait_Compat_App {
      */
     public function set_additional_head($str) {
         $this->additional_head = $str;
-    }
-
-    /**
-     * Undocumented function
-     *
-     * @return void
-     *
-     * @deprecated 1.1
-     */
-    public function get_all_js() {
-        $cs = CClientScript::instance();
-        $this->js = parent::js();
-        $additional_js = '';
-        $js = '';
-        $vjs = CView::factory('ccore/js');
-        $js .= PHP_EOL . $vjs->render();
-
-        $js .= PHP_EOL . $this->js . $additional_js;
-
-        $js = $cs->renderJsRequire($js);
-
-        if (ccfg::get('minify_js')) {
-            $js = CJSMin::minify($js);
-        }
-
-        return $js;
     }
 }
 //@codingStandardsIgnoreEnd

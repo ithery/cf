@@ -8,7 +8,7 @@ defined('SYSPATH') or die('No direct access allowed.');
  *
  * @since Mar 31, 2019, 6:18:55 PM
  *
- * @method CModel_Query|static ordered()
+ * @method static CModel_Query|static ordered()
  */
 trait CModel_Sortable_SortableTrait {
     public static function bootSortableTrait() {
@@ -198,7 +198,7 @@ trait CModel_Sortable_SortableTrait {
     }
 
     /**
-     * Build eloquent builder of sortable.
+     * Build builder of sortable.
      *
      * @return \CModel_Query
      */

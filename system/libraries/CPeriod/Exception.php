@@ -8,5 +8,5 @@ defined('SYSPATH') or die('No direct access allowed.');
  *
  * @since Jun 23, 2019, 12:52:07 PM
  */
-class CPeriod_Exception extends CException {
+class CPeriod_Exception extends Exception {
 }

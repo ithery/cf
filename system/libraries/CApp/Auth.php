@@ -223,20 +223,47 @@ class CApp_Auth {
         return $this->guard()->attempt($credentials, $remember);
     }
 
+    /**
+     * Log the user out of the application.
+     *
+     * @return void
+     */
     public function logout() {
         return $this->guard()->logout();
     }
 
+    /**
+     * Get the currently authenticated user.
+     *
+     * @return null|CAuth_AuthenticatableInterface
+     */
     public function user() {
         return $this->guard()->user();
     }
 
+    /**
+     * Get the hasher for current guard.
+     *
+     * @return CCrypt_HasherInterface
+     */
     public function hasher() {
         return $this->guard()->hasher();
     }
+
+    /**
+     * Determine if the current user is authenticated.
+     *
+     * @return bool
+     */
     public function check() {
         return $this->guard()->check();
     }
+
+    /**
+     * Get the ID for the currently authenticated user.
+     *
+     * @return null|int|string
+     */
     public function id() {
         return $this->guard()->id();
     }

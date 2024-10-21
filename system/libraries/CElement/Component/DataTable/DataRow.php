@@ -7,6 +7,10 @@ class CElement_Component_DataTable_DataRow implements CInterface_Arrayable {
         $this->row = $row;
     }
 
+    public function getRow() {
+        return $this->row;
+    }
+
     public function getValue($field) {
         if ($this->row instanceof CModel) {
             return array_reduce(

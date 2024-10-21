@@ -2,12 +2,6 @@
 
 defined('SYSPATH') or die('No direct access allowed.');
 
-/**
- * @author Hery Kurniawan
- * @license Ittron Global Teknologi <ittron.co.id>
- *
- * @since Jun 23, 2019, 5:02:36 AM
- */
 trait CCache_Trait_RetrievesMultipleKeys {
     /**
      * Retrieve multiple items from the cache by key.

@@ -6,23 +6,26 @@
 
 namespace OpenApi\Attributes;
 
+use OpenApi\Annotations as OA;
 use OpenApi\Generator;
 
 #[\Attribute(\Attribute::TARGET_CLASS | \Attribute::TARGET_METHOD | \Attribute::IS_REPEATABLE)]
-class Response extends \OpenApi\Annotations\Response
+class Response extends OA\Response
 {
     /**
-     * @param Header[]                  $headers
-     * @param Link[]                    $links
-     * @param array<string,string>|null $x
-     * @param Attachable[]|null         $attachables
+     * @param string|class-string|object|null                                                                $ref
+     * @param Header[]                                                                                       $headers
+     * @param MediaType|JsonContent|XmlContent|Attachable|array<MediaType|JsonContent|XmlContent|Attachable> $content
+     * @param Link[]                                                                                         $links
+     * @param array<string,mixed>|null                                                                       $x
+     * @param Attachable[]|null                                                                              $attachables
      */
     public function __construct(
         string|object|null $ref = null,
         int|string $response = null,
         ?string $description = null,
         ?array $headers = null,
-        $content = null,
+        MediaType|JsonContent|XmlContent|Attachable|array|null $content = null,
         ?array $links = null,
         // annotation
         ?array $x = null,

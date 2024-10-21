@@ -11,12 +11,12 @@
 
 namespace Symfony\Component\Cache\Adapter;
 
+use Psr\Log\LoggerAwareTrait;
 use Psr\Cache\CacheItemInterface;
 use Psr\Log\LoggerAwareInterface;
-use Psr\Log\LoggerAwareTrait;
 use Symfony\Component\Cache\CacheItem;
-use Symfony\Component\Cache\ResettableInterface;
 use Symfony\Contracts\Cache\CacheInterface;
+use Symfony\Component\Cache\ResettableInterface;
 
 /**
  * @author Nicolas Grekas <p@tchwork.com>
@@ -54,7 +54,7 @@ class ArrayAdapter implements AdapterInterface, CacheInterface, LoggerAwareInter
     }
 
     /**
-     * {@inheritdoc}
+     * @inheritdoc
      */
     public function get($key, $callback, $beta = null, array &$metadata = null) {
         $item = $this->getItem($key);
@@ -70,14 +70,14 @@ class ArrayAdapter implements AdapterInterface, CacheInterface, LoggerAwareInter
     }
 
     /**
-     * {@inheritdoc}
+     * @inheritdoc
      */
-    public function delete($key) {
+    public function delete(string $key): bool {
         return $this->deleteItem($key);
     }
 
     /**
-     * {@inheritdoc}
+     * @inheritdoc
      *
      * @return bool
      */
@@ -91,7 +91,7 @@ class ArrayAdapter implements AdapterInterface, CacheInterface, LoggerAwareInter
     }
 
     /**
-     * {@inheritdoc}
+     * @inheritdoc
      */
     public function getItem($key) {
         if (!$isHit = $this->hasItem($key)) {
@@ -105,7 +105,7 @@ class ArrayAdapter implements AdapterInterface, CacheInterface, LoggerAwareInter
     }
 
     /**
-     * {@inheritdoc}
+     * @inheritdoc
      */
     public function getItems(array $keys = []) {
         foreach ($keys as $key) {
@@ -118,7 +118,7 @@ class ArrayAdapter implements AdapterInterface, CacheInterface, LoggerAwareInter
     }
 
     /**
-     * {@inheritdoc}
+     * @inheritdoc
      *
      * @return bool
      */
@@ -132,7 +132,7 @@ class ArrayAdapter implements AdapterInterface, CacheInterface, LoggerAwareInter
     }
 
     /**
-     * {@inheritdoc}
+     * @inheritdoc
      *
      * @return bool
      */
@@ -145,7 +145,7 @@ class ArrayAdapter implements AdapterInterface, CacheInterface, LoggerAwareInter
     }
 
     /**
-     * {@inheritdoc}
+     * @inheritdoc
      *
      * @return bool
      */
@@ -177,7 +177,7 @@ class ArrayAdapter implements AdapterInterface, CacheInterface, LoggerAwareInter
     }
 
     /**
-     * {@inheritdoc}
+     * @inheritdoc
      *
      * @return bool
      */
@@ -186,7 +186,7 @@ class ArrayAdapter implements AdapterInterface, CacheInterface, LoggerAwareInter
     }
 
     /**
-     * {@inheritdoc}
+     * @inheritdoc
      *
      * @return bool
      */
@@ -195,7 +195,7 @@ class ArrayAdapter implements AdapterInterface, CacheInterface, LoggerAwareInter
     }
 
     /**
-     * {@inheritdoc}
+     * @inheritdoc
      *
      * @return bool
      */
@@ -237,7 +237,7 @@ class ArrayAdapter implements AdapterInterface, CacheInterface, LoggerAwareInter
     }
 
     /**
-     * {@inheritdoc}
+     * @inheritdoc
      */
     public function reset() {
         $this->clear();

@@ -1,10 +1,3 @@
-
-/**
- * Author:  Hery Kurniawan
- * Created: June 06, 2022
- */
-
-
 DROP TABLE IF EXISTS `chat_conversation`;
 CREATE TABLE `chat_conversation` (
   `chat_conversation_id` bigint(20) unsigned NOT NULL AUTO_INCREMENT,

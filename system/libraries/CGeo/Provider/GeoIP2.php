@@ -2,12 +2,6 @@
 
 defined('SYSPATH') or die('No direct access allowed.');
 
-/**
- * @author Hery Kurniawan
- * @license Ittron Global Teknologi <ittron.co.id>
- *
- * @since Aug 18, 2018, 7:46:29 PM
- */
 use GeoIp2\Exception\OutOfQueriesException;
 use GeoIp2\Exception\AuthenticationException;
 use GeoIp2\Exception\AddressNotFoundException;

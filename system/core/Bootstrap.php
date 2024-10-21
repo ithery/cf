@@ -20,17 +20,12 @@ if (!defined('EXT')) {
 if (!defined('DOCROOT')) {
     $docroot = realpath(dirname(__FILE__) . DS . '..' . DS . '..' . DS);
     define('DOCROOT', $docroot . DS);
-
-    define('CFINDEX', DOCROOT . 'index.php');
-
-    // If the front controller is a symlink, change to the real docroot
-    is_link(CFINDEX) and chdir(dirname(realpath(__FILE__)));
 }
 
 if (!defined('CFINDEX')) {
     define('CFINDEX', DOCROOT . 'index.php');
 }
-
+is_link(CFINDEX) and chdir(dirname(realpath(__FILE__)));
 if (!defined('SYSPATH')) {
     $sysPath = realpath(DOCROOT . 'system');
     define('SYSPATH', $sysPath . DS);
@@ -53,9 +48,9 @@ if (!defined('IN_PRODUCTION')) {
 //try to load data domain
 
 //end of constant from index
-
-define('CF_VERSION', '1.5');
-define('CF_CODENAME', 'CF1.5');
+define('CF_VERSION', '1.7');
+define('CF_CODENAME', 'CF1.7');
+define('CF_START', microtime(true));
 
 // Test of CF is running in Windows
 define('CF_IS_WIN', DIRECTORY_SEPARATOR === '\\');
@@ -81,20 +76,21 @@ require SYSPATH . 'core/CFConsole' . EXT;
 require SYSPATH . 'core/CFHTTP' . EXT;
 require SYSPATH . 'core/CFDeprecatedTrait' . EXT;
 require SYSPATH . 'core/CF' . EXT;
+require SYSPATH . 'core/CFConfig' . EXT;
 
 // Prepare the environment
 CF::setup();
 
 // End CF Loading
 CFBenchmark::stop(SYSTEM_BENCHMARK . '_cf_loading');
-
-if (!CF::isTesting()) {
-    if (defined('CFCLI')) {
-        CFConsole::execute();
-    } else {
-        CFHTTP::execute();
+if (!defined('CFVSCODE')) {
+    if (!CF::isTesting()) {
+        if (defined('CFCLI')) {
+            CFConsole::execute();
+        } else {
+            CFHTTP::execute();
+        }
     }
 }
-
 // stop total_execution
 CFBenchmark::stop(SYSTEM_BENCHMARK . '_total_execution');

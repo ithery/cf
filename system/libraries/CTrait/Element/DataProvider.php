@@ -66,10 +66,10 @@ trait CTrait_Element_DataProvider {
             }
 
             if (strlen($dbName) > 0) {
-                return CDatabase::instance($dbName);
+                return c::db($dbName);
             }
 
-            return CDatabase::instance($dbName, $dbConfig);
+            return c::db($dbName, $dbConfig);
         });
 
         return $this;

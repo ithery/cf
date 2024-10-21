@@ -3,13 +3,10 @@
 defined('SYSPATH') or die('No direct access allowed.');
 
 /**
- * @author Hery Kurniawan
- * @license Ittron Global Teknologi <ittron.co.id>
- *
  * @see CManager_DataProvider_SqlDataProvider
  * @see CManager_DataProvider_ModelDataProvider
  * @see CManager_DataProvider_ClosureDataProvider
- * @since Jul 8, 2018, 2:58:18 AM
+ * @see CManager_DataProvider_CollectionDataProvider
  */
 class CAjax_Engine_DataTable_Processor_DataProvider extends CAjax_Engine_DataTable_Processor {
     use CAjax_Engine_DataTable_Trait_ProcessorTrait;
@@ -37,8 +34,12 @@ class CAjax_Engine_DataTable_Processor_DataProvider extends CAjax_Engine_DataTab
         } else {
             $collections = $query->toEnumerable();
             $totalItem = $collections->count();
+            $paginationResult = $query->paginate($totalItem, ['*'], 'page', $this->parameter->page());
+            $collections = $paginationResult->items();
+            $totalItem = $paginationResult->total();
             $totalFilteredItem = $totalItem;
         }
+
         $output = [
             'sEcho' => intval(carr::get($request, 'sEcho')),
             'iTotalRecords' => $totalItem,
@@ -104,6 +105,9 @@ class CAjax_Engine_DataTable_Processor_DataProvider extends CAjax_Engine_DataTab
             if ($callback instanceof \Opis\Closure\SerializableClosure) {
                 return $callback->__invoke(...$args);
             }
+            if ($callback instanceof \CFunction_SerializableClosure) {
+                return $callback->__invoke(...$args);
+            }
 
             throw new Exception('callback is not callable on ' . __CLASS__);
         };
@@ -139,7 +143,7 @@ class CAjax_Engine_DataTable_Processor_DataProvider extends CAjax_Engine_DataTab
                     $transforms = json_decode($transforms, true);
                     if (is_array($transforms)) {
                         foreach ($transforms as $transforms_k => $transforms_v) {
-                            $value = ctransform::{$transforms_v['func']}($value, true);
+                            $value = CManager::transform()->call($transforms_v['func'], $value);
                         }
                     }
                 }

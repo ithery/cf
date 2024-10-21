@@ -5,6 +5,8 @@ abstract class CManager_DataProviderAbstract {
 
     protected $searchOr = [];
 
+    protected $searchFullTextOr = [];
+
     protected $sort = [];
 
     /**
@@ -12,12 +14,18 @@ abstract class CManager_DataProviderAbstract {
      */
     protected $callbacks = [];
 
+    abstract public function paginate($perPage = null, $columns = ['*'], $pageName = 'page', $page = null, $callback = null);
+
     public function searchAnd(array $search) {
         $this->searchAnd = $search;
     }
 
     public function searchOr(array $search) {
         $this->searchOr = $search;
+    }
+
+    public function searchFullTextOr(array $search) {
+        $this->searchFullTextOr = $search;
     }
 
     public function sort(array $sort) {
@@ -33,14 +41,17 @@ abstract class CManager_DataProviderAbstract {
             return false;
         }
 
-        return is_callable($callable) || ($callable instanceof \Opis\Closure\SerializableClosure);
+        return is_callable($callable) || ($callable instanceof Opis\Closure\SerializableClosure) || ($callable instanceof CFunction_SerializableClosure);
     }
 
     protected function callCallable($callable, array $args = []) {
         if (is_callable($callable)) {
             return call_user_func_array($callable, $args);
         }
-        if ($callable instanceof \Opis\Closure\SerializableClosure) {
+        if ($callable instanceof Opis\Closure\SerializableClosure) {
+            return $callable->__invoke(...$args);
+        }
+        if ($callable instanceof CFunction_SerializableClosure) {
             return $callable->__invoke(...$args);
         }
 

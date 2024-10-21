@@ -2,12 +2,6 @@
 
 defined('SYSPATH') or die('No direct access allowed.');
 
-/**
- * @author Hery Kurniawan
- * @license Ittron Global Teknologi <ittron.co.id>
- *
- * @since Aug 18, 2018, 8:02:45 PM
- */
 final class CGeo_Exception_ProviderNotRegistered extends \RuntimeException implements CGeo_Interface_ExceptionInterface {
     /**
      * @param string $providerName

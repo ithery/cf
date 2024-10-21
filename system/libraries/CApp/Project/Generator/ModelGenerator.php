@@ -2,12 +2,6 @@
 
 defined('SYSPATH') or die('No direct access allowed.');
 
-/**
- * @author Hery Kurniawan
- * @license Ittron Global Teknologi <ittron.co.id>
- *
- * @since Aug 12, 2019, 3:49:01 AM
- */
 class CApp_Project_Generator_ModelGenerator extends CApp_Project_AbstractGenerator {
     public $fieldsFillable;
 
@@ -36,7 +30,7 @@ class CApp_Project_Generator_ModelGenerator extends CApp_Project_AbstractGenerat
         }
         // generate the file name for the model based on the table name
         $filename = cstr::studly($table);
-        $db = CDatabase::instance($this->option('database'), null, CF::domain());
+        $db = c::db($this->option('database'));
         $schemaManager = $db->getSchemaManager();
         $columns = $schemaManager->listTableColumns($table);
         $columnNames = array_keys($columns);
@@ -52,7 +46,7 @@ class CApp_Project_Generator_ModelGenerator extends CApp_Project_AbstractGenerat
         ];
 
         $descQuery = 'describe ' . $table;
-        $resultDesc = $db->query($descQuery);
+        $resultDesc = $db->select($descQuery);
         $this->columns = new CCollection();
         foreach ($resultDesc as $col) {
             $this->columns->push([

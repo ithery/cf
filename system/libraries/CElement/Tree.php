@@ -19,7 +19,7 @@ class CElement_Tree extends CElement {
         $this->url = null;
         $this->callback = null;
         $this->requires = [];
-        CClientModules::instance()->registerModule('jstree');
+        c::manager()->registerModule('jstree');
     }
 
     public static function factory($id = null) {

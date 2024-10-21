@@ -1,4 +1,5 @@
 <?php
+use Carbon\Carbon;
 
 class CComponent_RenameMe_SupportDateTimes {
     public static function init() {

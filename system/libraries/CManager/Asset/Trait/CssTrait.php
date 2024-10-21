@@ -35,8 +35,13 @@ trait CManager_Asset_Trait_CssTrait {
         }
     }
 
-    public function registerCssFile($file, $pos = 'head') {
-        $originalFile = $file;
+    /**
+     * @param string $file
+     * @param string $pos
+     *
+     * @return CManager_Asset_Container
+     */
+    public function registerCssFile($file, $pos = CManager_Asset::POS_HEAD) {
         $fileOptions = $file;
         if (!is_array($fileOptions)) {
             $fileOptions = [

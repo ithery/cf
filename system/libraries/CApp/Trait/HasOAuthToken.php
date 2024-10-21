@@ -14,7 +14,7 @@ trait CApp_Trait_HasOAuthToken {
      * @return CModel_Relation_HasMany
      */
     public function clients() {
-        return $this->hasMany(Passport::clientModel(), 'user_id');
+        return $this->hasMany(CApi::oauth()->clientModel(), 'user_id');
     }
 
     /**
@@ -23,7 +23,7 @@ trait CApp_Trait_HasOAuthToken {
      * @return CModel_Relation_HasMany
      */
     public function tokens() {
-        return $this->hasMany(Passport::tokenModel(), 'user_id')->orderBy('created_at', 'desc');
+        return $this->hasMany(CApi::oauth()->tokenModel(), 'user_id')->orderBy('created_at', 'desc');
     }
 
     /**

@@ -2,12 +2,6 @@
 
 defined('SYSPATH') or die('No direct access allowed.');
 
-/**
- * @author Hery Kurniawan
- * @license Ittron Global Teknologi <ittron.co.id>
- *
- * @since Mar 10, 2019, 7:07:06 AM
- */
 use Monolog\Logger;
 use GuzzleHttp\Client;
 use GuzzleHttp\Middleware;
@@ -18,6 +12,9 @@ use GuzzleHttp\MessageFormatter;
 use Monolog\Handler\RotatingFileHandler;
 use GuzzleHttp\Exception\RequestException;
 
+/**
+ * @deprecated since 1.7 use \Cresenity\Vendor\Wago\Adapter\GuzzleAdapter
+ */
 class CVendor_Wago_Adapter_GuzzleAdapter implements CVendor_Wago_Contract_AdapterInterface {
     /**
      * @var Client
@@ -184,6 +181,14 @@ class CVendor_Wago_Adapter_GuzzleAdapter implements CVendor_Wago_Contract_Adapte
         $body = (string) $this->response->getBody();
         $code = (int) $this->response->getStatusCode();
         if ($code != 200) {
+            if ($code == 401) {
+                $content = json_decode($body, true);
+                $errMessage = carr::get($content, 'errMessage');
+                if ($errMessage == 'Token Not Found or Invalid Token') {
+                    throw new CVendor_Wago_Exception_InvalidTokenException($errMessage);
+                }
+            }
+
             throw new CVendor_Wago_Exception_HttpException(isset($body) ? $body : 'Request not processed.', $code);
         }
         $content = json_decode($body);

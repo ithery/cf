@@ -2,9 +2,9 @@
 
 return [
     [
-        'name' => 'basic.auto',
-        'label' => c::__('Auto Loading'),
-        'uri' => 'docs/basic/auto',
+        'name' => 'basic.coding',
+        'label' => c::__('Coding Standard'),
+        'uri' => 'docs/basic/coding',
     ],
     [
         'name' => 'basic.bootstrap',

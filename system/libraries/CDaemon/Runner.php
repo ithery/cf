@@ -196,13 +196,14 @@ class CDaemon_Runner {
     }
 
     /**
-     * @param bool $exit
+     * @param bool $force
      *
      * @return string
      */
-    public function stop($exit = true) {
+    public function stop($force = false) {
         $pid = $this->getPid();
-        $command = 'kill -9 ' . $pid;
+        $option = $force ? '-9' : '-2';
+        $command = 'kill ' . $option . ' ' . $pid;
         if (defined('CFCLI')) {
             $process = new Process($command);
             $process->run();
@@ -230,10 +231,19 @@ class CDaemon_Runner {
     public function rotateLog() {
         $logFile = $this->getLogFile();
 
-        if (strlen($logFile) > 0 && file_exists($logFile)) {
+        if (strlen($logFile) > 0 && CFile::isFile($logFile)) {
             $rotator = CLogger_Rotator::createRotate($logFile);
-
             $rotator->forceRotate();
+        }
+    }
+
+    public function autoRotateLog($size = null, $keep = null) {
+        $logFile = $this->getLogFile();
+        $size = $size ?: CF::config('daemon.logs.rotation.size', 500 * 1024);
+        $keep = $keep ?: CF::config('daemon.logs.rotation.keep', 10);
+        if (strlen($logFile) > 0 && CFile::isFile($logFile) && CFile::size($logFile) > $size) {
+            $rotator = CLogger_Rotator::createRotate($logFile);
+            $rotator->size($size)->keep($keep)->run();
         }
     }
 

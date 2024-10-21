@@ -1,6 +1,6 @@
 <?php
 
-class CDatabase_ConnectionResolver implements CDatabase_ConnectionResolverInterface {
+class CDatabase_ConnectionResolver implements CDatabase_Contract_ConnectionResolverInterface {
     /**
      * All of the registered connections.
      *

@@ -13,15 +13,16 @@ trait CTrait_Controller_Application_Server_Beanstalkd {
     public function index() {
         $app = CApp::instance();
         $app->title('Beanstalkd Status');
+
         try {
             $beanstalkd = $this->getBeanstalkd();
+            $tubesData = $beanstalkd->getTubesStats();
         } catch (\Pheanstalk\Exception\ConnectionException $ex) {
             $app->addAlert()->setType('error')->add('Cannot connect beanstalkd service, please check your connection configuration or the beanstalkd service status');
+
             return $app;
         }
 
-
-        $tubesData = $beanstalkd->getTubesStats();
         $tableData = [];
 
         foreach ($tubesData as $tubeData) {
@@ -107,6 +108,7 @@ trait CTrait_Controller_Application_Server_Beanstalkd {
             switch ($method) {
                 case 'reload':
                     return $this->reloadTube($tubeName, $submethod);
+
                     break;
             }
         }
@@ -270,6 +272,7 @@ trait CTrait_Controller_Application_Server_Beanstalkd {
         if ($this->beanstalkd == null) {
             $this->beanstalkd = CServer::createBeanstalkd(['host' => $this->host, 'port' => $this->port]);
         }
+
         return $this->beanstalkd;
     }
 }

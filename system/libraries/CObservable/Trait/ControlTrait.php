@@ -77,6 +77,20 @@ trait CObservable_Trait_ControlTrait {
     }
 
     /**
+     * Create Text Control.
+     *
+     * @param null|string $id
+     *
+     * @return CElement_FormInput_Textarea_Summernote
+     */
+    public function addSummerNoteControl($id = null) {
+        $control = new CElement_FormInput_Textarea_Summernote($id);
+        $this->wrapper->add($control);
+
+        return $control;
+    }
+
+    /**
      * Create Hidden Control.
      *
      * @param null|string $id
@@ -357,7 +371,7 @@ trait CObservable_Trait_ControlTrait {
     }
 
     /**
-     * Create Text Control.
+     * Create Radio Control.
      *
      * @param null|string $id
      *
@@ -371,7 +385,21 @@ trait CObservable_Trait_ControlTrait {
     }
 
     /**
-     * Create Text Control.
+     * Create Radio List Control.
+     *
+     * @param null|string $id
+     *
+     * @return CElement_FormInput_RadioList
+     */
+    public function addRadioListControl($id = null) {
+        $control = new CElement_FormInput_RadioList($id);
+        $this->wrapper->add($control);
+
+        return $control;
+    }
+
+    /**
+     * Create Checkbox Control.
      *
      * @param null|string $id
      *
@@ -385,7 +413,35 @@ trait CObservable_Trait_ControlTrait {
     }
 
     /**
-     * Create Text Control.
+     * Create Checkbox List Control.
+     *
+     * @param null|string $id
+     *
+     * @return CElement_FormInput_CheckboxList
+     */
+    public function addCheckboxListControl($id = null) {
+        $control = new CElement_FormInput_CheckboxList($id);
+        $this->wrapper->add($control);
+
+        return $control;
+    }
+
+    /**
+     * Create Mini Color Control.
+     *
+     * @param null|string $id
+     *
+     * @return CElement_FormInput_MiniColor
+     */
+    public function addMiniColorControl($id = null) {
+        $control = new CElement_FormInput_MiniColor($id);
+        $this->wrapper->add($control);
+
+        return $control;
+    }
+
+    /**
+     * Create Query Builder Control.
      *
      * @param null|string $id
      *

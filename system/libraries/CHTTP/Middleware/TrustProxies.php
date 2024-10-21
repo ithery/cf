@@ -26,7 +26,7 @@ class CHTTP_Middleware_TrustProxies {
      * Create a new trusted proxies middleware instance.
      */
     public function __construct() {
-        $this->config = CF::config('http.trustproxy', []);
+        $this->config = CF::config('http.trustedproxy', []);
     }
 
     /**

@@ -4,15 +4,11 @@ defined('SYSPATH') or die('No direct access allowed.');
 
 class Controller_Cresenity extends CController {
     public function index() {
-        return c::redirect();
+        return c::abort(404);
     }
 
     public function cron() {
         CCron::run();
-    }
-
-    public function task() {
-        CJob::cliRunner();
     }
 
     /**
@@ -25,6 +21,22 @@ class Controller_Cresenity extends CController {
     public function daemon() {
         try {
             CDaemon::cliRunner();
+        } catch (CDaemon_Exception_AlreadyRunningException $ex) {
+            //do nothing when exception is already running
+        }
+    }
+
+    public function supervisor() {
+        try {
+            CDaemon::cliSupervisorRunner();
+        } catch (CDaemon_Exception_AlreadyRunningException $ex) {
+            //do nothing when exception is already running
+        }
+    }
+
+    public function worker() {
+        try {
+            CDaemon::cliWorkerRunner();
         } catch (CDaemon_Exception_AlreadyRunningException $ex) {
             //do nothing when exception is already running
         }
@@ -56,10 +68,12 @@ class Controller_Cresenity extends CController {
             //throw new Exception(c::__('failed to get temporary file :filename', ['filename' => $file]));
         }
         $json = $disk->get($file);
-
         $ajaxMethod = CAjax::createMethod($json)->setArgs($args);
 
         $response = $ajaxMethod->executeEngine();
+        if (!($response instanceof Symfony\Component\HttpFoundation\Response)) {
+            $response = c::response($response);
+        }
 
         return $response;
     }
@@ -96,8 +110,8 @@ class Controller_Cresenity extends CController {
         $rand_string = rand(1000, 9999);
         imagestring($my_image, 5, $x, $y, $rand_string, 0x000000);
 
-        $session = CSession::instance();
-        $session->set('captcha', md5($rand_string) . 'a4xn');
+        $session = c::session();
+        $session->set('capp-captcha', md5($rand_string) . 'a4xn');
 
         imagejpeg($my_image);
         imagedestroy($my_image);
@@ -252,9 +266,6 @@ class Controller_Cresenity extends CController {
     }
 
     public function upload($method = 'temp') {
-        $orgId = CApp_Base::orgId();
-        $db = CDatabase::instance();
-
         $filesInput = $_FILES;
         $fileId = '';
         $fileIdPreview = '';
@@ -466,5 +477,44 @@ class Controller_Cresenity extends CController {
         $responseFactory = CBroadcast_SSE::createServerSentEventStream();
 
         return $responseFactory->toResponse($request);
+    }
+
+    public function auth($method) {
+        if ($method == 'ping') {
+            $appCode = c::request()->appCode;
+            $sid = c::request()->sid;
+
+            $user = c::app()->user();
+
+            $lastActivity = c::session()->get('_last_activity');
+            $diff = 0;
+            if ($lastActivity) {
+                $current = time();
+                $diff = $current - $lastActivity;
+            }
+
+            return c::response()->json([
+                'errCode' => 0,
+                'errMessage' => '',
+                'data' => [
+                    'isLogin' => $user != null,
+                    'elapsedInSeconds' => $diff,
+                ]
+            ]);
+        }
+
+        return c::abort(404);
+    }
+
+    public function tus() {
+        $server = CStorage::tus()->createServer();
+        // $entityBody = file_get_contents('php://input');
+        // print_r(c::request()->headers);
+        // die;
+
+        $server->setApiPath('/cresenity/tus');
+        $response = $server->serve(); // return an TusPhpS3\Http\Response
+
+        return $response;
     }
 }

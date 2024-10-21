@@ -248,6 +248,41 @@ class CModel_Relation_HasManyThrough extends CModel_Relation {
     }
 
     /**
+     * Get the first record matching the attributes. If the record is not found, create it.
+     *
+     * @param array $attributes
+     * @param array $values
+     *
+     * @return \CModel
+     */
+    public function firstOrCreate(array $attributes = [], array $values = []) {
+        if (!is_null($instance = (clone $this)->where($attributes)->first())) {
+            return $instance;
+        }
+
+        return $this->createOrFirst(array_merge($attributes, $values));
+    }
+    /**
+     * Attempt to create the record. If a unique constraint violation occurs, attempt to find the matching record.
+     *
+     * @param  array  $attributes
+     * @param  array  $values
+     * @return \CModel
+     */
+    public function createOrFirst(array $attributes = [], array $values = []) {
+        try {
+            return $this->getQuery()->withSavepointIfNeeded(function () use ($attributes, $values) {
+                return $this->create(array_merge($attributes, $values));
+            });
+        } catch (CDatabase_Exception_UniqueConstraintViolationException $exception) {
+            if ($result = $this->where($attributes)->first()) {
+                return $result;
+            }
+            throw $exception;
+        }
+    }
+
+    /**
      * Create or update a related record matching the attributes, and fill it with values.
      *
      * @param array $attributes

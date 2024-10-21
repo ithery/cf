@@ -30,7 +30,7 @@ trait CTrait_Element_Property_DependsOn {
         foreach ($this->dependsOn as $dependOn) {
             //we create ajax method
 
-            $dependsOnSelector = $dependOn->getSelector();
+            $dependsOnSelector = $dependOn->getSelector()->getQuerySelector();
             $targetSelector = '#' . $this->id();
             $ajaxMethod = CAjax::createMethod();
             $ajaxMethod->setType('DependsOn');
@@ -43,30 +43,30 @@ trait CTrait_Element_Property_DependsOn {
             $optionsJson .= "url:'" . $ajaxUrl . "',";
             $optionsJson .= "method:'" . 'post' . "',";
             $optionsJson .= !$dependOn->getBlock() ? 'block: false,' : '';
-
-            $optionsJson .= "dataAddition: { value: $('" . $dependsOnSelector . "').val() },";
+            $valueScript = $dependOn->getSelector()->getScriptForValue();
+            $optionsJson .= 'dataAddition: { value: ' . $valueScript . ' },';
             $optionsJson .= "onSuccess: (data) => {
-                let jQueryTarget = $('" . $targetSelector . "');
-                jQueryTarget.empty();
-                if(typeof data == 'object') {
-                    if(data.value) {
-                        jQueryTarget.html(data.value);
-                    } else {
-                        if(typeof data.html === 'undefined') {
-                            cresenity.htmlModal(data);
+                cresenity.handleResponse(data, () => {
+                    let jQueryTarget = $('" . $targetSelector . "');
+                    jQueryTarget.empty();
+                    if(typeof data == 'object') {
+                        if(data.value) {
+                            jQueryTarget.html(data.value);
                         } else {
-                            jQueryTarget.html(data.html);
-                            if (data.js && data.js.length > 0) {
-                                let script = cresenity.base64.decode(data.js);
-                                eval(script);
+                            if(typeof data.html === 'undefined') {
+                                cresenity.htmlModal(data);
+                            } else {
+                                jQueryTarget.html(data.html);
+                                if (data.js && data.js.length > 0) {
+                                    let script = cresenity.base64.decode(data.js);
+                                    eval(script);
+                                }
                             }
                         }
+                    } else {
+                        jQueryTarget.html(data);
                     }
-                } else {
-                    jQueryTarget.html(data);
-                }
-
-
+                });
             },";
             $optionsJson .= 'handleJsonResponse: true';
             $optionsJson .= '}';

@@ -239,7 +239,10 @@ class CDaemon_Supervisor {
         }) ? 'paused' : 'running';
     }
 
-    public static function boot() {
-        CDaemon_Supervisor_Bootstrap::boot();
+    /**
+     * @return CDaemon_Supervisor_Manager
+     */
+    public static function manager() {
+        return CDaemon_Supervisor_Manager::instance();
     }
 }

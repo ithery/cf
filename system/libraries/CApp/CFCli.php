@@ -1,10 +1,5 @@
 <?php
 
-/**
- * Description of CFCli.
- *
- * @author Hery
- */
 use Symfony\Component\Process\Process;
 use Symfony\Component\Process\PhpExecutableFinder;
 

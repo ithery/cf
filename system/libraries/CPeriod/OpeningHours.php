@@ -775,7 +775,7 @@ class CPeriod_OpeningHours {
             if ($date instanceof DateTime) {
                 $date = clone $date;
             }
-
+            /** @var DateTime $date */
             $date = $date->setTimezone($timezone);
         }
 

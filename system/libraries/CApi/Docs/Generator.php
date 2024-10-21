@@ -7,6 +7,9 @@ use Symfony\Component\Finder\Finder;
 use OpenApi\Generator as OpenApiGenerator;
 use Symfony\Component\Yaml\Dumper as YamlDumper;
 
+/**
+ * @see https://github.com/zircote/swagger-php
+ */
 class CApi_Docs_Generator {
     protected const SCAN_OPTION_PROCESSORS = 'processors';
 
@@ -61,6 +64,21 @@ class CApi_Docs_Generator {
      * @var array
      */
     protected $excludedDirs;
+
+    /**
+     * @var string
+     */
+    protected $basePath;
+
+    /**
+     * @var CApi_Docs_SecurityDefinition
+     */
+    protected $security;
+
+    /**
+     * @var bool
+     */
+    protected $yamlCopyRequired;
 
     /**
      * @param array                        $pathsConfig

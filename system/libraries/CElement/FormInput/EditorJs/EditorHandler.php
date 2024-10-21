@@ -93,8 +93,9 @@ class CElement_FormInput_EditorJs_EditorHandler {
     public function getBlocks() {
         $sanitizedBlocks = [];
 
-        foreach ($this->blocks as $block) {
+        foreach ($this->blocks as $blockIndex => $block) {
             $sanitizedBlock = $this->handler->sanitizeBlock($block['type'], $block['data'], isset($block['tunes']) ? $block['tunes'] : []);
+
             if (!empty($sanitizedBlock)) {
                 array_push($sanitizedBlocks, $sanitizedBlock);
             }

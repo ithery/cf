@@ -1,8 +1,13 @@
 <?php
 $config = new PhpCsFixer\Config();
 
-return $config->setRules([
-    '@PSR2' => true,
+$finder = PhpCsFixer\Finder::create()
+    ->name('*.php')
+    ->notName('*.blade.php')
+    ->ignoreDotFiles(true)
+    ->ignoreVCS(true);
+
+return $config->setFinder($finder)->setRules([
     'array_indentation' => true,
     'array_syntax' => ['syntax' => 'short'],
     'combine_consecutive_unsets' => true,
@@ -259,4 +264,6 @@ return $config->setRules([
     'list_syntax' => [
         'syntax' => 'long',
     ],
+    'single_import_per_statement' => true,
+    'single_line_after_imports' => true,
 ])->setLineEnding("\n");

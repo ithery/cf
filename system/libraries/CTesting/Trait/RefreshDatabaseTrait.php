@@ -1,6 +1,6 @@
 <?php
 
-trait CTesting_Trait_RefreshDatabase {
+trait CTesting_Trait_RefreshDatabaseTrait {
     /**
      * Define hooks to migrate the database before and after each test.
      *
@@ -30,7 +30,7 @@ trait CTesting_Trait_RefreshDatabase {
      */
     public function beginDatabaseTransaction() {
         foreach ($this->connectionsToTransact() as $name) {
-            $connection = CDatabase::instance($name);
+            $connection = CDatabase::manager()->connection($name);
             $dispatcher = $connection->getEventDispatcher();
 
             $connection->unsetEventDispatcher();
@@ -46,13 +46,13 @@ trait CTesting_Trait_RefreshDatabase {
 
         $this->beforeApplicationDestroyed(function () {
             foreach ($this->connectionsToTransact() as $name) {
-                $connection = CDatabase::instance($name);
+                $connection = CDatabase::manager()->connection($name);
                 $dispatcher = $connection->getEventDispatcher();
 
                 $connection->unsetEventDispatcher();
                 $connection->rollBack();
                 $connection->setEventDispatcher($dispatcher);
-                //$connection->disconnect();
+                $connection->disconnect();
             }
         });
     }

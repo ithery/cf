@@ -1,13 +1,7 @@
 <?php
 
 defined('SYSPATH') or die('No direct access allowed.');
-
-/**
- * @author Hery Kurniawan
- * @license Ittron Global Teknologi <ittron.co.id>
- *
- * @since Aug 18, 2018, 10:57:55 AM
- */
+//use Doctrine\DBAL\Types\Type;
 
 /**
  * The base class for mapping types.
@@ -67,6 +61,22 @@ abstract class CDatabase_Type {
 
     const ENUM = 'enum';
 
+    const POINT = 'point';
+
+    const LINE_STRING = 'linestring';
+
+    const MULTI_POINT = 'multipoint';
+
+    const POLYGON = 'polygon';
+
+    const MULTI_LINE_STRING = 'multilinestring';
+
+    const MULTI_POLYGON = 'multipolygon';
+
+    const GEOMETRY_COLLECTION = 'geometrycollection';
+
+    const GEOMETRY = 'geometry';
+
     /**
      * Map of already instantiated type objects. One instance per type (flyweight).
      *
@@ -106,6 +116,14 @@ abstract class CDatabase_Type {
         self::GUID => CDatabase_Type_GuidType::class,
         self::DATEINTERVAL => CDatabase_Type_DateIntervalType::class,
         self::ENUM => CDatabase_Type_EnumType::class,
+        self::POINT => CDatabase_Type_PointType::class,
+        self::LINE_STRING => CDatabase_Type_LineStringType::class,
+        self::MULTI_POINT => CDatabase_Type_MultiPointType::class,
+        self::POLYGON => CDatabase_Type_PolygonType::class,
+        self::MULTI_LINE_STRING => CDatabase_Type_MultiLineStringType::class,
+        self::MULTI_POLYGON => CDatabase_Type_MultiPolygonType::class,
+        self::GEOMETRY => CDatabase_Type_GeometryType::class,
+        self::GEOMETRY_COLLECTION => CDatabase_Type_GeometryCollectionType::class,
     ];
 
     /**

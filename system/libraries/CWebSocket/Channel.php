@@ -18,6 +18,13 @@ class CWebsocket_Channel {
     protected $connections = [];
 
     /**
+     * The channel name.
+     *
+     * @var CWebSocket_ChannelManager_LocalChannelManager
+     */
+    protected $channelManager;
+
+    /**
      * Create a new instance.
      *
      * @param string $name
@@ -45,6 +52,17 @@ class CWebsocket_Channel {
      */
     public function getConnections() {
         return $this->connections;
+    }
+
+    /**
+     * Get connection by socketId.
+     *
+     * @param  string socketId
+     *
+     * @return ?ConnectionInterface
+     */
+    public function getConnection(string $socketId) {
+        return $this->connections[$socketId] ?? null;
     }
 
     /**

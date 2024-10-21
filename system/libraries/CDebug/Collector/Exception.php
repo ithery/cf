@@ -1,10 +1,20 @@
 <?php
 
 class CDebug_Collector_Exception extends CDebug_CollectorAbstract {
+    /**
+     * @param mixed $exception
+     *
+     * @return bool
+     */
     protected function shouldCollect($exception) {
         return $exception instanceof Exception && (!$exception instanceof CDebug_Contract_ShouldNotCollectException);
     }
 
+    /**
+     * @param mixed $exception
+     *
+     * @return array
+     */
     public function collect($exception) {
         if (!CF::config('collector.exception')) {
             return null;
@@ -18,6 +28,13 @@ class CDebug_Collector_Exception extends CDebug_CollectorAbstract {
         return $data;
     }
 
+    /**
+     * Get data from exception object.
+     *
+     * @param Throwable $exception
+     *
+     * @return array
+     */
     public function getDataFromException($exception) {
         $app = CApp::instance();
         $route = c::request()->route();

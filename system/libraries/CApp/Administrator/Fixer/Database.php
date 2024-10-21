@@ -1,11 +1,17 @@
 <?php
 
 class CApp_Administrator_Fixer_Database {
+    /**
+     * @param string               $table
+     * @param CDatabase_Connection $db
+     *
+     * @return array
+     */
     public static function sqlCollation($table, $db = null) {
         if ($db == null) {
-            $db = CDatabase::instance();
+            $db = c::db();
         }
-
+        /** @var CDatabase_Connection $db */
         $schemaManager = $db->getSchemaManager();
         $schema = $schemaManager->createSchema();
         $columnsData = $schemaManager->listTableColumns($table);
@@ -23,6 +29,11 @@ class CApp_Administrator_Fixer_Database {
                 $targetOptions = [
                     'unsigned' => true,
                 ];
+                $currentCollation = $columnSchema->getPlatformOption('collation');
+                if ($currentCollation == 'utf8mb4_bin' || $currentCollation == 'utf8mb4_unicode') {
+                    //continue, maybe it set to utf8mb4_bin or utf8mb4_unicode manually
+                    continue;
+                }
                 $targetColumnSchema = clone $columnSchema;
                 $targetColumnSchema->setPlatformOption('collation', 'utf8mb4_unicode_ci');
                 // See if column has changed properties in table 2.
@@ -36,19 +47,23 @@ class CApp_Administrator_Fixer_Database {
                 }
             }
         }
-        $sql = null;
+        $sqlArray = [];
         if ($changes) {
             $sqlArray = $dbPlatform->getAlterTableSQL($tableDifferences);
-            $sql = implode(";\n", $sqlArray);
-            $sql .= ';';
         }
 
-        return $sql;
+        return $sqlArray;
     }
 
+    /**
+     * @param string               $table
+     * @param CDatabase_Connection $db
+     *
+     * @return array
+     */
     public static function sqlColumn($table, $db = null) {
         if ($db == null) {
-            $db = CDatabase::instance();
+            $db = c::db();
         }
         $schemaManager = $db->getSchemaManager();
         $schema = $schemaManager->createSchema();
@@ -233,19 +248,23 @@ class CApp_Administrator_Fixer_Database {
                 $changes++;
             }
         }
-        $sql = null;
+        $sqlArray = [];
         if ($changes) {
             $sqlArray = $dbPlatform->getAlterTableSQL($tableDifferences);
-            $sql = implode(";\n", $sqlArray);
-            $sql .= ';';
         }
 
-        return $sql;
+        return $sqlArray;
     }
 
+    /**
+     * @param string               $table
+     * @param CDatabase_Connection $db
+     *
+     * @return array
+     */
     public static function sqlDataType($table, $db = null) {
         if ($db == null) {
-            $db = CDatabase::instance();
+            $db = c::db();
         }
 
         $schemaManager = $db->getSchemaManager();
@@ -302,19 +321,23 @@ class CApp_Administrator_Fixer_Database {
                 }
             }
         }
-        $sql = null;
+        $sqlArray = [];
         if ($changes) {
             $sqlArray = $dbPlatform->getAlterTableSQL($tableDifferences);
-            $sql = implode(";\n", $sqlArray);
-            $sql .= ';';
         }
 
-        return $sql;
+        return $sqlArray;
     }
 
+    /**
+     * @param string               $table
+     * @param CDatabase_Connection $db
+     *
+     * @return array
+     */
     public static function sqlRelationship($table, $db = null) {
         if ($db == null) {
-            $db = CDatabase::instance();
+            $db = c::db();
         }
 
         $schemaManager = $db->getSchemaManager();
@@ -386,13 +409,11 @@ class CApp_Administrator_Fixer_Database {
                 $changes++;
             }
         }
-        $sql = null;
+        $sqlArray = [];
         if ($changes) {
             $sqlArray = $dbPlatform->getAlterTableSQL($tableDifferences);
-            $sql = implode(";\n", $sqlArray);
-            $sql .= ';';
         }
 
-        return $sql;
+        return $sqlArray;
     }
 }

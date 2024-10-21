@@ -155,6 +155,10 @@ class CDaemon_Helper {
         return static::pidPath() . $className . '.pid';
     }
 
+    public static function getSupervisorPidFile($className, $name) {
+        return static::pidPath() . $className . DS . $name . '.pid';
+    }
+
     public static function getLogFileList($className) {
         $logPath = rtrim(static::logPath(), '/') . '/' . $className;
         if (!is_dir($logPath)) {

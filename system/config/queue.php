@@ -2,13 +2,6 @@
 
 defined('SYSPATH') or die('No direct access allowed.');
 
-/**
- * @author Hery Kurniawan
- * @license Ittron Global Teknologi <ittron.co.id>
- *
- * @since Nov 4, 2019, 7:41:46 PM
- */
-
 return [
     /*
     |--------------------------------------------------------------------------
@@ -43,10 +36,11 @@ return [
 
         'database' => [
             'driver' => 'database',
-            'connection' => 'default',
+            'connection' => 'mysql',
             'table' => 'queue',
             'queue' => 'default',
             'retry_after' => 90,
+            'after_commit' => false,
         ],
 
         'beanstalkd' => [
@@ -55,6 +49,7 @@ return [
             'queue' => 'default',
             'retry_after' => 90,
             'block_for' => 0,
+            'after_commit' => false,
         ],
 
         'sqs' => [
@@ -64,6 +59,7 @@ return [
             'prefix' => '', //'https://sqs.us-east-1.amazonaws.com/your-account-id'),
             'queue' => '', // 'your-queue-name'),
             'region' => '', //, 'us-east-1'),
+            'after_commit' => false,
         ],
 
         'redis' => [
@@ -72,6 +68,7 @@ return [
             'queue' => 'default',
             'retry_after' => 90,
             'block_for' => null,
+            'after_commit' => false,
         ],
     ],
 

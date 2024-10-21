@@ -67,7 +67,6 @@ class CManager_EditorJs {
 
             // Get sanitized blocks (according to the rules from configuration)
             $blocks = $editor->getBlocks();
-
             $htmlOutput = '';
 
             foreach ($blocks as $block) {

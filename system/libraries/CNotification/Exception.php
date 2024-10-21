@@ -1,4 +1,4 @@
 <?php
 
-class CNotification_Exception extends CException {
+class CNotification_Exception extends Exception {
 }

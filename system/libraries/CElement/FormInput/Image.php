@@ -32,6 +32,7 @@ class CElement_FormInput_Image extends CElement_FormInput {
         $this->maxWidth = '200';
         $this->maxHeight = '150';
         $this->disabledUpload = false;
+        $this->accept = 'image/*';
         $this->view = 'cresenity/element/form-input/image';
 
         $this->onBeforeParse(function (CView_View $view) {
@@ -40,6 +41,7 @@ class CElement_FormInput_Image extends CElement_FormInput {
             $view->with('maxWidth', $this->maxWidth);
             $view->with('maxHeight', $this->maxHeight);
             $view->with('disabledUpload', $this->disabledUpload);
+            $view->with('accept', $this->accept);
             $view->with('preTag', $this->pretag());
             $view->with('postTag', $this->posttag());
             $view->with('name', $this->name);
@@ -50,7 +52,7 @@ class CElement_FormInput_Image extends CElement_FormInput {
     /**
      * @param string $imgsrc
      *
-     * @return $this'
+     * @return $this
      */
     public function setImgSrc($imgsrc) {
         $this->imgSrc = $imgsrc;

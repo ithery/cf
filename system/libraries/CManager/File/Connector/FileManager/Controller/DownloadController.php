@@ -8,6 +8,7 @@ class CManager_File_Connector_FileManager_Controller_DownloadController extends 
         $file = $fm->input('file');
         $path = $fm->path()->setName($file);
         $stream = $path->readStream();
+
         return c::response()->stream(function () use ($stream) {
             fpassthru($stream);
         }, 200, [

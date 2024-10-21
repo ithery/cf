@@ -93,7 +93,6 @@ trait CView_Trait_ManageComponentTrait {
 
         try {
             $view = c::value($view, $data);
-
             if ($view instanceof CView_View) {
                 return $view->with($data)->render();
             } elseif ($view instanceof CInterface_Htmlable) {
@@ -181,7 +180,7 @@ trait CView_Trait_ManageComponentTrait {
      * @return void
      */
     public function endSlot() {
-        carr::last($this->componentStack);
+        c::last($this->componentStack);
 
         $currentSlot = array_pop(
             $this->slotStack[$this->currentComponent()]

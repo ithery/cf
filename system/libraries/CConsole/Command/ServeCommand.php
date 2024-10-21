@@ -156,6 +156,14 @@ class CConsole_Command_ServeCommand extends CConsole_Command {
      */
     protected function getOptions() {
         $domain = CConsole::domain();
+        //check data domain
+        if (cstr::endsWith($domain, '.test')) {
+            $file = CFData::getFile($domain, 'domain') . '.php';
+
+            if (!CFile::exists($domain)) {
+                $this->createDomainFile($domain);
+            }
+        }
         if ($domain == null) {
             $domain = 'localhost';
         }
@@ -166,5 +174,12 @@ class CConsole_Command_ServeCommand extends CConsole_Command {
             ['tries', null, InputOption::VALUE_OPTIONAL, 'The max number of ports to attempt to serve from', 10],
             ['no-reload', null, InputOption::VALUE_NONE, 'Do not reload the development server on .env file changes'],
         ];
+    }
+
+    public function createDomainFile($domain) {
+        $domainData = [
+            'app_code' => CF::appCode()
+        ];
+        CFData::set($domain, $domainData, 'domain');
     }
 }

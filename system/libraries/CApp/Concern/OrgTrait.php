@@ -1,10 +1,5 @@
 <?php
-/**
- * @author Hery Kurniawan
- * @license Ittron Global Teknologi <ittron.co.id>
- *
- * @since Jul 27, 2019, 10:53:10 PM
- */
+
 trait CApp_Concern_OrgTrait {
     private $org = null;
 

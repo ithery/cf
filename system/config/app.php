@@ -6,7 +6,7 @@ return [
     /**
      * Your app name, it will used for display app identifier when running on framework.
      */
-    'title' => 'CRESENITY',
+    'title' => c::env('APP_NAME', 'CRESENITY'),
     /**
      * Base path of the web site. If this includes a domain, eg: localhost/cresenity/
      * then a full URL will be used, eg: http://localhost/cresenity/. If it only includes
@@ -43,7 +43,7 @@ return [
      */
     'timezone' => 'Asia/Jakarta',
     /**
-     * This key is used by the Illuminate encrypter service and should be set
+     * This key is used by the encrypter service and should be set
      * to a random, 32 character string, otherwise these encrypted strings
      * will not be safe. Please do this before deploying an application!
      */
@@ -81,7 +81,10 @@ return [
                 ]
             ]
         ],
-
+        'navs' => [
+            'name' => 'nav',
+            'renderer' => CNavigation_Renderer_SidenavRenderer::class
+        ],
         'middleware' => ['web'],
         'passwords' => 'users',
         'username' => 'username',
@@ -94,24 +97,19 @@ return [
         'limiters' => [
             'login' => null,
         ],
-        'features' => [
-            CApp_Auth_Features::registration(),
-            CApp_Auth_Features::resetPasswords(),
-            CApp_Auth_Features::emailVerification(),
-            CApp_Auth_Features::updateProfileInformation(),
-            CApp_Auth_Features::updatePasswords(),
-            //CApp_Auth_Features::twoFactorAuthentication(),
-        ],
+
     ],
     'model' => [
         'org' => CApp_Model_Org::class,
         'user' => CApp_Model_Users::class,
         'role' => CApp_Model_Roles::class,
         'role_nav' => CApp_Model_RoleNav::class,
+        'role_permission' => CApp_Model_RolePermission::class,
         'log_activity' => CApp_Model_LogActivity::class,
     ],
     'classes' => [
         'base' => CApp_Base::class,
+        'exception_handler' => CException_ExceptionHandler::class,
     ],
     'javascript' => [
         'minify' => false,
@@ -133,7 +131,20 @@ return [
         'currency_prefix' => c::env('FORMAT_CURRENCY_PREFIX', ''),
         'currency_suffix' => c::env('FORMAT_CURRENCY_SUFFIX', ''),
     ],
-
+    'visitor' => [
+        'default' => 'jenssegers',
+        //except save request or route names
+        'except' => ['login', 'register'],
+        //name of the table which visit records should save in
+        'table_name' => 'visit',
+        'model' => [
+            'visit' => CApp_Model_Visit::class,
+        ],
+        'drivers' => [
+            'jenssegers' => \CApp_Visitor_Driver_JenssegersAgentDriver::class,
+            'UAParser' => \CApp_Visitor_Driver_UAParserDriver::class,
+        ]
+    ],
     'smtp_host' => '', //deprecated
     'smtp_port' => '', //deprecated
     'smtp_secure' => false, //deprecated

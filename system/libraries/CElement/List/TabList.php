@@ -40,7 +40,7 @@ class CElement_List_TabList extends CElement_List {
 
     protected $widgetHeaderClass;
 
-    public function __construct($id) {
+    public function __construct($id = null) {
         parent::__construct($id);
 
         $this->tabPosition = 'left';
@@ -124,6 +124,20 @@ class CElement_List_TabList extends CElement_List {
         $this->tabPosition = $tabPosition;
 
         return $this;
+    }
+
+    /**
+     * @return CElement_List_TabList
+     */
+    public function setTabPositionLeft() {
+        return $this->setTabPosition('left');
+    }
+
+    /**
+     * @return CElement_List_TabList
+     */
+    public function setTabPositionTop() {
+        return $this->setTabPosition('top');
     }
 
     /**

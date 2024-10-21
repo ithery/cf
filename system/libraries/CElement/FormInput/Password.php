@@ -32,7 +32,7 @@ class CElement_FormInput_Password extends CElement_FormInput {
         $this->setAttr('autocomplete', $this->autoComplete ? 'on' : 'off');
         $this->addClass('cres:element:control:Password');
         $this->setAttr('cres-element', 'control:Password');
-        $this->setAttr('cres-config', c::jsonAttr($this->buildControlConfig()));
+        $this->setAttr('cres-config', c::json($this->buildControlConfig()));
         if ($this->readonly) {
             $this->setAttr('readonly', 'readonly');
         }

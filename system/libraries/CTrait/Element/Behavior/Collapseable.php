@@ -2,12 +2,6 @@
 
 defined('SYSPATH') or die('No direct access allowed.');
 
-/**
- * @author Hery Kurniawan
- * @license Ittron Global Teknologi <ittron.co.id>
- *
- * @since Feb 17, 2018, 1:30:47 AM
- */
 trait CTrait_Element_Behavior_Collapseable {
     /**
      * @var bool
@@ -21,6 +15,7 @@ trait CTrait_Element_Behavior_Collapseable {
      */
     public function setCollapseable($bool) {
         $this->collapseable = true;
+
         return $this;
     }
 

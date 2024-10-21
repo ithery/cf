@@ -1,0 +1,50 @@
+<?php
+return [
+    'client_modules' => [
+        'layout-helpers',
+        'jquery',
+        'bootstrap-5',
+        'fontawesome-5-f',
+        'ionicons',
+        'linearicons',
+        'themify-icons',
+        'pe-icon-7-stroke',
+        'glyphicons',
+        'perfect-scrollbar',
+        'sidenav',
+        'cropper',
+        'form',
+        'fileupload',
+        'notify',
+        'bootbox',
+        'prettify',
+        'jquery-ui-1.12.1.custom',
+        'jquery.datatable',
+        'select2',
+        'theme-material',
+        'toastr',
+    ],
+    'js' => [
+        'cresenity.js',
+        'cresenity/cresenity.bs5.js',
+
+        'cresenity-demo.js',
+    ],
+    'css' => [
+        'cresenity.css',
+        'cresenity/cresenity.bs4.css',
+        'uikit.css',
+        'spinkit.css',
+        'cresenity/cresenity.main.bs4.css',
+        // 'cresenity-demo-bs5.css',
+        // 'cresenity-demo-bs5-theme.css',
+        'cresenity-demo.css',
+    ],
+    'data' => [
+        'table' => [
+            //"dom" => "<'row'<'col-sm-6'l><'col-sm-6'f>><'row'<'col-sm-12'tr>><'row'<'col-sm-5'i><'col-sm-7'p>>",
+            //"dom" => "<fr\"\"l>t<\"F\"<\".footer_action\">p>",
+            'dom' => "<'row'<'col-sm-12 col-md-6'l><'col-sm-12 col-md-6'f>><'row'<'col-sm-12'tr>><'row'<'col-sm-12 col-md-5'i><'col-sm-12 col-md-7'p>>",
+        ],
+    ],
+];

@@ -2,12 +2,6 @@
 
 defined('SYSPATH') or die('No direct access allowed.');
 
-/**
- * @author Hery Kurniawan
- * @license Ittron Global Teknologi <ittron.co.id>
- *
- * @since Dec 26, 2017, 1:42:35 AM
- */
 trait CModel_Trait_Event {
     /**
      * The event dispatcher instance.
@@ -37,23 +31,59 @@ trait CModel_Trait_Event {
     /**
      * Register an observer with the Model.
      *
-     * @param object|string $class
+     * @param object|array|string $classes
      *
      * @return void
      */
-    public static function observe($class) {
-        $instance = new static;
+    public static function observe($classes) {
+        $instance = new static();
 
-        $className = is_string($class) ? $class : get_class($class);
+        foreach (carr::wrap($classes) as $class) {
+            $instance->registerObserver($class);
+        }
+    }
+
+    /**
+     * Register a single observer with the model.
+     *
+     * @param object|string $class
+     *
+     * @throws \RuntimeException
+     *
+     * @return void
+     */
+    protected function registerObserver($class) {
+        $className = $this->resolveObserverClassName($class);
 
         // When registering a model observer, we will spin through the possible events
         // and determine if this observer has that method. If it does, we will hook
         // it into the model's event system, making it convenient to watch these.
-        foreach ($instance->getObservableEvents() as $event) {
+        foreach ($this->getObservableEvents() as $event) {
             if (method_exists($class, $event)) {
                 static::registerModelEvent($event, $className . '@' . $event);
             }
         }
+    }
+
+    /**
+     * Resolve the observer's class name from an object or string.
+     *
+     * @param object|string $class
+     *
+     * @throws \InvalidArgumentException
+     *
+     * @return string
+     */
+    private function resolveObserverClassName($class) {
+        if (is_object($class)) {
+            return get_class($class);
+        }
+
+        if (class_exists($class)) {
+            return $class;
+        }
+
+        throw new InvalidArgumentException('Unable to find observer: ' . $class);
     }
 
     /**
@@ -64,9 +94,9 @@ trait CModel_Trait_Event {
     public function getObservableEvents() {
         return array_merge(
             [
-                'retrieved', 'creating', 'created', 'updating',
-                'updated', 'deleting', 'deleted', 'saving',
-                'saved', 'restoring', 'restored',
+                'retrieved', 'creating', 'created', 'updating', 'updated',
+                'saving', 'saved', 'restoring', 'restored', 'replicating',
+                'deleting', 'deleted', 'forceDeleting', 'forceDeleted',
             ],
             $this->observables
         );
@@ -166,7 +196,7 @@ trait CModel_Trait_Event {
      * @param string $event
      * @param string $method
      *
-     * @return mixed|null
+     * @return null|mixed
      */
     protected function fireCustomModelEvent($event, $method) {
         if (!isset($this->dispatchesEvents[$event])) {
@@ -275,6 +305,17 @@ trait CModel_Trait_Event {
     }
 
     /**
+     * Register a replicating model event with the dispatcher.
+     *
+     * @param \CEvent_QueuedClosure|\Closure|string|array $callback
+     *
+     * @return void
+     */
+    public static function replicating($callback) {
+        static::registerModelEvent('replicating', $callback);
+    }
+
+    /**
      * Register a deleting model event with the dispatcher.
      *
      * @param \Closure|string $callback
@@ -306,7 +347,7 @@ trait CModel_Trait_Event {
             return;
         }
 
-        $instance = new static;
+        $instance = new static();
 
         foreach ($instance->getObservableEvents() as $event) {
             static::$dispatcher->forget("model.{$event}: " . static::class);

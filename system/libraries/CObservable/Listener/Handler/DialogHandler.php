@@ -38,7 +38,7 @@ class CObservable_Listener_Handler_DialogHandler extends CObservable_Listener_Ha
         $this->name = 'Dialog';
         $this->method = 'get';
         $this->target = '';
-        $this->content = CHandlerElement::factory();
+        $this->content = CObservable_HandlerElement::factory();
         $this->actions = CElement_List_ActionList::factory();
         $this->param_inputs = [];
         $this->param_request = [];
@@ -161,7 +161,7 @@ class CObservable_Listener_Handler_DialogHandler extends CObservable_Listener_Ha
             $this->js_class = $this->js_class_manual;
         }
         if (strlen($this->js_class) > 0 && $this->js_class != 'cresenity') {
-            if ($this->content instanceof CHandlerElement) {
+            if ($this->content instanceof CObservable_HandlerElement) {
                 $content = $this->content->html();
             } else {
                 $content = $this->content;

@@ -17,10 +17,13 @@ class CElement_Component_Gallery_Item extends CElement_Component {
 
     protected $imageCallback;
 
+    protected $link;
+
     public function __construct($id = '', $tag = 'div') {
         parent::__construct($id, $tag);
-        $this->tag = 'a';
+        $this->tag = 'div';
         $this->type = 'image';
+        $this->link = $this->addA();
     }
 
     /**
@@ -49,8 +52,8 @@ class CElement_Component_Gallery_Item extends CElement_Component {
      * @return void
      */
     private function buildImage() {
-        $this->setAttr('href', $this->src);
-        $img = $this->addImg()->setSrc($this->thumbnail ?: $this->src);
+        $this->link->addClass('cres-gallery-item')->setAttr('href', $this->src);
+        $img = $this->link->addImg()->setSrc($this->thumbnail ?: $this->src);
         if ($this->imageCallback != null) {
             c::call($this->imageCallback, [$img]);
         }
@@ -67,7 +70,7 @@ class CElement_Component_Gallery_Item extends CElement_Component {
      */
     protected function build() {
         parent::build();
-        $this->addClass('cres-gallery-item');
+        $this->addClass('cres-gallery-item-wrapper');
         if ($this->type == 'image') {
             $this->buildImage();
         }

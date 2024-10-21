@@ -1,7 +1,7 @@
 <?php
 
 /**
- * Description of CookieSessionHandler
+ * Description of CookieSessionHandler.
  *
  * @author Hery
  */
@@ -29,38 +29,41 @@ class CSession_Handler_CookieSessionHandler implements SessionHandlerInterface {
      *
      * @var int
      */
-    protected $minutes;
+    protected $seconds;
 
     /**
      * Create a new cookie driven handler instance.
      *
      * @param CHTTP_Cookie $cookie
-     * @param int          $minutes
+     * @param int          $seconds
      *
      * @return void
      */
-    public function __construct(CHTTP_Cookie $cookie, $minutes) {
+    public function __construct(CHTTP_Cookie $cookie, $seconds) {
         $this->cookie = $cookie;
-        $this->minutes = $minutes;
+        $this->seconds = $seconds;
     }
 
     /**
-     * {@inheritdoc}
+     * @inheritdoc
      */
+    #[\ReturnTypeWillChange]
     public function open($savePath, $sessionName) {
         return true;
     }
 
     /**
-     * {@inheritdoc}
+     * @inheritdoc
      */
+    #[\ReturnTypeWillChange]
     public function close() {
         return true;
     }
 
     /**
-     * {@inheritdoc}
+     * @inheritdoc
      */
+    #[\ReturnTypeWillChange]
     public function read($sessionId) {
         $value = $this->request->cookies->get($sessionId) ?: '';
 
@@ -74,20 +77,22 @@ class CSession_Handler_CookieSessionHandler implements SessionHandlerInterface {
     }
 
     /**
-     * {@inheritdoc}
+     * @inheritdoc
      */
+    #[\ReturnTypeWillChange]
     public function write($sessionId, $data) {
         $this->cookie->queue($sessionId, json_encode([
             'data' => $data,
-            'expires' => $this->availableAt($this->minutes * 60),
-        ]), $this->minutes);
+            'expires' => $this->availableAt($this->seconds * 60),
+        ]), $this->seconds);
 
         return true;
     }
 
     /**
-     * {@inheritdoc}
+     * @inheritdoc
      */
+    #[\ReturnTypeWillChange]
     public function destroy($sessionId) {
         $this->cookie->queue($this->cookie->forget($sessionId));
 
@@ -95,8 +100,9 @@ class CSession_Handler_CookieSessionHandler implements SessionHandlerInterface {
     }
 
     /**
-     * {@inheritdoc}
+     * @inheritdoc
      */
+    #[\ReturnTypeWillChange]
     public function gc($lifetime) {
         return true;
     }

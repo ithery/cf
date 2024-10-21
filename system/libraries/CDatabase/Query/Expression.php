@@ -2,13 +2,7 @@
 
 defined('SYSPATH') or die('No direct access allowed.');
 
-/**
- * @author Hery Kurniawan
- * @license Ittron Global Teknologi <ittron.co.id>
- *
- * @since Jun 23, 2018, 5:55:14 AM
- */
-class CDatabase_Query_Expression {
+class CDatabase_Query_Expression implements CDatabase_Contract_Query_ExpressionInterface {
     /**
      * The value of the expression.
      *
@@ -32,7 +26,7 @@ class CDatabase_Query_Expression {
      *
      * @return mixed
      */
-    public function getValue() {
+    public function getValue(CDatabase_Grammar $grammar) {
         return $this->value;
     }
 
@@ -42,6 +36,6 @@ class CDatabase_Query_Expression {
      * @return string
      */
     public function __toString() {
-        return (string) $this->getValue();
+        return (string) $this->getValue(c::db()->getQueryGrammar());
     }
 }

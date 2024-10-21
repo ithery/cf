@@ -1,11 +1,5 @@
 <?php
 
-/**
- * @author Hery Kurniawan <hery@itton.co.id>
- * @license Ittron Global Teknologi
- *
- * @since Nov 15, 2020
- */
 class CDevSuite_Brew {
     const SUPPORTED_PHP_VERSIONS = [
         'php',

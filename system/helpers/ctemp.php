@@ -1,7 +1,7 @@
 <?php
 
 /**
- * Helper ctemp
+ * Helper ctemp.
  *
  * @deprecated 1.2 use CTemporary
  */

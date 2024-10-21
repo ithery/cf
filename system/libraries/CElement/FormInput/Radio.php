@@ -30,9 +30,9 @@ class CElement_FormInput_Radio extends CElement_FormInput {
         $this->checked = false;
         $this->inline = false;
         $this->label_wrap = false;
-        $js_radio = c::theme('radio.js');
-        if (strlen($js_radio) > 0) {
-            $this->applyjs = $js_radio;
+        $jsRadio = c::theme('radio.js');
+        if (strlen($jsRadio) > 0) {
+            $this->applyjs = $jsRadio;
         }
     }
 
@@ -98,7 +98,7 @@ class CElement_FormInput_Radio extends CElement_FormInput {
             $html->append('<div class="switch">');
         }
 
-        $html->append('<input type="radio" name="' . $this->name . '" id="' . $this->id . '" class="input-unstyled' . $this->validation->validation_class() . '" ' . $addition_attribute . ' value="' . $this->value . '"' . $disabled . $checked . '>');
+        $html->append('<input type="radio" name="' . $this->name . '" id="' . $this->id . '" class="input-unstyled' . $this->validation->validationClass() . '" ' . $addition_attribute . ' value="' . $this->value . '"' . $disabled . $checked . '>');
         if (strlen($this->label) > 0) {
             $html->appendln('&nbsp;' . $this->label);
         }

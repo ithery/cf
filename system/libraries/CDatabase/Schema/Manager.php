@@ -2,17 +2,11 @@
 
 defined('SYSPATH') or die('No direct access allowed.');
 
-/**
- * @author Hery Kurniawan
- * @license Ittron Global Teknologi <ittron.co.id>
- *
- * @since Aug 18, 2018, 8:09:14 AM
- */
 abstract class CDatabase_Schema_Manager {
     /**
      * Holds instance of the connection for this schema manager.
      *
-     * @var CDatabase
+     * @var CDatabase_Connection
      */
     protected $db;
 
@@ -28,10 +22,10 @@ abstract class CDatabase_Schema_Manager {
     /**
      * Constructor. Accepts the Connection instance to manage the schema for.
      *
-     * @param CDatabase               $conn
+     * @param CDatabase_Connection    $conn
      * @param null|CDatabase_Platform $platform
      */
-    public function __construct(CDatabase $conn, CDatabase_Platform $platform = null) {
+    public function __construct(CDatabase_Connection $conn, CDatabase_Platform $platform = null) {
         $this->db = $conn;
         $this->platform = $platform ? $platform : $this->db->getDatabasePlatform();
     }
@@ -105,7 +99,7 @@ abstract class CDatabase_Schema_Manager {
      */
     public function listSequences($database = null) {
         if ($database === null) {
-            $database = $this->db->getDatabase();
+            $database = $this->db->getDatabaseName();
         }
         $sql = $this->platform->getListSequencesSQL($database);
 
@@ -131,7 +125,7 @@ abstract class CDatabase_Schema_Manager {
      */
     public function listTableColumns($table, $database = null) {
         if (!$database) {
-            $database = $this->db->getDatabase();
+            $database = $this->db->getDatabaseName();
         }
 
         $sql = $this->platform->getListTableColumnsSQL($table, $database);
@@ -150,7 +144,7 @@ abstract class CDatabase_Schema_Manager {
      * @return \Doctrine\DBAL\Schema\Index[]
      */
     public function listTableIndexes($table) {
-        $sql = $this->platform->getListTableIndexesSQL($table, $this->db->getDatabase());
+        $sql = $this->platform->getListTableIndexesSQL($table, $this->db->getDatabaseName());
 
         $tableIndexes = $this->db->fetchAll($sql);
 
@@ -252,7 +246,7 @@ abstract class CDatabase_Schema_Manager {
      * @return \CDatabase_Schema_View[]
      */
     public function listViews() {
-        $database = $this->db->getDatabase();
+        $database = $this->db->getDatabaseName();
         $sql = $this->platform->getListViewsSQL($database);
         $views = $this->db->fetchAll($sql);
 
@@ -269,7 +263,7 @@ abstract class CDatabase_Schema_Manager {
      */
     public function listTableForeignKeys($table, $database = null) {
         if ($database === null) {
-            $database = $this->db->getDatabase();
+            $database = $this->db->getDatabaseName();
         }
         $sql = $this->platform->getListTableForeignKeysSQL($table, $database);
         $tableForeignKeys = $this->db->fetchAll($sql);
@@ -742,6 +736,7 @@ abstract class CDatabase_Schema_Manager {
             if (!$defaultPrevented) {
                 $column = $this->getPortableTableColumnDefinition($tableColumn);
             }
+
             if ($column) {
                 $name = strtolower($column->getQuotedName($this->platform));
                 $list[$name] = $column;
@@ -968,7 +963,7 @@ abstract class CDatabase_Schema_Manager {
             $schemaConfig->setName($searchPaths[0]);
         }
 
-        $params = $this->db->config();
+        $params = $this->db->getConfig();
         if (!isset($params['defaultTableOptions'])) {
             $params['defaultTableOptions'] = [];
         }
@@ -993,7 +988,7 @@ abstract class CDatabase_Schema_Manager {
      * @return array
      */
     public function getSchemaSearchPaths() {
-        return [$this->db->getDatabase()];
+        return [$this->db->getDatabaseName()];
     }
 
     /**

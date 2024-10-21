@@ -40,7 +40,7 @@ trait CModel_Trait_QueriesRelationships {
             : 'getRelationExistenceCountQuery';
 
         $hasQuery = $relation->{$method}(
-            $relation->getRelated()->newQuery(),
+            $relation->getRelated()->newQueryWithoutRelationships(),
             $this
         );
 
@@ -77,6 +77,7 @@ trait CModel_Trait_QueriesRelationships {
         $relations = explode('.', $relations);
 
         $doesntHave = $operator === '<' && $count === 1;
+
         if ($doesntHave) {
             $operator = '>=';
             $count = 1;
@@ -145,12 +146,29 @@ trait CModel_Trait_QueriesRelationships {
     }
 
     /**
+     * Add a relationship count / exists condition to the query with where clauses.
+     *
+     * Also load the relationship with same condition.
+     *
+     * @param  \CModel_Relation<*, *, *>|string  $relation
+     * @param null|\Closure $callback
+     * @param string        $operator
+     * @param int           $count
+     *
+     * @return $this
+     */
+    public function withWhereHas($relation, Closure $callback = null, $operator = '>=', $count = 1) {
+        return $this->whereHas(cstr::before($relation, ':'), $callback, $operator, $count)
+            ->with($callback ? [$relation => fn ($query) => $callback($query)] : $relation);
+    }
+
+    /**
      * Add a relationship count / exists condition to the query with where clauses and an "or".
      *
-     * @param string   $relation
-     * @param \Closure $callback
-     * @param string   $operator
-     * @param int      $count
+     * @param \CModel_Relation<*, *, *>|string   $relation
+     * @param null|\Closure $callback
+     * @param string        $operator
+     * @param int           $count
      *
      * @return CModel_Query|static
      */
@@ -161,7 +179,7 @@ trait CModel_Trait_QueriesRelationships {
     /**
      * Add a relationship count / exists condition to the query with where clauses.
      *
-     * @param string        $relation
+     * @param \CModel_Relation<*, *, *>|string   $relation
      * @param null|\Closure $callback
      *
      * @return CModel_Query|static
@@ -173,8 +191,8 @@ trait CModel_Trait_QueriesRelationships {
     /**
      * Add a relationship count / exists condition to the query with where clauses and an "or".
      *
-     * @param string   $relation
-     * @param \Closure $callback
+     * @param \CModel_Relation<*, *, *>|string   $relation
+     * @param null|\Closure $callback
      *
      * @return CModel_Query|static
      */
@@ -205,6 +223,10 @@ trait CModel_Trait_QueriesRelationships {
             $types = $this->model->newModelQuery()->distinct()->pluck($relation->getMorphType())->filter()->all();
         }
 
+        if (empty($types)) {
+            return $this->where(new CDatabase_Query_Expression('0'), $operator, $count, $boolean);
+        }
+
         foreach ($types as &$type) {
             $type = CModel_Relation::getMorphedModel($type) ?: $type;
         }
@@ -230,10 +252,13 @@ trait CModel_Trait_QueriesRelationships {
     /**
      * Get the BelongsTo relationship for a single polymorphic type.
      *
-     * @param \CModel_Relation_MorphTo $relation
-     * @param string                   $type
+     * @template TRelatedModel of \CModel
+     * @template TDeclaringModel of \CModel
      *
-     * @return \CModel_Relation_BelongsTo
+     * @param \CModel_Relation_MorphTo<*, TDeclaringModel> $relation
+     * @param class-string<TRelatedModel> $type
+     *
+     * @return \CModel_Relation_BelongsTo<TRelatedModel, TDeclaringModel>
      */
     protected function getBelongsToRelation(CModel_Relation_MorphTo $relation, $type) {
         $belongsTo = CModel_Relation_BelongsTo::noConstraints(function () use ($relation, $type) {
@@ -380,13 +405,16 @@ trait CModel_Trait_QueriesRelationships {
             $relation = $this->getRelationWithoutConstraints($name);
 
             if ($function) {
-                $hashedColumn = $this->getQuery()->from === $relation->getQuery()->getQuery()->from
-                                            ? "{$relation->getRelationCountHash(false)}.${column}"
-                                            : $column;
+                if ($column instanceof CDatabase_Query_Expression) {
+                    $wrappedColumn = $column->getValue($this->getQuery()->getGrammar());
+                } else {
+                    $hashedColumn = $this->getRelationHashedColumn($column, $relation);
 
-                $expression = sprintf('%s(%s)', $function, $this->getQuery()->getGrammar()->wrap(
-                    $column === '*' ? $column : $relation->getRelated()->qualifyColumn($hashedColumn)
-                ));
+                    $wrappedColumn = $this->getQuery()->getGrammar()->wrap(
+                        $column === '*' ? $column : $relation->getRelated()->qualifyColumn($hashedColumn)
+                    );
+                }
+                $expression = $function === 'exists' ? $wrappedColumn : sprintf('%s(%s)', $function, $wrappedColumn);
             } else {
                 $expression = $column;
             }
@@ -422,10 +450,17 @@ trait CModel_Trait_QueriesRelationships {
                 preg_replace('/[^[:alnum:][:space:]_]/u', '', "${name} ${function} ${column}")
             );
 
-            $this->selectSub(
-                $function ? $query : $query->limit(1),
-                $alias
-            );
+            if ($function === 'exists') {
+                $this->selectRaw(
+                    sprintf('exists(%s) as %s', $query->toSql(), $this->getQuery()->grammar->wrap($alias)),
+                    $query->getBindings()
+                )->withCasts([$alias => 'bool']);
+            } else {
+                $this->selectSub(
+                    $function ? $query : $query->limit(1),
+                    $alias
+                );
+            }
         }
 
         return $this;
@@ -500,15 +535,19 @@ trait CModel_Trait_QueriesRelationships {
     /**
      * Add a morph-to relationship condition to the query.
      *
-     * @param \CModel_Relation_MorphTo|string $relation
-     * @param \CModel|string                  $model
-     * @param mixed                           $boolean
+     * @param \CModel_Relation_MorphTo<*, *>|string $relation
+     * @param null|\CModel|string $model
+     * @param string              $boolean
      *
      * @return \CModel_Query|static
      */
     public function whereMorphedTo($relation, $model, $boolean = 'and') {
         if (is_string($relation)) {
             $relation = $this->getRelationWithoutConstraints($relation);
+        }
+
+        if (is_null($model)) {
+            return $this->whereNull($relation->getMorphType(), $boolean);
         }
 
         if (is_string($model)) {
@@ -528,10 +567,40 @@ trait CModel_Trait_QueriesRelationships {
     }
 
     /**
+     * Add a not morph-to relationship condition to the query.
+     *
+     * @param \CModel_Relation_MorphTo<*, *>|string $relation
+     * @param \CModel|string $model
+     * @param mixed          $boolean
+     *
+     * @return $this
+     */
+    public function whereNotMorphedTo($relation, $model, $boolean = 'and') {
+        if (is_string($relation)) {
+            $relation = $this->getRelationWithoutConstraints($relation);
+        }
+
+        if (is_string($model)) {
+            $morphMap = CModel_Relation::morphMap();
+
+            if (!empty($morphMap) && in_array($model, $morphMap)) {
+                $model = array_search($model, $morphMap, true);
+            }
+
+            return $this->whereNot($relation->getMorphType(), '<=>', $model, $boolean);
+        }
+
+        return $this->whereNot(function ($query) use ($relation, $model) {
+            $query->where($relation->getMorphType(), '<=>', $model->getMorphClass())
+                ->where($relation->getForeignKeyName(), '<=>', $model->getKey());
+        }, null, null, $boolean);
+    }
+
+    /**
      * Add a morph-to relationship condition to the query with an "or where" clause.
      *
-     * @param \CModel_Relation_MorphTo|string $relation
-     * @param \CModel|string                  $model
+     * @param \CModel_Relation_MorphTo<*, *>|string $relation
+     * @param null|\CModel|string $model
      *
      * @return \CModel_Query|static
      */
@@ -540,17 +609,39 @@ trait CModel_Trait_QueriesRelationships {
     }
 
     /**
+     * Add a not morph-to relationship condition to the query with an "or where" clause.
+     *
+     * @param \CModel_Relation_MorphTo<*, *>|string $relation
+     * @param null|\CModel|string $model
+     *
+     * @return \CModel_Query|static
+     */
+    public function orWhereNotMorphedTo($relation, $model) {
+        return $this->whereNotMorphedTo($relation, $model, 'or');
+    }
+
+    /**
      * Add a "belongs to" relationship where clause to the query.
      *
-     * @param \CModel     $related
-     * @param null|string $relationshipName
-     * @param string      $boolean
+     * @param \CModel|\CModel_Collection<int, \CModel> $related
+     * @param null|string                              $relationshipName
+     * @param string                                   $boolean
      *
      * @throws \CModel_Exception_RelationNotFoundException
      *
      * @return $this
      */
     public function whereBelongsTo($related, $relationshipName = null, $boolean = 'and') {
+        if (!$related instanceof CCollection) {
+            $relatedCollection = $related->newCollection([$related]);
+        } else {
+            $relatedCollection = $related;
+
+            $related = $relatedCollection->first();
+        }
+        if ($relatedCollection->isEmpty()) {
+            throw new InvalidArgumentException('Collection given to whereBelongsTo method may not be empty.');
+        }
         if ($relationshipName === null) {
             $relationshipName = cstr::camel(c::classBasename($related));
         }
@@ -564,11 +655,10 @@ trait CModel_Trait_QueriesRelationships {
         if (!$relationship instanceof CModel_Relation_BelongsTo) {
             throw CModel_Exception_RelationNotFoundException::make($this->model, $relationshipName, CModel_Relation_BelongsTo::class);
         }
-        $this->where(
+        $this->whereIn(
             $relationship->getQualifiedForeignKeyName(),
-            '=',
-            $related->getAttributeValue($relationship->getOwnerKeyName()),
-            $boolean
+            $relatedCollection->pluck($relationship->getOwnerKeyName())->toArray(),
+            $boolean,
         );
 
         return $this;
@@ -586,6 +676,24 @@ trait CModel_Trait_QueriesRelationships {
      */
     public function orWhereBelongsTo($related, $relationshipName = null) {
         return $this->whereBelongsTo($related, $relationshipName, 'or');
+    }
+
+    /**
+     * Get the relation hashed column name for the given column and relation.
+     *
+     * @param string           $column
+     * @param \CModel_Relation $relation
+     *
+     * @return string
+     */
+    protected function getRelationHashedColumn($column, $relation) {
+        if (cstr::contains($column, '.')) {
+            return $column;
+        }
+
+        return $this->getQuery()->from === $relation->getQuery()->getQuery()->from
+            ? "{$relation->getRelationCountHash(false)}.$column"
+            : $column;
     }
 
     /**

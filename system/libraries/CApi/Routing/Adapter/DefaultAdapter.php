@@ -225,9 +225,9 @@ class CApi_Routing_Adapter_DefaultAdapter implements CApi_Contract_Routing_Adapt
     }
 
     /**
-     * Get the Laravel router instance.
+     * Get the router instance.
      *
-     * @return \Illuminate\Routing\Router
+     * @return \CRouting_Router
      */
     public function getRouter() {
         return $this->router;

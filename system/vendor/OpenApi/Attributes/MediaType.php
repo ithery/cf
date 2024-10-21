@@ -12,23 +12,24 @@ use OpenApi\Generator;
 class MediaType extends \OpenApi\Annotations\MediaType
 {
     /**
-     * @param array<string,Examples>    $examples
-     * @param array<string,string>|null $x
-     * @param Attachable[]|null         $attachables
+     * @param array<string,Examples>   $examples
+     * @param array<string,mixed>      $encoding
+     * @param array<string,mixed>|null $x
+     * @param Attachable[]|null        $attachables
      */
     public function __construct(
         ?string $mediaType = null,
         ?Schema $schema = null,
-        $example = null,
+        mixed $example = Generator::UNDEFINED,
         ?array $examples = null,
-        ?string $encoding = null,
+        ?array $encoding = null,
         // annotation
         ?array $x = null,
         ?array $attachables = null
     ) {
         parent::__construct([
                 'mediaType' => $mediaType ?? Generator::UNDEFINED,
-                'example' => $example ?? Generator::UNDEFINED,
+                'example' => $example,
                 'encoding' => $encoding ?? Generator::UNDEFINED,
                 'x' => $x ?? Generator::UNDEFINED,
                 'value' => $this->combine($schema, $examples, $attachables),

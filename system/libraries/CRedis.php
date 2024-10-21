@@ -8,8 +8,6 @@ class CRedis implements CRedis_FactoryInterface {
      */
     protected $config;
 
-    protected $configName;
-
     /**
      * The name of the default driver.
      *
@@ -41,30 +39,21 @@ class CRedis implements CRedis_FactoryInterface {
     private static $instance;
 
     /**
-     * @param string $configName
-     *
      * @return CRedis
      */
-    public static function instance($configName = 'redis') {
+    public static function instance() {
         if (self::$instance == null) {
-            self::$instance = [];
-        }
-        if (!isset(self::$instance[$configName])) {
-            self::$instance[$configName] = new static($configName);
+            self::$instance = new static();
         }
 
-        return self::$instance[$configName];
+        return self::$instance;
     }
 
-    public function __construct($configName, $config = []) {
-        $this->configName = $configName;
+    public function __construct() {
         $this->driver = 'phpredis';
-        if (!is_array($config)) {
-            $config = [];
-        }
-        if (count($config) == 0) {
-            $config = CF::config('database.' . $configName);
-        }
+
+        $config = CF::config('database.redis');
+
         $this->config = $config;
     }
 
@@ -98,15 +87,16 @@ class CRedis implements CRedis_FactoryInterface {
      */
     public function resolve($name = null) {
         $name = $name ?: 'default';
-        $options = isset($this->config['options']) ? $this->config['options'] : [];
-
-        if (isset($this->config[$name])) {
+        $options = $this->getConfig('options') ?: [];
+        $config = $this->getConfig($name);
+        if (is_array($config)) {
             return $this->connector()->connect(
-                $this->parseConnectionConfiguration($this->config[$name]),
-                $options
+                $this->parseConnectionConfiguration($config),
+                array_merge(carr::except($options, 'parameters'), ['parameters' => carr::get($options, 'parameters.' . $name, carr::get($options, 'parameters', []))])
             );
         }
-        if (isset($this->config['clusters'][$name])) {
+        $clusterConfig = $this->getConfig('clusters.' . $name);
+        if ($clusterConfig) {
             return $this->resolveCluster($name);
         }
 
@@ -124,9 +114,9 @@ class CRedis implements CRedis_FactoryInterface {
         return $this->connector()->connectToCluster(
             array_map(function ($config) {
                 return $this->parseConnectionConfiguration($config);
-            }, $this->config['clusters'][$name]),
-            isset($this->config['clusters']) && isset($this->config['clusters']['options']) ? $this->config['clusters']['options'] : [],
-            isset($this->config['options']) ? $this->config['options'] : []
+            }, $this->getConfig('clusters.' . $name)),
+            $this->getConfig('clusters.options') ?: [],
+            $this->getConfig('options') ?: []
         );
     }
 
@@ -173,9 +163,13 @@ class CRedis implements CRedis_FactoryInterface {
      */
     protected function parseConnectionConfiguration($config) {
         $parsed = (new CDatabase_ConfigurationUrlParser())->parseConfiguration($config);
+        $driver = strtolower($parsed['driver'] ?? '');
+        if (in_array($driver, ['tcp', 'tls'])) {
+            $parsed['scheme'] = $driver;
+        }
 
         return array_filter($parsed, function ($key) {
-            return !in_array($key, ['driver', 'username'], true);
+            return !in_array($key, ['driver'], true);
         }, ARRAY_FILTER_USE_KEY);
     }
 
@@ -218,6 +212,19 @@ class CRedis implements CRedis_FactoryInterface {
     }
 
     /**
+     * Disconnect the given connection and remove from local cache.
+     *
+     * @param null|string $name
+     *
+     * @return void
+     */
+    public function purge($name = null) {
+        $name = $name ?: 'default';
+
+        unset($this->connections[$name]);
+    }
+
+    /**
      * @return string
      */
     public function getDriver() {
@@ -248,5 +255,9 @@ class CRedis implements CRedis_FactoryInterface {
      */
     public function __call($method, $parameters) {
         return $this->connection()->{$method}(...$parameters);
+    }
+
+    public function getConfig($key, $default = null) {
+        return CDatabase::manager()->getConfig('redis.' . $key, $default);
     }
 }

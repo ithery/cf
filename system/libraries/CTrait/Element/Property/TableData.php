@@ -145,13 +145,13 @@ trait CTrait_Element_Property_TableData {
     public function getTableData() {
         switch ($this->tableDataType) {
             case 'query':
-                $db = CDatabase::instance();
+                $db = c::db();
                 if ($this->isUseTrait('CTrait_Element_Property_Database')) {
                     $db = $this->db();
                 }
                 $r = $db->query($this->tableDataQuery);
 
-                return $r->result_array(false);
+                return $r->resultArray(false);
 
                 break;
             default:

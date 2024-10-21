@@ -3,20 +3,25 @@
 class CManager_Asset_File_JsFile extends CManager_Asset_FileAbstract {
     protected $load;
 
+    protected $attributes;
+
     public function __construct(array $options) {
         parent::__construct($options);
+
         $this->type = 'js';
         $this->load = carr::get($options, 'load');
+        $this->attributes = carr::get($options, 'attributes', []);
     }
 
     public function getUrl($withHttp = false) {
         if ($this->isRemote) {
             return $this->script;
         }
+
         $file = $this->getPath();
         $path = $file;
         $path = carr::first(explode('?', $file));
-        $docroot = str_replace(DS, '/', DOCROOT);
+        $docroot = str_replace(DS, '/', CF::publicPath() ? CF::publicPath() . '/' : DOCROOT);
         $file = str_replace(DS, '/', $file);
         $base_url = curl::base();
         if ($withHttp) {
@@ -24,6 +29,8 @@ class CManager_Asset_File_JsFile extends CManager_Asset_FileAbstract {
         }
 
         $file = str_replace($docroot, $base_url, $file);
+
+        $file = str_replace(str_replace(DS, '/', DOCROOT), $base_url, $file);
 
         if (CF::config('assets.js.versioning')) {
             $separator = parse_url($file, PHP_URL_QUERY) ? '&' : '?';
@@ -36,14 +43,7 @@ class CManager_Asset_File_JsFile extends CManager_Asset_FileAbstract {
     }
 
     protected function fullpath($file) {
-        foreach ($this->mediaPaths as $dir) {
-            $path = $dir . 'js' . DS . $file;
-            if (file_exists($path)) {
-                return $path;
-            }
-        }
-        $dirs = CF::getDirs('media');
-        $dirs = array_merge($this->mediaPaths, $dirs);
+        $dirs = $this->getMediaPaths();
 
         foreach ($dirs as $dir) {
             $path = $dir . 'js' . DS . $file;
@@ -59,10 +59,14 @@ class CManager_Asset_File_JsFile extends CManager_Asset_FileAbstract {
     }
 
     public function render($withHttp = false) {
-        $attrDefer = $this->load == 'defer' ? ' defer' : '';
         $url = $this->getUrl($withHttp);
 
-        $script = '<script src="' . $url . '"' . $attrDefer . '></script>';
+        $attributes = $this->attributes;
+        if ($this->load == 'defer') {
+            $attributes['defer'] = 'defer';
+        }
+
+        $script = '<script src="' . $url . '"' . CBase_HtmlBuilder::attributes($attributes) . '></script>';
 
         return $script;
     }

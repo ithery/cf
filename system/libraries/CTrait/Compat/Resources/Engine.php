@@ -7,6 +7,7 @@ defined('SYSPATH') or die('No direct access allowed.');
  * @license Ittron Global Teknologi <ittron.co.id>
  *
  * @since Sep 10, 2018, 2:18:13 AM
+ * @see CResources_Engine
  */
 
  //@codingStandardsIgnoreStart
@@ -36,6 +37,13 @@ trait CTrait_Compat_Resources_Engine {
         return $this->getRootDirectory();
     }
 
+    /**
+     * @param string $rootDirectory
+     *
+     * @return $this
+     *
+     * @deprecated 1.2
+     */
     public function set_root_directory($rootDirectory) {
         return $this->setRootDirectory($rootDirectory);
     }

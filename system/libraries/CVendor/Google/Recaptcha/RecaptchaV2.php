@@ -84,7 +84,7 @@ class CVendor_Google_Recaptcha_RecaptchaV2 extends CVendor_Google_Recaptcha_Abst
      * @param null|string $name
      * @param array       $attributes
      *
-     * @return \Arcanedev\Html\Elements\Div
+     * @return \CElement_Element_Div
      */
     public function audio($name = null, array $attributes = []) {
         return $this->display($name, array_merge(

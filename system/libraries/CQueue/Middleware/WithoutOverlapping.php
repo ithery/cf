@@ -2,6 +2,7 @@
 
 class CQueue_Middleware_WithoutOverlapping {
     use CTrait_Helper_InteractsWithTime;
+
     /**
      * The job's unique key used for preventing overlaps.
      *

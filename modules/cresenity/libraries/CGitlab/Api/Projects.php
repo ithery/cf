@@ -48,7 +48,7 @@ class CGitlab_Api_Projects extends CGitlab_Api {
     }
 
     /**
-     * Get projects owned by the current user
+     * Get projects owned by the current user.
      *
      * @param int    $page
      * @param int    $per_page
@@ -76,7 +76,9 @@ class CGitlab_Api_Projects extends CGitlab_Api {
      * @return mixed
      */
     public function search($query, $page = 1, $per_page = self::PER_PAGE, $order_by = self::ORDER_BY, $sort = self::SORT) {
-        return $this->get('projects/search/' . $this->encodePath($query), [
+        return $this->get('search', [
+            'scope' => 'projects',
+            'search' => $query,
             'page' => $page,
             'per_page' => $per_page,
             'order_by' => $order_by,
@@ -101,6 +103,7 @@ class CGitlab_Api_Projects extends CGitlab_Api {
      */
     public function create($name, array $params = []) {
         $params['name'] = $name;
+
         return $this->post('projects', $params);
     }
 
@@ -113,6 +116,7 @@ class CGitlab_Api_Projects extends CGitlab_Api {
      */
     public function createForUser($user_id, $name, array $params = []) {
         $params['name'] = $name;
+
         return $this->post('projects/user/' . $this->encodePath($user_id), $params);
     }
 
@@ -280,6 +284,7 @@ class CGitlab_Api_Projects extends CGitlab_Api {
             $params = ['push_events' => true];
         }
         $params['url'] = $url;
+
         return $this->post($this->getProjectPath($project_id, 'hooks'), $params);
     }
 

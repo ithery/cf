@@ -2,6 +2,14 @@
 
 abstract class CDatabase_Schema_Grammar extends CDatabase_Grammar {
     use CDatabase_Trait_CompileJsonPathTrait;
+
+    /**
+     * The possible column modifiers.
+     *
+     * @var string[]
+     */
+    protected $modifiers = [];
+
     /**
      * If this Grammar supports schema changes wrapped in a transaction.
      *
@@ -48,12 +56,17 @@ abstract class CDatabase_Schema_Grammar extends CDatabase_Grammar {
      *
      * @param \CDatabase_Schema_Blueprint $blueprint
      * @param \CBase_Fluent               $command
-     * @param \CDatabase                  $connection
+     * @param \CDatabase_Connection       $connection
      *
      * @return array
      */
-    public function compileRenameColumn(CDatabase_Schema_Blueprint $blueprint, CBase_Fluent $command, CDatabase $connection) {
-        return CDatabase_Schema_Grammar_RenameColumn::compile($this, $blueprint, $command, $connection);
+    public function compileRenameColumn(CDatabase_Schema_Blueprint $blueprint, CBase_Fluent $command, CDatabase_Connection $connection) {
+        return sprintf(
+            'alter table %s rename column %s to %s',
+            $this->wrapTable($blueprint),
+            $this->wrap($command->from),
+            $this->wrap($command->to)
+        );
     }
 
     /**
@@ -67,8 +80,8 @@ abstract class CDatabase_Schema_Grammar extends CDatabase_Grammar {
      *
      * @return array
      */
-    public function compileChange(CDatabase_Schema_Blueprint $blueprint, CBase_Fluent $command, CDatabase $connection) {
-        return CDatabase_Schema_Grammar_ChangeColumn::compile($this, $blueprint, $command, $connection);
+    public function compileChange(CDatabase_Schema_Blueprint $blueprint, CBase_Fluent $command, CDatabase_Connection $connection) {
+        throw new LogicException('This database driver does not support modifying columns.');
     }
 
     /**
@@ -137,6 +150,18 @@ abstract class CDatabase_Schema_Grammar extends CDatabase_Grammar {
         }
 
         return $sql;
+    }
+
+    /**
+     * Compile a drop foreign key command.
+     *
+     * @param \CDatabase_Schema_Blueprint $blueprint
+     * @param \CBase_Fluent               $command
+     *
+     * @return string
+     */
+    public function compileDropForeign(CDatabase_Schema_Blueprint $blueprint, CBase_Fluent $command) {
+        throw new RuntimeException('This database driver does not support dropping foreign keys.');
     }
 
     /**
@@ -235,6 +260,24 @@ abstract class CDatabase_Schema_Grammar extends CDatabase_Grammar {
     }
 
     /**
+     * Determine if a command with a given name exists on the blueprint.
+     *
+     * @param \CDatabase_Schema_Blueprint $blueprint
+     * @param string                      $name
+     *
+     * @return bool
+     */
+    protected function hasCommand(CDatabase_Schema_Blueprint $blueprint, $name) {
+        foreach ($blueprint->getCommands() as $command) {
+            if ($command->name === $name) {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
+    /**
      * Add a prefix to an array of values.
      *
      * @param string $prefix
@@ -284,8 +327,8 @@ abstract class CDatabase_Schema_Grammar extends CDatabase_Grammar {
      * @return string
      */
     protected function getDefaultValue($value) {
-        if ($value instanceof CDatabase_Query_Expression) {
-            return $value;
+        if ($value instanceof CDatabase_Contract_Query_ExpressionInterface) {
+            return $this->getValue($value);
         }
 
         return is_bool($value)
@@ -325,15 +368,6 @@ abstract class CDatabase_Schema_Grammar extends CDatabase_Grammar {
      */
     public function supportsSchemaTransactions() {
         return $this->transactions;
-    }
-
-    /**
-     * Compile the query to determine the list of tables.
-     *
-     * @return string
-     */
-    public function compileTableExists() {
-        throw new LogicException('This database driver does not support check table exists.');
     }
 
     /**

@@ -3,7 +3,7 @@
 defined('SYSPATH') or die('No direct access allowed.');
 
 /**
- * PostgreSQL 8.1+ Database Driver
+ * PostgreSQL 8.1+ Database Driver.
  */
 class CDatabase_Driver_Pgsql extends CDatabase_Driver {
     use CTrait_Compat_Database_Driver_Pgsql;
@@ -20,8 +20,6 @@ class CDatabase_Driver_Pgsql extends CDatabase_Driver {
      */
     public function __construct($config) {
         $this->db_config = $config;
-
-        CF::log(CLogger::DEBUG, 'PgSQL Database Driver Initialized');
     }
 
     public function connect() {
@@ -133,6 +131,7 @@ class CDatabase_Driver_Pgsql extends CDatabase_Driver {
                 $column .= $parts[$i] . ' ';
             }
         }
+
         return $column;
     }
 

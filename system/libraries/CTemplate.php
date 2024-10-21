@@ -2,12 +2,6 @@
 
 defined('SYSPATH') or die('No direct access allowed.');
 
-/**
- * @author Hery Kurniawan
- * @license Ittron Global Teknologi <ittron.co.id>
- *
- * @since Jan 6, 2018, 6:33:59 PM
- */
 class CTemplate {
     const TEMPLATE_FOLDER = 'templates';
 

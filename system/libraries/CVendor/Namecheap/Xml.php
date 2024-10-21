@@ -60,9 +60,6 @@ class CVendor_Namecheap_Xml {
         $output = [];
         switch ($node->nodeType) {
             case XML_CDATA_SECTION_NODE:
-                $output = trim($node->textContent);
-
-                break;
             case XML_TEXT_NODE:
                 $output = trim($node->textContent);
 
@@ -113,6 +110,10 @@ class CVendor_Namecheap_Xml {
                             }
                         }
                     } else {
+                        if (is_string($output) && empty($output)) {
+                            $output = [];
+                        }
+
                         foreach ($a as $k => $v) {
                             $output['_' . $k] = $v;
                         }

@@ -67,9 +67,9 @@ trait CTrait_Compat_Manager {
      * @param string $id
      * @param string $type
      *
-     * @return CElement_FormInput
+     * @throws Exception
      *
-     * @throws CException
+     * @return CElement_FormInput
      *
      * @deprecated plase use createControl
      */
@@ -81,9 +81,9 @@ trait CTrait_Compat_Manager {
      * @param string $id
      * @param string $type
      *
-     * @return CElement_Element
+     * @throws Exception
      *
-     * @throws CException
+     * @return CElement_Element
      *
      * @deprecated plase use createElement
      */
@@ -141,7 +141,7 @@ trait CTrait_Compat_Manager {
     }
 
     /**
-     * Backward compatibility of registerModule
+     * Backward compatibility of registerModule.
      *
      * @param string $module
      * @param array  $data   optional
@@ -155,7 +155,7 @@ trait CTrait_Compat_Manager {
     }
 
     /**
-     * Undocumented function
+     * Undocumented function.
      *
      * @param string $module
      *

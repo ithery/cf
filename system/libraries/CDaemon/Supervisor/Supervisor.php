@@ -1,6 +1,6 @@
 <?php
 
-use CarbonV3\CarbonImmutable;
+use Carbon\CarbonImmutable;
 
 class CDaemon_Supervisor_Supervisor implements CDaemon_Contract_PausableInterface, CDaemon_Contract_RestartableInterface, CDaemon_Contract_TerminableInterface {
     use CDaemon_Trait_ListenForSignals;
@@ -36,7 +36,7 @@ class CDaemon_Supervisor_Supervisor implements CDaemon_Contract_PausableInterfac
     /**
      * The time at which auto-scaling last ran for this supervisor.
      *
-     * @var \CarbonV3\CarbonImmutable
+     * @var \Carbon\CarbonImmutable
      */
     public $lastAutoScaled;
 
@@ -46,6 +46,13 @@ class CDaemon_Supervisor_Supervisor implements CDaemon_Contract_PausableInterfac
      * @var null|\Closure
      */
     public $output;
+
+    /**
+     * The master daemon class.
+     *
+     * @var null|string
+     */
+    public $masterDaemonClass;
 
     /**
      * Create a new supervisor instance.
@@ -58,7 +65,6 @@ class CDaemon_Supervisor_Supervisor implements CDaemon_Contract_PausableInterfac
         $this->options = $options;
         $this->name = $options->name;
         $this->processPools = $this->createProcessPools();
-
         $this->output = function () {
         };
 
@@ -106,7 +112,7 @@ class CDaemon_Supervisor_Supervisor implements CDaemon_Contract_PausableInterfac
     protected function createProcessPool(CDaemon_Supervisor_SupervisorOptions $options) {
         return new CDaemon_Supervisor_ProcessPool($options, function ($type, $line) {
             $this->output($type, $line);
-        });
+        }, $this->masterDaemonClass);
     }
 
     /**
@@ -246,6 +252,7 @@ class CDaemon_Supervisor_Supervisor implements CDaemon_Contract_PausableInterfac
      * @return void
      */
     public function ensureNoDuplicateSupervisors() {
+        return true;
         if (CDaemon_Supervisor::supervisorRepository()->find($this->name) !== null) {
             throw new Exception("A supervisor with the name [{$this->name}] is already running.");
         }
@@ -277,7 +284,7 @@ class CDaemon_Supervisor_Supervisor implements CDaemon_Contract_PausableInterfac
             // user interface. This contains information on the specific options for it and
             // the current number of worker processes per queue for easy load monitoring.
             $this->persist();
-            CDaemon::log('Supervisor Looped');
+
             c::event(new CDaemon_Supervisor_Event_SupervisorLooped($this));
         } catch (Throwable $e) {
             CException::exceptionHandler()->report($e);
@@ -459,5 +466,15 @@ class CDaemon_Supervisor_Supervisor implements CDaemon_Contract_PausableInterfac
      */
     protected function exitProcess($status = 0) {
         exit((int) $status);
+    }
+
+    public function setMasterDaemonClass($masterDaemonClass) {
+        $this->masterDaemonClass = $masterDaemonClass;
+
+        return $this;
+    }
+
+    public function getMasterDaemonClass() {
+        return $this->masterDaemonClass;
     }
 }

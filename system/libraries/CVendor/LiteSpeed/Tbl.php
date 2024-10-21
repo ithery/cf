@@ -296,22 +296,22 @@ class CVendor_LiteSpeed_Tbl {
                     $buf .= ' class="text-' . $this->_align[$i] . '"';
                 }
 
-                $buf .= '>' . $attr->_label;
-                if ($hasSort && $attr->_type != 'action') {
+                $buf .= '>' . $attr->label;
+                if ($hasSort && $attr->type != 'action') {
                     $buf .= ' <a href="' . $url . '&sort=' . $this->_id . '`';
-                    if ($this->_sorted_tbl && ($this->_sort_key == $attr->GetKey())) {
+                    if ($this->_sorted_tbl && ($this->_sort_key == $attr->getKey())) {
                         if ($this->_sort_ascend == 1) {
-                            $buf .= '0' . $attr->GetKey() . '"><i class="pull-right fa fa-sort-asc"></i>';
+                            $buf .= '0' . $attr->getKey() . '"><i class="pull-right fa fa-sort-asc"></i>';
                         } else {
-                            $buf .= '1' . $attr->GetKey() . '"> <i class="pull-right fa fa-sort-desc"></i>';
+                            $buf .= '1' . $attr->getKey() . '"> <i class="pull-right fa fa-sort-desc"></i>';
                         }
                     } else {
-                        $buf .= '1' . $attr->GetKey() . '"> <i class="pull-right fa fa-sort"></i>';
+                        $buf .= '1' . $attr->getKey() . '"> <i class="pull-right fa fa-sort"></i>';
                     }
                     $buf .= '</a>';
                 }
-                if ($attr->_type == 'ctxseq') {
-                    $attr->_hrefLink = $url . $attr->_href;
+                if ($attr->type == 'ctxseq') {
+                    $attr->hrefLink = $url . $attr->href;
                 }
                 $buf .= '</th>';
             }
@@ -372,11 +372,11 @@ class CVendor_LiteSpeed_Tbl {
 
                 $action_attr = null;
                 foreach ($this->_dattrs as $attr) {
-                    if ($attr->_type == 'action') {
+                    if ($attr->type == 'action') {
                         if ($reason = $attr->blockedVersion()) {
-                            $attr->_maxVal = '';
-                        } elseif ($attr->IsFlagOn(Attr::BM_NOTNULL) && strpos($attr->_maxVal, 'd') !== false && count($dlayer) == 1) {
-                            $attr->_maxVal = str_replace('d', '', $attr->_maxVal); // do not allow delete if only one left
+                            $attr->maxVal = '';
+                        } elseif ($attr->IsFlagOn(Attr::BM_NOTNULL) && strpos($attr->maxVal, 'd') !== false && count($dlayer) == 1) {
+                            $attr->maxVal = str_replace('d', '', $attr->maxVal); // do not allow delete if only one left
                         }
                         $action_attr = $attr;
 
@@ -421,7 +421,7 @@ class CVendor_LiteSpeed_Tbl {
 
         $labels = [$this->_helpKey];
         foreach ($this->_dattrs as $attr) {
-            $labels[] = $attr->_helpKey;
+            $labels[] = $attr->helpKey;
         }
         if (($tips = Msg::getEditTips($labels)) != null) {
             $buf .= UIBase::getTblTips($tips);
@@ -448,21 +448,21 @@ class CVendor_LiteSpeed_Tbl {
         }
 
         $is_blocked = $attr->blockedVersion();
-        $version = $is_blocked ? $attr->_version : 0;
-        if ($attr->_type == 'sel1' && $node != null && $node->GetChildVal($attr->GetKey()) != null) {
-            $attr->SetDerivedSelOptions($disp->GetDerivedSelOptions($this->_id, $attr->_minVal, $node));
+        $version = $is_blocked ? $attr->version : 0;
+        if ($attr->type == 'sel1' && $node != null && $node->GetChildVal($attr->getKey()) != null) {
+            $attr->SetDerivedSelOptions($disp->GetDerivedSelOptions($this->_id, $attr->minVal, $node));
         }
 
         $buf = '<tr>';
-        if ($attr->_label) {
+        if ($attr->label) {
             if ($is_blocked) {
                 $buf .= '<td class="xtbl_label_blocked">';
             } else {
                 $buf .= '<td class="xtbl_label">';
             }
-            $buf .= $attr->_label;
+            $buf .= $attr->label;
 
-            $dhelp_item = Msg::getAttrTip($attr->_helpKey);
+            $dhelp_item = Msg::getAttrTip($attr->helpKey);
             if ($this->_cols == 1) {
                 $buf .= '&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;';
             } else {
@@ -490,7 +490,7 @@ class CVendor_LiteSpeed_Tbl {
         }
         $buf .= '>';
 
-        if ($attr->_href) {
+        if ($attr->href) {
             //$link = $disp->_ctrlUrl . 'm=' . $disp->_mid . '&p=' . $disp->_pid;
             $link = $disp->get(Info::FLD_CTRL_URL);
             if ($disp->get(Info::FLD_TID) != null) {
@@ -500,8 +500,8 @@ class CVendor_LiteSpeed_Tbl {
                 $link .= '&r=' . $disp->get(Info::FLD_REF);
             }
 
-            $link .= $attr->_href;
-            $attr->_hrefLink = str_replace('$R', urlencode($disp->get(Info::FLD_REF)), $link);
+            $link .= $attr->href;
+            $attr->hrefLink = str_replace('$R', urlencode($disp->get(Info::FLD_REF)), $link);
         }
 
         $buf .= ($attr->toHtml($node));
@@ -516,15 +516,15 @@ class CVendor_LiteSpeed_Tbl {
             return '';
         }
 
-        if ($attr->_type == 'sel1') {
-            $attr->SetDerivedSelOptions($disp->GetDerivedSelOptions($this->_id, $attr->_minVal, $dlayer));
+        if ($attr->type == 'sel1') {
+            $attr->SetDerivedSelOptions($disp->GetDerivedSelOptions($this->_id, $attr->minVal, $dlayer));
         }
 
         $is_blocked = $attr->blockedVersion();
         $helppop = '';
 
-        if (($dhelp_item = Msg::getAttrTip($attr->_helpKey)) != null) {
-            $helppop = '<span class="lst-tooltip">' . $dhelp_item->Render($is_blocked ? $attr->_version : 0) . '</span>';
+        if (($dhelp_item = Msg::getAttrTip($attr->helpKey)) != null) {
+            $helppop = '<span class="lst-tooltip">' . $dhelp_item->Render($is_blocked ? $attr->version : 0) . '</span>';
         }
 
         $buf = $attr->toInputGroup($dlayer, $is_blocked, $helppop);
@@ -567,7 +567,7 @@ class CVendor_LiteSpeed_Tbl {
 
             if ($key == 0) {
                 if ($this->_icon != null) {
-                    if ($attr->GetKey() == 'type' && is_array($attr->_maxVal) && is_array($this->_icon)) {
+                    if ($attr->getKey() == 'type' && is_array($attr->maxVal) && is_array($this->_icon)) {
                         $type = $data->GetChildVal('type');
                         $icon_name = isset($this->_icon[$type]) ? $this->_icon[$type] : 'application';
                     } else {
@@ -583,13 +583,13 @@ class CVendor_LiteSpeed_Tbl {
             }
             $buf .= '>';
 
-            if ($attr->_type == 'action') {
+            if ($attr->type == 'action') {
                 $buf .= $actionLink;
             } else {
-                if ($attr->_type == 'sel1' && $data->GetChildVal($attr->GetKey()) != null) {
-                    $attr->SetDerivedSelOptions($disp->GetDerivedSelOptions($this->_id, $attr->_minVal, $data));
+                if ($attr->type == 'sel1' && $data->GetChildVal($attr->getKey()) != null) {
+                    $attr->SetDerivedSelOptions($disp->GetDerivedSelOptions($this->_id, $attr->minVal, $data));
                 }
-                if ($attr->GetKey() == $this->_holderIndex) {
+                if ($attr->getKey() == $this->_holderIndex) {
                     $buf .= $attr->toHtml($data, $indexActionLink);
 
                     if ($this->_hasNote && (($note = $data->GetChildVal('note')) != null)) {

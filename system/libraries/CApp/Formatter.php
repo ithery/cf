@@ -155,16 +155,18 @@ class CApp_Formatter {
             return $x;
         }
         $carbon = CCarbon::parse($x);
-        if ($carbon instanceof \CarbonV3\Carbon) {
-            return $carbon->translatedFormat($dateFormat);
-        }
 
-        return $carbon->format($dateFormat);
+        return $carbon->translatedFormat($dateFormat);
     }
 
     public function unformatDate($x, $fromFormat = null) {
         $dateFormat = $fromFormat ?: $this->dateFormat;
-        $date = CCarbon::createFromLocaleFormat($dateFormat, CCarbon::getLocale(), $x);
+
+        try {
+            $date = CCarbon::createFromLocaleFormat($dateFormat, CCarbon::getLocale(), $x);
+        } catch (Exception $ex) {
+            $date = CCarbon::parse($x);
+        }
 
         return $date->format('Y-m-d');
     }
@@ -179,14 +181,14 @@ class CApp_Formatter {
         }
 
         $carbon = CCarbon::parse($x);
-        if ($carbon instanceof \CarbonV3\Carbon) {
-            return $carbon->translatedFormat($datetimeFormat);
-        }
 
-        return $carbon->format($datetimeFormat);
+        return $carbon->translatedFormat($datetimeFormat);
     }
 
     public function unformatDatetime($x, $fromFormat = null) {
+        if ($x instanceof DateTime) {
+            return $x->format('Y-m-d H:i:s');
+        }
         $datetimeFormat = $fromFormat ?: $this->datetimeFormat;
         $date = CCarbon::createFromLocaleFormat($datetimeFormat, CCarbon::getLocale(), $x);
 

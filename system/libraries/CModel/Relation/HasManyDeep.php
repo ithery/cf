@@ -126,10 +126,10 @@ class CModel_Relation_HasManyDeep extends CModel_Relation_HasManyThrough {
         $query->join($throughParent->getTable(), $first, '=', $second);
 
         if ($this->throughParentInstanceSoftDeletes($throughParent)) {
-            $column = $throughParent->getQualifiedDeletedAtColumn();
+            $column = $throughParent->getQualifiedStatusColumn();
 
             $query->withGlobalScope(__CLASS__ . ":${column}", function (CModel_Query $query) use ($column) {
-                $query->whereNull($column);
+                $query->where($column, '<>', 0);
             });
         }
     }

@@ -15,10 +15,10 @@ class CDatabase_Config {
                 $config = static::dsnToArray($name);
             } else {
                 //we will try to resolve the config name
-                $config = CF::config('database.connections.' . $name);
+                $config = CDatabase::manager()->getConfig('connections.' . $name);
                 if ($config === null) {
                     //we will try to resolve the first array of config
-                    $config = CF::config('database.' . $name);
+                    $config = CDatabase::manager()->getConfig($name);
                 }
                 if (!is_null($config)) {
                     if (is_string($config)) {
@@ -41,17 +41,32 @@ class CDatabase_Config {
         return null;
     }
 
-    protected static function flattenFormat(array $config) {
+    public static function flattenFormat(array $config) {
         if (isset($config['connection'])) {
             $connection = $config['connection'];
             $formattedConnection = static::reformatConnectionFormat($connection);
-            //this is old format, we will reformat this to new format
 
+            //this is old format, we will reformat this to new format
             $config = array_merge($formattedConnection, $config);
         }
 
+        if (isset($config['user'])) {
+            if (!isset($config['username'])) {
+                $config['username'] = $config['user'];
+            }
+            unset($config['user']);
+        }
+
+        if (isset($config['pass'])) {
+            if (!isset($config['password'])) {
+                $config['password'] = $config['pass'];
+            }
+            unset($config['pass']);
+        }
         if (isset($config['character_set'])) {
-            $config['charset'] = $config['character_set'];
+            if (!isset($config['charset'])) {
+                $config['charset'] = $config['character_set'];
+            }
             unset($config['character_set']);
         }
         if (isset($config['table_prefix'])) {
@@ -60,24 +75,57 @@ class CDatabase_Config {
         }
         if (!isset($config['collation'])) {
             $config['collation'] = null;
+            if (carr::get($config, 'charset') == 'utf8mb4') {
+                $config['collation'] = 'utf8mb4_unicode_ci';
+            }
+        }
+        if (isset($config['socket'])) {
+            if (!isset($config['unix_socket'])) {
+                $config['unix_socket'] = $config['socket'];
+            }
+            unset($config['socket']);
+        }
+        if (isset($config['type'])) {
+            if (!isset($config['driver'])) {
+                $config['driver'] = $config['type'];
+            }
+            unset($config['type']);
         }
 
-        $defaultConfig = [
-            'benchmark' => true,
-            'persistent' => false,
-            'connection' => '',
-            'charset' => 'utf8',
-            'prefix' => '',
-            'object' => true,
-            'cache' => false,
-            'escape' => true,
-        ];
+        if (isset($config['escape'])) {
+            //deprecated for escape, we will always escape all values on database
+            unset($config['escape']);
+        }
 
-        $config = array_merge($defaultConfig, $config);
+        if (isset($config['object'])) {
+            //deprecated for object, we will always fetch object for all fetching database
+            unset($config['object']);
+        }
+        if (isset($config['persistent'])) {
+            //deprecated for persistent
+            unset($config['persistent']);
+        }
+
+        // $defaultConfig = [
+        //     'benchmark' => true,
+        //     'persistent' => false,
+        //     'connection' => '',
+        //     'charset' => 'utf8mb4',
+        //     'collation' => 'utf8mb4_unicode_ci',
+        //     'prefix' => '',
+        //     'object' => true,
+        //     'cache' => false,
+        //     'escape' => true,
+        // ];
+
+        // $config = array_merge($defaultConfig, $config);
+
         if (!isset($config['port']) || $config['port'] == false) {
-            $port = static::getDefaultPort($config['driver']);
-            if ($port !== null) {
-                $config['port'] = $port;
+            if (isset($config['driver'])) {
+                $port = static::getDefaultPort($config['driver']);
+                if ($port !== null) {
+                    $config['port'] = $port;
+                }
             }
         }
 
@@ -86,7 +134,8 @@ class CDatabase_Config {
 
     protected static function normalizeDriver($driver) {
         $mappedDriver = [
-            'mysqli' => 'mysql'
+            'mysqli' => 'mysql',
+            'mariadb' => 'mysql'
         ];
 
         return carr::get($mappedDriver, $driver, $driver);

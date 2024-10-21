@@ -76,6 +76,7 @@ export default class CountDownTimer {
         this.displayCallback = this.config.displayCallback;
         this.autoStart = this.config.autoStart;
         this.timerInterval = this.config.timerInterval;
+        this.countUp = this.config.countUp ?? false;
         if(this.autoStart) {
             this.startTimer();
         } else {
@@ -96,7 +97,9 @@ export default class CountDownTimer {
 
         // Calculate the difference between now and the countdown date
         let distance = this.timestamp - now;
-
+        if(this.countUp) {
+            distance = now - this.timestamp;
+        }
         // Calculate the days, hours, minutes and seconds remaining
         let days = Math.floor(distance / (1000 * 60 * 60 * 24));
         let hours = Math.floor((distance % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));

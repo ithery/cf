@@ -4,6 +4,7 @@ defined('SYSPATH') or die('No direct access allowed.');
 
 final class CManager {
     use CTrait_Compat_Manager;
+
     protected $controls = [];
 
     protected $controlsCode = [];
@@ -76,6 +77,8 @@ final class CManager {
 
     /**
      * @return CClientScript
+     *
+     * @deprecated since 1.6 use CManager::asset()->runTime()
      */
     public static function clientScript() {
         return CClientScript::instance();
@@ -83,6 +86,8 @@ final class CManager {
 
     /**
      * @return CClientModule
+     *
+     * @deprecated since 1.6 dont use this anymore, use c::manager()->assets->module
      */
     public static function clientModule() {
         return CClientModules::instance();
@@ -106,10 +111,10 @@ final class CManager {
      */
     public static function registerModule($module, $data = []) {
         if (!empty($data)) {
-            CClientModules::instance()->defineModule($module, $data);
+            CManager::asset()->module()->defineModule($module, $data);
         }
-        if (!CClientModules::instance()->isRegisteredModule($module)) {
-            return CClientModules::instance()->registerModule($module);
+        if (!CManager::asset()->module()->isRegisteredModule($module)) {
+            return CManager::asset()->module()->registerRunTimeModule($module);
         }
 
         return false;
@@ -117,18 +122,18 @@ final class CManager {
 
     public static function registerThemeModule($module, $data = []) {
         if (!empty($data)) {
-            CClientModules::instance()->defineModule($module, $data);
+            CManager::asset()->module()->defineModule($module, $data);
         }
 
-        return CClientModules::instance()->registerThemeModule($module);
+        return CManager::asset()->module()->registerThemeModule($module);
     }
 
     public static function isRegisteredModule($module) {
-        return CClientModules::instance()->isRegisteredModule($module);
+        return CManager::asset()->module()->isRegisteredModule($module);
     }
 
     public static function getRegisteredModule() {
-        return CClientModules::instance()->getRegisteredModule();
+        return CManager::asset()->module()->getRegisteredModule();
     }
 
     /**
@@ -137,7 +142,7 @@ final class CManager {
      * @return bool
      */
     public static function unregisterModule($module) {
-        return CClientModules::instance()->unregisterModule($module);
+        return CManager::asset()->module()->unregisterRunTimeModule($module);
     }
 
     public function registerControls($controls) {
@@ -152,7 +157,7 @@ final class CManager {
      * @param string $class
      * @param string $codePath
      *
-     * @throws CException
+     * @throws Exception
      *
      * @return bool
      */
@@ -163,7 +168,7 @@ final class CManager {
             if (file_exists($codePath)) {
                 include $codePath;
             } else {
-                throw new CException('File :code_path not exists', [':code_path' => $code_path]);
+                throw new Exception(c::__('File :code_path not exists', [':code_path' => $code_path]));
             }
         }
 
@@ -175,7 +180,7 @@ final class CManager {
      * @param string $class
      * @param string $code_path optional
      *
-     * @throws CException
+     * @throws Exception
      *
      * @return bool true if no error
      */
@@ -186,7 +191,7 @@ final class CManager {
             if (file_exists($code_path)) {
                 include $code_path;
             } else {
-                throw new CException('File :code_path not exists', [':code_path' => $code_path]);
+                throw new Exception(c::__('File :code_path not exists', [':code_path' => $code_path]));
             }
         }
 
@@ -253,13 +258,13 @@ final class CManager {
      * @param string $id
      * @param string $type
      *
-     * @throws CException
+     * @throws Exception
      *
      * @return CElement_Element
      */
     public function createElement($id, $type) {
         if (!isset($this->elements[$type])) {
-            throw new CException('Type of element :type not registered', [':type' => $type]);
+            throw new Exception(c::__('Type of element :type not registered', [':type' => $type]));
         }
         $class = $this->elements[$type];
 
@@ -311,12 +316,24 @@ final class CManager {
         return false;
     }
 
-    public static function registerCss($file, $pos = CClientScript::POS_HEAD) {
-        $cs = CClientScript::instance()->registerCssFile($file, $pos);
+    /**
+     * @param string $file
+     * @param string $pos
+     *
+     * @return CManager_Asset_Container
+     */
+    public static function registerCss($file, $pos = CManager_Asset::POS_HEAD) {
+        return CManager::asset()->runTime()->registerCssFile($file, $pos);
     }
 
-    public static function registerJs($file, $pos = CClientScript::POS_END) {
-        $cs = CClientScript::instance()->registerJsFile($file, $pos);
+    /**
+     * @param string|array $file
+     * @param string       $pos
+     *
+     * @return CManager_Asset_Container
+     */
+    public static function registerJs($file, $pos = CManager_Asset::POS_END) {
+        return CManager::asset()->runTime()->registerJsFile($file, $pos);
     }
 
     /**
@@ -427,5 +444,30 @@ final class CManager {
      */
     public static function editorJs() {
         return CManager_EditorJs::instance();
+    }
+
+    public static function onBoarding() {
+        return CManager_OnBoarding_Steps::instance();
+    }
+
+    /**
+     * @return CManager_Factory
+     */
+    public static function factory() {
+        return new CBase_ForwarderStaticClass(CManager_Factory::class);
+    }
+
+    /**
+     * @return CManager_FileProvider_FileProvider
+     */
+    public static function createFileProvider() {
+        return new CManager_FileProvider_FileProvider();
+    }
+
+    /**
+     * @return CManager_FileProvider_ImageFileProvider
+     */
+    public static function createImageFileProvider() {
+        return new CManager_FileProvider_ImageFileProvider();
     }
 }

@@ -55,10 +55,19 @@ abstract class CApi_MethodAbstract implements CInterface_Arrayable {
         'expiration' => null,
     ];
 
+    /**
+     * @var int
+     */
     protected $orgId;
 
+    /**
+     * @var string
+     */
     protected $sessionIdParameter = 'sessionId';
 
+    /**
+     * @var string
+     */
     protected $group;
 
     public function __construct($orgId = null, $sessionId = null, $request = null) {
@@ -83,6 +92,13 @@ abstract class CApi_MethodAbstract implements CInterface_Arrayable {
         $this->group = $group;
 
         return $this;
+    }
+
+    /**
+     * @return string
+     */
+    public function getGroup() {
+        return $this->group;
     }
 
     public function getApiRequest() {
@@ -196,5 +212,13 @@ abstract class CApi_MethodAbstract implements CInterface_Arrayable {
         }
         $validator = CValidation::createValidator($data, $rules, $messages);
         $validator->validate();
+    }
+
+    protected function manager() {
+        return CApi_Manager::instance($this->group);
+    }
+
+    protected function auth() {
+        return $this->manager()->auth();
     }
 }

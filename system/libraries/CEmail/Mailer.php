@@ -1,7 +1,6 @@
 <?php
 
 use Symfony\Component\Mime\Email;
-use Illuminate\Support\HtmlString;
 use Symfony\Component\Mailer\Envelope;
 use CEmail_Contract_MailerInterface as MailerContract;
 use CEmail_Contract_MailableInterface as MailableContract;
@@ -384,6 +383,7 @@ class CEmail_Mailer implements MailerContract, MailQueueContract {
         }
 
         if (is_string($queue)) {
+            /** @var CEmail_Mailable $view */
             $view->onQueue($queue);
         }
 
@@ -503,7 +503,7 @@ class CEmail_Mailer implements MailerContract, MailQueueContract {
      * @return bool
      */
     protected function shouldSendMessage($message, $data = []) {
-        CEvent::dispatcher()->until(new CEmail_Event_MessageSending($message, $data)) !== false;
+        return CEvent::dispatcher()->until(new CEmail_Event_MessageSending($message, $data)) !== false;
     }
 
     /**

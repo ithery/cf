@@ -2,12 +2,6 @@
 
 defined('SYSPATH') or die('No direct access allowed.');
 
-/**
- * @author Hery Kurniawan
- * @license Ittron Global Teknologi <ittron.co.id>
- *
- * @since Jun 6, 2018, 11:32:00 AM
- */
 class CAjax {
     const TYPE_SELECT_SEARCH = 'SelectSearch';
 

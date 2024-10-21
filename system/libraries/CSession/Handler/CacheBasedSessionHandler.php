@@ -1,7 +1,7 @@
 <?php
 
 /**
- * Description of CacheBasedSessionHandler
+ * Description of CacheBasedSessionHandler.
  *
  * @author Hery
  */
@@ -34,43 +34,49 @@ class CSession_Handler_CacheBasedSessionHandler implements SessionHandlerInterfa
     }
 
     /**
-     * {@inheritdoc}
+     * @inheritdoc
      */
+    #[\ReturnTypeWillChange]
     public function open($savePath, $sessionName) {
         return true;
     }
 
     /**
-     * {@inheritdoc}
+     * @inheritdoc
      */
+    #[\ReturnTypeWillChange]
     public function close() {
         return true;
     }
 
     /**
-     * {@inheritdoc}
+     * @inheritdoc
      */
+    #[\ReturnTypeWillChange]
     public function read($sessionId) {
         return $this->cache->get($sessionId, '');
     }
 
     /**
-     * {@inheritdoc}
+     * @inheritdoc
      */
+    #[\ReturnTypeWillChange]
     public function write($sessionId, $data) {
-        return $this->cache->put($sessionId, $data, $this->minutes * 60);
+        return $this->cache->put($sessionId, $data, $this->seconds);
     }
 
     /**
-     * {@inheritdoc}
+     * @inheritdoc
      */
+    #[\ReturnTypeWillChange]
     public function destroy($sessionId) {
         return $this->cache->forget($sessionId);
     }
 
     /**
-     * {@inheritdoc}
+     * @inheritdoc
      */
+    #[\ReturnTypeWillChange]
     public function gc($lifetime) {
         return true;
     }

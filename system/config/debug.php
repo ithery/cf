@@ -5,5 +5,6 @@ return [
         'collectors' => [
             'cache' => true,
         ],
+        'editor' => c::env('DEBUGBAR_EDITOR', 'vscode'),
     ],
 ];

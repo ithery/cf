@@ -98,10 +98,9 @@ final class CApi_SessionFactory {
         $cacheOptions = [];
         $cacheOptions['driver'] = 'Redis';
 
-        $storage = 'redis';
         $expirationSeconds = 60 * 60 * 24 * 30;
 
-        $redis = CRedis::instance($storage);
+        $redis = CRedis::instance();
         $driver = new CCache_Driver_RedisDriver($redis);
         $redisStore = new CCache_Repository($driver);
         //$expirationSeconds = CF::config($expiration);

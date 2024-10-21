@@ -2,14 +2,9 @@
 
 defined('SYSPATH') or die('No direct access allowed.');
 
-/**
- * @author Hery Kurniawan
- * @license Ittron Global Teknologi <ittron.co.id>
- *
- * @since Sep 8, 2019, 2:18:49 AM
- */
 abstract class CQueue_AbstractJob implements CQueue_JobInterface {
     use CTrait_Helper_InteractsWithTime;
+
     /**
      * The job handler instance.
      *

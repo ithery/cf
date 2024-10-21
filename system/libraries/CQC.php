@@ -2,9 +2,6 @@
 
 defined('SYSPATH') or die('No direct access allowed.');
 
-/**
- * @author Hery Kurniawan <hery@itton.co.id>
- */
 class CQC {
     const TYPE_DATABASE_CHECKER = 'DatabaseChecker';
 
@@ -98,5 +95,19 @@ class CQC {
      */
     public static function phpstan() {
         return CQC_Phpstan::instance();
+    }
+
+    /**
+     * @return CQC_Phpcs
+     */
+    public static function phpcs() {
+        return CQC_Phpcs::instance();
+    }
+
+    /**
+     * @return CQC_Phpcsfixer
+     */
+    public static function phpcsfixer() {
+        return CQC_Phpcsfixer::instance();
     }
 }

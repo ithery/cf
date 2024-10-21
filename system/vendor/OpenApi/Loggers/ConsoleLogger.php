@@ -1,4 +1,4 @@
-<?php
+<?php declare(strict_types=1);
 
 /**
  * @license Apache 2.0
@@ -33,13 +33,15 @@ class ConsoleLogger extends AbstractLogger implements LoggerInterface
         $this->debug = $debug;
     }
 
-    public function loggedMessageAboveNotice()
+    public function loggedMessageAboveNotice(): bool
     {
         return $this->loggedMessageAboveNotice;
     }
 
     /**
-     * @param array $context additional details; supports custom `prefix` and `exception`
+     * @param string            $level
+     * @param string|\Exception $message
+     * @param array             $context additional details; supports custom `prefix` and `exception`
      */
     public function log($level, $message, array $context = []): void
     {
@@ -51,9 +53,10 @@ class ConsoleLogger extends AbstractLogger implements LoggerInterface
                 if (!$this->debug) {
                     return;
                 }
+                $prefix = 'Debug: ';
                 // no break
             case LogLevel::WARNING:
-                $prefix = $context['prefix'] ?? 'Warning: ';
+                $prefix = $prefix ?: ($context['prefix'] ?? 'Warning: ');
                 $color = static::COLOR_WARNING;
                 break;
             case LogLevel::ERROR:

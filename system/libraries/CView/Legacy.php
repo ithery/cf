@@ -9,6 +9,7 @@ defined('SYSPATH') or die('No direct access allowed.');
 
 class CView_Legacy {
     use CTrait_Compat_View;
+
     protected static $viewFolder = 'views';
 
     // The view file name and type
@@ -54,7 +55,7 @@ class CView_Legacy {
      * @param array  $data pre-load data
      * @param string $type type of file: html, css, js, etc
      *
-     * @throws CException if the requested view cannot be found
+     * @throws Exception if the requested view cannot be found
      *
      * @return void
      */

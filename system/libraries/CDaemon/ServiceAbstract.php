@@ -2,12 +2,6 @@
 
 defined('SYSPATH') or die('No direct access allowed.');
 
-/**
- * @author Hery Kurniawan
- * @license Ittron Global Teknologi <ittron.co.id>
- *
- * @since Mar 12, 2019, 3:23:13 PM
- */
 use Symfony\Component\Process\Process;
 
 abstract class CDaemon_ServiceAbstract implements CDaemon_ServiceInterface {
@@ -71,7 +65,14 @@ abstract class CDaemon_ServiceAbstract implements CDaemon_ServiceInterface {
 
     protected $terminateLimit = 20;
 
-    protected $sizeToRotate = '500KB';
+    protected $logSizeToRotate = 500 * 1024;
+
+    protected $logKeepToRotate = 10;
+
+    /**
+     * @var CDaemon_Runner
+     */
+    protected $runner = null;
 
     /**
      * The frequency of the event loop. In seconds.
@@ -190,6 +191,8 @@ abstract class CDaemon_ServiceAbstract implements CDaemon_ServiceInterface {
         $this->config = $config;
         $this->stdout = carr::get($config, 'stdout', false);
         $this->pidFile = $this->getConfig('pidFile');
+        $this->logSizeToRotate = CF::config('daemon.logs.rotation.size', 500 * 1024);
+        $this->logKeepToRotate = CF::config('daemon.logs.rotation.keep', 10);
         CDaemon_ErrorHandler::init();
         //$this->getopt();
     }
@@ -566,56 +569,29 @@ abstract class CDaemon_ServiceAbstract implements CDaemon_ServiceInterface {
      * Log the $message to the filename returned by CDaemon_ServiceAbstract::logFile() and/or optionally print to stdout.
      * Multi-Line messages will be handled nicely.
      *
-     * Note: Your logFile() method will be called every 5 minutes (at even increments, eg 00:05, 00:10, 00:15, etc) to
-     * allow you to rotate the filename based on time (one log file per month, day, hour, whatever) if you wish.
-     *
-     * Note: You may find value in overloading this method in your app in favor of a more fully-featured logging tool
-     * like log4php or Zend_Log. There are fantastic logging libraries available, and this simplistic home-grown option
-     * was chosen specifically to avoid forcing another dependency on you.
-     *
      * @param string $message
      * @param string $label   Truncated at 12 chars
      * @param mixed  $indent
      */
     public function log($message, $label = '', $indent = 0) {
-        static $logFile = '';
-        static $logFileCheckAt = 0;
-        static $logFileError = false;
-        $header = "\nDate                  PID   Label         Message\n";
+        $header = "\nDate                  PID   Label         Message" . PHP_EOL;
         $date = date('Y-m-d H:i:s');
         $pid = str_pad($this->pid, 5, ' ', STR_PAD_LEFT);
         $label = str_pad(substr($label, 0, 12), 13, ' ', STR_PAD_RIGHT);
         $prefix = "[${date}] ${pid} ${label}" . str_repeat("\t", $indent);
-        if (time() >= $logFileCheckAt && $this->logFile() != $logFile) {
-            $logFile = $this->logFile();
-            $logFileCheckAt = mktime(date('H'), (date('i') - (date('i') % 5)) + 5, null);
-            @fclose(self::$logHandle);
-            self::$logHandle = $logFileError = false;
-        }
-        if (self::$logHandle === false) {
-            if (strlen($logFile) > 0 && file_exists($logFile)) {
-                $rotator = CLogger_Rotator::createRotate($logFile);
+        $logFile = $this->logFile();
 
-                $rotator->size($this->sizeToRotate)->run();
-            }
-            if (strlen($logFile) > 0 && self::$logHandle = @fopen($logFile, 'a+')) {
-                if ($this->parent) {
-                    fwrite(self::$logHandle, $header);
-                    if ($this->stdout) {
-                        echo $header;
-                    }
-                }
-            } elseif (!$logFileError) {
-                $logFileError = true;
-                trigger_error(__CLASS__ . 'Error: Could not write to logfile ' . $logFile, E_USER_WARNING);
+        $this->runner()->autoRotateLog($this->logSizeToRotate, $this->logKeepToRotate);
+        if (!CFile::exists($logFile)) {
+            CFile::put($logFile, $header);
+            if ($this->stdout) {
+                echo $header;
             }
         }
-        $message = $prefix . ' ' . str_replace("\n", "\n${prefix} ", trim($message)) . "\n";
-        if (self::$logHandle) {
-            fwrite(self::$logHandle, $message);
-        }
+        $line = $prefix . ' ' . str_replace(PHP_EOL, PHP_EOL . $prefix, trim($message)) . PHP_EOL;
+        CFile::append($logFile, $line);
         if ($this->stdout) {
-            echo $message;
+            echo $line;
         }
     }
 
@@ -830,7 +806,7 @@ abstract class CDaemon_ServiceAbstract implements CDaemon_ServiceInterface {
         if ($this->idleProbability) {
             $probability = (1 / $this->idleProbability);
         }
-        $is_idle = function () use ($endTime, $probability) {
+        $isIdle = function () use ($endTime, $probability) {
             if ($endTime) {
                 return microtime(true) < $endTime;
             }
@@ -841,8 +817,8 @@ abstract class CDaemon_ServiceAbstract implements CDaemon_ServiceInterface {
             return false;
         };
         // If we have idle time, do any housekeeping tasks
-        if ($is_idle()) {
-            $this->dispatch([CDaemon_ServiceAbstract::ON_IDLE], [$is_idle]);
+        if ($isIdle()) {
+            $this->dispatch([CDaemon_ServiceAbstract::ON_IDLE], [$isIdle]);
         }
         $stats = [];
         $stats['duration'] = microtime(true) - $startTime;
@@ -922,9 +898,11 @@ abstract class CDaemon_ServiceAbstract implements CDaemon_ServiceInterface {
      * There are 2 paths to the daemon calling restart: The Auto Restart feature, and, also, if a fatal error
      * is encountered after it's been running for a while, it will attempt to re-start.
      *
+     * @param mixed $rotateLog
+     *
      * @return void;
      */
-    public function restart() {
+    public function restart($rotateLog = false) {
         if (!$this->parent) {
             return;
         }
@@ -944,13 +922,14 @@ abstract class CDaemon_ServiceAbstract implements CDaemon_ServiceInterface {
         if (is_resource(STDIN)) {
             fclose(STDIN);
         }
-        // Close the static log handle to prevent it being inherrited by the new process.
-        if (is_resource(self::$logHandle)) {
-            fclose(self::$logHandle);
-        }
 
-        $class = get_class($this);
-        CDaemon::createRunner($class)->run();
+        $runner = $this->runner();
+
+        if ($rotateLog) {
+            $this->log('Rotating Log...');
+            $runner->rotateLog();
+        }
+        $runner->run();
 
         // A new daemon process has been created. This one will stick around just long enough to clean up the worker processes.
         exit();
@@ -1285,5 +1264,13 @@ abstract class CDaemon_ServiceAbstract implements CDaemon_ServiceInterface {
 
     public function isShutdown() {
         return $this->shutdown;
+    }
+
+    public function runner() {
+        if ($this->runner == null) {
+            $this->runner = CDaemon::createRunner(get_class($this));
+        }
+
+        return $this->runner;
     }
 }

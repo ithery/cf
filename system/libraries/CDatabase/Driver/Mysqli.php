@@ -7,6 +7,7 @@ defined('SYSPATH') or die('No direct access allowed.');
  */
 class CDatabase_Driver_Mysqli extends CDatabase_Driver_AbstractMysql {
     use CTrait_Compat_Database_Driver_Mysqli;
+
     /**
      * Database connection link.
      *
@@ -19,8 +20,6 @@ class CDatabase_Driver_Mysqli extends CDatabase_Driver_AbstractMysql {
      */
     protected $pdo;
 
-    protected $dbConfig;
-
     protected $statements = [];
 
     /**
@@ -29,11 +28,9 @@ class CDatabase_Driver_Mysqli extends CDatabase_Driver_AbstractMysql {
      * @param  array  database configuration
      * @param mixed $config
      */
-    public function __construct(CDatabase $db, $config) {
-        $this->db = $db;
+    public function __construct(CDatabase_Connection $connection, $config) {
+        $this->connection = $connection;
         $this->dbConfig = $config;
-
-        CF::log(CLogger::DEBUG, 'MySQLi Database Driver Initialized');
     }
 
     public function close() {
@@ -290,7 +287,7 @@ class CDatabase_Driver_Mysqli extends CDatabase_Driver_AbstractMysql {
      *
      * @return CDatabase_Schema_Manager_Mysql
      */
-    public function getSchemaManager(CDatabase $db) {
+    public function getSchemaManager(CDatabase_Connection $db) {
         return new CDatabase_Schema_Manager_Mysql($db);
     }
 
@@ -314,6 +311,9 @@ class CDatabase_Driver_Mysqli extends CDatabase_Driver_AbstractMysql {
         return false;
     }
 
+    /**
+     * @return bool
+     */
     public function ping() {
         if (!$this->link) {
             $this->connect();

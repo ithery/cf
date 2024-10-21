@@ -22,6 +22,7 @@ abstract class CDebug_CollectorAbstract {
             mkdir($path, 0777, true);
         }
         $path .= date('Ymd') . $this->getExt();
+
         file_put_contents($path, $data . PHP_EOL, FILE_APPEND | LOCK_EX);
 
         return true;

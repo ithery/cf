@@ -2,12 +2,6 @@
 
 defined('SYSPATH') or die('No direct access allowed.');
 
-/**
- * @author Hery Kurniawan
- * @license Ittron Global Teknologi <ittron.co.id>
- *
- * @since Dec 30, 2017, 3:11:24 AM
- */
 trait CApp_Trait_BaseTrait {
     private static $org = null;
 
@@ -74,6 +68,9 @@ trait CApp_Trait_BaseTrait {
                 }
             }
         }
+        if ($orgId) {
+            $orgId = (int) $orgId;
+        }
 
         return $orgId;
     }
@@ -137,33 +134,33 @@ trait CApp_Trait_BaseTrait {
     //@codingStandardsIgnoreEnd
 
     /**
-     * @param int $org_id optional, default using return values of SM::org_id()
+     * @param int $orgId optional, default using return values of self::orgId()
      *
      * @return stdClass of org
      */
-    public static function org($org_id = null) {
-        $db = CDatabase::instance();
+    public static function org($orgId = null) {
+        $db = c::db();
 
-        if ($org_id == null) {
-            $org_id = self::orgId();
+        if ($orgId == null) {
+            $orgId = self::orgId();
         }
         if (self::$org == null) {
             self::$org = [];
         }
-        if (!isset(self::$org[$org_id])) {
-            self::$org[$org_id] = cdbutils::get_row('select * from org where org_id = ' . $db->escape($org_id));
+        if (!isset(self::$org[$orgId])) {
+            self::$org[$orgId] = $db->table('org')->find($orgId);
         }
 
-        return self::$org[$org_id];
+        return self::$org[$orgId];
     }
 
     /**
      * Get current CSession object.
      *
-     * @return CSession
+     * @return CSession_Store
      */
     public static function session() {
-        return CSession::instance();
+        return c::session();
     }
 
     /**
@@ -178,7 +175,7 @@ trait CApp_Trait_BaseTrait {
     /**
      * User from session.
      *
-     * @return null|stdClass
+     * @return null|stdClass|CModel
      */
     public static function user() {
         return c::app()->user();
@@ -211,10 +208,10 @@ trait CApp_Trait_BaseTrait {
      * @return string
      */
     public static function username() {
-        $app = CApp::instance();
+        $app = c::app();
         $user = $app->user();
         if ($user != null) {
-            return $user->username;
+            return $user->username ?: $user->email;
         }
 
         return 'system';
@@ -224,7 +221,7 @@ trait CApp_Trait_BaseTrait {
      * @return CApp_Model_Roles
      */
     public static function role() {
-        $app = CApp::instance();
+        $app = c::app();
         $role = $app->role();
 
         return $role;
@@ -388,8 +385,8 @@ trait CApp_Trait_BaseTrait {
     }
 
     public static function checkPermission($permissionName) {
-        if (!self::havePermission($permissionName)) {
-            self::notAccessible();
+        if (!static::havePermission($permissionName)) {
+            static::notAccessible();
 
             return false;
         }
@@ -415,25 +412,16 @@ trait CApp_Trait_BaseTrait {
             return false;
         }
 
-        $domain = CF::domain();
-        $pos = strpos($domain, 'app.ittron.co.id');
-        if ($pos === false) {
-            $pos = strpos($domain, 'dev.ittron.co.id');
-        }
-        if ($pos === false) {
-            $pos = strpos($domain, 'dev8.ittron.co.id');
-        }
-        if ($pos === false) {
-            $pos = strpos($domain, 'staging.ittron.co.id');
-        }
-
-        return $pos !== false;
+        return true;
     }
 
     /**
      * @return bool
      */
     public static function isStaging() {
+        if (c::env('ENVIRONTMENT') == CBase::ENVIRONMENT_STAGING) {
+            return true;
+        }
         $domain = CF::domain();
         $pos = strpos($domain, 'staging.ittron.co.id');
 

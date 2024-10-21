@@ -24,6 +24,7 @@ defined('SYSPATH') or die('No direct access allowed.');
  * @method CElement_Element_H4                   addH4($id=null)
  * @method CElement_Element_H5                   addH5($id=null)
  * @method CElement_Element_H6                   addH6($id=null)
+ * @method CElement_Element_H6                   addP($id=null)
  * @method CElement_Element_Span                 addSpan($id=null)
  * @method CElement_Element_Pre                  addPre($id=null)
  * @method CElement_List_ActionList              addActionList($id=null)
@@ -38,6 +39,9 @@ defined('SYSPATH') or die('No direct access allowed.');
  * @method CElement_Component_Image              addImage($id=null)
  * @method CElement_Component_Chart              addChart($id=null)
  * @method CElement_Component_Metric_ValueMetric addValueMetric($id=null)
+ * @method CApp                                  addBr()
+ * @method CApp                                  addHr()
+ * @method CApp                                  add(mixed $renderable)
  * @method $this                                 addJs($js)
  */
 class CApp implements CInterface_Responsable, CInterface_Renderable, CInterface_Jsonable {
@@ -55,7 +59,6 @@ class CApp implements CInterface_Responsable, CInterface_Renderable, CInterface_
         CApp_Concern_AuthTrait,
         CApp_Concern_BootstrapTrait,
         CApp_Concern_TitleTrait;
-
     public static $instance = null;
 
     protected $renderer;
@@ -106,6 +109,10 @@ class CApp implements CInterface_Responsable, CInterface_Renderable, CInterface_
 
     private static $haveScrollToTop = null;
 
+    private $coreModuleIsRegistered = false;
+
+    private $visitor;
+
     public function __construct($domain = null) {
         $this->element = new CApp_Element();
 
@@ -127,14 +134,14 @@ class CApp implements CInterface_Responsable, CInterface_Renderable, CInterface_
         $this->id = 'capp';
         //check login
 
-        if (ccfg::get('update_last_request')) {
+        if (CF::config('app.update_last_request')) {
             $user = $this->user();
 
             if ($user != null) {
-                if (!is_array($user) && is_object($user)) {
+                if (!is_array($user) && is_object($user) && $user->user_id) {
                     //update last request
-                    $db = $this->db();
-                    $db->update('users', ['last_request' => date('Y-m-d H:i:s')], ['user_id' => $user->user_id]);
+                    $db = c::db();
+                    $db->table('users')->where('user_id', '=', $user->user_id)->update(['last_request' => date('Y-m-d H:i:s')]);
                 }
             }
         }
@@ -262,10 +269,12 @@ class CApp implements CInterface_Responsable, CInterface_Renderable, CInterface_
      * @param null|mixed $domain
      * @param null|mixed $dbName
      *
-     * @return CDatabase
+     * @deprecated 1.6 use c::db
+     *
+     * @return CDatabase_Connection
      */
     public static function db($domain = null, $dbName = null) {
-        return CDatabase::instance($dbName, null, $domain);
+        return CDatabase::manager()->connection($dbName);
     }
 
     public function setAjaxData($key, $value = null) {
@@ -391,37 +400,37 @@ class CApp implements CInterface_Responsable, CInterface_Renderable, CInterface_
         return $this;
     }
 
-    public function registerCoreModules() {
-        $manager = CManager::instance();
-        $theme = CManager::theme()->getCurrentTheme();
-        $themeFile = CF::getFile('themes', $theme);
-        if (file_exists($themeFile)) {
-            $themeData = include $themeFile;
-            $moduleArray = carr::get($themeData, 'client_modules');
-            $cssArray = carr::get($themeData, 'css');
-            $jsArray = carr::get($themeData, 'js');
-            $cs = CClientScript::instance();
-            if ($moduleArray != null) {
-                foreach ($moduleArray as $module) {
-                    $manager->registerThemeModule($module);
-                }
-            }
-            if (ccfg::get('have_clock')) {
-                $manager->registerModule('servertime');
-            }
-            if ($cssArray != null) {
-                foreach ($cssArray as $css) {
-                    $manager->asset()->theme()->registerCssFile($css);
-                }
-            }
-            if ($jsArray != null) {
-                foreach ($jsArray as $js) {
-                    $manager->asset()->theme()->registerJsFiles($js);
-                }
-            }
-        }
+    public function registerCoreModules($force = false) {
+        if ($force || !$this->coreModuleIsRegistered) {
+            $manager = CManager::instance();
+            $theme = CManager::theme()->getCurrentTheme();
+            $themeFile = CF::getFile('themes', $theme);
+            if (file_exists($themeFile)) {
+                $themeData = include $themeFile;
+                $moduleArray = carr::get($themeData, 'client_modules');
+                $cssArray = carr::get($themeData, 'css');
+                $jsArray = carr::get($themeData, 'js');
 
-        $manager->registerModule('block-ui');
+                if ($moduleArray != null) {
+                    foreach ($moduleArray as $module) {
+                        $manager->registerThemeModule($module);
+                    }
+                }
+
+                if ($cssArray != null) {
+                    foreach ($cssArray as $css) {
+                        $manager->asset()->theme()->registerCssFile($css);
+                    }
+                }
+                if ($jsArray != null) {
+                    foreach ($jsArray as $js) {
+                        $manager->asset()->theme()->registerJsFiles($js);
+                    }
+                }
+            }
+
+            $manager->registerModule('block-ui');
+        }
     }
 
     public function reset() {
@@ -511,11 +520,12 @@ class CApp implements CInterface_Responsable, CInterface_Renderable, CInterface_
         $asset = CManager::asset();
         $html = $this->element->html();
         $js = $this->element->js();
+
         if (CF::config('app.javascript.minify')) {
             $js = $this->minifyJavascript($js);
         }
 
-        $js = $asset->renderJsRequire($js, 'cresenity.cf.requireJs');
+        //$js = $asset->renderJsRequire($js, 'cresenity.cf.requireJs');
 
         $cappScript = $this->yieldPushContent('capp-script');
         //strip cappScript from <script>
@@ -527,13 +537,17 @@ class CApp implements CInterface_Responsable, CInterface_Renderable, CInterface_
         // }
 
         //$js .= $cappScript;
+        $assetData = [];
+        $assetData['js'] = $asset->getAllJsFileUrl();
+        $assetData['css'] = $asset->getAllCssFileUrl();
+        $data['assets'] = $assetData;
         $data['html'] = $message . $html . $cappScript;
         $data['js'] = base64_encode($js);
         if (CF::config('app.debug')) {
             $data['jsRaw'] = $js;
         }
 
-        $data['css_require'] = $asset->getAllCssFileUrl();
+        //$data['css_require'] = $asset->getAllCssFileUrl();
         $data['message'] = $messageOrig;
         $data['ajaxData'] = $this->ajaxData;
         $data['html'] = mb_convert_encoding($data['html'], 'UTF-8', 'UTF-8');
@@ -594,12 +608,24 @@ class CApp implements CInterface_Responsable, CInterface_Renderable, CInterface_
      */
     public function toResponse($request) {
         if (c::request()->ajax()) {
-            return c::response()->json($this);
+            /** @var CApp $this */
+            if (CDebug::bar()->isEnabled()) {
+                CDebug::bar()->populateAssets();
+            }
+            CFEvent::run('CApp.beforeRender');
+            $this->registerCoreModules();
+
+            return c::response()->json($this->toArray());
         }
 
         return CHTTP::createResponse($this->render());
     }
 
+    /**
+     * @deprecated 1.6, dont use this anymore
+     *
+     * @return bool
+     */
     public static function isAdministrator() {
         return carr::first(explode('/', trim(curl::current(), '/'))) == 'administrator';
     }
@@ -660,5 +686,16 @@ class CApp implements CInterface_Responsable, CInterface_Renderable, CInterface_
      */
     public function notification() {
         return CApp_Notification::instance();
+    }
+
+    /**
+     * @return CApp_Visitor
+     */
+    public function visitor() {
+        if ($this->visitor == null) {
+            $this->visitor = new CApp_Visitor(CF::config('app.visitor'));
+        }
+
+        return $this->visitor;
     }
 }

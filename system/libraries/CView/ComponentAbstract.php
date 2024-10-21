@@ -2,12 +2,6 @@
 
 defined('SYSPATH') or die('No direct access allowed.');
 
-/**
- * @author Hery Kurniawan <hery@itton.co.id>
- * @license Ittron Global Teknologi
- *
- * @since Dec 6, 2020
- */
 abstract class CView_ComponentAbstract {
     /**
      * The component alias name.
@@ -24,6 +18,27 @@ abstract class CView_ComponentAbstract {
     public $attributes;
 
     /**
+     * The properties / methods that should not be exposed to the component.
+     *
+     * @var array
+     */
+    protected $except = [];
+
+    /**
+     * The component resolver callback.
+     *
+     * @var (\Closure(string, array): CView_ComponentAbstract)|null
+     */
+    protected static $componentsResolver;
+
+    /**
+     * The cache of blade view names, keyed by contents.
+     *
+     * @var array<string, string>
+     */
+    protected static $bladeViewCache = [];
+
+    /**
      * The cache of public property names, keyed by class.
      *
      * @var array
@@ -38,11 +53,11 @@ abstract class CView_ComponentAbstract {
     protected static $methodCache = [];
 
     /**
-     * The properties / methods that should not be exposed to the component.
+     * The cache of constructor parameters, keyed by class.
      *
-     * @var array
+     * @var array<class-string, array<int, string>>
      */
-    protected $except = [];
+    protected static $constructorParametersCache = [];
 
     /**
      * Get the view / view contents that represent the component.
@@ -50,6 +65,50 @@ abstract class CView_ComponentAbstract {
      * @return \CView_ViewInterface|\CInterface_Htmlable|\Closure|string
      */
     abstract public function render();
+
+    /**
+     * Resolve the component instance with the given data.
+     *
+     * @param array $data
+     *
+     * @return static
+     */
+    public static function resolve($data) {
+        if (static::$componentsResolver) {
+            return call_user_func(static::$componentsResolver, static::class, $data);
+        }
+
+        $parameters = static::extractConstructorParameters();
+
+        $dataKeys = array_keys($data);
+
+        if (empty(array_diff($parameters, $dataKeys))) {
+            $params = array_values(array_intersect_key($data, array_flip($parameters)));
+
+            return new static(...$params);
+        }
+
+        return CContainer::getInstance()->make(static::class, $data);
+    }
+
+    /**
+     * Extract the constructor parameters for the component.
+     *
+     * @return array
+     */
+    protected static function extractConstructorParameters() {
+        if (!isset(static::$constructorParametersCache[static::class])) {
+            $class = new ReflectionClass(static::class);
+
+            $constructor = $class->getConstructor();
+
+            static::$constructorParametersCache[static::class] = $constructor
+                ? c::collect($constructor->getParameters())->map->getName()->all()
+                : [];
+        }
+
+        return static::$constructorParametersCache[static::class];
+    }
 
     /**
      * Resolve the Blade view or view file that should be used when rendering the component.
@@ -68,11 +127,7 @@ abstract class CView_ComponentAbstract {
         }
 
         $resolver = function ($view) {
-            $factory = CView::factory();
-
-            return $factory->exists($view)
-                        ? $view
-                        : $this->createBladeViewFromString($factory, $view);
+            return $this->extractBladeViewFromString($view);
         };
 
         return $view instanceof Closure ? function (array $data = []) use ($view, $resolver) {
@@ -84,15 +139,37 @@ abstract class CView_ComponentAbstract {
     /**
      * Create a Blade view with the raw component string content.
      *
+     * @param string $contents
+     *
+     * @return string
+     */
+    protected function extractBladeViewFromString($contents) {
+        $key = sprintf('%s::%s', static::class, $contents);
+
+        if (isset(static::$bladeViewCache[$key])) {
+            return static::$bladeViewCache[$key];
+        }
+
+        if (strlen($contents) <= PHP_MAXPATHLEN && CView::factory()->exists($contents)) {
+            return static::$bladeViewCache[$key] = $contents;
+        }
+
+        return static::$bladeViewCache[$key] = $this->createBladeViewFromString(CView::factory(), $contents);
+    }
+
+    /**
+     * Create a Blade view with the raw component string content.
+     *
      * @param CView_Factory $factory
      * @param string        $contents
      *
      * @return string
      */
     protected function createBladeViewFromString($factory, $contents) {
+        $directory = $factory->compiledPath();
         $factory->addNamespace(
             '__components',
-            $directory = CF::config('view.compiled')
+            $directory
         );
 
         if (!is_file($viewFile = $directory . '/' . sha1($contents) . '.blade.php')) {
@@ -233,6 +310,10 @@ abstract class CView_ComponentAbstract {
             'view',
             'withName',
             'withAttributes',
+            'flushCache',
+            'forgetFactory',
+            'forgetComponentsResolver',
+            'resolveComponentsUsing',
         ], $this->except);
     }
 
@@ -265,11 +346,71 @@ abstract class CView_ComponentAbstract {
     }
 
     /**
+     * Get a new attribute bag instance.
+     *
+     * @param array $attributes
+     *
+     * @return \CView_ComponentAttributeBag
+     */
+    protected function newAttributeBag(array $attributes = []) {
+        return new CView_ComponentAttributeBag($attributes);
+    }
+
+    /**
      * Determine if the component should be rendered.
      *
      * @return bool
      */
     public function shouldRender() {
         return true;
+    }
+
+    /**
+     * Get the evaluated view contents for the given view.
+     *
+     * @param null|string                 $view
+     * @param \CInterface_Arrayable|array $data
+     * @param array                       $mergeData
+     *
+     * @return \CView_ViewInterface
+     */
+    public function view($view, $data = [], $mergeData = []) {
+        return CView::factory()->make($view, $data, $mergeData);
+    }
+
+    /**
+     * Flush the component's cached state.
+     *
+     * @return void
+     */
+    public static function flushCache() {
+        static::$bladeViewCache = [];
+        static::$constructorParametersCache = [];
+        static::$methodCache = [];
+        static::$propertyCache = [];
+    }
+
+    /**
+     * Forget the component's resolver callback.
+     *
+     * @return void
+     *
+     * @internal
+     */
+    public static function forgetComponentsResolver() {
+        static::$componentsResolver = null;
+    }
+
+    /**
+     * Set the callback that should be used to resolve components within views.
+     *
+     * @param \Closure $resolver
+     *
+     * @return void
+     *
+     * @internal
+     */
+    public static function resolveComponentsUsing($resolver) {
+        static::$componentsResolver = $resolver;
     }
 }

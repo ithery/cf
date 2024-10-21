@@ -4,9 +4,6 @@ use Mpdf\Tag\P;
 
 defined('SYSPATH') or die('No direct access allowed.');
 
-/**
- * @author Hery Kurniawan
- */
 class CCache_Repository implements CCache_RepositoryInterface, ArrayAccess {
     use CTrait_Helper_InteractsWithTime;
     use CTrait_Macroable {

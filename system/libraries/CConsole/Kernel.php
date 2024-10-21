@@ -1,6 +1,10 @@
 <?php
 
 use Symfony\Component\Finder\Finder;
+use Symfony\Component\Console\ConsoleEvents;
+use Symfony\Component\EventDispatcher\EventDispatcher;
+use Symfony\Component\Console\Event\ConsoleCommandEvent;
+use Symfony\Component\Console\Event\ConsoleTerminateEvent;
 use Symfony\Component\Debug\Exception\FatalThrowableError;
 use Symfony\Component\Console\Application as ConsoleApplication;
 
@@ -11,6 +15,13 @@ class CConsole_Kernel implements CConsole_KernelInterface {
      * @var CEvents_DispatcherInterface
      */
     protected $events;
+
+    /**
+     * The Symfony event dispatcher implementation.
+     *
+     * @var null|\Symfony\Contracts\EventDispatcher\EventDispatcherInterface
+     */
+    protected $symfonyDispatcher;
 
     /**
      * The Artisan application instance.
@@ -59,11 +70,39 @@ class CConsole_Kernel implements CConsole_KernelInterface {
         }
         $this->events = $events;
 
-        CBootstrap::instance()->boot();
+        CF::booted(function () {
+            if (!CF::isTesting()) {
+                $this->rerouteSymfonyCommandEvents();
+            }
+            $this->defineConsoleSchedule();
+        });
+    }
 
-        //$this->app->booted(function () {
-        //    $this->defineConsoleSchedule();
-        //});
+    /**
+     * Re-route the Symfony command events to their Laravel counterparts.
+     *
+     * @internal
+     *
+     * @return $this
+     */
+    public function rerouteSymfonyCommandEvents() {
+        if (is_null($this->symfonyDispatcher)) {
+            $this->symfonyDispatcher = new EventDispatcher();
+
+            $this->symfonyDispatcher->addListener(ConsoleEvents::COMMAND, function (ConsoleCommandEvent $event) {
+                $this->events->dispatch(
+                    new CConsole_Event_CommandStarting($event->getCommand()->getName(), $event->getInput(), $event->getOutput())
+                );
+            });
+
+            $this->symfonyDispatcher->addListener(ConsoleEvents::TERMINATE, function (ConsoleTerminateEvent $event) {
+                $this->events->dispatch(
+                    new CConsole_Event_CommandFinished($event->getCommand()->getName(), $event->getInput(), $event->getOutput(), $event->getExitCode())
+                );
+            });
+        }
+
+        return $this;
     }
 
     /**
@@ -283,7 +322,13 @@ class CConsole_Kernel implements CConsole_KernelInterface {
      */
     protected function getCFCli() {
         if (is_null($this->cfCli)) {
-            $this->cfCli = (new CConsole_Application())->resolveCommands($this->commands);
+            $this->cfCli = (new CConsole_Application())
+                ->resolveCommands($this->commands)
+                ->setContainerCommandLoader();
+
+            if ($this->symfonyDispatcher instanceof EventDispatcher) {
+                $this->cfCli->setDispatcher($this->symfonyDispatcher);
+            }
         }
 
         return $this->cfCli;

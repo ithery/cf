@@ -4,11 +4,6 @@ defined('SYSPATH') or die('No direct access allowed.');
 
 /**
  * An abstraction class for a foreign key constraint.
- *
- * @author Hery Kurniawan
- * @license Ittron Global Teknologi <ittron.co.id>
- *
- * @since Aug 18, 2018, 12:35:33 PM
  */
 class CDatabase_Schema_ForeignKeyConstraint extends CDatabase_AbstractAsset implements CDatabase_Schema_Constraint {
     /**
@@ -20,7 +15,7 @@ class CDatabase_Schema_ForeignKeyConstraint extends CDatabase_AbstractAsset impl
 
     /**
      * Asset identifier instances of the referencing table column names the foreign key constraint is associated with.
-     * array($columnName => Identifier)
+     * array($columnName => Identifier).
      *
      * @var CDatabase_Schema_Identifier[]
      */
@@ -35,7 +30,7 @@ class CDatabase_Schema_ForeignKeyConstraint extends CDatabase_AbstractAsset impl
 
     /**
      * Asset identifier instances of the referenced table column names the foreign key constraint is associated with.
-     * array($columnName => Identifier)
+     * array($columnName => Identifier).
      *
      * @var CDatabase_Schema_Identifier[]
      */
@@ -52,7 +47,7 @@ class CDatabase_Schema_ForeignKeyConstraint extends CDatabase_AbstractAsset impl
      * @param array                         $localColumnNames   names of the referencing table columns
      * @param CDatabase_Schema_Table|string $foreignTableName   referenced table
      * @param array                         $foreignColumnNames names of the referenced table columns
-     * @param string|null                   $name               name of the foreign key constraint
+     * @param null|string                   $name               name of the foreign key constraint
      * @param array                         $options            options associated with the foreign key constraint
      */
     public function __construct(array $localColumnNames, $foreignTableName, array $foreignColumnNames, $name = null, array $options = []) {
@@ -134,7 +129,7 @@ class CDatabase_Schema_ForeignKeyConstraint extends CDatabase_AbstractAsset impl
     }
 
     /**
-     * Returns unquoted representation of local table column names for comparison with other FK
+     * Returns unquoted representation of local table column names for comparison with other FK.
      *
      * @return array
      */
@@ -143,7 +138,7 @@ class CDatabase_Schema_ForeignKeyConstraint extends CDatabase_AbstractAsset impl
     }
 
     /**
-     * Returns unquoted representation of foreign table column names for comparison with other FK
+     * Returns unquoted representation of foreign table column names for comparison with other FK.
      *
      * @return array
      */
@@ -152,7 +147,7 @@ class CDatabase_Schema_ForeignKeyConstraint extends CDatabase_AbstractAsset impl
     }
 
     /**
-     * {@inheritdoc}
+     * @inheritdoc
      *
      * @see getLocalColumns
      */
@@ -283,7 +278,7 @@ class CDatabase_Schema_ForeignKeyConstraint extends CDatabase_AbstractAsset impl
      * Returns the referential action for UPDATE operations
      * on the referenced table the foreign key constraint is associated with.
      *
-     * @return string|null
+     * @return null|string
      */
     public function onUpdate() {
         return $this->onEvent('onUpdate');
@@ -293,7 +288,7 @@ class CDatabase_Schema_ForeignKeyConstraint extends CDatabase_AbstractAsset impl
      * Returns the referential action for DELETE operations
      * on the referenced table the foreign key constraint is associated with.
      *
-     * @return string|null
+     * @return null|string
      */
     public function onDelete() {
         return $this->onEvent('onDelete');
@@ -305,7 +300,7 @@ class CDatabase_Schema_ForeignKeyConstraint extends CDatabase_AbstractAsset impl
      *
      * @param string $event name of the database operation/event to return the referential action for
      *
-     * @return string|null
+     * @return null|string
      */
     private function onEvent($event) {
         if (isset($this->options[$event])) {

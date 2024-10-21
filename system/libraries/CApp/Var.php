@@ -1,11 +1,8 @@
 <?php
 
 /**
- * Description of Var
- *
- * @author Hery
+ * Class of CApp_Var.
  */
 class CApp_Var {
-
     use CApp_Trait_VarTrait;
 }

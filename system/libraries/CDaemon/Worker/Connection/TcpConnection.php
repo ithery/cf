@@ -3,11 +3,6 @@
 defined('SYSPATH') or die('No direct access allowed.');
 
 /**
- * @author Hery Kurniawan
- * @license Ittron Global Teknologi <ittron.co.id>
- *
- * @since Mar 16, 2019, 5:30:27 AM
- *
  * TcpConnection.
  */
 class CDaemon_Worker_Connection_TcpConnection extends CDaemon_Worker_ConnectionAbstract {
@@ -56,35 +51,35 @@ class CDaemon_Worker_Connection_TcpConnection extends CDaemon_Worker_ConnectionA
     /**
      * Emitted when data is received.
      *
-     * @var callback
+     * @var callable
      */
     public $onMessage = null;
 
     /**
      * Emitted when the other end of the socket sends a FIN packet.
      *
-     * @var callback
+     * @var callable
      */
     public $onClose = null;
 
     /**
      * Emitted when an error occurs with connection.
      *
-     * @var callback
+     * @var callable
      */
     public $onError = null;
 
     /**
      * Emitted when the send buffer becomes full.
      *
-     * @var callback
+     * @var callable
      */
     public $onBufferFull = null;
 
     /**
      * Emitted when the send buffer becomes empty.
      *
-     * @var callback
+     * @var callable
      */
     public $onBufferDrain = null;
 
@@ -132,13 +127,6 @@ class CDaemon_Worker_Connection_TcpConnection extends CDaemon_Worker_ConnectionA
     public $id = 0;
 
     /**
-     * A copy of $worker->id which used to clean up the connection in worker->connections
-     *
-     * @var int
-     */
-    protected $_id = 0;
-
-    /**
      * Sets the maximum send buffer size for the current connection.
      * OnBufferFull callback will be emited When the send buffer is full.
      *
@@ -168,6 +156,33 @@ class CDaemon_Worker_Connection_TcpConnection extends CDaemon_Worker_ConnectionA
     public static $defaultMaxPackageSize = 10485760;
 
     /**
+     * All connection instances.
+     *
+     * @var array
+     */
+    public static $connections = [];
+
+    /**
+     * Status to string.
+     *
+     * @var array
+     */
+    public static $statusToString = [
+        self::STATUS_INITIAL => 'INITIAL',
+        self::STATUS_CONNECTING => 'CONNECTING',
+        self::STATUS_ESTABLISHED => 'ESTABLISHED',
+        self::STATUS_CLOSING => 'CLOSING',
+        self::STATUS_CLOSED => 'CLOSED',
+    ];
+
+    /**
+     * A copy of $worker->id which used to clean up the connection in worker->connections.
+     *
+     * @var int
+     */
+    protected $_id = 0;
+
+    /**
      * Id recorder.
      *
      * @var int
@@ -175,7 +190,7 @@ class CDaemon_Worker_Connection_TcpConnection extends CDaemon_Worker_ConnectionA
     protected static $idRecorder = 1;
 
     /**
-     * Socket
+     * Socket.
      *
      * @var resource
      */
@@ -231,27 +246,7 @@ class CDaemon_Worker_Connection_TcpConnection extends CDaemon_Worker_ConnectionA
     protected $sslHandshakeCompleted = false;
 
     /**
-     * All connection instances.
-     *
-     * @var array
-     */
-    public static $connections = [];
-
-    /**
-     * Status to string.
-     *
-     * @var array
-     */
-    public static $statusToString = [
-        self::STATUS_INITIAL => 'INITIAL',
-        self::STATUS_CONNECTING => 'CONNECTING',
-        self::STATUS_ESTABLISHED => 'ESTABLISHED',
-        self::STATUS_CLOSING => 'CLOSING',
-        self::STATUS_CLOSED => 'CLOSED',
-    ];
-
-    /**
-     * Adding support of custom functions within protocols
+     * Adding support of custom functions within protocols.
      *
      * @param string $name
      * @param array  $arguments
@@ -309,6 +304,7 @@ class CDaemon_Worker_Connection_TcpConnection extends CDaemon_Worker_ConnectionA
         if ($raw_output) {
             return $this->status;
         }
+
         return self::$statusToString[$this->status];
     }
 
@@ -318,7 +314,7 @@ class CDaemon_Worker_Connection_TcpConnection extends CDaemon_Worker_ConnectionA
      * @param string $send_buffer
      * @param bool   $raw
      *
-     * @return bool|null
+     * @return null|bool
      */
     public function send($send_buffer, $raw = false) {
         if ($this->status === self::STATUS_CLOSING || $this->status === self::STATUS_CLOSED) {
@@ -338,11 +334,13 @@ class CDaemon_Worker_Connection_TcpConnection extends CDaemon_Worker_ConnectionA
             if ($this->sendBuffer) {
                 if ($this->bufferIsFull()) {
                     self::$statistics['send_fail']++;
+
                     return false;
                 }
             }
             $this->sendBuffer .= $send_buffer;
             $this->checkBufferWillFull();
+
             return null;
         }
         // Attempt to send data directly.
@@ -351,6 +349,7 @@ class CDaemon_Worker_Connection_TcpConnection extends CDaemon_Worker_ConnectionA
                 Worker::$globalEvent->add($this->socket, EventInterface::EV_WRITE, [$this, 'baseWrite']);
                 $this->sendBuffer = $send_buffer;
                 $this->checkBufferWillFull();
+
                 return null;
             }
             set_error_handler(function () {
@@ -360,6 +359,7 @@ class CDaemon_Worker_Connection_TcpConnection extends CDaemon_Worker_ConnectionA
             // send successful.
             if ($len === strlen($send_buffer)) {
                 $this->bytesWritten += $len;
+
                 return true;
             }
             // Send only part of the data.
@@ -382,6 +382,7 @@ class CDaemon_Worker_Connection_TcpConnection extends CDaemon_Worker_ConnectionA
                         }
                     }
                     $this->destroy();
+
                     return false;
                 }
                 $this->sendBuffer = $send_buffer;
@@ -389,10 +390,12 @@ class CDaemon_Worker_Connection_TcpConnection extends CDaemon_Worker_ConnectionA
             Worker::$globalEvent->add($this->socket, EventInterface::EV_WRITE, [$this, 'baseWrite']);
             // Check if the send buffer will be full.
             $this->checkBufferWillFull();
+
             return null;
         } else {
             if ($this->bufferIsFull()) {
                 self::$statistics['send_fail']++;
+
                 return false;
             }
             $this->sendBuffer .= $send_buffer;
@@ -411,6 +414,7 @@ class CDaemon_Worker_Connection_TcpConnection extends CDaemon_Worker_ConnectionA
         if ($pos) {
             return substr($this->remoteAddress, 0, $pos);
         }
+
         return '';
     }
 
@@ -423,6 +427,7 @@ class CDaemon_Worker_Connection_TcpConnection extends CDaemon_Worker_ConnectionA
         if ($this->remoteAddress) {
             return (int) substr(strrchr($this->remoteAddress, ':'), 1);
         }
+
         return 0;
     }
 
@@ -446,6 +451,7 @@ class CDaemon_Worker_Connection_TcpConnection extends CDaemon_Worker_ConnectionA
         if (!$pos) {
             return '';
         }
+
         return substr($address, 0, $pos);
     }
 
@@ -460,6 +466,7 @@ class CDaemon_Worker_Connection_TcpConnection extends CDaemon_Worker_ConnectionA
         if (!$pos) {
             return 0;
         }
+
         return (int) substr(strrchr($address, ':'), 1);
     }
 
@@ -499,6 +506,7 @@ class CDaemon_Worker_Connection_TcpConnection extends CDaemon_Worker_ConnectionA
         if ($this->transport === 'unix') {
             return false;
         }
+
         return strpos($this->getRemoteIp(), ':') === false;
     }
 
@@ -511,6 +519,7 @@ class CDaemon_Worker_Connection_TcpConnection extends CDaemon_Worker_ConnectionA
         if ($this->transport === 'unix') {
             return false;
         }
+
         return strpos($this->getRemoteIp(), ':') !== false;
     }
 
@@ -565,6 +574,7 @@ class CDaemon_Worker_Connection_TcpConnection extends CDaemon_Worker_ConnectionA
         if ($buffer === '' || $buffer === false) {
             if ($check_eof && (feof($socket) || !is_resource($socket) || $buffer === false)) {
                 $this->destroy();
+
                 return;
             }
         } else {
@@ -600,6 +610,7 @@ class CDaemon_Worker_Connection_TcpConnection extends CDaemon_Worker_ConnectionA
                     else {
                         Worker::safeEcho('error package. package_length=' . var_export($this->_currentPackageLength, true));
                         $this->destroy();
+
                         return;
                     }
                 }
@@ -620,6 +631,7 @@ class CDaemon_Worker_Connection_TcpConnection extends CDaemon_Worker_ConnectionA
                 if (!$this->onMessage) {
                     continue;
                 }
+
                 try {
                     // Decode request buffer before Emitting onMessage callback.
                     call_user_func($this->onMessage, $this, $parser::decode($one_request_buffer, $this));
@@ -631,6 +643,7 @@ class CDaemon_Worker_Connection_TcpConnection extends CDaemon_Worker_ConnectionA
                     exit(250);
                 }
             }
+
             return;
         }
         if ($this->recvBuffer === '' || $this->isPaused) {
@@ -640,8 +653,10 @@ class CDaemon_Worker_Connection_TcpConnection extends CDaemon_Worker_ConnectionA
         self::$statistics['total_request']++;
         if (!$this->onMessage) {
             $this->recvBuffer = '';
+
             return;
         }
+
         try {
             call_user_func($this->onMessage, $this, $this->recvBuffer);
         } catch (\Exception $e) {
@@ -688,6 +703,7 @@ class CDaemon_Worker_Connection_TcpConnection extends CDaemon_Worker_ConnectionA
             if ($this->status === self::STATUS_CLOSING) {
                 $this->destroy();
             }
+
             return true;
         }
         if ($len > 0) {
@@ -709,6 +725,7 @@ class CDaemon_Worker_Connection_TcpConnection extends CDaemon_Worker_ConnectionA
     public function doSslHandshake($socket) {
         if (feof($socket)) {
             $this->destroy();
+
             return false;
         }
         $async = $this instanceof CDaemon_Worker_Connection_AsyncTcpConnection;
@@ -738,6 +755,7 @@ class CDaemon_Worker_Connection_TcpConnection extends CDaemon_Worker_ConnectionA
         // Negotiation has failed.
         if (false === $ret) {
             $this->destroy();
+
             return false;
         } elseif (0 === $ret) {
             // There isn't enough data and should try again.
@@ -754,6 +772,7 @@ class CDaemon_Worker_Connection_TcpConnection extends CDaemon_Worker_ConnectionA
                 exit(250);
             }
         }
+
         return true;
     }
 
@@ -864,8 +883,10 @@ class CDaemon_Worker_Connection_TcpConnection extends CDaemon_Worker_ConnectionA
                     exit(250);
                 }
             }
+
             return true;
         }
+
         return false;
     }
 

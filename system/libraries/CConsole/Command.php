@@ -1,6 +1,7 @@
 <?php
-
+use Illuminate\Contracts\Console\Isolatable;
 use Symfony\Component\Console\Input\ArrayInput;
+use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\NullOutput;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
@@ -8,7 +9,9 @@ use Symfony\Component\Console\Command\Command as SymfonyCommand;
 
 class CConsole_Command extends SymfonyCommand {
     use CConsole_Trait_InteractsWithIOTrait;
-    use CConsole_Trait_HasParameters;
+    use CConsole_Trait_InteractsWithSignalsTrait;
+    use CConsole_Trait_HasParametersTrait;
+    use CConsole_Trait_CallsCommandsTrait;
     use CTrait_Macroable;
 
     /**
@@ -40,6 +43,27 @@ class CConsole_Command extends SymfonyCommand {
     protected $hidden = false;
 
     /**
+     * Indicates whether only one instance of the command can run at any given time.
+     *
+     * @var bool
+     */
+    protected $isolated = false;
+
+    /**
+     * The default exit code for isolated commands.
+     *
+     * @var int
+     */
+    protected $isolatedExitCode = self::SUCCESS;
+
+    /**
+     * The console command name aliases.
+     *
+     * @var array
+     */
+    protected $aliases;
+
+    /**
      * Create a new console command instance.
      *
      * @return void
@@ -64,6 +88,9 @@ class CConsole_Command extends SymfonyCommand {
         if (!isset($this->signature)) {
             $this->specifyParameters();
         }
+        if ($this instanceof Isolatable) {
+            $this->configureIsolation();
+        }
     }
 
     /**
@@ -84,6 +111,21 @@ class CConsole_Command extends SymfonyCommand {
     }
 
     /**
+     * Configure the console command for isolation.
+     *
+     * @return void
+     */
+    protected function configureIsolation() {
+        $this->getDefinition()->addOption(new InputOption(
+            'isolated',
+            null,
+            InputOption::VALUE_OPTIONAL,
+            'Do not run the command if another instance of the command is already running',
+            $this->isolated
+        ));
+    }
+
+    /**
      * Run the console command.
      *
      * @param \Symfony\Component\Console\Input\InputInterface   $input
@@ -92,10 +134,20 @@ class CConsole_Command extends SymfonyCommand {
      * @return int
      */
     public function run(InputInterface $input, OutputInterface $output) {
-        return parent::run(
-            $this->input = $input,
-            $this->output = new CConsole_OutputStyle($input, $output)
+        $this->output = $output instanceof CConsole_OutputStyle ? $output : c::container()->make(
+            CConsole_OutputStyle::class,
+            ['input' => $input, 'output' => $output]
         );
+        $this->components = c::container()->make(CConsole_View_ComponentFactory::class, ['output' => $this->output]);
+
+        try {
+            return parent::run(
+                $this->input = $input,
+                $this->output
+            );
+        } finally {
+            $this->untrap();
+        }
     }
 
     /**
@@ -111,51 +163,52 @@ class CConsole_Command extends SymfonyCommand {
     }
 
     /**
-     * Call another console command.
+     * Get a command isolation mutex instance for the command.
      *
-     * @param string $command
-     * @param array  $arguments
-     *
-     * @return int
+     * @return \CConsole_CommandMutexInterface
      */
-    public function call($command, array $arguments = []) {
-        $arguments['command'] = $command;
-
-        return $this->getApplication()->find($command)->run(
-            $this->createInputFromArguments($arguments),
-            $this->output
-        );
+    protected function commandIsolationMutex() {
+        return c::container()->bound(CConsole_CommandMutexInterface::class)
+            ? c::container()->make(CConsole_CommandMutexInterface::class)
+            : c::container()->make(CConsole_CacheCommandMutex::class);
     }
 
     /**
-     * Call another console command silently.
+     * Resolve the console command instance for the given command.
      *
-     * @param string $command
-     * @param array  $arguments
+     * @param \Symfony\Component\Console\Command\Command|string $command
      *
-     * @return int
+     * @return \Symfony\Component\Console\Command\Command
      */
-    public function callSilent($command, array $arguments = []) {
-        $arguments['command'] = $command;
+    protected function resolveCommand($command) {
+        if (!class_exists($command)) {
+            return $this->getApplication()->find($command);
+        }
 
-        return $this->getApplication()->find($command)->run(
-            $this->createInputFromArguments($arguments),
-            new NullOutput()
-        );
+        $command = c::container()->make($command);
+
+        if ($command instanceof SymfonyCommand) {
+            $command->setApplication($this->getApplication());
+        }
+
+        return $command;
     }
 
     /**
-     * Create an input instance from the given arguments.
+     * @inheritdoc
      *
-     * @param array $arguments
-     *
-     * @return \Symfony\Component\Console\Input\ArrayInput
+     * @return bool
      */
-    protected function createInputFromArguments(array $arguments) {
-        return c::tap(new ArrayInput($arguments), function ($input) {
-            if ($input->hasParameterOption(['--no-interaction'], true)) {
-                $input->setInteractive(false);
-            }
-        });
+    public function isHidden(): bool {
+        return $this->hidden;
+    }
+
+    /**
+     * @inheritdoc
+     */
+    public function setHidden($hidden = true) {
+        parent::setHidden($this->hidden = $hidden);
+
+        return $this;
     }
 }

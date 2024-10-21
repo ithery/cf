@@ -66,6 +66,7 @@ class CApi_Auth {
         // Spin through each of the registered authentication providers and attempt to
         // authenticate through one of them. This allows a developer to implement
         // and allow a number of different authentication mechanisms.
+
         foreach ($this->filterProviders($providers) as $provider) {
             try {
                 $user = $provider->authenticate($this->router->getCurrentRequest(), $this->router->getCurrentRoute());
@@ -124,7 +125,7 @@ class CApi_Auth {
      *
      * @param bool $authenticate
      *
-     * @return null|\Illuminate\Auth\GenericUser|\Illuminate\Database\Eloquent\Model
+     * @return null|\CAuth_GenericUser|\CModel
      */
     public function getUser($authenticate = true) {
         if ($this->user) {
@@ -145,7 +146,7 @@ class CApi_Auth {
      *
      * @param bool $authenticate
      *
-     * @return \Illuminate\Auth\GenericUser|\Illuminate\Database\Eloquent\Model
+     * @return \CAuth_GenericUser|\CModel
      */
     public function user($authenticate = true) {
         return $this->getUser($authenticate);
@@ -154,7 +155,7 @@ class CApi_Auth {
     /**
      * Set the authenticated user.
      *
-     * @param \Illuminate\Auth\GenericUser|\Illuminate\Database\Eloquent\Model $user
+     * @param \CAuth_GenericUser|\CModel $user
      *
      * @return \Dingo\Api\Auth\Auth
      */
@@ -194,7 +195,7 @@ class CApi_Auth {
      */
     public function extend($key, $provider) {
         if (is_callable($provider)) {
-            $provider = call_user_func($provider, $this->container);
+            $provider = call_user_func($provider, CContainer::getInstance());
         }
 
         $this->providers[$key] = $provider;

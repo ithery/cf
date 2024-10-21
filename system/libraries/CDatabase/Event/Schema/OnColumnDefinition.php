@@ -3,18 +3,11 @@
 defined('SYSPATH') or die('No direct access allowed.');
 
 /**
- * @author Hery Kurniawan
- * @license Ittron Global Teknologi <ittron.co.id>
- *
- * @since Sep 1, 2018, 1:07:30 PM
- */
-
-/**
  * Event used when the portable column definition is generated inside CDatabase_Schema_Manager.
  */
 class CDatabase_Event_Schema_OnColumnDefinition extends CDatabase_Event_Schema {
     /**
-     * @var CDatabase_Schema_Column|null
+     * @var null|CDatabase_Schema_Column
      */
     private $column = null;
 
@@ -36,17 +29,17 @@ class CDatabase_Event_Schema_OnColumnDefinition extends CDatabase_Event_Schema {
     private $database;
 
     /**
-     * @var CDatabase
+     * @var CDatabase_Connection
      */
     private $connection;
 
     /**
-     * @param array     $tableColumn
-     * @param string    $table
-     * @param string    $database
-     * @param CDatabase $connection
+     * @param array                $tableColumn
+     * @param string               $table
+     * @param string               $database
+     * @param CDatabase_Connection $connection
      */
-    public function __construct(array $tableColumn, $table, $database, CDatabase $connection) {
+    public function __construct(array $tableColumn, $table, $database, CDatabase_Connection $connection) {
         $this->tableColumn = $tableColumn;
         $this->table = $table;
         $this->database = $database;
@@ -63,11 +56,12 @@ class CDatabase_Event_Schema_OnColumnDefinition extends CDatabase_Event_Schema {
      */
     public function setColumn(CDatabase_Schema_Column $column = null) {
         $this->column = $column;
+
         return $this;
     }
 
     /**
-     * @return CDatabase_Schema_Column|null
+     * @return null|CDatabase_Schema_Column
      */
     public function getColumn() {
         return $this->column;

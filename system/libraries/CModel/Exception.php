@@ -1,10 +1,9 @@
 <?php
 
 /**
- * Description of Exception
+ * Description of Exception.
  *
  * @author Ecko
  */
-class CModel_Exception extends CException {
-    
+class CModel_Exception extends Exception {
 }

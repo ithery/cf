@@ -30,7 +30,7 @@ class ConvertCommand extends Command
         parent::__construct();
     }
 
-    protected function configure()
+    protected function configure(): void
     {
         $this
             ->setName('ua-parser:convert')
@@ -50,12 +50,18 @@ class ConvertCommand extends Command
         ;
     }
 
-    protected function execute(InputInterface $input, OutputInterface $output)
+    protected function execute(InputInterface $input, OutputInterface $output): int
     {
-        $this->getConverter()->convertFile($input->getArgument('file'), $input->getOption('no-backup'));
+        $file = $input->getArgument('file');
+        assert(is_string($file));
+        $noBackup = $input->getOption('no-backup');
+        assert(is_bool($noBackup));
+        $this->getConverter()->convertFile($file, $noBackup);
+
+        return 0;
     }
 
-    private function getConverter()
+    private function getConverter(): Converter
     {
         return new Converter($this->resourceDirectory);
     }

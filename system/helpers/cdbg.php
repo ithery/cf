@@ -96,7 +96,7 @@ class cdbg {
     }
 
     public static function dumpLastQuery($db = null) {
-        cdbg::varDump(CDatabase::instance($db)->lastQuery());
+        cdbg::varDump(c::db($db)->lastQuery());
     }
 
     /**
@@ -655,47 +655,58 @@ class cdbg {
     }
 
     public static function deprecated($message = '', $email = '') {
-        //run just once to make this performance good
+        return CDebug::collector()->collectDeprecated($message);
+    }
 
-        if (self::$deprecated_has_run) {
-            return true;
+    /**
+     * @return array
+     */
+    public static function callerInfoArray() {
+        $c = '';
+        $file = '';
+        $func = '';
+        $class = '';
+        // Older php version don't have 'DEBUG_BACKTRACE_IGNORE_ARGS', so manually remove the args from the backtrace
+        if (!defined('DEBUG_BACKTRACE_IGNORE_ARGS')) {
+            $trace = array_map(function ($item) {
+                unset($item['args']);
+
+                return $item;
+            }, debug_backtrace(false));
+        } else {
+            $trace = debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS);
         }
-        if (!self::$deprecated_has_run) {
-            self::$deprecated_has_run = true;
-        }
-        $subject = 'CApp Deprecated on ' . CF::domain() . ' ' . date('Y-m-d H:i:s');
 
-        try {
-            throw new Exception($message);
-        } catch (Exception $ex) {
-            $body = '<p>' . $ex->getMessage() . '</p>';
-            $body .= '<br/><br/>';
-            $body .= '<h4>CApp Deprecated on trace:<h4>';
-            $body .= nl2br($ex->getTraceAsString());
-        }
-
-        $body .= '<br/><br/>';
-        $body .= 'Domain:' . CF::domain() . '<br/>';
-        $body .= 'App Code:' . CF::appCode() . '<br/>';
-        $body .= 'Org Code:' . CF::orgCode() . '<br/>';
-        $body .= 'User Agent:' . CHTTP::request()->userAgent() . '<br/>';
-        $body .= 'Remote Address:' . CHTTP::request()->ip() . '<br/>';
-        $body .= 'Browser:' . crequest::browser() . '<br/>';
-        $body .= '<br/><br/>';
-
-        try {
-            if (strlen($email) == 0) {
-                $email = 'hery@ittron.co.id';
+        if (isset($trace[2])) {
+            $file = carr::get($trace, '1.file');
+            $line = carr::get($trace, '1.line');
+            $func = carr::get($trace, '2.function');
+            if ((substr($func, 0, 7) == 'include') || (substr($func, 0, 7) == 'require')) {
+                $func = '';
             }
-
-            //return CEmail::sender()->send($email, $subject, $message, []);
-        } catch (Exception $ex) {
-            if (!CF::isProduction()) {
-                throw $ex;
-            }
+        } elseif (isset($trace[1])) {
+            $file = carr::get($trace, '1.file');
+            $line = carr::get($trace, '1.line');
+            $func = '';
         }
+        if (isset($trace[3]['class'])) {
+            $class = carr::get($trace, '3.class');
+            $func = carr::get($trace, '3.function');
+            $file = carr::get($trace, '2.file');
+            $line = carr::get($trace, '2.line');
+        } elseif (isset($trace[2]['class'])) {
+            $class = carr::get($trace, '2.class');
+            $func = carr::get($trace, '2.function');
+            $file = carr::get($trace, '1.file');
+            $line = carr::get($trace, '1.line');
+        }
+        $r = [];
+        $r['file'] = $file;
+        $r['line'] = $line;
+        $r['class'] = $class;
+        $r['function'] = $func;
 
-        return true;
+        return $r;
     }
 
     /**
@@ -742,7 +753,7 @@ class cdbg {
         }
 
         $c = $file . ':' . $line . ' ';
-        $c .= ($class != '') ? ':' . $class . '->' : '';
+        $c .= ($class != '') ? ' ' . $class . '->' : '';
         $c .= ($func != '') ? $func . '(): ' : '';
 
         return $c;
@@ -761,7 +772,7 @@ class cdbg {
 
     public static function queryDump($db = null, $return = false) {
         if ($db == null) {
-            $db = CDatabase::instance();
+            $db = c::db();
         }
 
         return cdbg::varDump($db->lastQuery(), $return);

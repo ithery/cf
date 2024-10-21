@@ -1,6 +1,9 @@
 <?php
 
 trait CTrait_HasOptions {
+    /**
+     * @var array
+     */
     protected $options;
 
     public function getOptions() {

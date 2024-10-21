@@ -11,6 +11,9 @@ defined('SYSPATH') or die('No direct access allowed.');
 
 use CApp_Navigation_Helper as Helper;
 
+/**
+ * @deprecated 1.6, dont use this anymore
+ */
 class CApp_Navigation {
     public static $instance = [];
 
@@ -53,8 +56,8 @@ class CApp_Navigation {
     }
 
     /**
-     * @param callable $navigationCallback
-     * @param string   $domain             optional
+     * @param callable $activeCallback
+     * @param string   $domain         optional
      */
     public static function setActiveCallback(callable $activeCallback, $domain = null) {
         if ($domain == null) {

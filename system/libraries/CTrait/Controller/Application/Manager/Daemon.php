@@ -62,7 +62,7 @@ trait CTrait_Controller_Application_Manager_Daemon {
 
         $request = array_merge(CApp_Base::getRequest(), $options);
         $group = carr::get($request, 'group');
-        $groupQueryString = '';
+        $groupQueryString = '?group=';
         if (strlen($group) > 0) {
             $groupQueryString = '?group=' . $group;
         }
@@ -100,6 +100,9 @@ trait CTrait_Controller_Application_Manager_Daemon {
         $actStop = $table->addRowAction();
         $actStop->setIcon('fas fa-stop')->setLabel('Stop');
         $actStop->setLink(static::controllerUrl() . 'stop/{service_class}' . $groupQueryString)->setConfirm();
+        $actForceStop = $table->addRowAction();
+        $actForceStop->setIcon('fas fa-stop')->setLabel('Force Stop');
+        $actForceStop->setLink(static::controllerUrl() . 'stop/{service_class}' . $groupQueryString . '&force=1')->setConfirm();
         $actDebug = $table->addRowAction();
         $actDebug->setIcon('fas fa-life-ring')->setLabel('Debug');
         $actDebug->setLink(static::controllerUrl() . 'debug/{service_class}' . $groupQueryString);
@@ -132,9 +135,10 @@ trait CTrait_Controller_Application_Manager_Daemon {
         $errCode = 0;
         $errMessage = '';
         $group = carr::get($_GET, 'group');
+        $force = (bool) carr::get($_GET, 'force');
 
         try {
-            $started = CManager::daemon()->stop($serviceClass);
+            $started = CManager::daemon()->stop($serviceClass, $force);
         } catch (Exception $ex) {
             $errCode++;
             $errMessage = $ex->getMessage();
@@ -155,19 +159,19 @@ trait CTrait_Controller_Application_Manager_Daemon {
 
         switch ($method) {
             case 'index':
-                return call_user_func_array([$this, 'logIndex'], $logArgs);
+                return $this->logIndex(...$logArgs);
 
                 break;
             case 'file':
-                return call_user_func_array([$this, 'logFile'], $logArgs);
+                return $this->logFile(...$logArgs);
 
                 break;
             case 'restart':
-                return call_user_func_array([$this, 'logRestart'], $logArgs);
+                return $this->logRestart(...$logArgs);
 
                 break;
             case 'dump':
-                return call_user_func_array([$this, 'logDump'], $logArgs);
+                return $this->logDump(...$logArgs);
 
                 break;
             case 'back':
@@ -182,7 +186,6 @@ trait CTrait_Controller_Application_Manager_Daemon {
             return c::redirect($this->controllerUrl());
         }
         $app = CApp::instance();
-        $db = CDatabase::instance();
         $group = carr::get($_GET, 'group');
         $app->addBreadcrumb($this->getTitle(), static::controllerUrl());
         $app->title(CManager::daemon()->getServiceName($serviceClass));
@@ -197,13 +200,13 @@ trait CTrait_Controller_Application_Manager_Daemon {
         $logFile = CManager::daemon()->getLogFile($serviceClass);
         $basename = basename($logFile);
         if (file_exists($logFile)) {
-            $tabList->addTab()->setLabel('Current')->setAjaxUrl(static::controllerUrl() . 'log/file/' . $serviceClass . '/' . $basename);
+            $tabList->addTab()->setLabel('Current')->setAjaxUrl(static::controllerUrl() . 'log/file/' . $serviceClass . '?f=' . $basename);
         }
         for ($i = 1; $i <= 10; $i++) {
             $logFileRotate = $logFile . '.' . $i;
             if (file_exists($logFileRotate)) {
                 $basename = basename($logFileRotate);
-                $tabList->addTab()->setLabel('Rotate:' . $i)->setAjaxUrl(static::controllerUrl() . 'log/file/' . $serviceClass . '/' . $basename);
+                $tabList->addTab()->setLabel('Rotate:' . $i)->setAjaxUrl(static::controllerUrl() . 'log/file/' . $serviceClass . '?f=' . $basename);
             }
         }
 
@@ -212,9 +215,8 @@ trait CTrait_Controller_Application_Manager_Daemon {
 
     public function logFile($serviceClass = null, $filename = null) {
         $app = CApp::instance();
-        $db = CDatabase::instance();
+        $filename = $filename ?: c::request()->f;
         $logFile = CManager::daemon()->getLogFile($serviceClass, $filename);
-
         $divLog = $app->addDiv()->addClass('console');
         $log = '';
         if (file_exists($logFile)) {
@@ -231,8 +233,6 @@ trait CTrait_Controller_Application_Manager_Daemon {
             return c::redirect($this->controllerUrl() . 'log/index' . static::groupQueryString());
         }
         $group = carr::get($_GET, 'group');
-        $app = CApp::instance();
-        $db = CDatabase::instance();
 
         $errCode = 0;
         $errMessage = '';
@@ -269,7 +269,6 @@ trait CTrait_Controller_Application_Manager_Daemon {
         }
 
         $app = CApp::instance();
-        $db = CDatabase::instance();
 
         $errCode = 0;
         $errMessage = '';
@@ -303,7 +302,6 @@ trait CTrait_Controller_Application_Manager_Daemon {
             return c::redirect($this->controllerUrl());
         }
         $app = CApp::instance();
-        $db = CDatabase::instance();
         $group = carr::get($_GET, 'group');
         $app->addBreadcrumb($this->getTitle(), static::controllerUrl());
         $app->title(CManager::daemon()->getServiceName($serviceClass));

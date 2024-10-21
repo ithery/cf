@@ -9,18 +9,25 @@ use Monolog\Handler\ErrorLogHandler;
 use Monolog\Handler\HandlerInterface;
 use Monolog\Handler\RotatingFileHandler;
 use Monolog\Handler\SlackWebhookHandler;
+use Monolog\Handler\FingersCrossedHandler;
 use Monolog\Handler\WhatFailureGroupHandler;
 use Monolog\Handler\FormattableHandlerInterface;
 
 class CLogger_Manager implements LoggerInterface {
     use CLogger_Concern_ParseLogConfigurationTrait;
-
     /**
      * The array of resolved channels.
      *
      * @var array
      */
     protected $channels = [];
+
+    /**
+     * The context shared across channels and stacks.
+     *
+     * @var array
+     */
+    protected $sharedContext = [];
 
     /**
      * The registered custom driver creators.
@@ -38,6 +45,9 @@ class CLogger_Manager implements LoggerInterface {
 
     private static $instance;
 
+    /**
+     * @return CLogger_Manager
+     */
     public static function instance() {
         if (static::$instance == null) {
             static::$instance = new static();
@@ -120,8 +130,8 @@ class CLogger_Manager implements LoggerInterface {
         }
 
         try {
-            return c::with($this->resolve($name, $config), function ($logger) use ($name) {
-                return $this->channels[$name] = $this->tap($name, new CLogger_Logger($logger, CEvent::dispatcher()));
+            return $this->channels[$name] ?? c::with($this->resolve($name, $config), function ($logger) use ($name) {
+                return $this->channels[$name] = $this->tap($name, new CLogger_Logger($logger, CEvent::dispatcher()))->withContext($this->sharedContext);
             });
         } catch (Throwable $e) {
             return c::tap($this->createEmergencyLogger(), function ($logger) use ($e) {
@@ -147,7 +157,8 @@ class CLogger_Manager implements LoggerInterface {
      * @return \CLogger_Logger
      */
     protected function tap($name, CLogger_Logger $logger) {
-        foreach ($this->configurationFor($name)['tap'] ?? [] as $tap) {
+        $taps = isset($this->configurationFor($name)['tap']) ? $this->configurationFor($name)['tap'] : [];
+        foreach ($taps as $tap) {
             list($class, $arguments) = $this->parseTap($tap);
 
             c::container($class)->__invoke($logger, ...explode(',', $arguments));
@@ -263,7 +274,7 @@ class CLogger_Manager implements LoggerInterface {
                 : $this->channel($channel)->getProcessors();
         })->all();
 
-        if ($config['ignore_exceptions'] ?? false) {
+        if ((isset($config['ignore_exceptions']) ? $config['ignore_exceptions'] : false)) {
             $handlers = [new WhatFailureGroupHandler($handlers)];
         }
 
@@ -283,9 +294,9 @@ class CLogger_Manager implements LoggerInterface {
                 new StreamHandler(
                     $config['path'],
                     $this->level($config),
-                    $config['bubble'] ?? true,
-                    $config['permission'] ?? null,
-                    $config['locking'] ?? false
+                    isset($config['bubble']) ? $config['bubble'] : true,
+                    isset($config['permission']) ? $config['permission'] : null,
+                    isset($config['locking']) ? $config['locking'] : false
                 ),
                 $config
             ),
@@ -393,7 +404,7 @@ class CLogger_Manager implements LoggerInterface {
         );
 
         return new Monolog($this->parseChannel($config), [$this->prepareHandler(
-            $this->app->make($config['handler'], $with),
+            CContainer::getInstance()->make($config['handler'], $with),
             $config
         )]);
     }
@@ -422,14 +433,25 @@ class CLogger_Manager implements LoggerInterface {
      * @return \Monolog\Handler\HandlerInterface
      */
     protected function prepareHandler(HandlerInterface $handler, array $config = []) {
-        if (Monolog::API !== 1 && (Monolog::API !== 2 || !$handler instanceof FormattableHandlerInterface)) {
-            return $handler;
+        if (isset($config['action_level'])) {
+            $handler = new FingersCrossedHandler(
+                $handler,
+                $this->actionLevel($config),
+                0,
+                true,
+                $config['stop_buffering'] ?? true
+            );
         }
 
-        if (!isset($config['formatter'])) {
-            $handler->setFormatter($this->formatter());
-        } elseif ($config['formatter'] !== 'default') {
-            $handler->setFormatter(c::container()->make($config['formatter'], isset($config['formatter_with']) ? $config['formatter_with'] : []));
+        if (!$handler instanceof FormattableHandlerInterface) {
+            return $handler;
+        }
+        if ($handler instanceof FormattableHandlerInterface) {
+            if (!isset($config['formatter'])) {
+                $handler->setFormatter($this->formatter());
+            } elseif ($config['formatter'] !== 'default') {
+                $handler->setFormatter(c::container()->make($config['formatter'], isset($config['formatter_with']) ? $config['formatter_with'] : []));
+            }
         }
 
         return $handler;
@@ -444,6 +466,43 @@ class CLogger_Manager implements LoggerInterface {
         return c::tap(new LineFormatter(null, $this->dateFormat, true, true), function ($formatter) {
             $formatter->includeStacktraces();
         });
+    }
+
+    /**
+     * Share context across channels and stacks.
+     *
+     * @param array $context
+     *
+     * @return $this
+     */
+    public function shareContext(array $context) {
+        foreach ($this->channels as $channel) {
+            $channel->withContext($context);
+        }
+
+        $this->sharedContext = array_merge($this->sharedContext, $context);
+
+        return $this;
+    }
+
+    /**
+     * The context shared across channels and stacks.
+     *
+     * @return array
+     */
+    public function sharedContext() {
+        return $this->sharedContext;
+    }
+
+    /**
+     * Flush the shared context.
+     *
+     * @return $this
+     */
+    public function flushSharedContext() {
+        $this->sharedContext = [];
+
+        return $this;
     }
 
     /**

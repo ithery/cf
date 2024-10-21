@@ -9,6 +9,7 @@ class CResources_Engine_Image extends CResources_Engine {
 
     public function addSize($size_name, $options) {
         $this->sizes[$size_name] = $options;
+
         return $this;
     }
 
@@ -81,13 +82,13 @@ class CResources_Engine_Image extends CResources_Engine {
                 $src = @imagecreatefromjpeg($fullfilename);
             }
             if ($src == null) {
-                throw new CException('Error when resizing image, creating ' . $filename);
+                throw new Exception('Error when resizing image, creating ' . $filename);
             }
             $dst = @imagecreatetruecolor($maxPropWidth, $maxPropHeight);
             @imagecopyresampled($dst, $src, 0, 0, 0, 0, $maxPropWidth, $maxPropHeight, $img_width, $img_height);
             unset($src);
             if ($dst == null) {
-                throw new CException('Error when resizing image, resizing ' . $filename);
+                throw new Exception('Error when resizing image, resizing ' . $filename);
             }
             $wideimage = \WideImage\WideImage::load($dst);
 
@@ -120,6 +121,7 @@ class CResources_Engine_Image extends CResources_Engine {
         } catch (CResources_Exception $ex) {
             throw $ex;
         }
+
         return $full_size_path;
     }
 

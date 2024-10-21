@@ -2,12 +2,6 @@
 
 defined('SYSPATH') or die('No direct access allowed.');
 
-/**
- * @author Hery Kurniawan <hery@itton.co.id>
- * @license Ittron Global Teknologi
- *
- * @since Dec 7, 2020
- */
 trait CApp_Concern_ManageStackTrait {
     protected $renderCount = 0;
 
@@ -53,9 +47,9 @@ trait CApp_Concern_ManageStackTrait {
     /**
      * Stop injecting content into a push section.
      *
-     * @return string
-     *
      * @throws \InvalidArgumentException
+     *
+     * @return string
      */
     public function stopPush() {
         if (empty($this->pushStack)) {
@@ -108,9 +102,9 @@ trait CApp_Concern_ManageStackTrait {
     /**
      * Stop prepending content into a push section.
      *
-     * @return string
-     *
      * @throws \InvalidArgumentException
+     *
+     * @return string
      */
     public function stopPrepend() {
         if (empty($this->pushStack)) {

@@ -2,12 +2,6 @@
 
 defined('SYSPATH') or die('No direct access allowed.');
 
-/**
- * @author Hery Kurniawan
- * @license Ittron Global Teknologi <ittron.co.id>
- *
- * @since Jul 8, 2018, 2:58:18 AM
- */
 class CAjax_Engine_SelectSearch_Processor_DataProvider extends CAjax_Engine_SelectSearch_Processor {
     use CAjax_Engine_DataTable_Trait_ProcessorTrait;
 
@@ -18,9 +12,11 @@ class CAjax_Engine_SelectSearch_Processor_DataProvider extends CAjax_Engine_Sele
 
         /** @var CManager_Contract_DataProviderInterface $query */
         $dataProvider->searchOr($this->getSearchDataOr());
+        $dataProvider->searchFullTextOr($this->getSearchFullTextDataOr());
         $dataProvider->sort($this->getSortData());
         $page = $this->parameter->page();
         $prependData = [];
+        $prependDataCount = count($this->prependData());
         if ($page == 1) {
             $prependData = $this->prependData();
         }
@@ -38,9 +34,15 @@ class CAjax_Engine_SelectSearch_Processor_DataProvider extends CAjax_Engine_Sele
 
         $data = $items->map(function ($model) {
             $data = $model;
+            if (is_string($data)) {
+                $str = $data;
+                $data = [
+                    'id' => $str
+                ];
+            }
             if ($model instanceof CModel) {
                 $data = $model->toArray();
-                if ($this->keyField() && !isset($data['id'])) {
+                if ($this->keyField() && $model->{$this->keyField()}) {
                     $data['id'] = $model->{$this->keyField()};
                 }
             } else {
@@ -49,7 +51,7 @@ class CAjax_Engine_SelectSearch_Processor_DataProvider extends CAjax_Engine_Sele
                 }
             }
             $formatResult = $this->formatResult();
-            if ($formatResult instanceof \Opis\Closure\SerializableClosure) {
+            if ($formatResult instanceof CFunction_SerializableClosure) {
                 $formatResult = $formatResult->__invoke($model);
                 if ($formatResult instanceof CRenderable) {
                     $data['cappFormatResult'] = $formatResult->html();
@@ -60,7 +62,7 @@ class CAjax_Engine_SelectSearch_Processor_DataProvider extends CAjax_Engine_Sele
                 }
             }
             $formatSelection = $this->formatSelection();
-            if ($formatSelection instanceof \Opis\Closure\SerializableClosure) {
+            if ($formatSelection instanceof CFunction_SerializableClosure) {
                 $formatSelection = $formatSelection->__invoke($model);
                 if ($formatSelection instanceof CRenderable) {
                     $data['cappFormatSelection'] = $formatSelection->html();
@@ -73,7 +75,7 @@ class CAjax_Engine_SelectSearch_Processor_DataProvider extends CAjax_Engine_Sele
 
             return $data;
         });
-        $total = $paginationResult->total();
+        $total = $paginationResult->total() + $prependDataCount;
 
         return c::response()->jsonp($this->callback(), [
             'data' => $data,
@@ -86,6 +88,20 @@ class CAjax_Engine_SelectSearch_Processor_DataProvider extends CAjax_Engine_Sele
         $searchTerm = $this->searchTerm();
         if (strlen($searchTerm) > 0) {
             foreach ($this->searchField() as $field) {
+                if (strlen($field) > 0) {
+                    $searchData[$field] = $this->searchTerm();
+                }
+            }
+        }
+
+        return $searchData;
+    }
+
+    protected function getSearchFullTextDataOr() {
+        $searchData = [];
+        $searchTerm = $this->searchTerm();
+        if (strlen($searchTerm) > 0) {
+            foreach ($this->searchFullTextField() as $field) {
                 if (strlen($field) > 0) {
                     $searchData[$field] = $this->searchTerm();
                 }

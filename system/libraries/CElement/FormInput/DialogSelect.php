@@ -45,7 +45,7 @@ class CElement_FormInput_DialogSelect extends CElement_FormInput {
         $this->keyField = '';
         $this->searchField = '';
         $this->limit = 10;
-        $this->title = clang::__('Please choose an Item');
+        $this->title = c::__('Please choose an Item');
         $this->itemName = '';
         $this->imgSrc = CApp_Base::noImageUrl();
         $this->minWidth = '100';
@@ -111,7 +111,7 @@ class CElement_FormInput_DialogSelect extends CElement_FormInput {
 
     public function setTitle($title, $lang = true) {
         if ($lang) {
-            $title = clang::__($title);
+            $title = c::__($title);
         }
         $this->title = $title;
 
@@ -187,7 +187,7 @@ class CElement_FormInput_DialogSelect extends CElement_FormInput {
     }
 
     public function createAjaxUrl() {
-        return CAjaxMethod::factory()
+        return CAjax::createMethod()
             ->setType('DialogSelect')
             ->setData('format', $this->format)
             ->setData('fields', $this->fields)

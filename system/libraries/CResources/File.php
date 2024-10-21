@@ -9,13 +9,19 @@ defined('SYSPATH') or die('No direct access allowed.');
  * @since May 2, 2019, 12:56:36 AM
  */
 class CResources_File {
-    /** @var string */
+    /**
+     * @var string
+     */
     public $name;
 
-    /** @var int */
+    /**
+     * @var int
+     */
     public $size;
 
-    /** @var string */
+    /**
+     * @var string
+     */
     public $mimeType;
 
     public static function createFromResource($resource) {

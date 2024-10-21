@@ -9,6 +9,13 @@ class CDatabase_Query_Grammar extends CDatabase_Grammar {
     protected $operators = [];
 
     /**
+     * The grammar specific bitwise operators.
+     *
+     * @var array
+     */
+    protected $bitwiseOperators = [];
+
+    /**
      * The components that make up a select clause.
      *
      * @var array
@@ -35,9 +42,20 @@ class CDatabase_Query_Grammar extends CDatabase_Grammar {
      * @return string
      */
     public function compileSelect(CDatabase_Query_Builder $query) {
-        if ($query->unions && $query->aggregate) {
+        if (($query->unions || $query->havings) && $query->aggregate) {
             return $this->compileUnionAggregate($query);
         }
+        // If a "group limit" is in place, we will need to compile the SQL to use a
+        // different syntax. This primarily supports limits on eager loads using
+        // Eloquent. We'll also set the columns if they have not been defined.
+        if (isset($query->groupLimit)) {
+            if (is_null($query->columns)) {
+                $query->columns = ['*'];
+            }
+
+            return $this->compileGroupLimit($query);
+        }
+
         // If the query does not have any columns set, we'll set the columns to the
         // * character to just get all of the columns from the database. Then we
         // can build the query and concatenate all the pieces together as one.
@@ -70,12 +88,8 @@ class CDatabase_Query_Grammar extends CDatabase_Grammar {
      */
     protected function compileComponents(CDatabase_Query_Builder $query) {
         $sql = [];
-
         foreach ($this->selectComponents as $component) {
-            // To compile the query, we'll spin through each component of the query and
-            // see if that component exists. If it does we'll just call the compiler
-            // function for the component which is responsible for making the SQL.
-            if (!is_null($query->$component)) {
+            if (isset($query->$component)) {
                 $method = 'compile' . ucfirst($component);
 
                 $sql[$component] = $this->$method($query, $query->$component);
@@ -588,6 +602,35 @@ class CDatabase_Query_Grammar extends CDatabase_Grammar {
     }
 
     /**
+     * Compile a "where JSON contains key" clause.
+     *
+     * @param \CDatabase_Query_Builder $query
+     * @param array                    $where
+     *
+     * @return string
+     */
+    protected function whereJsonContainsKey(CDatabase_Query_Builder $query, $where) {
+        $not = $where['not'] ? 'not ' : '';
+
+        return $not . $this->compileJsonContainsKey(
+            $where['column']
+        );
+    }
+
+    /**
+     * Compile a "JSON contains key" statement into SQL.
+     *
+     * @param string $column
+     *
+     * @throws \RuntimeException
+     *
+     * @return string
+     */
+    protected function compileJsonContainsKey($column) {
+        throw new RuntimeException('This database engine does not support JSON contains key operations.');
+    }
+
+    /**
      * Compile a "where JSON length" clause.
      *
      * @param \CDatabase_Query_Builder $query
@@ -619,6 +662,41 @@ class CDatabase_Query_Grammar extends CDatabase_Grammar {
     }
 
     /**
+     * Compile a "JSON value cast" statement into SQL.
+     *
+     * @param string $value
+     *
+     * @return string
+     */
+    public function compileJsonValueCast($value) {
+        return $value;
+    }
+
+    /**
+     * Compile a "where fulltext" clause.
+     *
+     * @param \CDatabase_Query_Builder $query
+     * @param array                    $where
+     *
+     * @return string
+     */
+    public function whereFullText(CDatabase_Query_Builder $query, $where) {
+        throw new RuntimeException('This database engine does not support fulltext search operations.');
+    }
+
+    /**
+     * Compile a clause based on an expression.
+     *
+     * @param \CDatabase_Query_Builder $query
+     * @param array                    $where
+     *
+     * @return string
+     */
+    public function whereExpression(CDatabase_Query_Builder $query, $where) {
+        return $where['column']->getValue($this);
+    }
+
+    /**
      * Compile the "group by" portions of the query.
      *
      * @param CDatabase_Query_Builder $query
@@ -634,14 +712,13 @@ class CDatabase_Query_Grammar extends CDatabase_Grammar {
      * Compile the "having" portions of the query.
      *
      * @param CDatabase_Query_Builder $query
-     * @param array                   $havings
      *
      * @return string
      */
-    protected function compileHavings(CDatabase_Query_Builder $query, $havings) {
-        $sql = implode(' ', array_map([$this, 'compileHaving'], $havings));
-
-        return 'having ' . $this->removeLeadingBoolean($sql);
+    protected function compileHavings(CDatabase_Query_Builder $query) {
+        return 'having ' . $this->removeLeadingBoolean(c::collect($query->havings)->map(function ($having) {
+            return $having['boolean'] . ' ' . $this->compileHaving($having);
+        })->implode(' '));
     }
 
     /**
@@ -656,9 +733,19 @@ class CDatabase_Query_Grammar extends CDatabase_Grammar {
         // without doing any more processing on it. Otherwise, we will compile the
         // clause into SQL based on the components that make it up from builder.
         if ($having['type'] === 'Raw') {
-            return $having['boolean'] . ' ' . $having['sql'];
+            return $having['sql'];
         } elseif ($having['type'] === 'between') {
             return $this->compileHavingBetween($having);
+        } elseif ($having['type'] === 'Null') {
+            return $this->compileHavingNull($having);
+        } elseif ($having['type'] === 'NotNull') {
+            return $this->compileHavingNotNull($having);
+        } elseif ($having['type'] === 'bit') {
+            return $this->compileHavingBit($having);
+        } elseif ($having['type'] === 'Expression') {
+            return $this->compileHavingExpression($having);
+        } elseif ($having['type'] === 'Nested') {
+            return $this->compileNestedHavings($having);
         }
 
         return $this->compileBasicHaving($having);
@@ -696,6 +783,69 @@ class CDatabase_Query_Grammar extends CDatabase_Grammar {
         $max = $this->parameter(c::last($having['values']));
 
         return $having['boolean'] . ' ' . $column . ' ' . $between . ' ' . $min . ' and ' . $max;
+    }
+
+    /**
+     * Compile a having null clause.
+     *
+     * @param array $having
+     *
+     * @return string
+     */
+    protected function compileHavingNull($having) {
+        $column = $this->wrap($having['column']);
+
+        return $column . ' is null';
+    }
+
+    /**
+     * Compile a having not null clause.
+     *
+     * @param array $having
+     *
+     * @return string
+     */
+    protected function compileHavingNotNull($having) {
+        $column = $this->wrap($having['column']);
+
+        return $column . ' is not null';
+    }
+
+    /**
+     * Compile a having clause involving a bit operator.
+     *
+     * @param array $having
+     *
+     * @return string
+     */
+    protected function compileHavingBit($having) {
+        $column = $this->wrap($having['column']);
+
+        $parameter = $this->parameter($having['value']);
+
+        return '(' . $column . ' ' . $having['operator'] . ' ' . $parameter . ') != 0';
+    }
+
+    /**
+     * Compile a having clause involving an expression.
+     *
+     * @param array $having
+     *
+     * @return string
+     */
+    protected function compileHavingExpression($having) {
+        return $having['column']->getValue($this);
+    }
+
+    /**
+     * Compile a nested having clause.
+     *
+     * @param array $having
+     *
+     * @return string
+     */
+    protected function compileNestedHavings($having) {
+        return '(' . substr($this->compileHavings($having['query']), 7) . ')';
     }
 
     /**
@@ -749,6 +899,66 @@ class CDatabase_Query_Grammar extends CDatabase_Grammar {
      */
     protected function compileLimit(CDatabase_Query_Builder $query, $limit) {
         return 'limit ' . (int) $limit;
+    }
+
+    /**
+     * Compile a group limit clause.
+     *
+     * @param \CDatabase_Query_Builder $query
+     *
+     * @return string
+     */
+    protected function compileGroupLimit(CDatabase_Query_Builder $query) {
+        $selectBindings = array_merge($query->getRawBindings()['select'], $query->getRawBindings()['order']);
+
+        $query->setBindings($selectBindings, 'select');
+        $query->setBindings([], 'order');
+
+        $limit = (int) $query->groupLimit['value'];
+        $offset = $query->offset;
+
+        if (isset($offset)) {
+            $offset = (int) $offset;
+            $limit += $offset;
+
+            $query->offset = null;
+        }
+
+        $components = $this->compileComponents($query);
+
+        $components['columns'] .= $this->compileRowNumber(
+            $query->groupLimit['column'],
+            $components['orders'] ?? ''
+        );
+
+        unset($components['orders']);
+
+        $table = $this->wrap('cf_table');
+        $row = $this->wrap('cf_row');
+
+        $sql = $this->concatenate($components);
+
+        $sql = 'select * from (' . $sql . ') as ' . $table . ' where ' . $row . ' <= ' . $limit;
+
+        if (isset($offset)) {
+            $sql .= ' and ' . $row . ' > ' . $offset;
+        }
+
+        return $sql . ' order by ' . $row;
+    }
+
+    /**
+     * Compile a row number clause.
+     *
+     * @param string $partition
+     * @param string $orders
+     *
+     * @return string
+     */
+    protected function compileRowNumber($partition, $orders) {
+        $over = trim('partition by ' . $this->wrap($partition) . ' ' . $orders);
+
+        return ', row_number() over (' . $over . ') as ' . $this->wrap('cf_row');
     }
 
     /**
@@ -1011,6 +1221,10 @@ class CDatabase_Query_Grammar extends CDatabase_Grammar {
     public function prepareBindingsForUpdate(array $bindings, array $values) {
         $cleanBindings = carr::except($bindings, ['join', 'select']);
 
+        $values = carr::flatten(array_map(function ($value) {
+            return c::value($value);
+        }, $values));
+
         return array_values(
             array_merge($bindings['join'], $values, carr::flatten($cleanBindings))
         );
@@ -1270,5 +1484,14 @@ class CDatabase_Query_Grammar extends CDatabase_Grammar {
      */
     public function getOperators() {
         return $this->operators;
+    }
+
+    /**
+     * Get the grammar specific bitwise operators.
+     *
+     * @return array
+     */
+    public function getBitwiseOperators() {
+        return $this->bitwiseOperators;
     }
 }

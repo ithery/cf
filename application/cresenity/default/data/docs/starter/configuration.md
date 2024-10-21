@@ -4,14 +4,14 @@
 
 Pastikan server anda sudah  mempunyai requirement seperti yang dibawah ini untuk menggunakan CF:
 
-- PHP >= 5.6 (Recommend for PHP 7.4) [CF2.0 akan drop support PHP 5.6 secara penuh]
+- PHP >= 7.4
 - BCMath PHP Extension
 - JSON PHP Extension (already included on php 5.6)
 - Fileinfo PHP extension
 - Ctype PHP Extension
 - Mbstring PHP Extension
 - OpenSSL PHP Extension
-- Mysqli PHP Extension
+- PDO PHP Extension
 - Tokenizer PHP Extension
 - XML PHP Extension
 

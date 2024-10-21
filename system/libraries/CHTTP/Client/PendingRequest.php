@@ -11,7 +11,6 @@ use GuzzleHttp\Exception\TransferException;
 
 class CHTTP_Client_PendingRequest {
     use CTrait_Conditionable, CTrait_Macroable;
-
     /**
      * The factory instance.
      *
@@ -1143,5 +1142,9 @@ class CHTTP_Client_PendingRequest {
      */
     public function getOptions() {
         return $this->options;
+    }
+
+    public function getBodyFormat() {
+        return $this->bodyFormat;
     }
 }

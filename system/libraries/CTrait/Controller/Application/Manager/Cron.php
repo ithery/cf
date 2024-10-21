@@ -8,8 +8,7 @@ trait CTrait_Controller_Application_Manager_Cron {
     }
 
     public function index() {
-        $app = CApp::instance();
-        $db = CDatabase::instance();
+        $app = c::app();
         $rows = [];
 
         foreach (c::cron()->events() as $event) {
@@ -62,7 +61,7 @@ trait CTrait_Controller_Application_Manager_Cron {
         $app->addBreadcrumb('Cron', static::controllerUrl());
         $actionContainer = $app->addDiv()->addClass('action-container mb-3');
         $rotateAction = $actionContainer->addAction()
-            ->setLabel('Dump Status')
+            ->setLabel('Rotate Log')
             ->addClass('btn-primary')
             ->setIcon('fas fa-sync')
             ->setLink(static::controllerUrl() . 'rotateLog/' . $eventId)
@@ -130,9 +129,9 @@ trait CTrait_Controller_Application_Manager_Cron {
             return c::redirect(static::controllerUrl());
         }
 
-        $event->rotate();
+        $event->rotateLog();
 
-        return c::redirect(static::controllerUrl(). 'log/' . $eventId);
+        return c::redirect(static::controllerUrl() . 'log/' . $eventId);
     }
 
     private function getEvent($eventId) {

@@ -43,7 +43,7 @@ class CElement_Calendar extends CElement {
     }
 
     public static function ajax($data) {
-        $db = CDatabase::instance();
+        $db = c::db();
         $q = $data->query;
 
         $base_q = $q;

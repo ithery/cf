@@ -14,7 +14,7 @@ class NodeRegistry
     /**
     * @var string[] $nodeTypes Map of tag names to fully-qualified class names.
     */
-    private static $nodeTypes = array(
+    private static $nodeTypes = [
         'foreignObject'         => 'SVG\Nodes\Embedded\SVGForeignObject',
         'image'                 => 'SVG\Nodes\Embedded\SVGImage',
 
@@ -83,7 +83,7 @@ class NodeRegistry
         'textPath'              => 'SVG\Nodes\Texts\SVGTextPath',
         'title'                 => 'SVG\Nodes\Texts\SVGTitle',
         'tspan'                 => 'SVG\Nodes\Texts\SVGTSpan',
-    );
+    ];
 
     /**
      * Instantiate a node class matching the given type.
@@ -93,7 +93,7 @@ class NodeRegistry
      *
      * @return SVGNode The node that was created.
      */
-    public static function create($type)
+    public static function create(string $type): SVGNode
     {
         if (isset(self::$nodeTypes[$type])) {
             $nodeClass = self::$nodeTypes[$type];

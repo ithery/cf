@@ -3,13 +3,6 @@
 defined('SYSPATH') or die('No direct access allowed.');
 
 /**
- * @author Hery Kurniawan
- * @license Ittron Global Teknologi <ittron.co.id>
- *
- * @since Sep 8, 2019, 4:03:10 AM
- */
-
-/**
  * @mixin CQueue_QueueInterface
  */
 class CQueue_Manager implements CQueue_FactoryInterface, CQueue_Contract_MonitorInterface {
@@ -35,6 +28,13 @@ class CQueue_Manager implements CQueue_FactoryInterface, CQueue_Contract_Monitor
     protected $dispatcher;
 
     /**
+     * The default driver name.
+     *
+     * @var string
+     */
+    protected $defaultDriver;
+
+    /**
      * Create a new queue manager instance.
      *
      * @return void
@@ -44,6 +44,8 @@ class CQueue_Manager implements CQueue_FactoryInterface, CQueue_Contract_Monitor
             $dispatcher = CEvent::dispatcher();
         }
         $this->dispatcher = $dispatcher;
+
+        $this->defaultDriver = CF::config('queue.default');
     }
 
     /**
@@ -221,7 +223,7 @@ class CQueue_Manager implements CQueue_FactoryInterface, CQueue_Contract_Monitor
      * @return string
      */
     public function getDefaultDriver() {
-        return CQueue::config('default', 'database');
+        return $this->defaultDriver ?: 'database';
     }
 
     /**
@@ -229,10 +231,12 @@ class CQueue_Manager implements CQueue_FactoryInterface, CQueue_Contract_Monitor
      *
      * @param string $name
      *
-     * @return void
+     * @return $this
      */
     public function setDefaultDriver($name) {
-        $this->app['config']['queue.default'] = $name;
+        $this->defaultDriver = $name;
+
+        return $this;
     }
 
     /**

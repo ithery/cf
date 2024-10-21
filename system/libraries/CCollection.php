@@ -2,12 +2,6 @@
 
 defined('SYSPATH') or die('No direct access allowed.');
 
-/**
- * @author Hery Kurniawan
- * @license Ittron Global Teknologi <ittron.co.id>
- *
- * @since Dec 17, 2017, 9:20:23 PM
- */
 class CCollection implements ArrayAccess, CInterface_Enumerable, CBase_Contract_CanBeEscapedWhenCastToStringInterface {
     use CCollection_Concern_EnumeratesValuesTrait;
     use CTrait_Macroable;
@@ -1146,7 +1140,7 @@ class CCollection implements ArrayAccess, CInterface_Enumerable, CBase_Contract_
             ? $this->operatorForWhere(...func_get_args())
             : $key;
 
-        $items = $this->when($filter)->filter($filter);
+        $items = $this->unless($filter == null)->filter($filter);
 
         if ($items->isEmpty()) {
             throw new CCollection_Exception_ItemNotFoundException();
@@ -1430,14 +1424,23 @@ class CCollection implements ArrayAccess, CInterface_Enumerable, CBase_Contract_
     /**
      * Transform each item in the collection using a callback.
      *
-     * @param callable $callback
+     * @param callable|string $callback
      *
      * @return $this
      */
-    public function transform(callable $callback) {
+    public function transform($callback) {
         $this->items = $this->map($callback)->all();
 
         return $this;
+    }
+
+    /**
+     * Flatten a multi-dimensional associative array with dots.
+     *
+     * @return static
+     */
+    public function dot() {
+        return new static(carr::dot($this->all()));
     }
 
     /**
@@ -1589,6 +1592,7 @@ class CCollection implements ArrayAccess, CInterface_Enumerable, CBase_Contract_
      *
      * @return mixed
      */
+    #[\ReturnTypeWillChange]
     public function offsetGet($key) {
         return $this->items[$key];
     }

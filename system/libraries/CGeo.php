@@ -2,12 +2,6 @@
 
 defined('SYSPATH') or die('No direct access allowed.');
 
-/**
- * @author Hery Kurniawan
- * @license Ittron Global Teknologi <ittron.co.id>
- *
- * @since Aug 18, 2018, 7:03:04 PM
- */
 class CGeo {
     public static function ip() {
         return new CGeo_IP();
@@ -28,6 +22,6 @@ class CGeo {
      * @return CGeo_Spatial
      */
     public static function spatial() {
-        //TODO: move CModel_Spatial_Geometry to here
+        return new CGeo_Spatial();
     }
 }

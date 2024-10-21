@@ -3,23 +3,7 @@
 defined('SYSPATH') or die('No direct access allowed.');
 
 /**
- * @author Hery Kurniawan
- *
- * @since Aug 18, 2018, 7:23:39 PM
- *
- * @license Ittron Global Teknologi <ittron.co.id>
- */
-/**
- * Coordinate Implementation
- *
- * @author    Marcus Jaschen <mjaschen@gmail.com>
- * @license   https://opensource.org/licenses/MIT
- *
- * @link      https://github.com/mjaschen/phpgeo
- */
-
-/**
- * Coordinate Implementation
+ * Coordinate Implementation.
  */
 class CGeo_Location_Coordinate implements CGeo_Location_GeometryInterface {
     /**
@@ -55,6 +39,7 @@ class CGeo_Location_Coordinate implements CGeo_Location_GeometryInterface {
         $this->lng = (float) $lng;
         if ($ellipsoid !== null) {
             $this->ellipsoid = $ellipsoid;
+
             return;
         }
         $this->ellipsoid = CGeo_Location_Ellipsoid::createDefault();
@@ -75,7 +60,7 @@ class CGeo_Location_Coordinate implements CGeo_Location_GeometryInterface {
     }
 
     /**
-     * Returns an array containing the point
+     * Returns an array containing the point.
      *
      * @return array
      */
@@ -103,6 +88,7 @@ class CGeo_Location_Coordinate implements CGeo_Location_GeometryInterface {
         if ($calculator == null) {
             $calculator = new CGeo_Location_Distance_Haversine();
         }
+
         return $calculator->getDistance($this, $coordinate);
     }
 
@@ -116,7 +102,7 @@ class CGeo_Location_Coordinate implements CGeo_Location_GeometryInterface {
     }
 
     /**
-     * Validates latitude
+     * Validates latitude.
      *
      * @param float $latitude
      *
@@ -127,7 +113,7 @@ class CGeo_Location_Coordinate implements CGeo_Location_GeometryInterface {
     }
 
     /**
-     * Validates longitude
+     * Validates longitude.
      *
      * @param float $longitude
      *
@@ -151,6 +137,7 @@ class CGeo_Location_Coordinate implements CGeo_Location_GeometryInterface {
         if ($value < $lower || $value > $upper) {
             return false;
         }
+
         return true;
     }
 }

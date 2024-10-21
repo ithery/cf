@@ -7,7 +7,7 @@ class CSession_Factory {
     private static $instance;
 
     /**
-     * @var CConfig
+     * @var array
      */
     private $config;
 
@@ -41,7 +41,7 @@ class CSession_Factory {
         $driver = new CCache_Driver_RedisDriver($redis);
         $redisStore = new CCache_Repository($driver);
         $expirationSeconds = carr::get($this->config, 'expiration');
-        $handler = new CSession_Driver_Redis($redisStore, $expirationSeconds);
+        $handler = new CSession_Handler_RedisSessionHandler($redisStore, $expirationSeconds);
 
         return $handler;
     }
@@ -59,7 +59,9 @@ class CSession_Factory {
      * @return \CSession_Handler_ArraySessionHandler
      */
     public function createArrayDriver() {
-        return new CSession_Handler_ArraySessionHandler(carr::get($this->config, 'expiration'));
+        return new CSession_Handler_ArraySessionHandler(
+            carr::get($this->config, 'expiration', 3600)
+        );
     }
 
     /**
@@ -68,7 +70,10 @@ class CSession_Factory {
      * @return \CSession_Handler_CookieSessionHandler
      */
     public function createCookieDriver() {
-        return new CSession_Handler_CookieSessionHandler(CHTTP::cookie(), carr::get($this->config, 'expiration'));
+        return new CSession_Handler_CookieSessionHandler(
+            CHTTP::cookie(),
+            carr::get($this->config, 'expiration', 3600)
+        );
     }
 
     /**
@@ -86,7 +91,10 @@ class CSession_Factory {
      * @return \CSession_Handler_FileSessionHandler
      */
     public function createNativeDriver() {
-        return new CSession_Handler_FileSessionHandler(carr::get($this->config, 'storage'), carr::get($this->config, 'expiration'));
+        return new CSession_Handler_FileSessionHandler(
+            carr::get($this->config, 'storage'),
+            carr::get($this->config, 'expiration', 3600)
+        );
     }
 
     /**
@@ -98,17 +106,17 @@ class CSession_Factory {
         return new CSession_Handler_DatabaseSessionHandler(
             $this->getDatabaseConnection($this->config),
             carr::get($this->config, 'table', 'session'),
-            carr::get($this->config, 'expiration')
+            carr::get($this->config, 'expiration', 3600)
         );
     }
 
     /**
      * Get the database connection for the database driver.
      *
-     * @return CDatabase
+     * @return CDatabase_Connection
      */
     public function getDatabaseConnection() {
-        return CDatabase::instance(carr::get($this->config, 'storage', 'default'));
+        return c::db(carr::get($this->config, 'storage', 'default'));
     }
 
     /**
@@ -130,11 +138,11 @@ class CSession_Factory {
      * @return CSession_Handler_CacheBasedSessionHandler
      */
     protected function createCacheHandler($driver) {
-        $store = $this->config->get('session.store') ?: $driver;
+        $store = carr::get($this->config, 'storage') ?: $driver;
 
         return new CSession_Handler_CacheBasedSessionHandler(
             clone c::cache()->store($store),
-            $this->config->get('session.lifetime')
+            carr::get($this->config, 'expiration', 3600)
         );
     }
 

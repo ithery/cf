@@ -1,10 +1,7 @@
 <?php
 
 /**
- * Description of EncryptException
- *
- * @author Hery
+ * Class EncryptException.
  */
 class CCrypt_Exception_EncryptException extends RuntimeException {
-    //
 }

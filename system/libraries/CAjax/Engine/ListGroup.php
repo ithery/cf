@@ -2,15 +2,8 @@
 
 defined('SYSPATH') or die('No direct access allowed.');
 
-/**
- * @author Hery Kurniawan
- * @license Ittron Global Teknologi <ittron.co.id>
- *
- * @since Jun 3, 2019, 3:18:29 AM
- */
 class CAjax_Engine_ListGroup extends CAjax_Engine {
     public function execute() {
-        $db = CDatabase::instance();
         $input = $this->input;
         $data = $this->ajaxMethod->getData();
         $owner = carr::get($data, 'owner');

@@ -2,12 +2,6 @@
 
 defined('SYSPATH') or die('No direct access allowed.');
 
-/**
- * @author Hery Kurniawan
- * @license Ittron Global Teknologi <ittron.co.id>
- *
- * @since Mar 16, 2019, 4:41:23 AM
- */
 abstract class CDaemon_Worker_ListenerAbstract extends CDaemon_WorkerAbstract {
     /**
      * Default backlog. Backlog is the maximum length of the queue of pending connections.
@@ -15,18 +9,6 @@ abstract class CDaemon_Worker_ListenerAbstract extends CDaemon_WorkerAbstract {
      * @var int
      */
     const DEFAULT_BACKLOG = 102400;
-
-    /**
-     * PHP built-in protocols.
-     *
-     * @var array
-     */
-    protected static $builtinTransports = [
-        'tcp' => 'tcp',
-        'udp' => 'udp',
-        'unix' => 'unix',
-        'ssl' => 'tcp'
-    ];
 
     /**
      * Unix group of processes, needs appropriate privileges (usually root).
@@ -43,13 +25,6 @@ abstract class CDaemon_Worker_ListenerAbstract extends CDaemon_WorkerAbstract {
     public $user = '';
 
     /**
-     * Socket name. The format is like this http://0.0.0.0:80 .
-     *
-     * @var string
-     */
-    protected $socketName = '';
-
-    /**
      * reuse port.
      *
      * @var bool
@@ -64,13 +39,6 @@ abstract class CDaemon_Worker_ListenerAbstract extends CDaemon_WorkerAbstract {
     public $reloadable = true;
 
     /**
-     * Context of socket.
-     *
-     * @var resource
-     */
-    protected $_context = null;
-
-    /**
      * Construct.
      *
      * @param string $socketName
@@ -80,42 +48,42 @@ abstract class CDaemon_Worker_ListenerAbstract extends CDaemon_WorkerAbstract {
     /**
      * Emitted when a socket connection is successfully established.
      *
-     * @var callback
+     * @var callable
      */
     public $onConnect = null;
 
     /**
      * Emitted when data is received.
      *
-     * @var callback
+     * @var callable
      */
     public $onMessage = null;
 
     /**
      * Emitted when the other end of the socket sends a FIN packet.
      *
-     * @var callback
+     * @var callable
      */
     public $onClose = null;
 
     /**
      * Emitted when an error occurs with connection.
      *
-     * @var callback
+     * @var callable
      */
     public $onError = null;
 
     /**
      * Emitted when the send buffer becomes full.
      *
-     * @var callback
+     * @var callable
      */
     public $onBufferFull = null;
 
     /**
      * Emitted when the send buffer becomes empty.
      *
-     * @var callback
+     * @var callable
      */
     public $onBufferDrain = null;
 
@@ -139,6 +107,32 @@ abstract class CDaemon_Worker_ListenerAbstract extends CDaemon_WorkerAbstract {
      * @var string
      */
     public $protocol = null;
+
+    /**
+     * PHP built-in protocols.
+     *
+     * @var array
+     */
+    protected static $builtinTransports = [
+        'tcp' => 'tcp',
+        'udp' => 'udp',
+        'unix' => 'unix',
+        'ssl' => 'tcp'
+    ];
+
+    /**
+     * Socket name. The format is like this http://0.0.0.0:80 .
+     *
+     * @var string
+     */
+    protected $socketName = '';
+
+    /**
+     * Context of socket.
+     *
+     * @var resource
+     */
+    protected $_context = null;
 
     /**
      * Pause accept new connections or not.
@@ -295,6 +289,7 @@ abstract class CDaemon_Worker_ListenerAbstract extends CDaemon_WorkerAbstract {
                     throw new Exception($errmsg);
                 } catch (Exception $ex) {
                     $this->workerLog($ex->getTraceAsString());
+
                     throw $ex;
                 }
             }
@@ -333,6 +328,7 @@ abstract class CDaemon_Worker_ListenerAbstract extends CDaemon_WorkerAbstract {
      */
     protected static function getCurrentUser() {
         $user_info = posix_getpwuid(posix_getuid());
+
         return $user_info['name'];
     }
 
@@ -346,6 +342,7 @@ abstract class CDaemon_Worker_ListenerAbstract extends CDaemon_WorkerAbstract {
         $user_info = posix_getpwnam($this->user);
         if (!$user_info) {
             static::log("Warning: User {$this->user} not exsits");
+
             return;
         }
         $uid = $user_info['uid'];
@@ -354,6 +351,7 @@ abstract class CDaemon_Worker_ListenerAbstract extends CDaemon_WorkerAbstract {
             $group_info = posix_getgrnam($this->group);
             if (!$group_info) {
                 static::log("Warning: Group {$this->group} not exsits");
+
                 return;
             }
             $gid = $group_info['gid'];

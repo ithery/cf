@@ -1,15 +1,10 @@
 <?php
 
-use Dingo\Api\Http\Request;
-use Dingo\Api\Transformer\Binding;
 use League\Fractal\TransformerAbstract;
 use League\Fractal\Manager as FractalManager;
 use League\Fractal\Resource\Item as FractalItem;
 use League\Fractal\Pagination\IlluminatePaginatorAdapter;
-use Illuminate\Support\Collection as IlluminateCollection;
 use League\Fractal\Resource\Collection as FractalCollection;
-use Illuminate\Database\Eloquent\Collection as EloquentCollection;
-use Illuminate\Contracts\Pagination\Paginator as IlluminatePaginator;
 
 class CApi_Transformer_Adapter_FractalAdapter implements CApi_Contract_Transformer_AdapterInterface {
     /**
@@ -113,6 +108,7 @@ class CApi_Transformer_Adapter_FractalAdapter implements CApi_Contract_Transform
      */
     protected function shouldEagerLoad($response) {
         if ($response instanceof CPagination_PaginatorInterface) {
+            /** @var CPagination_AbstractPaginator $response */
             $response = $response->getCollection();
         }
 
@@ -192,8 +188,9 @@ class CApi_Transformer_Adapter_FractalAdapter implements CApi_Contract_Transform
             $eagerLoads[] = is_string($key) ? $key : $value;
         }
 
-        if (property_exists($transformer, 'lazyLoadedIncludes')) {
-            $eagerLoads = array_diff($eagerLoads, $transformer->lazyLoadedIncludes);
+        $lazyLoadedIncludes = 'lazyLoadedIncludes';
+        if (property_exists($transformer, $lazyLoadedIncludes)) {
+            $eagerLoads = array_diff($eagerLoads, $transformer->$lazyLoadedIncludes);
         }
 
         return $eagerLoads;

@@ -26,6 +26,11 @@ return [
         'label' => c::__('Table Export'),
         'uri' => 'demo/elements/table/export/index',
     ],
+    [
+        'name' => 'elements.table.autorefresh',
+        'label' => c::__('Table Auto Refresh'),
+        'uri' => 'demo/elements/table/autorefresh/index',
+    ],
 
     [
         'name' => 'elements.table.view',

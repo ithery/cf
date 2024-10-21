@@ -329,6 +329,12 @@ class CExporter_Sheet {
             $this->autoSize();
         }
 
+        if ($sheetExport instanceof CExporter_Concern_WithColumnWidths) {
+            foreach ($sheetExport->columnWidths() as $column => $width) {
+                $this->worksheet->getColumnDimension($column)->setAutoSize(false)->setWidth($width);
+            }
+        }
+
         if ($sheetExport instanceof CExporter_Concern_WithStyles) {
             $styles = $sheetExport->styles($this->worksheet);
             if (is_array($styles)) {

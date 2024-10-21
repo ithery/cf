@@ -13,7 +13,7 @@ class CElement_FormInput_Date extends CElement_FormInput {
 
     protected $dateFormat;
 
-    protected $have_button;
+    protected $haveButton;
 
     protected $startDate;
 
@@ -37,12 +37,17 @@ class CElement_FormInput_Date extends CElement_FormInput {
         $this->type = 'date';
         $this->dateFormat = c::formatter()->getDateFormat();
 
-        $this->have_button = false;
+        $this->haveButton = false;
         $this->startDate = '';
         $this->endDate = '';
         $this->disableDay = [];
         $this->inline = false;
         $this->addClass('form-control');
+    }
+
+    public static function factory($id = null) {
+        /** @phpstan-ignore-next-line */
+        return new static($id);
     }
 
     public function setStartDate($str) {
@@ -109,7 +114,7 @@ class CElement_FormInput_Date extends CElement_FormInput {
             $custom_css = ' style="' . $custom_css . '"';
         }
 
-        if ($this->have_button) {
+        if ($this->haveButton) {
             $html->appendln('<div class="input-append date" id="dp3" data-date="' . $this->value . '" data-date-format="' . $this->dateFormat . '">
                         <input class="input-unstyled ' . $classes . $this->validation->validationClass() . '" size="16" type="text" name="' . $this->name . '"  data-date-format="' . $this->dateFormat . '" id="' . $this->id . '" value="' . $this->value . '"' . $disabled . $readonly . $addition_attribute . $custom_css . '>
                         <span class="add-on"><i class="icon-th"></i></span>
@@ -244,7 +249,7 @@ class CElement_FormInput_Date extends CElement_FormInput {
         $js->setIndent($indent);
         $js->append(parent::js($indent))->br();
 
-        if ($this->have_button) {
+        if ($this->haveButton) {
             $js->append("$('#" . $this->id . "').parent().datepicker(" . $option . ');')->br();
         } else {
             $js->append("$('#" . $this->id . "').datepicker(" . $option . ');')->br();

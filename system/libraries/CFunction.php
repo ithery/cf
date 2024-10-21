@@ -94,6 +94,9 @@ class CFunction {
             if ($this->func instanceof OpisSerializableClosure) {
                 return $this->func->__invoke(...$args);
             }
+            if ($this->func instanceof CFunction_SerializableClosure) {
+                return $this->func->__invoke(...$args);
+            }
         }
         if ($error == 0) {
             if (is_array($this->func)) {
@@ -157,5 +160,43 @@ class CFunction {
         }
 
         return 'ERROR ON CFUNCTION';
+    }
+
+    public static function serializeClosure(Closure $func) {
+        return new CFunction_SerializableClosure($func);
+    }
+
+    public static function isSerializeClosure($func) {
+        return $func instanceof CFunction_SerializableClosure;
+    }
+
+    public static function getClosureCode(Closure $c) {
+        $str = 'function (';
+        $r = new ReflectionFunction($c);
+        $params = [];
+        foreach ($r->getParameters() as $p) {
+            $s = '';
+            if ($p->isArray()) {
+                $s .= 'array ';
+            } elseif ($p->getClass()) {
+                $s .= $p->getClass()->name . ' ';
+            }
+            if ($p->isPassedByReference()) {
+                $s .= '&';
+            }
+            $s .= '$' . $p->name;
+            if ($p->isOptional()) {
+                $s .= ' = ' . var_export($p->getDefaultValue(), true);
+            }
+            $params[] = $s;
+        }
+        $str .= implode(', ', $params);
+        $str .= '){' . PHP_EOL;
+        $lines = file($r->getFileName());
+        for ($l = $r->getStartLine(); $l < $r->getEndLine(); $l++) {
+            $str .= $lines[$l];
+        }
+
+        return $str;
     }
 }

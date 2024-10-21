@@ -3,18 +3,11 @@
 defined('SYSPATH') or die('No direct access allowed.');
 
 /**
- * @author Hery Kurniawan
- * @license Ittron Global Teknologi <ittron.co.id>
- *
- * @since Sep 1, 2018, 1:14:07 PM
- */
-
-/**
  * Event used when the portable index definition is generated inside CDatabase_Schema_Manager.
  */
 class CDatabase_Event_Schema_OnIndexDefinition extends CDatabase_Event_Schema {
     /**
-     * @var CDatabase_Schema_Index|null
+     * @var null|CDatabase_Schema_Index
      */
     private $index = null;
 
@@ -31,16 +24,16 @@ class CDatabase_Event_Schema_OnIndexDefinition extends CDatabase_Event_Schema {
     private $table;
 
     /**
-     * @var CDatabase
+     * @var CDatabase_Connection
      */
     private $connection;
 
     /**
-     * @param array     $tableIndex
-     * @param string    $table
-     * @param CDatabase $connection
+     * @param array                $tableIndex
+     * @param string               $table
+     * @param CDatabase_Connection $connection
      */
-    public function __construct(array $tableIndex, $table, CDatabase $connection) {
+    public function __construct(array $tableIndex, $table, CDatabase_Connection $connection) {
         $this->tableIndex = $tableIndex;
         $this->table = $table;
         $this->connection = $connection;
@@ -55,11 +48,12 @@ class CDatabase_Event_Schema_OnIndexDefinition extends CDatabase_Event_Schema {
      */
     public function setIndex(CDatabase_Schema_Index $index = null) {
         $this->index = $index;
+
         return $this;
     }
 
     /**
-     * @return CDatabase_Schema_Index|null
+     * @return null|CDatabase_Schema_Index
      */
     public function getIndex() {
         return $this->index;

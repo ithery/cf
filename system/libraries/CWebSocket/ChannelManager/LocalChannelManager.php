@@ -1,5 +1,6 @@
 <?php
 use Carbon\Carbon;
+use function React\Promise\all;
 use Ratchet\ConnectionInterface;
 use React\EventLoop\LoopInterface;
 
@@ -410,37 +411,75 @@ class CWebSocket_ChannelManager_LocalChannelManager implements CWebSocket_Contra
      *
      * @param \Ratchet\ConnectionInterface $connection
      *
-     * @return PromiseInterface[bool]
+     * @return \React\Promise\PromiseInterface[bool]
      */
     public function connectionPonged(ConnectionInterface $connection) {
-        $connection->lastPongedAt = Carbon::now();
-
-        return $this->updateConnectionInChannels($connection);
+        return $this->pongConnectionInChannels($connection);
     }
 
     /**
      * Remove the obsolete connections that didn't ponged in a while.
      *
-     * @return PromiseInterface[bool]
+     * @return \React\Promise\PromiseInterface[bool]
      */
     public function removeObsoleteConnections() {
-        if (!$this->lock()->acquire()) {
-            return CWebSocket_Helper::createFulfilledPromise(false);
-        }
+        return $this->lock()->get(function () {
+            return $this->getLocalConnections()
+                ->then(function ($connections) {
+                    $promises = [];
 
-        $this->getLocalConnections()->then(function ($connections) {
-            foreach ($connections as $connection) {
-                $differenceInSeconds = $connection->lastPongedAt->diffInSeconds(Carbon::now());
+                    foreach ($connections as $connection) {
+                        $differenceInSeconds = $connection->lastPongedAt->diffInSeconds(Carbon::now());
 
-                if ($differenceInSeconds > 120) {
-                    $this->unsubscribeFromAllChannels($connection);
-                }
-            }
+                        if ($differenceInSeconds > 120) {
+                            $promises[] = $this->unsubscribeFromAllChannels($connection);
+                        }
+                    }
+
+                    return all($promises);
+                })->then(function () {
+                    $this->lock()->release();
+                });
         });
+        // if (!$this->lock()->acquire()) {
+        //     return CWebSocket_Helper::createFulfilledPromise(false);
+        // }
 
-        return CWebSocket_Helper::createFulfilledPromise(
-            $this->lock()->forceRelease()
-        );
+        // $this->getLocalConnections()->then(function ($connections) {
+        //     foreach ($connections as $connection) {
+        //         $differenceInSeconds = $connection->lastPongedAt->diffInSeconds(Carbon::now());
+
+        //         if ($differenceInSeconds > 120) {
+        //             $this->unsubscribeFromAllChannels($connection);
+        //         }
+        //     }
+        // });
+
+        // return CWebSocket_Helper::createFulfilledPromise(
+        //     $this->lock()->forceRelease()
+        // );
+    }
+
+    /**
+     * Pong connection in channels.
+     *
+     * @param ConnectionInterface $connection
+     *
+     * @return \React\Promise\PromiseInterface[bool]
+     */
+    public function pongConnectionInChannels(ConnectionInterface $connection) {
+        return $this->getLocalChannels($connection->app->id)
+            ->then(function ($channels) use ($connection) {
+                foreach ($channels as $channel) {
+                    /** @var CWebsocket_Channel $channel */
+                    if ($conn = $channel->getConnection($connection->socketId)) {
+                        $conn->lastPongedAt = Carbon::now();
+                        $channel->saveConnection($conn);
+                    }
+                }
+
+                return true;
+            });
     }
 
     /**

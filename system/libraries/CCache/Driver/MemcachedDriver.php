@@ -2,14 +2,9 @@
 
 defined('SYSPATH') or die('No direct access allowed.');
 
-/**
- * @author Hery Kurniawan
- * @license Ittron Global Teknologi <ittron.co.id>
- *
- * @since Jun 23, 2019, 4:58:43 AM
- */
 class CCache_Driver_MemcachedDriver extends CCache_DriverTaggableAbstract implements CCache_Contract_LockProviderDriverInterface {
     use CTrait_Helper_InteractsWithTime;
+
     /**
      * The Memcached instance.
      *

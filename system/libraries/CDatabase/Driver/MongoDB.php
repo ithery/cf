@@ -4,6 +4,7 @@ use MongoDB\Client;
 
 class CDatabase_Driver_MongoDB extends CDatabase_Driver {
     use CTrait_Compat_Database_Driver_MongoDB;
+
     /**
      * Database connection link.
      */
@@ -34,7 +35,6 @@ class CDatabase_Driver_MongoDB extends CDatabase_Driver {
         $this->db = $db;
         $this->dbConfig = $config;
         $this->connect();
-        CF::log(CLogger::DEBUG, 'MongoDB Database Driver Initialized');
     }
 
     public function close() {

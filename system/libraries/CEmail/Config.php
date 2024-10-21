@@ -36,6 +36,11 @@ class CEmail_Config {
     /**
      * @var string
      */
+    protected $protocol;
+
+    /**
+     * @var string
+     */
     protected $from;
 
     /**
@@ -49,11 +54,12 @@ class CEmail_Config {
         'smtp.elasticemail.com' => 'elasticemail',
         'smtp25.elasticemail.com' => 'elasticemail',
         'smtp.postmarkapp.com' => 'postmarkapp',
+        'smtp.amazonaws.com' => 'ses',
+        'smtp.mailersend.com' => 'mailersend',
     ];
 
     public function __construct($options = []) {
         $options = $this->reformatOptions($options);
-
         $this->options = $options;
         $this->driver = carr::get($options, 'driver');
         $this->username = carr::get($options, 'username');
@@ -61,6 +67,9 @@ class CEmail_Config {
         $this->host = carr::get($options, 'host');
         $this->port = carr::get($options, 'port');
         $this->secure = carr::get($options, 'secure');
+        $this->protocol = carr::get($options, 'protocol', 'tcp');
+        $this->from = carr::get($options, 'from');
+        $this->fromName = carr::get($options, 'from_name');
     }
 
     public function reformatOptions($config) {
@@ -69,11 +78,13 @@ class CEmail_Config {
         $isLegacyOptions = !carr::get($config, 'driver');
 
         $newConfig = $config;
+
         if ($isLegacyOptions) {
             $smtpHost = carr::get($config, 'host', carr::get($config, 'smtp_host'));
             if ($smtpHost == null) {
                 throw new Exception('SMTP Host is null');
             }
+
             $driver = carr::get(static::$smtpHostToDriverMap, $smtpHost, 'smtp');
 
             $newConfig = [];
@@ -147,11 +158,19 @@ class CEmail_Config {
         return $this->secure;
     }
 
+    public function getProtocol() {
+        return $this->protocol;
+    }
+
     public function getFrom() {
         return $this->from;
     }
 
     public function getFromName() {
         return $this->fromName;
+    }
+
+    public function get($key, $default = null) {
+        return carr::get($this->options, $key, $default);
     }
 }

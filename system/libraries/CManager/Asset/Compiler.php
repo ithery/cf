@@ -64,7 +64,7 @@ class CManager_Asset_Compiler {
     protected function determineOutFile() {
         $firstFile = carr::first($this->files);
         $ymd = date('Ymd', filemtime($firstFile));
-        $basePath = defined('CFPUBLIC') ? DOCROOT . 'public' . DS : DOCROOT;
+        $basePath = CF::publicPath() ? CF::publicPath() . '/' : DOCROOT;
         $this->outFile = $basePath . 'compiled/asset/' . $this->type . '/' . $ymd . '/' . md5(implode(':', $this->files)) . '.' . $this->type;
     }
 
@@ -73,7 +73,7 @@ class CManager_Asset_Compiler {
         $this->lastModTimeNewestAsset = 0;
         foreach ($this->files as $file) {
             if (!file_exists($file)) {
-                throw new Exception('Error to compile asseet, ' . $file . ' not exist');
+                throw new Exception('Error to compile asset, ' . $file . ' not exist');
             }
             $mTime = filemtime($file);
             $this->lastModTimeNewestAsset = $mTime > $this->lastModTimeNewestAsset ? $mTime : $this->lastModTimeNewestAsset;

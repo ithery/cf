@@ -43,17 +43,27 @@ class CManager_Asset_Module {
         if ($this->allModules == null) {
             $this->allModules = [];
             $clientModulesFiles = CF::getFiles('config', 'client_modules');
+            $assetsFiles = CF::getFiles('config', 'assets');
 
             //$this->all_modules = include DOCROOT."config".DS."client_modules".DS."client_modules.php";
             $clientModulesFiles = array_reverse($clientModulesFiles);
+            $assetsFiles = array_reverse($assetsFiles);
+
+            $systemModulesFile = DOCROOT . 'system' . DS . 'data' . DS . 'assets-module.php';
+            $systemModules = include $systemModulesFile;
+            $this->allModules = array_merge($this->allModules, $systemModules);
 
             foreach ($clientModulesFiles as $file) {
                 $appModules = include $file;
                 if (!is_array($appModules)) {
-                    throw new CManager_Exception('Invalid client modules config format on :file', [':file', $file]);
+                    throw new CManager_Exception(c::__('Invalid client modules config format on :file', ['file' => $file]));
                 }
 
                 $this->allModules = array_merge($this->allModules, $appModules);
+            }
+            $assetModules = CF::config('assets.modules');
+            if ($assetModules) {
+                $this->allModules = array_merge($this->allModules, $assetModules);
             }
         }
 
@@ -158,7 +168,7 @@ class CManager_Asset_Module {
         $allModules = $this->allModules();
         if (!in_array($module, $this->modules[$type])) {
             if (!isset($allModules[$module])) {
-                throw new CManager_Exception('Module :module not defined', [':module' => $module]);
+                throw new CManager_Exception(c::__('Module :module not defined', [':module' => $module]));
             }
             //array
             $mod = $allModules[$module];
@@ -202,7 +212,7 @@ class CManager_Asset_Module {
     }
 
     /**
-     * @return CClientModules
+     * @return CManager_Asset_Module
      */
     public static function instance() {
         if (self::$instance == null) {

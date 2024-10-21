@@ -950,87 +950,37 @@ class CCron_Event {
      * @return void
      */
     public function log($message = '') {
-        static $logFile = '';
-        static $logFileError = false;
-        static $description = '';
-
-        if ($description != $this->description) {
-            $description = $this->description;
-            $logFile = $this->getLogFile();
-            if (!file_exists($this->getLogDirectory())) {
-                mkdir($this->getLogDirectory(), 0777, true);
-            }
-            if (self::$logHandle) {
-                self::$logHandle = false;
-            }
-        }
-
         $header = "\nDate                  Message\n";
         $date = date('Y-m-d H:i:s');
         $prefix = "[${date}]" . str_repeat("\t", $indent = 0);
-
-        if (self::$logHandle === false) {
-            $fileSize = 0;
-            if (file_exists($logFile)) {
-                $fileSize = filesize($logFile); // in bytes
-                // max file size 10MB
-                if ($fileSize >= 10485760) {
-                    $this->rotateLog($logFile, 10);
-                }
-            }
-            if (strlen($logFile) > 0 && self::$logHandle = fopen($logFile, 'a+')) {
-                $content = file_get_contents($logFile);
-                if ($content == '') {
-                    fwrite(self::$logHandle, $header);
-                }
-            } elseif (!$logFileError) {
-                $logFileError = true;
-                trigger_error(__CLASS__ . 'Error: Could not write to logfile ' . $logFile, E_USER_WARNING);
-            }
+        $logFile = $this->getLogFile();
+        if (!file_exists($this->getLogDirectory())) {
+            mkdir($this->getLogDirectory(), 0777, true);
         }
+        $this->autoRotateLog();
+        if (!CFile::exists($logFile)) {
+            CFile::put($logFile, $header);
+        }
+        $line = $prefix . ' ' . str_replace("\n", "\n${prefix} ", trim($message)) . "\n";
+        CFile::append($logFile, $line);
+    }
 
-        $message = $prefix . ' ' . str_replace("\n", "\n${prefix} ", trim($message)) . "\n";
-        if (self::$logHandle) {
-            fwrite(self::$logHandle, $message);
+    public function autoRotateLog($size = null, $keep = null) {
+        $logFile = $this->getLogFile();
+        $size = $size ?: CF::config('cron.logs.rotation.size', 500 * 1024);
+        $keep = $keep ?: CF::config('cron.logs.rotation.keep', 10);
+        if (strlen($logFile) > 0 && CFile::isFile($logFile) && CFile::size($logFile) > $size) {
+            $rotator = CLogger_Rotator::createRotate($logFile);
+            $rotator->size($size)->keep($keep)->run();
         }
     }
 
-    /**
-     * Rotate to prevent huge size of log file.
-     *
-     * @param string $fileName
-     * @param int    $maxRotation
-     *
-     * @return void
-     */
-    private function rotateLog($fileName, $maxRotation = 10) {
-        for ($i = $maxRotation; $i >= 0; $i--) {
-            $file = $fileName;
-            $fileToReplace = $fileName . '.' . ($i + 1);
-            if ($i > 0) {
-                $file .= ".${i}";
-            }
-            if (file_exists($file)) {
-                if ($i == $maxRotation) {
-                    unlink($file);
-                } else {
-                    rename($file, $fileToReplace);
-                }
-            }
-        }
-    }
+    public function rotateLog() {
+        $logFile = $this->getLogFile();
 
-    /**
-     * Rotate log file.
-     *
-     * @param int $maxRotation
-     *
-     * @return void
-     */
-    public function rotate($maxRotation = 10) {
-        $this->rotateLog($this->getLogFile(), $maxRotation);
-        $handle = fopen($this->getLogFile(), 'a+');
-        fwrite($handle, "\nDate                  Message\n");
-        fclose($handle);
+        if (strlen($logFile) > 0 && CFile::isFile($logFile)) {
+            $rotator = CLogger_Rotator::createRotate($logFile);
+            $rotator->forceRotate();
+        }
     }
 }

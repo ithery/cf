@@ -26,9 +26,6 @@ import initProgressive from './module/progressive';
 import cresToast from './module/toast';
 import CresAlpine from './module/CresAlpine';
 import SSE from './cresenity/SSE';
-import AlpineCleave from './alpine/cleave';
-import AlpineAutoNumeric from './alpine/autonumeric';
-import AlpineTippy from './alpine/tippy';
 import { attachWaves } from './ui/waves';
 import formatter from './formatter';
 import { initCssDomVar } from './module/css-dom-var';
@@ -42,6 +39,13 @@ import { initMenu } from './module/menu';
 import { formatCurrency, unformatCurrency } from './formatter/currency';
 import { cresQuery } from './module/CresQuery';
 import { isJson } from './util/helper';
+import * as dateFns from 'date-fns';
+import CresenityHistory from './history';
+import clsx from './module/clsx';
+import stylex from './module/stylex';
+import collect from 'collect.js';
+import emitter from './cresenity/emitter';
+import bootstrapHelper from './module/BootstrapHelper';
 
 export default class Cresenity {
     constructor() {
@@ -57,7 +61,8 @@ export default class Cresenity {
             'cresenity:loaded',
             'cresenity:js:loaded',
             'cresenity:ui:start',
-            'cresenity:notification:message'
+            'cresenity:notification:message',
+            'cresenity:history:statechange'
         ];
         this.modalElements = [];
         this.cresenityEventList = [
@@ -94,6 +99,12 @@ export default class Cresenity {
         this.theme = new Theme();
         this.$ = cresQuery;
         this.version = '1.4.1';
+        this.checkAuthenticationInterval = null;
+        this.dateFns = dateFns;
+        this.clsx = clsx;
+        this.stylex = stylex;
+        this.collect = collect;
+        this.emitter = emitter;
     }
     loadJs(filename, callback) {
         let fileref = document.createElement('script');
@@ -154,21 +165,25 @@ export default class Cresenity {
     on(eventName, cb) {
         window.addEventListener('cresenity:' + eventName, cb);
     }
-
+    async handleResponseAsync(data) {
+        return new Promise(async (resolve, reject) => {
+            if(data.assets) {
+                if(data.assets.css) {
+                    for (let i = 0; i < data.assets.css.length; i++) {
+                        await this.cf.requireCssAsync(data.assets.css[i]);
+                    }
+                }
+                if(data.assets.js) {
+                    for (let i = 0; i < data.assets.js.length; i++) {
+                        await this.cf.requireJsAsync(data.assets.js[i]);
+                    }
+                }
+            }
+            resolve(data);
+        });
+    }
     handleResponse(data, callback) {
-        if (data.cssRequire && data.cssRequire.length > 0) {
-            for (let i = 0; i < data.cssRequire.length; i++) {
-                this.cf.require(data.cssRequire[i], 'css');
-            }
-        }
-
-        if (data.css_require && data.css_require.length > 0) {
-            for (let i = 0; i < data.css_require.length; i++) {
-                this.cf.require(data.css_require[i], 'css');
-            }
-        }
-
-        callback();
+        this.handleResponseAsync(data).then(callback);
     }
     htmlModal(html) {
         showHtmlModal(html);
@@ -312,7 +327,6 @@ export default class Cresenity {
                                     $(element).html(data.html);
                                     break;
                             }
-
                             if (data.js && data.js.length > 0) {
                                 let script = this.base64.decode(data.js);
                                 eval(script);
@@ -371,7 +385,6 @@ export default class Cresenity {
         this.reload(options);
     }
     isDebug() {
-        console.log(this.cf.getConfig().environment);
         if(this.cf.getConfig().environment == 'production') {
             return false;
         }
@@ -418,7 +431,7 @@ export default class Cresenity {
             settings.headerText = settings.title;
         }
 
-        let modalContainer = jQuery('<div>').addClass('modal');
+        let modalContainer = jQuery('<div>').addClass('modal cres-modal').attr('role', 'dialog');
 
         if (settings.modalClass) {
             modalContainer.addClass(settings.modalClass);
@@ -431,7 +444,7 @@ export default class Cresenity {
         if (settings.isFull) {
             modalContainer.addClass('sidebar full');
         }
-        let modalDialog = jQuery('<div>').addClass('modal-dialog modal-xl');
+        let modalDialog = jQuery('<div>').addClass('modal-dialog modal-xl').attr('role', 'document');
         let modalContent = jQuery('<div>').addClass('modal-content');
 
         let modalHeader = jQuery('<div>').addClass('modal-header');
@@ -448,6 +461,9 @@ export default class Cresenity {
             modalTitle.html(settings.headerText);
             modalHeader.append(modalTitle).append(modalButtonClose);
             modalContent.append(modalHeader);
+            if(typeof modalTitle == 'string') {
+                modalContainer.attr('aria-labelledby', modalTitle);
+            }
         }
         modalDialog.append(modalContent);
         if (settings.haveFooter) {
@@ -515,10 +531,17 @@ export default class Cresenity {
             reloadOptions.selector = modalBody;
             this.reload(reloadOptions);
         }
+        if(bootstrapHelper.isBootstrap5()) {
+            let modal = new window.bootstrap.Modal(modalContainer[0], {
+                backdrop: settings.backdrop
+            });
+            modal.show();
+        } else {
+            modalContainer.modal({
+                backdrop: settings.backdrop
+            });
 
-        modalContainer.modal({
-            backdrop: settings.backdrop
-        });
+        }
 
         return modalContainer;
     }
@@ -528,6 +551,14 @@ export default class Cresenity {
             let lastModal = this.modalElements[this.modalElements.length - 1];
 
             lastModal.modal('hide');
+        }
+    }
+    closeAllDialog() {
+        if (this.modalElements.length > 0) {
+            for(let i = this.modalElements.length-1; i>=0; i--) {
+                const modal = this.modalElements[i];
+                modal.modal('hide');
+            }
         }
     }
     closeDialog() {
@@ -540,11 +571,15 @@ export default class Cresenity {
             method: 'post'
         }, options);
         let dataAddition = settings.dataAddition;
+        let requestData = settings.data;
+        if (typeof requestData === 'undefined') {
+            requestData = {};
+        }
+        if(dataAddition) {
+            requestData = extend(requestData, dataAddition);
+        }
         let url = settings.url;
         url = this.url.replaceParam(url);
-        if (typeof dataAddition === 'undefined') {
-            dataAddition = {};
-        }
         if (settings.block) {
             this.blockPage();
         }
@@ -553,7 +588,7 @@ export default class Cresenity {
         let ajaxOptions = {
             url: url,
             dataType: 'json',
-            data: dataAddition,
+            data: requestData,
             type: settings.method,
 
             success: (response) => {
@@ -577,8 +612,13 @@ export default class Cresenity {
                 }
             },
             error: (xhr, errorAjaxOptions, thrownError) => {
+                if(xhr.readyState == 4) {
+                    if(xhr.status==404) {
+                        this.showError('Not Found');
+                    }
+                }
                 if (thrownError !== 'abort') {
-                    this.showError(thrownError);
+                    this.showError('Something when wrong' + thrownError);
                 }
             },
 
@@ -927,7 +967,15 @@ export default class Cresenity {
     unblockElement(selector) {
         $(selector).unblock();
     }
-
+    arrayValue(elms) {
+        elms = $(elms);
+        if (elms.length === 0) {
+            return [];
+        }
+        return elms.map((index, elm) => {
+            return this.value(elm);
+        }).get();
+    }
     value(elm) {
         elm = $(elm);
         if (elm.length === 0) {
@@ -950,6 +998,12 @@ export default class Cresenity {
             return elm.attr('value');
         }
         return elm.html();
+    }
+    isUsingBootstrap() {
+        bootstrapHelper.isBootstrap();
+    }
+    initDependency() {
+        bootstrapHelper.check();
     }
     initConfirm() {
         elementRendered('a.confirm, button.confirm, input[type=submit].confirm', (el)=>{
@@ -1024,14 +1078,20 @@ export default class Cresenity {
     initCssDomVar() {
         initCssDomVar();
     }
+    initHistory() {
+        this.history = CresenityHistory;
+        if (!this.history.options || !this.history.options.delayInit) {
+            this.history.init();
+            this.history.Adapter.bind(window, 'statechange', function () { // Note: We are using statechange instead of popstate
+                dispatchWindowEvent('cresenity:history:statechange');
+            });
+        }
+    }
     initAlpineAndUi() {
-        Alpine.plugin(AlpineCleave);
-        Alpine.plugin(AlpineAutoNumeric);
-        Alpine.plugin(AlpineTippy);
         window.Alpine = Alpine;
+        this.alpine = new CresAlpine(window.Alpine);
         this.ui.start();
         window.Alpine.start();
-        this.alpine = new CresAlpine(window.Alpine);
     }
 
     initLiveReload() {
@@ -1063,6 +1123,7 @@ export default class Cresenity {
                     this.scrollToTop.init();
                 }
             }
+            this.initDependency();
             this.initElement();
             this.initConfirm();
             this.initReload();
@@ -1071,6 +1132,7 @@ export default class Cresenity {
             this.initWaves();
             this.initAlpineAndUi();
             this.initCssDomVar();
+            this.initHistory();
 
             this.initLiveReload();
             initProgressive();
@@ -1357,5 +1419,47 @@ export default class Cresenity {
         }
 
         return document.body;
+    }
+
+    startCheckAuthenticationInterval(intervalTime = 10000, callback) {
+        if(this.checkAuthenticationInterval) {
+            return;
+        }
+        this.checkAuthenticationInterval = setInterval(() => {
+            const baseUrl = window?.capp?.baseUrl ?? '/';
+            const sessionName = window?.capp?.sessionName ?? null;
+            let sid = null;
+            if(sessionName) {
+                if (typeof document !== 'undefined') {
+                    const match = document.cookie.match(new RegExp('(^|;\\s*)('+sessionName+')=([^;]*)'));
+                    sid = match ? decodeURIComponent(match[3]) : null;
+                }
+            }
+            let url = baseUrl + 'cresenity/auth/ping';
+            $.ajax({
+                type: 'get',
+                url: url,
+                dataType: 'json',
+                success: (responseAuth) => {
+                    this.handleJsonResponse(responseAuth, (dataAuth) => {
+                        callback(dataAuth);
+                    });
+                }
+            });
+        }, intervalTime);
+    }
+
+    stopCheckAuthenticationInterval() {
+        if(this.checkAuthenticationInterval) {
+            clearInterval(this.checkAuthenticationInterval);
+        }
+    }
+    onAuthExpired(callback, intervalTime = 1000) {
+        this.stopCheckAuthenticationInterval();
+        this.startCheckAuthenticationInterval(intervalTime, (data)=>{
+            if(data && !data.isLogin) {
+                callback(data);
+            }
+        });
     }
 }

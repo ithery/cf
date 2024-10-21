@@ -3,13 +3,6 @@
 defined('SYSPATH') or die('No direct access allowed.');
 
 /**
- * @author Hery Kurniawan
- * @license Ittron Global Teknologi <ittron.co.id>
- *
- * @since Aug 18, 2018, 1:39:53 PM
- */
-
-/**
  * Abstract Visitor with empty methods for easy extension.
  */
 class CDatabase_Schema_Visitor implements CDatabase_Schema_Visitor_Interface, CDatabase_Schema_Visitor_NamespaceInterface {
@@ -20,7 +13,7 @@ class CDatabase_Schema_Visitor implements CDatabase_Schema_Visitor_Interface, CD
     }
 
     /**
-     * {@inheritdoc}
+     * @inheritdoc
      */
     public function acceptNamespace($namespaceName) {
     }

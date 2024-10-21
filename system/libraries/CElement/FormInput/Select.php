@@ -12,6 +12,7 @@ class CElement_FormInput_Select extends CElement_FormInput {
     use CTrait_Compat_Element_FormInput_Select;
     use CTrait_Element_Property_ApplyJs;
     use CTrait_Element_Property_DependsOn;
+    use CTrait_Element_Property_Placeholder;
 
     protected $group_list = [];
 
@@ -22,8 +23,6 @@ class CElement_FormInput_Select extends CElement_FormInput {
     protected $hide_search;
 
     protected $maximumSelectionLength;
-
-    protected $placeholder;
 
     protected $select2Version;
 
@@ -45,6 +44,11 @@ class CElement_FormInput_Select extends CElement_FormInput {
         $this->addClass('form-control select');
     }
 
+    public static function factory($id = null) {
+        /** @phpstan-ignore-next-line */
+        return new static($id);
+    }
+
     public function setMultiple($bool = true) {
         $this->multiple = $bool;
 
@@ -53,12 +57,6 @@ class CElement_FormInput_Select extends CElement_FormInput {
 
     public function setMaximumSelectionLength($length) {
         $this->maximumSelectionLength = $length;
-
-        return $this;
-    }
-
-    public function setPlaceholder($placeholder) {
-        $this->placeholder = $placeholder;
 
         return $this;
     }
@@ -277,7 +275,7 @@ class CElement_FormInput_Select extends CElement_FormInput {
         foreach ($this->dependsOn as $dependOn) {
             //we create ajax method
 
-            $dependsOnSelector = $dependOn->getSelector();
+            $dependsOnSelector = $dependOn->getSelector()->getQuerySelector();
             $targetSelector = '#' . $this->id();
             $ajaxMethod = CAjax::createMethod();
             $ajaxMethod->setType('DependsOn');
@@ -290,8 +288,8 @@ class CElement_FormInput_Select extends CElement_FormInput {
             $optionsJson .= "url:'" . $ajaxUrl . "',";
             $optionsJson .= "method:'" . 'post' . "',";
             $optionsJson .= !$dependOn->getBlock() ? 'block: false,' : '';
-
-            $optionsJson .= "dataAddition: { value: $('" . $dependsOnSelector . "').val() },";
+            $valueScript = $dependOn->getSelector()->getScriptForValue();
+            $optionsJson .= 'dataAddition: { value: ' . $valueScript . ' },';
             $optionsJson .= "onSuccess: (data) => {
                  let jQuerySelect = $('" . $targetSelector . "');
                  jQuerySelect.empty();

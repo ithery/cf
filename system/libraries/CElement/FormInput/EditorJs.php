@@ -80,7 +80,7 @@ class CElement_FormInput_EditorJs extends CElement_FormInput {
         $divHolder->setAttr('data-input-id', $this->id);
         $this->addClass('cres:element:control:EditorJs');
         $this->setAttr('cres-element', 'control:EditorJs');
-        $this->setAttr('cres-config', c::jsonAttr($this->buildControlConfig()));
+        $this->setAttr('cres-config', c::json($this->buildControlConfig()));
 
         $this->setAttr('data-holder-id', $this->holderId());
         $this->setAttr('type', $this->type);
@@ -96,24 +96,40 @@ class CElement_FormInput_EditorJs extends CElement_FormInput {
                 $value = [];
             }
         }
-        $this->setAttr('value', c::jsonAttr($value));
+        $this->setAttr('value', c::json($value));
         $manager = c::manager();
-        $manager->registerJs('https://cdn.jsdelivr.net/npm/@editorjs/editorjs@latest');
-        $manager->registerJs('https://cdn.jsdelivr.net/npm/@editorjs/simple-image@latest');
-        $manager->registerJs('https://cdn.jsdelivr.net/npm/@editorjs/list@latest');
-        $manager->registerJs('https://cdn.jsdelivr.net/npm/@editorjs/quote@latest');
-        $manager->registerJs('https://cdn.jsdelivr.net/npm/@editorjs/image@latest');
-        $manager->registerJs('https://cdn.jsdelivr.net/npm/@editorjs/code@latest');
-        $manager->registerJs('https://cdn.jsdelivr.net/npm/@editorjs/table@latest');
-        $manager->registerJs('https://cdn.jsdelivr.net/npm/@editorjs/link@latest');
-        $manager->registerJs('https://cdn.jsdelivr.net/npm/@editorjs/warning@latest');
-        $manager->registerJs('https://cdn.jsdelivr.net/npm/@editorjs/marker@latest');
-        $manager->registerJs('https://cdn.jsdelivr.net/npm/@editorjs/inline-code@latest');
-        $manager->registerJs('https://cdn.jsdelivr.net/npm/@editorjs/checklist@latest');
-        $manager->registerJs('https://cdn.jsdelivr.net/npm/@editorjs/delimiter@latest');
-        $manager->registerJs('https://cdn.jsdelivr.net/npm/@editorjs/embed@latest');
-        $manager->registerJs('https://cdn.jsdelivr.net/npm/@editorjs/raw@latest');
-        $manager->registerJs('https://cdn.jsdelivr.net/npm/@editorjs/table@latest');
+        // $manager->registerJs('https://cdn.jsdelivr.net/npm/@editorjs/editorjs@latest');
+        // $manager->registerJs('https://cdn.jsdelivr.net/npm/@editorjs/simple-image@latest');
+        // $manager->registerJs('https://cdn.jsdelivr.net/npm/@editorjs/list@latest');
+        // $manager->registerJs('https://cdn.jsdelivr.net/npm/@editorjs/quote@latest');
+        // $manager->registerJs('https://cdn.jsdelivr.net/npm/@editorjs/image@latest');
+        // $manager->registerJs('https://cdn.jsdelivr.net/npm/@editorjs/code@latest');
+        // $manager->registerJs('https://cdn.jsdelivr.net/npm/@editorjs/table@latest');
+        // $manager->registerJs('https://cdn.jsdelivr.net/npm/@editorjs/link@latest');
+        // $manager->registerJs('https://cdn.jsdelivr.net/npm/@editorjs/warning@latest');
+        // $manager->registerJs('https://cdn.jsdelivr.net/npm/@editorjs/marker@latest');
+        // $manager->registerJs('https://cdn.jsdelivr.net/npm/@editorjs/inline-code@latest');
+        // $manager->registerJs('https://cdn.jsdelivr.net/npm/@editorjs/checklist@latest');
+        // $manager->registerJs('https://cdn.jsdelivr.net/npm/@editorjs/delimiter@latest');
+        // $manager->registerJs('https://cdn.jsdelivr.net/npm/@editorjs/embed@latest');
+        // $manager->registerJs('https://cdn.jsdelivr.net/npm/@editorjs/raw@latest');
+        // $manager->registerJs('https://cdn.jsdelivr.net/npm/@editorjs/table@latest');
+
+        $manager->registerJs('plugins/editorjs/editorjs-2.28.0.js');
+        $manager->registerJs('plugins/editorjs/simple-image-1.5.1.js');
+        $manager->registerJs('plugins/editorjs/list-1.8.0.js');
+        $manager->registerJs('plugins/editorjs/quote-2.5.0.js');
+        $manager->registerJs('plugins/editorjs/image-2.8.1.js');
+        $manager->registerJs('plugins/editorjs/code-2.8.0.js');
+        $manager->registerJs('plugins/editorjs/table-2.2.2.js');
+        $manager->registerJs('plugins/editorjs/link-2.5.0.js');
+        $manager->registerJs('plugins/editorjs/warning-1.3.0.js');
+        $manager->registerJs('plugins/editorjs/marker-1.3.0.js');
+        $manager->registerJs('plugins/editorjs/inline-code-1.4.0.js');
+        $manager->registerJs('plugins/editorjs/checklist-1.5.0.js');
+        $manager->registerJs('plugins/editorjs/delimiter-1.3.0.js');
+        $manager->registerJs('plugins/editorjs/embed-2.5.3.js');
+        $manager->registerJs('plugins/editorjs/raw-2.4.0.js');
     }
 
     protected function buildControlConfig() {

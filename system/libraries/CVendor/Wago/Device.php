@@ -35,9 +35,21 @@ class CVendor_Wago_Device {
             'message' => $message,
         ];
         $imageUrl = carr::get($options, 'imageUrl');
+        $documentUrl = carr::get($options, 'documentUrl');
+        $mimeType = carr::get($options, 'mimeType');
+        $fileName = carr::get($options, 'fileName');
         $scheduleAt = carr::get($options, 'scheduleAt');
         if ($imageUrl) {
             $request['imageUrl'] = $imageUrl;
+        }
+        if ($documentUrl) {
+            $request['documentUrl'] = $documentUrl;
+        }
+        if ($mimeType) {
+            $request['mimeType'] = $mimeType;
+        }
+        if ($fileName) {
+            $request['fileName'] = $fileName;
         }
         if ($scheduleAt) {
             $request['scheduleAt'] = $scheduleAt;
@@ -48,6 +60,13 @@ class CVendor_Wago_Device {
 
     public function getInfo() {
         return $this->handleResponse($this->client->get('info'));
+    }
+
+    /**
+     * @return array
+     */
+    public function getStatus() {
+        return $this->handleResponse($this->client->get('status'));
     }
 
     public function getWebhook() {
@@ -66,15 +85,26 @@ class CVendor_Wago_Device {
         return $this->handleResponse($this->client->post('webhook/set', $options));
     }
 
+    /**
+     * @param mixed $response
+     *
+     * @return array
+     */
     public function handleResponse($response) {
         if (is_string($response)) {
             $response = json_decode($response, true);
         }
         $errCode = (int) carr::get($response, 'errCode');
         if ($errCode != 0) {
-            throw new CVendor_Wago_Exception_ApiException(carr::get($response, 'errMessage'));
+            $errMessage = carr::get($response, 'errMessage');
+
+            throw new CVendor_Wago_Exception_ApiException($errMessage);
         }
 
         return carr::get($response, 'data', []);
+    }
+
+    public function getClient() {
+        return $this->client;
     }
 }

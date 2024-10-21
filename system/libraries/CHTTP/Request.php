@@ -2,20 +2,16 @@
 
 defined('SYSPATH') or die('No direct access allowed.');
 
-/**
- * @author Hery Kurniawan
- *
- * @since Jun 2, 2019, 10:24:00 PM
- *
- * @license Ittron Global Teknologi <ittron.co.id>
- */
 use Symfony\Component\HttpFoundation\ParameterBag;
+use Symfony\Component\HttpFoundation\Session\SessionInterface;
 use Symfony\Component\HttpFoundation\Request as SymfonyRequest;
+use Symfony\Component\HttpFoundation\Exception\SessionNotFoundException;
 
 class CHTTP_Request extends SymfonyRequest implements CInterface_Arrayable, ArrayAccess {
     use CHTTP_Trait_InteractsWithInput,
         CHTTP_Trait_InteractsWithContentTypes,
         CHTTP_Trait_InteractsWithFlashData;
+
     protected $browser;
 
     /**
@@ -463,6 +459,20 @@ class CHTTP_Request extends SymfonyRequest implements CInterface_Arrayable, Arra
     }
 
     /**
+     * Gets the Session.
+     *
+     * @return null|SessionInterface The session
+     */
+    public function getSession() {
+        $session = $this->session();
+        if ($session) {
+            return new CSession_SymfonySessionDecorator($session);
+        }
+
+        throw new SessionNotFoundException();
+    }
+
+    /**
      * Get the session associated with the request.
      *
      * @throws \RuntimeException
@@ -730,5 +740,22 @@ class CHTTP_Request extends SymfonyRequest implements CInterface_Arrayable, Arra
 
     public function isCresRequest() {
         return $this->hasHeader('X-Cres-Version');
+    }
+
+    /**
+     * Sets a list of trusted proxies.
+     *
+     * You should only list the reverse proxies that you manage directly.
+     *
+     * @param array $proxies          A list of trusted proxies, the string 'REMOTE_ADDR' will be replaced with $_SERVER['REMOTE_ADDR']
+     * @param int   $trustedHeaderSet A bit field of Request::HEADER_*, to set which headers to trust from your proxies
+     *
+     * @return void
+     */
+    public static function setTrustedProxies(array $proxies, $trustedHeaderSet = null) {
+        if ($trustedHeaderSet === null) {
+            $trustedHeaderSet = CHTTP_Request::HEADER_X_FORWARDED_FOR | CHTTP_Request::HEADER_X_FORWARDED_HOST | CHTTP_Request::HEADER_X_FORWARDED_PORT | CHTTP_Request::HEADER_X_FORWARDED_PROTO | CHTTP_Request::HEADER_X_FORWARDED_PREFIX | CHTTP_Request::HEADER_X_FORWARDED_AWS_ELB;
+        }
+        parent::setTrustedProxies($proxies, $trustedHeaderSet);
     }
 }

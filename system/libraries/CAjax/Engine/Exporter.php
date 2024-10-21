@@ -9,6 +9,6 @@ class CAjax_Engine_Exporter extends CAjax_Engine {
         $headers = carr::get($data, 'headers', []);
         $exporter = unserialize($exporter);
 
-        return CExporter::toDownloadResponse($exporter, $filename, $writerType, $headers);
+        return CExporter::download($exporter, $filename, $writerType, $headers);
     }
 }

@@ -4,6 +4,9 @@ defined('SYSPATH') or die('No direct access allowed.');
 
 /**
  * @template TModelClass
+ *
+ * @see CDatabase_Query_Builder
+ * @see CModel_Query
  */
 trait CDatabase_Trait_Builder {
     use CTrait_Conditionable;

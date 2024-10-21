@@ -36,6 +36,8 @@ class CApi_Manager {
 
     private $resultFormatter;
 
+    private $methodResolver;
+
     /**
      * @param string $group
      *
@@ -64,6 +66,9 @@ class CApi_Manager {
         return carr::get($this->config, $key, $default);
     }
 
+    /**
+     * @return CApi_HTTP_Response_Format_JsonFormat
+     */
     public function resultFormatter() {
         if ($this->resultFormatter == null) {
             $this->resultFormatter = new CApi_HTTP_Response_Format_JsonFormat();

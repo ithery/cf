@@ -107,6 +107,7 @@
             $input_name = carr::get($f, 'input_name');
             $input_value = carr::get($f, 'input_value');
             $file_url = carr::get($f, 'file_url');
+            $file_name = carr::get($f, 'file_name');
             $isImage = false;
             $pathParts = pathinfo($file_url);
             $ext = carr::get($pathParts,'extension');
@@ -143,6 +144,7 @@
                         <label><?php echo $controlLabel; ?>:</label><input type="{{ $control }}" name="{{ $name }}_custom_control[{{ $input_name }}][{{ $controlName }}]" value="{{ $control_value }}"  >
                     </div>
                 @endforeach
+                <p class="multi-image-ajax-filename">{{ $file_name }}</p>
                 <a class="multi-image-ajax-remove">@lang('element/file.remove')</a>
             </div>
         @endforeach
@@ -341,6 +343,8 @@
                     div_cc.append(cc);
                     div.append(div_cc);
                 @endforeach
+                var filenameLabel = $("<p>").addClass("multi-image-ajax-filename").html(name);
+                div.append(filenameLabel);
                 @if($removeLink)
                     var remove = $("<a>").addClass("multi-image-ajax-remove").html("@lang('element/file.remove')");
                     div.append(remove);

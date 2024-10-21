@@ -4,6 +4,7 @@ use PhpOffice\PhpSpreadsheet\IOFactory;
 
 class CExporter {
     use CExporter_Trait_RegistersCustomConcernsTrait;
+
     const ACTION_STORE = 'store';
 
     const ACTION_DOWNLOAD = 'download';
@@ -41,10 +42,20 @@ class CExporter {
     const DATA_TYPE_STRING = 'string';
 
     const DATA_TYPE_DATETIME = 'datetime';
+
     const DATA_TYPE_DATE = 'date';
+
     const DATA_TYPE_CURRENCY = 'currency';
+
     const DATA_TYPE_INTEGER = 'integer';
+
     const DATA_TYPE_NUMBER = 'number';
+
+    const DATA_TYPE_PERCENTAGE = 'percentage';
+
+    const DATA_TYPE_PERCENTAGE_0 = 'percentage0';
+
+    const DATA_TYPE_PERCENTAGE_00 = 'percentage00';
 
     protected static $externalWriter = [
         self::SNAPPYPDF => CExporter_PhpSpreadsheet_SnappyPdf::class,
@@ -104,9 +115,11 @@ class CExporter {
      * @throws \PhpOffice\PhpSpreadsheet\Exception
      * @throws \PhpOffice\PhpSpreadsheet\Writer\Exception
      *
+     * @deprecated 1.6 use download which return response object
+     *
      * @return void
      */
-    public static function download($export, $fileName, $writerType = null, array $headers = []) {
+    public static function forceDownload($export, $fileName, $writerType = null, array $headers = []) {
         $localPath = static::export($export, $fileName, $writerType)->getLocalPath();
         cdownload::force($localPath, null, $fileName);
         unlink($localPath);
@@ -121,9 +134,9 @@ class CExporter {
      * @throws \PhpOffice\PhpSpreadsheet\Exception
      * @throws \PhpOffice\PhpSpreadsheet\Writer\Exception
      *
-     * @return void
+     * @return \Symfony\Component\HttpFoundation\BinaryFileResponse
      */
-    public static function toDownloadResponse($export, $fileName, $writerType = null, array $headers = []) {
+    public static function download($export, $fileName, $writerType = null, array $headers = []) {
         return c::response()->download(
             static::export($export, $fileName, $writerType)->getLocalPath(),
             $fileName,
@@ -257,7 +270,7 @@ class CExporter {
         $file = CTemporary::getPath('ajax', $filename);
         $disk = CTemporary::disk();
         if (!$disk->exists($file)) {
-            throw new CException('failed to get temporary file :filename', [':filename' => $file]);
+            throw new Exception(c::__('failed to get temporary file :filename', ['filename' => $file]));
         }
         $json = $disk->get($file);
 

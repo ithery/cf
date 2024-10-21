@@ -2,12 +2,6 @@
 
 defined('SYSPATH') or die('No direct access allowed.');
 
-/**
- * @author Hery Kurniawan
- * @license Ittron Global Teknologi <ittron.co.id>
- *
- * @since Aug 11, 2019, 3:29:43 AM
- */
 use Aws\S3\S3Client;
 use League\Flysystem\Visibility;
 use League\Flysystem\Ftp\FtpAdapter;
@@ -432,6 +426,13 @@ class CStorage {
         $this->customCreators[$driver] = $callback;
 
         return $this;
+    }
+
+    /**
+     * @return CStorage_Tus|CBase_ForwarderStaticClass
+     */
+    public static function tus() {
+        return new CBase_ForwarderStaticClass(CStorage_Tus::class);
     }
 
     /**

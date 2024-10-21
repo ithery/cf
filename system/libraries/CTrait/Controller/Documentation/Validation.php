@@ -22,6 +22,6 @@ trait CTrait_Controller_Documentation_Validation {
             'publish_at' => 'nullable|date',
         ]);
 
-        echo $app->render();
+        return $app;
     }
 }
