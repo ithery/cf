@@ -157,6 +157,7 @@ class CConsole_Command_AboutCommand extends CConsole_Command {
         static::addToSection('Environment', function () {
             return [
                 'Application Name' => CF::config('app.name'),
+                'Application Prefix' => CF::config('app.prefix'),
                 'Application Code' => CF::appCode(),
                 'CF Version' => CF::version(),
                 'PHP Version' => phpversion(),
@@ -192,7 +193,7 @@ class CConsole_Command_AboutCommand extends CConsole_Command {
                 'Cache' => CF::config('cache.default'),
                 'Database' => CF::config('database.default'),
                 'Logs' => $logs,
-                'Mail' => CF::config('mail.default'),
+                'Mail' => CF::config('email.default'),
                 'Octane' => CF::config('octane.server'),
                 'Queue' => CF::config('queue.default'),
                 'Scout' => CF::config('model.scout.driver'),

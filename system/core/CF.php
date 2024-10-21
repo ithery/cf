@@ -264,8 +264,8 @@ final class CF {
     }
 
     /**
-     * @param type $directory
-     * @param type $domain
+     * @param string      $directory
+     * @param null|string $domain
      *
      * @return string
      */
@@ -674,7 +674,11 @@ final class CF {
             return constant('CFCLI_APPCODE');
         }
         if (CF::isTesting()) {
-            foreach ($_SERVER['argv'] as $argv) {
+            $serverArgv = $_SERVER['argv'];
+            if (!is_array($serverArgv)) {
+                $serverArgv = [$serverArgv];
+            }
+            foreach ($serverArgv as $argv) {
                 if (substr($argv, -strlen('phpunit.xml')) === (string) 'phpunit.xml') {
                     if (file_exists($argv)) {
                         $content = file_get_contents($argv);
@@ -693,7 +697,11 @@ final class CF {
     public static function domain() {
         $domain = '';
         if (CF::isTesting()) {
-            foreach ($_SERVER['argv'] as $argv) {
+            $serverArgv = $_SERVER['argv'];
+            if (!is_array($serverArgv)) {
+                $serverArgv = [$serverArgv];
+            }
+            foreach ($serverArgv as $argv) {
                 if (substr($argv, -strlen('phpunit.xml')) === (string) 'phpunit.xml') {
                     if (file_exists($argv)) {
                         $content = file_get_contents($argv);

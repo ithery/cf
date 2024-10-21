@@ -23,7 +23,7 @@ parameters:
         - '#Right side of && is always true.#'
         - '#Left side of && is always true.#'
         - '#Left side of \|\| is always true.#'
-        - '#Class Error should be written with ::class notation, string found.#'
+        - '#Class Error should be written with \:\:class notation, string found.#'
 
 
 parametersSchema:

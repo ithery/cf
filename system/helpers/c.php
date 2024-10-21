@@ -332,7 +332,7 @@ class c {
      * @param null|string $message
      * @param array       $context
      *
-     * @return null|\CLogger
+     * @return null|\CLogger_Manager
      */
     public static function logger($message = null, array $context = []) {
         if (is_null($message)) {
@@ -2054,6 +2054,20 @@ class c {
         }
 
         return $basePath . implode('', $paths);
+    }
+
+    /**
+     * @return CApp_Visitor
+     */
+    public static function visitor() {
+        return c::app()->visitor();
+    }
+
+    public static function randmd5() {
+        $rand = rand(0, 9999);
+        $base = date('YmdHis') . $rand;
+
+        return md5($rand);
     }
 }
 

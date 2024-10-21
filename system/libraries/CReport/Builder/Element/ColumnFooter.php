@@ -33,6 +33,7 @@ class CReport_Builder_Element_ColumnFooter extends CReport_Builder_ElementAbstra
         //$processor->preventYOverflow($generator, $height);
 
         parent::generate($generator, $processor);
+        $generator->setColumnFooterDrawn();
         $processor->addY($height);
     }
 }

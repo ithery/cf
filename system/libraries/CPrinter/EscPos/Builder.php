@@ -23,9 +23,12 @@ class CPrinter_EscPos_Builder extends CPrinter_EscPos_Printer {
 
     private $driver = null;
 
-    public function __construct() {
-        $connector = new CPrinter_EscPos_PrintConnector_DummyPrintConnector();
-        parent::__construct($connector);
+    public function __construct(CPrinter_EscPos_Contract_PrintConnectorInterface $connector = null, CPrinter_EscPos_CapabilityProfile $profile = null) {
+        if ($connector == null) {
+            $connector = new CPrinter_EscPos_PrintConnector_DummyPrintConnector();
+        }
+
+        parent::__construct($connector, $profile);
     }
 
     public static function factory() {
@@ -115,6 +118,27 @@ class CPrinter_EscPos_Builder extends CPrinter_EscPos_Printer {
         }
 
         return $this;
+    }
+
+    /**
+     * @return $this
+     */
+    public function setJustifyLeft() {
+        return $this->setJustification(CPrinter_EscPos::JUSTIFY_LEFT);
+    }
+
+    /**
+     * @return $this
+     */
+    public function setJustifyRight() {
+        return $this->setJustification(CPrinter_EscPos::JUSTIFY_RIGHT);
+    }
+
+    /**
+     * @return $this
+     */
+    public function setJustifyCenter() {
+        return $this->setJustification(CPrinter_EscPos::JUSTIFY_CENTER);
     }
 
     public function render() {

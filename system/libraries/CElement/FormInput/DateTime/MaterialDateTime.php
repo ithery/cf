@@ -108,13 +108,21 @@ class CElement_FormInput_DateTime_MaterialDateTime extends CElement_FormInput_Da
 
         if ($this->disableYesterday) {
             if (strlen($option) > 0) {
-                $option .= ',minDate: new Date()';
+                if (is_bool($this->disableYesterday)) {
+                    $option .= ',minDate: new Date()';
+                } else {
+                    $option .= ',minDate: new Date(moment("' . $this->disableYesterday . '"))';
+                }
             }
         }
 
         if ($this->disableTomorrow) {
             if (strlen($option) > 0) {
-                $option .= ',maxDate: new Date()';
+                if (is_bool($this->disableTomorrow)) {
+                    $option .= ',maxDate: new Date()';
+                } else {
+                    $option .= ',maxDate: new Date(moment("' . $this->disableTomorrow . '"))';
+                }
             }
         }
         //$option .= " ,nowButton : true";

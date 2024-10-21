@@ -120,7 +120,7 @@ class CVendor_Namecheap_Command_Domains extends CVendor_Namecheap_AbstractComman
      * @param Currency|eapFee|Opt : Purchase fee for the premium domain during Early Access Program (EAP)*
      */
     public function create(array $domainInfo, array $contactInfo) {
-        $data = $this->api->parseDomainData($domainInfo, $contactInfo);
+        $data = $this->parseDomainData($domainInfo, $contactInfo);
 
         return $this->api->post($this->command . __FUNCTION__, $data);
     }
@@ -197,7 +197,7 @@ class CVendor_Namecheap_Command_Domains extends CVendor_Namecheap_AbstractComman
      * @param string|auxBillingFax|Opt : Fax number in the format +NNN.NNNNNNNNNN
      */
     public function setContacts(array $domainInfo, array $contactInfo) {
-        $data = $this->api->parseContactInfo($contactInfo);
+        $data = $this->parseContactInfo($contactInfo);
 
         return $this->api->post($this->command . __FUNCTION__, array_merge($domainInfo, $data));
     }
@@ -215,7 +215,9 @@ class CVendor_Namecheap_Command_Domains extends CVendor_Namecheap_AbstractComman
             $data['DomainList'] = $domain;
         }
 
-        return $this->api->get($this->command . __FUNCTION__, $data);
+        $response = $this->api->get($this->command . __FUNCTION__, $data);
+
+        return $response;
     }
 
     /**
@@ -436,22 +438,22 @@ class CVendor_Namecheap_Command_Domains extends CVendor_Namecheap_AbstractComman
             'AuxBillingFax' => !empty($d['auxBillingFax']) ? $d['auxBillingFax'] : null,
         ];
         # Validation fields
-        $reqFields = $this->checkRequiredFields($registrant, $requiredRegistrant);
+        $reqFields = $this->api->checkRequiredFields($registrant, $requiredRegistrant);
         if (count($reqFields)) {
             $flist = implode(', ', $reqFields);
 
             throw new \Exception($flist . ' : these fields are required!', 2010324);
         } else {
             // validate / replaced values with $registrant array for tech, admin, auxBilling
-            $reqFields = $this->checkRequiredFields($tech, $requiredTech);
+            $reqFields = $this->api->checkRequiredFields($tech, $requiredTech);
             foreach ($reqFields as $k) {
                 $tech[$k] = $registrant['Registrant' . substr($k, strlen('Tech'))];
             }
-            $reqFields = $this->checkRequiredFields($admin, $requiredAdmin);
+            $reqFields = $this->api->checkRequiredFields($admin, $requiredAdmin);
             foreach ($reqFields as $k) {
                 $admin[$k] = $registrant['Registrant' . substr($k, strlen('Admin'))];
             }
-            $reqFields = $this->checkRequiredFields($auxBilling, $requiredAuxBilling);
+            $reqFields = $this->api->checkRequiredFields($auxBilling, $requiredAuxBilling);
             foreach ($reqFields as $k) {
                 $auxBilling[$k] = $registrant['Registrant' . substr($k, strlen('AuxBilling'))];
             }

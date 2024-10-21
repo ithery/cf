@@ -184,11 +184,12 @@ class CElement_FormInput_MultipleFileAjax extends CElement_FormInput {
         return $this;
     }
 
-    public function addFile($fileUrl, $inputName = '', $inputValue = '') {
+    public function addFile($fileUrl, $inputName = '', $inputValue = '', $fileName = '') {
         $arr = [];
         $arr['input_name'] = $inputName;
         $arr['input_value'] = $inputValue;
         $arr['file_url'] = $fileUrl;
+        $arr['file_name'] = $fileName;
 
         $this->files[] = $arr;
 

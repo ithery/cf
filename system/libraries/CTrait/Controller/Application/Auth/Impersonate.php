@@ -93,6 +93,7 @@ trait CTrait_Controller_Application_Auth_Impersonate {
                 if ($manager->start($request->user(), $userToImpersonate, $guardName)) {
                     $redirectUrl = carr::get(CApp_Base::getRequestGet(), 'r');
                     if ($redirectUrl) {
+                        $redirectUrl = urldecode($redirectUrl);
                         return c::redirect($redirectUrl);
                     }
                 }

@@ -1351,9 +1351,9 @@ class carr {
      * `predicate` returns truthy for. The predicate is invoked with three
      * arguments: (value, index|key, collection).
      *
-     * @param iterable $collection the collection to inspect
-     * @param callable $predicate  the function invoked per iteration
-     * @param int      $fromIndex  the index to search from
+     * @param Traversable $collection the collection to inspect
+     * @param callable    $predicate  the function invoked per iteration
+     * @param int         $fromIndex  the index to search from
      *
      * @return mixed returns the matched element, else `null`
      *

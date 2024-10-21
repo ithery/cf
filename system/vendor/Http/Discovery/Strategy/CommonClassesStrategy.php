@@ -38,8 +38,8 @@ use Http\Adapter\Buzz\Client as Buzz;
 use Http\Adapter\Cake\Client as Cake;
 use Http\Adapter\Zend\Client as Zend;
 use Http\Adapter\Artax\Client as Artax;
-use Symfony\Component\HttpClient\HttplugClient as SymfonyHttplug;
-use Symfony\Component\HttpClient\Psr18Client as SymfonyPsr18;
+// use Symfony\Component\HttpClient\HttplugClient as SymfonyHttplug;
+// use Symfony\Component\HttpClient\Psr18Client as SymfonyPsr18;
 use Nyholm\Psr7\Factory\HttplugFactory as NyholmHttplugFactory;
 
 /**
@@ -75,14 +75,14 @@ final class CommonClassesStrategy implements DiscoveryStrategy
             ['class' => SlimUriFactory::class, 'condition' => [SlimRequest::class, SlimUriFactory::class]],
         ],
         HttpAsyncClient::class => [
-            ['class' => SymfonyHttplug::class, 'condition' => [SymfonyHttplug::class, Promise::class, RequestFactory::class, [self::class, 'isPsr17FactoryInstalled']]],
+            // ['class' => SymfonyHttplug::class, 'condition' => [SymfonyHttplug::class, Promise::class, RequestFactory::class, [self::class, 'isPsr17FactoryInstalled']]],
             ['class' => Guzzle7::class, 'condition' => Guzzle7::class],
             ['class' => Guzzle6::class, 'condition' => Guzzle6::class],
             ['class' => Curl::class, 'condition' => Curl::class],
             ['class' => React::class, 'condition' => React::class],
         ],
         HttpClient::class => [
-            ['class' => SymfonyHttplug::class, 'condition' => [SymfonyHttplug::class, RequestFactory::class, [self::class, 'isPsr17FactoryInstalled']]],
+            // ['class' => SymfonyHttplug::class, 'condition' => [SymfonyHttplug::class, RequestFactory::class, [self::class, 'isPsr17FactoryInstalled']]],
             ['class' => Guzzle7::class, 'condition' => Guzzle7::class],
             ['class' => Guzzle6::class, 'condition' => Guzzle6::class],
             ['class' => Guzzle5::class, 'condition' => Guzzle5::class],
@@ -99,10 +99,10 @@ final class CommonClassesStrategy implements DiscoveryStrategy
             ],
         ],
         Psr18Client::class => [
-            [
-                'class' => [self::class, 'symfonyPsr18Instantiate'],
-                'condition' => [SymfonyPsr18::class, Psr17RequestFactory::class],
-            ],
+            // [
+            //     'class' => [self::class, 'symfonyPsr18Instantiate'],
+            //     'condition' => [SymfonyPsr18::class, Psr17RequestFactory::class],
+            // ],
             [
                 'class' => GuzzleHttp::class,
                 'condition' => [self::class, 'isGuzzleImplementingPsr18'],

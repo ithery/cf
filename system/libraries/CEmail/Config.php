@@ -68,6 +68,7 @@ class CEmail_Config {
         $this->port = carr::get($options, 'port');
         $this->secure = carr::get($options, 'secure');
         $this->protocol = carr::get($options, 'protocol', 'tcp');
+        $this->from = carr::get($options, 'from');
         $this->fromName = carr::get($options, 'from_name');
     }
 
@@ -98,6 +99,7 @@ class CEmail_Config {
                 $newConfig['port'] = carr::get($config, 'port', carr::get($config, 'smtp_port'));
             }
         }
+
         return $newConfig;
     }
 
@@ -122,6 +124,7 @@ class CEmail_Config {
         if (!isset($config['secure']) || c::blank($config['secure'])) {
             $config['secure'] = carr::get($config, 'smtp_secure', CF::config('app.email.secure', CF::config('app.smtp_secure')), 'tls');
         }
+
         return $config;
     }
 
