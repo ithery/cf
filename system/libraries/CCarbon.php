@@ -22,9 +22,9 @@ class CCarbon extends BaseCarbon {
     /**
      * Create a Carbon instance from a given ordered UUID or ULID.
      *
-     * @param \Ramsey\Uuid\Uuid|\Symfony\Component\Uid\Ulid|string $id
+     * @param Uuid|Ulid|string $id
      *
-     * @return \CCarbon
+     * @return CCarbon
      */
     public static function createFromId($id) {
         return Ulid::isValid($id)
