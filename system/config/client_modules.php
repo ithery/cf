@@ -449,6 +449,10 @@ return [
         'css' => ['libs/bootstrap-4/bootstrap.css'],
         'js' => ['libs/bootstrap-4/popper.js', 'libs/bootstrap-4/bootstrap.js'],
     ],
+    'bootstrap-5' => [
+        'css' => ['libs/bootstrap-5/bootstrap.css'],
+        'js' => ['libs/bootstrap-5/bootstrap.js'],
+    ],
     'bootstrap-4-material' => [
         'css' => ['libs/bootstrap-4-material/bootstrap-material.css'],
         'js' => ['libs/bootstrap-4/popper.js', 'libs/bootstrap-4/bootstrap.js', 'libs/material/material-ripple.js'],

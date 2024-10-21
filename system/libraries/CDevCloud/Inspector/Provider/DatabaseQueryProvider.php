@@ -9,7 +9,7 @@ class CDevCloud_Inspector_Provider_DatabaseQueryProvider extends CDevCloud_Inspe
                 $connection = $query->connection;
                 $sql = $query->sql;
                 if (CDevCloud::inspector()->canAddSegments()) {
-                    $this->handleQueryReport($sql, $bindings, $time, $connection->name);
+                    $this->handleQueryReport($sql, $bindings, $time, $connection->getName());
                 }
             });
         } catch (\Exception $e) {
@@ -20,10 +20,10 @@ class CDevCloud_Inspector_Provider_DatabaseQueryProvider extends CDevCloud_Inspe
     /**
      * Attach a span to monitor query execution.
      *
-     * @param $sql
-     * @param array $bindings
+     * @param string $sql
+     * @param array  $bindings
      * @param $time
-     * @param $connection
+     * @param string $connection
      */
     protected function handleQueryReport($sql, array $bindings, $time, $connection) {
         $segment = CDevCloud::inspector()->startSegment($connection, substr($sql, 0, 50))

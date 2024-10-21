@@ -69,7 +69,7 @@ class CManager_DataProvider_ModelDataProvider extends CManager_DataProviderAbstr
         }
 
         $aggregateFields = $this->getAggregateFieldFromQuery($query);
-
+        
         //process search
         if (count($this->searchOr) > 0) {
             $dataSearch = $this->searchOr;
@@ -87,7 +87,6 @@ class CManager_DataProvider_ModelDataProvider extends CManager_DataProviderAbstr
                             $relation = implode('.', $fields);
                             $q->orWhereHas($relation, function ($q2) use ($value, $field) {
                                 $table = $q2->getModel()->getTable();
-
                                 $q2->where($table . '.' . $field, 'like', '%' . $value . '%');
                             });
                         } else {
@@ -96,7 +95,48 @@ class CManager_DataProvider_ModelDataProvider extends CManager_DataProviderAbstr
                                 //TODO apply search on aggregateFields
                             } else {
                                 if (!$this->isRelationField($q, $fieldName)) {
-                                    $q->orWhere($fieldName, 'like', '%' . $value . '%');
+                                    $connectionType = $q->getConnection()->getDriverName();
+                                    if ($connectionType == 'pgsql') {
+                                        $q->orWhere($fieldName, 'ilike', '%' . $value . '%');
+                                    } else {
+                                        $q->orWhere($fieldName, 'like', '%' . $value . '%');
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            });
+        }
+
+        if (count($this->searchFullTextOr) > 0) {
+            $dataSearch = $this->searchFullTextOr;
+            $query->where(function (CModel_Query $q) use ($dataSearch, $aggregateFields) {
+                foreach ($dataSearch as $fieldName => $value) {
+                    if ($this->isCallable($value)) {
+                        $q->orWhere(function ($q) use ($value) {
+                            $this->callCallable($value, [$q]);
+                        });
+                    } else {
+                        if (strpos($fieldName, '.') !== false) {
+                            $fields = explode('.', $fieldName);
+
+                            $field = array_pop($fields);
+                            $relation = implode('.', $fields);
+                            $q->orWhereHas($relation, function ($q2) use ($value, $field) {
+                                $table = $q2->getModel()->getTable();
+
+                                // $q2->where($table . '.' . $field, 'like', '%' . $value . '%');
+                                $q2->whereFullText($table . '.' . $field, $value);
+                            });
+                        } else {
+                            //check this is aggregate field where or not
+                            if (in_array($fieldName, $aggregateFields)) {
+                                //TODO apply search on aggregateFields
+                            } else {
+                                if (!$this->isRelationField($q, $fieldName)) {
+                                    // $q->orWhere($fieldName, 'like', '%' . $value . '%');
+                                    $q->orWhereFullText($fieldName, $value);
                                 }
                             }
                         }
@@ -128,7 +168,12 @@ class CManager_DataProvider_ModelDataProvider extends CManager_DataProviderAbstr
                                 //TODO apply search on aggregateFields
                             } else {
                                 if (!$this->isRelationField($q, $fieldName)) {
-                                    $q->where($fieldName, 'like', '%' . $value . '%');
+                                    $connectionType = $q->getConnection()->getDriverName();
+                                    if ($connectionType == 'pgsql') {
+                                        $q->where($fieldName, 'ilike', '%' . $value . '%');
+                                    } else {
+                                        $q->where($fieldName, 'like', '%' . $value . '%');
+                                    }
                                 }
                             }
                         }
@@ -238,6 +283,7 @@ class CManager_DataProvider_ModelDataProvider extends CManager_DataProviderAbstr
             $currentModel = $joinModel;
             $joinIndex++;
             $columnAlias = $joinAlias;
+            $beforeAlias = $joinAlias;
         }
 
         if ($relation instanceof CModel_Relation_BelongsTo) {

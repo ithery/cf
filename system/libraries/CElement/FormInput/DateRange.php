@@ -15,6 +15,8 @@ class CElement_FormInput_DateRange extends CElement_FormInput {
 
     protected $dateEnd;
 
+    protected $haveButton;
+
     public function __construct($id) {
         parent::__construct($id);
 

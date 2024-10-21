@@ -505,6 +505,18 @@ return [
             'css/icon/linearicons'
         ],
     ],
+    'remixicon' => [
+        'css' => ['icon/remixicon.css'],
+        'files' => [
+            'css/icon/remixicon'
+        ],
+    ],
+    'materialdesignicons' => [
+        'css' => ['icon/materialdesignicons.css'],
+        'files' => [
+            'css/icon/materialdesignicons'
+        ],
+    ],
     'themify-icons' => [
         'css' => ['icon/themify-icons.css'],
         'files' => [

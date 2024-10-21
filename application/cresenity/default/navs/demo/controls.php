@@ -11,6 +11,11 @@ return [
         'uri' => 'demo/controls/password/index',
     ],
     [
+        'name' => 'controls.autonumeric',
+        'label' => c::__('Auto Numeric'),
+        'uri' => 'demo/controls/autonumeric/index',
+    ],
+    [
         'name' => 'controls.select',
         'label' => c::__('Select'),
         'uri' => 'demo/controls/select/index',
@@ -59,5 +64,10 @@ return [
         'name' => 'controls.querybuilder',
         'label' => c::__('Query Builder'),
         'uri' => 'demo/controls/querybuilder/index',
+    ],
+    [
+        'name' => 'controls.color',
+        'label' => c::__('Color Picker'),
+        'uri' => 'demo/controls/color/index',
     ],
 ];

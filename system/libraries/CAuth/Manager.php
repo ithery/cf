@@ -140,9 +140,18 @@ final class CAuth_Manager implements CAuth_Contract_AuthFactoryInterface {
      * @return \CAuth_Guard_SessionGuard
      */
     public function createSessionDriver($name, $config) {
-        $provider = $this->createUserProvider(carr::get($config, 'provider', null));
+        $providerSessionName = carr::get($config, 'providerSessionName', 'user_provider');
+        $provider = null;
 
-        $guard = new CAuth_Guard_SessionGuard($name, $provider, CSession::instance()->store());
+        if ($providerSessionName) {
+            $provider = c::session()->get($providerSessionName);
+        }
+        if ($provider == null) {
+            $provider = carr::get($config, 'provider', null);
+        }
+        $provider = $this->createUserProvider($provider);
+
+        $guard = new CAuth_Guard_SessionGuard($name, $provider, c::session());
 
         // When using the remember me functionality of the authentication services we
         // will need to be set the encryption instance of the guard, which allows

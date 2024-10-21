@@ -156,6 +156,7 @@ final class CGeo_Provider_Nominatim extends CGeo_ProviderHttpAbstract implements
         if ($key) {
             $queries['key'] = $key;
         }
+
         $url = $this->rootUrl
             . '/reverse' . $this->getExtension() . '?'
             . http_build_query($queries, '', '&', PHP_QUERY_RFC3986);

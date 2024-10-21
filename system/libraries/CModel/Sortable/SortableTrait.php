@@ -198,7 +198,7 @@ trait CModel_Sortable_SortableTrait {
     }
 
     /**
-     * Build eloquent builder of sortable.
+     * Build builder of sortable.
      *
      * @return \CModel_Query
      */

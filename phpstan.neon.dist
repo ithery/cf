@@ -13,12 +13,22 @@ parameters:
     excludePaths:
         analyseAndScan:
             - system/stubs
+            - *.blade.php
         analyse:
             - system/vendor
+            - *.blade.php
+    ignoreErrors:
+        - '#If condition is always true.#'
+        - '#Negated boolean expression is always true.#'
+        - '#Right side of && is always true.#'
+        - '#Left side of && is always true.#'
+        - '#Left side of \|\| is always true.#'
+        - '#Class Error should be written with \:\:class notation, string found.#'
 
 
 parametersSchema:
     checkModelProperties: bool()
+    checkUnusedViews: bool()
 
 conditionalTags:
     CQC_Phpstan_Service_Rule_ModelProperty_ModelPropertyRule:
@@ -27,15 +37,15 @@ conditionalTags:
         phpstan.rules.rule: %checkModelProperties%
 services:
     -
-        class: CQC_Phpstan_Service_Method_RelationForwardsCallsExtension
+        class: CQC_Phpstan_Method_RelationForwardsCallsExtension
         tags:
             - phpstan.broker.methodsClassReflectionExtension
     -
-        class: CQC_Phpstan_Service_Method_ModelForwardsCallsExtension
+        class: CQC_Phpstan_Method_ModelForwardsCallsExtension
         tags:
             - phpstan.broker.methodsClassReflectionExtension
     -
-        class: CQC_Phpstan_Service_Method_ModelQueryForwardsCallsExtension
+        class: CQC_Phpstan_Method_ModelQueryForwardsCallsExtension
         tags:
             - phpstan.broker.methodsClassReflectionExtension
     -
@@ -43,15 +53,15 @@ services:
         tags:
             - phpstan.broker.propertiesClassReflectionExtension
     -
-        class: CQC_Phpstan_Service_Method_HigherOrderCollectionProxyExtension
+        class: CQC_Phpstan_Method_HigherOrderCollectionProxyExtension
         tags:
             - phpstan.broker.methodsClassReflectionExtension
     -
-        class: CQC_Phpstan_Service_Method_Extension
+        class: CQC_Phpstan_Method_Extension
         tags:
             - phpstan.broker.methodsClassReflectionExtension
     -
-        class: CQC_Phpstan_Service_Method_RedirectResponseMethodsClassReflectionExtension
+        class: CQC_Phpstan_Method_RedirectResponseMethodsClassReflectionExtension
         tags:
             - phpstan.broker.methodsClassReflectionExtension
     -

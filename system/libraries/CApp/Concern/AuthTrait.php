@@ -113,7 +113,7 @@ trait CApp_Concern_AuthTrait {
     /**
      * Get Role Object.
      *
-     * @return CApp_Model_Roles
+     * @return null|CApp_Model_Roles
      */
     public function role() {
         if ($this->role == null) {

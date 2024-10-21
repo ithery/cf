@@ -1,5 +1,11 @@
 <?php
 
+/**
+ * @template TKey of array-key
+ * @template TModel of \CModel
+ *
+ * @extends \CCollection<TKey, TModel>
+ */
 class CModel_Collection extends CCollection implements CQueue_QueueableCollectionInterface {
     /**
      * Find a model in the collection by key.

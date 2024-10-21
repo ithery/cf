@@ -2,12 +2,6 @@
 
 defined('SYSPATH') or die('No direct access allowed.');
 
-/**
- * @author Hery Kurniawan
- * @license Ittron Global Teknologi <ittron.co.id>
- *
- * @since Apr 21, 2019, 5:58:13 PM
- */
 class CElement_FormInput_MiniColor extends CElement_FormInput {
     use CTrait_Element_Property_Placeholder;
 
@@ -22,19 +16,20 @@ class CElement_FormInput_MiniColor extends CElement_FormInput {
     public function build() {
         $this->setAttr('placeholder', $this->placeholder);
         $this->setAttr('value', $this->value);
+        $this->addClass('cres:element:control:ColorPicker');
+        $this->setAttr('cres-element', 'control:ColorPicker');
+        $this->setAttr('cres-config', c::json($this->buildControlConfig()));
     }
 
-    public function js($indent = 0) {
-        $js = new CStringBuilder();
-        $js->setIndent($indent);
-        $miniColorOptions = [];
-        $miniColorOptions['control'] = 'hue';
-        $miniColorOptions['position'] = 'bottom left';
-        $miniColorJsonOptions = json_encode($miniColorOptions);
-        $miniColorJs = "$('#" . $this->id . "').minicolors(" . $miniColorJsonOptions . ')';
-        $js->appendln($miniColorJs);
-        $js->append(parent::js());
+    protected function buildControlConfig() {
+        $config = [
+            'applyJs' => 'minicolor',
+            'minicolorsOptions' => [
+                'control' => 'hue',
+                'position' => 'bottom left',
+            ]
+        ];
 
-        return $js->text();
+        return $config;
     }
 }

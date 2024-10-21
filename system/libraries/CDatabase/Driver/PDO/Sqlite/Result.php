@@ -158,6 +158,7 @@ class CDatabase_Driver_PDO_Sqlite_Result extends CDatabase_Result {
         }
     }
 
+    #[\ReturnTypeWillChange]
     public function rewind() {
         // Same problem that seek() has, see above.
         return $this->seek(0);

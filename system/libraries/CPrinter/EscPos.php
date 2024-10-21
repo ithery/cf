@@ -331,8 +331,8 @@ class CPrinter_EscPos {
         return new CPrinter_EscPos_Builder();
     }
 
-    public function renderToHtml($data) {
-        $renderer = new CPrinter_EscPos_Renderer_HtmlRenderer($data);
+    public function renderToHtml($data, CPrinter_EscPos_CapabilityProfile $profile = null) {
+        $renderer = new CPrinter_EscPos_Renderer_HtmlRenderer($data, $profile ?: CPrinter_EscPos_CapabilityProfile::load('default'));
 
         return $renderer->render();
     }

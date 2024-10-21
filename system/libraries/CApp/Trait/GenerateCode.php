@@ -92,7 +92,6 @@ trait CApp_Trait_GenerateCode {
     }
 
     public static function _get_next_code_from_format($key_format) {
-        $db = c::db();
         $key_counter = self::_get_key_counter($key_format);
         $result = $key_counter;
         $counter = self::_get_next_counter($key_counter);

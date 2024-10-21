@@ -132,6 +132,7 @@ HTML;
     }
 
     public function getViewData() {
+        /** @var CApp $this */
         if ($this->viewData == null) {
             $theme_path = '';
 

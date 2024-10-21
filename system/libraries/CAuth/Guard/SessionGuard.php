@@ -449,6 +449,11 @@ class CAuth_Guard_SessionGuard implements CAuth_Contract_StatefulGuardInterface,
      * @return void
      */
     public function login(CAuth_AuthenticatableInterface $user, $remember = false) {
+        $authManager = CAuth::impersonateManager();
+        if ($authManager->isImpersonating()) {
+            $authManager->stop();
+        }
+
         $this->updateSession($user->getAuthIdentifier());
 
         // If the user should be permanently "remembered" by the application we will
@@ -478,6 +483,15 @@ class CAuth_Guard_SessionGuard implements CAuth_Contract_StatefulGuardInterface,
      */
     protected function updateSession($id) {
         $this->session->put($this->getName(), $id);
+        //get the provider for this guart
+        $providerSessionName = CF::config('auth.guards.' . $this->name . '.providerSessionName', 'user_provider');
+        $provider = CF::config('auth.guards.' . $this->name . '.provider');
+
+        if ($providerSessionName && $provider) {
+            $this->session->put($providerSessionName, $provider);
+        }
+
+        //$this->session->put($this->provider->getName(), $id);
     }
 
     /**

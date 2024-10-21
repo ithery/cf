@@ -121,36 +121,6 @@ class CElement_FormInput extends CElement_Element {
         return $this;
     }
 
-    public function setOnText($text) {
-        $this->onText = $text;
-
-        return $this;
-    }
-
-    public function setOffText($text) {
-        $this->offText = $text;
-
-        return $this;
-    }
-
-    public function setChecked($bool) {
-        $this->checked = $bool;
-
-        return $this;
-    }
-
-    public function showUpdown() {
-        $this->showupdown = true;
-
-        return $this;
-    }
-
-    public function hideUpdown() {
-        $this->showupdown = false;
-
-        return $this;
-    }
-
     public function toArray() {
         $data = [];
         if ($this->disabled) {

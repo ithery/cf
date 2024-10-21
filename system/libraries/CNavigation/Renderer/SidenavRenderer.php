@@ -77,17 +77,17 @@ class CNavigation_Renderer_SidenavRenderer extends CNavigation_RendererAbstract 
                     }
                 }
 
-                $li_class = 'sidenav-item cres-sidenav-item ';
+                $liClass = 'sidenav-item cres-sidenav-item ';
 
-                $addition_style = '';
+                $additionStyle = '';
                 if ($border == 'top') {
-                    $addition_style = ' style="border-top:1px solid #bbb"';
+                    $additionStyle = ' style="border-top:1px solid #bbb"';
                 }
                 if ($border == 'bottom') {
-                    $addition_style = ' style="border-bottom:1px solid #bbb"';
+                    $additionStyle = ' style="border-bottom:1px solid #bbb"';
                 }
 
-                $html .= '<li class="' . $li_class . $class . $activeClass . '" ' . $addition_style . '>';
+                $html .= '<li class="' . $liClass . $class . $activeClass . '" ' . $additionStyle . '>';
 
                 $iconClass = carr::get($d, 'icon');
                 if (strlen($iconClass) > 0 && strpos($iconClass, 'fa-') === false && strpos($iconClass, 'ion-') === false) {
@@ -139,8 +139,16 @@ class CNavigation_Renderer_SidenavRenderer extends CNavigation_RendererAbstract 
                 $html .= $elem;
                 $html .= $childHtml;
                 $html .= '</li>';
+                $after = carr::get($d, 'after');
+                if ($after && is_array($after)) {
+                    $separator = carr::get($after, 'separator');
+                    if ($separator == 'line') {
+                        $html .= '<li class="sidenav-item cres-sidenav-item cres-sidenav-item-separator"><hr/></li>';
+                    }
+                }
             }
         }
+
         if (strlen($html) > 0) {
             if ($level == 0) {
                 $html = "  <ul class=\"sidenav-inner \">\r\n" . $html . "  </ul>\r\n";

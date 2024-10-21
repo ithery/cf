@@ -41,36 +41,6 @@ class CElement_FormInput_AutoNumeric extends CElement_FormInput {
         return new CElement_FormInput_AutoNumeric($id);
     }
 
-    protected function build() {
-        $this->setAttr('type', $this->type);
-        $this->setAttr('value', $this->value);
-        if (!isset($this->attr['data-m-dec'])) {
-            $this->setAttr('data-m-dec', $this->decimalDigit);
-        }
-        if (!isset($this->attr['data-a-sep'])) {
-            $this->setAttr('data-a-sep', $this->thousandSeparator);
-        }
-        if (!isset($this->attr['data-a-dec'])) {
-            $this->setAttr('data-a-dec', $this->decimalSeparator);
-        }
-        if ($this->placeholder) {
-            $this->setAttr('placeholder', $this->placeholder);
-        }
-
-        if ($this->maxValue !== null) {
-            $this->setAttr('data-v-max', $this->maxValue);
-        }
-        if ($this->minValue !== null) {
-            $this->setAttr('data-v-min', $this->minValue);
-        }
-        if ($this->readonly) {
-            $this->setAttr('readonly', 'readonly');
-        }
-        if ($this->disabled) {
-            $this->setAttr('disabled', 'disabled');
-        }
-    }
-
     public function setDecimalDigit($digit) {
         $this->decimalDigit = $digit;
 
@@ -111,15 +81,44 @@ class CElement_FormInput_AutoNumeric extends CElement_FormInput {
         return $this;
     }
 
-    public function js($indent = 0) {
-        $js = new CStringBuilder();
-        $js->setIndent($indent);
-        $js->append(parent::jsChild());
+    protected function build() {
+        $this->setAttr('type', $this->type);
+        $this->setAttr('value', $this->value);
+        if (!isset($this->attr['data-m-dec'])) {
+            $this->setAttr('data-m-dec', $this->decimalDigit);
+        }
+        if (!isset($this->attr['data-a-sep'])) {
+            $this->setAttr('data-a-sep', $this->thousandSeparator);
+        }
+        if (!isset($this->attr['data-a-dec'])) {
+            $this->setAttr('data-a-dec', $this->decimalSeparator);
+        }
+        if ($this->placeholder) {
+            $this->setAttr('placeholder', $this->placeholder);
+        }
 
-        $js->append("
-            $('#" . $this->id . "').autoNumeric('init');
-        ");
+        if ($this->maxValue !== null) {
+            $this->setAttr('data-v-max', $this->maxValue);
+        }
+        if ($this->minValue !== null) {
+            $this->setAttr('data-v-min', $this->minValue);
+        }
+        if ($this->readonly) {
+            $this->setAttr('readonly', 'readonly');
+        }
+        if ($this->disabled) {
+            $this->setAttr('disabled', 'disabled');
+        }
+        $this->addClass('cres:element:control:AutoNumeric');
+        $this->setAttr('cres-element', 'control:AutoNumeric');
+        $this->setAttr('cres-config', c::json($this->buildControlConfig()));
+    }
 
-        return $js->text();
+    protected function buildControlConfig() {
+        $config = [
+            'applyJs' => 'autoNumeric',
+        ];
+
+        return $config;
     }
 }

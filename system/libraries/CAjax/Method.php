@@ -280,6 +280,7 @@ class CAjax_Method implements CInterface_Jsonable {
         if (!$this->checkAuth()) {
             throw new CAjax_Exception_AuthAjaxException('Unauthenticated');
         }
+
         $engine = self::createEngine($this, $input);
         $response = $engine->execute();
         if ($response != null && $response instanceof CHTTP_JsonResponse) {

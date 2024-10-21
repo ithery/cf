@@ -332,7 +332,7 @@ class c {
      * @param null|string $message
      * @param array       $context
      *
-     * @return null|\CLogger
+     * @return null|\CLogger_Manager
      */
     public static function logger($message = null, array $context = []) {
         if (is_null($message)) {
@@ -433,7 +433,7 @@ class c {
             return $value->toHtml();
         }
 
-        return htmlspecialchars($value, ENT_QUOTES, 'UTF-8', $doubleEncode);
+        return htmlspecialchars($value ?? '', ENT_QUOTES | ENT_SUBSTITUTE, 'UTF-8', $doubleEncode);
     }
 
     /**
@@ -756,6 +756,9 @@ class c {
         if ($value instanceof Countable) {
             return count($value) === 0;
         }
+        if ($value instanceof CBase_String) {
+            return trim((string) $value) === '';
+        }
 
         return empty($value);
     }
@@ -812,6 +815,30 @@ class c {
      */
     public static function router() {
         return CRouting_Router::instance();
+    }
+
+    /**
+     * Create an Fluent object from the given value.
+     *
+     * @param object|array $value
+     *
+     * @return \CBase_Fluent
+     */
+    public static function fluent($value) {
+        return new CBase_Fluent($value);
+    }
+
+    /**
+     * Return a new literal or anonymous object using named arguments.
+     *
+     * @return \stdClass
+     */
+    public static function literal(...$arguments) {
+        if (count($arguments) === 1 && array_is_list($arguments)) {
+            return $arguments[0];
+        }
+
+        return (object) $arguments;
     }
 
     /**
@@ -995,6 +1022,20 @@ class c {
         }
 
         return CContainer::getInstance()->make($abstract, $parameters);
+    }
+
+    /**
+     * @param null|string $key
+     * @param mixed       $default
+     *
+     * @return CConfig_Repository|mixed
+     */
+    public static function config($key = null, $default = null) {
+        if ($key == null) {
+            return CConfig::repository();
+        }
+
+        return CConfig::repository()->get($key, $default);
     }
 
     /**
@@ -1348,7 +1389,8 @@ class c {
 
     /**
      * @param mixed $obj
-     * @return boolean
+     *
+     * @return bool
      */
     public static function isIterable($obj) {
         return is_array($obj) || (is_object($obj) && ($obj instanceof \Traversable));
@@ -1357,6 +1399,7 @@ class c {
     /**
      * @param string $type
      * @param string $message
+     *
      * @return void
      */
     public static function msg($type, $message) {
@@ -1365,6 +1408,7 @@ class c {
 
     /**
      * @param string $path
+     *
      * @return string
      */
     public static function docRoot($path = null) {
@@ -1408,7 +1452,8 @@ class c {
     }
 
     /**
-     * @param string|null $name
+     * @param null|string $name
+     *
      * @return CStorage_Adapter
      */
     public static function disk($name = null) {
@@ -1417,6 +1462,7 @@ class c {
 
     /**
      * @param callable $callable
+     *
      * @return Closure
      */
     public static function closureFromCallable($callable) {
@@ -1431,6 +1477,7 @@ class c {
 
     /**
      * @param null|mixed $event
+     *
      * @return CBroadcast_PendingBroadcast
      */
     public static function broadcast($event = null) {
@@ -1938,8 +1985,89 @@ class c {
         return CBase_CClsx::clsx(...$args);
     }
 
+    /**
+     * Generate CSS style string from an associative array.
+     *
+     * @param array $styles Styles array
+     *
+     * @return string
+     */
+    public static function stylex($styles) {
+        if (!is_array($styles) || empty($styles)) {
+            return '';
+        }
+
+        if (array_values($styles) === $styles) { // Check if it's an indexed array
+            return implode(';', $styles) . ';';
+        }
+
+        $styleNames = '';
+        foreach ($styles as $key => $value) {
+            $cssPropertyName = cstr::kebabCase($key);
+            if (is_string($value)) {
+                $styleNames .= "{$cssPropertyName}:{$value};";
+
+                continue;
+            }
+
+            if (is_bool($value)) {
+                $styleNames .= $cssPropertyName;
+
+                continue;
+            }
+
+            if (!is_array($value) || empty($value)) {
+                continue;
+            }
+
+            foreach ($value as $condValue => $condition) {
+                if ((is_callable($condition) && $condition()) || $condition) {
+                    $styleNames .= "{$cssPropertyName}:{$condValue};";
+
+                    break;
+                }
+            }
+        }
+
+        return $styleNames;
+    }
+
     public static function elapsed() {
         return microtime(true) - CF_START;
+    }
+
+    /**
+     * Join the given paths together.
+     *
+     * @param null|string $basePath
+     * @param string      ...$paths
+     *
+     * @return string
+     */
+    public static function joinPaths($basePath, ...$paths) {
+        foreach ($paths as $index => $path) {
+            if (empty($path) && $path !== '0') {
+                unset($paths[$index]);
+            } else {
+                $paths[$index] = DIRECTORY_SEPARATOR . ltrim($path, DIRECTORY_SEPARATOR);
+            }
+        }
+
+        return $basePath . implode('', $paths);
+    }
+
+    /**
+     * @return CApp_Visitor
+     */
+    public static function visitor() {
+        return c::app()->visitor();
+    }
+
+    public static function randmd5() {
+        $rand = rand(0, 9999);
+        $base = date('YmdHis') . $rand;
+
+        return md5($rand);
     }
 }
 

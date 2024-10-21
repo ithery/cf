@@ -44,7 +44,6 @@ class CConsole_Command_Phpcsfixer_InstallCommand extends CConsole_Command {
 
     public function handle() {
         $this->downloadPhpcsfixerPharOnBinPath();
-        $this->setupPhpcsfixerConfig();
     }
 
     protected function downloadPhpcsfixerPharOnBinPath() {
@@ -70,25 +69,10 @@ class CConsole_Command_Phpcsfixer_InstallCommand extends CConsole_Command {
 
                 return false;
             }
+        } else {
+            $this->info($pharPath . ' is already installed');
         }
 
         return true;
-    }
-
-
-
-
-    protected function setupPhpcsfixerConfig() {
-        $configFile = CQC::phpcsfixer()->phpcsfixerConfiguration();
-        if (!CFile::exists($configFile)) {
-            $stubFile = DOCROOT.'.php-cs-fixer.dist.php';
-            if (!$stubFile) {
-                $this->error('.php-cs-fixer.dist.php not found on '.$stubFile);
-                exit(1);
-            }
-            $content = CFile::get($stubFile);
-            CFile::put($configFile, $content);
-            $this->info('php-cs-fixer configuration ' . basename($configFile) . ' created on ' . $configFile);
-        }
     }
 }

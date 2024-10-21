@@ -31,7 +31,7 @@ final class CAuth_ImpersonateManager {
             $guardName = c::app()->auth()->guardName();
         }
 
-        $providerName = CF::config("auth.guards.${guardName}.provider");
+        $providerName = CF::config("auth.guards.".$guardName.".provider");
 
         if (empty($providerName)) {
             throw new CAuth_Exception_MissingUserProviderException($guardName);
@@ -45,7 +45,7 @@ final class CAuth_ImpersonateManager {
         }
 
         if (!($modelInstance = $userProvider->retrieveById($id))) {
-            $model = CF::config("auth.providers.${providerName}.model");
+            $model = CF::config("auth.providers.".$providerName.".model");
 
             throw (new CModel_Exception_ModelNotFoundException())->setModel(
                 $model,
@@ -102,6 +102,7 @@ final class CAuth_ImpersonateManager {
 
         try {
             $currentGuard = $this->getCurrentAuthGuardName();
+
             c::session()->put($this->getSessionKey(), $from->getAuthIdentifier());
             c::session()->put($this->getSessionGuard(), $currentGuard);
             c::session()->put($this->getSessionGuardUsing(), $guardName);

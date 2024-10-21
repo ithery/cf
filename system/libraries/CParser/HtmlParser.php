@@ -36,6 +36,8 @@ class CParser_HtmlParser implements CParser_HtmlParser_TokenizerCallbackInterfac
 
     protected $startIndex = 0;
 
+    protected $tagname;
+
     public function __construct($options) {
         $this->options = $options;
         $this->tokenizer = new CParser_HtmlParser_Tokenizer($this->options, $this);
@@ -58,7 +60,7 @@ class CParser_HtmlParser implements CParser_HtmlParser_TokenizerCallbackInterfac
     }
 
     /**
-     * Resets the parser to a blank state, ready to parse a new HTML document
+     * Resets the parser to a blank state, ready to parse a new HTML document.
      */
     public function reset() {
         $this->dispatcher->dispatch(new CParser_HtmlParser_Event_OnReset());
@@ -76,7 +78,7 @@ class CParser_HtmlParser implements CParser_HtmlParser_TokenizerCallbackInterfac
     }
 
     /**
-     * Parses a complete HTML document and pushes it to the handler
+     * Parses a complete HTML document and pushes it to the handler.
      *
      * @param mixed $data
      */

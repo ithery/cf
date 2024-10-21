@@ -9,6 +9,11 @@ defined('SYSPATH') or die('No direct access allowed.');
  * @see https://github.com/nehakadam/DateTimePicker
  */
 class CElement_FormInput_DateTime_ModalDateTime extends CElement_FormInput_DateTime {
+    /**
+     * @var string
+     */
+    protected $parentElementSelector;
+
     public function __construct($id) {
         parent::__construct($id);
         c::manager()->registerModule('datetimepicker');
@@ -34,6 +39,13 @@ class CElement_FormInput_DateTime_ModalDateTime extends CElement_FormInput_DateT
         $this->addClass('form-control');
         $this->addClass('cres-control-modal-datetime');
         $this->after()->addDiv($this->id . '-dtbox');
+    }
+
+    public function setParentElementSelector($selector) {
+        if ($selector instanceof CRenderable) {
+            $selector = '#' . $selector->id();
+        }
+        $this->parentElementSelector = $selector;
     }
 
     protected function getTranslation($key) {
@@ -107,6 +119,9 @@ class CElement_FormInput_DateTime_ModalDateTime extends CElement_FormInput_DateT
         $options .= 'shortMonthNames:' . $this->getShortMonthNames() . ',';
         $options .= 'fullMonthNames:' . $this->getFullMonthNames() . ',';
         $options .= "clearButtonContent:'" . $this->getTranslation('clear') . "',";
+        if ($this->parentElementSelector) {
+            $options .= "parentElement: '" . $this->parentElementSelector . "',";
+        }
 
         $options .= 'isPopup:true,';
         $options .= '}';

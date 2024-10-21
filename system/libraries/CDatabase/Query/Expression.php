@@ -29,4 +29,13 @@ class CDatabase_Query_Expression implements CDatabase_Contract_Query_ExpressionI
     public function getValue(CDatabase_Grammar $grammar) {
         return $this->value;
     }
+
+    /**
+     * Get the value of the expression.
+     *
+     * @return string
+     */
+    public function __toString() {
+        return (string) $this->getValue(c::db()->getQueryGrammar());
+    }
 }

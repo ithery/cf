@@ -178,7 +178,7 @@ class CTranslation_Driver_FileDriver extends CTranslation_DriverAbstract impleme
      *
      * @param string $language
      *
-     * @return Collection
+     * @return CCollection
      */
     public function getGroupTranslationsFor($language) {
         return $this->getGroupFilesFor($language)->mapWithKeys(function ($group) {

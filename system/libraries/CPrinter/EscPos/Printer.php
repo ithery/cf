@@ -120,6 +120,7 @@ class CPrinter_EscPos_Printer {
 
                 break;
         }
+
         if (!$this->profile->getSupportsBarcodeB()) {
             // A simpler barcode command which supports fewer codes
             self::validateInteger($type, 65, 71, __FUNCTION__);

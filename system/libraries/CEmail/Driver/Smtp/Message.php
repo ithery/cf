@@ -11,14 +11,28 @@ class CEmail_Driver_Smtp_Message {
 
     protected $options;
 
+    protected $type;
+
+    protected $uniqueid = '';
+
+    protected $boundaries;
+
+    protected $alt_body;
+
     public function __construct($to, $body, $subject, CEmail_Config $config, $options) {
         $this->config = $config;
         $this->options = $options;
         $this->body = $body;
         $this->headers = [];
         $this->extraHeaders = [];
+
+        $from = $this->config->getFrom();
+        if ($this->config->getFromName()) {
+            $from = $this->config->getFromName() . ' <' . $this->config->getFrom() . '>';
+        }
+
         $this->setHeader('Subject', $subject);
-        $this->setHeader('From', $this->config->getOption('username'));
+        $this->setHeader('From', $from);
         $this->setHeader('To', CEmail_DriverAbstract::formatAddresses($to));
 
         foreach (['cc' => 'Cc', 'bcc' => 'Bcc', 'reply_to' => 'Reply-To'] as $key => $header) {
@@ -28,6 +42,10 @@ class CEmail_Driver_Smtp_Message {
                 $this->setHeader($header, CEmail_DriverAbstract::formatAddresses($list));
             }
         }
+
+        $this->setHeader('MINE-Version', '1.0');
+        $this->setHeader('Content-Type', 'text/' . $this->type() . '; charset="' . $this->charset() . '"');
+        $this->setHeader('Content-Transfer-Encoding', $this->encoding());
     }
 
     /**
@@ -43,7 +61,7 @@ class CEmail_Driver_Smtp_Message {
         $encoding = $this->encoding();
 
         $headers = '';
-        $parts = ['Date', 'Return-Path', 'From', 'To', 'Cc', 'Bcc', 'Reply-To', 'Subject', 'Message-ID', 'X-Priority', 'X-Mailer', 'MIME-Version', 'Content-Type'];
+        $parts = ['Date', 'Return-Path', 'From', 'To', 'Cc', 'Bcc', 'Reply-To', 'Subject', 'Message-ID', 'X-Priority', 'X-Mailer', 'MIME-Version', 'Content-Type', 'Content-Transfer-Encoding'];
         $noBcc and array_splice($parts, 5, 1);
 
         foreach ($parts as $part) {
@@ -180,6 +198,49 @@ class CEmail_Driver_Smtp_Message {
     }
 
     /**
+     * Set the boundaries to use for delimiting MIME parts.
+     * If you override this, ensure you set all 3 boundaries to unique values.
+     * The default boundaries include a "=_" sequence which cannot occur in quoted-printable bodies,
+     * as suggested by https://www.rfc-editor.org/rfc/rfc2045#section-6.7.
+     *
+     * @return void
+     */
+    protected function setBoundaries() {
+        $this->uniqueid = $this->generateId();
+        $this->boundaries[0] = 'b1=_' . $this->uniqueid;
+        $this->boundaries[1] = 'b2=_' . $this->uniqueid;
+        $this->boundaries[2] = 'b3=_' . $this->uniqueid;
+    }
+
+    /**
+     * Create a unique ID to use for boundaries.
+     *
+     * @return string
+     */
+    protected function generateId() {
+        $len = 32; //32 bytes = 256 bits
+        $bytes = '';
+        if (function_exists('random_bytes')) {
+            try {
+                $bytes = random_bytes($len);
+            } catch (Exception $e) {
+                //Do nothing
+            }
+        } elseif (function_exists('openssl_random_pseudo_bytes')) {
+            /** @noinspection CryptographicallySecureRandomnessInspection */
+            $bytes = openssl_random_pseudo_bytes($len);
+        }
+        if ($bytes === '') {
+            //We failed to produce a proper random string, so make do.
+            //Use a hash to force the length to the same as the other methods
+            $bytes = hash('sha256', uniqid((string) mt_rand(), true), true);
+        }
+
+        //We don't care about messing up base64 format here, just want a random string
+        return str_replace(['=', '+', '/'], '', base64_encode(hash('sha256', $bytes, true)));
+    }
+
+    /**
      * Encodes a mimeheader.
      *
      * @param string $header Header to encode
@@ -187,7 +248,6 @@ class CEmail_Driver_Smtp_Message {
      * @return string Mimeheader encoded string
      */
     protected function encodeMimeheader($header) {
-
         // determine the transfer encoding to be used
         $transferEncoding = ($this->encoding() === 'quoted-printable') ? 'Q' : 'B';
 
@@ -234,7 +294,7 @@ class CEmail_Driver_Smtp_Message {
     }
 
     public function newline() {
-        return $this->config->getOption('newline', PHP_EOL);
+        return $this->config->getOption('newline', "\r\n");
     }
 
     /**

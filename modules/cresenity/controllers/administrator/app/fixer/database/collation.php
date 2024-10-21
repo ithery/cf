@@ -20,20 +20,21 @@ class Controller_Administrator_App_Fixer_Database_Collation extends CApp_Adminis
 
         $app->addDiv('data-type-result');
 
-        echo $app->render();
+        return $app;
     }
 
     public function check() {
         $app = CApp::instance();
 
-        $db = CDatabase::instance();
+        $db = c::db();
         $schemaManager = $db->getSchemaManager();
         $tables = $schemaManager->listTableNames();
         $haveChanged = false;
         foreach ($tables as $table) {
-            $sql = DatabaseFixer::sqlCollation($table);
+            $sqls = DatabaseFixer::sqlCollation($table);
 
-            if (strlen($sql) > 0) {
+            if (count($sqls) > 0) {
+                $sql = implode(";\n", $sqls);
                 $template = $app->addTemplate()
                     ->setTemplate('CApp/Administrator/Fixer/Database/Collation/Result')
                     ->setVar('table', $table)
@@ -50,20 +51,22 @@ class Controller_Administrator_App_Fixer_Database_Collation extends CApp_Adminis
             $app->addAlert()->setType('success')->add('No Problem Found');
         }
 
-        echo $app->render();
+        return $app;
     }
 
     public function execute($table) {
         $sql = DatabaseFixer::sqlCollation($table);
-        $db = CDatabase::instance();
+        $db = c::db();
         $errCode = 0;
         $errMessage = '';
+
         try {
             $db->query($sql);
         } catch (Exception $ex) {
             $errCode++;
             $errMessage = $ex->getMessage();
         }
-        echo CApp_Base::jsonResponse($errCode, $errMessage);
+
+        return CApp_Base::toJsonResponse($errCode, $errMessage);
     }
 }

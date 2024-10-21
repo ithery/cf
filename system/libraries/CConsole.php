@@ -25,7 +25,7 @@ class CConsole {
 
     public static function prefix() {
         $appConfig = CConfig::instance('app');
-        $appConfig->refresh();
+        // $appConfig->refresh();
 
         return $appConfig->get('prefix');
     }

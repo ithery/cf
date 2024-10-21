@@ -41,4 +41,9 @@ return [
         'label' => c::__('Select2'),
         'uri' => 'demo/cresjs/alpine/select2/index',
     ],
+    [
+        'name' => 'cresjs.alpine.treenode',
+        'label' => c::__('Tree Node'),
+        'uri' => 'demo/cresjs/alpine/treenode/index',
+    ],
 ];

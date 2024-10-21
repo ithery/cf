@@ -15,7 +15,7 @@ class CConsole_Command_PhpstanCommand extends CConsole_Command {
      *
      * @var string
      */
-    protected $signature = 'phpstan {file?} {--format=table : format to display} {--debug} {--no-progress}';
+    protected $signature = 'phpstan {path?} {--format=table : format to display} {--debug} {--no-progress}';
 
     public function handle() {
         $isFramework = CF::appCode() == null;
@@ -23,10 +23,21 @@ class CConsole_Command_PhpstanCommand extends CConsole_Command {
         $debug = $this->option('debug');
         $noProgress = $this->option('no-progress');
         $appDir = $isFramework ? DOCROOT . 'system/libraries/CElement' : c::appRoot();
-        $file = $this->argument('file');
+        $path = $this->argument('path');
+        // Get the current working directory
+        $currentWorkingDirectory = getcwd();
+        $fullPath = $path;
+        // Check if the path is relative or absolute
+        if (!$this->isAbsolutePath($path)) {
+            // If the path is relative, convert it to an absolute path
+            $fullPath = realpath($currentWorkingDirectory . DIRECTORY_SEPARATOR . $path);
+        } else {
+            // If the path is absolute, use it directly
+            $fullPath = realpath($path);
+        }
         $scanPath = $appDir;
-        if ($file) {
-            $scanPath = $file;
+        if ($path) {
+            $scanPath = $fullPath;
         }
 
         if (!$this->isPhpStanInstalled()) {
@@ -71,5 +82,10 @@ class CConsole_Command_PhpstanCommand extends CConsole_Command {
 
     private function phpBinary() {
         return (new PhpExecutableFinder())->find(false);
+    }
+
+    // Helper function to check if a path is absolute
+    private function isAbsolutePath($path) {
+        return $path[0] === '/' || $path[1] === ':' || substr($path, 0, 2) === '\\\\';
     }
 }

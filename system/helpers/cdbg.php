@@ -659,6 +659,57 @@ class cdbg {
     }
 
     /**
+     * @return array
+     */
+    public static function callerInfoArray() {
+        $c = '';
+        $file = '';
+        $func = '';
+        $class = '';
+        // Older php version don't have 'DEBUG_BACKTRACE_IGNORE_ARGS', so manually remove the args from the backtrace
+        if (!defined('DEBUG_BACKTRACE_IGNORE_ARGS')) {
+            $trace = array_map(function ($item) {
+                unset($item['args']);
+
+                return $item;
+            }, debug_backtrace(false));
+        } else {
+            $trace = debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS);
+        }
+
+        if (isset($trace[2])) {
+            $file = carr::get($trace, '1.file');
+            $line = carr::get($trace, '1.line');
+            $func = carr::get($trace, '2.function');
+            if ((substr($func, 0, 7) == 'include') || (substr($func, 0, 7) == 'require')) {
+                $func = '';
+            }
+        } elseif (isset($trace[1])) {
+            $file = carr::get($trace, '1.file');
+            $line = carr::get($trace, '1.line');
+            $func = '';
+        }
+        if (isset($trace[3]['class'])) {
+            $class = carr::get($trace, '3.class');
+            $func = carr::get($trace, '3.function');
+            $file = carr::get($trace, '2.file');
+            $line = carr::get($trace, '2.line');
+        } elseif (isset($trace[2]['class'])) {
+            $class = carr::get($trace, '2.class');
+            $func = carr::get($trace, '2.function');
+            $file = carr::get($trace, '1.file');
+            $line = carr::get($trace, '1.line');
+        }
+        $r = [];
+        $r['file'] = $file;
+        $r['line'] = $line;
+        $r['class'] = $class;
+        $r['function'] = $func;
+
+        return $r;
+    }
+
+    /**
      * @return string
      */
     public static function callerInfo() {
@@ -702,7 +753,7 @@ class cdbg {
         }
 
         $c = $file . ':' . $line . ' ';
-        $c .= ($class != '') ? ':' . $class . '->' : '';
+        $c .= ($class != '') ? ' ' . $class . '->' : '';
         $c .= ($func != '') ? $func . '(): ' : '';
 
         return $c;

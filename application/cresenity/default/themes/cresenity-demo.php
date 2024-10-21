@@ -14,7 +14,6 @@ return [
         'perfect-scrollbar',
         'sidenav',
         'cropper',
-        'layout-helpers',
         'form',
         'fileupload',
         'notify',

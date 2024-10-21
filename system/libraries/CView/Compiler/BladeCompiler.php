@@ -22,8 +22,11 @@ class CView_Compiler_BladeCompiler extends CView_CompilerAbstract implements CVi
         CView_Compiler_BladeCompiler_CompileLayoutTrait,
         CView_Compiler_BladeCompiler_CompileLoopTrait,
         CView_Compiler_BladeCompiler_CompileRawPhpTrait,
+        CView_Compiler_BladeCompiler_CompileSessionTrait,
         CView_Compiler_BladeCompiler_CompileStackTrait,
+        CView_Compiler_BladeCompiler_CompileStyleTrait,
         CView_Compiler_BladeCompiler_CompileTranslationTrait,
+        CView_Compiler_BladeCompiler_CompileUseStatementTrait,
         CTrait_ReflectsClosureTrait;
 
     /**

@@ -25,6 +25,7 @@ trait CTrait_Controller_Application_Log_System {
             $tab = $tabList->addTab()
                 ->setLabel("${year} - ${month}")
                 ->addClass('p-0')
+                ->setNoPadding()
                 ->setAjaxUrl($this->currentUrl() . "tabDaily/${year}/${month}");
         }
 
@@ -49,6 +50,7 @@ trait CTrait_Controller_Application_Log_System {
 
     public function tabDaily($year, $month) {
         $app = c::app();
+
         $path = DOCROOT . 'logs/' . CF::appCode();
 
         $path .= DS . $year;
@@ -74,6 +76,7 @@ trait CTrait_Controller_Application_Log_System {
                 $tab = $tabList->addTab()
                     ->setLabel($basename)
                     ->addClass('p-0')
+                    ->setNoPadding()
                     ->setAjaxUrl($this->currentUrl() . "systemTable/${year}/${month}?file=" . urlencode($basename));
             }
         }
@@ -82,6 +85,7 @@ trait CTrait_Controller_Application_Log_System {
     }
 
     public function systemTable($year, $month) {
+
         $file = c::request()->file;
         $app = c::app();
         $path = DOCROOT . 'logs/' . CF::appCode();

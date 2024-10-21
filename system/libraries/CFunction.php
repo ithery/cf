@@ -94,6 +94,9 @@ class CFunction {
             if ($this->func instanceof OpisSerializableClosure) {
                 return $this->func->__invoke(...$args);
             }
+            if ($this->func instanceof CFunction_SerializableClosure) {
+                return $this->func->__invoke(...$args);
+            }
         }
         if ($error == 0) {
             if (is_array($this->func)) {
@@ -161,6 +164,10 @@ class CFunction {
 
     public static function serializeClosure(Closure $func) {
         return new CFunction_SerializableClosure($func);
+    }
+
+    public static function isSerializeClosure($func) {
+        return $func instanceof CFunction_SerializableClosure;
     }
 
     public static function getClosureCode(Closure $c) {

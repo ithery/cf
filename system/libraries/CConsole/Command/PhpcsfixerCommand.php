@@ -15,7 +15,7 @@ class CConsole_Command_PhpcsfixerCommand extends CConsole_Command {
      *
      * @var string
      */
-    protected $signature = 'php-cs-fixer {file?} {--format=table : format to display} {--debug} {--ignore-env}';
+    protected $signature = 'php-cs-fixer {path?} {--format=table : format to display} {--debug} {--ignore-env}';
 
     public function handle() {
         $isFramework = CF::appCode() == null;
@@ -23,10 +23,21 @@ class CConsole_Command_PhpcsfixerCommand extends CConsole_Command {
         $debug = $this->option('debug');
         $ignoreEnv = $this->option('ignore-env');
         $appDir = $isFramework ? DOCROOT . 'system/libraries/CElement' : c::appRoot();
-        $file = $this->argument('file');
+        $path = $this->argument('path');
+        // Get the current working directory
+        $currentWorkingDirectory = getcwd();
+        $fullPath = $path;
+        // Check if the path is relative or absolute
+        if (!$this->isAbsolutePath($path)) {
+            // If the path is relative, convert it to an absolute path
+            $fullPath = realpath($currentWorkingDirectory . DIRECTORY_SEPARATOR . $path);
+        } else {
+            // If the path is absolute, use it directly
+            $fullPath = realpath($path);
+        }
         $scanPath = $appDir;
-        if ($file) {
-            $scanPath = $file;
+        if ($path) {
+            $scanPath = $fullPath;
         }
 
         if (!$this->isPhpCsFixerInstalled()) {
@@ -35,10 +46,10 @@ class CConsole_Command_PhpcsfixerCommand extends CConsole_Command {
 
         chdir($isFramework ? DOCROOT : c::appRoot());
         //$command = [$this->phpBinary(), $this->getPhpCsPhar(),$appDir];
-        $command = [$this->phpBinary(), $this->getPhpCsFixerPhar(), '--config='.CQC::phpcsfixer()->phpcsfixerConfiguration()];
+        $command = [$this->phpBinary(), $this->getPhpCsFixerPhar(), '--config=' . CQC::phpcsfixer()->phpcsfixerConfiguration()];
         $command[] = 'fix';
         $command[] = $scanPath;
-        $envVariables=[];
+        $envVariables = [];
         if ($ignoreEnv) {
             $envVariables['PHP_CS_FIXER_IGNORE_ENV'] = 1;
         }
@@ -71,5 +82,10 @@ class CConsole_Command_PhpcsfixerCommand extends CConsole_Command {
 
     private function phpBinary() {
         return (new PhpExecutableFinder())->find(false);
+    }
+
+    // Helper function to check if a path is absolute
+    private function isAbsolutePath($path) {
+        return $path[0] === '/' || $path[1] === ':' || substr($path, 0, 2) === '\\\\';
     }
 }

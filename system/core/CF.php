@@ -181,27 +181,6 @@ final class CF {
         // Set and test the logger instance, we need to know whats wrong when CF Fail
         self::$logger = CLogger::logger();
 
-        // Disable notices and "strict" errors
-        $ER = error_reporting(~E_NOTICE & ~E_STRICT);
-
-        if (function_exists('date_default_timezone_set')) {
-            $timezone = self::config('app.timezone');
-
-            // Set default timezone, due to increased validation of date settings
-            // which cause massive amounts of E_NOTICEs to be generated in PHP 5.2+
-            date_default_timezone_set(empty($timezone) ? date_default_timezone_get() : $timezone);
-        }
-
-        // Restore error reporting
-        error_reporting($ER);
-
-        // Load locales
-        $locale = self::config('app.locale');
-
-        // Set locale information
-        self::$locale = setlocale(LC_ALL, $locale);
-        // Set locale information
-        self::$fallbackLocale = self::config('app.fallback_locale');
         CFBenchmark::stop(SYSTEM_BENCHMARK . '_environment_setup');
         self::fireCallbacks(self::$bootingCallbacks);
         static::loadBootstrapFiles();
@@ -285,8 +264,8 @@ final class CF {
     }
 
     /**
-     * @param type $directory
-     * @param type $domain
+     * @param string      $directory
+     * @param null|string $domain
      *
      * @return string
      */
@@ -433,24 +412,14 @@ final class CF {
     /**
      * Get a config item or group.
      *
-     * @param mixed      $group
+     * @param mixed      $key
      * @param null|mixed $default
      * @param mixed      $required
      *
      * @return CConfig|mixed
      */
-    public static function config($group, $default = null, $required = true) {
-        $path = null;
-        if (strpos($group, '.') !== false) {
-            // Split the config group and path
-            list($group, $path) = explode('.', $group, 2);
-        }
-
-        $config = CConfig::instance($group);
-
-        $value = $config->get($path, $default);
-
-        return $value;
+    public static function config($key, $default = null, $required = true) {
+        return CConfig::repository()->get($key, $default);
     }
 
     /**
@@ -705,7 +674,11 @@ final class CF {
             return constant('CFCLI_APPCODE');
         }
         if (CF::isTesting()) {
-            foreach ($_SERVER['argv'] as $argv) {
+            $serverArgv = $_SERVER['argv'];
+            if (!is_array($serverArgv)) {
+                $serverArgv = [$serverArgv];
+            }
+            foreach ($serverArgv as $argv) {
                 if (substr($argv, -strlen('phpunit.xml')) === (string) 'phpunit.xml') {
                     if (file_exists($argv)) {
                         $content = file_get_contents($argv);
@@ -724,7 +697,11 @@ final class CF {
     public static function domain() {
         $domain = '';
         if (CF::isTesting()) {
-            foreach ($_SERVER['argv'] as $argv) {
+            $serverArgv = $_SERVER['argv'];
+            if (!is_array($serverArgv)) {
+                $serverArgv = [$serverArgv];
+            }
+            foreach ($serverArgv as $argv) {
                 if (substr($argv, -strlen('phpunit.xml')) === (string) 'phpunit.xml') {
                     if (file_exists($argv)) {
                         $content = file_get_contents($argv);
@@ -817,6 +794,7 @@ final class CF {
                     if (static::isFile($path . $search)) {
                         // A matching file has been found
                         $found = $path . $search;
+
                         // Stop searching
                         break;
                     }
@@ -926,6 +904,9 @@ final class CF {
             if ($paths[0] == 'application') {
                 return $paths[1];
             }
+        }
+        if (defined('CF_APPCODE')) {
+            return constant('CF_APPCODE');
         }
 
         if (CF::isCFCli() || CF::isTesting()) {
@@ -1101,6 +1082,7 @@ final class CF {
      */
     public static function setLocale($locale) {
         static::$locale = $locale;
+        // setlocale(LC_ALL, $locale);
         CTranslation::translator()->setLocale($locale);
         CCarbon::setLocale($locale);
         CEvent::dispatch('cf.locale.updated');
@@ -1113,7 +1095,7 @@ final class CF {
      *
      * @return void
      */
-    public function setFallbackLocale($fallbackLocale) {
+    public static function setFallbackLocale($fallbackLocale) {
         static::$fallbackLocale = $fallbackLocale;
         CTranslation::translator()->setFallback($fallbackLocale);
     }

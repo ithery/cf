@@ -26,7 +26,7 @@ class CObservable_Listener_Handler_PrependHandler extends CObservable_Listener_H
         $this->name = 'Prepend';
         $this->method = 'get';
         $this->target = '';
-        $this->content = CHandlerElement::factory();
+        $this->content = CObservable_HandlerElement::factory();
         $this->param_inputs = [];
     }
 
@@ -37,11 +37,13 @@ class CObservable_Listener_Handler_PrependHandler extends CObservable_Listener_H
         foreach ($inputs as $inp) {
             $this->param_inputs[] = $inp;
         }
+
         return $this;
     }
 
     public function setMethod($method) {
         $this->method = $method;
+
         return $this;
     }
 
@@ -51,6 +53,7 @@ class CObservable_Listener_Handler_PrependHandler extends CObservable_Listener_H
 
     public function setCheckDuplicateSelector($selector) {
         $this->check_duplicate_selector = $selector;
+
         return $this;
     }
 

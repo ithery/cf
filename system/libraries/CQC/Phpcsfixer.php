@@ -22,12 +22,23 @@ class CQC_Phpcsfixer {
         return DOCROOT . '.bin' . DS . 'php-cs-fixer' . DS . 'php-cs-fixer.phar';
     }
 
-
-    public static function phpcsfixerConfiguration() {
+    public static function phpcsfixerAppConfiguration() {
         if (CF::appCode() == null) {
-            //do nothing CF already have phpcs.xml
+            return null;
         }
 
-        return c::appRoot() . '.php-cs-fixer.dist.php';
+        $appConfiguration = c::appRoot() . '.php-cs-fixer.dist.php';
+
+        return $appConfiguration;
+    }
+
+    public static function phpcsfixerConfiguration() {
+        $cfConfiguration = DOCROOT . '.php-cs-fixer.dist.php';
+        if (CF::appCode() == null) {
+            return $cfConfiguration;
+        }
+        $appConfiguration = self::phpcsfixerAppConfiguration();
+
+        return CFile::exists($appConfiguration) ? $appConfiguration : $cfConfiguration;
     }
 }

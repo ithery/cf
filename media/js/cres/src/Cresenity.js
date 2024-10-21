@@ -42,8 +42,10 @@ import { isJson } from './util/helper';
 import * as dateFns from 'date-fns';
 import CresenityHistory from './history';
 import clsx from './module/clsx';
+import stylex from './module/stylex';
 import collect from 'collect.js';
 import emitter from './cresenity/emitter';
+import bootstrapHelper from './module/BootstrapHelper';
 
 export default class Cresenity {
     constructor() {
@@ -100,6 +102,7 @@ export default class Cresenity {
         this.checkAuthenticationInterval = null;
         this.dateFns = dateFns;
         this.clsx = clsx;
+        this.stylex = stylex;
         this.collect = collect;
         this.emitter = emitter;
     }
@@ -162,21 +165,25 @@ export default class Cresenity {
     on(eventName, cb) {
         window.addEventListener('cresenity:' + eventName, cb);
     }
-
+    async handleResponseAsync(data) {
+        return new Promise(async (resolve, reject) => {
+            if(data.assets) {
+                if(data.assets.css) {
+                    for (let i = 0; i < data.assets.css.length; i++) {
+                        await this.cf.requireCssAsync(data.assets.css[i]);
+                    }
+                }
+                if(data.assets.js) {
+                    for (let i = 0; i < data.assets.js.length; i++) {
+                        await this.cf.requireJsAsync(data.assets.js[i]);
+                    }
+                }
+            }
+            resolve(data);
+        });
+    }
     handleResponse(data, callback) {
-        if (data.cssRequire && data.cssRequire.length > 0) {
-            for (let i = 0; i < data.cssRequire.length; i++) {
-                this.cf.require(data.cssRequire[i], 'css');
-            }
-        }
-
-        if (data.css_require && data.css_require.length > 0) {
-            for (let i = 0; i < data.css_require.length; i++) {
-                this.cf.require(data.css_require[i], 'css');
-            }
-        }
-
-        callback();
+        this.handleResponseAsync(data).then(callback);
     }
     htmlModal(html) {
         showHtmlModal(html);
@@ -524,10 +531,17 @@ export default class Cresenity {
             reloadOptions.selector = modalBody;
             this.reload(reloadOptions);
         }
+        if(bootstrapHelper.isBootstrap5()) {
+            let modal = new window.bootstrap.Modal(modalContainer[0], {
+                backdrop: settings.backdrop
+            });
+            modal.show();
+        } else {
+            modalContainer.modal({
+                backdrop: settings.backdrop
+            });
 
-        modalContainer.modal({
-            backdrop: settings.backdrop
-        });
+        }
 
         return modalContainer;
     }
@@ -985,6 +999,12 @@ export default class Cresenity {
         }
         return elm.html();
     }
+    isUsingBootstrap() {
+        bootstrapHelper.isBootstrap();
+    }
+    initDependency() {
+        bootstrapHelper.check();
+    }
     initConfirm() {
         elementRendered('a.confirm, button.confirm, input[type=submit].confirm', (el)=>{
             $(el).click((e)=>{
@@ -1103,6 +1123,7 @@ export default class Cresenity {
                     this.scrollToTop.init();
                 }
             }
+            this.initDependency();
             this.initElement();
             this.initConfirm();
             this.initReload();

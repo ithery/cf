@@ -27,15 +27,16 @@ class Controller_Administrator_App_Fixer_Database_Relationship extends CApp_Admi
     public function check() {
         $app = CApp::instance();
 
-        $db = CDatabase::instance();
+        $db = c::db();
         $schemaManager = $db->getSchemaManager();
         $tables = $schemaManager->listTableNames();
         $schema = $schemaManager->createSchema();
         $haveChanged = false;
         foreach ($tables as $table) {
-            $sql = DatabaseFixer::sqlRelationship($table);
+            $sqls = DatabaseFixer::sqlRelationship($table);
 
-            if (strlen($sql) > 0) {
+            if (count($sqls) > 0) {
+                $sql = implode(";\n", $sqls);
                 $template = $app->addTemplate()
                     ->setTemplate('CApp/Administrator/Fixer/Database/Relationship/Result')
                     ->setVar('table', $table)
@@ -60,9 +61,10 @@ class Controller_Administrator_App_Fixer_Database_Relationship extends CApp_Admi
 
     public function execute($table) {
         $sql = DatabaseFixer::sqlRelationship($table);
-        $db = CDatabase::instance();
+        $db = c::db();
         $errCode = 0;
         $errMessage = '';
+
         try {
             $db->query($sql);
         } catch (Exception $ex) {

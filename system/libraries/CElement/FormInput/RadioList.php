@@ -14,7 +14,10 @@ class CElement_FormInput_RadioList extends CElement_FormInput {
         parent::build();
         foreach ($this->list as $key => $value) {
             $controlName = $this->name ?: $this->id;
-            $this->addRadioControl()->setName($controlName)->setValue($key)->setLabel($value);
+            $radioControl = $this->addRadioControl()->setName($controlName)->setValue($key)->setLabel($value);
+            if ($key == $this->value) {
+                $radioControl->setChecked();
+            }
         }
     }
 }

@@ -70,7 +70,6 @@ class CConsole_Kernel implements CConsole_KernelInterface {
         }
         $this->events = $events;
 
-        CBootstrap::instance()->boot();
         CF::booted(function () {
             if (!CF::isTesting()) {
                 $this->rerouteSymfonyCommandEvents();
