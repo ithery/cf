@@ -392,7 +392,17 @@ class CModel_HasResource_FileAdder_FileAdder {
     protected function processResourceItem(CModel_HasResourceInterface $model, CModel_Resource_ResourceInterface $resource, self $fileAdder) {
         $this->guardAgainstDisallowedFileAdditions($resource, $model);
         $model->resource()->save($resource);
-        $this->filesystem->add($fileAdder->pathToFile, $resource, $fileAdder->fileName);
+        /** @var CModel|CModel_HasResourceInterface $model */
+        /** @var CModel|CModel_Resource_ResourceInterface $resource */
+        if (!$resource->getConnectionName()) {
+            $resource->setConnection($model->getConnectionName());
+        }
+        if ($fileAdder->file instanceof CResources_Support_RemoteFile) {
+            $this->filesystem->addRemote($fileAdder->file, $resource, $fileAdder->fileName);
+        } else {
+            $this->filesystem->add($fileAdder->pathToFile, $resource, $fileAdder->fileName);
+        }
+
         if (!$fileAdder->preserveOriginal) {
             unlink($fileAdder->pathToFile);
         }
@@ -400,6 +410,9 @@ class CModel_HasResource_FileAdder_FileAdder {
             $generateResponsiveImagesJobClass = CF::config('resource.jobs.generate_responsive_images', CResources_TaskQueue_GenerateResponsiveImage::class);
             $job = new $generateResponsiveImagesJobClass($resource);
             /** @var CQueue_AbstractTask $job */
+            if ($customConnection = CF::config('resource.queue_connection_name')) {
+                $job->onConnection($customConnection);
+            }
             if ($customQueue = CF::config('resource.queue_name')) {
                 $job->onQueue($customQueue);
             }

@@ -189,6 +189,12 @@ trait CModel_Resource_ResourceTrait {
         return strtolower(CF::config("storage.disks.{$this->disk}.driver"));
     }
 
+    public function getConversionsDiskDriverName(): string {
+        $diskName = $this->conversions_disk ?? $this->disk;
+
+        return strtolower(CF::config("storage.disks.{$diskName}.driver"));
+    }
+
     /**
      * Determine if the media item has a custom property with the given name.
      *

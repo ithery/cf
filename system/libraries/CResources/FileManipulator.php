@@ -130,6 +130,7 @@ class CResources_FileManipulator {
         $performConversionsJobClass = CF::config('resource.task_queue.perform_conversions', CResources_TaskQueue_PerformConversions::class);
         $job = new $performConversionsJobClass($queuedConversions, $resource);
 
+        /** @var CQueue_AbstractTask $job */
         if ($customQueue = CF::config('resource.queue_name')) {
             $job->onQueue($customQueue);
         }
