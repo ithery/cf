@@ -355,7 +355,9 @@ trait CModel_Resource_ResourceTrait {
     public function copy(
         CModel_HasResourceInterface $model,
         $collectionName = 'default',
-        $diskName = ''
+        $diskName = '',
+        $fileName = '',
+        $fileAdderCallback = null
     ) {
         $temporaryDirectory = CResources_Helpers_TemporaryDirectory::create();
         $temporaryFile = $temporaryDirectory->path($this->file_name);
@@ -365,10 +367,16 @@ trait CModel_Resource_ResourceTrait {
             ->addResource($temporaryFile)
             ->usingName($this->name)
             ->setOrder($this->order_column)
+            ->withManipulations($this->manipulations)
             ->withCustomProperties($this->custom_properties);
-
+        if ($fileName !== '') {
+            $fileAdder->usingFileName($fileName);
+        }
+        if ($fileAdderCallback instanceof Closure) {
+            $fileAdder = $fileAdderCallback($fileAdder);
+        }
         $newMedia = $fileAdder
-            ->toResourceCollection($collectionName);
+            ->toResourceCollection($collectionName, $diskName);
         $temporaryDirectory->delete();
 
         return $newMedia;
