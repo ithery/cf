@@ -16,6 +16,11 @@ use CResources_ImageGenerator_FileType_ImageType as ImageGenerator;
 
 class CModel_HasResource_FileAdder_FileAdder {
     /**
+     * @var null|int
+     */
+    public $order = null;
+
+    /**
      * @var CModel|CModel_HasResourceInterface subject
      */
     protected $subject;
@@ -69,6 +74,16 @@ class CModel_HasResource_FileAdder_FileAdder {
      * @var string
      */
     protected $diskName = '';
+
+    /**
+     * @var null|string
+     */
+    protected $onQueue = null;
+
+    /**
+     * @var null|int
+     */
+    protected $fileSize = null;
 
     /**
      * @var string
@@ -168,12 +183,24 @@ class CModel_HasResource_FileAdder_FileAdder {
         return $this;
     }
 
+    public function setOrder($order) {
+        $this->order = $order;
+
+        return $this;
+    }
+
     public function usingFileName($fileName) {
         return $this->setFileName($fileName);
     }
 
     public function setFileName($fileName) {
         $this->fileName = $fileName;
+
+        return $this;
+    }
+
+    public function setFileSize(int $fileSize) {
+        $this->fileSize = $fileSize;
 
         return $this;
     }
@@ -186,6 +213,12 @@ class CModel_HasResource_FileAdder_FileAdder {
 
     public function storingConversionsOnDisk($diskName) {
         $this->conversionsDiskName = $diskName;
+
+        return $this;
+    }
+
+    public function onQueue($queue = null) {
+        $this->onQueue = $queue;
 
         return $this;
     }
@@ -398,11 +431,15 @@ class CModel_HasResource_FileAdder_FileAdder {
             $resource->setConnection($model->getConnectionName());
         }
         if ($fileAdder->file instanceof CResources_Support_RemoteFile) {
-            $this->filesystem->addRemote($fileAdder->file, $resource, $fileAdder->fileName);
+            $addedMediaSuccessfully = $this->filesystem->addRemote($fileAdder->file, $resource, $fileAdder->fileName);
         } else {
-            $this->filesystem->add($fileAdder->pathToFile, $resource, $fileAdder->fileName);
+            $addedMediaSuccessfully = $this->filesystem->add($fileAdder->pathToFile, $resource, $fileAdder->fileName);
         }
+        if (!$addedMediaSuccessfully) {
+            $resource->forceDelete();
 
+            throw CResources_Exception_FileCannotBeAdded_DiskCannotBeAccessed::create($resource->disk);
+        }
         if (!$fileAdder->preserveOriginal) {
             unlink($fileAdder->pathToFile);
         }

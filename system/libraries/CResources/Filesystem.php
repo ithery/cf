@@ -27,9 +27,16 @@ class CResources_Filesystem {
     }
 
     public function add($file, CModel_Resource_ResourceInterface $resource, $targetFileName = null) {
-        $this->copyToResourceLibrary($file, $resource, null, $targetFileName);
+        try {
+            $this->copyToResourceLibrary($file, $resource, null, $targetFileName);
+        } catch (CResources_Exception_FileCannotBeAdded_DiskCannotBeAccessed $exception) {
+            return false;
+        }
+
         CEvent::dispatch(new CResources_Event_ResourceHasBeenAdded($resource));
         CResources_Factory::createFileManipulator()->createDerivedFiles($resource);
+
+        return true;
     }
 
     public function addRemote(CResources_Support_RemoteFile $file, CModel_Resource_ResourceInterface $resource, $targetFileName = null) {
