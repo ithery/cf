@@ -322,6 +322,9 @@ class CModel_HasResource_FileAdder_FileAdder {
         $resource->custom_properties = $this->customProperties;
         $resource->responsive_images = [];
         $resource->manipulations = $this->manipulations;
+        if ($resource->hasVersionColumn()) {
+            $resource->version = 2;
+        }
         if (c::filled($this->customHeaders)) {
             $resource->setCustomHeaders($this->customHeaders);
         }
@@ -394,8 +397,9 @@ class CModel_HasResource_FileAdder_FileAdder {
             unlink($fileAdder->pathToFile);
         }
         if ($this->generateResponsiveImages && (new ImageGenerator())->canConvert($resource)) {
-            $generateResponsiveImagesJobClass = CF::config('resource.jobs.generate_responsive_images', GenerateResponsiveImages::class);
+            $generateResponsiveImagesJobClass = CF::config('resource.jobs.generate_responsive_images', CResources_TaskQueue_GenerateResponsiveImage::class);
             $job = new $generateResponsiveImagesJobClass($resource);
+            /** @var CQueue_AbstractTask $job */
             if ($customQueue = CF::config('resource.queue_name')) {
                 $job->onQueue($customQueue);
             }

@@ -367,4 +367,9 @@ trait CModel_Resource_ResourceTrait {
 
         CResources_Helpers_TemporaryDirectory::delete($temporaryDirectoryPath);
     }
+
+    public function hasVersionColumn() {
+        /** @var CModel $this */
+        return $this->getConnection()->getSchemaBuilder()->hasColumn($this->getTable(), 'version');
+    }
 }
