@@ -242,6 +242,7 @@ CREATE TABLE `resource` (
   `custom_properties` longtext,
   `responsive_images` longtext,
   `order_column` int(20) unsigned DEFAULT NULL,
+  `version` int,
   `created` datetime DEFAULT NULL,
   `createdby` varchar(255) DEFAULT NULL,
   `updated` datetime DEFAULT NULL,

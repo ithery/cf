@@ -37,6 +37,12 @@ class CResources_PathGenerator implements CResources_PathGeneratorInterface {
         /** @var CModel $resource */
         $ymd = date('Ymd', strtotime($resource->created));
 
+        if ($resource->version == 2) {
+            $appCode = CF::appCode();
+
+            return 'resources' . '/' . $appCode . '/' . $ymd . '/' . $resource->model_type . '/' . $resource->getKey();
+        }
+
         return 'resources' . '/' . $ymd . '/' . $resource->model_type . '/' . $resource->getKey();
     }
 }

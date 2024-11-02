@@ -3,10 +3,28 @@
 defined('SYSPATH') or die('No direct access allowed.');
 
 /**
- * @author Hery Kurniawan
- * @license Ittron Global Teknologi <ittron.co.id>
- *
- * @since Jul 21, 2019, 3:39:27 AM
+ * @property      string     $uuid
+ * @property      string     $model_type
+ * @property      string|int $model_id
+ * @property      string     $collection_name
+ * @property      string     $name
+ * @property      string     $file_name
+ * @property      string     $mime_type
+ * @property      string     $disk
+ * @property      string     $conversions_disk
+ * @property      string     $type
+ * @property      string     $extension
+ * @property-read string     $humanReadableSize
+ * @property-read string     $preview_url
+ * @property-read string     $original_url
+ * @property      int        $size
+ * @property      ?int       $order_column
+ * @property      array      $manipulations
+ * @property      array      $custom_properties
+ * @property      array      $generated_conversions
+ * @property      array      $responsive_images
+ * @property-read ?\CCarbon  $created_at
+ * @property-read ?\CCarbon  $updated_at
  */
 trait CModel_Resource_ResourceTrait {
     use CModel_Resource_Concern_CustomResourcePropertiesTrait;
@@ -134,25 +152,6 @@ trait CModel_Resource_ResourceTrait {
         );
     }
 
-    public function getContent($conversionName = '') {
-        $disk = CStorage::instance()->disk($this->disk);
-
-        return $disk->get($this->getPath($conversionName));
-    }
-
-    public function getImageGenerators() {
-        return c::collect(CF::config('resource.image_generators'));
-    }
-
-    public function getTypeAttribute() {
-        $type = $this->getTypeFromExtension();
-        if ($type !== CModel_Resource::TYPE_OTHER) {
-            return $type;
-        }
-
-        return $this->getTypeFromMime();
-    }
-
     public function getTypeFromExtension() {
         $imageGenerator = $this->getImageGenerators()
             ->map(function ($className) {
@@ -173,6 +172,37 @@ trait CModel_Resource_ResourceTrait {
         return $imageGenerator ? $imageGenerator->getType() : CModel_Resource::TYPE_OTHER;
     }
 
+    protected function extension(): CModel_Casts_Attribute {
+        return CModel_Casts_Attribute::get(function () {
+            return pathinfo($this->file_name, PATHINFO_EXTENSION);
+        });
+    }
+
+    protected function humanReadableSize(): CModel_Casts_Attribute {
+        return CModel_Casts_Attribute::get(function () {
+            return CResources_Helpers_File::getHumanReadableSize($this->size);
+        });
+    }
+
+    public function getContent($conversionName = '') {
+        $disk = CStorage::instance()->disk($this->disk);
+
+        return $disk->get($this->getPath($conversionName));
+    }
+
+    public function getImageGenerators() {
+        return c::collect(CF::config('resource.image_generators'));
+    }
+
+    public function getTypeAttribute() {
+        $type = $this->getTypeFromExtension();
+        if ($type !== CModel_Resource::TYPE_OTHER) {
+            return $type;
+        }
+
+        return $this->getTypeFromMime();
+    }
+
     public function getExtensionAttribute() {
         return pathinfo($this->file_name, PATHINFO_EXTENSION);
     }
@@ -187,6 +217,12 @@ trait CModel_Resource_ResourceTrait {
         }
 
         return strtolower(CF::config("storage.disks.{$this->disk}.driver"));
+    }
+
+    public function getConversionsDiskDriverName(): string {
+        $diskName = $this->conversions_disk ?? $this->disk;
+
+        return strtolower(CF::config("storage.disks.{$diskName}.driver"));
     }
 
     /**
@@ -297,6 +333,65 @@ trait CModel_Resource_ResourceTrait {
         return $this->responsiveImages($conversionName)->getSrcset();
     }
 
+    protected function previewUrl(): CModel_Casts_Attribute {
+        return CModel_Casts_Attribute::get(function () {
+            return $this->hasGeneratedConversion('preview') ? $this->getUrl('preview') : '';
+        });
+    }
+
+    protected function originalUrl(): CModel_Casts_Attribute {
+        return CModel_Casts_Attribute::get(function () {
+            return $this->getUrl();
+        });
+    }
+
+    public function move(CModel_HasResourceInterface $model, $collectionName = 'default') {
+        $newMedia = $this->copy($model, $collectionName);
+        $this->delete();
+
+        return $newMedia;
+    }
+
+    public function copy(
+        CModel_HasResourceInterface $model,
+        $collectionName = 'default',
+        $diskName = '',
+        $fileName = '',
+        $fileAdderCallback = null
+    ) {
+        $temporaryDirectory = CResources_Helpers_TemporaryDirectory::create();
+        $temporaryFile = $temporaryDirectory->path($this->file_name);
+        $filesystem = CResources_Factory::createFileSystem();
+        $filesystem->copyFromResourceLibrary($this, $temporaryFile);
+        $fileAdder = $model
+            ->addResource($temporaryFile)
+            ->usingName($this->name)
+            ->setOrder($this->order_column)
+            ->withManipulations($this->manipulations)
+            ->withCustomProperties($this->custom_properties);
+        if ($fileName !== '') {
+            $fileAdder->usingFileName($fileName);
+        }
+        if ($fileAdderCallback instanceof Closure) {
+            $fileAdder = $fileAdderCallback($fileAdder);
+        }
+        $newMedia = $fileAdder
+            ->toResourceCollection($collectionName, $diskName);
+        $temporaryDirectory->delete();
+
+        return $newMedia;
+    }
+
+    public function responsiveImages($conversionName = '') {
+        return new CResources_ResponsiveImage_RegisteredResponsiveImage($this, $conversionName);
+    }
+
+    public function stream() {
+        $filesystem = CResources_Factory::createFileSystem();
+
+        return $filesystem->getStream($this);
+    }
+
     public function toHtml() {
         return $this->img()->toHtml();
     }
@@ -311,37 +406,6 @@ trait CModel_Resource_ResourceTrait {
         return (new CResources_HtmlableMedia($this))
             ->conversion($conversionName)
             ->attributes($extraAttributes);
-    }
-
-    public function move(CModel_HasResourceInterface $model, $collectionName = 'default') {
-        $newMedia = $this->copy($model, $collectionName);
-        $this->delete();
-
-        return $newMedia;
-    }
-
-    public function copy(CModel_HasResourceInterface $model, $collectionName = 'default') {
-        $temporaryDirectory = CResources_Helpers_TemporaryDirectory::create();
-        $temporaryFile = $temporaryDirectory->path($this->file_name);
-        CResources_Factory::createFileSystem()->copyFromResourceLibrary($this, $temporaryFile);
-        $newMedia = $model
-            ->addResource($temporaryFile)
-            ->usingName($this->name)
-            ->withCustomProperties($this->custom_properties)
-            ->toResourceCollection($collectionName);
-        $temporaryDirectory->delete();
-
-        return $newMedia;
-    }
-
-    public function responsiveImages($conversionName = '') {
-        return new CResources_ResponsiveImage_RegisteredResponsiveImage($this, $conversionName);
-    }
-
-    public function stream() {
-        $filesystem = CResources_Factory::createFileSystem();
-
-        return $filesystem->getStream($this);
     }
 
     public function __invoke(...$arguments) {
@@ -366,5 +430,32 @@ trait CModel_Resource_ResourceTrait {
         $call($image);
 
         CResources_Helpers_TemporaryDirectory::delete($temporaryDirectoryPath);
+    }
+
+    public function mailAttachment(string $conversion = ''): CEmail_Attachment {
+        $attachment = CEmail_Attachment::fromStorageDisk($this->disk, $this->getPathRelativeToRoot($conversion))->as($this->file_name);
+
+        if ($this->mime_type) {
+            $attachment->withMime($this->mime_type);
+        }
+
+        return $attachment;
+    }
+
+    public function toMailAttachment(): CEmail_Attachment {
+        return $this->mailAttachment();
+    }
+
+    protected function saveOrTouch(): bool {
+        if (!$this->exists || $this->isDirty()) {
+            return $this->save();
+        }
+
+        return $this->touch();
+    }
+
+    public function hasVersionColumn() {
+        /** @var CModel $this */
+        return $this->getConnection()->getSchemaBuilder()->hasColumn($this->getTable(), 'version');
     }
 }
