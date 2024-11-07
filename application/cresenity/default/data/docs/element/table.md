@@ -3,6 +3,44 @@
 
 Element Table digunakan untuk mempresentasikan ui table
 
+### Table Options
+
+##### setPagingList
+##### setLabelNoData
+##### setDatabaseResolver
+##### setActionHeaderLabel
+##### setScrollX
+##### setScrollY
+##### setActionLocation
+##### setDomain
+##### setInfoText
+##### setColReorder
+##### setFixedColumn
+##### setFixedHeader
+##### setTableStriped
+##### setTableBordered
+##### setWidgetTitle
+##### setDom
+##### setCustomColumnHeader
+##### setResponsive
+##### setShowHeader
+##### setTbodyId
+##### setHeaderNoLineBreak
+##### setOption
+##### setAjax
+##### setAjaxMethod
+##### setApplyDataTable
+##### setDisplayLength
+setDisplayLength menampilkan jumlah default data ditampilkan per halaman, jika tidak di set maka secara default ditampilkan 10 data per halaman
+```php
+$app = c::app();
+$table = $app->addTable();
+$table->setDisplayLength(5);    // menampilkan jumlah data per halaman
+$table->addColumn('role')->setLabel('Role');
+$table ...
+return $app;
+```
+
 
 ### Table Data
 
