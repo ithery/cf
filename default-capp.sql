@@ -290,7 +290,7 @@ CREATE TABLE `queue_failed` (
   `queue` text COLLATE utf8mb4_unicode_ci NOT NULL,
   `payload` longtext COLLATE utf8mb4_unicode_ci NOT NULL,
   `exception` longtext COLLATE utf8mb4_unicode_ci NOT NULL,
-  `failed_at` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  `failed_at` datetime DEFAULT NULL,
   `created` datetime DEFAULT NULL,
   `createdby` varchar(255) DEFAULT NULL,
   `updated` datetime DEFAULT NULL,
