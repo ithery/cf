@@ -308,7 +308,7 @@ CREATE TABLE `queue_batch` (
   `org_id` bigint(20) unsigned DEFAULT NULL,
   `app_code` varchar(200) DEFAULT NULL,
   `name` varchar(200) DEFAULT NULL,
-  `id` varchar(255) DEFAULT NULL,
+  `id` varchar(191) DEFAULT NULL,
   `total_jobs` int DEFAULT NULL,
   `pending_jobs` int DEFAULT NULL,
   `failed_jobs` int DEFAULT NULL,
