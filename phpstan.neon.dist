@@ -8,6 +8,7 @@ parameters:
     earlyTerminatingFunctionCalls:
         - c::abort
         - cdbg::dd
+    checkUnusedViews: true
     checkModelProperties: true
     reportUnmatchedIgnoredErrors: false
     excludePaths:
