@@ -329,6 +329,7 @@ CREATE TABLE `queue_batch` (
   CONSTRAINT `queue_batch_ibfk_1` FOREIGN KEY (`org_id`) REFERENCES `org` (`org_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
+DROP TABLE IF EXISTS `meta`;
 CREATE TABLE `meta` (
   `meta_id` bigint(20) unsigned NOT NULL AUTO_INCREMENT,
   `org_id` bigint(20) unsigned DEFAULT NULL,
@@ -350,6 +351,7 @@ CREATE TABLE `meta` (
   KEY `meta__metable_id_metable_type_index` (`metable_id`,`metable_type`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE utf8mb4_unicode_ci;
 
+DROP TABLE IF EXISTS `visit`;
 CREATE TABLE `visit` (
   `visit_id` bigint(20) unsigned NOT NULL AUTO_INCREMENT,
   `org_id` bigint(20) unsigned DEFAULT NULL,
@@ -383,6 +385,7 @@ CREATE TABLE `visit` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE utf8mb4_unicode_ci;
 
 
+DROP TABLE IF EXISTS `notification`;
 CREATE TABLE `notification` (
   `notification_id` bigint(20) unsigned NOT NULL AUTO_INCREMENT,
   `org_id` bigint(20) unsigned DEFAULT NULL,
@@ -409,7 +412,7 @@ CREATE TABLE `notification` (
   KEY `notification__ref_id_ref_type_index` (`ref_id`,`ref_type`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE utf8mb4_unicode_ci;
 
-
+DROP TABLE IF EXISTS `translation`;
 CREATE TABLE `translation` (
   `translation_id` bigint(20) unsigned NOT NULL AUTO_INCREMENT,
   `org_id` bigint(20) unsigned,
@@ -581,6 +584,7 @@ CREATE TABLE IF NOT EXISTS `log_login_fail` (
   UNIQUE KEY `log_login_fail_id` (`log_login_fail_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
+DROP TABLE IF EXISTS `access_token`;
 CREATE TABLE `access_token` (
   `access_token_id` bigint(20) unsigned NOT NULL AUTO_INCREMENT,
   `tokenable_type` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
@@ -601,6 +605,7 @@ CREATE TABLE `access_token` (
 ) ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8mb4;
 
 
+DROP TABLE IF EXISTS `websocket_statistic`;
 CREATE TABLE `websocket_statistic` (
   `websocket_statistic_id` bigint(20) unsigned NOT NULL AUTO_INCREMENT,
   `app` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
@@ -618,7 +623,7 @@ CREATE TABLE `websocket_statistic` (
   UNIQUE KEY `websocket_statistic_id` (`websocket_statistic_id`)
 ) ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8mb4;
 
-
+DROP TABLE IF EXISTS `cache`;
 CREATE TABLE `cache` (
   `cache_id` bigint(20) unsigned NOT NULL AUTO_INCREMENT,
   `key` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
@@ -636,6 +641,7 @@ CREATE TABLE `cache` (
   UNIQUE KEY `key` (`key`)
 ) ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8mb4;
 
+DROP TABLE IF EXISTS `cache_lock`;
 CREATE TABLE `cache_lock` (
   `cache_lock_id` bigint(20) unsigned NOT NULL AUTO_INCREMENT,
   `key` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
@@ -653,6 +659,7 @@ CREATE TABLE `cache_lock` (
   UNIQUE KEY `key` (`key`)
 ) ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8mb4;
 
+DROP TABLE IF EXISTS `session`;
 CREATE TABLE `session` (
   `session_id` bigint(20) unsigned NOT NULL AUTO_INCREMENT,
   `key` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
