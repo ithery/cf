@@ -39,7 +39,7 @@ class CBase_HtmlString implements CInterface_Htmlable {
      * @return bool
      */
     public function isEmpty() {
-        return $this->html === '';
+        return ($this->html ?? '') === '';
     }
 
     /**
@@ -57,6 +57,6 @@ class CBase_HtmlString implements CInterface_Htmlable {
      * @return string
      */
     public function __toString() {
-        return $this->toHtml();
+        return $this->toHtml() ?? '';
     }
 }
