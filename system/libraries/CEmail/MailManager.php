@@ -105,15 +105,7 @@ class CEmail_MailManager implements CEmail_Contract_FactoryInterface {
         // Once we have created the mailer instance we will set a container instance
         // on the mailer. This allows us to resolve mailer classes via containers
         // for maximum testability on said classes instead of passing Closures.
-        $mailer = new CEmail_Mailer(
-            $name,
-            $this->createSymfonyTransport($config),
-        );
-
-        // if ($this->app->bound('queue')) {
-        //     $mailer->setQueue($this->app['queue']);
-        // }
-        $mailer->setQueue(CQueue::queuer());
+        $mailer = $this->build(['name' => $name, ...$config]);
 
         // Next we will set all of the global addresses on this mailer, which allows
         // for easy unification of all "from" addresses as well as easy debugging
@@ -121,6 +113,27 @@ class CEmail_MailManager implements CEmail_Contract_FactoryInterface {
         foreach (['from', 'reply_to', 'to', 'return_path'] as $type) {
             $this->setGlobalAddress($mailer, $config, $type);
         }
+
+        return $mailer;
+    }
+
+    /**
+     * Build a new mailer instance.
+     *
+     * @param array $config
+     *
+     * @return \CEmail_Mailer
+     */
+    public function build($config) {
+        $mailer = new CEmail_Mailer(
+            $config['name'] ?? 'ondemand',
+            $this->createSymfonyTransport($config),
+        );
+
+        // if ($this->app->bound('queue')) {
+        //     $mailer->setQueue($this->app['queue']);
+        // }
+        $mailer->setQueue(CQueue::queuer());
 
         return $mailer;
     }
@@ -456,11 +469,11 @@ class CEmail_MailManager implements CEmail_Contract_FactoryInterface {
      * @return void
      */
     public function setDefaultDriver(string $name) {
-        if ($this->app['config']['mail.driver']) {
-            $this->app['config']['mail.driver'] = $name;
+        if (CConfig::repository()->get('email.driver')) {
+            CConfig::repository()->set('email.driver', $name);
         }
 
-        $this->app['config']['mail.default'] = $name;
+        CConfig::repository()->set('email.default', $name);
     }
 
     /**
