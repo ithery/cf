@@ -138,18 +138,20 @@ class CEmail_Driver_SesV2Driver extends CEmail_DriverAbstract {
         $message .= 'Content-Type: multipart/mixed; boundary="' . $boundary . '"';
         $message .= "\n\n";
 
-        // // Bagian teks
+        // Plain text part (optional)
         $message .= "--$boundary\n";
         $message .= 'Content-Type: multipart/alternative; boundary="alternative_boundary"';
         $message .= "\n\n";
 
+        // Plain text body
         $message .= "--alternative_boundary\n";
-        $message .= 'Content-Type: text/plain; charset=us-ascii';
+        $message .= 'Content-Type: text/plain; charset=UTF-8';
         $message .= "\n";
         $message .= "\n";
 
+        // HTML body
         $message .= "--alternative_boundary\n";
-        $message .= 'Content-Type: text/html; charset=us-ascii';
+        $message .= 'Content-Type: text/html; charset=UTF-8';
         $message .= "\n";
         $message .= "\n";
         $message .= "$body\n";
