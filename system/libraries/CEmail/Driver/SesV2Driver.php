@@ -34,6 +34,9 @@ class CEmail_Driver_SesV2Driver extends CEmail_DriverAbstract {
     public function send($to, $subject, $body, $options = []) {
         $from = carr::get($options, 'from', $this->config->getFrom());
         $fromName = carr::get($options, 'from_name', $this->config->getFromName());
+        if (strlen($fromName) > 0) {
+            $from = $fromName . ' <' . $from . '>';
+        }
         $attachments = carr::get($options, 'attachments', []);
         $replyTo = carr::get($options, 'replyTo', '');
         $cc = carr::get($options, 'cc', []);
