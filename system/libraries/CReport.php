@@ -11,7 +11,7 @@ class CReport {
 
     const TEXT_ALIGNMENT_RIGHT = 'right';
 
-    const TEXT_ALIGNMENT_JUSTIFY = 'justify';
+    const TEXT_ALIGNMENT_JUSTIFIED = 'justified';
 
     const VERTICAL_ALIGNMENT_TOP = 'top';
 

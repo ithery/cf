@@ -33,7 +33,7 @@ class CReport_Generator_Processor_PdfProcessor extends CReport_Generator_Process
             CREPORT::TEXT_ALIGNMENT_CENTER => 'C',
             CREPORT::TEXT_ALIGNMENT_LEFT => 'L',
             CREPORT::TEXT_ALIGNMENT_RIGHT => 'R',
-            CREPORT::TEXT_ALIGNMENT_JUSTIFY => 'J',
+            CREPORT::TEXT_ALIGNMENT_JUSTIFIED => 'J',
         ];
 
         return carr::get($alignmentMap, $alignment, 'L');
@@ -283,6 +283,7 @@ class CReport_Generator_Processor_PdfProcessor extends CReport_Generator_Process
         $width = carr::get($options, 'width');
         $height = carr::get($options, 'height');
         $font = carr::get($options, 'font');
+        $letterSpacing = carr::get($options, 'letterSpacing');
         $backgroundColor = carr::get($options, 'backgroundColor');
         $foregroundColor = carr::get($options, 'foregroundColor');
         $x = carr::get($options, 'x');
@@ -320,6 +321,12 @@ class CReport_Generator_Processor_PdfProcessor extends CReport_Generator_Process
             $color = CColor::create($foregroundColor);
             $color = $color->toRgb();
             $this->tcpdf->setTextColor($color->red(), $color->green(), $color->blue());
+        }
+
+        if ($letterSpacing) {
+            $this->tcpdf->setFontSpacing($letterSpacing);
+        } else {
+            $this->tcpdf->setFontSpacing(1);
         }
         $this->tcpdf->setCellHeightRatio($lineSpacing);
 
