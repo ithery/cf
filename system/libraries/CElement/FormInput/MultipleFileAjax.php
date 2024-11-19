@@ -16,6 +16,9 @@ class CElement_FormInput_MultipleFileAjax extends CElement_FormInput {
 
     protected $maxUploadSize;
 
+    /**
+     * @var array
+     */
     protected $allowedExtension;
 
     protected $validationCallback;
@@ -138,7 +141,7 @@ class CElement_FormInput_MultipleFileAjax extends CElement_FormInput {
     }
 
     /**
-     * @param int $ext
+     * @param string|array $ext
      *
      * @return $this
      */

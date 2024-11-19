@@ -293,7 +293,7 @@ trait CElement_FormInput_QueryBuilder_Parser_FunctionTrait {
      *
      * @throws CElement_FormInput_QueryBuilder_Exception_ParseException when SQL operator is !null
      *
-     * @return CModel_Query
+     * @return CModel_Query|CDatabase_Query_Builder
      */
     protected function makeQueryWhenNull(CModel_Query $query, stdClass $rule, array $sqlOperator, $condition) {
         if ($sqlOperator['operator'] == 'NULL') {
@@ -316,7 +316,7 @@ trait CElement_FormInput_QueryBuilder_Parser_FunctionTrait {
      *
      * @see makeQueryWhenArray
      *
-     * @return CModel_Query
+     * @return CModel_Query|CDatabase_Query_Builder
      */
     private function makeArrayQueryIn(CModel_Query $query, stdClass $rule, $operator, array $value, $condition) {
         if ($operator == 'NOT IN') {
