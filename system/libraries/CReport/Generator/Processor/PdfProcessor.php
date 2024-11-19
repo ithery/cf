@@ -495,4 +495,8 @@ class CReport_Generator_Processor_PdfProcessor extends CReport_Generator_Process
         $subset = 'default';
         $this->tcpdf->AddFont($fontName, $style, $fontPath, $subset);
     }
+
+    public function raw($content) {
+        $this->tcpdf->raw($content);
+    }
 }
