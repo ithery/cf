@@ -53,11 +53,10 @@ class CReport_Generator_Processor_PdfProcessor extends CReport_Generator_Process
      * Return format for a component of a box.
      *
      * @param CReport_Builder_Object_Pen      $pen
-     * @param null|CReport_Builder_Object_Box $box
      *
      * @return int[]|string[]|int[][]
      */
-    public static function getPdfPen(CReport_Builder_Object_Pen $pen, CReport_Builder_Object_Box $box = null) {
+    public static function getPdfPen(CReport_Builder_Object_Pen $pen) {
         $lineColor = $pen->getLineColor();
         if ($lineColor) {
             $lineColorRgb = CColor::create($lineColor)->toRgb();
