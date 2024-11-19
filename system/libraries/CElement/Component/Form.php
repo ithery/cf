@@ -88,7 +88,7 @@ class CElement_Component_Form extends CElement_Component {
         $this->action = '';
         $this->autocomplete = true;
         $this->enctype = 'application/x-www-form-urlencoded';
-        $this->validation = false;
+        $this->validation = null;
         $this->ajax_submit = false;
         $this->ajax_success_script_callback = '';
         $this->ajax_datatype = 'text';
@@ -237,7 +237,6 @@ class CElement_Component_Form extends CElement_Component {
      */
     public function setValidation($validationData = true) {
         if (is_array($validationData)) {
-            $this->validation = false;
             CManager::asset()->module()->registerRunTimeModules('validate');
 
             /**
@@ -281,7 +280,7 @@ class CElement_Component_Form extends CElement_Component {
     /**
      * Make form to submit through ajax.
      *
-     * @param string $bool
+     * @param bool $bool
      *
      * @return CElement_Component_Form
      */

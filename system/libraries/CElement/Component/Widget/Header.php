@@ -49,7 +49,7 @@ class CElement_Component_Widget_Header extends CElement_Element {
      */
     public function actions() {
         if ($this->actions == null) {
-            $this->actions = CElement_Factory::createList('ActionList', $this->parent->id . '_header');
+            $this->actions = new CElement_List_ActionList($this->parent->id . '_header');
             $this->actions->setStyle('widget-action')->addClass('ml-auto');
             $this->add($this->actions);
         }

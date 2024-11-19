@@ -10,7 +10,7 @@ class CElement_Component_Form_FieldValidation {
     }
 
     public static function factory() {
-        return new static();
+        return new CElement_Component_Form_FieldValidation();
     }
 
     public function addValidation($name, $param) {

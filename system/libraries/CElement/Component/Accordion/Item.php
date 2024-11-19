@@ -31,7 +31,7 @@ class CElement_Component_Accordion_Item extends CElement_Component {
 
     public function __construct($id) {
         parent::__construct($id);
-        $this->header = CElement_Factory::createComponent('Accordion_Item_Header');
+        $this->header = new CElement_Component_Accordion_Item_Header();
         $this->add($this->header);
 
         $this->body = $this->addDiv()->addClass('component-accordion-item');

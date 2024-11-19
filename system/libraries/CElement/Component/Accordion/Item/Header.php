@@ -19,7 +19,7 @@ class CElement_Component_Accordion_Item_Header extends CElement_Component {
 
     protected $targetBody = '';
 
-    public function __construct($id) {
+    public function __construct($id = null) {
         parent::__construct($id);
 
         $this->addClass('component-accordion-item-header card-header');

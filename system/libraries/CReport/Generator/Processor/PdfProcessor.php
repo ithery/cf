@@ -81,7 +81,9 @@ class CReport_Generator_Processor_PdfProcessor extends CReport_Generator_Process
 
         return [
             'width' => $pen->getLineWidth(),
+            //butt,round,square
             'cap' => 'butt',
+            //miter,round,bevel
             'join' => 'miter',
             'dash' => $dash,
             'phase' => 0,

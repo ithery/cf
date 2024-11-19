@@ -6,6 +6,11 @@ class CElement_Component_Shimmer_Element {
      */
     protected $builder;
 
+    /**
+     * @var string
+     */
+    protected $class;
+
     public function __construct($class, $builderCallback) {
         $this->class = $class;
         if ($builderCallback) {

@@ -33,7 +33,7 @@ class CElement_Component_Widget extends CElement_Component {
 
     private $close;
 
-    private $js_collapse;
+    private $jsCollapse;
 
     private $wrapperClass;
 
@@ -54,7 +54,7 @@ class CElement_Component_Widget extends CElement_Component {
 
         $this->collapse = false;
         $this->close = false;
-        $this->js_collapse = true;
+        $this->jsCollapse = true;
     }
 
     public static function factory($id = null) {

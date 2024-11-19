@@ -7,6 +7,7 @@ trait CElement_Component_DataTable_Trait_JavascriptTrait {
         /** @var CElement_Component_DataTable $this */
         $this->buildOnce();
         $ajax_url = '';
+        $varNameOTable = null;
         if ($this->ajax) {
             $columns = [];
             foreach ($this->columns as $col) {
