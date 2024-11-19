@@ -1,9 +1,9 @@
 <?php
 //============================================================+
 // File name   : tcpdf.php
-// Version     : 6.7.5
+// Version     : 6.7.7
 // Begin       : 2002-08-03
-// Last Update : 2024-03-18
+// Last Update : 2024-10-26
 // Author      : Nicola Asuni - Tecnick.com LTD - www.tecnick.com - info@tecnick.com
 // License     : GNU-LGPL v3 (http://www.gnu.org/copyleft/lesser.html)
 // -------------------------------------------------------------------
@@ -104,7 +104,7 @@
  * Tools to encode your unicode fonts are on fonts/utils directory.</p>
  * @package com.tecnick.tcpdf
  * @author Nicola Asuni
- * @version 6.6.5
+ * @version 6.7.7
  */
 
 // TCPDF configuration
@@ -8175,7 +8175,7 @@ class TCPDF {
 	 * @since 5.0.010 (2010-05-17)
 	 */
 	protected function _getannotsrefs($n) {
-		if (!(isset($this->PageAnnots[$n]) OR ($this->sign AND isset($this->signature_data['cert_type'])))) {
+		if (!(isset($this->PageAnnots[$n]) OR count($this->empty_signature_appearance)>0 OR ($this->sign AND isset($this->signature_data['cert_type'])))) {
 			return '';
 		}
 		$out = ' /Annots [';
@@ -8543,7 +8543,7 @@ class TCPDF {
 						}
 						case 'freetext': {
 							if (isset($pl['opt']['da']) AND !empty($pl['opt']['da'])) {
-								$annots .= ' /DA ('.$pl['opt']['da'].')';
+								$annots .= ' /DA '.$this->_datastring($pl['opt']['da']);
 							}
 							if (isset($pl['opt']['q']) AND ($pl['opt']['q'] >= 0) AND ($pl['opt']['q'] <= 2)) {
 								$annots .= ' /Q '.intval($pl['opt']['q']);
@@ -8800,7 +8800,7 @@ class TCPDF {
 								$annots .= ' /AA << '.$pl['opt']['aa'].' >>';
 							}
 							if (isset($pl['opt']['da']) AND !empty($pl['opt']['da'])) {
-								$annots .= ' /DA ('.$pl['opt']['da'].')';
+								$annots .= ' /DA '.$this->_datastring($pl['opt']['da']);
 							}
 							if (isset($pl['opt']['q']) AND ($pl['opt']['q'] >= 0) AND ($pl['opt']['q'] <= 2)) {
 								$annots .= ' /Q '.intval($pl['opt']['q']);
@@ -9950,7 +9950,7 @@ class TCPDF {
 				$out .= ' >> >>';
 			}
 			$font = $this->getFontBuffer((($this->pdfa_mode) ? 'pdfa' : '') .'helvetica');
-			$out .= ' /DA (/F'.$font['i'].' 0 Tf 0 g)';
+			$out .= ' /DA ' . $this->_datastring('/F'.$font['i'].' 0 Tf 0 g');
 			$out .= ' /Q '.(($this->rtl)?'2':'0');
 			//$out .= ' /XFA ';
 			$out .= ' >>';
@@ -11057,7 +11057,7 @@ class TCPDF {
 				$this->encryptdata['V'] = 4;
 				$this->encryptdata['Length'] = 128;
 				$this->encryptdata['CF']['CFM'] = 'AESV2';
-				$this->encryptdata['CF']['Length'] = 128;
+				$this->encryptdata['CF']['Length'] = 16;
 				if ($this->encryptdata['pubkey']) {
 					$this->encryptdata['SubFilter'] = 'adbe.pkcs7.s5';
 					$this->encryptdata['Recipients'] = array();
@@ -11068,7 +11068,7 @@ class TCPDF {
 				$this->encryptdata['V'] = 5;
 				$this->encryptdata['Length'] = 256;
 				$this->encryptdata['CF']['CFM'] = 'AESV3';
-				$this->encryptdata['CF']['Length'] = 256;
+				$this->encryptdata['CF']['Length'] = 32;
 				if ($this->encryptdata['pubkey']) {
 					$this->encryptdata['SubFilter'] = 'adbe.pkcs7.s5';
 					$this->encryptdata['Recipients'] = array();
@@ -13947,11 +13947,11 @@ class TCPDF {
 	 * @since 3.0.000 (2008-03-27)
 	 */
 	protected function addExtGState($parms) {
-		if ($this->pdfa_mode || $this->pdfa_version >= 2) {
-			// transparencies are not allowed in PDF/A mode
+		if (($this->pdfa_mode && $this->pdfa_version < 2) || ($this->state != 2)) {
+			// transparency is not allowed in PDF/A-1 mode
 			return;
 		}
-		// check if this ExtGState already exist
+        // check if this ExtGState already exist
 		foreach ($this->extgstates as $i => $ext) {
 			if ($ext['parms'] == $parms) {
 				if ($this->inxobj) {
@@ -16451,7 +16451,7 @@ class TCPDF {
 			)
 		);
 
-		if(empty($html)) {
+		if($html === '' || $html === null) {
 			return $dom;
 		}
 		// array of CSS styles ( selector => properties).
@@ -19066,7 +19066,7 @@ class TCPDF {
 				if ($imgsrc[0] === '@') {
 					// data stream
 					$imgsrc = '@'.base64_decode(substr($imgsrc, 1));
-					$type = '';
+					$type = preg_match('/<svg([^\>]*)>/si', $imgsrc) ? 'svg' : '';
 				} else if (preg_match('@^data:image/([^;]*);base64,(.*)@', $imgsrc, $reg)) {
 					$imgsrc = '@'.base64_decode($reg[2]);
 					$type = $reg[1];
@@ -23189,9 +23189,9 @@ class TCPDF {
 		// disable case-folding for this XML parser
 		xml_parser_set_option($parser, XML_OPTION_CASE_FOLDING, 0);
 		// sets the element handler functions for the XML parser
-		xml_set_element_handler($parser, 'startSVGElementHandler', 'endSVGElementHandler');
+		xml_set_element_handler($parser, [$this, 'startSVGElementHandler'], [$this, 'endSVGElementHandler']);
 		// sets the character data handler function for the XML parser
-		xml_set_character_data_handler($parser, 'segSVGContentHandler');
+		xml_set_character_data_handler($parser, [$this, 'segSVGContentHandler']);
 		// start parsing an XML document
 		if (!xml_parse($parser, $svgdata)) {
 			$error_message = sprintf('SVG Error: %s at line %d', xml_error_string(xml_get_error_code($parser)), xml_get_current_line_number($parser));
@@ -23341,7 +23341,7 @@ class TCPDF {
 		$text_color = TCPDF_COLORS::convertHTMLColorToDec($svgstyle['text-color'], $this->spot_colors);
 		$this->setTextColorArray($text_color);
 		// clip
-		if (preg_match('/rect\(([a-z0-9\-\.]*)[\s]*([a-z0-9\-\.]*)[\s]*([a-z0-9\-\.]*)[\s]*([a-z0-9\-\.]*)\)/si', $svgstyle['clip'], $regs)) {
+        if (preg_match('/rect\(([a-z0-9\-\.]*+)[\s]*+([a-z0-9\-\.]*+)[\s]*+([a-z0-9\-\.]*+)[\s]*+([a-z0-9\-\.]*+)\)/si', $svgstyle['clip'], $regs)) {
 			$top = (isset($regs[1])?$this->getHTMLUnitToUnits($regs[1], 0, $this->svgunit, false):0);
 			$right = (isset($regs[2])?$this->getHTMLUnitToUnits($regs[2], 0, $this->svgunit, false):0);
 			$bottom = (isset($regs[3])?$this->getHTMLUnitToUnits($regs[3], 0, $this->svgunit, false):0);
@@ -23458,8 +23458,8 @@ class TCPDF {
 				$cy -= $h;
 			}
 			$this->_out(sprintf('%F 0 0 %F %F %F cm', ($w * $this->k), ($h * $this->k), ($x * $this->k), ($cy * $this->k)));
-			if (count($gradient['stops']) > 1) {
-				$this->Gradient($gradient['type'], $gradient['coords'], $gradient['stops'], array(), false);
+            if ((is_array($gradient['stops']) || $gradient['stops'] instanceof Countable) && count($gradient['stops']) > 1) {
+				$this->Gradient($gradient['type'], $gradient['coords'], $gradient['stops']);
 			}
 		} elseif ($svgstyle['fill'] != 'none') {
 			$fill_color = TCPDF_COLORS::convertHTMLColorToDec($svgstyle['fill'], $this->spot_colors);
@@ -23653,7 +23653,8 @@ class TCPDF {
 			$params = array();
 			if (isset($val[2])) {
 				// get curve parameters
-				$rawparams = preg_split('/([\,\s]+)/si', trim($val[2]));
+                preg_match_all('/-?\d*\.?\d+/', trim($val[2]), $matches);
+				$rawparams = $matches[0];
 				$params = array();
 				foreach ($rawparams as $ck => $cp) {
 					$params[$ck] = $this->getHTMLUnitToUnits($cp, 0, $this->svgunit, false);
