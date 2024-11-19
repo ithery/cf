@@ -39,7 +39,7 @@ class CElement_Component_Form extends CElement_Component {
     protected $enctype;
 
     /**
-     * @var CElement_Component_Form_Validation
+     * @var null|CElement_Component_Form_Validation
      */
     protected $validation;
 

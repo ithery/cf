@@ -97,7 +97,8 @@ trait CElement_Component_DataTable_Trait_ActionCreationTrait {
         $id = carr::get($options, 'id');
 
         $options['action'] = CExporter::ACTION_DOWNLOAD;
-        $act = CElement_Factory::createComponent('Action', $id)->setLabel('Export');
+        $act = new CElement_Component_Action($id);
+        $act->setLabel('Export');
         $downloadUrl = $this->createDownloadUrl($options);
         $act->setLink($downloadUrl)->setLinkTarget('_blank');
 

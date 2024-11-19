@@ -20,7 +20,7 @@ class CElement_Element_A extends CElement_Element {
      * @return static
      */
     public static function factory($id = null) {
-        return CElement_Factory::create(static::class, $id);
+        return new CElement_Element_A($id);
     }
 
     /**

@@ -20,7 +20,7 @@ class CElement_Component_Accordion extends CElement_Component {
      * @return CElement_Component_Accordion_Item
      */
     public function addItem($id = null) {
-        $item = CElement_Factory::createComponent('Accordion_Item');
+        $item = new CElement_Component_Accordion_Item($id);
         $this->add($item);
 
         return $item;

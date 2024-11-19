@@ -63,7 +63,7 @@ class CElement_Component_Widget_Header extends CElement_Element {
      * @return CElement_Component_Action
      */
     public function addAction($id = '') {
-        $action = CElement_Factory::createComponent('Action', $id);
+        $action = new CElement_Component_Action($id);
         $this->actions()->add($action);
 
         return $action;

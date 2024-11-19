@@ -42,12 +42,8 @@ class CElement_Factory {
                 $class_name = 'CElement_Element_' . ucfirst($tag);
 
                 return new $class_name($id);
-
-                break;
             default:
                 throw new CApp_Exception(c::__('element [:tag] not found', ['tag' => $tag]));
-
-                break;
         }
 
         return false;
