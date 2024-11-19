@@ -19,6 +19,9 @@ class CElement_ViewComponent extends CElement {
      */
     protected $data;
 
+    /**
+     * @phpstan-ignore-next-line
+     */
     public function __construct($id, $component, $options = []) {
         parent::__construct($id);
         if ($component != null) {

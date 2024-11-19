@@ -125,23 +125,6 @@ class CElement_Factory {
      *
      * @throws CElement_Exception
      *
-     * @return \CElement_Composite
-     */
-    public static function createComposite($name, $id = '') {
-        $className = 'CElement_Composite_' . $name;
-        if (!class_exists($className)) {
-            throw new CElement_Exception(c::__('composite element [:name] not found', ['name' => $name]));
-        }
-
-        return new $className($id);
-    }
-
-    /**
-     * @param string $name
-     * @param string $id   optional
-     *
-     * @throws CElement_Exception
-     *
      * @return \CElement_List
      */
     public static function createList($name, $id = '') {
