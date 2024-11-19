@@ -3056,9 +3056,9 @@ class TCPDF {
 			$this->setFont($font, '', 1);
 			$this->setTextRenderingMode(0, false, false);
 			// $msg = "\x50\x6f\x77\x65\x72\x65\x64\x20\x62\x79\x20\x54\x43\x50\x44\x46\x20\x28\x77\x77\x77\x2e\x74\x63\x70\x64\x66\x2e\x6f\x72\x67\x29";
-			// $lnk = "\x68\x74\x74\x70\x3a\x2f\x2f\x77\x77\x77\x2e\x74\x63\x70\x64\x66\x2e\x6f\x72\x67";
+            // $lnk = "\x68\x74\x74\x70\x3a\x2f\x2f\x77\x77\x77\x2e\x74\x63\x70\x64\x66\x2e\x6f\x72\x67";
 
-			// $this->Cell(0, 0, $msg, 0, 0, 'L', 0, $lnk, 0, false, 'D', 'B');
+            // $this->Cell(0, 0, $msg, 0, 0, 'L', 0, $lnk, 0, false, 'D', 'B');
 			$this->_outRestoreGraphicsState();
 			// restore graphic settings
 			$this->setGraphicVars($gvars);
@@ -19021,29 +19021,29 @@ class TCPDF {
 				$this->setLineWidth($hrHeight);
 
 				$lineStyle = array();
-                    		if (isset($tag['fgcolor'])) {
-		                        $lineStyle['color'] = $tag['fgcolor'];
-                    		}
+                if (isset($tag['fgcolor'])) {
+                    $lineStyle['color'] = $tag['fgcolor'];
+                }
 
-                    		if (isset($tag['fgcolor'])) {
-                        		$lineStyle['color'] = $tag['fgcolor'];
-                    		}
+                if (isset($tag['fgcolor'])) {
+                    $lineStyle['color'] = $tag['fgcolor'];
+                }
 
-                    		if (isset($tag['style']['cap'])) {
-                        		$lineStyle['cap'] = $tag['style']['cap'];
-                    		}
+                if (isset($tag['style']['cap'])) {
+                    $lineStyle['cap'] = $tag['style']['cap'];
+                }
 
-                    		if (isset($tag['style']['join'])) {
-                        		$lineStyle['join'] = $tag['style']['join'];
-                    		}
+                if (isset($tag['style']['join'])) {
+                    $lineStyle['join'] = $tag['style']['join'];
+                }
 
-                    		if (isset($tag['style']['dash'])) {
-                        		$lineStyle['dash'] = $tag['style']['dash'];
-                    		}
+                if (isset($tag['style']['dash'])) {
+                    $lineStyle['dash'] = $tag['style']['dash'];
+                }
 
-                    		if (isset($tag['style']['phase'])) {
-                        		$lineStyle['phase'] = $tag['style']['phase'];
-                    		}
+                if (isset($tag['style']['phase'])) {
+                    $lineStyle['phase'] = $tag['style']['phase'];
+                }
 
 				$lineStyle = array_filter($lineStyle);
 
