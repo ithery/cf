@@ -17,7 +17,7 @@ class CElement_Element_A extends CElement_Element {
     /**
      * @param string $id
      *
-     * @return static
+     * @return CElement_Element_A
      */
     public static function factory($id = null) {
         return new CElement_Element_A($id);

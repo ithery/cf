@@ -45,7 +45,7 @@ class CElement_Factory {
             default:
                 throw new CApp_Exception(c::__('element [:tag] not found', ['tag' => $tag]));
         }
-
+        /** @phpstan-ignore-next-line */
         return false;
     }
 

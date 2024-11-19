@@ -96,11 +96,12 @@ class CElement_FormInput_DateRange extends CElement_FormInput {
         $option = '';
 
         $autoclose = 'true';
+        /** @phpstan-ignore-next-line */
         if (strlen($option) > 0) {
             $option .= ',';
         }
         $option .= 'autoclose: ' . $autoclose . '';
-
+        /** @phpstan-ignore-next-line */
         if (strlen($option) > 0) {
             $option = '{' . $option . '}';
         }

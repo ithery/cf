@@ -316,13 +316,16 @@ trait CElement_FormInput_QueryBuilder_Parser_FunctionTrait {
      *
      * @see makeQueryWhenArray
      *
-     * @return CModel_Query|CDatabase_Query_Builder
+     * @return CModel_Query
+     * @phpstan-ignore-next-line
      */
     private function makeArrayQueryIn(CModel_Query $query, stdClass $rule, $operator, array $value, $condition) {
         if ($operator == 'NOT IN') {
+            /** @phpstan-ignore-next-line */
             return $query->whereNotIn($rule->field, $value, $condition);
         }
 
+        /** @phpstan-ignore-next-line */
         return $query->whereIn($rule->field, $value, $condition);
     }
 
@@ -340,6 +343,7 @@ trait CElement_FormInput_QueryBuilder_Parser_FunctionTrait {
      * @throws CElement_FormInput_QueryBuilder_Exception_ParseException when more then two items given for the between
      *
      * @return CModel_Query
+     * @phpstan-ignore-next-line
      */
     private function makeArrayQueryBetween(CModel_Query $query, stdClass $rule, $operator, array $value, $condition) {
         if (count($value) !== 2) {
@@ -347,9 +351,11 @@ trait CElement_FormInput_QueryBuilder_Parser_FunctionTrait {
         }
 
         if ($operator == 'NOT BETWEEN') {
+            /** @phpstan-ignore-next-line */
             return $query->whereNotBetween($rule->field, $value, $condition);
         }
 
+        /** @phpstan-ignore-next-line */
         return $query->whereBetween($rule->field, $value, $condition);
     }
 }
