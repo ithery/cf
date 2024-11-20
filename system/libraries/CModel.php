@@ -70,6 +70,8 @@ defined('SYSPATH') or die('No direct access allowed.');
  * @method static       CModel_Query|static                       lockForUpdate()                                                                           Lock the selected rows in the table for updating.
  * @method static       mixed                                     sum($column)                                                                              Retrieve the sum of the values of a given column.
  * @method static       void                                      truncate()                                                                                Run a truncate statement on the table.
+ * @method static       CDatabase_Result                          insert(array values)                                                                      Insert to table
+ * @method static       int                                       count($columns = '*')                                                                     Retrieve the "count" result of the query.
  *
  * @see CModel_Query
  */

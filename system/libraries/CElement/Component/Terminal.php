@@ -2,12 +2,7 @@
 
 defined('SYSPATH') or die('No direct access allowed.');
 
-/**
- * @author Hery Kurniawan
- * @license Ittron Global Teknologi <ittron.co.id>
- *
- * @since Sep 14, 2018, 7:54:55 PM
- */
+
 class CElement_Component_Terminal extends CElement_Component {
     use CApp_Trait_Template,
         CTrait_Element_Property_Height;
@@ -26,7 +21,7 @@ class CElement_Component_Terminal extends CElement_Component {
         $this->templateName = 'CElement/Component/Terminal';
         $this->greetings = '';
         $this->prompt = '';
-        $this->height = '400';
+        $this->height = 400;
         $this->ajaxMethod = 'post';
 
         CManager::instance()->registerModule('terminal');

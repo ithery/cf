@@ -10,12 +10,12 @@ defined('SYSPATH') or die('No direct access allowed.');
  */
 trait CTrait_Element_Property_Height {
     /**
-     * @var int
+     * @var int|string
      */
     protected $height;
 
     /**
-     * @param int $height
+     * @param int|string $height
      *
      * @return $this
      */
@@ -25,7 +25,7 @@ trait CTrait_Element_Property_Height {
     }
 
     /**
-     * @return int
+     * @return int|string
      */
     public function getHeight() {
         return $this->height;

@@ -1,16 +1,18 @@
 <?php
 /**
- * @method CReport_Builder_Element_Title        addTitle()        Add Title Element
- * @method CReport_Builder_Element_Band         addBand()         Add Band Element
- * @method CReport_Builder_Element_Image        addImage()        Add Image Element
- * @method CReport_Builder_Element_PageHeader   addPageHeader()   Add PageHeader Element
- * @method CReport_Builder_Element_Frame        addFrame()        Add Frame Element
- * @method CReport_Builder_Element_StaticText   addStaticText()   Add StaticText Element
- * @method CReport_Builder_Element_ColumnHeader addColumnHeader() Add ColumnHeader Element
- * @method CReport_Builder_Element_Detail       addDetail()       Add Detail Element
- * @method CReport_Builder_Element_TextField    addTextField()    Add TextField Element
- * @method CReport_Builder_Element_Group        addGroup()        Add Group Element
- * @method CReport_Builder_Element_Variable     addVariable()     Add Variable Element
+ * @method CReport_Builder_Element_Title        addTitle()           Add Title Element
+ * @method CReport_Builder_Element_Band         addBand()            Add Band Element
+ * @method CReport_Builder_Element_Image        addImage()           Add Image Element
+ * @method CReport_Builder_Element_PageHeader   addPageHeader()      Add PageHeader Element
+ * @method CReport_Builder_Element_Frame        addFrame()           Add Frame Element
+ * @method CReport_Builder_Element_StaticText   addStaticText()      Add StaticText Element
+ * @method CReport_Builder_Element_ColumnHeader addColumnHeader()    Add ColumnHeader Element
+ * @method CReport_Builder_Element_Detail       addDetail()          Add Detail Element
+ * @method CReport_Builder_Element_TextField    addTextField()       Add TextField Element
+ * @method CReport_Builder_Element_Group        addGroup()           Add Group Element
+ * @method CReport_Builder_Element_Variable     addVariable()        Add Variable Element
+ * @method float                                getContainerWidth()  Get Container Width
+ * @method float                                getContainerHeight() Get Container Height
  */
 class CReport_Builder {
     use CTrait_ForwardsCalls;

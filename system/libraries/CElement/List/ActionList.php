@@ -10,6 +10,7 @@ class CElement_List_ActionList extends CElement_List {
     use CTrait_Compat_Element_ActionList,
         CTrait_Element_Property_Label,
         CTrait_Element_Property_Icon;
+
     public $actions = [];
 
     protected $style;
@@ -44,7 +45,7 @@ class CElement_List_ActionList extends CElement_List {
         if (in_array($style, $availableStyles)) {
             $this->style = $style;
         } else {
-            throw new Exception('style ' . $style . 'is not defined, available styles:[' . implode(',' . $availableStyles) . ']');
+            throw new Exception('style ' . $style . 'is not defined, available styles:[' . implode(',', $availableStyles) . ']');
         }
 
         return $this;

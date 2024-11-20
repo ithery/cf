@@ -116,19 +116,6 @@ return [
         'perform_conversions' => CResources_TaskQueue_PerformConversions::class,
         'generate_responsive_images' => CResources_TaskQueue_GenerateResponsiveImage::class,
     ],
-    'remote' => [
-        /*
-         * Any extra headers that should be included when uploading resource to
-         * a remote disk. Even though supported headers may vary between
-         * different drivers, a sensible default has been provided.
-         *
-         * Supported by S3: CacheControl, Expires, StorageClass,
-         * ServerSideEncryption, Metadata, ACL, ContentEncoding
-         */
-        'extra_headers' => [
-            'CacheControl' => 'max-age=604800',
-        ],
-    ],
     'responsive_images' => [
         /*
          * This class is responsible for calculating the target widths of the responsive

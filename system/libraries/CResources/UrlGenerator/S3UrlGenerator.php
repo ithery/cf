@@ -21,12 +21,10 @@ class CResources_UrlGenerator_S3UrlGenerator extends CResources_UrlGeneratorAbst
         if ($root = CF::config('storage.disks.' . $this->resource->disk . '.root')) {
             $url = $root . '/' . $url;
         }
-        $url = $this->rawUrlEncodeFilename($url);
+        // $url = $this->rawUrlEncodeFilename($url);
         $url = $this->versionUrl($url);
 
-        //return CF::config('resource.s3.domain') . '/' . $url;
         return CStorage::instance()->disk($this->resource->disk)->url($url);
-        ;
     }
 
     /**

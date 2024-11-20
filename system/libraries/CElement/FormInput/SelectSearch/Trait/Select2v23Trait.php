@@ -98,7 +98,7 @@ trait CElement_FormInput_SelectSearch_Trait_Select2v23Trait {
                 }
             }
         }
-
+        /** @phpstan-ignore-next-line */
         if ($selectedData && is_array($selectedData) && count($selectedData) > 0) {
             if (!$this->multiple) {
                 $selectedData = carr::first($selectedData);

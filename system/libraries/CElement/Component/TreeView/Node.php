@@ -27,6 +27,7 @@ class CElement_Component_TreeView_Node implements CInterface_Arrayable {
     public static function createFromArray($array) {
         $title = carr::get($array, 'text', '');
         $childs = carr::get($array, 'children', []);
+        /** @phpstan-ignore-next-line */
         return new static($title, $childs);
     }
 
@@ -43,6 +44,7 @@ class CElement_Component_TreeView_Node implements CInterface_Arrayable {
             if (is_array($child)) {
                 $child = static::createFromArray($child);
             } elseif (is_string($child)) {
+                /** @phpstan-ignore-next-line */
                 $child = new static($child);
             } else {
                 throw new Exception('child is on bad format');

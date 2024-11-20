@@ -26,6 +26,9 @@ class CReport_Builder_Element_Image extends CReport_Builder_ElementAbstract {
             if ($tag == 'imageExpression') {
                 $element->setSrc((string) $xmlElement);
             }
+            if ($tag == 'scaleImage') {
+                $element->setScaleImage(CReport_Builder_JrXmlToPhpEnum::getScaleImageEnum((string) $xmlElement));
+            }
         }
         if ($xml['hAlign']) {
             $element->setHorizontalAlignment(CReport_Builder_JrXmlToPhpEnum::getHorizontalAlignmentEnum((string) $xml['hAlign']));
@@ -34,7 +37,7 @@ class CReport_Builder_Element_Image extends CReport_Builder_ElementAbstract {
             $element->setVerticalAlignment(CReport_Builder_JrXmlToPhpEnum::getVerticalAlignmentEnum((string) $xml['vAlign']));
         }
         if ($xml['scaleImage']) {
-            $element->setVerticalAlignment(CReport_Builder_JrXmlToPhpEnum::getScaleImageEnum((string) $xml['scaleImage']));
+            $element->setScaleImage(CReport_Builder_JrXmlToPhpEnum::getScaleImageEnum((string) $xml['scaleImage']));
         }
 
         return $element;

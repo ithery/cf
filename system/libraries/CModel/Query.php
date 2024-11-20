@@ -69,6 +69,7 @@ defined('SYSPATH') or die('No direct access allowed.');
  * @method bool                exists()                                                                                 Determine if any rows exist for the current query
  * @method mixed               sum($column)                                                                             Retrieve the sum of the values of a given column..
  * @method static              void                                      truncate()                                     Run a truncate statement on the table.
+ * @method static              CDatabase_Result                          insert(array values)                           Run a truncate statement on the table.
  *
  * @property-read CModel_HigherOrderBuilderProxy $orWhere
  * @property-read CModel_HigherOrderBuilderProxy $whereNot

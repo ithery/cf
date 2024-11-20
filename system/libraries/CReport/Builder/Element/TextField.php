@@ -147,6 +147,7 @@ class CReport_Builder_Element_TextField extends CReport_Builder_ElementAbstract 
             $options['text'] = $text;
             $options['textAlignment'] = $this->getTextAlignment();
             $options['verticalAlignment'] = $this->getVerticalAlignment();
+            $options['letterSpacing'] = $this->getLetterSpacing();
             $options['font'] = $this->getFont();
             $options['backgroundColor'] = $this->getBackgroundColor();
             $options['foregroundColor'] = $this->getForegroundColor();

@@ -19,7 +19,7 @@ class CElement_Component_Accordion_Item_Header extends CElement_Component {
 
     protected $targetBody = '';
 
-    public function __construct($id) {
+    public function __construct($id = null) {
         parent::__construct($id);
 
         $this->addClass('component-accordion-item-header card-header');
@@ -27,7 +27,7 @@ class CElement_Component_Accordion_Item_Header extends CElement_Component {
 
     public function actions() {
         if ($this->actions == null) {
-            $this->actions = CElement_Factory::createList('ActionList', $this->parent->id . '_header');
+            $this->actions = new CElement_List_ActionList($this->parent->id . '_header');
             $this->actions->setStyle('widget-action')->addClass('float-right pull-right');
             $this->add($this->actions);
         }

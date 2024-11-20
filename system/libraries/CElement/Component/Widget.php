@@ -33,7 +33,7 @@ class CElement_Component_Widget extends CElement_Component {
 
     private $close;
 
-    private $js_collapse;
+    private $jsCollapse;
 
     private $wrapperClass;
 
@@ -43,7 +43,7 @@ class CElement_Component_Widget extends CElement_Component {
         parent::__construct($id);
         $this->wrapperClass = c::theme('widget.class.wrapper', 'widget-box');
         $this->bodyClass = c::theme('widget.class.body', 'widget-content');
-        $this->header = CElement_Factory::createComponent(CElement_Component_Widget_Header::class);
+        $this->header = new CElement_Component_Widget_Header($this->id . '-header');
         $this->add($this->header);
         $this->content = $this->addDiv();
         $this->wrapper = $this->content;
@@ -54,7 +54,7 @@ class CElement_Component_Widget extends CElement_Component {
 
         $this->collapse = false;
         $this->close = false;
-        $this->js_collapse = true;
+        $this->jsCollapse = true;
     }
 
     public static function factory($id = null) {

@@ -101,10 +101,18 @@ class CResources_ResourceCollection {
         return $this;
     }
 
+    /**
+     * @return CResources_ResourceCollection
+     */
     public function singleFile() {
         return $this->onlyKeepLatest(1);
     }
 
+    /**
+     * @param int $maximumNumberOfItemsInCollection
+     *
+     * @return CResources_ResourceCollection
+     */
     public function onlyKeepLatest($maximumNumberOfItemsInCollection) {
         if ($maximumNumberOfItemsInCollection < 1) {
             throw new InvalidArgumentException("You should pass a value higher than 0. `{$maximumNumberOfItemsInCollection}` given.");

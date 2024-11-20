@@ -178,7 +178,7 @@ class CElement_Tree extends CElement {
 
         $callback_node_url = CAjaxMethod::factory()
             ->set_type('callback')
-            ->set_data('callable', ['CElement_Tree', 'ajax'])
+            ->set_data('callable', [CElement_Tree::class, 'ajax'])
             ->set_data('tree_callback', $this->callback)
             ->set_data('requires', $this->requires)
             ->set_data('operation', 'get_node')
@@ -186,7 +186,7 @@ class CElement_Tree extends CElement {
             ->makeurl();
         $callback_content_url = CAjaxMethod::factory()
             ->set_type('callback')
-            ->set_data('callable', ['CElement_Tree', 'ajax'])
+            ->set_data('callable', [CElement_Tree::class, 'ajax'])
             ->set_data('tree_callback', $this->callback)
             ->set_data('requires', $this->requires)
             ->set_data('operation', 'get_content')

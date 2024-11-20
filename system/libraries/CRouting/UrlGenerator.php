@@ -668,6 +668,19 @@ class CRouting_UrlGenerator {
     }
 
     /**
+     * Force the use of the HTTPS scheme for all generated URLs.
+     *
+     * @param bool $force
+     *
+     * @return void
+     */
+    public function forceHttps($force = true) {
+        if ($force) {
+            $this->forceScheme('https');
+        }
+    }
+
+    /**
      * Set the forced root URL.
      *
      * @param null|string $root

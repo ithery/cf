@@ -26,7 +26,7 @@ class CElement_Component_ListGroup extends CElement_Component {
      * @return CElement_Component_ListGroup_Item
      */
     public function addItem($id = '') {
-        $item = CElement_Factory::createComponent('ListGroup_Item', $id);
+        $item = new CElement_Component_ListGroup_Item($id);
         $this->add($item);
 
         return $item;

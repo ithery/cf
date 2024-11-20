@@ -17,11 +17,13 @@ class CElement_Element_Iframe extends CElement_Element {
     public function set_src($src) {
         // @codingStandardsIgnoreEnd
         $this->src = $src;
+
         return $this;
     }
 
     public function setSrc($src) {
         $this->src = $src;
+
         return $this;
     }
 

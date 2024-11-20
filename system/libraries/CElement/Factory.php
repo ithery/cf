@@ -42,14 +42,10 @@ class CElement_Factory {
                 $class_name = 'CElement_Element_' . ucfirst($tag);
 
                 return new $class_name($id);
-
-                break;
             default:
                 throw new CApp_Exception(c::__('element [:tag] not found', ['tag' => $tag]));
-
-                break;
         }
-
+        /** @phpstan-ignore-next-line */
         return false;
     }
 
@@ -114,23 +110,6 @@ class CElement_Factory {
         }
         if (!class_exists($className)) {
             throw new CElement_Exception(c::__('component [:name] not found', ['name' => $name]));
-        }
-
-        return new $className($id);
-    }
-
-    /**
-     * @param string $name
-     * @param string $id   optional
-     *
-     * @throws CElement_Exception
-     *
-     * @return \CElement_Composite
-     */
-    public static function createComposite($name, $id = '') {
-        $className = 'CElement_Composite_' . $name;
-        if (!class_exists($className)) {
-            throw new CElement_Exception(c::__('composite element [:name] not found', ['name' => $name]));
         }
 
         return new $className($id);

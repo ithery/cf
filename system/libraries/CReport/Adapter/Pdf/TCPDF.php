@@ -220,4 +220,53 @@ class CReport_Adapter_Pdf_TCPDF extends \TCPDF {
 
         return $oid;
     }
+
+    /**
+	 * Terminates the PDF document.
+	 * It is not necessary to call this method explicitly because Output() does it automatically.
+	 * If the document contains no page, AddPage() is called to prevent from getting an invalid document.
+	 * @public
+	 * @since 1.0
+	 * @see Open(), Output()
+	 */
+	public function Close() {
+		if ($this->state == 3) {
+			return;
+		}
+		if ($this->page == 0) {
+			$this->AddPage();
+		}
+		$this->endLayer();
+		if ($this->tcpdflink) {
+			// save current graphic settings
+			$gvars = $this->getGraphicVars();
+			$this->setEqualColumns();
+			$this->lastpage(true);
+			$this->setAutoPageBreak(false);
+			$this->x = 0;
+			$this->y = $this->h - (1 / $this->k);
+			$this->lMargin = 0;
+			$this->_outSaveGraphicsState();
+			$font = defined('PDF_FONT_NAME_MAIN')?PDF_FONT_NAME_MAIN:'helvetica';
+			$this->setFont($font, '', 1);
+			$this->setTextRenderingMode(0, false, false);
+			// $msg = "\x50\x6f\x77\x65\x72\x65\x64\x20\x62\x79\x20\x54\x43\x50\x44\x46\x20\x28\x77\x77\x77\x2e\x74\x63\x70\x64\x66\x2e\x6f\x72\x67\x29";
+            // $lnk = "\x68\x74\x74\x70\x3a\x2f\x2f\x77\x77\x77\x2e\x74\x63\x70\x64\x66\x2e\x6f\x72\x67";
+
+            // $this->Cell(0, 0, $msg, 0, 0, 'L', 0, $lnk, 0, false, 'D', 'B');
+			$this->_outRestoreGraphicsState();
+			// restore graphic settings
+			$this->setGraphicVars($gvars);
+		}
+		// close page
+		$this->endPage();
+		// close document
+		$this->_enddoc();
+		// unset all class variables (except critical ones)
+		$this->_destroy(false);
+	}
+
+    public function raw($s) {
+        $this->_out($s);
+    }
 }
