@@ -330,8 +330,6 @@ class CReport_Generator_Processor_PdfProcessor extends CReport_Generator_Process
 
         if ($letterSpacing) {
             $this->tcpdf->setFontSpacing($letterSpacing);
-        } else {
-            $this->tcpdf->setFontSpacing(1);
         }
         if ($wordSpacing) {
             $this->tcpdf->setWordSpacing($wordSpacing);
