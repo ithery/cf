@@ -48,6 +48,7 @@ class CPrinter_EscPos_Renderer_HtmlRenderer extends CPrinter_EscPos_RendererAbst
             }
             //do nothing
         });
+
         $parser->on(CPrinter_EscPos_Parser::EVENT_FEED_FORM, function (CPrinter_EscPos_Parser $parser) {
             //do nothing
         });

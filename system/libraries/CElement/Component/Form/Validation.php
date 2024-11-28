@@ -123,6 +123,7 @@ class CElement_Component_Form_Validation {
      */
     protected function getSessionToken() {
         $session = CSession::store();
+        /** @phpstan-ignore-next-line */
         if (!$session) {
             return null;
         }

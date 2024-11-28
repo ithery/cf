@@ -12,7 +12,7 @@ class CElement_Component_CountDownTimer extends CElement_Component {
     protected $expiredText;
 
     /**
-     * @var int
+     * @var bool
      */
     protected $autoStart;
 

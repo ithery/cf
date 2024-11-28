@@ -3,12 +3,24 @@
 class CElement_FormInput_FileAjax extends CElement_FormInput {
     use CElement_Trait_UseViewTrait;
 
+    /**
+     * @var string
+     */
     protected $fileName;
 
+    /**
+     * @var string
+     */
     protected $acceptFile;
 
+    /**
+     * @var int
+     */
     protected $maxUploadSize;   // in MB
 
+    /**
+     * @var array
+     */
     protected $allowedExtension;
 
     protected $validationCallback;
@@ -81,7 +93,7 @@ class CElement_FormInput_FileAjax extends CElement_FormInput {
     }
 
     /**
-     * @param int $ext
+     * @param string|array $ext
      *
      * @return $this
      */

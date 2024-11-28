@@ -228,7 +228,7 @@ class CPrinter_EscPos_CapabilityProfile {
      *
      * @throws InvalidArgumentException Where the ID does not exist. Some similarly-named profiles will be suggested in the Exception text.
      *
-     * @return CPrinter_RawPrint_CapabilityProfile the CapabilityProfile that was requested
+     * @return CPrinter_EscPos_CapabilityProfile the CapabilityProfile that was requested
      */
     public static function load(string $profileName) {
         self::loadCapabilitiesDataFile();

@@ -28,7 +28,7 @@ class CConsole_Command_PhpstanCommand extends CConsole_Command {
         $currentWorkingDirectory = getcwd();
         $fullPath = $path;
         // Check if the path is relative or absolute
-        if (!$this->isAbsolutePath($path)) {
+        if ($path && !$this->isAbsolutePath($path)) {
             // If the path is relative, convert it to an absolute path
             $fullPath = realpath($currentWorkingDirectory . DIRECTORY_SEPARATOR . $path);
         } else {

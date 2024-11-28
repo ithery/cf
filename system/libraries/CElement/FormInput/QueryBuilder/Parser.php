@@ -80,7 +80,7 @@ class CElement_FormInput_QueryBuilder_Parser {
      * @param stdClass     $rule
      * @param null|string  $condition
      *
-     * @return CModel_Query
+     * @return CModel_Query|CDatabase_Query_Builder
      */
     protected function createNestedQuery(CModel_Query $querybuilder, stdClass $rule, $condition = null) {
         if ($condition === null) {
@@ -88,7 +88,7 @@ class CElement_FormInput_QueryBuilder_Parser {
         }
 
         $condition = $this->validateCondition($condition);
-
+        /** @phpstan-ignore-next-line */
         return $querybuilder->whereNested(function ($query) use (&$rule, &$querybuilder, &$condition) {
             foreach ($rule->rules as $loopRule) {
                 $function = 'makeQuery';
@@ -147,7 +147,7 @@ class CElement_FormInput_QueryBuilder_Parser {
      * @param stdClass $rule
      * @param $value
      *
-     * @throws QBParseException
+     * @throws CElement_FormInput_QueryBuilder_Exception_ParseException
      *
      * @return string
      */
@@ -232,8 +232,8 @@ class CElement_FormInput_QueryBuilder_Parser {
      *
      * @param stdClass $rule
      *
-     * @throws QBRuleException
-     * @throws \timgws\QBParseException
+     * @throws CElement_FormInput_QueryBuilder_Exception_RuleException
+     * @throws CElement_FormInput_QueryBuilder_Exception_ParseException
      *
      * @return mixed
      */

@@ -11,7 +11,7 @@ defined('SYSPATH') or die('No direct access allowed.');
  */
 trait CTrait_Element_ActionList_Header {
     /**
-     * @var CElement_List_ActionList
+     * @var null|CElement_List_ActionList
      */
     protected $headerActionList;
 

@@ -9,9 +9,9 @@ class CElement_Calendar extends CElement {
 
     protected $query;
 
-    protected $key_field;
+    protected $keyField;
 
-    public function __construct($id = '', $tag = 'div') {
+    public function __construct($id = null) {
         parent::__construct($id);
 
         CManager::instance()->registerModule('fullcalendar');
@@ -95,9 +95,9 @@ class CElement_Calendar extends CElement {
         return CAjaxMethod::factory()
             ->set_type('callback')
             ->set_method('post')
-            ->set_data('callable', ['CElement_Calendar', 'ajax'])
+            ->set_data('callable', [CElement_Calendar::class, 'ajax'])
             ->set_data('query', $this->query)
-            ->set_data('key_field', $this->key_field)
+            ->set_data('key_field', $this->keyField)
             ->makeurl();
     }
 
@@ -156,8 +156,12 @@ class CElement_Calendar extends CElement {
         return $this;
     }
 
-    public function set_key_field($key_field) {
-        $this->key_field = $key_field;
+    public function set_key_field($keyField) {
+        return $this->setKeyField($keyField);
+    }
+
+    public function setKeyField($keyField) {
+        $this->keyField = $keyField;
 
         return $this;
     }

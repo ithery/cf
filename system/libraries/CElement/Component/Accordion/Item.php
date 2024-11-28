@@ -31,7 +31,7 @@ class CElement_Component_Accordion_Item extends CElement_Component {
 
     public function __construct($id) {
         parent::__construct($id);
-        $this->header = CElement_Factory::createComponent('Accordion_Item_Header');
+        $this->header = new CElement_Component_Accordion_Item_Header();
         $this->add($this->header);
 
         $this->body = $this->addDiv()->addClass('component-accordion-item');
@@ -44,7 +44,7 @@ class CElement_Component_Accordion_Item extends CElement_Component {
     }
 
     /**
-     * @return type
+     * @return CElement_Component_Accordion_Item_Header
      */
     public function header() {
         return $this->header;
@@ -54,7 +54,7 @@ class CElement_Component_Accordion_Item extends CElement_Component {
      * Set the title of the accordion item.
      *
      * @param string $title
-     * @param string $lang
+     * @param bool   $lang
      *
      * @return $this
      */

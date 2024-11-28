@@ -123,4 +123,11 @@ abstract class CReport_Generator_ProcessorAbstract {
      * @return void
      */
     abstract public function addFont($fontName, $fontPath);
+
+    /**
+     * @param string $content
+     *
+     * @return void
+     */
+    abstract public function raw($content);
 }

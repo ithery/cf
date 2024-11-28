@@ -422,7 +422,7 @@ class CElement_Component_DataTable extends CElement_Component {
     }
 
     /**
-     * @param int $column
+     * @param int|bool $column
      *
      * @return \CElement_Component_DataTable
      */
@@ -758,6 +758,7 @@ class CElement_Component_DataTable extends CElement_Component {
             return $this;
         }
         $modelQuery = $model;
+        /** @phpstan-ignore-next-line */
         if ($modelQuery instanceof CModel_Collection) {
             throw new Exception('error when calling setDataFromModel, please use CModel/CModel_Query instance (CModel_Collection passed)');
         }
@@ -810,7 +811,7 @@ class CElement_Component_DataTable extends CElement_Component {
     }
 
     /**
-     * @param CCollection $arr
+     * @param CCollection $collection
      *
      * @return $this
      */
@@ -831,8 +832,10 @@ class CElement_Component_DataTable extends CElement_Component {
         if (strlen($this->dbName) > 0) {
             return c::db($this->dbName);
         }
+        $dbName = 'db-datatable-' . $this->id;
+        CDatabase::manager()->addConnection($this->dbConfig, $dbName);
 
-        return c::db($this->dbName, $this->dbConfig);
+        return c::db($dbName);
     }
 
     /**
@@ -1001,7 +1004,7 @@ class CElement_Component_DataTable extends CElement_Component {
      */
     public function getHeaderActionList() {
         if ($this->headerActionList == null) {
-            $this->headerActionList = CElement_Factory::createList('ActionList');
+            $this->headerActionList = new CElement_List_ActionList();
             $this->headerActionList->setStyle('widget-action');
         }
 
@@ -1076,7 +1079,7 @@ class CElement_Component_DataTable extends CElement_Component {
     }
 
     /**
-     * @return Closure|\Opis\SerializableClosure
+     * @return null|Closure|\Opis\Closure\SerializableClosure
      */
     public function getRowClassCallbackFunction() {
         return $this->rowClassCallbackFunction;

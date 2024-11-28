@@ -10,12 +10,12 @@ defined('SYSPATH') or die('No direct access allowed.');
  */
 trait CTrait_Element_Property_Width {
     /**
-     * @var int
+     * @var int|string
      */
     protected $width;
 
     /**
-     * @param int $width
+     * @param int|string $width
      *
      * @return $this
      */
@@ -25,7 +25,7 @@ trait CTrait_Element_Property_Width {
     }
 
     /**
-     * @return int
+     * @return int|string
      */
     public function getWidth() {
         return $this->width;

@@ -15,6 +15,8 @@ interface CModel_Resource_ResourceInterface extends CInterface_Responsable, CInt
 
     public function getDiskDriverName();
 
+    public function getConversionsDiskDriverName(): string;
+
     public function getPath($conversionName = '');
 
     public function markAsConversionGenerated($conversionName, $generated);

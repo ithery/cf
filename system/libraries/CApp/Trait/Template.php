@@ -5,6 +5,7 @@ defined('SYSPATH') or die('No direct access allowed.');
 /**
  * @deprecated since 1.6 Apr 10, 2019, 12:34:27 AM
  */
+/** @phpstan-ignore-next-line */
 trait CApp_Trait_Template {
     protected $templateName;
 

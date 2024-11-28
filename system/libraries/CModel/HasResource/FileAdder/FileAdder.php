@@ -16,6 +16,11 @@ use CResources_ImageGenerator_FileType_ImageType as ImageGenerator;
 
 class CModel_HasResource_FileAdder_FileAdder {
     /**
+     * @var null|int
+     */
+    public $order = null;
+
+    /**
      * @var CModel|CModel_HasResourceInterface subject
      */
     protected $subject;
@@ -69,6 +74,16 @@ class CModel_HasResource_FileAdder_FileAdder {
      * @var string
      */
     protected $diskName = '';
+
+    /**
+     * @var null|string
+     */
+    protected $onQueue = null;
+
+    /**
+     * @var null|int
+     */
+    protected $fileSize = null;
 
     /**
      * @var string
@@ -168,12 +183,24 @@ class CModel_HasResource_FileAdder_FileAdder {
         return $this;
     }
 
+    public function setOrder($order) {
+        $this->order = $order;
+
+        return $this;
+    }
+
     public function usingFileName($fileName) {
         return $this->setFileName($fileName);
     }
 
     public function setFileName($fileName) {
         $this->fileName = $fileName;
+
+        return $this;
+    }
+
+    public function setFileSize(int $fileSize) {
+        $this->fileSize = $fileSize;
 
         return $this;
     }
@@ -186,6 +213,12 @@ class CModel_HasResource_FileAdder_FileAdder {
 
     public function storingConversionsOnDisk($diskName) {
         $this->conversionsDiskName = $diskName;
+
+        return $this;
+    }
+
+    public function onQueue($queue = null) {
+        $this->onQueue = $queue;
 
         return $this;
     }
@@ -322,6 +355,9 @@ class CModel_HasResource_FileAdder_FileAdder {
         $resource->custom_properties = $this->customProperties;
         $resource->responsive_images = [];
         $resource->manipulations = $this->manipulations;
+        if ($resource->hasVersionColumn()) {
+            $resource->version = 2;
+        }
         if (c::filled($this->customHeaders)) {
             $resource->setCustomHeaders($this->customHeaders);
         }
@@ -389,13 +425,31 @@ class CModel_HasResource_FileAdder_FileAdder {
     protected function processResourceItem(CModel_HasResourceInterface $model, CModel_Resource_ResourceInterface $resource, self $fileAdder) {
         $this->guardAgainstDisallowedFileAdditions($resource, $model);
         $model->resource()->save($resource);
-        $this->filesystem->add($fileAdder->pathToFile, $resource, $fileAdder->fileName);
+        /** @var CModel|CModel_HasResourceInterface $model */
+        /** @var CModel|CModel_Resource_ResourceInterface $resource */
+        if (!$resource->getConnectionName()) {
+            $resource->setConnection($model->getConnectionName());
+        }
+        if ($fileAdder->file instanceof CResources_Support_RemoteFile) {
+            $addedMediaSuccessfully = $this->filesystem->addRemote($fileAdder->file, $resource, $fileAdder->fileName);
+        } else {
+            $addedMediaSuccessfully = $this->filesystem->add($fileAdder->pathToFile, $resource, $fileAdder->fileName);
+        }
+        if (!$addedMediaSuccessfully) {
+            $resource->forceDelete();
+
+            throw CResources_Exception_FileCannotBeAdded_DiskCannotBeAccessed::create($resource->disk);
+        }
         if (!$fileAdder->preserveOriginal) {
             unlink($fileAdder->pathToFile);
         }
         if ($this->generateResponsiveImages && (new ImageGenerator())->canConvert($resource)) {
-            $generateResponsiveImagesJobClass = CF::config('resource.jobs.generate_responsive_images', GenerateResponsiveImages::class);
+            $generateResponsiveImagesJobClass = CF::config('resource.jobs.generate_responsive_images', CResources_TaskQueue_GenerateResponsiveImage::class);
             $job = new $generateResponsiveImagesJobClass($resource);
+            /** @var CQueue_AbstractTask $job */
+            if ($customConnection = CF::config('resource.queue_connection_name')) {
+                $job->onConnection($customConnection);
+            }
             if ($customQueue = CF::config('resource.queue_name')) {
                 $job->onQueue($customQueue);
             }

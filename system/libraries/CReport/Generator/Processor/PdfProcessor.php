@@ -1,6 +1,9 @@
 <?php
 
 class CReport_Generator_Processor_PdfProcessor extends CReport_Generator_ProcessorAbstract {
+    /**
+     * @var CReport_Adapter_Pdf_TCPDF
+     */
     protected $tcpdf;
 
     public function __construct(CReport_Builder_Report $report) {
@@ -33,7 +36,7 @@ class CReport_Generator_Processor_PdfProcessor extends CReport_Generator_Process
             CREPORT::TEXT_ALIGNMENT_CENTER => 'C',
             CREPORT::TEXT_ALIGNMENT_LEFT => 'L',
             CREPORT::TEXT_ALIGNMENT_RIGHT => 'R',
-            CREPORT::TEXT_ALIGNMENT_JUSTIFY => 'J',
+            CREPORT::TEXT_ALIGNMENT_JUSTIFIED => 'J',
         ];
 
         return carr::get($alignmentMap, $alignment, 'L');
@@ -53,11 +56,10 @@ class CReport_Generator_Processor_PdfProcessor extends CReport_Generator_Process
      * Return format for a component of a box.
      *
      * @param CReport_Builder_Object_Pen      $pen
-     * @param null|CReport_Builder_Object_Box $box
      *
      * @return int[]|string[]|int[][]
      */
-    public static function getPdfPen(CReport_Builder_Object_Pen $pen, CReport_Builder_Object_Box $box = null) {
+    public static function getPdfPen(CReport_Builder_Object_Pen $pen) {
         $lineColor = $pen->getLineColor();
         if ($lineColor) {
             $lineColorRgb = CColor::create($lineColor)->toRgb();
@@ -81,7 +83,9 @@ class CReport_Generator_Processor_PdfProcessor extends CReport_Generator_Process
 
         return [
             'width' => $pen->getLineWidth(),
+            //butt,round,square
             'cap' => 'butt',
+            //miter,round,bevel
             'join' => 'miter',
             'dash' => $dash,
             'phase' => 0,
@@ -283,6 +287,8 @@ class CReport_Generator_Processor_PdfProcessor extends CReport_Generator_Process
         $width = carr::get($options, 'width');
         $height = carr::get($options, 'height');
         $font = carr::get($options, 'font');
+        $letterSpacing = carr::get($options, 'letterSpacing');
+        $wordSpacing = carr::get($options, 'wordSpacing');
         $backgroundColor = carr::get($options, 'backgroundColor');
         $foregroundColor = carr::get($options, 'foregroundColor');
         $x = carr::get($options, 'x');
@@ -320,6 +326,17 @@ class CReport_Generator_Processor_PdfProcessor extends CReport_Generator_Process
             $color = CColor::create($foregroundColor);
             $color = $color->toRgb();
             $this->tcpdf->setTextColor($color->red(), $color->green(), $color->blue());
+        }
+
+        if ($letterSpacing) {
+            $this->tcpdf->setFontSpacing($letterSpacing);
+        } else {
+            $this->tcpdf->setFontSpacing(1);
+        }
+        if ($wordSpacing) {
+            $this->tcpdf->setWordSpacing($wordSpacing);
+        } else {
+            $this->tcpdf->setWordSpacing(1);
         }
         $this->tcpdf->setCellHeightRatio($lineSpacing);
 
@@ -486,5 +503,9 @@ class CReport_Generator_Processor_PdfProcessor extends CReport_Generator_Process
         $style = '';
         $subset = 'default';
         $this->tcpdf->AddFont($fontName, $style, $fontPath, $subset);
+    }
+
+    public function raw($content) {
+        $this->tcpdf->raw($content);
     }
 }

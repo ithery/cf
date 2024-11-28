@@ -10,7 +10,7 @@ class CElement_FormInput_EditorJs_BlockHandler {
     const DEFAULT_ARRAY_KEY = '-';
 
     /**
-     * @var CElement_FormInput_EditorJs_EditorConfig
+     * @var null|CElement_FormInput_EditorJs_EditorConfig
      */
     private $rules = null;
 
@@ -41,7 +41,7 @@ class CElement_FormInput_EditorJs_BlockHandler {
          * Default action for blocks that are not mentioned in a configuration.
          */
         if (!array_key_exists($blockType, $this->rules->tools)) {
-            throw new CElement_FormInput_EditorJs_EditorJsException("Tool `${blockType}` not found in the configuration");
+            throw new CElement_FormInput_EditorJs_EditorJsException('Tool `' . $blockType . '` not found in the configuration');
         }
 
         $rule = $this->rules->tools[$blockType];

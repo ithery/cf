@@ -10,7 +10,7 @@ defined('SYSPATH') or die('No direct access allowed.');
  */
 class CResources_Filesystem {
     /**
-     * @var CResources_Manager
+     * @var CStorage
      */
     protected $filesystem;
 
@@ -27,9 +27,101 @@ class CResources_Filesystem {
     }
 
     public function add($file, CModel_Resource_ResourceInterface $resource, $targetFileName = null) {
-        $this->copyToResourceLibrary($file, $resource, null, $targetFileName);
+        try {
+            $this->copyToResourceLibrary($file, $resource, null, $targetFileName);
+        } catch (CResources_Exception_FileCannotBeAdded_DiskCannotBeAccessed $exception) {
+            return false;
+        }
+
         CEvent::dispatch(new CResources_Event_ResourceHasBeenAdded($resource));
         CResources_Factory::createFileManipulator()->createDerivedFiles($resource);
+
+        return true;
+    }
+
+    public function addRemote(CResources_Support_RemoteFile $file, CModel_Resource_ResourceInterface $resource, $targetFileName = null) {
+        try {
+            $this->copyToResourceLibraryFromRemote($file, $resource, null, $targetFileName);
+        } catch (CResources_Exception_FileCannotBeAdded_DiskCannotBeAccessed $exception) {
+            return false;
+        }
+
+        CEvent::dispatch(new CResources_Event_ResourceHasBeenAdded($resource));
+
+        CResources_Factory::createFileManipulator()->createDerivedFiles($resource);
+
+        return true;
+    }
+
+    public function prepareCopyFileOnDisk(CResources_Support_RemoteFile $file, CModel_Resource_ResourceInterface $resource, string $destination): void {
+        $this->copyFileOnDisk($file->getKey(), $destination, $resource->disk);
+    }
+
+    public function copyToResourceLibraryFromRemote(CResources_Support_RemoteFile $file, CModel_Resource_ResourceInterface $resource, $type = null, $targetFileName = null) {
+        $destinationFileName = $targetFileName ?: $file->getFilename();
+
+        $destination = $this->getResourceDirectory($resource, $type) . $destinationFileName;
+
+        $diskDriverName = (in_array($type, ['conversions', 'responsiveImages']))
+            ? $resource->getConversionsDiskDriverName()
+            : $resource->getDiskDriverName();
+
+        if ($this->shouldCopyFileOnDisk($file, $resource, $diskDriverName)) {
+            $this->prepareCopyFileOnDisk($file, $resource, $destination);
+
+            return;
+        }
+
+        $storage = CStorage::instance()->disk($file->getDisk());
+
+        $headers = $diskDriverName === 'local'
+            ? []
+            : $this->getRemoteHeadersForFile(
+                $file->getKey(),
+                $resource->getCustomHeaders(),
+                $storage->mimeType($file->getKey())
+            );
+
+        $this->streamFileToDisk(
+            $storage->getDriver()->readStream($file->getKey()),
+            $destination,
+            $resource->disk,
+            $headers
+        );
+    }
+
+    protected function shouldCopyFileOnDisk(CResources_Support_RemoteFile $file, CModel_Resource_ResourceInterface $resource, string $diskDriverName): bool {
+        if ($file->getDisk() !== $resource->disk) {
+            return false;
+        }
+
+        if ($diskDriverName === 'local') {
+            return true;
+        }
+
+        if (count($resource->getCustomHeaders()) > 0) {
+            return false;
+        }
+
+        if ((is_countable(CF::config('resource.remote.extra_headers')) ? count(CF::config('resource.remote.extra_headers')) : 0) > 0) {
+            return false;
+        }
+
+        return true;
+    }
+
+    protected function copyFileOnDisk(string $file, string $destination, string $disk): void {
+        $this->filesystem->disk($disk)
+            ->copy($file, $destination);
+    }
+
+    protected function streamFileToDisk($stream, string $destination, string $disk, array $headers): void {
+        $this->filesystem->disk($disk)
+            ->getDriver()->writeStream(
+                $destination,
+                $stream,
+                $headers
+            );
     }
 
     public function copyToResourceLibrary($pathToFile, CModel_Resource_ResourceInterface $resource, $type = null, $targetFileName = null) {
