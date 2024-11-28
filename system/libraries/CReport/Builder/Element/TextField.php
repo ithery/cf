@@ -148,6 +148,7 @@ class CReport_Builder_Element_TextField extends CReport_Builder_ElementAbstract 
             $options['textAlignment'] = $this->getTextAlignment();
             $options['verticalAlignment'] = $this->getVerticalAlignment();
             $options['letterSpacing'] = $this->getLetterSpacing();
+            $options['wordSpacing'] = $this->getWordSpacing();
             $options['font'] = $this->getFont();
             $options['backgroundColor'] = $this->getBackgroundColor();
             $options['foregroundColor'] = $this->getForegroundColor();
@@ -184,6 +185,8 @@ class CReport_Builder_Element_TextField extends CReport_Builder_ElementAbstract 
         $options['backgroundColor'] = $this->getBackgroundColor();
         $options['box'] = $this->getBox();
         $options['lineSpacing'] = $this->getLineSpacing();
+        $options['letterSpacing'] = $this->getLetterSpacing();
+        $options['wordSpacing'] = $this->getWordSpacing();
 
         return $processor->cellHeight($options);
     }

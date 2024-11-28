@@ -32,7 +32,7 @@ class CReport_Builder_Element_PageFooter extends CReport_Builder_ElementAbstract
         $height = $this->getHeight();
         $processor->resetY();
         $report = $generator->getReport();
-        $y = $report->getPageHeight() - $report->getTopMargin() - $height - $report->getBottomMargin();
+        $y = $report->getPageHeight() - ($report->getTopMargin() + $height + $report->getBottomMargin());
         $processor->addY($y);
 
         $generator->setProcessingPageFooter(true);

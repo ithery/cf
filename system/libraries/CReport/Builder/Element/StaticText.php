@@ -70,6 +70,7 @@ class CReport_Builder_Element_StaticText extends CReport_Builder_ElementAbstract
             $options['textAlignment'] = $this->getTextAlignment();
             $options['verticalAlignment'] = $this->getVerticalAlignment();
             $options['letterSpacing'] = $this->getLetterSpacing();
+            $options['wordSpacing'] = $this->getWordSpacing();
             $options['font'] = $this->getFont();
             $options['backgroundColor'] = $this->getBackgroundColor();
             $options['foregroundColor'] = $this->getForegroundColor();

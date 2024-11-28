@@ -1,6 +1,9 @@
 <?php
 
 class CReport_Generator_Processor_PdfProcessor extends CReport_Generator_ProcessorAbstract {
+    /**
+     * @var CReport_Adapter_Pdf_TCPDF
+     */
     protected $tcpdf;
 
     public function __construct(CReport_Builder_Report $report) {
@@ -285,6 +288,7 @@ class CReport_Generator_Processor_PdfProcessor extends CReport_Generator_Process
         $height = carr::get($options, 'height');
         $font = carr::get($options, 'font');
         $letterSpacing = carr::get($options, 'letterSpacing');
+        $wordSpacing = carr::get($options, 'wordSpacing');
         $backgroundColor = carr::get($options, 'backgroundColor');
         $foregroundColor = carr::get($options, 'foregroundColor');
         $x = carr::get($options, 'x');
@@ -326,8 +330,11 @@ class CReport_Generator_Processor_PdfProcessor extends CReport_Generator_Process
 
         if ($letterSpacing) {
             $this->tcpdf->setFontSpacing($letterSpacing);
+        }
+        if ($wordSpacing) {
+            $this->tcpdf->setWordSpacing($wordSpacing);
         } else {
-            $this->tcpdf->setFontSpacing(1);
+            $this->tcpdf->setWordSpacing(1);
         }
         $this->tcpdf->setCellHeightRatio($lineSpacing);
 

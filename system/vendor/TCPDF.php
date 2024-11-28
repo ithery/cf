@@ -1565,6 +1565,13 @@ class TCPDF {
 	protected $font_spacing = 0;
 
 	/**
+	 * Increases or decreases the space between characters in a text by the specified amount (tracking).
+	 * @protected
+	 * @since 6.7.7 (2024-10-26)
+	 */
+	protected $word_spacing = 0;
+
+	/**
 	 * Array of no-write regions.
 	 * ('page' => page number or empy for current page, 'xt' => X top, 'yt' => Y top, 'xb' => X bottom, 'yb' => Y bottom, 'side' => page side 'L' = left or 'R' = right)
 	 * @protected
@@ -5475,6 +5482,10 @@ class TCPDF {
 				// increase/decrease font spacing
 				$rs .= sprintf('BT %F Tc ET ', ($this->font_spacing * $this->k));
 			}
+			if ($this->word_spacing != 0) {
+				// increase/decrease word spacing
+				$rs .= sprintf('BT %F Tw ET ', ($this->word_spacing * $this->k));
+			}
 			if ($this->ColorFlag AND ($this->textrendermode < 4)) {
 				$s .= 'q '.$this->TextColor.' ';
 			}
@@ -5597,6 +5608,10 @@ class TCPDF {
 				// reset font spacing mode
 				$rs .= ' BT 0 Tc ET';
 			}
+			if ($this->word_spacing != 0) {
+				// reset font spacing mode
+				$rs .= ' BT 0 Tw ET';
+			}
 			if ($this->font_stretching != 100) {
 				// reset font stretching mode
 				$rs .= ' BT 100 Tz ET';
@@ -5630,6 +5645,7 @@ class TCPDF {
 		}
 		$gstyles = ''.$this->linestyleWidth.' '.$this->linestyleCap.' '.$this->linestyleJoin.' '.$this->linestyleDash.' '.$this->DrawColor.' '.$this->FillColor."\n";
 		$rs = $gstyles.$rs;
+
 		$this->cell_padding = $prev_cell_padding;
 		$this->cell_margin = $prev_cell_margin;
 		return $rs;
@@ -6086,6 +6102,8 @@ class TCPDF {
 						$resth -= $h;
 					}
 					$ccode .= $this->getCellCode($w, $h, '', $cborder, 1, '', $fill, '', 0, true)."\n";
+
+
 				} // end for each column
 			} elseif ($page == $startpage) { // first page
 				for ($column = $startcolumn; $column < $this->num_columns; ++$column) { // for each column
@@ -6106,6 +6124,7 @@ class TCPDF {
 						$h = $this->h - $this->y - $this->bMargin;
 						$resth -= $h;
 					}
+
 					$ccode .= $this->getCellCode($w, $h, '', $cborder, 1, '', $fill, '', 0, true)."\n";
 				} // end for each column
 			} elseif ($page == $endpage) { // last page
@@ -6810,6 +6829,7 @@ class TCPDF {
 			if ($firstblock AND $this->isRTLTextDir()) {
 				$tmpstr = $this->stringRightTrim($tmpstr);
 			}
+
 			$this->Cell($w, $h, $tmpstr, 0, $ln, $align, $fill, $link, $stretch);
 			unset($tmpstr);
 			if ($firstline) {
@@ -22744,16 +22764,18 @@ class TCPDF {
 		return $this->font_stretching;
 	}
 
-	/**
-	 * Set the amount to increase or decrease the space between characters in a text.
-	 * @param float $spacing amount to increase or decrease the space between characters in a text (0 = default spacing)
-	 * @author Nicola Asuni
-	 * @public
-	 * @since 5.9.000 (2010-09-29)
-	 */
-	public function setFontSpacing($spacing=0) {
-		$this->font_spacing = $spacing;
-	}
+    /**
+     * Set the amount to increase or decrease the space between characters in a text.
+     * @param float $spacing amount to increase or decrease the space between characters in a text (0 = default spacing)
+     * @author Nicola Asuni
+     * @public
+     * @since 5.9.000 (2010-09-29)
+     */
+    public function setFontSpacing($spacing=0) {
+        $this->font_spacing = $spacing;
+    }
+
+
 
 	/**
 	 * Get the amount to increase or decrease the space between characters in a text.
@@ -22765,7 +22787,12 @@ class TCPDF {
 	public function getFontSpacing() {
 		return $this->font_spacing;
 	}
-
+    public function setWordSpacing($spacing=0) {
+        $this->word_spacing = $spacing;
+    }
+    public function getWordSpacing() {
+        return $this->word_spacing;
+    }
 	/**
 	 * Return an array of no-write page regions
 	 * @return array of no-write page regions
