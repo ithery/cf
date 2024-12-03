@@ -11,6 +11,8 @@ use League\OAuth2\Server\Grant\RefreshTokenGrant;
 use League\OAuth2\Server\Grant\ClientCredentialsGrant;
 
 class CApi_OAuth_Loader {
+    protected $apiGroup;
+
     /**
      * AuthorizationServer.
      *
@@ -130,6 +132,10 @@ class CApi_OAuth_Loader {
                 new ClientCredentialsGrant(),
                 $this->oauth->tokensExpireIn()
             );
+            $server->enableGrantType(
+                $this->makeSocialGrant(),
+                $this->oauth->socialAccessTokensExpireIn()
+            );
 
             if ($this->oauth->implicitGrantEnabled) {
                 $server->enableGrantType(
@@ -191,6 +197,22 @@ class CApi_OAuth_Loader {
      */
     protected function makePasswordGrant() {
         $grant = new PasswordGrant(
+            $this->getBridgeUserRepository(),
+            $this->getBridgeRefreshTokenRepository(),
+        );
+
+        $grant->setRefreshTokenTTL($this->oauth->refreshTokensExpireIn());
+
+        return $grant;
+    }
+
+    /**
+     * Create and configure a Password grant instance.
+     *
+     * @return \CApi_OAuth_Bridge_SocialGrant
+     */
+    protected function makeSocialGrant() {
+        $grant = new CApi_OAuth_Bridge_SocialGrant(
             $this->getBridgeUserRepository(),
             $this->getBridgeRefreshTokenRepository(),
         );
