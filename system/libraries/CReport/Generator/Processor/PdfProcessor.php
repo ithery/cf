@@ -333,8 +333,6 @@ class CReport_Generator_Processor_PdfProcessor extends CReport_Generator_Process
         }
         if ($wordSpacing) {
             $this->tcpdf->setWordSpacing($wordSpacing);
-        } else {
-            $this->tcpdf->setWordSpacing(1);
         }
         $this->tcpdf->setCellHeightRatio($lineSpacing);
 
