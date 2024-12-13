@@ -328,10 +328,10 @@ class CReport_Generator_Processor_PdfProcessor extends CReport_Generator_Process
             $this->tcpdf->setTextColor($color->red(), $color->green(), $color->blue());
         }
 
-        if ($letterSpacing) {
+        if ($letterSpacing !== null) {
             $this->tcpdf->setFontSpacing($letterSpacing);
         }
-        if ($wordSpacing) {
+        if ($wordSpacing !== null) {
             $this->tcpdf->setWordSpacing($wordSpacing);
         }
         $this->tcpdf->setCellHeightRatio($lineSpacing);
