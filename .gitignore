@@ -9,8 +9,6 @@ error_log
 application/*
 !application/cresenity
 
-application/cresenity/default/config/*
-application/cresenity/config/*
 
 /config/
 /config/*
