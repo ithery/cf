@@ -12,8 +12,8 @@ application/*
 application/cresenity/default/config/*
 application/cresenity/config/*
 
-config/
-config/*
+/config/
+/config/*
 !config/client_modules.php
 
 #ignore data domain or org
