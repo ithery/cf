@@ -37,6 +37,7 @@ class CResources {
         $date = '';
         $arr_name = explode('_', $filename);
         $count_arr_name = count($arr_name);
+        $name = '';
         //org_code
         if (isset($arr_name[0])) {
             $orgCode = $arr_name[0];
