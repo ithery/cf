@@ -68,7 +68,6 @@ final class CAuth_Manager implements CAuth_Contract_AuthFactoryInterface {
         if (!isset($this->guards[$name])) {
             $this->guards[$name] = $this->resolve($name);
         }
-
         return $this->guards[$name];
     }
 
@@ -83,7 +82,6 @@ final class CAuth_Manager implements CAuth_Contract_AuthFactoryInterface {
      */
     protected function resolve($name) {
         $config = $this->getConfig($name);
-
         if (is_null($config)) {
             throw new InvalidArgumentException("Auth guard [{$name}] is not defined.");
         }
@@ -140,19 +138,10 @@ final class CAuth_Manager implements CAuth_Contract_AuthFactoryInterface {
      * @return \CAuth_Guard_SessionGuard
      */
     public function createSessionDriver($name, $config) {
-        $providerSessionName = carr::get($config, 'providerSessionName', 'user_provider');
-        $provider = null;
-
-        if ($providerSessionName) {
-            $provider = c::session()->get($providerSessionName);
-        }
-        if ($provider == null) {
-            $provider = carr::get($config, 'provider', null);
-        }
+        // $providerSessionName = carr::get($config, 'providerSessionName', 'user_provider');
+        $provider = carr::get($config, 'provider', null);
         $provider = $this->createUserProvider($provider);
-
         $guard = new CAuth_Guard_SessionGuard($name, $provider, c::session());
-
         // When using the remember me functionality of the authentication services we
         // will need to be set the encryption instance of the guard, which allows
         // secure, encrypted cookie values to get generated for those cookies.
