@@ -104,7 +104,8 @@ class CDatabase_Schema_Grammar_MySqlGrammar extends CDatabase_Schema_Grammar {
             'select column_name as `name`, data_type as `type_name`, column_type as `type`, '
             . 'collation_name as `collation`, is_nullable as `nullable`, '
             . 'column_default as `default`, column_comment as `comment`, '
-            . 'generation_expression as `expression`, extra as `extra` '
+            // . 'generation_expression as `expression`, extra as `extra` '
+            . 'extra as `extra` '
             . 'from information_schema.columns where table_schema = %s and table_name = %s '
             . 'order by ordinal_position asc',
             $this->quoteString($database),
