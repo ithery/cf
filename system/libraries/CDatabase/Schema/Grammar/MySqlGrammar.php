@@ -21,8 +21,8 @@ class CDatabase_Schema_Grammar_MySqlGrammar extends CDatabase_Schema_Grammar {
     /**
      * Compile a create database command.
      *
-     * @param string                $name
-     * @param \CDatabase_Connection $connection
+     * @param string               $name
+     * @param CDatabase_Connection $connection
      *
      * @return string
      */
@@ -161,9 +161,9 @@ class CDatabase_Schema_Grammar_MySqlGrammar extends CDatabase_Schema_Grammar {
     /**
      * Compile a create table command.
      *
-     * @param \CDatabase_Schema_Blueprint $blueprint
-     * @param \CBase_Fluent               $command
-     * @param \CDatabase_Connection       $connection
+     * @param CDatabase_Schema_Blueprint $blueprint
+     * @param CBase_Fluent               $command
+     * @param CDatabase_Connection       $connection
      *
      * @return array
      */
@@ -192,9 +192,9 @@ class CDatabase_Schema_Grammar_MySqlGrammar extends CDatabase_Schema_Grammar {
     /**
      * Create the main create table clause.
      *
-     * @param \CDatabase_Schema_Blueprint $blueprint
-     * @param \CBase_Fluent               $command
-     * @param \CDatabase_Connection       $connection
+     * @param CDatabase_Schema_Blueprint $blueprint
+     * @param CBase_Fluent               $command
+     * @param CDatabase_Connection       $connection
      *
      * @return array
      */
@@ -222,9 +222,9 @@ class CDatabase_Schema_Grammar_MySqlGrammar extends CDatabase_Schema_Grammar {
     /**
      * Append the character set specifications to a command.
      *
-     * @param string                      $sql
-     * @param \CDatabase_Connection       $connection
-     * @param \CDatabase_Schema_Blueprint $blueprint
+     * @param string                     $sql
+     * @param CDatabase_Connection       $connection
+     * @param CDatabase_Schema_Blueprint $blueprint
      *
      * @return string
      */
@@ -253,9 +253,9 @@ class CDatabase_Schema_Grammar_MySqlGrammar extends CDatabase_Schema_Grammar {
     /**
      * Append the engine specifications to a command.
      *
-     * @param string                      $sql
-     * @param \CDatabase_Connection       $connection
-     * @param \CDatabase_Schema_Blueprint $blueprint
+     * @param string                     $sql
+     * @param CDatabase_Connection       $connection
+     * @param CDatabase_Schema_Blueprint $blueprint
      *
      * @return string
      */
@@ -272,8 +272,8 @@ class CDatabase_Schema_Grammar_MySqlGrammar extends CDatabase_Schema_Grammar {
     /**
      * Compile an add column command.
      *
-     * @param \CDatabase_Schema_Blueprint $blueprint
-     * @param \CBase_Fluent               $command
+     * @param CDatabase_Schema_Blueprint $blueprint
+     * @param CBase_Fluent               $command
      *
      * @return array
      */
@@ -286,8 +286,8 @@ class CDatabase_Schema_Grammar_MySqlGrammar extends CDatabase_Schema_Grammar {
     /**
      * Compile the auto-incrementing column starting values.
      *
-     * @param \CDatabase_Schema_Blueprint $blueprint
-     * @param \CBase_Fluent               $command
+     * @param CDatabase_Schema_Blueprint $blueprint
+     * @param CBase_Fluent               $command
      *
      * @return string
      */
@@ -302,9 +302,9 @@ class CDatabase_Schema_Grammar_MySqlGrammar extends CDatabase_Schema_Grammar {
     /**
      * Compile a rename column command.
      *
-     * @param \CDatabase_Schema_Blueprint $blueprint
-     * @param \CBase_Fluent               $command
-     * @param \CDatabase_Connection       $connection
+     * @param CDatabase_Schema_Blueprint $blueprint
+     * @param CBase_Fluent               $command
+     * @param CDatabase_Connection       $connection
      *
      * @return array|string
      */
@@ -322,8 +322,8 @@ class CDatabase_Schema_Grammar_MySqlGrammar extends CDatabase_Schema_Grammar {
     /**
      * Compile a primary key command.
      *
-     * @param \CDatabase_Schema_Blueprint $blueprint
-     * @param \CBase_Fluent               $command
+     * @param CDatabase_Schema_Blueprint $blueprint
+     * @param CBase_Fluent               $command
      *
      * @return string
      */
@@ -336,8 +336,8 @@ class CDatabase_Schema_Grammar_MySqlGrammar extends CDatabase_Schema_Grammar {
     /**
      * Compile a unique key command.
      *
-     * @param \CDatabase_Schema_Blueprint $blueprint
-     * @param \CBase_Fluent               $command
+     * @param CDatabase_Schema_Blueprint $blueprint
+     * @param CBase_Fluent               $command
      *
      * @return string
      */
@@ -348,8 +348,8 @@ class CDatabase_Schema_Grammar_MySqlGrammar extends CDatabase_Schema_Grammar {
     /**
      * Compile a plain index key command.
      *
-     * @param \CDatabase_Schema_Blueprint $blueprint
-     * @param \CBase_Fluent               $command
+     * @param CDatabase_Schema_Blueprint $blueprint
+     * @param CBase_Fluent               $command
      *
      * @return string
      */
@@ -360,7 +360,7 @@ class CDatabase_Schema_Grammar_MySqlGrammar extends CDatabase_Schema_Grammar {
     /**
      * Compile a fulltext index key command.
      *
-     * @param \CDatabase_Schema_Blueprint $blueprint
+     * @param CDatabase_Schema_Blueprint $blueprint
      * @param \CBase)Fluent            $command
      *
      * @return string
@@ -372,8 +372,8 @@ class CDatabase_Schema_Grammar_MySqlGrammar extends CDatabase_Schema_Grammar {
     /**
      * Compile a spatial index key command.
      *
-     * @param \CDatabase_Schema_Blueprint $blueprint
-     * @param \CBase_Fluent               $command
+     * @param CDatabase_Schema_Blueprint $blueprint
+     * @param CBase_Fluent               $command
      *
      * @return string
      */
@@ -384,9 +384,9 @@ class CDatabase_Schema_Grammar_MySqlGrammar extends CDatabase_Schema_Grammar {
     /**
      * Compile an index creation command.
      *
-     * @param \CDatabase_Schema_Blueprint $blueprint
-     * @param \CBase_Fluent               $command
-     * @param string                      $type
+     * @param CDatabase_Schema_Blueprint $blueprint
+     * @param CBase_Fluent               $command
+     * @param string                     $type
      *
      * @return string
      */
@@ -404,8 +404,8 @@ class CDatabase_Schema_Grammar_MySqlGrammar extends CDatabase_Schema_Grammar {
     /**
      * Compile a drop table command.
      *
-     * @param \CDatabase_Schema_Blueprint $blueprint
-     * @param \CBase_Fluent               $command
+     * @param CDatabase_Schema_Blueprint $blueprint
+     * @param CBase_Fluent               $command
      *
      * @return string
      */
@@ -416,8 +416,8 @@ class CDatabase_Schema_Grammar_MySqlGrammar extends CDatabase_Schema_Grammar {
     /**
      * Compile a drop table (if exists) command.
      *
-     * @param \CDatabase_Schema_Blueprint $blueprint
-     * @param \CBase_Fluent               $command
+     * @param CDatabase_Schema_Blueprint $blueprint
+     * @param CBase_Fluent               $command
      *
      * @return string
      */
@@ -428,8 +428,8 @@ class CDatabase_Schema_Grammar_MySqlGrammar extends CDatabase_Schema_Grammar {
     /**
      * Compile a drop column command.
      *
-     * @param \CDatabase_Schema_Blueprint $blueprint
-     * @param \CBase_Fluent               $command
+     * @param CDatabase_Schema_Blueprint $blueprint
+     * @param CBase_Fluent               $command
      *
      * @return string
      */
@@ -442,8 +442,8 @@ class CDatabase_Schema_Grammar_MySqlGrammar extends CDatabase_Schema_Grammar {
     /**
      * Compile a drop primary key command.
      *
-     * @param \CDatabase_Schema_Blueprint $blueprint
-     * @param \CBase_Fluent               $command
+     * @param CDatabase_Schema_Blueprint $blueprint
+     * @param CBase_Fluent               $command
      *
      * @return string
      */
@@ -454,8 +454,8 @@ class CDatabase_Schema_Grammar_MySqlGrammar extends CDatabase_Schema_Grammar {
     /**
      * Compile a drop unique key command.
      *
-     * @param \CDatabase_Schema_Blueprint $blueprint
-     * @param \CBase_Fluent               $command
+     * @param CDatabase_Schema_Blueprint $blueprint
+     * @param CBase_Fluent               $command
      *
      * @return string
      */
@@ -468,8 +468,8 @@ class CDatabase_Schema_Grammar_MySqlGrammar extends CDatabase_Schema_Grammar {
     /**
      * Compile a drop index command.
      *
-     * @param \CDatabase_Schema_Blueprint $blueprint
-     * @param \CBase_Fluent               $command
+     * @param CDatabase_Schema_Blueprint $blueprint
+     * @param CBase_Fluent               $command
      *
      * @return string
      */
@@ -482,8 +482,8 @@ class CDatabase_Schema_Grammar_MySqlGrammar extends CDatabase_Schema_Grammar {
     /**
      * Compile a drop fulltext index command.
      *
-     * @param \CDatabase_Schema_Blueprint $blueprint
-     * @param \CBase_Fluent               $command
+     * @param CDatabase_Schema_Blueprint $blueprint
+     * @param CBase_Fluent               $command
      *
      * @return string
      */
@@ -494,8 +494,8 @@ class CDatabase_Schema_Grammar_MySqlGrammar extends CDatabase_Schema_Grammar {
     /**
      * Compile a drop spatial index command.
      *
-     * @param \CDatabase_Schema_Blueprint $blueprint
-     * @param \CBase_Fluent               $command
+     * @param CDatabase_Schema_Blueprint $blueprint
+     * @param CBase_Fluent               $command
      *
      * @return string
      */
@@ -506,8 +506,8 @@ class CDatabase_Schema_Grammar_MySqlGrammar extends CDatabase_Schema_Grammar {
     /**
      * Compile a drop foreign key command.
      *
-     * @param \CDatabase_Schema_Blueprint $blueprint
-     * @param \CBase_Fluent               $command
+     * @param CDatabase_Schema_Blueprint $blueprint
+     * @param CBase_Fluent               $command
      *
      * @return string
      */
@@ -520,8 +520,8 @@ class CDatabase_Schema_Grammar_MySqlGrammar extends CDatabase_Schema_Grammar {
     /**
      * Compile a rename table command.
      *
-     * @param \CDatabase_Schema_Blueprint $blueprint
-     * @param \CBase_Fluent               $command
+     * @param CDatabase_Schema_Blueprint $blueprint
+     * @param CBase_Fluent               $command
      *
      * @return string
      */
@@ -534,8 +534,8 @@ class CDatabase_Schema_Grammar_MySqlGrammar extends CDatabase_Schema_Grammar {
     /**
      * Compile a rename index command.
      *
-     * @param \CDatabase_Schema_Blueprint $blueprint
-     * @param \CBase_Fluent               $command
+     * @param CDatabase_Schema_Blueprint $blueprint
+     * @param CBase_Fluent               $command
      *
      * @return string
      */
@@ -609,7 +609,7 @@ class CDatabase_Schema_Grammar_MySqlGrammar extends CDatabase_Schema_Grammar {
     /**
      * Create the column definition for a char type.
      *
-     * @param \CBase_Fluent $column
+     * @param CBase_Fluent $column
      *
      * @return string
      */
@@ -620,7 +620,7 @@ class CDatabase_Schema_Grammar_MySqlGrammar extends CDatabase_Schema_Grammar {
     /**
      * Create the column definition for a string type.
      *
-     * @param \CBase_Fluent $column
+     * @param CBase_Fluent $column
      *
      * @return string
      */
@@ -631,7 +631,7 @@ class CDatabase_Schema_Grammar_MySqlGrammar extends CDatabase_Schema_Grammar {
     /**
      * Create the column definition for a tiny text type.
      *
-     * @param \CBase_Fluent $column
+     * @param CBase_Fluent $column
      *
      * @return string
      */
@@ -642,7 +642,7 @@ class CDatabase_Schema_Grammar_MySqlGrammar extends CDatabase_Schema_Grammar {
     /**
      * Create the column definition for a text type.
      *
-     * @param \CBase_Fluent $column
+     * @param CBase_Fluent $column
      *
      * @return string
      */
@@ -653,7 +653,7 @@ class CDatabase_Schema_Grammar_MySqlGrammar extends CDatabase_Schema_Grammar {
     /**
      * Create the column definition for a medium text type.
      *
-     * @param \CBase_Fluent $column
+     * @param CBase_Fluent $column
      *
      * @return string
      */
@@ -664,7 +664,7 @@ class CDatabase_Schema_Grammar_MySqlGrammar extends CDatabase_Schema_Grammar {
     /**
      * Create the column definition for a long text type.
      *
-     * @param \CBase_Fluent $column
+     * @param CBase_Fluent $column
      *
      * @return string
      */
@@ -675,7 +675,7 @@ class CDatabase_Schema_Grammar_MySqlGrammar extends CDatabase_Schema_Grammar {
     /**
      * Create the column definition for a big integer type.
      *
-     * @param \CBase_Fluent $column
+     * @param CBase_Fluent $column
      *
      * @return string
      */
@@ -686,7 +686,7 @@ class CDatabase_Schema_Grammar_MySqlGrammar extends CDatabase_Schema_Grammar {
     /**
      * Create the column definition for an integer type.
      *
-     * @param \CBase_Fluent $column
+     * @param CBase_Fluent $column
      *
      * @return string
      */
@@ -697,7 +697,7 @@ class CDatabase_Schema_Grammar_MySqlGrammar extends CDatabase_Schema_Grammar {
     /**
      * Create the column definition for a medium integer type.
      *
-     * @param \CBase_Fluent $column
+     * @param CBase_Fluent $column
      *
      * @return string
      */
@@ -708,7 +708,7 @@ class CDatabase_Schema_Grammar_MySqlGrammar extends CDatabase_Schema_Grammar {
     /**
      * Create the column definition for a tiny integer type.
      *
-     * @param \CBase_Fluent $column
+     * @param CBase_Fluent $column
      *
      * @return string
      */
@@ -719,7 +719,7 @@ class CDatabase_Schema_Grammar_MySqlGrammar extends CDatabase_Schema_Grammar {
     /**
      * Create the column definition for a small integer type.
      *
-     * @param \CBase_Fluent $column
+     * @param CBase_Fluent $column
      *
      * @return string
      */
@@ -730,7 +730,7 @@ class CDatabase_Schema_Grammar_MySqlGrammar extends CDatabase_Schema_Grammar {
     /**
      * Create the column definition for a float type.
      *
-     * @param \CBase_Fluent $column
+     * @param CBase_Fluent $column
      *
      * @return string
      */
@@ -741,7 +741,7 @@ class CDatabase_Schema_Grammar_MySqlGrammar extends CDatabase_Schema_Grammar {
     /**
      * Create the column definition for a double type.
      *
-     * @param \CBase_Fluent $column
+     * @param CBase_Fluent $column
      *
      * @return string
      */
@@ -756,7 +756,7 @@ class CDatabase_Schema_Grammar_MySqlGrammar extends CDatabase_Schema_Grammar {
     /**
      * Create the column definition for a decimal type.
      *
-     * @param \CBase_Fluent $column
+     * @param CBase_Fluent $column
      *
      * @return string
      */
@@ -767,7 +767,7 @@ class CDatabase_Schema_Grammar_MySqlGrammar extends CDatabase_Schema_Grammar {
     /**
      * Create the column definition for a boolean type.
      *
-     * @param \CBase_Fluent $column
+     * @param CBase_Fluent $column
      *
      * @return string
      */
@@ -778,7 +778,7 @@ class CDatabase_Schema_Grammar_MySqlGrammar extends CDatabase_Schema_Grammar {
     /**
      * Create the column definition for an enumeration type.
      *
-     * @param \CBase_Fluent $column
+     * @param CBase_Fluent $column
      *
      * @return string
      */
@@ -789,7 +789,7 @@ class CDatabase_Schema_Grammar_MySqlGrammar extends CDatabase_Schema_Grammar {
     /**
      * Create the column definition for a set enumeration type.
      *
-     * @param \CBase_Fluent $column
+     * @param CBase_Fluent $column
      *
      * @return string
      */
@@ -800,7 +800,7 @@ class CDatabase_Schema_Grammar_MySqlGrammar extends CDatabase_Schema_Grammar {
     /**
      * Create the column definition for a json type.
      *
-     * @param \CBase_Fluent $column
+     * @param CBase_Fluent $column
      *
      * @return string
      */
@@ -811,7 +811,7 @@ class CDatabase_Schema_Grammar_MySqlGrammar extends CDatabase_Schema_Grammar {
     /**
      * Create the column definition for a jsonb type.
      *
-     * @param \CBase_Fluent $column
+     * @param CBase_Fluent $column
      *
      * @return string
      */
@@ -822,7 +822,7 @@ class CDatabase_Schema_Grammar_MySqlGrammar extends CDatabase_Schema_Grammar {
     /**
      * Create the column definition for a date type.
      *
-     * @param \CBase_Fluent $column
+     * @param CBase_Fluent $column
      *
      * @return string
      */
@@ -833,7 +833,7 @@ class CDatabase_Schema_Grammar_MySqlGrammar extends CDatabase_Schema_Grammar {
     /**
      * Create the column definition for a date-time type.
      *
-     * @param \CBase_Fluent $column
+     * @param CBase_Fluent $column
      *
      * @return string
      */
@@ -850,7 +850,7 @@ class CDatabase_Schema_Grammar_MySqlGrammar extends CDatabase_Schema_Grammar {
     /**
      * Create the column definition for a date-time (with time zone) type.
      *
-     * @param \CBase_Fluent $column
+     * @param CBase_Fluent $column
      *
      * @return string
      */
@@ -861,7 +861,7 @@ class CDatabase_Schema_Grammar_MySqlGrammar extends CDatabase_Schema_Grammar {
     /**
      * Create the column definition for a time type.
      *
-     * @param \CBase_Fluent $column
+     * @param CBase_Fluent $column
      *
      * @return string
      */
@@ -872,7 +872,7 @@ class CDatabase_Schema_Grammar_MySqlGrammar extends CDatabase_Schema_Grammar {
     /**
      * Create the column definition for a time (with time zone) type.
      *
-     * @param \CBase_Fluent $column
+     * @param CBase_Fluent $column
      *
      * @return string
      */
@@ -883,7 +883,7 @@ class CDatabase_Schema_Grammar_MySqlGrammar extends CDatabase_Schema_Grammar {
     /**
      * Create the column definition for a timestamp type.
      *
-     * @param \CBase_Fluent $column
+     * @param CBase_Fluent $column
      *
      * @return string
      */
@@ -900,7 +900,7 @@ class CDatabase_Schema_Grammar_MySqlGrammar extends CDatabase_Schema_Grammar {
     /**
      * Create the column definition for a timestamp (with time zone) type.
      *
-     * @param \CBase_Fluent $column
+     * @param CBase_Fluent $column
      *
      * @return string
      */
@@ -911,7 +911,7 @@ class CDatabase_Schema_Grammar_MySqlGrammar extends CDatabase_Schema_Grammar {
     /**
      * Create the column definition for a year type.
      *
-     * @param \CBase_Fluent $column
+     * @param CBase_Fluent $column
      *
      * @return string
      */
@@ -922,7 +922,7 @@ class CDatabase_Schema_Grammar_MySqlGrammar extends CDatabase_Schema_Grammar {
     /**
      * Create the column definition for a binary type.
      *
-     * @param \CBase_Fluent $column
+     * @param CBase_Fluent $column
      *
      * @return string
      */
@@ -933,7 +933,7 @@ class CDatabase_Schema_Grammar_MySqlGrammar extends CDatabase_Schema_Grammar {
     /**
      * Create the column definition for a uuid type.
      *
-     * @param \CBase_Fluent $column
+     * @param CBase_Fluent $column
      *
      * @return string
      */
@@ -944,7 +944,7 @@ class CDatabase_Schema_Grammar_MySqlGrammar extends CDatabase_Schema_Grammar {
     /**
      * Create the column definition for an IP address type.
      *
-     * @param \CBase_Fluent $column
+     * @param CBase_Fluent $column
      *
      * @return string
      */
@@ -955,7 +955,7 @@ class CDatabase_Schema_Grammar_MySqlGrammar extends CDatabase_Schema_Grammar {
     /**
      * Create the column definition for a MAC address type.
      *
-     * @param \CBase_Fluent $column
+     * @param CBase_Fluent $column
      *
      * @return string
      */
@@ -966,7 +966,7 @@ class CDatabase_Schema_Grammar_MySqlGrammar extends CDatabase_Schema_Grammar {
     /**
      * Create the column definition for a spatial Geometry type.
      *
-     * @param \CBase_Fluent $column
+     * @param CBase_Fluent $column
      *
      * @return string
      */
@@ -992,7 +992,7 @@ class CDatabase_Schema_Grammar_MySqlGrammar extends CDatabase_Schema_Grammar {
     /**
      * Create the column definition for a spatial Point type.
      *
-     * @param \CBase_Fluent $column
+     * @param CBase_Fluent $column
      *
      * @return string
      */
@@ -1003,7 +1003,7 @@ class CDatabase_Schema_Grammar_MySqlGrammar extends CDatabase_Schema_Grammar {
     /**
      * Create the column definition for a spatial LineString type.
      *
-     * @param \CBase_Fluent $column
+     * @param CBase_Fluent $column
      *
      * @return string
      */
@@ -1014,7 +1014,7 @@ class CDatabase_Schema_Grammar_MySqlGrammar extends CDatabase_Schema_Grammar {
     /**
      * Create the column definition for a spatial Polygon type.
      *
-     * @param \CBase_Fluent $column
+     * @param CBase_Fluent $column
      *
      * @return string
      */
@@ -1025,7 +1025,7 @@ class CDatabase_Schema_Grammar_MySqlGrammar extends CDatabase_Schema_Grammar {
     /**
      * Create the column definition for a spatial GeometryCollection type.
      *
-     * @param \CBase_Fluent $column
+     * @param CBase_Fluent $column
      *
      * @return string
      */
@@ -1036,7 +1036,7 @@ class CDatabase_Schema_Grammar_MySqlGrammar extends CDatabase_Schema_Grammar {
     /**
      * Create the column definition for a spatial MultiPoint type.
      *
-     * @param \CBase_Fluent $column
+     * @param CBase_Fluent $column
      *
      * @return string
      */
@@ -1047,7 +1047,7 @@ class CDatabase_Schema_Grammar_MySqlGrammar extends CDatabase_Schema_Grammar {
     /**
      * Create the column definition for a spatial MultiLineString type.
      *
-     * @param \CBase_Fluent $column
+     * @param CBase_Fluent $column
      *
      * @return string
      */
@@ -1058,7 +1058,7 @@ class CDatabase_Schema_Grammar_MySqlGrammar extends CDatabase_Schema_Grammar {
     /**
      * Create the column definition for a spatial MultiPolygon type.
      *
-     * @param \CBase_Fluent $column
+     * @param CBase_Fluent $column
      *
      * @return string
      */
@@ -1069,9 +1069,9 @@ class CDatabase_Schema_Grammar_MySqlGrammar extends CDatabase_Schema_Grammar {
     /**
      * Create the column definition for a generated, computed column type.
      *
-     * @param \CBase_Fluent $column
+     * @param CBase_Fluent $column
      *
-     * @throws \RuntimeException
+     * @throws RuntimeException
      *
      * @return void
      */
@@ -1082,8 +1082,8 @@ class CDatabase_Schema_Grammar_MySqlGrammar extends CDatabase_Schema_Grammar {
     /**
      * Get the SQL for a generated virtual column modifier.
      *
-     * @param \CDatabase_Schema_Blueprint $blueprint
-     * @param \CBase_Fluent               $column
+     * @param CDatabase_Schema_Blueprint $blueprint
+     * @param CBase_Fluent               $column
      *
      * @return null|string
      */
@@ -1096,8 +1096,8 @@ class CDatabase_Schema_Grammar_MySqlGrammar extends CDatabase_Schema_Grammar {
     /**
      * Get the SQL for a generated stored column modifier.
      *
-     * @param \CDatabase_Schema_Blueprint $blueprint
-     * @param \CBase_Fluent               $column
+     * @param CDatabase_Schema_Blueprint $blueprint
+     * @param CBase_Fluent               $column
      *
      * @return null|string
      */
@@ -1110,8 +1110,8 @@ class CDatabase_Schema_Grammar_MySqlGrammar extends CDatabase_Schema_Grammar {
     /**
      * Get the SQL for an unsigned column modifier.
      *
-     * @param \CDatabase_Schema_Blueprint $blueprint
-     * @param \CBase_Fluent               $column
+     * @param CDatabase_Schema_Blueprint $blueprint
+     * @param CBase_Fluent               $column
      *
      * @return null|string
      */
@@ -1124,8 +1124,8 @@ class CDatabase_Schema_Grammar_MySqlGrammar extends CDatabase_Schema_Grammar {
     /**
      * Get the SQL for a character set column modifier.
      *
-     * @param \CDatabase_Schema_Blueprint $blueprint
-     * @param \CBase_Fluent               $column
+     * @param CDatabase_Schema_Blueprint $blueprint
+     * @param CBase_Fluent               $column
      *
      * @return null|string
      */
@@ -1138,8 +1138,8 @@ class CDatabase_Schema_Grammar_MySqlGrammar extends CDatabase_Schema_Grammar {
     /**
      * Get the SQL for a collation column modifier.
      *
-     * @param \CDatabase_Schema_Blueprint $blueprint
-     * @param \CBase_Fluent               $column
+     * @param CDatabase_Schema_Blueprint $blueprint
+     * @param CBase_Fluent               $column
      *
      * @return null|string
      */
@@ -1152,8 +1152,8 @@ class CDatabase_Schema_Grammar_MySqlGrammar extends CDatabase_Schema_Grammar {
     /**
      * Get the SQL for a nullable column modifier.
      *
-     * @param \CDatabase_Schema_Blueprint $blueprint
-     * @param \CBase_Fluent               $column
+     * @param CDatabase_Schema_Blueprint $blueprint
+     * @param CBase_Fluent               $column
      *
      * @return null|string
      */
@@ -1170,8 +1170,8 @@ class CDatabase_Schema_Grammar_MySqlGrammar extends CDatabase_Schema_Grammar {
     /**
      * Get the SQL for an invisible column modifier.
      *
-     * @param \CDatabase_Schema_Blueprint $blueprint
-     * @param \CBase_Fluent               $column
+     * @param CDatabase_Schema_Blueprint $blueprint
+     * @param CBase_Fluent               $column
      *
      * @return null|string
      */
@@ -1184,8 +1184,8 @@ class CDatabase_Schema_Grammar_MySqlGrammar extends CDatabase_Schema_Grammar {
     /**
      * Get the SQL for a default column modifier.
      *
-     * @param \CDatabase_Schema_Blueprint $blueprint
-     * @param \CBase_Fluent               $column
+     * @param CDatabase_Schema_Blueprint $blueprint
+     * @param CBase_Fluent               $column
      *
      * @return null|string
      */
@@ -1198,8 +1198,8 @@ class CDatabase_Schema_Grammar_MySqlGrammar extends CDatabase_Schema_Grammar {
     /**
      * Get the SQL for an "on update" column modifier.
      *
-     * @param \CDatabase_Schema_Blueprint $blueprint
-     * @param \CBase_Fluent               $column
+     * @param CDatabase_Schema_Blueprint $blueprint
+     * @param CBase_Fluent               $column
      *
      * @return null|string
      */
@@ -1212,8 +1212,8 @@ class CDatabase_Schema_Grammar_MySqlGrammar extends CDatabase_Schema_Grammar {
     /**
      * Get the SQL for an auto-increment column modifier.
      *
-     * @param \CDatabase_Schema_Blueprint $blueprint
-     * @param \CBase_Fluent               $column
+     * @param CDatabase_Schema_Blueprint $blueprint
+     * @param CBase_Fluent               $column
      *
      * @return null|string
      */
@@ -1226,8 +1226,8 @@ class CDatabase_Schema_Grammar_MySqlGrammar extends CDatabase_Schema_Grammar {
     /**
      * Get the SQL for a "first" column modifier.
      *
-     * @param \CDatabase_Schema_Blueprint $blueprint
-     * @param \CBase_Fluent               $column
+     * @param CDatabase_Schema_Blueprint $blueprint
+     * @param CBase_Fluent               $column
      *
      * @return null|string
      */
@@ -1240,8 +1240,8 @@ class CDatabase_Schema_Grammar_MySqlGrammar extends CDatabase_Schema_Grammar {
     /**
      * Get the SQL for an "after" column modifier.
      *
-     * @param \CDatabase_Schema_Blueprint $blueprint
-     * @param \CBase_Fluent               $column
+     * @param CDatabase_Schema_Blueprint $blueprint
+     * @param CBase_Fluent               $column
      *
      * @return null|string
      */
@@ -1254,8 +1254,8 @@ class CDatabase_Schema_Grammar_MySqlGrammar extends CDatabase_Schema_Grammar {
     /**
      * Get the SQL for a "comment" column modifier.
      *
-     * @param \CDatabase_Schema_Blueprint $blueprint
-     * @param \CBase_Fluent               $column
+     * @param CDatabase_Schema_Blueprint $blueprint
+     * @param CBase_Fluent               $column
      *
      * @return null|string
      */
@@ -1268,8 +1268,8 @@ class CDatabase_Schema_Grammar_MySqlGrammar extends CDatabase_Schema_Grammar {
     /**
      * Get the SQL for a SRID column modifier.
      *
-     * @param \CDatabase_Schema_Blueprint $blueprint
-     * @param \CBase_Fluent               $column
+     * @param CDatabase_Schema_Blueprint $blueprint
+     * @param CBase_Fluent               $column
      *
      * @return null|string
      */
