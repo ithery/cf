@@ -45,6 +45,28 @@ trait CDatabase_Trait_Builder {
     }
 
     /**
+     * Run a map over each item while chunking.
+     *
+     * @template TReturn
+     *
+     * @param callable(TValue): TReturn $callback
+     * @param int                       $count
+     *
+     * @return \CCollection<int, TReturn>
+     */
+    public function chunkMap($callback, $count = 1000) {
+        $collection = new CCollection();
+
+        $this->chunk($count, function ($items) use ($collection, $callback) {
+            $items->each(function ($item) use ($collection, $callback) {
+                $collection->push($callback($item));
+            });
+        });
+
+        return $collection;
+    }
+
+    /**
      * Execute a callback over each item while chunking.
      *
      * @param callable $callback
@@ -72,14 +94,41 @@ trait CDatabase_Trait_Builder {
      *
      * @return bool
      */
-    public function chunkById($count, callable $callback, $column = null, $alias = null) {
-        if ($column == null) {
-            $column = $this->defaultKeyName();
-        }
+    public function chunkById($count, $callback, $column = null, $alias = null) {
+        return $this->orderedChunkById($count, $callback, $column, $alias);
+    }
 
-        if ($alias == null) {
-            $alias = $column;
-        }
+    /**
+     * Chunk the results of a query by comparing IDs in descending order.
+     *
+     * @param int                                             $count
+     * @param callable(\CCollection<int, TValue>, int): mixed $callback
+     * @param null|string                                     $column
+     * @param null|string                                     $alias
+     *
+     * @return bool
+     */
+    public function chunkByIdDesc($count, $callback, $column = null, $alias = null) {
+        return $this->orderedChunkById($count, $callback, $column, $alias, true);
+    }
+
+    /**
+     * Chunk the results of a query by comparing IDs in a given order.
+     *
+     * @param int                                             $count
+     * @param callable(\CCollection<int, TValue>, int): mixed $callback
+     * @param null|string                                     $column
+     * @param null|string                                     $alias
+     * @param bool                                            $descending
+     *
+     * @throws \RuntimeException
+     *
+     * @return bool
+     */
+    public function orderedChunkById($count, $callback, $column = null, $alias = null, $descending = false) {
+        $column ??= $this->defaultKeyName();
+
+        $alias ??= $column;
 
         $lastId = null;
 
@@ -91,7 +140,11 @@ trait CDatabase_Trait_Builder {
             // We'll execute the query for the given page and get the results. If there are
             // no results we can just break and return from here. When there are results
             // we will call the callback with the current chunk of these results here.
-            $results = $clone->forPageAfterId($count, $lastId, $column)->get();
+            if ($descending) {
+                $results = $clone->forPageBeforeId($count, $lastId, $column)->get();
+            } else {
+                $results = $clone->forPageAfterId($count, $lastId, $column)->get();
+            }
 
             $countResults = $results->count();
 
@@ -106,7 +159,11 @@ trait CDatabase_Trait_Builder {
                 return false;
             }
 
-            $lastId = $results->last()->{$alias};
+            $lastId = c::get($results->last(), $alias);
+
+            if ($lastId === null) {
+                throw new RuntimeException("The chunkById operation was aborted because the [{$alias}] column is not present in the query result.");
+            }
 
             unset($results);
 
@@ -260,6 +317,24 @@ trait CDatabase_Trait_Builder {
      */
     public function first($columns = ['*']) {
         return $this->take(1)->get($columns)->first();
+    }
+
+    /**
+     * Execute the query and get the first result or throw an exception.
+     *
+     * @param array|string $columns
+     * @param null|string  $message
+     *
+     * @throws \CDatabase_Exception_RecordNotFoundException
+     *
+     * @return TValue
+     */
+    public function firstOrFail($columns = ['*'], $message = null) {
+        if (!is_null($result = $this->first($columns))) {
+            return $result;
+        }
+
+        throw new CDatabase_Exception_RecordNotFoundException($message ?: 'No record found for the given query.');
     }
 
     /**
