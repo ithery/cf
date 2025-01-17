@@ -752,11 +752,13 @@ class c {
         if (is_numeric($value) || is_bool($value)) {
             return false;
         }
-
+        if ($value instanceof CModel) {
+            return false;
+        }
         if ($value instanceof Countable) {
             return count($value) === 0;
         }
-        if ($value instanceof CBase_String) {
+        if ($value instanceof Stringable) {
             return trim((string) $value) === '';
         }
 
