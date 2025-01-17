@@ -773,7 +773,7 @@ class c {
      * @return bool
      */
     public static function filled($value) {
-        return !static::blank($value);
+        return !self::blank($value);
     }
 
     /**
