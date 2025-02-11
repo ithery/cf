@@ -176,3 +176,14 @@
     padding: 10px;
     vertical-align: top;
 }
+
+.cres-editor-js-content  .cres-editor-js-image {
+    --bg-color: #cdd1e0;
+    --front-color: #388ae5;
+    --border-color: #e8e8eb;
+}
+
+.cres-editor-js-content  .cres-editor-js-image.withBackground .cres-editor-js-image-tool {
+    padding: 15px;
+    background: var(--bg-color);
+}
