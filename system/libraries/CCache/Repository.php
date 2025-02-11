@@ -1,7 +1,5 @@
 <?php
 
-use Mpdf\Tag\P;
-
 defined('SYSPATH') or die('No direct access allowed.');
 
 class CCache_Repository implements CCache_RepositoryInterface, ArrayAccess {

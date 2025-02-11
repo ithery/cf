@@ -70,6 +70,15 @@ class CElement_FormInput_ImageAjax extends CElement_FormInput_Image {
         });
     }
 
+    public function setValue($val) {
+        parent::setValue($val);
+        if ($val) {
+            $this->imgSrc = CTemporary::getUrl('imgupload', $val);
+        }
+
+        return $this;
+    }
+
     /**
      * @param int $size
      *

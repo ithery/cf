@@ -102,6 +102,23 @@ class CElement_FormInput_MultipleImageAjax extends CElement_FormInput {
         });
     }
 
+    // public function setValue($val) {
+    //     parent::setValue($val);
+    //     foreach ($val as $fileId) {
+    //         $src = CTemporary::getUrl('imgupload', $fileId);
+    //         $file = [];
+    //         $file['input_name'] = '';
+    //         $file['input_value'] = $fileId;
+    //         $file['file_url'] = $src;
+    //         if (!is_array($this->files)) {
+    //             $this->files = [];
+    //         }
+    //         $this->files[] = $file;
+    //     }
+
+    //     return $this;
+    // }
+
     public function setWithInfo($withInfo = true) {
         $this->withInfo = $withInfo;
 

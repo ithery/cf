@@ -1,7 +1,5 @@
 <?php
 
-use Mpdf\Tag\P;
-
 class CApp_Api_Method_Server_Service_Beanstalkd_GetTubeInfo extends CApp_Api_Method_Server {
     public function execute() {
         $errCode = 0;

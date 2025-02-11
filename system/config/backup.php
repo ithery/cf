@@ -70,12 +70,6 @@ return [
         /*
          * The database dump can be compressed to decrease diskspace usage.
          *
-         * Out of the box Laravel-backup supplies
-         * Spatie\DbDumper\Compressors\GzipCompressor::class.
-         *
-         * You can also create custom compressor. More info on that here:
-         * https://github.com/spatie/db-dumper#using-compression
-         *
          * If you do not want any compressor at all, set it to null.
          */
         'database_dump_compressor' => null,
@@ -98,7 +92,6 @@ return [
     ],
     /*
      * You can get notified when specific events occur. Out of the box you can use 'mail' and 'slack'.
-     * For Slack you need to install guzzlehttp/guzzle and laravel/slack-notification-channel.
      *
      * You can also use your own notification classes, just make sure the class is named after one of
      * the `Spatie\Backup\Events` classes.
