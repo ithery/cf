@@ -19,6 +19,8 @@
  * @method static orderBySpatial($geometryColumn, $geometry, $orderFunction, $direction = 'asc')
  * @method static orderByDistance($geometryColumn, $geometry, $direction = 'asc')
  * @method static orderByDistanceSphere($geometryColumn, $geometry, $direction = 'asc')
+ *
+ * @see https://github.com/grimzy/laravel-mysql-spatial/tree/master
  */
 trait CModel_Spatial_SpatialTrait {
     /**
