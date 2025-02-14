@@ -65,7 +65,7 @@ abstract class CModel_Spatial_GeometryAbstract implements CModel_Spatial_Contrac
         $srid = unpack('L', $srid)[1];
 
         $wkb = substr($wkb, 4);
-        $parser = new Parser(new Factory());
+        $parser = new Parser(new CModel_Spatial_GeometryFactory());
 
         /** @var Geometry $parsed */
         $parsed = $parser->parse($wkb);
