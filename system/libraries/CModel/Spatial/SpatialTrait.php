@@ -118,7 +118,7 @@ trait CModel_Spatial_SpatialTrait {
     public function scopeDistance($query, $geometryColumn, $geometry, $distance) {
         $this->isColumnAllowed($geometryColumn);
 
-        $query->whereRaw("st_distance(`{$geometryColumn}`, ST_GeomFromText(?, ?, 'axis-order=long-lat')) <= ?", [
+        $query->whereRaw("st_distance(`{$geometryColumn}`, ST_GeomFromText(?, ?)) <= ?", [
             $geometry->toWkt(),
             $geometry->getSrid(),
             $distance,
@@ -132,7 +132,7 @@ trait CModel_Spatial_SpatialTrait {
 
         $query = $this->scopeDistance($query, $geometryColumn, $geometry, $distance);
 
-        $query->whereRaw("st_distance(`{$geometryColumn}`, ST_GeomFromText(?, ?, 'axis-order=long-lat')) != 0", [
+        $query->whereRaw("st_distance(`{$geometryColumn}`, ST_GeomFromText(?, ?)) != 0", [
             $geometry->toWkt(),
             $geometry->getSrid(),
         ]);
@@ -149,7 +149,7 @@ trait CModel_Spatial_SpatialTrait {
             $query->select('*');
         }
 
-        $query->selectRaw("st_distance(`{$geometryColumn}`, ST_GeomFromText(?, ?, 'axis-order=long-lat')) as distance", [
+        $query->selectRaw("st_distance(`{$geometryColumn}`, ST_GeomFromText(?, ?)) as distance", [
             $geometry->toWkt(),
             $geometry->getSrid(),
         ]);
@@ -158,7 +158,7 @@ trait CModel_Spatial_SpatialTrait {
     public function scopeDistanceSphere($query, $geometryColumn, $geometry, $distance) {
         $this->isColumnAllowed($geometryColumn);
 
-        $query->whereRaw("st_distance_sphere(`{$geometryColumn}`, ST_GeomFromText(?, ?, 'axis-order=long-lat')) <= ?", [
+        $query->whereRaw("st_distance_sphere(`{$geometryColumn}`, ST_GeomFromText(?, ?)) <= ?", [
             $geometry->toWkt(),
             $geometry->getSrid(),
             $distance,
@@ -172,7 +172,7 @@ trait CModel_Spatial_SpatialTrait {
 
         $query = $this->scopeDistanceSphere($query, $geometryColumn, $geometry, $distance);
 
-        $query->whereRaw("st_distance_sphere({$geometryColumn}, ST_GeomFromText(?, ?, 'axis-order=long-lat')) != 0", [
+        $query->whereRaw("st_distance_sphere({$geometryColumn}, ST_GeomFromText(?, ?)) != 0", [
             $geometry->toWkt(),
             $geometry->getSrid(),
         ]);
@@ -188,7 +188,7 @@ trait CModel_Spatial_SpatialTrait {
         if (!$columns) {
             $query->select('*');
         }
-        $query->selectRaw("st_distance_sphere(`{$geometryColumn}`, ST_GeomFromText(?, ?, 'axis-order=long-lat')) as distance", [
+        $query->selectRaw("st_distance_sphere(`{$geometryColumn}`, ST_GeomFromText(?, ?)) as distance", [
             $geometry->toWkt(),
             $geometry->getSrid(),
         ]);
@@ -201,7 +201,7 @@ trait CModel_Spatial_SpatialTrait {
             throw new CModel_Spatial_Exception_UnknownSpatialRelationFunctionException($relationship);
         }
 
-        $query->whereRaw("st_{$relationship}(`{$geometryColumn}`, ST_GeomFromText(?, ?, 'axis-order=long-lat'))", [
+        $query->whereRaw("st_{$relationship}(`{$geometryColumn}`, ST_GeomFromText(?, ?))", [
             $geometry->toWkt(),
             $geometry->getSrid(),
         ]);
