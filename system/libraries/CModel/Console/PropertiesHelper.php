@@ -10,6 +10,14 @@ class CModel_Console_PropertiesHelper {
         return $type;
     }
 
+    public static function getSpatialType($type) {
+        $typeConvertion = [
+            'multipolygon' => CModel_Spatial_Geometry_MultiPolygon::class,
+        ];
+
+        return carr::get($typeConvertion, $type);
+    }
+
     public static function getType($type) {
         $typeConvertion = [
             'tinyint' => 'int',
@@ -49,6 +57,9 @@ class CModel_Console_PropertiesHelper {
 
         if ($result = carr::get($typeConvertion, $type)) {
             return $result;
+        }
+        if ($spatialResult = self::getSpatialType($type)) {
+            return $spatialResult;
         }
 
         return $type;
