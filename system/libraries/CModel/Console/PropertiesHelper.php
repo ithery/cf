@@ -13,6 +13,12 @@ class CModel_Console_PropertiesHelper {
     public static function getSpatialType($type) {
         $typeConvertion = [
             'multipolygon' => CModel_Spatial_Geometry_MultiPolygon::class,
+            'polygon' => CModel_Spatial_Geometry_Polygon::class,
+            'point' => CModel_Spatial_Geometry_Point::class,
+            'multipoint' => CModel_Spatial_Geometry_MultiPoint::class,
+            'linestring' => CModel_Spatial_Geometry_LineString::class,
+            'multilinestring' => CModel_Spatial_Geometry_MultiLineString::class,
+            'geometrycollection' => CModel_Spatial_Geometry_GeometryCollection::class,
         ];
 
         return carr::get($typeConvertion, $type);
