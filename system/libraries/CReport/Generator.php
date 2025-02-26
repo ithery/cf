@@ -67,11 +67,35 @@ class CReport_Generator {
     protected $isProcessingDetail;
 
     /**
+     * @var bool
+     */
+    protected $isProcessingHook;
+
+    /**
      * @var CReport_Generator_Instruction[]
      */
     protected $instructions;
 
     private $columnFooterDrawn;
+
+    /**
+     * @var bool
+     */
+    private $isProcessingPdf;
+
+    /**
+     * @var bool
+     */
+    private $isProcessingExcel;
+
+    /**
+     * @var null|CReport_Generator_ProcessorAbstract
+     */
+    private $processor;
+
+    private $currentBand;
+
+    private $detailNumberOnPage;
 
     public function __construct(CReport_Builder_Report $report, CReport_Builder_Dictionary $dictionary, CManager_Contract_DataProviderInterface $dataProvider = null) {
         $this->report = $report;
@@ -87,6 +111,19 @@ class CReport_Generator {
         $this->isProcessingDetail = false;
         $this->instructions = [];
         $this->columnFooterDrawn = false;
+        $this->isProcessingPdf = false;
+        $this->isProcessingExcel = false;
+        $this->processor = null;
+        $this->currentBand = null;
+        $this->detailNumberOnPage = 0;
+    }
+
+    public function setCurrentBand(CReport_Builder_ElementAbstract $currentBand) {
+        $this->currentBand = $currentBand;
+    }
+
+    public function getCurrentBand() {
+        return $this->currentBand;
     }
 
     public function setProcessingPageFooter($bool) {
@@ -97,6 +134,16 @@ class CReport_Generator {
 
     public function addInstruction(CReport_Generator_ProcessorAbstract $processor, Closure $closure) {
         $this->instructions[] = new CReport_Generator_Instruction($processor->getY(), $this->getPageNumber(), $closure);
+    }
+
+    public function isProcessingHook() {
+        return $this->isProcessingHook;
+    }
+
+    public function setProcessingHook($bool) {
+        $this->isProcessingHook = $bool;
+
+        return $this;
     }
 
     public function isProcessingPageFooter() {
@@ -163,10 +210,22 @@ class CReport_Generator {
     }
 
     /**
-     * @return CReport_Builder_Row
+     * @return null|CReport_Builder_Row
      */
     public function getCurrentRow() {
         return $this->currentRow;
+    }
+
+    /**
+     * @return null|CReport_Builder_Row
+     */
+    public function getNextRow() {
+        $nextIndex = $this->reportCount + 1;
+        if ($this->data && $this->data->count() > $nextIndex) {
+            return $this->data[$nextIndex];
+        }
+
+        return null;
     }
 
     /**
@@ -181,8 +240,13 @@ class CReport_Generator {
     public function incrementPageNumber() {
         $this->pageNumber++;
         $this->columnFooterDrawn = false;
+        $this->detailNumberOnPage = 0;
 
         return $this;
+    }
+
+    public function incrementDetailNumberOnPage() {
+        $this->detailNumberOnPage = $this->detailNumberOnPage + 1;
     }
 
     public function setColumnFooterDrawn($bool = true) {
@@ -209,6 +273,10 @@ class CReport_Generator {
 
     public function evaluatePrintWhenExpression(string $expression = null) {
         return $this->evaluator->evaluatePrintWhenExpression($expression);
+    }
+
+    public function getDetailNumberOnPage() {
+        return $this->detailNumberOnPage;
     }
 
     /**
@@ -302,6 +370,40 @@ class CReport_Generator {
         return $this->dictionary->getVariableValue($name, $default);
     }
 
+    public function isProcessingPdf() {
+        return $this->isProcessingPdf;
+    }
+
+    public function isProcessingExcel() {
+        return $this->isProcessingExcel;
+    }
+
+    public function getProcessor() {
+        return $this->processor;
+    }
+
+    public function willChangePage() {
+        if ($this->isProcessingDetail() && $this->isProcessingPdf()) {
+            $processor = $this->getProcessor();
+            /** @var CReport_Generator_Processor_PdfProcessor $processor */
+            $detail = $this->getCurrentBand();
+            /** @var CReport_Builder_Element_Detail $detail */
+            $nextRow = $this->getNextRow();
+            if ($nextRow) {
+                $currentHeight = $detail->getHeightForOverflow($this, $processor);
+                $currentRow = $this->getCurrentRow();
+                $this->setCurrentRow($nextRow);
+                $nextHeight = $detail->getHeightForOverflow($this, $processor);
+                $this->setCurrentRow($currentRow);
+                if ($processor->willChangePage($this, $currentHeight + $nextHeight)) {
+                    return true;
+                }
+            }
+        }
+
+        return false;
+    }
+
     protected function generate(CReport_Generator_ProcessorAbstract $processor) {
         $this->pageNumber = 1;
 
@@ -317,19 +419,25 @@ class CReport_Generator {
     }
 
     public function getPdf() {
-        $processor = new CReport_Generator_Processor_PdfProcessor($this->report);
-        $this->generate($processor);
-        $pdf = $processor->getOutput();
-
+        $this->processor = new CReport_Generator_Processor_PdfProcessor($this->report);
+        $this->isProcessingPdf = true;
+        $this->generate($this->processor);
+        $this->isProcessingPdf = false;
+        $pdf = $this->processor->getOutput();
+        $this->processor = null;
         // $pdf = CReport_Jasper_Instructions::get();
 
         return $pdf;
     }
 
     public function getExcel() {
-        $processor = new CReport_Generator_Processor_ExcelProcessor($this->report);
-        $this->generate($processor);
-        $excel = $processor->getOutput();
+        $this->isProcessingExcel = true;
+
+        $this->processor = new CReport_Generator_Processor_ExcelProcessor($this->report);
+        $this->generate($this->processor);
+        $this->isProcessingExcel = false;
+        $excel = $this->processor->getOutput();
+        $this->processor = null;
 
         // $pdf = CReport_Jasper_Instructions::get();
 

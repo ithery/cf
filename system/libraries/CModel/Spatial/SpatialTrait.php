@@ -3,22 +3,22 @@
 /**
  * Trait SpatialTrait.
  *
- * @method static distance($geometryColumn, $geometry, $distance)
- * @method static distanceExcludingSelf($geometryColumn, $geometry, $distance)
- * @method static distanceSphere($geometryColumn, $geometry, $distance)
- * @method static distanceSphereExcludingSelf($geometryColumn, $geometry, $distance)
- * @method static comparison($geometryColumn, $geometry, $relationship)
- * @method static within($geometryColumn, $polygon)
- * @method static crosses($geometryColumn, $geometry)
- * @method static contains($geometryColumn, $geometry)
- * @method static disjoint($geometryColumn, $geometry)
- * @method static equals($geometryColumn, $geometry)
- * @method static intersects($geometryColumn, $geometry)
- * @method static overlaps($geometryColumn, $geometry)
- * @method static doesTouch($geometryColumn, $geometry)
- * @method static orderBySpatial($geometryColumn, $geometry, $orderFunction, $direction = 'asc')
- * @method static orderByDistance($geometryColumn, $geometry, $direction = 'asc')
- * @method static orderByDistanceSphere($geometryColumn, $geometry, $direction = 'asc')
+ * @method static CModel_Query|static distance($geometryColumn, $geometry, $distance)
+ * @method static CModel_Query|static distanceExcludingSelf($geometryColumn, $geometry, $distance)
+ * @method static CModel_Query|static distanceSphere($geometryColumn, $geometry, $distance)
+ * @method static CModel_Query|static distanceSphereExcludingSelf($geometryColumn, $geometry, $distance)
+ * @method static CModel_Query|static comparison($geometryColumn, $geometry, $relationship)
+ * @method static CModel_Query|static within($geometryColumn, $polygon)
+ * @method static CModel_Query|static crosses($geometryColumn, $geometry)
+ * @method static CModel_Query|static contains($geometryColumn, $geometry)
+ * @method static CModel_Query|static disjoint($geometryColumn, $geometry)
+ * @method static CModel_Query|static equals($geometryColumn, $geometry)
+ * @method static CModel_Query|static intersects($geometryColumn, $geometry)
+ * @method static CModel_Query|static overlaps($geometryColumn, $geometry)
+ * @method static CModel_Query|static doesTouch($geometryColumn, $geometry)
+ * @method static CModel_Query|static orderBySpatial($geometryColumn, $geometry, $orderFunction, $direction = 'asc')
+ * @method static CModel_Query|static orderByDistance($geometryColumn, $geometry, $direction = 'asc')
+ * @method static CModel_Query|static orderByDistanceSphere($geometryColumn, $geometry, $direction = 'asc')
  *
  * @see https://github.com/grimzy/laravel-mysql-spatial/tree/master
  */

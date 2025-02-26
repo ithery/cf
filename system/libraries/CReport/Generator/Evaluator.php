@@ -25,8 +25,24 @@ class CReport_Generator_Evaluator {
         return true;
     }
 
-    public function getExpression($expression, string $evaluationTime = CReport::EVALUATION_TIME_NOW) {
+    public function getExpression($expression, string $evaluationTime = CReport::EVALUATION_TIME_NOW, CReport_Builder_Row $row = null) {
         $originalExpression = $expression;
+
+        if (!$this->generator->isProcessingHook()) {
+            $this->generator->setProcessingHook(true);
+            preg_match_all("/H{(\w+)}/", $expression, $matchesH);
+            if ($matchesH) {
+                foreach ($matchesH[1] as $matchH) {
+                    if (class_exists($matchH)) {
+                        $hookClass = new $matchH($this->generator);
+                        if ($hookClass instanceof CReport_Hook_HookInterface) {
+                            $expression = $hookClass->getValue();
+                        }
+                    }
+                }
+            }
+            $this->generator->setProcessingHook(false);
+        }
         preg_match_all("/P{(\w+)}/", $expression, $matchesP);
         if ($matchesP) {
             foreach ($matchesP[1] as $matchP) {
@@ -40,6 +56,7 @@ class CReport_Generator_Evaluator {
             foreach ($matchesV[1] as $matchV) {
                 if ($evaluationTime == CReport::EVALUATION_TIME_NOW && $matchV == 'PAGE_COUNT') {
                     $evaluateNow = false;
+
                     continue;
                 }
                 $variableValue = $this->generator->getVariableValue($matchV);
@@ -52,13 +69,16 @@ class CReport_Generator_Evaluator {
                 $expression = str_ireplace(['$V{' . $matchV . '}'], [$variableValue], $expression);
             }
         }
+        if ($row == null) {
+            $row = $this->generator->getCurrentRow();
+        }
 
-        if ($this->generator->getCurrentRow() != null) {
+        if ($row != null) {
             // preg_match_all('/F{[^}]*}/', $expression, $matchesF);
             preg_match_all('/F{(.+?)}/', $expression, $matchesF);
             if ($matchesF) {
                 foreach ($matchesF[1] as $matchF) {
-                    $fieldValue = $this->generator->getFieldValue($matchF);
+                    $fieldValue = carr::get($row, $matchF);
                     if (is_string($fieldValue)) {
                         $fieldValue = '"' . $fieldValue . '"';
                     }
@@ -86,6 +106,7 @@ class CReport_Generator_Evaluator {
             $expressionEvaluator = new CReport_Generator_Expression($expression);
             $result = $expressionEvaluator->evaluate();
         }
+
         return $result;
     }
 

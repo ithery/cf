@@ -294,6 +294,7 @@ class CReport_Builder_Report implements CReport_Builder_Contract_JrXmlElementInt
             if ($child instanceof CReport_Builder_Element_Group) {
                 continue;
             }
+            $generator->setCurrentBand($child);
             $child->generate($generator, $processor);
         }
     }
@@ -372,6 +373,7 @@ class CReport_Builder_Report implements CReport_Builder_Contract_JrXmlElementInt
             return $value instanceof CReport_Builder_Element_ColumnFooter;
         });
     }
+
     /**
      * @return null|CReport_Builder_Element_ColumnFooter
      */
