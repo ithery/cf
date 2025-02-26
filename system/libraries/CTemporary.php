@@ -14,6 +14,15 @@ class CTemporary {
         return CStorage::instance()->temp($diskName);
     }
 
+    /**
+     * @param null|mixed $diskName
+     *
+     * @return CStorage_Adapter
+     */
+    public static function publicDisk($diskName = null) {
+        return CStorage::instance()->publicTemp($diskName);
+    }
+
     public static function defaultDiskDriver() {
         $defaultDiskName = static::defaultDiskName();
         $config = CF::config('storage.disks.' . $defaultDiskName);
@@ -157,23 +166,12 @@ class CTemporary {
         $path = static::getPath($folder, $filename);
 
         return static::disk()->url($path);
+    }
 
-        $mainFolder = substr($filename, 0, 8);
-        $basefile = basename($filename);
-        $url = curl::base() . 'temp/' . $folder . '/' . $mainFolder . '/';
-        $depth = 5;
-        for ($i = 0; $i < $depth; $i++) {
-            $c = '_';
-            if (strlen($basefile) > ($i + 1)) {
-                $c = substr($basefile, $i + 8, 1);
-                if (strlen($c) == 0) {
-                    $c = '_';
-                }
-                $url .= $c . '/';
-            }
-        }
+    public static function getPublicUrl($folder, $filename) {
+        $path = static::getPath($folder, $filename);
 
-        return $url . $filename;
+        return static::publicDisk()->url($path);
     }
 
     /**
@@ -210,6 +208,16 @@ class CTemporary {
         }
         $path = static::getPath($folder, $filename);
         static::disk()->put($path, $content);
+
+        return $path;
+    }
+
+    public static function publicPut($folder, $content, $filename = null) {
+        if ($filename == null) {
+            $filename = static::generateRandomFilename();
+        }
+        $path = static::getPath($folder, $filename);
+        static::publicDisk()->put($path, $content);
 
         return $path;
     }

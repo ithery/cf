@@ -29,4 +29,13 @@ class CServer_Runner {
     public static function ffmpeg($options = null) {
         return new CServer_Runner_FFMpeg($options);
     }
+
+    /**
+     * @param array $options
+     *
+     * @return CServer_Runner_Teserract
+     */
+    public static function teserract($options = null) {
+        return new CServer_Runner_Teserract($options);
+    }
 }

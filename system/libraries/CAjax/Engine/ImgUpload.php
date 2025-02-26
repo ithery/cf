@@ -40,7 +40,7 @@ class CAjax_Engine_ImgUpload extends CAjax_Engine {
                 $extension = '.' . $ext;
                 $fileId = date('Ymd') . cutils::randmd5() . $extension;
 
-                $disk = CTemporary::disk();
+                $disk = CTemporary::publicDisk();
                 $fullfilename = CTemporary::getPath(static::FOLDER, $fileId);
                 if (!isset($_FILES[$inputName]['tmp_name'][$i]) || empty($_FILES[$inputName]['tmp_name'][$i])) {
                     CLogger::channel()->error('Error on ImgUpload', (array) $_FILES);
@@ -53,13 +53,12 @@ class CAjax_Engine_ImgUpload extends CAjax_Engine {
                     $infoData['fileId'] = $fileId;
                     $infoData['temporaryPath'] = $fullfilename;
                     $infoData['temporaryDisk'] = $diskName;
-                    $infoData['url'] = CTemporary::getUrl(static::FOLDER, $fileId);
-                    $fullfilenameinf = CTemporary::put(static::FOLDER_INFO, json_encode($infoData), $fileId);
+                    $infoData['url'] = CTemporary::getPublicUrl(static::FOLDER, $fileId);
+                    $fullfilenameinf = CTemporary::publicPut(static::FOLDER_INFO, json_encode($infoData), $fileId);
                 }
                 $return[] = $fileId;
             }
         }
-
         if (isset($_POST[$inputName])) {
             $imageDataArray = $_POST[$inputName];
             $filenameArray = $_POST[$inputName . '_filename'];
@@ -95,14 +94,14 @@ class CAjax_Engine_ImgUpload extends CAjax_Engine {
                 $unencodedData = base64_decode($filteredData);
                 $fileId = date('Ymd') . cutils::randmd5() . $extension;
 
-                $fullfilename = CTemporary::put(static::FOLDER, $unencodedData, $fileId);
+                $fullfilename = CTemporary::publicPut(static::FOLDER, $unencodedData, $fileId);
                 if ($withInfo) {
                     $infoData['filename'] = $fileName;
                     $infoData['fileId'] = $fileId;
                     $infoData['temporaryPath'] = $fullfilename;
                     $infoData['temporaryDisk'] = $diskName;
-                    $infoData['url'] = CTemporary::getUrl(static::FOLDER, $fileId);
-                    $fullfilenameinf = CTemporary::put(static::FOLDER_INFO, json_encode($infoData), $fileId);
+                    $infoData['url'] = CTemporary::getPublicUrl(static::FOLDER, $fileId);
+                    $fullfilenameinf = CTemporary::publicPut(static::FOLDER_INFO, json_encode($infoData), $fileId);
                 }
                 $return[] = $fileId;
             }
@@ -110,7 +109,7 @@ class CAjax_Engine_ImgUpload extends CAjax_Engine {
         $return = [
             'fileId' => $fileId,
             'fileName' => $fileName,
-            'url' => CTemporary::getUrl(static::FOLDER, $fileId),
+            'url' => $fileId ? CTemporary::getPublicUrl(static::FOLDER, $fileId) : '',
         ];
 
         return json_encode($return);

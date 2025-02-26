@@ -89,6 +89,19 @@ class CStorage {
     }
 
     /**
+     * Get a filesystem instance.
+     *
+     * @param null|string $name
+     *
+     * @return CStorage_FilesystemInterface
+     */
+    public function publicTemp($name = null) {
+        $name = $name ?: $this->getPublicTempDriver();
+
+        return $this->disks[$name] = $this->get($name);
+    }
+
+    /**
      * Get a default cloud filesystem instance.
      *
      * @return CStorage_FilesystemInterface
@@ -373,6 +386,15 @@ class CStorage {
      */
     public function getTempDriver() {
         return CF::config('storage.temp');
+    }
+
+    /**
+     * Get the default driver name.
+     *
+     * @return string
+     */
+    public function getPublicTempDriver() {
+        return CF::config('storage.public-temp', $this->getTempDriver());
     }
 
     /**
