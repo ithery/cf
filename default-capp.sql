@@ -137,6 +137,25 @@ CREATE TABLE IF NOT EXISTS `sys_counter` (
   CONSTRAINT `sys_counter_ibfk_1` FOREIGN KEY (`org_id`) REFERENCES `org` (`org_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
+
+DROP TABLE IF EXISTS `sys_row_count`;
+CREATE TABLE IF NOT EXISTS `sys_row_count` (
+  `sys_row_count_id` bigint(20) unsigned NOT NULL AUTO_INCREMENT,
+  `org_id` bigint(20) unsigned DEFAULT NULL,
+  `table` varchar(255) DEFAULT NULL,
+  `row_count` int(11) DEFAULT NULL,
+  `created` datetime DEFAULT NULL,
+  `createdby` varchar(255) DEFAULT NULL,
+  `updated` datetime DEFAULT NULL,
+  `updatedby` varchar(255) DEFAULT NULL,
+  `deleted` datetime DEFAULT NULL,
+  `deletedby` varchar(255) DEFAULT NULL,
+  `status` int(11) NOT NULL DEFAULT '1',
+  PRIMARY KEY (`sys_row_count_id`),
+  UNIQUE KEY `sys_row_count_id` (`sys_row_count_id`),
+  CONSTRAINT `sys_row_count_id_ibfk_1` FOREIGN KEY (`org_id`) REFERENCES `org` (`org_id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
 DROP TABLE IF EXISTS `users`;
 CREATE TABLE IF NOT EXISTS `users` (
   `user_id` bigint(20) unsigned NOT NULL AUTO_INCREMENT,
