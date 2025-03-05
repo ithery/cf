@@ -118,6 +118,7 @@ class CReport_Builder_Element_Detail extends CReport_Builder_ElementAbstract {
         if (count($this->children) > 0) {
             $lastRow = null;
             foreach ($data as $rowIndex => $row) {
+                $generator->incrementDetailNumberOnPage();
                 $height = $this->getHeight();
                 /** @var CReport_Builder_Row $row */
                 $generator->setCurrentRow($row);

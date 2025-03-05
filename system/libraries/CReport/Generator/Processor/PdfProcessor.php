@@ -55,7 +55,7 @@ class CReport_Generator_Processor_PdfProcessor extends CReport_Generator_Process
     /**
      * Return format for a component of a box.
      *
-     * @param CReport_Builder_Object_Pen      $pen
+     * @param CReport_Builder_Object_Pen $pen
      *
      * @return int[]|string[]|int[][]
      */
@@ -123,7 +123,7 @@ class CReport_Generator_Processor_PdfProcessor extends CReport_Generator_Process
         return $border;
     }
 
-    public function preventYOverflow(CReport_Generator $generator, $height) {
+    public function willChangePage(CReport_Generator $generator, $height) {
         $preventYAxis = $this->currentY + $height;
         $pageHeight = $this->pageHeight;
         $pageFooter = $generator->getPageFooter();
@@ -142,7 +142,29 @@ class CReport_Generator_Processor_PdfProcessor extends CReport_Generator_Process
         // var_dump($pageFooter);
         //exit;
 
-        if ($preventYAxis >= $discount) {
+        return $preventYAxis >= $discount;
+    }
+
+    public function preventYOverflow(CReport_Generator $generator, $height) {
+        // $preventYAxis = $this->currentY + $height;
+        // $pageHeight = $this->pageHeight;
+        $pageFooter = $generator->getPageFooter();
+        $columnFooter = $generator->isColumnFooterDrawn() ? null : $generator->getColumnFooter();
+        // $pageFooterHeight = 0;
+        // $columnFooterHeight = 0;
+        // if ($pageFooter) {
+        //     $pageFooterHeight = $pageFooter->getHeight();
+        // }
+        // if ($columnFooter) {
+        //     $columnFooterHeight = $columnFooter->getHeight();
+        // }
+        // $topMargin = $this->topMargin;
+        // $bottomMargin = $this->bottomMargin;
+        // $discount = $pageHeight - $pageFooterHeight - $columnFooterHeight - $topMargin - $bottomMargin; //dicount heights of page parts;
+        // var_dump($pageFooter);
+        //exit;
+
+        if ($this->willChangePage($generator, $height)) {
             if ($columnFooter) {
                 $columnFooter->generate($generator, $this);
             }

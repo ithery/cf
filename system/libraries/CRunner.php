@@ -29,4 +29,13 @@ class CRunner {
     public static function ffmpeg($options = null) {
         return new CRunner_FFMpeg($options);
     }
+
+    /**
+     * @param array $options
+     *
+     * @return CRunner_Teserract
+     */
+    public static function teserract($options = null) {
+        return new CRunner_Teserract($options);
+    }
 }

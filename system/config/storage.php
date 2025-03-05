@@ -26,6 +26,16 @@ return [
     'temp' => 'local-temp',
     /*
       |--------------------------------------------------------------------------
+      | Default Public Temporary Disk
+      |--------------------------------------------------------------------------
+      |
+      | Here you may specify the default filesystem disk that should be used
+      | by the public temporary for the framework.
+      |
+     */
+    'public-temp' => 'local-temp',
+    /*
+      |--------------------------------------------------------------------------
       | Default Cloud Filesystem Disk
       |--------------------------------------------------------------------------
       |

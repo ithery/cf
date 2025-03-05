@@ -1,97 +1,105 @@
 <?php
 
-declare(strict_types=1);
-
 namespace GeoIO;
 
-interface Extractor
-{
-    /**
-     * Determines whether the given geometry is supported by this Extractor.
-     */
-    public function supports(mixed $geometry): bool;
+interface Extractor {
+    const TYPE_POINT = 'Point';
+
+    const TYPE_LINESTRING = 'LineString';
+
+    const TYPE_POLYGON = 'Polygon';
+
+    const TYPE_MULTIPOINT = 'MultiPoint';
+
+    const TYPE_MULTILINESTRING = 'MultiLineString';
+
+    const TYPE_MULTIPOLYGON = 'MultiPolygon';
+
+    const TYPE_GEOMETRYCOLLECTION = 'GeometryCollection';
 
     /**
-     * Extracts the type of the given geometry.
+     * @param $geometry
+     *
+     * @return bool
      */
-    public function extractType(mixed $geometry): GeometryType;
+    public function supports($geometry);
 
     /**
-     * Extracts the dimension of the given geometry.
+     * @param mixed $geometry
+     *
+     * @return string One of the Extractor::TYPE_* constants
      */
-    public function extractDimension(mixed $geometry): Dimension;
+    public function extractType($geometry);
 
     /**
-     * Extracts the SRID of the given geometry.
+     * @param mixed $geometry
      *
-     * Must return `null` if the geometry has no SRID assigned.
+     * @return string One of the Dimension::DIMENSION_* constants
      */
-    public function extractSrid(mixed $geometry): ?int;
+    public function extractDimension($geometry);
 
     /**
-     * Extracts the Coordinates of the given Point.
+     * @param mixed $geometry
      *
-     * Must return `null` if the Point is empty.
+     * @return null|int
      */
-    public function extractCoordinatesFromPoint(mixed $point): ?Coordinates;
+    public function extractSrid($geometry);
 
     /**
-     * Extracts the Points of the given LineString.
+     * Structure of the returned array:.
      *
-     * The iterable must yield Point representations which are accepted by the
-     * extractCoordinatesFromPoint() method of this Extractor.
+     * [
+     *     'x' => $x, // float
+     *     'y' => $y, // float
+     *     'z' => $z, // float|null
+     *     'm' => $m  // float|null
+     * ]
      *
-     * Must return an empty iterable if the LineString is empty.
+     * @param mixed $point
+     *
+     * @return array
      */
-    public function extractPointsFromLineString(mixed $lineString): iterable;
+    public function extractCoordinatesFromPoint($point);
 
     /**
-     * Extracts the LineStrings of the given Polygon.
+     * @param mixed $lineString
      *
-     * The iterable must yield LineString representations which are accepted
-     * by the extractPointsFromLineString() method of this Extractor.
-     *
-     * Must return an empty iterable if the Polygon is empty.
+     * @return array|\Traversable
      */
-    public function extractLineStringsFromPolygon(mixed $polygon): iterable;
+    public function extractPointsFromLineString($lineString);
 
     /**
-     * Extracts the Points of the given MultiPoint.
+     * @param mixed $polygon
      *
-     * The iterable must return Point representations which are accepted by the
-     * extractCoordinatesFromPoint() method of this Extractor.
-     *
-     * Must return an empty iterable if the MultiPoint is empty.
+     * @return array|\Traversable
      */
-    public function extractPointsFromMultiPoint(mixed $multiPoint): iterable;
+    public function extractLineStringsFromPolygon($polygon);
 
     /**
-     * Extracts the LineStrings of the given MultiLineString.
+     * @param mixed $multiPoint
      *
-     * The iterable must yield LineString representations which are accepted
-     * by the extractPointsFromLineString() method of this Extractor.
-     *
-     * Must return an empty iterable if the MultiLineString is empty.
+     * @return array|\Traversable
      */
-    public function extractLineStringsFromMultiLineString(mixed $multiLineString): iterable;
+    public function extractPointsFromMultiPoint($multiPoint);
 
     /**
-     * Extracts the Polygons of the given MultiPolygon.
+     * @param mixed $multiLineString
      *
-     * The iterable must yield Polygon representations which are accepted
-     * by the extractLineStringsFromPolygon() method of this Extractor.
-     *
-     * Must return an empty iterable if the MultiPolygon is empty.
+     * @return array|\Traversable
      */
-    public function extractPolygonsFromMultiPolygon(mixed $multiPolygon): iterable;
+    public function extractLineStringsFromMultiLineString($multiLineString);
 
     /**
-     * Extracts the geometries of the given GeometryCollection.
+     * @param mixed $multiPolygon
      *
-     * The iterable must yield geometry representations which are accepted
-     * by any of the extract*() methods of this Extractor.
-     *
-     * Must return an empty iterable if the GeometryCollection is empty.
+     * @return array|\Traversable
      */
-    public function extractGeometriesFromGeometryCollection(mixed $geometryCollection): iterable;
+    public function extractPolygonsFromMultiPolygon($multiPolygon);
+
+    /**
+     * @param mixed $geometryCollection
+     *
+     * @return array|\Traversable
+     */
+    public function extractGeometriesFromGeometryCollection($geometryCollection);
 }
