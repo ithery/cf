@@ -6,6 +6,20 @@ class CHTTP_Client_Response implements ArrayAccess {
     }
 
     /**
+     * The request cookies.
+     *
+     * @var \GuzzleHttp\Cookie\CookieJar
+     */
+    public $cookies;
+
+    /**
+     * The transfer stats for the request.
+     *
+     * @var null|\GuzzleHttp\TransferStats
+     */
+    public $transferStats;
+
+    /**
      * The underlying PSR response.
      *
      * @var \Psr\Http\Message\ResponseInterface
