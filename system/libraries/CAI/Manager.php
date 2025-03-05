@@ -20,6 +20,15 @@ class CAI_Manager {
         return new CAI_Service_OpenAIService($options);
     }
 
+    /**
+     * @param array $options
+     *
+     * @return CAI_Service_HuggingFace
+     */
+    public function createHuggingFace($options = []) {
+        return new CAI_Service_HuggingFace($options);
+    }
+
     public function createOllamaService() {
     }
 
