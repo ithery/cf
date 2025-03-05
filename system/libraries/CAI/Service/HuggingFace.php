@@ -3,6 +3,9 @@
 use GuzzleHttp\Client;
 use GuzzleHttp\Exception\RequestException;
 
+/**
+ * @see https://github.com/rezaulhreza/hugging-face-for-laravel
+ */
 class CAI_Service_HuggingFace extends CAI_ServiceAbstract {
     protected $apiKey;
 
