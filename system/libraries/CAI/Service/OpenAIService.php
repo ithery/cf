@@ -2,6 +2,9 @@
 
 use OpenAI\OpenAI;
 
+/**
+ * @see https://github.com/halilcosdu/laravel-chatbot/
+ */
 class CAI_Service_OpenAIService extends CAI_ServiceAbstract {
     protected $apiKey;
 

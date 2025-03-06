@@ -3,6 +3,9 @@
 class CAI_Manager {
     private static $instance;
 
+    /**
+     * @return CAI_Manager
+     */
     public static function instance() {
         if (self::$instance == null) {
             self::$instance = new self();
