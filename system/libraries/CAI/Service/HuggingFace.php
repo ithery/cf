@@ -47,7 +47,6 @@ class CAI_Service_HuggingFace extends CAI_ServiceAbstract {
             }
 
             $payload = $this->buildPayload($prompt, $options);
-
             $response = CHTTP::client()->withToken($this->apiKey)
                 ->timeout(30)
                 ->retry(2, 1000)
