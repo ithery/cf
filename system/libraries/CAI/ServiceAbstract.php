@@ -90,10 +90,10 @@ abstract class CAI_ServiceAbstract {
     /**
      * Set LLM prompt text.
      */
-    abstract public function ask();
+    abstract public function ask(array $options = []);
 
     /**
      * Generate Images.
      */
-    abstract public function images(array $options);
+    abstract public function image(array $options = []);
 }

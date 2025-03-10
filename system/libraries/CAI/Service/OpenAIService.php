@@ -2,6 +2,9 @@
 
 use OpenAI\OpenAI;
 
+/**
+ * @see https://github.com/halilcosdu/laravel-chatbot/
+ */
 class CAI_Service_OpenAIService extends CAI_ServiceAbstract {
     protected $apiKey;
 
@@ -26,7 +29,7 @@ class CAI_Service_OpenAIService extends CAI_ServiceAbstract {
         $this->openAI = $openAI;
     }
 
-    public function ask() {
+    public function ask(array $options = []) {
         $result = $this->openAI->chat()->create([
             'model' => $this->model,
             'temperature' => $this->temperature,
@@ -41,7 +44,7 @@ class CAI_Service_OpenAIService extends CAI_ServiceAbstract {
         return c::optional($result)->choices[0]->message->content;
     }
 
-    public function images(array $options) {
+    public function image(array $options = []) {
     }
 
     public function getOpenAI() {

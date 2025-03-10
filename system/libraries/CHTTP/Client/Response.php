@@ -1,9 +1,24 @@
 <?php
+use GuzzleHttp\Psr7\StreamWrapper;
 
 class CHTTP_Client_Response implements ArrayAccess {
     use CTrait_Macroable {
         __call as macroCall;
     }
+
+    /**
+     * The request cookies.
+     *
+     * @var \GuzzleHttp\Cookie\CookieJar
+     */
+    public $cookies;
+
+    /**
+     * The transfer stats for the request.
+     *
+     * @var null|\GuzzleHttp\TransferStats
+     */
+    public $transferStats;
 
     /**
      * The underlying PSR response.
@@ -77,6 +92,28 @@ class CHTTP_Client_Response implements ArrayAccess {
      */
     public function collect($key = null) {
         return CCollection::make($this->json($key));
+    }
+
+    /**
+     * Get the JSON decoded body of the response as a fluent object.
+     *
+     * @param null|string $key
+     *
+     * @return \CBase_Fluent
+     */
+    public function fluent($key = null) {
+        return new CBase_Fluent((array) $this->json($key));
+    }
+
+    /**
+     * Get the body of the response as a PHP resource.
+     *
+     * @throws \InvalidArgumentException
+     *
+     * @return resource
+     */
+    public function resource() {
+        return StreamWrapper::getResource($this->response->getBody());
     }
 
     /**
@@ -296,6 +333,122 @@ class CHTTP_Client_Response implements ArrayAccess {
      */
     public function throwIf($condition) {
         return $condition ? $this->throw() : $this;
+    }
+
+    /**
+     * Throw an exception if the response status code matches the given code.
+     *
+     * @param callable|int $statusCode
+     *
+     * @throws \Illuminate\Http\Client\RequestException
+     *
+     * @return $this
+     */
+    public function throwIfStatus($statusCode) {
+        if (is_callable($statusCode) && $statusCode($this->status(), $this)) {
+            return $this->throw();
+        }
+
+        return $this->status() === $statusCode ? $this->throw() : $this;
+    }
+
+    /**
+     * Throw an exception unless the response status code matches the given code.
+     *
+     * @param callable|int $statusCode
+     *
+     * @throws \Illuminate\Http\Client\RequestException
+     *
+     * @return $this
+     */
+    public function throwUnlessStatus($statusCode) {
+        if (is_callable($statusCode)) {
+            return $statusCode($this->status(), $this) ? $this : $this->throw();
+        }
+
+        return $this->status() === $statusCode ? $this : $this->throw();
+    }
+
+    /**
+     * Throw an exception if the response status code is a 4xx level code.
+     *
+     * @throws \Illuminate\Http\Client\RequestException
+     *
+     * @return $this
+     */
+    public function throwIfClientError() {
+        return $this->clientError() ? $this->throw() : $this;
+    }
+
+    /**
+     * Throw an exception if the response status code is a 5xx level code.
+     *
+     * @throws \Illuminate\Http\Client\RequestException
+     *
+     * @return $this
+     */
+    public function throwIfServerError() {
+        return $this->serverError() ? $this->throw() : $this;
+    }
+
+    /**
+     * Dump the content from the response.
+     *
+     * @param null|string $key
+     *
+     * @return $this
+     */
+    public function dump($key = null) {
+        $content = $this->body();
+
+        $json = json_decode($content);
+
+        if (json_last_error() === JSON_ERROR_NONE) {
+            $content = $json;
+        }
+
+        if (!is_null($key)) {
+            c::dump(c::get($content, $key));
+        } else {
+            c::dump($content);
+        }
+
+        return $this;
+    }
+
+    /**
+     * Dump the content from the response and end the script.
+     *
+     * @param null|string $key
+     *
+     * @return never
+     */
+    public function dd($key = null) {
+        $this->dump($key);
+
+        exit(1);
+    }
+
+    /**
+     * Dump the headers from the response.
+     *
+     * @return $this
+     */
+    public function dumpHeaders() {
+        c::dump($this->headers());
+
+        return $this;
+    }
+
+    /**
+     * Dump the headers from the response and end the script.
+     *
+     * @return never
+     */
+    public function ddHeaders() {
+        $this->dumpHeaders();
+
+        exit(1);
     }
 
     /**
