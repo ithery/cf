@@ -1056,7 +1056,7 @@ class Request {
 
         $pass = $this->getPassword();
         if ('' != $pass) {
-            $userinfo .= ":${pass}";
+            $userinfo .= ":" . $pass;
         }
 
         return $userinfo;
