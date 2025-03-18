@@ -65,8 +65,8 @@ trait CApp_Concern_RendererTrait {
     }
     @keyframes cresautofill { from {} }
 </style>
-${cresStyle}
-${allStyles}
+{$cresStyle}
+{$allStyles}
 HTML;
     }
 
@@ -92,20 +92,21 @@ HTML;
         }
 
         return <<<HTML
-            ${endClientScript}
-            <script defer src="${cresJs}"></script>
-            ${notificationScript}
+            {$endClientScript}
+            <script defer src="{$cresJs}"></script>
+            {$notificationScript}
             <script>
-                ${js}
-                ${readyClientScript}
+                window.asdf='a';
+                {$js}
+                {$readyClientScript}
                 if (window) {
                     window.onload = function () {
-                        ${loadClientScript}
+                        {$loadClientScript}
                     }
                 }
-                ${customJs}
+                {$customJs}
             </script>
-            ${pushesScript}
+            {$pushesScript}
 
 HTML;
     }
