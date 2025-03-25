@@ -20,7 +20,7 @@ class CValidation_Factory implements CValidation_FactoryInterface {
     /**
      * The IoC container instance.
      *
-     * @var CContainer
+     * @var CContainer_Container
      */
     protected $container;
 
