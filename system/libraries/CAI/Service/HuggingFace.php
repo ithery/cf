@@ -348,4 +348,123 @@ class CAI_Service_HuggingFace extends CAI_ServiceAbstract {
     public function isModelSupported(string $model): bool {
         return array_key_exists($model, $this->models);
     }
+
+    /**
+     * Generate text from a given prompt.
+     *
+     * @throws CAI_Exception_ClientException
+     *
+     * @return array
+     */
+    public function nlp(array $options = []) {
+        $prompt = carr::get($options, 'prompt', $this->prompt);
+        $candidateLabels = carr::get($options, 'candidateLabels');
+
+        try {
+            $retryCount = 0;
+            $maxRetries = 5; // You can set a limit for retries
+            $waitTime = 10; // Wait time in seconds before retrying (can be dynamic based on response)
+
+            while ($retryCount < $maxRetries) {
+                $payload = [];
+                $payload['inputs'] = $prompt;
+                if ($candidateLabels) {
+                    $payload['parameters'] = [];
+                    $payload['parameters']['candidate_labels'] = $candidateLabels;
+                }
+                $response = $this->client->post('https://api-inference.huggingface.co/models/facebook/bart-large-mnli', [
+                    'headers' => [
+                        'Authorization' => 'Bearer ' . $this->apiKey,
+                    ],
+                    'json' => $payload,
+                ]);
+
+                $responseData = json_decode($response->getBody()->getContents(), true);
+                cdbg::dd($responseData);
+                // Check if the response indicates that the model is still loading
+                if (isset($responseData['error']) && strpos($responseData['error'], 'currently loading') !== false) {
+                    $retryCount++;
+                    $estimatedTime = $responseData['estimated_time'] ?? $waitTime;
+                    sleep($estimatedTime); // Wait for the estimated time before retrying
+
+                    continue;
+                }
+
+                // If no error, break out of the loop
+                break;
+            }
+
+            // If retries exceeded, throw an error
+            if ($retryCount >= $maxRetries) {
+                throw new CAI_Exception_ClientException('Model loading took too long. Try again later.');
+            }
+
+            // Check if the response contains the necessary data
+            if (isset($responseData[0]['generated_text'])) {
+                $generatedText = $responseData[0]['generated_text'];
+
+                return $generatedText;
+            }
+
+            throw new CAI_Exception_ClientException('Text generation failed. No "generated_text" in response.');
+        } catch (RequestException $e) {
+            throw new CAI_Exception_ClientException('Request failed: ' . $e->getMessage());
+        } catch (\Exception $e) {
+            throw new CAI_Exception_ClientException('Unexpected error: ' . $e->getMessage());
+        }
+    }
+
+    public function ner(array $options = []) {
+        $prompt = carr::get($options, 'prompt', $this->prompt);
+
+        try {
+            $retryCount = 0;
+            $maxRetries = 5; // You can set a limit for retries
+            $waitTime = 10; // Wait time in seconds before retrying (can be dynamic based on response)
+
+            while ($retryCount < $maxRetries) {
+                $payload = [];
+                $payload['inputs'] = $prompt;
+
+                $response = $this->client->post('https://api-inference.huggingface.co/models/dbmdz/bert-large-cased-finetuned-conll03-english', [
+                    'headers' => [
+                        'Authorization' => 'Bearer ' . $this->apiKey,
+                    ],
+                    'json' => $payload,
+                ]);
+
+                $responseData = json_decode($response->getBody()->getContents(), true);
+                cdbg::dd($responseData);
+                // Check if the response indicates that the model is still loading
+                if (isset($responseData['error']) && strpos($responseData['error'], 'currently loading') !== false) {
+                    $retryCount++;
+                    $estimatedTime = $responseData['estimated_time'] ?? $waitTime;
+                    sleep($estimatedTime); // Wait for the estimated time before retrying
+
+                    continue;
+                }
+
+                // If no error, break out of the loop
+                break;
+            }
+
+            // If retries exceeded, throw an error
+            if ($retryCount >= $maxRetries) {
+                throw new CAI_Exception_ClientException('Model loading took too long. Try again later.');
+            }
+
+            // Check if the response contains the necessary data
+            if (isset($responseData[0]['generated_text'])) {
+                $generatedText = $responseData[0]['generated_text'];
+
+                return $generatedText;
+            }
+
+            throw new CAI_Exception_ClientException('Text generation failed. No "generated_text" in response.');
+        } catch (RequestException $e) {
+            throw new CAI_Exception_ClientException('Request failed: ' . $e->getMessage());
+        } catch (\Exception $e) {
+            throw new CAI_Exception_ClientException('Unexpected error: ' . $e->getMessage());
+        }
+    }
 }
