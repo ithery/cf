@@ -252,6 +252,7 @@ class CBase_Vite implements CInterface_Htmlable {
             return new CBase_HtmlString(
                 $entrypoints
                     ->prepend('@vite/client')
+                    ->map(fn ($entrypoint) => $this->prependDefaultIfNecessary($entrypoint))
                     ->map(fn ($entrypoint) => $this->makeTagForChunk($entrypoint, $this->hotAsset($entrypoint), null, null))
                     ->join('')
             );
@@ -332,6 +333,18 @@ class CBase_Vite implements CInterface_Htmlable {
             ->map(fn ($args) => $this->makePreloadTagForChunk(...$args));
 
         return new CBase_HtmlString($preloads->join('') . $stylesheets->join('') . $scripts->join(''));
+    }
+
+    protected function prependDefaultIfNecessary($url) {
+        if ($url !== '@vite/client') {
+            if (is_dir(CF::appDir() . DS . 'default')) {
+                if (!cstr::startsWith($url, 'default')) {
+                    $url = 'default/' . $url;
+                }
+            }
+        }
+
+        return $url;
     }
 
     /**
@@ -674,7 +687,19 @@ class CBase_Vite implements CInterface_Htmlable {
      * @return string
      */
     protected function assetPath($path, $secure = null) {
-        return c::media($path, $secure);
+        $path = CF::publicPath($path);
+        if (cstr::startsWith($path, CF::publicPath())) {
+            $path = str_replace(CF::publicPath() . '/', '', $path);
+        }
+        $urlGenerator = CRouting::urlGenerator();
+        $root = $urlGenerator->formatRoot($urlGenerator->formatScheme($secure));
+        $i = 'index.php';
+
+        $root = cstr::contains($root, $i) ? str_replace('/' . $i, '', $root) : $root;
+
+        return $root . '/' . trim($path, '/');
+
+        // return c::media($path, $secure);
     }
 
     /**
@@ -743,6 +768,11 @@ class CBase_Vite implements CInterface_Htmlable {
      */
     protected function chunk($manifest, $file) {
         if (!isset($manifest[$file])) {
+            $fileWithDefault = 'default/' . $file;
+            if (isset($manifest[$fileWithDefault])) {
+                return $manifest[$fileWithDefault];
+            }
+
             throw new Exception("Unable to locate file in Vite manifest: {$file}.");
         }
 

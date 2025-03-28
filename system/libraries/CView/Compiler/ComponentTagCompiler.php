@@ -302,7 +302,6 @@ class CView_Compiler_ComponentTagCompiler {
      */
     protected function guessAnonymousComponentUsingPaths(CView_Factory $viewFactory, string $component) {
         $delimiter = CView::HINT_PATH_DELIMITER;
-
         foreach ($this->blade->getAnonymousComponentPaths() as $path) {
             try {
                 if (cstr::contains($component, $delimiter)
@@ -352,6 +351,11 @@ class CView_Compiler_ComponentTagCompiler {
                 }
 
                 if ($viewFactory->exists($view = $this->guessViewName($componentName, $directory) . '.index')) {
+                    return $view;
+                }
+                $lastViewSegment = cstr::afterLast(cstr::afterLast($componentName, '.'), ':');
+
+                if ($viewFactory->exists($view = $this->guessViewName($componentName, $directory) . '.' . $lastViewSegment)) {
                     return $view;
                 }
             });
