@@ -124,7 +124,12 @@ class CTranslation_Loader_FileLoader extends CTranslation_LoaderAbstract {
         $result = [];
         $cfPaths = array_reverse($cfPaths);
         foreach ($cfPaths as $cfPath) {
+            //remove docroot when started with DOCROOT
+            if (cstr::startsWith($path, DOCROOT)) {
+                $path = substr($path, strlen(DOCROOT));
+            }
             $pathToFind = $cfPath . $path;
+
             if ($this->files->exists($full = "{$pathToFind}/{$locale}/{$group}.php")) {
                 $array = $this->files->getRequire($full);
                 if (is_array($array)) {
