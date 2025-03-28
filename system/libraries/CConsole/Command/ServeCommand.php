@@ -110,12 +110,17 @@ class CConsole_Command_ServeCommand extends CConsole_Command {
      * @return array
      */
     protected function serverCommand() {
+        $docroot = DOCROOT;
+        if (CF::isIndexInApp()) {
+            $docroot = CF::publicPath();
+        }
+
         return [
             (new PhpExecutableFinder())->find(false),
             '-S',
             $this->host() . ':' . $this->port(),
             '-t',
-            DOCROOT,
+            $docroot,
         ];
     }
 

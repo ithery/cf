@@ -688,7 +688,6 @@ class CBase_Vite implements CInterface_Htmlable {
      */
     protected function manifest($buildDirectory) {
         $path = $this->manifestPath($buildDirectory);
-
         if (!isset(static::$manifests[$path])) {
             if (!is_file($path)) {
                 throw new CBase_Exception_ViteManifestNotFoundException("Vite manifest not found at: $path");
@@ -748,6 +747,19 @@ class CBase_Vite implements CInterface_Htmlable {
         }
 
         return $manifest[$file];
+    }
+
+    /**
+     * Get the nonce attribute for the prefetch script tags.
+     *
+     * @return \CBase_HtmlString
+     */
+    protected function nonceAttribute() {
+        if ($this->cspNonce() === null) {
+            return new CBase_HtmlString('');
+        }
+
+        return new CBase_HtmlString(' nonce="' . $this->cspNonce() . '"');
     }
 
     /**
