@@ -37,11 +37,11 @@ class CView_Compiler_ComponentTagCompiler {
      *
      * @return void
      */
-    public function __construct(array $aliases = [], array $namespaces = []) {
+    public function __construct(array $aliases = [], array $namespaces = [], CView_Compiler_BladeCompiler $blade = null) {
         $this->aliases = $aliases;
         $this->namespaces = $namespaces;
 
-        $this->blade = CView::blade();
+        $this->blade = $blade ?: CView::blade();
     }
 
     /**
@@ -318,6 +318,9 @@ class CView_Compiler_ComponentTagCompiler {
                     return $guess;
                 }
                 if ($viewFactory->exists($guess = $path['prefixHash'] . $delimiter . $formattedComponent . '.index')) {
+                    return $guess;
+                }
+                if ($viewFactory->exists($guess = $path['prefixHash'] . $delimiter . $formattedComponent . '.' . cstr::afterLast($formattedComponent, '.'))) {
                     return $guess;
                 }
             } catch (InvalidArgumentException $e) {

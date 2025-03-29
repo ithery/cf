@@ -713,6 +713,7 @@ class CBase_Vite implements CInterface_Htmlable {
      */
     protected function manifest($buildDirectory) {
         $path = $this->manifestPath($buildDirectory);
+
         if (!isset(static::$manifests[$path])) {
             if (!is_file($path)) {
                 throw new CBase_Exception_ViteManifestNotFoundException("Vite manifest not found at: $path");
@@ -732,6 +733,10 @@ class CBase_Vite implements CInterface_Htmlable {
      * @return string
      */
     protected function manifestPath($buildDirectory) {
+        // $relativeIndex = str_replace(DOCROOT, '', CFINDEX);
+
+        // return strpos($relativeIndex, 'application/') !== false;
+        // cdbg::dd(CFINDEX, CF::isIndexInApp(), CF::publicPath($buildDirectory . '/' . $this->manifestFilename), $buildDirectory . '/' . $this->manifestFilename);
         return CF::publicPath($buildDirectory . '/' . $this->manifestFilename);
     }
 

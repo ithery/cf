@@ -693,7 +693,7 @@ class CApp implements CInterface_Responsable, CInterface_Renderable, CInterface_
      */
     public function visitor() {
         if ($this->visitor == null) {
-            $this->visitor = new CApp_Visitor(CF::config('app.visitor'));
+            $this->visitor = new CApp_Visitor(CF::config('visitor'));
         }
 
         return $this->visitor;

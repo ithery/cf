@@ -26,7 +26,7 @@ class CApp_Model_Visit extends CModel {
 
     public function __construct(array $attributes = []) {
         if (!isset($this->table)) {
-            $this->setTable(CF::config('app.visitor.table_name'));
+            $this->setTable(CF::config('visitor.table_name'));
         }
         parent::__construct($attributes);
     }

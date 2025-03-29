@@ -51,6 +51,13 @@ class CView_Compiler_BladeCompiler extends CView_CompilerAbstract implements CVi
     protected $conditions = [];
 
     /**
+     * The registered string preparation callbacks.
+     *
+     * @var array
+     */
+    protected $prepareStringsForCompilationUsing = [];
+
+    /**
      * All of the registered precompilers.
      *
      * @var array
@@ -256,11 +263,16 @@ class CView_Compiler_BladeCompiler extends CView_CompilerAbstract implements CVi
     public function compileString($value) {
         list($this->footer, $result) = [[], ''];
 
+        foreach ($this->prepareStringsForCompilationUsing as $callback) {
+            $value = $callback($value);
+        }
+        $value = $this->storeUncompiledBlocks($value);
+
         // First we will compile the Blade component tags. This is a precompile style
         // step which compiles the component Blade tags into @component directives
         // that may be used by Blade. Then we should call any other precompilers.
         $value = $this->compileComponentTags(
-            $this->compileComments($this->storeUncompiledBlocks($value))
+            $this->compileComments($value)
         );
 
         foreach ($this->precompilers as $precompiler) {
@@ -312,7 +324,7 @@ class CView_Compiler_BladeCompiler extends CView_CompilerAbstract implements CVi
 
         return c::tap($view->render(), function () use ($view, $deleteCachedView) {
             if ($deleteCachedView) {
-                unlink($view->getPath());
+                @unlink($view->getPath());
             }
         });
     }
@@ -411,7 +423,8 @@ class CView_Compiler_BladeCompiler extends CView_CompilerAbstract implements CVi
 
         return (new CView_Compiler_ComponentTagCompiler(
             $this->classComponentAliases,
-            $this->classComponentNamespaces
+            $this->classComponentNamespaces,
+            $this
         ))->compile($value);
     }
 
