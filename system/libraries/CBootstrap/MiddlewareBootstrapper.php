@@ -16,6 +16,7 @@ class CBootstrap_MiddlewareBootstrapper extends CBootstrap_BootstrapperAbstract 
         CMiddleware::manager()->pushMiddleware(CHTTP_Middleware_CleanInput::class);
         if (!c::request()->is('cresenity/auth/ping')) {
             CMiddleware::manager()->pushMiddleware(CSession_Middleware_SessionMiddleware::class);
+            CMiddleware::manager()->pushMiddleware(CView_Middleware_ShareErrorsFromSession::class);
         }
     }
 }

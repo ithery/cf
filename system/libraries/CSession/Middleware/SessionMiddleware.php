@@ -212,7 +212,7 @@ class CSession_Middleware_SessionMiddleware {
      * @return void
      */
     protected function saveSession($request) {
-        CSession::instance()->store()->save();
+        CSession::store()->save();
     }
 
     /**
