@@ -2093,6 +2093,22 @@ class c {
             }
         );
     }
+
+    public static function storagePath($path = '') {
+        $storagePath = rtrim(DOCROOT, '/') . '/temp/storage/' . CF::appCode();
+        if ($path) {
+            $storagePath = $storagePath . '/' . ltrim($path, '/');
+        }
+    }
+
+    public static function basePath($path = '') {
+        $basePath = CF::appDir();
+        if ($path) {
+            $basePath = $basePath . '/' . ltrim($path, '/');
+        }
+
+        return $basePath;
+    }
 }
 
 // End c
