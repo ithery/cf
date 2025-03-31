@@ -1,19 +1,7 @@
 <?php
 
 use Illuminate\Support\Collection;
-use Illuminate\Database\Eloquent\Builder;
-use Prettus\Repository\Contracts\Presentable;
-use Prettus\Repository\Contracts\CriteriaInterface;
-use Prettus\Validator\Contracts\ValidatorInterface;
-use Prettus\Repository\Contracts\PresenterInterface;
 use Prettus\Validator\Exceptions\ValidatorException;
-use Prettus\Repository\Events\RepositoryEntityCreated;
-use Prettus\Repository\Events\RepositoryEntityDeleted;
-use Prettus\Repository\Events\RepositoryEntityUpdated;
-use Prettus\Repository\Exceptions\RepositoryException;
-use Prettus\Repository\Events\RepositoryEntityCreating;
-use Prettus\Repository\Events\RepositoryEntityDeleting;
-use Prettus\Repository\Events\RepositoryEntityUpdating;
 use Illuminate\Contracts\Pagination\LengthAwarePaginator;
 
 /**

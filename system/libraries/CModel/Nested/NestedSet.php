@@ -3,10 +3,7 @@
 defined('SYSPATH') or die('No direct access allowed.');
 
 /**
- * @author Hery Kurniawan
- * @license Ittron Global Teknologi <ittron.co.id>
- *
- * @since Jun 23, 2018, 5:42:31 AM
+ * @see https://github.com/lazychaser/laravel-nestedset/
  */
 class CModel_Nested_NestedSet {
     /**

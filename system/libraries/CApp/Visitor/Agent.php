@@ -134,7 +134,7 @@ class CApp_Visitor_Agent extends MobileDetect {
      *
      * @return mixed
      */
-    protected function retrieveUsingCacheOrResolve(string $key, Closure $callback): mixed {
+    protected function retrieveUsingCacheOrResolve(string $key, Closure $callback) {
         $cacheKey = $this->createCacheKey($key);
 
         if (!is_null($cacheItem = $this->store[$cacheKey] ?? null)) {
