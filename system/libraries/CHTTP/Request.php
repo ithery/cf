@@ -80,7 +80,7 @@ class CHTTP_Request extends SymfonyRequest implements CInterface_Arrayable, Arra
      */
     public function root() {
         if (CF::isCli()) {
-            CLogger::info('Port:' . $this->getPort());
+            CLogger::info('getSchemeAndHttpHost:' . $this->getSchemeAndHttpHost());
         }
 
         return rtrim($this->getSchemeAndHttpHost() . $this->getBaseUrl(), '/');
