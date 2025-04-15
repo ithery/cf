@@ -447,7 +447,7 @@ trait CModel_Relation_Trait_InteractsWithPivotTable {
                     return 0;
                 }
 
-                $query->whereIn($this->relatedPivotKey, (array) $ids);
+                $query->whereIn($this->getQualifiedRelatedPivotKeyName(), (array) $ids);
             }
 
             // Once we have all of the conditions set on the statement, we are ready
