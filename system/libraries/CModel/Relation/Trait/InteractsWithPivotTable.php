@@ -90,9 +90,7 @@ trait CModel_Relation_Trait_InteractsWithPivotTable {
         // all of the entities that exist in the "current" array but are not in the
         // array of the new IDs given to the method which will complete the sync.
         if ($detaching) {
-            $detach = array_diff($current, array_keys(
-                $records = $this->formatRecordsList($this->parseIds($ids))
-            ));
+            $detach = array_diff($current, array_keys($records));
             if (count($detach) > 0) {
                 $this->detach($detach);
 
@@ -606,8 +604,10 @@ trait CModel_Relation_Trait_InteractsWithPivotTable {
             return $value->pluck($this->relatedKey)->all();
         }
 
-        if ($value instanceof CCollection) {
-            return $value->toArray();
+        if ($value instanceof CCollection || is_array($value)) {
+            return c::collect($value)->map(function ($item) {
+                return $item instanceof CModel ? $item->{$this->relatedKey} : $item;
+            })->all();
         }
 
         return (array) $value;
