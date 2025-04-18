@@ -48,8 +48,8 @@ if (!defined('IN_PRODUCTION')) {
 //try to load data domain
 
 //end of constant from index
-define('CF_VERSION', '1.7');
-define('CF_CODENAME', 'CF1.7');
+define('CF_VERSION', '1.8');
+define('CF_CODENAME', 'CF1.8');
 define('CF_START', microtime(true));
 
 // Test of CF is running in Windows
