@@ -15,6 +15,7 @@ class CFConsole {
         CConsole_Command_Database_ExplainCommand::class,
         CConsole_Command_Database_MonitorCommand::class,
         CConsole_Command_Database_ShowCommand::class,
+        CConsole_Command_Database_SchemaCommand::class,
         CConsole_Command_Api_JWTSecretCommand::class,
         CConsole_Command_Api_OAuth_KeyCommand::class,
         CConsole_Command_Api_OAuth_ClientCommand::class,
