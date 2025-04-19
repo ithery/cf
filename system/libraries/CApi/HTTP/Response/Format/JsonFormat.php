@@ -1,5 +1,7 @@
 <?php
 
+use Illuminate\Contracts\Support\Arrayable;
+
 class CApi_HTTP_Response_Format_JsonFormat extends CApi_HTTP_Response_FormatAbstract {
     /*
      * JSON format (as well as JSONP) uses JsonOptionalFormatting trait, which
@@ -50,7 +52,7 @@ class CApi_HTTP_Response_Format_JsonFormat extends CApi_HTTP_Response_FormatAbst
     /**
      * Format an array or instance implementing Arrayable.
      *
-     * @param array|\CInterface_Arrayable $content
+     * @param array|\Illuminate\Contracts\Support\Arrayable $content
      *
      * @return string
      */
@@ -76,12 +78,12 @@ class CApi_HTTP_Response_Format_JsonFormat extends CApi_HTTP_Response_FormatAbst
     /**
      * Morph a value to an array.
      *
-     * @param array|\CInterface_Arrayable $value
+     * @param array|\Illuminate\Contracts\Support\Arrayable $value
      *
      * @return array
      */
     protected function morphToArray($value) {
-        return $value instanceof CInterface_Arrayable ? $value->toArray() : $value;
+        return $value instanceof Arrayable ? $value->toArray() : $value;
     }
 
     /**

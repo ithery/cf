@@ -1,8 +1,10 @@
 <?php
 
+use Illuminate\Contracts\Support\Arrayable;
+
 defined('SYSPATH') or die('No direct access allowed.');
 
-class CConfig implements CInterface_Arrayable, ArrayAccess {
+class CConfig implements Arrayable, ArrayAccess {
     protected static $instances = [];
 
     protected $group;

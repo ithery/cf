@@ -1,5 +1,7 @@
 <?php
 
+use Illuminate\Contracts\Support\Arrayable;
+
 class CElement_Helper {
     public static function getClasses($classes) {
         if (is_string($classes)) {
@@ -12,12 +14,13 @@ class CElement_Helper {
                 return !c::blank($class);
             })->all();
         }
-        if ($classes instanceof CInterface_Arrayable) {
+        if ($classes instanceof Arrayable) {
             return $classes->toArray();
         }
         if (is_array($classes)) {
             return $classes;
         }
+
         return [];
     }
 }

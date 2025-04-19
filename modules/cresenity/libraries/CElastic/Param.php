@@ -1,19 +1,8 @@
 <?php
 
-defined('SYSPATH') OR die('No direct access allowed.');
+defined('SYSPATH') or die('No direct access allowed.');
 
-/**
- * @author Hery Kurniawan
- * @since Jul 7, 2018, 8:11:05 PM
- * @license Ittron Global Teknologi <ittron.co.id>
- */
-
-/**
- * Class to handle params.
- * This function can be used to handle params for queries, filter
- */
 class CElastic_Param implements CInterface_Arrayable, \Countable {
-
     /**
      * Params.
      *
@@ -40,6 +29,7 @@ class CElastic_Param implements CInterface_Arrayable, \Countable {
         if (!empty($this->_rawParams)) {
             $data = array_merge($data, $this->_rawParams);
         }
+
         return $this->_convertArrayable($data);
     }
 
@@ -61,6 +51,7 @@ class CElastic_Param implements CInterface_Arrayable, \Countable {
                 $arr[$key] = $value;
             }
         }
+
         return $arr;
     }
 
@@ -85,6 +76,7 @@ class CElastic_Param implements CInterface_Arrayable, \Countable {
      */
     protected function _setRawParam($key, $value) {
         $this->_rawParams[$key] = $value;
+
         return $this;
     }
 
@@ -98,6 +90,7 @@ class CElastic_Param implements CInterface_Arrayable, \Countable {
      */
     public function setParam($key, $value) {
         $this->_params[$key] = $value;
+
         return $this;
     }
 
@@ -110,6 +103,7 @@ class CElastic_Param implements CInterface_Arrayable, \Countable {
      */
     public function setParams(array $params) {
         $this->_params = $params;
+
         return $this;
     }
 
@@ -125,6 +119,7 @@ class CElastic_Param implements CInterface_Arrayable, \Countable {
      */
     public function addParam($key, $value) {
         $this->_params[$key][] = $value;
+
         return $this;
     }
 
@@ -141,6 +136,7 @@ class CElastic_Param implements CInterface_Arrayable, \Countable {
         if (!$this->hasParam($key)) {
             throw new InvalidException('Param ' . $key . ' does not exist');
         }
+
         return $this->_params[$key];
     }
 
@@ -165,12 +161,11 @@ class CElastic_Param implements CInterface_Arrayable, \Countable {
     }
 
     /**
-     * {@inheritdoc}
+     * @inheritdoc
      *
      * @return int
      */
     public function count() {
         return count($this->_params);
     }
-
 }

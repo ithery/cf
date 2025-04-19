@@ -1,11 +1,13 @@
 <?php
 
+use Illuminate\Contracts\Support\Arrayable;
+
 defined('SYSPATH') or die('No direct access allowed.');
 
 /**
  * @author Hery Kurniawan <hery@itton.co.id>
  */
-class CBase_MessageBag implements CInterface_Arrayable, Countable, CInterface_Jsonable, JsonSerializable, CBase_MessageBagInterface, CBase_MessageProviderInterface {
+class CBase_MessageBag implements Arrayable, Countable, CInterface_Jsonable, JsonSerializable, CBase_MessageBagInterface, CBase_MessageProviderInterface {
     /**
      * All of the registered messages.
      *
@@ -29,7 +31,7 @@ class CBase_MessageBag implements CInterface_Arrayable, Countable, CInterface_Js
      */
     public function __construct(array $messages = []) {
         foreach ($messages as $key => $value) {
-            $this->messages[$key] = $value instanceof CInterface_Arrayable ? $value->toArray() : (array) $value;
+            $this->messages[$key] = $value instanceof Arrayable ? $value->toArray() : (array) $value;
         }
     }
 

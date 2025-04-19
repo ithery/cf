@@ -1,5 +1,8 @@
 <?php
-class CException_Solution_SolutionTransformer implements CInterface_Arrayable {
+
+use Illuminate\Contracts\Support\Arrayable;
+
+class CException_Solution_SolutionTransformer implements Arrayable {
     protected $solution;
 
     public function __construct(CException_Contract_SolutionInterface $solution) {

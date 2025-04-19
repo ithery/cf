@@ -1,12 +1,14 @@
 <?php
 
+use Illuminate\Contracts\Support\Arrayable;
+
 /**
  * @template TKey of array-key
  * @template TItem
  *
  * @extends  \ArrayObject<TKey, TItem>
  */
-class CModel_Casts_ArrayObject extends ArrayObject implements CInterface_Arrayable, JsonSerializable {
+class CModel_Casts_ArrayObject extends ArrayObject implements Arrayable, JsonSerializable {
     /**
      * Get a collection containing the underlying array.
      *

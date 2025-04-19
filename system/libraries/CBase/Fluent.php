@@ -1,6 +1,8 @@
 <?php
 
-class CBase_Fluent implements CInterface_Arrayable, ArrayAccess, CInterface_Jsonable, JsonSerializable {
+use Illuminate\Contracts\Support\Arrayable;
+
+class CBase_Fluent implements Arrayable, ArrayAccess, CInterface_Jsonable, JsonSerializable {
     /**
      * All of the attributes set on the fluent instance.
      *

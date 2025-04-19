@@ -1,6 +1,8 @@
 <?php
 
-class CException_Config implements CInterface_Arrayable {
+use Illuminate\Contracts\Support\Arrayable;
+
+class CException_Config implements Arrayable {
     use CTrait_HasOptions;
 
     private static $instance;

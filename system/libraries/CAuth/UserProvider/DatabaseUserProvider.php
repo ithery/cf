@@ -1,5 +1,7 @@
 <?php
 
+use Illuminate\Contracts\Support\Arrayable;
+
 class CAuth_UserProvider_DatabaseUserProvider extends CAuth_UserProviderAbstract {
     /**
      * The active database connection.
@@ -119,7 +121,7 @@ class CAuth_UserProvider_DatabaseUserProvider extends CAuth_UserProviderAbstract
                 continue;
             }
 
-            if (is_array($value) || $value instanceof CInterface_Arrayable) {
+            if (is_array($value) || $value instanceof Arrayable) {
                 $query->whereIn($key, $value);
             } elseif ($value instanceof Closure) {
                 $value($query);

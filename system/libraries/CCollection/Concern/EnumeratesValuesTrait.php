@@ -1,6 +1,7 @@
 <?php
 
 use Symfony\Component\VarDumper\VarDumper;
+use Illuminate\Contracts\Support\Arrayable;
 
 /**
  * @property-read CBase_HigherOrderCollectionProxy $average
@@ -803,7 +804,7 @@ trait CCollection_Concern_EnumeratesValuesTrait {
      */
     public function toArray() {
         return $this->map(function ($value) {
-            return $value instanceof CInterface_Arrayable ? $value->toArray() : $value;
+            return $value instanceof Arrayable ? $value->toArray() : $value;
         })->all();
     }
 
@@ -821,7 +822,7 @@ trait CCollection_Concern_EnumeratesValuesTrait {
             if ($value instanceof Cinterface_Jsonable) {
                 return json_decode($value->toJson(), true);
             }
-            if ($value instanceof Cinterface_Arrayable) {
+            if ($value instanceof Arrayable) {
                 return $value->toArray();
             }
 
@@ -917,7 +918,7 @@ trait CCollection_Concern_EnumeratesValuesTrait {
         if ($items instanceof CInterface_Enumerable) {
             return $items->all();
         }
-        if ($items instanceof CInterface_Arrayable) {
+        if ($items instanceof Arrayable) {
             return $items->toArray();
         }
         if ($items instanceof CInterface_Jsonable) {

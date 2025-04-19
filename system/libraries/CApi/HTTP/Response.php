@@ -1,5 +1,6 @@
 <?php
 
+use Illuminate\Contracts\Support\Arrayable;
 use Symfony\Component\HttpKernel\Exception\NotAcceptableHttpException;
 
 class CApi_HTTP_Response extends CHTTP_Response {
@@ -161,7 +162,7 @@ class CApi_HTTP_Response extends CHTTP_Response {
             $this->content = $formatter->formatModel($this->content);
         } elseif ($this->content instanceof CModel_Collection) {
             $this->content = $formatter->formatModelCollection($this->content);
-        } elseif (is_array($this->content) || $this->content instanceof ArrayObject || $this->content instanceof CInterface_Arrayable) {
+        } elseif (is_array($this->content) || $this->content instanceof ArrayObject || $this->content instanceof Arrayable) {
             $this->content = $formatter->formatArray($this->content);
         } else {
             if (!empty($defaultContentType)) {

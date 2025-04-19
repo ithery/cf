@@ -1,4 +1,7 @@
 <?php
+
+use Illuminate\Contracts\Support\Arrayable;
+
 /**
  * @template TRelatedModel of \Model
  * @template TDeclaringModel of \Model
@@ -696,7 +699,7 @@ class CModel_Relation_BelongsToMany extends CModel_Relation {
      * @return null|CModel|CModel_Collection
      */
     public function find($id, $columns = ['*']) {
-        if (!$id instanceof CModel && (is_array($id) || $id instanceof CInterface_Arrayable)) {
+        if (!$id instanceof CModel && (is_array($id) || $id instanceof Arrayable)) {
             return $this->findMany($id, $columns);
         }
 
@@ -716,7 +719,7 @@ class CModel_Relation_BelongsToMany extends CModel_Relation {
      * @return CModel_Collection
      */
     public function findMany($ids, $columns = ['*']) {
-        $ids = $ids instanceof CInterface_Arrayable ? $ids->toArray() : $ids;
+        $ids = $ids instanceof Arrayable ? $ids->toArray() : $ids;
 
         if (empty($ids)) {
             return $this->getRelated()->newCollection();
@@ -741,7 +744,7 @@ class CModel_Relation_BelongsToMany extends CModel_Relation {
     public function findOrFail($id, $columns = ['*']) {
         $result = $this->find($id, $columns);
 
-        $id = $id instanceof CInterface_Arrayable ? $id->toArray() : $id;
+        $id = $id instanceof Arrayable ? $id->toArray() : $id;
 
         if (is_array($id)) {
             if (count($result) == count(array_unique($id))) {

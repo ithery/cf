@@ -1,7 +1,10 @@
 <?php
 
+use Illuminate\Contracts\Support\Arrayable;
+
 class CBroadcast_BroadcastEvent implements CQueue_ShouldQueueInterface {
     use CQueue_Trait_QueueableTrait;
+
     /**
      * The event instance.
      *
@@ -101,7 +104,7 @@ class CBroadcast_BroadcastEvent implements CQueue_ShouldQueueInterface {
      * @return mixed
      */
     protected function formatProperty($value) {
-        if ($value instanceof CInterface_Arrayable) {
+        if ($value instanceof Arrayable) {
             return $value->toArray();
         }
 

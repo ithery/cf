@@ -1,6 +1,8 @@
 <?php
 
-class CElement_Component_DataTable_DataRow implements CInterface_Arrayable {
+use Illuminate\Contracts\Support\Arrayable;
+
+class CElement_Component_DataTable_DataRow implements Arrayable {
     protected $row;
 
     public function __construct($row) {

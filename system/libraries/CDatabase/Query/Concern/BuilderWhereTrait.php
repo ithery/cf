@@ -1,5 +1,7 @@
 <?php
 
+use Illuminate\Contracts\Support\Arrayable;
+
 trait CDatabase_Query_Concern_BuilderWhereTrait {
     /**
      * Add a basic where clause to the query.
@@ -326,7 +328,7 @@ trait CDatabase_Query_Concern_BuilderWhereTrait {
         // Next, if the value is Arrayable we need to cast it to its raw array form so we
         // have the underlying array value instead of an Arrayable object which is not
         // able to be added as a binding, etc. We will then add to the wheres array.
-        if ($values instanceof CInterface_Arrayable) {
+        if ($values instanceof Arrayable) {
             $values = $values->toArray();
         }
 
@@ -380,17 +382,17 @@ trait CDatabase_Query_Concern_BuilderWhereTrait {
     /**
      * Add a "where in raw" clause for integer values to the query.
      *
-     * @param string                      $column
-     * @param \CInterface_Arrayable|array $values
-     * @param string                      $boolean
-     * @param bool                        $not
+     * @param string                                        $column
+     * @param \Illuminate\Contracts\Support\Arrayable|array $values
+     * @param string                                        $boolean
+     * @param bool                                          $not
      *
      * @return $this
      */
     public function whereIntegerInRaw($column, $values, $boolean = 'and', $not = false) {
         $type = $not ? 'NotInRaw' : 'InRaw';
 
-        if ($values instanceof CInterface_Arrayable) {
+        if ($values instanceof Arrayable) {
             $values = $values->toArray();
         }
 
@@ -406,8 +408,8 @@ trait CDatabase_Query_Concern_BuilderWhereTrait {
     /**
      * Add an "or where in raw" clause for integer values to the query.
      *
-     * @param string                      $column
-     * @param \CInterface_Arrayable|array $values
+     * @param string                                        $column
+     * @param \Illuminate\Contracts\Support\Arrayable|array $values
      *
      * @return $this
      */
@@ -418,9 +420,9 @@ trait CDatabase_Query_Concern_BuilderWhereTrait {
     /**
      * Add a "where not in raw" clause for integer values to the query.
      *
-     * @param string                      $column
-     * @param \CInterface_Arrayable|array $values
-     * @param string                      $boolean
+     * @param string                                        $column
+     * @param \Illuminate\Contracts\Support\Arrayable|array $values
+     * @param string                                        $boolean
      *
      * @return $this
      */
@@ -431,8 +433,8 @@ trait CDatabase_Query_Concern_BuilderWhereTrait {
     /**
      * Add an "or where not in raw" clause for integer values to the query.
      *
-     * @param string                      $column
-     * @param \CInterface_Arrayable|array $values
+     * @param string                                        $column
+     * @param \Illuminate\Contracts\Support\Arrayable|array $values
      *
      * @return $this
      */

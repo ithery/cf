@@ -5,6 +5,8 @@
  *
  * @author Hery
  */
+
+use Illuminate\Contracts\Support\Arrayable;
 use Symfony\Component\Console\Helper\Table;
 use Symfony\Component\Console\Question\Question;
 use Symfony\Component\Console\Input\InputInterface;
@@ -218,7 +220,7 @@ trait CConsole_Trait_InteractsWithIOTrait {
      * Format input to textual table.
      *
      * @param array                       $headers
-     * @param \CInterface_Arrayable|array $rows
+     * @param \Illuminate\Contracts\Support\Arrayable|array $rows
      * @param string                      $tableStyle
      * @param array                       $columnStyles
      *
@@ -227,7 +229,7 @@ trait CConsole_Trait_InteractsWithIOTrait {
     public function table($headers, $rows, $tableStyle = 'default', array $columnStyles = []) {
         $table = new Table($this->output);
 
-        if ($rows instanceof CInterface_Arrayable) {
+        if ($rows instanceof Arrayable) {
             $rows = $rows->toArray();
         }
 

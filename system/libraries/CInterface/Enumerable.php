@@ -1,6 +1,8 @@
 <?php
 
-interface CInterface_Enumerable extends CInterface_Arrayable, Countable, IteratorAggregate, CInterface_Jsonable, JsonSerializable {
+use Illuminate\Contracts\Support\Arrayable;
+
+interface CInterface_Enumerable extends Arrayable, Countable, IteratorAggregate, CInterface_Jsonable, JsonSerializable {
     /**
      * Create a new collection instance if the value isn't one already.
      *

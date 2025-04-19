@@ -1,11 +1,8 @@
 <?php
 
-/**
- * Description of MethodAbstract.
- *
- * @author Hery
- */
-abstract class CApi_MethodAbstract implements CInterface_Arrayable {
+use Illuminate\Contracts\Support\Arrayable;
+
+abstract class CApi_MethodAbstract implements Arrayable {
     /**
      * @var int
      */

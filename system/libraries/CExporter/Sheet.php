@@ -4,6 +4,7 @@ use PhpOffice\PhpSpreadsheet\IOFactory;
 use PhpOffice\PhpSpreadsheet\Chart\Chart;
 use PhpOffice\PhpSpreadsheet\Reader\Html;
 use PhpOffice\PhpSpreadsheet\Spreadsheet;
+use Illuminate\Contracts\Support\Arrayable;
 use PhpOffice\PhpSpreadsheet\Shared\StringHelper;
 use PhpOffice\PhpSpreadsheet\Worksheet\Worksheet;
 use PhpOffice\PhpSpreadsheet\Worksheet\BaseDrawing;
@@ -12,6 +13,7 @@ use PhpOffice\PhpSpreadsheet\Cell\Cell as SpreadsheetCell;
 class CExporter_Sheet {
     use CExporter_Trait_DelegatedMacroableTrait,
         CExporter_Trait_HasEventBusTrait;
+
     /**
      * @var int
      */
@@ -561,7 +563,7 @@ class CExporter_Sheet {
             return $row->attributesToArray();
         }
 
-        if ($row instanceof CInterface_Arrayable) {
+        if ($row instanceof Arrayable) {
             return $row->toArray();
         }
 

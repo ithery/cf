@@ -2,6 +2,8 @@
 
 defined('SYSPATH') or die('No direct access allowed.');
 
+use Illuminate\Contracts\Support\Arrayable;
+
 /**
  * Class carr.
  */
@@ -350,10 +352,10 @@ class carr {
      * @return array
      */
     public static function merge($array1, $array2) {
-        if ($array1 instanceof CInterface_Arrayable) {
+        if ($array1 instanceof Arrayable) {
             $array1 = $array1->toArray();
         }
-        if ($array2 instanceof CInterface_Arrayable) {
+        if ($array2 instanceof Arrayable) {
             $array2 = $array2->toArray();
         }
         if (carr::isAssoc($array2)) {

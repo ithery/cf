@@ -5,6 +5,8 @@
  *
  * @author Hery
  */
+
+use Illuminate\Contracts\Support\Arrayable;
 use Psr\Http\Message\ResponseInterface as PsrResponseInterface;
 use Symfony\Bridge\PsrHttpMessage\Factory\HttpFoundationFactory;
 use Symfony\Component\HttpFoundation\Response as SymfonyResponse;
@@ -259,7 +261,7 @@ class CHTTP_Kernel {
         } elseif ($response instanceof CModel && $response->wasRecentlyCreated) {
             $response = new CHTTP_JsonResponse($response, 201);
         } elseif (!$response instanceof SymfonyResponse
-            && ($response instanceof CInterface_Arrayable
+            && ($response instanceof Arrayable
             || $response instanceof CInterface_Jsonable
             || $response instanceof ArrayObject
             || $response instanceof JsonSerializable

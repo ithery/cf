@@ -1,5 +1,7 @@
 <?php
 
+use Illuminate\Contracts\Support\Arrayable;
+
 class CManager_Transform_Parser {
     /**
      * Normalizes a legacy method so that we can accept for new method name only.
@@ -144,7 +146,7 @@ class CManager_Transform_Parser {
     }
 
     public static function getArguments(array $parameters, $data) {
-        if ($data instanceof CModel || $data instanceof CInterface_Arrayable) {
+        if ($data instanceof CModel || $data instanceof Arrayable) {
             $data = $data->toArray();
         }
         foreach ($parameters as $index => $parameter) {

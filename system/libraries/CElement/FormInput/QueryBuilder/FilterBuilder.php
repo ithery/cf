@@ -1,6 +1,8 @@
 <?php
 
-class CElement_FormInput_QueryBuilder_FilterBuilder implements CInterface_Arrayable {
+use Illuminate\Contracts\Support\Arrayable;
+
+class CElement_FormInput_QueryBuilder_FilterBuilder implements Arrayable {
     protected $filters;
 
     public function __construct() {
@@ -28,7 +30,7 @@ class CElement_FormInput_QueryBuilder_FilterBuilder implements CInterface_Arraya
 
     public function toArray() {
         return c::collect($this->filters)->map(function ($filter) {
-            return $filter instanceof CInterface_Arrayable ? $filter->toArray() : $filter;
+            return $filter instanceof Arrayable ? $filter->toArray() : $filter;
         })->toArray();
     }
 }

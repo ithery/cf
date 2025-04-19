@@ -1,4 +1,6 @@
 <?php
 
-interface CBase_Contract_ValidatedData extends CInterface_Arrayable, \ArrayAccess, \IteratorAggregate {
+use Illuminate\Contracts\Support\Arrayable;
+
+interface CBase_Contract_ValidatedData extends Arrayable, \ArrayAccess, \IteratorAggregate {
 }

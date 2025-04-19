@@ -1,5 +1,7 @@
 <?php
 
+use Illuminate\Contracts\Support\Arrayable;
+
 class CBase_Js implements CInterface_Htmlable {
     /**
      * Flags that should be used when encoding to JSON.
@@ -86,7 +88,7 @@ class CBase_Js implements CInterface_Htmlable {
             return $data->toJson($flags | static::REQUIRED_FLAGS);
         }
 
-        if ($data instanceof CInterface_Arrayable && !($data instanceof JsonSerializable)) {
+        if ($data instanceof Arrayable && !($data instanceof JsonSerializable)) {
             $data = $data->toArray();
         }
 

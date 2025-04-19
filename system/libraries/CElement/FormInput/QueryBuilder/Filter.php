@@ -1,8 +1,9 @@
 <?php
 
+use Illuminate\Contracts\Support\Arrayable;
 use CElement_FormInput_QueryBuilder_Constant as Constant;
 
-class CElement_FormInput_QueryBuilder_Filter implements CInterface_Arrayable {
+class CElement_FormInput_QueryBuilder_Filter implements Arrayable {
     use CElement_FormInput_QueryBuilder_Filter_OperatorTrait;
     use CElement_FormInput_QueryBuilder_Filter_InputTrait;
 

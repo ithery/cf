@@ -1,6 +1,8 @@
 <?php
 
-class CAuth_Access_Response implements CInterface_Arrayable {
+use Illuminate\Contracts\Support\Arrayable;
+
+class CAuth_Access_Response implements Arrayable {
     /**
      * Indicates whether the response was allowed.
      *

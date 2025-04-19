@@ -1,14 +1,10 @@
 <?php
 
+use Illuminate\Contracts\Support\Arrayable;
+
 defined('SYSPATH') or die('No direct access allowed.');
 
-/**
- * @author Hery Kurniawan <hery@itton.co.id>
- * @license Ittron Global Teknologi
- *
- * @since Nov 28, 2020
- */
-class CElement_Component_TreeView_Node implements CInterface_Arrayable {
+class CElement_Component_TreeView_Node implements Arrayable {
     /**
      * @var string
      */

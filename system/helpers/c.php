@@ -607,7 +607,7 @@ class c {
      * Get the evaluated view contents for the given view.
      *
      * @param null|string                $view
-     * @param CInterface_Arrayable|array $data
+     * @param \Illuminate\Contracts\Support\Arrayable|array $data
      * @param array                      $mergeData
      *
      * @return CView_View|CView_Factory

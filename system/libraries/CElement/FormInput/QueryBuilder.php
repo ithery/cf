@@ -1,5 +1,7 @@
 <?php
 
+use Illuminate\Contracts\Support\Arrayable;
+
 /**
  * Description of Textarea.
  *
@@ -79,7 +81,7 @@ class CElement_FormInput_QueryBuilder extends CElement_FormInput {
 
     public function js($indent = 0) {
         $filters = $this->filters;
-        if ($filters instanceof CInterface_Arrayable) {
+        if ($filters instanceof Arrayable) {
             $filters = $filters->toArray();
         }
 
