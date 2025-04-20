@@ -1,4 +1,6 @@
 <?php
+
+use Illuminate\Contracts\Support\Arrayable;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\File\UploadedFile;
 use Symfony\Component\HttpFoundation\Session\SessionInterface;
@@ -174,7 +176,7 @@ class CException_Context_RequestContext extends CException_ContextAbstract imple
         }
 
         try {
-            if ($user instanceof CInterface_Arrayable) {
+            if ($user instanceof Arrayable) {
                 return $user->toArray();
             }
             if ($user instanceof CModel) {
@@ -205,7 +207,7 @@ class CException_Context_RequestContext extends CException_ContextAbstract imple
         }
 
         try {
-            if ($role instanceof CInterface_Arrayable) {
+            if ($role instanceof Arrayable) {
                 return $role->toArray();
             }
             if ($role instanceof CModel) {
