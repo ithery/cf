@@ -2,11 +2,7 @@
 
 namespace Cresenity\Base\Contract;
 
-interface Arrayable {
-    /**
-     * Get the instance as an array.
-     *
-     * @return array
-     */
-    public function toArray();
+use Illuminate\Contracts\Support\Arrayable as IlluminateArrayable;
+
+interface Arrayable extends IlluminateArrayable {
 }

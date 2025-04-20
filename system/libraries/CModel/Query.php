@@ -1,5 +1,7 @@
 <?php
 
+use Illuminate\Contracts\Support\Arrayable;
+
 defined('SYSPATH') or die('No direct access allowed.');
 
 /**
@@ -272,7 +274,7 @@ class CModel_Query {
      * @return $this
      */
     public function whereKey($id) {
-        if (is_array($id) || $id instanceof CInterface_Arrayable) {
+        if (is_array($id) || $id instanceof Arrayable) {
             $this->query->whereIn($this->model->getQualifiedKeyName(), $id);
 
             return $this;
@@ -289,7 +291,7 @@ class CModel_Query {
      * @return $this
      */
     public function whereKeyNot($id) {
-        if (is_array($id) || $id instanceof CInterface_Arrayable) {
+        if (is_array($id) || $id instanceof Arrayable) {
             $this->query->whereNotIn($this->model->getQualifiedKeyName(), $id);
 
             return $this;
@@ -392,10 +394,10 @@ class CModel_Query {
      *
      * @return null|static|CModel|CModel_Collection|static[]
      *
-     * @phpstan-return ($id is (\CInterface_Arrayable<array-key, mixed>|array<mixed>) ? \CModel_Collection<int, TModel> : TModel)|null
+     * @phpstan-return ($id is (\Illuminate\Contracts\Support\Arrayable<array-key, mixed>|array<mixed>) ? \CModel_Collection<int, TModel> : TModel)|null
      */
     public function find($id, $columns = ['*']) {
-        if (is_array($id) || $id instanceof CInterface_Arrayable) {
+        if (is_array($id) || $id instanceof Arrayable) {
             return $this->findMany($id, $columns);
         }
 
@@ -405,8 +407,8 @@ class CModel_Query {
     /**
      * Find multiple models by their primary keys.
      *
-     * @param CInterface_Arrayable|array $ids
-     * @param array                      $columns
+     * @param \Illuminate\Contracts\Support\Arrayable|array $ids
+     * @param array                                         $columns
      *
      * @return CModel_Collection
      */
@@ -428,7 +430,7 @@ class CModel_Query {
      *
      * @return CModel|CModel_Collection
      *
-     * @phpstan-return ($id is (\CInterface_Arrayable<array-key, mixed>|array<mixed>) ? \CModel_Collection<int, TModel> : TModel)
+     * @phpstan-return ($id is (\Illuminate\Contracts\Support\Arrayable<array-key, mixed>|array<mixed>) ? \CModel_Collection<int, TModel> : TModel)
      */
     public function findOrFail($id, $columns = ['*']) {
         $result = $this->find($id, $columns);

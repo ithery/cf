@@ -6,6 +6,7 @@ use Brick\Math\BigDecimal;
 use Carbon\CarbonImmutable;
 use Carbon\CarbonInterface;
 use Brick\Math\RoundingMode;
+use Illuminate\Contracts\Support\Arrayable;
 use Brick\Math\Exception\MathException as BrickMathException;
 
 trait CModel_Trait_Attributes {
@@ -288,11 +289,11 @@ trait CModel_Trait_Attributes {
                 $attributes[$key] = $this->serializeClassCastableAttribute($key, $attributes[$key]);
             }
 
-            if ($this->isEnumCastable($key) && (!($attributes[$key] ?? null) instanceof CInterface_Arrayable)) {
+            if ($this->isEnumCastable($key) && (!($attributes[$key] ?? null) instanceof Arrayable)) {
                 $attributes[$key] = isset($attributes[$key]) ? $this->getStorableEnumValue($attributes[$key]) : null;
             }
 
-            if ($attributes[$key] instanceof CInterface_Arrayable) {
+            if ($attributes[$key] instanceof Arrayable) {
                 $attributes[$key] = $attributes[$key]->toArray();
             }
         }
@@ -336,7 +337,7 @@ trait CModel_Trait_Attributes {
             // If the values implements the Arrayable interface we can just call this
             // toArray method on the instances which will convert both models and
             // collections to their proper array form and we'll set the values.
-            if ($value instanceof CInterface_Arrayable) {
+            if ($value instanceof Arrayable) {
                 $relation = $value->toArray();
             } elseif (is_null($value)) {
                 // If the value is null, we'll still go ahead and set it in this list of
@@ -691,7 +692,7 @@ trait CModel_Trait_Attributes {
             $value = $this->mutateAttribute($key, $value);
         }
 
-        return $value instanceof CInterface_Arrayable ? $value->toArray() : $value;
+        return $value instanceof Arrayable ? $value->toArray() : $value;
     }
 
     /**

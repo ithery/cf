@@ -87,9 +87,9 @@ class CHTTP_Resources_Json_ResourceCollection extends CHTTP_Resources_Json_JsonR
     /**
      * Transform the resource into a JSON array.
      *
-     * @param \Illuminate\CHTTP_Request $request
+     * @param \CHTTP_Request $request
      *
-     * @return array|\CInterface_Arrayable|\JsonSerializable
+     * @return array|\Illuminate\Contracts\Support\Arrayable|\JsonSerializable
      */
     public function toArray(CHTTP_Request $request) {
         return $this->collection->map->toArray($request)->all();

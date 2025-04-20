@@ -1,6 +1,8 @@
 <?php
 
-class CNavigation_Nav implements CInterface_Arrayable {
+use Illuminate\Contracts\Support\Arrayable;
+
+class CNavigation_Nav implements Arrayable {
     protected $name;
 
     protected $data;

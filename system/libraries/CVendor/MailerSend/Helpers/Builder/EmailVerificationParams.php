@@ -1,21 +1,28 @@
 <?php
 
+use Illuminate\Contracts\Support\Arrayable;
 
-class CVendor_MailerSend_Helpers_Builder_EmailVerificationParams implements CInterface_Arrayable, \JsonSerializable
-{
-    protected string $name;
-    protected array $emailAddresses = [];
-
+class CVendor_MailerSend_Helpers_Builder_EmailVerificationParams implements Arrayable, \JsonSerializable {
     public const VALID = 'valid';
+
     public const CATCH_ALL = 'catch_all';
+
     public const MAILBOX_FULL = 'mailbox_full';
+
     public const ROLE_BASED = 'role_based';
+
     public const UNKNOWN = 'unknown';
+
     public const SYNTAX_ERROR = 'syntax_error';
+
     public const TYPO = 'typo';
+
     public const MAILBOX_NOT_FOUND = 'mailbox_not_found';
+
     public const DISPOSABLE = 'disposable';
+
     public const MAILBOX_BLOCKED = 'mailbox_blocked';
+
     public const FAILED = 'failed';
 
     public const POSSIBLE_RESULTS = [
@@ -32,44 +39,41 @@ class CVendor_MailerSend_Helpers_Builder_EmailVerificationParams implements CInt
         self::FAILED,
     ];
 
-    public function __construct(string $name)
-    {
+    protected string $name;
+
+    protected array $emailAddresses = [];
+
+    public function __construct(string $name) {
         $this->name = $name;
     }
 
-    public function getName(): string
-    {
+    public function getName(): string {
         return $this->name;
     }
 
-    public function setName(string $name): self
-    {
+    public function setName(string $name): self {
         $this->name = $name;
 
         return $this;
     }
 
-    public function getEmailAddresses(): array
-    {
+    public function getEmailAddresses(): array {
         return $this->emailAddresses;
     }
 
-    public function setEmailAddresses(array $emailAddresses): self
-    {
+    public function setEmailAddresses(array $emailAddresses): self {
         $this->emailAddresses = $emailAddresses;
 
         return $this;
     }
 
-    public function addEmailAddress(string $emailAddress): self
-    {
+    public function addEmailAddress(string $emailAddress): self {
         $this->emailAddresses[] = $emailAddress;
 
         return $this;
     }
 
-    public function toArray(): array
-    {
+    public function toArray(): array {
         return [
             'name' => $this->getName(),
             'emailAddresses' => $this->emailAddresses,
@@ -77,8 +81,7 @@ class CVendor_MailerSend_Helpers_Builder_EmailVerificationParams implements CInt
     }
 
     #[\ReturnTypeWillChange]
-    public function jsonSerialize()
-    {
+    public function jsonSerialize() {
         return $this->toArray();
     }
 }

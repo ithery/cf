@@ -1,6 +1,8 @@
 <?php
 
-class CManager_OnBoarding_Step implements CInterface_Arrayable {
+use Illuminate\Contracts\Support\Arrayable;
+
+class CManager_OnBoarding_Step implements Arrayable {
     protected array $attributes = [];
 
     /**

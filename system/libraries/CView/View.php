@@ -1,5 +1,7 @@
 <?php
 
+use Illuminate\Contracts\Support\Arrayable;
+
 /**
  * Description of View.
  *
@@ -49,7 +51,7 @@ class CView_View implements ArrayAccess, CInterface_Htmlable, CView_ViewInterfac
         $this->path = $path;
         $this->engine = $engine;
 
-        $this->data = $data instanceof CInterface_Arrayable ? $data->toArray() : (array) $data;
+        $this->data = $data instanceof Arrayable ? $data->toArray() : (array) $data;
     }
 
     /**

@@ -1,6 +1,8 @@
 <?php
 
-class CModel_AccessToken_NewAccessToken implements CInterface_Arrayable, CInterface_Jsonable {
+use Illuminate\Contracts\Support\Arrayable;
+
+class CModel_AccessToken_NewAccessToken implements Arrayable, CInterface_Jsonable {
     /**
      * The access token instance.
      *

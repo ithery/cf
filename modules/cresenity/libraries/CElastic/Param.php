@@ -1,8 +1,10 @@
 <?php
 
+use Illuminate\Contracts\Support\Arrayable;
+
 defined('SYSPATH') or die('No direct access allowed.');
 
-class CElastic_Param implements CInterface_Arrayable, \Countable {
+class CElastic_Param implements Arrayable, \Countable {
     /**
      * Params.
      *

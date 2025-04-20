@@ -1,49 +1,43 @@
 <?php
 
+use Illuminate\Contracts\Support\Arrayable;
 
-class CVendor_MailerSend_Helpers_Builder_MatchFilter implements CInterface_Arrayable, \JsonSerializable
-{
+class CVendor_MailerSend_Helpers_Builder_MatchFilter implements Arrayable, \JsonSerializable {
     protected string $type;
+
     protected array $filters = [];
 
-    public function __construct(string $type)
-    {
+    public function __construct(string $type) {
         $this->type = $type;
     }
 
-    public function getType(): string
-    {
+    public function getType(): string {
         return $this->type;
     }
 
-    public function setType(string $type): self
-    {
+    public function setType(string $type): self {
         $this->type = $type;
 
         return $this;
     }
 
-    public function getFilters(): array
-    {
+    public function getFilters(): array {
         return $this->filters;
     }
 
-    public function setFilters(array $filters): self
-    {
+    public function setFilters(array $filters): self {
         $this->filters = $filters;
 
         return $this;
     }
 
-    public function addFilter(CVendor_MailerSend_Helpers_Builder_Filter $filter): self
-    {
+    public function addFilter(CVendor_MailerSend_Helpers_Builder_Filter $filter): self {
         $this->filters[] = $filter;
 
         return $this;
     }
 
-    public function toArray(): array
-    {
+    public function toArray(): array {
         $array = [
             'type' => $this->getType(),
         ];
@@ -56,8 +50,7 @@ class CVendor_MailerSend_Helpers_Builder_MatchFilter implements CInterface_Array
     }
 
     #[\ReturnTypeWillChange]
-    public function jsonSerialize()
-    {
+    public function jsonSerialize() {
         return $this->toArray();
     }
 }

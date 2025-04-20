@@ -368,9 +368,9 @@ abstract class CView_ComponentAbstract {
     /**
      * Get the evaluated view contents for the given view.
      *
-     * @param null|string                 $view
-     * @param \CInterface_Arrayable|array $data
-     * @param array                       $mergeData
+     * @param null|string                                   $view
+     * @param \Illuminate\Contracts\Support\Arrayable|array $data
+     * @param array                                         $mergeData
      *
      * @return \CView_ViewInterface
      */

@@ -1,8 +1,9 @@
 <?php
 
 use Assert\Assertion;
+use Illuminate\Contracts\Support\Arrayable;
 
-class CVendor_MailerSend_Helpers_Builder_Header implements CInterface_Arrayable, JsonSerializable {
+class CVendor_MailerSend_Helpers_Builder_Header implements Arrayable, JsonSerializable {
     protected string $name;
 
     protected string $value;

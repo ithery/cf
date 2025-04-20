@@ -2,6 +2,7 @@
 
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\VarDumper\VarDumper;
+use Illuminate\Contracts\Support\Arrayable;
 
 require_once dirname(__FILE__) . '/Trait/CollectionTest/BasicTrait.php';
 require_once dirname(__FILE__) . '/Trait/CollectionTest/ExceptionTrait.php';
@@ -2039,7 +2040,7 @@ class TestArrayAccessImplementation implements ArrayAccess {
     }
 }
 
-class TestArrayableObject implements CInterface_Arrayable {
+class TestArrayableObject implements Arrayable {
     public function toArray() {
         return ['foo' => 'bar'];
     }

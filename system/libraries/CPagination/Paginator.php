@@ -1,6 +1,8 @@
 <?php
 
-class CPagination_Paginator extends CPagination_AbstractPaginator implements CInterface_Arrayable, ArrayAccess, Countable, IteratorAggregate, CInterface_Jsonable, JsonSerializable, CPagination_PaginatorInterface {
+use Illuminate\Contracts\Support\Arrayable;
+
+class CPagination_Paginator extends CPagination_AbstractPaginator implements Arrayable, ArrayAccess, Countable, IteratorAggregate, CInterface_Jsonable, JsonSerializable, CPagination_PaginatorInterface {
     /**
      * Determine if there are more items in the data source.
      *
@@ -13,7 +15,7 @@ class CPagination_Paginator extends CPagination_AbstractPaginator implements CIn
      *
      * @param mixed    $items
      * @param int      $perPage
-     * @param int|null $currentPage
+     * @param null|int $currentPage
      * @param array    $options     (path, query, fragment, pageName)
      *
      * @return void
@@ -61,7 +63,7 @@ class CPagination_Paginator extends CPagination_AbstractPaginator implements CIn
     /**
      * Get the URL for the next page.
      *
-     * @return string|null
+     * @return null|string
      */
     public function nextPageUrl() {
         if ($this->hasMorePages()) {
@@ -72,7 +74,7 @@ class CPagination_Paginator extends CPagination_AbstractPaginator implements CIn
     /**
      * Render the paginator using the given view.
      *
-     * @param string|null $view
+     * @param null|string $view
      * @param array       $data
      *
      * @return string
@@ -84,7 +86,7 @@ class CPagination_Paginator extends CPagination_AbstractPaginator implements CIn
     /**
      * Render the paginator using the given view.
      *
-     * @param string|null $view
+     * @param null|string $view
      * @param array       $data
      *
      * @return string

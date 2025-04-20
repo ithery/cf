@@ -8,9 +8,11 @@ use GuzzleHttp\Exception\ConnectException;
 use GuzzleHttp\Exception\RequestException;
 use Symfony\Component\VarDumper\VarDumper;
 use GuzzleHttp\Exception\TransferException;
+use Illuminate\Contracts\Support\Arrayable;
 
 class CHTTP_Client_PendingRequest {
     use CTrait_Conditionable, CTrait_Macroable;
+
     /**
      * The factory instance.
      *
@@ -732,7 +734,7 @@ class CHTTP_Client_PendingRequest {
                 return $value;
             }
 
-            return $value instanceof CInterface_Arrayable ? $value->toArray() : $value;
+            return $value instanceof Arrayable ? $value->toArray() : $value;
         })->all();
     }
 

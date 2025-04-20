@@ -1,15 +1,19 @@
 <?php
 
-class CVendor_MailerSend_Helpers_Builder_SmsInbound implements CInterface_Arrayable, \JsonSerializable
-{
+use Illuminate\Contracts\Support\Arrayable;
+
+class CVendor_MailerSend_Helpers_Builder_SmsInbound implements Arrayable, \JsonSerializable {
     protected ?string $smsNumberId = null;
+
     protected ?string $name = null;
+
     protected ?string $forward_url = null;
+
     protected $filter = null;
+
     protected ?bool $enabled = true;
 
-    public function __construct(string $smsNumberId = null, string $name = null, string $forward_url = null, $filter = null, bool $enabled = null)
-    {
+    public function __construct(string $smsNumberId = null, string $name = null, string $forward_url = null, $filter = null, bool $enabled = null) {
         $this->smsNumberId = $smsNumberId;
         $this->name = $name;
         $this->forward_url = $forward_url;
@@ -17,78 +21,70 @@ class CVendor_MailerSend_Helpers_Builder_SmsInbound implements CInterface_Arraya
         $this->enabled = $enabled;
     }
 
-    public function getSmsNumberId(): ?string
-    {
+    public function getSmsNumberId(): ?string {
         return $this->smsNumberId;
     }
 
-    public function setSmsNumberId(string $smsNumberId): CVendor_MailerSend_Helpers_Builder_SmsInbound
-    {
+    public function setSmsNumberId(string $smsNumberId): CVendor_MailerSend_Helpers_Builder_SmsInbound {
         $this->smsNumberId = $smsNumberId;
 
         return $this;
     }
 
-    public function getName(): ?string
-    {
+    public function getName(): ?string {
         return $this->name;
     }
 
-    public function setName(string $name): CVendor_MailerSend_Helpers_Builder_SmsInbound
-    {
+    public function setName(string $name): CVendor_MailerSend_Helpers_Builder_SmsInbound {
         $this->name = $name;
 
         return $this;
     }
 
-    public function getFilter()
-    {
+    public function getFilter() {
         return $this->filter;
     }
 
     /**
-     * @param array|SmsInboundFilter|null $filter
+     * @param null|array|SmsInboundFilter $filter
+     *
      * @return $this
      */
-    public function setFilter($filter): CVendor_MailerSend_Helpers_Builder_SmsInbound
-    {
+    public function setFilter($filter): CVendor_MailerSend_Helpers_Builder_SmsInbound {
         $this->filter = $filter;
 
         return $this;
     }
 
-    public function getForwardUrl(): ?string
-    {
+    public function getForwardUrl(): ?string {
         return $this->forward_url;
     }
 
-    public function setForwardUrl(string $forward_url): CVendor_MailerSend_Helpers_Builder_SmsInbound
-    {
+    public function setForwardUrl(string $forward_url): CVendor_MailerSend_Helpers_Builder_SmsInbound {
         $this->forward_url = $forward_url;
 
         return $this;
     }
 
     /**
-     * @return bool|null
+     * @return null|bool
      */
-    public function getEnabled(): ?bool
-    {
+    public function getEnabled(): ?bool {
         return $this->enabled;
     }
 
     /**
-     * @param bool|null $enabled
+     * @param null|bool $enabled
+     *
      * @return SmsInbound
      */
-    public function setEnabled(?bool $enabled): CVendor_MailerSend_Helpers_Builder_SmsInbound
-    {
+    public function setEnabled(?bool $enabled): CVendor_MailerSend_Helpers_Builder_SmsInbound {
         $this->enabled = $enabled;
+
         return $this;
     }
 
-    public function toArray(): array
-    {
+    public function toArray(): array {
         return [
             'sms_number_id' => $this->getSmsNumberId(),
             'name' => $this->getName(),
@@ -99,8 +95,7 @@ class CVendor_MailerSend_Helpers_Builder_SmsInbound implements CInterface_Arraya
     }
 
     #[\ReturnTypeWillChange]
-    public function jsonSerialize()
-    {
+    public function jsonSerialize() {
         return $this->toArray();
     }
 }

@@ -1,32 +1,29 @@
 <?php
 
-
 use Assert\Assertion;
+use Illuminate\Contracts\Support\Arrayable;
 
-class CVendor_MailerSend_Helpers_Builder_Recipient implements CInterface_Arrayable, \JsonSerializable
-{
+class CVendor_MailerSend_Helpers_Builder_Recipient implements Arrayable, \JsonSerializable {
     protected ?string $name;
+
     protected string $email;
 
     /**
      * @throws CVendor_MailerSend_Exceptions_MailerSendAssertException
      */
-    public function __construct(string $email, ?string $name)
-    {
+    public function __construct(string $email, ?string $name) {
         $this->setEmail($email);
         $this->setName($name);
     }
 
-    public function setName(?string $name): void
-    {
+    public function setName(?string $name): void {
         $this->name = $name;
     }
 
     /**
      * @throws CVendor_MailerSend_Exceptions_MailerSendAssertException
      */
-    public function setEmail(string $email): void
-    {
+    public function setEmail(string $email): void {
         CVendor_MailerSend_Helpers_GeneralHelpers::assert(static function () use ($email) {
             Assertion::email($email);
         });
@@ -34,8 +31,7 @@ class CVendor_MailerSend_Helpers_Builder_Recipient implements CInterface_Arrayab
         $this->email = $email;
     }
 
-    public function toArray(): array
-    {
+    public function toArray(): array {
         return [
             'name' => $this->name,
             'email' => $this->email,
@@ -43,8 +39,7 @@ class CVendor_MailerSend_Helpers_Builder_Recipient implements CInterface_Arrayab
     }
 
     #[\ReturnTypeWillChange]
-    public function jsonSerialize()
-    {
+    public function jsonSerialize() {
         return $this->toArray();
     }
 }

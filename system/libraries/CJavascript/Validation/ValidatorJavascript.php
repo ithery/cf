@@ -1,15 +1,13 @@
 <?php
 
+use Illuminate\Contracts\Support\Arrayable;
+
 defined('SYSPATH') or die('No direct access allowed.');
 
 /**
- * @author Hery Kurniawan
- * @license Ittron Global Teknologi <ittron.co.id>
- *
  * @see Proengsoft\JsValidation https://github.com/proengsoft/laravel-jsvalidation
- * @since Apr 14, 2019, 1:04:19 PM
  */
-class CJavascript_Validation_ValidatorJavascript implements CInterface_Arrayable {
+class CJavascript_Validation_ValidatorJavascript implements Arrayable {
     /**
      * Registered validator instance.
      *

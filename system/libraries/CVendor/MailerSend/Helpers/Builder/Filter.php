@@ -1,21 +1,21 @@
 <?php
 
+use Illuminate\Contracts\Support\Arrayable;
 
-class CVendor_MailerSend_Helpers_Builder_Filter implements CInterface_Arrayable, \JsonSerializable
-{
+class CVendor_MailerSend_Helpers_Builder_Filter implements Arrayable, \JsonSerializable {
     protected string $comparer;
+
     protected string $value;
+
     protected ?string $key;
 
-    public function __construct(string $comparer, string $value, string $key = null)
-    {
+    public function __construct(string $comparer, string $value, string $key = null) {
         $this->comparer = $comparer;
         $this->value = $value;
         $this->key = $key;
     }
 
-    public function toArray(): array
-    {
+    public function toArray(): array {
         $array = [
             'comparer' => $this->comparer,
             'value' => $this->value,
@@ -29,8 +29,7 @@ class CVendor_MailerSend_Helpers_Builder_Filter implements CInterface_Arrayable,
     }
 
     #[\ReturnTypeWillChange]
-    public function jsonSerialize()
-    {
+    public function jsonSerialize() {
         return $this->toArray();
     }
 }

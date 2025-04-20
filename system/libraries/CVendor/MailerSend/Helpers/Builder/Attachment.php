@@ -1,10 +1,14 @@
 <?php
 
-class CVendor_MailerSend_Helpers_Builder_Attachment implements CInterface_Arrayable, \JsonSerializable
-{
+use Illuminate\Contracts\Support\Arrayable;
+
+class CVendor_MailerSend_Helpers_Builder_Attachment implements Arrayable, \JsonSerializable {
     protected string $content;
+
     protected string $filename;
+
     protected ?string $disposition = null;
+
     protected ?string $id = null;
 
     public function __construct(
@@ -30,8 +34,7 @@ class CVendor_MailerSend_Helpers_Builder_Attachment implements CInterface_Arraya
         }
     }
 
-    public function setContent(string $content): void
-    {
+    public function setContent(string $content): void {
         if (!$this->isBase64($content)) {
             $this->content = base64_encode($content);
         } else {
@@ -39,23 +42,19 @@ class CVendor_MailerSend_Helpers_Builder_Attachment implements CInterface_Arraya
         }
     }
 
-    public function setFilename(string $filename): void
-    {
+    public function setFilename(string $filename): void {
         $this->filename = $filename;
     }
 
-    public function setDisposition(?string $disposition): void
-    {
+    public function setDisposition(?string $disposition): void {
         $this->disposition = $disposition;
     }
 
-    public function setId(?string $id): void
-    {
+    public function setId(?string $id): void {
         $this->id = $id;
     }
 
-    public function toArray(): array
-    {
+    public function toArray(): array {
         return [
             'content' => $this->content,
             'filename' => $this->filename,
@@ -65,13 +64,11 @@ class CVendor_MailerSend_Helpers_Builder_Attachment implements CInterface_Arraya
     }
 
     #[\ReturnTypeWillChange]
-    public function jsonSerialize()
-    {
+    public function jsonSerialize() {
         return $this->toArray();
     }
 
-    protected function isBase64($string): bool
-    {
+    protected function isBase64($string): bool {
         $decoded_data = base64_decode($string, true);
         $encoded_data = base64_encode($decoded_data);
 

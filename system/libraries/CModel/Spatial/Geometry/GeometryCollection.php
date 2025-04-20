@@ -2,8 +2,9 @@
 
 use GeoJson\GeoJson;
 use GeoJson\Feature\FeatureCollection;
+use Illuminate\Contracts\Support\Arrayable;
 
-class CModel_Spatial_Geometry_GeometryCollection extends CModel_Spatial_GeometryAbstract implements IteratorAggregate, ArrayAccess, CInterface_Arrayable, Countable {
+class CModel_Spatial_Geometry_GeometryCollection extends CModel_Spatial_GeometryAbstract implements IteratorAggregate, ArrayAccess, Arrayable, Countable {
     /**
      * The minimum number of items required to create this collection.
      *

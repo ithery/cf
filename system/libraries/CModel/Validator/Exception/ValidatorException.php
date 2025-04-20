@@ -1,8 +1,11 @@
 <?php
+
+use Illuminate\Contracts\Support\Arrayable;
+
 /**
  * Class ValidatorException.
  */
-class CModel_Validator_Exception_ValidatorException extends \Exception implements Cinterface_Jsonable, Cinterface_Arrayable {
+class CModel_Validator_Exception_ValidatorException extends \Exception implements Cinterface_Jsonable, Arrayable {
     /**
      * @var CBase_MessageBag
      */

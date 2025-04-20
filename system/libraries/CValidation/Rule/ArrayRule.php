@@ -1,5 +1,7 @@
 <?php
 
+use Illuminate\Contracts\Support\Arrayable;
+
 class CValidation_Rule_ArrayRule implements Stringable {
     /**
      * The accepted keys.
@@ -16,7 +18,7 @@ class CValidation_Rule_ArrayRule implements Stringable {
      * @return void
      */
     public function __construct($keys = null) {
-        if ($keys instanceof CInterface_Arrayable) {
+        if ($keys instanceof Arrayable) {
             $keys = $keys->toArray();
         }
 

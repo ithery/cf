@@ -1,6 +1,8 @@
 <?php
 
-abstract class CVendor_Google_Recaptcha_Http_AbstractResponse implements CInterface_Arrayable, CInterface_Jsonable, JsonSerializable {
+use Illuminate\Contracts\Support\Arrayable;
+
+abstract class CVendor_Google_Recaptcha_Http_AbstractResponse implements Arrayable, CInterface_Jsonable, JsonSerializable {
     /* -----------------------------------------------------------------
       |  Constants
       | -----------------------------------------------------------------

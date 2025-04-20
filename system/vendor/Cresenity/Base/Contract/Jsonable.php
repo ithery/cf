@@ -2,13 +2,7 @@
 
 namespace Cresenity\Base\Contract;
 
-interface Jsonable {
-    /**
-     * Convert the object to its JSON representation.
-     *
-     * @param int $options
-     *
-     * @return string
-     */
-    public function toJson($options = 0);
+use Illuminate\Contracts\Support\Jsonable as IlluminateJsonable;
+
+interface Jsonable extends IlluminateJsonable {
 }

@@ -1,18 +1,18 @@
 <?php
 
-class CVendor_MailerSend_Helpers_Builder_SmsInboundFilter implements CInterface_Arrayable, \JsonSerializable
-{
+use Illuminate\Contracts\Support\Arrayable;
+
+class CVendor_MailerSend_Helpers_Builder_SmsInboundFilter implements Arrayable, \JsonSerializable {
     protected string $comparer;
+
     protected string $value;
 
-    public function __construct(string $comparer, string $value)
-    {
+    public function __construct(string $comparer, string $value) {
         $this->comparer = $comparer;
         $this->value = $value;
     }
 
-    public function toArray(): array
-    {
+    public function toArray(): array {
         return [
             'comparer' => $this->comparer,
             'value' => $this->value,
@@ -20,8 +20,7 @@ class CVendor_MailerSend_Helpers_Builder_SmsInboundFilter implements CInterface_
     }
 
     #[\ReturnTypeWillChange]
-    public function jsonSerialize()
-    {
+    public function jsonSerialize() {
         return $this->toArray();
     }
 }

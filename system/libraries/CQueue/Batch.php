@@ -1,6 +1,8 @@
 <?php
 
-class CQueue_Batch implements CInterface_Arrayable, JsonSerializable {
+use Illuminate\Contracts\Support\Arrayable;
+
+class CQueue_Batch implements Arrayable, JsonSerializable {
     /**
      * The batch ID.
      *

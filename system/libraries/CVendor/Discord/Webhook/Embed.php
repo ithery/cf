@@ -1,6 +1,8 @@
 <?php
 
-class CVendor_Discord_Webhook_Embed implements CInterface_Arrayable {
+use Illuminate\Contracts\Support\Arrayable;
+
+class CVendor_Discord_Webhook_Embed implements Arrayable {
     protected $title;
 
     protected $type = 'rich';

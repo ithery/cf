@@ -1,14 +1,20 @@
 <?php
 
+use Illuminate\Contracts\Support\Arrayable;
 
-class CVendor_MailerSend_Helpers_Builder_SenderIdentity implements CInterface_Arrayable, \JsonSerializable
-{
+class CVendor_MailerSend_Helpers_Builder_SenderIdentity implements Arrayable, \JsonSerializable {
     protected string $domainId;
+
     protected string $name;
+
     protected string $email;
+
     protected ?string $replyToEmail = null;
+
     protected ?string $replyToName = null;
+
     protected ?bool $addNote = false;
+
     protected ?string $personalNote = null;
 
     /**
@@ -16,95 +22,86 @@ class CVendor_MailerSend_Helpers_Builder_SenderIdentity implements CInterface_Ar
      * @param string $name
      * @param string $email
      */
-    public function __construct(string $domainId, string $name, string $email)
-    {
+    public function __construct(string $domainId, string $name, string $email) {
         $this->domainId = $domainId;
         $this->name = $name;
         $this->email = $email;
     }
 
-    public function getDomainId(): string
-    {
+    public function getDomainId(): string {
         return $this->domainId;
     }
 
-    public function setDomainId(string $domainId): self
-    {
+    public function setDomainId(string $domainId): self {
         $this->domainId = $domainId;
+
         return $this;
     }
 
-    public function getName(): string
-    {
+    public function getName(): string {
         return $this->name;
     }
 
-    public function setName(string $name): self
-    {
+    public function setName(string $name): self {
         $this->name = $name;
+
         return $this;
     }
 
-    public function getEmail(): string
-    {
+    public function getEmail(): string {
         return $this->email;
     }
 
-    public function setEmail(string $email): self
-    {
+    public function setEmail(string $email): self {
         $this->email = $email;
+
         return $this;
     }
 
-    public function getReplyToEmail(): ?string
-    {
+    public function getReplyToEmail(): ?string {
         return $this->replyToEmail;
     }
 
-    public function setReplyToEmail(?string $replyToEmail): self
-    {
+    public function setReplyToEmail(?string $replyToEmail): self {
         $this->replyToEmail = $replyToEmail;
+
         return $this;
     }
 
-    public function getReplyToName(): ?string
-    {
+    public function getReplyToName(): ?string {
         return $this->replyToName;
     }
 
-    public function setReplyToName(?string $replyToName): self
-    {
+    public function setReplyToName(?string $replyToName): self {
         $this->replyToName = $replyToName;
+
         return $this;
     }
 
-    public function isAddNote(): ?bool
-    {
+    public function isAddNote(): ?bool {
         return $this->addNote;
     }
 
-    public function setAddNote(?bool $addNote): self
-    {
+    public function setAddNote(?bool $addNote): self {
         $this->addNote = $addNote;
+
         return $this;
     }
 
-    public function getPersonalNote(): ?string
-    {
+    public function getPersonalNote(): ?string {
         return $this->personalNote;
     }
 
-    public function setPersonalNote(?string $personalNote): self
-    {
+    public function setPersonalNote(?string $personalNote): self {
         $this->personalNote = $personalNote;
+
         return $this;
     }
 
     /**
      * @inheritDoc
      */
-    public function toArray()
-    {
+    public function toArray() {
         return [
             'domain_id' => $this->getDomainId(),
             'name' => $this->getName(),
@@ -117,8 +114,7 @@ class CVendor_MailerSend_Helpers_Builder_SenderIdentity implements CInterface_Ar
     }
 
     #[\ReturnTypeWillChange]
-    public function jsonSerialize()
-    {
+    public function jsonSerialize() {
         return $this->toArray();
     }
 }

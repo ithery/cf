@@ -1,6 +1,8 @@
 <?php
 
-class CPagination_Cursor implements CInterface_Arrayable {
+use Illuminate\Contracts\Support\Arrayable;
+
+class CPagination_Cursor implements Arrayable {
     /**
      * The parameters associated with the cursor.
      *

@@ -1,6 +1,8 @@
 <?php
 
-class CExporter_Validator_Failure implements CInterface_Arrayable {
+use Illuminate\Contracts\Support\Arrayable;
+
+class CExporter_Validator_Failure implements Arrayable {
     /**
      * @var int
      */

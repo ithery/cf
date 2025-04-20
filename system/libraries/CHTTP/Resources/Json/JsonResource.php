@@ -115,7 +115,7 @@ class CHTTP_Resources_Json_JsonResource implements ArrayAccess, JsonSerializable
      *
      * @param \CHTTP_Request $request
      *
-     * @return array|\CInterface_Arrayable|\JsonSerializable
+     * @return array|\Illuminate\Contracts\Support\Arrayable|\JsonSerializable
      */
     public function toArray(CHTTP_Request $request) {
         if (is_null($this->resource)) {

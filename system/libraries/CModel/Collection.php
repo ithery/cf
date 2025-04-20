@@ -1,5 +1,7 @@
 <?php
 
+use Illuminate\Contracts\Support\Arrayable;
+
 /**
  * @template TKey of array-key
  * @template TModel of \CModel
@@ -20,7 +22,7 @@ class CModel_Collection extends CCollection implements CQueue_QueueableCollectio
             $key = $key->getKey();
         }
 
-        if ($key instanceof CInterface_Arrayable) {
+        if ($key instanceof Arrayable) {
             $key = $key->toArray();
         }
 

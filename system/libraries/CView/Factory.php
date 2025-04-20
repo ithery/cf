@@ -1,5 +1,7 @@
 <?php
 
+use Illuminate\Contracts\Support\Arrayable;
+
 /**
  * Description of Factory.
  *
@@ -94,9 +96,9 @@ class CView_Factory {
     /**
      * Get the evaluated view contents for the given view.
      *
-     * @param string                     $path
-     * @param CInterface_Arrayable|array $data
-     * @param array                      $mergeData
+     * @param string                                        $path
+     * @param \Illuminate\Contracts\Support\Arrayable|array $data
+     * @param array                                         $mergeData
      *
      * @return CView_View
      */
@@ -111,9 +113,9 @@ class CView_Factory {
     /**
      * Get the evaluated view contents for the given view.
      *
-     * @param string                     $view
-     * @param CInterface_Arrayable|array $data
-     * @param array                      $mergeData
+     * @param string                                        $view
+     * @param \Illuminate\Contracts\Support\Arrayable|array $data
+     * @param array                                         $mergeData
      *
      * @return CView_View
      */
@@ -134,9 +136,9 @@ class CView_Factory {
     /**
      * Get the first view that actually exists from the given list.
      *
-     * @param array                       $views
-     * @param \CInterface_Arrayable|array $data
-     * @param array                       $mergeData
+     * @param array                                         $views
+     * @param \Illuminate\Contracts\Support\Arrayable|array $data
+     * @param array                                         $mergeData
      *
      * @throws \InvalidArgumentException
      *
@@ -157,10 +159,10 @@ class CView_Factory {
     /**
      * Get the rendered content of the view based on a given condition.
      *
-     * @param bool                        $condition
-     * @param string                      $view
-     * @param \CInterface_Arrayable|array $data
-     * @param array                       $mergeData
+     * @param bool                                          $condition
+     * @param string                                        $view
+     * @param \Illuminate\Contracts\Support\Arrayable|array $data
+     * @param array                                         $mergeData
      *
      * @return string
      */
@@ -175,10 +177,10 @@ class CView_Factory {
     /**
      * Get the rendered content of the view based on the negation of a given condition.
      *
-     * @param bool                        $condition
-     * @param string                      $view
-     * @param \CInterface_Arrayable|array $data
-     * @param array                       $mergeData
+     * @param bool                                          $condition
+     * @param string                                        $view
+     * @param \Illuminate\Contracts\Support\Arrayable|array $data
+     * @param array                                         $mergeData
      *
      * @return string
      */
@@ -238,15 +240,15 @@ class CView_Factory {
      * @return array
      */
     protected function parseData($data) {
-        return $data instanceof CInterface_Arrayable ? $data->toArray() : $data;
+        return $data instanceof Arrayable ? $data->toArray() : $data;
     }
 
     /**
      * Create a new view instance from the given arguments.
      *
-     * @param string                      $view
-     * @param string                      $path
-     * @param \CInterface_Arrayable|array $data
+     * @param string                                        $view
+     * @param string                                        $path
+     * @param \Illuminate\Contracts\Support\Arrayable|array $data
      *
      * @return \CView_View
      */

@@ -1,17 +1,13 @@
 <?php
 
 use Assert\Assertion;
+use Illuminate\Contracts\Support\Arrayable;
 
-class CVendor_MailerSend_Helpers_Builder_SmsWebhookParams implements CInterface_Arrayable, \JsonSerializable
-{
-    private ?string $url;
-    private ?string $name;
-    private ?array $events;
-    private ?bool $enabled;
-    private ?string $smsNumberId;
-
+class CVendor_MailerSend_Helpers_Builder_SmsWebhookParams implements Arrayable, \JsonSerializable {
     public const SMS_SENT = 'sms.sent';
+
     public const SMS_DELIVERED = 'sms.delivered';
+
     public const SMS_FAILED = 'sms.failed';
 
     public const ALL_ACTIVITIES = [
@@ -20,18 +16,28 @@ class CVendor_MailerSend_Helpers_Builder_SmsWebhookParams implements CInterface_
         self::SMS_FAILED,
     ];
 
+    private ?string $url;
+
+    private ?string $name;
+
+    private ?array $events;
+
+    private ?bool $enabled;
+
+    private ?string $smsNumberId;
+
     /**
      * SmsWebhookParams constructor.
      *
-     * @param string|null $url
-     * @param string|null $name
-     * @param array|null $events
-     * @param string|null $smsNumberId
-     * @param bool|null $enabled
+     * @param null|string $url
+     * @param null|string $name
+     * @param null|array  $events
+     * @param null|string $smsNumberId
+     * @param null|bool   $enabled
+     *
      * @throws MailerSendAssertException
      */
-    public function __construct(string $url = null, string $name = null, array $events = null, string $smsNumberId = null, ?bool $enabled = null)
-    {
+    public function __construct(string $url = null, string $name = null, array $events = null, string $smsNumberId = null, ?bool $enabled = null) {
         $this->setUrl($url)
             ->setName($name)
             ->setEvents($events)
@@ -40,56 +46,56 @@ class CVendor_MailerSend_Helpers_Builder_SmsWebhookParams implements CInterface_
     }
 
     /**
-     * @return string|null
+     * @return null|string
      */
-    public function getUrl(): ?string
-    {
+    public function getUrl(): ?string {
         return $this->url;
     }
 
     /**
-     * @param string|null $url
+     * @param null|string $url
+     *
      * @return CVendor_MailerSend_Helpers_Builder_SmsWebhookParams
      */
-    public function setUrl(?string $url): CVendor_MailerSend_Helpers_Builder_SmsWebhookParams
-    {
+    public function setUrl(?string $url): CVendor_MailerSend_Helpers_Builder_SmsWebhookParams {
         $this->url = $url;
+
         return $this;
     }
 
     /**
-     * @return string|null
+     * @return null|string
      */
-    public function getName(): ?string
-    {
+    public function getName(): ?string {
         return $this->name;
     }
 
     /**
-     * @param string|null $name
+     * @param null|string $name
+     *
      * @return SmsWebhookParams
      */
-    public function setName(?string $name): CVendor_MailerSend_Helpers_Builder_SmsWebhookParams
-    {
+    public function setName(?string $name): CVendor_MailerSend_Helpers_Builder_SmsWebhookParams {
         $this->name = $name;
+
         return $this;
     }
 
     /**
      * @return ?array
      */
-    public function getEvents(): ?array
-    {
+    public function getEvents(): ?array {
         return $this->events;
     }
 
     /**
-     * @param array|null $events
-     * @return $this
+     * @param null|array $events
+     *
      * @throws MailerSendAssertException
+     *
+     * @return $this
      */
-    public function setEvents(?array $events): CVendor_MailerSend_Helpers_Builder_SmsWebhookParams
-    {
+    public function setEvents(?array $events): CVendor_MailerSend_Helpers_Builder_SmsWebhookParams {
         if ($events) {
             CVendor_MailerSend_Helpers_GeneralHelpers::assert(
                 fn () => Assertion::allInArray($events, self::ALL_ACTIVITIES, 'One or multiple invalid events.')
@@ -97,48 +103,47 @@ class CVendor_MailerSend_Helpers_Builder_SmsWebhookParams implements CInterface_
         }
 
         $this->events = $events;
+
         return $this;
     }
 
     /**
-     * @return bool|null
+     * @return null|bool
      */
-    public function getEnabled(): ?bool
-    {
+    public function getEnabled(): ?bool {
         return $this->enabled;
     }
 
     /**
-     * @param bool|null $enabled
+     * @param null|bool $enabled
+     *
      * @return CVendor_MailerSend_Helpers_Builder_SmsWebhookParams
      */
-    public function setEnabled(?bool $enabled): CVendor_MailerSend_Helpers_Builder_SmsWebhookParams
-    {
+    public function setEnabled(?bool $enabled): CVendor_MailerSend_Helpers_Builder_SmsWebhookParams {
         $this->enabled = $enabled;
+
         return $this;
     }
 
     /**
-     * @return string|null
+     * @return null|string
      */
-    public function getSmsNumberId(): ?string
-    {
+    public function getSmsNumberId(): ?string {
         return $this->smsNumberId;
     }
 
     /**
-     * @param string|null $smsNumberId
+     * @param null|string $smsNumberId
+     *
      * @return CVendor_MailerSend_Helpers_Builder_SmsWebhookParams
      */
-    public function setSmsNumberId(?string $smsNumberId): CVendor_MailerSend_Helpers_Builder_SmsWebhookParams
-    {
+    public function setSmsNumberId(?string $smsNumberId): CVendor_MailerSend_Helpers_Builder_SmsWebhookParams {
         $this->smsNumberId = $smsNumberId;
+
         return $this;
     }
 
-
-    public function toArray()
-    {
+    public function toArray() {
         return [
             'url' => $this->getUrl(),
             'name' => $this->getName(),
@@ -149,8 +154,7 @@ class CVendor_MailerSend_Helpers_Builder_SmsWebhookParams implements CInterface_
     }
 
     #[\ReturnTypeWillChange]
-    public function jsonSerialize()
-    {
+    public function jsonSerialize() {
         return $this->toArray();
     }
 }

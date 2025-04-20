@@ -1,17 +1,17 @@
 <?php
 
 use Assert\Assertion;
+use Illuminate\Contracts\Support\Arrayable;
 
-class CVendor_MailerSend_Helpers_Builder_SmsPersonalization implements CInterface_Arrayable, \JsonSerializable
-{
+class CVendor_MailerSend_Helpers_Builder_SmsPersonalization implements Arrayable, \JsonSerializable {
     protected string $recipient;
+
     protected array $data;
 
     /**
      * @throws CVendor_MailerSend_Exceptions_MailerSendAssertException
      */
-    public function __construct(string $recipient, array $substitutions)
-    {
+    public function __construct(string $recipient, array $substitutions) {
         $this->setRecipient($recipient);
         $this->setData($substitutions);
     }
@@ -19,8 +19,7 @@ class CVendor_MailerSend_Helpers_Builder_SmsPersonalization implements CInterfac
     /**
      * @throws CVendor_MailerSend_Exceptions_MailerSendAssertException
      */
-    public function setRecipient(string $recipient): void
-    {
+    public function setRecipient(string $recipient): void {
         CVendor_MailerSend_Helpers_GeneralHelpers::assert(static function () use ($recipient) {
             Assertion::startsWith($recipient, '+');
         });
@@ -31,8 +30,7 @@ class CVendor_MailerSend_Helpers_Builder_SmsPersonalization implements CInterfac
     /**
      * @throws MailerSendAssertException
      */
-    public function setData(array $data): void
-    {
+    public function setData(array $data): void {
         CVendor_MailerSend_Helpers_GeneralHelpers::assert(static function () use ($data) {
             Assertion::minCount($data, 1);
         });
@@ -40,8 +38,7 @@ class CVendor_MailerSend_Helpers_Builder_SmsPersonalization implements CInterfac
         $this->data = $data;
     }
 
-    public function toArray(): array
-    {
+    public function toArray(): array {
         return [
             'phone_number' => $this->recipient,
             'data' => $this->data,
@@ -49,8 +46,7 @@ class CVendor_MailerSend_Helpers_Builder_SmsPersonalization implements CInterfac
     }
 
     #[\ReturnTypeWillChange]
-    public function jsonSerialize()
-    {
+    public function jsonSerialize() {
         return $this->toArray();
     }
 }
