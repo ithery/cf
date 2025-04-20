@@ -2,11 +2,12 @@
 
 use Symfony\Component\Mime\Address;
 use PHPUnit\Framework\Assert as PHPUnit;
+use Illuminate\Contracts\Support\Renderable;
 
 use Symfony\Component\Mailer\Header\TagHeader;
 use Symfony\Component\Mailer\Header\MetadataHeader;
 
-class CEmail_Mailable implements CEmail_Contract_MailableInterface, CInterface_Renderable {
+class CEmail_Mailable implements CEmail_Contract_MailableInterface, Renderable {
     use CTrait_Conditionable, CTrait_ForwardsCalls, CTrait_Localizable, CTrait_Macroable {
         __call as macroCall;
     }

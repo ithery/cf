@@ -1,11 +1,11 @@
 <?php
 
+use Illuminate\Contracts\Support\Renderable;
+
 /**
- * Description of Renderable
- *
- * @author Hery
+ * @deprecated 1.8 use Illuminate\Contracts\Support\Renderable
  */
-interface CInterface_Renderable {
+interface CInterface_Renderable extends Renderable {
     /**
      * Get the evaluated contents of the object.
      *

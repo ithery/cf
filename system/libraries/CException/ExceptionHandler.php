@@ -354,7 +354,7 @@ class CException_ExceptionHandler implements CException_ExceptionHandlerInterfac
      */
     public function render($request, $e) {
         if (method_exists($e, 'render')) {
-            /** @var CInterface_Renderable $e */
+            /** @var \Illuminate\Contracts\Support\Renderable $e */
             if ($response = $e->render($request)) {
                 return c::router()->toResponse($request, $response);
             }
@@ -669,6 +669,7 @@ class CException_ExceptionHandler implements CException_ExceptionHandlerInterfac
                 $this->report($t);
             }
         }
+
         return $this->convertExceptionToResponse($e);
     }
 
@@ -687,20 +688,22 @@ class CException_ExceptionHandler implements CException_ExceptionHandlerInterfac
             return "{$path}/errors";
         })->push(__DIR__ . '/views')->all());
     }
+
     /**
      * Get the view used to render HTTP exceptions.
      *
-     * @param  \Symfony\Component\HttpKernel\Exception\HttpExceptionInterface  $e
-     * @return string|null
+     * @param \Symfony\Component\HttpKernel\Exception\HttpExceptionInterface $e
+     *
+     * @return null|string
      */
     protected function getHttpExceptionView(HttpExceptionInterface $e) {
-        $view = 'errors/http/'.$e->getStatusCode();
+        $view = 'errors/http/' . $e->getStatusCode();
 
         if (c::view()->exists($view)) {
             return $view;
         }
 
-        $view = substr($view, 0, -2).'xx';
+        $view = substr($view, 0, -2) . 'xx';
 
         if (c::view()->exists($view)) {
             return $view;
@@ -708,6 +711,7 @@ class CException_ExceptionHandler implements CException_ExceptionHandlerInterfac
 
         return null;
     }
+
     /**
      * Map the given exception into an http response.
      *

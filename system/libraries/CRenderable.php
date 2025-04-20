@@ -1,9 +1,12 @@
 <?php
 
+use Illuminate\Contracts\Support\Renderable;
+
 defined('SYSPATH') or die('No direct access allowed.');
 
 class CRenderable extends CObject implements CApp_Interface_Renderable {
     use CTrait_Compat_Renderable;
+
     /**
      * Renderable Child Array.
      *
@@ -136,7 +139,7 @@ class CRenderable extends CObject implements CApp_Interface_Renderable {
 
                 $r = $r->html($html->getIndent());
             }
-            if ($r instanceof CInterface_Renderable) {
+            if ($r instanceof Renderable) {
                 $r = $r->render();
             }
 

@@ -1,6 +1,7 @@
 <?php
 
 use Illuminate\Contracts\Support\Jsonable;
+use Illuminate\Contracts\Support\Renderable;
 
 defined('SYSPATH') or die('No direct access allowed.');
 
@@ -46,7 +47,7 @@ defined('SYSPATH') or die('No direct access allowed.');
  * @method CApp                                  add(mixed $renderable)
  * @method $this                                 addJs($js)
  */
-class CApp implements CInterface_Responsable, CInterface_Renderable, Jsonable {
+class CApp implements CInterface_Responsable, Renderable, Jsonable {
     use CTrait_Compat_App,
         CTrait_Macroable,
         CTrait_RequestInfoTrait,

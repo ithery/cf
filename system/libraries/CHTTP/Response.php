@@ -2,6 +2,7 @@
 
 use Illuminate\Contracts\Support\Jsonable;
 use Illuminate\Contracts\Support\Arrayable;
+use Illuminate\Contracts\Support\Renderable;
 use Symfony\Component\HttpFoundation\ResponseHeaderBag;
 use Symfony\Component\HttpFoundation\Response as SymfonyResponse;
 
@@ -47,7 +48,7 @@ class CHTTP_Response extends SymfonyResponse {
             $this->header('Content-Type', 'application/json');
 
             $content = $this->morphToJson($content);
-        } elseif ($content instanceof CInterface_Renderable) {
+        } elseif ($content instanceof Renderable) {
             // If this content implements the "Renderable" interface then we will call the
             // render method on the object so we will avoid any "__toString" exceptions
             // that might be thrown and have their errors obscured by PHP's handling.

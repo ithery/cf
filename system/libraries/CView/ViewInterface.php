@@ -1,6 +1,8 @@
 <?php
 
-interface CView_ViewInterface extends CInterface_Renderable {
+use Illuminate\Contracts\Support\Renderable;
+
+interface CView_ViewInterface extends Renderable {
     /**
      * Get the name of the view.
      *
