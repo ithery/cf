@@ -1,5 +1,6 @@
 <?php
 
+use Illuminate\Contracts\Support\Jsonable;
 use Illuminate\Contracts\Support\Arrayable;
 
 defined('SYSPATH') or die('No direct access allowed.');
@@ -7,7 +8,7 @@ defined('SYSPATH') or die('No direct access allowed.');
 /**
  * @author Hery Kurniawan <hery@itton.co.id>
  */
-class CBase_MessageBag implements Arrayable, Countable, CInterface_Jsonable, JsonSerializable, CBase_MessageBagInterface, CBase_MessageProviderInterface {
+class CBase_MessageBag implements Arrayable, Countable, Jsonable, JsonSerializable, CBase_MessageBagInterface, CBase_MessageProviderInterface {
     /**
      * All of the registered messages.
      *

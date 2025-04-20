@@ -1,8 +1,9 @@
 <?php
 
+use Illuminate\Contracts\Support\Jsonable;
 use Illuminate\Contracts\Support\Arrayable;
 
-interface CVendor_Google_Recaptcha_Http_ResponseInterface extends Arrayable, CInterface_Jsonable, JsonSerializable {
+interface CVendor_Google_Recaptcha_Http_ResponseInterface extends Arrayable, Jsonable, JsonSerializable {
     /**
      * Get error codes.
      *

@@ -6,6 +6,7 @@
  * @author Hery
  */
 
+use Illuminate\Contracts\Support\Jsonable;
 use Illuminate\Contracts\Support\Arrayable;
 use Symfony\Component\HttpFoundation\JsonResponse as BaseJsonResponse;
 
@@ -60,7 +61,7 @@ class CHTTP_JsonResponse extends BaseJsonResponse {
     public function setData($data = []) {
         $this->original = $data;
 
-        if ($data instanceof CInterface_Jsonable) {
+        if ($data instanceof Jsonable) {
             $this->data = $data->toJson($this->encodingOptions);
         } elseif ($data instanceof JsonSerializable) {
             $this->data = json_encode($data->jsonSerialize(), $this->encodingOptions);

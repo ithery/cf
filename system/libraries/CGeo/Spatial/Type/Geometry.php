@@ -1,10 +1,10 @@
 <?php
 
 use WKB as geoPHPWkb;
-use Illuminate\Support\Facades\DB;
+use Illuminate\Contracts\Support\Jsonable;
 use Illuminate\Contracts\Support\Arrayable;
 
-abstract class CGeo_Spatial_Type_Geometry implements CModel_Contract_CastableInterface, Arrayable, CInterface_Jsonable, JsonSerializable, Stringable {
+abstract class CGeo_Spatial_Type_Geometry implements CModel_Contract_CastableInterface, Arrayable, Jsonable, JsonSerializable, Stringable {
     use CTrait_Macroable;
 
     public $srid = 0;

@@ -1,5 +1,6 @@
 <?php
 
+use Illuminate\Contracts\Support\Jsonable;
 use Illuminate\Contracts\Support\Arrayable;
 
 class CBase_Js implements CInterface_Htmlable {
@@ -84,7 +85,7 @@ class CBase_Js implements CInterface_Htmlable {
      * @return string
      */
     public static function encode($data, $flags = 0, $depth = 512) {
-        if ($data instanceof CInterface_Jsonable) {
+        if ($data instanceof Jsonable) {
             return $data->toJson($flags | static::REQUIRED_FLAGS);
         }
 

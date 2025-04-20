@@ -1,5 +1,6 @@
 <?php
 
+use Illuminate\Contracts\Support\Jsonable;
 use Illuminate\Contracts\Support\Arrayable;
 
 defined('SYSPATH') or die('No direct access allowed.');
@@ -77,7 +78,7 @@ defined('SYSPATH') or die('No direct access allowed.');
  *
  * @see CModel_Query
  */
-abstract class CModel implements ArrayAccess, Arrayable, CInterface_Jsonable, CQueue_QueueableEntityInterface, CBase_Contract_CanBeEscapedWhenCastToStringInterface {
+abstract class CModel implements ArrayAccess, Arrayable, Jsonable, CQueue_QueueableEntityInterface, CBase_Contract_CanBeEscapedWhenCastToStringInterface {
     use CModel_Trait_GuardsAttributes,
         CModel_Trait_Attributes,
         CModel_Trait_Relationships,

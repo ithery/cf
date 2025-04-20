@@ -1,5 +1,6 @@
 <?php
 
+use Illuminate\Contracts\Support\Jsonable;
 use Symfony\Component\VarDumper\VarDumper;
 use Illuminate\Contracts\Support\Arrayable;
 
@@ -819,7 +820,7 @@ trait CCollection_Concern_EnumeratesValuesTrait {
             if ($value instanceof JsonSerializable) {
                 return $value->jsonSerialize();
             }
-            if ($value instanceof Cinterface_Jsonable) {
+            if ($value instanceof Jsonable) {
                 return json_decode($value->toJson(), true);
             }
             if ($value instanceof Arrayable) {
@@ -921,7 +922,7 @@ trait CCollection_Concern_EnumeratesValuesTrait {
         if ($items instanceof Arrayable) {
             return $items->toArray();
         }
-        if ($items instanceof CInterface_Jsonable) {
+        if ($items instanceof Jsonable) {
             return json_decode($items->toJson(), true);
         }
         if ($items instanceof JsonSerializable) {

@@ -1,8 +1,9 @@
 <?php
 
+use Illuminate\Contracts\Support\Jsonable;
 use Illuminate\Contracts\Support\Arrayable;
 
-class CPagination_LengthAwarePaginator extends CPagination_AbstractPaginator implements Arrayable, ArrayAccess, Countable, IteratorAggregate, JsonSerializable, Cinterface_Jsonable, CPagination_LengthAwarePaginatorInterface {
+class CPagination_LengthAwarePaginator extends CPagination_AbstractPaginator implements Arrayable, ArrayAccess, Countable, IteratorAggregate, JsonSerializable, Jsonable, CPagination_LengthAwarePaginatorInterface {
     /**
      * The total number of items before slicing.
      *

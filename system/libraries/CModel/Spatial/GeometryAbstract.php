@@ -3,8 +3,9 @@
 use GeoIO\Factory;
 use GeoJson\GeoJson;
 use GeoIO\WKB\Parser\Parser;
+use Illuminate\Contracts\Support\Jsonable;
 
-abstract class CModel_Spatial_GeometryAbstract implements CModel_Spatial_Contract_GeometryInterface, CInterface_Jsonable, \JsonSerializable {
+abstract class CModel_Spatial_GeometryAbstract implements CModel_Spatial_Contract_GeometryInterface, Jsonable, \JsonSerializable {
     protected static $wkb_types = [
         1 => CModel_Spatial_Geometry_Point::class,
         2 => CModel_Spatial_Geometry_LineString::class,

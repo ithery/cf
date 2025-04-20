@@ -1,6 +1,7 @@
 <?php
 
 use PHPUnit\Framework\TestCase;
+use Illuminate\Contracts\Support\Jsonable;
 use Symfony\Component\VarDumper\VarDumper;
 use Illuminate\Contracts\Support\Arrayable;
 
@@ -2046,7 +2047,7 @@ class TestArrayableObject implements Arrayable {
     }
 }
 
-class TestJsonableObject implements CInterface_Jsonable {
+class TestJsonableObject implements Jsonable {
     public function toJson($options = 0) {
         return '{"foo":"bar"}';
     }

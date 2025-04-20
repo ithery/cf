@@ -6,6 +6,7 @@
  * @author Hery
  */
 
+use Illuminate\Contracts\Support\Jsonable;
 use Illuminate\Contracts\Support\Arrayable;
 use Psr\Http\Message\ResponseInterface as PsrResponseInterface;
 use Symfony\Bridge\PsrHttpMessage\Factory\HttpFoundationFactory;
@@ -729,7 +730,7 @@ class CRouting_Router {
             $response = new CHTTP_JsonResponse($response, 201);
         } elseif (!$response instanceof SymfonyResponse
             && ($response instanceof Arrayable
-            || $response instanceof CInterface_Jsonable
+            || $response instanceof Jsonable
             || $response instanceof ArrayObject
             || $response instanceof JsonSerializable
             || is_array($response))

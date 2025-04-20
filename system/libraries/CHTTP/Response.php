@@ -1,5 +1,6 @@
 <?php
 
+use Illuminate\Contracts\Support\Jsonable;
 use Illuminate\Contracts\Support\Arrayable;
 use Symfony\Component\HttpFoundation\ResponseHeaderBag;
 use Symfony\Component\HttpFoundation\Response as SymfonyResponse;
@@ -67,7 +68,7 @@ class CHTTP_Response extends SymfonyResponse {
      */
     protected function shouldBeJson($content) {
         return $content instanceof Arrayable
-                || $content instanceof CInterface_Jsonable
+                || $content instanceof Jsonable
                 || $content instanceof ArrayObject
                 || $content instanceof JsonSerializable
                 || is_array($content);
@@ -81,7 +82,7 @@ class CHTTP_Response extends SymfonyResponse {
      * @return string
      */
     protected function morphToJson($content) {
-        if ($content instanceof CInterface_Jsonable) {
+        if ($content instanceof Jsonable) {
             return $content->toJson();
         } elseif ($content instanceof Arrayable) {
             return json_encode($content->toArray());

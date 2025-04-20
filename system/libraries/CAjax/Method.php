@@ -1,8 +1,10 @@
 <?php
 
+use Illuminate\Contracts\Support\Jsonable;
+
 defined('SYSPATH') or die('No direct access allowed.');
 
-class CAjax_Method implements CInterface_Jsonable {
+class CAjax_Method implements Jsonable {
     public $name = '';
 
     public $method = 'GET';
