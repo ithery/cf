@@ -45,7 +45,7 @@ class CElastic_Param implements Arrayable, \Countable {
     protected function _convertArrayable(array $array) {
         $arr = [];
         foreach ($array as $key => $value) {
-            if ($value instanceof CInterface_Arrayable) {
+            if ($value instanceof Arrayable) {
                 $arr[$value instanceof CInterface_Nameable ? $value->getName() : $key] = $value->toArray();
             } elseif (is_array($value)) {
                 $arr[$key] = $this->_convertArrayable($value);

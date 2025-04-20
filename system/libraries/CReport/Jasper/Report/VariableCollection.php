@@ -1,4 +1,7 @@
 <?php
+
+use Illuminate\Contracts\Support\Arrayable;
+
 /**
  * @see CModel_Collection
  */
@@ -16,7 +19,7 @@ class CReport_Jasper_Report_VariableCollection extends CCollection {
             $name = $name->getName();
         }
 
-        if ($name instanceof CInterface_Arrayable) {
+        if ($name instanceof Arrayable) {
             $name = $name->toArray();
         }
 
