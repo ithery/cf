@@ -799,7 +799,7 @@ abstract class CModel implements ArrayAccess, Arrayable, Jsonable, CQueue_Queuea
      *
      * @param array|mixed $columns
      *
-     * @return CModel_COllection|static[]
+     * @return CModel_Collection|static[]
      */
     public static function all($columns = ['*']) {
         return static::query()->get(

@@ -8,6 +8,7 @@ class CEmail_Factory {
         'kirimemail' => CEmail_Driver_KirimEmailDriver::class,
         'ses' => CEmail_Driver_SesDriver::class,
         'sesV2' => CEmail_Driver_SesV2Driver::class,
+        'smtp' => CEmail_Driver_SmtpDriver::class,
     ];
 
     /**
