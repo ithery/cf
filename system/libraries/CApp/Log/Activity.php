@@ -8,6 +8,7 @@ class CApp_Log_Activity {
     public static function populate($description, $data) {
         $modelName = CF::config('app.model.log_activity', CApp_Model_LogActivity::class);
         $model = new $modelName();
+        /** @var CModel $model */
         $nav = cnav::nav();
         $navName = '';
         $navLabel = '';
