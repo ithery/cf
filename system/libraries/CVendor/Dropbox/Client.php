@@ -36,12 +36,20 @@ class CVendor_Dropbox_Client {
 
     protected $landingUri;
 
+    protected $options;
+
     public function __construct($clientId, $clientSecret, $options = []) {
+        $this->options = $options;
+        $accessToken = carr::get($options, 'accessToken');
+        $expiredIn = null;
+        if ($accessToken) {
+            $expiredIn = c::now()->addYears(100);
+        }
         $this->clientId = $clientId;
         $this->clientSecret = $clientSecret;
-        $this->accessToken = null;
+        $this->accessToken = $accessToken;
         $this->refreshToken = null;
-        $this->expiredIn = null;
+        $this->expiredIn = $expiredIn;
         $this->accessTokenCacheKey = 'dropbox.token.' . $clientId;
         $this->useCache = carr::get($options, 'useCache', true);
         $this->redirectUri = carr::get($options, 'redirectUri', CF::config('vendor.dropbox.redirect_uri'));
@@ -52,11 +60,19 @@ class CVendor_Dropbox_Client {
         $this->loadFromCache();
     }
 
+    public function files() {
+        return new CVendor_Dropbox_Files($this->clientId, $this->clientSecret, $this->options);
+    }
+
     /**
      * @return \CCache_Repository
      */
     protected function cache() {
         return CCache::manager()->store();
+    }
+
+    public function getCurrentAccount() {
+        return $this->post('users/get_current_account');
     }
 
     /**
@@ -198,7 +214,15 @@ class CVendor_Dropbox_Client {
      * @return object
      */
     public function isConnected() {
-        return is_array($this->tokenData) && isset($this->tokenData, 'uid');
+        return is_array($this->tokenData) && isset($this->tokenData['uid']);
+    }
+
+    protected function forceStartingSlash($string) {
+        if (substr($string, 0, 1) !== '/') {
+            $string = "/$string";
+        }
+
+        return $string;
     }
 
     /**

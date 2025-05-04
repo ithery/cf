@@ -275,4 +275,11 @@ class CVendor {
     public static function qontak() {
         return new CBase_ForwarderStaticClass(CVendor_Qontak::class);
     }
+
+    /**
+     * @return \CVendor_Dropbox|CBase_ForwarderStaticClass
+     */
+    public static function dropbox() {
+        return new CBase_ForwarderStaticClass(CVendor_Dropbox::class);
+    }
 }

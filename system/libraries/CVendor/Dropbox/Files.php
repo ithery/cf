@@ -6,8 +6,8 @@ use GuzzleHttp\Exception\ClientException;
 use function PHPUnit\Framework\throwException;
 
 class CVendor_Dropbox_Files extends CVendor_Dropbox_Client {
-    public function __construct() {
-        parent::__construct();
+    public function __construct($clientId, $clientSecret, $options = []) {
+        parent::__construct($clientId, $clientSecret, $options);
     }
 
     public function listContents($path = '') {
