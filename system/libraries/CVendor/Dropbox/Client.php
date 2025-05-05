@@ -562,7 +562,7 @@ class CVendor_Dropbox_Client {
      *
      * @throws \Exception
      */
-    public function contentEndpointRequest(string $endpoint, array $arguments, mixed $body = '', bool $isRefreshed = false): ResponseInterface {
+    public function contentEndpointRequest(string $endpoint, array $arguments, $body = '', bool $isRefreshed = false): ResponseInterface {
         $headers = ['Dropbox-API-Arg' => json_encode($arguments)];
 
         if ($body !== '') {
@@ -618,6 +618,15 @@ class CVendor_Dropbox_Client {
     protected function determineException(ClientException $exception): Exception {
         if (in_array($exception->getResponse()->getStatusCode(), [400, 409])) {
             return new CVendor_Dropbox_Exception_BadRequestException($exception->getResponse());
+        }
+        if (in_array($exception->getResponse()->getStatusCode(), [401])) {
+            // jika response .tag berisi expired_access_token
+            $body = json_decode($exception->getResponse()->getBody(), true);
+            if ($body !== null) {
+                if (isset($body['error']['.tag']) && $body['error']['.tag'] == 'expired_access_token') {
+                    throw new CVendor_Dropbox_Exception_ExpiredAccessTokenException($exception->getResponse());
+                }
+            }
         }
 
         return $exception;

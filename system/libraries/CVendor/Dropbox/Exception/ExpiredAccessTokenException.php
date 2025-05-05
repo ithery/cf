@@ -2,7 +2,7 @@
 
 use Psr\Http\Message\ResponseInterface;
 
-class CVendor_Dropbox_Exception_BadRequestException extends Exception {
+class CVendor_Dropbox_Exception_ExpiredAccessTokenException extends Exception {
     public $dropboxCode = null;
 
     public $response;

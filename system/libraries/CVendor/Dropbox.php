@@ -12,16 +12,9 @@ class CVendor_Dropbox {
      * @return CVendor_Dropbox_Client the configured Dropbox client instance
      */
     public static function client($options = []) {
-        $clientId = carr::get($options, 'clientId', CF::config('vendor.dropbox.client_id'));
-        $clientSecret = carr::get($options, 'clientSecret', CF::config('vendor.dropbox.client_secret'));
-        $client = new CVendor_Dropbox_Client($clientId, $clientSecret, $options);
+        $accessToken = carr::get($options, 'accessToken', CF::config('vendor.dropbox.access_token'));
+        $client = new CVendor_Dropbox_Client($accessToken);
 
         return $client;
-    }
-
-    public static function connect($options = []) {
-        $client = self::client($options);
-
-        return $client->connect();
     }
 }
