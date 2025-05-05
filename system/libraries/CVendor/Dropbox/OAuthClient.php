@@ -3,7 +3,7 @@
 use GuzzleHttp\Client;
 use GuzzleHttp\Exception\ClientException;
 
-class CVendor_Dropbox_Client {
+class CVendor_Dropbox_OAuthClient {
     const MAX_CHUNK_SIZE = 1024 * 1024 * 150;
 
     protected static $baseUrl = 'https://api.dropboxapi.com/2/';
