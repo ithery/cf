@@ -21,7 +21,7 @@ class CNavigation_Menu {
         return count($this->items);
     }
 
-    public static function createItem($item) {
-        return  new ENAdmin_Navigation_Item($item);
-    }
+    // public static function createItem($item) {
+    //     return  new ENAdmin_Navigation_Item($item);
+    // }
 }

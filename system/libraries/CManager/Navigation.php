@@ -8,10 +8,10 @@ class CManager_Navigation {
     }
 
     public static function setAccessCallback(callable $accessCallback) {
-        CApp_Navigation::setAccessCallback($accessCallback);
+        CNavigation::manager()->setAccessCallback($accessCallback);
     }
 
     public static function setActiveCallback(callable $activeCallback) {
-        CApp_Navigation::setActiveCallback($activeCallback);
+        CNavigation::manager()->setActiveCallback($activeCallback);
     }
 }

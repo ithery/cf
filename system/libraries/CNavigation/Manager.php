@@ -8,7 +8,9 @@ class CNavigation_Manager {
 
     protected static $instance;
 
-    protected $activeCallback = [];
+    protected $activeCallback;
+
+    protected $accessCallback;
 
     public static function instance() {
         if (self::$instance == null) {
@@ -126,5 +128,29 @@ class CNavigation_Manager {
 
     public function getActiveCallback() {
         return $this->activeCallback;
+    }
+
+    public function setAccessCallback($accessCallback) {
+        $this->accessCallback = $accessCallback;
+
+        return $this;
+    }
+
+    public function getAccessCallback() {
+        return $this->accessCallback;
+    }
+
+    public static function render($options = []) {
+        $engine = carr::get($options, 'engine', 'Bootstrap');
+        $layout = carr::get($options, 'layout', 'horizontal');
+
+        $engine = ucfirst(cstr::lower($engine));
+        $engineClassName = 'CNavigation_Renderer_' . $engine . 'Renderer';
+        $engineClass = new $engineClassName();
+        $app = c::app();
+        $app->setNavRenderer($engineClass);
+        $app->setNav(CApp_Navigation_Data::get());
+
+        return $app->renderNavigation();
     }
 }

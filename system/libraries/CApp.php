@@ -231,7 +231,7 @@ class CApp implements CInterface_Responsable, Renderable, Jsonable {
      * @return CApp_Navigation
      */
     public static function nav($domain = null) {
-        return CApp_Navigation::instance($domain);
+        return CNavigation::manager();
     }
 
     /**
@@ -240,7 +240,7 @@ class CApp implements CInterface_Responsable, Renderable, Jsonable {
      * @return CApp_Navigation
      */
     public static function navigation($domain = null) {
-        return CApp_Navigation::instance($domain);
+        return CNavigation::manager();
     }
 
     public static function isAjax() {
