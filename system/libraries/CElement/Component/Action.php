@@ -379,7 +379,7 @@ class CElement_Component_Action extends CElement_Component {
             }
             //prefix
             if ($this->style == 'btn-dropdown') {
-                $html->appendln('<li>');
+                $html->appendln('<li class="dropdown-item">');
             } elseif ($this->style == 'btn-group-toggle-radio') {
                 if ($this->isActive) {
                     $classes .= ' active';

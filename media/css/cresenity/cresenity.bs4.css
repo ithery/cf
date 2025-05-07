@@ -32,7 +32,7 @@ a:focus, a:hover {
 input, textarea, select, .uneditable-input {
     height: 28px;
 }
-.dropdown-menu a, .dropdown-menu > li > a {
+.dropdown-menu > a, .dropdown-menu > li:not(.dropdown-item) > a {
     display: block;
     padding: 3px 20px;
     clear: both;
@@ -40,6 +40,9 @@ input, textarea, select, .uneditable-input {
     line-height: 20px;
     color: #333;
     white-space: nowrap;
+}
+.dropdown-menu > li.dropdown-item > a {
+    color: #333;
 }
 .dropdown-menu > li.open > a:focus, .dropdown-menu > li.open > a:hover,.dropdown-menu .open > a, .dropdown-menu .open > a:hover {
     color: #fff;

@@ -1,0 +1,26 @@
+
+.dropdown-item.active a, .dropdown-item:active a {
+    color: var(--bs-dropdown-link-active-color);
+    text-decoration: none;
+    background-color: var(--bs-dropdown-link-active-bg);
+}
+
+/* nestable */
+
+.dd-handle {
+    background-image: none !important;
+    background: #fff !important;
+    height: 46px !important;
+    line-height: 35px !important;
+}
+.dd-handle:hover {
+    color: inherit !important;
+}
+.dd-handle .btn-group {
+    margin-top: 0;
+}
+.dd-item .btn-group {
+    position: absolute;
+    top: 7px;
+    right: 7px;
+}
