@@ -79,7 +79,7 @@ class CNavigation_Renderer_MenuRenderer extends CNavigation_RendererAbstract {
 
                 $liClass = 'sidebar-item cres-sidebar-item ';
                 if ($level > 0) {
-                    $liClass .= 'submenu-item ';
+                    $liClass = 'submenu-item cres-sidebar-item ';
                 }
                 $hasSubmenu = $url == '' ? true : false;
                 if ($hasSubmenu) {

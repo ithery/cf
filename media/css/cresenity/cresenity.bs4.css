@@ -58,7 +58,8 @@ input, textarea, select, .uneditable-input {
     outline: 0;
     filter: progid:dximagetransform.microsoft.gradient(startColorstr='#ff0088cc', endColorstr='#ff0077b3', GradientType=0);
 }
-.dropdown-menu li > a:hover, .dropdown-menu li > a:focus, .dropdown-submenu:hover > a {
+
+/* .dropdown-menu li > a:hover, .dropdown-menu li > a:focus, .dropdown-submenu:hover > a {
     color: #fff;
     text-decoration: none;
     background-color: #08c;
@@ -70,7 +71,7 @@ input, textarea, select, .uneditable-input {
     background-image: linear-gradient(to bottom, #08c, #0077b3);
     background-repeat: repeat-x;
     filter: progid:dximagetransform.microsoft.gradient(startColorstr='#ff0088cc', endColorstr='#ff0077b3', GradientType=0);
-}
+} */
 .dropdown-submenu {
     position: relative;
 }

@@ -2,12 +2,6 @@
 
 defined('SYSPATH') or die('No direct access allowed.');
 
-/**
- * @author Hery Kurniawan
- * @license Ittron Global Teknologi <ittron.co.id>
- *
- * @since Jun 3, 2018, 2:52:36 PM
- */
 class CElement_FormInput_Select extends CElement_FormInput {
     use CTrait_Compat_Element_FormInput_Select;
     use CTrait_Element_Property_ApplyJs;
@@ -41,7 +35,8 @@ class CElement_FormInput_Select extends CElement_FormInput {
         $this->maximumSelectionLength = false;
         $this->select2Version = c::theme('select2.version');
         $this->isOptionHtml = false;
-        $this->addClass('form-control select');
+        $additionClass = CManager::theme()->getData('select.classes', '');
+        $this->addClass('form-control form-select ' . $additionClass);
     }
 
     public static function factory($id = null) {
