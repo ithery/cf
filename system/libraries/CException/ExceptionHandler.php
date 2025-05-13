@@ -374,6 +374,8 @@ class CException_ExceptionHandler implements CException_ExceptionHandlerInterfac
             }
 
             if (CView::exists('errors/http/' . $e->getStatusCode())) {
+                c::app()->registerCoreModules();
+
                 return c::response()->view('errors/http/' . $e->getStatusCode(), [
                     'exception' => $e,
                 ], $e->getStatusCode());

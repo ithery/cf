@@ -83,9 +83,9 @@ class CApp implements CInterface_Responsable, Renderable, Jsonable {
 
     protected $baseResolver = null;
 
-    private $content = '';
+    protected $content = '';
 
-    private $js = '';
+    protected $js = '';
 
     private $custom_js = '';
 
