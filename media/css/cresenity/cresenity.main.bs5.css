@@ -285,6 +285,12 @@ html[data-bs-theme='dark'] {
     border-width: 0;
 }
 
+.table-responsive .dataTables_wrapper {
+    > div:nth-child(2) {
+        overflow-x: auto;
+    }
+}
+
 .btn.dropdown-toggle {
     background-color: #435ebe;
     border-color: #435ebe;
@@ -304,6 +310,12 @@ html[data-bs-theme='dark'] {
         border-color: #364b98;
         color: #fff;
     }
+}
+
+.page-item .page-link {
+    padding: var(--bs-pagination-padding-y) var(--bs-pagination-padding-x) !important;
+    font-size: 0.875rem !important;
+    line-height: inherit !important;
 }
 
 /* nestable */
@@ -327,6 +339,12 @@ html[data-bs-theme='dark'] {
 }
 
 /* Dark Theme */
+html[data-bs-theme='dark'] {
+    .buttons .btn {
+        margin: auto;
+    }
+}
+
 html[data-bs-theme='dark'] {
     .widget-box {
         --bs-card-spacer-y: 1rem;
@@ -420,11 +438,28 @@ html[data-bs-theme='dark'] {
 }
 
 html[data-bs-theme='dark'] {
+    .table-responsive .dataTables_wrapper {
+        > div:nth-child(2) {
+            overflow-x: auto;
+        }
+    }
+}
+
+html[data-bs-theme='dark'] {
     .table:not(.table-borderless) thead th, .dataTable-table:not(.table-borderless) thead th {
         color: rgba(var(--bs-link-color-rgb), var(--bs-link-opacity, 1));
         &::before, &::after {
             color: var(--bs-table-color-state, var(--bs-table-color-type, var(--bs-table-color)));
         }
+    }
+}
+
+html[data-bs-theme='dark'] {
+    .page-link.active, .active > .page-link {
+        z-index: 3;
+        color: var(--bs-pagination-active-color);
+        background-color: var(--bs-pagination-active-bg);
+        border-color: var(--bs-pagination-active-border-color);
     }
 }
 

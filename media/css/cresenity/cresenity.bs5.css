@@ -7,3 +7,9 @@
     color: #333;
     white-space: nowrap;
 }
+
+html[data-bs-theme='dark'] {
+    .dropdown-menu > a, .dropdown-menu > li > a {
+        color: #fff;
+    }
+}
