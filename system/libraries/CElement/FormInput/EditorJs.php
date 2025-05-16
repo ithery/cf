@@ -128,7 +128,7 @@ class CElement_FormInput_EditorJs extends CElement_FormInput {
         $manager->registerJs('plugins/editorjs/inline-code-1.4.0.js');
         $manager->registerJs('plugins/editorjs/checklist-1.5.0.js');
         $manager->registerJs('plugins/editorjs/delimiter-1.3.0.js');
-        $manager->registerJs('plugins/editorjs/embed-2.5.3.js');
+        $manager->registerJs('plugins/editorjs/embed-2.7.6.js');
         $manager->registerJs('plugins/editorjs/raw-2.4.0.js');
     }
 
@@ -152,5 +152,9 @@ class CElement_FormInput_EditorJs extends CElement_FormInput {
         ];
 
         return $config;
+    }
+
+    public function getTool($key) {
+        return carr::get($this->tools, $key);
     }
 }

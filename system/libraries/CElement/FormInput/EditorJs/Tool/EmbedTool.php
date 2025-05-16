@@ -24,6 +24,16 @@ class CElement_FormInput_EditorJs_Tool_EmbedTool extends CElement_FormInput_Edit
         ];
     }
 
+    public function enable() {
+        $this->enabled = true;
+        return $this;
+    }
+
+    public function disable() {
+        $this->enabled = false;
+        return $this;
+    }
+
     protected function enableService($service) {
         $this->services[$service] = true;
 
