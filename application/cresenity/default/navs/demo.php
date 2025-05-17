@@ -58,9 +58,9 @@ return [
         'subnav' => include dirname(__FILE__) . '/demo/utils.php',
         'badge' => 'new',
     ],
-    [
-        'name' => 'system',
-        'label' => c::__('System'),
-        'subnav' => include dirname(__FILE__) . '/demo/system.php',
-    ],
+    // [
+    //     'name' => 'system',
+    //     'label' => c::__('System'),
+    //     'subnav' => include dirname(__FILE__) . '/demo/system.php',
+    // ],
 ];
