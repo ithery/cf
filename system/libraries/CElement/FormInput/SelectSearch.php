@@ -318,6 +318,18 @@ class CElement_FormInput_SelectSearch extends CElement_FormInput {
         return $this;
     }
 
+
+    /**
+     * @param CCollection $collection
+     *
+     * @return $this
+     */
+    public function setDataFromCollection($collection) {
+        $this->dataProvider = CManager::createCollectionDataProvider($collection);
+
+        return $this;
+    }
+
     public function setAllowClear($bool = true) {
         $this->allowClear = $bool;
 
