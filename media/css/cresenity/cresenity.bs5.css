@@ -7,8 +7,29 @@
     color: #333;
     white-space: nowrap;
 }
-
+.btn.dropdown-toggle.daterange-dropdownbutton, .btn.dropdown-toggle.daterange-dropdownbutton:hover, .btn.dropdown-toggle.daterange-dropdownbutton:focus, .btn.dropdown-toggle.daterange-dropdownbutton:active {
+    color: #202e3c !important;
+    background-color: #fff;
+    border: 1px solid #d2dce8;
+    border-radius: 4px;
+}
+.card-header.with-elements {
+    padding-top: 0.4375rem;
+    padding-bottom: 0.4375rem;
+}
+.card-header.with-elements, .card-title.with-elements {
+    display: -webkit-box;
+    display: -ms-flexbox;
+    display: flex;
+    width: 100%;
+    -webkit-box-align: center;
+    -ms-flex-align: center;
+    align-items: center;
+    -ms-flex-wrap: wrap;
+    flex-wrap: wrap;
+}
 html[data-bs-theme='dark'] {
+
     .dropdown-menu > a, .dropdown-menu > li > a {
         color: #fff;
     }
