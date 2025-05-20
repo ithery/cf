@@ -374,3 +374,39 @@ html[data-bs-theme='dark'] {
         }
     }
 }
+html[data-bs-theme='dark'] {
+    .dd-list {
+        display: block;
+        position: relative;
+        margin: 0;
+        padding: 0;
+        list-style: none;
+        .dd-list {
+            padding-left: 30px;
+        }
+    }
+    .dd-placeholder, .dd-empty {
+        margin: 5px 0;
+        padding: 0;
+        min-height: 30px;
+        background: #1e1e2d;
+        border: 1px dashed #b6bcbf;
+        box-sizing: border-box;
+        -moz-box-sizing: border-box;
+    }
+    .dd-item .btn-group {
+        position: absolute;
+        top: 7px;
+        right: 7px;
+    }
+    .dd-handle {
+        background-color: #1b1b29 !important;
+        border: 1px solid #35354f;
+        color: #c2c2d9;
+    }
+    .dd-dragel {
+        position: absolute;
+        pointer-events: none;
+        z-index: 9999;
+    }
+}
