@@ -110,6 +110,9 @@ html[data-bs-theme='dark'] {
 .buttons .btn {
     margin: auto;
 }
+body .bi::before, [class^='bi-']::before, [class*=' bi-']::before {
+    vertical-align: -0.125rem;
+}
 .widget-box {
     --bs-card-spacer-y: 1rem;
     --bs-card-spacer-x: 1rem;
@@ -156,7 +159,7 @@ html[data-bs-theme='dark'] {
     box-shadow: none;
     margin-bottom: 2.2rem;
     border: none;
-    .widget-title {
+    & .widget-title {
         border: none;
         padding: var(--bs-card-cap-padding-y) var(--bs-card-cap-padding-x);
         margin-bottom: 0;
@@ -165,13 +168,22 @@ html[data-bs-theme='dark'] {
         &:first-child {
             border-radius: var(--bs-card-inner-border-radius) var(--bs-card-inner-border-radius) 0 0;
         }
-        h5 {
+        & h5 {
             font-size: 1rem;
             font-weight: 700;
             color: var(--bs-card-title-color);
         }
+        & .widget-title-wrapper {
+            display: flex;
+            gap: 0.5rem;
+            align-items: center;
+
+            & h5 {
+                margin-bottom: 0;
+            }
+        }
     }
-    .widget-content {
+    & .widget-content {
         padding: 1.5rem;
         flex: 1 1 auto;
         color: var(--bs-card-color);
