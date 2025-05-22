@@ -408,6 +408,7 @@ html[data-bs-theme='dark'] {
     }
 }
 html[data-bs-theme='dark'] {
+
     .dd-list {
         display: block;
         position: relative;
