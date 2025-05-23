@@ -419,6 +419,9 @@ html[data-bs-theme='dark'] {
         }
     }
 }
+html[data-bs-theme='dark'] div.dataTables_wrapper {
+    padding: 0;
+}
 html[data-bs-theme='dark'] {
 
     .dd-list {
