@@ -113,6 +113,10 @@ html[data-bs-theme='dark'] {
 body .bi::before, [class^='bi-']::before, [class*=' bi-']::before {
     vertical-align: -0.125rem;
 }
+#toast-container>div {
+    width: var(--bs-toast-max-width) !important;
+    color: var(--bs-toast-color);
+}
 .widget-box {
     --bs-card-spacer-y: 1rem;
     --bs-card-spacer-x: 1rem;
