@@ -201,6 +201,9 @@ body .bi::before, [class^='bi-']::before, [class*=' bi-']::before {
     display: flex;
     gap: 0.5rem;
 }
+.widget-content.nopadding {
+    padding: 0 !important;
+}
 .btn.dropdown-toggle {
     background-color: #435ebe;
     border-color: #435ebe;
