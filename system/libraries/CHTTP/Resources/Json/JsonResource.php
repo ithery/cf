@@ -68,7 +68,7 @@ class CHTTP_Resources_Json_JsonResource implements ArrayAccess, JsonSerializable
      *
      * @param mixed $resource
      *
-     * @return \Illuminate\Http\Resources\Json\AnonymousResourceCollection
+     * @return \CHTTP_Resources_Json_AnonymousResourceCollection
      */
     public static function collection($resource) {
         return c::tap(static::newCollection($resource), function ($collection) {

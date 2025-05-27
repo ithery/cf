@@ -70,8 +70,8 @@ class CTesting_TestCase extends BaseTestCase {
     protected function setUpTraits() {
         $uses = array_flip(c::classUsesRecursive(static::class));
 
-        if (isset($uses[CTesting_Trait_RefreshDatabase::class])) {
-            /** @var CTesting_Trait_RefreshDatabase $this */
+        if (isset($uses[CTesting_Trait_RefreshDatabaseTrait::class])) {
+            /** @var CTesting_Trait_RefreshDatabaseTrait $this */
             $this->refreshDatabase();
         }
         foreach ($uses as $trait) {

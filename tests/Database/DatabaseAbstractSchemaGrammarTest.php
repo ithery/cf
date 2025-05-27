@@ -14,7 +14,7 @@ class DatabaseAbstractSchemaGrammarTest extends TestCase {
         $this->expectException(LogicException::class);
         $this->expectExceptionMessage('This database driver does not support creating databases.');
 
-        $grammar->compileCreateDatabase('foo', m::mock(Connection::class));
+        $grammar->compileCreateDatabase('foo', m::mock(CDatabase_Connection::class));
     }
 
     public function testDropDatabaseIfExists() {

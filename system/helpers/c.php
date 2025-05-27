@@ -28,6 +28,17 @@ class c {
         return rtrim($str, DS) . DS;
     }
 
+    /**
+     * Unsigned right shift.
+     *
+     * Emulates (in PHP) the unsigned right shift operator ">>>" as it's
+     * known in Java or C#.
+     *
+     * @param int $a the left operand
+     * @param int $b the right operand
+     *
+     * @return int the result of the shift operation
+     */
     public static function urShift($a, $b) {
         if ($b == 0) {
             return $a;
@@ -36,10 +47,26 @@ class c {
         return ($a >> $b) & ~(1 << (8 * PHP_INT_SIZE - 1) >> ($b - 1));
     }
 
+    /**
+     * @param string $path
+     *
+     * @return string
+     */
     public static function manimgurl($path) {
         return curl::base() . 'public/manual/' . $path;
     }
 
+    /**
+     * Ensures a value is an iteratee shim.
+     *
+     * Checks if the value is a callable, then if it has a `toString()` method,
+     * and finally if it is an array with exactly one property. Otherwise
+     * defers to `c::property`.
+     *
+     * @param mixed $value the value to inspect
+     *
+     * @return callable returns the resolved value
+     */
     public static function baseIteratee($value) {
         if (\is_callable($value)) {
             return $value;
@@ -606,9 +633,9 @@ class c {
     /**
      * Get the evaluated view contents for the given view.
      *
-     * @param null|string                $view
+     * @param null|string                                   $view
      * @param \Illuminate\Contracts\Support\Arrayable|array $data
-     * @param array                      $mergeData
+     * @param array                                         $mergeData
      *
      * @return CView_View|CView_Factory
      */
@@ -1729,6 +1756,9 @@ class c {
      * @return callable|Closure
      */
     public static function toCallable($callback) {
+        if ($callback instanceof CSerializer_Serializer) {
+            return $callback->getClosure();
+        }
         if ($callback instanceof SerializableClosure) {
             return $callback->getClosure();
         }
@@ -1749,8 +1779,19 @@ class c {
         return is_callable($callback);
     }
 
+    /**
+     * Checks if given string is a HTML.
+     *
+     * @param string $string
+     *
+     * @return bool
+     */
     public static function isHtml($string) {
-        return preg_match('/<[^<]+>/', $string, $m) != 0;
+        if ($string === null) {
+            return false;
+        }
+
+        return preg_match('/<[^<]+>/', (string) $string, $m) != 0;
     }
 
     /**
@@ -1764,6 +1805,13 @@ class c {
         return new CBase_HtmlString('<input type="hidden" name="_method" value="' . $method . '">');
     }
 
+    /**
+     * Generate a fake value for a given property.
+     *
+     * @param null|string $property
+     *
+     * @return mixed
+     */
     public static function faker($property = null) {
         $faker = FackerFactory::create();
 
@@ -1908,10 +1956,24 @@ class c {
         return CAuth_Access_Gate::instance();
     }
 
+    /**
+     * Resolve the user timezone for the given request.
+     *
+     * @param CHTTP_Request $request
+     *
+     * @return string
+     */
     public static function resolveUserTimezone(CHTTP_Request $request) {
         return $request->timezone;
     }
 
+    /**
+     * Make a closure to be queueable.
+     *
+     * @param \Closure $closure
+     *
+     * @return CEvent_QueuedClosure
+     */
     public static function queueable(Closure $closure) {
         return new CEvent_QueuedClosure($closure);
     }
@@ -2034,6 +2096,11 @@ class c {
         return $styleNames;
     }
 
+    /**
+     * Returns the time elapsed in seconds since the application began.
+     *
+     * @return float
+     */
     public static function elapsed() {
         return microtime(true) - CF_START;
     }
@@ -2065,6 +2132,15 @@ class c {
         return c::app()->visitor();
     }
 
+    /**
+     * Generates a random MD5 hash.
+     *
+     * This function is using the date and time along with a random number
+     * between 0 and 9999 to generate a unique MD5 hash. The hash is then
+     * returned as a string.
+     *
+     * @return string
+     */
     public static function randmd5() {
         $rand = rand(0, 9999);
         $base = date('YmdHis') . $rand;
@@ -2094,6 +2170,13 @@ class c {
         );
     }
 
+    /**
+     * Return the path where the whole resource library is stored.
+     *
+     * @param string $path
+     *
+     * @return string
+     */
     public static function storagePath($path = '') {
         $storagePath = rtrim(DOCROOT, '/') . '/temp/storage/' . CF::appCode();
         if ($path) {
@@ -2101,6 +2184,13 @@ class c {
         }
     }
 
+    /**
+     * Return the base path for the given path.
+     *
+     * @param string $path
+     *
+     * @return string
+     */
     public static function basePath($path = '') {
         $basePath = CF::appDir();
         if ($path) {

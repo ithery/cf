@@ -113,7 +113,7 @@ html[data-bs-theme='dark'] {
 body .bi::before, [class^='bi-']::before, [class*=' bi-']::before {
     vertical-align: -0.125rem;
 }
-#toast-container>div {
+#toast-container > div {
     width: var(--bs-toast-max-width) !important;
     color: var(--bs-toast-color);
 }
@@ -181,7 +181,6 @@ body .bi::before, [class^='bi-']::before, [class*=' bi-']::before {
             display: flex;
             gap: 0.5rem;
             align-items: center;
-
             & h5 {
                 margin-bottom: 0;
             }
