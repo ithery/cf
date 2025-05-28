@@ -465,3 +465,8 @@ html[data-bs-theme='dark'] {
         z-index: 9999;
     }
 }
+html[data-bs-theme='dark'] {
+    &.material-style .select2-search__field {
+        color: #fff;
+    }
+}
