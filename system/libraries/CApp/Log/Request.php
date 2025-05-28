@@ -10,6 +10,8 @@ defined('SYSPATH') or die('No direct access allowed.');
  */
 use CApp_Base as Base;
 
+use CApp_Navigation_Helper as NavHelper;
+
 class CApp_Log_Request {
     public static function populate($data = []) {
         $db = c::db();
@@ -31,17 +33,17 @@ class CApp_Log_Request {
             }
         }
 
-        $nav = cnav::nav();
+        $nav = NavHelper::nav();
 
         $nav_name = '';
         $nav_label = '';
         $action_label = '';
         $action_name = '';
-        $controller = crouter::controller();
+        $controller = c::router()->current()->getController();
         if ($controller == 'cresenity') {
             return false;
         }
-        $method = crouter::method();
+        $method = c::router()->current()->getRouteData()->getMethod();
         if ($nav != null) {
             $nav_name = $nav['name'];
             $nav_label = $nav['label'];

@@ -89,6 +89,13 @@ class c {
         };
     }
 
+    /**
+     * Checks if `value` is a match to `source` (recursively).
+     *
+     * @param mixed $source the value to compare
+     *
+     * @return callable returns the function that checks if `value` is a match to `source`
+     */
     public static function baseMatches($source) {
         return function ($value, $index, $collection) use ($source) {
             if ($value === $source || static::isEqual($value, $source)) {

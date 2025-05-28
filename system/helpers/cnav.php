@@ -3,7 +3,9 @@
 use CApp_Navigation_Helper as Helper;
 
 //@codingStandardsIgnoreStart
-
+/**
+ * @deprecated 1.8 use CApp_Navigation_Helper
+ */
 class cnav {
     public static function nav($nav = null, $controller = null, $method = null, $path = null) {
         return Helper::nav($nav, $controller, $method, $path);

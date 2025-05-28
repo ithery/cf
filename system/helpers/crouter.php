@@ -2,6 +2,9 @@
 defined('SYSPATH') or die('No direct access allowed.');
 
 //@codingStandardsIgnoreStart
+/**
+ * @deprecated 1.8 use CRouting_Router|c::router()
+ */
 class crouter {
     /**
      * @return string

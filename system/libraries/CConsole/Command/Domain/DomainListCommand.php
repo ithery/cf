@@ -1,7 +1,7 @@
 <?php
 
 /**
- * Description of DomainListCommand
+ * Description of DomainListCommand.
  *
  * @author Hery
  */
@@ -14,14 +14,14 @@ class CConsole_Command_Domain_DomainListCommand extends CConsole_Command {
     protected $signature = 'domain:list';
 
     public function handle() {
-        $allFiles = cfs::list_files(CFData::path() . 'domain');
-
+        $allFiles = CFile::allFiles(CFData::path() . 'domain');
         $rows = c::collect($allFiles)->map(function ($file) {
             $domain = basename($file);
             if (substr($domain, -4) == '.php') {
                 $domain = substr($domain, 0, strlen($domain) - 4);
             }
             $domainData = include $file;
+
             return [
                 'domain' => $domain,
                 'appCode' => carr::get($domainData, 'app_code'),

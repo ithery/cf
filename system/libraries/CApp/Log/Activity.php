@@ -3,13 +3,14 @@
 defined('SYSPATH') or die('No direct access allowed.');
 
 use CApp_Base as Base;
+use CApp_Navigation_Helper as NavHelper;
 
 class CApp_Log_Activity {
     public static function populate($description, $data) {
         $modelName = CF::config('app.model.log_activity', CApp_Model_LogActivity::class);
         $model = new $modelName();
         /** @var CModel $model */
-        $nav = cnav::nav();
+        $nav = NavHelper::nav();
         $navName = '';
         $navLabel = '';
         $actionName = '';
