@@ -59,6 +59,8 @@ class CElement_FormInput_SelectSearch extends CElement_FormInput {
 
     protected $perPage;
 
+    protected $onModal;
+
     public function __construct($id = null) {
         parent::__construct($id);
         $this->dropdownClasses = [];
@@ -80,6 +82,7 @@ class CElement_FormInput_SelectSearch extends CElement_FormInput {
         $this->value = null;
         $this->allowClear = false;
         $this->prependData = [];
+        $this->onModal = false;
         $language = CF::getLocale();
         if (strlen($language) > 2) {
             $language = strtolower(substr($language, 0, 2));
@@ -332,6 +335,12 @@ class CElement_FormInput_SelectSearch extends CElement_FormInput {
 
     public function setAllowClear($bool = true) {
         $this->allowClear = $bool;
+
+        return $this;
+    }
+
+    public function setOnModal($bool = true) {
+        $this->onModal = $bool;
 
         return $this;
     }
@@ -678,6 +687,12 @@ class CElement_FormInput_SelectSearch extends CElement_FormInput {
                 result['" . $variableUniqueKey . "']= " . $valueScript . ';
             ';
         }
+
+        $strJsOnModal = '';
+        if ($this->onModal) {
+            $strJsOnModal = 'dropdownParent: $("#' . $this->id . '").closest(".modal"),';
+        }
+
         $str = "
 
             $('#" . $this->id . "').select2({
@@ -686,6 +701,7 @@ class CElement_FormInput_SelectSearch extends CElement_FormInput {
                 placeholder: '" . $placeholder . "',
                 allowClear: " . ($this->allowClear ? 'true' : 'false') . ",
                 minimumInputLength: '" . $this->minInputLength . "',
+                " . $strJsOnModal . "
                 ajax: {
                     url: '" . $ajaxUrl . "',
                     dataType: 'jsonp',
