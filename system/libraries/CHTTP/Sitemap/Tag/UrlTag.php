@@ -1,7 +1,6 @@
 <?php
 
 use Carbon\Carbon;
-use DateTimeInterface;
 
 class CHTTP_Sitemap_Tag_UrlTag extends CHTTP_Sitemap_TagAbstract {
     const CHANGE_FREQUENCY_ALWAYS = 'always';
