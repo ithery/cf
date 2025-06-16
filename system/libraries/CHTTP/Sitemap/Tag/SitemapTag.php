@@ -1,7 +1,6 @@
 <?php
 
 use Carbon\Carbon;
-use DateTimeInterface;
 
 class CHTTP_Sitemap_Tag_SitemapTag extends CHTTP_Sitemap_TagAbstract {
     public string $url;
