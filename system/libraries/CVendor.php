@@ -282,4 +282,8 @@ class CVendor {
     public static function dropbox() {
         return new CBase_ForwarderStaticClass(CVendor_Dropbox::class);
     }
+
+    public static function kataai() {
+        return new CBase_ForwarderStaticClass(CVendor_Kataai::class);
+    }
 }
