@@ -89,6 +89,12 @@ class CVendor_Kataai_Client {
         }
     }
 
+    public function logout() {
+        $logoutUrl = $this->baseUrl . '/v1/users/logout';
+
+        return $this->post($logoutUrl);
+    }
+
     protected function getDefaultOptions() {
         $options = [
             'headers' => [
