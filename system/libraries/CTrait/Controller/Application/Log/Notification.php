@@ -17,7 +17,7 @@ trait CTrait_Controller_Application_Log_Notification {
             ->setCallback(function ($row, $val) {
                 $action = new CElement_Element_A();
                 $action->add($val)
-                    ->setHref($this->controllerUrl() . 'notificationDetail/' . $val);
+                    ->setHref($this->controllerUrl() . 'detail/' . $val);
 
                 return $action;
             });
@@ -38,7 +38,7 @@ trait CTrait_Controller_Application_Log_Notification {
         return $app;
     }
 
-    public function notificationDetail($logNotificationId) {
+    public function detail($logNotificationId) {
         $app = c::app();
         if (!isset($this->logNotificationModel)) {
             $this->logNotificationModel = CNotification_Model_LogNotification::class;
