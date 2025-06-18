@@ -39,6 +39,13 @@ class CQueue_Dispatcher implements CQueue_QueueingDispatcherInterface {
     protected $queueResolver;
 
     /**
+     * Indicates if dispatching after response is disabled.
+     *
+     * @var bool
+     */
+    protected $allowsDispatchingAfterResponses = true;
+
+    /**
      * Create a new command dispatcher instance.
      *
      * @param CContainer_ContainerInterface $container
@@ -249,6 +256,12 @@ class CQueue_Dispatcher implements CQueue_QueueingDispatcherInterface {
      * @return void
      */
     public function dispatchAfterResponse($command, $handler = null) {
+        if (!$this->allowsDispatchingAfterResponses) {
+            $this->dispatchSync($command);
+
+            return;
+        }
+
         CF::terminating(function () use ($command, $handler) {
             $this->dispatchNow($command, $handler);
         });
@@ -276,6 +289,28 @@ class CQueue_Dispatcher implements CQueue_QueueingDispatcherInterface {
      */
     public function map(array $map) {
         $this->handlers = array_merge($this->handlers, $map);
+
+        return $this;
+    }
+
+    /**
+     * Allow dispatching after responses.
+     *
+     * @return $this
+     */
+    public function withDispatchingAfterResponses() {
+        $this->allowsDispatchingAfterResponses = true;
+
+        return $this;
+    }
+
+    /**
+     * Disable dispatching after responses.
+     *
+     * @return $this
+     */
+    public function withoutDispatchingAfterResponses() {
+        $this->allowsDispatchingAfterResponses = false;
 
         return $this;
     }
