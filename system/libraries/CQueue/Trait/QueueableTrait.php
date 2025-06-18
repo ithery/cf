@@ -132,6 +132,17 @@ trait CQueue_Trait_QueueableTrait {
     }
 
     /**
+     * Set the delay for the job to zero seconds.
+     *
+     * @return $this
+     */
+    public function withoutDelay() {
+        $this->delay = 0;
+
+        return $this;
+    }
+
+    /**
      * Indicate that the job should be dispatched after all database transactions have committed.
      *
      * @return $this
@@ -184,7 +195,7 @@ trait CQueue_Trait_QueueableTrait {
      */
     public function chain($chain) {
         $this->chained = c::collect($chain)->map(function ($job) {
-            return serialize($job);
+            return $this->serializeJob($job);
         })->all();
 
         return $this;

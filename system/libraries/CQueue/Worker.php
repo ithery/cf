@@ -369,6 +369,9 @@ class CQueue_Worker {
             $this->currentJobName = null;
             if (CDaemon::getRunningService() != null) {
                 CDaemon::log('Run Job Exception :' . $e->getMessage());
+                if (!CF::isProduction()) {
+                    CDaemon::log($e->getTraceAsString());
+                }
             } else {
                 $this->exceptions->report($e);
             }
