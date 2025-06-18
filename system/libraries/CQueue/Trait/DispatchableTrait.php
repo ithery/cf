@@ -95,4 +95,15 @@ trait CQueue_Trait_DispatchableTrait {
     public static function withChain($chain) {
         return new CQueue_PendingChain(static::class, $chain);
     }
+
+    /**
+     * Create a new pending job dispatch instance.
+     *
+     * @param mixed $job
+     *
+     * @return \CQueue_PendingDispatch
+     */
+    protected static function newPendingDispatch($job) {
+        return new CQueue_PendingDispatch($job);
+    }
 }
