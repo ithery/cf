@@ -1763,9 +1763,10 @@ class c {
      * @return callable|Closure
      */
     public static function toCallable($callback) {
-        if ($callback instanceof CSerializer_Serializer) {
+        if ($callback instanceof CFunction_SerializableClosure) {
             return $callback->getClosure();
         }
+
         if ($callback instanceof SerializableClosure) {
             return $callback->getClosure();
         }
@@ -1779,6 +1780,10 @@ class c {
      * @return bool
      */
     public static function isCallable($callback) {
+        if ($callback instanceof CFunction_SerializableClosure) {
+            return true;
+        }
+
         if ($callback instanceof SerializableClosure) {
             return true;
         }
