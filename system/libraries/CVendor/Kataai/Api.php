@@ -42,6 +42,24 @@ class CVendor_Kataai_Api {
         return $this->handleResponse($response);
     }
 
+    public function getMessageTemplates($page = 1, $limit = 5, $fields = null) {
+        $path = 'v1/message_templates';
+        $url = $this->getApiUrl($path);
+        $query = [
+            'page'=>$page,
+            'limit'=>$limit,
+        ];
+        if ($fields!==null) {
+            if (is_array($fields)) {
+                $fields = implode(',', $fields);
+            }
+            $query['fields'] = $fields;
+        }
+        $response = $this->client->get($url, $query);
+
+        return $this->handleResponse($response);
+    }
+
     protected function handleResponse($response) {
         $json = json_decode($response, true);
         //check is json successfully decoded

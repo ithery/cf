@@ -41,7 +41,6 @@ class CVendor_Kataai_Client {
         if ($this->loginData == null) {
             $this->loginData = $this->cache->get($this->getLoginDataCacheKey());
         }
-
         if ($this->loginData == null) {
             $this->login();
         }
