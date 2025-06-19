@@ -78,12 +78,10 @@ class CVendor {
     }
 
     /**
-     * @param array $options
-     *
      * @return \CVendor_Namecheap
      */
-    public static function namecheap($options) {
-        return new CVendor_Namecheap($options);
+    public static function namecheap() {
+        return new CVendor_Namecheap();
     }
 
     /**
@@ -272,9 +270,16 @@ class CVendor {
     }
 
     /**
-     * @return \CVendor_Figma|CBase_ForwarderStaticClass
+     * @return \CVendor_Qontak|CBase_ForwarderStaticClass
      */
     public static function qontak() {
         return new CBase_ForwarderStaticClass(CVendor_Qontak::class);
+    }
+
+    /**
+     * @return \CVendor_Kataai|CBase_ForwarderStaticClass
+     */
+    public static function kataai() {
+        return new CBase_ForwarderStaticClass(CVendor_Kataai::class);
     }
 }
