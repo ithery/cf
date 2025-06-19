@@ -275,4 +275,8 @@ class CVendor {
     public static function qontak() {
         return new CBase_ForwarderStaticClass(CVendor_Qontak::class);
     }
+
+    public static function kataai() {
+        return new CBase_ForwarderStaticClass(CVendor_Kataai::class);
+    }
 }
