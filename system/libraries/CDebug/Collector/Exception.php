@@ -57,10 +57,10 @@ class CDebug_Collector_Exception extends CDebug_CollectorAbstract {
         $data['datetime'] = date('Y-m-d H:i:s');
         $data['appId'] = $app->appId();
         $data['appCode'] = $app->code();
-        $data['user'] = CApp_Base::username();
-        $data['role'] = CApp_Base::roleName();
-        $data['orgId'] = CApp_Base::orgId();
-        $data['orgCode'] = CApp_Base::orgCode();
+        $data['user'] = c::base()->username();
+        $data['role'] = c::base()->roleName();
+        $data['orgId'] = c::base()->orgId();
+        $data['orgCode'] = c::base()->orgCode();
         $data['error'] = $error;
         $data['message'] = $message;
         $data['uuid'] = $uuid;
