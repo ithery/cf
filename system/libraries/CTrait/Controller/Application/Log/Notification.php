@@ -51,7 +51,8 @@ trait CTrait_Controller_Application_Log_Notification {
         $app->addBreadcrumb('Log', static::controllerUrl() . '?tab=notification');
         $app->title($logNotificationModel->description);
 
-        $form = $app->addForm();
+        $widget = $app->addWidget()->setTitle('Notification Detail')->addClass('mb-3');
+        $form = $widget->addForm();
         $divRow = $form->addDiv()->addClass('row');
 
         $divRow->addDiv()->addClass('col-md-4')->addField()

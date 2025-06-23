@@ -52,7 +52,7 @@ class CDebug_CollectorManager {
      *
      * @return void
      */
-    public function collectException($ex) {
+    public function collectException(Throwable $ex) {
         return $this->exception()->collect($ex);
     }
 

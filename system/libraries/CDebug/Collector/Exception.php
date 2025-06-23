@@ -2,20 +2,20 @@
 
 class CDebug_Collector_Exception extends CDebug_CollectorAbstract {
     /**
-     * @param mixed $exception
+     * @param Throwable $exception
      *
      * @return bool
      */
     protected function shouldCollect($exception) {
-        return $exception instanceof Exception && (!$exception instanceof CDebug_Contract_ShouldNotCollectException);
+        return $exception instanceof Throwable && (!$exception instanceof CDebug_Contract_ShouldNotCollectException);
     }
 
     /**
-     * @param mixed $exception
+     * @param Throwable $exception
      *
      * @return array
      */
-    public function collect($exception) {
+    public function collect(Throwable $exception) {
         if (!CF::config('collector.exception')) {
             return null;
         }
