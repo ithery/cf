@@ -3,6 +3,9 @@
 use League\OAuth2\Server\ResourceServer;
 use Psr\Http\Message\ServerRequestInterface;
 
+/**
+ * @see https://github.com/rinvex/laravel-oauth/
+ */
 class CApi_OAuth {
     /**
      * Indicates if the implicit grant type is enabled.
