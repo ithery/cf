@@ -3,14 +3,14 @@
 defined('SYSPATH') or die('No direct access allowed.');
 
 /**
- * @property      string                 $name
- * @property      string                 $createdby
- * @property      string                 $updatedby
- * @property      CCarbon|\Carbon\Carbon $created
- * @property      CCarbon|\Carbon\Carbon $updated
- * @property      int                    $status
- * @property      int                    $depth
- * @property-read int                    $role_id
+ * @property      string                                                    $name
+ * @property      null|string                                               $createdby
+ * @property      null|string                                               $updatedby
+ * @property      null|string|CCarbon|\Carbon\Carbon|\CarbonV3\Carbonstring $created
+ * @property      null|string|CCarbon|\Carbon\Carbon|\CarbonV3\Carbonstring $updated
+ * @property      int                                                       $status
+ * @property      int                                                       $depth
+ * @property-read int                                                       $role_id
  *
  * @method static CModel_Collection byAccess(string $permitWithoutWildcard)
  * @method static CModel_Collection byAnyAccess(string $permitWithoutWildcard)

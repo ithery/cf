@@ -3,12 +3,12 @@
 defined('SYSPATH') or die('No direct access allowed.');
 
 /**
- * @property      string  $createdby
- * @property      string  $updatedby
- * @property      CCarbon $created
- * @property      CCarbon $updated
- * @property      int     $status
- * @property-read int     $org_id
+ * @property      null|string                                               $createdby
+ * @property      null|string                                               $updatedby
+ * @property      null|string|CCarbon|\Carbon\Carbon|\CarbonV3\Carbonstring $created
+ * @property      null|string|CCarbon|\Carbon\Carbon|\CarbonV3\Carbonstring $updated
+ * @property      int                                                       $status
+ * @property-read int                                                       $org_id
  */
 trait CApp_Model_Trait_Org {
     public function __construct(array $attributes = []) {
