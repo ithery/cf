@@ -38,7 +38,12 @@ CREATE TABLE `oauth_access_token` (
   `deleted` datetime DEFAULT NULL,
   `deletedby` varchar(50) DEFAULT NULL,
   `status` tinyint(4) NOT NULL DEFAULT '1',
-  PRIMARY KEY (`oauth_access_token_id`)
+  PRIMARY KEY (`oauth_access_token_id`),
+  KEY `org_id` (`org_id`),
+  KEY `oauth_client_id` (`oauth_client_id`),
+  KEY `idx_token` (`token`),
+  CONSTRAINT `oauth_access_token_ibfk_1` FOREIGN KEY (`org_id`) REFERENCES `org` (`org_id`),
+  CONSTRAINT `oauth_access_token_ibfk_2` FOREIGN KEY (`oauth_client_id`) REFERENCES `oauth_client` (`oauth_client_id`)
 ) ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 
@@ -57,7 +62,12 @@ CREATE TABLE `oauth_refresh_token` (
   `deleted` datetime DEFAULT NULL,
   `deletedby` varchar(50) DEFAULT NULL,
   `status` tinyint(4) NOT NULL DEFAULT '1',
-  PRIMARY KEY (`oauth_refresh_token_id`)
+  PRIMARY KEY (`oauth_refresh_token_id`),
+  KEY `org_id` (`org_id`),
+  KEY `oauth_access_token_id` (`oauth_access_token_id`),
+  KEY `idx_token` (`token`),
+  CONSTRAINT `oauth_refresh_token_ibfk_1` FOREIGN KEY (`org_id`) REFERENCES `org` (`org_id`),
+  CONSTRAINT `oauth_refresh_token_ibfk_2` FOREIGN KEY (`oauth_access_token_id`) REFERENCES `oauth_access_token` (`oauth_access_token_id`)
 ) ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 

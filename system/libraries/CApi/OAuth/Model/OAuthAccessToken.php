@@ -92,9 +92,11 @@ class CApi_OAuth_Model_OAuthAccessToken extends CModel {
         if ($userModel == null) {
             $provider = CF::config('auth.guards.api.provider');
 
-            $model = CF::config('auth.providers.' . $provider . '.model');
+            $modelName = CF::config('auth.providers.' . $provider . '.model');
+            $model = new $modelName();
+            /** @var CModel $model */
 
-            return $this->belongsTo($model, 'user_id', (new $model())->getKeyName());
+            return $this->belongsTo($modelName, 'user_id', $model->getKeyName());
         } else {
             return $this->morphTo('user');
         }
