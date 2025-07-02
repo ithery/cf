@@ -32,7 +32,7 @@ final class CVendor_Kataai_MessageUtil {
         }
 
         if ($this->message->getButtons()) {
-            $params= array_merge($params, $this->makeButtonParams());
+            $params = array_merge($params, $this->makeButtonParams());
         }
 
         return $params;

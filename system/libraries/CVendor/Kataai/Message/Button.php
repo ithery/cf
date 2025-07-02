@@ -26,7 +26,7 @@ final class CVendor_Kataai_Message_Button {
 
     public function toArray(): array {
         return [
-            'type' => $this->getType(),
+            'type' => 'text',
         ] + $this->buttonItem();
     }
 

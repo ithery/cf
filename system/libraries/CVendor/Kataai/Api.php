@@ -72,10 +72,10 @@ class CVendor_Kataai_Api {
         $path = 'v1/message_templates';
         $url = $this->getApiUrl($path);
         $query = [
-            'page'=>$page,
-            'limit'=>$limit,
+            'page' => $page,
+            'limit' => $limit,
         ];
-        if ($fields!==null) {
+        if ($fields !== null) {
             if (is_array($fields)) {
                 $fields = implode(',', $fields);
             }
@@ -95,6 +95,7 @@ class CVendor_Kataai_Api {
 
         return $json;
     }
+
     protected function handleResponseMessage($response, CVendor_Kataai_Message $message = null) {
         $json = json_decode($response, true);
         //check is json successfully decoded
@@ -106,6 +107,6 @@ class CVendor_Kataai_Api {
             $json['messages'][0]['id'] ?? '',
             $json['messages'][0]['status'] ?? '',
             $json['messages'][0] ?? []
-        ) ;
+        );
     }
 }
