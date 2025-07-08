@@ -107,7 +107,7 @@ trait CModel_Relation_Trait_AsPivot {
      *
      * @return CModel_Query
      */
-    protected function setKeysForSaveQuery($query) {
+    protected function setKeysForSaveQuery(CModel_Query $query) {
         return $this->setKeysForSelectQuery($query);
     }
 
