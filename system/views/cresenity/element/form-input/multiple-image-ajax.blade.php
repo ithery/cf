@@ -310,7 +310,7 @@
                 var div_cc;
                 var cc_label;
                 var cc;
-                <?php foreach ($customControl as $cc): ?>
+                @foreach ($customControl as $cc)
                     <?php
                     $control = carr::get($cc, 'control');
                     $control_name = carr::get($cc, 'input_name');
@@ -322,7 +322,7 @@
                     div_cc.append(cc_label);
                     div_cc.append(cc);
                     div.append(div_cc);
-                <?php endforeach; ?>
+                @endforeach
                 @if($removeLink)
                     var remove = $("<a>").addClass("multi-image-ajax-remove").html("@lang('element/image.remove')");
                     div.append(remove);

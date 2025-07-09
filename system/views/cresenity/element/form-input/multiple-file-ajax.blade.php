@@ -27,7 +27,7 @@
         background:#fff;
     }
 
-    .multi-image-ajax .div-img{
+    .multi-image-ajax .div-img,  .multi-image-ajax .div-file{
         border: 0px;
         width: auto;
         height: 100px;
@@ -114,7 +114,7 @@
             $imgExtensions = array("jpg", "jpeg", "png", "gif");
 
             if (in_array($ext, $imgExtensions)) {
-                if (getimagesize($file_url)) {
+                if (@getimagesize($file_url)) {
                     $isImage = true;
                 }
             }
@@ -163,7 +163,7 @@
             const removeLabel = "@lang('element/file.remove')";
             const elementId = "{{ $id }}";
             var haveCropper = {{ ($cropper != null) ? 'true' : 'false'  }};
-            const maxUploadSize = <?= $maxUploadSize ?> * 1024 * 1024;
+            const maxUploadSize = {{  $maxUploadSize  }} * 1024 * 1024;
             const readerOnLoadResolver = (child, file, reader) =>{
                 return $.proxy(function (file, fileList, event) {
                     var filesize = event.total;
@@ -213,13 +213,13 @@
                 } else {
                     container.removeClass('disabled');
                 }
-                $("#<?= $id ?>").trigger('change');
+                $("#" + elementId).trigger('change');
             }
             fileChanged();
             // Remove File
             function fileUploadRemove(e) {
 
-                $('#container-<?php echo $id ?> .multi-image-ajax-remove').click(function (e) {
+                $('#container-' + elementId + ' .multi-image-ajax-remove').click(function (e) {
                     e.preventDefault();
                     e.stopPropagation();
 
@@ -353,9 +353,9 @@
                 fileList.append(div.addClass("loading"));
                 fileUploadRemove();
                 var data = new FormData();
-                data.append("<?php echo $name; ?>[]", imageData);
+                data.append("{{ $name }}[]", imageData);
 
-                data.append('<?php echo $ajaxName; ?>_filename[]', file.name);
+                data.append('{{ $ajaxName }}_filename[]', file.name);
                 var xhr = new XMLHttpRequest();
                 xhr.onreadystatechange = function () {
                     if (this.readyState == 4 && this.status == 200) {
@@ -371,7 +371,7 @@
                         //div.remove();
                     }
                 };
-                xhr.open("post", "<?php echo $ajaxUrl; ?>");
+                xhr.open("post", "{{ $ajaxUrl }}");
                 xhr.send(data);
             }
 
