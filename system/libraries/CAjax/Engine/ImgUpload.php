@@ -112,6 +112,6 @@ class CAjax_Engine_ImgUpload extends CAjax_Engine {
             'url' => $fileId ? CTemporary::getPublicUrl(static::FOLDER, $fileId) : '',
         ];
 
-        return json_encode($return);
+        return c::response()->json($return);
     }
 }

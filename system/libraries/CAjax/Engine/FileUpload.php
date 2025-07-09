@@ -113,6 +113,6 @@ class CAjax_Engine_FileUpload extends CAjax_Engine {
             'url' => CTemporary::getUrl(static::FOLDER, $fileId),
         ];
 
-        return json_encode($return);
+        return c::response()->json($return);
     }
 }

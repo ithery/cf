@@ -5,15 +5,15 @@ return [
     ],
     'hugging-face' => [
         /*
-    |--------------------------------------------------------------------------
-    | HuggingFace API Key
-    |--------------------------------------------------------------------------
-    |
-    | This is your HuggingFace API key which you can get from your
-    | HuggingFace account settings. This key is used to authenticate
-    | requests to the HuggingFace API.
-    |
-    */
+        |--------------------------------------------------------------------------
+        | HuggingFace API Key
+        |--------------------------------------------------------------------------
+        |
+        | This is your HuggingFace API key which you can get from your
+        | HuggingFace account settings. This key is used to authenticate
+        | requests to the HuggingFace API.
+        |
+        */
         'api_key' => c::env('HUGGINGFACE_API_KEY'),
 
         /*

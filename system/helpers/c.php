@@ -1751,14 +1751,14 @@ class c {
     /**
      * @param callable|Closure $callback
      *
-     * @return callable|SerializableClosure
+     * @return callable|CFunction_SerializableClosure
      */
     public static function toSerializableClosure($callback) {
-        return $callback instanceof Closure ? new SerializableClosure($callback) : $callback;
+        return $callback instanceof Closure ? new CFunction_SerializableClosure($callback) : $callback;
     }
 
     /**
-     * @param callable|Closure|SerializableClosure $callback
+     * @param callable|Closure|SerializableClosure|CFunction_SerializableClosure $callback
      *
      * @return callable|Closure
      */
@@ -1775,7 +1775,7 @@ class c {
     }
 
     /**
-     * @param callable|Closure|SerializableClosure $callback
+     * @param callable|Closure|SerializableClosure|CFunction_SerializableClosure $callback
      *
      * @return bool
      */
