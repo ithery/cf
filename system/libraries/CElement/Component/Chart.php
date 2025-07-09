@@ -81,6 +81,7 @@ abstract class CElement_Component_Chart extends CElement_Component {
         $this->updateTypeFromChart($chart);
         $this->labels = $chart->getDataLabels();
         $seriesLabels = $chart->getSeriesLabels();
+        $dataOptions = $chart->getDataOptions();
         $series = [];
         $colors = $chart->getColors();
         foreach ($chart->getValues() as $index => $serie) {
@@ -88,16 +89,17 @@ abstract class CElement_Component_Chart extends CElement_Component {
             $dataset['data'] = $serie;
             //$dataset['fill'] = false;
             $label = carr::get($seriesLabels, $index);
+            $options = carr::get($dataOptions, $index, []);
             if ($label) {
                 $dataset['label'] = $label;
             }
-            $dataset['fill'] = false;
+            // $dataset['fill'] = false;
 
             if ($chart instanceof CChart_Chart_PieChart) {
                 while (count($colors) < count($serie)) {
                     $colors[] = CColor::random()->toRgba();
                 }
-                $dataset['color'] = c::collect($colors)->map(function ($color) {
+                $dataset['borderColor'] = c::collect($colors)->map(function ($color) {
                     return $this->colorToRgba($color);
                 })->all();
                 $dataset['backgroundColor'] = c::collect($colors)->map(function ($color) {
@@ -107,10 +109,10 @@ abstract class CElement_Component_Chart extends CElement_Component {
                 $randColor = CColor::random()->toRgba();
                 $color = carr::get($colors, $index) ?: $randColor;
                 $backgroundColor = carr::get($colors, $index) ?: $randColor->fadeOut(80);
-                $dataset['color'] = $this->colorToRgba($color);
+                $dataset['borderColor'] = $this->colorToRgba($color);
                 $dataset['backgroundColor'] = $this->colorToRgba($backgroundColor);
             }
-            $series[] = $dataset;
+            $series[] = array_merge($dataset, $options);
         }
         $this->data = $series;
 

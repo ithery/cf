@@ -11,8 +11,8 @@ class CChart_ChartAbstract {
     protected $title;
 
     /**
-     * Data set values.
-     * Every array entry is a data set.
+     * Dataset values.
+     * Every array entry is a dataset.
      *
      * @var array
      */
@@ -21,6 +21,15 @@ class CChart_ChartAbstract {
     protected $seriesLabels = [];
 
     protected $dataLabels = [];
+
+    /**
+     * Dataset options.
+     * Every array entry is a dataset.
+     * Can be used to overwrite dataset values.
+     *
+     * @var array
+     */
+    protected $dataOptions = [];
 
     /**
      * @var array<CColor_FormatAbstract>
@@ -47,12 +56,14 @@ class CChart_ChartAbstract {
     private $isShowLegend = true;
 
     private $legendPosition = CChart::POSITION_RIGHT;
+
     /**
      * X Axis.
      *
      * @var int
      */
     private $xAxis;
+
     /**
      * Y Axis.
      *
@@ -98,13 +109,16 @@ class CChart_ChartAbstract {
     /**
      * @param array  $data
      * @param string $label
+     * @param mixed  $options
      *
      * @return $this
      */
-    public function addSeries(array $data, $label = null) {
+    public function addSeries(array $data, $label = null, $options = []) {
         $this->seriesLabels[] = $label;
 
         $this->values[] = $data;
+
+        $this->dataOptions[] = $options;
     }
 
     public function setColors(array $colors) {
@@ -136,6 +150,10 @@ class CChart_ChartAbstract {
 
     public function getSeriesLabels() {
         return $this->seriesLabels;
+    }
+
+    public function getDataOptions() {
+        return $this->dataOptions;
     }
 
     /**
