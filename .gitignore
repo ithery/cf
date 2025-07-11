@@ -17,8 +17,7 @@ application/*
 #ignore data domain or org
 /data
 /data/*
-/data/org/*
-
+!/data/.gitkeep
 #ignore
 /index.php
 
