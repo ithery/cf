@@ -94,7 +94,6 @@ class cutils {
 
     public static function randmd5() {
         $rand = rand(0, 9999);
-        $base = date('YmdHis') . $rand;
 
         return md5($rand);
     }

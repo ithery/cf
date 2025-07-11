@@ -1889,6 +1889,10 @@ class c {
             return $callback->__invoke(...$args);
         }
 
+        if ($callback instanceof CFunction_SerializableClosure) {
+            return $callback->__invoke(...$args);
+        }
+
         throw new Exception('callback is not callable');
     }
 

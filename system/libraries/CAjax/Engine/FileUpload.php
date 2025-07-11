@@ -1,6 +1,8 @@
 <?php
 
 class CAjax_Engine_FileUpload extends CAjax_Engine {
+    use CAjax_Trait_UploadTrait;
+
     const FOLDER = 'fileupload';
 
     const FOLDER_INFO = 'fileuploadinfo';
@@ -19,27 +21,16 @@ class CAjax_Engine_FileUpload extends CAjax_Engine {
                 $fileName = $_FILES[$inputName]['name'][$i];
                 //$fileSize = $_FILES[$inputName]['size'][$i];
                 $ext = pathinfo($_FILES[$inputName]['name'][$i], PATHINFO_EXTENSION);
-                if (in_array($ext, ['php', 'sh', 'htm', 'pht'])) {
-                    die('Not Allowed X_X');
-                }
-                if (cstr::startsWith($ext, ['php', 'sh', 'htm', 'pht'])) {
-                    die('Not Allowed X_X');
-                }
-
-                if ($allowedExtension) {
-                    if (!in_array(strtolower($ext), $allowedExtension)) {
-                        die('Not Allowed X_X');
-                    }
-                }
-                if ($validationCallback && $validationCallback instanceof Opis\Closure\SerializableClosure) {
-                    $validationCallback->__invoke($_FILES[$inputName]['name'][$i], $_FILES[$inputName]['tmp_name'][$i]);
+                $this->checkExtension($ext, $allowedExtension);
+                if ($validationCallback && c::isCallable($validationCallback)) {
+                    c::call($validationCallback, [$_FILES[$inputName]['name'][$i], $_FILES[$inputName]['tmp_name'][$i]]);
                 }
 
                 $extension = '.' . $ext;
 
-                $fileId = date('Ymd') . cutils::randmd5() . $extension;
-                $disk = CTemporary::disk();
-                $fullfilename = CTemporary::getPath('fileupload', $fileId);
+                $fileId = $this->generateFileId($extension);
+                $disk = $this->getDisk();
+                $fullfilename = CTemporary::getPath(static::FOLDER, $fileId);
 
                 if (!$disk->put($fullfilename, file_get_contents($_FILES[$inputName]['tmp_name'][$i]))) {
                     die('fail upload from ' . $_FILES[$inputName]['tmp_name'][$i] . ' to ' . $fullfilename);
@@ -50,10 +41,9 @@ class CAjax_Engine_FileUpload extends CAjax_Engine {
                     $infoData['fileId'] = $fileId;
                     $infoData['temporaryPath'] = $fullfilename;
                     $infoData['temporaryDisk'] = $diskName;
-                    $infoData['url'] = CTemporary::getUrl(static::FOLDER, $fileId);
-                    $fullfilenameinf = CTemporary::put(static::FOLDER_INFO, json_encode($infoData), $fileId);
+                    $infoData['url'] = CTemporary::getPublicUrl(static::FOLDER, $fileId);
+                    $fullfilenameinf = CTemporary::publicPut(static::FOLDER_INFO, json_encode($infoData), $fileId);
                 }
-                $return[] = $fileId;
             }
         }
 
@@ -71,19 +61,7 @@ class CAjax_Engine_FileUpload extends CAjax_Engine {
                 $fileName = carr::get($filenameArray, $k);
 
                 $ext = pathinfo($fileName, PATHINFO_EXTENSION);
-                if (in_array($ext, ['php', 'sh', 'htm', 'pht'])) {
-                    die('Not Allowed X_X');
-                }
-
-                if (cstr::startsWith($ext, ['php', 'sh', 'htm', 'pht'])) {
-                    die('Not Allowed X_X');
-                }
-
-                if ($allowedExtension) {
-                    if (!in_array(strtolower($ext), $allowedExtension)) {
-                        die('Not Allowed X_X');
-                    }
-                }
+                $this->checkExtension($ext, $allowedExtension);
                 if ($validationCallback && $validationCallback instanceof Opis\Closure\SerializableClosure) {
                     $validationCallback->__invoke($fileName, $fileData);
                 }
@@ -92,7 +70,7 @@ class CAjax_Engine_FileUpload extends CAjax_Engine {
 
                 $filteredData = substr($fileData, strpos($fileData, ',') + 1);
                 $unencodedData = base64_decode($filteredData);
-                $fileId = date('Ymd') . cutils::randmd5() . $extension;
+                $fileId = $this->generateFileId($extension);
                 $fullfilename = CTemporary::getPath(static::FOLDER, $fileId);
                 $disk = CTemporary::disk();
                 $disk->put($fullfilename, $unencodedData);
@@ -101,10 +79,9 @@ class CAjax_Engine_FileUpload extends CAjax_Engine {
                     $infoData['fileId'] = $fileId;
                     $infoData['temporaryPath'] = $fullfilename;
                     $infoData['temporaryDisk'] = $diskName;
-                    $infoData['url'] = CTemporary::getUrl(static::FOLDER, $fileId);
-                    $fullfilenameinf = CTemporary::put(static::FOLDER_INFO, json_encode($infoData), $fileId);
+                    $infoData['url'] = CTemporary::getPublicUrl(static::FOLDER, $fileId);
+                    $fullfilenameinf = CTemporary::publicPut(static::FOLDER_INFO, json_encode($infoData), $fileId);
                 }
-                $return[] = $fileId;
             }
         }
         $return = [
@@ -114,5 +91,9 @@ class CAjax_Engine_FileUpload extends CAjax_Engine {
         ];
 
         return c::response()->json($return);
+    }
+
+    public function generateFileId($extension) {
+        return date('Ymd') . cutils::randmd5() . 'f' . $extension;
     }
 }

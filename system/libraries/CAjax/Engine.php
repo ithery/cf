@@ -2,8 +2,6 @@
 
 defined('SYSPATH') or die('No direct access allowed.');
 
-use Opis\Closure\SerializableClosure;
-
 abstract class CAjax_Engine implements CAjax_EngineInterface {
     /**
      * @var CAjax_Method
@@ -90,13 +88,6 @@ abstract class CAjax_Engine implements CAjax_EngineInterface {
     }
 
     public function invokeCallback($callback, array $args = []) {
-        if ($callback instanceof SerializableClosure) {
-            return $callback->__invoke(...$args);
-        }
-        if ($callback instanceof CFunction_SerializableClosure) {
-            return $callback->__invoke(...$args);
-        }
-
-        return call_user_func_array($callback, $args);
+        return c::call($callback, $args);
     }
 }

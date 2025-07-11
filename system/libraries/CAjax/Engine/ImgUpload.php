@@ -1,6 +1,8 @@
 <?php
 
 class CAjax_Engine_ImgUpload extends CAjax_Engine {
+    use CAjax_Trait_UploadTrait;
+
     const FOLDER = 'imgupload';
 
     const FOLDER_INFO = 'imguploadinfo';
@@ -20,25 +22,13 @@ class CAjax_Engine_ImgUpload extends CAjax_Engine {
                 $fileName = $_FILES[$inputName]['name'][$i];
                 //$fileSize = $_FILES[$inputName]['size'][$i];
                 $ext = pathinfo($_FILES[$inputName]['name'][$i], PATHINFO_EXTENSION);
-                if (in_array(strtolower($ext), ['php', 'sh', 'htm', 'pht'])) {
-                    die('Not Allowed X_X');
-                }
-
-                if (cstr::startsWith($ext, ['php', 'sh', 'htm', 'pht'])) {
-                    die('Not Allowed X_X');
-                }
-
-                if ($allowedExtension) {
-                    if (!in_array(strtolower($ext), $allowedExtension)) {
-                        die('Not Allowed X_X');
-                    }
-                }
+                $this->checkExtension($ext, $allowedExtension);
                 if ($validationCallback && $validationCallback instanceof Opis\Closure\SerializableClosure) {
                     $validationCallback->__invoke($_FILES[$inputName]['name'][$i], $_FILES[$inputName]['tmp_name'][$i]);
                 }
 
                 $extension = '.' . $ext;
-                $fileId = date('Ymd') . cutils::randmd5() . $extension;
+                $fileId = $this->generateFileId($extension);
 
                 $disk = CTemporary::publicDisk();
                 $fullfilename = CTemporary::getPath(static::FOLDER, $fileId);
@@ -73,18 +63,7 @@ class CAjax_Engine_ImgUpload extends CAjax_Engine {
                 $fileName = carr::get($filenameArray, $k);
                 $ext = pathinfo($fileName, PATHINFO_EXTENSION);
 
-                if (in_array(strtolower($ext), ['php', 'sh', 'htm', 'pht'])) {
-                    die('Not Allowed X_X');
-                }
-                if (cstr::startsWith($ext, ['php', 'sh', 'htm', 'pht'])) {
-                    die('Not Allowed X_X');
-                }
-
-                if ($allowedExtension) {
-                    if (!in_array(strtolower($ext), $allowedExtension)) {
-                        die('Not Allowed X_X');
-                    }
-                }
+                $this->checkExtension($ext, $allowedExtension);
                 if ($validationCallback && $validationCallback instanceof Opis\Closure\SerializableClosure) {
                     $validationCallback->__invoke($fileName, $imageData);
                 }
@@ -92,7 +71,7 @@ class CAjax_Engine_ImgUpload extends CAjax_Engine {
                 $extension = '.' . $ext;
                 $filteredData = substr($imageData, strpos($imageData, ',') + 1);
                 $unencodedData = base64_decode($filteredData);
-                $fileId = date('Ymd') . cutils::randmd5() . $extension;
+                $fileId = $this->generateFileId($extension);
 
                 $fullfilename = CTemporary::publicPut(static::FOLDER, $unencodedData, $fileId);
                 if ($withInfo) {
@@ -113,5 +92,9 @@ class CAjax_Engine_ImgUpload extends CAjax_Engine {
         ];
 
         return c::response()->json($return);
+    }
+
+    public function generateFileId($extension) {
+        return date('Ymd') . cutils::randmd5() . 'i' . $extension;
     }
 }
