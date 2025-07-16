@@ -8,7 +8,7 @@ class CTesting_Fake_Base_BusFake implements CQueue_QueueingDispatcherInterface {
     /**
      * The original Bus dispatcher implementation.
      *
-     * @var \CQueue_QueueingDispatcherInterface
+     * @var \CQueue_Dispatcher
      */
     protected $dispatcher;
 
