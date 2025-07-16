@@ -183,6 +183,7 @@ class CApi_OAuth_ClientRepository {
     /**
      * Store a new password grant client.
      *
+     * @param int         $orgId
      * @param int         $userId
      * @param string      $name
      * @param string      $redirect
@@ -191,8 +192,8 @@ class CApi_OAuth_ClientRepository {
      *
      * @return \CApi_OAuth_Model_OAuthClient
      */
-    public function createPasswordGrantClient($userId, $userType, $name, $redirect, $provider = null) {
-        return $this->create($userId, $userType, $name, $redirect, $provider, false, true);
+    public function createPasswordGrantClient($orgId, $userId, $userType, $name, $redirect, $provider = null) {
+        return $this->create($orgId, $userId, $userType, $name, $redirect, $provider, false, true);
     }
 
     /**

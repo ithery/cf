@@ -61,13 +61,17 @@ defined('SYSPATH') or die('No direct access allowed.');
                     var xhr = new XMLHttpRequest();
                     xhr.onreadystatechange = function () {
                         if (this.readyState == 4 && this.status == 200) {
-                            var dataFile = JSON.parse(this.responseText);
-                            $('#<?php echo $id; ?>').val(dataFile.fileId);
-                            $('#container-<?php echo $id; ?> .fileupload-preview span').html(dataFile.fileName);
-                            $('#container-<?php echo $id; ?> .fileupload-preview').removeClass('loading');
-                            $('#container-<?php echo $id; ?> .fileupload-preview').removeClass('spinner');
-                            $('#<?php echo $id; ?>').trigger('change');
+                            var response = JSON.parse(this.responseText);
+                            cresenity.handleJsonResponse(response, function (dataFile) {
+                                $('#<?php echo $id; ?>').val(dataFile.fileId);
+                                $('#container-<?php echo $id; ?> .fileupload-preview span').html(dataFile.fileName);
+                                $('#container-<?php echo $id; ?> .fileupload-preview').removeClass('loading');
+                                $('#container-<?php echo $id; ?> .fileupload-preview').removeClass('spinner');
+                                $('#<?php echo $id; ?>').trigger('change');
+
+                            });
                         } else if (this.readyState == 4 && this.status != 200) {
+                            cresenity.message('error', 'File Upload Failed');
                         }
                     };
                     xhr.open("post", '<?php echo $ajaxUrl; ?>');

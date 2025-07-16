@@ -337,14 +337,18 @@
                 var xhr = new XMLHttpRequest();
                 xhr.onreadystatechange = function () {
                     if (this.readyState == 4 && this.status == 200) {
-                        var dataFile = JSON.parse(this.responseText);
-                        div.removeClass("loading");
-                        div.append("<input type=\"hidden\" name=\"<?php echo $name; ?>[]\" value=" + dataFile.fileId + ">");
-                        if(file.type.match("image.*")){
-                            img.attr('src', data.url);
-                        }
-                        index++;
-                        fileChanged();
+                        var response = JSON.parse(this.responseText);
+
+                        cresenity.handleJsonResponse(response, function (dataFile) {
+                            div.removeClass("loading");
+                            div.append("<input type=\"hidden\" name=\"<?php echo $name; ?>[]\" value=" + dataFile.fileId + ">");
+                            if(file.type.match("image.*")){
+                                img.attr('src', data.url);
+                            }
+                            index++;
+                            fileChanged();
+                        });
+
                     } else if (this.readyState == 4 && this.status != 200) {
                         //div.remove();
                     }
