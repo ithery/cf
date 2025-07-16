@@ -2,6 +2,7 @@
 use GuzzleHttp\Psr7\StreamWrapper;
 
 class CHTTP_Client_Response implements ArrayAccess {
+    use CHTTP_Client_Trait_DeterminesStatusCodeTrait;
     use CTrait_Macroable {
         __call as macroCall;
     }
@@ -180,39 +181,12 @@ class CHTTP_Client_Response implements ArrayAccess {
     }
 
     /**
-     * Determine if the response code was "OK".
-     *
-     * @return bool
-     */
-    public function ok() {
-        return $this->status() === 200;
-    }
-
-    /**
      * Determine if the response was a redirect.
      *
      * @return bool
      */
     public function redirect() {
         return $this->status() >= 300 && $this->status() < 400;
-    }
-
-    /**
-     * Determine if the response was a 401 "Unauthorized" response.
-     *
-     * @return bool
-     */
-    public function unauthorized() {
-        return $this->status() === 401;
-    }
-
-    /**
-     * Determine if the response was a 403 "Forbidden" response.
-     *
-     * @return bool
-     */
-    public function forbidden() {
-        return $this->status() === 403;
     }
 
     /**
@@ -302,7 +276,19 @@ class CHTTP_Client_Response implements ArrayAccess {
      */
     public function toException() {
         if ($this->failed()) {
-            return new CHTTP_Client_Exception_RequestException($this);
+            $originalTruncateAt = CHTTP_Client_Exception_RequestException::$truncateAt;
+
+            try {
+                if ($this->truncateExceptionsAt !== null) {
+                    $this->truncateExceptionsAt === false
+                        ? CHTTP_Client_Exception_RequestException::dontTruncate()
+                        : CHTTP_Client_Exception_RequestException::truncateAt($this->truncateExceptionsAt);
+                }
+
+                return new CHTTP_Client_Exception_RequestException($this);
+            } finally {
+                CHTTP_Client_Exception_RequestException::$truncateAt = $originalTruncateAt;
+            }
         }
     }
 
@@ -339,7 +325,7 @@ class CHTTP_Client_Response implements ArrayAccess {
      * @return $this
      */
     public function throwIf($condition) {
-        return $condition ? $this->throw() : $this;
+        return c::value($condition, $this) ? $this->throw(func_get_args()[1] ?? null) : $this;
     }
 
     /**
@@ -347,7 +333,7 @@ class CHTTP_Client_Response implements ArrayAccess {
      *
      * @param callable|int $statusCode
      *
-     * @throws \Illuminate\Http\Client\RequestException
+     * @throws \CHTTP_Client_Exception_RequestException
      *
      * @return $this
      */
@@ -364,7 +350,7 @@ class CHTTP_Client_Response implements ArrayAccess {
      *
      * @param callable|int $statusCode
      *
-     * @throws \Illuminate\Http\Client\RequestException
+     * @throws \CHTTP_Client_Exception_RequestException
      *
      * @return $this
      */
@@ -379,7 +365,7 @@ class CHTTP_Client_Response implements ArrayAccess {
     /**
      * Throw an exception if the response status code is a 4xx level code.
      *
-     * @throws \Illuminate\Http\Client\RequestException
+     * @throws \CHTTP_Client_Exception_RequestException
      *
      * @return $this
      */
@@ -390,7 +376,7 @@ class CHTTP_Client_Response implements ArrayAccess {
     /**
      * Throw an exception if the response status code is a 5xx level code.
      *
-     * @throws \Illuminate\Http\Client\RequestException
+     * @throws \CHTTP_Client_Exception_RequestException
      *
      * @return $this
      */
