@@ -35,6 +35,13 @@ class CHTTP_Client_Response implements ArrayAccess {
     protected $decoded;
 
     /**
+     * The length at which request exceptions will be truncated.
+     *
+     * @var null|int<1, max>|false
+     */
+    protected $truncateExceptionsAt = null;
+
+    /**
      * Create a new response instance.
      *
      * @param \Psr\Http\Message\MessageInterface $response
@@ -389,6 +396,30 @@ class CHTTP_Client_Response implements ArrayAccess {
      */
     public function throwIfServerError() {
         return $this->serverError() ? $this->throw() : $this;
+    }
+
+    /**
+     * Indicate that request exceptions should be truncated to the given length.
+     *
+     * @param int<1, max> $length
+     *
+     * @return $this
+     */
+    public function truncateExceptionsAt(int $length) {
+        $this->truncateExceptionsAt = $length;
+
+        return $this;
+    }
+
+    /**
+     * Indicate that request exceptions should not be truncated.
+     *
+     * @return $this
+     */
+    public function dontTruncateExceptions() {
+        $this->truncateExceptionsAt = false;
+
+        return $this;
     }
 
     /**
