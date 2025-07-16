@@ -1,8 +1,11 @@
 <?php
 
+use GuzzleHttp\Middleware;
 use GuzzleHttp\TransferStats;
+use GuzzleHttp\Promise\Create;
 use GuzzleHttp\Promise\PromiseInterface;
 use PHPUnit\Framework\Assert as PHPUnit;
+use GuzzleHttp\Exception\ConnectException;
 use GuzzleHttp\Psr7\Response as Psr7Response;
 
 /**
@@ -59,6 +62,20 @@ final class CHTTP_Client {
     protected $dispatcher;
 
     /**
+     * The middleware to apply to every request.
+     *
+     * @var array
+     */
+    protected $globalMiddleware = [];
+
+    /**
+     * The options to apply to every request.
+     *
+     * @var \Closure|array
+     */
+    protected $globalOptions = [];
+
+    /**
      * The stub callables that will handle requests.
      *
      * @var \CCollection
@@ -86,6 +103,13 @@ final class CHTTP_Client {
      */
     protected $responseSequences = [];
 
+    /**
+     * Indicates that an exception should be thrown if any request is not faked.
+     *
+     * @var bool
+     */
+    protected $preventStrayRequests = false;
+
     private static $instance;
 
     public static function instance() {
@@ -108,6 +132,58 @@ final class CHTTP_Client {
     }
 
     /**
+     * Add middleware to apply to every request.
+     *
+     * @param callable $middleware
+     *
+     * @return $this
+     */
+    public function globalMiddleware($middleware) {
+        $this->globalMiddleware[] = $middleware;
+
+        return $this;
+    }
+
+    /**
+     * Add request middleware to apply to every request.
+     *
+     * @param callable $middleware
+     *
+     * @return $this
+     */
+    public function globalRequestMiddleware($middleware) {
+        $this->globalMiddleware[] = Middleware::mapRequest($middleware);
+
+        return $this;
+    }
+
+    /**
+     * Add response middleware to apply to every request.
+     *
+     * @param callable $middleware
+     *
+     * @return $this
+     */
+    public function globalResponseMiddleware($middleware) {
+        $this->globalMiddleware[] = Middleware::mapResponse($middleware);
+
+        return $this;
+    }
+
+    /**
+     * Set the options to apply to every request.
+     *
+     * @param \Closure|array $options
+     *
+     * @return $this
+     */
+    public function globalOptions($options) {
+        $this->globalOptions = $options;
+
+        return $this;
+    }
+
+    /**
      * Create a new response instance for use during stubbing.
      *
      * @param array|string $body
@@ -117,15 +193,57 @@ final class CHTTP_Client {
      * @return \GuzzleHttp\Promise\PromiseInterface
      */
     public static function response($body = null, $status = 200, $headers = []) {
+        return Create::promiseFor(
+            static::psr7Response($body, $status, $headers)
+        );
+    }
+
+    /**
+     * Create a new PSR-7 response instance for use during stubbing.
+     *
+     * @param null|array|string    $body
+     * @param int                  $status
+     * @param array<string, mixed> $headers
+     *
+     * @return \GuzzleHttp\Psr7\Response
+     */
+    public static function psr7Response($body = null, $status = 200, $headers = []) {
         if (is_array($body)) {
             $body = json_encode($body);
 
             $headers['Content-Type'] = 'application/json';
         }
 
-        $response = new Psr7Response($status, $headers, $body);
+        return new Psr7Response($status, $headers, $body);
+    }
 
-        return \GuzzleHttp\Promise\Create::promiseFor($response);
+    /**
+     * Create a new RequestException instance for use during stubbing.
+     *
+     * @param null|array|string    $body
+     * @param int                  $status
+     * @param array<string, mixed> $headers
+     *
+     * @return \CHTTP_Client_Exception_RequestException
+     */
+    public static function failedRequest($body = null, $status = 200, $headers = []) {
+        return new CHTTP_Client_Exception_RequestException(new CHTTP_Client_Response(static::psr7Response($body, $status, $headers)));
+    }
+
+    /**
+     * Create a new connection exception for use during stubbing.
+     *
+     * @param null|string $message
+     *
+     * @return \Closure(\Illuminate\Http\Client\Request): \GuzzleHttp\Promise\PromiseInterface
+     */
+    public static function failedConnection($message = null) {
+        return function ($request) use ($message) {
+            return Create::rejectionFor(new ConnectException(
+                $message ?? "cURL error 6: Could not resolve host: {$request->toPsrRequest()->getUri()->getHost()} (see https://curl.haxx.se/libcurl/c/libcurl-errors.html) for {$request->toPsrRequest()->getUri()}.",
+                $request->toPsrRequest(),
+            ));
+        };
     }
 
     /**
@@ -167,9 +285,10 @@ final class CHTTP_Client {
 
         $this->stubCallbacks = $this->stubCallbacks->merge(c::collect([
             function ($request, $options) use ($callback) {
-                $response = $callback instanceof Closure
-                                ? $callback($request, $options)
-                                : $callback;
+                $response = $callback;
+                while ($response instanceof Closure) {
+                    $response = $response($request, $options);
+                }
 
                 if ($response instanceof PromiseInterface) {
                     $options['on_stats'](new TransferStats(
@@ -211,11 +330,51 @@ final class CHTTP_Client {
             if (!cstr::is(cstr::start($url, '*'), $request->url())) {
                 return;
             }
+            if (is_int($callback) && $callback >= 100 && $callback < 600) {
+                return static::response(null, $callback);
+            }
 
-            return $callback instanceof Closure || $callback instanceof CHTTP_Client_ResponseSequence
-                ? $callback($request, $options)
-                : $callback;
+            if (is_int($callback) || is_string($callback)) {
+                return static::response($callback);
+            }
+
+            if ($callback instanceof Closure || $callback instanceof CHTTP_Client_ResponseSequence) {
+                return $callback($request, $options);
+            }
+
+            return $callback;
         });
+    }
+
+    /**
+     * Indicate that an exception should be thrown if any request is not faked.
+     *
+     * @param bool $prevent
+     *
+     * @return $this
+     */
+    public function preventStrayRequests($prevent = true) {
+        $this->preventStrayRequests = $prevent;
+
+        return $this;
+    }
+
+    /**
+     * Determine if stray requests are being prevented.
+     *
+     * @return bool
+     */
+    public function preventingStrayRequests() {
+        return $this->preventStrayRequests;
+    }
+
+    /**
+     * Indicate that an exception should not be thrown if any request is not faked.
+     *
+     * @return $this
+     */
+    public function allowStrayRequests() {
+        return $this->preventStrayRequests(false);
     }
 
     /**
@@ -341,13 +500,24 @@ final class CHTTP_Client {
         if (empty($this->recorded)) {
             return c::collect();
         }
+        $collect = new CCollection($this->recorded);
+        if ($callback) {
+            return $collect->filter(function ($pair) use ($callback) {
+                return $callback($pair[0], $pair[1]);
+            });
+        }
 
-        $callback = $callback ?: function () {
-            return true;
-        };
+        return $collect;
+    }
 
-        return c::collect($this->recorded)->filter(function ($pair) use ($callback) {
-            return $callback($pair[0], $pair[1]);
+    /**
+     * Create a new pending request instance for this factory.
+     *
+     * @return \CHTTP_Client_PendingRequest
+     */
+    public function createPendingRequest() {
+        return c::tap($this->newPendingRequest(), function ($request) {
+            $request->stub($this->stubCallbacks)->preventStrayRequests($this->preventStrayRequests);
         });
     }
 
@@ -357,7 +527,7 @@ final class CHTTP_Client {
      * @return \CHTTP_Client_PendingRequest
      */
     protected function newPendingRequest() {
-        return new CHTTP_Client_PendingRequest($this);
+        return (new CHTTP_Client_PendingRequest($this, $this->globalMiddleware))->withOptions(c::value($this->globalOptions));
     }
 
     /**
@@ -367,6 +537,15 @@ final class CHTTP_Client {
      */
     public function getDispatcher() {
         return $this->dispatcher;
+    }
+
+    /**
+     * Get the array of global middleware.
+     *
+     * @return array
+     */
+    public function getGlobalMiddleware() {
+        return $this->globalMiddleware;
     }
 
     /**
