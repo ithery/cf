@@ -1,20 +1,19 @@
 <?php
 
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
-
 class CBackup_HouseKeeping {
-
-    /** @var \Illuminate\Support\Collection */
+    /**
+     * @var CCollection
+     */
     protected $backupDestinations;
 
-    /** @var \Spatie\Backup\Tasks\Cleanup\CleanupStrategy */
+    /**
+     * @var CBackup_HouseKeeping_AbstractStrategy
+     */
     protected $strategy;
 
-    /** @var bool */
+    /**
+     * @var bool
+     */
     protected $sendNotifications = true;
 
     public function __construct(CCollection $backupDestinations, CBackup_HouseKeeping_AbstractStrategy $strategy, $disableNotifications = false) {
@@ -26,7 +25,6 @@ class CBackup_HouseKeeping {
     }
 
     public function run() {
-        
         $this->backupDestinations->each(function (CBackup_BackupDestination $backupDestination) {
             try {
                 if (!$backupDestination->isReachable()) {
@@ -34,15 +32,14 @@ class CBackup_HouseKeeping {
                 }
 
                 CBackup::output()->info("Cleaning backups of {$backupDestination->backupName()} on disk {$backupDestination->diskName()}...");
-                
+
                 $this->strategy->deleteOldBackups($backupDestination->backups());
                 $this->sendNotification(new CBackup_Event_HouseKeepingWasSuccessful($backupDestination));
 
-                $usedStorage =  CBackup_Helper::formatHumanReadableSize($backupDestination->fresh()->usedStorage());
+                $usedStorage = CBackup_Helper::formatHumanReadableSize($backupDestination->fresh()->usedStorage());
                 CBackup::output()->info("Used storage after cleanup: {$usedStorage}.");
             } catch (Exception $exception) {
                 CBackup::output()->error("HouseKeeping failed because {$exception->getMessage()}." . PHP_EOL . $exception->getTraceAsString());
-            
 
                 $this->sendNotification(new CBackup_Event_HouseKeepingHasFailed($exception));
 
@@ -56,5 +53,4 @@ class CBackup_HouseKeeping {
             CEvent::dispatch($notification);
         }
     }
-
 }

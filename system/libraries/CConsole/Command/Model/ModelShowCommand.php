@@ -124,10 +124,10 @@ class CConsole_Command_Model_ModelShowCommand extends CConsole_Command_AppComman
     /**
      * Get the virtual (non-column) attributes for the given model.
      *
-     * @param \Illuminate\Database\Eloquent\Model $model
-     * @param \Doctrine\DBAL\Schema\Column[]      $columns
+     * @param \CModel                        $model
+     * @param \Doctrine\DBAL\Schema\Column[] $columns
      *
-     * @return \Illuminate\Support\Collection
+     * @return CCollection
      */
     protected function getVirtualAttributes($model, $columns) {
         $class = new ReflectionClass($model);
@@ -168,9 +168,9 @@ class CConsole_Command_Model_ModelShowCommand extends CConsole_Command_AppComman
     /**
      * Get the relations from the given model.
      *
-     * @param \Illuminate\Database\Eloquent\Model $model
+     * @param \CModel $model
      *
-     * @return \Illuminate\Support\Collection
+     * @return CCollection
      */
     protected function getRelations($model) {
         return c::collect(get_class_methods($model))
@@ -273,13 +273,13 @@ class CConsole_Command_Model_ModelShowCommand extends CConsole_Command_AppComman
     /**
      * Render the model information as JSON.
      *
-     * @param string                         $class
-     * @param string                         $database
-     * @param string                         $table
-     * @param string                         $policy
-     * @param \Illuminate\Support\Collection $attributes
-     * @param \Illuminate\Support\Collection $relations
-     * @param \Illuminate\Support\Collection $observers
+     * @param string      $class
+     * @param string      $database
+     * @param string      $table
+     * @param string      $policy
+     * @param CCollection $attributes
+     * @param CCollection $relations
+     * @param CCollection $observers
      *
      * @return void
      */
@@ -300,13 +300,13 @@ class CConsole_Command_Model_ModelShowCommand extends CConsole_Command_AppComman
     /**
      * Render the model information for the CLI.
      *
-     * @param string                         $class
-     * @param string                         $database
-     * @param string                         $table
-     * @param string                         $policy
-     * @param \Illuminate\Support\Collection $attributes
-     * @param \Illuminate\Support\Collection $relations
-     * @param \Illuminate\Support\Collection $observers
+     * @param string      $class
+     * @param string      $database
+     * @param string      $table
+     * @param string      $policy
+     * @param CCollection $attributes
+     * @param CCollection $relations
+     * @param CCollection $observers
      *
      * @return void
      */
@@ -383,8 +383,8 @@ class CConsole_Command_Model_ModelShowCommand extends CConsole_Command_AppComman
     /**
      * Get the cast type for the given column.
      *
-     * @param string                              $column
-     * @param \Illuminate\Database\Eloquent\Model $model
+     * @param string  $column
+     * @param \CModel $model
      *
      * @return null|string
      */
@@ -465,8 +465,8 @@ class CConsole_Command_Model_ModelShowCommand extends CConsole_Command_AppComman
     /**
      * Determine if the given attribute is hidden.
      *
-     * @param string                              $attribute
-     * @param \Illuminate\Database\Eloquent\Model $model
+     * @param string  $attribute
+     * @param \CModel $model
      *
      * @return bool
      */

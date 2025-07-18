@@ -1,9 +1,5 @@
 <?php
 
-use Illuminate\Support\Arr;
-use Illuminate\Support\Number;
-use Symfony\Component\Console\Attribute\AsCommand;
-
 class CConsole_Command_Database_ShowCommand extends CConsole_Command_Database_AbstractInspectionCommand {
     /**
      * The name and signature of the console command.
