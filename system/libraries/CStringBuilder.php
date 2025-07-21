@@ -75,7 +75,7 @@ class CStringBuilder {
         return $this;
     }
 
-    public function appendln($str) {
+    public function appendln(string $str) {
         $this->text .= static::indent($this->indent);
 
         return $this->append($str);

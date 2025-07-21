@@ -251,7 +251,7 @@ class CElement_Component_Nestable extends CElement_Component {
                 if ($this->checkbox) {
                     $html->appendln('<input id="cb_' . $d[$this->idKey] . '" name="cb[' . $d[$this->idKey] . ']" data-parent-id="' . $d['parent_id'] . '" type="checkbox" value="' . $d[$this->idKey] . '"/>')->incIndent();
                 }
-                $val = carr::get($d, $this->valueKey);
+                $val = carr::get($d, $this->valueKey, null);
                 $newV = $val;
                 if ($this->displayCallback !== false && is_callable($this->displayCallback)) {
                     $newV = CFunction::factory($this->displayCallback)
