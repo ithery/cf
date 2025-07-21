@@ -30,7 +30,7 @@ class CElement_Component_Nestable extends CElement_Component {
 
     protected $checkbox;
 
-    protected $disable_dnd;
+    protected $disableDnd;
 
     protected $js_cell;
 
@@ -51,6 +51,7 @@ class CElement_Component_Nestable extends CElement_Component {
         $this->checkbox = false;
         $this->requires = [];
         $this->js_cell = '';
+        $this->disableDnd = false;
     }
 
     /**
@@ -149,19 +150,19 @@ class CElement_Component_Nestable extends CElement_Component {
     }
 
     public function setDisableDnd($disableDnd) {
-        $this->disable_dnd = $disableDnd;
+        $this->disableDnd = $disableDnd;
 
         return $this;
     }
 
     public function disableDnd() {
-        $this->disable_dnd = true;
+        $this->disableDnd = true;
 
         return $this;
     }
 
     public function enableDnd() {
-        $this->disable_dnd = false;
+        $this->disableDnd = false;
 
         return $this;
     }
@@ -218,7 +219,8 @@ class CElement_Component_Nestable extends CElement_Component {
         }
         $html = new CStringBuilder();
         $html->setIndent($indent);
-        $styles = $this->disable_dnd ? 'pointer-events: none;' : '';
+        $styles = '';
+        // $styles = $this->disableDnd ? 'pointer-events: none;' : '';
         $html->appendln('<div id="' . $this->id . '" cres-element="component:Nestable" class="dd nestable cres-nestable cres:element:component:Nestable" style="' . $styles . '">')->incIndent();
         if (count($this->data) > 0) {
             $depthBefore = -1;
@@ -239,7 +241,11 @@ class CElement_Component_Nestable extends CElement_Component {
                     $in++;
                     $html->appendln('<ol class="dd-list">')->incIndent();
                 }
-                $html->appendln('<li class="dd-item" data-id="' . $d[$this->idKey] . '">')->incIndent();
+                $itemClass = '';
+                if ($this->disableDnd) {
+                    $itemClass = ' dd-nodrag';
+                }
+                $html->appendln('<li class="dd-item ' . $itemClass . '" data-id="' . $d[$this->idKey] . '">')->incIndent();
 
                 $html->appendln('<div class="dd-handle">')->incIndent();
                 if ($this->checkbox) {
@@ -284,21 +290,12 @@ class CElement_Component_Nestable extends CElement_Component {
         $js = new CStringBuilder();
         $js->setIndent($indent);
         if ($this->applyjs) {
-            if ($this->disable_dnd) {
-                $js->appendln("
-                    jQuery('#" . $this->id . "').nestable({
-                        /* config options */
-                        maxDepth:0
-                    });
-                ")->incIndent();
-            } else {
-                $js->appendln("
-                    jQuery('#" . $this->id . "').nestable({
-                        /* config options */
-                        maxDepth:100
-                    });
-                ")->incIndent();
-            }
+            $js->appendln("
+                jQuery('#" . $this->id . "').nestable({
+                    maxDepth:100
+                });
+            ")->incIndent();
+
             if (strlen($this->input) > 0) {
                 $js->appendln("
                     jQuery('#" . $this->id . "').on('change', function() {
