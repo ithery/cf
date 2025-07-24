@@ -79,6 +79,15 @@ class CElement_Component_Widget extends CElement_Component {
         return $this->header()->addAction($id);
     }
 
+    /**
+     * @param string $id
+     *
+     * @return CElement_List_ActionList
+     */
+    public function addHeaderActionList($id = '') {
+        return $this->header()->addActionList($id);
+    }
+
     public function setHeaderActionStyle($style) {
         $this->header()->actions()->setStyle($style);
 

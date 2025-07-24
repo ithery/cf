@@ -80,6 +80,7 @@ class CModel_Spatial_Geometry_MultiPolygon extends CModel_Spatial_Geometry_Geome
         return $polygons;
     }
 
+    #[\ReturnTypeWillChange]
     public function offsetSet($offset, $value) {
         $this->validateItemType($value);
 
