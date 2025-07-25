@@ -321,7 +321,6 @@ class CElement_FormInput_SelectSearch extends CElement_FormInput {
         return $this;
     }
 
-
     /**
      * @param CCollection $collection
      *
@@ -550,6 +549,57 @@ class CElement_FormInput_SelectSearch extends CElement_FormInput {
         return $html->text();
     }
 
+    protected function buildSelectedData() {
+        $selectedData = [];
+
+        $selectedRows = $this->getSelectedRow();
+        if ($selectedRows) {
+            foreach ($selectedRows as $index => $selectedRow) {
+                if ($selectedRow != null) {
+                    $row = $selectedRow;
+                    $model = null;
+                    if ($row instanceof CModel) {
+                        $model = $row;
+                        $row = $this->modelToSelect2Array($model);
+                    }
+                    if (is_object($row)) {
+                        $row = (array) $row;
+                    }
+                    if (isset($this->valueCallback) && is_callable($this->valueCallback)) {
+                        foreach ($row as $k => $v) {
+                            $row[$k] = ($this->valueCallback)($row, $k, $v);
+                        }
+                    }
+                    $formatResult = $this->formatResult;
+                    if ($formatResult instanceof CFunction_SerializableClosure) {
+                        $formatResult = $formatResult->__invoke($model ?: $row);
+                        if ($formatResult instanceof CRenderable) {
+                            $data['cappFormatResult'] = $formatResult->html();
+                            $data['cappFormatResultIsHtml'] = true;
+                        } else {
+                            $data['cappFormatResult'] = $formatResult;
+                            $data['cappFormatResultIsHtml'] = c::isHtml($formatResult);
+                        }
+                    }
+                    $formatSelection = $this->formatSelection;
+                    if ($formatSelection instanceof CFunction_SerializableClosure) {
+                        $formatSelection = $formatSelection->__invoke($model ?: $row);
+                        if ($formatSelection instanceof CRenderable) {
+                            $row['cappFormatSelection'] = $formatSelection->html();
+                            $row['cappFormatSelectionIsHtml'] = true;
+                        } else {
+                            $row['cappFormatSelection'] = $formatSelection;
+                            $row['cappFormatSelectionIsHtml'] = c::isHtml($formatSelection);
+                        }
+                    }
+                    $selectedData[] = $row;
+                }
+            }
+        }
+
+        return $selectedData;
+    }
+
     public function js($indent = 0) {
         if ($this->applyJs == 'select2v2.3') {
             return $this->jsSelect2v23($indent);
@@ -600,53 +650,7 @@ class CElement_FormInput_SelectSearch extends CElement_FormInput {
         if ($this->value !== null) {
             $value = $this->value;
         }
-
-        $selectedRows = $this->getSelectedRow();
-
-        $selectedData = [];
-        if ($selectedRows) {
-            foreach ($selectedRows as $index => $selectedRow) {
-                if ($selectedRow != null) {
-                    $row = $selectedRow;
-                    $model = null;
-                    if ($row instanceof CModel) {
-                        $model = $row;
-                        $row = $this->modelToSelect2Array($model);
-                    }
-                    if (is_object($row)) {
-                        $row = (array) $row;
-                    }
-                    if (isset($this->valueCallback) && is_callable($this->valueCallback)) {
-                        foreach ($row as $k => $v) {
-                            $row[$k] = ($this->valueCallback)($row, $k, $v);
-                        }
-                    }
-                    $formatResult = $this->formatResult;
-                    if ($formatResult instanceof CFunction_SerializableClosure) {
-                        $formatResult = $formatResult->__invoke($model ?: $row);
-                        if ($formatResult instanceof CRenderable) {
-                            $data['cappFormatResult'] = $formatResult->html();
-                            $data['cappFormatResultIsHtml'] = true;
-                        } else {
-                            $data['cappFormatResult'] = $formatResult;
-                            $data['cappFormatResultIsHtml'] = c::isHtml($formatResult);
-                        }
-                    }
-                    $formatSelection = $this->formatSelection;
-                    if ($formatSelection instanceof CFunction_SerializableClosure) {
-                        $formatSelection = $formatSelection->__invoke($model ?: $row);
-                        if ($formatSelection instanceof CRenderable) {
-                            $row['cappFormatSelection'] = $formatSelection->html();
-                            $row['cappFormatSelectionIsHtml'] = true;
-                        } else {
-                            $row['cappFormatSelection'] = $formatSelection;
-                            $row['cappFormatSelectionIsHtml'] = c::isHtml($formatSelection);
-                        }
-                    }
-                    $selectedData[] = $row;
-                }
-            }
-        }
+        $selectedData = $this->buildSelectedData();
 
         if ($selectedData && is_array($selectedData) && count($selectedData) > 0) {
             if (!$this->multiple) {
@@ -859,5 +863,31 @@ class CElement_FormInput_SelectSearch extends CElement_FormInput {
         }
 
         return $js->text();
+    }
+
+    public function buildJavascriptOptions() {
+        $options = [];
+        $ajaxUrl = $this->createAjaxUrl();
+        $strSelection = $this->formatSelection;
+        $strResult = $this->formatResult;
+        $options['ajaxUrl'] = $ajaxUrl;
+        $options['language'] = $this->language;
+        $options['placeholder'] = $this->placeholder;
+        $options['multiple'] = $this->multiple;
+        $options['autoSelect'] = $this->autoSelect;
+        $options['minInputLength'] = $this->minInputLength;
+        $options['delay'] = $this->delay;
+        $options['requires'] = $this->requires;
+        $options['valueCallback'] = $this->valueCallback;
+        $options['applyJs'] = $this->applyJs;
+        $options['perPage'] = $this->perPage;
+        $options['value'] = $this->value;
+        $options['allowClear'] = $this->allowClear;
+        $options['onModal'] = $this->onModal;
+        $options['strSelection'] = $strSelection;
+        $options['strResult'] = $strResult;
+        $options['prependData'] = $this->prependData;
+
+        return $options;
     }
 }
