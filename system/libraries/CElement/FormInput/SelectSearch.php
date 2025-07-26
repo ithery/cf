@@ -11,6 +11,7 @@ defined('SYSPATH') or die('No direct access allowed.');
 class CElement_FormInput_SelectSearch extends CElement_FormInput {
     use CTrait_Compat_Element_FormInput_SelectSearch;
     use CElement_FormInput_SelectSearch_Trait_Select2v23Trait;
+    use CElement_FormInput_SelectSearch_Trait_SelectSearchUtilsTrait;
     use CTrait_Element_Property_ApplyJs;
     use CTrait_Element_Property_DependsOn;
     use CTrait_Element_Property_Placeholder;
@@ -446,13 +447,6 @@ class CElement_FormInput_SelectSearch extends CElement_FormInput {
         return null;
     }
 
-    public function modelToSelect2Array(CModel $model) {
-        $itemArray = $model->toArray();
-        $itemArray['id'] = $model->getKey();
-
-        return $itemArray;
-    }
-
     public function html($indent = 0) {
         //call parent to trigger build
 
@@ -570,28 +564,8 @@ class CElement_FormInput_SelectSearch extends CElement_FormInput {
                             $row[$k] = ($this->valueCallback)($row, $k, $v);
                         }
                     }
-                    $formatResult = $this->formatResult;
-                    if ($formatResult instanceof CFunction_SerializableClosure) {
-                        $formatResult = $formatResult->__invoke($model ?: $row);
-                        if ($formatResult instanceof CRenderable) {
-                            $data['cappFormatResult'] = $formatResult->html();
-                            $data['cappFormatResultIsHtml'] = true;
-                        } else {
-                            $data['cappFormatResult'] = $formatResult;
-                            $data['cappFormatResultIsHtml'] = c::isHtml($formatResult);
-                        }
-                    }
-                    $formatSelection = $this->formatSelection;
-                    if ($formatSelection instanceof CFunction_SerializableClosure) {
-                        $formatSelection = $formatSelection->__invoke($model ?: $row);
-                        if ($formatSelection instanceof CRenderable) {
-                            $row['cappFormatSelection'] = $formatSelection->html();
-                            $row['cappFormatSelectionIsHtml'] = true;
-                        } else {
-                            $row['cappFormatSelection'] = $formatSelection;
-                            $row['cappFormatSelectionIsHtml'] = c::isHtml($formatSelection);
-                        }
-                    }
+                    $row = $this->addCAppFormatToData($this->formatResult, $row, $model ?: $row, 'result');
+                    $row = $this->addCAppFormatToData($this->formatSelection, $row, $model ?: $row, 'selection');
                     $selectedData[] = $row;
                 }
             }
@@ -880,13 +854,30 @@ class CElement_FormInput_SelectSearch extends CElement_FormInput {
         $options['requires'] = $this->requires;
         $options['valueCallback'] = $this->valueCallback;
         $options['applyJs'] = $this->applyJs;
-        $options['perPage'] = $this->perPage;
+        $options['perPage'] = (int) $this->perPage;
         $options['value'] = $this->value;
         $options['allowClear'] = $this->allowClear;
         $options['onModal'] = $this->onModal;
         $options['strSelection'] = $strSelection;
         $options['strResult'] = $strResult;
         $options['prependData'] = $this->prependData;
+        $options['readonly'] = $this->readonly;
+
+        $dependsOn = [];
+        foreach ($this->dependsOn as $index => $dependOn) {
+            $dependsOnSelector = $dependOn->getSelector()->getQuerySelector();
+            $targetSelector = '#' . $this->id();
+            $throttle = $dependOn->getThrottle();
+            $dependOn = [];
+            $dependOn['targetSelector'] = $targetSelector;
+            $dependOn['dependsOnSelector'] = $dependsOnSelector;
+            $dependOn['throttle'] = $throttle;
+
+            $dependsOn[] = $dependOn;
+        }
+
+        $options['dependsOn'] = $dependsOn;
+        $options['selectedData'] = $this->buildSelectedData();
 
         return $options;
     }

@@ -3,6 +3,8 @@
 defined('SYSPATH') or die('No direct access allowed.');
 
 abstract class CAjax_Engine_SelectSearch_Processor implements CAjax_Engine_SelectSearch_ProcessorInterface {
+    use CElement_FormInput_SelectSearch_Trait_SelectSearchUtilsTrait;
+
     /**
      * @var CAjax_Engine
      */

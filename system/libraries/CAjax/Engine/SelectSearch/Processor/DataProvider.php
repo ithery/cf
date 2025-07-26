@@ -50,28 +50,10 @@ class CAjax_Engine_SelectSearch_Processor_DataProvider extends CAjax_Engine_Sele
                     $data['id'] = carr::get($data, $this->keyField());
                 }
             }
-            $formatResult = $this->formatResult();
-            if ($formatResult instanceof CFunction_SerializableClosure) {
-                $formatResult = $formatResult->__invoke($model);
-                if ($formatResult instanceof CRenderable) {
-                    $data['cappFormatResult'] = $formatResult->html();
-                    $data['cappFormatResultIsHtml'] = true;
-                } else {
-                    $data['cappFormatResult'] = $formatResult;
-                    $data['cappFormatResultIsHtml'] = c::isHtml($formatResult);
-                }
-            }
-            $formatSelection = $this->formatSelection();
-            if ($formatSelection instanceof CFunction_SerializableClosure) {
-                $formatSelection = $formatSelection->__invoke($model);
-                if ($formatSelection instanceof CRenderable) {
-                    $data['cappFormatSelection'] = $formatSelection->html();
-                    $data['cappFormatSelectionIsHtml'] = true;
-                } else {
-                    $data['cappFormatSelection'] = $formatSelection;
-                    $data['cappFormatSelectionIsHtml'] = c::isHtml($formatSelection);
-                }
-            }
+
+            $data = $this->addCAppFormatToData($this->formatResult(), $data, $model, 'result');
+
+            $data = $this->addCAppFormatToData($this->formatSelection(), $data, $model, 'selection');
 
             return $data;
         });
