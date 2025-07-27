@@ -4,6 +4,8 @@ import AlpineAutoNumeric from '../alpine/autonumeric';
 import AlpineTippy from '../alpine/tippy';
 import AlpineReload from '../alpine/reload';
 import CresAlpineUI from './CresAlpine/ui';
+import AlpineSelect2 from '../alpine/select2';
+import AlpineMessage from '../alpine/message';
 
 const CRESALPINE_RENDER_ATTR_NAME = 'data-cresalpine-render';
 const CRESALPINE_RENDER_BINDING_ATTR_NAME = `:${CRESALPINE_RENDER_ATTR_NAME}`;
@@ -23,6 +25,8 @@ export default class CresAlpine {
         Alpine.plugin(AlpineAutoNumeric);
         Alpine.plugin(AlpineTippy);
         Alpine.plugin(AlpineReload);
+        Alpine.plugin(AlpineSelect2);
+        Alpine.plugin(AlpineMessage);
         Alpine.directive('destroy', (el, { expression }, { evaluateLater, cleanup }) => {
             const clean = evaluateLater(expression);
             cleanup(() => clean());

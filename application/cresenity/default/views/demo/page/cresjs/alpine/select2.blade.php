@@ -17,6 +17,9 @@
     <h3>Select 2 With Option</h3>
     <select name="my-select2-input-2" id="my-select2-input-2"></select>
     <p class="mt-3">Selected value 2: <span x-text="selectedOption2"></span></p>
+    <h3>Select 2 With x-select</h3>
+    <select name="my-select2-input-3" id="my-select2-input-3" x-select2="selectData"></select>
+    <p class="mt-3">Selected value 3: <span x-text="selectedOption3"></span></p>
 </div>
 
 @CAppPushScript
@@ -26,6 +29,7 @@ function select2Data() {
     return {
         selectedOption:null,
         selectedOption2:null,
+        selectedOption3:null,
         selectData: @json($selectData),
         init() {
             $('#my-select2-input').select2().on('change',()=>{
@@ -40,6 +44,7 @@ function select2Data() {
         updateSelection() {
             this.selectedOption = $('#my-select2-input').select2('val');
             this.selectedOption2 = $('#my-select2-input-2').select2('val');
+            this.selectedOption3 = $('#my-select2-input-3').select2('val');
 
         },
         initSelect2(){
