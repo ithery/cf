@@ -46,4 +46,9 @@ return [
         'label' => c::__('Tree Node'),
         'uri' => 'demo/cresjs/alpine/treenode/index',
     ],
+    [
+        'name' => 'cresjs.alpine.message',
+        'label' => c::__('Message'),
+        'uri' => 'demo/cresjs/alpine/message/index',
+    ],
 ];
