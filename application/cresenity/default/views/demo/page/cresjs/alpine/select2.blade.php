@@ -44,9 +44,7 @@ function select2Data() {
         },
         initSelect2(){
             const select2Options = this.buildSelect2Options();
-            console.log('AAAA', select2Options);
             if(select2Options.multiple) {
-                console.log('AAAA');
                 $('#my-select2-input-2').attr('multiple','multiple');
             }
             const selectedData = this.selectData.selectedData;
@@ -119,7 +117,6 @@ function select2Data() {
                 if (typeof item.loading !== 'undefined') {
                     return item.text;
                 }
-                console.log('templateResult',item);
                 if(item.cappFormatResult) {
                     if(item.cappFormatResultIsHtml) {
                         return $('<div>' + item.cappFormatResult +'</div>');
@@ -179,7 +176,6 @@ function select2Data() {
                     }
                 }
                 let htmlResult = strSelection;
-                console.log('templateSelection',htmlResult);
                 if(htmlResult==='undefined') {
                     return item.text;
                 }
