@@ -2,17 +2,21 @@
     @CAppElement(function() {
         $selectSearch = new CElement_FormInput_SelectSearch('my-select2-input');
         $selectSearch->setDataFromModel(\Cresenity\Demo\Model\Country::class);
-        $selectSearch->setKeyField('country_id');
+        $selectSearch->setKeyField('id');
         $selectSearch->setSearchField('name');
         $selectSearch->setFormat('<div>{name}</div><div><span class="badge badge-success">{code}</span></div>');
-        $selectSearch->setAutoSelect();
+        // $selectSearch->setAutoSelect();
+        $selectSearch->setMultiple();
+        $selectSearch->setValue([1,2]);
         return $selectSearch;
     })
 
 
     <p class="mt-3">Selected value: <span x-text="selectedOption"></span></p>
     <hr/>
+    <h3>Select 2 With Option</h3>
     <select name="my-select2-input-2" id="my-select2-input-2"></select>
+    <p class="mt-3">Selected value 2: <span x-text="selectedOption2"></span></p>
 </div>
 
 @CAppPushScript
@@ -21,6 +25,7 @@
 function select2Data() {
     return {
         selectedOption:null,
+        selectedOption2:null,
         selectData: @json($selectData),
         init() {
             $('#my-select2-input').select2().on('change',()=>{
@@ -34,10 +39,23 @@ function select2Data() {
         },
         updateSelection() {
             this.selectedOption = $('#my-select2-input').select2('val');
+            this.selectedOption2 = $('#my-select2-input-2').select2('val');
+
         },
         initSelect2(){
             const select2Options = this.buildSelect2Options();
-            console.log(select2Options);
+            console.log('AAAA', select2Options);
+            if(select2Options.multiple) {
+                console.log('AAAA');
+                $('#my-select2-input-2').attr('multiple','multiple');
+            }
+            const selectedData = this.selectData.selectedData;
+            if(selectedData) {
+                for(const selectedValue of selectedData) {
+
+                }
+            }
+            // $html->appendln('<option data-multiple="' . ($this->multiple ? '1' : '0') . '" value="' . $selectedValue . '" data-content="' . c::e($strSelection) . '" selected="selected" >' . $strSelection . '</option>');
             $('#my-select2-input-2').select2(select2Options);
         },
         buildSelect2Options() {
@@ -46,12 +64,14 @@ function select2Data() {
             options.language = this.selectData.language;
             options.allowClear = this.selectData.allowClear ? 'true' : 'false';
             options.placeholder = this.selectData.placeholder;
+            options.multiple = this.selectData.multiple;
             let ajaxOptions = {};
             ajaxOptions.url = this.selectData.ajaxUrl;
             ajaxOptions.dataType = 'jsonp';
             ajaxOptions.quietMillis = this.selectData.delay;
             ajaxOptions.delay = this.selectData.delay;
             ajaxOptions.multiple = this.selectData.multiple;
+
             ajaxOptions.data =  (params) => {
                 let result = {
                     q: params.term, // search term
@@ -62,7 +82,6 @@ function select2Data() {
             },
 
             ajaxOptions.processResults = (data, params) => {
-                console.log('select2.processResults', data, params);
                 params.page = params.page || 1;
                 var more = (params.page * this.selectData.perPage) < data.total;
                 return {
@@ -79,13 +98,14 @@ function select2Data() {
                 }
             }
             options.ajax = ajaxOptions;
-            console.log(this.selectData.searchField);
-            if(this.selectData.selectedData) {
-                let selectedData = this.selectData.selectedData;
+            let selectedData = this.selectData.selectedData;
+
+            if(selectedData) {
                 if (Array.isArray(selectedData) && selectedData.length > 0) {
                     if (this.selectData.multiple == false) {
                         selectedData = selectedData[0]; // ambil elemen pertama
                     }
+
                     options.initSelection = function (element, callback) {
                         const data = selectedData;
                         callback(data);
@@ -136,7 +156,7 @@ function select2Data() {
                         }
                     }
                 }
-                console.log('templateSelection2',item);
+
                 if(item.cappFormatSelection) {
 
                     if(item.cappFormatSelectionIsHtml) {

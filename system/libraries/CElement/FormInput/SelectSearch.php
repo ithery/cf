@@ -397,6 +397,7 @@ class CElement_FormInput_SelectSearch extends CElement_FormInput {
                 $value = $value->toArray();
             }
             $values = carr::wrap($value);
+
             $result = c::collect($values)->map(function ($value) {
                 $db = c::db();
                 if (count($this->prependData) > 0) {
@@ -547,15 +548,18 @@ class CElement_FormInput_SelectSearch extends CElement_FormInput {
         $selectedData = [];
 
         $selectedRows = $this->getSelectedRow();
+
         if ($selectedRows) {
             foreach ($selectedRows as $index => $selectedRow) {
                 if ($selectedRow != null) {
                     $row = $selectedRow;
                     $model = null;
+
                     if ($row instanceof CModel) {
                         $model = $row;
                         $row = $this->modelToSelect2Array($model);
                     }
+
                     if (is_object($row)) {
                         $row = (array) $row;
                     }
@@ -631,7 +635,6 @@ class CElement_FormInput_SelectSearch extends CElement_FormInput {
                 $selectedData = carr::first($selectedData);
             }
             $rjson = json_encode($selectedData);
-
             $strJsInit = '
                 initSelection : function (element, callback) {
                     var data = ' . $rjson . ';
@@ -862,6 +865,7 @@ class CElement_FormInput_SelectSearch extends CElement_FormInput {
         $options['strResult'] = $strResult;
         $options['prependData'] = $this->prependData;
         $options['readonly'] = $this->readonly;
+        $options['value'] = $this->value;
 
         $dependsOn = [];
         foreach ($this->dependsOn as $index => $dependOn) {
