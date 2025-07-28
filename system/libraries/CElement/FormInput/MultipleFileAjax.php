@@ -21,8 +21,14 @@ class CElement_FormInput_MultipleFileAjax extends CElement_FormInput {
      */
     protected $allowedExtension;
 
+    /**
+     * @var CFunction_SerializableClosure
+     */
     protected $validationCallback;
 
+    /**
+     * @var int
+     */
     protected $limitFile;
 
     protected $disabledUpload;
