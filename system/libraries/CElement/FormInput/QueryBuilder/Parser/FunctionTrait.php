@@ -1,6 +1,6 @@
 <?php
 
-use Carbon\Carbon;
+use CElement_FormInput_QueryBuilder_Constant as Constant;
 
 trait CElement_FormInput_QueryBuilder_Parser_FunctionTrait {
     protected $operators = [
