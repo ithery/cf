@@ -183,16 +183,37 @@ class CModel_HasResource_FileAdder_FileAdder {
         return $this;
     }
 
+    /**
+     * Set the order of the resource.
+     *
+     * @param null|int $order the order of the resource
+     *
+     * @return $this
+     */
     public function setOrder($order) {
         $this->order = $order;
 
         return $this;
     }
 
+    /**
+     * Set the file name to be used for the resource.
+     *
+     * @param string $fileName the file name to use
+     *
+     * @return $this
+     */
     public function usingFileName($fileName) {
         return $this->setFileName($fileName);
     }
 
+    /**
+     * Set the file name for the resource.
+     *
+     * @param string $fileName the file name to be set
+     *
+     * @return $this
+     */
     public function setFileName($fileName) {
         $this->fileName = $fileName;
 
