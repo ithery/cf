@@ -183,7 +183,7 @@ class CElement_FormInput_QueryBuilder_Parser {
      *
      * @return CModel_Query
      */
-    protected function makeQuery(CModel_Query $query, stdClass $rule, $queryCondition = 'AND') {
+    protected function makeQuery($query, stdClass $rule, $queryCondition = 'AND') {
         /*
          * Ensure that the value is correct for the rule, return query on exception
          */
@@ -209,7 +209,7 @@ class CElement_FormInput_QueryBuilder_Parser {
      *
      * @return CModel_Query
      */
-    protected function convertIncomingQBtoQuery(CModel_Query $query, stdClass $rule, $value, $queryCondition = 'AND') {
+    protected function convertIncomingQBtoQuery($query, stdClass $rule, $value, $queryCondition = 'AND') {
         /*
          * Convert the Operator (LIKE/NOT LIKE/GREATER THAN) given to us by QueryBuilder
          * into on one that we can use inside the SQL query

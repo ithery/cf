@@ -32,7 +32,7 @@ function select2Data() {
         selectedOption3:null,
         selectData: @json($selectData),
         init() {
-            $('#my-select2-input').select2().on('change',()=>{
+            $('#my-select2-input, #my-select2-input-2, #my-select2-input-3').select2().on('change',()=>{
                 this.updateSelection();
             });
 
@@ -52,14 +52,15 @@ function select2Data() {
             if(select2Options.multiple) {
                 $('#my-select2-input-2').attr('multiple','multiple');
             }
-            const selectedData = this.selectData.selectedData;
-            if(selectedData) {
-                for(const selectedValue of selectedData) {
 
-                }
-            }
             // $html->appendln('<option data-multiple="' . ($this->multiple ? '1' : '0') . '" value="' . $selectedValue . '" data-content="' . c::e($strSelection) . '" selected="selected" >' . $strSelection . '</option>');
             $('#my-select2-input-2').select2(select2Options);
+            $('#my-select2-input-2').on('select2:select', function (e) {
+                const data = e.params.data;
+                console.log(data, e.params);
+
+            });
+
         },
         buildSelect2Options() {
             let options = {};

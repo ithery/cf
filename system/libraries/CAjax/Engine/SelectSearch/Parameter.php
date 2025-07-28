@@ -27,4 +27,8 @@ class CAjax_Engine_SelectSearch_Parameter {
     public function callback() {
         return carr::get($this->requestGet, 'callback');
     }
+
+    public function id() {
+        return carr::get($this->requestGet, 'id');
+    }
 }

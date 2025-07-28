@@ -89,6 +89,15 @@ abstract class CAjax_Engine_SelectSearch_Processor implements CAjax_Engine_Selec
         return $this->parameter->callback();
     }
 
+    /**
+     * Returns the ID of the current search.
+     *
+     * @return int
+     */
+    public function searchIds() {
+        return carr::wrap($this->parameter->id());
+    }
+
     public function input() {
         return $this->engine->getInput();
     }

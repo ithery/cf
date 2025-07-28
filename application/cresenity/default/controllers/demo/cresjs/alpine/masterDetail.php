@@ -9,8 +9,15 @@ class Controller_Demo_Cresjs_Alpine_MasterDetail extends \Cresenity\Demo\Control
         $app = c::app();
         $app->title('Alpine Master Detail');
         $items = [];
+        $select = new CElement_FormInput_SelectSearch();
+        $select->setDataFromModel(\Cresenity\Demo\Model\Country::class);
+        $select->setKeyField('id');
+        $select->setSearchField('name');
+        $select->setFormat('<div>{name}</div><div><span class="badge badge-success">{code}</span></div>');
+        // $select->setAutoSelect();
         $app->addView('demo.page.cresjs.alpine.master-detail', [
-            'items' => $items
+            'items' => $items,
+            'selectData' => $select->buildJavascriptOptions()
         ]);
 
         return $app;
