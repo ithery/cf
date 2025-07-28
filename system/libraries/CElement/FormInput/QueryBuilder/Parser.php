@@ -12,6 +12,13 @@ class CElement_FormInput_QueryBuilder_Parser {
         $this->fields = $fields;
     }
 
+    /**
+     * Parses the ruleset and returns a CModel_Query object.
+     *
+     * @param string $rules the ruleset as a JSON string
+     *
+     * @return CModel_Query|CDatabase_Query_Builder
+     */
     public function parse($rules) {
         $modelClass = $this->modelClass;
         // do a JSON decode (throws exceptions if there is a JSON error...)

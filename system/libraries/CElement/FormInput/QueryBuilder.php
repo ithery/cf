@@ -40,6 +40,14 @@ class CElement_FormInput_QueryBuilder extends CElement_FormInput {
         $this->addClass('capp-query-builder capp-input');
     }
 
+    /**
+     * Parse the given rules and return a CModel_Query object from the given model class.
+     *
+     * @param string $rules
+     * @param string $modelClass
+     *
+     * @return CModel_Query
+     */
     public static function parseToModelQuery($rules, $modelClass) {
         $parser = new CElement_FormInput_QueryBuilder_Parser($modelClass);
 
