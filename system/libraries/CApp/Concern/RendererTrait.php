@@ -96,7 +96,6 @@ HTML;
             <script defer src="{$cresJs}"></script>
             {$notificationScript}
             <script>
-                window.asdf='a';
                 {$js}
                 {$readyClientScript}
                 if (window) {

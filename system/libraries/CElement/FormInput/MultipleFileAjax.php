@@ -54,6 +54,8 @@ class CElement_FormInput_MultipleFileAjax extends CElement_FormInput {
 
     protected $withInfo;
 
+    protected $asFileAjax = false;
+
     public function __construct($id) {
         parent::__construct($id);
         $this->type = 'image';
@@ -73,6 +75,7 @@ class CElement_FormInput_MultipleFileAjax extends CElement_FormInput {
         $this->customControl = [];
         $this->customControlValue = [];
         $this->withInfo = false;
+        $this->asFileAjax = false;
         c::manager()->registerModule('mime-icons');
         $this->onBeforeParse(function (CView_View $view) {
             $ajaxName = $this->name;
@@ -84,6 +87,7 @@ class CElement_FormInput_MultipleFileAjax extends CElement_FormInput {
                 ->setData('allowedExtension', $this->allowedExtension)
                 ->setData('validationCallback', $this->validationCallback)
                 ->setData('withInfo', $this->withInfo)
+                ->setData('asFileAjax', $this->asFileAjax)
                 ->makeUrl();
 
             $view->with('id', $this->id);
@@ -106,6 +110,7 @@ class CElement_FormInput_MultipleFileAjax extends CElement_FormInput {
             $view->with('customControlValue', $this->customControlValue);
             $view->with('cropper', $this->cropper);
             $view->with('accept', $this->accept);
+            $view->with('asFileAjax', $this->asFileAjax);
         });
     }
 
@@ -173,6 +178,12 @@ class CElement_FormInput_MultipleFileAjax extends CElement_FormInput {
         return $this;
     }
 
+    public function setAsFileAjax($bool = true) {
+        $this->asFileAjax = $bool;
+
+        return $this;
+    }
+
     /**
      * @return CElement_Helper_Cropper
      */
@@ -200,6 +211,17 @@ class CElement_FormInput_MultipleFileAjax extends CElement_FormInput {
         $arr['file_url'] = $fileUrl;
         $arr['file_name'] = $fileName;
 
+        $this->files[] = $arr;
+
+        return $this;
+    }
+
+    public function addFileAjax(CAjax_FileAjax $fileAjax) {
+        $arr = [];
+        $arr['input_name'] = $fileAjax->getIdentifier();
+        $arr['input_value'] = $fileAjax->getIdentifier();
+        $arr['file_url'] = $fileAjax->getUrl();
+        $arr['file_name'] = $fileAjax->getFileName();
         $this->files[] = $arr;
 
         return $this;

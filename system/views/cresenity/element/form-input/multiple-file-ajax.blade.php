@@ -158,6 +158,7 @@
 
     (function ($) {
         $(function () {
+            const asFileAjax = {{ $asFileAjax  ? 'true' : 'false'}};
             const errorMessageLimitFile = '@lang("element/file.errorMessageLimitFile",["limit" => $limitFile])';
             const errorMessageMaxUploadSize = '@lang("element/file.errorMessageMaxUploadSize",["sizeMB" => $maxUploadSize])';
             const removeLabel = "@lang('element/file.remove')";
@@ -362,7 +363,12 @@
                         var response = JSON.parse(this.responseText);
                         cresenity.handleJsonResponse(response, function (dataFile) {
                             div.removeClass("loading");
-                            div.append("<input type=\"hidden\" name=\"<?php echo $name; ?>[]\" value=" + dataFile.fileId + ">");
+                            if(asFileAjax) {
+                                div.append("<input type=\"hidden\" name=\"<?php echo $name; ?>[]\" value=" + JSON.stringify(dataFile) + ">");
+                            } else {
+                                div.append("<input type=\"hidden\" name=\"<?php echo $name; ?>[]\" value=" + dataFile.fileId + ">");
+                            }
+
                             if(file.type.match("image.*")){
                                 img.attr('src', data.url);
                             }

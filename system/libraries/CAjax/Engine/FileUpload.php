@@ -12,6 +12,7 @@ class CAjax_Engine_FileUpload extends CAjax_Engine {
         $inputName = carr::get($data, 'inputName');
         $allowedExtension = carr::get($data, 'allowedExtension', []);
         $validationCallback = carr::get($data, 'validationCallback');
+        $asFileAjax = carr::get($data, 'asFileAjax');
         $withInfo = carr::get($data, 'withInfo', false);
         $diskName = carr::get($data, 'disk', CF::config('storage.temp'));
         $fileId = '';

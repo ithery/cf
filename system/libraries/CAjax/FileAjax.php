@@ -7,8 +7,6 @@ class CAjax_FileAjax {
 
     protected $fileId;
 
-    protected $fileName;
-
     protected $type;
 
     protected $extension;
@@ -17,7 +15,11 @@ class CAjax_FileAjax {
 
     protected $resource;
 
-    public function __construct($fileId) {
+    protected $url;
+
+    protected $filename;
+
+    public function __construct($fileId = null) {
         $this->fileId = $fileId;
         $filenameWithoutExtension = pathinfo($fileId, PATHINFO_FILENAME);
         $this->extension = pathinfo($fileId, PATHINFO_EXTENSION);
@@ -54,7 +56,38 @@ class CAjax_FileAjax {
     }
 
     public function getUrl() {
-        return CTemporary::getPublicUrl($this->getTemporaryFolderName(), $this->fileId);
+        if ($this->url) {
+            return $this->url;
+        }
+        if ($this->fileId) {
+            return CTemporary::getPublicUrl($this->getTemporaryFolderName(), $this->fileId);
+        }
+
+        if ($this->resource) {
+            return $this->resource->getFullUrl();
+        }
+
+        return null;
+    }
+
+    public function getFileName() {
+        if ($this->filename) {
+            return $this->filename;
+        }
+        if ($this->fileId) {
+            return basename($this->fileId);
+        }
+        if ($this->resource) {
+            return basename($this->resource->getUrl());
+        }
+
+        return null;
+    }
+
+    public function setFilename($filename) {
+        $this->filename = $filename;
+
+        return $this;
     }
 
     /**
@@ -87,12 +120,100 @@ class CAjax_FileAjax {
         return $file;
     }
 
+    public static function create($mixed) {
+        if (is_array($mixed)) {
+            return self::fromJson(json_encode($mixed));
+        }
+        if (cstr::startsWith($mixed, '{')) {
+            return self::fromJson($mixed);
+        }
+        if (cstr::startsWith($mixed, '@')) {
+            return self::fromIdentifier($mixed);
+        }
+        if (cstr::startsWith($mixed, 'http')) {
+            return self::fromUrl($mixed);
+        }
+        if ($mixed instanceof CModel) {
+            return self::fromResource($mixed);
+        }
+
+        return new self($mixed);
+    }
+
+    public function setUrl($url) {
+        $this->url = $url;
+
+        return $this;
+    }
+
+    public static function fromUrl($url) {
+        $file = new self(null);
+        $file->setUrl($url);
+
+        return $file;
+    }
+
+    public static function fromJson($json) {
+        if (is_string($json)) {
+            $data = json_decode($json, true);
+        }
+        $fileId = carr::get($data, 'fileId');
+        $url = carr::get($data, 'url');
+        $filename = carr::get($data, 'fileName');
+
+        $file = new self($fileId);
+        $file->setFilename($filename);
+        $file->setUrl($url);
+        // $file->setUrl($url);
+
+        return $file;
+    }
+
+    public static function fromIdentifier($identifier) {
+        $data = self::parseIdentifier($identifier);
+        $fileId = carr::get($data, 'fileId');
+        $resourceId = carr::get($data, 'resourceId');
+        $url = carr::get($data, 'url');
+
+        if ($fileId) {
+            $file = new self($fileId);
+
+            return $file;
+        }
+        if ($resourceId) {
+            $resourceClass = CF::config('resource.resource_model');
+            $resource = $resourceClass::find($resourceId);
+            $file = self::fromResource($resource);
+
+            return $file;
+        }
+
+        $file = new self(null);
+        $file->setUrl($url);
+
+        return $file;
+    }
+
+    public static function parseIdentifier($identifier) {
+        if (cstr::startsWith($identifier, '@')) {
+            $identifier = substr($identifier, 1);
+        }
+        $identifier = explode('|', $identifier);
+        $result = [];
+        $result['fileId'] = $identifier[0];
+        $result['resourceId'] = $identifier[1];
+        $result['url'] = $identifier[2];
+
+        return $result;
+    }
+
     public function saveToResource() {
     }
 
     public function getIdentifier() {
-        $identifier = $this->fileId;
-        $identifier .= c::optional($this->resource)->getKey();
+        $identifier = '@' . $this->fileId;
+        $identifier .= '|' . c::optional($this->resource)->getKey();
+        $identifier .= '|' . $this->url;
 
         return $identifier;
     }

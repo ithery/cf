@@ -1,12 +1,14 @@
 <?php
 
 /**
- * PHP Shapefile - PHP library to read and write ESRI Shapefiles, compatible with WKT and GeoJSON
+ * PHP Shapefile - PHP library to read and write ESRI Shapefiles, compatible with WKT and GeoJSON.
  *
- * @package Shapefile
  * @author  Gaspare Sganga
+ *
  * @version 4.0.0dev
+ *
  * @license MIT
+ *
  * @link    https://gasparesganga.com/labs/php-shapefile/
  */
 
@@ -19,44 +21,36 @@ use Shapefile\ShapefileException;
  * Abstract base class for all Geometry Collections.
  * It defines some common public methods and some helper protected functions.
  */
-abstract class GeometryCollection extends Geometry
-{
+abstract class GeometryCollection extends Geometry {
     /**
-     * @var \Shapefile\Geometry\Geometry[]  The actual geometries in the collection.
-     *                                      They are enforced to be all of the same type by addGeometry() method.
+     * @var \Shapefile\Geometry\Geometry[] The actual geometries in the collection.
+     *                                     They are enforced to be all of the same type by addGeometry() method.
      */
     protected $geometries = [];
-    
-    
-    
+
     /////////////////////////////// ABSTRACT ///////////////////////////////
     /**
      * Gets the class name of the base geometries in the collection.
      *
-     * @return  string
+     * @return string
      */
     abstract protected function getCollectionClass();
-    
-    
-    
+
     /////////////////////////////// PUBLIC ///////////////////////////////
     /**
      * Constructor.
      *
-     * @param   \Shapefile\Geometry\Geometry[]  $geometries     Optional array of geometries to initialize the collection.
+     * @param \Shapefile\Geometry\Geometry[] $geometries optional array of geometries to initialize the collection
      */
-    public function __construct(array $geometries = null)
-    {
+    public function __construct(array $geometries = null) {
         if ($geometries !== null) {
             foreach ($geometries as $Geometry) {
                 $this->addGeometry($Geometry);
             }
         }
     }
-    
-    
-    public function getBoundingBox()
-    {
+
+    public function getBoundingBox() {
         if ($this->isEmpty()) {
             return null;
         }
@@ -100,22 +94,20 @@ abstract class GeometryCollection extends Geometry
                 }
             }
         }
+
         return $ret;
     }
-    
-    
-    
+
     /////////////////////////////// PROTECTED ///////////////////////////////
     /**
      * Adds a Geometry to the collection.
      * It enforces all geometries to be of the same type.
      *
-     * @param   \Shapefile\Geometry\Geometry    $Geometry
+     * @param \Shapefile\Geometry\Geometry $Geometry
      *
-     * @return  self    Returns $this to provide a fluent interface.
+     * @return self returns $this to provide a fluent interface
      */
-    protected function addGeometry(Geometry $Geometry)
-    {
+    protected function addGeometry(Geometry $Geometry) {
         if (!is_a($Geometry, $this->getCollectionClass())) {
             throw new ShapefileException(Shapefile::ERR_INPUT_GEOMETRY_TYPE_NOT_VALID, $this->getCollectionClass());
         }
@@ -131,52 +123,51 @@ abstract class GeometryCollection extends Geometry
             }
             $this->geometries[] = $Geometry;
         }
+
         return $this;
     }
-    
+
     /**
      * Gets a Geometry at specified index from the collection.
      *
-     * @param   int     $index      The index of the Geometry.
+     * @param int $index the index of the Geometry
      *
-     * @return  \Shapefile\Geometry\Geometry
+     * @return \Shapefile\Geometry\Geometry
      */
-    protected function getGeometry($index)
-    {
+    protected function getGeometry($index) {
         if (!isset($this->geometries[$index])) {
             throw new ShapefileException(Shapefile::ERR_INPUT_GEOMETRY_INDEX_NOT_VALID, $index);
         }
+
         return $this->geometries[$index];
     }
-    
+
     /**
      * Gets all the geometries in the collection.
      *
-     * @return  \Shapefile\Geometry\Geometry[]
+     * @return \Shapefile\Geometry\Geometry[]
      */
-    protected function getGeometries()
-    {
+    protected function getGeometries() {
         return $this->geometries;
     }
-    
+
     /**
      * Gets the number of geometries in the collection.
      *
-     * @return  int
+     * @return int
      */
-    protected function getNumGeometries()
-    {
+    protected function getNumGeometries() {
         return count($this->geometries);
     }
-    
+
     /**
      * Reverses the order of geometries in the collection.
      *
-     * @return  self    Returns $this to provide a fluent interface.
+     * @return self returns $this to provide a fluent interface
      */
-    protected function reverseGeometries()
-    {
+    protected function reverseGeometries() {
         $this->geometries = array_reverse($this->geometries);
+
         return $this;
     }
 }
