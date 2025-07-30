@@ -1,12 +1,14 @@
 <?php
 
 /**
- * PHP Shapefile - PHP library to read and write ESRI Shapefiles, compatible with WKT and GeoJSON
+ * PHP Shapefile - PHP library to read and write ESRI Shapefiles, compatible with WKT and GeoJSON.
  *
- * @package Shapefile
  * @author  Gaspare Sganga
+ *
  * @version 4.0.0dev
+ *
  * @license MIT
+ *
  * @link    https://gasparesganga.com/labs/php-shapefile/
  */
 
@@ -42,19 +44,18 @@ use Shapefile\ShapefileException;
  *          ]
  *      }
  */
-class MultiPoint extends GeometryCollection
-{
+class MultiPoint extends GeometryCollection {
     /**
-     * WKT and GeoJSON basetypes, collection class type
+     * WKT and GeoJSON basetypes, collection class type.
      */
-    const WKT_BASETYPE      = 'MULTIPOINT';
-    const GEOJSON_BASETYPE  = 'MultiPoint';
-    const COLLECTION_CLASS  = 'Point';
-    
-    
+    const WKT_BASETYPE = 'MULTIPOINT';
+
+    const GEOJSON_BASETYPE = 'MultiPoint';
+
+    const COLLECTION_CLASS = 'Point';
+
     /////////////////////////////// PUBLIC ///////////////////////////////
-    public function initFromArray($array)
-    {
+    public function initFromArray($array) {
         $this->checkInit();
         if (!isset($array['points']) || !is_array($array['points'])) {
             throw new ShapefileException(Shapefile::ERR_INPUT_ARRAY_NOT_VALID);
@@ -64,27 +65,27 @@ class MultiPoint extends GeometryCollection
             $Point->initFromArray($coordinates);
             $this->addPoint($Point);
         }
+
         return $this;
     }
-    
-    public function initFromWKT($wkt)
-    {
+
+    public function initFromWKT($wkt) {
         $this->checkInit();
         $wkt = $this->wktSanitize($wkt);
         if (!$this->wktIsEmpty($wkt)) {
             $force_z = $this->wktIsZ($wkt);
             $force_m = $this->wktIsM($wkt);
-            foreach (explode(',', str_replace(array('(', ')'), '', $this->wktExtractData($wkt))) as $wkt_coordinates) {
+            foreach (explode(',', str_replace(['(', ')'], '', $this->wktExtractData($wkt))) as $wkt_coordinates) {
                 $coordinates = $this->wktParseCoordinates($wkt_coordinates, $force_z, $force_m);
                 $Point = new Point($coordinates['x'], $coordinates['y'], $coordinates['z'], $coordinates['m']);
                 $this->addPoint($Point);
             }
         }
+
         return $this;
     }
-    
-    public function initFromGeoJSON($geojson)
-    {
+
+    public function initFromGeoJSON($geojson) {
         $this->checkInit();
         $geojson = $this->geojsonSanitize($geojson);
         if ($geojson !== null) {
@@ -94,24 +95,23 @@ class MultiPoint extends GeometryCollection
                 $this->addPoint($Point);
             }
         }
+
         return $this;
     }
-    
-    
-    public function getArray()
-    {
+
+    public function getArray() {
         $points = [];
         foreach ($this->getPoints() as $Point) {
             $points[] = $Point->getArray();
         }
+
         return [
             'numpoints' => $this->getNumGeometries(),
-            'points'    => $points,
+            'points' => $points,
         ];
     }
-    
-    public function getWKT()
-    {
+
+    public function getWKT() {
         $ret = $this->wktInitializeOutput();
         if (!$this->isEmpty()) {
             $points = [];
@@ -120,11 +120,11 @@ class MultiPoint extends GeometryCollection
             }
             $ret .= '(' . implode(', ', $points) . ')';
         }
+
         return $ret;
     }
-    
-    public function getGeoJSON($flag_bbox = true, $flag_feature = false)
-    {
+
+    public function getGeoJSON($flag_bbox = true, $flag_feature = false) {
         if ($this->isEmpty()) {
             return 'null';
         }
@@ -132,75 +132,66 @@ class MultiPoint extends GeometryCollection
         foreach ($this->getPoints() as $Point) {
             $coordinates[] = $Point->getRawArray();
         }
+
         return $this->geojsonPackOutput($coordinates, $flag_bbox, $flag_feature);
     }
-    
-    
+
     /**
      * Adds a point to the collection.
      *
-     * @param   \Shapefile\Geometry\Point   $Point
+     * @param \Shapefile\Geometry\Point $Point
      *
-     * @return  self    Returns $this to provide a fluent interface.
+     * @return self returns $this to provide a fluent interface
      */
-    public function addPoint(Point $Point)
-    {
+    public function addPoint(Point $Point) {
         $this->addGeometry($Point);
+
         return $this;
     }
-    
+
     /**
      * Gets a point at specified index from the collection.
      *
-     * @param   int     $index      The index of the point.
+     * @param int $index the index of the point
      *
-     * @return  \Shapefile\Geometry\Point
+     * @return \Shapefile\Geometry\Point
      */
-    public function getPoint($index)
-    {
+    public function getPoint($index) {
         return $this->getGeometry($index);
     }
-    
+
     /**
      * Gets all the points in the collection.
      *
-     * @return  \Shapefile\Geometry\Point[]
+     * @return \Shapefile\Geometry\Point[]
      */
-    public function getPoints()
-    {
+    public function getPoints() {
         return $this->getGeometries();
     }
-    
+
     /**
      * Gets the number of points in the collection.
      *
-     * @return  int
+     * @return int
      */
-    public function getNumPoints()
-    {
+    public function getNumPoints() {
         return $this->getNumGeometries();
     }
-    
-    
-    public function getSHPBasetype()
-    {
+
+    public function getSHPBasetype() {
         return Shapefile::SHAPE_TYPE_MULTIPOINT;
     }
-    
-    
+
     /////////////////////////////// PROTECTED ///////////////////////////////
-    protected function getWKTBasetype()
-    {
+    protected function getWKTBasetype() {
         return static::WKT_BASETYPE;
     }
-    
-    protected function getGeoJSONBasetype()
-    {
+
+    protected function getGeoJSONBasetype() {
         return static::GEOJSON_BASETYPE;
     }
-    
-    protected function getCollectionClass()
-    {
+
+    protected function getCollectionClass() {
         return __NAMESPACE__ . '\\' . static::COLLECTION_CLASS;
     }
 }

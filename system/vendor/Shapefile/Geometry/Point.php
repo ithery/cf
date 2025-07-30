@@ -1,12 +1,14 @@
 <?php
 
 /**
- * PHP Shapefile - PHP library to read and write ESRI Shapefiles, compatible with WKT and GeoJSON
+ * PHP Shapefile - PHP library to read and write ESRI Shapefiles, compatible with WKT and GeoJSON.
  *
- * @package Shapefile
  * @author  Gaspare Sganga
+ *
  * @version 4.0.0dev
+ *
  * @license MIT
+ *
  * @link    https://gasparesganga.com/labs/php-shapefile/
  */
 
@@ -35,51 +37,48 @@ use Shapefile\ShapefileException;
  *          "coordinates": [x, y, z] / [x, y, m] / [x, y, z, m]
  *      }
  */
-class Point extends Geometry
-{
+class Point extends Geometry {
     /**
-     * WKT and GeoJSON basetypes
+     * WKT and GeoJSON basetypes.
      */
-    const WKT_BASETYPE      = 'POINT';
-    const GEOJSON_BASETYPE  = 'Point';
-    
+    const WKT_BASETYPE = 'POINT';
+
+    const GEOJSON_BASETYPE = 'Point';
+
     /**
-     * @var float|null  X coordinate
+     * @var null|float X coordinate
      */
     private $x = null;
-    
+
     /**
-     * @var float|null  Y coordinate
+     * @var null|float Y coordinate
      */
     private $y = null;
-    
+
     /**
-     * @var floa|null   Z coordinate
+     * @var null|floa Z coordinate
      */
     private $z = null;
-    
+
     /**
-     * @var float|bool|null     M coordinate
+     * @var null|float|bool M coordinate
      */
     private $m = null;
-    
-    
+
     /////////////////////////////// PUBLIC ///////////////////////////////
     /**
      * Constructor.
      *
-     * @param   float       $x      X coordinate
-     * @param   float       $y      Y coordinate
-     * @param   float       $z      Z coordinate
-     * @param   float|bool  $m      M coordinate
+     * @param float      $x X coordinate
+     * @param float      $y Y coordinate
+     * @param float      $z Z coordinate
+     * @param float|bool $m M coordinate
      */
-    public function __construct($x = null, $y = null, $z = null, $m = null)
-    {
+    public function __construct($x = null, $y = null, $z = null, $m = null) {
         $this->init($x, $y, $z, $m);
     }
-    
-    public function initFromArray($array)
-    {
+
+    public function initFromArray($array) {
         $this->checkInit();
         $this->init(
             isset($array['x']) ? $array['x'] : null,
@@ -87,11 +86,11 @@ class Point extends Geometry
             isset($array['z']) ? $array['z'] : null,
             isset($array['m']) ? $array['m'] : null
         );
+
         return $this;
     }
-    
-    public function initFromWKT($wkt)
-    {
+
+    public function initFromWKT($wkt) {
         $this->checkInit();
         $wkt = $this->wktSanitize($wkt);
         if (!$this->wktIsEmpty($wkt)) {
@@ -102,27 +101,26 @@ class Point extends Geometry
             );
             $this->init($coordinates['x'], $coordinates['y'], $coordinates['z'], $coordinates['m']);
         }
+
         return $this;
     }
-    
-    public function initFromGeoJSON($geojson)
-    {
+
+    public function initFromGeoJSON($geojson) {
         $this->checkInit();
         $geojson = $this->geojsonSanitize($geojson);
         if ($geojson !== null) {
             $coordinates = $this->geojsonParseCoordinates($geojson['coordinates'], $geojson['flag_m']);
             $this->init($coordinates['x'], $coordinates['y'], $coordinates['z'], $coordinates['m']);
         }
+
         return $this;
     }
-    
-    
-    public function getArray()
-    {
+
+    public function getArray() {
         if ($this->isEmpty()) {
             return null;
         }
-        
+
         $ret = [
             'x' => $this->x,
             'y' => $this->y,
@@ -133,28 +131,28 @@ class Point extends Geometry
         if ($this->isM()) {
             $ret['m'] = $this->m;
         }
+
         return $ret;
     }
-    
-    public function getWKT()
-    {
+
+    public function getWKT() {
         $ret = $this->wktInitializeOutput();
         if (!$this->isEmpty()) {
             $ret .= '(' . implode(' ', $this->getRawArray()) . ')';
         }
+
         return $ret;
     }
-    
-    public function getGeoJSON($flag_bbox = false, $flag_feature = false)
-    {
+
+    public function getGeoJSON($flag_bbox = false, $flag_feature = false) {
         if ($this->isEmpty()) {
             return 'null';
         }
+
         return $this->geojsonPackOutput($this->getRawArray(), $flag_bbox, $flag_feature);
     }
-    
-    public function getBoundingBox()
-    {
+
+    public function getBoundingBox() {
         if ($this->isEmpty()) {
             return null;
         }
@@ -175,67 +173,59 @@ class Point extends Geometry
                 $ret['mmax'] = $this->m;
             }
         }
+
         return $ret;
     }
-    
-    
-    public function getSHPBasetype()
-    {
+
+    public function getSHPBasetype() {
         return Shapefile::SHAPE_TYPE_POINT;
     }
-    
-    
+
     /**
-     * Gets X coordinate
+     * Gets X coordinate.
      *
-     * @return  float
+     * @return float
      */
-    public function getX()
-    {
+    public function getX() {
         return $this->x;
     }
-    
+
     /**
-     * Gets Y coordinate
+     * Gets Y coordinate.
      *
-     * @return  float
+     * @return float
      */
-    public function getY()
-    {
+    public function getY() {
         return $this->y;
     }
-    
+
     /**
-     * Gets Z coordinate
+     * Gets Z coordinate.
      *
-     * @return  float
+     * @return float
      */
-    public function getZ()
-    {
+    public function getZ() {
         return $this->z;
     }
-    
+
     /**
-     * Gets M coordinate
+     * Gets M coordinate.
      *
-     * @return  float
+     * @return float
      */
-    public function getM()
-    {
+    public function getM() {
         return $this->m;
     }
-    
-    
+
     /**
      * @internal
      *
      * Gets an indexed array of coordinates.
      * This is not actually for public use, rather it is used by other classes in the library.
      *
-     * @return  array
+     * @return array
      */
-    public function getRawArray()
-    {
+    public function getRawArray() {
         $ret = [];
         if (!$this->isEmpty()) {
             $ret[] = $this->x;
@@ -244,38 +234,34 @@ class Point extends Geometry
                 $ret[] = $this->z;
             }
             if ($this->isM()) {
-                $ret[] = $this->m === false ? 0 : $this->m ;
+                $ret[] = $this->m === false ? 0 : $this->m;
             }
         }
+
         return $ret;
     }
-    
-    
-    /****************************** PROTECTED ******************************/
-    protected function getWKTBasetype()
-    {
+
+    /* PROTECTED */
+    protected function getWKTBasetype() {
         return static::WKT_BASETYPE;
     }
-    
-    protected function getGeoJSONBasetype()
-    {
+
+    protected function getGeoJSONBasetype() {
         return static::GEOJSON_BASETYPE;
     }
-    
-    
-    /****************************** PRIVATE ******************************/
+
+    /* PRIVATE */
     /**
      * Initializes Geometry with coordinates.
      *
-     * @param   float       $x      X coordinate
-     * @param   float       $y      Y coordinate
-     * @param   float       $z      Z coordinate
-     * @param   float|bool  $m      M coordinate
+     * @param float      $x X coordinate
+     * @param float      $y Y coordinate
+     * @param float      $z Z coordinate
+     * @param float|bool $m M coordinate
      *
-     * @return  self    Returns $this to provide a fluent interface.
+     * @return self returns $this to provide a fluent interface
      */
-    private function init($x = null, $y = null, $z = null, $m = null)
-    {
+    private function init($x = null, $y = null, $z = null, $m = null) {
         if ($x === null xor $y === null) {
             throw new ShapefileException(Shapefile::ERR_GEOM_POINT_NOT_VALID);
         }
@@ -292,21 +278,22 @@ class Point extends Geometry
                 $this->setFlagM(true);
             }
         }
+
         return $this;
     }
-    
+
     /**
      * Validates a coordinate value.
      *
-     * @param   float   $value  Coordinate value
+     * @param float $value Coordinate value
      *
      * @return float
      */
-    private function validateCoordValue($value)
-    {
+    private function validateCoordValue($value) {
         if (!is_numeric($value)) {
             throw new ShapefileException(Shapefile::ERR_GEOM_COORD_VALUE_NOT_VALID, $value);
         }
+
         return floatval($value);
     }
 }

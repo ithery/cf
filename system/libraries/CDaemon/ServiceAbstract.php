@@ -274,6 +274,7 @@ abstract class CDaemon_ServiceAbstract implements CDaemon_ServiceInterface {
             $plugin->setup();
         }
         $this->dispatch([self::ON_INIT]);
+        $this->dispatchEvent(new CDaemon_Event_Service_OnInit($this));
         foreach ($this->workers as $worker) {
             $worker->setup();
         }
@@ -294,6 +295,7 @@ abstract class CDaemon_ServiceAbstract implements CDaemon_ServiceInterface {
         try {
             $this->shutdown = true;
             $this->dispatch([self::ON_SHUTDOWN]);
+            $this->dispatchEvent(new CDaemon_Event_Service_OnShutdown($this));
             foreach (array_merge($this->workers, $this->plugins) as $object) {
                 $object->teardown();
                 unset($object);
@@ -360,12 +362,14 @@ abstract class CDaemon_ServiceAbstract implements CDaemon_ServiceInterface {
             }
             if ($this->shouldRun()) {
                 $this->dispatch([self::ON_PREEXECUTE]);
+                $this->dispatchEvent(new CDaemon_Event_Service_OnPreExecute($this));
                 $this->loopProcess();
                 if (version_compare(PHP_VERSION, '5.3.0', '>=')) {
                     pcntl_signal_dispatch();
                 }
 
                 $this->dispatch([self::ON_POSTEXECUTE]);
+                $this->dispatchEvent(new CDaemon_Event_Service_OnPostExecute($this));
             }
             $this->timer();
         }
@@ -618,6 +622,11 @@ abstract class CDaemon_ServiceAbstract implements CDaemon_ServiceInterface {
     public function error($message, $label = '') {
         $this->log($message, $label);
         $this->dispatch([self::ON_ERROR], [$message]);
+        $this->dispatchEvent(new CDaemon_Event_Service_OnError($this, $message, $label));
+    }
+
+    public function dispatchEvent($event) {
+        return CEvent::dispatch($event);
     }
 
     /**
@@ -686,6 +695,7 @@ abstract class CDaemon_ServiceAbstract implements CDaemon_ServiceInterface {
                 break;
         }
         $this->dispatch([self::ON_SIGNAL], [$signal]);
+        $this->dispatchEvent(new CDaemon_Event_Service_OnSignal($this, $signal));
     }
 
     /**
@@ -819,6 +829,7 @@ abstract class CDaemon_ServiceAbstract implements CDaemon_ServiceInterface {
         // If we have idle time, do any housekeeping tasks
         if ($isIdle()) {
             $this->dispatch([CDaemon_ServiceAbstract::ON_IDLE], [$isIdle]);
+            $this->dispatchEvent(new CDaemon_Event_Service_OnIdle($this));
         }
         $stats = [];
         $stats['duration'] = microtime(true) - $startTime;
@@ -907,6 +918,7 @@ abstract class CDaemon_ServiceAbstract implements CDaemon_ServiceInterface {
             return;
         }
         $this->log('Restart Happening Now...');
+        $this->dispatchEvent(new CDaemon_Event_Service_OnRestart($this));
         $this->shutdown = true;
         // We want to shutdown workers, release any lock files, and swap out the pid file (as applicable)
         // Basically put this into a walking-dead state by destructing everything while keeping this process alive
@@ -1002,7 +1014,6 @@ abstract class CDaemon_ServiceAbstract implements CDaemon_ServiceInterface {
 
         return $this->plugins[$alias];
     }
-
 
     /**
      * @param string $alias
@@ -1208,11 +1219,13 @@ abstract class CDaemon_ServiceAbstract implements CDaemon_ServiceInterface {
         if (!is_integer($setValue)) {
             throw new Exception(__METHOD__ . ' Failed. Could not set pid. Integer Expected. Given: ' . $setValue);
         }
+        $oldPid = $this->pid;
         $this->pid = $setValue;
         if ($this->parent) {
             $this->parentPid = $setValue;
         }
         $this->dispatch([self::ON_PIDCHANGE], [$setValue]);
+        $this->dispatchEvent(new CDaemon_Event_Service_OnPidChange($this, $oldPid, $setValue));
     }
 
     public function isParent() {
