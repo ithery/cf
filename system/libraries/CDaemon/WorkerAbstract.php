@@ -12,6 +12,6 @@ abstract class CDaemon_WorkerAbstract implements CDaemon_WorkerInterface {
      * @param CDaemon_Worker_MediatorAbstract $mediator
      */
     public function setMediator(CDaemon_Worker_MediatorAbstract $mediator) {
-        $this->mediator = $this->mediator;
+        $this->mediator = $mediator;
     }
 }

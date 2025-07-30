@@ -63,20 +63,20 @@ class MultiPolygon extends GeometryCollection
     const WKT_BASETYPE      = 'MULTIPOLYGON';
     const GEOJSON_BASETYPE  = 'MultiPolygon';
     const COLLECTION_CLASS  = 'Polygon';
-    
-    
+
+
     /**
      * @var int     Action to perform on polygons rings.
      */
     private $closed_rings;
-    
+
     /**
      * @var int     Orientation to force for polygons rings.
      */
     private $force_orientation;
-    
-    
-    
+
+
+
     /////////////////////////////// PUBLIC ///////////////////////////////
     /**
      * Constructor.
@@ -97,8 +97,8 @@ class MultiPolygon extends GeometryCollection
         $this->force_orientation    = $force_orientation;
         parent::__construct($polygons);
     }
-    
-    
+
+
     public function initFromArray($array)
     {
         $this->checkInit();
@@ -126,7 +126,7 @@ class MultiPolygon extends GeometryCollection
         }
         return $this;
     }
-    
+
     public function initFromWKT($wkt)
     {
         $this->checkInit();
@@ -150,7 +150,7 @@ class MultiPolygon extends GeometryCollection
         }
         return $this;
     }
-    
+
     public function initFromGeoJSON($geojson)
     {
         $this->checkInit();
@@ -178,8 +178,8 @@ class MultiPolygon extends GeometryCollection
         }
         return $this;
     }
-    
-    
+
+
     public function getArray()
     {
         $parts = [];
@@ -191,7 +191,7 @@ class MultiPolygon extends GeometryCollection
             'parts'     => $parts,
         ];
     }
-    
+
     public function getWKT()
     {
         $ret = $this->wktInitializeOutput();
@@ -212,9 +212,10 @@ class MultiPolygon extends GeometryCollection
         }
         return $ret;
     }
-    
+
     public function getGeoJSON($flag_bbox = true, $flag_feature = false)
     {
+        global $aabbcc;
         if ($this->isEmpty()) {
             return 'null';
         }
@@ -230,10 +231,11 @@ class MultiPolygon extends GeometryCollection
             }
             $coordinates[] = $parts;
         }
+
         return $this->geojsonPackOutput($coordinates, $flag_bbox, $flag_feature);
     }
-    
-    
+
+
     /**
      * Adds a polygon to the collection.
      *
@@ -246,7 +248,7 @@ class MultiPolygon extends GeometryCollection
         $this->addGeometry($Polygon, true);
         return $this;
     }
-    
+
     /**
      * Gets a polygon at specified index from the collection.
      *
@@ -258,7 +260,7 @@ class MultiPolygon extends GeometryCollection
     {
         return $this->getGeometry($index);
     }
-    
+
     /**
      * Gets all the polygons in the collection.
      *
@@ -268,7 +270,7 @@ class MultiPolygon extends GeometryCollection
     {
         return $this->getGeometries();
     }
-    
+
     /**
      * Gets the number of polygons in the collection.
      *
@@ -278,8 +280,8 @@ class MultiPolygon extends GeometryCollection
     {
         return $this->getNumGeometries();
     }
-    
-    
+
+
     /**
      * Forces multipolygon rings to be closed.
      *
@@ -292,8 +294,8 @@ class MultiPolygon extends GeometryCollection
         }
         return $this;
     }
-    
-    
+
+
     /**
      * Checks whether all multipolygon outer rings have a clockwise orientation and all the inner rings have a counterclockwise one.
      * Note that a false return value does not guarantee multipolygon is strictly counterclockwise. Use MultiPolygon::forceCounterClockwise() to enforce that!
@@ -307,7 +309,7 @@ class MultiPolygon extends GeometryCollection
         if ($this->isEmpty()) {
             return Shapefile::UNDEFINED;
         }
-        
+
         foreach ($this->getPolygons() as $Polygon) {
             if ($Polygon->getOuterRing()->isClockwise(true) === false) {
                 return false;
@@ -318,10 +320,10 @@ class MultiPolygon extends GeometryCollection
                 }
             }
         }
-        
+
         return true;
     }
-    
+
     /**
      * Checks whether all multipolygon outer rings have a counterclockwise orientation and all the inner rings have a clockwise one.
      * Note that a false return value does not guarantee multipolygon is strictly clockwise. Use MultiPolygon::forceClockwise() to enforce that!
@@ -335,7 +337,7 @@ class MultiPolygon extends GeometryCollection
         if ($this->isEmpty()) {
             return Shapefile::UNDEFINED;
         }
-        
+
         foreach ($this->getPolygons() as $Polygon) {
             if ($Polygon->getOuterRing()->isClockwise(true) === true) {
                 return false;
@@ -346,10 +348,10 @@ class MultiPolygon extends GeometryCollection
                 }
             }
         }
-        
+
         return true;
     }
-    
+
     /**
      * Forces all multipolygon outer rings to have a clockwise orientation and all the inner rings to have a counterclockwise one.
      *
@@ -365,7 +367,7 @@ class MultiPolygon extends GeometryCollection
         }
         return $this;
     }
-    
+
     /**
      * Forces all multipolygon outer rings to have a counterclockwise orientation and all the inner rings to have a clockwise one.
      *
@@ -381,14 +383,14 @@ class MultiPolygon extends GeometryCollection
         }
         return $this;
     }
-    
-    
+
+
     public function getSHPBasetype()
     {
         return Shapefile::SHAPE_TYPE_POLYGON;
     }
-    
-    
+
+
     /////////////////////////////// PROTECTED ///////////////////////////////
     /**
      * Enforces class-wide action and orientation for polygons rings.
@@ -401,7 +403,7 @@ class MultiPolygon extends GeometryCollection
     protected function addGeometry(Geometry $Polygon, $flag_rings_and_orientation = true)
     {
         parent::addGeometry($Polygon);
-        
+
         if ($flag_rings_and_orientation && ($this->closed_rings != Shapefile::ACTION_IGNORE || $this->force_orientation != Shapefile::ORIENTATION_UNCHANGED)) {
             foreach ($Polygon->getRings() as $i => $Linestring) {
                 // Closed rings
@@ -418,21 +420,21 @@ class MultiPolygon extends GeometryCollection
                 }
             }
         }
-        
+
         return $this;
     }
-    
-    
+
+
     protected function getWKTBasetype()
     {
         return static::WKT_BASETYPE;
     }
-    
+
     protected function getGeoJSONBasetype()
     {
         return static::GEOJSON_BASETYPE;
     }
-    
+
     protected function getCollectionClass()
     {
         return __NAMESPACE__ . '\\' . static::COLLECTION_CLASS;

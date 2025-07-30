@@ -516,6 +516,20 @@ abstract class Geometry {
         return $this->parseCoordinatesArray($coordinates_array, false, $force_m, Shapefile::ERR_INPUT_GEOJSON_NOT_VALID);
     }
 
+    protected function stripNonNumericValues(array $array) {
+        if(count($array) === 0) {
+            return $array;
+        }
+        if (is_array($array[0])) {
+            return array_map(function($value) {
+                return $this->stripNonNumericValues($value);
+            }, $array);
+        } else {
+            return array_map(function($value) {
+                return is_numeric($value) && is_finite(floatval($value)) ? $value : 0;
+            }, $array);
+        }
+    }
     /**
      * Builds valid GeoJSON starting from raw coordinates.
      *
@@ -530,6 +544,8 @@ abstract class Geometry {
         // Type
         $ret['type'] = $this->getGeoJSONBasetype() . ($this->isM() ? 'M' : '');
         // Bounding box
+        global $aabbcc;
+
         if ($flag_bbox) {
             $ret['bbox'] = [];
             $bbox = $this->getBoundingBox();
@@ -549,9 +565,14 @@ abstract class Geometry {
             if ($this->isM()) {
                 $ret['bbox'][] = $bbox['mmax'];
             }
+
+            $ret['bbox'] = $this->stripNonNumericValues($ret['bbox']);
+
         }
+
         // Coordinates
         $ret['coordinates'] = $coordinates;
+        $ret['coordinates'] = $this->stripNonNumericValues($ret['coordinates']);
         // Feature
         if ($flag_feature) {
             $ret = [
@@ -560,7 +581,6 @@ abstract class Geometry {
                 'properties' => $this->data,
             ];
         }
-
         return json_encode($ret);
     }
 

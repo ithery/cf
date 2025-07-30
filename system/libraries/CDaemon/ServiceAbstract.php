@@ -1003,8 +1003,9 @@ abstract class CDaemon_ServiceAbstract implements CDaemon_ServiceInterface {
         return $this->plugins[$alias];
     }
 
+
     /**
-     * @param type $alias
+     * @param string $alias
      *
      * @throws Exception
      *
@@ -1081,7 +1082,7 @@ abstract class CDaemon_ServiceAbstract implements CDaemon_ServiceInterface {
     }
 
     /**
-     * @param type $alias
+     * @param string $alias
      *
      * @throws Exception
      *
