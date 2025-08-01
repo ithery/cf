@@ -16,7 +16,7 @@
  * limitations under the License.
  */
 
-require_once dirname(__FILE__) . '/../GuzzleHttp/Psr7/functions_include.php';
+require_once dirname(__FILE__) . '/../../../../system/vendor/GuzzleHttp/Psr7/functions_include.php';
 
 use Monolog\Logger;
 use Google\Auth\OAuth2;
@@ -744,6 +744,7 @@ class Google_Client {
 
     /**
      * @return array
+     *
      * @visible For Testing
      */
     public function prepareScopes() {

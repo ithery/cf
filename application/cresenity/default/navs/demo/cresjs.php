@@ -17,4 +17,9 @@ return [
         'label' => c::__('Progressive'),
         'uri' => 'demo/cresjs/progressive/index',
     ],
+    [
+        'name' => 'cresjs.confirm',
+        'label' => c::__('Confirm'),
+        'uri' => 'demo/cresjs/confirm/index',
+    ],
 ];

@@ -24,7 +24,7 @@ class CAjax_Engine_DataTable_Processor_Elastic extends CAjax_Engine_DataTable_Pr
         $instanceName = carr::get($ajaxData, 'name');
         $instanceConfig = carr::get($ajaxData, 'config');
 
-        /*
+        /**
          * @var CElastic
          */
         $el = CElastic::instance($domain, $instanceName, $instanceConfig);

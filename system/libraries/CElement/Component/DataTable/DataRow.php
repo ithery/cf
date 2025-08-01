@@ -24,6 +24,17 @@ class CElement_Component_DataTable_DataRow implements CInterface_Arrayable {
         return $field;
     }
 
+    public function exists($field) {
+        if ($this->row instanceof CModel) {
+            return isset($this->row->$field);
+        }
+        if (carr::accessible($this->row)) {
+            return carr::exists($this->row, $field);
+        }
+
+        return $field;
+    }
+
     public function toArray() {
         if ($this->row instanceof CModel) {
             return $this->row->getAttributes();

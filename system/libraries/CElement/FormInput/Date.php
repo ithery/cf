@@ -17,9 +17,9 @@ class CElement_FormInput_Date extends CElement_FormInput {
 
     protected $startDate;
 
-    protected $end_date;
+    protected $endDate;
 
-    protected $disable_day;
+    protected $disableDay;
 
     protected $inline;
 
@@ -39,14 +39,38 @@ class CElement_FormInput_Date extends CElement_FormInput {
 
         $this->have_button = false;
         $this->startDate = '';
-        $this->end_date = '';
-        $this->disable_day = [];
+        $this->endDate = '';
+        $this->disableDay = [];
         $this->inline = false;
         $this->addClass('form-control');
     }
 
     public function setStartDate($str) {
         $this->startDate = $str;
+
+        return $this;
+    }
+
+    public function setEndDate($str) {
+        $this->endDate = $str;
+
+        return $this;
+    }
+
+    /**
+     * @param string|array $day
+     *
+     * @return $this
+     */
+    public function addDisableDaysOfWeek($day) {
+        $dayArray = $day;
+        if (!is_array($day)) {
+            $dayArray = explode(',', $day);
+        }
+
+        foreach ($dayArray as $d) {
+            $this->disableDay[] = trim($d);
+        }
 
         return $this;
     }
@@ -166,7 +190,7 @@ class CElement_FormInput_Date extends CElement_FormInput {
             weekStart: 0
         }
         ";
-        $day_map = [
+        $dayMap = [
             'sunday' => '0',
             'monday' => '1',
             'tuesday' => '2',
@@ -176,13 +200,13 @@ class CElement_FormInput_Date extends CElement_FormInput {
             'saturday' => '6',
         ];
 
-        foreach ($this->disable_day as $k => $v) {
-            if (isset($day_map[strtolower($this->disable_day[$k])])) {
-                $this->disable_day[$k] = $day_map[strtolower($this->disable_day[$k])];
+        foreach ($this->disableDay as $k => $v) {
+            if (isset($dayMap[strtolower($this->disableDay[$k])])) {
+                $this->disableDay[$k] = $dayMap[strtolower($this->disableDay[$k])];
             }
         }
 
-        $disable_day_str = implode(',', $this->disable_day);
+        $disableDayStr = implode(',', $this->disableDay);
 
         $jsOption = "
             format: {
@@ -206,11 +230,11 @@ class CElement_FormInput_Date extends CElement_FormInput {
         if (strlen($this->startDate) > 0) {
             $jsOption .= ",startDate: '" . $this->startDate . "'";
         }
-        if (strlen($this->end_date) > 0) {
-            $jsOption .= ",endDate: '" . $this->end_date . "'";
+        if (strlen($this->endDate) > 0) {
+            $jsOption .= ",endDate: '" . $this->endDate . "'";
         }
-        if (strlen($disable_day_str)) {
-            $jsOption .= ",daysOfWeekDisabled: '" . $disable_day_str . "'";
+        if (strlen($disableDayStr)) {
+            $jsOption .= ",daysOfWeekDisabled: '" . $disableDayStr . "'";
         }
         $autoclose = 'true';
         $jsOption .= ',autoclose: ' . $autoclose . '';

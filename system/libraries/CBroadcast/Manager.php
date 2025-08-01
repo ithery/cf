@@ -178,7 +178,7 @@ class CBroadcast_Manager implements CBroadcast_Contract_FactoryInterface {
      * @return mixed
      */
     protected function callCustomCreator(array $config) {
-        return $this->customCreators[$config['driver']]($this->app, $config);
+        return $this->customCreators[$config['driver']]($config);
     }
 
     /**
@@ -224,6 +224,24 @@ class CBroadcast_Manager implements CBroadcast_Contract_FactoryInterface {
      */
     protected function createRedisDriver(array $config) {
         return new CBroadcast_Broadcaster_RedisBroadcaster(
+            CRedis::instance(),
+            isset($config['connection']) ? $config['connection'] : null,
+            CF::config('database.redis.options.prefix', '')
+        );
+    }
+
+    /**
+     * Create an instance of the driver.
+     *
+     * @param array $config
+     *
+     * @return \CBroadcast_Contract_BroadcasterInterface
+     */
+    protected function createSseDriver(array $config) {
+        $eventHistory = new CBroadcast_SSE_Storage_BroadcastEventHistoryCached();
+
+        return new CBroadcast_Broadcaster_RedisSseBroadcaster(
+            $eventHistory,
             CRedis::instance(),
             isset($config['connection']) ? $config['connection'] : null,
             CF::config('database.redis.options.prefix', '')

@@ -5,14 +5,14 @@
  */
 class CDatabase_Platform_Keywords_MySql57 extends CDatabase_Platform_Keywords_MySql {
     /**
-     * {@inheritdoc}
+     * @inheritdoc
      */
     public function getName() {
         return 'MySQL57';
     }
 
     /**
-     * {@inheritdoc}
+     * @inheritdoc
      *
      * @link http://dev.mysql.com/doc/mysqld-version-reference/en/mysqld-version-reference-reservedwords-5-7.html
      */

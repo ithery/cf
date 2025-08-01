@@ -75,7 +75,7 @@ class CExporter_Exportable_DataTable extends CExporter_Exportable implements CEx
         $columnIntIndex = 0;
         $detectedDataType = null;
         $transformMaps = [
-            'format_currency' => 'currency',
+            'format_currency' => CExporter::DATA_TYPE_CURRENCY,
             'formatCurrency' => 'currency',
             'thousand_separator' => 'float',
             'formatDatetime' => 'datetime',
@@ -206,20 +206,20 @@ class CExporter_Exportable_DataTable extends CExporter_Exportable implements CEx
     }
 
     public static function dataTypeToColumnFormat($dataType) {
-        if ($dataType == 'date') {
+        if ($dataType == CExporter::DATA_TYPE_DATE) {
             return NumberFormat::FORMAT_DATE_YYYYMMDD;
         }
-        if ($dataType == 'datetime') {
+        if ($dataType == CExporter::DATA_TYPE_DATETIME) {
             return 'yyyy-mm-dd hh:mm:ss';
         }
 
-        if ($dataType == 'currency') {
+        if ($dataType == CExporter::DATA_TYPE_CURRENCY) {
             return NumberFormat::FORMAT_NUMBER_COMMA_SEPARATED1;
         }
-        if ($dataType == 'integer' || $dataType == 'number') {
+        if ($dataType == CExporter::DATA_TYPE_INTEGER || $dataType == CExporter::DATA_TYPE_NUMBER) {
             return NumberFormat::FORMAT_NUMBER;
         }
-        if ($dataType == 'string') {
+        if ($dataType == CExporter::DATA_TYPE_STRING) {
             return DataType::TYPE_STRING;
         }
 

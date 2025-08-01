@@ -1,6 +1,9 @@
-/********************************************************/
+/*******************************************************   */
+
 /*                     Generic elements                 */
-/********************************************************/
+
+/*******************************************************   */
+
 /* Count & close */
 .count,
 .close {
@@ -22,11 +25,14 @@
     border-width: 1px;
     border-style: solid;
     font-weight: bold;
-    -webkit-box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.5),
+    -webkit-box-shadow:
+        inset 0 1px 0 rgba(255, 255, 255, 0.5),
         0 1px 3px rgba(0, 0, 0, 0.75);
-    -moz-box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.5),
+    -moz-box-shadow:
+        inset 0 1px 0 rgba(255, 255, 255, 0.5),
         0 1px 3px rgba(0, 0, 0, 0.75);
-    box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.5),
+    box-shadow:
+        inset 0 1px 0 rgba(255, 255, 255, 0.5),
         0 1px 3px rgba(0, 0, 0, 0.75);
     -webkit-text-shadow: 0 1px 2px rgba(0, 0, 0, 0.5);
     -moz-text-shadow: 0 1px 2px rgba(0, 0, 0, 0.5);
@@ -85,13 +91,14 @@
 #access > li > a:hover > .count {
     margin-top: 6px;
 }
+
 /* Blocks */
 .block,
 details.details {
     border: 1px solid #bfbfbf;
     position: relative;
     background-color: white;
-    color: #666666;
+    color: #666;
     -webkit-border-radius: 9px;
     -moz-border-radius: 9px;
     border-radius: 9px;
@@ -104,11 +111,14 @@ details.details > summary {
     border-bottom-width: 1px;
     border-bottom-style: solid;
     cursor: pointer;
-    -webkit-box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.75),
+    -webkit-box-shadow:
+        inset 0 1px 0 rgba(255, 255, 255, 0.75),
         0 1px 1px rgba(0, 0, 0, 0.15);
-    -moz-box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.75),
+    -moz-box-shadow:
+        inset 0 1px 0 rgba(255, 255, 255, 0.75),
         0 1px 1px rgba(0, 0, 0, 0.15);
-    box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.75),
+    box-shadow:
+        inset 0 1px 0 rgba(255, 255, 255, 0.75),
         0 1px 1px rgba(0, 0, 0, 0.15);
     -webkit-text-shadow: 0 1px 0 white;
     -moz-text-shadow: 0 1px 0 white;
@@ -136,14 +146,14 @@ html.details details.details[open] > summary {
     border-bottom-left-radius: 0;
     border-bottom-right-radius: 0;
 }
-details.details > summary:before {
+details.details > summary::before {
     content: '?';
     padding-right: 5px;
 }
-html.details details.details > summary:before {
+html.details details.details > summary::before {
     display: none;
 }
-details.details.open > summary:before {
+details.details.open > summary::before {
     content: '?';
 }
 h3.block-title {
@@ -158,6 +168,7 @@ details.details > summary > h3 {
 .block-title > .absolute-right {
     right: 17px;
 }
+
 /* Accordions */
 .accordion {
     border: 1px solid #bfbfbf;
@@ -175,11 +186,14 @@ details.details > summary > h3 {
     border-bottom-width: 1px;
     border-bottom-style: solid;
     cursor: pointer;
-    -webkit-box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.75),
+    -webkit-box-shadow:
+        inset 0 1px 0 rgba(255, 255, 255, 0.75),
         0 1px 1px rgba(0, 0, 0, 0.15);
-    -moz-box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.75),
+    -moz-box-shadow:
+        inset 0 1px 0 rgba(255, 255, 255, 0.75),
         0 1px 1px rgba(0, 0, 0, 0.15);
-    box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.75),
+    box-shadow:
+        inset 0 1px 0 rgba(255, 255, 255, 0.75),
         0 1px 1px rgba(0, 0, 0, 0.15);
 }
 .accordion > dt:first-child {
@@ -204,6 +218,7 @@ details.details > summary > h3 {
     border-bottom-left-radius: 5px;
     border-bottom-right-radius: 5px;
 }
+
 /* Ribbon, from Chris Coyer CSS Tricks : http://css-tricks.com/snippets/css/corner-ribbon */
 .ribbon {
     display: block;
@@ -265,8 +280,8 @@ details.details > summary > h3 {
 .no-csstransforms .tiny > .ribbon-inner {
     left: -9px;
 }
-.ribbon-inner:before,
-.ribbon-inner:after {
+.ribbon-inner::before,
+.ribbon-inner::after {
     content: '';
     border-left: 3px solid transparent;
     border-right: 3px solid transparent;
@@ -275,18 +290,17 @@ details.details > summary > h3 {
     position: absolute;
     bottom: -3px;
 }
-.tiny > .ribbon-inner:before,
-.tiny > .ribbon-inner:after {
+.tiny > .ribbon-inner::before,
+.tiny > .ribbon-inner::after {
     border-left-width: 2px;
     border-right-width: 2px;
     border-top-width: 2px;
     bottom: -2px;
 }
-.ribbon-inner:before {
+.ribbon-inner::before {
     left: 1px;
 }
-
-.ribbon-inner:after {
+.ribbon-inner::after {
     right: 1px;
 } /* Meter bars */
 .meter {
@@ -297,28 +311,32 @@ details.details > summary > h3 {
     margin-left: -2px;
     *margin-left: 2px;
     *vertical-align: middle;
-    background: #999999 url(../img/old-browsers/style/bg_meter.png) repeat-x;
+    background: #999 url(../img/old-browsers/style/bg_meter.png) repeat-x;
     -webkit-background-size: 100% 100%;
     -moz-background-size: 100% 100%;
     -o-background-size: 100% 100%;
     background-size: 100% 100%;
-    background: -webkit-gradient(
-        linear,
-        left top,
-        left bottom,
-        from(#808080),
-        to(#999999)
-    );
-    background: -webkit-linear-gradient(top, #808080, #999999);
-    background: -moz-linear-gradient(top, #808080, #999999);
-    background: -ms-linear-gradient(top, #808080, #999999);
-    background: -o-linear-gradient(top, #808080, #999999);
-    background: linear-gradient(top, #808080, #999999);
-    -webkit-box-shadow: inset 0 0 1px rgba(0, 0, 0, 0.75),
+    background:
+        -webkit-gradient(
+            linear,
+            left top,
+            left bottom,
+            from(#808080),
+            to(#999)
+        );
+    background: -webkit-linear-gradient(top, #808080, #999);
+    background: -moz-linear-gradient(top, #808080, #999);
+    background: -ms-linear-gradient(top, #808080, #999);
+    background: -o-linear-gradient(top, #808080, #999);
+    background: linear-gradient(top, #808080, #999);
+    -webkit-box-shadow:
+        inset 0 0 1px rgba(0, 0, 0, 0.75),
         0 1px 0 rgba(255, 255, 255, 0.25);
-    -moz-box-shadow: inset 0 0 1px rgba(0, 0, 0, 0.75),
+    -moz-box-shadow:
+        inset 0 0 1px rgba(0, 0, 0, 0.75),
         0 1px 0 rgba(255, 255, 255, 0.25);
-    box-shadow: inset 0 0 1px rgba(0, 0, 0, 0.75),
+    box-shadow:
+        inset 0 0 1px rgba(0, 0, 0, 0.75),
         0 1px 0 rgba(255, 255, 255, 0.25);
 } /* Information spot */
 .info-spot {
@@ -370,7 +388,7 @@ details.details > summary > h3 {
 .info-spot:hover > .info-bubble {
     display: block;
 }
-.info-bubble:before {
+.info-bubble::before {
     content: '';
     display: block;
     position: absolute;
@@ -391,8 +409,10 @@ details.details > summary > h3 {
     right: 100%;
     height: 26px;
     width: 21px;
-    /*background-color:expression(this.parentNode.currentStyle['background-color']); */
+
+    /* background-color:expression(this.parentNode.currentStyle['background-color']); */
 }
+
 /* Flipped */
 .on-top > .info-bubble {
     top: auto;
@@ -402,7 +422,7 @@ details.details > summary > h3 {
     -moz-border-radius: 5px 5px 5px 0;
     border-radius: 5px 5px 5px 0;
 }
-.on-top > .info-bubble:before {
+.on-top > .info-bubble::before {
     top: auto;
     bottom: 0;
 } /* IE7 */
@@ -418,7 +438,7 @@ details.details > summary > h3 {
     -moz-border-radius: 5px 0 5px 5px;
     border-radius: 5px 0 5px 5px;
 }
-.on-left > .info-bubble:before {
+.on-left > .info-bubble::before {
     right: auto;
     left: 100%;
     -webkit-border-radius: 0;
@@ -443,6 +463,7 @@ details.details > summary > h3 {
     left: auto;
     right: 15px;
 }
+
 /* Touch screen do not handle hover correctly, the text is shown on an modal */
 .js.touch .info-spot:hover > [class^='icon-'],
 .js.touch .info-spot:hover > [class*=' icon-'] {

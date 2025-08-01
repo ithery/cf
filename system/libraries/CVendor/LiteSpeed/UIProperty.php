@@ -23,33 +23,43 @@ class CVendor_LiteSpeed_UIProperty {
 
     private $tabs;
 
-    public function Get($field) {
+    public function get($field) {
         switch ($field) {
-            case self::FLD_PAGE_TITLE: return $this->page_title;
-            case self::FLD_FORM_ACTION: return $this->form_action;
-            case self::FLD_FORM_HIDDENVARS: return $this->form_hiddenvars;
-            case self::FLD_TABS: return $this->tabs;
-            case self::FLD_SERVER_NAME: return $this->servername;
+            case self::FLD_PAGE_TITLE:
+                return $this->page_title;
+            case self::FLD_FORM_ACTION:
+                return $this->form_action;
+            case self::FLD_FORM_HIDDENVARS:
+                return $this->form_hiddenvars;
+            case self::FLD_TABS:
+                return $this->tabs;
+            case self::FLD_SERVER_NAME:
+                return $this->servername;
             default:
                 die("illegal field ${field}");
         }
     }
 
-    public function Set($field, $val) {
+    public function set($field, $val) {
         switch ($field) {
-            case self::FLD_PAGE_TITLE: $this->page_title = $val;
+            case self::FLD_PAGE_TITLE:
+                $this->page_title = $val;
 
                 break;
-            case self::FLD_FORM_ACTION: $this->form_action = $val;
+            case self::FLD_FORM_ACTION:
+                $this->form_action = $val;
 
                 break;
-            case self::FLD_FORM_HIDDENVARS: $this->form_hiddenvars = $val;
+            case self::FLD_FORM_HIDDENVARS:
+                $this->form_hiddenvars = $val;
 
                 break;
-            case self::FLD_TABS: $this->tabs = $val;
+            case self::FLD_TABS:
+                $this->tabs = $val;
 
                 break;
-            case self::FLD_SERVER_NAME: $this->servername = $val;
+            case self::FLD_SERVER_NAME:
+                $this->servername = $val;
 
                 break;
             default:

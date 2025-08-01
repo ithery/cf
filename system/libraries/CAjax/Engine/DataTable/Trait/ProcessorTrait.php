@@ -101,6 +101,12 @@ trait CAjax_Engine_DataTable_Trait_ProcessorTrait {
             }
 
             $arr['DT_RowId'] = $key;
+
+            if ($table->getRowClassCallbackFunction() != null) {
+                $arr['DT_RowClass'] = CFunction::factory($table->getRowClassCallbackFunction())
+                    ->addArg($row)
+                    ->execute();
+            }
             $aaData[] = $arr;
         }
 

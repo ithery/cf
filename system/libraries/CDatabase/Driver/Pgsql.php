@@ -195,7 +195,7 @@ class CDatabase_Driver_Pgsql extends CDatabase_Driver {
         }
 
         if (!isset($result)) {
-            throw new CDatabase_Exception('Table :table does not exist in your database', [':table' => $table]);
+            throw CDatabase_Exception::tableNotFound($table);
         }
 
         return $result;

@@ -43,6 +43,6 @@ class CConsole_Command_Api_JWTSecretCommand extends CConsole_Command {
      * @return void
      */
     protected function displayKey($key) {
-        $this->info("jwt-auth secret generated [${key}]");
+        $this->info('jwt-auth secret generated [' . $key . ']');
     }
 }

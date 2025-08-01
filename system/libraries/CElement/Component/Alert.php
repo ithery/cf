@@ -2,6 +2,7 @@
 
 class CElement_Component_Alert extends CElement_Component {
     use CTrait_Element_Property_Title;
+
     /**
      * @var CElement_Element_H4
      */
@@ -37,6 +38,22 @@ class CElement_Component_Alert extends CElement_Component {
         $this->type = $type;
 
         return $this;
+    }
+
+    public function setTypeDanger() {
+        return $this->setType('danger');
+    }
+
+    public function setTypeSuccess() {
+        return $this->setType('success');
+    }
+
+    public function setTypeWarning() {
+        return $this->setType('warning');
+    }
+
+    public function setTypeInfo() {
+        return $this->setType('info');
     }
 
     public function setDismissable($bool = true) {

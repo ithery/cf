@@ -42,7 +42,9 @@ class CManager_DataProvider_SqlDataProvider extends CManager_DataProviderAbstrac
     }
 
     public function toEnumerable() {
-        return c::collect($this->getDb()->query($this->sql, $this->bindings)->resultArray(false));
+        $sql = $this->getFullQuery();
+
+        return c::collect($this->getDb()->query($sql)->resultArray(false));
     }
 
     private function executeQuery($sql, $bindings = []) {
@@ -56,6 +58,7 @@ class CManager_DataProvider_SqlDataProvider extends CManager_DataProviderAbstrac
         $results = c::collect();
         if ($total > 0) {
             $query = $this->getQueryForPage($page, $perPage);
+
             $resultQ = $this->executeQuery($query);
             $results = c::collect($resultQ->result(false));
         }
@@ -250,8 +253,8 @@ class CManager_DataProvider_SqlDataProvider extends CManager_DataProviderAbstrac
         }
         $q = $this->getFullQuery();
         $alias = $method . '_' . $column;
-        $qTotal = 'select ' . $method . '(' . $this->db->escapeColumn($column) . ') as ' . $alias . ' from (' . $q . ') as t';
-        $rTotal = c::db()->query($qTotal);
+        $qTotal = 'select ' . $method . '(' . $this->getDb()->escapeColumn($column) . ') as ' . $alias . ' from (' . $q . ') as t';
+        $rTotal = $this->getDb()->query($qTotal);
 
         return $rTotal[0]->$alias;
     }

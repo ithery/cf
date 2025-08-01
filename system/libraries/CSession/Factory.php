@@ -11,6 +11,8 @@ class CSession_Factory {
      */
     private $config;
 
+    private $customCreators = [];
+
     /**
      * @return CSession_Factory
      */
@@ -131,7 +133,7 @@ class CSession_Factory {
         $store = $this->config->get('session.store') ?: $driver;
 
         return new CSession_Handler_CacheBasedSessionHandler(
-            clone $this->container->make('cache')->store($store),
+            clone c::cache()->store($store),
             $this->config->get('session.lifetime')
         );
     }

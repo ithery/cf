@@ -23,6 +23,6 @@ class CVendor_LiteSpeed_Node_FileLine {
     }
 
     public function debugStr() {
-        return sprintf('fid=%s from line %s to %s', $this->_fid, $this->_fline0, $this->_fline1);
+        return sprintf('fid=%s from line %s to %s', $this->fid, $this->fline0, $this->fline1);
     }
 }

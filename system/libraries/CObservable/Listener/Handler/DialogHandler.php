@@ -115,7 +115,7 @@ class CObservable_Listener_Handler_DialogHandler extends CObservable_Listener_Ha
             if (strlen($dataAddition) > 0) {
                 $dataAddition .= ',';
             }
-            $dataAddition .= "'" . $inp . "':$.cresenity.value('#" . $inp . "')";
+            $dataAddition .= "'" . $inp . "':cresenity.value('#" . $inp . "')";
         }
         foreach ($this->param_request as $req_k => $req_v) {
             if (strlen($dataAddition) > 0) {

@@ -21,10 +21,10 @@ class CDatabase_Driver_PDO_Sqlite_Result extends CDatabase_Result {
         if (is_object($result) or $result = $link->prepare($sql)) {
             // run the query. Return true if success, false otherwise
             if (!$result->execute()) {
-                // Throw Kohana Exception with error message. See PDOStatement errorInfo() method
-                $arr_infos = $result->errorInfo();
+                // Throw Exception with error message. See PDOStatement errorInfo() method
+                $arrInfos = $result->errorInfo();
 
-                throw new CDatabase_Exception('There was an SQL error: :error', [':error' => $arr_infos[2]]);
+                throw CDatabase_Exception::queryException(carr::get($arrInfos, 2, ''));
             }
 
             if (preg_match('/^SELECT|PRAGMA|EXPLAIN/i', $sql)) {
@@ -45,7 +45,7 @@ class CDatabase_Driver_PDO_Sqlite_Result extends CDatabase_Result {
                 $errorInfo = implode(',', $errorInfo);
             }
             // SQL error
-            throw new CDatabase_Exception_QueryException(c::__('There was an SQL error: :error', [':error' => $errorInfo . ' (SQL: ' . $sql . ')']));
+            throw CDatabase_Exception::queryException($errorInfo . ' (SQL: ' . $sql . ')');
         }
 
         // Set result type
@@ -123,7 +123,7 @@ class CDatabase_Driver_PDO_Sqlite_Result extends CDatabase_Result {
                 $rows[] = $row;
             }
         } catch (PDOException $e) {
-            throw new CDatabase_Exception('There was an SQL error: :error', [':error' => $e->getMessage()]);
+            throw CDatabase_Exception::queryException($e->getMessage());
 
             return false;
         }
@@ -154,7 +154,7 @@ class CDatabase_Driver_PDO_Sqlite_Result extends CDatabase_Result {
         try {
             return $this->result->fetch($this->fetch_type, PDO::FETCH_ORI_ABS, $offset);
         } catch (PDOException $e) {
-            throw new CDatabase_Exception('There was an SQL error: :error', [':error' => $e->getMessage()]);
+            throw CDatabase_Exception::queryException($e->getMessage());
         }
     }
 

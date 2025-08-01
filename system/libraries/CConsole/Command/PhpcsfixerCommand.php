@@ -1,0 +1,75 @@
+<?php
+
+/**
+ * Description of PhpStanCommand.
+ *
+ * @author Hery
+ */
+use Symfony\Component\Process\Process;
+use Symfony\Component\Process\PhpExecutableFinder;
+use Symfony\Component\Console\Formatter\OutputFormatterStyle;
+
+class CConsole_Command_PhpcsfixerCommand extends CConsole_Command {
+    /**
+     * The name and signature of the console command.
+     *
+     * @var string
+     */
+    protected $signature = 'php-cs-fixer {file?} {--format=table : format to display} {--debug} {--ignore-env}';
+
+    public function handle() {
+        $isFramework = CF::appCode() == null;
+        $format = $this->option('format');
+        $debug = $this->option('debug');
+        $ignoreEnv = $this->option('ignore-env');
+        $appDir = $isFramework ? DOCROOT . 'system/libraries/CElement' : c::appRoot();
+        $file = $this->argument('file');
+        $scanPath = $appDir;
+        if ($file) {
+            $scanPath = $file;
+        }
+
+        if (!$this->isPhpCsFixerInstalled()) {
+            throw new RuntimeException('php-cs-fixer is not installed, please install with phpcs:install command');
+        }
+
+        chdir($isFramework ? DOCROOT : c::appRoot());
+        //$command = [$this->phpBinary(), $this->getPhpCsPhar(),$appDir];
+        $command = [$this->phpBinary(), $this->getPhpCsFixerPhar(), '--config='.CQC::phpcsfixer()->phpcsfixerConfiguration()];
+        $command[] = 'fix';
+        $command[] = $scanPath;
+        $envVariables=[];
+        if ($ignoreEnv) {
+            $envVariables['PHP_CS_FIXER_IGNORE_ENV'] = 1;
+        }
+        $process = Process::fromShellCommandline($command, c::appRoot(), $envVariables);
+        $process->setTimeout(60 * 60);
+        $process->start(function ($type, $buffer) {
+            $this->output->write($buffer);
+        });
+
+        $process->wait();
+        // executes after the command finishes
+        if (!$process->isSuccessful()) {
+            $errMessage = $process->getErrorOutput();
+            if (strlen($errMessage) == 0) {
+                $errMessage = 'Something went wrong on running phpcs, please manually check the command';
+            }
+            $this->error($errMessage);
+        }
+
+        return $process->getExitCode();
+    }
+
+    private function isPhpCsFixerInstalled() {
+        return CQC::phpcsfixer()->isInstalled();
+    }
+
+    private function getPhpCsFixerPhar() {
+        return CQC::phpcsfixer()->phpcsfixerPhar();
+    }
+
+    private function phpBinary() {
+        return (new PhpExecutableFinder())->find(false);
+    }
+}

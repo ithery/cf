@@ -142,10 +142,21 @@ trait CElement_Component_DataTable_Trait_HtmlTrait {
                     $no++;
                     $key = '';
 
-                    if (array_key_exists($this->keyField, $row)) {
-                        $key = $row[$this->keyField];
+                    if ($dataRow->exists($this->keyField)) {
+                        $key = $dataRow->getValue($this->keyField);
                     }
-                    $html->appendln('<tr id="tr-' . $key . '">')->incIndent()->br();
+
+                    $trClass = '';
+                    if ($this->rowClassCallbackFunction != null) {
+                        $trClass = CFunction::factory($this->rowClassCallbackFunction)
+                            ->addArg($row)
+                            ->execute();
+                    }
+                    $attrId = '';
+                    if ($key) {
+                        $attrId = 'id="tr-' . $key . '"';
+                    }
+                    $html->appendln('<tr ' . $attrId . ($trClass ? ' class="' . $trClass . '"' : '') . '>')->incIndent()->br();
 
                     if ($this->numbering) {
                         $html->appendln('<td scope="row" class="align-right">' . $no . '</td>')->br();
@@ -163,6 +174,10 @@ trait CElement_Component_DataTable_Trait_HtmlTrait {
                         $js .= $this->drawActionAndGetJs($html, $dataRow, $key);
                     }
                     foreach ($this->columns as $col) {
+                        /** @var CElement_Component_DataTable_Column $col */
+                        if (!$this->applyDataTable && !$col->isVisible()) {
+                            continue;
+                        }
                         $cell = new CElement_Component_DataTable_Cell($this, $col, $row);
 
                         $newValue = $cell->html();
@@ -248,8 +263,9 @@ trait CElement_Component_DataTable_Trait_HtmlTrait {
             $this->getRowActionList()->apply('setJsParam', $jsparam);
             $this->getRowActionList()->apply('setHandlerParam', $jsparam);
             $actions = $this->getRowActionList()->childs();
-
+            $actionNeedRender = false;
             foreach ($actions as &$action) {
+                /** @var CElement_Component_ActionRow $action */
                 if (($this->filterActionCallbackFunc) != null) {
                     $visibility = CFunction::factory($this->filterActionCallbackFunc)
                         ->addArg($this)
@@ -266,11 +282,13 @@ trait CElement_Component_DataTable_Trait_HtmlTrait {
                 if ($action instanceof CElement_Component_ActionRow) {
                     $action->applyRowCallback($row->toArray());
                 }
+                $actionNeedRender = $actionNeedRender || $action->isVisible();
             }
 
             $js = $this->getRowActionList()->js();
-
-            $html->appendln($this->getRowActionList()->html($html->getIndent()));
+            if ($actionNeedRender) {
+                $html->appendln($this->getRowActionList()->html($html->getIndent()));
+            }
             $html->decIndent()->appendln('</td>')->br();
         }
 
@@ -413,6 +431,7 @@ trait CElement_Component_DataTable_Trait_HtmlTrait {
 
     public function htmlTHead() {
         $thClass = '';
+        /** @var CElement_Component_DataTable $this */
         if ($this->headerNoLineBreak) {
             $thClass = ' no-line-break';
         }
@@ -445,8 +464,14 @@ trait CElement_Component_DataTable_Trait_HtmlTrait {
                 $html->appendln($this->htmlActionTh());
             }
             foreach ($this->columns as $col) {
+                /** @var CElement_Component_DataTable_Column $col */
+                if (!$this->applyDataTable && !$col->isVisible()) {
+                    continue;
+                }
+
                 $html->appendln($col->renderHeaderHtml($this->export_pdf, $thClass, $html->getIndent()))->br();
             }
+
             if ($this->getActionLocation() == 'last') {
                 $html->appendln($this->htmlActionTh());
             }

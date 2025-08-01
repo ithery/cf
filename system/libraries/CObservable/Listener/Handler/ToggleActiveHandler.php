@@ -46,7 +46,7 @@ class CObservable_Listener_Handler_ToggleActiveHandler extends CObservable_Liste
         $js = '';
 
         if ($this->itemsSelector) {
-            $js .= 'jQuery(' . $this->itemsSelector . "').removeClass('" . $this->toggleClass . "');";
+            $js .= "jQuery('" . $this->itemsSelector . "').removeClass('" . $this->toggleClass . "');";
         } else {
             $js .= "jQuery('" . $this->getSelector() . "').parent().children().removeClass('" . $this->toggleClass . "');";
         }

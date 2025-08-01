@@ -3,11 +3,6 @@
 defined('SYSPATH') or die('No direct access allowed.');
 
 /**
- * @author Hery Kurniawan
- * @license Ittron Global Teknologi <ittron.co.id>
- *
- * @since Jun 19, 2018, 11:36:57 PM
- *
  * @property      string  $name
  * @property      string  $createdby
  * @property      string  $updatedby
@@ -64,12 +59,15 @@ trait CApp_Model_Trait_Roles {
         }
 
         $root = $root->descendants();
+        /** @var CModel_Nested_Relation_Descendants $root */
         if (strlen($orgId) > 0) {
             $root = $root->where(function ($query) use ($orgId) {
                 $query->where('org_id', '=', $orgId)->orWhereNull('org_id');
             })->where('status', '>', 0);
         }
-        if (is_array($type)) {
+        if (is_callable($type)) {
+            call_user_func_array($type, [$root]);
+        } elseif (is_array($type)) {
             foreach ($type as $k => $v) {
                 $root = $root->where($k, '=', $v);
             }

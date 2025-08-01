@@ -21,7 +21,7 @@ class CElement_List_ActionList extends CElement_List {
         parent::__construct($listId);
 
         $this->style = 'btn-list';
-        $this->label = c::__('Action');
+        $this->label = c::__('element/action.action');
         $this->btn_dropdown_classes = [];
         $this->label_size = 2;
         $this->icon = '';

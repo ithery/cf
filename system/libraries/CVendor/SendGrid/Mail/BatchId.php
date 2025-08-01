@@ -1,15 +1,7 @@
 <?php
 
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
-
 /**
- * This class is used to construct a BatchId object for the /mail/send API call
- *
- * @package SendGrid\Mail
+ * This class is used to construct a BatchId object for the /mail/send API call.
  */
 class CVendor_SendGrid_Mail_BatchId implements \JsonSerializable {
     /**
@@ -18,9 +10,9 @@ class CVendor_SendGrid_Mail_BatchId implements \JsonSerializable {
     private $batch_id;
 
     /**
-     * Optional constructor
+     * Optional constructor.
      *
-     * @param string|null $batch_id This ID represents a batch of emails to
+     * @param null|string $batch_id This ID represents a batch of emails to
      *                              be sent at the same time
      */
     public function __construct($batch_id = null) {
@@ -30,7 +22,7 @@ class CVendor_SendGrid_Mail_BatchId implements \JsonSerializable {
     }
 
     /**
-     * Add the batch id to a BatchId object
+     * Add the batch id to a BatchId object.
      *
      * @param string $batch_id This ID represents a batch of emails to be sent
      *                         at the same time
@@ -45,7 +37,7 @@ class CVendor_SendGrid_Mail_BatchId implements \JsonSerializable {
     }
 
     /**
-     * Return the batch id from a BatchId object
+     * Return the batch id from a BatchId object.
      *
      * @return string
      */
@@ -54,7 +46,7 @@ class CVendor_SendGrid_Mail_BatchId implements \JsonSerializable {
     }
 
     /**
-     * Return an array representing a BatchId object for the Twilio SendGrid API
+     * Return an array representing a BatchId object for the Twilio SendGrid API.
      *
      * @return null|string
      */

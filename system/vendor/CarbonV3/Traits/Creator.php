@@ -185,7 +185,7 @@ trait Creator {
             $date = @static::now($tz)->change($time);
 
             if (!$date) {
-                throw new InvalidFormatException("Could not parse '${time}': " . $exception->getMessage(), 0, $exception);
+                throw new InvalidFormatException("Could not parse '$time': " . $exception->getMessage(), 0, $exception);
             }
 
             return $date;
@@ -820,7 +820,7 @@ trait Creator {
             $format = $replacements[$code] ?? '?';
 
             if ($format === '!') {
-                throw new InvalidFormatException("Format ${code} not supported for creation.");
+                throw new InvalidFormatException("Format $code not supported for creation.");
             }
 
             return $format;
@@ -903,8 +903,15 @@ trait Creator {
      *
      * @return void
      */
-    private static function setLastErrors(array $lastErrors) {
-        static::$lastErrors = $lastErrors;
+    private static function setLastErrors($lastErrors) {
+        if (\is_array($lastErrors) || $lastErrors === false) {
+            static::$lastErrors = \is_array($lastErrors) ? $lastErrors : [
+                'warning_count' => 0,
+                'warnings' => [],
+                'error_count' => 0,
+                'errors' => [],
+            ];
+        }
     }
 
     /**

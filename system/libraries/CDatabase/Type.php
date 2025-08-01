@@ -145,7 +145,7 @@ abstract class CDatabase_Type {
      *
      * @param CDatabase_Platform $platform
      *
-     * @return int|null
+     * @return null|int
      *
      * @todo Needed?
      */
@@ -178,9 +178,9 @@ abstract class CDatabase_Type {
      *
      * @param string $name the name of the type (as returned by getName())
      *
-     * @return CDatabase_Type
+     * @throws \CDatabase_Exception
      *
-     * @throws \Doctrine\DBAL\DBALException
+     * @return CDatabase_Type
      */
     public static function getType($name) {
         if (!isset(self::$typeObjects[$name])) {
@@ -199,9 +199,9 @@ abstract class CDatabase_Type {
      * @param string $name      The name of the type. This should correspond to what getName() returns.
      * @param string $className the class name of the custom type
      *
-     * @return void
-     *
      * @throws CDatabase_Exception
+     *
+     * @return void
      */
     public static function addType($name, $className) {
         if (isset(self::$typesMap[$name])) {
@@ -228,9 +228,9 @@ abstract class CDatabase_Type {
      * @param string $name
      * @param string $className
      *
-     * @return void
+     * @throws \CDatabase_Exception
      *
-     * @throws \Doctrine\DBAL\DBALException
+     * @return void
      */
     public static function overrideType($name, $className) {
         if (!isset(self::$typesMap[$name])) {
@@ -258,7 +258,7 @@ abstract class CDatabase_Type {
 
     /**
      * Gets the types array map which holds all registered types and the corresponding
-     * type class
+     * type class.
      *
      * @return array
      */

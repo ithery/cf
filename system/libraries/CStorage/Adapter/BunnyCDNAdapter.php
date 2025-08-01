@@ -223,7 +223,7 @@ class CStorage_Adapter_BunnyCDNAdapter implements FilesystemAdapter {
      */
     public function createDirectory($path, Config $config) {
         try {
-            $this->client->make_directory($path);
+            $this->client->makeDirectory($path);
             // @codeCoverageIgnoreStart
         } catch (CStorage_Vendor_BunnyCDN_Exception $e) {
             // Lol apparently this is "idempotent" but there's an exception... Sure whatever..

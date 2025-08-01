@@ -3,10 +3,11 @@
 defined('SYSPATH') or die('No direct access allowed.');
 
 /**
- * @author Hery Kurniawan
- * @license Ittron Global Teknologi <ittron.co.id>
- *
- * @since Jun 19, 2018, 3:37:54 AM
+ * @property string  $createdby
+ * @property string  $updatedby
+ * @property CCarbon $created
+ * @property CCarbon $updated
+ * @property int     $status
  */
 class CApp_Model_Users extends CApp_Model implements CAuth_AuthenticatableInterface, CAuth_Contract_ImpersonateableInterface {
     use CApp_Model_Trait_Users;

@@ -334,7 +334,7 @@ class CElement_Component_Form extends CElement_Component {
             $this->setAttr('target', $this->target);
         }
         if (strlen($this->method) > 0) {
-            $this->setAttr('method', $this->method);
+            $this->setAttr('method', cstr::upper($this->method));
         }
         if (strlen($this->action) > 0) {
             $this->setAttr('action', $this->action);

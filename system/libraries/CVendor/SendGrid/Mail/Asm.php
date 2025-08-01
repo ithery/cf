@@ -1,15 +1,7 @@
 <?php
 
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
-
 /**
- * This class is used to construct a Asm object for the /mail/send API call
- *
- * @package SendGrid\Mail
+ * This class is used to construct a Asm object for the /mail/send API call.
  */
 class CVendor_SendGrid_Mail_Asm implements \JsonSerializable {
     /**
@@ -24,12 +16,12 @@ class CVendor_SendGrid_Mail_Asm implements \JsonSerializable {
     private $groups_to_display;
 
     /**
-     * Optional constructor
+     * Optional constructor.
      *
-     * @param int|CVendor_SendGrid_Mail_GroupId|null           $group_id          A GroupId object or the
+     * @param null|int|CVendor_SendGrid_Mail_GroupId           $group_id          A GroupId object or the
      *                                                                            unsubscribe group to
      *                                                                            associate with this email
-     * @param int[]|CVendor_SendGrid_Mail_GroupsToDisplay|null $groups_to_display a GroupsToDisplay
+     * @param null|int[]|CVendor_SendGrid_Mail_GroupsToDisplay $groups_to_display a GroupsToDisplay
      *                                                                            object or an array
      *                                                                            containing the
      *                                                                            unsubscribe groups
@@ -51,7 +43,7 @@ class CVendor_SendGrid_Mail_Asm implements \JsonSerializable {
     }
 
     /**
-     * Add the group id to a Asm object
+     * Add the group id to a Asm object.
      *
      * @param int|CVendor_SendGrid_Mail_GroupId $group_id The unsubscribe group to associate with this
      *                                                    email
@@ -69,11 +61,12 @@ class CVendor_SendGrid_Mail_Asm implements \JsonSerializable {
             }
             $this->group_id = new CVendor_SendGrid_Mail_GroupId($group_id);
         }
+
         return;
     }
 
     /**
-     * Retrieve the GroupId object from a Asm object
+     * Retrieve the GroupId object from a Asm object.
      *
      * The unsubscribe group to associate with this email
      *
@@ -84,7 +77,7 @@ class CVendor_SendGrid_Mail_Asm implements \JsonSerializable {
     }
 
     /**
-     * Add the groups to display id(s) to a Asm object
+     * Add the groups to display id(s) to a Asm object.
      *
      * @param int[]|CVendor_SendGrid_Mail_GroupsToDisplay $groups_to_display a GroupsToDisplay
      *                                                                       object or an array
@@ -108,11 +101,12 @@ class CVendor_SendGrid_Mail_Asm implements \JsonSerializable {
             }
             $this->groups_to_display = new CVendor_SendGrid_Mail_GroupsToDisplay($groups_to_display);
         }
+
         return;
     }
 
     /**
-     * Retrieve the groups to display id(s) from a Asm object
+     * Retrieve the groups to display id(s) from a Asm object.
      *
      * @return int[]
      */
@@ -121,7 +115,7 @@ class CVendor_SendGrid_Mail_Asm implements \JsonSerializable {
     }
 
     /**
-     * Return an array representing a Asm object for the Twilio SendGrid API
+     * Return an array representing a Asm object for the Twilio SendGrid API.
      *
      * @return null|array
      */

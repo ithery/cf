@@ -43,6 +43,8 @@ class CLogger {
 
     protected $threshold;
 
+    protected $writers = [];
+
     /**
      * @var CLogger Singleton instance container
      */
@@ -85,7 +87,7 @@ class CLogger {
         }
 
         $writer = CLogger_Writer::factory($type, $options);
-        $this->_writers[$writer->__toString()] = [
+        $this->writers[$writer->__toString()] = [
             'object' => $writer,
             'levels' => $levels,
         ];
@@ -194,7 +196,7 @@ class CLogger {
         // Reset the messages array
         $this->messages = [];
 
-        foreach ($this->_writers as $writer) {
+        foreach ($this->writers as $writer) {
             if (empty($writer['levels'])) {
                 // Write all of the messages
                 $writer['object']->write($messages);
@@ -219,7 +221,141 @@ class CLogger {
         return static::$logLevels;
     }
 
+    /**
+     * @return CLogger_Manager
+     */
     public static function logger() {
         return CLogger_Manager::instance();
+    }
+
+    /**
+     * Get a log channel instance.
+     *
+     * @param null|string $channel
+     *
+     * @return \Psr\Log\LoggerInterface
+     */
+    public static function channel($channel = null) {
+        return CLogger_Manager::instance()->channel($channel);
+    }
+
+    /**
+     * System is unusable.
+     *
+     * @param string $message
+     * @param array  $context
+     *
+     * @return void
+     */
+    public function emergency($message, array $context = []) {
+        $this->channel()->emergency($message, $context);
+    }
+
+    /**
+     * Action must be taken immediately.
+     *
+     * Example: Entire website down, database unavailable, etc. This should
+     * trigger the SMS alerts and wake you up.
+     *
+     * @param string $message
+     * @param array  $context
+     *
+     * @return void
+     */
+    public function alert($message, array $context = []) {
+        $this->channel()->alert($message, $context);
+    }
+
+    /**
+     * Critical conditions.
+     *
+     * Example: Application component unavailable, unexpected exception.
+     *
+     * @param string $message
+     * @param array  $context
+     *
+     * @return void
+     */
+    public function critical($message, array $context = []) {
+        $this->channel()->critical($message, $context);
+    }
+
+    /**
+     * Runtime errors that do not require immediate action but should typically
+     * be logged and monitored.
+     *
+     * @param string $message
+     * @param array  $context
+     *
+     * @return void
+     */
+    public function error($message, array $context = []) {
+        $this->channel()->error($message, $context);
+    }
+
+    /**
+     * Exceptional occurrences that are not errors.
+     *
+     * Example: Use of deprecated APIs, poor use of an API, undesirable things
+     * that are not necessarily wrong.
+     *
+     * @param string $message
+     * @param array  $context
+     *
+     * @return void
+     */
+    public function warning($message, array $context = []) {
+        $this->channel()->warning($message, $context);
+    }
+
+    /**
+     * Normal but significant events.
+     *
+     * @param string $message
+     * @param array  $context
+     *
+     * @return void
+     */
+    public function notice($message, array $context = []) {
+        $this->channel()->notice($message, $context);
+    }
+
+    /**
+     * Interesting events.
+     *
+     * Example: User logs in, SQL logs.
+     *
+     * @param string $message
+     * @param array  $context
+     *
+     * @return void
+     */
+    public function info($message, array $context = []) {
+        $this->channel()->info($message, $context);
+    }
+
+    /**
+     * Detailed debug information.
+     *
+     * @param string $message
+     * @param array  $context
+     *
+     * @return void
+     */
+    public function debug($message, array $context = []) {
+        $this->channel()->debug($message, $context);
+    }
+
+    /**
+     * Logs with an arbitrary level.
+     *
+     * @param mixed  $level
+     * @param string $message
+     * @param array  $context
+     *
+     * @return void
+     */
+    public function log($level, $message, array $context = []) {
+        $this->channel()->log($level, $message, $context);
     }
 }

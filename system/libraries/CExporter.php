@@ -38,6 +38,14 @@ class CExporter {
 
     const IS_QUEUE = false;
 
+    const DATA_TYPE_STRING = 'string';
+
+    const DATA_TYPE_DATETIME = 'datetime';
+    const DATA_TYPE_DATE = 'date';
+    const DATA_TYPE_CURRENCY = 'currency';
+    const DATA_TYPE_INTEGER = 'integer';
+    const DATA_TYPE_NUMBER = 'number';
+
     protected static $externalWriter = [
         self::SNAPPYPDF => CExporter_PhpSpreadsheet_SnappyPdf::class,
         self::SNAPPYIMAGE => CExporter_PhpSpreadsheet_SnappyImage::class,

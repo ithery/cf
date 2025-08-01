@@ -37,10 +37,14 @@
             scope: '.'
         }).then(function (registration) {
             // Registration was successful
+            @if(c::app()->pwa($group)->isDebug())
             console.log('CF PWA[{{ $group }}]: ServiceWorker registration successful with scope: ', registration.scope);
+            @endif
         }, function (err) {
             // registration failed :(
+            @if(c::app()->pwa($group)->isDebug())
             console.log('CF PWA[{{ $group }}]: ServiceWorker registration failed: ', err);
+            @endif
         });
     }
 </script>

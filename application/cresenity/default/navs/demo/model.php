@@ -10,4 +10,9 @@ return [
         'label' => c::__('Remote Model'),
         'uri' => 'demo/model/remote/index',
     ],
+    [
+        'name' => 'model.lazy',
+        'label' => c::__('Lazy Model'),
+        'uri' => 'demo/model/lazy/index',
+    ],
 ];

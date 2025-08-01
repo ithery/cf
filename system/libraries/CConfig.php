@@ -154,6 +154,7 @@ class CConfig implements CInterface_Arrayable, ArrayAccess {
         return carr::has($this->items, $key);
     }
 
+    #[\ReturnTypeWillChange]
     public function offsetExists($key) {
         return $this->has($key);
     }
@@ -162,10 +163,12 @@ class CConfig implements CInterface_Arrayable, ArrayAccess {
         return $this->get($key);
     }
 
+    #[\ReturnTypeWillChange]
     public function offsetSet($key, $value) {
         $this->set($key, $value);
     }
 
+    #[\ReturnTypeWillChange]
     public function offsetUnset($key) {
         $this->set($key, null);
     }

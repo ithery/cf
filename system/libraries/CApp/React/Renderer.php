@@ -17,12 +17,25 @@ class CApp_React_Renderer {
      */
     protected $path;
 
-    public function __construct($name) {
+    public function __construct($name, $content = null) {
         $this->name = $name;
-        $this->path = CApp_React_Finder::instance()->find(
-            $name = $this->normalize($name)
-        );
+
         $this->cachePath = static::compiledPath();
+        if ($content == null) {
+            $this->path = CApp_React_Finder::instance()->find(
+                $name = $this->normalize($name)
+            );
+        } else {
+            //we save the content to temp
+            $path = $this->getContentPath($content);
+            //we put the content
+            $dir = dirname($path);
+            if (!CFile::isDirectory($dir)) {
+                CFile::makeDirectory($dir, 0755, true);
+            }
+            CFile::put($path, $content);
+            $this->path = $path;
+        }
     }
 
     public function render($props) {
@@ -34,10 +47,12 @@ class CApp_React_Renderer {
         // const reactProductionDomUrl = 'https://unpkg.com/react-dom@17/umd/react-dom.production.min.js';
         $componentName = $this->name;
         $compiledPath = $this->getCompiledPath();
+
         if ($this->isExpired()) {
             $react = $nodeJs->createReact($this->path);
             $react->compile($compiledPath);
         }
+
         $jsContents = file_get_contents($compiledPath);
         $domId = 'cres-react-' . uniqid('cr-');
         $html = '<div id="' . $domId . '"></div>';
@@ -96,6 +111,17 @@ class CApp_React_Renderer {
      */
     public function getCompiledPath() {
         return $this->cachePath . '/' . sha1($this->path) . '.js';
+    }
+
+    /**
+     * Get the path to the compiled version of a react.
+     *
+     * @param mixed $content
+     *
+     * @return string
+     */
+    public function getContentPath($content) {
+        return $this->cachePath . '/' . sha1($content) . '.jsx';
     }
 
     /**

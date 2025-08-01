@@ -1,13 +1,6 @@
 <?php
 
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
-
 class CVendor_Namecheap_Constant {
-
     public static $ncErrorCodes = [
         # Common for all commands
         'globalErrorCodes' => [
@@ -394,5 +387,4 @@ class CVendor_Namecheap_Constant {
         2011369 => 'WhoisGuard forwarded Email address is not valid',
         2011280 => 'WhoisGuard cannot be alloted/enabled for this domain',
     ];
-
 }

@@ -36,6 +36,13 @@ class CConsole_Application extends SymfonyApplication implements CConsole_Applic
     protected $events;
 
     /**
+     * A map of command names to classes.
+     *
+     * @var array
+     */
+    protected $commandMap = [];
+
+    /**
      * Create a new Artisan console application.
      *
      * @param CEvent_DispatcherInterface $events
@@ -230,6 +237,15 @@ class CConsole_Application extends SymfonyApplication implements CConsole_Applic
      * @return \Symfony\Component\Console\Command\Command
      */
     public function resolve($command) {
+        if (is_subclass_of($command, SymfonyCommand::class) && ($commandName = $command::getDefaultName())) {
+            $this->commandMap[$commandName] = $command;
+
+            return null;
+        }
+        if ($command instanceof CConsole_Command) {
+            return $this->add($command);
+        }
+
         return $this->add(CContainer::getInstance()->make($command));
     }
 
@@ -246,6 +262,17 @@ class CConsole_Application extends SymfonyApplication implements CConsole_Applic
         foreach ($commands as $command) {
             $this->resolve($command);
         }
+
+        return $this;
+    }
+
+    /**
+     * Set the container command loader for lazy resolution.
+     *
+     * @return $this
+     */
+    public function setContainerCommandLoader() {
+        $this->setCommandLoader(new CConsole_ContainerCommandLoader($this->commandMap));
 
         return $this;
     }

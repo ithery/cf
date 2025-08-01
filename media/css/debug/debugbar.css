@@ -15,7 +15,7 @@ div.phpdebugbar {
     background: #fff;
     z-index: 10000;
     font-size: 14px;
-    color: #000;
+    color: #000 !important;
     text-align: left;
     line-height: 1;
     letter-spacing: normal;
@@ -129,7 +129,7 @@ div.phpdebugbar-header-right {
 div.phpdebugbar-header > div > * {
     padding: 5px 5px;
     font-size: 14px;
-    color: #555;
+    color: #555 !important;
     text-decoration: none;
 }
 div.phpdebugbar-header-left > * {

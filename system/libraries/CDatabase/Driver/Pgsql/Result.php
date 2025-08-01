@@ -1,13 +1,15 @@
 <?php
 
 /**
- * PostgreSQL Result
+ * PostgreSQL Result.
  */
 class CDatabase_Driver_Pgsql_Result extends CDatabase_Result {
     // Data fetching types
     protected $fetch_type = 'pgsql_fetch_object';
 
     protected $return_type = PGSQL_ASSOC;
+
+    protected $link;
 
     /**
      * Sets up the result variables.
@@ -33,7 +35,7 @@ class CDatabase_Driver_Pgsql_Result extends CDatabase_Result {
                 $this->fetch_type = ($object === true) ? 'pg_fetch_object' : 'pg_fetch_array';
             }
         } else {
-            throw new CDatabase_Exception('There was an SQL error: :error', [':error' => pg_last_error() . ' - ' . $sql]);
+            throw CDatabase_Exception::queryException(pg_last_error() . ' - ' . $sql);
         }
 
         // Set result type
@@ -146,7 +148,7 @@ class CDatabase_Driver_Pgsql_Result extends CDatabase_Result {
     }
 
     /**
-     * ArrayAccess: offsetGet
+     * ArrayAccess: offsetGet.
      *
      * @param mixed $offset
      */
@@ -157,6 +159,7 @@ class CDatabase_Driver_Pgsql_Result extends CDatabase_Result {
 
         // Return the row by calling the defined fetching callback
         $fetch = $this->fetch_type;
+
         return $fetch($this->result, null, $this->return_type);
     }
 }

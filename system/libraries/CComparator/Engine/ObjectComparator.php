@@ -1,16 +1,9 @@
 <?php
 
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
-
 /**
  * Compares objects for equality.
  */
 class CComparator_Engine_ObjectComparator extends CComparator_Engine_ArrayComparator {
-
     /**
      * Returns whether the comparator can compare two values.
      *
@@ -33,19 +26,27 @@ class CComparator_Engine_ObjectComparator extends CComparator_Engine_ArrayCompar
      * @param bool  $ignoreCase   Case is ignored when set to true
      * @param array $processed    List of already processed elements (used to prevent infinite recursion)
      *
-     * @throws ComparisonFailure
+     * @throws CComparator_Exception_ComparisonFailureException
      */
     public function assertEquals($expected, $actual, $delta = 0.0, $canonicalize = false, $ignoreCase = false, array &$processed = []) {
         if (\get_class($actual) !== \get_class($expected)) {
-            throw new ComparisonFailure(
-            $expected, $actual, $this->exporter->export($expected), $this->exporter->export($actual), false, \sprintf(
-                    '%s is not instance of expected class "%s".', $this->exporter->export($actual), \get_class($expected)
-            )
+            throw new CComparator_Exception_ComparisonFailureException(
+                $expected,
+                $actual,
+                $this->exporter->export($expected),
+                $this->exporter->export($actual),
+                false,
+                \sprintf(
+                    '%s is not instance of expected class "%s".',
+                    $this->exporter->export($actual),
+                    \get_class($expected)
+                )
             );
         }
         // don't compare twice to allow for cyclic dependencies
-        if (\in_array([$actual, $expected], $processed, true) ||
-                \in_array([$expected, $actual], $processed, true)) {
+        if (\in_array([$actual, $expected], $processed, true)
+            || \in_array([$expected, $actual], $processed, true)
+        ) {
             return;
         }
         $processed[] = [$actual, $expected];
@@ -55,13 +56,22 @@ class CComparator_Engine_ObjectComparator extends CComparator_Engine_ArrayCompar
         if ($actual !== $expected) {
             try {
                 parent::assertEquals(
-                        $this->toArray($expected), $this->toArray($actual), $delta, $canonicalize, $ignoreCase, $processed
+                    $this->toArray($expected),
+                    $this->toArray($actual),
+                    $delta,
+                    $canonicalize,
+                    $ignoreCase,
+                    $processed
                 );
             } catch (CComparator_Exception_ComparisonFailureException $e) {
                 throw new CComparator_Exception_ComparisonFailureException(
-                $expected, $actual,
-                // replace "Array" with "MyClass object"
-                \substr_replace($e->getExpectedAsString(), \get_class($expected) . ' Object', 0, 5), \substr_replace($e->getActualAsString(), \get_class($actual) . ' Object', 0, 5), false, 'Failed asserting that two objects are equal.'
+                    $expected,
+                    $actual,
+                    // replace "Array" with "MyClass object"
+                    \substr_replace($e->getExpectedAsString(), \get_class($expected) . ' Object', 0, 5),
+                    \substr_replace($e->getActualAsString(), \get_class($actual) . ' Object', 0, 5),
+                    false,
+                    'Failed asserting that two objects are equal.'
                 );
             }
         }
@@ -78,5 +88,4 @@ class CComparator_Engine_ObjectComparator extends CComparator_Engine_ArrayCompar
     protected function toArray($object) {
         return $this->exporter->toArray($object);
     }
-
 }

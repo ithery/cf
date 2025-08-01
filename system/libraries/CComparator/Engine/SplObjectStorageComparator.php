@@ -1,16 +1,9 @@
 <?php
 
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
-
 /**
  * Compares \SplObjectStorage instances for equality.
  */
 class CComparator_Engine_SplObjectStorageComparator extends CComparator_AbstractEngine {
-
     /**
      * Returns whether the comparator can compare two values.
      *
@@ -32,23 +25,32 @@ class CComparator_Engine_SplObjectStorageComparator extends CComparator_Abstract
      * @param bool  $canonicalize Arrays are sorted before comparison when set to true
      * @param bool  $ignoreCase   Case is ignored when set to true
      *
-     * @throws ComparisonFailure
+     * @throws CComparator_Exception_ComparisonFailureException
      */
     public function assertEquals($expected, $actual, $delta = 0.0, $canonicalize = false, $ignoreCase = false) {
         foreach ($actual as $object) {
             if (!$expected->contains($object)) {
-                throw new ComparisonFailure(
-                $expected, $actual, $this->exporter->export($expected), $this->exporter->export($actual), false, 'Failed asserting that two objects are equal.'
+                throw new CComparator_Exception_ComparisonFailureException(
+                    $expected,
+                    $actual,
+                    $this->exporter->export($expected),
+                    $this->exporter->export($actual),
+                    false,
+                    'Failed asserting that two objects are equal.'
                 );
             }
         }
         foreach ($expected as $object) {
             if (!$actual->contains($object)) {
                 throw new CComparator_Exception_ComparisonFailureException(
-                $expected, $actual, $this->exporter->export($expected), $this->exporter->export($actual), false, 'Failed asserting that two objects are equal.'
+                    $expected,
+                    $actual,
+                    $this->exporter->export($expected),
+                    $this->exporter->export($actual),
+                    false,
+                    'Failed asserting that two objects are equal.'
                 );
             }
         }
     }
-
 }

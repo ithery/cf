@@ -1,7 +1,7 @@
 <?php
 
 /**
- * Description of Summernote
+ * Description of Summernote.
  *
  * @author Hery Kurniawan
  * @license Ittron Global Teknologi <ittron.co.id>
@@ -28,21 +28,25 @@ class CElement_FormInput_Textarea_Summernote extends CElement_FormInput_Textarea
 
     public function setToolbarType($toolbarType) {
         $this->toolbarType = $toolbarType;
+
         return $this;
     }
 
     public function setDragDrop($bool = true) {
         $this->haveDragDrop = $bool;
+
         return $this;
     }
 
     public function setUploadUrl($url) {
         $this->uploadUrl = $url;
+
         return $this;
     }
 
     public function setSanitizePaste($bool = true) {
         $this->sanitizePaste = $bool;
+
         return $this;
     }
 
@@ -63,6 +67,7 @@ class CElement_FormInput_Textarea_Summernote extends CElement_FormInput_Textarea
                         ['height', ['height']]
                     ]
                 ";
+
                 break;
             case 'non-video':
                 $json = "
@@ -77,6 +82,7 @@ class CElement_FormInput_Textarea_Summernote extends CElement_FormInput_Textarea
                         ['misc', ['fullscreen', 'codeview', 'help']]
                     ]
                 ";
+
                 break;
             case 'link-only':
                 $json = "
@@ -84,6 +90,7 @@ class CElement_FormInput_Textarea_Summernote extends CElement_FormInput_Textarea
                         ['media', ['link']],
                     ]
                 ";
+
                 break;
             case 'text-only':
                 $json = "
@@ -97,9 +104,10 @@ class CElement_FormInput_Textarea_Summernote extends CElement_FormInput_Textarea
                         ['height', ['height']]
                     ]
                 ";
+
                 break;
             case 'text-media':
-                    $json = "
+                $json = "
                         [
                             ['fontstyle', ['style']],
                             ['style', ['bold', 'italic', 'underline', 'clear']],
@@ -112,6 +120,7 @@ class CElement_FormInput_Textarea_Summernote extends CElement_FormInput_Textarea
                             ['others', ['codeview']]
                         ]
                     ";
+
                 break;
             case 'text':
                 $json = "
@@ -119,6 +128,7 @@ class CElement_FormInput_Textarea_Summernote extends CElement_FormInput_Textarea
                         ['style', ['bold', 'italic', 'underline']],
                     ]
                 ";
+
                 break;
             case 'text-link-para':
                 $json = "
@@ -128,6 +138,7 @@ class CElement_FormInput_Textarea_Summernote extends CElement_FormInput_Textarea
                         ['link', ['link']],
                     ]
                 ";
+                // no break
             case 'text-link':
                 $json = "
                     [
@@ -135,8 +146,10 @@ class CElement_FormInput_Textarea_Summernote extends CElement_FormInput_Textarea
                         ['link', ['link']],
                     ]
                 ";
+
                 break;
         }
+
         return $json;
     }
 
@@ -217,6 +230,7 @@ class CElement_FormInput_Textarea_Summernote extends CElement_FormInput_Textarea
         ";
 
         $js .= parent::js();
+
         return $js;
     }
 }

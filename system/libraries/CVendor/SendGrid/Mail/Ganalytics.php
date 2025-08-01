@@ -1,15 +1,7 @@
 <?php
 
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
-
 /**
- * This class is used to construct a Ganalytics object for the /mail/send API call
- *
- * @package SendGrid\Mail
+ * This class is used to construct a Ganalytics object for the /mail/send API call.
  */
 class CVendor_SendGrid_Mail_Ganalytics implements \JsonSerializable {
     /**
@@ -43,16 +35,16 @@ class CVendor_SendGrid_Mail_Ganalytics implements \JsonSerializable {
     private $utm_campaign;
 
     /**
-     * Optional constructor
+     * Optional constructor.
      *
-     * @param bool|null   $enable       Indicates if this setting is enabled
-     * @param string|null $utm_source   Name of the referrer source. (e.g.
+     * @param null|bool   $enable       Indicates if this setting is enabled
+     * @param null|string $utm_source   Name of the referrer source. (e.g.
      *                                  Google, SomeDomain.com, or Marketing Email)
-     * @param string|null $utm_medium   Name of the marketing medium. (e.g. Email)
-     * @param string|null $utm_term     Used to identify any paid keywords
-     * @param string|null $utm_content  Used to differentiate your campaign from
+     * @param null|string $utm_medium   Name of the marketing medium. (e.g. Email)
+     * @param null|string $utm_term     Used to identify any paid keywords
+     * @param null|string $utm_content  Used to differentiate your campaign from
      *                                  advertisements
-     * @param string|null $utm_campaign The name of the campaign
+     * @param null|string $utm_campaign The name of the campaign
      */
     public function __construct(
         $enable = null,
@@ -83,7 +75,7 @@ class CVendor_SendGrid_Mail_Ganalytics implements \JsonSerializable {
     }
 
     /**
-     * Update the enable setting on a Ganalytics object
+     * Update the enable setting on a Ganalytics object.
      *
      * @param bool $enable Indicates if this setting is enabled
      *
@@ -97,7 +89,7 @@ class CVendor_SendGrid_Mail_Ganalytics implements \JsonSerializable {
     }
 
     /**
-     * Retrieve the enable setting on a Ganalytics object
+     * Retrieve the enable setting on a Ganalytics object.
      *
      * @return bool
      */
@@ -106,7 +98,7 @@ class CVendor_SendGrid_Mail_Ganalytics implements \JsonSerializable {
     }
 
     /**
-     * Add the campaign source to a Ganalytics object
+     * Add the campaign source to a Ganalytics object.
      *
      * @param string $utm_source Name of the referrer source. (e.g.
      *                           Google, SomeDomain.com, or Marketing Email)
@@ -121,7 +113,7 @@ class CVendor_SendGrid_Mail_Ganalytics implements \JsonSerializable {
     }
 
     /**
-     * Return the campaign source from a Ganalytics object
+     * Return the campaign source from a Ganalytics object.
      *
      * @return string
      */
@@ -130,7 +122,7 @@ class CVendor_SendGrid_Mail_Ganalytics implements \JsonSerializable {
     }
 
     /**
-     * Add the campaign medium to a Ganalytics object
+     * Add the campaign medium to a Ganalytics object.
      *
      * @param string $utm_medium Name of the marketing medium. (e.g. Email)
      *
@@ -144,7 +136,7 @@ class CVendor_SendGrid_Mail_Ganalytics implements \JsonSerializable {
     }
 
     /**
-     * Return the campaign medium from a Ganalytics object
+     * Return the campaign medium from a Ganalytics object.
      *
      * @return string
      */
@@ -153,7 +145,7 @@ class CVendor_SendGrid_Mail_Ganalytics implements \JsonSerializable {
     }
 
     /**
-     * Add the campaign term to a Ganalytics object
+     * Add the campaign term to a Ganalytics object.
      *
      * @param string $utm_term Used to identify any paid keywords
      *
@@ -167,7 +159,7 @@ class CVendor_SendGrid_Mail_Ganalytics implements \JsonSerializable {
     }
 
     /**
-     * Return the campaign term from a Ganalytics object
+     * Return the campaign term from a Ganalytics object.
      *
      * @return string
      */
@@ -176,7 +168,7 @@ class CVendor_SendGrid_Mail_Ganalytics implements \JsonSerializable {
     }
 
     /**
-     * Add the campaign content to a Ganalytics object
+     * Add the campaign content to a Ganalytics object.
      *
      * @param string $utm_content Used to differentiate your campaign from
      *                            advertisements
@@ -191,7 +183,7 @@ class CVendor_SendGrid_Mail_Ganalytics implements \JsonSerializable {
     }
 
     /**
-     * Return the campaign content from a Ganalytics object
+     * Return the campaign content from a Ganalytics object.
      *
      * @return string
      */
@@ -200,7 +192,7 @@ class CVendor_SendGrid_Mail_Ganalytics implements \JsonSerializable {
     }
 
     /**
-     * Add the campaign name to a Ganalytics object
+     * Add the campaign name to a Ganalytics object.
      *
      * @param string $utm_campaign The name of the campaign
      *
@@ -214,7 +206,7 @@ class CVendor_SendGrid_Mail_Ganalytics implements \JsonSerializable {
     }
 
     /**
-     * Return the campaign name from a Ganalytics object
+     * Return the campaign name from a Ganalytics object.
      *
      * @return string
      */
@@ -223,7 +215,7 @@ class CVendor_SendGrid_Mail_Ganalytics implements \JsonSerializable {
     }
 
     /**
-     * Return an array representing a Ganalytics object for the Twilio SendGrid API
+     * Return an array representing a Ganalytics object for the Twilio SendGrid API.
      *
      * @return null|array
      */

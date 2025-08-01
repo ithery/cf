@@ -9,11 +9,14 @@ class CApp_PWA {
 
     protected $startUrl = '';
 
+    protected $debug = true;
+
     public function __construct($group = 'default') {
         $this->group = $group;
         $startUrl = $this->getGroupConfig('start_url', '/');
         $startUrl = '/' . trim($startUrl, '/') . '/';
         $this->startUrl = $startUrl;
+        $this->debug = $this->getGroupConfig('debug', true);
     }
 
     public function enable() {
@@ -65,5 +68,9 @@ class CApp_PWA {
      */
     public function isEnabled() {
         return $this->enabled;
+    }
+
+    public function isDebug() {
+        return $this->debug;
     }
 }

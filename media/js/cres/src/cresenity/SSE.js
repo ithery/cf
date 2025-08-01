@@ -1,3 +1,4 @@
+import SSEManager from './sse/sse-manager';
 export default class SSE {
     constructor() {
 

@@ -88,6 +88,7 @@ abstract class CModel_Nested_Relation extends CModel_Relation {
             $grammar->wrap($this->parent->getLftName()),
             $grammar->wrap($this->parent->getRgtName())
         );
+
         return $query->whereRaw($condition);
     }
 
@@ -101,21 +102,6 @@ abstract class CModel_Nested_Relation extends CModel_Relation {
      */
     public function initRelation(array $models, $relation) {
         return $models;
-    }
-
-    /**
-     * @param CModel_Query $query
-     * @param CModel_Query $parent
-     * @param array        $columns
-     *
-     * @return mixed
-     */
-    public function getRelationQuery(
-        CModel_Query $query,
-        CModel_Query $parent,
-        $columns = ['*']
-    ) {
-        return $this->getRelationExistenceQuery($query, $parent, $columns);
     }
 
     /**
@@ -146,6 +132,10 @@ abstract class CModel_Nested_Relation extends CModel_Relation {
      * @return void
      */
     public function addEagerConstraints(array $models) {
+        // The first model in the array is always the parent, so add the scope constraints based on that model.
+        // @link https://github.com/laravel/framework/pull/25240
+        // @link https://github.com/lazychaser/laravel-nestedset/issues/351
+        c::optional($models[0])->applyNestedSetScope($this->query);
         $this->query->whereNested(function (CDatabase_Query_Builder $inner) use ($models) {
             // We will use this query in order to apply constraints to the
             // base query builder
@@ -171,6 +161,7 @@ abstract class CModel_Nested_Relation extends CModel_Relation {
             $related = $this->matchForModel($model, $results);
             $model->setRelation($relation, $related);
         }
+
         return $models;
     }
 
@@ -187,6 +178,18 @@ abstract class CModel_Nested_Relation extends CModel_Relation {
                 $result->push($related);
             }
         }
+
         return $result;
+    }
+
+    /**
+     * Get the plain foreign key.
+     *
+     * @return mixed
+     */
+    public function getForeignKeyName() {
+        // Return a stub value for relation
+        // resolvers which need this function.
+        return CModel_Nested_NestedSet::PARENT_ID;
     }
 }

@@ -11,18 +11,18 @@ defined('SYSPATH') or die('No direct access allowed.');
 
 <div id="container-{{ $id }}" class="fileupload fileupload-new" >
     <div class="fileupload-new thumbnail" >
-        <img id="cimg-{{ $id }}" src="{{ $imgSrc }}" style="max-width: <?php echo $maxWidth; ?>px; max-height: <?php echo $maxHeight; ?>px;"  />
+        <img id="cimg-{{ $id }}" src="{{ $imgSrc }}" style="max-width: {{ $maxWidth }}px; max-height: {{ $maxHeight }}px;"  />
     </div>
     <div class="fileupload-preview fileupload-exists thumbnail" style="max-width: <?php echo $maxWidth; ?>px; max-height: <?php echo $maxHeight; ?>px; line-height: 20px;"></div>'
     <div>
-        <?php if (!$disabledUpload): ?>
+        @if(!$disabledUpload)
             <span class="btn btn-file btn-primary">
-                <span class="fileupload-new"><?php echo clang::__('Select Image'); ?></span>
-                <span class="fileupload-change fileupload-exists"><?php echo clang::__('Change'); ?></span>
-                <input type="file" accept="image/*" id="<?php echo $id; ?>" name="<?php echo $name; ?>" value="<?php echo $value; ?>" style="display:none;" />
+                <span class="fileupload-new">@lang('element/image.selectFile')</span>
+                <span class="fileupload-change fileupload-exists">@lang('element/image.change')</span>
+                <input type="file" accept="image/*" id="{{ $id }}" name="{{ $name }}" value="<?php echo $value; ?>" style="display:none;" />
             </span>
-            <a href="javascript:;" class="btn fileupload-remove fileupload-exists btn-danger" data-dismiss="fileupload"><?php echo clang::__('Remove'); ?></a>
-        <?php endif; ?>
+            <a href="javascript:;" class="btn fileupload-remove fileupload-exists btn-danger" data-dismiss="fileupload">@lang('element/image.remove')</a>
+        @endif
     </div>
 </div>
 

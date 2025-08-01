@@ -11,17 +11,17 @@ defined('SYSPATH') or die('No direct access allowed.');
 class CApp_Remote_Client_Engine_Server extends CApp_Remote_Client_Engine {
     public function __construct($options) {
         parent::__construct($options);
-        $this->baseUrl .= 'Server/';
+        $this->baseApiUrl .= 'Server/';
     }
 
     public function getPHPInfo() {
-        $data = $this->request($this->baseUrl . 'GetPHPInfo');
+        $data = $this->request($this->baseApiUrl . 'GetPHPInfo');
 
         return $data;
     }
 
     public function getDomainList() {
-        $data = $this->request($this->baseUrl . 'GetDomainList');
+        $data = $this->request($this->baseApiUrl . 'GetDomainList');
 
         return $data;
     }
@@ -29,19 +29,19 @@ class CApp_Remote_Client_Engine_Server extends CApp_Remote_Client_Engine {
     public function getDomainInfo($domain) {
         $post = [];
         $post['domain'] = $domain;
-        $data = $this->request($this->baseUrl . 'GetDomainInfo', $post);
+        $data = $this->request($this->baseApiUrl . 'GetDomainInfo', $post);
 
         return $data;
     }
 
     public function getServerInfo() {
-        $data = $this->request($this->baseUrl . 'GetServerInfo');
+        $data = $this->request($this->baseApiUrl . 'GetServerInfo');
 
         return $data;
     }
 
     public function getServerStorageInfo() {
-        $data = $this->request($this->baseUrl . 'GetServerStorageInfo');
+        $data = $this->request($this->baseApiUrl . 'GetServerStorageInfo');
 
         return $data;
     }
@@ -49,7 +49,7 @@ class CApp_Remote_Client_Engine_Server extends CApp_Remote_Client_Engine {
     public function deleteDomain($domain) {
         $post = [];
         $post['domain'] = $domain;
-        $data = $this->request($this->baseUrl . 'DomainDelete', $post);
+        $data = $this->request($this->baseApiUrl . 'DomainDelete', $post);
 
         return $data;
     }
@@ -57,13 +57,13 @@ class CApp_Remote_Client_Engine_Server extends CApp_Remote_Client_Engine {
     public function getFileList($directory) {
         $post = [];
         $post['directory'] = $directory;
-        $data = $this->request($this->baseUrl . 'GetFileList', $post);
+        $data = $this->request($this->baseApiUrl . 'GetFileList', $post);
 
         return $data;
     }
 
     public function temp($post) {
-        $data = $this->request($this->baseUrl . 'Temp', $post);
+        $data = $this->request($this->baseApiUrl . 'Temp', $post);
 
         return $data;
     }

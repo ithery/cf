@@ -1,23 +1,16 @@
 <?php
 
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
-
 class CVendor_Namecheap_Command_Domains extends CVendor_Namecheap_AbstractCommand {
-
     protected $command = 'namecheap.domains.';
 
     /**
      * @todo Returns a list of domains for the particular user..
      *
-     * @param str|listType|opt : Possible values are ALL, EXPIRING, or EXPIRED | Default : ALL
-     * @param str|searchTerm|opt :Keyword to look for in the domain list
-     * @param num|page|opt : Page to return | Default Value: 1
-     * @param num|pageSize|opt :Number of domains to be listed on a page. Minimum value is 10, and maximum value is 100. | Default Value: 20
-     * @param str|sortBy|opt : Possible values are NAME, NAME_DESC, EXPIREDATE, EXPIREDATE_DESC, CREATEDATE, CREATEDATE_DESC
+     * @param null|string $searchTerm Possible values are ALL, EXPIRING, or EXPIRED | Default : ALL
+     * @param null|string $listType   Keyword to look for in the domain list
+     * @param null|int    $page       Page to return | Default Value: 1
+     * @param null|int    $pageSize   Number of domains to be listed on a page. Minimum value is 10, and maximum value is 100. | Default Value: 20
+     * @param null|string $sortBy     Possible values are NAME, NAME_DESC, EXPIREDATE, EXPIREDATE_DESC, CREATEDATE, CREATEDATE_DESC
      */
     public function getList($searchTerm = null, $listType = null, $page = null, $pageSize = null, $sortBy = null) {
         $data = [
@@ -27,13 +20,14 @@ class CVendor_Namecheap_Command_Domains extends CVendor_Namecheap_AbstractComman
             'PageSize' => $pageSize,
             'SortBy' => $sortBy
         ];
+
         return $this->api->get($this->command . __FUNCTION__, $data);
     }
 
     /**
      * @todo Gets contact information of the requested domain.
      *
-     * @param str|domainName|req : Domain to get contacts
+     * @param string $domainName Domain to get contacts
      */
     public function getContacts($domainName) {
         return $this->api->get($this->command . __FUNCTION__, ['DomainName' => $domainName]);
@@ -41,102 +35,93 @@ class CVendor_Namecheap_Command_Domains extends CVendor_Namecheap_AbstractComman
 
     /**
      * @todo Registers a new domain name.
-     * 
-     * @param str|domainName|Req : Domain name to register 
+     *
+     * @param string|domainName|Req : Domain name to register
      * @param num|years|Req : Number of years to register Default Value: 2
-     *
-     * @param str|registrantFirstName|Req : First name of the Registrant user
-     * @param str|registrantLastName|Req : Second name of the Registrant user
-     * @param str|registrantAddress1|Req : Address1 of the Registrant user
-     * @param str|registrantCity|Req : City of the Registrant user
-     * @param str|registrantStateProvince|Req : State/Province of the Registrant user
-     * @param str|registrantPostalCode|Req : PostalCode of the Registrant user
-     * @param str|registrantCountry|Req : Country of the Registrant user
-     * @param str|registrantPhone|Req : Phone number in the format +NNN.NNNNNNNNNN
-     * @param str|registrantEmailAddress|Req : Email address of the Registrant user
-     *
-     * @param str|registrantOrganizationName|Opt : Organization of the Registrant user
-     * @param str|registrantJobTitle|Opt : Job title of the Registrant user
-     * @param str|registrantAddress2|Opt : Address2 of the Registrant user
-     * @param str|registrantStateProvinceChoice|Opt : StateProvinceChoice of the Registrant user
-     * @param str|registrantPhoneExt|Opt : PhoneExt of the Registrant user
-     * @param str|registrantFax|Opt : Fax number in the format +NNN.NNNNNNNNNN
-     *
-     * @param str|techFirstName|Req : First name of the tech user
-     * @param str|techLastName|Req : Second name of the tech user
-     * @param str|techAddress1|Req : Address1 of the tech user
-     * @param str|techCity|Req : City of the tech user
-     * @param str|techStateProvince|Req : State/Province of the tech user
-     * @param str|techPostalCode|Req : PostalCode of the tech user
-     * @param str|techCountry|Req : Country of the tech user
-     * @param str|techPhone|Req : Phone number in the format +NNN.NNNNNNNNNN
-     * @param str|techEmailAddress|Req : Email address of the tech user
-     *
-     * @param str|techOrganizationName|Opt : Organization of the tech user
-     * @param str|techJobTitle|Opt : Job title of the tech user
-     * @param str|techAddress2|Opt : Address2 of the tech user
-     * @param str|techStateProvinceChoice|Opt : StateProvinceChoice of the tech user
-     * @param str|techPhoneExt|Opt : PhoneExt of the tech user
-     * @param str|techFax|Opt : Fax number in the format +NNN.NNNNNNNNNN
-     *
-     * @param str|adminFirstName|Req : First name of the admin user
-     * @param str|adminLastName|Req : Second name of the admin user
-     * @param str|adminAddress1|Req : Address1 of the admin user
-     * @param str|adminCity|Req : City of the admin user
-     * @param str|adminStateProvince|Req : State/Province of the admin user
-     * @param str|adminPostalCode|Req : PostalCode of the admin user
-     * @param str|adminCountry|Req : Country of the admin user
-     * @param str|adminPhone|Req : Phone number in the format +NNN.NNNNNNNNNN
-     * @param str|adminEmailAddress|Req : Email address of the admin user
-     *
-     * @param str|adminOrganizationName|Opt : Organization of the admin user
-     * @param str|adminJobTitle|Opt : Job title of the admin user
-     * @param str|adminAddress2|Opt : Address2 of the admin user
-     * @param str|adminStateProvinceChoice|Opt : StateProvinceChoice of the admin user
-     * @param str|adminPhoneExt|Opt : PhoneExt of the admin user
-     * @param str|adminFax|Opt : Fax number in the format +NNN.NNNNNNNNNN
-     *
-     * @param str|auxBillingFirstName|Req : First name of the auxBilling user
-     * @param str|auxBillingLastName|Req : Second name of the auxBilling user
-     * @param str|auxBillingAddress1|Req : Address1 of the auxBilling user
-     * @param str|auxBillingCity|Req : City of the auxBilling user
-     * @param str|auxBillingStateProvince|Req : State/Province of the auxBilling user
-     * @param str|auxBillingPostalCode|Req : PostalCode of the auxBilling user
-     * @param str|auxBillingCountry|Req : Country of the auxBilling user
-     * @param str|auxBillingPhone|Req : Phone number in the format +NNN.NNNNNNNNNN
-     * @param str|auxBillingEmailAddress|Req : Email address of the auxBilling user
-     *
-     * @param str|auxBillingOrganizationName|Opt : Organization of the auxBilling user
-     * @param str|auxBillingJobTitle|Opt : Job title of the auxBilling user
-     * @param str|auxBillingAddress2|Opt : Address2 of the auxBilling user
-     * @param str|auxBillingStateProvinceChoice|Opt : StateProvinceChoice of the auxBilling user
-     * @param str|auxBillingPhoneExt|Opt : PhoneExt of the auxBilling user
-     * @param str|auxBillingFax|Opt : Fax number in the format +NNN.NNNNNNNNNN
-     *
-     * @param str|billingFirstName|Opt : First name of the billing user
-     * @param str|billingLastName|Opt : Second name of the billing user
-     * @param str|billingAddress1|Opt : Address1 of the billing user
-     * @param str|billingCity|Opt : City of the billing user
-     * @param str|billingStateProvince|Opt : State/Province of the billing user
-     * @param str|billingPostalCode|Opt : PostalCode of the billing user
-     * @param str|billingCountry|Opt : Country of the billing user
-     * @param str|billingPhone|Opt : Phone number in the format +NNN.NNNNNNNNNN
-     * @param str|billingEmailAddress|Opt : Email address of the billing user
-     * @param str|billingAddress2|Opt : Address2 of the billing user
-     * @param str|billingStateProvinceChoice|Opt : StateProvinceChoice of the billing user
-     * @param str|billingPhoneExt|Opt : PhoneExt of the billing user
-     * @param str|billingFax|Opt : Fax number in the format +NNN.NNNNNNNNNN
-     * 
-     * @param str|idnCode|Opt : Code of Internationalized Domain Name (please refer to the note below)
-     * @param str|nameservers|Opt : Comma-separated list of custom nameservers to be associated with the domain name
-     * @param str|addFreeWhoisguard|Opt : Adds free WhoisGuard for the domain Default Value: no
-     * @param str|wGEnabled|Opt : Enables free WhoisGuard for the domain Default Value: no
+     * @param string|registrantFirstName|Req : First name of the Registrant user
+     * @param string|registrantLastName|Req : Second name of the Registrant user
+     * @param string|registrantAddress1|Req : Address1 of the Registrant user
+     * @param string|registrantCity|Req : City of the Registrant user
+     * @param string|registrantStateProvince|Req : State/Province of the Registrant user
+     * @param string|registrantPostalCode|Req : PostalCode of the Registrant user
+     * @param string|registrantCountry|Req : Country of the Registrant user
+     * @param string|registrantPhone|Req : Phone number in the format +NNN.NNNNNNNNNN
+     * @param string|registrantEmailAddress|Req : Email address of the Registrant user
+     * @param string|registrantOrganizationName|Opt : Organization of the Registrant user
+     * @param string|registrantJobTitle|Opt : Job title of the Registrant user
+     * @param string|registrantAddress2|Opt : Address2 of the Registrant user
+     * @param string|registrantStateProvinceChoice|Opt : StateProvinceChoice of the Registrant user
+     * @param string|registrantPhoneExt|Opt : PhoneExt of the Registrant user
+     * @param string|registrantFax|Opt : Fax number in the format +NNN.NNNNNNNNNN
+     * @param string|techFirstName|Req : First name of the tech user
+     * @param string|techLastName|Req : Second name of the tech user
+     * @param string|techAddress1|Req : Address1 of the tech user
+     * @param string|techCity|Req : City of the tech user
+     * @param string|techStateProvince|Req : State/Province of the tech user
+     * @param string|techPostalCode|Req : PostalCode of the tech user
+     * @param string|techCountry|Req : Country of the tech user
+     * @param string|techPhone|Req : Phone number in the format +NNN.NNNNNNNNNN
+     * @param string|techEmailAddress|Req : Email address of the tech user
+     * @param string|techOrganizationName|Opt : Organization of the tech user
+     * @param string|techJobTitle|Opt : Job title of the tech user
+     * @param string|techAddress2|Opt : Address2 of the tech user
+     * @param string|techStateProvinceChoice|Opt : StateProvinceChoice of the tech user
+     * @param string|techPhoneExt|Opt : PhoneExt of the tech user
+     * @param string|techFax|Opt : Fax number in the format +NNN.NNNNNNNNNN
+     * @param string|adminFirstName|Req : First name of the admin user
+     * @param string|adminLastName|Req : Second name of the admin user
+     * @param string|adminAddress1|Req : Address1 of the admin user
+     * @param string|adminCity|Req : City of the admin user
+     * @param string|adminStateProvince|Req : State/Province of the admin user
+     * @param string|adminPostalCode|Req : PostalCode of the admin user
+     * @param string|adminCountry|Req : Country of the admin user
+     * @param string|adminPhone|Req : Phone number in the format +NNN.NNNNNNNNNN
+     * @param string|adminEmailAddress|Req : Email address of the admin user
+     * @param string|adminOrganizationName|Opt : Organization of the admin user
+     * @param string|adminJobTitle|Opt : Job title of the admin user
+     * @param string|adminAddress2|Opt : Address2 of the admin user
+     * @param string|adminStateProvinceChoice|Opt : StateProvinceChoice of the admin user
+     * @param string|adminPhoneExt|Opt : PhoneExt of the admin user
+     * @param string|adminFax|Opt : Fax number in the format +NNN.NNNNNNNNNN
+     * @param string|auxBillingFirstName|Req : First name of the auxBilling user
+     * @param string|auxBillingLastName|Req : Second name of the auxBilling user
+     * @param string|auxBillingAddress1|Req : Address1 of the auxBilling user
+     * @param string|auxBillingCity|Req : City of the auxBilling user
+     * @param string|auxBillingStateProvince|Req : State/Province of the auxBilling user
+     * @param string|auxBillingPostalCode|Req : PostalCode of the auxBilling user
+     * @param string|auxBillingCountry|Req : Country of the auxBilling user
+     * @param string|auxBillingPhone|Req : Phone number in the format +NNN.NNNNNNNNNN
+     * @param string|auxBillingEmailAddress|Req : Email address of the auxBilling user
+     * @param string|auxBillingOrganizationName|Opt : Organization of the auxBilling user
+     * @param string|auxBillingJobTitle|Opt : Job title of the auxBilling user
+     * @param string|auxBillingAddress2|Opt : Address2 of the auxBilling user
+     * @param string|auxBillingStateProvinceChoice|Opt : StateProvinceChoice of the auxBilling user
+     * @param string|auxBillingPhoneExt|Opt : PhoneExt of the auxBilling user
+     * @param string|auxBillingFax|Opt : Fax number in the format +NNN.NNNNNNNNNN
+     * @param string|billingFirstName|Opt : First name of the billing user
+     * @param string|billingLastName|Opt : Second name of the billing user
+     * @param string|billingAddress1|Opt : Address1 of the billing user
+     * @param string|billingCity|Opt : City of the billing user
+     * @param string|billingStateProvince|Opt : State/Province of the billing user
+     * @param string|billingPostalCode|Opt : PostalCode of the billing user
+     * @param string|billingCountry|Opt : Country of the billing user
+     * @param string|billingPhone|Opt : Phone number in the format +NNN.NNNNNNNNNN
+     * @param string|billingEmailAddress|Opt : Email address of the billing user
+     * @param string|billingAddress2|Opt : Address2 of the billing user
+     * @param string|billingStateProvinceChoice|Opt : StateProvinceChoice of the billing user
+     * @param string|billingPhoneExt|Opt : PhoneExt of the billing user
+     * @param string|billingFax|Opt : Fax number in the format +NNN.NNNNNNNNNN
+     * @param string|idnCode|Opt : Code of Internationalized Domain Name (please refer to the note below)
+     * @param string|nameservers|Opt : Comma-separated list of custom nameservers to be associated with the domain name
+     * @param string|addFreeWhoisguard|Opt : Adds free WhoisGuard for the domain Default Value: no
+     * @param string|wGEnabled|Opt : Enables free WhoisGuard for the domain Default Value: no
      * @param bool|isPremiumDomain|Opt : Indication if the domain name is premium
      * @param Currency|premiumPrice|Opt : Registration price for the premium domain
      * @param Currency|eapFee|Opt : Purchase fee for the premium domain during Early Access Program (EAP)*
      */
     public function create(array $domainInfo, array $contactInfo) {
         $data = $this->api->parseDomainData($domainInfo, $contactInfo);
+
         return $this->api->post($this->command . __FUNCTION__, $data);
     }
 
@@ -150,101 +135,97 @@ class CVendor_Namecheap_Command_Domains extends CVendor_Namecheap_AbstractComman
     /**
      * @todo Sets contact information for the domain.
      *
-     * @param str|registrantFirstName|Req : First name of the Registrant user
-     * @param str|registrantLastName|Req : Second name of the Registrant user
-     * @param str|registrantAddress1|Req : Address1 of the Registrant user
-     * @param str|registrantCity|Req : City of the Registrant user
-     * @param str|registrantStateProvince|Req : State/Province of the Registrant user
-     * @param str|registrantPostalCode|Req : PostalCode of the Registrant user
-     * @param str|registrantCountry|Req : Country of the Registrant user
-     * @param str|registrantPhone|Req : Phone number in the format +NNN.NNNNNNNNNN
-     * @param str|registrantEmailAddress|Req : Email address of the Registrant user
-     *
-     * @param str|registrantOrganizationName|Opt : Organization of the Registrant user
-     * @param str|registrantJobTitle|Opt : Job title of the Registrant user
-     * @param str|registrantAddress2|Opt : Address2 of the Registrant user
-     * @param str|registrantStateProvinceChoice|Opt : StateProvinceChoice of the Registrant user
-     * @param str|registrantPhoneExt|Opt : PhoneExt of the Registrant user
-     * @param str|registrantFax|Opt : Fax number in the format +NNN.NNNNNNNNNN
-     *
-     * @param str|techFirstName|Req : First name of the tech user
-     * @param str|techLastName|Req : Second name of the tech user
-     * @param str|techAddress1|Req : Address1 of the tech user
-     * @param str|techCity|Req : City of the tech user
-     * @param str|techStateProvince|Req : State/Province of the tech user
-     * @param str|techPostalCode|Req : PostalCode of the tech user
-     * @param str|techCountry|Req : Country of the tech user
-     * @param str|techPhone|Req : Phone number in the format +NNN.NNNNNNNNNN
-     * @param str|techEmailAddress|Req : Email address of the tech user
-     *
-     * @param str|techOrganizationName|Opt : Organization of the tech user
-     * @param str|techJobTitle|Opt : Job title of the tech user
-     * @param str|techAddress2|Opt : Address2 of the tech user
-     * @param str|techStateProvinceChoice|Opt : StateProvinceChoice of the tech user
-     * @param str|techPhoneExt|Opt : PhoneExt of the tech user
-     * @param str|techFax|Opt : Fax number in the format +NNN.NNNNNNNNNN
-     *
-     * @param str|adminFirstName|Req : First name of the admin user
-     * @param str|adminLastName|Req : Second name of the admin user
-     * @param str|adminAddress1|Req : Address1 of the admin user
-     * @param str|adminCity|Req : City of the admin user
-     * @param str|adminStateProvince|Req : State/Province of the admin user
-     * @param str|adminPostalCode|Req : PostalCode of the admin user
-     * @param str|adminCountry|Req : Country of the admin user
-     * @param str|adminPhone|Req : Phone number in the format +NNN.NNNNNNNNNN
-     * @param str|adminEmailAddress|Req : Email address of the admin user
-     *
-     * @param str|adminOrganizationName|Opt : Organization of the admin user
-     * @param str|adminJobTitle|Opt : Job title of the admin user
-     * @param str|adminAddress2|Opt : Address2 of the admin user
-     * @param str|adminStateProvinceChoice|Opt : StateProvinceChoice of the admin user
-     * @param str|adminPhoneExt|Opt : PhoneExt of the admin user
-     * @param str|adminFax|Opt : Fax number in the format +NNN.NNNNNNNNNN
-     *
-     * @param str|auxBillingFirstName|Req : First name of the auxBilling user
-     * @param str|auxBillingLastName|Req : Second name of the auxBilling user
-     * @param str|auxBillingAddress1|Req : Address1 of the auxBilling user
-     * @param str|auxBillingCity|Req : City of the auxBilling user
-     * @param str|auxBillingStateProvince|Req : State/Province of the auxBilling user
-     * @param str|auxBillingPostalCode|Req : PostalCode of the auxBilling user
-     * @param str|auxBillingCountry|Req : Country of the auxBilling user
-     * @param str|auxBillingPhone|Req : Phone number in the format +NNN.NNNNNNNNNN
-     * @param str|auxBillingEmailAddress|Req : Email address of the auxBilling user
-     *
-     * @param str|auxBillingOrganizationName|Opt : Organization of the auxBilling user
-     * @param str|auxBillingJobTitle|Opt : Job title of the auxBilling user
-     * @param str|auxBillingAddress2|Opt : Address2 of the auxBilling user
-     * @param str|auxBillingStateProvinceChoice|Opt : StateProvinceChoice of the auxBilling user
-     * @param str|auxBillingPhoneExt|Opt : PhoneExt of the auxBilling user
-     * @param str|auxBillingFax|Opt : Fax number in the format +NNN.NNNNNNNNNN
+     * @param string|registrantFirstName|Req : First name of the Registrant user
+     * @param string|registrantLastName|Req : Second name of the Registrant user
+     * @param string|registrantAddress1|Req : Address1 of the Registrant user
+     * @param string|registrantCity|Req : City of the Registrant user
+     * @param string|registrantStateProvince|Req : State/Province of the Registrant user
+     * @param string|registrantPostalCode|Req : PostalCode of the Registrant user
+     * @param string|registrantCountry|Req : Country of the Registrant user
+     * @param string|registrantPhone|Req : Phone number in the format +NNN.NNNNNNNNNN
+     * @param string|registrantEmailAddress|Req : Email address of the Registrant user
+     * @param string|registrantOrganizationName|Opt : Organization of the Registrant user
+     * @param string|registrantJobTitle|Opt : Job title of the Registrant user
+     * @param string|registrantAddress2|Opt : Address2 of the Registrant user
+     * @param string|registrantStateProvinceChoice|Opt : StateProvinceChoice of the Registrant user
+     * @param string|registrantPhoneExt|Opt : PhoneExt of the Registrant user
+     * @param string|registrantFax|Opt : Fax number in the format +NNN.NNNNNNNNNN
+     * @param string|techFirstName|Req : First name of the tech user
+     * @param string|techLastName|Req : Second name of the tech user
+     * @param string|techAddress1|Req : Address1 of the tech user
+     * @param string|techCity|Req : City of the tech user
+     * @param string|techStateProvince|Req : State/Province of the tech user
+     * @param string|techPostalCode|Req : PostalCode of the tech user
+     * @param string|techCountry|Req : Country of the tech user
+     * @param string|techPhone|Req : Phone number in the format +NNN.NNNNNNNNNN
+     * @param string|techEmailAddress|Req : Email address of the tech user
+     * @param string|techOrganizationName|Opt : Organization of the tech user
+     * @param string|techJobTitle|Opt : Job title of the tech user
+     * @param string|techAddress2|Opt : Address2 of the tech user
+     * @param string|techStateProvinceChoice|Opt : StateProvinceChoice of the tech user
+     * @param string|techPhoneExt|Opt : PhoneExt of the tech user
+     * @param string|techFax|Opt : Fax number in the format +NNN.NNNNNNNNNN
+     * @param string|adminFirstName|Req : First name of the admin user
+     * @param string|adminLastName|Req : Second name of the admin user
+     * @param string|adminAddress1|Req : Address1 of the admin user
+     * @param string|adminCity|Req : City of the admin user
+     * @param string|adminStateProvince|Req : State/Province of the admin user
+     * @param string|adminPostalCode|Req : PostalCode of the admin user
+     * @param string|adminCountry|Req : Country of the admin user
+     * @param string|adminPhone|Req : Phone number in the format +NNN.NNNNNNNNNN
+     * @param string|adminEmailAddress|Req : Email address of the admin user
+     * @param string|adminOrganizationName|Opt : Organization of the admin user
+     * @param string|adminJobTitle|Opt : Job title of the admin user
+     * @param string|adminAddress2|Opt : Address2 of the admin user
+     * @param string|adminStateProvinceChoice|Opt : StateProvinceChoice of the admin user
+     * @param string|adminPhoneExt|Opt : PhoneExt of the admin user
+     * @param string|adminFax|Opt : Fax number in the format +NNN.NNNNNNNNNN
+     * @param string|auxBillingFirstName|Req : First name of the auxBilling user
+     * @param string|auxBillingLastName|Req : Second name of the auxBilling user
+     * @param string|auxBillingAddress1|Req : Address1 of the auxBilling user
+     * @param string|auxBillingCity|Req : City of the auxBilling user
+     * @param string|auxBillingStateProvince|Req : State/Province of the auxBilling user
+     * @param string|auxBillingPostalCode|Req : PostalCode of the auxBilling user
+     * @param string|auxBillingCountry|Req : Country of the auxBilling user
+     * @param string|auxBillingPhone|Req : Phone number in the format +NNN.NNNNNNNNNN
+     * @param string|auxBillingEmailAddress|Req : Email address of the auxBilling user
+     * @param string|auxBillingOrganizationName|Opt : Organization of the auxBilling user
+     * @param string|auxBillingJobTitle|Opt : Job title of the auxBilling user
+     * @param string|auxBillingAddress2|Opt : Address2 of the auxBilling user
+     * @param string|auxBillingStateProvinceChoice|Opt : StateProvinceChoice of the auxBilling user
+     * @param string|auxBillingPhoneExt|Opt : PhoneExt of the auxBilling user
+     * @param string|auxBillingFax|Opt : Fax number in the format +NNN.NNNNNNNNNN
      */
     public function setContacts(array $domainInfo, array $contactInfo) {
         $data = $this->api->parseContactInfo($contactInfo);
+
         return $this->api->post($this->command . __FUNCTION__, array_merge($domainInfo, $data));
     }
 
     /**
      * @todo Checks the availability of domains.
-     * @param str or Array|domain|req : The list of domains or a single domain name
+     *
+     * @param string|array $domain The list of domains or a single domain name
      */
     public function check($domain) {
         if (is_array($domain)) {
             $domainString = implode(',', $domain);
             $data['DomainList'] = $domainString;
-        } else if (is_string($domain)) {
+        } elseif (is_string($domain)) {
             $data['DomainList'] = $domain;
         }
+
         return $this->api->get($this->command . __FUNCTION__, $data);
     }
 
     /**
      * @todo Reactivates an expired domain.
      *
-     * @param str|domainName|req : Domain name to reactivate
-     * @param str|PromotionCode|opt : Promotional (coupon) code for reactivating the domain
-     * @param num|yearsToAdd|opt : Number of years after expiry
-     * @param bool|isPremiumDomain|opt : Indication if the domain name is premium
-     * @param num|premiumPrice|opt : Reactivation price for the premium domain
+     * @param string      $domainName      Domain name to reactivate
+     * @param null|string $promotionCode   Promotional (coupon) code for reactivating the domain
+     * @param null|int    $yearsToAdd      Number of years after expiry
+     * @param null|bool   $isPremiumDomain Indication if the domain name is premium
+     * @param null|float  $premiumPrice    Reactivation price for the premium domain
      */
     public function reactivate($domainName, $promotionCode = null, $yearsToAdd = null, $isPremiumDomain = null, $premiumPrice = null) {
         $data = [
@@ -254,17 +235,18 @@ class CVendor_Namecheap_Command_Domains extends CVendor_Namecheap_AbstractComman
             'IsPremiumDomain' => $isPremiumDomain,
             'PremiumPrice' => $premiumPrice,
         ];
+
         return $this->api->get($this->command . __FUNCTION__, $data);
     }
 
     /**
      * @todo Renew an expired domain.
      *
-     * @param str|domainName|req : Domain name to reactivate
-     * @param num|years|req : Number of years to renew
-     * @param str|promotionCode	|opt : Promotional (coupon) code for renewing the domain
-     * @param bool|isPremiumDomain|opt : Indication if the domain name is premium
-     * @param num|premiumPrice|opt : Reactivation price for the premium domain
+     * @param string      $domainName      Domain name to reactivate
+     * @param int         $years           Number of years to renew
+     * @param null|string $promotionCode   Promotional (coupon) code for renewing the domain
+     * @param null|bool   $isPremiumDomain Indication if the domain name is premium
+     * @param null|float  $premiumPrice    Reactivation price for the premium domain
      */
     public function renew($domainName, $years, $promotionCode = null, $isPremiumDomain = null, $premiumPrice = null) {
         $data = [
@@ -274,43 +256,48 @@ class CVendor_Namecheap_Command_Domains extends CVendor_Namecheap_AbstractComman
             'IsPremiumDomain' => $isPremiumDomain,
             'PremiumPrice' => $premiumPrice,
         ];
+
         return $this->api->get($this->command . __FUNCTION__, $data);
     }
 
     /**
      * @todo Gets the RegistrarLock status of the requested domain.
      *
-     * @param str|DomainName|req : Domain name to get status for	
+     * @param string $domainName Domain name to get status for
      */
     public function getRegistrarLock($domainName) {
         $data = ['DomainName' => $domainName];
+
         return $this->api->get($this->command . __FUNCTION__, $data);
     }
 
     /**
      * @todo Sets the RegistrarLock status for a domain.
      *
-     * @param str|DomainName|req : Domain name to get status for	
-     * @param str|LockAction|opt : Possible values: LOCK, UNLOCK. | Default Value: LOCK.	
+     * @param string      $domainName Domain name to get status for
+     * @param null|string $lockAction Possible values: LOCK, UNLOCK. | Default Value: LOCK.
      */
     public function setRegistrarLock($domainName, $lockAction = null) {
         $data = [
             'DomainName' => $domainName,
             'LockAction' => $lockAction,
         ];
+
         return $this->api->get($this->command . __FUNCTION__, $data);
     }
 
     /**
      * @todo Returns information about the requested domain.
-     * @param str|domainName|req : Domain name for which domain information needs to be requested	
-     * @param str|hostName|opt : Hosted domain name for which domain information needs to be requested
+     *
+     * @param string      $domainName Domain name for which domain information needs to be requested
+     * @param null|string $hostName   Hosted domain name for which domain information needs to be requested
      */
     public function getInfo($domainName, $hostName = null) {
         $data = [
             'DomainName' => $domainName,
             'HostName' => $hostName,
         ];
+
         return $this->api->get($this->command . __FUNCTION__, $data);
     }
 
@@ -352,6 +339,7 @@ class CVendor_Namecheap_Command_Domains extends CVendor_Namecheap_AbstractComman
             'PremiumPrice' => !empty($dd['premiumPrice']) ? $dd['premiumPrice'] : null,
             'EapFee' => !empty($dd['eapFee']) ? $dd['eapFee'] : null,
         ];
+
         return array_merge($domainInfo, $this->parseContactInfo($cd), $billing, $extra);
     }
 
@@ -359,16 +347,16 @@ class CVendor_Namecheap_Command_Domains extends CVendor_Namecheap_AbstractComman
         $requiredFields = [
             'FirstName', 'LastName', 'Address1', 'City', 'StateProvince', 'PostalCode', 'Country', 'Phone', 'EmailAddress',
         ];
-        $requiredRegistrant = array_map(function($f) {
+        $requiredRegistrant = array_map(function ($f) {
             return 'Registrant' . $f;
         }, $requiredFields);
-        $requiredTech = array_map(function($f) {
+        $requiredTech = array_map(function ($f) {
             return 'Tech' . $f;
         }, $requiredFields);
-        $requiredAdmin = array_map(function($f) {
+        $requiredAdmin = array_map(function ($f) {
             return 'Admin' . $f;
         }, $requiredFields);
-        $requiredAuxBilling = array_map(function($f) {
+        $requiredAuxBilling = array_map(function ($f) {
             return 'AuxBilling' . $f;
         }, $requiredFields);
         $registrant = [
@@ -451,20 +439,24 @@ class CVendor_Namecheap_Command_Domains extends CVendor_Namecheap_AbstractComman
         $reqFields = $this->checkRequiredFields($registrant, $requiredRegistrant);
         if (count($reqFields)) {
             $flist = implode(', ', $reqFields);
-            throw new \Exception($flist . " : these fields are required!", 2010324);
+
+            throw new \Exception($flist . ' : these fields are required!', 2010324);
         } else {
             // validate / replaced values with $registrant array for tech, admin, auxBilling
             $reqFields = $this->checkRequiredFields($tech, $requiredTech);
-            foreach ($reqFields as $k)
+            foreach ($reqFields as $k) {
                 $tech[$k] = $registrant['Registrant' . substr($k, strlen('Tech'))];
+            }
             $reqFields = $this->checkRequiredFields($admin, $requiredAdmin);
-            foreach ($reqFields as $k)
+            foreach ($reqFields as $k) {
                 $admin[$k] = $registrant['Registrant' . substr($k, strlen('Admin'))];
+            }
             $reqFields = $this->checkRequiredFields($auxBilling, $requiredAuxBilling);
-            foreach ($reqFields as $k)
+            foreach ($reqFields as $k) {
                 $auxBilling[$k] = $registrant['Registrant' . substr($k, strlen('AuxBilling'))];
+            }
         }
+
         return array_merge($registrant, $tech, $admin, $auxBilling);
     }
-
 }

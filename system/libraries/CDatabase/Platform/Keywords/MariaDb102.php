@@ -3,13 +3,6 @@
 defined('SYSPATH') or die('No direct access allowed.');
 
 /**
- * @author Hery Kurniawan
- * @license Ittron Global Teknologi <ittron.co.id>
- *
- * @since Aug 18, 2018, 11:45:22 AM
- */
-
-/**
  * MariaDb reserved keywords list.
  *
  * @link https://mariadb.com/kb/en/the-mariadb-library/reserved-words/

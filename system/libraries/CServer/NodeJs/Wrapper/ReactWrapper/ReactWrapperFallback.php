@@ -32,6 +32,10 @@ class CServer_NodeJs_Wrapper_ReactWrapper_ReactWrapperFallback {
         'text', 'tspan',
     ];
 
+    protected $result;
+
+    protected $buffer;
+
     public function __construct($source) {
         $this->source = $source;
     }

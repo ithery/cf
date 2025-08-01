@@ -29,7 +29,7 @@ trait CElement_Component_DataTable_Trait_ActionCreationTrait {
         $ajaxMethod->setData('writerType', carr::get($options, 'writerType'));
         $ajaxMethod->setData('headers', carr::get($options, 'headers', []));
         $ajaxMethod->setExpiration(carr::get($options, 'expiration', c::now()->addDays(1)->getTimestamp()));
-        if (carr::get($options, 'auth', c::app()->isLoginRequired())) {
+        if (carr::get($options, 'auth', c::app()->isAuthEnabled())) {
             $ajaxMethod->enableAuth();
         }
 

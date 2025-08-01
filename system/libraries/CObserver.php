@@ -7,7 +7,6 @@ class CObserver {
 
     private function __construct() {
         $this->objectList = [];
-        $this->autoid = 0;
     }
 
     public static function instance() {
@@ -24,7 +23,7 @@ class CObserver {
 
     public function newId() {
         $uniqid = uniqid(time(), true);
-        $uniqid = str_replace('.', '', $uniqid);
+        $uniqid = 'cr' . str_replace('.', '', $uniqid);
 
         return $uniqid;
     }
@@ -41,8 +40,15 @@ class CObserver {
 
     public function add(CObject $obj) {
         if (array_key_exists($obj->id(), $this->objectList)) {
-            throw new CException('Object :object_id is exists.', [':object_id' => $obj->id()]);
+            throw new Exception(c::__('Object :object_id is exists.', ['object_id' => $obj->id()]));
         }
+        // if ($obj->id() == 'asd dd') {
+        //cdbg::dd(preg_match('/^[A-Za-z][A-Za-z0-9_:\.-]*/', $obj->id()));
+        // }
+        // if (!preg_match('/^[A-Za-z0-9_:\.-]*/', $obj->id())) {
+        //     // valid
+        //     throw new Exception('id of element is not valid:' . $obj->id());
+        // }
 
         $this->objectList[$obj->id()] = $obj;
     }

@@ -7,6 +7,13 @@ defined('SYSPATH') or die('No direct access allowed.');
  */
 class CContainer_Container implements CContainer_ContainerInterface, ArrayAccess {
     /**
+     * The contextual binding map.
+     *
+     * @var array
+     */
+    public $contextual = [];
+
+    /**
      * The current globally available container (if any).
      *
      * @var static
@@ -84,13 +91,6 @@ class CContainer_Container implements CContainer_ContainerInterface, ArrayAccess
     protected $with = [];
 
     /**
-     * The contextual binding map.
-     *
-     * @var array
-     */
-    public $contextual = [];
-
-    /**
      * All of the registered rebound callbacks.
      *
      * @var array
@@ -150,7 +150,7 @@ class CContainer_Container implements CContainer_ContainerInterface, ArrayAccess
     }
 
     /**
-     *  {@inheritdoc}
+     *  @inheritdoc
      */
     public function has($id) {
         return $this->bound($id);
@@ -167,6 +167,7 @@ class CContainer_Container implements CContainer_ContainerInterface, ArrayAccess
         if ($this->isAlias($abstract)) {
             $abstract = $this->getAlias($abstract);
         }
+
         return isset($this->resolved[$abstract])
                 || isset($this->instances[$abstract]);
     }
@@ -199,7 +200,7 @@ class CContainer_Container implements CContainer_ContainerInterface, ArrayAccess
      * Register a binding with the container.
      *
      * @param string               $abstract
-     * @param \Closure|string|null $concrete
+     * @param null|\Closure|string $concrete
      * @param bool                 $shared
      *
      * @return void
@@ -240,6 +241,7 @@ class CContainer_Container implements CContainer_ContainerInterface, ArrayAccess
             if ($abstract == $concrete) {
                 return $container->build($concrete);
             }
+
             return $container->make($concrete, $parameters);
         };
     }
@@ -278,6 +280,7 @@ class CContainer_Container implements CContainer_ContainerInterface, ArrayAccess
         if (is_array($method)) {
             return $method[0] . '@' . $method[1];
         }
+
         return $method;
     }
 
@@ -310,7 +313,7 @@ class CContainer_Container implements CContainer_ContainerInterface, ArrayAccess
      * Register a binding if it hasn't already been registered.
      *
      * @param string               $abstract
-     * @param \Closure|string|null $concrete
+     * @param null|\Closure|string $concrete
      * @param bool                 $shared
      *
      * @return void
@@ -325,7 +328,7 @@ class CContainer_Container implements CContainer_ContainerInterface, ArrayAccess
      * Register a shared binding in the container.
      *
      * @param string               $abstract
-     * @param \Closure|string|null $concrete
+     * @param null|\Closure|string $concrete
      *
      * @return void
      */
@@ -337,7 +340,7 @@ class CContainer_Container implements CContainer_ContainerInterface, ArrayAccess
      * Register a shared binding if it hasn't already been registered.
      *
      * @param string               $abstract
-     * @param \Closure|string|null $concrete
+     * @param null|\Closure|string $concrete
      *
      * @return void
      */
@@ -353,9 +356,9 @@ class CContainer_Container implements CContainer_ContainerInterface, ArrayAccess
      * @param string   $abstract
      * @param \Closure $closure
      *
-     * @return void
-     *
      * @throws \InvalidArgumentException
+     *
+     * @return void
      */
     public function extend($abstract, Closure $closure) {
         $abstract = $this->getAlias($abstract);
@@ -389,6 +392,7 @@ class CContainer_Container implements CContainer_ContainerInterface, ArrayAccess
         if ($isBound) {
             $this->rebound($abstract);
         }
+
         return $instance;
     }
 
@@ -446,6 +450,7 @@ class CContainer_Container implements CContainer_ContainerInterface, ArrayAccess
                 $results[] = $this->make($abstract);
             }
         }
+
         return $results;
     }
 
@@ -517,6 +522,7 @@ class CContainer_Container implements CContainer_ContainerInterface, ArrayAccess
         if (isset($this->reboundCallbacks[$abstract])) {
             return $this->reboundCallbacks[$abstract];
         }
+
         return [];
     }
 
@@ -539,7 +545,7 @@ class CContainer_Container implements CContainer_ContainerInterface, ArrayAccess
      *
      * @param callable|string $callback
      * @param array           $parameters
-     * @param string|null     $defaultMethod
+     * @param null|string     $defaultMethod
      *
      * @return mixed
      */
@@ -585,13 +591,18 @@ class CContainer_Container implements CContainer_ContainerInterface, ArrayAccess
     }
 
     /**
-     *  {@inheritdoc}
+     *  @inheritdoc
      */
     public function get($id) {
-        if ($this->has($id)) {
+        try {
             return $this->resolve($id);
+        } catch (Exception $e) {
+            if ($this->has($id) || $e instanceof CContainer_Exception_CircularDependencyException) {
+                throw $e;
+            }
+
+            throw new CContainer_Exception_EntryNotFoundException($id, is_int($e->getCode()) ? $e->getCode() : 0, $e);
         }
-        throw new CContainer_Exception_EntryNotFoundException;
     }
 
     /**
@@ -644,6 +655,7 @@ class CContainer_Container implements CContainer_ContainerInterface, ArrayAccess
         // we will be ready to return back the fully constructed class instance.
         $this->resolved[$abstract] = true;
         array_pop($this->with);
+
         return $object;
     }
 
@@ -664,6 +676,7 @@ class CContainer_Container implements CContainer_ContainerInterface, ArrayAccess
         if (isset($this->bindings[$abstract])) {
             return $this->bindings[$abstract]['concrete'];
         }
+
         return $abstract;
     }
 
@@ -672,7 +685,7 @@ class CContainer_Container implements CContainer_ContainerInterface, ArrayAccess
      *
      * @param string $abstract
      *
-     * @return string|null
+     * @return null|string
      */
     protected function getContextualConcrete($abstract) {
         if (!is_null($binding = $this->findInContextualBindings($abstract))) {
@@ -696,7 +709,7 @@ class CContainer_Container implements CContainer_ContainerInterface, ArrayAccess
      *
      * @param string $abstract
      *
-     * @return string|null
+     * @return null|string
      */
     protected function findInContextualBindings($abstract) {
         if (isset($this->contextual[end($this->buildStack)][$abstract])) {
@@ -721,9 +734,9 @@ class CContainer_Container implements CContainer_ContainerInterface, ArrayAccess
      *
      * @param string $concrete
      *
-     * @return mixed
-     *
      * @throws CContainer_Exception_BindingResolutionException
+     *
+     * @return mixed
      */
     public function build($concrete) {
         // If the concrete type is actually a Closure, we will just execute it and
@@ -746,7 +759,8 @@ class CContainer_Container implements CContainer_ContainerInterface, ArrayAccess
         // resolving any other types or dependencies out of these containers.
         if (is_null($constructor)) {
             array_pop($this->buildStack);
-            return new $concrete;
+
+            return new $concrete();
         }
         $dependencies = $constructor->getParameters();
         // Once we have all the constructor's parameters we can create each of the
@@ -756,6 +770,7 @@ class CContainer_Container implements CContainer_ContainerInterface, ArrayAccess
             $dependencies
         );
         array_pop($this->buildStack);
+
         return $reflector->newInstanceArgs($instances);
     }
 
@@ -774,6 +789,7 @@ class CContainer_Container implements CContainer_ContainerInterface, ArrayAccess
             // of resolutions and let reflection attempt to determine the result.
             if ($this->hasParameterOverride($dependency)) {
                 $results[] = $this->getParameterOverride($dependency);
+
                 continue;
             }
             // If the class is null, it means the dependency is a string or some other
@@ -781,6 +797,7 @@ class CContainer_Container implements CContainer_ContainerInterface, ArrayAccess
             // we will just bomb out with an error since we have no-where to go.
             $results[] = is_null($dependency->getClass()) ? $this->resolvePrimitive($dependency) : $this->resolveClass($dependency);
         }
+
         return $results;
     }
 
@@ -823,9 +840,9 @@ class CContainer_Container implements CContainer_ContainerInterface, ArrayAccess
      *
      * @param \ReflectionParameter $parameter
      *
-     * @return mixed
-     *
      * @throws \CContainer_Exception_BindingResolutionException
+     *
+     * @return mixed
      */
     protected function resolvePrimitive(ReflectionParameter $parameter) {
         if (!is_null($concrete = $this->getContextualConcrete('$' . $parameter->name))) {
@@ -842,9 +859,9 @@ class CContainer_Container implements CContainer_ContainerInterface, ArrayAccess
      *
      * @param \ReflectionParameter $parameter
      *
-     * @return mixed
-     *
      * @throws CContainer_Exception_BindingResolutionException
+     *
+     * @return mixed
      */
     protected function resolveClass(ReflectionParameter $parameter) {
         try {
@@ -856,6 +873,7 @@ class CContainer_Container implements CContainer_ContainerInterface, ArrayAccess
             if ($parameter->isOptional()) {
                 return $parameter->getDefaultValue();
             }
+
             throw $e;
         }
     }
@@ -865,9 +883,9 @@ class CContainer_Container implements CContainer_ContainerInterface, ArrayAccess
      *
      * @param string $concrete
      *
-     * @return void
-     *
      * @throws CContainer_Exception_BindingResolutionException
+     *
+     * @return void
      */
     protected function notInstantiable($concrete) {
         if (!empty($this->buildStack)) {
@@ -876,6 +894,7 @@ class CContainer_Container implements CContainer_ContainerInterface, ArrayAccess
         } else {
             $message = "Target [$concrete] is not instantiable.";
         }
+
         throw new CContainer_Exception_BindingResolutionException($message);
     }
 
@@ -884,12 +903,13 @@ class CContainer_Container implements CContainer_ContainerInterface, ArrayAccess
      *
      * @param \ReflectionParameter $parameter
      *
-     * @return void
-     *
      * @throws CContainer_Exception_BindingResolutionException
+     *
+     * @return void
      */
     protected function unresolvablePrimitive(ReflectionParameter $parameter) {
         $message = "Unresolvable dependency resolving [$parameter] in class {$parameter->getDeclaringClass()->getName()}";
+
         throw new CContainer_Exception_BindingResolutionException($message);
     }
 
@@ -897,7 +917,7 @@ class CContainer_Container implements CContainer_ContainerInterface, ArrayAccess
      * Register a new resolving callback.
      *
      * @param \Closure|string $abstract
-     * @param \Closure|null   $callback
+     * @param null|\Closure   $callback
      *
      * @return void
      */
@@ -916,7 +936,7 @@ class CContainer_Container implements CContainer_ContainerInterface, ArrayAccess
      * Register a new after resolving callback for all types.
      *
      * @param \Closure|string $abstract
-     * @param \Closure|null   $callback
+     * @param null|\Closure   $callback
      *
      * @return void
      */
@@ -980,6 +1000,7 @@ class CContainer_Container implements CContainer_ContainerInterface, ArrayAccess
                 $results = array_merge($results, $callbacks);
             }
         }
+
         return $results;
     }
 
@@ -1011,9 +1032,9 @@ class CContainer_Container implements CContainer_ContainerInterface, ArrayAccess
      *
      * @param string $abstract
      *
-     * @return string
-     *
      * @throws \LogicException
+     *
+     * @return string
      */
     public function getAlias($abstract) {
         if (!isset($this->aliases[$abstract])) {
@@ -1022,6 +1043,7 @@ class CContainer_Container implements CContainer_ContainerInterface, ArrayAccess
         if ($this->aliases[$abstract] === $abstract) {
             throw new LogicException("[{$abstract}] is aliased to itself.");
         }
+
         return $this->getAlias($this->aliases[$abstract]);
     }
 
@@ -1037,6 +1059,7 @@ class CContainer_Container implements CContainer_ContainerInterface, ArrayAccess
         if (isset($this->extenders[$abstract])) {
             return $this->extenders[$abstract];
         }
+
         return [];
     }
 
@@ -1102,15 +1125,16 @@ class CContainer_Container implements CContainer_ContainerInterface, ArrayAccess
      */
     public static function getInstance() {
         if (is_null(static::$instance)) {
-            static::$instance = new static;
+            static::$instance = new static();
         }
+
         return static::$instance;
     }
 
     /**
      * Set the shared instance of the container.
      *
-     * @param CContainer_ContainerInterface|null $container
+     * @param null|CContainer_ContainerInterface $container
      *
      * @return CContainer_ContainerInterface|static
      */
@@ -1125,6 +1149,7 @@ class CContainer_Container implements CContainer_ContainerInterface, ArrayAccess
      *
      * @return bool
      */
+    #[\ReturnTypeWillChange]
     public function offsetExists($key) {
         return $this->bound($key);
     }
@@ -1148,6 +1173,7 @@ class CContainer_Container implements CContainer_ContainerInterface, ArrayAccess
      *
      * @return void
      */
+    #[\ReturnTypeWillChange]
     public function offsetSet($key, $value) {
         $this->bind($key, $value instanceof Closure ? $value : function () use ($value) {
             return $value;
@@ -1161,6 +1187,7 @@ class CContainer_Container implements CContainer_ContainerInterface, ArrayAccess
      *
      * @return void
      */
+    #[\ReturnTypeWillChange]
     public function offsetUnset($key) {
         unset($this->bindings[$key], $this->instances[$key], $this->resolved[$key]);
     }

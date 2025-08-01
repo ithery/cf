@@ -1,18 +1,10 @@
 <?php
 
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
-
 /**
- * This class is used to construct a MailSettings object for the /mail/send API call
+ * This class is used to construct a MailSettings object for the /mail/send API call.
  *
  * A collection of different mail settings that you can use to specify how you would
  * like this email to be handled
- *
- * @package SendGrid\Mail
  */
 class CVendor_SendGrid_Mail_MailSettings implements \JsonSerializable {
     /**
@@ -41,14 +33,14 @@ class CVendor_SendGrid_Mail_MailSettings implements \JsonSerializable {
     private $spam_check;
 
     /**
-     * Optional constructor
+     * Optional constructor.
      *
-     * @param CVendor_SendGrid_Mail_BccSettings|null          $bcc_settings           BccSettings object
-     * @param CVendor_SendGrid_Mail_BypassListManagement|null $bypass_list_management BypassListManagement
+     * @param null|CVendor_SendGrid_Mail_BccSettings          $bcc_settings           BccSettings object
+     * @param null|CVendor_SendGrid_Mail_BypassListManagement $bypass_list_management BypassListManagement
      *                                                                                object
-     * @param CVendor_SendGrid_Mail_Footer|null               $footer                 Footer object
-     * @param CVendor_SendGrid_Mail_SandBoxMode|null          $sandbox_mode           SandBoxMode object
-     * @param CVendor_SendGrid_Mail_SpamCheck|null            $spam_check             SpamCheck object
+     * @param null|CVendor_SendGrid_Mail_Footer               $footer                 Footer object
+     * @param null|CVendor_SendGrid_Mail_SandBoxMode          $sandbox_mode           SandBoxMode object
+     * @param null|CVendor_SendGrid_Mail_SpamCheck            $spam_check             SpamCheck object
      */
     public function __construct(
         $bcc_settings = null,
@@ -75,11 +67,11 @@ class CVendor_SendGrid_Mail_MailSettings implements \JsonSerializable {
     }
 
     /**
-     * Set the bcc settings on a MailSettings object
+     * Set the bcc settings on a MailSettings object.
      *
      * @param CVendor_SendGrid_Mail_BccSettings|bool $enable The BccSettings object or an indication
      *                                                       if the setting is enabled
-     * @param string|null                            $email  The email address that you would like
+     * @param null|string                            $email  The email address that you would like
      *                                                       to receive the BCC
      *
      * @throws CVendor_SendGrid_Exception_TypeException
@@ -88,6 +80,7 @@ class CVendor_SendGrid_Mail_MailSettings implements \JsonSerializable {
         if ($enable instanceof CVendor_SendGrid_Mail_BccSettings) {
             $bcc = $enable;
             $this->bcc = $bcc;
+
             return;
         }
         if (!is_bool($enable)) {
@@ -99,7 +92,7 @@ class CVendor_SendGrid_Mail_MailSettings implements \JsonSerializable {
     }
 
     /**
-     * Retrieve the bcc settings from a MailSettings object
+     * Retrieve the bcc settings from a MailSettings object.
      *
      * @return CVendor_SendGrid_Mail_Bcc
      */
@@ -108,7 +101,7 @@ class CVendor_SendGrid_Mail_MailSettings implements \JsonSerializable {
     }
 
     /**
-     * Set bypass list management settings on a MailSettings object
+     * Set bypass list management settings on a MailSettings object.
      *
      * @param CVendor_SendGrid_Mail_BypassListManagement|bool $enable The BypassListManagement
      *                                                                object or an indication
@@ -120,6 +113,7 @@ class CVendor_SendGrid_Mail_MailSettings implements \JsonSerializable {
         if ($enable instanceof CVendor_SendGrid_Mail_BypassListManagement) {
             $bypass_list_management = $enable;
             $this->bypass_list_management = $bypass_list_management;
+
             return;
         }
         if (!is_bool($enable)) {
@@ -128,11 +122,12 @@ class CVendor_SendGrid_Mail_MailSettings implements \JsonSerializable {
             );
         }
         $this->bypass_list_management = new CVendor_SendGrid_Mail_BypassListManagement($enable);
+
         return;
     }
 
     /**
-     * Retrieve bypass list management settings from a MailSettings object
+     * Retrieve bypass list management settings from a MailSettings object.
      *
      * @return CVendor_SendGrid_Mail_BypassListManagement
      */
@@ -141,12 +136,12 @@ class CVendor_SendGrid_Mail_MailSettings implements \JsonSerializable {
     }
 
     /**
-     * Set the footer settings on a MailSettings object
+     * Set the footer settings on a MailSettings object.
      *
      * @param CVendor_SendGrid_Mail_Footer|bool $enable The Footer object or an indication
      *                                                  if the setting is enabled
-     * @param string|null                       $text   The plain text content of your footer
-     * @param string|null                       $html   The HTML content of your footer
+     * @param null|string                       $text   The plain text content of your footer
+     * @param null|string                       $html   The HTML content of your footer
      *
      * @return null
      */
@@ -154,14 +149,16 @@ class CVendor_SendGrid_Mail_MailSettings implements \JsonSerializable {
         if ($enable instanceof CVendor_SendGrid_Mail_Footer) {
             $footer = $enable;
             $this->footer = $footer;
+
             return;
         }
         $this->footer = new CVendor_SendGrid_Mail_Footer($enable, $text, $html);
+
         return;
     }
 
     /**
-     * Retrieve the footer settings from a MailSettings object
+     * Retrieve the footer settings from a MailSettings object.
      *
      * @return Footer
      */
@@ -170,7 +167,7 @@ class CVendor_SendGrid_Mail_MailSettings implements \JsonSerializable {
     }
 
     /**
-     * Set sandbox mode settings on a MailSettings object
+     * Set sandbox mode settings on a MailSettings object.
      *
      * @param CVendor_SendGrid_Mail_SandBoxMode|bool $enable The SandBoxMode object or an
      *                                                       indication if the setting is enabled
@@ -181,14 +178,16 @@ class CVendor_SendGrid_Mail_MailSettings implements \JsonSerializable {
         if ($enable instanceof CVendor_SendGrid_Mail_SandBoxMode) {
             $sandbox_mode = $enable;
             $this->sandbox_mode = $sandbox_mode;
+
             return;
         }
         $this->sandbox_mode = new CVendor_SendGrid_Mail_SandBoxMode($enable);
+
         return;
     }
 
     /**
-     * Retrieve sandbox mode settings on a MailSettings object
+     * Retrieve sandbox mode settings on a MailSettings object.
      *
      * @return CVendor_SendGrid_Mail_SandBoxMode
      */
@@ -197,21 +196,21 @@ class CVendor_SendGrid_Mail_MailSettings implements \JsonSerializable {
     }
 
     /**
-     * Enable sandbox mode on a MailSettings object
+     * Enable sandbox mode on a MailSettings object.
      */
     public function enableSandboxMode() {
         $this->setSandboxMode(true);
     }
 
     /**
-     * Disable sandbox mode on a MailSettings object
+     * Disable sandbox mode on a MailSettings object.
      */
     public function disableSandboxMode() {
         $this->setSandboxMode(false);
     }
 
     /**
-     * Set spam check settings on a MailSettings object
+     * Set spam check settings on a MailSettings object.
      *
      * @param CVendor_SendGrid_Mail_SpamCheck|bool $enable      The SpamCheck object or an
      *                                                          indication if the setting is enabled
@@ -229,14 +228,16 @@ class CVendor_SendGrid_Mail_MailSettings implements \JsonSerializable {
         if ($enable instanceof CVendor_SendGrid_Mail_SpamCheck) {
             $spam_check = $enable;
             $this->spam_check = $spam_check;
+
             return;
         }
         $this->spam_check = new CVendor_SendGrid_Mail_SpamCheck($enable, $threshold, $post_to_url);
+
         return;
     }
 
     /**
-     * Retrieve spam check settings from a MailSettings object
+     * Retrieve spam check settings from a MailSettings object.
      *
      * @return CVendor_SendGrid_Mail_SpamCheck
      */
@@ -245,7 +246,7 @@ class CVendor_SendGrid_Mail_MailSettings implements \JsonSerializable {
     }
 
     /**
-     * Return an array representing a MailSettings object for the Twilio SendGrid API
+     * Return an array representing a MailSettings object for the Twilio SendGrid API.
      *
      * @return null|array
      */

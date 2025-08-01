@@ -19,7 +19,20 @@ class CElement_Component_Icon extends CElement_Component {
 
     public function build() {
         $icon = $this->icon;
+        $this->addClass('capp-icon');
+        if (strpos($this->originalIcon, '.') !== false) {
+            if ($icon = c::manager()->icon()->loadFile($this->originalIcon)) {
+                $component = new CView_Component_IconComponent($this->originalIcon);
 
-        $this->addClass($icon);
+                $icon = $component->render()->toHtml();
+                $this->setAttr('data-icon', $this->originalIcon);
+                $this->add($icon);
+
+                return;
+            }
+        }
+        $iconPrefix = c::theme('icon.prefix', 'icon icon-');
+
+        $this->addClass($iconPrefix . $icon);
     }
 }

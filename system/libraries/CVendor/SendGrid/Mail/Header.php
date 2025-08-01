@@ -1,19 +1,11 @@
 <?php
 
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
-
 /**
- * This class is used to construct a Header object for the /mail/send API call
+ * This class is used to construct a Header object for the /mail/send API call.
  *
  * An object containing key/value pairs of header names and the value to substitute
  * for them. You must ensure these are properly encoded if they contain unicode
  * characters. Must not be one of the reserved headers
- *
- * @package SendGrid\Mail
  */
 class CVendor_SendGrid_Mail_Header implements \JsonSerializable {
     /**
@@ -27,10 +19,10 @@ class CVendor_SendGrid_Mail_Header implements \JsonSerializable {
     private $value;
 
     /**
-     * Optional constructor
+     * Optional constructor.
      *
-     * @param string|null $key   Header key
-     * @param string|null $value Header value
+     * @param null|string $key   Header key
+     * @param null|string $value Header value
      */
     public function __construct($key = null, $value = null) {
         if (isset($key)) {
@@ -42,7 +34,7 @@ class CVendor_SendGrid_Mail_Header implements \JsonSerializable {
     }
 
     /**
-     * Add the key on a Header object
+     * Add the key on a Header object.
      *
      * @param string $key Header key
      *
@@ -56,7 +48,7 @@ class CVendor_SendGrid_Mail_Header implements \JsonSerializable {
     }
 
     /**
-     * Retrieve the key from a Header object
+     * Retrieve the key from a Header object.
      *
      * @return string
      */
@@ -65,7 +57,7 @@ class CVendor_SendGrid_Mail_Header implements \JsonSerializable {
     }
 
     /**
-     * Add the value on a Header object
+     * Add the value on a Header object.
      *
      * @param string $value Header value
      *
@@ -79,7 +71,7 @@ class CVendor_SendGrid_Mail_Header implements \JsonSerializable {
     }
 
     /**
-     * Retrieve the value from a Header object
+     * Retrieve the value from a Header object.
      *
      * @return string
      */
@@ -88,7 +80,7 @@ class CVendor_SendGrid_Mail_Header implements \JsonSerializable {
     }
 
     /**
-     * Return an array representing a Header object for the Twilio SendGrid API
+     * Return an array representing a Header object for the Twilio SendGrid API.
      *
      * @return null|array
      */

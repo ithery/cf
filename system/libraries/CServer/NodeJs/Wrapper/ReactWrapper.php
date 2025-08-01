@@ -2,6 +2,8 @@
 class CServer_NodeJs_Wrapper_ReactWrapper extends CServer_NodeJs_WrapperAbstract {
     protected $sourceMap;
 
+    protected $lastFile;
+
     public function __construct(CServer_NodeJs_Runner $node, $file, $sourceMap = false) {
         $this->sourceMap = $sourceMap;
         parent::__construct($node, $file);
@@ -30,6 +32,11 @@ class CServer_NodeJs_Wrapper_ReactWrapper extends CServer_NodeJs_WrapperAbstract
         $outFile = $destination;
         if ($outFile == null) {
             $outFile = sys_get_temp_dir() . DIRECTORY_SEPARATOR . preg_replace('/\.jsx$/i', '', basename($path)) . '.js';
+        } else {
+            $dirOutFile = dirname($outFile);
+            if (!CFile::isDirectory($dirOutFile)) {
+                CFile::makeDirectory($dirOutFile, 0755, true);
+            }
         }
         $outFile = escapeshellarg($outFile);
         $appDirectory = $this->node->getDirectory();

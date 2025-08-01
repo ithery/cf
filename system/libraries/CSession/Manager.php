@@ -92,7 +92,7 @@ class CSession_Manager {
         return new CSession_StoreEncrypted(
             $this->config->get('session.cookie'),
             $handler,
-            $this->container['encrypter']
+            c::crypt()
         );
     }
 

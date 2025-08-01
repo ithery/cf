@@ -1,6 +1,8 @@
-/********************************************************/
+/*******************************************************   */
+
 /*                       Block arrows                   */
-/********************************************************/
+
+/*******************************************************   */
 .block-arrow {
     display: block;
     width: 0;
@@ -12,6 +14,7 @@
     margin: 1px 0 0 -6px;
     border: 6px solid transparent;
     border-top-color: inherit;
+
     /* border-top-color:expression(this.parentNode.currentStyle['border-top-color']); */
 }
 .block-arrow > span {
@@ -29,7 +32,7 @@
 .translucid > .block-arrow > span,
 .notification > .block-arrow > span,
 .black-gradient > .block-arrow > span {
-    border-top-color: #000000;
+    border-top-color: #000;
 }
 .anthracite-gradient > .block-arrow > span {
     border-top-color: #404040;
@@ -56,6 +59,7 @@
     margin: 0 0 1px -6px;
     border-top-color: transparent;
     border-bottom-color: inherit;
+
     /* border-bottom-color:expression(this.parentNode.currentStyle['border-bottom-color']); */
 }
 .block-arrow.top > span {
@@ -69,7 +73,7 @@
 .translucid > .block-arrow.top > span,
 .notification > .block-arrow.top > span,
 .black-gradient > .block-arrow.top > span {
-    border-bottom-color: #333333;
+    border-bottom-color: #333;
 }
 .anthracite-gradient > .block-arrow.top > span {
     border-bottom-color: #565656;
@@ -95,7 +99,8 @@
     margin: -6px 0 0 1px;
     border-top-color: transparent;
     border-left-color: inherit;
-    /*border-left-color:expression(this.parentNode.currentStyle['border-left-color']); */
+
+    /* border-left-color:expression(this.parentNode.currentStyle['border-left-color']); */
 }
 .block-arrow.right > span {
     margin: -6px -5px -6px -7px;
@@ -135,6 +140,7 @@
     margin: -6px 1px 0 0;
     border-top-color: transparent;
     border-right-color: inherit;
+
     /* border-right-color:expression(this.parentNode.currentStyle['border-right-color']); */
 }
 .block-arrow.left > span {

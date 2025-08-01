@@ -1,22 +1,16 @@
 <?php
 
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
-
 class CDevSuite_Command_UnsecureCommand extends CDevSuite_CommandAbstract {
-
     public function getSignatureArguments() {
-        return '{domain} {--all}';
+        return '{name?} {--all}';
     }
 
     public function run(CConsole_Command $cfCommand) {
-        $domain = $cfCommand->argument('domain');
+        $domain = $cfCommand->argument('name') ?: CF::appCode();
         $all = $cfCommand->option('all');
         if ($all) {
             CDevSuite::site()->unsecureAll();
+
             return;
         }
 
@@ -28,5 +22,4 @@ class CDevSuite_Command_UnsecureCommand extends CDevSuite_CommandAbstract {
 
         CDevSuite::info('The [' . $url . '] site will now serve traffic over HTTP.');
     }
-
 }

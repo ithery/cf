@@ -59,6 +59,13 @@ trait CObservable_Listener_Handler_Trait_ParamHandlerTrait {
                 if (strlen($dataAddition) > 0) {
                     $dataAddition .= ',';
                 }
+                if (is_array($reqV)) {
+                    if (carr::isAssoc($reqV)) {
+                        $reqV = json_encode($reqV);
+                    } else {
+                        $reqV = implode(',', $reqV);
+                    }
+                }
                 $dataAddition .= "'" . $reqK . "':'" . $reqV . "'";
             }
         }

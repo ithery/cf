@@ -6,6 +6,7 @@ return [
             'name' => 'CF PWA',
             'start_url' => '/',
             'theme' => 'cresenity',
+            'debug' => !CF::isProduction(),
             'manifest' => [
                 'name' => c::env('APP_NAME', 'CF PWA App'),
                 'short_name' => 'PWA',
@@ -15,6 +16,14 @@ return [
                 'display' => 'standalone',
                 'orientation' => 'any',
                 'status_bar' => 'black',
+                'dir' => 'auto',
+                'lang' => 'en',
+                'display_override' => [
+                    'fullscreen'
+                ],
+                'categories' => [
+                    'business',
+                ],
                 'icons' => [
                     '72x72' => [
                         'path' => '/system/media/img/pwa/icons/icon-72x72.png',

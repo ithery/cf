@@ -76,16 +76,21 @@ final class CGeo_Provider_Nominatim extends CGeo_ProviderHttpAbstract implements
         if (filter_var($address, FILTER_VALIDATE_IP)) {
             throw new CGeo_Exception_UnsupportedOperation('The Nominatim provider does not support IP addresses.');
         }
+        $queries = [
+            'format' => 'jsonv2',
+            'q' => $address,
+            'addressdetails' => 1,
+            'extratags' => 1,
+            'limit' => $query->getLimit(),
+        ];
+        $key = $query->getData('key');
+        if ($key) {
+            $queries['key'] = $key;
+        }
 
         $url = $this->rootUrl
             . '/search' . $this->getExtension() . '?'
-            . http_build_query([
-                'format' => 'jsonv2',
-                'q' => $address,
-                'addressdetails' => 1,
-                'extratags' => 1,
-                'limit' => $query->getLimit(),
-            ], '', '&', PHP_QUERY_RFC3986);
+            . http_build_query($queries, '', '&', PHP_QUERY_RFC3986);
 
         $countrycodes = $query->getData('countrycodes');
         if (!is_null($countrycodes)) {
@@ -143,15 +148,21 @@ final class CGeo_Provider_Nominatim extends CGeo_ProviderHttpAbstract implements
         $longitude = $coordinates->getLongitude();
         $latitude = $coordinates->getLatitude();
 
+        $queries = [
+            'format' => 'jsonv2',
+            'lat' => $latitude,
+            'lon' => $longitude,
+            'addressdetails' => 1,
+            'zoom' => $query->getData('zoom', 18),
+        ];
+        $key = $query->getData('key');
+
+        if ($key) {
+            $queries['key'] = $key;
+        }
         $url = $this->rootUrl
             . '/reverse' . $this->getExtension() . '?'
-            . http_build_query([
-                'format' => 'jsonv2',
-                'lat' => $latitude,
-                'lon' => $longitude,
-                'addressdetails' => 1,
-                'zoom' => $query->getData('zoom', 18),
-            ], '', '&', PHP_QUERY_RFC3986);
+            . http_build_query($queries, '', '&', PHP_QUERY_RFC3986);
 
         $content = $this->executeQuery($url, $query->getLocale());
         $json = json_decode($content);
@@ -246,7 +257,7 @@ final class CGeo_Provider_Nominatim extends CGeo_ProviderHttpAbstract implements
     /**
      * @inheritdoc
      */
-    public function getName(): string {
+    public function getName() {
         return 'nominatim';
     }
 
@@ -256,7 +267,7 @@ final class CGeo_Provider_Nominatim extends CGeo_ProviderHttpAbstract implements
      *
      * @return string
      */
-    private function executeQuery(string $url, string $locale = null): string {
+    private function executeQuery($url, $locale = null) {
         if (null !== $locale) {
             $url .= '&' . http_build_query([
                 'accept-language' => $locale,

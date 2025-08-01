@@ -135,7 +135,6 @@ abstract class CDatabase_Schema_Manager {
         }
 
         $sql = $this->platform->getListTableColumnsSQL($table, $database);
-
         $tableColumns = $this->db->fetchAll($sql);
 
         return $this->getPortableTableColumnList($table, $database, $tableColumns);

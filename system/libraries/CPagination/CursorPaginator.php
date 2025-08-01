@@ -2,13 +2,6 @@
 
 class CPagination_CursorPaginator extends CPagination_CursorPaginatorAbstract implements Cinterface_Arrayable, ArrayAccess, Countable, IteratorAggregate, CInterface_Jsonable, JsonSerializable, CPagination_CursorPaginatorInterface {
     /**
-     * Indicates whether there are more items in the data source.
-     *
-     * @return bool
-     */
-    protected $hasMore;
-
-    /**
      * Create a new paginator instance.
      *
      * @param mixed                    $items

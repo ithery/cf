@@ -3,6 +3,10 @@
 use Ratchet\ConnectionInterface;
 
 class CWebSocket_Server_MockableConnection implements ConnectionInterface {
+    protected $app;
+
+    protected $socketId;
+
     /**
      * Create a new Mockable connection.
      *

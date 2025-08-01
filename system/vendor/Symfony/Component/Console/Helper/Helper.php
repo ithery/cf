@@ -43,8 +43,9 @@ abstract class Helper implements HelperInterface {
      * @param mixed $string
      */
     public static function width($string) {
-        $string ??= '';
-
+        if($string==null) {
+            $string = '';
+        }
         if (preg_match('//u', $string)) {
             return (new UnicodeString($string))->width(false);
         }

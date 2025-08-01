@@ -343,7 +343,6 @@ class CElement_List_TabList extends CElement_List {
         ");
 
         $js->appendln("
-            //console.log(jQuery('#" . $this->id . "').find('li.active a.tab-ajax-load').attr('data-tab'));
             jQuery('#" . $this->id . "').find('li.active a.tab-ajax-load').click();
             if(!jQuery('#" . $this->id . "').hasClass('ajax')) {
                 setTimeout(function() {

@@ -49,6 +49,10 @@ return [
             'driver' => 'redis',
             'connection' => 'default',
         ],
+        'sse' => [
+            'driver' => 'sse',
+            'connection' => 'default',
+        ],
 
         'log' => [
             'driver' => 'log',
@@ -59,5 +63,12 @@ return [
         ],
 
     ],
-
+    'sse' => [
+        'resume_lifetime' => 60,
+        'ping' => [
+            'enable' => true,
+            'frequency' => 30,
+            'eager_env' => 'local', // null or array
+        ],
+    ],
 ];

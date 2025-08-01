@@ -6,12 +6,12 @@ class Controller_Demo_Elements_Table_Action extends \Cresenity\Demo\Controller {
 
         $app->setTitle('Table Action');
 
-        $app->addP()->add('Demo for table action, show country for continent ASIA and EUROPE only');
-        $app->addP()->add('customize action table link and customize action which show just for continent not ASIA');
+        $app->addP()->add('Demo for table action, show country for continent ASIA, AFRICA and EUROPE only');
+        $app->addP()->add('customize action table link and customize action which show just for continent not ASIA and no action for continent EUROPE');
         $table = $app->addTable();
 
         $table->setDataFromModel(Cresenity\Demo\Model\Country::class, function (CModel_Query $query) {
-            $query->whereIn('continent', ['Asia', 'Europe']);
+            $query->whereIn('continent', ['Asia', 'Europe', 'Africa']);
         });
 
         $table->addColumn('name')->setLabel('Name')->setCallback(function ($row, $value) {
@@ -42,11 +42,13 @@ class Controller_Demo_Elements_Table_Action extends \Cresenity\Demo\Controller {
         $table->setAjax(true);
         $table->setRowActionStyle('btn-dropdown');
         $table->addRowAction()->setLabel('Edit')
-            ->setLink(c::url('demo/elements/table/action/edit/{code}'));
+            ->setLink(c::url('demo/elements/table/action/edit/{code}'))->withRowCallback(function (CElement_Component_ActionRow $element, Cresenity\Demo\Model\Country $model) {
+                $element->setVisibility(cstr::toupper($model->continent) != 'EUROPE');
+            });
         $table->addRowAction()->setLabel('Set To Asia')
             ->setLink(c::url('demo/elements/table/action/index'))
             ->withRowCallback(function (CElement_Component_ActionRow $element, Cresenity\Demo\Model\Country $model) {
-                $element->setVisibility(cstr::toupper($model->continent) != 'ASIA');
+                $element->setVisibility(cstr::toupper($model->continent) != 'ASIA' && cstr::toupper($model->continent) != 'EUROPE');
             });
 
         return $app;

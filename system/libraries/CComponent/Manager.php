@@ -2,9 +2,6 @@
 
 defined('SYSPATH') or die('No direct access allowed.');
 
-/**
- * @author Hery Kurniawan <hery@itton.co.id>
- */
 class CComponent_Manager {
     public static $isLivewireRequestTestingOverride;
 
@@ -20,6 +17,8 @@ class CComponent_Manager {
     protected $queryParamsForTesting = [];
 
     protected static $redirector = null;
+
+    protected $shouldDisableBackButtonCache = false;
 
     /**
      * @return CComponent_Manager
