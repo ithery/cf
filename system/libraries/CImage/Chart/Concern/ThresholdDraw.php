@@ -5,8 +5,8 @@ trait CImage_Chart_Concern_ThresholdDraw {
     /**
      * Draw an X threshold
      *
-     * @param mixed   $value
-     * @param boolean $format
+     * @param mixed $value
+     * @param array $format
      *
      * @return array|null|integer
      */

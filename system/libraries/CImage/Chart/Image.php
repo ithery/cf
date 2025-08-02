@@ -12,6 +12,10 @@ use CImage_Chart_Data as Data;
 use CImage_Chart_Constant as Constant;
 
 class CImage_Chart_Image extends CImage_Chart_Draw {
+    protected $imageMapStorageFolder;
+
+    protected $imageMapFileName;
+
     /**
      * @param int  $xSize
      * @param int  $ySize
