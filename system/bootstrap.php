@@ -33,6 +33,7 @@ if (CF::config('app.mail_error')) {
 
 CFBenchmark::start('capp:bootstrap');
 CApp::registerBlade();
+CManager::registerBlade();
 CApp::registerComponent();
 
 CApp::registerControl();

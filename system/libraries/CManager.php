@@ -13,6 +13,11 @@ final class CManager {
 
     protected $elements_code = [];
 
+    /**
+     * @var CManager_GoogleFonts
+     */
+    protected $googleFonts = null;
+
     protected static $langObjectCallback = null;
 
     protected static $useRequireJs = false;
@@ -469,5 +474,27 @@ final class CManager {
      */
     public static function createImageFileProvider() {
         return new CManager_FileProvider_ImageFileProvider();
+    }
+
+    public function googleFonts() {
+        if ($this->googleFonts == null) {
+            $this->googleFonts = new CManager_GoogleFonts(
+                CStorage::instance()->disk(CF::config('assets.google_fonts.disk')),
+                CF::config('assets.google_fonts.path'),
+                CF::config('assets.google_fonts.inline'),
+                CF::config('assets.google_fonts.fallback'),
+                CF::config('assets.google_fonts.user_agent'),
+                CF::config('assets.google_fonts.fonts'),
+                CF::config('assets.google_fonts.preload', false)
+            );
+        }
+
+        return $this->googleFonts;
+    }
+
+    public static function registerBlade() {
+        CView::blade()->directive('googlefonts', function ($expression) {
+            return "<?php echo c::manager()->googleFonts()->load($expression)->toHtml(); ?>";
+        });
     }
 }

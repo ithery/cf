@@ -1,5 +1,4 @@
 <?php
-use CModel_Console_PropertiesHelper as Helper;
 
 class CConsole_Command_Asset_AssetInstallCommand extends CConsole_Command_AppCommand {
     /**

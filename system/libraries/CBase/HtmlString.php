@@ -1,11 +1,8 @@
 <?php
 
-defined('SYSPATH') or die('No direct access allowed.');
+use Illuminate\Contracts\Support\Htmlable;
 
-/**
- * @author Hery Kurniawan <hery@itton.co.id>
- */
-class CBase_HtmlString implements CInterface_Htmlable {
+class CBase_HtmlString implements Htmlable {
     /**
      * The HTML string.
      *
