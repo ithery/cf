@@ -31,4 +31,14 @@ return [
         'label' => c::__('CF 1.6'),
         'uri' => 'docs/change/1-6',
     ],
+    [
+        'name' => 'change.1-7',
+        'label' => c::__('CF 1.7'),
+        'uri' => 'docs/change/1-7',
+    ],
+    [
+        'name' => 'change.1-8',
+        'label' => c::__('CF 1.8'),
+        'uri' => 'docs/change/1-8',
+    ],
 ];
