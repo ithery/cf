@@ -8,8 +8,8 @@ class CResources_Downloader_DefaultDownloader implements CResources_DownloaderIn
     public function getTempFile($url) {
         $context = stream_context_create([
             'ssl' => [
-                'verify_peer' => CF::config('resource.media_downloader_ssl'), ,
-                'verify_peer_name' => CF::config('resource.media_downloader_ssl'),
+                'verify_peer' => CF::config('resource.resource_downloader_ssl'),
+                'verify_peer_name' => CF::config('resource.resource_downloader_ssl'),
             ],
             'http' => [
                 'header' => 'User-Agent: CF ResourceLibrary',

@@ -143,7 +143,9 @@ return [
      * This is particularly useful when the url of the image is behind a firewall and
      * need to add additional flags, possibly using curl.
      */
-    'media_downloader' => CResources_Downloader_DefaultDownloader::class,
+    'resource_downloader' => CResources_Downloader_DefaultDownloader::class,
+    'resource_downloader_ssl' => c::env('RESOURCE_DOWNLOADER_SSL', false),
+
     /*
      * When converting Resource instances to response the resource library will add
      * a `loading` attribute to the `img` tag. Here you can set the default
