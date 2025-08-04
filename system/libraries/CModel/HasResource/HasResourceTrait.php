@@ -116,11 +116,11 @@ trait CModel_HasResource_HasResourceTrait {
         $args = func_get_args();
         $url = carr::get($args, 0);
         $allowedMimeTypes = array_slice($args, 2);
-        if (!$stream = @fopen($url, 'r')) {
-            throw CResources_Exception_FileCannotBeAdded_UnreachableUrl::create($url);
-        }
-        $temporaryFile = tempnam(sys_get_temp_dir(), 'resource-library');
-        file_put_contents($temporaryFile, $stream);
+        $downloader = CF::config('resource.resource_downloader', CResources_Downloader_DefaultDownloader::class);
+        $downloader = new $downloader();
+        /** @var CResources_Downloader_DefaultDownloader $downloader */
+        $temporaryFile = $downloader->getTempFile($url);
+
         $this->guardAgainstInvalidMimeType($temporaryFile, $allowedMimeTypes);
         $filename = carr::get($args, 1);
 
