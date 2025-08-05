@@ -15,7 +15,6 @@ application/*
 !config/client_modules.php
 
 #ignore data domain or org
-/data
 /data/*
 !/data/.gitkeep
 #ignore
