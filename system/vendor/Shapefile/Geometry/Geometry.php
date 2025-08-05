@@ -197,7 +197,7 @@ abstract class Geometry {
     public function setCustomBoundingBox($bounding_box) {
         $bounding_box = array_intersect_key($bounding_box, array_flip(['xmin', 'xmax', 'ymin', 'ymax', 'zmin', 'zmax', 'mmin', 'mmax']));
         if (
-                $this->isEmpty()
+            $this->isEmpty()
             || !isset($bounding_box['xmin'], $bounding_box['xmax'], $bounding_box['ymin'], $bounding_box['ymax'])
             || (($this->isZ() && !isset($bounding_box['zmin'], $bounding_box['zmax'])) || (!$this->isZ() && (isset($bounding_box['zmin']) || isset($bounding_box['zmax']))))
             || (($this->isM() && !isset($bounding_box['mmin'], $bounding_box['mmax'])) || (!$this->isM() && (isset($bounding_box['mmin']) || isset($bounding_box['mmax']))))
@@ -517,19 +517,20 @@ abstract class Geometry {
     }
 
     protected function stripNonNumericValues(array $array) {
-        if(count($array) === 0) {
+        if (count($array) === 0) {
             return $array;
         }
         if (is_array($array[0])) {
-            return array_map(function($value) {
+            return array_map(function ($value) {
                 return $this->stripNonNumericValues($value);
             }, $array);
         } else {
-            return array_map(function($value) {
+            return array_map(function ($value) {
                 return is_numeric($value) && is_finite(floatval($value)) ? $value : 0;
             }, $array);
         }
     }
+
     /**
      * Builds valid GeoJSON starting from raw coordinates.
      *
@@ -544,7 +545,6 @@ abstract class Geometry {
         // Type
         $ret['type'] = $this->getGeoJSONBasetype() . ($this->isM() ? 'M' : '');
         // Bounding box
-        global $aabbcc;
 
         if ($flag_bbox) {
             $ret['bbox'] = [];
@@ -567,7 +567,6 @@ abstract class Geometry {
             }
 
             $ret['bbox'] = $this->stripNonNumericValues($ret['bbox']);
-
         }
 
         // Coordinates
@@ -581,6 +580,7 @@ abstract class Geometry {
                 'properties' => $this->data,
             ];
         }
+
         return json_encode($ret);
     }
 
