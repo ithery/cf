@@ -29,27 +29,27 @@ const buildConfigFromModifiers = (
 
     const has = (key) => modifiers.includes(key);
 
-    if (has('multiple')) config.multiple = true;
-    if (has('tags')) config.tags = true;
-    if (has('allow-clear') || has('allowClear')) config.allowClear = true;
+    if (has('multiple')) {config.multiple = true;}
+    if (has('tags')) {config.tags = true;}
+    if (has('allow-clear') || has('allowClear')) {config.allowClear = true;}
 
     const placeholder = getValue('placeholder');
-    if (placeholder !== undefined) config.placeholder = placeholder;
+    if (placeholder !== undefined) {config.placeholder = placeholder;}
 
     const language = getValue('language');
-    if (language !== undefined) config.language = language;
+    if (language !== undefined) {config.language = language;}
 
     const perPage = getValue('per-page');
-    if (perPage !== undefined) config.perPage = parseInt(perPage);
+    if (perPage !== undefined) {config.perPage = parseInt(perPage);}
 
     const delay = getValue('delay');
-    if (delay !== undefined) config.delay = parseInt(delay);
+    if (delay !== undefined) {config.delay = parseInt(delay);}
 
     const formatResult = getValue('format-result');
-    if (formatResult !== undefined) config.formatResult = formatResult;
+    if (formatResult !== undefined) {config.formatResult = formatResult;}
 
     const formatSelection = getValue('format-selection');
-    if (formatSelection !== undefined) config.formatSelection = formatSelection;
+    if (formatSelection !== undefined) {config.formatSelection = formatSelection;}
 
     return config;
 };
@@ -57,7 +57,7 @@ const buildSelect2Options = (selectData) => {
     let options = {};
     options.width = '100%';
     options.language = selectData.language;
-    options.allowClear = selectData.allowClear ? 'true' : 'false';
+    options.allowClear = selectData.allowClear ? true : false;
     options.placeholder = selectData.placeholder;
     options.multiple = selectData.multiple;
     let ajaxOptions = {};
@@ -76,9 +76,9 @@ const buildSelect2Options = (selectData) => {
         return result;
     };
     ajaxOptions.processResults = (data, params) => {
-        addToCache(data.data);;
+        addToCache(data.data);
         params.page = params.page || 1;
-        var more = params.page * selectData.perPage < data.total;
+        let more = params.page * selectData.perPage < data.total;
         return {
             results: data.data,
             pagination: {
@@ -115,9 +115,8 @@ const buildSelect2Options = (selectData) => {
         if (item.cappFormatResult) {
             if (item.cappFormatResultIsHtml) {
                 return $('<div>' + item.cappFormatResult + '</div>');
-            } else {
-                return item.cappFormatResult;
             }
+            return item.cappFormatResult;
         }
 
         return $('<div>' + selectData.formatResult + '</div>');
@@ -152,9 +151,8 @@ const buildSelect2Options = (selectData) => {
         if (item.cappFormatSelection) {
             if (item.cappFormatSelectionIsHtml) {
                 return $('<div>' + item.cappFormatSelection + '</div>');
-            } else {
-                return item.cappFormatSelection;
             }
+            return item.cappFormatSelection;
         }
         if (item.id === '' && item.text) {
             return item.text;
@@ -180,7 +178,6 @@ const buildSelect2Options = (selectData) => {
     };
     return options;
 };
-
 
 
 const valueChangeCallback = (el) => {
@@ -219,7 +216,7 @@ const createOption = (item, selectData) => {
             '</option>'
     );
     return optionEl;
-}
+};
 const jsonpRequest = (url, data) => {
     return new Promise((resolve, reject) => {
         $.ajax({
@@ -234,10 +231,10 @@ const jsonpRequest = (url, data) => {
 };
 const loadSelectedOption = async (value, el, selectData) => {
     // console.log('loadSelectedOption', value, el, selectData);
-    if (!value || (Array.isArray(value) && value.length === 0)) return;
+    if (!value || (Array.isArray(value) && value.length === 0)) {return;}
     const values = Array.isArray(value) ? value : [value];
     const url = selectData.ajaxUrl;
-    if (!url) return;
+    if (!url) {return;}
     const missingIds = values.filter(v => !(String(v) in selectDataCache));
     const renderOptions = (items) => {
         $(el).find('option').remove();
@@ -261,7 +258,7 @@ const loadSelectedOption = async (value, el, selectData) => {
                 selectDataCache[idStr] = item;
             }
         } catch (err) {
-            console.error("Failed to load via JSONP:", err);
+            console.error('Failed to load via JSONP:', err);
         }
     }
     const matchedItems = values
@@ -287,7 +284,7 @@ export default function (Alpine) {
             } else {
                 el.removeAttribute('multiple');
             }
-             // Setup Select2
+            // Setup Select2
             const instance = $(el).select2(select2Config);
             if (el._x_model) {
                 const value = el._x_model?.get?.();
@@ -314,7 +311,7 @@ export default function (Alpine) {
             if (el._x_model) {
                 let modelLoaded = false;
                 effect(() => {
-                    if (modelLoaded) return;
+                    if (modelLoaded) {return;}
                     Alpine.mutateDom(() => {
                         const value = el._x_model?.get?.() ?? (el.multiple ? [] : '');
                         loadSelectedOption(value, el, selectData);
@@ -326,7 +323,7 @@ export default function (Alpine) {
                 let bindingLoaded = false;
 
                 effect(() => {
-                    if (bindingLoaded) return;
+                    if (bindingLoaded) {return;}
                     Alpine.mutateDom(() => {
                         const value = el._x_bindings.value ?? (el.multiple ? [] : '');
                         loadSelectedOption(value, el, selectData);
