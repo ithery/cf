@@ -3,6 +3,9 @@
 use Illuminate\Contracts\Support\Arrayable;
 
 class CElement_FormInput_QueryBuilder extends CElement_FormInput {
+    /**
+     * @var CElement_FormInput_QueryBuilder_FilterBuilder
+     */
     protected $filters;
 
     protected $inputId;
@@ -13,8 +16,10 @@ class CElement_FormInput_QueryBuilder extends CElement_FormInput {
 
     protected $containerId;
 
-    public function __construct($id) {
-        if ($id == '') {
+    protected $isApplySelect2;
+
+    public function __construct($id = null) {
+        if ($id == null) {
             $id = spl_object_hash($this);
         }
         $this->id = $id;
@@ -69,6 +74,12 @@ class CElement_FormInput_QueryBuilder extends CElement_FormInput {
         return $this;
     }
 
+    public function setApplySelect2($bool = true) {
+        $this->isApplySelect2 = $bool;
+
+        return $this;
+    }
+
     public function build() {
         parent::build();
         if ($this->readonly) {
@@ -85,23 +96,22 @@ class CElement_FormInput_QueryBuilder extends CElement_FormInput {
             $filters = $filters->toArray();
         }
 
-        return "
-        $('#" . $this->containerId . "').queryBuilder({
+        $js = parent::js($indent);
+        $js .= '
+        let qb_' . $this->inputId . " = $('#" . $this->containerId . "').queryBuilder({
 
             filters: " . c::json($filters) . ',
 
             rules: ' . c::json($this->value) . ',
         });
-        let error_' . $this->inputId . "= null;
+        let error_' . $this->inputId . " = null;
         $('#" . $this->containerId . "').on('validationError.queryBuilder', function(e, rule, error, value) {
-            error_" . $this->inputId . "= error;
+            error_" . $this->inputId . " = error;
 
         });
         let form = $('#" . $this->inputId . "').closest('form');
         if(form.length>0) {
             form.on('submit',()=>{
-
-
                 const result = $('#" . $this->containerId . "').queryBuilder('getRules');
                 console.log('form submit', error_" . $this->inputId . ');
                 if(error_' . $this->inputId . ") {
@@ -112,9 +122,28 @@ class CElement_FormInput_QueryBuilder extends CElement_FormInput {
                 $('#" . $this->inputId . "').val(JSON.stringify(result, null, 2));
                 return true;
             });
+        }";
+
+        if ($this->isApplySelect2) {
+            $js .= '
+
+        if ($.fn.select2) {
+            qb_' . $this->inputId . ".on('afterCreateRuleInput.queryBuilder', function(e, rule) {
+                if(rule.__ && rule.\$el) {
+                    if(rule.__.filter) {
+                        if(rule.__.filter.input && rule.__.filter.input=='select') {
+                            $(rule.\$el).find('.rule-value-container select').css('min-width','200px');
+                            $(rule.\$el).find('.rule-value-container select').select2();
+                        }
+                    }
+                }
+
+            });
         }
 
-
         ";
+        }
+
+        return $js;
     }
 }

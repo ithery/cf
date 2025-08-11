@@ -28,12 +28,13 @@ class CElement_FormInput_QueryBuilder_FilterBuilder implements Arrayable {
     /**
      * Add a filter to the builder and register a callback to manipulate it.
      *
-     * @param callable $callback
+     * @param callable    $callback
+     * @param null|string $id
      *
      * @return $this
      */
-    public function withFilter($callback) {
-        c::tap($this->addFilter(), $callback);
+    public function withFilter($callback, $id = null) {
+        c::tap($this->addFilter($id), $callback);
 
         return $this;
     }
