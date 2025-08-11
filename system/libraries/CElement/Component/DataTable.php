@@ -76,7 +76,7 @@ class CElement_Component_DataTable extends CElement_Component {
 
     public $filterActionCallbackFunc;
 
-    public $display_length;
+    public $displayLength;
 
     public $paging_list;
 
@@ -149,6 +149,9 @@ class CElement_Component_DataTable extends CElement_Component {
 
     protected $scrollY;
 
+    /**
+     * @var CDatabase_Contract_ConnectionResolverInterface
+     */
     protected $dbResolver;
 
     /**
@@ -183,7 +186,7 @@ class CElement_Component_DataTable extends CElement_Component {
 
         $this->dbName = $db->getName();
         $this->dbConfig = strlen($db->getName()) == 0 ? $db->getConfig() : [];
-        $this->display_length = '10';
+        $this->displayLength = '10';
         $this->paging_list = $this->defaultPagingList;
         $this->options = new CElement_Component_DataTable_Options();
         $this->data = [];
@@ -202,7 +205,7 @@ class CElement_Component_DataTable extends CElement_Component {
         $this->footerFields = [];
         $this->cellCallbackFunc = '';
         $this->filterActionCallbackFunc = '';
-        $this->display_length = '10';
+        $this->displayLength = '10';
         $this->ajax = false;
         $this->ajax_method = 'get';
         $this->title = '';
@@ -563,7 +566,7 @@ class CElement_Component_DataTable extends CElement_Component {
     }
 
     public function setDisplayLength($length) {
-        $this->display_length = $length;
+        $this->displayLength = $length;
 
         return $this;
     }
@@ -772,6 +775,8 @@ class CElement_Component_DataTable extends CElement_Component {
      * @param string          $require
      *
      * @return $this
+     *
+     * @deprecated version 1.8
      */
     public function setDataFromElastic($el, $require = null) {
         $this->query = $el;

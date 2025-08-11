@@ -2,14 +2,6 @@
 
 use Illuminate\Contracts\Support\Arrayable;
 
-/**
- * Description of Textarea.
- *
- * @author Hery Kurniawan
- * @license Ittron Global Teknologi <ittron.co.id>
- *
- * @since Jan 28, 2018, 9:50:24 PM
- */
 class CElement_FormInput_QueryBuilder extends CElement_FormInput {
     protected $filters;
 

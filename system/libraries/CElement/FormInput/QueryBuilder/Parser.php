@@ -1,5 +1,7 @@
 <?php
-
+/**
+ * @see https://github.com/timgws/QueryBuilderParser
+ */
 class CElement_FormInput_QueryBuilder_Parser {
     use CElement_FormInput_QueryBuilder_Parser_FunctionTrait;
 

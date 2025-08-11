@@ -278,7 +278,7 @@ trait CElement_Component_DataTable_Trait_JavascriptTrait {
              *
              */
             $js->appendln($jqueryui)->br()
-                ->appendln('iDisplayLength: ' . $this->display_length . ',')->br()
+                ->appendln('iDisplayLength: ' . $this->displayLength . ',')->br()
                 ->appendln('bSortCellsTop: ' . $hs_val . ',')->br()
                 ->appendln('aaSorting: [],')->br()
 
