@@ -6,7 +6,7 @@ trait CElement_Component_DataTable_Trait_JavascriptTrait {
 
         /** @var CElement_Component_DataTable $this */
         $this->buildOnce();
-        $ajax_url = '';
+        $ajaxUrl = '';
         $varNameOTable = null;
         if ($this->ajax) {
             $columns = [];
@@ -41,7 +41,7 @@ trait CElement_Component_DataTable_Trait_JavascriptTrait {
             if (c::app()->isAuthEnabled()) {
                 $ajaxMethod->enableAuth();
             }
-            $ajax_url = $ajaxMethod->makeUrl();
+            $ajaxUrl = $ajaxMethod->makeUrl();
         }
 
         $js = new CStringBuilder();
@@ -72,11 +72,11 @@ trait CElement_Component_DataTable_Trait_JavascriptTrait {
                 $km .= $k;
                 $vm .= "'" . $v . "'";
             }
-            $hs_val = $this->headerSortable ? 'true' : 'false';
+            $hsVal = $this->headerSortable ? 'true' : 'false';
             $varName = 'table_' . cstr::slug($this->id(), '_');
             $varNameOTable = 'otable_' . cstr::slug($this->id(), '_');
             $js->appendln('var ' . $varName . " = jQuery('#" . $this->id . "');")->br();
-            $js->appendln('var header_sortable = ' . $hs_val . ';')->br();
+            $js->appendln('var header_sortable = ' . $hsVal . ';')->br();
             $js->appendln('var vaoColumns = [];')->br();
             if ($this->numbering) {
                 $aojson = [];
@@ -179,7 +179,7 @@ trait CElement_Component_DataTable_Trait_JavascriptTrait {
                     ->appendln('bRetrieve: true,')->br()
                     ->appendln($this->options->toJsonRow('processing'))->br()
                     ->appendln($this->options->toJsonRow('serverSide'))->br()
-                    ->appendln("sAjaxSource: '" . $ajax_url . "',")->br()
+                    ->appendln("sAjaxSource: '" . $ajaxUrl . "',")->br()
                     ->appendln("sServerMethod: '" . strtoupper($this->ajax_method) . "',")->br()
                     ->appendln("fnServerData: function ( sSource, aoData, fnCallback, oSettings ) {
         var data_quick_search = [];
@@ -279,7 +279,7 @@ trait CElement_Component_DataTable_Trait_JavascriptTrait {
              */
             $js->appendln($jqueryui)->br()
                 ->appendln('iDisplayLength: ' . $this->displayLength . ',')->br()
-                ->appendln('bSortCellsTop: ' . $hs_val . ',')->br()
+                ->appendln('bSortCellsTop: ' . $hsVal . ',')->br()
                 ->appendln('aaSorting: [],')->br()
 
                 ->appendln('oLanguage: ' . json_encode($this->getLegacyLabels()) . ',')->br()
