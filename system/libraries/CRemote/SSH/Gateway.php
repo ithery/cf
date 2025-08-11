@@ -43,7 +43,7 @@ class CRemote_SSH_Gateway implements CRemote_SSH_GatewayInterface {
     /**
      * The SecLib connection instance.
      *
-     * @var \phpseclib\Net\SFTP
+     * @var \phpseclib3\Net\SFTP
      */
     protected $connection;
 
