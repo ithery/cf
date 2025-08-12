@@ -5,13 +5,25 @@
 class CElement_FormInput_QueryBuilder_Parser {
     use CElement_FormInput_QueryBuilder_Parser_FunctionTrait;
 
-    protected $modelClass;
+    protected $modelQuery;
 
     protected $fields;
 
-    public function __construct($modelClass, $fields = []) {
-        $this->modelClass = $modelClass;
+    protected $ruleCallbacks;
+
+    public function __construct($modelQuery, $fields = []) {
+        if (is_string($modelQuery) && class_exists($modelQuery)) {
+            $modelQuery = $modelQuery::query();
+        }
+        $this->modelQuery = $modelQuery;
         $this->fields = $fields;
+        $this->ruleCallbacks = [];
+    }
+
+    public function addRuleCallback($field, $callback) {
+        $this->ruleCallbacks[$field] = $callback;
+
+        return $this;
     }
 
     /**
@@ -22,10 +34,10 @@ class CElement_FormInput_QueryBuilder_Parser {
      * @return CModel_Query|CDatabase_Query_Builder
      */
     public function parse($rules) {
-        $modelClass = $this->modelClass;
+
         // do a JSON decode (throws exceptions if there is a JSON error...)
         $query = $this->decodeJSON($rules);
-        $modelQuery = $modelClass::query();
+        $modelQuery = $this->modelQuery;
         // This can happen if the querybuilder had no rules...
         if (!isset($query->rules) || !is_array($query->rules)) {
             return $modelQuery;
@@ -226,7 +238,12 @@ class CElement_FormInput_QueryBuilder_Parser {
         $sqlOperator = $this->operator_sql[$rule->operator];
         $operator = $sqlOperator['operator'];
         $condition = strtolower($queryCondition);
+        if (isset($this->ruleCallbacks[$rule->field])) {
+            $callback = $this->ruleCallbacks[$rule->field];
+            $query = $callback($query, $rule, $sqlOperator, $value, $condition);
 
+            return $query;
+        }
         if ($this->operatorRequiresArray($operator)) {
             return $this->makeQueryWhenArray($query, $rule, $sqlOperator, $value, $condition);
         } elseif ($this->operatorIsNull($operator)) {
