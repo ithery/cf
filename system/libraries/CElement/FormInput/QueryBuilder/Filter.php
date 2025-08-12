@@ -22,6 +22,8 @@ class CElement_FormInput_QueryBuilder_Filter implements Arrayable {
 
     protected $placeholder;
 
+    protected $multiple;
+
     public function __construct($id = null) {
         $this->id = $id;
         $this->label = 'Name';
@@ -31,6 +33,7 @@ class CElement_FormInput_QueryBuilder_Filter implements Arrayable {
         $this->input = null;
         $this->validation = null;
         $this->placeholder = null;
+        $this->multiple = null;
     }
 
     public function setId($id) {
@@ -98,6 +101,12 @@ class CElement_FormInput_QueryBuilder_Filter implements Arrayable {
         return $this;
     }
 
+    public function setMultiple($bool = true) {
+        $this->multiple = $bool;
+
+        return $this;
+    }
+
     /**
      * @param array $validation
      *
@@ -127,6 +136,10 @@ class CElement_FormInput_QueryBuilder_Filter implements Arrayable {
         $result['type'] = $this->type;
         if ($this->input) {
             $result['input'] = $this->input;
+        }
+
+        if ($this->multiple) {
+            $result['multiple'] = $this->multiple;
         }
 
         if ($this->values) {

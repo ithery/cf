@@ -61,9 +61,45 @@ final class CElement_FormInput_QueryBuilder_Constant {
 
     const FILTER_OPERATOR_IS_EMPTY = 'is_empty';
 
-    const FILTER_OPERATOR_NOT_IS_EMPTY = 'is_not_empty';
+    const FILTER_OPERATOR_IS_NOT_EMPTY = 'is_not_empty';
 
     const FILTER_OPERATOR_IS_NULL = 'is_null';
 
     const FILTER_OPERATOR_IS_NOT_NULL = 'is_not_null';
+
+    public static function getOperatorData() {
+        return [
+            self::FILTER_OPERATOR_EQUAL => [
+                'accept_values' => true,
+                'apply_to' => ['string', 'number', 'datetime']
+            ],
+            'not_equal' => ['accept_values' => true,  'apply_to' => ['string', 'number', 'datetime']],
+            'in' => [
+                'accept_values' => true,
+                'apply_to' => ['string', 'number', 'datetime'],
+                'multiple' => true,
+            ],
+            'not_in' => [
+                'accept_values' => true,
+                'apply_to' => ['string', 'number', 'datetime'],
+                'multiple' => true,
+            ],
+            'less' => ['accept_values' => true,  'apply_to' => ['number', 'datetime']],
+            'less_or_equal' => ['accept_values' => true,  'apply_to' => ['number', 'datetime']],
+            'greater' => ['accept_values' => true,  'apply_to' => ['number', 'datetime']],
+            'greater_or_equal' => ['accept_values' => true,  'apply_to' => ['number', 'datetime']],
+            'between' => ['accept_values' => true,  'apply_to' => ['number', 'datetime']],
+            'not_between' => ['accept_values' => true,  'apply_to' => ['number', 'datetime']],
+            'begins_with' => ['accept_values' => true,  'apply_to' => ['string']],
+            'not_begins_with' => ['accept_values' => true,  'apply_to' => ['string']],
+            'contains' => ['accept_values' => true,  'apply_to' => ['string']],
+            'not_contains' => ['accept_values' => true,  'apply_to' => ['string']],
+            'ends_with' => ['accept_values' => true,  'apply_to' => ['string']],
+            'not_ends_with' => ['accept_values' => true,  'apply_to' => ['string']],
+            'is_empty' => ['accept_values' => false, 'apply_to' => ['string']],
+            'is_not_empty' => ['accept_values' => false, 'apply_to' => ['string']],
+            'is_null' => ['accept_values' => false, 'apply_to' => ['string', 'number', 'datetime']],
+            'is_not_null' => ['accept_values' => false, 'apply_to' => ['string', 'number', 'datetime']]
+        ];
+    }
 }

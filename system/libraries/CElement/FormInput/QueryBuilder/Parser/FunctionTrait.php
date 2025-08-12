@@ -3,31 +3,8 @@
 use CElement_FormInput_QueryBuilder_Constant as Constant;
 
 trait CElement_FormInput_QueryBuilder_Parser_FunctionTrait {
-    protected $operators = [
-        'equal' => ['accept_values' => true,  'apply_to' => ['string', 'number', 'datetime']],
-        'not_equal' => ['accept_values' => true,  'apply_to' => ['string', 'number', 'datetime']],
-        'in' => ['accept_values' => true,  'apply_to' => ['string', 'number', 'datetime']],
-        'not_in' => ['accept_values' => true,  'apply_to' => ['string', 'number', 'datetime']],
-        'less' => ['accept_values' => true,  'apply_to' => ['number', 'datetime']],
-        'less_or_equal' => ['accept_values' => true,  'apply_to' => ['number', 'datetime']],
-        'greater' => ['accept_values' => true,  'apply_to' => ['number', 'datetime']],
-        'greater_or_equal' => ['accept_values' => true,  'apply_to' => ['number', 'datetime']],
-        'between' => ['accept_values' => true,  'apply_to' => ['number', 'datetime']],
-        'not_between' => ['accept_values' => true,  'apply_to' => ['number', 'datetime']],
-        'begins_with' => ['accept_values' => true,  'apply_to' => ['string']],
-        'not_begins_with' => ['accept_values' => true,  'apply_to' => ['string']],
-        'contains' => ['accept_values' => true,  'apply_to' => ['string']],
-        'not_contains' => ['accept_values' => true,  'apply_to' => ['string']],
-        'ends_with' => ['accept_values' => true,  'apply_to' => ['string']],
-        'not_ends_with' => ['accept_values' => true,  'apply_to' => ['string']],
-        'is_empty' => ['accept_values' => false, 'apply_to' => ['string']],
-        'is_not_empty' => ['accept_values' => false, 'apply_to' => ['string']],
-        'is_null' => ['accept_values' => false, 'apply_to' => ['string', 'number', 'datetime']],
-        'is_not_null' => ['accept_values' => false, 'apply_to' => ['string', 'number', 'datetime']]
-    ];
-
     protected $operator_sql = [
-        'equal' => ['operator' => '='],
+        Constant::FILTER_OPERATOR_EQUAL => ['operator' => '='],
         'not_equal' => ['operator' => '!='],
         'in' => ['operator' => 'IN'],
         'not_in' => ['operator' => 'NOT IN'],

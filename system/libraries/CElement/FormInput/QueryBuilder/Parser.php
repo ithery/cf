@@ -1,7 +1,7 @@
 <?php
-/**
- * @see https://github.com/timgws/QueryBuilderParser
- */
+
+ use CElement_FormInput_QueryBuilder_Constant as Constant;
+
 class CElement_FormInput_QueryBuilder_Parser {
     use CElement_FormInput_QueryBuilder_Parser_FunctionTrait;
 
@@ -137,7 +137,7 @@ class CElement_FormInput_QueryBuilder_Parser {
             return false;
         }
 
-        if (!isset($this->operators[$rule->operator])) {
+        if (!isset(Constant::getOperatorData()[$rule->operator])) {
             return false;
         }
 
@@ -240,7 +240,7 @@ class CElement_FormInput_QueryBuilder_Parser {
         $condition = strtolower($queryCondition);
         if (isset($this->ruleCallbacks[$rule->field])) {
             $callback = $this->ruleCallbacks[$rule->field];
-            $query = $callback($query, $rule, $sqlOperator, $value, $condition);
+            $query = $callback($query, $rule, $value, $condition);
 
             return $query;
         }
@@ -277,7 +277,8 @@ class CElement_FormInput_QueryBuilder_Parser {
         /*
          * If the SQL Operator is set not to have a value, make sure that we set the value to null.
          */
-        if ($this->operators[$rule->operator]['accept_values'] === false) {
+        $operatorData = Constant::getOperatorData();
+        if ($operatorData[$rule->operator]['accept_values'] === false) {
             return $this->operatorValueWhenNotAcceptingOne($rule);
         }
 
