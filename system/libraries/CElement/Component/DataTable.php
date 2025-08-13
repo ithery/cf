@@ -865,6 +865,17 @@ class CElement_Component_DataTable extends CElement_Component {
     }
 
     /**
+     * Get columns that are visible.
+     *
+     * @return CElement_Component_DataTable_Column[]
+     */
+    public function getVisibleColumns() {
+        return c::collect($this->columns)->filter(function (CElement_Component_DataTable_Column $column) {
+            return $column->isVisible();
+        })->toArray();
+    }
+
+    /**
      * @param mixed $index
      *
      * @return CElement_Component_DataTable_Column
