@@ -53,7 +53,7 @@ final class CVendor_Qontak_MessageUtil {
         $buttons = [];
 
         foreach ($this->message->getButtons() as $key => $button) {
-            $buttons[] = [
+            $buttons = [
                 'index' => (string) $key,
             ] + $button->toArray();
         }
