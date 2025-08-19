@@ -240,7 +240,7 @@ trait CElement_FormInput_QueryBuilder_Parser_FunctionTrait {
      * This function enforces those requirements.
      * makeQuery, for arrays.
      *
-     * @param CModel_Query $query
+     * @param CModel_Query|CDatabase_Query_Builder $query
      * @param stdClass     $rule
      * @param array        $sqlOperator
      * @param array        $value
@@ -248,9 +248,9 @@ trait CElement_FormInput_QueryBuilder_Parser_FunctionTrait {
      *
      * @throws CElement_FormInput_QueryBuilder_Exception_ParseException
      *
-     * @return CModel_Query
+     * @return CModel_Query|CDatabase_Query_Builder
      */
-    protected function makeQueryWhenArray(CModel_Query $query, stdClass $rule, array $sqlOperator, array $value, $condition) {
+    protected function makeQueryWhenArray($query, stdClass $rule, array $sqlOperator, array $value, $condition) {
         if ($sqlOperator['operator'] == 'IN' || $sqlOperator['operator'] == 'NOT IN') {
             return $this->makeArrayQueryIn($query, $rule, $sqlOperator['operator'], $value, $condition);
         } elseif ($sqlOperator['operator'] == 'BETWEEN' || $sqlOperator['operator'] == 'NOT BETWEEN') {
@@ -263,7 +263,7 @@ trait CElement_FormInput_QueryBuilder_Parser_FunctionTrait {
     /**
      * Create a 'null' query when required.
      *
-     * @param CModel_Query $query
+     * @param CModel_Query|CDatabase_Query_Builder $query
      * @param stdClass     $rule
      * @param array        $sqlOperator
      * @param string       $condition
@@ -272,7 +272,7 @@ trait CElement_FormInput_QueryBuilder_Parser_FunctionTrait {
      *
      * @return CModel_Query|CDatabase_Query_Builder
      */
-    protected function makeQueryWhenNull(CModel_Query $query, stdClass $rule, array $sqlOperator, $condition) {
+    protected function makeQueryWhenNull($query, stdClass $rule, array $sqlOperator, $condition) {
         if ($sqlOperator['operator'] == 'NULL') {
             return $query->whereNull($rule->field, $condition);
         } elseif ($sqlOperator['operator'] == 'NOT NULL') {
@@ -285,7 +285,7 @@ trait CElement_FormInput_QueryBuilder_Parser_FunctionTrait {
     /**
      * MakeArrayQueryIn, when the query is an IN or NOT IN...
      *
-     * @param CModel_Query $query
+     * @param CModel_Query|CDatabase_Query_Builder $query
      * @param stdClass     $rule
      * @param string       $operator
      * @param array        $value
@@ -293,10 +293,10 @@ trait CElement_FormInput_QueryBuilder_Parser_FunctionTrait {
      *
      * @see makeQueryWhenArray
      *
-     * @return CModel_Query
+     * @return CModel_Query|CDatabase_Query_Builder
      * @phpstan-ignore-next-line
      */
-    private function makeArrayQueryIn(CModel_Query $query, stdClass $rule, $operator, array $value, $condition) {
+    private function makeArrayQueryIn($query, stdClass $rule, $operator, array $value, $condition) {
         if ($operator == 'NOT IN') {
             /** @phpstan-ignore-next-line */
             return $query->whereNotIn($rule->field, $value, $condition);
@@ -309,7 +309,7 @@ trait CElement_FormInput_QueryBuilder_Parser_FunctionTrait {
     /**
      * MakeArrayQueryBetween, when the query is a BETWEEN or NOT BETWEEN...
      *
-     * @param CModel_Query $query
+     * @param CModel_Query|CDatabase_Query_Builder $query
      * @param stdClass     $rule
      * @param string       $operator  the SQL operator used. [BETWEEN|NOT BETWEEN]
      * @param array        $value
@@ -319,10 +319,10 @@ trait CElement_FormInput_QueryBuilder_Parser_FunctionTrait {
      *
      * @throws CElement_FormInput_QueryBuilder_Exception_ParseException when more then two items given for the between
      *
-     * @return CModel_Query
+     * @return CModel_Query|CDatabase_Query_Builder
      * @phpstan-ignore-next-line
      */
-    private function makeArrayQueryBetween(CModel_Query $query, stdClass $rule, $operator, array $value, $condition) {
+    private function makeArrayQueryBetween($query, stdClass $rule, $operator, array $value, $condition) {
         if (count($value) !== 2) {
             throw new CElement_FormInput_QueryBuilder_Exception_ParseException("{$rule->field} should be an array with only two items.");
         }
