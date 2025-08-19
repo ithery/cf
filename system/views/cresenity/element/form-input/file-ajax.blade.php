@@ -58,6 +58,7 @@ defined('SYSPATH') or die('No direct access allowed.');
                     });
                     var data = new FormData();
                     data.append('<?php echo $ajaxName; ?>[]', file);
+                    data.append('<?php echo $ajaxName; ?>_filename[]', file.name);
                     var xhr = new XMLHttpRequest();
                     xhr.onreadystatechange = function () {
                         if (this.readyState == 4 && this.status == 200) {
