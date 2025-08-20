@@ -89,6 +89,6 @@ abstract class CServer_System_OS implements CServer_System_OSInterface {
     }
 
     public function createCommand() {
-        return CServer::command($this->system->getSSHConfig());
+        return CServer::command($this->system->getSSH());
     }
 }

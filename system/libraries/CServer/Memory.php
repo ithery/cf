@@ -24,32 +24,34 @@ class CServer_Memory extends CServer_Base {
      */
     protected $info;
 
-    public function __construct(array $sshConfig = null) {
+    public function __construct(CRemote_SSH $ssh = null) {
         $os = CServer::getOS();
         $this->info = new CServer_Memory_Info();
         $osClass = 'CServer_Memory_OS_' . $os;
         $this->os = new $osClass($this, $this->info);
-        $this->sshConfig = $sshConfig;
-        $this->host = carr::get($sshConfig, 'host');
+        $this->ssh = $ssh;
+        $this->host = $ssh ? $ssh->getHost() : 'localhost';
     }
 
     /**
-     * @param array $sshConfig
+     * @param array|CRemote_SSH $sshConfig
      *
      * @return CServer_Memory
      */
-    public static function instance(array $sshConfig = null) {
+    public static function instance($sshConfig = null) {
         if (!is_array(self::$instance)) {
             self::$instance = [];
         }
         $host = 'localhost';
-
+        $ssh = null;
         if ($sshConfig != null) {
-            $host = carr::get($sshConfig, 'host');
+            $ssh = CServer_SSHRepository::instance()->getSSH($sshConfig);
+            $host = $ssh->getHost();
         }
         if (!isset(self::$instance[$host])) {
-            self::$instance[$host] = new CServer_Memory($sshConfig);
+            self::$instance[$host] = new CServer_Memory($ssh);
         }
+
         return self::$instance[$host];
     }
 
@@ -57,6 +59,7 @@ class CServer_Memory extends CServer_Base {
         if (!$this->info->getMemApplication()) {
             $this->os->buildMemory();
         }
+
         return $this->info->getMemApplication();
     }
 
@@ -64,6 +67,7 @@ class CServer_Memory extends CServer_Base {
         if (!$this->info->getMemFree()) {
             $this->os->buildMemory();
         }
+
         return $this->info->getMemFree();
     }
 
@@ -71,6 +75,7 @@ class CServer_Memory extends CServer_Base {
         if (!$this->info->getMemBuffer()) {
             $this->os->buildMemory();
         }
+
         return $this->info->getMemBuffer();
     }
 
@@ -78,6 +83,7 @@ class CServer_Memory extends CServer_Base {
         if (!$this->info->getMemTotal()) {
             $this->os->buildMemory();
         }
+
         return $this->info->getMemTotal();
     }
 
@@ -85,6 +91,7 @@ class CServer_Memory extends CServer_Base {
         if (!$this->info->getMemUsed()) {
             $this->os->buildMemory();
         }
+
         return $this->info->getMemUsed();
     }
 
@@ -92,6 +99,7 @@ class CServer_Memory extends CServer_Base {
         if (!$this->info->getMemCache()) {
             $this->os->buildMemory();
         }
+
         return $this->info->getMemCache();
     }
 
@@ -99,6 +107,7 @@ class CServer_Memory extends CServer_Base {
         if (!$this->info->getMemPercentUsed()) {
             $this->os->buildMemory();
         }
+
         return $this->info->getMemPercentUsed();
     }
 
@@ -106,6 +115,7 @@ class CServer_Memory extends CServer_Base {
         if (!$this->info->getMemPercentBuffer()) {
             $this->os->buildMemory();
         }
+
         return $this->info->getMemPercentBuffer();
     }
 
@@ -113,6 +123,7 @@ class CServer_Memory extends CServer_Base {
         if (!$this->info->getMemPercentApplication()) {
             $this->os->buildMemory();
         }
+
         return $this->info->getMemPercentApplication();
     }
 
@@ -120,6 +131,7 @@ class CServer_Memory extends CServer_Base {
         if (!$this->info->getMemPercentCache()) {
             $this->os->buildMemory();
         }
+
         return $this->info->getMemPercentCache();
     }
 
@@ -127,6 +139,7 @@ class CServer_Memory extends CServer_Base {
         if (!$this->info->getSwapDevices()) {
             $this->os->buildSwap();
         }
+
         return $this->info->getSwapDevices();
     }
 
@@ -134,6 +147,7 @@ class CServer_Memory extends CServer_Base {
         if (!$this->info->getSwapFree()) {
             $this->os->buildSwap();
         }
+
         return $this->info->getSwapFree();
     }
 
@@ -141,6 +155,7 @@ class CServer_Memory extends CServer_Base {
         if (!$this->info->getSwapPercentUsed()) {
             $this->os->buildSwap();
         }
+
         return $this->info->getSwapPercentUsed();
     }
 
@@ -148,6 +163,7 @@ class CServer_Memory extends CServer_Base {
         if (!$this->info->getSwapTotal()) {
             $this->os->buildSwap();
         }
+
         return $this->info->getSwapTotal();
     }
 
@@ -155,6 +171,7 @@ class CServer_Memory extends CServer_Base {
         if (!$this->info->getSwapUsed()) {
             $this->os->buildSwap();
         }
+
         return $this->info->getSwapUsed();
     }
 }

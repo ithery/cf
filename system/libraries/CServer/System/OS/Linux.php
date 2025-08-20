@@ -588,6 +588,8 @@ class CServer_System_OS_Linux extends CServer_System_OS {
                 $ip = gethostbyname($result);
                 if ($ip != $result) {
                     $this->info->setHostname(gethostbyaddr($ip));
+                } else {
+                    $this->info->setHostname($result);
                 }
             } elseif ($cmd->executeProgram('hostname', '', $ret)) {
                 $this->info->setHostname($ret);

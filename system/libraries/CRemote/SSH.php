@@ -52,7 +52,7 @@ class CRemote_SSH {
     protected function makeConnection($name, array $config) {
         $timeout = isset($config['timeout']) ? $config['timeout'] : 10;
         $host = carr::get($config, 'ip_address');
-        if (strlen($host) == 0) {
+        if ($host == null) {
             $host = carr::get($config, 'host');
         }
 
@@ -238,5 +238,13 @@ class CRemote_SSH {
      */
     public function getString($remote) {
         return $this->connection->getString($remote);
+    }
+
+    public function getConfig() {
+        return $this->config;
+    }
+
+    public function getHost() {
+        return carr::get($this->config, 'host', carr::get($this->config, 'ip_address'));
     }
 }

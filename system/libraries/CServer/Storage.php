@@ -33,31 +33,33 @@ class CServer_Storage extends CServer_Base {
 
     protected $totalSpace;
 
-    public function __construct($sshConfig = null) {
+    public function __construct(CRemote_SSH $ssh = null) {
         $os = CServer::getOS();
         $this->info = new CServer_Storage_Info();
         $osClass = 'CServer_Storage_OS_' . $os;
         $this->os = new $osClass($this, $this->info);
-        $this->sshConfig = $sshConfig;
-        $this->host = carr::get($sshConfig, 'host');
+        $this->ssh = $ssh;
+        $this->host = $ssh ? $ssh->getHost() : 'localhost';
     }
 
     /**
-     * @param array $sshConfig
+     * @param array|CRemote_SSH $sshConfig
      *
      * @return CServer_Storage
      */
-    public static function instance(array $sshConfig = null) {
+    public static function instance($sshConfig = null) {
         if (!is_array(self::$instance)) {
             self::$instance = [];
         }
         $host = 'localhost';
 
+        $ssh = null;
         if ($sshConfig != null) {
-            $host = carr::get($sshConfig, 'host');
+            $ssh = CServer_SSHRepository::instance()->getSSH($sshConfig);
+            $host = $ssh->getHost();
         }
         if (!isset(self::$instance[$host])) {
-            self::$instance[$host] = new CServer_Storage($sshConfig);
+            self::$instance[$host] = new CServer_Storage($ssh);
         }
 
         return self::$instance[$host];

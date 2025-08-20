@@ -12,21 +12,34 @@ class CServer_Command extends CServer_Base {
     protected static $instance = [];
 
     public function __construct($sshConfig = null) {
+        if ($sshConfig && $sshConfig instanceof CRemote_SSH) {
+            $this->ssh = $sshConfig;
+            $sshConfig = $sshConfig->getConfig();
+        }
         $this->sshConfig = $sshConfig;
         $this->host = carr::get($sshConfig, 'host');
     }
 
     public static function instance($sshConfig = null) {
+        $ssh = null;
+        if ($sshConfig && $sshConfig instanceof CRemote_SSH) {
+            $ssh = $sshConfig;
+            $sshConfig = $sshConfig->getConfig();
+        }
+
         if (!is_array(self::$instance)) {
             self::$instance = [];
         }
         $host = 'localhost';
 
         if ($sshConfig != null) {
-            $host = carr::get($sshConfig, 'host');
+            $host = carr::get($sshConfig, 'host', carr::get($sshConfig, 'ip_address'));
+            if ($ssh == null) {
+                $ssh = CRemote::ssh($sshConfig);
+            }
         }
         if (!isset(self::$instance[$host])) {
-            self::$instance[$host] = new CServer_Command($sshConfig);
+            self::$instance[$host] = new CServer_Command($ssh);
         }
 
         return self::$instance[$host];
@@ -254,14 +267,16 @@ class CServer_Command extends CServer_Base {
      */
     public function rfts($strFileName, &$strRet, $intLines = 0, $intBytes = 4096, $booErrorRep = true) {
         $log = CServer::config()->getLog();
-        if ($this->sshConfig != null) {
-            $ssh = CRemote::ssh($this->sshConfig);
+        if ($ssh = $this->getSSH()) {
             $output = '';
             $ssh->run('cat ' . $strFileName, function ($line) use (&$output) {
                 $output .= $line;
             });
 
             $strRet = $output;
+            if (cstr::contains($output, ['No such file or directory'])) {
+                return false;
+            }
 
             return true;
         }
@@ -329,6 +344,21 @@ class CServer_Command extends CServer_Base {
      * @return bool command successfull or not
      */
     public function executeProgram($strProgramname, $strArgs, &$strBuffer, $booErrorRep = true, $timeout = 30) {
+        if ($ssh = $this->getSSH()) {
+            $output = '';
+            $command = $strProgramname . ' ' . $strArgs;
+            $ssh->run($command, function ($line) use (&$output) {
+                $output .= $line;
+            });
+
+            $strBuffer = $output;
+            // if (cstr::contains($output, ['No such file or directory'])) {
+            //     return false;
+            // }
+
+            return true;
+        }
+
         if ((CServer::getOS() !== 'WINNT') && preg_match('/^([^=]+=[^ \t]+)[ \t]+(.*)$/', $strProgramname, $strmatch)) {
             $strSet = $strmatch[1] . ' ';
             $strProgramname = $strmatch[2];
@@ -637,8 +667,7 @@ class CServer_Command extends CServer_Base {
         $pipes = [];
         $process = null;
         $descriptorspec = [0 => ['pipe', 'r'], 1 => ['pipe', 'w'], 2 => ['pipe', 'w']];
-        if ($this->sshConfig != null) {
-            $ssh = CRemote::ssh($this->sshConfig);
+        if ($ssh = $this->getSSH()) {
             $output = '';
             $ssh->run($cmd, function ($line) use (&$strBuffer) {
                 $strBuffer .= $line;

@@ -2,12 +2,6 @@
 
 defined('SYSPATH') or die('No direct access allowed.');
 
-/**
- * @author Hery Kurniawan
- * @license Ittron Global Teknologi <ittron.co.id>
- *
- * @since Jun 15, 2018, 1:45:37 PM
- */
 class CServer_System extends CServer_Base {
     protected static $instance = [];
 
@@ -21,32 +15,34 @@ class CServer_System extends CServer_Base {
      */
     protected $info;
 
-    public function __construct($sshConfig = null) {
+    public function __construct(CRemote_SSH $ssh = null) {
         $os = CServer::getOS();
         $this->info = new CServer_System_Info();
         $osClass = 'CServer_System_OS_' . $os;
         $this->os = new $osClass($this, $this->info);
-        $this->sshConfig = $sshConfig;
-        $this->host = carr::get($sshConfig, 'host');
+        $this->ssh = $ssh;
+        $this->host = $ssh ? $ssh->getHost() : 'localhost';
     }
 
     /**
-     * @param array $sshConfig
+     * @param array|CRemote_SSH $sshConfig
      *
      * @return CServer_System
      */
-    public static function instance(array $sshConfig = null) {
+    public static function instance($sshConfig = null) {
         if (!is_array(self::$instance)) {
             self::$instance = [];
         }
         $host = 'localhost';
-
+        $ssh = null;
         if ($sshConfig != null) {
-            $host = carr::get($sshConfig, 'host');
+            $ssh = CServer_SSHRepository::instance()->getSSH($sshConfig);
+            $host = $ssh->getHost();
         }
         if (!isset(self::$instance[$host])) {
-            self::$instance[$host] = new CServer_System($sshConfig);
+            self::$instance[$host] = new CServer_System($ssh);
         }
+
         return self::$instance[$host];
     }
 
@@ -54,6 +50,7 @@ class CServer_System extends CServer_Base {
         if (!$this->info->getHostname()) {
             $this->os->buildHostname();
         }
+
         return $this->info->getHostname();
     }
 
@@ -61,6 +58,7 @@ class CServer_System extends CServer_Base {
         if (!$this->info->getIp()) {
             $this->os->buildIp();
         }
+
         return $this->info->getIp();
     }
 
@@ -68,6 +66,7 @@ class CServer_System extends CServer_Base {
         if (!$this->info->getUptime()) {
             $this->os->buildUptime();
         }
+
         return $this->info->getUptime();
     }
 
@@ -75,6 +74,7 @@ class CServer_System extends CServer_Base {
         if (!$this->info->getKernel()) {
             $this->os->buildKernel();
         }
+
         return $this->info->getKernel();
     }
 
@@ -82,6 +82,7 @@ class CServer_System extends CServer_Base {
         if (!$this->info->getDistribution()) {
             $this->os->buildDistro();
         }
+
         return $this->info->getDistribution();
     }
 
@@ -89,11 +90,13 @@ class CServer_System extends CServer_Base {
         if (!$this->info->getDistributionIcon()) {
             $this->os->buildDistro();
         }
+
         return $this->info->getDistributionIcon();
     }
 
     public function getLastBoot() {
         $uptime = $this->getUptime();
+
         return time() - intval($uptime);
     }
 
@@ -101,6 +104,7 @@ class CServer_System extends CServer_Base {
         if (!$this->info->getUsers()) {
             $this->os->buildUsers();
         }
+
         return $this->info->getUsers();
     }
 
@@ -108,6 +112,7 @@ class CServer_System extends CServer_Base {
         if (!$this->info->getProcesses()) {
             $this->os->buildProcesses();
         }
+
         return $this->info->getProcesses();
     }
 
@@ -115,6 +120,7 @@ class CServer_System extends CServer_Base {
         if (!$this->info->getLoad()) {
             $this->os->buildLoadAvg();
         }
+
         return $this->info->getLoad();
     }
 
@@ -122,6 +128,7 @@ class CServer_System extends CServer_Base {
         if (!$this->info->getLoadPercent()) {
             $this->os->buildLoadAvg();
         }
+
         return $this->info->getLoadPercent();
     }
 
@@ -129,6 +136,7 @@ class CServer_System extends CServer_Base {
         if (!$this->info->getMachine()) {
             $this->os->buildMachine();
         }
+
         return $this->info->getMachine();
     }
 
@@ -136,6 +144,7 @@ class CServer_System extends CServer_Base {
         if (!$this->info->getCpus()) {
             $this->os->buildCpuInfo();
         }
+
         return $this->info->getCpus();
     }
 }
