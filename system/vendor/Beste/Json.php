@@ -63,8 +63,9 @@ final class Json {
     }
 
     /**
-     * @param mixed $data
-     * @param int|null $options
+     * @param mixed    $data
+     * @param null|int $options
+     *
      * @throws UnexpectedValueException
      */
     public static function encode($data, ?int $options = null): string {
@@ -78,10 +79,12 @@ final class Json {
     }
 
     /**
-     * @param mixed $value
-     * @param int|null $options
-     * @return string
+     * @param mixed    $value
+     * @param null|int $options
+     *
      * @throws UnexpectedValueException
+     *
+     * @return string
      */
     public static function pretty($value, ?int $options = null): string {
         $options ??= 0;

@@ -4,43 +4,42 @@ declare(strict_types=1);
 
 namespace Kreait\Firebase\Exception;
 
+use Throwable;
+use function mb_stripos;
 use GuzzleHttp\Exception\ConnectException;
 use GuzzleHttp\Exception\RequestException;
-use Kreait\Firebase\Exception\RemoteConfig\ApiConnectionFailed;
+use Kreait\Firebase\Http\ErrorResponseParser;
+use Kreait\Firebase\Exception\RemoteConfig\VersionMismatch;
 use Kreait\Firebase\Exception\RemoteConfig\OperationAborted;
 use Kreait\Firebase\Exception\RemoteConfig\PermissionDenied;
-use Kreait\Firebase\Exception\RemoteConfig\RemoteConfigError;
 use Kreait\Firebase\Exception\RemoteConfig\ValidationFailed;
-use Kreait\Firebase\Exception\RemoteConfig\VersionMismatch;
-use Kreait\Firebase\Http\ErrorResponseParser;
-use Throwable;
+use Kreait\Firebase\Exception\RemoteConfig\RemoteConfigError;
 
-use function mb_stripos;
+use Kreait\Firebase\Exception\RemoteConfig\ApiConnectionFailed;
 
 /**
  * @internal
  */
-class RemoteConfigApiExceptionConverter
-{
-    public function __construct(private readonly ErrorResponseParser $responseParser)
-    {
+class RemoteConfigApiExceptionConverter {
+    private ErrorResponseParser $responseParser;
+
+    public function __construct(ErrorResponseParser $responseParser) {
+        $this->responseParser = $responseParser;
     }
 
-    public function convertException(Throwable $exception): RemoteConfigException
-    {
+    public function convertException(Throwable $exception): RemoteConfigException {
         if ($exception instanceof RequestException) {
             return $this->convertGuzzleRequestException($exception);
         }
 
         if ($exception instanceof ConnectException) {
-            return new ApiConnectionFailed('Unable to connect to the API: '.$exception->getMessage(), $exception->getCode(), $exception);
+            return new ApiConnectionFailed('Unable to connect to the API: ' . $exception->getMessage(), $exception->getCode(), $exception);
         }
 
         return new RemoteConfigError($exception->getMessage(), $exception->getCode(), $exception);
     }
 
-    private function convertGuzzleRequestException(RequestException $e): RemoteConfigException
-    {
+    private function convertGuzzleRequestException(RequestException $e): RemoteConfigException {
         $message = $e->getMessage();
         $code = $e->getCode();
         $response = $e->getResponse();

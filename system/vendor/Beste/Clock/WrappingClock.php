@@ -8,17 +8,14 @@ use Beste\Clock;
 use DateTimeImmutable;
 use Psr\Clock\ClockInterface;
 
-final class WrappingClock implements Clock
-{
+final class WrappingClock implements Clock {
     private ClockInterface $wrappedClock;
 
-    private function __construct(ClockInterface $wrappedClock)
-    {
+    private function __construct(ClockInterface $wrappedClock) {
         $this->wrappedClock = $wrappedClock;
     }
 
-    public static function wrapping(object $clock): self
-    {
+    public static function wrapping(object $clock): self {
         if ($clock instanceof ClockInterface) {
             return new self($clock);
         }
@@ -34,13 +31,11 @@ final class WrappingClock implements Clock
         $wrappedClock = new class($clock) implements ClockInterface {
             private object $clock;
 
-            public function __construct(object $clock)
-            {
+            public function __construct(object $clock) {
                 $this->clock = $clock;
             }
 
-            public function now(): \DateTimeImmutable
-            {
+            public function now(): DateTimeImmutable {
                 assert(method_exists($this->clock, 'now'));
 
                 $now = $this->clock->now();
@@ -54,8 +49,7 @@ final class WrappingClock implements Clock
         return new self($wrappedClock);
     }
 
-    public function now(): DateTimeImmutable
-    {
+    public function now(): DateTimeImmutable {
         return $this->wrappedClock->now();
     }
 }

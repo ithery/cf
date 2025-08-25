@@ -6,7 +6,5 @@ namespace Beste;
 
 use Psr\Clock\ClockInterface;
 
-interface Clock extends ClockInterface
-{
-
+interface Clock extends ClockInterface {
 }

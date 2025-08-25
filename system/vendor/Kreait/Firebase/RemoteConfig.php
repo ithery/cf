@@ -5,31 +5,36 @@ declare(strict_types=1);
 namespace Kreait\Firebase;
 
 use Beste\Json;
-use Kreait\Firebase\Exception\RemoteConfig\VersionNotFound;
+use Traversable;
+use function is_string;
+use function array_shift;
+use Psr\Http\Message\ResponseInterface;
+use Kreait\Firebase\RemoteConfig\Version;
+use Kreait\Firebase\RemoteConfig\Template;
 use Kreait\Firebase\RemoteConfig\ApiClient;
 use Kreait\Firebase\RemoteConfig\FindVersions;
-use Kreait\Firebase\RemoteConfig\Template;
-use Kreait\Firebase\RemoteConfig\Version;
-use Kreait\Firebase\RemoteConfig\VersionNumber;
-use Psr\Http\Message\ResponseInterface;
-use Traversable;
 
-use function array_shift;
-use function is_string;
+use Kreait\Firebase\RemoteConfig\VersionNumber;
+use Kreait\Firebase\Exception\RemoteConfig\VersionNotFound;
 
 /**
  * @internal
  *
  * @phpstan-import-type RemoteConfigTemplateShape from Template
  */
-final class RemoteConfig implements Contract\RemoteConfig
-{
-    public function __construct(private readonly ApiClient $client)
-    {
+final class RemoteConfig implements Contract\RemoteConfig {
+    private ApiClient $client;
+
+    public function __construct(ApiClient $client) {
+        $this->client = $client;
     }
 
-    public function get(Version|VersionNumber|int|string|null $versionNumber = null): Template
-    {
+    /**
+     * @param null|null|Version|VersionNumber|int|string $versionNumber
+     *
+     * @return Template
+     */
+    public function get($versionNumber = null): Template {
         if ($versionNumber !== null) {
             $versionNumber = $this->ensureVersionNumber($versionNumber);
         }
@@ -37,17 +42,14 @@ final class RemoteConfig implements Contract\RemoteConfig
         return $this->buildTemplateFromResponse($this->client->getTemplate($versionNumber));
     }
 
-    public function validate($template): void
-    {
+    public function validate($template): void {
         $this->client->validateTemplate($this->ensureTemplate($template));
     }
 
-    public function publish($template): string
-    {
+    public function publish($template): string {
         $etag = $this->client
             ->publishTemplate($this->ensureTemplate($template))
-            ->getHeader('ETag')
-        ;
+            ->getHeader('ETag');
 
         $etag = array_shift($etag);
 
@@ -62,8 +64,12 @@ final class RemoteConfig implements Contract\RemoteConfig
         return $etag;
     }
 
-    public function getVersion(VersionNumber|int|string $versionNumber): Version
-    {
+    /**
+     * @param VersionNumber|int|string $versionNumber
+     *
+     * @return Version
+     */
+    public function getVersion($versionNumber): Version {
         $versionNumber = $this->ensureVersionNumber($versionNumber);
 
         foreach ($this->listVersions() as $version) {
@@ -75,15 +81,18 @@ final class RemoteConfig implements Contract\RemoteConfig
         throw VersionNotFound::withVersionNumber($versionNumber);
     }
 
-    public function rollbackToVersion(VersionNumber|int|string $versionNumber): Template
-    {
+    /**
+     * @param VersionNumber|int|string $versionNumber
+     *
+     * @return Template
+     */
+    public function rollbackToVersion($versionNumber): Template {
         $versionNumber = $this->ensureVersionNumber($versionNumber);
 
         return $this->buildTemplateFromResponse($this->client->rollbackToVersion($versionNumber));
     }
 
-    public function listVersions($query = null): Traversable
-    {
+    public function listVersions($query = null): Traversable {
         $query = $query instanceof FindVersions ? $query : FindVersions::fromArray((array) $query);
         $pageToken = null;
         $count = 0;
@@ -110,16 +119,14 @@ final class RemoteConfig implements Contract\RemoteConfig
     /**
      * @param Template|RemoteConfigTemplateShape $value
      */
-    private function ensureTemplate($value): Template
-    {
+    private function ensureTemplate($value): Template {
         return $value instanceof Template ? $value : Template::fromArray($value);
     }
 
     /**
      * @param VersionNumber|positive-int|non-empty-string $value
      */
-    private function ensureVersionNumber(Version|VersionNumber|int|string $value): VersionNumber
-    {
+    private function ensureVersionNumber($value): VersionNumber {
         if ($value instanceof VersionNumber) {
             return $value;
         }
@@ -131,8 +138,7 @@ final class RemoteConfig implements Contract\RemoteConfig
         return VersionNumber::fromValue($value);
     }
 
-    private function buildTemplateFromResponse(ResponseInterface $response): Template
-    {
+    private function buildTemplateFromResponse(ResponseInterface $response): Template {
         $etag = $response->getHeaderLine('ETag');
 
         if ($etag === '') {

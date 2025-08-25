@@ -4,40 +4,43 @@ declare(strict_types=1);
 
 namespace Kreait\Firebase\Auth;
 
+use Stringable;
 use DateInterval;
 use DateTimeImmutable;
 use DateTimeInterface;
-use Google\Auth\SignBlobInterface;
-use Kreait\Firebase\Exception\Auth\AuthError;
-use Kreait\Firebase\Util\DT;
-use Lcobucci\JWT\Encoding\JoseEncoder;
 use Lcobucci\JWT\Token;
+use Kreait\Firebase\Util\DT;
 use Lcobucci\JWT\Token\Parser;
-use Stringable;
+use Google\Auth\SignBlobInterface;
+use Lcobucci\JWT\Encoding\JoseEncoder;
+use Kreait\Firebase\Exception\Auth\AuthError;
 
 /**
  * @internal
  */
-final class CustomTokenViaGoogleCredentials
-{
-    private readonly JoseEncoder $encoder;
+final class CustomTokenViaGoogleCredentials {
+    private JoseEncoder $encoder;
 
-    private readonly Parser $parser;
+    private Parser $parser;
 
-    public function __construct(private readonly SignBlobInterface $signer, private readonly ?string $tenantId = null)
-    {
+    private SignBlobInterface $signer;
+
+    private ?string $tenantId;
+
+    public function __construct(SignBlobInterface $signer, ?string $tenantId = null) {
+        $this->signer = $signer;
+        $this->tenantId = $tenantId;
         $this->encoder = new JoseEncoder();
         $this->parser = new Parser($this->encoder);
     }
 
     /**
-     * @param Stringable|string $uid
+     * @param Stringable|string              $uid
      * @param array<non-empty-string, mixed> $claims
      *
      * @throws AuthError
      */
-    public function createCustomToken($uid, array $claims = [], ?DateTimeInterface $expiresAt = null): Token
-    {
+    public function createCustomToken($uid, array $claims = [], ?DateTimeInterface $expiresAt = null): Token {
         $now = new DateTimeImmutable();
         $expiresAt = ($expiresAt !== null)
             ? DT::toUTCDateTimeImmutable($expiresAt)
@@ -64,7 +67,7 @@ final class CustomTokenViaGoogleCredentials
         $base64UrlHeader = $this->base64EncodeArray($header);
         $base64UrlPayload = $this->base64EncodeArray($payload);
 
-        $signature = $this->signer->signBlob($base64UrlHeader.'.'.$base64UrlPayload);
+        $signature = $this->signer->signBlob($base64UrlHeader . '.' . $base64UrlPayload);
         $signature = str_replace(['=', '+', '/'], ['', '-', '_'], $signature);
 
         return $this->parser->parse(sprintf('%s.%s.%s', $base64UrlHeader, $base64UrlPayload, $signature));
@@ -73,8 +76,7 @@ final class CustomTokenViaGoogleCredentials
     /**
      * @param array<mixed> $array
      */
-    private function base64EncodeArray(array $array): string
-    {
+    private function base64EncodeArray(array $array): string {
         return $this->encoder->base64UrlEncode($this->encoder->jsonEncode($array));
     }
 }

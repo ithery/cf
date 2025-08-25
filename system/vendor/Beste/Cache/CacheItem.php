@@ -2,25 +2,27 @@
 
 namespace Beste\Cache;
 
-use Psr\Cache\CacheItemInterface;
 use Psr\Clock\ClockInterface;
+use Psr\Cache\CacheItemInterface;
 
 /**
  * @internal
  */
-final class CacheItem implements CacheItemInterface
-{
+final class CacheItem implements CacheItemInterface {
     /**
      * @var mixed
      */
     private $value;
+
     private ?\DateTimeInterface $expiresAt;
+
     private bool $isHit;
+
     private CacheKey $key;
+
     private ClockInterface $clock;
 
-    public function __construct(CacheKey $key, ClockInterface $clock)
-    {
+    public function __construct(CacheKey $key, ClockInterface $clock) {
         $this->key = $key;
         $this->clock = $clock;
         $this->value = null;
@@ -28,13 +30,11 @@ final class CacheItem implements CacheItemInterface
         $this->isHit = false;
     }
 
-    public function getKey(): string
-    {
+    public function getKey(): string {
         return $this->key->toString();
     }
 
-    public function get(): mixed
-    {
+    public function get(): mixed {
         if ($this->isHit()) {
             return $this->value;
         }
@@ -42,8 +42,7 @@ final class CacheItem implements CacheItemInterface
         return null;
     }
 
-    public function isHit(): bool
-    {
+    public function isHit(): bool {
         if ($this->isHit === false) {
             return false;
         }
@@ -57,10 +56,10 @@ final class CacheItem implements CacheItemInterface
 
     /**
      * @param mixed $value
+     *
      * @return void
      */
-    public function set($value)
-    {
+    public function set($value) {
         $this->isHit = true;
         $this->value = $value;
 
@@ -68,24 +67,25 @@ final class CacheItem implements CacheItemInterface
     }
 
     /**
-     * @param \DateTimeInterface|null $expiration
+     * @param null|\DateTimeInterface $expiration
+     *
      * @return void
      */
-    public function expiresAt($expiration)
-    {
+    public function expiresAt($expiration) {
         $this->expiresAt = $expiration;
 
         return $this;
     }
 
     /**
-     * @param \DateInterval|integer|null $time
+     * @param null|\DateInterval|int $time
+     *
      * @return static
      */
-    public function expiresAfter($time)
-    {
+    public function expiresAfter($time) {
         if ($time === null) {
             $this->expiresAt = null;
+
             return $this;
         }
 
