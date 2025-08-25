@@ -4,26 +4,27 @@ declare(strict_types=1);
 
 namespace CuyZ\Valinor\Type\Types;
 
-use CuyZ\Valinor\Compiler\Native\ComplianceNode;
-use CuyZ\Valinor\Compiler\Node;
-use CuyZ\Valinor\Type\CompositeTraversableType;
-use CuyZ\Valinor\Type\CompositeType;
+use function is_array;
 use CuyZ\Valinor\Type\Type;
-use CuyZ\Valinor\Utility\Polyfill;
-
 use function array_is_list;
 use function function_exists;
-use function is_array;
+use CuyZ\Valinor\Compiler\Node;
+use CuyZ\Valinor\Utility\Polyfill;
+
+use CuyZ\Valinor\Type\CompositeType;
+use CuyZ\Valinor\Type\CompositeTraversableType;
+use CuyZ\Valinor\Compiler\Native\ComplianceNode;
 
 /** @internal */
-final class ListType implements CompositeTraversableType
-{
+final class ListType implements CompositeTraversableType {
     private static self $native;
 
     private string $signature;
 
-    public function __construct(private Type $subType)
-    {
+    private Type $subType;
+
+    public function __construct(Type $subType) {
+        $this->subType = $subType;
         $this->signature = "list<{$this->subType->toString()}>";
     }
 
@@ -31,9 +32,8 @@ final class ListType implements CompositeTraversableType
      * @codeCoverageIgnore
      * @infection-ignore-all
      */
-    public static function native(): self
-    {
-        if (! isset(self::$native)) {
+    public static function native(): self {
+        if (!isset(self::$native)) {
             self::$native = new self(MixedType::get());
             self::$native->signature = 'list';
         }
@@ -41,13 +41,12 @@ final class ListType implements CompositeTraversableType
         return self::$native;
     }
 
-    public function accepts($value): bool
-    {
-        if (! is_array($value)) {
+    public function accepts($value): bool {
+        if (!is_array($value)) {
             return false;
         }
 
-        if (! array_is_list($value)) {
+        if (!array_is_list($value)) {
             return false;
         }
 
@@ -64,8 +63,7 @@ final class ListType implements CompositeTraversableType
     /**
      * @return ComplianceNode
      */
-    public function compiledAccept(ComplianceNode $node): ComplianceNode
-    {
+    public function compiledAccept(ComplianceNode $node): ComplianceNode {
         $condition = Node::logicalAnd(
             Node::functionCall('is_array', [$node]),
             Node::functionCall('array_is_list', [$node]),
@@ -85,8 +83,7 @@ final class ListType implements CompositeTraversableType
         ]));
     }
 
-    public function matches(Type $other): bool
-    {
+    public function matches(Type $other): bool {
         if ($other instanceof MixedType) {
             return true;
         }
@@ -107,18 +104,15 @@ final class ListType implements CompositeTraversableType
         return false;
     }
 
-    public function keyType(): ArrayKeyType
-    {
+    public function keyType(): ArrayKeyType {
         return ArrayKeyType::integer();
     }
 
-    public function subType(): Type
-    {
+    public function subType(): Type {
         return $this->subType;
     }
 
-    public function traverse(): array
-    {
+    public function traverse(): array {
         if ($this->subType instanceof CompositeType) {
             return [$this->subType, ...$this->subType->traverse()];
         }
@@ -126,13 +120,11 @@ final class ListType implements CompositeTraversableType
         return [$this->subType];
     }
 
-    public function nativeType(): ArrayType
-    {
+    public function nativeType(): ArrayType {
         return ArrayType::native();
     }
 
-    public function toString(): string
-    {
+    public function toString(): string {
         return $this->signature;
     }
 }

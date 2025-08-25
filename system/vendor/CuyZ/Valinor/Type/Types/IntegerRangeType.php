@@ -4,31 +4,29 @@ declare(strict_types=1);
 
 namespace CuyZ\Valinor\Type\Types;
 
-use CuyZ\Valinor\Compiler\Native\ComplianceNode;
+use function ltrim;
+use function sprintf;
+use function is_string;
+use function preg_match;
+use CuyZ\Valinor\Type\Type;
 use CuyZ\Valinor\Compiler\Node;
+use CuyZ\Valinor\Type\IntegerType;
+use CuyZ\Valinor\Compiler\Native\ComplianceNode;
+
 use CuyZ\Valinor\Mapper\Tree\Message\ErrorMessage;
 use CuyZ\Valinor\Mapper\Tree\Message\MessageBuilder;
-use CuyZ\Valinor\Type\IntegerType;
-use CuyZ\Valinor\Type\Parser\Exception\Scalar\ReversedValuesForIntegerRange;
 use CuyZ\Valinor\Type\Parser\Exception\Scalar\SameValueForIntegerRange;
-use CuyZ\Valinor\Type\Type;
-
-use function is_string;
-use function ltrim;
-use function preg_match;
-use function sprintf;
+use CuyZ\Valinor\Type\Parser\Exception\Scalar\ReversedValuesForIntegerRange;
 
 /** @internal */
-final class IntegerRangeType implements IntegerType
-{
+final class IntegerRangeType implements IntegerType {
     private int $min;
 
     private int $max;
 
     private string $signature;
 
-    public function __construct(int $min, int $max)
-    {
+    public function __construct(int $min, int $max) {
         $this->min = $min;
         $this->max = $max;
         $this->signature = sprintf(
@@ -46,22 +44,19 @@ final class IntegerRangeType implements IntegerType
         }
     }
 
-    public function accepts($value): bool
-    {
+    public function accepts($value): bool {
         return is_int($value)
             && $value >= $this->min
             && $value <= $this->max;
     }
 
-    public function compiledAccept(ComplianceNode $node): ComplianceNode
-    {
+    public function compiledAccept(ComplianceNode $node): ComplianceNode {
         return Node::functionCall('is_int', [$node])
             ->and($node->isGreaterOrEqualsTo(Node::value($this->min)))
             ->and($node->isLessOrEqualsTo(Node::value($this->max)));
     }
 
-    public function matches(Type $other): bool
-    {
+    public function matches(Type $other): bool {
         if ($other instanceof UnionType) {
             return $other->isMatchedBy($this);
         }
@@ -89,53 +84,46 @@ final class IntegerRangeType implements IntegerType
         return false;
     }
 
-    public function canCast($value): bool
-    {
+    public function canCast($value): bool {
         if (is_string($value)) {
             $value = preg_match('/^0+$/', $value)
                 ? '0'
                 : ltrim($value, '0');
         }
 
-        return ! is_bool($value)
+        return !is_bool($value)
             && filter_var($value, FILTER_VALIDATE_INT) !== false
             && $value >= $this->min
             && $value <= $this->max;
     }
 
-    public function cast($value): int
-    {
+    public function cast($value): int {
         assert($this->canCast($value));
 
-        return (int)$value; // @phpstan-ignore-line
+        return (int) $value; // @phpstan-ignore-line
     }
 
-    public function errorMessage(): ErrorMessage
-    {
+    public function errorMessage(): ErrorMessage {
         return MessageBuilder::newError('Value {source_value} is not a valid integer between {min} and {max}.')
             ->withCode('invalid_integer_range')
-            ->withParameter('min', (string)$this->min)
-            ->withParameter('max', (string)$this->max)
+            ->withParameter('min', (string) $this->min)
+            ->withParameter('max', (string) $this->max)
             ->build();
     }
 
-    public function min(): int
-    {
+    public function min(): int {
         return $this->min;
     }
 
-    public function max(): int
-    {
+    public function max(): int {
         return $this->max;
     }
 
-    public function nativeType(): NativeIntegerType
-    {
+    public function nativeType(): NativeIntegerType {
         return NativeIntegerType::get();
     }
 
-    public function toString(): string
-    {
+    public function toString(): string {
         return $this->signature;
     }
 }

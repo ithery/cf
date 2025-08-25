@@ -4,47 +4,48 @@ declare(strict_types=1);
 
 namespace CuyZ\Valinor\Type\Types;
 
-use CuyZ\Valinor\Compiler\Native\ComplianceNode;
+use function array_map;
+use CuyZ\Valinor\Type\Type;
+use CuyZ\Valinor\Type\ObjectType;
+use CuyZ\Valinor\Type\GenericType;
 use CuyZ\Valinor\Type\CombiningType;
 use CuyZ\Valinor\Type\CompositeType;
-use CuyZ\Valinor\Type\GenericType;
-use CuyZ\Valinor\Type\ObjectType;
-use CuyZ\Valinor\Type\Type;
 
-use function array_map;
+use CuyZ\Valinor\Compiler\Native\ComplianceNode;
 
 /** @internal */
-final class InterfaceType implements ObjectType, GenericType
-{
+final class InterfaceType implements ObjectType, GenericType {
+    private string $interfaceName;
+
+    private array $generics;
+
     public function __construct(
         /** @var class-string */
-        private string $interfaceName,
+        string $interfaceName,
         /** @var array<non-empty-string, Type> */
-        private array $generics = []
-    ) {}
+        array $generics = []
+    ) {
+        $this->interfaceName = $interfaceName;
+        $this->generics = $generics;
+    }
 
-    public function className(): string
-    {
+    public function className(): string {
         return $this->interfaceName;
     }
 
-    public function generics(): array
-    {
+    public function generics(): array {
         return $this->generics;
     }
 
-    public function accepts($value): bool
-    {
+    public function accepts($value): bool {
         return $value instanceof $this->interfaceName;
     }
 
-    public function compiledAccept(ComplianceNode $node): ComplianceNode
-    {
+    public function compiledAccept(ComplianceNode $node): ComplianceNode {
         return $node->instanceOf($this->interfaceName);
     }
 
-    public function matches(Type $other): bool
-    {
+    public function matches(Type $other): bool {
         if ($other instanceof MixedType || $other instanceof UndefinedObjectType) {
             return true;
         }
@@ -53,15 +54,14 @@ final class InterfaceType implements ObjectType, GenericType
             return $other->isMatchedBy($this);
         }
 
-        if (! $other instanceof ObjectType) {
+        if (!$other instanceof ObjectType) {
             return false;
         }
 
         return is_a($this->interfaceName, $other->className(), true);
     }
 
-    public function traverse(): array
-    {
+    public function traverse(): array {
         $types = [];
 
         foreach ($this->generics as $type) {
@@ -75,13 +75,11 @@ final class InterfaceType implements ObjectType, GenericType
         return $types;
     }
 
-    public function nativeType(): InterfaceType
-    {
+    public function nativeType(): InterfaceType {
         return new self($this->interfaceName);
     }
 
-    public function toString(): string
-    {
+    public function toString(): string {
         return empty($this->generics)
             ? $this->interfaceName
             : $this->interfaceName . '<' . implode(', ', array_map(fn (Type $type) => $type->toString(), $this->generics)) . '>';

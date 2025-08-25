@@ -4,25 +4,27 @@ declare(strict_types=1);
 
 namespace CuyZ\Valinor\Mapper;
 
+use RuntimeException;
+use CuyZ\Valinor\Utility\ValueDumper;
 use CuyZ\Valinor\Mapper\Tree\Message\Messages;
 use CuyZ\Valinor\Mapper\Tree\Message\NodeMessage;
-use CuyZ\Valinor\Utility\ValueDumper;
-use RuntimeException;
 
 /** @internal */
-final class ArgumentsMapperError extends RuntimeException implements MappingError
-{
+final class ArgumentsMapperError extends RuntimeException implements MappingError {
     private Messages $messages;
 
     private string $type;
 
-    private mixed $source;
+    /**
+     * @var mixed
+     */
+    private $source;
 
     /**
      * @param non-empty-list<NodeMessage> $messages
+     * @param mixed                       $source
      */
-    public function __construct(mixed $source, string $type, string $function, array $messages)
-    {
+    public function __construct($source, string $type, string $function, array $messages) {
         $this->messages = new Messages(...$messages);
         $this->type = $type;
         $this->source = $source;
@@ -41,21 +43,18 @@ final class ArgumentsMapperError extends RuntimeException implements MappingErro
         parent::__construct($body, 1671115362);
     }
 
-    public function messages(): Messages
-    {
+    public function messages(): Messages {
         return $this->messages;
     }
 
-    public function type(): string
-    {
+    public function type(): string {
         return $this->type;
     }
 
     /**
      * @return mixed
      */
-    public function source()
-    {
+    public function source() {
         return $this->source;
     }
 }

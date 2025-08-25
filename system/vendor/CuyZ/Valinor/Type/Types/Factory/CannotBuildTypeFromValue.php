@@ -9,10 +9,8 @@ use LogicException;
 use function gettype;
 
 /** @internal */
-final class CannotBuildTypeFromValue extends LogicException
-{
-    public function __construct(mixed $value)
-    {
+final class CannotBuildTypeFromValue extends LogicException {
+    public function __construct($value) {
         $type = gettype($value);
 
         parent::__construct(

@@ -4,19 +4,18 @@ declare(strict_types=1);
 
 namespace CuyZ\Valinor\Type\Types;
 
-use CuyZ\Valinor\Compiler\Native\ComplianceNode;
-use CuyZ\Valinor\Compiler\Node;
-use CuyZ\Valinor\Type\CompositeTraversableType;
-use CuyZ\Valinor\Type\CompositeType;
-use CuyZ\Valinor\Type\Type;
-use CuyZ\Valinor\Utility\Polyfill;
 use Generator;
-
 use function is_iterable;
+use CuyZ\Valinor\Type\Type;
+use CuyZ\Valinor\Compiler\Node;
+use CuyZ\Valinor\Utility\Polyfill;
+use CuyZ\Valinor\Type\CompositeType;
+use CuyZ\Valinor\Type\CompositeTraversableType;
+
+use CuyZ\Valinor\Compiler\Native\ComplianceNode;
 
 /** @internal */
-final class IterableType implements CompositeTraversableType
-{
+final class IterableType implements CompositeTraversableType {
     private static self $native;
 
     private ArrayKeyType $keyType;
@@ -25,8 +24,7 @@ final class IterableType implements CompositeTraversableType
 
     private string $signature;
 
-    public function __construct(ArrayKeyType $keyType, Type $subType)
-    {
+    public function __construct(ArrayKeyType $keyType, Type $subType) {
         $this->keyType = $keyType;
         $this->subType = $subType;
         $this->signature = $keyType === ArrayKeyType::default()
@@ -34,9 +32,8 @@ final class IterableType implements CompositeTraversableType
             : "iterable<{$this->keyType->toString()}, {$this->subType->toString()}>";
     }
 
-    public static function native(): self
-    {
-        if (! isset(self::$native)) {
+    public static function native(): self {
+        if (!isset(self::$native)) {
             self::$native = new self(ArrayKeyType::default(), MixedType::get());
             self::$native->signature = 'iterable';
         }
@@ -46,7 +43,7 @@ final class IterableType implements CompositeTraversableType
 
     /**
      * Returns true if the given value is an iterable that satisfies the
-     * following conditions:
+     * following conditions:.
      *
      * - Each key must satisfy the key type.
      * - Each value must satisfy the sub type.
@@ -55,11 +52,11 @@ final class IterableType implements CompositeTraversableType
      * true as soon as the given value is an iterable.
      *
      * @param mixed $value the value to check
+     *
      * @return bool true if the value is an iterable that satisfies the conditions, false otherwise
      */
-    public function accepts($value): bool
-    {
-        if (! is_iterable($value)) {
+    public function accepts($value): bool {
+        if (!is_iterable($value)) {
             return false;
         }
 
@@ -68,11 +65,11 @@ final class IterableType implements CompositeTraversableType
         }
 
         foreach ($value as $key => $item) {
-            if (! $this->keyType->accepts($key)) {
+            if (!$this->keyType->accepts($key)) {
                 return false;
             }
 
-            if (! $this->subType->accepts($item)) {
+            if (!$this->subType->accepts($item)) {
                 return false;
             }
         }
@@ -80,8 +77,7 @@ final class IterableType implements CompositeTraversableType
         return true;
     }
 
-    public function compiledAccept(ComplianceNode $node): ComplianceNode
-    {
+    public function compiledAccept(ComplianceNode $node): ComplianceNode {
         $condition = Node::logicalAnd(
             Node::functionCall('is_iterable', [$node]),
             Node::negate($node->instanceOf(Generator::class)),
@@ -95,9 +91,9 @@ final class IterableType implements CompositeTraversableType
         $iteratorToArray = PHP_VERSION_ID >= 8_02_00
             ? Node::functionCall('iterator_to_array', [$node])
             : Node::ternary(
-                condition: Node::functionCall('is_array', [$node]),
-                ifTrue: $node,
-                ifFalse: Node::functionCall('iterator_to_array', [$node]),
+                Node::functionCall('is_array', [$node]),
+                $node,
+                Node::functionCall('iterator_to_array', [$node]),
             );
 
         return $condition->and(Node::functionCall(function_exists('array_all') ? 'array_all' : Polyfill::class . '::array_all', [
@@ -114,8 +110,7 @@ final class IterableType implements CompositeTraversableType
         ]));
     }
 
-    public function matches(Type $other): bool
-    {
+    public function matches(Type $other): bool {
         if ($other instanceof MixedType) {
             return true;
         }
@@ -129,18 +124,15 @@ final class IterableType implements CompositeTraversableType
             && $this->subType->matches($other->subType());
     }
 
-    public function keyType(): ArrayKeyType
-    {
+    public function keyType(): ArrayKeyType {
         return $this->keyType;
     }
 
-    public function subType(): Type
-    {
+    public function subType(): Type {
         return $this->subType;
     }
 
-    public function traverse(): array
-    {
+    public function traverse(): array {
         if ($this->subType instanceof CompositeType) {
             return [$this->subType, ...$this->subType->traverse()];
         }
@@ -148,13 +140,11 @@ final class IterableType implements CompositeTraversableType
         return [$this->subType];
     }
 
-    public function nativeType(): IterableType
-    {
+    public function nativeType(): IterableType {
         return self::native();
     }
 
-    public function toString(): string
-    {
+    public function toString(): string {
         return $this->signature;
     }
 }

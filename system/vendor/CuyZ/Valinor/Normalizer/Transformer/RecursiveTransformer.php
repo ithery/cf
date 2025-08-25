@@ -4,33 +4,34 @@ declare(strict_types=1);
 
 namespace CuyZ\Valinor\Normalizer\Transformer;
 
-use BackedEnum;
 use Closure;
-use CuyZ\Valinor\Definition\AttributeDefinition;
+use WeakMap;
+use stdClass;
+use UnitEnum;
+use BackedEnum;
+use DateTimeZone;
+use DateTimeInterface;
+use function is_array;
+use function array_map;
+use function is_object;
+use function is_iterable;
+use function get_object_vars;
+use CuyZ\Valinor\Type\Types\EnumType;
 use CuyZ\Valinor\Definition\Attributes;
+use CuyZ\Valinor\Type\Types\NativeClassType;
+
+use CuyZ\Valinor\Definition\AttributeDefinition;
+use CuyZ\Valinor\Normalizer\Exception\TypeUnhandledByNormalizer;
 use CuyZ\Valinor\Definition\Repository\ClassDefinitionRepository;
 use CuyZ\Valinor\Definition\Repository\FunctionDefinitionRepository;
 use CuyZ\Valinor\Normalizer\Exception\CircularReferenceFoundDuringNormalization;
-use CuyZ\Valinor\Normalizer\Exception\TypeUnhandledByNormalizer;
-use CuyZ\Valinor\Type\Types\EnumType;
-use CuyZ\Valinor\Type\Types\NativeClassType;
-use DateTimeInterface;
-use DateTimeZone;
-use stdClass;
-use UnitEnum;
-use WeakMap;
-
-use function array_map;
-use function get_object_vars;
-use function is_array;
-use function is_iterable;
-use function is_object;
 
 /**  @internal */
-final class RecursiveTransformer implements Transformer
-{
+final class RecursiveTransformer implements Transformer {
     private ClassDefinitionRepository $classDefinitionRepository;
+
     private FunctionDefinitionRepository $functionDefinitionRepository;
+
     private TransformerContainer $transformerContainer;
 
     public function __construct(
@@ -45,20 +46,21 @@ final class RecursiveTransformer implements Transformer
 
     /**
      * @param mixed $value
+     *
      * @return mixed
      */
-    public function transform($value)
-    {
+    public function transform($value) {
         return $this->doTransform($value, new WeakMap()); // @phpstan-ignore-line
     }
 
     /**
-     * @param WeakMap<object, object> $references
+     * @param WeakMap<object, object>   $references
      * @param list<AttributeDefinition> $attributes
+     * @param mixed                     $value
+     *
      * @return mixed
      */
-    private function doTransform($value, WeakMap $references, array $attributes = [])
-    {
+    private function doTransform($value, WeakMap $references, array $attributes = []) {
         if (is_object($value)) {
             if (isset($references[$value])) {
                 throw new CircularReferenceFoundDuringNormalization($value);
@@ -76,7 +78,7 @@ final class RecursiveTransformer implements Transformer
             $attributes = [...$attributes, ...$classAttributes];
         }
 
-        if (! $this->transformerContainer->hasTransformers() && $attributes === []) {
+        if (!$this->transformerContainer->hasTransformers() && $attributes === []) {
             return $this->defaultTransformer($value, $references);
         }
 
@@ -127,9 +129,9 @@ final class RecursiveTransformer implements Transformer
 
     /**
      * @param non-empty-list<callable> $transformers
+     * @param mixed                    $value
      */
-    private function nextTransformer(array $transformers, $value): callable
-    {
+    private function nextTransformer(array $transformers, $value): callable {
         $transformer = array_shift($transformers);
 
         if ($transformers === []) {
@@ -138,7 +140,7 @@ final class RecursiveTransformer implements Transformer
 
         $function = $this->functionDefinitionRepository->for($transformer);
 
-        if (! $function->parameters->at(0)->type->accepts($value)) {
+        if (!$function->parameters->at(0)->type->accepts($value)) {
             return $this->nextTransformer($transformers, $value);
         }
 
@@ -147,10 +149,11 @@ final class RecursiveTransformer implements Transformer
 
     /**
      * @param WeakMap<object, object> $references
-     * @return iterable<mixed>|scalar|null
+     * @param mixed                   $value
+     *
+     * @return null|iterable<mixed>|scalar
      */
-    private function defaultTransformer($value, WeakMap $references)
-    {
+    private function defaultTransformer($value, WeakMap $references) {
         if ($value === null) {
             return null;
         }
@@ -174,7 +177,7 @@ final class RecursiveTransformer implements Transformer
             })();
         }
 
-        if (is_object($value) && ! $value instanceof Closure) {
+        if (is_object($value) && !$value instanceof Closure) {
             if ($value instanceof UnitEnum) {
                 return $value instanceof BackedEnum ? $value->value : $value->name;
             }
@@ -188,14 +191,14 @@ final class RecursiveTransformer implements Transformer
             }
 
             if (\get_class($value) === stdClass::class) {
-                $result = (array)$value;
+                $result = (array) $value;
 
                 if ($result === []) {
                     return EmptyObject::get();
                 }
 
                 return array_map(
-                    fn (mixed $value) => $this->doTransform($value, $references),
+                    fn ($value) => $this->doTransform($value, $references),
                     $result,
                 );
             }
@@ -225,7 +228,7 @@ final class RecursiveTransformer implements Transformer
                 $property = $class->properties->get($key);
 
                 // Ganti first-class callable ke array callable biasa
-                $keyTransformersAttributes = $property->attributes->filter(function(AttributeDefinition $attribute) {
+                $keyTransformersAttributes = $property->attributes->filter(function (AttributeDefinition $attribute) {
                     return TransformerContainer::filterKeyTransformerAttributes($attribute);
                 });
 

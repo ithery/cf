@@ -9,10 +9,8 @@ use RuntimeException;
 use function get_debug_type;
 
 /** @internal */
-final class InvalidIterableKeyType extends RuntimeException
-{
-    public function __construct(mixed $key, string $path)
-    {
+final class InvalidIterableKeyType extends RuntimeException {
+    public function __construct($key, string $path) {
         $type = get_debug_type($key);
 
         parent::__construct(

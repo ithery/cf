@@ -4,36 +4,33 @@ declare(strict_types=1);
 
 namespace CuyZ\Valinor\Type\Types;
 
-use CuyZ\Valinor\Compiler\Native\ComplianceNode;
+use function assert;
+use CuyZ\Valinor\Type\Type;
 use CuyZ\Valinor\Compiler\Node;
-use CuyZ\Valinor\Mapper\Tree\Message\ErrorMessage;
-use CuyZ\Valinor\Mapper\Tree\Message\MessageBuilder;
 use CuyZ\Valinor\Type\FixedType;
 use CuyZ\Valinor\Type\FloatType;
-use CuyZ\Valinor\Type\Type;
+use CuyZ\Valinor\Compiler\Native\ComplianceNode;
+use CuyZ\Valinor\Mapper\Tree\Message\ErrorMessage;
 
-use function assert;
+use CuyZ\Valinor\Mapper\Tree\Message\MessageBuilder;
 
 /** @internal */
-final class FloatValueType implements FloatType, FixedType
-{
+final class FloatValueType implements FloatType, FixedType {
     private float $value;
+
     public function __construct(float $value) {
         $this->value = $value;
     }
 
-    public function accepts($value): bool
-    {
+    public function accepts($value): bool {
         return $value === $this->value;
     }
 
-    public function compiledAccept(ComplianceNode $node): ComplianceNode
-    {
+    public function compiledAccept(ComplianceNode $node): ComplianceNode {
         return $node->equals(Node::value($this->value));
     }
 
-    public function matches(Type $other): bool
-    {
+    public function matches(Type $other): bool {
         if ($other instanceof UnionType) {
             return $other->isMatchedBy($this);
         }
@@ -47,38 +44,32 @@ final class FloatValueType implements FloatType, FixedType
             || $other instanceof MixedType;
     }
 
-    public function canCast($value): bool
-    {
-        return is_numeric($value) && (float)$value === $this->value;
+    public function canCast($value): bool {
+        return is_numeric($value) && (float) $value === $this->value;
     }
 
-    public function cast($value): float
-    {
+    public function cast($value): float {
         assert($this->canCast($value));
 
-        return (float)$value; // @phpstan-ignore-line
+        return (float) $value; // @phpstan-ignore-line
     }
 
-    public function errorMessage(): ErrorMessage
-    {
+    public function errorMessage(): ErrorMessage {
         return MessageBuilder::newError('Value {source_value} does not match float value {expected_value}.')
             ->withCode('invalid_float_value')
-            ->withParameter('expected_value', (string)$this->value)
+            ->withParameter('expected_value', (string) $this->value)
             ->build();
     }
 
-    public function value(): float
-    {
+    public function value(): float {
         return $this->value;
     }
 
-    public function nativeType(): NativeFloatType
-    {
+    public function nativeType(): NativeFloatType {
         return NativeFloatType::get();
     }
 
-    public function toString(): string
-    {
-        return (string)$this->value;
+    public function toString(): string {
+        return (string) $this->value;
     }
 }

@@ -71,7 +71,9 @@ use Attribute;
  * $arguments['name'] === 'John Doe';
  * $arguments['isActive'] === true;
  * ```
+ *
  * @api
  */
 #[Attribute(Attribute::TARGET_CLASS)]
-final class AsConverter {}
+final class AsConverter {
+}

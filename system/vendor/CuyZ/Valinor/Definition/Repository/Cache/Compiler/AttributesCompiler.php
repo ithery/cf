@@ -4,22 +4,24 @@ declare(strict_types=1);
 
 namespace CuyZ\Valinor\Definition\Repository\Cache\Compiler;
 
-use CuyZ\Valinor\Definition\Attributes;
-
-use function array_map;
 use function count;
+
 use function implode;
 use function is_array;
+use function array_map;
 use function is_object;
 use function var_export;
+use CuyZ\Valinor\Definition\Attributes;
 
 /** @internal */
-final class AttributesCompiler
-{
-    public function __construct(private ClassDefinitionCompiler $classDefinitionCompiler) {}
+final class AttributesCompiler {
+    private ClassDefinitionCompiler $classDefinitionCompiler;
 
-    public function compile(Attributes $attributes): string
-    {
+    public function __construct(ClassDefinitionCompiler $classDefinitionCompiler) {
+        $this->classDefinitionCompiler = $classDefinitionCompiler;
+    }
+
+    public function compile(Attributes $attributes): string {
         if (count($attributes) === 0) {
             return Attributes::class . '::empty()';
         }
@@ -31,8 +33,7 @@ final class AttributesCompiler
             PHP;
     }
 
-    private function compileAttributes(Attributes $attributes): string
-    {
+    private function compileAttributes(Attributes $attributes): string {
         $attributesListCode = [];
 
         foreach ($attributes as $attribute) {
@@ -42,7 +43,7 @@ final class AttributesCompiler
                 $arguments = '';
             } else {
                 $arguments = implode(', ', array_map(
-                    fn (mixed $argument) => $this->compileAttributeArguments($argument),
+                    fn ($argument) => $this->compileAttributeArguments($argument),
                     $attribute->arguments,
                 ));
             }
@@ -58,8 +59,7 @@ final class AttributesCompiler
         return implode(', ', $attributesListCode);
     }
 
-    private function compileAttributeArguments(mixed $value): string
-    {
+    private function compileAttributeArguments($value): string {
         if (is_object($value)) {
             return 'unserialize(' . var_export(serialize($value), true) . ')';
         }

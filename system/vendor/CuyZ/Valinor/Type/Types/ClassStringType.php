@@ -4,43 +4,41 @@ declare(strict_types=1);
 
 namespace CuyZ\Valinor\Type\Types;
 
-use CuyZ\Valinor\Compiler\Native\ComplianceNode;
+use Stringable;
+use function assert;
+use function array_map;
+use function is_string;
+use CuyZ\Valinor\Type\Type;
 use CuyZ\Valinor\Compiler\Node;
-use CuyZ\Valinor\Mapper\Tree\Message\ErrorMessage;
-use CuyZ\Valinor\Mapper\Tree\Message\MessageBuilder;
-use CuyZ\Valinor\Type\CompositeType;
 use CuyZ\Valinor\Type\ObjectType;
 use CuyZ\Valinor\Type\StringType;
-use CuyZ\Valinor\Type\Type;
-use CuyZ\Valinor\Type\Types\Exception\InvalidUnionOfClassString;
+use CuyZ\Valinor\Type\CompositeType;
 use CuyZ\Valinor\Utility\IsSingleton;
 use CuyZ\Valinor\Utility\Reflection\Reflection;
-use Stringable;
+use CuyZ\Valinor\Compiler\Native\ComplianceNode;
 
-use function array_map;
-use function assert;
-use function is_string;
+use CuyZ\Valinor\Mapper\Tree\Message\ErrorMessage;
+use CuyZ\Valinor\Mapper\Tree\Message\MessageBuilder;
+use CuyZ\Valinor\Type\Types\Exception\InvalidUnionOfClassString;
 
 /** @internal */
-final class ClassStringType implements StringType, CompositeType
-{
+final class ClassStringType implements StringType, CompositeType {
     use IsSingleton;
 
     /**
-     * @var ObjectType|UnionType|null
+     * @var null|ObjectType|UnionType
      */
     private $subType;
 
     private string $signature;
 
     /**
-     * @param ObjectType|UnionType|null|null $subType
+     * @param null|null|ObjectType|UnionType $subType
      */
-    public function __construct($subType = null)
-    {
+    public function __construct($subType = null) {
         if ($subType instanceof UnionType) {
             foreach ($subType->types() as $type) {
-                if (! $type instanceof ObjectType) {
+                if (!$type instanceof ObjectType) {
                     throw new InvalidUnionOfClassString($subType);
                 }
             }
@@ -53,18 +51,16 @@ final class ClassStringType implements StringType, CompositeType
     }
 
     /**
-     * {@inheritDoc}
+     * @inheritDoc
      *
      * @param mixed $value
      */
-
-    public function accepts( $value): bool
-    {
-        if (! is_string($value)) {
+    public function accepts($value): bool {
+        if (!is_string($value)) {
             return false;
         }
 
-        if (! $this->subType) {
+        if (!$this->subType) {
             return Reflection::classOrInterfaceExists($value);
         }
 
@@ -82,11 +78,10 @@ final class ClassStringType implements StringType, CompositeType
         return false;
     }
 
-    public function compiledAccept(ComplianceNode $node): ComplianceNode
-    {
+    public function compiledAccept(ComplianceNode $node): ComplianceNode {
         $condition = Node::functionCall('is_string', [$node]);
 
-        if (! $this->subType) {
+        if (!$this->subType) {
             return $condition->and(Node::functionCall(Reflection::class . '::classOrInterfaceExists', [$node]));
         }
 
@@ -113,8 +108,7 @@ final class ClassStringType implements StringType, CompositeType
         return $condition->and(Node::logicalOr(...$conditions)->wrap());
     }
 
-    public function matches(Type $other): bool
-    {
+    public function matches(Type $other): bool {
         if ($other instanceof NativeStringType
             || $other instanceof NonEmptyStringType
             || $other instanceof ScalarConcreteType
@@ -127,36 +121,33 @@ final class ClassStringType implements StringType, CompositeType
             return $other->isMatchedBy($this);
         }
 
-        if (! $other instanceof self) {
+        if (!$other instanceof self) {
             return false;
         }
 
-        if (! $this->subType) {
+        if (!$this->subType) {
             return true;
         }
 
-        if (! $other->subType) {
+        if (!$other->subType) {
             return true;
         }
 
         return $this->subType->matches($other->subType);
     }
 
-    public function canCast($value): bool
-    {
+    public function canCast($value): bool {
         return (is_string($value) || $value instanceof Stringable)
-            && $this->accepts((string)$value);
+            && $this->accepts((string) $value);
     }
 
-    public function cast($value): string
-    {
+    public function cast($value): string {
         assert($this->canCast($value));
 
-        return (string)$value; // @phpstan-ignore-line
+        return (string) $value; // @phpstan-ignore-line
     }
 
-    public function errorMessage(): ErrorMessage
-    {
+    public function errorMessage(): ErrorMessage {
         if ($this->subType) {
             return MessageBuilder::newError('Value {source_value} is not a valid class string of `{expected_class_type}`.')
                 ->withCode('invalid_class_string')
@@ -169,14 +160,15 @@ final class ClassStringType implements StringType, CompositeType
             ->build();
     }
 
-    public function subType(): ObjectType|UnionType|null
-    {
+    /**
+     * @return null|ObjectType|UnionType
+     */
+    public function subType() {
         return $this->subType;
     }
 
-    public function traverse(): array
-    {
-        if (! $this->subType) {
+    public function traverse(): array {
+        if (!$this->subType) {
             return [];
         }
 
@@ -187,13 +179,11 @@ final class ClassStringType implements StringType, CompositeType
         return [$this->subType];
     }
 
-    public function nativeType(): NativeStringType
-    {
+    public function nativeType(): NativeStringType {
         return NativeStringType::get();
     }
 
-    public function toString(): string
-    {
+    public function toString(): string {
         return $this->signature;
     }
 }
