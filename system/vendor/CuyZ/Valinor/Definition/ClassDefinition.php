@@ -7,8 +7,7 @@ namespace CuyZ\Valinor\Definition;
 use CuyZ\Valinor\Type\ObjectType;
 
 /** @internal */
-final class ClassDefinition
-{
+final class ClassDefinition {
     public string $name;
 
     public ObjectType $type;
@@ -22,6 +21,7 @@ final class ClassDefinition
     public bool $isFinal;
 
     public bool $isAbstract;
+
     public function __construct(
         /** @var class-string */
         string $name,

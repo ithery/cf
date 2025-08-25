@@ -19,8 +19,7 @@ final class AttributeDefinition
         $this->arguments = $arguments;
     }
 
-    public function instantiate(): object
-    {
+    public function instantiate(): object {
         return new ($this->class->type->className())(...$this->arguments);
     }
 }
