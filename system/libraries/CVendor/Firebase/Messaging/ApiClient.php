@@ -10,6 +10,7 @@ use GuzzleHttp\Promise\PromiseInterface;
  */
 class CVendor_Firebase_Messaging_ApiClient implements ClientInterface {
     use CVendor_Firebase_Trait_WrappedGuzzleClientTrait;
+
     /**
      * @var CVendor_Firebase_Messaging_ApiExceptionConverter
      */

@@ -1,4 +1,6 @@
 <?php
+use Kreait\Firebase\Messaging\CloudMessage;
+use Kreait\Firebase\Messaging\Notification;
 
 class CNotification_Message_Firebase extends CNotification_MessageAbstract {
     public function send() {
@@ -11,8 +13,8 @@ class CNotification_Message_Firebase extends CNotification_MessageAbstract {
 
         $messaging = $firebase->createMessaging();
 
-        $message = $messaging->createCloudMessage()
-            ->withNotification($messaging->createNotification($this->getOption('subject'), $this->getOption('message'), $this->getOption('imageUrl')));
+        $message = CloudMessage::new()
+            ->withNotification(Notification::create($this->getOption('subject'), $this->getOption('message'), $this->getOption('imageUrl')));
 
         if (is_array($data)) {
             $message = $message->withData($data);

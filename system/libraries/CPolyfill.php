@@ -24,4 +24,8 @@ class CPolyfill {
     public static function php84() {
         CPolyfill_Php84::polyfill();
     }
+
+    public static function php85() {
+        CPolyfill_Php85::polyfill();
+    }
 }

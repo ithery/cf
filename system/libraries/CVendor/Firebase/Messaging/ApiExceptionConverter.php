@@ -47,12 +47,15 @@ class CVendor_Firebase_Messaging_ApiExceptionConverter {
 
     public function convertResponse(ResponseInterface $response, $previous = null) {
         $code = $response->getStatusCode();
-
+        $request = null;
+        if ($previous instanceof RequestException) {
+            $request = $previous->getRequest();
+        }
         if ($code < 400) {
             throw new CVendor_Firebase_Exception_InvalidArgumentException('Cannot convert a non-failed response to an exception');
         }
 
-        $errors = $this->responseParser->getErrorsFromResponse($response);
+        $errors = $this->responseParser->getErrorsFromResponse($response, $request);
         $message = $this->responseParser->getErrorReasonFromResponse($response);
 
         switch ($code) {
@@ -106,7 +109,7 @@ class CVendor_Firebase_Messaging_ApiExceptionConverter {
         }
 
         if ($response = $e->getResponse()) {
-            return $this->convertResponse($response);
+            return $this->convertResponse($response, $e);
         }
 
         return new CVendor_Firebase_Messaging_Exception_MessagingErrorException($e->getMessage(), $e->getCode(), $e);

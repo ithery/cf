@@ -7,15 +7,19 @@ namespace Beste\Clock;
 use Beste\Clock;
 use DateTimeImmutable;
 
-final class SystemClock implements Clock {
-    private function __construct() {
+final class SystemClock implements Clock
+{
+    private function __construct()
+    {
     }
 
-    public static function create() {
+    public static function create(): self
+    {
         return new self();
     }
 
-    public function now() {
+    public function now(): DateTimeImmutable
+    {
         return new DateTimeImmutable();
     }
 }

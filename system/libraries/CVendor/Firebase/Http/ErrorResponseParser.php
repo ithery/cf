@@ -1,6 +1,7 @@
 <?php
 
 use Psr\Http\Message\ResponseInterface;
+use Psr\Http\Message\RequestInterface;
 
 final class CVendor_Firebase_Http_ErrorResponseParser {
     public function getErrorReasonFromResponse(ResponseInterface $response) {
@@ -23,11 +24,19 @@ final class CVendor_Firebase_Http_ErrorResponseParser {
         return $responseBody;
     }
 
-    public function getErrorsFromResponse(ResponseInterface $response) {
-        try {
-            return CHelper::json()->decode((string) $response->getBody(), true);
-        } catch (\InvalidArgumentException $e) {
-            return [];
+    public function getErrorsFromResponse(ResponseInterface $response, RequestInterface $request = null) {
+        $responseBody = null;
+        if ($response) {
+            $responseBody = json_decode((string) $response->getBody(), true);
+            if ($responseBody == null) {
+                $messageError = 'response is not json:' . (string) $response->getBody();
+                if ($request) {
+                    $messageError.= 'on url:' . $request->getUri();
+                }
+                throw new Exception($messageError);
+            }
         }
+
+        return $responseBody;
     }
 }

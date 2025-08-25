@@ -217,14 +217,14 @@ class CVendor {
     /**
      * @param array $options
      *
-     * @return \CVendor_Firebase
+     * @return \Kreait\Firebase\Factory
      */
     public static function firebase($options = null) {
         if (!is_array($options)) {
             $options = CF::config('vendor.firebase');
         }
 
-        return new CVendor_Firebase($options);
+        return CVendor_Firebase::create($options);
     }
 
     /**

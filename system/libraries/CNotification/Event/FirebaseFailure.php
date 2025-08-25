@@ -1,12 +1,13 @@
 <?php
+use Kreait\Firebase\Messaging\SendReport;
 
 class CNotification_Event_FirebaseFailure {
     /**
-     * @var CVendor_Firebase_Messaging_SendReport
+     * @var SendReport
      */
     public $report;
 
-    public function __construct(CVendor_Firebase_Messaging_SendReport $report) {
+    public function __construct(SendReport $report) {
         $this->report = $report;
     }
 }

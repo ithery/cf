@@ -4,7 +4,6 @@ class CApp_Notification_ServiceWorkerService {
     public function generate($config) {
         $driver = carr::get($config, 'driver');
         $options = carr::get($config, 'options');
-
         $output = '';
 
         if ($driver == 'firebase') {
