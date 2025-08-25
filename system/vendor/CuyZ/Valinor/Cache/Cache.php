@@ -9,10 +9,10 @@ namespace CuyZ\Valinor\Cache;
  *
  * @template T = mixed
  */
-interface Cache
-{
+interface Cache {
     /**
      * @param non-empty-string $key
+     *
      * @return null|T
      */
     public function get(string $key, ...$arguments);

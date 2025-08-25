@@ -4,34 +4,47 @@ declare(strict_types=1);
 
 namespace CuyZ\Valinor\Cache\Warmup;
 
-use CuyZ\Valinor\Cache\Exception\InvalidSignatureToWarmup;
-use CuyZ\Valinor\Definition\Repository\ClassDefinitionRepository;
-use CuyZ\Valinor\Mapper\Object\Factory\ObjectBuilderFactory;
-use CuyZ\Valinor\Mapper\Tree\Builder\ObjectImplementations;
+use function in_array;
+use CuyZ\Valinor\Type\Type;
 use CuyZ\Valinor\Type\ClassType;
 use CuyZ\Valinor\Type\CompositeType;
-use CuyZ\Valinor\Type\Parser\Exception\InvalidType;
 use CuyZ\Valinor\Type\Parser\TypeParser;
-use CuyZ\Valinor\Type\Type;
 use CuyZ\Valinor\Type\Types\InterfaceType;
+use CuyZ\Valinor\Type\Parser\Exception\InvalidType;
+use CuyZ\Valinor\Cache\Exception\InvalidSignatureToWarmup;
+use CuyZ\Valinor\Mapper\Tree\Builder\ObjectImplementations;
+use CuyZ\Valinor\Mapper\Object\Factory\ObjectBuilderFactory;
 
-use function in_array;
+use CuyZ\Valinor\Definition\Repository\ClassDefinitionRepository;
 
 /** @internal */
-final class RecursiveCacheWarmupService
-{
-    /** @var list<class-string> */
+final class RecursiveCacheWarmupService {
+    /**
+     * @var list<class-string>
+     */
     private array $classesWarmedUp = [];
 
-    public function __construct(
-        private TypeParser $parser,
-        private ObjectImplementations $implementations,
-        private ClassDefinitionRepository $classDefinitionRepository,
-        private ObjectBuilderFactory $objectBuilderFactory
-    ) {}
+    private TypeParser $parser;
 
-    public function warmup(string ...$signatures): void
-    {
+    private ObjectImplementations $implementations;
+
+    private ClassDefinitionRepository $classDefinitionRepository;
+
+    private ObjectBuilderFactory $objectBuilderFactory;
+
+    public function __construct(
+        TypeParser $parser,
+        ObjectImplementations $implementations,
+        ClassDefinitionRepository $classDefinitionRepository,
+        ObjectBuilderFactory $objectBuilderFactory
+    ) {
+        $this->parser = $parser;
+        $this->implementations = $implementations;
+        $this->classDefinitionRepository = $classDefinitionRepository;
+        $this->objectBuilderFactory = $objectBuilderFactory;
+    }
+
+    public function warmup(string ...$signatures): void {
         foreach ($signatures as $signature) {
             try {
                 $this->warmupType($this->parser->parse($signature));
@@ -41,8 +54,7 @@ final class RecursiveCacheWarmupService
         }
     }
 
-    private function warmupType(Type $type): void
-    {
+    private function warmupType(Type $type): void {
         if ($type instanceof InterfaceType) {
             $this->warmupInterfaceType($type);
         }
@@ -58,11 +70,10 @@ final class RecursiveCacheWarmupService
         }
     }
 
-    private function warmupInterfaceType(InterfaceType $type): void
-    {
+    private function warmupInterfaceType(InterfaceType $type): void {
         $interfaceName = $type->className();
 
-        if (! $this->implementations->has($interfaceName)) {
+        if (!$this->implementations->has($interfaceName)) {
             return;
         }
 
@@ -75,8 +86,7 @@ final class RecursiveCacheWarmupService
         }
     }
 
-    private function warmupClassType(ClassType $type): void
-    {
+    private function warmupClassType(ClassType $type): void {
         if (in_array($type->className(), $this->classesWarmedUp, true)) {
             return;
         }

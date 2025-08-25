@@ -4,21 +4,21 @@ declare(strict_types=1);
 
 namespace CuyZ\Valinor\Mapper\Object\Factory;
 
-use CuyZ\Valinor\Definition\ClassDefinition;
-use CuyZ\Valinor\Mapper\Object\Exception\ObjectBuildersCollision;
-use CuyZ\Valinor\Mapper\Object\ObjectBuilder;
-use CuyZ\Valinor\Type\ScalarType;
-use CuyZ\Valinor\Type\Type;
-use CuyZ\Valinor\Utility\TypeHelper;
-
-use function array_merge;
 use function count;
 use function usort;
+use function array_merge;
+use CuyZ\Valinor\Type\Type;
+use CuyZ\Valinor\Type\ScalarType;
+use CuyZ\Valinor\Utility\TypeHelper;
+
+use CuyZ\Valinor\Definition\ClassDefinition;
+use CuyZ\Valinor\Mapper\Object\ObjectBuilder;
+use CuyZ\Valinor\Mapper\Object\Exception\ObjectBuildersCollision;
 
 /** @internal */
-final class SortingObjectBuilderFactory implements ObjectBuilderFactory
-{
+final class SortingObjectBuilderFactory implements ObjectBuilderFactory {
     private ObjectBuilderFactory $delegate;
+
     public function __construct(ObjectBuilderFactory $delegate) {
         $this->delegate = $delegate;
     }
@@ -38,8 +38,7 @@ final class SortingObjectBuilderFactory implements ObjectBuilderFactory
      * 4. String type
      * 5. Boolean type
      */
-    public function for(ClassDefinition $class): array
-    {
+    public function for(ClassDefinition $class): array {
         $builders = $this->delegate->for($class);
 
         $sortedByArgumentsNumber = [];
@@ -58,15 +57,15 @@ final class SortingObjectBuilderFactory implements ObjectBuilderFactory
         // }
 
         foreach ($sortedByArgumentsNumber as $sortedBuilders) {
-            usort($sortedBuilders, array($this, 'sortObjectBuilders'));
+            usort($sortedBuilders, [$this, 'sortObjectBuilders']);
 
             $sortedByPriority = array_merge($sortedByPriority, $sortedBuilders);
         }
+
         return $sortedByPriority;
     }
 
-    private function sortObjectBuilders(ObjectBuilder $builderA, ObjectBuilder $builderB): int
-    {
+    private function sortObjectBuilders(ObjectBuilder $builderA, ObjectBuilder $builderB): int {
         $argumentsA = $builderA->describeArguments()->toArray();
         $argumentsB = $builderB->describeArguments()->toArray();
 
@@ -101,13 +100,12 @@ final class SortingObjectBuilderFactory implements ObjectBuilderFactory
         return $winner === $builderA ? -1 : 1;
     }
 
-    private function sortTypes(Type $typeA, Type $typeB): int
-    {
+    private function sortTypes(Type $typeA, Type $typeB): int {
         if ($typeA instanceof ScalarType && $typeB instanceof ScalarType) {
             return TypeHelper::scalarTypePriority($typeB) <=> TypeHelper::scalarTypePriority($typeA);
         }
 
-        if (! $typeA instanceof ScalarType) {
+        if (!$typeA instanceof ScalarType) {
             // @infection-ignore-all / Decrementing sorting value makes no sense, so we ignore it.
             return -1;
         }

@@ -12,10 +12,11 @@ use CuyZ\Valinor\Normalizer\Transformer\Transformer;
  *
  * @implements Normalizer<resource>
  */
-final class StreamNormalizer implements Normalizer
-{
+final class StreamNormalizer implements Normalizer {
     private Transformer $transformer;
+
     private JsonFormatter $formatter;
+
     /**
      * @internal
      */
@@ -29,9 +30,10 @@ final class StreamNormalizer implements Normalizer
 
     /**
      * @pure
+     *
+     * @param mixed $value
      */
-    public function normalize($value)
-    {
+    public function normalize($value) {
         $result = $this->transformer->transform($value);
 
         return $this->formatter->format($result);

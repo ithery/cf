@@ -7,10 +7,8 @@ namespace CuyZ\Valinor\Normalizer\Formatter\Exception;
 use RuntimeException;
 
 /** @internal */
-final class CannotFormatInvalidTypeToJson extends RuntimeException
-{
-    public function __construct(mixed $value)
-    {
+final class CannotFormatInvalidTypeToJson extends RuntimeException {
+    public function __construct(mixed $value) {
         $type = get_debug_type($value);
 
         parent::__construct(

@@ -4,24 +4,23 @@ declare(strict_types=1);
 
 namespace CuyZ\Valinor\Mapper\Object\Factory;
 
-use CuyZ\Valinor\Definition\ClassDefinition;
-use CuyZ\Valinor\Mapper\Object\Argument;
-use CuyZ\Valinor\Mapper\Object\Exception\PermissiveTypeNotAllowed;
-use CuyZ\Valinor\Type\CompositeType;
 use CuyZ\Valinor\Type\Type;
+use CuyZ\Valinor\Type\CompositeType;
 use CuyZ\Valinor\Type\Types\MixedType;
+use CuyZ\Valinor\Mapper\Object\Argument;
+use CuyZ\Valinor\Definition\ClassDefinition;
 use CuyZ\Valinor\Type\Types\UndefinedObjectType;
+use CuyZ\Valinor\Mapper\Object\Exception\PermissiveTypeNotAllowed;
 
 /** @internal */
-final class StrictTypesObjectBuilderFactory implements ObjectBuilderFactory
-{
+final class StrictTypesObjectBuilderFactory implements ObjectBuilderFactory {
     private ObjectBuilderFactory $delegate;
+
     public function __construct(ObjectBuilderFactory $delegate) {
         $this->delegate = $delegate;
     }
 
-    public function for(ClassDefinition $class): array
-    {
+    public function for(ClassDefinition $class): array {
         $builders = $this->delegate->for($class);
 
         foreach ($builders as $builder) {
@@ -35,8 +34,7 @@ final class StrictTypesObjectBuilderFactory implements ObjectBuilderFactory
         return $builders;
     }
 
-    private function checkPresenceOfPermissiveType(Argument $argument, Type $type): void
-    {
+    private function checkPresenceOfPermissiveType(Argument $argument, Type $type): void {
         if ($type instanceof CompositeType) {
             foreach ($type->traverse() as $subType) {
                 self::checkPresenceOfPermissiveType($argument, $subType);

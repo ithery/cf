@@ -10,12 +10,14 @@ namespace CuyZ\Valinor\Cache;
  * @template EntryType
  * @implements Cache<EntryType>
  */
-final class RuntimeCache implements Cache
-{
-    /** @var array<string, EntryType|null> */
+final class RuntimeCache implements Cache {
+    /**
+     * @var array<string, null|EntryType>
+     */
     private array $entries = [];
 
     private Cache $delegate;
+
     public function __construct(
         /** @var Cache<EntryType> */
         Cache $delegate
@@ -23,18 +25,15 @@ final class RuntimeCache implements Cache
         $this->delegate = $delegate;
     }
 
-    public function get(string $key, ...$arguments)
-    {
+    public function get(string $key, ...$arguments) {
         return $this->entries[$key] ??= $this->delegate->get($key, ...$arguments);
     }
 
-    public function set(string $key, CacheEntry $entry): void
-    {
+    public function set(string $key, CacheEntry $entry): void {
         $this->delegate->set($key, $entry);
     }
 
-    public function clear(): void
-    {
+    public function clear(): void {
         $this->entries = [];
 
         $this->delegate->clear();

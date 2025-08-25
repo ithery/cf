@@ -4,24 +4,27 @@ declare(strict_types=1);
 
 namespace CuyZ\Valinor\Normalizer\Transformer;
 
-use CuyZ\Valinor\Definition\AttributeDefinition;
-use CuyZ\Valinor\Definition\FunctionDefinition;
+use CuyZ\Valinor\Type\StringType;
+use CuyZ\Valinor\Type\Types\CallableType;
 use CuyZ\Valinor\Definition\MethodDefinition;
+use CuyZ\Valinor\Definition\FunctionDefinition;
+use CuyZ\Valinor\Definition\AttributeDefinition;
+use CuyZ\Valinor\Normalizer\Exception\TransformerHasNoParameter;
 use CuyZ\Valinor\Definition\Repository\FunctionDefinitionRepository;
+use CuyZ\Valinor\Normalizer\Exception\TransformerHasTooManyParameters;
 use CuyZ\Valinor\Normalizer\Exception\KeyTransformerHasTooManyParameters;
 use CuyZ\Valinor\Normalizer\Exception\KeyTransformerParameterInvalidType;
 use CuyZ\Valinor\Normalizer\Exception\TransformerHasInvalidCallableParameter;
-use CuyZ\Valinor\Normalizer\Exception\TransformerHasNoParameter;
-use CuyZ\Valinor\Normalizer\Exception\TransformerHasTooManyParameters;
-use CuyZ\Valinor\Type\StringType;
-use CuyZ\Valinor\Type\Types\CallableType;
 
 /** @internal */
-final class TransformerContainer
-{
+final class TransformerContainer {
     private bool $transformersCallablesWereChecked = false;
+
     private FunctionDefinitionRepository $functionDefinitionRepository;
-    /** @var list<callable> */
+
+    /**
+     * @var list<callable>
+     */
     private array $transformers;
 
     public function __construct(
@@ -33,17 +36,15 @@ final class TransformerContainer
         $this->transformers = $transformers;
     }
 
-    public function hasTransformers(): bool
-    {
+    public function hasTransformers(): bool {
         return $this->transformers !== [];
     }
 
     /**
      * @return list<callable>
      */
-    public function transformers(): array
-    {
-        if (! $this->transformersCallablesWereChecked) {
+    public function transformers(): array {
+        if (!$this->transformersCallablesWereChecked) {
             $this->transformersCallablesWereChecked = true;
 
             foreach ($this->transformers as $transformer) {
@@ -56,24 +57,22 @@ final class TransformerContainer
         return $this->transformers;
     }
 
-    public static function filterTransformerAttributes(AttributeDefinition $attribute): bool
-    {
+    public static function filterTransformerAttributes(AttributeDefinition $attribute): bool {
         return $attribute->class->methods->has('normalize')
             && self::checkTransformer($attribute->class->methods->get('normalize'));
     }
 
-    public static function filterKeyTransformerAttributes(AttributeDefinition $attribute): bool
-    {
+    public static function filterKeyTransformerAttributes(AttributeDefinition $attribute): bool {
         return $attribute->class->methods->has('normalizeKey')
             && self::checkKeyTransformer($attribute->class->methods->get('normalizeKey'));
     }
 
     /**
      * @param MethodDefinition|FunctionDefinition $method
-     * @return boolean
+     *
+     * @return bool
      */
-    private static function checkTransformer($method): bool
-    {
+    private static function checkTransformer($method): bool {
         $parameters = $method->parameters;
 
         if ($parameters->count() === 0) {
@@ -84,15 +83,14 @@ final class TransformerContainer
             throw new TransformerHasTooManyParameters($method);
         }
 
-        if ($parameters->count() > 1 && ! $parameters->at(1)->nativeType instanceof CallableType) {
+        if ($parameters->count() > 1 && !$parameters->at(1)->nativeType instanceof CallableType) {
             throw new TransformerHasInvalidCallableParameter($method, $parameters->at(1)->nativeType);
         }
 
         return true;
     }
 
-    private static function checkKeyTransformer(MethodDefinition $method): bool
-    {
+    private static function checkKeyTransformer(MethodDefinition $method): bool {
         $parameters = $method->parameters;
 
         if ($parameters->count() > 1) {
@@ -102,7 +100,7 @@ final class TransformerContainer
         if ($parameters->count() > 0) {
             $type = $parameters->at(0)->type;
 
-            if (! $type instanceof StringType) {
+            if (!$type instanceof StringType) {
                 throw new KeyTransformerParameterInvalidType($method);
             }
         }

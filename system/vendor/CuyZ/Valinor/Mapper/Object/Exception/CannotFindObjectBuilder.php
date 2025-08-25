@@ -4,31 +4,31 @@ declare(strict_types=1);
 
 namespace CuyZ\Valinor\Mapper\Object\Exception;
 
-use CuyZ\Valinor\Mapper\Object\ObjectBuilder;
-use CuyZ\Valinor\Mapper\Tree\Message\ErrorMessage;
-use CuyZ\Valinor\Mapper\Tree\Message\HasCode;
-use CuyZ\Valinor\Mapper\Tree\Message\HasParameters;
-use CuyZ\Valinor\Utility\TypeHelper;
-
-use function array_keys;
 use function count;
 use function ksort;
+use function array_keys;
+use CuyZ\Valinor\Utility\TypeHelper;
+use CuyZ\Valinor\Mapper\Object\ObjectBuilder;
+
+use CuyZ\Valinor\Mapper\Tree\Message\HasCode;
+use CuyZ\Valinor\Mapper\Tree\Message\ErrorMessage;
+use CuyZ\Valinor\Mapper\Tree\Message\HasParameters;
 
 /** @internal */
-final class CannotFindObjectBuilder implements ErrorMessage, HasCode, HasParameters
-{
+final class CannotFindObjectBuilder implements ErrorMessage, HasCode, HasParameters {
     private string $body = 'Value {source_value} does not match any of {allowed_types}.';
 
     private string $code = 'cannot_find_object_builder';
 
-    /** @var array<string, string> */
+    /**
+     * @var array<string, string>
+     */
     private array $parameters;
 
     /**
      * @param non-empty-list<ObjectBuilder> $builders
      */
-    public function __construct(array $builders)
-    {
+    public function __construct(array $builders) {
         $this->parameters = [
             'allowed_types' => (function () use ($builders) {
                 $signatures = [];
@@ -55,18 +55,15 @@ final class CannotFindObjectBuilder implements ErrorMessage, HasCode, HasParamet
         ];
     }
 
-    public function body(): string
-    {
+    public function body(): string {
         return $this->body;
     }
 
-    public function code(): string
-    {
+    public function code(): string {
         return $this->code;
     }
 
-    public function parameters(): array
-    {
+    public function parameters(): array {
         return $this->parameters;
     }
 }

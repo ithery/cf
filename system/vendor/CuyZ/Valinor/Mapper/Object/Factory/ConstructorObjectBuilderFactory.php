@@ -4,38 +4,39 @@ declare(strict_types=1);
 
 namespace CuyZ\Valinor\Mapper\Object\Factory;
 
-use CuyZ\Valinor\Definition\ClassDefinition;
-use CuyZ\Valinor\Definition\FunctionObject;
-use CuyZ\Valinor\Definition\FunctionsContainer;
-use CuyZ\Valinor\Mapper\Object\Constructor;
-use CuyZ\Valinor\Mapper\Object\DynamicConstructor;
-use CuyZ\Valinor\Mapper\Object\Exception\CannotInstantiateObject;
-use CuyZ\Valinor\Mapper\Object\Exception\InvalidConstructorClassTypeParameter;
-use CuyZ\Valinor\Mapper\Object\Exception\InvalidConstructorMethodWithAttributeReturnType;
-use CuyZ\Valinor\Mapper\Object\Exception\InvalidConstructorReturnType;
-use CuyZ\Valinor\Mapper\Object\Exception\MissingConstructorClassTypeParameter;
-use CuyZ\Valinor\Mapper\Object\FunctionObjectBuilder;
-use CuyZ\Valinor\Mapper\Object\MethodObjectBuilder;
-use CuyZ\Valinor\Mapper\Object\NativeConstructorObjectBuilder;
-use CuyZ\Valinor\Mapper\Object\NativeEnumObjectBuilder;
-use CuyZ\Valinor\Mapper\Object\ObjectBuilder;
+use function is_a;
+use function count;
+use function array_values;
+use function array_key_exists;
 use CuyZ\Valinor\Type\ClassType;
 use CuyZ\Valinor\Type\ObjectType;
-use CuyZ\Valinor\Type\Types\ClassStringType;
 use CuyZ\Valinor\Type\Types\EnumType;
+use CuyZ\Valinor\Definition\FunctionObject;
+use CuyZ\Valinor\Mapper\Object\Constructor;
+use CuyZ\Valinor\Definition\ClassDefinition;
+use CuyZ\Valinor\Type\Types\ClassStringType;
+use CuyZ\Valinor\Mapper\Object\ObjectBuilder;
 use CuyZ\Valinor\Type\Types\NativeStringType;
+use CuyZ\Valinor\Definition\FunctionsContainer;
 use CuyZ\Valinor\Utility\Reflection\Reflection;
+use CuyZ\Valinor\Mapper\Object\DynamicConstructor;
+use CuyZ\Valinor\Mapper\Object\MethodObjectBuilder;
 use PhpOffice\PhpSpreadsheet\Calculation\Functions;
+use CuyZ\Valinor\Mapper\Object\FunctionObjectBuilder;
+use CuyZ\Valinor\Mapper\Object\NativeEnumObjectBuilder;
+use CuyZ\Valinor\Mapper\Object\NativeConstructorObjectBuilder;
+use CuyZ\Valinor\Mapper\Object\Exception\CannotInstantiateObject;
 
-use function array_key_exists;
-use function array_values;
-use function count;
-use function is_a;
+use CuyZ\Valinor\Mapper\Object\Exception\InvalidConstructorReturnType;
+use CuyZ\Valinor\Mapper\Object\Exception\InvalidConstructorClassTypeParameter;
+use CuyZ\Valinor\Mapper\Object\Exception\MissingConstructorClassTypeParameter;
+use CuyZ\Valinor\Mapper\Object\Exception\InvalidConstructorMethodWithAttributeReturnType;
 
 /** @internal */
-final class ConstructorObjectBuilderFactory implements ObjectBuilderFactory
-{
-    /** @var list<FunctionObject> */
+final class ConstructorObjectBuilderFactory implements ObjectBuilderFactory {
+    /**
+     * @var list<FunctionObject>
+     */
     private array $filteredConstructors;
 
     private ObjectBuilderFactory $delegate;
@@ -43,6 +44,7 @@ final class ConstructorObjectBuilderFactory implements ObjectBuilderFactory
     private array $nativeConstructors;
 
     private FunctionsContainer $constructors;
+
     public function __construct(
         ObjectBuilderFactory $delegate,
         /** @var array<class-string, null> */
@@ -55,8 +57,7 @@ final class ConstructorObjectBuilderFactory implements ObjectBuilderFactory
         $this->filteredConstructors = array_values($this->constructors->toArray());
     }
 
-    public function for(ClassDefinition $class): array
-    {
+    public function for(ClassDefinition $class): array {
         $builders = $this->builders($class);
 
         if (count($builders) === 0) {
@@ -73,8 +74,7 @@ final class ConstructorObjectBuilderFactory implements ObjectBuilderFactory
     /**
      * @return list<ObjectBuilder>
      */
-    private function builders(ClassDefinition $class): array
-    {
+    private function builders(ClassDefinition $class): array {
         $className = $class->name;
         $classType = $class->type;
         $methods = $class->methods;
@@ -82,14 +82,14 @@ final class ConstructorObjectBuilderFactory implements ObjectBuilderFactory
         $builders = [];
 
         foreach ($this->filteredConstructors() as $constructor) {
-            if (! $this->constructorMatches($constructor, $classType)) {
+            if (!$this->constructorMatches($constructor, $classType)) {
                 continue;
             }
 
             $definition = $constructor->definition;
             $functionClass = $definition->class;
 
-            if ($functionClass && $definition->isStatic && ! $definition->isClosure) {
+            if ($functionClass && $definition->isStatic && !$definition->isClosure) {
                 $scopedClass = is_a($className, $functionClass, true) ? $className : $functionClass;
 
                 $builders[$definition->signature] = new MethodObjectBuilder($scopedClass, $definition->name, $definition->parameters);
@@ -99,23 +99,23 @@ final class ConstructorObjectBuilderFactory implements ObjectBuilderFactory
         }
 
         foreach ($methods as $method) {
-            if (! $method->isStatic) {
+            if (!$method->isStatic) {
                 continue;
             }
 
-            if (! $method->attributes->has(Constructor::class)) {
+            if (!$method->attributes->has(Constructor::class)) {
                 continue;
             }
 
-            if (! $method->returnType instanceof ClassType) {
+            if (!$method->returnType instanceof ClassType) {
                 throw new InvalidConstructorMethodWithAttributeReturnType($className, $method);
             }
 
-            if (! is_a($className, $method->returnType->className(), true)) {
+            if (!is_a($className, $method->returnType->className(), true)) {
                 throw new InvalidConstructorMethodWithAttributeReturnType($className, $method);
             }
 
-            if (! $class->type->matches($method->returnType)) {
+            if (!$class->type->matches($method->returnType)) {
                 continue;
             }
 
@@ -142,15 +142,14 @@ final class ConstructorObjectBuilderFactory implements ObjectBuilderFactory
         return array_values($builders);
     }
 
-    private function constructorMatches(FunctionObject $function, ObjectType $classType): bool
-    {
+    private function constructorMatches(FunctionObject $function, ObjectType $classType): bool {
         $definition = $function->definition;
 
-        if (! $classType->matches($definition->returnType)) {
+        if (!$classType->matches($definition->returnType)) {
             return false;
         }
 
-        if (! $definition->attributes->has(DynamicConstructor::class)) {
+        if (!$definition->attributes->has(DynamicConstructor::class)) {
             return true;
         }
 
@@ -164,7 +163,7 @@ final class ConstructorObjectBuilderFactory implements ObjectBuilderFactory
             $parameterType = ClassStringType::get();
         }
 
-        if (! $parameterType instanceof ClassStringType) {
+        if (!$parameterType instanceof ClassStringType) {
             throw new InvalidConstructorClassTypeParameter($definition, $parameterType);
         }
 
@@ -180,9 +179,8 @@ final class ConstructorObjectBuilderFactory implements ObjectBuilderFactory
     /**
      * @return list<FunctionObject>
      */
-    private function filteredConstructors(): array
-    {
-        if (! isset($this->filteredConstructors)) {
+    private function filteredConstructors(): array {
+        if (!isset($this->filteredConstructors)) {
             $this->filteredConstructors = [];
 
             foreach ($this->constructors as $constructor) {
@@ -195,7 +193,7 @@ final class ConstructorObjectBuilderFactory implements ObjectBuilderFactory
                     continue;
                 }
 
-                if (! $function->returnType instanceof ObjectType) {
+                if (!$function->returnType instanceof ObjectType) {
                     throw new InvalidConstructorReturnType($function);
                 }
 

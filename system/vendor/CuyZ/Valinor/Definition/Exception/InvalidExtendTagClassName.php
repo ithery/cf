@@ -4,18 +4,16 @@ declare(strict_types=1);
 
 namespace CuyZ\Valinor\Definition\Exception;
 
-use CuyZ\Valinor\Type\Type;
 use ReflectionClass;
 use RuntimeException;
+use CuyZ\Valinor\Type\Type;
 
 /** @internal */
-final class InvalidExtendTagClassName extends RuntimeException
-{
+final class InvalidExtendTagClassName extends RuntimeException {
     /**
      * @param ReflectionClass<object> $reflection
      */
-    public function __construct(ReflectionClass $reflection, Type $invalidExtendTag)
-    {
+    public function __construct(ReflectionClass $reflection, Type $invalidExtendTag) {
         /** @var ReflectionClass<object> $parentClass */
         $parentClass = $reflection->getParentClass();
 

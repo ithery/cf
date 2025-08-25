@@ -7,8 +7,7 @@ namespace CuyZ\Valinor\Definition;
 use CuyZ\Valinor\Type\Type;
 
 /** @internal */
-final class ParameterDefinition
-{
+final class ParameterDefinition {
     public string $name;
 
     public string $signature;
@@ -27,6 +26,7 @@ final class ParameterDefinition
     public $defaultValue;
 
     public Attributes $attributes;
+
     public function __construct(
         /** @var non-empty-string */
         string $name,

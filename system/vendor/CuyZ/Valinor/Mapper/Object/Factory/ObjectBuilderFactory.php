@@ -8,8 +8,7 @@ use CuyZ\Valinor\Definition\ClassDefinition;
 use CuyZ\Valinor\Mapper\Object\ObjectBuilder;
 
 /** @internal */
-interface ObjectBuilderFactory
-{
+interface ObjectBuilderFactory {
     /**
      * @return non-empty-list<ObjectBuilder>
      */

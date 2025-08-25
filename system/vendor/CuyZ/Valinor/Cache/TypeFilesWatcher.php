@@ -5,25 +5,31 @@ declare(strict_types=1);
 namespace CuyZ\Valinor\Cache;
 
 use Closure;
-use CuyZ\Valinor\Definition\Repository\ClassDefinitionRepository;
-use CuyZ\Valinor\Library\Settings;
-use CuyZ\Valinor\Type\CompositeType;
-use CuyZ\Valinor\Type\ObjectType;
-use CuyZ\Valinor\Type\Type;
-use CuyZ\Valinor\Utility\Reflection\Reflection;
 use ReflectionFunction;
-
 use function array_filter;
 use function array_unique;
 use function array_values;
+use CuyZ\Valinor\Type\Type;
+use CuyZ\Valinor\Type\ObjectType;
+use CuyZ\Valinor\Library\Settings;
+
+use CuyZ\Valinor\Type\CompositeType;
+use CuyZ\Valinor\Utility\Reflection\Reflection;
+use CuyZ\Valinor\Definition\Repository\ClassDefinitionRepository;
 
 /** @internal */
-final class TypeFilesWatcher
-{
+final class TypeFilesWatcher {
+    private Settings $settings;
+
+    private ClassDefinitionRepository $classDefinitionRepository;
+
     public function __construct(
-        private Settings $settings,
-        private ClassDefinitionRepository $classDefinitionRepository,
-    ) {}
+        Settings $settings,
+        ClassDefinitionRepository $classDefinitionRepository
+    ) {
+        $this->settings = $settings;
+        $this->classDefinitionRepository = $classDefinitionRepository;
+    }
 
     /**
      * This method returns a list of files in which are declared all types that
@@ -60,8 +66,7 @@ final class TypeFilesWatcher
      *
      * @return list<non-empty-string>
      */
-    public function for(Type $type): array
-    {
+    public function for(Type $type): array {
         // Merging the files bound to settings and the files bound to the type
         $files = [
             ...array_map(
@@ -83,10 +88,10 @@ final class TypeFilesWatcher
 
     /**
      * @param array<non-empty-string> $files
+     *
      * @return array<non-empty-string>
      */
-    private function filesToWatch(Type $type, array $files = []): array
-    {
+    private function filesToWatch(Type $type, array $files = []): array {
         if (isset($files[$type->toString()])) {
             // Prevents infinite loop in case of circular references
             return [];
@@ -101,7 +106,7 @@ final class TypeFilesWatcher
         if ($type instanceof ObjectType) {
             $fileName = Reflection::class($type->className())->getFileName();
 
-            if (! $fileName) {
+            if (!$fileName) {
                 return [];
             }
 
@@ -116,5 +121,4 @@ final class TypeFilesWatcher
 
         return $files;
     }
-
 }

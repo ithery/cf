@@ -4,30 +4,31 @@ declare(strict_types=1);
 
 namespace CuyZ\Valinor\Normalizer\Formatter;
 
-use CuyZ\Valinor\Normalizer\Formatter\Exception\CannotFormatInvalidTypeToJson;
-use CuyZ\Valinor\Normalizer\Transformer\EmptyObject;
 use Generator;
-
-use function array_is_list;
 use function assert;
 use function fwrite;
+
 use function is_bool;
-use function is_iterable;
 use function is_null;
 use function is_scalar;
+use function is_iterable;
 use function json_encode;
-
+use function array_is_list;
 use const JSON_FORCE_OBJECT;
+use CuyZ\Valinor\Normalizer\Transformer\EmptyObject;
+
+use CuyZ\Valinor\Normalizer\Formatter\Exception\CannotFormatInvalidTypeToJson;
 
 /** @internal */
-final class JsonFormatter
-{
+final class JsonFormatter {
     private bool $prettyPrint;
 
     private bool $forceObject;
 
     private $resource;
+
     private int $jsonEncodingOptions;
+
     public function __construct(
         /** @var resource */
         $resource,
@@ -35,15 +36,16 @@ final class JsonFormatter
     ) {
         $this->resource = $resource;
         $this->jsonEncodingOptions = $jsonEncodingOptions;
-        $this->prettyPrint = (bool)($this->jsonEncodingOptions & JSON_PRETTY_PRINT);
-        $this->forceObject = (bool)($this->jsonEncodingOptions & JSON_FORCE_OBJECT);
+        $this->prettyPrint = (bool) ($this->jsonEncodingOptions & JSON_PRETTY_PRINT);
+        $this->forceObject = (bool) ($this->jsonEncodingOptions & JSON_FORCE_OBJECT);
     }
 
     /**
+     * @param mixed $value
+     *
      * @return resource
      */
-    public function format($value)
-    {
+    public function format($value) {
         $this->formatRecursively($value, 1);
 
         return $this->resource;
@@ -51,11 +53,11 @@ final class JsonFormatter
 
     /**
      * @param mixed $value
-     * @param integer $depth
+     * @param int   $depth
+     *
      * @return void
      */
-    private function formatRecursively($value, int $depth): void
-    {
+    private function formatRecursively($value, int $depth): void {
         if (is_null($value)) {
             $this->write('null');
         } elseif (is_bool($value)) {
@@ -81,8 +83,9 @@ final class JsonFormatter
             if ($this->forceObject) {
                 $isList = false;
             } elseif ($value instanceof Generator) {
-                if (! $value->valid()) {
+                if (!$value->valid()) {
                     $this->write('[]');
+
                     return;
                 }
 
@@ -99,7 +102,7 @@ final class JsonFormatter
             foreach ($value as $key => $val) {
                 $chunk = '';
 
-                if (! $isFirst) {
+                if (!$isFirst) {
                     $chunk = ',';
                 }
 
@@ -109,10 +112,10 @@ final class JsonFormatter
 
                 $isFirst = false;
 
-                if (! $isList) {
+                if (!$isList) {
                     assert(is_scalar($key));
 
-                    $key = json_encode((string)$key, $this->jsonEncodingOptions);
+                    $key = json_encode((string) $key, $this->jsonEncodingOptions);
 
                     $chunk .= $key . ':';
 
@@ -140,8 +143,7 @@ final class JsonFormatter
         }
     }
 
-    private function write(string $content): void
-    {
+    private function write(string $content): void {
         fwrite($this->resource, $content);
     }
 }

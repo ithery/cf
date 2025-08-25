@@ -4,35 +4,32 @@ declare(strict_types=1);
 
 namespace CuyZ\Valinor\Mapper\Object\Factory;
 
-use CuyZ\Valinor\Definition\ClassDefinition;
+use Exception;
+use DateTimeZone;
+use function count;
+use function array_filter;
+use CuyZ\Valinor\Type\ObjectType;
 use CuyZ\Valinor\Definition\FunctionObject;
-use CuyZ\Valinor\Definition\Repository\FunctionDefinitionRepository;
-use CuyZ\Valinor\Mapper\Object\FunctionObjectBuilder;
-use CuyZ\Valinor\Mapper\Object\NativeConstructorObjectBuilder;
+use CuyZ\Valinor\Definition\ClassDefinition;
 use CuyZ\Valinor\Mapper\Object\ObjectBuilder;
 use CuyZ\Valinor\Mapper\Tree\Message\MessageBuilder;
-use CuyZ\Valinor\Type\ObjectType;
-use DateTimeZone;
-use Exception;
+use CuyZ\Valinor\Mapper\Object\FunctionObjectBuilder;
 
-use function array_filter;
-use function count;
+use CuyZ\Valinor\Mapper\Object\NativeConstructorObjectBuilder;
+use CuyZ\Valinor\Definition\Repository\FunctionDefinitionRepository;
 
 /** @internal */
-final class DateTimeZoneObjectBuilderFactory implements ObjectBuilderFactory
-{
+final class DateTimeZoneObjectBuilderFactory implements ObjectBuilderFactory {
     private ObjectBuilderFactory $delegate;
 
     private FunctionDefinitionRepository $functionDefinitionRepository;
 
-    public function __construct(ObjectBuilderFactory $delegate, FunctionDefinitionRepository $functionDefinitionRepository)
-    {
+    public function __construct(ObjectBuilderFactory $delegate, FunctionDefinitionRepository $functionDefinitionRepository) {
         $this->delegate = $delegate;
         $this->functionDefinitionRepository = $functionDefinitionRepository;
     }
 
-    public function for(ClassDefinition $class): array
-    {
+    public function for(ClassDefinition $class): array {
         $builders = $this->delegate->for($class);
 
         if ($class->name !== DateTimeZone::class) {
@@ -40,7 +37,7 @@ final class DateTimeZoneObjectBuilderFactory implements ObjectBuilderFactory
         }
 
         // Remove `DateTimeZone` native constructors
-        $builders = array_filter($builders, fn (ObjectBuilder $builder) => ! $builder instanceof NativeConstructorObjectBuilder);
+        $builders = array_filter($builders, fn (ObjectBuilder $builder) => !$builder instanceof NativeConstructorObjectBuilder);
 
         $useDefaultBuilder = true;
 
@@ -61,8 +58,7 @@ final class DateTimeZoneObjectBuilderFactory implements ObjectBuilderFactory
         return $builders;
     }
 
-    private function defaultBuilder(ObjectType $type): FunctionObjectBuilder
-    {
+    private function defaultBuilder(ObjectType $type): FunctionObjectBuilder {
         $constructor = function (string $timezone) {
             try {
                 return new DateTimeZone($timezone);

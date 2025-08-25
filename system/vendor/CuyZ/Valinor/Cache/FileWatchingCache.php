@@ -4,9 +4,9 @@ declare(strict_types=1);
 
 namespace CuyZ\Valinor\Cache;
 
-use function file_exists;
 use function filemtime;
 use function var_export;
+use function file_exists;
 
 /**
  * This cache implementation will watch the files of the application and
@@ -25,19 +25,25 @@ use function var_export;
  * @template EntryType
  * @implements Cache<EntryType>
  */
-final class FileWatchingCache implements Cache
-{
-    /** @var array<string, array<string, int>> */
+final class FileWatchingCache implements Cache {
+    /**
+     * @var array<string, array<string, int>>
+     */
     private array $timestamps = [];
+
+    private Cache $delegate;
 
     public function __construct(
         /** @var Cache<EntryType> */
-        private Cache $delegate,
-    ) {}
+        Cache $delegate
+    ) {
+        $this->delegate = $delegate;
+    }
 
-    /** @internal */
-    public function get(string $key, ...$arguments)
-    {
+    /**
+     * @internal
+     */
+    public function get(string $key, ...$arguments) {
         $this->timestamps[$key] ??= $this->delegate->get("$key.timestamps"); // @phpstan-ignore assign.propertyType
 
         if ($this->timestamps[$key] === null) {
@@ -47,7 +53,7 @@ final class FileWatchingCache implements Cache
         assert(is_array($this->timestamps[$key]));
 
         foreach ($this->timestamps[$key] as $fileName => $timestamp) {
-            if (! file_exists($fileName)) {
+            if (!file_exists($fileName)) {
                 return null;
             }
 
@@ -59,9 +65,10 @@ final class FileWatchingCache implements Cache
         return $this->delegate->get($key, ...$arguments);
     }
 
-    /** @internal */
-    public function set(string $key, CacheEntry $entry): void
-    {
+    /**
+     * @internal
+     */
+    public function set(string $key, CacheEntry $entry): void {
         $this->delegate->set($key, $entry);
 
         $this->timestamps[$key] = [];
@@ -81,8 +88,7 @@ final class FileWatchingCache implements Cache
         $this->delegate->set("$key.timestamps", new CacheEntry($code));
     }
 
-    public function clear(): void
-    {
+    public function clear(): void {
         $this->timestamps = [];
 
         $this->delegate->clear();

@@ -9,13 +9,11 @@ use LogicException;
 use function implode;
 
 /** @internal */
-final class ClassTypeAliasesDuplication extends LogicException
-{
+final class ClassTypeAliasesDuplication extends LogicException {
     /**
      * @param class-string $className
      */
-    public function __construct(string $className, string ...$names)
-    {
+    public function __construct(string $className, string ...$names) {
         $names = implode('`, `', $names);
 
         parent::__construct(

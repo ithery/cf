@@ -4,34 +4,33 @@ declare(strict_types=1);
 
 namespace CuyZ\Valinor\Normalizer;
 
-use CuyZ\Valinor\Normalizer\Formatter\JsonFormatter;
-use CuyZ\Valinor\Normalizer\Transformer\Transformer;
 use RuntimeException;
-
-use function get_debug_type;
-use function is_resource;
-
-use const JSON_FORCE_OBJECT;
 use const JSON_HEX_AMP;
+use const JSON_HEX_TAG;
+
 use const JSON_HEX_APOS;
 use const JSON_HEX_QUOT;
-use const JSON_HEX_TAG;
-use const JSON_INVALID_UTF8_IGNORE;
-use const JSON_INVALID_UTF8_SUBSTITUTE;
+
+use function is_resource;
+use const JSON_FORCE_OBJECT;
+use function get_debug_type;
 use const JSON_NUMERIC_CHECK;
-use const JSON_PRESERVE_ZERO_FRACTION;
 use const JSON_THROW_ON_ERROR;
-use const JSON_UNESCAPED_LINE_TERMINATORS;
 use const JSON_UNESCAPED_SLASHES;
 use const JSON_UNESCAPED_UNICODE;
+use const JSON_INVALID_UTF8_IGNORE;
+use const JSON_PRESERVE_ZERO_FRACTION;
+use const JSON_INVALID_UTF8_SUBSTITUTE;
+use const JSON_UNESCAPED_LINE_TERMINATORS;
+use CuyZ\Valinor\Normalizer\Formatter\JsonFormatter;
+use CuyZ\Valinor\Normalizer\Transformer\Transformer;
 
 /**
  * @api
  *
  * @implements Normalizer<string>
  */
-final class JsonNormalizer implements Normalizer
-{
+final class JsonNormalizer implements Normalizer {
     private const ACCEPTABLE_JSON_OPTIONS = JSON_FORCE_OBJECT
         | JSON_HEX_QUOT
         | JSON_HEX_TAG
@@ -53,7 +52,7 @@ final class JsonNormalizer implements Normalizer
 
     /**
      * Internal note
-     * -------------
+     * -------------.
      *
      * We could use the `int-mask-of<JsonNormalizer::JSON_*>` annotation
      * to let PHPStan infer the type of the accepted options, but some caveats
@@ -68,7 +67,7 @@ final class JsonNormalizer implements Normalizer
      */
     public function __construct(
         Transformer $transformer,
-        int $jsonEncodingOptions = JSON_THROW_ON_ERROR,
+        int $jsonEncodingOptions = JSON_THROW_ON_ERROR
     ) {
         $this->transformer = $transformer;
         $this->jsonEncodingOptions = (self::ACCEPTABLE_JSON_OPTIONS & $jsonEncodingOptions) | JSON_THROW_ON_ERROR;
@@ -97,16 +96,16 @@ final class JsonNormalizer implements Normalizer
      * // {"longitude":40.7128,"latitude":-74.0000}
      * ```
      */
-    public function withOptions(int $options): self
-    {
+    public function withOptions(int $options): self {
         return new self($this->transformer, $options);
     }
 
     /**
      * @pure
+     *
+     * @param mixed $value
      */
-    public function normalize($value): string
-    {
+    public function normalize($value): string {
         $result = $this->transformer->transform($value);
 
         /** @var resource $resource */
@@ -152,10 +151,9 @@ final class JsonNormalizer implements Normalizer
      *
      * @param resource $resource
      */
-    public function streamTo($resource): StreamNormalizer
-    {
+    public function streamTo($resource): StreamNormalizer {
         // This check is there to help people that do not use static analyzers.
-        if (! is_resource($resource)) {
+        if (!is_resource($resource)) {
             throw new RuntimeException('Expected a valid resource, got ' . get_debug_type($resource));
         }
 

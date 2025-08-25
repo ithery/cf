@@ -7,10 +7,8 @@ namespace CuyZ\Valinor\Cache\Exception;
 use RuntimeException;
 
 /** @internal */
-final class CacheDirectoryNotWritable extends RuntimeException
-{
-    public function __construct(string $directory)
-    {
+final class CacheDirectoryNotWritable extends RuntimeException {
+    public function __construct(string $directory) {
         parent::__construct(
             "Provided directory `$directory` is not writable.",
             1616445016

@@ -9,8 +9,9 @@ namespace CuyZ\Valinor\Normalizer;
  *
  * @template T of Normalizer
  */
-final class Format
-{
+final class Format {
+    private string $type;
+
     /**
      * Allows a normalizer to format an input to a PHP array, containing only
      * scalar values.
@@ -47,8 +48,7 @@ final class Format
      *
      * @return self<ArrayNormalizer>
      */
-    public static function array(): self
-    {
+    public static function array(): self {
         return new self(ArrayNormalizer::class);
     }
 
@@ -78,11 +78,10 @@ final class Format
      *
      * @return self<JsonNormalizer>
      */
-    public static function json(): self
-    {
+    public static function json(): self {
         return new self(JsonNormalizer::class);
     }
-    private string $type;
+
     /**
      * @param class-string<T> $type
      */
@@ -93,8 +92,7 @@ final class Format
     /**
      * @return class-string<T>
      */
-    public function type(): string
-    {
+    public function type(): string {
         return $this->type;
     }
 }

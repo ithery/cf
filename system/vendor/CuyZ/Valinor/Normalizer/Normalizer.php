@@ -9,8 +9,7 @@ namespace CuyZ\Valinor\Normalizer;
  *
  * @template-covariant T
  */
-interface Normalizer
-{
+interface Normalizer {
     /**
      * A normalizer is a service that transforms a given input into scalar and
      * array values, while preserving the original structure.
@@ -20,6 +19,9 @@ interface Normalizer
      * recursively transforming the data into a format that can be serialized.
      *
      * @pure
+     *
+     * @param mixed $value
+     *
      * @return T
      */
     public function normalize($value);

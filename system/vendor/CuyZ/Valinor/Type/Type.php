@@ -7,8 +7,7 @@ namespace CuyZ\Valinor\Type;
 use CuyZ\Valinor\Compiler\Native\ComplianceNode;
 
 /** @internal */
-interface Type
-{
+interface Type {
     public function accepts($value): bool;
 
     public function compiledAccept(ComplianceNode $node): ComplianceNode;

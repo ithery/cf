@@ -7,17 +7,18 @@ namespace CuyZ\Valinor\Type;
 use CuyZ\Valinor\Mapper\Tree\Message\ErrorMessage;
 
 /** @internal */
-interface ScalarType extends Type
-{
+interface ScalarType extends Type {
     /**
      * @param mixed $value
-     * @return boolean
+     *
+     * @return bool
      */
     public function canCast($value): bool;
 
     /**
      * @param mixed $value
-     * @return boolean|string|integer|float
+     *
+     * @return bool|string|int|float
      */
     public function cast($value);
 

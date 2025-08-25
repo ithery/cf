@@ -4,15 +4,13 @@ declare(strict_types=1);
 
 namespace CuyZ\Valinor\Mapper\Object\Exception;
 
-use CuyZ\Valinor\Definition\FunctionDefinition;
-use CuyZ\Valinor\Type\Types\UnresolvableType;
 use LogicException;
+use CuyZ\Valinor\Type\Types\UnresolvableType;
+use CuyZ\Valinor\Definition\FunctionDefinition;
 
 /** @internal */
-final class InvalidConstructorReturnType extends LogicException
-{
-    public function __construct(FunctionDefinition $function)
-    {
+final class InvalidConstructorReturnType extends LogicException {
+    public function __construct(FunctionDefinition $function) {
         if ($function->returnType instanceof UnresolvableType) {
             $message = $function->returnType->message();
         } else {

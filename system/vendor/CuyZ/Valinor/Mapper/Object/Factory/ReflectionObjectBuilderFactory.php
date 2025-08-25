@@ -8,10 +8,8 @@ use CuyZ\Valinor\Definition\ClassDefinition;
 use CuyZ\Valinor\Mapper\Object\ReflectionObjectBuilder;
 
 /** @internal */
-final class ReflectionObjectBuilderFactory implements ObjectBuilderFactory
-{
-    public function for(ClassDefinition $class): array
-    {
+final class ReflectionObjectBuilderFactory implements ObjectBuilderFactory {
+    public function for(ClassDefinition $class): array {
         return [new ReflectionObjectBuilder($class)];
     }
 }

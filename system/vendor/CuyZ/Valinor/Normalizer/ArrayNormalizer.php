@@ -12,9 +12,9 @@ use CuyZ\Valinor\Normalizer\Transformer\Transformer;
  *
  * @implements Normalizer<array<mixed>|scalar|null>
  */
-final class ArrayNormalizer implements Normalizer
-{
+final class ArrayNormalizer implements Normalizer {
     private Transformer $transformer;
+
     /**
      * @internal
      */
@@ -26,19 +26,19 @@ final class ArrayNormalizer implements Normalizer
 
     /**
      * @pure
+     *
+     * @param mixed $value
      */
-    public function normalize($value)
-    {
-        /** @var array<mixed>|scalar|null */
+    public function normalize($value) {
+        /** @var null|array<mixed>|scalar */
         return $this->format(
             $this->transformer->transform($value),
         );
     }
 
-    private function format($value)
-    {
+    private function format($value) {
         if (is_iterable($value)) {
-            if (! is_array($value)) {
+            if (!is_array($value)) {
                 $value = iterator_to_array($value);
             }
 
