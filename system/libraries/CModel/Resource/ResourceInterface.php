@@ -1,14 +1,30 @@
 <?php
 
-defined('SYSPATH') or die('No direct access allowed.');
+use Illuminate\Contracts\Support\Htmlable;
 
 /**
- * @author Hery Kurniawan
- * @license Ittron Global Teknologi <ittron.co.id>
+ * @property-read int                         $resource_id
+ * @property      null|int                    $org_id
+ * @property      null|string                 $model_type
+ * @property      null|int                    $model_id
+ * @property      null|string                 $collection_name
+ * @property      null|string                 $name
+ * @property      null|string                 $file_name
+ * @property      null|string                 $mime_type
+ * @property      null|string                 $disk
+ * @property      null|int                    $size
+ * @property      null|string                 $manipulations
+ * @property      null|string                 $custom_properties
+ * @property      null|string                 $responsive_images
+ * @property      null|int                    $order_column
+ * @property      null|int                    $is_active
+ * @property      null|CCarbon|\Carbon\Carbon $deleted
+ * @property      null|string                 $deletedby
  *
- * @since May 2, 2019, 12:53:18 AM
+ * @see CApp_Model_Interface_ResourceInterface
+ * @see CApp_Model_Resource
  */
-interface CModel_Resource_ResourceInterface extends CInterface_Responsable, CInterface_Htmlable {
+interface CModel_Resource_ResourceInterface extends CInterface_Responsable, Htmlable {
     const TYPE_OTHER = 'other';
 
     public function getExtensionAttribute();

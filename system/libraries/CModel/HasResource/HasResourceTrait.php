@@ -60,6 +60,17 @@ trait CModel_HasResource_HasResourceTrait {
     }
 
     /**
+     * Add a file from a request.
+     *
+     * @param string $key
+     *
+     * @return CModel_HasResource_FileAdder_FileAdder
+     */
+    public function addResourceFromRequest($key) {
+        return CModel_HasResource_FileAdder_FileAdderFactory::createFromRequest($this, $key);
+    }
+
+    /**
      * Add a file from the given disk.
      *
      * @param string $key
@@ -69,17 +80,6 @@ trait CModel_HasResource_HasResourceTrait {
      */
     public function addResourceFromDisk($key, $disk = null) {
         return CModel_HasResource_FileAdder_FileAdderFactory::createFromDisk($this, $key, $disk ?: CF::config('storage.default'));
-    }
-
-    /**
-     * Add a file from a request.
-     *
-     * @param string $key
-     *
-     * @return CModel_HasResource_FileAdder_FileAdder
-     */
-    public function addResourceFromRequest($key) {
-        return CModel_HasResource_FileAdder_FileAdderFactory::createFromRequest($this, $key);
     }
 
     /**
@@ -116,6 +116,10 @@ trait CModel_HasResource_HasResourceTrait {
         $args = func_get_args();
         $url = carr::get($args, 0);
         $allowedMimeTypes = array_slice($args, 2);
+
+        if (!cstr::startsWith($url, ['http://', 'https://'])) {
+            throw CResources_Exception_InvalidUrlException::doesNotStartWithProtocol($url);
+        }
         $downloader = CF::config('resource.resource_downloader', CResources_Downloader_DefaultDownloader::class);
         $downloader = new $downloader();
         /** @var CResources_Downloader_DefaultDownloader $downloader */
@@ -138,6 +142,27 @@ trait CModel_HasResource_HasResourceTrait {
         $file = CModel_HasResource_FileAdder_FileAdderFactory::create($this, $temporaryFile)
             ->usingName(pathinfo($filename, PATHINFO_FILENAME))
             ->usingFileName($filename);
+
+        return $file;
+    }
+
+    /**
+     * Add a remote file to the resourcelibrary.
+     *
+     * //@param string       $url
+     * //@param string|array ...$allowedMimeTypes
+     *
+     * @throws CResources_Exception_FileCannotBeAdded
+     *
+     * @return CModel_HasResource_FileAdder_FileAdder
+     */
+    public function addResourceFromString(string $text) {
+        $tmpFile = tempnam(sys_get_temp_dir(), 'resource-library');
+
+        file_put_contents($tmpFile, $text);
+
+        $file = CModel_HasResource_FileAdder_FileAdderFactory::create($this, $tmpFile)
+            ->usingFileName('text.txt');
 
         return $file;
     }
@@ -181,6 +206,24 @@ trait CModel_HasResource_HasResourceTrait {
     }
 
     /**
+     * Add a file to the media library from a stream.
+     *
+     * @param mixed $stream
+     *
+     * @return CModel_HasResource_FileAdder_FileAdder
+     */
+    public function addResourceFromStream($stream) {
+        $tmpFile = tempnam(sys_get_temp_dir(), 'resource-library');
+
+        file_put_contents($tmpFile, $stream);
+
+        $file = CModel_HasResource_FileAdder_FileAdderFactory::create($this, $tmpFile)
+            ->usingFileName('text.txt');
+
+        return $file;
+    }
+
+    /**
      * Copy a file to the resourcelibrary.
      *
      * @param string|\Symfony\Component\HttpFoundation\File\UploadedFile $file
@@ -206,12 +249,20 @@ trait CModel_HasResource_HasResourceTrait {
      * @param string         $collectionName
      * @param array|callable $filters
      *
-     * @return CCollection
+     * @return CModel_Resource_ResourceCollection
      */
     public function getResource($collectionName = 'default', $filters = []) {
-        $repository = new CResources_Repository();
+        $repository = $this->getResourceRepository();
 
         return $repository->getCollection($this, $collectionName, $filters);
+    }
+
+    public function getResourceRepository(): CResources_Repository {
+        return c::container(CResources_Repository::class);
+    }
+
+    public function getMediaModel(): string {
+        return CF::config('resource.resource_model', CApp_Model_Resource::class);
     }
 
     /**
@@ -221,9 +272,41 @@ trait CModel_HasResource_HasResourceTrait {
      * @return $this
      */
     public function getFirstResource($collectionName = 'default', array $filters = []) {
+        return $this->getResourceItem($collectionName, $filters, CResources_Enum_CollectionPosition::FIRST);
+    }
+
+    /**
+     * @param string $collectionName
+     * @param array  $filters
+     *
+     * @return $this
+     */
+    public function getLastResource($collectionName = 'default', array $filters = []) {
+        return $this->getResourceItem($collectionName, $filters, CResources_Enum_CollectionPosition::LAST);
+    }
+
+    protected function getResourceItem(string $collectionName, $filters, string $position) {
         $resource = $this->getResource($collectionName, $filters);
 
-        return $resource->first();
+        return $position === CResources_Enum_CollectionPosition::FIRST
+            ? $resource->first()
+            : $resource->last();
+    }
+
+    private function getResourceItemUrl(string $collectionName, string $conversionName, string $position): string {
+        $resource = $position === CResources_Enum_CollectionPosition::FIRST
+            ? $this->getFirstResource($collectionName)
+            : $this->getLastResource($collectionName);
+
+        if (!$resource) {
+            return $this->getFallbackResourceUrl($collectionName, $conversionName) ?: '';
+        }
+
+        if ($conversionName !== '' && !$resource->hasGeneratedConversion($conversionName)) {
+            return $resource->getUrl();
+        }
+
+        return $resource->getUrl($conversionName);
     }
 
     /**
@@ -237,12 +320,37 @@ trait CModel_HasResource_HasResourceTrait {
      * @return string
      */
     public function getFirstResourceUrl($collectionName = 'default', $conversionName = '') {
-        $resource = $this->getFirstResource($collectionName);
+        return $this->getResourceItemUrl($collectionName, $conversionName, CResources_Enum_CollectionPosition::FIRST);
+    }
+
+    /**
+     * Get the url of the image for the given conversionName
+     * for first resource for the given collectionName.
+     * If no profile is given, return the source's url.
+     *
+     * @param mixed $collectionName
+     * @param mixed $conversionName
+     *
+     * @return string
+     */
+    public function getLastResourceUrl($collectionName = 'default', $conversionName = '') {
+        return $this->getResourceItemUrl($collectionName, $conversionName, CResources_Enum_CollectionPosition::LAST);
+    }
+
+    private function getResourceItemFullUrl(string $collectionName, string $conversionName, string $position): string {
+        $resource = $position === CResources_Enum_CollectionPosition::FIRST
+            ? $this->getFirstResource($collectionName)
+            : $this->getLastResource($collectionName);
+
         if (!$resource) {
-            return '';
+            return $this->getFallbackResourceUrl($collectionName, $conversionName) ?: '';
         }
 
-        return $resource->getUrl($conversionName);
+        if ($conversionName !== '' && !$resource->hasGeneratedConversion($conversionName)) {
+            return $resource->getFullUrl();
+        }
+
+        return $resource->getFullUrl($conversionName);
     }
 
     /**
@@ -256,12 +364,42 @@ trait CModel_HasResource_HasResourceTrait {
      * @return string
      */
     public function getFirstResourceFullUrl($collectionName = 'default', $conversionName = '') {
-        $resource = $this->getFirstResource($collectionName);
+        return $this->getResourceItemFullUrl($collectionName, $conversionName, CResources_Enum_CollectionPosition::FIRST);
+    }
+
+    /**
+     * Get the url of the image for the given conversionName
+     * for last resource for the given collectionName.
+     * If no profile is given, return the source's full url.
+     *
+     * @param mixed $collectionName
+     * @param mixed $conversionName
+     *
+     * @return string
+     */
+    public function getLastResourceFullUrl($collectionName = 'default', $conversionName = '') {
+        return $this->getResourceItemFullUrl($collectionName, $conversionName, CResources_Enum_CollectionPosition::LAST);
+    }
+
+    private function getResourceItemTemporaryUrl(
+        DateTimeInterface $expiration,
+        string $collectionName,
+        string $conversionName,
+        string $position
+    ): string {
+        $resource = $position === CResources_Enum_CollectionPosition::FIRST
+            ? $this->getFirstResource($collectionName)
+            : $this->getLastResource($collectionName);
+
         if (!$resource) {
-            return '';
+            return $this->getFallbackResourceUrl($collectionName, $conversionName) ?: '';
         }
 
-        return $resource->getFullUrl($conversionName);
+        if ($conversionName !== '' && !$resource->hasGeneratedConversion($conversionName)) {
+            return $resource->getTemporaryUrl($expiration);
+        }
+
+        return $resource->getTemporaryUrl($expiration, $conversionName);
     }
 
     /**
@@ -460,7 +598,12 @@ trait CModel_HasResource_HasResourceTrait {
      * @return mixed
      */
     public function loadResource($collectionName) {
+        if (CF::config('resource.force_lazy_loading') && $this->exists) {
+            $this->loadMissing('resource');
+        }
         $collection = $this->exists ? $this->resource : c::collect($this->unAttachedResourceLibraryItems)->pluck('resource');
+
+        $collection = new CModel_Resource_ResourceCollection($collection);
         $values = $collection
             ->filter(function (CModel_Resource_ResourceInterface $resourceItem) use ($collectionName) {
                 if ($collectionName == '') {
