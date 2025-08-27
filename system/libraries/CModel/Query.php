@@ -86,6 +86,13 @@ class CModel_Query {
         CTrait_ForwardsCalls;
 
     /**
+     * The attributes that should be added to new models created by this builder.
+     *
+     * @var array
+     */
+    public $pendingAttributes = [];
+
+    /**
      * The base query builder instance.
      *
      * @var CDatabase_Query_Builder
@@ -1034,7 +1041,7 @@ class CModel_Query {
     /**
      * Delete a record from the database.
      *
-     * @return mixed
+     * @return int
      */
     public function delete() {
         if (isset($this->onDelete)) {
@@ -1067,16 +1074,27 @@ class CModel_Query {
     }
 
     /**
+     * Determine if the given model has a scope.
+     *
+     * @param string $scope
+     *
+     * @return bool
+     */
+    public function hasNamedScope($scope) {
+        return $this->model && $this->model->hasNamedScope($scope);
+    }
+
+    /**
      * Call the given local model scopes.
      *
-     * @param array $scopes
+     * @param array|string $scopes
      *
      * @return mixed
      */
-    public function scopes(array $scopes) {
+    public function scopes($scopes) {
         $builder = $this;
 
-        foreach ($scopes as $scope => $parameters) {
+        foreach (carr::wrap($scopes) as $scope => $parameters) {
             // If the scope key is an integer, then the scope was passed as the value and
             // the parameter list is empty, so we will format the scope name and these
             // parameters here. Then, we'll be ready to call the scope on the model.
@@ -1087,10 +1105,14 @@ class CModel_Query {
             // Next we'll pass the scope callback to the callScope method which will take
             // care of grouping the "wheres" properly so the logical order doesn't get
             // messed up when adding scopes. Then we'll return back out the builder.
-            $builder = $builder->callScope(
-                [$this->model, 'scope' . ucfirst($scope)],
-                (array) $parameters
+            $builder = $builder->callNamedScope(
+                $scope,
+                carr::wrap($parameters)
             );
+            // $builder = $builder->callScope(
+            //     [$this->model, 'scope' . ucfirst($scope)],
+            //     (array) $parameters
+            // );
         }
 
         return $builder;
@@ -1153,7 +1175,7 @@ class CModel_Query {
 
         //$result = $scope(...array_values($parameters)) ?? $this;
         //$result = isset($scope(array_values($parameters))) ? $scope(array_values($parameters)) : $this;
-        $result = call_user_func_array($scope, array_values($parameters));
+        $result = call_user_func_array($scope, array_values($parameters)) ?? $this;
 
         $result = isset($result) && !is_null($result) ? $result : $this;
 
@@ -1162,6 +1184,20 @@ class CModel_Query {
         }
 
         return $result;
+    }
+
+    /**
+     * Apply the given named scope on the current builder instance.
+     *
+     * @param string $scope
+     * @param array  $parameters
+     *
+     * @return mixed
+     */
+    protected function callNamedScope($scope, array $parameters = []) {
+        return $this->callScope(function (...$parameters) use ($scope) {
+            return $this->model->callNamedScope($scope, $parameters);
+        }, $parameters);
     }
 
     /**
@@ -1205,10 +1241,10 @@ class CModel_Query {
         // Here we'll check if the given subset of where clauses contains any "or"
         // booleans and in this case create a nested where expression. That way
         // we don't add any unnecessary nesting thus keeping the query clean.
-        if ($whereBooleans->contains('or')) {
+        if ($whereBooleans->contains(fn ($logicalOperator) => cstr::contains($logicalOperator, 'or'))) {
             $query->wheres[] = $this->createNestedWhere(
                 $whereSlice,
-                $whereBooleans->first()
+                str_replace(' not', '', $whereBooleans->first())
             );
         } else {
             $query->wheres = array_merge($query->wheres, $whereSlice);
@@ -1234,12 +1270,17 @@ class CModel_Query {
     /**
      * Set the relationships that should be eager loaded.
      *
-     * @param mixed $relations
+     * @param mixed      $relations
+     * @param null|mixed $callback
      *
      * @return $this
      */
-    public function with($relations) {
-        $eagerLoad = $this->parseWithRelations(is_string($relations) ? func_get_args() : $relations);
+    public function with($relations, $callback = null) {
+        if ($callback instanceof Closure) {
+            $eagerLoad = $this->parseWithRelations([$relations => $callback]);
+        } else {
+            $eagerLoad = $this->parseWithRelations(is_string($relations) ? func_get_args() : $relations);
+        }
 
         $this->eagerLoad = array_merge($this->eagerLoad, $eagerLoad);
 
@@ -1262,6 +1303,19 @@ class CModel_Query {
     }
 
     /**
+     * Set the relationships that should be eager loaded while removing any previously added eager loading specifications.
+     *
+     * @param  array<array-key, array|(\Closure(\CModel_Relation<*,*,*>): mixed)|string>|string  $relations
+     *
+     * @return $this
+     */
+    public function withOnly($relations) {
+        $this->eagerLoad = [];
+
+        return $this->with($relations);
+    }
+
+    /**
      * Create a new instance of the model being queried.
      *
      * @param array $attributes
@@ -1269,12 +1323,12 @@ class CModel_Query {
      * @return CModel
      */
     public function newModelInstance($attributes = []) {
-        return $this->model->newInstance($attributes);
-        /*
+        $attributes = array_merge($this->pendingAttributes, $attributes);
+        // return $this->model->newInstance($attributes);
+
         return $this->model->newInstance($attributes)->setConnection(
             $this->query->getConnection()->getName()
         );
-        */
     }
 
     /**
@@ -1426,6 +1480,33 @@ class CModel_Query {
     }
 
     /**
+     * Specify attributes that should be added to any new models created by this builder.
+     *
+     * The given key / value pairs will also be added as where conditions to the query.
+     *
+     * @param \CDatabase_Query_Expression|array|string $attributes
+     * @param mixed                                    $value
+     * @param bool                                     $asConditions
+     *
+     * @return $this
+     */
+    public function withAttributes($attributes, $value = null, $asConditions = true) {
+        if (!is_array($attributes)) {
+            $attributes = [$attributes => $value];
+        }
+
+        if ($asConditions) {
+            foreach ($attributes as $column => $value) {
+                $this->where($this->qualifyColumn($column), $value);
+            }
+        }
+
+        $this->pendingAttributes = array_merge($this->pendingAttributes, $attributes);
+
+        return $this;
+    }
+
+    /**
      * Apply query-time casts to the model instance.
      *
      * @param array $casts
@@ -1451,6 +1532,17 @@ class CModel_Query {
         return $this->getQuery()->getConnection()->transactionLevel() > 0
             ? $this->getQuery()->getConnection()->transaction($scope)
             : $scope();
+    }
+
+    /**
+     * Get the Eloquent builder instances that are used in the union of the query.
+     *
+     * @return \CCollection
+     */
+    protected function getUnionBuilders() {
+        return isset($this->query->unions)
+            ? (new CCollection($this->query->unions))->pluck('query')
+            : new CCollection();
     }
 
     /**
@@ -1504,6 +1596,37 @@ class CModel_Query {
         $this->eagerLoad = $eagerLoad;
 
         return $this;
+    }
+
+    /**
+     * Indicate that the given relationships should not be eagerly loaded.
+     *
+     * @param array $relations
+     *
+     * @return $this
+     */
+    public function withoutEagerLoad(array $relations) {
+        $relations = array_diff(array_keys($this->model->getRelations()), $relations);
+
+        return $this->with($relations);
+    }
+
+    /**
+     * Flush the relationships being eagerly loaded.
+     *
+     * @return $this
+     */
+    public function withoutEagerLoads() {
+        return $this->setEagerLoads([]);
+    }
+
+    /**
+     * Get the "limit" value from the query or null if it's not set.
+     *
+     * @return mixed
+     */
+    public function getLimit() {
+        return $this->query->getLimit();
     }
 
     /**

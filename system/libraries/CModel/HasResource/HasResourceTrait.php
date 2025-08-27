@@ -261,7 +261,7 @@ trait CModel_HasResource_HasResourceTrait {
         return c::container(CResources_Repository::class);
     }
 
-    public function getMediaModel(): string {
+    public function getResourceModel(): string {
         return CF::config('resource.resource_model', CApp_Model_Resource::class);
     }
 
@@ -269,7 +269,7 @@ trait CModel_HasResource_HasResourceTrait {
      * @param string $collectionName
      * @param array  $filters
      *
-     * @return $this
+     * @return null|CModel_Resource_ResourceInterface
      */
     public function getFirstResource($collectionName = 'default', array $filters = []) {
         return $this->getResourceItem($collectionName, $filters, CResources_Enum_CollectionPosition::FIRST);
@@ -279,12 +279,19 @@ trait CModel_HasResource_HasResourceTrait {
      * @param string $collectionName
      * @param array  $filters
      *
-     * @return $this
+     * @return null|CModel_Resource_ResourceInterface
      */
     public function getLastResource($collectionName = 'default', array $filters = []) {
         return $this->getResourceItem($collectionName, $filters, CResources_Enum_CollectionPosition::LAST);
     }
 
+    /**
+     * @param string         $collectionName
+     * @param array|callable $filters
+     * @param string         $position
+     *
+     * @return CModel_Resource_ResourceInterface
+     */
     protected function getResourceItem(string $collectionName, $filters, string $position) {
         $resource = $this->getResource($collectionName, $filters);
 
@@ -411,12 +418,79 @@ trait CModel_HasResource_HasResourceTrait {
      * @param mixed $conversionName
      */
     public function getFirstTemporaryUrl(DateTimeInterface $expiration, $collectionName = 'default', $conversionName = '') {
-        $resource = $this->getFirstResource($collectionName);
-        if (!$resource) {
-            return '';
+        $expiration = $expiration ?: c::now()->addMinutes(CF::config('resource.temporary_url_default_lifetime'));
+
+        return $this->getResourceItemTemporaryUrl($expiration, $collectionName, $conversionName, CResources_Enum_CollectionPosition::FIRST);
+    }
+
+    /**
+     * Get the url of the image for the given conversionName
+     * for last resource for the given collectionName.
+     * If no profile is given, return the source's url.
+     *
+     * @param mixed $collectionName
+     * @param mixed $conversionName
+     */
+    public function getLastTemporaryUrl(DateTimeInterface $expiration, $collectionName = 'default', $conversionName = '') {
+        $expiration = $expiration ?: c::now()->addMinutes(CF::config('resource.temporary_url_default_lifetime'));
+
+        return $this->getResourceItemTemporaryUrl($expiration, $collectionName, $conversionName, CResources_Enum_CollectionPosition::LAST);
+    }
+
+    public function getRegisteredResourceCollections() {
+        $this->registerResourceCollections();
+
+        return c::collect($this->resourceCollections);
+    }
+
+    /**
+     * Get the resource collection by its collectionName.
+     *
+     * @param string $collectionName
+     *
+     * @return null|CResources_ResourceCollection
+     */
+    public function getResourceCollection(string $collectionName = 'default') {
+        $this->registerResourceCollections();
+
+        return c::collect($this->resourceCollections)
+            ->first(fn (CResources_ResourceCollection $collection) => $collection->name === $collectionName);
+    }
+
+    public function getFallbackResourceUrl(string $collectionName = 'default', string $conversionName = ''): string {
+        $fallbackUrls = c::optional($this->getResourceCollection($collectionName))->fallbackUrls;
+
+        if (in_array($conversionName, ['', 'default'], true)) {
+            return $fallbackUrls['default'] ?? '';
         }
 
-        return $resource->getTemporaryUrl($expiration, $conversionName);
+        return $fallbackUrls[$conversionName] ?? $fallbackUrls['default'] ?? '';
+    }
+
+    public function getFallbackResourcePath(string $collectionName = 'default', string $conversionName = ''): string {
+        $fallbackPaths = c::optional($this->getResourceCollection($collectionName))->fallbackPaths;
+
+        if (in_array($conversionName, ['', 'default'], true)) {
+            return $fallbackPaths['default'] ?? '';
+        }
+
+        return $fallbackPaths[$conversionName] ?? $fallbackPaths['default'] ?? '';
+    }
+
+    private function getResourceItemPath(string $collectionName, string $conversionName, string $position): string {
+        $media = $position === CResources_Enum_CollectionPosition::FIRST
+            ? $this->getFirstResource($collectionName)
+            : $this->getLastResource($collectionName);
+
+        if (!$media) {
+            return $this->getFallbackResourcePath($collectionName, $conversionName) ?: '';
+        }
+
+        if ($conversionName !== '' && !$media->hasGeneratedConversion($conversionName)) {
+            return $media->getPath();
+        }
+
+        return $media->getPath($conversionName);
     }
 
     /**
@@ -428,12 +502,19 @@ trait CModel_HasResource_HasResourceTrait {
      * @param mixed $conversionName
      */
     public function getFirstResourcePath($collectionName = 'default', $conversionName = '') {
-        $resource = $this->getFirstResource($collectionName);
-        if (!$resource) {
-            return '';
-        }
+        return $this->getResourceItemPath($collectionName, $conversionName, CResources_Enum_CollectionPosition::FIRST);
+    }
 
-        return $resource->getPath($conversionName);
+    /**
+     * Get the url of the image for the given conversionName
+     * for last resource for the given collectionName.
+     * If no profile is given, return the source's url.
+     *
+     * @param mixed $collectionName
+     * @param mixed $conversionName
+     */
+    public function getLastResourcePath($collectionName = 'default', $conversionName = '') {
+        return $this->getResourceItemPath($collectionName, $conversionName, CResources_Enum_CollectionPosition::LAST);
     }
 
     /**
@@ -448,13 +529,13 @@ trait CModel_HasResource_HasResourceTrait {
      */
     public function updateResource(array $newResourceArray, $collectionName = 'default') {
         $this->removeResourceItemsNotPresentInArray($newResourceArray, $collectionName);
+        $resourceClass = $this->getResourceModel();
 
         return c::collect($newResourceArray)
-            ->map(function (array $newResourceItem) use ($collectionName) {
+            ->map(function (array $newResourceItem) use ($collectionName, $resourceClass) {
                 static $orderColumn = 1;
-                $resourceClass = CF::config('resource.resource_model');
-                /** @var CModel_Resource_ResourceInterface|CModel $resourceClass */
                 $currentResource = $resourceClass::findOrFail($newResourceItem['id']);
+                /** @var CModel_Resource_ResourceInterface|CModel $currentResource */
                 if ($currentResource->collection_name !== $collectionName) {
                     throw CResources_Exception_ResourceCannotBeUpdated::doesNotBelongToCollection($collectionName, $currentResource);
                 }
@@ -474,9 +555,12 @@ trait CModel_HasResource_HasResourceTrait {
     protected function removeResourceItemsNotPresentInArray(array $newResourceArray, $collectionName = 'default') {
         $this->getResource($collectionName)
             ->reject(function (CModel_Resource_ResourceInterface $currentResourceItem) use ($newResourceArray) {
-                return in_array($currentResourceItem->id, array_column($newResourceArray, 'id'));
+                return in_array($currentResourceItem->getKey(), array_column($newResourceArray, $currentResourceItem->getKeyName()));
             })
             ->each->delete();
+        if ($this->resourceIsPreloaded()) {
+            unset($this->resource);
+        }
     }
 
     /**
@@ -488,7 +572,7 @@ trait CModel_HasResource_HasResourceTrait {
      */
     public function clearResourceCollection($collectionName = 'default') {
         $this->getResource($collectionName)->each->delete();
-        c::event(new CollectionHasBeenCleared($this, $collectionName));
+        c::event(new CResources_Event_CollectionHasBeenCleared($this, $collectionName));
         if ($this->resourceIsPreloaded()) {
             unset($this->resource);
         }
@@ -499,8 +583,8 @@ trait CModel_HasResource_HasResourceTrait {
     /**
      * Remove all resource in the given collection except some.
      *
-     * @param string                                                 $collectionName
-     * @param \Spatie\ResourceLibrary\Models\Resource[]|\CCollection $excludedResource
+     * @param string                              $collectionName
+     * @param \CModel_Resource_ResourceCollection $excludedResource
      *
      * @return $this
      */
@@ -516,9 +600,11 @@ trait CModel_HasResource_HasResourceTrait {
 
         $this->getResource($collectionName)
             ->reject(function (CModel_Resource_ResourceInterface $resource) use ($excludedResource) {
-                return $excludedResource->where('resource_id', $resource->resource_id)->count();
+                return $excludedResource->where($resource->getKeyName(), $resource->getKey())->count();
             })
-            ->each->delete();
+            ->each(function (CModel_Resource_ResourceInterface $resource) {
+                $resource->delete();
+            });
         if ($this->resourceIsPreloaded()) {
             unset($this->resource);
         }

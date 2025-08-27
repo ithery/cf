@@ -57,12 +57,12 @@ class CResources_ResourceCollection {
     /**
      * @var string
      */
-    public $fallbackUrl = '';
+    public $fallbackUrls = [];
 
     /**
      * @var string
      */
-    public $fallbackPath = '';
+    public $fallbackPaths = [];
 
     public function __construct($name) {
         $this->name = $name;
@@ -127,14 +127,22 @@ class CResources_ResourceCollection {
         $this->resourceConversionRegistrations = $resourceConversionRegistrations;
     }
 
-    public function useFallbackUrl($url) {
-        $this->fallbackUrl = $url;
+    public function useFallbackUrl($url, string $conversionName = '') {
+        if ($conversionName === '') {
+            $conversionName = 'default';
+        }
+
+        $this->fallbackUrls[$conversionName] = $url;
 
         return $this;
     }
 
-    public function useFallbackPath($path) {
-        $this->fallbackPath = $path;
+    public function useFallbackPath($path, string $conversionName = '') {
+        if ($conversionName === '') {
+            $conversionName = 'default';
+        }
+
+        $this->fallbackPaths[$conversionName] = $path;
 
         return $this;
     }

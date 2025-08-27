@@ -21,6 +21,10 @@ use Illuminate\Contracts\Support\Htmlable;
  * @property      null|CCarbon|\Carbon\Carbon $deleted
  * @property      null|string                 $deletedby
  *
+ * @method mixed  getKey()
+ * @method string getKeyName()
+ * @method int    delete()
+ *
  * @see CApp_Model_Interface_ResourceInterface
  * @see CApp_Model_Resource
  */
@@ -46,4 +50,14 @@ interface CModel_Resource_ResourceInterface extends CInterface_Responsable, Html
     public function hasResponsiveImages($conversionName = '');
 
     public function responsiveImages($conversionName = '');
+
+    public function getUrl($conversionName = '');
+
+    public function hasGeneratedConversion($conversionName);
+
+    public function getPathRelativeToRoot(string $conversionName = ''): string;
+
+    public function getFullUrl($conversionName = '');
+
+    public function getTemporaryUrl(DateTimeInterface $expiration, $conversionName = '', array $options = []);
 }

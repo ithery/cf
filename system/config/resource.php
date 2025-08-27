@@ -147,6 +147,12 @@ return [
     'resource_downloader_ssl' => c::env('RESOURCE_DOWNLOADER_SSL', false),
 
     /*
+     * The default lifetime in minutes for temporary urls.
+     * This is used when you call the `getLastTemporaryUrl` or `getLastTemporaryUrl` method on a media item.
+     */
+    'temporary_url_default_lifetime' => c::env('RESOURCE_TEMPORARY_URL_DEFAULT_LIFETIME', 5),
+
+    /*
      * When converting Resource instances to response the resource library will add
      * a `loading` attribute to the `img` tag. Here you can set the default
      * value of that attribute.
@@ -156,4 +162,16 @@ return [
      * More info: https://css-tricks.com/native-lazy-loading/
      */
     'default_loading_attribute_value' => null,
+
+    /*
+     * You can specify a prefix for that is used for storing all resource.
+     * If you set this to `/my-subdir`, all your resource will be stored in a `/my-subdir` directory.
+     */
+    'prefix' => c::env('RESOURCE_PREFIX', ''),
+
+    /*
+     * When forcing lazy loading, media will be loaded even if you don't eager load media and you have
+     * disabled lazy loading globally in the service provider.
+     */
+    'force_lazy_loading' => c::env('FORCE_RESOURCE_LIBRARY_LAZY_LOADING', true),
 ];

@@ -2181,7 +2181,40 @@ class CDatabase_Query_Builder {
      * @return \CDatabase_Contract_Query_ExpressionInterface
      */
     public function raw($value) {
-        return CDatabase::raw($value);
+        return $this->connection->raw($value);
+    }
+
+    /**
+     * Get the query builder instances that are used in the union of the query.
+     *
+     * @return \CCollection
+     */
+    protected function getUnionBuilders() {
+        return isset($this->unions)
+            ? (new CCollection($this->unions))->pluck('query')
+            : new CCollection();
+    }
+
+    /**
+     * Get the "limit" value for the query or null if it's not set.
+     *
+     * @return mixed
+     */
+    public function getLimit() {
+        $value = $this->unions ? $this->unionLimit : $this->limit;
+
+        return !is_null($value) ? (int) $value : null;
+    }
+
+    /**
+     * Get the "offset" value for the query or null if it's not set.
+     *
+     * @return mixed
+     */
+    public function getOffset() {
+        $value = $this->unions ? $this->unionOffset : $this->offset;
+
+        return !is_null($value) ? (int) $value : null;
     }
 
     /**
@@ -2238,12 +2271,35 @@ class CDatabase_Query_Builder {
         }
 
         if (is_array($value)) {
-            $this->bindings[$type] = array_values(array_merge($this->bindings[$type], $value));
+            // $this->bindings[$type] = array_values(array_merge($this->bindings[$type], $value));
+            $this->bindings[$type] = array_values(array_map(
+                function ($value) {
+                    return $this->castBinding($value);
+                },
+                array_merge($this->bindings[$type], $value),
+            ));
         } else {
-            $this->bindings[$type][] = $value;
+            $this->bindings[$type][] = $this->castBinding($value);
         }
 
         return $this;
+    }
+
+    /**
+     * Cast the given binding value.
+     *
+     * @param mixed $value
+     *
+     * @return mixed
+     */
+    public function castBinding($value) {
+        // prepare for php 8
+
+        // if ($value instanceof UnitEnum) {
+        //     return enum_value($value);
+        // }
+
+        return $value;
     }
 
     /**
@@ -2267,9 +2323,11 @@ class CDatabase_Query_Builder {
      * @return array
      */
     protected function cleanBindings(array $bindings) {
-        return array_values(array_filter($bindings, function ($binding) {
-            return !$binding instanceof CDatabase_Contract_Query_ExpressionInterface;
-        }));
+        return c::collect($bindings)->reject(function ($binding) {
+            return $binding instanceof CDatabase_Contract_Query_ExpressionInterface;
+        })->map(function ($binding) {
+            return $this->castBinding($binding);
+        })->values()->all();
     }
 
     /**
@@ -2289,7 +2347,7 @@ class CDatabase_Query_Builder {
      * @return string
      */
     protected function defaultKeyName() {
-        if (strlen($this->from) > 0) {
+        if ($this->from) {
             return $this->from . '_' . 'id';
         }
 
@@ -2349,6 +2407,15 @@ class CDatabase_Query_Builder {
     }
 
     /**
+     * Clone the query.
+     *
+     * @return static
+     */
+    public function clone() {
+        return clone $this;
+    }
+
+    /**
      * Clone the query without the given properties.
      *
      * @param array $except
@@ -2356,7 +2423,7 @@ class CDatabase_Query_Builder {
      * @return static
      */
     public function cloneWithout(array $except) {
-        return c::tap(clone $this, function ($clone) use ($except) {
+        return c::tap($this->clone(), function ($clone) use ($except) {
             foreach ($except as $property) {
                 $clone->{$property} = null;
             }
@@ -2371,7 +2438,7 @@ class CDatabase_Query_Builder {
      * @return static
      */
     public function cloneWithoutBindings(array $except) {
-        return c::tap(clone $this, function ($clone) use ($except) {
+        return c::tap($this->clone(), function ($clone) use ($except) {
             foreach ($except as $type) {
                 $clone->bindings[$type] = [];
             }
@@ -2383,8 +2450,19 @@ class CDatabase_Query_Builder {
      *
      * @return $this
      */
-    public function dump() {
-        cdbg::d($this->toSql(), $this->getBindings());
+    public function dump(...$args) {
+        c::dump($this->toSql(), $this->getBindings(), ...$args);
+
+        return $this;
+    }
+
+    /**
+     * Dump the raw current SQL with embedded bindings.
+     *
+     * @return $this
+     */
+    public function dumpRawSql() {
+        c::dump($this->toRawSql());
 
         return $this;
     }
@@ -2392,10 +2470,19 @@ class CDatabase_Query_Builder {
     /**
      * Die and dump the current SQL and bindings.
      *
-     * @return void
+     * @return never
      */
     public function dd() {
         cdbg::dd($this->toSql(), $this->getBindings());
+    }
+
+    /**
+     * Die and dump the current SQL with embedded bindings.
+     *
+     * @return never
+     */
+    public function ddRawSql() {
+        cdbg::dd($this->toRawSql());
     }
 
     /**
