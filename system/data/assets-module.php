@@ -766,7 +766,10 @@ return [
             'plugins/jquery-query-builder/query-builder.js',
             // 'plugins/jquery-query-builder/plugin/query-builder-bs4-tooltip-error.js',
         ],
-        'requirements' => ['jquery.extendext'],
+        'requirements' => [
+            'jquery.extendext',
+            'bootstrap-icons',
+        ],
     ],
 
     'redoc' => [

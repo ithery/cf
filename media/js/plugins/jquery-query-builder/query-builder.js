@@ -4009,15 +4009,17 @@ QueryBuilder.define('bt-tooltip-errors', function(options) {
     this.model.on('update', function(e, node, field) {
         if (field == 'error' && self.settings.display_errors) {
             var $el = node.$el.find(QueryBuilder.selectors.error_container).eq(0);
-
+            var title = $el.attr('title');
             if (bsVersion.startsWith('5')) {
-                $el.attr('data-bs-original-title',options).attr('data-bs-title',options).tooltip();
+                $el.attr('data-bs-original-title',title).attr('data-bs-title',title).tooltip();
             }
 
             if (bsVersion.startsWith('4')) {
-                $el.tooltip(options)
-                   .tooltip('hide');
+                $el.attr('data-original-title', title);
+                $el.removeAttr('title');
+                $el.tooltip(options);
             } else {
+                $el.attr('data-original-title', title)
                 $el.tooltip(options)
                     .tooltip('hide')
                     .tooltip('fixTitle');
