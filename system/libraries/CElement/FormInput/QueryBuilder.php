@@ -99,7 +99,7 @@ class CElement_FormInput_QueryBuilder extends CElement_FormInput {
         $js = parent::js($indent);
         $js .= '
         let qb_' . $this->inputId . " = $('#" . $this->containerId . "').queryBuilder({
-            // plugins: ['bt-tooltip-errors'],
+            plugins: ['bt-tooltip-errors'],
             filters: " . c::json($filters) . ',
             allow_empty: true,
             rules: ' . c::json($this->value) . ',

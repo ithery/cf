@@ -517,6 +517,12 @@ return [
             'css/icon/materialdesignicons'
         ],
     ],
+    'bootstrap-icons' => [
+        'css' => ['icon/bootstrap-icons.css'],
+        'files' => [
+            'css/icon/bootstrap-icons'
+        ],
+    ],
     'themify-icons' => [
         'css' => ['icon/themify-icons.css'],
         'files' => [
