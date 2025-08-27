@@ -151,7 +151,7 @@ class CLogger {
      * @return void
      */
     public static function warning($message, array $context = []) {
-        self::warning($message, $context);
+        self::channel()->warning($message, $context);
     }
 
     /**
