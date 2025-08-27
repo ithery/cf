@@ -6,27 +6,24 @@ namespace Kreait\Firebase\Messaging;
 
 use Countable;
 
-use function array_filter;
-use function array_map;
-use function array_values;
 use function count;
+use function array_map;
+use function array_filter;
+use function array_values;
 
-final class MulticastSendReport implements Countable
-{
+final class MulticastSendReport implements Countable {
     /**
      * @var array<SendReport>
      */
     private array $items = [];
 
-    private function __construct()
-    {
+    private function __construct() {
     }
 
     /**
      * @param SendReport[] $items
      */
-    public static function withItems(array $items): self
-    {
+    public static function withItems(array $items): self {
         $report = new self();
         $report->items = $items;
 
@@ -36,28 +33,23 @@ final class MulticastSendReport implements Countable
     /**
      * @return SendReport[]
      */
-    public function getItems(): array
-    {
+    public function getItems(): array {
         return $this->items;
     }
 
-    public function successes(): self
-    {
-        return $this->filter(static fn(SendReport $item): bool => $item->isSuccess());
+    public function successes(): self {
+        return $this->filter(static fn (SendReport $item): bool => $item->isSuccess());
     }
 
-    public function failures(): self
-    {
-        return $this->filter(static fn(SendReport $item): bool => $item->isFailure());
+    public function failures(): self {
+        return $this->filter(static fn (SendReport $item): bool => $item->isFailure());
     }
 
-    public function hasFailures(): bool
-    {
+    public function hasFailures(): bool {
         return $this->failures()->count() > 0;
     }
 
-    public function filter(callable $callback): self
-    {
+    public function filter(callable $callback): self {
         $items = $this->items;
 
         return self::withItems(array_values(array_filter($items, $callback)));
@@ -66,20 +58,17 @@ final class MulticastSendReport implements Countable
     /**
      * @return list<mixed>
      */
-    public function map(callable $callback): array
-    {
+    public function map(callable $callback): array {
         return array_values(array_map($callback, $this->items));
     }
 
     /**
      * @return list<non-empty-string>
      */
-    public function validTokens(): array
-    {
+    public function validTokens(): array {
         return $this->successes()
-            ->filter(static fn(SendReport $report): bool => $report->target()->type() === MessageTarget::TOKEN)
-            ->map(static fn(SendReport $report): string => $report->target()->value())
-        ;
+            ->filter(static fn (SendReport $report): bool => $report->target()->type() === MessageTarget::TOKEN)
+            ->map(static fn (SendReport $report): string => $report->target()->value());
     }
 
     /**
@@ -87,12 +76,10 @@ final class MulticastSendReport implements Countable
      *
      * @return list<non-empty-string>
      */
-    public function unknownTokens(): array
-    {
+    public function unknownTokens(): array {
         return $this
-            ->filter(static fn(SendReport $report): bool => $report->messageWasSentToUnknownToken())
-            ->map(static fn(SendReport $report): string => $report->target()->value())
-        ;
+            ->filter(static fn (SendReport $report): bool => $report->messageWasSentToUnknownToken())
+            ->map(static fn (SendReport $report): string => $report->target()->value());
     }
 
     /**
@@ -100,16 +87,13 @@ final class MulticastSendReport implements Countable
      *
      * @return list<non-empty-string>
      */
-    public function invalidTokens(): array
-    {
+    public function invalidTokens(): array {
         return $this
-            ->filter(static fn(SendReport $report): bool => $report->messageTargetWasInvalid())
-            ->map(static fn(SendReport $report): string => $report->target()->value())
-        ;
+            ->filter(static fn (SendReport $report): bool => $report->messageTargetWasInvalid())
+            ->map(static fn (SendReport $report): string => $report->target()->value());
     }
 
-    public function count(): int
-    {
+    public function count(): int {
         return count($this->items);
     }
 }

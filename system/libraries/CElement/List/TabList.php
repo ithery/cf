@@ -334,7 +334,6 @@ class CElement_List_TabList extends CElement_List {
                     if(data_text) widget_tab.find('> ." . $this->widgetHeaderClass . " h5').first().html(data_text);
                     var widget_content = widget_tab.find('." . $this->widgetBodyClass . "').first();
                     widget_content.removeAttr('class').addClass('" . $this->widgetBodyClass . "');
-
                     if(data_class) widget_content.addClass(data_class);
                 }
 

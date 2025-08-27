@@ -38,6 +38,10 @@ class CResources_ImageGenerator_Factory {
      * @return null|CResources_ImageGenerator_FileTypeAbstract
      */
     public static function forMimeType($mimeType = null) {
+        if (is_null($mimeType)) {
+            return null;
+        }
+
         return static::getImageGenerators()
             ->first(function (CResources_ImageGenerator_FileTypeAbstract $imageGenerator) use ($mimeType) {
                 return $imageGenerator->canHandleMime($mimeType);

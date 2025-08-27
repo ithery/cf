@@ -30,6 +30,8 @@ trait CModel_Resource_ResourceTrait {
     use CModel_Resource_Concern_CustomResourcePropertiesTrait;
     use CModel_Resource_Concern_IsSortedTrait;
 
+    protected int $streamChunkSize = (1024 * 1024); // default to 1MB chunks.
+
     public static function bootResourceTrait() {
         static::observe(new CModel_Resource_ResourceObserver());
     }
@@ -75,6 +77,10 @@ trait CModel_Resource_ResourceTrait {
         return $urlGenerator->getPath();
     }
 
+    public function getPathRelativeToRoot(string $conversionName = ''): string {
+        return $this->getUrlGenerator($conversionName)->getPathRelativeToRoot();
+    }
+
     /**
      * @param string $conversionName
      *
@@ -99,6 +105,10 @@ trait CModel_Resource_ResourceTrait {
         }
 
         return $this->getUrl();
+    }
+
+    public function getDownloadFilename(): string {
+        return $this->file_name;
     }
 
     /**

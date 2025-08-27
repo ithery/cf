@@ -30,15 +30,15 @@ abstract class CResources_ImageGenerator_FileTypeAbstract implements CResources_
     /**
      * @return bool
      */
-    abstract public function requirementsAreInstalled();
+    abstract public function requirementsAreInstalled() : bool;
 
     /**
      * @return CCollection
      */
-    abstract public function supportedExtensions();
+    abstract public function supportedExtensions() : CCollection;
 
     /**
      * @return CCollection
      */
-    abstract public function supportedMimetypes();
+    abstract public function supportedMimetypes() : CCollection;
 }

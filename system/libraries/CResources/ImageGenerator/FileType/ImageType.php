@@ -14,21 +14,21 @@ class CResources_ImageGenerator_FileType_ImageType extends CResources_ImageGener
     /**
      * @return bool
      */
-    public function requirementsAreInstalled() {
+    public function requirementsAreInstalled() : bool {
         return true;
     }
 
     /**
      * @return CCollection
      */
-    public function supportedExtensions() {
+    public function supportedExtensions() : CCollection {
         return c::collect(['png', 'jpg', 'jpeg', 'gif']);
     }
 
     /**
      * @return CCollection
      */
-    public function supportedMimeTypes() {
+    public function supportedMimeTypes() : CCollection {
         return c::collect(['image/jpeg', 'image/gif', 'image/png']);
     }
 }
