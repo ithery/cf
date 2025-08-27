@@ -747,13 +747,20 @@ return [
             'plugins/cropper/cropper.js',
         ],
     ],
+    'jquery.extendext' => [
+        'js' => [
+            'plugins/jquery-extendext/jquery-extendext.js',
+        ]
+    ],
     'jquery-query-builder' => [
         'css' => [
             'plugins/jquery-query-builder/query-builder.default.css',
         ],
         'js' => [
-            'plugins/jquery-query-builder/query-builder.standalone.js',
+            'plugins/jquery-query-builder/query-builder.js',
+            // 'plugins/jquery-query-builder/plugin/query-builder-bs4-tooltip-error.js',
         ],
+        'requirements' => ['jquery.extendext'],
     ],
 
     'redoc' => [

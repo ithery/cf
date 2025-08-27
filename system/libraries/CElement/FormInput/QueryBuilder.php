@@ -35,6 +35,7 @@ class CElement_FormInput_QueryBuilder extends CElement_FormInput {
         $this->add($this->container);
         $this->add($this->input);
         $this->addClass('capp-query-builder capp-input');
+        $this->value = [];
     }
 
     /**
@@ -95,28 +96,27 @@ class CElement_FormInput_QueryBuilder extends CElement_FormInput {
         if ($filters instanceof Arrayable) {
             $filters = $filters->toArray();
         }
-
         $js = parent::js($indent);
         $js .= '
         let qb_' . $this->inputId . " = $('#" . $this->containerId . "').queryBuilder({
-
+            // plugins: ['bt-tooltip-errors'],
             filters: " . c::json($filters) . ',
-
+            allow_empty: true,
             rules: ' . c::json($this->value) . ',
         });
         let error_' . $this->inputId . " = null;
         $('#" . $this->containerId . "').on('validationError.queryBuilder', function(e, rule, error, value) {
-            error_" . $this->inputId . " = error;
-
+            window.error_query_builder_" . $this->inputId . " = error;
+            cresenity.toast('error', Array.isArray(window.error_query_builder_" . $this->inputId . '  ) ? window.error_query_builder_' . $this->inputId . '[0] : window.error_query_builder_' . $this->inputId . ");
         });
         let form = $('#" . $this->inputId . "').closest('form');
         if(form.length>0) {
             form.on('submit',()=>{
                 const result = $('#" . $this->containerId . "').queryBuilder('getRules');
                 console.log('form submit', error_" . $this->inputId . ');
-                if(error_' . $this->inputId . ") {
-                    cresenity.toast('error', Array.isArray(error_" . $this->inputId . '  )?error_' . $this->inputId . '[0]:error_' . $this->inputId . ');
-                    error_' . $this->inputId . " = null;
+                if(window.error_query_builder_' . $this->inputId . ") {
+                    cresenity.toast('error', Array.isArray(window.error_query_builder_" . $this->inputId . '  ) ? window.error_query_builder_' . $this->inputId . '[0] : window.error_query_builder_' . $this->inputId . ');
+                    window.error_query_builder_' . $this->inputId . " = null;
                     return false;
                 }
                 $('#" . $this->inputId . "').val(JSON.stringify(result, null, 2));
