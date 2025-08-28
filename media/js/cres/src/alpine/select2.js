@@ -306,7 +306,7 @@ export default function (Alpine) {
             }
 
             $(el).on('change.select2 select2:select select2:unselect', valueChangeCallback(el));
-            valueChangeCallback(el)();
+            // valueChangeCallback(el)();
             // x-model support
             if (el._x_model) {
                 let modelLoaded = false;
