@@ -239,4 +239,15 @@ class CApp_Formatter {
     public function unformatNumber($number) {
         return $this->unformatCurrency($number);
     }
+
+    public function formatSize($bytes) {
+        $si_prefix = ['B', 'KB', 'MB', 'GB', 'TB', 'PB', 'EB', 'ZB', 'YB'];
+        $base = 1024;
+        $class = min((int) log($bytes, $base), count($si_prefix) - 1);
+        if (pow($base, $class) == 0) {
+            return 0;
+        }
+
+        return sprintf('%1.2f', $bytes / pow($base, $class)) . ' ' . $si_prefix[$class];
+    }
 }

@@ -18,6 +18,8 @@ class CElement_FormInput_QueryBuilder extends CElement_FormInput {
 
     protected $isApplySelect2;
 
+    protected $isToastOnError;
+
     public function __construct($id = null) {
         if ($id == null) {
             $id = spl_object_hash($this);
@@ -36,6 +38,7 @@ class CElement_FormInput_QueryBuilder extends CElement_FormInput {
         $this->add($this->input);
         $this->addClass('capp-query-builder capp-input');
         $this->value = [];
+        $this->isToastOnError = false;
     }
 
     /**
@@ -75,6 +78,19 @@ class CElement_FormInput_QueryBuilder extends CElement_FormInput {
         return $this;
     }
 
+    /**
+     * Whether to show a toast when the rules can't be parsed.
+     *
+     * @param bool $bool
+     *
+     * @return $this
+     */
+    public function withToastOnError($bool) {
+        $this->isToastOnError = $bool;
+
+        return $this;
+    }
+
     public function setApplySelect2($bool = true) {
         $this->isApplySelect2 = $bool;
 
@@ -104,10 +120,16 @@ class CElement_FormInput_QueryBuilder extends CElement_FormInput {
             allow_empty: true,
             rules: ' . c::json($this->value) . ',
         });
-        let error_' . $this->inputId . " = null;
+        window.error_query_builder_error_' . $this->inputId . " = null;
         $('#" . $this->containerId . "').on('validationError.queryBuilder', function(e, rule, error, value) {
-            window.error_query_builder_" . $this->inputId . " = error;
-            cresenity.toast('error', Array.isArray(window.error_query_builder_" . $this->inputId . '  ) ? window.error_query_builder_' . $this->inputId . '[0] : window.error_query_builder_' . $this->inputId . ");
+            window.error_query_builder_" . $this->inputId . ' = error;
+        ';
+        if ($this->isToastOnError) {
+            $js .= "
+                    cresenity.toast('error', Array.isArray(window.error_query_builder_" . $this->inputId . '  ) ? window.error_query_builder_' . $this->inputId . '[0] : window.error_query_builder_' . $this->inputId . ');
+            ';
+        }
+        $js .= "
         });
         let form = $('#" . $this->inputId . "').closest('form');
         if(form.length>0) {
