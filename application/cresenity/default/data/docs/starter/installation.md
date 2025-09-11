@@ -27,7 +27,7 @@
 
         contoh: `phpcf app:create mysecondproject` (enter lalu buat kode projek yang belum digunakan)
 
-    2. upload folder `mysecondproject` untuk remote ke subdomain ittron
+    2. upload folder `mysecondproject` untuk remote ke subdomain cresenity
 
     3. set up domain di folder data/domain (jika tidak ada folder data buat folder lalu download)
 

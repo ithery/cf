@@ -1,7 +1,5 @@
 <?php
 
-defined('SYSPATH') or die('No direct access allowed.');
-
 /**
  * Thrown when you no longer may access the API because your quota has exceeded.
  */
