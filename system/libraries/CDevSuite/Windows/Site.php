@@ -1,7 +1,7 @@
 <?php
 
 /**
- * Description of Site
+ * Description of Site.
  *
  * @author Hery
  */
@@ -228,11 +228,12 @@ class CDevSuite_Windows_Site extends CDevSuite_Site {
     /**
      * Trust the given certificate file in the Mac Keychain.
      *
-     * @param string $crtPath
+     * @param string     $crtPath
+     * @param null|mixed $url
      *
      * @return void
      */
-    public function trustCertificate($crtPath) {
+    public function trustCertificate($crtPath, $url = null) {
         CDevSuite::info('Trust Certificate ' . $crtPath);
         $this->cli->run(sprintf('cmd "/C certutil -addstore "Root" "%s""', $crtPath));
     }
