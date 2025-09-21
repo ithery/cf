@@ -1,6 +1,18 @@
 <?php
 
 class CDevSuite_PackageManager_Apt extends CDevSuite_PackageManager {
+    const SUPPORTED_PHP_VERSIONS = [
+        'php',
+        'php83',
+        'php81',
+        'php80',
+        'php74',
+        'php73',
+        'php72',
+        'php71',
+        'php70',
+    ];
+
     public $cli;
 
     /**
@@ -99,5 +111,9 @@ class CDevSuite_PackageManager_Apt extends CDevSuite_PackageManager {
         } catch (DomainException $e) {
             return false;
         }
+    }
+
+    public function supportedPhpVersions() {
+        return c::collect(static::SUPPORTED_PHP_VERSIONS);
     }
 }

@@ -1,19 +1,44 @@
 <?php
 
-class CDevSuite_PackageManager_Yum extends CDevSuite_PackageManager {
+class CDevSuite_PackageManager_Homebrew extends CDevSuite_PackageManager {
     const SUPPORTED_PHP_VERSIONS = [
         'php',
+        'php@8.3',
+        'php@8.1',
+        'php@8.0',
+        'php@7.4',
+        'php@7.3',
+        'php@7.2',
+        'php@7.1',
+        'php@7.0',
+        'php73',
+        'php72',
+        'php71',
+        'php70',
     ];
 
     public $cli;
 
     /**
-     * Create a new Yum instance.
+     * Create a new Homebrew instance.
      *
      * @return void
      */
     public function __construct() {
         $this->cli = CDevSuite::commandLine();
+    }
+
+    /**
+     * Get array of installed packages.
+     *
+     * @param string $package
+     *
+     * @return array
+     */
+    public function packages($package) {
+        $query = "brew list --formula | grep {$package}";
+
+        return explode(PHP_EOL, $this->cli->runAsUser($query));
     }
 
     /**
@@ -24,11 +49,11 @@ class CDevSuite_PackageManager_Yum extends CDevSuite_PackageManager {
      * @return bool
      */
     public function installed($package) {
-        $query = "yum list installed {$package} | grep {$package} | sed 's_  _\\t_g' | sed 's_\\._\\t_g' | cut -f 1";
+        // For php-fpm we need to tim the -fpm out of the string as
+        // php-fpm gets installed among php
+        $package = str_replace('-fpm', '', $package);
 
-        $packages = explode(PHP_EOL, $this->cli->run($query));
-
-        return in_array($package, $packages);
+        return in_array($package, $this->packages($package));
     }
 
     /**
@@ -52,17 +77,17 @@ class CDevSuite_PackageManager_Yum extends CDevSuite_PackageManager {
      * @return void
      */
     public function installOrFail($package) {
-        CDevSuite::output('<info>[' . $package . '] is not installed, installing it now via Yum...</info> 🍻');
+        CDevSuite::output('<info>[' . $package . '] is not installed, installing it now via Brew...</info> 🍻');
 
-        $this->cli->run(trim('yum install -y ' . $package), function ($exitCode, $errorOutput) use ($package) {
+        $this->cli->runAsUser(trim('brew install ' . $package), function ($exitCode, $errorOutput) use ($package) {
             CDevSuite::output($errorOutput);
 
-            throw new DomainException('Yum was unable to install [' . $package . '].');
+            throw new DomainException('Brew was unable to install [' . $package . '].');
         });
     }
 
     /**
-     * Configure package manager on devsuite install.
+     * Configure package manager on valet install.
      *
      * @return void
      */
@@ -71,7 +96,7 @@ class CDevSuite_PackageManager_Yum extends CDevSuite_PackageManager {
     }
 
     /**
-     * Restart dnsmasq in Fedora.
+     * Restart dnsmasq in Ubuntu.
      *
      * @param mixed $sm
      */
@@ -86,8 +111,8 @@ class CDevSuite_PackageManager_Yum extends CDevSuite_PackageManager {
      */
     public function isAvailable() {
         try {
-            $output = $this->cli->run('which yum', function ($exitCode, $output) {
-                throw new DomainException('Yum not available');
+            $output = $this->cli->runAsUser('which brew', function ($exitCode, $output) {
+                throw new DomainException('Brew not available');
             });
 
             return $output != '';

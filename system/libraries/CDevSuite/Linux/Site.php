@@ -88,6 +88,10 @@ class CDevSuite_Linux_Site extends CDevSuite_Site {
         $this->createCertificate($url, $certificateExpireInDays);
 
         $this->createSecureNginxServer($url);
+        $this->files->putAsUser(
+            $this->nginxPath($url),
+            $this->buildSecureNginxServer($url, $siteConf)
+        );
     }
 
     /**
@@ -153,9 +157,9 @@ class CDevSuite_Linux_Site extends CDevSuite_Site {
         $this->createPrivateKey($keyPath);
         $this->createSigningRequest($url, $keyPath, $csrPath, $confPath);
 
-        $caSrlParam = '-CAserial "' . $caSrlPath . '"';
-        if (!$this->files->exists($caSrlPath)) {
-            $caSrlParam .= ' -CAcreateserial';
+        $caSrlParam = ' -CAcreateserial';
+        if ($this->files->exists($caSrlPath)) {
+            $caSrlParam = ' -CAserial ' . $caSrlPath;
         }
 
         $commandOpenSSL = sprintf(

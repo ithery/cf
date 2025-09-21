@@ -174,12 +174,21 @@ class CDevSuite_Filesystem {
     }
 
     public function putAsRoot($path, $contents) {
-        $localFile = CTemporary::createLocalFile($contents, 'devsuite');
-        $localFilename = $localFile->getFileName();
+        $tmp = tempnam(sys_get_temp_dir(), 'devsuite_');
+        file_put_contents($tmp, $contents);
+        // $localFile = CTemporary::createLocalFile($contents, 'devsuite');
+        // $localFilename = $localFile->getFileName();
 
-        $this->copyAsRoot($localFilename, $path);
+        try {
+            $this->copyAsRoot($tmp, $path);
+        } catch (Exception $e) {
+            throw $e;
+        } finally {
+            @unlink($tmp);
+        }
+        // $this->copyAsRoot($localFilename, $path);
 
-        $localFile->delete();
+        // $localFile->delete();
     }
 
     /**
@@ -454,7 +463,7 @@ class CDevSuite_Filesystem {
                     }
                 } else {
                     if (true !== @unlink($file)) {
-                        throw new \Exception(sprintf('Failed to remove file "%s".', $file), 0, null, $file);
+                        throw new \Exception(sprintf('Failed to remove file "%s".', $file));
                     }
                 }
             }

@@ -1,6 +1,10 @@
 <?php
 
 class CDevSuite_PackageManager_Eopkg extends CDevSuite_PackageManager {
+    const SUPPORTED_PHP_VERSIONS = [
+        'php',
+    ];
+
     public $cli;
 
     /**
@@ -99,5 +103,9 @@ class CDevSuite_PackageManager_Eopkg extends CDevSuite_PackageManager {
         } catch (DomainException $e) {
             return false;
         }
+    }
+
+    public function supportedPhpVersions() {
+        return c::collect(static::SUPPORTED_PHP_VERSIONS);
     }
 }
