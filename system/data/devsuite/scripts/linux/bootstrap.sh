@@ -111,5 +111,5 @@ then
 # and let it handle the request. These are commands which can be run
 # without sudo and don't require taking over terminals like Ngrok.
 else
-    php "$DIR/cli/valet.php" "$@"
+    php "$DIR/cli/devsuite.php" "$@"
 fi

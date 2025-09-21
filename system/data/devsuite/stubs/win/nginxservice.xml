@@ -11,5 +11,5 @@
   <stopargument>-s</stopargument>
   <stopargument>stop</stopargument>
   <logpath>DEVSUITE_HOME_PATH\Log\</logpath>
-  <logmode>reset</logmode>
+  <log mode="reset"></log>
 </service>

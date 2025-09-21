@@ -31,7 +31,8 @@ class CDevSuite_Windows_Ngrok {
      * @return void
      */
     public function run(string $command) {
-        $ngrok = realpath(__DIR__ . '/../../bin/ngrok.exe');
+        $binPath = realpath(CDevSuite::binPath());
+        $ngrok = $binPath . '/ngrok.exe';
 
         $this->cli->passthru("\"$ngrok\" $command");
     }
@@ -54,8 +55,8 @@ Then use: valet ngrok authtoken my-token');
         $options = (new CCollection($options))->map(function ($value, $key) {
             return "--$key=$value";
         })->implode(' ');
-
-        $ngrok = realpath(__DIR__ . '/../../bin/ngrok.exe');
+        $binPath = realpath(CDevSuite::binPath());
+        $ngrok = $binPath . '/ngrok.exe';
 
         $this->cli->passthru("start \"$domain\" \"$ngrok\" http $domain:$port $options");
     }
