@@ -1,20 +1,20 @@
 <?php
 
 /**
- * Description of PhpFpm
+ * Description of PhpFpm.
  *
  * @author Hery
  */
 use Symfony\Component\Process\Process;
 
 class CDevSuite_Windows_PhpFpm extends CDevSuite_PhpFpm {
+    const SERVICE = 'phpfpmservice';
+
     public $cli;
 
     public $files;
 
     public $winsw;
-
-    const SERVICE = 'phpfpmservice';
 
     /**
      * Create a new PHP FPM class instance.
@@ -72,7 +72,7 @@ class CDevSuite_Windows_PhpFpm extends CDevSuite_PhpFpm {
      * @return string
      */
     public function findPhpPath() {
-        $php = $this->cli->runOrDie('where php', function ($code, $output) {
+        $php = $this->cli->runOrExit('where php', function ($code, $output) {
             CDevSuite::warning('Could not find PHP. Make sure it\'s added to the environment variables.');
         });
 

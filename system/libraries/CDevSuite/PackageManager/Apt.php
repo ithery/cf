@@ -13,7 +13,7 @@ class CDevSuite_PackageManager_Apt extends CDevSuite_PackageManager {
     }
 
     /**
-     * Get array of installed packages
+     * Get array of installed packages.
      *
      * @param string $package
      *

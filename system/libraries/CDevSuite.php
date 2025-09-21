@@ -80,13 +80,17 @@ class CDevSuite {
         CDevSuite_Bootstrap::instance()->bootstrap();
     }
 
-    public static function homePath() {
-        $path = $_SERVER['HOME'] . DS . '.config' . DS . 'devsuite' . DS;
-        return str_replace('\\', '/', $path);
+    public static function homePath($path = '') {
+        $basePath = $_SERVER['HOME'] . DS . '.config' . DS . 'devsuite' . DS;
+
+        $basePath = str_replace('\\', '/', $basePath);
+
+        return $basePath . ($path ? DIRECTORY_SEPARATOR . $path : $path);
     }
 
     public static function legacyHomePath() {
         $path = $_SERVER['HOME'] . DS . '.devsuite' . DS;
+
         return str_replace('\\', '/', $path);
     }
 
@@ -99,16 +103,19 @@ class CDevSuite {
 
     public static function serverPath() {
         $path = DOCROOT . 'devsuite.php';
+
         return str_replace('\\', '/', $path);
     }
 
     public static function stubsPath() {
         $path = DOCROOT . 'system' . DS . 'data' . DS . 'devsuite' . DS . 'stubs' . DS . static::osFolder() . DS;
+
         return str_replace('\\', '/', $path);
     }
 
     public static function scriptsPath() {
         $path = DOCROOT . 'system' . DS . 'data' . DS . 'devsuite' . DS . 'scripts' . DS;
+
         return str_replace('\\', '/', $path);
     }
 
@@ -119,6 +126,7 @@ class CDevSuite {
         if (static::$db == null) {
             static::$db = new CDevSuite_Db();
         }
+
         return static::$db;
     }
 
@@ -129,6 +137,7 @@ class CDevSuite {
         if (static::$ssh == null) {
             static::$ssh = new CDevSuite_Ssh();
         }
+
         return static::$ssh;
     }
 
@@ -139,6 +148,7 @@ class CDevSuite {
         if (static::$deploy == null) {
             static::$deploy = new CDevSuite_Deploy();
         }
+
         return static::$deploy;
     }
 
@@ -147,15 +157,19 @@ class CDevSuite {
             switch (CServer::getOS()) {
                 case CServer::OS_LINUX:
                     static::$configuration = new CDevSuite_Linux_Configuration();
+
                     break;
                 case CServer::OS_WINNT:
                     static::$configuration = new CDevSuite_Windows_Configuration();
+
                     break;
                 case CServer::OS_DARWIN:
                     static::$configuration = new CDevSuite_Mac_Configuration();
+
                     break;
             }
         }
+
         return static::$configuration;
     }
 
@@ -164,20 +178,24 @@ class CDevSuite {
             switch (CServer::getOS()) {
                 case CServer::OS_LINUX:
                     static::$filesystem = new CDevSuite_Linux_Filesystem();
+
                     break;
                 case CServer::OS_WINNT:
                     static::$filesystem = new CDevSuite_Windows_Filesystem();
+
                     break;
                 case CServer::OS_DARWIN:
                     static::$filesystem = new CDevSuite_Mac_Filesystem();
+
                     break;
             }
         }
+
         return static::$filesystem;
     }
 
     /**
-     * Get CommandLine instance
+     * Get CommandLine instance.
      *
      * @return CDevSuite_CommandLine
      */
@@ -186,15 +204,19 @@ class CDevSuite {
             switch (CServer::getOS()) {
                 case CServer::OS_LINUX:
                     static::$commandLine = new CDevSuite_Linux_CommandLine();
+
                     break;
                 case CServer::OS_WINNT:
                     static::$commandLine = new CDevSuite_Windows_CommandLine();
+
                     break;
                 case CServer::OS_DARWIN:
                     static::$commandLine = new CDevSuite_Mac_CommandLine();
+
                     break;
             }
         }
+
         return static::$commandLine;
     }
 
@@ -203,15 +225,19 @@ class CDevSuite {
             switch (CServer::getOS()) {
                 case CServer::OS_LINUX:
                     static::$devCloud = new CDevSuite_Linux_DevCloud();
+
                     break;
                 case CServer::OS_WINNT:
                     static::$devCloud = new CDevSuite_Windows_DevCloud();
+
                     break;
                 case CServer::OS_DARWIN:
                     static::$devCloud = new CDevSuite_Mac_DevCloud();
+
                     break;
             }
         }
+
         return static::$devCloud;
     }
 
@@ -220,15 +246,19 @@ class CDevSuite {
             switch (CServer::getOS()) {
                 case CServer::OS_LINUX:
                     static::$system = new CDevSuite_Linux_System();
+
                     break;
                 case CServer::OS_WINNT:
                     static::$system = new CDevSuite_Windows_System();
+
                     break;
                 case CServer::OS_DARWIN:
                     static::$system = new CDevSuite_Mac_System();
+
                     break;
             }
         }
+
         return static::$system;
     }
 
@@ -240,37 +270,45 @@ class CDevSuite {
             switch (CServer::getOS()) {
                 case CServer::OS_LINUX:
                     static::$site = new CDevSuite_Linux_Site();
+
                     break;
                 case CServer::OS_WINNT:
                     static::$site = new CDevSuite_Windows_Site();
+
                     break;
                 case CServer::OS_DARWIN:
                     static::$site = new CDevSuite_Mac_Site();
+
                     break;
             }
         }
+
         return static::$site;
     }
 
     /**
-     * @return CDevSuite_DnsMasq
-     *
      * @throws Exception
+     *
+     * @return CDevSuite_DnsMasq
      */
     public static function dnsMasq() {
         if (static::$dnsMasq == null) {
             switch (CServer::getOS()) {
                 case CServer::OS_LINUX:
                     static::$dnsMasq = new CDevSuite_Linux_DnsMasq();
+
                     break;
                 case CServer::OS_DARWIN:
                     static::$dnsMasq = new CDevSuite_Mac_DnsMasq();
+
                     break;
                 default:
                     throw new Exception('Dev Suite DnsMasq not available for this OS:' . CServer::getOS());
+
                     break;
             }
         }
+
         return static::$dnsMasq;
     }
 
@@ -282,20 +320,24 @@ class CDevSuite {
             switch (CServer::getOS()) {
                 case CServer::OS_LINUX:
                     static::$nginx = new CDevSuite_Linux_Nginx();
+
                     break;
                 case CServer::OS_WINNT:
                     static::$nginx = new CDevSuite_Windows_Nginx();
+
                     break;
                 case CServer::OS_DARWIN:
                     static::$nginx = new CDevSuite_Mac_Nginx();
+
                     break;
             }
         }
+
         return static::$nginx;
     }
 
     /**
-     * Get PhpFpm instance
+     * Get PhpFpm instance.
      *
      * @return CDevSuite_PhpFpm
      */
@@ -304,15 +346,19 @@ class CDevSuite {
             switch (CServer::getOS()) {
                 case CServer::OS_LINUX:
                     static::$phpFpm = new CDevSuite_Linux_PhpFpm();
+
                     break;
                 case CServer::OS_WINNT:
                     static::$phpFpm = new CDevSuite_Windows_PhpFpm();
+
                     break;
                 case CServer::OS_DARWIN:
                     static::$phpFpm = new CDevSuite_Mac_PhpFpm();
+
                     break;
             }
         }
+
         return static::$phpFpm;
     }
 
@@ -335,9 +381,11 @@ class CDevSuite {
                     }, static function () {
                         throw new DomainException('No compatible package manager found.');
                     });
+
                     break;
             }
         }
+
         return static::$packageManager;
     }
 
@@ -355,9 +403,11 @@ class CDevSuite {
                     }, static function () {
                         throw new DomainException('No compatible service manager found.');
                     });
+
                     break;
             }
         }
+
         return static::$serviceManager;
     }
 
@@ -370,7 +420,7 @@ class CDevSuite {
     }
 
     /**
-     * Get the user's group
+     * Get the user's group.
      */
     public static function group() {
         switch (CServer::getOS()) {
@@ -411,6 +461,7 @@ class CDevSuite {
         if ($os == CServer::OS_LINUX) {
             return 'linux';
         }
+
         return 'linux';
     }
 

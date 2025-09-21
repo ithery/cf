@@ -6,6 +6,9 @@
  * @author Hery
  */
 class CDevSuite_Acrylic {
+    /**
+     * @var CDevSuite_Windows_CommandLine
+     */
     protected $cli;
 
     protected $files;
@@ -28,14 +31,15 @@ class CDevSuite_Acrylic {
      * @return void
      */
     public function install($tld = 'test') {
-        $this->uninstall();
+        // $this->uninstall();
+        CDevSuite::info('Installing Acrylic DNS...');
         $this->createHostsFile($tld);
+        $this->installService();
+        // $this->configureNetworkDNS();
 
-        $this->configureNetworkDNS();
-
-        $this->cli->runOrDie('cmd /C "' . $this->path() . '/AcrylicUI.exe" InstallAcrylicService', function ($code, $output) {
-            CDevSuite::warning($output);
-        });
+        // $this->cli->runOrDie('cmd /C "' . $this->path() . '/AcrylicUI.exe" InstallAcrylicService', function ($code, $output) {
+        //     CDevSuite::warning($output);
+        // });
 
         $this->restart();
     }
@@ -51,7 +55,7 @@ class CDevSuite_Acrylic {
         $contents = $this->files->get(CDevSuite::stubsPath() . 'AcrylicHosts.txt');
 
         $this->files->put(
-            $this->path() . '/AcrylicHosts.txt',
+            $this->path('AcrylicHosts.txt'),
             str_replace(['DEVSUITE_TLD', 'DEVSUITE_HOME_PATH'], [$tld, rtrim(CDevSuite::homePath(), '/')], $contents)
         );
 
@@ -63,14 +67,36 @@ class CDevSuite_Acrylic {
     }
 
     /**
+     * Install the Acrylic DNS service.
+     *
+     * @return void
+     */
+    protected function installService() {
+        $this->uninstall();
+
+        $this->configureNetworkDNS();
+
+        $this->cli->runOrExit('cmd /C "' . $this->path('AcrylicUI.exe') . '" InstallAcrylicService', function ($code, $output) {
+            error("Failed to install Acrylic DNS: $output");
+        });
+
+        $this->flushdns();
+    }
+
+    /**
      * Configure the Network DNS.
      *
      * @return void
      */
     public function configureNetworkDNS() {
-        $bin = realpath(CDevSuite::binPath());
+        // $bin = realpath(CDevSuite::binPath());
 
-        $this->cli->run('cmd /C cd "' . $bin . '" && configuredns');
+        // $this->cli->run('cmd /C cd "' . $bin . '" && configuredns');
+
+        $this->cli->powershell(implode(';', [
+            '(Get-NetIPAddress -AddressFamily IPv4).InterfaceIndex | ForEach-Object {Set-DnsClientServerAddress -InterfaceIndex $_ -ServerAddresses (\"127.0.0.1\", \"8.8.8.8\")}',
+            '(Get-NetIPAddress -AddressFamily IPv6).InterfaceIndex | ForEach-Object {Set-DnsClientServerAddress -InterfaceIndex $_ -ServerAddresses (\"::1\", \"2001:4860:4860::8888\")}',
+        ]));
     }
 
     /**
@@ -94,9 +120,37 @@ class CDevSuite_Acrylic {
      * @return void
      */
     public function uninstall() {
+        if (!$this->installed()) {
+            return;
+        }
         $this->stop();
+        $this->cli->run('cmd /C "' . $this->path('AcrylicUI.exe') . '" UninstallAcrylicService', function ($code, $output) {
+            CDevSuite::warning("Failed to uninstall Acrylic DNS: $output");
+        });
+        $this->removeNetworkDNS();
 
-        $this->cli->run('cmd /C "' . $this->path() . '/AcrylicUI.exe" UninstallAcrylicService');
+        $this->flushdns();
+    }
+
+    /**
+     * Determine if the Acrylic DNS is installed.
+     *
+     * @return bool
+     */
+    protected function installed(): bool {
+        return $this->cli->powershell('Get-Service -Name "AcrylicDNSProxySvc"')->isSuccessful();
+    }
+
+    /**
+     * Remove the Network DNS.
+     *
+     * @return void
+     */
+    protected function removeNetworkDNS() {
+        $this->cli->powershell(implode(';', [
+            '(Get-NetIPAddress -AddressFamily IPv4).InterfaceIndex | ForEach-Object {Set-DnsClientServerAddress -InterfaceIndex $_ -ResetServerAddresses}',
+            '(Get-NetIPAddress -AddressFamily IPv6).InterfaceIndex | ForEach-Object {Set-DnsClientServerAddress -InterfaceIndex $_ -ResetServerAddresses}',
+        ]));
     }
 
     /**
@@ -105,8 +159,8 @@ class CDevSuite_Acrylic {
      * @return void
      */
     public function start() {
-        $this->cli->runOrDie('cmd /C "' . $this->path() . '/AcrylicUI.exe" StartAcrylicService', function ($code, $output) {
-            CDevSuite::warning($output);
+        $this->cli->runOrExit('cmd /C "' . $this->path('AcrylicUI.exe') . '" StartAcrylicService', function ($code, $output) {
+            CDevSuite::error("Failed to start Acrylic DNS: $output");
         });
 
         $this->flushdns();
@@ -118,7 +172,9 @@ class CDevSuite_Acrylic {
      * @return void
      */
     public function stop() {
-        $this->cli->run('cmd /C "' . $this->path() . '/AcrylicUI.exe" StopAcrylicService');
+        $this->cli->run('cmd /C "' . $this->path('AcrylicUI.exe') . '" StopAcrylicService', function ($code, $output) {
+            CDevSuite::warning("Failed to stop Acrylic DNS: $output");
+        });
 
         $this->flushdns();
     }
@@ -129,9 +185,9 @@ class CDevSuite_Acrylic {
      * @return void
      */
     public function restart() {
-        $this->stop();
-
-        $this->start();
+        $this->cli->run('cmd /C "' . $this->path('AcrylicUI.exe') . '" RestartAcrylicService', function ($code, $output) {
+            CDevSuite::warning("Failed to restart Acrylic DNS: $output");
+        });
     }
 
     /**
@@ -146,9 +202,13 @@ class CDevSuite_Acrylic {
     /**
      * Get the Acrylic path.
      *
+     * @param string $path
+     *
      * @return string
      */
-    public function path() {
-        return str_replace(DIRECTORY_SEPARATOR, '/', realpath(CDevSuite::binPath() . 'acrylic/'));
+    public function path(string $path = ''): string {
+        $basePath = str_replace(DIRECTORY_SEPARATOR, '/', realpath(CDevSuite::binPath() . 'acrylic/'));
+
+        return $basePath . ($path ? DIRECTORY_SEPARATOR . $path : $path);
     }
 }

@@ -189,7 +189,7 @@ class CDevSuite_ServiceManager_Systemd extends CDevSuite_ServiceManager {
     }
 
     /**
-     * Determine real service name
+     * Determine real service name.
      *
      * @param mixed $service Service name
      *

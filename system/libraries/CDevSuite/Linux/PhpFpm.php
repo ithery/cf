@@ -1,11 +1,14 @@
 <?php
 
 /**
- * Description of PhpFpm
+ * Description of PhpFpm.
  *
  * @author Hery
  */
 class CDevSuite_Linux_PhpFpm extends CDevSuite_PhpFpm {
+    /**
+     * @var CDevSuite_PackageManager
+     */
     public $pm;
 
     public $sm;
@@ -106,6 +109,7 @@ class CDevSuite_Linux_PhpFpm extends CDevSuite_PhpFpm {
 
         if ($exception) {
             CDevSuite::info('Changing version failed');
+
             throw $exception;
         }
 
@@ -152,7 +156,7 @@ class CDevSuite_Linux_PhpFpm extends CDevSuite_PhpFpm {
     }
 
     /**
-     * Install Drop-In systemd override for php-fpm service
+     * Install Drop-In systemd override for php-fpm service.
      *
      * @return void
      */
@@ -209,7 +213,7 @@ class CDevSuite_Linux_PhpFpm extends CDevSuite_PhpFpm {
     }
 
     /**
-     * Determine php service name
+     * Determine php service name.
      *
      * @return string
      */

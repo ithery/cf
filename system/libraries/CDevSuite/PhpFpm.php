@@ -10,5 +10,7 @@ abstract class CDevSuite_PhpFpm {
 
     abstract public function install();
 
+    abstract public function uninstall();
+
     abstract public function stop();
 }

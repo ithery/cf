@@ -4,6 +4,8 @@
  * Description of Winsw.
  *
  * @author Hery
+ *
+ * @deprecated 1.8
  */
 class CDevSuite_Winsw {
     /**
@@ -42,7 +44,7 @@ class CDevSuite_Winsw {
             CDevSuite::homePath() . 'Services/' . $service,
             'install'
         ];
-        $this->cli->runOrDie($command, function ($code, $output) use ($service) {
+        $this->cli->runOrExit($command, function ($code, $output) use ($service) {
             CDevSuite::warning("Could not install the ${service} service. Check ~/.devsuite/Log for errors.");
             CDevSuite::warning('Output:' . $output);
         });
@@ -105,7 +107,7 @@ class CDevSuite_Winsw {
         $this->cli->run($command, function () use ($service, $command) {
             sleep(2);
 
-            $this->cli->runOrDie($command, function () use ($service) {
+            $this->cli->runOrExit($command, function () use ($service) {
                 CDevSuite::warning("Could not start the ${service} service. Check ~/.devsuite/Log for errors.");
             });
         });
