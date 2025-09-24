@@ -217,11 +217,16 @@ class CElement_Component_Nestable extends CElement_Component {
         if ($this->query != null) {
             $this->getDataFromQuery();
         }
+        $classes = $this->classes;
+        $classes = implode(' ', $classes);
+        if (strlen($classes) > 0) {
+            $classes = ' ' . $classes;
+        }
         $html = new CStringBuilder();
         $html->setIndent($indent);
         $styles = '';
         // $styles = $this->disableDnd ? 'pointer-events: none;' : '';
-        $html->appendln('<div id="' . $this->id . '" cres-element="component:Nestable" class="dd nestable cres-nestable cres:element:component:Nestable" style="' . $styles . '">')->incIndent();
+        $html->appendln('<div id="' . $this->id . '" cres-element="component:Nestable" class="dd nestable cres-nestable cres:element:component:Nestable ' . $classes . '" style="' . $styles . '">')->incIndent();
         if (count($this->data) > 0) {
             $depthBefore = -1;
             $in = 0;
