@@ -72,7 +72,7 @@ class CElement_FormInput_ImageAjax extends CElement_FormInput_Image {
 
     public function setValue($val) {
         parent::setValue($val);
-        if ($val) {
+        if ($val && $this->imgSrc == null) {
             $this->imgSrc = CTemporary::getUrl('imgupload', $val);
         }
 

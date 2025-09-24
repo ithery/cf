@@ -249,15 +249,18 @@ class CRouting_UrlGenerator {
         } else {
             $path = CF::findFile('media', $path, false, $extension);
         }
-
+        // Normalize slashes (Windows/Linux compatibility)
+        $path = str_replace(['\\', '//'], '/', $path);
+        $publicPath = CF::publicPath() ? str_replace('\\', '/', CF::publicPath()) : null;
+        $docroot = str_replace('\\', '/', DOCROOT);
         $count = 1;
-        if (CF::publicPath()) {
-            if (cstr::startsWith($path, CF::publicPath())) {
-                $path = str_replace(CF::publicPath() . '/', '', $path, $count);
+        if ($publicPath) {
+            if (cstr::startsWith($path, $publicPath)) {
+                $path = str_replace($publicPath . '/', '', $path, $count);
             }
         } else {
-            if (cstr::startsWith($path, DOCROOT)) {
-                $path = str_replace(DOCROOT, '', $path, $count);
+            if (cstr::startsWith($path, $docroot)) {
+                $path = str_replace($docroot, '', $path, $count);
             }
         }
 
