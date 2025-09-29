@@ -92,7 +92,6 @@ trait CAjax_Engine_DataTable_Trait_ProcessorTrait {
             }
             foreach ($table->columns as $col) {
                 $cell = new CElement_Component_DataTable_Cell($table, $col, $row);
-
                 $arr[] = $cell->html();
                 $js .= $cell->js();
             }

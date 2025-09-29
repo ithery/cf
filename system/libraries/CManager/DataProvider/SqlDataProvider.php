@@ -107,12 +107,17 @@ class CManager_DataProvider_SqlDataProvider extends CManager_DataProviderAbstrac
     }
 
     protected function getQueryLimit($page, $perPage) {
+        $connection = $this->getDb();
+        $driver = $connection->getDriverName();
         if ($page <= 0) {
             return '';
         }
         $offset = ($page - 1) * $perPage;
         $limit = $perPage;
         $sLimit = 'LIMIT ' . intval($offset) . ', ' . intval($limit);
+        if ($driver == 'pgsql') {
+            $sLimit = 'LIMIT ' . intval($limit) . ' OFFSET ' . intval($offset);
+        }
 
         return $sLimit;
     }
