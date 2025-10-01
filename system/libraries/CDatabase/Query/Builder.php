@@ -363,7 +363,8 @@ class CDatabase_Query_Builder {
         if ($query->getConnection()->getDatabaseName() !== $this->getConnection()->getDatabaseName()) {
             $databaseName = $query->getConnection()->getDatabaseName();
 
-            if (strpos($query->from, $databaseName) !== 0 && strpos($query->from, '.') === false) {
+            // if (strpos($query->from, $databaseName) !== 0 && strpos($query->from, '.') === false) {
+            if (!cstr::startsWith($query->from, $databaseName) && !cstr::contains($query->from, '.')) {
                 $query->from($databaseName . '.' . $query->from);
             }
         }
