@@ -126,10 +126,16 @@ class CManager_DataProvider_SqlDataProvider extends CManager_DataProviderAbstrac
         $sortData = $this->sort;
 
         $sOrder = '';
+        $connection = $this->getDb();
+        $driver = $connection->getDriverName();
         //process ordering
-        if (count($this->sort) > 0) {
-            foreach ($this->sort as $fieldName => $sortDirection) {
-                $sOrder .= ', ' . $this->getDb()->escapeColumn($fieldName) . ' ' . $this->getDb()->escapeStr($sortDirection);
+        if (count($sortData) > 0) {
+            foreach ($sortData as $fieldName => $sortDirection) {
+                $fieldNameEscaped = $connection->escapeColumn($fieldName);
+                if ($driver === 'pgsql') {
+                    $fieldNameEscaped = '' . $fieldName . '';
+                }
+                $sOrder .= ', ' . $fieldNameEscaped . ' ' . $connection->escapeStr($sortDirection);
             }
         }
 
