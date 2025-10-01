@@ -2,12 +2,6 @@
 
 defined('SYSPATH') or die('No direct access allowed.');
 
-/**
- * @author Hery Kurniawan
- * @license Ittron Global Teknologi <ittron.co.id>
- *
- * @since Jun 15, 2018, 12:00:39 AM
- */
 class CElement_FormInput_SelectSearch extends CElement_FormInput {
     use CTrait_Compat_Element_FormInput_SelectSearch;
     use CElement_FormInput_SelectSearch_Trait_Select2v23Trait;

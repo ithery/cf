@@ -1,7 +1,7 @@
 {
     "main": "dist/cres.js",
     "name": "cf-cres",
-    "version": "1.5.4",
+    "version": "1.5.5",
     "scripts": {
         "build": "cross-env NODE_ENV=production npx rollup -c",
         "dev": "npx rollup -c -w",
@@ -60,6 +60,7 @@
         "lodash.clonedeep": "^4.5.0",
         "lodash.merge": "^4.6.2",
         "pusher-js": "^7.0.3",
+        "sortablejs": "^1.15.6",
         "tippy.js": "^6.3.7"
     }
 }

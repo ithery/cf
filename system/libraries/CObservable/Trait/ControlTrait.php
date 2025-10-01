@@ -453,4 +453,18 @@ trait CObservable_Trait_ControlTrait {
 
         return $control;
     }
+
+    /**
+     * Create Sortable Control.
+     *
+     * @param null|string $id
+     *
+     * @return CElement_FormInput_Sortable
+     */
+    public function addSortableControl($id = null) {
+        $control = new CElement_FormInput_Sortable($id);
+        $this->wrapper->add($control);
+
+        return $control;
+    }
 }

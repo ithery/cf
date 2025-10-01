@@ -2,12 +2,6 @@
 
 defined('SYSPATH') or die('No direct access allowed.');
 
-/**
- * @author Hery Kurniawan
- * @license Ittron Global Teknologi <ittron.co.id>
- *
- * @since Sep 14, 2018, 3:50:56 PM
- */
 class CElement_FormInput_SelectTag extends CElement_FormInput {
     use CTrait_Compat_Element_FormInput_SelectTag;
 

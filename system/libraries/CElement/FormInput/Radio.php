@@ -2,12 +2,6 @@
 
 defined('SYSPATH') or die('No direct access allowed.');
 
-/**
- * @author Hery Kurniawan
- * @license Ittron Global Teknologi <ittron.co.id>
- *
- * @since Mar 24, 2019, 1:54:36 AM
- */
 class CElement_FormInput_Radio extends CElement_FormInput {
     use CTrait_Compat_Element_FormInput_Radio,
         CTrait_Element_Property_Label;
