@@ -117,7 +117,7 @@ class Controller_Cresenity extends CController {
         imagedestroy($my_image);
     }
 
-    public function noimage($width = 200, $height = 150, $bg_color = 'EFEFEF', $txt_color = 'AAAAAA', $text = 'NO IMAGE') {
+    public function noimage($width = 200, $height = 150, $bgColor = 'EFEFEF', $txtColor = 'AAAAAA', $text = 'NO IMAGE') {
         if (strlen($text) > 0) {
             $text = urldecode($text);
         }
@@ -132,23 +132,37 @@ class Controller_Cresenity extends CController {
         }
         $image = imagecreate($width, $height);
         //Making of colors, we are changing HEX to RGB
-        $bg_color = imagecolorallocate($image, base_convert(substr($bg_color, 0, 2), 16, 10), base_convert(substr($bg_color, 2, 2), 16, 10), base_convert(substr($bg_color, 4, 2), 16, 10));
+        $bgColor = imagecolorallocate($image, base_convert(substr($bgColor, 0, 2), 16, 10), base_convert(substr($bgColor, 2, 2), 16, 10), base_convert(substr($bgColor, 4, 2), 16, 10));
 
-        $txt_color = imagecolorallocate($image, base_convert(substr($txt_color, 0, 2), 16, 10), base_convert(substr($txt_color, 2, 2), 16, 10), base_convert(substr($txt_color, 4, 2), 16, 10));
+        $txtColor = imagecolorallocate($image, base_convert(substr($txtColor, 0, 2), 16, 10), base_convert(substr($txtColor, 2, 2), 16, 10), base_convert(substr($txtColor, 4, 2), 16, 10));
 
         //Fill the background color
-        imagefill($image, 0, 0, $bg_color);
-        //Calculating font size
-        $fontsize = ($width > $height) ? ($height / 10) : ($width / 10);
-        if ($width < 100) {
-            $fontsize = 1;
+        imagefill($image, 0, 0, $bgColor);
+
+        $fontFile = CManager_FontManager::getArialFontPath();
+        $maxWidth = $width * 0.7;   // teks maksimal 80% lebar gambar
+        $maxHeight = $height * 0.4; // teks maksimal 40% tinggi gambar
+        $fontSize = 10;
+        while (true) {
+            $box = imagettfbbox($fontSize, 0, $fontFile, $text);
+            $textWidth = abs($box[2] - $box[0]);
+            $textHeight = abs($box[5] - $box[1]);
+
+            if ($textWidth > $maxWidth || $textHeight > $maxHeight) {
+                $fontSize--;
+
+                break;
+            }
+            $fontSize++;
         }
-        $line_number = 1;
-        $total_lines = 1;
-        $center_x = ceil((imagesx($image) - (imagefontwidth($fontsize) * strlen($text))) / 2);
-        $center_y = ceil(((imagesy($image) - (imagefontheight($fontsize) * $total_lines)) / 2) + (($line_number - 1) * imagefontheight($fontsize)));
-        //Inserting Text
-        imagestring($image, $fontsize, $center_x, $center_y, $text, $txt_color);
+        // Hitung posisi tengah
+        $box = imagettfbbox($fontSize, 0, $fontFile, $text);
+        $textWidth = abs($box[2] - $box[0]);
+        $textHeight = abs($box[5] - $box[1]);
+        $x = ($width - $textWidth) / 2;
+        $y = ($height + $textHeight) / 2;
+        // Render teks
+        imagettftext($image, $fontSize, 0, $x, $y, $txtColor, $fontFile, $text);
 
         //Tell the browser what kind of file is come in
         $headers = [

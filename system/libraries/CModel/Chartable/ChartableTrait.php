@@ -69,8 +69,8 @@ trait CModel_Chartable_ChartableTrait {
             ? CCarbon::now()->endOfYear()
             : CCarbon::parse($stopDate);
 
-        $newQuery = new CDatabase_Query_Builder();
-        $newQuery->from($builder);
+        $newQuery = new CDatabase_Query_Builder($builder->getConnection());
+        $newQuery->from($builder, 'chartable_sub');
         $query = $newQuery->select(
             CDatabase::raw("${value} as value"),
             CDatabase::raw("YEAR(${dateColumn}) as label")
@@ -118,8 +118,8 @@ trait CModel_Chartable_ChartableTrait {
             ? CCarbon::now()->endOfMonth()
             : CCarbon::parse($stopDate);
 
-        $newQuery = new CDatabase_Query_Builder();
-        $newQuery->from($builder);
+        $newQuery = new CDatabase_Query_Builder($builder->getConnection());
+        $newQuery->from($builder, 'chartable_sub');
         $query = $newQuery->select(
             CDatabase::raw("${value} as value"),
             CDatabase::raw("CONCAT(YEAR(${dateColumn}),LPAD(MONTH(${dateColumn}),2,'0')) as label")
@@ -166,9 +166,14 @@ trait CModel_Chartable_ChartableTrait {
         $stopDate = empty($stopDate)
             ? CCarbon::now()->endOfWeek()
             : CCarbon::parse($stopDate);
+        $driver = $builder->getConnection()->getDriverName();
+        // $dateExpression = 'CONCAT(YEAR(' . $dateColumn . '),LPAD(MONTH(' . $dateColumn . "),2,'0'),'-W',FLOOR((DayOfMonth(${dateColumn})-1)/7)+1)";
+        // if ($driver == 'pgsql') {
+        //     $dateExpression = "TO_CHAR(created_at, 'YYYY-MM-DD')";
+        // }
 
-        $newQuery = new CDatabase_Query_Builder();
-        $newQuery->from($builder);
+        $newQuery = new CDatabase_Query_Builder($builder->getConnection());
+        $newQuery->from($builder, 'chartable_sub');
         $query = $newQuery->select(
             CDatabase::raw("${value} as value"),
             CDatabase::raw("CONCAT(YEAR(${dateColumn}),LPAD(MONTH(${dateColumn}),2,'0'),'-W',FLOOR((DayOfMonth(${dateColumn})-1)/7)+1) as label")
@@ -219,11 +224,16 @@ trait CModel_Chartable_ChartableTrait {
         $stopDate = empty($stopDate)
             ? CCarbon::now()
             : CCarbon::parse($stopDate);
-        $newQuery = new CDatabase_Query_Builder();
-        $newQuery->from($builder);
+        $newQuery = new CDatabase_Query_Builder($builder->getConnection());
+        $newQuery->from($builder, 'chartable_sub');
+        $driver = $builder->getConnection()->getDriverName();
+        $dateExpression = 'DATE_FORMAT(' . $dateColumn . ", '%Y-%m-%d')";
+        if ($driver == 'pgsql') {
+            $dateExpression = "TO_CHAR(created_at, 'YYYY-MM-DD')";
+        }
         $query = $newQuery->select(
             CDatabase::raw("${value} as value"),
-            CDatabase::raw("DATE(${dateColumn}) as label")
+            CDatabase::raw($dateExpression . ' as label')
         )
             ->where($dateColumn, '>=', $startDate)
             ->where($dateColumn, '<=', $stopDate)
@@ -267,22 +277,29 @@ trait CModel_Chartable_ChartableTrait {
         $stopDate = empty($stopDate)
             ? CCarbon::now()->endOfDay()
             : CCarbon::parse($stopDate);
-        $newQuery = new CDatabase_Query_Builder();
-        $newQuery->from($builder);
+
+        $newQuery = new CDatabase_Query_Builder($builder->getConnection());
+        $newQuery->from($builder, 'chartable_sub');
+
+        $dateExpression = 'DATE_FORMAT(' . $dateColumn . ", '%Y-%m-%d %H')";
+        $driver = $builder->getConnection()->getDriverName();
+        if ($driver == 'pgsql') {
+            $dateExpression = "TO_CHAR(created_at, 'YYYY-MM-DD HH24')";
+        }
         $query = $newQuery->select(
             CDatabase::raw("${value} as value"),
-            CDatabase::raw("DATE_FORMAT(${dateColumn}, '%Y-%m-%d %H') as label")
+            CDatabase::raw($dateExpression . ' as label')
         )
             ->where($dateColumn, '>=', $startDate)
             ->where($dateColumn, '<=', $stopDate)
             ->orderBy('label')
-            ->groupBy('label')
-            ->get();
+            ->groupBy('label');
 
+        $collection = $query->get();
         $days = $startDate->diffInHours($stopDate) + 1;
 
-        return CModel_Chartable_TimeCollection::times($days, function () use ($startDate, $query) {
-            $found = $query->firstWhere(
+        return CModel_Chartable_TimeCollection::times($days, function () use ($startDate, $collection) {
+            $found = $collection->firstWhere(
                 'label',
                 $startDate->format('Y-m-d H')
             );
