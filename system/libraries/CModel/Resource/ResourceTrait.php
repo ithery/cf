@@ -62,7 +62,6 @@ trait CModel_Resource_ResourceTrait {
 
     public function getTemporaryUrl(DateTimeInterface $expiration, $conversionName = '', array $options = []) {
         $urlGenerator = $this->getUrlGenerator($conversionName);
-
         return $urlGenerator->getTemporaryUrl($expiration, $options);
     }
 

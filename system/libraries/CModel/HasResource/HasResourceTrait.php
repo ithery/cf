@@ -417,7 +417,7 @@ trait CModel_HasResource_HasResourceTrait {
      * @param mixed $collectionName
      * @param mixed $conversionName
      */
-    public function getFirstTemporaryUrl(DateTimeInterface $expiration, $collectionName = 'default', $conversionName = '') {
+    public function getFirstTemporaryUrl(DateTimeInterface $expiration = null, $collectionName = 'default', $conversionName = '') {
         $expiration = $expiration ?: c::now()->addMinutes(CF::config('resource.temporary_url_default_lifetime'));
 
         return $this->getResourceItemTemporaryUrl($expiration, $collectionName, $conversionName, CResources_Enum_CollectionPosition::FIRST);
@@ -431,7 +431,7 @@ trait CModel_HasResource_HasResourceTrait {
      * @param mixed $collectionName
      * @param mixed $conversionName
      */
-    public function getLastTemporaryUrl(DateTimeInterface $expiration, $collectionName = 'default', $conversionName = '') {
+    public function getLastTemporaryUrl(DateTimeInterface $expiration = null, $collectionName = 'default', $conversionName = '') {
         $expiration = $expiration ?: c::now()->addMinutes(CF::config('resource.temporary_url_default_lifetime'));
 
         return $this->getResourceItemTemporaryUrl($expiration, $collectionName, $conversionName, CResources_Enum_CollectionPosition::LAST);

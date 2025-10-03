@@ -124,7 +124,7 @@ class CLogger_Manager implements LoggerInterface {
      *
      * @return \Psr\Log\LoggerInterface
      */
-    protected function get($name, array $config = null) {
+    protected function get($name, $config = null) {
         if (isset($this->channels[$name])) {
             return $this->channels[$name];
         }
@@ -207,7 +207,7 @@ class CLogger_Manager implements LoggerInterface {
      *
      * @return \Psr\Log\LoggerInterface
      */
-    protected function resolve($name, array $config = null) {
+    protected function resolve($name, $config = null) {
         $config = $config ?: $this->configurationFor($name);
 
         if (is_null($config)) {

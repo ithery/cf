@@ -11,6 +11,7 @@
 
 namespace Symfony\Component\HttpFoundation;
 
+class_exists(AcceptHeaderItem::class);
 /**
  * Represents an Accept-* header.
  *
@@ -50,14 +51,18 @@ class AcceptHeader
      */
     public static function fromString($headerValue)
     {
-        $index = 0;
+        $parts = HeaderUtils::split($headerValue ?? '', ',;=');
 
-        return new self(array_map(function ($itemValue) use (&$index) {
-            $item = AcceptHeaderItem::fromString($itemValue);
+        return new self(array_map(function ($subParts) {
+            static $index = 0;
+            $part = array_shift($subParts);
+            $attributes = HeaderUtils::combine($subParts);
+
+            $item = new AcceptHeaderItem($part[0], $attributes);
             $item->setIndex($index++);
 
             return $item;
-        }, preg_split('/\s*(?:,*("[^"]+"),*|,*(\'[^\']+\'),*|,+)\s*/', $headerValue, 0, PREG_SPLIT_NO_EMPTY | PREG_SPLIT_DELIM_CAPTURE)));
+        }, $parts));
     }
 
     /**

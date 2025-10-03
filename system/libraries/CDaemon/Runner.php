@@ -21,6 +21,8 @@ class CDaemon_Runner {
     public function __construct($serviceClass, $domain = null) {
         $this->serviceClass = $serviceClass;
         $this->domain = $domain ?: CF::domain();
+
+
     }
 
     public function setDebug($bool = true) {
@@ -118,7 +120,6 @@ class CDaemon_Runner {
 
     protected function runUnix() {
         $commandToExecute = $this->getCommandToExecuteOnUnix();
-
         $process = new Process($commandToExecute);
         $process->setWorkingDirectory(DOCROOT);
         $process->run();

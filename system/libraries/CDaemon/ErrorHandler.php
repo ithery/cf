@@ -13,7 +13,7 @@ defined('SYSPATH') or die('No direct access allowed.');
  */
 class CDaemon_ErrorHandler {
     public static function init() {
-        error_reporting(E_ALL);
+        error_reporting(E_ALL & ~E_DEPRECATED);
         set_error_handler([static::class, 'daemonError']);
         set_exception_handler([static::class, 'daemonException']);
         register_shutdown_function([static::class, 'daemonShutdownFunction']);
@@ -68,8 +68,8 @@ class CDaemon_ErrorHandler {
 
                 break;
         }
-        $message = sprintf('PHP %s: %s in %s on line %d pid %s', $errors, $errStr, $errFile, $errLine, getmypid());
 
+        $message = sprintf('PHP %s: %s in %s on line %d pid %s', $errors, $errStr, $errFile, $errLine, getmypid());
         $runningService->log($message);
         if ($isFatal) {
             if (!$e) {

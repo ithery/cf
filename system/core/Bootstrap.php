@@ -1,8 +1,6 @@
 <?php
 
-if (isset($_COOKIE['cf-strict'])) {
-    error_reporting(E_ALL);
-}
+
 date_default_timezone_set('Asia/Jakarta');
 //define all constant needed by framework
 //we using if because it is maybe already defined in old index.php

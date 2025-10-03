@@ -43,6 +43,9 @@ class HeaderUtils {
      *               $separators
      */
     public static function split($header, $separators) {
+        if ('' === $separators) {
+            throw new \InvalidArgumentException('At least one separator must be specified.');
+        }
         $quotedSeparators = preg_quote($separators, '/');
 
         preg_match_all('

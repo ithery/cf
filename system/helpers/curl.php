@@ -32,7 +32,7 @@ class curl {
         // Load the site domain
         $site_domain = (string) CF::config('core.site_domain', '');
         $domain = carr::get($_SERVER, 'HTTP_HOST');
-        if (strlen($domain) == 0) {
+        if (!$domain) {
             $domain = CF::domain();
         }
         if ($protocol == false) {
