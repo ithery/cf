@@ -13,7 +13,7 @@ defined('SYSPATH') or die('No direct access allowed.');
  */
 class CDaemon_ErrorHandler {
     public static function init() {
-        error_reporting(E_ALL & ~E_DEPRECATED);
+        // error_reporting(E_ALL & ~E_DEPRECATED);
         set_error_handler([static::class, 'daemonError']);
         set_exception_handler([static::class, 'daemonException']);
         register_shutdown_function([static::class, 'daemonShutdownFunction']);
