@@ -12,6 +12,7 @@ use Symfony\Component\PropertyAccess\PropertyAccess;
 use Symfony\Component\Debug\Exception\FatalThrowableError;
 use Symfony\Component\PropertyAccess\Exception\NoSuchIndexException;
 use Symfony\Component\PropertyAccess\Exception\NoSuchPropertyException;
+use Illuminate\Contracts\Support\Htmlable;
 
 //@codingStandardsIgnoreStart
 class c {
@@ -453,7 +454,7 @@ class c {
     /**
      * Encode HTML special characters in a string.
      *
-     * @param CBase_DeferringDisplayableValue|CInterface_Htmlable|string $value
+     * @param CBase_DeferringDisplayableValue|Htmlable|string $value
      * @param bool                                                       $doubleEncode
      *
      * @return string
@@ -463,7 +464,7 @@ class c {
             $value = $value->resolveDisplayableValue();
         }
 
-        if ($value instanceof CInterface_Htmlable) {
+        if ($value instanceof Htmlable) {
             return $value->toHtml();
         }
 
