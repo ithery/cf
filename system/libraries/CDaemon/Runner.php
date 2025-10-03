@@ -21,8 +21,6 @@ class CDaemon_Runner {
     public function __construct($serviceClass, $domain = null) {
         $this->serviceClass = $serviceClass;
         $this->domain = $domain ?: CF::domain();
-
-
     }
 
     public function setDebug($bool = true) {

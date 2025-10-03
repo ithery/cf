@@ -38,35 +38,28 @@ class CDaemon_ErrorHandler {
         if (($errNo & error_reporting()) == 0) {
             return true;
         }
-
+        // Map error numbers to labels and fatal flag
+        $errorMap = [
+            -1 => ['label' => 'Exception', 'fatal' => true],
+            E_NOTICE => ['label' => 'Notice', 'fatal' => false],
+            E_USER_NOTICE => ['label' => 'Notice', 'fatal' => false],
+            E_WARNING => ['label' => 'Warning', 'fatal' => false],
+            E_USER_WARNING => ['label' => 'Warning', 'fatal' => false],
+            E_ERROR => ['label' => 'Fatal Error', 'fatal' => true],
+            E_USER_ERROR => ['label' => 'Fatal Error', 'fatal' => true],
+        ];
+        // Default
+        $errors = 'Unknown';
         $isFatal = false;
-        switch ($errNo) {
-            case -1:
-                // Custom - Works with the daemon_exception exception handler
-                $isFatal = true;
-                $errors = 'Exception';
+
+        // Loop over mapping, check bitmask (some $errNo can be combined)
+        foreach ($errorMap as $num => $info) {
+            if ($errNo === $num || ($errNo & $num) === $num) {
+                $errors = $info['label'];
+                $isFatal = $info['fatal'];
 
                 break;
-            case E_NOTICE:
-            case E_USER_NOTICE:
-                $errors = 'Notice';
-
-                break;
-            case E_WARNING:
-            case E_USER_WARNING:
-                $errors = 'Warning';
-
-                break;
-            case E_ERROR:
-            case E_USER_ERROR:
-                $isFatal = true;
-                $errors = 'Fatal Error';
-
-                break;
-            default:
-                $errors = 'Unknown';
-
-                break;
+            }
         }
 
         $message = sprintf('PHP %s: %s in %s on line %d pid %s', $errors, $errStr, $errFile, $errLine, getmypid());
@@ -124,6 +117,8 @@ class CDaemon_ErrorHandler {
             case E_CORE_ERROR:
             case E_CORE_WARNING:
             case E_COMPILE_ERROR:
+            case E_COMPILE_WARNING:
+            case E_USER_ERROR:
                 self::daemonError($error['type'], $error['message'], $error['file'], $error['line']);
         }
     }
