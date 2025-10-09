@@ -40,6 +40,7 @@ import { formatCurrency, unformatCurrency } from './formatter/currency';
 import { cresQuery } from './module/CresQuery';
 import { isJson } from './util/helper';
 import * as dateFns from 'date-fns';
+import * as dateFnsTz from 'date-fns-tz';
 import CresenityHistory from './history';
 import clsx from './module/clsx';
 import stylex from './module/stylex';
@@ -101,6 +102,7 @@ export default class Cresenity {
         this.version = '1.4.1';
         this.checkAuthenticationInterval = null;
         this.dateFns = dateFns;
+        this.dateFnsTz = dateFnsTz;
         this.clsx = clsx;
         this.stylex = stylex;
         this.collect = collect;
