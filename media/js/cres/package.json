@@ -1,7 +1,7 @@
 {
     "main": "dist/cres.js",
     "name": "cf-cres",
-    "version": "1.5.5",
+    "version": "1.5.6",
     "scripts": {
         "build": "cross-env NODE_ENV=production npx rollup -c",
         "dev": "npx rollup -c -w",
@@ -54,7 +54,8 @@
     "dependencies": {
         "cleave.js": "^1.6.0",
         "collect.js": "^4.36.1",
-        "date-fns": "^2.28.0",
+        "date-fns": "^4.1.0",
+        "date-fns-tz": "^3.2.0",
         "event-source-polyfill": "^1.0.25",
         "locutus": "^2.0.15",
         "lodash.clonedeep": "^4.5.0",
