@@ -446,14 +446,6 @@ final class CF {
      * @return bool
      */
     public static function autoLoad($class, $directory = 'libraries') {
-        if (CF::isCli()) {
-            // echo "c:".$class."\n";
-            // if ($class=='CDaemon_Runner') {
-            //     echo "class:".$class."\n";
-            // }
-
-        }
-
         if (class_exists($class, false)) {
             return true;
         }
