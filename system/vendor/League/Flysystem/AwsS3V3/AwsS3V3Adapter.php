@@ -25,7 +25,7 @@ use League\Flysystem\UnableToWriteFile;
 use League\Flysystem\UnableToDeleteFile;
 use League\Flysystem\DirectoryAttributes;
 use League\Flysystem\UnableToSetVisibility;
-use League\Flysystem\UnableToCreateDirectory;
+use League\Flysystem\UnableToDeleteDirectory;
 use League\Flysystem\UnableToProvideChecksum;
 use League\Flysystem\UnableToRetrieveMetadata;
 use League\MimeTypeDetection\MimeTypeDetector;
@@ -336,7 +336,7 @@ class AwsS3V3Adapter implements FilesystemAdapter, PublicUrlGenerator, ChecksumP
         try {
             $this->client->deleteMatchingObjects($this->bucket, $prefix);
         } catch (Throwable $exception) {
-            throw UnableToCreateDirectory::dueToFailure($path, $exception);
+            throw UnableToDeleteDirectory::atLocation($path, '', $exception);
         }
     }
 
@@ -347,8 +347,8 @@ class AwsS3V3Adapter implements FilesystemAdapter, PublicUrlGenerator, ChecksumP
      * @return void
      */
     public function createDirectory($path, Config $config) {
-        $defaultVisibility = $config->get('directory_visibility', $this->visibility->defaultForDirectories());
-        $config = $config->withDefaults(['visibility' => $defaultVisibility]);
+        $defaultVisibility = $config->get(Config::OPTION_DIRECTORY_VISIBILITY, $this->visibility->defaultForDirectories());
+        $config = $config->withDefaults([Config::OPTION_VISIBILITY => $defaultVisibility]);
         $this->upload(rtrim($path, '/') . '/', '', $config);
     }
 
