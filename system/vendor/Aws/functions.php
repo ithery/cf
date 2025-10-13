@@ -1,9 +1,11 @@
 <?php
+
 namespace Aws;
 
+use GuzzleHttp\Utils;
 use GuzzleHttp\Client;
-use Psr\Http\Message\RequestInterface;
 use GuzzleHttp\ClientInterface;
+use Psr\Http\Message\RequestInterface;
 use GuzzleHttp\Promise\FulfilledPromise;
 
 //-----------------------------------------------------------------------------
@@ -11,27 +13,25 @@ use GuzzleHttp\Promise\FulfilledPromise;
 //-----------------------------------------------------------------------------
 
 /**
- * Returns a function that always returns the same value;
+ * Returns a function that always returns the same value;.
  *
- * @param mixed $value Value to return.
+ * @param mixed $value value to return
  *
  * @return callable
  */
-function constantly($value)
-{
+function constantly($value) {
     return function () use ($value) { return $value; };
 }
 
 /**
  * Filters values that do not satisfy the predicate function $pred.
  *
- * @param mixed    $iterable Iterable sequence of data.
- * @param callable $pred Function that accepts a value and returns true/false
+ * @param mixed    $iterable iterable sequence of data
+ * @param callable $pred     Function that accepts a value and returns true/false
  *
  * @return \Generator
  */
-function filter($iterable, callable $pred)
-{
+function filter($iterable, callable $pred) {
     foreach ($iterable as $value) {
         if ($pred($value)) {
             yield $value;
@@ -42,13 +42,12 @@ function filter($iterable, callable $pred)
 /**
  * Applies a map function $f to each value in a collection.
  *
- * @param mixed    $iterable Iterable sequence of data.
- * @param callable $f        Map function to apply.
+ * @param mixed    $iterable iterable sequence of data
+ * @param callable $f        map function to apply
  *
  * @return \Generator
  */
-function map($iterable, callable $f)
-{
+function map($iterable, callable $f) {
     foreach ($iterable as $value) {
         yield $f($value);
     }
@@ -59,13 +58,12 @@ function map($iterable, callable $f)
  * value in the sequence and yields the application of the map function to each
  * value.
  *
- * @param mixed    $iterable Iterable sequence of data.
- * @param callable $f        Map function to apply.
+ * @param mixed    $iterable iterable sequence of data
+ * @param callable $f        map function to apply
  *
  * @return \Generator
  */
-function flatmap($iterable, callable $f)
-{
+function flatmap($iterable, callable $f) {
     foreach (map($iterable, $f) as $outer) {
         foreach ($outer as $inner) {
             yield $inner;
@@ -76,13 +74,12 @@ function flatmap($iterable, callable $f)
 /**
  * Partitions the input sequence into partitions of the specified size.
  *
- * @param mixed    $iterable Iterable sequence of data.
- * @param int $size Size to make each partition (except possibly the last chunk)
+ * @param mixed $iterable iterable sequence of data
+ * @param int   $size     Size to make each partition (except possibly the last chunk)
  *
  * @return \Generator
  */
-function partition($iterable, $size)
-{
+function partition($iterable, $size) {
     $buffer = [];
     foreach ($iterable as $value) {
         $buffer[] = $value;
@@ -110,9 +107,9 @@ function partition($iterable, $size)
  *
  * @return callable
  */
-function or_chain()
-{
+function or_chain() {
     $fns = func_get_args();
+
     return function () use ($fns) {
         $args = func_get_args();
         foreach ($fns as $fn) {
@@ -121,6 +118,7 @@ function or_chain()
                 return $result;
             }
         }
+
         return null;
     };
 }
@@ -138,17 +136,16 @@ function or_chain()
  * @param string $path Path to the JSON file on disk
  *
  * @return mixed Returns the JSON decoded data. Note that JSON objects are
- *     decoded as associative arrays.
+ *               decoded as associative arrays.
  */
-function load_compiled_json($path)
-{
+function load_compiled_json($path) {
     static $compiledList = [];
 
     $compiledFilepath = "{$path}.php";
 
     if (!isset($compiledList[$compiledFilepath])) {
         if (is_readable($compiledFilepath)) {
-            $compiledList[$compiledFilepath] = include($compiledFilepath);
+            $compiledList[$compiledFilepath] = include $compiledFilepath;
         }
     }
 
@@ -158,7 +155,7 @@ function load_compiled_json($path)
 
     if (!file_exists($path)) {
         throw new \InvalidArgumentException(
-            sprintf("File not found: %s", $path)
+            sprintf('File not found: %s', $path)
         );
     }
 
@@ -166,10 +163,9 @@ function load_compiled_json($path)
 }
 
 /**
- * No-op
+ * No-op.
  */
-function clear_compiled_json()
-{
+function clear_compiled_json() {
     // pass
 }
 
@@ -180,13 +176,12 @@ function clear_compiled_json()
 /**
  * Iterates over the files in a directory and works with custom wrappers.
  *
- * @param string   $path Path to open (e.g., "s3://foo/bar").
- * @param resource $context Stream wrapper context.
+ * @param string   $path    Path to open (e.g., "s3://foo/bar").
+ * @param resource $context stream wrapper context
  *
- * @return \Generator Yields relative filename strings.
+ * @return \Generator yields relative filename strings
  */
-function dir_iterator($path, $context = null)
-{
+function dir_iterator($path, $context = null) {
     $dh = $context ? opendir($path, $context) : opendir($path);
     if (!$dh) {
         throw new \InvalidArgumentException('File not found: ' . $path);
@@ -205,12 +200,11 @@ function dir_iterator($path, $context = null)
  * it again).
  *
  * @param string   $path    Path to traverse (e.g., s3://bucket/key, /tmp)
- * @param resource $context Stream context options.
+ * @param resource $context stream context options
  *
- * @return \Generator Yields absolute filenames.
+ * @return \Generator yields absolute filenames
  */
-function recursive_dir_iterator($path, $context = null)
-{
+function recursive_dir_iterator($path, $context = null) {
     $invalid = ['.' => true, '..' => true];
     $pathLen = strlen($path) + 1;
     $iterator = dir_iterator($path, $context);
@@ -232,6 +226,7 @@ function recursive_dir_iterator($path, $context = null)
                         return substr("{$fullPath}/{$file}", $pathLen);
                     }
                 );
+
                 continue;
             }
         }
@@ -248,11 +243,10 @@ function recursive_dir_iterator($path, $context = null)
  *
  * @param mixed $input
  *
- * @return string Returns a string containing the type of the variable and
- *                if a class is provided, the class name.
+ * @return string returns a string containing the type of the variable and
+ *                if a class is provided, the class name
  */
-function describe_type($input)
-{
+function describe_type($input) {
     switch (gettype($input)) {
         case 'object':
             return 'object(' . get_class($input) . ')';
@@ -271,70 +265,17 @@ function describe_type($input)
  *
  * @return callable
  */
-function default_http_handler()
-{
-    $version = guzzle_major_version();
-    // If Guzzle 6 or 7 installed
-    if ($version === 6 || $version === 7) {
-        return new \Aws\Handler\GuzzleV6\GuzzleHandler();
-    }
-
-    // If Guzzle 5 installed
-    if ($version === 5) {
-        return new \Aws\Handler\GuzzleV5\GuzzleHandler();
-    }
-
-    throw new \RuntimeException('Unknown Guzzle version: ' . $version);
+function default_http_handler() {
+    return new \Aws\Handler\Guzzle\GuzzleHandler();
 }
 
 /**
- * Gets the default user agent string depending on the Guzzle version
+ * Gets the default user agent string depending on the Guzzle version.
  *
  * @return string
  */
-function default_user_agent()
-{
-    $version = guzzle_major_version();
-    // If Guzzle 6 or 7 installed
-    if ($version === 6 || $version === 7) {
-        return \GuzzleHttp\default_user_agent();
-    }
-
-    // If Guzzle 5 installed
-    if ($version === 5) {
-        return \GuzzleHttp\Client::getDefaultUserAgent();
-    }
-
-    throw new \RuntimeException('Unknown Guzzle version: ' . $version);
-}
-
-/**
- * Get the major version of guzzle that is installed.
- *
- * @internal This function is internal and should not be used outside aws/aws-sdk-php.
- * @return int
- * @throws \RuntimeException
- */
-function guzzle_major_version()
-{
-    static $cache = null;
-    if (null !== $cache) {
-        return $cache;
-    }
-
-    if (defined('\GuzzleHttp\ClientInterface::VERSION')) {
-        $version = (string) ClientInterface::VERSION;
-        if ($version[0] === '6') {
-            return $cache = 6;
-        }
-        if ($version[0] === '5') {
-            return $cache = 5;
-        }
-    } elseif (defined('\GuzzleHttp\ClientInterface::MAJOR_VERSION')) {
-        return $cache = ClientInterface::MAJOR_VERSION;
-    }
-
-    throw new \RuntimeException('Unable to determine what Guzzle version is installed.');
+function default_user_agent() {
+    return Utils::defaultUserAgent();
 }
 
 /**
@@ -342,13 +283,13 @@ function guzzle_major_version()
  *
  * Returns a promise that is fulfilled with the serialized request.
  *
- * @param CommandInterface $command Command to serialize.
+ * @param CommandInterface $command command to serialize
+ *
+ * @throws \RuntimeException
  *
  * @return RequestInterface
- * @throws \RuntimeException
  */
-function serialize(CommandInterface $command)
-{
+function serialize(CommandInterface $command) {
     $request = null;
     $handlerList = $command->getHandlerList();
 
@@ -356,6 +297,7 @@ function serialize(CommandInterface $command)
     $handlerList->setHandler(
         function (CommandInterface $_, RequestInterface $r) use (&$request) {
             $request = $r;
+
             return new FulfilledPromise(new Result([]));
         }
     );
@@ -376,14 +318,14 @@ function serialize(CommandInterface $command)
  * Manifest data is stored statically, so it does not need to be loaded more
  * than once per process. The JSON data is also cached in opcache.
  *
- * @param string $service Case-insensitive namespace or endpoint prefix of the
- *                        service for which you are retrieving manifest data.
+ * @param string $service case-insensitive namespace or endpoint prefix of the
+ *                        service for which you are retrieving manifest data
+ *
+ * @throws \InvalidArgumentException if the service is not supported
  *
  * @return array
- * @throws \InvalidArgumentException if the service is not supported.
  */
-function manifest($service = null)
-{
+function manifest($service = null) {
     // Load the manifest and create aliases for lowercased namespaces
     static $manifest = [];
     static $aliases = [];
@@ -418,29 +360,28 @@ function manifest($service = null)
 }
 
 /**
- * Checks if supplied parameter is a valid hostname
+ * Checks if supplied parameter is a valid hostname.
  *
  * @param string $hostname
+ *
  * @return bool
  */
-function is_valid_hostname($hostname)
-{
-    return (
+function is_valid_hostname($hostname) {
+    return
         preg_match("/^([a-z\d](-*[a-z\d])*)(\.([a-z\d](-*[a-z\d])*))*\.?$/i", $hostname)
-        && preg_match("/^.{1,253}$/", $hostname)
-        && preg_match("/^[^\.]{1,63}(\.[^\.]{0,63})*$/", $hostname)
-    );
+        && preg_match('/^.{1,253}$/', $hostname)
+        && preg_match("/^[^\.]{1,63}(\.[^\.]{0,63})*$/", $hostname);
 }
 
 /**
- * Checks if supplied parameter is a valid host label
+ * Checks if supplied parameter is a valid host label.
  *
  * @param $label
+ *
  * @return bool
  */
-function is_valid_hostlabel($label)
-{
-    return preg_match("/^(?!-)[a-zA-Z0-9-]{1,63}(?<!-)$/", $label);
+function is_valid_hostlabel($label) {
+    return preg_match('/^(?!-)[a-zA-Z0-9-]{1,63}(?<!-)$/', $label);
 }
 
 /**
@@ -449,16 +390,17 @@ function is_valid_hostlabel($label)
  *
  * @param $filename
  * @param bool $process_sections
- * @param int $scanner_mode
+ * @param int  $scanner_mode
+ *
  * @return array|bool
  */
 function parse_ini_file(
     $filename,
     $process_sections = false,
-    $scanner_mode = INI_SCANNER_NORMAL)
-{
+    $scanner_mode = INI_SCANNER_NORMAL
+) {
     return parse_ini_string(
-        preg_replace('/^#.*\\n/m', "", file_get_contents($filename)),
+        preg_replace('/^#.*\\n/m', '', file_get_contents($filename)),
         $process_sections,
         $scanner_mode
     );
@@ -466,13 +408,13 @@ function parse_ini_file(
 
 /**
  * Outputs boolean value of input for a select range of possible values,
- * null otherwise
+ * null otherwise.
  *
  * @param $input
- * @return bool|null
+ *
+ * @return null|bool
  */
-function boolean_value($input)
-{
+function boolean_value($input) {
     if (is_bool($input)) {
         return $input;
     }
@@ -487,27 +429,32 @@ function boolean_value($input)
 
     if (is_string($input)) {
         switch (strtolower($input)) {
-            case "true":
-            case "on":
-            case "1":
+            case 'true':
+            case 'on':
+            case '1':
                 return true;
+
                 break;
 
-            case "false":
-            case "off":
-            case "0":
+            case 'false':
+            case 'off':
+            case '0':
                 return false;
+
                 break;
         }
     }
+
     return null;
 }
 
 /**
- * Parses ini sections with subsections (i.e. the service section)
+ * Parses ini sections with subsections (i.e. the service section).
  *
  * @param $filename
  * @param $filename
+ * @param mixed $section_name
+ *
  * @return array
  */
 function parse_ini_section_with_subsections($filename, $section_name) {
@@ -528,8 +475,7 @@ function parse_ini_section_with_subsections($filename, $section_name) {
         }
 
         if (preg_match('/^\[.*\]$/', $line)
-            && trim($line, '[]') === $section_name)
-        {
+            && trim($line, '[]') === $section_name) {
             while (!feof($stream)) {
                 $line = trim(fgets($stream));
 
@@ -538,8 +484,7 @@ function parse_ini_section_with_subsections($filename, $section_name) {
                 }
 
                 if (preg_match('/^\[.*\]$/', $line)
-                    && trim($line, '[]') === $section_name)
-                {
+                    && trim($line, '[]') === $section_name) {
                     continue;
                 } elseif (strpos($line, '[') === 0) {
                     break;
@@ -561,45 +506,47 @@ function parse_ini_section_with_subsections($filename, $section_name) {
     }
 
     fclose($stream);
+
     return $config;
 }
 
 /**
- * Checks if an input is a valid epoch time
+ * Checks if an input is a valid epoch time.
  *
  * @param $input
+ *
  * @return bool
  */
-function is_valid_epoch($input)
-{
+function is_valid_epoch($input) {
     if (is_string($input) || is_numeric($input)) {
         if (is_string($input) && !preg_match("/^-?[0-9]+\.?[0-9]*$/", $input)) {
             return false;
         }
+
         return true;
     }
+
     return false;
 }
 
 /**
- * Checks if an input is a fips pseudo region
+ * Checks if an input is a fips pseudo region.
  *
  * @param $region
+ *
  * @return bool
  */
-function is_fips_pseudo_region($region)
-{
+function is_fips_pseudo_region($region) {
     return strpos($region, 'fips-') !== false || strpos($region, '-fips') !== false;
 }
 
 /**
- * Returns a region without a fips label
+ * Returns a region without a fips label.
  *
  * @param $region
+ *
  * @return string
  */
-function strip_fips_pseudo_regions($region)
-{
+function strip_fips_pseudo_regions($region) {
     return str_replace(['fips-', '-fips'], ['', ''], $region);
 }
-
