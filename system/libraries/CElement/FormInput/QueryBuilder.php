@@ -120,6 +120,8 @@ class CElement_FormInput_QueryBuilder extends CElement_FormInput {
             allow_empty: true,
             rules: ' . c::json($this->value) . ',
         });
+
+        const qbEl = qb_' . $this->inputId . ';
         window.error_query_builder_error_' . $this->inputId . " = null;
         $('#" . $this->containerId . "').on('validationError.queryBuilder', function(e, rule, error, value) {
             window.error_query_builder_" . $this->inputId . ' = error;
@@ -147,20 +149,33 @@ class CElement_FormInput_QueryBuilder extends CElement_FormInput {
         }";
 
         if ($this->isApplySelect2) {
-            $js .= '
+            $js .= "
 
         if ($.fn.select2) {
-            qb_' . $this->inputId . ".on('afterCreateRuleInput.queryBuilder', function(e, rule) {
+            function initSelect2InBuilder(root) {
+                root.find('.rule-value-container select').each(function() {
+                    const select = $(this);
+                    if (!select.hasClass('select2-hidden-accessible')) {
+                        select.css('min-width', '200px').select2();
+                    }
+                });
+            }
+            qbEl.on('afterCreateRuleInput.queryBuilder', function(e, rule) {
                 if(rule.__ && rule.\$el) {
                     if(rule.__.filter) {
                         if(rule.__.filter.input && rule.__.filter.input=='select') {
-                            $(rule.\$el).find('.rule-value-container select').css('min-width','200px');
-                            $(rule.\$el).find('.rule-value-container select').select2();
+                            initSelect2InBuilder(\$(rule.\$el));
                         }
                     }
                 }
 
             });
+            // Jika rules di-set secara programatis, inisialisasi select2 setelah selesai setRules
+            setTimeout(() => {
+                if (qbEl.find('.rule-value-container select').length > 0) {
+                    initSelect2InBuilder(qbEl);
+                }
+            }, 500);
         }
 
         ";

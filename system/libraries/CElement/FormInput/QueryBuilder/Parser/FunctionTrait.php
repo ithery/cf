@@ -192,7 +192,6 @@ trait CElement_FormInput_QueryBuilder_Parser_FunctionTrait {
             $json = json_encode($json);
         }
         $query = json_decode($json);
-
         if (json_last_error()) {
             throw new CElement_FormInput_QueryBuilder_Exception_ParseException('JSON parsing threw an error: ' . json_last_error_msg());
         }
@@ -241,10 +240,10 @@ trait CElement_FormInput_QueryBuilder_Parser_FunctionTrait {
      * makeQuery, for arrays.
      *
      * @param CModel_Query|CDatabase_Query_Builder $query
-     * @param stdClass     $rule
-     * @param array        $sqlOperator
-     * @param array        $value
-     * @param string       $condition
+     * @param stdClass                             $rule
+     * @param array                                $sqlOperator
+     * @param array                                $value
+     * @param string                               $condition
      *
      * @throws CElement_FormInput_QueryBuilder_Exception_ParseException
      *
@@ -264,9 +263,9 @@ trait CElement_FormInput_QueryBuilder_Parser_FunctionTrait {
      * Create a 'null' query when required.
      *
      * @param CModel_Query|CDatabase_Query_Builder $query
-     * @param stdClass     $rule
-     * @param array        $sqlOperator
-     * @param string       $condition
+     * @param stdClass                             $rule
+     * @param array                                $sqlOperator
+     * @param string                               $condition
      *
      * @throws CElement_FormInput_QueryBuilder_Exception_ParseException when SQL operator is !null
      *
@@ -286,10 +285,10 @@ trait CElement_FormInput_QueryBuilder_Parser_FunctionTrait {
      * MakeArrayQueryIn, when the query is an IN or NOT IN...
      *
      * @param CModel_Query|CDatabase_Query_Builder $query
-     * @param stdClass     $rule
-     * @param string       $operator
-     * @param array        $value
-     * @param string       $condition
+     * @param stdClass                             $rule
+     * @param string                               $operator
+     * @param array                                $value
+     * @param string                               $condition
      *
      * @see makeQueryWhenArray
      *
@@ -310,10 +309,10 @@ trait CElement_FormInput_QueryBuilder_Parser_FunctionTrait {
      * MakeArrayQueryBetween, when the query is a BETWEEN or NOT BETWEEN...
      *
      * @param CModel_Query|CDatabase_Query_Builder $query
-     * @param stdClass     $rule
-     * @param string       $operator  the SQL operator used. [BETWEEN|NOT BETWEEN]
-     * @param array        $value
-     * @param string       $condition
+     * @param stdClass                             $rule
+     * @param string                               $operator  the SQL operator used. [BETWEEN|NOT BETWEEN]
+     * @param array                                $value
+     * @param string                               $condition
      *
      * @see makeQueryWhenArray
      *
