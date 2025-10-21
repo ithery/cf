@@ -120,6 +120,8 @@ class CDaemon_Runner {
         $commandToExecute = $this->getCommandToExecuteOnUnix();
         $process = new Process($commandToExecute);
         $process->setWorkingDirectory(DOCROOT);
+        $process->setTimeout(null); // nonaktifkan timeout
+        $process->disableOutput(); // biar lebih ringan
         $process->run();
         $result = $process->getExitCode();
 
