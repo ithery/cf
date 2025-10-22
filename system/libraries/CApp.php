@@ -494,7 +494,7 @@ class CApp implements CInterface_Responsable, Renderable, Jsonable {
             foreach ($childs as $child) {
                 $depth = carr::get($child, 'depth');
                 $childList[$child['role_id']] = cutils::indent($depth, '&nbsp;&nbsp;') . $child['name'];
-                $traverse($child->getChildren);
+                $traverse($child->getChildren()->orderBy('lft', 'asc')->get());
             }
         };
 
