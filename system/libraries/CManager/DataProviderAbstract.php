@@ -63,4 +63,6 @@ abstract class CManager_DataProviderAbstract {
 
         return in_array($method, $validAggregate);
     }
+
+    abstract public function toEnumerable();
 }

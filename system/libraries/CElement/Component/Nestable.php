@@ -36,6 +36,9 @@ class CElement_Component_Nestable extends CElement_Component {
 
     protected $isCollapsed = false;
 
+    /**
+     * @var CManager_DataProviderAbstract
+     */
     protected $query;
 
     public function __construct($id) {
@@ -194,16 +197,16 @@ class CElement_Component_Nestable extends CElement_Component {
     protected function getDataFromQuery() {
         $models = $this->query->toEnumerable();
         $childArray = [];
+
         if ($models instanceof CModel_Nested_Collection) {
             $tree = $models->toTree();
-
             $traverse = function ($nodes) use (&$traverse, &$childArray) {
                 foreach ($nodes as $node) {
                     if ($node->status == 0) {
                         continue;
                     }
                     $childArray[] = $node->toArray();
-                    $traverse($node->getChildren);
+                    $traverse($node->getChildren()->orderBy('lft', 'asc')->get());
                 }
             };
 

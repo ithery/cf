@@ -40,7 +40,7 @@ class CModel_Nested_Collection extends CModel_Collection {
     /**
      * Build a tree from a list of nodes. Each item will have set children relation.
      *
-     * To successfully build tree "id", "_lft" and "parent_id" keys must present.
+     * To successfully build tree "id", "lft" and "parent_id" keys must present.
      *
      * If `$root` is provided, the tree will contain only descendants of that node.
      *
@@ -55,6 +55,7 @@ class CModel_Nested_Collection extends CModel_Collection {
         $this->linkNodes();
         $items = [];
         $root = $this->getRootNodeId($root);
+
         /* @var CModel|NodeTrait $node */
         foreach ($this->items as $node) {
             if ($node->getParentId() == $root) {
