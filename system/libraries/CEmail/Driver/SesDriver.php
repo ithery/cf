@@ -55,6 +55,18 @@ class CEmail_Driver_SesDriver extends CEmail_DriverAbstract {
         return $data;
     }
 
+    public function getListIdentitiesDomain() {
+        $client = $this->ses;
+
+        $result = $client->listIdentities([
+            'IdentityType' => 'Domain', // atau 'Domain', atau kosong untuk semua
+            'MaxItems'     => 50,
+        ]);
+
+        $identities = $result->get('Identities') ?: [];
+        return $identities;
+    }
+
     public function send2(array $to, $subject, $body, $options = []) {
         // $this->verifyEmailAddress('adamwsw8@gmail.com');
         $from = carr::get($options, 'from', $this->config->getFrom());
