@@ -32,7 +32,7 @@ class CModel_Scout_Engine_TNTSearchEngine extends CModel_Scout_EngineAbstract {
     /**
      * Update the given model in the index.
      *
-     * @param Collection $models
+     * @param CCollection $models
      *
      * @return void
      */
@@ -42,8 +42,11 @@ class CModel_Scout_Engine_TNTSearchEngine extends CModel_Scout_EngineAbstract {
         $index = $this->tnt->getIndex();
         $index->setPrimaryKey($models->first()->getKeyName());
 
-        $index->indexBeginTransaction();
+        // $index->indexBeginTransaction();
         $models->each(function ($model) use ($index) {
+            if (method_exists($model, 'shouldBeSearchable') && !$model->shouldBeSearchable()) {
+                return;
+            }
             $array = $model->toSearchableArray();
 
             if (empty($array)) {
@@ -56,13 +59,13 @@ class CModel_Scout_Engine_TNTSearchEngine extends CModel_Scout_EngineAbstract {
                 $index->insert($array);
             }
         });
-        $index->indexEndTransaction();
+        // $index->indexEndTransaction();
     }
 
     /**
      * Remove the given model from the index.
      *
-     * @param Collection $models
+     * @param CCollection $models
      *
      * @return void
      */
@@ -200,11 +203,15 @@ class CModel_Scout_Engine_TNTSearchEngine extends CModel_Scout_EngineAbstract {
         }
 
         // sort models by tnt search result set
-        return $model->newCollection($results['ids'])->map(function ($hit) use ($models) {
+        return $model->newCollection(c::collect($results['ids'])->map(function ($hit) use ($models, $results) {
             if (isset($models[$hit])) {
-                return $models[$hit];
+                if (isset($this->tnt->config['searchBoolean']) ? $this->tnt->config['searchBoolean'] : false) {
+                    return $models[$hit];
+                } else {
+                    return $models[$hit]->setAttribute('__tntSearchScore__', $results['docScores'][$hit]);
+                }
             }
-        })->filter()->values();
+        })->filter()->all());
     }
 
     /**
@@ -295,7 +302,9 @@ class CModel_Scout_Engine_TNTSearchEngine extends CModel_Scout_EngineAbstract {
 
     public function initIndex($model) {
         $indexName = $model->searchableAs();
-
+        if ($this->tnt->config['engine'] == "TeamTNT\TNTSearch\Engines\RedisEngine") {
+            return;
+        }
         if (!file_exists($this->tnt->config['storage'] . "/{$indexName}.index")) {
             $indexer = $this->tnt->createIndex("${indexName}.index");
             //try to get PDO
@@ -320,8 +329,10 @@ class CModel_Scout_Engine_TNTSearchEngine extends CModel_Scout_EngineAbstract {
      * matching results are looked up and removed, instead of returning a collection with
      * all the valid results.
      *
-     * @param mixed $builder
-     * @param mixed $searchResults
+     * @param CModel_Scout_Builder $builder
+     * @param mixed                $searchResults
+     *
+     * @return CCollection
      */
     private function discardIdsFromResultSetByConstraints($builder, $searchResults) {
         $qualifiedKeyName = $builder->model->getQualifiedKeyName(); // tableName.id
