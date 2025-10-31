@@ -257,6 +257,8 @@ final class CF {
      *
      * @throws CHTTP_Exception_NotFoundHttpException
      *
+     * @deprecated 1.8 use c::abort(404)
+     *
      * @return void
      */
     public static function show404($page = false, $template = false) {

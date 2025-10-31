@@ -108,6 +108,18 @@ abstract class CModel_Scout_EngineAbstract {
     abstract public function deleteIndex($name);
 
     /**
+     * Pluck and return the primary keys of the given results using the given key name.
+     *
+     * @param mixed  $results
+     * @param string $key
+     *
+     * @return \CCollection
+     */
+    public function mapIdsFrom($results, $key) {
+        return $this->mapIds($results);
+    }
+
+    /**
      * Get the results of the query as a Collection of primary keys.
      *
      * @param \CModel_Scout_Builder $builder
@@ -128,7 +140,7 @@ abstract class CModel_Scout_EngineAbstract {
     public function get(CModel_Scout_Builder $builder) {
         return $this->map(
             $builder,
-            $this->search($builder),
+            $builder->applyAfterRawSearchCallback($this->search($builder)),
             $builder->model
         );
     }
@@ -143,7 +155,7 @@ abstract class CModel_Scout_EngineAbstract {
     public function cursor(CModel_Scout_Builder $builder) {
         return $this->lazyMap(
             $builder,
-            $this->search($builder),
+            $builder->applyAfterRawSearchCallback($this->search($builder)),
             $builder->model
         );
     }

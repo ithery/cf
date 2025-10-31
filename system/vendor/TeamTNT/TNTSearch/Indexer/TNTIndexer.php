@@ -252,7 +252,6 @@ class TNTIndexer {
         if (!isset($config['driver'])) {
             throw new Exception('A driver must be specified.');
         }
-
         switch ($config['driver']) {
             case 'mysql':
                 return new MySqlConnector();

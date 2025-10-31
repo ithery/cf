@@ -36,6 +36,13 @@ trait CModel_Scout_SearchableTrait {
         CCollection::macro('unsearchable', function () use ($self) {
             $self->queueRemoveFromSearch($this);
         });
+        CCollection::macro('searchableSync', function () use ($self) {
+            $self->syncMakeSearchable($this);
+        });
+
+        CCollection::macro('unsearchableSync', function () use ($self) {
+            $self->syncRemoveFromSearch($this);
+        });
     }
 
     /**
@@ -51,12 +58,27 @@ trait CModel_Scout_SearchableTrait {
         }
 
         if (!CF::config('model.scout.queue')) {
-            return $models->first()->searchableUsing()->update($models);
+            return $this->syncMakeSearchable($models);
         }
 
         c::dispatch((new CModel_Scout::$makeSearchableJob($models))
             ->onQueue($models->first()->syncWithSearchUsingQueue())
             ->onConnection($models->first()->syncWithSearchUsing()));
+    }
+
+    /**
+     * Synchronously make the given models searchable.
+     *
+     * @param \CModel_Collection $models
+     *
+     * @return void
+     */
+    public function syncMakeSearchable($models) {
+        if ($models->isEmpty()) {
+            return;
+        }
+
+        return $models->first()->makeSearchableUsing($models)->first()->searchableUsing()->update($models);
     }
 
     /**
@@ -72,12 +94,27 @@ trait CModel_Scout_SearchableTrait {
         }
 
         if (!CF::config('model.scout.queue')) {
-            return $models->first()->searchableUsing()->delete($models);
+            return $this->syncRemoveFromSearch($models);
         }
 
         c::dispatch(new CModel_Scout::$removeFromSearchJob($models))
             ->onQueue($models->first()->syncWithSearchUsingQueue())
             ->onConnection($models->first()->syncWithSearchUsing());
+    }
+
+    /**
+     * Synchronously make the given models unsearchable.
+     *
+     * @param \CModel_Collection $models
+     *
+     * @return void
+     */
+    public function syncRemoveFromSearch($models) {
+        if ($models->isEmpty()) {
+            return;
+        }
+
+        return $models->first()->searchableUsing()->delete($models);
     }
 
     /**
@@ -107,7 +144,7 @@ trait CModel_Scout_SearchableTrait {
      * @return \CModel_Scout_Builder
      */
     public static function search($query = '', $callback = null) {
-        return CContainer::getInstance()->make(CModel_Scout_Builder::class, [
+        return CContainer::getInstance()->make(static::$scoutBuilder ?? CModel_Scout_Builder::class, [
             'model' => new static(),
             'query' => $query,
             'callback' => $callback,
@@ -123,19 +160,40 @@ trait CModel_Scout_SearchableTrait {
      * @return void
      */
     public static function makeAllSearchable($chunk = null) {
+        static::makeAllSearchableQuery()->searchable($chunk);
+    }
+
+    /**
+     * Get a query builder for making all instances of the model searchable.
+     *
+     * @return \Illuminate\Database\Eloquent\Builder
+     */
+    public static function makeAllSearchableQuery() {
         $self = new static();
 
         $softDelete = static::usesSoftDelete() && CF::config('model.scout.soft_delete', true);
 
-        $self->newQuery()
+        return $self->newQuery()
             ->when(true, function ($query) use ($self) {
                 $self->makeAllSearchableUsing($query);
             })
             ->when($softDelete, function ($query) {
                 $query->withTrashed();
             })
-            ->orderBy($self->getKeyName())
-            ->searchable($chunk);
+            ->orderBy(
+                $self->qualifyColumn($self->getScoutKeyName())
+            );
+    }
+
+    /**
+     * Modify the collection of models being made searchable.
+     *
+     * @param \CCollection $models
+     *
+     * @return \CCollection
+     */
+    public function makeSearchableUsing(CCollection $models) {
+        return $models;
     }
 
     /**
@@ -159,6 +217,15 @@ trait CModel_Scout_SearchableTrait {
     }
 
     /**
+     * Synchronously make the given model instance searchable.
+     *
+     * @return void
+     */
+    public function searchableSync() {
+        $this->newCollection([$this])->searchableSync();
+    }
+
+    /**
      * Remove all instances of the model from the search index.
      *
      * @return void
@@ -176,6 +243,15 @@ trait CModel_Scout_SearchableTrait {
      */
     public function unsearchable() {
         $this->newCollection([$this])->unsearchable();
+    }
+
+    /**
+     * Synchronously remove the given model instance from the search index.
+     *
+     * @return void
+     */
+    public function unsearchableSync() {
+        $this->newCollection([$this])->unsearchableSync();
     }
 
     /**
@@ -223,9 +299,12 @@ trait CModel_Scout_SearchableTrait {
         if ($builder->queryCallback) {
             call_user_func($builder->queryCallback, $query);
         }
+        $whereIn = in_array($this->getScoutKeyType(), ['int', 'integer'])
+        ? 'whereIntegerInRaw'
+        : 'whereIn';
 
-        return $query->whereIn(
-            $this->getScoutKeyName(),
+        return $query->{$whereIn}(
+            $this->qualifyColumn($this->getScoutKeyName()),
             $ids
         );
     }
@@ -272,6 +351,15 @@ trait CModel_Scout_SearchableTrait {
      */
     public function searchableAs() {
         return CF::config('model.scout.prefix') . $this->getTable();
+    }
+
+    /**
+     * Get the index name for the model when indexing.
+     *
+     * @return string
+     */
+    public function indexableAs() {
+        return $this->searchableAs();
     }
 
     /**
@@ -352,11 +440,29 @@ trait CModel_Scout_SearchableTrait {
     }
 
     /**
+     * Get the auto-incrementing key type for querying models.
+     *
+     * @return string
+     */
+    public function getScoutKeyType() {
+        return $this->getKeyType();
+    }
+
+    /**
      * Get the key name used to index the model.
      *
      * @return mixed
      */
     public function getScoutKeyName() {
-        return $this->getQualifiedKeyName();
+        return $this->getKeyName();
+    }
+
+    /**
+     * Determine if the current class should use soft deletes with searching.
+     *
+     * @return bool
+     */
+    protected static function usesSoftDelete() {
+        return in_array(CModel_SoftDelete_Scope::class, c::classUsesRecursive(get_called_class()));
     }
 }

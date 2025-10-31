@@ -1,7 +1,13 @@
 <?php
+use Illuminate\Contracts\Support\Arrayable;
 
+/**
+ * @template TModel of \CModel
+ */
 class CModel_Scout_Builder {
     use CTrait_Macroable;
+    use CTrait_Tappable;
+    use CTrait_Conditionable;
 
     /**
      * The model instance.
@@ -32,6 +38,13 @@ class CModel_Scout_Builder {
     public $queryCallback;
 
     /**
+     * Optional callback after raw search.
+     *
+     * @var null|\Closure
+     */
+    public $afterRawSearchCallback;
+
+    /**
      * The custom index specified for the search.
      *
      * @var string
@@ -53,6 +66,13 @@ class CModel_Scout_Builder {
     public $whereIns = [];
 
     /**
+     * The "where not in" constraints added to the query.
+     *
+     * @var array
+     */
+    public $whereNotIns = [];
+
+    /**
      * The "limit" that should be applied to the search.
      *
      * @var int
@@ -65,6 +85,13 @@ class CModel_Scout_Builder {
      * @var array
      */
     public $orders = [];
+
+    /**
+     * Extra options that should be applied to the search.
+     *
+     * @var array
+     */
+    public $options = [];
 
     /**
      * Create a new search builder instance.
@@ -116,13 +143,34 @@ class CModel_Scout_Builder {
     /**
      * Add a "where in" constraint to the search query.
      *
-     * @param string $field
-     * @param array  $values
+     * @param string                                        $field
+     * @param \Illuminate\Contracts\Support\Arrayable|array $values
      *
      * @return $this
      */
-    public function whereIn($field, array $values) {
+    public function whereIn($field, $values) {
+        if ($values instanceof Arrayable) {
+            $values = $values->toArray();
+        }
         $this->whereIns[$field] = $values;
+
+        return $this;
+    }
+
+    /**
+     * Add a "where not in" constraint to the search query.
+     *
+     * @param string                                        $field
+     * @param \Illuminate\Contracts\Support\Arrayable|array $values
+     *
+     * @return $this
+     */
+    public function whereNotIn($field, $values) {
+        if ($values instanceof Arrayable) {
+            $values = $values->toArray();
+        }
+
+        $this->whereNotIns[$field] = $values;
 
         return $this;
     }
@@ -180,33 +228,57 @@ class CModel_Scout_Builder {
     }
 
     /**
-     * Apply the callback's query changes if the given "value" is true.
+     * Add a descending "order by" clause to the search query.
      *
-     * @param mixed    $value
-     * @param callable $callback
-     * @param callable $default
-     *
-     * @return mixed
-     */
-    public function when($value, $callback, $default = null) {
-        if ($value) {
-            return $callback($this, $value) ?: $this;
-        } elseif ($default) {
-            return $default($this, $value) ?: $this;
-        }
-
-        return $this;
-    }
-
-    /**
-     * Pass the query to a given callback.
-     *
-     * @param \Closure $callback
+     * @param string $column
      *
      * @return $this
      */
-    public function tap($callback) {
-        return $this->when(true, $callback);
+    public function orderByDesc($column) {
+        return $this->orderBy($column, 'desc');
+    }
+
+    /**
+     * Add an "order by" clause for a timestamp to the query.
+     *
+     * @param string $column
+     *
+     * @return $this
+     */
+    public function latest($column = null) {
+        if (is_null($column)) {
+            $column = $this->model->getCreatedAtColumn() ?? 'created';
+        }
+
+        return $this->orderBy($column, 'desc');
+    }
+
+    /**
+     * Add an "order by" clause for a timestamp to the query.
+     *
+     * @param string $column
+     *
+     * @return $this
+     */
+    public function oldest($column = null) {
+        if (is_null($column)) {
+            $column = $this->model->getCreatedAtColumn() ?? 'created';
+        }
+
+        return $this->orderBy($column, 'asc');
+    }
+
+    /**
+     * Set extra options for the search query.
+     *
+     * @param array $options
+     *
+     * @return $this
+     */
+    public function options(array $options) {
+        $this->options = $options;
+
+        return $this;
     }
 
     /**
@@ -229,6 +301,19 @@ class CModel_Scout_Builder {
      */
     public function raw() {
         return $this->engine()->search($this);
+    }
+
+    /**
+     * Set the callback that should have an opportunity to inspect and modify the raw result returned by the search engine.
+     *
+     * @param callable $callback
+     *
+     * @return $this
+     */
+    public function withRawResults($callback) {
+        $this->afterRawSearchCallback = $callback;
+
+        return $this;
     }
 
     /**
@@ -278,18 +363,59 @@ class CModel_Scout_Builder {
      */
     public function simplePaginate($perPage = null, $pageName = 'page', $page = null) {
         $engine = $this->engine();
-
+        if ($engine instanceof CModel_Scout_Contract_PaginateModel) {
+            return $engine->simplePaginate($this, $perPage, $page)->appends('query', $this->query);
+        } elseif ($engine instanceof CModel_Scout_Contract_PaginateModelUsingDatabase) {
+            return $engine->simplePaginateUsingDatabase($this, $perPage, $pageName, $page)->appends('query', $this->query);
+        }
         $page = $page ?: CPagination_Paginator::resolveCurrentPage($pageName);
 
         $perPage = $perPage ?: $this->model->getPerPage();
 
         $results = $this->model->newCollection($engine->map(
             $this,
-            $rawResults = $engine->paginate($this, $perPage, $page),
+            $this->applyAfterRawSearchCallback($rawResults = $engine->paginate($this, $perPage, $page)),
             $this->model
         )->all());
 
         $hasMorePages = ($perPage * $page) < $engine->getTotalCount($rawResults);
+
+        $paginator = CContainer::getInstance()->makeWith(CPagination_Paginator::class, [
+            'items' => $results,
+            'perPage' => $perPage,
+            'currentPage' => $page,
+            'options' => [
+                'path' => CPagination_Paginator::resolveCurrentPath(),
+                'pageName' => $pageName,
+            ],
+        ])->hasMorePagesWhen($hasMorePages);
+
+        return $paginator->appends('query', $this->query);
+    }
+
+    /**
+     * Paginate the given query into a simple paginator with raw data.
+     *
+     * @param int      $perPage
+     * @param string   $pageName
+     * @param null|int $page
+     *
+     * @return \CPagination_PaginatorInterface
+     */
+    public function simplePaginateRaw($perPage = null, $pageName = 'page', $page = null) {
+        $engine = $this->engine();
+        if ($engine instanceof CModel_Scout_Contract_PaginateModel) {
+            return $engine->simplePaginate($this, $perPage, $page)->appends('query', $this->query);
+        } elseif ($engine instanceof CModel_Scout_Contract_PaginateModelUsingDatabase) {
+            return $engine->simplePaginateUsingDatabase($this, $perPage, $pageName, $page)->appends('query', $this->query);
+        }
+        $page = $page ?: CPagination_Paginator::resolveCurrentPage($pageName);
+
+        $perPage = $perPage ?: $this->model->getPerPage();
+
+        $results = $this->applyAfterRawSearchCallback($engine->paginate($this, $perPage, $page));
+
+        $hasMorePages = ($perPage * $page) < $engine->getTotalCount($results);
 
         $paginator = CContainer::getInstance()->makeWith(CPagination_Paginator::class, [
             'items' => $results,
@@ -315,14 +441,18 @@ class CModel_Scout_Builder {
      */
     public function paginate($perPage = null, $pageName = 'page', $page = null) {
         $engine = $this->engine();
-
+        if ($engine instanceof CModel_Scout_Contract_PaginateModel) {
+            return $engine->simplePaginate($this, $perPage, $page)->appends('query', $this->query);
+        } elseif ($engine instanceof CModel_Scout_Contract_PaginateModelUsingDatabase) {
+            return $engine->simplePaginateUsingDatabase($this, $perPage, $pageName, $page)->appends('query', $this->query);
+        }
         $page = $page ?: CPagination_Paginator::resolveCurrentPage($pageName);
 
         $perPage = $perPage ?: $this->model->getPerPage();
 
         $results = $this->model->newCollection($engine->map(
             $this,
-            $rawResults = $engine->paginate($this, $perPage, $page),
+            $this->applyAfterRawSearchCallback($rawResults = $engine->paginate($this, $perPage, $page)),
             $this->model
         )->all());
 
@@ -351,12 +481,16 @@ class CModel_Scout_Builder {
      */
     public function paginateRaw($perPage = null, $pageName = 'page', $page = null) {
         $engine = $this->engine();
-
+        if ($engine instanceof CModel_Scout_Contract_PaginateModel) {
+            return $engine->simplePaginate($this, $perPage, $page)->appends('query', $this->query);
+        } elseif ($engine instanceof CModel_Scout_Contract_PaginateModelUsingDatabase) {
+            return $engine->simplePaginateUsingDatabase($this, $perPage, $pageName, $page)->appends('query', $this->query);
+        }
         $page = $page ?: CPagination_Paginator::resolveCurrentPage($pageName);
 
         $perPage = $perPage ?: $this->model->getPerPage();
 
-        $results = $engine->paginate($this, $perPage, $page);
+        $ $results = $this->applyAfterRawSearchCallback($engine->paginate($this, $perPage, $page));
 
         $paginator = CContainer::getInstance()->makeWith(CPagination_LengthAwarePaginator::class, [
             'items' => $results,
@@ -387,8 +521,7 @@ class CModel_Scout_Builder {
         if (is_null($this->queryCallback)) {
             return $totalCount;
         }
-
-        $ids = $engine->mapIds($results)->all();
+        $ids = $engine->mapIdsFrom($results, $this->model->getScoutKeyName())->all();
 
         if (count($ids) < $totalCount) {
             $ids = $engine->keys(c::tap(clone $this, function ($builder) use ($totalCount) {
@@ -405,11 +538,33 @@ class CModel_Scout_Builder {
     }
 
     /**
+     * Invoke the "after raw search" callback.
+     *
+     * @param mixed $results
+     *
+     * @return mixed
+     */
+    public function applyAfterRawSearchCallback($results) {
+        if ($this->afterRawSearchCallback) {
+            $results = call_user_func($this->afterRawSearchCallback, $results) ?: $results;
+        }
+
+        return $results;
+    }
+
+    /**
      * Get the engine that should handle the query.
      *
      * @return mixed
      */
     protected function engine() {
         return $this->model->searchableUsing();
+    }
+
+    /**
+     * Get the connection type for the underlying model.
+     */
+    public function modelConnectionType(): string {
+        return $this->model->getConnection()->getDriverName();
     }
 }

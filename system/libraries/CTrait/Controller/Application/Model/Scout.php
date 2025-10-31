@@ -23,6 +23,7 @@ trait CTrait_Controller_Application_Model_Scout {
             $model = new $class();
             $tnt = $this->loadTNTEngine($model);
             $indexName = $model->searchableAs() . '.index';
+
             try {
                 $tnt->selectIndex($indexName);
                 $rowsIndexed = $tnt->totalDocumentsInCollection();
@@ -36,9 +37,9 @@ trait CTrait_Controller_Application_Model_Scout {
             $indexedColumns = $rowsTotal ? implode(',', array_keys($model->first()->toSearchableArray())) : '';
 
             if ($recordsDifference == 0) {
-                $recordsDifference = '<fg=green>Synchronized</>';
+                $recordsDifference = '<span class="badge badge-success">Synchronized</badge>';
             } else {
-                $recordsDifference = "<fg=red>${recordsDifference}</>";
+                $recordsDifference = '<span class="badge badge-danger">' . $recordsDifference . '</badge>';
             }
             $tableData[] = [
                 'searchable' => $class,
@@ -61,8 +62,25 @@ trait CTrait_Controller_Application_Model_Scout {
         $table->addColumn('rows_indexed')->setLabel('Indexed Records');
         $table->addColumn('rows_total')->setLabel('DB Records');
         $table->addColumn('difference')->setLabel('Records Difference');
+        $table->setRowActionStyle('btn-dropdown');
+        $table->addRowAction()->setLabel('Import')->setIcon('ti ti-reload')
+            ->setLink($this->controllerUrl() . 'import/{searchable}')->setConfirm();
+        $table->addRowAction()->setLabel('Flush')->setIcon('ti ti-trash')
+            ->setLink($this->controllerUrl() . 'flush/{searchable}')->setConfirm();
 
         return $app;
+    }
+
+    public function import($model) {
+        $model::makeAllSearchable();
+
+        return c::redirect($this->controllerUrl());
+    }
+
+    public function flush($model) {
+        $model::removeAllFromSearch();
+
+        return c::redirect($this->controllerUrl());
     }
 
     /**
