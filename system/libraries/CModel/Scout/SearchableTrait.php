@@ -462,7 +462,7 @@ trait CModel_Scout_SearchableTrait {
      *
      * @return bool
      */
-    protected static function usesSoftDelete() {
+    public static function usesSoftDelete() {
         return in_array(CModel_SoftDelete_Scope::class, c::classUsesRecursive(get_called_class()));
     }
 }
