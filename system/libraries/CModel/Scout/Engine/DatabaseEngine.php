@@ -1,12 +1,5 @@
 <?php
 
-use CModel_Scout_Builder;
-use Illuminate\Support\Arr;
-use Illuminate\Support\LazyCollection;
-use Illuminate\Database\Eloquent\SoftDeletes;
-use Laravel\Scout\Attributes\CModel_Scout_Attributes_SearchUsingPrefix;
-use Laravel\Scout\Attributes\CModel_Scout_Attributes_SearchUsingFullText;
-
 class CModel_Scout_Engine_DatabaseEngine extends CModel_Scout_EngineAbstract implements CModel_Scout_Contract_PaginateModel {
     /**
      * Create a new engine instance.

@@ -11,7 +11,7 @@ class CModel_Scout_RemoveableScoutCollection extends CCollection {
             return [];
         }
 
-        return in_array(CModel_Trait_Scoutable::class, c::classUsesRecursive($this->first()))
+        return in_array(CModel_Scout_SearchableTrait::class, c::classUsesRecursive($this->first()))
             ? $this->map->getScoutKey()->all()
             : parent::getQueueableIds();
     }
