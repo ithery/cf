@@ -412,7 +412,7 @@ class MysqlEngine extends SqliteEngine
             } elseif (is_array($this->config['extension'])) {
                 $includeFile = in_array($object->getExtension(), $this->config['extension']);
             } else {
-                $includeFile = stringEndsWith($name, $this->config['extension']);
+                $includeFile = \cstr::endsWith($name, $this->config['extension']);
             }
 
             if ($includeFile && !in_array($name, $exclude)) {
