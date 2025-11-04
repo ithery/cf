@@ -94,6 +94,13 @@ class CModel_Scout_Builder {
     public $options = [];
 
     /**
+     * The query constraints (for tntSearch).
+     *
+     * @var array
+     */
+    public $constraints;
+
+    /**
      * Create a new search builder instance.
      *
      * @param \CModel       $model
@@ -566,5 +573,11 @@ class CModel_Scout_Builder {
      */
     public function modelConnectionType(): string {
         return $this->model->getConnection()->getDriverName();
+    }
+
+    public function constrain($constraints) {
+        $this->constraints = $constraints;
+
+        return $this;
     }
 }

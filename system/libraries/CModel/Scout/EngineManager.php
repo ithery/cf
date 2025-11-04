@@ -15,7 +15,7 @@ class CModel_Scout_EngineManager extends CBase_ManagerAbstract {
 
     public function createTntsearchEngine() {
         $tnt = new TNTSearch();
-        $driver = CF::config('database.default');
+
         $config = CF::config('model.scout.tntsearch');
         $storage = carr::get($config, 'storage');
         if ($storage == null) {
@@ -40,7 +40,7 @@ class CModel_Scout_EngineManager extends CBase_ManagerAbstract {
         ];
 
         $tnt->loadConfig($config + $tntDbConfig);
-
+        $tnt->setDatabaseHandle(c::db($databaseConfigName)->getPdo());
         // $tnt->maxDocs = CF::config('model.scout.tntsearch.maxDocs', 500);
 
         $tnt->setFuzziness(CF::config('model.scout.tntsearch.fuzziness', $tnt->getFuzziness()));
