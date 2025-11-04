@@ -302,7 +302,8 @@ class CModel_Scout_Engine_TNTSearchEngine extends CModel_Scout_EngineAbstract {
 
     public function initIndex($model) {
         $indexName = $model->searchableAs();
-        if ($this->tnt->config['engine'] == "TeamTNT\TNTSearch\Engines\RedisEngine") {
+
+        if (isset($this->tnt->config['engine']) && $this->tnt->config['engine'] == "TeamTNT\TNTSearch\Engines\RedisEngine") {
             return;
         }
         if (!file_exists($this->tnt->config['storage'] . "/{$indexName}.index")) {
