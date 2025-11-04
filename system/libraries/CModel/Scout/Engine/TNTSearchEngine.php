@@ -144,7 +144,7 @@ class CModel_Scout_Engine_TNTSearchEngine extends CModel_Scout_EngineAbstract {
         $this->builder = $builder;
 
         if (isset($builder->model->asYouType)) {
-            $this->tnt->asYouType = $builder->model->asYouType;
+            $this->tnt->asYouType($builder->model->asYouType);
         }
 
         if ($builder->callback) {

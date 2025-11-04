@@ -15,7 +15,7 @@ class CModel_Scout_EngineManager extends CBase_ManagerAbstract {
 
     public function createTntsearchEngine() {
         $tnt = new TNTSearch();
-
+        $driver = CF::config('database.default');
         $config = CF::config('model.scout.tntsearch');
         $storage = carr::get($config, 'storage');
         if ($storage == null) {
@@ -41,14 +41,14 @@ class CModel_Scout_EngineManager extends CBase_ManagerAbstract {
 
         $tnt->loadConfig($config + $tntDbConfig);
 
-        $tnt->maxDocs = CF::config('model.scout.tntsearch.maxDocs', 500);
+        // $tnt->maxDocs = CF::config('model.scout.tntsearch.maxDocs', 500);
 
-        $tnt->fuzziness = CF::config('model.scout.tntsearch.fuzziness', $tnt->fuzziness);
-        $tnt->fuzzy_distance = CF::config('model.scout.tntsearch.fuzzy.distance', $tnt->fuzzy_distance);
-        $tnt->fuzzy_prefix_length = CF::config('model.scout.tntsearch.fuzzy.prefix_length', $tnt->fuzzy_prefix_length);
-        $tnt->fuzzy_max_expansions = CF::config('model.scout.tntsearch.fuzzy.max_expansions', $tnt->fuzzy_max_expansions);
-
-        $tnt->asYouType = CF::config('model.scout.tntsearch.asYouType', $tnt->asYouType);
+        $tnt->setFuzziness(CF::config('model.scout.tntsearch.fuzziness', $tnt->getFuzziness()));
+        $tnt->setFuzzyDistance(CF::config('model.scout.tntsearch.fuzzy.distance', $tnt->getFuzzyDistance()));
+        $tnt->setFuzzyPrefixLength(CF::config('model.scout.tntsearch.fuzzy.prefix_length', $tnt->getFuzzyPrefixLength()));
+        $tnt->setFuzzyMaxExpansions(CF::config('model.scout.tntsearch.fuzzy.max_expansions', $tnt->getFuzzyMaxExpansions()));
+        $tnt->setFuzzyNoLimit(CF::config('model.scout.tntsearch.fuzzy.no_limit', $tnt->getFuzzyNoLimit()));
+        $tnt->asYouType(CF::config('model.scout.tntsearch.asYouType', $tnt->getAsYouType()));
 
         return $tnt;
     }

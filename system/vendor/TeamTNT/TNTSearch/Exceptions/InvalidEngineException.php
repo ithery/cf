@@ -4,6 +4,6 @@ namespace TeamTNT\TNTSearch\Exceptions;
 
 use Exception;
 
-class IndexNotFoundException extends Exception
+class InvalidEngineException extends Exception
 {
 }
