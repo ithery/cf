@@ -255,13 +255,15 @@ class CModel_Scout_Engine_DatabaseEngine extends CModel_Scout_EngineAbstract imp
         if (PHP_MAJOR_VERSION < 8) {
             return [];
         }
+        $reflectionMethod = new ReflectionMethod($builder->model, 'toSearchableArray');
+        if (PHP_MAJOR_VERSION >= 8 && method_exists($reflectionMethod, 'getAttributes')) {
+            foreach ($reflectionMethod->getAttributes() as $attribute) {
+                if ($attribute->getName() !== $attributeClass) {
+                    continue;
+                }
 
-        foreach ((new ReflectionMethod($builder->model, 'toSearchableArray'))->getAttributes() as $attribute) {
-            if ($attribute->getName() !== $attributeClass) {
-                continue;
+                $columns = array_merge($columns, carr::wrap($attribute->getArguments()[0]));
             }
-
-            $columns = array_merge($columns, carr::wrap($attribute->getArguments()[0]));
         }
 
         return $columns;
