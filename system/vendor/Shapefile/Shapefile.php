@@ -1229,7 +1229,16 @@ abstract class Shapefile {
     protected function getOption($option) {
         return $this->options[$option];
     }
-
+    /**
+     * Gets all options or a specified option value.
+     *
+     * @param string|null $option name of the option
+     *
+     * @return array|string|null
+     */
+    protected function getOptions() {
+        return $this->options;
+    }
     /**
      * Sets shape type.
      * It can be called just once for an instance of the class.

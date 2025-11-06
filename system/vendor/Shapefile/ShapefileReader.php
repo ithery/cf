@@ -224,7 +224,7 @@ class ShapefileReader extends Shapefile implements \Iterator {
     /**
      * Gets current record and moves the cursor to the next one.
      *
-     * @return \Shapefile\Geometry\Geometry|null
+     * @return null|\Shapefile\Geometry\Geometry
      */
     public function fetchRecord() {
         $ret = $this->readCurrentRecord();
@@ -344,11 +344,9 @@ class ShapefileReader extends Shapefile implements \Iterator {
             $bounding_box = $this->readXYBoundingBox() + $this->readZRange() + $this->readMRange();
             if (!$this->isZ()) {
                 unset($bounding_box['zmin'], $bounding_box['zmax']);
-
             }
             if (!$this->isM()) {
                 unset($bounding_box['mmin'], $bounding_box['mmax']);
-
             }
             $this->setCustomBoundingBox($bounding_box);
         }
@@ -544,6 +542,9 @@ class ShapefileReader extends Shapefile implements \Iterator {
      * @return array associative array with "z" value or empty array
      */
     private function readZ() {
+        if($this->getOption(Shapefile::OPTION_SUPPRESS_Z)) {
+            return [];
+        }
         $z = $this->readDoubleL(Shapefile::FILE_SHP);
 
         return $this->getOption(Shapefile::OPTION_SUPPRESS_Z) ? [] : ['z' => $z];
@@ -555,6 +556,9 @@ class ShapefileReader extends Shapefile implements \Iterator {
      * @return array associative array with "m" value or empty array
      */
     private function readM() {
+        if($this->getOption(Shapefile::OPTION_SUPPRESS_M)) {
+            return [];
+        }
         $m = $this->readDoubleL(Shapefile::FILE_SHP);
 
         return $this->getOption(Shapefile::OPTION_SUPPRESS_M) ? [] : ['m' => $this->parseM($m)];
@@ -599,6 +603,9 @@ class ShapefileReader extends Shapefile implements \Iterator {
      * @return array associative array with the zmin and zmax values
      */
     private function readZRange() {
+        if ($this->getOption(Shapefile::OPTION_SUPPRESS_Z)) {
+            return [];
+        }
         $values = [
             'zmin' => $this->readDoubleL(Shapefile::FILE_SHP),
             'zmax' => $this->readDoubleL(Shapefile::FILE_SHP),
@@ -614,6 +621,9 @@ class ShapefileReader extends Shapefile implements \Iterator {
      * @return array associative array with the mmin and mmax values
      */
     private function readMRange() {
+        if ($this->getOption(Shapefile::OPTION_SUPPRESS_M)) {
+            return [];
+        }
         $values = [
             'mmin' => $this->parseM($this->readDoubleL(Shapefile::FILE_SHP)),
             'mmax' => $this->parseM($this->readDoubleL(Shapefile::FILE_SHP)),
