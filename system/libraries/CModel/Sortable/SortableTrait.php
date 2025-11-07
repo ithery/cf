@@ -3,11 +3,6 @@
 defined('SYSPATH') or die('No direct access allowed.');
 
 /**
- * @author Hery Kurniawan
- * @license Ittron Global Teknologi <ittron.co.id>
- *
- * @since Mar 31, 2019, 6:18:55 PM
- *
  * @method static CModel_Query|static ordered()
  */
 trait CModel_Sortable_SortableTrait {
