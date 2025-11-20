@@ -35,7 +35,7 @@ class CQueue_Worker {
     /**
      * The queue manager instance.
      *
-     * @var \CQueue_FactoryInterface
+     * @var CQueue_FactoryInterface
      */
     protected $manager;
 
@@ -56,14 +56,14 @@ class CQueue_Worker {
     /**
      * The exception handler instance.
      *
-     * @var \CException_ExceptionHandler
+     * @var CException_ExceptionHandler
      */
     protected $exceptions;
 
     /**
      * The callback used to determine if the application is in maintenance mode.
      *
-     * @var \callable
+     * @var callable
      */
     protected $isDownForMaintenance;
 
@@ -92,7 +92,7 @@ class CQueue_Worker {
      * @param CQueue_Manager              $manager
      * @param CEvent_Dispatcher           $events
      * @param CException_ExceptionHandler $exceptions
-     * @param \callable                   $isDownForMaintenance
+     * @param callable                    $isDownForMaintenance
      *
      * @return void
      */
@@ -107,9 +107,9 @@ class CQueue_Worker {
     /**
      * Listen to the given queue in a loop.
      *
-     * @param string                $connectionName
-     * @param string                $queue
-     * @param \CQueue_WorkerOptions $options
+     * @param string               $connectionName
+     * @param string               $queue
+     * @param CQueue_WorkerOptions $options
      *
      * @return void
      */
@@ -372,6 +372,13 @@ class CQueue_Worker {
                 if (!CF::isProduction()) {
                     CDaemon::log($e->getTraceAsString());
                 }
+                CLogger::error('QueueException:' . $job->resolveName(), [
+                    'job' => $job,
+                    'connection' => $connectionName,
+                    'options' => $options,
+                    'message' => $e->getMessage(),
+                    'trace' => $e->getTraceAsString()
+                ]);
             } else {
                 $this->exceptions->report($e);
             }
@@ -384,7 +391,7 @@ class CQueue_Worker {
     /**
      * Stop the worker if we have lost connection to a database.
      *
-     * @param \Throwable $e
+     * @param Throwable $e
      *
      * @return void
      */
@@ -401,7 +408,7 @@ class CQueue_Worker {
      * @param CQueue_AbstractJob   $job
      * @param CQueue_WorkerOptions $options
      *
-     * @throws \Throwable
+     * @throws Throwable
      *
      * @return void
      */
@@ -436,9 +443,9 @@ class CQueue_Worker {
      * @param string               $connectionName
      * @param CQueue_JobInterface  $job
      * @param CQueue_WorkerOptions $options
-     * @param \Exception           $e
+     * @param Exception            $e
      *
-     * @throws \Exception
+     * @throws Exception
      *
      * @return void
      */
@@ -514,7 +521,7 @@ class CQueue_Worker {
      * @param string             $connectionName
      * @param CQueue_AbstractJob $job
      * @param int                $maxTries
-     * @param \Exception         $e
+     * @param Exception          $e
      *
      * @return void
      */
@@ -533,9 +540,9 @@ class CQueue_Worker {
     /**
      * Mark the given job as failed if it has exceeded the maximum allowed attempts.
      *
-     * @param string               $connectionName
-     * @param \CQueue_JobInterface $job
-     * @param \Throwable           $e
+     * @param string              $connectionName
+     * @param CQueue_JobInterface $job
+     * @param Throwable           $e
      *
      * @return void
      */
@@ -560,9 +567,9 @@ class CQueue_Worker {
     /**
      * Mark the given job as failed if it should fail on timeouts.
      *
-     * @param string               $connectionName
-     * @param \CQueue_JobInterface $job
-     * @param \Throwable           $e
+     * @param string              $connectionName
+     * @param CQueue_JobInterface $job
+     * @param Throwable           $e
      *
      * @return void
      */
@@ -576,7 +583,7 @@ class CQueue_Worker {
      * Mark the given job as failed and raise the relevant event.
      *
      * @param CQueue_AbstractJob $job
-     * @param \Exception         $e
+     * @param Exception          $e
      *
      * @return void
      */
@@ -587,8 +594,8 @@ class CQueue_Worker {
     /**
      * Calculate the backoff for the given job.
      *
-     * @param \CQueue_JobInterface  $job
-     * @param \CQueue_WorkerOptions $options
+     * @param CQueue_JobInterface  $job
+     * @param CQueue_WorkerOptions $options
      *
      * @return int
      */
@@ -638,7 +645,7 @@ class CQueue_Worker {
      *
      * @param string             $connectionName
      * @param CQueue_AbstractJob $job
-     * @param \Exception         $e
+     * @param Exception          $e
      *
      * @return void
      */
@@ -740,7 +747,7 @@ class CQueue_Worker {
     /**
      * Create an instance of MaxAttemptsExceededException.
      *
-     * @param null|\CQueue_JobInterface $job
+     * @param null|CQueue_JobInterface $job
      *
      * @return CQueue_Exception_MaxAttemptsExceededException
      */
