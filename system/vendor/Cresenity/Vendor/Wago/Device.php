@@ -99,14 +99,19 @@ class Device {
     }
 
     /**
-     * @param string $url
+     * @param string     $url
+     * @param null|mixed $name
      *
      * @return array
      */
-    public function setWebhook($url) {
+    public function setWebhook($url, $name = null) {
         $options = [
             'endpoint' => $url
         ];
+
+        if ($name) {
+            $options['name'] = $name;
+        }
 
         return $this->handleResponse($this->client->post('webhook/set', $options));
     }
