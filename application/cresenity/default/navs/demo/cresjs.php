@@ -28,4 +28,10 @@ return [
         'label' => c::__('Reactive'),
         'uri' => 'demo/cresjs/reactive/index',
     ],
+
+    [
+        'name' => 'cresjs.style',
+        'label' => c::__('Style'),
+        'uri' => 'demo/cresjs/style/index',
+    ],
 ];

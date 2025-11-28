@@ -19,6 +19,9 @@ export const isString = (str) => {
 export const isArray = (array) => {
     return Array.isArray(array);
 };
+export const isNumeric = (n) => {
+    return !isNaN(parseFloat(n)) && isFinite(n);
+}
 export const isFunction = (func) => {
     return typeof func === 'function';
 };
@@ -64,3 +67,30 @@ export const extend = (target, ...sources) => {
     }
     return target;
 };
+
+
+export const deepMerge = (target, source) => {
+    if (!source || typeof source !== 'object') {
+        return target
+    }
+    if (!target || typeof target !== 'object') {
+        target = Array.isArray(source) ? [] : {}
+    }
+    for (const key in source) {
+        if (Object.prototype.hasOwnProperty.call(source, key)) {
+            const sourceValue = source[key]
+            if (Array.isArray(sourceValue)) {
+                target[key] = Array.isArray(target[key])
+                    ? target[key].map((item, index) =>
+                        sourceValue[index] ? deepMerge(item, sourceValue[index]) : item
+                    ).concat(sourceValue.slice(target[key].length))
+                    : [...sourceValue]
+            } else if (sourceValue && typeof sourceValue === 'object') {
+                target[key] = deepMerge(target[key], sourceValue);
+            } else {
+                target[key] = sourceValue
+            }
+        }
+    }
+    return target
+}

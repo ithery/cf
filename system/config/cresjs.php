@@ -33,4 +33,7 @@ return [
             'debug' => true
         ]
     ],
+    'style' => [
+        'enable' => false,
+    ],
 ];

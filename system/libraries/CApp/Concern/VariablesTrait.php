@@ -48,6 +48,8 @@ trait CApp_Concern_VariablesTrait {
         $variables['vscode']['liveReload'] = carr::get($cresjsConfig, 'vscode.live_reload');
         $variables['react'] = [];
         $variables['react']['enable'] = carr::get($cresjsConfig, 'react.enable');
+        $variables['cresStyle'] = [];
+        $variables['cresStyle']['enable'] = carr::get($cresjsConfig, 'style.enable');
         $variables['block'] = [];
         $variables['block']['html'] = carr::get($cresjsConfig, 'block.html');
         $variables['waves'] = [];

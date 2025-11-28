@@ -47,6 +47,7 @@ import stylex from './module/stylex';
 import collect from 'collect.js';
 import emitter from './cresenity/emitter';
 import bootstrapHelper from './module/BootstrapHelper';
+import cresStyle from './module/CresStyle';
 
 export default class Cresenity {
     constructor() {
@@ -1093,6 +1094,7 @@ export default class Cresenity {
         window.Alpine = Alpine;
         this.alpine = new CresAlpine(window.Alpine);
         this.ui.start();
+        this.cresStyle = cresStyle;
         window.Alpine.start();
     }
 
