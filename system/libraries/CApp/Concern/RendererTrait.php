@@ -43,7 +43,9 @@ trait CApp_Concern_RendererTrait {
 
         $alpineJs = curl::base() . 'media/js/libs/alpine.js?v=' . md5(CFile::lastModified(DOCROOT . 'media/js/libs/alpine.js'));
         $alpineScript = '<script src="' . $alpineJs . '" defer></script>';
-        $cresStyle = '<link href="' . $cresCss . '" rel="stylesheet" />' . PHP_EOL;
+        $cresStyle = '<link href="' . $cresCss . '" rel="stylesheet" />';
+        $cresStyleIsEnabled = !!CF::config('cresjs.style.enable');
+        $cresStyleInline = $cresStyleIsEnabled ? PHP_EOL . '<style id="cres-styles"></style>' : '';
 
         $allStyles = carr::get($viewData, 'head_client_script');
 
@@ -68,7 +70,7 @@ trait CApp_Concern_RendererTrait {
     }
     @keyframes cresautofill { from {} }
 </style>
-{$cresStyle}
+{$cresStyle}{$cresStyleInline}
 {$allStyles}
 HTML;
     }
