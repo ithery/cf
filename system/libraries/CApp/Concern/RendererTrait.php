@@ -55,6 +55,9 @@ trait CApp_Concern_RendererTrait {
     [cres\:offline] {
         display: none;
     }
+    [cs-cloak] {
+        display: none!important;
+    }
     [cres\:dirty]:not(textarea):not(input):not(select) {
         display: none;
     }
