@@ -87,7 +87,7 @@ class CRemote_SSH {
      *
      * @param array $config
      *
-     * @throws \InvalidArgumentException
+     * @throws InvalidArgumentException
      *
      * @return array
      */
@@ -102,7 +102,7 @@ class CRemote_SSH {
             return ['password' => $config['password']];
         }
 
-        throw new \InvalidArgumentException('Password / key is required.');
+        throw new InvalidArgumentException('Password / key is required.');
     }
 
     public function output() {
@@ -125,7 +125,7 @@ class CRemote_SSH {
      * Run a set of commands to the connection.
      *
      * @param string|array $commands
-     * @param \Closure     $callback
+     * @param Closure      $callback
      *
      * @return $this
      */
@@ -187,7 +187,7 @@ class CRemote_SSH {
     }
 
     /**
-     * @return \phpseclib3\Net\SFTP
+     * @return phpseclib3\Net\SFTP
      */
     public function getClient() {
         return $this->connection->getGateway()->getConnection();
@@ -215,6 +215,17 @@ class CRemote_SSH {
      */
     public function putString($remote, $contents) {
         $this->connection->putString($remote, $contents);
+    }
+
+    /**
+     * Check whether a given file exists on the server.
+     *
+     * @param string $remote
+     *
+     * @return bool
+     */
+    public function exists($remote) {
+        return $this->connection->exists($remote);
     }
 
     /**
