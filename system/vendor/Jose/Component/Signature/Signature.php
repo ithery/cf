@@ -6,29 +6,34 @@ namespace Jose\Component\Signature;
 
 use InvalidArgumentException;
 use function array_key_exists;
-use function sprintf;
 
 class Signature
 {
-    private readonly ?string $encodedProtectedHeader;
+    private ?string $encodedProtectedHeader;
 
     /**
      * @var array<string, mixed>
      */
-    private readonly array $protectedHeader;
+    private array $protectedHeader;
+
+    private string $signature;
+
+    private array $header;
 
     /**
      * @param array{alg?: string, string?: mixed} $protectedHeader
      * @param array{alg?: string, string?: mixed} $header
      */
     public function __construct(
-        private readonly string $signature,
+        string $signature,
         array $protectedHeader,
         ?string $encodedProtectedHeader,
-        private readonly array $header
+        array $header
     ) {
+        $this->signature = $signature;
         $this->protectedHeader = $encodedProtectedHeader === null ? [] : $protectedHeader;
         $this->encodedProtectedHeader = $encodedProtectedHeader;
+        $this->header = $header;
     }
 
     /**

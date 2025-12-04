@@ -5,7 +5,6 @@ declare(strict_types=1);
 namespace Jose\Component\Core\Util\Ecc;
 
 use Brick\Math\BigInteger;
-use Override;
 use RuntimeException;
 use Stringable;
 use const STR_PAD_LEFT;
@@ -13,18 +12,28 @@ use const STR_PAD_LEFT;
 /**
  * @internal
  */
-final readonly class Curve implements Stringable
+final class Curve implements Stringable
 {
+    private int $size;
+    private BigInteger $prime;
+    private BigInteger $a;
+    private BigInteger $b;
+    private Point $generator;
+
     public function __construct(
-        private int $size,
-        private BigInteger $prime,
-        private BigInteger $a,
-        private BigInteger $b,
-        private Point $generator
+        int $size,
+        BigInteger $prime,
+        BigInteger $a,
+        BigInteger $b,
+        Point $generator
     ) {
+        $this->size = $size;
+        $this->prime = $prime;
+        $this->a = $a;
+        $this->b = $b;
+        $this->generator = $generator;
     }
 
-    #[Override]
     public function __toString(): string
     {
         return 'curve(' . Math::toString($this->getA()) . ', ' . Math::toString($this->getB()) . ', ' . Math::toString(

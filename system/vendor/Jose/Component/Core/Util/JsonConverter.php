@@ -10,9 +10,9 @@ use const JSON_THROW_ON_ERROR;
 use const JSON_UNESCAPED_SLASHES;
 use const JSON_UNESCAPED_UNICODE;
 
-final readonly class JsonConverter
+final class JsonConverter
 {
-    public static function encode(mixed $payload): string
+    public static function encode($payload): string
     {
         try {
             return json_encode($payload, JSON_THROW_ON_ERROR | JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE);

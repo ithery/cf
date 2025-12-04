@@ -10,14 +10,13 @@ use RuntimeException;
 use function extension_loaded;
 use function is_array;
 use function is_string;
-use function sprintf;
 use const OPENSSL_KEYTYPE_EC;
 use const STR_PAD_LEFT;
 
 /**
  * @internal
  */
-final readonly class ECKey
+final class ECKey
 {
     public static function convertToPEM(JWK $jwk): string
     {
@@ -30,13 +29,22 @@ final readonly class ECKey
 
     public static function convertPublicKeyToPEM(JWK $jwk): string
     {
-        $der = match ($jwk->get('crv')) {
-            'P-256' => self::p256PublicKey(),
-            'secp256k1' => self::p256KPublicKey(),
-            'P-384' => self::p384PublicKey(),
-            'P-521' => self::p521PublicKey(),
-            default => throw new InvalidArgumentException('Unsupported curve.'),
-        };
+        switch ($jwk->get('crv')) {
+            case 'P-256':
+                $der = self::p256PublicKey();
+                break;
+            case 'secp256k1':
+                $der = self::p256KPublicKey();
+                break;
+            case 'P-384':
+                $der = self::p384PublicKey();
+                break;
+            case 'P-521':
+                $der = self::p521PublicKey();
+                break;
+            default:
+                throw new InvalidArgumentException('Unsupported curve.');
+        }
         $der .= self::getKey($jwk);
         $pem = '-----BEGIN PUBLIC KEY-----' . "\n";
         $pem .= chunk_split(base64_encode($der), 64, "\n");
@@ -46,13 +54,22 @@ final readonly class ECKey
 
     public static function convertPrivateKeyToPEM(JWK $jwk): string
     {
-        $der = match ($jwk->get('crv')) {
-            'P-256' => self::p256PrivateKey($jwk),
-            'secp256k1' => self::p256KPrivateKey($jwk),
-            'P-384' => self::p384PrivateKey($jwk),
-            'P-521' => self::p521PrivateKey($jwk),
-            default => throw new InvalidArgumentException('Unsupported curve.'),
-        };
+        switch ($jwk->get('crv')) {
+            case 'P-256':
+                $der = self::p256PrivateKey($jwk);
+                break;
+            case 'secp256k1':
+                $der = self::p256KPrivateKey($jwk);
+                break;
+            case 'P-384':
+                $der = self::p256KPrivateKey($jwk);
+                break;
+            case 'P-521':
+                $der = self::p521PrivateKey($jwk);
+                break;
+            default:
+                throw new InvalidArgumentException('Unsupported curve.');
+        }
         $der .= self::getKey($jwk);
         $pem = '-----BEGIN EC PRIVATE KEY-----' . "\n";
         $pem .= chunk_split(base64_encode($der), 64, "\n");
@@ -76,12 +93,20 @@ final readonly class ECKey
 
     private static function getNistCurveSize(string $curve): int
     {
-        return match ($curve) {
-            'P-256', 'secp256k1' => 256,
-            'P-384' => 384,
-            'P-521' => 521,
-            default => throw new InvalidArgumentException(sprintf('The curve "%s" is not supported.', $curve)),
-        };
+        switch ($curve) {
+            case 'P-256':
+            case 'secp256k1':
+                return 256;
+                break;
+            case 'P-384':
+                return 384;
+                break;
+            case 'P-521':
+                return 521;
+                break;
+            default:
+                throw new InvalidArgumentException('Unsupported curve.');
+        }
     }
 
     private static function createECKeyUsingOpenSSL(string $curve): array
@@ -92,7 +117,6 @@ final readonly class ECKey
         $key = openssl_pkey_new([
             'curve_name' => self::getOpensslCurveName($curve),
             'private_key_type' => OPENSSL_KEYTYPE_EC,
-            'private_key_bits' => 2048, // Not used for EC keys. See https://github.com/php/php-src/pull/19103
         ]);
         if ($key === false) {
             throw new RuntimeException('Unable to create the key');
@@ -128,13 +152,22 @@ final readonly class ECKey
 
     private static function getOpensslCurveName(string $curve): string
     {
-        return match ($curve) {
-            'P-256' => 'prime256v1',
-            'secp256k1' => 'secp256k1',
-            'P-384' => 'secp384r1',
-            'P-521' => 'secp521r1',
-            default => throw new InvalidArgumentException(sprintf('The curve "%s" is not supported.', $curve)),
-        };
+        switch ($curve) {
+            case 'P-256':
+                return 'prime256v1';
+                break;
+            case 'secp256k1':
+                return 'secp256k1';
+                break;
+            case 'P-384':
+                return 'secp384r1';
+                break;
+            case 'P-521':
+                return 'secp521r1';
+                break;
+            default:
+                throw new InvalidArgumentException('Unsupported curve.');
+        }
     }
 
     private static function p256PublicKey(): string

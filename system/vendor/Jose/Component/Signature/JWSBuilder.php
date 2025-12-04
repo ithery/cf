@@ -20,7 +20,6 @@ use function count;
 use function in_array;
 use function is_array;
 use function is_string;
-use function sprintf;
 
 class JWSBuilder
 {
@@ -40,9 +39,11 @@ class JWSBuilder
 
     protected ?bool $isPayloadEncoded = null;
 
-    public function __construct(
-        private readonly AlgorithmManager $signatureAlgorithmManager
-    ) {
+    private AlgorithmManager $signatureAlgorithmManager;
+
+    public function __construct(AlgorithmManager $signatureAlgorithmManager)
+    {
+        $this->signatureAlgorithmManager = $signatureAlgorithmManager;
     }
 
     /**
@@ -125,9 +126,11 @@ class JWSBuilder
         );
 
         if ($this->isPayloadEncoded === false && $this->isPayloadDetached === false) {
-            mb_detect_encoding($this->payload, 'UTF-8', true) !== false || throw new InvalidArgumentException(
-                'The payload must be encoded in UTF-8'
-            );
+            if (mb_detect_encoding($this->payload, 'UTF-8', true) === false) {
+                throw new InvalidArgumentException(
+                    'The payload must be encoded in UTF-8'
+                );
+            }
         }
 
         $jws = new JWS($this->payload, $encodedPayload, $this->isPayloadDetached);
@@ -193,7 +196,7 @@ class JWSBuilder
      */
     private function findSignatureAlgorithm(JWK $key, array $protectedHeader, array $header): Algorithm
     {
-        $completeHeader = [...$header, ...$protectedHeader];
+        $completeHeader = array_merge($header, $protectedHeader);
         $alg = $completeHeader['alg'] ?? null;
         if (! is_string($alg)) {
             throw new InvalidArgumentException('No "alg" parameter set in the header.');

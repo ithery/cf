@@ -24,11 +24,13 @@ namespace Jose\Component\Core\Util\Ecc;
 /**
  * @internal
  */
-final readonly class PublicKey
+final class PublicKey
 {
-    public function __construct(
-        private Point $point
-    ) {
+    private Point $point;
+
+    public function __construct(Point $point)
+    {
+        $this->point = $point;
     }
 
     public function getPoint(): Point
