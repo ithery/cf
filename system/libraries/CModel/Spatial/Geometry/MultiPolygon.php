@@ -18,10 +18,24 @@ class CModel_Spatial_Geometry_MultiPolygon extends CModel_Spatial_Geometry_Geome
      */
     protected $collectionItemType = CModel_Spatial_Geometry_Polygon::class;
 
+    /**
+     * Returns a Well-Known Text (WKT) representation of the MultiPolygon.
+     *
+     * @return string The WKT representation of the MultiPolygon
+     */
     public function toWKT() {
         return sprintf('MULTIPOLYGON(%s)', (string) $this);
     }
 
+    /**
+     * Returns a string representation of the MultiPolygon.
+     *
+     * The MultiPolygon is represented as a comma-separated list of polygons.
+     * Each polygon is represented as a string enclosed in parentheses, with its
+     * points separated by commas.
+     *
+     * @return string The string representation of the MultiPolygon
+     */
     public function __toString() {
         return implode(',', array_map(function (CModel_Spatial_Geometry_Polygon $polygon) {
             return sprintf('(%s)', (string) $polygon);
@@ -87,6 +101,15 @@ class CModel_Spatial_Geometry_MultiPolygon extends CModel_Spatial_Geometry_Geome
         parent::offsetSet($offset, $value);
     }
 
+    /**
+     * Creates a new MultiPolygon from a GeoJson MultiPolygon object.
+     *
+     * @param mixed $geoJson The GeoJson object to create a MultiPolygon from
+     *
+     * @throws CModel_Spatial_Exception_InvalidGeoJsonException If the passed GeoJson object is not of the correct type
+     *
+     * @return CModel_Spatial_Geometry_MultiPolygon A new MultiPolygon object
+     */
     public static function fromJson($geoJson) {
         if (is_string($geoJson)) {
             $geoJson = GeoJson::jsonUnserialize(json_decode($geoJson));

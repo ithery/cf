@@ -9,11 +9,11 @@ class CModel_Spatial_Geometry_Point extends CModel_Spatial_GeometryAbstract {
     protected $lng;
 
     /**
-     * Construct a new Point object
+     * Construct a new Point object.
      *
-     * @param float $lat latitude value
-     * @param float $lng longitude value
-     * @param int $srid srid value (optional, defaults to 0)
+     * @param float $lat  latitude value
+     * @param float $lng  longitude value
+     * @param int   $srid srid value (optional, defaults to 0)
      */
     public function __construct($lat, $lng, $srid = 0) {
         parent::__construct($srid);
@@ -23,7 +23,7 @@ class CModel_Spatial_Geometry_Point extends CModel_Spatial_GeometryAbstract {
     }
 
     /**
-     * Returns the latitude value of the point
+     * Returns the latitude value of the point.
      *
      * @return float The latitude value
      */
@@ -32,7 +32,7 @@ class CModel_Spatial_Geometry_Point extends CModel_Spatial_GeometryAbstract {
     }
 
     /**
-     * Set the latitude value of the point
+     * Set the latitude value of the point.
      *
      * @param float $lat The new latitude value
      */
@@ -40,9 +40,8 @@ class CModel_Spatial_Geometry_Point extends CModel_Spatial_GeometryAbstract {
         $this->lat = (float) $lat;
     }
 
-
     /**
-     * Returns the longitude value of the point
+     * Returns the longitude value of the point.
      *
      * @return float The longitude value
      */
@@ -50,9 +49,8 @@ class CModel_Spatial_Geometry_Point extends CModel_Spatial_GeometryAbstract {
         return $this->lng;
     }
 
-
     /**
-     * Set the longitude value of the point
+     * Set the longitude value of the point.
      *
      * @param float $lng The new longitude value
      */
@@ -76,6 +74,7 @@ class CModel_Spatial_Geometry_Point extends CModel_Spatial_GeometryAbstract {
      *
      * @param string $pair The pair of longitude and latitude values
      * @param int    $srid The SRID value (default is 0)
+     *
      * @return static A new Point object
      */
     public static function fromPair($pair, $srid = 0) {
@@ -94,10 +93,11 @@ class CModel_Spatial_Geometry_Point extends CModel_Spatial_GeometryAbstract {
     }
 
     /**
-     * Create a new Point object from a Well-Known Text (WKT) representation of the point
+     * Create a new Point object from a Well-Known Text (WKT) representation of the point.
      *
      * @param string $wktArgument The WKT representation of the point
-     * @param int    $srid The SRID value (default is 0)
+     * @param int    $srid        The SRID value (default is 0)
+     *
      * @return static A new Point object
      */
     public static function fromString($wktArgument, $srid = 0) {

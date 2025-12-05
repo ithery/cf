@@ -11,16 +11,40 @@ class CModel_Spatial_Geometry_LineString extends CModel_Spatial_Geometry_PointCo
      */
     protected $minimumCollectionItems = 2;
 
+    /**
+     * Returns a Well-Known Text (WKT) representation of the LineString.
+     *
+     * @return string The WKT representation of the LineString
+     */
     public function toWKT() {
         return sprintf('LINESTRING(%s)', $this->toPairList());
     }
 
+    /**
+     * Creates a new LineString from a Well-Known Text (WKT) representation of the LineString.
+     *
+     * @param string $wkt The WKT representation of the LineString
+     * @param int $srid The SRID value (optional, defaults to 0)
+     * @return static A new LineString object
+     */
     public static function fromWkt($wkt, $srid = 0) {
         $wktArgument = CModel_Spatial_GeometryAbstract::getWKTArgument($wkt);
 
         return static::fromString($wktArgument, $srid);
     }
 
+    /**
+     * Creates a new LineString from a string representation of the LineString.
+     *
+     * The string representation of the LineString is a comma-separated list of points.
+     * Each point is represented as a pair of longitude and latitude values separated by a space.
+     *
+     * Example: "POINT(0 0),POINT(4 4),POINT(4 8),POINT(0 8)"
+     *
+     * @param string $wktArgument The string representation of the LineString
+     * @param int $srid The SRID value (optional, defaults to 0)
+     * @return static A new LineString object
+     */
     public static function fromString($wktArgument, $srid = 0) {
         $pairs = explode(',', trim($wktArgument));
         $points = array_map(function ($pair) {

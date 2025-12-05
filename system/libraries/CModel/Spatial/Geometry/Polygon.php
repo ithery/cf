@@ -42,4 +42,38 @@ class CModel_Spatial_Geometry_Polygon extends CModel_Spatial_Geometry_MultiLineS
 
         return new GeoJsonPolygon($linearRings);
     }
+
+    /**
+     * Returns the centroid of this polygon.
+     *
+     * Requires the geoPHP library, install via composer require phayes/geophp.
+     *
+     * @throws \RuntimeException if geoPHP is not found
+     * @throws \RuntimeException if failed to parse polygon GeoJSON via geoPHP
+     *
+     * @return CModel_Spatial_Geometry_Point
+     */
+    public function getCentroid() {
+        if (!class_exists('geoPHP')) {
+            throw new \RuntimeException('geoPHP library not found. Install via composer require phayes/geophp');
+        }
+
+        // Ambil GeoJSON dari polygon
+        $geoJson = json_encode($this->jsonSerialize());
+
+        // Load menjadi geometry geoPHP
+        $polygon = \geoPHP::load($geoJson, 'json');
+
+        if (!$polygon) {
+            throw new \RuntimeException('Failed to parse polygon GeoJSON via geoPHP');
+        }
+
+        // Dapatkan centroid
+        $centroid = $polygon->getCentroid();
+
+        return new CModel_Spatial_Geometry_Point(
+            $centroid->getY(), // lat
+            $centroid->getX()  // lng
+        );
+    }
 }
