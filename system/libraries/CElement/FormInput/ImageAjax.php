@@ -70,6 +70,11 @@ class CElement_FormInput_ImageAjax extends CElement_FormInput_Image {
         });
     }
 
+    public static function factory($id = null) {
+        /** @phpstan-ignore-next-line */
+        return new static($id);
+    }
+
     public function setValue($val) {
         parent::setValue($val);
         if ($val && $this->imgSrc == null) {
