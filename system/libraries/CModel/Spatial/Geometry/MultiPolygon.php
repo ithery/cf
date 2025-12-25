@@ -148,4 +148,26 @@ class CModel_Spatial_Geometry_MultiPolygon extends CModel_Spatial_Geometry_Geome
 
         return new GeoJsonMultiPolygon($polygons);
     }
+
+    public function getCentroid() {
+        // Ambil GeoJSON.
+        $geoJson = json_encode($this->jsonSerialize());
+
+        // Load ke geoPHP Geometry.
+        $geometry = \geoPHP::load($geoJson, 'json');
+
+        if (!$geometry) {
+            throw new \Exception('Failed to parse polygon GeoJSON via geoPHP');
+        }
+
+        // Hitung centroid menggunakan geoPHP.
+        $centroid = $geometry->centroid();
+
+        if (!$centroid) {
+            throw new \Exception('Failed to calculate centroid via geoPHP');
+        }
+
+        // geoPHP Point: ->y() = lat, ->x() = lng
+        return new CModel_Spatial_Geometry_Point($centroid->y(), $centroid->x());
+    }
 }
