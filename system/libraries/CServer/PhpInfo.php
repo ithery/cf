@@ -2,12 +2,6 @@
 
 defined('SYSPATH') or die('No direct access allowed.');
 
-/**
- * @author Hery Kurniawan
- * @license Ittron Global Teknologi <ittron.co.id>
- *
- * @since Jun 13, 2018, 5:11:06 PM
- */
 use CServer_PhpInfo_Filter as Filter;
 
 final class CServer_PhpInfo {
@@ -17,7 +11,7 @@ final class CServer_PhpInfo {
 
     public static function instance() {
         if (self::$instance == null) {
-            self::$instance = new CServer_Storage();
+            self::$instance = new CServer_PhpInfo();
         }
 
         return self::$instance;
