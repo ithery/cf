@@ -253,4 +253,41 @@ class CDaemon_Runner {
 
         return $labelStatus;
     }
+
+    /**
+     * Get daemon start time.
+     *
+     * @return null|CCarbon
+     */
+    public function getStartTime() {
+        $pid = $this->getPid();
+        if (!$pid) {
+            return null;
+        }
+
+        $pid = trim($pid);
+
+        // Unix only
+        if (CDaemon_Helper::getPlatform() !== CDaemon_Helper::UNIX) {
+            return null;
+        }
+
+        // Pastikan process masih hidup
+        if (!CDaemon_Utils::daemonIsRunningWithPid($pid, $this->serviceClass)) {
+            return null;
+        }
+
+        $command = "ps -o lstart= -p {$pid}";
+        $output = trim(shell_exec($command));
+
+        if (!$output) {
+            return null;
+        }
+
+        try {
+            return new CCarbon($output);
+        } catch (Exception $e) {
+            return null;
+        }
+    }
 }

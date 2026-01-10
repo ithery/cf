@@ -7,6 +7,10 @@ final class CManager_Daemon {
 
     protected $daemonsGroup = [];
 
+    protected $statusCache = [];
+
+    protected $cacheTime = [];
+
     /**
      * @return CManager_Daemon
      */
@@ -16,6 +20,30 @@ final class CManager_Daemon {
         }
 
         return self::$instance;
+    }
+
+    public function getDaemonStatus($serviceClass) {
+        $ttl = 5; // detik
+
+        if (isset($this->statusCache[$serviceClass])
+            && (time() - $this->cacheTime[$serviceClass]) < $ttl
+        ) {
+            return $this->statusCache[$serviceClass];
+        }
+
+        $runner = CDaemon::createRunner($serviceClass);
+        $isRunning = $runner->isRunning();
+        $startTime = $isRunning ? $runner->getStartTime() : null;
+
+        $status = [
+            'running' => $isRunning,
+            'start_time' => $startTime,
+        ];
+
+        $this->statusCache[$serviceClass] = $status;
+        $this->cacheTime[$serviceClass] = time();
+
+        return $status;
     }
 
     public function registerDaemon($class, $name = null, $group = null) {

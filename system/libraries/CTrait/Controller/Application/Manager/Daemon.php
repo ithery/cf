@@ -83,8 +83,15 @@ trait CTrait_Controller_Application_Manager_Daemon {
             $isRunning = CManager::daemon()->isRunning(carr::get($row, 'service_class'));
             $badgeClass = $isRunning ? 'badge badge-success bg-success' : 'badge badge-danger bg-danger';
             $badgeLabel = $isRunning ? 'RUNNING' : 'STOPPED';
+            $div = c::div();
+            $div->addDiv()->add('<span class="' . $badgeClass . '">' . $badgeLabel . '</span>');
+            // $runner = CDaemon::createRunner(carr::get($row, 'service_class'));
+            // $startTime = $isRunning ? $runner->getStartTime() : '';
+            // if ($startTime) {
+            //     $div->addDiv()->add('<span>' . $startTime . '</span>');
+            // }
 
-            return '<span class="' . $badgeClass . '">' . $badgeLabel . '</span>';
+            return $div;
         });
         $table->setTitle('Service List');
         $table->setApplyDataTable(false);
