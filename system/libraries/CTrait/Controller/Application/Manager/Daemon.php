@@ -2,8 +2,16 @@
 use Symfony\Component\Process\Process;
 
 trait CTrait_Controller_Application_Manager_Daemon {
+    protected $isShowStartTime = false;
+
     protected function getTitle() {
         return 'Daemon Manager';
+    }
+
+    protected function showStartTime() {
+        $this->isShowStartTime = true;
+
+        return $this;
     }
 
     public function index() {
