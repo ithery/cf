@@ -93,11 +93,13 @@ trait CTrait_Controller_Application_Manager_Daemon {
             $badgeLabel = $isRunning ? 'RUNNING' : 'STOPPED';
             $div = c::div();
             $div->addDiv()->add('<span class="' . $badgeClass . '">' . $badgeLabel . '</span>');
-            // $runner = CDaemon::createRunner(carr::get($row, 'service_class'));
-            // $startTime = $isRunning ? $runner->getStartTime() : '';
-            // if ($startTime) {
-            //     $div->addDiv()->add('<span>' . $startTime . '</span>');
-            // }
+            if ($this->showStartTime()) {
+                $runner = CDaemon::createRunner(carr::get($row, 'service_class'));
+                $startTime = $isRunning ? $runner->getStartTime() : '';
+                if ($startTime) {
+                    $div->addDiv()->add('<span>' . $startTime . '</span>');
+                }
+            }
 
             return $div;
         });
