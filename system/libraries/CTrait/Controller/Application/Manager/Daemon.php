@@ -11,7 +11,7 @@ trait CTrait_Controller_Application_Manager_Daemon {
     protected function showStartTime() {
         $this->isShowStartTime = true;
 
-        return $this;
+        return $this->isShowStartTime;
     }
 
     public function index() {
@@ -29,12 +29,12 @@ trait CTrait_Controller_Application_Manager_Daemon {
         $handlerActionClick->setUrl($this->controllerUrl() . 'reloadTabService');
 
         $reloadOptions = [];
-        static::reloadTabService($tableServiceDiv, $reloadOptions);
+        $this->reloadTabService($tableServiceDiv, $reloadOptions);
 
         return $app;
     }
 
-    public static function reloadTabService($container = null, $options = []) {
+    public function reloadTabService($container = null, $options = []) {
         $app = $container ?: c::app();
         $daemonManager = CManager_Daemon::instance();
         $request = array_merge(CApp_Base::getRequest(), $options);
@@ -46,7 +46,7 @@ trait CTrait_Controller_Application_Manager_Daemon {
             $notGrouped = $daemonManager->daemons(false);
             if (count($notGrouped) > 0) {
                 $tab = $tabList->addTab()->setLabel('Not Grouped');
-                static::reloadTableService($tab, ['group' => false]);
+                $this->reloadTableService($tab, ['group' => false]);
             }
             foreach ($groupKeys as $groupName) {
                 $tab = $tabList->addTab()->setLabel($groupName);
@@ -54,17 +54,17 @@ trait CTrait_Controller_Application_Manager_Daemon {
                     $tab->setActive();
                 }
 
-                static::reloadTableService($tab, ['group' => $groupName]);
+                $this->reloadTableService($tab, ['group' => $groupName]);
             }
         } else {
             $div = $app->addDiv();
-            static::reloadTableService($div);
+            $this->reloadTableService($div);
         }
 
         return $app;
     }
 
-    public static function reloadTableService($container = null, $options = []) {
+    public function reloadTableService($container = null, $options = []) {
         $app = $container ?: c::app();
         $daemonManager = CManager_Daemon::instance();
 
@@ -82,10 +82,11 @@ trait CTrait_Controller_Application_Manager_Daemon {
             $dService['service_name'] = $vService;
             $dataService[] = $dService;
         }
+
         $table = $app->addTable();
         $table->setDataFromArray($dataService);
         $table->addColumn('service_name')->setLabel('Name')->setCallback(function ($row, $value) use ($groupQueryString) {
-            return CElement_Element_A::factory()->setHref(static::controllerUrl() . 'log/index/' . carr::get($row, 'service_class') . $groupQueryString)->add($value);
+            return CElement_Element_A::factory()->setHref($this->controllerUrl() . 'log/index/' . carr::get($row, 'service_class') . $groupQueryString)->add($value);
         });
         $table->addColumn('service_status')->setLabel('Service Status')->setCallback(function ($row, $value) {
             $isRunning = CManager::daemon()->isRunning(carr::get($row, 'service_class'));
@@ -275,6 +276,7 @@ trait CTrait_Controller_Application_Manager_Daemon {
             cmsg::add('error', $errMessage);
         }
         sleep(1);
+
         // curl::redirect($this->controllerUrl() . 'log/index/' . $serviceClass . static::groupQueryString());
         return c::redirect($this->controllerUrl() . 'log/index/' . $serviceClass . static::groupQueryString());
     }
