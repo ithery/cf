@@ -1,12 +1,5 @@
 <?php
 defined('SYSPATH') or die('No direct access allowed.');
-
-/**
- * @author Hery Kurniawan
- * @license Ittron Global Teknologi <ittron.co.id>
- *
- * @since Aug 12, 2019, 12:01:17 AM
- */
 ?>
 <div class="row no-gutters">
     <div class="col-xl-8">
@@ -43,7 +36,7 @@ defined('SYSPATH') or die('No direct access allowed.');
                 <button class="btn btn-primary btn-cropper-perform-crop" ><?php echo clang::__('filemanager.btn-crop'); ?></button>
             </div>
             <form id='cropForm'>
-                <input type="hidden" id="img" name="img" value="<?php echo $img->name ?>">
+                <input type="hidden" id="img" name="img" value="<?php echo $img->name; ?>">
                 <input type="hidden" id="working_dir" name="working_dir" value="<?php echo $working_dir; ?>">
                 <input type="hidden" id="dataX" name="dataX">
                 <input type="hidden" id="dataY" name="dataY">
