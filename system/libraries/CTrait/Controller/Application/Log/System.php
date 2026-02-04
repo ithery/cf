@@ -85,7 +85,6 @@ trait CTrait_Controller_Application_Log_System {
     }
 
     public function systemTable($year, $month) {
-
         $file = c::request()->file;
         $app = c::app();
         $path = DOCROOT . 'logs/' . CF::appCode();

@@ -1,24 +1,45 @@
 # Configuration
 
-### Server Requirements
+Halaman ini menjelaskan konfigurasi dasar yang **wajib dipenuhi** sebelum menggunakan **Cresenity Framework (CF)**.
 
-Pastikan server anda sudah  mempunyai requirement seperti yang dibawah ini untuk menggunakan CF:
+---
 
+## Server Requirements
+
+Pastikan server Anda telah memenuhi requirement berikut sebelum menjalankan Cresenity Framework.
+
+### PHP
 - PHP >= 7.4
-- BCMath PHP Extension
-- JSON PHP Extension (already included on php 5.6)
-- Fileinfo PHP extension
-- Ctype PHP Extension
-- Mbstring PHP Extension
-- OpenSSL PHP Extension
-- PDO PHP Extension
-- Tokenizer PHP Extension
-- XML PHP Extension
 
+### PHP Extensions
 
-### Application Folders
-Setelah menginstall CF, anda harus membuat folder baru pada folder applications. Nama folder pada applications akan berlaku sebagai appCode untuk aplikasi yang dibuat
+Extension PHP berikut **harus aktif**:
 
+- BCMath
+- JSON (sudah termasuk secara default sejak PHP 5.6)
+- Fileinfo
+- Ctype
+- Mbstring
+- OpenSSL
+- PDO
+- Tokenizer
+- XML
 
-### Directory Permission
-Pastikan folder temp dan logs writable by webserver agar CF dapat berjalan.
+> **Catatan:**
+> Sebagian besar extension di atas sudah aktif secara default pada instalasi PHP modern.
+> Anda dapat mengeceknya dengan menjalankan perintah `php -m`.
+
+---
+
+## Application Folders
+
+Setelah menginstall Cresenity Framework, Anda harus membuat folder aplikasi di dalam direktori `applications`.
+
+---
+
+## Directory Permission
+
+Pastikan direktori berikut dapat ditulis (**writable**) oleh web server agar Cresenity Framework dapat berjalan dengan baik:
+
+- `temp`
+- `logs`

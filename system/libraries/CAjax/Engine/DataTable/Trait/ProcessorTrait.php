@@ -90,6 +90,7 @@ trait CAjax_Engine_DataTable_Trait_ProcessorTrait {
                     $arr[] = $htmlRowAction;
                 }
             }
+
             foreach ($table->columns as $col) {
                 $cell = new CElement_Component_DataTable_Cell($table, $col, $row);
                 $arr[] = $cell->html();

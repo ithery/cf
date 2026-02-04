@@ -35,7 +35,6 @@ class CElement_Component_DataTable_Cell {
             if (strpos($fieldName, '.') !== false) {
                 $fields = explode('.', $fieldName);
                 $html = $this->row;
-
                 foreach ($fields as $fieldIndex => $field) {
                     if ($html instanceof  CModel_Collection) {
                         $remainFields = array_slice($fields, $fieldIndex);
@@ -54,10 +53,10 @@ class CElement_Component_DataTable_Cell {
         } else {
             $html = carr::get($this->row, $this->column->getFieldname());
         }
+
         if ($html instanceof CCollection) {
             $html = $html->toArray();
         }
-
         //do transform
         $html = $this->column->applyTransform($html, $this->row);
 
