@@ -44,7 +44,6 @@ trait CTrait_Compat_Database {
     /**
      * Returns the last query run.
      *
-     *
      * @return string SQL
      *
      * @deprecated use lastQuery
@@ -109,31 +108,6 @@ trait CTrait_Compat_Database {
      */
     public function table_exists($table_name, $prefix = true) {
         return $this->tableExists($table_name, $prefix);
-    }
-
-    /**
-     * Lists all the tables in the current database.
-     *
-     * @return array
-     *
-     * @deprecated use listTables
-     */
-    public function list_tables() {
-        return $this->listTables();
-    }
-
-    /**
-     * Get the field data for a database table, along with the field's attributes.
-     *
-     * @param   string  table name
-     * @param mixed $table
-     *
-     * @return array
-     *
-     * @deprecated
-     */
-    public function list_fields($table = '') {
-        return $this->listFields($table);
     }
 
     /**
@@ -252,6 +226,7 @@ trait CTrait_Compat_Database {
      */
     public function having($key, $value = '', $quote = true) {
         $this->having[] = $this->driver->where($key, $value, 'AND', count($this->having), true);
+
         return $this;
     }
 
@@ -271,6 +246,7 @@ trait CTrait_Compat_Database {
      */
     public function orhaving($key, $value = '', $quote = true) {
         $this->having[] = $this->driver->where($key, $value, 'OR', count($this->having), true);
+
         return $this;
     }
 
@@ -487,7 +463,7 @@ trait CTrait_Compat_Database {
     /**
      * Pushes existing query space onto the query stack.  Use push
      * and pop to prevent queries from clashing before they are
-     * executed
+     * executed.
      *
      * @return CDatabase This Databaes object
      *
