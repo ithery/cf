@@ -58,7 +58,8 @@ class CQueue_CallQueuedClosure implements CQueue_ShouldQueueInterface {
      * @return void
      */
     public function handle(CContainer_Container $container) {
-        $container->call($this->closure->getClosure(), ['job' => $this]);
+        // $container->call($this->closure->getClosure(), ['job' => $this]);
+        $container->call($this->closure->getClosure(), [$this]);
     }
 
     /**
