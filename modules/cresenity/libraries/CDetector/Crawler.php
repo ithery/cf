@@ -3,10 +3,7 @@
 defined('SYSPATH') or die('No direct access allowed.');
 
 /**
- * @author Hery Kurniawan
- * @license Ittron Global Teknologi <ittron.co.id>
- *
- * @since Jun 23, 2019, 4:19:55 AM
+ * @deprecated 1.8
  */
 class CDetector_Crawler {
     /**
@@ -94,7 +91,7 @@ class CDetector_Crawler {
     /**
      * Set HTTP headers.
      *
-     * @param array|null $httpHeaders
+     * @param null|array $httpHeaders
      */
     public function setHttpHeaders($httpHeaders) {
         // Use global _SERVER if $httpHeaders aren't defined.
@@ -134,13 +131,14 @@ class CDetector_Crawler {
                 }
             }
         }
+
         return $this->userAgent = $userAgent;
     }
 
     /**
      * Check user agent string against the regex.
      *
-     * @param string|null $userAgent
+     * @param null|string $userAgent
      *
      * @return bool
      */
@@ -157,13 +155,14 @@ class CDetector_Crawler {
         if ($matches) {
             $this->matches = $matches;
         }
+
         return (bool) $result;
     }
 
     /**
      * Return the matches.
      *
-     * @return string|null
+     * @return null|string
      */
     public function getMatches() {
         return isset($this->matches[0]) ? $this->matches[0] : null;

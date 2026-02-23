@@ -3,10 +3,7 @@
 defined('SYSPATH') or die('No direct access allowed.');
 
 /**
- * @author Hery Kurniawan
- * @license Ittron Global Teknologi <ittron.co.id>
- *
- * @since Nov 18, 2017, 6:46:45 PM
+ * @deprecated 1.8
  */
 use ONGR\ElasticsearchDSL\Search as DSLQuery;
 

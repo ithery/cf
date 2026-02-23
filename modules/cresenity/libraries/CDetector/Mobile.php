@@ -3,10 +3,7 @@
 defined('SYSPATH') or die('No direct access allowed.');
 
 /**
- * @author Hery Kurniawan
- * @license Ittron Global Teknologi <ittron.co.id>
- *
- * @since Jun 23, 2019, 4:18:47 AM
+ * @deprecated 1.8
  */
 class CDetector_Mobile {
     /**

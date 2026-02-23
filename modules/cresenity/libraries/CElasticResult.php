@@ -3,10 +3,7 @@
 defined('SYSPATH') or die('No direct access allowed.');
 
 /**
- * @author Hery Kurniawan
- * @license Ittron Global Teknologi <ittron.co.id>
- *
- * @since Oct 18, 2017, 10:26:29 PM
+ * @deprecated 1.8
  */
 abstract class CElasticResult extends CDatabase_Result {
     protected $raw_response = [];

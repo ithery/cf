@@ -1,14 +1,11 @@
 <?php
 
-defined('SYSPATH') OR die('No direct access allowed.');
+defined('SYSPATH') or die('No direct access allowed.');
 
 /**
- * @author Hery Kurniawan
- * @since May 16, 2019, 10:19:24 PM
- * @license Ittron Global Teknologi <ittron.co.id>
+ * @deprecated 1.8
  */
 class CEmoji_AbstractIndex implements CEmoji_IndexInterface {
-
     /**
      * @var array
      */
@@ -40,7 +37,7 @@ class CEmoji_AbstractIndex implements CEmoji_IndexInterface {
      * @return array
      */
     public function findByUnicode($unicode) {
-        if (isset($this->emojiUnicodes[$unicode]) && isset($this->emojis[$this->emojiUnicodes[$unicode]])) {
+        if (isset($this->emojiUnicodes[$unicode], $this->emojis[$this->emojiUnicodes[$unicode]])) {
             return $this->emojis[$this->emojiUnicodes[$unicode]];
         }
     }
@@ -50,7 +47,7 @@ class CEmoji_AbstractIndex implements CEmoji_IndexInterface {
      * @param array
      */
     public function findByName($name) {
-        if (isset($this->emojiNames[$name]) && isset($this->emojis[$this->emojiNames[$name]])) {
+        if (isset($this->emojiNames[$name], $this->emojis[$this->emojiNames[$name]])) {
             return $this->emojis[$this->emojiNames[$name]];
         }
     }
@@ -75,5 +72,4 @@ class CEmoji_AbstractIndex implements CEmoji_IndexInterface {
     public function getEmojis() {
         return $this->emojis;
     }
-
 }

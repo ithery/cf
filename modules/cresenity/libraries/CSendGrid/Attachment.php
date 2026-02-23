@@ -3,10 +3,7 @@
 defined('SYSPATH') or die('No direct access allowed.');
 
 /**
- * @author Hery Kurniawan
- * @license Ittron Global Teknologi <ittron.co.id>
- *
- * @since Jan 7, 2018, 12:27:35 PM
+ * @deprecated 1.8
  */
 class CSendGrid_Attachment implements \JsonSerializable {
     private $content;

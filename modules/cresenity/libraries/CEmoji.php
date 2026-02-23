@@ -3,10 +3,7 @@
 defined('SYSPATH') or die('No direct access allowed.');
 
 /**
- * @author Hery Kurniawan
- * @license Ittron Global Teknologi <ittron.co.id>
- *
- * @since May 16, 2019, 9:56:58 PM
+ * @deprecated 1.8
  */
 class CEmoji {
     /**

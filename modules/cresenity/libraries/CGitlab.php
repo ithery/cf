@@ -3,10 +3,7 @@
 defined('SYSPATH') or die('No direct access allowed.');
 
 /**
- * @author Hery Kurniawan
- * @license Ittron Global Teknologi <ittron.co.id>
- *
- * @since Jun 19, 2018, 3:46:29 AM
+ * @deprecated 1.8
  */
 class CGitlab {
     protected $gitUrl;
@@ -31,6 +28,7 @@ class CGitlab {
         if ($token != null) {
             self::$instances[$gitUrl]->client()->authenticate($token);
         }
+
         return self::$instances[$gitUrl];
     }
 
