@@ -3,10 +3,7 @@
 defined('SYSPATH') or die('No direct access allowed.');
 
 /**
- * @author Hery Kurniawan
- * @license Ittron Global Teknologi <ittron.co.id>
- *
- * @since Mar 24, 2019, 3:48:03 AM
+ * @deprecated 1.8
  */
 trait CElement_Component_DataTable_Trait_ExportTrait {
     use CElement_Component_DataTable_Trait_Legacy_ExportTrait;
