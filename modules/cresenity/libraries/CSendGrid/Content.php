@@ -1,12 +1,7 @@
 <?php
 
 /**
- * Description of Content
- *
- * @author Hery Kurniawan
- * @license Ittron Global Teknologi <ittron.co.id>
- *
- * @since Jan 7, 2018, 12:35:25 PM
+ * @deprecated 1.8
  */
 class CSendGrid_Content implements \JsonSerializable {
     private $type;

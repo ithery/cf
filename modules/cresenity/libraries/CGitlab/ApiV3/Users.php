@@ -3,10 +3,7 @@
 defined('SYSPATH') or die('No direct access allowed.');
 
 /**
- * @author Hery Kurniawan
- * @license Ittron Global Teknologi <ittron.co.id>
- *
- * @since Jun 19, 2018, 4:58:29 AM
+ * @deprecated 1.8
  */
 class CGitlab_ApiV3_Users extends CGitlab_Api {
     /**
@@ -60,6 +57,7 @@ class CGitlab_ApiV3_Users extends CGitlab_Api {
     public function create($email, $password, array $params = []) {
         $params['email'] = $email;
         $params['password'] = $password;
+
         return $this->post('users', $params);
     }
 

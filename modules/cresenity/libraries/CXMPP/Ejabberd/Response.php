@@ -1,10 +1,7 @@
 <?php
 
 /**
- * @author Hery Kurniawan <hery@itton.co.id>
- * @license Ittron Global Teknologi
- *
- * @since May 30, 2020
+ * @deprecated 1.8
  */
 class CXMPP_Ejabberd_Response {
     protected $errCode;
@@ -84,6 +81,7 @@ class CXMPP_Ejabberd_Response {
         if (empty(carr::get($array, 'data', []))) {
             $array['data'] = new stdclass();
         }
+
         return json_encode($array);
     }
 

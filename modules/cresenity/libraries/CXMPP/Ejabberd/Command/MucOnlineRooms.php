@@ -1,10 +1,7 @@
 <?php
 
 /**
- * @author Hery Kurniawan <hery@itton.co.id>
- * @license Ittron Global Teknologi
- *
- * @since May 31, 2020
+ * @deprecated 1.8
  */
 class CXMPP_Ejabberd_Command_MucOnlineRooms extends CXMPP_Ejabberd_CommandAbstract {
     private $service;
