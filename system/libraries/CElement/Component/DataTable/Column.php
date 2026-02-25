@@ -48,6 +48,8 @@ class CElement_Component_DataTable_Column extends CObject {
 
     protected $searchCallback = null;
 
+    protected $sortCallback = null;
+
     public function __construct($fieldname) {
         parent::__construct();
 
@@ -71,6 +73,7 @@ class CElement_Component_DataTable_Column extends CObject {
         $this->class = [];
         $this->customCss = [];
         $this->searchCallback = null;
+        $this->sortCallback = null;
     }
 
     /**
@@ -240,14 +243,24 @@ class CElement_Component_DataTable_Column extends CObject {
     }
 
     public function setSearchCallback($callback) {
-        //$this->callback = c::toSerializableClosure($callback);
         $this->searchCallback = c::toSerializableClosure($callback);
+
+        return $this;
+    }
+
+
+    public function setSortCallback($callback) {
+        $this->sortCallback = c::toSerializableClosure($callback);
 
         return $this;
     }
 
     public function getSearchCallback() {
         return $this->searchCallback;
+    }
+
+    public function getSortCallback() {
+        return $this->sortCallback;
     }
 
     public function setExportCallback($callback, $require = '') {

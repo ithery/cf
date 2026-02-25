@@ -69,7 +69,7 @@ class CManager_DataProvider_ModelDataProvider extends CManager_DataProviderAbstr
         }
 
         $aggregateFields = $this->getAggregateFieldFromQuery($query);
-        
+
         //process search
         if (count($this->searchOr) > 0) {
             $dataSearch = $this->searchOr;
@@ -197,21 +197,26 @@ class CManager_DataProvider_ModelDataProvider extends CManager_DataProviderAbstr
             $query->getQuery()->orders = null;
             $sortIndex = 0;
             foreach ($this->sort as $fieldName => $sortDirection) {
-                if (strpos($fieldName, '.') !== false) {
-                    $fields = explode('.', $fieldName);
-
-                    $field = array_pop($fields);
-                    $relationPath = implode('.', $fields);
-
-                    $alias = $this->withSelectRelationColumn($query, $relationPath, $field, $sortIndex);
-                    if ($alias) {
-                        $query->orderBy($alias, $sortDirection);
-                    }
+                if ($this->isCallable($sortDirection)) {
+                    $this->callCallable($sortDirection, [$query]);
                 } else {
-                    if (!$this->isRelationField($query, $fieldName)) {
-                        $query->orderBy($fieldName, $sortDirection);
+                    if (strpos($fieldName, '.') !== false) {
+                        $fields = explode('.', $fieldName);
+
+                        $field = array_pop($fields);
+                        $relationPath = implode('.', $fields);
+
+                        $alias = $this->withSelectRelationColumn($query, $relationPath, $field, $sortIndex);
+                        if ($alias) {
+                            $query->orderBy($alias, $sortDirection);
+                        }
+                    } else {
+                        if (!$this->isRelationField($query, $fieldName)) {
+                            $query->orderBy($fieldName, $sortDirection);
+                        }
                     }
                 }
+
                 $sortIndex++;
             }
         }

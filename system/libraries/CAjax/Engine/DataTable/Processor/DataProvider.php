@@ -96,6 +96,23 @@ class CAjax_Engine_DataTable_Processor_DataProvider extends CAjax_Engine_DataTab
         return $searchData;
     }
 
+    protected function createSortCallable($callback, $direction) {
+        return function ($q) use ($direction, $callback) {
+            $args = [$q, $direction];
+            if (is_callable($callback)) {
+                return call_user_func_array($callback, $args);
+            }
+            if ($callback instanceof \Opis\Closure\SerializableClosure) {
+                return $callback->__invoke(...$args);
+            }
+            if ($callback instanceof \CFunction_SerializableClosure) {
+                return $callback->__invoke(...$args);
+            }
+
+            throw new Exception('callback is not callable on ' . __CLASS__);
+        };
+    }
+
     protected function createSearchCallable($callback, $keyword) {
         return function ($q) use ($keyword, $callback) {
             $args = [$q, $keyword];
@@ -184,8 +201,18 @@ class CAjax_Engine_DataTable_Processor_DataProvider extends CAjax_Engine_DataTab
                     $column = carr::get($columns, intval($request['iSortCol_' . $i]) - $i2);
                     $sortDirection = $request['sSortDir_' . $i];
                     if ($column) {
+                        /** @var CElement_Component_DataTable_Column $column */
                         $fieldName = $column->getFieldname();
-                        $sortData[$fieldName] = $sortDirection;
+                        if ($callback = $column->getSortCallback()) {
+                            $table = $this->table();
+                            $query = $table->getQuery();
+                            if (!($query instanceof CManager_DataProvider_ModelDataProvider)) {
+                                throw new Exception('SortCallback only running on ModelDataProvider');
+                            }
+                            $sortData[$fieldName] = $this->createSortCallable($callback, $sortDirection);
+                        } else {
+                            $sortData[$fieldName] = $sortDirection;
+                        }
                     }
                 }
             }
