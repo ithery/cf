@@ -1,9 +1,13 @@
 <?php
 
 trait CTrait_Controller_Application_Log_System {
+    public function getPath() {
+        return DOCROOT . 'logs/' . CF::appCode();
+    }
+
     public function system() {
         $app = c::app();
-        $path = DOCROOT . 'logs/' . cf::appCode();
+        $path = $this->getPath();
         $years = array_reverse($this->getSubdirectory($path));
 
         $reportTimes = [];
@@ -51,7 +55,7 @@ trait CTrait_Controller_Application_Log_System {
     public function tabDaily($year, $month) {
         $app = c::app();
 
-        $path = DOCROOT . 'logs/' . CF::appCode();
+        $path = $this->getPath();
 
         $path .= DS . $year;
 
@@ -87,7 +91,7 @@ trait CTrait_Controller_Application_Log_System {
     public function systemTable($year, $month) {
         $file = c::request()->file;
         $app = c::app();
-        $path = DOCROOT . 'logs/' . CF::appCode();
+        $path = $this->getPath();
 
         $path .= DS . $year;
 
@@ -136,7 +140,7 @@ trait CTrait_Controller_Application_Log_System {
 
     public function systemTableDownload($year, $month, $file) {
         $app = c::app();
-        $path = DOCROOT . 'logs/' . CF::appCode();
+        $path = $this->getPath();
 
         $path .= DS . $year;
 
