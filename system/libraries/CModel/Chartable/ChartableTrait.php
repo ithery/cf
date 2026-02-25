@@ -119,10 +119,15 @@ trait CModel_Chartable_ChartableTrait {
             : CCarbon::parse($stopDate);
 
         $newQuery = new CDatabase_Query_Builder($builder->getConnection());
+        $driver = $builder->getConnection()->getDriverName();
+        $dateExpression = "CONCAT(YEAR(${dateColumn}),LPAD(MONTH(${dateColumn}),2,'0'))";
+        if ($driver == 'pgsql') {
+            $dateExpression = "TO_CHAR(created_at, 'YYYYMM')";
+        }
         $newQuery->from($builder, 'chartable_sub');
         $query = $newQuery->select(
             CDatabase::raw("${value} as value"),
-            CDatabase::raw("CONCAT(YEAR(${dateColumn}),LPAD(MONTH(${dateColumn}),2,'0')) as label")
+            CDatabase::raw($dateExpression . " as label")
         )
             ->where($dateColumn, '>=', $startDate)
             ->where($dateColumn, '<=', $stopDate)
