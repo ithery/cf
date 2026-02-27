@@ -1,6 +1,5 @@
 <?php
 
-use JsonException;
 use Assert\Assertion;
 use Psr\Http\Client\ClientExceptionInterface;
 

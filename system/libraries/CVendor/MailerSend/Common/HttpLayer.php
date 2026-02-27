@@ -1,6 +1,5 @@
 <?php
 
-use JsonException;
 use Http\Client\HttpClient;
 use Http\Client\Common\PluginClient;
 use Psr\Http\Client\ClientInterface;
