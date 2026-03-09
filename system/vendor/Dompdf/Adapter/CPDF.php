@@ -20,7 +20,7 @@ use Dompdf\Exception;
 use Dompdf\Image\Cache;
 use Dompdf\PhpEvaluator;
 
-require_once dirname(__FILE__) . '/../../lib/Cpdf.php';
+require_once dirname(__FILE__) . '/../lib/Cpdf.php';
 
 /**
  * PDF rendering interface.
