@@ -23,7 +23,7 @@ class CReport_Generator_Processor_PdfProcessor extends CReport_Generator_Process
         $this->tcpdf->SetRightMargin($report->getRightMargin());
         $this->tcpdf->SetTopMargin($report->getTopMargin());
         $this->tcpdf->SetAutoPageBreak(true, $report->getBottomMargin() > 0 ? $report->getBottomMargin() / 2 : 0);
-        // $this->font($this->defaultFont);
+        $this->font($this->defaultFont);
         $this->tcpdf->AddPage();
         $this->tcpdf->setPage(1, true);
     }
@@ -228,12 +228,13 @@ class CReport_Generator_Processor_PdfProcessor extends CReport_Generator_Process
 
     public function font(CReport_Builder_Object_Font $font) {
         $fontName = $font->getFontName();
+
+        $fontSize = $font->getFontSize();
+        $fontFile = $font->getFontFile();
         // if (cstr::lower($fontName) == 'helvetica') {
         //     cdbg::dd('helvetica' . cdbg::getTraceString());
         //     die;
         // }
-        $fontSize = $font->getFontSize();
-        $fontFile = $font->getFontFile();
         // $fontfile = CReport_Jasper_Instructions::$fontdir . '/' . $arraydata['font'] . '.php';
         // if(file_exists($fontfile) || $this->jasperReport->bypassnofont==false){
 
