@@ -232,6 +232,7 @@ class CReport_Generator_Processor_PdfProcessor extends CReport_Generator_Process
         $fontSize = $font->getFontSize();
         $fontFile = $font->getFontFile();
         if (cstr::lower($fontName) == 'jnsrzdbcasansb') {
+            cdbg::d(CReport_Pdf_FontManager::instance()->all());
             cdbg::dd($fontFile . cdbg::getTraceString());
             die;
         }
