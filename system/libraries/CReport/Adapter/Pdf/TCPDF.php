@@ -440,8 +440,8 @@ class CReport_Adapter_Pdf_TCPDF extends \TCPDF {
             $this->y = $this->h - (1 / $this->k);
             $this->lMargin = 0;
             $this->_outSaveGraphicsState();
-            $font = defined('PDF_FONT_NAME_MAIN') ? PDF_FONT_NAME_MAIN : 'helvetica';
-            $this->setFont($font, '', 1);
+            // $font = defined('PDF_FONT_NAME_MAIN') ? PDF_FONT_NAME_MAIN : 'helvetica';
+            // $this->setFont($font, '', 1);
             $this->setTextRenderingMode(0, false, false);
             // $msg = "\x50\x6f\x77\x65\x72\x65\x64\x20\x62\x79\x20\x54\x43\x50\x44\x46\x20\x28\x77\x77\x77\x2e\x74\x63\x70\x64\x66\x2e\x6f\x72\x67\x29";
             // $lnk = "\x68\x74\x74\x70\x3a\x2f\x2f\x77\x77\x77\x2e\x74\x63\x70\x64\x66\x2e\x6f\x72\x67";
