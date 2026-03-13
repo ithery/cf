@@ -67,7 +67,6 @@ class CReport_Builder_Report implements CReport_Builder_Contract_JrXmlElementInt
                 $report->setFont(CReport_Builder_Object_Font::fromXml($xmlElement));
             }
         }
-        die();
         $report->addChildrenFromXml($xml);
 
         return $report;
