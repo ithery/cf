@@ -102,6 +102,15 @@ class CReport_Builder_Report implements CReport_Builder_Contract_JrXmlElementInt
     }
 
     /**
+     * Get default font for the report. This font will be used for all elements that doesn't have font defined.
+     *
+     * @return CReport_Builder_Object_Font
+     */
+    public function getDefaultFont() {
+        return $this->defaultFont;
+    }
+
+    /**
      * @param float $width
      *
      * @return $this

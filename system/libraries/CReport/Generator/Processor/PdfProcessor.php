@@ -23,6 +23,7 @@ class CReport_Generator_Processor_PdfProcessor extends CReport_Generator_Process
         $this->tcpdf->SetRightMargin($report->getRightMargin());
         $this->tcpdf->SetTopMargin($report->getTopMargin());
         $this->tcpdf->SetAutoPageBreak(true, $report->getBottomMargin() > 0 ? $report->getBottomMargin() / 2 : 0);
+        $this->font($this->defaultFont);
         $this->tcpdf->AddPage();
         $this->tcpdf->setPage(1, true);
     }

@@ -19,6 +19,8 @@ abstract class CReport_Generator_ProcessorAbstract {
 
     protected $currentX;
 
+    protected $defaultFont;
+
     public function __construct(CReport_Builder_Report $report) {
         $this->report = $report;
         $this->pageHeight = $report->getOrientation() == CReport::ORIENTATION_LANDSCAPE ? $report->getPageWidth() : $report->getPageHeight();
@@ -30,6 +32,7 @@ abstract class CReport_Generator_ProcessorAbstract {
         $this->rightMargin = $report->getRightMargin();
         $this->currentY = $this->topMargin;
         $this->currentX = $this->leftMargin;
+        $this->defaultFont = $report->getDefaultFont();
     }
 
     /**
