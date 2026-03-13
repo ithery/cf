@@ -419,7 +419,7 @@ class CReport_Generator {
     }
 
     public function getPdf() {
-        cdbg::dd($this->report->getDefaultFont());
+        cdbg::dd('Generator', $this->report->getDefaultFont());
         $this->processor = new CReport_Generator_Processor_PdfProcessor($this->report);
         $this->isProcessingPdf = true;
         $this->generate($this->processor);
