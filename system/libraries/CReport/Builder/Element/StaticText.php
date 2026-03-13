@@ -65,10 +65,6 @@ class CReport_Builder_Element_StaticText extends CReport_Builder_ElementAbstract
             if ($font == null) {
                 $font = $generator->getReport()->getDefaultFont() ?: new CReport_Builder_Object_Font();
             }
-            if (cstr::lower($font->getFontName()) == 'helvetica') {
-                cdbg::d($this);
-                cdbg::dd(cdbg::getTraceString());
-            }
             $options = [];
             $options['x'] = $this->getX();
             $options['y'] = $this->getY();
