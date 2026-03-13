@@ -24,6 +24,8 @@ class CReport_Builder_Report implements CReport_Builder_Contract_JrXmlElementInt
 
     protected $orientation;
 
+    protected $defaultFont;
+
     public function __construct($name = null) {
         $this->name = $name ?: 'CReport';
         $paperSize = CReport_Paper::$pageFormats['A4'];
@@ -36,6 +38,7 @@ class CReport_Builder_Report implements CReport_Builder_Contract_JrXmlElementInt
         $this->leftMargin = 20;
         $this->rightMargin = 20;
         $this->font = new CReport_Builder_Object_Font();
+        $this->defaultFont = new CReport_Builder_Object_Font();
     }
 
     public static function fromXml(SimpleXMLElement $xml) {
@@ -60,6 +63,7 @@ class CReport_Builder_Report implements CReport_Builder_Contract_JrXmlElementInt
         }
         foreach ($xml as $tag => $xmlElement) {
             if ($tag == 'defaultFont') {
+                $report->setDefaultFont(CReport_Builder_Object_Font::fromXml($xmlElement));
                 $report->setFont(CReport_Builder_Object_Font::fromXml($xmlElement));
             }
         }
@@ -80,6 +84,19 @@ class CReport_Builder_Report implements CReport_Builder_Contract_JrXmlElementInt
 
     public function addChildren(CReport_Builder_ElementAbstract $element) {
         $this->children[] = $element;
+
+        return $this;
+    }
+
+    /**
+     * Set default font for the report. This font will be used for all elements that doesn't have font defined.
+     *
+     * @param CReport_Builder_Object_Font $font
+     *
+     * @return $this
+     */
+    public function setDefaultFont(CReport_Builder_Object_Font $font) {
+        $this->defaultFont = $font;
 
         return $this;
     }
