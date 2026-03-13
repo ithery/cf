@@ -17,7 +17,10 @@ trait CReport_Builder_Trait_HasTextElementTrait {
             $textElement .= ' wordSpacing="' . $this->getWordSpacing() . '"';
         }
         $textElement .= '">';
-        $textElement .= $this->font->toJrXml();
+        if ($this->font) {
+            $textElement .= $this->font->toJrXml();
+        }
+
         $textElement .= $this->paragraph->toJrXml();
         $textElement .= '</textElement>';
 
