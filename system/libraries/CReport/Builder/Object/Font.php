@@ -172,6 +172,9 @@ class CReport_Builder_Object_Font implements CReport_Builder_Contract_JrXmlEleme
         if ($xml['size']) {
             $font->setFontSize((float) $xml['size']);
         }
+        if ($xml['name']) {
+            $font->setFontName((string) $xml['name']);
+        }
         if ($xml['fontName']) {
             $font->setFontName((string) $xml['fontName']);
         }
