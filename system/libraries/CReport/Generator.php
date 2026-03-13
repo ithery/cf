@@ -407,10 +407,6 @@ class CReport_Generator {
     protected function generate(CReport_Generator_ProcessorAbstract $processor) {
         $this->pageNumber = 1;
 
-        foreach ($this->getFonts() as $font) {
-            CReport_Pdf_FontManager::instance()->addFont($font->getName(), $font->getPath());
-            //$processor->addFont($font->getName(), $font->getPath());
-        }
         $this->dictionary->fillVariables($this->report->getVariableElements(), $this);
         $this->report->generate($this, $processor);
         foreach ($this->instructions as $instruction) {
@@ -419,6 +415,10 @@ class CReport_Generator {
     }
 
     public function getPdf() {
+        foreach ($this->getFonts() as $font) {
+            CReport_Pdf_FontManager::instance()->addFont($font->getName(), $font->getPath());
+            //$processor->addFont($font->getName(), $font->getPath());
+        }
         $this->processor = new CReport_Generator_Processor_PdfProcessor($this->report);
         $this->isProcessingPdf = true;
         $this->generate($this->processor);
