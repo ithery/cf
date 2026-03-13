@@ -65,6 +65,7 @@ class CReport_Builder_Report implements CReport_Builder_Contract_JrXmlElementInt
             if ($tag == 'defaultFont') {
                 cdbg::d('defaultFont');
                 cdbg::d(CReport_Builder_Object_Font::fromXml($xmlElement));
+                cdbg::d($xmlElement);
                 $report->setDefaultFont(CReport_Builder_Object_Font::fromXml($xmlElement));
                 $report->setFont(CReport_Builder_Object_Font::fromXml($xmlElement));
             }
