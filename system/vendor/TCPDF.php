@@ -4537,6 +4537,9 @@ class TCPDF {
 	 * @see AddFont(), SetFontSize()
 	 */
 	public function setFont($family, $style='', $size=null, $fontfile='', $subset='default', $out=true) {
+        if(strtolower($family) == 'helvetica') {
+            \cdbg::dd(\cdbg::getTraceString());
+        }
 		//Select a font; size given in points
 		if ($size === null) {
 			$size = $this->FontSizePt;
