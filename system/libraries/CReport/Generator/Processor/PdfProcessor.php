@@ -228,10 +228,10 @@ class CReport_Generator_Processor_PdfProcessor extends CReport_Generator_Process
 
     public function font(CReport_Builder_Object_Font $font) {
         $fontName = $font->getFontName();
-        if (cstr::lower($fontName) == 'helvetica') {
-            cdbg::dd('helvetica' . cdbg::getTraceString());
-            die;
-        }
+        // if (cstr::lower($fontName) == 'helvetica') {
+        //     cdbg::dd('helvetica' . cdbg::getTraceString());
+        //     die;
+        // }
         $fontSize = $font->getFontSize();
         $fontFile = $font->getFontFile();
         // $fontfile = CReport_Jasper_Instructions::$fontdir . '/' . $arraydata['font'] . '.php';
@@ -525,6 +525,9 @@ class CReport_Generator_Processor_PdfProcessor extends CReport_Generator_Process
     public function addFont($fontName, $fontPath) {
         $style = '';
         $subset = 'default';
+
+        cdbg::dd($fontName . cdbg::getTraceString());
+
         $this->tcpdf->AddFont($fontName, $style, $fontPath, $subset);
     }
 
@@ -532,3 +535,7 @@ class CReport_Generator_Processor_PdfProcessor extends CReport_Generator_Process
         $this->tcpdf->raw($content);
     }
 }
+        // if (cstr::lower($fontName) == 'helvetica') {
+        //     cdbg::dd('helvetica' . cdbg::getTraceString());
+        //     die;
+        // }
