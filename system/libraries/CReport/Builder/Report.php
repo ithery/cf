@@ -63,7 +63,6 @@ class CReport_Builder_Report implements CReport_Builder_Contract_JrXmlElementInt
         }
         foreach ($xml as $tag => $xmlElement) {
             if ($tag == 'defaultFont') {
-                cdbg::d($xmlElement);
                 $report->setDefaultFont(CReport_Builder_Object_Font::fromXml($xmlElement));
                 $report->setFont(CReport_Builder_Object_Font::fromXml($xmlElement));
             }
@@ -99,6 +98,7 @@ class CReport_Builder_Report implements CReport_Builder_Contract_JrXmlElementInt
      */
     public function setDefaultFont(CReport_Builder_Object_Font $font) {
         $this->defaultFont = $font;
+        cdbg::d($this->defaultFont);
 
         return $this;
     }
