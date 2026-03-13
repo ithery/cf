@@ -6,8 +6,18 @@ class CReport_Adapter_Pdf_TCPDF extends \TCPDF {
 
     protected $isXmpEnabled = true;
 
+    protected $overwriteXmp = null;
+
+    protected $xmpToolkit = null;
+
     public function setProducer($producer) {
         $this->producer = $producer;
+    }
+
+    public function setXmpToolkit($xmpToolkit) {
+        $this->xmpToolkit = $xmpToolkit;
+
+        return $this;
     }
 
     public function disableXmp() {
@@ -66,6 +76,12 @@ class CReport_Adapter_Pdf_TCPDF extends \TCPDF {
         return $oid;
     }
 
+    public function setOverwriteXmp($overwriteXmp) {
+        $this->overwriteXmp = $overwriteXmp;
+
+        return $this;
+    }
+
     /**
      * Put XMP data object and return ID.
      *
@@ -75,6 +91,8 @@ class CReport_Adapter_Pdf_TCPDF extends \TCPDF {
      * @protected
      */
     protected function _putXMP() {
+        $xmpToolkit = $this->xmpToolkit ?: 'Adobe XMP Core 4.2.1-c043 52.372728, 2009/01/18-15:08:04';
+
         $oid = $this->_newobj();
         // store current isunicode value
         $prev_isunicode = $this->isunicode;
@@ -83,134 +101,139 @@ class CReport_Adapter_Pdf_TCPDF extends \TCPDF {
         $this->encrypted = false;
         // set XMP data
         $xmp = '<?xpacket begin="' . TCPDF_FONTS::unichr(0xfeff, $this->isunicode) . '" id="W5M0MpCehiHzreSzNTczkc9d"?>' . "\n";
-        $xmp .= '<x:xmpmeta xmlns:x="adobe:ns:meta/" x:xmptk="Adobe XMP Core 4.2.1-c043 52.372728, 2009/01/18-15:08:04">' . "\n";
         if ($this->isXmpEnabled) {
-            $xmp .= "\t" . '<rdf:RDF xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#">' . "\n";
-            $xmp .= "\t\t" . '<rdf:Description rdf:about="" xmlns:dc="http://purl.org/dc/elements/1.1/">' . "\n";
-            $xmp .= "\t\t\t" . '<dc:format>application/pdf</dc:format>' . "\n";
-            $xmp .= "\t\t\t" . '<dc:title>' . "\n";
-            $xmp .= "\t\t\t\t" . '<rdf:Alt>' . "\n";
-            $xmp .= "\t\t\t\t\t" . '<rdf:li xml:lang="x-default">' . TCPDF_STATIC::_escapeXML($this->title) . '</rdf:li>' . "\n";
-            $xmp .= "\t\t\t\t" . '</rdf:Alt>' . "\n";
-            $xmp .= "\t\t\t" . '</dc:title>' . "\n";
-            $xmp .= "\t\t\t" . '<dc:creator>' . "\n";
-            $xmp .= "\t\t\t\t" . '<rdf:Seq>' . "\n";
-            $xmp .= "\t\t\t\t\t" . '<rdf:li>' . TCPDF_STATIC::_escapeXML($this->author) . '</rdf:li>' . "\n";
-            $xmp .= "\t\t\t\t" . '</rdf:Seq>' . "\n";
-            $xmp .= "\t\t\t" . '</dc:creator>' . "\n";
-            $xmp .= "\t\t\t" . '<dc:description>' . "\n";
-            $xmp .= "\t\t\t\t" . '<rdf:Alt>' . "\n";
-            $xmp .= "\t\t\t\t\t" . '<rdf:li xml:lang="x-default">' . TCPDF_STATIC::_escapeXML($this->subject) . '</rdf:li>' . "\n";
-            $xmp .= "\t\t\t\t" . '</rdf:Alt>' . "\n";
-            $xmp .= "\t\t\t" . '</dc:description>' . "\n";
-            $xmp .= "\t\t\t" . '<dc:subject>' . "\n";
-            $xmp .= "\t\t\t\t" . '<rdf:Bag>' . "\n";
-            $xmp .= "\t\t\t\t\t" . '<rdf:li>' . TCPDF_STATIC::_escapeXML($this->keywords) . '</rdf:li>' . "\n";
-            $xmp .= "\t\t\t\t" . '</rdf:Bag>' . "\n";
-            $xmp .= "\t\t\t" . '</dc:subject>' . "\n";
-            $xmp .= "\t\t" . '</rdf:Description>' . "\n";
-            // convert doc creation date format
-            $dcdate = TCPDF_STATIC::getFormattedDate($this->doc_creation_timestamp);
-            $doccreationdate = substr($dcdate, 0, 4) . '-' . substr($dcdate, 4, 2) . '-' . substr($dcdate, 6, 2);
-            $doccreationdate .= 'T' . substr($dcdate, 8, 2) . ':' . substr($dcdate, 10, 2) . ':' . substr($dcdate, 12, 2);
-            $doccreationdate .= substr($dcdate, 14, 3) . ':' . substr($dcdate, 18, 2);
-            $doccreationdate = TCPDF_STATIC::_escapeXML($doccreationdate);
-            // convert doc modification date format
-            $dmdate = TCPDF_STATIC::getFormattedDate($this->doc_modification_timestamp);
-            $docmoddate = substr($dmdate, 0, 4) . '-' . substr($dmdate, 4, 2) . '-' . substr($dmdate, 6, 2);
-            $docmoddate .= 'T' . substr($dmdate, 8, 2) . ':' . substr($dmdate, 10, 2) . ':' . substr($dmdate, 12, 2);
-            $docmoddate .= substr($dmdate, 14, 3) . ':' . substr($dmdate, 18, 2);
-            $docmoddate = TCPDF_STATIC::_escapeXML($docmoddate);
-            $xmp .= "\t\t" . '<rdf:Description rdf:about="" xmlns:xmp="http://ns.adobe.com/xap/1.0/">' . "\n";
-            $xmp .= "\t\t\t" . '<xmp:CreateDate>' . $doccreationdate . '</xmp:CreateDate>' . "\n";
-            $xmp .= "\t\t\t" . '<xmp:CreatorTool>' . $this->creator . '</xmp:CreatorTool>' . "\n";
-            $xmp .= "\t\t\t" . '<xmp:ModifyDate>' . $docmoddate . '</xmp:ModifyDate>' . "\n";
-            $xmp .= "\t\t\t" . '<xmp:MetadataDate>' . $doccreationdate . '</xmp:MetadataDate>' . "\n";
-            $xmp .= "\t\t" . '</rdf:Description>' . "\n";
-            $xmp .= "\t\t" . '<rdf:Description rdf:about="" xmlns:pdf="http://ns.adobe.com/pdf/1.3/">' . "\n";
-            $xmp .= "\t\t\t" . '<pdf:Keywords>' . TCPDF_STATIC::_escapeXML($this->keywords) . '</pdf:Keywords>' . "\n";
-            $xmp .= "\t\t\t" . '<pdf:Producer>' . TCPDF_STATIC::_escapeXML($this->producer ?: TCPDF_STATIC::getTCPDFProducer()) . '</pdf:Producer>' . "\n";
-            $xmp .= "\t\t" . '</rdf:Description>' . "\n";
-            $xmp .= "\t\t" . '<rdf:Description rdf:about="" xmlns:xmpMM="http://ns.adobe.com/xap/1.0/mm/">' . "\n";
-            $uuid = 'uuid:' . substr($this->file_id, 0, 8) . '-' . substr($this->file_id, 8, 4) . '-' . substr($this->file_id, 12, 4) . '-' . substr($this->file_id, 16, 4) . '-' . substr($this->file_id, 20, 12);
-            $xmp .= "\t\t\t" . '<xmpMM:DocumentID>' . $uuid . '</xmpMM:DocumentID>' . "\n";
-            $xmp .= "\t\t\t" . '<xmpMM:InstanceID>' . $uuid . '</xmpMM:InstanceID>' . "\n";
-            $xmp .= "\t\t" . '</rdf:Description>' . "\n";
-            if ($this->pdfa_mode) {
-                $xmp .= "\t\t" . '<rdf:Description rdf:about="" xmlns:pdfaid="http://www.aiim.org/pdfa/ns/id/">' . "\n";
-                $xmp .= "\t\t\t" . '<pdfaid:part>' . $this->pdfa_version . '</pdfaid:part>' . "\n";
-                $xmp .= "\t\t\t" . '<pdfaid:conformance>B</pdfaid:conformance>' . "\n";
+            if ($this->overwriteXmp) {
+                $xmp .= $this->overwriteXmp;
+            } else {
+                $xmp .= '<x:xmpmeta xmlns:x="adobe:ns:meta/" x:xmptk="' . $xmpToolkit . '">' . "\n";
+                $xmp .= "\t" . '<rdf:RDF xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#">' . "\n";
+                $xmp .= "\t\t" . '<rdf:Description rdf:about="" xmlns:dc="http://purl.org/dc/elements/1.1/">' . "\n";
+                $xmp .= "\t\t\t" . '<dc:format>application/pdf</dc:format>' . "\n";
+                $xmp .= "\t\t\t" . '<dc:title>' . "\n";
+                $xmp .= "\t\t\t\t" . '<rdf:Alt>' . "\n";
+                $xmp .= "\t\t\t\t\t" . '<rdf:li xml:lang="x-default">' . TCPDF_STATIC::_escapeXML($this->title) . '</rdf:li>' . "\n";
+                $xmp .= "\t\t\t\t" . '</rdf:Alt>' . "\n";
+                $xmp .= "\t\t\t" . '</dc:title>' . "\n";
+                $xmp .= "\t\t\t" . '<dc:creator>' . "\n";
+                $xmp .= "\t\t\t\t" . '<rdf:Seq>' . "\n";
+                $xmp .= "\t\t\t\t\t" . '<rdf:li>' . TCPDF_STATIC::_escapeXML($this->author) . '</rdf:li>' . "\n";
+                $xmp .= "\t\t\t\t" . '</rdf:Seq>' . "\n";
+                $xmp .= "\t\t\t" . '</dc:creator>' . "\n";
+                $xmp .= "\t\t\t" . '<dc:description>' . "\n";
+                $xmp .= "\t\t\t\t" . '<rdf:Alt>' . "\n";
+                $xmp .= "\t\t\t\t\t" . '<rdf:li xml:lang="x-default">' . TCPDF_STATIC::_escapeXML($this->subject) . '</rdf:li>' . "\n";
+                $xmp .= "\t\t\t\t" . '</rdf:Alt>' . "\n";
+                $xmp .= "\t\t\t" . '</dc:description>' . "\n";
+                $xmp .= "\t\t\t" . '<dc:subject>' . "\n";
+                $xmp .= "\t\t\t\t" . '<rdf:Bag>' . "\n";
+                $xmp .= "\t\t\t\t\t" . '<rdf:li>' . TCPDF_STATIC::_escapeXML($this->keywords) . '</rdf:li>' . "\n";
+                $xmp .= "\t\t\t\t" . '</rdf:Bag>' . "\n";
+                $xmp .= "\t\t\t" . '</dc:subject>' . "\n";
                 $xmp .= "\t\t" . '</rdf:Description>' . "\n";
+                // convert doc creation date format
+                $dcdate = TCPDF_STATIC::getFormattedDate($this->doc_creation_timestamp);
+                $doccreationdate = substr($dcdate, 0, 4) . '-' . substr($dcdate, 4, 2) . '-' . substr($dcdate, 6, 2);
+                $doccreationdate .= 'T' . substr($dcdate, 8, 2) . ':' . substr($dcdate, 10, 2) . ':' . substr($dcdate, 12, 2);
+                $doccreationdate .= substr($dcdate, 14, 3) . ':' . substr($dcdate, 18, 2);
+                $doccreationdate = TCPDF_STATIC::_escapeXML($doccreationdate);
+                // convert doc modification date format
+                $dmdate = TCPDF_STATIC::getFormattedDate($this->doc_modification_timestamp);
+                $docmoddate = substr($dmdate, 0, 4) . '-' . substr($dmdate, 4, 2) . '-' . substr($dmdate, 6, 2);
+                $docmoddate .= 'T' . substr($dmdate, 8, 2) . ':' . substr($dmdate, 10, 2) . ':' . substr($dmdate, 12, 2);
+                $docmoddate .= substr($dmdate, 14, 3) . ':' . substr($dmdate, 18, 2);
+                $docmoddate = TCPDF_STATIC::_escapeXML($docmoddate);
+                $xmp .= "\t\t" . '<rdf:Description rdf:about="" xmlns:xmp="http://ns.adobe.com/xap/1.0/">' . "\n";
+                $xmp .= "\t\t\t" . '<xmp:CreateDate>' . $doccreationdate . '</xmp:CreateDate>' . "\n";
+                $xmp .= "\t\t\t" . '<xmp:CreatorTool>' . $this->creator . '</xmp:CreatorTool>' . "\n";
+                $xmp .= "\t\t\t" . '<xmp:ModifyDate>' . $docmoddate . '</xmp:ModifyDate>' . "\n";
+                $xmp .= "\t\t\t" . '<xmp:MetadataDate>' . $doccreationdate . '</xmp:MetadataDate>' . "\n";
+                $xmp .= "\t\t" . '</rdf:Description>' . "\n";
+                $xmp .= "\t\t" . '<rdf:Description rdf:about="" xmlns:pdf="http://ns.adobe.com/pdf/1.3/">' . "\n";
+                $xmp .= "\t\t\t" . '<pdf:Keywords>' . TCPDF_STATIC::_escapeXML($this->keywords) . '</pdf:Keywords>' . "\n";
+                $xmp .= "\t\t\t" . '<pdf:Producer>' . TCPDF_STATIC::_escapeXML($this->producer ?: TCPDF_STATIC::getTCPDFProducer()) . '</pdf:Producer>' . "\n";
+                $xmp .= "\t\t" . '</rdf:Description>' . "\n";
+                $xmp .= "\t\t" . '<rdf:Description rdf:about="" xmlns:xmpMM="http://ns.adobe.com/xap/1.0/mm/">' . "\n";
+                $uuid = 'uuid:' . substr($this->file_id, 0, 8) . '-' . substr($this->file_id, 8, 4) . '-' . substr($this->file_id, 12, 4) . '-' . substr($this->file_id, 16, 4) . '-' . substr($this->file_id, 20, 12);
+                $xmp .= "\t\t\t" . '<xmpMM:DocumentID>' . $uuid . '</xmpMM:DocumentID>' . "\n";
+                $xmp .= "\t\t\t" . '<xmpMM:InstanceID>' . $uuid . '</xmpMM:InstanceID>' . "\n";
+                $xmp .= "\t\t" . '</rdf:Description>' . "\n";
+                if ($this->pdfa_mode) {
+                    $xmp .= "\t\t" . '<rdf:Description rdf:about="" xmlns:pdfaid="http://www.aiim.org/pdfa/ns/id/">' . "\n";
+                    $xmp .= "\t\t\t" . '<pdfaid:part>' . $this->pdfa_version . '</pdfaid:part>' . "\n";
+                    $xmp .= "\t\t\t" . '<pdfaid:conformance>B</pdfaid:conformance>' . "\n";
+                    $xmp .= "\t\t" . '</rdf:Description>' . "\n";
+                }
+                // XMP extension schemas
+                $xmp .= "\t\t" . '<rdf:Description rdf:about="" xmlns:pdfaExtension="http://www.aiim.org/pdfa/ns/extension/" xmlns:pdfaSchema="http://www.aiim.org/pdfa/ns/schema#" xmlns:pdfaProperty="http://www.aiim.org/pdfa/ns/property#">' . "\n";
+                $xmp .= "\t\t\t" . '<pdfaExtension:schemas>' . "\n";
+                $xmp .= "\t\t\t\t" . '<rdf:Bag>' . "\n";
+                $xmp .= "\t\t\t\t\t" . '<rdf:li rdf:parseType="Resource">' . "\n";
+                $xmp .= "\t\t\t\t\t\t" . '<pdfaSchema:namespaceURI>http://ns.adobe.com/pdf/1.3/</pdfaSchema:namespaceURI>' . "\n";
+                $xmp .= "\t\t\t\t\t\t" . '<pdfaSchema:prefix>pdf</pdfaSchema:prefix>' . "\n";
+                $xmp .= "\t\t\t\t\t\t" . '<pdfaSchema:schema>Adobe PDF Schema</pdfaSchema:schema>' . "\n";
+                $xmp .= "\t\t\t\t\t\t" . '<pdfaSchema:property>' . "\n";
+                $xmp .= "\t\t\t\t\t\t\t" . '<rdf:Seq>' . "\n";
+                $xmp .= "\t\t\t\t\t\t\t\t" . '<rdf:li rdf:parseType="Resource">' . "\n";
+                $xmp .= "\t\t\t\t\t\t\t\t\t" . '<pdfaProperty:category>internal</pdfaProperty:category>' . "\n";
+                $xmp .= "\t\t\t\t\t\t\t\t\t" . '<pdfaProperty:description>Adobe PDF Schema</pdfaProperty:description>' . "\n";
+                $xmp .= "\t\t\t\t\t\t\t\t\t" . '<pdfaProperty:name>InstanceID</pdfaProperty:name>' . "\n";
+                $xmp .= "\t\t\t\t\t\t\t\t\t" . '<pdfaProperty:valueType>URI</pdfaProperty:valueType>' . "\n";
+                $xmp .= "\t\t\t\t\t\t\t\t" . '</rdf:li>' . "\n";
+                $xmp .= "\t\t\t\t\t\t\t" . '</rdf:Seq>' . "\n";
+                $xmp .= "\t\t\t\t\t\t" . '</pdfaSchema:property>' . "\n";
+                $xmp .= "\t\t\t\t\t" . '</rdf:li>' . "\n";
+                $xmp .= "\t\t\t\t\t" . '<rdf:li rdf:parseType="Resource">' . "\n";
+                $xmp .= "\t\t\t\t\t\t" . '<pdfaSchema:namespaceURI>http://ns.adobe.com/xap/1.0/mm/</pdfaSchema:namespaceURI>' . "\n";
+                $xmp .= "\t\t\t\t\t\t" . '<pdfaSchema:prefix>xmpMM</pdfaSchema:prefix>' . "\n";
+                $xmp .= "\t\t\t\t\t\t" . '<pdfaSchema:schema>XMP Media Management Schema</pdfaSchema:schema>' . "\n";
+                $xmp .= "\t\t\t\t\t\t" . '<pdfaSchema:property>' . "\n";
+                $xmp .= "\t\t\t\t\t\t\t" . '<rdf:Seq>' . "\n";
+                $xmp .= "\t\t\t\t\t\t\t\t" . '<rdf:li rdf:parseType="Resource">' . "\n";
+                $xmp .= "\t\t\t\t\t\t\t\t\t" . '<pdfaProperty:category>internal</pdfaProperty:category>' . "\n";
+                $xmp .= "\t\t\t\t\t\t\t\t\t" . '<pdfaProperty:description>UUID based identifier for specific incarnation of a document</pdfaProperty:description>' . "\n";
+                $xmp .= "\t\t\t\t\t\t\t\t\t" . '<pdfaProperty:name>InstanceID</pdfaProperty:name>' . "\n";
+                $xmp .= "\t\t\t\t\t\t\t\t\t" . '<pdfaProperty:valueType>URI</pdfaProperty:valueType>' . "\n";
+                $xmp .= "\t\t\t\t\t\t\t\t" . '</rdf:li>' . "\n";
+                $xmp .= "\t\t\t\t\t\t\t" . '</rdf:Seq>' . "\n";
+                $xmp .= "\t\t\t\t\t\t" . '</pdfaSchema:property>' . "\n";
+                $xmp .= "\t\t\t\t\t" . '</rdf:li>' . "\n";
+                $xmp .= "\t\t\t\t\t" . '<rdf:li rdf:parseType="Resource">' . "\n";
+                $xmp .= "\t\t\t\t\t\t" . '<pdfaSchema:namespaceURI>http://www.aiim.org/pdfa/ns/id/</pdfaSchema:namespaceURI>' . "\n";
+                $xmp .= "\t\t\t\t\t\t" . '<pdfaSchema:prefix>pdfaid</pdfaSchema:prefix>' . "\n";
+                $xmp .= "\t\t\t\t\t\t" . '<pdfaSchema:schema>PDF/A ID Schema</pdfaSchema:schema>' . "\n";
+                $xmp .= "\t\t\t\t\t\t" . '<pdfaSchema:property>' . "\n";
+                $xmp .= "\t\t\t\t\t\t\t" . '<rdf:Seq>' . "\n";
+                $xmp .= "\t\t\t\t\t\t\t\t" . '<rdf:li rdf:parseType="Resource">' . "\n";
+                $xmp .= "\t\t\t\t\t\t\t\t\t" . '<pdfaProperty:category>internal</pdfaProperty:category>' . "\n";
+                $xmp .= "\t\t\t\t\t\t\t\t\t" . '<pdfaProperty:description>Part of PDF/A standard</pdfaProperty:description>' . "\n";
+                $xmp .= "\t\t\t\t\t\t\t\t\t" . '<pdfaProperty:name>part</pdfaProperty:name>' . "\n";
+                $xmp .= "\t\t\t\t\t\t\t\t\t" . '<pdfaProperty:valueType>Integer</pdfaProperty:valueType>' . "\n";
+                $xmp .= "\t\t\t\t\t\t\t\t" . '</rdf:li>' . "\n";
+                $xmp .= "\t\t\t\t\t\t\t\t" . '<rdf:li rdf:parseType="Resource">' . "\n";
+                $xmp .= "\t\t\t\t\t\t\t\t\t" . '<pdfaProperty:category>internal</pdfaProperty:category>' . "\n";
+                $xmp .= "\t\t\t\t\t\t\t\t\t" . '<pdfaProperty:description>Amendment of PDF/A standard</pdfaProperty:description>' . "\n";
+                $xmp .= "\t\t\t\t\t\t\t\t\t" . '<pdfaProperty:name>amd</pdfaProperty:name>' . "\n";
+                $xmp .= "\t\t\t\t\t\t\t\t\t" . '<pdfaProperty:valueType>Text</pdfaProperty:valueType>' . "\n";
+                $xmp .= "\t\t\t\t\t\t\t\t" . '</rdf:li>' . "\n";
+                $xmp .= "\t\t\t\t\t\t\t\t" . '<rdf:li rdf:parseType="Resource">' . "\n";
+                $xmp .= "\t\t\t\t\t\t\t\t\t" . '<pdfaProperty:category>internal</pdfaProperty:category>' . "\n";
+                $xmp .= "\t\t\t\t\t\t\t\t\t" . '<pdfaProperty:description>Conformance level of PDF/A standard</pdfaProperty:description>' . "\n";
+                $xmp .= "\t\t\t\t\t\t\t\t\t" . '<pdfaProperty:name>conformance</pdfaProperty:name>' . "\n";
+                $xmp .= "\t\t\t\t\t\t\t\t\t" . '<pdfaProperty:valueType>Text</pdfaProperty:valueType>' . "\n";
+                $xmp .= "\t\t\t\t\t\t\t\t" . '</rdf:li>' . "\n";
+                $xmp .= "\t\t\t\t\t\t\t" . '</rdf:Seq>' . "\n";
+                $xmp .= "\t\t\t\t\t\t" . '</pdfaSchema:property>' . "\n";
+                $xmp .= "\t\t\t\t\t" . '</rdf:li>' . "\n";
+                $xmp .= "\t\t\t\t" . '</rdf:Bag>' . "\n";
+                $xmp .= "\t\t\t" . '</pdfaExtension:schemas>' . "\n";
+                $xmp .= "\t\t" . '</rdf:Description>' . "\n";
+                $xmp .= $this->custom_xmp_rdf;
+                $xmp .= "\t" . '</rdf:RDF>' . "\n";
+                $xmp .= $this->custom_xmp;
+                $xmp .= '</x:xmpmeta>' . "\n";
             }
-            // XMP extension schemas
-            $xmp .= "\t\t" . '<rdf:Description rdf:about="" xmlns:pdfaExtension="http://www.aiim.org/pdfa/ns/extension/" xmlns:pdfaSchema="http://www.aiim.org/pdfa/ns/schema#" xmlns:pdfaProperty="http://www.aiim.org/pdfa/ns/property#">' . "\n";
-            $xmp .= "\t\t\t" . '<pdfaExtension:schemas>' . "\n";
-            $xmp .= "\t\t\t\t" . '<rdf:Bag>' . "\n";
-            $xmp .= "\t\t\t\t\t" . '<rdf:li rdf:parseType="Resource">' . "\n";
-            $xmp .= "\t\t\t\t\t\t" . '<pdfaSchema:namespaceURI>http://ns.adobe.com/pdf/1.3/</pdfaSchema:namespaceURI>' . "\n";
-            $xmp .= "\t\t\t\t\t\t" . '<pdfaSchema:prefix>pdf</pdfaSchema:prefix>' . "\n";
-            $xmp .= "\t\t\t\t\t\t" . '<pdfaSchema:schema>Adobe PDF Schema</pdfaSchema:schema>' . "\n";
-            $xmp .= "\t\t\t\t\t\t" . '<pdfaSchema:property>' . "\n";
-            $xmp .= "\t\t\t\t\t\t\t" . '<rdf:Seq>' . "\n";
-            $xmp .= "\t\t\t\t\t\t\t\t" . '<rdf:li rdf:parseType="Resource">' . "\n";
-            $xmp .= "\t\t\t\t\t\t\t\t\t" . '<pdfaProperty:category>internal</pdfaProperty:category>' . "\n";
-            $xmp .= "\t\t\t\t\t\t\t\t\t" . '<pdfaProperty:description>Adobe PDF Schema</pdfaProperty:description>' . "\n";
-            $xmp .= "\t\t\t\t\t\t\t\t\t" . '<pdfaProperty:name>InstanceID</pdfaProperty:name>' . "\n";
-            $xmp .= "\t\t\t\t\t\t\t\t\t" . '<pdfaProperty:valueType>URI</pdfaProperty:valueType>' . "\n";
-            $xmp .= "\t\t\t\t\t\t\t\t" . '</rdf:li>' . "\n";
-            $xmp .= "\t\t\t\t\t\t\t" . '</rdf:Seq>' . "\n";
-            $xmp .= "\t\t\t\t\t\t" . '</pdfaSchema:property>' . "\n";
-            $xmp .= "\t\t\t\t\t" . '</rdf:li>' . "\n";
-            $xmp .= "\t\t\t\t\t" . '<rdf:li rdf:parseType="Resource">' . "\n";
-            $xmp .= "\t\t\t\t\t\t" . '<pdfaSchema:namespaceURI>http://ns.adobe.com/xap/1.0/mm/</pdfaSchema:namespaceURI>' . "\n";
-            $xmp .= "\t\t\t\t\t\t" . '<pdfaSchema:prefix>xmpMM</pdfaSchema:prefix>' . "\n";
-            $xmp .= "\t\t\t\t\t\t" . '<pdfaSchema:schema>XMP Media Management Schema</pdfaSchema:schema>' . "\n";
-            $xmp .= "\t\t\t\t\t\t" . '<pdfaSchema:property>' . "\n";
-            $xmp .= "\t\t\t\t\t\t\t" . '<rdf:Seq>' . "\n";
-            $xmp .= "\t\t\t\t\t\t\t\t" . '<rdf:li rdf:parseType="Resource">' . "\n";
-            $xmp .= "\t\t\t\t\t\t\t\t\t" . '<pdfaProperty:category>internal</pdfaProperty:category>' . "\n";
-            $xmp .= "\t\t\t\t\t\t\t\t\t" . '<pdfaProperty:description>UUID based identifier for specific incarnation of a document</pdfaProperty:description>' . "\n";
-            $xmp .= "\t\t\t\t\t\t\t\t\t" . '<pdfaProperty:name>InstanceID</pdfaProperty:name>' . "\n";
-            $xmp .= "\t\t\t\t\t\t\t\t\t" . '<pdfaProperty:valueType>URI</pdfaProperty:valueType>' . "\n";
-            $xmp .= "\t\t\t\t\t\t\t\t" . '</rdf:li>' . "\n";
-            $xmp .= "\t\t\t\t\t\t\t" . '</rdf:Seq>' . "\n";
-            $xmp .= "\t\t\t\t\t\t" . '</pdfaSchema:property>' . "\n";
-            $xmp .= "\t\t\t\t\t" . '</rdf:li>' . "\n";
-            $xmp .= "\t\t\t\t\t" . '<rdf:li rdf:parseType="Resource">' . "\n";
-            $xmp .= "\t\t\t\t\t\t" . '<pdfaSchema:namespaceURI>http://www.aiim.org/pdfa/ns/id/</pdfaSchema:namespaceURI>' . "\n";
-            $xmp .= "\t\t\t\t\t\t" . '<pdfaSchema:prefix>pdfaid</pdfaSchema:prefix>' . "\n";
-            $xmp .= "\t\t\t\t\t\t" . '<pdfaSchema:schema>PDF/A ID Schema</pdfaSchema:schema>' . "\n";
-            $xmp .= "\t\t\t\t\t\t" . '<pdfaSchema:property>' . "\n";
-            $xmp .= "\t\t\t\t\t\t\t" . '<rdf:Seq>' . "\n";
-            $xmp .= "\t\t\t\t\t\t\t\t" . '<rdf:li rdf:parseType="Resource">' . "\n";
-            $xmp .= "\t\t\t\t\t\t\t\t\t" . '<pdfaProperty:category>internal</pdfaProperty:category>' . "\n";
-            $xmp .= "\t\t\t\t\t\t\t\t\t" . '<pdfaProperty:description>Part of PDF/A standard</pdfaProperty:description>' . "\n";
-            $xmp .= "\t\t\t\t\t\t\t\t\t" . '<pdfaProperty:name>part</pdfaProperty:name>' . "\n";
-            $xmp .= "\t\t\t\t\t\t\t\t\t" . '<pdfaProperty:valueType>Integer</pdfaProperty:valueType>' . "\n";
-            $xmp .= "\t\t\t\t\t\t\t\t" . '</rdf:li>' . "\n";
-            $xmp .= "\t\t\t\t\t\t\t\t" . '<rdf:li rdf:parseType="Resource">' . "\n";
-            $xmp .= "\t\t\t\t\t\t\t\t\t" . '<pdfaProperty:category>internal</pdfaProperty:category>' . "\n";
-            $xmp .= "\t\t\t\t\t\t\t\t\t" . '<pdfaProperty:description>Amendment of PDF/A standard</pdfaProperty:description>' . "\n";
-            $xmp .= "\t\t\t\t\t\t\t\t\t" . '<pdfaProperty:name>amd</pdfaProperty:name>' . "\n";
-            $xmp .= "\t\t\t\t\t\t\t\t\t" . '<pdfaProperty:valueType>Text</pdfaProperty:valueType>' . "\n";
-            $xmp .= "\t\t\t\t\t\t\t\t" . '</rdf:li>' . "\n";
-            $xmp .= "\t\t\t\t\t\t\t\t" . '<rdf:li rdf:parseType="Resource">' . "\n";
-            $xmp .= "\t\t\t\t\t\t\t\t\t" . '<pdfaProperty:category>internal</pdfaProperty:category>' . "\n";
-            $xmp .= "\t\t\t\t\t\t\t\t\t" . '<pdfaProperty:description>Conformance level of PDF/A standard</pdfaProperty:description>' . "\n";
-            $xmp .= "\t\t\t\t\t\t\t\t\t" . '<pdfaProperty:name>conformance</pdfaProperty:name>' . "\n";
-            $xmp .= "\t\t\t\t\t\t\t\t\t" . '<pdfaProperty:valueType>Text</pdfaProperty:valueType>' . "\n";
-            $xmp .= "\t\t\t\t\t\t\t\t" . '</rdf:li>' . "\n";
-            $xmp .= "\t\t\t\t\t\t\t" . '</rdf:Seq>' . "\n";
-            $xmp .= "\t\t\t\t\t\t" . '</pdfaSchema:property>' . "\n";
-            $xmp .= "\t\t\t\t\t" . '</rdf:li>' . "\n";
-            $xmp .= "\t\t\t\t" . '</rdf:Bag>' . "\n";
-            $xmp .= "\t\t\t" . '</pdfaExtension:schemas>' . "\n";
-            $xmp .= "\t\t" . '</rdf:Description>' . "\n";
-            $xmp .= $this->custom_xmp_rdf;
-            $xmp .= "\t" . '</rdf:RDF>' . "\n";
-            $xmp .= $this->custom_xmp;
         }
-        $xmp .= '</x:xmpmeta>' . "\n";
+
         $xmp .= '<?xpacket end="w"?>';
         $out = '<< /Type /Metadata /Subtype /XML /Length ' . strlen($xmp) . ' >> stream' . "\n" . $xmp . "\n" . 'endstream' . "\n" . 'endobj';
         // restore previous isunicode value
