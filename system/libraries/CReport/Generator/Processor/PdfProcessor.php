@@ -231,10 +231,10 @@ class CReport_Generator_Processor_PdfProcessor extends CReport_Generator_Process
 
         $fontSize = $font->getFontSize();
         $fontFile = $font->getFontFile();
-        // if (cstr::lower($fontName) == 'helvetica') {
-        //     cdbg::dd('helvetica' . cdbg::getTraceString());
-        //     die;
-        // }
+        if (cstr::lower($fontName) == 'jnsrzdbcasansb') {
+            cdbg::dd($fontFile . cdbg::getTraceString());
+            die;
+        }
         // $fontfile = CReport_Jasper_Instructions::$fontdir . '/' . $arraydata['font'] . '.php';
         // if(file_exists($fontfile) || $this->jasperReport->bypassnofont==false){
 
