@@ -10,6 +10,174 @@ class CReport_Adapter_Pdf_TCPDF extends \TCPDF {
 
     protected $xmpToolkit = null;
 
+    /**
+     * This is the class constructor.
+     * It allows to set up the page format, the orientation and the measure unit used in all the methods (except for the font sizes).
+     *
+     * @param string    $orientation page orientation. Possible values are (case insensitive):<ul><li>P or Portrait (default)</li><li>L or Landscape</li><li>'' (empty string) for automatic orientation</li></ul>
+     * @param string    $unit        User measure unit. Possible values are:<ul><li>pt: point</li><li>mm: millimeter (default)</li><li>cm: centimeter</li><li>in: inch</li></ul><br />A point equals 1/72 of inch, that is to say about 0.35 mm (an inch being 2.54 cm). This is a very common unit in typography; font sizes are expressed in that unit.
+     * @param mixed     $format      The format used for pages. It can be either: one of the string values specified at getPageSizeFromFormat() or an array of parameters specified at setPageFormat().
+     * @param bool      $unicode     TRUE means that the input text is unicode (default = true)
+     * @param string    $encoding    charset encoding (used only when converting back html entities); default is UTF-8
+     * @param bool      $diskcache   DEPRECATED FEATURE
+     * @param false|int $pdfa        if not false, set the document to PDF/A mode and the good version (1 or 3)
+     * @public
+     *
+     * @see getPageSizeFromFormat(), setPageFormat()
+     */
+    public function __construct($orientation = 'P', $unit = 'mm', $format = 'A4', $unicode = true, $encoding = 'UTF-8', $diskcache = false, $pdfa = false) {
+        // set file ID for trailer
+        $serformat = (is_array($format) ? json_encode($format) : $format);
+        $this->file_id = md5(TCPDF_STATIC::getRandomSeed('TCPDF' . $orientation . $unit . $serformat . $encoding));
+        $this->hash_key = hash_hmac('sha256', TCPDF_STATIC::getRandomSeed($this->file_id), TCPDF_STATIC::getRandomSeed('TCPDF'), false);
+        $this->font_obj_ids = [];
+        $this->page_obj_id = [];
+        $this->form_obj_id = [];
+        // set pdf/a mode
+        if ($pdfa != false) {
+            $this->pdfa_mode = true;
+            $this->pdfa_version = $pdfa;  // 1 or 3
+        } else {
+            $this->pdfa_mode = false;
+        }
+
+        $this->force_srgb = false;
+        // set language direction
+        $this->rtl = false;
+        $this->tmprtl = false;
+        // some checks
+        $this->_dochecks();
+        // initialization of properties
+        $this->isunicode = $unicode;
+        $this->page = 0;
+        $this->transfmrk[0] = [];
+        $this->pagedim = [];
+        $this->n = 2;
+        $this->buffer = '';
+        $this->pages = [];
+        $this->state = 0;
+        $this->fonts = [];
+        $this->FontFiles = [];
+        $this->diffs = [];
+        $this->images = [];
+        $this->links = [];
+        $this->gradients = [];
+        $this->InFooter = false;
+        $this->lasth = 0;
+        $this->FontFamily = defined('PDF_FONT_NAME_MAIN') ? PDF_FONT_NAME_MAIN : 'helvetica';
+        $this->FontStyle = '';
+        $this->FontSizePt = 12;
+        $this->underline = false;
+        $this->overline = false;
+        $this->linethrough = false;
+        $this->DrawColor = '0 G';
+        $this->FillColor = '0 g';
+        $this->TextColor = '0 g';
+        $this->ColorFlag = false;
+        $this->pdflayers = [];
+        // encryption values
+        $this->encrypted = false;
+        $this->last_enc_key = '';
+        // standard Unicode fonts
+        $this->CoreFonts = [
+            'courier' => 'Courier',
+            'courierB' => 'Courier-Bold',
+            'courierI' => 'Courier-Oblique',
+            'courierBI' => 'Courier-BoldOblique',
+            'helvetica' => 'Helvetica',
+            'helveticaB' => 'Helvetica-Bold',
+            'helveticaI' => 'Helvetica-Oblique',
+            'helveticaBI' => 'Helvetica-BoldOblique',
+            'times' => 'Times-Roman',
+            'timesB' => 'Times-Bold',
+            'timesI' => 'Times-Italic',
+            'timesBI' => 'Times-BoldItalic',
+            'symbol' => 'Symbol',
+            'zapfdingbats' => 'ZapfDingbats'
+        ];
+        // set scale factor
+        $this->setPageUnit($unit);
+        // set page format and orientation
+        $this->setPageFormat($format, $orientation);
+        // page margins (1 cm)
+        $margin = 28.35 / $this->k;
+        $this->setMargins($margin, $margin);
+        $this->clMargin = $this->lMargin;
+        $this->crMargin = $this->rMargin;
+        // internal cell padding
+        $cpadding = $margin / 10;
+        $this->setCellPaddings($cpadding, 0, $cpadding, 0);
+        // cell margins
+        $this->setCellMargins(0, 0, 0, 0);
+        // line width (0.2 mm)
+        $this->LineWidth = 0.57 / $this->k;
+        $this->linestyleWidth = sprintf('%F w', ($this->LineWidth * $this->k));
+        $this->linestyleCap = '0 J';
+        $this->linestyleJoin = '0 j';
+        $this->linestyleDash = '[] 0 d';
+        // automatic page break
+        $this->setAutoPageBreak(true, (2 * $margin));
+        // full width display mode
+        $this->setDisplayMode('fullwidth');
+        // compression
+        $this->setCompression();
+        // set default PDF version number
+        $this->setPDFVersion();
+        $this->tcpdflink = true;
+        $this->encoding = $encoding;
+        $this->HREF = [];
+        $this->getFontsList();
+        $this->fgcolor = ['R' => 0, 'G' => 0, 'B' => 0];
+        $this->strokecolor = ['R' => 0, 'G' => 0, 'B' => 0];
+        $this->bgcolor = ['R' => 255, 'G' => 255, 'B' => 255];
+        $this->extgstates = [];
+        $this->setTextShadow();
+        // signature
+        $this->sign = false;
+        $this->tsa_timestamp = false;
+        $this->tsa_data = [];
+        $this->signature_appearance = ['page' => 1, 'rect' => '0 0 0 0', 'name' => 'Signature'];
+        $this->empty_signature_appearance = [];
+        // user's rights
+        $this->ur['enabled'] = false;
+        $this->ur['document'] = '/FullSave';
+        $this->ur['annots'] = '/Create/Delete/Modify/Copy/Import/Export';
+        $this->ur['form'] = '/Add/Delete/FillIn/Import/Export/SubmitStandalone/SpawnTemplate';
+        $this->ur['signature'] = '/Modify';
+        $this->ur['ef'] = '/Create/Delete/Modify/Import';
+        $this->ur['formex'] = '';
+        // set default JPEG quality
+        $this->jpeg_quality = 75;
+        // initialize some settings
+        TCPDF_FONTS::utf8Bidi([], '', false, $this->isunicode, $this->CurrentFont);
+        // set default font
+        // $this->setFont($this->FontFamily, $this->FontStyle, $this->FontSizePt);
+        $this->setHeaderFont([$this->FontFamily, $this->FontStyle, $this->FontSizePt]);
+        $this->setFooterFont([$this->FontFamily, $this->FontStyle, $this->FontSizePt]);
+        // check if PCRE Unicode support is enabled
+        if ($this->isunicode and (@preg_match('/\pL/u', 'a') == 1)) {
+            // PCRE unicode support is turned ON
+            // \s     : any whitespace character
+            // \p{Z}  : any separator
+            // \p{Lo} : Unicode letter or ideograph that does not have lowercase and uppercase variants. Is used to chunk chinese words.
+            // \xa0   : Unicode Character 'NO-BREAK SPACE' (U+00A0)
+            //$this->setSpacesRE('/(?!\xa0)[\s\p{Z}\p{Lo}]/u');
+            $this->setSpacesRE('/(?!\xa0)[\s\p{Z}]/u');
+        } else {
+            // PCRE unicode support is turned OFF
+            $this->setSpacesRE('/[^\S\xa0]/');
+        }
+        $this->default_form_prop = ['lineWidth' => 1, 'borderStyle' => 'solid', 'fillColor' => [255, 255, 255], 'strokeColor' => [128, 128, 128]];
+        // set document creation and modification timestamp
+        $this->doc_creation_timestamp = time();
+        $this->doc_modification_timestamp = $this->doc_creation_timestamp;
+        // get default graphic vars
+        $this->default_graphic_vars = $this->getGraphicVars();
+        $this->header_xobj_autoreset = false;
+        $this->custom_xmp = '';
+        $this->custom_xmp_rdf = '';
+    }
+
     public function setProducer($producer) {
         $this->producer = $producer;
     }
