@@ -1,7 +1,7 @@
 
 
 function setupLayout(cresStyle) {
-    if (!cresStyle) return console.error('Vimesh style core is not loaded!')
+    if (!cresStyle) return console.error('Cres style core is not loaded!')
     const E = cresStyle._.each
     const R = cresStyle.register
     const GS = cresStyle._.generateSizes
