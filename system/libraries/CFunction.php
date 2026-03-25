@@ -3,14 +3,6 @@
 defined('SYSPATH') or die('No direct access allowed.');
 use Opis\Closure\SerializableClosure as OpisSerializableClosure;
 
-/**
- * @author Hery Kurniawan
- * @license Ittron Global Teknologi <ittron.co.id>
- *
- * @version Release:1.1
- *
- * @since Feb 17, 2018, 12:58:00 AM
- */
 class CFunction {
     /**
      * @var string|callable

@@ -2,12 +2,6 @@
 
 defined('SYSPATH') or die('No direct access allowed.');
 
-/**
- * @author Hery Kurniawan <hery@itton.co.id>
- * @license Ittron Global Teknologi
- *
- * @since Nov 29, 2020
- */
 class CComponent_HydrationMiddleware_HashDataPropertiesForDirtyDetection implements CComponent_HydrationMiddlewareInterface {
     protected static $propertyHashesByComponentId = [];
 
@@ -29,12 +23,12 @@ class CComponent_HydrationMiddleware_HashDataPropertiesForDirtyDetection impleme
         $data = c::get($response, 'memo.data', []);
 
         $dirtyProps = c::collect(isset(static::$propertyHashesByComponentId[$instance->id]) ? static::$propertyHashesByComponentId[$instance->id] : [])
-                ->filter(function ($hash, $key) use ($data) {
+            ->filter(function ($hash, $key) use ($data) {
                     // Only return the propertyHashes/props that have changed.
                     return static::hash(c::get($data, $key)) !== $hash;
                 })
-                ->keys()
-                ->toArray();
+            ->keys()
+            ->toArray();
 
         c::set($response, 'effects.dirty', $dirtyProps);
     }

@@ -2,12 +2,6 @@
 
 defined('SYSPATH') or die('No direct access allowed.');
 
-/**
- * @author Hery Kurniawan <hery@itton.co.id>
- * @license Ittron Global Teknologi
- *
- * @since Nov 29, 2020
- */
 trait CComponent_Concern_ValidatesInputTrait {
     protected $errorBag;
 
@@ -27,7 +21,7 @@ trait CComponent_Concern_ValidatesInputTrait {
         $fields = (array) $field;
 
         if (empty($fields)) {
-            return $this->errorBag = new CBase_MessageBag;
+            return $this->errorBag = new CBase_MessageBag();
         }
 
         $this->setErrorBag(
@@ -96,7 +90,7 @@ trait CComponent_Concern_ValidatesInputTrait {
         }
 
         return c::collect($this->getRules())
-                        ->filter(function ($value, $key) use ($name) {
+            ->filter(function ($value, $key) use ($name) {
                             return $this->beforeFirstDot($key) === $name;
                         });
     }
@@ -110,8 +104,8 @@ trait CComponent_Concern_ValidatesInputTrait {
         }
 
         return c::collect($this->getRules())
-                        ->keys()
-                        ->map(function ($key) {
+            ->keys()
+            ->map(function ($key) {
                             return (string) c::str($key)->before('.*');
                         })->contains($dotNotatedProperty);
     }

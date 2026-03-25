@@ -2,10 +2,6 @@
 
 defined('SYSPATH') or die('No direct access allowed.');
 
-/**
- * @author Hery Kurniawan
- * @license Ittron Global Teknologi <ittron.co.id>
- */
 class CElement_List_ActionList extends CElement_List {
     use CTrait_Compat_Element_ActionList,
         CTrait_Element_Property_Label,

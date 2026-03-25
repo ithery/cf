@@ -2,10 +2,6 @@
 
 defined('SYSPATH') or die('No direct access allowed.');
 
-/**
- * @author Hery Kurniawan
- * @license Ittron Global Teknologi <ittron.co.id>
- */
 class CElement_List_ActionRowList extends CElement_List_ActionList {
     public function __construct($id = null) {
         parent::__construct($id);

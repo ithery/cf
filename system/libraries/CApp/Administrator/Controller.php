@@ -2,12 +2,6 @@
 
 defined('SYSPATH') or die('No direct access allowed.');
 
-/**
- * @author Hery Kurniawan
- * @license Ittron Global Teknologi <ittron.co.id>
- *
- * @since Sep 8, 2018, 12:02:00 AM
- */
 use CApp_Administrator as Administrator;
 
 class CApp_Administrator_Controller extends CController {

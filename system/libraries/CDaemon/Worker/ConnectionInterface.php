@@ -2,12 +2,6 @@
 
 defined('SYSPATH') or die('No direct access allowed.');
 
-/**
- * @author Hery Kurniawan
- * @license Ittron Global Teknologi <ittron.co.id>
- *
- * @since Mar 16, 2019, 6:01:13 AM
- */
 interface CDaemon_Worker_ConnectionInterface {
     /**
      * Sends data on the connection.

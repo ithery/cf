@@ -2,12 +2,6 @@
 
 defined('SYSPATH') or die('No direct access allowed.');
 
-/**
- * @author Hery Kurniawan
- * @license Ittron Global Teknologi <ittron.co.id>
- *
- * @since Feb 17, 2019, 2:08:19 AM
- */
 class CElement_FormInput_DateTime_MaterialDateTime extends CElement_FormInput_DateTime {
     protected $disableYesterday;
 
@@ -18,6 +12,7 @@ class CElement_FormInput_DateTime_MaterialDateTime extends CElement_FormInput_Da
     protected $disableTime;
 
     protected $isAmPmEnabled;
+
     public function __construct($id) {
         parent::__construct($id);
         CManager::instance()->registerModule('bootstrap-4-material-datepicker');
@@ -85,6 +80,7 @@ class CElement_FormInput_DateTime_MaterialDateTime extends CElement_FormInput_Da
 
     public function disableAmPm() {
         $this->isAmPmEnabled = false;
+
         return $this;
     }
 
@@ -96,7 +92,7 @@ class CElement_FormInput_DateTime_MaterialDateTime extends CElement_FormInput_Da
         $shortTimeValue = $this->isAmPmEnabled ? 'true' : 'false';
         $option = ' weekStart: 1';
         $option .= " ,format : '" . $this->dateTimeFormat . "'";
-        $option .= ' ,shortTime: '. $shortTimeValue;
+        $option .= ' ,shortTime: ' . $shortTimeValue;
 
         if ($this->disableDate) {
             $option .= ' ,date: false';

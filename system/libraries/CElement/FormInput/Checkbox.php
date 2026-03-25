@@ -1,13 +1,5 @@
 <?php
 
-/**
- * Description of Checkbox.
- *
- * @author Alvin
- * @license Ittron Global Teknologi <ittron.co.id>
- *
- * @since Mar 14, 2018, 15:35:24 PM
- */
 class CElement_FormInput_Checkbox extends CElement_FormInput {
     use CTrait_Compat_Element_FormInput_Checkbox,
         CTrait_Element_Property_Label;

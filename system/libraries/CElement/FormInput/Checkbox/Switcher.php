@@ -1,13 +1,5 @@
 <?php
 
-/**
- * Description of Checkbox
- *
- * @author Alvin
- * @license Ittron Global Teknologi <ittron.co.id>
- *
- * @since Mar 14, 2018, 15:35:24 PM
- */
 class CElement_FormInput_Checkbox_Switcher extends CElement_FormInput_Checkbox {
     public function __construct($id) {
         parent::__construct($id);

@@ -2,12 +2,6 @@
 
 defined('SYSPATH') or die('No direct access allowed.');
 
-/**
- * @author Hery Kurniawan
- * @license Ittron Global Teknologi <ittron.co.id>
- *
- * @since Mar 10, 2019, 7:06:52 AM
- */
 interface CApp_Cloud_AdapterInterface {
     /**
      * @param string $url
@@ -46,7 +40,7 @@ interface CApp_Cloud_AdapterInterface {
     public function post($url, $content = '');
 
     /**
-     * @return array|null
+     * @return null|array
      */
     public function getLatestResponseHeaders();
 }

@@ -2,12 +2,6 @@
 
 defined('SYSPATH') or die('No direct access allowed.');
 
-/**
- * @author Hery Kurniawan
- * @license Ittron Global Teknologi <ittron.co.id>
- *
- * @since Apr 14, 2019, 7:10:42 PM
- */
 class CElement_List_TabList extends CElement_List {
     use CTrait_Compat_Element_TabList;
 

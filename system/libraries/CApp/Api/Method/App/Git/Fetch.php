@@ -4,12 +4,6 @@ defined('SYSPATH') or die('No direct access allowed.');
 
 use Symfony\Component\Process\Process;
 
-/**
- * @author Muhammad Harisuddin Thohir <me@harisuddin.com>
- * @license Ittron Global Teknologi <ittron.co.id>
- *
- * @since Mar 10, 2020, 11:13:37 AM
- */
 class CApp_Api_Method_App_Git_Fetch extends CApp_Api_Method_App {
     public function execute() {
         $output = '';

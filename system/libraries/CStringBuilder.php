@@ -1,11 +1,5 @@
 <?php
 
-/**
- * @author Hery Kurniawan
- * @license Ittron Global Teknologi <ittron.co.id>
- *
- * @since Feb 17, 2018, 2:16:00 AM
- */
 class CStringBuilder {
     use CTrait_Compat_StringBuilder;
 

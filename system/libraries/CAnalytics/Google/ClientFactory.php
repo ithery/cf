@@ -5,11 +5,7 @@ defined('SYSPATH') or die('No direct access allowed.');
 use Symfony\Component\Cache\Adapter\Psr16Adapter;
 
 /**
- * @author Hery Kurniawan
- * @license Ittron Global Teknologi <ittron.co.id>
- *
  * @see CAnalytics
- * @since Jun 23, 2019, 12:48:42 PM
  */
 
 use Google\Analytics\Data\V1beta\BetaAnalyticsDataClient;

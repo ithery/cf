@@ -2,12 +2,6 @@
 
 defined('SYSPATH') or die('No direct access allowed.');
 
-/**
- * @author Hery Kurniawan
- * @license Ittron Global Teknologi <ittron.co.id>
- *
- * @since Jun 15, 2018, 1:59:16 AM
- */
 class CApp_Api_Method_Server_DomainUpdate extends CApp_Api_Method_Server {
     public function execute() {
         $errCode = 0;
@@ -45,6 +39,7 @@ class CApp_Api_Method_Server_DomainUpdate extends CApp_Api_Method_Server {
                 $errMessage = 'domain ' . $domainToCreate . ' already exist on this server';
             }
         }
+
         try {
             $domainData = [];
             $domainData['app_id'] = $appId;

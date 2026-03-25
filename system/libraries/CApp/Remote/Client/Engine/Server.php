@@ -2,12 +2,6 @@
 
 defined('SYSPATH') or die('No direct access allowed.');
 
-/**
- * @author Hery Kurniawan
- * @license Ittron Global Teknologi <ittron.co.id>
- *
- * @since Jun 14, 2018, 9:32:42 PM
- */
 class CApp_Remote_Client_Engine_Server extends CApp_Remote_Client_Engine {
     public function __construct($options) {
         parent::__construct($options);
