@@ -157,12 +157,11 @@ trait CApp_Concern_BootstrapTrait {
                 'radio' => CElement_FormInput_Radio::class,
                 'label' => CElement_FormInput_Label::class,
                 'quill' => CElement_FormInput_Textarea_Quill::class,
-                'ckeditor' => CFormInputCKEditor::class,
+                'ckeditor' => CElement_FormInput_Textarea_CKEditor::class,
                 //'filedrop' => CFormInputFileDrop::class,
                 //'slider' => CFormInputSlider::class,
                 //'tooltip' => CFormInputTooltip::class,
                 'fileupload' => CElement_FormInput_MultipleImageAjax::class,
-                'wysiwyg' => CFormInputWysiwyg::class,
             ]);
 
             CFBenchmark::stop('CApp.RegisterControl');

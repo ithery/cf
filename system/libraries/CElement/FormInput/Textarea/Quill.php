@@ -2,14 +2,9 @@
 
 defined('SYSPATH') or die('No direct access allowed.');
 
-/**
- * @author Hery Kurniawan
- * @license Ittron Global Teknologi <ittron.co.id>
- *
- * @since Jun 3, 2019, 7:17:38 PM
- */
 class CElement_FormInput_Textarea_Quill extends CElement_Element_Div {
     use CTrait_Element_Property_Value;
+
     protected $theme;
 
     protected $toolbar;
