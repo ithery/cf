@@ -1,13 +1,5 @@
 <?php
 
-/**
- * Description of Summernote.
- *
- * @author Hery Kurniawan
- * @license Ittron Global Teknologi <ittron.co.id>
- *
- * @since Jan 28, 2018, 9:43:02 PM
- */
 class CElement_FormInput_Textarea_Summernote extends CElement_FormInput_Textarea {
     protected $toolbarType = 'default';
 

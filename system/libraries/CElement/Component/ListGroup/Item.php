@@ -2,12 +2,6 @@
 
 defined('SYSPATH') or die('No direct access allowed.');
 
-/**
- * @author Hery Kurniawan
- * @license Ittron Global Teknologi <ittron.co.id>
- *
- * @since Jun 2, 2019, 11:14:24 PM
- */
 class CElement_Component_ListGroup_Item extends CElement_Element {
     /**
      *  Callback for this item, when not defined will use default renderer.

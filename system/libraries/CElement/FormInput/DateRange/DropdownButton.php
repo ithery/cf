@@ -2,14 +2,6 @@
 
 defined('SYSPATH') or die('No direct access allowed.');
 
-/**
- * @author Hery Kurniawan
- * @license Ittron Global Teknologi <ittron.co.id>
- *
- * @since Jun 13, 2019, 6:38:34 PM
- */
-use Carbon\Carbon;
-
 class CElement_FormInput_DateRange_DropdownButton extends CElement_FormInput_DateRange_Dropdown {
     use CElement_FormInput_Trait_PredefinedDateRangeTrait;
 
@@ -172,8 +164,8 @@ class CElement_FormInput_DateRange_DropdownButton extends CElement_FormInput_Dat
             $('#" . $this->id . "').daterangepicker({
                 startDate: moment('" . $this->dateStart . "'),
                 endDate: moment('" . $this->dateEnd . "'),
-                " . $jsDisableDate . "
-                " . $jsRangeProperty . '
+                " . $jsDisableDate . '
+                ' . $jsRangeProperty . '
                 ' . $jsCustomRange . '
                 ' . $jsSpan . "
                 opens: '" . $this->openDirection . "',

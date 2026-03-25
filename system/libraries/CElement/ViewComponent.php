@@ -2,12 +2,6 @@
 
 defined('SYSPATH') or die('No direct access allowed.');
 
-/**
- * @author Hery Kurniawan <hery@itton.co.id>
- * @license Ittron Global Teknologi
- *
- * @since Nov 29, 2020
- */
 class CElement_ViewComponent extends CElement {
     /**
      * @var string
@@ -21,6 +15,10 @@ class CElement_ViewComponent extends CElement {
 
     /**
      * @phpstan-ignore-next-line
+     *
+     * @param mixed $id
+     * @param mixed $component
+     * @param mixed $options
      */
     public function __construct($id, $component, $options = []) {
         parent::__construct($id);

@@ -3,13 +3,6 @@
 defined('SYSPATH') or die('No direct access allowed.');
 
 /**
- * @author Hery Kurniawan
- * @license Ittron Global Teknologi <ittron.co.id>
- *
- * @since Jun 3, 2019, 1:46:52 AM
- */
-
-/**
  * @method string setDataFromCallback($callback,$require)
  */
 class CElement_Component_Kanban_List extends CElement_Component_Widget {

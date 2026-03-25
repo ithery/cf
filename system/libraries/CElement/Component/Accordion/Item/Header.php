@@ -2,12 +2,6 @@
 
 defined('SYSPATH') or die('No direct access allowed.');
 
-/**
- * @author Hery Kurniawan
- * @license Ittron Global Teknologi <ittron.co.id>
- *
- * @since Jul 7, 2018, 5:27:51 AM
- */
 class CElement_Component_Accordion_Item_Header extends CElement_Component {
     use CTrait_Element_Property_Icon,
         CTrait_Element_Property_Title;

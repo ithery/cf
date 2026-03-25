@@ -2,12 +2,6 @@
 
 defined('SYSPATH') or die('No direct access allowed.');
 
-/**
- * @author Hery Kurniawan
- * @license Ittron Global Teknologi <ittron.co.id>
- *
- * @since Jun 13, 2019, 6:38:26 PM
- */
 class CElement_FormInput_DateRange_Dropdown extends CElement_FormInput {
     use CElement_Trait_MomentJsTrait;
 

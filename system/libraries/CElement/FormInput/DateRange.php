@@ -2,12 +2,6 @@
 
 defined('SYSPATH') or die('No direct access allowed.');
 
-/**
- * @author Hery Kurniawan
- * @license Ittron Global Teknologi <ittron.co.id>
- *
- * @since Nov 30, 2018, 4:32:01 PM
- */
 class CElement_FormInput_DateRange extends CElement_FormInput {
     protected $dateFormat;
 

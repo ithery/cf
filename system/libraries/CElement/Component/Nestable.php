@@ -2,12 +2,6 @@
 
 defined('SYSPATH') or die('No direct access allowed.');
 
-/**
- * @author Hery Kurniawan
- * @license Ittron Global Teknologi <ittron.co.id>
- *
- * @since Oct 12, 2018, 1:48:18 PM
- */
 class CElement_Component_Nestable extends CElement_Component {
     use CTrait_Compat_Element_Nestable,
         CTrait_Element_ActionList_Row;

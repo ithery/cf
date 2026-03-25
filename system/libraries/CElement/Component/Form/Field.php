@@ -2,12 +2,6 @@
 
 defined('SYSPATH') or die('No direct access allowed.');
 
-/**
- * @author Hery Kurniawan
- * @license Ittron Global Teknologi <ittron.co.id>
- *
- * @since Feb 17, 2018, 2:29:43 AM
- */
 class CElement_Component_Form_Field extends CElement_Component {
     use CTrait_Compat_Element_Form_Field;
     use CTrait_Element_Property_Label;

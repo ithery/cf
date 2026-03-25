@@ -2,12 +2,6 @@
 
 defined('SYSPATH') or die('No direct access allowed.');
 
-/**
- * @author Hery Kurniawan
- * @license Ittron Global Teknologi <ittron.co.id>
- *
- * @since Jun 24, 2018, 6:55:42 PM
- */
 class CElement_FormInput_Image extends CElement_FormInput {
     use CElement_Trait_UseViewTrait,
         CTrait_Compat_Element_FormInput_Image;

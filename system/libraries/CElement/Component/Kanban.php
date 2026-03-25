@@ -2,12 +2,6 @@
 
 defined('SYSPATH') or die('No direct access allowed.');
 
-/**
- * @author Hery Kurniawan
- * @license Ittron Global Teknologi <ittron.co.id>
- *
- * @since Jun 3, 2019, 1:43:39 AM
- */
 class CElement_Component_Kanban extends CElement_Component {
     protected $saveCallback;
 
@@ -46,6 +40,7 @@ class CElement_Component_Kanban extends CElement_Component {
                 $errCode = 0;
                 $errMessage = '';
                 $result = null;
+
                 try {
                     $result = CFunction::factory(carr::get($args, 2))->setRequire(carr::get($args, 1))->setArgs($args)->execute();
                 } catch (Exception $ex) {

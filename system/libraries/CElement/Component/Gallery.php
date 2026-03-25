@@ -2,12 +2,6 @@
 
 defined('SYSPATH') or die('No direct access allowed.');
 
-/**
- * @author Hery Kurniawan
- * @license Ittron Global Teknologi <ittron.co.id>
- *
- * @since Jun 20, 2018, 2:23:56 AM
- */
 class CElement_Component_Gallery extends CElement_Component {
     public function __construct($id = '', $tag = 'div') {
         parent::__construct($id, $tag);

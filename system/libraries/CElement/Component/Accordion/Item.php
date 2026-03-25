@@ -2,12 +2,6 @@
 
 defined('SYSPATH') or die('No direct access allowed.');
 
-/**
- * @author Hery Kurniawan
- * @license Ittron Global Teknologi <ittron.co.id>
- *
- * @since Jul 7, 2018, 5:28:34 AM
- */
 class CElement_Component_Accordion_Item extends CElement_Component {
     /**
      * @var CElement_Component_Accordion_Item_Header

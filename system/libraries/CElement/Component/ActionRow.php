@@ -3,12 +3,6 @@
 defined('SYSPATH') or die('No direct access allowed.');
 use Opis\Closure\SerializableClosure;
 
-/**
- * @author Hery Kurniawan
- * @license Ittron Global Teknologi <ittron.co.id>
- *
- * @since May 12, 2018, 9:08:07 PM
- */
 class CElement_Component_ActionRow extends CElement_Component_Action {
     protected $rowCallback;
 

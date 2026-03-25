@@ -2,12 +2,6 @@
 
 defined('SYSPATH') or die('No direct access allowed.');
 
-/**
- * @author Hery Kurniawan
- * @license Ittron Global Teknologi <ittron.co.id>
- *
- * @since Jun 20, 2018, 1:45:20 AM
- */
 class CElement_Component_Widget_Header extends CElement_Element {
     use CTrait_Element_Property_Icon,
         CTrait_Element_Property_Title;

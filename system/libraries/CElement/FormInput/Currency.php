@@ -2,12 +2,6 @@
 
 defined('SYSPATH') or die('No direct access allowed.');
 
-/**
- * @author Hery Kurniawan
- * @license Ittron Global Teknologi <ittron.co.id>
- *
- * @since Jun 24, 2018, 6:26:04 PM
- */
 class CElement_FormInput_Currency extends CElement_FormInput {
     use CTrait_Compat_Element_FormInput_Currency,
         CTrait_Element_Property_Placeholder;

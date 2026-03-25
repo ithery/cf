@@ -2,12 +2,6 @@
 
 defined('SYSPATH') or die('No direct access allowed.');
 
-/**
- * @author Hery Kurniawan
- * @license Ittron Global Teknologi <ittron.co.id>
- *
- * @since Nov 12, 2017, 3:34:27 AM
- */
 abstract class CElement_Element extends CElement {
     protected $isBuilded = false;
 

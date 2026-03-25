@@ -2,12 +2,6 @@
 
 defined('SYSPATH') or die('No direct access allowed.');
 
-/**
- * @author Hery Kurniawan
- * @license Ittron Global Teknologi <ittron.co.id>
- *
- * @since Jun 2, 2019, 9:50:41 PM
- */
 class CElement_Component_ListGroup extends CElement_Component {
     use CTrait_Element_Property_Database,
         CTrait_Element_Property_TableData;

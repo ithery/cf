@@ -2,12 +2,6 @@
 
 defined('SYSPATH') or die('No direct access allowed.');
 
-/**
- * @author Hery Kurniawan
- * @license Ittron Global Teknologi <ittron.co.id>
- *
- * @since Sep 7, 2018, 7:50:27 PM
- */
 class CElement_Component_PrismCode extends CElement_Component {
     protected $prismLanguage = 'php';
 
