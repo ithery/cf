@@ -3,13 +3,6 @@
 defined('SYSPATH') or die('No direct access allowed.');
 
 /**
- * @author Hery Kurniawan
- * @license Ittron Global Teknologi <ittron.co.id>
- *
- * @since Aug 18, 2018, 12:18:31 PM
- */
-
-/**
  * Table Diff.
  */
 class CDatabase_Schema_Table_Diff {
@@ -66,7 +59,7 @@ class CDatabase_Schema_Table_Diff {
     public $changedIndexes = [];
 
     /**
-     * All removed indexes
+     * All removed indexes.
      *
      * @var CDatabase_Schema_Index[]
      */
@@ -80,28 +73,28 @@ class CDatabase_Schema_Table_Diff {
     public $renamedIndexes = [];
 
     /**
-     * All added foreign key definitions
+     * All added foreign key definitions.
      *
      * @var CDatabase_Schema_ForeignKeyConstraint[]
      */
     public $addedForeignKeys = [];
 
     /**
-     * All changed foreign keys
+     * All changed foreign keys.
      *
      * @var CDatabase_Schema_ForeignKeyConstraint[]
      */
     public $changedForeignKeys = [];
 
     /**
-     * All removed foreign keys
+     * All removed foreign keys.
      *
      * @var CDatabase_Schema_ForeignKeyConstraint[]|string[]
      */
     public $removedForeignKeys = [];
 
     /**
-     * @var CDatabase_Schema_Table|null
+     * @var null|CDatabase_Schema_Table
      */
     public $fromTable;
 
@@ -115,7 +108,7 @@ class CDatabase_Schema_Table_Diff {
      * @param CDatabase_Schema_Index[]      $addedIndexes
      * @param CDatabase_Schema_Index[]      $changedIndexes
      * @param CDatabase_Schema_Index[]      $removedIndexes
-     * @param CDatabase_Schema_Table|null   $fromTable
+     * @param null|CDatabase_Schema_Table   $fromTable
      */
     public function __construct($tableName, $addedColumns = [], $changedColumns = [], $removedColumns = [], $addedIndexes = [], $changedIndexes = [], $removedIndexes = [], CDatabase_Schema_Table $fromTable = null) {
         $this->name = $tableName;

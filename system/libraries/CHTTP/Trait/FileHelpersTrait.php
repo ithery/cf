@@ -2,12 +2,6 @@
 
 defined('SYSPATH') or die('No direct access allowed.');
 
-/**
- * @author Hery Kurniawan
- * @license Ittron Global Teknologi <ittron.co.id>
- *
- * @since Aug 11, 2019, 10:50:01 PM
- */
 trait CHTTP_Trait_FileHelpersTrait {
     /**
      * The cache copy of the file's hash name.

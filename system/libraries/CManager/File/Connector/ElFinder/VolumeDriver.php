@@ -2,12 +2,7 @@
 
 defined('SYSPATH') or die('No direct access allowed.');
 
-/**
- * @author Hery Kurniawan
- * @license Ittron Global Teknologi <ittron.co.id>
- *
- * @since Mar 28, 2019, 3:17:43 AM
- */
+
 use CManager_File_Connector_ElFinder_VolumeDriver_LocalFileSystem as elFinderVolumeLocalFileSystem;
 use CManager_File_Connector_ElFinder_Session as elFinderSession;
 use CManager_File_Connector_ElFinder_SessionInterface as elFinderSessionInterface;
@@ -698,7 +693,7 @@ abstract class CManager_File_Connector_ElFinder_VolumeDriver {
     protected $sessionCaching = ['rootstat' => true, 'subdirs' => true];
 
     /**
-     * elFinder session wrapper object
+     * Object elFinder session wrapper object
      *
      * @var elFinderSessionInterface
      */
@@ -953,7 +948,7 @@ abstract class CManager_File_Connector_ElFinder_VolumeDriver {
     }
 
     /**
-     * chmod a file or folder
+     * Do chmod a file or folder
      *
      * @param string $hash file or folder hash to chmod
      * @param string $mode octal string representing new permissions
@@ -1005,7 +1000,7 @@ abstract class CManager_File_Connector_ElFinder_VolumeDriver {
     }
 
     /**
-     * stat a file or folder for elFinder cmd exec
+     * Do stat a file or folder for elFinder cmd exec
      *
      * @param string $hash file or folder hash to chmod
      *
@@ -2040,14 +2035,11 @@ abstract class CManager_File_Connector_ElFinder_VolumeDriver {
     /**
      * Return file size / total directory size
      *
-     * @param  string   file hash
-     * @param mixed $hash
+     * @param string $hash
      *
      * @return array
      *
      * @throws elFinderAbortException
-     *
-     * @author Dmitry (dio) Levashov
      */
     public function size($hash) {
         return $this->countSize($this->decode($hash));
@@ -2056,12 +2048,9 @@ abstract class CManager_File_Connector_ElFinder_VolumeDriver {
     /**
      * Open file for reading and return file pointer
      *
-     * @param  string   file hash
-     * @param mixed $hash
+     * @param string $hash
      *
      * @return resource|false
-     *
-     * @author Dmitry (dio) Levashov
      * */
     public function open($hash) {
         if (($file = $this->file($hash)) == false || $file['mime'] == 'directory') {

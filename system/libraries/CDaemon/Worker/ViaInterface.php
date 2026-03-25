@@ -2,12 +2,6 @@
 
 defined('SYSPATH') or die('No direct access allowed.');
 
-/**
- * @author Hery Kurniawan
- * @license Ittron Global Teknologi <ittron.co.id>
- *
- * @since Mar 16, 2019, 3:56:53 AM
- */
 interface CDaemon_Worker_ViaInterface {
     /**
      * Puts the message on the queue.

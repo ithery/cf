@@ -23,6 +23,5 @@ class CComponent_HydrationMiddleware_PerformActionCalls implements CComponent_Hy
     }
 
     public static function dehydrate($instance, $response) {
-
     }
 }

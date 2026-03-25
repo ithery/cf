@@ -2,12 +2,6 @@
 
 defined('SYSPATH') or die('No direct access allowed.');
 
-/**
- * @author Hery Kurniawan
- * @license Ittron Global Teknologi <ittron.co.id>
- *
- * @since Aug 30, 2019, 2:18:02 AM
- */
 use CImage_Chart_Constant as Constant;
 
 class CImage_Chart_Data {

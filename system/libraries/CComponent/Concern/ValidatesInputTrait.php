@@ -91,8 +91,8 @@ trait CComponent_Concern_ValidatesInputTrait {
 
         return c::collect($this->getRules())
             ->filter(function ($value, $key) use ($name) {
-                            return $this->beforeFirstDot($key) === $name;
-                        });
+                return $this->beforeFirstDot($key) === $name;
+            });
     }
 
     public function hasRuleFor($dotNotatedProperty) {
@@ -106,8 +106,8 @@ trait CComponent_Concern_ValidatesInputTrait {
         return c::collect($this->getRules())
             ->keys()
             ->map(function ($key) {
-                            return (string) c::str($key)->before('.*');
-                        })->contains($dotNotatedProperty);
+                return (string) c::str($key)->before('.*');
+            })->contains($dotNotatedProperty);
     }
 
     public function ruleWithNumbersReplacedByStars($dotNotatedProperty) {

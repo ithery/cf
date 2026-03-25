@@ -2,12 +2,6 @@
 
 defined('SYSPATH') or die('No direct access allowed.');
 
-/**
- * @author Hery Kurniawan
- * @license Ittron Global Teknologi <ittron.co.id>
- *
- * @since Sep 8, 2018, 1:54:30 AM
- */
 class CManager_Asset_Helper {
     public static function urlCssFile($file, $withHttp = false) {
         //return CResource::instance('css')->url($file);

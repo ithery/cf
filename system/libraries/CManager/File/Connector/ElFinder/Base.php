@@ -2,12 +2,6 @@
 
 defined('SYSPATH') or die('No direct access allowed.');
 
-/**
- * @author Hery Kurniawan
- * @license Ittron Global Teknologi <ittron.co.id>
- *
- * @since Mar 28, 2019, 3:04:58 AM
- */
 use CManager_File_Connector_ElFinder_Session as elFinderSession;
 
 class CManager_File_Connector_ElFinder_Base {

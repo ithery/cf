@@ -2,14 +2,7 @@
 
 defined('SYSPATH') or die('No direct access allowed.');
 
- /**
-  * @author Hery Kurniawan
-  * @license Ittron Global Teknologi <ittron.co.id>
-  *
-  * @since Aug 18, 2018, 10:43:47 AM
-  */
-
- use Doctrine\Common\Cache\Cache;
+use Doctrine\Common\Cache\Cache;
 
 /**
  * Configuration container for the CDatabase.

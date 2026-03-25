@@ -2,12 +2,6 @@
 
 defined('SYSPATH') or die('No direct access allowed.');
 
-/**
- * @author Hery Kurniawan
- * @license Ittron Global Teknologi <ittron.co.id>
- *
- * @since Feb 16, 2019, 1:43:07 AM
- */
 use Intervention\Image\Image;
 use Intervention\Image\AbstractFont;
 use Intervention\Image\ImageManager;

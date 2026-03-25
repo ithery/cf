@@ -23,6 +23,5 @@ class CComponent_HydrationMiddleware_PerformEventEmissions implements CComponent
     }
 
     public static function dehydrate($instance, $response) {
-
     }
 }

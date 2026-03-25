@@ -2,12 +2,6 @@
 
 defined('SYSPATH') or die('No direct access allowed.');
 
-/**
- * @author Hery Kurniawan
- * @license Ittron Global Teknologi <ittron.co.id>
- *
- * @since Aug 18, 2018, 8:31:26 AM
- */
 class CDatabase_Driver_Sqlsrv_Result extends CDatabase_Result {
     /**
      * @var \mysqli

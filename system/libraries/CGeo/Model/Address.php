@@ -3,13 +3,6 @@
 defined('SYSPATH') or die('No direct access allowed.');
 
 /**
- * @author Hery Kurniawan
- * @license Ittron Global Teknologi <ittron.co.id>
- *
- * @since Aug 18, 2018, 8:06:07 PM
- */
-
-/**
  * @author William Durand <william.durand1@gmail.com>
  */
 class CGeo_Model_Address implements CGeo_Interface_LocationInterface {

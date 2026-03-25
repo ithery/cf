@@ -2,12 +2,6 @@
 
 defined('SYSPATH') or die('No direct access allowed.');
 
-/**
- * @author Hery Kurniawan
- * @license Ittron Global Teknologi <ittron.co.id>
- *
- * @since Mar 10, 2019, 1:07:02 AM
- */
 interface CEvent_DispatcherInterface {
     /**
      * Register an event listener with the dispatcher.
@@ -43,7 +37,7 @@ interface CEvent_DispatcherInterface {
      * @param string|object $event
      * @param mixed         $payload
      *
-     * @return array|null
+     * @return null|array
      */
     public function until($event, $payload = []);
 
@@ -54,7 +48,7 @@ interface CEvent_DispatcherInterface {
      * @param mixed         $payload
      * @param bool          $halt
      *
-     * @return array|null
+     * @return null|array
      */
     public function dispatch($event, $payload = [], $halt = false);
 

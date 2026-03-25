@@ -2,12 +2,6 @@
 
 defined('SYSPATH') or die('No direct access allowed.');
 
-/**
- * @author Hery Kurniawan
- * @license Ittron Global Teknologi <ittron.co.id>
- *
- * @since Aug 23, 2019, 3:28:16 AM
- */
 final class CDatabase_TransactionIsolationLevel {
     /**
      * Transaction isolation level READ UNCOMMITTED.

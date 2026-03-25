@@ -3,55 +3,48 @@
 defined('SYSPATH') or die('No direct access allowed.');
 
 /**
- * @author Hery Kurniawan
- * @license Ittron Global Teknologi <ittron.co.id>
- *
- * @since Aug 18, 2018, 8:10:22 PM
- */
-
-/**
  * A location is a single result from a Geocoder.
  */
 interface CGeo_Interface_LocationInterface {
     /**
      * Will always return the coordinates value object.
      *
-     * @return CGeo_Model_Coordinates|null
+     * @return null|CGeo_Model_Coordinates
      */
     public function getCoordinates();
 
     /**
      * Returns the bounds value object.
      *
-     * @return CGeo_Model_Bounds|null
+     * @return null|CGeo_Model_Bounds
      */
     public function getBounds();
 
     /**
      * Returns the street number value.
      *
-     * @return string|int|null
+     * @return null|string|int
      */
     public function getStreetNumber();
 
     /**
      * Returns the street name value.
      *
-     * @return string|null
+     * @return null|string
      */
     public function getStreetName();
 
     /**
      * Returns the city or locality value.
      *
-     * @return string|null
+     * @return null|string
      */
     public function getLocality();
 
     /**
      * Returns the postal code or zipcode value.
      *
-     * @return string|null
+     * @return null|string
      */
     public function getPostalCode();
 
@@ -59,7 +52,7 @@ interface CGeo_Interface_LocationInterface {
      * Returns the locality district, or
      * sublocality, or neighborhood.
      *
-     * @return string|null
+     * @return null|string
      */
     public function getSubLocality();
 
@@ -75,7 +68,7 @@ interface CGeo_Interface_LocationInterface {
     /**
      * Returns the country value object.
      *
-     * @return CGeo_Model_Country|null
+     * @return null|CGeo_Model_Country
      */
     public function getCountry();
 
@@ -84,7 +77,7 @@ interface CGeo_Interface_LocationInterface {
      *
      * {@link http://php.net/manual/en/timezones.php}
      *
-     * @return string|null
+     * @return null|string
      */
     public function getTimezone();
 

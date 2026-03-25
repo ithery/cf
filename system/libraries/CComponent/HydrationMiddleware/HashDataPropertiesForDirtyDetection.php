@@ -24,9 +24,9 @@ class CComponent_HydrationMiddleware_HashDataPropertiesForDirtyDetection impleme
 
         $dirtyProps = c::collect(isset(static::$propertyHashesByComponentId[$instance->id]) ? static::$propertyHashesByComponentId[$instance->id] : [])
             ->filter(function ($hash, $key) use ($data) {
-                    // Only return the propertyHashes/props that have changed.
-                    return static::hash(c::get($data, $key)) !== $hash;
-                })
+                // Only return the propertyHashes/props that have changed.
+                return static::hash(c::get($data, $key)) !== $hash;
+            })
             ->keys()
             ->toArray();
 

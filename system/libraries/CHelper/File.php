@@ -2,12 +2,6 @@
 
 defined('SYSPATH') or die('No direct access allowed.');
 
-/**
- * @author Hery Kurniawan
- * @license Ittron Global Teknologi <ittron.co.id>
- *
- * @since Jun 14, 2018, 5:11:09 AM
- */
 use Symfony\Component\Finder\Finder;
 
 class CHelper_File {

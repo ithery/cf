@@ -22,6 +22,5 @@ class CComponent_HydrationMiddleware_PerformDataBindingUpdates implements CCompo
     }
 
     public static function dehydrate($instance, $response) {
-
     }
 }

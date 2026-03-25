@@ -3,13 +3,6 @@
 defined('SYSPATH') or die('No direct access allowed.');
 
 /**
- * @author Hery Kurniawan
- * @license Ittron Global Teknologi <ittron.co.id>
- *
- * @since Jun 30, 2019, 7:52:15 PM
- */
-
-/**
  * MySQLi Prepared Statement (experimental).
  */
 class CDatabase_Driver_Mysqli_Statement {

@@ -2,12 +2,6 @@
 
 defined('SYSPATH') or die('No direct access allowed.');
 
-/**
- * @author Hery Kurniawan
- * @license Ittron Global Teknologi <ittron.co.id>
- *
- * @since Aug 18, 2018, 9:06:21 PM
- */
 final class CGeo_Query_ReverseQuery implements CGeo_Interface_QueryInterface {
     /**
      * @var CGeo_Model_Coordinates
@@ -15,7 +9,7 @@ final class CGeo_Query_ReverseQuery implements CGeo_Interface_QueryInterface {
     private $coordinates;
 
     /**
-     * @var string|null
+     * @var null|string
      */
     private $locale;
 
@@ -63,6 +57,7 @@ final class CGeo_Query_ReverseQuery implements CGeo_Interface_QueryInterface {
     public function withCoordinates(CGeo_Model_Coordinates $coordinates) {
         $new = clone $this;
         $new->coordinates = $coordinates;
+
         return $new;
     }
 
@@ -74,6 +69,7 @@ final class CGeo_Query_ReverseQuery implements CGeo_Interface_QueryInterface {
     public function withLimit($limit) {
         $new = clone $this;
         $new->limit = $limit;
+
         return $new;
     }
 
@@ -85,6 +81,7 @@ final class CGeo_Query_ReverseQuery implements CGeo_Interface_QueryInterface {
     public function withLocale($locale) {
         $new = clone $this;
         $new->locale = $locale;
+
         return $new;
     }
 
@@ -97,6 +94,7 @@ final class CGeo_Query_ReverseQuery implements CGeo_Interface_QueryInterface {
     public function withData($name, $value) {
         $new = clone $this;
         $new->data[$name] = $value;
+
         return $new;
     }
 
@@ -123,7 +121,7 @@ final class CGeo_Query_ReverseQuery implements CGeo_Interface_QueryInterface {
 
     /**
      * @param string     $name
-     * @param mixed|null $default
+     * @param null|mixed $default
      *
      * @return mixed
      */
@@ -131,6 +129,7 @@ final class CGeo_Query_ReverseQuery implements CGeo_Interface_QueryInterface {
         if (!array_key_exists($name, $this->data)) {
             return $default;
         }
+
         return $this->data[$name];
     }
 
@@ -142,7 +141,7 @@ final class CGeo_Query_ReverseQuery implements CGeo_Interface_QueryInterface {
     }
 
     /**
-     * String for logging. This is also a unique key for the query
+     * String for logging. This is also a unique key for the query.
      *
      * @return string
      */

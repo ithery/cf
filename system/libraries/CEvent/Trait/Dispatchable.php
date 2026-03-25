@@ -2,12 +2,6 @@
 
 defined('SYSPATH') or die('No direct access allowed.');
 
-/**
- * @author Hery Kurniawan
- * @license Ittron Global Teknologi <ittron.co.id>
- *
- * @since Mar 10, 2019, 1:01:29 AM
- */
 trait CEvent_Trait_Dispatchable {
     /**
      * Dispatch the event with the given arguments.

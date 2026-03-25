@@ -2,12 +2,6 @@
 
 defined('SYSPATH') or die('No direct access allowed.');
 
-/**
- * @author Hery Kurniawan
- * @license Ittron Global Teknologi <ittron.co.id>
- *
- * @since Aug 18, 2018, 9:12:51 PM
- */
 final class CGeo_Model_AdminLevelCollection implements \IteratorAggregate, \Countable {
     const MAX_LEVEL_DEPTH = 5;
 

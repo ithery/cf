@@ -3,13 +3,6 @@
 defined('SYSPATH') or die('No direct access allowed.');
 
 /**
- * @author Hery Kurniawan
- * @license Ittron Global Teknologi <ittron.co.id>
- *
- * @since Jul 17, 2018, 12:20:01 AM
- */
-
-/**
  * JSON tools.
  */
 class CHelper_JSON {
@@ -139,6 +132,7 @@ class CHelper_JSON {
     public static function stringify(/* inherit from json_encode */) {
         // extract arguments
         $args = func_get_args();
+
         return call_user_func_array([__CLASS__, 'encode'], $args);
     }
 

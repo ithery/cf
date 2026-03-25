@@ -2,12 +2,6 @@
 
 defined('SYSPATH') or die('No direct access allowed.');
 
-/**
- * @author Hery Kurniawan
- * @license Ittron Global Teknologi <ittron.co.id>
- *
- * @since Aug 18, 2018, 9:00:18 PM
- */
 final class CGeo_Query_GeocodeQuery implements CGeo_Interface_QueryInterface {
     /**
      * The address or text that should be geocoded.
@@ -17,12 +11,12 @@ final class CGeo_Query_GeocodeQuery implements CGeo_Interface_QueryInterface {
     private $text;
 
     /**
-     * @var CGeo_Model_Bounds|null
+     * @var null|CGeo_Model_Bounds
      */
     private $bounds;
 
     /**
-     * @var string|null
+     * @var null|string
      */
     private $locale;
 
@@ -63,6 +57,7 @@ final class CGeo_Query_GeocodeQuery implements CGeo_Interface_QueryInterface {
     public function withText($text) {
         $new = clone $this;
         $new->text = $text;
+
         return $new;
     }
 
@@ -74,6 +69,7 @@ final class CGeo_Query_GeocodeQuery implements CGeo_Interface_QueryInterface {
     public function withBounds(CGeo_Model_Bounds $bounds) {
         $new = clone $this;
         $new->bounds = $bounds;
+
         return $new;
     }
 
@@ -85,6 +81,7 @@ final class CGeo_Query_GeocodeQuery implements CGeo_Interface_QueryInterface {
     public function withLocale($locale) {
         $new = clone $this;
         $new->locale = $locale;
+
         return $new;
     }
 
@@ -96,6 +93,7 @@ final class CGeo_Query_GeocodeQuery implements CGeo_Interface_QueryInterface {
     public function withLimit($limit) {
         $new = clone $this;
         $new->limit = $limit;
+
         return $new;
     }
 
@@ -108,6 +106,7 @@ final class CGeo_Query_GeocodeQuery implements CGeo_Interface_QueryInterface {
     public function withData($name, $value) {
         $new = clone $this;
         $new->data[$name] = $value;
+
         return $new;
     }
 
@@ -119,14 +118,14 @@ final class CGeo_Query_GeocodeQuery implements CGeo_Interface_QueryInterface {
     }
 
     /**
-     * @return Bounds|null
+     * @return null|Bounds
      */
     public function getBounds() {
         return $this->bounds;
     }
 
     /**
-     * @return string|null
+     * @return null|string
      */
     public function getLocale() {
         return $this->locale;
@@ -141,7 +140,7 @@ final class CGeo_Query_GeocodeQuery implements CGeo_Interface_QueryInterface {
 
     /**
      * @param string     $name
-     * @param mixed|null $default
+     * @param null|mixed $default
      *
      * @return mixed
      */
@@ -149,6 +148,7 @@ final class CGeo_Query_GeocodeQuery implements CGeo_Interface_QueryInterface {
         if (!array_key_exists($name, $this->data)) {
             return $default;
         }
+
         return $this->data[$name];
     }
 
@@ -160,7 +160,7 @@ final class CGeo_Query_GeocodeQuery implements CGeo_Interface_QueryInterface {
     }
 
     /**
-     * String for logging. This is also a unique key for the query
+     * String for logging. This is also a unique key for the query.
      *
      * @return string
      */

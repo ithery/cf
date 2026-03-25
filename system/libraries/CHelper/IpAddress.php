@@ -2,12 +2,6 @@
 
 defined('SYSPATH') or die('No direct access allowed.');
 
-/**
- * @author Hery Kurniawan
- * @license Ittron Global Teknologi <ittron.co.id>
- *
- * @since Jun 23, 2019, 11:36:02 PM
- */
 class CHelper_IpAddress {
     /**
      * Method CIDRtoMask
@@ -16,7 +10,7 @@ class CHelper_IpAddress {
      * Usage:
      *     CIDR::CIDRtoMask(22);
      * Result:
-     *     string(13) "255.255.252.0"
+     *     string(13) "255.255.252.0".
      *
      * @param $int int Between 0 and 32
      * @static
@@ -33,7 +27,7 @@ class CHelper_IpAddress {
      * Usage:
      *     CIDR::countSetBits(ip2long('255.255.252.0'));
      * Result:
-     *     int(22)
+     *     int(22).
      *
      * @param $int int a number
      * @static
@@ -46,6 +40,7 @@ class CHelper_IpAddress {
     public static function countSetbits($int) {
         $int = $int - (($int >> 1) & 0x55555555);
         $int = ($int & 0x33333333) + (($int >> 2) & 0x33333333);
+
         return (($int + ($int >> 4) & 0xF0F0F0F) * 0x1010101) >> 24;
     }
 
@@ -57,7 +52,7 @@ class CHelper_IpAddress {
      *     CIDR::validNetMask('127.0.0.1');
      * Result:
      *     bool(true)
-     *     bool(false)
+     *     bool(false).
      *
      * @param $netmask string a 1pv4 formatted ip address
      *
@@ -71,6 +66,7 @@ class CHelper_IpAddress {
     public static function validNetMask($netmask) {
         $netmask = ip2long($netmask);
         $neg = ((~(int) $netmask) & 0xFFFFFFFF);
+
         return (($neg + 1) & $neg) === 0;
     }
 
@@ -80,7 +76,7 @@ class CHelper_IpAddress {
      * Usage:
      *     CIDR::maskToCIDR('255.255.252.0');
      * Result:
-     *     int(22)
+     *     int(22).
      *
      * @param $netmask string a 1pv4 formatted ip address
      *
@@ -104,7 +100,7 @@ class CHelper_IpAddress {
      * Usage:
      *     CIDR::alignedCIDR('127.0.0.1','255.255.252.0');
      * Result:
-     *     string(12) "127.0.0.0/22"
+     *     string(12) "127.0.0.0/22".
      *
      * @param $ipinput string a IPv4 formatted ip address
      * @param $netmask string a 1pv4 formatted ip address
@@ -114,6 +110,7 @@ class CHelper_IpAddress {
      */
     public static function alignedCIDR($ipinput, $netmask) {
         $alignedIP = long2ip((ip2long($ipinput)) & (ip2long($netmask)));
+
         return "$alignedIP/" . self::maskToCIDR($netmask);
     }
 
@@ -125,7 +122,7 @@ class CHelper_IpAddress {
      *     CIDR::IPisWithinCIDR('127.0.0.33','127.0.0.1/27');
      * Result:
      *     bool(true)
-     *     bool(false)
+     *     bool(false).
      *
      * @param $ipinput string a IPv4 formatted ip address
      * @param $cidr String a IPv4 formatted CIDR block. Block is aligned during execution.
@@ -141,7 +138,8 @@ class CHelper_IpAddress {
         $ipinput = (ip2long($ipinput));
         $ip1 = (ip2long($cidr[0]));
         $ip2 = ($ip1 + pow(2, (32 - (int) $cidr[1])) - 1);
-        return (($ip1 <= $ipinput) && ($ipinput <= $ip2));
+
+        return ($ip1 <= $ipinput) && ($ipinput <= $ip2);
     }
 
     /**
@@ -153,7 +151,7 @@ class CHelper_IpAddress {
      *     CIDR::maxBlock("127.0.0.0");
      * Result:
      *     int(32)
-     *     int(8)
+     *     int(8).
      *
      * @param $ipinput string a IPv4 formatted ip address
      * @static
@@ -179,10 +177,10 @@ class CHelper_IpAddress {
      *       [4]=> string(13) "127.0.0.16/28"
      *       [5]=> string(13) "127.0.0.32/31"
      *       [6]=> string(13) "127.0.0.34/32"
-     *     }
+     *     }.
      *
      * @param string      $startIPinput a IPv4 formatted ip address
-     * @param string|null $endIPinput   a IPv4 formatted ip address
+     * @param null|string $endIPinput   a IPv4 formatted ip address
      *
      * @see http://null.pp.ru/src/php/Netmask.phps
      *
@@ -198,6 +196,7 @@ class CHelper_IpAddress {
             $listCIDRs[] = long2ip($start) . "/$size";
             $start += pow(2, (32 - $size));
         }
+
         return $listCIDRs;
     }
 
@@ -212,7 +211,7 @@ class CHelper_IpAddress {
      *     array(2) {
      *       "127.0.0.128",
      *       "127.0.0.255",
-     *     }
+     *     }.
      *
      * @param $cidr string CIDR block
      *
@@ -226,6 +225,7 @@ class CHelper_IpAddress {
         $cidr = explode('/', $cidr);
         $range[0] = long2ip((ip2long($cidr[0])) & ((-1 << (32 - (int) $cidr[1]))));
         $range[1] = long2ip((ip2long($cidr[0])) + pow(2, (32 - (int) $cidr[1])) - 1);
+
         return $range;
     }
 
@@ -239,7 +239,7 @@ class CHelper_IpAddress {
      *     array(2) {
      *       "127.0.0.1",
      *       "127.0.0.255",
-     *     }
+     *     }.
      *
      * @param $string
      *
@@ -249,6 +249,7 @@ class CHelper_IpAddress {
         if (!preg_match_all("/^((?:\d{1,3}\.?){4})\-((?:\d{1,3}\.?){4})$/", $string, $matches)) {
             return false;
         }
+
         return [
             $matches[1][0],
             $matches[2][0],
@@ -260,14 +261,17 @@ class CHelper_IpAddress {
         $isRange = false;
         if ($ip) {
             $ip = str_replace('*', '0', $ip);
+
             try {
                 $isIpAddress = inet_pton($ip) !== false;
             } catch (\Exception $e) {
             }
+
             try {
                 $isRange = static::cidrToRange($ip);
             } catch (\Exception $e) {
             }
+
             try {
                 if (!$isIpAddress && !$isRange) {
                     $isRange = static::twoIpsToRange($ip);
@@ -275,6 +279,7 @@ class CHelper_IpAddress {
             } catch (\Exception $e) {
             }
         }
+
         return $ip && ($isIpAddress || $isRange);
     }
 
@@ -288,6 +293,7 @@ class CHelper_IpAddress {
         $netWork = $ipLong & $ipMaskLong;
         $start = $netWork + 1; //去掉网络号 ,ignore network ID(eg: 192.168.1.0)
         $end = ($netWork | $inverseIpMaskLong) - 1; //去掉广播地址 ignore brocast IP(eg: 192.168.1.255)
+
         return [$start, $end];
     }
 
@@ -295,6 +301,7 @@ class CHelper_IpAddress {
         if (strpos($ip, '/') === false) {
             return false;
         }
+
         return static::cidrToRange($ip);
     }
 
@@ -305,6 +312,7 @@ class CHelper_IpAddress {
                     return true;
                 }
             }
+
             return false;
         }
         // Wildcarded range
@@ -318,11 +326,13 @@ class CHelper_IpAddress {
         if (count($twoIps = explode('-', $range)) == 2) {
             $ip1 = ip2long($twoIps[0]);
             $ip2 = ip2long($twoIps[1]);
+
             return ip2long($ip) >= $ip1 && ip2long($ip) <= $ip2;
         }
         if (count($twoIps = explode('-', $range)) == 2) {
             $ip1 = ip2long($twoIps[0]);
             $ip2 = ip2long($twoIps[1]);
+
             return ip2long($ip) >= $ip1 && ip2long($ip) <= $ip2;
         }
         // Masked range or fixed IP
@@ -346,6 +356,7 @@ class CHelper_IpAddress {
         $x = ip2long($ipv4_arr[1]);
         $mask = long2ip($x) == $ipv4_arr[1] ? $x : 0xffffffff << (32 - $ipv4_arr[1]);
         $ipv4_long = ip2long($ip);
+
         return ($ipv4_long & $mask) == ($network_long & $mask);
     }
 }
