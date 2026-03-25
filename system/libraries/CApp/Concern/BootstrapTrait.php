@@ -118,7 +118,6 @@ trait CApp_Concern_BootstrapTrait {
 
     public static function registerControl() {
         if (!static::$registerControlBooted) {
-            CFBenchmark::start('CApp.RegisterControl');
             $manager = CManager::instance();
             $manager->registerControls([
                 'text' => CElement_FormInput_Text::class,
@@ -164,7 +163,6 @@ trait CApp_Concern_BootstrapTrait {
                 'fileupload' => CElement_FormInput_MultipleImageAjax::class,
             ]);
 
-            CFBenchmark::stop('CApp.RegisterControl');
             static::$registerControlBooted = true;
         }
     }
