@@ -1,13 +1,11 @@
 <?php
 
-/**
- * @deprecated since 1.2
- */
-//@codingStandardsIgnoreStart
-class CFormInputSlider extends CFormInput {
-    protected $min_value;
+defined('SYSPATH') or die('No direct access allowed.');
 
-    protected $max_value;
+class CElement_FormInput_Slider extends CElement_FormInput {
+    protected $minValue;
+
+    protected $maxValue;
 
     protected $value;
 
@@ -17,17 +15,17 @@ class CFormInputSlider extends CFormInput {
 
     protected $tooltip;
 
-    protected $on_slide;
+    protected $onSlide;
 
-    protected $on_slide_start;
+    protected $onSlideStart;
 
-    protected $on_slide_stop;
+    protected $onSlideStop;
 
     public function __construct($id = '') {
         parent::__construct($id);
 
-        $this->min_value = 0;
-        $this->max_value = 10;
+        $this->minValue = 0;
+        $this->maxValue = 10;
         $this->value = 0;
         $this->step = 1;
         $this->orientation = 'horizontal';
@@ -35,7 +33,7 @@ class CFormInputSlider extends CFormInput {
     }
 
     public static function factory($id = '') {
-        return new CFormInputSlider($id);
+        return new CElement_FormInput_Slider($id);
     }
 
     public function html($indent = 0) {
@@ -51,6 +49,7 @@ class CFormInputSlider extends CFormInput {
                 . ' class="' . $classes . '" />');
 
         $html->appendln(parent::html($indent));
+
         return $html->text();
     }
 
@@ -59,52 +58,58 @@ class CFormInputSlider extends CFormInput {
 
         $js->append("jQuery('#" . $this->id . "').slider({");
         $js->append("   'range': true,");
-        $js->append("   'min': " . $this->min_value . ',');
-        $js->append("   'max': " . $this->max_value . ',');
+        $js->append("   'min': " . $this->minValue . ',');
+        $js->append("   'max': " . $this->maxValue . ',');
         $js->append("   'value': " . $this->value . ',');
         $js->append("   'step': " . $this->step . ',');
         $js->append("   'orientation': '" . $this->orientation . "',");
         $js->append("   'tooltip': '" . $this->tooltip . "',");
         $js->append('})');
 
-        if (strlen($this->on_slide) > 0) {
+        if (strlen($this->onSlide) > 0) {
             $js->append(".on('slide', function(e) {");
-            $js->append($this->on_slide);
+            $js->append($this->onSlide);
             $js->append('})');
         }
-        if (strlen($this->on_slide_stop) > 0) {
+        if (strlen($this->onSlideStop) > 0) {
             $js->append(".on('slideStop', function(e) {");
-            $js->append($this->on_slide_stop);
+            $js->append($this->onSlideStop);
             $js->append('})');
         }
         $js->append(';');
 
         $js->appendln(parent::js($indent));
+
         return $js->text();
     }
 
-    public function set_min_value($min_value) {
-        $this->min_value = $min_value;
+    public function setMinValue($minValue) {
+        $this->minValue = $minValue;
+
         return $this;
     }
 
-    public function set_max_value($max_value) {
-        $this->max_value = $max_value;
+    public function setMaxValue($maxValue) {
+        $this->maxValue = $maxValue;
+
         return $this;
     }
 
-    public function set_value($value) {
+    public function setValue($value) {
         $this->value = $value;
+
         return $this;
     }
 
-    public function set_tooltip($tooltip) {
+    public function setTooltip($tooltip) {
         $this->tooltip = $tooltip;
+
         return $this;
     }
 
-    public function set_step($step) {
+    public function setStep($step) {
         $this->step = $step;
+
         return $this;
     }
 }
