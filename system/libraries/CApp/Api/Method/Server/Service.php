@@ -4,12 +4,6 @@ defined('SYSPATH') or die('No direct access allowed.');
 
 use Symfony\Component\Process\Process;
 
-/**
- * @author Muhammad Harisuddin Thohir <haris@thohir.com>
- * @license Ittron Global Teknologi <ittron.co.id>
- *
- * @since Aug 31, 2021, 06:57:37 PM
- */
 class CApp_Api_Method_Server_Service extends CApp_Api_Method_Server {
     public function execute() {
         $errCode = 0;

@@ -2,12 +2,6 @@
 
 defined('SYSPATH') or die('No direct access allowed.');
 
-/**
- * @author Hery Kurniawan
- * @license Ittron Global Teknologi <ittron.co.id>
- *
- * @since Mar 28, 2019, 8:08:26 PM
- */
 class CApp_Api_Method_Server_GetAppList extends CApp_Api_Method_Server {
     public function execute() {
         $errCode = 0;

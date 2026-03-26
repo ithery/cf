@@ -3,14 +3,7 @@
 defined('SYSPATH') or die('No direct access allowed.');
 
 /**
- * @author Hery Kurniawan
- * @license Ittron Global Teknologi <ittron.co.id>
- *
- * @since Mar 17, 2019, 4:35:31 PM
- */
-
-/**
- * Protocol interface
+ * Protocol interface.
  */
 interface CDaemon_Worker_ProtocolInterface {
     /**

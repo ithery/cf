@@ -2,12 +2,6 @@
 
 defined('SYSPATH') or die('No direct access allowed.');
 
-/**
- * @author Hery Kurniawan
- * @license Ittron Global Teknologi <ittron.co.id>
- *
- * @since Mar 15, 2019, 12:12:16 PM
- */
 abstract class CDaemon_Worker_MediatorAbstract extends CDaemon_TaskAbstract {
     /**
      * The version is used in case formats change in the future.

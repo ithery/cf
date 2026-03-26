@@ -3,13 +3,6 @@
 defined('SYSPATH') or die('No direct access allowed.');
 
 /**
- * @author Hery Kurniawan
- * @license Ittron Global Teknologi <ittron.co.id>
- *
- * @since Jun 25, 2019, 9:22:47 PM
- */
-
-/**
  * Not a singleton; we could have multiple clients to multiple Odoo instances.
  */
 use PhpXmlRpc\Value;
@@ -453,7 +446,7 @@ class CVendor_Odoo_Client {
      * @param mixed  $limit
      * @param mixed  $order
      *
-     * @return collection
+     * @return CCollection
      *
      * FIXME: all external IDs must have the same "module" at the moment.
      * Will fix this later if needed and if I can find sufficient documentaion.

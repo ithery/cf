@@ -1,8 +1,5 @@
 <?php
 
-/**
- * @author Alvin <alvin@ittron.id>
- */
 class CVendor_RajaOngkir_Starter extends CVendor_RajaOngkir {
     public function __construct() {
         parent::__construct();

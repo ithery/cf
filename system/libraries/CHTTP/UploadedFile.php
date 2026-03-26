@@ -2,13 +2,6 @@
 
 defined('SYSPATH') or die('No direct access allowed.');
 
-/**
- * @author Hery Kurniawan
- *
- * @since Aug 11, 2019, 10:38:55 PM
- *
- * @license Ittron Global Teknologi <ittron.co.id>
- */
 use Symfony\Component\HttpFoundation\File\UploadedFile as SymfonyUploadedFile;
 
 class CHTTP_UploadedFile extends SymfonyUploadedFile {

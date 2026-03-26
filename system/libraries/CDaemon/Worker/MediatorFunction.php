@@ -2,12 +2,6 @@
 
 defined('SYSPATH') or die('No direct access allowed.');
 
-/**
- * @author Hery Kurniawan
- * @license Ittron Global Teknologi <ittron.co.id>
- *
- * @since Mar 16, 2019, 5:03:00 AM
- */
 final class CDaemon_Worker_MediatorFunction extends CDaemon_Worker_MediatorAbstract {
     /**
      * @var callable
@@ -33,16 +27,20 @@ final class CDaemon_Worker_MediatorFunction extends CDaemon_Worker_MediatorAbstr
         switch ($method) {
             case 'execute':
                 return $this->function;
+
                 break;
             case 'setup':
                 return function () {
                 };
+
                 break;
             case 'teardown':
                 $that = $this;
+
                 return function () use ($that) {
                     $that->function = null;
                 };
+
                 break;
             default:
                 throw new Exception("$method() is Not Callable.");

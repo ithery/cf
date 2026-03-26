@@ -2,12 +2,6 @@
 
 defined('SYSPATH') or die('No direct access allowed.');
 
-/**
- * @author Hery Kurniawan
- * @license Ittron Global Teknologi <ittron.co.id>
- *
- * @since Jun 14, 2018, 4:40:47 AM
- */
 abstract class CApp_Api_Method implements CApp_Api_MethodInterface {
     /**
      * @var CApp_Api

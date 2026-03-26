@@ -2,12 +2,6 @@
 
 defined('SYSPATH') or die('No direct access allowed.');
 
-/**
- * @author Hery Kurniawan
- * @license Ittron Global Teknologi <ittron.co.id>
- *
- * @since Jun 25, 2019, 10:10:42 PM
- */
 trait CVendor_Odoo_Trait_HasModelDataTrait {
     /**
      * Data structure as returned by the API and converted to
