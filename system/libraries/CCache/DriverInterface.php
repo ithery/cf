@@ -2,12 +2,6 @@
 
 defined('SYSPATH') or die('No direct access allowed.');
 
-/**
- * @author Hery Kurniawan
- * @license Ittron Global Teknologi <ittron.co.id>
- *
- * @since Feb 16, 2019, 1:07:23 PM
- */
 interface CCache_DriverInterface {
     /**
      * Retrieve an item from the cache by key.

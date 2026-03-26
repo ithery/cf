@@ -2,12 +2,6 @@
 
 defined('SYSPATH') or die('No direct access allowed.');
 
-/**
- * @author Hery Kurniawan <hery@itton.co.id>
- * @license Ittron Global Teknologi
- *
- * @since Nov 29, 2020
- */
 trait CComponent_Concern_ReceivesEventsTrait {
     protected $eventQueue = [];
 
@@ -52,11 +46,11 @@ trait CComponent_Concern_ReceivesEventsTrait {
 
     protected function getEventsAndHandlers() {
         return c::collect($this->getListeners())
-                        ->mapWithKeys(function ($value, $key) {
-                            $key = is_numeric($key) ? $value : $key;
+            ->mapWithKeys(function ($value, $key) {
+                $key = is_numeric($key) ? $value : $key;
 
-                            return [$key => $value];
-                        })->toArray();
+                return [$key => $value];
+            })->toArray();
     }
 
     public function getEventsBeingListenedFor() {

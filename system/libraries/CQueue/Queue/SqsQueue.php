@@ -2,12 +2,6 @@
 
 defined('SYSPATH') or die('No direct access allowed.');
 
-/**
- * @author Hery Kurniawan
- * @license Ittron Global Teknologi <ittron.co.id>
- *
- * @since Nov 5, 2019, 8:17:06 PM
- */
 use Aws\Sqs\SqsClient;
 
 class CQueue_Queue_SqsQueue extends CQueue_AbstractQueue {
@@ -31,6 +25,13 @@ class CQueue_Queue_SqsQueue extends CQueue_AbstractQueue {
      * @var string
      */
     protected $prefix;
+
+    /**
+     * The queue URL suffix.
+     *
+     * @var string
+     */
+    protected $suffix;
 
     /**
      * Create a new Amazon SQS queue instance.

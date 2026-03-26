@@ -2,12 +2,6 @@
 
 defined('SYSPATH') or die('No direct access allowed.');
 
-/**
- * @author Hery Kurniawan
- * @license Ittron Global Teknologi <ittron.co.id>
- *
- * @since Jun 23, 2019, 5:01:57 AM
- */
 class CCache_Driver_ApcDriver extends CCache_DriverTaggableAbstract {
     use CCache_Trait_RetrievesMultipleKeys;
 

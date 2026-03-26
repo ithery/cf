@@ -23,7 +23,7 @@ class CDatabase_Configuration {
      *
      * @return void
      */
-    public function setSQLLogger(SQLLogger $logger = null) {
+    public function setSQLLogger(CDatabase_Logger $logger = null) {
         $this->attributes['sqlLogger'] = $logger;
     }
 

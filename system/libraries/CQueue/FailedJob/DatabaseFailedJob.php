@@ -2,12 +2,6 @@
 
 defined('SYSPATH') or die('No direct access allowed.');
 
-/**
- * @author Hery Kurniawan
- * @license Ittron Global Teknologi <ittron.co.id>
- *
- * @since Nov 4, 2019, 5:14:15 PM
- */
 class CQueue_FailedJob_DatabaseFailedJob extends CQueue_AbstractFailedJob {
     /**
      * The current connection.

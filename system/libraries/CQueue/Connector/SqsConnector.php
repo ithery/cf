@@ -2,12 +2,6 @@
 
 defined('SYSPATH') or die('No direct access allowed.');
 
-/**
- * @author Hery Kurniawan
- * @license Ittron Global Teknologi <ittron.co.id>
- *
- * @since Nov 5, 2019, 8:03:39 PM
- */
 use Aws\Sqs\SqsClient;
 
 class CQueue_Connector_SqsConnector extends CQueue_AbstractConnector {
@@ -23,6 +17,7 @@ class CQueue_Connector_SqsConnector extends CQueue_AbstractConnector {
         if (!empty($config['key']) && !empty($config['secret'])) {
             $config['credentials'] = carr::only($config, ['key', 'secret', 'token']);
         }
+
         return new CQueue_Queue_SqsQueue(
             new SqsClient($config),
             $config['queue'],

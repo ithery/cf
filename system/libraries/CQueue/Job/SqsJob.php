@@ -2,12 +2,6 @@
 
 defined('SYSPATH') or die('No direct access allowed.');
 
-/**
- * @author Hery Kurniawan
- * @license Ittron Global Teknologi <ittron.co.id>
- *
- * @since Nov 5, 2019, 5:26:55 PM
- */
 use Aws\Sqs\SqsClient;
 
 class CQueue_Job_SqsJob extends CQueue_AbstractJob {

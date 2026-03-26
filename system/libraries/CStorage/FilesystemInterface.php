@@ -2,12 +2,6 @@
 
 defined('SYSPATH') or die('No direct access allowed.');
 
-/**
- * @author Hery Kurniawan
- * @license Ittron Global Teknologi <ittron.co.id>
- *
- * @since Aug 11, 2019, 3:52:37 AM
- */
 interface CStorage_FilesystemInterface {
     /**
      * The public visibility setting.
@@ -37,9 +31,9 @@ interface CStorage_FilesystemInterface {
      *
      * @param string $path
      *
-     * @return string
-     *
      * @throws \Illuminate\Contracts\Filesystem\FileNotFoundException
+     *
+     * @return string
      */
     public function get($path);
 
@@ -48,9 +42,9 @@ interface CStorage_FilesystemInterface {
      *
      * @param string $path
      *
-     * @return resource|null The path resource or null on failure.
-     *
      * @throws FileNotFoundException
+     *
+     * @return null|resource the path resource or null on failure
      */
     public function readStream($path);
 
@@ -72,10 +66,10 @@ interface CStorage_FilesystemInterface {
      * @param resource $resource
      * @param array    $options
      *
-     * @return bool
-     *
-     * @throws \InvalidArgumentException If $resource is not a file handle.
+     * @throws \InvalidArgumentException if $resource is not a file handle
      * @throws FileExistsException
+     *
+     * @return bool
      */
     public function writeStream($path, $resource, array $options = []);
 
@@ -168,7 +162,7 @@ interface CStorage_FilesystemInterface {
     /**
      * Get an array of all files in a directory.
      *
-     * @param string|null $directory
+     * @param null|string $directory
      * @param bool        $recursive
      *
      * @return array
@@ -178,7 +172,7 @@ interface CStorage_FilesystemInterface {
     /**
      * Get all of the files from the given directory (recursive).
      *
-     * @param string|null $directory
+     * @param null|string $directory
      *
      * @return array
      */
@@ -187,7 +181,7 @@ interface CStorage_FilesystemInterface {
     /**
      * Get all of the directories within a given directory.
      *
-     * @param string|null $directory
+     * @param null|string $directory
      * @param bool        $recursive
      *
      * @return array
@@ -197,7 +191,7 @@ interface CStorage_FilesystemInterface {
     /**
      * Get all (recursive) of the directories within a given directory.
      *
-     * @param string|null $directory
+     * @param null|string $directory
      *
      * @return array
      */

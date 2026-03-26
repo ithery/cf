@@ -2,12 +2,6 @@
 
 defined('SYSPATH') or die('No direct access allowed.');
 
-/**
- * @author Hery Kurniawan
- * @license Ittron Global Teknologi <ittron.co.id>
- *
- * @since Jun 23, 2019, 5:10:02 AM
- */
 class CCache_Driver_ApcDriver_ApcWrapper {
     /**
      * Indicates if APCu is supported.

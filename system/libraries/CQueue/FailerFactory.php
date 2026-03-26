@@ -2,12 +2,6 @@
 
 defined('SYSPATH') or die('No direct access allowed.');
 
-/**
- * @author Hery Kurniawan
- * @license Ittron Global Teknologi <ittron.co.id>
- *
- * @since Nov 5, 2019, 5:35:15 PM
- */
 use Aws\DynamoDb\DynamoDbClient;
 
 class CQueue_FailerFactory {
