@@ -2,12 +2,6 @@
 
 defined('SYSPATH') or die('No direct access allowed.');
 
-/**
- * @author Hery Kurniawan
- * @license Ittron Global Teknologi <ittron.co.id>
- *
- * @since Aug 30, 2019, 2:57:57 AM
- */
 use CImage_Chart_Constant as Constant;
 
 class CImage_Chart_BaseDraw {
@@ -827,7 +821,7 @@ class CImage_Chart_BaseDraw {
                 }
             }
         } else {
-            $width = ($this->graphAreaX2 - $this->graphAreaX1) - (carr::get($data, 'axis.'.$axisID.'.margin', 0) * 2);
+            $width = ($this->graphAreaX2 - $this->graphAreaX1) - (carr::get($data, 'axis.' . $axisID . '.margin', 0) * 2);
             $scaleWidth = $data['axis'][$axisID]['scaleMax'] - $data['axis'][$axisID]['scaleMin'];
             $step = $width / $scaleWidth;
             if ($returnOnly0Height) {
