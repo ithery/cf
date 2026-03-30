@@ -2,12 +2,6 @@
 
 defined('SYSPATH') or die('No direct access allowed.');
 
-/**
- * @author Hery Kurniawan
- * @license Ittron Global Teknologi <ittron.co.id>
- *
- * @since May 1, 2019, 11:30:32 PM
- */
 class CModel_HasResource_FileAdder_FileAdderFactory {
     /**
      * @param CModel                                                     $subject

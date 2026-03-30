@@ -2,12 +2,6 @@
 
 defined('SYSPATH') or die('No direct access allowed.');
 
-/**
- * @author Hery Kurniawan
- * @license Ittron Global Teknologi <ittron.co.id>
- *
- * @since Jun 23, 2019, 8:56:20 PM
- */
 trait CModel_Tracker_TrackerTrait {
     public function cache() {
         return new CTracker_Cache();
@@ -25,6 +19,7 @@ trait CModel_Tracker_TrackerTrait {
 
     public function scopePeriod($query, CPeriod $minutes, $alias = '') {
         $alias = $alias ? "$alias." : '';
+
         return $query
             ->where($alias . 'updated', '>=', (string) ($minutes->startDate ? $minutes->startDate : 1))
             ->where($alias . 'updated', '<=', (string) ($minutes->endDate ? $minutes->endDate : 1));

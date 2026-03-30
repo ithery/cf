@@ -2,12 +2,6 @@
 
 defined('SYSPATH') or die('No direct access allowed.');
 
-/**
- * @author Hery Kurniawan
- * @license Ittron Global Teknologi <ittron.co.id>
- *
- * @since Jun 24, 2018, 2:22:24 PM
- */
 class CModel_Nested_Relation_Descendants extends CModel_Nested_Relation {
     /**
      * Set the base constraints on the relation query.

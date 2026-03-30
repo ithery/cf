@@ -2,12 +2,6 @@
 
 defined('SYSPATH') or die('No direct access allowed.');
 
-/**
- * @author Hery Kurniawan
- * @license Ittron Global Teknologi <ittron.co.id>
- *
- * @since Aug 11, 2019, 5:32:56 AM
- */
 use Symfony\Component\HttpFoundation\File\UploadedFile;
 
 class CManager_File_Connector_FileManager_FM_Item {

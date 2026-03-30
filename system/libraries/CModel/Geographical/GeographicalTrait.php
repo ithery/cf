@@ -3,11 +3,6 @@
 defined('SYSPATH') or die('No direct access allowed.');
 
 /**
- * @author Hery Kurniawan
- * @license Ittron Global Teknologi <ittron.co.id>
- *
- * @since May 24, 2019, 11:31:50 AM
- *
  * @method static CModel_Query<static> distance($latitude, $longitude)
  */
 trait CModel_Geographical_GeographicalTrait {

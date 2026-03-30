@@ -52,7 +52,7 @@ class CImage_File {
             throw CImage_Exception_InvalidImageDriverException::driver($imageDriver);
         }
         $this->imageDriver = $imageDriver;
-        \Intervention\Image\Facades\Image::configure([
+        CImage::interventionImageManager()->configure([
             'driver' => $this->imageDriver,
         ]);
 
@@ -85,11 +85,11 @@ class CImage_File {
     }
 
     public function getWidth() {
-        return \Intervention\Image\Facades\Image::make($this->pathToImage)->width();
+        return CImage::interventionImageManager()->make($this->pathToImage)->width();
     }
 
     public function getHeight() {
-        return \Intervention\Image\Facades\Image::make($this->pathToImage)->height();
+        return CImage::interventionImageManager()->make($this->pathToImage)->height();
     }
 
     public function getManipulationSequence() {

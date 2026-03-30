@@ -2,17 +2,11 @@
 
 defined('SYSPATH') or die('No direct access allowed.');
 
-/**
- * @author Hery Kurniawan
- * @license Ittron Global Teknologi <ittron.co.id>
- *
- * @since Nov 6, 2019, 8:14:38 PM
- */
 interface CModel_Queue_QueueableCollectionInterface {
     /**
      * Get the type of the entities being queued.
      *
-     * @return string|null
+     * @return null|string
      */
     public function getQueueableClass();
 
@@ -33,7 +27,7 @@ interface CModel_Queue_QueueableCollectionInterface {
     /**
      * Get the connection of the entities being queued.
      *
-     * @return string|null
+     * @return null|string
      */
     public function getQueueableConnection();
 }

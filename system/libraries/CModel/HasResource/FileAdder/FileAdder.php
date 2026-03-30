@@ -2,12 +2,6 @@
 
 defined('SYSPATH') or die('No direct access allowed.');
 
-/**
- * @author Hery Kurniawan
- * @license Ittron Global Teknologi <ittron.co.id>
- *
- * @since May 1, 2019, 11:15:13 PM
- */
 use CResources_File as PendingFile;
 use CResources_Helpers_File as File;
 use Symfony\Component\HttpFoundation\File\UploadedFile;

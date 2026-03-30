@@ -2,12 +2,6 @@
 
 defined('SYSPATH') or die('No direct access allowed.');
 
-/**
- * @author Hery Kurniawan
- * @license Ittron Global Teknologi <ittron.co.id>
- *
- * @since Jun 23, 2018, 5:06:51 AM
- */
 class CModel_Nested_Collection extends CModel_Collection {
     /**
      * Fill `parent` and `children` relationships for every node in the collection.

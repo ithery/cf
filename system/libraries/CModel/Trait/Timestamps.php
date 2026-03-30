@@ -2,12 +2,6 @@
 
 defined('SYSPATH') or die('No direct access allowed.');
 
-/**
- * @author Hery Kurniawan
- * @license Ittron Global Teknologi <ittron.co.id>
- *
- * @since Dec 25, 2017, 10:08:50 PM
- */
 trait CModel_Trait_Timestamps {
     /**
      * Indicates if the model should be timestamped.

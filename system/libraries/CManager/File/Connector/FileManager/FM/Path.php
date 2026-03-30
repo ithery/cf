@@ -2,13 +2,6 @@
 
 defined('SYSPATH') or die('No direct access allowed.');
 
-/**
- * @author Hery Kurniawan
- *
- * @since Aug 11, 2019, 3:20:19 AM
- *
- * @license Ittron Global Teknologi <ittron.co.id>
- */
 use Intervention\Image\ImageManager;
 // import the Intervention Image Manager Class
 use Intervention\Image\Facades\Image;

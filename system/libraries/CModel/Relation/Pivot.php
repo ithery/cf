@@ -2,12 +2,6 @@
 
 defined('SYSPATH') or die('No direct access allowed.');
 
-/**
- * @author Hery Kurniawan
- * @license Ittron Global Teknologi <ittron.co.id>
- *
- * @since Jul 28, 2019, 3:10:38 AM
- */
 class CModel_Relation_Pivot extends CModel {
     use CModel_Relation_Trait_AsPivot;
 

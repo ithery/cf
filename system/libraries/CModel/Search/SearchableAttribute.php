@@ -2,12 +2,6 @@
 
 defined('SYSPATH') or die('No direct access allowed.');
 
-/**
- * @author Hery Kurniawan
- * @license Ittron Global Teknologi <ittron.co.id>
- *
- * @since Apr 28, 2019, 9:48:55 PM
- */
 class CModel_Search_SearchableAttribute {
     /**
      * @var string

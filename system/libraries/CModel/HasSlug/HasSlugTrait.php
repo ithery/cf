@@ -2,12 +2,6 @@
 
 defined('SYSPATH') or die('No direct access allowed.');
 
-/**
- * @author Hery Kurniawan
- * @license Ittron Global Teknologi <ittron.co.id>
- *
- * @since Jun 30, 2019, 3:15:06 PM
- */
 use CModel_HasSlug_InvalidOptionException as InvalidOptionException;
 
 trait CModel_HasSlug_HasSlugTrait {
@@ -75,24 +69,28 @@ trait CModel_HasSlug_HasSlugTrait {
         if ($this->hasCustomSlugBeenUsed() && !empty($this->$slugField)) {
             return $this->$slugField;
         }
+
         return cstr::slug($this->getSlugSourceString(), $this->slugOptions->slugSeparator, $this->slugOptions->slugLanguage);
     }
 
     protected function hasCustomSlugBeenUsed() {
         $slugField = $this->slugOptions->slugField;
+
         return $this->getOriginal($slugField) != $this->$slugField;
     }
 
     protected function getSlugSourceString() {
         if (is_callable($this->slugOptions->generateSlugFrom)) {
             $slugSourceString = call_user_func($this->slugOptions->generateSlugFrom, $this);
+
             return substr($slugSourceString, 0, $this->slugOptions->maximumLength);
         }
         $slugSourceString = c::collect($this->slugOptions->generateSlugFrom)
-                ->map(function ($fieldName) {
-                    return carr::get($this, $fieldName, '');
-                })
-                ->implode($this->slugOptions->slugSeparator);
+            ->map(function ($fieldName) {
+                return carr::get($this, $fieldName, '');
+            })
+            ->implode($this->slugOptions->slugSeparator);
+
         return substr($slugSourceString, 0, $this->slugOptions->maximumLength);
     }
 
@@ -102,6 +100,7 @@ trait CModel_HasSlug_HasSlugTrait {
         while ($this->otherRecordExistsWithSlug($slug) || $slug === '') {
             $slug = $originalSlug . $this->slugOptions->slugSeparator . $i++;
         }
+
         return $slug;
     }
 
@@ -111,11 +110,12 @@ trait CModel_HasSlug_HasSlugTrait {
             $key = $key ? $key : '0';
         }
         $query = static::where($this->slugOptions->slugField, $slug)
-                ->where($this->getKeyName(), '!=', $key)
-                ->withoutGlobalScopes();
+            ->where($this->getKeyName(), '!=', $key)
+            ->withoutGlobalScopes();
         if ($this->usesSoftDelete()) {
             $query->withTrashed();
         }
+
         return $query->exists();
     }
 
@@ -123,6 +123,7 @@ trait CModel_HasSlug_HasSlugTrait {
         if (in_array('CModel_Validating_ValidatingTrait', class_uses(static::class))) {
             return true;
         }
+
         return false;
     }
 

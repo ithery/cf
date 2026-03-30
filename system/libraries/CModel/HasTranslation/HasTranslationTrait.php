@@ -2,12 +2,6 @@
 
 defined('SYSPATH') or die('No direct access allowed.');
 
-/**
- * @author Hery Kurniawan
- * @license Ittron Global Teknologi <ittron.co.id>
- *
- * @since Jun 30, 2019, 3:44:30 PM
- */
 trait CModel_HasTranslation_HasTranslationTrait {
     /**
      * @param string $key
@@ -18,6 +12,7 @@ trait CModel_HasTranslation_HasTranslationTrait {
         if (!$this->isTranslatableAttribute($key)) {
             return parent::getAttributeValue($key);
         }
+
         return $this->getTranslation($key, $this->getLocale());
     }
 
@@ -42,6 +37,7 @@ trait CModel_HasTranslation_HasTranslationTrait {
         if ($this->hasGetMutator($key)) {
             return $this->mutateAttribute($key, $translation);
         }
+
         return $translation;
     }
 
@@ -57,12 +53,15 @@ trait CModel_HasTranslation_HasTranslationTrait {
         if ($key !== null) {
             $this->guardAgainstNonTranslatableAttribute($key);
             $attributes = $this->getAttributes();
+
             return array_filter(json_decode((isset($attributes[$key]) ? $attributes[$key] : '') ?: '{}', true) ?: [], function ($value) {
                 return $value !== null && $value !== '';
             });
         }
+
         return array_reduce($this->getTranslatableAttributes(), function ($result, $item) {
             $result[$item] = $this->getTranslations($item);
+
             return $result;
         });
     }
@@ -79,6 +78,7 @@ trait CModel_HasTranslation_HasTranslationTrait {
         $translations[$locale] = $value;
         $this->attributes[$key] = $this->asJson($translations);
         CEvent::dispatch(new CModel_HasTranslation_Event_TranslationHasBeenSet($this, $key, $locale, $oldValue, $value));
+
         return $this;
     }
 
@@ -87,6 +87,7 @@ trait CModel_HasTranslation_HasTranslationTrait {
         foreach ($translations as $locale => $translation) {
             $this->setTranslation($key, $locale, $translation);
         }
+
         return $this;
     }
 
@@ -94,6 +95,7 @@ trait CModel_HasTranslation_HasTranslationTrait {
         $translations = $this->getTranslations($key);
         unset($translations[$locale]);
         $this->setAttribute($key, $translations);
+
         return $this;
     }
 
@@ -101,6 +103,7 @@ trait CModel_HasTranslation_HasTranslationTrait {
         c::collect($this->getTranslatableAttributes())->each(function ($attribute) use ($locale) {
             $this->forgetTranslation($attribute, $locale);
         });
+
         return $this;
     }
 
@@ -114,6 +117,7 @@ trait CModel_HasTranslation_HasTranslationTrait {
 
     public function hasTranslation($key, $locale = null) {
         $locale = $locale ?: $this->getLocale();
+
         return isset($this->getTranslations($key)[$locale]);
     }
 
@@ -133,6 +137,7 @@ trait CModel_HasTranslation_HasTranslationTrait {
         if (!is_null($fallbackLocale = CF::config('app.fallback_locale'))) {
             return $fallbackLocale;
         }
+
         return $locale;
     }
 
@@ -146,10 +151,10 @@ trait CModel_HasTranslation_HasTranslationTrait {
 
     public function getTranslationsAttribute() {
         return c::collect($this->getTranslatableAttributes())
-                        ->mapWithKeys(function ($key) {
+            ->mapWithKeys(function ($key) {
                             return [$key => $this->getTranslations($key)];
                         })
-                        ->toArray();
+            ->toArray();
     }
 
     public function getCasts() {
@@ -168,6 +173,7 @@ trait CModel_HasTranslation_HasTranslationTrait {
         $values = array_map(function ($attribute) {
             return $this->getTranslation($attribute, CF::config('app.locale')) ?: null;
         }, $keys = $this->getTranslatableAttributes());
+
         return array_replace(parent::attributesToArray(), array_combine($keys, $values));
     }
 

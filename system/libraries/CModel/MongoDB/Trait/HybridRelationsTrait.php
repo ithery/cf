@@ -2,12 +2,6 @@
 
 defined('SYSPATH') or die('No direct access allowed.');
 
-/**
- * @author Hery Kurniawan
- * @license Ittron Global Teknologi <ittron.co.id>
- *
- * @since Oct 21, 2019, 9:21:53 PM
- */
 trait CModel_MongoDB_Trait_HybridRelationsTrait {
     /**
      * Define a one-to-one relationship.

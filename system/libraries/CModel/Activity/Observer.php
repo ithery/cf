@@ -2,12 +2,6 @@
 
 defined('SYSPATH') or die('No direct access allowed.');
 
-/**
- * @author Hery Kurniawan
- * @license Ittron Global Teknologi <ittron.co.id>
- *
- * @since Mar 15, 2019, 7:15:30 PM
- */
 class CModel_Activity_Observer {
     public function created(CModel $model) {
         if (CModel_Activity::instance()->isStarted()) {

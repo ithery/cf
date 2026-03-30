@@ -2,12 +2,6 @@
 
 defined('SYSPATH') or die('No direct access allowed.');
 
-/**
- * @author Hery Kurniawan
- * @license Ittron Global Teknologi <ittron.co.id>
- *
- * @since Jun 23, 2018, 5:17:17 AM
- */
 use Carbon\Carbon;
 
 class CModel_Nested_Query extends CModel_Query {

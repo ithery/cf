@@ -3,9 +3,6 @@
 defined('SYSPATH') or die('No direct access allowed.');
 
 /**
- * @author Hery Kurniawan
- * @license Ittron Global Teknologi <ittron.co.id>
- *
  * @see CModel
  *
  * @method static \CModel_Query<static>|static withTrashed(bool $withTrashed = true)

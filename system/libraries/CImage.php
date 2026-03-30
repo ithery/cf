@@ -3,6 +3,8 @@
 defined('SYSPATH') or die('No direct access allowed.');
 
 class CImage {
+    protected static $interventionImageManager;
+
     /**
      * Create CImage_Avatar Object.
      *
@@ -31,5 +33,14 @@ class CImage {
      */
     public static function chart($width = 500, $height = 200) {
         return new CImage_Chart_Builder($width, $height);
+    }
+
+    public static function interventionImageManager() {
+        if (self::$interventionImageManager == null) {
+            $config = CF::config('image');
+            self::$interventionImageManager = new \Intervention\Image\ImageManager($config);
+        }
+
+        return self::$interventionImageManager;
     }
 }

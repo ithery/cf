@@ -2,12 +2,6 @@
 
 defined('SYSPATH') or die('No direct access allowed.');
 
-/**
- * @author Hery Kurniawan
- * @license Ittron Global Teknologi <ittron.co.id>
- *
- * @since Jun 30, 2019, 3:33:01 PM
- */
 class CModel_Validating_ValidationException extends CValidation_Exception implements CBase_MessageProviderInterface {
     /**
      * The model with validation errors.

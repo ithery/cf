@@ -2,12 +2,6 @@
 
 defined('SYSPATH') or die('No direct access allowed.');
 
-/**
- * @author Hery Kurniawan
- * @license Ittron Global Teknologi <ittron.co.id>
- *
- * @since Apr 28, 2019, 9:37:29 PM
- */
 class CModel_Search_SearchResult {
     /**
      * @var CModel_SearchableInterface
@@ -37,6 +31,7 @@ class CModel_Search_SearchResult {
 
     public function setType($type) {
         $this->type = $type;
+
         return $this;
     }
 }

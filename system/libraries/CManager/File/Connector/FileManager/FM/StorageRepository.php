@@ -2,13 +2,6 @@
 
 defined('SYSPATH') or die('No direct access allowed.');
 
-/**
- * @author Hery Kurniawan
- *
- * @since Aug 11, 2019, 3:25:46 AM
- *
- * @license Ittron Global Teknologi <ittron.co.id>
- */
 use League\Flysystem\Cached\CachedAdapter;
 
 class CManager_File_Connector_FileManager_FM_StorageRepository {

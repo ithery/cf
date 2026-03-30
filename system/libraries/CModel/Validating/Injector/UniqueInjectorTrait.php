@@ -2,12 +2,6 @@
 
 defined('SYSPATH') or die('No direct access allowed.');
 
-/**
- * @author Hery Kurniawan
- * @license Ittron Global Teknologi <ittron.co.id>
- *
- * @since Jun 30, 2019, 3:26:15 PM
- */
 trait CModel_Validating_Injector_UniqueInjectorTrait {
     /**
      * Prepare a unique rule, adding the table name, column and model identifier
@@ -50,6 +44,7 @@ trait CModel_Validating_Injector_UniqueInjectorTrait {
                 }
             }
         }
+
         return 'unique:' . implode(',', $parameters);
     }
 }

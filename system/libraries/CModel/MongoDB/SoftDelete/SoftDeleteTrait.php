@@ -2,12 +2,6 @@
 
 defined('SYSPATH') or die('No direct access allowed.');
 
-/**
- * @author Hery Kurniawan
- * @license Ittron Global Teknologi <ittron.co.id>
- *
- * @since Nov 7, 2019, 11:13:39 PM
- */
 trait CModel_MongoDB_SoftDelete_SoftDeleteTrait {
     use CModel_SoftDelete_SoftDeleteTrait;
 
@@ -26,7 +20,7 @@ trait CModel_MongoDB_SoftDelete_SoftDeleteTrait {
      * @return void
      */
     public static function bootSoftDeleteTrait() {
-        static::addGlobalScope(new CModel_MongoDB_SoftDelete_Scope);
+        static::addGlobalScope(new CModel_MongoDB_SoftDelete_Scope());
     }
 
     /**
@@ -55,7 +49,7 @@ trait CModel_MongoDB_SoftDelete_SoftDeleteTrait {
     /**
      * Restore a soft-deleted model instance.
      *
-     * @return bool|null
+     * @return null|bool
      */
     public function restore() {
         // If the restoring event does not return false, we will proceed with this

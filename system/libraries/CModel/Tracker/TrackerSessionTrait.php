@@ -2,12 +2,6 @@
 
 defined('SYSPATH') or die('No direct access allowed.');
 
-/**
- * @author Hery Kurniawan
- * @license Ittron Global Teknologi <ittron.co.id>
- *
- * @since Jun 23, 2019, 9:01:15 PM
- */
 trait CModel_Tracker_TrackerSessionTrait {
     public function user() {
         return $this->belongsTo('CApp_Model_Users');
@@ -59,6 +53,7 @@ trait CModel_Tracker_TrackerSessionTrait {
         if ($result) {
             return $query->get();
         }
+
         return $query;
     }
 
@@ -76,6 +71,7 @@ trait CModel_Tracker_TrackerSessionTrait {
         if ($result) {
             return $query->get();
         }
+
         return $query;
     }
 }
