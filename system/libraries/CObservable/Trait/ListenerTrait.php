@@ -2,12 +2,6 @@
 
 defined('SYSPATH') or die('No direct access allowed.');
 
-/**
- * @author Hery Kurniawan
- * @license Ittron Global Teknologi <ittron.co.id>
- *
- * @since Apr 20, 2019, 11:02:05 AM
- */
 trait CObservable_Trait_ListenerTrait {
     /**
      * @var CObservable_Listener[]
@@ -31,6 +25,7 @@ trait CObservable_Trait_ListenerTrait {
             }
             $this->listeners[$event] = $listener;
         }
+
         return $this->listeners[$event];
     }
 
@@ -40,6 +35,7 @@ trait CObservable_Trait_ListenerTrait {
                 return true;
             }
         }
+
         return false;
     }
 
@@ -50,6 +46,7 @@ trait CObservable_Trait_ListenerTrait {
                 $return[] = $listener;
             }
         }
+
         return $return;
     }
 
@@ -60,6 +57,7 @@ trait CObservable_Trait_ListenerTrait {
         if (!isset($this->listeners['ready'])) {
             $this->listeners['ready'] = new CObservable_Listener_ReadyListener($this->id);
         }
+
         return $this->listeners['ready'];
     }
 
@@ -70,6 +68,7 @@ trait CObservable_Trait_ListenerTrait {
         if (!isset($this->listeners['click'])) {
             $this->listeners['click'] = new CObservable_Listener_ClickListener($this->id);
         }
+
         return $this->listeners['click'];
     }
 
@@ -80,6 +79,7 @@ trait CObservable_Trait_ListenerTrait {
         if (!isset($this->listeners['change'])) {
             $this->listeners['change'] = new CObservable_Listener_ChangeListener($this->id);
         }
+
         return $this->listeners['change'];
     }
 
@@ -90,6 +90,7 @@ trait CObservable_Trait_ListenerTrait {
         if (!isset($this->listeners['mouseUp'])) {
             $this->listeners['mouseUp'] = new CObservable_Listener_MouseUpListener($this->id);
         }
+
         return $this->listeners['mouseUp'];
     }
 
@@ -100,6 +101,7 @@ trait CObservable_Trait_ListenerTrait {
         if (!isset($this->listeners['mouseDown'])) {
             $this->listeners['mouseDown'] = new CObservable_Listener_ChangeListener($this->id);
         }
+
         return $this->listeners['mouseDown'];
     }
 }

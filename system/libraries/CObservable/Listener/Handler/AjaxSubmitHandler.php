@@ -2,12 +2,6 @@
 
 defined('SYSPATH') or die('No direct access allowed.');
 
-/**
- * @author Hery Kurniawan
- * @license Ittron Global Teknologi <ittron.co.id>
- *
- * @since Apr 20, 2019, 3:58:12 PM
- */
 class CObservable_Listener_Handler_AjaxSubmitHandler extends CObservable_Listener_Handler {
     use CObservable_Listener_Handler_Trait_AjaxHandlerTrait,
         CObservable_Listener_Handler_Trait_TargetHandlerTrait;
@@ -32,6 +26,7 @@ class CObservable_Listener_Handler_AjaxSubmitHandler extends CObservable_Listene
         $js .= '
             cresenity.ajaxSubmit(' . $optionsJson . ');;
          ';
+
         return $js;
     }
 }

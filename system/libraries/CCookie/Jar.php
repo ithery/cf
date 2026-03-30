@@ -2,12 +2,6 @@
 
 defined('SYSPATH') or die('No direct access allowed.');
 
-/**
- * @author Hery Kurniawan
- * @license Ittron Global Teknologi <ittron.co.id>
- *
- * @since Jun 23, 2019, 3:35:34 PM
- */
 use Symfony\Component\HttpFoundation\Cookie;
 
 class CCookie_Jar implements CCookie_JarQueueInterface {
@@ -59,7 +53,7 @@ class CCookie_Jar implements CCookie_JarQueueInterface {
      * @param bool        $secure
      * @param bool        $httpOnly
      * @param bool        $raw
-     * @param string|null $sameSite
+     * @param null|string $sameSite
      *
      * @return \Symfony\Component\HttpFoundation\Cookie
      */
@@ -81,7 +75,7 @@ class CCookie_Jar implements CCookie_JarQueueInterface {
      * @param bool        $secure
      * @param bool        $httpOnly
      * @param bool        $raw
-     * @param string|null $sameSite
+     * @param null|string $sameSite
      *
      * @return \Symfony\Component\HttpFoundation\Cookie
      */

@@ -2,12 +2,6 @@
 
 defined('SYSPATH') or die('No direct access allowed.');
 
-/**
- * @author Hery Kurniawan
- * @license Ittron Global Teknologi <ittron.co.id>
- *
- * @since Sep 2, 2018, 5:12:31 PM
- */
 trait CObservable_Trait_EventsTrait {
     public function onClick(Closure $event = null, $options = []) {
         /** @var CObservable $this */

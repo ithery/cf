@@ -2,12 +2,6 @@
 
 defined('SYSPATH') or die('No direct access allowed.');
 
-/**
- * @author Hery Kurniawan
- * @license Ittron Global Teknologi <ittron.co.id>
- *
- * @since Sep 3, 2018, 1:15:13 AM
- */
 class CObservable_Javascript_Native {
     /**
      * @var CObservable_Javascript

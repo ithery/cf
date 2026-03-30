@@ -2,12 +2,6 @@
 
 defined('SYSPATH') or die('No direct access allowed.');
 
-/**
- * @author Hery Kurniawan
- * @license Ittron Global Teknologi <ittron.co.id>
- *
- * @since Apr 20, 2019, 3:27:04 PM
- */
 class CObservable_Listener_Handler_EmitHandler extends CObservable_Listener_Handler {
     protected $method;
 
@@ -20,7 +14,7 @@ class CObservable_Listener_Handler_EmitHandler extends CObservable_Listener_Hand
     }
 
     /**
-     * Set Method
+     * Set Method.
      *
      * @param string $method
      *
@@ -33,7 +27,7 @@ class CObservable_Listener_Handler_EmitHandler extends CObservable_Listener_Hand
     }
 
     /**
-     * Add Emit Parameter
+     * Add Emit Parameter.
      *
      * @param mixed $param
      *
@@ -44,7 +38,7 @@ class CObservable_Listener_Handler_EmitHandler extends CObservable_Listener_Hand
     }
 
     /**
-     * Set Emit Parameters
+     * Set Emit Parameters.
      *
      * @param array $params
      *
@@ -55,7 +49,7 @@ class CObservable_Listener_Handler_EmitHandler extends CObservable_Listener_Hand
     }
 
     /**
-     * Apply Param Array
+     * Apply Param Array.
      *
      * @param array $array
      *
@@ -70,6 +64,7 @@ class CObservable_Listener_Handler_EmitHandler extends CObservable_Listener_Hand
                 $array[$key] = CBase::createStringParamable($value, $this->params)->get();
             }
         }
+
         return $array;
     }
 
@@ -92,7 +87,6 @@ class CObservable_Listener_Handler_EmitHandler extends CObservable_Listener_Hand
             }
             $js .= ');';
         }
-
 
         return $js;
     }

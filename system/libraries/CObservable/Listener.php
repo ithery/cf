@@ -2,12 +2,6 @@
 
 defined('SYSPATH') or die('No direct access allowed.');
 
-/**
- * @author Hery Kurniawan
- * @license Ittron Global Teknologi <ittron.co.id>
- *
- * @since Sep 1, 2018, 3:43:55 PM
- */
 class CObservable_Listener extends CObservable_ListenerAbstract {
     use CTrait_Compat_Listener;
 

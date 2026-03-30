@@ -3,11 +3,7 @@
 defined('SYSPATH') or die('No direct access allowed.');
 
 /**
- * @author Hery Kurniawan
- * @license Ittron Global Teknologi <ittron.co.id>
- *
  * @see CJavascript_Statement_JQuery
- * @since Sep 2, 2018, 6:38:10 PM
  */
 trait CObservable_Javascript_JQuery_Trait_ActionsTrait {
     /**

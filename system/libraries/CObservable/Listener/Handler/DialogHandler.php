@@ -2,12 +2,6 @@
 
 defined('SYSPATH') or die('No direct access allowed.');
 
-/**
- * @author Hery Kurniawan
- * @license Ittron Global Teknologi <ittron.co.id>
- *
- * @since Apr 20, 2019, 3:09:11 PM
- */
 class CObservable_Listener_Handler_DialogHandler extends CObservable_Listener_Handler {
     use CTrait_Compat_Handler_Driver_Dialog,
         CObservable_Listener_Handler_Trait_AjaxHandlerTrait,

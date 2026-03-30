@@ -2,12 +2,6 @@
 
 defined('SYSPATH') or die('No direct access allowed.');
 
-/**
- * @author Hery Kurniawan
- * @license Ittron Global Teknologi <ittron.co.id>
- *
- * @since Apr 20, 2019, 3:44:27 PM
- */
 class CObservable_Listener_Handler_RemoveHandler extends CObservable_Listener_Handler {
     use CTrait_Compat_Handler_Driver_Remove,
         CObservable_Listener_Handler_Trait_TargetHandlerTrait;
@@ -23,6 +17,7 @@ class CObservable_Listener_Handler_RemoveHandler extends CObservable_Listener_Ha
 
     public function setParent($parent) {
         $this->parent = $parent;
+
         return $this;
     }
 

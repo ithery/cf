@@ -2,12 +2,6 @@
 
 defined('SYSPATH') or die('No direct access allowed.');
 
-/**
- * @author Hery Kurniawan
- * @license Ittron Global Teknologi <ittron.co.id>
- *
- * @since Apr 20, 2019, 3:44:27 PM
- */
 class CObservable_Listener_Handler_ToggleActiveHandler extends CObservable_Listener_Handler {
     use CObservable_Listener_Handler_Trait_TargetHandlerTrait;
     use CObservable_Listener_Handler_Trait_SelectorHandlerTrait;
