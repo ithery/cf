@@ -3,10 +3,7 @@
 defined('SYSPATH') or die('No direct access allowed.');
 
 /**
- * @author Hery Kurniawan
- * @license Ittron Global Teknologi <ittron.co.id>
- *
- * @since Jun 3, 2018, 4:28:05 PM
+ * @deprecated since 1.3, please use function registerModules, registerModule, requireJs, allModules and isRegisteredModule instead
  */
 //@codingStandardsIgnoreStart
 trait CTrait_Compat_ClientModules {

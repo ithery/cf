@@ -2,12 +2,6 @@
 
 defined('SYSPATH') or die('No direct access allowed.');
 
-/**
- * @author Hery Kurniawan
- * @license Ittron Global Teknologi <ittron.co.id>
- *
- * @since May 29, 2018, 10:57:46 PM
- */
 //@codingStandardsIgnoreStart
 trait CTrait_Compat_Curl {
     /**
@@ -39,7 +33,7 @@ trait CTrait_Compat_Curl {
      *
      * @param [type] $key
      * @param [type] $value
-     * @param bool   $overwrite
+     * @param bool $overwrite
      *
      * @return void
      */
@@ -48,7 +42,7 @@ trait CTrait_Compat_Curl {
     }
 
     /**
-     * Get value from key
+     * Get value from key.
      *
      * @param string $key
      *
@@ -93,7 +87,7 @@ trait CTrait_Compat_Curl {
     }
 
     /**
-     * Parse Header
+     * Parse Header.
      *
      * @param string $header_str
      *
