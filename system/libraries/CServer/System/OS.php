@@ -2,12 +2,6 @@
 
 defined('SYSPATH') or die('No direct access allowed.');
 
-/**
- * @author Hery Kurniawan
- * @license Ittron Global Teknologi <ittron.co.id>
- *
- * @since Jun 15, 2018, 1:48:09 PM
- */
 abstract class CServer_System_OS implements CServer_System_OSInterface {
     /**
      * @var CServer_System_Info

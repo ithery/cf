@@ -2,12 +2,6 @@
 
 defined('SYSPATH') or die('No direct access allowed.');
 
-/**
- * @author Hery Kurniawan
- * @license Ittron Global Teknologi <ittron.co.id>
- *
- * @since May 2, 2019, 2:21:40 AM
- */
 use CResources_Helpers_File as ResourceLibraryFileHelper;
 
 class CResources_FileManipulator {

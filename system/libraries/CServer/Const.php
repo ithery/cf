@@ -2,12 +2,6 @@
 
 defined('SYSPATH') or die('No direct access allowed.');
 
-/**
- * @author Hery Kurniawan
- * @license Ittron Global Teknologi <ittron.co.id>
- *
- * @since Jun 15, 2018, 4:01:50 PM
- */
 class CServer_Const {
     public static $distros = [
         'GoboLinux' => [
@@ -616,6 +610,7 @@ class CServer_Const {
             'Image' => 'RedHat.png',
         ]
     ];
+
     public static $languages = [
         'WINNT' => [
             '1' => 'Arabic',

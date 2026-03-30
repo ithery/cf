@@ -2,23 +2,16 @@
 
 defined('SYSPATH') or die('No direct access allowed.');
 
-/**
- * @author Hery Kurniawan <hery@itton.co.id>
- *
- * @since Aug 26, 2020
- *
- * @license Ittron Global Teknologi
- */
-use FFMpeg\Coordinate\TimeCode;
 use FFMpeg\FFMpeg;
-use FFMpeg\FFProbe\DataMapping\Stream;
-use FFMpeg\Filters\Audio\SimpleFilter;
-use FFMpeg\Filters\FilterInterface;
-use FFMpeg\Media\AbstractMediaType;
-use FFMpeg\Media\AdvancedMedia;
-use FFMpeg\Media\Concat;
 use FFMpeg\Media\Frame;
 use FFMpeg\Media\Video;
+use FFMpeg\Media\Concat;
+use FFMpeg\Coordinate\TimeCode;
+use FFMpeg\Media\AdvancedMedia;
+use FFMpeg\Filters\FilterInterface;
+use FFMpeg\Media\AbstractMediaType;
+use FFMpeg\FFProbe\DataMapping\Stream;
+use FFMpeg\Filters\Audio\SimpleFilter;
 
 /**
  * @mixin \FFMpeg\Media\AbstractMediaType
@@ -56,7 +49,7 @@ class CRunner_FFMpeg_Driver_PHPFFMpeg {
             $ffmpeg = FFMpeg::create();
         }
         $this->ffmpeg = $ffmpeg;
-        $this->pendingComplexFilters = new CCollection;
+        $this->pendingComplexFilters = new CCollection();
     }
 
     /**
@@ -131,7 +124,7 @@ class CRunner_FFMpeg_Driver_PHPFFMpeg {
     }
 
     /**
-     * Force 'openAdvanced' when opening the MediaCollection
+     * Force 'openAdvanced' when opening the MediaCollection.
      */
     public function openAdvanced(CRunner_FFMpeg_MediaCollection $mediaCollection) {
         $this->forceAdvanced = true;
@@ -191,8 +184,6 @@ class CRunner_FFMpeg_Driver_PHPFFMpeg {
             return $stream->isVideo();
         });
     }
-
-    //
 
     /**
      * Helper method to provide multiple ways to add a filter to the underlying

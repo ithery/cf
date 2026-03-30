@@ -2,12 +2,6 @@
 
 defined('SYSPATH') or die('No direct access allowed.');
 
-/**
- * @author Hery Kurniawan
- * @license Ittron Global Teknologi <ittron.co.id>
- *
- * @since Jun 15, 2018, 6:18:54 PM
- */
 class CServer_Memory_OS_Linux extends CServer_Memory_OS {
     /**
      * Physical memory information and Swap Space information.

@@ -2,12 +2,6 @@
 
 defined('SYSPATH') or die('No direct access allowed.');
 
-/**
- * @author Hery Kurniawan
- * @license Ittron Global Teknologi <ittron.co.id>
- *
- * @since Jun 13, 2018, 10:20:40 AM
- */
 class CServer_Storage extends CServer_Base {
     const SHOW_MOUNT_OPTION = true;
 

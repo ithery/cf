@@ -2,15 +2,9 @@
 
 defined('SYSPATH') or die('No direct access allowed.');
 
-/**
- * @author Hery Kurniawan <hery@itton.co.id>
- * @license Ittron Global Teknologi
- *
- * @since Aug 26, 2020
- */
+use FFMpeg\Media\AdvancedMedia;
 use FFMpeg\Format\FormatInterface;
 use FFMpeg\Format\Video\DefaultVideo;
-use FFMpeg\Media\AdvancedMedia;
 
 class CRunner_FFMpeg_AdvancedOutputMapping {
     /**

@@ -4,12 +4,6 @@ use Symfony\Component\HttpFoundation\StreamedResponse;
 
 defined('SYSPATH') or die('No direct access allowed.');
 
-/**
- * @author Hery Kurniawan <hery@itton.co.id>
- * @license Ittron Global Teknologi
- *
- * @since Dec 5, 2020
- */
 trait CRouting_Concern_RouteOutputBufferRunner {
     use CHTTP_Trait_OutputBufferTrait;
 

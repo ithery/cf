@@ -2,16 +2,9 @@
 
 defined('SYSPATH') or die('No direct access allowed.');
 
-/**
- * @author Hery Kurniawan <hery@itton.co.id>
- *
- * @since Aug 26, 2020
- *
- * @license Ittron Global Teknologi
- */
-use League\Flysystem\Adapter\Local;
 use League\Flysystem\AdapterInterface;
 use Spatie\TemporaryDirectory\TemporaryDirectory;
+use League\Flysystem\Local\LocalFilesystemAdapter;
 use League\Flysystem\Filesystem as LeagueFilesystem;
 
 /**
@@ -31,7 +24,7 @@ class CRunner_FFMpeg_Storage_Disk {
     private $temporaryDirectory;
 
     /**
-     * @var \Illuminate\Filesystem\FilesystemAdapter
+     * @var \CStorage_Adapter
      */
     private $filesystemAdapter;
 
@@ -108,7 +101,7 @@ class CRunner_FFMpeg_Storage_Disk {
     }
 
     public function isLocalDisk() {
-        return $this->getFlysystemAdapter() instanceof Local;
+        return $this->getFlysystemAdapter() instanceof LocalFilesystemAdapter;
     }
 
     /**

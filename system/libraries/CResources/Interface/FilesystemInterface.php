@@ -2,12 +2,6 @@
 
 defined('SYSPATH') or die('No direct access allowed.');
 
-/**
- * @author Hery Kurniawan
- * @license Ittron Global Teknologi <ittron.co.id>
- *
- * @since May 2, 2019, 1:58:45 AM
- */
 interface CResources_Interface_FilesystemInterface {
     /**
      * The public visibility setting.
@@ -37,9 +31,9 @@ interface CResources_Interface_FilesystemInterface {
      *
      * @param string $path
      *
-     * @return string
-     *
      * @throws \Illuminate\Contracts\Filesystem\FileNotFoundException
+     *
+     * @return string
      */
     public function get($path);
 
@@ -143,7 +137,7 @@ interface CResources_Interface_FilesystemInterface {
     /**
      * Get an array of all files in a directory.
      *
-     * @param string|null $directory
+     * @param null|string $directory
      * @param bool        $recursive
      *
      * @return array
@@ -153,7 +147,7 @@ interface CResources_Interface_FilesystemInterface {
     /**
      * Get all of the files from the given directory (recursive).
      *
-     * @param string|null $directory
+     * @param null|string $directory
      *
      * @return array
      */
@@ -162,7 +156,7 @@ interface CResources_Interface_FilesystemInterface {
     /**
      * Get all of the directories within a given directory.
      *
-     * @param string|null $directory
+     * @param null|string $directory
      * @param bool        $recursive
      *
      * @return array
@@ -172,7 +166,7 @@ interface CResources_Interface_FilesystemInterface {
     /**
      * Get all (recursive) of the directories within a given directory.
      *
-     * @param string|null $directory
+     * @param null|string $directory
      *
      * @return array
      */

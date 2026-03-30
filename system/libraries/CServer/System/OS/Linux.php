@@ -2,12 +2,6 @@
 
 defined('SYSPATH') or die('No direct access allowed.');
 
-/**
- * @author Hery Kurniawan
- * @license Ittron Global Teknologi <ittron.co.id>
- *
- * @since Jun 15, 2018, 2:27:16 PM
- */
 class CServer_System_OS_Linux extends CServer_System_OS {
     /**
      * Assoc array of all CPUs loads.

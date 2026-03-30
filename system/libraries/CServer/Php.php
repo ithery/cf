@@ -2,12 +2,6 @@
 
 defined('SYSPATH') or die('No direct access allowed.');
 
-/**
- * @author Hery Kurniawan
- * @license Ittron Global Teknologi <ittron.co.id>
- *
- * @since Jun 15, 2018, 12:58:56 PM
- */
 class CServer_Php {
     protected static $instance;
 
@@ -15,11 +9,12 @@ class CServer_Php {
         if (self::$instance == null) {
             return new CServer_Php();
         }
+
         return self::$instance;
     }
 
     /**
-     * Gets the current PHP version
+     * Gets the current PHP version.
      *
      * @return string
      */
@@ -28,7 +23,7 @@ class CServer_Php {
     }
 
     /**
-     * Gets the PHP extension version
+     * Gets the PHP extension version.
      *
      * @param string $extName <p>
      *                        An extension name.
@@ -36,7 +31,7 @@ class CServer_Php {
      *
      * @return string returns the version of that
      *                extension, or <b>FALSE</b> if there is no version information associated or
-     *                the extension isn't enabled.
+     *                the extension isn't enabled
      */
     public static function getExtVersion($extName) {
         return phpversion($extName);
@@ -51,7 +46,7 @@ class CServer_Php {
     }
 
     /**
-     * Gets the value of a configuration option
+     * Gets the value of a configuration option.
      *
      * @param string $varName <p>
      *                        The configuration option name.
@@ -66,7 +61,7 @@ class CServer_Php {
     }
 
     /**
-     * Retrieve a path to the loaded php.ini file
+     * Retrieve a path to the loaded php.ini file.
      *
      * @return string The loaded <i>php.ini</i> path, or <b>FALSE</b> if one is not loaded.
      */
@@ -75,27 +70,27 @@ class CServer_Php {
     }
 
     /**
-     * Returns the type of interface between web server and PHP
+     * Returns the type of interface between web server and PHP.
      *
-     * @return string the interface type, as a lowercase string.
+     * @return string the interface type, as a lowercase string
      */
     public static function getSapiName() {
         return php_sapi_name();
     }
 
     /**
-     * Returns directory path used for temporary files
+     * Returns directory path used for temporary files.
      *
-     * @return string the path of the temporary directory.
+     * @return string the path of the temporary directory
      */
     public static function getTempDir() {
         return sys_get_temp_dir();
     }
 
     /**
-     * Gets the name of the owner of the current PHP script
+     * Gets the name of the owner of the current PHP script.
      *
-     * @return string the username as a string.
+     * @return string the username as a string
      */
     public static function getCurrentUser() {
         return get_current_user();

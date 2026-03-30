@@ -2,71 +2,65 @@
 
 defined('SYSPATH') or die('No direct access allowed.');
 
-/**
- * @author Hery Kurniawan
- * @license Ittron Global Teknologi <ittron.co.id>
- *
- * @since Jun 15, 2018, 6:26:12 PM
- */
 class CServer_Device_Disk {
     /**
-     * Name of the disk device
+     * Name of the disk device.
      *
      * @var string
      */
     private $name = '';
 
     /**
-     * Type of the filesystem on the disk device
+     * Type of the filesystem on the disk device.
      *
      * @var string
      */
     private $fsType = '';
 
     /**
-     * Diskspace that is free in bytes
+     * Diskspace that is free in bytes.
      *
      * @var int
      */
     private $free = 0;
 
     /**
-     * Diskspace that is used in bytes
+     * Diskspace that is used in bytes.
      *
      * @var int
      */
     private $used = 0;
 
     /**
-     * Total diskspace
+     * Total diskspace.
      *
      * @var int
      */
     private $total = 0;
 
     /**
-     * Mount point of the disk device if available
+     * Mount point of the disk device if available.
      *
      * @var string
      */
     private $mountPoint = null;
 
     /**
-     * Additional options of the device, like mount options
+     * Additional options of the device, like mount options.
      *
      * @var string
      */
     private $options = null;
 
     /**
-     * Inodes usage in percent if available
+     * Inodes usage in percent if available.
      *
      * @var int
      */
     private $percentInodesUsed = null;
 
     /**
-     * Returns PercentUsed calculated when function is called from internal values
+     * Returns PercentUsed calculated when function is called from internal values.
      *
      * @see CServer_Device_Disk::$total
      * @see CServer_Device_Disk::$used

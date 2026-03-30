@@ -2,12 +2,6 @@
 
 defined('SYSPATH') or die('No direct access allowed.');
 
-/**
- * @author Hery Kurniawan <hery@itton.co.id>
- * @license Ittron Global Teknologi
- *
- * @since Aug 26, 2020
- */
 use FFMpeg\Format\FormatInterface;
 
 /**
@@ -27,14 +21,14 @@ class CRunner_FFMpeg_Exporter_MediaExporter {
     protected $driver;
 
     /**
-     * @var \FFMpeg\Format\FormatInterface
-     */
-    private $format;
-
-    /**
      * @var string
      */
     protected $visibility;
+
+    /**
+     * @var \FFMpeg\Format\FormatInterface
+     */
+    private $format;
 
     /**
      * @var \CRunner_FFMpeg_Storage_Disk
@@ -44,7 +38,7 @@ class CRunner_FFMpeg_Exporter_MediaExporter {
     public function __construct(CRunner_FFMpeg_Driver_PHPFFMpeg $driver) {
         $this->driver = $driver;
 
-        $this->maps = new CCollection;
+        $this->maps = new CCollection();
     }
 
     protected function getDisk() {

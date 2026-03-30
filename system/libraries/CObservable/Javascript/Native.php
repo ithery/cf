@@ -21,7 +21,7 @@ class CObservable_Javascript_Native {
     }
 
     public function raw($js) {
-        $variableStatement = CJavascript::rawStatement($js);
+        $variableStatement = CJavascript::createRawStatement($js);
 
         $this->javascript->addStatement($variableStatement);
 

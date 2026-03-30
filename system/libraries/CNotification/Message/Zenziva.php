@@ -2,12 +2,6 @@
 
 defined('SYSPATH') or die('No direct access allowed.');
 
-/**
- * @author Hery Kurniawan <hery@itton.co.id>
- * @license Ittron Global Teknologi
- *
- * @since Oct 2, 2020
- */
 class CNotification_Message_Zenziva extends CNotification_MessageAbstract {
     public function send() {
         $userKey = carr::get($this->config, 'key');

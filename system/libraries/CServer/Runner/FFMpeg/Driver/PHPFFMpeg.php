@@ -2,13 +2,6 @@
 
 defined('SYSPATH') or die('No direct access allowed.');
 
-/**
- * @author Hery Kurniawan <hery@itton.co.id>
- *
- * @since Aug 26, 2020
- *
- * @license Ittron Global Teknologi
- */
 use FFMpeg\FFMpeg;
 use FFMpeg\Media\Frame;
 use FFMpeg\Media\Video;
