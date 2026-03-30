@@ -2,12 +2,6 @@
 
 defined('SYSPATH') or die('No direct access allowed.');
 
-/**
- * @author Hery Kurniawan
- * @license Ittron Global Teknologi <ittron.co.id>
- *
- * @since Jun 2, 2019, 10:52:01 PM
- */
 trait CTrait_Element_Property_TableData {
     /**
      * @var array

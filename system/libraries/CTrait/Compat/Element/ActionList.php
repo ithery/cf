@@ -3,10 +3,7 @@
 defined('SYSPATH') or die('No direct access allowed.');
 
 /**
- * @author Hery Kurniawan
- * @license Ittron Global Teknologi <ittron.co.id>
- *
- * @since Feb 16, 2018, 6:19:05 AM
+ * @see CElement_List_ActionList
  */
 //@codingStandardsIgnoreStart
 trait CTrait_Compat_Element_ActionList {
@@ -20,6 +17,7 @@ trait CTrait_Compat_Element_ActionList {
      * @param mixed $style
      */
     public function set_style($style) {
+        /** @var CElement_List_ActionList $this */
         return $this->setStyle($style);
     }
 

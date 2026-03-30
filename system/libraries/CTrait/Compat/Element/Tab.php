@@ -3,10 +3,7 @@
 defined('SYSPATH') or die('No direct access allowed.');
 
 /**
- * @author Hery Kurniawan
- * @license Ittron Global Teknologi <ittron.co.id>
- *
- * @since Feb 17, 2018, 1:55:05 AM
+ * @see CElement_List_TabList_Tab
  */
 //@codingStandardsIgnoreStart
 trait CTrait_Compat_Element_Tab {
@@ -14,7 +11,7 @@ trait CTrait_Compat_Element_Tab {
      * @param string $label
      * @param bool   $lang
      *
-     * @return CElement_Component_Tab
+     * @return CElement_List_TabList_Tab
      *
      * @deprecated since 1.2, use setLabel
      */
@@ -27,7 +24,7 @@ trait CTrait_Compat_Element_Tab {
      *
      * @param string $url
      *
-     * @return CElement_Component_Tab
+     * @return CElement_List_TabList_Tab
      *
      * @deprecated since 1.1, use setAjaxUrl
      */
@@ -40,7 +37,7 @@ trait CTrait_Compat_Element_Tab {
      *
      * @param string $target
      *
-     * @return CElement_Component_Tab
+     * @return CElement_List_TabList_Tab
      *
      * @deprecated since 1.1, use setTarget
      */
@@ -53,7 +50,7 @@ trait CTrait_Compat_Element_Tab {
      *
      * @param string $bool
      *
-     * @return CElement_Component_Tab
+     * @return CElement_List_TabList_Tab
      *
      * @deprecated 1.1
      */
@@ -66,7 +63,7 @@ trait CTrait_Compat_Element_Tab {
      *
      * @param string $bool
      *
-     * @return CElement_Component_Tab
+     * @return CElement_List_TabList_Tab
      *
      * @deprecated 1.1 use setNoPadding
      */
@@ -79,7 +76,7 @@ trait CTrait_Compat_Element_Tab {
      *
      * @param string $bool
      *
-     * @return CElement_Component_Tab
+     * @return CElement_List_TabList_Tab
      *
      * @deprecated 1.1
      */
@@ -92,7 +89,7 @@ trait CTrait_Compat_Element_Tab {
      *
      * @param string $icon
      *
-     * @return CElement_Component_Tab
+     * @return CElement_List_TabList_Tab
      *
      * @deprecated 1.1
      */
@@ -105,7 +102,7 @@ trait CTrait_Compat_Element_Tab {
      *
      * @param int $indent
      *
-     * @return CElement_Component_Tab
+     * @return CElement_List_TabList_Tab
      *
      * @deprecated 1.1
      */

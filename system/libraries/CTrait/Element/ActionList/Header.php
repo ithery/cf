@@ -3,11 +3,7 @@
 defined('SYSPATH') or die('No direct access allowed.');
 
 /**
- * @author Hery Kurniawan
- * @license Ittron Global Teknologi <ittron.co.id>
- *
  * @see CElement_Component_DataTable
- * @since Feb 16, 2018, 5:55:30 AM
  */
 trait CTrait_Element_ActionList_Header {
     /**

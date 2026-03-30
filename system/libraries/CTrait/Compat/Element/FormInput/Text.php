@@ -3,10 +3,7 @@
 defined('SYSPATH') or die('No direct access allowed.');
 
 /**
- * @author Hery Kurniawan
- * @license Ittron Global Teknologi <ittron.co.id>
- *
- * @since Jun 3, 2018, 2:00:52 PM
+ * @see CElement_FormInput_Text
  */
 //@codingStandardsIgnoreStart
 trait CTrait_Compat_Element_FormInput_Text {
