@@ -2,12 +2,6 @@
 
 defined('SYSPATH') or die('No direct access allowed.');
 
-/**
- * @author Hery Kurniawan
- * @license Ittron Global Teknologi <ittron.co.id>
- *
- * @since May 15, 2019, 8:06:59 PM
- */
 abstract class CSocialLogin_AbstractUser implements ArrayAccess, CSocialLogin_Contract_UserInterface {
     /**
      * The unique identifier for the user.

@@ -2,22 +2,16 @@
 
 defined('SYSPATH') or die('No direct access allowed.');
 
-/**
- * @author Hery Kurniawan
- * @license Ittron Global Teknologi <ittron.co.id>
- *
- * @since Jun 23, 2019, 1:39:20 AM
- */
 use Ramsey\Uuid\Uuid as UUID;
 
 class CTracker_Repository_Session extends CTracker_AbstractRepository {
+    protected $relations = ['device', 'user', 'log', 'language', 'agent', 'referer', 'geoIp', 'cookie'];
+
     private $config;
 
     private $session;
 
     private $sessionInfo;
-
-    protected $relations = ['device', 'user', 'log', 'language', 'agent', 'referer', 'geoIp', 'cookie'];
 
     public function __construct() {
         $this->config = CTracker::config();
@@ -37,11 +31,13 @@ class CTracker_Repository_Session extends CTracker_AbstractRepository {
             $model = $this->newQuery()->where('uuid', $uuid)->with($this->relations)->first();
             $this->cache->cachePut($cacheKey, $model);
         }
+
         return $model;
     }
 
     public function getCurrentId($sessionInfo) {
         $this->setSessionData($sessionInfo);
+
         return $this->sessionGetId();
     }
 
@@ -58,6 +54,7 @@ class CTracker_Repository_Session extends CTracker_AbstractRepository {
         if ($this->model) {
             return carr::get($this->sessionInfo, $this->model->getKeyName());
         }
+
         return null;
     }
 
@@ -82,10 +79,13 @@ class CTracker_Repository_Session extends CTracker_AbstractRepository {
             if (!$result) {
                 $result = $query->get();
                 $this->cache->cachePut($cacheKey, $result, 1); // cache only for 1 minute
+
                 return $result;
             }
+
             return $result;
         }
+
         return $query;
     }
 
@@ -103,6 +103,7 @@ class CTracker_Repository_Session extends CTracker_AbstractRepository {
         if ($results) {
             $sessions = $sessions->get()->pluck('device')->unique();
         }
+
         return $sessions;
     }
 
@@ -127,6 +128,7 @@ class CTracker_Repository_Session extends CTracker_AbstractRepository {
             $session->updated = CTracker::populator()->get('session.updated');
             $session->save();
         }
+
         return $data;
     }
 }

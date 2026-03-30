@@ -2,12 +2,6 @@
 
 defined('SYSPATH') or die('No direct access allowed.');
 
-/**
- * @author Hery Kurniawan
- * @license Ittron Global Teknologi <ittron.co.id>
- *
- * @since Jun 23, 2019, 10:28:39 PM
- */
 class CTracker_Repository_Log extends CTracker_AbstractRepository {
     private $currentLogId;
 

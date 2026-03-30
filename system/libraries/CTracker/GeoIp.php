@@ -2,13 +2,6 @@
 
 defined('SYSPATH') or die('No direct access allowed.');
 
-/**
- * @author Hery Kurniawan
- * @license Ittron Global Teknologi <ittron.co.id>
- *
- * @since Jun 23, 2019, 2:39:25 PM
- */
-
 use GeoIp2\Database\Reader as GeoIpReader;
 use GeoIp2\Exception\AddressNotFoundException;
 
@@ -35,6 +28,7 @@ class CTracker_GeoIp {
         if (!$this->geoIp && $this->databaseExists()) {
             $this->geoIp = $this->getGeoIpInstance($this->databasePath);
         }
+
         return $this->geoIp;
     }
 
@@ -66,6 +60,7 @@ class CTracker_GeoIp {
         if (class_exists(GeoIpReader::class)) {
             return new CTracker_GeoIp_GeoIp2($databasePath);
         }
+
         return new CTracker_GeoIp_GeoIp1();
     }
 }

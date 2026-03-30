@@ -2,14 +2,12 @@
 
 defined('SYSPATH') or die('No direct access allowed.');
 
-/**
- * @author Hery Kurniawan
- * @license Ittron Global Teknologi <ittron.co.id>
- *
- * @since Jun 23, 2019, 10:32:24 PM
- */
 class CTracker_Repository_SqlQuery extends CTracker_AbstractRepository {
     use CModel_Tracker_TrackerSqlQueryTrait;
+
+    protected $currentUrl;
+
+    protected $refererParser;
 
     private $queries = [];
 

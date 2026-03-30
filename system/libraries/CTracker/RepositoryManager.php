@@ -2,12 +2,6 @@
 
 defined('SYSPATH') or die('No direct access allowed.');
 
-/**
- * @author Hery Kurniawan
- * @license Ittron Global Teknologi <ittron.co.id>
- *
- * @since Jun 23, 2019, 1:17:46 AM
- */
 class CTracker_RepositoryManager implements CTracker_RepositoryManagerInterface {
     use CTracker_RepositoryManager_DeviceTrait,
         CTracker_RepositoryManager_GeoIpTrait,
@@ -42,6 +36,7 @@ class CTracker_RepositoryManager implements CTracker_RepositoryManagerInterface 
         if (static::$instance == null) {
             static::$instance = new CTracker_RepositoryManager();
         }
+
         return static::$instance;
     }
 

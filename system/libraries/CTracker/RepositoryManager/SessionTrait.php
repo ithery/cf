@@ -2,12 +2,6 @@
 
 defined('SYSPATH') or die('No direct access allowed.');
 
-/**
- * @author Hery Kurniawan
- * @license Ittron Global Teknologi <ittron.co.id>
- *
- * @since Jun 23, 2019, 4:21:11 PM
- */
 trait CTracker_RepositoryManager_SessionTrait {
     /**
      * @var CTracker_Repository_Session
@@ -26,6 +20,7 @@ trait CTracker_RepositoryManager_SessionTrait {
         if ($newData && $currentData && $newData !== $currentData) {
             $newData = $this->updateSessionData($newData);
         }
+
         return $newData;
     }
 

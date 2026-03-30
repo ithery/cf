@@ -3,13 +3,6 @@
 defined('SYSPATH') or die('No direct access allowed.');
 
 /**
- * @author Hery Kurniawan
- * @license Ittron Global Teknologi <ittron.co.id>
- *
- * @since Jun 20, 2018, 12:21:47 AM
- */
-
-/**
  * A registry for templates.
  */
 class CTemplate_Registry {
@@ -99,6 +92,7 @@ class CTemplate_Registry {
         if ($this->find($name)) {
             return $this->found[$name];
         }
+
         throw new CTemplate_Exception_TemplateNotFound($name);
     }
 
@@ -193,9 +187,11 @@ class CTemplate_Registry {
             $file = $path . DIRECTORY_SEPARATOR . $name . $this->templateFileExtension;
             if ($this->isReadable($file)) {
                 $this->found[$name] = $this->enclose($file);
+
                 return true;
             }
         }
+
         return false;
     }
 

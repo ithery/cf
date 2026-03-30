@@ -2,12 +2,6 @@
 
 defined('SYSPATH') or die('No direct access allowed.');
 
-/**
- * @author Hery Kurniawan
- * @license Ittron Global Teknologi <ittron.co.id>
- *
- * @since Jun 23, 2019, 5:11:59 PM
- */
 class CTracker_GeoIp_Updater {
     const GEOLITE2_URL_BASE = 'http://geolite.maxmind.com/download/geoip/database/GeoLite2-City';
 
