@@ -2,12 +2,6 @@
 
 defined('SYSPATH') or die('No direct access allowed.');
 
-/**
- * @author Hery Kurniawan
- * @license Ittron Global Teknologi <ittron.co.id>
- *
- * @since Mar 28, 2019, 3:00:18 AM
- */
 class CManager_File_Config_ElFinder extends CManager_File_ConfigAbstract {
     public function __construct(array $options) {
         $path = carr::get($options, 'path', DOCROOT . 'temp/files');

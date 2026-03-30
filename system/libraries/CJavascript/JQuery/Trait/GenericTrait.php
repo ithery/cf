@@ -2,12 +2,6 @@
 
 defined('SYSPATH') or die('No direct access allowed.');
 
-/**
- * @author Hery Kurniawan
- * @license Ittron Global Teknologi <ittron.co.id>
- *
- * @since Sep 2, 2018, 12:49:09 AM
- */
 trait CJavascript_JQuery_Trait_GenericTrait {
     abstract public function addEvent($element, $js, $event, $preventDefault = false, $stopPropagation = false);
 
@@ -29,6 +23,7 @@ trait CJavascript_JQuery_Trait_GenericTrait {
         }
 
         $this->addScript($str);
+
         return $str;
     }
 
@@ -48,6 +43,7 @@ trait CJavascript_JQuery_Trait_GenericTrait {
         $str = "$({$to}).{$jQueryCall}({$element});";
 
         $this->addScript($str);
+
         return $str;
     }
 
@@ -68,11 +64,12 @@ trait CJavascript_JQuery_Trait_GenericTrait {
             $str = "$({$element}).attr(\"$attributeName\");";
         }
         $this->addScript($str);
+
         return $str;
     }
 
     /**
-     * Outputs a javascript library animate event
+     * Outputs a javascript library animate event.
      *
      * @param string       $element element
      * @param array|string $params
@@ -101,11 +98,12 @@ trait CJavascript_JQuery_Trait_GenericTrait {
         $str = "$({$element}).animate({\n$animations\n\t\t}" . $speed . $extra . ');';
 
         $this->addScript($str);
+
         return $str;
     }
 
     /**
-     * Show or hide with effect
+     * Show or hide with effect.
      *
      * @param string $action
      * @param string $element    element
@@ -124,6 +122,7 @@ trait CJavascript_JQuery_Trait_GenericTrait {
         }
         $str = "$({$element}).{$action}({$speed}{$callback});";
         $this->addScript($str);
+
         return $str;
     }
 
@@ -140,11 +139,12 @@ trait CJavascript_JQuery_Trait_GenericTrait {
         $str = "$({$element}).trigger(\"$event\");";
 
         $this->addScript($str);
+
         return $str;
     }
 
     /**
-     * Table Sorter Plugin
+     * Table Sorter Plugin.
      *
      * @param string $table   table name
      * @param string $options plugin location
@@ -157,7 +157,7 @@ trait CJavascript_JQuery_Trait_GenericTrait {
     }
 
     /**
-     * Call the JQuery method $jqueryCall on $element with parameters $param
+     * Call the JQuery method $jqueryCall on $element with parameters $param.
      *
      * @param string $element
      * @param string $jqueryCall
@@ -175,6 +175,7 @@ trait CJavascript_JQuery_Trait_GenericTrait {
         }
         $script = '$(' . CJavascript_Helper_Javascript::prepElement($element) . ').' . $jqueryCall . '(' . $param . $callback . ");\n";
         $this->addScript($script);
+
         return $script;
     }
 
@@ -195,7 +196,7 @@ trait CJavascript_JQuery_Trait_GenericTrait {
     }
 
     /**
-     * Executes the code $js
+     * Executes the code $js.
      *
      * @param string $js Code to execute
      *
@@ -204,11 +205,12 @@ trait CJavascript_JQuery_Trait_GenericTrait {
     public function exec($js) {
         $script = $js . "\n";
         $this->addScript($script);
+
         return $script;
     }
 
     /**
-     * Executes the code $js
+     * Executes the code $js.
      *
      * @param string $js Code to execute
      *
@@ -217,11 +219,12 @@ trait CJavascript_JQuery_Trait_GenericTrait {
     public function execAtLast($js) {
         $script = $js . "\n";
         $this->addScriptLast($script);
+
         return $script;
     }
 
     /**
-     * Executes the javascript code $js when $event fires on $element
+     * Executes the javascript code $js when $event fires on $element.
      *
      * @param string $event
      * @param string $element
@@ -236,6 +239,7 @@ trait CJavascript_JQuery_Trait_GenericTrait {
         $immediatly = true;
         extract($parameters);
         $script = $this->addEvent($element, $this->exec($js), $event, $preventDefault, $stopPropagation, $immediatly);
+
         return $script;
     }
 
@@ -250,11 +254,12 @@ trait CJavascript_JQuery_Trait_GenericTrait {
                 . "\n\t});"
                 . "\n}};\n";
         $retour .= "\t$(document).trigger('jsonReady',[data]);\n";
+
         return $this->exec($retour);
     }
 
     /**
-     * Sets an element draggable (HTML5 drag and drop)
+     * Sets an element draggable (HTML5 drag and drop).
      *
      * @param string $element    The element selector
      * @param array  $parameters default : array("attr"=>"id","preventDefault"=>false,"stopPropagation"=>false,"immediatly"=>true)
@@ -263,11 +268,12 @@ trait CJavascript_JQuery_Trait_GenericTrait {
         $attr = 'id';
         extract($parameters);
         $script = $this->addEvent($element, CJavascript_Helper_Javascript::draggable($attr), 'dragstart', $parameters);
+
         return $script;
     }
 
     /**
-     * Declares an element as a drop zone (HTML5 drag and drop)
+     * Declares an element as a drop zone (HTML5 drag and drop).
      *
      * @param string $element    The element selector
      * @param array  $parameters default : array("attr"=>"id","stopPropagation"=>false,"immediatly"=>true,"jqueryDone"=>"append")
@@ -279,6 +285,7 @@ trait CJavascript_JQuery_Trait_GenericTrait {
         $script = $this->addEvent($element, '', 'dragover', true, $stopPropagation);
         extract($parameters);
         $script .= $this->addEvent($element, CJavascript_Helper_Javascript::dropZone($jqueryDone, $jsCallback), 'drop', true, $stopPropagation);
+
         return $script;
     }
 
@@ -291,6 +298,7 @@ trait CJavascript_JQuery_Trait_GenericTrait {
         } else {
             $script = "setInterval({$jsCode},{$time});";
         }
+
         return $this->exec($script);
     }
 

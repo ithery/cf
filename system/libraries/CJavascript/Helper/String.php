@@ -2,12 +2,6 @@
 
 defined('SYSPATH') or die('No direct access allowed.');
 
-/**
- * @author Hery Kurniawan
- * @license Ittron Global Teknologi <ittron.co.id>
- *
- * @since Sep 2, 2018, 12:52:44 AM
- */
 class CJavascript_Helper_String {
     public static function contains($hay, $needle) {
         return strpos($hay, $needle) !== false;
@@ -22,11 +16,11 @@ class CJavascript_Helper_String {
     }
 
     public static function isNull($s) {
-        return (!isset($s) || null === $s || '' === $s);
+        return !isset($s) || null === $s || '' === $s;
     }
 
     public static function isNotNull($s) {
-        return (isset($s) && null !== $s && '' !== $s);
+        return isset($s) && null !== $s && '' !== $s;
     }
 
     public static function isBoolean($value) {
@@ -47,16 +41,19 @@ class CJavascript_Helper_String {
 
     public static function replaceAtFirst($subject, $from, $to) {
         $from = '/\A' . preg_quote($from, '/') . '/';
+
         return \preg_replace($from, $to, $subject, 1);
     }
 
     public static function replaceAtLast($subject, $from, $to) {
         $from = '/' . preg_quote($from, '/') . '\z/';
+
         return \preg_replace($from, $to, $subject, 1);
     }
 
     public static function replaceAtFirstAndLast($subject, $fromFirst, $toFirst, $fromLast, $toLast) {
         $s = self::replaceAtFirst($subject, $fromFirst, $toFirst);
+
         return self::replaceAtLast($s, $fromLast, $toLast);
     }
 
@@ -69,6 +66,7 @@ class CJavascript_Helper_String {
             $result = $matches[1];
             $str = \str_replace($before . $result . $after, '', $str);
         }
+
         return $result;
     }
 
@@ -76,6 +74,7 @@ class CJavascript_Helper_String {
         if (is_string($value)) {
             return str_replace('\\', '\\\\', $value);
         }
+
         return $value;
     }
 

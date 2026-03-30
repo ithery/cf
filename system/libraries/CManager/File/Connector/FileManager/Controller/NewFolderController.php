@@ -2,12 +2,6 @@
 
 defined('SYSPATH') or die('No direct access allowed.');
 
-/**
- * @author Hery Kurniawan
- * @license Ittron Global Teknologi <ittron.co.id>
- *
- * @since Aug 11, 2019, 4:23:21 AM
- */
 use CManager_File_Connector_FileManager_FM as FM;
 
 class CManager_File_Connector_FileManager_Controller_NewFolderController extends CManager_File_Connector_FileManager_AbstractController {
@@ -19,6 +13,7 @@ class CManager_File_Connector_FileManager_Controller_NewFolderController extends
     public function execute() {
         $fm = $this->fm();
         $folder_name = $fm->input('name');
+
         try {
             if (empty($folder_name)) {
                 $fm->error('folder-name');
@@ -31,8 +26,10 @@ class CManager_File_Connector_FileManager_Controller_NewFolderController extends
             }
         } catch (\Exception $e) {
             echo $e->getMessage();
+
             return;
         }
+
         return c::response(parent::$successResponse);
     }
 }

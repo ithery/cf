@@ -2,12 +2,6 @@
 
 defined('SYSPATH') or die('No direct access allowed.');
 
-/**
- * @author Hery Kurniawan
- * @license Ittron Global Teknologi <ittron.co.id>
- *
- * @since Sep 2, 2018, 9:26:43 PM
- */
 class CJavascript_Statement_Function extends CJavascript_Statement {
     protected $bodyStatements = [];
 
@@ -21,19 +15,20 @@ class CJavascript_Statement_Function extends CJavascript_Statement {
     }
 
     public function addStatement($statement) {
-        $this->bodyStatement[] = $statement;
+        $this->bodyStatements[] = $statement;
     }
 
     public function getStatement() {
         $implodedParameters = implode(',', $this->parameters);
         $str = 'function ' . $this->functionName . '(' . $implodedParameters . ') {';
-        foreach ($this->bodyStatement as $statement) {
+        foreach ($this->bodyStatements as $statement) {
             if ($statement instanceof CJavascript_Statement) {
                 $statement = $statement->getStatement();
             }
             $str .= $statement;
         }
         $str .= '}';
+
         return $str;
     }
 }

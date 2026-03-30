@@ -2,12 +2,6 @@
 
 defined('SYSPATH') or die('No direct access allowed.');
 
-/**
- * @author Hery Kurniawan
- * @license Ittron Global Teknologi <ittron.co.id>
- *
- * @since Aug 11, 2019, 2:32:44 AM
- */
 use CManager_File_Connector_FileManager_FM as FM;
 
 class CManager_File_Connector_FileManager_Controller_ErrorController extends CManager_File_Connector_FileManager_AbstractController {
@@ -29,6 +23,7 @@ class CManager_File_Connector_FileManager_Controller_ErrorController extends CMa
         if (!is_array($fm->config($mine_config_key))) {
             array_push($arrErrors, 'Config : ' . $mine_config_key . ' is not a valid array.');
         }
+
         return c::response()->json($arrErrors);
     }
 }

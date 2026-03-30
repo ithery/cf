@@ -2,12 +2,6 @@
 
 defined('SYSPATH') or die('No direct access allowed.');
 
-/**
- * @author Hery Kurniawan
- * @license Ittron Global Teknologi <ittron.co.id>
- *
- * @since Mar 28, 2019, 1:50:58 AM
- */
 class CManager_File_Connector_FileManager extends CManager_File_ConnectorAbstract {
     protected static $defaultMethodControllerMapping = [
         'Crop' => CManager_File_Connector_FileManager_Controller_CropController::class,
@@ -36,9 +30,9 @@ class CManager_File_Connector_FileManager extends CManager_File_ConnectorAbstrac
             throw new Exception('Controller class for ' . $method . ' not available');
         }
 
-
         //$controllerClass = 'CManager_File_Connector_FileManager_Controller_' . $controllerName . 'Controller';
         $controller = new $controllerClass($this);
+
         return $controller->execute();
     }
 
@@ -55,6 +49,7 @@ class CManager_File_Connector_FileManager extends CManager_File_ConnectorAbstrac
         //get class name from config, otherwise default
 
         $controllerClass = $this->config->getConfig('controller.' . $method, $defaultControllerClass);
+
         return $controllerClass;
     }
 }

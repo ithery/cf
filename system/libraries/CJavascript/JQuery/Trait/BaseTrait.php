@@ -2,22 +2,17 @@
 
 defined('SYSPATH') or die('No direct access allowed.');
 
-/**
- * @author Hery Kurniawan
- * @license Ittron Global Teknologi <ittron.co.id>
- *
- * @since Sep 2, 2018, 12:45:44 AM
- */
 trait CJavascript_JQuery_Trait_BaseTrait {
     public function getSelector($element) {
         if ($element instanceof CRenderable) {
             return '#' . $element->id();
         }
+
         return $element;
     }
 
     /**
-     * Ensures the speed parameter is valid for jQuery
+     * Ensures the speed parameter is valid for jQuery.
      *
      * @param string|int $speed
      *
@@ -29,11 +24,12 @@ trait CJavascript_JQuery_Trait_BaseTrait {
         } elseif (preg_match('/[^0-9]/', $speed)) {
             $speed = '';
         }
+
         return $speed;
     }
 
     /**
-     * Allows to attach a condition
+     * Allows to attach a condition.
      *
      * @param string $condition
      * @param string $jsCodeIfTrue
@@ -46,6 +42,7 @@ trait CJavascript_JQuery_Trait_BaseTrait {
         }
 
         $this->addScript($str);
+
         return $str;
     }
 }

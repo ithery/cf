@@ -2,12 +2,6 @@
 
 defined('SYSPATH') or die('No direct access allowed.');
 
-/**
- * @author Hery Kurniawan
- * @license Ittron Global Teknologi <ittron.co.id>
- *
- * @since Sep 8, 2018, 1:41:33 AM
- */
 trait CManager_Asset_Trait_CssTrait {
     public function fullpathCssFile($file) {
         return CManager_Asset_Helper::fullpathCssFile($file, $this->mediaPaths);

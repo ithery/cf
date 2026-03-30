@@ -2,12 +2,6 @@
 
 defined('SYSPATH') or die('No direct access allowed.');
 
-/**
- * @author Hery Kurniawan <hery@itton.co.id>
- * @license Ittron Global Teknologi
- *
- * @since Oct 2, 2020
- */
 class CManager_Asset_Compiler_Minify_MinifyJs extends CManager_Asset_Compiler_MinifyAbstract {
     /**
      * Var-matching regex based on http://stackoverflow.com/a/9337047/802993.

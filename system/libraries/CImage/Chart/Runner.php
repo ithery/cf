@@ -2,12 +2,6 @@
 
 defined('SYSPATH') or die('No direct access allowed.');
 
-/**
- * @author Hery Kurniawan
- * @license Ittron Global Teknologi <ittron.co.id>
- *
- * @since Aug 30, 2019, 2:11:47 AM
- */
 class CImage_Chart_Runner extends CController {
     public function __construct() {
         parent::__construct();

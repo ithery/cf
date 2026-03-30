@@ -2,12 +2,6 @@
 
 defined('SYSPATH') or die('No direct access allowed.');
 
-/**
- * @author Hery Kurniawan
- * @license Ittron Global Teknologi <ittron.co.id>
- *
- * @since Sep 2, 2018, 9:24:30 PM
- */
 class CJavascript_Statement_JQuery_Event implements CJavascript_Statement_JQuery_CompilableInterface {
     protected $jqueryEvents = [
         'bind', 'blur', 'change', 'click', 'dblclick', 'delegate', 'die', 'error', 'focus', 'focusin', 'focusout', 'hover', 'keydown', 'keypress', 'keyup', 'live', 'load', 'mousedown', 'mouseenter', 'mouseleave', 'mousemove', 'mouseout', 'mouseover', 'mouseup', 'off', 'on', 'one', 'ready', 'resize', 'scroll', 'select', 'submit', 'toggle', 'trigger', 'triggerHandler', 'undind', 'undelegate', 'unload'

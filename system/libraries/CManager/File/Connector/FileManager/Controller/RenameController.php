@@ -2,12 +2,6 @@
 
 defined('SYSPATH') or die('No direct access allowed.');
 
-/**
- * @author Hery Kurniawan
- * @license Ittron Global Teknologi <ittron.co.id>
- *
- * @since Aug 11, 2019, 9:49:30 PM
- */
 use CManager_File_Connector_FileManager_FM as FM;
 
 class CManager_File_Connector_FileManager_Controller_RenameController extends CManager_File_Connector_FileManager_AbstractController {
@@ -57,6 +51,7 @@ class CManager_File_Connector_FileManager_Controller_RenameController extends CM
         } else {
             $fm->dispatch(new CManager_File_Connector_FileManager_Event_FileWasRenamed($old_file->path(), $new_file));
         }
+
         return c::response(parent::$successResponse);
     }
 }

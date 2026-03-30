@@ -2,12 +2,6 @@
 
 defined('SYSPATH') or die('No direct access allowed.');
 
-/**
- * @author Hery Kurniawan
- * @license Ittron Global Teknologi <ittron.co.id>
- *
- * @since Mar 27, 2019, 2:50:02 PM
- */
 use CManager_File_Connector_ElFinder_Base as ElFinder;
 
 class CManager_File_Connector_ElFinder extends CManager_File_ConnectorAbstract {
