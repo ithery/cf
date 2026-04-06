@@ -198,7 +198,7 @@ class CApp_Formatter {
     public function formatCurrency($x, $decimalDigit = null, $decimalSeparator = null, $thousandSeparator = null, $currencyPrefix = null, $currencySuffix = null, $stripZeroDecimal = null) {
         $decimalSeparator = $decimalSeparator ?: $this->decimalSeparator;
         $thousandSeparator = $thousandSeparator ?: $this->thousandSeparator;
-        $decimalDigit = $decimalDigit ?: ($this->currencyDecimalDigit ?: $this->decimalDigit);
+        $decimalDigit = $decimalDigit !== null ? $decimalDigit : ($this->currencyDecimalDigit !== null ? $this->currencyDecimalDigit : $this->decimalDigit);
         $currencySuffix = $currencySuffix ?: $this->currencySuffix;
         $currencyPrefix = $currencyPrefix ?: $this->currencyPrefix;
         $stripZeroDecimal = $stripZeroDecimal !== null ? $stripZeroDecimal : $this->currencyStripZeroDecimal;
