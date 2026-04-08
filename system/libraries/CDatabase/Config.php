@@ -20,6 +20,9 @@ class CDatabase_Config {
                     //we will try to resolve the first array of config
                     $config = CDatabase::manager()->getConfig($name);
                 }
+                if ($config && is_string($config)) {
+                    $config = CDatabase::manager()->getConfig('connections.' . $config);
+                }
                 if (!is_null($config)) {
                     if (is_string($config)) {
                         //if config is string we will try to resolve back
