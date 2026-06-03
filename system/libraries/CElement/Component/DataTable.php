@@ -771,24 +771,6 @@ class CElement_Component_DataTable extends CElement_Component {
     }
 
     /**
-     * @param CElastic_Search $el
-     * @param string          $require
-     *
-     * @return $this
-     *
-     * @deprecated version 1.8
-     */
-    public function setDataFromElastic($el, $require = null) {
-        $this->query = $el;
-        $this->isElastic = true;
-        if ($el instanceof CElastic_Search) {
-            $this->query = $el->ajaxData();
-        }
-
-        return $this;
-    }
-
-    /**
      * @param callable|Closure $callback
      * @param array            $callbackOptions
      * @param string           $require
