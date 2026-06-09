@@ -136,7 +136,7 @@ abstract class CRedis_AbstractConnection implements CRedis_ConnectionInterface {
      */
     public function listen(Closure $callback) {
         if ($this->events) {
-            $this->events->listen(CommandExecuted::class, $callback);
+            $this->events->listen(CRedis_Event_CommandExecuted::class, $callback);
         }
     }
 
