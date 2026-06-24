@@ -8,6 +8,7 @@ CPolyfill::php81();
 CPolyfill::php82();
 CPolyfill::php83();
 CPolyfill::php84();
+CPolyfill::php85();
 CFConfig::bootstrap();
 
 CPagination_Paginator::useBootstrap();
