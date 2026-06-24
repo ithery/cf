@@ -2232,6 +2232,24 @@ class c {
 
         return c::value($default);
     }
+
+    public static function arrayLast(array $array, callable $callback = null, $default = null) {
+        if ($callback === null) {
+            return empty($array)
+                ? $default
+                : end($array);
+        }
+
+        $result = $default;
+
+        foreach ($array as $key => $value) {
+            if ($callback($value, $key)) {
+                $result = $value;
+            }
+        }
+
+        return $result;
+    }
 }
 
 // End c
