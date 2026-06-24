@@ -2216,6 +2216,22 @@ class c {
 
         return $basePath;
     }
+
+    public static function enumValue($value, $default = null) {
+        if (interface_exists('BackedEnum') && $value instanceof \BackedEnum) {
+            return $value->value;
+        }
+
+        if (interface_exists('UnitEnum') && $value instanceof \UnitEnum) {
+            return $value->name;
+        }
+
+        if ($value !== null) {
+            return $value;
+        }
+
+        return c::value($default);
+    }
 }
 
 // End c

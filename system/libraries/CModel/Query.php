@@ -1027,15 +1027,36 @@ class CModel_Query {
      * @return array
      */
     protected function addUpdatedAtColumn(array $values) {
-        if (!$this->model->usesTimestamps()) {
+        if (! $this->model->usesTimestamps() || is_null($this->model->getUpdatedAtColumn())) {
             return $values;
         }
 
-        return carr::add(
-            $values,
-            $this->model->getUpdatedAtColumn(),
-            $this->model->freshTimestampString()
-        );
+        $column = $this->model->getUpdatedAtColumn();
+
+        if (! array_key_exists($column, $values)) {
+            $timestamp = $this->model->freshTimestampString();
+
+            if ($this->model->hasSetMutator($column)
+                || $this->model->hasAttributeSetMutator($column)
+                || $this->model->hasCast($column)
+            ) {
+                $timestamp = $this->model->newInstance()
+                    ->forceFill([$column => $timestamp])
+                    ->getAttributes()[$column] ?? $timestamp;
+            }
+
+            $values = array_merge([$column => $timestamp], $values);
+        }
+
+        $segments = preg_split('/\s+as\s+/i', $this->query->from);
+
+        $qualifiedColumn = array_last($segments).'.'.$column;
+
+        $values[$qualifiedColumn] = carr::get($values, $qualifiedColumn, $values[$column]);
+
+        unset($values[$column]);
+
+        return $values;
     }
 
     /**
