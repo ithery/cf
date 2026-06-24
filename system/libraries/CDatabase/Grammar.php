@@ -37,7 +37,9 @@ abstract class CDatabase_Grammar {
             return $this->getValue($table);
         }
 
-        $prefix ??= $this->connection->getTablePrefix();
+        if ($prefix === null) {
+            $prefix = $this->connection->getTablePrefix();
+        }
 
         // If the table being wrapped has an alias we'll need to separate the pieces
         // so we can prefix the table and then wrap each of the segments on their
@@ -49,11 +51,13 @@ abstract class CDatabase_Grammar {
         // If the table being wrapped has a custom schema name specified, we need to
         // prefix the last segment as the table name then wrap each segment alone
         // and eventually join them both back together using the dot connector.
-        if (str_contains($table, '.')) {
+        if (strpos($table, '.') !== false) {
             $table = substr_replace($table, '.' . $prefix, strrpos($table, '.'), 1);
 
             return (new CCollection(explode('.', $table)))
-                ->map($this->wrapValue(...))
+                ->map(function ($value) {
+                    return $this->wrapValue($value);
+                })
                 ->implode('.');
         }
 
@@ -122,7 +126,9 @@ abstract class CDatabase_Grammar {
     protected function wrapAliasedTable($value, $prefix = null) {
         $segments = preg_split('/\s+as\s+/i', $value);
 
-        $prefix ??= $this->connection->getTablePrefix();
+        if ($prefix === null) {
+            $prefix = $this->connection->getTablePrefix();
+        }
 
         return $this->wrapTable($segments[0], $prefix) . ' as ' . $this->wrapValue($prefix . $segments[1]);
     }
@@ -180,7 +186,7 @@ abstract class CDatabase_Grammar {
      * @return bool
      */
     protected function isJsonSelector($value) {
-        return str_contains($value, '->');
+        return strpos($value, '->') !== false;
     }
 
     /**
@@ -224,7 +230,7 @@ abstract class CDatabase_Grammar {
             return implode(', ', array_map([$this, __FUNCTION__], $value));
         }
 
-        return "'${value}'";
+        return "'" . $value . "'";
     }
 
     /**

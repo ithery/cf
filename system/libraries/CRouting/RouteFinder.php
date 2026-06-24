@@ -1,10 +1,5 @@
 <?php
 
-/**
- * Description of RouteFinder.
- *
- * @author Hery
- */
 class CRouting_RouteFinder {
     /**
      * Return Route From Uri.
@@ -33,27 +28,54 @@ class CRouting_RouteFinder {
 
         $route = null;
 
-        if (class_exists($className)) {
+        if (class_exists($className) && static::isRoutableMethod($className, $method)) {
             $routedUri = strtolower($routeData->getControllerDir()) . $routeData->getController();
             $routedUri .= '/' . $method;
 
             $arguments = $routeData->getArguments();
-            //cdbg::dd($routeData);
 
             $parameters = [];
             foreach ($arguments as $key => $argument) {
-                $routedUri .= "/{any${key}}";
+                $routedUri .= "/{any" . $key . "}";
                 $parameters[$key] = $argument;
             }
 
-            //cdbg::dd($routedUri);
-            //$routedUri = 't/ittron/feeds/hashtag/posts/{any0}';
             $route = new CRouting_Route(CRouting_Router::$verbs, $routedUri, $className . '@' . $method, $parameters);
 
             $route->setRouteData($routeData);
         }
 
         return $route;
+    }
+
+    /**
+     * @param string $className
+     * @param string $method
+     *
+     * @return bool
+     */
+    protected static function isRoutableMethod($className, $method) {
+        if (substr($method, 0, 2) === '__') {
+            return false;
+        }
+
+        if (!method_exists($className, $method)) {
+            return false;
+        }
+
+        $reflection = new ReflectionMethod($className, $method);
+
+        if (!$reflection->isPublic()) {
+            return false;
+        }
+
+        // Block methods inherited from CController that are not actions
+        $declaringClass = $reflection->getDeclaringClass()->getName();
+        if ($declaringClass === 'CController') {
+            return false;
+        }
+
+        return true;
     }
 
     public static function controllerUrl($controller) {

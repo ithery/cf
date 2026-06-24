@@ -83,14 +83,12 @@ abstract class CController {
      * @return \Symfony\Component\HttpFoundation\Response
      */
     public function callAction($method, $parameters) {
-        if (!method_exists($this, $method) && !method_exists($this, '__call')) {
+        if (!$this->isCallableAction($method)) {
             throw new CHTTP_Exception_NotFoundHttpException();
         }
-        if (method_exists($this, $method)) {
-            $reflectionClass = new ReflectionClass($this);
 
-            $reflectionMethod = $reflectionClass->getMethod($method);
-            /** @var ReflectionMethod $reflectionMethod */
+        if (method_exists($this, $method)) {
+            $reflectionMethod = new ReflectionMethod($this, $method);
             $requiredParameter = $reflectionMethod->getNumberOfRequiredParameters();
 
             if (count($parameters) < $requiredParameter) {
@@ -99,6 +97,47 @@ abstract class CController {
         }
 
         return $this->{$method}(...array_values($parameters));
+    }
+
+    /**
+     * @param string $method
+     *
+     * @return bool
+     */
+    protected function isCallableAction($method) {
+        // Block all magic methods
+        if (substr($method, 0, 2) === '__') {
+            return false;
+        }
+
+        if (in_array($method, static::getBlockedMethods(), true)) {
+            return false;
+        }
+
+        if (!method_exists($this, $method) && !method_exists($this, '__call')) {
+            return false;
+        }
+
+        // Ensure method is public
+        if (method_exists($this, $method)) {
+            $reflection = new ReflectionMethod($this, $method);
+            if (!$reflection->isPublic()) {
+                return false;
+            }
+        }
+
+        return true;
+    }
+
+    /**
+     * @return string[]
+     */
+    protected static function getBlockedMethods() {
+        return [
+            'callAction',
+            'middleware',
+            'getMiddleware',
+        ];
     }
 
     public static function controllerUrl() {
