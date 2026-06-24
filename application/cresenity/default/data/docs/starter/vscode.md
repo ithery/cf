@@ -4,7 +4,7 @@ Visual Studio Code is the recommended editor for Cresenity Framework development
 
 ---
 
-## PHP CF Extension
+### PHP CF Extension
 
 Install the official Cresenity Framework extension from the VS Code Marketplace:
 
@@ -16,7 +16,7 @@ This extension provides:
 - Go-to-definition support for CF classes
 - Code snippets for common CF patterns
 
-### Installation
+#### Installation
 
 1. Open VS Code
 2. Press `Ctrl+Shift+X` (or `Cmd+Shift+X` on macOS) to open the Extensions panel
@@ -31,7 +31,7 @@ code --install-extension cresenity.php-cf
 
 ---
 
-## Recommended Extensions
+### Recommended Extensions
 
 The following extensions work well with the configuration files included in the framework:
 
@@ -44,11 +44,11 @@ The following extensions work well with the configuration files included in the 
 
 ---
 
-## Included Configuration Files
+### Included Configuration Files
 
 The framework root includes several configuration files that VS Code and its extensions will automatically pick up:
 
-### `.php-cs-fixer.dist.php`
+#### .php-cs-fixer.dist.php
 
 Defines the code style rules for the project. When the PHP CS Fixer extension is installed, it will automatically use this file to format your PHP code on save.
 
@@ -60,7 +60,7 @@ Key rules enforced:
 - Ordered imports by length
 - PHPDoc alignment and formatting
 
-### `.editorconfig`
+#### .editorconfig
 
 Ensures consistent editor settings across all contributors:
 
@@ -69,7 +69,7 @@ Ensures consistent editor settings across all contributors:
 - 4-space indentation
 - Trailing whitespace trimming
 
-### `phpstan.neon`
+#### phpstan.neon
 
 Configuration for PHPStan static analysis. Run analysis from the command line:
 
@@ -77,13 +77,13 @@ Configuration for PHPStan static analysis. Run analysis from the command line:
 ./system/vendor/PHPStan/phpstan analyse
 ```
 
-### `phpcs.xml`
+#### phpcs.xml
 
 Code sniffer rules based on the PEAR standard with CF-specific customizations (same-line braces, relaxed commenting rules).
 
 ---
 
-## IDE Helper
+### IDE Helper
 
 The framework includes a `_ide_helper.php` file in the root directory. This file provides additional type hints for classes that use dynamic methods (such as `CApp`), improving autocompletion in VS Code and other IDEs.
 
@@ -91,7 +91,7 @@ This file is loaded automatically by Intelephense and similar language servers â
 
 ---
 
-## Workspace Snippets
+### Workspace Snippets
 
 The framework includes VS Code snippets in `.vscode/cf.json.code-snippets`. Currently available:
 

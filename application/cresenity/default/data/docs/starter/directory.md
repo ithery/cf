@@ -1,6 +1,6 @@
 # Directory Structure
 
-## Introduction
+### Introduction
 
 Cresenity Framework supports multiple applications running within a single framework installation. Each application lives in its own subdirectory under `application/` and is identified by an `app_code` defined in the domain configuration.
 
@@ -8,7 +8,7 @@ The root directory structure is fixed and should not be modified. You are free t
 
 ---
 
-## Root Directory Structure
+### Root Directory Structure
 
 ```
 /                           (Document Root)
@@ -38,7 +38,7 @@ The root directory structure is fixed and should not be modified. You are free t
 
 ---
 
-## Application Directory Structure
+### Application Directory Structure
 
 Each application follows the structure `application/{app_code}/`. Inside, files are organized by organization code (`org_code`). The `default/` directory serves as the base and is always loaded. If an `org_code` is configured, its directory is loaded on top of `default/`, allowing per-organization overrides.
 
@@ -66,6 +66,8 @@ application/{app_code}/
 └── env.php                 Environment variables
 ```
 
+---
+
 ### File Lookup Order
 
 When the framework resolves a file (controller, view, config, etc.), it searches in the following order:
@@ -78,7 +80,7 @@ The first match wins. This allows organizations to override specific files witho
 
 ---
 
-## Domain Configuration
+### Domain Configuration
 
 Each domain is mapped to an application via a PHP file in `data/domain/`. The filename must match the domain:
 

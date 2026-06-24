@@ -4,13 +4,13 @@ This page covers the essential configuration required to run a Cresenity Framewo
 
 ---
 
-## Server Requirements
+### Server Requirements
 
-### PHP
+#### PHP
 
 - PHP >= 7.4
 
-### PHP Extensions
+#### PHP Extensions
 
 The following PHP extensions must be enabled:
 
@@ -26,14 +26,14 @@ The following PHP extensions must be enabled:
 
 > Most of these extensions are enabled by default in modern PHP installations. You can verify with `php -m`.
 
-### Web Server
+#### Web Server
 
 - **Apache** with `mod_rewrite` enabled — the framework includes an `.htaccess` file that handles URL rewriting automatically.
 - **Nginx** — requires manual rewrite configuration to route all requests to `index.php`.
 
 ---
 
-## Directory Permissions
+### Directory Permissions
 
 The following directories must be writable by the web server:
 
@@ -47,7 +47,7 @@ chmod -R 775 temp logs resources
 
 ---
 
-## Environment Variables (`env.php`)
+### Environment Variables
 
 Each application has an `env.php` file located at `application/{app_code}/env.php`. This file returns an array of environment-specific values such as database credentials, API keys, and other secrets.
 
@@ -72,11 +72,11 @@ c::env('MYSQL_HOST', '127.0.0.1');  // returns value, or default if not set
 
 ---
 
-## Config Files
+### Config Files
 
 Configuration files are PHP files that return an array. The framework uses a layered config system — application config files override the framework defaults.
 
-### System Config (defaults)
+#### System Config (defaults)
 
 Located in `system/config/`. These are the framework defaults and should not be modified directly. Key files include:
 
@@ -89,7 +89,7 @@ Located in `system/config/`. These are the framework defaults and should not be 
 | `routes.php` | Default route (`_default`) |
 | `core.php` | Debug mode, URL suffix |
 
-### Application Config (overrides)
+#### Application Config (overrides)
 
 Located in `application/{app_code}/default/config/`. Only include the keys you want to override — the framework will merge them with the system defaults.
 
@@ -121,7 +121,7 @@ return [
 ];
 ```
 
-### Accessing Config Values
+#### Accessing Config Values
 
 Use `CF::config()` or `c::config()` to read configuration values using dot notation:
 
@@ -134,7 +134,7 @@ $default  = c::config('app.missing_key', 'foo');   // 'foo' (fallback)
 
 ---
 
-## Bootstrap File
+### Bootstrap File
 
 Each application can have a `bootstrap.php` file at `application/{app_code}/bootstrap.php`. This file is executed after the framework is initialized and before the request is dispatched. Use it to register service providers, set up middleware, configure pagination, or run any application-level setup.
 
@@ -148,7 +148,7 @@ CPagination_Paginator::useBootstrap();
 
 ---
 
-## Next Steps
+### Next Steps
 
 - [Routing](/docs/basic/routing) — learn how URLs map to controllers
 - [Controllers](/docs/basic/controller) — handle requests and build responses

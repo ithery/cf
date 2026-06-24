@@ -1,6 +1,6 @@
 # Installation
 
-## Requirements
+### Requirements
 
 Before installing Cresenity Framework, make sure your environment meets the following requirements:
 
@@ -13,7 +13,7 @@ For a full list of required PHP extensions, see [Configuration](/docs/starter/co
 
 ---
 
-## 1. Install the `phpcf` CLI Tool
+### Install the phpcf CLI Tool
 
 The `phpcf` command-line tool is used to create and manage Cresenity applications.
 
@@ -29,7 +29,7 @@ phpcf --version
 
 ---
 
-## 2. Clone the Framework
+### Clone the Framework
 
 ```bash
 git clone git@github.com:cresenity/cf.git
@@ -44,7 +44,7 @@ cp index.php.sample index.php
 
 ---
 
-## 3. Set Up an Existing Project
+### Set Up an Existing Project
 
 If you are working on an existing project, clone its repository into the `application/` directory:
 
@@ -57,7 +57,7 @@ This will create the structure `application/myproject/`.
 
 ---
 
-## 4. Create a New Project
+### Create a New Project
 
 To scaffold a new application, use the `phpcf` CLI tool from the framework root directory:
 
@@ -67,7 +67,7 @@ phpcf app:create myproject
 
 You will be prompted to enter a unique application code.
 
-### Configure the Domain
+#### Configure the Domain
 
 1. Create a domain configuration file in the `data/domain/` directory. If the `data/` directory does not exist, create it first:
 
@@ -95,7 +95,7 @@ You will be prompted to enter a unique application code.
 
 ---
 
-## Next Steps
+### Next Steps
 
 - [Directory Structure](/docs/starter/directory) — understand how the framework is organized
 - [Configuration](/docs/starter/configuration) — configure your application
