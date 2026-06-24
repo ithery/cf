@@ -99,7 +99,7 @@ return $config->setFinder($finder)->setRules([
     ],
     //'ereg_to_preg' => true, // risky
     //'no_superfluous_elseif' => true,
-    'no_superfluous_phpdoc_tags' => true,
+    'no_superfluous_phpdoc_tags' => ['allow_mixed' => true],
     'no_trailing_whitespace' => true,
     'no_unneeded_control_parentheses' => true,
     // 'no_trailing_comma_in_list_call' => true,

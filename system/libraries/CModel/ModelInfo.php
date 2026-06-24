@@ -1,58 +1,109 @@
 <?php
 
-use Illuminate\Contracts\Support\Arrayable;
+defined('SYSPATH') or die('No direct access allowed.');
 
 /**
- * @implements Arrayable<string, mixed>
- *
  * @internal
  */
-class CModel_ModelInfo implements Arrayable, ArrayAccess {
+class CModel_ModelInfo implements ArrayAccess {
     /**
-     * @template TModel of \Illuminate\Database\Eloquent\Model
-     *
-     * @param class-string<TModel>                                                                                             $class      the model's fully-qualified class
-     * @param string                                                                                                           $database   the database connection name
-     * @param string                                                                                                           $table      the database table name
-     * @param null|class-string                                                                                                $policy     the policy that applies to the model
-     * @param \CCollection<int, array<string, mixed>>                                                                          $attributes the attributes available on the model
-     * @param \CCollection<int, array{name: string, type: string, related: class-string<\Illuminate\Database\Eloquent\Model>}> $relations  the relations defined on the model
-     * @param \CCollection<int, array{event: string, class: string}>                                                           $events     the events that the model dispatches
-     * @param \CCollection<int, array{event: string, observer: array<int, string>}>                                            $observers  the observers registered for the model
-     * @param class-string<\CModel_Collection<TModel>>                                                                         $collection the Collection class that collects the models
-     * @param class-string<\CModel_Query<TModel>>                                                                              $builder    the Builder class registered for the model
-     * @param null|\Illuminate\Http\Resources\Json\JsonResource                                                                $resource   the JSON resource that represents the model
+     * @var string
+     */
+    public $class;
+
+    /**
+     * @var string
+     */
+    public $database;
+
+    /**
+     * @var string
+     */
+    public $table;
+
+    /**
+     * @var null|string
+     */
+    public $policy;
+
+    /**
+     * @var CCollection
+     */
+    public $attributes;
+
+    /**
+     * @var CCollection
+     */
+    public $relations;
+
+    /**
+     * @var CCollection
+     */
+    public $events;
+
+    /**
+     * @var CCollection
+     */
+    public $observers;
+
+    /**
+     * @var string
+     */
+    public $collection;
+
+    /**
+     * @var string
+     */
+    public $builder;
+
+    /**
+     * @var null|string
+     */
+    public $resource;
+
+    /**
+     * @param string      $class
+     * @param string      $database
+     * @param string      $table
+     * @param null|string $policy
+     * @param CCollection $attributes
+     * @param CCollection $relations
+     * @param CCollection $events
+     * @param CCollection $observers
+     * @param string      $collection
+     * @param string      $builder
+     * @param null|string $resource
      */
     public function __construct(
-        public $class,
-        public $database,
-        public $table,
-        public $policy,
-        public $attributes,
-        public $relations,
-        public $events,
-        public $observers,
-        public $collection,
-        public $builder,
-        public $resource
+        $class,
+        $database,
+        $table,
+        $policy,
+        $attributes,
+        $relations,
+        $events,
+        $observers,
+        $collection,
+        $builder,
+        $resource
     ) {
+        $this->class = $class;
+        $this->database = $database;
+        $this->table = $table;
+        $this->policy = $policy;
+        $this->attributes = $attributes;
+        $this->relations = $relations;
+        $this->events = $events;
+        $this->observers = $observers;
+        $this->collection = $collection;
+        $this->builder = $builder;
+        $this->resource = $resource;
     }
 
     /**
      * Convert the model info to an array.
      *
-     * @return array{
-     *     "class": class-string<\Illuminate\Database\Eloquent\Model>,
-     *     database: string,
-     *     table: string,
-     *     policy: null|class-string,
-     *     attributes: \CCollection<int, array<string, mixed>>,
-     *     relations: \CCollection<int, array{name: string, type: string, related: class-string<\Illuminate\Database\Eloquent\Model>}>,
-     *     events: \CCollection<int, array{event: string, class: string}>,
-     *     observers: \CCollection<int, array{event: string, observer: array<int, string>}>, collection: class-string<\Illuminate\Database\Eloquent\Collection<\Illuminate\Database\Eloquent\Model>>,
-     *     builder: class-string<\Illuminate\Database\Eloquent\Builder<\Illuminate\Database\Eloquent\Model>>,
-     *     resource: null|\Illuminate\Http\Resources\Json\JsonResource
-     * }
+     * @return array
      */
     public function toArray() {
         return [
@@ -71,36 +122,43 @@ class CModel_ModelInfo implements Arrayable, ArrayAccess {
     }
 
     /**
-     * Determine if the given offset exists.
+     * @param mixed $offset
+     *
+     * @return bool
      */
-    public function offsetExists(mixed $offset): bool {
+    public function offsetExists($offset) {
         return property_exists($this, $offset);
     }
 
     /**
-     * Get the value for a given offset.
+     * @param mixed $offset
      *
-     * @throws \InvalidArgumentException
+     * @return mixed
      */
-    public function offsetGet(mixed $offset): mixed {
-        return property_exists($this, $offset) ? $this->{$offset} : throw new InvalidArgumentException("Property {$offset} does not exist.");
+    public function offsetGet($offset) {
+        if (!property_exists($this, $offset)) {
+            throw new InvalidArgumentException("Property {$offset} does not exist.");
+        }
+
+        return $this->{$offset};
     }
 
     /**
-     * Set the value at the given offset.
+     * @param mixed $offset
+     * @param mixed $value
      *
-     * @throws \LogicException
+     * @throws LogicException
      */
-    public function offsetSet(mixed $offset, mixed $value): void {
+    public function offsetSet($offset, $value) {
         throw new LogicException(self::class . ' may not be mutated using array access.');
     }
 
     /**
-     * Unset the value at the given offset.
+     * @param mixed $offset
      *
-     * @throws \LogicException
+     * @throws LogicException
      */
-    public function offsetUnset(mixed $offset): void {
+    public function offsetUnset($offset) {
         throw new LogicException(self::class . ' may not be mutated using array access.');
     }
 }

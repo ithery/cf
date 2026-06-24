@@ -18,8 +18,6 @@ abstract class CDatabase_Grammar {
     /**
      * Wrap an array of values.
      *
-     * @param array $values
-     *
      * @return array
      */
     public function wrapArray(array $values) {
@@ -30,15 +28,36 @@ abstract class CDatabase_Grammar {
      * Wrap a table in keyword identifiers.
      *
      * @param CDatabase_Contract_Query_ExpressionInterface|string $table
+     * @param null|string                                         $prefix
      *
      * @return string
      */
-    public function wrapTable($table) {
-        if (!$this->isExpression($table)) {
-            return $this->wrap($this->tablePrefix . $table, true);
+    public function wrapTable($table, $prefix = null) {
+        if ($this->isExpression($table)) {
+            return $this->getValue($table);
         }
 
-        return $this->getValue($table);
+        $prefix ??= $this->connection->getTablePrefix();
+
+        // If the table being wrapped has an alias we'll need to separate the pieces
+        // so we can prefix the table and then wrap each of the segments on their
+        // own and then join these both back together using the "as" connector.
+        if (stripos($table, ' as ') !== false) {
+            return $this->wrapAliasedTable($table, $prefix);
+        }
+
+        // If the table being wrapped has a custom schema name specified, we need to
+        // prefix the last segment as the table name then wrap each segment alone
+        // and eventually join them both back together using the dot connector.
+        if (str_contains($table, '.')) {
+            $table = substr_replace($table, '.' . $prefix, strrpos($table, '.'), 1);
+
+            return (new CCollection(explode('.', $table)))
+                ->map($this->wrapValue(...))
+                ->implode('.');
+        }
+
+        return $this->wrapValue($prefix . $table);
     }
 
     /**
@@ -90,6 +109,22 @@ abstract class CDatabase_Grammar {
         }
 
         return $this->wrap($segments[0]) . ' as ' . $this->wrapValue($segments[1]);
+    }
+
+    /**
+     * Wrap a table that has an alias.
+     *
+     * @param string      $value
+     * @param null|string $prefix
+     *
+     * @return string
+     */
+    protected function wrapAliasedTable($value, $prefix = null) {
+        $segments = preg_split('/\s+as\s+/i', $value);
+
+        $prefix ??= $this->connection->getTablePrefix();
+
+        return $this->wrapTable($segments[0], $prefix) . ' as ' . $this->wrapValue($prefix . $segments[1]);
     }
 
     /**
@@ -151,8 +186,6 @@ abstract class CDatabase_Grammar {
     /**
      * Convert an array of column names into a delimited string.
      *
-     * @param array $columns
-     *
      * @return string
      */
     public function columnize(array $columns) {
@@ -161,8 +194,6 @@ abstract class CDatabase_Grammar {
 
     /**
      * Create query parameter place-holders for an array.
-     *
-     * @param array $values
      *
      * @return string
      */

@@ -293,7 +293,23 @@ class CDatabase_Schema_Builder {
             $this->connection->selectFromWriteConnection($this->grammar->compileColumns($table))
         );
     }
+    /**
+     * Get the indexes for a given table.
+     *
+     * @param  string  $table
+     * @return array
+     */
+    public function getIndexes($table) {
+        [$schema, $table] = $this->parseSchemaAndTable($table);
 
+        $table = $this->connection->getTablePrefix().$table;
+
+        return $this->connection->getPostProcessor()->processIndexes(
+            $this->connection->selectFromWriteConnection(
+                $this->grammar->compileIndexes($schema, $table)
+            )
+        );
+    }
     /**
      * Modify a table on the schema.
      *
@@ -485,7 +501,52 @@ class CDatabase_Schema_Builder {
     public function registerCustomDoctrineType($class, $name, $type) {
         $this->connection->registerDoctrineType($class, $name, $type);
     }
+    /**
+     * Get the names of the current schemas for the connection.
+     *
+     * @return string[]|null
+     */
+    public function getCurrentSchemaListing() {
+        return null;
+    }
 
+    /**
+     * Get the default schema name for the connection.
+     *
+     * @return string|null
+     */
+    public function getCurrentSchemaName() {
+        return $this->getCurrentSchemaListing()[0] ?? null;
+    }
+    /**
+     * Parse the given database object reference and extract the schema and table.
+     *
+     * @param  string  $reference
+     * @param  string|bool|null  $withDefaultSchema
+     * @return array{string|null, string}
+     *
+     * @throws \InvalidArgumentException
+     */
+    public function parseSchemaAndTable($reference, $withDefaultSchema = null) {
+        $segments = explode('.', $reference);
+
+        if (count($segments) > 2) {
+            throw new InvalidArgumentException(
+                "Using three-part references is not supported, you may use `Schema::connection('{$segments[0]}')` instead."
+            );
+        }
+
+        $table = $segments[1] ?? $segments[0];
+
+        $schema = match (true) {
+            isset($segments[1]) => $segments[0],
+            is_string($withDefaultSchema) => $withDefaultSchema,
+            $withDefaultSchema => $this->getCurrentSchemaName(),
+            default => null,
+        };
+
+        return [$schema, $table];
+    }
     /**
      * Get the database connection instance.
      *

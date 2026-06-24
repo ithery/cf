@@ -35,7 +35,7 @@ abstract class CDatabase_Schema_Grammar extends CDatabase_Grammar {
      * @return void
      */
     public function compileCreateDatabase($name, $connection) {
-        throw new LogicException('This database driver does not support creating databases.');
+        return sprintf('create database %s', $this->wrapValue($name));
     }
 
     /**
@@ -48,19 +48,130 @@ abstract class CDatabase_Schema_Grammar extends CDatabase_Grammar {
      * @return void
      */
     public function compileDropDatabaseIfExists($name) {
-        throw new LogicException('This database driver does not support dropping databases.');
+        return sprintf('drop database if exists %s', $this->wrapValue($name));
+    }
+
+    /**
+     * Compile the query to determine the schemas.
+     *
+     * @throws \RuntimeException
+     *
+     * @return string
+     */
+    public function compileSchemas() {
+        throw new RuntimeException('This database driver does not support retrieving schemas.');
+    }
+
+    /**
+     * Compile the query to determine if the given table exists.
+     *
+     * @param null|string $schema
+     * @param string      $table
+     *
+     * @return null|string
+     */
+    public function compileTableExists($schema, $table) {
+        // empty implementation
+    }
+
+    /**
+     * Compile the query to determine the tables.
+     *
+     * @param null|string|string[] $schema
+     *
+     * @throws \RuntimeException
+     *
+     * @return string
+     */
+    public function compileTables($schema) {
+        throw new RuntimeException('This database driver does not support retrieving tables.');
+    }
+
+    /**
+     * Compile the query to determine the views.
+     *
+     * @param null|string|string[] $schema
+     *
+     * @throws \RuntimeException
+     *
+     * @return string
+     */
+    public function compileViews($schema) {
+        throw new RuntimeException('This database driver does not support retrieving views.');
+    }
+
+    /**
+     * Compile the query to determine the user-defined types.
+     *
+     * @param null|string|string[] $schema
+     *
+     * @throws \RuntimeException
+     *
+     * @return string
+     */
+    public function compileTypes($schema) {
+        throw new RuntimeException('This database driver does not support retrieving user-defined types.');
+    }
+
+    /**
+     * Compile the query to determine the columns.
+     *
+     * @param null|string $schema
+     * @param string      $table
+     *
+     * @throws \RuntimeException
+     *
+     * @return string
+     */
+    public function compileColumns($schema, $table) {
+        throw new RuntimeException('This database driver does not support retrieving columns.');
+    }
+
+    /**
+     * Compile the query to determine the indexes.
+     *
+     * @param null|string $schema
+     * @param string      $table
+     *
+     * @throws \RuntimeException
+     *
+     * @return string
+     */
+    public function compileIndexes($schema, $table) {
+        throw new RuntimeException('This database driver does not support retrieving indexes.');
+    }
+
+    /**
+     * Compile a vector index key command.
+     *
+     * @throws \RuntimeException
+     *
+     * @return void
+     */
+    public function compileVectorIndex(CDatabase_Schema_Blueprint $blueprint, CBase_Fluent $command) {
+        throw new RuntimeException('The database driver in use does not support vector indexes.');
+    }
+
+    /**
+     * Compile the query to determine the foreign keys.
+     *
+     * @param null|string $schema
+     * @param string      $table
+     *
+     * @throws \RuntimeException
+     *
+     * @return string
+     */
+    public function compileForeignKeys($schema, $table) {
+        throw new RuntimeException('This database driver does not support retrieving foreign keys.');
     }
 
     /**
      * Compile a rename column command.
      *
-     * @param \CDatabase_Schema_Blueprint $blueprint
-     * @param \CBase_Fluent               $command
-     * @param \CDatabase_Connection       $connection
-     *
-     * @return array
+     * @return list<string>|string
      */
-    public function compileRenameColumn(CDatabase_Schema_Blueprint $blueprint, CBase_Fluent $command, CDatabase_Connection $connection) {
+    public function compileRenameColumn(CDatabase_Schema_Blueprint $blueprint, CBase_Fluent $command) {
         return sprintf(
             'alter table %s rename column %s to %s',
             $this->wrapTable($blueprint),
@@ -72,23 +183,16 @@ abstract class CDatabase_Schema_Grammar extends CDatabase_Grammar {
     /**
      * Compile a change column command into a series of SQL statements.
      *
-     * @param \CDatabase_Schema_Blueprint $blueprint
-     * @param \CBase_Fluent               $command
-     * @param \CDatabase                  $connection
-     *
      * @throws \RuntimeException
      *
-     * @return array
+     * @return list<string>|string
      */
-    public function compileChange(CDatabase_Schema_Blueprint $blueprint, CBase_Fluent $command, CDatabase_Connection $connection) {
-        throw new LogicException('This database driver does not support modifying columns.');
+    public function compileChange(CDatabase_Schema_Blueprint $blueprint, CBase_Fluent $command) {
+        throw new RuntimeException('This database driver does not support modifying columns.');
     }
 
     /**
      * Compile a fulltext index key command.
-     *
-     * @param \CDatabase_Schema_Blueprint $blueprint
-     * @param \CBase_Fluent               $command
      *
      * @throws \RuntimeException
      *
@@ -101,20 +205,16 @@ abstract class CDatabase_Schema_Grammar extends CDatabase_Grammar {
     /**
      * Compile a drop fulltext index command.
      *
-     * @param \CDatabase_Schema_Blueprint $blueprint
-     * @param \CBase_Fluent               $command
+     * @throws \RuntimeException
      *
      * @return string
      */
-    public function compileDropFulltext(CDatabase_Schema_Blueprint $blueprint, CBase_Fluent $command) {
-        throw new RuntimeException('This database driver does not support fulltext index creation.');
+    public function compileDropFullText(CDatabase_Schema_Blueprint $blueprint, CBase_Fluent $command) {
+        throw new RuntimeException('This database driver does not support fulltext index removal.');
     }
 
     /**
      * Compile a foreign key command.
-     *
-     * @param \CDatabase_Schema_Blueprint $blueprint
-     * @param \CBase_Fluent               $command
      *
      * @return string
      */
@@ -155,8 +255,7 @@ abstract class CDatabase_Schema_Grammar extends CDatabase_Grammar {
     /**
      * Compile a drop foreign key command.
      *
-     * @param \CDatabase_Schema_Blueprint $blueprint
-     * @param \CBase_Fluent               $command
+     * @throws \RuntimeException
      *
      * @return string
      */
@@ -165,9 +264,7 @@ abstract class CDatabase_Schema_Grammar extends CDatabase_Grammar {
     }
 
     /**
-     * Compile the blueprint's column definitions.
-     *
-     * @param \CDatabase_Schema_Blueprint $blueprint
+     * Compile the blueprint's added column definitions.
      *
      * @return array
      */
@@ -175,21 +272,30 @@ abstract class CDatabase_Schema_Grammar extends CDatabase_Grammar {
         $columns = [];
 
         foreach ($blueprint->getAddedColumns() as $column) {
-            // Each of the column types have their own compiler functions which are tasked
-            // with turning the column definition into its SQL format for this platform
-            // used by the connection. The column's modifiers are compiled and added.
-            $sql = $this->wrap($column) . ' ' . $this->getType($column);
-
-            $columns[] = $this->addModifiers($sql, $blueprint, $column);
+            $columns[] = $this->getColumn($blueprint, $column);
         }
 
         return $columns;
     }
 
     /**
-     * Get the SQL for the column data type.
+     * Compile the column definition.
      *
-     * @param \CBase_Fluent $column
+     * @param \CDatabase_Schema_ColumnDefinition $column
+     *
+     * @return string
+     */
+    protected function getColumn(CDatabase_Schema_Blueprint $blueprint, $column) {
+        // Each of the column types has their own compiler functions, which are tasked
+        // with turning the column definition into its SQL format for this platform
+        // used by the connection. The column's modifiers are compiled and added.
+        $sql = $this->wrap($column) . ' ' . $this->getType($column);
+
+        return $this->addModifiers($sql, $blueprint, $column);
+    }
+
+    /**
+     * Get the SQL for the column data type.
      *
      * @return string
      */
@@ -200,8 +306,6 @@ abstract class CDatabase_Schema_Grammar extends CDatabase_Grammar {
     /**
      * Create the column definition for a generated, computed column type.
      *
-     * @param \CBase_Fluent $column
-     *
      * @throws \RuntimeException
      *
      * @return void
@@ -211,11 +315,40 @@ abstract class CDatabase_Schema_Grammar extends CDatabase_Grammar {
     }
 
     /**
+     * Create the column definition for a vector type.
+     *
+     * @throws \RuntimeException
+     *
+     * @return string
+     */
+    protected function typeVector(CBase_Fluent $column) {
+        throw new RuntimeException('This database driver does not support the vector type.');
+    }
+
+    /**
+     * Create the column definition for a tsvector type.
+     *
+     * @throws \RuntimeException
+     *
+     * @return string
+     */
+    protected function typeTsvector(CBase_Fluent $column) {
+        throw new RuntimeException('This database driver does not support the tsvector type.');
+    }
+
+    /**
+     * Create the column definition for a raw column type.
+     *
+     * @return string
+     */
+    protected function typeRaw(CBase_Fluent $column) {
+        return $column->offsetGet('definition');
+    }
+
+    /**
      * Add the column modifiers to the definition.
      *
-     * @param string                      $sql
-     * @param \CDatabase_Schema_Blueprint $blueprint
-     * @param \CBase_Fluent               $column
+     * @param string $sql
      *
      * @return string
      */
@@ -230,10 +363,9 @@ abstract class CDatabase_Schema_Grammar extends CDatabase_Grammar {
     }
 
     /**
-     * Get the primary key command if it exists on the blueprint.
+     * Get the command with a given name if it exists on the blueprint.
      *
-     * @param \CDatabase_Schema_Blueprint $blueprint
-     * @param string                      $name
+     * @param string $name
      *
      * @return null|\CBase_Fluent
      */
@@ -241,15 +373,14 @@ abstract class CDatabase_Schema_Grammar extends CDatabase_Grammar {
         $commands = $this->getCommandsByName($blueprint, $name);
 
         if (count($commands) > 0) {
-            return reset($commands);
+            return array_first($commands);
         }
     }
 
     /**
      * Get all of the commands with a given name.
      *
-     * @param \CDatabase_Schema_Blueprint $blueprint
-     * @param string                      $name
+     * @param string $name
      *
      * @return array
      */
@@ -262,8 +393,7 @@ abstract class CDatabase_Schema_Grammar extends CDatabase_Grammar {
     /**
      * Determine if a command with a given name exists on the blueprint.
      *
-     * @param \CDatabase_Schema_Blueprint $blueprint
-     * @param string                      $name
+     * @param string $name
      *
      * @return bool
      */
@@ -280,10 +410,10 @@ abstract class CDatabase_Schema_Grammar extends CDatabase_Grammar {
     /**
      * Add a prefix to an array of values.
      *
-     * @param string $prefix
-     * @param array  $values
+     * @param string        $prefix
+     * @param array<string> $values
      *
-     * @return array
+     * @return array<string>
      */
     public function prefixArray($prefix, array $values) {
         return array_map(function ($value) use ($prefix) {
@@ -294,21 +424,23 @@ abstract class CDatabase_Schema_Grammar extends CDatabase_Grammar {
     /**
      * Wrap a table in keyword identifiers.
      *
-     * @param mixed $table
+     * @param null|string $prefix
+     * @param mixed       $table
      *
      * @return string
      */
-    public function wrapTable($table) {
+    public function wrapTable($table, $prefix = null) {
         return parent::wrapTable(
-            $table instanceof CDatabase_Schema_Blueprint ? $table->getTable() : $table
+            $table instanceof CDatabase_Schema_Blueprint ? $table->getTable() : $table,
+            $prefix
         );
     }
 
     /**
      * Wrap a value in keyword identifiers.
      *
-     * @param \CDatabase_Query_Expression|string $value
-     * @param bool                               $prefixAlias
+     * @param \CBase_Fluent|\CDatabase_Query_Expression|string $value
+     * @param bool                                             $prefixAlias
      *
      * @return string
      */
@@ -327,29 +459,17 @@ abstract class CDatabase_Schema_Grammar extends CDatabase_Grammar {
      * @return string
      */
     protected function getDefaultValue($value) {
-        if ($value instanceof CDatabase_Contract_Query_ExpressionInterface) {
+        if ($value instanceof CDatabase_Query_Expression) {
             return $this->getValue($value);
         }
 
+        if ($value instanceof UnitEnum) {
+            return "'" . str_replace("'", "''", c::enumValue($value)) . "'";
+        }
+
         return is_bool($value)
-                    ? "'" . (int) $value . "'"
-                    : "'" . (string) $value . "'";
-    }
-
-    /**
-     * Create an empty Doctrine DBAL TableDiff from the Blueprint.
-     *
-     * @param \CDatabase_Schema_Blueprint $blueprint
-     * @param \CDatabase_Schema_Manager   $schema
-     *
-     * @return \CDatabase_Schema_Table_Diff
-     */
-    public function getDoctrineTableDiff(CDatabase_Schema_Blueprint $blueprint, CDatabase_Schema_Manager $schema) {
-        $table = $this->getTablePrefix() . $blueprint->getTable();
-
-        return c::tap(new CDatabase_Schema_Table_Diff($table), function ($tableDiff) use ($schema, $table) {
-            $tableDiff->fromTable = $schema->listTableDetails($table);
-        });
+            ? "'" . (int) $value . "'"
+            : "'" . str_replace("'", "''", $value) . "'";
     }
 
     /**
@@ -368,6 +488,19 @@ abstract class CDatabase_Schema_Grammar extends CDatabase_Grammar {
      */
     public function supportsSchemaTransactions() {
         return $this->transactions;
+    }
+
+    /**
+     * Create an empty Doctrine DBAL TableDiff from the Blueprint.
+     *
+     * @return \CDatabase_Schema_Table_Diff
+     */
+    public function getDoctrineTableDiff(CDatabase_Schema_Blueprint $blueprint, CDatabase_Schema_Manager $schema) {
+        $table = $this->getTablePrefix() . $blueprint->getTable();
+
+        return c::tap(new CDatabase_Schema_Table_Diff($table), function ($tableDiff) use ($schema, $table) {
+            $tableDiff->fromTable = $schema->listTableDetails($table);
+        });
     }
 
     /**
