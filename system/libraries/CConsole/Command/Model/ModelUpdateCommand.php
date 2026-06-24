@@ -92,6 +92,11 @@ class CConsole_Command_Model_ModelUpdateCommand extends CConsole_Command_AppComm
         return $result;
     }
 
+    /**
+     * @param array $properties
+     *
+     * @return array
+     */
     public function updateFieldProperties($properties) {
         $fields = Helper::getFields($this->getTable(), $this->prefix);
         $currentPropertyFields = array_column($properties, 'field');
@@ -127,6 +132,11 @@ class CConsole_Command_Model_ModelUpdateCommand extends CConsole_Command_AppComm
         return $properties;
     }
 
+    /**
+     * @param array $properties
+     *
+     * @return int|false
+     */
     private function getMissingPropertyIndex($properties) {
         $fieldsKey = c::collect(Helper::getFields($this->getTable(), $this->prefix))->keys()->toArray();
         $classMethods = get_class_methods($this->prefix . 'Model_' . Helper::getModel($this->getTable()));
@@ -143,6 +153,11 @@ class CConsole_Command_Model_ModelUpdateCommand extends CConsole_Command_AppComm
         return false;
     }
 
+    /**
+     * @param array $properties
+     *
+     * @return array
+     */
     public function updateFieldRelation($properties) {
         $compared = [];
 

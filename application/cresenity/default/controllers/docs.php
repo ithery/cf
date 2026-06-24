@@ -98,6 +98,14 @@ class Controller_Docs extends CController {
         return $app;
     }
 
+    /**
+     * Handle dynamic method calls into the controller.
+     *
+     * @param string $method
+     * @param array  $args
+     *
+     * @return \CApp
+     */
     public function __call($method, $args) {
         return $this->page($method, carr::first($args));
     }

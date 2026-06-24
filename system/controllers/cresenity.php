@@ -78,6 +78,12 @@ class Controller_Cresenity extends CController {
         return $response;
     }
 
+    /**
+     * Handle dynamic method calls into the controller.
+     *
+     * @param string $methods
+     * @return \CApp
+     */
     public function api(...$methods) {
         if (c::blank($methods)) {
             return c::response('CF API');
@@ -211,7 +217,7 @@ class Controller_Cresenity extends CController {
                 break;
         }
 
-        $avatarApi = CImage::avatar()->api($engineName);
+        $avatarApi = CImage::avatar($engineName)->api();
         /*
         if (!isset($_GET['noheader'])) {
             header('Content-type: image/png');
@@ -415,6 +421,11 @@ class Controller_Cresenity extends CController {
         return $this->version();
     }
 
+    /**
+     * @param string $method
+     *
+     * @return \CApp
+     */
     public function cache($method) {
         if ($method == 'delete') {
             $key = c::request()->key;

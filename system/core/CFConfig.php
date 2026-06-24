@@ -39,6 +39,15 @@ class CFConfig {
         }
     }
 
+    /**
+     * Load the configuration files for a given config key.
+     *
+     * @param string             $configKey
+     * @param array              $files
+     * @param CConfig_Repository $repository
+     *
+     * @return void
+     */
     public static function loadConfigurationFiles($configKey, array $files, CConfig_Repository $repository) {
         $configs = [];
         foreach ($files as $path) {

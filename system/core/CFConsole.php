@@ -1,8 +1,18 @@
 <?php
 
 class CFConsole {
+    /**
+     * The commands that are available to the console application.
+     *
+     * @var array
+     */
     public static $commands = [];
 
+    /**
+     * The default commands that are always available.
+     *
+     * @var array
+     */
     public static $defaultCommands = [
         CConsole_Command_VersionCommand::class,
         CConsole_Command_AboutCommand::class,
@@ -107,6 +117,11 @@ class CFConsole {
 
     ];
 
+    /**
+     * Execute the console application.
+     *
+     * @return void
+     */
     public static function execute() {
         $kernel = new CConsole_Kernel();
         $commands = array_merge(static::$defaultCommands, static::$commands);
@@ -124,6 +139,13 @@ class CFConsole {
         exit($status);
     }
 
+    /**
+     * Add a command class to the console application.
+     *
+     * @param string|array $classArray
+     *
+     * @return void
+     */
     public static function addCommand($classArray) {
         $classArray = carr::wrap($classArray);
         foreach ($classArray as $class) {

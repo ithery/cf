@@ -1231,6 +1231,14 @@ final class CF {
         return false;
     }
 
+    /**
+     * Run callback with specific appCode.
+     *
+     * @param string   $appCode
+     * @param callable $callback
+     *
+     * @return mixed
+     */
     public static function asAppCode($appCode, $callback) {
         if (is_callable($callback)) {
             $domain = CF::domain();

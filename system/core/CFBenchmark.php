@@ -7,8 +7,17 @@ defined('SYSPATH') or die('No direct access allowed.');
  */
 final class CFBenchmark {
     // Benchmark timestamps
+
+    /**
+     * @var array
+     */
     private static $marks;
 
+    /**
+     * Callback function to be called when a benchmark is stopped.
+     *
+     * @var callable
+     */
     private static $onStopCallback;
 
     /**
@@ -65,9 +74,9 @@ final class CFBenchmark {
             $times = [];
             $names = array_keys(self::$marks);
 
-            foreach ($names as $name) {
+            foreach ($names as $nameLoop) {
                 // Get each mark recursively
-                $times[$name] = self::get($name, $decimals);
+                $times[$nameLoop] = self::get($nameLoop, $decimals);
             }
 
             // Return the array
@@ -130,9 +139,14 @@ final class CFBenchmark {
         return $completed;
     }
 
+    /**
+     * Set the callback function to be called when a benchmark is stopped.
+     *
+     * @param callable $callback
+     *
+     * @return void
+     */
     public static function onStopCallback($callback) {
         static::$onStopCallback = $callback;
     }
 }
-
-// End Benchmark
