@@ -1050,7 +1050,7 @@ class CModel_Query {
 
         $segments = preg_split('/\s+as\s+/i', $this->query->from);
 
-        $qualifiedColumn = array_last($segments).'.'.$column;
+        $qualifiedColumn = c::arrayLast($segments).'.'.$column;
 
         $values[$qualifiedColumn] = carr::get($values, $qualifiedColumn, $values[$column]);
 
