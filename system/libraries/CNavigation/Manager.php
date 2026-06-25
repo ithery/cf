@@ -2,16 +2,28 @@
 
 class CNavigation_Manager {
     /**
-     * @var array<CNavigation_Nav>
+     * @var array<string, CNavigation_Nav>
      */
     protected $navs = [];
 
+    /**
+     * @var null|CNavigation_Manager
+     */
     protected static $instance;
 
+    /**
+     * @var null|callable
+     */
     protected $activeCallback;
 
+    /**
+     * @var null|callable
+     */
     protected $accessCallback;
 
+    /**
+     * @return CNavigation_Manager
+     */
     public static function instance() {
         if (self::$instance == null) {
             self::$instance = new self();
@@ -20,10 +32,22 @@ class CNavigation_Manager {
         return self::$instance;
     }
 
+    /**
+     * @param null|string|array|Closure|CNavigation_Nav $nav
+     *
+     * @return CNavigation_Nav
+     */
     public function nav($nav = 'nav') {
         return $this->resolveNav($nav);
     }
 
+    /**
+     * @param string|array|Closure $nav
+     *
+     * @throws Exception
+     *
+     * @return string
+     */
     private function resolveName($nav) {
         if ($nav instanceof Closure) {
             return 'closure-' . $this->closureHash($nav);
@@ -38,6 +62,13 @@ class CNavigation_Manager {
         throw new Exception('Nav with type ' . gettype($nav) . ' is not supported');
     }
 
+    /**
+     * @param null|string|array|Closure|CNavigation_Nav $nav
+     *
+     * @throws Exception
+     *
+     * @return CNavigation_Nav
+     */
     public function resolveNav($nav) {
         if ($nav === null) {
             $nav = 'nav';
@@ -76,6 +107,11 @@ class CNavigation_Manager {
         return $this->navs[$name];
     }
 
+    /**
+     * @param Closure $closure
+     *
+     * @return string
+     */
     protected function closureHash(Closure $closure) {
         $reflection = new CFunction_SerializableClosure_Support_ReflectionClosure($closure);
 
@@ -126,20 +162,36 @@ class CNavigation_Manager {
         return $this;
     }
 
+    /**
+     * @return null|callable
+     */
     public function getActiveCallback() {
         return $this->activeCallback;
     }
 
+    /**
+     * @param callable $accessCallback
+     *
+     * @return $this
+     */
     public function setAccessCallback($accessCallback) {
         $this->accessCallback = $accessCallback;
 
         return $this;
     }
 
+    /**
+     * @return null|callable
+     */
     public function getAccessCallback() {
         return $this->accessCallback;
     }
 
+    /**
+     * @param array $options
+     *
+     * @return string
+     */
     public static function render($options = []) {
         $engine = carr::get($options, 'engine', 'Bootstrap');
         $layout = carr::get($options, 'layout', 'horizontal');
