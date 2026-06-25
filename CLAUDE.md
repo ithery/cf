@@ -109,6 +109,7 @@ npm run prod                             # Production build
 - **Method names**: camelCase
 - **Class names**: StudlyCaps with C-prefix (CApp, CModel, CDatabase)
 - **No comments** unless the WHY is non-obvious
+- **PHPDoc required**: all properties must have `@var`, all methods must have `@param`/`@return`. Intelephense warnings for missing type info (P1132) must be resolved
 - Config: `.php-cs-fixer.dist.php`, `.editorconfig`, `phpcs.xml`
 
 ### JavaScript

@@ -15,4 +15,9 @@ return [
         'label' => c::__('Lazy Model'),
         'uri' => 'demo/model/lazy/index',
     ],
+    [
+        'name' => 'model.chartable',
+        'label' => c::__('Chartable Trait'),
+        'uri' => 'demo/model/chartable/index',
+    ],
 ];
