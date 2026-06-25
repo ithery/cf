@@ -46,7 +46,7 @@ class CDatabase_Schema_Builder_PostgresBuilder extends CDatabase_Schema_Builder 
         $table = $this->connection->getTablePrefix() . $table;
 
         return count($this->connection->selectFromWriteConnection(
-            $this->grammar->compileTableExists(),
+            $this->grammar->compileTableExists($schema, $table),
             [$database, $schema, $table]
         )) > 0;
     }

@@ -18,9 +18,12 @@ class CDatabase_Schema_Grammar_OdbcGrammar extends CDatabase_Schema_Grammar {
     /**
      * Compile the query to determine if a table exists.
      *
+     * @param null|string $schema
+     * @param string      $table
+     *
      * @return string
      */
-    public function compileTableExists() {
+    public function compileTableExists($schema, $table) {
         return 'select * from information_schema.tables where table_schema = ? and table_name = ?';
     }
 

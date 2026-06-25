@@ -19,7 +19,7 @@ class CDatabase_Schema_Grammar_SqliteGrammar extends CDatabase_Schema_Grammar {
      *
      * @return string
      */
-    public function compileTableExists() {
+    public function compileTableExists($schema, $table) {
         return "select * from sqlite_master where type = 'table' and name = ?";
     }
 
