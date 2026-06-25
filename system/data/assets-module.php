@@ -478,6 +478,10 @@ return [
             'libs/bootstrap-4/plugins/moment/moment.js',
         ],
     ],
+    'bootstrap-5' => [
+        'css' => ['libs/bootstrap-5/bootstrap.min.css'],
+        'js' => ['libs/bootstrap-5/bootstrap.bundle.js'],
+    ],
     /*
      * ICON
      */
