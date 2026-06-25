@@ -25,10 +25,11 @@ export default {
     },
 
     onwarn(warning, warn) {
-        // suppress eval warnings
         if (warning.code === 'EVAL') {return;}
-        // suppress circular dependency warnings
         if (warning.code === 'CIRCULAR_DEPENDENCY') {return;}
+        if (warning.code === 'EMPTY_BUNDLE') {return;}
+        if (warning.message && warning.message.includes('output file') && warning.message.includes('cres.css')) {return;}
+        if (warning.code === 'NAMESPACE_CONFLICT' || (warning.message && warning.message.includes('re-exports'))) {return;}
         warn(warning);
     },
     plugins: [
@@ -45,7 +46,6 @@ export default {
             extensions: ['.css'],
             extract: true,
             minimize: isProduction
-            // modules: true,
         }),
         filesize(),
         terser({ format: { comments: false } }),
