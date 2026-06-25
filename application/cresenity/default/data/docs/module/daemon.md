@@ -1,61 +1,90 @@
-# CDaemon
+# Module - Daemon
 
-### Introduction
+The `CDaemon` module provides long-running background services that run continuously on the server. Daemons are ideal for queue workers, WebSocket servers, and real-time data processors.
 
-Saat membangun aplikasi web, Anda mungkin perlu memiliki beberapa service yang harus berjalan terus menerus dibackground pada server.
+---
 
+### Creating a Daemon Service
 
+Extend `CDaemon_ServiceAbstract` and implement `setup()` and `execute()`:
 
-Contoh Kode membuat class daemon:
 ```php
-class MYDaemon_QueueRunnerDaemon extends CDaemon_ServiceAbstract {
-    protected $loopInterval = 1; // set loop interval to 1 seconds
+<?php
+class MyApp_Daemon_QueueRunner extends CDaemon_ServiceAbstract {
+    protected $loopInterval = 1;
 
-    /**
-     * Run once time when daemon startup
-     */
     public function setup() {
-        // make sure to disable benchmark to optimize memory when daemon running with query
+        // Run once on startup
         c::db()->disableBenchmark();
     }
 
-    /**
-     * Run each time loop interval
-     */
     public function execute() {
-        //in this example we will run queue
+        // Run on each loop iteration
         CQueue::run('database', [
             'sleep' => 0,
         ]);
+
         $this->loopCount++;
         if ($this->loopCount > 10000) {
-            //automatically restart daemon for prevent memory leak
+            // Auto-restart to prevent memory leaks
             $this->restart();
         }
     }
 }
-
 ```
 
-contoh kode untuk registerkan daemon ke framework:
+---
+
+### Registering a Daemon
+
+Register the daemon in `bootstrap.php`:
+
 ```php
-c::manager()->registerDaemon(MYDaemon_QueueRunnerDaemon::class);
-
+c::manager()->registerDaemon(MyApp_Daemon_QueueRunner::class);
 ```
 
-### UI Previewer
+---
 
-Setelah diregister ke framework mennggunakan CManager, maka daemon dapat dipantau melalui ui.
+### Configuration
 
-Contoh Kode untuk ui previewer:
+| Property | Description |
+|----------|------------|
+| `$loopInterval` | Seconds between each `execute()` call |
+| `$loopCount` | Current loop iteration count |
+
+| Method | Description |
+|--------|------------|
+| `setup()` | Called once when the daemon starts |
+| `execute()` | Called on each loop iteration |
+| `restart()` | Restart the daemon process |
+| `log($message)` | Write to daemon log file |
+| `debug($message)` | Write debug message (non-production only) |
+| `error($message)` | Write error message |
+| `getConfig($key)` | Get daemon configuration value |
+
+---
+
+### Running Daemons
+
+```bash
+php cf daemon:run
+```
+
+---
+
+### Daemon UI Manager
+
+Monitor registered daemons with a built-in UI:
+
 ```php
 <?php
-class Controller_Daemon extends CController {
+class Controller_Admin_Daemon extends CController {
     use CTrait_Controller_Application_Manager_Daemon;
 
     protected function getTitle() {
-        return 'Daemon';
+        return 'Daemon Manager';
     }
 }
-
 ```
+
+This provides a UI to start, stop, and monitor daemon services.
