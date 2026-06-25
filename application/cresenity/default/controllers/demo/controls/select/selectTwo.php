@@ -89,6 +89,34 @@ class Controller_Demo_Controls_Select_SelectTwo extends \Cresenity\Demo\Controll
             }
         });
 
+        $div = $form->addDiv()->addClass('border-1 p-3 mb-3');
+        $div->addH5()->add('Div Depends On SelectTwo');
+        $selectCountryForDetail = $div->addSelectTwoControl('select_country_detail')
+            ->setDataFromModel(\Cresenity\Demo\Model\Country::class);
+        $selectCountryForDetail->setKeyField('code');
+        $selectCountryForDetail->setSearchField('name');
+        $selectCountryForDetail->setPlaceholder('Select a country to see details...');
+        $selectCountryForDetail->setAllowClear(true);
+
+        $divDetail = $div->addDiv()->addClass('mt-3');
+        $divDetail->setDependsOn($selectCountryForDetail, function ($value) {
+            $div = c::div();
+            if (strlen($value) > 0) {
+                $country = \Cresenity\Demo\Model\Country::where('code', '=', $value)->first();
+                if ($country) {
+                    $widget = $div->addWidget()->setTitle('Country Detail');
+                    $row = $widget->addDiv()->addClass('row');
+                    $row->addDiv()->addClass('col-md-4')->addField()->setLabel('Code')->addLabelControl()->setValue($country->code);
+                    $row->addDiv()->addClass('col-md-4')->addField()->setLabel('Name')->addLabelControl()->setValue($country->name);
+                    $row->addDiv()->addClass('col-md-4')->addField()->setLabel('Continent')->addLabelControl()->setValue($country->continent);
+                } else {
+                    $div->addAlert()->setTypeWarning()->add('Country not found');
+                }
+            }
+
+            return $div;
+        });
+
         $form->addActionList()->addAction()->setLabel('Submit')->setSubmit();
 
         return $app;

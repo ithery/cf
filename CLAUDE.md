@@ -116,6 +116,9 @@ All JS in `media/js/cres/src/` MUST comply with `.eslintrc` — read that file b
 Use `const` for values never reassigned, `let` otherwise — never `var`.
 Build after changes: `cd media/js/cres && npm run build`
 
+### CSS
+All CSS MUST comply with `.stylelintrc` — read that file before writing any CSS.
+
 ## Important Conventions
 
 - `system/vendor/` is manually managed — do NOT run composer install into it
