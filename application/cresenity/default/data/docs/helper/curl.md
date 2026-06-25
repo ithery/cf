@@ -1,16 +1,54 @@
 # Helper curl
 
+The `curl` helper class provides URL utility methods.
 
 ### curl::base
 
-Fungsi abort throws CHTTP_Exception yang akan dirender oleh exception handler
+Returns the base URL of the application:
 
 ```php
-curl::base(403);
+$baseUrl = curl::base();
+// 'http://myapp.dev.cresenity.com/'
 ```
 
-Kita dapat juga mem-provide exception's message dan custom HTTP response headers yang akan dikirim ke browser:
+### curl::current
+
+Returns the current URI path:
 
 ```php
-c::abort(403, 'Unauthorized.', $headers);
+$current = curl::current();
+// 'admin/user/edit'
+```
+
+With query string:
+
+```php
+$current = curl::current(true);
+// 'admin/user/edit?page=2'
+```
+
+### curl::redirect
+
+Redirects to the given URL:
+
+```php
+curl::redirect('https://example.com');
+curl::redirect(curl::base() . 'home');
+```
+
+### curl::site
+
+Returns the full site URL for a given path:
+
+```php
+$url = curl::site('admin/dashboard');
+```
+
+### curl::query
+
+Returns the current query string:
+
+```php
+$query = curl::query();
+// 'page=2&sort=name'
 ```
