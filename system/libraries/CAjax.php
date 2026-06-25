@@ -19,6 +19,8 @@ class CAjax {
 
     const TYPE_VALIDATION = 'Validation';
 
+    const TYPE_DEPENDS_ON = 'DependsOn';
+
     /**
      * @param null|array|string $options
      *

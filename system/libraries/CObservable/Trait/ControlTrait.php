@@ -15,6 +15,20 @@ trait CObservable_Trait_ControlTrait {
     }
 
     /**
+     * Create SelectTwo Control (cres.js auto-initialized).
+     *
+     * @param null|string $id
+     *
+     * @return CElement_FormInput_SelectTwo
+     */
+    public function addSelectTwoControl($id = null) {
+        $control = new CElement_FormInput_SelectTwo($id);
+        $this->wrapper->add($control);
+
+        return $control;
+    }
+
+    /**
      * Create Map Picker Control.
      *
      * @param null|string $id
