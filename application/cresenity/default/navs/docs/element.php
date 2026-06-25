@@ -17,14 +17,29 @@ return [
         'uri' => 'docs/element/form',
     ],
     [
+        'name' => 'element.widget',
+        'label' => c::__('Widget'),
+        'uri' => 'docs/element/widget',
+    ],
+    [
+        'name' => 'element.action',
+        'label' => c::__('Action'),
+        'uri' => 'docs/element/action',
+    ],
+    [
+        'name' => 'element.alert',
+        'label' => c::__('Alert'),
+        'uri' => 'docs/element/alert',
+    ],
+    [
         'name' => 'element.tab',
         'label' => c::__('Tab'),
         'uri' => 'docs/element/tab',
     ],
     [
-        'name' => 'element.widget',
-        'label' => c::__('Widget'),
-        'uri' => 'docs/element/widget',
+        'name' => 'element.accordion',
+        'label' => c::__('Accordion'),
+        'uri' => 'docs/element/accordion',
     ],
     [
         'name' => 'element.showmore',
@@ -36,5 +51,4 @@ return [
         'label' => c::__('Shimmer'),
         'uri' => 'docs/element/shimmer',
     ],
-
 ];
