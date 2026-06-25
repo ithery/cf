@@ -1,170 +1,68 @@
 # Cres JS - Reload
 
+Load or refresh content in a DOM element via AJAX.
 
 ```js
 cresenity.reload(options);
-//3.5.1
 ```
 
 ### Options
 
-##### url (required)
-Url ajax yang akan diload
+| Option | Default | Description |
+|--------|---------|------------|
+| `url` | `'/'` | AJAX URL to load content from (required) |
+| `selector` | - | CSS selector of the target element (required) |
+| `method` | `'get'` | HTTP method |
+| `reloadType` | `'reload'` | How to insert content (see below) |
+| `dataAddition` | `{}` | Additional data to send with the request |
+| `onBlock` | `false` | Callback before AJAX starts (for custom loading) |
+| `onUnblock` | `false` | Callback after AJAX completes |
+| `blockHtml` | `false` | Custom loading indicator HTML |
+| `onSuccess` | `false` | Callback on success with response data |
+| `onComplete` | `false` | Callback when AJAX completes |
+
+### Reload Types
+
+| Type | Description |
+|------|------------|
+| `reload` | Replace content inside the target element |
+| `after` | Insert after the target element |
+| `before` | Insert before the target element |
+| `append` | Append inside the target element |
+| `prepend` | Prepend inside the target element |
+
+### Shorthand Methods
 
 ```js
-{
-    url : '/app/ajax/reload',
-}
-
+cresenity.append(options);   // reloadType: 'append'
+cresenity.prepend(options);  // reloadType: 'prepend'
+cresenity.after(options);    // reloadType: 'after'
+cresenity.before(options);   // reloadType: 'before'
 ```
-
-##### selector (required)
-Selector element yang akan direload
-
-```js
-{
-    selector : '.element .tobe .selected',
-}
-
-```
-##### reloadType (default:reload)
-Jenis reload, parameter yang ada:
-
-1. reload : replace inside current selector element
-2. after : after selector element
-3. before : before selector element
-4. append : append inside current selector element
-5. prepend: prepend inside current selector element
-
-```js
-{
-    reloadType : 'reload',
-}
-
-```
-
-##### onBlock (default:false)
-callback function saat akan melakukan ajax
-```js
-{
-    onBlock : () => {
-        //do something to block here
-        $(selector).addClass('loading');
-    }
-}
-
-```
-
-##### onUnblock (default:false)
-callback function saat setelah ajax (success maupun error)
-
-```js
-{
-    onUnblock : () => {
-        //do something to unblock here
-        $(selector).removeClass('loading');
-    }
-}
-
-```
-
-##### blockHtml (default:false)
-blockHtml yang akan digunakan untuk memblock reload element
-
-parameter `false` akan menggunakan default html:
-```html
-<div class="sk-wave sk-primary">
-    <div class="sk-rect sk-rect1"></div>
-    <div class="sk-rect sk-rect2"></div>
-    <div class="sk-rect sk-rect3"></div>
-    <div class="sk-rect sk-rect4"></div>
-    <div class="sk-rect sk-rect5"></div>
-</div>
-```
-##### method (default:'get')
-Method yang akan digunakan untuk ajax
-
-##### onComplete (default:false)
-Callback saat ajax complete
-```js
-{
-    onComplete : () => {
-
-    }
-}
-
-```
-
-##### onSuccess (default:false)
-Callback saat ajax success, mempunyai parameter object data dari json response capp
-```js
-{
-    onSuccess : (data) => {
-
-    }
-}
-
-```
-
-##### dataAdditional (default:{})
-data yang akan dikirim untuk ajax
-```js
-{
-    dataAdditional : {
-        name: 'John',
-        email: 'john@doe.com',
-    }
-}
-
-```
-
 
 ### Events
 
-##### reload:success
-Event saat reload success
-
 ```js
-    //when object cresenity not loaded
-    window.addEventListener('cresenity:reload:success',(event) => {
-        const cAppResponse = event.detail
-    });
+// Success
+cresenity.on('reload:success', (event) => {
+    const response = event.detail;
+});
 
-    //when object cresenity is loaded
-    cresenity.on('reload:success',(event) => {
-        const cAppResponse = event.detail
-    });
+// Error
+cresenity.on('reload:error', (event) => {
+    const { xhr, ajaxOptions, error } = event.detail;
+});
+
+// Complete
+cresenity.on('reload:complete', (event) => {
+    // no parameters
+});
 ```
 
-##### reload:error
-Event saat reload error
+Events can also be listened before cresenity loads:
 
 ```js
-    //when object cresenity not loaded
-    window.addEventListener('cresenity:reload:error',(event) => {
-        const xhr = event.detail.xhr; // ajax xhr object
-        const ajaxOptions = event.detail.ajaxOption; // ajaxOptions object
-        const error = event.error; // thrown error
-        //do something to handle error
-    });
-
-    //when object cresenity is loaded
-    cresenity.on('reload:error',(event) => {
-        //do something to handle error
-    });
-```
-
-##### reload:complete
-
-```js
-    //when object cresenity not loaded
-    window.addEventListener('cresenity:reload:complete',(event) => {
-        //no parameters passed on event, event.detail == null
-        //do something to handle complete event
-    });
-
-    //when object cresenity is loaded
-    cresenity.on('reload:complete',(event) => {
-        //do something to handle complete event
-    });
+window.addEventListener('cresenity:reload:success', (event) => {
+    const response = event.detail;
+});
 ```

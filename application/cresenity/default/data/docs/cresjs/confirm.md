@@ -1,26 +1,27 @@
 # Cres JS - Confirm
 
-Simple Confirm
+Show a confirmation dialog before executing an action.
+
+### Simple Confirm
 
 ```javascript
 cresenity.confirm((confirmed) => {
-    if(confirmed) {
-        //do something when user press Yes
-    } else {
-        //do something when user press No
+    if (confirmed) {
+        // user pressed Yes
     }
 });
 ```
 
-Advance Confirm
+### Advanced Confirm
+
+Pass options for custom message and callbacks:
+
 ```javascript
 cresenity.confirm({
-    message: 'Apakah anda yakin?',
+    message: 'Are you sure?',
     confirmCallback: (confirmed) => {
-        if(confirmed) {
-            //do something when user press Yes
-        } else {
-            //do something when user press No
+        if (confirmed) {
+            // user pressed Yes
         }
     }
 });
@@ -28,11 +29,16 @@ cresenity.confirm({
 
 ### Custom Confirm Handler
 
+Override the default confirmation dialog with your own implementation:
+
 ```javascript
-window.addEventListener('cresenity:loaded',()=>{
-    cresenity.setConfirmHandler((owner, setting, callback)=>{
-        const confirmed = window.confirm('Apakah anda sudah benar-benar yakin?');
+window.addEventListener('cresenity:loaded', () => {
+    cresenity.setConfirmHandler((owner, settings, callback) => {
+        // Use any custom dialog library
+        const confirmed = window.confirm(settings.message);
         callback(confirmed);
     });
 });
 ```
+
+This is useful for integrating custom modal libraries (SweetAlert2, etc.) as the confirmation dialog.

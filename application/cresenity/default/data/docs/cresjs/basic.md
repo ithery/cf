@@ -1,83 +1,86 @@
 # Cres JS - Basic
-### Introduction
 
-Secara basic, cresenity mempunyai banyak helper yang bisa digunakan dan bisa langsung digunakan pada project saat penulisan javascript.
-
-
-untuk alpine object dapat diakses dari `cresenity.Alpine`, semisal untuk mendapatkan version Alpine yang digunakan pada cresenity dapat dicheck dengan perintah berikut:
-
-
-```js
-console.log(cresenity.alpine.Alpine.version);
-//3.9.5
-```
-
+Cresenity provides several built-in utilities accessible directly from the `cresenity` object.
 
 ### Base64
 
-
-Untuk base64 object dapat diakses melalui cresenity.base64
+Encode and decode Base64 strings:
 
 ```js
-var foo = 'foo';
-var bar = cresenity.base64.encode(foo);
+let encoded = cresenity.base64.encode('hello');
+// aGVsbG8=
 
-var result = cresenity.base64.decode(bar);
-
-console.log(foo,bar,result);
-// foo Zm9v foo
+let decoded = cresenity.base64.decode(encoded);
+// hello
 ```
+
 ### clsx
 
+Build CSS class strings conditionally:
+
 ```js
-import clsx from 'clsx';
-// or
-import { clsx } from 'clsx';
+cresenity.clsx('foo', true && 'bar', 'baz');
+// 'foo bar baz'
 
-// Strings (variadic)
-cres.clsx('foo', true && 'bar', 'baz');
-//=> 'foo bar baz'
+cresenity.clsx({ foo: true, bar: false, baz: true });
+// 'foo baz'
 
-// Objects
-cres.clsx({ foo:true, bar:false, baz:isTrue() });
-//=> 'foo baz'
-
-// Objects (variadic)
-cres.clsx({ foo:true }, { bar:false }, null, { '--foobar':'hello' });
-//=> 'foo --foobar'
-
-// Arrays
-cres.clsx(['foo', 0, false, 'bar']);
-//=> 'foo bar'
-
-// Arrays (variadic)
-cres.clsx(['foo'], ['', 0, false, 'bar'], [['baz', [['hello'], 'there']]]);
-//=> 'foo bar baz hello there'
-
-// Kitchen sink (with nesting)
-cres.clsx('foo', [1 && 'bar', { baz:false, bat:null }, ['hello', ['world']]], 'cya');
-//=> 'foo bar hello world cya'
+cresenity.clsx(['foo', 0, false, 'bar']);
+// 'foo bar'
 ```
 
-### history
-``` javascript
-(function(window,undefined){
+### History
 
-	// Bind to StateChange Event
-	cres.history.Adapter.bind(window,'statechange',function(){ // Note: We are using statechange instead of popstate
-		var State = cres.history.getState(); // Note: We are using cres.history.getState() instead of event.state
-	});
+Manage browser history state:
 
-	// Change our States
-	cres.history.pushState({state:1}, "State 1", "?state=1"); // logs {state:1}, "State 1", "?state=1"
-	cres.history.pushState({state:2}, "State 2", "?state=2"); // logs {state:2}, "State 2", "?state=2"
-	cres.history.replaceState({state:3}, "State 3", "?state=3"); // logs {state:3}, "State 3", "?state=3"
-	cres.history.pushState(null, null, "?state=4"); // logs {}, '', "?state=4"
-	cres.history.back(); // logs {state:3}, "State 3", "?state=3"
-	cres.history.back(); // logs {state:1}, "State 1", "?state=1"
-	cres.history.back(); // logs {}, "Home Page", "?"
-	cres.history.go(2); // logs {state:3}, "State 3", "?state=3"
+```js
+cresenity.history.pushState({ page: 1 }, 'Page 1', '?page=1');
+cresenity.history.replaceState({ page: 2 }, 'Page 2', '?page=2');
+cresenity.history.back();
+cresenity.history.go(2);
 
-})(window);
+cresenity.history.Adapter.bind(window, 'statechange', function () {
+    let state = cresenity.history.getState();
+});
 ```
-### dateFns
+
+### date-fns
+
+The [date-fns](https://date-fns.org/) library is available for date manipulation:
+
+```js
+let now = new Date();
+let formatted = cresenity.dateFns.format(now, 'yyyy-MM-dd');
+let tomorrow = cresenity.dateFns.addDays(now, 1);
+```
+
+### collect.js
+
+The [collect.js](https://collect.js.org/) library is available for collection manipulation:
+
+```js
+let items = cresenity.collect([1, 2, 3, 4, 5]);
+let sum = items.sum();
+let filtered = items.filter(i => i > 2).all();
+```
+
+### Debounce
+
+Debounce a function call:
+
+```js
+let handler = cresenity.debounce(() => {
+    console.log('debounced');
+}, 300);
+```
+
+### Reactive (Alpine)
+
+Create reactive data with Alpine.js:
+
+```js
+let data = cresenity.reactive({ count: 0 }, (data) => {
+    console.log('count changed:', data.count);
+});
+data.count++;
+```
