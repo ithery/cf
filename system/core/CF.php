@@ -65,6 +65,11 @@ final class CF {
      */
     private static $sharedAppCode = [];
 
+    /**
+     * Force appCode for CF.
+     *
+     * @var string
+     */
     private static $forceAppCode = null;
 
     /**
@@ -112,6 +117,11 @@ final class CF {
         return c::env('ENVIRONMENT', CBase::ENVIRONMENT_DEVELOPMENT);
     }
 
+    /**
+     * Check CF is running on development.
+     *
+     * @return bool
+     */
     public static function environment(...$environments) {
         if (count($environments) > 0) {
             $patterns = is_array($environments[0]) ? $environments[0] : $environments;
@@ -359,7 +369,7 @@ final class CF {
      */
     public static function paths($domain = null, $forceReload = false, $withShared = true) {
         if ($domain == null) {
-            $domain = CF::domain($domain);
+            $domain = CF::domain();
         }
         $isDiffAppCode = false;
         if (CF::appCode() != CF::appCode($domain)) {

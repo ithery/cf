@@ -181,6 +181,11 @@ class CRouting_RouteFinder {
         return true;
     }
 
+    /**
+     * @param string $controller
+     *
+     * @return string
+     */
     public static function controllerUrl($controller) {
         $classExplode = explode('_', $controller);
         $classExplode = array_map(function ($item) {

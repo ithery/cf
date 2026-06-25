@@ -10,6 +10,13 @@ trait CObservable_Listener_Handler_Trait_TargetHandlerTrait {
      */
     protected $target;
 
+    /**
+     * Set the target of the handler.
+     *
+     * @param string|CObservable|CRenderable $target
+     *
+     * @return $this
+     */
     public function setTarget($target) {
         if ($target instanceof CObservable) {
             if (get_class($this) == CObservable_Listener_Handler_ReloadHandler::class) {

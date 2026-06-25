@@ -504,6 +504,11 @@ class Controller_Cresenity extends CController {
         return $responseFactory->toResponse($request);
     }
 
+    /**
+     * @param string $method
+     *
+     * @return \CApp
+     */
     public function auth($method) {
         if ($method == 'ping') {
             $appCode = c::request()->appCode;

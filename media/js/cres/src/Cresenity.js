@@ -48,6 +48,7 @@ import collect from 'collect.js';
 import emitter from './cresenity/emitter';
 import bootstrapHelper from './module/BootstrapHelper';
 import cresStyle from './module/CresStyle';
+import DownloadProgress from './module/DownloadProgress';
 
 export default class Cresenity {
     constructor() {
@@ -108,6 +109,7 @@ export default class Cresenity {
         this.stylex = stylex;
         this.collect = collect;
         this.emitter = emitter;
+        this.download = new DownloadProgress(this);
     }
     loadJs(filename, callback) {
         let fileref = document.createElement('script');
@@ -169,21 +171,19 @@ export default class Cresenity {
         window.addEventListener('cresenity:' + eventName, cb);
     }
     async handleResponseAsync(data) {
-        return new Promise(async (resolve, reject) => {
-            if(data.assets) {
-                if(data.assets.css) {
-                    for (let i = 0; i < data.assets.css.length; i++) {
-                        await this.cf.requireCssAsync(data.assets.css[i]);
-                    }
-                }
-                if(data.assets.js) {
-                    for (let i = 0; i < data.assets.js.length; i++) {
-                        await this.cf.requireJsAsync(data.assets.js[i]);
-                    }
+        if(data.assets) {
+            if(data.assets.css) {
+                for (let i = 0; i < data.assets.css.length; i++) {
+                    await this.cf.requireCssAsync(data.assets.css[i]);
                 }
             }
-            resolve(data);
-        });
+            if(data.assets.js) {
+                for (let i = 0; i < data.assets.js.length; i++) {
+                    await this.cf.requireJsAsync(data.assets.js[i]);
+                }
+            }
+        }
+        return data;
     }
     handleResponse(data, callback) {
         this.handleResponseAsync(data).then(callback);
@@ -357,7 +357,7 @@ export default class Cresenity {
                 complete: () => {
                     this.dispatch('reload:complete');
                     $(element).data('xhr', false);
-                    if (typeof settings.onBlock === 'function') {
+                    if (typeof settings.onUnblock === 'function') {
                         settings.onUnblock($(element));
                     } else {
                         this.unblockElement($(element));
@@ -543,7 +543,6 @@ export default class Cresenity {
             modalContainer.modal({
                 backdrop: settings.backdrop
             });
-
         }
 
         return modalContainer;
@@ -621,7 +620,7 @@ export default class Cresenity {
                     }
                 }
                 if (thrownError !== 'abort') {
-                    this.showError('Something when wrong' + thrownError);
+                    this.showError('Something went wrong' + (thrownError ? ' (' + thrownError + ')' : ''));
                 }
             },
 
@@ -1003,7 +1002,7 @@ export default class Cresenity {
         return elm.html();
     }
     isUsingBootstrap() {
-        bootstrapHelper.isBootstrap();
+        return bootstrapHelper.isBootstrap();
     }
     initDependency() {
         bootstrapHelper.check();
@@ -1158,165 +1157,7 @@ export default class Cresenity {
         this.cf.init();
     }
     downloadProgress(options) {
-        let settings = extend({
-            // These are the defaults.
-            method: 'get',
-            dataAddition: {},
-            url: '/',
-            onComplete: false,
-            onSuccess: false,
-            onBlock: false,
-            onUnblock: false
-        }, options);
-
-
-        let method = settings.method;
-
-        let xhr = jQuery(window).data('cappXhrProgress');
-        if (xhr) {
-            xhr.abort();
-        }
-
-        let dataAddition = settings.dataAddition;
-        let url = settings.url;
-        url = this.url.replaceParam(url);
-        if (typeof dataAddition === 'undefined') {
-            dataAddition = {};
-        }
-
-
-        if (typeof settings.onBlock === 'function') {
-            settings.onBlock();
-        } else {
-            this.blockPage();
-        }
-
-        $.ajax({
-            type: method,
-            url: url,
-            dataType: 'json',
-            data: dataAddition,
-            success: (response) => {
-                this.handleJsonResponse(response, (data) => {
-                    let progressUrl = data.progressUrl;
-                    let progressContainer = $('<div>').addClass('cres-download-progress');
-
-                    const interval = setInterval(() => {
-                        $.ajax({
-                            type: method,
-                            url: progressUrl,
-                            dataType: 'json',
-                            success: (responseProgress) => {
-                                this.handleJsonResponse(responseProgress, (dataProgress) => {
-                                    let progressContainerStatus = progressContainer.find('.cres-download-progress-status');
-                                    if (dataProgress.state === 'DONE') {
-                                        progressContainerStatus.empty();
-                                        let innerStatus = $('<div>');
-
-                                        let innerStatusLabel = $('<label>', {
-                                            class: 'mb-3 d-block'
-                                        }).append('Your file is ready');
-                                        let linkDownload = $('<a>', {
-                                            target: '_blank',
-                                            href: dataProgress.fileUrl,
-                                            class: 'btn btn-primary'
-                                        }).append('Download');
-                                        let linkClose = $('<a>', {
-                                            href: 'javascript:;',
-                                            class: 'btn btn-primary ml-3'
-                                        }).append('Close');
-
-                                        innerStatus.append(innerStatusLabel);
-                                        innerStatus.append(linkDownload);
-                                        innerStatus.append(linkClose);
-
-                                        progressContainerStatus.append(innerStatus);
-                                        linkClose.click(() => {
-                                            this.closeLastModal();
-                                        });
-                                        clearInterval(interval);
-                                    } else {
-                                        if(dataProgress.state === 'PENDING') {
-                                            let progressValue = parseFloat(dataProgress.progressValue);
-                                            if(progressValue>0) {
-                                                let progressStatusBar = progressContainer.find('.cres-download-progress-status-bar');
-                                                if(progressStatusBar.length==0) {
-                                                    //create the status bar
-                                                    let progressAnimation = progressContainer.find('.cres-download-progress-animation');
-                                                    progressAnimation.empty();
-                                                    let progressStatusBar = $('<div class="cres-download-progress-status-bar my-4">');
-                                                    let progress = $('<div class="progress">');
-                                                    let progressBar = $('<div class="progress-bar progress-bar-striped progress-bar-animated">');
-                                                    progressAnimation.append(
-                                                        progressStatusBar.append(progress.append(progressBar))
-                                                    );
-                                                }
-
-                                                let progressMax = parseFloat(dataProgress.progressMax);
-                                                if(isNaN(progressMax) || progressMax==0) {
-                                                    progressMax = 100;
-                                                }
-
-                                                let progressBar = progressStatusBar.find('.progress-bar');
-                                                let progressPercent = Math.round(progressMax>0 ? progressValue * 100 / progressMax : 0);
-
-                                                progressBar.css('width', progressPercent + '%');
-                                                progressBar.html(progressPercent + '%');
-                                            }
-                                        }
-                                    }
-                                });
-                            }
-                        });
-                    }, 3000);
-
-                    let innerStatus = $('<div>');
-                    let innerStatusLabel = $('<label>', {
-                        class: 'mb-4'
-                    }).append('Please Wait...');
-                    let innerStatusAnimation = $('<div class="cres-download-progress-animation">').append('<div class="sk-fading-circle sk-primary"><div class="sk-circle1 sk-circle"></div><div class="sk-circle2 sk-circle"></div><div class="sk-circle3 sk-circle"></div><div class="sk-circle4 sk-circle"></div><div class="sk-circle5 sk-circle"></div><div class="sk-circle6 sk-circle"></div><div class="sk-circle7 sk-circle"></div><div class="sk-circle8 sk-circle"></div><div class="sk-circle9 sk-circle"></div><div class="sk-circle10 sk-circle"></div><div class="sk-circle11 sk-circle"></div><div class="sk-circle12 sk-circle"></div></div>');
-                    let innerStatusAction = $('<div>', {
-                        class: 'text-center my-3'
-                    });
-                    let innerStatusCancelButton = $('<button>', {
-                        class: 'btn btn-primary'
-                    }).append('Cancel');
-                    innerStatusAction.append(innerStatusCancelButton);
-                    innerStatus.append(innerStatusLabel);
-                    innerStatus.append(innerStatusAnimation);
-                    innerStatus.append(innerStatusAction);
-                    progressContainer.append($('<div class="text-center">').addClass('cres-download-progress-status')
-                        .append(innerStatus));
-
-                    innerStatusCancelButton.click(() => {
-                        clearInterval(interval);
-                        this.closeLastModal();
-                    });
-
-
-                    this.modal({
-                        message: progressContainer,
-                        modalClass: 'cres-modal-download-progress'
-                    });
-                });
-            },
-            error: (xhrError, ajaxOptions, thrownError) => {
-                if (thrownError !== 'abort') {
-                    this.message('error', 'Error, please call administrator... (' + thrownError + ')');
-                }
-            },
-            complete: () => {
-                if (typeof settings.onBlock === 'function') {
-                    settings.onUnblock();
-                } else {
-                    this.unblockPage();
-                }
-
-                if (typeof settings.onComplete === 'function') {
-                    settings.onComplete();
-                }
-            }
-        });
+        this.download.start(options);
     }
     reactive(data, cb) {
         const reactiveData =Alpine.reactive(data);
@@ -1335,7 +1176,7 @@ export default class Cresenity {
         return this.alpine.getAlpineDataInstance(node);
     }
     handleJsonResponse(response, onSuccess, onError) {
-        let errMessage = 'Unexpected error happen, please relogin ro refresh this page';
+        let errMessage = 'Unexpected error happened, please re-login or refresh this page';
         if (typeof onError == 'string') {
             errMessage = onError;
         }

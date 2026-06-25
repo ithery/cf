@@ -15,4 +15,9 @@ return [
         'label' => c::__('Toggle Active'),
         'uri' => 'demo/listener/handler/toggleActive/index',
     ],
+    [
+        'name' => 'listener.handler.downloadProgress',
+        'label' => c::__('Download Progress'),
+        'uri' => 'demo/listener/handler/downloadProgress/index',
+    ],
 ];
