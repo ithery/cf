@@ -26,6 +26,11 @@ return [
         'uri' => 'demo/controls/select/search/index',
     ],
     [
+        'name' => 'controls.select.selectTwo',
+        'label' => c::__('Select Two'),
+        'uri' => 'demo/controls/select/selectTwo/index',
+    ],
+    [
         'name' => 'controls.checkbox',
         'label' => c::__('Checkbox'),
         'uri' => 'demo/controls/checkbox/index',

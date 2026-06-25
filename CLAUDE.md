@@ -102,6 +102,7 @@ npm run prod                             # Production build
 
 ## Code Style
 
+### PHP
 - **Braces**: same line for classes, methods, and control structures
 - **Indentation**: 4 spaces
 - **Quotes**: single quotes
@@ -109,6 +110,11 @@ npm run prod                             # Production build
 - **Class names**: StudlyCaps with C-prefix (CApp, CModel, CDatabase)
 - **No comments** unless the WHY is non-obvious
 - Config: `.php-cs-fixer.dist.php`, `.editorconfig`, `phpcs.xml`
+
+### JavaScript
+All JS in `media/js/cres/src/` MUST comply with `.eslintrc` — read that file before writing any JS.
+Use `const` for values never reassigned, `let` otherwise — never `var`.
+Build after changes: `cd media/js/cres && npm run build`
 
 ## Important Conventions
 

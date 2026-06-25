@@ -47,7 +47,7 @@ return [
     ],
     [
         'name' => 'elements.repeater',
-        'label' => c::__('Repeater') . ' [DEV]',
+        'label' => c::__('Repeater'),
         'uri' => 'demo/elements/repeater/index',
     ],
     [

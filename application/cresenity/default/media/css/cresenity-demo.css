@@ -23,6 +23,21 @@ a {
     box-shadow: 0 2px 4px -1px rgb(0 0 0 / 7%), 0 4px 5px 0 rgb(0 0 0 / 5%), 0 1px 10px 0 rgb(0 0 0 / 3%);
     color: #fff;
 }
+
+/* Widget / Card */
+.widget-box {
+    border: 1px solid rgba(24, 28, 33, 0.1);
+    border-radius: 0.375rem;
+    margin-bottom: 1.5rem;
+    box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.06), 0 1px 2px -1px rgba(0, 0, 0, 0.06);
+}
+.widget-box .widget-title {
+    border-bottom: 1px solid rgba(24, 28, 33, 0.1);
+    font-weight: 600;
+}
+.widget-box .widget-content {
+    border-width: 0;
+}
 .modal.modal-large .modal-dialog {
     max-width: calc(100vw - 250px);
     width: calc(100vw - 250px);
@@ -36,5 +51,5 @@ a {
     }
 }
 code {
-    white-space: pre;;
+    white-space: pre;
 }
