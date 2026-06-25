@@ -304,19 +304,21 @@ class CDatabase_Schema_Grammar_MySqlGrammar extends CDatabase_Schema_Grammar {
      *
      * @param CDatabase_Schema_Blueprint $blueprint
      * @param CBase_Fluent               $command
-     * @param CDatabase_Connection       $connection
+     * @param null|CDatabase_Connection  $connection
      *
      * @return array|string
      */
-    public function compileRenameColumn(CDatabase_Schema_Blueprint $blueprint, CBase_Fluent $command, CDatabase_Connection $connection) {
-        return $connection->usingNativeSchemaOperations()
-            ? sprintf(
-                'alter table %s rename column %s to %s',
-                $this->wrapTable($blueprint),
-                $this->wrap($command->from),
-                $this->wrap($command->to)
-            )
-            : parent::compileRenameColumn($blueprint, $command, $connection);
+    public function compileRenameColumn(CDatabase_Schema_Blueprint $blueprint, CBase_Fluent $command, CDatabase_Connection $connection = null) {
+        if ($connection !== null && !$connection->usingNativeSchemaOperations()) {
+            return parent::compileRenameColumn($blueprint, $command);
+        }
+
+        return sprintf(
+            'alter table %s rename column %s to %s',
+            $this->wrapTable($blueprint),
+            $this->wrap($command->from),
+            $this->wrap($command->to)
+        );
     }
 
     /**
