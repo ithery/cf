@@ -15,12 +15,25 @@ class CElement_FormInput_SelectTwo extends CElement_FormInput {
     use CTrait_Element_Property_ApplyJs;
     use CTrait_Element_Property_DependsOn;
     use CTrait_Element_Property_Placeholder;
+
+    /**
+     * @var string
+     */
     protected $query;
 
+    /**
+     * @var null|string|CFunction_SerializableClosure
+     */
     protected $formatSelection;
 
+    /**
+     * @var null|string|CFunction_SerializableClosure
+     */
     protected $formatResult;
 
+    /**
+     * @var string
+     */
     protected $keyField;
 
     /**
@@ -33,32 +46,74 @@ class CElement_FormInput_SelectTwo extends CElement_FormInput {
      */
     protected $searchFullTextField = [];
 
+    /**
+     * @var bool
+     */
     protected $multiple;
 
+    /**
+     * @var bool
+     */
     protected $autoSelect;
 
+    /**
+     * @var int
+     */
     protected $minInputLength;
 
+    /**
+     * @var array
+     */
     protected $dropdownClasses;
 
+    /**
+     * @var int
+     */
     protected $delay;
 
+    /**
+     * @var null|callable
+     */
     protected $valueCallback;
 
+    /**
+     * @var null|CManager_Contract_DataProviderInterface
+     */
     protected $dataProvider;
 
+    /**
+     * @var array
+     */
     protected $requires;
 
+    /**
+     * @var bool
+     */
     protected $allowClear;
 
+    /**
+     * @var null|CFunction_SerializableClosure
+     */
     protected $queryResolver;
 
+    /**
+     * @var string
+     */
     protected $language;
 
+    /**
+     * @var array
+     */
     protected $prependData;
 
+    /**
+     * @var int
+     */
     protected $perPage;
 
+    /**
+     * @var bool
+     */
     protected $onModal;
 
     /**
@@ -102,10 +157,18 @@ class CElement_FormInput_SelectTwo extends CElement_FormInput {
         // @phpstan-ignore-next-line
         return new static($id);
     }
+    /**
+     * @param Closure $resolver
+     *
+     * @return void
+     */
     public function setQueryResolver(Closure $resolver) {
         $this->queryResolver = CFunction::serializeClosure($resolver);
     }
 
+    /**
+     * @return string
+     */
     public function query() {
         if ($this->queryResolver != null) {
             return $this->queryResolver->__invoke($this->query);
@@ -236,12 +299,22 @@ class CElement_FormInput_SelectTwo extends CElement_FormInput {
         return $this;
     }
 
+    /**
+     * @param array $data
+     *
+     * @return $this
+     */
     public function setPrependData(array $data) {
         $this->prependData = $data;
 
         return $this;
     }
 
+    /**
+     * @param array $row
+     *
+     * @return $this
+     */
     public function prependRow(array $row) {
         $this->prependData[] = $row;
 
@@ -259,6 +332,11 @@ class CElement_FormInput_SelectTwo extends CElement_FormInput {
         return $this;
     }
 
+    /**
+     * @param string|Closure $fmt
+     *
+     * @return $this
+     */
     public function setFormat($fmt) {
         $this->setFormatResult($fmt);
         $this->setFormatSelection($fmt);
@@ -294,6 +372,11 @@ class CElement_FormInput_SelectTwo extends CElement_FormInput {
         return $this;
     }
 
+    /**
+     * @param string|array $c
+     *
+     * @return $this
+     */
     public function addDropdownClass($c) {
         if (is_array($c)) {
             $this->dropdownClasses = array_merge($c, $this->dropdownClasses);
@@ -338,18 +421,31 @@ class CElement_FormInput_SelectTwo extends CElement_FormInput {
         return $this;
     }
 
+    /**
+     * @param bool $bool
+     *
+     * @return $this
+     */
     public function setAllowClear($bool = true) {
         $this->allowClear = $bool;
 
         return $this;
     }
 
+    /**
+     * @param bool $bool
+     *
+     * @return $this
+     */
     public function setOnModal($bool = true) {
         $this->onModal = $bool;
 
         return $this;
     }
 
+    /**
+     * @return string
+     */
     public function createAjaxUrl() {
         $ajaxMethod = CAjax::createMethod();
         $ajaxMethod->setType(CAjax::TYPE_SELECT_SEARCH);
@@ -373,22 +469,9 @@ class CElement_FormInput_SelectTwo extends CElement_FormInput {
         return $ajaxUrl;
     }
 
-    private function generateSelect2Template($template) {
-        //escape the character
-        $template = str_replace("'", "\'", $template);
-        preg_match_all("/{([\w]*)}/", $template, $matches, PREG_SET_ORDER);
-
-        foreach ($matches as $val) {
-            $str = carr::get($val, 1); //matches str without bracket {}
-            $bracketStr = carr::get($val, 0); //matches str with bracket {}
-            if (strlen($str) > 0) {
-                $template = str_replace($bracketStr, "'+item." . $str . "+'", $template);
-            }
-        }
-
-        return $template;
-    }
-
+    /**
+     * @return null|array|CCollection
+     */
     protected function getSelectedRow() {
         if ($this->autoSelect || $this->value != null) {
             $value = null;
@@ -453,6 +536,11 @@ class CElement_FormInput_SelectTwo extends CElement_FormInput {
         return null;
     }
 
+    /**
+     * @param int $indent
+     *
+     * @return string
+     */
     public function html($indent = 0) {
         //call parent to trigger build
 
@@ -550,6 +638,9 @@ class CElement_FormInput_SelectTwo extends CElement_FormInput {
         return $html->text();
     }
 
+    /**
+     * @return array
+     */
     protected function buildSelectedData() {
         $selectedData = [];
 

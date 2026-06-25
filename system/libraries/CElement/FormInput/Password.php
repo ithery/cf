@@ -7,10 +7,19 @@ class CElement_FormInput_Password extends CElement_FormInput {
         CTrait_Element_Property_Placeholder,
         CTrait_Element_Property_AutoComplete;
 
+    /**
+     * @var bool
+     */
     private $showPassword = false;
 
+    /**
+     * @var bool
+     */
     private $toggleVisibility = false;
 
+    /**
+     * @param null|string $id
+     */
     public function __construct($id) {
         parent::__construct($id);
         $this->type = 'password';
@@ -19,6 +28,9 @@ class CElement_FormInput_Password extends CElement_FormInput {
         $this->addClass('form-control');
     }
 
+    /**
+     * @return void
+     */
     public function build() {
         $this->setAttr('type', $this->type);
         $this->setAttr('value', $this->value);
@@ -36,22 +48,34 @@ class CElement_FormInput_Password extends CElement_FormInput {
         }
     }
 
+    /**
+     * @param bool $bool
+     *
+     * @return $this
+     */
     public function setShowPassword($bool = true) {
         $this->showPassword = $bool;
 
         return $this;
     }
 
+    /**
+     * @param bool $bool
+     *
+     * @return $this
+     */
     public function setToggleVisibility($bool = true) {
         $this->toggleVisibility = $bool;
 
         return $this;
     }
 
+    /**
+     * @return array
+     */
     protected function buildControlConfig() {
         $config = [
             'toggleVisibility' => (bool) $this->toggleVisibility,
-
         ];
 
         return $config;

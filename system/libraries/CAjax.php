@@ -36,6 +36,13 @@ class CAjax {
         return new CAjax_Method($options);
     }
 
+    /**
+     * @param string $file
+     *
+     * @throws Exception
+     *
+     * @return array
+     */
     public static function getData($file) {
         $filename = $file . '.tmp';
 
@@ -52,6 +59,12 @@ class CAjax {
         return $data;
     }
 
+    /**
+     * @param string $file
+     * @param array  $data
+     *
+     * @return array
+     */
     public static function setData($file, $data) {
         $filename = $file . '.tmp';
 
@@ -64,6 +77,9 @@ class CAjax {
         return $data;
     }
 
+    /**
+     * @return int
+     */
     public static function getDefaultExpiration() {
         return c::now()->addMinutes(CF::config('app.ajax.expiration', 60))->getTimestamp();
     }

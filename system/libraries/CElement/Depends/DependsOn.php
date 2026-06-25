@@ -14,8 +14,16 @@ class CElement_Depends_DependsOn {
      */
     protected $selector;
 
+    /**
+     * @var SerializableClosure
+     */
     protected $resolver;
 
+    /**
+     * @param CRenderable|string|array $selector
+     * @param callable                 $resolver
+     * @param array                    $options
+     */
     public function __construct($selector, $resolver, $options = []) {
         $this->options = $options;
 
@@ -23,36 +31,63 @@ class CElement_Depends_DependsOn {
         $this->selector = new CElement_Depends_Selector(carr::wrap($selector));
     }
 
+    /**
+     * @param CRenderable|string|array $selector
+     *
+     * @return $this
+     */
     public function addSelector($selector) {
         $this->selector->addSelector($selector);
 
         return $this;
     }
 
+    /**
+     * @param CRenderable|string|array $selector
+     *
+     * @return $this
+     */
     public function setSelector($selector) {
         $this->selector->setSelectors($selector);
 
         return $this;
     }
 
+    /**
+     * @param callable $resolver
+     *
+     * @return $this
+     */
     public function setResolver($resolver) {
         $this->resolver = new SerializableClosure($resolver);
 
         return $this;
     }
 
+    /**
+     * @return CElement_Depends_Selector
+     */
     public function getSelector() {
         return $this->selector;
     }
 
+    /**
+     * @return SerializableClosure
+     */
     public function getResolver() {
         return $this->resolver;
     }
 
+    /**
+     * @return int
+     */
     public function getThrottle() {
         return $this->getOption('throttle', 100);
     }
 
+    /**
+     * @return bool
+     */
     public function getBlock() {
         return $this->getOption('block', true);
     }
