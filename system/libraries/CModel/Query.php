@@ -21,7 +21,7 @@ defined('SYSPATH') or die('No direct access allowed.');
  * @method void                chunk($count, callable $callback)                                                        Chunk the results of the query.
  * @method \CCollection        lists($column, $key = null)                                                              Get an array with the values of a given column.
  * @method void                onDelete(Closure $callback)                                                              Register a replacement for the default delete function.
- * @method CModel[]            getModels($columns = ['*'])                                                              Get the hydrated models without eager loading.
+ * @method CModel[]            getModels($columns = null)                                                               Get the hydrated models without eager loading.
  * @method array               eagerLoadRelations(array $models)                                                        Eager load the relationships for the models.
  * @method array               loadRelation(array $models, $name, Closure $constraints)                                 Eagerly load the relationship on a set of models.
  * @method CModel_Query|static where($column, $operator = null, $value = null, $boolean = 'and')                        Add a basic where clause to the query.
@@ -53,7 +53,7 @@ defined('SYSPATH') or die('No direct access allowed.');
  * @method CModel_Query|static whereMonth($column, $operator, $value)
  * @method CModel_Query|static whereYear($column, $operator, $value)
  * @method CModel_Query|static join($table, $first, $operator = null, $second = null, $type = 'inner', $where = false)
- * @method CModel_Query|static select($columns = ['*'])
+ * @method CModel_Query|static select($columns = null, ...$args)
  * @method CModel_Query|static groupBy(...$groups)
  * @method CModel_Query|static newQuery()
  * @method CModel_Query|static withTrashed()
@@ -70,8 +70,8 @@ defined('SYSPATH') or die('No direct access allowed.');
  * @method CModel_Query|static lockForUpdate()                                                                          Lock the selected rows in the table for updating.
  * @method bool                exists()                                                                                 Determine if any rows exist for the current query
  * @method mixed               sum($column)                                                                             Retrieve the sum of the values of a given column..
- * @method static              void                                      truncate()                                     Run a truncate statement on the table.
- * @method static              CDatabase_Result                          insert(array values)                           Run a truncate statement on the table.
+ * @method void                truncate()                                                                               Run a truncate statement on the table.
+ * @method CDatabase_Result    insert(array $values)                                                                     Insert new records into the table.
  *
  * @property-read CModel_HigherOrderBuilderProxy $orWhere
  * @property-read CModel_HigherOrderBuilderProxy $whereNot
@@ -1517,8 +1517,8 @@ class CModel_Query {
         }
 
         if ($asConditions) {
-            foreach ($attributes as $column => $value) {
-                $this->where($this->qualifyColumn($column), $value);
+            foreach ($attributes as $column => $columnValue) {
+                $this->where($this->qualifyColumn($column), $columnValue);
             }
         }
 
