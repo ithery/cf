@@ -91,7 +91,7 @@ trait CTrait_Element_Property_DependsOn {
         foreach ($this->dependsOn as $dependOn) {
             //we create ajax method
 
-            $dependsOnSelector = $dependOn->getSelector();
+            $dependsOnSelector = $dependOn->getSelector()->getQuerySelector();
             $targetSelector = '#' . $this->id();
             $ajaxMethod = CAjax::createMethod();
             $ajaxMethod->setType('DependsOn');

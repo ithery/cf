@@ -508,7 +508,7 @@ class CApp_Navigation_Helper {
                 $html .= '<li class="' . $li_class . $active_class . '" ' . $addition_style . '>';
 
                 $iconClass = carr::get($d, 'icon');
-                if (strlen($iconClass) > 0 && strpos($iconClass, 'fa-') === false && strpos($iconClass, 'ion-') === false) {
+                if (strlen($iconClass) > 0 && strpos($iconClass, 'fa-') === false && strpos($iconClass, 'ion-') === false && strpos($iconClass, 'ti-') === false && strpos($iconClass, 'lnr') === false && strpos($iconClass, 'pe-') === false) {
                     $iconClass = 'icon-' . $iconClass;
                 }
                 $icon_html = '';

@@ -90,7 +90,7 @@ class CNavigation_Renderer_SidenavRenderer extends CNavigation_RendererAbstract 
                 $html .= '<li class="' . $liClass . $class . $activeClass . '" ' . $additionStyle . '>';
 
                 $iconClass = carr::get($d, 'icon');
-                if (strlen($iconClass) > 0 && strpos($iconClass, 'fa-') === false && strpos($iconClass, 'ion-') === false) {
+                if (strlen($iconClass) > 0 && strpos($iconClass, 'fa-') === false && strpos($iconClass, 'ion-') === false && strpos($iconClass, 'ti-') === false && strpos($iconClass, 'lnr') === false && strpos($iconClass, 'pe-') === false) {
                     $iconClass = c::theme('icon.prefix', 'icon-') . $iconClass;
                 }
                 $icon_html = '';
