@@ -1,6 +1,6 @@
 # Form Input - Standard Control
 
-All form input controls are added to a field using `addXxxControl()` methods. Each control returns an object that can be configured with `setValue()`, `setPlaceholder()`, `setDisabled()`, `setReadonly()`, and other methods.
+Standard controls map directly to HTML5 input elements. They are the basic building blocks for forms.
 
 ---
 
@@ -16,13 +16,7 @@ $form->addField()->setLabel('Name')->addTextControl('name')
 
 ```php
 $form->addField()->setLabel('Password')->addPasswordControl('password')
-    ->setPlaceholder('Enter password...');
-```
-
-Show/hide toggle:
-
-```php
-$form->addField()->setLabel('Password')->addPasswordControl('password')
+    ->setPlaceholder('Enter password...')
     ->setToggleVisibility(true);
 ```
 
@@ -38,15 +32,6 @@ $form->addField()->setLabel('Email')->addEmailControl('email')
 ```php
 $form->addField()->setLabel('Quantity')->addNumberControl('qty')
     ->setValue(1);
-```
-
-### Auto Numeric
-
-Formatted number input with currency support:
-
-```php
-$form->addField()->setLabel('Price')->addAutoNumericControl('price')
-    ->setValue(50000);
 ```
 
 ### Textarea
@@ -70,17 +55,6 @@ Adds a hidden CSRF token field for form security:
 $form->addCsrfControl();
 ```
 
-### Label
-
-Display-only field (non-editable):
-
-```php
-$form->addField()->setLabel('Status')->addLabelControl()
-    ->setValue('Active');
-```
-
----
-
 ### Select
 
 Static dropdown select:
@@ -94,30 +68,6 @@ $form->addField()->setLabel('Role')->addSelectControl('role')
     ])
     ->setValue('user');
 ```
-
-### Select Search (Select2)
-
-AJAX-powered searchable select. See [Select Search](/docs/forminput/selectsearch) for full documentation.
-
-```php
-$form->addField()->setLabel('Country')->addSelectSearchControl('country')
-    ->setDataFromModel(CountryModel::class)
-    ->setKeyField('code')
-    ->setSearchField('name');
-```
-
-### Select Two (cres.js)
-
-Modern Select2 with cres.js auto-initialization. Works inside Repeater.
-
-```php
-$form->addField()->setLabel('Country')->addSelectTwoControl('country')
-    ->setDataFromModel(CountryModel::class)
-    ->setKeyField('code')
-    ->setSearchField('name');
-```
-
----
 
 ### Checkbox
 
@@ -148,8 +98,6 @@ $form->addField()->setLabel('Gender')->addRadioControl('gender')
 
 ### Radio List
 
-Multiple radio buttons from a list:
-
 ```php
 $form->addField()->setLabel('Plan')->addRadioListControl('plan')
     ->setList([
@@ -159,7 +107,17 @@ $form->addField()->setLabel('Plan')->addRadioListControl('plan')
     ]);
 ```
 
----
+### File
+
+```php
+$form->addField()->setLabel('Document')->addFileControl('document');
+```
+
+### Image
+
+```php
+$form->addField()->setLabel('Photo')->addImageControl('photo');
+```
 
 ### Date
 
@@ -174,105 +132,19 @@ $form->addField()->setLabel('Birthday')->addDateControl('birthday')
 $form->addField()->setLabel('Start Time')->addTimeControl('start_time');
 ```
 
-### Date Time
-
-```php
-$form->addField()->setLabel('Event Date')->addDateTimeModalControl('event_date');
-```
-
-### Date Range
-
-```php
-$form->addField()->setLabel('Period')->addDateRangeDropdownButtonControl('period');
-```
-
----
-
-### File
-
-```php
-$form->addField()->setLabel('Document')->addFileControl('document');
-```
-
-### File (AJAX)
-
-Upload file via AJAX without form submit:
-
-```php
-$form->addField()->setLabel('Document')->addFileAjaxControl('document');
-```
-
-### Multiple File (AJAX)
-
-```php
-$form->addField()->setLabel('Attachments')->addMultipleFileAjaxControl('attachments');
-```
-
-### Image
-
-```php
-$form->addField()->setLabel('Photo')->addImageControl('photo');
-```
-
-### Image (AJAX)
-
-Upload image via AJAX with preview:
-
-```php
-$form->addField()->setLabel('Avatar')->addImageAjaxControl('avatar');
-```
-
-### Multiple Image (AJAX)
-
-```php
-$form->addField()->setLabel('Gallery')->addMultipleImageAjaxControl('gallery');
-```
-
----
-
-### Editor JS
-
-Block-style rich text editor:
-
-```php
-$form->addField()->setLabel('Content')->addEditorJsControl('content');
-```
-
-### Summernote
-
-WYSIWYG rich text editor:
-
-```php
-$form->addField()->setLabel('Body')->addSummerNoteControl('body');
-```
-
-### Color Picker
-
-```php
-$form->addField()->setLabel('Color')->addMiniColorControl('color')
-    ->setValue('#cc131f');
-```
-
 ### Range
 
 ```php
 $form->addField()->setLabel('Volume')->addRangeControl('volume');
 ```
 
-### Sortable
+### Label
 
-Drag-and-drop sortable list:
-
-```php
-$form->addField()->setLabel('Order')->addSortableControl('order');
-```
-
-### Query Builder
-
-Visual query builder for creating filter conditions:
+Display-only field (non-editable):
 
 ```php
-$form->addField()->setLabel('Filter')->addQueryBuilderControl('filter');
+$form->addField()->setLabel('Status')->addLabelControl()
+    ->setValue('Active');
 ```
 
 ---
