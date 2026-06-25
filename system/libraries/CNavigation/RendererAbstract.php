@@ -34,7 +34,7 @@ abstract class CNavigation_RendererAbstract implements CApp_Navigation_EngineInt
 
         /* get nav */
         if ($navs == null) {
-            $navs = CApp_Navigation_Data::get();
+            $navs = CNavigation_Data::get();
         }
 
         $this->navs = $navs;

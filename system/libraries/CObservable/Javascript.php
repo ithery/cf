@@ -2,6 +2,9 @@
 
 defined('SYSPATH') or die('No direct access allowed.');
 
+/**
+ * @deprecated 1.8 Use cres-config + cres.js pattern instead (e.g. SelectTwo, Repeater)
+ */
 class CObservable_Javascript {
     /**
      * @var string|CRenderable

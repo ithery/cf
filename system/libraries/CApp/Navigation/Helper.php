@@ -2,6 +2,9 @@
 
 defined('SYSPATH') or die('No direct access allowed.');
 
+/**
+ * @deprecated 1.6 Use CNavigation_Manager instead
+ */
 class CApp_Navigation_Helper {
     protected static $role_navs = [];
 

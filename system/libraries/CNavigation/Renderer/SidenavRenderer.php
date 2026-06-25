@@ -66,7 +66,7 @@ class CNavigation_Renderer_SidenavRenderer extends CNavigation_RendererAbstract 
                 $findNav = Helper::nav($d);
 
                 $isActive = $findNav !== false;
-                $activeCallback = CApp_Navigation::getActiveCallback($domain);
+                $activeCallback = CNavigation::manager()->getActiveCallback();
                 if ($activeCallback != null) {
                     $isActive = CFunction::factory($activeCallback)->addArg($d)->addArg($isActive)->execute();
                 }
