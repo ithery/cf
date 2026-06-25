@@ -1,18 +1,44 @@
 <?php
 
+/**
+ * Dynamic repeatable form rows with add/remove functionality.
+ *
+ * @see CElement_Component
+ */
 class CElement_Component_Repeater extends CElement_Component {
+    /**
+     * @var null|callable
+     */
     protected $itemBuilder;
 
+    /**
+     * @var bool
+     */
     protected $canDelete;
 
+    /**
+     * @var bool
+     */
     protected $canAdd;
 
+    /**
+     * @var string
+     */
     protected $addLabel;
 
+    /**
+     * @var string
+     */
     protected $deleteLabel;
 
+    /**
+     * @var int
+     */
     protected $minItem;
 
+    /**
+     * @param null|string $id
+     */
     public function __construct($id = null) {
         parent::__construct($id);
         $this->canDelete = true;
@@ -22,23 +48,41 @@ class CElement_Component_Repeater extends CElement_Component {
         $this->minItem = 1;
     }
 
+    /**
+     * @param null|string $id
+     *
+     * @return static
+     */
     public static function factory($id = null) {
         // @phpstan-ignore-next-line
         return new static($id);
     }
 
+    /**
+     * @param callable $itemBuilder
+     *
+     * @return $this
+     */
     public function setItemBuilder($itemBuilder) {
         $this->itemBuilder = $itemBuilder;
 
         return $this;
     }
 
+    /**
+     * @param int $minItem
+     *
+     * @return $this
+     */
     public function setMinItem($minItem) {
         $this->minItem = (int) $minItem;
 
         return $this;
     }
 
+    /**
+     * @return void
+     */
     protected function build() {
         $config = [
             'minItem' => $this->minItem,

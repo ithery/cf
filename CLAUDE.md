@@ -34,7 +34,27 @@ system/helpers/      Helper classes (c, carr, cstr, curl)
 system/vendor/       Third-party libraries (NOT composer-managed, committed to git)
 system/config/       Default config files
 application/         One subfolder per app, each with default/ containing controllers/views/config
+modules/             DEPRECATED — do not add new code here, migrate to system/libraries
+media/js/cres/src/   Cres.js source (Rollup-bundled, exposed as window.cresenity)
 ```
+
+### CElement Components (PHP + JS)
+
+Components with client-side behavior have a PHP class in `system/libraries/CElement/Component/` and a corresponding JS module in `media/js/cres/src/element/component/`. The PHP side renders HTML with a `cres-element` attribute and `cres-config` JSON. The JS side auto-initializes via `initComponent()` in `element/component/index.js`.
+
+```
+PHP: system/libraries/CElement/Component/Repeater.php    → renders <div cres-element="component:Repeater" cres-config="...">
+JS:  media/js/cres/src/element/component/Repeater/       → Repeater.js, updater.js, index.js, index.scss
+```
+
+Components with JS: ShowMore, Shimmer, Repeater, Gallery, ProgressBar, Nestable, Image, CountDownTimer.
+Components without JS (to be migrated to cres.js): Widget, Form, Alert, Accordion, Action, Tab, Chart, Icon, ListGroup, Tooltip, PrismCode, Kanban, TreeView, PdfViewer, FileManager. These currently inline JS via PHP `js()` method or rely on external plugins — migrate them to `media/js/cres/src/element/component/` following the pattern above.
+
+When adding a new component with JS behavior:
+1. Create PHP class in `system/libraries/CElement/Component/` — set `cres-element` and `cres-config` attrs in `build()`
+2. Create JS module in `media/js/cres/src/element/component/{Name}/` — export `init{Name}` and class
+3. Register in `media/js/cres/src/element/component/index.js` — import and add to `initComponent()` switch + `component` export
+4. Run `npm run dev` to rebuild
 
 ### Routing
 
