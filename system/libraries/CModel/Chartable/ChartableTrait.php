@@ -218,7 +218,7 @@ trait CModel_Chartable_ChartableTrait {
      */
     private function groupByYears(CModel_Query $builder, $value, $startDate = null, $stopDate = null, $dateColumn = 'created', $groupColumn = null) {
         $startDate = empty($startDate)
-            ? CCarbon::now()->subYears(10)->addYearsNoOverflow()->startOfYear()
+            ? CCarbon::now()->subYear(10)->addYearsNoOverflow()->startOfYear()
             : CCarbon::parse($startDate);
 
         $stopDate = empty($stopDate)
