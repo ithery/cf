@@ -165,15 +165,6 @@ return [
     'peity' => [
         'js' => ['plugins' . DS . 'peity' . DS . 'jquery.peity.min.js'],
     ],
-    'flot' => [
-        'js' => [
-            'plugins' . DS . 'flot' . DS . 'jquery.flot.min.js',
-            'plugins' . DS . 'flot' . DS . 'jquery.flot.bar.order.min.js',
-            'plugins' . DS . 'flot' . DS . 'jquery.flot.pie.min.js',
-            'plugins' . DS . 'flot' . DS . 'jquery.flot.resize.min.js',
-            'plugins' . DS . 'flot' . DS . 'jquery.flot.stack.js',
-        ],
-    ],
     'colorpicker' => [
         'js' => ['plugins' . DS . 'colorpicker' . DS . 'bootstrap-colorpicker.js'],
         'css' => ['plugins' . DS . 'colorpicker' . DS . 'colorpicker.css'],
