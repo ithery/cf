@@ -12,6 +12,22 @@ function getBlocksList(element) {
     );
 }
 
+function resetClonedControls(clone) {
+    let initialized = clone.querySelectorAll('[data-cres-initialized]');
+    for (let i = 0; i < initialized.length; i++) {
+        let el = initialized[i];
+        el.removeAttribute('data-cres-initialized');
+        el.classList.remove('cres:initialized');
+
+        let select2Container = el.nextElementSibling;
+        if (select2Container && select2Container.classList.contains('select2-container')) {
+            select2Container.remove();
+        }
+
+        el.style.display = '';
+    }
+}
+
 const addBlock = (element) => {
     let clone;
     if (element.blocks.length > 0) {
@@ -23,7 +39,9 @@ const addBlock = (element) => {
     if (element.cloneClass) {
         addClass(clone, element.cloneClass);
     }
-    // modify name/for/id attributes
+
+    resetClonedControls(clone);
+
     element.blockWrapper[0].appendChild(clone);
     componentUpdate(element);
 };
@@ -93,6 +111,7 @@ export default class Repeater {
         this.cloneClass = this.element.getAttribute('data-repeater-class');
         this.inputName = this.element.getAttribute('data-repeater-input-name');
         this.minItem = cresConfig.minItem ?? 1;
+        this.maxItem = cresConfig.maxItem ?? null;
         initRepeater(this);
     }
 }

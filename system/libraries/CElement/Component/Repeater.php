@@ -32,9 +32,24 @@ class CElement_Component_Repeater extends CElement_Component {
     protected $deleteLabel;
 
     /**
+     * @var string
+     */
+    protected $addButtonClass;
+
+    /**
+     * @var string
+     */
+    protected $deleteButtonClass;
+
+    /**
      * @var int
      */
     protected $minItem;
+
+    /**
+     * @var null|int
+     */
+    protected $maxItem;
 
     /**
      * @param null|string $id
@@ -45,7 +60,10 @@ class CElement_Component_Repeater extends CElement_Component {
         $this->canAdd = true;
         $this->deleteLabel = 'Delete';
         $this->addLabel = 'New Item';
+        $this->addButtonClass = 'btn-primary w-100';
+        $this->deleteButtonClass = 'btn-danger';
         $this->minItem = 1;
+        $this->maxItem = null;
     }
 
     /**
@@ -81,11 +99,89 @@ class CElement_Component_Repeater extends CElement_Component {
     }
 
     /**
+     * @param int $maxItem
+     *
+     * @return $this
+     */
+    public function setMaxItem($maxItem) {
+        $this->maxItem = (int) $maxItem;
+
+        return $this;
+    }
+
+    /**
+     * @param bool $bool
+     *
+     * @return $this
+     */
+    public function setCanAdd($bool) {
+        $this->canAdd = (bool) $bool;
+
+        return $this;
+    }
+
+    /**
+     * @param bool $bool
+     *
+     * @return $this
+     */
+    public function setCanDelete($bool) {
+        $this->canDelete = (bool) $bool;
+
+        return $this;
+    }
+
+    /**
+     * @param string $label
+     *
+     * @return $this
+     */
+    public function setAddLabel($label) {
+        $this->addLabel = $label;
+
+        return $this;
+    }
+
+    /**
+     * @param string $label
+     *
+     * @return $this
+     */
+    public function setDeleteLabel($label) {
+        $this->deleteLabel = $label;
+
+        return $this;
+    }
+
+    /**
+     * @param string $class
+     *
+     * @return $this
+     */
+    public function setAddButtonClass($class) {
+        $this->addButtonClass = $class;
+
+        return $this;
+    }
+
+    /**
+     * @param string $class
+     *
+     * @return $this
+     */
+    public function setDeleteButtonClass($class) {
+        $this->deleteButtonClass = $class;
+
+        return $this;
+    }
+
+    /**
      * @return void
      */
     protected function build() {
         $config = [
             'minItem' => $this->minItem,
+            'maxItem' => $this->maxItem,
         ];
         $this->addClass('cres:element:component:Repeater');
         $this->setAttr('cres-element', 'component:Repeater');
@@ -95,10 +191,14 @@ class CElement_Component_Repeater extends CElement_Component {
             $divRow = $divItems->addDiv()->addClass('cres-repeater-row');
             $divItem = $divRow->addDiv()->addClass('cres-repeater-item');
             call_user_func_array($this->itemBuilder, [$divItem]);
-            $divAction = $divRow->addDiv()->addClass('cres-repeater-item-action');
-            $divAction->addAction()->setLabel($this->deleteLabel)->addClass('btn-danger cres-repeater-action-delete');
+            if ($this->canDelete) {
+                $divAction = $divRow->addDiv()->addClass('cres-repeater-item-action');
+                $divAction->addAction()->setLabel($this->deleteLabel)->addClass($this->deleteButtonClass . ' cres-repeater-action-delete');
+            }
         }
-        $divAction = $this->addDiv()->addClass('cres-repeater-action');
-        $divAction->addAction()->setLabel($this->addLabel)->addClass('btn-primary w-100 cres-repeater-action-add');
+        if ($this->canAdd) {
+            $divAction = $this->addDiv()->addClass('cres-repeater-action');
+            $divAction->addAction()->setLabel($this->addLabel)->addClass($this->addButtonClass . ' cres-repeater-action-add');
+        }
     }
 }
