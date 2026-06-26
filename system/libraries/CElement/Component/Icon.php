@@ -25,8 +25,11 @@ class CElement_Component_Icon extends CElement_Component {
                 return;
             }
         }
-        $iconPrefix = c::theme('icon.prefix', 'icon icon-');
-
-        $this->addClass($iconPrefix . $icon);
+        if (strpos($icon, 'fa-') !== false || strpos($icon, 'ion-') !== false || strpos($icon, 'ti-') !== false || strpos($icon, 'lnr') !== false || strpos($icon, 'pe-') !== false) {
+            $this->addClass($icon);
+        } else {
+            $iconPrefix = c::theme('icon.prefix', 'icon icon-');
+            $this->addClass($iconPrefix . $icon);
+        }
     }
 }
