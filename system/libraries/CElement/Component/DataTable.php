@@ -933,9 +933,11 @@ class CElement_Component_DataTable extends CElement_Component {
         return new $class($table);
     }
 
+    /**
+     * @return $this
+     */
     public function prepareForExportable() {
         $this->parent = null;
-        $this->data = null;
         $this->wrapper = null;
         $this->rowActionList = null;
         $this->headerActionList = null;
