@@ -7,11 +7,16 @@ class Controller_Demo_Elements_Table_Export extends \Cresenity\Demo\Controller {
         $isExport = (bool) c::request()->export;
 
         $app->addDiv()->addClass('mb-3')->add(
-            'Demo for DataTable export using <code>createDownloadAction()</code>. '
-            . 'Click the Export button in the widget header to download as Excel.'
+            'Demo for DataTable export. Click the Export button to download as Excel.'
         );
 
-        $table = $app->addTable();
+        $widget = $app->addWidget()->setTitle('Product Data');
+        $widget->addHeaderAction()->setIcon('ti-download')->setLabel('Export Excel')
+            ->setLink(c::url('demo/elements/table/export/index?export=1'))
+            ->setLinkTarget('_blank');
+        $widget->setNoPadding(true);
+
+        $table = $widget->addTable();
         $table->setDataFromModel(\Cresenity\Demo\Model\Product::class);
         $table->addColumn('sku')->setLabel('SKU')->setWidth('100');
         $table->addColumn('name')->setLabel('Product Name');
@@ -23,16 +28,6 @@ class Controller_Demo_Elements_Table_Export extends \Cresenity\Demo\Controller {
         })->setDataType('currency');
         $table->addColumn('stock')->setLabel('Stock')->setWidth('80');
         $table->setAjax(false);
-
-        $widget = $app->addWidget()->setTitle('Product Data');
-        $exportAction = $table->createDownloadAction([
-            'filename' => 'products-' . date('Ymd-His') . '.xlsx',
-        ]);
-        $exportAction->setIcon('ti-download')->setLabel('Export Excel');
-        $widget->addHeaderAction()->setIcon('ti-download')->setLabel('Export Excel')
-            ->setLink($exportAction->getAttr('href'))->setLinkTarget('_blank');
-        $widget->setNoPadding(true);
-        $widget->add($table);
 
         if ($isExport) {
             return $table->downloadExcel('products-' . date('Ymd-His') . '.xlsx');
