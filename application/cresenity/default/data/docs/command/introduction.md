@@ -1,26 +1,63 @@
 # CF Command - Introduction
 
-### Command Call
+### Membuat Command
 
-CF mempunyai command console yang sudah terinclude dalam framework. CF Command tersedia pada root directory aplikasi kita dan terdapat banyak command yang membantu kita dalam pembuatan aplikasi.
+CF menyediakan fitur untuk membuat command console custom pada aplikasi. Command dibuat dengan meng-extend class `CConsole_Command`.
 
-Untuk melihat seluruh command yang tersedia, kita dapat menggunakan `list` command:
+### Struktur Command
 
+Sebuah command class memiliki dua property utama dan satu method yang harus diimplementasikan:
+
+```php
+class CConsole_Command_MyCommand extends CConsole_Command {
+    protected $signature = 'my:command {argument} {--option=}';
+
+    protected $description = 'Deskripsi command';
+
+    public function handle() {
+        $argument = $this->argument('argument');
+        $option = $this->option('option');
+
+        $this->info('Command berhasil dijalankan');
+    }
+}
 ```
-php cf list
+
+### Signature
+
+Property `$signature` mendefinisikan nama command beserta argument dan option yang diterima:
+
+```php
+// Argument wajib
+protected $signature = 'mail:send {user}';
+
+// Argument opsional
+protected $signature = 'mail:send {user?}';
+
+// Argument dengan default value
+protected $signature = 'mail:send {user=foo}';
+
+// Option dengan value
+protected $signature = 'mail:send {--queue=}';
+
+// Option boolean (flag)
+protected $signature = 'mail:send {--queue}';
+
+// Variadic argument
+protected $signature = 'mail:send {user*}';
 ```
 
 ### Registrasi Command
 
-Seluruh default command yang tersedia didefinisikan pada class `CFConsole` di `system/core/CFConsole.php`. Property `$defaultCommands` berisi daftar semua command class yang selalu tersedia.
+Semua default command didefinisikan pada `CFConsole` di `system/core/CFConsole.php` dalam property `$defaultCommands`.
 
-Untuk menambahkan command custom pada aplikasi, gunakan method `addCommand`:
+Untuk mendaftarkan command custom pada aplikasi, gunakan method `addCommand`:
 
 ```php
 CFConsole::addCommand(MyCustomCommand::class);
 ```
 
-Atau untuk menambahkan beberapa command sekaligus:
+Atau beberapa command sekaligus:
 
 ```php
 CFConsole::addCommand([
@@ -28,7 +65,3 @@ CFConsole::addCommand([
     MyCommand2::class,
 ]);
 ```
-
-### Multi Aplikasi
-
-Karena CF bersifat multi aplikasi, command akan berjalan pada konteks satu domain/aplikasi. Gunakan `domain:switch` untuk berpindah aplikasi sebelum menjalankan command.

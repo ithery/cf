@@ -8,6 +8,11 @@ return [
         'uri' => 'docs/phpcf/install',
     ],
     [
+        'name' => 'phpcf.commands',
+        'label' => c::__('Commands'),
+        'uri' => 'docs/phpcf/commands',
+    ],
+    [
         'name' => 'phpcf.testing',
         'label' => c::__('Testing'),
         'uri' => 'docs/phpcf/testing',

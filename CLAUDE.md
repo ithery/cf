@@ -7,7 +7,7 @@ Custom PHP framework supporting 80+ applications in a single installation. Not L
 - **PHP**: >= 7.4 (no PHP 8.1+ syntax in framework code)
 - **Main branch**: `master`, development on `development`
 - **Entry point**: `index.php` → `system/core/Bootstrap.php` → `CF::setup()`
-- **CLI**: `php cf <command>` (e.g. `php cf app:create myapp`)
+- **CLI**: `phpcf <command>` (e.g. `phpcf app:create myapp`), installed via `composer global require cresenity/phpcf`
 
 ## Documentation
 
