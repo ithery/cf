@@ -1,27 +1,33 @@
 # PHPCF - Model
-### make:model
+
+### model:list
+
+Menampilkan daftar semua model.
 
 ```
-Usage:
-  make:model <table>
-
-Arguments:
-  table
-
-Help:
-  Create a new model class based on created table on database
+phpcf model:list
 ```
 
+### model:show
+
+Menampilkan informasi detail tentang model.
+
+```
+phpcf model:show {model}
+```
+
+### model:tables
+
+Menampilkan daftar tabel yang memiliki model.
+
+```
+phpcf model:tables
+```
 
 ### model:update
 
+Update properties model berdasarkan perubahan pada tabel database.
+
 ```
-Usage:
-  model:update <table>
-
-Arguments:
-  table
-
-Help:
-  Update model properties
+phpcf model:update {table}
 ```

@@ -34,4 +34,4 @@ phpcf domain:switch domain.name
 
 ### Daftar Command
 
-Seluruh default command yang tersedia didefinisikan pada class `CFConsole` di `system/core/CFConsole.php`. Untuk daftar lengkap command, lihat halaman [Commands](docs/phpcf/commands).
+Seluruh default command yang tersedia didefinisikan pada class `CFConsole` di `system/core/CFConsole.php`. Lihat menu di samping untuk daftar command per kategori.

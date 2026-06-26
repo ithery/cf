@@ -1,22 +1,82 @@
 # PHPCF - DevSuite
-### devsuite:install
 
-`phpcf devsuite:install`
+### Install & Uninstall
 
+```
+phpcf devsuite:install
+phpcf devsuite:uninstall
+```
 
-### devsuite:start
+### Service
 
-`phpcf devsuite:start`
+```
+phpcf devsuite:start
+phpcf devsuite:restart
+phpcf devsuite:stop
+```
 
-### devsuite:stop
+### Link
 
-`phpcf devsuite:stop`
+Menghubungkan direktori project ke DevSuite.
 
-### devsuite:link
+```
+phpcf devsuite:link
+phpcf devsuite:links
+phpcf devsuite:unlink
+```
 
-`phpcf devsuite:link`
+### SSL/TLS
 
+Mengamankan domain dengan trusted TLS certificate.
 
-### devsuite:links
+```
+phpcf devsuite:secure
+phpcf devsuite:unsecure
+```
 
-`phpcf devsuite:links`
+### TLD
+
+Mengatur Top Level Domain untuk DevSuite.
+
+```
+phpcf devsuite:tld
+```
+
+### Open & Share
+
+```
+phpcf devsuite:open
+phpcf devsuite:share
+```
+
+### SSH
+
+```
+phpcf devsuite:ssh
+phpcf devsuite:ssh:list
+phpcf devsuite:ssh:create
+```
+
+### Deploy
+
+```
+phpcf devsuite:deploy:init
+phpcf devsuite:deploy:run
+```
+
+### Database
+
+```
+phpcf devsuite:db:install
+phpcf devsuite:db:start
+phpcf devsuite:db:uninstall
+```
+
+| Command | Deskripsi |
+|---------|-----------|
+| `phpcf devsuite:db:list` | Menampilkan daftar database |
+| `phpcf devsuite:db:create` | Membuat database baru |
+| `phpcf devsuite:db:delete` | Menghapus database |
+| `phpcf devsuite:db:compare` | Membandingkan database |
+| `phpcf devsuite:db:clone` | Clone database |
+| `phpcf devsuite:db:sync` | Sinkronisasi database |
