@@ -36,4 +36,9 @@ return [
         'label' => c::__('Base Class'),
         'uri' => 'docs/basic/base',
     ],
+    [
+        'name' => 'basic.database',
+        'label' => c::__('Database'),
+        'uri' => 'docs/basic/database',
+    ],
 ];
