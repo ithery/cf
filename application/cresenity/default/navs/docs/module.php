@@ -17,6 +17,11 @@ return [
         'uri' => 'docs/module/cron',
     ],
     [
+        'name' => 'module.websocket',
+        'label' => c::__('CWebSocket'),
+        'uri' => 'docs/module/websocket',
+    ],
+    [
         'name' => 'module.period',
         'label' => c::__('CPeriod'),
         'uri' => 'docs/module/period',
