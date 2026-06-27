@@ -58,11 +58,54 @@ The `cron()` method accepts a standard 5-field cron expression:
 
 ### Running the Scheduler
 
-Add this to your system crontab:
+CF's cron system does **not** run automatically. You must register a system-level crontab entry on the server for each application domain. Without this, none of the registered cron jobs will execute.
+
+#### Adding the Crontab Entry
+
+SSH into your server and edit the crontab:
 
 ```bash
-* * * * * cd /path/to/project && php cf cron:run >> /dev/null 2>&1
+crontab -e
 ```
+
+Add a line for your application domain:
+
+```bash
+* * * * * /usr/local/lsws/lsphp84/bin/php "/home/sandbox/public_html/index.php" "cresenity/cron" "myapp.dev.cresenity.com" 1> "/dev/null" 2>&1 &
+```
+
+The format is:
+
+```
+* * * * * {php_binary} "{path_to_index.php}" "cresenity/cron" "{domain}" 1> "/dev/null" 2>&1 &
+```
+
+| Part | Description |
+|---|---|
+| `* * * * *` | Run every minute (the framework handles individual job scheduling) |
+| `{php_binary}` | Path to PHP CLI binary (e.g. `/usr/local/lsws/lsphp84/bin/php` or `/usr/bin/php`) |
+| `{path_to_index.php}` | Full path to the CF `index.php` entry point |
+| `"cresenity/cron"` | The internal route that triggers the cron runner |
+| `{domain}` | The application domain — CF uses this to determine which app config and bootstrap to load |
+
+#### Multiple Applications
+
+Each application needs its own crontab entry:
+
+```bash
+* * * * * /usr/bin/php "/home/sandbox/public_html/index.php" "cresenity/cron" "myapp.example.com" 1> "/dev/null" 2>&1 &
+* * * * * /usr/bin/php "/home/sandbox/public_html/index.php" "cresenity/cron" "otherapp.example.com" 1> "/dev/null" 2>&1 &
+```
+
+#### Verifying
+
+Check that the crontab is registered:
+
+```bash
+crontab -l | grep myapp
+```
+
+You can verify cron execution from the admin Cron Manager UI, which shows the last run time for each registered job.
 
 ---
 
