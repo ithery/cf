@@ -202,8 +202,6 @@ abstract class CDaemon_ServiceAbstract implements CDaemon_ServiceInterface {
      * To easily add rules to this, overload this method, build yourself an array of error messages,
      * and then call parent::checkEnvironment($my_errors).
      *
-     * @param array $errors
-     *
      * @throws Exception
      *
      * @return void
@@ -395,7 +393,7 @@ abstract class CDaemon_ServiceAbstract implements CDaemon_ServiceInterface {
      * Register a callback for the given $event. Use the event class constants for built-in events. Add and dispatch
      * your own events however you want.
      *
-     * @param $event mixed scalar  When creating custom events, keep ints < 100 reserved for the daemon
+     * @param $event    mixed scalar  When creating custom events, keep ints < 100 reserved for the daemon
      * @param $callback closure|callback
      * @param $throttle Optional time in seconds to throttle calls to the given $callback. For example, if
      *                  $throttle = 10, the provided $callback will not be called more than once every 10 seconds, even if the
@@ -544,7 +542,7 @@ abstract class CDaemon_ServiceAbstract implements CDaemon_ServiceInterface {
             // Child Process
             $this->startTime = time();
             $this->parent = false;
-            $this->parentPid == $this->pid;
+            $this->parentPid = $this->pid;
             $this->pid(getmypid());
             // Remove unused worker objects. They can be memory hogs.
             foreach ($this->workers as $workerKey => $worker) {
@@ -561,6 +559,7 @@ abstract class CDaemon_ServiceAbstract implements CDaemon_ServiceInterface {
             }
             exit;
         }
+
         // Parent Process - Return the newly created Core_Lib_Process object
         return $proc;
     }
@@ -616,7 +615,6 @@ abstract class CDaemon_ServiceAbstract implements CDaemon_ServiceInterface {
      * The library has no concept of a runtime error. If your application doesn't attach any ON_ERROR listeners, there
      * is literally no difference between using this and just passing the message to CDaemon_ServiceAbstract::log().
      *
-     * @param $message
      * @param string $label
      */
     public function error($message, $label = '') {
@@ -1033,8 +1031,6 @@ abstract class CDaemon_ServiceAbstract implements CDaemon_ServiceInterface {
     /**
      * Simple function to validate that alises for Plugins won't interfere with each other or with existing daemon properties.
      *
-     * @param $alias
-     *
      * @throws Exception
      */
     private function checkPluginAlias($alias) {
@@ -1109,8 +1105,6 @@ abstract class CDaemon_ServiceAbstract implements CDaemon_ServiceInterface {
 
     /**
      * Simple function to validate that alises for Plugins or Workers won't interfere with each other or with existing daemon properties.
-     *
-     * @param $alias
      *
      * @throws Exception
      */
