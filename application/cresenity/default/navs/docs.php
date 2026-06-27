@@ -69,6 +69,11 @@ return [
         'label' => c::__('Other'),
         'subnav' => [
             [
+                'name' => 'other.websocket',
+                'label' => c::__('CWebSocket'),
+                'uri' => 'docs/other/websocket',
+            ],
+            [
                 'name' => 'other.maintenance',
                 'label' => c::__('Maintenance'),
                 'uri' => 'docs/other/maintenance',
