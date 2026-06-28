@@ -8,7 +8,7 @@ defined('SYSPATH') or die('No direct access allowed.');
 
 use phpseclib3\Net\SFTP;
 use phpseclib3\Net\SSH2;
-use phpseclib3\Crypt\RSA;
+use phpseclib3\Crypt\PublicKeyLoader;
 use phpseclib3\System\SSH\Agent;
 
 class CRemote_SSH_Gateway implements CRemote_SSH_GatewayInterface {
@@ -241,11 +241,9 @@ class CRemote_SSH_Gateway implements CRemote_SSH_GatewayInterface {
     }
 
     /**
-     * Load the RSA key instance.
-     *
      * @param array $auth
      *
-     * @return \phpseclib3\Crypt\RSA
+     * @return \phpseclib3\Crypt\Common\PrivateKey
      */
     protected function loadRsaKey(array $auth) {
         $key = $this->getKey($auth);
@@ -254,16 +252,12 @@ class CRemote_SSH_Gateway implements CRemote_SSH_GatewayInterface {
     }
 
     /**
-     * Create a new RSA key instance.
-     *
      * @param array $auth
      *
-     * @return \phpseclib3\Crypt\RSA
+     * @return \phpseclib3\Crypt\Common\PrivateKey
      */
     protected function getKey(array $auth) {
-        $key = RSA::loadPrivateKey(trim(carr::get($auth, 'keytext')));
-
-        return $key;
+        return PublicKeyLoader::loadPrivateKey(trim(carr::get($auth, 'keytext')));
     }
 
     /**
