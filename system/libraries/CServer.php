@@ -69,15 +69,6 @@ class CServer {
     }
 
     /**
-     * @param array|null $sshConfig
-     *
-     * @return CServer_Command
-     */
-    public static function command($sshConfig = null) {
-        return CServer_Command::instance($sshConfig);
-    }
-
-    /**
      * @param null|CRemote_SSH|CRemote_SSH_Config $sshConfig
      *
      * @return CServer_Config

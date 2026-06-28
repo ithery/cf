@@ -68,13 +68,6 @@ class CServer_Server {
     }
 
     /**
-     * @return CServer_Command
-     */
-    public function command() {
-        return CServer_Command::instance($this->ssh);
-    }
-
-    /**
      * @return CServer_Database
      */
     public function database() {
