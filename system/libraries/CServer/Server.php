@@ -197,6 +197,7 @@ class CServer_Server {
                 $strProgram .= '.exe';
                 $pathParts = pathinfo($strProgram);
             }
+            $serverpath = '';
             if ($isWindows) {
                 if ($this->readEnv('Path', $serverpath)) {
                     $arrPath = preg_split('/;/', $serverpath, -1, PREG_SPLIT_NO_EMPTY);
@@ -232,6 +233,7 @@ class CServer_Server {
         }
 
         $exceptPath = '';
+        $windir = '';
         if ($isWindows && $this->readEnv('WinDir', $windir)) {
             foreach ($arrPath as $strPath) {
                 if ((strtolower($strPath) == $windir . '\\system32') && is_dir($windir . '\\SysWOW64')) {
