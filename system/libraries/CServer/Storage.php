@@ -2,7 +2,7 @@
 
 defined('SYSPATH') or die('No direct access allowed.');
 
-class CServer_Storage extends CServer_Base {
+class CServer_Storage {
     const SHOW_MOUNT_OPTION = true;
 
     const SHOW_MOUNT_POINT = true;
@@ -11,57 +11,37 @@ class CServer_Storage extends CServer_Base {
 
     const SHOW_INODES = true;
 
-    protected static $instance = [];
-
     /**
-     * @var CServer_Storage_OS
+     * @var CServer_Server
      */
-    protected $os;
+    protected $server;
 
     /**
      * @var CServer_Storage_Info
      */
     protected $info;
 
-    protected $freeSpace;
-
-    protected $totalSpace;
-
-    public function __construct(CRemote_SSH $ssh = null) {
-        $os = CServer::getOS();
+    /**
+     * @param CServer_Server $server
+     */
+    public function __construct(CServer_Server $server) {
+        $this->server = $server;
         $this->info = new CServer_Storage_Info();
-        $osClass = 'CServer_Storage_OS_' . $os;
-        $this->os = new $osClass($this, $this->info);
-        $this->ssh = $ssh;
-        $this->host = $ssh ? $ssh->getHost() : 'localhost';
     }
 
     /**
-     * @param array|CRemote_SSH $sshConfig
-     *
-     * @return CServer_Storage
+     * @return CServer_Server
      */
-    public static function instance($sshConfig = null) {
-        if (!is_array(self::$instance)) {
-            self::$instance = [];
-        }
-        $host = 'localhost';
-
-        $ssh = null;
-        if ($sshConfig != null) {
-            $ssh = CServer_SSHRepository::instance()->getSSH($sshConfig);
-            $host = $ssh->getHost();
-        }
-        if (!isset(self::$instance[$host])) {
-            self::$instance[$host] = new CServer_Storage($ssh);
-        }
-
-        return self::$instance[$host];
+    public function getServer() {
+        return $this->server;
     }
 
+    /**
+     * @return array
+     */
     public function getDiskDevices() {
         if (!$this->info->getDiskDevices()) {
-            $this->os->buildDiskDevices();
+            $this->buildDiskDevices();
         }
 
         return $this->info->getDiskDevices();
@@ -71,18 +51,60 @@ class CServer_Storage extends CServer_Base {
      * @return float
      */
     public function getFreeSpace() {
-        if ($this->freeSpace == null) {
-            $this->freeSpace = disk_free_space('/');
+        if ($this->server->isRemote()) {
+            $output = '';
+            $this->server->executeProgram('df', '-k / | tail -1', $output);
+            $parts = preg_split('/\s+/', trim($output));
+            if (isset($parts[3])) {
+                return (float) $parts[3] * 1024;
+            }
+
+            return 0.0;
         }
 
-        return $this->freeSpace;
+        return (float) disk_free_space('/');
     }
 
+    /**
+     * @return float
+     */
     public function getTotalSpace() {
-        if ($this->totalSpace == null) {
-            $this->totalSpace = @disk_total_space('/');
+        if ($this->server->isRemote()) {
+            $output = '';
+            $this->server->executeProgram('df', '-k / | tail -1', $output);
+            $parts = preg_split('/\s+/', trim($output));
+            if (isset($parts[1])) {
+                return (float) $parts[1] * 1024;
+            }
+
+            return 0.0;
         }
 
-        return $this->totalSpace;
+        return (float) @disk_total_space('/');
+    }
+
+    /**
+     * @return void
+     */
+    protected function buildDiskDevices() {
+        $dfArgs = '';
+        $hideFstypes = [];
+        $config = $this->server->config();
+        if (is_string($config->getHideFsTypes())) {
+            if (preg_match(CServer::ARRAY_EXP, $config->getHideFsTypes())) {
+                $hideFstypes = eval($config->getHideFsTypes());
+            } else {
+                $hideFstypes = [$config->getHideFsTypes()];
+            }
+        }
+        foreach ($hideFstypes as $fstype) {
+            $dfArgs .= '-x ' . $fstype . ' ';
+        }
+        $dfArgs = trim($dfArgs);
+        $param = $dfArgs !== '' ? '-P ' . $dfArgs . ' 2>/dev/null' : '-P 2>/dev/null';
+        $arrResult = $this->server->df($param);
+        foreach ($arrResult as $dev) {
+            $this->info->setDiskDevices($dev);
+        }
     }
 }

@@ -43,7 +43,7 @@ class CServer_Server {
      * @return CServer_Storage
      */
     public function storage() {
-        return CServer_Storage::instance($this->ssh);
+        return new CServer_Storage($this);
     }
 
     /**

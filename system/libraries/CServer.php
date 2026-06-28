@@ -14,8 +14,23 @@ class CServer {
      */
     const ARRAY_EXP = '/^return array \([^;]*\);$/';
 
+
+    /**
+     * @param null|CRemote_SSH|CRemote_SSH_Config $sshConfig
+     *
+     * @return CServer_Server
+     */
+    public static function server($sshConfig = null) {
+        return new CServer_Server($sshConfig);
+    }
+
+    /**
+     * @param null|CRemote_SSH|CRemote_SSH_Config $sshConfig
+     *
+     * @return CServer_Storage
+     */
     public static function storage($sshConfig = null) {
-        return CServer_Storage::instance($sshConfig);
+        return self::server($sshConfig)->storage();
     }
 
     public static function php($sshConfig = null) {
@@ -47,8 +62,13 @@ class CServer {
         return CServer_Command::instance($sshConfig);
     }
 
-    public static function config() {
-        return CServer_Config::instance();
+    /**
+     * @param null|CRemote_SSH|CRemote_SSH_Config $sshConfig
+     *
+     * @return CServer_Config
+     */
+    public static function config($sshConfig = null) {
+        return self::server($sshConfig)->config();
     }
 
     public static function phpInfo() {
