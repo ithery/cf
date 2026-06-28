@@ -57,12 +57,17 @@ final class CServer_PhpInfo {
      * @return \CCollection
      */
     public function toCollection($filter = Filter::ALL) {
-        ob_start();
-        phpinfo($filter);
+        if ($this->server->isRemote()) {
+            $html = trim($this->server->runCommand($this->server->php()->getPhpBinary() . ' -r "phpinfo(' . $filter . ');"'));
+        } else {
+            ob_start();
+            phpinfo($filter);
+            $html = ob_get_clean();
+        }
 
         $phpinfo = ['phpinfo' => c::collect()];
 
-        if (preg_match_all('#(?:<h2>(?:<a name=".*?">)?(.*?)(?:</a>)?</h2>)|(?:<tr(?: class=".*?")?><t[hd](?: class=".*?")?>(.*?)\s*</t[hd]>(?:<t[hd](?: class=".*?")?>(.*?)\s*</t[hd]>(?:<t[hd](?: class=".*?")?>(.*?)\s*</t[hd]>)?)?</tr>)#s', ob_get_clean(), $matches, PREG_SET_ORDER)) {
+        if (preg_match_all('#(?:<h2>(?:<a name=".*?">)?(.*?)(?:</a>)?</h2>)|(?:<tr(?: class=".*?")?><t[hd](?: class=".*?")?>(.*?)\s*</t[hd]>(?:<t[hd](?: class=".*?")?>(.*?)\s*</t[hd]>(?:<t[hd](?: class=".*?")?>(.*?)\s*</t[hd]>)?)?</tr>)#s', $html, $matches, PREG_SET_ORDER)) {
             c::collect($matches)->each(function ($match) use (&$phpinfo) {
                 if (strlen($match[1])) {
                     $phpinfo[$match[1]] = c::collect();
