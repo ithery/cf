@@ -6,55 +6,54 @@ class CServer_Memory_OS_Darwin extends CServer_Memory_OS_Linux {
     use CServer_Trait_OS_Darwin;
 
     /**
-     * Get memory and swap information.
-     *
      * @return void
      */
     public function buildMemory() {
-        $cmd = $this->createCommand();
+        $pstat = '';
         $s = $this->grabkey('hw.memsize');
-        if ($cmd->executeProgram('vm_stat', '', $pstat, CServer::config()->isDebug())) {
-            // calculate free memory from page sizes (each page = 4096)
-            if (preg_match('/^Pages free:\s+(\S+)/m', $pstat, $free_buf)) {
-                if (preg_match('/^Anonymous pages:\s+(\S+)/m', $pstat, $anon_buf) && preg_match('/^Pages wired down:\s+(\S+)/m', $pstat, $wire_buf) && preg_match('/^File-backed pages:\s+(\S+)/m', $pstat, $fileb_buf)) {
-                    // OS X 10.9 or never
-                    $this->info->setMemFree($free_buf[1] * 4 * 1024);
-                    $this->info->setMemApplication(($anon_buf[1] + $wire_buf[1]) * 4 * 1024);
-                    $this->info->setMemCache($fileb_buf[1] * 4 * 1024);
-                    if (preg_match('/^Pages occupied by compressor:\s+(\S+)/m', $pstat, $compr_buf)) {
-                        $this->info->setMemBuffer($compr_buf[1] * 4 * 1024);
+        if ($this->server->executeProgram('vm_stat', '', $pstat, $this->server->config()->isDebug())) {
+            if (preg_match('/^Pages free:\s+(\S+)/m', $pstat, $freeBuf)) {
+                if (preg_match('/^Anonymous pages:\s+(\S+)/m', $pstat, $anonBuf) && preg_match('/^Pages wired down:\s+(\S+)/m', $pstat, $wireBuf) && preg_match('/^File-backed pages:\s+(\S+)/m', $pstat, $filebBuf)) {
+                    $this->info->setMemFree($freeBuf[1] * 4 * 1024);
+                    $this->info->setMemApplication(($anonBuf[1] + $wireBuf[1]) * 4 * 1024);
+                    $this->info->setMemCache($filebBuf[1] * 4 * 1024);
+                    if (preg_match('/^Pages occupied by compressor:\s+(\S+)/m', $pstat, $comprBuf)) {
+                        $this->info->setMemBuffer($comprBuf[1] * 4 * 1024);
                     }
                 } else {
-                    if (preg_match('/^Pages speculative:\s+(\S+)/m', $pstat, $spec_buf)) {
-                        $this->info->setMemFree(($free_buf[1] + $spec_buf[1]) * 4 * 1024);
+                    if (preg_match('/^Pages speculative:\s+(\S+)/m', $pstat, $specBuf)) {
+                        $this->info->setMemFree(($freeBuf[1] + $specBuf[1]) * 4 * 1024);
                     } else {
-                        $this->info->setMemFree($free_buf[1] * 4 * 1024);
+                        $this->info->setMemFree($freeBuf[1] * 4 * 1024);
                     }
                     $appMemory = 0;
-                    if (preg_match('/^Pages wired down:\s+(\S+)/m', $pstat, $wire_buf)) {
-                        $appMemory += $wire_buf[1] * 4 * 1024;
+                    if (preg_match('/^Pages wired down:\s+(\S+)/m', $pstat, $wireBuf)) {
+                        $appMemory += $wireBuf[1] * 4 * 1024;
                     }
-                    if (preg_match('/^Pages active:\s+(\S+)/m', $pstat, $active_buf)) {
-                        $appMemory += $active_buf[1] * 4 * 1024;
+                    if (preg_match('/^Pages active:\s+(\S+)/m', $pstat, $activeBuf)) {
+                        $appMemory += $activeBuf[1] * 4 * 1024;
                     }
-                    $this->sys->setMemApplication($appMemory);
-                    if (preg_match('/^Pages inactive:\s+(\S+)/m', $pstat, $inactive_buf)) {
-                        $this->sys->setMemCache($inactive_buf[1] * 4 * 1024);
+                    $this->info->setMemApplication($appMemory);
+                    if (preg_match('/^Pages inactive:\s+(\S+)/m', $pstat, $inactiveBuf)) {
+                        $this->info->setMemCache($inactiveBuf[1] * 4 * 1024);
                     }
                 }
             } else {
                 $lines = preg_split("/\n/", $pstat, -1, PREG_SPLIT_NO_EMPTY);
-                $ar_buf = preg_split("/\s+/", $lines[1], 19);
-                $this->info->setMemFree($ar_buf[2] * 4 * 1024);
+                $parts = preg_split("/\s+/", $lines[1], 19);
+                $this->info->setMemFree($parts[2] * 4 * 1024);
             }
             $this->info->setMemTotal($s);
             $this->info->setMemUsed($this->info->getMemTotal() - $this->info->getMemFree());
         }
     }
 
+    /**
+     * @return void
+     */
     public function buildSwap() {
-        $cmd = $this->createCommand();
-        if ($cmd->executeProgram('sysctl', 'vm.swapusage | colrm 1 22', $swapBuff, CServer::config()->isDebug())) {
+        $swapBuff = '';
+        if ($this->server->executeProgram('sysctl', 'vm.swapusage | colrm 1 22', $swapBuff, $this->server->config()->isDebug())) {
             $swap1 = preg_split('/M/', $swapBuff);
             $swap2 = preg_split('/=/', $swap1[1]);
             $swap3 = preg_split('/=/', $swap1[2]);

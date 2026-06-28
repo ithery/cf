@@ -14,6 +14,11 @@ class CServer_Memory {
     protected $info;
 
     /**
+     * @var CServer_Memory_OS
+     */
+    protected $os;
+
+    /**
      * @var bool
      */
     protected $memoryBuilt = false;
@@ -29,6 +34,9 @@ class CServer_Memory {
     public function __construct(CServer_Server $server) {
         $this->server = $server;
         $this->info = new CServer_Memory_Info();
+        $osName = $server->getOS();
+        $osClass = 'CServer_Memory_OS_' . $osName;
+        $this->os = new $osClass($server, $this->info);
     }
 
     /**
@@ -41,56 +49,20 @@ class CServer_Memory {
     /**
      * @return void
      */
-    protected function buildMemory() {
-        if ($this->memoryBuilt) {
-            return;
-        }
-        $this->memoryBuilt = true;
-
-        $mbuf = '';
-        if ($this->server->rfts('/proc/meminfo', $mbuf)) {
-            $lines = preg_split("/\n/", $mbuf, -1, PREG_SPLIT_NO_EMPTY);
-            foreach ($lines as $line) {
-                if (preg_match('/^MemTotal:\s+(\d+)\s*kB/i', $line, $m)) {
-                    $this->info->setMemTotal($m[1] * 1024);
-                } elseif (preg_match('/^MemFree:\s+(\d+)\s*kB/i', $line, $m)) {
-                    $this->info->setMemFree($m[1] * 1024);
-                } elseif (preg_match('/^Cached:\s+(\d+)\s*kB/i', $line, $m)) {
-                    $this->info->setMemCache($m[1] * 1024);
-                } elseif (preg_match('/^Buffers:\s+(\d+)\s*kB/i', $line, $m)) {
-                    $this->info->setMemBuffer($m[1] * 1024);
-                }
-            }
-            $this->info->setMemUsed($this->info->getMemTotal() - $this->info->getMemFree());
-            if ($this->info->getMemCache() !== null && $this->info->getMemBuffer() !== null) {
-                $this->info->setMemApplication($this->info->getMemUsed() - $this->info->getMemCache() - $this->info->getMemBuffer());
-            }
+    protected function ensureMemoryBuilt() {
+        if (!$this->memoryBuilt) {
+            $this->memoryBuilt = true;
+            $this->os->buildMemory();
         }
     }
 
     /**
      * @return void
      */
-    protected function buildSwap() {
-        if ($this->swapBuilt) {
-            return;
-        }
-        $this->swapBuilt = true;
-
-        $sbuf = '';
-        if ($this->server->rfts('/proc/swaps', $sbuf, 0, 4096, false)) {
-            $swaps = preg_split("/\n/", $sbuf, -1, PREG_SPLIT_NO_EMPTY);
-            unset($swaps[0]);
-            foreach ($swaps as $swap) {
-                $parts = preg_split('/\s+/', $swap, 5);
-                $dev = CServer_Factory::createDeviceDisk();
-                $dev->setMountPoint($parts[0]);
-                $dev->setName('SWAP');
-                $dev->setTotal($parts[2] * 1024);
-                $dev->setUsed($parts[3] * 1024);
-                $dev->setFree($dev->getTotal() - $dev->getUsed());
-                $this->info->setSwapDevices($dev);
-            }
+    protected function ensureSwapBuilt() {
+        if (!$this->swapBuilt) {
+            $this->swapBuilt = true;
+            $this->os->buildSwap();
         }
     }
 
@@ -98,7 +70,7 @@ class CServer_Memory {
      * @return int
      */
     public function getMemApplication() {
-        $this->buildMemory();
+        $this->ensureMemoryBuilt();
 
         return $this->info->getMemApplication();
     }
@@ -107,7 +79,7 @@ class CServer_Memory {
      * @return int
      */
     public function getMemFree() {
-        $this->buildMemory();
+        $this->ensureMemoryBuilt();
 
         return $this->info->getMemFree();
     }
@@ -116,7 +88,7 @@ class CServer_Memory {
      * @return int
      */
     public function getMemBuffer() {
-        $this->buildMemory();
+        $this->ensureMemoryBuilt();
 
         return $this->info->getMemBuffer();
     }
@@ -125,7 +97,7 @@ class CServer_Memory {
      * @return int
      */
     public function getMemTotal() {
-        $this->buildMemory();
+        $this->ensureMemoryBuilt();
 
         return $this->info->getMemTotal();
     }
@@ -134,7 +106,7 @@ class CServer_Memory {
      * @return int
      */
     public function getMemUsed() {
-        $this->buildMemory();
+        $this->ensureMemoryBuilt();
 
         return $this->info->getMemUsed();
     }
@@ -143,7 +115,7 @@ class CServer_Memory {
      * @return int
      */
     public function getMemCache() {
-        $this->buildMemory();
+        $this->ensureMemoryBuilt();
 
         return $this->info->getMemCache();
     }
@@ -152,7 +124,7 @@ class CServer_Memory {
      * @return float
      */
     public function getMemPercentUsed() {
-        $this->buildMemory();
+        $this->ensureMemoryBuilt();
 
         return $this->info->getMemPercentUsed();
     }
@@ -161,7 +133,7 @@ class CServer_Memory {
      * @return float
      */
     public function getMemPercentBuffer() {
-        $this->buildMemory();
+        $this->ensureMemoryBuilt();
 
         return $this->info->getMemPercentBuffer();
     }
@@ -170,7 +142,7 @@ class CServer_Memory {
      * @return float
      */
     public function getMemPercentApplication() {
-        $this->buildMemory();
+        $this->ensureMemoryBuilt();
 
         return $this->info->getMemPercentApplication();
     }
@@ -179,7 +151,7 @@ class CServer_Memory {
      * @return float
      */
     public function getMemPercentCache() {
-        $this->buildMemory();
+        $this->ensureMemoryBuilt();
 
         return $this->info->getMemPercentCache();
     }
@@ -188,7 +160,7 @@ class CServer_Memory {
      * @return array
      */
     public function getSwapDevices() {
-        $this->buildSwap();
+        $this->ensureSwapBuilt();
 
         return $this->info->getSwapDevices();
     }
@@ -197,7 +169,7 @@ class CServer_Memory {
      * @return int
      */
     public function getSwapFree() {
-        $this->buildSwap();
+        $this->ensureSwapBuilt();
 
         return $this->info->getSwapFree();
     }
@@ -206,7 +178,7 @@ class CServer_Memory {
      * @return float
      */
     public function getSwapPercentUsed() {
-        $this->buildSwap();
+        $this->ensureSwapBuilt();
 
         return $this->info->getSwapPercentUsed();
     }
@@ -215,7 +187,7 @@ class CServer_Memory {
      * @return int
      */
     public function getSwapTotal() {
-        $this->buildSwap();
+        $this->ensureSwapBuilt();
 
         return $this->info->getSwapTotal();
     }
@@ -224,7 +196,7 @@ class CServer_Memory {
      * @return int
      */
     public function getSwapUsed() {
-        $this->buildSwap();
+        $this->ensureSwapBuilt();
 
         return $this->info->getSwapUsed();
     }
