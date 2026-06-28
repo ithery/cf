@@ -181,6 +181,48 @@ public function show($id) {
 
 ---
 
+### Authentication
+
+By default, when `auth.enable` is `true` in `config/app.php`, all pages require login and will redirect unauthenticated users to the login page. To make a page publicly accessible, disable authentication using `setLoginRequired(false)`:
+
+```php
+<?php
+class Controller_Home extends CController {
+    public function index() {
+        $app = c::app();
+        $app->setLoginRequired(false);
+        $app->addView('landing');
+
+        return $app;
+    }
+}
+```
+
+Available methods on `CApp`:
+
+| Method | Description |
+|---|---|
+| `setLoginRequired(false)` | Disable auth check for the current request |
+| `setLoginRequired(true)` | Enable auth check (default when `auth.enable` is `true`) |
+| `disableAuth()` | Alias for `setLoginRequired(false)` |
+| `enableAuth()` | Alias for `setLoginRequired(true)` |
+| `isLoginRequired()` | Check if auth is currently required |
+
+For base controllers that handle multiple public pages, set it in the constructor:
+
+```php
+<?php
+class MyApp_Controller_PublicController extends CController {
+    public function __construct() {
+        parent::__construct();
+
+        c::app()->setLoginRequired(false);
+    }
+}
+```
+
+---
+
 ### Middleware
 
 Register middleware in the controller constructor. Middleware runs before the controller action is executed.
